@@ -142,47 +142,6 @@ public class ArrayTripPattern implements TripPattern, Serializable {
         }
     }
 
-    // based on Arrays.binarySearch source, but always returns a positive int
-    private int findDepartureAfter(int stopIndex, int key) {
-        int low = 0;
-        int high = trips.length - 1;
-        int mid = 0;
-        while (low <= high) {
-            mid = (low + high) >>> 1;
-            final int d = tripTimes[mid].departureTimes[stopIndex];
-            if (d == key)
-                return mid;
-            else if (d > key) 
-                high = mid - 1;
-            else
-                low = ++mid;
-        }
-        return mid;
-    }
-    
-    // based on Arrays.binarySearch source, but always returns a positive int
-    private int findArrivalBefore(int stopIndex, int key) {
-        int low = 0;
-        int high = trips.length - 1;
-        int mid = 0;
-        while (low <= high) {
-            mid = (low + high) >>> 1;
-            final int d; 
-            if (tripTimes[mid].arrivalTimes == null)
-                d = tripTimes[mid].departureTimes[stopIndex + 1]; // handle with instance methods on TripTimes?
-            else
-                d = tripTimes[mid].arrivalTimes[stopIndex];
-            if (d == key) // reverse optimizing depends on finding trips that leave exactly at the given time
-                return mid;
-
-            else if (d > key) 
-                high = --mid; // is this correct ? 
-            else
-                low = mid + 1;
-        }
-        return mid; // 
-    }
-
     public int getNextTrip(int stopIndex, int afterTime, boolean wheelchairAccessible,
             boolean bikesAllowed, boolean pickup) {
         int mask = pickup ? MASK_PICKUP : MASK_DROPOFF;
@@ -193,20 +152,22 @@ public class ArrayTripPattern implements TripPattern, Serializable {
         if (wheelchairAccessible && (perStopFlags[stopIndex] & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
             return -1;
         }
-        int tripIndex = findDepartureAfter(stopIndex, afterTime);
-        if (tripIndex == trips.length) {
-            return -1;
-        }
-        if (wheelchairAccessible || bikesAllowed) {
-            int flags = (bikesAllowed ? FLAG_BIKES_ALLOWED : 0) | (wheelchairAccessible ? FLAG_WHEELCHAIR_ACCESSIBLE : 0);
-            while ((perTripFlags[tripIndex] & flags) == 0) {
-                tripIndex++;
-                if (tripIndex == perTripFlags.length) {
-                    return -1;
-                }
+        TripTimes bestTrip = null;
+        int bestTime = Integer.MAX_VALUE;
+        int bestIndex = -1; // should eventually not be needed
+        int flags = (bikesAllowed ? FLAG_BIKES_ALLOWED : 0) | (wheelchairAccessible ? FLAG_WHEELCHAIR_ACCESSIBLE : 0);
+        // linear search... because trips may change with stoptime updates, we cannot count on them being sorted
+        for (int i = 0; i < trips.length; i++) {
+            TripTimes currTrip = tripTimes[i]; // grab reference in case it is swapped out by an update
+            int currTime = currTrip.getDepartureTime(stopIndex);
+            boolean acceptableTrip = flags == 0 ? true : (perTripFlags[i] & flags) != 0; 
+            if (currTime > afterTime && currTime < bestTime && acceptableTrip) {
+                bestTrip = currTrip;
+                bestTime = currTime;
+                bestIndex = i;
             }
         }
-        return tripIndex;
+        return bestIndex;
     }
 
     public int getPreviousTrip(int stopIndex, int beforeTime, boolean wheelchairAccessible,
@@ -219,20 +180,22 @@ public class ArrayTripPattern implements TripPattern, Serializable {
         if (wheelchairAccessible && (perStopFlags[stopIndex + 1] & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
             return -1;
         }
-        int tripIndex = findArrivalBefore(stopIndex, beforeTime);
-        if (tripIndex == -1) { // passed 0, no trip before the given time
-            return -1;
-        }
-        if (wheelchairAccessible || bikesAllowed) {
-            int flags = (bikesAllowed ? FLAG_BIKES_ALLOWED : 0) | (wheelchairAccessible ? FLAG_WHEELCHAIR_ACCESSIBLE : 0);
-            while ((perTripFlags[tripIndex] & flags) == 0) {
-                tripIndex--;
-                if (tripIndex == -1) {
-                    return -1;
-                }
+        TripTimes bestTrip = null;
+        int bestTime = Integer.MIN_VALUE;
+        int bestIndex = -1; // should eventually not be needed
+        int flags = (bikesAllowed ? FLAG_BIKES_ALLOWED : 0) | (wheelchairAccessible ? FLAG_WHEELCHAIR_ACCESSIBLE : 0);
+        // linear search... because trips may change with stoptime updates, we cannot count on them being sorted
+        for (int i = 0; i < trips.length; i++) {
+            TripTimes currTrip = tripTimes[i]; // grab reference in case it is swapped out by an update
+            int currTime = currTrip.getDepartureTime(stopIndex);
+            boolean acceptableTrip = flags == 0 ? true : (perTripFlags[i] & flags) != 0; 
+            if (currTime < beforeTime && currTime > bestTime && acceptableTrip) {
+                bestTrip = currTrip;
+                bestTime = currTime;
+                bestIndex = i;
             }
         }
-        return tripIndex;
+        return bestIndex;
     }
 
     public int getDepartureTime(int hop, int trip) {
