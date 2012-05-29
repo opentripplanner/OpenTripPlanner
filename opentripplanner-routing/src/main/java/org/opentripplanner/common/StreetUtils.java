@@ -208,6 +208,7 @@ public class StreetUtils {
                     PlainStreetEdge pse = (PlainStreetEdge) e;
                     StreetTraversalPermission permission = pse.getPermission();
                     permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
+                    permission = permission.remove(StreetTraversalPermission.BICYCLE);
                     if (permission == StreetTraversalPermission.NONE) {
                         pse.detach();
                     } else {
@@ -219,6 +220,7 @@ public class StreetUtils {
                     TurnEdge turn = (TurnEdge) e;
                     StreetTraversalPermission permission = turn.getPermission();
                     permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
+                    permission = permission.remove(StreetTraversalPermission.BICYCLE);
                     if (permission == StreetTraversalPermission.NONE) {
                         turn.detach();
                     } else {
