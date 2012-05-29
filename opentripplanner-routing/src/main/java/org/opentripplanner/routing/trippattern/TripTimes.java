@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.edgetype;
+package org.opentripplanner.routing.trippattern;
 
 import java.io.Serializable;
 import java.util.List;
@@ -23,9 +23,9 @@ public class TripTimes implements Serializable {
 
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
-    protected final Trip trip;
+    public final Trip trip;
 
-    protected final int index; // this is kind of ugly, but the headsigns are in the pattern not here
+    public final int index; // this is kind of ugly, but the headsigns are in the pattern not here
     
     @XmlElement
     protected int[] departureTimes;

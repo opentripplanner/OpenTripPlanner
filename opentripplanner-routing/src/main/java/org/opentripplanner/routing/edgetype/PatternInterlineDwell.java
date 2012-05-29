@@ -26,6 +26,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.trippattern.TripPattern;
 import org.opentripplanner.routing.vertextype.OnboardVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

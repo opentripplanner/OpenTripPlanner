@@ -16,8 +16,8 @@ package org.opentripplanner.routing.vertextype;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.trippattern.TripPattern;
 
 public class PatternArriveVertex extends PatternStopVertex {
 

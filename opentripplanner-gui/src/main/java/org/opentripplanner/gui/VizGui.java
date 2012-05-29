@@ -68,7 +68,6 @@ import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
-import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -78,6 +77,7 @@ import org.opentripplanner.routing.impl.GraphServiceImpl;
 import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.trippattern.TripPattern;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
