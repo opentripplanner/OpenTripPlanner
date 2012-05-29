@@ -23,6 +23,8 @@ public class PatternDepartVertex extends PatternStopVertex {
 
     private static final long serialVersionUID = -1458696615022789418L;
 
+    // stop could be pulled from pattern?
+    
     // constructor for multi-trip trip patterns
     public PatternDepartVertex(Graph g, TripPattern tripPattern, StopTime stopTime) {
         super(g, makeLabel(tripPattern.getExemplar(), stopTime), tripPattern, stopTime.getStop());

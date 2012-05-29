@@ -15,9 +15,7 @@ package org.opentripplanner.routing.edgetype;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.RoutingRequest;
 

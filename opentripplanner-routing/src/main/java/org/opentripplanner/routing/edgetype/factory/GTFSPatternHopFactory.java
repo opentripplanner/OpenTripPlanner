@@ -62,6 +62,7 @@ import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
+import org.opentripplanner.routing.edgetype.ScheduledStopPattern;
 import org.opentripplanner.routing.edgetype.TimedTransferEdge;
 import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
@@ -88,58 +89,6 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.linearref.LinearLocation;
 import com.vividsolutions.jts.linearref.LocationIndexedLine;
-
-/**
- * 
- * A ScheduledStopPattern is an intermediate object used when processing GTFS files. It represents an ordered
- * list of stops and a service ID. Any two trips with the same stops in the same order, and that
- * operate on the same days, can be combined using a TripPattern to save memory.
- */
-
-class ScheduledStopPattern {
-    ArrayList<Stop> stops;
-    ArrayList<Integer> pickups;
-    ArrayList<Integer> dropoffs;
-
-    AgencyAndId calendarId;
-
-    public ScheduledStopPattern(ArrayList<Stop> stops, ArrayList<Integer> pickups, ArrayList<Integer> dropoffs, AgencyAndId calendarId) {
-        this.stops = stops;
-        this.pickups = pickups;
-        this.dropoffs = dropoffs;
-        this.calendarId = calendarId;
-    }
-
-    public boolean equals(Object other) {
-        if (other instanceof ScheduledStopPattern) {
-            ScheduledStopPattern pattern = (ScheduledStopPattern) other;
-            return pattern.stops.equals(stops) && pattern.calendarId.equals(calendarId) && pattern.pickups.equals(pickups) && pattern.dropoffs.equals(dropoffs);
-        } else {
-            return false;
-        }
-    }
-
-    public int hashCode() {
-        return this.stops.hashCode() ^ this.calendarId.hashCode() + this.pickups.hashCode() + this.dropoffs.hashCode();
-    }
-
-    public String toString() {
-        return "StopPattern(" + stops + ", " + calendarId + ")";
-    }
-    
-    public static ScheduledStopPattern fromTrip(Trip trip, GtfsRelationalDao dao) {
-        ArrayList<Stop> stops = new ArrayList<Stop>();
-        ArrayList<Integer> pickups = new ArrayList<Integer>();
-        ArrayList<Integer> dropoffs = new ArrayList<Integer>();
-        for (StopTime stoptime : dao.getStopTimesForTrip(trip)) {
-            stops.add(stoptime.getStop());
-            pickups.add(stoptime.getPickupType());
-            dropoffs.add(stoptime.getDropOffType());
-        }
-        return new ScheduledStopPattern(stops, pickups, dropoffs, trip.getServiceId());
-    }
-
-}
 
 class InterliningTrip  implements Comparable<InterliningTrip> {
     public Trip trip;
@@ -386,7 +335,7 @@ public class GTFSPatternHopFactory {
             ArrayTripPattern tripPattern = patterns.get(stopPattern);
             if (tripPattern == null) {
                 // it's the first time we are encountering this stops+pickups+serviceId combination
-                tripPattern = new ArrayTripPattern(trip);
+                tripPattern = new ArrayTripPattern(trip, stopPattern);
                 makePatternVerticesAndEdges(graph, tripPattern, trip, stopTimes);
                 patterns.put(stopPattern, tripPattern);
             } 
@@ -401,8 +350,9 @@ public class GTFSPatternHopFactory {
 
         /* link up interlined trips (where a vehicle continues on to another logical trip) */
         for (List<InterliningTrip> blockTrips : tripsForBlock.values()) {
-            if (blockTrips.size() == 1) { // skip blocks of only a single trip
-                continue;
+
+            if (blockTrips.size() == 1) { 
+                continue; // skip blocks of only a single trip
             }
             Collections.sort(blockTrips); // sort trips within the block by first arrival time 
             
@@ -429,11 +379,12 @@ public class GTFSPatternHopFactory {
                 Trip toExemplar = toInterlineTrip.tripPattern.exemplar;
 
                 // make a key representing all interline dwells between these same vertices
-                InterlineSwitchoverKey dwellKey = new InterlineSwitchoverKey(s0, s1,
-                        fromInterlineTrip.tripPattern, toInterlineTrip.tripPattern);
+                InterlineSwitchoverKey dwellKey = new InterlineSwitchoverKey(
+                        s0, s1, fromInterlineTrip.tripPattern, toInterlineTrip.tripPattern);
                 // do we already have a PatternInterlineDwell edge for this dwell?
                 PatternInterlineDwell dwell = getInterlineDwell(dwellKey);
-                if (dwell == null) { // create the dwell because it does not exist yet
+                if (dwell == null) { 
+                    // create the dwell because it does not exist yet
                     Vertex startJourney = patternArriveNodes.get(new T2<Stop, Trip>(s0, fromExemplar));
                     Vertex endJourney = patternDepartNodes.get(new T2<Stop, Trip>(s1, toExemplar));
                     // toTrip is just an exemplar; dwell edges can contain many trip connections
@@ -444,10 +395,10 @@ public class GTFSPatternHopFactory {
                 dwell.addTrip(fromTrip.getId(), toTrip.getId(), dwellTime,
                         fromInterlineTrip.getPatternIndex(), toInterlineTrip.getPatternIndex());
             }
-        } // END loop over interline blocks 
+        } // END loop over interlining blocks 
         
         loadTransfers(graph);
-        deleteUselessDwells(graph);
+//        deleteUselessDwells(graph);
         clearCachedData();
         graph.putService(FareService.class, fareServiceFactory.makeFareService());
     }
@@ -787,8 +738,8 @@ public class GTFSPatternHopFactory {
      * The first time a particular ScheduledStopPattern (stops+pickups+serviceId combination) 
      * is encountered, an empty tripPattern object is created to hold the schedule information. This
      * method creates the corresponding PatternStop vertices and PatternBoard/Hop/Alight edges.
-     * Trips will be added to the tripPattern later; StopTimes are passed in instead of stops 
-     * because they are needed for shape distances.
+     * StopTimes are passed in instead of Stops only because they are needed for shape distances.
+     * Trips will be added to the tripPattern later.
      */
     private void makePatternVerticesAndEdges(Graph graph, TripPattern tripPattern, 
             Trip trip, List<StopTime> stopTimes) {

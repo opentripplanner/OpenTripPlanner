@@ -18,20 +18,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
-import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
-import org.opentripplanner.routing.edgetype.factory.TripOvertakingException;
 
 /**
  * A memory-efficient implementation of TripPattern
@@ -42,41 +36,58 @@ public class ArrayTripPattern implements TripPattern, Serializable {
 
     public final Trip exemplar;
 
-    private String[][] headsigns;
+    // override trip_headsign with stop_headsign where necessary
+    private final List<List<String>> headsigns = new ArrayList<List<String>>();
 
     private final ArrayList<TripTimes> tripTimes = new ArrayList<TripTimes>();
 
-    @XmlElement
-    private String[] zones;
-
-    @XmlElement
-    private final ArrayList<Integer> perTripFlags = new ArrayList<Integer>();
-
-    @XmlElement
-    private int[] perStopFlags;
+//    @XmlElement
+//    private final ArrayList<Integer> perTripFlags = new ArrayList<Integer>();
 
     private final ArrayList<Trip> trips = new ArrayList<Trip>();
 
+    // all trips in pattern have the same number of stops, can use arrays
+    public Stop[] stops; 
+
+    @XmlElement
+    private int[] perStopFlags;
+    
+    //@XmlElement
+    //private String[] zones; // use stops instead
+
     int bestRunningTimes[];
-
+    
     int bestDwellTimes[];
-
-    public ArrayTripPattern(Trip exemplar) { //ScheduledStopPattern stopPattern) {
+    
+    public ArrayTripPattern(Trip exemplar, ScheduledStopPattern stopPattern) {
         this.exemplar = exemplar;
+        setStopsFromStopPattern(stopPattern);
     }
 
-    public void setStopFlags(int trip, int flags) {
-        perStopFlags[trip] = flags;
+    public void setStopsFromStopPattern(ScheduledStopPattern stopPattern) {
+        this.stops = new Stop[stopPattern.stops.size()];
+        perStopFlags = new int[stops.length];
+        int i = 0;
+        for (Stop stop : stopPattern.stops) {
+            this.stops[i] = stop;
+            if (stop.getWheelchairBoarding() == 1) {
+                perStopFlags[i] |= FLAG_WHEELCHAIR_ACCESSIBLE;
+            }
+            perStopFlags[i] |= stopPattern.pickups.get(i) << SHIFT_PICKUP;
+            perStopFlags[i] |= stopPattern.dropoffs.get(i) << SHIFT_DROPOFF;
+            ++i;
+        }
     }
 
     // finish off the pattern once all times have been added 
-    // maybe trim arrays too
-    public void finalize() {
-        this.zones = zones;
-        this.perStopFlags = perStopFlags;
+    // cache running times and dwell times; maybe trim arrays too
+    public void finish() {
+        int nHops = stops.length - 1;
+        int nTrips = trips.size();
         this.bestRunningTimes = new int[nHops];
-        this.bestDwellTimes = nullArrivals ? null : new int[nHops];
+        boolean nullArrivals = false; // TODO: should scan through triptimes?
         if ( ! nullArrivals) {
+            this.bestDwellTimes = new int[nHops];
             for (int h = 1; h < nHops; ++h) { // dwell time is undefined on first hop
                 bestDwellTimes[h] = Integer.MAX_VALUE;
                 for (int t = 0; t < nTrips; ++t) {
@@ -91,64 +102,49 @@ public class ArrayTripPattern implements TripPattern, Serializable {
         // because when there are no arrivals array, the last departure is actually used for an arrival 
         for (int h = 0; h < nHops; ++h) {
             bestRunningTimes[h] = Integer.MAX_VALUE;
-            for (int t = 0; t < nTrips; ++t) { // iterate over trip times
+            for (int t = 0; t < nTrips; ++t) { 
                 int rt = this.getRunningTime(h, t);
                 if (bestRunningTimes[h] > rt) {
                     bestRunningTimes[h] = rt;
                 }
             }
         }
-        if (headsigns != null) { 
-            // DO NOT transpose headsigns to allow repeating empty rows
-            this.headsigns = new String[nHops][nTrips]; 
-            String[] nullRow = null; 
-            // headsigns contains 1 less headsign than there are stops, because sign change is pointless at the last stop
-            for (int s = 0; s < nHops; ++s) { 
-                boolean rowIsNull = true;
-                for (int t = 0; t < headsigns[s].size(); ++t) {
-                    this.headsigns[s][t] = headsigns[s].get(t); 
-                    if (this.headsigns[s][t] != null) {
-                        rowIsNull = false; 
-                    }
-                }
-                if (rowIsNull) {
-                    // repeat the same row object when empty row encountered
-                    if (nullRow == null) {
-                        nullRow = this.headsigns[s];
-                    } else {
-                        this.headsigns[s] = nullRow;
-                    }
-                }
-            }
-        }
-        
+    }
+    
+    public Boolean tripAcceptable(Trip trip, boolean bicycle, boolean wheelchair) {
+        boolean result = true;
+        if (bicycle)
+            result &= trip.getWheelchairAccessible() == 1;
+        if (wheelchair)
+            result &= trip.getTripBikesAllowed() == 2 ||
+            (trip.getRoute().getBikesAllowed() == 2 && trip.getTripBikesAllowed() != 1); 
+        return result;
     }
     
     @Override
     public TripTimes getNextTrip(int stopIndex, int afterTime, RoutingRequest options) {
         boolean pickup = true;
-        boolean wheelchairAccessible = options.wheelchairAccessible;
-        boolean bikesAllowed = options.modes.getBicycle();
-        
         int mask = pickup ? MASK_PICKUP : MASK_DROPOFF;
         int shift = pickup ? SHIFT_PICKUP : SHIFT_DROPOFF;
         if ((perStopFlags[stopIndex] & mask) >> shift == NO_PICKUP) {
             return null;
         }
-        if (wheelchairAccessible && (perStopFlags[stopIndex] & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
+        boolean wheelchair = options.wheelchairAccessible;
+        boolean bicycle = options.modes.getBicycle();
+        if (wheelchair && (perStopFlags[stopIndex] & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
             return null;
         }
+        // linear search:
+        // because trips may change with stoptime updates, we cannot count on them being sorted
         TripTimes bestTrip = null;
         int bestTime = Integer.MAX_VALUE;
-        int flags = (bikesAllowed ? FLAG_BIKES_ALLOWED : 0) | (wheelchairAccessible ? FLAG_WHEELCHAIR_ACCESSIBLE : 0);
-        // linear search... because trips may change with stoptime updates, we cannot count on them being sorted
         for (int i = 0; i < trips.size(); i++) {
-            // grab a reference in case it is swapped out by an update
+            // grab a reference before tests in case it is swapped out by an update thread
             TripTimes currTrip = tripTimes.get(i); 
             int currTime = currTrip.getDepartureTime(stopIndex);
-            boolean acceptableTrip = flags == 0 ? true : (perTripFlags.get(i) & flags) != 0; 
-            if (currTime > afterTime && currTime < bestTime && acceptableTrip && 
-                ! options.bannedTrips.contains(trips.get(i).getId())) {
+            if (currTime > afterTime && currTime < bestTime && 
+                    tripAcceptable(currTrip.trip, bicycle, wheelchair) && 
+                    ! options.bannedTrips.contains(trips.get(i).getId())) {
                 bestTrip = currTrip;
                 bestTime = currTime;
             }
@@ -159,33 +155,36 @@ public class ArrayTripPattern implements TripPattern, Serializable {
     @Override
     public TripTimes getPreviousTrip(int stopIndex, int beforeTime, RoutingRequest options) {
         boolean pickup = false;
-        boolean wheelchairAccessible = options.wheelchairAccessible;
-        boolean bikesAllowed = options.modes.getBicycle();
-
         int mask = pickup ? MASK_PICKUP : MASK_DROPOFF;
         int shift = pickup ? SHIFT_PICKUP : SHIFT_DROPOFF;
         if ((perStopFlags[stopIndex + 1] & mask) >> shift == NO_PICKUP) {
             return null;
         }
-        if (wheelchairAccessible && (perStopFlags[stopIndex + 1] & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
+        boolean wheelchair = options.wheelchairAccessible;
+        boolean bicycle = options.modes.getBicycle();
+        if (wheelchair && (perStopFlags[stopIndex + 1] & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
             return null;
         }
+        // linear search:
+        // because trips may change with stoptime updates, we cannot count on them being sorted
         TripTimes bestTrip = null;
         int bestTime = Integer.MIN_VALUE;
-        int flags = (bikesAllowed ? FLAG_BIKES_ALLOWED : 0) | (wheelchairAccessible ? FLAG_WHEELCHAIR_ACCESSIBLE : 0);
-        // linear search... because trips may change with stoptime updates, we cannot count on them being sorted
         for (int i = 0; i < trips.size(); i++) {
-            // grab reference in case it is swapped out by an update
+            // grab a reference before tests in case it is swapped out by an update thread
             TripTimes currTrip = tripTimes.get(i); 
-            int currTime = currTrip.getDepartureTime(stopIndex);
-            boolean acceptableTrip = flags == 0 ? true : (perTripFlags.get(i) & flags) != 0; 
-            if (currTime < beforeTime && currTime > bestTime && acceptableTrip &&
-                ! options.bannedTrips.contains(trips.get(i).getId())) {
+            int currTime = currTrip.getArrivalTime(stopIndex);
+            if (currTime < beforeTime && currTime > bestTime && 
+                    tripAcceptable(currTrip.trip, bicycle, wheelchair) &&
+                    ! options.bannedTrips.contains(trips.get(i).getId())) {
                 bestTrip = currTrip;
                 bestTime = currTime;
             }
         }
         return bestTrip;
+    }
+    
+    public List<Stop> getStops() {
+        return Arrays.asList(stops);
     }
 
     public int getDepartureTime(int hop, int trip) {
@@ -209,18 +208,21 @@ public class ArrayTripPattern implements TripPattern, Serializable {
         return new DeparturesIterator(stopIndex);
     }
 
+    // SEEMS UNUSED
     public boolean getWheelchairAccessible(int stopIndex, int trip) {
-        if ((perStopFlags[stopIndex] & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
-            return false;
-        }
-        if ((perTripFlags.get(trip) & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
-            return false;
-        }
+//        if ((perStopFlags[stopIndex] & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
+//            return false;
+//        }
+//        if ((perTripFlags.get(trip) & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
+//            return false;
+//        }
         return true;
     }
 
+    // SEEMS UNUSED
     public boolean getBikesAllowed(int trip) {
-        return (perTripFlags.get(trip) & FLAG_BIKES_ALLOWED) != 0;
+//        return (perTripFlags.get(trip) & FLAG_BIKES_ALLOWED) != 0;
+        return true;
     }
 
     public Trip getTrip(int tripIndex) {
@@ -245,7 +247,8 @@ public class ArrayTripPattern implements TripPattern, Serializable {
     }
 
     public String getZone(int stopIndex) {
-        return zones[stopIndex];
+        //return zones[stopIndex];
+        return stops[stopIndex].getZoneId();
     }
 
     @Override
@@ -271,7 +274,7 @@ public class ArrayTripPattern implements TripPattern, Serializable {
         if (headsigns == null) {
             return null;
         }
-        return headsigns[stopIndex][trip];
+        return headsigns.get(trip).get(stopIndex);
     }
 
     @Override
@@ -318,14 +321,49 @@ public class ArrayTripPattern implements TripPattern, Serializable {
 
     public void addTrip(Trip trip, List<StopTime> stopTimes) {
         // TODO: double-check that the stops and pickup/dropoffs are right for this trip
-        int index = tripTimes.size();
-        tripTimes.add(new TripTimes(trip, index, stopTimes));
+        int nextIndex = tripTimes.size();
+        tripTimes.add(new TripTimes(trip, nextIndex, stopTimes));
         trips.add(trip);
-        // this could be replaced with reading directly from the Trip object in TripTimes
-        perTripFlags.add(
-                (trip.getWheelchairAccessible() == 1 ? TripPattern.FLAG_WHEELCHAIR_ACCESSIBLE : 0)
-                | 
-                (((trip.getRoute().getBikesAllowed() == 2 && trip.getTripBikesAllowed() != 1) 
-                || trip.getTripBikesAllowed() == 2) ? TripPattern.FLAG_BIKES_ALLOWED : 0));
+        
+        // stoptimes can have headsign info that overrides the trip's headsign
+        ArrayList<String> headsigns = new ArrayList<String>();
+        boolean allHeadsignsNull = true;
+        for (StopTime st : stopTimes) {
+            String headsign = st.getStopHeadsign();
+            if (headsign != null)
+                allHeadsignsNull = false;
+            headsigns.add(headsign);
+        }
+        if (allHeadsignsNull)
+            headsigns = null;
+        this.headsigns.add(headsigns);
+        // stoptimes should be transposed later and compacted with reused arrays
+        // 1x1 array should always return the same headsign to allow for no change 
     }
+    
+//    
+//    if (headsigns != null) { 
+//        // DO NOT transpose headsigns to allow reusing rows
+//        this.headsigns = new String[nHops][nTrips]; 
+//        String[] nullRow = null; 
+//        // headsigns contains 1 less headsign than there are stops, because sign change is pointless at the last stop
+//        for (int s = 0; s < nHops; ++s) { 
+//            boolean rowIsNull = true;
+//            for (int t = 0; t < headsigns[s].size(); ++t) {
+//                this.headsigns[s][t] = headsigns[s].get(t); 
+//                if (this.headsigns[s][t] != null) {
+//                    rowIsNull = false; 
+//                }
+//            }
+//            if (rowIsNull) {
+//                // repeat the same row object when empty row encountered
+//                if (nullRow == null) {
+//                    nullRow = this.headsigns[s];
+//                } else {
+//                    this.headsigns[s] = nullRow;
+//                }
+//            }
+//        }
+//    }
+
 }

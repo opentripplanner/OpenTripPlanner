@@ -66,10 +66,6 @@ public class TripTimes implements Serializable {
         return arrivalTimes[hop];
     }
 
-    public Trip getTrip() {
-        return trip;
-    }
-
     public int getRunningTime(int stopIndex) {
         return getArrivalTime(stopIndex) - getDepartureTime(stopIndex);
     }
@@ -81,6 +77,15 @@ public class TripTimes implements Serializable {
         int arrivalTime = getArrivalTime(hop-1);
         int departureTime = getDepartureTime(hop);
         return departureTime - arrivalTime;
+    }
+    
+    public Trip getTrip() {
+        return trip;
+    }
+
+    // replace arrivals array with null when arrivals and departures are equal
+    public boolean compact() {
+        return true;
     }
     
 }
