@@ -20,6 +20,7 @@ import java.util.List;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.automata.AutomatonState;
 import org.opentripplanner.routing.edgetype.FreeEdge;
+import org.opentripplanner.routing.edgetype.TripTimes;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.patch.NoteNarrative;
@@ -250,9 +251,9 @@ public class StateEditor {
 
     /* Basic Setters */
 
-    public void setTrip(int trip) {
+    public void setTripTimes(TripTimes tripTimes) {
         cloneStateDataAsNeeded();
-        child.stateData.trip = trip;
+        child.stateData.tripTimes = tripTimes;
     }
 
     public void setTripId(AgencyAndId tripId) {
@@ -335,7 +336,7 @@ public class StateEditor {
     public void setFromState(State state) {
         cloneStateDataAsNeeded();
         child.stateData.route = state.stateData.route;
-        child.stateData.trip = state.stateData.trip;
+        child.stateData.tripTimes = state.stateData.tripTimes;
         child.stateData.tripId = state.stateData.tripId;
         child.stateData.zone = state.stateData.zone;
         child.stateData.extensions = state.stateData.extensions;
@@ -359,10 +360,6 @@ public class StateEditor {
 
     public long getElapsedTime() {
         return child.getElapsedTime();
-    }
-
-    public int getTrip() {
-        return child.getTrip();
     }
 
     public AgencyAndId getTripId() {

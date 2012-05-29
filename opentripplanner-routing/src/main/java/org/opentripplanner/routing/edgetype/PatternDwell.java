@@ -58,9 +58,10 @@ public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnB
     }
 
     public State traverse(State state0) {
-        int trip = state0.getTrip();
-        int dwellTime = pattern.getDwellTime(stopIndex, trip);
-        EdgeNarrative en = new TransitNarrative(pattern.getTrip(trip), pattern.getHeadsign(stopIndex, trip), this);
+        //int trip = state0.getTrip();
+        TripTimes tripTimes = state0.getTripTimes();
+        int dwellTime = tripTimes.getDwellTime(stopIndex);
+        EdgeNarrative en = new TransitNarrative(tripTimes.trip, pattern.getHeadsign(stopIndex, tripTimes.index), this);
         StateEditor s1 = state0.edit(this, en);
         s1.incrementTimeInSeconds(dwellTime);
         s1.incrementWeight(dwellTime);

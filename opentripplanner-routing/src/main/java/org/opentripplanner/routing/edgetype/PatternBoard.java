@@ -87,8 +87,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             if (state0.getBackEdge() instanceof PatternAlight) {
                 return null;
             }
-            Trip trip = pattern.getTrip(state0.getTrip());
-            EdgeNarrative en = new TransitNarrative(trip, this);
+            EdgeNarrative en = new TransitNarrative(state0.getTripTimes().trip, this);
             StateEditor s1 = state0.edit(this, en);
             int type = pattern.getBoardType(stopIndex);
             if (TransitUtils.handleBoardAlightType(s1, type)) {
@@ -111,7 +110,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
              */
             long current_time = state0.getTime();
             int bestWait = -1;
-            int bestPatternIndex = -1;
+            TripTimes bestTripTimes = null;
             AgencyAndId serviceId = getPattern().getExemplar().getServiceId();
             SD: for (ServiceDay sd : rctx.serviceDays) {
                 int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
@@ -120,18 +119,16 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
                 if (secondsSinceMidnight < 0)
                     continue;
                 if (sd.serviceIdRunning(serviceId)) {
-                    int patternIndex = getPattern().getNextTrip(stopIndex, secondsSinceMidnight, options);
-                    if (patternIndex >= 0) {
-                        Trip trip = pattern.getTrip(patternIndex);
+                    TripTimes tripTimes = getPattern().getNextTrip(stopIndex, secondsSinceMidnight, options);
+                    if (tripTimes != null) {
                         // a trip was found, index is valid, wait will be non-negative
-                        int wait = (int) (sd.time(pattern.getDepartureTime(stopIndex,
-                                patternIndex)) - current_time);
+                        int wait = (int) (sd.time(tripTimes.getDepartureTime(stopIndex)) - current_time);
                         if (wait < 0)
                             _log.error("negative wait time on board");
                         if (bestWait < 0 || wait < bestWait) {
                             // track the soonest departure over all relevant schedules
                             bestWait = wait;
-                            bestPatternIndex = patternIndex;
+                            bestTripTimes = tripTimes;
                         }
                     }
                 }
@@ -139,7 +136,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             if (bestWait < 0) {
                 return null;
             }
-            Trip trip = getPattern().getTrip(bestPatternIndex);
+            Trip trip = bestTripTimes.getTrip();
 
             /* check if route banned for this plan */
             if (options.bannedRoutes != null) {
@@ -178,7 +175,8 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             if (TransitUtils.handleBoardAlightType(s1, type)) {
                 return null;
             }
-            s1.setTrip(bestPatternIndex);
+            // save the trip times to ensure that router has a consistent view of them 
+            s1.setTripTimes(bestTripTimes); 
             s1.incrementTimeInSeconds(bestWait);
             s1.incrementNumBoardings();
             s1.setTripId(trip.getId());

@@ -94,7 +94,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
              */
             long current_time = state0.getTime();
             int bestWait = -1;
-            int bestPatternIndex = -1;
+            TripTimes bestTripTimes = null;
             AgencyAndId serviceId = getPattern().getExemplar().getServiceId();
             SD: for (ServiceDay sd : rctx.serviceDays) {
                 int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
@@ -103,20 +103,18 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
                 if (secondsSinceMidnight < 0)
                     continue;
                 if (sd.serviceIdRunning(serviceId)) {
-                    int patternIndex = pattern.getPreviousTrip(stopIndex, secondsSinceMidnight, options);
-                    if (patternIndex >= 0) {
-                        Trip trip = pattern.getTrip(patternIndex);
+                    TripTimes tripTimes = pattern.getPreviousTrip(stopIndex, secondsSinceMidnight, options);
+                    if (tripTimes != null) {
                         // a trip was found, index is valid, wait will be defined.
                         // even though we are going backward I tend to think waiting
                         // should be expressed as non-negative.
-                        int wait = (int) (current_time - sd.time(pattern.getArrivalTime(stopIndex,
-                                patternIndex)));
+                        int wait = (int) (current_time - sd.time(tripTimes.getArrivalTime(stopIndex)));
                         if (wait < 0)
                             _log.error("negative wait time on alight");
                         if (bestWait < 0 || wait < bestWait) {
                             // track the soonest arrival over all relevant schedules
                             bestWait = wait;
-                            bestPatternIndex = patternIndex;
+                            bestTripTimes = tripTimes;
                         }
                     }
                 }
@@ -124,7 +122,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             if (bestWait < 0) {
                 return null;
             }
-            Trip trip = getPattern().getTrip(bestPatternIndex);
+            Trip trip = bestTripTimes.getTrip();
 
             /* check if route banned for this plan */
             if (options.bannedRoutes != null) {
@@ -163,7 +161,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             if (TransitUtils.handleBoardAlightType(s1, type)) {
                 return null;
             }
-            s1.setTrip(bestPatternIndex);
+            s1.setTripTimes(bestTripTimes);
             s1.incrementTimeInSeconds(bestWait);
             s1.incrementNumBoardings();
             s1.setTripId(trip.getId());
@@ -188,8 +186,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             if (state0.getBackEdge() instanceof PatternBoard) {
                 return null;
             }
-            Trip trip = pattern.getTrip(state0.getTrip());
-            EdgeNarrative en = new TransitNarrative(trip, this);
+            EdgeNarrative en = new TransitNarrative(state0.getTripTimes().trip, this);
             StateEditor s1 = state0.edit(this, en);
             int type = pattern.getAlightType(stopIndex + 1);
             if (TransitUtils.handleBoardAlightType(s1, type)) {

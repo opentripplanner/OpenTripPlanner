@@ -130,7 +130,7 @@ public class GraphPath {
             Edge e = s.getBackEdge();
             Trip trip = null;
             if (e instanceof PatternBoard) {
-                trip = ((PatternBoard) e).getPattern().getTrip(s.getTrip());
+                trip = s.getTripTimes().getTrip();
             } else if (e instanceof Board) {
                 trip = ((Board) e).getTrip();
             }
@@ -155,13 +155,13 @@ public class GraphPath {
             Edge e = s.getBackEdge();
             Trip trip = null;
             if (e instanceof PatternBoard) {
-                trip  = ((PatternBoard) e).getPattern().getTrip(s.getTrip());
+                trip  = s.getTripTimes().getTrip();
             } else if (e instanceof Board) {
                 trip = ((Board) e).getTrip();
             } else {
                 continue;
             }
-                        ret.add(trip.getId());
+            ret.add(trip.getId());
         }
         return ret;
     }

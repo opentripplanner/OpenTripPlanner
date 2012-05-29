@@ -1,9 +1,12 @@
 package org.opentripplanner.routing.edgetype;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 
+import org.onebusaway.gtfs.model.StopTime;
+import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
 
 /**
@@ -20,14 +23,31 @@ public class TripTimes implements Serializable {
 
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
+    protected final Trip trip;
+
+    protected final int index; // this is kind of ugly, but the headsigns are in the pattern not here
+    
     @XmlElement
     protected int[] departureTimes;
 
     @XmlElement
     protected int[] arrivalTimes;
 
-    public TripTimes(int nStops, boolean nullArrivals) {
+    public TripTimes(Trip trip, int index, List<StopTime> stopTimes) {
+        // stopTimes are assumed to be pre-filtered / valid / monotonically increasing etc.
+        this(trip, index, stopTimes.size(), false);
+        for (int hop = 0; hop < stopTimes.size() - 1; hop++) {
+            StopTime st = stopTimes.get(hop);
+            departureTimes[hop] = st.getDepartureTime();
+            arrivalTimes[hop + 1] = st.getArrivalTime();
+        }
+        // this would really make more sense if indexes were stops instead of hops
+    }
+    
+    public TripTimes(Trip trip, int index, int nStops, boolean nullArrivals) {
         // departure arrays could be 1 shorter when arrivals are present, but they are not
+        this.trip = trip;
+        this.index = index;
         departureTimes = new int[nStops];
         if (nullArrivals) {
             arrivalTimes = null;
@@ -46,4 +66,21 @@ public class TripTimes implements Serializable {
         return arrivalTimes[hop];
     }
 
+    public Trip getTrip() {
+        return trip;
+    }
+
+    public int getRunningTime(int stopIndex) {
+        return getArrivalTime(stopIndex) - getDepartureTime(stopIndex);
+    }
+
+    public int getDwellTime(int hop) {
+        // the dwell time of a hop is the dwell time *before* that hop.
+        // Therefore it is undefined for hop 0, and at the end of a trip.
+        // see GTFSPatternHopFactory.makeTripPattern()
+        int arrivalTime = getArrivalTime(hop-1);
+        int departureTime = getDepartureTime(hop);
+        return departureTime - arrivalTime;
+    }
+    
 }

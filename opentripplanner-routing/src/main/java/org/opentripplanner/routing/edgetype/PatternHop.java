@@ -80,9 +80,9 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
     }
     
     public State traverse(State s0) {
-        int trip = s0.getTrip();
-        int runningTime = pattern.getRunningTime(stopIndex, trip);
-        EdgeNarrative en = new TransitNarrative(pattern.getTrip(trip), pattern.getHeadsign(stopIndex, trip), this);
+        TripTimes tripTimes = s0.getTripTimes();
+        int runningTime = tripTimes.getRunningTime(stopIndex);
+        EdgeNarrative en = new TransitNarrative(tripTimes.trip, pattern.getHeadsign(stopIndex, tripTimes.index), this);
         StateEditor s1 = s0.edit(this, en);
         s1.incrementTimeInSeconds(runningTime);
         if (s0.getOptions().isArriveBy())

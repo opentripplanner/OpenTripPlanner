@@ -47,7 +47,7 @@ public interface TripPattern {
      * 
      * @param pickup whether the stop must be one that picks up passengers 
      */
-    public int getNextTrip(int stopIndex, int afterTime, RoutingRequest options);
+    public TripTimes getNextTrip(int stopIndex, int afterTime, RoutingRequest options);
 
     /** Gets the running time after a given stop on a given trip */
     public int getRunningTime(int stopIndex, int tripIndex);
@@ -59,7 +59,7 @@ public interface TripPattern {
      * 
      * @param pickup whether the stop must be one that picks up passengers
      */
-    public int getPreviousTrip(int stopIndex, int beforeTime, RoutingRequest options);
+    public TripTimes getPreviousTrip(int stopIndex, int beforeTime, RoutingRequest options);
 
     /** Gets the arrival time for a given stop on a given trip */
     public int getArrivalTime(int stopIndex, int trip);
@@ -105,4 +105,6 @@ public interface TripPattern {
     public int getAlightType(int stopIndex);
 
     public int getBoardType(int stopIndex);
+
+    public TripTimes getTripTimes(int tripIndex);
 }

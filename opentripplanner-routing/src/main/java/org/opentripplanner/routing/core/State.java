@@ -21,6 +21,7 @@ import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.automata.AutomatonState;
 import org.opentripplanner.routing.edgetype.OnBoardForwardEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.TripTimes;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.pathparser.PathParser;
@@ -168,8 +169,8 @@ public class State implements Cloneable {
         return Math.abs(this.time - stateData.startTime);
     }
 
-    public int getTrip() {
-        return stateData.trip;
+    public TripTimes getTripTimes() {
+        return stateData.tripTimes;
     }
 
     public AgencyAndId getTripId() {

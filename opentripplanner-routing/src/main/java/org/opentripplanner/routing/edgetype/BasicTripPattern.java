@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.factory.TripOvertakingException;
 
 /**
@@ -57,7 +58,6 @@ public final class BasicTripPattern implements Serializable, TripPattern {
     public ArrayTripPattern arrayPattern = null;
 
     public ArrayList<Stop> stops;
-
 	private ArrayList<String>[] headsigns;
     
     @SuppressWarnings("unchecked")
@@ -111,14 +111,6 @@ public final class BasicTripPattern implements Serializable, TripPattern {
             perTripFlags.remove(hop);
             trips.remove(hop);
         }
-    }
-
-    public void setTripFlags(int trip, int flags) {
-        perTripFlags.set(trip, flags);
-    }
-
-    public void setStopFlags(int trip, int flags) {
-        perStopFlags[trip] = flags;
     }
 
     /** 
@@ -445,6 +437,24 @@ public final class BasicTripPattern implements Serializable, TripPattern {
     @Override
     public int getBoardType(int stopIndex) {
         return (perStopFlags[stopIndex] & MASK_PICKUP) >> SHIFT_PICKUP;
+    }
+
+    @Override
+    public TripTimes getNextTrip(int stopIndex, int afterTime, RoutingRequest options) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public TripTimes getPreviousTrip(int stopIndex, int beforeTime, RoutingRequest options) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public TripTimes getTripTimes(int tripIndex) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }
