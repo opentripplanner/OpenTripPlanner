@@ -37,7 +37,7 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
 
     private Map<String, Graph> graphs = new HashMap<String, Graph>();
 
-    private LoadLevel loadLevel;
+    private LoadLevel loadLevel = LoadLevel.FULL;
     
     private String defaultRouterId = "";
     
@@ -115,7 +115,7 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
                 return getGraph(null); // fall back on default if graph does not exist
             }
             try {
-            	graph = Graph.load(is, LoadLevel.FULL);
+            	graph = Graph.load(is, loadLevel);
             	// key on resource name instead of routerId so fallbacks to defaultRouterId will all yield the same Graph
                 graphs.put(resourceName, graph);
             } catch (Exception ex) {
