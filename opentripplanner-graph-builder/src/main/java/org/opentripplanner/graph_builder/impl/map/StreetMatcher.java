@@ -32,6 +32,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.index.strtree.STRtree;
 import com.vividsolutions.jts.linearref.LinearLocation;
 import com.vividsolutions.jts.linearref.LocationIndexedLine;
+import com.vividsolutions.jts.simplify.DouglasPeuckerSimplifier;
 
 public class StreetMatcher {
     private static final Logger log = LoggerFactory.getLogger(StreetMatcher.class);
@@ -66,10 +67,12 @@ public class StreetMatcher {
     public List<Edge> match(Geometry routeGeometry) {
         
         routeGeometry = removeDuplicatePoints(routeGeometry);
-        
+
         if (routeGeometry == null) 
             return null;
         
+        routeGeometry = DouglasPeuckerSimplifier.simplify(routeGeometry, 0.00001);
+
         // initial state: start midway along a block.
         LocationIndexedLine indexedLine = new LocationIndexedLine(routeGeometry);
 
@@ -87,6 +90,7 @@ public class StreetMatcher {
             distanceThreshold *= 2;
             nearbyEdges = index.query(envelope);
         }
+
         // compute initial states
         for (Object obj : nearbyEdges) {
             Edge initialEdge = (Edge) obj;
@@ -96,13 +100,13 @@ public class StreetMatcher {
             LinearLocation initialLocation = indexedEdge.project(routeStartCoordinate);
             
             double error = MatchState.distance(initialLocation.getCoordinate(edgeGeometry), routeStartCoordinate);
-            MatchState state = new MidblockMatchState(null, routeGeometry, initialEdge, startIndex, initialLocation, error, 0.01);
+            MidblockMatchState state = new MidblockMatchState(null, routeGeometry, initialEdge, startIndex, initialLocation, error, 0.01);
             states.insert(state, 0); //make sure all initial states are visited by inserting them at 0
         }
 
         // search for best-matching path
         int seen_count = 0, total = 0;
-        HashSet<MatchState> seen = new HashSet<MatchState>(); 
+        HashSet<MatchState> seen = new HashSet<MatchState>();
         while (!states.empty()) {
             double k = states.peek_min_key();
             MatchState state = states.extract_min();
