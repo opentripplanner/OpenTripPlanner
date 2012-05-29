@@ -35,7 +35,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
-import org.opentripplanner.routing.trippattern.ArrayTripPattern;
 import org.opentripplanner.routing.trippattern.TripPattern;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
@@ -332,7 +331,7 @@ public class LocalStopFinder {
     }
 
     private List<Stop> getStops(TripPattern pattern) {
-        return ((ArrayTripPattern) pattern).getStops();
+        return pattern.getStops();
     }
 
 }

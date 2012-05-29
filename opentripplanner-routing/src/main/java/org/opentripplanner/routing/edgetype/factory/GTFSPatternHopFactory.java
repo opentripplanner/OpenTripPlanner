@@ -39,11 +39,10 @@ import org.opentripplanner.common.model.T2;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation;
+import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
 import org.opentripplanner.routing.edgetype.Alight;
-import org.opentripplanner.routing.edgetype.BasicTripPattern;
 import org.opentripplanner.routing.edgetype.Board;
 import org.opentripplanner.routing.edgetype.Dwell;
 import org.opentripplanner.routing.edgetype.FreeEdge;
@@ -68,7 +67,6 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.FareServiceFactory;
-import org.opentripplanner.routing.trippattern.ArrayTripPattern;
 import org.opentripplanner.routing.trippattern.FrequencyBasedTripPattern;
 import org.opentripplanner.routing.trippattern.ScheduledStopPattern;
 import org.opentripplanner.routing.trippattern.TripPattern;
@@ -94,9 +92,9 @@ class InterliningTrip  implements Comparable<InterliningTrip> {
     public Trip trip;
     public StopTime firstStopTime;
     public StopTime lastStopTime;
-    ArrayTripPattern tripPattern;
+    TripPattern tripPattern;
 
-    InterliningTrip(Trip trip, List<StopTime> stopTimes, ArrayTripPattern tripPattern) {
+    InterliningTrip(Trip trip, List<StopTime> stopTimes, TripPattern tripPattern) {
         this.trip = trip;
         this.firstStopTime = stopTimes.get(0);
         this.lastStopTime = stopTimes.get(stopTimes.size() - 1);
@@ -148,10 +146,10 @@ class BlockIdAndServiceId {
 class InterlineSwitchoverKey {
 
     public Stop s0, s1;
-    public ArrayTripPattern pattern1, pattern2;
+    public TripPattern pattern1, pattern2;
 
     public InterlineSwitchoverKey(Stop s0, Stop s1, 
-        ArrayTripPattern pattern1, ArrayTripPattern pattern2) {
+        TripPattern pattern1, TripPattern pattern2) {
         this.s0 = s0;
         this.s1 = s1;
         this.pattern1 = pattern1;
@@ -199,7 +197,7 @@ public class GTFSPatternHopFactory {
 
     private Map<InterlineSwitchoverKey, PatternInterlineDwell> interlineDwells = new HashMap<InterlineSwitchoverKey, PatternInterlineDwell>();
 
-    HashMap<ScheduledStopPattern, ArrayTripPattern> patterns = new HashMap<ScheduledStopPattern, ArrayTripPattern>();
+    HashMap<ScheduledStopPattern, TripPattern> patterns = new HashMap<ScheduledStopPattern, TripPattern>();
 
     /* maps replacing label lookup */
     private Map<Stop, Vertex> stopNodes = new HashMap<Stop, Vertex>();
@@ -332,10 +330,10 @@ public class GTFSPatternHopFactory {
 
             /* this trip is not frequency-based, add it to the corresponding trip pattern */
             ScheduledStopPattern stopPattern = ScheduledStopPattern.fromTrip(trip, _dao);
-            ArrayTripPattern tripPattern = patterns.get(stopPattern);
+            TripPattern tripPattern = patterns.get(stopPattern);
             if (tripPattern == null) {
                 // it's the first time we are encountering this stops+pickups+serviceId combination
-                tripPattern = new ArrayTripPattern(trip, stopPattern);
+                tripPattern = new TripPattern(trip, stopPattern);
                 makePatternVerticesAndEdges(graph, tripPattern, trip, stopTimes);
                 patterns.put(stopPattern, tripPattern);
             } 
@@ -654,7 +652,7 @@ public class GTFSPatternHopFactory {
         }
     }
 
-    private void addTripToInterliningMap(Trip trip, List<StopTime> stopTimes, ArrayTripPattern tripPattern) {
+    private void addTripToInterliningMap(Trip trip, List<StopTime> stopTimes, TripPattern tripPattern) {
         String blockId = trip.getBlockId();
         BlockIdAndServiceId key = new BlockIdAndServiceId(blockId, trip.getServiceId()); 
         List<InterliningTrip> trips = tripsForBlock.get(key);

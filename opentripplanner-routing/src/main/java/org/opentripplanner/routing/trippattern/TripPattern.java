@@ -13,10 +13,18 @@
 
 package org.opentripplanner.routing.trippattern;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 
+import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.RoutingRequest;
 
 /**
@@ -26,83 +34,354 @@ import org.opentripplanner.routing.core.RoutingRequest;
  * included so that information such as route name can be found. Trips are assumed to be
  * non-overtaking, so that an earlier trip never arrives after a later trip.
  */
+public class TripPattern implements Serializable {
 
-public interface TripPattern {
-
+    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
     public static final int FLAG_WHEELCHAIR_ACCESSIBLE = 1;
-
     public static final int MASK_PICKUP = 2|4;
     public static final int SHIFT_PICKUP = 1;
-
     public static final int MASK_DROPOFF = 8|16;
     public static final int SHIFT_DROPOFF = 3;
-
     public static final int NO_PICKUP = 1;
 
-    public static final int FLAG_BIKES_ALLOWED = 32;
+    /* an arbitrary trip that uses this pattern */
+    public final Trip exemplar;
 
-    /** Get the index of the next trip that has a stop after afterTime at the stop at stopIndex
-     * 
-     * @param pickup whether the stop must be one that picks up passengers 
-     */
-    public TripTimes getNextTrip(int stopIndex, int afterTime, RoutingRequest options);
+    // override trip_headsign with stop_headsign where necessary
+    private final List<List<String>> headsigns = new ArrayList<List<String>>();
 
-    /** Gets the running time after a given stop on a given trip */
-    public int getRunningTime(int stopIndex, int tripIndex);
+    private final ArrayList<TripTimes> tripTimes = new ArrayList<TripTimes>();
+
+//    @XmlElement
+//    private final ArrayList<Integer> perTripFlags = new ArrayList<Integer>();
+
+    // redundant since tripTimes have a trip
+    private final ArrayList<Trip> trips = new ArrayList<Trip>();
+
+    // all trips in pattern have the same number of stops, can use arrays
+    public Stop[] stops; 
+
+    @XmlElement
+    private int[] perStopFlags;
+    
+    //@XmlElement
+    //private String[] zones; // use stops instead
+
+    int bestRunningTimes[];
+    
+    int bestDwellTimes[];
+
+    public TripPattern(Trip exemplar, ScheduledStopPattern stopPattern) {
+        this.exemplar = exemplar;
+        setStopsFromStopPattern(stopPattern);
+    }
+
+    public void setStopsFromStopPattern(ScheduledStopPattern stopPattern) {
+        this.stops = new Stop[stopPattern.stops.size()];
+        perStopFlags = new int[stops.length];
+        int i = 0;
+        for (Stop stop : stopPattern.stops) {
+            this.stops[i] = stop;
+            if (stop.getWheelchairBoarding() == 1) {
+                perStopFlags[i] |= FLAG_WHEELCHAIR_ACCESSIBLE;
+            }
+            perStopFlags[i] |= stopPattern.pickups.get(i) << SHIFT_PICKUP;
+            perStopFlags[i] |= stopPattern.dropoffs.get(i) << SHIFT_DROPOFF;
+            ++i;
+        }
+    }
+
+    // finish off the pattern once all times have been added 
+    // cache running times and dwell times; maybe trim arrays too
+    public void finish() {
+        int nHops = stops.length - 1;
+        int nTrips = trips.size();
+        this.bestRunningTimes = new int[nHops];
+        boolean nullArrivals = false; // TODO: should scan through triptimes?
+        if ( ! nullArrivals) {
+            this.bestDwellTimes = new int[nHops];
+            for (int h = 1; h < nHops; ++h) { // dwell time is undefined on first hop
+                bestDwellTimes[h] = Integer.MAX_VALUE;
+                for (int t = 0; t < nTrips; ++t) {
+                    int dt = this.getDwellTime(h,  t);
+                    if (bestDwellTimes[h] > dt) {
+                        bestDwellTimes[h] = dt;
+                    }
+                }
+            }
+        }
+        // FIXME: why is incoming running times 1 shorter than departures?
+        // because when there are no arrivals array, the last departure is actually used for an arrival 
+        for (int h = 0; h < nHops; ++h) {
+            bestRunningTimes[h] = Integer.MAX_VALUE;
+            for (int t = 0; t < nTrips; ++t) { 
+                int rt = this.getRunningTime(h, t);
+                if (bestRunningTimes[h] > rt) {
+                    bestRunningTimes[h] = rt;
+                }
+            }
+        }
+    }
+    
+    private Boolean tripAcceptable(Trip trip, boolean bicycle, boolean wheelchair) {
+        boolean result = true;
+        if (bicycle)
+            result &= trip.getWheelchairAccessible() == 1;
+        if (wheelchair)
+            result &= trip.getTripBikesAllowed() == 2 ||
+            (trip.getRoute().getBikesAllowed() == 2 && trip.getTripBikesAllowed() != 1); 
+        return result;
+    }
+    
+    /** Get the index of the next trip that has a stop after afterTime at the stop at stopIndex */
+    public TripTimes getNextTrip(int stopIndex, int afterTime, RoutingRequest options) {
+        boolean pickup = true;
+        int mask = pickup ? MASK_PICKUP : MASK_DROPOFF;
+        int shift = pickup ? SHIFT_PICKUP : SHIFT_DROPOFF;
+        if ((perStopFlags[stopIndex] & mask) >> shift == NO_PICKUP) {
+            return null;
+        }
+        boolean wheelchair = options.wheelchairAccessible;
+        boolean bicycle = options.modes.getBicycle();
+        if (wheelchair && (perStopFlags[stopIndex] & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
+            return null;
+        }
+        // linear search:
+        // because trips may change with stoptime updates, we cannot count on them being sorted
+        TripTimes bestTrip = null;
+        int bestTime = Integer.MAX_VALUE;
+        for (int i = 0; i < trips.size(); i++) {
+            // grab a reference before tests in case it is swapped out by an update thread
+            TripTimes currTrip = tripTimes.get(i); 
+            int currTime = currTrip.getDepartureTime(stopIndex);
+            if (currTime > afterTime && currTime < bestTime && 
+                    tripAcceptable(currTrip.trip, bicycle, wheelchair) && 
+                    ! options.bannedTrips.contains(trips.get(i).getId())) {
+                bestTrip = currTrip;
+                bestTime = currTime;
+            }
+        }
+        return bestTrip;
+    }
+    
+    /** Gets the index of the previous trip that has a stop before beforeTime at the stop at stopIndex */
+    public TripTimes getPreviousTrip(int stopIndex, int beforeTime, RoutingRequest options) {
+        boolean pickup = false;
+        int mask = pickup ? MASK_PICKUP : MASK_DROPOFF;
+        int shift = pickup ? SHIFT_PICKUP : SHIFT_DROPOFF;
+        if ((perStopFlags[stopIndex + 1] & mask) >> shift == NO_PICKUP) {
+            return null;
+        }
+        boolean wheelchair = options.wheelchairAccessible;
+        boolean bicycle = options.modes.getBicycle();
+        if (wheelchair && (perStopFlags[stopIndex + 1] & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
+            return null;
+        }
+        // linear search:
+        // because trips may change with stoptime updates, we cannot count on them being sorted
+        TripTimes bestTrip = null;
+        int bestTime = Integer.MIN_VALUE;
+        for (int i = 0; i < trips.size(); i++) {
+            // grab a reference before tests in case it is swapped out by an update thread
+            TripTimes currTrip = tripTimes.get(i); 
+            int currTime = currTrip.getArrivalTime(stopIndex);
+            if (currTime < beforeTime && currTime > bestTime && 
+                    tripAcceptable(currTrip.trip, bicycle, wheelchair) &&
+                    ! options.bannedTrips.contains(trips.get(i).getId())) {
+                bestTrip = currTrip;
+                bestTime = currTime;
+            }
+        }
+        return bestTrip;
+    }
+    
+    public List<Stop> getStops() {
+        return Arrays.asList(stops);
+    }
 
     /** Gets the departure time for a given stop on a given trip */
-    public int getDepartureTime(int stopIndex, int tripIndex);
+    public int getDepartureTime(int hop, int trip) {
+        return tripTimes.get(trip).getDepartureTime(hop);
+    }
 
-    /** Gets the index of the previous trip that has a stop before beforeTime at the stop at stopIndex 
-     * 
-     * @param pickup whether the stop must be one that picks up passengers
-     */
-    public TripTimes getPreviousTrip(int stopIndex, int beforeTime, RoutingRequest options);
+    /** Gets the arrival time for a given HOP on a given trip */
+    public int getArrivalTime(int hop, int trip) {
+        return tripTimes.get(trip).getArrivalTime(hop);
+    }
 
-    /** Gets the arrival time for a given stop on a given trip */
-    public int getArrivalTime(int stopIndex, int trip);
+    /** Gets the running time after a given stop (i.e. for the given HOP) on a given trip */
+    public int getRunningTime(int stopIndex, int trip) {
+        return tripTimes.get(trip).getRunningTime(stopIndex);
+    }
 
-    /** Gets the dwell time at a given stop on a given trip */
-    public int getDwellTime(int stopIndex, int trip);
+    /** Gets the dwell time at a given stop (i.e. before then given HOP) on a given trip */
+    public int getDwellTime(int hop, int trip) {
+        // the dwell time of a hop is the dwell time *before* that hop.
+        return tripTimes.get(trip).getDwellTime(hop);
+    }
 
-    /** Gets all the departure times at a given stop (not used in routing) */
-    public Iterator<Integer> getDepartureTimes(int stopIndex);
+    // SEEMS UNUSED
+    public boolean getWheelchairAccessible(int stopIndex, int trip) {
+//        if ((perStopFlags[stopIndex] & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
+//            return false;
+//        }
+//        if ((perTripFlags.get(trip) & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
+//            return false;
+//        }
+        return true;
+    }
 
-    /** Gets the accessibility of a given stop on a given trip */ 
-    public boolean getWheelchairAccessible(int stopIndex, int trip);
-
-    /** Gets the bikability of a given trip */ 
-    public boolean getBikesAllowed(int trip);
+    // SEEMS UNUSED
+    public boolean getBikesAllowed(int trip) {
+//        return (perTripFlags.get(trip) & FLAG_BIKES_ALLOWED) != 0;
+        return true;
+    }
 
     /** Gets the Trip object for a given trip index */
-    public Trip getTrip(int trip);
+    public Trip getTrip(int tripIndex) {
+        return trips.get(tripIndex);
+    }
+    
+    @XmlTransient
+    public List<Trip> getTrips() {
+    	return trips;
+    }
 
+    public int getTripIndex(Trip trip) {
+        return trips.indexOf(trip);
+    }
+    
     /** Returns whether passengers can alight at a given stop */
-    public boolean canAlight(int stopIndex);
+    public boolean canAlight(int stopIndex) {
+        return getAlightType(stopIndex) != NO_PICKUP;
+    }
 
     /** Returns whether passengers can board at a given stop */
-    public boolean canBoard(int stopIndex);
+    public boolean canBoard(int stopIndex) {
+        return getBoardType(stopIndex) != NO_PICKUP;
+    }
 
     /** Returns the zone of a given stop */
-    public String getZone(int stopIndex);
+    public String getZone(int stopIndex) {
+        //return zones[stopIndex];
+        return stops[stopIndex].getZoneId();
+    }
 
     /** Returns an arbitrary trip that uses this pattern */
-    public Trip getExemplar();
+    public Trip getExemplar() {
+        return exemplar;
+    }
 
     /** Returns the shortest possible running time for this stop */
-    public int getBestRunningTime(int stopIndex);
+    public int getBestRunningTime(int stopIndex) {
+        return bestRunningTimes[stopIndex];
+    }
 
     /** Returns the shortest possible dwell time at this stop */
-    int getBestDwellTime(int stopIndex);
+    public int getBestDwellTime(int stopIndex) {
+        if (bestDwellTimes == null) {
+            return 0;
+        }
+        return bestDwellTimes[stopIndex];
+    }
 
-    public List<Trip> getTrips();
+    /** The current headsign as-of this stop if it differs from the trip headsign or null otherwise */
+    public String getHeadsign(int stopIndex, int trip) {
+        if (headsigns == null) {
+            return null;
+        }
+        return headsigns.get(trip).get(stopIndex);
+    }
 
-    /** Gets the current headsign as-of this stop, if it differs from the trip headsign */
-    public String getHeadsign(int stopIndex, int trip);
+    public int getAlightType(int stopIndex) {
+        return (perStopFlags[stopIndex] & MASK_DROPOFF) >> SHIFT_DROPOFF;
+    }
 
-    public int getAlightType(int stopIndex);
+    public int getBoardType(int stopIndex) {
+        return (perStopFlags[stopIndex] & MASK_PICKUP) >> SHIFT_PICKUP;
+    }
+    
+    public class DeparturesIterator implements Iterator<Integer> {
 
-    public int getBoardType(int stopIndex);
+        int nextPosition = 0;
 
-    public TripTimes getTripTimes(int tripIndex);
+        private int stopIndex;
+
+        public DeparturesIterator(int stopIndex) {
+            this.stopIndex = stopIndex;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return nextPosition < trips.size();
+        }
+
+        @Override
+        public Integer next() {
+            return tripTimes.get(nextPosition++).departureTimes[stopIndex];
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
+    }
+    
+    /** Gets all the departure times at a given stop (not used in routing) */
+    public Iterator<Integer> getDepartureTimes(int stopIndex) {
+        return new DeparturesIterator(stopIndex);
+    }
+
+    public TripTimes getTripTimes(int tripIndex) {
+        return tripTimes.get(tripIndex);
+    }
+
+    public void addTrip(Trip trip, List<StopTime> stopTimes) {
+        // TODO: double-check that the stops and pickup/dropoffs are right for this trip
+        int nextIndex = tripTimes.size();
+        tripTimes.add(new TripTimes(trip, nextIndex, stopTimes));
+        trips.add(trip);
+        
+        // stoptimes can have headsign info that overrides the trip's headsign
+        ArrayList<String> headsigns = new ArrayList<String>();
+        boolean allHeadsignsNull = true;
+        for (StopTime st : stopTimes) {
+            String headsign = st.getStopHeadsign();
+            if (headsign != null)
+                allHeadsignsNull = false;
+            headsigns.add(headsign);
+        }
+        if (allHeadsignsNull)
+            headsigns = null;
+        this.headsigns.add(headsigns);
+        // stoptimes should be transposed later and compacted with reused arrays
+        // 1x1 array should always return the same headsign to allow for no change 
+    }
+    
+//    
+//    if (headsigns != null) { 
+//        // DO NOT transpose headsigns to allow reusing rows
+//        this.headsigns = new String[nHops][nTrips]; 
+//        String[] nullRow = null; 
+//        // headsigns contains 1 less headsign than there are stops, because sign change is pointless at the last stop
+//        for (int s = 0; s < nHops; ++s) { 
+//            boolean rowIsNull = true;
+//            for (int t = 0; t < headsigns[s].size(); ++t) {
+//                this.headsigns[s][t] = headsigns[s].get(t); 
+//                if (this.headsigns[s][t] != null) {
+//                    rowIsNull = false; 
+//                }
+//            }
+//            if (rowIsNull) {
+//                // repeat the same row object when empty row encountered
+//                if (nullRow == null) {
+//                    nullRow = this.headsigns[s];
+//                } else {
+//                    this.headsigns[s] = nullRow;
+//                }
+//            }
+//        }
+//    }
+
 }
