@@ -37,9 +37,8 @@ public class TripTimes implements Serializable {
         // stopTimes are assumed to be pre-filtered / valid / monotonically increasing etc.
         this(trip, index, stopTimes.size(), false);
         for (int hop = 0; hop < stopTimes.size() - 1; hop++) {
-            StopTime st = stopTimes.get(hop);
-            departureTimes[hop] = st.getDepartureTime();
-            arrivalTimes[hop + 1] = st.getArrivalTime();
+            departureTimes[hop] = stopTimes.get(hop).getDepartureTime();
+            arrivalTimes[hop] = stopTimes.get(hop+1).getArrivalTime();
         }
         // this would really make more sense if indexes were stops instead of hops
     }

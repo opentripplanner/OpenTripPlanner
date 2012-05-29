@@ -288,10 +288,12 @@ public class TripPattern implements Serializable {
 
     /** The current headsign as-of this stop if it differs from the trip headsign or null otherwise */
     public String getHeadsign(int stopIndex, int trip) {
-        if (headsigns == null) {
+        if (headsigns == null)
             return null;
-        }
-        return headsigns.get(trip).get(stopIndex);
+        List<String> headsignsForTrip = headsigns.get(trip);
+        if (headsignsForTrip == null)
+            return null;
+        return headsignsForTrip.get(stopIndex);
     }
 
     public int getAlightType(int stopIndex) {
