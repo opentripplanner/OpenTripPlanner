@@ -15,6 +15,7 @@ package org.opentripplanner.api.ws;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.ws.rs.GET;
@@ -232,9 +233,14 @@ public class TransitIndex {
             @QueryParam("endTime") Long endTime,
             @QueryParam("routerId") String routerId) throws JSONException {
 
+        startTime /= 1000;
+
         if (endTime == null) {
             endTime = startTime + 86400;
+        } else {
+            endTime /= 1000;
         }
+
         if (endTime - startTime > MAX_STOP_TIME_QUERY_INTERVAL) {
             return new TransitError("Max stop time query interval is " + (endTime - startTime));
         }
@@ -285,7 +291,12 @@ public class TransitIndex {
 //        }
         // TODO: verify correctness
         options.dateTime = startTime;
-        options.setRoutingContext(getGraph(routerId));
+        Graph graph = getGraph(routerId);
+        Collection<Vertex> vertices = graph.getVertices();
+        Iterator<Vertex> it = vertices.iterator();
+        options.setFrom(it.next().getLabel());
+        options.setTo(it.next().getLabel());
+        options.setRoutingContext(graph);
         return options;
     }
 
@@ -299,6 +310,8 @@ public class TransitIndex {
             @QueryParam("stopId") String stopId, @QueryParam("tripAgency") String tripAgency,
             @QueryParam("tripId") String tripId, @QueryParam("time") long time,
             @QueryParam("routerId") String routerId) throws JSONException {
+
+        time /= 1000;
 
         AgencyAndId firstStop = null;
         if (stopId != null) {
