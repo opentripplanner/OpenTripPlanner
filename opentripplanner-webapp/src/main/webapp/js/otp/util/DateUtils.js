@@ -34,7 +34,7 @@ otp.util.DateUtils = {
                 pre = "";
             if(post == null)
                 post = "";
-                
+
             retVal = pre + date.toDateString() + ' @ ' + date.toLocaleTimeString() + post;
         }
         catch(e)
@@ -108,7 +108,6 @@ otp.util.DateUtils = {
         return retVal;
     },
 
-    
     /** default to now + 365 days */ 
     addDays : function(days, date)
     {
@@ -134,15 +133,16 @@ otp.util.DateUtils = {
         }
         return date;
     },
-    
+
+    /** */
     pad : function (n, digits) {
-	    var string = n.toString();
-	    var missingDigits = digits - string.length;
-	    if (missingDigits > 0) {
-	    	string = ('0' * missingDigits) + string;
-	    }
-	    return string;
-	},
+        var string = n.toString();
+        var missingDigits = digits - string.length;
+        if (missingDigits > 0) {
+            string = ('0' * missingDigits) + string;
+        }
+        return string;
+    },
 
     /** make an iso [YYYY]-[MM]-[DD] (2012-04-22) date for the api */
     dateToIsoDateString : function(date, defVal)
@@ -150,11 +150,11 @@ otp.util.DateUtils = {
         var retVal = defVal;
         try
         {
-        	// there is a Date.toISOString() method, but it will account for the browser time zone
-        	// we want to assume the date is expressed in the _server_ time zone
-        	retVal = [date.getFullYear(), this.pad(date.getMonth() + 1, 2), 
-        	          this.pad(date.getDate(), 2)].join('-'); 
-        	console.log(retVal);
+            // there is a Date.toISOString() method, but it will account for the browser time zone
+            // we want to assume the date is expressed in the _server_ time zone
+            retVal = [date.getFullYear(), this.pad(date.getMonth() + 1, 2), 
+                      this.pad(date.getDate(), 2)].join('-'); 
+            console.log(retVal);
         }
         catch(e)
         {
@@ -203,12 +203,30 @@ otp.util.DateUtils = {
     /** arbitrary am/pm time string correction ... e.g., 1233pm gets formatted into 12:33pm, etc... */
     correctAmPmTimeString : function(time, format)
     {
-        time = time.trim();
-        time = time.match(/(\d+)(?::(\d\d))?\s*(p?)/);
+        if(time == null || time.length < 1) return time;
 
-        var h = time[1];
-        var m = this.parseInt(time[2], null);
-        var am = time[3];
+        time = time.toLowerCase().trim();
+        var ttime = time.match(/(\d+)(?::(\d\d))?\s*(p?)/);
+
+        var h = ttime[1];
+        var m = this.parseInt(ttime[2], null);
+        var am = ttime[3];
+
+        // look for AM or PM at the end of the string
+        if((am == null || am.length == 0) && (time.indexOf('a') || time.indexOf('p'))) 
+        {
+            // find the string index of the A(m) or P(m)
+            var p = time.indexOf('a');
+            var suffix = "am"
+            if (p < 0) {
+                p = time.indexOf('p');
+                suffix = "pm";
+            }
+
+            // if the A or P is the last or second to last character in the string, we've got our AM or PM indicator
+            if(p > 0 && (p == time.length-1 || p == time.length-2))
+                am = suffix;
+        }
 
         if(h && h.length > 2)
         {
