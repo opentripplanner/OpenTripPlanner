@@ -62,6 +62,7 @@ import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -1776,6 +1777,18 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     .createEdge(_nodes.get(startNode), _nodes.get(endNode), way, start, end,
                             geometry, name, length, permissions, back);
             street.setId(id);
+
+            String highway = way.getTag("highway");
+            if ("footway".equals(highway) && way.isTag("footway", "crossing")) {
+                street.setStreetClass(StreetEdge.CLASS_CROSSING);
+            } else if ("residential".equals(highway) || "tertiary".equals(highway)
+                    || "secondary".equals(highway) || "secondary_link".equals(highway)
+                    || "primary".equals(highway) || "primary_link".equals(highway)
+                    || "trunk".equals(highway) || "trunk_link".equals(highway)) {
+                street.setStreetClass(StreetEdge.CLASS_STREET);
+            } else {
+                street.setStreetClass(StreetEdge.CLASS_OTHERPATH);
+            }
 
             if (!way.hasTag("name")) {
                 street.setBogusName(true);

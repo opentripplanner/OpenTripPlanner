@@ -242,5 +242,10 @@ public class TestStreetMatcher {
         public String toString() {
             return "SimpleEdge(" + fromv + ", " + tov + ")";
         }
+
+        @Override
+        public int getStreetClass() {
+            return StreetEdge.CLASS_STREET;
+        }
     }
 }

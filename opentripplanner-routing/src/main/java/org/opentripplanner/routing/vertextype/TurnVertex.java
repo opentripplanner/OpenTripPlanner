@@ -63,7 +63,7 @@ public class TurnVertex extends StreetVertex {
     /** is this street a staircase */
     private boolean stairs = false;
 
-    protected boolean crossable = true; // can this street be safely crossed? (unused)
+    protected int streetClass;
 
     protected String edgeId;
 
@@ -271,14 +271,6 @@ public class TurnVertex extends StreetVertex {
         return wheelchairAccessible;
     }
 
-    public void setCrossable(boolean crossable) {
-        this.crossable = crossable;
-    }
-
-    public boolean isCrossable() {
-        return crossable;
-    }
-
     public void setRoundabout(boolean roundabout) {
         this.roundabout = roundabout;
     }
@@ -329,5 +321,13 @@ public class TurnVertex extends StreetVertex {
 
     public Set<Alert> getWheelchairNotes() {
         return wheelchairNotes;
+    }
+
+    public void setStreetClass(int streetClass) {
+        this.streetClass = streetClass;
+    }
+    
+    public int getStreetClass() {
+        return streetClass;
     }
 }

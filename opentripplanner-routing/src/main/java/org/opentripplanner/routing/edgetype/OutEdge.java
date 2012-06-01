@@ -140,4 +140,10 @@ public class OutEdge extends StreetEdge {
     public boolean isNoThruTraffic() {
         return ((TurnVertex) fromv).isNoThruTraffic();
     }
+
+    @Override
+    public int getStreetClass() {
+        //this is always safe as it can appear anywhere in a path
+        return CLASS_OTHERPATH; 
+    }
 }

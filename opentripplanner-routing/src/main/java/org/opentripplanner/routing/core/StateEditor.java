@@ -25,6 +25,7 @@ import org.opentripplanner.routing.patch.NoteNarrative;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.Patch;
 import org.opentripplanner.routing.pathparser.PathParser;
+import org.opentripplanner.routing.spt.GraphPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -497,6 +498,7 @@ public class StateEditor {
         }
         if (modified)
             state.pathParserStates = parserStates;
+
         return accept;
     }
 

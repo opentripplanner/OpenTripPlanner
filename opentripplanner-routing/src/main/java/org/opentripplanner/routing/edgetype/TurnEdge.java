@@ -319,4 +319,9 @@ public class TurnEdge extends StreetEdge {
 	        out.defaultWriteObject();
 	    }
 
+    @Override
+    public int getStreetClass() {
+        return ((TurnVertex) fromv).getStreetClass();
+    }
+
 }

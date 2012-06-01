@@ -56,7 +56,7 @@ public class PlainStreetEdge extends StreetEdge {
 
     private String id;
 
-    private boolean crossable = true;
+    private int streetClass = CLASS_OTHERPATH;
 
     public boolean back;
     
@@ -335,10 +335,6 @@ public class PlainStreetEdge extends StreetEdge {
         out.defaultWriteObject();
     }
 
-    public boolean isCrossable() {
-        return crossable;
-    }
-
     public boolean getSlopeOverride() {
         return elevationProfileSegment.getSlopeOverride();
     }
@@ -419,12 +415,20 @@ public class PlainStreetEdge extends StreetEdge {
                 elevationProfileSegment, back, getNotes());
         tv.setWheelchairNotes(getWheelchairNotes());
         tv.setWheelchairAccessible(isWheelchairAccessible());
-        tv.setCrossable(isCrossable());
+        tv.setStreetClass(streetClass);
         tv.setPermission(getPermission());
         tv.setRoundabout(isRoundabout());
         tv.setBogusName(hasBogusName());
         tv.setNoThruTraffic(isNoThruTraffic());
         tv.setStairs(isStairs());
         return tv;
+    }
+
+    public int getStreetClass() {
+        return streetClass;
+    }
+
+    public void setStreetClass(int streetClass) {
+        this.streetClass = streetClass;
     }
 }
