@@ -51,6 +51,23 @@ public class AutomatonTest extends TestCase {
 
     }
 
+    //this one tests the choice method
+    public void testAutomata2() {
+        Nonterminal any = choice(WALK,STATION,TRANSIT);
+        NFA nfa = choice(star(WALK), seq(star(any), TRANSIT, star(any))).toNFA();
+        System.out.print(nfa.toGraphViz());
+        DFA dfa = new DFA(nfa);
+        testParse(dfa);
+        nfa = nfa.reverse().reverse().reverse().reverse();
+        dfa = new DFA(nfa);
+        testParse(dfa);
+
+        dfa = dfa.minimize();
+        testParse(dfa);
+
+    }
+
+
     private static void testParse(DFA dfa) {
         testParse(dfa, true, WALK, WALK, WALK, WALK, WALK, WALK, WALK);
         testParse(dfa, true, WALK, STATION, TRANSIT, STATION, WALK, WALK, WALK);
