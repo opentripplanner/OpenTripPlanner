@@ -181,60 +181,32 @@ otp.util.DateUtils = {
         return date.format(this.TIME_FORMAT_STRING);
     },
 
-    /** my own parse int, since I've seen "09" not work natively */ 
-    parseInt : function(int, defVal)
-    {
-        var retVal = defVal;
-        try
-        {
-            if(int)
-            {
-                var i = int * 1;
-                i = i * 1;
-                i = i / 1;
-                retVal = i;
-            }
-        }
-        catch(e)
-        {}
-        return retVal;
-    },
 
     /** arbitrary am/pm time string correction ... e.g., 1233pm gets formatted into 12:33pm, etc... */
     correctAmPmTimeString : function(time, format)
     {
+        // step 0: leave if we don't have what we need...
         if(time == null || time.length < 1) return time;
 
+        // step 1: clean up input param
         time = time.toLowerCase().trim();
-        var ttime = time.match(/(\d+)(?::(\d\d))?\s*(p?)/);
 
+        // step 2: break up the time into H MM a/p parts
+        var ttime = time.match(/(\d+)(?::(\d\d))?\s*([ap]?)/);
         var h = ttime[1];
-        var m = this.parseInt(ttime[2], null);
+        var m = parseInt(ttime[2], 10) || null;
         var am = ttime[3];
 
-        // look for AM or PM at the end of the string
-        if((am == null || am.length == 0) && (time.indexOf('a') || time.indexOf('p'))) 
-        {
-            // find the string index of the A(m) or P(m)
-            var p = time.indexOf('a');
-            var suffix = "am"
-            if (p < 0) {
-                p = time.indexOf('p');
-                suffix = "pm";
-            }
-
-            // if the A or P is the last or second to last character in the string, we've got our AM or PM indicator
-            if(p > 0 && (p == time.length-1 || p == time.length-2))
-                am = suffix;
-        }
-
+        // step 3: fix up the hours string (make sure it's 1 or 2 chracters long ... if longer, fix) 
         if(h && h.length > 2)
         {
             if(m == null)
                 m = h.substring(h.length-2);
             h = h.substring(0, h.length-2);
         }
-        h = this.parseInt(h, 12);
+        h = parseInt(h, 10) || 12;
+
+        // step 4: fix AM / PM on hours that are longer than 12 (and don't otherwise specify am/pm)
         if(h > 12)
         {
             h = h % 12;
@@ -243,17 +215,23 @@ otp.util.DateUtils = {
             if(am == null || am == '')
                 am = 'p';
         }
-        if(m == null || m > 59 || m < 0)
+
+        // step 5: fix up the minutes, making sure they're 
+        if (m == null || m > 59 || m < 0)
+        {
             m = "00";
+        }
         else if(m.length != 2 && m >= 0 && m <= 9)
         {
-            m = "0" + m          // pad single digit number
+            m = "0" + m;       // pad single digit number
         }
 
+        // step 5b: cast m back into a string
         m = "" + m + "";
         if(m.length != 2)
             console.log("ERROR: we have problem with our minutes string:== " + m);
 
+        // step 6: rationalize the a/p stuff...
         if(am)
         {
             if(am == 'p')
@@ -263,16 +241,19 @@ otp.util.DateUtils = {
         } 
         else
         {
+            // step 6b: when no a/p given, choose best fit for transit (e.g., 12pm and 8am are more popular times than 12am and 8pm)
             if(h > 6 && h < 12)
                 am = "am";
             else
                 am = "pm";
         }
 
+        // step 7: if our format has a space between MM and AM/PM, add that spacer to our output
         var space = "";
-        if(format.toLowerCase().charAt(format.length-2) == " ")
+        if(format && format.toLowerCase().charAt(format.length-2) == " ")
             space = " ";
 
+        // step 8: final h:m <space> am/pm formatting and return...
         return  h + ":" + m + space + am;
     },
 
@@ -290,7 +271,7 @@ otp.util.DateUtils = {
     /** */
     parseTimeTest : function(t)
     {
-        var times = ['1:00 pm','1:00 p.m.','100 p','1:00p.m.','1:00p','1 pm','1 p.m.','1 p','1pm','1p.m.','1p','1:pm','13:00','13','944am', '1354','12335','1232p'];
+        var times = ['9:00 pm','1:09 p.m.','100 p','1:08p.m.','1:08p','1 pm','1 p.m.','1 p','1pm','1p.m.','1p','1:pm','13:09','13','944am', '1354','12335','1232p'];
 
         for ( var i = 0; i < times.length; i++ )
         {
