@@ -200,7 +200,12 @@ public abstract class RoutingResource {
         }
         request.setBatch(get(batch, n, new Boolean(false)));
         request.setOptimize(opt);
-        request.setModes(get(modes, n, new TraverseModeSet("WALK,TRANSIT")));
+        TraverseModeSet modeSet = get(modes, n, new TraverseModeSet("WALK,TRANSIT"));
+        request.setModes(modeSet);
+        if (modeSet.getBicycle() && modeSet.getWalk()) {
+            //slower bike speed for bike sharing, based on empirical evidence from DC.
+            request.setBikeSpeed(3.5);
+        }
         request.setMinTransferTime(get(minTransferTime, n, 0));
         request.setMaxTransfers(get(maxTransfers, n, 2));
         final long NOW_THRESHOLD_MILLIS = 15 * 60 * 60 * 1000;
