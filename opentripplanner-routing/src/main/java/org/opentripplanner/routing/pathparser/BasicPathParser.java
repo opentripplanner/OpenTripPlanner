@@ -7,6 +7,7 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
+import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.OffboardVertex;
 import org.opentripplanner.routing.vertextype.OnboardVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -68,6 +69,8 @@ public class BasicPathParser extends PathParser {
 			return TRANSIT;
 		if (v instanceof OffboardVertex)
 			return STATION;
+		if (v instanceof BikeRentalStationVertex)
+                    return OTHERPATH;
 		else 
 			throw new RuntimeException("failed to tokenize path");
 	}
