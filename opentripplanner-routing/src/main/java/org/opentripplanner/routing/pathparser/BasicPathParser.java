@@ -26,7 +26,7 @@ public class BasicPathParser extends PathParser {
 
 	private static final int STATION = 1;
 	private static final int TRANSIT = 2;
-	//some other values come from StreetEdge.java
+	//3,4,5 come from StreetEdge.java
 	
 	private static final DFA DFA;
 	static {
