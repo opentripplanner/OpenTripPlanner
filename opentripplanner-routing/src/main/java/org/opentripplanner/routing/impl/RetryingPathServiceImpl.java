@@ -31,6 +31,8 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.error.TransitTimesException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.pathparser.BasicPathParser;
+import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
@@ -90,6 +92,8 @@ public class RetryingPathServiceImpl implements PathService {
         // make sure the options has a routing context *before* cloning it (otherwise you get
         // orphan RoutingContexts leaving temporary edges in the graph until GC)
         options.setRoutingContext(graphService.getGraph(options.getRouterId()));
+        options.rctx.pathParsers = new PathParser[1];
+        options.rctx.pathParsers[0] = new BasicPathParser();
 
         long searchBeginTime = System.currentTimeMillis();
         

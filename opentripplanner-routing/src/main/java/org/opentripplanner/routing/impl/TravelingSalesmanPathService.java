@@ -30,6 +30,8 @@ import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.pathparser.BasicPathParser;
+import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.RoutingService;
@@ -62,6 +64,9 @@ public class TravelingSalesmanPathService implements PathService {
         Graph graph = graphService.getGraph(options.getRouterId());
         long time = options.dateTime;
         options.setRoutingContext(graph);
+        options.rctx.pathParsers = new PathParser[1];
+        options.rctx.pathParsers[0] = new BasicPathParser();
+
         List<Vertex> vertices = options.rctx.intermediateVertices;
         vertices.add(options.rctx.toVertex);
         options.intermediatePlaces.clear();

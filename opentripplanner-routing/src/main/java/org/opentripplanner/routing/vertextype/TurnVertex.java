@@ -20,6 +20,7 @@ import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.patch.Alert;
@@ -63,7 +64,7 @@ public class TurnVertex extends StreetVertex {
     /** is this street a staircase */
     private boolean stairs = false;
 
-    protected int streetClass;
+    protected int streetClass = StreetEdge.CLASS_OTHERPATH;
 
     protected String edgeId;
 

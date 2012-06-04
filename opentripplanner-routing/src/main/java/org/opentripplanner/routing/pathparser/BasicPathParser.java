@@ -26,20 +26,18 @@ public class BasicPathParser extends PathParser {
 
 	private static final int STATION = 1;
 	private static final int TRANSIT = 2;
-	private static final int STREET = 3; //these must match the class numbers in StreetEdge
-	private static final int CROSSING = 4; //crosswalks
-	private static final int OTHERPATH = 5;
+	//some other values come from StreetEdge.java
 	
 	private static final DFA DFA;
 	static {
 	    
-	        Nonterminal bikeNonStreet = star(choice(CROSSING, OTHERPATH));
+	        Nonterminal bikeNonStreet = star(choice(StreetEdge.CLASS_CROSSING, StreetEdge.CLASS_OTHERPATH));
 	        
 	        //(C|O)*(S+O(C|O)*)*(S*(C|O)*) -- the inverse of S+C+S+
 	        Nonterminal optionalNontransitLeg = 
 	                seq(bikeNonStreet, 
-	                    star(seq(plus(STREET), OTHERPATH, bikeNonStreet)), 
-	                    seq(star(STREET),bikeNonStreet));
+	                    star(plus(StreetEdge.CLASS_STREET), StreetEdge.CLASS_OTHERPATH, bikeNonStreet), 
+	                    seq(star(StreetEdge.CLASS_STREET),bikeNonStreet));
 	                
 		Nonterminal transitLeg = seq(plus(STATION), plus(TRANSIT), plus(STATION));
 		Nonterminal itinerary = seq(optionalNontransitLeg, star(transitLeg, optionalNontransitLeg));
@@ -62,7 +60,7 @@ public class BasicPathParser extends PathParser {
 			    int cls = ((StreetEdge) edge).getStreetClass();
 			    return cls;
 			} else {
-			    return OTHERPATH;
+			    return StreetEdge.CLASS_OTHERPATH;
 			}
 		}
 		if (v instanceof OnboardVertex)
@@ -70,7 +68,7 @@ public class BasicPathParser extends PathParser {
 		if (v instanceof OffboardVertex)
 			return STATION;
 		if (v instanceof BikeRentalStationVertex)
-                    return OTHERPATH;
+                    return StreetEdge.CLASS_OTHERPATH;
 		else 
 			throw new RuntimeException("failed to tokenize path");
 	}
