@@ -587,7 +587,7 @@ public class ContractionHierarchy implements Serializable {
     	upOptions.setRoutingContext(graph, origin, target);
         downOptions.setArriveBy(true);
         downOptions.dateTime = time;
-        upOptions.setRoutingContext(graph, target, origin);
+        downOptions.setRoutingContext(graph, target, origin);
 
     	/** max walk distance cannot be less than distances to nearest transit stops */
     	double minWalkDistance = 
