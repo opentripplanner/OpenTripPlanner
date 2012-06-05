@@ -1779,7 +1779,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             street.setId(id);
 
             String highway = way.getTag("highway");
-            if ("footway".equals(highway) && way.isTag("footway", "crossing")) {
+            if ("footway".equals(highway) && way.isTag("footway", "crossing") && !way.isTag("bicycle", "designated")) {
                 street.setStreetClass(StreetEdge.CLASS_CROSSING);
             } else if ("residential".equals(highway) || "tertiary".equals(highway)
                     || "secondary".equals(highway) || "secondary_link".equals(highway)
