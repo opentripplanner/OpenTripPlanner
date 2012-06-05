@@ -1055,8 +1055,10 @@ public class GTFSPatternHopFactory {
                 LineString line = getLineStringForShapeId(shapeId);
                 LocationIndexedLine lol = new LocationIndexedLine(line);
 
-                return getSegmentGeometry(shapeId, lol, startIndex, endIndex, startDistance,
-                        endDistance);
+                geometry = getSegmentGeometry(graph, shapeId, lol, startIndex, endIndex, startDistance,
+                        endDistance, st0, st1);
+                
+                return geometry;
             }
         }
 
@@ -1074,25 +1076,69 @@ public class GTFSPatternHopFactory {
         double distanceFrom = startCoord.getSegmentLength(line);
         double distanceTo = endCoord.getSegmentLength(line);
 
-        return getSegmentGeometry(shapeId, lol, startCoord, endCoord, distanceFrom, distanceTo);
+        return getSegmentGeometry(graph, shapeId, lol, startCoord, endCoord, distanceFrom, distanceTo, st0, st1);
     }
 
-    private Geometry getSegmentGeometry(AgencyAndId shapeId,
+    private LineString createSimpleGeometry(Stop s0, Stop s1) {
+        
+        Coordinate[] coordinates = new Coordinate[] {
+                new Coordinate(s0.getLon(), s0.getLat()),
+                new Coordinate(s1.getLon(), s1.getLat())
+        };
+        CoordinateSequence sequence = new PackedCoordinateSequence.Double(coordinates, 2);
+        
+        return _geometryFactory.createLineString(sequence);        
+    }
+
+    private boolean isValid(Geometry geometry, Stop s0, Stop s1) {
+        Coordinate[] coordinates = geometry.getCoordinates();
+        if (coordinates.length < 2) {
+            return false;
+        }
+        if (geometry.getLength() == 0) {
+            return false;
+        }
+        for (Coordinate coordinate : coordinates) {
+            if (Double.isNaN(coordinate.x) || Double.isNaN(coordinate.y)) {
+                return false;
+            }
+        }
+        Coordinate geometryStartCoord = coordinates[0];
+        Coordinate geometryEndCoord = coordinates[coordinates.length - 1];
+        
+        Coordinate startCoord = new Coordinate(s0.getLon(), s0.getLat());
+        Coordinate endCoord = new Coordinate(s1.getLon(), s1.getLat());
+        if (DistanceLibrary.distance(startCoord, geometryStartCoord) > 100) {
+            return false;
+        } else if (DistanceLibrary.distance(endCoord, geometryEndCoord) > 100) {
+            return false;
+        }
+        return true;
+    }
+
+    private LineString getSegmentGeometry(Graph graph, AgencyAndId shapeId,
             LocationIndexedLine locationIndexedLine, LinearLocation startIndex,
-            LinearLocation endIndex, double startDistance, double endDistance) {
+            LinearLocation endIndex, double startDistance, double endDistance, 
+            StopTime st0, StopTime st1) {
 
         ShapeSegmentKey key = new ShapeSegmentKey(shapeId, startDistance, endDistance);
 
-        Geometry geometry = _geometriesByShapeSegmentKey.get(key);
+        LineString geometry = _geometriesByShapeSegmentKey.get(key);
         if (geometry == null) {
 
-            geometry = locationIndexedLine.extractLine(startIndex, endIndex);
+            geometry = (LineString) locationIndexedLine.extractLine(startIndex, endIndex);
 
             // Pack the resulting line string
-            CoordinateSequence sequence = new PackedCoordinateSequence.Float(geometry
+            CoordinateSequence sequence = new PackedCoordinateSequence.Double(geometry
                     .getCoordinates(), 2);
             geometry = _geometryFactory.createLineString(sequence);
+            
+            if (!isValid(geometry, st0.getStop(), st1.getStop())) {
+                _log.warn(GraphBuilderAnnotation.register(graph, Variety.BOGUS_SHAPE_GEOMETRY_CAUGHT, shapeId, st0, st1));
 
+                //fall back to trivial geometry
+                geometry = createSimpleGeometry(st0.getStop(), st1.getStop());
+            }
             _geometriesByShapeSegmentKey.put(key, (LineString) geometry);
         }
 
@@ -1164,7 +1210,7 @@ public class GTFSPatternHopFactory {
             distances = null;
         }
 
-        CoordinateSequence sequence = new PackedCoordinateSequence.Float(coordinates, 2);
+        CoordinateSequence sequence = new PackedCoordinateSequence.Double(coordinates, 2);
         geometry = _geometryFactory.createLineString(sequence);
         _geometriesByShapeId.put(shapeId, geometry);
         _distancesByShapeId.put(shapeId, distances);
@@ -1280,7 +1326,7 @@ public class GTFSPatternHopFactory {
             }
 
             TransferEdge transferEdge = new TransferEdge(fromv, tov, distance, time);
-            CoordinateSequence sequence = new PackedCoordinateSequence.Float(new Coordinate[] {
+            CoordinateSequence sequence = new PackedCoordinateSequence.Double(new Coordinate[] {
                     fromv.getCoordinate(), tov.getCoordinate() }, 2);
             Geometry geometry = _geometryFactory.createLineString(sequence);
             transferEdge.setGeometry(geometry);
