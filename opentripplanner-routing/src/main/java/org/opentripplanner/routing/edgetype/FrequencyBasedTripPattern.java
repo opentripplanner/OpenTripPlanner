@@ -179,14 +179,10 @@ public class FrequencyBasedTripPattern implements Serializable, TripPattern {
         if (beforeTimeAtStart < timeRangeStart[timeRange]) timeRange -= 1;
         if (timeRange < 0) return -1;
         
-        System.out.println("before " + beforeTime);
-        System.out.println("range is " +timeRange);
-        
         int frequency = timeRangeFrequency[timeRange];
         int frequencyOffset = (timeRangeEnd[timeRange] - timeRangeStart[timeRange]) % frequency;
         int lastArrivalTimeInRange = stopArrivalTimeOffset + timeRangeEnd[timeRange] - frequencyOffset;
         
-        System.out.println("lat " + lastArrivalTimeInRange);
         int arrivalTime;
 
         if (exact) {
@@ -195,11 +191,9 @@ public class FrequencyBasedTripPattern implements Serializable, TripPattern {
                 arrivalTime = lastArrivalTimeInRange;
             } else {
                 int offset = (lastArrivalTimeInRange - beforeTime) % frequency;
-                System.out.println("offset " + offset);
                 if (offset == 0)
                     offset = frequency; // catch exact hits
                 arrivalTime = beforeTime - frequency + offset;
-                System.out.println("at " + arrivalTime);
             }
         } else {
             arrivalTime = beforeTime - frequency;
