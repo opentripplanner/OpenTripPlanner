@@ -248,7 +248,7 @@ public class TestPatternHopFactory extends TestCase {
         Vertex stop_g = graph.getVertex("agency_G_depart");
         PatternHop hop = getHopOut(stop_g);
         Geometry geometry = hop.getGeometry();
-        assertTrue(geometry.getLength() > 1.0);
+        assertFalse(geometry.getLength() > 1.0);
 
         Vertex stop_a = graph.getVertex("agency_A_depart");
         hop = getHopOut(stop_a);
