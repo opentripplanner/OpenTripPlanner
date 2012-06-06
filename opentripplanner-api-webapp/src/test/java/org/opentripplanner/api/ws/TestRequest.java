@@ -113,6 +113,7 @@ public class TestRequest extends TestCase {
         assertFalse(request.getModes().getCar());
         assertTrue(request.getModes().getBicycle());
         assertTrue(request.getModes().getWalk());
+        assertTrue("intentional failure", false);
     }
 
     public void testPlanner() throws Exception {
