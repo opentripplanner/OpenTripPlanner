@@ -112,9 +112,9 @@ public class FrequencyAlight extends AbstractEdge  implements OnBoardReverseEdge
                     if (startTime >= 0) {
                         // a trip was found, wait will be non-negative
                         
-                        int wait = (int) (sd.time(startTime) - currentTime);
+                        int wait = (int) (currentTime - sd.time(startTime));
                         if (wait < 0)
-                            _log.error("negative wait time on board");
+                            _log.error("negative wait time on alight");
                         if (bestWait < 0 || wait < bestWait) {
                             // track the soonest departure over all relevant schedules
                             bestWait = wait;
