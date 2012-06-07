@@ -1,7 +1,10 @@
 package org.opentripplanner.graph_builder.impl.osm;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.junit.Test;
@@ -21,7 +24,7 @@ public class TestLengthConstrainedPathFinder extends TestCase {
     private HashMap<Class<?>, Object> extra = new HashMap<Class<?>, Object>();
 
     @Test
-    public void testGraphBuilder() throws Exception {
+    public void testFinder() throws Exception {
         
         Graph gg = new Graph();
 
@@ -32,15 +35,15 @@ public class TestLengthConstrainedPathFinder extends TestCase {
         provider.setPath(file);
         loader.setProvider(provider);
         loader.buildGraph(gg, extra);
-
-        Vertex v2 = gg.getVertex("way 25660216 from 1"); // Kamiennogorska
-        Vertex v2back = gg.getVertex("way 25660216 from 1 back"); // Kamiennogorska
-                                                                  // back
-        assertNotNull(v2);
-        assertNotNull(v2back);
+        gg.save(new File("/home/abyrd/constrain.graph"));
         
-        Edge startEdge = v2.getOutgoing().iterator().next();
-        Edge endEdge = v2.getIncoming().iterator().next();
+        Vertex v1 = gg.getVertex("way 27331296 from 3"); 
+        Vertex v2 = gg.getVertex("way 27339447 from 2");
+        assertNotNull(v1);
+        assertNotNull(v2);
+        
+        Edge startEdge = v1.getOutgoing().iterator().next();
+        Edge endEdge = v2.getOutgoing().iterator().next();
         assertNotNull(startEdge);
         assertNotNull(endEdge);
         System.out.println(startEdge);
@@ -54,7 +57,7 @@ public class TestLengthConstrainedPathFinder extends TestCase {
             long elapsed = 0;
             for (int pathLength = 100; elapsed < 2000 && pathLength < 4000; pathLength += 50) {
                 long t0 = System.currentTimeMillis();
-                finder = new LengthConstrainedPathFinder(startEdge, startEdge, pathLength, 0, prune);
+                finder = new LengthConstrainedPathFinder(startEdge, endEdge, pathLength, 0, prune);
                 solutions = finder.solveBreadthFirst();
                 long t1 = System.currentTimeMillis();
                 elapsed = t1 - t0;
@@ -62,16 +65,24 @@ public class TestLengthConstrainedPathFinder extends TestCase {
             }   
         }
 
-        finder = new LengthConstrainedPathFinder(startEdge, startEdge, 1800, 0, true);
+        finder = new LengthConstrainedPathFinder(startEdge, endEdge, 2500, 0, true);
+        
         solutions = finder.solveDepthFirst();
         System.out.println(solutions.size());
-        for (State s : solutions)
-            System.out.println(s.toStringVerbose());
+//        for (State s : solutions)
+//            System.out.println(s.toStringVerbose());
 
         solutions = finder.solveBreadthFirst();
         System.out.println(solutions.size());
-        for (State s : solutions)
-            System.out.println(s.toStringVerbose());
+//        for (State s : solutions)
+//            System.out.println(s.toStringVerbose());
+        
+        File csvOut = new File("/home/abyrd/constrain.csv");
+        PrintWriter pw = new PrintWriter(csvOut);
+        for (Entry<Edge, Double> entry : finder.pathProportions().entrySet()) {
+            pw.printf("%f; %s \n", entry.getValue(), entry.getKey().getGeometry().toText());
+        }
+        pw.close();
         
     }
     

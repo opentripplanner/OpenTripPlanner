@@ -194,6 +194,25 @@ public class LengthConstrainedPathFinder {
             return String.format("%5.0f %d %s", this.minLength, edges.size(), edges);
         }
     }
+    
+    public Map<Edge, Double> pathProportions() {
+        Map<Edge, Double> edgeCounts = new HashMap<Edge, Double>();
+        for (State path : getSolutions()) {
+            for (Edge edge : path.toEdgeList()) {
+                Double count = edgeCounts.get(edge);
+                if (count == null)
+                    count = 0.0;
+                edgeCounts.put(edge, count + 1);
+            }
+        }
+        int nPaths = getSolutions().size();
+        List<Edge> edges = new ArrayList<Edge>(edgeCounts.keySet());
+        for (Edge edge : edges) {
+            Double count = edgeCounts.get(edge);
+            edgeCounts.put(edge, count / nPaths);
+        }
+        return edgeCounts;
+    }
 
 }
 
