@@ -1,7 +1,6 @@
 package org.opentripplanner.graph_builder.impl.osm;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -35,7 +34,7 @@ public class TestLengthConstrainedPathFinder extends TestCase {
         provider.setPath(file);
         loader.setProvider(provider);
         loader.buildGraph(gg, extra);
-        gg.save(new File("/home/abyrd/constrain.graph"));
+        //gg.save(new File("/home/abyrd/constrain.graph"));
         
         Vertex v1 = gg.getVertex("way 27331296 from 3"); 
         Vertex v2 = gg.getVertex("way 27339447 from 2");
@@ -65,7 +64,7 @@ public class TestLengthConstrainedPathFinder extends TestCase {
             }   
         }
 
-        finder = new LengthConstrainedPathFinder(startEdge, endEdge, 2500, 0, true);
+        finder = new LengthConstrainedPathFinder(startEdge, endEdge, 2000, 0, true);
         
         solutions = finder.solveDepthFirst();
         System.out.println(solutions.size());
