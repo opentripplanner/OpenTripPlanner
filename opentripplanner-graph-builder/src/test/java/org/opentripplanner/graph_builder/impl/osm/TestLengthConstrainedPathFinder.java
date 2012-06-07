@@ -22,6 +22,8 @@ public class TestLengthConstrainedPathFinder extends TestCase {
 
     private HashMap<Class<?>, Object> extra = new HashMap<Class<?>, Object>();
 
+    private static final boolean DEBUG_OUTPUT = false;
+    
     @Test
     public void testFinder() throws Exception {
         
@@ -34,7 +36,8 @@ public class TestLengthConstrainedPathFinder extends TestCase {
         provider.setPath(file);
         loader.setProvider(provider);
         loader.buildGraph(gg, extra);
-        //gg.save(new File("/home/abyrd/constrain.graph"));
+        if(DEBUG_OUTPUT)
+            gg.save(new File("/home/abyrd/constrain.graph"));
         
         Vertex v1 = gg.getVertex("way 27331296 from 3"); 
         Vertex v2 = gg.getVertex("way 27339447 from 2");
@@ -68,20 +71,18 @@ public class TestLengthConstrainedPathFinder extends TestCase {
         
         solutions = finder.solveDepthFirst();
         System.out.println(solutions.size());
-//        for (State s : solutions)
-//            System.out.println(s.toStringVerbose());
 
         solutions = finder.solveBreadthFirst();
         System.out.println(solutions.size());
-//        for (State s : solutions)
-//            System.out.println(s.toStringVerbose());
         
-        File csvOut = new File("/home/abyrd/constrain.csv");
-        PrintWriter pw = new PrintWriter(csvOut);
-        for (Entry<Edge, Double> entry : finder.pathProportions().entrySet()) {
-            pw.printf("%f; %s \n", entry.getValue(), entry.getKey().getGeometry().toText());
+        if(DEBUG_OUTPUT) {
+            File csvOut = new File("/home/abyrd/constrain.csv");
+            PrintWriter pw = new PrintWriter(csvOut);
+            for (Entry<Edge, Double> entry : finder.pathProportions().entrySet()) {
+                pw.printf("%f; %s \n", entry.getValue(), entry.getKey().getGeometry().toText());
+            }
+            pw.close();
         }
-        pw.close();
         
     }
     
