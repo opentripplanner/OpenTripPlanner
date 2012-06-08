@@ -9,8 +9,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+
+import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.pqueue.BinHeap;
+import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.TurnVertex;
 
 /**
  * Path finder for use in debugging and testing the vehicle location inference
@@ -44,18 +49,24 @@ import org.opentripplanner.routing.graph.Edge;
  */
 public class LengthConstrainedPathFinder {
 
-    // search parameters
-    private final Edge startEdge, targetEdge;
+    //these actually represent being somewhere on the linestring, not points
+    private final TurnVertex startVertex, targetVertex; 
     private final double targetLength, epsilon;
     private Set<State> solutions;
     // cached derived values
     private final boolean reverse; 
-    public final Map<Edge, Double> bounds;
-    
+    public final Map<Vertex, Double> bounds;
+
     public LengthConstrainedPathFinder (Edge startEdge, Edge targetEdge, 
            double targetLength, double epsilon, boolean calculateBounds) {
-        this.startEdge = startEdge;
-        this.targetEdge = targetEdge;
+        this((TurnVertex)(startEdge.getFromVertex()), (TurnVertex)(targetEdge.getFromVertex()), 
+           targetLength, epsilon, calculateBounds);
+        }
+
+    public LengthConstrainedPathFinder (TurnVertex startVertex, TurnVertex targetVertex, 
+           double targetLength, double epsilon, boolean calculateBounds) {
+        this.startVertex = startVertex;
+        this.targetVertex = targetVertex;
         reverse = targetLength < 0;
         targetLength = Math.abs(targetLength);
         this.targetLength = targetLength;
@@ -67,22 +78,24 @@ public class LengthConstrainedPathFinder {
     }
 
     // use reverse search from the target edge to find lower bounds on distance for pruning
-    private Map<Edge, Double> findBounds() {
-        // lower bound on distance after traversing the edge
-        Map<Edge, Double> ret = new HashMap<Edge, Double>();
-        ret.put(targetEdge, 0.0); 
-        BinHeap<Edge> pq = new BinHeap<Edge>();
-        pq.insert(targetEdge, 0.0);
+    private Map<Vertex, Double> findBounds() {
+        Map<Vertex, Double> ret = new HashMap<Vertex, Double>();
+        ret.put(targetVertex, 0.0); 
+        BinHeap<Vertex> pq = new BinHeap<Vertex>();
+        pq.insert(targetVertex, 0.0);
         while ( ! pq.empty()) {
-            double length = pq.peek_min_key();
-            Edge e0 = pq.extract_min();
-            for (Edge e1 : getAdjacentEdges(e0, !reverse)) {
-                double length1 = length + e1.getDistance();
+            double length0 = pq.peek_min_key();
+            Vertex v0 = pq.extract_min();
+            // TODO handle PlainStreetEdges (or not?) they may already work right (before edge...)
+            for (Edge edge : getTurns(v0, !reverse)) {
+                double length1 = length0 + edge.getDistance();
+                // sense intentionally swapped because this is a search backward from target
+                Vertex v1 = reverse ? edge.getToVertex() : edge.getFromVertex();
                 if (length1 < targetLength) {
-                    Double existingLength = ret.get(e1);
+                    Double existingLength = ret.get(v1);
                     if (existingLength == null || length1 < existingLength) {
-                        ret.put(e1, length1);
-                        pq.insert(e1, length1);
+                        ret.put(v1, length1);
+                        pq.insert(v1, length1);
                     }
                 }
             }
@@ -98,43 +111,43 @@ public class LengthConstrainedPathFinder {
     }
     
     /** accounts for negative target distances */
-    private Iterable<Edge> getAdjacentEdges(Edge edge, boolean reverse) {
+    private Iterable<Edge> getTurns(Vertex vertex, boolean reverse) {
         if (reverse)
-            return edge.getFromVertex().getIncoming();
+            return vertex.getIncoming();
         else
-            return edge.getToVertex().getOutgoing();
+            return vertex.getOutgoing();
     }
     
-    /** breadth-first search */
-    public Set<State> solveBreadthFirst() {
-        solutions = new HashSet<State>();
-        Queue<State> q = new LinkedList<State>();
-        q.add(new State(startEdge));
-        while ( ! q.isEmpty()) {
-            State s0 = q.poll();
-            //System.out.println(s0.toString());
-            if (s0.isSolution())
-                solutions.add(s0);
-            for (Edge edge : getAdjacentEdges(s0.edge, reverse)) {
-                State s1 = s0.traverse(edge);
-                if (s1.isCandidate())
-                    q.add(s1);
-            }
-        }
-        return getSolutions();
-    }
+//    /** breadth-first search */
+//    public Set<State> solveBreadthFirst() {
+//        solutions = new HashSet<State>();
+//        Queue<State> q = new LinkedList<State>();
+//        q.add(new State(startEdge));
+//        while ( ! q.isEmpty()) {
+//            State s0 = q.poll();
+//            //System.out.println(s0.toString());
+//            if (s0.isSolution())
+//                solutions.add(s0);
+//            for (Edge edge : getAdjacentEdges(s0.edge, reverse)) {
+//                State s1 = s0.traverse(edge);
+//                if (s1.isCandidate())
+//                    q.add(s1);
+//            }
+//        }
+//        return getSolutions();
+//    }
 
     /** recursive depth-first search using JVM stack */
     public Set<State> solveDepthFirst() {
         solutions = new HashSet<State>();
-        depthFirst(new State(startEdge));
+        depthFirst(new State(startVertex));
         return getSolutions();
     }
 
     private void depthFirst(State s0) {
         if (s0.isSolution())
             solutions.add(s0);
-        for (Edge edge : getAdjacentEdges(s0.edge, reverse)) {
+        for (Edge edge : getTurns(s0.vertex, reverse)) {
             State s1 = s0.traverse(edge);
             if (s1.isCandidate())
                 depthFirst(s1);
@@ -143,79 +156,80 @@ public class LengthConstrainedPathFinder {
     
     public class State {
         
-        final Edge edge; 
+        final Vertex vertex; 
         final double minLength; // before traversing the edge, without initial/final edge fragments
         final State back;
         
-        public State(Edge edge) { 
-            // min distance should be 0 on 2-length paths
+        public State(TurnVertex tvertex) { 
+            // make initial state. min distance should be 0 paths of length 2. 
             // neg is harmless because it is only used as a lower bound 
-            this(edge, 0 - edge.getDistance(), null);
+            this(tvertex, 0 - tvertex.getLength(), null);
         }
         
-        private State(Edge edge, double minLength, State back) {
-            this.edge = edge;
+        private State(Vertex vertex, double minLength, State back) {
+            this.vertex = vertex;
             this.minLength = minLength;
             this.back = back;
         }
 
-        public List<Edge> toEdgeList() {
-            List<Edge> ret = new LinkedList<Edge>();
+        public List<Vertex> toVertexList() {
+            List<Vertex> ret = new LinkedList<Vertex>();
             for (State s = this; s != null; s = s.back)
-                ret.add(0, s.edge);
+                ret.add(0, s.vertex);
             return ret;
         }
 
         private boolean isCandidate() {
             Double lBound = 0.0;
             if (bounds != null)
-                lBound = bounds.get(this.edge);
+                lBound = bounds.get(this.vertex);
                 if (lBound == null)
                     lBound = Double.POSITIVE_INFINITY;
             return this.minLength - epsilon + lBound < targetLength;
         }
 
         private double getMaxLength() {
-            return this.minLength + startEdge.getDistance() + targetEdge.getDistance(); 
+            // TurnVertex has length because it actually represents being on a segment
+            return this.minLength + startVertex.getLength() + targetVertex.getLength(); 
         }
 
         private boolean isSolution() {
-            return edge == targetEdge && 
+            return vertex == targetVertex && 
                    this.minLength - epsilon <= targetLength && 
                    this.getMaxLength() + epsilon >= targetLength;
         }
         
         private State traverse(Edge edge) {
-            return new State(edge, this.minLength + this.edge.getDistance(), this);
+            return new State(edge.getToVertex(), this.minLength + edge.getDistance(), this);
         }
         
         public String toString() {
-            return String.format("%5.0f %s", minLength, edge);
+            return String.format("%5.0f %s", minLength, vertex);
         }
 
         public String toStringVerbose() {
-            List<Edge> edges = this.toEdgeList();
-            return String.format("%5.0f %d %s", this.minLength, edges.size(), edges);
+            List<Vertex> vertices = this.toVertexList();
+            return String.format("%5.0f %d %s", this.minLength, vertices.size(), vertices);
         }
     }
     
-    public Map<Edge, Double> pathProportions() {
-        Map<Edge, Double> edgeCounts = new HashMap<Edge, Double>();
+    public Map<Vertex, Double> pathProportions() {
+        Map<Vertex, Double> vertexCounts = new HashMap<Vertex, Double>();
         for (State path : getSolutions()) {
-            for (Edge edge : path.toEdgeList()) {
-                Double count = edgeCounts.get(edge);
+            for (Vertex vertex : path.toVertexList()) {
+                Double count = vertexCounts.get(vertex);
                 if (count == null)
                     count = 0.0;
-                edgeCounts.put(edge, count + 1);
+                vertexCounts.put(vertex, count + 1);
             }
         }
         int nPaths = getSolutions().size();
-        List<Edge> edges = new ArrayList<Edge>(edgeCounts.keySet());
-        for (Edge edge : edges) {
-            Double count = edgeCounts.get(edge);
-            edgeCounts.put(edge, count / nPaths);
+        List<Vertex> vs = new ArrayList<Vertex>(vertexCounts.keySet());
+        for (Vertex v : vs) {
+            Double count = vertexCounts.get(v);
+            vertexCounts.put(v, count / nPaths);
         }
-        return edgeCounts;
+        return vertexCounts;
     }
 
 }
