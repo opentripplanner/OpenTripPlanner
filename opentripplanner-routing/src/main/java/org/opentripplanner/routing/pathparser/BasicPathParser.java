@@ -39,7 +39,10 @@ public class BasicPathParser extends PathParser {
 
         // (C|O)*(S+O(C|O)*)*(S*(C|O)*) -- the inverse of S+C+S+
         Nonterminal optionalNontransitLeg = seq(bikeNonStreet,
-                star(plus(StreetEdge.CLASS_STREET), StreetEdge.CLASS_OTHERPATH, bikeNonStreet),
+                star(plus(StreetEdge.CLASS_STREET),
+                     star(StreetEdge.CLASS_CROSSING),
+                     StreetEdge.CLASS_OTHERPATH,
+                     bikeNonStreet),
                 seq(star(StreetEdge.CLASS_STREET), bikeNonStreet));
 
         Nonterminal transitLeg = seq(plus(STATION), plus(TRANSIT), plus(STATION));
