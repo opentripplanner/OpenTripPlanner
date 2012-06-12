@@ -212,8 +212,8 @@ public abstract class RoutingResource {
         boolean tripPlannedForNow = Math.abs(request.getDateTime().getTime() - new Date().getTime()) 
                 < NOW_THRESHOLD_MILLIS;
         request.setUseBikeRentalAvailabilityInformation(tripPlannedForNow);
-        if (intermediatePlaces != null && intermediatePlacesOrdered && request.getModes().isTransit())
-            throw new UnsupportedOperationException("TSP is not supported for transit trips");
+        if (intermediatePlaces != null && (request.getModes().isTransit() || request.getModes().getWalk() && request.getModes().getBicycle()))
+            throw new UnsupportedOperationException("TSP is not supported for transit or bike share trips");
         return request;
     }
     
