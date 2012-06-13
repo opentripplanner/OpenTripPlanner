@@ -210,7 +210,7 @@ public class TestRequest extends TestCase {
             this(v1, v2);
             this.intermediatePlaces = intermediates;
             TravelingSalesmanPathService tsp = new TravelingSalesmanPathService();
-            tsp.chainedPathService = Context.getInstance().pathService;
+            tsp.setChainedPathService(Context.getInstance().pathService);
             tsp.graphService = Context.getInstance().graphService;
             this.planGenerator.pathService = tsp;
         }

@@ -44,7 +44,7 @@ public class TravelingSalesmanPathService implements PathService {
     @Autowired public GraphService graphService;
     // @Resource("name") or @Qualifier
     @Autowired public SPTService tspSptService;
-    @Autowired public PathService chainedPathService;
+    private PathService chainedPathService;
     
     @Override
     public List<GraphPath> getPaths(RoutingRequest options) {
@@ -153,6 +153,15 @@ public class TravelingSalesmanPathService implements PathService {
             lastVertex = path.getEndVertex();
         }
         return newPath;
+    }
+
+    public PathService getChainedPathService() {
+        return chainedPathService;
+    }
+
+    @Autowired
+    public void setChainedPathService(PathService chainedPathService) {
+        this.chainedPathService = chainedPathService;
     }
 
 }
