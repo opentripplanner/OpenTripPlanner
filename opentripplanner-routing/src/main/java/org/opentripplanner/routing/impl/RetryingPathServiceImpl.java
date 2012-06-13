@@ -14,33 +14,20 @@
 package org.opentripplanner.routing.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
-import org.opentripplanner.common.model.NamedPlace;
-import org.opentripplanner.routing.core.RoutingContext;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.error.TransitTimesException;
-import org.opentripplanner.routing.error.VertexNotFoundException;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.pathparser.BasicPathParser;
 import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
-import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
-import org.opentripplanner.routing.services.RoutingService;
 import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
