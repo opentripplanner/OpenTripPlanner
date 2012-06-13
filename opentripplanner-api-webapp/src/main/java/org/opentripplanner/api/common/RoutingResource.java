@@ -212,7 +212,7 @@ public abstract class RoutingResource {
         boolean tripPlannedForNow = Math.abs(request.getDateTime().getTime() - new Date().getTime()) 
                 < NOW_THRESHOLD_MILLIS;
         request.setUseBikeRentalAvailabilityInformation(tripPlannedForNow);
-        if (intermediatePlaces != null && intermediatePlaces.size() > 0
+        if (request.getIntermediatePlaces() != null
                 && (request.getModes().isTransit() || 
                         (request.getModes().getWalk() && 
                          request.getModes().getBicycle())))
