@@ -102,15 +102,6 @@ public class RetryingPathServiceImpl implements PathService {
         Queue<RoutingRequest> optionQueue = new LinkedList<RoutingRequest>();
         optionQueue.add(options);
 
-        /* if the user wants to travel by transit, create a bus-only set of options */
-        if (options.getModes().getTrainish() && options.getModes().contains(TraverseMode.BUS)) {
-            RoutingRequest busOnly = options.clone();
-            busOnly.setModes(options.getModes().clone());
-            busOnly.getModes().setTrainish(false);
-            // Moved inside block to avoid double insertion in list ? (AMB)
-            // optionQueue.add(busOnly);
-        }
-
         double maxWeight = Double.MAX_VALUE;
         double maxWalk = options.getMaxWalkDistance();
         long maxTime = options.isArriveBy() ? 0 : Long.MAX_VALUE;
