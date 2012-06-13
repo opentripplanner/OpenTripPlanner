@@ -40,7 +40,7 @@ public class GtfsBundle {
 
     private CsvInputSource csvInputSource;
 
-    private Boolean defaultBikesAllowed = false;
+    private Boolean defaultBikesAllowed = true;
 
     private boolean transfersTxtDefinesStationPaths = false;
 
