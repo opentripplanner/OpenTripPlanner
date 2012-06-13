@@ -60,14 +60,15 @@ public class TravelingSalesmanPathService implements PathService {
         options.rctx.pathParsers = new PathParser[1];
         options.rctx.pathParsers[0] = new BasicPathParser();
 
-        List<Vertex> vertices = options.rctx.intermediateVertices;
-        vertices.add(options.rctx.toVertex);
-        options.intermediatePlaces.clear();
-
+        Vertex fromVertex = options.rctx.fromVertex;
+        Vertex toVertex = options.rctx.toVertex;
         if (options.intermediatePlacesOrdered) {
+            List<Vertex> vertices = options.rctx.intermediateVertices;
+            vertices.add(toVertex);
+            options.intermediatePlaces.clear();
             // simple case: intermediate places are in order.
             List<GraphPath> paths = new ArrayList<GraphPath>();
-            Vertex previousVertex = options.rctx.fromVertex;
+            Vertex previousVertex = fromVertex;
             for (Vertex v : vertices) {
                 options.dateTime = time;
                 options.setRoutingContext(graph, previousVertex, v);
@@ -87,14 +88,16 @@ public class TravelingSalesmanPathService implements PathService {
         Map<Vertex, HashMap<Vertex, GraphPath>> paths = new HashMap<Vertex, HashMap<Vertex, GraphPath>>();
 
         HashMap<Vertex, GraphPath> firstLegPaths = new HashMap<Vertex, GraphPath>();
-        paths.put(options.rctx.fromVertex, firstLegPaths);
+        paths.put(fromVertex, firstLegPaths);
 
         // compute shortest paths between each pair of vertices
-        for (Vertex v : options.rctx.intermediateVertices) {
+        @SuppressWarnings("unchecked")
+        List<Vertex> intermediates = (List<Vertex>) options.rctx.intermediateVertices.clone();
+        for (Vertex v : intermediates) {
 
             /* Find initial paths from the source vertex to the intermediate vertex */
             options.dateTime = time;
-            options.setRoutingContext(graph, options.rctx.fromVertex, v);
+            options.setRoutingContext(graph, fromVertex, v);
             List<GraphPath> partialPaths = chainedPathService.getPaths(options);
             if (partialPaths == null || partialPaths.size() == 0)
                 return null;
@@ -104,12 +107,12 @@ public class TravelingSalesmanPathService implements PathService {
             HashMap<Vertex, GraphPath> outPaths = new HashMap<Vertex, GraphPath>();
             paths.put(v, outPaths);
 
-            for (Vertex tv : options.rctx.intermediateVertices) {
+            for (Vertex tv : intermediates) {
                 /* We don't need to compute paths where the source and target vertex are the same */
                 if (v == tv)
                     continue;
 
-                options.setRoutingContext(graph, options.rctx.fromVertex, tv);
+                options.setRoutingContext(graph, v, tv);
                 List<GraphPath> morePaths = chainedPathService.getPaths(options);
                 if (!morePaths.isEmpty()) {
                     outPaths.put(tv, morePaths.get(0));
@@ -117,17 +120,17 @@ public class TravelingSalesmanPathService implements PathService {
             }
 
             /* Find paths from the intermediate vertex to the target vertex */
-            options.setRoutingContext(graph, v, options.rctx.toVertex);
+            options.setRoutingContext(graph, v, toVertex);
             List<GraphPath> lastPaths = chainedPathService.getPaths(options);
             if (!lastPaths.isEmpty())
-                outPaths.put(options.rctx.toVertex, lastPaths.get(0));
+                outPaths.put(toVertex, lastPaths.get(0));
         }
 
         // compute shortest path overall
         HashSet<Vertex> verticesCopy = new HashSet<Vertex>();
-        verticesCopy.addAll(options.rctx.intermediateVertices);
-        return Arrays.asList(TSPPathFinder.findShortestPath(options.rctx.toVertex,
-                options.rctx.fromVertex, paths, verticesCopy, time, options));
+        verticesCopy.addAll(intermediates);
+        return Arrays.asList(TSPPathFinder.findShortestPath(toVertex,
+                fromVertex, paths, verticesCopy, time, options));
     }
 
     private GraphPath joinPaths(List<GraphPath> paths) {

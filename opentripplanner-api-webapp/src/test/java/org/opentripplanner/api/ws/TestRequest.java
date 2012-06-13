@@ -170,7 +170,7 @@ public class TestRequest extends TestCase {
         assertNotNull(v3);
         assertNotNull(v4);
         
-        TestPlanner planner = new TestPlanner(v1.getLabel(), v4.getLabel(), Arrays.asList(v3.getLabel(), v2.getLabel()));
+        TestPlanner planner = new TestPlanner(v1.getLabel(), v4.getLabel(), Arrays.asList(v2.getLabel(), v3.getLabel()));
         List<GraphPath> paths = planner.getPaths();
         
         assertTrue(paths.size() > 0);
@@ -217,7 +217,9 @@ public class TestRequest extends TestCase {
         
         public List<GraphPath> getPaths() {
             try {
-                return this.planGenerator.pathService.getPaths(this.buildRequest());
+                RoutingRequest options = this.buildRequest();
+                options.intermediatePlacesOrdered = false;
+                return this.planGenerator.pathService.getPaths(options);
             } catch (ParameterException e) {
                 e.printStackTrace();
                 return null;
