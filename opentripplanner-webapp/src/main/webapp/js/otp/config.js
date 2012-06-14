@@ -36,9 +36,10 @@ otp.config_defaults = {
             showEditButton        : true,   // turn on/off itinerary edit button
             showPrintButton       : true,   // turn on/off itinerary print button
             showLinksButton       : true,   // turn on/off itinerary links button
+            showLayerSwitcher     : true,   // turn on/off OpenLayers layer switcher when more than 1 basemap exists (see map.baseLayer below)
             useOptionDependencies : true,   // trip form changes based on mode and optimize flags (e.g., bike mode has no wheelchair or walk distance forms etc...) 
             useRouteLongName      : false,  // format route name with both short-name and long-name...see / override Itinerary.makeRouteName() for different formatting options
-            appendGeocodeName     : true,   // true = send string:lat,lon parameter format to OTP, else just lat,lon goes to OTP 
+            appendGeocodeName     : true,   // true = send string:lat,lon parameter format to OTP, else just lat,lon goes to OTP
             OPTIONS_NOTE: "THIS IS A STRUCTURE USED TO CUSTOMIZE THE TRIP FORMS AND OTHER BEHAVIORS"
         },
 
@@ -127,7 +128,9 @@ otp.config_defaults = {
                    "by<a href='http://openstreetmap.org/' target='_blank'> OpenStreetMap.</a> " +
                    "Tiles from<a href='http://mapbox.com/about/maps' target='_blank'> MapBox Streets.</a>"
                }
-           ),
+           )
+           /* comment here to test single / multiple basemaps & layer switcher on/off */
+          ,
            // Regular Open Street Map server
            new OpenLayers.Layer.OSM(
                "Open Street Map"
@@ -160,6 +163,7 @@ otp.config_defaults = {
                    +" Tiles courtesy of <a href='http://open.mapquest.com/' target='_blank'>MapQuest</a>"
                }
            )
+           /**/
         ],
 
         // NOTE: this object is ignored if a baseLayer (which is an instance of OpenLayers.Layer)
