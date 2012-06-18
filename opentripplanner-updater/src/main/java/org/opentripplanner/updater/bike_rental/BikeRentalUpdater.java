@@ -22,6 +22,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
+
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
@@ -51,6 +53,8 @@ public class BikeRentalUpdater implements Runnable {
 
     private String routerId;
 
+    private GraphService graphService;
+
     public void setRouterId(String routerId) {
         this.routerId = routerId;
     }
@@ -62,6 +66,11 @@ public class BikeRentalUpdater implements Runnable {
 
     @Autowired
     public void setGraphService(GraphService graphService) {
+        this.graphService = graphService;
+    }
+
+    @PostConstruct
+    public void setup() {
         if (routerId != null) {
             graph = graphService.getGraph(routerId);
         } else {

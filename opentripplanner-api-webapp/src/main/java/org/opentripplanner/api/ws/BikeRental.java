@@ -49,9 +49,10 @@ public class BikeRental {
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public BikeRentalStationList getBikerentalStations(
             @QueryParam("lowerLeft") String lowerLeft,
-            @QueryParam("upperRight") String upperRight) {
+            @QueryParam("upperRight") String upperRight,
+            @QueryParam("routerId") String routerId) {
 
-        Graph graph = graphService.getGraph();
+        Graph graph = graphService.getGraph(routerId);
         BikeRentalStationService bikeRentalService = graph.getService(BikeRentalStationService.class);
         
         Envelope envelope;
