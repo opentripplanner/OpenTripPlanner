@@ -20,7 +20,10 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jettison.json.JSONException;
-import org.opentripplanner.api.model.RouterIdList;
+import org.opentripplanner.api.model.RouterInfo;
+import org.opentripplanner.api.model.RouterList;
+import org.opentripplanner.common.geometry.GraphUtils;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -34,12 +37,20 @@ public class Routers {
     @Autowired GraphService graphService;
     
     /**
-     * Returns a list if routerIDs
+     * Returns a list of routers and their bounds.
      */
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public RouterIdList getRouterIds()
+    public RouterList getRouterIds()
             throws JSONException {
-        return new RouterIdList(graphService.getGraphIds());
+        RouterList routerList = new RouterList();
+        for (String id : graphService.getGraphIds()) {
+            RouterInfo routerInfo = new RouterInfo();
+            routerInfo.routerId = id;
+            Graph graph = graphService.getGraph();
+            routerInfo.polygon = GraphUtils.makeConcaveHull(graph);
+            routerList.routerInfo.add(routerInfo);
+        }
+        return routerList;
     }
 }
