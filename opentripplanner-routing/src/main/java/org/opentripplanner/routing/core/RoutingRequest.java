@@ -246,7 +246,10 @@ public class RoutingRequest implements Cloneable, Serializable {
      * irrelevant at that point, since temporary graph elements have been removed and the graph may
      * have been reloaded. 
      */
-    public RoutingContext rctx;    
+    public RoutingContext rctx;
+
+    /** A transit stop that this trip must start from */
+    private AgencyAndId startingTransitStopId;
     
     
     /* CONSTRUCTORS */
@@ -911,6 +914,14 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public void setUseBikeRentalAvailabilityInformation(boolean useBikeRentalAvailabilityInformation) {
         this.useBikeRentalAvailabilityInformation = useBikeRentalAvailabilityInformation;
+    }
+
+    public AgencyAndId getStartingTransitStopId() {
+        return startingTransitStopId;
+    }
+
+    public void setStartTransitStopId(AgencyAndId startingTransitStopId) {
+        this.startingTransitStopId = startingTransitStopId;
     }
 
 }
