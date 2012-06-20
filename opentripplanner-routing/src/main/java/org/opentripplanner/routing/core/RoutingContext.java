@@ -9,7 +9,6 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.common.model.NamedPlace;
-import org.opentripplanner.routing.algorithm.strategies.GenericAStarFactory;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.error.TransitTimesException;
@@ -52,8 +51,7 @@ public class RoutingContext implements Cloneable {
     //public final Calendar calendar;
     public final CalendarService calendarService;
     public final Map<AgencyAndId, Set<ServiceDate>> serviceDatesByServiceId = new HashMap<AgencyAndId, Set<ServiceDate>>();
-    public final GenericAStarFactory aStarSearchFactory = null;
-    public final RemainingWeightHeuristic remainingWeightHeuristic;
+    public RemainingWeightHeuristic remainingWeightHeuristic;
     public final TransferTable transferTable;
             
     /**
