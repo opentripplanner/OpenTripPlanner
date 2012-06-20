@@ -1338,6 +1338,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             markNodesForKeeping(_areaWaysById.values(), _areaNodes);
         }
 
+        /**
+         * After all relations, ways, and nodes are loaded, handle areas.
+         */
         public void nodesLoaded() {
             processMultipolygons();
             AREA: for (OSMWay way : _singleWayAreas) {
@@ -1481,7 +1484,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         /**
-         * Handle turn restrictions
+         * Store turn restrictions for use in StreetUtils.makeEdgeBased.
          * 
          * @param relation
          */
@@ -1621,7 +1624,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         /**
-         * Handle oneway streets, cycleways, and whatnot. See
+         * Handle oneway streets, cycleways, and other per-mode and universal access controls. See
          * http://wiki.openstreetmap.org/wiki/Bicycle for various scenarios, along with
          * http://wiki.openstreetmap.org/wiki/OSM_tags_for_routing#Oneway.
          * 
@@ -1719,6 +1722,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             return new P2<PlainStreetEdge>(street, backStreet);
         }
 
+        /**
+         * Check OSM tags for various one-way and one-way-by-mode tags and return a pair
+         * of permissions for travel along and against the way. 
+         */
         private P2<StreetTraversalPermission> getPermissions(StreetTraversalPermission permissions, OSMWithTags way) {
 
             StreetTraversalPermission permissionsFront = permissions;
