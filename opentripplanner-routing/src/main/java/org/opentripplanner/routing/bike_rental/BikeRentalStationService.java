@@ -25,6 +25,7 @@ public class BikeRentalStationService {
     }
     
     public void addStation(BikeRentalStation station) {
+        stations.remove(station);
         stations.add(station);
     }
     
