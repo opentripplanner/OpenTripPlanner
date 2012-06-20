@@ -23,24 +23,21 @@ public abstract class TransitVertex extends AbstractVertex {
     
     private static final long serialVersionUID = 53855622892837370L;
 
-    private final AgencyAndId stopId;
-    
-    private final String stopCode;
+    private final Stop stop;
 
     public TransitVertex(Graph graph, String label, Stop stop) {
         super(graph, label, stop.getLon(), stop.getLat(), stop.getName());
-        this.stopId = stop.getId();
-        this.stopCode = stop.getCode();
+        this.stop = stop;
     }
 
     /** Get the stop at which this TransitVertex is located */
     public AgencyAndId getStopId() {
-        return stopId;
+        return stop.getId();
     }
     
     /** The passenger-facing stop ID/Code (for systems like TriMet that have this feature).  */
     public String getStopCode() {
-        return stopCode;
+        return stop.getCode();
     }
 
 }

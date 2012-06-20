@@ -14,23 +14,23 @@
 package org.opentripplanner.routing.vertextype;
 
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.trippattern.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 
 public abstract class OnboardVertex extends TransitVertex {
 
     private static final long serialVersionUID = 1L;
 
-    // remember to have optimizetransit builder change these
-    //private final TripPattern tripPattern;
+    private final TripPattern tripPattern; // set to null for non-pattern vertices
+    // (or just use patterns for everything, eliminating simple hops)
     
     public OnboardVertex(Graph g, String label, TripPattern tripPattern, Stop stop) {
         super(g, label, stop);
-        //this.tripPattern = tripPattern;
+        this.tripPattern = tripPattern;
     }
 
-//    public TripPattern getTripPattern() {
-//        return tripPattern;
-//    }
+    public TripPattern getTripPattern() {
+        return tripPattern;
+    }
     
 }

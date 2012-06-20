@@ -45,7 +45,7 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
 
     public PatternHop(PatternStopVertex from, PatternStopVertex to, Stop start, Stop end, int stopIndex,
             TripPattern tripPattern) {
-        super(from, to, tripPattern);
+        super(from, to);
         this.start = start;
         this.end = end;
         this.stopIndex = stopIndex;
@@ -56,15 +56,15 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
     }
 
     public TraverseMode getMode() {
-        return GtfsLibrary.getTraverseMode(pattern.getExemplar().getRoute());
+        return GtfsLibrary.getTraverseMode(getPattern().getExemplar().getRoute());
     }
 
     public String getName() {
-        return GtfsLibrary.getRouteName(pattern.getExemplar().getRoute());
+        return GtfsLibrary.getRouteName(getPattern().getExemplar().getRoute());
     }
     
     public State optimisticTraverse(State state0) {
-    	int runningTime = pattern.getBestRunningTime(stopIndex);
+    	int runningTime = getPattern().getBestRunningTime(stopIndex);
     	StateEditor s1 = state0.edit(this);
     	s1.incrementTimeInSeconds(runningTime);
     	s1.incrementWeight(runningTime);
@@ -73,7 +73,7 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
 
     @Override
     public double timeLowerBound(RoutingRequest options) {
-        return pattern.getBestRunningTime(stopIndex);
+        return getPattern().getBestRunningTime(stopIndex);
     }
     
     @Override
@@ -84,14 +84,14 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
     public State traverse(State s0) {
         TripTimes tripTimes = s0.getTripTimes();
         int runningTime = tripTimes.getRunningTime(stopIndex);
-        EdgeNarrative en = new TransitNarrative(tripTimes.trip, pattern.getHeadsign(stopIndex, tripTimes.index), this);
+        EdgeNarrative en = new TransitNarrative(tripTimes.trip, getPattern().getHeadsign(stopIndex, tripTimes.index), this);
         StateEditor s1 = s0.edit(this, en);
         s1.incrementTimeInSeconds(runningTime);
         if (s0.getOptions().isArriveBy())
             s1.setZone(getStartStop().getZoneId());
         else
             s1.setZone(getEndStop().getZoneId());
-        s1.setRoute(pattern.getExemplar().getRoute().getId());
+        s1.setRoute(getPattern().getExemplar().getRoute().getId());
         s1.incrementWeight(runningTime);
         return s1.makeState();
     }

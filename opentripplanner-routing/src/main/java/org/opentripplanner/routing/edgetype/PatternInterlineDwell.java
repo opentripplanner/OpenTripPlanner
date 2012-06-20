@@ -142,7 +142,7 @@ public class PatternInterlineDwell extends AbstractEdge implements OnBoardForwar
         // FIXME: ugly!
         TripPattern pattern = ((OnboardVertex)s1.getVertex()).getTripPattern();
         s1.incrementTimeInSeconds(dwellData.dwellTime);
-        s1.setTripId(targetTrip.getId()); // TODO: is this right? the targetTrip is more like and exemplar? (AMB)
+        s1.setTripId(targetTrip.getId()); // TODO: is this right? the targetTrip is more like an exemplar? (AMB)
         s1.setTripTimes(pattern.getTripTimes(dwellData.patternIndex));
         s1.incrementWeight(dwellData.dwellTime);
         return s1.makeState();

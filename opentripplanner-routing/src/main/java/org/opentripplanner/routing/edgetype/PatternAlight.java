@@ -53,7 +53,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
 
     public PatternAlight(PatternStopVertex fromPatternStop, TransitStopArrive toStationVertex,
             TripPattern pattern, int stopIndex, TraverseMode mode) {
-        super(fromPatternStop, toStationVertex, pattern);
+        super(fromPatternStop, toStationVertex);
         this.stopIndex = stopIndex;
         this.modeMask = new TraverseModeSet(mode).getMask();
     }
@@ -105,7 +105,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
                 if (secondsSinceMidnight < 0)
                     continue;
                 if (sd.serviceIdRunning(serviceId)) {
-                    TripTimes tripTimes = pattern.getPreviousTrip(stopIndex, secondsSinceMidnight, options);
+                    TripTimes tripTimes = getPattern().getPreviousTrip(stopIndex, secondsSinceMidnight, options);
                     if (tripTimes != null) {
                         // a trip was found, index is valid, wait will be defined.
                         // even though we are going backward I tend to think waiting
@@ -159,7 +159,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
 
             EdgeNarrative en = new TransitNarrative(trip, this);
             StateEditor s1 = state0.edit(this, en);
-            int type = pattern.getAlightType(stopIndex + 1);
+            int type = getPattern().getAlightType(stopIndex + 1);
             if (TransitUtils.handleBoardAlightType(s1, type)) {
                 return null;
             }
@@ -167,7 +167,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             s1.incrementTimeInSeconds(bestWait);
             s1.incrementNumBoardings();
             s1.setTripId(trip.getId());
-            s1.setZone(pattern.getZone(stopIndex + 1));
+            s1.setZone(getPattern().getZone(stopIndex + 1));
             s1.setRoute(trip.getRoute().getId());
 
             long wait_cost = bestWait;
@@ -190,7 +190,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             }
             EdgeNarrative en = new TransitNarrative(state0.getTripTimes().trip, this);
             StateEditor s1 = state0.edit(this, en);
-            int type = pattern.getAlightType(stopIndex + 1);
+            int type = getPattern().getAlightType(stopIndex + 1);
             if (TransitUtils.handleBoardAlightType(s1, type)) {
                 return null;
             }

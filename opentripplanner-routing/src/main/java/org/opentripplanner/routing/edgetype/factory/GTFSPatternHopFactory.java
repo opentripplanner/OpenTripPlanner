@@ -396,7 +396,7 @@ public class GTFSPatternHopFactory {
         } // END loop over interlining blocks 
         
         loadTransfers(graph);
-//        deleteUselessDwells(graph);
+//TODO:        deleteUselessDwells(graph);
         clearCachedData();
         graph.putService(FareService.class, fareServiceFactory.makeFareService());
     }
@@ -623,10 +623,10 @@ public class GTFSPatternHopFactory {
      * and departure times.
      */
     private void deleteUselessDwells(Graph graph) {
-        HashSet<BasicTripPattern> possiblySimplePatterns = new HashSet<BasicTripPattern>();
-        HashSet<BasicTripPattern> notSimplePatterns = new HashSet<BasicTripPattern>();
+        HashSet<TripPattern> possiblySimplePatterns = new HashSet<TripPattern>();
+        HashSet<TripPattern> notSimplePatterns = new HashSet<TripPattern>();
         for (PatternDwell dwell : potentiallyUselessDwells) {
-            BasicTripPattern pattern = (BasicTripPattern) dwell.getPattern();
+            TripPattern pattern = (TripPattern) dwell.getPattern();
             boolean useless = true;
             for (int i = 0; i < pattern.getNumDwells(); ++i) {
                 if (pattern.getDwellTime(dwell.getStopIndex(), i) != 0) {
@@ -647,7 +647,7 @@ public class GTFSPatternHopFactory {
                 possiblySimplePatterns.add(pattern);
             }
         }
-        for (BasicTripPattern pattern: possiblySimplePatterns) {
+        for (TripPattern pattern: possiblySimplePatterns) {
             pattern.simplify();
         }
     }

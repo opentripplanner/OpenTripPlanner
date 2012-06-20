@@ -54,11 +54,17 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
 
     public PatternBoard(TransitStopDepart fromStopVertex, PatternStopVertex toPatternVertex, 
             TripPattern pattern, int stopIndex, TraverseMode mode) {
-        super(fromStopVertex, toPatternVertex, pattern);
+        super(fromStopVertex, toPatternVertex);
         this.stopIndex = stopIndex;
         this.modeMask = new TraverseModeSet(mode).getMask();
     }
 
+    /** look for pattern in tov (instead of fromv as is done for all other pattern edges) */
+    @Override 
+    public TripPattern getPattern() {
+        return ((PatternStopVertex) tov).getTripPattern();
+    }
+                           
     public String getDirection() {
         return null;
     }
@@ -91,7 +97,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             }
             EdgeNarrative en = new TransitNarrative(state0.getTripTimes().trip, this);
             StateEditor s1 = state0.edit(this, en);
-            int type = pattern.getBoardType(stopIndex);
+            int type = getPattern().getBoardType(stopIndex);
             if (TransitUtils.handleBoardAlightType(s1, type)) {
                 return null;
             }
@@ -114,7 +120,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             int bestWait = -1;
             TripTimes bestTripTimes = null;
             AgencyAndId serviceId = getPattern().getExemplar().getServiceId();
-            SD: for (ServiceDay sd : rctx.serviceDays) {
+            for (ServiceDay sd : rctx.serviceDays) {
                 int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
                 // only check for service on days that are not in the future
                 // this avoids unnecessarily examining tomorrow's services
@@ -173,7 +179,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
 
             EdgeNarrative en = new TransitNarrative(trip, this);
             StateEditor s1 = state0.edit(this, en);
-            int type = pattern.getBoardType(stopIndex);
+            int type = getPattern().getBoardType(stopIndex);
             if (TransitUtils.handleBoardAlightType(s1, type)) {
                 return null;
             }
