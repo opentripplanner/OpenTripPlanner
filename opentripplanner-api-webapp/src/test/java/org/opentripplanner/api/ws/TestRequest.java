@@ -22,6 +22,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.codehaus.jettison.json.JSONException;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.model.AbsoluteDirection;
 import org.opentripplanner.api.model.Itinerary;
@@ -283,6 +284,20 @@ public class TestRequest extends TestCase {
         stations = bikeRental.getBikeRentalStations("45.5,-122.7",
                 "45.6,-122.6", "portland");
         assertEquals(1, stations.stations.size());
+    }
+
+    public void testMetadata() throws JSONException {
+        Metadata metadata = new Metadata();
+        metadata.graphService = Context.getInstance().graphService;
+        GraphMetadata data1 = metadata.getMetadata(null);
+        assertTrue("centerLatitude is not 40.005; got " + data1.getCenterLatitude(), 
+                Math.abs(40.005 - data1.getCenterLatitude()) < 0.000001);
+        
+        GraphMetadata data2 = metadata.getMetadata("portland");
+        assertTrue(Math.abs(-122 - data2.getCenterLongitude()) < 1);
+        assertTrue(Math.abs(-122 - data2.getLowerLeftLongitude()) < 2);
+        assertTrue(Math.abs(-122 - data2.getUpperRightLongitude()) < 2);
+
     }
 
     /**
