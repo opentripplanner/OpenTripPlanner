@@ -15,8 +15,8 @@
 package org.opentripplanner.api.ws;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -28,9 +28,8 @@ import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.RelativeDirection;
 import org.opentripplanner.api.model.WalkStep;
-import org.opentripplanner.api.ws.PlanGenerator;
-import org.opentripplanner.api.ws.Planner;
-import org.opentripplanner.common.model.NamedPlace;
+import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.impl.shapefile.AttributeFeatureConverter;
 import org.opentripplanner.graph_builder.impl.shapefile.CaseBasedTraversalPermissionConverter;
 import org.opentripplanner.graph_builder.impl.shapefile.ShapefileFeatureSourceFactoryImpl;
@@ -39,24 +38,62 @@ import org.opentripplanner.graph_builder.impl.shapefile.ShapefileStreetSchema;
 import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory;
 import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.GraphServiceBeanImpl;
 import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.impl.TravelingSalesmanPathService;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.StreetVertex;
+
+import com.vividsolutions.jts.geom.LineString;
+
+class SimpleGraphServiceImpl implements GraphService {
+
+    private HashMap<String, Graph> graphs = new HashMap<String, Graph>();
+
+    @Override
+    public void setLoadLevel(LoadLevel level) {      
+    }
+
+    @Override
+    public void refreshGraphs() {
+    }
+
+    @Override
+    public Graph getGraph() {
+        return graphs.get(null);
+    }
+
+    @Override
+    public Graph getGraph(String routerId) {
+        return graphs.get(routerId);
+    }
+
+    @Override
+    public Collection<String> getGraphIds() {
+        return graphs.keySet();
+    }
+    
+    public void putGraph(String graphId, Graph graph) {
+        graphs.put(graphId, graph);
+    }
+    
+}
 
 /* This is a hack to hold context and graph data between test runs, since loading it is slow. */
 class Context {
     public Graph graph = new Graph();
-    public GraphService graphService = new GraphServiceBeanImpl(graph); 
+    public SimpleGraphServiceImpl graphService = new SimpleGraphServiceImpl();
     public PlanGenerator planGenerator = new PlanGenerator();
     public RetryingPathServiceImpl pathService = new RetryingPathServiceImpl();
     private static Context instance = null;
@@ -67,6 +104,8 @@ class Context {
         return instance;
     }
     public Context() {
+        graphService.putGraph(null, makeSimpleGraph()); //default graph is tiny test graph
+        graphService.putGraph("portland", graph);
         ShapefileStreetGraphBuilderImpl builder = new ShapefileStreetGraphBuilderImpl();
         FeatureSourceFactory factory = new ShapefileFeatureSourceFactoryImpl(new File("src/test/resources/portland/Streets_pdx.shp"));
         builder.setFeatureSourceFactory(factory);
@@ -96,6 +135,31 @@ class Context {
         pathService.graphService = graphService;
         planGenerator.pathService = pathService;
     }
+    private Graph makeSimpleGraph() {
+        Graph graph = new Graph();
+        StreetVertex tl = new IntersectionVertex(graph, "tl", -80.01, 40.01, "top and left");
+        StreetVertex tr = new IntersectionVertex(graph, "tr", -80.0, 40.01, "top and right");
+        StreetVertex bl = new IntersectionVertex(graph, "bl", -80.01, 40.0, "bottom and left");
+        StreetVertex br = new IntersectionVertex(graph, "br", -80.0, 40.0, "bottom and right");
+        
+        makeEdges(tl, tr, "top");
+        makeEdges(tl, bl, "left");
+        makeEdges(br, tr, "right");
+        makeEdges(bl, br, "bottom");
+        
+        return graph;
+    }
+
+    private void makeEdges(StreetVertex v1, StreetVertex v2, String name) {
+        LineString geometry = GeometryUtils.makeLineString(v1.getCoordinate().x,
+                v1.getCoordinate().y, v2.getCoordinate().x, v2.getCoordinate().y);
+        double length = DistanceLibrary.distance(v1.getCoordinate(), v2.getCoordinate());
+        new PlainStreetEdge(v1, v2, geometry, name, length, StreetTraversalPermission.ALL, false);
+
+        geometry = GeometryUtils.makeLineString(v2.getCoordinate().x, v2.getCoordinate().y,
+                v1.getCoordinate().x, v1.getCoordinate().y);
+        new PlainStreetEdge(v2, v1, geometry, name, length, StreetTraversalPermission.ALL, true);
+    }
 }
 
 
@@ -117,7 +181,7 @@ public class TestRequest extends TestCase {
 
     public void testPlanner() throws Exception {
         
-        Planner planner = new TestPlanner("113410", "137427");
+        Planner planner = new TestPlanner("portland", "113410", "137427");
         
         Response response = planner.getItineraries();
         Itinerary itinerary = response.getPlan().itinerary.get(0);
@@ -137,7 +201,7 @@ public class TestRequest extends TestCase {
     public void testAlerts() throws Exception {
 
 	//SE 47th and Ash, NE 47th and Davis (note that we cross Burnside, this goes from SE to NE)
-	Planner planner = new TestPlanner("114789 back", "114237");
+	Planner planner = new TestPlanner("portland", "114789 back", "114237");
 	Response response = planner.getItineraries();
 
         Itinerary itinerary = response.getPlan().itinerary.get(0);
@@ -170,7 +234,7 @@ public class TestRequest extends TestCase {
         assertNotNull(v3);
         assertNotNull(v4);
         
-        TestPlanner planner = new TestPlanner(v1.getLabel(), v4.getLabel(), Arrays.asList(v2.getLabel(), v3.getLabel()));
+        TestPlanner planner = new TestPlanner("portland", v1.getLabel(), v4.getLabel(), Arrays.asList(v2.getLabel(), v3.getLabel()));
         List<GraphPath> paths = planner.getPaths();
         
         assertTrue(paths.size() > 0);
@@ -189,7 +253,7 @@ public class TestRequest extends TestCase {
      * Jersey from HTTP Query string.
      */
     private static class TestPlanner extends Planner {
-        public TestPlanner(String v1, String v2) {
+        public TestPlanner(String routerId, String v1, String v2) {
             super();
             this.fromPlace = Arrays.asList(v1);
             this.toPlace = Arrays.asList(v2);
@@ -202,12 +266,12 @@ public class TestRequest extends TestCase {
             this.numItineraries = Arrays.asList(1);
             this.transferPenalty = Arrays.asList(0);
             this.maxTransfers = Arrays.asList(2);
-            
+            this.routerId = Arrays.asList(routerId);
             this.planGenerator = Context.getInstance().planGenerator;
         }
 
-        public TestPlanner(String v1, String v2, List<String> intermediates) {
-            this(v1, v2);
+        public TestPlanner(String routerId, String v1, String v2, List<String> intermediates) {
+            this(routerId, v1, v2);
             this.intermediatePlaces = intermediates;
             TravelingSalesmanPathService tsp = new TravelingSalesmanPathService();
             tsp.setChainedPathService(Context.getInstance().pathService);
