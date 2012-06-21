@@ -15,6 +15,7 @@
 package org.opentripplanner.api.ws;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -23,12 +24,14 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.codehaus.jettison.json.JSONException;
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.model.AbsoluteDirection;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.RelativeDirection;
 import org.opentripplanner.api.model.WalkStep;
+import org.opentripplanner.api.model.patch.PatchResponse;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.impl.shapefile.AttributeFeatureConverter;
@@ -53,12 +56,16 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.impl.TravelingSalesmanPathService;
+import org.opentripplanner.routing.patch.Patch;
 import org.opentripplanner.routing.services.GraphService;
+import org.opentripplanner.routing.services.PatchService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
 import com.vividsolutions.jts.geom.LineString;
+
+import static org.mockito.Mockito.*;
 
 class SimpleGraphServiceImpl implements GraphService {
 
@@ -298,6 +305,21 @@ public class TestRequest extends TestCase {
         assertTrue(Math.abs(-122 - data2.getLowerLeftLongitude()) < 2);
         assertTrue(Math.abs(-122 - data2.getUpperRightLongitude()) < 2);
 
+    }
+
+    /** Smoke test for patcher */
+    public void testPatcher() throws JSONException {
+        Patcher p = new Patcher();
+        PatchService service = mock(PatchService.class);
+        when(service.getStopPatches(any(AgencyAndId.class))).thenReturn(new ArrayList<Patch>());
+        when(service.getRoutePatches(any(AgencyAndId.class))).thenReturn(new ArrayList<Patch>());
+
+        p.setPatchService(service);
+        PatchResponse stopPatches = p.getStopPatches("TriMet", "5678");
+        assertNull(stopPatches.patches);
+        PatchResponse routePatches = p.getRoutePatches("TriMet", "100");
+        assertNull(routePatches.patches);
+        
     }
 
     /**
