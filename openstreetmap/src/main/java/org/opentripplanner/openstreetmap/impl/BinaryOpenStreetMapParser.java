@@ -16,7 +16,9 @@ package org.opentripplanner.openstreetmap.impl;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapContentHandler;
 import org.opentripplanner.openstreetmap.model.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import crosby.binary.BinaryParser;
 import crosby.binary.Osmformat;
@@ -31,11 +33,24 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
     private boolean _parseWays = true;
     private boolean _parseRelations = true;
     private boolean _parseNodes = true;
+    private Map<String, String> stringTable = new HashMap<String, String>();
 
     public BinaryOpenStreetMapParser(OpenStreetMapContentHandler handler) {
         _handler = handler;
     }
 
+    // The strings are already being pulled from a string table in the PBF file,
+    // but there appears to be a separate string table per 8k-entry PBF file block.
+    // String.intern grinds to a halt on large PBF files (as it did on GTFS import), so 
+    // we implement our own. 
+    public String internalize(String s) {
+        String fromTable = stringTable.get(s);
+        if (fromTable == null) {
+            stringTable.put(s, s);
+            return s;
+        } 
+        return fromTable;
+    }
 
     public void complete() {
         // Jump in circles
@@ -54,9 +69,9 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
             tmp.setLon(parseLon(i.getLon()));
 
             for (int j = 0; j < i.getKeysCount(); j++) {
-                String key = getStringById(i.getKeys(j)).intern();
+                String key = internalize(getStringById(i.getKeys(j)));
                 // if _handler.retain_tag(key) // TODO: filter tags
-                String value = getStringById(i.getVals(j)).intern();
+                String value = internalize(getStringById(i.getVals(j)));
                 OSMTag tag = new OSMTag();
                 tag.setK(key);
                 tag.setV(value);
@@ -98,8 +113,8 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
                     int valid = nodes.getKeysVals(j++);
 
                     OSMTag tag = new OSMTag();
-                    String key = getStringById(keyid).intern();
-                    String value = getStringById(valid).intern();
+                    String key = internalize(getStringById(keyid));
+                    String value = internalize(getStringById(valid));
                     tag.setK(key);
                     tag.setV(value);
                     tmp.addTag(tag);
@@ -123,8 +138,8 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
 
             for (int j = 0; j < i.getKeysCount(); j++) {
                 OSMTag tag = new OSMTag();
-                String key = getStringById(i.getKeys(j)).intern();
-                String value = getStringById(i.getVals(j)).intern();
+                String key = internalize(getStringById(i.getKeys(j)));
+                String value = internalize(getStringById(i.getVals(j)));
                 tag.setK(key);
                 tag.setV(value);
                 tmp.addTag(tag);
@@ -155,8 +170,8 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
 
             for (int j = 0; j < i.getKeysCount(); j++) {
                 OSMTag tag = new OSMTag();
-                String key = getStringById(i.getKeys(j)).intern();
-                String value = getStringById(i.getVals(j)).intern();
+                String key = internalize(getStringById(i.getKeys(j)));
+                String value = internalize(getStringById(i.getVals(j)));
                 tag.setK(key);
                 tag.setV(value);
                 tmp.addTag(tag);
@@ -170,7 +185,7 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
                 relMember.setRef(mid);
                 lastMid = mid;
 
-                relMember.setRole(getStringById(i.getRolesSid(j)).intern());
+                relMember.setRole(internalize(getStringById(i.getRolesSid(j))));
 
                 if (i.getTypes(j) == Osmformat.Relation.MemberType.NODE) {
                     relMember.setType("node");
