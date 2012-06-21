@@ -47,14 +47,15 @@ public class BikeRental {
     
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public BikeRentalStationList getBikerentalStations(
+    public BikeRentalStationList getBikeRentalStations(
             @QueryParam("lowerLeft") String lowerLeft,
             @QueryParam("upperRight") String upperRight,
             @QueryParam("routerId") String routerId) {
 
         Graph graph = graphService.getGraph(routerId);
+        if (graph == null) return null;
         BikeRentalStationService bikeRentalService = graph.getService(BikeRentalStationService.class);
-        
+        if (bikeRentalService == null) return new BikeRentalStationList();
         Envelope envelope;
         if (lowerLeft != null) {
             envelope = GraphInternals.getEnvelope(lowerLeft, upperRight);
@@ -64,7 +65,7 @@ public class BikeRental {
         Collection<BikeRentalStation> stations = bikeRentalService.getStations();
         List<BikeRentalStation> out = new ArrayList<BikeRentalStation>();
         for (BikeRentalStation station : stations) {
-            if (envelope.contains(station.x, station.x)) {
+            if (envelope.contains(station.x, station.y)) {
                 out.add(station);
             }
         }
