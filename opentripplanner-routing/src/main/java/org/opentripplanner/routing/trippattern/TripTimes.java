@@ -19,10 +19,13 @@ import org.opentripplanner.common.MavenVersion;
  * By making indexes refer to stops not hops we could reuse the departures array for arrivals, 
  * at the cost of an extra entry. This seems more coherent to me (AMB) but would probably break things elsewhere.
  */
-public class TripTimes implements Serializable {
+public class TripTimes implements Cloneable, Serializable {
 
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
-
+    public static final int PASSED = -1;
+    public static final int CANCELED = -2;
+    public static final int EXPIRED = -3;
+    
     public final Trip trip;
 
     public final int index; // this is kind of ugly, but the headsigns are in the pattern not here
@@ -85,6 +88,46 @@ public class TripTimes implements Serializable {
     // replace arrivals array with null when arrivals and departures are equal
     public boolean compact() {
         return true;
+    }
+
+    public String dumpTimes() {
+        StringBuilder sb = new StringBuilder();
+        for (int hop=0; hop<departureTimes.length; hop++) {
+            sb.append(departureTimes[hop]); 
+            sb.append('_');
+            sb.append(arrivalTimes[hop]);
+            sb.append(' ');
+        }
+        return sb.toString();
+    }
+    
+    public TripTimes updatedClone(UpdateList ul, int startIndex) {
+        TripTimes ret = (TripTimes) this.clone();
+        for (int i = 0; i < ul.updates.size(); i++) {
+            int targetIndex = startIndex + i;
+            Update u = ul.updates.get(i);
+            ret.departureTimes[targetIndex] = u.depart;
+            // hops not stops... arrival time is for the previous hop 
+            // and if arv / dep have been merged?
+            if (targetIndex >= 1)
+                ret.arrivalTimes[targetIndex-1] = u.arrive; 
+        }
+        System.out.println(this.dumpTimes());
+        System.out.println(ret.dumpTimes());
+        return ret;
+    }
+    
+    @Override
+    public TripTimes clone() {
+        TripTimes ret = null; 
+        try {
+            ret = (TripTimes) super.clone();
+            ret.arrivalTimes = this.arrivalTimes.clone();
+            ret.departureTimes = this.departureTimes.clone();
+        } catch (CloneNotSupportedException e) {
+            // will not happen
+        }
+        return ret;
     }
     
 }

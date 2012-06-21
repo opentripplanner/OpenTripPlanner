@@ -21,11 +21,14 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents a class of trips distinguished by service id and list of stops. For each stop, there
@@ -35,6 +38,8 @@ import org.opentripplanner.routing.core.RoutingRequest;
  * non-overtaking, so that an earlier trip never arrives after a later trip.
  */
 public class TripPattern implements Serializable {
+
+    private static final Logger LOG = LoggerFactory.getLogger(TripPattern.class);
 
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
     public static final int FLAG_WHEELCHAIR_ACCESSIBLE = 1;
@@ -252,6 +257,16 @@ public class TripPattern implements Serializable {
         return trips.indexOf(trip);
     }
     
+    public int getTripIndex(AgencyAndId tripId) {
+        int ret = 0;
+        for (Trip t : trips) {
+            if (t.getId().equals(tripId)) // replace with indexing in stoptime updater?
+                return ret;
+            ret += 1;
+        }
+        return -1;
+    }
+
     /** Returns whether passengers can alight at a given stop */
     public boolean canAlight(int stopIndex) {
         return getAlightType(stopIndex) != NO_PICKUP;
@@ -340,6 +355,22 @@ public class TripPattern implements Serializable {
         return tripTimes.get(tripIndex);
     }
 
+    public void update(UpdateList ul) {
+        int tripIndex = this.getTripIndex(ul.tripId);
+        if (tripIndex == -1) {
+            LOG.debug("tripId {} not found", ul.tripId);
+            return;
+        }
+        int stopIndex = ul.findUpdateStopIndex(this);
+        if (stopIndex == -1) {
+            LOG.debug("update block did not match stopIds");
+            return;
+        }
+        TripTimes oldTimes = getTripTimes(tripIndex);
+        TripTimes newTimes = oldTimes.updatedClone(ul, stopIndex);
+        this.tripTimes.set(tripIndex, newTimes);
+    }
+    
     public void addTrip(Trip trip, List<StopTime> stopTimes) {
         // TODO: double-check that the stops and pickup/dropoffs are right for this trip
         int nextIndex = tripTimes.size();
