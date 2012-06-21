@@ -590,4 +590,14 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
         variant.addTrip(trip);
         return variant;
     }
+
+    @Override
+    public List<String> provides() {
+        return Arrays.asList("transitIndex");
+    }
+
+    @Override
+    public List<String> getPrerequisites() {
+        return Collections.emptyList();
+    }
 }
