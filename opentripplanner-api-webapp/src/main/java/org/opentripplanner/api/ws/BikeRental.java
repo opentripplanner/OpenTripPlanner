@@ -24,7 +24,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.opentripplanner.api.ws.analysis.GraphInternals;
+import org.opentripplanner.api.ws.internals.GraphInternals;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.graph.Graph;
