@@ -104,38 +104,6 @@ public class StoptimeUpdaterOld {
         }
     }
     
-    public static void main(String[] params) {
-        File file = new File("/var/otp/data/nl/gtfs-rt.protobuf");
-        try {
-            InputStream is = new FileInputStream(file);
-            FeedMessage feed = GtfsRealtime.FeedMessage.parseFrom(is);
-            System.out.println(feed);
-            
-            FeedHeader header = feed.getHeader();
-            long timestamp = header.getTimestamp();
-
-            for (FeedEntity entity : feed.getEntityList()) {
-                System.out.println(entity);
-//                TripUpdate tUpdate = entity.getTripUpdate();
-//                String trip = tUpdate.getTrip().getTripId();
-//                AgencyAndId tripId = new AgencyAndId("agency", trip);
-//                UpdatedTrip uTrip = getOrMakeUpdatedTrip(tripId);
-//                for (StopTimeUpdate sUpdate : tUpdate.getStopTimeUpdateList()) {
-//                    uTrip.update(time, stopIndex, arrival, departure);
-//                }
-            }
-            
-            
-        } catch (FileNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        
-    }
-
     private static UpdatedTrip getOrMakeUpdatedTrip(AgencyAndId tripId) {
         UpdatedTrip ut = updatedTrips.get(tripId);
         if (ut == null) {

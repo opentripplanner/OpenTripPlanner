@@ -16,6 +16,8 @@ public class UpdateList {
 
     public final AgencyAndId tripId;
 
+    public long timestamp; /// addme
+    
     public final List<Update> updates;
     
     public void addUpdate(Update u) {
