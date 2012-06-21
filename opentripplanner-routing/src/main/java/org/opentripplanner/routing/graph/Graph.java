@@ -117,7 +117,7 @@ public class Graph implements Serializable {
      * 
      * @param vv the vertex to add
      */
-    protected void addVertex(Vertex v) {
+    public void addVertex(Vertex v) {
         Vertex old = vertices.put(v.getLabel(), v);
         if (old != null) {
             if (old == v)
