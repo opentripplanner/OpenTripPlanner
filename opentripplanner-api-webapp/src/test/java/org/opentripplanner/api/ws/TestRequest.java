@@ -37,6 +37,8 @@ import org.opentripplanner.graph_builder.impl.shapefile.ShapefileStreetGraphBuil
 import org.opentripplanner.graph_builder.impl.shapefile.ShapefileStreetSchema;
 import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory;
 import org.opentripplanner.routing.algorithm.GenericAStar;
+import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -131,10 +133,27 @@ class Context {
         builder.buildGraph(graph, new HashMap<Class<?>, Object>());
         graph.streetIndex = new StreetVertexIndexServiceImpl(graph);
         
+        initBikeRental();
+
         pathService.sptService = new GenericAStar();
         pathService.graphService = graphService;
         planGenerator.pathService = pathService;
     }
+
+    private void initBikeRental() {
+        BikeRentalStationService service = new BikeRentalStationService();
+        BikeRentalStation station = new BikeRentalStation();
+        station.x = -122.637634;
+        station.y = 45.513084;
+        station.bikesAvailable = 5;
+        station.spacesAvailable = 4;
+        station.id = "1";
+        station.name = "bike rental station";
+
+        service.addStation(station);
+        graph.putService(BikeRentalStationService.class, service);
+    }
+
     private Graph makeSimpleGraph() {
         Graph graph = new Graph();
         StreetVertex tl = new IntersectionVertex(graph, "tl", -80.01, 40.01, "top and left");
@@ -167,12 +186,12 @@ public class TestRequest extends TestCase {
 
     public void testRequest() {
         RoutingRequest request = new RoutingRequest();
-        
+
         request.addMode(TraverseMode.CAR);
         assertTrue(request.getModes().getCar());
         request.removeMode(TraverseMode.CAR);
         assertFalse(request.getModes().getCar());
-     
+
         request.setModes(new TraverseModeSet("BICYCLE,WALK"));
         assertFalse(request.getModes().getCar());
         assertTrue(request.getModes().getBicycle());
@@ -180,9 +199,9 @@ public class TestRequest extends TestCase {
     }
 
     public void testPlanner() throws Exception {
-        
+
         Planner planner = new TestPlanner("portland", "113410", "137427");
-        
+
         Response response = planner.getItineraries();
         Itinerary itinerary = response.getPlan().itinerary.get(0);
         Leg leg = itinerary.legs.get(0);
@@ -222,7 +241,7 @@ public class TestRequest extends TestCase {
 	}
 
     public void testIntermediate() throws Exception {
-        
+
         Graph graph = Context.getInstance().graph;
         Vertex v1 = graph.getVertex("114080 back");//getVertexByCrossStreets("NW 10TH AVE", "W BURNSIDE ST", false);
         Vertex v2 = graph.getVertex("115250");//graph.getOutgoing(getVertexByCrossStreets("SE 82ND AVE", "SE ASH ST", false)).iterator().next().getToVertex();
@@ -233,10 +252,10 @@ public class TestRequest extends TestCase {
         assertNotNull(v2);
         assertNotNull(v3);
         assertNotNull(v4);
-        
+
         TestPlanner planner = new TestPlanner("portland", v1.getLabel(), v4.getLabel(), Arrays.asList(v2.getLabel(), v3.getLabel()));
         List<GraphPath> paths = planner.getPaths();
-        
+
         assertTrue(paths.size() > 0);
         GraphPath path = paths.get(0);
         int curVertex = 0;
@@ -247,7 +266,25 @@ public class TestRequest extends TestCase {
         }
         assertEquals(4, curVertex); //found all four, in the correct order (1, 3, 2, 4)
     }
-    
+
+    public void testBikeRental() {
+        BikeRental bikeRental = new BikeRental();
+        bikeRental.setGraphService(Context.getInstance().graphService);
+        //no stations in graph
+        BikeRentalStationList stations = bikeRental.getBikeRentalStations(null,
+                null, null);
+        assertEquals(0, stations.stations.size());
+
+        //no stations in range
+        stations = bikeRental.getBikeRentalStations("55.5,-122.7",
+                "65.6,-122.6", "portland");
+        assertEquals(0, stations.stations.size());
+        //finally, a station
+        stations = bikeRental.getBikeRentalStations("45.5,-122.7",
+                "45.6,-122.6", "portland");
+        assertEquals(1, stations.stations.size());
+    }
+
     /**
      * Subclass of Planner for testing. Constructor sets fields that would usually be set by 
      * Jersey from HTTP Query string.
@@ -291,5 +328,5 @@ public class TestRequest extends TestCase {
         }
         
     }
-    
+
 }
