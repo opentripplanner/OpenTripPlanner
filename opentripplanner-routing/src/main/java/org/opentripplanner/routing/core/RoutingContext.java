@@ -78,14 +78,11 @@ public class RoutingContext implements Cloneable {
     
     /* CONSTRUCTORS */
     
-    public RoutingContext(RoutingRequest traverseOptions, Graph graph) {
-        this(traverseOptions, graph, null, null);
-    }
-
-    public RoutingContext(RoutingRequest traverseOptions, Graph graph, Vertex from, Vertex to) {
+    public RoutingContext(RoutingRequest traverseOptions, Graph graph, 
+                          Vertex from, Vertex to, boolean findPlaces) {
         this.opt = traverseOptions;
         this.graph = graph;
-        if (from == null && to == null) {
+        if (findPlaces) {
             // normal mode, search for vertices based on fromPlace and toPlace
             fromVertex = graph.streetIndex.getVertexForPlace(opt.getFromPlace(), opt);
             toVertex = graph.streetIndex.getVertexForPlace(opt.getToPlace(), opt, fromVertex);

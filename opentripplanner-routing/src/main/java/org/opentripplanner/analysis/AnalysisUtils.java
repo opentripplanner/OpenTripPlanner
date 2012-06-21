@@ -50,6 +50,7 @@ public class AnalysisUtils {
         DisjointSet<Vertex> components = getConnectedComponents(graph);
 
         Map<Integer, List<Coordinate>> componentCoordinates = new HashMap<Integer, List<Coordinate>>();
+        options.setDummyRoutingContext(graph);
         for (Vertex v : graph.getVertices()) {
             for (Edge e : v.getOutgoing()) {
                 State s0 = new State(v, time, options);

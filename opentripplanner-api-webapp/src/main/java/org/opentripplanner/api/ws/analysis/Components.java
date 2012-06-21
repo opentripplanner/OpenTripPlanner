@@ -29,6 +29,7 @@ import org.opentripplanner.analysis.AnalysisUtils;
 import org.opentripplanner.api.model.analysis.GraphComponent;
 import org.opentripplanner.api.model.analysis.GraphComponentPolygons;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -82,7 +83,8 @@ public class Components {
     public GraphComponentPolygons getComponentPolygons(
             @DefaultValue("TRANSIT,WALK") @QueryParam("modes") TraverseModeSet modes,
             @QueryParam("date") String date, @QueryParam("time") String time,
-            @DefaultValue("") @QueryParam("bannedRoutes") String bannedRoutes) {
+            @DefaultValue("") @QueryParam("bannedRoutes") String bannedRoutes,
+            @QueryParam("routerId") String routerId) {
 
         RoutingRequest options = new RoutingRequest(modes);
         options.bannedRoutes = new HashSet<RouteSpec>();
@@ -101,10 +103,7 @@ public class Components {
         if (cachedPolygons == null || dateTime != cachedDateTime || !options.equals(cachedOptions)) {
             cachedOptions = options;
             cachedDateTime = dateTime;
-            // TODO: verify correctness (AMB)
-            Graph graph = graphService.getGraph();
-            //TODO: fix
-            options.setRoutingContext(graph);
+            Graph graph = graphService.getGraph(routerId);
             cachedPolygons = AnalysisUtils.getComponentPolygons(graph, options, dateTime);
         }
         

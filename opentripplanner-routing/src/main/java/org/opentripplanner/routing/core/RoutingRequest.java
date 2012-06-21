@@ -715,8 +715,8 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public void setRoutingContext (Graph graph) {
         if (rctx == null) {
-            this.rctx = new RoutingContext(this, graph); // graphService.getGraph(routerId)
-            // check after reference established to allow temp edge cleanup on exception
+            this.rctx = new RoutingContext(this, graph, null, null, true); // graphService.getGraph(routerId)
+            // check after back reference is established, to allow temp edge cleanup on exceptions
             this.rctx.check();
         } else {
             if (rctx.graph == graph) {
@@ -736,12 +736,17 @@ public class RoutingRequest implements Cloneable, Serializable {
         // FIXME here, or in test, and/or in other places like TSP that use this method
         // if (rctx != null)
         //    this.rctx.destroy();
-        this.rctx = new RoutingContext(this, graph, from, to);
+        this.rctx = new RoutingContext(this, graph, from, to, false);
     }
 
     /** For use in tests. Force RoutingContext to specific vertices rather than making temp edges. */
     public void setRoutingContext (Graph graph, String from, String to) {
         this.setRoutingContext(graph, graph.getVertex(from), graph.getVertex(to));
+    }
+
+    /** Used in internals API. Make a RoutingContext with no origin or destination vertices specified. */
+    public void setDummyRoutingContext (Graph graph) {
+        this.setRoutingContext(graph, "", "");
     }
 
     public RoutingContext getRoutingContext () {
