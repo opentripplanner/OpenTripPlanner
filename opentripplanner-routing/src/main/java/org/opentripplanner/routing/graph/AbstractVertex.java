@@ -25,7 +25,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.opentripplanner.common.MavenVersion;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
