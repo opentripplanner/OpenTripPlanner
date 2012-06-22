@@ -85,8 +85,10 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
     public List<String> provides() {
         List<String> result = new ArrayList<String>();
         result.add("transit");
-        for (GraphBuilderWithGtfsDao builder : gtfsGraphBuilders) {
-            result.addAll(builder.provides());
+        if (gtfsGraphBuilders != null) {
+            for (GraphBuilderWithGtfsDao builder : gtfsGraphBuilders) {
+                result.addAll(builder.provides());
+            }
         }
         return result;
     }
