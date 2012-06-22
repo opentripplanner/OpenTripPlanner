@@ -301,16 +301,15 @@ public class Graph implements Serializable {
         BASIC, FULL, NO_HIERARCHIES, DEBUG;
     }
     
-    public static Graph load(File file, LoadLevel level) 
-        throws IOException, ClassNotFoundException {
+    public static Graph load(File file, LoadLevel level) throws IOException, ClassNotFoundException {
         LOG.info("Reading graph " + file.getAbsolutePath() + " ...");
         // cannot use getClassLoader() in static context
         ObjectInputStream in = new ObjectInputStream (new FileInputStream(file));
         return load(in, level);
     }
-    
-    public static Graph load(ClassLoader classLoader, File file, LoadLevel level) 
-        throws IOException, ClassNotFoundException {
+
+    public static Graph load(ClassLoader classLoader, File file, LoadLevel level)
+            throws IOException, ClassNotFoundException {
         LOG.info("Reading graph " + file.getAbsolutePath() + " with alternate classloader ...");
         ObjectInputStream in = new GraphObjectInputStream(
                 new BufferedInputStream (new FileInputStream(file)), classLoader);
@@ -323,7 +322,7 @@ public class Graph implements Serializable {
     }
 
     @SuppressWarnings("unchecked")
-	private static Graph load(ObjectInputStream in, LoadLevel level) 
+	public static Graph load(ObjectInputStream in, LoadLevel level) 
         throws IOException, ClassNotFoundException {
         try {
             Graph graph = (Graph) in.readObject();
@@ -401,35 +400,41 @@ public class Graph implements Serializable {
     public void save(File file) throws IOException {
         LOG.info("Main graph size: |V|={} |E|={}", this.countVertices(), this.countEdges());
         LOG.info("Writing graph " + file.getAbsolutePath() + " ...");
-        ObjectOutputStream out = new ObjectOutputStream(
-                new BufferedOutputStream(new FileOutputStream(file)));
+        ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(
+                new FileOutputStream(file)));
         try {
-            LOG.debug("Consolidating edges...");
-            // this is not space efficient
-            List<Edge> edges = new ArrayList<Edge>(this.countEdges());
-            for (Vertex v : getVertices()) {
-                // there are assumed to be no edges in an incoming list that are not in an outgoing
-                // list
-                edges.addAll(v.getOutgoing());
-                if (v.getDegreeOut() + v.getDegreeIn() == 0)
-                    LOG.debug("vertex {} has no edges, it will not survive serialization.", v);
-            }
-            LOG.debug("Assigning vertex/edge ID numbers...");
-            this.renumberVerticesAndEdges();
-            LOG.debug("Writing edges...");
-            out.writeObject(this);
-            out.writeObject(edges);
-            out.writeObject(this.hierarchies);
-            LOG.debug("Writing debug data...");
-            out.writeObject(this.vertexById);
-            out.writeObject(this.edgeById);
-            out.writeObject(this.idForEdge);
+            save(out);
             out.close();
         } catch (RuntimeException e) {
             out.close();
-            file.delete(); //remove half-written file
+            file.delete(); // remove half-written file
             throw e;
         }
+    }
+
+    public void save(ObjectOutputStream out) throws IOException {
+        LOG.debug("Consolidating edges...");
+        // this is not space efficient
+        List<Edge> edges = new ArrayList<Edge>(this.countEdges());
+        for (Vertex v : getVertices()) {
+            // there are assumed to be no edges in an incoming list that are not
+            // in an outgoing
+            // list
+            edges.addAll(v.getOutgoing());
+            if (v.getDegreeOut() + v.getDegreeIn() == 0)
+                LOG.debug("vertex {} has no edges, it will not survive serialization.", v);
+        }
+        LOG.debug("Assigning vertex/edge ID numbers...");
+        this.renumberVerticesAndEdges();
+        LOG.debug("Writing edges...");
+        out.writeObject(this);
+        out.writeObject(edges);
+        out.writeObject(this.hierarchies);
+        LOG.debug("Writing debug data...");
+        out.writeObject(this.vertexById);
+        out.writeObject(this.edgeById);
+        out.writeObject(this.idForEdge);
+
         LOG.info("Graph written.");
     }
     
