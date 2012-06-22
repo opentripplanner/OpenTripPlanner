@@ -187,8 +187,8 @@ public class TransitIndex {
             if (agency != null && !agency.equals(stopId.getAgencyId())) continue;
             Stop stop = new Stop();
             stop.id = stopId;
-            stop.lat = transitStop.getLat();
-            stop.lon = transitStop.getLon();
+            stop.lat = transitStop.getY();
+            stop.lon = transitStop.getX();
             stop.stopCode = transitStop.getStopCode();
             stop.stopName = transitStop.getName();
             stop.routes = transitIndexService.getRoutesForStop(stopId);

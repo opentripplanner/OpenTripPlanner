@@ -32,7 +32,7 @@ import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.RelativeDirection;
 import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.api.model.patch.PatchResponse;
-import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.impl.shapefile.AttributeFeatureConverter;
 import org.opentripplanner.graph_builder.impl.shapefile.CaseBasedTraversalPermissionConverter;
@@ -180,7 +180,7 @@ class Context {
     private void makeEdges(StreetVertex v1, StreetVertex v2, String name) {
         LineString geometry = GeometryUtils.makeLineString(v1.getCoordinate().x,
                 v1.getCoordinate().y, v2.getCoordinate().x, v2.getCoordinate().y);
-        double length = DistanceLibrary.distance(v1.getCoordinate(), v2.getCoordinate());
+        double length = SphericalDistanceLibrary.getInstance().distance(v1.getCoordinate(), v2.getCoordinate());
         new PlainStreetEdge(v1, v2, geometry, name, length, StreetTraversalPermission.ALL, false);
 
         geometry = GeometryUtils.makeLineString(v2.getCoordinate().x, v2.getCoordinate().y,

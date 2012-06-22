@@ -11,7 +11,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.vertextype.TurnVertex;
-import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
@@ -31,7 +31,7 @@ public class GeometryIndex implements GeometryIndexService {
     
     private static final Logger LOG = LoggerFactory.getLogger(GeometryIndex.class);
     private static final double SEARCH_RADIUS_M = 100; // meters
-    private static final double SEARCH_RADIUS_DEG = DistanceLibrary.metersToDegrees(SEARCH_RADIUS_M);
+    private static final double SEARCH_RADIUS_DEG = SphericalDistanceLibrary.metersToDegrees(SEARCH_RADIUS_M);
     
     private STRtree pedestrianIndex;
     private STRtree index;

@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation;
@@ -42,6 +43,8 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class CheckGeometryGraphBuilderImpl implements GraphBuilder {
 
+
+    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     /** An set of ids which identifies what stages this graph builder provides (i.e. streets, elevation, transit) */
     public List<String> provides() {
@@ -84,9 +87,9 @@ public class CheckGeometryGraphBuilderImpl implements GraphBuilder {
                     }
                     Coordinate geometryStartCoord = geometryCoordinates[0];
                     Coordinate geometryEndCoord = geometryCoordinates[geometryCoordinates.length - 1];
-                    if (DistanceLibrary.distance(edgeStartCoord, geometryStartCoord) > MAX_VERTEX_SHAPE_ERROR) {
+                    if (getDistanceLibrary().distance(edgeStartCoord, geometryStartCoord) > MAX_VERTEX_SHAPE_ERROR) {
                         _log.warn(GraphBuilderAnnotation.register(graph, Variety.VERTEX_SHAPE_ERROR, e));
-                    } else if (DistanceLibrary.distance(edgeEndCoord, geometryEndCoord) > MAX_VERTEX_SHAPE_ERROR) {
+                    } else if (getDistanceLibrary().distance(edgeEndCoord, geometryEndCoord) > MAX_VERTEX_SHAPE_ERROR) {
                         _log.warn(GraphBuilderAnnotation.register(graph, Variety.VERTEX_SHAPE_ERROR, e));
                     }
                 }
@@ -98,5 +101,13 @@ public class CheckGeometryGraphBuilderImpl implements GraphBuilder {
     @Override
     public void checkInputs() {
         //no inputs to check
+    }
+
+    public DistanceLibrary getDistanceLibrary() {
+        return distanceLibrary;
+    }
+
+    public void setDistanceLibrary(DistanceLibrary distanceLibrary) {
+        this.distanceLibrary = distanceLibrary;
     }
 }

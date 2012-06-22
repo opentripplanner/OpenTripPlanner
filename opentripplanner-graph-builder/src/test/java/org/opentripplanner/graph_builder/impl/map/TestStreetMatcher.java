@@ -29,7 +29,7 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -200,8 +200,8 @@ public class TestStreetMatcher {
 
         @Override
         public double getDistance() {
-            return DistanceLibrary.distance(getFromVertex().getCoordinate(), getToVertex()
-                    .getCoordinate());
+            return SphericalDistanceLibrary.getInstance().distance(getFromVertex().getCoordinate(),
+                    getToVertex().getCoordinate());
         }
 
         @Override

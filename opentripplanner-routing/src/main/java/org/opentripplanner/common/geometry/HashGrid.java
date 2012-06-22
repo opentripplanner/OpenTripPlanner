@@ -50,6 +50,7 @@ public class HashGrid {
     private final List<Object>[][] bins;
     private int nBins = 0;
     private int nEntries = 0;
+    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
     
     @SuppressWarnings("unchecked")
     public HashGrid(double binSizeMeters, int xBins, int yBins) {
@@ -102,7 +103,7 @@ public class HashGrid {
             Coordinate c1 = coords[i+1];
             RasterizedSegment rs = new RasterizedSegment(c0, c1, dist, t);
             rasterize(c0, c1, rs);
-            dist += DistanceLibrary.fastDistance(coords[i], coords[i+1]);
+            dist += distanceLibrary.fastDistance(coords[i], coords[i+1]);
         }
     }
     
@@ -225,7 +226,7 @@ public class HashGrid {
                         //if (t == p)
                         //    continue;
                         // FIXME
-                        double distance = DistanceLibrary.fastDistance(c, c);
+                        double distance = distanceLibrary .fastDistance(c, c);
                         // bins may contain distant colliding objects
                         if (distance > radiusMeters)
                             continue;

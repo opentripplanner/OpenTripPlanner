@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -34,6 +35,8 @@ public abstract class MatchState {
     protected static final double NEW_SEGMENT_PENALTY = 0.1;
 
     protected static final double NO_TRAVERSE_PENALTY = 20;
+
+    private static DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     public double currentError;
 
@@ -105,7 +108,7 @@ public abstract class MatchState {
         index = it.getLocation();
         while (index.compareTo(endIndex) < 0) {
             Coordinate thisCoordinate = index.getCoordinate(geometry);
-            double distance = DistanceLibrary.fastDistance(previousCoordinate, thisCoordinate);
+            double distance = distanceLibrary.fastDistance(previousCoordinate, thisCoordinate);
             total += distance;
             previousCoordinate = thisCoordinate;
             if (!it.hasNext())
@@ -115,14 +118,14 @@ public abstract class MatchState {
         }
         //now, last bit of last segment
         Coordinate finalCoordinate = endIndex.getCoordinate(geometry);
-        total += DistanceLibrary.distance(previousCoordinate, finalCoordinate);
+        total += distanceLibrary.distance(previousCoordinate, finalCoordinate);
 
         return total;
     }
 
     
     protected static double distance(Coordinate from, Coordinate to) {
-        return DistanceLibrary.fastDistance(from, to);
+        return distanceLibrary.fastDistance(from, to);
     }
 
 }

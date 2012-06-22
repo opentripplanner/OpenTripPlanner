@@ -13,6 +13,8 @@
 
 package org.opentripplanner.routing.reach;
 
+import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
@@ -37,12 +39,14 @@ public class ReachRemainingWeightHeuristic implements RemainingWeightHeuristic {
 
     private double maxSpeed;
 
+    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
+
     @Override
     public double computeInitialWeight(State s, Vertex target) {
         this.options = s.getOptions();
         this.useTransit = options.getModes().isTransit();
         this.maxSpeed = getMaxSpeed(options);
-        return s.getVertex().fastDistance(target) / maxSpeed;
+        return getDistanceLibrary() .fastDistance(s.getVertex().getCoordinate(), target.getCoordinate()) / maxSpeed;
     }
 
     @Override
@@ -50,7 +54,8 @@ public class ReachRemainingWeightHeuristic implements RemainingWeightHeuristic {
 
         
     	Vertex sv = s.getVertex();
-        double euclidianDistance = sv.fastDistance(target);
+        double euclidianDistance = distanceLibrary.fastDistance(sv.getCoordinate(),
+                target.getCoordinate());
         /*	On a non-transit trip, the remaining weight is simply distance / speed
          *	On a transit trip, there are two cases:
          *	(1) we're not on a transit vehicle.  In this case, there are two possible ways to 
@@ -142,7 +147,8 @@ public class ReachRemainingWeightHeuristic implements RemainingWeightHeuristic {
 
     	Vertex sv = s.getVertex();
         
-        double euclidianDistance = sv.fastDistance(target);
+        double euclidianDistance = distanceLibrary.fastDistance(sv.getCoordinate(), 
+                target.getCoordinate());
         double speed = options.getSpeedUpperBound();
 
         if (useTransit) {
@@ -206,4 +212,12 @@ public class ReachRemainingWeightHeuristic implements RemainingWeightHeuristic {
 	@Override
 	public void reset() {
 	}
+
+    public DistanceLibrary getDistanceLibrary() {
+        return distanceLibrary;
+    }
+
+    public void setDistanceLibrary(DistanceLibrary distanceLibrary) {
+        this.distanceLibrary = distanceLibrary;
+    }
 }

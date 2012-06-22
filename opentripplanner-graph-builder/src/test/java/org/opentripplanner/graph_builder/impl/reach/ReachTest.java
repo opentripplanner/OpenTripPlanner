@@ -22,7 +22,7 @@ import junit.framework.TestCase;
 
 import org.junit.Test;
 import org.opentripplanner.common.IterableLibrary;
-import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -137,7 +137,7 @@ public class ReachTest extends TestCase {
         Coordinate c1 = vA.getCoordinate();
         Coordinate c2 = vB.getCoordinate();
         
-        double length = DistanceLibrary.distance(c1, c2);
+        double length = SphericalDistanceLibrary.getInstance().distance(c1, c2);
         String name = vA.getName() + " - " + vB.getName();
         GeometryFactory gf = GeometryUtils.getGeometryFactory();
         LineString geometry = gf.createLineString(new Coordinate[] { c1, c2});

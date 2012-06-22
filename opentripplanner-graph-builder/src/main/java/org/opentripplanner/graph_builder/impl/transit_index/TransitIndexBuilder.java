@@ -33,6 +33,7 @@ import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.services.GraphBuilderWithGtfsDao;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -88,6 +89,8 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
     List<TraverseMode> modes = new ArrayList<TraverseMode>();
 
     private HashSet<Edge> handledEdges = new HashSet<Edge>();
+
+    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     @Override
     public void setDao(GtfsRelationalDao dao) {
@@ -209,7 +212,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                 coord = new Coordinate(stop.getLon(), stop.getLat());
                 double total = 0;
                 for (int k = 0; k < i; ++k) {
-                    double distance = DistanceLibrary.distance(coord, centers[k].coord);
+                    double distance = distanceLibrary .distance(coord, centers[k].coord);
                     total += distance * distance;
                 }
                 if (total > bestDistance) {
@@ -237,7 +240,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                 double best_distance = Double.MAX_VALUE;
                 for (int c = 0; c < centers.length; ++c) {
                     Coordinate center = centers[c].coord;
-                    double distance = DistanceLibrary.distance(coord, center);
+                    double distance = distanceLibrary.distance(coord, center);
                     if (distance < best_distance) {
                         best_center = c;
                         best_distance = distance;

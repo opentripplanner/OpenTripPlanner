@@ -33,6 +33,7 @@ import org.onebusaway.gtfs.model.Transfer;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.T2;
@@ -248,6 +249,8 @@ public class GTFSPatternHopFactory {
     private HashSet<Stop> stops = new HashSet<Stop>();
 
     private int defaultStreetToStopTime;
+
+    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     public GTFSPatternHopFactory(GtfsContext context) {
         _dao = context.getDao();
@@ -619,7 +622,7 @@ public class GTFSPatternHopFactory {
                 continue;
             }
             int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
-            double hopDistance = DistanceLibrary.fastDistance(
+            double hopDistance = distanceLibrary.fastDistance(
                    st0.getStop().getLon(), st0.getStop().getLat(),
                    st1.getStop().getLon(), st1.getStop().getLat());
             double hopSpeed = hopDistance/runningTime;
@@ -1108,9 +1111,9 @@ public class GTFSPatternHopFactory {
         
         Coordinate startCoord = new Coordinate(s0.getLon(), s0.getLat());
         Coordinate endCoord = new Coordinate(s1.getLon(), s1.getLat());
-        if (DistanceLibrary.distance(startCoord, geometryStartCoord) > 100) {
+        if (distanceLibrary.distance(startCoord, geometryStartCoord) > 100) {
             return false;
-        } else if (DistanceLibrary.distance(endCoord, geometryEndCoord) > 100) {
+        } else if (distanceLibrary.distance(endCoord, geometryEndCoord) > 100) {
             return false;
         }
         return true;
@@ -1317,7 +1320,7 @@ public class GTFSPatternHopFactory {
             if (fromv.equals(tov))
                 continue;
 
-            double distance = DistanceLibrary.distance(fromv.getCoordinate(), tov.getCoordinate());
+            double distance = distanceLibrary.distance(fromv.getCoordinate(), tov.getCoordinate());
             int time;
             if (transfer.getTransferType() == 2) {
                 time = transfer.getMinTransferTime();

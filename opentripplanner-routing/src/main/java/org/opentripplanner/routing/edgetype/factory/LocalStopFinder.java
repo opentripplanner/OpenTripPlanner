@@ -21,6 +21,8 @@ import java.util.Set;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
@@ -64,6 +66,8 @@ public class LocalStopFinder {
     private HashMap<Stop, HashMap<TripPattern, P2<Double>>> neighborhoods;
 
     private HashMap<AgencyAndId, TransitStop> transitStops;
+
+    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
     
     public LocalStopFinder(StreetVertexIndexServiceImpl indexService, Graph graph) {
         this.graph = graph;
@@ -269,7 +273,7 @@ public class LocalStopFinder {
                 }
             }
             
-            if (fromv.fastDistance(origin) > LOCAL_STOP_SEARCH_RADIUS) {
+            if (distanceLibrary .fastDistance(fromv.getCoordinate(), origin.getCoordinate()) > LOCAL_STOP_SEARCH_RADIUS) {
                 /* we have now traveled far from the origin, so we know that anything we find
                  * from here on out is going to be too far
                  */

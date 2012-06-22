@@ -29,6 +29,7 @@ import org.opentripplanner.common.StreetUtils;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.P2;
@@ -463,6 +464,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         // track which vertical level each OSM way belongs to, for building elevators etc.
         private Map<OSMWay, OSMLevel> wayLevels = new HashMap<OSMWay, OSMLevel>();
         private HashSet<OSMNode> _bikeRentalNodes = new HashSet<OSMNode>();
+        private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
         public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
             this.graph = graph;
@@ -700,7 +702,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                                 id = unique(id);
                                 String name = getNameForWay(areaEntity, id);
 
-                                double length = DistanceLibrary.distance(
+                                double length = distanceLibrary.distance(
                                         startEndpoint.getCoordinate(), endEndpoint.getCoordinate());
                                 PlainStreetEdge street = edgeFactory.createEdge(nodeI, nodeJ, areaEntity, startEndpoint,
                                         endEndpoint, geometry, name, length,
@@ -897,7 +899,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         }
                     }
 
-                    distance += DistanceLibrary.distance(
+                    distance += distanceLibrary.distance(
                             segmentStartOSMNode.getLat(), segmentStartOSMNode.getLon(),
                             osmEndNode.getLat(), osmEndNode.getLon());
 
@@ -1638,7 +1640,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             Coordinate[] coordinates = geometry.getCoordinates();
             double d = 0;
             for (int i = 1; i < coordinates.length; ++i) {
-                d += DistanceLibrary.distance(coordinates[i - 1], coordinates[i]);
+                d += distanceLibrary .distance(coordinates[i - 1], coordinates[i]);
             }
 
             LineString backGeometry = (LineString) geometry.reverse();

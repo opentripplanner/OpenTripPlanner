@@ -7,6 +7,7 @@ import org.opentripplanner.analyst.core.Sample;
 import org.opentripplanner.analyst.core.SampleSource;
 import org.opentripplanner.routing.vertextype.TurnVertex;
 import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -25,7 +26,8 @@ import com.vividsolutions.jts.operation.distance.GeometryLocation;
 public class SampleFactory implements SampleSource {
 
     private static final double SEARCH_RADIUS_M = 150; // meters
-    private static final double SEARCH_RADIUS_DEG = DistanceLibrary.metersToDegrees(SEARCH_RADIUS_M);
+    private static final double SEARCH_RADIUS_DEG = SphericalDistanceLibrary.metersToDegrees(SEARCH_RADIUS_M);
+    private static DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     @Autowired
     private GeometryIndex index;
@@ -96,7 +98,7 @@ public class SampleFactory implements SampleSource {
         // WRONG: using unprojected coordinates
         double lengthRatio = beginning.getLength() / g.getLength();
         double distOnStreet = v.getLength() * lengthRatio;
-        double distToStreet = DistanceLibrary.fastDistance(
+        double distToStreet = distanceLibrary .fastDistance(
                 gl[0].getCoordinate(), 
                 gl[1].getCoordinate());
         double dist = distOnStreet + distToStreet;

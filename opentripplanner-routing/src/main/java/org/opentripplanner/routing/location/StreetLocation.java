@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.OutEdge;
@@ -43,6 +44,8 @@ import com.vividsolutions.jts.linearref.LocationIndexedLine;
  * Also for situating bus stops in the middle of street segments.
  */
 public class StreetLocation extends AbstractVertex {
+
+    private static DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     private ArrayList<Edge> extra = new ArrayList<Edge>();
 
@@ -104,9 +107,9 @@ public class StreetLocation extends AbstractVertex {
             boolean seen = cache.containsKey(street.getGeometry());
             /* forward edges and vertices */
             Vertex edgeLocation;
-            if (DistanceLibrary.distance(nearestPoint, fromv.getCoordinate()) < 0.0001) {
+            if (distanceLibrary .distance(nearestPoint, fromv.getCoordinate()) < 0.0001) {
                 edgeLocation = fromv;
-            } else if (DistanceLibrary.distance(nearestPoint, tov.getCoordinate()) < 0.0001) {
+            } else if (distanceLibrary.distance(nearestPoint, tov.getCoordinate()) < 0.0001) {
                 edgeLocation = tov;
             } else {
                 edgeLocation = createHalfLocation(graph, location, label + " to "

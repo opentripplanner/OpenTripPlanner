@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.common.model.P2;
@@ -80,6 +81,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     private STRtree transitStopTree;
 
     private STRtree intersectionTree;
+
+    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
 //    private static final double SEARCH_RADIUS_M = 100; // meters
 //    private static final double SEARCH_RADIUS_DEG = DistanceLibrary.metersToDegrees(SEARCH_RADIUS_M);
@@ -156,11 +159,11 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     @SuppressWarnings("unchecked")
     public List<Vertex> getLocalTransitStops(Coordinate c, double distance) {
         Envelope env = new Envelope(c);
-        env.expandBy(DistanceLibrary.metersToDegrees(distance));
+        env.expandBy(SphericalDistanceLibrary.metersToDegrees(distance));
         List<Vertex> nearby = transitStopTree.query(env);
         List<Vertex> results = new ArrayList<Vertex>();
         for (Vertex v : nearby) {
-            if (v.distance(c) <= distance) {
+            if (distanceLibrary.distance(v.getCoordinate(), c) <= distance) {
                 results.add(v);
             }
         }
@@ -218,7 +221,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         // here we skip examining stops, as they are really only relevant when transit is being used
         if (options != null && options.getModes().isTransit()) {
             for (Vertex v : getLocalTransitStops(coordinate, 1000)) {
-                double d = v.distance(coordinate);
+                double d = distanceLibrary.distance(v.getCoordinate(), coordinate);
                 if (d < closest_stop_distance) {
                     closest_stop_distance = d;
                     closest_stop = v;
@@ -235,7 +238,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         if (candidate != null) {
             StreetEdge bestStreet = candidate.edge;
             Coordinate nearestPoint = candidate.nearestPointOnEdge;
-            closest_street_distance = DistanceLibrary.distance(coordinate, nearestPoint);
+            closest_street_distance = distanceLibrary.distance(coordinate, nearestPoint);
             _log.debug("best street: {} dist: {}", bestStreet.toString(), closest_street_distance);
             if (name == null) {
                 name = bestStreet.getName();
@@ -469,12 +472,13 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     /** radius is meters */
     public List<TransitStop> getNearbyTransitStops(Coordinate coordinate, double radius) {
         Envelope envelope = new Envelope(coordinate);
-        envelope.expandBy(DistanceLibrary.metersToDegrees(radius));
+        getDistanceLibrary();
+        envelope.expandBy(SphericalDistanceLibrary.metersToDegrees(radius));
         List<?> stops = transitStopTree.query(envelope);
         ArrayList<TransitStop> out = new ArrayList<TransitStop>();
         for (Object o : stops) {
             TransitStop stop = (TransitStop) o;
-            if (stop.distance(coordinate) < radius) {
+            if (distanceLibrary.distance(stop.getCoordinate(), coordinate) < radius) {
                 out.add(stop);
             }
         }
@@ -523,6 +527,14 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             return sl.isWheelchairAccessible();
         }
         return true;
+    }
+
+    public DistanceLibrary getDistanceLibrary() {
+        return distanceLibrary;
+    }
+
+    public void setDistanceLibrary(DistanceLibrary distanceLibrary) {
+        this.distanceLibrary = distanceLibrary;
     }
 
 }

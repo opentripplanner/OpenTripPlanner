@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.edgetype.FreeEdge;
@@ -51,9 +52,12 @@ public class LinkRequest {
     private Boolean result;
 
     private List<Edge> edgesAdded = new ArrayList<Edge>();
+
+    private DistanceLibrary distanceLibrary;
     
     public LinkRequest(NetworkLinkerLibrary linker) {
         this.linker = linker;
+        this.distanceLibrary = linker.getDistanceLibrary();
     }
     
     /**
@@ -120,7 +124,7 @@ public class LinkRequest {
             List<StreetVertex> atIntersection = linker.index.getIntersectionAt(coordinate);
             if (atIntersection != null) {
                 // if so, the stop can be linked directly to all vertices at the intersection
-                if (edges.getScore() > atIntersection.get(0).distance(coordinate))
+                if (edges.getScore() > distanceLibrary.distance(atIntersection.get(0).getCoordinate(), coordinate))
                     return atIntersection;
             }
             return getSplitterVertices(vertexLabel, edges.toEdgeList(), coordinate);

@@ -25,6 +25,8 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -70,6 +72,8 @@ public class MultiObjectivePathServiceImpl implements PathService {
 
     private TraverseVisitor traverseVisitor;
 
+    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
+
     /**
      * Give up on searching for itineraries after this many seconds have elapsed.
      */
@@ -111,7 +115,8 @@ public class MultiObjectivePathServiceImpl implements PathService {
                           maxWalk *= 2) {
             LOG.debug("try search with max walk {}", maxWalk);
             // increase maxWalk if settings make trip impossible
-            if (maxWalk < Math.min(originVertex.distance(targetVertex), 
+            if (maxWalk < Math.min(distanceLibrary.distance(originVertex.getCoordinate(), 
+                    targetVertex.getCoordinate()), 
                 originVertex.getDistanceToNearestTransitStop() +
                 targetVertex.getDistanceToNearestTransitStop())) 
                 continue WALK;
@@ -119,7 +124,8 @@ public class MultiObjectivePathServiceImpl implements PathService {
             
             // cap search / heuristic weight
             final double AVG_TRANSIT_SPEED = 25; // m/sec 
-            double cutoff = (originVertex.distance(targetVertex) * 1.5) / AVG_TRANSIT_SPEED; // wait time is irrelevant in the heuristic
+            double cutoff = (distanceLibrary.distance(originVertex.getCoordinate(),
+                    targetVertex.getCoordinate()) * 1.5) / AVG_TRANSIT_SPEED; // wait time is irrelevant in the heuristic
             cutoff += options.getMaxWalkDistance() * options.walkReluctance;
             options.maxWeight = cutoff;
             

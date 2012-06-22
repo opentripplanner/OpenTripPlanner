@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.Hop;
 import org.opentripplanner.routing.edgetype.PatternHop;
@@ -31,6 +32,7 @@ import org.opentripplanner.common.pqueue.IntBinHeap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.index.strtree.STRtree;
 
@@ -49,6 +51,8 @@ public class SimplifiedLowerBoundGraph {
     int max_gindex = 0;
     final double GROUP_RADIUS = 5.0; // meters
 
+    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
+
     private void groupVertices() {
         LOG.info("grouping vertices by location...");
         max_gindex = 0;
@@ -63,14 +67,15 @@ public class SimplifiedLowerBoundGraph {
         for (Vertex v : originalGraph.getVertices()) {
             if (v.getGroupIndex() != -1)
                 continue;
-            Envelope env = new Envelope(v.getCoordinate());
-            env.expandBy(DistanceLibrary.metersToDegrees(GROUP_RADIUS));
+            Coordinate coordinate = v.getCoordinate();
+            Envelope env = new Envelope(coordinate);
+            env.expandBy(SphericalDistanceLibrary.metersToDegrees(GROUP_RADIUS));
             @SuppressWarnings("unchecked")
             List<Vertex> nearby = vertexIndex.query(env);
             ArrayList<Vertex> group = new ArrayList<Vertex>();
             // group will contain at least v and possibly other vertices
             for (Vertex n : nearby) {
-                if (n.getGroupIndex() == -1 && n.distance(v) <= GROUP_RADIUS) {
+                if (n.getGroupIndex() == -1 && distanceLibrary .distance(n.getCoordinate(), coordinate) <= GROUP_RADIUS) {
                     n.setGroupIndex(max_gindex);
                     group.add(n);
                 }
