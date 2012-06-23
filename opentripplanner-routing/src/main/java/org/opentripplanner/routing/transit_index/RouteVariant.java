@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -211,6 +212,7 @@ public class RouteVariant implements Serializable {
         return direction;
     }
 
+    @XmlTransient
     public LineString getGeometry() {
         if (geometry == null) {
             List<Coordinate> coords = new ArrayList<Coordinate>();
