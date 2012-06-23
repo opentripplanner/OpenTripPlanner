@@ -116,11 +116,9 @@ otp.planner.Itinerary = {
         // Reproject layer data for display if necessary
         if (this.map.dataProjection != vLayer.map.getProjection()) {
             for (var i = 0; i < this.m_vectors.length; ++i) {
-                if (!this.m_vectors[i].geometry._otp_reprojected) {
+                if (this.m_vectors[i].geometry && !this.m_vectors[i].geometry._otp_reprojected) {
                     this.m_vectors[i].geometry._otp_reprojected = true;
-                    this.m_vectors[i].geometry.transform(
-                            this.map.dataProjection, vLayer.map
-                                    .getProjectionObject());
+                    this.m_vectors[i].geometry.transform(this.map.dataProjection, vLayer.map.getProjectionObject());
                 }
             }
         }
@@ -144,7 +142,7 @@ otp.planner.Itinerary = {
         vLayer.addFeatures(this.m_vectors);
 
         this.m_extent = vLayer.getDataExtent();
-        if (mLayer != null) // we don't want to change the extent for alternative routes 
+        if(this.m_extent && mLayer != null) // we don't want to change the extent for alternative routes 
         	this.m_extent.extend(mLayer.getDataExtent());
     },
 
@@ -317,6 +315,7 @@ otp.planner.Itinerary = {
         var marker = otp.util.OpenLayersUtils.makeMarker(x, y, options);
         this.m_markers.push(marker);
     },
+
 
    /**
     * Gets a new Marker Layer for drawing the trip plan's features upon
