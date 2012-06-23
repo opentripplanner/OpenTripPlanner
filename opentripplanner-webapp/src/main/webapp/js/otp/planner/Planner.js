@@ -335,7 +335,7 @@ otp.planner.Planner = {
     {
         this.m_renderer.clear();
         var newTab = this.m_tabs[activeTab.id];
-        
+
         // remove the topo graph from the south panel, if applicable 
         var oldTab = this.m_tabs[this.m_activeTabID];
         if(oldTab != null && oldTab.topoRenderer != null) {

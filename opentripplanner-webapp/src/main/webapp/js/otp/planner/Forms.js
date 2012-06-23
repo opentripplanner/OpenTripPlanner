@@ -502,6 +502,10 @@ otp.planner.StaticForms = {
                 forms.m_arriveByForm.setValue('true');
                 time = true;
             }
+            if(params.arriveBy && params.arriveBy == "true")
+                forms.m_arriveByForm.setValue('true');
+            else if(params.arriveBy && params.arriveBy == "false")
+                forms.m_arriveByForm.setValue('false');
 
             if(params.time)
             {
@@ -612,7 +616,7 @@ otp.planner.StaticForms = {
         retVal.toPlace   = this.m_toForm.getNamedCoord();
         retVal.date      = this.m_date.getRawValue();
         retVal.time      = otp.util.DateUtils.parseTime(this.m_time.getRawValue(), this.locale.time.time_format);
-        retVal.arriveBy  = this.m_arriveByForm.getRawValue();
+        retVal.arriveBy  = this.m_arriveByForm.getValue();
         retVal.opt       = this.m_optimizeForm.getValue();
         retVal.routerId  = this.m_routerIdForm.getValue();
 

@@ -26,7 +26,7 @@ otp.planner.ParamTemplate = 'submit'
         + '&maxWalkDistance={maxWalkDistance}'
         + '&time={time}'
         + '&date={date}'
-        + '&arr={arriveBy}&itinID={itinID}'
+        + '&arriveBy={arriveBy}&itinID={itinID}'
         + '&wheelchair={wheelchair}';
 
 otp.planner.Templates = {
