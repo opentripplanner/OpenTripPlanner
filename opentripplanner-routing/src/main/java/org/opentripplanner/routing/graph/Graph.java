@@ -45,7 +45,7 @@ import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation;
-import org.opentripplanner.routing.core.MortonVertexComparator;
+import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
@@ -99,6 +99,8 @@ public class Graph implements Serializable {
     private Collection<String> agencies = new HashSet<String>();
 
     private transient Set<Edge> temporaryEdges;
+
+    private VertexComparatorFactory vertexComparatorFactory = new MortonVertexComparatorFactory();
 
     public Graph(Graph basedOn) {
         this();
@@ -254,7 +256,7 @@ public class Graph implements Serializable {
     /* this will require a rehash of any existing hashtables keyed on vertices */
     private void renumberVerticesAndEdges() {
         this.vertexById = new ArrayList<Vertex>(getVertices());
-        Collections.sort(this.vertexById, new MortonVertexComparator(this.vertexById));
+        Collections.sort(this.vertexById, getVertexComparatorFactory().getComparator(vertexById));
         this.edgeById = new HashMap<Integer, Edge>();
         this.idForEdge = new HashMap<Edge, Integer>();
         int i = 0;
@@ -511,6 +513,14 @@ public class Graph implements Serializable {
 
     public Collection<Edge> getTemporaryEdges() {
         return temporaryEdges;
+    }
+
+    public VertexComparatorFactory getVertexComparatorFactory() {
+        return vertexComparatorFactory;
+    }
+
+    public void setVertexComparatorFactory(VertexComparatorFactory vertexComparatorFactory) {
+        this.vertexComparatorFactory = vertexComparatorFactory;
     }
 
 }
