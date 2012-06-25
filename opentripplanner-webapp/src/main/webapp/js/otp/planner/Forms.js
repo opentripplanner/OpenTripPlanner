@@ -428,8 +428,51 @@ otp.planner.StaticForms = {
         return retVal;
     },
 
+    /** parse (trimet) mode param */
+    parseMode : function(mode)
+    {
+        var retVal = mode;
+        try
+        {
+            if(mode == 'A') retVal = 'TRANSIT,WALK';
+            if(mode == 'T') retVal = 'BUSISH,WALK';
+            if(mode == 'B') retVal = 'TRAINISH,WALK';
+        }
+        catch(e)
+        {}
 
-    /** */
+        return retVal;
+    },
+
+
+    /** parse (trimet) min/opt param */
+    parseOptimize : function(opt)
+    {
+        var retVal = opt;
+        try
+        {
+            if(opt == 'T') retVal = 'QUICK';
+            if(opt == 'X') retVal = 'TRANSFERS';
+        }
+        catch(e)
+        {}
+
+        return retVal;
+    },
+
+
+    /**
+     * populate the trip planner form with url parameters.
+     * 
+     * Code here works with both to parse the same set of params that the OTP ReST API accepts, as well as TriMet's legacy trip form.
+     * 
+     * TriMet URLs (yes the backwards x = lat and y = lon happens in our world):
+     * http://ride.trimet.org/?from=PDX&to=ZOO&after=2:00pm&on=06/25/12&min=T&walk=0.75&mode=T&xo=45.5876&yo=-122.5932&xd=45.5097&yd=-122.7163&submit
+     * http://ride.trimet.org/?from=PDX&to=ZOO&by=2:00pm&on=06/25/12&min=X&walk=0.10&mode=A&xo=45.5876&yo=-122.5932&xd=45.5097&yd=-122.7163&submit
+     * http://ride.trimet.org/?from=PDX&to=ZOO&date=06/25/12&time=1:50pm&min=T&walk=0.75&mode=T&arr=A&submit
+     * 
+     * @param {Object} params
+     */
     populate : function(params)
     {
         var forms = this;
@@ -438,15 +481,31 @@ otp.planner.StaticForms = {
             this.clearFrom(true);
             this.clearTo(true);
 
-            // check different GET parameters for from & to info 
-            this.setFormGeocodeName(params.Orig,      forms.m_fromForm);
-            this.setFormGeocodeName(params.Dest,      forms.m_toForm);
-            this.setFormGeocodeName(params.Floc,      forms.m_fromForm);
-            this.setFormGeocodeName(params.Tloc,      forms.m_toForm);
-            this.setFormGeocodeName(params.from,      forms.m_fromForm);
-            this.setFormGeocodeName(params.to,        forms.m_toForm);
+            // check different GET parameters for from & to info -- note fromPlace and toPlace have highest respective precedence
+            if(params.from && params.xo && params.yo)
+            {
+                forms.m_fromForm.setNameLatLon(params.from, params.xo, params.yo, null, true);
+            }
+            else
+            {
+                this.setFormGeocodeName(params.Orig, forms.m_fromForm);
+                this.setFormGeocodeName(params.Floc, forms.m_fromForm);
+                this.setFormGeocodeName(params.from, forms.m_fromForm);
+            }
             this.setFormGeocodeName(params.fromPlace, forms.m_fromForm);
-            this.setFormGeocodeName(params.toPlace,   forms.m_toForm);
+
+            if(params.to && params.xd && params.yd)
+            {
+                forms.m_toForm.setNameLatLon(params.to, params.xd, params.yd, null, true);
+            }
+            else
+            {
+                this.setFormGeocodeName(params.Dest, forms.m_toForm);
+                this.setFormGeocodeName(params.Tloc, forms.m_toForm);
+                this.setFormGeocodeName(params.to,   forms.m_toForm);
+            }
+            this.setFormGeocodeName(params.toPlace, forms.m_toForm);
+
             if(this.THIS.poi)
             {
                 this.THIS.poi.setFromCoord(this.THIS.m_fromForm.geocodeCoord);
@@ -516,10 +575,11 @@ otp.planner.StaticForms = {
 
             if(params.mode)
             {
-                forms.m_modeForm.setValue(params.mode);
+                var mode = this.parseMode(params.mode);
+                forms.m_modeForm.setValue(mode);
                 if(this.m_optionsManager)
                 {
-                    this.m_optionsManager.doMode(params.mode);
+                    this.m_optionsManager.doMode(mode);
                 }
             }
 
@@ -527,16 +587,25 @@ otp.planner.StaticForms = {
             if(params.min)
                 params.optimize = params.min;
             if(params.opt)
-                params.optimize = params.opt
+                params.optimize = params.opt;
             if(params.optimize)
             {
-                forms.m_optimizeForm.setValue(params.optimize);
+                var opt = this.parseOptimize(params.optimize);
+                forms.m_optimizeForm.setValue(opt);
                 if(this.m_optionsManager)
                 {
-                    this.m_optionsManager.doOpt(params.optimize);
+                    this.m_optionsManager.doOpt(opt);
                 }
             }
 
+            if(params.walk && params.walk <= 1.10)
+            {
+                if(params.walk <= 0.10)      forms.m_maxWalkDistanceForm.setValue(160);
+                else if(params.walk <= 0.25) forms.m_maxWalkDistanceForm.setValue(420);
+                else if(params.walk <= 0.50) forms.m_maxWalkDistanceForm.setValue(840);
+                else if(params.walk <= 0.75) forms.m_maxWalkDistanceForm.setValue(1260);
+                else if(params.walk <= 1.10) forms.m_maxWalkDistanceForm.setValue(1609);
+            }
             if(params.maxWalkDistance)
                 forms.m_maxWalkDistanceForm.setValue(params.maxWalkDistance);
             if(params.wheelchair && this.planner.options.showWheelchairForm)
