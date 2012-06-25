@@ -51,10 +51,10 @@ public class Population implements Iterable<Individual> {
             for (Individual i : this.individuals) {
                 Sample s = i.sample;
                 long t = Long.MAX_VALUE;
-                double birdfly = DistanceLibrary.distance(origin.getLat(), origin.getLon(), i.getLat(), i.getLon());
+                //double birdfly = DistanceLibrary.distance(origin.getLat(), origin.getLon(), i.getLat(), i.getLon());
                 if (s != null)
                     t = s.eval(spt);
-                csvWriter.printf("%f,%f,%f,%d,%f\n", i.getLat(), i.getLon(), i.data, t, birdfly);
+                csvWriter.printf("%f,%f,%f,%d,%f\n", i.getLat(), i.getLon(), i.data, t);
             }
             csvWriter.close();
         } catch (Exception e) {
