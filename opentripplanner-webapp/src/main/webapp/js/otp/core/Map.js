@@ -61,7 +61,7 @@ otp.core.MapStatic = {
     permaLinkEnabled  : false,
     historyEnabled    : true,
     rightClickZoom    : true,
-    layerSwitchEnabled: false,
+    showLayerSwitcher : null,
 
     /*
      * Projections - neither should need changing. displayProjection is only
@@ -91,8 +91,10 @@ otp.core.MapStatic = {
             this.baseLayer = otp.util.OpenLayersUtils.makeMapBaseLayer(this.map, this.baseLayerOptions);
         } else {
             this.map.addLayers(this.baseLayer);
-            if (this.baseLayer.length > 1) {
-                this.layerSwitchEnabled=true;
+            if (this.baseLayer.length > 1 && this.showLayerSwitcher !== false) {
+                this.showLayerSwitcher=true;
+            } else {
+                this.showLayerSwitcher=false;
             }
         }
         this.map.setBaseLayer(this.baseLayer, true);
@@ -104,7 +106,7 @@ otp.core.MapStatic = {
         // if we have an empty array of controls, then add the defaults
         if (this.options.controls != null && this.options.controls.length == 0)
         {
-            this.options.controls = otp.util.OpenLayersUtils.defaultControls(this.map, this.zoomWheelEnabled, this.handleRightClicks, this.permaLinkEnabled, this.attribution, this.historyEnabled, this.layerSwitchEnabled);
+            this.options.controls = otp.util.OpenLayersUtils.defaultControls(this.map, this.zoomWheelEnabled, this.handleRightClicks, this.permaLinkEnabled, this.attribution, this.historyEnabled, this.showLayerSwitcher);
         }
 
         var layerLoaded = false;
