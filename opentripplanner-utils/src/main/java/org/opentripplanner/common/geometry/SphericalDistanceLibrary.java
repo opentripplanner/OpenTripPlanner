@@ -89,10 +89,12 @@ public class SphericalDistanceLibrary implements DistanceLibrary {
         return radius * atan2(y, x);        
     }
     
-    /* (non-Javadoc)
-     * @see org.opentripplanner.common.geometry.DistanceLibrary#fastDistance(double, double, double, double, double)
+
+    /**
+     * Approximated, fast and under-estimated equirectangular distance between two points.
+     * Works only for small delta lat/lon, fall-back on exact distance if not the case.
+     * See: http://www.movable-type.co.uk/scripts/latlong.html
      */
-    @Override
     public final double fastDistance(double lat1, double lon1, double lat2, double lon2,
             double radius) {
     	if (Math.abs(lat1 - lat2) > MAX_LAT_DELTA_DEG

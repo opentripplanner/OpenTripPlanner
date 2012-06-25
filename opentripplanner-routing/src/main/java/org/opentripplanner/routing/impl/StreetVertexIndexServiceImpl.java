@@ -107,6 +107,12 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         setup();
     }
 
+    public StreetVertexIndexServiceImpl(Graph graph, DistanceLibrary distanceLibrary) {
+        this.graph = graph;
+        this.distanceLibrary = distanceLibrary;
+        setup();
+    }
+
     public void setup_modifiable() {
         edgeTree = new Quadtree();
         postSetup();
