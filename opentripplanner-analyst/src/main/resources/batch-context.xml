@@ -8,18 +8,51 @@
            http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
            http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-2.0.xsd">
 
-<!-- 	    
-	<bean id="origins" factory-bean="populationFactory" factory-method="fromRaster">
-		<constructor-arg type="String" value="/path/popdensity.raster" />
-	</bean>
+    <context:annotation-config />
+    <context:component-scan base-package="org.opentripplanner.routing.impl"/>
+    <context:component-scan base-package="org.opentripplanner.narrative.impl"/>
+    <context:component-scan base-package="org.opentripplanner.analyst"/>
+    
+    <!-- specify a GraphService, configuring the path to the serialized Graphs -->
+    <bean id="graphService" class="org.opentripplanner.routing.impl.GraphServiceImpl">
+        <property name="path" value="/var/otp/graphs/{}/" />
+        <property name="defaultRouterId" value="paris" />
+    </bean>
+
+<!-- 	
+    <bean id="origins" factory-bean="populationFactory" factory-method="fromRaster">
+        <constructor-arg type="String" value="/path/popdensity.raster" />
+    </bean> 
+-->
+
+    <bean id="origins" class="org.opentripplanner.analyst.batch.Population">
+        <property name="individuals">
+            <list>
+			    <bean class="org.opentripplanner.analyst.batch.Individual">
+			        <property name="lon" value="2.34520" />
+			        <property name="lat" value="48.8555" />
+			    </bean>
+            </list>
+        </property>
+    </bean>
 
 	<bean id="destinations" factory-bean="populationFactory" factory-method="fromShapefile">
-		<constructor-arg type="String" value="/home/syncopate/Dropbox/immoPrix/Prix point.shp" />
+		<constructor-arg type="String" value="/home/abyrd/Dropbox/immoPrix/Prix point.shp" />
+        <constructor-arg type="String" value="prixm2" />
+        <constructor-arg type="String" value="residus" />
+        <!--         
+        <property name="aggregator"> 
+            <bean class="org.opentripplanner.analyst.batch.aggregator.ThresholdSumAggregator">
+                <property name="threshold" value="2000">
+            </bean>
+        </property>
+        -->
 	</bean>
- -->
-	<bean id="origins" class="org.opentripplanner.analyst.batch.Population" />
-	<bean id="destinations" class="org.opentripplanner.analyst.batch.Population" />
-	<bean id="aggreagator" class="org.opentripplanner.analyst.batch.aggregator.ThresholdSumAggregator" />
+
+    <bean id="heuristicFactory" class="org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl"/>
+    <bean id="sptService" class="org.opentripplanner.routing.algorithm.GenericAStar"/>
+    <bean id="populationFactory" class="org.opentripplanner.analyst.batch.factory.PopulationFactory" />
+    <bean id="individualFactory" class="org.opentripplanner.analyst.batch.factory.IndividualFactory" />
 
 	<bean id="batchProcessor" class="org.opentripplanner.analyst.batch.BatchProcessor" />
 
