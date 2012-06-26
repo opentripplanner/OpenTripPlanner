@@ -34,6 +34,7 @@ import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.EdgeNarrative;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -424,14 +425,8 @@ public class PlanGenerator {
     }
 
     private Calendar makeCalendar(State state) {
-        CalendarService service = state.getContext().calendarService;
-        Collection<String> agencyIds = state.getContext().graph.getAgencyIds();
-        TimeZone timeZone; 
-        if (agencyIds.size() == 0) {
-            timeZone = TimeZone.getTimeZone("GMT");
-        } else {
-            timeZone = service.getTimeZoneForAgencyId(agencyIds.iterator().next());
-        }
+        RoutingContext rctx = state.getContext();
+        TimeZone timeZone = rctx.graph.getTimeZone(); 
         Calendar calendar = Calendar.getInstance(timeZone);
         calendar.setTimeInMillis(state.getTimeInMillis());
         return calendar;
