@@ -127,6 +127,8 @@ public abstract class RoutingResource {
      * this should ideally be done when setting the routing context, but at present departure/
      * arrival time is stored in the request as an epoch time with the TZ already resolved, and other
      * code depends on this behavior. (AMB)
+     * Alternatively, we could eliminate the separate RoutingRequest objects and just resolve
+     * vertices and timezones here right away, but just ignore them in semantic equality checks.
      */
     @Autowired GraphService graphService;
     

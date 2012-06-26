@@ -14,7 +14,9 @@
 package org.opentripplanner.util;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -53,12 +55,16 @@ public class DateUtils implements DateConstants {
             if (d != null && s != null)
                 retVal = new Date(d.getTime() + s * 1000);
         } else if (time != null) {
+            // we could just set the Calendar fields directly instead of using secPastMidnight
             Integer s = secPastMid(time);
             if (s != null && s > 0) {
-                // ??? replace String manipulation with Calendar.set hack or JodaTime (AMB)
-                String p = formatDate(DATE_FORMAT, retVal, tz);
-                Date d = parseDate(p, tz);
-                retVal = new Date(d.getTime() + s * 1000);
+                // Maybe we should be using JodaTime... (AMB)
+                Calendar cal = new GregorianCalendar(tz);
+                cal.set(Calendar.HOUR_OF_DAY, 0);
+                cal.set(Calendar.MINUTE, 0);
+                cal.set(Calendar.SECOND, 0);
+                cal.set(Calendar.MILLISECOND, 0);
+                retVal = new Date(cal.getTimeInMillis() + s * 1000);
             }
         }
         LOG.debug( "resulting date is {}", retVal);
