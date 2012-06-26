@@ -152,7 +152,13 @@ public abstract class RoutingResource {
         {
             String d = get(date, n, null);
             String t = get(time, n, null);
-            TimeZone tz = graphService.getGraph(request.routerId).getTimeZone();
+            TimeZone tz;
+            if (graphService != null) { // in tests it will be null
+                tz = graphService.getGraph(request.routerId).getTimeZone();
+            } else {
+                LOG.warn("no graph service available, using default timezone.");
+                tz = TimeZone.getDefault();
+            }
             if (d == null && t != null) { 
                 LOG.debug("parsing ISO datetime {}", t);
                 try { // Full ISO date in time param ?

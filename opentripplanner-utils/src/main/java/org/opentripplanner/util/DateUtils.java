@@ -39,6 +39,9 @@ public class DateUtils implements DateConstants {
      * @param time
      */
     static public Date toDate(String date, String time, TimeZone tz) {
+        //LOG.debug("JVM default timezone is {}", TimeZone.getDefault());
+        LOG.debug("Parsing date {} and time {}", date, time);
+        LOG.debug( "using timezone {}", tz);
         Date retVal = new Date();
         if (date != null) {
             Date d = parseDate(date, tz);
@@ -58,14 +61,13 @@ public class DateUtils implements DateConstants {
                 retVal = new Date(d.getTime() + s * 1000);
             }
         }
-
+        LOG.debug( "resulting date is {}", retVal);
         return retVal;
     }
 
     // TODO: could be replaced with Apache's DateFormat.parseDate ???
     static public Date parseDate(String input, TimeZone tz) {
         Date retVal = null;
-
         try {
             String newString = input.trim().replace('_', '.').replace('-', '.').replace(':', '.').replace(
                     '/', '.');

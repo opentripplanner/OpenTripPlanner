@@ -25,7 +25,6 @@ public class BatchProcessor {
 
     private static final Logger LOG = LoggerFactory.getLogger(BatchProcessor.class);
     private static final String CONFIG = "batch-context.xml";
-    private static final TimeZone TIMEZONE = TimeZone.getDefault();
     
     @Autowired GraphService graphService;
     @Autowired SPTService sptService;
@@ -34,9 +33,10 @@ public class BatchProcessor {
     
     private TraverseModeSet modes = new TraverseModeSet("WALK,TRANSIT");
     private final String DATE = "2011-02-04";
-    private final String TIME = "08:00 AM";
-    
-    public static void main(String[] args) throws IOException {
+    private static final String TIME = "08:00 AM";
+    private static final TimeZone TIMEZONE = TimeZone.getDefault();
+
+    static void main(String[] args) throws IOException {
 
         GenericApplicationContext ctx = new GenericApplicationContext();
         XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader(ctx);
