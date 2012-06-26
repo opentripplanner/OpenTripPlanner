@@ -35,6 +35,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
@@ -101,6 +102,8 @@ public class Graph implements Serializable {
     private transient Set<Edge> temporaryEdges;
 
     private VertexComparatorFactory vertexComparatorFactory = new MortonVertexComparatorFactory();
+
+    private transient TimeZone timeZone = null;
 
     public Graph(Graph basedOn) {
         this();
@@ -521,6 +524,36 @@ public class Graph implements Serializable {
 
     public void setVertexComparatorFactory(VertexComparatorFactory vertexComparatorFactory) {
         this.vertexComparatorFactory = vertexComparatorFactory;
+    }
+    
+    /**
+     * Returns the time zone for the first agency in this graph. This is used to interpret
+     * times in API requests. The JVM default time zone cannot be used because we support 
+     * multiple graphs on one server via the routerId.
+     * Ideally we would want to interpret times in the time zone of the geographic location
+     * where the origin/destination vertex or board/alight event is located. This may become
+     * necessary when we start making graphs with long distance train, boat, or air services. 
+     */
+    public TimeZone getTimeZone() {
+        if (timeZone  == null) {
+            Collection<String> agencyIds = this.getAgencyIds();
+            if (agencyIds.size() == 0) {
+                timeZone = TimeZone.getTimeZone("GMT");
+                LOG.warn("graph contains no agencies; API request times will be interpreted as GMT.");
+            } else {
+                CalendarService cs = this.getCalendarService();
+                for (String agencyId : agencyIds) {
+                    TimeZone tz = cs.getTimeZoneForAgencyId(agencyId);
+                    if (timeZone == null) {
+                        LOG.debug("graph time zone set to {}", tz);
+                        timeZone = tz;
+                    } else if ( ! timeZone.equals(tz)) {
+                        LOG.error("agency time zone differs from graph time zone: {}", tz);
+                    }
+                }
+            }
+        }
+        return timeZone;
     }
 
 }
