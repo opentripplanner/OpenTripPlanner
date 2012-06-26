@@ -116,7 +116,10 @@ public class GraphBuilderAnnotation implements Serializable {
         		"be caused by the use of 00:xx instead of 24:xx for stoptimes after midnight."), 
         BOGUS_SHAPE_GEOMETRY("Shape geometry for shape_id %s does not have two distinct points."), 
         BOGUS_SHAPE_GEOMETRY_CAUGHT("Shape geometry for shape_id %s cannot be used with stop times %s " +
-        		"and %s; using straight-line path instead");
+        		"and %s; using straight-line path instead"), 
+        BOGUS_SHAPE_DIST_TRAVELED("The shape_dist_traveled field for stoptime %s is wrong -- either "
+                        + "it is the same as the value for the previous stoptime, or it is greater than "
+                        + "the max shape_dist_traveled for the shape in shapes.txt");
         
         private final String formatString;
 

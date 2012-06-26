@@ -86,6 +86,7 @@ import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.io.gml2.GMLWriter;
 import com.vividsolutions.jts.linearref.LinearLocation;
 import com.vividsolutions.jts.linearref.LocationIndexedLine;
 
@@ -1055,6 +1056,11 @@ public class GTFSPatternHopFactory {
                 LinearLocation startIndex = getSegmentFraction(distances, startDistance);
                 LinearLocation endIndex = getSegmentFraction(distances, endDistance);
 
+                if (equals(startIndex, endIndex)) {
+                    //bogus shape_dist_traveled 
+                    GraphBuilderAnnotation.register(graph, Variety.BOGUS_SHAPE_DIST_TRAVELED, st1);
+                    return createSimpleGeometry(st0.getStop(), st1.getStop());
+                }
                 LineString line = getLineStringForShapeId(shapeId);
                 LocationIndexedLine lol = new LocationIndexedLine(line);
 
@@ -1080,6 +1086,12 @@ public class GTFSPatternHopFactory {
         double distanceTo = endCoord.getSegmentLength(line);
 
         return getSegmentGeometry(graph, shapeId, lol, startCoord, endCoord, distanceFrom, distanceTo, st0, st1);
+    }
+
+    private static boolean equals(LinearLocation startIndex, LinearLocation endIndex) {
+        return startIndex.getSegmentIndex() == endIndex.getSegmentIndex()
+                && startIndex.getSegmentFraction() == endIndex.getSegmentFraction()
+                && startIndex.getComponentIndex() == endIndex.getComponentIndex();
     }
 
     private LineString createSimpleGeometry(Stop s0, Stop s1) {
