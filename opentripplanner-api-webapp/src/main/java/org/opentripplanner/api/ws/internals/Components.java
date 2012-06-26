@@ -99,11 +99,11 @@ public class Components {
             }
         }
 
-        long dateTime = DateUtils.toDate(date, time).getTime();
+        Graph graph = graphService.getGraph(routerId);
+        long dateTime = DateUtils.toDate(date, time, graph.getTimeZone()).getTime();
         if (cachedPolygons == null || dateTime != cachedDateTime || !options.equals(cachedOptions)) {
             cachedOptions = options;
             cachedDateTime = dateTime;
-            Graph graph = graphService.getGraph(routerId);
             cachedPolygons = AnalysisUtils.getComponentPolygons(graph, options, dateTime);
         }
         

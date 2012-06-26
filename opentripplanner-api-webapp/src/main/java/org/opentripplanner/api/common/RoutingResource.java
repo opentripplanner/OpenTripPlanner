@@ -2,6 +2,7 @@ package org.opentripplanner.api.common;
 
 import java.util.List;
 import java.util.Date;
+import java.util.TimeZone;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.QueryParam;
@@ -11,8 +12,10 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * This class defines all the JAX-RS query parameters for a path search as fields, allowing them to 
@@ -119,6 +122,14 @@ public abstract class RoutingResource {
     /** A transit stop required to be the first stop in the search */
     @DefaultValue("") @QueryParam("startTransitStopId") protected List<String> startTransitStopId;
 
+    /* 
+     * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
+     * this should ideally be done when setting the routing context, but at present departure/
+     * arrival time is stored in the request as an epoch time with the TZ already resolved, and other
+     * code depends on this behavior. (AMB)
+     */
+    @Autowired GraphService graphService;
+    
     /** 
      * Build the 0th Request object from the query parameter lists. 
      * @throws ParameterException when there is a problem interpreting a query parameter
@@ -141,16 +152,17 @@ public abstract class RoutingResource {
         {
             String d = get(date, n, null);
             String t = get(time, n, null);
+            TimeZone tz = graphService.getGraph(request.routerId).getTimeZone();
             if (d == null && t != null) { 
                 LOG.debug("parsing ISO datetime {}", t);
                 try { // Full ISO date in time param ?
                     request.setDateTime(javax.xml.datatype.DatatypeFactory.newInstance()
                            .newXMLGregorianCalendar(t).toGregorianCalendar().getTime());
                 } catch (DatatypeConfigurationException e) {
-                    request.setDateTime(d, t);
+                    request.setDateTime(d, t, tz);
                 }
             } else {
-                request.setDateTime(d, t);
+                request.setDateTime(d, t, tz);
             }
         }
         request.setWheelchair(get(wheelchair, n, false));

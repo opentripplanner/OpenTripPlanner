@@ -493,8 +493,8 @@ public class RoutingRequest implements Cloneable, Serializable {
         LOG.debug("Request datetime parsed as {}", dateTime);
     }
 
-    public void setDateTime(String date, String time) {
-        Date dateObject = DateUtils.toDate(date, time);
+    public void setDateTime(String date, String time, TimeZone tz) {
+        Date dateObject = DateUtils.toDate(date, time, tz);
         setDateTime(dateObject);
     }
 

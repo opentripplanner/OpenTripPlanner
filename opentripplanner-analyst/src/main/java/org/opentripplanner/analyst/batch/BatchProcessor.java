@@ -1,6 +1,7 @@
 package org.opentripplanner.analyst.batch;
 
 import java.io.IOException;
+import java.util.TimeZone;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -24,7 +25,8 @@ public class BatchProcessor {
 
     private static final Logger LOG = LoggerFactory.getLogger(BatchProcessor.class);
     private static final String CONFIG = "batch-context.xml";
-
+    private static final TimeZone TIMEZONE = TimeZone.getDefault();
+    
     @Autowired GraphService graphService;
     @Autowired SPTService sptService;
     @Resource Population origins;
@@ -85,7 +87,7 @@ public class BatchProcessor {
     
     private RoutingRequest buildRequest(double lat, double lon) {
         RoutingRequest req = new RoutingRequest();
-        req.setDateTime(DATE, TIME);
+        req.setDateTime(DATE, TIME, TIMEZONE);
         req.setFrom(String.format("%f, %f", lat, lon));
         req.batch = true;
         req.setRoutingContext(graphService.getGraph());
