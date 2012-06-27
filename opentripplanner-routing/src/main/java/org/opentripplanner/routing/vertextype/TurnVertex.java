@@ -334,6 +334,9 @@ public class TurnVertex extends StreetVertex {
     }
 
     public TurnEdge makeTurnEdge(StreetVertex tov) {
+        if (tov instanceof TurnVertex) {
+            return new TurnEdge(this, (TurnVertex) tov);            
+        }
         return new TurnEdge(this, tov);
     }
 }
