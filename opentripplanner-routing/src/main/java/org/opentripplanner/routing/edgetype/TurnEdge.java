@@ -135,7 +135,7 @@ public class TurnEdge extends StreetEdge {
         }
     }
 
-    private boolean turnRestricted(State s0, RoutingRequest options) {
+    protected boolean turnRestricted(State s0, RoutingRequest options) {
         if (restrictedModes == null)
             return false;
         else {
