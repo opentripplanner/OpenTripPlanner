@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -28,11 +29,13 @@ import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.patch.AgencyAndIdAdapter;
-import org.opentripplanner.routing.patch.LineStringAdapter;
-import org.opentripplanner.routing.patch.StopAdapter;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.transit_index.adapters.AgencyAndIdAdapter;
+import org.opentripplanner.routing.transit_index.adapters.LineStringAdapter;
+import org.opentripplanner.routing.transit_index.adapters.StopAgencyAndIdAdapter;
+import org.opentripplanner.util.PolylineEncoder;
+import org.opentripplanner.util.model.EncodedPolylineBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,7 +75,7 @@ public class RouteVariant implements Serializable {
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     private ArrayList<AgencyAndId> trips;
 
-    @XmlJavaTypeAdapter(StopAdapter.class)
+    @XmlJavaTypeAdapter(StopAgencyAndIdAdapter.class)
     private ArrayList<Stop> stops;
 
     /** An unordered list of all segments for this route */
@@ -89,6 +92,7 @@ public class RouteVariant implements Serializable {
     private String direction;
 
     private LineString geometry;
+
 
     public RouteVariant() {
         // needed for JAXB but unused
@@ -212,6 +216,7 @@ public class RouteVariant implements Serializable {
         return direction;
     }
 
+
     @XmlJavaTypeAdapter(LineStringAdapter.class)
     public LineString getGeometry() {
         if (geometry == null) {
@@ -224,6 +229,7 @@ public class RouteVariant implements Serializable {
             }
             Coordinate[] coordArray = new Coordinate[coords.size()];
             geometry = GeometryUtils.getGeometryFactory().createLineString(coords.toArray(coordArray));
+
         }
         return geometry;
     }

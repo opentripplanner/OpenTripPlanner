@@ -11,7 +11,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.patch;
+package org.opentripplanner.routing.transit_index.adapters;
 
 import java.util.List;
 import java.util.Map;
@@ -19,7 +19,7 @@ import java.util.TreeMap;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-public class MapAdaptor extends XmlAdapter<MapType, Map<String, String>> {
+public class MapAdapter extends XmlAdapter<MapType, Map<String, String>> {
 
     @Override
     public MapType marshal(Map<String, String> v) throws Exception {

@@ -39,5 +39,10 @@ public abstract class TransitVertex extends AbstractVertex {
     public String getStopCode() {
         return stop.getCode();
     }
+    
+    /** Stop information need by API  */
+    public Stop getStop() {
+        return stop;
+    }
 
 }

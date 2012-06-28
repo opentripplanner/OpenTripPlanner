@@ -11,37 +11,41 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.api.model.patch;
+package org.opentripplanner.routing.transit_index.adapters;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-import org.onebusaway.gtfs.model.Agency;
+import org.onebusaway.gtfs.model.Stop;
 
-public class AgencyAdapter extends XmlAdapter<AgencyType, Agency> {
+public class StopAdapter extends XmlAdapter<StopType, Stop> {
 
     @Override
-    public Agency unmarshal(AgencyType arg) throws Exception {
+    public Stop unmarshal(StopType arg) throws Exception {
         if (arg == null) {
             return null;
         }
-        Agency a = new Agency();
+        Stop a = new Stop();
         a.setId(arg.id);
-        a.setId(arg.name);
-        a.setId(arg.url);
-        a.setId(arg.timezone);
-        a.setId(arg.lang);
-        a.setId(arg.phone);
-        a.setId(arg.fareUrl);
-        return new Agency(a);
+        a.setName(arg.stopName);
+        a.setCode(arg.stopCode);
+        a.setDesc(arg.stopDesc);
+        a.setLat(arg.stopLat);
+        a.setLon(arg.stopLon);
+        a.setZoneId(arg.zoneId);
+        a.setUrl(arg.stopUrl);
+        a.setLocationType(arg.locationType);
+        a.setParentStation(arg.parentStation);
+        a.setWheelchairBoarding(arg.wheelchairBoarding);
+        a.setDirection(arg.direction);
+        return new Stop(a);
     }
 
     @Override
-    public AgencyType marshal(Agency arg) throws Exception {
+    public StopType marshal(Stop arg) throws Exception {
         if (arg == null) {
             return null;
         }
-        return new AgencyType(arg.getId(), arg.getName(), arg.getUrl(), arg.getTimezone(),
-                arg.getLang(), arg.getPhone(), arg.getFareUrl());
+        return new StopType(arg);
     }
 
 }

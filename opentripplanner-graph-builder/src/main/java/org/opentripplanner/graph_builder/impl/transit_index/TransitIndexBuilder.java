@@ -86,6 +86,8 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 
     private HashMap<AgencyAndId, HashSet<String>> directionsByRoute = new HashMap<AgencyAndId, HashSet<String>>();
 
+    private HashMap<AgencyAndId, HashSet<Stop>> stopsByRoute = new HashMap<AgencyAndId, HashSet<Stop>>();
+
     List<TraverseMode> modes = new ArrayList<TraverseMode>();
 
     private HashSet<Edge> handledEdges = new HashSet<Edge>();
@@ -117,15 +119,15 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                 + variantsByRoute.size() + " routes, " + totalTrips + " trips, " + totalVariants
                 + " variants ");
 
-        TransitIndexServiceImpl service = (TransitIndexServiceImpl) graph.getService(TransitIndexService.class);
+        TransitIndexServiceImpl service = (TransitIndexServiceImpl) graph
+                .getService(TransitIndexService.class);
         if (service == null) {
-            service = new TransitIndexServiceImpl(variantsByAgency,
-                    variantsByRoute, variantsByTrip, preBoardEdges, preAlightEdges, directionsByRoute,
+            service = new TransitIndexServiceImpl(variantsByAgency, variantsByRoute,
+                    variantsByTrip, preBoardEdges, preAlightEdges, directionsByRoute, stopsByRoute,
                     modes);
         } else {
-            service.merge(variantsByAgency,
-                    variantsByRoute, variantsByTrip, preBoardEdges, preAlightEdges, directionsByRoute,
-                    modes);
+            service.merge(variantsByAgency, variantsByRoute, variantsByTrip, preBoardEdges,
+                    preAlightEdges, directionsByRoute, stopsByRoute, modes);
         }
 
         insertCalendarData(service);
@@ -141,13 +143,12 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
     }
 
     /**
-     * Find the longest consecutive sequence of minutes with no transit stops; this is assumed to be
-     * the overnight service break.
+     * Find the longest consecutive sequence of minutes with no transit stops; this is assumed to be the overnight service break.
      * 
      * @return
      */
     private int findOvernightBreak() {
-        final int minutesInDay = 24*60;
+        final int minutesInDay = 24 * 60;
         boolean[] minutes = new boolean[minutesInDay];
         for (StopTime stopTime : dao.getAllStopTimes()) {
             int time;
@@ -165,7 +166,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
         int run = 0;
         for (int i = 0; i < minutesInDay; ++i) {
             if (minutes[i]) {
-                 //end of run
+                // end of run
                 if (run > bestLength) {
                     bestLength = run;
                     best = i - run;
@@ -259,7 +260,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                 coord = new Coordinate(stop.getLon(), stop.getLat());
                 double total = 0;
                 for (int k = 0; k < i; ++k) {
-                    double distance = distanceLibrary .distance(coord, centers[k].coord);
+                    double distance = distanceLibrary.distance(coord, centers[k].coord);
                     total += distance * distance;
                 }
                 if (total > bestDistance) {
@@ -312,7 +313,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
         }
         _log.debug("found transit center");
 
-        //the highest-weighted cluster
+        // the highest-weighted cluster
         return Collections.max(Arrays.asList(centers)).coord;
     }
 
@@ -336,7 +337,8 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                 if (!(e instanceof AbstractEdge)) {
                     continue;
                 }
-                if (e instanceof PatternHop || e instanceof Alight || e instanceof PatternDwell || e instanceof Dwell) {
+                if (e instanceof PatternHop || e instanceof Alight || e instanceof PatternDwell
+                        || e instanceof Dwell) {
                     noStart = true;
                 }
                 if (e instanceof PatternBoard) {
@@ -489,10 +491,9 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
             }
 
             /**
-             * now we have the case where no route has a unique start, stop, or via. This can happen
-             * if you have a single route which serves trips on an H-shaped alignment, where trips
-             * can start at A or B and end at either C or D, visiting the same sets of stops along
-             * the shared segments.
+             * now we have the case where no route has a unique start, stop, or via. This can happen if you have a single route which serves trips on
+             * an H-shaped alignment, where trips can start at A or B and end at either C or D, visiting the same sets of stops along the shared
+             * segments.
              * 
              * <pre>
              *                    A      B
@@ -503,24 +504,21 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
              *                    C      D
              * </pre>
              * 
-             * First, we try unique start + end, then start + via + end, and if that doesn't work,
-             * we check for expresses, and finally we use a random trip's id.
+             * First, we try unique start + end, then start + via + end, and if that doesn't work, we check for expresses, and finally we use a random
+             * trip's id.
              * 
-             * It can happen if there is an express and a local version of a given line where the
-             * local starts and ends at the same place as the express but makes a strict superset of
-             * stops; the local version will get a "via", but the express will be doomed.
+             * It can happen if there is an express and a local version of a given line where the local starts and ends at the same place as the
+             * express but makes a strict superset of stops; the local version will get a "via", but the express will be doomed.
              * 
-             * We can first check for the local/express situation by saying that if there are a
-             * subset of routes with the same start/end, and there is exactly one that can't be
-             * named with start/end/via, call it "express".
+             * We can first check for the local/express situation by saying that if there are a subset of routes with the same start/end, and there is
+             * exactly one that can't be named with start/end/via, call it "express".
              * 
-             * Consider the following three trips (A, B, C) along a route with four stops. A is the
-             * local, and gets "via stop 3"; B is a limited, and C is (logically) an express:
+             * Consider the following three trips (A, B, C) along a route with four stops. A is the local, and gets "via stop 3"; B is a limited, and
+             * C is (logically) an express:
              * 
              * A,B,C -- A,B -- A -- A, B, C
              * 
-             * Here, neither B nor C is nameable. If either were removed, the other would be called
-             * "express".
+             * Here, neither B nor C is nameable. If either were removed, the other would be called "express".
              * 
              * 
              * 
@@ -537,8 +535,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                 // take the intersection
                 remainingVariants.retainAll(ends.get(lastStop));
                 if (remainingVariants.size() == 1) {
-                    String name = routeName + " from " + firstStop + " to "
-                            + lastStop;
+                    String name = routeName + " from " + firstStop + " to " + lastStop;
                     variant.setName(name);
                     continue;
                 }
@@ -562,8 +559,8 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                         }
                     }
                     if (found && !bad) {
-                        String name = routeName + " from " + firstStop + " to "
-                                + lastStop + " via " + getName(stop);
+                        String name = routeName + " from " + firstStop + " to " + lastStop
+                                + " via " + getName(stop);
                         variant.setName(name);
                         break;
                     }
@@ -575,8 +572,8 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                         // we know that this one must be a subset of the other, because it
                         // has no unique via. So, it is the express
 
-                        String name = routeName + " from " + firstStop + " to "
-                                + lastStop + " express";
+                        String name = routeName + " from " + firstStop + " to " + lastStop
+                                + " express";
                         variant.setName(name);
                     } else {
                         // the final fallback
@@ -617,6 +614,16 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
             //nonduplicate stoptimes
             if (stops.size() == 0 || !stopTime.getStop().equals(stops.get(stops.size() - 1)))
             stops.add(stopTime.getStop());
+        }
+
+        // build the list of stops for this route
+        HashSet<Stop> stopsForRoute = stopsByRoute.get(routeId);
+        if (stopsForRoute == null) {
+            stopsForRoute = new HashSet<Stop>();
+            stopsByRoute.put(routeId, stopsForRoute);
+        }
+        for (StopTime stopTime : stopTimes) {
+            stopsByRoute.get(routeId).add(stopTime.getStop());
         }
 
         Route route = trip.getRoute();
