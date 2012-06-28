@@ -34,7 +34,7 @@ import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.transit_index.adapters.AgencyAndIdArrayListAdapter;
 import org.opentripplanner.routing.transit_index.adapters.LineStringAdapter;
-import org.opentripplanner.routing.transit_index.adapters.StopAgencyAndIdArayListAdapter;
+import org.opentripplanner.routing.transit_index.adapters.StopAgencyAndIdArrayListAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,11 +68,10 @@ public class RouteVariant implements Serializable {
 
     private TraverseMode mode;
 
-    // @XmlElementWrapper
     @XmlJavaTypeAdapter(AgencyAndIdArrayListAdapter.class)
     private ArrayList<AgencyAndId> trips;
 
-    @XmlJavaTypeAdapter(StopAgencyAndIdArayListAdapter.class)
+    @XmlJavaTypeAdapter(StopAgencyAndIdArrayListAdapter.class)
     private ArrayList<Stop> stops;
 
     /** An unordered list of all segments for this route */
