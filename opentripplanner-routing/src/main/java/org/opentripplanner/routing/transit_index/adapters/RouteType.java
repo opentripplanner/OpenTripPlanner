@@ -50,6 +50,10 @@ public class RouteType {
             this.routeTextColor = route.getTextColor();
         }
     }
+    
+    public AgencyAndId getId(){
+        return this.id;
+    }
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     AgencyAndId id;

@@ -196,6 +196,8 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
     public List<AgencyAndId> getRoutesForStop(AgencyAndId stop) {
         HashSet<AgencyAndId> out = new HashSet<AgencyAndId>();
         Edge edge = preBoardEdges.get(stop);
+        if (edge == null)
+            return new ArrayList<AgencyAndId>();
         for (Edge e: edge.getToVertex().getOutgoing()) {
             if (e instanceof TransitBoardAlight && ((TransitBoardAlight) e).isBoarding()) {
                 TransitBoardAlight board = (TransitBoardAlight) e;
@@ -203,7 +205,6 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
                     out.add(t.getRoute().getId());
                 }
             }
-
         }
         return new ArrayList<AgencyAndId>(out);
     }

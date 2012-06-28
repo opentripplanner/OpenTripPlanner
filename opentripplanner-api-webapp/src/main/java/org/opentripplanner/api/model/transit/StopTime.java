@@ -10,6 +10,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.transit_index.adapters.AgencyAndIdAdapter;
 import org.opentripplanner.routing.transit_index.adapters.StopType;
 import org.opentripplanner.routing.transit_index.adapters.TripType;
+import org.opentripplanner.routing.transit_index.adapters.TripType;
 
 public class StopTime {
     /**

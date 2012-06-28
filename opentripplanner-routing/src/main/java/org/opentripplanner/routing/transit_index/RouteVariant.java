@@ -223,6 +223,8 @@ public class RouteVariant implements Serializable {
             geometry = GeometryUtils.getGeometryFactory().createLineString(
                     coords.toArray(coordArray));
 
+
+
         }
         return geometry;
     }

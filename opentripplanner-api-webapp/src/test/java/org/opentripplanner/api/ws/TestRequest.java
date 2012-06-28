@@ -48,6 +48,7 @@ import org.opentripplanner.api.model.patch.PatchResponse;
 import org.opentripplanner.api.model.transit.AgencyList;
 import org.opentripplanner.api.model.transit.ModeList;
 import org.opentripplanner.api.model.transit.RouteData;
+import org.opentripplanner.api.model.transit.RouteDataList;
 import org.opentripplanner.api.model.transit.RouteList;
 import org.opentripplanner.api.model.transit.StopList;
 import org.opentripplanner.api.model.transit.StopTimeList;
@@ -423,12 +424,16 @@ public class TestRequest extends TestCase {
         assertEquals(agencyIds.agencies.toArray(new Agency[0])[0].getId(), ("TriMet"));
         assertEquals(1, agencyIds.agencies.size());
 
-        RouteData routeData = (RouteData) index.getRouteData("TriMet", "100", false, false,
+        RouteDataList routeDataList = (RouteDataList) index.getRouteData("TriMet", "100", false, false,
                 routerId);
-        assertEquals(new AgencyAndId("TriMet", "100"), routeData.id);
-        assertTrue(routeData.variants.size() >= 2);
+        assertEquals(new AgencyAndId("TriMet", "100"), routeDataList.routeData.toArray(new RouteData[0])[0].id);
+        assertTrue(routeDataList.routeData.toArray(new RouteData[0])[0].variants.size() >= 2);
 
         RouteList routes = (RouteList) index.getRoutes("TriMet", false, routerId);
+        assertTrue(routes.routes.size() > 50);
+
+        //without agencyId
+        routes = (RouteList) index.getRoutes(null, true, routerId);
         assertTrue(routes.routes.size() > 50);
 
         ModeList modes = (ModeList) index.getModes(routerId);
@@ -436,6 +441,10 @@ public class TestRequest extends TestCase {
         assertFalse(modes.modes.contains(TraverseMode.FUNICULAR));
 
         RouteList routesForStop = (RouteList) index.getRoutesForStop("TriMet", "10579", false,
+                routerId);
+        assertEquals(1, routesForStop.routes.size());
+
+        routesForStop = (RouteList) index.getRoutesForStop(null, "10579", false,
                 routerId);
         assertEquals(1, routesForStop.routes.size());
         // assertEquals("MAX Red Line", routesForStop.routes.get(0).routeLongName);
@@ -447,6 +456,10 @@ public class TestRequest extends TestCase {
         long startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 9, 1, 7, 50, 0) * 1000;
         long endTime = startTime + 60 * 60 * 1000;
         StopTimeList stopTimesForStop = (StopTimeList) index.getStopTimesForStop("TriMet", "10579",
+                startTime, endTime, false, false, null, routerId);
+        assertTrue(stopTimesForStop.stopTimes.size() > 0);
+
+        stopTimesForStop = (StopTimeList) index.getStopTimesForStop(null, "10579",
                 startTime, endTime, false, false, null, routerId);
         assertTrue(stopTimesForStop.stopTimes.size() > 0);
 

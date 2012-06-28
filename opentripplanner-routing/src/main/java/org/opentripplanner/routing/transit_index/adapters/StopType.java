@@ -20,6 +20,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.opentripplanner.routing.transit_index.adapters.AgencyAndIdAdapter;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 
