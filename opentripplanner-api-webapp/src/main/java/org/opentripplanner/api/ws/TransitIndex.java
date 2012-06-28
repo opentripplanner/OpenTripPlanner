@@ -14,6 +14,8 @@ package org.opentripplanner.api.ws;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -297,6 +299,7 @@ public class TransitIndex {
                 for (StopTime st : getStopTimesForBoardEdge(startTime, endTime, options, e,
                         extended)) {
                     // diffrent parameters
+                    st.phase = "departure";
                     if (extended != null && extended.equals(true)) {
                         if (routeId != null && !routeId.equals("")
                                 && !st.trip.getRoute().getId().getId().equals(routeId))
@@ -318,6 +321,7 @@ public class TransitIndex {
                         extended)) {
                     if (!trips.contains(st.trip)) {
                         // diffrent parameters
+                        st.phase = "arrival";
                         if (extended != null && extended.equals(true)) {
                             if (routeId != null && !routeId.equals("")
                                     && !st.trip.getRoute().getId().getId().equals(routeId))
@@ -331,6 +335,16 @@ public class TransitIndex {
                 }
             }
         }
+        Collections.sort(result.stopTimes, new Comparator<StopTime>(){
+
+            @Override
+            public int compare(StopTime o1, StopTime o2) {
+                if (o1.phase.equals("arrival") && o2.phase.equals("departure")) return 1;
+                if (o1.phase.equals("departure") && o2.phase.equals("arrival")) return -1;
+                return o1.time - o2.time > 0 ? 1 : -1;
+            }
+
+        });
 
         return result;
     }
@@ -428,6 +442,7 @@ public class TransitIndex {
                     }
             result.stopTimes.add(st);
         }
+
         return result;
     }
 
