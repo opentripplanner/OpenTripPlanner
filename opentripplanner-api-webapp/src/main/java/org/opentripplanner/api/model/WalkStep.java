@@ -19,7 +19,11 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.patch.Alert;
 
 /**
@@ -97,7 +101,8 @@ public class WalkStep {
      * The elevation profile as a comma-separated list of x,y values. 
      * x is the distance from the start of the step, y is the elevation at this distance.
      */
-    public String elevation;
+    @XmlTransient
+    public List<P2<Double>> elevation;
 
     @XmlElement
 	public List<Alert> alerts;
@@ -169,4 +174,17 @@ public class WalkStep {
 			}
 		}
 	}
+
+    public String streetNameNoParens() {
+        int idx = streetName.indexOf('(');
+        if (idx < 0) return streetName;
+        return streetName.substring(0, idx - 1);
+    }
+
+    @XmlJavaTypeAdapter(ElevationAdapter.class)
+    @JsonSerialize
+    public List<P2<Double>> getElevation() {
+        return elevation;
+    }
+
 }

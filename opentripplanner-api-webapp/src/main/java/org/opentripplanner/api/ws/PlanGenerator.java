@@ -15,7 +15,7 @@ package org.opentripplanner.api.ws;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
@@ -23,7 +23,6 @@ import java.util.TimeZone;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
-import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.Place;
@@ -33,6 +32,7 @@ import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
+import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -75,6 +75,8 @@ import com.vividsolutions.jts.geom.Geometry;
 public class PlanGenerator {
 
     private static final Logger LOG = LoggerFactory.getLogger(PlanGenerator.class);
+
+    private static final double MAX_ZAG_DISTANCE = 30;
 
     @Autowired public PathService pathService;
     
@@ -619,6 +621,13 @@ public class PlanGenerator {
             }
 
             String streetName = edgeNarrative.getName();
+            int idx = streetName.indexOf('(');
+            String streetNameNoParens;
+            if (idx > 0)
+                streetNameNoParens = streetName.substring(0, idx - 1);
+            else
+                streetNameNoParens = streetName;
+
             if (step == null) {
                 // first step
                 step = createWalkStep(currState);
@@ -629,14 +638,14 @@ public class PlanGenerator {
                 step.setAbsoluteDirection(thisAngle);
                 // new step, set distance to length of first edge
                 distance = edgeNarrative.getDistance();
-            } else if ((step.streetName != null && !step.streetName.equals(streetName))
+            } else if ((step.streetName != null && !step.streetNameNoParens().equals(streetNameNoParens))
                     && (!step.bogusName || !edgeNarrative.hasBogusName())) {
                 /* street name has changed */
                 if (roundaboutExit > 0) {
                     // if we were just on a roundabout,
                     // make note of which exit was taken in the existing step
                     step.exit = Integer.toString(roundaboutExit); // ordinal numbers from
-                    if (streetName.equals(roundaboutPreviousStreet)) {
+                    if (streetNameNoParens.equals(roundaboutPreviousStreet)) {
                         step.stayOn = true;
                     }
                     // localization
@@ -652,6 +661,9 @@ public class PlanGenerator {
                     // and use one-based exit numbering
                     roundaboutExit = 1;
                     roundaboutPreviousStreet = backState.getBackEdgeNarrative().getName();
+                    idx = roundaboutPreviousStreet.indexOf('(');
+                    if (idx > 0)
+                        roundaboutPreviousStreet = roundaboutPreviousStreet.substring(0, idx - 1);
                 }
                 double thisAngle = DirectionUtils.getFirstAngle(geom);
                 step.setDirections(lastAngle, thisAngle, edgeNarrative.isRoundabout());
@@ -750,12 +762,40 @@ public class PlanGenerator {
                 }
             }
 
-            if (!createdNewStep) {
+            if (createdNewStep) {
+                //check last three steps for zag
+                int last = steps.size() - 1;
+                if (last >= 2) {
+                    WalkStep threeBack = steps.get(last - 2);
+                    WalkStep twoBack = steps.get(last - 1);
+                    WalkStep lastStep = steps.get(last);
+
+                    if (twoBack.distance < MAX_ZAG_DISTANCE
+                            && lastStep.streetNameNoParens().equals(threeBack.streetNameNoParens())) {
+                        // total hack to remove zags.
+                        steps.remove(last);
+                        steps.remove(last - 1);
+                        step = threeBack;
+                        step.distance += twoBack.distance;
+                        if (twoBack.elevation != null) {
+                            if (step.elevation == null) {
+                                step.elevation = twoBack.elevation;
+                            } else {
+                                for (P2<Double> d : twoBack.elevation) {
+                                    step.elevation.add(new P2<Double>(d.getFirst() + step.distance, d.getSecond()));
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
                 if (step.elevation != null) {
-                    String s = encodeElevationProfile(edge, distance);
-                    if (step.elevation.length() > 0 && s != null && s.length() > 0)
-                        step.elevation += ",";
-                    step.elevation += s;
+                    List<P2<Double>> s = encodeElevationProfile(edge, distance);
+                    if (step.elevation != null && step.elevation.size() > 0) {
+                        step.elevation.addAll(s);
+                    } else {
+                        step.elevation = s;
+                    }
                 }
                 distance += edgeNarrative.getDistance();
 
@@ -794,23 +834,20 @@ public class PlanGenerator {
         return step;
     }
 
-    private String encodeElevationProfile(Edge edge, double offset) {
+    private List<P2<Double>> encodeElevationProfile(Edge edge, double offset) {
         if (!(edge instanceof EdgeWithElevation)) {
-            return "";
+            return Collections.emptyList();
         }
         EdgeWithElevation elevEdge = (EdgeWithElevation) edge;
         if (elevEdge.getElevationProfile() == null) {
-            return "";
+            return Collections.emptyList();
         }
-        StringBuilder str = new StringBuilder();
+        ArrayList<P2<Double>> out = new ArrayList<P2<Double>>();
         Coordinate[] coordArr = elevEdge.getElevationProfile().toCoordinateArray();
         for (int i = 0; i < coordArr.length; i++) {
-            str.append(Math.round(coordArr[i].x + offset));
-            str.append(",");
-            str.append(Math.round(coordArr[i].y * 10.0) / 10.0);
-            str.append(i < coordArr.length - 1 ? "," : "");
+            out.add(new P2<Double>(coordArr[i].x + offset, coordArr[i].y));
         }
-        return str.toString();
+        return out;
     }
 
 }
