@@ -478,7 +478,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     /** radius is meters */
     public List<TransitStop> getNearbyTransitStops(Coordinate coordinate, double radius) {
         Envelope envelope = new Envelope(coordinate);
-        getDistanceLibrary();
+
         envelope.expandBy(SphericalDistanceLibrary.metersToDegrees(radius));
         List<?> stops = transitStopTree.query(envelope);
         ArrayList<TransitStop> out = new ArrayList<TransitStop>();
