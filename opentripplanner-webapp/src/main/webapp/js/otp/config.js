@@ -13,7 +13,7 @@ if(typeof(otp.config.locale) == "undefined" || otp.config.locale == null) otp.co
 
 // step 2: create an object of default otp.config default values (see step3 where we apply this to any existing config)
 otp.config_defaults = {
-    routerId      : "",
+    routerId      : null,
     locale        : otp.config.locale,
     metricsSystem : otp.config.locale.config.metricsSystem,  // Metrics system (e.g., 'english' == feet, miles, other value or null is metric system)
 
@@ -21,6 +21,7 @@ otp.config_defaults = {
         url            : null,
         printUrl       : "print.html",
         maxTransfers   : null,  // when maxTransfers != null, value is sent down as maxTransfers param to the api (current api default maxTransfers=2)
+        appName        : "OpenTripPlanner Map",
 
         // options to turn stuff on / off on the planner
         options        : {
@@ -100,7 +101,7 @@ otp.config_defaults = {
         // This can either be an OpenLayers.Bounds object or the string "automatic"
         // If set to "automatic", the client will ask the server for the default extent.
         defaultExtent: "automatic",
-     
+
         // These options are passed directly to the OpenLayers.Map constructor.
         options : {
             projection        : new OpenLayers.Projection("EPSG:900913"),
@@ -163,7 +164,6 @@ otp.config_defaults = {
                    +" Tiles courtesy of <a href='http://open.mapquest.com/' target='_blank'>MapQuest</a>"
                }
            )
-           /**/
         ],
 
         // NOTE: this object is ignored if a baseLayer (which is an instance of OpenLayers.Layer)
