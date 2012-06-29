@@ -78,7 +78,7 @@ public class TransitIndex {
     @GET
     @Path("/agencyIds")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public Object getAgencyIds(@QueryParam("routerId") String routerId)
+    public AgencyList getAgencyIds(@QueryParam("routerId") String routerId)
             throws JSONException {
 
         Graph graph = getGraph(routerId);
