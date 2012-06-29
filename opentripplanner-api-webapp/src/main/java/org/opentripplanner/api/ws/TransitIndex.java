@@ -224,6 +224,7 @@ public class TransitIndex {
 
     /**
      * Return stop times for a stop, in seconds since the epoch
+     * startTime and endTime are in milliseconds since epoch
      */
     @GET
     @Path("/stopTimesForStop")
@@ -301,7 +302,7 @@ public class TransitIndex {
     }
 
     /**
-     * Return subsequent stop times for a trip
+     * Return subsequent stop times for a trip; time is in milliseconds since epoch
      */
     @GET
     @Path("/stopTimesForTrip")
