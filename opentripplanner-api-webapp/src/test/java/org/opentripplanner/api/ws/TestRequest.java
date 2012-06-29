@@ -175,7 +175,7 @@ class Context {
     private void initTransit() {
         GtfsGraphBuilderImpl gtfsBuilder = new GtfsGraphBuilderImpl();
         GtfsBundle bundle = new GtfsBundle();
-        bundle.setPath(new File("../opentripplanner-routing/" + ConstantsForTests.PORTLAND_GTFS));
+        bundle.setPath(new File("../opentripplanner-routing/src/test/resources/google_transit.zip"));
 
         ArrayList<GtfsBundle> bundleList = new ArrayList<GtfsBundle>();
         bundleList.add(bundle);
