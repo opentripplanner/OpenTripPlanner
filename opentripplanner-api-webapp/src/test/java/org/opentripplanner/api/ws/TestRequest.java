@@ -25,20 +25,35 @@ import junit.framework.TestCase;
 
 import org.codehaus.jettison.json.JSONException;
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.model.AbsoluteDirection;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.RelativeDirection;
+import org.opentripplanner.api.model.RouterInfo;
+import org.opentripplanner.api.model.RouterList;
 import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.api.model.patch.PatchResponse;
+import org.opentripplanner.api.model.transit.AgencyList;
+import org.opentripplanner.api.model.transit.ModeList;
+import org.opentripplanner.api.model.transit.RouteData;
+import org.opentripplanner.api.model.transit.RouteList;
+import org.opentripplanner.api.model.transit.StopList;
+import org.opentripplanner.api.model.transit.StopTimeList;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
+import org.opentripplanner.graph_builder.impl.TransitToStreetNetworkGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.shapefile.AttributeFeatureConverter;
 import org.opentripplanner.graph_builder.impl.shapefile.CaseBasedTraversalPermissionConverter;
 import org.opentripplanner.graph_builder.impl.shapefile.ShapefileFeatureSourceFactoryImpl;
 import org.opentripplanner.graph_builder.impl.shapefile.ShapefileStreetGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.shapefile.ShapefileStreetSchema;
+import org.opentripplanner.graph_builder.impl.transit_index.TransitIndexBuilder;
+import org.opentripplanner.graph_builder.model.GtfsBundle;
+import org.opentripplanner.graph_builder.model.GtfsBundles;
+import org.opentripplanner.graph_builder.services.GraphBuilderWithGtfsDao;
 import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory;
 import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
@@ -62,6 +77,7 @@ import org.opentripplanner.routing.services.PatchService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.util.TestUtils;
 
 import com.vividsolutions.jts.geom.LineString;
 
@@ -72,7 +88,7 @@ class SimpleGraphServiceImpl implements GraphService {
     private HashMap<String, Graph> graphs = new HashMap<String, Graph>();
 
     @Override
-    public void setLoadLevel(LoadLevel level) {      
+    public void setLoadLevel(LoadLevel level) {
     }
 
     @Override
@@ -93,31 +109,38 @@ class SimpleGraphServiceImpl implements GraphService {
     public Collection<String> getGraphIds() {
         return graphs.keySet();
     }
-    
+
     public void putGraph(String graphId, Graph graph) {
         graphs.put(graphId, graph);
     }
-    
+
 }
 
 /* This is a hack to hold context and graph data between test runs, since loading it is slow. */
 class Context {
     public Graph graph = new Graph();
+
     public SimpleGraphServiceImpl graphService = new SimpleGraphServiceImpl();
+
     public PlanGenerator planGenerator = new PlanGenerator();
+
     public RetryingPathServiceImpl pathService = new RetryingPathServiceImpl();
+
     private static Context instance = null;
+
     public static Context getInstance() {
         if (instance == null) {
             instance = new Context();
         }
         return instance;
     }
+
     public Context() {
-        graphService.putGraph(null, makeSimpleGraph()); //default graph is tiny test graph
+        graphService.putGraph(null, makeSimpleGraph()); // default graph is tiny test graph
         graphService.putGraph("portland", graph);
         ShapefileStreetGraphBuilderImpl builder = new ShapefileStreetGraphBuilderImpl();
-        FeatureSourceFactory factory = new ShapefileFeatureSourceFactoryImpl(new File("src/test/resources/portland/Streets_pdx.shp"));
+        FeatureSourceFactory factory = new ShapefileFeatureSourceFactoryImpl(new File(
+                "src/test/resources/portland/Streets_pdx.shp"));
         builder.setFeatureSourceFactory(factory);
         ShapefileStreetSchema schema = new ShapefileStreetSchema();
         schema.setIdAttribute("LOCALID");
@@ -134,20 +157,42 @@ class Context {
 
         schema.setPermissionConverter(perms);
 
-        //as a test, use prefixes ("NE", SE", etc) as an alert
-        schema.setNoteConverter(new AttributeFeatureConverter<String> ("PREFIX"));
+        // as a test, use prefixes ("NE", SE", etc) as an alert
+        schema.setNoteConverter(new AttributeFeatureConverter<String>("PREFIX"));
 
         builder.setSchema(schema);
         builder.buildGraph(graph, new HashMap<Class<?>, Object>());
-        graph.streetIndex = new StreetVertexIndexServiceImpl(graph);
-        
+        initTransit();
+
         initBikeRental();
+        graph.streetIndex = new StreetVertexIndexServiceImpl(graph);
 
         pathService.sptService = new GenericAStar();
         pathService.graphService = graphService;
         planGenerator.pathService = pathService;
     }
 
+    private void initTransit() {
+        GtfsGraphBuilderImpl gtfsBuilder = new GtfsGraphBuilderImpl();
+        GtfsBundle bundle = new GtfsBundle();
+        bundle.setPath(new File("../opentripplanner-routing/" + ConstantsForTests.PORTLAND_GTFS));
+
+        ArrayList<GtfsBundle> bundleList = new ArrayList<GtfsBundle>();
+        bundleList.add(bundle);
+        GtfsBundles bundles = new GtfsBundles();
+        bundles.setBundles(bundleList);
+        gtfsBuilder.setGtfsBundles(bundles);
+
+        gtfsBuilder.setGtfsGraphBuilders(Arrays
+                .asList((GraphBuilderWithGtfsDao) new TransitIndexBuilder()));
+
+        HashMap<Class<?>, Object> extra = new HashMap<Class<?>, Object>();
+        gtfsBuilder.buildGraph(graph, extra);
+
+        TransitToStreetNetworkGraphBuilderImpl linker = new TransitToStreetNetworkGraphBuilderImpl();
+        linker.buildGraph(graph, extra);
+
+    }
     private void initBikeRental() {
         BikeRentalStationService service = new BikeRentalStationService();
         BikeRentalStation station = new BikeRentalStation();
@@ -320,6 +365,65 @@ public class TestRequest extends TestCase {
         PatchResponse routePatches = p.getRoutePatches("TriMet", "100");
         assertNull(routePatches.patches);
         
+    }
+
+    public void testRouters() throws JSONException {
+        Routers routerApi = new Routers();
+        routerApi.graphService = Context.getInstance().graphService;
+        RouterList routers = routerApi.getRouterIds();
+        assertEquals(2, routers.routerInfo.size());
+        RouterInfo router0 = routers.routerInfo.get(0);
+        RouterInfo router1 = routers.routerInfo.get(1);
+        RouterInfo otherRouter;
+        RouterInfo defaultRouter;
+        if (router0.routerId == null) {
+            defaultRouter = router0;
+            otherRouter = router1;
+        } else {
+            defaultRouter = router1;
+            otherRouter = router0;
+        }
+        assertNull(defaultRouter.routerId);
+        assertNotNull(otherRouter.routerId);
+        assertTrue(otherRouter.polygon.getArea() > 0);
+    }
+
+    public void testTransitIndex() throws JSONException {
+        TransitIndex index = new TransitIndex();
+        index.setGraphService(Context.getInstance().graphService);
+        String routerId = "portland";
+        AgencyList agencyIds = index.getAgencyIds(routerId);
+        assertTrue(agencyIds.agencyIds.contains("TriMet"));
+        assertEquals(1, agencyIds.agencyIds.size());
+
+        RouteData routeData = (RouteData) index.getRouteData("TriMet", "100", routerId);
+        assertEquals(new AgencyAndId("TriMet", "100"), routeData.id);
+        assertTrue(routeData.variants.size() >= 2);
+
+        RouteList routes = (RouteList) index.getRoutes("TriMet", routerId);
+        assertTrue(routes.routes.size() > 50);
+
+        ModeList modes = (ModeList) index.getModes(routerId);
+        assertTrue(modes.modes.contains(TraverseMode.TRAM));
+        assertFalse(modes.modes.contains(TraverseMode.FUNICULAR));
+
+        RouteList routesForStop = (RouteList) index.getRoutesForStop("TriMet", "10579", routerId);
+        assertEquals(1, routesForStop.routes.size());
+        assertEquals("MAX Red Line", routesForStop.routes.get(0).routeLongName);
+
+        StopList stopsNearPoint = (StopList) index.getStopsNearPoint("TriMet", 45.464783,
+                -122.578918, routerId);
+        assertTrue(stopsNearPoint.stops.size() > 0);
+
+        long startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 9, 1, 7, 50, 0) * 1000;
+        long endTime = startTime + 60 * 60 * 1000;
+        StopTimeList stopTimesForStop = (StopTimeList) index.getStopTimesForStop("TriMet", "10579",
+                startTime, endTime, routerId);
+        assertTrue(stopTimesForStop.stopTimes.size() > 0);
+
+        StopTimeList stopTimesForTrip = (StopTimeList) index.getStopTimesForTrip("TriMet", "1254",
+                "TriMet", "10W1040", startTime, routerId);
+        assertTrue(stopTimesForTrip.stopTimes.size() > 0);
     }
 
     /**
