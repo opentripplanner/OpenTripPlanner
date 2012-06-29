@@ -772,7 +772,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 endpointsMatch = from.equals(other.from);
             }
         } else {
-            endpointsMatch = from.equals(other.from) && to.equals(other.to);
+            endpointsMatch = ((from == null && other.from == null) || from.equals(other.from))
+                          && ((to == null && other.to == null)     || to.equals(other.to));
         }
         return endpointsMatch && dateTime == other.dateTime 
                 && isArriveBy() == other.isArriveBy() 
