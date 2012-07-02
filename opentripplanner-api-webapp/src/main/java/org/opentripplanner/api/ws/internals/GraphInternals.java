@@ -153,7 +153,10 @@ public class GraphInternals {
             ) {
 
         initIndexes(routerId);
-
+        
+        if (className != null && className.equals(""))
+            className = null;
+        
         Envelope envelope = getEnvelope(lowerLeft, upperRight);
 
         STRtree vertexIndex = vertexIndices.get(routerId);
