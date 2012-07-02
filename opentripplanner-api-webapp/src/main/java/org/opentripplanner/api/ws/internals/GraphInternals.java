@@ -16,6 +16,7 @@ package org.opentripplanner.api.ws.internals;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.ws.rs.GET;
@@ -255,7 +256,7 @@ public class GraphInternals {
 
         initIndexes(routerId);
 
-        if (className.equals(""))
+        if (className != null && className.equals(""))
             className = null;
 
         Envelope envelope = getEnvelope(lowerLeft, upperRight);
