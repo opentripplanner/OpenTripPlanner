@@ -15,6 +15,7 @@
 package org.opentripplanner.api.ws;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -33,6 +34,11 @@ import org.opentripplanner.api.model.RelativeDirection;
 import org.opentripplanner.api.model.RouterInfo;
 import org.opentripplanner.api.model.RouterList;
 import org.opentripplanner.api.model.WalkStep;
+import org.opentripplanner.api.model.analysis.EdgeSet;
+import org.opentripplanner.api.model.analysis.FeatureCount;
+import org.opentripplanner.api.model.analysis.GraphComponentPolygons;
+import org.opentripplanner.api.model.analysis.VertexSet;
+import org.opentripplanner.api.model.json_serializers.WithGraph;
 import org.opentripplanner.api.model.patch.PatchResponse;
 import org.opentripplanner.api.model.transit.AgencyList;
 import org.opentripplanner.api.model.transit.ModeList;
@@ -40,6 +46,8 @@ import org.opentripplanner.api.model.transit.RouteData;
 import org.opentripplanner.api.model.transit.RouteList;
 import org.opentripplanner.api.model.transit.StopList;
 import org.opentripplanner.api.model.transit.StopTimeList;
+import org.opentripplanner.api.ws.internals.Components;
+import org.opentripplanner.api.ws.internals.GraphInternals;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
@@ -165,6 +173,12 @@ class Context {
 
         initBikeRental();
         graph.streetIndex = new StreetVertexIndexServiceImpl(graph);
+
+        try {
+            graph.save(File.createTempFile("graph", ".obj"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         pathService.sptService = new GenericAStar();
         pathService.graphService = graphService;
@@ -423,6 +437,33 @@ public class TestRequest extends TestCase {
         StopTimeList stopTimesForTrip = (StopTimeList) index.getStopTimesForTrip("TriMet", "1254",
                 "TriMet", "10W1040", startTime, routerId);
         assertTrue(stopTimesForTrip.stopTimes.size() > 0);
+    }
+
+    public void testComponents() {
+        Components components = new Components();
+        components.setGraphService(Context.getInstance().graphService);
+        GraphComponentPolygons componentPolygons = components.getComponentPolygons(
+                new TraverseModeSet(TraverseMode.WALK), "2009/10/1", "12:00:00", "", "portland");
+        assertTrue(componentPolygons.components.size() >= 1);
+    }
+
+    public void testGraphInternals() {
+        GraphInternals internals = new GraphInternals();
+        internals.setGraphService(Context.getInstance().graphService);
+        FeatureCount counts = internals.countVertices("45.5,-122.6", "45.6,-122.5", "portland");
+        assertTrue(counts.vertices > 0);
+        assertTrue(counts.edges > 0);
+
+        WithGraph obj = (WithGraph) internals.getEdges("45.5,-122.6", "45.55,-122.55", "", false,
+                false, true, "portland");
+        EdgeSet edges = (EdgeSet) obj.getObject();
+        assertTrue(edges.edges.size() > 0);
+        
+        obj = (WithGraph) internals.getVertices("45.5,-122.6", "45.55,-122.55", false, "", false,
+                false, "portland");
+        VertexSet vertices = (VertexSet) obj.getObject();
+        assertTrue(vertices.vertices.size() > 0);
+
     }
 
     /**
