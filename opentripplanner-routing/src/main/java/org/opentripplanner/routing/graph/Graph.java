@@ -262,9 +262,14 @@ public class Graph implements Serializable {
         Collections.sort(this.vertexById, getVertexComparatorFactory().getComparator(vertexById));
         this.edgeById = new HashMap<Integer, Edge>();
         this.idForEdge = new HashMap<Edge, Integer>();
+        // need to renumber vertices before edges, because vertex indices are
+        // used as hashcodes, and vertex hashcodes are used for edge hashcodes
         int i = 0;
         for (Vertex v : this.vertexById) {
-            v.setIndex(i);
+            v.setIndex(i++);
+        }
+        i = 0;
+        for (Vertex v : this.vertexById) {
             int j = 0;
             for (Edge e : v.getOutgoing()) {
                 int eid = (i*100) + j;
