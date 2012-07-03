@@ -305,8 +305,7 @@ public class GTFSPatternHopFactory {
 
             /* GTFS stop times frequently contain duplicate, missing, or incorrect entries */
             List<StopTime> stopTimes = getNonduplicateStopTimesForTrip(trip); // duplicate stopIds
-            filterStopTimes(stopTimes, graph); // duplicate times (0-time), fast or slow hops
-//TODO:            filterNegativeHops(stopTimes, graph);
+            filterStopTimes(stopTimes, graph); // duplicate times (0-time), negative, fast or slow hops
             interpolateStopTimes(stopTimes); // interpolate between timepoints
             if (stopTimes.size() < 2) {
                 _log.warn(GraphBuilderAnnotation.register(graph, Variety.TRIP_DEGENERATE, trip));
@@ -514,9 +513,10 @@ public class GTFSPatternHopFactory {
         }
         for (int i = 1; i < stopTimes.size(); i++) {
             boolean st1bogus = false;
+            boolean midnightCrossed = false;
             StopTime st1 = stopTimes.get(i);
             if (!st1.isDepartureTimeSet() && st1.isArrivalTimeSet()) {
-                /* set depature time if it is missing */
+                /* set departure time if it is missing */
                 st1.setDepartureTime(st1.getArrivalTime());
             }
             /* do not process non-timepoint stoptimes, 
@@ -524,7 +524,28 @@ public class GTFSPatternHopFactory {
             if ( ! (st1.isArrivalTimeSet() && st1.isDepartureTimeSet())) {
                 continue;
             }
+            final int HOUR = 60 * 60;
+            int dwellTime = st0.getDepartureTime() - st0.getArrivalTime(); 
+            if (dwellTime < 0) {
+                _log.warn(GraphBuilderAnnotation.register(graph, Variety.NEGATIVE_DWELL_TIME, st0));
+//                if (st0.getArrivalTime() > 23 * HOUR && st0.getDepartureTime() < 1 * HOUR) {
+//                    midnightCrossed = true;
+//                    st0.setDepartureTime(st0.getDepartureTime() + 24 * HOUR);
+//                } else {
+//                    st0.setDepartureTime(st0.getArrivalTime());
+//                }
+            }
             int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
+            if (runningTime < 0) {            
+                _log.warn(GraphBuilderAnnotation.register(graph, Variety.NEGATIVE_HOP_TIME, st0, st1));
+                // negative hops are usually caused by incorrect coding of midnight crossings
+//                midnightCrossed = true;
+//                if (st0.getDepartureTime() > 23 * HOUR && st1.getArrivalTime() < 1 * HOUR) {
+//                    st1.setArrivalTime(st1.getArrivalTime() + 24 * HOUR);
+//                } else {
+//                    st1.setArrivalTime(st0.getDepartureTime());
+//                }
+            }
             double hopDistance = DistanceLibrary.fastDistance(
                    st0.getStop().getLon(), st0.getStop().getLat(),
                    st1.getStop().getLon(), st1.getStop().getLat());
@@ -571,7 +592,7 @@ public class GTFSPatternHopFactory {
                 st0 = st1;
         } // END for loop over stop times
     }
-
+    
     private void loadAgencies(Graph graph) {
         for (Agency agency : _dao.getAllAgencies()) {
             graph.addAgencyId(agency.getId());
