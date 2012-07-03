@@ -39,7 +39,12 @@ public class TripTimes implements Cloneable, Serializable {
 
     public TripTimes(Trip trip, int index, List<StopTime> stopTimes) {
         // stopTimes are assumed to be pre-filtered / valid / monotonically increasing etc.
-        this(trip, index, stopTimes.size(), false);
+        this.trip = trip;
+        this.index = index;
+        // departure arrays could be 1 shorter when arrivals are present, but they are not
+        int nStops = stopTimes.size();
+        departureTimes = new int[nStops];
+        arrivalTimes = new int[nStops];
         boolean nullArrivals = true;
         // this might be clearer if time array indexes were stops instead of hops
         for (int hop = 0; hop < stopTimes.size() - 1; hop++) {
@@ -49,22 +54,11 @@ public class TripTimes implements Cloneable, Serializable {
                 nullArrivals = false;
         }
         // if all dwell times are 0, arrival times array is not needed. save some memory.
+        // this should probably be factored out into a method, so it can be used in updates
         if (nullArrivals)
             arrivalTimes = null;
     }
     
-    public TripTimes(Trip trip, int index, int nStops, boolean nullArrivals) {
-        // departure arrays could be 1 shorter when arrivals are present, but they are not
-        this.trip = trip;
-        this.index = index;
-        departureTimes = new int[nStops];
-        if (nullArrivals) {
-            arrivalTimes = null;
-        } else {
-            arrivalTimes = new int[nStops];
-        }
-    }
-
     public int getDepartureTime(int hop) {
         return departureTimes[hop];
     }
