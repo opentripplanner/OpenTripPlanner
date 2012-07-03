@@ -131,9 +131,9 @@ public class TripPattern implements Serializable {
     
     private Boolean tripAcceptable(Trip trip, boolean bicycle, boolean wheelchair) {
         boolean result = true;
-        if (bicycle)
-            result &= trip.getWheelchairAccessible() == 1;
         if (wheelchair)
+            result &= trip.getWheelchairAccessible() == 1;
+        if (bicycle)
             result &= trip.getTripBikesAllowed() == 2 ||
             (trip.getRoute().getBikesAllowed() == 2 && trip.getTripBikesAllowed() != 1); 
         return result;
