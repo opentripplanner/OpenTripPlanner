@@ -188,6 +188,8 @@ public class GTFSPatternHopFactory {
     private Map<AgencyAndId, LineString> _geometriesByShapeId = new HashMap<AgencyAndId, LineString>();
 
     private Map<AgencyAndId, double[]> _distancesByShapeId = new HashMap<AgencyAndId, double[]>();
+    
+    private boolean _deleteUselessDwells = true;
 
     private ArrayList<PatternDwell> potentiallyUselessDwells = new ArrayList<PatternDwell> ();
 
@@ -329,6 +331,7 @@ public class GTFSPatternHopFactory {
             }
 
             /* this trip is not frequency-based, add it to the corresponding trip pattern */
+            // maybe rename ScheduledStopPattern to TripPatternKey?
             ScheduledStopPattern stopPattern = ScheduledStopPattern.fromTrip(trip, _dao);
             TripPattern tripPattern = patterns.get(stopPattern);
             if (tripPattern == null) {
@@ -396,7 +399,8 @@ public class GTFSPatternHopFactory {
         } // END loop over interlining blocks 
         
         loadTransfers(graph);
-//TODO:        deleteUselessDwells(graph);
+        if (_deleteUselessDwells) 
+            deleteUselessDwells(graph);
         clearCachedData();
         graph.putService(FareService.class, fareServiceFactory.makeFareService());
     }
@@ -617,39 +621,19 @@ public class GTFSPatternHopFactory {
         }
     }
     
-    /**
-     * Delete dwell edges that take no time, and merge their start and end vertices.
-     * For trip patterns that have no trips with dwells, remove the dwell data, and merge the arrival
-     * and departure times.
-     */
+    /** Delete dwell edges that take no time, and merge their start and end vertices. */
     private void deleteUselessDwells(Graph graph) {
-        HashSet<TripPattern> possiblySimplePatterns = new HashSet<TripPattern>();
-        HashSet<TripPattern> notSimplePatterns = new HashSet<TripPattern>();
+        int nDwells = potentiallyUselessDwells.size();
+        int nDeleted = 0;
         for (PatternDwell dwell : potentiallyUselessDwells) {
-            TripPattern pattern = (TripPattern) dwell.getPattern();
-            boolean useless = true;
-            for (int i = 0; i < pattern.getNumDwells(); ++i) {
-                if (pattern.getDwellTime(dwell.getStopIndex(), i) != 0) {
-                    useless = false;
-                    break;
-                }
-            }
-
-            if (!useless) {
-                possiblySimplePatterns.remove(pattern);
-                notSimplePatterns.add(pattern);
-                continue;
-            }
-
-            Vertex v = dwell.getFromVertex();
-            v.mergeFrom(graph, dwell.getToVertex());
-            if (!notSimplePatterns.contains(pattern)) {
-                possiblySimplePatterns.add(pattern);
-            }
+            // useless arrival time arrays are now eliminated in TripTimes constructor (AMB) 
+            if (dwell.allDwellsZero()) {
+                dwell.getFromVertex().mergeFrom(graph, dwell.getToVertex());
+                nDeleted += 1;
+            }                
         }
-        for (TripPattern pattern: possiblySimplePatterns) {
-            pattern.simplify();
-        }
+        _log.debug("deleted {} dwell edges / {} candidates, merging arrival and departure vertices.", 
+           nDeleted, nDwells);
     }
 
     private void addTripToInterliningMap(Trip trip, List<StopTime> stopTimes, TripPattern tripPattern) {
@@ -1197,4 +1181,13 @@ public class GTFSPatternHopFactory {
     public void setDefaultStreetToStopTime(int defaultStreetToStopTime) {
         this.defaultStreetToStopTime = defaultStreetToStopTime;
     }
+
+    /**
+     * you might not want to delete dwell edges when using realtime updates, because new dwells 
+     * might be introduced via trip updates.
+     */
+    public void setDeleteUselessDwells(boolean delete) {
+        this._deleteUselessDwells = delete;
+    }
+
 }

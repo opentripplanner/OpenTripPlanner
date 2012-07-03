@@ -33,17 +33,24 @@ public class TripTimes implements Cloneable, Serializable {
     @XmlElement
     protected int[] departureTimes;
 
+    // null means all dwells are 0-length, and arrival times are to be derived from departure times
     @XmlElement
-    protected int[] arrivalTimes;
+    protected int[] arrivalTimes; 
 
     public TripTimes(Trip trip, int index, List<StopTime> stopTimes) {
         // stopTimes are assumed to be pre-filtered / valid / monotonically increasing etc.
         this(trip, index, stopTimes.size(), false);
+        boolean nullArrivals = true;
+        // this might be clearer if time array indexes were stops instead of hops
         for (int hop = 0; hop < stopTimes.size() - 1; hop++) {
             departureTimes[hop] = stopTimes.get(hop).getDepartureTime();
             arrivalTimes[hop] = stopTimes.get(hop+1).getArrivalTime();
+            if (departureTimes[hop] != arrivalTimes[hop])
+                nullArrivals = false;
         }
-        // this would really make more sense if indexes were stops instead of hops
+        // if all dwell times are 0, arrival times array is not needed. save some memory.
+        if (nullArrivals)
+            arrivalTimes = null;
     }
     
     public TripTimes(Trip trip, int index, int nStops, boolean nullArrivals) {
@@ -68,8 +75,8 @@ public class TripTimes implements Cloneable, Serializable {
         return arrivalTimes[hop];
     }
 
-    public int getRunningTime(int stopIndex) {
-        return getArrivalTime(stopIndex) - getDepartureTime(stopIndex);
+    public int getRunningTime(int hop) {
+        return getArrivalTime(hop) - getDepartureTime(hop);
     }
 
     public int getDwellTime(int hop) {

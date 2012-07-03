@@ -104,4 +104,8 @@ public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnB
         return stopIndex;
     }
 
+    public boolean allDwellsZero() {
+        return this.getPattern().allDwellsZero(this.stopIndex);
+    }
+
 }
