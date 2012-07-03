@@ -462,7 +462,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         private ArrayList<IntersectionVertex> endpoints = new ArrayList<IntersectionVertex>();
 
         // track which vertical level each OSM way belongs to, for building elevators etc.
-        private Map<OSMWay, OSMLevel> wayLevels = new HashMap<OSMWay, OSMLevel>();
+        private Map<OSMWithTags, OSMLevel> wayLevels = new HashMap<OSMWithTags, OSMLevel>();
         private HashSet<OSMNode> _bikeRentalNodes = new HashSet<OSMNode>();
         private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
@@ -1113,7 +1113,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
         }
 
-        private void getLevelsForWay(OSMWay way) {
+        private void getLevelsForWay(OSMWithTags way) {
             /* Determine OSM level for each way, if it was not already set */
             if (!wayLevels.containsKey(way)) {
                 // if this way is not a key in the wayLevels map, a level map was not
@@ -1258,6 +1258,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     for (Long node : way.getNodeRefs()) {
                         MapUtils.addToMapSet(_areasForNode, node, way);
                     }
+                    getLevelsForWay(way);
                 }
                 return;
             }
@@ -1311,6 +1312,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 for (OSMRelationMember member : relation.getMembers()) {
                     _areaWayIds.add(member.getRef());
                 }
+                getLevelsForWay(relation);
             } else if (!(relation.isTag("type", "restriction"))
                     && !(relation.isTag("type", "route") && relation.isTag("route", "road"))
                     && !(relation.isTag("type", "multipolygon") && relation.hasTag("highway"))
