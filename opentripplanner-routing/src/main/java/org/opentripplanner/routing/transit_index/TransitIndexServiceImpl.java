@@ -61,6 +61,8 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
 
     private Coordinate center;
 
+    private int overnightBreak;
+
     public TransitIndexServiceImpl(HashMap<String, List<RouteVariant>> variantsByAgency,
             HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute,
             HashMap<AgencyAndId, RouteVariant> variantsByTrip,
@@ -205,5 +207,14 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
     @Override
     public Coordinate getCenter() {
         return center;
+    }
+
+    public void setOvernightBreak(int overnightBreak) {
+        this.overnightBreak = overnightBreak;
+    }
+
+    @Override
+    public int getOvernightBreak() {
+        return overnightBreak;
     }
 }

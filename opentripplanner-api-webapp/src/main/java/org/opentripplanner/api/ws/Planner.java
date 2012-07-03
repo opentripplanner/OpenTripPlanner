@@ -54,9 +54,11 @@ public class Planner extends RoutingResource {
     @Autowired public PlanGenerator planGenerator;
     @Context protected HttpServletRequest httpServletRequest;
 
-    @GET
-    @Produces( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public Response getItineraries() throws JSONException {
+    /** Java is immensely painful */
+    interface OneArgFunc<T,U> {
+        public T call(U arg);
+    }
+    private Response wrapGenerate(OneArgFunc<TripPlan, RoutingRequest> func) {
 
         /*
          * TODO: add Lang / Locale parameter, and thus get localized content (Messages & more...)
@@ -71,11 +73,12 @@ public class Planner extends RoutingResource {
         RoutingRequest request = null;
         try {
             // fill in request from query parameters via shared superclass method
-            request = super.buildRequest(); 
-            TripPlan plan = planGenerator.generate(request);
+            request = super.buildRequest();
+            TripPlan plan = func.call(request);
             response.setPlan(plan);
         } catch (Exception e) {
             PlannerError error = new PlannerError(e);
+            e.printStackTrace();
             response.setError(error);
         } finally {
             if (request != null) 
@@ -84,4 +87,34 @@ public class Planner extends RoutingResource {
         return response;
     }
 
+    @GET
+    @Produces( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    public Response getItineraries() throws JSONException {
+        return wrapGenerate(new OneArgFunc<TripPlan, RoutingRequest>() {
+            public TripPlan call(RoutingRequest request) {
+                return planGenerator.generate(request);
+            }});
+    }
+
+    @GET
+    @Path("/first")
+    @Produces( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    public Response getFirstTrip() throws JSONException {
+
+        return wrapGenerate(new OneArgFunc<TripPlan, RoutingRequest>() {
+            public TripPlan call(RoutingRequest request) {
+                return planGenerator.generateFirstTrip(request);
+            }});
+    }
+
+    @GET
+    @Path("/last")
+    @Produces( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    public Response getLastTrip() throws JSONException {
+
+        return wrapGenerate(new OneArgFunc<TripPlan, RoutingRequest>() {
+            public TripPlan call(RoutingRequest request) {
+                return planGenerator.generateLastTrip(request);
+            }});
+    }
 }

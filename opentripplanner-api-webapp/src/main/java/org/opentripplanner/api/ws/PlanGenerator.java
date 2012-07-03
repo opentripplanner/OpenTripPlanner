@@ -16,6 +16,7 @@ package org.opentripplanner.api.ws;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Set;
 import java.util.TimeZone;
@@ -57,6 +58,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.services.FareService;
+import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -79,6 +81,7 @@ public class PlanGenerator {
     private static final double MAX_ZAG_DISTANCE = 30;
 
     @Autowired public PathService pathService;
+    @Autowired GraphService graphService;
     
     /** Generates a TripPlan from a Request */
     public TripPlan generate(RoutingRequest options) {
@@ -848,6 +851,67 @@ public class PlanGenerator {
             out.add(new P2<Double>(coordArr[i].x + offset, coordArr[i].y));
         }
         return out;
+    }
+
+    /** Returns the first trip of the service day. */
+    public TripPlan generateFirstTrip(RoutingRequest request) {
+        Graph graph = graphService.getGraph(request.getRouterId());
+
+        TransitIndexService transitIndex = graph.getService(TransitIndexService.class);
+        transitIndexWithBreakRequired(transitIndex);
+
+        request.setArriveBy(false);
+
+        TimeZone tz = graph.getTimeZone();
+
+        GregorianCalendar calendar = new GregorianCalendar(tz);
+        calendar.setTimeInMillis(request.dateTime * 1000);
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.AM_PM, 0);
+        calendar.set(Calendar.SECOND, transitIndex.getOvernightBreak());
+
+        request.dateTime = calendar.getTimeInMillis() / 1000;
+        return generate(request);
+    }
+
+    /** Return the last trip of the service day */
+    public TripPlan generateLastTrip(RoutingRequest request) {
+        Graph graph = graphService.getGraph(request.getRouterId());
+
+        TransitIndexService transitIndex = graph.getService(TransitIndexService.class);
+        transitIndexWithBreakRequired(transitIndex);
+
+        request.setArriveBy(true);
+
+        TimeZone tz = graph.getTimeZone();
+
+        GregorianCalendar calendar = new GregorianCalendar(tz);
+        calendar.setTimeInMillis(request.dateTime * 1000);
+        calendar.set(Calendar.HOUR, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.AM_PM, 0);
+        calendar.set(Calendar.SECOND, transitIndex.getOvernightBreak());
+        calendar.add(Calendar.DAY_OF_YEAR, 1);
+
+        request.dateTime = calendar.getTimeInMillis() / 1000;
+
+        return generate(request);
+    }
+
+    private void transitIndexWithBreakRequired(TransitIndexService transitIndex) {
+        transitIndexRequired(transitIndex);
+        if (transitIndex.getOvernightBreak() == -1) {
+            throw new RuntimeException("TransitIndexBuilder could not find an overnight break "
+                    + "in the transit schedule; first/last trips are undefined");
+        }
+    }
+
+    private void transitIndexRequired(TransitIndexService transitIndex) {
+        if (transitIndex == null) {
+            throw new RuntimeException(
+                    "TransitIndexBuilder is required for first/last/next/previous trip");
+        }
     }
 
 }

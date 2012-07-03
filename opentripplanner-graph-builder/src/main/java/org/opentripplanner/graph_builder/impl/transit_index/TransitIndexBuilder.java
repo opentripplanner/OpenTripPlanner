@@ -135,7 +135,46 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
         Coordinate coord = findTransitCenter();
         service.setCenter(coord);
 
+        service.setOvernightBreak(findOvernightBreak());
+
         graph.putService(TransitIndexService.class, service);
+    }
+
+    /**
+     * Find the longest consecutive sequence of minutes with no transit stops; this is assumed to be
+     * the overnight service break.
+     * 
+     * @return
+     */
+    private int findOvernightBreak() {
+        final int minutesInDay = 24*60;
+        boolean[] minutes = new boolean[minutesInDay];
+        for (StopTime stopTime : dao.getAllStopTimes()) {
+            minutes[(stopTime.getDepartureTime() / 60) % minutesInDay] = true;
+        }
+        int bestLength = 0;
+        int best = -1;
+        int run = 0;
+        for (int i = 0; i < minutesInDay; ++i) {
+            if (minutes[i]) {
+                 //end of run
+                if (run > bestLength) {
+                    bestLength = run;
+                    best = i - run;
+                }
+                run = 0;
+            } else {
+                run += 1;
+            }
+        }
+        if (run > bestLength) {
+            bestLength = run;
+            best = 1440 - run;
+        }
+        if (best < 0) {
+            return -1;
+        }
+        return best * 60 + 1;
     }
 
     /**

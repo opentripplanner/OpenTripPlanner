@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -283,6 +284,18 @@ public class TestRequest extends TestCase {
 
     }
 
+    public void testFirstTrip() throws Exception {
+
+        Planner planner = new TestPlanner("portland", "45.58,-122.68", "45.48,-122.6");
+
+        Response response = planner.getFirstTrip();
+        Itinerary itinerary = response.getPlan().itinerary.get(0);
+        Leg leg = itinerary.legs.get(1);
+        assertTrue(leg.startTime.get(Calendar.HOUR) >= 4);
+        assertTrue(leg.startTime.get(Calendar.HOUR) <= 7);
+
+    }
+
     public void testAlerts() throws Exception {
 
 	//SE 47th and Ash, NE 47th and Davis (note that we cross Burnside, this goes from SE to NE)
@@ -475,21 +488,24 @@ public class TestRequest extends TestCase {
             super();
             this.fromPlace = Arrays.asList(v1);
             this.toPlace = Arrays.asList(v2);
-            this.date = Arrays.asList("2009-01-01");
+            this.date = Arrays.asList("2009-10-01");
             this.time = Arrays.asList("11:11:11");
             this.maxWalkDistance = Arrays.asList(840.0);
             this.walkSpeed = Arrays.asList(1.33);
             this.optimize = Arrays.asList(OptimizeType.QUICK);
-            this.modes = Arrays.asList(new TraverseModeSet("WALK"));
+            this.modes = Arrays.asList(new TraverseModeSet("WALK,TRANSIT"));
             this.numItineraries = Arrays.asList(1);
             this.transferPenalty = Arrays.asList(0);
             this.maxTransfers = Arrays.asList(2);
             this.routerId = Arrays.asList(routerId);
             this.planGenerator = Context.getInstance().planGenerator;
+            this.graphService = Context.getInstance().graphService;
+            this.planGenerator.graphService = Context.getInstance().graphService;
         }
 
         public TestPlanner(String routerId, String v1, String v2, List<String> intermediates) {
             this(routerId, v1, v2);
+            this.modes = Arrays.asList(new TraverseModeSet("WALK"));
             this.intermediatePlaces = intermediates;
             TravelingSalesmanPathService tsp = new TravelingSalesmanPathService();
             tsp.setChainedPathService(Context.getInstance().pathService);

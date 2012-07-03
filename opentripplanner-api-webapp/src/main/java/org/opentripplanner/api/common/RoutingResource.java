@@ -130,7 +130,8 @@ public abstract class RoutingResource {
      * Alternatively, we could eliminate the separate RoutingRequest objects and just resolve
      * vertices and timezones here right away, but just ignore them in semantic equality checks.
      */
-    @Autowired GraphService graphService;
+    @Autowired
+    protected GraphService graphService;
     
     /** 
      * Build the 0th Request object from the query parameter lists. 
