@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.trippattern;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -41,22 +42,17 @@ public class TripTimes implements Cloneable, Serializable {
         // stopTimes are assumed to be pre-filtered / valid / monotonically increasing etc.
         this.trip = trip;
         this.index = index;
-        // departure arrays could be 1 shorter when arrivals are present, but they are not
         int nStops = stopTimes.size();
-        departureTimes = new int[nStops];
-        arrivalTimes = new int[nStops];
-        boolean nullArrivals = true;
+        int nHops = nStops - 1;
+        departureTimes = new int[nHops];
+        arrivalTimes = new int[nHops];
         // this might be clearer if time array indexes were stops instead of hops
-        for (int hop = 0; hop < stopTimes.size() - 1; hop++) {
+        for (int hop = 0; hop < nHops; hop++) {
             departureTimes[hop] = stopTimes.get(hop).getDepartureTime();
             arrivalTimes[hop] = stopTimes.get(hop+1).getArrivalTime();
-            if (departureTimes[hop] != arrivalTimes[hop])
-                nullArrivals = false;
         }
         // if all dwell times are 0, arrival times array is not needed. save some memory.
-        // this should probably be factored out into a method, so it can be used in updates
-        if (nullArrivals)
-            arrivalTimes = null;
+        this.compact();
     }
     
     public int getDepartureTime(int hop) {
@@ -76,6 +72,7 @@ public class TripTimes implements Cloneable, Serializable {
     public int getDwellTime(int hop) {
         // the dwell time of a hop is the dwell time *before* that hop.
         // Therefore it is undefined for hop 0, and at the end of a trip.
+        // Add range checking and -1 error value?
         // see GTFSPatternHopFactory.makeTripPattern()
         int arrivalTime = getArrivalTime(hop-1);
         int departureTime = getDepartureTime(hop);
@@ -86,8 +83,21 @@ public class TripTimes implements Cloneable, Serializable {
         return trip;
     }
 
-    // replace arrivals array with null when arrivals and departures are equal
+    /** replace arrivals array with null if all dwell times are zero */
     public boolean compact() {
+        if (arrivalTimes == null)
+            return false;
+        int nHops = arrivalTimes.length;
+        // dwell time is undefined for hop 0, because there is no arrival for hop -1
+        for (int hop = 1; hop < nHops; hop++) {
+            if (this.getDwellTime(hop) != 0) {
+                return false;
+            }
+        }
+        // extend departureTimes array by 1 to hold final arrival time
+        departureTimes = Arrays.copyOf(departureTimes, nHops+1);
+        departureTimes[nHops] = arrivalTimes[nHops-1];
+        arrivalTimes = null;
         return true;
     }
 
