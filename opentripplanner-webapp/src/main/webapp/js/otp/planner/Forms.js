@@ -27,6 +27,7 @@ otp.planner.StaticForms = {
     // external (config) objects
     routerId              : null,
     preferredRoutes       : null,
+    unpreferredRoutes     : null,
     locale                : null,
     planner               : null,
     contextMenu           : null,
@@ -216,9 +217,12 @@ otp.planner.StaticForms = {
         if(this.routerId)
             added_params.routerId = this.routerId;
 
-        // step 5: preferred routes (to be a visable form at some point)
+        // step 5: preferred routes (to be a visible form at some point)
         if(this.preferredRoutes)
             added_params.preferredRoutes = this.preferredRoutes;
+
+        if(this.unpreferredRoutes)
+            added_params.unpreferredRoutes = this.unpreferredRoutes;
 
         // step 6: set data up, including the added params & submit...
         var data = {
@@ -630,8 +634,11 @@ otp.planner.StaticForms = {
                 this.planner.maxTransfers = Number(params.maxTransfers);
 
             // list of routes sent to the API
-            if(params.preferredRoutes)
+            if(typeof(params.preferredRoutes)=='string') 
                 this.preferredRoutes = params.preferredRoutes;
+
+            if(typeof(params.unpreferredRoutes)=='string') 
+                this.unpreferredRoutes = params.unpreferredRoutes;
 
             if(params.routerId)
                 this.routerId = params.routerId;
@@ -709,6 +716,8 @@ otp.planner.StaticForms = {
         retVal.arriveBy  = this.m_arriveByForm.getValue();
         retVal.opt       = this.m_optimizeForm.getValue();
         retVal.routerId  = this.routerId;
+        retVal.preferredRoutes = this.preferredRoutes;
+        retVal.unpreferredRoutes = this.unpreferredRoutes;
 
         // break up the from coordinate into lat & lon
         retVal.fromLat = otp.util.ObjUtils.getLat(this.m_fromForm.geocodeCoord);

@@ -27,7 +27,10 @@ otp.planner.ParamTemplate = 'submit'
         + '&time={time}'
         + '&date={date}'
         + '&arriveBy={arriveBy}&itinID={itinID}'
-        + '&wheelchair={wheelchair}';
+        + '&wheelchair={wheelchair}'
+        + '&preferredRoutes={preferredRoutes}'
+        + '&unpreferredRoutes={unpreferredRoutes}'
+        ;
 
 otp.planner.Templates = {
 
