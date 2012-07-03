@@ -98,7 +98,7 @@ public class TripPattern implements Serializable {
     }
 
     // finish off the pattern once all times have been added 
-    // cache running times and dwell times; maybe trim arrays too
+    // cache best (lowest) running times and dwell times; maybe trim arrays too
     public void finish() {
         int nHops = stops.length - 1;
         int nTrips = trips.size();
@@ -139,7 +139,10 @@ public class TripPattern implements Serializable {
         return result;
     }
     
-    /** Get the index of the next trip that has a stop after afterTime at the stop at stopIndex */
+    /** 
+     * Get the index of the next trip that has a stop after (or at) 
+     * afterTime at the stop at stopIndex
+     */
     public TripTimes getNextTrip(int stopIndex, int afterTime, RoutingRequest options) {
         boolean pickup = true;
         int mask = pickup ? MASK_PICKUP : MASK_DROPOFF;
@@ -160,7 +163,7 @@ public class TripPattern implements Serializable {
             // grab a reference before tests in case it is swapped out by an update thread
             TripTimes currTrip = tripTimes.get(i); 
             int currTime = currTrip.getDepartureTime(stopIndex);
-            if (currTime > afterTime && currTime < bestTime && 
+            if (currTime >= afterTime && currTime < bestTime && 
                     tripAcceptable(currTrip.trip, bicycle, wheelchair) && 
                     ! options.bannedTrips.contains(trips.get(i).getId())) {
                 bestTrip = currTrip;
@@ -170,7 +173,10 @@ public class TripPattern implements Serializable {
         return bestTrip;
     }
     
-    /** Gets the index of the previous trip that has a stop before beforeTime at the stop at stopIndex */
+    /** 
+     * Gets the index of the previous trip that has a stop before (or at) beforeTime at 
+     * the stop at stopIndex 
+     */
     public TripTimes getPreviousTrip(int stopIndex, int beforeTime, RoutingRequest options) {
         boolean pickup = false;
         int mask = pickup ? MASK_PICKUP : MASK_DROPOFF;
@@ -191,7 +197,7 @@ public class TripPattern implements Serializable {
             // grab a reference before tests in case it is swapped out by an update thread
             TripTimes currTrip = tripTimes.get(i); 
             int currTime = currTrip.getArrivalTime(stopIndex);
-            if (currTime < beforeTime && currTime > bestTime && 
+            if (currTime <= beforeTime && currTime > bestTime && 
                     tripAcceptable(currTrip.trip, bicycle, wheelchair) &&
                     ! options.bannedTrips.contains(trips.get(i).getId())) {
                 bestTrip = currTrip;
@@ -391,6 +397,15 @@ public class TripPattern implements Serializable {
         this.headsigns.add(headsigns);
         // stoptimes should be transposed later and compacted with reused arrays
         // 1x1 array should always return the same headsign to allow for no change 
+    }
+
+    public boolean allDwellsZero(int hopIndex) {
+        for (int t = 0; t < trips.size(); ++t) {
+            if (getDwellTime(hopIndex, t) != 0) {
+                return false;
+            }
+        }
+        return true;
     }
     
 //    
