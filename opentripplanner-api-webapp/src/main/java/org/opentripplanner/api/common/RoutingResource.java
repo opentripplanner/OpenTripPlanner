@@ -10,6 +10,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.PrototypeRoutingRequest;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.services.GraphService;
@@ -132,6 +133,9 @@ public abstract class RoutingResource {
      */
     @Autowired
     protected GraphService graphService;
+
+    @Autowired
+    protected PrototypeRoutingRequest prototypeRoutingRequest;
     
     /** 
      * Build the 0th Request object from the query parameter lists. 
@@ -148,11 +152,12 @@ public abstract class RoutingResource {
      * @throws ParameterException when there is a problem interpreting a query parameter
      */
     protected RoutingRequest buildRequest(int n) throws ParameterException {
-        RoutingRequest request = new RoutingRequest();
-        request.setRouterId(get(routerId, n, ""));
-        request.setFrom(get(fromPlace, n, null));
-        request.setTo(get(toPlace, n, null));
+        RoutingRequest request = prototypeRoutingRequest.clone();
+        request.setRouterId(get(routerId, n, request.getRouterId()));
+        request.setFrom(get(fromPlace, n, request.getFromPlace().getRepresentation()));
+        request.setTo(get(toPlace, n, request.getToPlace().getRepresentation()));
         {
+            //FIXME: get defaults for these from request
             String d = get(date, n, null);
             String t = get(time, n, null);
             TimeZone tz;
@@ -174,11 +179,11 @@ public abstract class RoutingResource {
                 request.setDateTime(d, t, tz);
             }
         }
-        request.setWheelchair(get(wheelchair, n, false));
-        request.setNumItineraries(get(numItineraries, n, 3));
-        request.setMaxWalkDistance(get(maxWalkDistance, n, 840.0));
-        request.setWalkSpeed(get(walkSpeed, n, 1.33));
-        OptimizeType opt = get(optimize, n, OptimizeType.QUICK);
+        request.setWheelchairAccessible(get(wheelchair, n, request.isWheelchairAccessible()));
+        request.setNumItineraries(get(numItineraries, n, request.getNumItineraries()));
+        request.setMaxWalkDistance(get(maxWalkDistance, n, request.getMaxWalkDistance()));
+        request.setWalkSpeed(get(walkSpeed, n, request.getWalkSpeed()));
+        OptimizeType opt = get(optimize, n, request.getOptimize());
         {
             Double tsafe =  get(triangleSafetyFactor, n, null);
             Double tslope = get(triangleSlopeFactor,  n, null);
@@ -203,36 +208,36 @@ public abstract class RoutingResource {
             }
         }
         request.setArriveBy(get(arriveBy, n, false));
-        request.setShowIntermediateStops(get(showIntermediateStops, n, false));
+        request.setShowIntermediateStops(get(showIntermediateStops, n, request.isShowIntermediateStops()));
         /* intermediate places and their ordering are shared because they are themselves a list */
         if (intermediatePlaces != null && intermediatePlaces.size() > 0 
             && ! intermediatePlaces.get(0).equals("")) {
             request.setIntermediatePlaces(intermediatePlaces);
         }
         if (intermediatePlacesOrdered == null)
-            intermediatePlacesOrdered = true;
+            intermediatePlacesOrdered = request.isIntermediatePlacesOrdered();
         request.setIntermediatePlacesOrdered(intermediatePlacesOrdered);
-        request.setPreferredRoutes(get(preferredRoutes, n, ""));
-        request.setUnpreferredRoutes(get(unpreferredRoutes, n, ""));
-        request.setBannedRoutes(get(bannedRoutes, n, ""));
+        request.setPreferredRoutes(get(preferredRoutes, n, request.getPreferredRouteStr()));
+        request.setUnpreferredRoutes(get(unpreferredRoutes, n, request.getUnpreferredRouteStr()));
+        request.setBannedRoutes(get(bannedRoutes, n, request.getBannedRouteStr()));
         // replace deprecated optimization preference
         // opt has already been assigned above
         if (opt == OptimizeType.TRANSFERS) {
             opt = OptimizeType.QUICK;
             request.setTransferPenalty(get(transferPenalty, n, 0) + 1800);
         } else {
-            request.setTransferPenalty(get(transferPenalty, n, 0));
+            request.setTransferPenalty(get(transferPenalty, n, request.getTransferPenalty()));
         }
-        request.setBatch(get(batch, n, new Boolean(false)));
+        request.setBatch(get(batch, n, new Boolean(request.isBatch())));
         request.setOptimize(opt);
-        TraverseModeSet modeSet = get(modes, n, new TraverseModeSet("WALK,TRANSIT"));
+        TraverseModeSet modeSet = get(modes, n, request.getModes());
         request.setModes(modeSet);
         if (modeSet.getBicycle() && modeSet.getWalk()) {
             //slower bike speed for bike sharing, based on empirical evidence from DC.
             request.setBikeSpeed(3.5);
         }
-        request.setMinTransferTime(get(minTransferTime, n, 0));
-        request.setMaxTransfers(get(maxTransfers, n, 2));
+        request.setMinTransferTime(get(minTransferTime, n, request.getMinTransferTime()));
+        request.setMaxTransfers(get(maxTransfers, n, request.getMaxTransfers()));
         final long NOW_THRESHOLD_MILLIS = 15 * 60 * 60 * 1000;
         boolean tripPlannedForNow = Math.abs(request.getDateTime().getTime() - new Date().getTime()) 
                 < NOW_THRESHOLD_MILLIS;
@@ -243,9 +248,10 @@ public abstract class RoutingResource {
                          request.getModes().getBicycle())))
             throw new UnsupportedOperationException("TSP is not supported for transit or bike share trips");
 
-        String startTransitStopId = get(this.startTransitStopId, n, null);
+        String startTransitStopId = get(this.startTransitStopId, n,
+                AgencyAndId.convertToString(request.getStartingTransitStopId()));
         if (startTransitStopId != null && !"".equals(startTransitStopId)) {
-            request.setStartTransitStopId(AgencyAndId.convertFromString(startTransitStopId));
+            request.setStartingTransitStopId(AgencyAndId.convertFromString(startTransitStopId));
         }
         return request;
     }

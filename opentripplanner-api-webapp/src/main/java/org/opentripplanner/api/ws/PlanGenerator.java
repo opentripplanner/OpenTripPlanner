@@ -95,7 +95,7 @@ public class PlanGenerator {
         boolean tooSloped = false;
         try {
             paths = pathService.getPaths(options);
-            if (paths == null && options.getWheelchairAccessible()) {
+            if (paths == null && options.isWheelchairAccessible()) {
                 // There are no paths that meet the user's slope restrictions.
                 // Try again without slope restrictions (and warn user).
                 options.maxSlope = Double.MAX_VALUE;
@@ -155,7 +155,7 @@ public class PlanGenerator {
         TripPlan plan = new TripPlan(from, to, request.getDateTime());
 
         for (GraphPath path : paths) {
-            Itinerary itinerary = generateItinerary(path, request.getShowIntermediateStops());
+            Itinerary itinerary = generateItinerary(path, request.isShowIntermediateStops());
             plan.addItinerary(itinerary);
         }
         return plan;

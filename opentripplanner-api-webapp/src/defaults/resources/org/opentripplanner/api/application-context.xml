@@ -14,6 +14,10 @@
     <context:component-scan base-package="org.opentripplanner.api"/>
 	<context:component-scan base-package="org.opentripplanner.routing.impl"/>
 
+	<bean id="prototypeRoutingRequest" class="org.opentripplanner.routing.core.PrototypeRoutingRequest">
+		<!-- Set default routing parameters here -->
+	</bean>
+
 	<bean id="pathService" class="org.opentripplanner.routing.impl.RetryingPathServiceImpl">
         <property name="firstPathTimeout" value="10.0" />
         <property name="multiPathTimeout" value="1.0" />

@@ -61,7 +61,7 @@ public class TransitStartPathService implements PathService {
         }
 
         RoutingRequest subOptions = options.clone();
-        subOptions.setStartTransitStopId(null);
+        subOptions.setStartingTransitStopId(null);
         subOptions.setRoutingContext(graph, startingTransitStop, options.rctx.toVertex);
         List<GraphPath> pathsOnTransit = chainedPathService.getPaths(subOptions);
 

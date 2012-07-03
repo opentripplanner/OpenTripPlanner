@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import lombok.Data;
+
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.NamedPlace;
@@ -38,6 +40,7 @@ import org.slf4j.LoggerFactory;
  * 
  * NOTE this is the result of merging what used to be called a REQUEST and a TRAVERSEOPTIONS
  */
+@Data
 public class RoutingRequest implements Cloneable, Serializable {
     
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
@@ -90,7 +93,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** max walk/bike speed along streets, in meters per second */
     private double walkSpeed;
     private double bikeSpeed;
-    private double carSpeed;    
+    private double carSpeed;
 
     /**
      * When optimizing for few transfers, we don't actually optimize for fewest transfers, as this
@@ -288,7 +291,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     /* ACCESSOR METHODS */
 
     public boolean transitAllowed() {
-        return getModes().isTransit();
+        return modes.isTransit();
     }
     
     public long getSecondsSinceEpoch() {
@@ -300,10 +303,6 @@ public class RoutingRequest implements Cloneable, Serializable {
         walkingOptions.arriveBy = arriveBy;
         if (worstTime == Long.MAX_VALUE || worstTime == 0)
             worstTime = arriveBy ? 0 : Long.MAX_VALUE;
-    }
-
-    public RoutingRequest getWalkingOptions() {
-        return walkingOptions;
     }
 
     public void setMode(TraverseMode mode) {
@@ -329,10 +328,6 @@ public class RoutingRequest implements Cloneable, Serializable {
             walkingOptions.modes.setBicycle(false);
             walkingOptions.modes.setWalk(true);
         }
-    }
-
-    public TraverseModeSet getModes() {
-        return modes;
     }
 
     public void setOptimize(OptimizeType optimize) {
@@ -370,10 +365,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     @SuppressWarnings("unchecked")
     public <T> T getExtension(Object key) {
         return (T) extensions.get(key);
-    }
-
-    public boolean isReverseOptimizing() {
-        return reverseOptimizing;
     }
 
     /** @return the (soft) maximum walk distance */
@@ -428,21 +419,6 @@ public class RoutingRequest implements Cloneable, Serializable {
         return s;
     }
 
-    public HashMap<String, String> getParameters() {
-        return parameters;
-    }
-
-    public String getRouterId() {
-        return routerId;
-    }
-
-    /** @param routerId the router ID, used to switch between router instances. */
-    public void setRouterId(String routerId) {
-        this.routerId = routerId;
-    }
-
-    public String getFrom() { return from; }
-
     // TODO factor out splitting code which appears in 3 places
     public void setFrom(String from) {
         if (from.contains("::")) {
@@ -453,8 +429,6 @@ public class RoutingRequest implements Cloneable, Serializable {
             this.from = from;
         }
     }
-
-    public String getTo() { return to; }
 
     public void setTo(String to) {
         if (to.contains("::")) {
@@ -479,10 +453,6 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
     }
 
-    public OptimizeType getOptimize() { 
-        return optimize; 
-    }
-
     public Date getDateTime() { 
         return new Date(dateTime * 1000); 
     }
@@ -494,10 +464,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     public void setDateTime(String date, String time, TimeZone tz) {
         Date dateObject = DateUtils.toDate(date, time, tz);
         setDateTime(dateObject);
-    }
-
-    public boolean isArriveBy() { 
-        return arriveBy; 
     }
 
     public Integer getNumItineraries() { 
@@ -531,23 +497,9 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + isArriveBy() + sep + getOptimize() + sep + modes.getAsStr() + sep
                 + getNumItineraries();
     }
-    
-    public TraverseModeSet getModeSet() { 
-        return modes; 
-    }
 
     public void removeMode(TraverseMode mode) { 
         modes.setMode(mode, false); 
-    }
-
-    /** Set whether the trip must be wheelchair accessible */
-    public void setWheelchair(boolean wheelchair) { 
-        this.wheelchairAccessible = wheelchair; 
-    }
-
-    /** return whether the trip must be wheelchair accessible */
-    public boolean getWheelchairAccessible() { 
-        return wheelchairAccessible; 
     }
 
     public void setIntermediatePlaces(List<String> intermediates) {
@@ -571,55 +523,6 @@ public class RoutingRequest implements Cloneable, Serializable {
         return intermediatePlaces;
     }
 
-    /**
-     * @return the maximum street slope for wheelchair trips
-     */
-    public double getMaxSlope() {
-        return maxSlope;
-    }
-    
-    /**
-     * @param maxSlope the maximum street slope for wheelchair trpis
-     */
-    public void setMaxSlope(double maxSlope) {
-        this.maxSlope = maxSlope;
-    }
-    
-    /** 
-     * @param showIntermediateStops
-     *          whether the planner should return intermediate stop lists for transit legs 
-     */
-    public void setShowIntermediateStops(boolean showIntermediateStops) {
-        this.showIntermediateStops = showIntermediateStops;
-    }
-
-    /** 
-     * @return whether the planner should return intermediate stop lists for transit legs 
-     */
-    public boolean getShowIntermediateStops() {
-        return showIntermediateStops;
-    }
-
-    public void setMinTransferTime(Integer minTransferTime) {
-        this.minTransferTime = minTransferTime;
-    }
-
-    public void setBatch(boolean batch) {
-        this.batch = batch;
-    }
-    
-    public Integer getMinTransferTime() {
-        return minTransferTime;
-    }
-    
-    public void setTransferPenalty(Integer transferPenalty) {
-        this.transferPenalty = transferPenalty;
-    }
-
-    public Integer getTransferPenalty() {
-        return transferPenalty;
-    }
-    
     public void setTriangleSafetyFactor(double triangleSafetyFactor) {
         this.triangleSafetyFactor = triangleSafetyFactor;
         walkingOptions.triangleSafetyFactor = triangleSafetyFactor;
@@ -635,43 +538,11 @@ public class RoutingRequest implements Cloneable, Serializable {
         walkingOptions.triangleTimeFactor = triangleTimeFactor;
     }
 
-    public double getTriangleSafetyFactor() {
-        return triangleSafetyFactor;
-    }
-
-    public double getTriangleSlopeFactor() {
-        return triangleSlopeFactor;
-    }
-
-    public double getTriangleTimeFactor() {
-        return triangleTimeFactor;
-    }
-
     public void setMaxTransfers(int maxTransfers) {
         if (maxTransfers > CLAMP_TRANSFERS) {
             maxTransfers = CLAMP_TRANSFERS;
         }
         this.maxTransfers = maxTransfers;
-    }
-
-    public Integer getMaxTransfers() {
-        return maxTransfers;
-    }
-
-    public void setIntermediatePlacesOrdered(boolean intermediatePlacesOrdered) {
-        this.intermediatePlacesOrdered = intermediatePlacesOrdered;
-    }
-
-    public boolean isIntermediatePlacesOrdered() {
-        return intermediatePlacesOrdered;
-    }
-
-    public String getFromName() {
-        return fromName;
-    }
-
-    public String getToName() {
-        return toName;
     }
 
     public NamedPlace getFromPlace() {
@@ -681,7 +552,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     public NamedPlace getToPlace() {
         return new NamedPlace(toName, to);
     }
-    
     
     /* INSTANCE METHODS */
 
@@ -873,18 +743,6 @@ public class RoutingRequest implements Cloneable, Serializable {
         return walkSpeed;
     }
 
-    public void setWalkSpeed(double walkSpeed) {
-        this.walkSpeed = walkSpeed;
-    }
-
-    public void setBikeSpeed(double bikeSpeed) {
-        this.bikeSpeed = bikeSpeed;
-    }
-
-    public void setCarSpeed(double carSpeed) {
-        this.carSpeed = carSpeed;
-    }
-
     /**
      * @param mode
      * @return The board cost for a specific traverse mode.
@@ -904,28 +762,28 @@ public class RoutingRequest implements Cloneable, Serializable {
         return bikeBoardCost;
     }
 
-    public void setWalkBoardCost(int walkBoardCost) {
-        this.walkBoardCost = walkBoardCost;
+    private String getRouteSetStr(HashSet<RouteSpec> routes) {
+        StringBuilder builder = new StringBuilder();
+        for (RouteSpec spec : routes) {
+            builder.append(spec.getRepresentation());
+            builder.append(",");
+        }
+        if (builder.length() > 0) {
+            // trim trailing comma
+            builder.setLength(builder.length() - 1);
+        }
+        return builder.toString();
     }
 
-    public void setBikeBoardCost(int bikeBoardCost) {
-        this.bikeBoardCost = bikeBoardCost;
+    public String getPreferredRouteStr() {
+        return getRouteSetStr(preferredRoutes);
     }
 
-    public boolean useBikeRentalAvailabilityInformation() {
-        return useBikeRentalAvailabilityInformation;
+    public String getUnpreferredRouteStr() {
+        return getRouteSetStr(unpreferredRoutes);
     }
 
-    public void setUseBikeRentalAvailabilityInformation(boolean useBikeRentalAvailabilityInformation) {
-        this.useBikeRentalAvailabilityInformation = useBikeRentalAvailabilityInformation;
+    public String getBannedRouteStr() {
+        return getRouteSetStr(bannedRoutes);
     }
-
-    public AgencyAndId getStartingTransitStopId() {
-        return startingTransitStopId;
-    }
-
-    public void setStartTransitStopId(AgencyAndId startingTransitStopId) {
-        this.startingTransitStopId = startingTransitStopId;
-    }
-
 }

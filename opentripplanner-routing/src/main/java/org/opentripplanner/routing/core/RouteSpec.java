@@ -53,7 +53,6 @@ public class RouteSpec implements Cloneable, Serializable {
         return ret;
     }
 
-
     @Override
     public boolean equals(Object other) {
         if (other instanceof RouteSpec) {
@@ -67,12 +66,16 @@ public class RouteSpec implements Cloneable, Serializable {
     public int hashCode() {
         return agency.hashCode() ^ routeName.hashCode();
     }
-    
+
+    public String getRepresentation() {
+        return agency + "_" + routeName;
+    }
+
     @Override
     public String toString() {
     	return String.format("RouteSpec<agency=%s name=%s>", agency, routeName);
     }
-    
+
     public RouteSpec clone() {
         try {
             return (RouteSpec) super.clone();
