@@ -29,12 +29,16 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.pqueue.BinHeap;
+import org.opentripplanner.routing.pathparser.BasicPathParser;
+import org.opentripplanner.routing.pathparser.PathParser;
+import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.util.monitoring.MonitoringStore;
 import org.opentripplanner.util.monitoring.MonitoringStoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Implements a multi-objective goal-directed search algorithm like the one in Sec. 4.2 of: 
  * Perny and Spanjaard. Near Admissible Algorithms for Multiobjective Search.
@@ -62,6 +66,8 @@ import org.slf4j.LoggerFactory;
  */
 //@Component
 public class MultiObjectivePathServiceImpl implements PathService {
+
+    @Autowired public GraphService graphService;
 
     private static final Logger LOG = LoggerFactory.getLogger(MultiObjectivePathServiceImpl.class);
 
@@ -95,6 +101,13 @@ public class MultiObjectivePathServiceImpl implements PathService {
 
     @Override
     public List<GraphPath> getPaths(RoutingRequest options) {
+
+        if (options.rctx == null) {
+            options.setRoutingContext(graphService.getGraph(options.getRouterId()));
+            // move into setRoutingContext ?
+            options.rctx.pathParsers = new PathParser[1];
+            options.rctx.pathParsers[0] = new BasicPathParser();
+        }
 
         // always use the bidirectional heuristic because the others are not precise enough
         RemainingWeightHeuristic heuristic = new BidirectionalRemainingWeightHeuristic(options.rctx.graph);
