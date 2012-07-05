@@ -21,6 +21,7 @@ import java.util.List;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.strategies.BidirectionalRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
@@ -110,9 +111,7 @@ public class MultiObjectivePathServiceImpl implements PathService {
         Vertex targetVertex = options.rctx.target;
         
         // increase maxWalk repeatedly in case hard limiting is in use 
-        WALK: for (double maxWalk = options.getMaxWalkDistance();
-                          maxWalk < 100000 && returnStates.isEmpty();
-                          maxWalk *= 2) {
+        WALK: for (double maxWalk = options.getMaxWalkDistance(); returnStates.isEmpty(); maxWalk *= 2) {
             LOG.debug("try search with max walk {}", maxWalk);
             // increase maxWalk if settings make trip impossible
             if (maxWalk < Math.min(distanceLibrary.distance(originVertex.getCoordinate(), 
@@ -147,7 +146,7 @@ public class MultiObjectivePathServiceImpl implements PathService {
                 if (System.currentTimeMillis() > endTime) {
                     LOG.debug("timeout at {} msec", System.currentTimeMillis() - startTime);
                     if (returnStates.isEmpty())
-                        continue WALK;
+                        break WALK; // disable walk distance increases
                     else {
                         storeMemory();
                         break WALK;
