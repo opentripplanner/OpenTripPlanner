@@ -242,6 +242,6 @@ public class FrequencyAlight extends AbstractEdge  implements OnBoardReverseEdge
     }
 
     public String toString() {
-        return "PatternBoard(" + getFromVertex() + ", " + getToVertex() + ")";
+        return "FrequencyAlight(" + getFromVertex() + ", " + getToVertex() + ")";
     }
 }

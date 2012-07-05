@@ -239,7 +239,7 @@ public class FrequencyBoard extends AbstractEdge  implements OnBoardForwardEdge 
     }
 
     public String toString() {
-        return "PatternBoard(" + getFromVertex() + ", " + getToVertex() + ")";
+        return "FrequencyBoard(" + getFromVertex() + ", " + getToVertex() + ")";
     }
 
     public FrequencyBasedTripPattern getPattern() {
