@@ -20,6 +20,8 @@ import java.util.List;
 
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
 import org.opentripplanner.routing.algorithm.strategies.BidirectionalRemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.strategies.LBGRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.core.State;
@@ -109,11 +111,16 @@ public class MultiObjectivePathServiceImpl implements PathService {
             options.rctx.pathParsers[0] = new BasicPathParser();
         }
 
-        // always use the bidirectional heuristic because the others are not precise enough
-        RemainingWeightHeuristic heuristic = new BidirectionalRemainingWeightHeuristic(options.rctx.graph);
-        // TODO: some way to ensure that this is set to bidi heuristic
-        //options.rctx.remainingWeightHeuristic = heuristic;
-        
+        RemainingWeightHeuristic heuristic;
+        if (options.getModes().isTransit()) {
+            LOG.debug("Transit itinerary requested.");
+            // always use the bidirectional heuristic because the others are not precise enough
+            heuristic = new BidirectionalRemainingWeightHeuristic(options.rctx.graph);    
+        } else {
+            LOG.debug("Non-transit itinerary requested.");
+            heuristic = new DefaultRemainingWeightHeuristic();
+        }        
+                
         // the states that will eventually be turned into paths and returned
         List<State> returnStates = new LinkedList<State>();
 
