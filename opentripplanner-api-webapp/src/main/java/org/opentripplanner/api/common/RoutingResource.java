@@ -85,7 +85,7 @@ public abstract class RoutingResource {
     /** The minimum time, in seconds, between successive trips on different vehicles.
      *  This is designed to allow for imperfect schedule adherence.  This is a minimum;
      *  transfers over longer distances might use a longer time. */
-    @DefaultValue("240") @QueryParam("minTransferTime") protected List<Integer> minTransferTime;
+    @DefaultValue("-1") @QueryParam("minTransferTime") protected List<Integer> minTransferTime;
 
     /** The maximum number of possible itineraries to return. */
     @DefaultValue("3") @QueryParam("numItineraries") protected List<Integer> numItineraries;
@@ -136,7 +136,10 @@ public abstract class RoutingResource {
 
     @Autowired
     protected PrototypeRoutingRequest prototypeRoutingRequest;
-    
+
+    @DefaultValue("-1") @QueryParam("boardSlack") private List<Integer> boardSlack;
+    @DefaultValue("-1") @QueryParam("alightSlack") private List<Integer> alightSlack;
+
     /** 
      * Build the 0th Request object from the query parameter lists. 
      * @throws ParameterException when there is a problem interpreting a query parameter
@@ -236,7 +239,15 @@ public abstract class RoutingResource {
             //slower bike speed for bike sharing, based on empirical evidence from DC.
             request.setBikeSpeed(3.5);
         }
-        request.setMinTransferTime(get(minTransferTime, n, request.getMinTransferTime()));
+        request.setBoardSlack(get(boardSlack, n, request.getBoardSlack()));
+        request.setAlightSlack(get(alightSlack, n, request.getAlightSlack()));
+        request.setTransferSlack(get(minTransferTime, n, request.getTransferSlack()));
+
+        if (request.getBoardSlack() + request.getAlightSlack() > request.getTransferSlack()) {
+            throw new RuntimeException("Invalid parameters: transfer slack must "
+                    + "be greater than or equal to board slack plus alight slack");
+        }
+
         request.setMaxTransfers(get(maxTransfers, n, request.getMaxTransfers()));
         final long NOW_THRESHOLD_MILLIS = 15 * 60 * 60 * 1000;
         boolean tripPlannedForNow = Math.abs(request.getDateTime().getTime() - new Date().getTime()) 
@@ -268,7 +279,13 @@ public abstract class RoutingResource {
         int maxIndex = l.size() - 1;
         if (n > maxIndex)
             n = maxIndex;
-        return l.get(n);
+        T value = l.get(n);
+        if (value instanceof Integer) {
+            if (value.equals(-1)) {
+                return defaultValue;
+            }
+        }
+        return value;
     }
 
 }

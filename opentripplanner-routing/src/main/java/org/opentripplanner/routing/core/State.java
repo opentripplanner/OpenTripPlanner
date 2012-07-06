@@ -192,6 +192,10 @@ public class State implements Cloneable {
         return stateData.alightedLocal;
     }
 
+    /**
+     * Whether this path has ever previously boarded (or alighted from, in a reverse search) a
+     * transit vehicle
+     */
     public boolean isEverBoarded() {
         return stateData.everBoarded;
     }

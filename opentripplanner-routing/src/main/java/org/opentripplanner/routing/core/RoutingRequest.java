@@ -48,7 +48,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     private static final int CLAMP_ITINERARIES = 3;
     private static final int CLAMP_TRANSFERS = 4;
 
-    
     /* FIELDS UNIQUELY IDENTIFYING AN SPT REQUEST */
 
     /* TODO no defaults should be set here, they should all be handled in one place (searchresource) */ 
@@ -195,7 +194,10 @@ public class RoutingRequest implements Cloneable, Serializable {
      * specific transfer timing information in transfers.txt
      */
     // initialize to zero so this does not inadvertently affect tests, and let Planner handle defaults
-    public int minTransferTime = 0;
+    private int transferSlack = 0;
+    /** Invariant: boardSlack + alightSlack <= transferSlack. */
+    private int boardSlack = 0;
+    private int alightSlack = 0;
 
     public int maxTransfers = 2;
 
@@ -663,7 +665,9 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && bannedTrips.equals(other.bannedTrips)
                 && preferredRoutes.equals(other.preferredRoutes)
                 && unpreferredRoutes.equals(other.unpreferredRoutes)
-                && minTransferTime == other.minTransferTime
+                && transferSlack == other.transferSlack
+                && boardSlack == other.boardSlack
+                && alightSlack == other.alightSlack
                 && nonpreferredTransferPenalty == other.nonpreferredTransferPenalty
                 && useAnotherThanPreferredRoutesPenalty == other.useAnotherThanPreferredRoutesPenalty
                 && useUnpreferredRoutesPenalty == other.useUnpreferredRoutesPenalty
@@ -695,7 +699,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + new Double(transferPenalty).hashCode() + new Double(maxSlope).hashCode()
                 + new Double(walkReluctance).hashCode() + new Double(waitReluctance).hashCode()
                 + walkBoardCost + bikeBoardCost + bannedRoutes.hashCode()
-                + bannedTrips.hashCode() * 1373 + minTransferTime * 20996011
+                + bannedTrips.hashCode() * 1373 + transferSlack * 20996011
                 + (int) nonpreferredTransferPenalty + (int) transferPenalty * 163013803
                 + new Double(triangleSafetyFactor).hashCode() * 195233277
                 + new Double(triangleSlopeFactor).hashCode() * 136372361
