@@ -74,6 +74,8 @@ public class MultiObjectivePathServiceImpl implements PathService {
     private static final Logger LOG = LoggerFactory.getLogger(MultiObjectivePathServiceImpl.class);
 
     private static final MonitoringStore store = MonitoringStoreFactory.getStore();
+
+    private static final double MAX_WALK = 100000;
     
     private double[] _timeouts = new double[] {4, 2, 0.6, 0.4}; // seconds
     
@@ -132,6 +134,9 @@ public class MultiObjectivePathServiceImpl implements PathService {
         
         // increase maxWalk repeatedly in case hard limiting is in use 
         WALK: for (double maxWalk = options.getMaxWalkDistance(); returnStates.isEmpty(); maxWalk *= 2) {
+            if (maxWalk != Double.MAX_VALUE && maxWalk > MAX_WALK) {
+                break;
+            }
             LOG.debug("try search with max walk {}", maxWalk);
             // increase maxWalk if settings make trip impossible
             if (maxWalk < Math.min(distanceLibrary.distance(originVertex.getCoordinate(), 
