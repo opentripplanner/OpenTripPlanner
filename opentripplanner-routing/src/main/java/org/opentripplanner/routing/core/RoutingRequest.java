@@ -68,7 +68,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public List<NamedPlace> intermediatePlaces;
     public boolean intermediatePlacesOrdered;
     /** The maximum distance (in meters) the user is willing to walk. Defaults to 1/2 mile. */
-    public double maxWalkDistance = Double.MAX_VALUE;
+    public double maxWalkDistance = 800;
     /** The worst possible time (latest for depart-by and earliest for arrive-by) to accept */
     public long worstTime = Long.MAX_VALUE;
     /** The worst possible weight that we will accept when planning a trip. */
@@ -379,13 +379,6 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
     }
 
-    public void setMaxWalkDistance(double maxWalkDistance) {
-        this.maxWalkDistance = maxWalkDistance;
-        if (walkingOptions != null) {
-            walkingOptions.maxWalkDistance = maxWalkDistance;
-        }
-    }
-
     public void setPreferredRoutes(String s) {
         if (s != null && !s.equals(""))
             preferredRoutes = new HashSet<RouteSpec>(RouteSpec.listFromString(s));
@@ -441,9 +434,6 @@ public class RoutingRequest implements Cloneable, Serializable {
             this.to = to;
         }
     }
-    
-    /** @param walk - the (soft) maximum walk distance to set */
-    public void setMaxWalkDistance(Double walk) { this.maxWalkDistance = walk; }
 
     public void addMode(TraverseMode mode) { 
         modes.setMode(mode, true); 
