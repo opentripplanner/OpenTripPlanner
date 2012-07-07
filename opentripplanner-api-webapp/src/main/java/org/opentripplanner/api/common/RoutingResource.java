@@ -62,7 +62,7 @@ public abstract class RoutingResource {
     @DefaultValue("false") @QueryParam("wheelchair") protected List<Boolean> wheelchair;
 
     /** The maximum distance (in meters) the user is willing to walk. Defaults to approximately 1/2 mile. */
-    @DefaultValue("800") @QueryParam("maxWalkDistance") protected List<Double> maxWalkDistance;
+    @DefaultValue("-1") @QueryParam("maxWalkDistance") protected List<Double> maxWalkDistance;
 
     /** The user's walking speed in meters/second. Defaults to approximately 3 MPH. */
     @QueryParam("walkSpeed") protected List<Double> walkSpeed;
@@ -88,7 +88,7 @@ public abstract class RoutingResource {
     @DefaultValue("-1") @QueryParam("minTransferTime") protected List<Integer> minTransferTime;
 
     /** The maximum number of possible itineraries to return. */
-    @DefaultValue("3") @QueryParam("numItineraries") protected List<Integer> numItineraries;
+    @DefaultValue("-1") @QueryParam("numItineraries") protected List<Integer> numItineraries;
 
     /** The list of preferred routes.  The format is agency_route, so TriMet_100. */
     @DefaultValue("") @QueryParam("preferredRoutes") protected List<String> preferredRoutes;
@@ -109,13 +109,13 @@ public abstract class RoutingResource {
      *  internal weight units, which are roughly equivalent to seconds.  Set this to a high
      *  value to discourage transfers.  Of course, transfers that save significant
      *  time or walking will still be taken.*/
-    @DefaultValue("0") @QueryParam("transferPenalty") protected List<Integer> transferPenalty;
+    @DefaultValue("-1") @QueryParam("transferPenalty") protected List<Integer> transferPenalty;
     
     /** The maximum number of transfers (that is, one plus the maximum number of boardings)
      *  that a trip will be allowed.  Larger values will slow performance, but could give
      *  better routes.  This is limited on the server side by the MAX_TRANSFERS value in
      *  org.opentripplanner.api.ws.Planner. */
-    @DefaultValue("2") @QueryParam("maxTransfers") protected List<Integer> maxTransfers;
+    @DefaultValue("-1") @QueryParam("maxTransfers") protected List<Integer> maxTransfers;
 
     /** If true, goal direction is turned off and a full path tree is built (specify only once) */
     @DefaultValue("false") @QueryParam("batch") protected List<Boolean> batch;
