@@ -37,7 +37,7 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
 
     private Stop start, end;
 
-    private int stopIndex;
+    public int stopIndex;
 
     private Geometry geometry = null;
 
