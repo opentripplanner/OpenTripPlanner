@@ -1,18 +1,31 @@
 package org.opentripplanner.graph_builder;
 
+import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
+
+import org.geotools.referencing.GeodeticCalculator;
 import org.onebusaway.gtfs.model.Trip;
+import org.opengis.geometry.DirectPosition;
 import org.opentripplanner.common.IterableLibrary;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-
+import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.TurnVertex;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.linearref.LinearLocation;
+import com.vividsolutions.jts.linearref.LocationIndexedLine;
 
 public class GraphStats {
 
@@ -88,6 +101,7 @@ public class GraphStats {
         } else {
             out = System.out;
         }
+        System.out.println("done loading graph.");
         
         String command = jc.getParsedCommand();
         if (command.equals("endpoints")) {
@@ -102,9 +116,62 @@ public class GraphStats {
     @Parameters(commandNames = "endpoints", commandDescription = "Generate random endpoints for performance testing") 
     class CommandEndpoints {
 
+        @Parameter(names = { "-r", "--radius"}, description = "perturbation radius in meters")
+        private double radius = 100;
+
+        @Parameter(names = { "-n", "--number"}, description = "number of endpoints to generate")
+        private int n = 20;
+
+        @Parameter(names = { "-s", "--stops"}, description = "choose endpoints near stops not street vertices")
+        private boolean useStops = false;
+
+        @Parameter(names = { "-rs", "--seed"}, description = "random seed, allows reproducible results")
+        private Long seed = null;
+
+        // go along road then random
         public void run() {
+            System.out.printf("Producing %d random endpoints within radius %2.2fm around %s.\n", 
+                    n, radius, useStops ? "stops" : "streets");
+            List<Vertex> vertices = new ArrayList<Vertex>();
+            GeodeticCalculator gc = new GeodeticCalculator();
+            Class<?> klasse = useStops ? TransitStop.class : TurnVertex.class;
+            for (Vertex v : graph.getVertices())
+                if (klasse.isInstance(v))
+                    vertices.add(v);
+            Random random = new Random();
+            if (seed != null)
+                random.setSeed(seed);
+            Collections.shuffle(vertices, random);
+            vertices = vertices.subList(0, n);
+            out.printf("n,name,lat,lon\n");
+            int i = 0;
+            for (Vertex v : vertices) {
+                Coordinate c;
+                if (v instanceof TurnVertex) {
+                    LineString ls = ((TurnVertex)v).geometry;
+                    int numPoints = ls.getNumPoints();
+                    LocationIndexedLine lil = new LocationIndexedLine(ls);
+                    int seg = random.nextInt(numPoints);
+                    double frac = random.nextDouble();
+                    LinearLocation ll = new LinearLocation(seg, frac);
+                    c = lil.extractPoint(ll);
+                } else {
+                    c = v.getCoordinate();
+                }
+                // perturb
+                double distance = random.nextDouble() * radius;
+                double azimuth = random.nextDouble() * 360 - 180;
+                // double x = c.x + r * Math.cos(theta);
+                // double y = c.y + r * Math.sin(theta);
+                gc.setStartingGeographicPoint(c.x, c.y);
+                gc.setDirection(azimuth, distance);
+                Point2D dest = gc.getDestinationGeographicPoint();
+                String name = v.getName();
+                out.printf("%d,%s,%f,%f\n", i, name, dest.getY(), dest.getX());
+                i += 1;
+            }
+            System.out.printf("done.\n"); 
         }
-        
     }
 
     @Parameters(commandNames = "speedstats", commandDescription = "speed stats") 
