@@ -284,11 +284,11 @@ public class StateEditor {
         // but do a null check anyway
         if (routeId != null) {
             AgencyAndId[] oldRouteSequence = child.stateData.routeSequence;
-            LOG.debug("old route seq {}", Arrays.asList(oldRouteSequence));
+            //LOG.debug("old route seq {}", Arrays.asList(oldRouteSequence));
             int oldLength = oldRouteSequence.length;
             child.stateData.routeSequence = Arrays.copyOf(oldRouteSequence, oldLength + 1);
             child.stateData.routeSequence[oldLength] = routeId;
-            LOG.debug("new route seq {}", Arrays.asList(child.stateData.routeSequence)); // array will be interpreted as varargs
+            //LOG.debug("new route seq {}", Arrays.asList(child.stateData.routeSequence)); // array will be interpreted as varargs
         }
     }
 
