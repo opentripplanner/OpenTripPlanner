@@ -191,6 +191,7 @@ public class TestContractionHeirarchies extends TestCase {
         RoutingRequest options = new RoutingRequest();
         options.optimize = OptimizeType.QUICK;
         options.walkReluctance = 1;
+        options.setMaxWalkDistance(Double.MAX_VALUE);
         options.setWalkSpeed(1);
 
         // test hop limit
@@ -254,6 +255,7 @@ public class TestContractionHeirarchies extends TestCase {
 
         options = new RoutingRequest();
         options.optimize = OptimizeType.QUICK;
+        options.setMaxWalkDistance(Double.MAX_VALUE);
         options.setWalkSpeed(1);
         // Turn off remaining weight heuristic: Unless latitude is very low, heuristic will sometimes 
         // lead algorithm to attempt to reduce distance incorrectly via FreeEdges 
@@ -358,6 +360,7 @@ public class TestContractionHeirarchies extends TestCase {
         RoutingRequest options = new RoutingRequest();
         options.optimize = OptimizeType.QUICK;
         options.walkReluctance = 1;
+        options.setMaxWalkDistance(Double.MAX_VALUE);
         options.setWalkSpeed(1);
         GraphPath path = hierarchy.getShortestPath(vertices.get(0), vertices.get(1), 0, options);
         assertNotNull(path);
