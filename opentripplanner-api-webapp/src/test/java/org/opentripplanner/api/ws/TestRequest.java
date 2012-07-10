@@ -491,7 +491,7 @@ public class TestRequest extends TestCase {
             this.toPlace = Arrays.asList(v2);
             this.date = Arrays.asList("2009-10-01");
             this.time = Arrays.asList("11:11:11");
-            this.maxWalkDistance = Arrays.asList(840.0);
+            this.maxWalkDistance = Arrays.asList(1600.0);
             this.walkSpeed = Arrays.asList(1.33);
             this.optimize = Arrays.asList(OptimizeType.QUICK);
             this.modes = Arrays.asList(new TraverseModeSet("WALK,TRANSIT"));
