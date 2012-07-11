@@ -63,6 +63,10 @@ otp.core.MapStatic = {
     rightClickZoom    : true,
     showLayerSwitcher : null,
 
+    // map base layers - @see showMapView() & showSatelliteView() below 
+    cartoLayer        : null,
+    orthoLayer        : null,
+
     /*
      * Projections - neither should need changing. displayProjection is only
      * used within OpenLayers for now -- from/to form fields are populated using
@@ -87,10 +91,18 @@ otp.core.MapStatic = {
         otp.configure(this, config);
 
         this.map = otp.util.OpenLayersUtils.makeMap(this.mapDiv, this.options);
-        if (this.baseLayer == null) {
+        if (this.baseLayer == null)
+        {
             this.baseLayer = otp.util.OpenLayersUtils.makeMapBaseLayer(this.map, this.baseLayerOptions);
-        } else {
+            this.cartoLayer = this.baseLayer;
+            this.orthoLayer = this.baseLayer;
+        }
+        else
+        {
             this.map.addLayers(this.baseLayer);
+            this.cartoLayer = this.map.layers[0];
+            this.orthoLayer = this.map.layers[1];
+
             if (this.baseLayer.length > 1 && this.showLayerSwitcher !== false) {
                 this.showLayerSwitcher=true;
             } else {
@@ -507,6 +519,27 @@ otp.core.MapStatic = {
     {
         this.closeAllPopups();
     },
+
+    /** 
+     * showMapView is for a manual switch of base layers (as opposed to OpenLayer layer switcher) 
+     * assumes first entry in config.map.baseLayer is a map layer, and second entry is an ortho layer
+     */
+    showMapView : function()
+    {
+        if(this.cartoLayer)
+            this.map.setBaseLayer(this.cartoLayer, true);
+    },
+
+    /** 
+     * showSatelliteView is for a manual switch of base layers (as opposed to OpenLayer layer switcher) 
+     * assumes second entry in config.map.baseLayer is an ortho layer, and first entry is an map layer
+     */
+    showSatelliteView : function()
+    {
+        if(this.orthoLayer)
+            this.map.setBaseLayer(this.orthoLayer, true);
+    },
+    
 
     /**
      * Remove all OTP features from non base layers on the map
