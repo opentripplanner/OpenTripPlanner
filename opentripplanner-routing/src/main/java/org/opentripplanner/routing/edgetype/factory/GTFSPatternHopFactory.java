@@ -671,7 +671,7 @@ public class GTFSPatternHopFactory {
 
     private void loadAgencies(Graph graph) {
         for (Agency agency : _dao.getAllAgencies()) {
-            graph.addAgencyId(agency.getId());
+            graph.addAgency(agency);
         }
     }
 

@@ -84,7 +84,7 @@ public class TransitIndex {
         Graph graph = getGraph(routerId);
         
         AgencyList response = new AgencyList();
-        response.agencyIds = graph.getAgencyIds();
+        response.agencies = graph.getAgencies();
         return response;
     }
 
