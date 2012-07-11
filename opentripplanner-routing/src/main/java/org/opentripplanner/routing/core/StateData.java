@@ -16,7 +16,7 @@ package org.opentripplanner.routing.core;
 import java.util.HashMap;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Vertex;
 
 /**
@@ -59,6 +59,8 @@ public class StateData implements Cloneable {
     protected HashMap<Object, Object> extensions;
 
     protected RoutingRequest opt;
+
+    protected TripPattern lastPattern;
 
     protected StateData clone() {
         try {

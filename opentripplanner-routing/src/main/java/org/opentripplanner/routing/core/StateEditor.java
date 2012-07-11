@@ -20,13 +20,13 @@ import java.util.List;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.automata.AutomatonState;
 import org.opentripplanner.routing.edgetype.FreeEdge;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.patch.NoteNarrative;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.Patch;
 import org.opentripplanner.routing.pathparser.PathParser;
-import org.opentripplanner.routing.spt.GraphPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -501,5 +501,10 @@ public class StateEditor {
     public void alightTransit() {
         cloneStateDataAsNeeded();
         child.stateData.lastTransitWalk = child.getWalkDistance();
+    }
+
+    public void setLastPattern(TripPattern pattern) {
+        cloneStateDataAsNeeded();
+        child.stateData.lastPattern = pattern;
     }
 }
