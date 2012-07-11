@@ -8,9 +8,9 @@ import javax.annotation.PostConstruct;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.edgetype.PatternBoard;
+import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
-import org.opentripplanner.routing.trippattern.TripPattern;
 import org.opentripplanner.routing.trippattern.UpdateList;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
 import org.slf4j.Logger;
@@ -35,16 +35,16 @@ public class StoptimeUpdater implements Runnable {
     @Autowired
     private GraphService graphService;
     private UpdateStreamer updateStreamer;
-    private Map<AgencyAndId, TripPattern> patternForTripId;
+    private Map<AgencyAndId, TableTripPattern> patternForTripId;
    
     @PostConstruct
     public void setup () {
         Graph g = graphService.getGraph();
         // index trip patterns on trip ids they contain
-        patternForTripId = new HashMap<AgencyAndId, TripPattern>();
+        patternForTripId = new HashMap<AgencyAndId, TableTripPattern>();
         for (TransitStopDepart tsd : filter(g.getVertices(), TransitStopDepart.class)) {
             for (PatternBoard pb : filter(tsd.getOutgoing(), PatternBoard.class)) {
-                TripPattern pattern = pb.getPattern();
+                TableTripPattern pattern = pb.getPattern();
                 for (Trip trip : pattern.getTrips()) {
                     patternForTripId.put(trip.getId(), pattern);
                 }
@@ -66,7 +66,7 @@ public class StoptimeUpdater implements Runnable {
                     LOG.debug("incoherent stoptime UpdateList");
                     continue; 
                 }
-                TripPattern pattern = patternForTripId.get(ul.tripId);
+                TableTripPattern pattern = patternForTripId.get(ul.tripId);
                 if (pattern != null) {
                     LOG.debug("pattern found for {}", ul.tripId);
                     pattern.update(ul);

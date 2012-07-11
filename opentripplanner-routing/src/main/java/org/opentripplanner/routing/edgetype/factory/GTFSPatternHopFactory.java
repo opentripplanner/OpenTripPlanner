@@ -47,6 +47,7 @@ import org.opentripplanner.routing.edgetype.Board;
 import org.opentripplanner.routing.edgetype.Dwell;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.FrequencyAlight;
+import org.opentripplanner.routing.edgetype.FrequencyBasedTripPattern;
 import org.opentripplanner.routing.edgetype.FrequencyBoard;
 import org.opentripplanner.routing.edgetype.FrequencyDwell;
 import org.opentripplanner.routing.edgetype.FrequencyHop;
@@ -59,17 +60,16 @@ import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
+import org.opentripplanner.routing.edgetype.ScheduledStopPattern;
 import org.opentripplanner.routing.edgetype.TimedTransferEdge;
 import org.opentripplanner.routing.edgetype.TransferEdge;
+import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.FareServiceFactory;
-import org.opentripplanner.routing.trippattern.FrequencyBasedTripPattern;
-import org.opentripplanner.routing.trippattern.ScheduledStopPattern;
-import org.opentripplanner.routing.trippattern.TripPattern;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.routing.vertextype.PatternDepartVertex;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
@@ -92,9 +92,9 @@ class InterliningTrip  implements Comparable<InterliningTrip> {
     public Trip trip;
     public StopTime firstStopTime;
     public StopTime lastStopTime;
-    TripPattern tripPattern;
+    TableTripPattern tripPattern;
 
-    InterliningTrip(Trip trip, List<StopTime> stopTimes, TripPattern tripPattern) {
+    InterliningTrip(Trip trip, List<StopTime> stopTimes, TableTripPattern tripPattern) {
         this.trip = trip;
         this.firstStopTime = stopTimes.get(0);
         this.lastStopTime = stopTimes.get(stopTimes.size() - 1);
@@ -146,10 +146,10 @@ class BlockIdAndServiceId {
 class InterlineSwitchoverKey {
 
     public Stop s0, s1;
-    public TripPattern pattern1, pattern2;
+    public TableTripPattern pattern1, pattern2;
 
     public InterlineSwitchoverKey(Stop s0, Stop s1, 
-        TripPattern pattern1, TripPattern pattern2) {
+        TableTripPattern pattern1, TableTripPattern pattern2) {
         this.s0 = s0;
         this.s1 = s1;
         this.pattern1 = pattern1;
@@ -199,7 +199,7 @@ public class GTFSPatternHopFactory {
 
     private Map<InterlineSwitchoverKey, PatternInterlineDwell> interlineDwells = new HashMap<InterlineSwitchoverKey, PatternInterlineDwell>();
 
-    HashMap<ScheduledStopPattern, TripPattern> patterns = new HashMap<ScheduledStopPattern, TripPattern>();
+    HashMap<ScheduledStopPattern, TableTripPattern> patterns = new HashMap<ScheduledStopPattern, TableTripPattern>();
 
     /* maps replacing label lookup */
     private Map<Stop, Vertex> stopNodes = new HashMap<Stop, Vertex>();
@@ -332,10 +332,10 @@ public class GTFSPatternHopFactory {
             /* this trip is not frequency-based, add it to the corresponding trip pattern */
             // maybe rename ScheduledStopPattern to TripPatternKey?
             ScheduledStopPattern stopPattern = ScheduledStopPattern.fromTrip(trip, _dao);
-            TripPattern tripPattern = patterns.get(stopPattern);
+            TableTripPattern tripPattern = patterns.get(stopPattern);
             if (tripPattern == null) {
                 // it's the first time we are encountering this stops+pickups+serviceId combination
-                tripPattern = new TripPattern(trip, stopPattern);
+                tripPattern = new TableTripPattern(trip, stopPattern);
                 makePatternVerticesAndEdges(graph, tripPattern, trip, stopTimes);
                 patterns.put(stopPattern, tripPattern);
             } 
@@ -488,9 +488,9 @@ public class GTFSPatternHopFactory {
             createdEdges.add(alight);
         }
 
-        pattern.setTripFlags(((trip.getWheelchairAccessible() == 1) ? TripPattern.FLAG_WHEELCHAIR_ACCESSIBLE : 0)
+        pattern.setTripFlags(((trip.getWheelchairAccessible() == 1) ? TableTripPattern.FLAG_WHEELCHAIR_ACCESSIBLE : 0)
         | (((trip.getRoute().getBikesAllowed() == 2 && trip.getTripBikesAllowed() != 1)
-            || trip.getTripBikesAllowed() == 2) ? TripPattern.FLAG_BIKES_ALLOWED : 0));
+            || trip.getTripBikesAllowed() == 2) ? TableTripPattern.FLAG_BIKES_ALLOWED : 0));
 
         return pattern;
     }
@@ -657,7 +657,7 @@ public class GTFSPatternHopFactory {
            nDeleted, nDwells);
     }
 
-    private void addTripToInterliningMap(Trip trip, List<StopTime> stopTimes, TripPattern tripPattern) {
+    private void addTripToInterliningMap(Trip trip, List<StopTime> stopTimes, TableTripPattern tripPattern) {
         String blockId = trip.getBlockId();
         BlockIdAndServiceId key = new BlockIdAndServiceId(blockId, trip.getServiceId()); 
         List<InterliningTrip> trips = tripsForBlock.get(key);
@@ -744,7 +744,7 @@ public class GTFSPatternHopFactory {
      * StopTimes are passed in instead of Stops only because they are needed for shape distances.
      * Trips will be added to the tripPattern later.
      */
-    private void makePatternVerticesAndEdges(Graph graph, TripPattern tripPattern, 
+    private void makePatternVerticesAndEdges(Graph graph, TableTripPattern tripPattern, 
             Trip trip, List<StopTime> stopTimes) {
 
         TraverseMode mode = GtfsLibrary.getTraverseMode(trip.getRoute());

@@ -26,7 +26,6 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.trippattern.TripPattern;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
@@ -53,7 +52,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
     private int modeMask;
 
     public PatternBoard(TransitStopDepart fromStopVertex, PatternStopVertex toPatternVertex, 
-            TripPattern pattern, int stopIndex, TraverseMode mode) {
+            TableTripPattern pattern, int stopIndex, TraverseMode mode) {
         super(fromStopVertex, toPatternVertex);
         this.stopIndex = stopIndex;
         this.modeMask = new TraverseModeSet(mode).getMask();
@@ -61,7 +60,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
 
     /** look for pattern in tov (instead of fromv as is done for all other pattern edges) */
     @Override 
-    public TripPattern getPattern() {
+    public TableTripPattern getPattern() {
         return ((PatternStopVertex) tov).getTripPattern();
     }
                            

@@ -30,12 +30,12 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.PatternBoard;
+import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
-import org.opentripplanner.routing.trippattern.TripPattern;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,7 +50,7 @@ public class LocalStopFinder {
 
     private static final double LOCAL_STOP_SEARCH_RADIUS = 1000; /* how far to search for nearby stops */
 
-    private HashSet<TripPattern> patterns;
+    private HashSet<TableTripPattern> patterns;
 
     private Graph graph;
 
@@ -60,7 +60,7 @@ public class LocalStopFinder {
 
     private RoutingRequest bikingOptions;
 
-    private HashMap<Stop, HashMap<TripPattern, P2<Double>>> neighborhoods;
+    private HashMap<Stop, HashMap<TableTripPattern, P2<Double>>> neighborhoods;
 
     private HashMap<AgencyAndId, TransitStop> transitStops;
     
@@ -71,7 +71,7 @@ public class LocalStopFinder {
 
     public void markLocalStops() {
         _log.debug("Finding local stops");
-        patterns = new HashSet<TripPattern>();
+        patterns = new HashSet<TableTripPattern>();
         transitStops = new HashMap<AgencyAndId, TransitStop>();
         int total = 0;
         for (Vertex gv : graph.getVertices()) {
@@ -83,7 +83,7 @@ public class LocalStopFinder {
             }
             for (Edge e : gv.getOutgoing()) {
                 if (e instanceof PatternBoard) {
-                    TripPattern pattern = ((PatternBoard) e).getPattern();
+                    TableTripPattern pattern = ((PatternBoard) e).getPattern();
                     patterns.add(pattern);
                 }
             }
@@ -91,21 +91,21 @@ public class LocalStopFinder {
         
         // For each pattern, check if each stop is local
 
-        neighborhoods = new HashMap<Stop, HashMap<TripPattern, P2<Double>>>();
+        neighborhoods = new HashMap<Stop, HashMap<TableTripPattern, P2<Double>>>();
 
         walkingOptions = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK));
         bikingOptions = new RoutingRequest(new TraverseModeSet(TraverseMode.BICYCLE));
         bikingOptions.optimize = OptimizeType.SAFE;
 
         int nonLocal = 0;
-        for (TripPattern pattern : patterns) {
+        for (TableTripPattern pattern : patterns) {
             List<Stop> stops = getStops(pattern);
             // a stop is local if, in order to get to all other nearby patterns, it is
             // just as good to transfer at the previous stop.
             // so, each stop in the system needs a neighborhood of patterns.
 
-            HashMap<TripPattern, P2<Double>> previousDistances = null;
-            HashMap<TripPattern, P2<Double>> distances = null;
+            HashMap<TableTripPattern, P2<Double>> previousDistances = null;
+            HashMap<TableTripPattern, P2<Double>> distances = null;
             for (int i = 0; i < stops.size() - 1; ++i) {
                 Stop stop = stops.get(i);
 
@@ -113,7 +113,7 @@ public class LocalStopFinder {
 
                 previousDistances = distances;
                 distances = getNeighborhood(stop);
-                HashMap<TripPattern, P2<Double>> nextDistances = null;
+                HashMap<TableTripPattern, P2<Double>> nextDistances = null;
                 Stop nextStop = stops.get(i + 1);
                 nextDistances = getNeighborhood(nextStop);
 
@@ -126,8 +126,8 @@ public class LocalStopFinder {
                     continue;
                 } else {
                     boolean local = true;
-                    for (Entry<TripPattern, P2<Double>> entry : distances.entrySet()) {
-                        TripPattern key = entry.getKey();
+                    for (Entry<TableTripPattern, P2<Double>> entry : distances.entrySet()) {
+                        TableTripPattern key = entry.getKey();
                         if (key == pattern) {
                             continue;
                         }
@@ -175,15 +175,15 @@ public class LocalStopFinder {
         _log.debug("Local stops: " + (total - nonLocal) + " / " + total);
     }
 
-    private HashMap<TripPattern, P2<Double>> getNeighborhood(Stop stop) {
+    private HashMap<TableTripPattern, P2<Double>> getNeighborhood(Stop stop) {
         TransitStop transitStop = getVertexForStop(stop);
-        HashMap<TripPattern, P2<Double>> neighborhood = neighborhoods.get(stop);
+        HashMap<TableTripPattern, P2<Double>> neighborhood = neighborhoods.get(stop);
         if (neighborhood == null) {
-            Set<TripPattern> nearbyPatterns = getNearbyPatterns(stop);
-            HashMap<TripPattern, Double> walkNeighborhood = getBestDistanceForPatterns(graph, transitStop, walkingOptions, nearbyPatterns);
-            HashMap<TripPattern, Double> bikeNeighborhood = getBestDistanceForPatterns(graph, transitStop, bikingOptions, nearbyPatterns);
-            neighborhood = new HashMap<TripPattern, P2<Double>>();
-            for (TripPattern p : nearbyPatterns) {
+            Set<TableTripPattern> nearbyPatterns = getNearbyPatterns(stop);
+            HashMap<TableTripPattern, Double> walkNeighborhood = getBestDistanceForPatterns(graph, transitStop, walkingOptions, nearbyPatterns);
+            HashMap<TableTripPattern, Double> bikeNeighborhood = getBestDistanceForPatterns(graph, transitStop, bikingOptions, nearbyPatterns);
+            neighborhood = new HashMap<TableTripPattern, P2<Double>>();
+            for (TableTripPattern p : nearbyPatterns) {
                 Double walkDistance = walkNeighborhood.get(p);
                 if (walkDistance == null) {
                     continue; /* if you can't walk there, there's no point */
@@ -207,8 +207,8 @@ public class LocalStopFinder {
      * @param nearbyPatterns
      * @return
      */
-    private HashMap<TripPattern, Double> getBestDistanceForPatterns(Graph graph, Vertex origin,
-            RoutingRequest options, Set<TripPattern> nearbyPatterns) {
+    private HashMap<TableTripPattern, Double> getBestDistanceForPatterns(Graph graph, Vertex origin,
+            RoutingRequest options, Set<TableTripPattern> nearbyPatterns) {
 
         // Iteration Variables
         HashSet<Vertex> closed = new HashSet<Vertex>();
@@ -218,7 +218,7 @@ public class LocalStopFinder {
         spt.add(initial);
         queue.insert(initial, 0);
 
-        HashMap<TripPattern, Double> patternCosts = new HashMap<TripPattern, Double>();
+        HashMap<TableTripPattern, Double> patternCosts = new HashMap<TableTripPattern, Double>();
 
         int patternsSeen = 0;
 
@@ -247,7 +247,7 @@ public class LocalStopFinder {
                 for (Edge e : departureVertex.getOutgoing()) {
                     if (e instanceof PatternBoard) {
                         /* finally, a PatternBoard */
-                        TripPattern pattern = ((PatternBoard) e).getPattern();
+                        TableTripPattern pattern = ((PatternBoard) e).getPattern();
                         if (nearbyPatterns.contains(pattern)) {
                             Double cost = patternCosts.get(pattern);
                             if (cost == null) {
@@ -303,12 +303,12 @@ public class LocalStopFinder {
         return transitStops.get(stop.getId());
     }
 
-    private HashSet<TripPattern> getNearbyPatterns(Stop stop) {
+    private HashSet<TableTripPattern> getNearbyPatterns(Stop stop) {
         // get all transit stops within about the LOCAL_STOP_SEARCH_RADIUS
         Coordinate c = new Coordinate(stop.getLon(), stop.getLat());
         List<Vertex> localTransitStops = indexService.getLocalTransitStops(c, LOCAL_STOP_SEARCH_RADIUS);
 
-        HashSet<TripPattern> neighborhood = new HashSet<TripPattern>();
+        HashSet<TableTripPattern> neighborhood = new HashSet<TableTripPattern>();
         for (Vertex v : localTransitStops) {
             if (v instanceof TransitStop) {
                 if (((TransitStop) v).isEntrance()) {
@@ -330,7 +330,7 @@ public class LocalStopFinder {
         return neighborhood;
     }
 
-    private List<Stop> getStops(TripPattern pattern) {
+    private List<Stop> getStops(TableTripPattern pattern) {
         return pattern.getStops();
     }
 

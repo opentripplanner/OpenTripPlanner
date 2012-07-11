@@ -22,7 +22,6 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.trippattern.TripPattern;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 
@@ -44,7 +43,7 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
     private Geometry geometry = null;
 
     public PatternHop(PatternStopVertex from, PatternStopVertex to, Stop start, Stop end, int stopIndex,
-            TripPattern tripPattern) {
+            TableTripPattern tripPattern) {
         super(from, to);
         this.start = start;
         this.end = end;

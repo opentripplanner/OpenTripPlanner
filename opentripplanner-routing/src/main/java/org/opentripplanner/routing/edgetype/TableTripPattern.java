@@ -11,7 +11,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.trippattern;
+package org.opentripplanner.routing.edgetype;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -27,6 +27,8 @@ import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.routing.trippattern.UpdateList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,9 +39,9 @@ import org.slf4j.LoggerFactory;
  * included so that information such as route name can be found. Trips are assumed to be
  * non-overtaking, so that an earlier trip never arrives after a later trip.
  */
-public class TripPattern implements Serializable {
+public class TableTripPattern implements TripPattern, Serializable {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TripPattern.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TableTripPattern.class);
 
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
     public static final int FLAG_WHEELCHAIR_ACCESSIBLE = 1;
@@ -77,7 +79,7 @@ public class TripPattern implements Serializable {
     
     int bestDwellTimes[];
 
-    public TripPattern(Trip exemplar, ScheduledStopPattern stopPattern) {
+    public TableTripPattern(Trip exemplar, ScheduledStopPattern stopPattern) {
         this.exemplar = exemplar;
         setStopsFromStopPattern(stopPattern);
     }

@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.trippattern;
+package org.opentripplanner.routing.edgetype;
 
 import java.util.ArrayList;
 

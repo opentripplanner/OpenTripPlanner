@@ -32,7 +32,7 @@ public class TripTimes implements Cloneable, Serializable {
     public final int index; // this is kind of ugly, but the headsigns are in the pattern not here
     
     @XmlElement
-    protected int[] departureTimes;
+    public int[] departureTimes;
 
     // null means all dwells are 0-length, and arrival times are to be derived from departure times
     @XmlElement

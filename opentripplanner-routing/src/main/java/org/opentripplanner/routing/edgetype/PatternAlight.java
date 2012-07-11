@@ -26,7 +26,6 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.trippattern.TripPattern;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.TransitStopArrive;
@@ -52,7 +51,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
     private int modeMask;
 
     public PatternAlight(PatternStopVertex fromPatternStop, TransitStopArrive toStationVertex,
-            TripPattern pattern, int stopIndex, TraverseMode mode) {
+            TableTripPattern pattern, int stopIndex, TraverseMode mode) {
         super(fromPatternStop, toStationVertex);
         this.stopIndex = stopIndex;
         this.modeMask = new TraverseModeSet(mode).getMask();

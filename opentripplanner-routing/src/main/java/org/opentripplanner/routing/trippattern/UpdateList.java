@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,7 +109,7 @@ public class UpdateList {
      * @param pattern
      * @return
      */
-    public int findUpdateStopIndex(TripPattern pattern) {
+    public int findUpdateStopIndex(TableTripPattern pattern) {
         if (updates == null || updates.size() < 1)
             return -1;
         List<Stop> patternStops = pattern.getStops();
