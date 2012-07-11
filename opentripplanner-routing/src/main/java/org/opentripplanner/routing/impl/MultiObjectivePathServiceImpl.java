@@ -23,6 +23,7 @@ import org.opentripplanner.routing.algorithm.strategies.BidirectionalRemainingWe
 import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.LBGRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.strategies.TransitLocalStreetService;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -117,7 +118,7 @@ public class MultiObjectivePathServiceImpl implements PathService {
         if (options.getModes().isTransit()) {
             LOG.debug("Transit itinerary requested.");
             // always use the bidirectional heuristic because the others are not precise enough
-            heuristic = new BidirectionalRemainingWeightHeuristic(options.rctx.graph);    
+            heuristic = new BidirectionalRemainingWeightHeuristic(options.rctx.graph);
         } else {
             LOG.debug("Non-transit itinerary requested.");
             heuristic = new DefaultRemainingWeightHeuristic();
@@ -221,6 +222,7 @@ public class MultiObjectivePathServiceImpl implements PathService {
                         }
 
                         double h = heuristic.computeForwardWeight(new_sv, targetVertex);
+                        if (h == Double.MAX_VALUE) continue;
 //                    for (State bs : boundingStates) {
 //                        if (eDominates(bs, new_sv)) {
 //                            continue STATE;
