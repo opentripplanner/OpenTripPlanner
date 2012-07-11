@@ -11,7 +11,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.analysis;
+package org.opentripplanner.internals;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,6 +50,7 @@ public class AnalysisUtils {
         DisjointSet<Vertex> components = getConnectedComponents(graph);
 
         Map<Integer, List<Coordinate>> componentCoordinates = new HashMap<Integer, List<Coordinate>>();
+        options.setDummyRoutingContext(graph);
         for (Vertex v : graph.getVertices()) {
             for (Edge e : v.getOutgoing()) {
                 State s0 = new State(v, time, options);

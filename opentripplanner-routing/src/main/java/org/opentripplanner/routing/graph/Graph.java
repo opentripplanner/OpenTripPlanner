@@ -35,6 +35,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
@@ -45,7 +46,7 @@ import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation;
-import org.opentripplanner.routing.core.MortonVertexComparator;
+import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
@@ -100,6 +101,10 @@ public class Graph implements Serializable {
 
     private transient Set<Edge> temporaryEdges;
 
+    private VertexComparatorFactory vertexComparatorFactory = new MortonVertexComparatorFactory();
+
+    private transient TimeZone timeZone = null;
+
     public Graph(Graph basedOn) {
         this();
         this.bundle = basedOn.getBundle();
@@ -117,7 +122,7 @@ public class Graph implements Serializable {
      * 
      * @param vv the vertex to add
      */
-    protected void addVertex(Vertex v) {
+    public void addVertex(Vertex v) {
         Vertex old = vertices.put(v.getLabel(), v);
         if (old != null) {
             if (old == v)
@@ -254,12 +259,17 @@ public class Graph implements Serializable {
     /* this will require a rehash of any existing hashtables keyed on vertices */
     private void renumberVerticesAndEdges() {
         this.vertexById = new ArrayList<Vertex>(getVertices());
-        Collections.sort(this.vertexById, new MortonVertexComparator(this.vertexById));
+        Collections.sort(this.vertexById, getVertexComparatorFactory().getComparator(vertexById));
         this.edgeById = new HashMap<Integer, Edge>();
         this.idForEdge = new HashMap<Edge, Integer>();
+        // need to renumber vertices before edges, because vertex indices are
+        // used as hashcodes, and vertex hashcodes are used for edge hashcodes
         int i = 0;
         for (Vertex v : this.vertexById) {
-            v.setIndex(i);
+            v.setIndex(i++);
+        }
+        i = 0;
+        for (Vertex v : this.vertexById) {
             int j = 0;
             for (Edge e : v.getOutgoing()) {
                 int eid = (i*100) + j;
@@ -301,16 +311,15 @@ public class Graph implements Serializable {
         BASIC, FULL, NO_HIERARCHIES, DEBUG;
     }
     
-    public static Graph load(File file, LoadLevel level) 
-        throws IOException, ClassNotFoundException {
+    public static Graph load(File file, LoadLevel level) throws IOException, ClassNotFoundException {
         LOG.info("Reading graph " + file.getAbsolutePath() + " ...");
         // cannot use getClassLoader() in static context
         ObjectInputStream in = new ObjectInputStream (new FileInputStream(file));
         return load(in, level);
     }
-    
-    public static Graph load(ClassLoader classLoader, File file, LoadLevel level) 
-        throws IOException, ClassNotFoundException {
+
+    public static Graph load(ClassLoader classLoader, File file, LoadLevel level)
+            throws IOException, ClassNotFoundException {
         LOG.info("Reading graph " + file.getAbsolutePath() + " with alternate classloader ...");
         ObjectInputStream in = new GraphObjectInputStream(
                 new BufferedInputStream (new FileInputStream(file)), classLoader);
@@ -323,7 +332,7 @@ public class Graph implements Serializable {
     }
 
     @SuppressWarnings("unchecked")
-	private static Graph load(ObjectInputStream in, LoadLevel level) 
+	public static Graph load(ObjectInputStream in, LoadLevel level) 
         throws IOException, ClassNotFoundException {
         try {
             Graph graph = (Graph) in.readObject();
@@ -401,35 +410,41 @@ public class Graph implements Serializable {
     public void save(File file) throws IOException {
         LOG.info("Main graph size: |V|={} |E|={}", this.countVertices(), this.countEdges());
         LOG.info("Writing graph " + file.getAbsolutePath() + " ...");
-        ObjectOutputStream out = new ObjectOutputStream(
-                new BufferedOutputStream(new FileOutputStream(file)));
+        ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(
+                new FileOutputStream(file)));
         try {
-            LOG.debug("Consolidating edges...");
-            // this is not space efficient
-            List<Edge> edges = new ArrayList<Edge>(this.countEdges());
-            for (Vertex v : getVertices()) {
-                // there are assumed to be no edges in an incoming list that are not in an outgoing
-                // list
-                edges.addAll(v.getOutgoing());
-                if (v.getDegreeOut() + v.getDegreeIn() == 0)
-                    LOG.debug("vertex {} has no edges, it will not survive serialization.", v);
-            }
-            LOG.debug("Assigning vertex/edge ID numbers...");
-            this.renumberVerticesAndEdges();
-            LOG.debug("Writing edges...");
-            out.writeObject(this);
-            out.writeObject(edges);
-            out.writeObject(this.hierarchies);
-            LOG.debug("Writing debug data...");
-            out.writeObject(this.vertexById);
-            out.writeObject(this.edgeById);
-            out.writeObject(this.idForEdge);
+            save(out);
             out.close();
         } catch (RuntimeException e) {
             out.close();
-            file.delete(); //remove half-written file
+            file.delete(); // remove half-written file
             throw e;
         }
+    }
+
+    public void save(ObjectOutputStream out) throws IOException {
+        LOG.debug("Consolidating edges...");
+        // this is not space efficient
+        List<Edge> edges = new ArrayList<Edge>(this.countEdges());
+        for (Vertex v : getVertices()) {
+            // there are assumed to be no edges in an incoming list that are not
+            // in an outgoing
+            // list
+            edges.addAll(v.getOutgoing());
+            if (v.getDegreeOut() + v.getDegreeIn() == 0)
+                LOG.debug("vertex {} has no edges, it will not survive serialization.", v);
+        }
+        LOG.debug("Assigning vertex/edge ID numbers...");
+        this.renumberVerticesAndEdges();
+        LOG.debug("Writing edges...");
+        out.writeObject(this);
+        out.writeObject(edges);
+        out.writeObject(this.hierarchies);
+        LOG.debug("Writing debug data...");
+        out.writeObject(this.vertexById);
+        out.writeObject(this.edgeById);
+        out.writeObject(this.idForEdge);
+
         LOG.info("Graph written.");
     }
     
@@ -506,6 +521,44 @@ public class Graph implements Serializable {
 
     public Collection<Edge> getTemporaryEdges() {
         return temporaryEdges;
+    }
+
+    public VertexComparatorFactory getVertexComparatorFactory() {
+        return vertexComparatorFactory;
+    }
+
+    public void setVertexComparatorFactory(VertexComparatorFactory vertexComparatorFactory) {
+        this.vertexComparatorFactory = vertexComparatorFactory;
+    }
+    
+    /**
+     * Returns the time zone for the first agency in this graph. This is used to interpret
+     * times in API requests. The JVM default time zone cannot be used because we support 
+     * multiple graphs on one server via the routerId.
+     * Ideally we would want to interpret times in the time zone of the geographic location
+     * where the origin/destination vertex or board/alight event is located. This may become
+     * necessary when we start making graphs with long distance train, boat, or air services. 
+     */
+    public TimeZone getTimeZone() {
+        if (timeZone  == null) {
+            Collection<String> agencyIds = this.getAgencyIds();
+            if (agencyIds.size() == 0) {
+                timeZone = TimeZone.getTimeZone("GMT");
+                LOG.warn("graph contains no agencies; API request times will be interpreted as GMT.");
+            } else {
+                CalendarService cs = this.getCalendarService();
+                for (String agencyId : agencyIds) {
+                    TimeZone tz = cs.getTimeZoneForAgencyId(agencyId);
+                    if (timeZone == null) {
+                        LOG.debug("graph time zone set to {}", tz);
+                        timeZone = tz;
+                    } else if ( ! timeZone.equals(tz)) {
+                        LOG.error("agency time zone differs from graph time zone: {}", tz);
+                    }
+                }
+            }
+        }
+        return timeZone;
     }
 
 }

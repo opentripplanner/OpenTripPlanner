@@ -2,16 +2,21 @@ package org.opentripplanner.api.common;
 
 import java.util.List;
 import java.util.Date;
+import java.util.TimeZone;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.QueryParam;
 import javax.xml.datatype.DatatypeConfigurationException;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.PrototypeRoutingRequest;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * This class defines all the JAX-RS query parameters for a path search as fields, allowing them to 
@@ -57,7 +62,7 @@ public abstract class RoutingResource {
     @DefaultValue("false") @QueryParam("wheelchair") protected List<Boolean> wheelchair;
 
     /** The maximum distance (in meters) the user is willing to walk. Defaults to approximately 1/2 mile. */
-    @DefaultValue("800") @QueryParam("maxWalkDistance") protected List<Double> maxWalkDistance;
+    @DefaultValue("-1") @QueryParam("maxWalkDistance") protected List<Double> maxWalkDistance;
 
     /** The user's walking speed in meters/second. Defaults to approximately 3 MPH. */
     @QueryParam("walkSpeed") protected List<Double> walkSpeed;
@@ -80,10 +85,10 @@ public abstract class RoutingResource {
     /** The minimum time, in seconds, between successive trips on different vehicles.
      *  This is designed to allow for imperfect schedule adherence.  This is a minimum;
      *  transfers over longer distances might use a longer time. */
-    @DefaultValue("240") @QueryParam("minTransferTime") protected List<Integer> minTransferTime;
+    @DefaultValue("-1") @QueryParam("minTransferTime") protected List<Integer> minTransferTime;
 
     /** The maximum number of possible itineraries to return. */
-    @DefaultValue("3") @QueryParam("numItineraries") protected List<Integer> numItineraries;
+    @DefaultValue("-1") @QueryParam("numItineraries") protected List<Integer> numItineraries;
 
     /** The list of preferred routes.  The format is agency_route, so TriMet_100. */
     @DefaultValue("") @QueryParam("preferredRoutes") protected List<String> preferredRoutes;
@@ -104,17 +109,37 @@ public abstract class RoutingResource {
      *  internal weight units, which are roughly equivalent to seconds.  Set this to a high
      *  value to discourage transfers.  Of course, transfers that save significant
      *  time or walking will still be taken.*/
-    @DefaultValue("0") @QueryParam("transferPenalty") protected List<Integer> transferPenalty;
+    @DefaultValue("-1") @QueryParam("transferPenalty") protected List<Integer> transferPenalty;
     
     /** The maximum number of transfers (that is, one plus the maximum number of boardings)
      *  that a trip will be allowed.  Larger values will slow performance, but could give
      *  better routes.  This is limited on the server side by the MAX_TRANSFERS value in
      *  org.opentripplanner.api.ws.Planner. */
-    @DefaultValue("2") @QueryParam("maxTransfers") protected List<Integer> maxTransfers;
+    @DefaultValue("-1") @QueryParam("maxTransfers") protected List<Integer> maxTransfers;
 
     /** If true, goal direction is turned off and a full path tree is built (specify only once) */
     @DefaultValue("false") @QueryParam("batch") protected List<Boolean> batch;
-    
+
+    /** A transit stop required to be the first stop in the search */
+    @DefaultValue("") @QueryParam("startTransitStopId") protected List<String> startTransitStopId;
+
+    /* 
+     * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
+     * this should ideally be done when setting the routing context, but at present departure/
+     * arrival time is stored in the request as an epoch time with the TZ already resolved, and other
+     * code depends on this behavior. (AMB)
+     * Alternatively, we could eliminate the separate RoutingRequest objects and just resolve
+     * vertices and timezones here right away, but just ignore them in semantic equality checks.
+     */
+    @Autowired
+    protected GraphService graphService;
+
+    @Autowired
+    protected PrototypeRoutingRequest prototypeRoutingRequest;
+
+    @DefaultValue("-1") @QueryParam("boardSlack") private List<Integer> boardSlack;
+    @DefaultValue("-1") @QueryParam("alightSlack") private List<Integer> alightSlack;
+
     /** 
      * Build the 0th Request object from the query parameter lists. 
      * @throws ParameterException when there is a problem interpreting a query parameter
@@ -130,30 +155,38 @@ public abstract class RoutingResource {
      * @throws ParameterException when there is a problem interpreting a query parameter
      */
     protected RoutingRequest buildRequest(int n) throws ParameterException {
-        RoutingRequest request = new RoutingRequest();
-        request.setRouterId(get(routerId, n, ""));
-        request.setFrom(get(fromPlace, n, null));
-        request.setTo(get(toPlace, n, null));
+        RoutingRequest request = prototypeRoutingRequest.clone();
+        request.setRouterId(get(routerId, n, request.getRouterId()));
+        request.setFrom(get(fromPlace, n, request.getFromPlace().getRepresentation()));
+        request.setTo(get(toPlace, n, request.getToPlace().getRepresentation()));
         {
+            //FIXME: get defaults for these from request
             String d = get(date, n, null);
             String t = get(time, n, null);
+            TimeZone tz;
+            if (graphService != null) { // in tests it will be null
+                tz = graphService.getGraph(request.routerId).getTimeZone();
+            } else {
+                LOG.warn("no graph service available, using default timezone.");
+                tz = TimeZone.getDefault();
+            }
             if (d == null && t != null) { 
                 LOG.debug("parsing ISO datetime {}", t);
                 try { // Full ISO date in time param ?
                     request.setDateTime(javax.xml.datatype.DatatypeFactory.newInstance()
                            .newXMLGregorianCalendar(t).toGregorianCalendar().getTime());
                 } catch (DatatypeConfigurationException e) {
-                    request.setDateTime(d, t);
+                    request.setDateTime(d, t, tz);
                 }
             } else {
-                request.setDateTime(d, t);
+                request.setDateTime(d, t, tz);
             }
         }
-        request.setWheelchair(get(wheelchair, n, false));
-        request.setNumItineraries(get(numItineraries, n, 3));
-        request.setMaxWalkDistance(get(maxWalkDistance, n, 840.0));
-        request.setWalkSpeed(get(walkSpeed, n, 1.33));
-        OptimizeType opt = get(optimize, n, OptimizeType.QUICK);
+        request.setWheelchairAccessible(get(wheelchair, n, request.isWheelchairAccessible()));
+        request.setNumItineraries(get(numItineraries, n, request.getNumItineraries()));
+        request.setMaxWalkDistance(get(maxWalkDistance, n, request.getMaxWalkDistance()));
+        request.setWalkSpeed(get(walkSpeed, n, request.getWalkSpeed()));
+        OptimizeType opt = get(optimize, n, request.getOptimize());
         {
             Double tsafe =  get(triangleSafetyFactor, n, null);
             Double tslope = get(triangleSlopeFactor,  n, null);
@@ -178,37 +211,59 @@ public abstract class RoutingResource {
             }
         }
         request.setArriveBy(get(arriveBy, n, false));
-        request.setShowIntermediateStops(get(showIntermediateStops, n, false));
+        request.setShowIntermediateStops(get(showIntermediateStops, n, request.isShowIntermediateStops()));
         /* intermediate places and their ordering are shared because they are themselves a list */
         if (intermediatePlaces != null && intermediatePlaces.size() > 0 
             && ! intermediatePlaces.get(0).equals("")) {
             request.setIntermediatePlaces(intermediatePlaces);
         }
         if (intermediatePlacesOrdered == null)
-            intermediatePlacesOrdered = true;
+            intermediatePlacesOrdered = request.isIntermediatePlacesOrdered();
         request.setIntermediatePlacesOrdered(intermediatePlacesOrdered);
-        request.setPreferredRoutes(get(preferredRoutes, n, ""));
-        request.setUnpreferredRoutes(get(unpreferredRoutes, n, ""));
-        request.setBannedRoutes(get(bannedRoutes, n, ""));
+        request.setPreferredRoutes(get(preferredRoutes, n, request.getPreferredRouteStr()));
+        request.setUnpreferredRoutes(get(unpreferredRoutes, n, request.getUnpreferredRouteStr()));
+        request.setBannedRoutes(get(bannedRoutes, n, request.getBannedRouteStr()));
         // replace deprecated optimization preference
         // opt has already been assigned above
         if (opt == OptimizeType.TRANSFERS) {
             opt = OptimizeType.QUICK;
             request.setTransferPenalty(get(transferPenalty, n, 0) + 1800);
         } else {
-            request.setTransferPenalty(get(transferPenalty, n, 0));
+            request.setTransferPenalty(get(transferPenalty, n, request.getTransferPenalty()));
         }
-        request.setBatch(get(batch, n, new Boolean(false)));
+        request.setBatch(get(batch, n, new Boolean(request.isBatch())));
         request.setOptimize(opt);
-        request.setModes(get(modes, n, new TraverseModeSet("WALK,TRANSIT")));
-        request.setMinTransferTime(get(minTransferTime, n, 0));
-        request.setMaxTransfers(get(maxTransfers, n, 2));
+        TraverseModeSet modeSet = get(modes, n, request.getModes());
+        request.setModes(modeSet);
+        if (modeSet.getBicycle() && modeSet.getWalk()) {
+            //slower bike speed for bike sharing, based on empirical evidence from DC.
+            request.setBikeSpeed(3.5);
+        }
+        request.setBoardSlack(get(boardSlack, n, request.getBoardSlack()));
+        request.setAlightSlack(get(alightSlack, n, request.getAlightSlack()));
+        request.setTransferSlack(get(minTransferTime, n, request.getTransferSlack()));
+
+        if (request.getBoardSlack() + request.getAlightSlack() > request.getTransferSlack()) {
+            throw new RuntimeException("Invalid parameters: transfer slack must "
+                    + "be greater than or equal to board slack plus alight slack");
+        }
+
+        request.setMaxTransfers(get(maxTransfers, n, request.getMaxTransfers()));
         final long NOW_THRESHOLD_MILLIS = 15 * 60 * 60 * 1000;
         boolean tripPlannedForNow = Math.abs(request.getDateTime().getTime() - new Date().getTime()) 
                 < NOW_THRESHOLD_MILLIS;
         request.setUseBikeRentalAvailabilityInformation(tripPlannedForNow);
-        if (intermediatePlaces != null && intermediatePlacesOrdered && request.getModes().isTransit())
-            throw new UnsupportedOperationException("TSP is not supported for transit trips");
+        if (request.getIntermediatePlaces() != null
+                && (request.getModes().isTransit() || 
+                        (request.getModes().getWalk() && 
+                         request.getModes().getBicycle())))
+            throw new UnsupportedOperationException("TSP is not supported for transit or bike share trips");
+
+        String startTransitStopId = get(this.startTransitStopId, n,
+                AgencyAndId.convertToString(request.getStartingTransitStopId()));
+        if (startTransitStopId != null && !"".equals(startTransitStopId)) {
+            request.setStartingTransitStopId(AgencyAndId.convertFromString(startTransitStopId));
+        }
         return request;
     }
     
@@ -224,7 +279,13 @@ public abstract class RoutingResource {
         int maxIndex = l.size() - 1;
         if (n > maxIndex)
             n = maxIndex;
-        return l.get(n);
+        T value = l.get(n);
+        if (value instanceof Integer) {
+            if (value.equals(-1)) {
+                return defaultValue;
+            }
+        }
+        return value;
     }
 
 }

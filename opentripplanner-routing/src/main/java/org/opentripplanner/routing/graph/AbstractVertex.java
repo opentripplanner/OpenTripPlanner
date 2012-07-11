@@ -25,8 +25,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.opentripplanner.common.MavenVersion;
-import org.opentripplanner.common.geometry.DistanceLibrary;
-import org.opentripplanner.common.geometry.Pointlike;
 import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -82,27 +80,8 @@ public abstract class AbstractVertex implements Vertex {
         this(g, label, x, y);
         this.name = name;
     }
-
     
     /* PUBLIC METHODS */
-    
-    /** Distance in meters to the coordinate */
-    @Override
-    public double distance(Coordinate c) {
-        return DistanceLibrary.distance(getY(), getX(), c.y, c.x);
-    }
-
-    /** Distance in meters to the vertex */
-    @Override
-    public double distance(Pointlike p) {
-        return DistanceLibrary.distance(getLat(), getLon(), p.getLat(), p.getLon());
-    }
-    
-    /** Fast, slightly approximated, under-estimated distance in meters to the vertex */
-    @Override
-    public double fastDistance(Pointlike p) {
-        return DistanceLibrary.fastDistance(getLat(), getLon(), p.getLat(), p.getLon());
-    }
 
     @Override
     public String toString() {
@@ -196,12 +175,10 @@ public abstract class AbstractVertex implements Vertex {
         return y;
     }
 
-    @Override
     public double getLon() {
         return x;
     }
 
-    @Override
     public double getLat() {
         return y;
     }

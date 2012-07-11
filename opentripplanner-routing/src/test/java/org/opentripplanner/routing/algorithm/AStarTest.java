@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -282,7 +282,7 @@ public class AStarTest {
 
         @Override
         public double getDistance() {
-            return DistanceLibrary.distance(getFromVertex().getCoordinate(), getToVertex()
+            return SphericalDistanceLibrary.getInstance().distance(getFromVertex().getCoordinate(), getToVertex()
                     .getCoordinate());
         }
     }

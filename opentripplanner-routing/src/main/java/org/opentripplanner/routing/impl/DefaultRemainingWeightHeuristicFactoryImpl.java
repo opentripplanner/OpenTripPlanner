@@ -35,7 +35,7 @@ public class DefaultRemainingWeightHeuristicFactoryImpl
 
     @Override
     public RemainingWeightHeuristic getInstanceForSearch(RoutingRequest opt) {
-        LOG.debug("Using Euclidean heuristic independent of search type.");
+        //LOG.debug("Using Euclidean heuristic independent of search type.");
         return new DefaultRemainingWeightHeuristic();
     }
 

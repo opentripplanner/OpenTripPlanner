@@ -19,6 +19,13 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 
+/**
+ * A patch modifies a graph by filtering edge traversals.  Traversals 
+ * can either be forbidden entirely (in the case of cancelled service), or
+ * modified (for instance, to add an alert). 
+ * @author novalis
+ *
+ */
 public interface Patch extends Serializable {
     public Alert getAlert();
 

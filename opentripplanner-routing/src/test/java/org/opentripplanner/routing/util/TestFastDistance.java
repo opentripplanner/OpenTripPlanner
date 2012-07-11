@@ -18,6 +18,7 @@ import java.util.Random;
 import junit.framework.TestCase;
 
 import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 
 public class TestFastDistance extends TestCase {
 
@@ -31,14 +32,15 @@ public class TestFastDistance extends TestCase {
     	// Seed the random generator, if we have a failure
     	// we'd like to be able to reproduce it...
     	Random r = new Random(42);
+    	DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
     	
     	for (int i = 0; i < N_TEST; i++) {
     		double lat1 = r.nextDouble() * 2.0 * MAX_LAT - MAX_LAT;
     		double lon1 = r.nextDouble() * 360.0;
     		double lat2 = lat1 + r.nextDouble() * 2.0 * MAX_DELTA_LAT - MAX_DELTA_LAT;
     		double lon2 = lon1 + r.nextDouble() * 2.0 * MAX_DELTA_LON - MAX_DELTA_LON;
-    		double de = DistanceLibrary.distance(lat1, lon1, lat2, lon2);
-    		double da = DistanceLibrary.fastDistance(lat1, lon1, lat2, lon2);
+    		double de = distanceLibrary.distance(lat1, lon1, lat2, lon2);
+    		double da = distanceLibrary.fastDistance(lat1, lon1, lat2, lon2);
     		assertTrue(da <= de);
     		assertTrue(da >= de / 1.00054);
     	}

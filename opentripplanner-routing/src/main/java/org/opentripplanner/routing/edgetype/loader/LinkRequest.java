@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -12,6 +13,7 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.edgetype.FreeEdge;
@@ -50,9 +52,12 @@ public class LinkRequest {
     private Boolean result;
 
     private List<Edge> edgesAdded = new ArrayList<Edge>();
+
+    private DistanceLibrary distanceLibrary;
     
     public LinkRequest(NetworkLinkerLibrary linker) {
         this.linker = linker;
+        this.distanceLibrary = linker.getDistanceLibrary();
     }
     
     /**
@@ -119,7 +124,7 @@ public class LinkRequest {
             List<StreetVertex> atIntersection = linker.index.getIntersectionAt(coordinate);
             if (atIntersection != null) {
                 // if so, the stop can be linked directly to all vertices at the intersection
-                if (edges.getScore() > atIntersection.get(0).distance(coordinate))
+                if (edges.getScore() > distanceLibrary.distance(atIntersection.get(0).getCoordinate(), coordinate))
                     return atIntersection;
             }
             return getSplitterVertices(vertexLabel, edges.toEdgeList(), coordinate);
@@ -287,7 +292,17 @@ public class LinkRequest {
      * @return the new replacement edge pair
      */
     private P2<PlainStreetEdge> replace(Collection<StreetEdge> edges) {
-        /* find the two most common starting points in this edge bundle */ 
+        /* find the two most common starting points in this edge bundle */
+        if (edges.size() == 2) {
+            //special case for two PSEs (an already-replaced bundle from transit linking)
+            Iterator<StreetEdge> it = edges.iterator();
+            Edge firstEdge = it.next();
+            Edge secondEdge = it.next();
+            if (firstEdge instanceof PlainStreetEdge && secondEdge instanceof PlainStreetEdge) {
+                return new P2<PlainStreetEdge>((PlainStreetEdge) firstEdge, (PlainStreetEdge) secondEdge);
+            }
+        }
+
         P2<Entry<TurnVertex, Set<Edge>>> ends = findEndVertices(edges);
 
         Entry<TurnVertex, Set<Edge>> start = ends.getFirst();

@@ -32,6 +32,7 @@ public abstract class Tile {
         modelsByStyle.put(Style.DIFFERENCE, buildDifferenceColorMap());
         modelsByStyle.put(Style.TRANSPARENT, buildTransparentColorMap());
         modelsByStyle.put(Style.MASK, buildMaskColorMap(90));
+        modelsByStyle.put(Style.BOARDINGS, buildBoardingColorMap());
     }
     
     /* INSTANCE */
@@ -162,6 +163,21 @@ public abstract class Tile {
         return new IndexColorModel(8, 256, r, g, b, a);
     }
 
+    private static IndexColorModel buildBoardingColorMap() {
+        byte[] r = new byte[256];
+        byte[] g = new byte[256];
+        byte[] b = new byte[256];
+        byte[] a = new byte[256];
+        Arrays.fill(a, (byte) 80);
+        g[0] = (byte) 255;
+        b[1] = (byte) 255;
+        r[2] = (byte) 255;
+        g[2] = (byte) 255;
+        r[3] = (byte) 255;
+        a[255] = 0;
+        return new IndexColorModel(8, 256, r, g, b, a);
+    }
+
     protected BufferedImage getEmptyImage(Style style) {
         IndexColorModel colorModel = modelsByStyle.get(style);
         if (colorModel == null)
@@ -179,7 +195,11 @@ public abstract class Tile {
         for (Sample s : getSamples()) {
             byte pixel;
             if (s != null) {
-                pixel = s.evalByte(spt);
+                if (renderRequest.style == Style.BOARDINGS) {
+                    pixel = s.evalBoardings(spt);
+                } else {
+                    pixel = s.evalByte(spt); // renderRequest.style
+                }
             } else {
                 pixel = TRANSPARENT;
             }

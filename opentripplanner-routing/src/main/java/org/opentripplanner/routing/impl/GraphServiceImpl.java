@@ -36,8 +36,9 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
     private String resourcePattern;
 
     private Map<String, Graph> graphs = new HashMap<String, Graph>();
+    private Map<String, LoadLevel> levels = new HashMap<String, LoadLevel>();
 
-    private LoadLevel loadLevel;
+    private LoadLevel loadLevel = LoadLevel.FULL;
     
     private String defaultRouterId = "";
     
@@ -98,24 +99,31 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
         }
         LOG.debug("graph for routerId '{}' is at {}", routerId, resourceName);
         graph = graphs.get(resourceName);
+        LoadLevel level = levels.get(resourceName);
+        if (level != loadLevel) {
+            graph = null; //force reload at new load level
+        }
         if (graph == null) {
             LOG.debug("this graph was not yet loaded");
             InputStream is;
-			try {
-				Resource resource = resourceLoader.getResource(resourceName.concat("/Graph.obj"));
-				is = resource.getInputStream();
-			} catch (Exception e) {
-	            LOG.warn("graph file not found at {}", resourceName);
-	            if (routerId.equals(defaultRouterId)) {
-	            	LOG.warn("graph for default routerId {} does not exist at {}", routerId, resourceName);
-	            	return null;
-	            }
-	            return getGraph(null); // fall back on default if graph does not exist
-			}
             try {
-            	graph = Graph.load(is, LoadLevel.FULL);
+                Resource resource = resourceLoader.getResource(resourceName.concat("/Graph.obj"));
+                is = resource.getInputStream();
+            } catch (Exception e) {
+                LOG.warn("graph file not found or not openable at {}", resourceName);
+                if (routerId.equals(defaultRouterId)) {
+                    LOG.warn("graph for default routerId {} does not exist or cannot be opened at {}",
+                             routerId, resourceName);
+                    e.printStackTrace();
+                    return null;
+                }
+                return getGraph(null); // fall back on default if graph does not exist
+            }
+            try {
+            	graph = Graph.load(is, loadLevel);
             	// key on resource name instead of routerId so fallbacks to defaultRouterId will all yield the same Graph
                 graphs.put(resourceName, graph);
+                levels.put(resourceName, loadLevel);
             } catch (Exception ex) {
                 LOG.error("Exception while loading graph from {}.", resourceName);
                 throw new RuntimeException("error loading graph from " + resourceName, ex);

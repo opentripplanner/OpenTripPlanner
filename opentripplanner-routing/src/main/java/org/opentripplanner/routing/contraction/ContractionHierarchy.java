@@ -37,6 +37,8 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
+import org.opentripplanner.routing.pathparser.BasicPathParser;
+import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.util.NullExtraEdges;
@@ -585,10 +587,14 @@ public class ContractionHierarchy implements Serializable {
     	upOptions.setArriveBy(false);
     	upOptions.dateTime = time;
     	upOptions.setRoutingContext(graph, origin, target);
+    	upOptions.rctx.pathParsers = new PathParser[1];
+    	upOptions.rctx.pathParsers[0] = new BasicPathParser();
         downOptions.setArriveBy(true);
         downOptions.dateTime = time;
-        upOptions.setRoutingContext(graph, target, origin);
-
+        downOptions.setRoutingContext(graph, target, origin);
+        downOptions.rctx.pathParsers = new PathParser[1];
+        downOptions.rctx.pathParsers[0] = new BasicPathParser();
+        
     	/** max walk distance cannot be less than distances to nearest transit stops */
     	double minWalkDistance = 
     	        origin.getDistanceToNearestTransitStop() + target.getDistanceToNearestTransitStop();

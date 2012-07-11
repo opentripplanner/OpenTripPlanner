@@ -14,7 +14,6 @@ package org.opentripplanner.routing.edgetype;
 
 import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.vertextype.OnboardVertex;
-import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 
 /**

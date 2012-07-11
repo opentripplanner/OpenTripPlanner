@@ -79,7 +79,6 @@ public class FrequencyAlight extends AbstractEdge  implements OnBoardReverseEdge
         if (options.isArriveBy()) {
             /* backward traversal: find a transit trip on this pattern */
 
-            /* forward traversal: look for a transit trip on this pattern */
             if (!options.getModes().get(modeMask)) {
                 return null;
             }
@@ -108,14 +107,14 @@ public class FrequencyAlight extends AbstractEdge  implements OnBoardReverseEdge
                 if (secondsSinceMidnight < 0)
                     continue;
                 if (sd.serviceIdRunning(serviceId)) {
-                    int startTime = pattern.getNextDepartureTime(stopIndex, secondsSinceMidnight,
+                    int startTime = pattern.getPreviousArrivalTime(stopIndex, secondsSinceMidnight,
                             options.wheelchairAccessible, mode == TraverseMode.BICYCLE, true);
                     if (startTime >= 0) {
                         // a trip was found, wait will be non-negative
                         
-                        int wait = (int) (sd.time(startTime) - currentTime);
+                        int wait = (int) (currentTime - sd.time(startTime));
                         if (wait < 0)
-                            _log.error("negative wait time on board");
+                            _log.error("negative wait time on alight");
                         if (bestWait < 0 || wait < bestWait) {
                             // track the soonest departure over all relevant schedules
                             bestWait = wait;
@@ -185,7 +184,7 @@ public class FrequencyAlight extends AbstractEdge  implements OnBoardReverseEdge
             /* forward traversal: not so much to do */
             // do not alight immediately when arrive-depart dwell has been eliminated
             // this affects multi-itinerary searches
-            if (state0.getBackEdge() instanceof PatternAlight) {
+            if (state0.getBackEdge() instanceof FrequencyAlight) {
                 return null;
             }
             EdgeNarrative en = new TransitNarrative(trip, this);
@@ -243,6 +242,6 @@ public class FrequencyAlight extends AbstractEdge  implements OnBoardReverseEdge
     }
 
     public String toString() {
-        return "PatternBoard(" + getFromVertex() + ", " + getToVertex() + ")";
+        return "FrequencyAlight(" + getFromVertex() + ", " + getToVertex() + ")";
     }
 }

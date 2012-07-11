@@ -34,6 +34,12 @@ import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TimeRange;
 import com.google.transit.realtime.GtfsRealtime.TranslatedString.Translation;
 
+/**  
+ * This presently only includes GTFS-Realtime Service Alert feeds; 
+ * we hope to eventually include Trip Updates as well. 
+ * @author novalis
+ *
+ */
 public class UpdateHandler {
     private static final Logger log = LoggerFactory.getLogger(UpdateHandler.class);
 

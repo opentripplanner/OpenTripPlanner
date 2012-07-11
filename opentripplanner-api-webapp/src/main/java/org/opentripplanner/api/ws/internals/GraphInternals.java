@@ -11,10 +11,12 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.api.ws.analysis;
+package org.opentripplanner.api.ws.internals;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.ws.rs.GET;
@@ -69,21 +71,25 @@ import com.vividsolutions.jts.index.strtree.STRtree;
 public class GraphInternals {
     private GraphService graphService;
 
-    STRtree vertexIndex;
+    private HashMap<String, STRtree> vertexIndices = new HashMap<String, STRtree>();
 
-    STRtree edgeIndex;
+    private HashMap<String, STRtree> edgeIndices = new HashMap<String, STRtree>();
 
     @Required
     public void setGraphService(GraphService graphService) {
         this.graphService = graphService;
     }
 
-    public synchronized void initIndexes() {
+    public synchronized void initIndexes(String routerId) {
+        STRtree vertexIndex = vertexIndices.get(routerId);
         if (vertexIndex != null) {
             return;
         }
+        vertexIndex = new STRtree();
+        STRtree edgeIndex = new STRtree();
+
         graphService.setLoadLevel(LoadLevel.DEBUG);
-        Graph graph = graphService.getGraph();
+        Graph graph = graphService.getGraph(routerId);
         vertexIndex = new STRtree();
         edgeIndex = new STRtree();
         for (Vertex v : graph.getVertices()) {
@@ -102,6 +108,9 @@ public class GraphInternals {
         }
         vertexIndex.build();
         edgeIndex.build();
+        
+        vertexIndices.put(routerId, vertexIndex);
+        edgeIndices.put(routerId, edgeIndex);
     }
 
     /**
@@ -114,8 +123,9 @@ public class GraphInternals {
     @Path("/vertex")
     @Produces({ MediaType.APPLICATION_JSON })
     public Object getVertex(
-            @QueryParam("label") String label) {
-        Graph graph = graphService.getGraph();
+            @QueryParam("label") String label,
+            @QueryParam("routerId") String routerId) {
+        Graph graph = graphService.getGraph(routerId);
         Vertex vertex = graph.getVertex(label);
         if (vertex == null) {
             return null;
@@ -138,14 +148,20 @@ public class GraphInternals {
             @QueryParam("pointsOnly") boolean pointsOnly,
             @QueryParam("exactClass") String className,
             @QueryParam("skipTransit") boolean skipTransit,
-            @QueryParam("skipStreets") boolean skipStreets) {
+            @QueryParam("skipStreets") boolean skipStreets,
+            @QueryParam("routerId") String routerId 
+            ) {
 
-        initIndexes();
-
+        initIndexes(routerId);
+        
+        if (className != null && className.equals(""))
+            className = null;
+        
         Envelope envelope = getEnvelope(lowerLeft, upperRight);
 
+        STRtree vertexIndex = vertexIndices.get(routerId);
         @SuppressWarnings("unchecked")
-        List<Vertex> query = vertexIndex.query(envelope);
+        List<Vertex> query = vertexIndex .query(envelope);
         List<Vertex> filtered = new ArrayList<Vertex>();
         for (Vertex v : query) {
             if (skipTransit && v instanceof TransitVertex) continue;
@@ -164,7 +180,7 @@ public class GraphInternals {
             VertexSet out = new VertexSet();
             out.vertices = filtered;
 
-            Graph graph = graphService.getGraph();
+            Graph graph = graphService.getGraph(routerId);
             return out.withGraph(graph);
         }
     }
@@ -178,9 +194,10 @@ public class GraphInternals {
     @GET
     @Path("/verticesForEdge")
     @Produces({ MediaType.APPLICATION_JSON })
-    public Object getVerticesForEdge(@QueryParam("edge") int edgeId) {
+    public Object getVerticesForEdge(@QueryParam("edge") int edgeId, 
+            @QueryParam("routerId") String routerId) {
 
-        Graph graph = graphService.getGraph();
+        Graph graph = graphService.getGraph(routerId);
         Edge edge = graph.getEdgeById(edgeId);
 
         VertexSet out = new VertexSet();
@@ -193,6 +210,7 @@ public class GraphInternals {
 
     /**
      * Get edges connected to an vertex
+     * @param routerId 
      * 
      * @return
      */
@@ -200,9 +218,10 @@ public class GraphInternals {
     @GET
     @Path("/edgesForVertex")
     @Produces({ MediaType.APPLICATION_JSON })
-    public EdgesForVertex getEdgesForVertex(@QueryParam("vertex") String label) {
+    public EdgesForVertex getEdgesForVertex(@QueryParam("vertex") String label,
+            @QueryParam("routerId") String routerId) {
 
-        Graph graph = graphService.getGraph();
+        Graph graph = graphService.getGraph(routerId);
         Vertex vertex = graph.getVertex(label);
         if (vertex == null) {
             return null;
@@ -235,14 +254,20 @@ public class GraphInternals {
             @QueryParam("exactClass") String className,
             @QueryParam("skipTransit") boolean skipTransit,
             @QueryParam("skipStreets") boolean skipStreets,
-            @QueryParam("skipNoGeometry") boolean skipNoGeometry) {
+            @QueryParam("skipNoGeometry") boolean skipNoGeometry,
+            @QueryParam("routerId") String routerId) {
 
-        initIndexes();
+        initIndexes(routerId);
+
+        if (className != null && className.equals(""))
+            className = null;
 
         Envelope envelope = getEnvelope(lowerLeft, upperRight);
 
         EdgeSet out = new EdgeSet();
-        Graph graph = graphService.getGraph();
+        Graph graph = graphService.getGraph(routerId);
+
+        STRtree edgeIndex = edgeIndices.get(routerId);
 
         @SuppressWarnings("unchecked")
         List<Edge> query = edgeIndex.query(envelope);
@@ -269,25 +294,30 @@ public class GraphInternals {
     @Produces({ MediaType.APPLICATION_JSON })
     public FeatureCount countVertices(
             @QueryParam("lowerLeft") String lowerLeft,
-            @QueryParam("upperRight") String upperRight) {
+            @QueryParam("upperRight") String upperRight,
+            @QueryParam("routerId") String routerId) {
 
-        initIndexes();
+        initIndexes(routerId);
 
         Envelope envelope = getEnvelope(lowerLeft, upperRight);
 
         FeatureCount out = new FeatureCount();
 
         @SuppressWarnings("unchecked")
+
+        STRtree vertexIndex = vertexIndices.get(routerId);
         List<Vertex> vertexQuery = vertexIndex.query(envelope);
         out.vertices = vertexQuery.size();
         
         @SuppressWarnings("unchecked")
+        STRtree edgeIndex = edgeIndices.get(routerId);
         List<Edge> edgeQuery = edgeIndex.query(envelope);
         out.edges = edgeQuery.size();
         
         return out;
     }
 
+    /** Envelopes are in latitude, longitude format */
     public static Envelope getEnvelope(String lowerLeft, String upperRight) {
         String[] lowerLeftParts = lowerLeft.split(",");
         String[] upperRightParts = upperRight.split(",");
@@ -302,8 +332,8 @@ public class GraphInternals {
     @GET
     @Path("/annotations")
     @Produces({ MediaType.APPLICATION_JSON })
-    public Object getAnnotations() {
-        Graph graph = graphService.getGraph();
+    public Object getAnnotations(@QueryParam("routerId") String routerId) {
+        Graph graph = graphService.getGraph(routerId);
         List<GraphBuilderAnnotation> builderAnnotations = graph.getBuilderAnnotations();
 
         List<Annotation> out = new ArrayList<Annotation>();

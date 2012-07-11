@@ -13,6 +13,8 @@
 
 package org.opentripplanner.routing.edgetype.factory;
 
+import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.edgetype.TransferEdge;
@@ -25,6 +27,7 @@ import com.vividsolutions.jts.geom.LineString;
 public class TransferGraphLinker {
 
     private Graph graph;
+    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     public TransferGraphLinker(Graph graph) {
         this.graph = graph;
@@ -33,7 +36,8 @@ public class TransferGraphLinker {
     public void run() {
         for (TransferTable.Transfer transfer : graph.getTransferTable().getAllTransfers()) {
  
-            double distance = transfer.from.distance(transfer.to.getCoordinate());
+            double distance = distanceLibrary.distance(transfer.from.getCoordinate(), 
+                    transfer.to.getCoordinate());
             TransferEdge edge = null;
             switch (transfer.seconds) {
                 case TransferTable.FORBIDDEN_TRANSFER:

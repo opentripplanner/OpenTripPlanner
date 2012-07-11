@@ -143,9 +143,12 @@ public class TableTripPattern implements TripPattern, Serializable {
     
     /** 
      * Get the index of the next trip that has a stop after (or at) 
-     * afterTime at the stop at stopIndex
+     * afterTime at the stop at stopIndex. 
+     * The haveBicycle parameter must be passed in because we cannot determine whether the user
+     * is in possession of a rented bicycle from the options alone.
      */
-    public TripTimes getNextTrip(int stopIndex, int afterTime, RoutingRequest options) {
+    public TripTimes getNextTrip(int stopIndex, int afterTime, boolean haveBicycle,
+            RoutingRequest options) {
         boolean pickup = true;
         int mask = pickup ? MASK_PICKUP : MASK_DROPOFF;
         int shift = pickup ? SHIFT_PICKUP : SHIFT_DROPOFF;
@@ -153,7 +156,6 @@ public class TableTripPattern implements TripPattern, Serializable {
             return null;
         }
         boolean wheelchair = options.wheelchairAccessible;
-        boolean bicycle = options.modes.getBicycle();
         if (wheelchair && (perStopFlags[stopIndex] & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
             return null;
         }
@@ -166,7 +168,7 @@ public class TableTripPattern implements TripPattern, Serializable {
             TripTimes currTrip = tripTimes.get(i); 
             int currTime = currTrip.getDepartureTime(stopIndex);
             if (currTime >= afterTime && currTime < bestTime && 
-                    tripAcceptable(currTrip.trip, bicycle, wheelchair) && 
+                    tripAcceptable(currTrip.trip, haveBicycle, wheelchair) && 
                     ! options.bannedTrips.contains(trips.get(i).getId())) {
                 bestTrip = currTrip;
                 bestTime = currTime;
@@ -179,7 +181,8 @@ public class TableTripPattern implements TripPattern, Serializable {
      * Gets the index of the previous trip that has a stop before (or at) beforeTime at 
      * the stop at stopIndex 
      */
-    public TripTimes getPreviousTrip(int stopIndex, int beforeTime, RoutingRequest options) {
+    public TripTimes getPreviousTrip(int stopIndex, int beforeTime, boolean haveBicycle, 
+            RoutingRequest options) {
         boolean pickup = false;
         int mask = pickup ? MASK_PICKUP : MASK_DROPOFF;
         int shift = pickup ? SHIFT_PICKUP : SHIFT_DROPOFF;
@@ -187,7 +190,6 @@ public class TableTripPattern implements TripPattern, Serializable {
             return null;
         }
         boolean wheelchair = options.wheelchairAccessible;
-        boolean bicycle = options.modes.getBicycle();
         if (wheelchair && (perStopFlags[stopIndex + 1] & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
             return null;
         }
@@ -200,7 +202,7 @@ public class TableTripPattern implements TripPattern, Serializable {
             TripTimes currTrip = tripTimes.get(i); 
             int currTime = currTrip.getArrivalTime(stopIndex);
             if (currTime <= beforeTime && currTime > bestTime && 
-                    tripAcceptable(currTrip.trip, bicycle, wheelchair) &&
+                    tripAcceptable(currTrip.trip, haveBicycle, wheelchair) &&
                     ! options.bannedTrips.contains(trips.get(i).getId())) {
                 bestTrip = currTrip;
                 bestTime = currTime;

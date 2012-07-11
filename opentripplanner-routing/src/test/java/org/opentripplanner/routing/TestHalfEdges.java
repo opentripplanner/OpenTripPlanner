@@ -188,6 +188,7 @@ public class TestHalfEdges extends TestCase {
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 11, 1, 12, 34, 25);
         options.dateTime = startTime;
         options.setRoutingContext(graph, brOut, end);
+        options.setMaxWalkDistance(Double.MAX_VALUE);
         ShortestPathTree spt1 = aStar.getShortestPathTree(options);
 
         GraphPath pathBr = spt1.getPath(end, false);

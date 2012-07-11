@@ -29,6 +29,7 @@ import org.opentripplanner.common.StreetUtils;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.P2;
@@ -62,6 +63,7 @@ import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -460,8 +462,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         private ArrayList<IntersectionVertex> endpoints = new ArrayList<IntersectionVertex>();
 
         // track which vertical level each OSM way belongs to, for building elevators etc.
-        private Map<OSMWay, OSMLevel> wayLevels = new HashMap<OSMWay, OSMLevel>();
+        private Map<OSMWithTags, OSMLevel> wayLevels = new HashMap<OSMWithTags, OSMLevel>();
         private HashSet<OSMNode> _bikeRentalNodes = new HashSet<OSMNode>();
+        private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
         public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
             this.graph = graph;
@@ -699,7 +702,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                                 id = unique(id);
                                 String name = getNameForWay(areaEntity, id);
 
-                                double length = DistanceLibrary.distance(
+                                double length = distanceLibrary.distance(
                                         startEndpoint.getCoordinate(), endEndpoint.getCoordinate());
                                 PlainStreetEdge street = edgeFactory.createEdge(nodeI, nodeJ, areaEntity, startEndpoint,
                                         endEndpoint, geometry, name, length,
@@ -896,7 +899,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         }
                     }
 
-                    distance += DistanceLibrary.distance(
+                    distance += distanceLibrary.distance(
                             segmentStartOSMNode.getLat(), segmentStartOSMNode.getLon(),
                             osmEndNode.getLat(), osmEndNode.getLon());
 
@@ -1110,7 +1113,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
         }
 
-        private void getLevelsForWay(OSMWay way) {
+        private void getLevelsForWay(OSMWithTags way) {
             /* Determine OSM level for each way, if it was not already set */
             if (!wayLevels.containsKey(way)) {
                 // if this way is not a key in the wayLevels map, a level map was not
@@ -1255,6 +1258,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     for (Long node : way.getNodeRefs()) {
                         MapUtils.addToMapSet(_areasForNode, node, way);
                     }
+                    getLevelsForWay(way);
                 }
                 return;
             }
@@ -1308,6 +1312,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 for (OSMRelationMember member : relation.getMembers()) {
                     _areaWayIds.add(member.getRef());
                 }
+                getLevelsForWay(relation);
             } else if (!(relation.isTag("type", "restriction"))
                     && !(relation.isTag("type", "route") && relation.isTag("route", "road"))
                     && !(relation.isTag("type", "multipolygon") && relation.hasTag("highway"))
@@ -1337,6 +1342,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             markNodesForKeeping(_areaWaysById.values(), _areaNodes);
         }
 
+        /**
+         * After all relations, ways, and nodes are loaded, handle areas.
+         */
         public void nodesLoaded() {
             processMultipolygons();
             AREA: for (OSMWay way : _singleWayAreas) {
@@ -1480,7 +1488,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         /**
-         * Handle turn restrictions
+         * Store turn restrictions for use in StreetUtils.makeEdgeBased.
          * 
          * @param relation
          */
@@ -1620,7 +1628,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         /**
-         * Handle oneway streets, cycleways, and whatnot. See
+         * Handle oneway streets, cycleways, and other per-mode and universal access controls. See
          * http://wiki.openstreetmap.org/wiki/Bicycle for various scenarios, along with
          * http://wiki.openstreetmap.org/wiki/OSM_tags_for_routing#Oneway.
          * 
@@ -1634,7 +1642,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             Coordinate[] coordinates = geometry.getCoordinates();
             double d = 0;
             for (int i = 1; i < coordinates.length; ++i) {
-                d += DistanceLibrary.distance(coordinates[i - 1], coordinates[i]);
+                d += distanceLibrary .distance(coordinates[i - 1], coordinates[i]);
             }
 
             LineString backGeometry = (LineString) geometry.reverse();
@@ -1718,6 +1726,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             return new P2<PlainStreetEdge>(street, backStreet);
         }
 
+        /**
+         * Check OSM tags for various one-way and one-way-by-mode tags and return a pair
+         * of permissions for travel along and against the way. 
+         */
         private P2<StreetTraversalPermission> getPermissions(StreetTraversalPermission permissions, OSMWithTags way) {
 
             StreetTraversalPermission permissionsFront = permissions;
@@ -1776,6 +1788,18 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     .createEdge(_nodes.get(startNode), _nodes.get(endNode), way, start, end,
                             geometry, name, length, permissions, back);
             street.setId(id);
+
+            String highway = way.getTag("highway");
+            if ("footway".equals(highway) && way.isTag("footway", "crossing") && !way.isTag("bicycle", "designated")) {
+                street.setStreetClass(StreetEdge.CLASS_CROSSING);
+            } else if ("residential".equals(highway) || "tertiary".equals(highway)
+                    || "secondary".equals(highway) || "secondary_link".equals(highway)
+                    || "primary".equals(highway) || "primary_link".equals(highway)
+                    || "trunk".equals(highway) || "trunk_link".equals(highway)) {
+                street.setStreetClass(StreetEdge.CLASS_STREET);
+            } else {
+                street.setStreetClass(StreetEdge.CLASS_OTHERPATH);
+            }
 
             if (!way.hasTag("name")) {
                 street.setBogusName(true);

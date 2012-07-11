@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.OutEdge;
@@ -42,6 +44,8 @@ import com.vividsolutions.jts.linearref.LocationIndexedLine;
  * Also for situating bus stops in the middle of street segments.
  */
 public class StreetLocation extends AbstractVertex {
+
+    private static DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     private ArrayList<Edge> extra = new ArrayList<Edge>();
 
@@ -94,6 +98,7 @@ public class StreetLocation extends AbstractVertex {
              * previous elements of edges) */
 
             Vertex fromv = street.getFromVertex();
+            Vertex tov = street.getToVertex();
             if (street instanceof PlainStreetEdge) {
                 wheelchairAccessible |= ((PlainStreetEdge) street).isWheelchairAccessible();
             } else {
@@ -101,8 +106,15 @@ public class StreetLocation extends AbstractVertex {
             }
             boolean seen = cache.containsKey(street.getGeometry());
             /* forward edges and vertices */
-            TurnVertex edgeLocation = createHalfLocation(graph, location, label + " to "
-                    + street.getToVertex().getLabel(), name, nearestPoint, street, cache);
+            Vertex edgeLocation;
+            if (distanceLibrary .distance(nearestPoint, fromv.getCoordinate()) < 0.0001) {
+                edgeLocation = fromv;
+            } else if (distanceLibrary.distance(nearestPoint, tov.getCoordinate()) < 0.0001) {
+                edgeLocation = tov;
+            } else {
+                edgeLocation = createHalfLocation(graph, location, label + " to "
+                        + tov.getLabel(), name, nearestPoint, street, cache);
+            }
 
             if (!seen) {
                 FreeEdge l1in = new FreeEdge(location, edgeLocation);
@@ -110,8 +122,6 @@ public class StreetLocation extends AbstractVertex {
 
                 location.extra.add(l1in);
                 location.extra.add(l1out);
-                graph.addTemporaryEdge(l1in);
-                graph.addTemporaryEdge(l1out);
             }
             
             double distance = fromv.getDistanceToNearestTransitStop();
@@ -161,23 +171,22 @@ public class StreetLocation extends AbstractVertex {
             newFrom.setElevationProfile(street.getElevationProfile(0, lengthIn), false);
             newFrom.setPermission(street.getPermission());
             newFrom.setNoThruTraffic(street.isNoThruTraffic());
+            newFrom.setStreetClass(street.getStreetClass());
 
             location = new TurnVertex(null, label + " (vertex at splitter)", geometries.getSecond(), street.getName(), lengthOut,
                     false, street.getNotes());
             location.setElevationProfile(street.getElevationProfile(lengthIn, lengthIn + lengthOut), false);
             location.setPermission(street.getPermission());
+            location.setStreetClass(street.getStreetClass());
             location.setNoThruTraffic(street.isNoThruTraffic());
             
             cache.put(geometry, new P2<TurnVertex>(newFrom, location));
 
             FreeEdge free = new FreeEdge(fromv, newFrom);
             TurnEdge incoming = new TurnEdge(newFrom, location);
-
-            graph.addTemporaryEdge(free);
-            graph.addTemporaryEdge(incoming);
-            
             base.extra.add(free);
             base.extra.add(incoming);
+
         }
         Vertex tov = street.getToVertex();
         StreetEdge e;
@@ -191,7 +200,6 @@ public class StreetLocation extends AbstractVertex {
             e = outEdge;
         }
         base.extra.add(e);
-        graph.addTemporaryEdge(e);
         
         return location;
     }

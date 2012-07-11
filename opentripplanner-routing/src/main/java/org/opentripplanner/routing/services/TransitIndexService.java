@@ -58,5 +58,20 @@ public interface TransitIndexService {
 
     public Agency getAgency(String id);
 
+    /**
+     * Returns the transit center of the city -- the place where there is the highest
+     * concentration of transit.  This isn't intended to be a rigorously computed result;
+     * it's intended for display.
+     * @return
+     */
     public Coordinate getCenter();
+
+    /**
+     * Returns the overnight service break time in seconds past midnight. If none is found (that is,
+     * there is a trip every minute of the day), returns -1. This may give weird results on tiny
+     * systems with irregular hours of service, but we don't expect the relevant APIs to be used in
+     * these cases.
+     * 
+     */
+    int getOvernightBreak();
 }

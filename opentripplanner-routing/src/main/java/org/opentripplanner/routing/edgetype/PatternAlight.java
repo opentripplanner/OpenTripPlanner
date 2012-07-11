@@ -97,6 +97,9 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             int bestWait = -1;
             TripTimes bestTripTimes = null;
             AgencyAndId serviceId = getPattern().getExemplar().getServiceId();
+            // get the non-transit mode, mostly to determine whether the user is carrying a bike
+            // this should maybe be done differently (using mode only for traversal permissions).
+            TraverseMode nonTransitMode = state0.getNonTransitMode(options);
             SD: for (ServiceDay sd : rctx.serviceDays) {
                 int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
                 // only check for service on days that are not in the future
@@ -104,7 +107,8 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
                 if (secondsSinceMidnight < 0)
                     continue;
                 if (sd.serviceIdRunning(serviceId)) {
-                    TripTimes tripTimes = getPattern().getPreviousTrip(stopIndex, secondsSinceMidnight, options);
+                    TripTimes tripTimes = getPattern().getPreviousTrip(stopIndex, 
+                            secondsSinceMidnight, nonTransitMode == TraverseMode.BICYCLE, options);
                     if (tripTimes != null) {
                         // a trip was found, index is valid, wait will be defined.
                         // even though we are going backward I tend to think waiting
@@ -176,10 +180,8 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
                 wait_cost *= options.waitReluctance;
             }
             s1.incrementWeight(preferences_penalty);
-            TraverseMode mode = state0.getNonTransitMode(options);
-            s1.incrementWeight(wait_cost + options.getBoardCost(mode));
+            s1.incrementWeight(wait_cost + options.getBoardCost(nonTransitMode));
             return s1.makeState();
-
         } else {
             /* forward traversal: not so much to do */
             // do not alight immediately when arrive-depart dwell has been eliminated

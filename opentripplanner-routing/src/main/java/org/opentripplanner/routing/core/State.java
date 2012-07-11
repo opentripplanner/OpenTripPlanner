@@ -193,6 +193,10 @@ public class State implements Cloneable {
         return stateData.alightedLocal;
     }
 
+    /**
+     * Whether this path has ever previously boarded (or alighted from, in a reverse search) a
+     * transit vehicle
+     */
     public boolean isEverBoarded() {
         return stateData.everBoarded;
     }
@@ -358,6 +362,8 @@ public class State implements Cloneable {
         return stateData.opt;
     }
     
+    /* will return BICYCLE if routing with an owned bicycle, or if at this state the user is holding
+     * on to a rented bicycle */
     public TraverseMode getNonTransitMode(RoutingRequest options) {
         TraverseModeSet modes = options.getModes();
         if (modes.getCar())

@@ -61,7 +61,7 @@ otp.core.MapStatic = {
     permaLinkEnabled  : false,
     historyEnabled    : true,
     rightClickZoom    : true,
-    layerSwitchEnabled: false,
+    showLayerSwitcher : null,
 
     /*
      * Projections - neither should need changing. displayProjection is only
@@ -91,8 +91,10 @@ otp.core.MapStatic = {
             this.baseLayer = otp.util.OpenLayersUtils.makeMapBaseLayer(this.map, this.baseLayerOptions);
         } else {
             this.map.addLayers(this.baseLayer);
-            if (this.baseLayer.length > 1) {
-                this.layerSwitchEnabled=true;
+            if (this.baseLayer.length > 1 && this.showLayerSwitcher !== false) {
+                this.showLayerSwitcher=true;
+            } else {
+                this.showLayerSwitcher=false;
             }
         }
         this.map.setBaseLayer(this.baseLayer, true);
@@ -104,7 +106,7 @@ otp.core.MapStatic = {
         // if we have an empty array of controls, then add the defaults
         if (this.options.controls != null && this.options.controls.length == 0)
         {
-            this.options.controls = otp.util.OpenLayersUtils.defaultControls(this.map, this.zoomWheelEnabled, this.handleRightClicks, this.permaLinkEnabled, this.attribution, this.historyEnabled, this.layerSwitchEnabled);
+            this.options.controls = otp.util.OpenLayersUtils.defaultControls(this.map, this.zoomWheelEnabled, this.handleRightClicks, this.permaLinkEnabled, this.attribution, this.historyEnabled, this.showLayerSwitcher);
         }
 
         var layerLoaded = false;
@@ -171,20 +173,13 @@ otp.core.MapStatic = {
     /** */
     zoomToDefaultExtent : function()
     {
-        try
-        {
-            if(this.defaultExtent && this.defaultExtent !== 'automatic')
-            {
-                this.zoomToExtent(this.defaultExtent);
-            }
-        }
-        catch(e)
-        {}
+        this.zoomToExtent(this.defaultExtent);
     },
 
 
     /** */
-    getContextMenu : function(cm) {
+    getContextMenu : function(cm)
+    {
         if(cm != null)
         {
             this.contextMenu = cm;
@@ -343,7 +338,16 @@ otp.core.MapStatic = {
     /** */
     zoomToExtent : function(extent)
     {
-        this.map.zoomToExtent(extent);
+        try
+        {
+            if(extent && extent.containsBounds)
+            {
+                this.map.zoomToExtent(extent);
+            }
+        }
+        catch(e)
+        {
+        }
     },
 
     /** */
@@ -518,12 +522,9 @@ otp.core.MapStatic = {
         for (var i = 0; i < this.map.layers.length; i++)
         {
             var layer = this.map.layers[i];
-            if (!layer.isBaseLayer && layer.OTP_LAYER)
+            if (!layer.isBaseLayer && layer.OTP_LAYER && layer.removeFeatures)
             {
-                if (layer.isVector)
-                {
-                    layer.removeFeatures(layer.features);
-                }
+                layer.removeFeatures(layer.features);
             }
         }
         Ext.each(this.allFeaturesRemoved, function(fn) {

@@ -26,6 +26,8 @@ otp.planner.StaticForms = {
 
     // external (config) objects
     routerId              : null,
+    preferredRoutes       : null,
+    unpreferredRoutes     : null,
     locale                : null,
     planner               : null,
     contextMenu           : null,
@@ -36,10 +38,9 @@ otp.planner.StaticForms = {
     fromToOverride        : null,  // over-ride me to get rid of From / To from with something else
     geocoder              : null,
 
+
     // forms & stores
     m_panel               : null,
-    m_routerIdForm        : null,
-    m_preferredRoutes     : '',
 
     m_fromForm            : null,
     m_toForm              : null,
@@ -187,28 +188,48 @@ otp.planner.StaticForms = {
 
         otp.util.ExtUtils.setTripPlannerCookie();
 
-        // get bike form data if we're using the triangle
-        var triParams = {};
-        if(this.m_bikeTriangle && this.m_optimizeForm.getValue() == "TRIANGLE")
-            triParams = this.m_bikeTriangle.getFormData();
+        // build up extra params for the submit
+        var added_params = {}
 
+        // step 1: get bike form data if we're using the triangle
+        if(this.m_bikeTriangle && this.m_optimizeForm.getValue() == "TRIANGLE")
+            added_params = this.m_bikeTriangle.getFormData();
+
+        // step 2: intermediate places 
         var intPlacesItems = this.m_interPlacesPanel.items; 
-        if(intPlacesItems != null) {
+        if(intPlacesItems != null)
+        {
             var intPlacesArr = [];
             for (var i=0; i<intPlacesItems.getCount(); i++) { 
                 var comp = intPlacesItems.itemAt(i); 
                 intPlacesArr.push(comp.field.getValue());
             }
             if(intPlacesArr.length > 0) {
-                triParams['intermediatePlaces'] = intPlacesArr;
+                added_params.intermediatePlaces = intPlacesArr;
             }
         }
 
+        // step 3: checkMaxTransfers to add this parameter / value to the form
+        if(otp.util.ObjUtils.isNumber(this.planner.maxTransfers) && this.planner.maxTransfers >= 0 && this.planner.maxTransfers <= 1000)
+            added_params.maxTransfers = this.planner.maxTransfers;
+
+        // step 4: router id field
+        if(this.routerId)
+            added_params.routerId = this.routerId;
+
+        // step 5: preferred routes (to be a visible form at some point)
+        if(this.preferredRoutes)
+            added_params.preferredRoutes = this.preferredRoutes;
+
+        if(this.unpreferredRoutes)
+            added_params.unpreferredRoutes = this.unpreferredRoutes;
+
+        // step 6: set data up, including the added params & submit...
         var data = {
             method  : 'GET',
             url     : this.url,
             waitMsg : this.locale.tripPlanner.labels.submitMsg,
-            params  : triParams
+            params  : added_params
         }
         this.m_panel.form.submit(data);
         otp.util.Analytics.gaEvent(otp.util.Analytics.OTP_TRIP_SUBMIT);
@@ -237,10 +258,10 @@ otp.planner.StaticForms = {
             fromPlace : fromPlace,
             toPlace   : toPlace,
             date      : date,
-            time      : time,
-            preferredRoutes : this.m_preferredRoutes
+            time      : time
         });
     },
+
 
     /** */
     submitSuccess : function(form, action)
@@ -428,8 +449,51 @@ otp.planner.StaticForms = {
         return retVal;
     },
 
+    /** parse (trimet) mode param */
+    parseMode : function(mode)
+    {
+        var retVal = mode;
+        try
+        {
+            if(mode == 'A') retVal = 'TRANSIT,WALK';
+            if(mode == 'B') retVal = 'BUSISH,WALK';
+            if(mode == 'T') retVal = 'TRAINISH,WALK';
+        }
+        catch(e)
+        {}
 
-    /** */
+        return retVal;
+    },
+
+
+    /** parse (trimet) min/opt param */
+    parseOptimize : function(opt)
+    {
+        var retVal = opt;
+        try
+        {
+            if(opt == 'T') retVal = 'QUICK';
+            if(opt == 'X') retVal = 'TRANSFERS';
+        }
+        catch(e)
+        {}
+
+        return retVal;
+    },
+
+
+    /**
+     * populate the trip planner form with url parameters.
+     * 
+     * Code here works with both to parse the same set of params that the OTP ReST API accepts, as well as TriMet's legacy trip form.
+     * 
+     * TriMet URLs (yes the backwards x = lat and y = lon happens in our world):
+     * http://ride.trimet.org/?from=PDX&to=ZOO&after=2:00pm&on=06/25/12&min=T&walk=0.75&mode=T&xo=45.5876&yo=-122.5932&xd=45.5097&yd=-122.7163&submit
+     * http://ride.trimet.org/?from=PDX&to=ZOO&by=2:00pm&on=06/25/12&min=X&walk=0.10&mode=A&xo=45.5876&yo=-122.5932&xd=45.5097&yd=-122.7163&submit
+     * http://ride.trimet.org/?from=PDX&to=ZOO&date=06/25/12&time=1:50pm&min=T&walk=0.75&mode=T&arr=A&submit
+     * 
+     * @param {Object} params
+     */
     populate : function(params)
     {
         var forms = this;
@@ -438,15 +502,31 @@ otp.planner.StaticForms = {
             this.clearFrom(true);
             this.clearTo(true);
 
-            // check different GET parameters for from & to info 
-            this.setFormGeocodeName(params.Orig,      forms.m_fromForm);
-            this.setFormGeocodeName(params.Dest,      forms.m_toForm);
-            this.setFormGeocodeName(params.Floc,      forms.m_fromForm);
-            this.setFormGeocodeName(params.Tloc,      forms.m_toForm);
-            this.setFormGeocodeName(params.from,      forms.m_fromForm);
-            this.setFormGeocodeName(params.to,        forms.m_toForm);
+            // check different GET parameters for from & to info -- note fromPlace and toPlace have highest respective precedence
+            if(params.from && params.xo && params.yo)
+            {
+                forms.m_fromForm.setNameLatLon(params.from, params.xo, params.yo, null, true);
+            }
+            else
+            {
+                this.setFormGeocodeName(params.Orig, forms.m_fromForm);
+                this.setFormGeocodeName(params.Floc, forms.m_fromForm);
+                this.setFormGeocodeName(params.from, forms.m_fromForm);
+            }
             this.setFormGeocodeName(params.fromPlace, forms.m_fromForm);
-            this.setFormGeocodeName(params.toPlace,   forms.m_toForm);
+
+            if(params.to && params.xd && params.yd)
+            {
+                forms.m_toForm.setNameLatLon(params.to, params.xd, params.yd, null, true);
+            }
+            else
+            {
+                this.setFormGeocodeName(params.Dest, forms.m_toForm);
+                this.setFormGeocodeName(params.Tloc, forms.m_toForm);
+                this.setFormGeocodeName(params.to,   forms.m_toForm);
+            }
+            this.setFormGeocodeName(params.toPlace, forms.m_toForm);
+
             if(this.THIS.poi)
             {
                 this.THIS.poi.setFromCoord(this.THIS.m_fromForm.geocodeCoord);
@@ -471,9 +551,6 @@ otp.planner.StaticForms = {
                 forms.m_date.setRawValue(params.on);
                 date = true;
             }
-
-            if(params.preferredRoutes)
-                this.m_preferredRoutes = params.preferredRoutes;
 
             // arrive by parameter 
             if(params.arrParam && (params.arrParam.indexOf("rive") > 0 || params.arrParam == "true"))
@@ -502,6 +579,10 @@ otp.planner.StaticForms = {
                 forms.m_arriveByForm.setValue('true');
                 time = true;
             }
+            if(params.arriveBy && params.arriveBy == "true")
+                forms.m_arriveByForm.setValue('true');
+            else if(params.arriveBy && params.arriveBy == "false")
+                forms.m_arriveByForm.setValue('false');
 
             if(params.time)
             {
@@ -512,10 +593,11 @@ otp.planner.StaticForms = {
 
             if(params.mode)
             {
-                forms.m_modeForm.setValue(params.mode);
+                var mode = this.parseMode(params.mode);
+                forms.m_modeForm.setValue(mode);
                 if(this.m_optionsManager)
                 {
-                    this.m_optionsManager.doMode(params.mode);
+                    this.m_optionsManager.doMode(mode);
                 }
             }
 
@@ -523,24 +605,43 @@ otp.planner.StaticForms = {
             if(params.min)
                 params.optimize = params.min;
             if(params.opt)
-                params.optimize = params.opt
+                params.optimize = params.opt;
             if(params.optimize)
             {
-                forms.m_optimizeForm.setValue(params.optimize);
+                var opt = this.parseOptimize(params.optimize);
+                forms.m_optimizeForm.setValue(opt);
                 if(this.m_optionsManager)
                 {
-                    this.m_optionsManager.doOpt(params.optimize);
+                    this.m_optionsManager.doOpt(opt);
                 }
             }
 
+            if(params.walk && params.walk <= 1.10)
+            {
+                if(params.walk <= 0.10)      forms.m_maxWalkDistanceForm.setValue(160);
+                else if(params.walk <= 0.25) forms.m_maxWalkDistanceForm.setValue(420);
+                else if(params.walk <= 0.50) forms.m_maxWalkDistanceForm.setValue(840);
+                else if(params.walk <= 0.75) forms.m_maxWalkDistanceForm.setValue(1260);
+                else if(params.walk <= 1.10) forms.m_maxWalkDistanceForm.setValue(1609);
+            }
             if(params.maxWalkDistance)
                 forms.m_maxWalkDistanceForm.setValue(params.maxWalkDistance);
             if(params.wheelchair && this.planner.options.showWheelchairForm)
                 forms.m_wheelchairForm.setValue(params.wheelchair);
 
-            this.setDirtyRawInput(params.routerId, forms.m_routerIdForm);
+            // max transfers url param sent to API
+            if(params.maxTransfers && params.maxTransfers >= 0 && params.maxTransfers < 1000)
+                this.planner.maxTransfers = Number(params.maxTransfers);
 
-            // stupid trip planner form processing...
+            // list of routes sent to the API
+            if(typeof(params.preferredRoutes)=='string') 
+                this.preferredRoutes = params.preferredRoutes;
+
+            if(typeof(params.unpreferredRoutes)=='string') 
+                this.unpreferredRoutes = params.unpreferredRoutes;
+
+            if(params.routerId)
+                this.routerId = params.routerId;
 
             // Hour=7&Minute=02&AmPm=pm
             if(!time && params.Hour && params.Minute && params.AmPm)
@@ -612,9 +713,11 @@ otp.planner.StaticForms = {
         retVal.toPlace   = this.m_toForm.getNamedCoord();
         retVal.date      = this.m_date.getRawValue();
         retVal.time      = otp.util.DateUtils.parseTime(this.m_time.getRawValue(), this.locale.time.time_format);
-        retVal.arriveBy  = this.m_arriveByForm.getRawValue();
+        retVal.arriveBy  = this.m_arriveByForm.getValue();
         retVal.opt       = this.m_optimizeForm.getValue();
-        retVal.routerId  = this.m_routerIdForm.getValue();
+        retVal.routerId  = this.routerId;
+        retVal.preferredRoutes = this.preferredRoutes;
+        retVal.unpreferredRoutes = this.unpreferredRoutes;
 
         // break up the from coordinate into lat & lon
         retVal.fromLat = otp.util.ObjUtils.getLat(this.m_fromForm.geocodeCoord);
@@ -642,7 +745,7 @@ otp.planner.StaticForms = {
         {
         }
 
-        return retVal;
+        return retVal; 
     },
 
     /**
@@ -760,12 +863,6 @@ otp.planner.StaticForms = {
             items:       optForms
         });
 
-        this.m_routerIdForm = new Ext.form.Hidden({
-            id:             'trip-routerid-form',
-            name:           'routerId',
-            value:          this.routerId
-        });
-
         this.m_submitButton = new Ext.Button({
             text:    this.locale.tripPlanner.labels.planTrip,
             id:      'trip-submit',
@@ -777,30 +874,15 @@ otp.planner.StaticForms = {
         this.m_toPlace   = new Ext.form.Hidden({name: 'toPlace',   value: ''});
         this.m_fromPlace = new Ext.form.Hidden({name: 'fromPlace', value: ''});
         var dateParam    = new Ext.form.Hidden({name: 'date',      value: ''});
-        var prefRoutes   = new Ext.form.Hidden({name: 'preferredRoutes', value: ''});
-        //this.m_intermediatePlaces = new Ext.form.Hidden({name: 'intermediatePlaces', value: ''});
 
         var forms = [  
                 fromToFP,
                 optFP,
                 dateParam,
-                prefRoutes,
-                this.m_routerIdForm,
                 this.m_toPlace,
                 this.m_fromPlace,
-                //this.m_intermediatePlaces,
                 this.m_submitButton
         ];
-
-        if(otp.util.ObjUtils.isNumber(this.planner.maxTransfers))
-        {
-            var m = this.planner.maxTransfers;
-            var maxT = new Ext.form.Hidden({
-                name:  'maxTransfers',
-                value: m
-            });
-            forms.push(maxT);
-        }
 
         var conf = {
             title:       this.locale.tripPlanner.labels.tabTitle,

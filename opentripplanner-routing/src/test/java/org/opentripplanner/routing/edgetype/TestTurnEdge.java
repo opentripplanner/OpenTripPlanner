@@ -154,6 +154,7 @@ public class TestTurnEdge extends TestCase {
 
         GenericAStar aStar = new GenericAStar();
         RoutingRequest options = new RoutingRequest();
+        options.setMaxWalkDistance(Double.MAX_VALUE);
         options.setRoutingContext(graph, blOut, trIn);
         ShortestPathTree spt = aStar.getShortestPathTree(options);
 

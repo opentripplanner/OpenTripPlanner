@@ -13,6 +13,9 @@
 
 package org.opentripplanner.graph_builder.services;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.routing.graph.Graph;
 
@@ -25,4 +28,6 @@ import org.opentripplanner.routing.graph.Graph;
 public interface GraphBuilderWithGtfsDao {
 	public void setDao(GtfsRelationalDao dao);
 	public void buildGraph(Graph graph);
+        public List<String> provides();
+        public List<String> getPrerequisites();
 }

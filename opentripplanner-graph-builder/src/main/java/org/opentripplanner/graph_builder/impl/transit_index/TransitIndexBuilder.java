@@ -33,6 +33,7 @@ import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.services.GraphBuilderWithGtfsDao;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -89,6 +90,8 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 
     private HashSet<Edge> handledEdges = new HashSet<Edge>();
 
+    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
+
     @Override
     public void setDao(GtfsRelationalDao dao) {
         this.dao = dao;
@@ -132,7 +135,46 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
         Coordinate coord = findTransitCenter();
         service.setCenter(coord);
 
+        service.setOvernightBreak(findOvernightBreak());
+
         graph.putService(TransitIndexService.class, service);
+    }
+
+    /**
+     * Find the longest consecutive sequence of minutes with no transit stops; this is assumed to be
+     * the overnight service break.
+     * 
+     * @return
+     */
+    private int findOvernightBreak() {
+        final int minutesInDay = 24*60;
+        boolean[] minutes = new boolean[minutesInDay];
+        for (StopTime stopTime : dao.getAllStopTimes()) {
+            minutes[(stopTime.getDepartureTime() / 60) % minutesInDay] = true;
+        }
+        int bestLength = 0;
+        int best = -1;
+        int run = 0;
+        for (int i = 0; i < minutesInDay; ++i) {
+            if (minutes[i]) {
+                 //end of run
+                if (run > bestLength) {
+                    bestLength = run;
+                    best = i - run;
+                }
+                run = 0;
+            } else {
+                run += 1;
+            }
+        }
+        if (run > bestLength) {
+            bestLength = run;
+            best = 1440 - run;
+        }
+        if (best < 0) {
+            return -1;
+        }
+        return best * 60 + 1;
     }
 
     /**
@@ -209,7 +251,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                 coord = new Coordinate(stop.getLon(), stop.getLat());
                 double total = 0;
                 for (int k = 0; k < i; ++k) {
-                    double distance = DistanceLibrary.distance(coord, centers[k].coord);
+                    double distance = distanceLibrary .distance(coord, centers[k].coord);
                     total += distance * distance;
                 }
                 if (total > bestDistance) {
@@ -237,7 +279,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                 double best_distance = Double.MAX_VALUE;
                 for (int c = 0; c < centers.length; ++c) {
                     Coordinate center = centers[c].coord;
-                    double distance = DistanceLibrary.distance(coord, center);
+                    double distance = distanceLibrary.distance(coord, center);
                     if (distance < best_distance) {
                         best_center = c;
                         best_distance = distance;
@@ -589,5 +631,15 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
         variantsByTrip.put(trip.getId(), variant);
         variant.addTrip(trip);
         return variant;
+    }
+
+    @Override
+    public List<String> provides() {
+        return Arrays.asList("transitIndex");
+    }
+
+    @Override
+    public List<String> getPrerequisites() {
+        return Collections.emptyList();
     }
 }

@@ -63,9 +63,6 @@ otp.planner.Itinerary = {
     {
         otp.configure(this, config);
 
-        this.m_vectors    = new Array();
-        this.m_markers    = new Array();
-
         this.m_legStore   = otp.planner.Utils.makeLegStore();
         this.m_fromStore  = otp.planner.Utils.makeFromStore();
         this.m_toStore    = otp.planner.Utils.makeToStore();
@@ -104,48 +101,28 @@ otp.planner.Itinerary = {
      */
     draw : function(vLayer, mLayer)
     {
-        if (this.m_vectors.length < 1) {
-            this.makeRouteLines();
-            this.makeWalkLines();
-        }
-
-        if (this.m_markers.length < 1) {
-            this.makeMarkers();
-        }
-
-        // Reproject layer data for display if necessary
-        if (this.map.dataProjection != vLayer.map.getProjection()) {
-            for (var i = 0; i < this.m_vectors.length; ++i) {
-                if (!this.m_vectors[i].geometry._otp_reprojected) {
-                    this.m_vectors[i].geometry._otp_reprojected = true;
-                    this.m_vectors[i].geometry.transform(
-                            this.map.dataProjection, vLayer.map
-                                    .getProjectionObject());
-                }
+        // step 1: draw route lines (vectors) and adjust the map extent to the extent of the vLayer 
+        if (vLayer)
+        {
+            this.getVectors(vLayer.map.getProjection());
+            if(this.m_vectors && this.m_vectors.length >= 1)
+            {
+                vLayer.addFeatures(this.m_vectors);
+                this.m_extent = vLayer.getDataExtent();
             }
         }
 
-        // In order to use this function also for alternative routes
-        if (mLayer != null) { 
-            if (this.map.dataProjection != mLayer.map.getProjection()) {
-                for (var i = 0; i < this.m_markers.length; ++i) {
-                    if (!this.m_markers[i].geometry._otp_reprojected) {
-                        this.m_markers[i].geometry._otp_reprojected = true;
-                        this.m_markers[i].geometry.transform(
-                                this.map.dataProjection, 
-                                mLayer.map.getProjectionObject()
-                        );
-                    }
-                }
+        // step 2: draw markers (note mLayer is null on alt-route preview), and increase the extent 
+        if(mLayer)
+        {
+            this.getMarkers(mLayer.map.getProjection());
+            if(this.m_markers && this.m_markers.length >= 1)
+            {
+                mLayer.addFeatures(this.m_markers);
+                if(this.m_extent)
+                    this.m_extent.extend(mLayer.getDataExtent());
             }
-            mLayer.addFeatures(this.m_markers);
         }
-
-        vLayer.addFeatures(this.m_vectors);
-
-        this.m_extent = vLayer.getDataExtent();
-        if (mLayer != null) // we don't want to change the extent for alternative routes 
-        	this.m_extent.extend(mLayer.getDataExtent());
     },
 
     /** */
@@ -160,29 +137,78 @@ otp.planner.Itinerary = {
         return this.m_extent;
     },
 
-    /** */
-    getMarkers : function()
-    {
-        return this.m_markers;
-    },
-
     /**
      * returns route vectors 
      * NOTE: will create & cache the vectors from the itinerary, if they are not already there
      * BUT:  the line might not be there fully if this is the first call to get the vector from AJAX, 
      *       since the route vector may not be completely returned from the async call.
+     *       
+     * IMPORTANT -- July 6 2012 / OpenLayers 2.12: something in OL 2.11 & 2.12 makes vectors.geometry 
+     *              become empty (I think we're doing a delete all when clearing an itinery, and newer OL
+     *              libs are now kicking out the geom data).  So we have refactored geom building routines,
+     *              so it's worth watching whether the app degrades in some way with these changes... 
      */
-    getVectors : function()
+    getVectors : function(proj)
     {
-        var retVal = null;
-
-        if (this.m_vectors.length < 1) {
+        // rebuild the cache if necessary
+        if(!this.m_vectors || this.m_vectors.length < 1 || !this.m_vectors[0].geometry)
+        {
+            console.log("Itinerary.getVectors: rebuilding vector cache for this itinerary");
+            this.m_vectors = new Array();
             this.makeRouteLines();
             this.makeWalkLines();
         }
-        retVal = this.m_vectors;
 
-        return retVal;
+        // reproject layer data if necessary
+        if(this.m_vectors && proj && proj != this.map.dataProjection)
+        {
+            for(var i = 0; i < this.m_vectors.length; ++i)
+            {
+                if (this.m_vectors[i].geometry && !this.m_vectors[i].geometry._otp_reprojected)
+                {
+                    this.m_vectors[i].geometry._otp_reprojected = true;
+                    this.m_vectors[i].geometry.transform(this.map.dataProjection, proj);
+                }
+            }
+        }
+
+        return this.m_vectors;
+    },
+
+    /**
+     * returns route markers annotating the itinerary on the map.
+     * NOTE: will create & cache the markers from the itinerary, if they are not already there
+     *
+     * IMPORTANT -- July 6 2012 / OpenLayers 2.12: something in OL 2.11 & 2.12 makes vectors.geometry 
+     *              become empty (I think we're doing a delete all when clearing an itinery, and newer OL
+     *              libs are now kicking out the geom data).  So we have refactored geom building routines,
+     *              so it's worth watching whether the app degrades in some way with these changes... 
+     * 
+     */
+    getMarkers : function(proj)
+    {
+        // rebuild the cache if necessary
+        if(!this.m_markers || this.m_markers.length < 1 || !this.m_markers[0].geometry)
+        {
+            console.log("Itinerary.getMarkers: rebuilding marker cache for this itinerary");
+            this.m_markers = new Array();
+            this.makeMarkers();
+        }
+
+        // reproject layer data if necessary
+        if(this.m_markers && proj && proj != this.map.dataProjection)
+        {
+            for (var i = 0; i < this.m_markers.length; ++i)
+            {
+                if (this.m_markers[i].geometry && !this.m_markers[i].geometry._otp_reprojected)
+                {
+                    this.m_markers[i].geometry._otp_reprojected = true;
+                    this.m_markers[i].geometry.transform(this.map.dataProjection, proj);
+                }
+            }
+        }
+
+        return this.m_markers;
     },
 
 
@@ -317,6 +343,7 @@ otp.planner.Itinerary = {
         var marker = otp.util.OpenLayersUtils.makeMarker(x, y, options);
         this.m_markers.push(marker);
     },
+
 
    /**
     * Gets a new Marker Layer for drawing the trip plan's features upon

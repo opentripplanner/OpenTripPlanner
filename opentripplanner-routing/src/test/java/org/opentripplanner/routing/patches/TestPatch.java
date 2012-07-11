@@ -41,7 +41,6 @@ import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.patch.Alert;
@@ -174,6 +173,11 @@ public class TestPatch extends TestCase {
             @Override
             public Coordinate getCenter() {
                 return null;
+            }
+
+            @Override
+            public int getOvernightBreak() {
+                return 0;
             }
         };
         graph.putService(TransitIndexService.class, index);

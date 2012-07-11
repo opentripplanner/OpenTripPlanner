@@ -1,12 +1,18 @@
 package org.opentripplanner.analyst.batch;
 
 import java.io.IOException;
+import java.util.TimeZone;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.opentripplanner.analyst.batch.aggregator.Aggregator;
 import org.opentripplanner.analyst.request.Renderer;
+import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.services.GraphService;
+import org.opentripplanner.routing.services.SPTService;
+import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,21 +24,23 @@ import org.springframework.stereotype.Component;
 public class BatchProcessor {
 
     private static final Logger LOG = LoggerFactory.getLogger(BatchProcessor.class);
-    private static final String CONFIG = "application-context.xml";
-    private static final String BATCH_CONFIG = "batch-context.xml";
-
-    @Autowired Renderer renderer;
+    private static final String CONFIG = "batch-context.xml";
+    
+    @Autowired GraphService graphService;
+    @Autowired SPTService sptService;
     @Resource Population origins;
     @Resource Population destinations;
-    @Resource Aggregator aggregator;
-    private boolean aggregate = false;
     
-    public static void main(String[] args) throws IOException {
+    private TraverseModeSet modes = new TraverseModeSet("WALK,TRANSIT");
+    private final String DATE = "2011-02-04";
+    private static final String TIME = "08:00 AM";
+    private static final TimeZone TIMEZONE = TimeZone.getDefault();
+
+    static void main(String[] args) throws IOException {
 
         GenericApplicationContext ctx = new GenericApplicationContext();
         XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader(ctx);
         xmlReader.loadBeanDefinitions(new ClassPathResource(CONFIG));
-        xmlReader.loadBeanDefinitions(new ClassPathResource(BATCH_CONFIG));
         ctx.refresh();
         ctx.registerShutdownHook();
         //ctx.getBean(BatchProcessor.class).run();
@@ -42,7 +50,6 @@ public class BatchProcessor {
     // is run intentionally
     @PostConstruct
     private void runAfterSetters() {
-        LOG.info("Hello, this is the batch processor. My renderer is: {}", renderer);
         /* to cover several kinds of batch requests, there are two modes: agg and non-agg.
          * The batch processor chooses a mode based on whether the aggregator property has been
          * set or not.
@@ -65,9 +72,27 @@ public class BatchProcessor {
          * default TraverseOptions can be supplied.
          * 
          * Aggregate over origins or destinations option
-            
-        
-        */
+         */
+        for (Individual oi : origins) {
+            RoutingRequest req = buildRequest(oi.getLat(), oi.getLon());
+            ShortestPathTree spt = sptService.getShortestPathTree(req);
+            destinations.writeCsv("/home/abyrd/disagg.csv", spt, oi);
+//            for (Individual di : destinations) {
+//                long travelTime = di.sample.eval(spt);
+//                // if an aggregator is defined over 
+//            }
+            req.cleanup();
+        }
+    }
+    
+    private RoutingRequest buildRequest(double lat, double lon) {
+        RoutingRequest req = new RoutingRequest();
+        req.setDateTime(DATE, TIME, TIMEZONE);
+        req.setFrom(String.format("%f, %f", lat, lon));
+        req.batch = true;
+        req.setRoutingContext(graphService.getGraph());
+        return req;
     }
 
 }
+

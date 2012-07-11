@@ -1,8 +1,12 @@
 package org.opentripplanner.routing.bike_rental;
 
+import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlAttribute;
 
-public class BikeRentalStation {
+public class BikeRentalStation implements Serializable {
+    private static final long serialVersionUID = 8311460609708089384L;
+
     @XmlAttribute
     public String id;
     @XmlAttribute

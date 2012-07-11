@@ -37,6 +37,13 @@ public class NamedPlace {
         this.place = place;
     }
     
+    public String getRepresentation() {
+        if (name == null) {
+            return place;
+        }
+        return name + "::" + place;
+    }
+
     public String toString() {
         return "NamedPlace(" + name + ", " + place + ")";
     }

@@ -15,7 +15,7 @@ package org.opentripplanner.graph_builder.impl;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -83,7 +83,14 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
     private boolean generateFeedIds = false;
 
     public List<String> provides() {
-        return Arrays.asList("transit");
+        List<String> result = new ArrayList<String>();
+        result.add("transit");
+        if (gtfsGraphBuilders != null) {
+            for (GraphBuilderWithGtfsDao builder : gtfsGraphBuilders) {
+                result.addAll(builder.provides());
+            }
+        }
+        return result;
     }
 
     public List<String> getPrerequisites() {

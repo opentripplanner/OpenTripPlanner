@@ -255,7 +255,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
 
     private StreetVertexIndexService indexService;
 
-    private SPTService sptService = new GenericAStar();
+    private GenericAStar sptService = new GenericAStar();
 
     private DefaultListModel metadataModel;
 
@@ -294,6 +294,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
 
         showGraph = new ShowGraph(this, getGraph());
         pane.add(showGraph, BorderLayout.CENTER);
+        sptService.setTraverseVisitor(new VisualTraverseVisitor(showGraph));
 
         /*
          * left panel, top-to-bottom: list of nearby vertices, list of edges for selected vertex,
@@ -871,7 +872,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         options.setMaxWalkDistance(Double.MAX_VALUE);
         options.from = from;
         options.to   = to;
-        //options.remainingWeightHeuristic = new BidirectionalRemainingWeightHeuristic(graph);
+        options.numItineraries = 1;
         System.out.println("--------");
         System.out.println("Path from " + from + " to " + to + " at " + when);
         System.out.println("\tModes: " + modeSet);

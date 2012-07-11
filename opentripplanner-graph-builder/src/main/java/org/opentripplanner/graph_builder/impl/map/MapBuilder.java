@@ -43,7 +43,7 @@ public class MapBuilder implements GraphBuilder {
     }
 
     public List<String> getPrerequisites() {
-        return Arrays.asList("streets", "transit");
+        return Arrays.asList("streets", "transit", "transitIndex");
     }
 
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {

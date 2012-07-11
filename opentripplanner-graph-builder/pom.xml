@@ -101,6 +101,11 @@
       		<artifactId>jets3t</artifactId>
       		<version>0.8.1</version>
     	</dependency>
+        <dependency>
+          <groupId>com.beust</groupId>
+          <artifactId>jcommander</artifactId>
+          <version>1.27</version>
+        </dependency>
     </dependencies>
 
     <build>

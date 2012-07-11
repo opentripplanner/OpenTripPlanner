@@ -11,22 +11,19 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.common.geometry;
+package org.opentripplanner.routing.core;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import java.io.Serializable;
+import java.util.List;
 
-public interface Pointlike {
+import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.graph.VertexComparatorFactory;
 
-    public double getLon();
-    public double getLat();
+public class MortonVertexComparatorFactory implements VertexComparatorFactory, Serializable {
+    private static final long serialVersionUID = -6904862616793682390L;
 
-    /** Distance in meters to the coordinate */
-    public abstract double distance(Coordinate c);
+    public MortonVertexComparator getComparator(List<Vertex> domain) {
+        return new MortonVertexComparator(domain);
+    }
 
-    /** Distance in meters to the vertex */
-    public abstract double distance(Pointlike p);
-
-    /** Fast, slightly approximated, under-estimated distance in meters to the vertex */
-    public abstract double fastDistance(Pointlike p);
-    
 }

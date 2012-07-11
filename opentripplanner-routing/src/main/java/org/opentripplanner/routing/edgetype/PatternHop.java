@@ -14,7 +14,7 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.EdgeNarrative;
@@ -38,7 +38,7 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
 
     private Stop start, end;
 
-    private int stopIndex;
+    public int stopIndex;
 
     private Geometry geometry = null;
 
@@ -51,7 +51,8 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
     }
 
     public double getDistance() {
-        return DistanceLibrary.distance(start.getLat(), start.getLon(), end.getLat(), end.getLon());
+        return SphericalDistanceLibrary.getInstance().distance(start.getLat(), start.getLon(), end.getLat(),
+                end.getLon());
     }
 
     public TraverseMode getMode() {

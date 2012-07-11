@@ -72,7 +72,7 @@ public class StreetUtils {
                         }
                         TurnVertex tv_in = getTurnVertexForEdge(graph, turnVertices, pse_in);
                         TurnVertex tv_out = getTurnVertexForEdge(graph, turnVertices, pse_out);
-                        TurnEdge turn = new TurnEdge(tv_in, tv_out);
+                        TurnEdge turn = tv_in.makeTurnEdge(tv_out);
                         if (restrictions != null) {
                             TurnRestriction restriction = restrictions.get(pse_in);
                             if (restriction != null) {
@@ -100,7 +100,7 @@ public class StreetUtils {
                             tov = e_out.getToVertex(); // tov for outgoing
                         }
                         if (fromv instanceof TurnVertex) {
-                            new TurnEdge((TurnVertex) fromv, (StreetVertex) tov);
+                            ((TurnVertex) fromv).makeTurnEdge((StreetVertex) tov);
                         } else {
                             new FreeEdge(fromv, tov);
                         }
@@ -208,6 +208,7 @@ public class StreetUtils {
                     PlainStreetEdge pse = (PlainStreetEdge) e;
                     StreetTraversalPermission permission = pse.getPermission();
                     permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
+                    permission = permission.remove(StreetTraversalPermission.BICYCLE);
                     if (permission == StreetTraversalPermission.NONE) {
                         pse.detach();
                     } else {
@@ -219,6 +220,7 @@ public class StreetUtils {
                     TurnEdge turn = (TurnEdge) e;
                     StreetTraversalPermission permission = turn.getPermission();
                     permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
+                    permission = permission.remove(StreetTraversalPermission.BICYCLE);
                     if (permission == StreetTraversalPermission.NONE) {
                         turn.detach();
                     } else {

@@ -81,7 +81,7 @@ public class NominatimGeocoder implements Geocoder {
             // make json request
             URL nominatimGeocoderUrl = getNominatimGeocoderUrl(address, bbox);
             URLConnection conn = nominatimGeocoderUrl.openConnection();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"));
             
             StringBuilder sb = new StringBuilder(128);
             String line = null;

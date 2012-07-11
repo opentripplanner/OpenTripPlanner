@@ -21,6 +21,8 @@ import java.util.Set;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
@@ -29,8 +31,10 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.edgetype.FrequencyBoard;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -50,7 +54,7 @@ public class LocalStopFinder {
 
     private static final double LOCAL_STOP_SEARCH_RADIUS = 1000; /* how far to search for nearby stops */
 
-    private HashSet<TableTripPattern> patterns;
+    private HashSet<TripPattern> patterns;
 
     private Graph graph;
 
@@ -63,6 +67,8 @@ public class LocalStopFinder {
     private HashMap<Stop, HashMap<TableTripPattern, P2<Double>>> neighborhoods;
 
     private HashMap<AgencyAndId, TransitStop> transitStops;
+
+    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
     
     public LocalStopFinder(StreetVertexIndexServiceImpl indexService, Graph graph) {
         this.graph = graph;
@@ -71,7 +77,7 @@ public class LocalStopFinder {
 
     public void markLocalStops() {
         _log.debug("Finding local stops");
-        patterns = new HashSet<TableTripPattern>();
+        patterns = new HashSet<TripPattern>();
         transitStops = new HashMap<AgencyAndId, TransitStop>();
         int total = 0;
         for (Vertex gv : graph.getVertices()) {
@@ -86,6 +92,10 @@ public class LocalStopFinder {
                     TableTripPattern pattern = ((PatternBoard) e).getPattern();
                     patterns.add(pattern);
                 }
+                if (e instanceof FrequencyBoard) {
+                    TripPattern pattern = ((FrequencyBoard) e).getPattern();
+                    patterns.add(pattern);
+                }
             }
         }
         
@@ -98,7 +108,7 @@ public class LocalStopFinder {
         bikingOptions.optimize = OptimizeType.SAFE;
 
         int nonLocal = 0;
-        for (TableTripPattern pattern : patterns) {
+        for (TripPattern pattern : patterns) {
             List<Stop> stops = getStops(pattern);
             // a stop is local if, in order to get to all other nearby patterns, it is
             // just as good to transfer at the previous stop.
@@ -264,7 +274,7 @@ public class LocalStopFinder {
                 }
             }
             
-            if (fromv.fastDistance(origin) > LOCAL_STOP_SEARCH_RADIUS) {
+            if (distanceLibrary .fastDistance(fromv.getCoordinate(), origin.getCoordinate()) > LOCAL_STOP_SEARCH_RADIUS) {
                 /* we have now traveled far from the origin, so we know that anything we find
                  * from here on out is going to be too far
                  */
@@ -330,7 +340,7 @@ public class LocalStopFinder {
         return neighborhood;
     }
 
-    private List<Stop> getStops(TableTripPattern pattern) {
+    private List<Stop> getStops(TripPattern pattern) {
         return pattern.getStops();
     }
 

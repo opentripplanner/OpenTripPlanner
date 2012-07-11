@@ -14,8 +14,11 @@
 package org.opentripplanner.util;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,43 +40,40 @@ public class DateUtils implements DateConstants {
      * @param date
      * @param time
      */
-    static public Date toDate(String date, String time) {
+    static public Date toDate(String date, String time, TimeZone tz) {
+        //LOG.debug("JVM default timezone is {}", TimeZone.getDefault());
+        LOG.debug("Parsing date {} and time {}", date, time);
+        LOG.debug( "using timezone {}", tz);
         Date retVal = new Date();
-
         if (date != null) {
-            Date d = parseDate(date);
+            Date d = parseDate(date, tz);
             Integer s = null;
             if (time != null)
                 s = secPastMid(time);
             if (s == null || s < 0)
                 s = secPastMid();
-
             if (d != null && s != null)
                 retVal = new Date(d.getTime() + s * 1000);
         } else if (time != null) {
+            // we could just set the Calendar fields directly instead of using secPastMidnight
             Integer s = secPastMid(time);
             if (s != null && s > 0) {
-                String p = formatDate(DATE_FORMAT, retVal);
-                Date d = parseDate(p);
-                retVal = new Date(d.getTime() + s * 1000);
+                // Maybe we should be using JodaTime... (AMB)
+                Calendar cal = new GregorianCalendar(tz);
+                cal.set(Calendar.HOUR_OF_DAY, 0);
+                cal.set(Calendar.MINUTE, 0);
+                cal.set(Calendar.SECOND, 0);
+                cal.set(Calendar.MILLISECOND, 0);
+                retVal = new Date(cal.getTimeInMillis() + s * 1000);
             }
         }
-
+        LOG.debug( "resulting date is {}", retVal);
         return retVal;
     }
 
-    static public String todayAsString() {
-        return formatDate(DATE_FORMAT, new Date());
-    }
-
-    static public String nowAsString() {
-        return formatDate(TIME_FORMAT, new Date());
-    }
-
     // TODO: could be replaced with Apache's DateFormat.parseDate ???
-    static public Date parseDate(String input) {
+    static public Date parseDate(String input, TimeZone tz) {
         Date retVal = null;
-
         try {
             String newString = input.trim().replace('_', '.').replace('-', '.').replace(':', '.').replace(
                     '/', '.');
@@ -87,7 +87,9 @@ public class DateUtils implements DateConstants {
                 }
 
                 for (String df : dl) {
-                    retVal = DateUtils.parseDate(new SimpleDateFormat(df), newString);
+                    SimpleDateFormat sdf = new SimpleDateFormat(df);
+                    sdf.setTimeZone(tz);
+                    retVal = DateUtils.parseDate(sdf, newString);
                     // getYear() returns (year - 1900)
                     if (retVal != null && retVal.getYear() + 1900 >= 2000)
                         break;
@@ -290,14 +292,15 @@ public class DateUtils implements DateConstants {
         return retVal;
     }
 
-    public static String formatDate(String sdfFormat, Date date) {
-        return formatDate(sdfFormat, date, null);
+    public static String formatDate(String sdfFormat, Date date, TimeZone tz) {
+        return formatDate(sdfFormat, date, null, tz);
     }
 
-    public static String formatDate(String sdfFormat, Date date, String defValue) {
+    public static String formatDate(String sdfFormat, Date date, String defValue, TimeZone tz) {
         String retVal = defValue;
         try {
             SimpleDateFormat sdf = new SimpleDateFormat(sdfFormat);
+            sdf.setTimeZone(tz);
             retVal = sdf.format(date);
         } catch (Exception e) {
             retVal = defValue;

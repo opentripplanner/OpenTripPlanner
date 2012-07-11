@@ -51,7 +51,8 @@ public class PreBoardEdge extends FreeEdge {
                 s1.setAlightedLocal(true);
             }
 
-            s1.incrementTimeInSeconds(options.minTransferTime / 2);
+            //apply board slack
+            s1.incrementTimeInSeconds(options.getBoardSlack());
             s1.alightTransit();
             return s1.makeState();
         } else {
@@ -81,7 +82,14 @@ public class PreBoardEdge extends FreeEdge {
              * look in the global transfer table for the rules from the previous stop to this stop.
              */
             long t0 = s0.getTime();
-            long board_after = t0 + options.minTransferTime / 2;
+
+            long slack;
+            if (s0.isEverBoarded()) {
+                slack = options.getTransferSlack() - options.getAlightSlack();
+            } else {
+                slack = options.getBoardSlack();
+            }
+            long board_after = t0 + slack;
             long transfer_penalty = 0;
             if (s0.getLastAlightedTime() != 0) {
                 /* this is a transfer rather than an initial boarding */

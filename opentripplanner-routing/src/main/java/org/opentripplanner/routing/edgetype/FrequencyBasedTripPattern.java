@@ -20,10 +20,11 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 
 import org.onebusaway.gtfs.model.Frequency;
+import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.model.T2;
 
-public class FrequencyBasedTripPattern implements Serializable {
+public class FrequencyBasedTripPattern implements Serializable, TripPattern {
 
     private static final long serialVersionUID = -5392197874345648815L;
 
@@ -64,6 +65,8 @@ public class FrequencyBasedTripPattern implements Serializable {
     @XmlElement
     private int[] perStopFlags;
 
+    private transient List<Stop> stops;
+    
     boolean exact;
 
     public FrequencyBasedTripPattern(Trip trip, int size) {
@@ -176,14 +179,10 @@ public class FrequencyBasedTripPattern implements Serializable {
         if (beforeTimeAtStart < timeRangeStart[timeRange]) timeRange -= 1;
         if (timeRange < 0) return -1;
         
-        System.out.println("before " + beforeTime);
-        System.out.println("range is " +timeRange);
-        
         int frequency = timeRangeFrequency[timeRange];
         int frequencyOffset = (timeRangeEnd[timeRange] - timeRangeStart[timeRange]) % frequency;
         int lastArrivalTimeInRange = stopArrivalTimeOffset + timeRangeEnd[timeRange] - frequencyOffset;
         
-        System.out.println("lat " + lastArrivalTimeInRange);
         int arrivalTime;
 
         if (exact) {
@@ -192,11 +191,9 @@ public class FrequencyBasedTripPattern implements Serializable {
                 arrivalTime = lastArrivalTimeInRange;
             } else {
                 int offset = (lastArrivalTimeInRange - beforeTime) % frequency;
-                System.out.println("offset " + offset);
                 if (offset == 0)
                     offset = frequency; // catch exact hits
                 arrivalTime = beforeTime - frequency + offset;
-                System.out.println("at " + arrivalTime);
             }
         } else {
             arrivalTime = beforeTime - frequency;
@@ -291,6 +288,15 @@ public class FrequencyBasedTripPattern implements Serializable {
         dwellTimes[index] = dwellTime;
         headsigns[index] = headsign;
 
+    }
+
+    @Override
+    public List<Stop> getStops() {
+        return stops;
+    }
+
+    public void setStops(List<Stop> stops) {
+        this.stops = stops;
     }
 
 }

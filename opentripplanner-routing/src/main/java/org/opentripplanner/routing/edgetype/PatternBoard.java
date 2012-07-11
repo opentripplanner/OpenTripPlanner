@@ -119,6 +119,9 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             int bestWait = -1;
             TripTimes bestTripTimes = null;
             AgencyAndId serviceId = getPattern().getExemplar().getServiceId();
+            // this method is on State not RoutingRequest because we care whether the user is in
+            // possession of a rented bike.
+            TraverseMode mode = state0.getNonTransitMode(options); 
             for (ServiceDay sd : rctx.serviceDays) {
                 int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
                 // only check for service on days that are not in the future
@@ -126,7 +129,8 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
                 if (secondsSinceMidnight < 0)
                     continue;
                 if (sd.serviceIdRunning(serviceId)) {
-                    TripTimes tripTimes = getPattern().getNextTrip(stopIndex, secondsSinceMidnight, options);
+                    TripTimes tripTimes = getPattern().getNextTrip(stopIndex, secondsSinceMidnight, 
+                            mode == TraverseMode.BICYCLE, options);
                     if (tripTimes != null) {
                         // a trip was found, index is valid, wait will be non-negative
                         int wait = (int) (sd.time(tripTimes.getDepartureTime(stopIndex)) - current_time);
@@ -197,7 +201,6 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
                 wait_cost *= options.waitReluctance;
             }
             s1.incrementWeight(preferences_penalty);
-            TraverseMode mode = state0.getNonTransitMode(options); // why is this method on State not RoutingRequest?
             s1.incrementWeight(wait_cost + options.getBoardCost(mode));
             return s1.makeState();
         }

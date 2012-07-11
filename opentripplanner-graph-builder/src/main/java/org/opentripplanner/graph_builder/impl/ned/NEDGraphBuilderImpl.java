@@ -13,6 +13,7 @@
 
 package org.opentripplanner.graph_builder.impl.ned;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -25,6 +26,7 @@ import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.Interpolator2D;
 import org.geotools.geometry.DirectPosition2D;
 import org.opengis.coverage.Coverage;
+import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.ned.NEDGridCoverageFactory;
@@ -34,7 +36,7 @@ import org.opentripplanner.routing.edgetype.EdgeWithElevation;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +67,8 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
      * arc-second NED data.
      */
     private double distanceBetweenSamplesM = 10;
+
+    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     public List<String> provides() {
         return Arrays.asList("elevation");
@@ -319,7 +323,7 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
         // calculate the total edge length in meters
         double edgeLenM = 0;
         for (int i = 0; i < coords.length - 1; i++) {
-            edgeLenM += DistanceLibrary.distance(coords[i].y, coords[i].x, coords[i + 1].y,
+            edgeLenM += distanceLibrary.distance(coords[i].y, coords[i].x, coords[i + 1].y,
                     coords[i + 1].x);
         }
 
@@ -373,7 +377,7 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
             y2 = innerPt.y;
 
             // percentage of total edge length represented by current segment:
-            double pct = DistanceLibrary.distance(y1, x1, y2, x2) / length;
+            double pct = distanceLibrary .distance(y1, x1, y2, x2) / length;
 
             if (pctThrough + pct > t) { // if current segment contains 't,' we're done
                 double pctAlongSeg = (t - pctThrough) / pct;
@@ -390,7 +394,7 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
         x2 = coords[coords.length - 1].x;
         y2 = coords[coords.length - 1].y;
 
-        double pct = DistanceLibrary.distance(y1, x1, y2, x2) / length;
+        double pct = distanceLibrary.distance(y1, x1, y2, x2) / length;
         double pctAlongSeg = (t - pctThrough) / pct;
 
         return new Coordinate(x1 + (pctAlongSeg * (x2 - x1)), y1 + (pctAlongSeg * (y2 - y1)));

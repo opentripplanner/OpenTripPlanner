@@ -20,7 +20,9 @@ import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.util.ElevationProfileSegment;
@@ -63,7 +65,7 @@ public class TurnVertex extends StreetVertex {
     /** is this street a staircase */
     private boolean stairs = false;
 
-    protected boolean crossable = true; // can this street be safely crossed? (unused)
+    protected int streetClass = StreetEdge.CLASS_OTHERPATH;
 
     protected String edgeId;
 
@@ -271,14 +273,6 @@ public class TurnVertex extends StreetVertex {
         return wheelchairAccessible;
     }
 
-    public void setCrossable(boolean crossable) {
-        this.crossable = crossable;
-    }
-
-    public boolean isCrossable() {
-        return crossable;
-    }
-
     public void setRoundabout(boolean roundabout) {
         this.roundabout = roundabout;
     }
@@ -329,5 +323,20 @@ public class TurnVertex extends StreetVertex {
 
     public Set<Alert> getWheelchairNotes() {
         return wheelchairNotes;
+    }
+
+    public void setStreetClass(int streetClass) {
+        this.streetClass = streetClass;
+    }
+    
+    public int getStreetClass() {
+        return streetClass;
+    }
+
+    public TurnEdge makeTurnEdge(StreetVertex tov) {
+        if (tov instanceof TurnVertex) {
+            return new TurnEdge(this, (TurnVertex) tov);            
+        }
+        return new TurnEdge(this, tov);
     }
 }

@@ -19,7 +19,6 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.routing.vertextype.TransitStopArrive;
 
@@ -75,7 +74,13 @@ public class PreAlightEdge extends FreeEdge {
              * look in the global transfer table for the rules from the previous stop to this stop.
              */
             long t0 = s0.getTime();
-            long alight_before = t0 - options.minTransferTime / 2;
+            long slack;
+            if (s0.isEverBoarded()) {
+                slack = options.getTransferSlack() - options.getBoardSlack();
+            } else {
+                slack = options.getAlightSlack();
+            }
+            long alight_before = t0 - slack;
             int transfer_penalty = 0;
             if (s0.getLastAlightedTime() != 0) {
                 /* this is a transfer rather than an initial boarding */
@@ -135,7 +140,7 @@ public class PreAlightEdge extends FreeEdge {
                 s1.setAlightedLocal(true);
             }
             s1.alightTransit();
-            s1.incrementTimeInSeconds(options.minTransferTime / 2);
+            s1.incrementTimeInSeconds(options.getAlightSlack());
             return s1.makeState();
         }
     }

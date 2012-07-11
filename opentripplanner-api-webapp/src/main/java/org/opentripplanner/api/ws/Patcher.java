@@ -44,88 +44,83 @@ import com.sun.jersey.api.spring.Autowire;
 @Autowire
 public class Patcher {
 
-	private PatchService patchservice;
+    private PatchService patchservice;
 
-	@Autowired
-	public void setPatchService(PatchService patchService) {
-		this.patchservice = patchService;
-	}
+    @Autowired
+    public void setPatchService(PatchService patchService) {
+        this.patchservice = patchService;
+    }
 
-	/**
-	 * Return a list of all patches that apply to a given stop
-	 * 
-	 * @return Returns either an XML or a JSON document, depending on the HTTP
-	 *         Accept header of the client making the request.
-	 * 
-	 * @throws JSONException
-	 */
-	@GET
-	@Path("/stopPatches")
-	@Produces( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML,
-			MediaType.TEXT_XML })
-	public PatchResponse getStopPatches(
-			@QueryParam("agency") String agency,
-			@QueryParam("id") String id) throws JSONException {
+    /**
+     * Return a list of all patches that apply to a given stop
+     * 
+     * @return Returns either an XML or a JSON document, depending on the HTTP Accept header of the
+     *         client making the request.
+     * 
+     * @throws JSONException
+     */
+    @GET
+    @Path("/stopPatches")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    public PatchResponse getStopPatches(@QueryParam("agency") String agency,
+            @QueryParam("id") String id) throws JSONException {
 
-		PatchResponse response = new PatchResponse();
-		Collection<Patch> patches = patchservice.getStopPatches(new AgencyAndId(agency, id));
-		for (Patch patch : patches) {
-			response.addPatch(patch);
-		}
-		return response;
-	}
+        PatchResponse response = new PatchResponse();
+        Collection<Patch> patches = patchservice.getStopPatches(new AgencyAndId(agency, id));
+        for (Patch patch : patches) {
+            response.addPatch(patch);
+        }
+        return response;
+    }
 
-	/**
-	 * Return a list of all patches that apply to a given route
-	 * 
-	 * @return Returns either an XML or a JSON document, depending on the HTTP
-	 *         Accept header of the client making the request.
-	 * 
-	 * @throws JSONException
-	 */
-	@GET
-	@Path("/routePatches")
-	@Produces( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML,
-			MediaType.TEXT_XML })
-	public PatchResponse getRoutePatches(
-			@QueryParam("agency") String agency,
-			@QueryParam("id") String id) throws JSONException {
+    /**
+     * Return a list of all patches that apply to a given route
+     * 
+     * @return Returns either an XML or a JSON document, depending on the HTTP Accept header of the
+     *         client making the request.
+     * 
+     * @throws JSONException
+     */
+    @GET
+    @Path("/routePatches")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    public PatchResponse getRoutePatches(@QueryParam("agency") String agency,
+            @QueryParam("id") String id) throws JSONException {
 
-		PatchResponse response = new PatchResponse();
-		Collection<Patch> patches = patchservice.getRoutePatches(new AgencyAndId(agency, id));
-		for (Patch patch : patches) {
-			response.addPatch(patch);
-		}
-		return response;
-	}
+        PatchResponse response = new PatchResponse();
+        Collection<Patch> patches = patchservice.getRoutePatches(new AgencyAndId(agency, id));
+        for (Patch patch : patches) {
+            response.addPatch(patch);
+        }
+        return response;
+    }
 
-	@RolesAllowed("user")
-	@POST
-	@Path("/patch")
-	@Produces( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML,
-			MediaType.TEXT_XML })
-	@Consumes( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-	public PatchCreationResponse createPatches(PatchSet patches) throws JSONException {
-		PatchCreationResponse response = new PatchCreationResponse();
-		for (Patch patch : patches.patches) {
-			if (patch.getId() == null) {
-				response.status = "Every patch must have an id";
-				return response;
-			}
-			if (patch instanceof AlertPatch) {
-			    AlertPatch alertPatch = (AlertPatch) patch;
+    @RolesAllowed("user")
+    @POST
+    @Path("/patch")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    public PatchCreationResponse createPatches(PatchSet patches) throws JSONException {
+        PatchCreationResponse response = new PatchCreationResponse();
+        for (Patch patch : patches.patches) {
+            if (patch.getId() == null) {
+                response.status = "Every patch must have an id";
+                return response;
+            }
+            if (patch instanceof AlertPatch) {
+                AlertPatch alertPatch = (AlertPatch) patch;
 
-			    final AgencyAndId route = alertPatch.getRoute();
-                            if (route != null && route.getId().equals("")) {
-				response.status = "Every route patch must have a route id";
-				return response;
-                            }
-			}
-		}
-		for (Patch patch : patches.patches) {
-			patchservice.apply(patch);
-		}
-		response.status = "OK";
-		return response;
-	}
+                final AgencyAndId route = alertPatch.getRoute();
+                if (route != null && route.getId().equals("")) {
+                    response.status = "Every route patch must have a route id";
+                    return response;
+                }
+            }
+        }
+        for (Patch patch : patches.patches) {
+            patchservice.apply(patch);
+        }
+        response.status = "OK";
+        return response;
+    }
 }

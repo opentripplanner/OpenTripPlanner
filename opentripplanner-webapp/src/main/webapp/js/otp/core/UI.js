@@ -42,6 +42,7 @@ otp.core.UI = {
     // default config options
     alwaysUseDefaultNorthWestCenter : false,
     centerTitle   : '',
+    rtl			  : false,
 
     /**
      * @constructor 
@@ -50,6 +51,11 @@ otp.core.UI = {
     {
         otp.configure(this, config);
 
+        if (config.locale.config.rtl) {
+            this.rtl = true;
+            Ext.get(document.body).set({'dir':'rtl'});
+        }
+		
         this.viewport = new Ext.Viewport({
           layout:'border',
           deferredRender:false, 
@@ -147,7 +153,7 @@ otp.core.UI = {
 
             this.west   = new Ext.Panel({
                 layout:       'accordion',
-                region:       'west',
+                region:       this.rtl ? 'east' : 'west',
                 id:           'west-panel',
                 header:       false,
                 width:        360,

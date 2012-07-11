@@ -55,7 +55,7 @@
     <bean id="checkGeometry" class="org.opentripplanner.graph_builder.impl.CheckGeometryGraphBuilderImpl" />
 
     <bean id="graphBuilderTask" class="org.opentripplanner.graph_builder.GraphBuilderTask">
-        <property name="alwaysRebuild" value="false" />
+        <property name="alwaysRebuild" value="true" />
         <property name="path" value="target/graph-bundle" />
         <property name="graphBuilders">
             <list>

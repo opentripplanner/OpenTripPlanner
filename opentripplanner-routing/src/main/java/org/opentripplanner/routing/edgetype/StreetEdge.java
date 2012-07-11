@@ -26,6 +26,9 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 public abstract class StreetEdge extends AbstractEdge implements EdgeWithElevation {
     
     private static final long serialVersionUID = 1L;
+    public static final int CLASS_STREET = 3;
+    public static final int CLASS_CROSSING = 4;
+    public static final int CLASS_OTHERPATH = 5;
 
     public StreetEdge(StreetVertex v1, StreetVertex v2) {
         super(v1, v2);
@@ -38,5 +41,7 @@ public abstract class StreetEdge extends AbstractEdge implements EdgeWithElevati
     public abstract StreetTraversalPermission getPermission();
     
     public abstract boolean isNoThruTraffic();
+    
+    public abstract int getStreetClass();
     
 }

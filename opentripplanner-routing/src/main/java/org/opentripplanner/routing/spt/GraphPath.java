@@ -25,8 +25,6 @@ import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.edgetype.Board;
-import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;
@@ -127,13 +125,8 @@ public class GraphPath {
     public List<RouteSpec> getRouteSpecs() {
         List<RouteSpec> ret = new LinkedList<RouteSpec>();
         for (State s : states) {
-            Edge e = s.getBackEdge();
-            Trip trip = null;
-            if (e instanceof PatternBoard) {
-                trip = s.getTripTimes().getTrip();
-            } else if (e instanceof Board) {
-                trip = ((Board) e).getTrip();
-            }
+            EdgeNarrative e = s.getBackEdgeNarrative();
+            Trip trip = e.getTrip();
             if ( trip != null) {
                 String routeName = GtfsLibrary.getRouteName(trip.getRoute());
                 RouteSpec spec = new RouteSpec(trip.getId().getAgencyId(), routeName);
@@ -152,16 +145,11 @@ public class GraphPath {
     public List<AgencyAndId> getTrips() {
         List<AgencyAndId> ret = new LinkedList<AgencyAndId>();
         for (State s : states) {
-            Edge e = s.getBackEdge();
-            Trip trip = null;
-            if (e instanceof PatternBoard) {
-                trip  = s.getTripTimes().getTrip();
-            } else if (e instanceof Board) {
-                trip = ((Board) e).getTrip();
-            } else {
-                continue;
-            }
-            ret.add(trip.getId());
+            EdgeNarrative e = s.getBackEdgeNarrative();
+            if (e == null) continue;
+            Trip trip = e.getTrip();
+            if (trip != null)
+                ret.add(trip.getId());
         }
         return ret;
     }

@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
@@ -86,6 +87,8 @@ public class PopulationFactory {
                     point = (Point) geom;
                 } else if (geom instanceof Polygon) {
                     point = ((Polygon) geom).getCentroid();
+                } else if (geom instanceof MultiPolygon) {
+                    point = ((MultiPolygon) geom).getCentroid();
                 } else {
                     throw new IllegalStateException("Shapefile must contain either points or polygons.");
                 }
