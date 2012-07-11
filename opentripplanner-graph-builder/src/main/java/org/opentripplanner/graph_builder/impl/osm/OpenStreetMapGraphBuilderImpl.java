@@ -162,13 +162,13 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
-        Handler handler = new Handler();
+        Handler handler = new Handler(graph);
         for (OpenStreetMapProvider provider : _providers) {
             _log.debug("gathering osm from provider: " + provider);
             provider.readOSM(handler);
         }
         _log.debug("building osm street graph");
-        handler.buildGraph(graph, extra);
+        handler.buildGraph(extra);
     }
 
     @SuppressWarnings("unchecked")
@@ -466,8 +466,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         private HashSet<OSMNode> _bikeRentalNodes = new HashSet<OSMNode>();
         private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
-        public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
+        public Handler(Graph graph) {
             this.graph = graph;
+        }
+
+        public void buildGraph(HashMap<Class<?>, Object> extra) {
 
             // handle turn restrictions, road names, and level maps in relations
             processRelations();
