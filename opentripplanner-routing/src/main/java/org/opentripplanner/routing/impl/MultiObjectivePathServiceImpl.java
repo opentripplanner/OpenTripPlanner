@@ -291,7 +291,7 @@ public class MultiObjectivePathServiceImpl implements PathService {
         final double EPSILON = 0.05;
         if (s0.similarRouteSequence(s1)) {
             return s0.getWeight() <= s1.getWeight() * (1 + EPSILON) &&
-                    s0.getTime() <= s1.getTime() * (1 + EPSILON) &&
+                    s0.getElapsedTime() <= s1.getElapsedTime() * (1 + EPSILON) &&
                     s0.getWalkDistance() <= s1.getWalkDistance() * (1 + EPSILON) && 
                     s0.getNumBoardings() <= s1.getNumBoardings();
         } else {
