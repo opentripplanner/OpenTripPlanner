@@ -38,6 +38,7 @@ otp.config_defaults = {
             showPrintButton       : true,   // turn on/off itinerary print button
             showLinksButton       : true,   // turn on/off itinerary links button
             showLayerSwitcher     : true,   // turn on/off OpenLayers layer switcher when more than 1 basemap exists (see map.baseLayer below)
+            setMaxExtentToDefault : true,   // will replace the OpenLayers.Map.zoomToMaxExtent() method with a pointer to otp.core.Map.zoomToDefaultExtent()
             useOptionDependencies : true,   // trip form changes based on mode and optimize flags (e.g., bike mode has no wheelchair or walk distance forms etc...) 
             useRouteLongName      : false,  // format route name with both short-name and long-name...see / override Itinerary.makeRouteName() for different formatting options
             appendGeocodeName     : true,   // true = send string:lat,lon parameter format to OTP, else just lat,lon goes to OTP
@@ -73,27 +74,6 @@ otp.config_defaults = {
             addressParamName : "address"
         },
         fromToOverride : new Ext.Template('<div class="mapHelp">' + otp.config.locale.config.rightClickMsg + '</div>')
-
-        /* debug geocoder */
-        /*  *
-        ,fromToOverride:null,
-        geocoder  :
-        {
-            enabled : true,
-            isSolr  : true,
-            url     : "/js/otp/planner/test/solr-geo.json",
-            addressParamName : "address"
-        }
-        /*  *
-        ,fromToOverride:null,
-        geocoder  :
-        {
-            enabled : true,
-            isSolr  : false,
-            url     : "/js/otp/planner/test/geo-multi.xml",
-            addressParamName : "address"
-        }
-        /* */
     },
 
     map : {
@@ -131,7 +111,7 @@ otp.config_defaults = {
                }
            )
            /* comment here to test single / multiple basemaps & layer switcher on/off */
-          ,
+           ,
            // Regular Open Street Map server
            new OpenLayers.Layer.OSM(
                "Open Street Map"
