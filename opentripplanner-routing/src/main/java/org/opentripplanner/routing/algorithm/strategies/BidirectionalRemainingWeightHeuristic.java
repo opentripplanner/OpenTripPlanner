@@ -94,7 +94,7 @@ public class BidirectionalRemainingWeightHeuristic implements
                         && !localStreetService.transferrable(v)) {
                     return Double.MAX_VALUE;
                 }
-                if (s.isAlightedLocal() || s.getNumBoardings() > s.getOptions().getMaxTransfers()) {
+                if (s.isAlightedLocal() || (!s.isOnboard() && s.getNumBoardings() > s.getOptions().getMaxTransfers())) {
                     double d = distanceLibrary.fastDistance(v.getCoordinate(),
                             target.getCoordinate());
                     if (d > s.getOptions().getMaxWalkDistance() - s.getWalkDistance()) {
