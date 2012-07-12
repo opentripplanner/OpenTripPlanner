@@ -171,10 +171,13 @@ otp.planner.Planner = {
     },
 
     /** */
-    clear : function() {
+    clear : function()
+    {
         this.showFormTab();
         this.m_forms.clear();
         this.m_renderer.clear();
+        this.controller.deactivate(this.CLASS_NAME);
+        this.closeElevation();
     },
 
     /** */
@@ -359,10 +362,7 @@ otp.planner.Planner = {
 
         // hide the south panel, if empty
         if (this.ui.innerSouth.isVisible()  && this.ui.innerSouth.getEl().dom.childNodes.length == 0)
-        {
-            this.ui.innerSouth.hide();
-            this.ui.viewport.doLayout();
-        }
+            this.closeElevation();
 
         // update the dynamic link to the current trip plan
         if (this.m_activeTabID === 0)
@@ -383,6 +383,17 @@ otp.planner.Planner = {
         }
     },
 
+    /** */
+    closeElevation : function() 
+    {
+        try
+        {
+            this.ui.innerSouth.hide();
+            this.ui.viewport.doLayout();
+        }
+        catch(e)
+        {}
+    },
 
     /**
      * adds a form panel to a new tab in the trip planner tab'd panel.
