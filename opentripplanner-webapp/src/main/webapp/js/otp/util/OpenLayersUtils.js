@@ -87,7 +87,7 @@ otp.util.OpenLayersUtils = {
     defaultControls : function(map, doZoomWheel, doRightClicks, doPermaLink, doAttribution, doHistory, doLayerSwitch)
     {
         var retVal = {
-            pan   : new OpenLayers.Control.PanZoomBar({zoomWorldIcon:true}),
+            pan   : new OpenLayers.Control.PanZoomBar({zoomWorldIcon:true, zoomStopHeight:6}),
             mouse : new OpenLayers.Control.MousePosition({numDigits: 4}),
             scale : new OpenLayers.Control.ScaleLine(),
             arg   : new OpenLayers.Control.ArgParser(),

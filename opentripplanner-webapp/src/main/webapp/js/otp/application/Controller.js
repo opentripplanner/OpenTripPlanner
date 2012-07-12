@@ -46,8 +46,8 @@ otp.application.Controller = {
             locale           : this.config.locale,
             routerId         : this.config.routerId,
             attribution      : otp.util.ExtUtils.MAP_ATTRIBUTION,
-            showLayerSwitcher: this.config.planner.options.showLayerSwitcher,
-            options: {
+            plannerOptions   : this.config.planner.options,
+            options          : {
                 controls: []
             }
         });
