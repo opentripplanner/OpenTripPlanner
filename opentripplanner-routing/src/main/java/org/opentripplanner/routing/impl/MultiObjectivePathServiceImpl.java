@@ -23,6 +23,7 @@ import org.opentripplanner.routing.algorithm.strategies.BidirectionalRemainingWe
 import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.LBGRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.strategies.TransitLocalStreetService;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -117,7 +118,7 @@ public class MultiObjectivePathServiceImpl implements PathService {
         if (options.getModes().isTransit()) {
             LOG.debug("Transit itinerary requested.");
             // always use the bidirectional heuristic because the others are not precise enough
-            heuristic = new BidirectionalRemainingWeightHeuristic(options.rctx.graph);    
+            heuristic = new BidirectionalRemainingWeightHeuristic(options.rctx.graph);
         } else {
             LOG.debug("Non-transit itinerary requested.");
             heuristic = new DefaultRemainingWeightHeuristic();
@@ -221,6 +222,7 @@ public class MultiObjectivePathServiceImpl implements PathService {
                         }
 
                         double h = heuristic.computeForwardWeight(new_sv, targetVertex);
+                        if (h == Double.MAX_VALUE) continue;
 //                    for (State bs : boundingStates) {
 //                        if (eDominates(bs, new_sv)) {
 //                            continue STATE;
@@ -289,9 +291,13 @@ public class MultiObjectivePathServiceImpl implements PathService {
         final double EPSILON = 0.05;
         if (s0.similarRouteSequence(s1)) {
             return s0.getWeight() <= s1.getWeight() * (1 + EPSILON) &&
-                    s0.getTime() <= s1.getTime() * (1 + EPSILON) &&
+                    s0.getElapsedTime() <= s1.getElapsedTime() * (1 + EPSILON) &&
                     s0.getWalkDistance() <= s1.getWalkDistance() * (1 + EPSILON) && 
-                    s0.getNumBoardings() <= s1.getNumBoardings();
+                    s0.getNumBoardings() <= s1.getNumBoardings() &&
+                    (s0.getWeight() < s1.getWeight() ||
+                     s0.getElapsedTime() < s1.getElapsedTime() ||
+                     s0.getWalkDistance() < s1.getWalkDistance() ||
+                     s0.getNumBoardings() < s1.getNumBoardings());
         } else {
             return false;
         }

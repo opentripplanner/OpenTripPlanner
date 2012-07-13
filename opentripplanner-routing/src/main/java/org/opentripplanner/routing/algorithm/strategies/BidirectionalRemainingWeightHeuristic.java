@@ -15,14 +15,17 @@ package org.opentripplanner.routing.algorithm.strategies;
 
 import java.util.Arrays;
 
+import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.pqueue.BinHeap;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.AbstractVertex;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
+import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,12 +52,17 @@ public class BidirectionalRemainingWeightHeuristic implements
 
     Graph g;
 
+    private TransitLocalStreetService localStreetService;
+
+    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
+
     /**
      * RemainingWeightHeuristic interface
      */
 
-    public BidirectionalRemainingWeightHeuristic(Graph g) {
-        this.g = g;
+    public BidirectionalRemainingWeightHeuristic(Graph graph) {
+        this.g = graph;
+        this.localStreetService = g.getService(TransitLocalStreetService.class);
     }
 
     @Override
@@ -70,16 +78,36 @@ public class BidirectionalRemainingWeightHeuristic implements
 
     @Override
     public double computeReverseWeight(State s, Vertex target) {
-        if (s.getVertex() instanceof StreetLocation)
+        final Vertex v = s.getVertex();
+        if (v instanceof StreetLocation)
             return 0;
         if (s.getWeight() < 10 * 60)
             return 0;
-        int index = s.getVertex().getIndex();
+        int index = v.getIndex();
         if (index < weights.length) {
             double h = weights[index];
+            if (s.isEverBoarded()) {
+                if (localStreetService != null
+                        && v instanceof StreetVertex
+                        && s.getOptions().getMaxWalkDistance() - s.getWalkDistance() < distanceLibrary
+                                .fastDistance(v.getCoordinate(), target.getCoordinate())
+                        && !localStreetService.transferrable(v)) {
+                    return Double.MAX_VALUE;
+                }
+                if (s.isAlightedLocal() || (!s.isOnboard() && s.getNumBoardings() > s.getOptions().getMaxTransfers())) {
+                    double d = distanceLibrary.fastDistance(v.getCoordinate(),
+                            target.getCoordinate());
+                    if (d > s.getOptions().getMaxWalkDistance() - s.getWalkDistance()) {
+                        return Double.MAX_VALUE;
+                    }
+                    double walk = d / s.getOptions().getSpeedUpperBound();
+                    return Math.max(h, walk);
+                }
+            }
             // System.out.printf("h=%f at %s\n", h, s.getVertex());
             // return infinite heuristic values 
             // so transit boarding is not even attempted useless patterns
+
             return h;
             //return h == Double.POSITIVE_INFINITY ? 0 : h;
             

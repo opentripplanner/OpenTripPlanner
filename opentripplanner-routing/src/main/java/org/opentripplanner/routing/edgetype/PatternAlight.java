@@ -82,6 +82,9 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
         RoutingRequest options = state0.getOptions();
         if (options.isArriveBy()) {
             /* backward traversal: find a transit trip on this pattern */
+            if (state0.getLastPattern() == pattern) {
+                return null;
+            }
             if (!options.getModes().get(modeMask)) {
                 return null;
             }
@@ -210,6 +213,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             s1.setTripId(null);
             s1.setLastAlightedTime(state0.getTime());
             s1.setPreviousStop(tov);
+            s1.setLastPattern(pattern);
             return s1.makeState();
         }
     }
