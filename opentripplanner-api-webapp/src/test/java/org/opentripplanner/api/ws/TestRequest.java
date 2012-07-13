@@ -26,6 +26,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.codehaus.jettison.json.JSONException;
+import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.model.AbsoluteDirection;
@@ -420,8 +421,8 @@ public class TestRequest extends TestCase {
         index.setGraphService(Context.getInstance().graphService);
         String routerId = "portland";
         AgencyList agencyIds = index.getAgencyIds(routerId);
-        assertTrue(agencyIds.agencyIds.contains("TriMet"));
-        assertEquals(1, agencyIds.agencyIds.size());
+        assertEquals(agencyIds.agencies.toArray(new Agency[0])[0].getId(),("TriMet"));
+        assertEquals(1, agencyIds.agencies.size());
 
         RouteData routeData = (RouteData) index.getRouteData("TriMet", "100", routerId);
         assertEquals(new AgencyAndId("TriMet", "100"), routeData.id);

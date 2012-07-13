@@ -39,6 +39,7 @@ import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
+import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
@@ -68,7 +69,7 @@ public class Graph implements Serializable {
     private final MavenVersion mavenVersion = MavenVersion.VERSION;
 
     private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
-    
+
     // transit feed validity information in seconds since epoch
     private long transitServiceStarts = Long.MAX_VALUE;
 
@@ -79,7 +80,7 @@ public class Graph implements Serializable {
     private TransferTable transferTable = new TransferTable();
 
     private GraphBundle bundle;
-    
+
     /* vertex index by name is reconstructed from edges */
     private transient Map<String, Vertex> vertices;
 
@@ -97,7 +98,9 @@ public class Graph implements Serializable {
     
     private List<GraphBuilderAnnotation> graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>();
 
-    private Collection<String> agencies = new HashSet<String>();
+    private Collection<String> agenciesIds = new HashSet<String>();
+
+    private Collection<Agency> agencies = new HashSet<Agency>();
 
     private transient Set<Edge> temporaryEdges;
 
@@ -501,11 +504,16 @@ public class Graph implements Serializable {
     }
 
     public Collection<String> getAgencyIds() {
+        return agenciesIds;
+    }
+
+    public Collection<Agency> getAgencies() {
         return agencies;
     }
 
-    public void addAgencyId(String agency) {
+    public void addAgency(Agency agency) {
         agencies.add(agency);
+        agenciesIds.add(agency.getId());
     }
 
     public void addTemporaryEdge(Edge edge) {

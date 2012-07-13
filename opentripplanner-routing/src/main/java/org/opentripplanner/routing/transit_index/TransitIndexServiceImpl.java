@@ -197,7 +197,7 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
             }
             
         }
-        return new ArrayList<AgencyAndId>(Arrays.asList(out.toArray(new AgencyAndId[0])));
+        return new ArrayList<AgencyAndId>(out);
     }
 
     public void setCenter(Coordinate coord) {

@@ -125,7 +125,7 @@ public class RetryingPathServiceImpl implements PathService {
                         paths.size(), (System.currentTimeMillis() - searchBeginTime) / 1000.0);
                 break;
             }
-            if (maxWeight == Double.MAX_VALUE) {
+            if (maxWeight == Double.MAX_VALUE && maxWalk == Double.MAX_VALUE) {
                 /* the worst trip we are willing to accept is at most twice as bad or twice as long */
                 if (somePaths.isEmpty()) {
                     // if there is no first path, there won't be any other paths
@@ -146,6 +146,9 @@ public class RetryingPathServiceImpl implements PathService {
                 }
             }
             if (somePaths.isEmpty()) {
+                //try again doubling maxwalk
+                maxWalk *= 2;
+                optionQueue.add(currOptions);
                 LOG.debug("No paths were found.");
                 continue;
             }
