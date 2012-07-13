@@ -60,13 +60,15 @@ otp.planner.Templates = {
 
         if(this.TP_ITINERARY == null)
             this.TP_ITINERARY = new Ext.XTemplate(
-                  '<div id={id} class="dir-alt-route-inner"><a href="javascript:void;">{id}</a>: ',
-                  ' {startTimeDisplay} - {endTimeDisplay} ',
+                  '<div id={id} class="dir-alt-route-inner">',
+                    '<div class="time-span">{[otp.util.StringFormattingUtils.timeSpan(values.startTime, values.endTime)]}</div>',
+                    '<div class="duration-hours-mins">{[otp.util.StringFormattingUtils.durationHoursMins(values.duration)]}</div>',
+
                   '<tpl if="numTransfers">',
                     '<br/><span class="transfers">',
-                    '({numTransfers} ',
-                    '<tpl if="numTransfers == 1">' + this.locale.instructions.transfer  + '</tpl>',
-                    '<tpl if="numTransfers != 1">' + this.locale.instructions.transfers + '</tpl>',
+                    '({transfers} ',
+                    '<tpl if="transfers == 1">' + this.locale.instructions.transfer  + '</tpl>',
+                    '<tpl if="transfers != 1">' + this.locale.instructions.transfers + '</tpl>',
                     ', {duration} ' + this.getDurationTemplateString(),
                     ')</span>',
                   '</tpl>',

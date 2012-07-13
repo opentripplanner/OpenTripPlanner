@@ -217,6 +217,12 @@ otp.locale.Polish = {
     time:
     {
 // TODO
+        // TODO
+        hour_abbrev    : "hour",
+        hours_abbrev   : "hours",
+        hour           : "hour",
+        hours          : "hours",
+
         format        : "D, j M H:i",
         date_format   : "d-m-Y",
         time_format   : "H:i",

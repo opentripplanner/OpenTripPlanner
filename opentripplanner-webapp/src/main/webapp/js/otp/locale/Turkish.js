@@ -216,6 +216,12 @@ otp.locale.Turkish = {
 
     time:
     {
+        // TODO
+        hour_abbrev    : "hour",
+        hours_abbrev   : "hours",
+        hour           : "hour",
+        hours          : "hours",
+
         minute         : "dakika",
         minutes        : "dakika",
         minute_abbrev  : "dak",

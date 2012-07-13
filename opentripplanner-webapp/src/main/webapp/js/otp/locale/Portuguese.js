@@ -213,6 +213,12 @@ otp.locale.Portuguese = {
 
     time:
     {
+        // TODO
+        hour_abbrev    : "hour",
+        hours_abbrev   : "hours",
+        hour           : "hour",
+        hours          : "hours",
+
         minute         : "minuto",
         minutes        : "minutos",
         minute_abbrev  : "min",

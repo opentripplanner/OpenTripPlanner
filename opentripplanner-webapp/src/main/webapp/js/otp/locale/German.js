@@ -215,6 +215,12 @@ otp.locale.German = {
 
     time:
     {
+        // TODO
+        hour_abbrev    : "hour",
+        hours_abbrev   : "hours",
+        hour           : "hour",
+        hours          : "hours",
+
         minute         : "Minute",
         minutes        : "Minuten",
         minute_abbrev  : "min.",

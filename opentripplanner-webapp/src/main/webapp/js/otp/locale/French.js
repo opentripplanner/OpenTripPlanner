@@ -204,6 +204,12 @@ otp.locale.French = {
     },
 
     time : {
+        // TODO
+        hour_abbrev    : "hour",
+        hours_abbrev   : "hours",
+        hour           : "hour",
+        hours          : "hours",
+
         format : "d.m.Y \\à H:i",
         date_format : "d-m-Y",
         time_format : "H:i",

@@ -41,6 +41,57 @@ otp.util.StringFormattingUtils = {
         return (((sign)?'':'-') + '$' + num + '.' + cents);
     },
 
+    /** */
+    timeSpan : function(startTime, endTime, locale, sep)
+    {
+        var retVal = startTime + sep + endTime;
+        try
+        {
+            if(sep == null)    sep = " - ";
+            if(locale == null) locale = otp.config.locale;
+
+            var tf = locale.time.time_format;
+            var s = startTime.format(tf);
+            var e = endTime.format(tf);
+            retVal = s + sep + e;
+        }
+        catch(e)
+        {
+        }
+
+        return retVal;
+    },
+
+    /** */
+    durationHoursMins : function(durr, locale, sep)
+    {
+        var retVal = durr;
+        try
+        {
+            if(locale == null) locale = otp.config.locale;
+
+            if(durr >= 60.0 && locale.CLASS_NAME == otp.locale.English.CLASS_NAME)
+            {
+                var hrs  = Math.floor(durr / 60);
+                var mins = durr % 60;
+
+                var m = (mins == 1) ? locale.time.minute_abbrev : locale.time.minutes_abbrev;
+                var h = (hrs  == 1) ? locale.time.hour_abbrev   : locale.time.hours_abbrev;
+                retVal = hrs + " " + h + " " + mins + " " + m;
+            }
+            else
+            {
+                var m = (mins == 1) ? locale.time.minute_abbrev : locale.time.minutes_abbrev;
+                retVal = durr + " " + m;
+            }
+        }
+        catch(e)
+        {
+        }
+
+        return retVal;
+    },
+
 
     /** */
     percent : function(inStr, symbol)
@@ -298,6 +349,7 @@ otp.util.StringFormattingUtils = {
         
         return retVal;
     },
+
 
     CLASS_NAME: "otp.util.StringFormattingUtils"
 };
