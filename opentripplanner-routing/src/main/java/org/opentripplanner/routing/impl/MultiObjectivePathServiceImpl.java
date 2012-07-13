@@ -293,7 +293,11 @@ public class MultiObjectivePathServiceImpl implements PathService {
             return s0.getWeight() <= s1.getWeight() * (1 + EPSILON) &&
                     s0.getElapsedTime() <= s1.getElapsedTime() * (1 + EPSILON) &&
                     s0.getWalkDistance() <= s1.getWalkDistance() * (1 + EPSILON) && 
-                    s0.getNumBoardings() <= s1.getNumBoardings();
+                    s0.getNumBoardings() <= s1.getNumBoardings() &&
+                    (s0.getWeight() < s1.getWeight() ||
+                     s0.getElapsedTime() < s1.getElapsedTime() ||
+                     s0.getWalkDistance() < s1.getWalkDistance() ||
+                     s0.getNumBoardings() < s1.getNumBoardings());
         } else {
             return false;
         }
