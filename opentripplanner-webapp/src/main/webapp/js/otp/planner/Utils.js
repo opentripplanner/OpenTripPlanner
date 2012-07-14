@@ -23,6 +23,10 @@ function millisToMinutes (n, p) {
     return parseInt(n / 60000);
 }
 
+function secondsToMinutes (n, p) {
+    return parseInt(n / 60);
+}
+
 function metersToMiles (n, p) {
     var miles = n / 1609.344;
     return miles.toFixed(1);
@@ -69,17 +73,17 @@ otp.planner.Utils = {
                   {name: 'regularFare',  mapping: 'fare', convert: function(val, rec) { return otp.planner.Utils.getFare(rec, 'regular'); }},
                   {name: 'seniorFare',   mapping: 'fare', convert: function(val, rec) { return otp.planner.Utils.getFare(rec, 'senior'); }},
                   {name: 'studentFare',  mapping: 'fare', convert: function(val, rec) { return otp.planner.Utils.getFare(rec, 'student'); }},
-                  {name: 'duration',     mapping: 'duration', convert: millisToMinutes},
-                  {name: 'startTime',    mapping: 'startTime', convert: isoDateStringToDate},
-                  {name: 'endTime',      mapping: 'endTime', convert: isoDateStringToDate},
+                  {name: 'duration',     mapping: 'duration',      convert: millisToMinutes},
+                  {name: 'startTime',    mapping: 'startTime',     convert: isoDateStringToDate},
+                  {name: 'endTime',      mapping: 'endTime',       convert: isoDateStringToDate},
                   {name: 'startTimeDisplay', mapping: 'startTime', convert: prettyDateTime},
-                  {name: 'endTimeDisplay', mapping: 'endTime', convert: prettyDateTime},
+                  {name: 'endTimeDisplay',   mapping: 'endTime',   convert: prettyDateTime},
                   {name: 'numTransfers', mapping: 'transfers'},
-                  {name: 'numLegs',      mapping: 'legs', convert : function (n, p) { return p.length; }},
-                  {name: 'walkTime',     mapping: 'walkTime', convert: millisToMinutes},
-                  {name: 'walkDistance', mapping: 'walkDistance', convert: prettyDistance},
-                  {name: 'transitTime',  mapping: 'transitTime', convert: millisToMinutes},
-                  {name: 'waitingTime',  mapping: 'waitingTime', convert: millisToMinutes}
+                  {name: 'numLegs',      mapping: 'legs',         convert : function (n, p) { return p.length; }},
+                  {name: 'walkDistance', mapping: 'walkDistance', convert: prettyDistance  },
+                  {name: 'walkTime',     mapping: 'walkTime',     convert: secondsToMinutes},
+                  {name: 'transitTime',  mapping: 'transitTime',  convert: secondsToMinutes},
+                  {name: 'waitingTime',  mapping: 'waitingTime',  convert: secondsToMinutes}
     ]),
     
     LEG_RECORD : new Ext.data.Record.create([

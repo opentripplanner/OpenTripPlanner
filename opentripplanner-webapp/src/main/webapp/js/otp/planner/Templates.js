@@ -30,7 +30,7 @@ otp.planner.ParamTemplate = 'submit'
         + '&wheelchair={wheelchair}'
         + '&preferredRoutes={preferredRoutes}'
         + '&unpreferredRoutes={unpreferredRoutes}'
-        ;
+;
 
 otp.planner.Templates = {
 
@@ -61,18 +61,18 @@ otp.planner.Templates = {
         if(this.TP_ITINERARY == null)
             this.TP_ITINERARY = new Ext.XTemplate(
                   '<div id={id} class="dir-alt-route-inner">',
-                    '<div class="time-span">{[otp.util.StringFormattingUtils.timeSpan(values.startTime, values.endTime)]}</div>',
-                    '<div class="duration-hours-mins">{[otp.util.StringFormattingUtils.durationHoursMins(values.duration)]}</div>',
-
+                    '<span class="time-span itinopt">{[otp.util.StringFormattingUtils.timeSpan(values.startTime, values.endTime, otp.planner.Templates.locale)]}</span>',
+                    '<span class="duration-hours-mins itinopt">{[otp.util.StringFormattingUtils.durationHoursMins(values.duration, otp.planner.Templates.locale)]}</span>',
+                  '</div>',
                   '<tpl if="numTransfers">',
-                    '<br/><span class="transfers">',
-                    '({transfers} ',
-                    '<tpl if="transfers == 1">' + this.locale.instructions.transfer  + '</tpl>',
-                    '<tpl if="transfers != 1">' + this.locale.instructions.transfers + '</tpl>',
-                    ', {duration} ' + this.getDurationTemplateString(),
-                    ')</span>',
-                  '</tpl>',
-                  '</div>'
+                  '<div id={id} class="dir-alt-route-inner">',
+                    '<span>&nbsp;&nbsp;</span>',
+                    '<span class="transfers">{numTransfers} ',
+                    '<tpl if="numTransfers == 1">' + this.locale.instructions.transfer  + '</tpl>',
+                    '<tpl if="numTransfers != 1">' + this.locale.instructions.transfers + '</tpl>',
+                    '</span>',
+                  '</div>',
+                  '</tpl>'
             ).compile();
 
         if(this.tripFeedbackDetails == null)

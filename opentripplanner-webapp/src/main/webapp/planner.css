@@ -168,15 +168,6 @@ height:16px;
 background-image: url(images/ui/buttons/systemmap.png)!important;
 }
 
-/* Show alternative routes */
-.dir-alt-route-inner {
-    padding: 2px 4px 2px 20px;
-    font-family: arial, sans serif;
-    font-size: 13px;    
-}
-[dir=rtl] .dir-alt-route-inner {
-    padding: 2px 20px 2px 4px;
-}
 
 #trip-details {
   border: 1px solid #4c4c4c;
@@ -398,11 +389,6 @@ text-indent: 40px;
 font-size: 90%;
 }
 
-.transfers {
-  color: #888;
-  font-size: 90%;
-}
-
 a:link {
 font-weight: 700;
 text-decoration: none;
@@ -599,12 +585,12 @@ vertical-align: middle;
 margin: 0;
 }
 [dir=rtl] .itiny, .itiny-note {
-	padding-left: 0;
-	padding-right: 7px;
+    padding-left: 0;
+    padding-right: 7px;
 }
 
 .itiny .x-tree-ec-icon {
-display: none;
+    display: none;
 }
 
 
@@ -618,8 +604,8 @@ vertical-align: middle;
 margin: 0;
 }
 [dir=rtl] .itiny-steps {
-	padding-left: 0;
-	padding-right: 10px;
+    adding-left: 0;
+    padding-right: 10px;
 }
 .itiny-inline-icon {
 float: left;
@@ -636,7 +622,7 @@ width: 21px !important;
 height: 21px !important;
 }
 [dir=rtl] .itiny-step-icon {
-float: right;
+    float: right;
 }
 .popup-route-icon {
 float: left;
@@ -1140,4 +1126,27 @@ These rules fix RTL support for styles defined in external libraries
 
 [dir=rtl] .x-form-field-wrap {
     text-align:  right;
+}
+
+
+/* 
+ * Itinerary Options Tree (top of page)
+ * Frank Purcell - July 2012
+ */
+.dir-alt-route-inner > span {
+    font: normal 100%/125% Arial,Helvetica,sans-serif !important;
+    font-size: 14px;
+    height: 30px;
+    color:#878787 !important; 
+}
+.x-tree-selected .dir-alt-route-inner > span {
+    color:#444 !important; 
+    font: bold 100%/125% Arial,Helvetica,sans-serif !important;
+}
+span.duration-hours-mins {
+    float: right !important;
+    padding-right: 5px !important;
+}
+span.transfers {
+  font-size: 90% !important;
 }
