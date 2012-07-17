@@ -40,6 +40,15 @@
 		<constructor-arg type="String" value="/home/abyrd/Dropbox/immoPrix/Prix point.shp" />
         <constructor-arg type="String" value="prixm2" />
         <constructor-arg type="String" value="residus" />
+	</bean>
+
+    <bean id="heuristicFactory" class="org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl"/>
+    <bean id="sptService" class="org.opentripplanner.routing.algorithm.GenericAStar"/>
+    <bean id="populationFactory" class="org.opentripplanner.analyst.batch.factory.PopulationFactory" />
+    <bean id="individualFactory" class="org.opentripplanner.analyst.batch.factory.IndividualFactory" />
+
+	<bean id="batchProcessor" class="org.opentripplanner.analyst.batch.BatchProcessor"> 
+        <property name="routerId" value="paris" />
         <!--         
         <property name="aggregator"> 
             <bean class="org.opentripplanner.analyst.batch.aggregator.ThresholdSumAggregator">
@@ -48,12 +57,5 @@
         </property>
         -->
 	</bean>
-
-    <bean id="heuristicFactory" class="org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl"/>
-    <bean id="sptService" class="org.opentripplanner.routing.algorithm.GenericAStar"/>
-    <bean id="populationFactory" class="org.opentripplanner.analyst.batch.factory.PopulationFactory" />
-    <bean id="individualFactory" class="org.opentripplanner.analyst.batch.factory.IndividualFactory" />
-
-	<bean id="batchProcessor" class="org.opentripplanner.analyst.batch.BatchProcessor" />
 
 </beans>
