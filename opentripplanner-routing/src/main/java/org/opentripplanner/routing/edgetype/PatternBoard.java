@@ -203,6 +203,12 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             s1.setRoute(trip.getRoute().getId());
 
             long wait_cost = bestWait;
+
+            // don't wait too long for this boarding
+            if (options.maxWait > 0 && bestWait > options.maxWait) {
+                return null;
+            }
+
             if (state0.getNumBoardings() == 0) {
                 wait_cost *= options.waitAtBeginningFactor;
                 // this is subtracted out in Analyst searches in lieu of reverse optimization

@@ -237,6 +237,11 @@ public class RoutingRequest implements Cloneable, Serializable {
     private boolean useBikeRentalAvailabilityInformation = false;
 
     /**
+     * The maximum wait time (in seconds) for any one boarding. A value of 0 disables.
+     */
+    public long maxWait;
+
+    /**
      * The routing context used to actually carry out this search. It is important to build States 
      * from TraverseOptions rather than RoutingContexts, and just keep a reference to the context 
      * in the TraverseOptions, rather than using RoutingContexts for everything because in some 
@@ -674,7 +679,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && bikeRentalDropoffTime == other.bikeRentalDropoffTime
                 && bikeRentalDropoffCost == other.bikeRentalDropoffCost
                 && useBikeRentalAvailabilityInformation == other.useBikeRentalAvailabilityInformation
-                && extensions.equals(other.extensions);
+                && extensions.equals(other.extensions)
+                && maxWait == other.maxWait;
     }
 
     /** Equality and hashCode should not consider the routing context, to allow SPT caching. */
@@ -694,7 +700,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + new Double(triangleSafetyFactor).hashCode() * 195233277
                 + new Double(triangleSlopeFactor).hashCode() * 136372361
                 + new Double(triangleTimeFactor).hashCode() * 790052899
-                + new Double(stairsReluctance).hashCode() * 315595321;
+                + new Double(stairsReluctance).hashCode() * 315595321
+                + new Long(maxWait).hashCode() * 209477;
         if (batch) {
             hashCode *= -1;
             hashCode += to.hashCode() * 1327144003;

@@ -125,6 +125,12 @@ public abstract class RoutingResource {
     /** A transit stop required to be the first stop in the search */
     @DefaultValue("") @QueryParam("startTransitStopId") protected List<String> startTransitStopId;
 
+    /** 
+     * The maximum wait (in seconds) permissible at any one time (each board can have as much as 
+     * this much wait time). A value of 0 allows infinite wait times.
+     */
+    @DefaultValue("0") @QueryParam("maxWait") protected List<Long> maxWait;
+
     /* 
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
      * this should ideally be done when setting the routing context, but at present departure/
@@ -266,6 +272,9 @@ public abstract class RoutingResource {
         if (startTransitStopId != null && !"".equals(startTransitStopId)) {
             request.setStartingTransitStopId(AgencyAndId.convertFromString(startTransitStopId));
         }
+        
+        request.setMaxWait(get(maxWait, n, request.getMaxWait()));
+
         return request;
     }
     
