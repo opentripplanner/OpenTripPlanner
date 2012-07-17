@@ -13,12 +13,14 @@
 
 package org.opentripplanner.routing.core;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.automata.AutomatonState;
 import org.opentripplanner.routing.edgetype.FreeEdge;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.patch.NoteNarrative;
@@ -39,7 +41,7 @@ import org.slf4j.LoggerFactory;
  */
 public class StateEditor {
 
-    private static final Logger _log = LoggerFactory.getLogger(StateEditor.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StateEditor.class);
 
     protected State child;
 
@@ -90,14 +92,14 @@ public class StateEditor {
                 child.vertex = en.getFromVertex();
             } else {
                 // Parent state is not at either end of edge.
-                _log.warn("Edge is not connected to parent state: {}", en);
-                _log.warn("   from   vertex: {}", en.getFromVertex());
-                _log.warn("   to     vertex: {}", en.getToVertex());
-                _log.warn("   parent vertex: {}", parent.vertex);
+                LOG.warn("Edge is not connected to parent state: {}", en);
+                LOG.warn("   from   vertex: {}", en.getFromVertex());
+                LOG.warn("   to     vertex: {}", en.getToVertex());
+                LOG.warn("   parent vertex: {}", parent.vertex);
                 defectiveTraversal = true;
             }
             if (traversingBackward != parent.getOptions().isArriveBy()) {
-                _log
+                LOG
                         .error("Actual traversal direction does not match traversal direction in TraverseOptions.");
                 defectiveTraversal = true;
             }
@@ -123,7 +125,7 @@ public class StateEditor {
 
         // if something was flagged incorrect, do not make a new state
         if (defectiveTraversal) {
-            _log.error("Defective traversal flagged on edge " + child.backEdge);
+            LOG.error("Defective traversal flagged on edge " + child.backEdge);
             return null;
         }
 
@@ -136,7 +138,7 @@ public class StateEditor {
             // direction
             if (traversingBackward ? (child.getTimeDeltaSec() > 0)
                     : (child.getTimeDeltaSec() < 0)) {
-                _log.trace("Time was incremented the wrong direction during state editing. {}",
+                LOG.trace("Time was incremented the wrong direction during state editing. {}",
                         child.backEdge);
                 return null;
             }
@@ -204,13 +206,13 @@ public class StateEditor {
 
     public void incrementWeight(double weight) {
         if (Double.isNaN(weight)) {
-            _log.warn("A state's weight is being incremented by NaN while traversing edge "
+            LOG.warn("A state's weight is being incremented by NaN while traversing edge "
                     + child.backEdge);
             defectiveTraversal = true;
             return;
         }
         if (weight < 0) {
-            _log.warn("A state's weight is being incremented by a negative amount while traversing edge "
+            LOG.warn("A state's weight is being incremented by a negative amount while traversing edge "
                     + child.backEdge);
             defectiveTraversal = true;
             return;
@@ -226,7 +228,7 @@ public class StateEditor {
      */
     public void incrementTimeInSeconds(int seconds) {
         if (seconds < 0) {
-            _log.warn("A state's time is being incremented by a negative amount while traversing edge "
+            LOG.warn("A state's time is being incremented by a negative amount while traversing edge "
                     + child.getBackEdge());
             defectiveTraversal = true;
             return;
@@ -236,7 +238,7 @@ public class StateEditor {
 
     public void incrementWalkDistance(double length) {
         if (length < 0) {
-            _log.warn("A state's walk distance is being incremented by a negative amount.");
+            LOG.warn("A state's walk distance is being incremented by a negative amount.");
             defectiveTraversal = true;
             return;
         }
@@ -256,16 +258,8 @@ public class StateEditor {
     }
 
     public void setTripId(AgencyAndId tripId) {
-        final int SMALL_PRIME = 31;
-        final int LARGE_PRIME = 24421;
         cloneStateDataAsNeeded();
         child.stateData.tripId = tripId;
-        // tripId is set to null when alighting.
-        // only update hash when encountering a new tripid
-        if (tripId != null) {
-            child.stateData.tripSeqHash *= LARGE_PRIME;
-            child.stateData.tripSeqHash += tripId.getId().hashCode() * SMALL_PRIME;
-        }
     }
 
     public void setWalkDistance(double walkDistance) {
@@ -284,15 +278,18 @@ public class StateEditor {
         }
     }
 
-    public void setRoute(AgencyAndId route) {
-        if (route == null) {
-            if (child.stateData.route != null) {
-                cloneStateDataAsNeeded();
-                child.stateData.route = route;
-            }
-        } else if (!route.equals(child.stateData.route)) {
-            cloneStateDataAsNeeded();
-            child.stateData.route = route;
+    public void setRoute(AgencyAndId routeId) {
+        cloneStateDataAsNeeded();
+        child.stateData.route = routeId;
+        // unlike tripId, routeId is not set to null when alighting
+        // but do a null check anyway
+        if (routeId != null) {
+            AgencyAndId[] oldRouteSequence = child.stateData.routeSequence;
+            //LOG.debug("old route seq {}", Arrays.asList(oldRouteSequence));
+            int oldLength = oldRouteSequence.length;
+            child.stateData.routeSequence = Arrays.copyOf(oldRouteSequence, oldLength + 1);
+            child.stateData.routeSequence[oldLength] = routeId;
+            //LOG.debug("new route seq {}", Arrays.asList(child.stateData.routeSequence)); // array will be interpreted as varargs
         }
     }
 
@@ -501,5 +498,10 @@ public class StateEditor {
     public void alightTransit() {
         cloneStateDataAsNeeded();
         child.stateData.lastTransitWalk = child.getWalkDistance();
+    }
+
+    public void setLastPattern(TripPattern pattern) {
+        cloneStateDataAsNeeded();
+        child.stateData.lastPattern = pattern;
     }
 }

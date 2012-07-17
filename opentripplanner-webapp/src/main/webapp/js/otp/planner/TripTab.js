@@ -104,9 +104,9 @@ otp.planner.TripTab = {
             var id    = this.m_tripNodePrefix + (i + 1);
             var itin  = store.getAt(i);
             itin.set('id', (i+1)); // for template -- eg: the numerical hyperlink listing itinerary option
-            if (itin.data && !otp.util.Modes.isTransit(itin.data.mode)) {
+            if(!itin.data || !itin.data.transitTime || itin.data.transitTime <= 0)
                 itin.data.numTransfers = null;  // don't display transfer information on non-transit trips
-            }
+
             var text = this.templates.TP_ITINERARY.applyTemplate(itin.data);
             var treeNodeConfig = Ext.apply({}, {id: id, text: text}, treeNodeDefaults);
             z[i] = otp.util.ExtUtils.makeTreeNode(treeNodeConfig, this.itineraryClick, this);

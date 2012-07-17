@@ -215,6 +215,11 @@ otp.locale.English = {
 
     time:
     {
+        hour_abbrev    : "hour",
+        hours_abbrev   : "hours",
+        hour           : "hour",
+        hours          : "hours",
+
         minute         : "minute",
         minutes        : "minutes",
         minute_abbrev  : "min",

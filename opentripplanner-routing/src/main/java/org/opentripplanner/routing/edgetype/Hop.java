@@ -75,7 +75,7 @@ public class Hop extends AbstractEdge implements OnBoardForwardEdge, OnBoardReve
             s1.setZone(getStartStop().getZoneId());
         else
             s1.setZone(getEndStop().getZoneId());
-        s1.setRoute(start.getTrip().getRoute().getId());
+        //s1.setRoute(start.getTrip().getRoute().getId());
         return s1.makeState();
     }
 

@@ -217,6 +217,12 @@ otp.locale.Hebrew = {
 
     time:
     {
+        // TODO
+        hour_abbrev    : "שעה",
+        hours_abbrev   : "שעות",
+        hour           : "שעה",
+        hours          : "שעות",
+
         minute         : "דקה",
         minutes        : "דקות",
         minute_abbrev  : "דקה",

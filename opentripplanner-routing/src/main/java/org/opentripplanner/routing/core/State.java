@@ -21,6 +21,7 @@ import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.automata.AutomatonState;
 import org.opentripplanner.routing.edgetype.OnBoardForwardEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.pathparser.PathParser;
@@ -95,13 +96,13 @@ public class State implements Cloneable {
         // this should be harmless since reversed clones are only used when routing has finished
         this.stateData.opt = options;
         this.stateData.startTime = time;
-        this.stateData.tripSeqHash = 0;
         this.stateData.usingRentedBike = false;
         this.time = time;
         if (options.rctx != null) {
         	this.pathParserStates = new int[options.rctx.pathParsers.length];
         	Arrays.fill(this.pathParserStates, AutomatonState.START);
         }
+        stateData.routeSequence = new AgencyAndId[0];
     }
 
     /**
@@ -244,7 +245,7 @@ public class State implements Cloneable {
         if (isBikeRenting() != other.isBikeRenting())
             return false;
 
-        if (this.similarTripSeq(other)) {
+        if (this.similarRouteSequence(other)) {
             return this.weight <= other.weight;
         }
 
@@ -397,8 +398,16 @@ public class State implements Cloneable {
         return time * 1000;
     }
 
-    public boolean similarTripSeq(State existing) {
-        return this.stateData.tripSeqHash == existing.stateData.tripSeqHash;
+    public boolean similarRouteSequence(State that) {
+        AgencyAndId[] rs0 = this.stateData.routeSequence;
+        AgencyAndId[] rs1 = that.stateData.routeSequence;
+        if (rs0 == rs1)
+            return true;
+        int n = rs0.length < rs1.length ? rs0.length : rs1.length;
+        for (int i = 0; i < n; i++)
+            if (rs0[i] != rs1[i])
+                return false;
+        return true;
     }
 
     public double getWalkSinceLastTransit() {
@@ -470,5 +479,9 @@ public class State implements Cloneable {
 		sb.append(")");
 		return sb.toString();
 	}
+
+    public TripPattern getLastPattern() {
+        return stateData.lastPattern;
+    }
 
 }

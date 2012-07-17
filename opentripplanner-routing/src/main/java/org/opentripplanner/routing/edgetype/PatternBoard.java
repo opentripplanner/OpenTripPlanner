@@ -103,9 +103,13 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             s1.setTripId(null);
             s1.setLastAlightedTime(state0.getTime());
             s1.setPreviousStop(fromv);
+            s1.setLastPattern(this.getPattern());
             return s1.makeState();
         } else {
             /* forward traversal: look for a transit trip on this pattern */
+            if (state0.getLastPattern() == this.getPattern()) {
+                return null;
+            }
             if (!options.getModes().get(modeMask)) {
                 return null;
             }

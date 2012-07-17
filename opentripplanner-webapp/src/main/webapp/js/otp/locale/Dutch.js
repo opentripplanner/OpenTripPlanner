@@ -214,6 +214,12 @@ otp.locale.Dutch = {
 
     time:
     {
+        // TODO
+        hour_abbrev    : "hour",
+        hours_abbrev   : "hours",
+        hour           : "hour",
+        hours          : "hours",
+
         minute         : "minuut",
         minutes        : "minuten",
         minute_abbrev  : "min",

@@ -19,6 +19,7 @@ import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 
 /**
@@ -37,21 +38,26 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
     private double maxSpeed;
 
     private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
+    private TransitLocalStreetService localStreetService;
 
     @Override
     public double computeInitialWeight(State s, Vertex target) {
         this.options = s.getOptions();
         this.useTransit = options.getModes().isTransit();
         this.maxSpeed = getMaxSpeed(options);
-        return distanceLibrary.fastDistance(s.getVertex().getCoordinate(), 
-                target.getCoordinate()) / maxSpeed;
+
+        Graph graph = options.rctx.graph;
+        localStreetService = graph.getService(TransitLocalStreetService.class);
+
+        return distanceLibrary.fastDistance(s.getVertex().getCoordinate(), target.getCoordinate())
+                / maxSpeed;
     }
 
     @Override
     public double computeForwardWeight(State s, Vertex target) {
 
     	Vertex sv = s.getVertex();
-        double euclidianDistance = distanceLibrary .fastDistance(sv.getCoordinate(), 
+        double euclidianDistance = distanceLibrary.fastDistance(sv.getCoordinate(), 
                 target.getCoordinate());
         /*	On a non-transit trip, the remaining weight is simply distance / speed
          *	On a transit trip, there are two cases:
@@ -80,6 +86,13 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
                 }
                 if (s.isEverBoarded()) {
                     boardCost += options.transferPenalty;
+                    if (localStreetService != null) {
+                        if (s.getOptions().getMaxWalkDistance() - s.getWalkDistance() < distanceLibrary
+                                .fastDistance(sv.getCoordinate(), target.getCoordinate())
+                                && !localStreetService.transferrable(sv)) {
+                            return Double.POSITIVE_INFINITY;
+                        }
+                    }
                 }
                 if (euclidianDistance < target.getDistanceToNearestTransitStop()) {
                     if (euclidianDistance + s.getWalkDistance() > options.getMaxWalkDistance()) {
