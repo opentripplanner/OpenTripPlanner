@@ -175,6 +175,12 @@ otp.locale.Polish = {
         trip_details : "Szczegóły trasy",
         fare         : "Opłata",
         fare_symbol  : "zł",
+
+        // TODO  -- used in the Trip Details summary to describe different fares 
+        regular_fare : "",
+        student_fare : "",
+        senior_fare  : "",
+
         travel       : "Początek podróży",
         valid        : "Ważny",
         trip_length  : "Czasowy",

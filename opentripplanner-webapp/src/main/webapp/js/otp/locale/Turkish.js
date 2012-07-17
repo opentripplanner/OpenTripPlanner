@@ -177,6 +177,12 @@ otp.locale.Turkish = {
         trip_details : "Yolculuk detayları",
         fare         : "Ücret",
         fare_symbol  : "$",
+
+        // TODO  -- used in the Trip Details summary to describe different fares 
+        regular_fare   : "",
+        student_fare : "",
+        senior_fare  : "",
+
         travel       : "Seyehat",
         valid        : "Geçerli",
         trip_length  : "Zaman",
