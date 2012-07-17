@@ -42,7 +42,7 @@ public class BatchProcessor {
     private TraverseModeSet modes = new TraverseModeSet("WALK,TRANSIT");
     private String outputPath;
 
-    static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {
 
         GenericApplicationContext ctx = new GenericApplicationContext();
         XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader(ctx);
