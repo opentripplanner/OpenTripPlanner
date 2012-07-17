@@ -104,13 +104,18 @@ otp.planner.Templates = {
                 '<div id="trip-details">',
                 '<h3>' + this.locale.labels.trip_details + '</h3>',
                 '<table cellpadding="3" cellspacing="0" border="0">',
-                    '<tpl if="regularFare != null && showFareInfo == true">',
-                      '<tr><td><strong>' + this.locale.labels.fare      + '</strong></td><td>{regularFare}</td></tr>',
-                    '</tpl>',
-                    '<tr><td><strong>' + this.locale.labels.travel      + '</strong></td><td>{startTimeDisplay}</td></tr>',
-                    '<tr><td><strong>' + this.locale.labels.valid       + '</strong></td><td>{[new Date().format("' + this.locale.time.format + '")]}</td></tr>',
+                    '<tr><td><strong>' + this.locale.labels.travel  + '</strong></td><td>{[otp.planner.Templates.THIS.prettyDateTime(values.startTime)]}</td></tr>',
                     '<tr><td><strong>' + this.locale.labels.trip_length + '</strong></td><td>{duration} ' + this.getDurationTemplateString() + '</td></tr>',
                     '<tpl if="walkDistance"><tr><td><strong>{distanceVerb}</strong></td><td>{walkDistance}</td></tr></tpl>',
+
+                    '<tpl if="regularFare != null && showFareInfo == true">',
+                      '<tr><td><strong>' + this.locale.labels.fare  + '</strong></td><td>' + this.locale.labels.regular_fare + ' {regularFare}</td></tr>',
+                      '<tpl if="seniorFare != null"><tr><td></td><td>'   + this.locale.labels.senior_fare  + ' {seniorFare}</td><tr></tpl>',
+                      '<tpl if="studentFare  != null"><tr><td></td><td>' + this.locale.labels.student_fare + ' {studentFare}</td><tr></tpl>',
+                    '</tpl>',
+
+                    '<tr class="valid_date"><td>&nbsp;</td><td>&nbsp;</td></tr>',
+                    '<tr class="valid_date"><td></td><td>' + this.locale.labels.valid + ' {[otp.planner.Templates.THIS.prettyDateTime()]}</td></tr>',
                 '</table></div>'
             ).compile();
 
@@ -188,6 +193,22 @@ otp.planner.Templates = {
             this.TP_END = new Ext.XTemplate(
                   '<h4><a href="javascript: void;">' + this.locale.instructions.end_at + '</a> {name}</h4>'
             ).compile(); 
+    },
+
+    /** */
+    prettyDateTime : function(date)
+    {
+        var retVal = date;
+        try
+        {
+            if(!date)
+                date = new Date();
+
+            retVal = date.format(this.locale.time.format);
+        }
+        catch(e)
+        {}
+        return retVal;
     },
 
     makeLegTemplate : function(mode)

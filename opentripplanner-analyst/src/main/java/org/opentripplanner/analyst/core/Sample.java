@@ -40,9 +40,9 @@ public class Sample {
         long m0 = Long.MAX_VALUE;
         long m1 = Long.MAX_VALUE;
         if (s0 != null)
-            m0 = (s0.getElapsedTime() + t0); 
+            m0 = (s0.getActiveTime() + t0); 
         if (s1 != null)
-            m1 = (s1.getElapsedTime() + t1); 
+            m1 = (s1.getActiveTime() + t1); 
         return (m0 < m1) ? m0 : m1; 
     }
     

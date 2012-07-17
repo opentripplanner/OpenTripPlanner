@@ -174,6 +174,12 @@ otp.locale.Italian = {
         trip_details : "Dettagli viaggio",
         fare         : "Tariffa",
         fare_symbol  : "\u20ac",
+
+        // TODO  -- used in the Trip Details summary to describe different fares 
+        regular_fare : "",
+        student_fare : "",
+        senior_fare  : "",
+
         travel       : "Viaggio",
         valid        : "Valido",
         trip_length  : "Tempo",

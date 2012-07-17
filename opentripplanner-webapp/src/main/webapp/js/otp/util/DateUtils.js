@@ -51,9 +51,9 @@ otp.util.DateUtils = {
 
         if(mStr  == ":"){ mmStr = ":"; sStr="";}
         if(mStr  == "."){ mmStr = "."; sStr="";}
-        if(mStr  == null) mStr  = " " + this.locale.time.minute_abbrev + ", ";
-        if(mmStr == null) mmStr = " " + this.locale.time.minutes_abbrev;
-        if(sStr  == null) sStr  = " " + this.locale.time.seconds_abbrev + " ";
+        if(mStr  == null) mStr  = " " + otp.util.DateUtils.locale.time.minute_abbrev + ", ";
+        if(mmStr == null) mmStr = " " + otp.util.DateUtils.locale.time.minutes_abbrev;
+        if(sStr  == null) sStr  = " " + otp.util.DateUtils.locale.time.seconds_abbrev + " ";
 
         if(m && m > 0)
             retVal += m + (m == 1 ? mStr : mmStr);
@@ -67,7 +67,7 @@ otp.util.DateUtils = {
     getMonthAsInt : function(str, pad)
     {
         var retVal = str;
-        var months = this.locale.time.months;
+        var months = otp.util.DateUtils.locale.time.months;
 
         for(var i = 0; i < months.length; i++)
         {
@@ -102,7 +102,7 @@ otp.util.DateUtils = {
         }
         catch(e)
         {
-            retVal = {"min":this.locale.time.minute_abbrev, "sec":this.locale.time.second_abbrev};
+            retVal = {"min":otp.util.DateUtils.locale.time.minute_abbrev, "sec":otp.util.DateUtils.locale.time.second_abbrev};
         }
 
         return retVal;
@@ -152,8 +152,8 @@ otp.util.DateUtils = {
         {
             // there is a Date.toISOString() method, but it will account for the browser time zone
             // we want to assume the date is expressed in the _server_ time zone
-            retVal = [date.getFullYear(), this.pad(date.getMonth() + 1, 2), 
-                      this.pad(date.getDate(), 2)].join('-'); 
+            retVal = [date.getFullYear(), otp.util.DateUtils.pad(date.getMonth() + 1, 2), 
+                      otp.util.DateUtils.pad(date.getDate(), 2)].join('-'); 
             console.log(retVal);
         }
         catch(e)
@@ -167,18 +167,18 @@ otp.util.DateUtils = {
     prettyDateTime : function(date)
     {
         if (typeof date == "string") {
-            date = this.isoDateStringToDate(date);
+            date = otp.util.DateUtils.isoDateStringToDate(date);
         }
-        return date.format(this.DATE_TIME_FORMAT_STRING);
+        return date.format(otp.util.DateUtils.DATE_TIME_FORMAT_STRING);
     },
 
     /** */
     prettyTime : function(date)
     {
         if (typeof date == "string") {
-            date = this.isoDateStringToDate(date);
+            date = otp.util.DateUtils.isoDateStringToDate(date);
         }
-        return date.format(this.TIME_FORMAT_STRING);
+        return date.format(otp.util.DateUtils.TIME_FORMAT_STRING);
     },
 
 
@@ -263,7 +263,7 @@ otp.util.DateUtils = {
         var retVal = time;
         if(format && format.toLowerCase().charAt(format.length-1) == "a" && format.toLowerCase().indexOf("g:i") == 0)
         {
-            retVal = this.correctAmPmTimeString(time, format);
+            retVal = otp.util.DateUtils.correctAmPmTimeString(time, format);
         }
         return retVal;
     },
@@ -275,8 +275,8 @@ otp.util.DateUtils = {
 
         for ( var i = 0; i < times.length; i++ )
         {
-          console.log(this.parseTime(times[i], 'g:i a'));
-          console.log(this.parseTime(times[i], 'H:i'));
+          console.log(otp.util.DateUtils.parseTime(times[i], 'g:i a'));
+          console.log(otp.util.DateUtils.parseTime(times[i], 'H:i'));
         }
     },
 

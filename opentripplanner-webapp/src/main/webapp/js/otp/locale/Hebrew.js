@@ -178,6 +178,12 @@ otp.locale.Hebrew = {
         trip_details : "פרטי המסלול",
         fare         : "תשלום",
         fare_symbol  : "₪",
+
+        // TODO  -- used in the Trip Details summary to describe different fares 
+        regular_fare : "",
+        student_fare : "",
+        senior_fare  : "",
+
         travel       : "מסלול",
         valid        : "נכון ל",
         trip_length  : "זמן",

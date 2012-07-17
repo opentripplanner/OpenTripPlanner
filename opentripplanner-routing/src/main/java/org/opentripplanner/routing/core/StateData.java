@@ -62,6 +62,14 @@ public class StateData implements Cloneable {
 
     protected TripPattern lastPattern;
 
+    /** 
+     * This is the wait time at the beginning of the trip (or at the end of the trip for
+     * reverse searches). In Analyst anyhow, this is is subtracted from total trip length of each
+     * final State in lieu of reverse optimization. It is initially set to zero so that it will be
+     * ineffectual on a search that does not ever board a transit vehicle.
+     */
+    protected long initialWaitTime = 0;
+
     protected StateData clone() {
         try {
             return (StateData) super.clone();

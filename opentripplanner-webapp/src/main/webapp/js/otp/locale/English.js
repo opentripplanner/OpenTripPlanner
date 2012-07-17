@@ -42,7 +42,6 @@ otp.locale.English = {
         next             : "Next map position"
     },
 
-    // TODO Localize Me
     bikeTriangle : 
     {
         safeName : "Bike friendly",
@@ -174,13 +173,16 @@ otp.locale.English = {
         about        : "About",
         stop_id      : "Stop ID",
         trip_details : "Trip details",
-        fare         : "Fare",
-        fare_symbol  : "$",
         travel       : "Travel",
         valid        : "Valid",
         trip_length  : "Time",
         with_a_walk  : "with a walk of",
-        alert_for_rt : "Alert for route"
+        alert_for_rt : "Alert for route",
+        fare         : "Fare",
+        regular_fare : "Adult",
+        student_fare : "Youth",
+        senior_fare  : "Honored Citizen",
+        fare_symbol  : "$"
     },
 
     // see otp.planner.Templates for use -- one output are the itinerary leg headers

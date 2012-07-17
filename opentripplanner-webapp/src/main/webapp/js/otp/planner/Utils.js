@@ -17,8 +17,6 @@ otp.namespace("otp.planner");
 /**
   * Web Map / TripPlanner
   */
-try
-{
 function millisToMinutes (n, p) {
     return parseInt(n / 60000);
 }
@@ -27,32 +25,9 @@ function secondsToMinutes (n, p) {
     return parseInt(n / 60);
 }
 
-function metersToMiles (n, p) {
-    var miles = n / 1609.344;
-    return miles.toFixed(1);
-}
 
-function metersToFeet(meters) {
-    return parseInt(meters * 3.2808);
-}
-
-// TODO: make sure otp.util.DateUtils is available so we don't have to wrap these functions
-function isoDateStringToDate(dateStr) {
-    return otp.util.DateUtils.isoDateStringToDate(dateStr);
-}
-
-function prettyDateTime(date) {
-    return otp.util.DateUtils.prettyDateTime(date);
-}
-
-function prettyTime(date) {
-    return otp.util.DateUtils.prettyTime(date);
-}
-
-function prettyDistance(distance) {
-    return otp.planner.Utils.prettyDistance(distance);
-}
-
+try
+{
 otp.planner.Utils = {
 
     // constants
@@ -65,82 +40,58 @@ otp.planner.Utils = {
     FROM_ID            : 'from',
     TRIP_ID            : 'trip',
     TO_ID              : 'to',
-    
-    ITIN_RECORD : new Ext.data.Record.create([
-                  'id',
-                  'description',
-                  {name: 'viaRoute',     mapping: '@viaRoute'},
-                  {name: 'regularFare',  mapping: 'fare', convert: function(val, rec) { return otp.planner.Utils.getFare(rec, 'regular'); }},
-                  {name: 'seniorFare',   mapping: 'fare', convert: function(val, rec) { return otp.planner.Utils.getFare(rec, 'senior'); }},
-                  {name: 'studentFare',  mapping: 'fare', convert: function(val, rec) { return otp.planner.Utils.getFare(rec, 'student'); }},
-                  {name: 'duration',     mapping: 'duration',      convert: millisToMinutes},
-                  {name: 'startTime',    mapping: 'startTime',     convert: isoDateStringToDate},
-                  {name: 'endTime',      mapping: 'endTime',       convert: isoDateStringToDate},
-                  {name: 'startTimeDisplay', mapping: 'startTime', convert: prettyDateTime},
-                  {name: 'endTimeDisplay',   mapping: 'endTime',   convert: prettyDateTime},
-                  {name: 'numTransfers', mapping: 'transfers'},
-                  {name: 'numLegs',      mapping: 'legs',         convert : function (n, p) { return p.length; }},
-                  {name: 'walkDistance', mapping: 'walkDistance', convert: prettyDistance  },
-                  {name: 'walkTime',     mapping: 'walkTime',     convert: secondsToMinutes},
-                  {name: 'transitTime',  mapping: 'transitTime',  convert: secondsToMinutes},
-                  {name: 'waitingTime',  mapping: 'waitingTime',  convert: secondsToMinutes}
-    ]),
-    
-    LEG_RECORD : new Ext.data.Record.create([
-                  {name: 'id',               mapping: '@id'},
-                  {name: 'mode',             mapping: '@mode'},
-                  {name: 'agencyId',         mapping: '@agencyId'},
-                  {name: 'agencyName',       mapping: '@agencyName'},
-                  {name: 'agencyUrl',        mapping: '@agencyUrl'},
-                  {name: 'headsign',         mapping: '@headsign'},
-                  {name: 'order',            mapping: '@order'},
-                  {name: 'interline',        mapping: '@interlineWithPreviousLeg'},
-                  {name: 'startTime',        mapping: 'startTime', convert: isoDateStringToDate},
-                  {name: 'endTime',          mapping: 'endTime', convert: isoDateStringToDate},
-                  {name: 'startTimeDisplayShort', mapping: 'startTime', convert: prettyTime},
-                  {name: 'endTimeDisplayShort',   mapping: 'endTime',   convert: prettyTime},
-                  {name: 'duration',         mapping: 'duration', convert: millisToMinutes},
-                  {name: 'distance',         mapping: 'distance', convert: prettyDistance},
-                  {name: 'direction',        mapping: 'direction'},
-                  {name: 'key',              mapping: 'key'},
-                  {name: 'alerts',           mapping: 'leg', 
-                  convert: function(n, p)
-                  {
-                      // TODO: we're using the DEPRICATED notes/text fields.
-                      //       need to rewrite this with alerts/.../note
-                      var nodes = Ext.DomQuery.select('notes', p);
-                      var alerts = [];
-                      for(var i = 0; i < nodes.length; i++)
-                      {
-                          var node = nodes[i];
-                          var x = Ext.DomQuery.selectValue('text', node);
-                          if(x)
-                          {
-                              alerts.push(x);
-                          }
-                      }
-                      return alerts;
-                  }},
-                  {name: 'routeShortName',   mapping: '@route'},
-                  {name: 'routeLongName',    mapping: '@routeLongName'},
-                  {name: 'fromName',         mapping: 'from/name'},
-                  {name: 'fromDescription',  mapping: 'from/description'},
-                  {name: 'fromStopCode',     mapping: 'from/stopCode'},
-                  {name: 'toName',           mapping: 'to/name'},
-                  {name: 'toDescription',    mapping: 'to/description'},
-                  {name: 'toStopCode',       mapping: 'to/stopCode'},
 
-                  {name: 'steps',            mapping: 'steps', 
-                                             convert: function(val, rec) {
-                                                return otp.planner.Utils.makeWalkSteps(val, rec);
-                                             }
-                  },
-                  {name: 'legGeometry',      mapping: 'legGeometry/points',
-                                             convert: function(n,p) {
-                                                return otp.util.OpenLayersUtils.encoded_polyline_converter(n,p);
-                                             } 
-                  }
+    ITIN_RECORD : new Ext.data.Record.create([
+          'id',
+          'description',
+          {name: 'viaRoute',     mapping: '@viaRoute'},
+          {name: 'regularFare',  mapping: 'fare', convert: function(val, rec) { return otp.planner.Utils.getFare(rec, 'regular'); }},
+          {name: 'seniorFare',   mapping: 'fare', convert: function(val, rec) { return otp.planner.Utils.getFare(rec, 'senior'); }},
+          {name: 'studentFare',  mapping: 'fare', convert: function(val, rec) { return otp.planner.Utils.getFare(rec, 'student'); }},
+          {name: 'duration',     mapping: 'duration',       convert: millisToMinutes},
+          {name: 'startTime',    mapping: 'startTime',      convert: otp.util.DateUtils.isoDateStringToDate},
+          {name: 'endTime',      mapping: 'endTime',        convert: otp.util.DateUtils.isoDateStringToDate},
+          {name: 'startTimeDisplay', mapping: 'startTime',  convert: otp.util.DateUtils.prettyDateTime},
+          {name: 'endTimeDisplay',   mapping: 'endTime',    convert: otp.util.DateUtils.prettyDateTime},
+          {name: 'numTransfers', mapping: 'transfers'},
+          {name: 'numLegs',      mapping: 'itinerary/legs', convert: function(val, rec) {return otp.planner.Utils.numLegs(val, rec); }},
+          {name: 'modes',        mapping: 'itinerary/legs', convert: function(val, rec) {return otp.planner.Utils.getModes(rec);     }},
+          {name: 'walkDistance', mapping: 'walkDistance',   convert: function(val, rec) {return otp.planner.Utils.prettyDistance(val);}},
+          {name: 'walkTime',     mapping: 'walkTime',       convert: secondsToMinutes},
+          {name: 'transitTime',  mapping: 'transitTime',    convert: secondsToMinutes},
+          {name: 'waitingTime',  mapping: 'waitingTime',    convert: secondsToMinutes}
     ]),
+
+    LEG_RECORD : new Ext.data.Record.create([
+          {name: 'id',               mapping: '@id'},
+          {name: 'mode',             mapping: '@mode'},
+          {name: 'agencyId',         mapping: '@agencyId'},
+          {name: 'agencyName',       mapping: '@agencyName'},
+          {name: 'agencyUrl',        mapping: '@agencyUrl'},
+          {name: 'headsign',         mapping: '@headsign'},
+          {name: 'order',            mapping: '@order'},
+          {name: 'interline',        mapping: '@interlineWithPreviousLeg'},
+          {name: 'startTime',        mapping: 'startTime',           convert: otp.util.DateUtils.isoDateStringToDate},
+          {name: 'endTime',          mapping: 'endTime',             convert: otp.util.DateUtils.isoDateStringToDate},
+          {name: 'startTimeDisplayShort', mapping: 'startTime',      convert: otp.util.DateUtils.prettyTime},
+          {name: 'endTimeDisplayShort',   mapping: 'endTime',        convert: otp.util.DateUtils.prettyTime},
+          {name: 'duration',         mapping: 'duration',            convert: millisToMinutes},
+          {name: 'distance',         mapping: 'distance',            convert: function(val, rec) {return otp.planner.Utils.prettyDistance(val);}},
+          {name: 'direction',        mapping: 'direction'},
+          {name: 'key',              mapping: 'key'},
+          {name: 'alerts',           mapping: 'leg',                 convert: function(val, rec) {return otp.planner.Utils.getAlerts(rec);}},
+          {name: 'routeShortName',   mapping: '@route'},
+          {name: 'routeLongName',    mapping: '@routeLongName'},
+          {name: 'fromName',         mapping: 'from/name'},
+          {name: 'fromDescription',  mapping: 'from/description'},
+          {name: 'fromStopCode',     mapping: 'from/stopCode'},
+          {name: 'toName',           mapping: 'to/name'},
+          {name: 'toDescription',    mapping: 'to/description'},
+          {name: 'toStopCode',       mapping: 'to/stopCode'},
+          {name: 'steps',            mapping: 'steps',               convert: function(val, rec){return otp.planner.Utils.makeWalkSteps(rec)}},
+          {name: 'legGeometry',      mapping: 'legGeometry/points',  convert: function(val, rec){return otp.util.OpenLayersUtils.encoded_polyline_converter(val, rec)}}
+    ]),
+
     /**
      * utility to select a dom element
      * 
@@ -152,10 +103,53 @@ otp.planner.Utils = {
         return Ext.DomQuery.select(nodeName, xml);
     },
 
+    /** */
+    getModes : function(legs)
+    {
+        var retVal = null;
+        for(var i = 0; i < legs.length; i++)
+        {
+            var node = legs[i];
+            var mode = Ext.DomQuery.selectValue('mode',  node);
+            var rte  = Ext.DomQuery.selectValue('routeShortName', node);
+            if(rte)
+            {
+                console.log(rte);
+            }
+        }
+        return retVal;
+    },
+
+    /** */
+    numLegs : function(legs)
+    {
+        return -111;
+    },
+
+    /**
+     * TODO: we're using the DEPRICATED notes/text fields.
+     *       need to rewrite this with alerts/.../note
+     */
+    getAlerts : function(rec)
+    {
+        var nodes = Ext.DomQuery.select('notes', rec);
+        var alerts = [];
+        for(var i = 0; i < nodes.length; i++)
+        {
+          var node = nodes[i];
+          var x = Ext.DomQuery.selectValue('text', node);
+          if(x)
+          {
+              alerts.push(x);
+          }
+        }
+        return alerts;
+    },
+
     /**
      * parse the <steps></steps> element into a JavaScript
      */
-    makeWalkSteps : function(val, rec)
+    makeWalkSteps : function(rec)
     {
         var nodes = Ext.DomQuery.select('steps/walkSteps', rec);
         var steps = [];
@@ -321,19 +315,37 @@ otp.planner.Utils = {
     /** */
     makeLegStore: function()
     {
-        return new Ext.data.Store({
-            fields: this.LEG_RECORD,
-            reader: new Ext.data.XmlReader({record: 'leg'}, this.LEG_RECORD)
-        });
+        var retVal = null;
+        try
+        {
+            retVal = new Ext.data.Store({
+                fields: this.LEG_RECORD,
+                reader: new Ext.data.XmlReader({record: 'leg'}, this.LEG_RECORD)
+            });
+        }
+        catch(e)
+        {
+            console.log("EXCEPTION in planner.Utils.makeLegStore(): " + e);
+        }
+        return retVal;
     },
 
     /** */
     makeItinerariesStore: function()
     {
-        return new Ext.data.Store({
-            fields: this.ITIN_RECORD,
-            reader: new Ext.data.XmlReader({record: 'itinerary'}, this.ITIN_RECORD)
-        });
+        var retVal = null;
+        try
+        {
+            retVal = new Ext.data.Store({
+                fields: this.ITIN_RECORD,
+                reader: new Ext.data.XmlReader({record: 'itinerary'}, this.ITIN_RECORD)
+            });
+        }
+        catch(e)
+        {
+            console.log("EXCEPTION in planner.Utils.makeItinerariesStore(): " + e);
+        }
+        return retVal;
     },
 
     /** return either a 3 mile or 5 km value that works with the maxWalk form field values */
@@ -362,17 +374,20 @@ otp.planner.Utils = {
      * 
      * TODO: Make this method depend upon an app-wide config option specifying the system of units to use.
      */
-    prettyDistance : function(meters) {
+    prettyDistance : function(meters)
+    {
         var retVal = "";
 
-        if (meters == null || typeof meters == 'undefined') {
+        if (meters == null || typeof meters == 'undefined')
+        {
             retVal = "";
         }
-        else if (otp.config.metricsSystem == 'english') {
-            var miles = metersToMiles(meters);
+        else if (otp.config.metricsSystem == 'english')
+        {
             // Display distances < 0.1 miles in feet
+            var miles = (meters / 1609.344).toFixed(1);
             if (miles < 0.1) {
-                retVal = metersToFeet(meters) + " ft";
+                retVal = parseInt(meters * 3.2808) + " ft";
             } else {
                 retVal = miles + " mi";
             }

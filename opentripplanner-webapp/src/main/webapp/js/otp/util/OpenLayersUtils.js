@@ -48,6 +48,7 @@ catch (e)
 {
     console.log("no worries if this exception is thrown...just means that OpenLayers is not included in your html file (eg: maybe this is not an OL project)");
 }
+
 /**
   * Web Map / TripPlanner
   * @class 
@@ -201,7 +202,7 @@ otp.util.OpenLayersUtils = {
         try 
         {
             if(style == null)
-               style = this.BLACK_DASH_STYLE;
+               style = otp.util.OpenLayersUtils.BLACK_DASH_STYLE;
     
             retVal = new OpenLayers.Feature.Vector(
                         new OpenLayers.Geometry.LineString([
@@ -235,7 +236,7 @@ otp.util.OpenLayersUtils = {
         try 
         {
             if (style == null) 
-                style = this.RED_STYLE;
+                style = otp.util.OpenLayersUtils.RED_STYLE;
 
             var line = [];
             for (var i in pointList) 
@@ -365,7 +366,7 @@ otp.util.OpenLayersUtils = {
             externalGraphic: "${getExternalGraphic}",
             graphicOpacity: 1
         };
-        var graphicMapping = this.markerGraphicMapping;
+        var graphicMapping = otp.util.OpenLayersUtils.markerGraphicMapping;
         var olutils = this;
         var context = {
             getExternalGraphic: function(feature) {
@@ -706,11 +707,11 @@ otp.util.OpenLayersUtils = {
 
         while (strIndex < n.length) {
 
-          var rLat = this.decodeSignedNumberWithIndex(n, strIndex);
+          var rLat = otp.util.OpenLayersUtils.decodeSignedNumberWithIndex(n, strIndex);
           lat = lat + rLat.number * 1e-5;
           strIndex = rLat.index;
 
-          var rLon = this.decodeSignedNumberWithIndex(n, strIndex);
+          var rLon = otp.util.OpenLayersUtils.decodeSignedNumberWithIndex(n, strIndex);
           lon = lon + rLon.number * 1e-5;
           strIndex = rLon.index;
 
@@ -722,12 +723,12 @@ otp.util.OpenLayersUtils = {
      },
     
     decodeSignedNumber: function(value) {
-        var r = this.decodeSignedNumberWithIndex(value, 0);
+        var r = otp.util.OpenLayersUtils.decodeSignedNumberWithIndex(value, 0);
         return r.number;
     },
     
     decodeSignedNumberWithIndex: function(value,index) {
-        var r = this.decodeNumberWithIndex(value, index);
+        var r = otp.util.OpenLayersUtils.decodeNumberWithIndex(value, index);
         var sgn_num = r.number;
         if ((sgn_num & 0x01) > 0) {
           sgn_num = ~(sgn_num);
@@ -737,7 +738,7 @@ otp.util.OpenLayersUtils = {
     },
     
     decodeNumber: function(value) {
-        var r = this.decodeNumberWithIndex(value, 0);
+        var r = otp.util.OpenLayersUtils.decodeNumberWithIndex(value, 0);
         return r.number;
     },
 
