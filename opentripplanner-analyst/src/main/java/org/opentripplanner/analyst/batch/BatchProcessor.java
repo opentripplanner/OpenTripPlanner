@@ -6,8 +6,10 @@ import java.util.TimeZone;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
+import lombok.Data;
+
 import org.opentripplanner.analyst.batch.aggregator.Aggregator;
-import org.opentripplanner.analyst.request.Renderer;
+import org.opentripplanner.routing.core.PrototypeRoutingRequest;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.services.GraphService;
@@ -19,24 +21,28 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.stereotype.Component;
 
+@Data
 public class BatchProcessor {
 
     private static final Logger LOG = LoggerFactory.getLogger(BatchProcessor.class);
     private static final String CONFIG = "batch-context.xml";
     
-    @Autowired GraphService graphService;
-    @Autowired SPTService sptService;
-    @Resource Population origins;
-    @Resource Population destinations;
+    @Autowired private GraphService graphService;
+    @Autowired private SPTService sptService;
+    @Autowired private PrototypeRoutingRequest prototypeRoutingRequest;
+    @Resource private Population origins;
+    @Resource private Population destinations;
+    @Resource private Aggregator aggregator;
     
+    private String routerId;
+    private String date = "2011-02-04";
+    private String time = "08:00 AM";
+    private TimeZone timeZone = TimeZone.getDefault();
     private TraverseModeSet modes = new TraverseModeSet("WALK,TRANSIT");
-    private final String DATE = "2011-02-04";
-    private static final String TIME = "08:00 AM";
-    private static final TimeZone TIMEZONE = TimeZone.getDefault();
+    private String outputPath;
 
-    static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {
 
         GenericApplicationContext ctx = new GenericApplicationContext();
         XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader(ctx);
@@ -76,7 +82,7 @@ public class BatchProcessor {
         for (Individual oi : origins) {
             RoutingRequest req = buildRequest(oi.getLat(), oi.getLon());
             ShortestPathTree spt = sptService.getShortestPathTree(req);
-            destinations.writeCsv("/home/abyrd/disagg.csv", spt, oi);
+            destinations.writeCsv(outputPath, spt, oi);
 //            for (Individual di : destinations) {
 //                long travelTime = di.sample.eval(spt);
 //                // if an aggregator is defined over 
@@ -86,11 +92,12 @@ public class BatchProcessor {
     }
     
     private RoutingRequest buildRequest(double lat, double lon) {
-        RoutingRequest req = new RoutingRequest();
-        req.setDateTime(DATE, TIME, TIMEZONE);
+        RoutingRequest req = prototypeRoutingRequest.clone();
+        req.setRouterId(routerId);
+        req.setDateTime(date, time, timeZone);
         req.setFrom(String.format("%f, %f", lat, lon));
         req.batch = true;
-        req.setRoutingContext(graphService.getGraph());
+        req.setRoutingContext(graphService.getGraph(routerId));
         return req;
     }
 

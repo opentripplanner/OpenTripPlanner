@@ -6,7 +6,7 @@ div.olMapViewport {
 z-index: 0;
 }
 [dir=rtl] div.olMapViewport {
-	text-align:right;
+    text-align:right;
 }
 
 
@@ -63,6 +63,11 @@ color: #393939;
 padding: 3px;
 }
 
+
+.valid_date {
+  color: #737373;
+  font-size: 90%;
+}
 
 div.olControlAttribution a:hover,
 div.olControlAttribution a:active {

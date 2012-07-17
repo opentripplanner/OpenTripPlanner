@@ -178,6 +178,12 @@ otp.locale.Hungarian = {
         trip_details : "útvonal Details",
         fare         : "Fare",
         fare_symbol  : "\u20ac",
+
+        // TODO  -- used in the Trip Details summary to describe different fares 
+        regular_fare : "",
+        student_fare : "",
+        senior_fare  : "",
+
         travel       : "Travel",
         valid        : "Valid",
         trip_length  : "Time",
