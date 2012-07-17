@@ -96,7 +96,7 @@ otp.planner.Templates = {
 
         if(this.streetviewTemplate == null)
             this.streetviewTemplate =  new Ext.XTemplate(
-                '<a href="javascript:void;" onClick="otp.core.MapStatic.streetview({x}, {y});">{name}</a>'
+                '<a href="javascript:void(0);" onClick="otp.core.MapStatic.streetview({x}, {y});">{name}</a>'
             ).compile();
 
         if(this.TP_TRIPDETAILS == null)
@@ -125,7 +125,7 @@ otp.planner.Templates = {
         if(this.TP_LEG_MODE == null)
             this.TP_LEG_MODE = ''
                 + '<h4>' 
-                + '<a href="javascript:void;">{[otp.util.Modes.translate(values["mode"])]}</a>'
+                + '<a href="javascript:void(0);">{[otp.util.Modes.translate(values["mode"])]}</a>'
                 + ' {routeName} '
                 + this.HEADSIGN
                 + '</h4>';
@@ -133,7 +133,7 @@ otp.planner.Templates = {
         if(this.TP_LEG_CONTINUES == null)
             this.TP_LEG_CONTINUES = ''
                 + '<h4>'
-                + '<a href="javascript:void;">' + this.locale.instructions.continue_as + '</a> '
+                + '<a href="javascript:void(0);">' + this.locale.instructions.continue_as + '</a> '
                 + ' {routeName} '
                 + this.HEADSIGN
                 + '<span class="transfers">(' + this.locale.instructions.stay_aboard + ')</span>'
@@ -186,7 +186,7 @@ otp.planner.Templates = {
 
         if(this.TP_START == null)
             this.TP_START = new Ext.XTemplate(
-                  '<h4><a href="javascript:void;">' + this.locale.instructions.start_at + '</a> {name}</h4>'
+                  '<h4><a href="javascript:void(0);">' + this.locale.instructions.start_at + '</a> {name}</h4>'
             ).compile();
 
         if(this.TP_END == null)
@@ -214,7 +214,7 @@ otp.planner.Templates = {
     makeLegTemplate : function(mode)
     {
         return new Ext.XTemplate(
-                  '<h4><a href="javascript:void;">' + mode + ' </a>',
+                  '<h4><a href="javascript:void(0);">' + mode + ' </a>',
                     '{[otp.util.StringFormattingUtils.getDirection(values.direction)]} ',
                     this.locale.directions.to + ' {toName}',
                   '</h4>',
