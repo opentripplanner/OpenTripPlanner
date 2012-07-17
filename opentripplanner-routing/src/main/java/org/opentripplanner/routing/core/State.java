@@ -169,6 +169,17 @@ public class State implements Cloneable {
         return Math.abs(this.time - stateData.startTime);
     }
 
+    /** returns the length of the trip in seconds up to this time, not including the initial wait.
+        This is used in lieu of reverse optimization in Analyst. */
+    public long getActiveTime () {
+        long activeTime = getElapsedTime() - stateData.initialWaitTime;
+        // TODO: what should be done here?
+        if (activeTime < 0)
+            activeTime = getElapsedTime();
+
+        return activeTime;            
+    }
+
     public int getTrip() {
         return stateData.trip;
     }

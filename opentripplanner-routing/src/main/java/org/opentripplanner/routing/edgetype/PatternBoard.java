@@ -205,6 +205,8 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             long wait_cost = bestWait;
             if (state0.getNumBoardings() == 0) {
                 wait_cost *= options.waitAtBeginningFactor;
+                // this is subtracted out in Analyst searches in lieu of reverse optimization
+                s1.setInitialWaitTime(bestWait);
             } else {
                 wait_cost *= options.waitReluctance;
             }

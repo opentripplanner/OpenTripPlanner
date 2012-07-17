@@ -261,6 +261,12 @@ public class StateEditor {
         child.stateData.tripId = tripId;
     }
 
+    public void setInitialWaitTime (long initialWaitTime) {
+        cloneStateDataAsNeeded();
+        LOG.debug("initial wait time set to {} secs", initialWaitTime);
+        child.stateData.initialWaitTime = initialWaitTime;
+    }
+
     public void setWalkDistance(double walkDistance) {
         child.walkDistance = walkDistance;
     }
