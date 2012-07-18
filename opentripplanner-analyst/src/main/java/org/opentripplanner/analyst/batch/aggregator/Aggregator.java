@@ -10,5 +10,5 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
  * @author andrewbyrd
  */
 public interface Aggregator {
-	public double computeAggregate(Population destinations, ShortestPathTree spt);
+	public double computeAggregate(Population destinations);
 }
