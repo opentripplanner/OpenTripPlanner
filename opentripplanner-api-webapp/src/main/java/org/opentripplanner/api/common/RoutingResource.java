@@ -125,12 +125,19 @@ public abstract class RoutingResource {
     /** A transit stop required to be the first stop in the search */
     @DefaultValue("") @QueryParam("startTransitStopId") protected List<String> startTransitStopId;
 
-    /** 
+    /**
      * The maximum wait (in seconds) permissible at any one time (each board can have as much as 
      * this much wait time). A value of 0 allows infinite wait times.
      */
-    @DefaultValue("0") @QueryParam("maxWait") protected List<Long> maxWait;
-
+    @DefaultValue("0") @QueryParam("maxWait")
+    protected List<Long> maxWait;
+    
+    @DefaultValue("-1") @QueryParam("boardSlack")
+    private List<Integer> boardSlack;
+    
+    @DefaultValue("-1") @QueryParam("alightSlack")
+    private List<Integer> alightSlack;
+    
     /* 
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
      * this should ideally be done when setting the routing context, but at present departure/
@@ -145,8 +152,6 @@ public abstract class RoutingResource {
     @Autowired
     protected PrototypeRoutingRequest prototypeRoutingRequest;
 
-    @DefaultValue("-1") @QueryParam("boardSlack") private List<Integer> boardSlack;
-    @DefaultValue("-1") @QueryParam("alightSlack") private List<Integer> alightSlack;
 
     /** 
      * Build the 0th Request object from the query parameter lists. 
