@@ -19,7 +19,8 @@
         <property name="defaultRouterId" value="arbor" />
     </bean>
 
-    <bean id="origins" class="org.opentripplanner.analyst.batch.BasicPopulation">
+
+<!--     <bean id="origins" class="org.opentripplanner.analyst.batch.BasicPopulation">
         <property name="individuals">
             <list>
 			    <bean class="org.opentripplanner.analyst.batch.Individual">
@@ -30,9 +31,8 @@
             </list>
         </property>
     </bean>
+-->
 
-<!-- 	<alias name="destinations" alias="origins"/> -->
-	
 	<bean id="destinations" class="org.opentripplanner.analyst.batch.CSVPopulation">
         <property name="sourceFilename" value="/home/abyrd/access/annarbor.csv" />
         <property name="latCol" value="1" />
@@ -41,6 +41,8 @@
         <property name="inputCol" value="3" />        
 	</bean>
 
+	<alias name="destinations" alias="origins"/>
+	
     <bean id="heuristicFactory" class="org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl"/>
     <bean id="sptService" class="org.opentripplanner.routing.algorithm.GenericAStar"/>
     <bean id="individualFactory" class="org.opentripplanner.analyst.batch.IndividualFactory" />
@@ -54,6 +56,7 @@
         <property name="prototypeRoutingRequest">
 			<bean class="org.opentripplanner.routing.core.PrototypeRoutingRequest">
 				<!-- Set default routing parameters here -->
+		        <property name="maxWalkDistance" value="4000" />
 			</bean>
 		</property>		
         <!--         
