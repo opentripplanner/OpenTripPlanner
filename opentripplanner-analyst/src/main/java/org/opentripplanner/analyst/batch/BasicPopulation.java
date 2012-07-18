@@ -66,8 +66,12 @@ public class BasicPopulation implements Population {
             for (Individual i : this.individuals) {
                 Sample s = i.sample;
                 long t = Long.MAX_VALUE;
-                if (s != null)
+                if (s == null)
+                    t = -2;
+                else
                     t = s.eval(spt);
+                if (t == Long.MAX_VALUE)
+                    t = -1;
                 csvWriter.printf("%f,%f,%f,%d\n", i.getLat(), i.getLon(), i.input, t);
             }
             csvWriter.close();
