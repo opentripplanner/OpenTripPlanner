@@ -60,17 +60,18 @@ otp.planner.Templates = {
 
         if(this.TP_ITINERARY == null)
             this.TP_ITINERARY = new Ext.XTemplate(
+                  // line 1 of the itinerary option form -- all modes
                   '<div id={id} class="dir-alt-route-inner">',
                     '<span class="time-span itinopt">{[otp.util.StringFormattingUtils.timeSpan(values.startTime, values.endTime, otp.planner.Templates.locale)]}</span>',
                     '<span class="duration-hours-mins itinopt">{[otp.util.StringFormattingUtils.durationHoursMins(values.duration, otp.planner.Templates.locale)]}</span>',
                   '</div>',
+                  // line 2 of the itinerary option form -- only transit mode, which is indicated via the numTransfers 
                   '<tpl if="numTransfers">',
                   '<div id={id} class="dir-alt-route-inner">',
                     '<span>&nbsp;&nbsp;</span>',
-                    '<span class="transfers">{numTransfers} ',
-                    '<tpl if="numTransfers == 1">' + this.locale.instructions.transfer  + '</tpl>',
-                    '<tpl if="numTransfers != 1">' + this.locale.instructions.transfers + '</tpl>',
-                    '</span>',
+                    '<tpl if="numTransfers">',
+                      '<span class="transfers">{[otp.util.StringFormattingUtils.numSinglePlural(values.numTransfers, otp.planner.Templates.locale.instructions.transfer, otp.planner.Templates.locale.instructions.transfers )]}</span>',
+                    '</tpl>',
                   '</div>',
                   '</tpl>'
             ).compile();
@@ -104,9 +105,18 @@ otp.planner.Templates = {
                 '<div id="trip-details">',
                 '<h3>' + this.locale.labels.trip_details + '</h3>',
                 '<table cellpadding="3" cellspacing="0" border="0">',
-                    '<tr><td><strong>' + this.locale.labels.travel  + '</strong></td><td>{[otp.planner.Templates.THIS.prettyDateTime(values.startTime)]}</td></tr>',
-                    '<tr><td><strong>' + this.locale.labels.trip_length + '</strong></td><td>{duration} ' + this.getDurationTemplateString() + '</td></tr>',
-                    '<tpl if="walkDistance"><tr><td><strong>{distanceVerb}</strong></td><td>{walkDistance}</td></tr></tpl>',
+                    '<tr><td><strong>' + this.locale.labels.travel + '</strong></td><td>{[otp.planner.Templates.THIS.prettyDateTime(values.startTime)]}</td></tr>',
+
+                     // TODO: break time up into various mode times (i.e., Length : 2 hours 45 minutes (30min walk, 90min wait, 20min transit) 
+                    '<tr><td><strong>' + this.locale.labels.trip_length + '</strong></td><td>{[otp.util.StringFormattingUtils.durationHoursMins(values.duration, otp.planner.Templates.locale)]}</td></tr>',
+
+                    '<tpl if="numTransfers">',
+                      '<tr><td><strong>' + otp.util.StringFormattingUtils.capitolize(this.locale.instructions.transfers) + '</strong></td>', 
+                      '<td>{[otp.util.StringFormattingUtils.numSinglePlural(values.numTransfers, otp.planner.Templates.locale.instructions.transfer, otp.planner.Templates.locale.instructions.transfers )]}</td></tr>',
+                    '</tpl>',
+
+                    // TODO: add a distance verb to locale and break distance up into modes (i.e., Distance :  4.54 miles (includes 2.2 mi walk, 2.32 mi bike))
+                    //'<tpl if="walkDistance"><tr><td><strong>{distanceVerb}</strong></td><td>{walkDistance}</td></tr></tpl>',
 
                     '<tpl if="regularFare != null && showFareInfo == true">',
                       '<tr><td><strong>' + this.locale.labels.fare  + '</strong></td><td>' + this.locale.labels.regular_fare + ' {regularFare}</td></tr>',

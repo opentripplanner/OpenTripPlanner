@@ -179,9 +179,9 @@ otp.locale.English = {
         with_a_walk  : "with a walk of",
         alert_for_rt : "Alert for route",
         fare         : "Fare",
-        regular_fare : "Adult",
-        student_fare : "Youth",
-        senior_fare  : "Honored Citizen",
+        regular_fare : "Regular",
+        student_fare : "Student",
+        senior_fare  : "Senior",
         fare_symbol  : "$"
     },
 

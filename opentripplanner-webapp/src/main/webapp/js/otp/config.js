@@ -10,6 +10,10 @@
 if(typeof(otp) == "undefined" || otp == null) otp = {};
 if(typeof(otp.config) == "undefined" || otp.config == null) otp.config = {};
 if(typeof(otp.config.locale) == "undefined" || otp.config.locale == null) otp.config.locale = otp.locale.English;
+otp.config.default_fares = {
+    senior  : "100",
+    student : "150"
+};
 
 // step 2: create an object of default otp.config default values (see step3 where we apply this to any existing config)
 otp.config_defaults = {

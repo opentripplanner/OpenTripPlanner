@@ -190,18 +190,35 @@ otp.planner.Utils = {
      *          
      * 
      */
-    getFare : function(rec, fareType) {
+    getFare : function(rec, fareType)
+    {
         var nodes = Ext.DomQuery.select('fare/entry', rec);
         var fare = null;
-        for (var i = 0; i < nodes.length; i++) {
-            if (Ext.DomQuery.selectValue('key', rec) === fareType) {
+        for (var i = 0; i < nodes.length; i++)
+        {
+            if (Ext.DomQuery.selectValue('key', rec) === fareType)
+            {
                 var cents = parseInt(Ext.DomQuery.selectValue('value/cents', rec));
                 //TODO Use currency in value/currency once available
                 fare = this.formatMoney(cents);
             }
         }
+
+        // default fare vaules can be specified in config.js;  if we don't have a 
+        // fare in the .xml planner response, we'll look for something in the defaults 
+        if(!fare && otp.config.default_fares && otp.config.default_fares[fareType])
+        {
+            // fare symbol
+            var sym = '';
+            if(otp.config.default_fares[fareType].indexOf(otp.config.locale.labels.fare_symbol) < 0)
+                sym = otp.config.locale.labels.fare_symbol;
+
+            // TODO: limitation in placing the symbol in front of the number (and with no space / separator)
+            fare = sym + otp.config.default_fares[fareType]
+        }
         return fare;
     },
+
 
     /** 
      * TODO ... neeeds more work  ... trying to get â¬ and à¤°à¥à¤ªà¤¯à¤¾ to work...
@@ -223,6 +240,7 @@ otp.planner.Utils = {
             whole = whole.replace(r, '$1' + ',' + '$2');
         }
         v = whole + sub;
+        // TODO: limitation in placing the fare symbol in front of the number (and with no space / separator)
         if(v.charAt(0) == '-') {
             retVal = '-' + otp.config.locale.labels.fare_symbol + v.substr(1);
         }
