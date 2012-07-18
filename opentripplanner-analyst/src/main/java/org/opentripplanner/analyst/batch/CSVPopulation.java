@@ -35,7 +35,7 @@ public class CSVPopulation extends BasicPopulation {
 		    	Double input = Double.parseDouble(nextLine[inputCol]);
 		    	Individual individual = individualFactory.build(label, lon, lat, input);
 		    	this.add(individual);
-		    	LOG.debug(individual.toString());
+		    	//LOG.debug(individual.toString());
 		    }
 		    reader.close();
 		} catch (Exception e) {
