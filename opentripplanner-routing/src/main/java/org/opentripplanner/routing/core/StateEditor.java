@@ -263,7 +263,7 @@ public class StateEditor {
 
     public void setInitialWaitTime (long initialWaitTime) {
         cloneStateDataAsNeeded();
-        LOG.debug("initial wait time set to {} secs", initialWaitTime);
+        //LOG.debug("initial wait time set to {} secs", initialWaitTime);
         child.stateData.initialWaitTime = initialWaitTime;
     }
 
