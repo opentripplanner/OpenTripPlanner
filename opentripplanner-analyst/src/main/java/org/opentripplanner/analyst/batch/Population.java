@@ -14,19 +14,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A collection of individual locations that will be used as either the origin set or the 
- * destination set in a many-to-many search.
+ * A collection of individual locations that will be used as either the origin
+ * set or the destination set in a many-to-many search.
  * 
  * @author andrewbyrd
  */
 public interface Population extends Iterable<Individual> {
+
+    public List<Individual> getIndividuals();
     
-	public List<Individual> getIndividuals();
-	
-	public void setIndividuals(List<Individual> individuals);
-
+    public void setIndividuals(List<Individual> individuals);
+    
     public void add(Individual individual);
-
+    
     public void writeCsv(String outFileName, ShortestPathTree spt, Individual origin);
 
 }
