@@ -82,16 +82,39 @@ public class BatchProcessor {
          * Aggregate over origins or destinations option
          */
         if (aggregator == null) {
+            int nOrigins = origins.getIndividuals().size();
+            if (nOrigins > 1 && !outputPath.contains("{}")) {
+                LOG.error("output filename must contain origin placeholder.");
+                return;
+            }
+            int i = 0;
             for (Individual oi : origins) {
                 RoutingRequest req = buildRequest(oi);
                 if (req != null) {
                     ShortestPathTree spt = sptService.getShortestPathTree(req);
-                    destinations.writeCsv(outputPath, spt, oi);
+                    destinations.setOutputToTravelTime(spt, oi);
+                    if (nOrigins == 1) {
+                        destinations.writeCsv(outputPath);
+                    } else {
+                        String subName = outputPath.replace("{}", String.format("%d_%s", i, oi.label));
+                        destinations.writeCsv(subName);
+                    }
+                    req.cleanup();
+                    i += 1;
+                }
+            }
+        } else { // an aggregator has been provided
+            for (Individual oi : origins) {
+                RoutingRequest req = buildRequest(oi);
+                if (req != null) {
+                    ShortestPathTree spt = sptService.getShortestPathTree(req);
+                    destinations.setOutputToTravelTime(spt, oi);
+                    double aggregate = aggregator.computeAggregate(destinations);
+                    oi.output = aggregate;
                     req.cleanup();
                 }
             }
-        } else {
-            // an aggregator has been provided
+            origins.writeCsv(outputPath);
         }
     }
     

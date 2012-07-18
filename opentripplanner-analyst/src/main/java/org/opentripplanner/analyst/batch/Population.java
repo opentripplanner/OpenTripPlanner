@@ -27,6 +27,8 @@ public interface Population extends Iterable<Individual> {
     
     public void add(Individual individual);
     
-    public void writeCsv(String outFileName, ShortestPathTree spt, Individual origin);
+    public void setOutputToTravelTime(ShortestPathTree spt, Individual origin); // output mode enum?
+    
+    public void writeCsv(String outFileName);
 
 }

@@ -55,24 +55,32 @@ public class BasicPopulation implements Population {
         return this.individuals.iterator();
     }
 
+    // method to set output values from an SPT - ideally, eventually store output outside individuals
+    // so populations can be reused, maybe simply in arrays returned from traveltime eval method.
+    public void setOutputToTravelTime(ShortestPathTree spt, Individual origin) {
+        for (Individual i : this.individuals) {
+            Sample s = i.sample;
+            long t = Long.MAX_VALUE;
+            if (s == null)
+                t = -2;
+            else
+                t = s.eval(spt);
+            if (t == Long.MAX_VALUE)
+                t = -1;
+            i.output = t;
+        }
+    }
+    
     @Override
-    public void writeCsv(String outFileName, ShortestPathTree spt, Individual origin) {
+    public void writeCsv(String outFileName) {
         LOG.debug("Writing population to CSV: {}", outFileName);
         File outFile = new File(outFileName);
         PrintWriter csvWriter;
         try {
             csvWriter = new PrintWriter(outFile);
-            csvWriter.printf("lat,lon,data,traveltime\n");
+            csvWriter.printf("label,lat,lon,input,output\n"); // output could be travel time when aggregator not present
             for (Individual i : this.individuals) {
-                Sample s = i.sample;
-                long t = Long.MAX_VALUE;
-                if (s == null)
-                    t = -2;
-                else
-                    t = s.eval(spt);
-                if (t == Long.MAX_VALUE)
-                    t = -1;
-                csvWriter.printf("%f,%f,%f,%d\n", i.getLat(), i.getLon(), i.input, t);
+                csvWriter.printf("%s,%f,%f,%f,%f\n", i.label, i.lat, i.lon, i.input, i.output);
             }
             csvWriter.close();
         } catch (Exception e) {
@@ -80,5 +88,5 @@ public class BasicPopulation implements Population {
         }
         LOG.debug("Done writing population to CSV.");
     }
-
+        
 }
