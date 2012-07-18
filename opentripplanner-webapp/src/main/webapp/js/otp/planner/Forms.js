@@ -26,8 +26,8 @@ otp.planner.StaticForms = {
 
     // external (config) objects
     routerId              : null,
-    preferredRoutes       : null,
-    unpreferredRoutes     : null,
+    preferredRoutes       : '',
+    unpreferredRoutes     : '',
     locale                : null,
     planner               : null,
     contextMenu           : null,
