@@ -13,6 +13,7 @@ import org.opentripplanner.analyst.batch.aggregator.Aggregator;
 import org.opentripplanner.routing.core.PrototypeRoutingRequest;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -83,13 +84,11 @@ public class BatchProcessor {
     	if (aggregator == null) {
     		for (Individual oi : origins) {
     			RoutingRequest req = buildRequest(oi);
-    			ShortestPathTree spt = sptService.getShortestPathTree(req);
-    			destinations.writeCsv(outputPath, spt, oi);
-//                for (Individual di : destinations) {
-//                    long travelTime = di.sample.eval(spt);
-//                    // if an aggregator is defined over 
-//                }
-    			req.cleanup();
+    			if (req != null) {
+        			ShortestPathTree spt = sptService.getShortestPathTree(req);
+        			destinations.writeCsv(outputPath, spt, oi);
+        			req.cleanup();
+    			}
     		}
     	} else {
     		// an aggregator has been provided
@@ -102,8 +101,13 @@ public class BatchProcessor {
         req.setDateTime(date, time, timeZone);
         req.setFrom(String.format("%f,%f", i.getLat(), i.getLon()));
         req.batch = true;
-        req.setRoutingContext(graphService.getGraph(routerId));
-        return req;
+        try {
+            req.setRoutingContext(graphService.getGraph(routerId));
+            return req;
+        } catch (VertexNotFoundException vnfe) {
+            LOG.debug("no vertex could be created near the origin point");
+            return null;
+        }
     }
 
 }
