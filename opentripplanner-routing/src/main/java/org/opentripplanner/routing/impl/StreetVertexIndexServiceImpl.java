@@ -253,7 +253,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                     + coordinate.toString(), name, bundle.toEdgeList(), nearestPoint);
         }
 
-        // decide whether to return stop, street, or street + stop
+        // decide whether to return street, or street + stop
         if (closest_street == null) {
             // no street found, return closest stop or null
             _log.debug("returning only transit stop (no street found)");
@@ -263,10 +263,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             if (closest_stop != null) {
                 // both street and stop found
                 double relativeStopDistance = closest_stop_distance / closest_street_distance;
-                if (relativeStopDistance < 0.1) {
-                    _log.debug("returning only transit stop (stop much closer than street)");
-                    return closest_stop;
-                }
                 if (relativeStopDistance < 1.5) {
                     _log.debug("linking transit stop to street (distances are comparable)");
                     closest_street.addExtraEdgeTo(closest_stop);
