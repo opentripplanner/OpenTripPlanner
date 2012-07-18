@@ -505,6 +505,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     @Override
     public Vertex getVertexForPlace(NamedPlace place, RoutingRequest options, Vertex other) {
+    	if (place == null || place.place == null)
+    		return null;
         Matcher matcher = _latLonPattern.matcher(place.place);
         if (matcher.matches()) {
             double lat = Double.parseDouble(matcher.group(1));
