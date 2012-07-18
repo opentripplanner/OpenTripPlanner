@@ -295,6 +295,10 @@ public abstract class RoutingResource {
             if (value.equals(-1)) {
                 return defaultValue;
             }
+        } else if (value instanceof Double) {
+            if (value.equals(-1.0)) {
+                return defaultValue;
+            }
         }
         return value;
     }
