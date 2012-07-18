@@ -126,11 +126,19 @@ public abstract class RoutingResource {
     @DefaultValue("") @QueryParam("startTransitStopId") protected List<String> startTransitStopId;
 
     /**
-     * The maximum wait (in seconds) permissible at any one time (each board can have as much as 
-     * this much wait time). A value of 0 allows infinite wait times.
+     * When subtracting initial wait time, do not subtract more than this value, to prevent overly
+     * optimistic trips. Reasoning is that it is reasonable to delay a trip start 15 minutes to 
+     * make a better trip, but that it is not reasonable to delay a trip start 15 hours; if that
+     * is to be done, the time needs to be included in the trip time. This number depends on the
+     * transit system; for transit systems where trips are planned around the vehicles, this number
+     * can be much higher. For instance, it's perfectly reasonable to delay one's trip 12 hours if
+     * one is taking a cross-country Amtrak train from Emeryville to Chicago. Has no effect in
+     * stock OTP, only in Analyst.
+     *
+     * A value of 0 (the default) disables.
      */
-    @DefaultValue("0") @QueryParam("maxWait")
-    protected List<Long> maxWait;
+    @DefaultValue("0") @QueryParam("clampInitialWait")
+    protected List<Long> clampInitialWait;
     
     @DefaultValue("-1") @QueryParam("boardSlack")
     private List<Integer> boardSlack;
@@ -278,7 +286,7 @@ public abstract class RoutingResource {
             request.setStartingTransitStopId(AgencyAndId.convertFromString(startTransitStopId));
         }
         
-        request.setMaxWait(get(maxWait, n, request.getMaxWait()));
+        request.setClampInitialWait(get(clampInitialWait, n, request.getClampInitialWait()));
 
         return request;
     }

@@ -237,9 +237,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     private boolean useBikeRentalAvailabilityInformation = false;
 
     /**
-     * The maximum wait time (in seconds) for any one boarding. A value of 0 disables.
+     * The maximum wait time the user is willing to delay trip start. Only effective in Analyst.
      */
-    public long maxWait;
+    public long clampInitialWait;
 
     /**
      * The routing context used to actually carry out this search. It is important to build States 
@@ -680,7 +680,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && bikeRentalDropoffCost == other.bikeRentalDropoffCost
                 && useBikeRentalAvailabilityInformation == other.useBikeRentalAvailabilityInformation
                 && extensions.equals(other.extensions)
-                && maxWait == other.maxWait;
+                && clampInitialWait == other.clampInitialWait;
     }
 
     /** Equality and hashCode should not consider the routing context, to allow SPT caching. */
@@ -701,7 +701,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + new Double(triangleSlopeFactor).hashCode() * 136372361
                 + new Double(triangleTimeFactor).hashCode() * 790052899
                 + new Double(stairsReluctance).hashCode() * 315595321
-                + new Long(maxWait).hashCode() * 209477;
+                + new Long(clampInitialWait).hashCode() * 209477;
         if (batch) {
             hashCode *= -1;
             hashCode += to.hashCode() * 1327144003;

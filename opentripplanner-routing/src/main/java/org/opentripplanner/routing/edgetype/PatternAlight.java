@@ -187,11 +187,6 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
 
             long wait_cost = bestWait;
 
-            // don't wait too long for this alighting
-            if (options.maxWait > 0 && bestWait > options.maxWait) {
-                return null;
-            }
-
             if (state0.getNumBoardings() == 0) {
                 wait_cost *= options.waitAtBeginningFactor;
                 s1.setInitialWaitTime(bestWait);
