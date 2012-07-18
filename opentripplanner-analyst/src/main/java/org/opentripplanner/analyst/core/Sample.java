@@ -47,7 +47,7 @@ public class Sample {
     }
     
     public String toString() {
-        return String.format("Sample: %s in %d min or %s in %d min\n", v0, t0, v1, t1);
+        return String.format("Sample: %s in %d sec or %s in %d sec\n", v0, t0, v1, t1);
     }
     
 }

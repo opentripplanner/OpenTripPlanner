@@ -24,7 +24,7 @@ public class ThresholdSumAggregator implements Aggregator {
 		double result = 0;
 		for (Individual destination : destinations)
 			if (destination.sample.eval(spt) < thresholdSeconds)
-				result += destination.data;
+				result += destination.input;
 
 		return result;
 	}

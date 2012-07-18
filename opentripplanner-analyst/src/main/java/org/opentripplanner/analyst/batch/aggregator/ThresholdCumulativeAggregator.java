@@ -27,7 +27,7 @@ public class ThresholdCumulativeAggregator implements Aggregator {
 		for (Individual destination : destinations) {
 		    double t = destination.sample.eval(spt); 
 	            if (t < thresholdSeconds)
-	                result += destination.data * (thresholdSeconds - t);
+	                result += destination.input * (thresholdSeconds - t);
 		}
 		return result;
 	}

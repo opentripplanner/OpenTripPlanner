@@ -20,14 +20,14 @@ public class WeightedAverageAggregator implements Aggregator {
 		double result = 0;
 		int n = 0;
 		for (Individual destination : destinations) {
-			if (Double.isInfinite(destination.data))
+			if (Double.isInfinite(destination.input))
 				continue;
 			double t = destination.sample.eval(spt);
 			if (Double.isInfinite(t))
 				continue;
 
-			result += destination.data * t;
-			n += destination.data;
+			result += destination.input * t;
+			n += destination.input;
 		}
 		result /= n;
 		return result;

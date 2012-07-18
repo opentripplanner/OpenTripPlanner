@@ -7,6 +7,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import lombok.Data;
+import lombok.Setter;
 
 import org.opentripplanner.analyst.batch.aggregator.Aggregator;
 import org.opentripplanner.routing.core.PrototypeRoutingRequest;
@@ -30,10 +31,10 @@ public class BatchProcessor {
     
     @Autowired private GraphService graphService;
     @Autowired private SPTService sptService;
-    @Autowired private PrototypeRoutingRequest prototypeRoutingRequest;
     @Resource private Population origins;
     @Resource private Population destinations;
-    @Resource private Aggregator aggregator;
+    private PrototypeRoutingRequest prototypeRoutingRequest;
+    private Aggregator aggregator;
     
     private String routerId;
     private String date = "2011-02-04";
@@ -79,23 +80,27 @@ public class BatchProcessor {
          * 
          * Aggregate over origins or destinations option
          */
-        for (Individual oi : origins) {
-            RoutingRequest req = buildRequest(oi.getLat(), oi.getLon());
-            ShortestPathTree spt = sptService.getShortestPathTree(req);
-            destinations.writeCsv(outputPath, spt, oi);
-//            for (Individual di : destinations) {
-//                long travelTime = di.sample.eval(spt);
-//                // if an aggregator is defined over 
-//            }
-            req.cleanup();
-        }
+    	if (aggregator == null) {
+    		for (Individual oi : origins) {
+    			RoutingRequest req = buildRequest(oi);
+    			ShortestPathTree spt = sptService.getShortestPathTree(req);
+    			destinations.writeCsv(outputPath, spt, oi);
+//                for (Individual di : destinations) {
+//                    long travelTime = di.sample.eval(spt);
+//                    // if an aggregator is defined over 
+//                }
+    			req.cleanup();
+    		}
+    	} else {
+    		// an aggregator has been provided
+    	}
     }
     
-    private RoutingRequest buildRequest(double lat, double lon) {
+    private RoutingRequest buildRequest(Individual i) {
         RoutingRequest req = prototypeRoutingRequest.clone();
         req.setRouterId(routerId);
         req.setDateTime(date, time, timeZone);
-        req.setFrom(String.format("%f, %f", lat, lon));
+        req.setFrom(String.format("%f,%f", i.getLat(), i.getLon()));
         req.batch = true;
         req.setRoutingContext(graphService.getGraph(routerId));
         return req;
