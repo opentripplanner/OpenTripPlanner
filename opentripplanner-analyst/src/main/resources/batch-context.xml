@@ -16,39 +16,46 @@
     <!-- specify a GraphService, configuring the path to the serialized Graphs -->
     <bean id="graphService" class="org.opentripplanner.routing.impl.GraphServiceImpl">
         <property name="path" value="/var/otp/graphs/{}/" />
-        <property name="defaultRouterId" value="paris" />
+        <property name="defaultRouterId" value="arbor" />
     </bean>
 
-<!-- 	
-    <bean id="origins" factory-bean="populationFactory" factory-method="fromRaster">
-        <constructor-arg type="String" value="/path/popdensity.raster" />
-    </bean> 
--->
-
-    <bean id="origins" class="org.opentripplanner.analyst.batch.Population">
+    <bean id="origins" class="org.opentripplanner.analyst.batch.BasicPopulation">
         <property name="individuals">
             <list>
 			    <bean class="org.opentripplanner.analyst.batch.Individual">
-			        <property name="lon" value="2.34520" />
-			        <property name="lat" value="48.8555" />
+				    <property name="label" value="UMich" />
+			        <property name="lon" value="-83.73820" />
+			        <property name="lat" value="42.27490" />
 			    </bean>
             </list>
         </property>
     </bean>
 
-	<bean id="destinations" factory-bean="populationFactory" factory-method="fromShapefile">
-		<constructor-arg type="String" value="/home/abyrd/Dropbox/immoPrix/Prix point.shp" />
-        <constructor-arg type="String" value="prixm2" />
-        <constructor-arg type="String" value="residus" />
+<!-- 	<alias name="destinations" alias="origins"/> -->
+	
+	<bean id="destinations" class="org.opentripplanner.analyst.batch.CSVPopulation">
+        <property name="sourceFilename" value="/home/abyrd/access/annarbor.csv" />
+        <property name="latCol" value="1" />
+        <property name="lonCol" value="2" />
+        <property name="labelCol" value="0" />
+        <property name="inputCol" value="3" />        
 	</bean>
 
     <bean id="heuristicFactory" class="org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl"/>
     <bean id="sptService" class="org.opentripplanner.routing.algorithm.GenericAStar"/>
-    <bean id="populationFactory" class="org.opentripplanner.analyst.batch.factory.PopulationFactory" />
-    <bean id="individualFactory" class="org.opentripplanner.analyst.batch.factory.IndividualFactory" />
+    <bean id="individualFactory" class="org.opentripplanner.analyst.batch.IndividualFactory" />
 
 	<bean id="batchProcessor" class="org.opentripplanner.analyst.batch.BatchProcessor"> 
-        <property name="routerId" value="paris" />
+        <property name="outputPath" value="/home/abyrd/out.csv" />
+        <property name="routerId" value="arbor" />
+        <property name="date" value="2012-07-12" />
+        <property name="time" value="08:00 AM" />
+        <property name="timeZone" value="America/New_York" />
+        <property name="prototypeRoutingRequest">
+			<bean class="org.opentripplanner.routing.core.PrototypeRoutingRequest">
+				<!-- Set default routing parameters here -->
+			</bean>
+		</property>		
         <!--         
         <property name="aggregator"> 
             <bean class="org.opentripplanner.analyst.batch.aggregator.ThresholdSumAggregator">
