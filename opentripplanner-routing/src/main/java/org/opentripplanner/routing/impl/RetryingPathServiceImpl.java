@@ -39,6 +39,8 @@ public class RetryingPathServiceImpl implements PathService {
     private static final int MAX_TIME_FACTOR = 2;
     private static final int MAX_WEIGHT_FACTOR = 2;
 
+    private static final double MAX_WALK_MULTIPLE = 16;
+
     @Autowired public GraphService graphService;
     @Autowired public SPTService sptService;
 
@@ -93,6 +95,7 @@ public class RetryingPathServiceImpl implements PathService {
 
         double maxWeight = Double.MAX_VALUE;
         double maxWalk = options.getMaxWalkDistance();
+        double initialMaxWalk = maxWalk;
         long maxTime = options.isArriveBy() ? 0 : Long.MAX_VALUE;
         RoutingRequest currOptions;
         while (paths.size() < options.numItineraries) {
@@ -147,6 +150,8 @@ public class RetryingPathServiceImpl implements PathService {
             }
             if (somePaths.isEmpty()) {
                 //try again doubling maxwalk
+                if (maxWalk > initialMaxWalk * MAX_WALK_MULTIPLE || maxWalk >= Double.MAX_VALUE)
+                    break;
                 maxWalk *= 2;
                 optionQueue.add(currOptions);
                 LOG.debug("No paths were found.");
