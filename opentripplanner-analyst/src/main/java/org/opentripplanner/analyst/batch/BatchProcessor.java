@@ -81,18 +81,18 @@ public class BatchProcessor {
          * 
          * Aggregate over origins or destinations option
          */
-    	if (aggregator == null) {
-    		for (Individual oi : origins) {
-    			RoutingRequest req = buildRequest(oi);
-    			if (req != null) {
-        			ShortestPathTree spt = sptService.getShortestPathTree(req);
-        			destinations.writeCsv(outputPath, spt, oi);
-        			req.cleanup();
-    			}
-    		}
-    	} else {
-    		// an aggregator has been provided
-    	}
+        if (aggregator == null) {
+            for (Individual oi : origins) {
+                RoutingRequest req = buildRequest(oi);
+                if (req != null) {
+                    ShortestPathTree spt = sptService.getShortestPathTree(req);
+                    destinations.writeCsv(outputPath, spt, oi);
+                    req.cleanup();
+                }
+            }
+        } else {
+            // an aggregator has been provided
+        }
     }
     
     private RoutingRequest buildRequest(Individual i) {
