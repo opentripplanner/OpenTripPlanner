@@ -3,6 +3,7 @@ package org.opentripplanner.analyst.batch;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
+import java.awt.image.DataBufferInt;
 import java.awt.image.DataBufferShort;
 import java.awt.image.DataBufferUShort;
 import java.awt.image.RenderedImage;
@@ -118,11 +119,20 @@ public class RasterPopulation extends BasicPopulation {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_USHORT_GRAY);
         short[] imagePixelData = ((DataBufferUShort)image.getRaster().getDataBuffer()).getData();
         int i = 0;
+        double maxOutput = 0;
         for (Individual indiv : this.getIndividuals()) {
-            short pixel = (short) indiv.output;
+            if (indiv.output > maxOutput)
+                maxOutput = indiv.output;
+        }
+        for (Individual indiv : this.getIndividuals()) {
+            int pixel = (int) (indiv.output / maxOutput * 65535);
+            //  clamp to UShort
             if (pixel < 0)
                 pixel = 0;
-            imagePixelData[i] = pixel;
+            if(pixel > 65535)
+                pixel = 65535;
+            //LOG.debug("pixel {}", pixel);
+            imagePixelData[i] = (short) pixel;
             i++;
         }
         // replace coverage... we should maybe store only the envelope, or the gridgeom in the syntheticrasterpop
