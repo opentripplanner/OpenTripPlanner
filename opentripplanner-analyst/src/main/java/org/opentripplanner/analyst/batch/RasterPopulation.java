@@ -13,10 +13,17 @@ import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
 import org.geotools.coverage.grid.io.AbstractGridFormat;
 import org.geotools.coverage.grid.io.GridFormatFinder;
+import org.geotools.gce.geotiff.GeoTiffFormat;
+import org.geotools.gce.geotiff.GeoTiffWriteParams;
+import org.geotools.gce.geotiff.GeoTiffWriter;
 import org.geotools.referencing.CRS;
 import org.opengis.geometry.DirectPosition;
+import org.opengis.parameter.GeneralParameterValue;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,51 +34,51 @@ public class RasterPopulation extends BasicPopulation {
 
     private static final long serialVersionUID = 20120201L; //YYYYMMDD
     private static final Logger LOG = LoggerFactory.getLogger(RasterPopulation.class);
-    
-    @Setter int width, height; 
-    @Setter double originLon, originLat; // southwest corner
+
+    @Setter int width, height; // cells 
+    @Setter double left, right, top, bottom;
     @Setter double lonStep, latStep;
     
-    @PostConstruct
-    public void loadIndividuals() {
-        LOG.debug("Loading population from raster file {}", sourceFilename);
+    protected GridCoverage2D cov;
+    protected CoordinateReferenceSystem covCRS; 
+    
+    protected void createIndividuals() {
+        this.covCRS = cov.getCoordinateReferenceSystem();
+        MathTransform tr; 
         try {
-            File rasterFile = new File(sourceFilename);
+            final CoordinateReferenceSystem WGS84 = CRS.decode("EPSG:4326", true);
+            tr = CRS.findMathTransform(covCRS, WGS84);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
 
-            // determine file format and CRS, then load raster
-            AbstractGridFormat format = GridFormatFinder.findFormat(rasterFile);
-            AbstractGridCoverage2DReader reader = format.getReader(rasterFile);
-            CoordinateReferenceSystem sourceCRS = reader.getCrs();
-            GridCoverage2D cov = reader.read(null);
+        // add param for crop envelope? autocrop to graph area?
+        /*
+        // envelope around our area of interest (petite couronne)
+        ReferencedEnvelope wgsEnv = new ReferencedEnvelope(1.86, 2.76, 48.52, 49.1, WGS84);
+        // reproject the envelope to the raster's CRS, longitude first
+        ReferencedEnvelope sourceEnv = wgsEnv.transform(sourceCRS, true);
+        // crop raster to reprojected envelope
+        cov = (GridCoverage2D) Operations.DEFAULT.crop(cov, sourceEnv);
+        // fetch grid information from the new cropped raster
+         */
 
-            CoordinateReferenceSystem WGS84 = CRS.decode("EPSG:4326", true);
-            MathTransform tr = CRS.findMathTransform(sourceCRS, WGS84);
+        GridGeometry2D gridGeometry = cov.getGridGeometry();
+        GridEnvelope2D gridEnvelope = gridGeometry.getGridRange2D();
+        
+        this.width  = gridEnvelope.width;
+        this.height = gridEnvelope.height;
 
-            // add param for crop envelope? autocrop to graph area?
-            /*
-            // envelope around our area of interest (petite couronne)
-            ReferencedEnvelope wgsEnv = new ReferencedEnvelope(1.86, 2.76, 48.52, 49.1, WGS84);
-            // reproject the envelope to the raster's CRS, longitude first
-            ReferencedEnvelope sourceEnv = wgsEnv.transform(sourceCRS, true);
-            // crop raster to reprojected envelope
-            cov = (GridCoverage2D) Operations.DEFAULT.crop(cov, sourceEnv);
-            // fetch grid information from the new cropped raster
-             */
-
-            GridGeometry2D gridGeometry = cov.getGridGeometry();
-            GridEnvelope2D gridEnvelope = gridGeometry.getGridRange2D();
-            
-            int width  = gridEnvelope.width;
-            int height = gridEnvelope.height;
-
-            // grid coordinate object to be reused for reading each cell in the raster
-            GridCoordinates2D coord = new GridCoordinates2D();
-            // evaluating a raster returns an array of results, in this case 1D
-            int[] val = new int[1];
-            for (int gy = gridEnvelope.y, iy = 0; iy < height; gy++, iy++) {
-                for (int gx = gridEnvelope.x, ix = 0; ix < width; gx++, ix++) {
-                    coord.x = gx;
-                    coord.y = gy;
+        // grid coordinate object to be reused for reading each cell in the raster
+        GridCoordinates2D coord = new GridCoordinates2D();
+        // evaluating a raster returns an array of results, in this case 1D
+        int[] val = new int[1];
+        for (int gy = gridEnvelope.y, iy = 0; iy < height; gy++, iy++) {
+            for (int gx = gridEnvelope.x, ix = 0; ix < width; gx++, ix++) {
+                coord.x = gx;
+                coord.y = gy;
+                try {
                     // find coordinates for current raster cell in raster CRS
                     DirectPosition sourcePos = gridGeometry.gridToWorld(coord);
                     cov.evaluate(sourcePos, val);
@@ -84,11 +91,42 @@ public class RasterPopulation extends BasicPopulation {
                             targetPos.getOrdinate(1), 
                             val[0]);
                     this.add(individual);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return;
                 }
             }
+        }
+    }
+    
+    //to geotiff
+    public void writeToGeotiff(String fileName) {
+        try {
+            GeoTiffWriteParams wp = new GeoTiffWriteParams();
+            wp.setCompressionMode(GeoTiffWriteParams.MODE_EXPLICIT);
+            wp.setCompressionType("LZW");
+            ParameterValueGroup params = new GeoTiffFormat().getWriteParameters();
+            params.parameter(AbstractGridFormat.GEOTOOLS_WRITE_PARAMS.getName().toString()).setValue(wp);
+            new GeoTiffWriter(new File(fileName)).write(this.cov, (GeneralParameterValue[]) params.values().toArray(new GeneralParameterValue[1]));
+        } catch (Exception e) {
+            LOG.error("exception while writing geotiff.");
+            e.printStackTrace();
+        }
+    }
+    
+    @PostConstruct
+    public void loadIndividuals() {
+        LOG.debug("Loading population from raster file {}", sourceFilename);
+        try {
+            File rasterFile = new File(sourceFilename);
+            // determine file format and CRS, then load raster
+            AbstractGridFormat format = GridFormatFinder.findFormat(rasterFile);
+            AbstractGridCoverage2DReader reader = format.getReader(rasterFile);
+            this.cov = reader.read(null);
         } catch (Exception ex) {
             throw new IllegalStateException("Error loading population from raster file: ", ex);
         }
         LOG.debug("Done loading raster from file.");
+            
     }
 }

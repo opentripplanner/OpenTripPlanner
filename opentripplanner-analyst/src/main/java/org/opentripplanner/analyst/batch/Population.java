@@ -31,4 +31,5 @@ public interface Population extends Iterable<Individual> {
     
     public void writeCsv(String outFileName);
 
+    // loadIndividuals method to be called by batch processor before running 
 }
