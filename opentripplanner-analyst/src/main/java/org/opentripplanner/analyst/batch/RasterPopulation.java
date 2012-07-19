@@ -8,6 +8,8 @@ import java.awt.image.DataBufferShort;
 import java.awt.image.DataBufferUShort;
 import java.awt.image.RenderedImage;
 import java.io.File;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 
@@ -116,27 +118,19 @@ public class RasterPopulation extends BasicPopulation {
 
     public void writeGeotiff(String fileName) {
         LOG.info("writing geotiff.");
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_USHORT_GRAY);
-        short[] imagePixelData = ((DataBufferUShort)image.getRaster().getDataBuffer()).getData();
-        int i = 0;
-        double maxOutput = 0;
-        for (Individual indiv : this.getIndividuals()) {
-            if (indiv.output > maxOutput)
-                maxOutput = indiv.output;
-        }
-        for (Individual indiv : this.getIndividuals()) {
-            int pixel = (int) (indiv.output / maxOutput * 65535);
-            //  clamp to UShort
-            if (pixel < 0)
-                pixel = 0;
-            if(pixel > 65535)
-                pixel = 65535;
-            //LOG.debug("pixel {}", pixel);
-            imagePixelData[i] = (short) pixel;
-            i++;
+        float[][] imagePixelData = new float[height][width]; // maybe rename rows cols to avoid confusion with CRS coords
+        List<Individual> individuals = this.getIndividuals();
+        Iterator<Individual> indivIter = this.iterator(); // maybe individuals should also be stored in a 2D array
+        for (int row = 0; row < height; row++) {
+            for (int col = 0; col < width; col++) {
+                Individual indiv = indivIter.next();
+                int index = row * width + col;
+                float pixel = (float) indiv.output;
+                imagePixelData[row][col] = pixel;
+            }
         }
         // replace coverage... we should maybe store only the envelope, or the gridgeom in the syntheticrasterpop
-        this.cov = new GridCoverageFactory().create(cov.getName(), image, cov.getEnvelope());
+        this.cov = new GridCoverageFactory().create(cov.getName(), imagePixelData, cov.getEnvelope());
         try {
             GeoTiffWriteParams wp = new GeoTiffWriteParams();
             wp.setCompressionMode(GeoTiffWriteParams.MODE_EXPLICIT);
