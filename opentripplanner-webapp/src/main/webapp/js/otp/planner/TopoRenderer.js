@@ -28,6 +28,7 @@ otp.planner.TopoRendererStatic = {
     map :       null,
     panel :     null,
 
+    extWrapper :            null,
     mainContainerDiv :      null,
     axisDiv :               null,
     terrainContainerDiv :   null,
@@ -110,17 +111,57 @@ otp.planner.TopoRendererStatic = {
     },
     
     draw : function(itin, tree) {
-        var thisTR = this;
         
         this.processItinerary(itin);
         
-        var width = this.panel.getEl().getWidth();
-        var height = this.panel.getEl().getHeight();
+        //var width = this.panel.getWidth();
+        var height = this.panel.getHeight();
+        //if(width == 0) width = this.map.map.size.w;
+        width = this.map.map.size.w;
+        if(height == 0) height = 180;
+        
+        this.render(width, height);
+        
+        
+        this.extWrapper = new Ext.Panel({
+            contentEl : this.mainContainerDiv,
+            layout: 'fit',
+        });
+                
+    },
+    
+    redraw : function() {
+        this.panel.remove(this.extWrapper);
+        var width = this.panel.getWidth();
+        var height = this.panel.getHeight();
+        this.render(width, height);
+        this.extWrapper = new Ext.Panel({
+            contentEl : this.mainContainerDiv,
+            layout: 'fit',
+        });
+        this.panel.add(this.extWrapper);
+        this.panel.doLayout();
+        this.postLayout();
+    },
+
+    postLayout : function()
+    {
+        var this_ = this;
+        this.extWrapper.on('resize', function(el) {
+            this_.redraw();
+        });
+    },
+    
+    
+    render : function(width, height) {
+        var this_ = this;
+
         this.currentLeft = 0;
         this.currentMouseRect = null;
         this.markerLayer = null;
         this.locationPoint = null;
         this.locationMarker = null;
+        
         
         // compute the resolution of the main terrain graph in ft per pixel
         var res = Math.floor(this.totalDistance / 5000); 
@@ -148,7 +189,7 @@ otp.planner.TopoRendererStatic = {
         // create the container div elements and associated Raphael canvases                     
         this.createContainerDivs(width, height, terrainWidth, showPreview);  
         var axisCanvas = Raphael(this.axisDiv);
-        var terrainCanvas = Raphael(this.terrainDiv);
+        var terrainCanvas = Raphael(this.terrainDiv, terrainWidth, terrainHeight);
                
         // set up the terrain "cursor" w/ initial x = -10; not visible until
         // mouse first hovers over a terrain segment
@@ -264,6 +305,7 @@ otp.planner.TopoRendererStatic = {
             for (si = 0; si < steps.length; si++) {
                 var step = steps[si];
                 var segWidth = (step.distance*3.2808399)/res;
+                
                 leg.topoGraphSpan += segWidth;
 
                 var xCoords = new Array(), yCoords = new Array();
@@ -321,6 +363,7 @@ otp.planner.TopoRendererStatic = {
 
                 // create a rectangular area in front of this elevation segment
                 // to handle mouse envets
+                
                 var mouseRect = terrainCanvas.rect(currentX, 0, segWidth, terrainHeight).attr({
                     fill: 'white',
                     'fill-opacity': 0,
@@ -340,12 +383,12 @@ otp.planner.TopoRendererStatic = {
                     this.animate({'fill-opacity': .25}, 300);
                     this.labelBG.animate({opacity: 1}, 300);
                     this.labelFG.animate({opacity: 1}, 300);
-                    thisTR.currentMouseRect = this;
+                    this_.currentMouseRect = this;
                 });
                 
                 mouseRect.mouseout(function(event) {
                     // hide the terrain cursor
-                    thisTR.terrainCursor.attr({x : -10});
+                    this_.terrainCursor.attr({x : -10});
                     
                     // de-highlight the polygon and hide the street name label
                     // for the segment we're leaving
@@ -356,36 +399,36 @@ otp.planner.TopoRendererStatic = {
                     this.labelFG.animate({opacity: 0}, 300);
                     
                     // hide the locator marker on the main map
-                    if(thisTR.locationMarker != null) {
-                        thisTR.locationMarker.style = { display : 'none' };
-                        thisTR.markerLayer.redraw();
+                    if(this_.locationMarker != null) {
+                        this_.locationMarker.style = { display : 'none' };
+                        this_.markerLayer.redraw();
                     }
                 });
 
                 mouseRect.mousemove(function (event) {
                     // shift terrain cursor to follow mouse movement
-                    var nx = Math.round(event.clientX - thisTR.panel.getEl().getLeft() - thisTR.axisWidth - thisTR.currentLeft);
-                    thisTR.terrainCursor.attr({x : nx});
+                    var nx = Math.round(event.clientX - this_.panel.getEl().getLeft() - this_.axisWidth - this_.currentLeft);
+                    this_.terrainCursor.attr({x : nx});
 
                     // also, show / move the locator marker on the main map
                     var distAlongLS = this.leg.get('legGeometry').getLength() * (nx-this.legStartX)/this.leg.topoGraphSpan;
-                    thisTR.locationPoint = thisTR.pointAlongLineString(this.leg.get('legGeometry'), distAlongLS);
-                    if(thisTR.markerLayer == null) {
-                        thisTR.markerLayer = thisTR.map.getMap().getLayersByName('trip-marker-layer')[0];
+                    this_.locationPoint = this_.pointAlongLineString(this.leg.get('legGeometry'), distAlongLS);
+                    if(this_.markerLayer == null) {
+                        this_.markerLayer = this_.map.getMap().getLayersByName('trip-marker-layer')[0];
                     }
 
-                    if(thisTR.locationMarker == null || thisTR.locationMarker.attributes.mode != this.leg.get('mode')) {
+                    if(this_.locationMarker == null || this_.locationMarker.attributes.mode != this.leg.get('mode')) {
                         var topoMarkerID = this.leg.get('mode').toLowerCase()+'-topo-marker';
-                        thisTR.locationMarker = thisTR.markerLayer.getFeatureById(topoMarkerID);
+                        this_.locationMarker = this_.markerLayer.getFeatureById(topoMarkerID);
                     }
-                    thisTR.locationMarker.style = null;
-                    thisTR.locationMarker.move(new OpenLayers.LonLat(thisTR.locationPoint.x, thisTR.locationPoint.y));
+                    this_.locationMarker.style = null;
+                    this_.locationMarker.move(new OpenLayers.LonLat(this_.locationPoint.x, this_.locationPoint.y));
                 });
                 
                 mouseRect.click(function (event) {
                     // respond to clicks by recentering map
-                    if(thisTR.locationPoint != null) {
-                        thisTR.map.getMap().setCenter(new OpenLayers.LonLat(thisTR.locationPoint.x, thisTR.locationPoint.y));
+                    if(this_.locationPoint != null) {
+                        this_.map.getMap().setCenter(new OpenLayers.LonLat(this_.locationPoint.x, this_.locationPoint.y));
                     }
                 });
                 
@@ -410,7 +453,7 @@ otp.planner.TopoRendererStatic = {
         } // end of leg loop
         
         // bring terrain cursor and street labels (currently hidden) to foreground
-        thisTR.terrainCursor.toFront();        
+        this_.terrainCursor.toFront();        
         for(var b=0; b < bgLabels.length; b++) {
             bgLabels[b].toFront();
         }
@@ -424,7 +467,7 @@ otp.planner.TopoRendererStatic = {
         // draw preview panel (along bottom), if necessary
 
         if(showPreview) {
-            var previewCanvas = Raphael(this.previewDiv);
+            var previewCanvas = Raphael(this.previewDiv, width, previewHeight);
 
             var previewPathStr = "M 0 " + previewHeight + " ";
             for(var p = 0; p < previewXCoords.length; p++) {
@@ -482,8 +525,8 @@ otp.planner.TopoRendererStatic = {
                 if(nx < 0) nx = 0;
                 if(nx > width-sliderWidth) nx = width-sliderWidth;
 
-                thisTR.currentLeft = Math.round(-(nx/width)*terrainWidth);
-                thisTR.terrainDiv.style.left =  thisTR.currentLeft + 'px';
+                this_.currentLeft = Math.round(-(nx/width)*terrainWidth);
+                this_.terrainDiv.style.left =  this_.currentLeft + 'px';
 
                 var ndx = nx - this.attr("x");
                 this.attr({x: nx});
@@ -538,25 +581,6 @@ otp.planner.TopoRendererStatic = {
         this.terrainContainerDiv.appendChild(this.terrainDiv);
         if(showPreview) this.mainContainerDiv.appendChild(this.previewDiv);
 
-        // Remove all existing elements from the topo panel and add the new div
-        var panelEl = this.panel.getEl();
-        while (panelEl.first()) { 
-            panelEl.first().remove();
-        }
-        panelEl.appendChild(this.mainContainerDiv);
-    },
-
-
-    /** */
-    removeFromPanel : function()
-    {
-        try
-        {
-            var self = otp.planner.TopoRendererStatic.THIS;
-            self.panel.getEl().dom.removeChild(self.mainContainerDiv);
-        }
-        catch(e)
-        { }
     },
 
 
@@ -575,7 +599,7 @@ otp.planner.TopoRendererStatic = {
 
         return points[points.length-1];
     },
-
+    
     CLASS_NAME: "otp.planner.TopoRenderer"
 };
 
