@@ -33,12 +33,14 @@
     </bean>
 -->
 
-	<bean id="origins" class="org.opentripplanner.analyst.batch.CSVPopulation">
-        <property name="sourceFilename" value="/home/abyrd/access/annarbor.csv" />
-        <property name="latCol" value="1" />
-        <property name="lonCol" value="2" />
-        <property name="labelCol" value="0" />
-        <property name="inputCol" value="3" />        
+	<bean id="origins" class="org.opentripplanner.analyst.batch.SyntheticRasterPopulation">
+        <property name="left" value="-84.14" />
+        <property name="right" value="-83.41" />
+        <property name="bottom" value="42.07" />
+        <property name="top" value="42.45" />        
+        <property name="crsCode" value="epsg:4326" />
+        <property name="width" value="320" />
+        <property name="height" value="200" />        
 	</bean>
 
 	<bean id="destinations" class="org.opentripplanner.analyst.batch.CSVPopulation">
@@ -57,7 +59,7 @@
     <bean id="individualFactory" class="org.opentripplanner.analyst.batch.IndividualFactory" />
 
 	<bean id="batchProcessor" class="org.opentripplanner.analyst.batch.BatchProcessor"> 
-        <property name="outputPath" value="/home/abyrd/out.csv" />
+        <property name="outputPath" value="/home/abyrd/access/out1834_clamp.csv" />
         <property name="routerId" value="arbor" />
         <property name="date" value="2012-07-12" />
         <property name="time" value="08:00 AM" />
@@ -66,6 +68,7 @@
 			<bean class="org.opentripplanner.routing.core.PrototypeRoutingRequest">
 				<!-- Set default routing parameters here -->
 		        <property name="maxWalkDistance" value="4000" />
+		        <property name="clampInitialWait" value="1800" />
 			</bean>
 		</property>		
         <property name="aggregator"> 
