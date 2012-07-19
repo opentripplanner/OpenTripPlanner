@@ -16,6 +16,13 @@
     <context:component-scan base-package="org.opentripplanner.analyst"/>
     -->
     
+    <bean class="org.opentripplanner.analyst.request.SampleFactory" />
+    <bean class="org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl"/>
+    <bean class="org.opentripplanner.routing.algorithm.GenericAStar"/>
+    <bean class="org.opentripplanner.analyst.batch.IndividualFactory" />
+    <bean class="org.opentripplanner.analyst.core.GeometryIndex" />
+    
+    
     <!-- specify a GraphService, configuring the path to the serialized Graphs -->
     <bean id="graphService" class="org.opentripplanner.routing.impl.GraphServiceImpl">
         <property name="path" value="/var/otp/graphs/{}/" />
@@ -46,8 +53,8 @@
         <property name="bottom" value="42.07" />
         <property name="top" value="42.45" />        
         <property name="crsCode" value="epsg:4326" />
-        <property name="width" value="640" />
-        <property name="height" value="480" />        
+        <property name="width" value="320" />
+        <property name="height" value="200" />        
 	</bean>
 
 <!-- this loads a population from a comma-separated flat text file -->
@@ -61,14 +68,10 @@
 	</bean>
 
 <!-- do not do this: currently aggregate results are stored in individuals so populations cannot be reused -->
-
 <!-- <alias name="destinations" alias="origins"/> -->
 	
-    <bean id="heuristicFactory" class="org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl"/>
-    <bean id="sptService" class="org.opentripplanner.routing.algorithm.GenericAStar"/>
-    <bean id="individualFactory" class="org.opentripplanner.analyst.batch.IndividualFactory" />
-
-
+<!-- define the main batch processor, which will build one shortest path tree from each origin to all destinations -->
+	
 	<bean id="batchProcessor" class="org.opentripplanner.analyst.batch.BatchProcessor"> 
         <property name="outputPath" value="/home/abyrd/access/out1834_clamp.tiff" />
         <property name="routerId" value="arbor" />
@@ -80,6 +83,7 @@
 				<!-- Set default routing parameters here -->
 		        <property name="maxWalkDistance" value="4000" />
 		        <property name="clampInitialWait" value="1800" />
+		        <property name="arriveBy" value="true" />
 			</bean>
 		</property>		
         <property name="aggregator"> 
