@@ -272,9 +272,6 @@ public class PlanGenerator {
                     finalizeLeg(leg, state, path.states, startWalk, i, coordinates);
                     startWalk = i;
                     leg = makeLeg(itinerary, state);
-                    if (backEdge instanceof RentABikeOnEdge) {
-                        leg.rentedBike = true; 
-                    }
                     pgstate = PlanGenState.BICYCLE;
                 } else if (mode == TraverseMode.STL) {
                     finalizeLeg(leg, state, path.states, startWalk, i, coordinates);
@@ -520,6 +517,9 @@ public class PlanGenerator {
         leg.distance = 0.0;
         leg.from = makePlace(s.getBackState(), false);
         leg.mode = en.getMode().toString();
+        if (s.isBikeRenting()) {
+            leg.rentedBike = true; 
+        }
         return leg;
     }
 
