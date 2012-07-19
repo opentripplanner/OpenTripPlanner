@@ -114,7 +114,7 @@ public class RasterPopulation extends BasicPopulation {
     }
 
     public void writeGeotiff(String fileName) {
-        LOG.debug("writing geotiff.");
+        LOG.info("writing geotiff.");
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_USHORT_GRAY);
         short[] imagePixelData = ((DataBufferUShort)image.getRaster().getDataBuffer()).getData();
         int i = 0;
@@ -138,12 +138,12 @@ public class RasterPopulation extends BasicPopulation {
             LOG.error("exception while writing geotiff.");
             e.printStackTrace();
         }
-        LOG.debug("done writing geotiff.");
+        LOG.info("done writing geotiff.");
     }
     
     @PostConstruct
     public void loadIndividuals() {
-        LOG.debug("Loading population from raster file {}", sourceFilename);
+        LOG.info("Loading population from raster file {}", sourceFilename);
         try {
             File rasterFile = new File(sourceFilename);
             // determine file format and CRS, then load raster
@@ -153,7 +153,7 @@ public class RasterPopulation extends BasicPopulation {
         } catch (Exception ex) {
             throw new IllegalStateException("Error loading population from raster file: ", ex);
         }
-        LOG.debug("Done loading raster from file.");
+        LOG.info("Done loading raster from file.");
     }
     
 }

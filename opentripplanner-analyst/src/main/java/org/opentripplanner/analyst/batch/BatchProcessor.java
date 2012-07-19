@@ -81,8 +81,8 @@ public class BatchProcessor {
          * 
          * Aggregate over origins or destinations option
          */
+        int nOrigins = origins.getIndividuals().size();
         if (aggregator == null) {
-            int nOrigins = origins.getIndividuals().size();
             if (nOrigins > 1 && !outputPath.contains("{}")) {
                 LOG.error("output filename must contain origin placeholder.");
                 return;
@@ -106,7 +106,9 @@ public class BatchProcessor {
         } else { // an aggregator has been provided
             int i = 0;
             for (Individual oi : origins) {
-                LOG.debug("individual {} : {}", i, oi);
+                LOG.debug("individual {}: {}", i, oi);
+                if (i%100 == 0)
+                    LOG.info("individual {}/{}", i, nOrigins);
                 RoutingRequest req = buildRequest(oi);
                 if (req != null) {
                     ShortestPathTree spt = sptService.getShortestPathTree(req);
