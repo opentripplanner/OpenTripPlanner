@@ -104,7 +104,9 @@ public class BatchProcessor {
                 }
             }
         } else { // an aggregator has been provided
+            int i = 0;
             for (Individual oi : origins) {
+                LOG.debug("individual {} : {}", i, oi);
                 RoutingRequest req = buildRequest(oi);
                 if (req != null) {
                     ShortestPathTree spt = sptService.getShortestPathTree(req);
@@ -113,6 +115,7 @@ public class BatchProcessor {
                     oi.output = aggregate;
                     req.cleanup();
                 }
+                i += 1;
             }
             origins.writeCsv(outputPath);
         }
