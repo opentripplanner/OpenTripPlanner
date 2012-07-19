@@ -1,5 +1,11 @@
 package org.opentripplanner.analyst.batch;
 
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
+import java.awt.image.DataBufferShort;
+import java.awt.image.DataBufferUShort;
+import java.awt.image.RenderedImage;
 import java.io.File;
 
 import javax.annotation.PostConstruct;
@@ -8,6 +14,7 @@ import lombok.Setter;
 
 import org.geotools.coverage.grid.GridCoordinates2D;
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.GridCoverageFactory;
 import org.geotools.coverage.grid.GridEnvelope2D;
 import org.geotools.coverage.grid.GridGeometry2D;
 import org.geotools.coverage.grid.io.AbstractGridCoverage2DReader;
@@ -24,6 +31,8 @@ import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
+import org.opentripplanner.analyst.core.Sample;
+import org.opentripplanner.analyst.parameter.Style;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,8 +108,25 @@ public class RasterPopulation extends BasicPopulation {
         }
     }
     
-    //to geotiff
-    public void writeToGeotiff(String fileName) {
+    @Override
+    public void writeOriginalFormat(String fileName) {
+        writeGeotiff(fileName);
+    }
+
+    public void writeGeotiff(String fileName) {
+        LOG.debug("writing geotiff.");
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_USHORT_GRAY);
+        short[] imagePixelData = ((DataBufferUShort)image.getRaster().getDataBuffer()).getData();
+        int i = 0;
+        for (Individual indiv : this.getIndividuals()) {
+            short pixel = (short) indiv.output;
+            if (pixel < 0)
+                pixel = 0;
+            imagePixelData[i] = pixel;
+            i++;
+        }
+        // replace coverage... we should maybe store only the envelope, or the gridgeom in the syntheticrasterpop
+        this.cov = new GridCoverageFactory().create(cov.getName(), image, cov.getEnvelope());
         try {
             GeoTiffWriteParams wp = new GeoTiffWriteParams();
             wp.setCompressionMode(GeoTiffWriteParams.MODE_EXPLICIT);
@@ -112,6 +138,7 @@ public class RasterPopulation extends BasicPopulation {
             LOG.error("exception while writing geotiff.");
             e.printStackTrace();
         }
+        LOG.debug("done writing geotiff.");
     }
     
     @PostConstruct
@@ -127,6 +154,6 @@ public class RasterPopulation extends BasicPopulation {
             throw new IllegalStateException("Error loading population from raster file: ", ex);
         }
         LOG.debug("Done loading raster from file.");
-            
     }
+    
 }

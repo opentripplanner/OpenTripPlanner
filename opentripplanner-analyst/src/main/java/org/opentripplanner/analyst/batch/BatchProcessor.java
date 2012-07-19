@@ -117,7 +117,8 @@ public class BatchProcessor {
                 }
                 i += 1;
             }
-            origins.writeCsv(outputPath);
+            //origins.writeCsv(outputPath);
+            origins.writeOriginalFormat(outputPath);
         }
     }
     

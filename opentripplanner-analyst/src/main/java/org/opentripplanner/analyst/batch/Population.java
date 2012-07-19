@@ -31,5 +31,8 @@ public interface Population extends Iterable<Individual> {
     
     public void writeCsv(String outFileName);
 
+    /* write the output data in this population to an the same format as the original source (image, csv, shapefile) */
+    public void writeOriginalFormat(String fileName);
+
     // loadIndividuals method to be called by batch processor before running 
 }

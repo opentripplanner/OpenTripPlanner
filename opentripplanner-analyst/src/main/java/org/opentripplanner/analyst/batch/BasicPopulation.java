@@ -88,5 +88,10 @@ public class BasicPopulation implements Population {
         }
         LOG.debug("Done writing population to CSV.");
     }
+
+    @Override
+    public void writeOriginalFormat(String fileName) {
+        writeCsv(fileName);
+    }
         
 }
