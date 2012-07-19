@@ -16,6 +16,9 @@ package org.opentripplanner.routing.core;
 import java.util.Arrays;
 import java.util.Date;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.automata.AutomatonState;
@@ -28,7 +31,6 @@ import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
 public class State implements Cloneable {
-
     /* Data which is likely to change at most traversals */
     // the current time at this state, in seconds
     protected long time;
@@ -61,6 +63,8 @@ public class State implements Cloneable {
     // track the states of all path parsers -- probably changes frequently
     protected int[] pathParserStates;
     
+    private static final Logger LOG = LoggerFactory.getLogger(State.class);
+
     /* CONSTRUCTORS */
 
     /**
@@ -508,4 +512,78 @@ public class State implements Cloneable {
         return stateData.bikeRentalNetwork;
     }
 
+    /**
+     * Reverse the path implicit in the given state, i.e. produce a new chain of states that leads
+     * from this state to the other end of the implicit path.
+     */
+    public State reverse() {
+
+        State orig = this;
+        State ret = orig.reversedClone();
+
+        while (orig.getBackState() != null) {
+            Edge edge = orig.getBackEdge();
+            EdgeNarrative narrative = orig.getBackEdgeNarrative();
+            StateEditor editor = ret.edit(edge, narrative);
+            // note the distinction between setFromState and setBackState
+            editor.setFromState(orig);
+            editor.incrementTimeInSeconds(orig.getAbsTimeDeltaSec());
+            editor.incrementWeight(orig.getWeightDelta());
+            if (orig.isBikeRenting() != orig.getBackState().isBikeRenting())
+             editor.setBikeRenting(!orig.isBikeRenting());
+            ret = editor.makeState();
+            orig = orig.getBackState();
+        }
+
+        return ret;
+    }
+
+
+    /**
+     * Reverse the path implicit in the given state, re-traversing all edges in the opposite
+     * direction so as to remove any unnecessary waiting in the resulting itinerary. This produces a
+     * path that passes through all the same edges, but which may have a shorter overall duration
+     * due to different weights on time-dependent (e.g. transit boarding) edges.
+     * 
+     * @return a state at the other end of a reversed, optimized path
+     */
+    // optimize is now very similar to reverse, and the two could conceivably be combined
+    public State optimize() {
+        State orig = this;
+        State unoptimized = orig;
+        State ret = orig.reversedClone();
+        Edge edge = null;
+        try {
+            while (orig.getBackState() != null) {
+                edge = orig.getBackEdge();
+                ret = edge.traverse(ret);
+                EdgeNarrative origNarrative = orig.getBackEdgeNarrative();
+                EdgeNarrative retNarrative = ret.getBackEdgeNarrative();
+                copyExistingNarrativeToNewNarrativeAsAppropriate(origNarrative, retNarrative);
+                orig = orig.getBackState();
+            }
+        } catch (NullPointerException e) {
+            LOG.warn("Cannot reverse path at edge: " + edge
+                    + " returning unoptimized path. If edge is a PatternInterlineDwell,"
+                    + " this is not totally unexpected; otherwise, you might want to"
+                    + " look into it");
+            return unoptimized.reverse();
+        }
+        return ret;
+    }
+
+    private static void copyExistingNarrativeToNewNarrativeAsAppropriate(EdgeNarrative from,
+            EdgeNarrative to) {
+
+        if (!(to instanceof MutableEdgeNarrative))
+            return;
+
+        MutableEdgeNarrative m = (MutableEdgeNarrative) to;
+
+        if (to.getFromVertex() == null)
+            m.setFromVertex(from.getFromVertex());
+
+        if (to.getToVertex() == null)
+            m.setToVertex(from.getToVertex());
+    }
 }
