@@ -128,8 +128,12 @@ public class BatchProcessor {
         RoutingRequest req = prototypeRoutingRequest.clone();
         req.setRouterId(routerId);
         req.setDateTime(date, time, timeZone);
-        req.setFrom(String.format("%f,%f", i.getLat(), i.getLon()));
+        String latLon = String.format("%f,%f", i.getLat(), i.getLon());
         req.batch = true;
+        if (req.arriveBy)
+            req.setTo(latLon);
+        else
+            req.setFrom(latLon);
         try {
             req.setRoutingContext(graphService.getGraph(routerId));
             return req;
