@@ -385,6 +385,11 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                         }
                         if (e instanceof PatternDwell || e instanceof Dwell) {
                             segment.dwell = e;
+                            for (Edge e2 : e.getToVertex().getIncoming()) {
+                                if (e2 instanceof Board || e2 instanceof PatternBoard) {
+                                    segment.board = e2;
+                                }
+                            }
                             for (Edge e2 : e.getToVertex().getOutgoing()) {
                                 if (e2 instanceof PatternHop || e2 instanceof Hop) {
                                     segment.hopOut = e2;
