@@ -31,8 +31,8 @@ try
 otp.planner.Utils = {
 
     // constants
-    TRIPDETAILS_TREE   : 'tripdetails-tree-',
-    ITINERARIES_TREE   : 'itineraries-tree-',
+    TRIPDETAILS_TREE   : 'tripdetails-tree',
+    ITINERARIES_TREE   : 'itineraries-tree',
     TRIP_TAB           : 'trip-tab-',
     DETAILS_CLS        : 'itinys-node',
     ITIN_CLS           : 'itinys-node',
@@ -254,7 +254,7 @@ otp.planner.Utils = {
     /** */
     makeItinerariesTree : function(id, clickCallback, scope)
     {
-        var thisID = this.ITINERARIES_TREE + id;
+        var thisID = this.ITINERARIES_TREE + "-" + id;
         var root = otp.util.ExtUtils.makeTreeNode({
                 id: 'root-' + thisID,
                 text: '<strong>' + id + '</strong>',
@@ -279,7 +279,7 @@ otp.planner.Utils = {
     /** */
     makeTripDetailsTree : function(id, clickCallback, scope)
     {
-        var thisID = this.TRIPDETAILS_TREE + id;
+        var thisID = this.TRIPDETAILS_TREE + "-" + id;
         var root = otp.util.ExtUtils.makeTreeNode({
                 id      : 'root-' + thisID,
                 text    : '<strong>' + id + '</strong>',
