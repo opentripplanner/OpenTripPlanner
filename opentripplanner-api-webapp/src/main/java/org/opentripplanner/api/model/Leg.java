@@ -77,6 +77,13 @@ public class Leg {
      */
     @XmlAttribute
     public String routeColor = null;
+    
+    /**
+     * For transit legs, the ID of the route.
+     * For non-transit legs, null.
+     */
+    @XmlAttribute
+    public String routeId = null;
 
     /**
      * For transit leg, the route's text color (if one exists). For non-transit legs, null.
