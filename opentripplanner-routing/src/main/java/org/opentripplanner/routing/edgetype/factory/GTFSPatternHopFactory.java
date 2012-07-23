@@ -239,14 +239,7 @@ public class GTFSPatternHopFactory {
 
     HashMap<ScheduledStopPattern, BasicTripPattern> patterns = new HashMap<ScheduledStopPattern, BasicTripPattern>();
 
-    /* maps replacing label lookup */
-    private Map<Stop, Vertex> stopNodes = new HashMap<Stop, Vertex>();
-    Map<Stop, TransitStopArrive> stopArriveNodes = new HashMap<Stop, TransitStopArrive>();
-    Map<Stop, TransitStopDepart> stopDepartNodes = new HashMap<Stop, TransitStopDepart>();
-    Map<T2<Stop, Trip>, Vertex> patternArriveNodes = new HashMap<T2<Stop, Trip>, Vertex>(); 
-    Map<T2<Stop, Trip>, Vertex> patternDepartNodes = new HashMap<T2<Stop, Trip>, Vertex>(); // exemplar trip
-
-    private HashSet<Stop> stops = new HashSet<Stop>();
+    private GtfsStopContext context;
 
     private int defaultStreetToStopTime;
 
@@ -479,8 +472,8 @@ public class GTFSPatternHopFactory {
                 dwell = getInterlineDwell(dwellKey);
                 if (dwell == null) {
                     // create the dwell
-                    Vertex startJourney = patternArriveNodes.get(new T2<Stop, Trip>(s0,fromExemplar));
-                    Vertex endJourney = patternDepartNodes.get(new T2<Stop, Trip>(s1,toExemplar));
+                    Vertex startJourney = context.patternArriveNodes.get(new T2<Stop, Trip>(s0,fromExemplar));
+                    Vertex endJourney = context.patternDepartNodes.get(new T2<Stop, Trip>(s1,toExemplar));
                     dwell = new PatternInterlineDwell(startJourney, endJourney, toTrip);
                     putInterlineDwell(dwellKey, dwell);
                 }
@@ -575,8 +568,8 @@ public class GTFSPatternHopFactory {
             pattern.addHop(i, departureTime, runningTime, arrivalTime, dwellTime,
                     st0.getStopHeadsign());
 
-            TransitStopDepart stopDepart = stopDepartNodes.get(s0);
-            TransitStopArrive stopArrive = stopArriveNodes.get(s1);
+            TransitStopDepart stopDepart = context.stopDepartNodes.get(s0);
+            TransitStopArrive stopArrive = context.stopArriveNodes.get(s1);
 
             Edge board = new FrequencyBoard(stopDepart, psv0depart, pattern, i, mode);
             Edge alight = new FrequencyAlight(psv1arrive, stopArrive, pattern, i, mode);
@@ -684,8 +677,8 @@ public class GTFSPatternHopFactory {
 
     private void loadPathways(Graph graph) {
         for (Pathway pathway : _dao.getAllPathways()) {
-            Vertex fromVertex = stopNodes.get(pathway.getFromStop());
-            Vertex toVertex = stopNodes.get(pathway.getToStop());
+            Vertex fromVertex = context.stopNodes.get(pathway.getFromStop());
+            Vertex toVertex = context.stopNodes.get(pathway.getToStop());
             if (pathway.isWheelchairTraversalTimeSet()) {
                 new PathwayEdge(fromVertex, toVertex, pathway.getTraversalTime());
             } else {
@@ -696,23 +689,23 @@ public class GTFSPatternHopFactory {
 
     private void loadStops(Graph graph) {
         for (Stop stop : _dao.getAllStops()) {
-            if (stops.contains(stop)) {
+            if (context.stops.contains(stop.getId())) {
                 continue;
             }
-            stops.add(stop);
+            context.stops.add(stop.getId());
             //add a vertex representing the stop
             TransitStop stopVertex = new TransitStop(graph, stop);
             stopVertex.setStreetToStopTime(defaultStreetToStopTime);
-            stopNodes.put(stop, stopVertex);
+            context.stopNodes.put(stop, stopVertex);
             
             if (stop.getLocationType() != 2) {
                 //add a vertex representing arriving at the stop
                 TransitStopArrive arrive = new TransitStopArrive(graph, stop);
-                stopArriveNodes.put(stop, arrive);
+                context.stopArriveNodes.put(stop, arrive);
 
                 //add a vertex representing departing from the stop
                 TransitStopDepart depart = new TransitStopDepart(graph, stop);
-                stopDepartNodes.put(stop, depart);
+                context.stopDepartNodes.put(stop, depart);
 
                 //add edges from arrive to stop and stop to depart
                 new PreAlightEdge(arrive, stopVertex);
@@ -878,7 +871,7 @@ public class GTFSPatternHopFactory {
 
             psv0depart = new PatternDepartVertex(graph, tripPattern, st0);
             createdVertices.add(psv0depart);
-            patternDepartNodes.put(new T2<Stop, Trip>(s0, trip), psv0depart);
+            context.patternDepartNodes.put(new T2<Stop, Trip>(s0, trip), psv0depart);
             
             if (i != 0) {
                 psv0arrive = psv1arrive;
@@ -891,7 +884,7 @@ public class GTFSPatternHopFactory {
 
             psv1arrive = new PatternArriveVertex(graph, tripPattern, st1);
             createdVertices.add(psv1arrive);
-            patternArriveNodes.put(new T2<Stop, Trip>(s1, trip), psv1arrive);
+            context.patternArriveNodes.put(new T2<Stop, Trip>(s1, trip), psv1arrive);
 
             PatternHop hop = new PatternHop(psv0depart, psv1arrive, s0, s1, i,
                     tripPattern);
@@ -902,8 +895,8 @@ public class GTFSPatternHopFactory {
             tripPattern.addHop(i, 0, departureTime, runningTime, arrivalTime, dwellTime,
                     st0.getStopHeadsign(), trip);
 
-            TransitStopDepart stopDepart = stopDepartNodes.get(s0);
-            TransitStopArrive stopArrive = stopArriveNodes.get(s1);
+            TransitStopDepart stopDepart = context.stopDepartNodes.get(s0);
+            TransitStopArrive stopArrive = context.stopArriveNodes.get(s1);
 
             Edge board = new PatternBoard(stopDepart, psv0depart, tripPattern, i, mode);
             Edge alight = new PatternAlight(psv1arrive, stopArrive, tripPattern, i, mode);
@@ -934,8 +927,8 @@ public class GTFSPatternHopFactory {
         for (Transfer t : transfers) {
             Stop fromStop = t.getFromStop();
             Stop toStop = t.getToStop();
-            Vertex fromVertex = stopArriveNodes.get(fromStop);
-            Vertex toVertex = stopDepartNodes.get(toStop);
+            Vertex fromVertex = context.stopArriveNodes.get(fromStop);
+            Vertex toVertex = context.stopDepartNodes.get(toStop);
             switch (t.getTransferType()) {
             case 1:
                 // timed (synchronized) transfer 
@@ -991,8 +984,8 @@ public class GTFSPatternHopFactory {
                 dwellTime = 0;
             }
 
-            Vertex startStation = stopDepartNodes.get(s0);
-            Vertex endStation = stopArriveNodes.get(s1);
+            Vertex startStation = context.stopDepartNodes.get(s0);
+            Vertex endStation = context.stopArriveNodes.get(s1);
 
             // create and connect journey vertices
             if (psv1arrive == null) { 
@@ -1294,25 +1287,25 @@ public class GTFSPatternHopFactory {
         for (Stop stop : _dao.getAllStops()) {
             String parentStation = stop.getParentStation();
             if (parentStation != null) {
-                Vertex stopVertex = stopNodes.get(stop);
+                Vertex stopVertex = context.stopNodes.get(stop);
 
                 String agencyId = stop.getId().getAgencyId();
                 AgencyAndId parentStationId = new AgencyAndId(agencyId, parentStation);
 
                 Stop parentStop = _dao.getStopForId(parentStationId);
-                Vertex parentStopVertex = stopNodes.get(parentStop);
+                Vertex parentStopVertex = context.stopNodes.get(parentStop);
 
                 new FreeEdge(parentStopVertex, stopVertex);
                 new FreeEdge(stopVertex, parentStopVertex);
 
-                Vertex stopArriveVertex = stopArriveNodes.get(stop);
-                Vertex parentStopArriveVertex = stopArriveNodes.get(parentStop);
+                Vertex stopArriveVertex = context.stopArriveNodes.get(stop);
+                Vertex parentStopArriveVertex = context.stopArriveNodes.get(parentStop);
 
                 new FreeEdge(parentStopArriveVertex, stopArriveVertex);
                 new FreeEdge(stopArriveVertex, parentStopArriveVertex);
 
-                Vertex stopDepartVertex = stopDepartNodes.get(stop);
-                Vertex parentStopDepartVertex = stopDepartNodes.get(parentStop);
+                Vertex stopDepartVertex = context.stopDepartNodes.get(stop);
+                Vertex parentStopDepartVertex = context.stopDepartNodes.get(parentStop);
 
                 new FreeEdge(parentStopDepartVertex, stopDepartVertex);
                 new FreeEdge(stopDepartVertex, parentStopDepartVertex);
@@ -1325,8 +1318,8 @@ public class GTFSPatternHopFactory {
             if (type == 3)
                 continue;
 
-            Vertex fromv = stopArriveNodes.get(transfer.getFromStop());
-            Vertex tov = stopDepartNodes.get(transfer.getToStop());
+            Vertex fromv = context.stopArriveNodes.get(transfer.getFromStop());
+            Vertex tov = context.stopDepartNodes.get(transfer.getToStop());
 
             if (fromv.equals(tov))
                 continue;
@@ -1353,5 +1346,9 @@ public class GTFSPatternHopFactory {
 
     public void setDefaultStreetToStopTime(int defaultStreetToStopTime) {
         this.defaultStreetToStopTime = defaultStreetToStopTime;
+    }
+
+    public void setStopContext(GtfsStopContext context) {
+        this.context = context;
     }
 }
