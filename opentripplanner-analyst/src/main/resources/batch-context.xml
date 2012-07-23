@@ -53,8 +53,8 @@
         <property name="bottom" value="42.07" />
         <property name="top" value="42.45" />        
         <property name="crsCode" value="epsg:4326" />
-        <property name="width" value="320" />
-        <property name="height" value="200" />        
+        <property name="cols" value="32" />
+        <property name="rows" value="20" />        
 	</bean>
 
 <!-- this loads a population from a comma-separated flat text file -->
