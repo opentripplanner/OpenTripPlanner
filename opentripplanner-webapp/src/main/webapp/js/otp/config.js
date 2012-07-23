@@ -10,10 +10,15 @@
 if(typeof(otp) == "undefined" || otp == null) otp = {};
 if(typeof(otp.config) == "undefined" || otp.config == null) otp.config = {};
 if(typeof(otp.config.locale) == "undefined" || otp.config.locale == null) otp.config.locale = otp.locale.English;
+
+/* UNCOMMNET the following to have default fares in the UI -- note: routing engine fares take precedence 
 otp.config.default_fares = {
-    senior  : "100",
-    student : "150"
+    regular : "2.00",
+    senior  : "1.00",
+    student : "1.50"
 };
+*/
+
 
 // step 2: create an object of default otp.config default values (see step3 where we apply this to any existing config)
 otp.config_defaults = {
