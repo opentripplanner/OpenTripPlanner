@@ -16,7 +16,6 @@ public class Individual {
     public double lat;
     public Sample sample;
     public double input;
-    public double output;
         
     public Individual() {
     	

@@ -73,7 +73,7 @@ public class ShapefilePopulation extends BasicPopulation {
 	            
 	            Individual individual = individualFactory.build(
 	                    id, point.getX(), point.getY(), data);
-	            this.add(individual);
+	            this.addIndividual(individual);
 	            i += 1;
 	            if (individual.sample != null)
 	                nonNull += 1;

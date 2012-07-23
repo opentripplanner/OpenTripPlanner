@@ -1,16 +1,6 @@
 package org.opentripplanner.analyst.batch;
 
-import java.awt.Image;
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
-import java.awt.image.DataBufferInt;
-import java.awt.image.DataBufferShort;
-import java.awt.image.DataBufferUShort;
-import java.awt.image.RenderedImage;
 import java.io.File;
-import java.util.Iterator;
-import java.util.List;
-
 import javax.annotation.PostConstruct;
 
 import lombok.Setter;
@@ -26,118 +16,60 @@ import org.geotools.coverage.grid.io.GridFormatFinder;
 import org.geotools.gce.geotiff.GeoTiffFormat;
 import org.geotools.gce.geotiff.GeoTiffWriteParams;
 import org.geotools.gce.geotiff.GeoTiffWriter;
+import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.opengis.geometry.DirectPosition;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
-import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
-import org.opentripplanner.analyst.core.Sample;
-import org.opentripplanner.analyst.parameter.Style;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Individuals should be in row-major order
+ * Individuals should be in a random-access-friendly List implementation in row-major order
  */
 public class RasterPopulation extends BasicPopulation {
 
-    private static final long serialVersionUID = 20120201L; //YYYYMMDD
     private static final Logger LOG = LoggerFactory.getLogger(RasterPopulation.class);
 
-    @Setter int width, height; // cells 
-    @Setter double left, right, top, bottom;
-    @Setter double lonStep, latStep;
+    /* configuration fields */
+    @Setter int rows = 200, cols = 200; // these are the raster (gridEnvelope) dimensions
+    @Setter double left, right, top, bottom; // bounding box values in CRS
+    @Setter int band = 0; // raster band to read
     
-    protected GridCoverage2D cov;
-    protected CoordinateReferenceSystem covCRS; 
-    
-    protected void createIndividuals() {
-        this.covCRS = cov.getCoordinateReferenceSystem();
-        MathTransform tr; 
-        try {
-            final CoordinateReferenceSystem WGS84 = CRS.decode("EPSG:4326", true);
-            tr = CRS.findMathTransform(covCRS, WGS84);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return;
-        }
-
-        // add param for crop envelope? autocrop to graph area?
-        /*
-        // envelope around our area of interest (petite couronne)
-        ReferencedEnvelope wgsEnv = new ReferencedEnvelope(1.86, 2.76, 48.52, 49.1, WGS84);
-        // reproject the envelope to the raster's CRS, longitude first
-        ReferencedEnvelope sourceEnv = wgsEnv.transform(sourceCRS, true);
-        // crop raster to reprojected envelope
-        cov = (GridCoverage2D) Operations.DEFAULT.crop(cov, sourceEnv);
-        // fetch grid information from the new cropped raster
-         */
-
-        GridGeometry2D gridGeometry = cov.getGridGeometry();
-        GridEnvelope2D gridEnvelope = gridGeometry.getGridRange2D();
-        
-        this.width  = gridEnvelope.width;
-        this.height = gridEnvelope.height;
-
-        // grid coordinate object to be reused for reading each cell in the raster
-        GridCoordinates2D coord = new GridCoordinates2D();
-        // evaluating a raster returns an array of results, in this case 1D
-        int[] val = new int[1];
-        for (int gy = gridEnvelope.y, iy = 0; iy < height; gy++, iy++) {
-            for (int gx = gridEnvelope.x, ix = 0; ix < width; gx++, ix++) {
-                coord.x = gx;
-                coord.y = gy;
-                try {
-                    // find coordinates for current raster cell in raster CRS
-                    DirectPosition sourcePos = gridGeometry.gridToWorld(coord);
-                    cov.evaluate(sourcePos, val);
-                    // convert coordinates in raster CRS to WGS84
-                    DirectPosition targetPos = tr.transform(sourcePos, null);
-                    // add this grid cell to the population
-                    Individual individual = individualFactory.build(
-                            ix + "," + iy,
-                            targetPos.getOrdinate(0),
-                            targetPos.getOrdinate(1), 
-                            val[0]);
-                    this.add(individual);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    return;
-                }
-            }
-        }
-    }
+    /* derived fields */
+    protected CoordinateReferenceSystem coverageCRS; // from input raster or config string
+    protected GridEnvelope2D gridEnvelope; // the envelope for the pixels
+    protected ReferencedEnvelope refEnvelope; // the envelope in the CRS
+    protected GridGeometry2D gridGeometry; // relationship between the grid envelope and the CRS envelope
+    protected MathTransform gridToWGS84; // composed transform from the grid to the CRS to WGS84
+    protected GridCoverage2D coverage; // null if synthetic (no coverage to load)
     
     @Override
-    public void writeOriginalFormat(String fileName) {
-        writeGeotiff(fileName);
+    public void writeAppropriateFormat(String outFileName, ResultSet results) {
+        this.writeGeotiff(outFileName, results);
     }
 
-    public void writeGeotiff(String fileName) {
+    public void writeGeotiff(String fileName, ResultSet results) {
         LOG.info("writing geotiff.");
-        float[][] imagePixelData = new float[height][width]; // maybe rename rows cols to avoid confusion with CRS coords
-        List<Individual> individuals = this.getIndividuals();
-        Iterator<Individual> indivIter = this.iterator(); // maybe individuals should also be stored in a 2D array
-        for (int row = 0; row < height; row++) {
-            for (int col = 0; col < width; col++) {
-                Individual indiv = indivIter.next();
-                int index = row * width + col;
-                float pixel = (float) indiv.output;
+        float[][] imagePixelData = new float[rows][cols]; 
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                int index = row * cols + col;
+                float pixel = (float) results.results[index];
                 imagePixelData[row][col] = pixel;
             }
         }
-        // replace coverage... we should maybe store only the envelope, or the gridgeom in the syntheticrasterpop
-        this.cov = new GridCoverageFactory().create(cov.getName(), imagePixelData, cov.getEnvelope());
+        GridCoverage2D coverage = new GridCoverageFactory().create("OTPAnalyst", imagePixelData, refEnvelope);
         try {
             GeoTiffWriteParams wp = new GeoTiffWriteParams();
             wp.setCompressionMode(GeoTiffWriteParams.MODE_EXPLICIT);
             wp.setCompressionType("LZW");
             ParameterValueGroup params = new GeoTiffFormat().getWriteParameters();
             params.parameter(AbstractGridFormat.GEOTOOLS_WRITE_PARAMS.getName().toString()).setValue(wp);
-            new GeoTiffWriter(new File(fileName)).write(this.cov, (GeneralParameterValue[]) params.values().toArray(new GeneralParameterValue[1]));
+            GeoTiffWriter writer = new GeoTiffWriter(new File(fileName));
+            writer.write(coverage, (GeneralParameterValue[]) params.values().toArray(new GeneralParameterValue[1]));
         } catch (Exception e) {
             LOG.error("exception while writing geotiff.");
             e.printStackTrace();
@@ -145,19 +77,72 @@ public class RasterPopulation extends BasicPopulation {
         LOG.info("done writing geotiff.");
     }
     
-    @PostConstruct
-    public void loadIndividuals() {
+    @Override @PostConstruct
+    public void createIndividuals() {
         LOG.info("Loading population from raster file {}", sourceFilename);
         try {
             File rasterFile = new File(sourceFilename);
             // determine file format and CRS, then load raster
             AbstractGridFormat format = GridFormatFinder.findFormat(rasterFile);
             AbstractGridCoverage2DReader reader = format.getReader(rasterFile);
-            this.cov = reader.read(null);
+            GridCoverage2D coverage = reader.read(null);
+            this.coverageCRS = coverage.getCoordinateReferenceSystem();
+            GridGeometry2D gridGeometry = coverage.getGridGeometry();
+            GridEnvelope2D gridEnvelope = gridGeometry.getGridRange2D();
+            gridGeometry.getGridToCRS();
+            // because we may want to produce an empty raster rather than loading one, alongside the coverage we 
+            // store the row/col dimensions and the referenced envelope in the original coordinate reference system.
+            this.cols  = gridEnvelope.width;
+            this.rows = gridEnvelope.height;
+            this.createIndividuals0();
         } catch (Exception ex) {
             throw new IllegalStateException("Error loading population from raster file: ", ex);
         }
         LOG.info("Done loading raster from file.");
+    }
+    
+    protected void createIndividuals0() {
+        MathTransform tr; 
+        try {
+            final CoordinateReferenceSystem WGS84 = CRS.decode("EPSG:4326", true);
+            tr = CRS.findMathTransform(coverageCRS, WGS84);
+        } catch (Exception e) {
+            LOG.equals("error creating CRS transform.");
+            e.printStackTrace();
+            return;
+        }
+        // grid coordinate object to be reused for reading each cell in the raster
+        GridCoordinates2D coord = new GridCoordinates2D();
+        // evaluating a raster returns an array of results, in this case 1D
+        int[] val = new int[1];
+        for (int row = 0; row < rows; row++) {
+            for (int col = 0; col < cols; col++) {
+                coord.x = col;
+                coord.y = row;
+                try {
+                    // find coordinates for current raster cell in raster CRS
+                    DirectPosition sourcePos = gridGeometry.gridToWorld(coord);
+                    // TODO: we are performing 2 transforms here, it would probably be more efficient to compose 
+                    // the grid-to-crs and crs-to-WGS84 transforms into grid-to-WGS84.
+                    // cf. MathTransformFactory and CoordinateOperationFactory
+                    // convert coordinates in raster CRS to WGS84
+                    DirectPosition targetPos = tr.transform(sourcePos, null);
+                    double lon = targetPos.getOrdinate(0);
+                    double lat = targetPos.getOrdinate(1);
+                    // evaluate using grid coordinates, which should be more efficient than using world coordinates
+                    if (coverage != null)
+                        coverage.evaluate(coord, val); 
+                    // add this grid cell to the population
+                    String label = row + "_" + col;
+                    Individual individual = individualFactory.build(label, lon, lat, val[band]);
+                    this.addIndividual(individual);
+                } catch (Exception e) {
+                    LOG.error("error creating individuals for raster");
+                    e.printStackTrace();
+                    return;
+                }
+            }
+        }
     }
     
 }

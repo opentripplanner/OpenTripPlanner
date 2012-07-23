@@ -2,6 +2,7 @@ package org.opentripplanner.analyst.batch.aggregator;
 
 import org.opentripplanner.analyst.batch.Individual;
 import org.opentripplanner.analyst.batch.Population;
+import org.opentripplanner.analyst.batch.ResultSet;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
 /**
@@ -20,14 +21,16 @@ public class ThresholdCumulativeAggregator implements Aggregator {
     }
 
     @Override
-    public double computeAggregate(Population destinations) {
-        double result = 0;
-        for (Individual destination : destinations) {
-            double t = destination.output;
+    public double computeAggregate(ResultSet rs) {
+        double aggregate = 0;
+        int i = 0;
+        for (Individual indiv : rs.population) {
+            double t = rs.results[i];
             if (t > 0 && t < thresholdSeconds)
-                result += destination.input * (thresholdSeconds - t);
+                aggregate += indiv.input * (thresholdSeconds - t);
+            i++;
         }
-        return result;
+        return aggregate;
     }
 
 }

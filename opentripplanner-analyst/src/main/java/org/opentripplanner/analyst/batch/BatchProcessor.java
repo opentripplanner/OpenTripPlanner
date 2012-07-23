@@ -7,7 +7,6 @@ import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import lombok.Data;
-import lombok.Setter;
 
 import org.opentripplanner.analyst.batch.aggregator.Aggregator;
 import org.opentripplanner.routing.core.PrototypeRoutingRequest;
@@ -92,18 +91,19 @@ public class BatchProcessor {
                 RoutingRequest req = buildRequest(oi);
                 if (req != null) {
                     ShortestPathTree spt = sptService.getShortestPathTree(req);
-                    destinations.setOutputToTravelTime(spt, oi);
+                    ResultSet result = ResultSet.forTravelTimes(destinations, spt);
                     if (nOrigins == 1) {
-                        destinations.writeCsv(outputPath);
+                        result.writeAppropriateFormat(outputPath);
                     } else {
                         String subName = outputPath.replace("{}", String.format("%d_%s", i, oi.label));
-                        destinations.writeCsv(subName);
+                        result.writeAppropriateFormat(subName);
                     }
                     req.cleanup();
                     i += 1;
                 }
             }
         } else { // an aggregator has been provided
+            ResultSet aggregates = new ResultSet(origins);
             int i = 0;
             for (Individual oi : origins) {
                 LOG.debug("individual {}: {}", i, oi);
@@ -112,15 +112,13 @@ public class BatchProcessor {
                 RoutingRequest req = buildRequest(oi);
                 if (req != null) {
                     ShortestPathTree spt = sptService.getShortestPathTree(req);
-                    destinations.setOutputToTravelTime(spt, oi);
-                    double aggregate = aggregator.computeAggregate(destinations);
-                    oi.output = aggregate;
+                    ResultSet result = ResultSet.forTravelTimes(destinations, spt);
+                    aggregates.results[i] = aggregator.computeAggregate(result);
                     req.cleanup();
                 }
                 i += 1;
             }
-            //origins.writeCsv(outputPath);
-            origins.writeOriginalFormat(outputPath);
+            aggregates.writeAppropriateFormat(outputPath);
         }
     }
     
