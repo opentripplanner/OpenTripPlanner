@@ -150,7 +150,15 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
         final int minutesInDay = 24*60;
         boolean[] minutes = new boolean[minutesInDay];
         for (StopTime stopTime : dao.getAllStopTimes()) {
-            minutes[(stopTime.getDepartureTime() / 60) % minutesInDay] = true;
+            int time;
+            if (stopTime.isDepartureTimeSet()) {
+                time = stopTime.getDepartureTime();
+            } else if (stopTime.isArrivalTimeSet()) {
+                time = stopTime.getArrivalTime();
+            } else {
+                continue;
+            }
+            minutes[(time / 60) % minutesInDay] = true;
         }
         int bestLength = 0;
         int best = -1;
