@@ -614,6 +614,8 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
         List<StopTime> stopTimes = dao.getStopTimesForTrip(trip);
         ArrayList<Stop> stops = new ArrayList<Stop>();
         for (StopTime stopTime : stopTimes) {
+            //nonduplicate stoptimes
+            if (stops.size() == 0 || !stopTime.getStop().equals(stops.get(stops.size() - 1)))
             stops.add(stopTime.getStop());
         }
 
