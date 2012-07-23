@@ -53,6 +53,7 @@ public class BatchProcessor {
     @Resource private Population destinations;
     private PrototypeRoutingRequest prototypeRoutingRequest;
     private Aggregator aggregator;
+    private Accumulator accumulator;
     
     private String routerId;
     private String date = "2011-02-04";
@@ -73,7 +74,43 @@ public class BatchProcessor {
 
     private void run() {
         int nOrigins = origins.getIndividuals().size();
-        if (aggregator == null) {
+        if (aggregator != null) {
+            ResultSet aggregates = new ResultSet(origins);
+            int i = 0;
+            for (Individual oi : origins) {
+                LOG.debug("individual {}: {}", i, oi);
+                if (i%100 == 0)
+                    LOG.info("individual {}/{}", i, nOrigins);
+                RoutingRequest req = buildRequest(oi);
+                if (req != null) {
+                    ShortestPathTree spt = sptService.getShortestPathTree(req);
+                    ResultSet result = ResultSet.forTravelTimes(destinations, spt);
+                    aggregates.results[i] = aggregator.computeAggregate(result);
+                    req.cleanup();
+                }
+                i += 1;
+            }
+            aggregates.writeAppropriateFormat(outputPath);
+        } else if (accumulator != null) {
+            ResultSet accumulated = new ResultSet(destinations);
+            int i = 0;
+            for (Individual oi : origins) {
+                LOG.debug("individual {}: {}", i, oi);
+                if (i%100 == 0)
+                    LOG.info("individual {}/{}", i, nOrigins);
+                RoutingRequest req = buildRequest(oi);
+                if (req != null) {
+                    ShortestPathTree spt = sptService.getShortestPathTree(req);
+                    ResultSet times = ResultSet.forTravelTimes(destinations, spt);
+                    accumulator.accumulate(oi.input, times, accumulated);
+                    req.cleanup();
+                }
+                i += 1;
+            }
+            accumulator.finish();
+            accumulated.writeAppropriateFormat(outputPath);
+        } else { 
+            // neither aggregator nor accumlator
             if (nOrigins > 1 && !outputPath.contains("{}")) {
                 LOG.error("output filename must contain origin placeholder.");
                 return;
@@ -94,23 +131,6 @@ public class BatchProcessor {
                     i += 1;
                 }
             }
-        } else { // an aggregator has been provided
-            ResultSet aggregates = new ResultSet(origins);
-            int i = 0;
-            for (Individual oi : origins) {
-                LOG.debug("individual {}: {}", i, oi);
-                if (i%100 == 0)
-                    LOG.info("individual {}/{}", i, nOrigins);
-                RoutingRequest req = buildRequest(oi);
-                if (req != null) {
-                    ShortestPathTree spt = sptService.getShortestPathTree(req);
-                    ResultSet result = ResultSet.forTravelTimes(destinations, spt);
-                    aggregates.results[i] = aggregator.computeAggregate(result);
-                    req.cleanup();
-                }
-                i += 1;
-            }
-            aggregates.writeAppropriateFormat(outputPath);
         }
     }
     

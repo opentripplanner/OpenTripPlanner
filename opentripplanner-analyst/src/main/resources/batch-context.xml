@@ -46,20 +46,19 @@
 -->
 
 <!-- this creates a population arranged on a regular grid that can later be saved as an image -->
-
-	<bean id="origins" class="org.opentripplanner.analyst.batch.SyntheticRasterPopulation">
+	<bean id="destinations" class="org.opentripplanner.analyst.batch.SyntheticRasterPopulation">
         <property name="left" value="-84.14" />
         <property name="right" value="-83.41" />
         <property name="bottom" value="42.07" />
         <property name="top" value="42.45" />        
         <property name="crsCode" value="epsg:4326" />
-        <property name="cols" value="32" />
-        <property name="rows" value="20" />        
+        <property name="cols" value="1280" />
+        <property name="rows" value="1024" />        
 	</bean>
-
+ 
 <!-- this loads a population from a comma-separated flat text file -->
 
-	<bean id="destinations" class="org.opentripplanner.analyst.batch.CSVPopulation">
+	<bean id="origins" class="org.opentripplanner.analyst.batch.CSVPopulation">
         <property name="sourceFilename" value="/home/abyrd/access/annarbor.csv" />
         <property name="latCol" value="1" />
         <property name="lonCol" value="2" />
@@ -67,7 +66,7 @@
         <property name="inputCol" value="3" />        
 	</bean>
 
-<!-- do not do this: currently aggregate results are stored in individuals so populations cannot be reused -->
+<!-- aggregate results are no longer stored in individuals so populations can be reused -->
 <!-- <alias name="destinations" alias="origins"/> -->
 	
 <!-- define the main batch processor, which will build one shortest path tree from each origin to all destinations -->
@@ -81,17 +80,23 @@
         <property name="prototypeRoutingRequest">
 			<bean class="org.opentripplanner.routing.core.PrototypeRoutingRequest">
 				<!-- Set default routing parameters here -->
-		        <property name="maxWalkDistance" value="4000" />
+		        <property name="maxWalkDistance" value="400000" />
 		        <property name="clampInitialWait" value="1800" />
-		        <property name="arriveBy" value="true" />
+		        <property name="arriveBy" value="false" />
 			</bean>
 		</property>		
+		<!-- 
         <property name="aggregator"> 
             <bean class="org.opentripplanner.analyst.batch.aggregator.ThresholdSumAggregator">
-				<!-- one hour -->
                 <property name="threshold" value="3600" />
             </bean>
-        </property>
+        </property> 
+        -->
+        <property name="accumulator"> 
+            <bean class="org.opentripplanner.analyst.batch.ThresholdAccumulator">
+                <property name="threshold" value="3600" />
+            </bean>
+        </property> 
 	</bean>
 
 </beans>
