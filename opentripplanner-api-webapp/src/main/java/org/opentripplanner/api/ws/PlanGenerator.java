@@ -247,6 +247,7 @@ public class PlanGenerator {
                     pgstate = PlanGenState.PRETRANSIT;
                     leg = makeLeg(itinerary, state);
                     leg.from.orig = nextName;
+                    itinerary.transfers++;
                     startWalk = -1;
                 } else if (mode == TraverseMode.STL) {
                     // this comes after an alight; do nothing
