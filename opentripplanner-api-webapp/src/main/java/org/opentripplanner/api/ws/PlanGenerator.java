@@ -448,6 +448,7 @@ public class PlanGenerator {
             leg.routeLongName = trip.getRoute().getLongName();
             leg.routeColor = trip.getRoute().getColor();
             leg.routeTextColor = trip.getRoute().getTextColor();
+            leg.routeId = trip.getRoute().getId().getId();
             if (transitIndex != null) {
                 Agency agency = transitIndex.getAgency(leg.agencyId);
                 leg.agencyName = agency.getName();
