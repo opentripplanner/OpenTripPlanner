@@ -8,7 +8,7 @@
     <parent>
         <groupId>org.opentripplanner</groupId>
         <artifactId>opentripplanner</artifactId>
-        <version>0.7.8</version>
+        <version>0.7.9-SNAPSHOT</version>
     </parent>
 
     <repositories>
