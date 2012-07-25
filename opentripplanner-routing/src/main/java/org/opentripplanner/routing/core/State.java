@@ -501,4 +501,8 @@ public class State implements Cloneable {
         return stateData.lastPattern;
     }
 
+    public String getBikeRentalNetwork() {
+        return stateData.bikeRentalNetwork;
+    }
+
 }

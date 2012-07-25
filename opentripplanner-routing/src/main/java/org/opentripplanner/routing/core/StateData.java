@@ -70,6 +70,8 @@ public class StateData implements Cloneable {
      */
     protected long initialWaitTime = 0;
 
+    public String bikeRentalNetwork;
+
     protected StateData clone() {
         try {
             return (StateData) super.clone();

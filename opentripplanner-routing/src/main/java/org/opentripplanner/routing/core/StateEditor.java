@@ -513,4 +513,9 @@ public class StateEditor {
         cloneStateDataAsNeeded();
         child.stateData.lastPattern = pattern;
     }
+
+    public void setBikeRentalNetwork(String network) {
+        cloneStateDataAsNeeded();
+        child.stateData.bikeRentalNetwork = network;
+    }
 }
