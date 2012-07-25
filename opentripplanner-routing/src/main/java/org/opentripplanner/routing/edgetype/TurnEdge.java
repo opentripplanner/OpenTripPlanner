@@ -135,19 +135,21 @@ public class TurnEdge extends StreetEdge {
         }
     }
 
-    protected boolean turnRestricted(State s0, RoutingRequest options) {
+    protected boolean turnRestricted(TraverseMode traverseMode) {
         if (restrictedModes == null)
             return false;
         else {
-            return restrictedModes.contains(s0.getNonTransitMode(options));
+            return restrictedModes.contains(traverseMode);
         }
     }
 
     private State doTraverse(State s0, RoutingRequest options) {
-        if (turnRestricted(s0, options) && !options.getModes().contains(TraverseMode.WALK)) {
+        TraverseMode traverseMode = s0.getNonTransitMode(options);
+
+        if (turnRestricted(traverseMode) && !options.getModes().contains(TraverseMode.WALK)) {
             return null;
         }
-        TraverseMode traverseMode = s0.getNonTransitMode(options);
+
         if (!((TurnVertex) fromv).canTraverse(options, traverseMode)) {
             if (traverseMode == TraverseMode.BICYCLE) {
                 // try walking bicycle, since you can't ride it here
