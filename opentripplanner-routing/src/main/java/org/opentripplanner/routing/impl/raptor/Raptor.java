@@ -586,15 +586,15 @@ public class Raptor implements PathService {
             //target state bounding 
             for (RaptorState oldState : cur.getTargetStates()) {
                 // newstate would have to take some transit and then walk to the destination.
-                if (oldState.arrivalTime <= newState.arrivalTime + minTime + (newState.nBoardings - oldState.nBoardings) * 120
-                        && oldState.walkDistance <= newState.walkDistance + minWalk + newState.nBoardings * 100)
+                if (oldState.arrivalTime <= newState.arrivalTime + minTime
+                        && oldState.walkDistance <= newState.walkDistance + minWalk)
                     // todo waiting time?
                     continue SPTSTATE;
 
                 // newstate will arrive way too late (this is a hack)
                 if ((oldState.arrivalTime - options.dateTime) * 3 <= (newState.arrivalTime + minTime - options.dateTime))
                     continue SPTSTATE;
-                
+
             }
 
             cur.visitedLastRound.add(stop);
