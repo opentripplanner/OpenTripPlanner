@@ -89,6 +89,10 @@ public class GenericDijkstra {
             State u = queue.extract_min();
             Vertex u_vertex = u.getVertex();
 
+            if (!spt.getStates(u_vertex).contains(u)) {
+                continue;
+            }
+
             if (_verbose) {
                 System.out.println("min," + u.getWeight());
                 System.out.println(u_vertex);

@@ -55,6 +55,7 @@ import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.MultiShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
 import org.opentripplanner.routing.transit_index.RouteSegment;
 import org.opentripplanner.routing.transit_index.RouteVariant;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -454,11 +455,10 @@ public class Raptor implements PathService {
             spt = dijkstra.getShortestPathTree(start);
         } else {
 
-            dijkstra.setShortestPathTreeFactory(MultiShortestPathTree.FACTORY);
             if (options.rctx.graph.getService(TransitLocalStreetService.class) != null)
                 dijkstra.setSkipEdgeStrategy(new SkipNonTransferEdgeStrategy(options));
 
-            List<State> startPoints = new ArrayList<State>();
+            final List<State> startPoints = new ArrayList<State>();
             STARTWALK: for (RaptorState state : createdStates) {
                 if (false) {
                     double maxWalk = options.getMaxWalkDistance();
@@ -500,6 +500,19 @@ public class Raptor implements PathService {
                     + cur.visitedEver.size());
             dijkstra.setPriorityQueueFactory(new PrefilledPriorityQueueFactory(startPoints.subList(
                     1, startPoints.size())));
+
+            dijkstra.setShortestPathTreeFactory(new ShortestPathTreeFactory() {
+
+                @Override
+                public ShortestPathTree create(RoutingRequest options) {
+                    MultiShortestPathTree result = new MultiShortestPathTree(options);
+                    for (State state : startPoints.subList(1, startPoints.size())) {
+                        result.add(state);
+                    }
+                    return result;
+                }
+                
+            });
             spt = dijkstra.getShortestPathTree(startPoints.get(0));
         }
 
