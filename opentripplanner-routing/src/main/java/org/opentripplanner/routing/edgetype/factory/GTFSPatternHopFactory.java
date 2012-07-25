@@ -239,7 +239,7 @@ public class GTFSPatternHopFactory {
 
     HashMap<ScheduledStopPattern, BasicTripPattern> patterns = new HashMap<ScheduledStopPattern, BasicTripPattern>();
 
-    private GtfsStopContext context;
+    private GtfsStopContext context = new GtfsStopContext();
 
     private int defaultStreetToStopTime;
 
