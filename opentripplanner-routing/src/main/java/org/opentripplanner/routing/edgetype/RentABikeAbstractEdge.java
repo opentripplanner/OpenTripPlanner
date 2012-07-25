@@ -59,8 +59,8 @@ public abstract class RentABikeAbstractEdge extends AbstractEdge {
             EdgeNarrative en = new FixedModeEdge(this, s0.getNonTransitMode(options));
 
             StateEditor s1 = s0.edit(this, en);
-            s1.incrementWeight(options.bikeRentalPickupCost);
-            s1.incrementTimeInSeconds(options.bikeRentalPickupTime);
+            s1.incrementWeight(options.isArriveBy() ? options.bikeRentalDropoffCost : options.bikeRentalPickupCost);
+            s1.incrementTimeInSeconds(options.isArriveBy() ? options.bikeRentalDropoffTime : options.bikeRentalPickupTime);
             s1.setBikeRenting(true);
             State s1b = s1.makeState();
             return s1b;
@@ -80,8 +80,8 @@ public abstract class RentABikeAbstractEdge extends AbstractEdge {
             EdgeNarrative en = new FixedModeEdge(this, s0.getNonTransitMode(options));
 
             StateEditor s1e = s0.edit(this, en);
-            s1e.incrementWeight(options.bikeRentalDropoffCost);
-            s1e.incrementTimeInSeconds(options.bikeRentalDropoffTime);
+            s1e.incrementWeight(options.isArriveBy() ? options.bikeRentalPickupCost : options.bikeRentalDropoffCost);
+            s1e.incrementTimeInSeconds(options.isArriveBy() ? options.bikeRentalPickupTime : options.bikeRentalDropoffTime);
             s1e.setBikeRenting(false);
             State s1 = s1e.makeState();
             return s1;
