@@ -52,7 +52,7 @@ public class State implements Cloneable {
     protected State next;
 
     /* StateData contains data which is unlikely to change as often */
-    protected StateData stateData;
+    public StateData stateData;
 
     // how far have we walked
     protected double walkDistance;
@@ -265,11 +265,13 @@ public class State implements Cloneable {
             return false;
 
         if (this.similarRouteSequence(other)) {
-            return this.weight <= other.weight;
+            return walkDistance <= other.getWalkDistance() * 1.05 && this.weight <= other.weight * 1.05;
         }
 
         double weightDiff = this.weight / other.weight;
-        return (weightDiff < 1.02 && this.weight - other.weight < 30) && this.getElapsedTime() - other.getElapsedTime() <= 30;
+        return walkDistance <= other.getWalkDistance() * 1.05
+                && (weightDiff < 1.05 && this.weight - other.weight < 30)
+                && this.getElapsedTime() - other.getElapsedTime() <= 30;
     }
 
     /**
@@ -499,6 +501,14 @@ public class State implements Cloneable {
 
     public TripPattern getLastPattern() {
         return stateData.lastPattern;
+    }
+
+    public ServiceDay getServiceDay() {
+        return stateData.serviceDay;
+    }
+
+    public void setServiceDay(ServiceDay sd) {
+        stateData.serviceDay = sd;
     }
 
 }

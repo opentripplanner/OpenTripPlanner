@@ -26,8 +26,10 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectStreamClass;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -260,19 +262,25 @@ public class Graph implements Serializable {
     }
     
     /* this will require a rehash of any existing hashtables keyed on vertices */
-    private void renumberVerticesAndEdges() {
-        this.vertexById = new ArrayList<Vertex>(getVertices());
-        Collections.sort(this.vertexById, getVertexComparatorFactory().getComparator(vertexById));
+    public void renumberVerticesAndEdges() {
+        this.vertexById = Arrays.asList(new Vertex[AbstractVertex.getMaxIndex()]);
+        for (Vertex v : getVertices()) {
+            vertexById.set(v.getIndex(), v);
+        }
+        //Collections.sort(this.vertexById, getVertexComparatorFactory().getComparator(vertexById));
         this.edgeById = new HashMap<Integer, Edge>();
         this.idForEdge = new HashMap<Edge, Integer>();
         // need to renumber vertices before edges, because vertex indices are
         // used as hashcodes, and vertex hashcodes are used for edge hashcodes
         int i = 0;
+        /*
         for (Vertex v : this.vertexById) {
             v.setIndex(i++);
         }
         i = 0;
+        */
         for (Vertex v : this.vertexById) {
+            if (v == null) continue;
             int j = 0;
             for (Edge e : v.getOutgoing()) {
                 int eid = (i*100) + j;

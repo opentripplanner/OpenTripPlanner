@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import org.opentripplanner.common.model.T2;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.algorithm.GenericDijkstra;
 import org.opentripplanner.routing.algorithm.strategies.TransitLocalStreetService;
@@ -28,6 +29,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.impl.raptor.MaxWalkState;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
@@ -39,7 +41,7 @@ public class TransitLocalStreetComputer implements GraphBuilder {
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         HashSet<Vertex> transitShortestPathVertices = new HashSet<Vertex>();
-
+        graph.renumberVerticesAndEdges();
         RoutingRequest walk = new RoutingRequest(TraverseMode.WALK);
         RoutingRequest wheelchair = new RoutingRequest(TraverseMode.WALK);
         wheelchair.wheelchairAccessible = true;
@@ -55,6 +57,8 @@ public class TransitLocalStreetComputer implements GraphBuilder {
         int i = 0;
 
         final Collection<Vertex> allVertices = graph.getVertices();
+        HashMap<Vertex, HashMap<Vertex, int[]>> paths = new HashMap<Vertex, HashMap<Vertex, int[]>>();
+        HashMap<Vertex, HashMap<Vertex, T2<Double, Integer>>> costs = new HashMap<Vertex, HashMap<Vertex, T2<Double, Integer>>>();
         for (Vertex v : allVertices) {
             ++i;
             if (i % 1000 == 0) {
@@ -67,22 +71,42 @@ public class TransitLocalStreetComputer implements GraphBuilder {
             // stops in spt; get path to said stops; mark vertices
             for (RoutingRequest req : requests) {
                 req.setRoutingContext(graph, v, null);
-                req.setMaxWalkDistance(5000);
+                req.setMaxWalkDistance(3000);
                 GenericDijkstra dijkstra = new GenericDijkstra(req);
                 State origin = new MaxWalkState(v, req);
                 ShortestPathTree spt = dijkstra.getShortestPathTree(origin);
+                HashMap<Vertex, int[]> map = null;
+                HashMap<Vertex, T2<Double, Integer>> cost = null;
+                if (req == walk) {
+                    map = new HashMap<Vertex, int[]>();
+                    cost = new HashMap<Vertex, T2<Double, Integer>>();
+                    paths.put(v, map);
+                    costs.put(v, cost);
+                }
+                int[] path = new int[1000];
+
                 for (State s : spt.getAllStates()) {
-                    if (s.getVertex() instanceof TransitStop) {
+                    Vertex destStopVertex = s.getVertex();
+                    if (destStopVertex instanceof TransitStop) {
+                        int pathIndex = 0;
+                        if (req == walk) {
+                           cost.put(destStopVertex, new T2<Double, Integer>(s.getWalkDistance(), (int) s.getElapsedTime()));
+                        }
                         while (s != null) {
                             transitShortestPathVertices.add(s.getVertex());
+                            path[pathIndex++] = s.getVertex().getIndex();
                             s = s.getBackState();
                         }
+                        if (req == walk) {
+                            map.put(destStopVertex, Arrays.copyOf(path, pathIndex));
+                        }
+
                     }
                 }
             }
         }
         TransitLocalStreetService service = new TransitLocalStreetService(
-                transitShortestPathVertices);
+                transitShortestPathVertices, paths, costs);
         graph.putService(TransitLocalStreetService.class, service);
     }
 

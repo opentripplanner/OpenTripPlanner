@@ -156,12 +156,13 @@ public class TurnEdge extends StreetEdge {
             return null;
         }
 
-        FixedModeEdge en = new FixedModeEdge(this, traverseMode);
+        /*FixedModeEdge en = new FixedModeEdge(this, traverseMode);
         Set<Alert> wheelchairNotes = ((TurnVertex) fromv).getWheelchairNotes();
         if (options.wheelchairAccessible) {
             en.addNotes(wheelchairNotes);
         }
-        StateEditor s1 = s0.edit(this, en);
+        */
+        StateEditor s1 = s0.edit(this);
 
         switch (s0.getNoThruTrafficState()) {
         case INIT:
@@ -191,7 +192,7 @@ public class TurnEdge extends StreetEdge {
             break;
         }
 
-        double speed = options.getSpeed(s0.getNonTransitMode(options));
+        double speed = options.getSpeed(traverseMode);
         double time = (((TurnVertex) fromv).getEffectiveLength(traverseMode) + turnCost / 20.0) / speed;
         double weight = ((TurnVertex) fromv).computeWeight(s0, options, time);
         s1.incrementWalkDistance(((TurnVertex) fromv).getLength());

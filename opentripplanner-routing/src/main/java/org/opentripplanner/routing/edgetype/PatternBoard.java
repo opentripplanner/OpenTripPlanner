@@ -118,6 +118,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             int bestPatternIndex = -1;
             TraverseMode mode = state0.getNonTransitMode(options);
             AgencyAndId serviceId = getPattern().getExemplar().getServiceId();
+            ServiceDay serviceDay = null;
             SD: for (ServiceDay sd : rctx.serviceDays) {
                 int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
                 // only check for service on days that are not in the future
@@ -148,6 +149,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
                             // track the soonest departure over all relevant schedules
                             bestWait = wait;
                             bestPatternIndex = patternIndex;
+                            serviceDay = sd;
                         }
                     }
 
@@ -195,6 +197,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             if (TransitUtils.handleBoardAlightType(s1, type)) {
                 return null;
             }
+            s1.setServiceDay(serviceDay);
             s1.setTrip(bestPatternIndex);
             s1.incrementTimeInSeconds(bestWait);
             s1.incrementNumBoardings();

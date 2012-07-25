@@ -14,8 +14,10 @@
 package org.opentripplanner.routing.algorithm.strategies;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.HashSet;
 
+import org.opentripplanner.common.model.T2;
 import org.opentripplanner.routing.graph.Vertex;
 
 public class TransitLocalStreetService implements Serializable {
@@ -24,12 +26,36 @@ public class TransitLocalStreetService implements Serializable {
 
     private HashSet<Vertex> vertices;
 
-    public TransitLocalStreetService(HashSet<Vertex> vertices) {
+    private HashMap<Vertex, HashMap<Vertex, int[]>> paths = new HashMap<Vertex, HashMap<Vertex, int[]>>();
+
+    private HashMap<Vertex, HashMap<Vertex, T2<Double, Integer>>> costs;
+
+    public TransitLocalStreetService(HashSet<Vertex> vertices,
+            HashMap<Vertex, HashMap<Vertex, int[]>> paths,
+            HashMap<Vertex, HashMap<Vertex, T2<Double, Integer>>> costs) {
         this.vertices = vertices;
+        this.costs = costs;
+        this.paths = paths;
     }
 
     public boolean transferrable(Vertex v) {
         return vertices.contains(v);
+    }
+
+    public HashMap<Vertex, HashMap<Vertex, int[]>> getPaths() {
+        return paths;
+    }
+
+    public void setPaths(HashMap<Vertex, HashMap<Vertex, int[]>> paths) {
+        this.paths = paths;
+    }
+
+    public HashMap<Vertex, HashMap<Vertex, T2<Double, Integer>>> getCosts() {
+        return costs;
+    }
+
+    public void setCosts(HashMap<Vertex, HashMap<Vertex, T2<Double, Integer>>> costs) {
+        this.costs = costs;
     }
 
 }

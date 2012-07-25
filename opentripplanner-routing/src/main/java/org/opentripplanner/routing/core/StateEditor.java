@@ -54,6 +54,12 @@ public class StateEditor {
 
     /* CONSTRUCTORS */
 
+    protected StateEditor() {}
+    
+    public StateEditor(RoutingRequest options, Vertex v) {
+        child = new State(v, options);
+        child.stateData = new StateData();
+    }
     public StateEditor(State parent, Edge e) {
         this(parent, e, (EdgeNarrative) e);
     }
@@ -469,7 +475,7 @@ public class StateEditor {
      * older states.
      */
     private void cloneStateDataAsNeeded() {
-        if (child.stateData == child.backState.stateData)
+        if (child.backState != null && child.stateData == child.backState.stateData)
             child.stateData = child.stateData.clone();
     }
 
@@ -512,5 +518,14 @@ public class StateEditor {
     public void setLastPattern(TripPattern pattern) {
         cloneStateDataAsNeeded();
         child.stateData.lastPattern = pattern;
+    }
+    public void setOptions(RoutingRequest options) {
+        cloneStateDataAsNeeded();
+        child.stateData.opt = options;
+    }
+    
+    public void setServiceDay(ServiceDay day) {
+        cloneStateDataAsNeeded();
+        child.stateData.serviceDay = day;
     }
 }

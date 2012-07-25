@@ -62,6 +62,8 @@ public class StateData implements Cloneable {
 
     protected TripPattern lastPattern;
 
+    protected ServiceDay serviceDay;
+
     /** 
      * This is the wait time at the beginning of the trip (or at the end of the trip for
      * reverse searches). In Analyst anyhow, this is is subtracted from total trip length of each
