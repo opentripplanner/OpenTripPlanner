@@ -32,7 +32,9 @@ public class MaxWalkState extends State {
 
     @Override
     public boolean dominates(State other) {
-        return walkDistance <= other.getWalkDistance() * 1.05 && this.weight <= other.getWeight() * 1.05;
+      //checking absolute time is correct for RAPTOR
+        return walkDistance <= other.getWalkDistance() * 1.05 
+                && this.getTime() <= other.getTime() + 30; 
     }
 
     static class MaxWalkStateEditor extends StateEditor {
