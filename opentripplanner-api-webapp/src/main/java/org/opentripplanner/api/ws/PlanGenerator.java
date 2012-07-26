@@ -782,6 +782,7 @@ public class PlanGenerator {
                         steps.remove(last - 1);
                         step = threeBack;
                         step.distance += twoBack.distance;
+                        distance += step.distance;
                         if (twoBack.elevation != null) {
                             if (step.elevation == null) {
                                 step.elevation = twoBack.elevation;
