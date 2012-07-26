@@ -31,6 +31,7 @@ import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.common.pqueue.OTPPriorityQueue;
 import org.opentripplanner.common.pqueue.OTPPriorityQueueFactory;
 import org.opentripplanner.routing.algorithm.GenericDijkstra;
+import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.algorithm.strategies.TransitLocalStreetService;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
@@ -157,7 +158,7 @@ public class Raptor implements PathService {
 
         stops = Arrays.copyOfRange(stops, 0, raptorStopsForStopId.size());
         nTotalStops = stops.length;
-        // initNearbyStops();
+        //initNearbyStops();
     }
 
     // this doesn't speed things up
@@ -166,15 +167,22 @@ public class Raptor implements PathService {
         nearbyStops = new List[nTotalStops];
         for (int i = 0; i < nTotalStops; ++i) {
             if (i % 500 == 0) {
-                System.out.println("HERE:" + i);
+                System.out.println("Precomputing nearby stops:" + i + " / " + nTotalStops);
             }
             nearbyStops[i] = new ArrayList<T2<Double, RaptorStop>>();
             RaptorStop stop = stops[i];
             Coordinate coord = stop.stopVertex.getCoordinate();
             for (RaptorStop other : stops) {
+                if (other == stop) continue;
                 Coordinate otherCoord = other.stopVertex.getCoordinate();
+                if (Math.abs(otherCoord.x - coord.x) > 4850 / 111111.0) {
+                    continue;
+                }
+                if (Math.abs(otherCoord.y - coord.y) > 4850 / 111111.0) {
+                    continue;
+                }
                 double distance = distanceLibrary.fastDistance(coord, otherCoord);
-                if (distance > 8047) // 5 mi
+                if (distance > 4850) // 3 mi
                     continue;
                 nearbyStops[i].add(new T2<Double, RaptorStop>(distance, other));
             }
@@ -221,6 +229,10 @@ public class Raptor implements PathService {
         walkOptions.setModes(modes);
         RaptorPathSet routeSet = new RaptorPathSet(stops.length);
 
+        //idea: precompute paths from destination to stops, so that
+        //when we hit any such stop, we have a path, which will let us prune harder
+        //before walk searches.   
+        
         for (int i = 0; i < options.getMaxTransfers() + 2; ++i) {
             round(options, walkOptions, routeSet, i);
             if (routeSet.getTargetStates().size() >= options.getNumItineraries())
@@ -339,6 +351,7 @@ public class Raptor implements PathService {
 
         List<RaptorState> createdStates = new ArrayList<RaptorState>();
         System.out.println("Round " + nBoardings);
+        final double distanceToNearestTransitStop = options.rctx.target.getDistanceToNearestTransitStop();
         for (RaptorRoute route : routesToVisit) {
             List<RaptorState> boardStates = new ArrayList<RaptorState>(); // not really states
             boolean started = false;
@@ -358,7 +371,7 @@ public class Raptor implements PathService {
                 }
                 // this checks the case of continuing on the current trips.
                 CONTINUE: for (RaptorState boardState : boardStates) {
-
+                    
                     RaptorState newState = new RaptorState();
 
                     ServiceDay sd = boardState.serviceDay;
@@ -393,12 +406,32 @@ public class Raptor implements PathService {
                     cur.visitedLastRound.add(stop);
                     cur.visitedEver.add(stop);
                     newStates.add(newState);
+                    
+                    StopNearTarget nearTarget = cur.stopsNearTarget.get(stop);
+                    if (nearTarget != null) {
+                        RaptorState bound = new RaptorState();
+                        bound.arrivalTime = newState.arrivalTime + nearTarget.time;
+                        bound.walkDistance = newState.walkDistance + nearTarget.walkDistance;
+                        bound.nBoardings = newState.nBoardings;
+                        
+                        for (RaptorState oldBound : cur.boundingStates) {
+                            if (eDominates(oldBound, bound)) {
+                                continue CONTINUE;
+                            }
+                        }
+                        cur.boundingStates.add(bound);
+                    }
                 }
 
                 if (newStates.size() > 10) {
                     // System.out.println("HERE: " + newStates.size());
                 }
                 if (stopNo < route.getNStops() - 1) {
+
+                    if (stop.stopVertex.isLocal() && nBoardings > 1) {
+                        //cannot transfer at a local stop 
+                        continue;
+                    }
 
                     // try boarding here
                     TRYBOARD: for (RaptorState oldState : states) {
@@ -411,6 +444,7 @@ public class Raptor implements PathService {
                                 oldState.arrivalTime, stopNo);
                         if (boardSpec == null)
                             continue;
+                        
                         RaptorState boardState = new RaptorState();
                         boardState.nBoardings = nBoardings;
                         boardState.boardStop = stop;
@@ -453,35 +487,96 @@ public class Raptor implements PathService {
         if (nBoardings == 0) {
             State start = new MaxWalkState(options.rctx.origin, walkOptions);
             spt = dijkstra.getShortestPathTree(start);
+            //also, compute an initial spt from the target so that we can find out what transit stops are nearby and what
+            //the time is to them, so that we can start target bounding earlier
+            
+            RoutingRequest reversedWalkOptions = walkOptions.clone();
+            reversedWalkOptions.setArriveBy(true);
+            GenericDijkstra destDijkstra = new GenericDijkstra(reversedWalkOptions);
+            start = new MaxWalkState(options.rctx.target, reversedWalkOptions);
+            ShortestPathTree targetSpt = destDijkstra.getShortestPathTree(start);
+            for (State state : targetSpt.getAllStates()) {
+
+                final Vertex vertex = state.getVertex();
+
+                if (!(vertex instanceof TransitStop))
+                    continue;
+                RaptorStop stop = raptorStopsForStopId.get(((TransitStop) vertex).getStopId());
+                if (stop == null) {
+                    // we have found a stop is totally unused, so skip it
+                    continue;
+                }
+                
+                cur.addStopNearTarget(stop, state.getWalkDistance(), (int) state.getElapsedTime());
+            }
         } else {
 
             if (options.rctx.graph.getService(TransitLocalStreetService.class) != null)
                 dijkstra.setSkipEdgeStrategy(new SkipNonTransferEdgeStrategy(options));
 
             final List<State> startPoints = new ArrayList<State>();
+
             STARTWALK: for (RaptorState state : createdStates) {
                 if (false) {
-                    double maxWalk = options.getMaxWalkDistance();
+                    double maxWalk = options.getMaxWalkDistance() - state.walkDistance - distanceToNearestTransitStop;
                     CHECK: for (T2<Double, RaptorStop> nearby : nearbyStops[state.stop.index]) {
-                        Double distance = nearby.getFirst();
+                        double distance = nearby.getFirst();
                         RaptorStop stop = nearby.getSecond();
                         if (distance > maxWalk) {
-                            System.out.println("SKIPPED STATE: " + state.stop.stopVertex.getName());
+                            //System.out.println("SKIPPED STATE: " + state.stop.stopVertex.getName());
+                            //this is technically wrong because these distances are not exact
                             continue STARTWALK;
                         }
                         double minWalk = distance + state.walkDistance;
                         int minArrive = (int) (state.arrivalTime + distance
                                 / options.getSpeedUpperBound());
-                        if (statesByStop[stop.index] == null)
-                            break;
+                        if (statesByStop[stop.index] == null) {
+                            break CHECK; //we have never visited this stop, and we ought to
+                        }
                         for (RaptorState other : statesByStop[stop.index]) {
-                            if (other.walkDistance > minWalk || other.arrivalTime > minArrive) {
+                            if (other.nBoardings == nBoardings - 1 && (other.walkDistance > minWalk || other.arrivalTime > minArrive)) {
                                 break CHECK;
                             }
                         }
                     }
                 }
+                
+                // bounding states
+                // this reduces the number of initial vertices
+                // and the state space size
+                // but not the runtime
+
                 Vertex stopVertex = state.stop.stopVertex;
+                Vertex dest = options.rctx.target;
+
+                double targetDistance = distanceLibrary.fastDistance(dest.getCoordinate(), stopVertex.getCoordinate());
+                if (targetDistance + state.walkDistance > options.getMaxWalkDistance() ) {
+                    //can't walk to destination, so we can't alight at a local vertex
+                    if (state.stop.stopVertex.isLocal()) 
+                        continue;
+                }
+                
+                double minTime = (targetDistance - distanceToNearestTransitStop) / 25 + distanceToNearestTransitStop / options.getSpeedUpperBound();
+                
+                state.arrivalTime += minTime;
+                state.walkDistance += distanceToNearestTransitStop;
+
+                for (RaptorState bound : cur.boundingStates) {
+                    if (eDominates(bound, state)) {
+                        state.arrivalTime -= minTime;
+                        state.walkDistance -= distanceToNearestTransitStop;
+                        continue STARTWALK;
+                    }
+                }
+                state.arrivalTime -= minTime;
+                state.walkDistance -= distanceToNearestTransitStop;
+
+                // end bounding states 
+
+                if (distanceToNearestTransitStop + state.walkDistance > options.getMaxWalkDistance()) {
+                    continue;
+                }
+                
                 StateEditor dijkstraState = new MaxWalkState.MaxWalkStateEditor(walkOptions,
                         stopVertex);
                 dijkstraState.setNumBoardings(state.nBoardings);
@@ -513,6 +608,12 @@ public class Raptor implements PathService {
                 }
                 
             });
+            
+            
+            final TargetBound bounder = new TargetBound(options.rctx.target);
+            dijkstra.setSearchTerminationStrategy(bounder);
+            dijkstra.setSkipTraverseResultStrategy(bounder);
+            
             spt = dijkstra.getShortestPathTree(startPoints.get(0));
         }
 
@@ -539,7 +640,6 @@ public class Raptor implements PathService {
             }
         }
         SPTSTATE: for (State state : spt.getAllStates()) {
-            // FIXME: build a special-case SPT that tracks states which are stops or target
 
             final Vertex vertex = state.getVertex();
 
@@ -556,10 +656,9 @@ public class Raptor implements PathService {
                 states = new ArrayList<RaptorState>();
                 statesByStop[stop.index] = states;
             }
-            Vertex dest = options.rctx.target;
-            double minWalk = dest.getDistanceToNearestTransitStop();
+            double minWalk = distanceToNearestTransitStop;
             //maxWalkDistance bounding
-            //this bound could be tighter by having maxWalkDistance to each nearby route or stop?
+            //this bound could be tighter by having distance to each nearby route or stop?
             if (state.getWalkDistance() + minWalk > options.getMaxWalkDistance())
                 continue SPTSTATE;
             
@@ -580,7 +679,7 @@ public class Raptor implements PathService {
                 }
             }
 
-            double targetDistance = distanceLibrary.fastDistance(dest.getCoordinate(), vertex.getCoordinate());
+            double targetDistance = distanceLibrary.fastDistance(options.rctx.target.getCoordinate(), vertex.getCoordinate());
             double minTime = (targetDistance - minWalk) / 25 + minWalk / options.getSpeedUpperBound();
             
             //target state bounding 

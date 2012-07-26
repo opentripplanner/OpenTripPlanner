@@ -15,6 +15,7 @@ package org.opentripplanner.routing.impl.raptor;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,6 +27,8 @@ public class RaptorPathSet {
     Set<RaptorStop> visitedEver = new HashSet<RaptorStop>();
     
     Set<RaptorStop> visitedLastRound = Collections.emptySet();
+    HashMap<RaptorStop, StopNearTarget> stopsNearTarget = new HashMap<RaptorStop, StopNearTarget>();
+    public List<RaptorState> boundingStates = new ArrayList<RaptorState>();
     
     @SuppressWarnings("unchecked")
     RaptorPathSet(int nStops) {
@@ -55,6 +58,10 @@ public class RaptorPathSet {
 
     public List<RaptorState> getTargetStates() {
         return targetStates;
+    }
+
+    public void addStopNearTarget(RaptorStop stop, double walkDistance, int time) {
+        stopsNearTarget.put(stop, new StopNearTarget(stop, walkDistance, time));
     }
 
 }
