@@ -23,6 +23,7 @@ import com.vividsolutions.jts.geom.MultiLineString;
 public class DirectionUtils {
 
     public static DirectionUtils instance;
+    private static DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
     /* this is used to calculate angles on a sphere */
     private GeodeticCalculator geodeticCalculator;
 
@@ -55,6 +56,10 @@ public class DirectionUtils {
         int numPoints = line.getNumPoints();
         Coordinate coord0 = line.getCoordinateN(numPoints - 2);
         Coordinate coord1 = line.getCoordinateN(numPoints - 1);
+        int i = numPoints - 3;
+        while (distanceLibrary.fastDistance(coord0, coord1) < 10 && i >= 0) {
+            coord0 = line.getCoordinateN(i--);
+        }
 
         DirectionUtils utils = getInstance();
         utils.geodeticCalculator.setStartingGeographicPoint(coord0.x, coord0.y);
@@ -80,6 +85,10 @@ public class DirectionUtils {
 
         Coordinate coord0 = line.getCoordinateN(0);
         Coordinate coord1 = line.getCoordinateN(1);
+        int i = 2;
+        while (distanceLibrary.fastDistance(coord0, coord1) < 10 && i < line.getNumPoints()) {
+            coord1 = line.getCoordinateN(i++);
+        }
 
         DirectionUtils utils = getInstance();
         utils.geodeticCalculator.setStartingGeographicPoint(coord0.x, coord0.y);
