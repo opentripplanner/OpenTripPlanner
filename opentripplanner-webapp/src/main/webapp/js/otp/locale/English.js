@@ -364,7 +364,7 @@ otp.locale.English = {
             ['BUSISH,WALK', 'Bus only'],
             ['TRAINISH,WALK', 'Train only'],
             ['WALK', 'Walk only'],
-            ['BICYCLE', 'Bicycle'],
+            ['BICYCLE', 'Bicycle only'],
             ['TRANSIT,BICYCLE', 'Transit & Bicycle']
         ],
 
@@ -377,7 +377,7 @@ otp.locale.English = {
             ['BUSISH,WALK', 'Bus only'],
             ['TRAINISH,WALK', 'Train only'],
             ['WALK', 'Walk only'],
-            ['BICYCLE', 'Bicycle'],
+            ['BICYCLE', 'Bicycle only'],
             ['WALK,BICYCLE', 'Rented Bicycle'],
             ['TRANSIT,BICYCLE', 'Transit & Bicycle'],
             ['TRANSIT,WALK,BICYCLE', 'Transit & Rented Bicycle']
