@@ -92,6 +92,7 @@ public class StreetLocation extends AbstractVertex {
         /* linking vertex with epsilon transitions */
         StreetLocation location = new StreetLocation(graph, label, nearestPoint, name);
 
+        location.setDistanceToNearestTransitStop(Double.MAX_VALUE);
         HashMap<Geometry, P2<TurnVertex>> cache = new HashMap<Geometry, P2<TurnVertex>>();
         for (StreetEdge street : edges) {
             /* TODO: need to check for crossing uncrossable streets (in 
@@ -154,6 +155,7 @@ public class StreetLocation extends AbstractVertex {
         Vertex fromv = street.getFromVertex();
         TurnVertex newFrom, location;
         Geometry geometry = street.getGeometry();
+        double distanceToNearestTransitStop = Math.min(edge.getToVertex().getDistanceToNearestTransitStop(), edge.getFromVertex().getDistanceToNearestTransitStop());
         if (cache.containsKey (geometry)) {
             P2<TurnVertex> cached = cache.get(geometry);
             location = cached.getSecond();
@@ -168,6 +170,7 @@ public class StreetLocation extends AbstractVertex {
 
             newFrom = new TurnVertex(null, label + " (vertex going in to splitter)", geometries.getFirst(), street.getName(),
                     lengthIn, false, street.getNotes());
+            newFrom.setDistanceToNearestTransitStop(distanceToNearestTransitStop);
             newFrom.setElevationProfile(street.getElevationProfile(0, lengthIn), false);
             newFrom.setPermission(street.getPermission());
             newFrom.setNoThruTraffic(street.isNoThruTraffic());
@@ -179,6 +182,7 @@ public class StreetLocation extends AbstractVertex {
             location.setPermission(street.getPermission());
             location.setStreetClass(street.getStreetClass());
             location.setNoThruTraffic(street.isNoThruTraffic());
+            location.setDistanceToNearestTransitStop(distanceToNearestTransitStop);
             
             cache.put(geometry, new P2<TurnVertex>(newFrom, location));
 
