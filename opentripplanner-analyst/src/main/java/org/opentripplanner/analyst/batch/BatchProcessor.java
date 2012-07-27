@@ -34,11 +34,9 @@ public class BatchProcessor {
     private Aggregator aggregator;
     private Accumulator accumulator;
     
-    //private String routerId;
     private String date = "2011-02-04";
     private String time = "08:00 AM";
     private TimeZone timeZone = TimeZone.getDefault();
-    //private TraverseModeSet modes = new TraverseModeSet("WALK,TRANSIT");
     private String outputPath;
 
     public static void main(String[] args) throws IOException {

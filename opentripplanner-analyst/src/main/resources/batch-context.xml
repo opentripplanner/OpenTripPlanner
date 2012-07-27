@@ -79,6 +79,7 @@
 		        <property name="maxWalkDistance" value="400000" />
 		        <property name="clampInitialWait" value="1800" />
 		        <property name="arriveBy" value="false" />
+		        <property name="modes" value="WALK,TRANSIT" />
 			</bean>
 		</property>		
 		<!-- 
