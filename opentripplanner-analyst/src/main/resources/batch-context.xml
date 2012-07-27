@@ -10,12 +10,6 @@
 
     <context:annotation-config />
     
-	<!--     
-	<context:component-scan base-package="org.opentripplanner.routing.impl"/> 
-    <context:component-scan base-package="org.opentripplanner.narrative.impl"/>
-    <context:component-scan base-package="org.opentripplanner.analyst"/>
-    -->
-    
     <bean class="org.opentripplanner.analyst.request.SampleFactory" />
     <bean class="org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl"/>
     <bean class="org.opentripplanner.routing.algorithm.GenericAStar"/>
