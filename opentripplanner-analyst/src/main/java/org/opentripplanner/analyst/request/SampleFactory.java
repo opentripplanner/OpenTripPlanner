@@ -25,12 +25,24 @@ import com.vividsolutions.jts.operation.distance.GeometryLocation;
 @Component
 public class SampleFactory implements SampleSource {
 
-    private static final double SEARCH_RADIUS_M = 150; // meters
-    private static final double SEARCH_RADIUS_DEG = SphericalDistanceLibrary.metersToDegrees(SEARCH_RADIUS_M);
     private static DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     @Autowired
     private GeometryIndex index;
+
+    private double searchRadiusM;
+    private double searchRadiusLon;
+    private double searchRadiusLat;    
+
+    public SampleFactory() {
+        this.setSearchRadiusM(1000);
+    }
+    
+    private void setSearchRadiusM(double radiusMeters) {
+        this.searchRadiusM = radiusMeters;
+        this.searchRadiusLat = SphericalDistanceLibrary.metersToDegrees(searchRadiusM);
+        this.searchRadiusLon = SphericalDistanceLibrary.metersToDegrees(searchRadiusM);
+    }
 
     @Override
     /** implements SampleSource interface */
@@ -48,7 +60,7 @@ public class SampleFactory implements SampleSource {
 
         // query
         Envelope env = new Envelope(c);
-        env.expandBy(SEARCH_RADIUS_DEG, SEARCH_RADIUS_DEG);
+        env.expandBy(searchRadiusLon, searchRadiusLat);
         @SuppressWarnings("unchecked")
         List<TurnVertex> vs = (List<TurnVertex>) index.queryPedestrian(env);
         // query always returns a (possibly empty) list, but never null
@@ -58,7 +70,7 @@ public class SampleFactory implements SampleSource {
             Geometry g = v.getGeometry();
             DistanceOp o = new DistanceOp(p, g);
             double d = o.distance();
-            if (d > SEARCH_RADIUS_DEG)
+            if (d > searchRadiusLon)
                 continue;
             if (d < d1) {
                 if (d < d0) {
