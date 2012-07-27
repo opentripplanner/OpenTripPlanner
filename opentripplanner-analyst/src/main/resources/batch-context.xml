@@ -10,7 +10,9 @@
 
     <context:annotation-config />
     
-    <bean class="org.opentripplanner.analyst.request.SampleFactory" />
+    <bean class="org.opentripplanner.analyst.request.SampleFactory">
+	    <property name="searchRadiusM" value="200" />
+    </bean>
     <bean class="org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl"/>
     <bean class="org.opentripplanner.routing.algorithm.GenericAStar"/>
     <bean class="org.opentripplanner.analyst.batch.IndividualFactory" />
