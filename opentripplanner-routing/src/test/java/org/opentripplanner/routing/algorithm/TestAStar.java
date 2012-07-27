@@ -14,7 +14,6 @@
 package org.opentripplanner.routing.algorithm;
 
 import java.io.File;
-import java.util.GregorianCalendar;
 import java.util.Random;
 
 import junit.framework.TestCase;
