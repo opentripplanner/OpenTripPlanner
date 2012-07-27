@@ -13,7 +13,6 @@
 
 package org.opentripplanner.graph_builder.impl.ned;
 
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -350,7 +349,7 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
                 coordList.toArray(coordArr));
 
 
-        if(ee.setElevationProfile(elevPCS, true)) {
+        if(ee.setElevationProfile(elevPCS, false)) {
             log.trace(GraphBuilderAnnotation.register(graph, Variety.ELEVATION_FLATTENED, ee));
         }
     }
