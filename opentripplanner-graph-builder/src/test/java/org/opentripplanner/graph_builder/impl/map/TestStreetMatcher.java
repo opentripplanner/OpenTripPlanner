@@ -247,5 +247,10 @@ public class TestStreetMatcher {
         public int getStreetClass() {
             return StreetEdge.CLASS_STREET;
         }
+
+        @Override
+        public boolean isElevationFlattened() {
+            return false;
+        }
     }
 }

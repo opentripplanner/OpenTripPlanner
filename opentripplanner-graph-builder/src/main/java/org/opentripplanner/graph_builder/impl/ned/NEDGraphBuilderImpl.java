@@ -105,12 +105,12 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
                     EdgeWithElevation edgeWithElevation = (EdgeWithElevation) ee;
                     // if (ee instanceof TurnEdge && ((TurnVertex)ee.getFromVertex()).is
                     processEdge(graph, edgeWithElevation);
-                    if (edgeWithElevation.getElevationProfile() != null) {
+                    if (edgeWithElevation.getElevationProfile() != null && !edgeWithElevation.isElevationFlattened()) {
                         edgesWithElevation.add(edgeWithElevation);
-                        nProcessed += 1;
-                        if (nProcessed % 50000 == 0)
-                            log.info("set elevation on {}/{} edges", nProcessed, nTotal);
                     }
+                    nProcessed += 1;
+                    if (nProcessed % 50000 == 0)
+                        log.info("set elevation on {}/{} edges", nProcessed, nTotal);
                 }
             }
         }
@@ -144,6 +144,8 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
      * 
      */
     private void assignMissingElevations(Graph graph, List<EdgeWithElevation> edgesWithElevation) {
+
+        log.debug("Assigning missing elevations");
 
         BinHeap<ElevationRepairState> pq = new BinHeap<ElevationRepairState>();
         BinHeap<ElevationRepairState> secondary_pq = new BinHeap<ElevationRepairState>();
@@ -246,6 +248,13 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
                 }
             } // end loop over incoming edges
 
+            //limit elevation propagation to at max 2km; this prevents an infinite loop
+            //in the case of islands missing elevation (and some other cases)
+            if (bestDistance == Double.MAX_VALUE && state.distance > 2000) {
+                log.warn("While propagating elevations, hit 2km distance limit at " + state.vertex);
+                bestDistance = state.distance;
+                bestElevation = state.initialElevation;
+            }
             if (bestDistance != Double.MAX_VALUE) {
                 // we have found a second vertex with elevation, so we can interpolate the elevation
                 // for this point
@@ -347,7 +356,6 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
         Coordinate coordArr[] = new Coordinate[coordList.size()];
         PackedCoordinateSequence elevPCS = new PackedCoordinateSequence.Double(
                 coordList.toArray(coordArr));
-
 
         if(ee.setElevationProfile(elevPCS, false)) {
             log.trace(GraphBuilderAnnotation.register(graph, Variety.ELEVATION_FLATTENED, ee));

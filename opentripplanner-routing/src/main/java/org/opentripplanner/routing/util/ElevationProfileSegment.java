@@ -33,6 +33,8 @@ public class ElevationProfileSegment implements Serializable {
 
     protected boolean slopeOverride;
 
+    private boolean flattened;
+
     public ElevationProfileSegment(double length) {
         this.length = length;
         slopeSpeedEffectiveLength = length;
@@ -101,6 +103,7 @@ public class ElevationProfileSegment implements Serializable {
         if (elev == null || elev.size() < 2) {
             return false;
         }
+
         if (slopeOverride && !computed) {
             return false;
         }
@@ -122,6 +125,8 @@ public class ElevationProfileSegment implements Serializable {
         maxSlope = costs.maxSlope;
         slopeWorkCost = costs.slopeWorkCost;
         bicycleSafetyEffectiveLength += costs.slopeSafetyCost;
+        flattened = costs.flattened;
+
         return costs.flattened;
     }
 
@@ -135,5 +140,9 @@ public class ElevationProfileSegment implements Serializable {
             out += "(" + coord.x + "," + coord.y + "), ";
         }
         return out.substring(0, out.length() - 2);
+    }
+
+    public boolean isFlattened() {
+        return flattened;
     }
 }

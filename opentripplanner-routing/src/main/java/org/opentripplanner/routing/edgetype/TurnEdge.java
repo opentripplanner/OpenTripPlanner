@@ -250,7 +250,11 @@ public class TurnEdge extends StreetEdge {
     public boolean setElevationProfile(PackedCoordinateSequence elev, boolean computed) {
         return ((TurnVertex) fromv).setElevationProfile(elev, computed);
     }
-    
+
+    public boolean isElevationFlattened() {
+        return ((TurnVertex) fromv).isElevationFlattened();
+    }
+
     @Override
     public void addPatch(Patch patch) {
         if (patches == null) {
