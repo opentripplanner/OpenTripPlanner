@@ -26,9 +26,15 @@ otp.planner.BikeTriangle = {
     triangleSafetyFactor:  null,
 
     // default is 100% safety 
-    timeFactor:    0.0,
-    slopeFactor:   0.0,
-    safetyFactor:  1.0,
+    timeFactor      : 0.0,
+    slopeFactor     : 0.0,
+    safetyFactor    : 1.0,
+    
+    colorPanel      : '#e6e6e6',
+    colorTriangle   : '#ddd',
+    colorSlope      : '#47ad4a',
+    colorSafety     : '#80bee7',
+    colorTime       : '#e59a00',
 
 
     initialize : function(config) {
@@ -57,26 +63,26 @@ otp.planner.BikeTriangle = {
         var canvas = Raphael(this.panel.body.id, width, height);
 
         var bg = canvas.rect(0,0,width,height).attr({
-              stroke: 'none',
-              fill: '#eee'
+              stroke : 'none',
+              fill   : this.colorPanel
           });
 
         var triangle = canvas.path(["M",margin+tri_side/2,margin,"L",margin+tri_side,height-margin,"L",margin,height-margin,"z"]);
 
 
-        triangle.attr({fill:"#ddd", stroke:"none"});
-        
+        triangle.attr({fill:this.colorTriangle, stroke:"none"});
+
         var labelSize = "18px";
 
-        var safeFill = "#2890AC"; 
+        var safeFill = this.colorSafety; 
         var safeName = locale.bikeTriangle.safeName;
         var safeSym  = locale.bikeTriangle.safeSym;
 
-        var hillFill = "#6DB33F"; 
+        var hillFill = this.colorSlope; 
         var hillName = locale.bikeTriangle.hillName;
         var hillSym  = locale.bikeTriangle.hillSym;
         
-        var timeFill = "#D59F0F";
+        var timeFill = this.colorTime;
         var timeName = locale.bikeTriangle.timeName;
         var timeSym  = locale.bikeTriangle.timeSym;
 

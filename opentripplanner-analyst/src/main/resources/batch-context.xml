@@ -9,51 +9,88 @@
            http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-2.0.xsd">
 
     <context:annotation-config />
-    <context:component-scan base-package="org.opentripplanner.routing.impl"/>
-    <context:component-scan base-package="org.opentripplanner.narrative.impl"/>
-    <context:component-scan base-package="org.opentripplanner.analyst"/>
+    
+    <bean class="org.opentripplanner.analyst.request.SampleFactory" />
+    <bean class="org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl"/>
+    <bean class="org.opentripplanner.routing.algorithm.GenericAStar"/>
+    <bean class="org.opentripplanner.analyst.batch.IndividualFactory" />
+    <bean class="org.opentripplanner.analyst.core.GeometryIndex" />
+    
     
     <!-- specify a GraphService, configuring the path to the serialized Graphs -->
     <bean id="graphService" class="org.opentripplanner.routing.impl.GraphServiceImpl">
         <property name="path" value="/var/otp/graphs/{}/" />
-        <property name="defaultRouterId" value="paris" />
+        <property name="defaultRouterId" value="arbor" />
     </bean>
 
-<!-- 	
-    <bean id="origins" factory-bean="populationFactory" factory-method="fromRaster">
-        <constructor-arg type="String" value="/path/popdensity.raster" />
-    </bean> 
--->
 
-    <bean id="origins" class="org.opentripplanner.analyst.batch.Population">
+<!-- this creates a population directly from of a list of individuals -->
+<!--     
+	<bean id="origins" class="org.opentripplanner.analyst.batch.BasicPopulation">
         <property name="individuals">
             <list>
 			    <bean class="org.opentripplanner.analyst.batch.Individual">
-			        <property name="lon" value="2.34520" />
-			        <property name="lat" value="48.8555" />
+				    <property name="label" value="UMich" />
+			        <property name="lon" value="-83.73820" />
+			        <property name="lat" value="42.27490" />
 			    </bean>
             </list>
         </property>
     </bean>
+-->
 
-	<bean id="destinations" factory-bean="populationFactory" factory-method="fromShapefile">
-		<constructor-arg type="String" value="/home/abyrd/Dropbox/immoPrix/Prix point.shp" />
-        <constructor-arg type="String" value="prixm2" />
-        <constructor-arg type="String" value="residus" />
-        <!--         
-        <property name="aggregator"> 
-            <bean class="org.opentripplanner.analyst.batch.aggregator.ThresholdSumAggregator">
-                <property name="threshold" value="2000">
-            </bean>
-        </property>
-        -->
+<!-- this creates a population arranged on a regular grid that can later be saved as an image -->
+	<bean id="destinations" class="org.opentripplanner.analyst.batch.SyntheticRasterPopulation">
+        <property name="left" value="-84.14" />
+        <property name="right" value="-83.41" />
+        <property name="bottom" value="42.07" />
+        <property name="top" value="42.45" />        
+        <property name="crsCode" value="epsg:4326" />
+        <property name="cols" value="1280" />
+        <property name="rows" value="1024" />        
+	</bean>
+ 
+<!-- this loads a population from a comma-separated flat text file -->
+
+	<bean id="origins" class="org.opentripplanner.analyst.batch.CSVPopulation">
+        <property name="sourceFilename" value="/home/abyrd/access/annarbor.csv" />
+        <property name="latCol" value="1" />
+        <property name="lonCol" value="2" />
+        <property name="labelCol" value="0" />
+        <property name="inputCol" value="3" />        
 	</bean>
 
-    <bean id="heuristicFactory" class="org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl"/>
-    <bean id="sptService" class="org.opentripplanner.routing.algorithm.GenericAStar"/>
-    <bean id="populationFactory" class="org.opentripplanner.analyst.batch.factory.PopulationFactory" />
-    <bean id="individualFactory" class="org.opentripplanner.analyst.batch.factory.IndividualFactory" />
-
-	<bean id="batchProcessor" class="org.opentripplanner.analyst.batch.BatchProcessor" />
+<!-- aggregate results are no longer stored in individuals so populations can be reused -->
+<!-- <alias name="destinations" alias="origins"/> -->
+	
+<!-- define the main batch processor, which will build one shortest path tree from each origin to all destinations -->
+	
+	<bean id="batchProcessor" class="org.opentripplanner.analyst.batch.BatchProcessor"> 
+        <property name="outputPath" value="/home/abyrd/access/out1834_clamp.tiff" />
+        <property name="routerId" value="arbor" />
+        <property name="date" value="2012-07-12" />
+        <property name="time" value="08:00 AM" />
+        <property name="timeZone" value="America/New_York" />
+        <property name="prototypeRoutingRequest">
+			<bean class="org.opentripplanner.routing.core.PrototypeRoutingRequest">
+				<!-- Set default routing parameters here -->
+		        <property name="maxWalkDistance" value="400000" />
+		        <property name="clampInitialWait" value="1800" />
+		        <property name="arriveBy" value="false" />
+			</bean>
+		</property>		
+		<!-- 
+        <property name="aggregator"> 
+            <bean class="org.opentripplanner.analyst.batch.aggregator.ThresholdSumAggregator">
+                <property name="threshold" value="3600" />
+            </bean>
+        </property> 
+        -->
+        <property name="accumulator"> 
+            <bean class="org.opentripplanner.analyst.batch.ThresholdAccumulator">
+                <property name="threshold" value="3600" />
+            </bean>
+        </property> 
+	</bean>
 
 </beans>

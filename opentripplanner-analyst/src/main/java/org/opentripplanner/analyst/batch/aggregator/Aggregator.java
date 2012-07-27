@@ -1,7 +1,6 @@
 package org.opentripplanner.analyst.batch.aggregator;
 
-import org.opentripplanner.analyst.batch.Population;
-import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.analyst.batch.ResultSet;
 
 /**
  * An interface for classes that provide an aggregate function over populations
@@ -10,5 +9,5 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
  * @author andrewbyrd
  */
 public interface Aggregator {
-	public double computeAggregate(Population destinations, ShortestPathTree spt);
+	public double computeAggregate(ResultSet results);
 }

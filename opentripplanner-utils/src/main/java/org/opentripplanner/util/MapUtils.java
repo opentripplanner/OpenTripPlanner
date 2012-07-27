@@ -111,14 +111,18 @@ public class MapUtils {
         }
     }
 
-    public static <T, U, V extends Collection<U>> void mergeIn(Map<T, V> mapList,
+    public static <T, U, V extends Collection<U>> void mergeInUnique(Map<T, V> mapList,
             Map<T, V> from) {
         for (Map.Entry<T, V> entry : from.entrySet()) {
             T key = entry.getKey();
             V value = entry.getValue();
             V originalValue = mapList.get(key);
             if (originalValue != null) {
-                originalValue.addAll(value);
+                HashSet<U> originalSet = new HashSet<U>(originalValue);
+                for (U item : value) {
+                    if (!originalSet.contains(item))
+                        originalValue.add(item);
+                }
             } else {
                 mapList.put(key, value);
             }

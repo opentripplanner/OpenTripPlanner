@@ -18,6 +18,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.sun.jersey.api.spring.Autowire;
+
 /**
  * This class defines all the JAX-RS query parameters for a path search as fields, allowing them to 
  * be inherited by other REST resource classes (the trip planner and the Analyst WMS or tile 
@@ -123,6 +125,27 @@ public abstract class RoutingResource {
     /** A transit stop required to be the first stop in the search */
     @DefaultValue("") @QueryParam("startTransitStopId") protected List<String> startTransitStopId;
 
+    /**
+     * When subtracting initial wait time, do not subtract more than this value, to prevent overly
+     * optimistic trips. Reasoning is that it is reasonable to delay a trip start 15 minutes to 
+     * make a better trip, but that it is not reasonable to delay a trip start 15 hours; if that
+     * is to be done, the time needs to be included in the trip time. This number depends on the
+     * transit system; for transit systems where trips are planned around the vehicles, this number
+     * can be much higher. For instance, it's perfectly reasonable to delay one's trip 12 hours if
+     * one is taking a cross-country Amtrak train from Emeryville to Chicago. Has no effect in
+     * stock OTP, only in Analyst.
+     *
+     * A value of 0 (the default) disables.
+     */
+    @DefaultValue("0") @QueryParam("clampInitialWait")
+    protected List<Long> clampInitialWait;
+    
+    @DefaultValue("-1") @QueryParam("boardSlack")
+    private List<Integer> boardSlack;
+    
+    @DefaultValue("-1") @QueryParam("alightSlack")
+    private List<Integer> alightSlack;
+    
     /* 
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
      * this should ideally be done when setting the routing context, but at present departure/
@@ -137,8 +160,6 @@ public abstract class RoutingResource {
     @Autowired
     protected PrototypeRoutingRequest prototypeRoutingRequest;
 
-    @DefaultValue("-1") @QueryParam("boardSlack") private List<Integer> boardSlack;
-    @DefaultValue("-1") @QueryParam("alightSlack") private List<Integer> alightSlack;
 
     /** 
      * Build the 0th Request object from the query parameter lists. 
@@ -264,6 +285,9 @@ public abstract class RoutingResource {
         if (startTransitStopId != null && !"".equals(startTransitStopId)) {
             request.setStartingTransitStopId(AgencyAndId.convertFromString(startTransitStopId));
         }
+        
+        request.setClampInitialWait(get(clampInitialWait, n, request.getClampInitialWait()));
+
         return request;
     }
     
@@ -282,6 +306,10 @@ public abstract class RoutingResource {
         T value = l.get(n);
         if (value instanceof Integer) {
             if (value.equals(-1)) {
+                return defaultValue;
+            }
+        } else if (value instanceof Double) {
+            if (value.equals(-1.0)) {
                 return defaultValue;
             }
         }

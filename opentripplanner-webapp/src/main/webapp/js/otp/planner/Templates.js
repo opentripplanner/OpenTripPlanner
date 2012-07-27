@@ -60,17 +60,18 @@ otp.planner.Templates = {
 
         if(this.TP_ITINERARY == null)
             this.TP_ITINERARY = new Ext.XTemplate(
+                  // line 1 of the itinerary option form -- all modes
                   '<div id={id} class="dir-alt-route-inner">',
                     '<span class="time-span itinopt">{[otp.util.StringFormattingUtils.timeSpan(values.startTime, values.endTime, otp.planner.Templates.locale)]}</span>',
                     '<span class="duration-hours-mins itinopt">{[otp.util.StringFormattingUtils.durationHoursMins(values.duration, otp.planner.Templates.locale)]}</span>',
                   '</div>',
+                  // line 2 of the itinerary option form -- only transit mode, which is indicated via the numTransfers 
                   '<tpl if="numTransfers">',
                   '<div id={id} class="dir-alt-route-inner">',
                     '<span>&nbsp;&nbsp;</span>',
-                    '<span class="transfers">{numTransfers} ',
-                    '<tpl if="numTransfers == 1">' + this.locale.instructions.transfer  + '</tpl>',
-                    '<tpl if="numTransfers != 1">' + this.locale.instructions.transfers + '</tpl>',
-                    '</span>',
+                    '<tpl if="numTransfers">',
+                      '<span class="transfers">{[otp.util.StringFormattingUtils.numSinglePlural(values.numTransfers, otp.planner.Templates.locale.instructions.transfer, otp.planner.Templates.locale.instructions.transfers )]}</span>',
+                    '</tpl>',
                   '</div>',
                   '</tpl>'
             ).compile();
@@ -96,7 +97,7 @@ otp.planner.Templates = {
 
         if(this.streetviewTemplate == null)
             this.streetviewTemplate =  new Ext.XTemplate(
-                '<a href="javascript:void;" onClick="otp.core.MapStatic.streetview({x}, {y});">{name}</a>'
+                '<a href="javascript:void(0);" onClick="otp.core.MapStatic.streetview({x}, {y});">{name}</a>'
             ).compile();
 
         if(this.TP_TRIPDETAILS == null)
@@ -104,13 +105,27 @@ otp.planner.Templates = {
                 '<div id="trip-details">',
                 '<h3>' + this.locale.labels.trip_details + '</h3>',
                 '<table cellpadding="3" cellspacing="0" border="0">',
-                    '<tpl if="regularFare != null && showFareInfo == true">',
-                      '<tr><td><strong>' + this.locale.labels.fare      + '</strong></td><td>{regularFare}</td></tr>',
+                    '<tr><td><strong>' + this.locale.labels.travel + '</strong></td><td>{[otp.planner.Templates.THIS.prettyDateTime(values.startTime)]}</td></tr>',
+
+                     // TODO: break time up into various mode times (i.e., Length : 2 hours 45 minutes (30min walk, 90min wait, 20min transit) 
+                    '<tr><td><strong>' + this.locale.labels.trip_length + '</strong></td><td>{[otp.util.StringFormattingUtils.durationHoursMins(values.duration, otp.planner.Templates.locale)]}</td></tr>',
+
+                    '<tpl if="numTransfers">',
+                      '<tr><td><strong>' + otp.util.StringFormattingUtils.capitolize(this.locale.instructions.transfers) + '</strong></td>', 
+                      '<td>{[otp.util.StringFormattingUtils.numSinglePlural(values.numTransfers, otp.planner.Templates.locale.instructions.transfer, otp.planner.Templates.locale.instructions.transfers )]}</td></tr>',
                     '</tpl>',
-                    '<tr><td><strong>' + this.locale.labels.travel      + '</strong></td><td>{startTimeDisplay}</td></tr>',
-                    '<tr><td><strong>' + this.locale.labels.valid       + '</strong></td><td>{[new Date().format("' + this.locale.time.format + '")]}</td></tr>',
-                    '<tr><td><strong>' + this.locale.labels.trip_length + '</strong></td><td>{duration} ' + this.getDurationTemplateString() + '</td></tr>',
-                    '<tpl if="walkDistance"><tr><td><strong>{distanceVerb}</strong></td><td>{walkDistance}</td></tr></tpl>',
+
+                    // TODO: add a distance verb to locale and break distance up into modes (i.e., Distance :  4.54 miles (includes 2.2 mi walk, 2.32 mi bike))
+                    //'<tpl if="walkDistance"><tr><td><strong>{distanceVerb}</strong></td><td>{walkDistance}</td></tr></tpl>',
+
+                    '<tpl if="regularFare != null && showFareInfo == true">',
+                      '<tr><td><strong>' + this.locale.labels.fare  + '</strong></td><td>' + this.locale.labels.regular_fare + ' {regularFare}</td></tr>',
+                      '<tpl if="seniorFare != null"><tr><td></td><td>'   + this.locale.labels.senior_fare  + ' {seniorFare}</td><tr></tpl>',
+                      '<tpl if="studentFare  != null"><tr><td></td><td>' + this.locale.labels.student_fare + ' {studentFare}</td><tr></tpl>',
+                    '</tpl>',
+
+                    '<tr class="valid_date"><td>&nbsp;</td><td>&nbsp;</td></tr>',
+                    '<tr class="valid_date"><td></td><td>' + this.locale.labels.valid + ' {[otp.planner.Templates.THIS.prettyDateTime()]}</td></tr>',
                 '</table></div>'
             ).compile();
 
@@ -120,7 +135,7 @@ otp.planner.Templates = {
         if(this.TP_LEG_MODE == null)
             this.TP_LEG_MODE = ''
                 + '<h4>' 
-                + '<a href="javascript:void;">{[otp.util.Modes.translate(values["mode"])]}</a>'
+                + '<a href="javascript:void(0);">{[otp.util.Modes.translate(values["mode"])]}</a>'
                 + ' {routeName} '
                 + this.HEADSIGN
                 + '</h4>';
@@ -128,7 +143,7 @@ otp.planner.Templates = {
         if(this.TP_LEG_CONTINUES == null)
             this.TP_LEG_CONTINUES = ''
                 + '<h4>'
-                + '<a href="javascript:void;">' + this.locale.instructions.continue_as + '</a> '
+                + '<a href="javascript:void(0);">' + this.locale.instructions.continue_as + '</a> '
                 + ' {routeName} '
                 + this.HEADSIGN
                 + '<span class="transfers">(' + this.locale.instructions.stay_aboard + ')</span>'
@@ -181,7 +196,7 @@ otp.planner.Templates = {
 
         if(this.TP_START == null)
             this.TP_START = new Ext.XTemplate(
-                  '<h4><a href="javascript:void;">' + this.locale.instructions.start_at + '</a> {name}</h4>'
+                  '<h4><a href="javascript:void(0);">' + this.locale.instructions.start_at + '</a> {name}</h4>'
             ).compile();
 
         if(this.TP_END == null)
@@ -190,10 +205,26 @@ otp.planner.Templates = {
             ).compile(); 
     },
 
+    /** */
+    prettyDateTime : function(date)
+    {
+        var retVal = date;
+        try
+        {
+            if(!date)
+                date = new Date();
+
+            retVal = date.format(this.locale.time.format);
+        }
+        catch(e)
+        {}
+        return retVal;
+    },
+
     makeLegTemplate : function(mode)
     {
         return new Ext.XTemplate(
-                  '<h4><a href="javascript:void;">' + mode + ' </a>',
+                  '<h4><a href="javascript:void(0);">' + mode + ' </a>',
                     '{[otp.util.StringFormattingUtils.getDirection(values.direction)]} ',
                     this.locale.directions.to + ' {toName}',
                   '</h4>',

@@ -123,13 +123,17 @@ public class RoutingContext implements Cloneable {
     
     public void check() {
         ArrayList<String> notFound = new ArrayList<String>();
-        if (fromVertex == null) {
-            notFound.add("from");
-        }
-        //if ( ! opt.batch)
-        if (toVertex == null) {
-            notFound.add("to");
-        }
+
+        // check origin present when not doing an arrive-by batch search
+        if ( ! (opt.batch && opt.arriveBy)) 
+        	if (fromVertex == null) 
+        		notFound.add("from");
+        
+        // check destination present when not doing a depart-after batch search
+        if ( !opt.batch || opt.arriveBy) // 
+        	if (toVertex == null) 
+        		notFound.add("to");
+
         for (int i = 0; i < intermediateVertices.size(); i++) {
             if (intermediateVertices.get(i) == null) {
                 notFound.add("intermediate." + i);

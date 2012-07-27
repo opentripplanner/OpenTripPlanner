@@ -247,6 +247,7 @@ public class PlanGenerator {
                     pgstate = PlanGenState.PRETRANSIT;
                     leg = makeLeg(itinerary, state);
                     leg.from.orig = nextName;
+                    itinerary.transfers++;
                     startWalk = -1;
                 } else if (mode == TraverseMode.STL) {
                     // this comes after an alight; do nothing
@@ -272,9 +273,6 @@ public class PlanGenerator {
                     finalizeLeg(leg, state, path.states, startWalk, i, coordinates);
                     startWalk = i;
                     leg = makeLeg(itinerary, state);
-                    if (backEdge instanceof RentABikeOnEdge) {
-                        leg.rentedBike = true; 
-                    }
                     pgstate = PlanGenState.BICYCLE;
                 } else if (mode == TraverseMode.STL) {
                     finalizeLeg(leg, state, path.states, startWalk, i, coordinates);
@@ -450,6 +448,7 @@ public class PlanGenerator {
             leg.routeLongName = trip.getRoute().getLongName();
             leg.routeColor = trip.getRoute().getColor();
             leg.routeTextColor = trip.getRoute().getTextColor();
+            leg.routeId = trip.getRoute().getId().getId();
             if (transitIndex != null) {
                 Agency agency = transitIndex.getAgency(leg.agencyId);
                 leg.agencyName = agency.getName();
@@ -520,6 +519,9 @@ public class PlanGenerator {
         leg.distance = 0.0;
         leg.from = makePlace(s.getBackState(), false);
         leg.mode = en.getMode().toString();
+        if (s.isBikeRenting()) {
+            leg.rentedBike = true; 
+        }
         return leg;
     }
 
@@ -780,6 +782,7 @@ public class PlanGenerator {
                         steps.remove(last - 1);
                         step = threeBack;
                         step.distance += twoBack.distance;
+                        distance += step.distance;
                         if (twoBack.elevation != null) {
                             if (step.elevation == null) {
                                 step.elevation = twoBack.elevation;

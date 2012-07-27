@@ -177,8 +177,10 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             s1.setRoute(trip.getRoute().getId());
 
             long wait_cost = bestWait;
+
             if (state0.getNumBoardings() == 0) {
                 wait_cost *= options.waitAtBeginningFactor;
+                s1.setInitialWaitTime(bestWait);
             } else {
                 wait_cost *= options.waitReluctance;
             }

@@ -150,7 +150,15 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
         final int minutesInDay = 24*60;
         boolean[] minutes = new boolean[minutesInDay];
         for (StopTime stopTime : dao.getAllStopTimes()) {
-            minutes[(stopTime.getDepartureTime() / 60) % minutesInDay] = true;
+            int time;
+            if (stopTime.isDepartureTimeSet()) {
+                time = stopTime.getDepartureTime();
+            } else if (stopTime.isArrivalTimeSet()) {
+                time = stopTime.getArrivalTime();
+            } else {
+                continue;
+            }
+            minutes[(time / 60) % minutesInDay] = true;
         }
         int bestLength = 0;
         int best = -1;
@@ -385,6 +393,11 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                         }
                         if (e instanceof PatternDwell || e instanceof Dwell) {
                             segment.dwell = e;
+                            for (Edge e2 : e.getToVertex().getIncoming()) {
+                                if (e2 instanceof Board || e2 instanceof PatternBoard) {
+                                    segment.board = e2;
+                                }
+                            }
                             for (Edge e2 : e.getToVertex().getOutgoing()) {
                                 if (e2 instanceof PatternHop || e2 instanceof Hop) {
                                     segment.hopOut = e2;
@@ -601,6 +614,8 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
         List<StopTime> stopTimes = dao.getStopTimesForTrip(trip);
         ArrayList<Stop> stops = new ArrayList<Stop>();
         for (StopTime stopTime : stopTimes) {
+            //nonduplicate stoptimes
+            if (stops.size() == 0 || !stopTime.getStop().equals(stops.get(stops.size() - 1)))
             stops.add(stopTime.getStop());
         }
 

@@ -42,7 +42,6 @@ otp.locale.English = {
         next             : "Next map position"
     },
 
-    // TODO Localize Me
     bikeTriangle : 
     {
         safeName : "Bike friendly",
@@ -174,13 +173,16 @@ otp.locale.English = {
         about        : "About",
         stop_id      : "Stop ID",
         trip_details : "Trip details",
-        fare         : "Fare",
-        fare_symbol  : "$",
         travel       : "Travel",
         valid        : "Valid",
         trip_length  : "Time",
         with_a_walk  : "with a walk of",
-        alert_for_rt : "Alert for route"
+        alert_for_rt : "Alert for route",
+        fare         : "Fare",
+        regular_fare : "Regular",
+        student_fare : "Student",
+        senior_fare  : "Senior",
+        fare_symbol  : "$"
     },
 
     // see otp.planner.Templates for use -- one output are the itinerary leg headers
@@ -228,7 +230,7 @@ otp.locale.English = {
         seconds_abbrev : "secs",
         format         : "F jS, Y @ g:ia",
         date_format    : "n/j/Y",
-        time_format    : "g:i a",
+        time_format    : "g:ia",
         months         : ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     },
 
@@ -362,7 +364,7 @@ otp.locale.English = {
             ['BUSISH,WALK', 'Bus only'],
             ['TRAINISH,WALK', 'Train only'],
             ['WALK', 'Walk only'],
-            ['BICYCLE', 'Bicycle'],
+            ['BICYCLE', 'Bicycle only'],
             ['TRANSIT,BICYCLE', 'Transit & Bicycle']
         ],
 
@@ -375,7 +377,7 @@ otp.locale.English = {
             ['BUSISH,WALK', 'Bus only'],
             ['TRAINISH,WALK', 'Train only'],
             ['WALK', 'Walk only'],
-            ['BICYCLE', 'Bicycle'],
+            ['BICYCLE', 'Bicycle only'],
             ['WALK,BICYCLE', 'Rented Bicycle'],
             ['TRANSIT,BICYCLE', 'Transit & Bicycle'],
             ['TRANSIT,WALK,BICYCLE', 'Transit & Rented Bicycle']

@@ -40,14 +40,14 @@ public class Sample {
         long m0 = Long.MAX_VALUE;
         long m1 = Long.MAX_VALUE;
         if (s0 != null)
-            m0 = (s0.getElapsedTime() + t0); 
+            m0 = (s0.getActiveTime() + t0); 
         if (s1 != null)
-            m1 = (s1.getElapsedTime() + t1); 
+            m1 = (s1.getActiveTime() + t1); 
         return (m0 < m1) ? m0 : m1; 
     }
     
     public String toString() {
-        return String.format("Sample: %s in %d min or %s in %d min\n", v0, t0, v1, t1);
+        return String.format("Sample: %s in %d sec or %s in %d sec\n", v0, t0, v1, t1);
     }
     
 }

@@ -13,7 +13,6 @@
 
 package org.opentripplanner.graph_builder.services;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.onebusaway.gtfs.services.GtfsRelationalDao;

@@ -78,11 +78,10 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 
         RoutingContext rctx = options.getRoutingContext();
         long abortTime = DateUtils.absoluteTimeout(relTimeout);
-        
-        if (rctx.origin == null || rctx.target == null) {
-            return null;
-        }
 
+        // null checks on origin and destination vertices are already performed in setRoutingContext
+        // options.rctx.check();
+        
         ShortestPathTree spt = createShortestPathTree(options);
 
         final RemainingWeightHeuristic heuristic = options.batch ? 

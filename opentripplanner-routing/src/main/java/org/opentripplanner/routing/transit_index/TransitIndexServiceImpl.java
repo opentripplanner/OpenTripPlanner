@@ -15,7 +15,6 @@ package org.opentripplanner.routing.transit_index;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -85,12 +84,12 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
             HashMap<AgencyAndId, PreAlightEdge> preAlightEdges,
             HashMap<AgencyAndId, HashSet<String>> directionsByRoute, List<TraverseMode> modes) {
 
-        MapUtils.mergeIn(this.variantsByAgency, variantsByAgency);
-        MapUtils.mergeIn(this.variantsByRoute, variantsByRoute);
+        MapUtils.mergeInUnique(this.variantsByAgency, variantsByAgency);
+        MapUtils.mergeInUnique(this.variantsByRoute, variantsByRoute);
         this.variantsByTrip.putAll(variantsByTrip);
         this.preBoardEdges.putAll(preBoardEdges);
         this.preAlightEdges.putAll(preAlightEdges);
-        MapUtils.mergeIn(this.directionsForRoute, directionsByRoute);
+        MapUtils.mergeInUnique(this.directionsForRoute, directionsByRoute);
         for (TraverseMode mode : modes) {
             if (!this.modes.contains(mode)) {
                 this.modes.add(mode);

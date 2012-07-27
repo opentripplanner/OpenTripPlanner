@@ -7,6 +7,8 @@ import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vividsolutions.jts.geom.Coordinate;
+
 /**
  * This class is an helper for Edges and Vertexes to store various data about elevation profiles.
  * 
@@ -123,4 +125,15 @@ public class ElevationProfileSegment implements Serializable {
         return costs.flattened;
     }
 
+    public String toString() {
+        String out = "";
+        if (elevationProfile.size() == 0) {
+            return "(empty elevation profile)";
+        }
+        for (int i = 0; i < elevationProfile.size(); ++i) {
+            Coordinate coord = elevationProfile.getCoordinate(i);
+            out += "(" + coord.x + "," + coord.y + "), ";
+        }
+        return out.substring(0, out.length() - 2);
+    }
 }

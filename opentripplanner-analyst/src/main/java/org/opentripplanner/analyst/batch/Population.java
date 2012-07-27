@@ -7,6 +7,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.opentripplanner.analyst.core.Sample;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -14,58 +16,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A collection of individual locations that will be used as either the origin set or the 
- * destination set in a many-to-many search.
+ * A collection of individual locations that will be used as either the origin set or the destination set in a many-to-many search.
  * 
  * @author andrewbyrd
  */
-public class Population implements Iterable<Individual> {
-    
-    private static final long serialVersionUID = 20120201L;
-    
-    private static final Logger LOG = LoggerFactory.getLogger(Population.class);
-    
-    List<Individual> individuals = new ArrayList<Individual>(); 
-    
-    public Population() {    }
+public interface Population extends Iterable<Individual> {
 
-    public Population(Individual... individuals) {
-        this.individuals = Arrays.asList(individuals);
-    }
-    
-    public void setIndividuals(List<Individual> individuals) {
-        this.individuals = individuals;
-    }
-    
-    public void add(Individual individual) {
-        this.individuals.add(individual);
-    }
+    public List<Individual> getIndividuals();
 
-    public void writeCsv(String outFileName, ShortestPathTree spt, Individual origin) {
-        LOG.debug("Writing population to CSV: {}", outFileName);
-        File outFile = new File(outFileName);
-        PrintWriter csvWriter;
-        try {
-            csvWriter = new PrintWriter(outFile);
-            csvWriter.printf("lat,lon,data,traveltime,birdfly\n");
-            for (Individual i : this.individuals) {
-                Sample s = i.sample;
-                long t = Long.MAX_VALUE;
-                //double birdfly = DistanceLibrary.distance(origin.getLat(), origin.getLon(), i.getLat(), i.getLon());
-                if (s != null)
-                    t = s.eval(spt);
-                csvWriter.printf("%f,%f,%f,%d,%f\n", i.getLat(), i.getLon(), i.data, t);
-            }
-            csvWriter.close();
-        } catch (Exception e) {
-            LOG.debug("error writing population to CSV: {}", e);
-        }
-        LOG.debug("Done writing population to CSV.");
-    }
+    public void setIndividuals(List<Individual> individuals);
 
-    @Override
-    public Iterator<Individual> iterator() {
-        return this.individuals.iterator();
-    }
+    public void clearIndividuals(List<Individual> individuals);
+
+    public void addIndividual(Individual individual);
+
+    /* load the individuals from a file or create them based on other parameters */
+    @PostConstruct
+    public void createIndividuals();
+
+    public int size();
     
+    /**
+     * Save the output data in this population to a file, using a format that is appropriate for the specific class of population. For example, a
+     * population loaded from an image file or generated on a regular grid will be saved as a Geotiff raster. A population of points that are not
+     * known to be aligned on a regular grid in some CRS will be saved as a CSV file.
+     */
+    public void writeAppropriateFormat(String fileName, ResultSet results);
+
 }

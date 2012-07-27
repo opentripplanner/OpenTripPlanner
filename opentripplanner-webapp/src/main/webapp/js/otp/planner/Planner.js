@@ -344,7 +344,7 @@ otp.planner.Planner = {
         var oldTab = this.m_tabs[this.m_activeTabID];
         if(oldTab != null && oldTab.topoRenderer != null)
         {
-            oldTab.topoRenderer.removeFromPanel();
+            this.ui.innerSouth.remove(oldTab.topoRenderer.extWrapper);
         }
 
         // draw the new tab, if applicable
@@ -361,7 +361,7 @@ otp.planner.Planner = {
         }
 
         // hide the south panel, if empty
-        if (this.ui.innerSouth.isVisible()  && this.ui.innerSouth.getEl().dom.childNodes.length == 0)
+        if (this.ui.innerSouth.isVisible()  && this.ui.innerSouth.items.getCount() == 0)
             this.closeElevation();
 
         // update the dynamic link to the current trip plan

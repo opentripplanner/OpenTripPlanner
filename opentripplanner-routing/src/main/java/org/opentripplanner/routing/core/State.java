@@ -174,6 +174,26 @@ public class State implements Cloneable {
         return stateData.tripTimes;
     }
 
+    /** returns the length of the trip in seconds up to this time, not including the initial wait.
+        It subtracts out the initial wait or a clamp value specified in the request.
+        This is used in lieu of reverse optimization in Analyst. */
+    public long getActiveTime () {
+        long clampInitialWait = stateData.opt.clampInitialWait;
+
+        long initialWait = stateData.initialWaitTime;
+
+        // only subtract up the clamp value
+        if (clampInitialWait > 0 && initialWait > clampInitialWait)
+            initialWait = clampInitialWait;            
+
+        long activeTime = getElapsedTime() - initialWait;
+        // TODO: what should be done here?
+        if (activeTime < 0)
+            activeTime = getElapsedTime();
+
+        return activeTime;            
+    }
+
     public AgencyAndId getTripId() {
         return stateData.tripId;
     }
@@ -482,6 +502,10 @@ public class State implements Cloneable {
 
     public TripPattern getLastPattern() {
         return stateData.lastPattern;
+    }
+
+    public String getBikeRentalNetwork() {
+        return stateData.bikeRentalNetwork;
     }
 
 }
