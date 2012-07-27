@@ -69,13 +69,13 @@
 	
 	<bean id="batchProcessor" class="org.opentripplanner.analyst.batch.BatchProcessor"> 
         <property name="outputPath" value="/home/abyrd/access/out1834_clamp.tiff" />
-        <property name="routerId" value="arbor" />
         <property name="date" value="2012-07-12" />
         <property name="time" value="08:00 AM" />
         <property name="timeZone" value="America/New_York" />
         <property name="prototypeRoutingRequest">
-			<bean class="org.opentripplanner.routing.core.PrototypeRoutingRequest">
+			<bean class="org.opentripplanner.routing.core.RoutingRequest">
 				<!-- Set default routing parameters here -->
+		        <property name="routerId" value="arbor" />
 		        <property name="maxWalkDistance" value="400000" />
 		        <property name="clampInitialWait" value="1800" />
 		        <property name="arriveBy" value="false" />
