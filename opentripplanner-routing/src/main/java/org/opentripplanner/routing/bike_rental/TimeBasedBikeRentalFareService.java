@@ -104,15 +104,14 @@ public class TimeBasedBikeRentalFareService implements ChainedFareService, Seria
             }
         }
 
-        if (cost == 0) {
-            return next.getCost(path);
-        }
-
         if (next == null) {
             Fare fare = new Fare();
             fare.addFare(FareType.regular, new WrappedCurrency(Currency.getInstance(currency)),
                     cost);
             return fare;
+        }
+        if (cost == 0) {
+            return next.getCost(path);
         }
 
         Fare fare = next.getCost(path);
