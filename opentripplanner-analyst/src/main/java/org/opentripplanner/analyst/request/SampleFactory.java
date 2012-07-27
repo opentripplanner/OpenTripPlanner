@@ -38,7 +38,7 @@ public class SampleFactory implements SampleSource {
         this.setSearchRadiusM(1000);
     }
     
-    private void setSearchRadiusM(double radiusMeters) {
+    public void setSearchRadiusM(double radiusMeters) {
         this.searchRadiusM = radiusMeters;
         this.searchRadiusLat = SphericalDistanceLibrary.metersToDegrees(searchRadiusM);
         this.searchRadiusLon = SphericalDistanceLibrary.metersToDegrees(searchRadiusM);
