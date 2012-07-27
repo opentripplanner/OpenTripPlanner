@@ -61,7 +61,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
             minWalk = targetDistance;
         }
         final double optimisticDistance = current.getWalkDistance() + minWalk;
-        final double minTime = (targetDistance - minWalk) / 25 + minWalk
+        final double minTime = (targetDistance - minWalk) / Raptor.MAX_TRANSIT_SPEED + minWalk
                 / current.getOptions().getSpeedUpperBound();
 
         for (State bounder : bounders) {

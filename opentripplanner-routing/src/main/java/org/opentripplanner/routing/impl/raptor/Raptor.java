@@ -31,7 +31,6 @@ import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.common.pqueue.OTPPriorityQueue;
 import org.opentripplanner.common.pqueue.OTPPriorityQueueFactory;
 import org.opentripplanner.routing.algorithm.GenericDijkstra;
-import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.algorithm.strategies.TransitLocalStreetService;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
@@ -65,6 +64,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.vividsolutions.jts.geom.Coordinate;
 
 public class Raptor implements PathService {
+
+    static final double MAX_TRANSIT_SPEED = 25;
 
     @Autowired
     private GraphService graphService;
@@ -556,7 +557,7 @@ public class Raptor implements PathService {
                         continue;
                 }
                 
-                double minTime = (targetDistance - distanceToNearestTransitStop) / 25 + distanceToNearestTransitStop / options.getSpeedUpperBound();
+                double minTime = (targetDistance - distanceToNearestTransitStop) / MAX_TRANSIT_SPEED + distanceToNearestTransitStop / options.getSpeedUpperBound();
                 
                 state.arrivalTime += minTime;
                 state.walkDistance += distanceToNearestTransitStop;
@@ -680,7 +681,7 @@ public class Raptor implements PathService {
             }
 
             double targetDistance = distanceLibrary.fastDistance(options.rctx.target.getCoordinate(), vertex.getCoordinate());
-            double minTime = (targetDistance - minWalk) / 25 + minWalk / options.getSpeedUpperBound();
+            double minTime = (targetDistance - minWalk) / MAX_TRANSIT_SPEED + minWalk / options.getSpeedUpperBound();
             
             //target state bounding 
             for (RaptorState oldState : cur.getTargetStates()) {

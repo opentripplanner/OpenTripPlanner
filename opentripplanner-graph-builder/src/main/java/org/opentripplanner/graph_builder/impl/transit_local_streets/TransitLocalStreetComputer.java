@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 public class TransitLocalStreetComputer implements GraphBuilder {
     private static Logger log = LoggerFactory.getLogger(TransitLocalStreetComputer.class);
+    private boolean saveShortestPaths = false;
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
@@ -77,7 +78,7 @@ public class TransitLocalStreetComputer implements GraphBuilder {
                 ShortestPathTree spt = dijkstra.getShortestPathTree(origin);
                 HashMap<Vertex, int[]> map = null;
                 HashMap<Vertex, T2<Double, Integer>> cost = null;
-                if (req == walk) {
+                if (req == walk && saveShortestPaths ) {
                     map = new HashMap<Vertex, int[]>();
                     cost = new HashMap<Vertex, T2<Double, Integer>>();
                     paths.put(v, map);
@@ -89,7 +90,7 @@ public class TransitLocalStreetComputer implements GraphBuilder {
                     Vertex destStopVertex = s.getVertex();
                     if (destStopVertex instanceof TransitStop) {
                         int pathIndex = 0;
-                        if (req == walk) {
+                        if (req == walk && saveShortestPaths ) {
                            cost.put(destStopVertex, new T2<Double, Integer>(s.getWalkDistance(), (int) s.getElapsedTime()));
                         }
                         while (s != null) {
@@ -97,7 +98,7 @@ public class TransitLocalStreetComputer implements GraphBuilder {
                             path[pathIndex++] = s.getVertex().getIndex();
                             s = s.getBackState();
                         }
-                        if (req == walk) {
+                        if (req == walk && saveShortestPaths ) {
                             map.put(destStopVertex, Arrays.copyOf(path, pathIndex));
                         }
 
