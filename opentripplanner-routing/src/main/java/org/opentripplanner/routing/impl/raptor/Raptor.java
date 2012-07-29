@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -404,10 +405,25 @@ public class Raptor implements PathService {
                         }
                     }
 
+                    Iterator<RaptorState> it = states.iterator();
+                    while(it.hasNext()) {
+                        RaptorState oldState = it.next();
+                        if (eDominates(newState, oldState)) {
+                            it.remove();
+                        }
+                    }
+                    it = newStates.iterator();
+                    while(it.hasNext()) {
+                        RaptorState oldState = it.next();
+                        if (eDominates(newState, oldState)) {
+                            it.remove();
+                        }
+                    }
+
                     cur.visitedLastRound.add(stop);
                     cur.visitedEver.add(stop);
                     newStates.add(newState);
-                    
+
                     StopNearTarget nearTarget = cur.stopsNearTarget.get(stop);
                     if (nearTarget != null) {
                         RaptorState bound = new RaptorState();
