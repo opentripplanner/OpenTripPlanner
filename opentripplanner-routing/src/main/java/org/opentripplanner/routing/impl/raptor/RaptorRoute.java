@@ -13,6 +13,8 @@
 
 package org.opentripplanner.routing.impl.raptor;
 
+import java.io.Serializable;
+
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -27,7 +29,9 @@ import org.opentripplanner.routing.edgetype.TableTripPattern;
  * @author novalis
  * 
  */
-public class RaptorRoute {
+public class RaptorRoute implements Serializable {
+    private static final long serialVersionUID = -882026076718046636L;
+
     public RaptorStop[] stops;
 
     public PatternBoard[/* stops - 1 */][/* patterns */] boards;// array of patternboards for each

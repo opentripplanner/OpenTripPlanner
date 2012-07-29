@@ -13,11 +13,14 @@
 
 package org.opentripplanner.routing.impl.raptor;
 
+import java.io.Serializable;
+
 import org.opentripplanner.routing.vertextype.TransitStop;
 
-public class RaptorStop {
-    int index;
-    TransitStop stopVertex;
+public class RaptorStop implements Serializable {
+    private static final long serialVersionUID = 5308124086666575865L;
+    public int index;
+    public TransitStop stopVertex;
     
     public String toString() {
         return "RaptorStop(" + stopVertex + ", " + index + ")";

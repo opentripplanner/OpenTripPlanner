@@ -42,7 +42,10 @@ public class TransitLocalStreetComputer implements GraphBuilder {
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         HashSet<Vertex> transitShortestPathVertices = new HashSet<Vertex>();
+        
+        //this is necessary for storing walk distances by vertex index
         graph.renumberVerticesAndEdges();
+
         RoutingRequest walk = new RoutingRequest(TraverseMode.WALK);
         RoutingRequest wheelchair = new RoutingRequest(TraverseMode.WALK);
         wheelchair.wheelchairAccessible = true;
