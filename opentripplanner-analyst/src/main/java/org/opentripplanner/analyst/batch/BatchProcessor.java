@@ -30,7 +30,7 @@ public class BatchProcessor {
     @Autowired private SPTService sptService;
     @Resource private Population origins;
     @Resource private Population destinations;
-    private RoutingRequest prototypeRoutingRequest;
+    @Resource private RoutingRequest prototypeRoutingRequest;
     private Aggregator aggregator;
     private Accumulator accumulator;
     

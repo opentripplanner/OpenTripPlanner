@@ -40,6 +40,27 @@
         </property>
     </bean>
 -->
+ 
+<!-- load the origin population from a comma-separated flat text file -->
+
+	<bean id="origins" class="org.opentripplanner.analyst.batch.CSVPopulation">
+        <property name="sourceFilename" value="/home/abyrd/access/annarbor.csv" />
+        <property name="latCol" value="1" />
+        <property name="lonCol" value="2" />
+        <property name="labelCol" value="0" />
+        <property name="inputCol" value="3" />       
+        <!-- do not include origins who are NaN, Inf, negative, or outside the transit coverage area --> 
+        <property name="filterChain">
+        	<list>
+        		<bean class="org.opentripplanner.analyst.batch.NanInfFilter" />
+        		<bean class="org.opentripplanner.analyst.batch.InputClampFilter" />
+        		<bean class="org.opentripplanner.analyst.batch.GraphGeographicFilter">
+			        <property name="useOnlyStops" value="true" />
+			        <property name="bufferMeters" value="2000" />
+        		</bean>
+        	</list>
+        </property>        
+	</bean>
 
 <!-- create a destination population arranged on a regular grid that can be saved as an image -->
 	
@@ -52,24 +73,6 @@
         <property name="cols" value="1280" />
         <property name="rows" value="1024" />        
 	</bean>
- 
-<!-- load the origin population from a comma-separated flat text file -->
-
-	<bean id="origins" class="org.opentripplanner.analyst.batch.CSVPopulation">
-        <property name="sourceFilename" value="/home/abyrd/access/annarbor.csv" />
-        <property name="latCol" value="1" />
-        <property name="lonCol" value="2" />
-        <property name="labelCol" value="0" />
-        <property name="inputCol" value="3" />       
-        <!-- do not include origins who are NaN, Inf, negative, or outside the graph coverage area --> 
-        <property name="filterChain">
-        	<list>
-        		<bean class="org.opentripplanner.analyst.batch.NanInfFilter" />
-        		<bean class="org.opentripplanner.analyst.batch.InputClampFilter" />
-        		<bean class="org.opentripplanner.analyst.batch.GraphGeographicFilter" />
-        	</list>
-        </property>        
-	</bean>
 
 <!-- aggregate results are no longer stored in individuals so populations can be reused -->
 <!-- <alias name="destinations" alias="origins"/> -->
@@ -81,16 +84,6 @@
         <property name="date" value="2012-07-12" />
         <property name="time" value="08:00 AM" />
         <property name="timeZone" value="America/New_York" />
-        <property name="prototypeRoutingRequest">
-			<bean class="org.opentripplanner.routing.core.RoutingRequest">
-				<!-- Set default routing parameters here -->
-		        <property name="routerId" value="arbor" />
-		        <property name="maxWalkDistance" value="400000" />
-		        <property name="clampInitialWait" value="1800" />
-		        <property name="arriveBy" value="false" />
-		        <property name="modes" value="WALK,TRANSIT" />
-			</bean>
-		</property>		
 		<!-- 
         <property name="aggregator"> 
             <bean class="org.opentripplanner.analyst.batch.aggregator.ThresholdSumAggregator">
@@ -103,6 +96,15 @@
                 <property name="threshold" value="3600" />
             </bean>
         </property> 
+	</bean>
+
+	<bean id="prototypeRoutingRequest" class="org.opentripplanner.routing.core.RoutingRequest">
+		<!-- Set default routing parameters here -->
+        <property name="routerId" value="arbor" />
+        <property name="maxWalkDistance" value="2.000" />
+        <property name="clampInitialWait" value="1800" />
+        <property name="arriveBy" value="false" />
+        <property name="modes" value="WALK,TRANSIT" />
 	</bean>
 
 </beans>
