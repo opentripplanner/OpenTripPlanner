@@ -41,20 +41,20 @@ public class Hop extends AbstractEdge implements OnBoardForwardEdge, OnBoardReve
 
     private Trip trip;
 
-    private AgencyAndId _serviceId;
+    private int _serviceId;
 
     private int elapsed;
 
-    public AgencyAndId getServiceId() {
+    public int getServiceId() {
         return _serviceId;
     }
 
-    public Hop(Vertex startJourney, Vertex endJourney, StopTime start, StopTime end, Trip trip) {
+    public Hop(Vertex startJourney, Vertex endJourney, StopTime start, StopTime end, Trip trip, int serviceId) {
         super(startJourney, endJourney);
         this.start = start;
         this.end = end;
         this.trip = trip;
-        this._serviceId = start.getTrip().getServiceId();
+        this._serviceId = serviceId;
         this.elapsed = end.getArrivalTime() - start.getDepartureTime();
     }
 

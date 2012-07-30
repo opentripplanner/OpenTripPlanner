@@ -98,7 +98,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             long current_time = state0.getTime();
             int bestWait = -1;
             int bestPatternIndex = -1;
-            AgencyAndId serviceId = getPattern().getExemplar().getServiceId();
+            int serviceId = getPattern().getServiceId();
             TraverseMode mode = state0.getNonTransitMode(options);
             SD: for (ServiceDay sd : rctx.serviceDays) {
                 int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
@@ -235,7 +235,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
         else if (! rctx.opt.getModes().get(modeMask)) {
             return Double.POSITIVE_INFINITY;
         }
-        AgencyAndId serviceId = getPattern().getExemplar().getServiceId();
+        int serviceId = getPattern().getServiceId();
         for (ServiceDay sd : rctx.serviceDays)
             if (sd.serviceIdRunning(serviceId))
                 return 0;

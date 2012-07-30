@@ -99,10 +99,12 @@ public class ArrayTripPattern implements TableTripPattern, Serializable {
 
     int bestDwellTimes[];
 
+    private int serviceId;
+
     public ArrayTripPattern(Trip exemplar, ArrayList<Integer>[] departureTimes,
             ArrayList<Integer>[] runningTimes, ArrayList<Integer>[] arrivalTimes,
             ArrayList<Integer>[] dwellTimes, ArrayList<String>[] headsigns, String[] zones, ArrayList<Integer> perTripFlags,
-            int[] perStopFlags, ArrayList<Trip> trips) {
+            int[] perStopFlags, ArrayList<Trip> trips, int serviceId) {
         this.exemplar = exemplar;
         this.departureTimes = new int[departureTimes.length][departureTimes[0].size()];
         this.runningTimes = new int[runningTimes.length][runningTimes[0].size()];
@@ -180,6 +182,8 @@ public class ArrayTripPattern implements TableTripPattern, Serializable {
         for (int i = 0; i < trips.size(); ++i) {
             this.trips[i] = trips.get(i);
         }
+        
+        this.serviceId = serviceId;
     }
 
     public int getNextTrip(int stopIndex, int afterTime, boolean wheelchairAccessible,
@@ -352,5 +356,10 @@ public class ArrayTripPattern implements TableTripPattern, Serializable {
     @Override
     public List<Stop> getStops() {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int getServiceId() {
+        return serviceId;
     }
 }

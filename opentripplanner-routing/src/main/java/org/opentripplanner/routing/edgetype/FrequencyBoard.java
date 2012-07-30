@@ -42,13 +42,16 @@ public class FrequencyBoard extends AbstractEdge  implements OnBoardForwardEdge 
     private FrequencyBasedTripPattern pattern;
     private int modeMask;
 
+    private int serviceId;
+
 
     public FrequencyBoard(TransitVertex from, TransitVertex to,
-            FrequencyBasedTripPattern pattern, int stopIndex, TraverseMode mode) {
+            FrequencyBasedTripPattern pattern, int stopIndex, TraverseMode mode, int serviceId) {
         super(from, to);
         this.pattern = pattern;
         this.stopIndex = stopIndex;
         this.modeMask = new TraverseModeSet(mode).getMask();
+        this.serviceId = serviceId;
     }
 
     public String getDirection() {
@@ -114,7 +117,6 @@ public class FrequencyBoard extends AbstractEdge  implements OnBoardForwardEdge 
                 //we used to use route banning and that was not so bad.
                 return null;
             }
-            AgencyAndId serviceId = trip.getServiceId();
             for (ServiceDay sd : rctx.serviceDays) {
                 int secondsSinceMidnight = sd.secondsSinceMidnight(currentTime);
                 // only check for service on days that are not in the future
@@ -209,7 +211,6 @@ public class FrequencyBoard extends AbstractEdge  implements OnBoardForwardEdge 
             if (! rctx.opt.getModes().get(modeMask)) {
                 return Double.POSITIVE_INFINITY;
             }
-            AgencyAndId serviceId = pattern.getTrip().getServiceId();
             for (ServiceDay sd : rctx.serviceDays)
                 if (sd.serviceIdRunning(serviceId))
                     return 0;

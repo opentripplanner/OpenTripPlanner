@@ -166,9 +166,9 @@ public class RoutingContext implements Cloneable {
         // since DST changes more than one hour after midnight in US/EU.
         // But is this true everywhere?
         for (String agency : graph.getAgencyIds()) {
-            addIfNotExists(this.serviceDays, new ServiceDay(time - SEC_IN_DAY, calendarService, agency));
-            addIfNotExists(this.serviceDays, new ServiceDay(time, calendarService, agency));
-            addIfNotExists(this.serviceDays, new ServiceDay(time + SEC_IN_DAY, calendarService, agency));
+            addIfNotExists(this.serviceDays, new ServiceDay(graph, time - SEC_IN_DAY, calendarService, agency));
+            addIfNotExists(this.serviceDays, new ServiceDay(graph, time, calendarService, agency));
+            addIfNotExists(this.serviceDays, new ServiceDay(graph, time + SEC_IN_DAY, calendarService, agency));
         }
     }
 
@@ -197,15 +197,6 @@ public class RoutingContext implements Cloneable {
             return sl.isWheelchairAccessible();
         }
         return true;
-    }
-
-    public boolean serviceOn(AgencyAndId serviceId, ServiceDate serviceDate) {
-        Set<ServiceDate> dates = serviceDatesByServiceId.get(serviceId);
-        if (dates == null) {
-            dates = calendarService.getServiceDatesForServiceId(serviceId);
-            serviceDatesByServiceId.put(serviceId, dates);
-        }
-        return dates.contains(serviceDate);
     }
     
     /** 

@@ -16,6 +16,7 @@ package org.opentripplanner.routing.edgetype;
 import java.util.Iterator;
 import java.util.List;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
 
 /**
@@ -104,4 +105,6 @@ public interface TableTripPattern extends TripPattern {
     public int getAlightType(int stopIndex);
 
     public int getBoardType(int stopIndex);
+
+    public int getServiceId();
 }

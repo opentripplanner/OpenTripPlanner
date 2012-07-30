@@ -60,8 +60,10 @@ public final class BasicTripPattern implements Serializable, TableTripPattern {
 
     private ArrayList<String>[] headsigns;
 
+    private int serviceId;
+
     @SuppressWarnings("unchecked")
-    public BasicTripPattern(Trip exemplar, List<StopTime> stopTimes) {
+    public BasicTripPattern(Trip exemplar, List<StopTime> stopTimes, int serviceId) {
         this.exemplar = exemplar;
         int hops = stopTimes.size() - 1;
         departureTimes = (ArrayList<Integer>[]) Array.newInstance(ArrayList.class, hops);
@@ -95,6 +97,7 @@ public final class BasicTripPattern implements Serializable, TableTripPattern {
             perStopFlags[i] |= stopTime.getDropOffType() << SHIFT_DROPOFF;
             ++i;
         }
+        this.serviceId = serviceId;
     }
 
     /**
@@ -366,7 +369,7 @@ public final class BasicTripPattern implements Serializable, TableTripPattern {
      */
     public ArrayTripPattern convertToArrayTripPattern() {
         if (arrayPattern == null) {
-            arrayPattern = new ArrayTripPattern(exemplar, departureTimes, runningTimes, arrivalTimes, dwellTimes, headsigns, zones, perTripFlags, perStopFlags, trips);
+            arrayPattern = new ArrayTripPattern(exemplar, departureTimes, runningTimes, arrivalTimes, dwellTimes, headsigns, zones, perTripFlags, perStopFlags, trips, serviceId);
             departureTimes = runningTimes = arrivalTimes = dwellTimes = null;
             zones = null;
             perTripFlags = null;
@@ -450,5 +453,10 @@ public final class BasicTripPattern implements Serializable, TableTripPattern {
     @Override
     public List<Stop> getStops() {
         return stops;
+    }
+
+    @Override
+    public int getServiceId() {
+        return serviceId;
     }
 }
