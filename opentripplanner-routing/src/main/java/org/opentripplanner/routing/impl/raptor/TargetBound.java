@@ -75,7 +75,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
             if (optimisticDistance < bounder.walkDistance)
                 continue;
             if (current.getTime() + minTime > bounder.arrivalTime) {
-                return false;
+                return true;
             }
         }
 */
