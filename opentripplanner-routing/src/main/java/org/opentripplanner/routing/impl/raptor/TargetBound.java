@@ -26,10 +26,13 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
 
     private double distanceToNearestTransitStop;
 
-    public TargetBound(Vertex realTarget) {
+    private List<RaptorState> boundingStates;
+
+    public TargetBound(Vertex realTarget, List<RaptorState> boundingStates) {
         this.realTarget = realTarget;
         this.realTargetCoordinate = realTarget.getCoordinate();
         this.distanceToNearestTransitStop = realTarget.getDistanceToNearestTransitStop();
+        this.boundingStates = boundingStates;
     }
 
     @Override
@@ -54,23 +57,36 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
         if (targetDistance > remainingWalk) {
             // then we must have some transit + some walk.
             minWalk = this.distanceToNearestTransitStop + vertex.getDistanceToNearestTransitStop();
-            if (minWalk > remainingWalk)
-                return true;
         } else {
             // could walk directly to destination
             minWalk = targetDistance;
         }
+        if (minWalk > remainingWalk)
+            return true;
+
         final double optimisticDistance = current.getWalkDistance() + minWalk;
         final double minTime = (targetDistance - minWalk) / Raptor.MAX_TRANSIT_SPEED + minWalk
                 / current.getOptions().getSpeedUpperBound();
 
+        // this makes speed worse for some reason.  Oh, probably because any
+        // searches cut off here don't dominate other searches?
+/*
+        for (RaptorState bounder : boundingStates) {
+            if (optimisticDistance < bounder.walkDistance)
+                continue;
+            if (current.getTime() + minTime > bounder.arrivalTime) {
+                return false;
+            }
+        }
+*/
+
         for (State bounder : bounders) {
 
             if (optimisticDistance < bounder.getWalkDistance())
-                continue; //this path might win on distance
+                continue; // this path might win on distance
 
             if (bounder.getTime() < current.getTime() + minTime)
-                return true; //this path won't win on either time or distance
+                return true; // this path won't win on either time or distance
         }
         return false;
     }
