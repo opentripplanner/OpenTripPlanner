@@ -111,8 +111,7 @@ public class BasicPopulation implements Population {
         }
     }
 
-    @PostConstruct
-    private void SuperSetup() {
+    public void setup() {
         // call the subclass-specific file loading method
         this.createIndividuals();
         // call the shared filter chain method

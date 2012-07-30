@@ -45,10 +45,18 @@ public class BatchProcessor {
         xmlReader.loadBeanDefinitions(new ClassPathResource(CONFIG));
         ctx.refresh();
         ctx.registerShutdownHook();
-        ctx.getBean(BatchProcessor.class).run();
+        BatchProcessor processor = ctx.getBean(BatchProcessor.class);
+        if (processor == null)
+            LOG.error("No BatchProcessor bean was defined.");
+        else
+            processor.run();
     }
 
     private void run() {
+
+        origins.setup();
+        destinations.setup();
+
         int nOrigins = origins.getIndividuals().size();
         if (aggregator != null) {
             ResultSet aggregates = new ResultSet(origins);
@@ -67,7 +75,7 @@ public class BatchProcessor {
                 i += 1;
             }
             aggregates.writeAppropriateFormat(outputPath);
-        } else if (accumulator != null) {
+        } else if (accumulator != null) { 
             ResultSet accumulated = new ResultSet(destinations);
             int i = 0;
             for (Individual oi : origins) {
