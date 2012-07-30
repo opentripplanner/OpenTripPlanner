@@ -60,6 +60,13 @@
         <property name="lonCol" value="2" />
         <property name="labelCol" value="0" />
         <property name="inputCol" value="3" />        
+        <property name="filterChain">
+        	<list>
+        		<bean class="org.opentripplanner.analyst.batch.NanInfFilter" />
+        		<bean class="org.opentripplanner.analyst.batch.InputClampFilter" />
+        		<bean class="org.opentripplanner.analyst.batch.GraphGeographicFilter" />
+        	</list>
+        </property>        
 	</bean>
 
 <!-- aggregate results are no longer stored in individuals so populations can be reused -->
