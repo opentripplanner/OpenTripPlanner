@@ -54,9 +54,11 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
         final double remainingWalk = traverseOptions.maxWalkDistance
                 - current.getWalkDistance();
         final double minWalk;
+        double minTime = 0;
         if (targetDistance > remainingWalk) {
             // then we must have some transit + some walk.
             minWalk = this.distanceToNearestTransitStop + vertex.getDistanceToNearestTransitStop();
+            minTime = traverseOptions.getBoardSlack();
         } else {
             // could walk directly to destination
             minWalk = targetDistance;
@@ -79,7 +81,6 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
             }
         }
 */
-
         for (State bounder : bounders) {
 
             if (optimisticDistance < bounder.getWalkDistance())

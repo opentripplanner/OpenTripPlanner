@@ -204,7 +204,8 @@ public class Raptor implements PathService {
          * earlier trip (because a quicker path to pi has been found in a previous round). Thus, we
          * have to check if τk−1 (pi ) < τarr (t, pi ) and update t by recomputing et(r, pi ).
          */
-
+        int boardSlack = nBoardings == 1 ? options.getBoardSlack() : (options.getTransferSlack() - options.getAlightSlack());
+        
         List<RaptorState> createdStates = new ArrayList<RaptorState>();
         System.out.println("Round " + nBoardings);
         final double distanceToNearestTransitStop = options.rctx.target
@@ -237,6 +238,9 @@ public class Raptor implements PathService {
                             boardState.tripIndex, stopNo);
                     newState.arrivalTime = (int) sd.time(alightTime);
 
+                    //add in slack
+                    newState.arrivalTime += options.getAlightSlack();
+                    
                     newState.boardStop = boardState.boardStop;
                     newState.boardStopSequence = boardState.boardStopSequence;
                     newState.route = route;
@@ -314,7 +318,7 @@ public class Raptor implements PathService {
                             continue; // we got here via this route, so no reason to transfer
 
                         RaptorBoardSpec boardSpec = route.getTripIndex(options,
-                                oldState.arrivalTime, stopNo);
+                                oldState.arrivalTime + boardSlack, stopNo);
                         if (boardSpec == null)
                             continue;
 
@@ -433,18 +437,24 @@ public class Raptor implements PathService {
                 Vertex stopVertex = state.stop.stopVertex;
                 Vertex dest = options.rctx.target;
 
+                double minWalk = distanceToNearestTransitStop;
+                
                 double targetDistance = distanceLibrary.fastDistance(dest.getCoordinate(),
                         stopVertex.getCoordinate());
+
+                double minTime = (targetDistance - minWalk)
+                        / MAX_TRANSIT_SPEED + minWalk
+                        / options.getSpeedUpperBound();
 
                 if (targetDistance + state.walkDistance > options.getMaxWalkDistance()) {
                     // can't walk to destination, so we can't alight at a local vertex
                     if (state.stop.stopVertex.isLocal())
                         continue;
+                    //and must account for another boarding
+                    minTime += boardSlack;
                 }
 
 
-                double minWalk = distanceToNearestTransitStop;
-                
                 //this checks the precomputed table of walk distances by regions to see 
                 //to get a tigher bound on the best posible walk distance to the destination
                 //it (a) causes weird intermitten planner failures, (b) does not make 
@@ -470,9 +480,6 @@ public class Raptor implements PathService {
                     System.out.println("WRONG");
                 }
 */
-                double minTime = (targetDistance - minWalk)
-                        / MAX_TRANSIT_SPEED + minWalk
-                        / options.getSpeedUpperBound();
 
                 state.arrivalTime += minTime;
                 state.walkDistance += minWalk;
@@ -608,6 +615,8 @@ public class Raptor implements PathService {
                     options.rctx.target.getCoordinate(), vertex.getCoordinate());
             double minTime = (targetDistance - minWalk) / MAX_TRANSIT_SPEED + minWalk
                     / options.getSpeedUpperBound();
+            if (targetDistance > options.maxWalkDistance - state.getWalkDistance())
+                minTime += boardSlack;
 
             // target state bounding
             for (RaptorState oldState : cur.getTargetStates()) {
