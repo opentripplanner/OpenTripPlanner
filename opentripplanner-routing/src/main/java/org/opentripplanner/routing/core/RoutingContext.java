@@ -209,18 +209,6 @@ public class RoutingContext implements Cloneable {
     }
     
     /** 
-     * When a routing context is garbage collected, there should be no more references
-     * to the temporary vertices it created. We need to detach its edges from the permanent graph.
-     */
-    @Override public void finalize() {
-        int nRemoved = this.destroy();
-        if (nRemoved > 0) {
-            LOG.warn("Temporary edges were removed during garbage collection. " +
-                     "This is probably because a routing context was not properly destroyed.");
-        }
-    }
-    
-    /** 
      * Tear down this routing context, removing any temporary edges. 
      * @returns the number of edges removed. 
      */

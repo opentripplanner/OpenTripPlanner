@@ -274,5 +274,9 @@ public class StreetLocation extends AbstractVertex {
         }
         return nRemoved;
     }
+
+    @Override public void finalize() {
+        removeTemporaryEdges();
+    }
     
 }
