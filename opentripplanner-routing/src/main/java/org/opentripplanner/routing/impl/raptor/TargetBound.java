@@ -51,7 +51,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
         final double targetDistance = distanceLibrary.fastDistance(realTargetCoordinate,
                 vertex.getCoordinate());
 
-        final double remainingWalk = traverseOptions.getMaxWalkDistance()
+        final double remainingWalk = traverseOptions.maxWalkDistance
                 - current.getWalkDistance();
         final double minWalk;
         if (targetDistance > remainingWalk) {
@@ -65,7 +65,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
             return true;
 
         final double optimisticDistance = current.getWalkDistance() + minWalk;
-        final double minTime = (targetDistance - minWalk) / Raptor.MAX_TRANSIT_SPEED + minWalk
+        minTime += (targetDistance - minWalk) / Raptor.MAX_TRANSIT_SPEED + minWalk
                 / current.getOptions().getSpeedUpperBound();
 
         // this makes speed worse for some reason.  Oh, probably because any
