@@ -77,7 +77,7 @@ public class RasterPopulation extends BasicPopulation {
         LOG.info("done writing geotiff.");
     }
     
-    @Override @PostConstruct
+    @Override
     public void createIndividuals() {
         LOG.info("Loading population from raster file {}", sourceFilename);
         try {

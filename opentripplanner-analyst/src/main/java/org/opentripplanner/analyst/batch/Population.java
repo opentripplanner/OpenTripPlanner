@@ -30,8 +30,7 @@ public interface Population extends Iterable<Individual> {
 
     public void addIndividual(Individual individual);
 
-    /* load the individuals from a file or create them based on other parameters */
-    @PostConstruct
+    /* subclass-specific method to load the individuals from a file or create them based on other parameters */
     public void createIndividuals();
 
     public int size();

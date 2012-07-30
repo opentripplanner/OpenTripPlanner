@@ -29,8 +29,13 @@ public class BasicPopulation implements Population {
     @Setter @Getter 
     public List<Individual> individuals = new ArrayList<Individual>(); 
     
+    @Setter @Getter 
+    public List<IndividualFilter> filters = null; 
+
     @Autowired 
     IndividualFactory individualFactory;
+    
+    private boolean[] skip = null;
     
     public BasicPopulation() {  }
 
@@ -87,7 +92,31 @@ public class BasicPopulation implements Population {
 
     @Override
     public void writeAppropriateFormat(String outFileName, ResultSet results) {
+        // as a default, save to CSV. override this method in subclasses when more is known about data structure.
         this.writeCsv(outFileName, results);
     }
 
+    /** If a filter chain is specified, apply it to the individuals. To be called after loading individuals. */
+    private void applyFilterChain() {
+        this.skip = new boolean[individuals.size()]; // init to false
+        if (filters == null)
+            return;
+        for (IndividualFilter filter : filters) {
+            int i = 0;
+            for (Individual individual : this.individuals) {
+                boolean skipThis = ! filter.filter(individual);
+                skip[i++] |= skipThis;
+            }
+            
+        }
+    }
+
+    @PostConstruct
+    private void SuperSetup() {
+        // call the subclass-specific file loading method
+        this.createIndividuals();
+        // call the shared filter chain method
+        this.applyFilterChain();
+    }
+    
 }
