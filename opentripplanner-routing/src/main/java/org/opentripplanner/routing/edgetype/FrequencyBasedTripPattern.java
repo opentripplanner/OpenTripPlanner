@@ -69,7 +69,9 @@ public class FrequencyBasedTripPattern implements Serializable, TripPattern {
     
     boolean exact;
 
-    public FrequencyBasedTripPattern(Trip trip, int size) {
+    private int serviceId;
+
+    public FrequencyBasedTripPattern(Trip trip, int size, int serviceId) {
         this.exemplar = trip;
         departureTimes = new int[size];
         runningTimes = new int[size];
@@ -83,6 +85,7 @@ public class FrequencyBasedTripPattern implements Serializable, TripPattern {
 
         perStopFlags = new int[size];
 
+        this.serviceId = serviceId;
     }
 
     public int getNextDepartureTime(int stopIndex, int afterTime, boolean wheelchairAccessible,
@@ -297,6 +300,10 @@ public class FrequencyBasedTripPattern implements Serializable, TripPattern {
 
     public void setStops(List<Stop> stops) {
         this.stops = stops;
+    }
+
+    public int getServiceId() {
+        return serviceId;
     }
 
 }

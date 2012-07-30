@@ -40,6 +40,7 @@ import org.opentripplanner.common.model.T2;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation;
+import org.opentripplanner.routing.core.ServiceIdToNumberService;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
@@ -488,12 +489,13 @@ public class GTFSPatternHopFactory {
         deleteUselessDwells(graph);
         clearCachedData();
         graph.putService(FareService.class, fareServiceFactory.makeFareService());
+        graph.putService(ServiceIdToNumberService.class, new ServiceIdToNumberService(context.serviceIds));
       }
 
     private FrequencyBasedTripPattern makeFrequencyPattern(Graph graph, Trip trip,
             List<StopTime> stopTimes) {
         
-        FrequencyBasedTripPattern pattern = new FrequencyBasedTripPattern(trip, stopTimes.size());
+        FrequencyBasedTripPattern pattern = new FrequencyBasedTripPattern(trip, stopTimes.size(), getServiceId(trip));
         TraverseMode mode = GtfsLibrary.getTraverseMode(trip.getRoute());
         int lastStop = stopTimes.size() - 1;
 
@@ -571,8 +573,9 @@ public class GTFSPatternHopFactory {
             TransitStopDepart stopDepart = context.stopDepartNodes.get(s0);
             TransitStopArrive stopArrive = context.stopArriveNodes.get(s1);
 
-            Edge board = new FrequencyBoard(stopDepart, psv0depart, pattern, i, mode);
-            Edge alight = new FrequencyAlight(psv1arrive, stopArrive, pattern, i, mode);
+            final int serviceId = getServiceId(trip);
+            Edge board = new FrequencyBoard(stopDepart, psv0depart, pattern, i, mode, serviceId);
+            Edge alight = new FrequencyAlight(psv1arrive, stopArrive, pattern, i, mode, serviceId);
             createdEdges.add(board);
             createdEdges.add(alight);
         }
@@ -830,7 +833,7 @@ public class GTFSPatternHopFactory {
     }
 
     private BasicTripPattern makeTripPattern(Graph graph, Trip trip, List<StopTime> stopTimes) {
-        BasicTripPattern tripPattern = new BasicTripPattern(trip, stopTimes);
+        BasicTripPattern tripPattern = new BasicTripPattern(trip, stopTimes, getServiceId(trip));
 
         TraverseMode mode = GtfsLibrary.getTraverseMode(trip.getRoute());
         int lastStop = stopTimes.size() - 1;
@@ -912,6 +915,16 @@ public class GTFSPatternHopFactory {
         return tripPattern;
     }
 
+    private int getServiceId(Trip trip) {
+        AgencyAndId gtfsId = trip.getServiceId();
+        Integer id = context.serviceIds.get(gtfsId);
+        if (id == null) {
+            id = context.serviceIds.size();
+            context.serviceIds.put(gtfsId, id);
+        }
+        return id;
+    }
+
     private void clearCachedData() {
         _log.debug("shapes=" + _geometriesByShapeId.size());
         _log.debug("segments=" + _geometriesByShapeSegmentKey.size());
@@ -961,6 +974,8 @@ public class GTFSPatternHopFactory {
         PatternStopVertex psv0arrive, psv0depart, psv1arrive = null;
         ArrayList<Edge> created = new ArrayList<Edge>();
         
+        int serviceId = getServiceId(trip);
+        
         for (int i = 0; i < stopTimes.size() - 1; i++) {
             StopTime st0 = stopTimes.get(i);
             Stop s0 = st0.getStop();
@@ -999,7 +1014,7 @@ public class GTFSPatternHopFactory {
             psv1arrive = new PatternArriveVertex(graph, trip, st1);
 
             new Dwell(psv0arrive, psv0depart, st0);
-            Hop hop = new Hop(psv0depart, psv1arrive, st0, st1, trip);
+            Hop hop = new Hop(psv0depart, psv1arrive, st0, st1, trip, serviceId);
             created.add(hop);
             hop.setGeometry(getHopGeometry(graph, trip.getShapeId(), st0, st1, psv0depart,
                     psv1arrive));

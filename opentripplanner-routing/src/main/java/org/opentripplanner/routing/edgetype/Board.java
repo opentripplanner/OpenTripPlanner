@@ -118,7 +118,7 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
             long current_time = state0.getTime();
 
             /* check if this trip is running or not */
-            AgencyAndId serviceId = hop.getServiceId();
+            int serviceId = hop.getServiceId();
             int wait = -1;
             for (ServiceDay sd : rctx.serviceDays) {
                 int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
@@ -167,5 +167,9 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
     public State optimisticTraverse(State s0) {
         StateEditor s1 = s0.edit(this);
         return s1.makeState();
+    }
+
+    public int getServiceId() {
+        return hop.getServiceId();
     }
 }
