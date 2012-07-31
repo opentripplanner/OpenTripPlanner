@@ -16,6 +16,7 @@ package org.opentripplanner.graph_builder.impl.ned;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -148,10 +149,11 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
         log.debug("Assigning missing elevations");
 
         BinHeap<ElevationRepairState> pq = new BinHeap<ElevationRepairState>();
-        BinHeap<ElevationRepairState> secondary_pq = new BinHeap<ElevationRepairState>();
 
         // elevation for each vertex (known or interpolated)
         HashMap<Vertex, Double> elevations = new HashMap<Vertex, Double>();
+
+        HashSet<Vertex> closed = new HashSet<Vertex>();
 
         // initialize queue with all vertices which already have known elevation
         for (EdgeWithElevation e : edgesWithElevation) {
@@ -181,16 +183,8 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
             double key = pq.peek_min_key();
             ElevationRepairState state = pq.extract_min();
 
-            if (pq.empty() && secondary_pq != null) {
-                pq = secondary_pq;
-                secondary_pq = null;
-            }
-
-            if (key != 0 && elevations.containsKey(state.vertex)) {
-                // we have already explored this vertex; we might need to do something here
-                // but for now let's not.
-                continue;
-            }
+            if (closed.contains(state.vertex)) continue;
+            closed.add(state.vertex);
 
             ElevationRepairState curState = state;
             Vertex initialVertex = null;
