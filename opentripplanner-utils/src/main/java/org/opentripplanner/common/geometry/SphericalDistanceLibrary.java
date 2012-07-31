@@ -13,12 +13,12 @@
 
 package org.opentripplanner.common.geometry;
 
-import static java.lang.Math.atan2;
-import static java.lang.Math.cos;
-import static java.lang.Math.sin;
-import static java.lang.Math.sqrt;
-import static java.lang.Math.toDegrees;
-import static java.lang.Math.toRadians;
+import static org.apache.commons.math3.util.FastMath.atan2;
+import static org.apache.commons.math3.util.FastMath.cos;
+import static org.apache.commons.math3.util.FastMath.sin;
+import static org.apache.commons.math3.util.FastMath.sqrt;
+import static org.apache.commons.math3.util.FastMath.toDegrees;
+import static org.apache.commons.math3.util.FastMath.toRadians;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;

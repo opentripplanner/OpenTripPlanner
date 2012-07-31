@@ -33,5 +33,10 @@
       <artifactId>httpclient</artifactId>
       <version>4.1.2</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-math3</artifactId>
+      <version>3.0</version>
+    </dependency>
   </dependencies>
 </project>
