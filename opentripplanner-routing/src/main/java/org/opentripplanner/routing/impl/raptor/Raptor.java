@@ -238,7 +238,7 @@ public class Raptor implements PathService {
     }
 
     private void round(RaptorData data, RoutingRequest options, RoutingRequest walkOptions,
-            RaptorPathSet cur, int nBoardings) {
+            final RaptorPathSet cur, int nBoardings) {
 
         Set<RaptorStop> visitedLastRound = cur.visitedLastRound;
         Set<RaptorRoute> routesToVisit = new HashSet<RaptorRoute>();
@@ -605,7 +605,12 @@ public class Raptor implements PathService {
 
                 @Override
                 public ShortestPathTree create(RoutingRequest options) {
-                    MultiShortestPathTree result = new MultiShortestPathTree(options);
+                    ShortestPathTree result;
+                    if (cur.spt == null) {
+                        result = new MultiShortestPathTree(options);
+                    } else {
+                        result = cur.spt;
+                    }
                     for (State state : startPoints.subList(1, startPoints.size())) {
                         result.add(state);
                     }
@@ -615,7 +620,7 @@ public class Raptor implements PathService {
             });
 
             //TODO: include existing bounding states
-            final TargetBound bounder = new TargetBound(options.rctx.target, cur.dijkstraBoundingStates, cur.boundingSpt);
+            final TargetBound bounder = new TargetBound(options.rctx.target, cur.dijkstraBoundingStates);
             dijkstra.setSearchTerminationStrategy(bounder);
             dijkstra.setSkipTraverseResultStrategy(bounder);
 
@@ -623,8 +628,8 @@ public class Raptor implements PathService {
             if (!bounder.bounders.isEmpty()) {
                 cur.dijkstraBoundingStates = bounder.bounders;
             }
-            if (cur.boundingSpt == null)
-                cur.boundingSpt = spt;
+            if (cur.spt == null)
+                cur.spt = spt;
         }
 
         final List<? extends State> targetStates = spt.getStates(walkOptions.rctx.target);

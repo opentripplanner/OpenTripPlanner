@@ -33,7 +33,7 @@ public class RaptorPathSet {
     HashMap<RaptorStop, StopNearTarget> stopsNearTarget = new HashMap<RaptorStop, StopNearTarget>();
     public List<RaptorState> boundingStates = new ArrayList<RaptorState>();
     public List<State> dijkstraBoundingStates;
-    public ShortestPathTree boundingSpt;
+    public ShortestPathTree spt;
     
     @SuppressWarnings("unchecked")
     RaptorPathSet(int nStops) {

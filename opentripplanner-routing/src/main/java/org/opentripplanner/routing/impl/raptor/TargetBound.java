@@ -41,9 +41,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
 
     //private List<RaptorState> boundingStates;
 
-    private ShortestPathTree boundingSpt;
-
-    public TargetBound(Vertex realTarget, List<State> dijkstraBoundingStates, ShortestPathTree boundingSpt) {
+    public TargetBound(Vertex realTarget, List<State> dijkstraBoundingStates) {
         this.realTarget = realTarget;
         this.realTargetCoordinate = realTarget.getCoordinate();
         this.distanceToNearestTransitStop = realTarget.getDistanceToNearestTransitStop();
@@ -53,7 +51,6 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
         } else {
             bounders = new ArrayList<State>();
         }
-        this.boundingSpt = boundingSpt;
     }
 
     @Override
@@ -69,19 +66,6 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
     public boolean shouldSkipTraversalResult(Vertex origin, Vertex target, State parent,
             State current, ShortestPathTree spt, RoutingRequest traverseOptions) {
         final Vertex vertex = current.getVertex();
-
-        if (boundingSpt != null) {
-            final List<? extends State> states = boundingSpt.getStates(vertex);
-            if (states != null) {
-                for (State boundingState : states) {
-                    if (current.getWalkDistance() >= boundingState.getWalkDistance() &&
-                            current.getTime() >= boundingState.getTime()) {
-                        return true;
-                    }
-                }
-            }
-        }
-
         final double targetDistance = distanceLibrary.fastDistance(realTargetCoordinate.x, realTargetCoordinate.y,
                 vertex.getX(), vertex.getY());
 
@@ -131,9 +115,6 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
             }
         }
 
-        if (boundingSpt != null) {
-            boundingSpt.add(current);
-        }
         return false;
     }
 
