@@ -29,7 +29,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 
 public class TargetBound implements SearchTerminationStrategy, SkipTraverseResultStrategy {
 
-    List<State> bounders = new ArrayList<State>();
+    List<State> bounders;
 
     private Vertex realTarget;
 
@@ -41,11 +41,16 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
 
     private List<RaptorState> boundingStates;
 
-    public TargetBound(Vertex realTarget, List<RaptorState> boundingStates) {
+    public TargetBound(Vertex realTarget, List<RaptorState> boundingStates, List<State> bounders) {
         this.realTarget = realTarget;
         this.realTargetCoordinate = realTarget.getCoordinate();
         this.distanceToNearestTransitStop = realTarget.getDistanceToNearestTransitStop();
         this.boundingStates = boundingStates;
+        if (bounders == null) {
+            this.bounders = new ArrayList<State>();
+        } else {
+            this.bounders = bounders;
+        }
     }
 
     @Override
@@ -108,7 +113,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
 
             //adjusting the ratio between stateWeight and bounderWeight to 1:1 is worth about 3%
             //so not really worth it
-            if (bounderWeight < stateWeight * 4) {
+            if (bounderWeight < stateWeight) {
                 return true;
             }
         }

@@ -20,6 +20,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.opentripplanner.routing.core.State;
+
 public class RaptorPathSet {
     List<RaptorState>[] statesByStop;
     private List<RaptorState> targetStates = new ArrayList<RaptorState>();
@@ -29,6 +31,7 @@ public class RaptorPathSet {
     Set<RaptorStop> visitedLastRound = Collections.emptySet();
     HashMap<RaptorStop, StopNearTarget> stopsNearTarget = new HashMap<RaptorStop, StopNearTarget>();
     public List<RaptorState> boundingStates = new ArrayList<RaptorState>();
+    public List<State> dijkstraBoundingStates;
     
     @SuppressWarnings("unchecked")
     RaptorPathSet(int nStops) {
