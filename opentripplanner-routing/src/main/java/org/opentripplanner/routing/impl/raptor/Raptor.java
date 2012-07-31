@@ -624,6 +624,7 @@ public class Raptor implements PathService {
             dijkstra.setSearchTerminationStrategy(bounder);
             dijkstra.setSkipTraverseResultStrategy(bounder);
             
+            //Do local search
             spt = dijkstra.getShortestPathTree(startPoints.get(0));
             if (!bounder.bounders.isEmpty()) {
                 cur.dijkstraBoundingStates = bounder.bounders;
