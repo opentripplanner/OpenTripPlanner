@@ -1,3 +1,16 @@
+/* This program is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
 package org.opentripplanner.routing.impl.raptor;
 
 import java.util.ArrayList;
@@ -81,13 +94,23 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
             }
         }
 */
+        double stateWeight = optimisticDistance + current.getTime() + minTime - traverseOptions.dateTime;
+
         for (State bounder : bounders) {
 
-            if (optimisticDistance < bounder.getWalkDistance())
-                continue; // this path might win on distance
-
-            if (bounder.getTime() < current.getTime() + minTime)
+            if (optimisticDistance > bounder.getWalkDistance() && current.getTime() + minTime > bounder.getTime()) 
                 return true; // this path won't win on either time or distance
+
+            //check some combination of distance and time; a new path
+            //must not lose too badly.  This gets most of its power from time differences
+            //rather than walk differences.
+            double bounderWeight = bounder.getWalkDistance() + bounder.getTime() - traverseOptions.dateTime;
+
+            //adjusting the ratio between stateWeight and bounderWeight to 1:1 is worth about 3%
+            //so not really worth it
+            if (bounderWeight < stateWeight * 4) {
+                return true;
+            }
         }
         return false;
     }
