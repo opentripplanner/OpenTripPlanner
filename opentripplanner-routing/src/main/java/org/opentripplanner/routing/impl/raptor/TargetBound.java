@@ -90,16 +90,18 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
 
         // this makes speed worse for some reason.  Oh, probably because any
         // searches cut off here don't dominate other searches?
+
+        double stateWeight = optimisticDistance + current.getTime() + minTime - traverseOptions.dateTime;
 /*
         for (RaptorState bounder : boundingStates) {
-            if (optimisticDistance < bounder.walkDistance)
-                continue;
-            if (current.getTime() + minTime > bounder.arrivalTime) {
+            if (optimisticDistance > bounder.walkDistance && current.getTime() + minTime > bounder.arrivalTime)
                 return true;
-            }
-        }
-*/
-        double stateWeight = optimisticDistance + current.getTime() + minTime - traverseOptions.dateTime;
+                
+                double bounderWeight = bounder.walkDistance + bounder.arrivalTime - traverseOptions.dateTime;
+                if (bounderWeight * 4 < stateWeight) {
+                    return true;
+                }
+        }*/
 
         for (State bounder : bounders) {
 
@@ -111,9 +113,10 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
             //rather than walk differences.
             double bounderWeight = bounder.getWalkDistance() + bounder.getTime() - traverseOptions.dateTime;
 
-            //adjusting the ratio between stateWeight and bounderWeight to 1:1 is worth about 3%
-            //so not really worth it
-            if (bounderWeight < stateWeight) {
+            //adjusting the ratio between stateWeight and bounderWeight to 1:1 is worth about 50% (over 4:1) 
+            //Most of that improvement, unfortunately, comes at the wrong end -- 2:1 is only about 5%.  Also,
+            //1:1 ignores a number of reasonable-looking routes which even 2:1 finds.
+            if (bounderWeight * 4 < stateWeight) {
                 return true;
             }
         }
