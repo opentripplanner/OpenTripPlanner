@@ -90,20 +90,18 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
 
         double stateTime = current.getTime() + minTime - traverseOptions.dateTime;
         
-        // this makes speed worse for some reason.  Oh, probably because any
-        // searches cut off here don't dominate other searches?
-
+        // this makes speed worse for some reason. I have no idea why.
 /*
         for (RaptorState bounder : boundingStates) {
             if (optimisticDistance > bounder.walkDistance && current.getTime() + minTime > bounder.arrivalTime)
                 return true;
                 
-                double bounderWeight = bounder.walkDistance + bounder.arrivalTime - traverseOptions.dateTime;
-                if (bounderWeight * 4 < stateWeight) {
+                double bounderTime = bounder.arrivalTime - traverseOptions.dateTime;
+                if (bounderTime * 1.5 < stateTime) {
                     return true;
                 }
-        }*/
-
+        }
+*/
         for (State bounder : bounders) {
 
             if (optimisticDistance > bounder.getWalkDistance() && current.getTime() + minTime > bounder.getTime()) 
