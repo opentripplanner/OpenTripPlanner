@@ -94,7 +94,6 @@ public class Raptor implements PathService {
         walkOptions.setModes(modes);
         RaptorPathSet routeSet = new RaptorPathSet(data.stops.length);
 
-        options.maxTransfers += 2;
         for (int i = 0; i < options.getMaxTransfers() + 2; ++i) {
             round(data, options, walkOptions, routeSet, i);
             /*
@@ -462,9 +461,6 @@ public class Raptor implements PathService {
             }
         } else {
 
-            if (options.rctx.graph.getService(TransitLocalStreetService.class) != null)
-                dijkstra.setSkipEdgeStrategy(new SkipNonTransferEdgeStrategy(options));
-
             final List<State> startPoints = new ArrayList<State>();
 /*
             RegionData regionData = data.regionData;
@@ -623,10 +619,10 @@ public class Raptor implements PathService {
             });
 
             //TODO: include existing bounding states
-            final TargetBound bounder = new TargetBound(options.rctx.target, cur.dijkstraBoundingStates);
+            final TargetBound bounder = new TargetBound(options.rctx.graph, options.rctx.target, cur.dijkstraBoundingStates);
             dijkstra.setSearchTerminationStrategy(bounder);
             dijkstra.setSkipTraverseResultStrategy(bounder);
-
+            
             spt = dijkstra.getShortestPathTree(startPoints.get(0));
             if (!bounder.bounders.isEmpty()) {
                 cur.dijkstraBoundingStates = bounder.bounders;
