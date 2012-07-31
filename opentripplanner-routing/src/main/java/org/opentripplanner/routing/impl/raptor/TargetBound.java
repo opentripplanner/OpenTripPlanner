@@ -39,18 +39,21 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
 
     private double distanceToNearestTransitStop;
 
-    private List<RaptorState> boundingStates;
+    //private List<RaptorState> boundingStates;
 
-    public TargetBound(Vertex realTarget, List<RaptorState> boundingStates, List<State> bounders) {
+    private ShortestPathTree boundingSpt;
+
+    public TargetBound(Vertex realTarget, List<State> dijkstraBoundingStates, ShortestPathTree boundingSpt) {
         this.realTarget = realTarget;
         this.realTargetCoordinate = realTarget.getCoordinate();
         this.distanceToNearestTransitStop = realTarget.getDistanceToNearestTransitStop();
-        this.boundingStates = boundingStates;
-        if (bounders == null) {
-            this.bounders = new ArrayList<State>();
+        //this.boundingStates = boundingStates;
+        if (dijkstraBoundingStates != null) {
+            bounders = dijkstraBoundingStates;
         } else {
-            this.bounders = bounders;
+            bounders = new ArrayList<State>();
         }
+        this.boundingSpt = boundingSpt;
     }
 
     @Override
@@ -66,8 +69,21 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
     public boolean shouldSkipTraversalResult(Vertex origin, Vertex target, State parent,
             State current, ShortestPathTree spt, RoutingRequest traverseOptions) {
         final Vertex vertex = current.getVertex();
-        final double targetDistance = distanceLibrary.fastDistance(realTargetCoordinate,
-                vertex.getCoordinate());
+
+        if (boundingSpt != null) {
+            final List<? extends State> states = boundingSpt.getStates(vertex);
+            if (states != null) {
+                for (State boundingState : states) {
+                    if (current.getWalkDistance() >= boundingState.getWalkDistance() &&
+                            current.getTime() >= boundingState.getTime()) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        final double targetDistance = distanceLibrary.fastDistance(realTargetCoordinate.x, realTargetCoordinate.y,
+                vertex.getX(), vertex.getY());
 
         final double remainingWalk = traverseOptions.maxWalkDistance
                 - current.getWalkDistance();
@@ -113,6 +129,10 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
             if (bounderTime * 1.5 < stateTime) {
                 return true;
             }
+        }
+
+        if (boundingSpt != null) {
+            boundingSpt.add(current);
         }
         return false;
     }
