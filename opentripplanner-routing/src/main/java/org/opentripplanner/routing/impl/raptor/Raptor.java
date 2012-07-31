@@ -558,6 +558,9 @@ public class Raptor implements PathService {
                 state.walkDistance += minWalk;
 
                 for (RaptorState bound : cur.boundingStates) {
+                    if (bound == state) {
+                        break; //do not eliminate bounding states
+                    }
                     if (eDominates(bound, state)) {
                         state.arrivalTime -= minTime;
                         state.walkDistance -= minWalk;
