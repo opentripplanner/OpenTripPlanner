@@ -45,10 +45,12 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
 
     private TransitLocalStreetService transitLocalStreets;
 
+    private double speedUpperBound;
+
     //private List<RaptorState> boundingStates;
 
-    public TargetBound(Graph graph, Vertex realTarget, List<State> dijkstraBoundingStates) {
-        this.realTarget = realTarget;
+    public TargetBound(RoutingRequest options, List<State> dijkstraBoundingStates) {
+        this.realTarget = options.rctx.target;
         this.realTargetCoordinate = realTarget.getCoordinate();
         this.distanceToNearestTransitStop = realTarget.getDistanceToNearestTransitStop();
         //this.boundingStates = boundingStates;
@@ -57,7 +59,8 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
         } else {
             bounders = new ArrayList<State>();
         }
-        transitLocalStreets = graph.getService(TransitLocalStreetService.class);
+        transitLocalStreets = options.rctx.graph.getService(TransitLocalStreetService.class);
+        speedUpperBound = options.getSpeedUpperBound();
     }
 
     @Override
@@ -97,7 +100,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
 
         final double optimisticDistance = current.getWalkDistance() + minWalk;
         minTime += (targetDistance - minWalk) / Raptor.MAX_TRANSIT_SPEED + minWalk
-                / current.getOptions().getSpeedUpperBound();
+                / speedUpperBound;
 
         double stateTime = current.getTime() + minTime - traverseOptions.dateTime;
         

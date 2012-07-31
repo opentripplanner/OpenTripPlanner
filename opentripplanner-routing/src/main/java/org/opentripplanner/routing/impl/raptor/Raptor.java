@@ -619,7 +619,7 @@ public class Raptor implements PathService {
             });
 
             //TODO: include existing bounding states
-            final TargetBound bounder = new TargetBound(options.rctx.graph, options.rctx.target, cur.dijkstraBoundingStates);
+            final TargetBound bounder = new TargetBound(options, cur.dijkstraBoundingStates);
             dijkstra.setSearchTerminationStrategy(bounder);
             dijkstra.setSkipTraverseResultStrategy(bounder);
             
