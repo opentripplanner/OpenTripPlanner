@@ -13,6 +13,7 @@
 
 package org.opentripplanner.common.geometry;
 
+import static org.apache.commons.math3.util.FastMath.abs;
 import static org.apache.commons.math3.util.FastMath.atan2;
 import static org.apache.commons.math3.util.FastMath.cos;
 import static org.apache.commons.math3.util.FastMath.sin;
@@ -97,13 +98,13 @@ public class SphericalDistanceLibrary implements DistanceLibrary {
      */
     public final double fastDistance(double lat1, double lon1, double lat2, double lon2,
             double radius) {
-    	if (Math.abs(lat1 - lat2) > MAX_LAT_DELTA_DEG
-    			|| Math.abs(lon1 - lon2) > MAX_LON_DELTA_DEG)
+    	if (abs(lat1 - lat2) > MAX_LAT_DELTA_DEG
+    			|| abs(lon1 - lon2) > MAX_LON_DELTA_DEG)
     		return distance(lat1, lon1, lat2, lon2, radius);
 
-    	double dLat = Math.toRadians(lat2 - lat1);
-        double dLon = Math.toRadians(lon2 - lon1) * Math.cos(Math.toRadians((lat1 + lat2) / 2));
-        return radius * Math.sqrt(dLat * dLat + dLon * dLon) * MAX_ERR_INV;
+    	double dLat = toRadians(lat2 - lat1);
+        double dLon = toRadians(lon2 - lon1) * cos(toRadians((lat1 + lat2) / 2));
+        return radius * sqrt(dLat * dLat + dLon * dLon) * MAX_ERR_INV;
     }
 
     private final double p2(double a) {
@@ -124,7 +125,7 @@ public class SphericalDistanceLibrary implements DistanceLibrary {
         double lonRadians = toRadians(lon);
 
         double latRadius = radiusOfEarth;
-        double lonRadius = Math.cos(latRadians) * radiusOfEarth;
+        double lonRadius = cos(latRadians) * radiusOfEarth;
 
         double latOffset = latDistance / latRadius;
         double lonOffset = lonDistance / lonRadius;
