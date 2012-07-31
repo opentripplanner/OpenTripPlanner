@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.impl.raptor;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -32,6 +33,7 @@ import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.edgetype.Board;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternDwell;
@@ -62,21 +64,29 @@ public class Raptor implements PathService {
 
     private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
+    private List<ServiceDay> cachedServiceDays;
+
+    private RaptorData cachedRaptorData;
+
     @Override
     public List<GraphPath> getPaths(RoutingRequest options) {
 
+        
         if (options.rctx == null) {
             options.setRoutingContext(graphService.getGraph(options.getRouterId()));
             options.rctx.pathParsers = new PathParser[1];
             options.rctx.pathParsers[0] = new BasicPathParser();
         }
         Graph graph = graphService.getGraph(options.getRouterId());
+
         RaptorData data = graph.getService(RaptorDataService.class).getData();
 
-        options.setAlightSlack(0);
-        options.setBoardSlack(0);
-        options.setTransferSlack(0);
-
+        /* this does not actually affect speed either way (perhaps unfortunately)
+        options.setAlightSlack(120);
+        options.setBoardSlack(120);
+        options.setTransferSlack(240);
+         */
+        
         RoutingRequest walkOptions = options.clone();
         walkOptions.rctx.pathParsers = new PathParser[0];
         TraverseModeSet modes = options.getModes().clone();
@@ -84,10 +94,7 @@ public class Raptor implements PathService {
         walkOptions.setModes(modes);
         RaptorPathSet routeSet = new RaptorPathSet(data.stops.length);
 
-        // idea: precompute paths from destination to stops, so that
-        // when we hit any such stop, we have a path, which will let us prune harder
-        // before walk searches.
-
+        options.maxTransfers += 2;
         for (int i = 0; i < options.getMaxTransfers() + 2; ++i) {
             round(data, options, walkOptions, routeSet, i);
             /*
@@ -164,6 +171,70 @@ public class Raptor implements PathService {
         }
 
         return paths;
+    }
+
+    /**
+     * Prune raptor data to include only routes and boardings which have trips today.
+     * Doesn't actually improve speed
+     */
+    private RaptorData pruneDataForServiceDays(Graph graph, ArrayList<ServiceDay> serviceDays) {
+
+        if (serviceDays.equals(cachedServiceDays)) return cachedRaptorData;
+        //you are here: need to reduce list of boards
+        RaptorData data = graph.getService(RaptorDataService.class).getData();
+        RaptorData pruned = new RaptorData();
+        pruned.raptorStopsForStopId = data.raptorStopsForStopId;
+        pruned.stops = data.stops;
+        pruned.routes = new ArrayList<RaptorRoute>();
+        pruned.routesForStop = new List[pruned.stops.length];
+
+        for (RaptorRoute route : data.routes) {
+            ArrayList<Integer> keep = new ArrayList<Integer>();
+
+            for (int i = 0; i < route.boards[0].length; ++i) {
+                Edge board = route.boards[0][i];
+                int serviceId;
+                if (board instanceof PatternBoard) {
+                    serviceId = ((PatternBoard) board).getPattern().getServiceId();
+                } else if (board instanceof Board) {
+                    serviceId = ((Board) board).getServiceId();
+                } else {
+                    System.out.println("Unexpected nonboard among boards");
+                    continue;
+                }
+                for (ServiceDay day : serviceDays) {
+                    if (day.serviceIdRunning(serviceId)) {
+                        keep.add(i);
+                        break;
+                    }
+                }
+            }
+            if (keep.isEmpty()) continue;
+            int nPatterns = keep.size();
+            RaptorRoute prunedRoute = new RaptorRoute(route.getNStops(), nPatterns);
+            for (int stop = 0; stop < route.getNStops() - 1; ++stop) {
+                for (int pattern = 0; pattern < nPatterns; ++pattern) {
+                    prunedRoute.boards[stop][pattern] = route.boards[stop][keep.get(pattern)]; 
+                }
+            }
+            pruned.routes.add(route);
+            for (RaptorStop stop : route.stops) {
+                List<RaptorRoute> routes = pruned.routesForStop[stop.index];
+                if (routes == null) {
+                    routes = new ArrayList<RaptorRoute>();
+                    pruned.routesForStop[stop.index] = routes;
+                }
+                routes.add(route);
+            }
+        }
+        for (RaptorStop stop : data.stops) {
+            if (pruned.routesForStop[stop.index] == null) {
+                pruned.routesForStop[stop.index] = Collections.emptyList();
+            }
+        }
+        cachedServiceDays = serviceDays;
+        cachedRaptorData = pruned;
+        return pruned;
     }
 
     private void round(RaptorData data, RoutingRequest options, RoutingRequest walkOptions,
