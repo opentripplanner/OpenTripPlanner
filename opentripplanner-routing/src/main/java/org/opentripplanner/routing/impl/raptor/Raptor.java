@@ -359,15 +359,17 @@ public class Raptor implements PathService {
                         RaptorState bound = new RaptorState();
                         bound.arrivalTime = newState.arrivalTime + nearTarget.time;
                         bound.walkDistance = newState.walkDistance + nearTarget.walkDistance;
-                        bound.nBoardings = newState.nBoardings;
-                        bound.stop = stop;
+                        if (bound.walkDistance <= options.maxWalkDistance) {
+                            bound.nBoardings = newState.nBoardings;
+                            bound.stop = stop;
 
-                        for (RaptorState oldBound : cur.boundingStates) {
-                            if (eDominates(oldBound, bound)) {
-                                continue CONTINUE;
+                            for (RaptorState oldBound : cur.boundingStates) {
+                                if (eDominates(oldBound, bound)) {
+                                    continue CONTINUE;
+                                }
                             }
+                            cur.boundingStates.add(bound);
                         }
-                        cur.boundingStates.add(bound);
                     }
                 }
 
@@ -663,10 +665,6 @@ public class Raptor implements PathService {
                 statesByStop[stop.index] = states;
             }
             double minWalk = distanceToNearestTransitStop;
-            // maxWalkDistance bounding
-            // this bound could be tighter by having distance to each nearby route or stop?
-            if (state.getWalkDistance() + minWalk > options.getMaxWalkDistance())
-                continue SPTSTATE;
 
             RaptorState baseState = (RaptorState) state.getExtension("raptorParent");
             RaptorState newState = new RaptorState();
