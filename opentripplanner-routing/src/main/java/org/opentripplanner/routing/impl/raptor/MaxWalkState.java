@@ -36,6 +36,11 @@ public class MaxWalkState extends State {
         return walkDistance <= other.getWalkDistance() * 1.05 
                 && this.getTime() <= other.getTime() + 30; 
     }
+    
+    @Override
+    public boolean exceedsWeightLimit(double maxWeight) {
+        return false;
+    }
 
     static class MaxWalkStateEditor extends StateEditor {
 
