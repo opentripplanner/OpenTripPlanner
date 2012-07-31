@@ -118,8 +118,8 @@ public class RaptorDataBuilder implements GraphBuilder {
         nTotalStops = data.stops.length;
         // initNearbyStops();
 
-        RegionData regions = makeRegions(graph, data);
-        data.regionData = regions;
+        //RegionData regions = makeRegions(graph, data);
+        //data.regionData = regions;
         graph.putService(RaptorDataService.class, new RaptorDataService(data));
 
     }

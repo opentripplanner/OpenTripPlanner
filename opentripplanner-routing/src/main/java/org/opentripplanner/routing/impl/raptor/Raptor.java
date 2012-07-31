@@ -393,7 +393,7 @@ public class Raptor implements PathService {
                 dijkstra.setSkipEdgeStrategy(new SkipNonTransferEdgeStrategy(options));
 
             final List<State> startPoints = new ArrayList<State>();
-
+/*
             RegionData regionData = data.regionData;
             
             List<Integer> destinationRegions = regionData.getRegionsForVertex(options.rctx.target);
@@ -401,7 +401,7 @@ public class Raptor implements PathService {
             for (int destinationRegion : destinationRegions) {
                 minWalks.add(regionData.minWalk[destinationRegion]);
             }
-            
+            */
             STARTWALK: for (RaptorState state : createdStates) {
                 if (false) {
                     double maxWalk = options.getMaxWalkDistance() - state.walkDistance
