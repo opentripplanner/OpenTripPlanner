@@ -48,6 +48,7 @@ import org.opentripplanner.routing.pathparser.BasicPathParser;
 import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
+import org.opentripplanner.routing.spt.ArrayMultiShortestPathTree;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.MultiShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -606,7 +607,7 @@ public class Raptor implements PathService {
                 public ShortestPathTree create(RoutingRequest options) {
                     ShortestPathTree result;
                     if (cur.spt == null) {
-                        result = new MultiShortestPathTree(options);
+                        result = new ArrayMultiShortestPathTree(options);
                     } else {
                         result = cur.spt;
                     }
