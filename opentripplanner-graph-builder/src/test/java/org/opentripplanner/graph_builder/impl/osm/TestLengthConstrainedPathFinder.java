@@ -61,7 +61,7 @@ public class TestLengthConstrainedPathFinder extends TestCase {
         for (boolean prune : new boolean[] {false, true}) {
             System.out.printf("%s\n", prune);
             long elapsed = 0;
-            for (int pathLength = 100; elapsed < 2000 && pathLength < 4000; pathLength += 50) {
+            for (int pathLength = 100; elapsed < 2000 && pathLength < 1000; pathLength += 50) {
                 long t0 = System.currentTimeMillis();
                 finder = new LengthConstrainedPathFinder(tv1, tv2, pathLength, 0, prune);
                 solutions = finder.solveDepthFirst();
