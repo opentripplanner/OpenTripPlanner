@@ -19,7 +19,7 @@ otp.config.default_fares = {
 };
 */
 
-otp.osm_att = "Data <a href='http://creativecommons.org/licenses/by-sa/2.0/' target='_blank'> CC-BY-SA </a> by  <a href='http://openstreetmap.org/' target='_blank'> OpenStreetMap.</a> ";
+otp.osm_att = "Map data © <a href='http://www.openstreetmap.org/' target='_blank'>OpenStreetMap</a> contributors, <a href='http://creativecommons.org/licenses/by-sa/2.0/' target='_blank'>CC BY-SA</a>.  ";
 otp.ol_rez = [ 
         156543.03390000000945292413, 
         78271.51695000000472646207, 
