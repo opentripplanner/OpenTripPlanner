@@ -19,6 +19,35 @@ otp.config.default_fares = {
 };
 */
 
+otp.osm_att = "Data <a href='http://creativecommons.org/licenses/by-sa/2.0/' target='_blank'> CC-BY-SA </a> by  <a href='http://openstreetmap.org/' target='_blank'> OpenStreetMap.</a> ";
+otp.ol_rez = [ 
+        156543.03390000000945292413, 
+        78271.51695000000472646207, 
+        39135.75847500000236323103, 
+        19567.87923750000118161552, 
+        9783.93961875000059080776, 
+        4891.96980937500029540388, 
+        2445.98490468750014770194, 
+        1222.99245234375007385097, 
+        611.49622617187503692548, 
+        305.74811308593751846274, 
+        152.87405654296875923137, 
+        76.43702827148437961569, 
+        38.21851413574218980784, 
+        19.10925706787109490392, 
+        9.55462853393554745196, 
+        4.77731426696777372598, 
+        2.38865713348388686299, 
+        1.19432856674194343150, 
+        0.59716428337097171575, 
+        0.29858214168548585787, 
+        0.14929107084274292894, 
+        0.07464553542137146447, 
+        0.03732276771068573223, 
+        0.01866138385534286612, 
+        0.00933069192767143306
+];
+
 
 // step 2: create an object of default otp.config default values (see step3 where we apply this to any existing config)
 otp.config_defaults = {
@@ -114,9 +143,7 @@ otp.config_defaults = {
                ],
                {
                    numZoomLevels: 18,
-                   attribution:"Data<a href='http://creativecommons.org/licenses/by-sa/2.0/' target='_blank'> CC-BY-SA </a>" +
-                   "by<a href='http://openstreetmap.org/' target='_blank'> OpenStreetMap.</a> " +
-                   "Tiles from<a href='http://mapbox.com/about/maps' target='_blank'> MapBox Streets.</a>"
+                   attribution: otp.osm_att + "Tiles from<a href='http://mapbox.com/about/maps' target='_blank'> MapBox Streets.</a>"
                }
            )
            /* comment here to test single / multiple basemaps & layer switcher on/off */
@@ -134,13 +161,12 @@ otp.config_defaults = {
                 ],
                 {
                     numZoomLevels: 17,
-                    attribution:"Data <a href='http://creativecommons.org/licenses/by-sa/2.0/'> CC-BY-SA</a> by <a href='www.opencyclemap.org'>OpenCycleMap </a> and <a href='http://openstreetmap.org/'> Open Street Map</a>"
+                    attribution: otp.osm_att + "and <a href='www.opencyclemap.org' target='_blank'>OpenCycleMap </a>"
                 }
            ),
            // here's the MapQuest baseMap option for basemap tiles
            new OpenLayers.Layer.OSM(
                "OSM MapQuest",[
-                   "http://otile1.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png",
                    "http://otile2.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png",
                    "http://otile3.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png",
                    "http://otile4.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png"
@@ -149,8 +175,23 @@ otp.config_defaults = {
                    sphericalMecator : true,
                    isBaseLayer      : true,
                    numZoomLevels    : 19,
-                   attribution:"Data <a href='http://creativecommons.org/licenses/by-sa/2.0/'> CC-BY-SA </a> by  <a href='http://openstreetmap.org/'> OpenStreetMap</a>."
-                   +" Tiles courtesy of <a href='http://open.mapquest.com/' target='_blank'>MapQuest</a>"
+                   attribution: otp.osm_att + " Tiles courtesy of <a href='http://open.mapquest.com/' target='_blank'>MapQuest</a>"
+               }
+           ),
+           // here's the limited zoom example
+           new OpenLayers.Layer.OSM(
+               "Limited Zoom Example",[
+                   "http://otile2.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png",
+                   "http://otile3.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png",
+                   "http://otile4.mqcdn.com/tiles/1.0.0/osm/${z}/${x}/${y}.png"
+               ],
+               {
+                   serverResolutions : otp.ol_rez,
+                   maxResolution     : 76.43702827148437961569,
+                   sphericalMecator  : true,
+                   isBaseLayer       : true,
+                   numZoomLevels     : 8,
+                   attribution: otp.osm_att + " Tiles courtesy of <a href='http://open.mapquest.com/' target='_blank'>MapQuest</a>"
                }
            )
         ],
