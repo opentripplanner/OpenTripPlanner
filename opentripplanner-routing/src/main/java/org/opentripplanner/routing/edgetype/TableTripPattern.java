@@ -79,8 +79,11 @@ public class TableTripPattern implements TripPattern, Serializable {
     
     int bestDwellTimes[];
 
-    public TableTripPattern(Trip exemplar, ScheduledStopPattern stopPattern) {
+    int serviceId; // optimized serviceId code
+    
+    public TableTripPattern(Trip exemplar, ScheduledStopPattern stopPattern, int serviceId) {
         this.exemplar = exemplar;
+        this.serviceId = serviceId;
         setStopsFromStopPattern(stopPattern);
     }
 
@@ -439,8 +442,7 @@ public class TableTripPattern implements TripPattern, Serializable {
 
 
     public int getServiceId() { 
-        // TODO: save service id indices here
-        return -1;
+        return serviceId;
     }
 
 }

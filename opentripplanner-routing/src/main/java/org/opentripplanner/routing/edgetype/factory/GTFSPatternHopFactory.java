@@ -331,7 +331,7 @@ public class GTFSPatternHopFactory {
             TableTripPattern tripPattern = patterns.get(stopPattern);
             if (tripPattern == null) {
                 // it's the first time we are encountering this stops+pickups+serviceId combination
-                tripPattern = new TableTripPattern(trip, stopPattern);
+                tripPattern = new TableTripPattern(trip, stopPattern, getServiceId(trip));
                 makePatternVerticesAndEdges(graph, tripPattern, trip, stopTimes);
                 patterns.put(stopPattern, tripPattern);
             } 
