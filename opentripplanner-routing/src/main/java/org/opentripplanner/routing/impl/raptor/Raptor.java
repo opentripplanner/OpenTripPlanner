@@ -20,8 +20,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.opentripplanner.common.TurnRestriction;
-import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.T2;
@@ -40,7 +38,6 @@ import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
@@ -73,7 +70,6 @@ public class Raptor implements PathService {
 
     @Override
     public List<GraphPath> getPaths(RoutingRequest options) {
-
         
         if (options.rctx == null) {
             options.setRoutingContext(graphService.getGraph(options.getRouterId()));
@@ -81,7 +77,6 @@ public class Raptor implements PathService {
             options.rctx.pathParsers[0] = new BasicPathParser();
         }
         Graph graph = graphService.getGraph(options.getRouterId());
-
         RaptorData data = graph.getService(RaptorDataService.class).getData();
 
         /* this does not actually affect speed either way (perhaps unfortunately)
@@ -97,6 +92,8 @@ public class Raptor implements PathService {
         walkOptions.setModes(modes);
         RaptorPathSet routeSet = new RaptorPathSet(data.stops.length);
 
+        options.setMaxTransfers(options.maxTransfers + 2);
+        
         for (int i = 0; i < options.getMaxTransfers() + 2; ++i) {
             round(data, options, walkOptions, routeSet, i);
             /*
@@ -278,7 +275,7 @@ public class Raptor implements PathService {
          * have to check if τk−1 (pi ) < τarr (t, pi ) and update t by recomputing et(r, pi ).
          */
         int boardSlack = nBoardings == 1 ? options.getBoardSlack() : (options.getTransferSlack() - options.getAlightSlack());
-        
+        int trips = 0;
         List<RaptorState> createdStates = new ArrayList<RaptorState>();
         System.out.println("Round " + nBoardings);
         final double distanceToNearestTransitStop = options.rctx.target
@@ -392,6 +389,7 @@ public class Raptor implements PathService {
                         if (oldState.route == route)
                             continue; // we got here via this route, so no reason to transfer
 
+                        ++trips;
                         RaptorBoardSpec boardSpec = route.getTripIndex(options,
                                 oldState.arrivalTime + boardSlack, stopNo);
                         if (boardSpec == null)
@@ -427,6 +425,7 @@ public class Raptor implements PathService {
                 states.addAll(newStates);
             }
         }
+        System.out.println("Trips: " + trips);
 
         /*
          * finally, the third stage of round k considers foot- paths. For each foot-path (pi , pj )
@@ -469,11 +468,12 @@ public class Raptor implements PathService {
             RegionData regionData = data.regionData;
             
             List<Integer> destinationRegions = regionData.getRegionsForVertex(options.rctx.target);
-            List<double[]> minWalks = new ArrayList<double[]>(2);
+            List<int[]> minTimes = new ArrayList<int[]>(2);
+            //List<double[]> minWalks = new ArrayList<double[]>(2);
             for (int destinationRegion : destinationRegions) {
-                minWalks.add(regionData.minWalk[destinationRegion]);
+                minTimes.add(regionData.minTime[destinationRegion]);
             }
-            */
+*/
             STARTWALK: for (RaptorState state : createdStates) {
                 if (false) {
                     double maxWalk = options.getMaxWalkDistance() - state.walkDistance
@@ -528,7 +528,7 @@ public class Raptor implements PathService {
 
 
                 //this checks the precomputed table of walk distances by regions to see 
-                //to get a tighter bound on the best posible walk distance to the destination
+                //to get a tigther bound on the best posible walk distance to the destination
                 //it (a) causes weird intermitten planner failures, (b) does not make 
                 //much of a difference
                 
@@ -683,7 +683,6 @@ public class Raptor implements PathService {
                 states = new ArrayList<RaptorState>();
                 statesByStop[stop.index] = states;
             }
-            double minWalk = distanceToNearestTransitStop;
 
             RaptorState baseState = (RaptorState) state.getExtension("raptorParent");
             RaptorState newState = new RaptorState();
@@ -701,6 +700,11 @@ public class Raptor implements PathService {
                     continue SPTSTATE;
                 }
             }
+           
+            //the following does not actually speed things up, probably 
+            //because we're going to recheck it next round with more info  
+
+            double minWalk = distanceToNearestTransitStop;
 
             double targetDistance = distanceLibrary.fastDistance(
                     options.rctx.target.getCoordinate(), vertex.getCoordinate());

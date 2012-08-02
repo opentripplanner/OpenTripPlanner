@@ -15,6 +15,8 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
+import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
@@ -25,6 +27,7 @@ import org.opentripplanner.routing.graph.AbstractVertex;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.impl.raptor.RaptorData;
 import org.opentripplanner.routing.impl.raptor.RaptorRoute;
 import org.opentripplanner.routing.impl.raptor.RaptorStop;
@@ -36,12 +39,16 @@ import org.opentripplanner.routing.transit_index.RouteSegment;
 import org.opentripplanner.routing.transit_index.RouteVariant;
 import org.opentripplanner.routing.vertextype.OnboardVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
 public class RaptorDataBuilder implements GraphBuilder {
 
-    private static final int MAX_REGION_SIZE = 1000;
+    private static final Logger log = LoggerFactory.getLogger(RaptorDataBuilder.class);
+
+    private static final int MAX_REGION_SIZE = 800;
     private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     @SuppressWarnings("unchecked")
@@ -131,81 +138,142 @@ public class RaptorDataBuilder implements GraphBuilder {
                 vertices.add(v);
             }
         }
-        int[] regionForVertex = new int[AbstractVertex.getMaxIndex()];
-        Arrays.fill(regionForVertex, -1);
         
         ArrayList<ArrayList<Vertex>> verticesForRegion = new ArrayList<ArrayList<Vertex>>();
-        split(regionForVertex, verticesForRegion, vertices, 0, true, MAX_REGION_SIZE);
+        int nRegions = split(verticesForRegion, vertices, 0, true, MAX_REGION_SIZE);
         RegionData regions = new RegionData();
-        regions.regionForVertex = regionForVertex;
-        regions.minWalk = new double[verticesForRegion.size()][verticesForRegion.size()];
+        //regions.minWalk = new double[verticesForRegion.size()][verticesForRegion.size()];
+        regions.minTime = new int[nRegions][nRegions];
 
         // now compute minWalk for each region
         
         int regionIndex = 0;
         for (ArrayList<Vertex> region : verticesForRegion) {
-            // find initial spt from all nodes in region
-            HashMap<Vertex, Double> distances = new HashMap<Vertex, Double>();
-            BinHeap<Vertex> queue = new BinHeap<Vertex>();
-            for (Vertex v : region) {
-                queue.insert(v, 0);
-                distances.put(v, 0.0);
+            if (regionIndex % 5 == 0) {
+                log.debug("Building regions: " + regionIndex + " / " + verticesForRegion.size());
             }
-
-            // walk-distance free-transit spt computation
-            HashSet<Vertex> closed = new HashSet<Vertex>();
-            while (!queue.empty()) {
-                Vertex u = queue.extract_min();
-                if (closed.contains(u))
-                    continue;
-                closed.add(u);
-                double distance = distances.get(u);
-                for (Edge e : u.getOutgoing()) {
-                    if (!((e instanceof StreetEdge) || (e instanceof StreetTransitLink))) continue;
-                    double edgeDistance = e.getDistance() + distance;
-                    Vertex v = e.getToVertex();
-                    Double originalDistance = distances.get(v);
-                    if (originalDistance == null || originalDistance > edgeDistance) {
-                        distances.put(v, edgeDistance);
-                        queue.insert(v, edgeDistance);
-                    }
-                    if (v instanceof TransitStop) {
-                        RaptorStop stop = data.raptorStopsForStopId.get(((TransitStop) v)
-                                .getStopId());
-                        if (stop == null)
-                            continue;
-                        for (RaptorRoute route : data.routesForStop[stop.index]) {
-                            for (RaptorStop stopOnRoute : route.stops) {
-                                Vertex stopVertex = stopOnRoute.stopVertex;
-                                originalDistance = distances.get(stopVertex);
-                                if (originalDistance == null || originalDistance > edgeDistance) {
-                                    distances.put(stopVertex, edgeDistance);
-                                    queue.insert(stopVertex, edgeDistance);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            final double[] minWalk = regions.minWalk[regionIndex];
-            Arrays.fill(minWalk, Double.MAX_VALUE);
-            for (Map.Entry<Vertex, Double> entry : distances.entrySet()) {
-                Vertex v = entry.getKey();
-                double distance = entry.getValue();
-                int toRegion = regions.regionForVertex[v.getIndex()];
-                if (toRegion == -1) {
-                    System.out.println("Warning: no region for " + v);
-                    continue;
-                }
-                if (minWalk[toRegion] > distance) {
-                    minWalk[toRegion] = distance;
-                }
-            }
+            //findMinWalkDistance(data, regions, regionIndex, region);
+            findMinTime(graph, data, regions, regionIndex, region);
             regionIndex += 1;
         }
 
         return regions;
     }
+
+    private void findMinWalkDistance(RaptorData data, RegionData regions, int regionIndex,
+            ArrayList<Vertex> region) {
+        // find initial spt from all nodes in region
+        HashMap<Vertex, Double> distances = new HashMap<Vertex, Double>();
+        BinHeap<Vertex> queue = new BinHeap<Vertex>();
+        for (Vertex v : region) {
+            queue.insert(v, 0);
+            distances.put(v, 0.0);
+        }
+
+        // walk-distance free-transit spt computation
+        HashSet<Vertex> closed = new HashSet<Vertex>();
+        while (!queue.empty()) {
+            Vertex u = queue.extract_min();
+            if (closed.contains(u))
+                continue;
+            closed.add(u);
+            double distance = distances.get(u);
+            for (Edge e : u.getOutgoing()) {
+                if (!((e instanceof StreetEdge) || (e instanceof StreetTransitLink))) continue;
+                double edgeDistance = e.getDistance() + distance;
+                Vertex v = e.getToVertex();
+                Double originalDistance = distances.get(v);
+                if (originalDistance == null || originalDistance > edgeDistance) {
+                    distances.put(v, edgeDistance);
+                    queue.insert(v, edgeDistance);
+                }
+                if (v instanceof TransitStop) {
+                    RaptorStop stop = data.raptorStopsForStopId.get(((TransitStop) v)
+                            .getStopId());
+                    if (stop == null)
+                        continue;
+                    for (RaptorRoute route : data.routesForStop[stop.index]) {
+                        for (RaptorStop stopOnRoute : route.stops) {
+                            Vertex stopVertex = stopOnRoute.stopVertex;
+                            originalDistance = distances.get(stopVertex);
+                            if (originalDistance == null || originalDistance > edgeDistance) {
+                                distances.put(stopVertex, edgeDistance);
+                                queue.insert(stopVertex, edgeDistance);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        final double[] minWalk = regions.minWalk[regionIndex];
+        Arrays.fill(minWalk, Double.MAX_VALUE);
+        for (Map.Entry<Vertex, Double> entry : distances.entrySet()) {
+            Vertex v = entry.getKey();
+            double distance = entry.getValue();
+            int toRegion = v.getGroupIndex();
+            if (toRegion == -1) {
+                System.out.println("Warning: no region for " + v);
+                continue;
+            }
+            if (minWalk[toRegion] > distance) {
+                minWalk[toRegion] = distance;
+            }
+        }
+    }
+
+    private void findMinTime(Graph graph, RaptorData data, RegionData regions, int regionIndex,
+            ArrayList<Vertex> region) {
+        // find initial spt from all nodes in region
+        HashMap<Vertex, Integer> times = new HashMap<Vertex, Integer>();
+        BinHeap<Vertex> queue = new BinHeap<Vertex>();
+        for (Vertex v : region) {
+            queue.insert(v, 0);
+            times.put(v, 0);
+        }
+        RoutingRequest options = new RoutingRequest();
+        options.setWalkSpeed(6); //assume slightly fast biking speeds, which should be a good bound
+        //rctx ctor requires this
+        graph.streetIndex = new StreetVertexIndexServiceImpl(graph);
+        options.setRoutingContext(graph, region.get(0), null);
+        options.rctx.serviceDays = new ArrayList<ServiceDay>();
+        options.rctx.serviceDays.add(ServiceDay.universalService(graph));
+
+        // walk-distance free-transit spt computation
+        HashSet<Vertex> closed = new HashSet<Vertex>();
+        while (!queue.empty()) {
+            Vertex u = queue.extract_min();
+            if (closed.contains(u))
+                continue;
+            closed.add(u);
+            int time = times.get(u);
+            for (Edge e : u.getOutgoing()) {
+                final double timeLowerBound = e.timeLowerBound(options);
+                if (Double.isNaN(timeLowerBound)) continue;
+                int edgeTime = (int) (timeLowerBound + time);
+                Vertex v = e.getToVertex();
+                Integer originalTime = times.get(v);
+                if (originalTime == null || originalTime > edgeTime) {
+                    times.put(v, edgeTime);
+                    queue.insert(v, (double) edgeTime);
+                }
+            }
+        }
+        final int[] minTime = regions.minTime[regionIndex];
+        Arrays.fill(minTime, Integer.MAX_VALUE);
+        for (Map.Entry<Vertex, Integer> entry : times.entrySet()) {
+            Vertex v = entry.getKey();
+            int distance = entry.getValue();
+            //int toRegion = regions.regionForVertex[v.getIndex()];
+            int toRegion = v.getGroupIndex();
+            if (toRegion == -1) {
+                continue;
+            }
+            if (minTime[toRegion] > distance) {
+                minTime[toRegion] = distance;
+            }
+        }
+    }
+
 
     class HorizontalVertexComparator implements Comparator<Vertex> {
         @Override
@@ -229,13 +297,13 @@ public class RaptorDataBuilder implements GraphBuilder {
         }
     }
 
-    private int split(int[] regionForVertex, ArrayList<ArrayList<Vertex>> vertexForRegion,
+    private int split(ArrayList<ArrayList<Vertex>> vertexForRegion,
             List<Vertex> vertices, int index, boolean horiz, int regionSize) {
         if (vertices.size() <= regionSize) {
             final ArrayList<Vertex> region = new ArrayList<Vertex>();
             vertexForRegion.add(region);
             for (Vertex vertex : vertices) {
-                regionForVertex[vertex.getIndex()] = index;
+                vertex.setGroupIndex(index);
                 region.add(vertex);
             }
             return index + 1;
@@ -259,14 +327,14 @@ public class RaptorDataBuilder implements GraphBuilder {
             final ArrayList<Vertex> region = new ArrayList<Vertex>();
             vertexForRegion.add(region);
             for (Vertex vertex : vertices) {
-                regionForVertex[vertex.getIndex()] = index;
+                vertex.setGroupIndex(index);
                 region.add(vertex);
             }
             return index + 1;
         }
-        index = split(regionForVertex, vertexForRegion, vertices.subList(0, mid), index, !horiz,
+        index = split(vertexForRegion, vertices.subList(0, mid), index, !horiz,
                 regionSize);
-        index = split(regionForVertex, vertexForRegion, vertices.subList(mid, vertices.size()),
+        index = split(vertexForRegion, vertices.subList(mid, vertices.size()),
                 index, !horiz, regionSize);
         return index;
     }

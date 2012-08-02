@@ -44,7 +44,7 @@ public abstract class AbstractVertex implements Vertex {
 
     private int index;
     
-    private transient int groupIndex = -1;
+    private int groupIndex = -1;
 
     /* short debugging name */
     private final String label;

@@ -105,4 +105,14 @@ public class ServiceDay implements Serializable {
     public int hashCode() {
         return (int) midnight;
     }
+
+    public static ServiceDay universalService(Graph graph) {
+        //FIXME: assumes all service is in the same tz
+        final String agencyId = graph.getAgencyIds().iterator().next();
+        ServiceDay universal = new ServiceDay(graph, 0, graph.getCalendarService(), agencyId);
+        for (int i = 0; i < universal.serviceIdsRunning.length; ++i) {
+            universal.serviceIdsRunning[i] = 0xffffffff;
+        }
+        return universal;
+    }
 }

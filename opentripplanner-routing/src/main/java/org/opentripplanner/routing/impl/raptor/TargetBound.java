@@ -24,6 +24,7 @@ import org.opentripplanner.routing.algorithm.strategies.TransitLocalStreetServic
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.graph.AbstractVertex;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
@@ -45,6 +46,8 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
 
     private double speedUpperBound;
 
+    private List<int[]> minTimesNearEnd;
+
     //private List<RaptorState> boundingStates;
 
     public TargetBound(RoutingRequest options, List<State> dijkstraBoundingStates) {
@@ -59,6 +62,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
         }
         transitLocalStreets = options.rctx.graph.getService(TransitLocalStreetService.class);
         speedUpperBound = options.getSpeedUpperBound();
+        //this.minTimesNearEnd = minTimes;
     }
 
     @Override
@@ -97,9 +101,27 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
             return true;
 
         final double optimisticDistance = current.getWalkDistance() + minWalk;
+        
         minTime += (targetDistance - minWalk) / Raptor.MAX_TRANSIT_SPEED + minWalk
                 / speedUpperBound;
-
+        
+        //oh well, it was worth a try
+/*
+        int index = vertex.getIndex();
+        if (index < AbstractVertex.getMaxIndex()) {
+            int region = vertex.getGroupIndex();
+            double minPrecomputedTime = Double.POSITIVE_INFINITY;
+            if (region != -1) {
+                for (int[] minTimes : minTimesNearEnd) {
+                    int regionMinTime = minTimes[region];
+                    if (regionMinTime < minPrecomputedTime)
+                        minPrecomputedTime = regionMinTime;
+                }
+                if (minPrecomputedTime > minTime)
+                    minTime = minPrecomputedTime;
+            }
+        }
+*/
         double stateTime = current.getTime() + minTime - traverseOptions.dateTime;
         
         // this makes speed worse for some reason. I have no idea why.
