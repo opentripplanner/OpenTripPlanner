@@ -309,13 +309,13 @@ public class NEDDownloader implements NEDTileSource {
             String[] parts = param.split("=");
 
             if (parts[0].equals("lft")) {
-                lft = parts[1];
+                lft = String.format("%.5g", Double.parseDouble(parts[1]));
             } else if (parts[0].equals("rgt")) {
-                rgt = parts[1];
+                rgt = String.format("%.5g", Double.parseDouble(parts[1]));
             } else if (parts[0].equals("top")) {
-                top = parts[1];
+                top = String.format("%.5g", Double.parseDouble(parts[1]));
             } else if (parts[0].equals("bot")) {
-                bot = parts[1];
+                bot = String.format("%.5g", Double.parseDouble(parts[1]));
             }
         }
 

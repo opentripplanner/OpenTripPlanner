@@ -14,7 +14,7 @@
     <context:component-scan base-package="org.opentripplanner.api"/>
 	<context:component-scan base-package="org.opentripplanner.routing.impl"/>
 
-	<bean id="prototypeRoutingRequest" class="org.opentripplanner.routing.core.PrototypeRoutingRequest">
+	<bean id="prototypeRoutingRequest" class="org.opentripplanner.routing.core.RoutingRequest">
 		<!-- Set default routing parameters here -->
 	</bean>
 

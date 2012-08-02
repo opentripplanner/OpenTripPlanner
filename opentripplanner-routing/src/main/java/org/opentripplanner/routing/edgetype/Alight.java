@@ -99,7 +99,7 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
             long current_time = s0.getTime();
 
             /* check if this trip is running or not */
-            AgencyAndId serviceId = hop.getServiceId();
+            int serviceId = hop.getServiceId();
             int wait = -1;
             for (ServiceDay sd : rctx.serviceDays) {
                 int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);

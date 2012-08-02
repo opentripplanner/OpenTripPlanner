@@ -437,4 +437,10 @@ public class TableTripPattern implements TripPattern, Serializable {
 //        }
 //    }
 
+
+    public int getServiceId() { 
+        // TODO: save service id indices here
+        return -1;
+    }
+
 }

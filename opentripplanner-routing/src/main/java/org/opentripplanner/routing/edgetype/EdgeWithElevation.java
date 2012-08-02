@@ -24,4 +24,5 @@ public interface EdgeWithElevation extends Edge {
     public PackedCoordinateSequence getElevationProfile();
     public PackedCoordinateSequence getElevationProfile(double from, double to);
     public boolean setElevationProfile(PackedCoordinateSequence elevPCS, boolean computed);
+    boolean isElevationFlattened();
 }

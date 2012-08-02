@@ -13,7 +13,6 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.gtfs.GtfsLibrary;
@@ -99,11 +98,11 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             long current_time = state0.getTime();
             int bestWait = -1;
             TripTimes bestTripTimes = null;
-            AgencyAndId serviceId = getPattern().getExemplar().getServiceId();
+            int serviceId = getPattern().getServiceId();
             // get the non-transit mode, mostly to determine whether the user is carrying a bike
             // this should maybe be done differently (using mode only for traversal permissions).
             TraverseMode nonTransitMode = state0.getNonTransitMode(options);
-            SD: for (ServiceDay sd : rctx.serviceDays) {
+            for (ServiceDay sd : rctx.serviceDays) {
                 int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
                 // only check for service on days that are not in the future
                 // this avoids unnecessarily examining trips starting tomorrow
@@ -224,7 +223,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
         else if (! rctx.opt.getModes().get(modeMask)) {
             return Double.POSITIVE_INFINITY;
         }
-        AgencyAndId serviceId = getPattern().getExemplar().getServiceId();
+        int serviceId = getPattern().getServiceId();
         for (ServiceDay sd : rctx.serviceDays)
             if (sd.serviceIdRunning(serviceId))
                 return 0;

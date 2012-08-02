@@ -339,4 +339,8 @@ public class TurnVertex extends StreetVertex {
         }
         return new TurnEdge(this, tov);
     }
+
+    public boolean isElevationFlattened() {
+        return elevationProfileSegment.isFlattened();
+    }
 }

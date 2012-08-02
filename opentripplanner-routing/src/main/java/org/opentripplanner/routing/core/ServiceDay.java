@@ -14,14 +14,15 @@
 package org.opentripplanner.routing.core;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.Set;
 import java.util.TimeZone;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
+import org.opentripplanner.routing.graph.Graph;
 
 /**
  * Represents a day of transit services. 
@@ -34,13 +35,13 @@ public class ServiceDay implements Serializable {
     private static final long serialVersionUID = -1206371243806996680L;
 
     protected long midnight;
-    protected Set<AgencyAndId> serviceIdsRunning;
+    protected int serviceIdsRunning[];
     
     /* 
      * make a ServiceDay including the given time's day's starting second and a set of 
      * serviceIds running on that day.
      */
-    public ServiceDay(long time, CalendarService cs, String agencyId) {
+    public ServiceDay(Graph graph, long time, CalendarService cs, String agencyId) {
         TimeZone timeZone = cs.getTimeZoneForAgencyId(agencyId);
         GregorianCalendar calendar = new GregorianCalendar(timeZone);
         calendar.setTime(new Date(time * 1000));
@@ -48,14 +49,22 @@ public class ServiceDay implements Serializable {
         ServiceDate sd = new ServiceDate(calendar);
         Date d = sd.getAsDate(timeZone);
         this.midnight = d.getTime() / 1000;
-        this.serviceIdsRunning = cs.getServiceIdsOnDate(sd);
+        serviceIdsRunning = new int[cs.getServiceIds().size() / 32 + 1];
+        
+        ServiceIdToNumberService service = graph.getService(ServiceIdToNumberService.class);
+        
+        for (AgencyAndId serviceId : cs.getServiceIdsOnDate(sd)) {
+            int n = service.getNumber(serviceId);
+
+            serviceIdsRunning[n / 32] |= (1 << (n % 32));
+        }
     }
 
     /* 
      * Does the given serviceId run on this ServiceDay?
      */
-    public boolean serviceIdRunning(AgencyAndId serviceId) {
-        return this.serviceIdsRunning.contains(serviceId);
+    public boolean serviceIdRunning(int serviceId) {
+        return (this.serviceIdsRunning[serviceId / 32] & (1 << (serviceId % 32))) != 0;
     }
 
     /* 
@@ -83,6 +92,17 @@ public class ServiceDay implements Serializable {
     }
     
     public String toString() {
-        return Long.toString(this.midnight) + serviceIdsRunning;
+        return Long.toString(this.midnight) + Arrays.asList(serviceIdsRunning);
+    }
+    
+    public boolean equals(Object o) {
+        if (!(o instanceof ServiceDay)) return false;
+        ServiceDay other = (ServiceDay) o;
+        return other.midnight == midnight;
+    }
+    
+    @Override
+    public int hashCode() {
+        return (int) midnight;
     }
 }

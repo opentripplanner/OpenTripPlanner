@@ -3,15 +3,12 @@ package org.opentripplanner.analyst.batch;
 import java.io.IOException;
 import java.util.TimeZone;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import lombok.Data;
 
 import org.opentripplanner.analyst.batch.aggregator.Aggregator;
-import org.opentripplanner.routing.core.PrototypeRoutingRequest;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.SPTService;
@@ -33,28 +30,33 @@ public class BatchProcessor {
     @Autowired private SPTService sptService;
     @Resource private Population origins;
     @Resource private Population destinations;
-    private PrototypeRoutingRequest prototypeRoutingRequest;
+    @Resource private RoutingRequest prototypeRoutingRequest;
     private Aggregator aggregator;
     private Accumulator accumulator;
     
-    private String routerId;
     private String date = "2011-02-04";
     private String time = "08:00 AM";
     private TimeZone timeZone = TimeZone.getDefault();
-    private TraverseModeSet modes = new TraverseModeSet("WALK,TRANSIT");
     private String outputPath;
 
     public static void main(String[] args) throws IOException {
-
         GenericApplicationContext ctx = new GenericApplicationContext();
         XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader(ctx);
         xmlReader.loadBeanDefinitions(new ClassPathResource(CONFIG));
         ctx.refresh();
         ctx.registerShutdownHook();
-        ctx.getBean(BatchProcessor.class).run();
+        BatchProcessor processor = ctx.getBean(BatchProcessor.class);
+        if (processor == null)
+            LOG.error("No BatchProcessor bean was defined.");
+        else
+            processor.run();
     }
 
     private void run() {
+
+        origins.setup();
+        destinations.setup();
+
         int nOrigins = origins.getIndividuals().size();
         if (aggregator != null) {
             ResultSet aggregates = new ResultSet(origins);
@@ -73,7 +75,7 @@ public class BatchProcessor {
                 i += 1;
             }
             aggregates.writeAppropriateFormat(outputPath);
-        } else if (accumulator != null) {
+        } else if (accumulator != null) { 
             ResultSet accumulated = new ResultSet(destinations);
             int i = 0;
             for (Individual oi : origins) {
@@ -118,7 +120,6 @@ public class BatchProcessor {
     
     private RoutingRequest buildRequest(Individual i) {
         RoutingRequest req = prototypeRoutingRequest.clone();
-        req.setRouterId(routerId);
         req.setDateTime(date, time, timeZone);
         String latLon = String.format("%f,%f", i.getLat(), i.getLon());
         req.batch = true;
@@ -127,7 +128,7 @@ public class BatchProcessor {
         else
             req.setFrom(latLon);
         try {
-            req.setRoutingContext(graphService.getGraph(routerId));
+            req.setRoutingContext(graphService.getGraph(req.routerId));
             return req;
         } catch (VertexNotFoundException vnfe) {
             LOG.debug("no vertex could be created near the origin point");

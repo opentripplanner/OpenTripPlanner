@@ -151,6 +151,11 @@ public class PlainStreetEdge extends StreetEdge {
     }
 
     @Override
+    public boolean isElevationFlattened() {
+        return elevationProfileSegment.isFlattened();
+    }
+
+    @Override
     public double getDistance() {
         return length;
     }

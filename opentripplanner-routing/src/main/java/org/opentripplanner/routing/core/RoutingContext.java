@@ -166,9 +166,9 @@ public class RoutingContext implements Cloneable {
         // since DST changes more than one hour after midnight in US/EU.
         // But is this true everywhere?
         for (String agency : graph.getAgencyIds()) {
-            addIfNotExists(this.serviceDays, new ServiceDay(time - SEC_IN_DAY, calendarService, agency));
-            addIfNotExists(this.serviceDays, new ServiceDay(time, calendarService, agency));
-            addIfNotExists(this.serviceDays, new ServiceDay(time + SEC_IN_DAY, calendarService, agency));
+            addIfNotExists(this.serviceDays, new ServiceDay(graph, time - SEC_IN_DAY, calendarService, agency));
+            addIfNotExists(this.serviceDays, new ServiceDay(graph, time, calendarService, agency));
+            addIfNotExists(this.serviceDays, new ServiceDay(graph, time + SEC_IN_DAY, calendarService, agency));
         }
     }
 
@@ -197,27 +197,6 @@ public class RoutingContext implements Cloneable {
             return sl.isWheelchairAccessible();
         }
         return true;
-    }
-
-    public boolean serviceOn(AgencyAndId serviceId, ServiceDate serviceDate) {
-        Set<ServiceDate> dates = serviceDatesByServiceId.get(serviceId);
-        if (dates == null) {
-            dates = calendarService.getServiceDatesForServiceId(serviceId);
-            serviceDatesByServiceId.put(serviceId, dates);
-        }
-        return dates.contains(serviceDate);
-    }
-    
-    /** 
-     * When a routing context is garbage collected, there should be no more references
-     * to the temporary vertices it created. We need to detach its edges from the permanent graph.
-     */
-    @Override public void finalize() {
-        int nRemoved = this.destroy();
-        if (nRemoved > 0) {
-            LOG.warn("Temporary edges were removed during garbage collection. " +
-                     "This is probably because a routing context was not properly destroyed.");
-        }
     }
     
     /** 

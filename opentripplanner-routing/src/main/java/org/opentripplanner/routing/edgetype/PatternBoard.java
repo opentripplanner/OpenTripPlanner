@@ -122,7 +122,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             long current_time = state0.getTime();
             int bestWait = -1;
             TripTimes bestTripTimes = null;
-            AgencyAndId serviceId = getPattern().getExemplar().getServiceId();
+            int serviceId = getPattern().getServiceId();
             // this method is on State not RoutingRequest because we care whether the user is in
             // possession of a rented bike.
             TraverseMode mode = state0.getNonTransitMode(options); 
@@ -225,7 +225,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             if (! rctx.opt.getModes().get(modeMask)) {
                 return Double.POSITIVE_INFINITY;
             }
-            AgencyAndId serviceId = getPattern().getExemplar().getServiceId();
+            int serviceId = getPattern().getServiceId();
             for (ServiceDay sd : rctx.serviceDays)
                 if (sd.serviceIdRunning(serviceId))
                     return 0;

@@ -18,8 +18,9 @@ public class SyntheticRasterPopulation extends RasterPopulation {
     @Setter String name = "synthetic grid coverage";
     @Setter double resolutionMeters = 250; // deprecated
     @Setter String crsCode = "EPSG:4326";
-
-    @Override @PostConstruct
+    @Setter boolean boundsFromGraph = false; // use graph envelope, overriding any specified bounds
+    
+    @Override
     public void createIndividuals() {
         try {
             coverageCRS = CRS.decode(crsCode, true);
@@ -27,6 +28,9 @@ public class SyntheticRasterPopulation extends RasterPopulation {
             LOG.error("error decoding coordinate reference system code.");
             e.printStackTrace();
             return;
+        }
+        if (boundsFromGraph) {
+            // autowire graph service or pass in
         }
         gridEnvelope = new GridEnvelope2D(0, 0, cols, rows);
         refEnvelope = new ReferencedEnvelope(left, right, bottom, top, coverageCRS);
