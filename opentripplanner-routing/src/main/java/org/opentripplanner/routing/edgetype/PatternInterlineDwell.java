@@ -29,7 +29,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 
 /** 
  * A vehicle's wait between the end of one run and the beginning of another run on the same block 
@@ -144,7 +144,7 @@ public class PatternInterlineDwell extends AbstractEdge implements OnBoardForwar
         return s1.makeState();
     }
 
-    public Geometry getGeometry() {
+    public LineString getGeometry() {
         return null;
     }
 

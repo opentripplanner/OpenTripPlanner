@@ -21,7 +21,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 
 
 /**
@@ -84,7 +84,7 @@ public class FrequencyDwell extends AbstractEdge implements OnBoardForwardEdge, 
         return timeLowerBound(options);
     }
 
-    public Geometry getGeometry() {
+    public LineString getGeometry() {
         return null;
     }
 

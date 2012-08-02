@@ -26,7 +26,7 @@ import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 
 public class FrequencyHop extends AbstractEdge implements OnBoardForwardEdge, OnBoardReverseEdge, HopEdge {
 
@@ -36,7 +36,7 @@ public class FrequencyHop extends AbstractEdge implements OnBoardForwardEdge, On
     private Stop start;
     private Stop end;
     private int stopIndex;
-    private Geometry geometry;
+    private LineString geometry;
 
     public FrequencyHop(TransitVertex depart, TransitVertex arrive, Stop s0, Stop s1,
             int stopIndex, FrequencyBasedTripPattern pattern) {
@@ -94,11 +94,11 @@ public class FrequencyHop extends AbstractEdge implements OnBoardForwardEdge, On
         return s1.makeState();
     }
 
-    public void setGeometry(Geometry geometry) {
+    public void setGeometry(LineString geometry) {
         this.geometry = geometry;
     }
 
-    public Geometry getGeometry() {
+    public LineString getGeometry() {
         if (geometry == null) {
 
             Coordinate c1 = new Coordinate(start.getLon(), start.getLat());

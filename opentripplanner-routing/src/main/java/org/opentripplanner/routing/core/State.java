@@ -119,7 +119,7 @@ public class State implements Cloneable {
         return new StateEditor(this, e, en);
     }
 
-    protected State clone() {
+    public State clone() {
         State ret;
         try {
             ret = (State) super.clone();

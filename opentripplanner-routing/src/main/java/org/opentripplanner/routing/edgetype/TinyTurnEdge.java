@@ -13,13 +13,12 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import java.util.Set;
-
 import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Vertex;
 
 /**
@@ -31,7 +30,7 @@ public class TinyTurnEdge extends FreeEdge {
 
     private static final long serialVersionUID = 3925814840369402222L;
 
-    private Set<TraverseMode> restrictedModes;
+    private TraverseModeSet restrictedModes;
 
     private int turnCost = 0;
     
@@ -105,11 +104,11 @@ public class TinyTurnEdge extends FreeEdge {
         this.turnCost = turnCost;
     }
 
-    public void setRestrictedModes(Set<TraverseMode> modes) {
-        this.restrictedModes = modes;
+    public void setRestrictedModes(TraverseModeSet restrictedModes) {
+        this.restrictedModes = restrictedModes;
     }
 
-    public Set<TraverseMode> getRestrictedModes() {
+    public TraverseModeSet getRestrictedModes() {
         return restrictedModes;
     }
 

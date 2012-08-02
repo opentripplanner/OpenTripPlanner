@@ -15,6 +15,7 @@ package org.opentripplanner.routing.core;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -107,7 +108,7 @@ public class TraverseModeSet implements Cloneable, Serializable {
         return 0;
     }
 
-    public TraverseModeSet(List<TraverseMode> modeList) {
+    public TraverseModeSet(Collection<TraverseMode> modeList) {
         this(modeList.toArray(new TraverseMode[0]));
     }
     
@@ -368,7 +369,7 @@ public class TraverseModeSet implements Cloneable, Serializable {
      * @param restrictedModes A set of restricted modes
      * @return false If *at least one* of the non-transit mode is not restricted.
      */
-    public boolean isRestricted(Set<TraverseMode> restrictedModes) {
+    public boolean isRestricted(TraverseModeSet restrictedModes) {
         // For each non-transit mode, test if it's set and not restricted.
         // If so, then the traverse mode set is not restricted.
         if (getWalk() && !restrictedModes.contains(TraverseMode.WALK))

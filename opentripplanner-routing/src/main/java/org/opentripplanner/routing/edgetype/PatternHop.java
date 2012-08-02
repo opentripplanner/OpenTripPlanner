@@ -25,7 +25,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 
 /**
  * A transit vehicle's journey between departure at one stop and arrival at the next.
@@ -39,7 +39,7 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
 
     public int stopIndex;
 
-    private Geometry geometry = null;
+    private LineString geometry = null;
 
     public PatternHop(PatternStopVertex from, PatternStopVertex to, Stop start, Stop end, int stopIndex,
             TableTripPattern tripPattern) {
@@ -95,11 +95,11 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
         return s1.makeState();
     }
 
-    public void setGeometry(Geometry geometry) {
+    public void setGeometry(LineString geometry) {
         this.geometry = geometry;
     }
 
-    public Geometry getGeometry() {
+    public LineString getGeometry() {
         if (geometry == null) {
 
             Coordinate c1 = new Coordinate(start.getLon(), start.getLat());

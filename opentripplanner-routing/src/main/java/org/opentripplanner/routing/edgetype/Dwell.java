@@ -23,7 +23,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.graph.Vertex;
 
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 
 /**
  *  Models waiting in a station on a vehicle. 
@@ -87,7 +87,7 @@ public class Dwell extends AbstractEdge implements DwellEdge {
         return GtfsLibrary.getRouteName(stopTime.getTrip().getRoute());
     }
 
-    public Geometry getGeometry() {
+    public LineString getGeometry() {
         return null;
     }
 }

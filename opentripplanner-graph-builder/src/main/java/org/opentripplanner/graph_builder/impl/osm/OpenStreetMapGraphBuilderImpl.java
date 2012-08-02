@@ -55,6 +55,7 @@ import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
@@ -505,7 +506,16 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             generateElevationProfiles(graph);
 
             applyBikeSafetyFactor(graph);
-            StreetUtils.makeEdgeBased(graph, endpoints, turnRestrictions);
+            //StreetUtils.makeEdgeBased(graph, endpoints, turnRestrictions);
+            for (Map.Entry<Edge, TurnRestriction> entry : turnRestrictions.entrySet()) {
+                Edge edge = entry.getKey();
+                TurnRestriction turnRestriction = entry.getValue();
+                if (edge == null) {
+                    _log.warn("unexpected null edge from restriction " + turnRestriction);
+                    continue;
+                }
+                ((PlainStreetEdge) edge).addTurnRestriction(turnRestriction);
+            }
 
         } // END buildGraph()
 
@@ -1526,7 +1536,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     }
                 }
             }
-            modes = TraverseMode.internSet(modes);
 
             TurnRestrictionTag tag;
             if (relation.isTag("restriction", "no_right_turn")) {
@@ -1550,7 +1559,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
             TurnRestriction restriction = new TurnRestriction();
             restriction.type = tag.type;
-            restriction.modes = modes;
+            restriction.modes = new TraverseModeSet(modes);
             turnRestrictionsByTag.put(tag, restriction);
 
             MapUtils.addToMapList(turnRestrictionsByFromWay, from, tag);

@@ -15,6 +15,7 @@ package org.opentripplanner.routing.edgetype;
 
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.util.ElevationProfileSegment;
 
 /**
  * An edge which has an elevation profile -- a street, basically.
@@ -24,4 +25,5 @@ public interface EdgeWithElevation extends Edge {
     public PackedCoordinateSequence getElevationProfile();
     public PackedCoordinateSequence getElevationProfile(double from, double to);
     public boolean setElevationProfile(PackedCoordinateSequence elevPCS, boolean computed);
+    public ElevationProfileSegment getElevationProfileSegment();
 }

@@ -43,5 +43,7 @@ public abstract class StreetEdge extends AbstractEdge implements EdgeWithElevati
     public abstract boolean isNoThruTraffic();
     
     public abstract int getStreetClass();
+
+    public abstract boolean isWheelchairAccessible();
     
 }

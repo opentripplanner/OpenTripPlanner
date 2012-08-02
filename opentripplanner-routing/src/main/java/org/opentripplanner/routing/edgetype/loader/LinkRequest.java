@@ -32,7 +32,6 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.routing.vertextype.TransitVertex;
-import org.opentripplanner.routing.vertextype.TurnVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -153,7 +152,15 @@ public class LinkRequest {
             // first time this edge bundle is being split
             replacement = new LinkedList<P2<PlainStreetEdge>>();
             // make a single pair of PlainStreetEdges equivalent to this bundle
-            P2<PlainStreetEdge> newEdges = replace(edges);
+            Iterator<StreetEdge> iter = edges.iterator();
+            StreetEdge first = iter.next();
+            StreetEdge second = iter.next();
+            P2<PlainStreetEdge> newEdges;
+            if (first instanceof PlainStreetEdge && second instanceof PlainStreetEdge && edges.size() == 2) {
+                newEdges = new P2<PlainStreetEdge> (((PlainStreetEdge)first).clone(), ((PlainStreetEdge)second).clone()); 
+            } else {
+                newEdges = replace(edges);
+            }
             if (newEdges == null) {
                 return null;
             }
@@ -303,13 +310,13 @@ public class LinkRequest {
             }
         }
 
-        P2<Entry<TurnVertex, Set<Edge>>> ends = findEndVertices(edges);
+        P2<Entry<StreetVertex, Set<Edge>>> ends = findEndVertices(edges);
 
-        Entry<TurnVertex, Set<Edge>> start = ends.getFirst();
-        Entry<TurnVertex, Set<Edge>> end = ends.getSecond();
-        TurnVertex startVertex = start.getKey();
+        Entry<StreetVertex, Set<Edge>> start = ends.getFirst();
+        Entry<StreetVertex, Set<Edge>> end = ends.getSecond();
+        StreetVertex startVertex = start.getKey();
 
-        TurnVertex endVertex = null;
+        StreetVertex endVertex = null;
         if (end != null) {
             endVertex = end.getKey();
         } else {
@@ -327,11 +334,14 @@ public class LinkRequest {
         StreetVertex newEnd = new IntersectionVertex(linker.graph, "replace " + endVertex.getLabel(), endVertex.getX(),
                 endVertex.getY(), endVertex.getName());
 
+        StreetEdge forwardEdge = null;
         for (Edge e: startVertex.getOutgoing()) {
             final Vertex toVertex = e.getToVertex();
             if (!toVertex.getCoordinate().equals(endVertex.getCoordinate())) {
                 continue;
             }
+            if (e instanceof StreetEdge)
+                forwardEdge = (StreetEdge) e;
             if (e instanceof TurnEdge) {
                 final TurnEdge turnEdge = (TurnEdge) e;
                 TinyTurnEdge newTurn = new TinyTurnEdge(newEnd, toVertex, turnEdge.getPermission());
@@ -347,11 +357,14 @@ public class LinkRequest {
         StreetVertex newStart = new IntersectionVertex(linker.graph, "replace " + startVertex.getLabel(),
                 startVertex.getX(), startVertex.getY(), startVertex.getName());
 
+        StreetEdge backwardEdge = null;
         for (Edge e: endVertex.getOutgoing()) {
             final Vertex toVertex = e.getToVertex();
             if (!toVertex.getCoordinate().equals(startVertex.getCoordinate())) {
                 continue;
             }
+            if (e instanceof StreetEdge)
+                backwardEdge = (StreetEdge) e;
             if (e instanceof TurnEdge) {
                 final TurnEdge turnEdge = (TurnEdge) e;
                 TinyTurnEdge newTurn = new TinyTurnEdge(newStart, toVertex, turnEdge.getPermission());
@@ -364,20 +377,20 @@ public class LinkRequest {
         }
 
         /* create a pair of PlainStreetEdges equivalent to the bundle of original (turn)edges */
-        PlainStreetEdge forward = new PlainStreetEdge(startVertex, newEnd, startVertex.getGeometry(),
-                startVertex.getName(), startVertex.getLength(), startVertex.getPermission(), false);
+        PlainStreetEdge forward = new PlainStreetEdge(startVertex, newEnd, forwardEdge.getGeometry(),
+                startVertex.getName(), forwardEdge.getLength(), forwardEdge.getPermission(), false);
 
-        PlainStreetEdge backward = new PlainStreetEdge(endVertex, newStart, endVertex.getGeometry(),
-                endVertex.getName(), endVertex.getLength(), endVertex.getPermission(), true);
+        PlainStreetEdge backward = new PlainStreetEdge(endVertex, newStart, backwardEdge.getGeometry(),
+                endVertex.getName(), backwardEdge.getLength(), backwardEdge.getPermission(), true);
 
-        forward.setWheelchairAccessible(startVertex.isWheelchairAccessible());
-        backward.setWheelchairAccessible(endVertex.isWheelchairAccessible());
+        forward.setWheelchairAccessible(forwardEdge.isWheelchairAccessible());
+        backward.setWheelchairAccessible(backwardEdge.isWheelchairAccessible());
 
-        forward.setElevationProfile(startVertex.getElevationProfile(), false);
-        backward.setElevationProfile(endVertex.getElevationProfile(), false);
+        forward.setElevationProfile(forwardEdge.getElevationProfile(), false);
+        backward.setElevationProfile(backwardEdge.getElevationProfile(), false);
 
-        forward.setBicycleSafetyEffectiveLength(startVertex.getBicycleSafetyEffectiveLength());
-        backward.setBicycleSafetyEffectiveLength(endVertex.getBicycleSafetyEffectiveLength());
+        forward.setBicycleSafetyEffectiveLength(forwardEdge.getElevationProfileSegment().getBicycleSafetyEffectiveLength());
+        backward.setBicycleSafetyEffectiveLength(backwardEdge.getElevationProfileSegment().getBicycleSafetyEffectiveLength());
 
         addEdges(forward, backward);
         
@@ -387,38 +400,45 @@ public class LinkRequest {
         return replacement;
     }
 
-    private P2<Entry<TurnVertex, Set<Edge>>> findEndVertices(Collection<StreetEdge> edges) {
+    private P2<Entry<StreetVertex, Set<Edge>>> findEndVertices(Collection<StreetEdge> edges) {
         // find the two most common edge start points, which will be the endpoints of this street
-        HashMap<TurnVertex, Set<Edge>> edgesStartingAt = new HashMap<TurnVertex, Set<Edge>>();
+        HashMap<StreetVertex, Set<Edge>> edgesStartingAt = new HashMap<StreetVertex, Set<Edge>>();
         for (Edge edge : edges) {
             Set<Edge> starting = edgesStartingAt.get(edge.getFromVertex());
             if (starting == null) {
                 starting = new HashSet<Edge>();
-                if (edge.getFromVertex() instanceof TurnVertex) {
-                    edgesStartingAt.put((TurnVertex) edge.getFromVertex(), starting);
+                if (edge.getFromVertex() instanceof StreetVertex) {
+                    edgesStartingAt.put((StreetVertex) edge.getFromVertex(), starting);
                 }
             }
             starting.add(edge);
         }
         
         int maxStarting = 0;
-        int maxEnding = 0;
-        Entry<TurnVertex, Set<Edge>> startingVertex = null;
-        Entry<TurnVertex, Set<Edge>> endingVertex = null;
-        for (Entry<TurnVertex, Set<Edge>> entry : edgesStartingAt.entrySet()) {
+        Entry<StreetVertex, Set<Edge>> startingVertex = null;
+        for (Entry<StreetVertex, Set<Edge>> entry : edgesStartingAt.entrySet()) {
             int numEdges = entry.getValue().size();
             if (numEdges >= maxStarting) {
-                endingVertex = startingVertex;
-                maxEnding = maxStarting;
                 maxStarting = numEdges;
                 startingVertex = entry;
-            } else if (numEdges > maxEnding) {
-                endingVertex = entry;
-                maxEnding = numEdges;
             }
         }
-
-        return new P2<Entry<TurnVertex, Set<Edge>>>(startingVertex, endingVertex);
+        Coordinate startingCoordinate = startingVertex.getKey().getCoordinate();
+        int maxEnding = 0;
+        Entry<StreetVertex, Set<Edge>> endingVertex = null;
+        for (Entry<StreetVertex, Set<Edge>> entry : edgesStartingAt.entrySet()) {
+            Set<Edge> backEdges = entry.getValue();
+            for (Edge edge : backEdges) {
+                if (edge.getToVertex().getCoordinate().equals(startingCoordinate)) {
+                    int numEdges = backEdges.size();
+                    if (numEdges >= maxEnding) {
+                        maxEnding = numEdges;
+                        endingVertex = entry;
+                    }
+                }
+            }
+        }
+        return new P2<Entry<StreetVertex, Set<Edge>>>(startingVertex, endingVertex);
     }
 
     public List<Edge> getEdgesAdded() {

@@ -19,7 +19,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.graph.Vertex;
 
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 
 /**
  * A transfer directly between two stops without using the street network.
@@ -33,7 +33,7 @@ public class TransferEdge extends AbstractEdge {
     
     double distance;
 
-    private Geometry geometry = null;
+    private LineString geometry = null;
 
     private boolean wheelchairAccessible = true;
 
@@ -68,7 +68,7 @@ public class TransferEdge extends AbstractEdge {
         return distance;
     }
 
-    public Geometry getGeometry() {
+    public LineString getGeometry() {
         return geometry;
     }
 
@@ -91,7 +91,7 @@ public class TransferEdge extends AbstractEdge {
         return s1.makeState();
     }
 
-    public void setGeometry(Geometry geometry) {
+    public void setGeometry(LineString geometry) {
         this.geometry  = geometry;
     }
 

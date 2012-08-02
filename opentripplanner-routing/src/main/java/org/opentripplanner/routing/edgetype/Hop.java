@@ -13,7 +13,6 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
@@ -29,7 +28,7 @@ import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.graph.Vertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 
 public class Hop extends AbstractEdge implements OnBoardForwardEdge, OnBoardReverseEdge, HopEdge {
 
@@ -91,7 +90,7 @@ public class Hop extends AbstractEdge implements OnBoardForwardEdge, OnBoardReve
         return this.start + " " + this.end + " " + this._serviceId;
     }
 
-    private Geometry geometry = null;
+    private LineString geometry = null;
 
     public String getDirection() {
         return start.getTrip().getTripHeadsign();
@@ -117,7 +116,7 @@ public class Hop extends AbstractEdge implements OnBoardForwardEdge, OnBoardReve
                 .getTripBikesAllowed() != 1) || start.getTrip().getTripBikesAllowed() == 2;
     }
 
-    public Geometry getGeometry() {
+    public LineString getGeometry() {
         if (geometry == null) {
 
             Stop stop1 = start.getStop();
@@ -132,7 +131,7 @@ public class Hop extends AbstractEdge implements OnBoardForwardEdge, OnBoardReve
         return geometry;
     }
 
-    public void setGeometry(Geometry line) {
+    public void setGeometry(LineString line) {
         geometry = line;
     }
 

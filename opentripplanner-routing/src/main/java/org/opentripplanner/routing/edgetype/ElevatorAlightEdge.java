@@ -23,7 +23,7 @@ import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 
 /**
  * A relatively low cost edge for alighting from an elevator.
@@ -46,7 +46,7 @@ public class ElevatorAlightEdge extends AbstractEdge implements EdgeNarrative {
      * It's generally a polyline with two coincident points, but some elevators have horizontal
      * dimension, e.g. the ones on the Eiffel Tower.
      */
-    private Geometry the_geom;
+    private LineString the_geom;
     
     /**
      * @param level It's a float for future expansion.
@@ -76,7 +76,7 @@ public class ElevatorAlightEdge extends AbstractEdge implements EdgeNarrative {
     }
 
     @Override
-    public Geometry getGeometry() {
+    public LineString getGeometry() {
         return the_geom;
     }
 

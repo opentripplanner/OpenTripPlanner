@@ -19,7 +19,7 @@ import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.patch.Alert;
 
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 
 /**
  * An EdgeNarrative holds the data needed to generate a human-readable
@@ -40,7 +40,7 @@ public interface EdgeNarrative {
     /* True if the name is automatically generated rather than coming from OSM or GTFS */
     public boolean hasBogusName();
 
-    public Geometry getGeometry();
+    public LineString getGeometry();
 
     public double getDistance();
 

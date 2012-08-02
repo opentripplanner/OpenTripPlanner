@@ -29,7 +29,7 @@ import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.Patch;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 
 public class Shortcut extends AbstractEdge {
     private static final long serialVersionUID = -5813252201367498850L;
@@ -57,7 +57,7 @@ public class Shortcut extends AbstractEdge {
     }
 
     @Override
-    public Geometry getGeometry() {
+    public LineString getGeometry() {
         return GeometryUtils.getGeometryFactory().createLineString(new Coordinate[] { getFromVertex().getCoordinate(), getToVertex().getCoordinate() });
     }
 

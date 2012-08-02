@@ -34,7 +34,7 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 
 public class AStarTest {
 
@@ -276,7 +276,7 @@ public class AStarTest {
         }
 
         @Override
-        public Geometry getGeometry() {
+        public LineString getGeometry() {
             return null;
         }
 

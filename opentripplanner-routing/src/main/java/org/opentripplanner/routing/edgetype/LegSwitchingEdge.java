@@ -19,7 +19,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.graph.Vertex;
 
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 
 /* This edge, because it has no mode, initiates another leg.
  */
@@ -43,7 +43,7 @@ public class LegSwitchingEdge extends AbstractEdge {
 	}
 
 	@Override
-	public Geometry getGeometry() {
+	public LineString getGeometry() {
 		return null;
 	}
 

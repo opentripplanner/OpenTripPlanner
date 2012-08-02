@@ -52,7 +52,7 @@ public class TurnVertex extends StreetVertex {
 
     protected boolean wheelchairAccessible = true;
 
-    protected ElevationProfileSegment elevationProfileSegment;
+    private ElevationProfileSegment elevationProfileSegment;
 
     protected StreetTraversalPermission permission;
 
@@ -338,5 +338,13 @@ public class TurnVertex extends StreetVertex {
             return new TurnEdge(this, (TurnVertex) tov);            
         }
         return new TurnEdge(this, tov);
+    }
+
+    public ElevationProfileSegment getElevationProfileSegment() {
+        return elevationProfileSegment;
+    }
+
+    public void setElevationProfileSegment(ElevationProfileSegment elevationProfileSegment) {
+        this.elevationProfileSegment = elevationProfileSegment;
     }
 }

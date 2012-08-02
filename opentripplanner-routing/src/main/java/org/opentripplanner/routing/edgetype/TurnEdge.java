@@ -27,13 +27,15 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.Patch;
+import org.opentripplanner.routing.util.ElevationProfileSegment;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TurnVertex;
 
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 
 /**
  * An edge between two StreetVertices. This is the most common edge type in the edge-based street
@@ -53,7 +55,7 @@ public class TurnEdge extends StreetEdge {
     /**
      * If not null, this turn is prohibited to the modes in the set.
      */
-    private Set<TraverseMode> restrictedModes;
+    private TraverseModeSet restrictedModes;
 
 /* enforce initialization */
 //    /** No-arg constructor used only for customization -- do not call this unless
@@ -95,7 +97,7 @@ public class TurnEdge extends StreetEdge {
     }
 
     @Override
-    public Geometry getGeometry() {
+    public LineString getGeometry() {
         return ((TurnVertex) fromv).getGeometry();
     }
 
@@ -214,6 +216,11 @@ public class TurnEdge extends StreetEdge {
         return ((TurnVertex) fromv).getElevationProfile();
     }
 
+    public ElevationProfileSegment getElevationProfileSegment() {
+        return ((TurnVertex) fromv).getElevationProfileSegment();
+    }
+
+
     @Override
     public Vertex getFromVertex() {
         return fromv;
@@ -284,11 +291,11 @@ public class TurnEdge extends StreetEdge {
         return ((TurnVertex) fromv).getNotes();
     }
 
-    public void setRestrictedModes(Set<TraverseMode> modes) {
+    public void setRestrictedModes(TraverseModeSet modes) {
         this.restrictedModes = modes;
     }
 
-    public Set<TraverseMode> getRestrictedModes() {
+    public TraverseModeSet getRestrictedModes() {
         return restrictedModes;
     }
 
@@ -325,6 +332,11 @@ public class TurnEdge extends StreetEdge {
     @Override
     public int getStreetClass() {
         return ((TurnVertex) fromv).getStreetClass();
+    }
+
+    @Override
+    public boolean isWheelchairAccessible() {
+        return ((TurnVertex) fromv).isWheelchairAccessible();
     }
 
 }

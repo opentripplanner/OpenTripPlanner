@@ -20,14 +20,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.opentripplanner.common.TurnRestriction;
+import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.common.pqueue.OTPPriorityQueue;
 import org.opentripplanner.common.pqueue.OTPPriorityQueueFactory;
-import org.opentripplanner.routing.algorithm.GenericDijkstra;
-import org.opentripplanner.routing.algorithm.strategies.TransitLocalStreetService;
+import org.opentripplanner.routing.algorithm.EdgeBasedGenericDijkstra;
+import org.opentripplanner.routing.algorithm.EdgeBasedState;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
@@ -38,19 +40,19 @@ import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
+import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
+import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.SkipNonTransferEdgeStrategy;
 import org.opentripplanner.routing.pathparser.BasicPathParser;
 import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.spt.ArrayMultiShortestPathTree;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.MultiShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -433,9 +435,9 @@ public class Raptor implements PathService {
          */
 
         ShortestPathTree spt;
-        GenericDijkstra dijkstra = new GenericDijkstra(walkOptions);
+        EdgeBasedGenericDijkstra dijkstra = new EdgeBasedGenericDijkstra(walkOptions);
         if (nBoardings == 0) {
-            State start = new MaxWalkState(options.rctx.origin, walkOptions);
+            EdgeBasedState start = new EdgeBasedState(options.rctx.origin, walkOptions);
             spt = dijkstra.getShortestPathTree(start);
             // also, compute an initial spt from the target so that we can find out what transit
             // stops are nearby and what
@@ -443,8 +445,8 @@ public class Raptor implements PathService {
 
             RoutingRequest reversedWalkOptions = walkOptions.clone();
             reversedWalkOptions.setArriveBy(true);
-            GenericDijkstra destDijkstra = new GenericDijkstra(reversedWalkOptions);
-            start = new MaxWalkState(options.rctx.target, reversedWalkOptions);
+            EdgeBasedGenericDijkstra destDijkstra = new EdgeBasedGenericDijkstra(reversedWalkOptions);
+            start = new EdgeBasedState(options.rctx.target, reversedWalkOptions);
             ShortestPathTree targetSpt = destDijkstra.getShortestPathTree(start);
             for (State state : targetSpt.getAllStates()) {
 
@@ -462,7 +464,7 @@ public class Raptor implements PathService {
             }
         } else {
 
-            final List<State> startPoints = new ArrayList<State>();
+            final List<EdgeBasedState> startPoints = new ArrayList<EdgeBasedState>();
 /*
             RegionData regionData = data.regionData;
             
@@ -526,7 +528,7 @@ public class Raptor implements PathService {
 
 
                 //this checks the precomputed table of walk distances by regions to see 
-                //to get a tigher bound on the best posible walk distance to the destination
+                //to get a tighter bound on the best posible walk distance to the destination
                 //it (a) causes weird intermitten planner failures, (b) does not make 
                 //much of a difference
                 
@@ -582,7 +584,7 @@ public class Raptor implements PathService {
                     continue;
                 }
 
-                StateEditor dijkstraState = new MaxWalkState.MaxWalkStateEditor(walkOptions,
+                StateEditor dijkstraState = new EdgeBasedState.EdgeBasedStateEditor(walkOptions,
                         stopVertex);
                 dijkstraState.setNumBoardings(state.nBoardings);
                 dijkstraState.setWalkDistance(state.walkDistance);
@@ -590,7 +592,14 @@ public class Raptor implements PathService {
                 dijkstraState.setExtension("raptorParent", state);
                 dijkstraState.setOptions(walkOptions);
                 dijkstraState.incrementWeight(state.arrivalTime - options.dateTime);
-                startPoints.add(dijkstraState.makeState());
+                EdgeBasedState newState = (EdgeBasedState) dijkstraState.makeState();
+                for (Edge e : stopVertex.getOutgoing()) {
+                    if (e instanceof StreetTransitLink) {
+                        newState = newState.clone();
+                        newState.outgoing = e;
+                        startPoints.add(newState);
+                    }
+                }
             }
             if (startPoints.size() == 0) {
                 System.out.println("warning: no walk in round " + nBoardings);
@@ -619,18 +628,20 @@ public class Raptor implements PathService {
 
             });
 
-            //TODO: include existing bounding states
             final TargetBound bounder = new TargetBound(options, cur.dijkstraBoundingStates);
             dijkstra.setSearchTerminationStrategy(bounder);
             dijkstra.setSkipTraverseResultStrategy(bounder);
-            
+
             //Do local search
             spt = dijkstra.getShortestPathTree(startPoints.get(0));
+
             if (!bounder.bounders.isEmpty()) {
                 cur.dijkstraBoundingStates = bounder.bounders;
             }
+
             if (cur.spt == null)
                 cur.spt = spt;
+
         }
 
         final List<? extends State> targetStates = spt.getStates(walkOptions.rctx.target);
@@ -727,9 +738,9 @@ public class Raptor implements PathService {
 
     class PrefilledPriorityQueueFactory implements OTPPriorityQueueFactory {
 
-        private List<State> startPoints;
+        private List<? extends State> startPoints;
 
-        public PrefilledPriorityQueueFactory(List<State> startPoints) {
+        public PrefilledPriorityQueueFactory(List<? extends State> startPoints) {
             this.startPoints = startPoints;
         }
 

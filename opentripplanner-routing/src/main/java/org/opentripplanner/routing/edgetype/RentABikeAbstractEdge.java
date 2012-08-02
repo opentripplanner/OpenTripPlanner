@@ -22,7 +22,7 @@ import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 
 /**
  * Renting or dropping off a rented bike edge.
@@ -93,7 +93,7 @@ public abstract class RentABikeAbstractEdge extends AbstractEdge {
 	}
 
 	@Override
-	public Geometry getGeometry() {
+	public LineString getGeometry() {
 		return null;
 	}
 

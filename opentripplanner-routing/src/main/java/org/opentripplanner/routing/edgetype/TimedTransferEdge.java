@@ -20,7 +20,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.graph.Vertex;
 
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 
 /**
  * An edge represents what GTFS calls a timed transfer. This could also be referred to as a
@@ -59,7 +59,7 @@ public class TimedTransferEdge extends AbstractEdge {
     }
 
     @Override
-    public Geometry getGeometry() {
+    public LineString getGeometry() {
         return null;
     }
 

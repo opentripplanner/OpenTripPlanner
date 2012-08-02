@@ -19,10 +19,11 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.util.ElevationProfileSegment;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TurnVertex;
 
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 
 /**
  * An edge from the main edge-based street network out to an intersection vertex
@@ -50,7 +51,7 @@ public class OutEdge extends StreetEdge {
     }
 
     @Override
-    public Geometry getGeometry() {
+    public LineString getGeometry() {
         return ((TurnVertex) fromv).getGeometry();
     }
 
@@ -145,5 +146,15 @@ public class OutEdge extends StreetEdge {
     public int getStreetClass() {
         //this is always safe as it can appear anywhere in a path
         return CLASS_OTHERPATH; 
+    }
+
+    @Override
+    public ElevationProfileSegment getElevationProfileSegment() {
+        return ((TurnVertex) fromv).getElevationProfileSegment();
+    }
+
+    @Override
+    public boolean isWheelchairAccessible() {
+        return ((TurnVertex) fromv).isWheelchairAccessible();
     }
 }

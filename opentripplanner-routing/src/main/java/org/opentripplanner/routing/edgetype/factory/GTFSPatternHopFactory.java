@@ -1035,7 +1035,7 @@ public class GTFSPatternHopFactory {
         }
     }
 
-    private Geometry getHopGeometry(Graph graph, AgencyAndId shapeId, StopTime st0, StopTime st1,
+    private LineString getHopGeometry(Graph graph, AgencyAndId shapeId, StopTime st0, StopTime st1,
             Vertex startJourney, Vertex endJourney) {
 
         if (shapeId == null || shapeId.getId() == null || shapeId.getId().equals(""))
@@ -1350,7 +1350,7 @@ public class GTFSPatternHopFactory {
             TransferEdge transferEdge = new TransferEdge(fromv, tov, distance, time);
             CoordinateSequence sequence = new PackedCoordinateSequence.Double(new Coordinate[] {
                     fromv.getCoordinate(), tov.getCoordinate() }, 2);
-            Geometry geometry = _geometryFactory.createLineString(sequence);
+            LineString geometry = _geometryFactory.createLineString(sequence);
             transferEdge.setGeometry(geometry);
         }
     }

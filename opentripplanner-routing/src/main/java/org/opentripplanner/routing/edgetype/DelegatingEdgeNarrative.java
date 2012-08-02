@@ -21,7 +21,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.patch.Alert;
 
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 
 public abstract class DelegatingEdgeNarrative implements EdgeNarrative {
     protected EdgeNarrative base;
@@ -40,7 +40,7 @@ public abstract class DelegatingEdgeNarrative implements EdgeNarrative {
     }
 
     @Override
-    public Geometry getGeometry() {
+    public LineString getGeometry() {
         return base.getGeometry();
     }
 

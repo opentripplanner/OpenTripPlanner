@@ -35,7 +35,7 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.TurnVertex;
 import org.opentripplanner.util.TestUtils;
 
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 
 public class TestTurnEdge extends TestCase {
 
@@ -204,7 +204,7 @@ class MockTransfer extends AbstractEdge {
     }
 
     @Override
-    public Geometry getGeometry() {
+    public LineString getGeometry() {
         return null;
     }
 

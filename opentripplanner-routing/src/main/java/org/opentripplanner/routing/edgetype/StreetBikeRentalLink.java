@@ -120,4 +120,9 @@ public class StreetBikeRentalLink extends AbstractEdge implements EdgeWithElevat
         return elevationProfileSegment.setElevationProfile(elev, computed, false);
     }
 
+    @Override
+    public ElevationProfileSegment getElevationProfileSegment() {
+        return elevationProfileSegment;
+    }
+
 }

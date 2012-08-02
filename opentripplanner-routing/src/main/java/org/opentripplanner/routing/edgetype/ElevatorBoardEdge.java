@@ -22,8 +22,8 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Vertex;
 
-import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.LineString;
 
 
 /**
@@ -40,7 +40,7 @@ public class ElevatorBoardEdge extends AbstractEdge {
      * It's generally a polyline with two coincident points, but some elevators have horizontal
      * dimension, e.g. the ones on the Eiffel Tower.
      */
-    private Geometry the_geom;
+    private LineString the_geom;
 
     public ElevatorBoardEdge(Vertex from, Vertex to) {
         super(from, to);
@@ -69,7 +69,7 @@ public class ElevatorBoardEdge extends AbstractEdge {
     }
 
     @Override
-    public Geometry getGeometry() {
+    public LineString getGeometry() {
         return the_geom;
     }
 

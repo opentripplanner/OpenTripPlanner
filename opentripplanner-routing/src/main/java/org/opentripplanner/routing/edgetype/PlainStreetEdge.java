@@ -15,20 +15,28 @@ package org.opentripplanner.routing.edgetype;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
+import org.opentripplanner.common.TurnRestriction;
+import org.opentripplanner.common.TurnRestrictionType;
+import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.NoThruTrafficState;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.util.ElevationProfileSegment;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TurnVertex;
 
+import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 
 /**
@@ -38,7 +46,7 @@ import com.vividsolutions.jts.geom.LineString;
  * @author novalis
  * 
  */
-public class PlainStreetEdge extends StreetEdge {
+public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
     private static final long serialVersionUID = 1L;
 
@@ -75,6 +83,12 @@ public class PlainStreetEdge extends StreetEdge {
 
     private Set<Alert> wheelchairNotes;
 
+    private List<TurnRestriction> turnRestrictions = Collections.emptyList();
+
+    public int inAngle;
+
+    public int outAngle;
+
     /**
      * No-arg constructor used only for customization -- do not call this unless you know
      * what you are doing
@@ -95,6 +109,17 @@ public class PlainStreetEdge extends StreetEdge {
         this.name = name;
         this.permission = permission;
         this.back = back;
+        if (geometry != null) {
+            for (Coordinate c : geometry.getCoordinates()) {
+                if (Double.isNaN(c.x)) {
+                    System.out.println("DOOM");
+                }
+            }
+            double angleR = DirectionUtils.getLastAngle(geometry);
+            outAngle = ((int) (180 * angleR / Math.PI) + 180 + 360) % 360;
+            angleR = DirectionUtils.getFirstAngle(geometry);
+            inAngle = ((int) (180 * angleR / Math.PI) + 180 + 360) % 360;
+        }
     }
 
     @Override
@@ -348,6 +373,10 @@ public class PlainStreetEdge extends StreetEdge {
         return elevationProfileSegment.getElevationProfile(start, end);
     }
 
+    public ElevationProfileSegment getElevationProfileSegment() {
+        return elevationProfileSegment;
+    }
+
     public void setSlopeOverride(boolean slopeOverride) {
         elevationProfileSegment.setSlopeOverride(slopeOverride);
     }
@@ -430,5 +459,42 @@ public class PlainStreetEdge extends StreetEdge {
 
     public void setStreetClass(int streetClass) {
         this.streetClass = streetClass;
+    }
+
+    public void addTurnRestriction(TurnRestriction turnRestriction) {
+        if (turnRestrictions.isEmpty()) {
+            turnRestrictions = new ArrayList<TurnRestriction>();
+        }
+        turnRestrictions.add(turnRestriction);
+    }
+
+    @Override
+    public PlainStreetEdge clone() {
+        try {
+            return (PlainStreetEdge) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public List<TurnRestriction> getTurnRestrictions() {
+        return turnRestrictions;
+    }
+
+    public boolean canTurnOnto(Edge e, State state) {
+        for (TurnRestriction restriction : turnRestrictions) {
+            if (restriction.to == e && restriction.modes.contains(state.getNonTransitMode(state.getOptions()))) {
+                return restriction.type == TurnRestrictionType.ONLY_TURN;
+            }
+        }
+        return true;
+    }
+
+    public int getInAngle() {
+        return inAngle;
+    }
+
+    public int getOutAngle() {
+        return outAngle;
     }
 }
