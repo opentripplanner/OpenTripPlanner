@@ -19,13 +19,11 @@ import java.util.List;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
-import org.opentripplanner.routing.algorithm.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.strategies.SkipTraverseResultStrategy;
 import org.opentripplanner.routing.algorithm.strategies.TransitLocalStreetService;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
@@ -119,7 +117,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
 
         for (State bounder : bounders) {
 
-            if (minWalk > bounder.getWalkDistance() && current.getTime() + minTime > bounder.getTime()) 
+            if (optimisticDistance > bounder.getWalkDistance() && current.getTime() + minTime > bounder.getTime()) 
                 return true; // this path won't win on either time or distance
 
             //check that the new path is not much longer in time than the bounding path
