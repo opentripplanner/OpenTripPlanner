@@ -472,6 +472,8 @@ public class StateEditor {
 
     /** return true if all PathParsers advanced to a state other than REJECT */
     public boolean parsePath(State state) {
+        return true;
+        /*
         if (state.stateData.opt.rctx == null)
             return true; // a lot of tests don't set a routing context
         PathParser[] parsers = state.stateData.opt.rctx.pathParsers;
@@ -498,7 +500,7 @@ public class StateEditor {
         if (modified)
             state.pathParserStates = parserStates;
 
-        return accept;
+            return accept; */
     }
 
     public void alightTransit() {

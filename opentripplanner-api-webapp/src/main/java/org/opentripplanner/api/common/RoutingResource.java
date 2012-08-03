@@ -136,7 +136,14 @@ public abstract class RoutingResource {
      */
     @DefaultValue("0") @QueryParam("clampInitialWait")
     protected List<Long> clampInitialWait;
-    
+
+    /**
+     * If true, this trip will be reverse-optimized on the fly. Otherwise, reverse-optimization
+     * will occur once a trip has been chosen (in Analyst, it will not be done at all).
+     */
+    @QueryParam("reverseOptimizeOnTheFly")
+    protected List<Boolean> reverseOptimizeOnTheFly;
+        
     @DefaultValue("-1") @QueryParam("boardSlack")
     private List<Integer> boardSlack;
     
@@ -284,6 +291,9 @@ public abstract class RoutingResource {
         }
         
         request.setClampInitialWait(get(clampInitialWait, n, request.getClampInitialWait()));
+
+        request.setReverseOptimizeOnTheFly(get(reverseOptimizeOnTheFly, n, 
+                                               request.isReverseOptimizeOnTheFly()));
 
         return request;
     }

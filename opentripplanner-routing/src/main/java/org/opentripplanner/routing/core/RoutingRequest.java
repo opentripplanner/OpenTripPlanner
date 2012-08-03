@@ -242,6 +242,12 @@ public class RoutingRequest implements Cloneable, Serializable {
     public long clampInitialWait;
 
     /**
+     * When true, reverse optimize this search on the fly whenever needed, rather than 
+     * reverse-optimizing the entire path when it's done.
+     */
+    public boolean reverseOptimizeOnTheFly = false;
+
+    /**
      * The routing context used to actually carry out this search. It is important to build States 
      * from TraverseOptions rather than RoutingContexts, and just keep a reference to the context 
      * in the TraverseOptions, rather than using RoutingContexts for everything because in some 
@@ -260,7 +266,6 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /** A transit stop that this trip must start from */
     private AgencyAndId startingTransitStopId;
-    
     
     /* CONSTRUCTORS */
     
@@ -680,7 +685,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && bikeRentalDropoffCost == other.bikeRentalDropoffCost
                 && useBikeRentalAvailabilityInformation == other.useBikeRentalAvailabilityInformation
                 && extensions.equals(other.extensions)
-                && clampInitialWait == other.clampInitialWait;
+                && clampInitialWait == other.clampInitialWait
+                && reverseOptimizeOnTheFly == other.reverseOptimizeOnTheFly;
     }
 
     /** Equality and hashCode should not consider the routing context, to allow SPT caching. */
@@ -701,7 +707,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + new Double(triangleSlopeFactor).hashCode() * 136372361
                 + new Double(triangleTimeFactor).hashCode() * 790052899
                 + new Double(stairsReluctance).hashCode() * 315595321
-                + new Long(clampInitialWait).hashCode() * 209477;
+                + new Long(clampInitialWait).hashCode() * 209477
+                + new Boolean(reverseOptimizeOnTheFly).hashCode() * 95112799;
         if (batch) {
             hashCode *= -1;
             hashCode += to.hashCode() * 1327144003;
