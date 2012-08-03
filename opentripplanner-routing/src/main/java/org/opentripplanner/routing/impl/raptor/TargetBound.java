@@ -18,19 +18,21 @@ import java.util.List;
 
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.algorithm.strategies.SkipTraverseResultStrategy;
 import org.opentripplanner.routing.algorithm.strategies.TransitLocalStreetService;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.graph.AbstractVertex;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-public class TargetBound implements SearchTerminationStrategy, SkipTraverseResultStrategy {
+public class TargetBound implements SearchTerminationStrategy, SkipTraverseResultStrategy, RemainingWeightHeuristic {
+
+    private static final long serialVersionUID = -5296036164138922096L;
 
     List<State> bounders;
 
@@ -48,6 +50,18 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
 
     private List<int[]> minTimesNearEnd;
 
+    //this is saved so that it can be reused in various skipping functions
+    private double targetDistance;
+
+    private double speedWeight;
+
+    /**
+     * How much longer the worst path can be than the best in terms of time.
+     * Setting this lower will cut off some less-walking more-time paths.
+     * Setting it higher will slow down the search a lot.
+     */
+    private double timeBoundFactor = 1.5;
+
     //private List<RaptorState> boundingStates;
 
     public TargetBound(RoutingRequest options, List<State> dijkstraBoundingStates) {
@@ -63,6 +77,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
         transitLocalStreets = options.rctx.graph.getService(TransitLocalStreetService.class);
         speedUpperBound = options.getSpeedUpperBound();
         //this.minTimesNearEnd = minTimes;
+        this.speedWeight = options.getWalkReluctance() / speedUpperBound;
     }
 
     @Override
@@ -78,7 +93,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
     public boolean shouldSkipTraversalResult(Vertex origin, Vertex target, State parent,
             State current, ShortestPathTree spt, RoutingRequest traverseOptions) {
         final Vertex vertex = current.getVertex();
-        final double targetDistance = distanceLibrary.fastDistance(realTargetCoordinate.x, realTargetCoordinate.y,
+        targetDistance = distanceLibrary.fastDistance(realTargetCoordinate.x, realTargetCoordinate.y,
                 vertex.getX(), vertex.getY());
 
         final double remainingWalk = traverseOptions.maxWalkDistance
@@ -145,12 +160,43 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
             //check that the new path is not much longer in time than the bounding path
             double bounderTime = bounder.getTime() - traverseOptions.dateTime;
 
-            if (bounderTime * 1.5 < stateTime) {
+            if (bounderTime * timeBoundFactor  < stateTime) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    @Override
+    public double computeInitialWeight(State s, Vertex target) {
+        return computeForwardWeight(s, target);
+    }
+
+
+    /**
+     * This actually does have to be admissible, since when we find the target, it used to bound the rest of the search.
+     */
+    @Override
+    public double computeForwardWeight(State s, Vertex target) {
+        return targetDistance * speedWeight;
+    }
+
+    @Override
+    public double computeReverseWeight(State s, Vertex target) {
+        return computeForwardWeight(s, target);
+    }
+
+    @Override
+    public void reset() {
+    }
+
+    public double getTimeBoundFactor() {
+        return timeBoundFactor;
+    }
+
+    public void setTimeBoundFactor(double timeBoundFactor) {
+        this.timeBoundFactor = timeBoundFactor;
     }
 
 }
