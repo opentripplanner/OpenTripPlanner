@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.zip.GZIPInputStream;
 
+import lombok.Setter;
+
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.common.CTX;
 import org.opentripplanner.routing.core.ServiceDay;
@@ -22,9 +24,9 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer {
     private ZMQ.Context context;
     private ZMQ.Socket subscriber;
     private int count = 0;
-    private String defaultAgencyId = "";
-    private String address = "tcp://node01.post.openov.nl:7817";
-    private static String feed = "/GOVI/KV8"; 
+    @Setter private String defaultAgencyId = "";
+    @Setter private String address = "tcp://node01.post.openov.nl:7817";
+    @Setter private static String feed = "/GOVI/KV8"; 
     
     public KV8ZMQUpdateStreamer() {
         context = ZMQ.context(1);
@@ -104,8 +106,4 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer {
         return new AgencyAndId(row.get("DataOwnerCode"), tripId);
     }
     
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
 }
