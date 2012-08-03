@@ -29,6 +29,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.routing.spt.GraphPath;
 
 public class State implements Cloneable {
     /* Data which is likely to change at most traversals */
@@ -101,6 +102,7 @@ public class State implements Cloneable {
         this.stateData.opt = options;
         this.stateData.startTime = time;
         this.stateData.usingRentedBike = false;
+        this.walkDistance = 0;
         this.time = time;
         if (options.rctx != null) {
         	this.pathParserStates = new int[options.rctx.pathParsers.length];
@@ -297,6 +299,10 @@ public class State implements Cloneable {
         return (int) Math.abs(this.time - backState.time);
     }
 
+    public double getWalkDistanceDelta () {
+        return Math.abs(this.walkDistance - backState.walkDistance);
+    }
+
     public double getWeightDelta() {
         return this.weight - backState.weight;
     }
@@ -405,7 +411,9 @@ public class State implements Cloneable {
     public State reversedClone() {
         // We no longer compensate for schedule slack (minTransferTime) here.
         // It is distributed symmetrically over all preboard and prealight edges.
-        return new State(this.vertex, this.time, stateData.opt.reversedClone());
+        State newState = new State(this.vertex, this.time, stateData.opt.reversedClone());
+        newState.stateData.tripTimes = stateData.tripTimes;
+        return newState;
     }
 
     public void dumpPath() {
@@ -529,9 +537,16 @@ public class State implements Cloneable {
             editor.setFromState(orig);
             editor.incrementTimeInSeconds(orig.getAbsTimeDeltaSec());
             editor.incrementWeight(orig.getWeightDelta());
+            editor.incrementWalkDistance(orig.getWalkDistanceDelta());
             if (orig.isBikeRenting() != orig.getBackState().isBikeRenting())
              editor.setBikeRenting(!orig.isBikeRenting());
             ret = editor.makeState();
+            
+            if (ret == null) {
+                LOG.warn("Returned state is null for edge " + edge + 
+                         "; OTP will crash momentarily");
+            }
+
             orig = orig.getBackState();
         }
 
@@ -545,18 +560,27 @@ public class State implements Cloneable {
      * path that passes through all the same edges, but which may have a shorter overall duration
      * due to different weights on time-dependent (e.g. transit boarding) edges.
      * 
-     * @return a state at the other end of a reversed, optimized path
+     * @param forward Is this an on-the-fly reverse search in the midst of a forward search?
+     * @returns a state at the other end (or this end, in the case of a forward search) 
+     * of a reversed, optimized path
      */
     // optimize is now very similar to reverse, and the two could conceivably be combined
-    public State optimize() {
+    public State optimize(boolean forward) {
         State orig = this;
         State unoptimized = orig;
         State ret = orig.reversedClone();
+        
         Edge edge = null;
         try {
             while (orig.getBackState() != null) {
                 edge = orig.getBackEdge();
                 ret = edge.traverse(ret);
+
+                if (ret == null) {
+                    LOG.warn("Returned state is null for edge " + edge + 
+                             "; OTP will crash momentarily");
+                }
+
                 EdgeNarrative origNarrative = orig.getBackEdgeNarrative();
                 EdgeNarrative retNarrative = ret.getBackEdgeNarrative();
                 copyExistingNarrativeToNewNarrativeAsAppropriate(origNarrative, retNarrative);
@@ -564,12 +588,37 @@ public class State implements Cloneable {
             }
         } catch (NullPointerException e) {
             LOG.warn("Cannot reverse path at edge: " + edge
-                    + " returning unoptimized path. If edge is a PatternInterlineDwell,"
+                    + ", returning unoptimized path. If edge is a PatternInterlineDwell,"
                     + " this is not totally unexpected; otherwise, you might want to"
                     + " look into it");
-            return unoptimized.reverse();
+
+            if (forward)
+                return this;
+            else
+                return unoptimized.reverse();
         }
-        return ret;
+
+        if (forward) {
+            if (Math.abs(walkDistance - ret.walkDistance) > 0.5)
+                LOG.warn("On the fly reverse-optimization of path yielded a path with a different" +
+                         " walk distance, " + walkDistance + "m unoptimized vs. " +
+                         ret.walkDistance + "m optimized");
+            
+            return ret.reverse();
+        }
+        else
+            return ret;
+    }
+
+    /**
+     * Reverse-optimize a path after it is complete, by default
+     */
+    public State optimize () {
+        return optimize(false);
+    }
+
+    public boolean getReverseOptimizing () {
+        return stateData.opt.reverseOptimizing;
     }
 
     private static void copyExistingNarrativeToNewNarrativeAsAppropriate(EdgeNarrative from,
