@@ -31,6 +31,10 @@
             <version>1.0.0</version>
         </dependency>
         <dependency>
+	        <groupId>org.projectlombok</groupId>
+    	    <artifactId>lombok</artifactId>
+		</dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>opentripplanner-routing</artifactId>
             <version>${project.version}</version>

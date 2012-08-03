@@ -5,6 +5,8 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
+import lombok.Setter;
+
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.edgetype.PatternBoard;
@@ -24,7 +26,6 @@ import static org.opentripplanner.common.IterableLibrary.filter;
  * Update OTP stop time tables from some (realtime) source
  * @author abyrd
  */
-@Component
 public class StoptimeUpdater implements Runnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(StoptimeUpdater.class);
@@ -32,9 +33,8 @@ public class StoptimeUpdater implements Runnable {
     public static final int NEVER = Integer.MIN_VALUE;
     public static final int UPDATED = Integer.MAX_VALUE;
 
-    @Autowired
-    private GraphService graphService;
-    private UpdateStreamer updateStreamer;
+    @Autowired private GraphService graphService;
+    @Setter    private UpdateStreamer updateStreamer;
     private Map<AgencyAndId, TableTripPattern> patternForTripId;
    
     @PostConstruct
@@ -75,10 +75,6 @@ public class StoptimeUpdater implements Runnable {
                 }
             }
         }
-    }
-
-    public void setUpdateStreamer (UpdateStreamer us) {
-        this.updateStreamer = us;
     }
 
 }
