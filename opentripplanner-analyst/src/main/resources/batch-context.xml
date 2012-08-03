@@ -101,7 +101,7 @@
 	<bean id="prototypeRoutingRequest" class="org.opentripplanner.routing.core.RoutingRequest">
 		<!-- Set default routing parameters here -->
         <property name="routerId" value="arbor" />
-        <property name="maxWalkDistance" value="2.000" />
+        <property name="maxWalkDistance" value="2000" />
         <property name="clampInitialWait" value="1800" />
         <property name="arriveBy" value="false" />
         <property name="modes" value="WALK,TRANSIT" />

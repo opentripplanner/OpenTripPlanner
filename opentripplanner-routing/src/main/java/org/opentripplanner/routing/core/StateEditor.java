@@ -27,6 +27,7 @@ import org.opentripplanner.routing.patch.NoteNarrative;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.Patch;
 import org.opentripplanner.routing.pathparser.PathParser;
+import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -257,9 +258,9 @@ public class StateEditor {
 
     /* Basic Setters */
 
-    public void setTrip(int trip) {
+    public void setTripTimes(TripTimes tripTimes) {
         cloneStateDataAsNeeded();
-        child.stateData.trip = trip;
+        child.stateData.tripTimes = tripTimes;
     }
 
     public void setTripId(AgencyAndId tripId) {
@@ -357,7 +358,7 @@ public class StateEditor {
     public void setFromState(State state) {
         cloneStateDataAsNeeded();
         child.stateData.route = state.stateData.route;
-        child.stateData.trip = state.stateData.trip;
+        child.stateData.tripTimes = state.stateData.tripTimes;
         child.stateData.tripId = state.stateData.tripId;
         child.stateData.zone = state.stateData.zone;
         child.stateData.extensions = state.stateData.extensions;
@@ -381,10 +382,6 @@ public class StateEditor {
 
     public long getElapsedTime() {
         return child.getElapsedTime();
-    }
-
-    public int getTrip() {
-        return child.getTrip();
     }
 
     public AgencyAndId getTripId() {

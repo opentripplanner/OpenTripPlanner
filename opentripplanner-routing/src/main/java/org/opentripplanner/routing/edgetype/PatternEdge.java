@@ -13,6 +13,7 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.opentripplanner.routing.graph.AbstractEdge;
+import org.opentripplanner.routing.vertextype.OnboardVertex;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 
 /**
@@ -22,20 +23,14 @@ import org.opentripplanner.routing.vertextype.TransitVertex;
  */
 public abstract class PatternEdge extends AbstractEdge {
 
-    protected TableTripPattern pattern;
-
     private static final long serialVersionUID = 1L;
 
-    public PatternEdge(TransitVertex fromv, TransitVertex tov, TableTripPattern pattern) {
+    public PatternEdge(TransitVertex fromv, TransitVertex tov) {
         super(fromv, tov);
-        this.pattern = pattern;
     }
 
     public TableTripPattern getPattern() {
-        return pattern;
+        return ((OnboardVertex)fromv).getTripPattern();
     }
 
-    public void setPattern(TableTripPattern pattern) {
-        this.pattern = pattern;
-    }
 }

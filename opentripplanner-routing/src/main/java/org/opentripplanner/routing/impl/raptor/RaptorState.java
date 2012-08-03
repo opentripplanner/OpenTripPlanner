@@ -15,6 +15,7 @@ package org.opentripplanner.routing.impl.raptor;
 
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.trippattern.TripTimes;
 
 /* RaptorStates are always at some transit stop;
  * they either got there via a walk, in which case walkPath != null, or
@@ -36,7 +37,7 @@ public class RaptorState {
     int boardStopSequence = -1; //this is the index in this route
     RaptorRoute route;
     public int patternIndex = -1; 
-    public int tripIndex = -1;
+    public TripTimes tripTimes = null;
 
     /* if has walked to transit,  */
     State walkPath;

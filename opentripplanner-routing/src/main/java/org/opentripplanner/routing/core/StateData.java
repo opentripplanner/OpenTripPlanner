@@ -18,6 +18,7 @@ import java.util.HashMap;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.trippattern.TripTimes;
 
 /**
  * StateData contains the components of search state that are unlikely to be changed as often as
@@ -30,7 +31,7 @@ public class StateData implements Cloneable {
     protected long startTime;
 
     // which trip index inside a pattern
-    protected int trip;
+    protected TripTimes tripTimes;
 
     protected AgencyAndId tripId;
 

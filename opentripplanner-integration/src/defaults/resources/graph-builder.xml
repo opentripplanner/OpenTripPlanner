@@ -52,7 +52,6 @@
     </bean>
 
     <bean id="transitStreetLink" class="org.opentripplanner.graph_builder.impl.TransitToStreetNetworkGraphBuilderImpl" />
-    <bean id="optimizeTransit" class="org.opentripplanner.graph_builder.impl.OptimizeTransitGraphBuilderImpl" />
     <bean id="checkGeometry" class="org.opentripplanner.graph_builder.impl.CheckGeometryGraphBuilderImpl" />
 
     <bean id="graphBuilderTask" class="org.opentripplanner.graph_builder.GraphBuilderTask">
@@ -63,7 +62,6 @@
                 <ref bean="gtfsBuilder" />
                 <ref bean="streetBuilder" />
                 <ref bean="transitStreetLink" />
-                <ref bean="optimizeTransit" />
                 <ref bean="checkGeometry" />
             </list>
         </property>

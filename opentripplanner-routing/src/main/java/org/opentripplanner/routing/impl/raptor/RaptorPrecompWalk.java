@@ -376,15 +376,14 @@ public class RaptorPrecompWalk implements PathService {
 
                     ServiceDay sd = boardState.serviceDay;
 
-                    int alightTime = route.getAlightTime(boardState.patternIndex,
-                            boardState.tripIndex, stopNo);
+                    int alightTime = route.getAlightTime(boardState.tripTimes, stopNo);
                     newState.arrivalTime = (int) sd.time(alightTime);
 
                     newState.boardStop = boardState.boardStop;
                     newState.boardStopSequence = boardState.boardStopSequence;
                     newState.route = route;
                     newState.patternIndex = boardState.patternIndex;
-                    newState.tripIndex = boardState.tripIndex;
+                    newState.tripTimes = boardState.tripTimes;
                     newState.nBoardings = boardState.nBoardings;
                     newState.walkDistance = boardState.walkDistance;
                     newState.parent = boardState.parent;
@@ -430,7 +429,7 @@ public class RaptorPrecompWalk implements PathService {
                         boardState.boardStopSequence = stopNo;
                         boardState.arrivalTime = boardSpec.departureTime;
                         boardState.patternIndex = boardSpec.patternIndex;
-                        boardState.tripIndex = boardSpec.tripIndex;
+                        boardState.tripTimes = boardSpec.tripTimes;
                         boardState.parent = oldState;
                         boardState.serviceDay = boardSpec.serviceDay;
                         boardState.route = route;
@@ -569,7 +568,7 @@ public class RaptorPrecompWalk implements PathService {
                     }
                     newState.parent = state; 
                     state.stop = dest;
-                    state.tripIndex = -2; //this sentinel value will mean
+                    state.tripTimes = null;
                     cur.visitedLastRound.add(dest);
                     cur.visitedEver.add(dest);
                     //that the walk path is recomputed later

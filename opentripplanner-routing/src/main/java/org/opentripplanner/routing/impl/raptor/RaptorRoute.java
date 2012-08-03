@@ -21,6 +21,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.routing.trippattern.TripTimes;
 
 /**
  * A set of trips that have the same stops in the same order In other words, a TripPattern, but
@@ -56,17 +57,15 @@ public class RaptorRoute implements Serializable {
         return pattern.getDepartureTime(stopNo, tripIndex);
     }
 
-    public int getAlightTime(int patternIndex, int tripIndex, int stopNo) {
-        PatternAlight alight = alights[stopNo - 1][patternIndex];
-        TableTripPattern pattern = alight.getPattern();
-        return pattern.getArrivalTime(stopNo - 1, tripIndex);
+    public int getAlightTime(TripTimes tripTimes, int stopNo) {
+        return tripTimes.getArrivalTime(stopNo - 1);
     }
 
     public RaptorBoardSpec getTripIndex(RoutingRequest request, int arrivalTime, int stopNo) {
 
         RaptorBoardSpec spec = new RaptorBoardSpec();
         spec.departureTime = Integer.MAX_VALUE;
-        spec.tripIndex = -1;
+        spec.tripTimes = null;
         spec.patternIndex = -1;
 
         for (int i = 0; i < boards[stopNo].length; ++i) {
@@ -79,7 +78,7 @@ public class RaptorRoute implements Serializable {
             int time = (int) result.getTime();
             if (time < spec.departureTime) {
                 spec.departureTime = time;
-                spec.tripIndex = result.getTrip();
+                spec.tripTimes = result.getTripTimes();
                 spec.patternIndex = i;
                 spec.serviceDay = result.getServiceDay();
             }

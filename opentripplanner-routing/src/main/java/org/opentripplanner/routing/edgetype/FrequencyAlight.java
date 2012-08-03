@@ -166,7 +166,7 @@ public class FrequencyAlight extends AbstractEdge  implements OnBoardReverseEdge
             if (TransitUtils.handleBoardAlightType(s1, type)) {
                 return null;
             }
-            s1.setTrip(bestPatternIndex);
+            //s1.setTrip(bestPatternIndex); is this necessary? (AMB)
             s1.incrementTimeInSeconds(bestWait);
             s1.incrementNumBoardings();
             s1.setTripId(trip.getId());

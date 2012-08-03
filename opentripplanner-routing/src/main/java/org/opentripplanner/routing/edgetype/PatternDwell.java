@@ -19,6 +19,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.routing.vertextype.PatternDepartVertex;
 
@@ -36,13 +37,12 @@ public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnB
     private int stopIndex;
     
     public PatternDwell(PatternArriveVertex from, PatternDepartVertex to, int stopIndex, TableTripPattern tripPattern) {
-        super(from, to, tripPattern);
+        super(from, to);
         this.stopIndex = stopIndex;
-        this.pattern = tripPattern;
     }
 
     public String getDirection() {
-        return pattern.getExemplar().getTripHeadsign();
+        return getPattern().getExemplar().getTripHeadsign();
     }
 
     public double getDistance() {
@@ -50,17 +50,18 @@ public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnB
     }
 
     public TraverseMode getMode() {
-        return GtfsLibrary.getTraverseMode(pattern.getExemplar().getRoute());
+        return GtfsLibrary.getTraverseMode(getPattern().getExemplar().getRoute());
     }
 
     public String getName() {
-        return GtfsLibrary.getRouteName(pattern.getExemplar().getRoute());
+        return GtfsLibrary.getRouteName(getPattern().getExemplar().getRoute());
     }
 
     public State traverse(State state0) {
-        int trip = state0.getTrip();
-        int dwellTime = pattern.getDwellTime(stopIndex, trip);
-        EdgeNarrative en = new TransitNarrative(pattern.getTrip(trip), pattern.getHeadsign(stopIndex, trip), this);
+        //int trip = state0.getTrip();
+        TripTimes tripTimes = state0.getTripTimes();
+        int dwellTime = tripTimes.getDwellTime(stopIndex);
+        EdgeNarrative en = new TransitNarrative(tripTimes.trip, getPattern().getHeadsign(stopIndex, tripTimes.index), this);
         StateEditor s1 = state0.edit(this, en);
         s1.incrementTimeInSeconds(dwellTime);
         s1.incrementWeight(dwellTime);
@@ -69,7 +70,7 @@ public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnB
 
     @Override
     public State optimisticTraverse(State s0) {
-        int dwellTime = pattern.getBestDwellTime(stopIndex);
+        int dwellTime = getPattern().getBestDwellTime(stopIndex);
         StateEditor s1 = s0.edit(this);
         s1.incrementTimeInSeconds(dwellTime);
         s1.incrementWeight(dwellTime);
@@ -78,7 +79,7 @@ public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnB
     
     @Override
     public double timeLowerBound(RoutingRequest options) {
-        return pattern.getBestDwellTime(stopIndex);
+        return getPattern().getBestDwellTime(stopIndex);
     }
 
     @Override
@@ -94,20 +95,16 @@ public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnB
         return "PatternDwell(" + super.toString() + ")";
     }
 
-    public void setPattern(TableTripPattern pattern) {
-        this.pattern = pattern;
-    }
-
-    public TableTripPattern getPattern() {
-        return pattern;
-    }
-
     public void setStopIndex(int stopIndex) {
         this.stopIndex = stopIndex;
     }
 
     public int getStopIndex() {
         return stopIndex;
+    }
+
+    public boolean allDwellsZero() {
+        return this.getPattern().allDwellsZero(this.stopIndex);
     }
 
 }

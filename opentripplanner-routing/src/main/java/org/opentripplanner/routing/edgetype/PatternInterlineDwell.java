@@ -26,6 +26,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.OnboardVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -137,9 +138,11 @@ public class PatternInterlineDwell extends AbstractEdge implements OnBoardForwar
         }
 
         StateEditor s1 = state0.edit(this);
+        // FIXME: ugly!
+        TableTripPattern pattern = ((OnboardVertex)s1.getVertex()).getTripPattern();
         s1.incrementTimeInSeconds(dwellData.dwellTime);
-        s1.setTripId(targetTrip.getId());
-        s1.setTrip(dwellData.patternIndex);
+        s1.setTripId(targetTrip.getId()); // TODO: is this right? the targetTrip is more like an exemplar? (AMB)
+        s1.setTripTimes(pattern.getTripTimes(dwellData.patternIndex));
         s1.incrementWeight(dwellData.dwellTime);
         return s1.makeState();
     }

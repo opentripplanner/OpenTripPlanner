@@ -26,6 +26,7 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.pathparser.PathParser;
+import org.opentripplanner.routing.trippattern.TripTimes;
 
 public class State implements Cloneable {
 
@@ -170,6 +171,10 @@ public class State implements Cloneable {
         return Math.abs(this.time - stateData.startTime);
     }
 
+    public TripTimes getTripTimes() {
+        return stateData.tripTimes;
+    }
+
     /** returns the length of the trip in seconds up to this time, not including the initial wait.
         It subtracts out the initial wait or a clamp value specified in the request.
         This is used in lieu of reverse optimization in Analyst. */
@@ -188,10 +193,6 @@ public class State implements Cloneable {
             activeTime = getElapsedTime();
 
         return activeTime;            
-    }
-
-    public int getTrip() {
-        return stateData.trip;
     }
 
     public AgencyAndId getTripId() {
@@ -389,6 +390,8 @@ public class State implements Cloneable {
         return stateData.opt;
     }
     
+    /* will return BICYCLE if routing with an owned bicycle, or if at this state the user is holding
+     * on to a rented bicycle */
     public TraverseMode getNonTransitMode(RoutingRequest options) {
         TraverseModeSet modes = options.getModes();
         if (modes.getCar())
