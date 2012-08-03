@@ -20,6 +20,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.automata.AutomatonState;
 import org.opentripplanner.routing.edgetype.OnBoardForwardEdge;
+import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
@@ -119,7 +120,7 @@ public class State implements Cloneable {
         return new StateEditor(this, e, en);
     }
 
-    public State clone() {
+    protected State clone() {
         State ret;
         try {
             ret = (State) super.clone();
@@ -262,6 +263,10 @@ public class State implements Cloneable {
         }
         // Multi-state (bike rental) - no domination for different states
         if (isBikeRenting() != other.isBikeRenting())
+            return false;
+
+        if (backEdge != other.getBackEdge() && ((backEdge instanceof PlainStreetEdge)
+                && (!((PlainStreetEdge) backEdge).getTurnRestrictions().isEmpty())))
             return false;
 
         if (this.similarRouteSequence(other)) {

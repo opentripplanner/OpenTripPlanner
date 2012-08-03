@@ -6,6 +6,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateData;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 
@@ -33,6 +34,10 @@ public class MaxWalkState extends State {
     @Override
     public boolean dominates(State other) {
       //checking absolute time is correct for RAPTOR
+
+        if (backEdge != other.getBackEdge() && ((backEdge instanceof PlainStreetEdge)
+                && (!((PlainStreetEdge) backEdge).getTurnRestrictions().isEmpty())))
+            return false;
         return walkDistance <= other.getWalkDistance() * 1.05 
                 && this.getTime() <= other.getTime() + 30; 
     }

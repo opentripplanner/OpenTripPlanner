@@ -26,8 +26,7 @@ import org.opentripplanner.common.model.T2;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.common.pqueue.OTPPriorityQueue;
 import org.opentripplanner.common.pqueue.OTPPriorityQueueFactory;
-import org.opentripplanner.routing.algorithm.EdgeBasedGenericDijkstra;
-import org.opentripplanner.routing.algorithm.EdgeBasedState;
+import org.opentripplanner.routing.algorithm.GenericDijkstra;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
@@ -40,7 +39,6 @@ import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
-import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -434,9 +432,9 @@ public class Raptor implements PathService {
          */
 
         ShortestPathTree spt;
-        EdgeBasedGenericDijkstra dijkstra = new EdgeBasedGenericDijkstra(walkOptions);
+        GenericDijkstra dijkstra = new GenericDijkstra(walkOptions);
         if (nBoardings == 0) {
-            EdgeBasedState start = new EdgeBasedState(options.rctx.origin, walkOptions);
+            MaxWalkState start = new MaxWalkState(options.rctx.origin, walkOptions);
             spt = dijkstra.getShortestPathTree(start);
             // also, compute an initial spt from the target so that we can find out what transit
             // stops are nearby and what
@@ -444,8 +442,8 @@ public class Raptor implements PathService {
 
             RoutingRequest reversedWalkOptions = walkOptions.clone();
             reversedWalkOptions.setArriveBy(true);
-            EdgeBasedGenericDijkstra destDijkstra = new EdgeBasedGenericDijkstra(reversedWalkOptions);
-            start = new EdgeBasedState(options.rctx.target, reversedWalkOptions);
+            GenericDijkstra destDijkstra = new GenericDijkstra(reversedWalkOptions);
+            start = new MaxWalkState(options.rctx.target, reversedWalkOptions);
             ShortestPathTree targetSpt = destDijkstra.getShortestPathTree(start);
             for (State state : targetSpt.getAllStates()) {
 
@@ -463,7 +461,7 @@ public class Raptor implements PathService {
             }
         } else {
 
-            final List<EdgeBasedState> startPoints = new ArrayList<EdgeBasedState>();
+            final List<MaxWalkState> startPoints = new ArrayList<MaxWalkState>();
 /*
             RegionData regionData = data.regionData;
             
@@ -584,7 +582,7 @@ public class Raptor implements PathService {
                     continue;
                 }
 
-                StateEditor dijkstraState = new EdgeBasedState.EdgeBasedStateEditor(walkOptions,
+                StateEditor dijkstraState = new MaxWalkState.MaxWalkStateEditor(walkOptions,
                         stopVertex);
                 dijkstraState.setNumBoardings(state.nBoardings);
                 dijkstraState.setWalkDistance(state.walkDistance);
@@ -592,14 +590,8 @@ public class Raptor implements PathService {
                 dijkstraState.setExtension("raptorParent", state);
                 dijkstraState.setOptions(walkOptions);
                 dijkstraState.incrementWeight(state.arrivalTime - options.dateTime);
-                EdgeBasedState newState = (EdgeBasedState) dijkstraState.makeState();
-                for (Edge e : stopVertex.getOutgoing()) {
-                    if (e instanceof StreetTransitLink) {
-                        newState = newState.clone();
-                        newState.outgoing = e;
-                        startPoints.add(newState);
-                    }
-                }
+                MaxWalkState newState = (MaxWalkState) dijkstraState.makeState();
+                startPoints.add(newState);
             }
             if (startPoints.size() == 0) {
                 System.out.println("warning: no walk in round " + nBoardings);
