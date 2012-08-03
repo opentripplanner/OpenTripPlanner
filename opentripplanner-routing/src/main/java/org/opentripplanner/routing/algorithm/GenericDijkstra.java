@@ -83,7 +83,10 @@ public class GenericDijkstra {
     }
 
     public ShortestPathTree getShortestPathTree(State initialState) {
-        Vertex target = initialState.getOptions().rctx.target;
+        Vertex target = null;
+        if (options.rctx != null) {
+            target = initialState.getOptions().rctx.target;
+        }
         ShortestPathTree spt = createShortestPathTree(options);
         OTPPriorityQueue<State> queue = createPriorityQueue();
 
