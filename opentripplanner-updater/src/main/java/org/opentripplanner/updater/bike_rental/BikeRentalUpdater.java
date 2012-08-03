@@ -55,8 +55,14 @@ public class BikeRentalUpdater implements Runnable {
 
     private GraphService graphService;
 
+    private String network = "default";
+
     public void setRouterId(String routerId) {
         this.routerId = routerId;
+    }
+    
+    public void setNetwork(String network) {
+        this.network = network;
     }
 
     @Autowired
@@ -87,7 +93,7 @@ public class BikeRentalUpdater implements Runnable {
     public List<BikeRentalStation> getStations() {
         return source.getStations();
     }
-    
+
     @Override
     public void run() {
         _log.debug("Updating bike rental stations from " + source);
@@ -111,8 +117,8 @@ public class BikeRentalUpdater implements Runnable {
                     graph.addTemporaryEdge(e);
                 }
                 verticesByStation.put(station, vertex);
-                new RentABikeOnEdge(vertex, vertex);
-                new RentABikeOffEdge(vertex, vertex);
+                new RentABikeOnEdge(vertex, vertex, network);
+                new RentABikeOffEdge(vertex, vertex, network);
             } else {
                 vertex.setBikesAvailable(station.bikesAvailable);
                 vertex.setSpacesAvailable(station.spacesAvailable);

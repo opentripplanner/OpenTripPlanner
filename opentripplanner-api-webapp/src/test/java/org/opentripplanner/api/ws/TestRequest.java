@@ -68,7 +68,6 @@ import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.OptimizeType;
-import org.opentripplanner.routing.core.PrototypeRoutingRequest;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -503,7 +502,7 @@ public class TestRequest extends TestCase {
             this.planGenerator = Context.getInstance().planGenerator;
             this.graphService = Context.getInstance().graphService;
             this.planGenerator.graphService = Context.getInstance().graphService;
-            this.prototypeRoutingRequest = PrototypeRoutingRequest.getInstance();
+            this.prototypeRoutingRequest = new RoutingRequest();
         }
 
         public TestPlanner(String routerId, String v1, String v2, List<String> intermediates) {

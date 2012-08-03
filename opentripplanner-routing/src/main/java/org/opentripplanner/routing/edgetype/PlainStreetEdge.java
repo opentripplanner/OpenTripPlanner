@@ -176,6 +176,11 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     }
 
     @Override
+    public boolean isElevationFlattened() {
+        return elevationProfileSegment.isFlattened();
+    }
+
+    @Override
     public double getDistance() {
         return length;
     }

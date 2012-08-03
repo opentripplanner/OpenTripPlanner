@@ -532,12 +532,18 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         _log.warn("Capacity is not a number: " + node.getTag("capacity"));
                     }
                 }
+                String network = node.getTag("network");
+                if (network == null) {
+                     _log.warn("Bike rental station at osm node " + node.getId() + " with no network; not including");
+                     continue;
+                }
                 String creativeName = wayPropertySet.getCreativeNameForWay(node);
                 BikeRentalStationVertex station = new BikeRentalStationVertex(graph, "" + node.getId(), "bike rental "
                         + node.getId(), node.getLon(), node.getLat(),
                         creativeName, capacity);
-                new RentABikeOnEdge(station, station);
-                new RentABikeOffEdge(station, station);
+
+                new RentABikeOnEdge(station, station, network);
+                new RentABikeOffEdge(station, station, network);
             }
             _log.debug("Created " + n + " bike rental stations.");
         }

@@ -10,20 +10,16 @@
 
     <context:annotation-config />
     
-	<!--     
-	<context:component-scan base-package="org.opentripplanner.routing.impl"/> 
-    <context:component-scan base-package="org.opentripplanner.narrative.impl"/>
-    <context:component-scan base-package="org.opentripplanner.analyst"/>
-    -->
-    
-    <bean class="org.opentripplanner.analyst.request.SampleFactory" />
+    <bean class="org.opentripplanner.analyst.request.SampleFactory">
+	    <property name="searchRadiusM" value="200" />
+    </bean>
     <bean class="org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl"/>
     <bean class="org.opentripplanner.routing.algorithm.GenericAStar"/>
     <bean class="org.opentripplanner.analyst.batch.IndividualFactory" />
     <bean class="org.opentripplanner.analyst.core.GeometryIndex" />
     
-    
     <!-- specify a GraphService, configuring the path to the serialized Graphs -->
+    
     <bean id="graphService" class="org.opentripplanner.routing.impl.GraphServiceImpl">
         <property name="path" value="/var/otp/graphs/{}/" />
         <property name="defaultRouterId" value="arbor" />
@@ -44,8 +40,30 @@
         </property>
     </bean>
 -->
+ 
+<!-- load the origin population from a comma-separated flat text file -->
 
-<!-- this creates a population arranged on a regular grid that can later be saved as an image -->
+	<bean id="origins" class="org.opentripplanner.analyst.batch.CSVPopulation">
+        <property name="sourceFilename" value="/home/abyrd/access/annarbor.csv" />
+        <property name="latCol" value="1" />
+        <property name="lonCol" value="2" />
+        <property name="labelCol" value="0" />
+        <property name="inputCol" value="3" />       
+        <!-- do not include origins who are NaN, Inf, negative, or outside the transit coverage area --> 
+        <property name="filterChain">
+        	<list>
+        		<bean class="org.opentripplanner.analyst.batch.NanInfFilter" />
+        		<bean class="org.opentripplanner.analyst.batch.InputClampFilter" />
+        		<bean class="org.opentripplanner.analyst.batch.GraphGeographicFilter">
+			        <property name="useOnlyStops" value="true" />
+			        <property name="bufferMeters" value="2000" />
+        		</bean>
+        	</list>
+        </property>        
+	</bean>
+
+<!-- create a destination population arranged on a regular grid that can be saved as an image -->
+	
 	<bean id="destinations" class="org.opentripplanner.analyst.batch.SyntheticRasterPopulation">
         <property name="left" value="-84.14" />
         <property name="right" value="-83.41" />
@@ -55,16 +73,6 @@
         <property name="cols" value="1280" />
         <property name="rows" value="1024" />        
 	</bean>
- 
-<!-- this loads a population from a comma-separated flat text file -->
-
-	<bean id="origins" class="org.opentripplanner.analyst.batch.CSVPopulation">
-        <property name="sourceFilename" value="/home/abyrd/access/annarbor.csv" />
-        <property name="latCol" value="1" />
-        <property name="lonCol" value="2" />
-        <property name="labelCol" value="0" />
-        <property name="inputCol" value="3" />        
-	</bean>
 
 <!-- aggregate results are no longer stored in individuals so populations can be reused -->
 <!-- <alias name="destinations" alias="origins"/> -->
@@ -73,18 +81,9 @@
 	
 	<bean id="batchProcessor" class="org.opentripplanner.analyst.batch.BatchProcessor"> 
         <property name="outputPath" value="/home/abyrd/access/out1834_clamp.tiff" />
-        <property name="routerId" value="arbor" />
         <property name="date" value="2012-07-12" />
         <property name="time" value="08:00 AM" />
         <property name="timeZone" value="America/New_York" />
-        <property name="prototypeRoutingRequest">
-			<bean class="org.opentripplanner.routing.core.PrototypeRoutingRequest">
-				<!-- Set default routing parameters here -->
-		        <property name="maxWalkDistance" value="400000" />
-		        <property name="clampInitialWait" value="1800" />
-		        <property name="arriveBy" value="false" />
-			</bean>
-		</property>		
 		<!-- 
         <property name="aggregator"> 
             <bean class="org.opentripplanner.analyst.batch.aggregator.ThresholdSumAggregator">
@@ -97,6 +96,15 @@
                 <property name="threshold" value="3600" />
             </bean>
         </property> 
+	</bean>
+
+	<bean id="prototypeRoutingRequest" class="org.opentripplanner.routing.core.RoutingRequest">
+		<!-- Set default routing parameters here -->
+        <property name="routerId" value="arbor" />
+        <property name="maxWalkDistance" value="2.000" />
+        <property name="clampInitialWait" value="1800" />
+        <property name="arriveBy" value="false" />
+        <property name="modes" value="WALK,TRANSIT" />
 	</bean>
 
 </beans>

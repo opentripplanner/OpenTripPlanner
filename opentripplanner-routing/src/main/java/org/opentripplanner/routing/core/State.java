@@ -516,4 +516,7 @@ public class State implements Cloneable {
         stateData.serviceDay = sd;
     }
 
+    public String getBikeRentalNetwork() {
+        return stateData.bikeRentalNetwork;
+    }
 }

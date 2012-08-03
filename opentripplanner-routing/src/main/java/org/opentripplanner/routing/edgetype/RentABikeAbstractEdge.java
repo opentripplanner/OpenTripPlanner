@@ -34,8 +34,11 @@ public abstract class RentABikeAbstractEdge extends AbstractEdge {
 
     private static final long serialVersionUID = 1L;
 
-    public RentABikeAbstractEdge(Vertex from, Vertex to) {
+    private String network;
+
+    public RentABikeAbstractEdge(Vertex from, Vertex to, String network) {
         super(from, to);
+        this.network = network;
     }
 
     protected State traverseRent(State s0) {
@@ -58,9 +61,12 @@ public abstract class RentABikeAbstractEdge extends AbstractEdge {
         EdgeNarrative en = new FixedModeEdge(this, s0.getNonTransitMode(options));
 
         StateEditor s1 = s0.edit(this, en);
-        s1.incrementWeight(options.bikeRentalPickupCost);
-        s1.incrementTimeInSeconds(options.bikeRentalPickupTime);
+        s1.incrementWeight(options.isArriveBy() ? options.bikeRentalDropoffCost
+                : options.bikeRentalPickupCost);
+        s1.incrementTimeInSeconds(options.isArriveBy() ? options.bikeRentalDropoffTime
+                : options.bikeRentalPickupTime);
         s1.setBikeRenting(true);
+        s1.setBikeRentalNetwork(network);
         State s1b = s1.makeState();
         return s1b;
     }
@@ -70,7 +76,7 @@ public abstract class RentABikeAbstractEdge extends AbstractEdge {
         /*
          * To dropoff a bike, we need to have rented one.
          */
-        if (!s0.isBikeRenting())
+        if (!s0.isBikeRenting() || !s0.getBikeRentalNetwork().equals(network))
             return null;
         BikeRentalStationVertex pickup = (BikeRentalStationVertex) tov;
         if (options.isUseBikeRentalAvailabilityInformation() && pickup.getSpacesAvailable() == 0) {
@@ -79,8 +85,10 @@ public abstract class RentABikeAbstractEdge extends AbstractEdge {
         EdgeNarrative en = new FixedModeEdge(this, s0.getNonTransitMode(options));
 
         StateEditor s1e = s0.edit(this, en);
-        s1e.incrementWeight(options.bikeRentalDropoffCost);
-        s1e.incrementTimeInSeconds(options.bikeRentalDropoffTime);
+        s1e.incrementWeight(options.isArriveBy() ? options.bikeRentalPickupCost
+                : options.bikeRentalDropoffCost);
+        s1e.incrementTimeInSeconds(options.isArriveBy() ? options.bikeRentalPickupTime
+                : options.bikeRentalDropoffTime);
         s1e.setBikeRenting(false);
         State s1 = s1e.makeState();
         return s1;

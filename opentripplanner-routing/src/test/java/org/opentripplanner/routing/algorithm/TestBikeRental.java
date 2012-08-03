@@ -83,8 +83,8 @@ public class TestBikeRental extends TestCase {
                 36.856, "station", 10);
         new StreetBikeRentalLink(station, v2);
         new StreetBikeRentalLink(v2, station);
-        new RentABikeOnEdge(station, station);
-        new RentABikeOffEdge(station, station);
+        new RentABikeOnEdge(station, station, "default");
+        new RentABikeOffEdge(station, station, "default");
         
         // but we can't get off the bike at v3, so we still fail
         options = new RoutingRequest(new TraverseModeSet("WALK,BICYCLE,TRANSIT"));
@@ -100,8 +100,8 @@ public class TestBikeRental extends TestCase {
                 36.857, "station", 10);
         new StreetBikeRentalLink(station2, v3);
         new StreetBikeRentalLink(v3, station2);
-        new RentABikeOnEdge(station2, station2);
-        new RentABikeOffEdge(station2, station2);
+        new RentABikeOnEdge(station2, station2, "default");
+        new RentABikeOffEdge(station2, station2, "default");
         
         // now we succeed!
         options = new RoutingRequest(new TraverseModeSet("WALK,BICYCLE,TRANSIT"));

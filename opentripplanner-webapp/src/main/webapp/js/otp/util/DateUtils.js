@@ -19,9 +19,34 @@ otp.namespace("otp.util");
  */
 otp.util.DateUtils = {
 
-    DATE_TIME_FORMAT_STRING : "D, M jS g:ia",
-    TIME_FORMAT_STRING : "g:ia",
+    getTimeFormat : function()
+    {
+        var retVal = null;
+        try {
+            retVal = otp.config.locale.time.time_format;
+        }
+        catch(e){}
 
+        if(retVal == null)
+            retVal =  "g:ia";
+
+        return retVal; 
+    },
+
+    getDateTimeFormat : function()
+    {
+        var retVal = null;
+        try {
+            retVal = otp.config.locale.time.format;
+        }
+        catch(e){}
+
+        if(retVal == null)
+            retVal = "D, M jS g:ia";
+
+        return retVal; 
+    },
+    
     /** creates a nicely formatted date @ time string */
     getPrettyDate : function(pre, post, date)
     {
@@ -169,16 +194,17 @@ otp.util.DateUtils = {
         if (typeof date == "string") {
             date = otp.util.DateUtils.isoDateStringToDate(date);
         }
-        return date.format(otp.util.DateUtils.DATE_TIME_FORMAT_STRING);
+        return date.format(otp.util.DateUtils.getDateTimeFormat());
     },
 
     /** */
     prettyTime : function(date)
     {
-        if (typeof date == "string") {
+        if(typeof date == "string") {
             date = otp.util.DateUtils.isoDateStringToDate(date);
         }
-        return date.format(otp.util.DateUtils.TIME_FORMAT_STRING);
+
+        return date.format(otp.util.DateUtils.getTimeFormat());
     },
 
 

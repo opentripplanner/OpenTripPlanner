@@ -110,7 +110,7 @@ public class Renderer {
                     ParameterValueGroup params = new GeoTiffFormat().getWriteParameters();
                     params.parameter(AbstractGridFormat.GEOTOOLS_WRITE_PARAMS.getName().toString()).setValue(wp);
                     new GeoTiffWriter(outStream).write(coverage, (GeneralParameterValue[]) params.values().toArray(new GeneralParameterValue[1]));
-                    new GeoTiffWriter(outStream).write(coverage, null);
+                    //new GeoTiffWriter(outStream).write(coverage, null); //wasn't this line writing twice and trashing compressed version?
                     long t1 = System.currentTimeMillis();
                     LOG.debug("wrote geotiff in {}msec", t1-t0);
                 } catch (Exception e) {

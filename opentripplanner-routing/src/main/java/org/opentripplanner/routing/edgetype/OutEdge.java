@@ -138,6 +138,11 @@ public class OutEdge extends StreetEdge {
     }
 
     @Override
+    public boolean isElevationFlattened() {
+        return ((TurnVertex) fromv).isElevationFlattened();
+    }
+
+    @Override
     public boolean isNoThruTraffic() {
         return ((TurnVertex) fromv).isNoThruTraffic();
     }

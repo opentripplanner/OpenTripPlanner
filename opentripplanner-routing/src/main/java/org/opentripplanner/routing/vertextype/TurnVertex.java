@@ -347,4 +347,8 @@ public class TurnVertex extends StreetVertex {
     public void setElevationProfileSegment(ElevationProfileSegment elevationProfileSegment) {
         this.elevationProfileSegment = elevationProfileSegment;
     }
+
+    public boolean isElevationFlattened() {
+        return elevationProfileSegment.isFlattened();
+    }
 }

@@ -7,20 +7,19 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import javax.annotation.PostConstruct;
 
 import lombok.Getter;
 import lombok.Setter;
 
-import org.opentripplanner.analyst.core.Sample;
-import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class BasicPopulation implements Population {
-	    
+
     private static final Logger LOG = LoggerFactory.getLogger(BasicPopulation.class);
     
     @Setter 
@@ -29,8 +28,13 @@ public class BasicPopulation implements Population {
     @Setter @Getter 
     public List<Individual> individuals = new ArrayList<Individual>(); 
     
+    @Setter @Getter 
+    public List<IndividualFilter> filterChain = null; 
+
     @Autowired 
     IndividualFactory individualFactory;
+    
+    private boolean[] skip = null;
     
     public BasicPopulation() {  }
 
@@ -49,7 +53,7 @@ public class BasicPopulation implements Population {
 
     @Override 
     public Iterator<Individual> iterator() {
-        return this.individuals.iterator();
+        return new PopulationIterator();
     }
 
     @Override
@@ -87,7 +91,71 @@ public class BasicPopulation implements Population {
 
     @Override
     public void writeAppropriateFormat(String outFileName, ResultSet results) {
+        // as a default, save to CSV. override this method in subclasses when more is known about data structure.
         this.writeCsv(outFileName, results);
     }
 
+    /** If a filter chain is specified, apply it to the individuals. To be called after loading individuals. */
+    private void applyFilterChain() {
+        this.skip = new boolean[individuals.size()]; // init to false
+        if (filterChain == null)
+            return;
+        for (IndividualFilter filter : filterChain) {
+            LOG.debug("filter {}", filter);
+            int accepted = 0, rejected = 0;
+            int i = 0;
+            for (Individual individual : this.individuals) {
+                boolean skipThis = ! filter.filter(individual);
+                if (skipThis)
+                    rejected += 1;
+                else
+                    accepted += 1;
+                skip[i++] |= skipThis;
+            }
+            LOG.debug("accepted {}, rejected {}", accepted, rejected);
+        }
+    }
+
+    public void setup() {
+        // call the subclass-specific file loading method
+        this.createIndividuals();
+        // call the shared filter chain method
+        this.applyFilterChain();
+    }
+
+    class PopulationIterator implements Iterator<Individual> {
+
+        int i = 0;
+        int n = individuals.size();
+        Iterator<Individual> iter = individuals.iterator();
+        
+        public boolean hasNext() {
+            while (i < n && skip[i]) {
+                //LOG.debug("in iter, i = {}", i);
+                if (! iter.hasNext())
+                    return false;
+                i += 1;
+                iter.next();
+            }
+            //LOG.debug("done skipping at {}", i);
+            return iter.hasNext();
+        }
+        
+        public Individual next() {
+            if (this.hasNext()) {
+                Individual ret = iter.next();
+                i += 1;
+                return ret;
+            } else {
+                throw new NoSuchElementException();
+            }
+        }
+
+        public void remove() {
+            throw new UnsupportedOperationException(); 
+        }
+        
+    }
+
 }
+

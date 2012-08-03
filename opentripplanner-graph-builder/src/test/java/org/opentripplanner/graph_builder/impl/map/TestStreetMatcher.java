@@ -255,6 +255,10 @@ public class TestStreetMatcher {
 
         @Override
         public boolean isWheelchairAccessible() {
+            return true;
+        }
+
+        public boolean isElevationFlattened() {
             return false;
         }
     }

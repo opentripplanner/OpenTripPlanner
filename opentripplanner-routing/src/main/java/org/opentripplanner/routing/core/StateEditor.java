@@ -523,9 +523,14 @@ public class StateEditor {
         cloneStateDataAsNeeded();
         child.stateData.opt = options;
     }
-    
+
     public void setServiceDay(ServiceDay day) {
         cloneStateDataAsNeeded();
         child.stateData.serviceDay = day;
+    }
+
+    public void setBikeRentalNetwork(String network) {
+        cloneStateDataAsNeeded();
+        child.stateData.bikeRentalNetwork = network;
     }
 }

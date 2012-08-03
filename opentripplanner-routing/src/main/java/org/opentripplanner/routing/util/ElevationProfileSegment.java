@@ -7,6 +7,8 @@ import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vividsolutions.jts.geom.Coordinate;
+
 /**
  * This class is an helper for Edges and Vertexes to store various data about elevation profiles.
  * 
@@ -30,6 +32,8 @@ public class ElevationProfileSegment implements Serializable {
     private double maxSlope;
 
     protected boolean slopeOverride;
+
+    private boolean flattened;
 
     public ElevationProfileSegment(double length) {
         this.length = length;
@@ -99,6 +103,7 @@ public class ElevationProfileSegment implements Serializable {
         if (elev == null || elev.size() < 2) {
             return false;
         }
+
         if (slopeOverride && !computed) {
             return false;
         }
@@ -120,7 +125,24 @@ public class ElevationProfileSegment implements Serializable {
         maxSlope = costs.maxSlope;
         slopeWorkCost = costs.slopeWorkCost;
         bicycleSafetyEffectiveLength += costs.slopeSafetyCost;
+        flattened = costs.flattened;
+
         return costs.flattened;
     }
 
+    public String toString() {
+        String out = "";
+        if (elevationProfile.size() == 0) {
+            return "(empty elevation profile)";
+        }
+        for (int i = 0; i < elevationProfile.size(); ++i) {
+            Coordinate coord = elevationProfile.getCoordinate(i);
+            out += "(" + coord.x + "," + coord.y + "), ";
+        }
+        return out.substring(0, out.length() - 2);
+    }
+
+    public boolean isFlattened() {
+        return flattened;
+    }
 }

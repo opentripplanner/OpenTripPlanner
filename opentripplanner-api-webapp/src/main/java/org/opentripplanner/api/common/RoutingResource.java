@@ -10,15 +10,12 @@ import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.core.OptimizeType;
-import org.opentripplanner.routing.core.PrototypeRoutingRequest;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import com.sun.jersey.api.spring.Autowire;
 
 /**
  * This class defines all the JAX-RS query parameters for a path search as fields, allowing them to 
@@ -158,7 +155,7 @@ public abstract class RoutingResource {
     protected GraphService graphService;
 
     @Autowired
-    protected PrototypeRoutingRequest prototypeRoutingRequest;
+    protected RoutingRequest prototypeRoutingRequest;
 
 
     /** 

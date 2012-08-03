@@ -29,8 +29,8 @@ public class RentABikeOnEdge extends RentABikeAbstractEdge {
 
     private static final long serialVersionUID = 1L;
 
-    public RentABikeOnEdge(BikeRentalStationVertex from, BikeRentalStationVertex to) {
-        super(from, to);
+    public RentABikeOnEdge(BikeRentalStationVertex from, BikeRentalStationVertex to, String network) {
+        super(from, to, network);
     }
 
     @Override
