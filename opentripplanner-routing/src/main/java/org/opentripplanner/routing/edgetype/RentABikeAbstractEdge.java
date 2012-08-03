@@ -32,83 +32,82 @@ import com.vividsolutions.jts.geom.LineString;
  */
 public abstract class RentABikeAbstractEdge extends AbstractEdge {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public RentABikeAbstractEdge(Vertex from, Vertex to) {
-		super(from, to);
-	}
+    public RentABikeAbstractEdge(Vertex from, Vertex to) {
+        super(from, to);
+    }
 
-	protected State traverseRent(State s0) {
-            RoutingRequest options = s0.getOptions();
-            /*
-             * If we already have a bike (rented or own) we won't go any faster by having a second
-             * one.
-             */
-            if (!s0.getNonTransitMode(options).equals(TraverseMode.WALK))
-                return null;
-            /*
-             * To rent a bike, we need to have BICYCLE in allowed modes.
-             */
-            if (!options.getModes().contains(TraverseMode.BICYCLE))
-                return null;
-            
-            BikeRentalStationVertex dropoff = (BikeRentalStationVertex) tov;
-            if (options.isUseBikeRentalAvailabilityInformation() && dropoff.getBikesAvailable() == 0) {
-                return null;
-            }
-            EdgeNarrative en = new FixedModeEdge(this, s0.getNonTransitMode(options));
+    protected State traverseRent(State s0) {
+        RoutingRequest options = s0.getOptions();
+        /*
+         * If we already have a bike (rented or own) we won't go any faster by having a second one.
+         */
+        if (!s0.getNonTransitMode(options).equals(TraverseMode.WALK))
+            return null;
+        /*
+         * To rent a bike, we need to have BICYCLE in allowed modes.
+         */
+        if (!options.getModes().contains(TraverseMode.BICYCLE))
+            return null;
 
-            StateEditor s1 = s0.edit(this, en);
-            s1.incrementWeight(options.bikeRentalPickupCost);
-            s1.incrementTimeInSeconds(options.bikeRentalPickupTime);
-            s1.setBikeRenting(true);
-            State s1b = s1.makeState();
-            return s1b;
-	}
+        BikeRentalStationVertex dropoff = (BikeRentalStationVertex) tov;
+        if (options.isUseBikeRentalAvailabilityInformation() && dropoff.getBikesAvailable() == 0) {
+            return null;
+        }
+        EdgeNarrative en = new FixedModeEdge(this, s0.getNonTransitMode(options));
 
-	protected State traverseDropoff(State s0) {
-            RoutingRequest options = s0.getOptions();
-            /*
-             * To dropoff a bike, we need to have rented one.
-             */
-            if (!s0.isBikeRenting())
-                return null;
-            BikeRentalStationVertex pickup = (BikeRentalStationVertex) tov;
-            if (options.isUseBikeRentalAvailabilityInformation() && pickup.getSpacesAvailable() == 0) {
-                return null;
-            }
-            EdgeNarrative en = new FixedModeEdge(this, s0.getNonTransitMode(options));
+        StateEditor s1 = s0.edit(this, en);
+        s1.incrementWeight(options.bikeRentalPickupCost);
+        s1.incrementTimeInSeconds(options.bikeRentalPickupTime);
+        s1.setBikeRenting(true);
+        State s1b = s1.makeState();
+        return s1b;
+    }
 
-            StateEditor s1e = s0.edit(this, en);
-            s1e.incrementWeight(options.bikeRentalDropoffCost);
-            s1e.incrementTimeInSeconds(options.bikeRentalDropoffTime);
-            s1e.setBikeRenting(false);
-            State s1 = s1e.makeState();
-            return s1;
-	}
+    protected State traverseDropoff(State s0) {
+        RoutingRequest options = s0.getOptions();
+        /*
+         * To dropoff a bike, we need to have rented one.
+         */
+        if (!s0.isBikeRenting())
+            return null;
+        BikeRentalStationVertex pickup = (BikeRentalStationVertex) tov;
+        if (options.isUseBikeRentalAvailabilityInformation() && pickup.getSpacesAvailable() == 0) {
+            return null;
+        }
+        EdgeNarrative en = new FixedModeEdge(this, s0.getNonTransitMode(options));
 
-	@Override
-	public double getDistance() {
-		return 0;
-	}
+        StateEditor s1e = s0.edit(this, en);
+        s1e.incrementWeight(options.bikeRentalDropoffCost);
+        s1e.incrementTimeInSeconds(options.bikeRentalDropoffTime);
+        s1e.setBikeRenting(false);
+        State s1 = s1e.makeState();
+        return s1;
+    }
 
-	@Override
-	public LineString getGeometry() {
-		return null;
-	}
+    @Override
+    public double getDistance() {
+        return 0;
+    }
 
-	@Override
-	public TraverseMode getMode() {
-		return TraverseMode.WALK;
-	}
+    @Override
+    public LineString getGeometry() {
+        return null;
+    }
 
-	@Override
-	public String getName() {
-		return getToVertex().getName();
-	}
+    @Override
+    public TraverseMode getMode() {
+        return TraverseMode.WALK;
+    }
 
-	@Override
-	public boolean hasBogusName() {
-		return false;
-	}
+    @Override
+    public String getName() {
+        return getToVertex().getName();
+    }
+
+    @Override
+    public boolean hasBogusName() {
+        return false;
+    }
 }
