@@ -36,12 +36,13 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
     private String resourcePattern;
 
     private Map<String, Graph> graphs = new HashMap<String, Graph>();
+
     private Map<String, LoadLevel> levels = new HashMap<String, LoadLevel>();
 
     private LoadLevel loadLevel = LoadLevel.FULL;
-    
+
     private String defaultRouterId = "";
-    
+
     private ResourceLoader resourceLoader;
 
     private boolean preloadGraphs = true;
@@ -50,32 +51,28 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
         this.resourcePattern = "file:".concat(path);
     }
 
-	/**
-	 * This property allows loading a graph from the classpath or a path
-	 * relative to the webapp root, which can be useful in cloud computing
-	 * environments where webapps must be entirely self-contained. If it is
-	 * present, the placeholder {} will be replaced with the router ID. In
-	 * normal client-server operation, the ResourceLoader provided by Spring
-	 * will be a ServletContextResourceLoader, so the path will be interpreted
-	 * relative to the webapp root, and WARs should be handled transparently. If
-	 * you want to point to a path outside the webapp, or you want to be clear
-	 * about exactly where the resource is to be found, it should be prefixed
-	 * with 'classpath:','file:', or 'url:'.
-	 */
-	public void setResource(String resource) {
-		this.resourcePattern = resource;
-	}
+    /**
+     * This property allows loading a graph from the classpath or a path relative to the webapp root, which can be useful in cloud computing
+     * environments where webapps must be entirely self-contained. If it is present, the placeholder {} will be replaced with the router ID. In normal
+     * client-server operation, the ResourceLoader provided by Spring will be a ServletContextResourceLoader, so the path will be interpreted relative
+     * to the webapp root, and WARs should be handled transparently. If you want to point to a path outside the webapp, or you want to be clear about
+     * exactly where the resource is to be found, it should be prefixed with 'classpath:','file:', or 'url:'.
+     */
+    public void setResource(String resource) {
+        this.resourcePattern = resource;
+    }
 
     @Override
     public void refreshGraphs() {
-        //////////////////
+        // ////////////////
     }
 
-    @PostConstruct // This means it will run on startup
+    @PostConstruct
+    // This means it will run on startup
     public void preloadGraphs() {
-    	if (preloadGraphs) {
-    		getGraph(null); // pre-load the default graph
-    	}
+        if (preloadGraphs) {
+            getGraph(null); // pre-load the default graph
+        }
     }
 
     @Override
@@ -85,10 +82,10 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
 
     @Override
     public synchronized Graph getGraph(String routerId) {
-    	if (routerId == null || routerId.isEmpty()) {
-    		routerId = defaultRouterId;    		
-    		LOG.debug("routerId not specified, set to default of '{}'", routerId);
-    	}
+        if (routerId == null || routerId.isEmpty()) {
+            routerId = defaultRouterId;
+            LOG.debug("routerId not specified, set to default of '{}'", routerId);
+        }
         Graph graph;
         String resourceName;
         if (routerId.indexOf("../") != -1) {
@@ -101,7 +98,7 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
         graph = graphs.get(resourceName);
         LoadLevel level = levels.get(resourceName);
         if (level != loadLevel) {
-            graph = null; //force reload at new load level
+            graph = null; // force reload at new load level
         }
         if (graph == null) {
             LOG.debug("this graph was not yet loaded");
@@ -112,16 +109,17 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
             } catch (Exception e) {
                 LOG.warn("graph file not found or not openable at {}", resourceName);
                 if (routerId.equals(defaultRouterId)) {
-                    LOG.warn("graph for default routerId {} does not exist or cannot be opened at {}",
-                             routerId, resourceName);
+                    LOG.warn(
+                            "graph for default routerId {} does not exist or cannot be opened at {}",
+                            routerId, resourceName);
                     e.printStackTrace();
                     return null;
                 }
                 return getGraph(null); // fall back on default if graph does not exist
             }
             try {
-            	graph = Graph.load(is, loadLevel);
-            	// key on resource name instead of routerId so fallbacks to defaultRouterId will all yield the same Graph
+                graph = Graph.load(is, loadLevel);
+                // key on resource name instead of routerId so fallbacks to defaultRouterId will all yield the same Graph
                 graphs.put(resourceName, graph);
                 levels.put(resourceName, loadLevel);
             } catch (Exception ex) {
@@ -143,7 +141,7 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
     }
 
     public void setDefaultRouterId(String routerId) {
-    	this.defaultRouterId = routerId;
+        this.defaultRouterId = routerId;
     }
 
     @Override
@@ -151,9 +149,9 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
         return graphs.keySet();
     }
 
-	@Override
-	public void setResourceLoader(ResourceLoader rl) {
-		this.resourceLoader = rl;
-	}
+    @Override
+    public void setResourceLoader(ResourceLoader rl) {
+        this.resourceLoader = rl;
+    }
 
 }
