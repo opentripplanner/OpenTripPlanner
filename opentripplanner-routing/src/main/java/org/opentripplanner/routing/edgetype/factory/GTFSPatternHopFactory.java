@@ -540,8 +540,8 @@ public class GTFSPatternHopFactory {
             }
             int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
 
-            if (runningTime < 0) {            
-                _log.warn(GraphBuilderAnnotation.register(graph, Variety.NEGATIVE_HOP_TIME, st0, st1));
+            if (runningTime < 0) {
+                _log.warn(GraphBuilderAnnotation.register(graph, Variety.NEGATIVE_HOP_TIME, new StopTime(st0), new StopTime(st1)));
                 // negative hops are usually caused by incorrect coding of midnight crossings
                 midnightCrossed = true;
                 if (st0.getDepartureTime() > 23 * HOUR && st1.getArrivalTime() < 1 * HOUR) {
