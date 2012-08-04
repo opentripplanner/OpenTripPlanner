@@ -531,24 +531,24 @@ public class GTFSPatternHopFactory {
             int dwellTime = st0.getDepartureTime() - st0.getArrivalTime(); 
             if (dwellTime < 0) {
                 _log.warn(GraphBuilderAnnotation.register(graph, Variety.NEGATIVE_DWELL_TIME, st0));
-//                if (st0.getArrivalTime() > 23 * HOUR && st0.getDepartureTime() < 1 * HOUR) {
-//                    midnightCrossed = true;
-//                    st0.setDepartureTime(st0.getDepartureTime() + 24 * HOUR);
-//                } else {
-//                    st0.setDepartureTime(st0.getArrivalTime());
-//                }
+                if (st0.getArrivalTime() > 23 * HOUR && st0.getDepartureTime() < 1 * HOUR) {
+                    midnightCrossed = true;
+                    st0.setDepartureTime(st0.getDepartureTime() + 24 * HOUR);
+                } else {
+                    st0.setDepartureTime(st0.getArrivalTime());
+                }
             }
             int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
 
             if (runningTime < 0) {            
                 _log.warn(GraphBuilderAnnotation.register(graph, Variety.NEGATIVE_HOP_TIME, st0, st1));
                 // negative hops are usually caused by incorrect coding of midnight crossings
-//                midnightCrossed = true;
-//                if (st0.getDepartureTime() > 23 * HOUR && st1.getArrivalTime() < 1 * HOUR) {
-//                    st1.setArrivalTime(st1.getArrivalTime() + 24 * HOUR);
-//                } else {
-//                    st1.setArrivalTime(st0.getDepartureTime());
-//                }
+                midnightCrossed = true;
+                if (st0.getDepartureTime() > 23 * HOUR && st1.getArrivalTime() < 1 * HOUR) {
+                    st1.setArrivalTime(st1.getArrivalTime() + 24 * HOUR);
+                } else {
+                    st1.setArrivalTime(st0.getDepartureTime());
+                }
             }
             double hopDistance = distanceLibrary.fastDistance(
                    st0.getStop().getLon(), st0.getStop().getLat(),
