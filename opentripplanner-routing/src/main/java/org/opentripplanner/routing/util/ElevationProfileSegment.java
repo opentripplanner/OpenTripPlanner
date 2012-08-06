@@ -132,7 +132,7 @@ public class ElevationProfileSegment implements Serializable {
 
     public String toString() {
         String out = "";
-        if (elevationProfile.size() == 0) {
+        if (elevationProfile == null || elevationProfile.size() == 0) {
             return "(empty elevation profile)";
         }
         for (int i = 0; i < elevationProfile.size(); ++i) {
