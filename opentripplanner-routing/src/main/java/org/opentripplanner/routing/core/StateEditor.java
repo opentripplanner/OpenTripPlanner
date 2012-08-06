@@ -269,7 +269,7 @@ public class StateEditor {
     }
 
     /** 
-     * The lastNextArrivalDelta is the amount of time between the the arrival of the last trip
+     * The lastNextArrivalDelta is the amount of time between the arrival of the last trip
      * the planner used and the arrival of the trip after that.
      */
     public void setLastNextArrivalDelta (int lastNextArrivalDelta) {
