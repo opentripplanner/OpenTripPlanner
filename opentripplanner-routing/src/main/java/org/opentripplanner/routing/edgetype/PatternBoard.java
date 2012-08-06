@@ -214,7 +214,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
 
             // On-the-fly reverse optimization
             // determine if this needs to be reverse-optimized.
-            if (options.isReverseOptimizeOnTheFly() && state0.getNumBoardings() > 0) {
+            if (options.isReverseOptimizeOnTheFly() && !options.isReverseOptimizing() && state0.getNumBoardings() > 0) {
                 _log.debug("Considering reverse optimizing on the fly");
 
                 long lastAlight = state0.getLastAlightedTime();
@@ -222,7 +222,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
                 // impacting the possibility of this trip
                 long latestPossibleAlight = lastAlight + bestWait;
 
-                boolean needToReverseOptimize = false;
+                boolean needToReverseOptimize = true;
 
                 // convert the latest possible alight to seconds since midnight.
                 // TODO: this may perform strangely at service day boundaries, or if the previous
@@ -248,8 +248,8 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
                     needToReverseOptimize = true;
 
                 if (needToReverseOptimize)
-                    // it is reversed by optimize
-                    return s1.makeState().optimize(true);
+                    // it is re-reversed by optimize
+                    return s1.makeState().optimizeOrReverse(true, true);
                 
             }
             
