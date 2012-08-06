@@ -13,6 +13,10 @@
 
 package org.opentripplanner.routing.impl.raptor;
 
+import java.util.Date;
+
+import org.onebusaway.gtfs.model.Route;
+import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -49,7 +53,29 @@ public class RaptorState {
     public RaptorStop stop;
     
     public String toString() {
-        return "at " + stop + " boarded at " + boardStop + " on " + route + " time " + arrivalTime;
+        return "at " + stop + " boarded at " + boardStop + " on " + route + " time "
+                + new Date(((long) arrivalTime) * 1000) + " walkDistance " + walkDistance;
+    }
+
+    public void dump () {
+        RaptorState state = this;
+        while (state != null) {
+            String routeStr = "()";
+            if (state.route != null) {
+                Trip gtfsTrip = state.route.boards[0][0].getPattern().getExemplar();
+                Route gtfsRoute = gtfsTrip.getRoute();
+                routeStr = gtfsTrip.getTripHeadsign();
+                if (routeStr == null) {
+                    routeStr = gtfsRoute.getId().getId();
+                } else {
+                    routeStr = gtfsRoute.getId().getId() + " " + routeStr;
+                }
+            }
+            System.out.println("At stop " + state.stop.stopVertex.getName() + "(" + state.stop
+                    + ") on " + routeStr + " at time "
+                    + new Date(((long) state.arrivalTime) * 1000));
+            state = state.parent;
+        }
     }
     
 }
