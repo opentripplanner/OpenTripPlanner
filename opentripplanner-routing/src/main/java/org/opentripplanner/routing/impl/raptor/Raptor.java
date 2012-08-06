@@ -349,7 +349,7 @@ public class Raptor implements PathService {
                     cur.visitedLastRound.add(stop);
                     cur.visitedEver.add(stop);
                     newStates.add(newState);
-
+/*
                     StopNearTarget nearTarget = cur.stopsNearTarget.get(stop);
                     if (nearTarget != null) {
                         RaptorState bound = new RaptorState();
@@ -367,11 +367,9 @@ public class Raptor implements PathService {
                             cur.boundingStates.add(bound);
                         }
                     }
+                    */
                 }
 
-                if (newStates.size() > 10) {
-                    // System.out.println("HERE: " + newStates.size());
-                }
                 if (stopNo < route.getNStops() - 1) {
 
                     if (stop.stopVertex.isLocal() && nBoardings > 1) {
@@ -438,7 +436,7 @@ public class Raptor implements PathService {
             // also, compute an initial spt from the target so that we can find out what transit
             // stops are nearby and what
             // the time is to them, so that we can start target bounding earlier
-
+/*
             RoutingRequest reversedWalkOptions = walkOptions.clone();
             reversedWalkOptions.setArriveBy(true);
             GenericDijkstra destDijkstra = new GenericDijkstra(reversedWalkOptions);
@@ -458,6 +456,7 @@ public class Raptor implements PathService {
 
                 cur.addStopNearTarget(stop, state.getWalkDistance(), (int) state.getElapsedTime());
             }
+            */
         } else {
 
             final List<MaxWalkState> startPoints = new ArrayList<MaxWalkState>();
@@ -549,7 +548,7 @@ public class Raptor implements PathService {
                     System.out.println("WRONG");
                 }
 */
-
+/*
                 state.arrivalTime += minTime;
                 state.walkDistance += minWalk;
 
@@ -565,7 +564,7 @@ public class Raptor implements PathService {
                 }
                 state.arrivalTime -= minTime;
                 state.walkDistance -= minWalk;
-                
+                */
                 //this bit of code was a test to see if drastically bounding the number of 
                 //states explored would help; it does, but this code way overprunes.
                 /*
