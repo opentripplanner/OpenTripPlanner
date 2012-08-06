@@ -214,43 +214,14 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
 
             // On-the-fly reverse optimization
             // determine if this needs to be reverse-optimized.
-            if (options.isReverseOptimizeOnTheFly() && !options.isReverseOptimizing() && state0.getNumBoardings() > 0) {
-                _log.debug("Considering reverse optimizing on the fly");
+            // The last alight can be moved forward by bestWait (but no further) without
+            // impacting the possibility of this trip
+            if (options.isReverseOptimizeOnTheFly() && !options.isReverseOptimizing() && 
+                    state0.getNumBoardings() > 0 && state0.getLastNextArrivalDelta() <= bestWait) {
+                _log.debug("Reverse optimizing on the fly");
 
-                long lastAlight = state0.getLastAlightedTime();
-                // The last alight can be moved forward by bestWait (but no further) without
-                // impacting the possibility of this trip
-                long latestPossibleAlight = lastAlight + bestWait;
-
-                boolean needToReverseOptimize = true;
-
-                // convert the latest possible alight to seconds since midnight.
-                // TODO: this may perform strangely at service day boundaries, or if the previous
-                // alight was in a different time zone.
-                int secondsSinceMidnight = bestServiceDay
-                    .secondsSinceMidnight(latestPossibleAlight);
-                
-                // if that's clearly not right, assume we need to reverse-optimize
-                // we can still have issues if the original time is, say 25:00
-                // it would logically be in the next day (and that's where this algorithm will put
-                // it) but it shouldn't be.
-                if (secondsSinceMidnight < 0)
-                    needToReverseOptimize = true;
-
-                TripTimes possibleTripTimes = getPattern()
-                    .getPreviousTrip(stopIndex, secondsSinceMidnight,
-                                     mode == TraverseMode.BICYCLE, options);
-
-                // if it was really on the previous service day, the only way this would be true
-                // is it was the last trip on the previous service day, in which case reverse
-                // optimization wouldn't help.
-                if (possibleTripTimes != bestTripTimes)
-                    needToReverseOptimize = true;
-
-                if (needToReverseOptimize)
-                    // it is re-reversed by optimize
-                    return s1.makeState().optimizeOrReverse(true, true);
-                
+                // it is re-reversed by optimize, so this still yields a forward tree
+                return s1.makeState().optimizeOrReverse(true, true);
             }
             
             // if we didn't return an optimized path, return an unoptimized one

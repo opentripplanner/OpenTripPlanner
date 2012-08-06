@@ -414,6 +414,10 @@ public class TableTripPattern implements TripPattern, Serializable {
         }
         return true;
     }
+
+    public int getNumTrips () {
+        return trips.size();
+    }
     
 //    
 //    if (headsigns != null) { 

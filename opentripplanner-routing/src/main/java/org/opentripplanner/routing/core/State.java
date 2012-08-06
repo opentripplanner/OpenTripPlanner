@@ -70,7 +70,7 @@ public class State implements Cloneable {
     /* CONSTRUCTORS */
 
     /**
-     * Create an initial state representing the beginning of a search for the given routing context. 
+     * Create an initial state representing the beginning of a search for the given routing context.
      * Initial "parent-less" states can only be created at the beginning of a trip. elsewhere, all 
      * states must be created from a parent and associated with an edge.
      */
@@ -258,6 +258,10 @@ public class State implements Cloneable {
 
     public Vertex getVertex() {
         return this.vertex;
+    }
+
+    public int getLastNextArrivalDelta () {
+        return stateData.lastNextArrivalDelta;
     }
 
     /**
