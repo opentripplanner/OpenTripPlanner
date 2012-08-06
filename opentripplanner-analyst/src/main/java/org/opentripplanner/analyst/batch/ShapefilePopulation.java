@@ -30,8 +30,9 @@ public class ShapefilePopulation extends BasicPopulation {
     @Setter String labelAttribute;
 
     @Setter String inputAttribute;
-
-    public void loadIndividuals() {
+    
+    @Override
+    public void createIndividuals() {
         String filename = this.sourceFilename;
         LOG.debug("Loading population from shapefile {}", filename);
         LOG.debug("Feature attributes: input data in {}, labeled with {}", inputAttribute, labelAttribute);
