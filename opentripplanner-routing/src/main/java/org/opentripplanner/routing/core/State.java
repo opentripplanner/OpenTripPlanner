@@ -25,6 +25,7 @@ import org.opentripplanner.routing.automata.AutomatonState;
 import org.opentripplanner.routing.edgetype.OnBoardForwardEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.pathparser.PathParser;
@@ -187,6 +188,9 @@ public class State implements Cloneable {
         long clampInitialWait = stateData.opt.clampInitialWait;
 
         long initialWait = stateData.initialWaitTime;
+
+        LOG.debug("Initial wait: " + initialWait + ", clamp: " + clampInitialWait +
+                  ", elapsed: " + getElapsedTime());
 
         // only subtract up the clamp value
         if (clampInitialWait > 0 && initialWait > clampInitialWait)
@@ -521,70 +525,88 @@ public class State implements Cloneable {
     }
 
     /**
-     * Reverse the path implicit in the given state, i.e. produce a new chain of states that leads
-     * from this state to the other end of the implicit path.
-     */
-    public State reverse() {
-
-        State orig = this;
-        State ret = orig.reversedClone();
-
-        while (orig.getBackState() != null) {
-            Edge edge = orig.getBackEdge();
-            EdgeNarrative narrative = orig.getBackEdgeNarrative();
-            StateEditor editor = ret.edit(edge, narrative);
-            // note the distinction between setFromState and setBackState
-            editor.setFromState(orig);
-            editor.incrementTimeInSeconds(orig.getAbsTimeDeltaSec());
-            editor.incrementWeight(orig.getWeightDelta());
-            editor.incrementWalkDistance(orig.getWalkDistanceDelta());
-            if (orig.isBikeRenting() != orig.getBackState().isBikeRenting())
-             editor.setBikeRenting(!orig.isBikeRenting());
-            ret = editor.makeState();
-            
-            if (ret == null) {
-                LOG.warn("Returned state is null for edge " + edge + 
-                         "; OTP will crash momentarily");
-            }
-
-            orig = orig.getBackState();
-        }
-
-        return ret;
-    }
-
-
-    /**
      * Reverse the path implicit in the given state, re-traversing all edges in the opposite
      * direction so as to remove any unnecessary waiting in the resulting itinerary. This produces a
      * path that passes through all the same edges, but which may have a shorter overall duration
-     * due to different weights on time-dependent (e.g. transit boarding) edges.
+     * due to different weights on time-dependent (e.g. transit boarding) edges. If the optimize parameter
+     * is false, the path will be reversed but will have the same duration. This is the result of combining
+     * the functions from GraphPath optimize and reverse.
      * 
+     * @param optimize Should this path be optimized or just reversed?
      * @param forward Is this an on-the-fly reverse search in the midst of a forward search?
      * @returns a state at the other end (or this end, in the case of a forward search) 
      * of a reversed, optimized path
      */
-    // optimize is now very similar to reverse, and the two could conceivably be combined
-    public State optimize(boolean forward) {
+    public State optimizeOrReverse (boolean optimize, boolean forward) {
         State orig = this;
         State unoptimized = orig;
         State ret = orig.reversedClone();
-        
+        long newInitialWaitTime = 0;
+        boolean needToFigureInAdditionalWaitTime = false;
+
         Edge edge = null;
         try {
             while (orig.getBackState() != null) {
                 edge = orig.getBackEdge();
-                ret = edge.traverse(ret);
 
-                if (ret == null) {
-                    LOG.warn("Returned state is null for edge " + edge + 
-                             "; OTP will crash momentarily");
+                if (optimize) {
+                    ret = edge.traverse(ret);
+
+                    if (ret == null) {
+                        LOG.warn("Returned state is null for edge " + edge + 
+                                 "; OTP will crash momentarily");
+                    }
+                }
+                else {
+                    EdgeNarrative narrative = orig.getBackEdgeNarrative();
+                    StateEditor editor = ret.edit(edge, narrative);
+                    // note the distinction between setFromState and setBackState
+                    editor.setFromState(orig);
+
+                    // This means that there should be wait time inserted between two states
+                    // that the routing engine does not know about (this is due to a forward wait
+                    // that needs to be preserved in a reverse search)
+                    if (needToFigureInAdditionalWaitTime) {
+                        editor.incrementTimeInSeconds((int) newInitialWaitTime);
+
+                        // only figure it in once
+                        needToFigureInAdditionalWaitTime = false;
+                    }
+
+                    editor.incrementTimeInSeconds(orig.getAbsTimeDeltaSec());
+                    editor.incrementWeight(orig.getWeightDelta());
+                    editor.incrementWalkDistance(orig.getWalkDistanceDelta());
+                    if (orig.isBikeRenting() != orig.getBackState().isBikeRenting())
+                        editor.setBikeRenting(!orig.isBikeRenting());
+                    ret = editor.makeState();
+
+                    EdgeNarrative origNarrative = orig.getBackEdgeNarrative();
+                    EdgeNarrative retNarrative = ret.getBackEdgeNarrative();
+                    copyExistingNarrativeToNewNarrativeAsAppropriate(origNarrative, retNarrative);
                 }
 
-                EdgeNarrative origNarrative = orig.getBackEdgeNarrative();
-                EdgeNarrative retNarrative = ret.getBackEdgeNarrative();
-                copyExistingNarrativeToNewNarrativeAsAppropriate(origNarrative, retNarrative);
                 orig = orig.getBackState();
+
+                // If we're off the first transit vehicle, don't optimize out the initial wait.
+                // While we're at it, don't reverse-optimize the initial walk since that would
+                // have no effect.
+                // This allows all states' initial wait times to be handled the same way, by 
+                // clampInitialWait. In a normal, point-to-point search, this doesn't matter because
+                // the final path is reverse-optimized at the end and that removes any waiting time
+                // This also allows states to be compared based on their merits and still solves the
+                // earliest-arrival problem, because large waits are not factored out mid-stream.
+                if (forward && orig.getNumBoardings() == 0 && optimize) {
+                    optimize = false;
+
+                    // while we're here, also re-set the initial waiting time
+                    // ret is the boarding and orig is the State before boarding
+                    // but only set initial wait time if we're on transit at some point
+                    // during this trip.
+                    if (isEverBoarded()) {
+                        newInitialWaitTime = ret.getTime() - orig.getTime();
+                        needToFigureInAdditionalWaitTime = true;
+                    }
+                }                    
             }
         } catch (NullPointerException e) {
             LOG.warn("Cannot reverse path at edge: " + edge
@@ -598,13 +620,19 @@ public class State implements Cloneable {
                 return unoptimized.reverse();
         }
 
-        if (forward) {
-            if (Math.abs(walkDistance - ret.walkDistance) > 0.5)
-                LOG.warn("On the fly reverse-optimization of path yielded a path with a different" +
-                         " walk distance, " + walkDistance + "m unoptimized vs. " +
-                         ret.walkDistance + "m optimized");
-            
-            return ret.reverse();
+        if (forward) {           
+            State reversed = ret.reverse();
+
+            // set the initialWaitTime based on that computed above
+            reversed.stateData = reversed.stateData.clone();
+            reversed.stateData.initialWaitTime = newInitialWaitTime;
+            LOG.debug("Reversed state has intact initialWaitTime of " + 
+                      reversed.stateData.initialWaitTime +
+                      " secs, original " + stateData.initialWaitTime);
+
+            new GraphPath(reversed, false).dump();
+
+            return reversed;
         }
         else
             return ret;
@@ -614,7 +642,14 @@ public class State implements Cloneable {
      * Reverse-optimize a path after it is complete, by default
      */
     public State optimize () {
-        return optimize(false);
+        return optimizeOrReverse(true, false);
+    }
+
+    /**
+     * Reverse a path
+     */
+    public State reverse () {
+        return optimizeOrReverse(false, false);
     }
 
     public boolean getReverseOptimizing () {
