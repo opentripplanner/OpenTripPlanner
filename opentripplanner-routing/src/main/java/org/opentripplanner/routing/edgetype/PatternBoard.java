@@ -104,6 +104,24 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             s1.setLastAlightedTime(state0.getTime());
             s1.setPreviousStop(fromv);
             s1.setLastPattern(this.getPattern());
+
+            if (options.isReverseOptimizeOnTheFly()) {
+                int thisDeparture = state0.getTripTimes().getDepartureTime(stopIndex);
+                int numTrips = getPattern().getNumTrips(); 
+                int nextDeparture;
+
+                s1.setLastNextArrivalDelta(Integer.MAX_VALUE);
+
+                for (int tripIndex = 0; tripIndex < numTrips; tripIndex++) {
+                    nextDeparture = getPattern().getDepartureTime(stopIndex, tripIndex);
+        
+                    if (nextDeparture > thisDeparture) {
+                        s1.setLastNextArrivalDelta(nextDeparture - thisDeparture);
+                        break;
+                    }
+                }
+            }            
+
             return s1.makeState();
         } else {
             /* forward traversal: look for a transit trip on this pattern */
@@ -130,8 +148,20 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
                 int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
                 // only check for service on days that are not in the future
                 // this avoids unnecessarily examining tomorrow's services
-                if (secondsSinceMidnight < 0)
-                    continue;
+
+                // Removed by mattwigway 2012-08-06 following discussion with novalis_dt.
+                // Imagine a state at 23:59 Sunday, that should take a bus departing at 00:01
+                // Monday (and coded on Monday in the GTFS); disallowing Monday's departures would
+                // produce a strange plan. This proved to be a problem when reverse-optimizing
+                // arrive-by trips; trips would get moved earlier for transfer purposes and then
+                // the future days would not be considered.
+
+                // We also can't break off the search after we find trips today, because imagine
+                // a trip on a pattern at 25:00 today and another trip on the same pattern at
+                // 00:30 tommorrow. The 00:30 trip should be taken, but if we stopped the search
+                // after finding today's 25:00 trip we would never find tomorrow 00:30 trip.
+                //if (secondsSinceMidnight < 0)
+                //    continue;
                 if (sd.serviceIdRunning(serviceId)) {
                     TripTimes tripTimes = getPattern().getNextTrip(stopIndex, secondsSinceMidnight, 
                             mode == TraverseMode.BICYCLE, options);
@@ -216,10 +246,12 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             // impacting the possibility of this trip
             if (options.isReverseOptimizeOnTheFly() && !options.isReverseOptimizing() && 
                     state0.getNumBoardings() > 0 && state0.getLastNextArrivalDelta() <= bestWait) {
-                _log.debug("Reverse optimizing on the fly");
 
                 // it is re-reversed by optimize, so this still yields a forward tree
-                return s1.makeState().optimizeOrReverse(true, true);
+                State optimized = s1.makeState().optimizeOrReverse(true, true);
+                if (optimized == null)
+                    _log.error("Null optimized state. This shouldn't happen");
+                return optimized;
             }
             
             // if we didn't return an optimized path, return an unoptimized one

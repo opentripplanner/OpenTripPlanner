@@ -305,7 +305,10 @@ public class State implements Cloneable {
     }
 
     public double getWalkDistanceDelta () {
-        return Math.abs(this.walkDistance - backState.walkDistance);
+        if (backState != null)
+            return Math.abs(this.walkDistance - backState.walkDistance);
+        else
+            return 0.0;
     }
 
     public double getWeightDelta() {
@@ -542,8 +545,13 @@ public class State implements Cloneable {
         State orig = this;
         State unoptimized = orig;
         State ret = orig.reversedClone();
-        long newInitialWaitTime = 0;
+        long newInitialWaitTime = -1;
         boolean needToFigureInAdditionalWaitTime = false;
+        PathParser pathParsers[];
+
+        // disable path parsing temporarily
+        pathParsers = stateData.opt.rctx.pathParsers;
+        stateData.opt.rctx.pathParsers = new PathParser[0];
 
         Edge edge = null;
         try {
@@ -553,10 +561,8 @@ public class State implements Cloneable {
                 if (optimize) {
                     ret = edge.traverse(ret);
 
-                    if (ret == null) {
-                        LOG.warn("Returned state is null for edge " + edge + 
-                                 "; OTP will crash momentarily");
-                    }
+                    if (ret == null)
+                        LOG.debug("Error traversing edge " + edge + " in reverse optimization");
                 }
                 else {
                     EdgeNarrative narrative = orig.getBackEdgeNarrative();
@@ -569,7 +575,10 @@ public class State implements Cloneable {
                     // that needs to be preserved in a reverse search)
                     if (needToFigureInAdditionalWaitTime) {
                         editor.incrementTimeInSeconds((int) newInitialWaitTime);
-
+                        editor.setInitialWaitTime(newInitialWaitTime);
+                        // set the cost
+                        editor.incrementWeight(newInitialWaitTime * 
+                                               stateData.opt.waitAtBeginningFactor);
                         // only figure it in once
                         needToFigureInAdditionalWaitTime = false;
                     }
@@ -604,7 +613,7 @@ public class State implements Cloneable {
                     // but only set initial wait time if we're on transit at some point
                     // during this trip.
                     if (isEverBoarded()) {
-                        newInitialWaitTime = ret.getTime() - orig.getTime();
+                        newInitialWaitTime = Math.abs(ret.getTime() - orig.getTime());
                         needToFigureInAdditionalWaitTime = true;
                     }
                 }                    
@@ -615,25 +624,20 @@ public class State implements Cloneable {
                     + " this is not totally unexpected; otherwise, you might want to"
                     + " look into it");
 
+            // re-enable path parsing
+            stateData.opt.rctx.pathParsers = pathParsers;
+
             if (forward)
                 return this;
             else
                 return unoptimized.reverse();
         }
 
-        if (forward) {           
-            State reversed = ret.reverse();
+        // re-enable path parsing
+        stateData.opt.rctx.pathParsers = pathParsers;
 
-            // set the initialWaitTime based on that computed above
-            reversed.stateData = reversed.stateData.clone();
-            reversed.stateData.initialWaitTime = newInitialWaitTime;
-            LOG.debug("Reversed state has intact initialWaitTime of " + 
-                      reversed.stateData.initialWaitTime +
-                      " secs, original " + stateData.initialWaitTime);
-
-            new GraphPath(reversed, false).dump();
-
-            return reversed;
+        if (forward) {
+            return ret.reverse();
         }
         else
             return ret;
