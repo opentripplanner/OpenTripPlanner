@@ -514,10 +514,19 @@ public class GTFSPatternHopFactory {
             /* set depature time if it is missing */
             st0.setDepartureTime(st0.getArrivalTime());
         }
+        boolean midnightCrossed = false;
+        final int HOUR = 60 * 60;
+
         for (int i = 1; i < stopTimes.size(); i++) {
             boolean st1bogus = false;
-            boolean midnightCrossed = false;
             StopTime st1 = stopTimes.get(i);
+
+            if (midnightCrossed) {
+                if (st1.isDepartureTimeSet())
+                    st1.setDepartureTime(st1.getDepartureTime() + 24 * HOUR);
+                if (st1.isArrivalTimeSet())
+                    st1.setArrivalTime(st1.getArrivalTime() + 24 * HOUR);
+            }
             if (!st1.isDepartureTimeSet() && st1.isArrivalTimeSet()) {
                 /* set departure time if it is missing */
                 st1.setDepartureTime(st1.getArrivalTime());
@@ -527,7 +536,6 @@ public class GTFSPatternHopFactory {
             if ( ! (st1.isArrivalTimeSet() && st1.isDepartureTimeSet())) {
                 continue;
             }
-            final int HOUR = 60 * 60;
             int dwellTime = st0.getDepartureTime() - st0.getArrivalTime(); 
             if (dwellTime < 0) {
                 _log.warn(GraphBuilderAnnotation.register(graph, Variety.NEGATIVE_DWELL_TIME, st0));
