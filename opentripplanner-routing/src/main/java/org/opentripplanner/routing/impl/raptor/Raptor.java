@@ -695,7 +695,7 @@ public class Raptor implements PathService {
            
             //the following does not actually speed things up, probably 
             //because we're going to recheck it next round with more info  
-
+/*
             double minWalk = distanceToNearestTransitStop;
 
             double targetDistance = distanceLibrary.fastDistance(
@@ -719,7 +719,7 @@ public class Raptor implements PathService {
                     continue SPTSTATE;
 
             }
-
+*/
             cur.visitedLastRound.add(stop);
             cur.visitedEver.add(stop);
             states.add(newState);
