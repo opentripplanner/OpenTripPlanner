@@ -185,6 +185,21 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             }
             s1.incrementWeight(preferences_penalty);
             s1.incrementWeight(wait_cost + options.getBoardCost(nonTransitMode));
+
+            // On-the-fly reverse optimization
+            // determine if this needs to be reverse-optimized.
+            // The last alight can be moved forward by bestWait (but no further) without
+            // impacting the possibility of this trip
+            if (options.isReverseOptimizeOnTheFly() && !options.isReverseOptimizing() && 
+                    state0.getNumBoardings() > 0 && state0.getLastNextArrivalDelta() <= bestWait) {
+
+                // it is re-reversed by optimize, so this still yields a forward tree
+                State optimized = s1.makeState().optimizeOrReverse(true, true);
+                if (optimized == null)
+                    _log.error("Null optimized state. This shouldn't happen");
+                return optimized;
+            }
+
             return s1.makeState();
         } else {
             /* forward traversal: not so much to do */
@@ -206,11 +221,12 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             s1.setLastPattern(this.getPattern());
 
             // calculate the next possible arrival time, if necessary
-            // TODO: this will fail at dropoff-only stops
             if (options.isReverseOptimizeOnTheFly()) {
                 int thisArrival = state0.getTripTimes().getArrivalTime(stopIndex - 1);
                 int numTrips = getPattern().getNumTrips(); 
                 int nextArrival;
+
+                s1.setLastNextArrivalDelta(Integer.MAX_VALUE);
 
                 for (int tripIndex = 0; tripIndex < numTrips; tripIndex++) {
                     nextArrival = getPattern().getArrivalTime(stopIndex - 1, tripIndex);
