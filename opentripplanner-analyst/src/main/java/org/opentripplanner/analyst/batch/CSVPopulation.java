@@ -29,8 +29,8 @@ public class CSVPopulation extends BasicPopulation {
     @Setter
     public boolean headers = true;
 
-    @PostConstruct
-    public void loadIndividuals() {
+    @Override
+    public void createIndividuals() {
         try {
             CSVReader reader = new CSVReader(new FileReader(sourceFilename));
             String[] nextLine;

@@ -61,7 +61,7 @@ public class BasicPopulation implements Population {
         //
     }
 
-    @Override @PostConstruct
+    @Override
     public void createIndividuals() {
         // nothing to do in basic population case
     }
