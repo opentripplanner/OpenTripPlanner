@@ -121,7 +121,6 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
              */
             long current_time = state0.getTime();
             int bestWait = -1;
-            ServiceDay bestServiceDay = null;
             TripTimes bestTripTimes = null;
             int serviceId = getPattern().getServiceId();
             // this method is on State not RoutingRequest because we care whether the user is in
@@ -145,7 +144,6 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
                             // track the soonest departure over all relevant schedules
                             bestWait = wait;
                             bestTripTimes = tripTimes;
-                            bestServiceDay = sd;
                         }
                     }
                 }
