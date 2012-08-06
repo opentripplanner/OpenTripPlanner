@@ -204,6 +204,24 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             s1.setLastAlightedTime(state0.getTime());
             s1.setPreviousStop(tov);
             s1.setLastPattern(this.getPattern());
+
+            // calculate the next possible arrival time, if necessary
+            // TODO: this will fail at dropoff-only stops
+            if (options.isReverseOptimizeOnTheFly()) {
+                int thisArrival = state0.getTripTimes().getArrivalTime(stopIndex - 1);
+                int numTrips = getPattern().getNumTrips(); 
+                int nextArrival;
+
+                for (int tripIndex = 0; tripIndex < numTrips; tripIndex++) {
+                    nextArrival = getPattern().getArrivalTime(stopIndex - 1, tripIndex);
+        
+                    if (nextArrival > thisArrival) {
+                        s1.setLastNextArrivalDelta(nextArrival - thisArrival);
+                        break;
+                    }
+                }
+            }
+
             return s1.makeState();
         }
     }
