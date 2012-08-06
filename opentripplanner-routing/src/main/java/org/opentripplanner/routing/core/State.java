@@ -189,9 +189,6 @@ public class State implements Cloneable {
 
         long initialWait = stateData.initialWaitTime;
 
-        LOG.debug("Initial wait: " + initialWait + ", clamp: " + clampInitialWait +
-                  ", elapsed: " + getElapsedTime());
-
         // only subtract up the clamp value
         if (clampInitialWait > 0 && initialWait > clampInitialWait)
             initialWait = clampInitialWait;            
