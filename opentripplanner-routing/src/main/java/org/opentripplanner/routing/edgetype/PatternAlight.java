@@ -106,8 +106,9 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
                 int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
                 // only check for service on days that are not in the future
                 // this avoids unnecessarily examining trips starting tomorrow
-                if (secondsSinceMidnight < 0)
-                    continue;
+                // See comment in PatternAlight as to why this doesn't work.
+                //if (secondsSinceMidnight < 0)
+                //    continue;
                 if (sd.serviceIdRunning(serviceId)) {
                     TripTimes tripTimes = getPattern().getPreviousTrip(stopIndex, 
                             secondsSinceMidnight, nonTransitMode == TraverseMode.BICYCLE, options);
