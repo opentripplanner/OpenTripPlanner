@@ -79,8 +79,11 @@ public class BasicPopulation implements Population {
             csvWriter = new PrintWriter(outFile);
             csvWriter.printf("label,lat,lon,input,output\n"); // output could be travel time when aggregator not present
             int i = 0;
-            for (Individual indiv : this) {
-                csvWriter.printf("%s,%f,%f,%f,%f\n", indiv.label, indiv.lat, indiv.lon, indiv.input, results.results[i]);
+            for (Individual indiv : this.individuals) {
+                if ( ! this.skip[i]) {
+                    csvWriter.printf("%s,%f,%f,%f,%f\n", indiv.label, indiv.lat, indiv.lon, indiv.input, results.results[i]);
+                }
+                i++;
             }
             csvWriter.close();
         } catch (Exception e) {
