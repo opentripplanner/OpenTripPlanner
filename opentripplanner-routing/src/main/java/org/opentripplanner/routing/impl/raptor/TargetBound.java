@@ -154,13 +154,13 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
 
         for (State bounder : bounders) {
 
-            if (optimisticDistance * 1.05 > bounder.getWalkDistance() && current.getTime() + minTime > bounder.getTime()) 
+            if (optimisticDistance * 1.1 > bounder.getWalkDistance() && current.getTime() + minTime > bounder.getTime()) 
                 return true; // this path won't win on either time or distance
 
             //check that the new path is not much longer in time than the bounding path
             double bounderTime = bounder.getTime() - traverseOptions.dateTime;
 
-            if (bounderTime * timeBoundFactor  < stateTime) {
+            if (bounderTime * timeBoundFactor < stateTime) {
                 return true;
             }
         }

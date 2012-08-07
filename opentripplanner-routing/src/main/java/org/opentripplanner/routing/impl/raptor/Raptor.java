@@ -755,7 +755,7 @@ public class Raptor implements PathService {
         // todo: epsilon dominance?
 
         return state.nBoardings <= oldState.nBoardings && state.waitingTime <= oldState.waitingTime
-                && state.walkDistance <= oldState.walkDistance * 1.05
+                && state.walkDistance <= oldState.walkDistance * 1.1
                 && state.arrivalTime <= oldState.arrivalTime
         /*
          * && (state.nBoardings < oldState.nBoardings || state.waitingTime < oldState.waitingTime ||
