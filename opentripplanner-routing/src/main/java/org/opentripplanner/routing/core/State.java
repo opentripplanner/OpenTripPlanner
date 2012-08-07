@@ -532,9 +532,9 @@ public class State implements Cloneable {
      * Reverse the path implicit in the given state, re-traversing all edges in the opposite
      * direction so as to remove any unnecessary waiting in the resulting itinerary. This produces a
      * path that passes through all the same edges, but which may have a shorter overall duration
-     * due to different weights on time-dependent (e.g. transit boarding) edges. If the optimize parameter
-     * is false, the path will be reversed but will have the same duration. This is the result of combining
-     * the functions from GraphPath optimize and reverse.
+     * due to different weights on time-dependent (e.g. transit boarding) edges. If the optimize 
+     * parameter is false, the path will be reversed but will have the same duration. This is the 
+     * result of combining the functions from GraphPath optimize and reverse.
      * 
      * @param optimize Should this path be optimized or just reversed?
      * @param forward Is this an on-the-fly reverse search in the midst of a forward search?
@@ -559,12 +559,10 @@ public class State implements Cloneable {
                 edge = orig.getBackEdge();
 
                 if (optimize) {
-                    // first board: figure in wait time
+                    // first board: figure in wait time in on the fly optimization
                     if (edge instanceof PatternBoard && orig.getNumBoardings() == 1
                         && forward)
-                        // we want the back state because we don't want the old waiting time
-                        // excluded from the new.
-                        ret = ((PatternBoard) edge).traverse(ret, orig.getTime());
+                        ret = ((PatternBoard) edge).traverse(ret, orig.getBackState().getTime());
                     else                   
                         ret = edge.traverse(ret);
 
@@ -610,7 +608,10 @@ public class State implements Cloneable {
         stateData.opt.rctx.pathParsers = pathParsers;
 
         if (forward) {
-            return ret.reverse();
+            State reversed = ret.reverse();
+            LOG.debug("Weights: before " + this.getWeight() + " after " + reversed.getWeight());
+            LOG.debug("Times: before " + this.getElapsedTime() + " after " + reversed.getElapsedTime());
+            return reversed;
         }
         else
             return ret;
