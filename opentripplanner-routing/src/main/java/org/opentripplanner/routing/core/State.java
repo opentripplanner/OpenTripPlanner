@@ -559,7 +559,14 @@ public class State implements Cloneable {
                 edge = orig.getBackEdge();
 
                 if (optimize) {
-                    ret = edge.traverse(ret);
+                    // first board: figure in wait time
+                    if (edge instanceof PatternBoard && orig.getNumBoardings() == 1
+                        && forward)
+                        // we want the back state because we don't want the old waiting time
+                        // excluded from the new.
+                        ret = ((PatternBoard) edge).traverse(ret, orig.getTime());
+                    else                   
+                        ret = edge.traverse(ret);
 
                     if (ret == null)
                         LOG.debug("Error traversing edge " + edge + " in reverse optimization");
@@ -569,19 +576,6 @@ public class State implements Cloneable {
                     StateEditor editor = ret.edit(edge, narrative);
                     // note the distinction between setFromState and setBackState
                     editor.setFromState(orig);
-
-                    // This means that there should be wait time inserted between two states
-                    // that the routing engine does not know about (this is due to a forward wait
-                    // that needs to be preserved in a reverse search)
-                    if (needToFigureInAdditionalWaitTime) {
-                        editor.incrementTimeInSeconds((int) newInitialWaitTime);
-                        editor.setInitialWaitTime(newInitialWaitTime);
-                        // set the cost
-                        editor.incrementWeight(newInitialWaitTime * 
-                                               stateData.opt.waitAtBeginningFactor);
-                        // only figure it in once
-                        needToFigureInAdditionalWaitTime = false;
-                    }
 
                     editor.incrementTimeInSeconds(orig.getAbsTimeDeltaSec());
                     editor.incrementWeight(orig.getWeightDelta());
@@ -596,27 +590,6 @@ public class State implements Cloneable {
                 }
 
                 orig = orig.getBackState();
-
-                // If we're off the first transit vehicle, don't optimize out the initial wait.
-                // While we're at it, don't reverse-optimize the initial walk since that would
-                // have no effect.
-                // This allows all states' initial wait times to be handled the same way, by 
-                // clampInitialWait. In a normal, point-to-point search, this doesn't matter because
-                // the final path is reverse-optimized at the end and that removes any waiting time
-                // This also allows states to be compared based on their merits and still solves the
-                // earliest-arrival problem, because large waits are not factored out mid-stream.
-                if (forward && orig.getNumBoardings() == 0 && optimize) {
-                    optimize = false;
-
-                    // while we're here, also re-set the initial waiting time
-                    // ret is the boarding and orig is the State before boarding
-                    // but only set initial wait time if we're on transit at some point
-                    // during this trip.
-                    if (isEverBoarded()) {
-                        newInitialWaitTime = Math.abs(ret.getTime() - orig.getTime());
-                        needToFigureInAdditionalWaitTime = true;
-                    }
-                }                    
             }
         } catch (NullPointerException e) {
             LOG.warn("Cannot reverse path at edge: " + edge
