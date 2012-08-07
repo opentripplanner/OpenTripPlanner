@@ -38,7 +38,7 @@ public class MaxWalkState extends State {
         if (backEdge != other.getBackEdge() && ((backEdge instanceof PlainStreetEdge)
                 && (!((PlainStreetEdge) backEdge).getTurnRestrictions().isEmpty())))
             return false;
-        return walkDistance <= other.getWalkDistance() * 1.05 
+        return walkDistance <= other.getWalkDistance() * 1.10 
                 && this.getTime() <= other.getTime() + 30; 
     }
     
