@@ -554,63 +554,68 @@ public class State implements Cloneable {
         stateData.opt.rctx.pathParsers = new PathParser[0];
 
         Edge edge = null;
-        try {
-            while (orig.getBackState() != null) {
-                edge = orig.getBackEdge();
 
-                if (optimize) {
-                    // first board: figure in wait time in on the fly optimization
-                    if (edge instanceof PatternBoard && orig.getNumBoardings() == 1
-                        && forward)
-                        ret = ((PatternBoard) edge).traverse(ret, orig.getBackState().getTime());
-                    else                   
-                        ret = edge.traverse(ret);
+        while (orig.getBackState() != null) {
+            edge = orig.getBackEdge();
+            
+            if (optimize) {
+                // first board: figure in wait time in on the fly optimization
+                if (edge instanceof PatternBoard && orig.getNumBoardings() == 1
+                    && forward)
+                    ret = ((PatternBoard) edge).traverse(ret, orig.getBackState().getTime());
+                else                   
+                    ret = edge.traverse(ret);
 
-                    if (ret == null)
-                        LOG.debug("Error traversing edge " + edge + " in reverse optimization");
+                if (ret == null) {
+                    LOG.warn("Cannot reverse path at edge: " + edge +
+                             ", returning unoptimized path. If edge is a " +
+                             "PatternInterlineDwell, this is not totally unexpected; " +
+                             "otherwise, you might want to look into it");
+
+                    // re-enable path parsing
+                    stateData.opt.rctx.pathParsers = pathParsers;
+
+                    if (forward)
+                        return this;
+                    else
+                        return unoptimized.reverse();
                 }
-                else {
-                    EdgeNarrative narrative = orig.getBackEdgeNarrative();
-                    StateEditor editor = ret.edit(edge, narrative);
-                    // note the distinction between setFromState and setBackState
-                    editor.setFromState(orig);
-
-                    editor.incrementTimeInSeconds(orig.getAbsTimeDeltaSec());
-                    editor.incrementWeight(orig.getWeightDelta());
-                    editor.incrementWalkDistance(orig.getWalkDistanceDelta());
-                    if (orig.isBikeRenting() != orig.getBackState().isBikeRenting())
-                        editor.setBikeRenting(!orig.isBikeRenting());
-                    ret = editor.makeState();
-
-                    EdgeNarrative origNarrative = orig.getBackEdgeNarrative();
-                    EdgeNarrative retNarrative = ret.getBackEdgeNarrative();
-                    copyExistingNarrativeToNewNarrativeAsAppropriate(origNarrative, retNarrative);
-                }
-
-                orig = orig.getBackState();
             }
-        } catch (NullPointerException e) {
-            LOG.warn("Cannot reverse path at edge: " + edge
-                    + ", returning unoptimized path. If edge is a PatternInterlineDwell,"
-                    + " this is not totally unexpected; otherwise, you might want to"
-                    + " look into it");
+            else {
+                EdgeNarrative narrative = orig.getBackEdgeNarrative();
+                StateEditor editor = ret.edit(edge, narrative);
+                // note the distinction between setFromState and setBackState
+                editor.setFromState(orig);
 
-            // re-enable path parsing
-            stateData.opt.rctx.pathParsers = pathParsers;
+                editor.incrementTimeInSeconds(orig.getAbsTimeDeltaSec());
+                editor.incrementWeight(orig.getWeightDelta());
+                editor.incrementWalkDistance(orig.getWalkDistanceDelta());
+                if (orig.isBikeRenting() != orig.getBackState().isBikeRenting())
+                    editor.setBikeRenting(!orig.isBikeRenting());
+                ret = editor.makeState();
 
-            if (forward)
-                return this;
-            else
-                return unoptimized.reverse();
+                EdgeNarrative origNarrative = orig.getBackEdgeNarrative();
+                EdgeNarrative retNarrative = ret.getBackEdgeNarrative();
+                copyExistingNarrativeToNewNarrativeAsAppropriate(origNarrative, retNarrative);
+            }
+
+            orig = orig.getBackState();
         }
-
+            
         // re-enable path parsing
         stateData.opt.rctx.pathParsers = pathParsers;
 
         if (forward) {
             State reversed = ret.reverse();
-            LOG.debug("Weights: before " + this.getWeight() + " after " + reversed.getWeight());
-            LOG.debug("Times: before " + this.getElapsedTime() + " after " + reversed.getElapsedTime());
+            if (getWeight() <= reversed.getWeight())
+                LOG.warn("Optimization did not decrease weight: before " + this.getWeight() + 
+                         " after " + reversed.getWeight());
+            if (getElapsedTime() != reversed.getElapsedTime())
+                LOG.warn("Optimization changed time: before " + this.getElapsedTime() + 
+                         " after " + reversed.getElapsedTime());
+            if (getActiveTime() <= reversed.getActiveTime())
+                LOG.warn("Optimization increased active time: before " + this.getActiveTime() + 
+                         " after " + reversed.getActiveTime());
             return reversed;
         }
         else
