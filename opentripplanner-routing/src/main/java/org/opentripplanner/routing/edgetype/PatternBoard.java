@@ -85,6 +85,10 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
     }
 
     public State traverse(State state0) {
+        return traverse(state0, 0);
+    }
+
+    public State traverse(State state0, long arrivalTimeAtStop) {
         RoutingContext rctx = state0.getContext();
         RoutingRequest options = state0.getOptions();
         if (options.isArriveBy()) {
@@ -104,6 +108,19 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             s1.setLastAlightedTime(state0.getTime());
             s1.setPreviousStop(fromv);
             s1.setLastPattern(this.getPattern());
+
+            // determine the wait
+            if (arrivalTimeAtStop > 0) {
+                int wait = (int) Math.abs(state0.getTime() - arrivalTimeAtStop);
+                
+                s1.incrementTimeInSeconds(wait);
+                // this should only occur at the beginning
+                s1.incrementWeight(wait * options.waitAtBeginningFactor);
+
+                s1.setInitialWaitTime(wait);
+
+                _log.debug("Initial wait time set to {} in PatternBoard", wait);
+            }
 
             if (options.isReverseOptimizeOnTheFly()) {
                 int thisDeparture = state0.getTripTimes().getDepartureTime(stopIndex);
