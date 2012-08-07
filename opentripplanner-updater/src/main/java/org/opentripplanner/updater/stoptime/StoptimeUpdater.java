@@ -77,4 +77,11 @@ public class StoptimeUpdater implements Runnable {
         }
     }
 
+    public String toString() {
+        if (updateStreamer == null)
+            return "Streaming stoptime updater, with update streamer = null";
+        else
+            return "Streaming stoptime updater, using update streamer " + updateStreamer.toString();
+    }
+    
 }
