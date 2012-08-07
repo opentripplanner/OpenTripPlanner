@@ -110,7 +110,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
             }
         } else {
             // could walk directly to destination
-            if (targetDistance < distanceToNearestTransitStop)
+            if (targetDistance < distanceToNearestTransitStop || !transitLocalStreets.transferrable(vertex))
                 minWalk = targetDistance;
             else
                 minWalk = distanceToNearestTransitStop;
