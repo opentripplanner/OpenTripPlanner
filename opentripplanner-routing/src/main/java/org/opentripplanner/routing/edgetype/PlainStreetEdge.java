@@ -296,11 +296,20 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         PlainStreetEdge backPSE;
         if (backEdge != null && backEdge instanceof PlainStreetEdge) {
             backPSE = (PlainStreetEdge) backEdge;
+            int outAngle = 0;
+            int inAngle = 0;
+            if (options.arriveBy) {
+                if (!canTurnOnto(backPSE, s0))
+                    return null;
+                outAngle = backPSE.getOutAngle();
+                inAngle = getInAngle();
+            } else {
+                if (!backPSE.canTurnOnto(this, s0))
+                    return null;
+                outAngle = getOutAngle();
+                inAngle = backPSE.getInAngle();
+            }
 
-            if (!(options.arriveBy ? canTurnOnto(backPSE, s0) : backPSE.canTurnOnto(this, s0)))
-                return null;
-            int outAngle = backPSE.getOutAngle();
-            int inAngle = getInAngle();
             int turnCost = Math.abs(outAngle - inAngle);
             if (turnCost > 180) {
                 turnCost = 360 - turnCost;
@@ -308,7 +317,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             final double realTurnCost = (turnCost / 20.0) / options.getSpeed(traverseMode);
             s1.incrementWalkDistance(realTurnCost / 100); //just a tie-breaker
             weight += realTurnCost;
-            time += realTurnCost;
+            time += Math.ceil(realTurnCost);
         }
         s1.incrementWalkDistance(length);
         s1.incrementTimeInSeconds((int) Math.ceil(time));
