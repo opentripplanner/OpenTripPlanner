@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.zip.GZIPInputStream;
 
+import javax.annotation.PostConstruct;
+
 import lombok.Setter;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -21,16 +23,15 @@ import org.zeromq.ZMsg;
 /** StoptimeUpdateStreamer for CTX-encoded Dutch KV8 realtime updates over ZeroMQ */
 public class KV8ZMQUpdateStreamer implements UpdateStreamer {
 
-    private ZMQ.Context context;
-    private ZMQ.Socket subscriber;
+    private ZMQ.Context context = ZMQ.context(1);
+    private ZMQ.Socket subscriber = context.socket(ZMQ.SUB);
     private int count = 0;
     @Setter private String defaultAgencyId = "";
     @Setter private String address = "tcp://node01.post.openov.nl:7817";
     @Setter private static String feed = "/GOVI/KV8"; 
     
-    public KV8ZMQUpdateStreamer() {
-        context = ZMQ.context(1);
-        subscriber = context.socket(ZMQ.SUB);
+    @PostConstruct
+    public void connectToFeed() {
         subscriber.connect(address);
         subscriber.subscribe(feed.getBytes());
     }
