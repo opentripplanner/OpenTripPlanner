@@ -590,6 +590,7 @@ public class Raptor implements PathService {
                         stopVertex);
                 dijkstraState.setNumBoardings(state.nBoardings);
                 dijkstraState.setWalkDistance(state.walkDistance);
+                dijkstraState.setStartTime(state.arrivalTime);
                 dijkstraState.setTime(state.arrivalTime);
                 dijkstraState.setExtension("raptorParent", state);
                 dijkstraState.setOptions(walkOptions);

@@ -24,7 +24,10 @@ import org.opentripplanner.routing.algorithm.strategies.SkipTraverseResultStrate
 import org.opentripplanner.routing.algorithm.strategies.TransitLocalStreetService;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.edgetype.PatternAlight;
+import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
@@ -62,17 +65,23 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
      */
     private double timeBoundFactor = 1.5;
 
+    private List<Integer> previousArrivalTime = new ArrayList<Integer>();
+
+    private RoutingRequest options;
+
     //private List<RaptorState> boundingStates;
 
     public TargetBound(RoutingRequest options, List<State> dijkstraBoundingStates) {
+        this.options = options;
         this.realTarget = options.rctx.target;
         this.realTargetCoordinate = realTarget.getCoordinate();
         this.distanceToNearestTransitStop = realTarget.getDistanceToNearestTransitStop();
         //this.boundingStates = boundingStates;
+        bounders = new ArrayList<State>();
         if (dijkstraBoundingStates != null) {
-            bounders = dijkstraBoundingStates;
-        } else {
-            bounders = new ArrayList<State>();
+            for (State bounder : dijkstraBoundingStates) {
+                addBounder(bounder);
+            }
         }
         transitLocalStreets = options.rctx.graph.getService(TransitLocalStreetService.class);
         speedUpperBound = options.getSpeedUpperBound();
@@ -84,9 +93,18 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
     public boolean shouldSearchContinue(Vertex origin, Vertex target, State current,
             ShortestPathTree spt, RoutingRequest traverseOptions) {
         if (current.getVertex() == realTarget) {
-            bounders.add(current);
+            addBounder(current);
         }
         return true;
+    }
+
+    private void addBounder(State bounder) {
+        bounders.add(bounder);
+        RaptorState state = (RaptorState) bounder.getExtension("raptorParent");
+        RaptorStop stop = state.stop;
+        //get previous alight at stop
+        final int previousArriveTime = getPreviousArriveTime(options, state.arrivalTime - options.getAlightSlack() - 2, stop.stopVertex);
+        previousArrivalTime.add((int) (previousArriveTime + options.getAlightSlack() + bounder.getElapsedTime()));
     }
 
     @Override
@@ -155,10 +173,17 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
         }
 */
 
+        int i = 0;
+        boolean prevBounded = !bounders.isEmpty();
         for (State bounder : bounders) {
-
+            int prevTime = previousArrivalTime.get(i++);
+            
             if (optimisticDistance * 1.1 > bounder.getWalkDistance() && current.getTime() + minTime > bounder.getTime()) 
                 return true; // this path won't win on either time or distance
+            
+            if (!(optimisticDistance * 1.1 > bounder.getWalkDistance() && current.getTime() + minTime > prevTime)) {
+                prevBounded = false;
+            }
 
             //check that the new path is not much longer in time than the bounding path
             double bounderTime = bounder.getTime() - traverseOptions.dateTime;
@@ -167,8 +192,37 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
                 return true;
             }
         }
+        return prevBounded;
+    }
 
-        return false;
+    public static int getPreviousArriveTime(RoutingRequest request, int arrivalTime, Vertex stopVertex) {
+
+        int bestArrivalTime = -1;
+
+        request.arriveBy = true;
+
+        // find the alights
+        for (Edge prealight : stopVertex.getIncoming()) {
+            if (prealight instanceof PreAlightEdge) {
+                Vertex arrival = prealight.getFromVertex(); // this is the arrival vertex
+                for (Edge alight : arrival.getIncoming()) {
+                    if (alight instanceof PatternAlight) {
+                        State state = new State(alight.getToVertex(), arrivalTime, request);
+                        State result = alight.traverse(state);
+                        if (result == null)
+                            continue;
+                        int time = (int) result.getTime();
+                        if (time > bestArrivalTime) {
+                            bestArrivalTime = time;
+                        }
+                    }
+                }
+            }
+        }
+
+        request.arriveBy = false;
+        return bestArrivalTime;
+
     }
 
     @Override
