@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
@@ -32,12 +33,13 @@ public class RaptorPathSet {
     Set<RaptorStop> visitedLastRound = Collections.emptySet();
     HashMap<RaptorStop, StopNearTarget> stopsNearTarget = new HashMap<RaptorStop, StopNearTarget>();
     public List<RaptorState> boundingStates = new ArrayList<RaptorState>();
-    public List<State> dijkstraBoundingStates;
-    public ShortestPathTree spt;
+
+    public final TargetBound bounder;
     
     @SuppressWarnings("unchecked")
-    RaptorPathSet(int nStops) {
+    RaptorPathSet(int nStops, RoutingRequest options) {
         statesByStop = new List[nStops];
+        bounder = new TargetBound(options);
     }
     
     public List<RaptorState>[] getStates() {

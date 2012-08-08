@@ -27,13 +27,16 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.graph.AbstractVertex;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.spt.ArrayMultiShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-public class TargetBound implements SearchTerminationStrategy, SkipTraverseResultStrategy, RemainingWeightHeuristic {
+public class TargetBound implements SearchTerminationStrategy, SkipTraverseResultStrategy, RemainingWeightHeuristic, ShortestPathTreeFactory {
 
     private static final long serialVersionUID = -5296036164138922096L;
 
@@ -69,23 +72,18 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
 
     private RoutingRequest options;
 
+    public ShortestPathTree spt = new ArrayMultiShortestPathTree(options);
+
     //private List<RaptorState> boundingStates;
 
-    public TargetBound(RoutingRequest options, List<State> dijkstraBoundingStates) {
+    public TargetBound(RoutingRequest options) {
         this.options = options;
         this.realTarget = options.rctx.target;
         this.realTargetCoordinate = realTarget.getCoordinate();
         this.distanceToNearestTransitStop = realTarget.getDistanceToNearestTransitStop();
-        //this.boundingStates = boundingStates;
         bounders = new ArrayList<State>();
-        if (dijkstraBoundingStates != null) {
-            for (State bounder : dijkstraBoundingStates) {
-                addBounder(bounder);
-            }
-        }
         transitLocalStreets = options.rctx.graph.getService(TransitLocalStreetService.class);
         speedUpperBound = options.getSpeedUpperBound();
-        //this.minTimesNearEnd = minTimes;
         this.speedWeight = options.getWalkReluctance() / speedUpperBound;
     }
 
@@ -256,4 +254,14 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
         this.timeBoundFactor = timeBoundFactor;
     }
 
+    @Override
+    public ShortestPathTree create(RoutingRequest options) {
+        return spt;
+    }
+
+    public void addSptStates(List<MaxWalkState> states) {
+        for (MaxWalkState state : states) {
+            spt.add(state);
+        }
+    }
 }

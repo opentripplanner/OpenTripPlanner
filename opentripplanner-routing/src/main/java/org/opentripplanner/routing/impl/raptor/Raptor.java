@@ -88,7 +88,7 @@ public class Raptor implements PathService {
         TraverseModeSet modes = options.getModes().clone();
         modes.setTransit(false);
         walkOptions.setModes(modes);
-        RaptorPathSet routeSet = new RaptorPathSet(data.stops.length);
+        RaptorPathSet routeSet = new RaptorPathSet(data.stops.length, options);
 
         options.setMaxTransfers(options.maxTransfers + 2);
         
@@ -607,38 +607,16 @@ public class Raptor implements PathService {
             dijkstra.setPriorityQueueFactory(new PrefilledPriorityQueueFactory(startPoints.subList(
                     1, startPoints.size())));
 
-            dijkstra.setShortestPathTreeFactory(new ShortestPathTreeFactory() {
+            TargetBound bounder = cur.bounder;
+            dijkstra.setShortestPathTreeFactory(bounder);
+            bounder.addSptStates(startPoints.subList(1, startPoints.size()));
 
-                @Override
-                public ShortestPathTree create(RoutingRequest options) {
-                    ShortestPathTree result;
-                    if (cur.spt == null) {
-                        result = new ArrayMultiShortestPathTree(options);
-                    } else {
-                        result = cur.spt;
-                    }
-                    for (State state : startPoints.subList(1, startPoints.size())) {
-                        result.add(state);
-                    }
-                    return result;
-                }
-
-            });
-
-            final TargetBound bounder = new TargetBound(options, cur.dijkstraBoundingStates);
             dijkstra.setSearchTerminationStrategy(bounder);
             dijkstra.setSkipTraverseResultStrategy(bounder);
             dijkstra.setHeuristic(bounder);
 
             //Do local search
             spt = dijkstra.getShortestPathTree(startPoints.get(0));
-
-            if (!bounder.bounders.isEmpty()) {
-                cur.dijkstraBoundingStates = bounder.bounders;
-            }
-
-            if (cur.spt == null)
-                cur.spt = spt;
 
         }
 

@@ -229,7 +229,7 @@ public class RaptorPrecompWalk implements PathService {
         TraverseModeSet modes = options.getModes().clone();
         modes.setTransit(false);
         walkOptions.setModes(modes);
-        RaptorPathSet routeSet = new RaptorPathSet(stops.length);
+        RaptorPathSet routeSet = new RaptorPathSet(stops.length, walkOptions);
         // options.setMaxTransfers(5);
         // options.setMaxTransfers(0);
         for (int i = 0; i < options.getMaxTransfers() + 2; ++i) {
