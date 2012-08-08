@@ -385,6 +385,11 @@ public class TableTripPattern implements TripPattern, Serializable {
     }
     
     public void addTrip(Trip trip, List<StopTime> stopTimes) {
+
+        if (stopTimes.size() != stops.length) {
+            LOG.warn("Trip length does not match stop length");
+        }
+
         // TODO: double-check that the stops and pickup/dropoffs are right for this trip
         int nextIndex = tripTimes.size();
         tripTimes.add(new TripTimes(trip, nextIndex, stopTimes));
