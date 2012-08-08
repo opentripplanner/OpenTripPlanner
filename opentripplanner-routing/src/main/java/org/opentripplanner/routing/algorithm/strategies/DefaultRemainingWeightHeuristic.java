@@ -56,7 +56,7 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
         targetX = target.getX();
         targetY = target.getY();
 
-        return distanceLibrary.fastDistance(s.getVertex().getX(), s.getVertex().getY(), targetX, targetY)
+        return distanceLibrary.fastDistance(s.getVertex().getY(), s.getVertex().getX(), targetY, targetX)
                 / maxSpeed;
     }
 
@@ -64,8 +64,8 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
     public double computeForwardWeight(State s, Vertex target) {
 
     	Vertex sv = s.getVertex();
-        double euclidianDistance = distanceLibrary.fastDistance(sv.getX(), sv.getY(),
-                targetX, targetY);
+        double euclidianDistance = distanceLibrary.fastDistance(sv.getY(), sv.getX(),
+                targetY, targetX);
 
         /*	On a non-transit trip, the remaining weight is simply distance / speed
          *	On a transit trip, there are two cases:
