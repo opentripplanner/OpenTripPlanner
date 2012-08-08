@@ -272,9 +272,13 @@ public class Raptor implements PathService {
                 if (statesByStop[i] == null) continue;
                 boolean found = false;
                 for (RaptorState state : statesByStop[i]) {
-                    if (state.nBoardings == nBoardings && state.stalled) {
-                        createdStates.add(state);
-                        found = true;
+                    if (state.stalled) {
+                        if (state.nBoardings == nBoardings) {
+                            createdStates.add(state);
+                            found = true;
+                        } else if (state.nBoardings == nBoardings - 1) {
+                            visitedLastRound.add(state.stop);
+                        }
                     }
                 }
                 if (found) {
@@ -322,7 +326,7 @@ public class Raptor implements PathService {
             for (int stopNo = 0; stopNo < route.getNStops(); ++stopNo) {
                 // find the current time at this stop
                 RaptorStop stop = route.stops[stopNo];
-                if (!started && !visitedLastRound.contains(stop) && stalling)
+                if (!started && !visitedLastRound.contains(stop))
                     continue;
                 started = true;
 
@@ -622,7 +626,7 @@ public class Raptor implements PathService {
                     continue;
                 }
 
-                if (stalling && targetDistance > cur.bounder.bestTargetDistance * 1.33) {
+                if (stalling && targetDistance > cur.bounder.bestTargetDistance * 1.2) {
                     state.stalled = true;
                     continue;
                 }

@@ -33,6 +33,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.ArrayMultiShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
+import org.opentripplanner.routing.vertextype.TransitStop;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -121,7 +122,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
                 targetDistance = distanceLibrary.fastDistance(realTargetCoordinate.x, realTargetCoordinate.y,
                         vertex.getX(), vertex.getY());
                 distance[vertexIndex] = targetDistance;
-                if (targetDistance < bestTargetDistance) {
+                if (vertex instanceof TransitStop && targetDistance < bestTargetDistance) {
                     bestTargetDistance = targetDistance;
                 }
             }
