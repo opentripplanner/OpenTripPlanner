@@ -1,12 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:context="http://www.springframework.org/schema/context" xmlns:aop="http://www.springframework.org/schema/aop"
-    xmlns:tx="http://www.springframework.org/schema/tx" xmlns:sec="http://www.springframework.org/schema/security"
+    xmlns:context="http://www.springframework.org/schema/context" 
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
-           http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.0.xsd
-           http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-2.0.xsd
-           http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-2.0.xsd">
+           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
 
     <context:annotation-config />
     
@@ -45,9 +41,9 @@
 
 	<bean id="origins" class="org.opentripplanner.analyst.batch.CSVPopulation">
         <property name="sourceFilename" value="/home/abyrd/access/annarbor.csv" />
+        <property name="labelCol" value="0" />
         <property name="latCol" value="1" />
         <property name="lonCol" value="2" />
-        <property name="labelCol" value="0" />
         <property name="inputCol" value="3" />       
         <!-- do not include origins who are NaN, Inf, negative, or outside the transit coverage area --> 
         <property name="filterChain">
@@ -62,8 +58,22 @@
         </property>        
 	</bean>
 
-<!-- create a destination population arranged on a regular grid that can be saved as an image -->
-	
+	<bean id="destinations" class="org.opentripplanner.analyst.batch.CSVPopulation">
+        <property name="sourceFilename" value="/home/abyrd/access/annarbor.csv" />
+        <property name="labelCol" value="0" />
+        <property name="latCol" value="1" />
+        <property name="lonCol" value="2" />
+        <property name="inputCol" value="3" />       
+        <!-- do not include origins who are NaN, Inf, negative, or outside the transit coverage area --> 
+        <property name="filterChain">
+        	<list>
+        		<bean class="org.opentripplanner.analyst.batch.NanInfFilter" />
+        		<bean class="org.opentripplanner.analyst.batch.InputClampFilter" />
+        	</list>
+        </property>        
+	</bean>
+
+<!-- create a destination population arranged on a regular grid that can be saved as an image
 	<bean id="destinations" class="org.opentripplanner.analyst.batch.SyntheticRasterPopulation">
         <property name="left" value="-84.14" />
         <property name="right" value="-83.41" />
@@ -73,14 +83,15 @@
         <property name="cols" value="1280" />
         <property name="rows" value="1024" />        
 	</bean>
-
+ -->
+ 
 <!-- aggregate results are no longer stored in individuals so populations can be reused -->
 <!-- <alias name="destinations" alias="origins"/> -->
 	
 <!-- define the main batch processor, which will build one shortest path tree from each origin to all destinations -->
 	
 	<bean id="batchProcessor" class="org.opentripplanner.analyst.batch.BatchProcessor"> 
-        <property name="outputPath" value="/home/abyrd/access/out1834_clamp.tiff" />
+        <property name="outputPath" value="/home/abyrd/access/out.csv" />
         <property name="date" value="2012-07-12" />
         <property name="time" value="08:00 AM" />
         <property name="timeZone" value="America/New_York" />
