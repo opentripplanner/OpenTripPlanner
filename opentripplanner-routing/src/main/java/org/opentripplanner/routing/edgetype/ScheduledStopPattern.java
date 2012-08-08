@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.edgetype;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
@@ -46,11 +47,11 @@ public class ScheduledStopPattern {
         return "StopPattern(" + stops + ", " + calendarId + ")";
     }
     
-    public static ScheduledStopPattern fromTrip(Trip trip, GtfsRelationalDao dao) {
+    public static ScheduledStopPattern fromTrip(Trip trip, List<StopTime> stopTimes) {
         ArrayList<Stop> stops = new ArrayList<Stop>();
         ArrayList<Integer> pickups = new ArrayList<Integer>();
         ArrayList<Integer> dropoffs = new ArrayList<Integer>();
-        for (StopTime stoptime : dao.getStopTimesForTrip(trip)) {
+        for (StopTime stoptime : stopTimes) {
             stops.add(stoptime.getStop());
             pickups.add(stoptime.getPickupType());
             dropoffs.add(stoptime.getDropOffType());

@@ -327,7 +327,7 @@ public class GTFSPatternHopFactory {
 
             /* this trip is not frequency-based, add it to the corresponding trip pattern */
             // maybe rename ScheduledStopPattern to TripPatternKey?
-            ScheduledStopPattern stopPattern = ScheduledStopPattern.fromTrip(trip, _dao);
+            ScheduledStopPattern stopPattern = ScheduledStopPattern.fromTrip(trip, stopTimes);
             TableTripPattern tripPattern = patterns.get(stopPattern);
             if (tripPattern == null) {
                 // it's the first time we are encountering this stops+pickups+serviceId combination
