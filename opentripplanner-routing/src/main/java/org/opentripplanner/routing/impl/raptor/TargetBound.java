@@ -76,6 +76,8 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
 
     //private List<RaptorState> boundingStates;
 
+    double[] distance = new double[AbstractVertex.getMaxIndex()];
+
     public TargetBound(RoutingRequest options) {
         this.options = options;
         this.realTarget = options.rctx.target;
@@ -109,8 +111,19 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
     public boolean shouldSkipTraversalResult(Vertex origin, Vertex target, State parent,
             State current, ShortestPathTree spt, RoutingRequest traverseOptions) {
         final Vertex vertex = current.getVertex();
-        targetDistance = distanceLibrary.fastDistance(realTargetCoordinate.x, realTargetCoordinate.y,
-                vertex.getX(), vertex.getY());
+        int vertexIndex = vertex.getIndex();
+        if (vertexIndex < distance.length) {
+            if (distance[vertexIndex] > 0.0) {
+                targetDistance = distance[vertexIndex];
+            } else {
+                targetDistance = distanceLibrary.fastDistance(realTargetCoordinate.x, realTargetCoordinate.y,
+                        vertex.getX(), vertex.getY());
+                distance[vertexIndex] = targetDistance;
+            }
+        } else {
+            targetDistance = distanceLibrary.fastDistance(realTargetCoordinate.x, realTargetCoordinate.y,
+                    vertex.getX(), vertex.getY());
+        }
 
         final double remainingWalk = traverseOptions.maxWalkDistance
                 - current.getWalkDistance();
