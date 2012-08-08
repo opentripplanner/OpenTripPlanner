@@ -299,12 +299,12 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             int outAngle = 0;
             int inAngle = 0;
             if (options.arriveBy) {
-                if (!canTurnOnto(backPSE, s0))
+                if (!canTurnOnto(backPSE, s0, traverseMode))
                     return null;
                 outAngle = backPSE.getOutAngle();
                 inAngle = getInAngle();
             } else {
-                if (!backPSE.canTurnOnto(this, s0))
+                if (!backPSE.canTurnOnto(this, s0, traverseMode))
                     return null;
                 outAngle = getOutAngle();
                 inAngle = backPSE.getInAngle();
@@ -512,9 +512,9 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         return turnRestrictions;
     }
 
-    public boolean canTurnOnto(Edge e, State state) {
+    public boolean canTurnOnto(Edge e, State state, TraverseMode mode) {
         for (TurnRestriction restriction : turnRestrictions) {
-            if (restriction.to == e && restriction.modes.contains(state.getNonTransitMode(state.getOptions()))) {
+            if (restriction.to == e && restriction.modes.contains(mode)) {
                 return restriction.type == TurnRestrictionType.ONLY_TURN;
             }
         }
