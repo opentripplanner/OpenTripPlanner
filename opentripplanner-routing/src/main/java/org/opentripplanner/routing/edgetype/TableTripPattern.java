@@ -13,11 +13,14 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -279,6 +282,13 @@ public class TableTripPattern implements TripPattern, Serializable {
         }
         return -1;
     }
+    
+    private void writeObject(ObjectOutputStream outputStream) throws ClassNotFoundException,
+            IOException {
+        finish();
+        outputStream.defaultWriteObject();
+    }
+
 
     /** Returns whether passengers can alight at a given stop */
     public boolean canAlight(int stopIndex) {
