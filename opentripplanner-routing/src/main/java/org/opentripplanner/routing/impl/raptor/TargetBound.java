@@ -119,16 +119,16 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
             if (distance[vertexIndex] > 0.0) {
                 targetDistance = distance[vertexIndex];
             } else {
-                targetDistance = distanceLibrary.fastDistance(realTargetCoordinate.x, realTargetCoordinate.y,
-                        vertex.getX(), vertex.getY());
+                targetDistance = distanceLibrary.fastDistance(realTargetCoordinate.y, realTargetCoordinate.x,
+                        vertex.getY(), vertex.getX());
                 distance[vertexIndex] = targetDistance;
                 if (vertex instanceof TransitStop && targetDistance < bestTargetDistance) {
                     bestTargetDistance = targetDistance;
                 }
             }
         } else {
-            targetDistance = distanceLibrary.fastDistance(realTargetCoordinate.x, realTargetCoordinate.y,
-                    vertex.getX(), vertex.getY());
+            targetDistance = distanceLibrary.fastDistance(realTargetCoordinate.y, realTargetCoordinate.x,
+                    vertex.getY(), vertex.getX());
         }
 
         final double remainingWalk = traverseOptions.maxWalkDistance
@@ -283,6 +283,23 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
     public void addSptStates(List<MaxWalkState> states) {
         for (MaxWalkState state : states) {
             spt.add(state);
+        }
+    }
+
+    public double getTargetDistance(Vertex vertex) {
+        int vertexIndex = vertex.getIndex();
+        if (vertexIndex < distance.length) {
+            if (distance[vertexIndex] > 0.0) {
+                return distance[vertexIndex];
+            } else {
+                double d = distanceLibrary.fastDistance(realTargetCoordinate.y,
+                        realTargetCoordinate.x, vertex.getY(), vertex.getX());
+                distance[vertexIndex] = d;
+                return d;
+            }
+        } else {
+            return distanceLibrary.fastDistance(realTargetCoordinate.y, realTargetCoordinate.x,
+                    vertex.getY(), vertex.getX());
         }
     }
 }

@@ -52,9 +52,12 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class Raptor implements PathService {
+    private static final Logger log = LoggerFactory.getLogger(Raptor.class);
 
     static final double MAX_TRANSIT_SPEED = 25;
 
@@ -100,6 +103,7 @@ public class Raptor implements PathService {
             //uncomment next line, comment rest of loop, and comment stalling in phase 3 to turn off stalling
             //if (routeSet.getTargetStates().size() >= options.getNumItineraries()) break;
             if (routeSet.stalling && (!routeSet.getTargetStates().isEmpty() || i == options.getMaxTransfers() + 1)) {
+                log.debug("destall");
                 routeSet.stalling = false;
                 routeSet.highWater = i;
                 i = 0;//skip round 0, since we can't have any stalled states there
@@ -554,8 +558,7 @@ public class Raptor implements PathService {
 
                 double minWalk = distanceToNearestTransitStop;
                 
-                double targetDistance = distanceLibrary.fastDistance(dest.getCoordinate(),
-                        stopVertex.getCoordinate());
+                double targetDistance = cur.bounder.getTargetDistance(stopVertex);
 
                 double minTime = (targetDistance - minWalk)
                         / MAX_TRANSIT_SPEED + minWalk
