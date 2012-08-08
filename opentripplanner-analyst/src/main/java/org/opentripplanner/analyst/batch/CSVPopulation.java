@@ -27,14 +27,14 @@ public class CSVPopulation extends BasicPopulation {
     public int inputCol = 3;
 
     @Setter
-    public boolean headers = true;
+    public boolean skipHeaders = true;
 
     @Override
     public void createIndividuals() {
         try {
             CSVReader reader = new CSVReader(new FileReader(sourceFilename));
             String[] nextLine;
-            if (headers) {
+            if (skipHeaders) {
                 reader.readNext();
             }
             while ((nextLine = reader.readNext()) != null) {
