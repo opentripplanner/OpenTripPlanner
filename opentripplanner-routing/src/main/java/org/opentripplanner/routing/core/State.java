@@ -421,6 +421,8 @@ public class State implements Cloneable {
         // It is distributed symmetrically over all preboard and prealight edges.
         State newState = new State(this.vertex, this.time, stateData.opt.reversedClone());
         newState.stateData.tripTimes = stateData.tripTimes;
+        // make sure this is propagated forward
+        newState.stateData.initialWaitTime = stateData.initialWaitTime;
         return newState;
     }
 
@@ -561,8 +563,14 @@ public class State implements Cloneable {
             if (optimize) {
                 // first board: figure in wait time in on the fly optimization
                 if (edge instanceof PatternBoard && orig.getNumBoardings() == 1
-                    && forward)
+                    && forward) {
+                    if (ret.getTime() - orig.getBackState().getTime() < 0)
+                        LOG.warn("A transfer has been missed, time delta is negative: " +
+                                 ret.getTime() + " - " + orig.getBackState().getTime());
+
                     ret = ((PatternBoard) edge).traverse(ret, orig.getBackState().getTime());
+                    newInitialWaitTime = ret.stateData.initialWaitTime;
+                }
                 else                   
                     ret = edge.traverse(ret);
 
@@ -590,6 +598,7 @@ public class State implements Cloneable {
                 editor.incrementTimeInSeconds(orig.getAbsTimeDeltaSec());
                 editor.incrementWeight(orig.getWeightDelta());
                 editor.incrementWalkDistance(orig.getWalkDistanceDelta());
+
                 if (orig.isBikeRenting() != orig.getBackState().isBikeRenting())
                     editor.setBikeRenting(!orig.isBikeRenting());
                 ret = editor.makeState();
@@ -615,7 +624,21 @@ public class State implements Cloneable {
                          " after " + reversed.getElapsedTime());
             if (getActiveTime() <= reversed.getActiveTime())
                 LOG.warn("Optimization increased active time: before " + this.getActiveTime() + 
-                         " after " + reversed.getActiveTime());
+                         " after " + reversed.getActiveTime() + ", boardings: " + 
+                         this.getNumBoardings());
+            if (reversed.getWeight() > this.getBackState().getWeight())
+                LOG.warn("Weight has been reduced enough to make it run backwards, now:" +
+                         reversed.getWeight() + " backState " + getBackState().getWeight() + ", " +
+                         "number of boardings: " + getNumBoardings());
+            if (getTime() != reversed.getTime())
+                LOG.warn("Times do not match");
+            if (newInitialWaitTime != reversed.stateData.initialWaitTime)
+                LOG.warn("Initial wait time not propagated: is " + 
+                         reversed.stateData.initialWaitTime + 
+                         ", should be " + newInitialWaitTime);
+
+            //this.dumpPat
+
             return reversed;
         }
         else
