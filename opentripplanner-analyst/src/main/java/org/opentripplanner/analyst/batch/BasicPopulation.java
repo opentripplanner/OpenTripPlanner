@@ -1,17 +1,12 @@
 package org.opentripplanner.analyst.batch;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
-
-import javax.annotation.PostConstruct;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -20,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import au.com.bytecode.opencsv.CSVWriter;
+import com.csvreader.CsvWriter;
 
 public class BasicPopulation implements Population {
 
@@ -77,10 +72,9 @@ public class BasicPopulation implements Population {
         
     protected void writeCsv(String outFileName, ResultSet results) {
         LOG.debug("Writing population to CSV: {}", outFileName);
-        CSVWriter writer;
         try {
-            writer = new CSVWriter(new FileWriter(outFileName));
-            writer.writeNext( new String[] {"label", "lat", "lon", "input", "output"} );
+            CsvWriter writer = new CsvWriter(outFileName, ',', Charset.forName("UTF8"));
+            writer.writeRecord( new String[] {"label", "lat", "lon", "input", "output"} );
             int i = 0;
             // using internal list rather than filtered iterator
             for (Individual indiv : this.individuals) {
@@ -89,7 +83,7 @@ public class BasicPopulation implements Population {
                             indiv.label, Double.toString(indiv.lat), Double.toString(indiv.lon), 
                             Double.toString(indiv.input), Double.toString(results.results[i]) 
                     };
-                    writer.writeNext(entries);
+                    writer.writeRecord(entries);
                 }
                 i++;
             }
