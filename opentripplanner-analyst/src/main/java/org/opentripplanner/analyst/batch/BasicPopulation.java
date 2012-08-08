@@ -1,6 +1,8 @@
 package org.opentripplanner.analyst.batch;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,6 +19,8 @@ import lombok.Setter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import au.com.bytecode.opencsv.CSVWriter;
 
 public class BasicPopulation implements Population {
 
@@ -73,23 +77,28 @@ public class BasicPopulation implements Population {
         
     protected void writeCsv(String outFileName, ResultSet results) {
         LOG.debug("Writing population to CSV: {}", outFileName);
-        File outFile = new File(outFileName);
-        PrintWriter csvWriter;
+        CSVWriter writer;
         try {
-            csvWriter = new PrintWriter(outFile);
-            csvWriter.printf("label,lat,lon,input,output\n"); // output could be travel time when aggregator not present
+            writer = new CSVWriter(new FileWriter(outFileName));
+            writer.writeNext( new String[] {"label", "lat", "lon", "input", "output"} );
             int i = 0;
+            // using internal list rather than filtered iterator
             for (Individual indiv : this.individuals) {
                 if ( ! this.skip[i]) {
-                    csvWriter.printf("%s,%f,%f,%f,%f\n", indiv.label, indiv.lat, indiv.lon, indiv.input, results.results[i]);
+                    String[] entries = new String[] { 
+                            indiv.label, Double.toString(indiv.lat), Double.toString(indiv.lon), 
+                            Double.toString(indiv.input), Double.toString(results.results[i]) 
+                    };
+                    writer.writeNext(entries);
                 }
                 i++;
             }
-            csvWriter.close();
+            writer.close(); // flush writes and close
         } catch (Exception e) {
-            LOG.debug("error writing population to CSV: {}", e);
+            LOG.error("Error while writing to CSV file: {}", e.getMessage());
+            return;
         }
-        LOG.debug("Done writing population to CSV.");
+        LOG.debug("Done writing population to CSV at {}.", outFileName);
     }
 
     @Override
