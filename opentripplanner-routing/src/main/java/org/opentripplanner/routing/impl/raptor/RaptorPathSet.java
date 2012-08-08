@@ -35,6 +35,8 @@ public class RaptorPathSet {
     public List<RaptorState> boundingStates = new ArrayList<RaptorState>();
 
     public final TargetBound bounder;
+    public boolean stalling = false;
+    public int highWater;
     
     @SuppressWarnings("unchecked")
     RaptorPathSet(int nStops, RoutingRequest options) {

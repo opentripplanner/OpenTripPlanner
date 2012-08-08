@@ -78,6 +78,8 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
 
     double[] distance = new double[AbstractVertex.getMaxIndex()];
 
+    public double bestTargetDistance = Double.POSITIVE_INFINITY;
+
     public TargetBound(RoutingRequest options) {
         this.options = options;
         this.realTarget = options.rctx.target;
@@ -119,6 +121,9 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
                 targetDistance = distanceLibrary.fastDistance(realTargetCoordinate.x, realTargetCoordinate.y,
                         vertex.getX(), vertex.getY());
                 distance[vertexIndex] = targetDistance;
+                if (targetDistance < bestTargetDistance) {
+                    bestTargetDistance = targetDistance;
+                }
             }
         } else {
             targetDistance = distanceLibrary.fastDistance(realTargetCoordinate.x, realTargetCoordinate.y,
@@ -189,7 +194,9 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
         for (State bounder : bounders) {
             int prevTime = previousArrivalTime.get(i++);
             
-            if (optimisticDistance * 1.1 > bounder.getWalkDistance() && current.getTime() + minTime > bounder.getTime()) 
+            if (optimisticDistance * 1.1 > bounder.getWalkDistance()
+                    && current.getTime() + minTime > bounder.getTime()
+                    && current.getNumBoardings() >= bounder.getNumBoardings()) 
                 return true; // this path won't win on either time or distance
             
             if (!(optimisticDistance * 1.1 > bounder.getWalkDistance() && current.getTime() + minTime > prevTime)) {
