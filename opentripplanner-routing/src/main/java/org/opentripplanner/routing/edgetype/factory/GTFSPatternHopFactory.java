@@ -559,7 +559,7 @@ public class GTFSPatternHopFactory {
                 }
             }
             double hopDistance = distanceLibrary.fastDistance(
-                   st0.getStop().getLon(), st0.getStop().getLat(),
+                   st0.getStop().getLat(), st0.getStop().getLon(),
                    st1.getStop().getLon(), st1.getStop().getLat());
             double hopSpeed = hopDistance/runningTime;
             /* zero-distance hops are probably not harmful, though they could be better 
