@@ -178,14 +178,22 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
 
             long wait_cost = bestWait;
 
-            if (state0.getNumBoardings() == 0) {
+            // we don't want to apply the wait at beginning factor when we're actually
+            // at the end during reverse optimization
+            if (state0.getNumBoardings() == 0 && !options.isReverseOptimizing()) {
                 wait_cost *= options.waitAtBeginningFactor;
                 s1.setInitialWaitTime(bestWait);
             } else {
                 wait_cost *= options.waitReluctance;
             }
             s1.incrementWeight(preferences_penalty);
-            s1.incrementWeight(wait_cost + options.getBoardCost(nonTransitMode));
+            
+            // when reverse optimizing, the board cost needs to be applied on
+            // board to prevent state domination due to free boards
+            if (options.isReverseOptimizing())
+                s1.incrementWeight(wait_cost);
+            else
+                s1.incrementWeight(wait_cost + options.getBoardCost(nonTransitMode));
 
             // On-the-fly reverse optimization
             // determine if this needs to be reverse-optimized.
