@@ -334,7 +334,7 @@ public class LinkRequest {
             }
             if (e instanceof TurnEdge) {
                 final TurnEdge turnEdge = (TurnEdge) e;
-                TinyTurnEdge newTurn = new TinyTurnEdge(newEnd, toVertex, turnEdge.getPermission());
+                TinyTurnEdge newTurn = new TinyTurnEdge(newEnd, toVertex, turnEdge);
                 addEdges(newTurn);
                 newTurn.setRestrictedModes(turnEdge.getRestrictedModes());
                 newTurn.setTurnCost(turnEdge.turnCost);
@@ -354,7 +354,7 @@ public class LinkRequest {
             }
             if (e instanceof TurnEdge) {
                 final TurnEdge turnEdge = (TurnEdge) e;
-                TinyTurnEdge newTurn = new TinyTurnEdge(newStart, toVertex, turnEdge.getPermission());
+                TinyTurnEdge newTurn = new TinyTurnEdge(newStart, toVertex, turnEdge);
                 addEdges(newTurn);
                 newTurn.setRestrictedModes(turnEdge.getRestrictedModes());
                 newTurn.setTurnCost(turnEdge.turnCost);
