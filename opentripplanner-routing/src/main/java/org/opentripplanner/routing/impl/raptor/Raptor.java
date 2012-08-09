@@ -278,8 +278,8 @@ public class Raptor implements PathService {
                     if (state.stalled) {
                         if (state.nBoardings == nBoardings) {
                             createdStates.add(state);
-                            found = true;
                         } else if (state.nBoardings == nBoardings - 1) {
+                            found = true;
                             visitedLastRound.add(state.stop);
                         }
                     }
@@ -291,7 +291,13 @@ public class Raptor implements PathService {
                 }
             }
             for (State bounder : cur.bounder.bounders) {
-                worstTime = (int) ((bounder.getTime() - options.dateTime) * 1.5 + options.dateTime);
+                int time = (int) ((bounder.getTime() - options.dateTime) * 1.5 + options.dateTime);
+                if (time > worstTime) {
+                    worstTime = time;
+                }
+            }
+            if (worstTime == 0) {
+                worstTime = Integer.MAX_VALUE;
             }
         }
         cur.visitedLastRound = new HashSet<RaptorStop>();
