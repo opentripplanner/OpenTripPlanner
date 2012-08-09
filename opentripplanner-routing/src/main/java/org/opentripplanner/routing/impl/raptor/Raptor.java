@@ -95,17 +95,33 @@ public class Raptor implements PathService {
         options.setMaxTransfers(options.maxTransfers + 2);
         
         routeSet.stalling = true;
+        Set<RaptorStop> firstBoardings = null;
+        Set<RaptorStop> lastBoardings = null;
+
         for (int i = 0; i < options.getMaxTransfers() + 2; ++i) {
             round(data, options, walkOptions, routeSet, i);
             
             //uncomment next line, comment rest of loop, and comment stalling in phase 3 to turn off stalling
             //if (routeSet.getTargetStates().size() >= options.getNumItineraries()) break;
-            if (routeSet.stalling && (!routeSet.getTargetStates().isEmpty() || i == options.getMaxTransfers() + 1)) {
-                log.debug("destall");
-                routeSet.stalling = false;
-                routeSet.highWater = i;
-                i = 0;//skip round 0, since we can't have any stalled states there
-                continue;
+            if (routeSet.stalling) {
+                //need to save the stops visited in round zero so that the second search can use them 
+                if (i == 0) {
+                    firstBoardings = routeSet.visitedLastRound;
+                }
+
+                if (!routeSet.getTargetStates().isEmpty() || i == options.getMaxTransfers() + 1) {
+                    log.debug("destall");
+                    lastBoardings = routeSet.visitedLastRound;
+                    routeSet.visitedLastRound = firstBoardings;
+                    routeSet.stalling = false;
+                    routeSet.highWater = i;
+                    i = 0;// skip round 0, since we can't have any stalled states there
+                    continue;
+                }
+            } else {
+                if (i == routeSet.highWater - 1) {
+                    routeSet.visitedLastRound.addAll(lastBoardings);
+                }
             }
 
             if (i >= routeSet.highWater && routeSet.getTargetStates().size() >= options.getNumItineraries()) break;
@@ -268,13 +284,14 @@ public class Raptor implements PathService {
                 routesToVisit.add(route);
             }
         }
-        int worstTime = 0;
+        int worstTime = Integer.MAX_VALUE;
         if (!stalling) {
             //need to restore stalled states
             for (int i = 0; i < statesByStop.length; ++i) {
                 if (statesByStop[i] == null) continue;
                 boolean found = false;
                 for (RaptorState state : statesByStop[i]) {
+                    if (nBoardings == cur.highWater) state.stalled = true;
                     if (state.stalled) {
                         if (state.nBoardings == nBoardings) {
                             createdStates.add(state);
@@ -292,12 +309,9 @@ public class Raptor implements PathService {
             }
             for (State bounder : cur.bounder.bounders) {
                 int time = (int) ((bounder.getTime() - options.dateTime) * 1.5 + options.dateTime);
-                if (time > worstTime) {
+                if (time < worstTime) {
                     worstTime = time;
                 }
-            }
-            if (worstTime == 0) {
-                worstTime = Integer.MAX_VALUE;
             }
         }
         cur.visitedLastRound = new HashSet<RaptorStop>();
