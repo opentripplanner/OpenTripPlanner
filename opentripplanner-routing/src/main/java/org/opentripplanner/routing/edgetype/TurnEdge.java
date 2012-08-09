@@ -30,6 +30,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.Patch;
+import org.opentripplanner.routing.util.ElevationProfileSegment;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TurnVertex;
 
@@ -330,4 +331,8 @@ public class TurnEdge extends StreetEdge {
         return ((TurnVertex) fromv).getStreetClass();
     }
 
+    @Override
+    public ElevationProfileSegment getElevationProfileSegment() {
+        return ((TurnVertex) fromv).getElevationProfileSegment();
+    }
 }
