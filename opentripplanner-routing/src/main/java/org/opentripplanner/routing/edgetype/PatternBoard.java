@@ -91,6 +91,9 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
     public State traverse(State state0, long arrivalTimeAtStop) {
         RoutingContext rctx = state0.getContext();
         RoutingRequest options = state0.getOptions();
+        // this method is on State not RoutingRequest because we care whether the user is in
+        // possession of a rented bike.
+        TraverseMode mode = state0.getNonTransitMode(options); 
         if (options.isArriveBy()) {
             /* reverse traversal, not so much to do */
             // do not alight immediately when arrive-depart dwell has been eliminated
@@ -119,8 +122,13 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
 
                 s1.setInitialWaitTime(wait);
 
-                _log.debug("Initial wait time set to {} in PatternBoard", wait);
+                //_log.debug("Initial wait time set to {} in PatternBoard", wait);
             }
+            
+            // during reverse optimization, board costs should be applied to PatternBoards
+            // so that comparable trip plans result (comparable to non-optimized plans)
+            if (options.isReverseOptimizing())
+                s1.incrementWeight(options.getBoardCost(mode));
 
             if (options.isReverseOptimizeOnTheFly()) {
                 int thisDeparture = state0.getTripTimes().getDepartureTime(stopIndex);
@@ -158,9 +166,6 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             int bestWait = -1;
             TripTimes bestTripTimes = null;
             int serviceId = getPattern().getServiceId();
-            // this method is on State not RoutingRequest because we care whether the user is in
-            // possession of a rented bike.
-            TraverseMode mode = state0.getNonTransitMode(options); 
             for (ServiceDay sd : rctx.serviceDays) {
                 int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
                 // only check for service on days that are not in the future
