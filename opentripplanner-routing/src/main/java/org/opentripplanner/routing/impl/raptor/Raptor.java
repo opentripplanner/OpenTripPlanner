@@ -653,10 +653,14 @@ public class Raptor implements PathService {
                                 }
                                 continue;
                             }
+                            if (cur.statesByStop[stop.index] == null) {
+                                found = true;
+                                break ROUTE;
+                            }/*
                             if (cur.bounder.getTargetDistance(stop.stopVertex) < targetDistance) {
                                 found = true;
                                 break ROUTE;
-                            }
+                            }*/
                         }
                     }
                     if (!found) {
