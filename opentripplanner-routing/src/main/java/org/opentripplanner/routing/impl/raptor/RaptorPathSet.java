@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -71,6 +72,15 @@ public class RaptorPathSet {
 
     public void addStopNearTarget(RaptorStop stop, double walkDistance, int time) {
         stopsNearTarget.put(stop, new StopNearTarget(stop, walkDistance, time));
+    }
+
+    public void removeTargetState(State toRemove) {
+        for (Iterator<RaptorState> it = targetStates.iterator(); it.hasNext();) {
+            RaptorState state = it.next();
+            if (state.walkPath == toRemove) {
+                it.remove();
+            }
+        }
     }
 
 }

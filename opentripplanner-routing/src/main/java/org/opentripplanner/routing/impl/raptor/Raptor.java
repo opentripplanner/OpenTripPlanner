@@ -47,10 +47,8 @@ import org.opentripplanner.routing.pathparser.BasicPathParser;
 import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
-import org.opentripplanner.routing.spt.ArrayMultiShortestPathTree;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -723,6 +721,10 @@ public class Raptor implements PathService {
                 System.out.println("TARGET: " + state);
             }
         }
+        for (State state : cur.bounder.removedBoundingStates) {
+            cur.removeTargetState(state);
+        }
+
         SPTSTATE: for (State state : spt.getAllStates()) {
 
             final Vertex vertex = state.getVertex();

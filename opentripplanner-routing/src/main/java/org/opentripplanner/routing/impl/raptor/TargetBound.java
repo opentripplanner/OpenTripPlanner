@@ -42,6 +42,8 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
 
     private static final long serialVersionUID = -5296036164138922096L;
 
+    private static final long WORST_TIME_DIFFERENCE = 3600;
+
     List<State> bounders;
 
     private Vertex realTarget;
@@ -82,6 +84,8 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
 
     public double bestTargetDistance = Double.POSITIVE_INFINITY;
 
+    public List<State> removedBoundingStates = new ArrayList<State>();
+
     public TargetBound(RoutingRequest options) {
         this.options = options;
         this.realTarget = options.rctx.target;
@@ -105,7 +109,14 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
     private void addBounder(State bounder) {
         for (Iterator<State> it = bounders.iterator(); it.hasNext(); ) {
             State old = it.next();
-            if (bounder.dominates(old)) it.remove();
+            if (bounder.dominates(old)) {
+                it.remove();
+                removedBoundingStates.add(old);
+            } else if (bounder.getNumBoardings() <= old.getNumBoardings()
+                    && bounder.getTime() + WORST_TIME_DIFFERENCE < old.getTime()) {
+                it.remove();
+                removedBoundingStates.add(old);
+            }
         }
         bounders.add(bounder);
         RaptorState state = (RaptorState) bounder.getExtension("raptorParent");
