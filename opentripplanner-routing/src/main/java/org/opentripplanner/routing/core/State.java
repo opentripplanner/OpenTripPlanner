@@ -25,12 +25,11 @@ import org.opentripplanner.routing.automata.AutomatonState;
 import org.opentripplanner.routing.edgetype.OnBoardForwardEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
-import org.opentripplanner.routing.edgetype.PatternBoard;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.routing.spt.GraphPath;
 
 public class State implements Cloneable {
     /* Data which is likely to change at most traversals */
@@ -563,13 +562,14 @@ public class State implements Cloneable {
             
             if (optimize) {
                 // first board: figure in wait time in on the fly optimization
-                if (edge instanceof PatternBoard && orig.getNumBoardings() == 1
-                    && forward) {
+                if (edge instanceof TransitBoardAlight &&
+                        ((TransitBoardAlight) edge).isBoarding() &&                        
+                        orig.getNumBoardings() == 1 && forward) {
                     if (ret.getTime() - orig.getBackState().getTime() < 0)
                         LOG.warn("A transfer has been missed, time delta is negative: " +
                                  ret.getTime() + " - " + orig.getBackState().getTime());
 
-                    ret = ((PatternBoard) edge).traverse(ret, orig.getBackState().getTime());
+                    ret = ((TransitBoardAlight) edge).traverse(ret, orig.getBackState().getTime());
                     newInitialWaitTime = ret.stateData.initialWaitTime;
                 }
                 else                   

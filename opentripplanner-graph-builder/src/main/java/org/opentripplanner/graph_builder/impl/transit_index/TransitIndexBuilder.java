@@ -41,8 +41,7 @@ import org.opentripplanner.routing.edgetype.Alight;
 import org.opentripplanner.routing.edgetype.Board;
 import org.opentripplanner.routing.edgetype.Dwell;
 import org.opentripplanner.routing.edgetype.Hop;
-import org.opentripplanner.routing.edgetype.PatternAlight;
-import org.opentripplanner.routing.edgetype.PatternBoard;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
@@ -323,6 +322,8 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
     }
 
     private void createRouteVariants(Graph graph) {
+        TransitBoardAlight tba;
+        
         for (TransitVertex gv : IterableLibrary.filter(graph.getVertices(), TransitVertex.class)) {
             boolean start = false;
             boolean noStart = false;
@@ -339,10 +340,14 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                 if (e instanceof PatternHop || e instanceof Alight || e instanceof PatternDwell || e instanceof Dwell) {
                     noStart = true;
                 }
-                if (e instanceof PatternBoard) {
-                    pattern = ((PatternBoard) e).getPattern();
-                    trip = pattern.getExemplar();
-                    start = true;
+                if (e instanceof TransitBoardAlight) {
+                    tba = (TransitBoardAlight) e;
+
+                    if (tba.isBoarding()) {
+                        pattern = tba.getPattern();
+                        trip = pattern.getExemplar();
+                        start = true;
+                    }
                 }
                 if (e instanceof Board) {
                     trip = ((Board) e).getTrip();
@@ -380,7 +385,9 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                     RouteSegment segment = new RouteSegment(gv.getStopId());
                     segment.hopIn = prevHop;
                     for (Edge e : gv.getIncoming()) {
-                        if (e instanceof Board || e instanceof PatternBoard) {
+                        if (e instanceof Board || 
+                                (e instanceof TransitBoardAlight && 
+                                        ((TransitBoardAlight) e).isBoarding())) {
                             segment.board = e;
                         }
                     }
@@ -394,7 +401,9 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                         if (e instanceof PatternDwell || e instanceof Dwell) {
                             segment.dwell = e;
                             for (Edge e2 : e.getToVertex().getIncoming()) {
-                                if (e2 instanceof Board || e2 instanceof PatternBoard) {
+                                if (e2 instanceof Board || 
+                                        (e2 instanceof TransitBoardAlight && 
+                                         ((TransitBoardAlight) e2).isBoarding())) {
                                     segment.board = e2;
                                 }
                             }
@@ -403,12 +412,16 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                                     segment.hopOut = e2;
                                     gv = (TransitVertex) e2.getToVertex();
                                 }
-                                if (e2 instanceof PatternAlight || e2 instanceof Alight) {
+                                if ((e2 instanceof TransitBoardAlight &&
+                                        !((TransitBoardAlight) e2).isBoarding())
+                                        || e2 instanceof Alight) {
                                     segment.alight = e2;
                                 }
                             }
                         }
-                        if (e instanceof PatternAlight || e instanceof Alight) {
+                        if ((e instanceof TransitBoardAlight &&
+                                !((TransitBoardAlight) e).isBoarding())
+                                || e instanceof Alight) {
                             segment.alight = e;
                         }
                     }

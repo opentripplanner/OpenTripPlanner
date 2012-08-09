@@ -40,8 +40,7 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.routing.vertextype.TurnVertex;
 import org.opentripplanner.routing.edgetype.DelegatingEdgeNarrative;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.edgetype.PatternAlight;
-import org.opentripplanner.routing.edgetype.PatternBoard;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -364,14 +363,16 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         // mark key vertices
         lastLabelY = -999;
     	labelState(gp.states.getFirst(), "begin");
-        for (State s : gp.states) {
-        	Edge e = s.getBackEdge();
-        	if (e instanceof PatternBoard) {
-        		labelState(s, "board");
-        	} else if (e instanceof PatternAlight) {
-        		labelState(s, "alight");
-        	}
-        }
+    	for (State s : gp.states) {
+    	    Edge e = s.getBackEdge();
+    	    if (e instanceof TransitBoardAlight) {
+    	        if (((TransitBoardAlight) e).isBoarding()) {
+    	            labelState(s, "board");
+    	        } else {
+    	            labelState(s, "alight");
+    	        }
+    	    }
+    	}
     	labelState(gp.states.getLast(), "end");
 
         if (VIDEO) {

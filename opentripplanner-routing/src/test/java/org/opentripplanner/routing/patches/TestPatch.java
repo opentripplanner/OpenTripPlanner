@@ -36,7 +36,7 @@ import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.edgetype.PatternBoard;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
@@ -101,8 +101,9 @@ public class TestPatch extends TestCase {
                 route.setId(routeId);
                 route.setShortName(routeId.getId());
 
-                PatternBoard somePatternBoard = (PatternBoard) graph.getVertex("agency_A_depart")
+                TransitBoardAlight somePatternBoard = (TransitBoardAlight) graph.getVertex("agency_A_depart")
                         .getOutgoing().iterator().next();
+                assertTrue(somePatternBoard.isBoarding());
                 PatternHop somePatternHop = (PatternHop) somePatternBoard.getToVertex()
                         .getOutgoing().iterator().next();
 
