@@ -78,8 +78,15 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
 
     @Override
     public State traverse(State state0) {
+        return traverse(state0, 0);
+    }
+    
+    public State traverse(State state0, long arrivalTimeAtStop) {
         RoutingContext rctx = state0.getContext();
         RoutingRequest options = state0.getOptions();
+        // get the non-transit mode, mostly to determine whether the user is carrying a bike
+        // this should maybe be done differently (using mode only for traversal permissions).
+        TraverseMode nonTransitMode = state0.getNonTransitMode(options);
         if (options.isArriveBy()) {
             /* backward traversal: find a transit trip on this pattern */
             if (state0.getLastPattern() == this.getPattern()) {
@@ -99,9 +106,6 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             int bestWait = -1;
             TripTimes bestTripTimes = null;
             int serviceId = getPattern().getServiceId();
-            // get the non-transit mode, mostly to determine whether the user is carrying a bike
-            // this should maybe be done differently (using mode only for traversal permissions).
-            TraverseMode nonTransitMode = state0.getNonTransitMode(options);
             for (ServiceDay sd : rctx.serviceDays) {
                 int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
                 // only check for service on days that are not in the future
@@ -183,9 +187,11 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             if (state0.getNumBoardings() == 0 && !options.isReverseOptimizing()) {
                 wait_cost *= options.waitAtBeginningFactor;
                 s1.setInitialWaitTime(bestWait);
-            } else {
+            } 
+            else {
                 wait_cost *= options.waitReluctance;
             }
+            
             s1.incrementWeight(preferences_penalty);
             
             // when reverse optimizing, the board cost needs to be applied on
@@ -200,7 +206,8 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             // The last alight can be moved forward by bestWait (but no further) without
             // impacting the possibility of this trip
             if (options.isReverseOptimizeOnTheFly() && !options.isReverseOptimizing() && 
-                    state0.getNumBoardings() > 0 && state0.getLastNextArrivalDelta() <= bestWait) {
+                    state0.getNumBoardings() > 0 && state0.getLastNextArrivalDelta() <= bestWait &&
+                    state0.getLastNextArrivalDelta() > -1) {
 
                 // it is re-reversed by optimize, so this still yields a forward tree
                 State optimized = s1.makeState().optimizeOrReverse(true, true);
@@ -228,7 +235,25 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             s1.setLastAlightedTime(state0.getTime());
             s1.setPreviousStop(tov);
             s1.setLastPattern(this.getPattern());
+            
+            // determine the wait
+            if (arrivalTimeAtStop > 0) {
+                int wait = (int) Math.abs(state0.getTime() - arrivalTimeAtStop);
+                
+                s1.incrementTimeInSeconds(wait);
+                // this should only occur at the beginning
+                s1.incrementWeight(wait * options.waitAtBeginningFactor);
 
+                s1.setInitialWaitTime(wait);
+
+                //_log.debug("Initial wait time set to {} in PatternBoard", wait);
+            }
+
+            // during reverse optimization, board costs should be applied to PatternAlights
+            // so that comparable trip plans result (comparable to non-optimized plans)
+            if (options.isReverseOptimizing())
+                s1.incrementWeight(options.getBoardCost(nonTransitMode));
+            
             // calculate the next possible arrival time, if necessary
             if (options.isReverseOptimizeOnTheFly()) {
                 int thisArrival = state0.getTripTimes().getArrivalTime(stopIndex - 1);
