@@ -423,6 +423,8 @@ public class State implements Cloneable {
         newState.stateData.tripTimes = stateData.tripTimes;
         // make sure this is propagated forward
         newState.stateData.initialWaitTime = stateData.initialWaitTime;
+        newState.pathParserStates = 
+                Arrays.copyOf(this.pathParserStates, this.pathParserStates.length);
         return newState;
     }
 
@@ -548,7 +550,6 @@ public class State implements Cloneable {
         State unoptimized = orig;
         State ret = orig.reversedClone();
         long newInitialWaitTime = -1;
-        boolean needToFigureInAdditionalWaitTime = false;
         PathParser pathParsers[];
 
         // disable path parsing temporarily
@@ -617,28 +618,57 @@ public class State implements Cloneable {
         if (forward) {
             State reversed = ret.reverse();
             if (getWeight() <= reversed.getWeight())
-                LOG.warn("Optimization did not decrease weight: before " + this.getWeight() + 
-                         " after " + reversed.getWeight());
+                // This is possible; imagine a trip involving three lines, line A, line B and
+                // line C. Lines A and C run hourly while Line B runs every ten minute starting
+                // at 8:55. The user boards line A at 7:00 and gets off at the first transfer point
+                // (point u) at 8:00. The user then boards the first run of line B at 8:55, an optimal
+                // transfer since there is no later trip on line A that could have been taken. The user
+                // deboards line B at point v at 10:00, and boards line C at 10:15. This is a
+                // non-optimal transfer; the trip on line B can be moved forward 10 minutes. When
+                // that happens, the first transfer becomes non-optimal (8:00 to 9:05) and the trip
+                // on line A can be moved forward an hour, thus moving 55 minutes of waiting time
+                // from a previous state to the beginning of the trip where it is significantly
+                // cheaper.
+
+                LOG.warn("Optimization did not decrease weight: before " + this.getWeight()
+                        + " after " + reversed.getWeight());
             if (getElapsedTime() != reversed.getElapsedTime())
-                LOG.warn("Optimization changed time: before " + this.getElapsedTime() + 
-                         " after " + reversed.getElapsedTime());
+                LOG.warn("Optimization changed time: before " + this.getElapsedTime() + " after "
+                        + reversed.getElapsedTime());
             if (getActiveTime() <= reversed.getActiveTime())
-                LOG.warn("Optimization increased active time: before " + this.getActiveTime() + 
-                         " after " + reversed.getActiveTime() + ", boardings: " + 
-                         this.getNumBoardings());
-            if (reversed.getWeight() > this.getBackState().getWeight())
-                LOG.warn("Weight has been reduced enough to make it run backwards, now:" +
-                         reversed.getWeight() + " backState " + getBackState().getWeight() + ", " +
-                         "number of boardings: " + getNumBoardings());
+                // NOTE: this can happen and it isn't always bad (i.e. it doesn't always mean that
+                // reverse-opt got called when it shouldn't have). Imagine three lines A, B and C
+                // A trip takes line A at 7:00 and arrives at the first transit center at 7:30, where line
+                // B is boarded at 7:40 to another transit center with an arrival at 8:00. At 8:30, line C
+                // is boarded. Suppose line B runs every ten minutes and the other two run every hour. The
+                // optimizer will optimize the B->C connection, moving the trip on line B forward
+                // ten minutes. However, it will not be able to move the trip on Line A forward because
+                // there is not another possible trip. The waiting time will get pushed towards the
+                // the beginning, but not all the way.
+                LOG.warn("Optimization did not decrease active time: before "
+                        + this.getActiveTime() + " after " + reversed.getActiveTime()
+                        + ", boardings: " + this.getNumBoardings());
+            if (reversed.getWeight() < this.getBackState().getWeight())
+                LOG.warn("Weight has been reduced enough to make it run backwards, now:"
+                        + reversed.getWeight() + " backState " + getBackState().getWeight() + ", "
+                        + "number of boardings: " + getNumBoardings());
             if (getTime() != reversed.getTime())
                 LOG.warn("Times do not match");
+            if (Math.abs(getWeight() - reversed.getWeight()) > 1
+                    && newInitialWaitTime == stateData.initialWaitTime)
+                LOG.warn("Weight is changed (before: " + getWeight() + ", after: "
+                        + reversed.getWeight() + "), initial wait times " + "constant at "
+                        + newInitialWaitTime);
             if (newInitialWaitTime != reversed.stateData.initialWaitTime)
-                LOG.warn("Initial wait time not propagated: is " + 
-                         reversed.stateData.initialWaitTime + 
-                         ", should be " + newInitialWaitTime);
+                LOG.warn("Initial wait time not propagated: is "
+                        + reversed.stateData.initialWaitTime + ", should be " + newInitialWaitTime);
 
-            //this.dumpPat
-
+            // copy the path parser states so this path is not thrown out going forward
+//            reversed.pathParserStates = 
+//                    Arrays.copyOf(this.pathParserStates, this.pathParserStates.length, newLength);
+            
+            // copy things that didn't get copied
+            reversed.initializeFieldsFrom(this);
             return reversed;
         }
         else
@@ -657,6 +687,20 @@ public class State implements Cloneable {
      */
     public State reverse () {
         return optimizeOrReverse(false, false);
+    }
+    
+    /**
+     * After reverse-optimizing, many things are not set. Set them from the unoptimized state.
+     * @param o The other state to initialize things from.
+     */
+    private void initializeFieldsFrom (State o) {
+        StateData currentStateData = this.stateData;
+        
+        // easier to clone and copy back, plus more future proof
+        this.stateData = o.stateData.clone();
+        this.stateData.initialWaitTime = currentStateData.initialWaitTime;
+        // this will get re-set on the next alight (or board in a reverse search)
+        this.stateData.lastNextArrivalDelta = -1;
     }
 
     public boolean getReverseOptimizing () {

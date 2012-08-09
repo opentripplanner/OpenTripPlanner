@@ -84,6 +84,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
         return "leave street network for transit network";
     }
 
+    @Override
     public State traverse(State state0) {
         return traverse(state0, 0);
     }
@@ -259,15 +260,23 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             } else {
                 wait_cost *= options.waitReluctance;
             }
+            
             s1.incrementWeight(preferences_penalty);
-            s1.incrementWeight(wait_cost + options.getBoardCost(mode));
+
+            // when reverse optimizing, the board cost needs to be applied on
+            // alight to prevent state domination due to free alights
+            if (options.isReverseOptimizing())
+                s1.incrementWeight(wait_cost);
+            else
+                s1.incrementWeight(wait_cost + options.getBoardCost(mode));
 
             // On-the-fly reverse optimization
             // determine if this needs to be reverse-optimized.
             // The last alight can be moved forward by bestWait (but no further) without
             // impacting the possibility of this trip
             if (options.isReverseOptimizeOnTheFly() && !options.isReverseOptimizing() && 
-                    state0.getNumBoardings() > 0 && state0.getLastNextArrivalDelta() <= bestWait) {
+                    state0.getNumBoardings() > 0 && state0.getLastNextArrivalDelta() <= bestWait &&
+                    state0.getLastNextArrivalDelta() > -1) {
 
                 // it is re-reversed by optimize, so this still yields a forward tree
                 State optimized = s1.makeState().optimizeOrReverse(true, true);

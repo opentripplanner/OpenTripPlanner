@@ -76,7 +76,7 @@ public class GraphPath {
             lastState = optimize ? s.optimize().reverse() : s;
         }
         // DEBUG
-        // lastState = s;
+        lastState = s;
 
         /*
          * Starting from latest (time-wise) state, copy states to the head of a list in reverse
