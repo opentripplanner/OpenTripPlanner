@@ -54,8 +54,7 @@ import org.opentripplanner.routing.edgetype.FrequencyDwell;
 import org.opentripplanner.routing.edgetype.FrequencyHop;
 import org.opentripplanner.routing.edgetype.Hop;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
-import org.opentripplanner.routing.edgetype.PatternAlight;
-import org.opentripplanner.routing.edgetype.PatternBoard;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
@@ -778,8 +777,9 @@ public class GTFSPatternHopFactory {
 
             TransitStopDepart stopDepart = context.stopDepartNodes.get(s0);
             TransitStopArrive stopArrive = context.stopArriveNodes.get(s1);
-            Edge board = new PatternBoard(stopDepart, psv0depart, hopIndex, mode);
-            Edge alight = new PatternAlight(psv1arrive, stopArrive, hopIndex, mode);
+
+            Edge board = new TransitBoardAlight(stopDepart, psv0depart, hopIndex, mode);
+            Edge alight = new TransitBoardAlight(psv1arrive, stopArrive, hopIndex, mode);
         }        
     }
     
