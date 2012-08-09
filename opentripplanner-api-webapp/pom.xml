@@ -197,7 +197,7 @@
             <plugin>
                 <groupId>org.codehaus.enunciate</groupId>
                 <artifactId>maven-enunciate-plugin</artifactId>
-                <version>1.23</version>
+                <version>1.25</version>
                 <executions>
                   <execution>
                     <!-- default binding for docs goal is process-sources phase -->
