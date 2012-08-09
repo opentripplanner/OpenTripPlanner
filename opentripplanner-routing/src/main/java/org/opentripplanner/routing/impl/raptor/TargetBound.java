@@ -200,7 +200,8 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
                     && current.getNumBoardings() >= bounder.getNumBoardings()) 
                 return true; // this path won't win on either time or distance
             
-            if (!(optimisticDistance * 1.1 > bounder.getWalkDistance() && current.getTime() + minTime > prevTime)) {
+            if (!(optimisticDistance * 1.1 > bounder.getWalkDistance() && current.getTime() + minTime > prevTime)
+                    && current.getNumBoardings() >= bounder.getNumBoardings()) {
                 prevBounded = false;
             }
 
