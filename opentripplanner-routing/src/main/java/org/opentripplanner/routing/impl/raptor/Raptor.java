@@ -348,6 +348,9 @@ public class Raptor implements PathService {
 
                     ServiceDay sd = boardState.serviceDay;
 
+                    if (!route.boards[0][boardState.patternIndex].getPattern().canAlight(stopNo)) {
+                        continue;
+                    }
                     int alightTime = route.getAlightTime(boardState.tripTimes, stopNo);
                     newState.arrivalTime = (int) sd.time(alightTime);
 
