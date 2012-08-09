@@ -632,9 +632,29 @@ public class Raptor implements PathService {
                     continue;
                 }
 
-                if (stalling && targetDistance > cur.bounder.bestTargetDistance * 1.2) {
-                    state.stalled = true;
-                    continue;
+                //stall routes that are not in the direction of the destination
+                //the nBoardings > 3 thing could probably be refined a bit.
+                if (stalling && nBoardings > 3) {
+                    boolean found = false;
+                    ROUTE: for (RaptorRoute route : data.routesForStop[state.stop.index]) {
+                        boolean started = false;
+                        for (RaptorStop stop : route.stops) {
+                            if (!started) {
+                                if (stop == state.stop) {
+                                    started = true;
+                                }
+                                continue;
+                            }
+                            if (cur.bounder.getTargetDistance(stop.stopVertex) < targetDistance) {
+                                found = true;
+                                break ROUTE;
+                            }
+                        }
+                    }
+                    if (!found) {
+                        state.stalled = true;
+                        continue;
+                    }
                 }
 
                 StateEditor dijkstraState = new MaxWalkState.MaxWalkStateEditor(walkOptions,
