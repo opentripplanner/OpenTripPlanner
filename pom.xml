@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opentripplanner</groupId>
   <artifactId>opentripplanner</artifactId>
-  <version>0.7.12</version>
+  <version>0.7.13-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>OpenTripPlanner</name>
