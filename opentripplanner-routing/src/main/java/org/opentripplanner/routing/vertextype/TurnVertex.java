@@ -343,4 +343,8 @@ public class TurnVertex extends StreetVertex {
     public boolean isElevationFlattened() {
         return elevationProfileSegment.isFlattened();
     }
+
+    public ElevationProfileSegment getElevationProfileSegment() {
+        return elevationProfileSegment;
+    }
 }

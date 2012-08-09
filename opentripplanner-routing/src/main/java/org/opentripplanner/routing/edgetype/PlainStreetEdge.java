@@ -436,4 +436,9 @@ public class PlainStreetEdge extends StreetEdge {
     public void setStreetClass(int streetClass) {
         this.streetClass = streetClass;
     }
+
+    @Override
+    public ElevationProfileSegment getElevationProfileSegment() {
+        return elevationProfileSegment;
+    }
 }
