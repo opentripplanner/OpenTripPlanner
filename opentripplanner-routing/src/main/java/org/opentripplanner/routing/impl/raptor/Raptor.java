@@ -270,6 +270,7 @@ public class Raptor implements PathService {
                 routesToVisit.add(route);
             }
         }
+        int worstTime = 0;
         if (!stalling) {
             //need to restore stalled states
             for (int i = 0; i < statesByStop.length; ++i) {
@@ -290,6 +291,9 @@ public class Raptor implements PathService {
                         routesToVisit.add(route);
                     }
                 }
+            }
+            for (State bounder : cur.bounder.bounders) {
+                worstTime = (int) ((bounder.getTime() - options.dateTime) * 1.5 + options.dateTime);
             }
         }
         cur.visitedLastRound = new HashSet<RaptorStop>();
@@ -434,9 +438,15 @@ public class Raptor implements PathService {
                         if (oldState.route == route)
                             continue; // we got here via this route, so no reason to transfer
 
-                        if (stalling == oldState.stalled) 
+                        if (stalling == oldState.stalled)
                             continue;
-                        
+
+                        if (!stalling) {
+                            if (oldState.arrivalTime > worstTime) {
+                                continue;
+                            }
+                        }
+
                         ++trips;
                         RaptorBoardSpec boardSpec = route.getTripIndex(options,
                                 oldState.arrivalTime + boardSlack, stopNo);
