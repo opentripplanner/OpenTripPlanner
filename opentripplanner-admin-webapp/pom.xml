@@ -9,7 +9,7 @@
     <parent>
         <artifactId>opentripplanner</artifactId>
         <groupId>org.opentripplanner</groupId>
-        <version>0.7.11-SNAPSHOT</version>
+        <version>0.7.11</version>
     </parent>
 
     <build>
