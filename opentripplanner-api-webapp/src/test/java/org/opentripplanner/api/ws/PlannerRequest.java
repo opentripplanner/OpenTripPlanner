@@ -95,6 +95,9 @@ public class PlannerRequest {
     public double walkSpeed;
     
     /** TODO: documentation */
+    public double bikeSpeed;
+
+    /** TODO: documentation */
     public double triangleSafetyFactor;
     
     /** TODO: documentation */
