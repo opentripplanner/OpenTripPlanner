@@ -575,6 +575,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         RoutingRequest ret = this.clone();
         ret.setArriveBy( ! ret.isArriveBy());
         ret.reverseOptimizing = ! ret.reverseOptimizing; // this is not strictly correct
+        ret.useBikeRentalAvailabilityInformation = false;
         return ret;
     }
 
