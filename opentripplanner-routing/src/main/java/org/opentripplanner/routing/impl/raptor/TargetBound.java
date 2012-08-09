@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.impl.raptor;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.opentripplanner.common.geometry.DistanceLibrary;
@@ -102,6 +103,10 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
     }
 
     private void addBounder(State bounder) {
+        for (Iterator<State> it = bounders.iterator(); it.hasNext(); ) {
+            State old = it.next();
+            if (bounder.dominates(old)) it.remove();
+        }
         bounders.add(bounder);
         RaptorState state = (RaptorState) bounder.getExtension("raptorParent");
         RaptorStop stop = state.stop;
@@ -196,12 +201,13 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
             int prevTime = previousArrivalTime.get(i++);
             
             if (optimisticDistance * 1.1 > bounder.getWalkDistance()
-                    && current.getTime() + minTime > bounder.getTime()
-                    && current.getNumBoardings() >= bounder.getNumBoardings()) 
-                return true; // this path won't win on either time or distance
-            
-            if (!(optimisticDistance * 1.1 > bounder.getWalkDistance() && current.getTime() + minTime > prevTime)
                     && current.getNumBoardings() >= bounder.getNumBoardings()) {
+                if (current.getTime() + minTime > bounder.getTime()) {
+                    return true;
+                } else if (current.getTime() + minTime <= prevTime) {
+                    prevBounded = false;
+                }
+            } else {
                 prevBounded = false;
             }
 
