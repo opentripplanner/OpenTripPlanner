@@ -842,11 +842,11 @@ public class PlanGenerator {
 
     private List<P2<Double>> encodeElevationProfile(Edge edge, double offset) {
         if (!(edge instanceof EdgeWithElevation)) {
-            return Collections.emptyList();
+            return new ArrayList<P2<Double>>();
         }
         EdgeWithElevation elevEdge = (EdgeWithElevation) edge;
         if (elevEdge.getElevationProfile() == null) {
-            return Collections.emptyList();
+            return new ArrayList<P2<Double>>();
         }
         ArrayList<P2<Double>> out = new ArrayList<P2<Double>>();
         Coordinate[] coordArr = elevEdge.getElevationProfile().toCoordinateArray();
