@@ -32,8 +32,6 @@ public class RaptorState {
     int nBoardings;
     int arrivalTime;
     int waitingTime;
-
-    boolean stalled = false;
     
     public RaptorState() {
     }
