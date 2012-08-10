@@ -621,18 +621,6 @@ public class State implements Cloneable {
         if (forward) {
             State reversed = ret.reverse();
             if (getWeight() <= reversed.getWeight())
-                // This is possible; imagine a trip involving three lines, line A, line B and
-                // line C. Lines A and C run hourly while Line B runs every ten minute starting
-                // at 8:55. The user boards line A at 7:00 and gets off at the first transfer point
-                // (point u) at 8:00. The user then boards the first run of line B at 8:55, an optimal
-                // transfer since there is no later trip on line A that could have been taken. The user
-                // deboards line B at point v at 10:00, and boards line C at 10:15. This is a
-                // non-optimal transfer; the trip on line B can be moved forward 10 minutes. When
-                // that happens, the first transfer becomes non-optimal (8:00 to 9:05) and the trip
-                // on line A can be moved forward an hour, thus moving 55 minutes of waiting time
-                // from a previous state to the beginning of the trip where it is significantly
-                // cheaper.
-
                 LOG.warn("Optimization did not decrease weight: before " + this.getWeight()
                         + " after " + reversed.getWeight());
             if (getElapsedTime() != reversed.getElapsedTime())
@@ -652,6 +640,17 @@ public class State implements Cloneable {
                         + this.getActiveTime() + " after " + reversed.getActiveTime()
                         + ", boardings: " + this.getNumBoardings());
             if (reversed.getWeight() < this.getBackState().getWeight())
+                // This is possible; imagine a trip involving three lines, line A, line B and
+                // line C. Lines A and C run hourly while Line B runs every ten minute starting
+                // at 8:55. The user boards line A at 7:00 and gets off at the first transfer point
+                // (point u) at 8:00. The user then boards the first run of line B at 8:55, an optimal
+                // transfer since there is no later trip on line A that could have been taken. The user
+                // deboards line B at point v at 10:00, and boards line C at 10:15. This is a
+                // non-optimal transfer; the trip on line B can be moved forward 10 minutes. When
+                // that happens, the first transfer becomes non-optimal (8:00 to 9:05) and the trip
+                // on line A can be moved forward an hour, thus moving 55 minutes of waiting time
+                // from a previous state to the beginning of the trip where it is significantly
+                // cheaper.
                 LOG.warn("Weight has been reduced enough to make it run backwards, now:"
                         + reversed.getWeight() + " backState " + getBackState().getWeight() + ", "
                         + "number of boardings: " + getNumBoardings());
