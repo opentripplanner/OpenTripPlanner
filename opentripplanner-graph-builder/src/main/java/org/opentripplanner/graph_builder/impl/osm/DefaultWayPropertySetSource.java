@@ -55,7 +55,7 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
                 
         /* PEDESTRIAN_AND_BICYCLE */
         setProperties(props, "highway=cycleway", 
-            StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.6, 0.6);
+            StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.68, 0.68);
         setProperties(props, "highway=path", 
             StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.75, 0.75);
         setProperties(props, "highway=pedestrian", 
@@ -98,9 +98,9 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         /* BICYCLE_AND_CAR */
         // trunk and motorway links are often short distances and necessary connections
         setProperties(props, "highway=trunk_link", 
-            StreetTraversalPermission.BICYCLE_AND_CAR, 2.06, 2.06);
+            StreetTraversalPermission.CAR, 2.06, 2.06);
         setProperties(props, "highway=motorway_link", 
-            StreetTraversalPermission.BICYCLE_AND_CAR, 2.06, 2.06);
+            StreetTraversalPermission.CAR, 2.06, 2.06);
                         
          /* CAR */
         setProperties(props, "highway=trunk", 
@@ -292,13 +292,11 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
                         
         /* path */
         setProperties(props, "highway=path;bicycle=designated",
-            StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.6, 0.6);
+            StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.68, 0.68);
 
         /* footway */
         setProperties(props, "highway=footway;bicycle=designated",
-            StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.75, 0.75);
-        setProperties(props, "highway=footway;bicycle=yes",
-                StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.75, 0.75);
+            StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.75, 0.75);     
         /* Portland area specific tags */
         setProperties(props, "highway=footway;RLIS:bicycle=designated",
             StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.77, 0.77);
