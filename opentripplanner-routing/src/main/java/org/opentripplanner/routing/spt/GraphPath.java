@@ -24,7 +24,6 @@ import org.opentripplanner.routing.core.MutableEdgeNarrative;
 import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;
@@ -76,7 +75,7 @@ public class GraphPath {
             lastState = optimize ? s.optimize().reverse() : s;
         }
         // DEBUG
-        lastState = s;
+        // lastState = s;
 
         /*
          * Starting from latest (time-wise) state, copy states to the head of a list in reverse
