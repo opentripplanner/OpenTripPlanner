@@ -14,6 +14,10 @@
 /* this is in api.common so it can set package-private fields */
 package org.opentripplanner.api.ws;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -38,7 +42,6 @@ import org.opentripplanner.api.model.RouterList;
 import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.api.model.analysis.EdgeSet;
 import org.opentripplanner.api.model.analysis.FeatureCount;
-import org.opentripplanner.api.model.analysis.GraphComponentPolygons;
 import org.opentripplanner.api.model.analysis.VertexSet;
 import org.opentripplanner.api.model.json_serializers.WithGraph;
 import org.opentripplanner.api.model.patch.PatchResponse;
@@ -50,8 +53,8 @@ import org.opentripplanner.api.model.transit.StopList;
 import org.opentripplanner.api.model.transit.StopTimeList;
 import org.opentripplanner.api.ws.internals.Components;
 import org.opentripplanner.api.ws.internals.GraphInternals;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.TransitToStreetNetworkGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.shapefile.AttributeFeatureConverter;
@@ -89,8 +92,6 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.util.TestUtils;
 
 import com.vividsolutions.jts.geom.LineString;
-
-import static org.mockito.Mockito.*;
 
 class SimpleGraphServiceImpl implements GraphService {
 
@@ -422,7 +423,8 @@ public class TestRequest extends TestCase {
         assertEquals(agencyIds.agencies.toArray(new Agency[0])[0].getId(), ("TriMet"));
         assertEquals(1, agencyIds.agencies.size());
 
-        RouteData routeData = (RouteData) index.getRouteData("TriMet", "100", false, false, routerId);
+        RouteData routeData = (RouteData) index.getRouteData("TriMet", "100", false, false,
+                routerId);
         assertEquals(new AgencyAndId("TriMet", "100"), routeData.id);
         assertTrue(routeData.variants.size() >= 2);
 
@@ -433,9 +435,10 @@ public class TestRequest extends TestCase {
         assertTrue(modes.modes.contains(TraverseMode.TRAM));
         assertFalse(modes.modes.contains(TraverseMode.FUNICULAR));
 
-        RouteList routesForStop = (RouteList) index.getRoutesForStop("TriMet", "10579", false, routerId);
+        RouteList routesForStop = (RouteList) index.getRoutesForStop("TriMet", "10579", false,
+                routerId);
         assertEquals(1, routesForStop.routes.size());
-        //assertEquals("MAX Red Line", routesForStop.routes.get(0).routeLongName);
+        // assertEquals("MAX Red Line", routesForStop.routes.get(0).routeLongName);
 
         StopList stopsNearPoint = (StopList) index.getStopsNearPoint("TriMet", 45.464783,
                 -122.578918, false, routerId);
@@ -447,17 +450,17 @@ public class TestRequest extends TestCase {
                 startTime, endTime, false, false, null, routerId);
         assertTrue(stopTimesForStop.stopTimes.size() > 0);
 
-//        StopTimeList stopTimesForTrip = (StopTimeList) index.getStopTimesForTrip("TriMet", "1254",
-//                "TriMet", "10W1040", startTime, routerId);
-//        assertTrue(stopTimesForTrip.stopTimes.size() > 0);
+        // StopTimeList stopTimesForTrip = (StopTimeList) index.getStopTimesForTrip("TriMet", "1254",
+        // "TriMet", "10W1040", startTime, routerId);
+        // assertTrue(stopTimesForTrip.stopTimes.size() > 0);
     }
 
     public void testComponents() {
         Components components = new Components();
         components.setGraphService(Context.getInstance().graphService);
-//        GraphComponentPolygons componentPolygons = components.getComponentPolygons(
-//                new TraverseModeSet(TraverseMode.WALK), "2009/10/1", "12:00:00", "", "portland");
-//        assertTrue(componentPolygons.components.size() >= 1);
+        // GraphComponentPolygons componentPolygons = components.getComponentPolygons(
+        // new TraverseModeSet(TraverseMode.WALK), "2009/10/1", "12:00:00", "", "portland");
+        // assertTrue(componentPolygons.components.size() >= 1);
     }
 
     public void testGraphInternals() {

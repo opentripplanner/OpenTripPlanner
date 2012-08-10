@@ -14,17 +14,16 @@ import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.onebusaway.gtfs.model.Route;
 import org.opentripplanner.routing.transit_index.adapters.RouteAdapter;
 
-@XmlRootElement(name="StopTimeList")
+@XmlRootElement(name = "StopTimeList")
 public class StopTimeList {
 
-    @JsonSerialize(include=Inclusion.NON_NULL)
+    @JsonSerialize(include = Inclusion.NON_NULL)
     @XmlElementWrapper
     @XmlElement(name = "route")
     @XmlJavaTypeAdapter(RouteAdapter.class)
     public HashSet<Route> routes;
-    
-    @XmlElements(value=@XmlElement(name="stopTime"))
+
+    @XmlElements(value = @XmlElement(name = "stopTime"))
     public List<StopTime> stopTimes;
-    
-   
+
 }

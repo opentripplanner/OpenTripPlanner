@@ -35,7 +35,7 @@ public class RouteType {
         this.routeUrl = route.getUrl();
         this.routeColor = route.getColor();
         this.routeTextColor = route.getTextColor();
-        this.routeBikesAllowed= route.getBikesAllowed();
+        this.routeBikesAllowed = route.getBikesAllowed();
     }
 
     public RouteType(Route route, Boolean extended) {
@@ -74,10 +74,10 @@ public class RouteType {
 
     @XmlAttribute
     int routeType;
-    
+
     @XmlAttribute
     String routeTextColor;
-    
+
     @XmlAttribute
     int routeBikesAllowed;
 

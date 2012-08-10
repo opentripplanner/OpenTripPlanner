@@ -11,6 +11,6 @@ import org.opentripplanner.routing.transit_index.adapters.RouteType;
 
 @XmlRootElement(name = "RouteList")
 public class RouteList {
-    @XmlElements(value = { @XmlElement(name="route") })
+    @XmlElements(value = { @XmlElement(name = "route") })
     public List<RouteType> routes = new ArrayList<RouteType>();
 }

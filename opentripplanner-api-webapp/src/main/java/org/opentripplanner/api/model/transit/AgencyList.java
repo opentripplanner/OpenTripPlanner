@@ -13,6 +13,6 @@ import org.opentripplanner.routing.transit_index.adapters.AgencyAdapter;
 public class AgencyList {
 
     @XmlJavaTypeAdapter(value = AgencyAdapter.class)
-    @XmlElement(name="Agency")
+    @XmlElement(name = "Agency")
     public Collection<Agency> agencies;
 }

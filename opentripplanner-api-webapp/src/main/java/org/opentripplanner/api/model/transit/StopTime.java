@@ -8,9 +8,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.transit_index.adapters.AgencyAndIdAdapter;
-import org.opentripplanner.routing.transit_index.adapters.StopAdapter;
 import org.opentripplanner.routing.transit_index.adapters.StopType;
-import org.opentripplanner.routing.transit_index.adapters.TripAdapter;
 import org.opentripplanner.routing.transit_index.adapters.TripType;
 
 public class StopTime {

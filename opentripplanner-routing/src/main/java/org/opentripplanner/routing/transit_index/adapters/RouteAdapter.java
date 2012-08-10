@@ -21,7 +21,8 @@ public class RouteAdapter extends XmlAdapter<RouteType, Route> {
 
     @Override
     public Route unmarshal(RouteType arg) throws Exception {
-        throw new UnsupportedOperationException("We presently serialize Route as RouteType, and thus cannot deserialize them");
+        throw new UnsupportedOperationException(
+                "We presently serialize Route as RouteType, and thus cannot deserialize them");
     }
 
     @Override

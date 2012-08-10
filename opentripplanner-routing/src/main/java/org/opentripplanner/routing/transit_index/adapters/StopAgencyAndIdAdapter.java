@@ -18,21 +18,21 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 
-public class StopAgencyAndIdAdapter extends XmlAdapter<AgencyAndIdType, Stop>{
+public class StopAgencyAndIdAdapter extends XmlAdapter<AgencyAndIdType, Stop> {
 
-        @Override
-        public Stop unmarshal(AgencyAndIdType arg) throws Exception {
-            throw new UnsupportedOperationException("We presently serialize stops as AgencyAndId, and thus cannot deserialize them");
+    @Override
+    public Stop unmarshal(AgencyAndIdType arg) throws Exception {
+        throw new UnsupportedOperationException(
+                "We presently serialize stops as AgencyAndId, and thus cannot deserialize them");
+    }
+
+    @Override
+    public AgencyAndIdType marshal(Stop arg) throws Exception {
+        if (arg == null) {
+            return null;
         }
+        AgencyAndId id = arg.getId();
+        return new AgencyAndIdType(id.getAgencyId(), id.getId());
+    }
 
-        @Override
-        public AgencyAndIdType marshal(Stop arg) throws Exception {
-                if (arg == null) {
-                        return null;
-                }
-                AgencyAndId id = arg.getId();
-                return new AgencyAndIdType(id.getAgencyId(), id.getId());
-        }
-
-        
 }

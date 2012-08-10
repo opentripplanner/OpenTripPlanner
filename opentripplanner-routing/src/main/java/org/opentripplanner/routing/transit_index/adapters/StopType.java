@@ -61,7 +61,7 @@ public class StopType {
             this.wheelchairBoarding = stop.getWheelchairBoarding();
         }
     }
-    
+
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     AgencyAndId id;
 
@@ -97,8 +97,8 @@ public class StopType {
 
     @XmlAttribute
     String direction;
-    
-    @XmlElements(value=@XmlElement(name="route"))
+
+    @XmlElements(value = @XmlElement(name = "route"))
     public List<AgencyAndId> routes;
 
 }

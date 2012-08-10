@@ -25,18 +25,18 @@ import org.opentripplanner.routing.transit_index.RouteVariant;
 import org.opentripplanner.routing.transit_index.adapters.AgencyAndIdAdapter;
 import org.opentripplanner.routing.transit_index.adapters.StopType;
 
-@XmlRootElement(name="RouteData")
+@XmlRootElement(name = "RouteData")
 public class RouteData {
-	@XmlElement
-	@XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
-	public AgencyAndId id;
-	
-	@XmlElementWrapper
-        public List<StopType> stops;
-	
-	@XmlElementWrapper
-	public List<RouteVariant> variants;
-	
-	@XmlElementWrapper
-	public List<String> directions;
+    @XmlElement
+    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
+    public AgencyAndId id;
+
+    @XmlElementWrapper
+    public List<StopType> stops;
+
+    @XmlElementWrapper
+    public List<RouteVariant> variants;
+
+    @XmlElementWrapper
+    public List<String> directions;
 }

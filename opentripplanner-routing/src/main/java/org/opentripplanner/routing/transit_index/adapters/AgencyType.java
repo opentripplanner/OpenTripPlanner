@@ -31,7 +31,7 @@ public class AgencyType {
         this.phone = phone;
         this.fareUrl = fareUrl;
     }
-    
+
     public AgencyType(Agency arg) {
         this.id = arg.getId();
         this.name = arg.getName();
