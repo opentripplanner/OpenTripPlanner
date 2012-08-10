@@ -420,10 +420,6 @@ public class State implements Cloneable {
         // It is distributed symmetrically over all preboard and prealight edges.
         State newState = new State(this.vertex, this.time, stateData.opt.reversedClone());
         newState.stateData.tripTimes = stateData.tripTimes;
-        // make sure this is propagated forward
-        newState.stateData.initialWaitTime = stateData.initialWaitTime;
-        newState.pathParserStates = 
-                Arrays.copyOf(this.pathParserStates, this.pathParserStates.length);
         return newState;
     }
 
@@ -548,7 +544,7 @@ public class State implements Cloneable {
         State orig = this;
         State unoptimized = orig;
         State ret = orig.reversedClone();
-        long newInitialWaitTime = -1;
+        long newInitialWaitTime = this.stateData.initialWaitTime;
         PathParser pathParsers[];
 
         // disable path parsing temporarily
@@ -565,9 +561,6 @@ public class State implements Cloneable {
                 if (edge instanceof TransitBoardAlight &&
                         ((TransitBoardAlight) edge).isBoarding() &&                        
                         orig.getNumBoardings() == 1 && forward) {
-                    if (ret.getTime() - orig.getBackState().getTime() < 0)
-                        LOG.warn("A transfer has been missed, time delta is negative: " +
-                                 ret.getTime() + " - " + orig.getBackState().getTime());
 
                     ret = ((TransitBoardAlight) edge).traverse(ret, orig.getBackState().getTime());
                     newInitialWaitTime = ret.stateData.initialWaitTime;
@@ -609,6 +602,10 @@ public class State implements Cloneable {
                 copyExistingNarrativeToNewNarrativeAsAppropriate(origNarrative, retNarrative);
             }
 
+            if (ret.getTime() - orig.getBackState().getTime() < -0.5)
+                LOG.warn("A transfer has been missed, time delta is negative: " +
+                         ret.getTime() + " - " + orig.getBackState().getTime());
+            
             orig = orig.getBackState();
         }
             
