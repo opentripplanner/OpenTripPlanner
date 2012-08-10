@@ -420,6 +420,7 @@ public class State implements Cloneable {
         // It is distributed symmetrically over all preboard and prealight edges.
         State newState = new State(this.vertex, this.time, stateData.opt.reversedClone());
         newState.stateData.tripTimes = stateData.tripTimes;
+        newState.stateData.initialWaitTime = stateData.initialWaitTime;
         return newState;
     }
 
@@ -557,10 +558,19 @@ public class State implements Cloneable {
             edge = orig.getBackEdge();
             
             if (optimize) {
-                // first board: figure in wait time in on the fly optimization
+                // first board/last alight: figure in wait time in on the fly optimization
                 if (edge instanceof TransitBoardAlight &&
-                        ((TransitBoardAlight) edge).isBoarding() &&                        
-                        orig.getNumBoardings() == 1 && forward) {
+                        forward &&
+                        orig.getNumBoardings() == 1 &&
+                        (
+                                // boarding in a forward main search
+                                (((TransitBoardAlight) edge).isBoarding() &&                         
+                                        !stateData.opt.isArriveBy()) ||
+                                // alighting in a reverse main search
+                                (!((TransitBoardAlight) edge).isBoarding() &&
+                                        stateData.opt.isArriveBy())
+                         )
+                    ) {
 
                     ret = ((TransitBoardAlight) edge).traverse(ret, orig.getBackState().getTime());
                     newInitialWaitTime = ret.stateData.initialWaitTime;
@@ -601,10 +611,6 @@ public class State implements Cloneable {
                 EdgeNarrative retNarrative = ret.getBackEdgeNarrative();
                 copyExistingNarrativeToNewNarrativeAsAppropriate(origNarrative, retNarrative);
             }
-
-            if (ret.getTime() - orig.getBackState().getTime() < -0.5)
-                LOG.warn("A transfer has been missed, time delta is negative: " +
-                         ret.getTime() + " - " + orig.getBackState().getTime());
             
             orig = orig.getBackState();
         }
