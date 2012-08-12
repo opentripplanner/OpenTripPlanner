@@ -148,7 +148,7 @@ public class GraphStats {
             Collections.shuffle(vertices, random);
             vertices = vertices.subList(0, n);
             try {
-                writer.writeRecord( new String[] {"n", "name", "lat", "lon"} );
+                writer.writeRecord( new String[] {"n", "name", "lon", "lat"} );
                 int i = 0;
                 for (Vertex v : vertices) {
                     Coordinate c;
