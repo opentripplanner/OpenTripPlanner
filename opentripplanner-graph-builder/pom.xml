@@ -106,6 +106,10 @@
           <artifactId>jcommander</artifactId>
           <version>1.27</version>
         </dependency>
+        <dependency>
+          <groupId>net.sourceforge.javacsv</groupId>
+          <artifactId>javacsv</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
