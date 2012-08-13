@@ -60,7 +60,13 @@
                 <executions>
                     <execution>
                         <id>copy-resources</id>
-                        <phase>process-resources</phase>
+                        <!-- bind to the generate-resources phase, which comes just before 
+                        process-resources. the WAR packaging type automatically defines a
+                        resources:resources execution in the process-resources phase, which copies 
+                        resources from /src/main/resources to target/classes, and this automatic 
+                        execution will happen _before_ any manually declared execution in the same 
+                        phase, copying the resources into target before the defaults are provided. -->
+                        <phase>generate-resources</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
