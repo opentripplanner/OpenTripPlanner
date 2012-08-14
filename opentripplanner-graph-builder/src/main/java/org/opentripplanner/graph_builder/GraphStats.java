@@ -6,8 +6,13 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
+import java.util.Set;
 
 import org.geotools.referencing.GeodeticCalculator;
 import org.onebusaway.gtfs.model.Trip;
@@ -25,6 +30,8 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.csvreader.CsvWriter;
+import com.google.common.collect.Multiset;
+import com.google.common.collect.TreeMultiset;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.linearref.LinearLocation;
@@ -53,6 +60,8 @@ public class GraphStats {
     
     private CommandSpeedStats commandSpeedStats = new CommandSpeedStats();  
 
+    private CommandPatternStats commandPatternStats = new CommandPatternStats();  
+
     private JCommander jc;
     
     private Graph graph;
@@ -68,6 +77,7 @@ public class GraphStats {
         jc = new JCommander(this);
         jc.addCommand(commandEndpoints);
         jc.addCommand(commandSpeedStats);
+        jc.addCommand(commandPatternStats);
         
         try {
             jc.parse(args);
@@ -112,6 +122,8 @@ public class GraphStats {
             commandEndpoints.run();
         } else if (command.equals("speedstats")) {
             commandSpeedStats.run();
+        } else if (command.equals("patternstats")) {
+            commandPatternStats.run();
         }
         writer.close();
 
@@ -190,7 +202,7 @@ public class GraphStats {
     class CommandSpeedStats {
 
         public void run() {
-            System.out.println("dumping hop info...");
+            LOG.info("dumping hop info...");
             try {
                 writer.writeRecord( new String[] {"route", "distance", "time", "speed"} );
                 for (Vertex v : graph.getVertices()) {
@@ -216,6 +228,40 @@ public class GraphStats {
                             writer.writeRecord(entries);
                         }
                     }
+                }
+            } catch (IOException e) {
+                LOG.error("Exception writing CSV: {}", e.getMessage());
+                return;
+            }
+            LOG.info("done.");
+        }
+
+    }
+
+    @Parameters(commandNames = "patternstats", commandDescription = "trip pattern stats") 
+    class CommandPatternStats {
+        
+        public void run() {
+            LOG.info("counting number of trips per pattern...");
+            try {
+                writer.writeRecord( new String[] {"nTrips", "nPatterns"} );
+                Set<TableTripPattern> patterns = new HashSet<TableTripPattern>();
+                for (Vertex v : graph.getVertices()) {
+                    for (PatternHop ph : IterableLibrary.filter(v.getOutgoing(), PatternHop.class)) {
+                        TableTripPattern ttp = ph.getPattern();
+                        patterns.add(ttp);
+                    }
+                }
+                Multiset<Integer> counts = TreeMultiset.create();        
+                for (TableTripPattern ttp : patterns) {
+                    List<Trip> trips = ttp.getTrips();
+                    counts.add(trips.size());
+                }
+                for (Multiset.Entry<Integer> count : counts.entrySet()) {
+                    writer.writeRecord( new String[] {
+                        count.getElement().toString(),
+                        Integer.toString(count.getCount())
+                    } );
                 }
             } catch (IOException e) {
                 LOG.error("Exception writing CSV: {}", e.getMessage());
