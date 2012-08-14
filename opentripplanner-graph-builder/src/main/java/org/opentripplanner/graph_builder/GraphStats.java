@@ -244,7 +244,10 @@ public class GraphStats {
         public void run() {
             LOG.info("counting number of trips per pattern...");
             try {
-                writer.writeRecord( new String[] {"nTrips", "nPatterns"} );
+                writer.writeRecord( new String[] {
+                        "nTripsInPattern", "frequency", 
+                        "cumulativePatterns", "empiricalDistPatterns",
+                        "cumulativeTrips", "empiricalDistTrips" } );
                 Set<TableTripPattern> patterns = new HashSet<TableTripPattern>();
                 for (Vertex v : graph.getVertices()) {
                     for (PatternHop ph : IterableLibrary.filter(v.getOutgoing(), PatternHop.class)) {
@@ -252,15 +255,29 @@ public class GraphStats {
                         patterns.add(ttp);
                     }
                 }
-                Multiset<Integer> counts = TreeMultiset.create();        
+                Multiset<Integer> counts = TreeMultiset.create();
+                int nPatterns = patterns.size();
+                LOG.info("total number of patterns is: {}", nPatterns);
+                int nTrips = 0;
                 for (TableTripPattern ttp : patterns) {
                     List<Trip> trips = ttp.getTrips();
                     counts.add(trips.size());
+                    nTrips += trips.size();
                 }
+                LOG.info("total number of trips is: {}", nPatterns);
+                LOG.info("average number of trips per pattern is: {}", nTrips/nPatterns);
+                int cPatterns = 0;
+                int cTrips = 0;
                 for (Multiset.Entry<Integer> count : counts.entrySet()) {
+                    cPatterns += count.getCount();
+                    cTrips += count.getCount() * count.getElement();
                     writer.writeRecord( new String[] {
                         count.getElement().toString(),
-                        Integer.toString(count.getCount())
+                        Integer.toString(count.getCount()),
+                        Integer.toString(cPatterns),
+                        Double.toString(cPatterns / (double) nPatterns),
+                        Integer.toString(cTrips),
+                        Double.toString(cTrips / (double) nTrips)
                     } );
                 }
             } catch (IOException e) {
