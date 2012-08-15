@@ -264,7 +264,7 @@ public class GraphStats {
                     counts.add(trips.size());
                     nTrips += trips.size();
                 }
-                LOG.info("total number of trips is: {}", nPatterns);
+                LOG.info("total number of trips is: {}", nTrips);
                 LOG.info("average number of trips per pattern is: {}", nTrips/nPatterns);
                 int cPatterns = 0;
                 int cTrips = 0;
