@@ -8,10 +8,12 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.model.T2;
+import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStopArrive;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
 
+/** Retains graph-wide information between GTFSPatternHopFactory runs on different feeds. */
 public class GtfsStopContext {
 
     public HashSet<AgencyAndId> stops = new HashSet<AgencyAndId>();
@@ -27,4 +29,7 @@ public class GtfsStopContext {
     public Map<T2<Stop, Trip>, Vertex> patternDepartNodes = new HashMap<T2<Stop, Trip>, Vertex>(); // exemplar
                                                                                                    // trip
     public HashMap<AgencyAndId, Integer> serviceIds = new HashMap<AgencyAndId, Integer>();
+
+    public HashMap<TableTripPattern, Integer> tripPatternIds = new HashMap<TableTripPattern, Integer>();
+
 }

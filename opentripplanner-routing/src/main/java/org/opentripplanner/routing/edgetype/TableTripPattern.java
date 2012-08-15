@@ -52,6 +52,11 @@ public class TableTripPattern implements TripPattern, Serializable {
     public static final int NO_PICKUP = 1;
     public static final int FLAG_BIKES_ALLOWED = 32;
     
+    /** an integer index uniquely identifying this pattern among all in the graph.
+     *  this additional level of indirection allows versioning of trip patterns, which is 
+     *  necessary for real-time stop time updates. */
+//    public final int patternIndex;
+    
     /* an arbitrary trip that uses this pattern */
     public final Trip exemplar;
 
