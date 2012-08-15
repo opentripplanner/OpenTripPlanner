@@ -52,7 +52,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
     private int modeMask;
 
     public PatternBoard(TransitStopDepart fromStopVertex, PatternStopVertex toPatternVertex, 
-            TableTripPattern pattern, int stopIndex, TraverseMode mode) {
+            int stopIndex, TraverseMode mode) {
         super(fromStopVertex, toPatternVertex);
         this.stopIndex = stopIndex;
         this.modeMask = new TraverseModeSet(mode).getMask();

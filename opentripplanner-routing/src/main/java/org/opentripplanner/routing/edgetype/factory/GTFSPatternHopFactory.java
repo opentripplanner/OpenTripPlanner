@@ -773,13 +773,13 @@ public class GTFSPatternHopFactory {
             psv1arrive = new PatternArriveVertex(graph, tripPattern, st1);
             context.patternArriveNodes.put(new T2<Stop, Trip>(st1.getStop(), trip), psv1arrive);
 
-            PatternHop hop = new PatternHop(psv0depart, psv1arrive, s0, s1, hopIndex, tripPattern);
+            PatternHop hop = new PatternHop(psv0depart, psv1arrive, s0, s1, hopIndex);
             hop.setGeometry(getHopGeometry(graph, trip.getShapeId(), st0, st1, psv0depart, psv1arrive));
 
             TransitStopDepart stopDepart = context.stopDepartNodes.get(s0);
             TransitStopArrive stopArrive = context.stopArriveNodes.get(s1);
-            Edge board = new PatternBoard(stopDepart, psv0depart, tripPattern, hopIndex, mode);
-            Edge alight = new PatternAlight(psv1arrive, stopArrive, tripPattern, hopIndex, mode);
+            Edge board = new PatternBoard(stopDepart, psv0depart, hopIndex, mode);
+            Edge alight = new PatternAlight(psv1arrive, stopArrive, hopIndex, mode);
         }        
     }
     
