@@ -839,6 +839,8 @@ public class GTFSPatternHopFactory {
     }
 
     private int getTripPatternIndex(TableTripPattern pattern) {
+        // we could probably get away with just a set of tripPatterns since we are not storing
+        // indexes in the patterns themselves.
         Integer id = context.tripPatternIds.get(pattern);
         if (id == null) {
             id = context.serviceIds.size();
@@ -889,6 +891,7 @@ public class GTFSPatternHopFactory {
     }
 
     /// This should become unnecessary with unsorted trip patterns
+    /*
     private void createSimpleHops(Graph graph, Trip trip, List<StopTime> stopTimes) {
 
         ArrayList<Hop> hops = new ArrayList<Hop>();
@@ -957,7 +960,8 @@ public class GTFSPatternHopFactory {
             }
         }
     }
-
+    */
+    
     private Geometry getHopGeometry(Graph graph, AgencyAndId shapeId, StopTime st0, StopTime st1,
             Vertex startJourney, Vertex endJourney) {
 
