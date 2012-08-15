@@ -2,6 +2,7 @@ package org.opentripplanner.routing.trippattern;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -141,4 +142,22 @@ public class TripTimes implements Cloneable, Serializable {
         return ret;
     }
     
+    public static Comparator<TripTimes> getArrivalsComparator(final int hopIndex) {
+        return new Comparator<TripTimes>() {
+            @Override
+            public int compare(TripTimes tt1, TripTimes tt2) {
+                return tt1.getArrivalTime(hopIndex) - tt2.getArrivalTime(hopIndex);
+            }
+        };
+    }
+
+    public static Comparator<TripTimes> getDeparturesComparator(final int hopIndex) {
+        return new Comparator<TripTimes>() {
+            @Override
+            public int compare(TripTimes tt1, TripTimes tt2) {
+                return tt1.getDepartureTime(hopIndex) - tt2.getDepartureTime(hopIndex);
+            }
+        };
+    }
+
 }

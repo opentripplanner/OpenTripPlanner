@@ -390,6 +390,10 @@ public class GTFSPatternHopFactory {
         loadTransfers(graph);
         if (_deleteUselessDwells) 
             deleteUselessDwells(graph);
+        /* this is the wrong place to do this: it should be done on all feeds at once, or at deserialization*/
+        for (TableTripPattern tp : context.tripPatternIds.keySet()) {
+            tp.finish();
+        }
         clearCachedData();
         graph.putService(FareService.class, fareServiceFactory.makeFareService());
         graph.putService(ServiceIdToNumberService.class, new ServiceIdToNumberService(context.serviceIds));

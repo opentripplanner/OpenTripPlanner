@@ -16,6 +16,7 @@ package org.opentripplanner.routing.edgetype;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
@@ -281,10 +282,27 @@ public class TableTripPattern implements TripPattern, Serializable {
      * This is a non-static nested (inner) class so each timetable belongs to a specific 
      * trippattern, whose fields it can access.
      */
-    public class Timetable {
+    public class Timetable implements Serializable {
         
         private final ArrayList<TripTimes> tripTimes = new ArrayList<TripTimes>();
 
+        /** if the index is null, this timetable has not been indexed. use a linear search. */
+        private TripTimes[][] arrivalsIndex;
+        private TripTimes[][] departuresIndex;
+        
+        private void index() {
+            // index is stop-major and sorted, allowing binary search at a given stop
+            arrivalsIndex = new TripTimes[stops.length][];
+            departuresIndex = new TripTimes[stops.length][];
+            for (int stopIndex = 0; stopIndex < stops.length; stopIndex++) {
+                arrivalsIndex[stopIndex] = (TripTimes[]) tripTimes.clone();
+                departuresIndex[stopIndex] = (TripTimes[]) tripTimes.clone();
+                // TODO: STOP VS HOP
+                Arrays.sort(arrivalsIndex[stopIndex], TripTimes.getArrivalsComparator(stopIndex));
+                Arrays.sort(departuresIndex[stopIndex], TripTimes.getDeparturesComparator(stopIndex));
+            }
+        }
+        
         /** 
          * Get the index of the next trip that has a stop after (or at) 
          * afterTime at the stop at stopIndex. 
@@ -383,11 +401,11 @@ public class TableTripPattern implements TripPattern, Serializable {
         public void finish() {
             int nHops = stops.length - 1;
             int nTrips = trips.size();
-            // TODO: this is specific to the _updated_ times and should be moved into the inner class
-            TableTripPattern.this.bestRunningTimes = new int[nHops];
+            // TODO: bestRunningTimes is specific to the _updated_ times and should be moved into the inner class
+            bestRunningTimes = new int[nHops];
             boolean nullArrivals = false; // TODO: should scan through triptimes?
             if ( ! nullArrivals) {
-                TableTripPattern.this.bestDwellTimes = new int[nHops];
+                bestDwellTimes = new int[nHops];
                 for (int h = 1; h < nHops; ++h) { // dwell time is undefined on first hop
                     bestDwellTimes[h] = Integer.MAX_VALUE;
                     for (int t = 0; t < nTrips; ++t) {
@@ -408,6 +426,14 @@ public class TableTripPattern implements TripPattern, Serializable {
                         bestRunningTimes[h] = rt;
                     }
                 }
+            }
+            // break even list size for linear and binary searches was determined to be around 16
+            if (nTrips > 16) {
+                LOG.debug("indexing pattern with {} trips", nTrips);
+                index(); 
+            } else {
+                arrivalsIndex = null;
+                departuresIndex = null;
             }
         }
         
