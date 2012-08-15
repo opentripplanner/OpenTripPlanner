@@ -19,6 +19,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.util.ElevationProfileSegment;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TurnVertex;
 
@@ -150,5 +151,10 @@ public class OutEdge extends StreetEdge {
     public int getStreetClass() {
         //this is always safe as it can appear anywhere in a path
         return CLASS_OTHERPATH; 
+    }
+
+    @Override
+    public ElevationProfileSegment getElevationProfileSegment() {
+        return ((TurnVertex)fromv).getElevationProfileSegment();
     }
 }

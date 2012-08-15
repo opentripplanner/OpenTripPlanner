@@ -179,6 +179,11 @@ public class TestPatch extends TestCase {
             public int getOvernightBreak() {
                 return 0;
             }
+
+            @Override
+            public Collection<Stop> getStopsForRoute(AgencyAndId route) {
+                return Collections.emptyList();
+            }
         };
         graph.putService(TransitIndexService.class, index);
     }

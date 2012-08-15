@@ -25,6 +25,7 @@ import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.ServiceCalendar;
 import org.onebusaway.gtfs.model.ServiceCalendarDate;
+import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.PatternBoard;
@@ -51,9 +52,12 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
 
     private HashMap<AgencyAndId, HashSet<String>> directionsForRoute;
 
+    private HashMap<AgencyAndId, HashSet<Stop>> stopsForRoute;
+
     private List<TraverseMode> modes;
 
     private HashMap<String, List<ServiceCalendar>> calendarsByAgency = new HashMap<String, List<ServiceCalendar>>();
+
     private HashMap<String, List<ServiceCalendarDate>> calendarDatesByAgency = new HashMap<String, List<ServiceCalendarDate>>();
 
     private HashMap<String, Agency> agencies = new HashMap<String, Agency>();
@@ -67,13 +71,15 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
             HashMap<AgencyAndId, RouteVariant> variantsByTrip,
             HashMap<AgencyAndId, PreBoardEdge> preBoardEdges,
             HashMap<AgencyAndId, PreAlightEdge> preAlightEdges,
-            HashMap<AgencyAndId, HashSet<String>> directionsByRoute, List<TraverseMode> modes) {
+            HashMap<AgencyAndId, HashSet<String>> directionsByRoute,
+            HashMap<AgencyAndId, HashSet<Stop>> stopsByRoute, List<TraverseMode> modes) {
         this.variantsByAgency = variantsByAgency;
         this.variantsByRoute = variantsByRoute;
         this.variantsByTrip = variantsByTrip;
         this.preBoardEdges = preBoardEdges;
         this.preAlightEdges = preAlightEdges;
         this.directionsForRoute = directionsByRoute;
+        this.stopsForRoute = stopsByRoute;
         this.modes = modes;
     }
 
@@ -82,7 +88,8 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
             HashMap<AgencyAndId, RouteVariant> variantsByTrip,
             HashMap<AgencyAndId, PreBoardEdge> preBoardEdges,
             HashMap<AgencyAndId, PreAlightEdge> preAlightEdges,
-            HashMap<AgencyAndId, HashSet<String>> directionsByRoute, List<TraverseMode> modes) {
+            HashMap<AgencyAndId, HashSet<String>> directionsByRoute,
+            HashMap<AgencyAndId, HashSet<Stop>> stopsByRoute, List<TraverseMode> modes) {
 
         MapUtils.mergeInUnique(this.variantsByAgency, variantsByAgency);
         MapUtils.mergeInUnique(this.variantsByRoute, variantsByRoute);
@@ -90,6 +97,7 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
         this.preBoardEdges.putAll(preBoardEdges);
         this.preAlightEdges.putAll(preAlightEdges);
         MapUtils.mergeInUnique(this.directionsForRoute, directionsByRoute);
+        MapUtils.mergeInUnique(this.stopsForRoute, stopsByRoute);
         for (TraverseMode mode : modes) {
             if (!this.modes.contains(mode)) {
                 this.modes.add(mode);
@@ -153,7 +161,8 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
     @Override
     public void addCalendars(Collection<ServiceCalendar> allCalendars) {
         for (ServiceCalendar calendar : allCalendars) {
-            MapUtils.addToMapList(calendarsByAgency, calendar.getServiceId().getAgencyId(), calendar);
+            MapUtils.addToMapList(calendarsByAgency, calendar.getServiceId().getAgencyId(),
+                    calendar);
         }
     }
 
@@ -187,14 +196,14 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
     public List<AgencyAndId> getRoutesForStop(AgencyAndId stop) {
         HashSet<AgencyAndId> out = new HashSet<AgencyAndId>();
         Edge edge = preBoardEdges.get(stop);
-        for (Edge e: edge.getToVertex().getOutgoing()) {
+        for (Edge e : edge.getToVertex().getOutgoing()) {
             if (e instanceof PatternBoard) {
                 PatternBoard board = (PatternBoard) e;
                 for (Trip t : board.getPattern().getTrips()) {
                     out.add(t.getRoute().getId());
                 }
             }
-            
+
         }
         return new ArrayList<AgencyAndId>(out);
     }
@@ -215,5 +224,10 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
     @Override
     public int getOvernightBreak() {
         return overnightBreak;
+    }
+
+    @Override
+    public Collection<Stop> getStopsForRoute(AgencyAndId route) {
+        return stopsForRoute.get(route);
     }
 }

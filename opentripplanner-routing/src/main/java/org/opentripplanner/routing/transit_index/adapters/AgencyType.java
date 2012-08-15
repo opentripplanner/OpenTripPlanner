@@ -11,10 +11,12 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.api.model.patch;
+package org.opentripplanner.routing.transit_index.adapters;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
+
+import org.onebusaway.gtfs.model.Agency;
 
 @XmlRootElement(name = "Agency")
 public class AgencyType {
@@ -28,6 +30,16 @@ public class AgencyType {
         this.lang = lang;
         this.phone = phone;
         this.fareUrl = fareUrl;
+    }
+
+    public AgencyType(Agency arg) {
+        this.id = arg.getId();
+        this.name = arg.getName();
+        this.url = arg.getUrl();
+        this.timezone = arg.getTimezone();
+        this.lang = arg.getLang();
+        this.phone = arg.getPhone();
+        this.fareUrl = arg.getFareUrl();
     }
 
     public AgencyType() {

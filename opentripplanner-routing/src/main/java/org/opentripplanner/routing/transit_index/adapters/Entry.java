@@ -11,20 +11,25 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.patch;
+package org.opentripplanner.routing.transit_index.adapters;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlType;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+@XmlType
+public class Entry {
+    @XmlAttribute
+    public String key;
 
-@XmlRootElement(name = "MyMap")
-public class MapType {
-    @XmlElement(name = "entry", required = true)
-    private final List<Entry> entry = new ArrayList<Entry>();
-    
-    public List<Entry> getEntry() {
-        return this.entry;
+    @XmlAttribute
+    public String value;
+
+    public Entry() {
+        // empty constructor required by JAXB
+    }
+
+    public Entry(String key, String value) {
+        this.key = key;
+        this.value = value;
     }
 }

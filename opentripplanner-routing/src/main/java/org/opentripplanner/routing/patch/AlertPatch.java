@@ -13,8 +13,8 @@
 
 package org.opentripplanner.routing.patch;
 
-import java.util.List;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -27,6 +27,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.transit_index.RouteSegment;
 import org.opentripplanner.routing.transit_index.RouteVariant;
+import org.opentripplanner.routing.transit_index.adapters.AgencyAndIdAdapter;
 
 /**
  * This adds a note to all boardings of a given route or stop (optionally, in a given direction)

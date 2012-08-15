@@ -13,15 +13,15 @@
 
 package org.opentripplanner;
 
+import junit.framework.Test;
+import junit.framework.TestSuite;
+
 import org.opentripplanner.routing.TestHalfEdges;
 import org.opentripplanner.routing.algorithm.TestAStar;
 import org.opentripplanner.routing.algorithm.TestGraphPath;
 import org.opentripplanner.routing.core.TestGraph;
 import org.opentripplanner.routing.edgetype.TestTurnEdge;
 import org.opentripplanner.routing.edgetype.loader.TestPatternHopFactory;
-
-import junit.framework.Test;
-import junit.framework.TestSuite;
 
 public class AllTests {
 

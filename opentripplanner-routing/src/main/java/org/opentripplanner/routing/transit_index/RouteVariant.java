@@ -28,11 +28,11 @@ import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.patch.AgencyAndIdAdapter;
-import org.opentripplanner.routing.patch.LineStringAdapter;
-import org.opentripplanner.routing.patch.StopAdapter;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.transit_index.adapters.AgencyAndIdAdapter;
+import org.opentripplanner.routing.transit_index.adapters.LineStringAdapter;
+import org.opentripplanner.routing.transit_index.adapters.StopAgencyAndIdAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,13 +41,12 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 
 /**
- * This represents a particular stop pattern on a particular route. For example, the N train has at
- * least four different variants: express (over the Manhattan bridge), and local (via lower
- * Manhattan and the tunnel) x to Astoria and to Coney Island. During construction, it sometimes has
- * a fifth variant: along the D line to Coney Island after 59th St (or from Coney Island to 59th).
+ * This represents a particular stop pattern on a particular route. For example, the N train has at least four different variants: express (over the
+ * Manhattan bridge), and local (via lower Manhattan and the tunnel) x to Astoria and to Coney Island. During construction, it sometimes has a fifth
+ * variant: along the D line to Coney Island after 59th St (or from Coney Island to 59th).
  * 
- * This is needed because route names are intended for customer information, but scheduling
- * personnel need to know about where a particular trip actually goes.
+ * This is needed because route names are intended for customer information, but scheduling personnel need to know about where a particular trip
+ * actually goes.
  * 
  * @author novalis
  * 
@@ -58,29 +57,27 @@ public class RouteVariant implements Serializable {
     private static final long serialVersionUID = -3110443015998033630L;
 
     /*
-     * This indicates that trips with multipledirection_ids are part of this variant. It should
-     * probably never be used, because generally trips making the same stops in the same order will
-     * have the same direction
+     * This indicates that trips with multipledirection_ids are part of this variant. It should probably never be used, because generally trips making
+     * the same stops in the same order will have the same direction
      */
     private static final String MULTIDIRECTION = "[multidirection]";
 
     private String name; // "N via Whitehall"
 
     private TraverseMode mode;
-    
+
     // @XmlElementWrapper
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     private ArrayList<AgencyAndId> trips;
 
-    @XmlJavaTypeAdapter(StopAdapter.class)
+    @XmlJavaTypeAdapter(StopAgencyAndIdAdapter.class)
     private ArrayList<Stop> stops;
 
     /** An unordered list of all segments for this route */
     private ArrayList<RouteSegment> segments;
 
     /**
-     * An ordered list of segments that represents one characteristic trip (or trip pattern) on this
-     * variant
+     * An ordered list of segments that represents one characteristic trip (or trip pattern) on this variant
      */
     private ArrayList<RouteSegment> exemplarSegments;
 
@@ -112,7 +109,7 @@ public class RouteVariant implements Serializable {
                 if (!direction.equals(trip.getDirectionId())) {
                     direction = MULTIDIRECTION;
                 }
-            }            
+            }
         }
     }
 
@@ -169,7 +166,7 @@ public class RouteVariant implements Serializable {
             }
         }
 
-        //skip this seg
+        // skip this seg
         segment = successors.get(segment.hopOut);
         ArrayList<RouteSegment> out = new ArrayList<RouteSegment>();
         while (segment != null) {
@@ -223,7 +220,9 @@ public class RouteVariant implements Serializable {
                 }
             }
             Coordinate[] coordArray = new Coordinate[coords.size()];
-            geometry = GeometryUtils.getGeometryFactory().createLineString(coords.toArray(coordArray));
+            geometry = GeometryUtils.getGeometryFactory().createLineString(
+                    coords.toArray(coordArray));
+
         }
         return geometry;
     }
