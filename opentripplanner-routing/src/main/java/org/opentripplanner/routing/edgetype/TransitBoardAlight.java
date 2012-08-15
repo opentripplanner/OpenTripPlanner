@@ -120,9 +120,10 @@ public class TransitBoardAlight extends PatternEdge implements OnBoardForwardEdg
         TraverseMode mode = state0.getNonTransitMode(options); 
 
         // figure out the direction
-        // XOR: http://stackoverflow.com/questions/726652
-        boolean offTransit = !((boarding || options.isArriveBy()) && 
-                !(boarding && options.isArriveBy()));
+        // it's leaving transit iff it's a boarding and is arrive by, or it's not a boarding and
+        // is not arrive by
+        boolean offTransit = (boarding && options.isArriveBy()) || 
+                (!boarding && !options.isArriveBy()); 
         
         if (offTransit) {
             int type;
