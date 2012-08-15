@@ -745,7 +745,7 @@ public class GTFSPatternHopFactory {
      * is encountered, an empty tripPattern object is created to hold the schedule information. This
      * method also creates the corresponding PatternStop vertices and PatternBoard/Hop/Alight edges.
      * StopTimes are passed in instead of Stops only because they are needed for shape distances.
-     * Trips will be added to the tripPattern later.
+     * The TripPattern returned is empty; trips should be added to the TripPattern later.
      */
     private TableTripPattern makePatternVerticesAndEdges(Graph graph, Trip trip, 
             ScheduledStopPattern stopPattern, List<StopTime> stopTimes) {
