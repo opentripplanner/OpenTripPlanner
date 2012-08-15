@@ -128,6 +128,7 @@ public class TableTripPattern implements TripPattern, Serializable {
         return Arrays.asList(stops);
     }
 
+    /*
     // SEEMS UNUSED
     public boolean getWheelchairAccessible(int stopIndex, int trip) {
 //        if ((perStopFlags[stopIndex] & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
@@ -144,7 +145,8 @@ public class TableTripPattern implements TripPattern, Serializable {
 //        return (perTripFlags.get(trip) & FLAG_BIKES_ALLOWED) != 0;
         return true;
     }
-
+     */
+    
     /** Gets the Trip object for a given trip index */
     public Trip getTrip(int tripIndex) {
         return trips.get(tripIndex);
