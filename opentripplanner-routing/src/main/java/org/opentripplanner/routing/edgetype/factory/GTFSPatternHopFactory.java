@@ -43,16 +43,12 @@ import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
 import org.opentripplanner.routing.core.ServiceIdToNumberService;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.Alight;
-import org.opentripplanner.routing.edgetype.Board;
-import org.opentripplanner.routing.edgetype.Dwell;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.FrequencyAlight;
 import org.opentripplanner.routing.edgetype.FrequencyBasedTripPattern;
 import org.opentripplanner.routing.edgetype.FrequencyBoard;
 import org.opentripplanner.routing.edgetype.FrequencyDwell;
 import org.opentripplanner.routing.edgetype.FrequencyHop;
-import org.opentripplanner.routing.edgetype.Hop;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.PatternAlight;
 import org.opentripplanner.routing.edgetype.PatternBoard;
@@ -73,7 +69,6 @@ import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.FareServiceFactory;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.routing.vertextype.PatternDepartVertex;
-import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.routing.vertextype.TransitStopArrive;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
@@ -751,7 +746,7 @@ public class GTFSPatternHopFactory {
             ScheduledStopPattern stopPattern, List<StopTime> stopTimes) {
 
         TableTripPattern tripPattern = new TableTripPattern(trip, stopPattern, getServiceId(trip));
-        int tripPatternIndex = getTripPatternIndex(tripPattern);
+        getTripPatternIndex(tripPattern);
         TraverseMode mode = GtfsLibrary.getTraverseMode(trip.getRoute());
         
         // create journey vertices
@@ -778,8 +773,8 @@ public class GTFSPatternHopFactory {
 
             TransitStopDepart stopDepart = context.stopDepartNodes.get(s0);
             TransitStopArrive stopArrive = context.stopArriveNodes.get(s1);
-            Edge board = new PatternBoard(stopDepart, psv0depart, hopIndex, mode);
-            Edge alight = new PatternAlight(psv1arrive, stopArrive, hopIndex, mode);
+            new PatternBoard(stopDepart, psv0depart, hopIndex, mode);
+            new PatternAlight(psv1arrive, stopArrive, hopIndex, mode);
         }        
         
         return tripPattern;
