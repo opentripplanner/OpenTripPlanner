@@ -251,10 +251,24 @@ public class TableTripPattern implements TripPattern, Serializable {
         return serviceId;
     }
     
+        
+    public TripTimes getNextTrip(int stopIndex, int afterTime, boolean haveBicycle,
+            RoutingRequest options) {
+        Timetable timetable = scheduledTimetable;
+        //if (options.rctx.timetableResolver != null) {
+        //timetable = timtableResolver.resolve(this);
+        //}
+        return timetable.getNextTrip(stopIndex, afterTime, haveBicycle, options);
+    }
     
-    //if (options.rctx.timetableResolver != null) {
-    //timetable = timtableResolver.resolve(this);
-    //}
+    public TripTimes getPreviousTrip(int stopIndex, int beforeTime, boolean haveBicycle, 
+            RoutingRequest options) {
+        Timetable timetable = scheduledTimetable;
+        //if (options.rctx.timetableResolver != null) {
+        //timetable = timtableResolver.resolve(this);
+        //}
+        return timetable.getPreviousTrip(stopIndex, beforeTime, haveBicycle, options);
+    }        
 
     /* NESTED CLASS */
     
@@ -275,7 +289,8 @@ public class TableTripPattern implements TripPattern, Serializable {
          * The haveBicycle parameter must be passed in because we cannot determine whether the user
          * is in possession of a rented bicycle from the options alone.
          */
-        public TripTimes getNextTrip(int stopIndex, int afterTime, boolean haveBicycle,
+        // Method is protected so Lombok won't delegate to it.
+        protected TripTimes getNextTrip(int stopIndex, int afterTime, boolean haveBicycle,
                 RoutingRequest options) {
             boolean pickup = true;
             int mask = pickup ? MASK_PICKUP : MASK_DROPOFF;
@@ -307,9 +322,10 @@ public class TableTripPattern implements TripPattern, Serializable {
         
         /** 
          * Gets the index of the previous trip that has a stop before (or at) beforeTime at 
-         * the stop at stopIndex 
+         * the stop at stopIndex.
          */
-        public TripTimes getPreviousTrip(int stopIndex, int beforeTime, boolean haveBicycle, 
+        // Method is protected so Lombok won't delegate to it.
+        protected TripTimes getPreviousTrip(int stopIndex, int beforeTime, boolean haveBicycle, 
                 RoutingRequest options) {
             boolean pickup = false;
             int mask = pickup ? MASK_PICKUP : MASK_DROPOFF;
