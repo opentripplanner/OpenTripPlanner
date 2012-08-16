@@ -63,7 +63,6 @@ public class TimetableSnapshot {
     public TimetableSnapshot mutableCopy() {
         TimetableSnapshot ret = new TimetableSnapshot();
         ret.timetables = (HashMap<TableTripPattern, Timetable>) this.timetables.clone();
-        new HashMap<TableTripPattern, Timetable>(this.timetables);
         return ret;
     }
     
