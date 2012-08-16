@@ -312,6 +312,11 @@ public class TableTripPattern implements TripPattern, Serializable {
             return new Timetable(this);
         }
         
+        /* It is of course inefficient to call this after updating only one or two trips in a 
+         * pattern, since we can potentially get by with swapping only the new trip
+         * into the already-sorted lists. But let's see realistically how resource-intensive
+         * this is before optimizing it.
+         */
         private void index() {
             int nHops = stops.length - 1;
             // index is stop-major and sorted, allowing binary search at a given stop
@@ -347,7 +352,11 @@ public class TableTripPattern implements TripPattern, Serializable {
                 return null;
             }
             // binary search if this timetable has been indexed
-            if (departuresIndex != null) {
+            // TODO: potential optimization: when indexing, check if new sorted trip arrays are the 
+            // same as one for previous stop, and reuse them.
+            // If they are all the same, trip is FIFO and needs no index (ie tripTimes can be used
+            // as index at every stop). 
+            if (departuresIndex != null) { 
                 // search through the sorted list of TripTimes for this particular stop
                 TripTimes[] index = departuresIndex[stopIndex];
                 int tripIndex = TripTimes.binarySearchDepartures(index, stopIndex, afterTime); 
