@@ -32,7 +32,7 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.edgetype.PatternBoard;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -249,8 +249,9 @@ public class WeightTable implements Serializable {
 			while (!q.isEmpty()) {
 				Vertex u = q.poll();
 				for (Edge e : u.getOutgoing()) {
-					if (e instanceof PatternBoard) {
-						Vertex v = ((PatternBoard) e).getToVertex();
+					if (e instanceof TransitBoardAlight && 
+					        ((TransitBoardAlight) e).isBoarding()) {
+						Vertex v = ((TransitBoardAlight) e).getToVertex();
 						// give onboard vertices same index as their
 						// corresponding station
 						stopIndices.put(v, oi);

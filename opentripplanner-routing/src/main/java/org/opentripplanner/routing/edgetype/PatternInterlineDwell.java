@@ -152,7 +152,7 @@ public class PatternInterlineDwell extends AbstractEdge implements OnBoardForwar
     }
 
     public String toString() {
-        return "PatterninterlineDwell(" + super.toString() + ")";
+        return "PatternInterlineDwell(" + super.toString() + ")";
     }
     
     public Trip getTrip() {

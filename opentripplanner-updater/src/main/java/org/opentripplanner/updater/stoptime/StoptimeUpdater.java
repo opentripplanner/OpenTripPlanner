@@ -9,7 +9,7 @@ import lombok.Setter;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.routing.edgetype.PatternBoard;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
@@ -43,8 +43,12 @@ public class StoptimeUpdater implements Runnable {
         // index trip patterns on trip ids they contain
         patternForTripId = new HashMap<AgencyAndId, TableTripPattern>();
         for (TransitStopDepart tsd : filter(g.getVertices(), TransitStopDepart.class)) {
-            for (PatternBoard pb : filter(tsd.getOutgoing(), PatternBoard.class)) {
-                TableTripPattern pattern = pb.getPattern();
+            for (TransitBoardAlight tba : filter(tsd.getOutgoing(), TransitBoardAlight.class)) {
+                //
+                if (!tba.isBoarding())
+                    continue;
+                    
+                TableTripPattern pattern = tba.getPattern();
                 for (Trip trip : pattern.getTrips()) {
                     patternForTripId.put(trip.getId(), pattern);
                 }

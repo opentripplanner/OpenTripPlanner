@@ -42,8 +42,7 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
 
     private Geometry geometry = null;
 
-    public PatternHop(PatternStopVertex from, PatternStopVertex to, Stop start, Stop end, int stopIndex,
-            TableTripPattern tripPattern) {
+    public PatternHop(PatternStopVertex from, PatternStopVertex to, Stop start, Stop end, int stopIndex) {
         super(from, to);
         this.start = start;
         this.end = end;

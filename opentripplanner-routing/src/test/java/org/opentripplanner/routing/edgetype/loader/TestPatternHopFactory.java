@@ -41,8 +41,7 @@ import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
 import org.opentripplanner.routing.edgetype.Alight;
 import org.opentripplanner.routing.edgetype.FrequencyBasedTripPattern;
 import org.opentripplanner.routing.edgetype.FrequencyBoard;
-import org.opentripplanner.routing.edgetype.PatternAlight;
-import org.opentripplanner.routing.edgetype.PatternBoard;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.SimpleEdge;
@@ -114,10 +113,11 @@ public class TestPatternHopFactory extends TestCase {
         assertEquals(3, stop_b_depart.getDegreeOut());
 
         for (Edge e : stop_a_depart.getOutgoing()) {
-            assertTrue(e instanceof PatternBoard);
+            assertEquals(TransitBoardAlight.class, e.getClass());
+            assertTrue(((TransitBoardAlight) e).isBoarding());
         }
         
-        PatternBoard pb = (PatternBoard) stop_a_depart.getOutgoing().iterator().next();
+        TransitBoardAlight pb = (TransitBoardAlight) stop_a_depart.getOutgoing().iterator().next();
         Vertex journey_a_1 = pb.getToVertex();
 
         assertEquals(1, journey_a_1.getDegreeIn());
@@ -236,7 +236,10 @@ public class TestPatternHopFactory extends TestCase {
     }
 
     public PatternHop getHopOut(Vertex v) {
-        for (PatternBoard e : filter(v.getOutgoing(), PatternBoard.class)) {
+        for (TransitBoardAlight e : filter(v.getOutgoing(), TransitBoardAlight.class)) {
+            if (!e.isBoarding())
+                continue;
+            
             for (PatternHop f : filter(e.getToVertex().getOutgoing(), PatternHop.class)) {
                 return f;
             }
@@ -336,7 +339,10 @@ public class TestPatternHopFactory extends TestCase {
         GraphPath path = spt.getPath(stop_k, false);
         int num_alights = 0;
         for (State s : path.states) {
-            if (s.getBackEdge() instanceof PatternAlight || s.getBackEdge() instanceof Alight) {
+            if (s.getBackEdge() instanceof Alight ||
+                    (s.getBackEdge() instanceof TransitBoardAlight && 
+                            !((TransitBoardAlight) s.getBackEdge()).isBoarding())
+                    ) {
                 num_alights += 1;
             }
             if (s.getBackEdge() instanceof PatternDwell) {
@@ -352,7 +358,10 @@ public class TestPatternHopFactory extends TestCase {
 //        path.reverse();
         num_alights = 0;
         for (State s : path.states) {
-            if (s.getBackEdge()instanceof PatternAlight || s.getBackEdge() instanceof Alight) {
+            if (s.getBackEdge() instanceof Alight ||
+                    (s.getBackEdge() instanceof TransitBoardAlight && 
+                            !((TransitBoardAlight) s.getBackEdge()).isBoarding())
+                    ) {
                 num_alights += 1;
             }
             if (s.getBackEdge() instanceof PatternDwell) {

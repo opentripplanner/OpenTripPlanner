@@ -66,7 +66,7 @@ public class TableTripPattern implements TripPattern, Serializable {
     // redundant since tripTimes have a trip
     private final ArrayList<Trip> trips = new ArrayList<Trip>();
 
-    // all trips in pattern have the same number of stops, can use arrays
+    // all trips in a pattern have the same stops, so this applies to every trip in this pattern
     public Stop[] stops; 
 
     @XmlElement
@@ -87,7 +87,7 @@ public class TableTripPattern implements TripPattern, Serializable {
         setStopsFromStopPattern(stopPattern);
     }
 
-    public void setStopsFromStopPattern(ScheduledStopPattern stopPattern) {
+    private void setStopsFromStopPattern(ScheduledStopPattern stopPattern) {
         this.stops = new Stop[stopPattern.stops.size()];
         perStopFlags = new int[stops.length];
         int i = 0;
@@ -413,6 +413,10 @@ public class TableTripPattern implements TripPattern, Serializable {
             }
         }
         return true;
+    }
+
+    public int getNumTrips () {
+        return trips.size();
     }
     
 //    

@@ -92,7 +92,7 @@ otp.locale.Portuguese = {
         printTip      : "<b>Imprimir</b><br/>Versão de impressão do plano de viagem (sem mapa).",
 
         link          : "Link",
-        linkTip      : "<b>Link</b><br/>Mostra o link url para este plano de viagem
+        linkTip      : "<b>Link</b><br/>Mostra o link url para este plano de viagem",
 
         feedback      : "Feedback",
         feedbackTip   : "<b>Feedback</b><br/>Manda seus experiências ou problemas com o mapa",
@@ -161,7 +161,7 @@ otp.locale.Portuguese = {
         arrive       : "Chegar",
 
         start_at     : "Começar a",
-        end_at       : "Terminar a
+        end_at       : "Terminar a"
     },
 
     // see otp.planner.Templates for use
