@@ -291,15 +291,17 @@ public class TableTripPattern implements TripPattern, Serializable {
         private TripTimes[][] departuresIndex;
         
         private void index() {
+            int nHops = stops.length - 1;
             // index is stop-major and sorted, allowing binary search at a given stop
-            arrivalsIndex = new TripTimes[stops.length][];
-            departuresIndex = new TripTimes[stops.length][];
-            for (int stopIndex = 0; stopIndex < stops.length; stopIndex++) {
-                arrivalsIndex[stopIndex] = (TripTimes[]) tripTimes.clone();
-                departuresIndex[stopIndex] = (TripTimes[]) tripTimes.clone();
+            arrivalsIndex = new TripTimes[nHops][];
+            departuresIndex = new TripTimes[nHops][];
+            for (int hop = 0; hop < nHops; hop++) {
+                // copy arraylist into new arrays
+                arrivalsIndex[hop] = tripTimes.toArray(new TripTimes[tripTimes.size()]);
+                departuresIndex[hop] = tripTimes.toArray(new TripTimes[tripTimes.size()]);
                 // TODO: STOP VS HOP
-                Arrays.sort(arrivalsIndex[stopIndex], TripTimes.getArrivalsComparator(stopIndex));
-                Arrays.sort(departuresIndex[stopIndex], TripTimes.getDeparturesComparator(stopIndex));
+                Arrays.sort(arrivalsIndex[hop], TripTimes.getArrivalsComparator(hop));
+                Arrays.sort(departuresIndex[hop], TripTimes.getDeparturesComparator(hop));
             }
         }
         
@@ -322,7 +324,24 @@ public class TableTripPattern implements TripPattern, Serializable {
             if (wheelchair && (perStopFlags[stopIndex] & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
                 return null;
             }
-            // linear search:
+            // binary search if this timetable has been indexed
+            if (departuresIndex != null) {
+                // search through the sorted list of TripTimes for this particular stop
+                TripTimes[] index = departuresIndex[stopIndex];
+                int tripIndex = TripTimes.binarySearchDepartures(index, stopIndex, afterTime); 
+                //these appear to actually be hop indexes, which is what the binary search accepts
+                while (tripIndex < index.length) {
+                    TripTimes tt = index[tripIndex];
+                    Trip t = tt.trip;
+                    if (tripAcceptable(t, haveBicycle, wheelchair) && 
+                        !options.bannedTrips.contains(t.getId())) {
+                        return tt;
+                    }
+                    tripIndex += 1;
+                }
+                return null;
+            }
+            // no index. fall through to linear search:
             // because trips may change with stoptime updates, we cannot count on them being sorted
             TripTimes bestTrip = null;
             int bestTime = Integer.MAX_VALUE;
@@ -345,6 +364,7 @@ public class TableTripPattern implements TripPattern, Serializable {
          * the stop at stopIndex.
          */
         // Method is protected so Lombok won't delegate to it.
+        // TODO could be merged with departure search, lots of duplicate code
         protected TripTimes getPreviousTrip(int stopIndex, int beforeTime, boolean haveBicycle, 
                 RoutingRequest options) {
             boolean pickup = false;
@@ -357,7 +377,24 @@ public class TableTripPattern implements TripPattern, Serializable {
             if (wheelchair && (perStopFlags[stopIndex + 1] & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
                 return null;
             }
-            // linear search:
+            // binary search if this timetable has been indexed
+            if (arrivalsIndex != null) {
+                // search through the sorted list of TripTimes for this particular stop
+                TripTimes[] index = arrivalsIndex[stopIndex];
+                int tripIndex = TripTimes.binarySearchArrivals(index, stopIndex, beforeTime); 
+                //these appear to actually be hop indexes, which is what the binary search accepts
+                while (tripIndex >= 0) {
+                    TripTimes tt = index[tripIndex];
+                    Trip t = tt.trip;
+                    if (tripAcceptable(t, haveBicycle, wheelchair) && 
+                        !options.bannedTrips.contains(t.getId())) {
+                        return tt;
+                    }
+                    tripIndex -= 1;
+                }
+                return null;
+            }
+            // no index. fall through to linear search:
             // because trips may change with stoptime updates, we cannot count on them being sorted
             TripTimes bestTrip = null;
             int bestTime = Integer.MIN_VALUE;
@@ -429,7 +466,7 @@ public class TableTripPattern implements TripPattern, Serializable {
             }
             // break even list size for linear and binary searches was determined to be around 16
             if (nTrips > 16) {
-                LOG.debug("indexing pattern with {} trips", nTrips);
+                //LOG.debug("indexing pattern with {} trips", nTrips);
                 index(); 
             } else {
                 arrivalsIndex = null;
@@ -521,4 +558,5 @@ public class TableTripPattern implements TripPattern, Serializable {
         }
         
     }
+    
 }
