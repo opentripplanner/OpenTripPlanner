@@ -257,19 +257,23 @@ public class TableTripPattern implements TripPattern, Serializable {
         
     public TripTimes getNextTrip(int stopIndex, int afterTime, boolean haveBicycle,
             RoutingRequest options) {
-        Timetable timetable = scheduledTimetable;
-        //if (options.rctx.timetableResolver != null) {
-        //timetable = timtableResolver.resolve(this);
-        //}
+        Timetable timetable;
+        TimetableSnapshot snapshot = options.rctx.timetableSnapshot; 
+        if (snapshot != null)
+            timetable = snapshot.resolve(this);
+        else
+            timetable = scheduledTimetable;
         return timetable.getNextTrip(stopIndex, afterTime, haveBicycle, options);
     }
     
     public TripTimes getPreviousTrip(int stopIndex, int beforeTime, boolean haveBicycle, 
             RoutingRequest options) {
-        Timetable timetable = scheduledTimetable;
-        //if (options.rctx.timetableResolver != null) {
-        //timetable = timtableResolver.resolve(this);
-        //}
+        Timetable timetable;
+        TimetableSnapshot snapshot = options.rctx.timetableSnapshot; 
+        if (snapshot != null)
+            timetable = snapshot.resolve(this);
+        else
+            timetable = scheduledTimetable;
         return timetable.getPreviousTrip(stopIndex, beforeTime, haveBicycle, options);
     }        
 
