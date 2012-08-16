@@ -752,6 +752,10 @@ public class GTFSPatternHopFactory {
             ScheduledStopPattern stopPattern, List<StopTime> stopTimes) {
 
         TableTripPattern tripPattern = new TableTripPattern(trip, stopPattern, getServiceId(trip));
+        // These indexes may be used to make an array-based TimetableSnapshot if the current 
+        // hashmap-based implementation turns out to be insufficient.
+        // Otherwise, they can be replaced with a simple list of tripPatterns, so that their 
+        // scheduled timetables can be indexed and compacted once all trips are added.
         getTripPatternIndex(tripPattern);
         TraverseMode mode = GtfsLibrary.getTraverseMode(trip.getRoute());
         
