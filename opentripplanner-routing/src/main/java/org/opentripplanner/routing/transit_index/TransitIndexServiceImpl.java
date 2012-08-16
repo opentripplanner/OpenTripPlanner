@@ -28,7 +28,7 @@ import org.onebusaway.gtfs.model.ServiceCalendarDate;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.PatternBoard;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.graph.Edge;
@@ -196,9 +196,9 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
     public List<AgencyAndId> getRoutesForStop(AgencyAndId stop) {
         HashSet<AgencyAndId> out = new HashSet<AgencyAndId>();
         Edge edge = preBoardEdges.get(stop);
-        for (Edge e : edge.getToVertex().getOutgoing()) {
-            if (e instanceof PatternBoard) {
-                PatternBoard board = (PatternBoard) e;
+        for (Edge e: edge.getToVertex().getOutgoing()) {
+            if (e instanceof TransitBoardAlight && ((TransitBoardAlight) e).isBoarding()) {
+                TransitBoardAlight board = (TransitBoardAlight) e;
                 for (Trip t : board.getPattern().getTrips()) {
                     out.add(t.getRoute().getId());
                 }

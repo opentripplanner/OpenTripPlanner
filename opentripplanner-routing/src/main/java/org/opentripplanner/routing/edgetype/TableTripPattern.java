@@ -223,6 +223,10 @@ public class TableTripPattern implements TripPattern, Serializable {
     public int getBoardType(int stopIndex) {
         return (perStopFlags[stopIndex] & MASK_PICKUP) >> SHIFT_PICKUP;
     }
+
+    public int getNumTrips () {
+        return trips.size();
+    }
     
 //    
 //    if (headsigns != null) { 

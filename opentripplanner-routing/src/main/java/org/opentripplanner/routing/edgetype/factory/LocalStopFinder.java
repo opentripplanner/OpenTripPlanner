@@ -32,7 +32,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.FrequencyBoard;
-import org.opentripplanner.routing.edgetype.PatternBoard;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
@@ -88,9 +88,9 @@ public class LocalStopFinder {
                 total ++;
             }
             for (Edge e : gv.getOutgoing()) {
-                if (e instanceof PatternBoard) {
-                    TableTripPattern pattern = ((PatternBoard) e).getPattern();
-                    patterns.add(pattern);
+                if (e instanceof TransitBoardAlight && ((TransitBoardAlight) e).isBoarding()) {
+                        TableTripPattern pattern = ((TransitBoardAlight) e).getPattern();
+                        patterns.add(pattern);
                 }
                 if (e instanceof FrequencyBoard) {
                     TripPattern pattern = ((FrequencyBoard) e).getPattern();
@@ -255,9 +255,9 @@ public class LocalStopFinder {
                     continue;
                 }
                 for (Edge e : departureVertex.getOutgoing()) {
-                    if (e instanceof PatternBoard) {
+                    if (e instanceof TransitBoardAlight && ((TransitBoardAlight) e).isBoarding()) {
                         /* finally, a PatternBoard */
-                        TableTripPattern pattern = ((PatternBoard) e).getPattern();
+                        TableTripPattern pattern = ((TransitBoardAlight) e).getPattern();
                         if (nearbyPatterns.contains(pattern)) {
                             Double cost = patternCosts.get(pattern);
                             if (cost == null) {
@@ -330,8 +330,8 @@ public class LocalStopFinder {
                 }
                 for (Edge e : v.getOutgoing()) {
                     for (Edge e2 : e.getToVertex().getOutgoing()) {
-                        if (e2 instanceof PatternBoard) {
-                            neighborhood.add(((PatternBoard) e2).getPattern());
+                        if (e2 instanceof TransitBoardAlight && ((TransitBoardAlight) e2).isBoarding()) {
+                            neighborhood.add(((TransitBoardAlight) e2).getPattern());
                         }
                     }
                 }

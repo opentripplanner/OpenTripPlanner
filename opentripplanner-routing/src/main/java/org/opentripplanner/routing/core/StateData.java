@@ -71,6 +71,12 @@ public class StateData implements Cloneable {
      */
     protected long initialWaitTime = 0;
 
+    /**
+     * This is the time between the trip that was taken at the previous stop and the next trip
+     * that could have been taken. It is used to determine if a path needs reverse-optimization.
+     */
+    protected int lastNextArrivalDelta;
+
     public String bikeRentalNetwork;
 
     protected StateData clone() {

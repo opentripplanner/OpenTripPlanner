@@ -66,8 +66,7 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
-import org.opentripplanner.routing.edgetype.PatternAlight;
-import org.opentripplanner.routing.edgetype.PatternBoard;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.edgetype.TurnEdge;
@@ -488,12 +487,12 @@ public class VizGui extends JFrame implements VertexSelectionListener {
                 // figure out the pattern, if any
                 TableTripPattern pattern = null;
                 int stopIndex = 0;
-                if (selected instanceof PatternBoard) {
-                    PatternBoard boardEdge = (PatternBoard) selected;
+                if (selected instanceof TransitBoardAlight && ((TransitBoardAlight) selected).isBoarding()) {
+                    TransitBoardAlight boardEdge = (TransitBoardAlight) selected;
                     pattern = boardEdge.getPattern();
                     stopIndex = boardEdge.getStopIndex();
-                } else if (selected instanceof PatternAlight) {
-                    PatternAlight alightEdge = (PatternAlight) selected;
+                } else if (selected instanceof TransitBoardAlight && !((TransitBoardAlight) selected).isBoarding()) {
+                    TransitBoardAlight alightEdge = (TransitBoardAlight) selected;
                     pattern = alightEdge.getPattern();
                     stopIndex = alightEdge.getStopIndex();
                 } else {
