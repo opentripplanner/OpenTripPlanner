@@ -391,9 +391,11 @@ public class GTFSPatternHopFactory {
         if (_deleteUselessDwells) 
             deleteUselessDwells(graph);
         /* this is the wrong place to do this: it should be done on all feeds at once, or at deserialization*/
+        _log.info("begin indexing large patterns");
         for (TableTripPattern tp : context.tripPatternIds.keySet()) {
             tp.finish();
         }
+        _log.info("end indexing large patterns");
         clearCachedData();
         graph.putService(FareService.class, fareServiceFactory.makeFareService());
         graph.putService(ServiceIdToNumberService.class, new ServiceIdToNumberService(context.serviceIds));
