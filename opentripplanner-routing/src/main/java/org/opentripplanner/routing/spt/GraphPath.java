@@ -177,21 +177,6 @@ public class GraphPath {
      * Private Methods
      ****/
 
-    private static void copyExistingNarrativeToNewNarrativeAsAppropriate(EdgeNarrative from,
-            EdgeNarrative to) {
-
-        if (!(to instanceof MutableEdgeNarrative))
-            return;
-
-        MutableEdgeNarrative m = (MutableEdgeNarrative) to;
-
-        if (to.getFromVertex() == null)
-            m.setFromVertex(from.getFromVertex());
-
-        if (to.getToVertex() == null)
-            m.setToVertex(from.getToVertex());
-    }
-
     public void dump() {
         System.out.println(" --- BEGIN GRAPHPATH DUMP ---");
         System.out.println(this.toString());
