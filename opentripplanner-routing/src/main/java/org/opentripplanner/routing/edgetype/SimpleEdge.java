@@ -33,6 +33,7 @@ public class SimpleEdge extends FreeEdge {
         StateEditor s1 = s0.edit(this);
         s1.incrementTimeInSeconds(seconds);
         s1.incrementWeight(weight);
+        // SimpleEdges don't concern themselves with mode
         return s1.makeState();
     }
 

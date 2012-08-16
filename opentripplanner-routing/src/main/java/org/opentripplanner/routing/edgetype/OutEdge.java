@@ -56,11 +56,6 @@ public class OutEdge extends StreetEdge {
     }
 
     @Override
-    public TraverseMode getMode() {
-        return TraverseMode.WALK;
-    }
-
-    @Override
     public String getName() {
         return ((TurnVertex) fromv).getName();
     }
@@ -86,18 +81,19 @@ public class OutEdge extends StreetEdge {
             }
         }
 
-        FixedModeEdge en = new FixedModeEdge(this, traverseMode);
-        if (fromv.getWheelchairNotes() != null && options.wheelchairAccessible) {
-            en.addNotes(fromv.getWheelchairNotes());
-        }
-        StateEditor s1 = s0.edit(this, en);
+        StateEditor s1 = s0.edit(this);
 
+        if (fromv.getWheelchairNotes() != null && options.wheelchairAccessible) {
+            s1.addAlerts(fromv.getWheelchairNotes());
+        }
+        
         double speed = options.getSpeed(traverseMode);
         double time = fromv.getEffectiveLength(traverseMode) / speed;
         double weight = fromv.computeWeight(s0, options, time);
         s1.incrementWalkDistance(fromv.getLength());
         s1.incrementTimeInSeconds((int) time);
         s1.incrementWeight(weight);
+        s1.setBackMode(s0.getNonTransitMode(options));
         if (s1.weHaveWalkedTooFar(options))
             return null;
 

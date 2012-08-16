@@ -47,7 +47,6 @@ import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
-import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.TransitIndexService;
@@ -335,7 +334,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                     continue;
                 }
                 handledEdges.add(e);
-                if (!(e instanceof AbstractEdge)) {
+                if (!(e instanceof Edge)) {
                     continue;
                 }
                 if (e instanceof PatternHop || e instanceof Alight || e instanceof PatternDwell

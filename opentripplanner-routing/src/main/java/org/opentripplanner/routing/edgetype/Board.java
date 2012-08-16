@@ -21,7 +21,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.graph.AbstractEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -31,7 +31,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * vehicle. When traversed forward, the the resultant state has the time of the next departure, in
  * addition the pattern that was boarded. When traversed backward, the result state is unchanged.
  */
-public class Board extends AbstractEdge implements OnBoardForwardEdge {
+public class Board extends Edge implements OnBoardForwardEdge {
 
     String start_id; // a street vertex's id
 

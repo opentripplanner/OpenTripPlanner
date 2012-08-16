@@ -123,7 +123,7 @@ public class NycFareServiceImpl implements FareService, Serializable {
 					newRide.firstStop = ((HopEdge) backEdge).getStartStop();
 
 					newRide.route = routeId;
-					Trip trip = state.getBackEdgeNarrative().getTrip();
+					Trip trip = state.getBackEdge().getTrip();
 					Route route = trip.getRoute();
 					int type = route.getType();
 					newRide.classifier = type;

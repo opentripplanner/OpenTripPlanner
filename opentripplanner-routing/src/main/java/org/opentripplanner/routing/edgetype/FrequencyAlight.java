@@ -13,11 +13,9 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -26,14 +24,14 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.graph.AbstractEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public class FrequencyAlight extends AbstractEdge  implements OnBoardReverseEdge {
+public class FrequencyAlight extends Edge  implements OnBoardReverseEdge {
     private static final long serialVersionUID = 3388162982920747289L;
 
     private static final Logger _log = LoggerFactory.getLogger(FrequencyAlight.class);
@@ -64,10 +62,6 @@ public class FrequencyAlight extends AbstractEdge  implements OnBoardReverseEdge
 
     public Geometry getGeometry() {
         return null;
-    }
-
-    public TraverseMode getMode() {
-        return TraverseMode.ALIGHTING;
     }
 
     public String getName() {
@@ -161,8 +155,7 @@ public class FrequencyAlight extends AbstractEdge  implements OnBoardReverseEdge
                 }
             }
 
-            EdgeNarrative en = new TransitNarrative(trip, this);
-            StateEditor s1 = state0.edit(this, en);
+            StateEditor s1 = state0.edit(this);
             int type = pattern.getBoardType(stopIndex);
             if (TransitUtils.handleBoardAlightType(s1, type)) {
                 return null;
@@ -182,6 +175,7 @@ public class FrequencyAlight extends AbstractEdge  implements OnBoardReverseEdge
             }
             s1.incrementWeight(preferences_penalty);
             s1.incrementWeight(wait_cost + options.getBoardCost(mode));
+            s1.setBackMode(TraverseMode.ALIGHTING);
             return s1.makeState();
         } else {
             /* forward traversal: not so much to do */
@@ -190,8 +184,7 @@ public class FrequencyAlight extends AbstractEdge  implements OnBoardReverseEdge
             if (state0.getBackEdge() instanceof FrequencyAlight) {
                 return null;
             }
-            EdgeNarrative en = new TransitNarrative(trip, this);
-            StateEditor s1 = state0.edit(this, en);
+            StateEditor s1 = state0.edit(this);
             int type = pattern.getBoardType(stopIndex);
             if (TransitUtils.handleBoardAlightType(s1, type)) {
                 return null;
@@ -199,6 +192,7 @@ public class FrequencyAlight extends AbstractEdge  implements OnBoardReverseEdge
             s1.setTripId(null);
             s1.setLastAlightedTime(state0.getTime());
             s1.setPreviousStop(fromv);
+            s1.setBackMode(TraverseMode.ALIGHTING);
             return s1.makeState();
         }
     }
@@ -206,6 +200,7 @@ public class FrequencyAlight extends AbstractEdge  implements OnBoardReverseEdge
     public State optimisticTraverse(State state0) {
         StateEditor s1 = state0.edit(this);
         // no cost (see patternalight)
+        s1.setBackMode(TraverseMode.ALIGHTING);
         return s1.makeState();
     }
 

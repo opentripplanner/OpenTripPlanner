@@ -13,12 +13,11 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import org.opentripplanner.routing.graph.AbstractEdge;
-import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -28,7 +27,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author mattwigway
  *
  */
-public class ElevatorHopEdge extends AbstractEdge {
+public class ElevatorHopEdge extends Edge {
 
     private static final long serialVersionUID = 3925814840369402222L;
 
@@ -43,7 +42,6 @@ public class ElevatorHopEdge extends AbstractEdge {
     
     @Override
     public State traverse(State s0) {
-        EdgeNarrative en = new FixedModeEdge(this, s0.getNonTransitMode(s0.getOptions()));
         RoutingRequest options = s0.getOptions();
 
         if (options.wheelchairAccessible && !wheelchairAccessible) {
@@ -68,7 +66,8 @@ public class ElevatorHopEdge extends AbstractEdge {
         }
 
 
-        StateEditor s1 = s0.edit(this, en);
+        StateEditor s1 = s0.edit(this);
+        s1.setBackMode(mode);
         s1.incrementWeight(options.elevatorHopCost);
         s1.incrementTimeInSeconds(options.elevatorHopTime);
         return s1.makeState();
@@ -82,11 +81,6 @@ public class ElevatorHopEdge extends AbstractEdge {
     @Override
     public Geometry getGeometry() {
         return null;
-    }
-
-    @Override
-    public TraverseMode getMode() {
-        return TraverseMode.WALK;
     }
 
     @Override

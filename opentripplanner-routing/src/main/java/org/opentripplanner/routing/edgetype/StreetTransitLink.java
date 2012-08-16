@@ -19,7 +19,6 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -33,7 +32,7 @@ import com.vividsolutions.jts.geom.LineString;
  * where going from the street to the vehicle is immediate -- such as at a 
  * curbside bus stop.
  */
-public class StreetTransitLink extends AbstractEdge {
+public class StreetTransitLink extends Edge {
 
     private static final long serialVersionUID = -3311099256178798981L;
     private static final double STL_TRAVERSE_COST = 1;
@@ -72,7 +71,6 @@ public class StreetTransitLink extends AbstractEdge {
     }
 
     public String getName() {
-        // TODO Auto-generated method stub
         return "street transit link";
     }
 
@@ -101,12 +99,14 @@ public class StreetTransitLink extends AbstractEdge {
         StateEditor s1 = s0.edit(this);
         s1.incrementTimeInSeconds(transitStop.getStreetToStopTime() + 1);
         s1.incrementWeight(STL_TRAVERSE_COST + transitStop.getStreetToStopTime());
+        s1.setBackMode(TraverseMode.STL);
         return s1.makeState();
     }
 
     public State optimisticTraverse(State s0) {
         StateEditor s1 = s0.edit(this);
         s1.incrementWeight(STL_TRAVERSE_COST);
+        s1.setBackMode(TraverseMode.STL);
         return s1.makeState();
     }
     

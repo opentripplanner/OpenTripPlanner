@@ -13,89 +13,247 @@
 
 package org.opentripplanner.routing.graph;
 
-import java.io.Serializable;
-import java.util.List;
 
-import org.opentripplanner.routing.core.EdgeNarrative;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import javax.xml.bind.annotation.XmlTransient;
+
+import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.graph.AbstractEdge.ValidVertexTypes;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.Patch;
-import org.opentripplanner.routing.spt.GraphPath;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
- * This represents an edge transition function in the graph.
- * 
- * <h2>A note about multiple traverse results:</h2>
- * 
- * The {@link TraverseResult} supports a simple chaining mechanism through
- * {@link TraverseResult#addToExistingResultChain(TraverseResult)} and
- * {@link TraverseResult#getNextResult()} that allows one to construct a chain of multiple traverse
- * result objects that can be returned from an {@link Edge} traversal operation. It's important to
- * note that while this can be a powerful mechanism to allow for more dynamic edge-traversal
- * behavior, care must be taken when implementing.
- * 
- * Specifically, we currently forbid an edge from returning multiple results in both
- * {@link #traverse(State, RoutingRequest)} and {@link #traverseBack(State, RoutingRequest)}. If
- * one traverse operations returns multiple results, the inverse operation must always return a
- * single result. We've set this rule primarily to support the reverse path optimization in
- * {@link GraphPath#optimize()}.
- * 
- * If you think of a compelling reason where you need multiple traverse results in BOTH directions,
- * let us know.
+ * This is the standard implementation of an edge with fixed from and to Vertex instances;
+ * all standard OTP edges are subclasses of this.  
  */
-public interface Edge extends Serializable, EdgeNarrative {
+public abstract class Edge implements Serializable {
 
-    /** @return the vertex this edge comes from */
-    public Vertex getFromVertex();
+    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
-    /** @return the vertex this edge leads to, or null if this edge leads to more than one vertex */
-    public Vertex getToVertex();
+    protected Vertex fromv;
 
-    /** @return the number of edge endpoints removed from edge lists (0, 1, or 2) */
-    int detach();
+    protected Vertex tov;
 
-    void attach(Vertex fromv, Vertex tov);
+    private List<Patch> patches;
 
-    /** From a State at the beginning of this edge, calculate the new State at the end of the edge. */   
-    public State traverse(State s0);
+    protected Edge(Vertex v1, Vertex v2) {
+    	if (v1 == null || v2 == null)
+    		throw new IllegalStateException(this.getClass() + " constructed with null vertex : " + 
+    				  v1 + " " + v2);
+        this.fromv = v1;
+        this.tov = v2;
+//        if (! vertexTypesValid()) {
+//            throw new IllegalStateException(this.getClass() + " constructed with bad vertex types");
+//        }
 
-    /**
-     * Alternate traversal method that provides a lower bound on the changes in weight and time that
-     * will occur when traversing an edge. Used by RemainingWeightHeuristics.
-     */
-    public State optimisticTraverse(State s0);
+        fromv.addOutgoing(this);
+        tov.addIncoming(this);
+    }
 
-    /**
-     * Intended to replace optimisticTraverse, on the grounds that the lower bound on an edge's weight 
-     * should not be path-dependent, so the state is not needed.
-     * 
-     * @return a lower bound on this edge's weight, given these {@link RoutingRequest}.
-     * Double.POSITIVE_INFINITY if the edge cannot be traversed with the given {@link RoutingRequest}.
-     */
-    public double weightLowerBound(RoutingRequest options);
+    public Vertex getFromVertex() {
+        return fromv;
+    }
 
-    /**
-     * Another replacement for optimisticTraverse, intended for use in resource-limited shortest
-     * path searches.
-     * 
-     * @return a lower bound on the time it takes to traverse this edge, given these 
-     * {@link RoutingRequest}. Double.POSITIVE_INFINITY if the edge cannot be traversed 
-     * with the given {@link RoutingRequest}.
-     */
-    public double timeLowerBound(RoutingRequest options);
+    public Vertex getToVertex() {
+        return tov;
+    }
 
-    public void addPatch(Patch patch);
+    public void attachFrom(Vertex fromv) {
+        detachFrom();
+        if (fromv == null)
+            throw new IllegalStateException("attaching to fromv null");
+        this.fromv = fromv;
+        fromv.addOutgoing(this);
+    }
 
-    public List<Patch> getPatches();
+    public void attachTo(Vertex tov) {
+        detachTo();
+        if (tov == null)
+            throw new IllegalStateException("attaching to tov null");
+        this.tov = tov;
+        tov.addIncoming(this);
+    }
 
-    public void removePatch(Patch patch);
+    /** Attach this edge to new endpoint vertices, keeping edgelists coherent */
+    public void attach(Vertex fromv, Vertex tov) {
+    	attachFrom(fromv);
+    	attachTo(tov);
+    }
     
+    private boolean detachFrom() {
+        boolean detached = false;
+        if (fromv != null) {
+            detached = fromv.removeOutgoing(this);
+            fromv = null;
+        }
+        return detached;
+    }
+
+    private boolean detachTo() {
+        boolean detached = false;
+        if (tov != null) {
+            detached = tov.removeIncoming(this);
+            tov = null;
+        }
+        return detached;
+    }
+
+    /** Disconnect this edge from its endpoint vertices, keeping edgelists coherent */
+    public int detach() {
+        int nDetached = 0;
+    	if (detachFrom())
+    	    nDetached += 1;
+    	if (detachTo())
+    	    nDetached += 1;
+    	return nDetached;
+    }
+    
+    public Trip getTrip() {
+        return null;
+    }
+
+    public Set<Alert> getNotes() {
+    	return null;
+    }
+    
+    @Override
+    public int hashCode() {
+        return fromv.hashCode() * 31 + tov.hashCode();
+    }
+
+    public boolean isRoundabout() {
+        return false;
+    }
+    
+    public abstract State traverse (State s0);
+    
+    public State optimisticTraverse (State s0) {
+    	return this.traverse(s0);
+    }
+    
+    public double weightLowerBound(RoutingRequest options) {
+        // Edge weights are non-negative. Zero is an admissible default lower bound.
+    	return 0;
+    }
+        
+    public double timeLowerBound(RoutingRequest options) {
+        // No edge should take less than zero time to traverse.
+        return 0;
+    }
+    
+    public void addPatch(Patch patch) {
+        if (patches == null) {
+            patches = new ArrayList<Patch>();
+        }
+        if (!patches.contains(patch)) {
+            patches.add(patch);
+        }
+    }
+
+    public List<Patch> getPatches() {
+        if (patches == null) {
+            return Collections.emptyList();
+        }
+        return patches;
+    }
+
+    public void removePatch(Patch patch) {
+        if (patches == null || patches.size() == 1) {
+            patches = null;
+        } else {
+            patches.remove(patch);
+        }
+    }
+
+    public abstract String getName ();
+    
+    public boolean hasBogusName() {
+        return false;
+    }
+
+    public String toString() {
+        return getClass().getName() + "(" + fromv + " -> " + tov + ")";
+    }
+
+    
+    // The next few functions used to live in EdgeNarrative, which has now been removed
+    // @author mattwigway
+    
+    public Geometry getGeometry () {
+        return null;
+    }
+    
+    public double getDistance () {
+        return 0;
+    }
+    
+    /* SERIALIZATION */
+    
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        // edge lists are transient, reconstruct them
+        fromv.addOutgoing(this);
+        tov.addIncoming(this);
+    }
+    
+    private void writeObject(ObjectOutputStream out) throws IOException, ClassNotFoundException {
+        if (fromv == null)
+            System.out.printf("fromv null %s \n", this);
+        if (tov == null)
+            System.out.printf("tov null %s \n", this);
+        out.defaultWriteObject();
+    }
+
     
     /* GRAPH COHERENCY AND TYPE CHECKING */
-
-    public abstract ValidVertexTypes getValidVertexTypes();
     
-    public abstract boolean vertexTypesValid();
+    @SuppressWarnings("unchecked")
+    private static final ValidVertexTypes VALID_VERTEX_TYPES =
+            new ValidVertexTypes(Vertex.class, Vertex.class);
+    
+    @XmlTransient
+    public ValidVertexTypes getValidVertexTypes() {
+        return VALID_VERTEX_TYPES;
+    }
+
+    /*
+     * This may not be necessary if edge constructor types are strictly specified
+     */
+    public final boolean vertexTypesValid() {
+        return getValidVertexTypes().isValid(fromv, tov);
+    }
+    
+    public static final class ValidVertexTypes {
+        private final Class<? extends Vertex>[] classes;
+        // varargs constructor: 
+        // a loophole in the law against arrays/collections of parameterized generics
+        public ValidVertexTypes (Class<? extends Vertex>... classes) {
+            if (classes.length % 2 != 0) {
+                throw new IllegalStateException("from/to/from/to...");
+            } else {
+                this.classes = classes;
+            }
+        }
+        public boolean isValid (Vertex from, Vertex to) {
+            for (int i=0; i<classes.length; i+=2) {
+                if (classes[i].isInstance(from) && classes[i+1].isInstance(to))
+                    return true;
+            }
+            return false;
+        }
+    }
 
 }

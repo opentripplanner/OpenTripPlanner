@@ -101,11 +101,6 @@ public class TurnEdge extends StreetEdge {
     }
 
     @Override
-    public TraverseMode getMode() {
-        return TraverseMode.WALK;
-    }
-
-    @Override
     public String getName() {
         return fromv.getName();
     }
@@ -159,13 +154,13 @@ public class TurnEdge extends StreetEdge {
             return null;
         }
 
-        FixedModeEdge en = new FixedModeEdge(this, traverseMode);
+        StateEditor s1 = s0.edit(this);
+        s1.setBackMode(traverseMode);
         Set<Alert> wheelchairNotes = ((TurnVertex) fromv).getWheelchairNotes();
         if (options.wheelchairAccessible) {
-            en.addNotes(wheelchairNotes);
+            s1.addAlerts(wheelchairNotes);
         }
-        StateEditor s1 = s0.edit(this, en);
-
+        
         switch (s0.getNoThruTrafficState()) {
         case INIT:
             if (((TurnVertex) fromv).isNoThruTraffic()) {

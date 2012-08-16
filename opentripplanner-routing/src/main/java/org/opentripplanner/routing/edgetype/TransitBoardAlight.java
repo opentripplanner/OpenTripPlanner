@@ -16,7 +16,6 @@ package org.opentripplanner.routing.edgetype;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.ServiceDay;
@@ -134,8 +133,8 @@ public class TransitBoardAlight extends PatternEdge implements OnBoardForwardEdg
             if (state0.getBackEdge() instanceof TransitBoardAlight) {
                 return null;
             }
-            EdgeNarrative en = new TransitNarrative(state0.getTripTimes().trip, this);
-            StateEditor s1 = state0.edit(this, en);
+
+            StateEditor s1 = state0.edit(this);
             
             if (boarding)
                 type = getPattern().getBoardType(stopIndex);
@@ -185,6 +184,7 @@ public class TransitBoardAlight extends PatternEdge implements OnBoardForwardEdg
                 }
             }            
 
+            s1.setBackMode(getMode());
             return s1.makeState();
         } else {
             /* onto transit: look for a transit trip on this pattern */
@@ -290,8 +290,8 @@ public class TransitBoardAlight extends PatternEdge implements OnBoardForwardEdg
                 }
             }
 
-            EdgeNarrative en = new TransitNarrative(trip, this);
-            StateEditor s1 = state0.edit(this, en);
+            StateEditor s1 = state0.edit(this);
+            s1.setBackMode(getMode());
             
             if (boarding)
                 type = getPattern().getBoardType(stopIndex);
@@ -351,6 +351,7 @@ public class TransitBoardAlight extends PatternEdge implements OnBoardForwardEdg
     public State optimisticTraverse(State state0) {
         StateEditor s1 = state0.edit(this);
         // no cost (see patternalight)
+        s1.setBackMode(getMode());
         return s1.makeState();
     }
 

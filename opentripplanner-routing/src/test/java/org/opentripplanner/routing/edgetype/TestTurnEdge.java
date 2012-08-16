@@ -25,7 +25,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.graph.AbstractEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -188,7 +188,7 @@ public class TestTurnEdge extends TestCase {
 
 }
 
-class MockTransfer extends AbstractEdge {
+class MockTransfer extends Edge {
 
     private static final long serialVersionUID = 1L;
     private int cost;

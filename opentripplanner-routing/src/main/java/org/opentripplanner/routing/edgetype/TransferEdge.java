@@ -16,7 +16,7 @@ package org.opentripplanner.routing.edgetype;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.graph.AbstractEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -25,7 +25,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * A transfer directly between two stops without using the street network.
  *
  */
-public class TransferEdge extends AbstractEdge {
+public class TransferEdge extends Edge {
 
     private static final long serialVersionUID = 1L;
     
@@ -88,6 +88,7 @@ public class TransferEdge extends AbstractEdge {
         StateEditor s1 = s0.edit(this);
         s1.incrementTimeInSeconds(time);
         s1.incrementWeight(time);
+        s1.setBackMode(TraverseMode.TRANSFER);
         return s1.makeState();
     }
 

@@ -13,7 +13,6 @@
 
 package org.opentripplanner.routing.edgetype;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
 /**
@@ -23,7 +22,8 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
  */
 
 /* package-private ? */ 
-public abstract class StreetEdge extends AbstractEdge implements EdgeWithElevation {
+// EdgeWithElevation extends Edge
+public abstract class StreetEdge extends EdgeWithElevation {
     
     private static final long serialVersionUID = 1L;
     public static final int CLASS_STREET = 3;

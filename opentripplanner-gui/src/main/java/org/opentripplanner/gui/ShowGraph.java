@@ -320,20 +320,16 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     private void drawGraphPath(GraphPath gp) {
         // draw edges in different colors according to mode
     	for (State s : gp.states) {
-        	EdgeNarrative en = s.getBackEdgeNarrative();
-            if(en == null) continue;
+        	TraverseMode mode = s.getBackMode();
 
-        	TraverseMode mode = en.getMode();
-            if(en instanceof DelegatingEdgeNarrative) {
-                en = ((DelegatingEdgeNarrative)en).getBase();
-            }
-
-        	if (!(en instanceof Edge)) continue;
-        	Edge e = (Edge) en;
+        	Edge e = s.getBackEdge();
+        	if (e == null)
+        	    continue;
+        	
         	if (mode.isTransit()) {
-            	stroke(200, 050, 000); 
-            	strokeWeight(6);   
-            	drawEdge(e);
+            	    stroke(200, 050, 000); 
+            	    strokeWeight(6);   
+            	    drawEdge(e);
         	}
         	if (e instanceof StreetEdge) {
         		StreetTraversalPermission stp = ((StreetEdge)e).getPermission();

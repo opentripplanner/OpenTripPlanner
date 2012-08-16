@@ -15,6 +15,8 @@ package org.opentripplanner.routing.core;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -23,7 +25,6 @@ import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.patch.NoteNarrative;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.Patch;
 import org.opentripplanner.routing.pathparser.PathParser;
@@ -52,18 +53,16 @@ public class StateEditor {
     private boolean defectiveTraversal = false;
 
     private boolean traversingBackward;
+    
+    // we use our own set of notes and only replace the child notes if they're different
+    private Set<Alert> notes = null;
 
     /* CONSTRUCTORS */
 
     public StateEditor(State parent, Edge e) {
-        this(parent, e, (EdgeNarrative) e);
-    }
-
-    public StateEditor(State parent, Edge e, EdgeNarrative en) {
         child = parent.clone();
         child.backState = parent;
         child.backEdge = e;
-        child.backEdgeNarrative = en;
         // We clear child.next here, since it could have already been set in the
         // parent
         child.next = null;
@@ -77,24 +76,24 @@ public class StateEditor {
             // be clever
             // Note that we use equals(), not ==, here to allow for dynamically
             // created vertices
-            if (en.getFromVertex().equals(en.getToVertex())
-                    && parent.vertex.equals(en.getFromVertex())) {
+            if (e.getFromVertex().equals(e.getToVertex())
+                    && parent.vertex.equals(e.getFromVertex())) {
                 // TODO LG: We disable this test: the assumption that
                 // the from and to vertex of an edge are not the same
                 // is not true anymore: bike rental on/off edges.
                 traversingBackward = parent.getOptions().isArriveBy();
-                child.vertex = en.getToVertex();
-            } else if (parent.vertex.equals(en.getFromVertex())) {
+                child.vertex = e.getToVertex();
+            } else if (parent.vertex.equals(e.getFromVertex())) {
                 traversingBackward = false;
-                child.vertex = en.getToVertex();
-            } else if (parent.vertex.equals(en.getToVertex())) {
+                child.vertex = e.getToVertex();
+            } else if (parent.vertex.equals(e.getToVertex())) {
                 traversingBackward = true;
-                child.vertex = en.getFromVertex();
+                child.vertex = e.getFromVertex();
             } else {
                 // Parent state is not at either end of edge.
-                LOG.warn("Edge is not connected to parent state: {}", en);
-                LOG.warn("   from   vertex: {}", en.getFromVertex());
-                LOG.warn("   to     vertex: {}", en.getToVertex());
+                LOG.warn("Edge is not connected to parent state: {}", e);
+                LOG.warn("   from   vertex: {}", e.getFromVertex());
+                LOG.warn("   to     vertex: {}", e.getToVertex());
                 LOG.warn("   parent vertex: {}", parent.vertex);
                 defectiveTraversal = true;
             }
@@ -149,6 +148,13 @@ public class StateEditor {
         }
         if ( ! parsePath(this.child))
         	return null;
+        
+        // copy the notes if need be, keeping in mind they may both be null
+        if (this.notes != child.stateData.notes) {
+            cloneStateDataAsNeeded();
+            child.stateData.notes = this.notes;
+        }
+        
         spawned = true;
         return child;
     }
@@ -196,10 +202,13 @@ public class StateEditor {
     }
 
     /**
-     * Wrap the new State's predecessor EdgeNarrative so that it has the given note.
+     * Add an alert to this state. This used to use an EdgeNarrative
      */
     public void addAlert(Alert notes) {
-        child.backEdgeNarrative = new NoteNarrative(child.backEdgeNarrative, notes);
+        if (this.notes == null)
+            this.notes = new HashSet<Alert>();
+        
+        this.notes.add(notes);
     }
 
     /* Incrementors */
@@ -266,6 +275,14 @@ public class StateEditor {
         cloneStateDataAsNeeded();
         //LOG.debug("initial wait time set to {} secs", initialWaitTime);
         child.stateData.initialWaitTime = initialWaitTime;
+    }
+    
+    public void setBackMode (TraverseMode mode) {
+        if (mode == child.stateData.backMode)
+            return;
+        
+        cloneStateDataAsNeeded();
+        child.stateData.backMode = mode;
     }
 
     /** 
@@ -523,5 +540,11 @@ public class StateEditor {
     public void setBikeRentalNetwork(String network) {
         cloneStateDataAsNeeded();
         child.stateData.bikeRentalNetwork = network;
+    }
+
+    public void addAlerts(Set<Alert> notes) {
+        for (Alert note : notes) {
+            addAlert(note);
+        }        
     }
 }

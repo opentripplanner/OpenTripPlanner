@@ -20,7 +20,7 @@ import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.graph.AbstractEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -28,7 +28,7 @@ import com.vividsolutions.jts.geom.Geometry;
 /**
  *  Models waiting in a station on a vehicle. 
  */
-public class Dwell extends AbstractEdge implements DwellEdge {
+public class Dwell extends Edge implements DwellEdge {
 
     /*
      * Models waiting in a station where passengers may remain on the vehicle. This may be useful

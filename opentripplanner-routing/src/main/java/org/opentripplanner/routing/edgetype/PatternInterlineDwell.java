@@ -24,7 +24,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.graph.AbstractEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.OnboardVertex;
 import org.slf4j.Logger;
@@ -52,7 +52,7 @@ class InterlineDwellData implements Serializable {
     }
 }
 
-public class PatternInterlineDwell extends AbstractEdge implements OnBoardForwardEdge, OnBoardReverseEdge {
+public class PatternInterlineDwell extends Edge implements OnBoardForwardEdge, OnBoardReverseEdge {
     private static final Logger _log = LoggerFactory.getLogger(PatternInterlineDwell.class);
 
     private static final long serialVersionUID = 1L;
@@ -145,6 +145,9 @@ public class PatternInterlineDwell extends AbstractEdge implements OnBoardForwar
         // FIXME: this is interlining to the SCHEDULED timetable, not the updated timetable. use resolver.
         s1.setTripTimes(pattern.getTripTimes(dwellData.patternIndex));
         s1.incrementWeight(dwellData.dwellTime);
+        
+        // This shouldn't be changing - MWC
+        s1.setBackMode(getMode());
         return s1.makeState();
     }
 

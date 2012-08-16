@@ -124,7 +124,7 @@ public class GraphPath {
     public List<RouteSpec> getRouteSpecs() {
         List<RouteSpec> ret = new LinkedList<RouteSpec>();
         for (State s : states) {
-            EdgeNarrative e = s.getBackEdgeNarrative();
+            Edge e = s.getBackEdge();
             Trip trip = e.getTrip();
             if ( trip != null) {
                 String routeName = GtfsLibrary.getRouteName(trip.getRoute());
@@ -144,7 +144,7 @@ public class GraphPath {
     public List<AgencyAndId> getTrips() {
         List<AgencyAndId> ret = new LinkedList<AgencyAndId>();
         for (State s : states) {
-            EdgeNarrative e = s.getBackEdgeNarrative();
+            Edge e = s.getBackEdge();
             if (e == null) continue;
             Trip trip = e.getTrip();
             if (trip != null)

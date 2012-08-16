@@ -14,7 +14,6 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -27,7 +26,7 @@ import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
- *  Models waiting in a station on a vehicle.  The vehicle may not change 
+ *  Models waiting in a station on a vehicle.  The vehicle is not permitted to change 
  *  names during this time -- PatternInterlineDwell represents that case.
  */
 public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnBoardReverseEdge, DwellEdge {
@@ -61,8 +60,8 @@ public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnB
         //int trip = state0.getTrip();
         TripTimes tripTimes = state0.getTripTimes();
         int dwellTime = tripTimes.getDwellTime(stopIndex);
-        EdgeNarrative en = new TransitNarrative(tripTimes.trip, getPattern().getHeadsign(stopIndex, tripTimes.index), this);
-        StateEditor s1 = state0.edit(this, en);
+        StateEditor s1 = state0.edit(this);
+        s1.setBackMode(getMode());
         s1.incrementTimeInSeconds(dwellTime);
         s1.incrementWeight(dwellTime);
         return s1.makeState();
@@ -73,6 +72,7 @@ public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnB
         int dwellTime = getPattern().getBestDwellTime(stopIndex);
         StateEditor s1 = s0.edit(this);
         s1.incrementTimeInSeconds(dwellTime);
+        s1.setBackMode(getMode());
         s1.incrementWeight(dwellTime);
         return s1.makeState();
     }

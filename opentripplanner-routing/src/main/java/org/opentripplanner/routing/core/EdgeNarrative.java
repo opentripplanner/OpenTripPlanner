@@ -28,26 +28,26 @@ import com.vividsolutions.jts.geom.Geometry;
  *
  */
 public interface EdgeNarrative {
-
+    // -> Edge
     public Vertex getFromVertex();
-
+    // -> Edge
     public Vertex getToVertex();
-
+    // -> State.getBackMode()
     public TraverseMode getMode();
-
+    // -> Edge
     public String getName();
-
+    // -> Edge
     /* True if the name is automatically generated rather than coming from OSM or GTFS */
     public boolean hasBogusName();
-
+    // -> Edge
     public Geometry getGeometry();
-
+    // -> Edge
     public double getDistance();
-
+    // -> Edge
     public Trip getTrip();
-
+    // -> Edge
     public boolean isRoundabout();
-
+    // -> Edge
     public Set<Alert> getNotes();
 
 }

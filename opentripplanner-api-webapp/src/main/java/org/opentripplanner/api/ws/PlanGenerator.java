@@ -15,7 +15,6 @@ package org.opentripplanner.api.ws;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Set;
@@ -34,7 +33,6 @@ import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -48,7 +46,6 @@ import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
-import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
 import org.opentripplanner.routing.edgetype.TinyTurnEdge;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.TrivialPathException;
@@ -178,7 +175,7 @@ public class PlanGenerator {
         TransitIndexService transitIndex = graph.getService(TransitIndexService.class);
 
         Itinerary itinerary = makeEmptyItinerary(path);
-        EdgeNarrative postponedAlerts = null;
+        Edge postponedAlerts = null;
         Leg leg = null;
         CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
         double previousElevation = Double.MAX_VALUE;
@@ -189,19 +186,18 @@ public class PlanGenerator {
         for (State state : path.states) {
             i += 1;
             Edge backEdge = state.getBackEdge();
-            EdgeNarrative backEdgeNarrative = state.getBackEdgeNarrative();
             if (backEdge == null) {
                 continue;
             }
 
-            TraverseMode mode = backEdgeNarrative.getMode();
+            TraverseMode mode = state.getBackMode();
             if (mode != null) {
                 long dt = state.getAbsTimeDeltaSec();
                 if (mode == TraverseMode.BOARDING || mode == TraverseMode.ALIGHTING
                         || mode == TraverseMode.STL) {
                     itinerary.waitingTime += dt;
                 } else if (mode.isOnStreetNonTransit()) {
-                    itinerary.walkDistance += backEdgeNarrative.getDistance();
+                    itinerary.walkDistance += backEdge.getDistance();
                     itinerary.walkTime += dt;
                 } else if (mode.isTransit()) {
                     itinerary.transitTime += dt;
@@ -211,10 +207,10 @@ public class PlanGenerator {
             if (backEdge instanceof FreeEdge) {
                 if (backEdge instanceof PreBoardEdge) {
                     // Add boarding alerts to the next leg
-                    postponedAlerts = backEdgeNarrative;
+                    postponedAlerts = backEdge;
                 } else if (backEdge instanceof PreAlightEdge) {
                     // Add alighting alerts to the previous leg
-                    addNotesToLeg(itinerary.legs.get(itinerary.legs.size() - 1), backEdgeNarrative);
+                    addNotesToLeg(itinerary.legs.get(itinerary.legs.size() - 1), backEdge);
                 }
                 continue;
             }
@@ -284,7 +280,7 @@ public class PlanGenerator {
                     finalizeLeg(leg, state, path.states, startWalk, i, coordinates);
                     leg = makeLeg(itinerary, state);
                     itinerary.transfers++;
-                } else if (backEdgeNarrative instanceof LegSwitchingEdge) {
+                } else if (backEdge instanceof LegSwitchingEdge) {
                     nextName = state.getBackState().getBackState().getBackState().getVertex()
                             .getName();
                     finalizeLeg(leg, state, path.states, startWalk, i - 1, coordinates);
@@ -309,7 +305,7 @@ public class PlanGenerator {
                     finalizeLeg(leg, state, path.states, startWalk, i, coordinates);
                     leg = null;
                     pgstate = PlanGenState.PRETRANSIT;
-                } else if (backEdgeNarrative instanceof LegSwitchingEdge) {
+                } else if (backEdge instanceof LegSwitchingEdge) {
                     finalizeLeg(leg, state, path.states, startWalk, i - 1, coordinates);
                     leg = null;
                     pgstate = PlanGenState.START;
@@ -327,7 +323,7 @@ public class PlanGenerator {
                     finalizeLeg(leg, state, path.states, startWalk, i, coordinates);
                     leg = null;
                     pgstate = PlanGenState.PRETRANSIT;
-                } else if (backEdgeNarrative instanceof LegSwitchingEdge) {
+                } else if (backEdge instanceof LegSwitchingEdge) {
                     finalizeLeg(leg, state, path.states, startWalk, i - 1, coordinates);
                     leg = null;
                     pgstate = PlanGenState.START;
@@ -354,7 +350,7 @@ public class PlanGenerator {
                 }
                 break;
             case TRANSIT:
-                String route = backEdgeNarrative.getName();
+                String route = backEdge.getName();
                 if (mode == TraverseMode.ALIGHTING) {
                     if (showIntermediateStops && leg.stop != null && leg.stop.size() > 0) {
                         if (leg.stop.isEmpty()) {
@@ -393,8 +389,8 @@ public class PlanGenerator {
                 break;
             }
             if (leg != null) {
-                leg.distance += backEdgeNarrative.getDistance();
-                Geometry edgeGeometry = backEdgeNarrative.getGeometry();
+                leg.distance += backEdge.getDistance();
+                Geometry edgeGeometry = backEdge.getGeometry();
                 if (edgeGeometry != null) {
                     Coordinate[] edgeCoordinates = edgeGeometry.getCoordinates();
                     if (coordinates.size() > 0
@@ -411,7 +407,7 @@ public class PlanGenerator {
                     postponedAlerts = null;
                 }
 
-                addNotesToLeg(leg, backEdgeNarrative);
+                addNotesToLeg(leg, backEdge);
 
             }
 
@@ -436,7 +432,7 @@ public class PlanGenerator {
     }
 
     private void fixupTransitLeg(Leg leg, State state, TransitIndexService transitIndex) {
-        EdgeNarrative en = state.getBackEdgeNarrative();
+        Edge en = state.getBackEdge();
         leg.route = en.getName();
         Trip trip = en.getTrip();
         if (trip != null) {
@@ -455,7 +451,7 @@ public class PlanGenerator {
                 leg.agencyUrl = agency.getUrl();
             }
         }
-        leg.mode = en.getMode().toString();
+        leg.mode = state.getBackMode().toString();
         leg.startTime = makeCalendar(state.getBackState());
     }
 
@@ -471,8 +467,8 @@ public class PlanGenerator {
         coordinates.clear();
     }
 
-    private Set<Alert> addNotesToLeg(Leg leg, EdgeNarrative edgeNarrative) {
-        Set<Alert> notes = edgeNarrative.getNotes();
+    private Set<Alert> addNotesToLeg(Leg leg, Edge backEdge) {
+        Set<Alert> notes = backEdge.getNotes();
         if (notes != null) {
             for (Alert note : notes) {
                 leg.addAlert(note);
@@ -515,10 +511,9 @@ public class PlanGenerator {
         Leg leg = new Leg();
         itinerary.addLeg(leg);
         leg.startTime = makeCalendar(s.getBackState());
-        EdgeNarrative en = s.getBackEdgeNarrative();
         leg.distance = 0.0;
         leg.from = makePlace(s.getBackState(), false);
-        leg.mode = en.getMode().toString();
+        leg.mode = s.getBackMode().toString();
         if (s.isBikeRenting()) {
             leg.rentedBike = true; 
         }
@@ -591,15 +586,14 @@ public class PlanGenerator {
         for (State currState : states) {
             State backState = currState.getBackState();
             Edge edge = currState.getBackEdge();
-            EdgeNarrative edgeNarrative = currState.getBackEdgeNarrative();
             boolean createdNewStep = false;
             if (edge instanceof FreeEdge) {
                 continue;
             }
-            if (!edgeNarrative.getMode().isOnStreetNonTransit()) {
+            if (!currState.getBackMode().isOnStreetNonTransit()) {
                 continue; // ignore STLs and the like
             }
-            Geometry geom = edgeNarrative.getGeometry();
+            Geometry geom = edge.getGeometry();
             if (geom == null) {
                 continue;
             }
@@ -625,7 +619,7 @@ public class PlanGenerator {
                 continue;
             }
 
-            String streetName = edgeNarrative.getName();
+            String streetName = edge.getName();
             int idx = streetName.indexOf('(');
             String streetNameNoParens;
             if (idx > 0)
@@ -642,9 +636,9 @@ public class PlanGenerator {
                 double thisAngle = DirectionUtils.getFirstAngle(geom);
                 step.setAbsoluteDirection(thisAngle);
                 // new step, set distance to length of first edge
-                distance = edgeNarrative.getDistance();
+                distance = edge.getDistance();
             } else if ((step.streetName != null && !step.streetNameNoParens().equals(streetNameNoParens))
-                    && (!step.bogusName || !edgeNarrative.hasBogusName())) {
+                    && (!step.bogusName || !edge.hasBogusName())) {
                 /* street name has changed */
                 if (roundaboutExit > 0) {
                     // if we were just on a roundabout,
@@ -661,33 +655,33 @@ public class PlanGenerator {
                 createdNewStep = true;
 
                 steps.add(step);
-                if (edgeNarrative.isRoundabout()) {
+                if (edge.isRoundabout()) {
                     // indicate that we are now on a roundabout
                     // and use one-based exit numbering
                     roundaboutExit = 1;
-                    roundaboutPreviousStreet = backState.getBackEdgeNarrative().getName();
+                    roundaboutPreviousStreet = backState.getBackEdge().getName();
                     idx = roundaboutPreviousStreet.indexOf('(');
                     if (idx > 0)
                         roundaboutPreviousStreet = roundaboutPreviousStreet.substring(0, idx - 1);
                 }
                 double thisAngle = DirectionUtils.getFirstAngle(geom);
-                step.setDirections(lastAngle, thisAngle, edgeNarrative.isRoundabout());
+                step.setDirections(lastAngle, thisAngle, edge.isRoundabout());
                 // new step, set distance to length of first edge
-                distance = edgeNarrative.getDistance();
+                distance = edge.getDistance();
             } else {
                 /* street name has not changed */
                 double thisAngle = DirectionUtils.getFirstAngle(geom);
                 RelativeDirection direction = WalkStep.getRelativeDirection(lastAngle, thisAngle,
-                        edgeNarrative.isRoundabout());
+                        edge.isRoundabout());
                 boolean optionsBefore = backState.multipleOptionsBefore();
-                if (edgeNarrative.isRoundabout()) {
+                if (edge.isRoundabout()) {
                     // we are on a roundabout, and have already traversed at least one edge of it.
                     if (optionsBefore) {
                         // increment exit count if we passed one.
                         roundaboutExit += 1;
                     }
                 }
-                if (edgeNarrative.isRoundabout() || direction == RelativeDirection.CONTINUE) {
+                if (edge.isRoundabout() || direction == RelativeDirection.CONTINUE) {
                     // we are continuing almost straight, or continuing along a roundabout.
                     // just append elevation info onto the existing step.
 
@@ -762,7 +756,7 @@ public class PlanGenerator {
                         step.setDirections(lastAngle, thisAngle, false);
                         step.stayOn = true;
                         // new step, set distance to length of first edge
-                        distance = edgeNarrative.getDistance();
+                        distance = edge.getDistance();
                     }
                 }
             }
@@ -803,13 +797,13 @@ public class PlanGenerator {
                         step.elevation = s;
                     }
                 }
-                distance += edgeNarrative.getDistance();
+                distance += edge.getDistance();
 
             }
 
             // increment the total length for this step
-            step.distance += edgeNarrative.getDistance();
-            step.addAlerts(edgeNarrative.getNotes());
+            step.distance += edge.getDistance();
+            step.addAlerts(edge.getNotes());
             lastAngle = DirectionUtils.getLastAngle(geom);
         }
         return steps;
@@ -828,7 +822,7 @@ public class PlanGenerator {
     }
 
     private WalkStep createWalkStep(State s) {
-        EdgeNarrative en = s.getBackEdgeNarrative();
+        Edge en = s.getBackEdge();
         WalkStep step;
         step = new WalkStep();
         step.streetName = en.getName();
