@@ -140,7 +140,7 @@ public class TransitBoardAlight extends PatternEdge implements OnBoardForwardEdg
             if (boarding)
                 type = getPattern().getBoardType(stopIndex);
             else
-                type = getPattern().getAlightType(stopIndex);
+                type = getPattern().getAlightType(stopIndex + 1);
                 
             if (TransitUtils.handleBoardAlightType(s1, type)) {
                 return null;
@@ -296,7 +296,7 @@ public class TransitBoardAlight extends PatternEdge implements OnBoardForwardEdg
             if (boarding)
                 type = getPattern().getBoardType(stopIndex);
             else
-                type = getPattern().getAlightType(stopIndex);
+                type = getPattern().getAlightType(stopIndex + 1);
             
             if (TransitUtils.handleBoardAlightType(s1, type)) {
                 return null;
