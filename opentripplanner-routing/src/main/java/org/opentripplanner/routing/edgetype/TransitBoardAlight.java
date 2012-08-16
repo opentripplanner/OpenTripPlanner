@@ -62,7 +62,7 @@ public class TransitBoardAlight extends PatternEdge implements OnBoardForwardEdg
     private boolean boarding;
 
     public TransitBoardAlight (TransitStopDepart fromStopVertex, PatternStopVertex toPatternVertex, 
-            TableTripPattern pattern, int stopIndex, TraverseMode mode) {
+            int stopIndex, TraverseMode mode) {
         super(fromStopVertex, toPatternVertex);
         this.stopIndex = stopIndex;
         this.modeMask = new TraverseModeSet(mode).getMask();
@@ -70,7 +70,7 @@ public class TransitBoardAlight extends PatternEdge implements OnBoardForwardEdg
     }
     
     public TransitBoardAlight (PatternStopVertex fromPatternStop, TransitStopArrive toStationVertex,
-            TableTripPattern pattern, int stopIndex, TraverseMode mode) {
+            int stopIndex, TraverseMode mode) {
         super(fromPatternStop, toStationVertex);
         this.stopIndex = stopIndex;
         this.modeMask = new TraverseModeSet(mode).getMask();
