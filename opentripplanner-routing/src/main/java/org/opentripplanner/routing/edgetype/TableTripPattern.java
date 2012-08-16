@@ -71,7 +71,7 @@ public class TableTripPattern implements TripPattern, Serializable {
      * find early/late offsets, or as a fallback if the other timetable becomes corrupted or
      * expires. */
     @Delegate
-    private final Timetable scheduledTimetable = new Timetable();
+    protected final Timetable scheduledTimetable = new Timetable();
 
 //    @XmlElement
 //    private final ArrayList<Integer> perTripFlags = new ArrayList<Integer>();
@@ -284,11 +284,25 @@ public class TableTripPattern implements TripPattern, Serializable {
      */
     public class Timetable implements Serializable {
         
-        private final ArrayList<TripTimes> tripTimes = new ArrayList<TripTimes>();
+        private final ArrayList<TripTimes> tripTimes;
 
         /** if the index is null, this timetable has not been indexed. use a linear search. */
         private TripTimes[][] arrivalsIndex;
         private TripTimes[][] departuresIndex;
+        
+        public Timetable() {
+            tripTimes = new ArrayList<TripTimes>();
+        }
+        
+        /** copy constructor */
+        private Timetable (Timetable tt) {
+            tripTimes = new ArrayList<TripTimes>(tt.tripTimes);
+        }
+        
+        /** copy instance method sees enclosing instance */
+        public Timetable copy() {
+            return new Timetable(this);
+        }
         
         private void index() {
             int nHops = stops.length - 1;
@@ -556,7 +570,7 @@ public class TableTripPattern implements TripPattern, Serializable {
             }
             return true;
         }
-        
-    }
+                
+    } // END Class Timetable
     
 }
