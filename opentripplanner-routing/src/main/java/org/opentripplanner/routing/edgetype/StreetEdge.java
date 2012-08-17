@@ -12,7 +12,10 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 package org.opentripplanner.routing.edgetype;
+import java.util.Set;
+
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
 /**
@@ -43,5 +46,7 @@ public abstract class StreetEdge extends EdgeWithElevation {
     public abstract boolean isNoThruTraffic();
     
     public abstract int getStreetClass();
+    
+    public abstract Set<Alert> getNotes ();
     
 }

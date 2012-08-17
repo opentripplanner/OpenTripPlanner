@@ -168,13 +168,8 @@ public class StreetLocation extends AbstractVertex {
             double lengthIn = street.getLength() * lengthRatioIn;
             double lengthOut = street.getLength() * (1 - lengthRatioIn);
 
-            // TODO: here and below at location = new TurnVertex:
-            // these were calling street.getNotes() which at some point had been changed to always
-            // return null. Edge.getNotes has now been removed, and so we pass in null directly.
-            // However, the original intention was to recreate labels on streets at the start of
-            // a path; that functionality should be restored (MWC)
             newFrom = new TurnVertex(null, label + " (vertex going in to splitter)", geometries.getFirst(), street.getName(),
-                    lengthIn, false, null);
+                    lengthIn, false, street.getNotes());
             newFrom.setDistanceToNearestTransitStop(distanceToNearestTransitStop);
             newFrom.setElevationProfile(street.getElevationProfile(0, lengthIn), false);
             newFrom.setPermission(street.getPermission());
@@ -182,7 +177,7 @@ public class StreetLocation extends AbstractVertex {
             newFrom.setStreetClass(street.getStreetClass());
 
             location = new TurnVertex(null, label + " (vertex at splitter)", geometries.getSecond(), street.getName(), lengthOut,
-                    false, null);
+                    false, street.getNotes());
             location.setElevationProfile(street.getElevationProfile(lengthIn, lengthIn + lengthOut), false);
             location.setPermission(street.getPermission());
             location.setStreetClass(street.getStreetClass());

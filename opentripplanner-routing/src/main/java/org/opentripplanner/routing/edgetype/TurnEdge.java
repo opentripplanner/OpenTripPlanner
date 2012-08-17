@@ -303,6 +303,11 @@ public class TurnEdge extends StreetEdge {
     }
     
     @Override
+    public Set<Alert> getNotes () {
+        return ((TurnVertex) fromv).getNotes();
+    }
+    
+    @Override
     public double timeLowerBound(RoutingRequest options) {
         return (((TurnVertex) fromv).getLength() + turnCost/20) / options.getSpeedUpperBound();
     }

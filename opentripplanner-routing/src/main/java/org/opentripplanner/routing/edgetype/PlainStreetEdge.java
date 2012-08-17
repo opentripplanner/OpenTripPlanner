@@ -270,6 +270,8 @@ public class PlainStreetEdge extends StreetEdge {
         s1.incrementWeight(weight);
         if (s1.weHaveWalkedTooFar(options))
             return null;
+        
+        s1.addAlerts(getNotes());
 
         return s1.makeState();
     }

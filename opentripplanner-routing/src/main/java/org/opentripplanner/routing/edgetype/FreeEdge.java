@@ -40,6 +40,7 @@ public class FreeEdge extends Edge {
         StateEditor s1 = s0.edit(this);
         s1.setBackMode(s0.getNonTransitMode(s0.getOptions()));
         s1.incrementWeight(1);
+        // do not change mode
         return s1.makeState();
     }
 

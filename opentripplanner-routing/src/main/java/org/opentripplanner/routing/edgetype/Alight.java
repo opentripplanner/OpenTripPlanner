@@ -126,6 +126,7 @@ public class Alight extends Edge implements OnBoardReverseEdge {
             s1.setTripId(trip.getId());
             s1.setZone(zone);
             s1.setRoute(trip.getRoute().getId());
+            s1.setBackMode(getMode());
             return s1.makeState();
         } else {
             // forward traversal
@@ -134,6 +135,7 @@ public class Alight extends Edge implements OnBoardReverseEdge {
             s1.setTripId(null);
             s1.setLastAlightedTime(s0.getTime());
             s1.setPreviousStop(tov);
+            s1.setBackMode(getMode());
             return s1.makeState();
         }
     }

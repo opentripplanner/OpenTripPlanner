@@ -13,7 +13,6 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.ServiceDay;
@@ -98,6 +97,7 @@ public class Board extends Edge implements OnBoardForwardEdge {
             s1.setLastAlightedTime(state0.getTime());
             s1.setPreviousStop(fromv);
             TransitUtils.handleBoardAlightType(s1, pickupType);
+            s1.setBackMode(getMode());
             return s1.makeState();
         } else {
             if (options.bannedTrips.contains(getTrip().getId())) {
@@ -145,6 +145,7 @@ public class Board extends Edge implements OnBoardForwardEdge {
             s1.setTripId(trip.getId());
             s1.setZone(zone);
             s1.setRoute(trip.getRoute().getId());
+            s1.setBackMode(getMode());
             return s1.makeState();
         }
     }

@@ -59,6 +59,7 @@ public class Dwell extends Edge implements DwellEdge {
     	StateEditor state1 = state0.edit(this);
         state1.incrementTimeInSeconds(elapsed);
         state1.incrementWeight(elapsed);
+        state1.setBackMode(getMode());
         return state1.makeState();
     }
 

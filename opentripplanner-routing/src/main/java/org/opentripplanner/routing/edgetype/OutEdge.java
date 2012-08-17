@@ -13,12 +13,15 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import java.util.Set;
+
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.util.ElevationProfileSegment;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TurnVertex;
@@ -59,6 +62,10 @@ public class OutEdge extends StreetEdge {
     public String getName() {
         return ((TurnVertex) fromv).getName();
     }
+    
+    public Set<Alert> getNotes () {
+        return ((TurnVertex) fromv).getNotes();
+    }
 
     @Override
     public Trip getTrip() {
@@ -97,6 +104,7 @@ public class OutEdge extends StreetEdge {
         if (s1.weHaveWalkedTooFar(options))
             return null;
 
+        s1.addAlerts(getNotes());
         return s1.makeState();
     }
 
