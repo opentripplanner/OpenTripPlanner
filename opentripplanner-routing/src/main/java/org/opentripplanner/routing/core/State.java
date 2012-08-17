@@ -21,10 +21,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.automata.AutomatonState;
 import org.opentripplanner.routing.edgetype.OnBoardForwardEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.TimeDependentTrip;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Edge;
@@ -330,6 +332,34 @@ public class State implements Cloneable {
     
     public Set<Alert> getBackAlerts () {
         return stateData.notes;
+    }
+    
+    /**
+     * Get the name of the direction used to get to this state. For transit, it is the headsign,
+     * while for other things it is what you would expect.
+     */
+    public String getBackDirection () {
+        // This can happen when stop_headsign says different things at two trips on the same 
+        // pattern and at the same stop.
+        if (backEdge instanceof TimeDependentTrip) {
+            return ((TimeDependentTrip) backEdge).getDirection(stateData.tripTimes.index);
+        }
+        else {
+            return backEdge.getDirection();
+        }
+    }
+    
+    /**
+     * Get the back trip of the given state. For time dependent transit, State will find the
+     * right thing to do.
+     */
+    public Trip getBackTrip () {
+        if (backEdge instanceof TimeDependentTrip) {
+            return ((TimeDependentTrip) backEdge).getTrip(stateData.tripTimes.index);
+        }
+        else {
+            return backEdge.getTrip();
+        }
     }
 
     public Edge getBackEdge() {

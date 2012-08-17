@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.gtfs.GtfsLibrary;
@@ -31,7 +32,8 @@ import com.vividsolutions.jts.geom.Geometry;
  * A transit vehicle's journey between departure at one stop and arrival at the next.
  * This version represents a set of such journeys specified by a TripPattern.
  */
-public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoardReverseEdge, HopEdge {
+public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoardReverseEdge, 
+        HopEdge, TimeDependentTrip {
 
     private static final long serialVersionUID = 1L;
 
@@ -55,6 +57,15 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
 
     public TraverseMode getMode() {
         return GtfsLibrary.getTraverseMode(getPattern().getExemplar().getRoute());
+    }
+    
+    // Get the appropriate headsign for the given tripIndex
+    public String getDirection(int tripIndex) {
+        return getPattern().getHeadsign(stopIndex, tripIndex);
+    }
+    
+    public Trip getTrip(int tripIndex) {
+        return getPattern().getTrip(tripIndex);
     }
 
     public String getName() {

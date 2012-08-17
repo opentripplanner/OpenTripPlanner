@@ -123,7 +123,7 @@ public class GraphPath {
         List<RouteSpec> ret = new LinkedList<RouteSpec>();
         for (State s : states) {
             Edge e = s.getBackEdge();
-            Trip trip = e.getTrip();
+            Trip trip = s.getBackTrip();
             if ( trip != null) {
                 String routeName = GtfsLibrary.getRouteName(trip.getRoute());
                 RouteSpec spec = new RouteSpec(trip.getId().getAgencyId(), routeName);
@@ -144,7 +144,7 @@ public class GraphPath {
         for (State s : states) {
             Edge e = s.getBackEdge();
             if (e == null) continue;
-            Trip trip = e.getTrip();
+            Trip trip = s.getBackTrip();
             if (trip != null)
                 ret.add(trip.getId());
         }

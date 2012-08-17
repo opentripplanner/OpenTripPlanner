@@ -434,9 +434,15 @@ public class PlanGenerator {
     private void fixupTransitLeg(Leg leg, State state, TransitIndexService transitIndex) {
         Edge en = state.getBackEdge();
         leg.route = en.getName();
-        Trip trip = en.getTrip();
+        Trip trip = state.getBackTrip();
         if (trip != null) {
-            leg.headsign = trip.getTripHeadsign();
+            // this is the stop headsign
+            leg.headsign = state.getBackDirection();
+             //leg.headsign = "This is the headsign";
+            // handle no stop headsign
+            if (leg.headsign == null)            
+                leg.headsign = trip.getTripHeadsign();
+            
             leg.tripId = trip.getId().getId();
             leg.agencyId = trip.getId().getAgencyId();
             leg.tripShortName = trip.getTripShortName();

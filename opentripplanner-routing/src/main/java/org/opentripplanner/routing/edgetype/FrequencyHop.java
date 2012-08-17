@@ -61,6 +61,10 @@ public class FrequencyHop extends Edge implements OnBoardForwardEdge, OnBoardRev
         return GtfsLibrary.getRouteName(pattern.getTrip().getRoute());
     }
     
+    public String getDirection () {
+        return pattern.getHeadsign(stopIndex);
+    }
+    
     public State optimisticTraverse(State state0) {
         int runningTime = pattern.getRunningTime(stopIndex);
         StateEditor s1 = state0.edit(this);

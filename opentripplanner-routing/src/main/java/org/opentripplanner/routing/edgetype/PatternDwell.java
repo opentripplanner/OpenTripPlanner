@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -29,7 +30,8 @@ import com.vividsolutions.jts.geom.Geometry;
  *  Models waiting in a station on a vehicle.  The vehicle is not permitted to change 
  *  names during this time -- PatternInterlineDwell represents that case.
  */
-public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnBoardReverseEdge, DwellEdge {
+public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnBoardReverseEdge, 
+        DwellEdge, TimeDependentTrip {
     
     private static final long serialVersionUID = 1L;
 
@@ -46,6 +48,15 @@ public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnB
 
     public double getDistance() {
         return 0;
+    }
+    
+    // Get the appropriate headsign for the given tripIndex
+    public String getDirection(int tripIndex) {
+        return getPattern().getHeadsign(stopIndex, tripIndex);
+    }
+    
+    public Trip getTrip(int tripIndex) {
+        return getPattern().getTrip(tripIndex);
     }
 
     public TraverseMode getMode() {

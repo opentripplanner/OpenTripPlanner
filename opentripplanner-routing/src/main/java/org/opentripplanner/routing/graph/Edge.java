@@ -21,7 +21,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -30,7 +29,6 @@ import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.Patch;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -93,6 +91,14 @@ public abstract class Edge implements Serializable {
     	attachTo(tov);
     }
     
+    /**
+     * Get a direction on paths where it matters, or null
+     * @return
+     */
+    public String getDirection () {
+        return null;
+    }
+    
     private boolean detachFrom() {
         boolean detached = false;
         if (fromv != null) {
@@ -121,6 +127,11 @@ public abstract class Edge implements Serializable {
     	return nDetached;
     }
     
+    /** 
+     * This should only be called inside State; other methods should call
+     * {@link org.opentripplanner.routing.core.State.getBackTrip()}.
+     * @author mattwigway
+     */
     public Trip getTrip() {
         return null;
     }

@@ -91,10 +91,6 @@ public class Hop extends Edge implements OnBoardForwardEdge, OnBoardReverseEdge,
 
     private Geometry geometry = null;
 
-    public String getDirection() {
-        return start.getTrip().getTripHeadsign();
-    }
-
     public double getDistance() {
         Stop stop1 = start.getStop();
         Stop stop2 = end.getStop();
@@ -134,6 +130,10 @@ public class Hop extends Edge implements OnBoardForwardEdge, OnBoardReverseEdge,
         geometry = line;
     }
 
+    public String getDirection() {
+        return start.getStopHeadsign();
+    }
+    
     @Override
     public Stop getEndStop() {
         return end.getStop();
