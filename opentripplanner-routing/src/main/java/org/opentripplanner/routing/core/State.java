@@ -537,8 +537,6 @@ public class State implements Cloneable {
     public State optimizeOrReverse (boolean optimize, boolean forward) {
         State orig = this;
         State unoptimized = orig;
-        TraverseMode mode = null; // this is needed when reversing, because the backMode of this
-                                   // reversed state is the backMode of the next unreversed state 
         State ret = orig.reversedClone();
         long newInitialWaitTime = this.stateData.initialWaitTime;
         PathParser pathParsers[];
@@ -596,7 +594,7 @@ public class State implements Cloneable {
                 editor.incrementTimeInSeconds(orig.getAbsTimeDeltaSec());
                 editor.incrementWeight(orig.getWeightDelta());
                 editor.incrementWalkDistance(orig.getWalkDistanceDelta());
-                editor.setBackMode(mode);
+                editor.setBackMode(orig.getBackMode());
 
                 if (orig.isBikeRenting() != orig.getBackState().isBikeRenting())
                     editor.setBikeRenting(!orig.isBikeRenting());
@@ -607,7 +605,6 @@ public class State implements Cloneable {
                 //copyExistingNarrativeToNewNarrativeAsAppropriate(origNarrative, retNarrative);
             }
             
-            mode = orig.getBackMode();
             orig = orig.getBackState();
         }
             
