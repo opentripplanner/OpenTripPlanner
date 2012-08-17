@@ -61,13 +61,13 @@ public class CheckGeometryGraphBuilderImpl implements GraphBuilder {
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
-        // TODO: This was filtered to EdgeNarratives before EdgeNarrative removal
         for (Vertex gv : graph.getVertices()) {
             if (Double.isNaN(gv.getCoordinate().x) || Double.isNaN(gv.getCoordinate().y)) {
                 _log.warn("Vertex " + gv + " has NaN location; this will cause doom.");
                 _log.warn(GraphBuilderAnnotation.register(graph, Variety.BOGUS_VERTEX_GEOMETRY, gv));
             }
             
+            // TODO: This was filtered to EdgeNarratives before EdgeNarrative removal
             for (Edge e : gv.getOutgoing()) {
                 Geometry g = e.getGeometry();
                 if (g == null) {
