@@ -2,6 +2,7 @@ package org.opentripplanner.routing.trippattern;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -141,4 +142,78 @@ public class TripTimes implements Cloneable, Serializable {
         return ret;
     }
     
+    public static Comparator<TripTimes> getArrivalsComparator(final int hopIndex) {
+        return new Comparator<TripTimes>() {
+            @Override
+            public int compare(TripTimes tt1, TripTimes tt2) {
+                return tt1.getArrivalTime(hopIndex) - tt2.getArrivalTime(hopIndex);
+            }
+        };
+    }
+
+    public static Comparator<TripTimes> getDeparturesComparator(final int hopIndex) {
+        return new Comparator<TripTimes>() {
+            @Override
+            public int compare(TripTimes tt1, TripTimes tt2) {
+                return tt1.getDepartureTime(hopIndex) - tt2.getDepartureTime(hopIndex);
+            }
+        };
+    }
+    
+    /**
+     * Binary search method adapted from GNU Classpath Arrays.java (GPL). 
+     * Range parameters and range checking removed.
+     * Search across an array of TripTimes, looking only at a specific hop number.
+     * 
+     * @return the index at which the key was found, or the index of the first value higher than 
+     * key if it was not found, or a.length if there is no such value. Note that this has been
+     * changed from Arrays.binarysearch.
+     */
+    public static int binarySearchDepartures(TripTimes[] a, int hop, int key) {
+        int low = 0;
+        int hi = a.length - 1;
+        int mid = 0;
+        while (low <= hi) {
+            mid = (low + hi) >>> 1;
+            final int d = a[mid].getDepartureTime(hop);
+            if (d == key)
+                return mid;
+            else if (d > key)
+                hi = mid - 1;
+            else
+                // This gets the insertion point right on the last loop.
+                low = ++mid;
+        }
+        return mid;
+    }
+
+    /**
+     * Binary search method adapted from GNU Classpath Arrays.java (GPL). 
+     * Range parameters and range checking removed.
+     * Search across an array of TripTimes, looking only at a specific hop number.
+     * 
+     * @return the index at which the key was found, or the index of the first value *lower* than
+     * key if it was not found, or -1 if there is no such value. Note that this has been changed
+     * from Arrays.binarysearch: this is a mirror-image of the departure search algorithm.
+     * 
+     * TODO: I have worked through corner cases but should reverify with some critical distance.
+     */
+    public static int binarySearchArrivals(TripTimes[] a, int hop, int key) {
+        int low = 0;
+        int hi = a.length - 1;
+        int mid = hi;
+        while (low <= hi) {
+            mid = (low + hi) >>> 1;
+            final int d = a[mid].getArrivalTime(hop);
+            if (d == key)
+                return mid;
+            else if (d < key)
+                low = mid + 1;
+            else
+                // This gets the insertion point right on the last loop.
+                hi = --mid;
+        }
+        return mid;
+    }
+
 }

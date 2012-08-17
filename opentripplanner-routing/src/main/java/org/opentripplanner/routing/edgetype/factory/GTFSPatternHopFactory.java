@@ -43,16 +43,12 @@ import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
 import org.opentripplanner.routing.core.ServiceIdToNumberService;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.Alight;
-import org.opentripplanner.routing.edgetype.Board;
-import org.opentripplanner.routing.edgetype.Dwell;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.FrequencyAlight;
 import org.opentripplanner.routing.edgetype.FrequencyBasedTripPattern;
 import org.opentripplanner.routing.edgetype.FrequencyBoard;
 import org.opentripplanner.routing.edgetype.FrequencyDwell;
 import org.opentripplanner.routing.edgetype.FrequencyHop;
-import org.opentripplanner.routing.edgetype.Hop;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.PatternDwell;
@@ -72,7 +68,6 @@ import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.FareServiceFactory;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.routing.vertextype.PatternDepartVertex;
-import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.routing.vertextype.TransitStopArrive;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
@@ -330,8 +325,7 @@ public class GTFSPatternHopFactory {
             TableTripPattern tripPattern = patterns.get(stopPattern);
             if (tripPattern == null) {
                 // it's the first time we are encountering this stops+pickups+serviceId combination
-                tripPattern = new TableTripPattern(trip, stopPattern, getServiceId(trip));
-                makePatternVerticesAndEdges(graph, tripPattern, trip, stopTimes);
+                tripPattern = makePatternVerticesAndEdges(graph, trip, stopPattern, stopTimes);
                 patterns.put(stopPattern, tripPattern);
             } 
             tripPattern.addTrip(trip, stopTimes);
@@ -395,6 +389,12 @@ public class GTFSPatternHopFactory {
         loadTransfers(graph);
         if (_deleteUselessDwells) 
             deleteUselessDwells(graph);
+        /* this is the wrong place to do this: it should be done on all feeds at once, or at deserialization*/
+        _log.info("begin indexing large patterns");
+        for (TableTripPattern tp : context.tripPatternIds.keySet()) {
+            tp.finish();
+        }
+        _log.info("end indexing large patterns");
         clearCachedData();
         graph.putService(FareService.class, fareServiceFactory.makeFareService());
         graph.putService(ServiceIdToNumberService.class, new ServiceIdToNumberService(context.serviceIds));
@@ -743,19 +743,24 @@ public class GTFSPatternHopFactory {
     /** 
      * The first time a particular ScheduledStopPattern (stops+pickups+serviceId combination) 
      * is encountered, an empty tripPattern object is created to hold the schedule information. This
-     * method creates the corresponding PatternStop vertices and PatternBoard/Hop/Alight edges.
+     * method also creates the corresponding PatternStop vertices and PatternBoard/Hop/Alight edges.
      * StopTimes are passed in instead of Stops only because they are needed for shape distances.
-     * Trips will be added to the tripPattern later.
+     * The TripPattern returned is empty; trips should be added to the TripPattern later.
      */
-    private void makePatternVerticesAndEdges(Graph graph, TableTripPattern tripPattern, 
-            Trip trip, List<StopTime> stopTimes) {
+    private TableTripPattern makePatternVerticesAndEdges(Graph graph, Trip trip, 
+            ScheduledStopPattern stopPattern, List<StopTime> stopTimes) {
 
+        TableTripPattern tripPattern = new TableTripPattern(trip, stopPattern, getServiceId(trip));
+        // These indexes may be used to make an array-based TimetableSnapshot if the current 
+        // hashmap-based implementation turns out to be insufficient.
+        // Otherwise, they can be replaced with a simple list of tripPatterns, so that their 
+        // scheduled timetables can be indexed and compacted once all trips are added.
+        getTripPatternIndex(tripPattern);
         TraverseMode mode = GtfsLibrary.getTraverseMode(trip.getRoute());
-
-        PatternArriveVertex psv0arrive, psv1arrive = null;
-        PatternDepartVertex psv0depart;
         
         // create journey vertices
+        PatternArriveVertex psv0arrive, psv1arrive = null;
+        PatternDepartVertex psv0depart;
         for (int hopIndex = 0; hopIndex < stopTimes.size() - 1; hopIndex++) {
             StopTime st0 = stopTimes.get(hopIndex);
             Stop s0 = st0.getStop();
@@ -777,10 +782,11 @@ public class GTFSPatternHopFactory {
 
             TransitStopDepart stopDepart = context.stopDepartNodes.get(s0);
             TransitStopArrive stopArrive = context.stopArriveNodes.get(s1);
-
-            Edge board = new TransitBoardAlight(stopDepart, psv0depart, hopIndex, mode);
-            Edge alight = new TransitBoardAlight(psv1arrive, stopArrive, hopIndex, mode);
+            new TransitBoardAlight(stopDepart, psv0depart, hopIndex, mode);
+            new TransitBoardAlight(psv1arrive, stopArrive, hopIndex, mode);
         }        
+        
+        return tripPattern;
     }
     
     
@@ -836,6 +842,17 @@ public class GTFSPatternHopFactory {
         return id;
     }
 
+    private int getTripPatternIndex(TableTripPattern pattern) {
+        // we could probably get away with just a set of tripPatterns since we are not storing
+        // indexes in the patterns themselves.
+        Integer id = context.tripPatternIds.get(pattern);
+        if (id == null) {
+            id = context.serviceIds.size();
+            context.tripPatternIds.put(pattern, id);
+        }
+        return id;
+    }
+
     private void clearCachedData() {
         _log.debug("shapes=" + _geometriesByShapeId.size());
         _log.debug("segments=" + _geometriesByShapeSegmentKey.size());
@@ -878,6 +895,7 @@ public class GTFSPatternHopFactory {
     }
 
     /// This should become unnecessary with unsorted trip patterns
+    /*
     private void createSimpleHops(Graph graph, Trip trip, List<StopTime> stopTimes) {
 
         ArrayList<Hop> hops = new ArrayList<Hop>();
@@ -946,7 +964,8 @@ public class GTFSPatternHopFactory {
             }
         }
     }
-
+    */
+    
     private Geometry getHopGeometry(Graph graph, AgencyAndId shapeId, StopTime st0, StopTime st1,
             Vertex startJourney, Vertex endJourney) {
 
