@@ -64,18 +64,24 @@ public class StoptimeUpdater implements Runnable {
     public void run() {
         while (true) {
             // blocking call
-            for (UpdateList ul : updateStreamer.getUpdates().splitByTrip()) {
-                System.out.println(ul.toString());
+            UpdateList updates = updateStreamer.getUpdates();
+            // null return means exception while processing a message
+            if (updates == null)
+                continue;
+            // an update list can contain updates for several trips. Split it into a list of 
+            // updates for single trips, and handle each one separately.
+            for (UpdateList ul : updates.splitByTrip()) {
+                LOG.trace(ul.toString());
                 if (! ul.isSane()) {
-                    LOG.debug("incoherent stoptime UpdateList");
+                    LOG.trace("incoherent stoptime UpdateList");
                     continue; 
                 }
                 TableTripPattern pattern = patternForTripId.get(ul.tripId);
                 if (pattern != null) {
-                    LOG.debug("pattern found for {}", ul.tripId);
+                    LOG.trace("pattern found for {}", ul.tripId);
                     pattern.update(ul);
                 } else {
-                    LOG.debug("pattern not found {}", ul.tripId);
+                    LOG.trace("pattern not found {}", ul.tripId);
                 }
             }
         }
