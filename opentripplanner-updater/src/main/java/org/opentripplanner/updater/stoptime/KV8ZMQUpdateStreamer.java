@@ -1,6 +1,7 @@
 package org.opentripplanner.updater.stoptime;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,9 +14,10 @@ import lombok.Setter;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.common.CTX;
-import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.trippattern.Update;
 import org.opentripplanner.routing.trippattern.UpdateList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zeromq.ZFrame;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMsg;
@@ -23,9 +25,11 @@ import org.zeromq.ZMsg;
 /** StoptimeUpdateStreamer for CTX-encoded Dutch KV8 realtime updates over ZeroMQ */
 public class KV8ZMQUpdateStreamer implements UpdateStreamer {
 
+    private static Logger LOG = LoggerFactory.getLogger(KV8ZMQUpdateStreamer.class); 
+    
     private ZMQ.Context context = ZMQ.context(1);
     private ZMQ.Socket subscriber = context.socket(ZMQ.SUB);
-    private int count = 0;
+    private long count = 0;
     @Setter private String defaultAgencyId = "";
     @Setter private String address = "tcp://node01.post.openov.nl:7817";
     @Setter private static String feed = "/GOVI/KV8"; 
@@ -37,36 +41,56 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer {
     }
     
     public UpdateList getUpdates() {
+        /* recvMsg blocks -- unless you call Socket.setReceiveTimeout() */
+        // so when timeout occurs, it does not return null, but a reference to some
+        // static ZMsg object?
         ZMsg msg = ZMsg.recvMsg(subscriber);
-        try {
-            Iterator<ZFrame> msgs = msg.iterator();
-            msgs.next();
-            ArrayList<Byte> receivedMsgs = new ArrayList<Byte>();
-            while (msgs.hasNext()) {
-                for (byte b : msgs.next().getData()) {
-                    receivedMsgs.add(b);
-                }
-            }
-            byte[] fullMsg = new byte[receivedMsgs.size()];
-            for (int i = 0; i < fullMsg.length; i++) {
-                fullMsg[i] = receivedMsgs.get(i);
-            }
-            InputStream gzipped = new ByteArrayInputStream(fullMsg);
-            InputStream in = new GZIPInputStream(gzipped);
-            StringBuffer out = new StringBuffer();
-            byte[] b = new byte[4096];
-            for (int n; (n = in.read(b)) != -1;) {
-                out.append(new String(b, 0, n));
-            }
-            return parseCTX(out.toString());
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (msg == null) {
+            /* According to docs, null indicates that receive operation was "interrupted". */
+            LOG.warn("ZMQ received null message.");
             return null;
         }
+        /* 
+         * on subscription failure, message will not be null or empty, but its content length 
+         * will be 0 and bomb the gunzip below.
+         */        
+        UpdateList ret = null;
+        try {
+            Iterator<ZFrame> frames = msg.iterator();
+            // pop off first frame, which contains "/GOVI/KV8" (the feed name) (isn't there a method for this?)
+            frames.next();
+            ByteArrayOutputStream buffer = new ByteArrayOutputStream(); 
+            while (frames.hasNext()) {
+                ZFrame frame = frames.next();
+                byte[] frameData = frame.getData();
+                buffer.write(frameData);
+            }
+            if (buffer.size() == 0) {
+                LOG.debug("received 0-length CTX message {}", msg);
+                return null;
+            }
+            // chain input streams to gunzip contents of byte buffer
+            InputStream gzippedMessageStream = new ByteArrayInputStream(buffer.toByteArray());
+            InputStream messageStream = new GZIPInputStream(gzippedMessageStream);
+            // copy input stream back to output stream
+            buffer.reset();
+            byte[] b = new byte[4096];
+            for (int n; (n = messageStream.read(b)) != -1;) {
+                buffer.write(b, 0, n);
+            }            
+            if (++count % 1 == 0) {
+                LOG.debug("received CTX message #{}: {}", count, msg);
+            }
+            ret = parseCTX(buffer.toString());
+        } catch (Exception e) {
+            LOG.error("exception while decoding (unzipping) incoming CTX message: {}", e.getMessage()); 
+        } finally {
+            msg.destroy(); // is this necessary?
+        }
+        return ret;
     }
     
     public UpdateList parseCTX(String ctxString) {
-        System.out.println("CTX MSG " + count++);
         CTX ctx = new CTX(ctxString);
         UpdateList ret = new UpdateList(null); // indicate that updates may have mixed trip IDs
         for (int i = 0; i < ctx.rows.size(); i++) {
