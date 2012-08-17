@@ -93,6 +93,9 @@ public class UpdateList {
      * are not right-aligned wrt the full trip. They are contiguous, and delay predictions decay 
      * linearly to match scheduled times at the end of the block of updates.
      * 
+     * TODO: verify: does this mean that we can use scheduled times for the rest of the trip? Or
+     * are updates cumulative? 
+     * 
      * Note that GTFS sequence number is increasing but not necessarily sequential.
      * Though most NL data providers use increasing, sequential values, Arriva Line 315 does not.
      * 
@@ -127,7 +130,7 @@ public class UpdateList {
                 }
             }
             // stopId match succeeded
-            LOG.debug("found matching stop block at index {}", pi);
+            LOG.trace("found matching stop block at index {}", pi);
             return pi;
         }
         return -1;

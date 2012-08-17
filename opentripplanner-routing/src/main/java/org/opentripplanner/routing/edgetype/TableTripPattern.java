@@ -66,10 +66,14 @@ public class TableTripPattern implements TripPattern, Serializable {
     // override trip_headsign with stop_headsign where necessary
     private final List<List<String>> headsigns = new ArrayList<List<String>>();
 
-    /** This timetable holds the 'official' stop times from GTFS. If realtime stoptime updates are 
+    /** 
+     * This timetable holds the 'official' stop times from GTFS. If realtime stoptime updates are 
      * applied, trips searches will be conducted using another timetable and this one will serve to 
      * find early/late offsets, or as a fallback if the other timetable becomes corrupted or
-     * expires. */
+     * expires. 
+     * Via Lombok Delegate, calling timetable methods on a TableTripPattern will call them on its
+     * scheduled timetable.
+     */
     @Delegate
     protected final Timetable scheduledTimetable = new Timetable();
 
@@ -77,6 +81,15 @@ public class TableTripPattern implements TripPattern, Serializable {
 //    private final ArrayList<Integer> perTripFlags = new ArrayList<Integer>();
 
     // redundant since tripTimes have a trip
+    // however it's nice to have for order reference, since all timetables must have tripTimes
+    // in this order, e.g. for interlining. 
+    // potential optimization: trip fields can be removed from TripTimes?
+    /**
+     * This pattern may have multiple Timetable objects, but they should all contain TripTimes
+     * for the same trips, in the same order (that of the scheduled Timetable). An exception to 
+     * this rule may arise if unscheduled trips are added to a Timetable. For that case we need 
+     * to search for trips/TripIds in the Timetable rather than the enclosing TripPattern.  
+     */
     private final ArrayList<Trip> trips = new ArrayList<Trip>();
 
     // all trips in a pattern have the same stops, so this applies to every trip in this pattern
@@ -160,16 +173,6 @@ public class TableTripPattern implements TripPattern, Serializable {
 
     public int getTripIndex(Trip trip) {
         return trips.indexOf(trip);
-    }
-    
-    public int getTripIndex(AgencyAndId tripId) {
-        int ret = 0;
-        for (Trip t : trips) {
-            if (t.getId().equals(tripId)) // replace with indexing in stoptime updater?
-                return ret;
-            ret += 1;
-        }
-        return -1;
     }
 
     /** Returns whether passengers can alight at a given stop */
@@ -292,6 +295,8 @@ public class TableTripPattern implements TripPattern, Serializable {
      */
     public class Timetable implements Serializable {
         
+        private static final long serialVersionUID = 1L;
+
         private final ArrayList<TripTimes> tripTimes;
 
         /** if the index is null, this timetable has not been indexed. use a linear search. */
@@ -357,7 +362,10 @@ public class TableTripPattern implements TripPattern, Serializable {
             // If they are all the same, trip is FIFO and needs no index (ie tripTimes can be used
             // as index at every stop). 
             if (departuresIndex != null) { 
-                // search through the sorted list of TripTimes for this particular stop
+                // grab the sorted list of TripTimes for this particular stop
+                // if (departuresIndex.length == 1) // for optimized FIFO patterns
+                //     index = departuresIndex[0];
+                // else
                 TripTimes[] index = departuresIndex[stopIndex];
                 int tripIndex = TripTimes.binarySearchDepartures(index, stopIndex, afterTime); 
                 //these appear to actually be hop indexes, which is what the binary search accepts
@@ -537,24 +545,42 @@ public class TableTripPattern implements TripPattern, Serializable {
             return new DeparturesIterator(stopIndex);
         }
 
+        /** @return the index of TripTimes for this Trip(Id) in this particular Timetable */
+        private int getTripIndex(AgencyAndId tripId) {
+            int ret = 0;
+            for (TripTimes tt : tripTimes) {
+                if (tt.trip.getId().equals(tripId)) // replace with indexing in stoptime updater?
+                    return ret;
+                ret += 1;
+            }
+            return -1;
+        }
+        
+        /** not private because it's used when traversing interline dwells, which refer to order
+         * in the scheduled trip pattern. */
         public TripTimes getTripTimes(int tripIndex) {
             return tripTimes.get(tripIndex);
         }
 
-        public void update(UpdateList ul) {
+        public boolean update(UpdateList ul) {
+            /* though all timetables have the same trip ordering, some may have extra trips due to 
+             * the dynamic addition of unscheduled trips */
             int tripIndex = getTripIndex(ul.tripId);
             if (tripIndex == -1) {
-                LOG.debug("tripId {} not found", ul.tripId);
-                return;
+                LOG.trace("tripId {} not found", ul.tripId);
+                return false;
+            } else {
+                LOG.trace("tripId {} found at index {}", ul.tripId, tripIndex);
             }
             int stopIndex = ul.findUpdateStopIndex(TableTripPattern.this);
             if (stopIndex == -1) {
-                LOG.debug("update block did not match stopIds");
-                return;
+                LOG.trace("update block did not match stopIds");
+                return false;
             }
             TripTimes oldTimes = getTripTimes(tripIndex);
             TripTimes newTimes = oldTimes.updatedClone(ul, stopIndex);
             this.tripTimes.set(tripIndex, newTimes);
+            return true;
         }
         
         public void addTrip(Trip trip, List<StopTime> stopTimes) {

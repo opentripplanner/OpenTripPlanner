@@ -10,6 +10,9 @@ import javax.xml.bind.annotation.XmlElement;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Holds the arrival / departure times for a single trip in an ArrayTripPattern Also gets carried
@@ -22,6 +25,8 @@ import org.opentripplanner.common.MavenVersion;
  * at the cost of an extra entry. This seems more coherent to me (AMB) but would probably break things elsewhere.
  */
 public class TripTimes implements Cloneable, Serializable {
+
+    private static final Logger LOG = LoggerFactory.getLogger(TripTimes.class);
 
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
     public static final int PASSED = -1;
@@ -66,6 +71,17 @@ public class TripTimes implements Cloneable, Serializable {
         return arrivalTimes[hop];
     }
 
+    /**
+     * The arrivals array may not be present, and the departures array may have grown by 1 due to
+     * compaction, so we can't directly use array lengths as an indicator of number of hops. 
+     */
+    public int getNumHops() {
+        if (arrivalTimes == null)
+            return departureTimes.length - 1;
+        else
+            return arrivalTimes.length;
+    }
+
     public int getRunningTime(int hop) {
         return getArrivalTime(hop) - getDepartureTime(hop);
     }
@@ -88,10 +104,13 @@ public class TripTimes implements Cloneable, Serializable {
     public boolean compact() {
         if (arrivalTimes == null)
             return false;
+        // always use arrivalTimes to determine number of hops because departureTimes may grow by 1
+        // due to successive compact/decompact operations
         int nHops = arrivalTimes.length;
         // dwell time is undefined for hop 0, because there is no arrival for hop -1
         for (int hop = 1; hop < nHops; hop++) {
             if (this.getDwellTime(hop) != 0) {
+                LOG.trace("compact failed: nonzero dwell time before hop {}", hop);
                 return false;
             }
         }
@@ -101,31 +120,54 @@ public class TripTimes implements Cloneable, Serializable {
         arrivalTimes = null;
         return true;
     }
+    
+    public boolean decompact() {
+        if (arrivalTimes != null)
+            return false;
+        int nHops = departureTimes.length;
+        if (nHops < 1)
+            throw new RuntimeException("improper array length in TripTimes");
+        arrivalTimes = Arrays.copyOfRange(departureTimes, 1, nHops);
+        return true;
+    }
 
     public String dumpTimes() {
         StringBuilder sb = new StringBuilder();
-        for (int hop=0; hop<departureTimes.length; hop++) {
-            sb.append(departureTimes[hop]); 
-            sb.append('_');
-            sb.append(arrivalTimes[hop]);
+        int nHops = getNumHops();
+        sb.append(arrivalTimes == null ? "C " : "U ");
+        for (int hop=0; hop < nHops; hop++) {
+            sb.append(hop); 
+            sb.append(':');
+            sb.append(getDepartureTime(hop)); 
+            sb.append('-');
+            sb.append(getArrivalTime(hop));
             sb.append(' ');
         }
         return sb.toString();
     }
     
     public TripTimes updatedClone(UpdateList ul, int startIndex) {
+        LOG.trace(this.dumpTimes());
         TripTimes ret = (TripTimes) this.clone();
+        // there is certainly a more efficient way than repeatedly decompacting and recompacting
+        // but at least it's clear
+        ret.decompact();
         for (int i = 0; i < ul.updates.size(); i++) {
-            int targetIndex = startIndex + i;
+            int stopIndex = startIndex + i; // stop as in transit stop (not 'end', not 'hop')
             Update u = ul.updates.get(i);
-            ret.departureTimes[targetIndex] = u.depart;
-            // hops not stops... arrival time is for the previous hop 
-            // and if arv / dep have been merged?
-            if (targetIndex >= 1)
-                ret.arrivalTimes[targetIndex-1] = u.arrive; 
+            if (stopIndex < ret.departureTimes.length) {
+                // updates may contain a departure time of 0 for the final stop 
+                // but a valid arrival time at that same stop. avoid index out of bounds.
+                ret.departureTimes[stopIndex] = u.depart;
+            }
+            if (stopIndex >= 1 && stopIndex <= ret.arrivalTimes.length)  {
+                // first hop is defined by departure from first stop and arrival at second stop.
+                ret.arrivalTimes[stopIndex - 1] = u.arrive; 
+            }
         }
-        System.out.println(this.dumpTimes());
-        System.out.println(ret.dumpTimes());
+        LOG.trace(ret.dumpTimes());
+        ret.compact();
+        LOG.trace(ret.dumpTimes());
         return ret;
     }
     
@@ -134,7 +176,10 @@ public class TripTimes implements Cloneable, Serializable {
         TripTimes ret = null; 
         try {
             ret = (TripTimes) super.clone();
-            ret.arrivalTimes = this.arrivalTimes.clone();
+            if (arrivalTimes == null) // dwell times are all zero
+                ret.arrivalTimes = null;
+            else
+                ret.arrivalTimes = this.arrivalTimes.clone();
             ret.departureTimes = this.departureTimes.clone();
         } catch (CloneNotSupportedException e) {
             // will not happen
