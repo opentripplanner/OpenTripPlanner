@@ -34,5 +34,5 @@ public abstract class EdgeWithElevation extends Edge {
     public abstract boolean 
         setElevationProfile(PackedCoordinateSequence elevPCS, boolean computed);
     public abstract ElevationProfileSegment getElevationProfileSegment();
-    abstract boolean isElevationFlattened();
+    public abstract boolean isElevationFlattened();
 }
