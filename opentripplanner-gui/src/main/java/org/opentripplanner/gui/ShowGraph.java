@@ -30,15 +30,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 
-import org.opentripplanner.common.IterableLibrary;
-import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.routing.vertextype.TurnVertex;
-import org.opentripplanner.routing.edgetype.DelegatingEdgeNarrative;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
@@ -46,7 +42,6 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.PatternEdge;
 import org.opentripplanner.routing.edgetype.TurnEdge;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 

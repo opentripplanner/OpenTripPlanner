@@ -209,11 +209,6 @@ class MockTransfer extends Edge {
     }
 
     @Override
-    public TraverseMode getMode() {
-        return null;
-    }
-
-    @Override
     public String getName() {
         return null;
     }

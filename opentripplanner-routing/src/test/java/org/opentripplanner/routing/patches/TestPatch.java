@@ -202,17 +202,20 @@ public class TestPatch extends TestCase {
         Vertex stop_e = graph.getVertex("agency_E_arrive");
 
         ShortestPathTree spt;
-        GraphPath path;
+        GraphPath path, unoptimizedPath;
 
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0); 
         options.setRoutingContext(graph, stop_a, stop_e);
         spt = aStar.getShortestPathTree(options);
 
         path = spt.getPath(stop_e, true);
+        unoptimizedPath = spt.getPath(stop_e, false);
         assertNotNull(path);
         HashSet<Alert> expectedNotes = new HashSet<Alert>();
         expectedNotes.add(note1);
-        assertEquals(expectedNotes, path.states.get(1).getBackEdgeNarrative().getNotes());
+        assertEquals(expectedNotes, path.states.get(1).getBackAlerts());
+        assertEquals(expectedNotes, unoptimizedPath.states.get(1).getBackAlerts());
+
     }
 
     public void testTimeRanges() {
@@ -241,7 +244,7 @@ public class TestPatch extends TestCase {
         path = spt.getPath(stop_e, true);
         assertNotNull(path);
         // expect no notes because we are during the break
-        assertNull(path.states.get(1).getBackEdgeNarrative().getNotes());
+        assertNull(path.states.get(1).getBackAlerts());
 
         // now a trip during the second period
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 8, 0, 0);
@@ -252,7 +255,7 @@ public class TestPatch extends TestCase {
         assertNotNull(path);
         HashSet<Alert> expectedNotes = new HashSet<Alert>();
         expectedNotes.add(note1);
-        assertEquals(expectedNotes, path.states.get(1).getBackEdgeNarrative().getNotes());
+        assertEquals(expectedNotes, path.states.get(1).getBackAlerts());
     }
 
     public void testRouteNotePatch() {
@@ -280,6 +283,6 @@ public class TestPatch extends TestCase {
         assertNotNull(path);
         HashSet<Alert> expectedNotes = new HashSet<Alert>();
         expectedNotes.add(note1);
-        assertEquals(expectedNotes, path.states.get(2).getBackEdgeNarrative().getNotes());
+        assertEquals(expectedNotes, path.states.get(2).getBackAlerts());
     }
 }

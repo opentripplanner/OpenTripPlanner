@@ -198,6 +198,7 @@ public class TurnEdge extends StreetEdge {
         if (s1.weHaveWalkedTooFar(options))
             return null;
 
+        s1.addAlerts(((TurnVertex) fromv).getNotes());
         return s1.makeState();
     }
 
@@ -276,11 +277,6 @@ public class TurnEdge extends StreetEdge {
         } else {
             patches.remove(patch);
         }
-    }
-
-    @Override
-    public Set<Alert> getNotes() {
-        return ((TurnVertex) fromv).getNotes();
     }
 
     public void setRestrictedModes(Set<TraverseMode> modes) {

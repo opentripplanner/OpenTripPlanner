@@ -484,8 +484,8 @@ public class TestContractionHeirarchies extends TestCase {
         for (State state : path.states) {
         	if (state.getBackEdge() == null) 
         		continue;
-        	System.out.println(state.getBackEdgeNarrative().getMode());
-            if (TraverseMode.SUBWAY.equals(state.getBackEdgeNarrative().getMode())) {
+        	System.out.println(state.getBackMode());
+            if (TraverseMode.SUBWAY.equals(state.getBackMode())) {
                 subway1 = true;
                 break;
             }
@@ -522,7 +522,7 @@ public class TestContractionHeirarchies extends TestCase {
         for (State state : pathWithSubways.states) {
         	if (state.getBackEdge() == null) 
         		continue;
-            if (TraverseMode.SUBWAY.equals(state.getBackEdgeNarrative().getMode())) {
+            if (TraverseMode.SUBWAY.equals(state.getBackMode())) {
                 subway = true;
                 break;
             }
@@ -538,7 +538,7 @@ public class TestContractionHeirarchies extends TestCase {
         for (State state : pathWithSubways.states) {
         	if (state.getBackEdge() == null) 
         		continue;
-            if (TraverseMode.SUBWAY.equals(state.getBackEdgeNarrative().getMode())) {
+            if (TraverseMode.SUBWAY.equals(state.getBackMode())) {
                 subway = true;
                 break;
             }

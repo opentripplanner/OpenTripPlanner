@@ -125,9 +125,7 @@ public abstract class Edge implements Serializable {
         return null;
     }
 
-    public Set<Alert> getNotes() {
-    	return null;
-    }
+    // Notes are now handled by State
     
     @Override
     public int hashCode() {

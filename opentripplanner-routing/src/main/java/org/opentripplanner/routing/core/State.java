@@ -15,6 +15,7 @@ package org.opentripplanner.routing.core;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,6 +31,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.routing.patch.Alert;
 
 public class State implements Cloneable {
     /* Data which is likely to change at most traversals */
@@ -325,6 +327,10 @@ public class State implements Cloneable {
     public TraverseMode getBackMode () {
         return stateData.backMode;
     }
+    
+    public Set<Alert> getBackAlerts () {
+        return stateData.notes;
+    }
 
     public Edge getBackEdge() {
         return this.backEdge;
@@ -594,7 +600,10 @@ public class State implements Cloneable {
                 editor.incrementTimeInSeconds(orig.getAbsTimeDeltaSec());
                 editor.incrementWeight(orig.getWeightDelta());
                 editor.incrementWalkDistance(orig.getWalkDistanceDelta());
+                
+                // propagate the modes and alerts through to the reversed edge
                 editor.setBackMode(orig.getBackMode());
+                editor.addAlerts(orig.getBackAlerts());
 
                 if (orig.isBikeRenting() != orig.getBackState().isBikeRenting())
                     editor.setBikeRenting(!orig.isBikeRenting());

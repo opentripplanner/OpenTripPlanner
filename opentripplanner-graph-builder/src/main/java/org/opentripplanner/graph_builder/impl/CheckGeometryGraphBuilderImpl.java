@@ -23,11 +23,11 @@ import java.util.List;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
-import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
 import org.opentripplanner.routing.edgetype.HopEdge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,13 +61,14 @@ public class CheckGeometryGraphBuilderImpl implements GraphBuilder {
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
+        // TODO: This was filtered to EdgeNarratives before EdgeNarrative removal
         for (Vertex gv : graph.getVertices()) {
             if (Double.isNaN(gv.getCoordinate().x) || Double.isNaN(gv.getCoordinate().y)) {
                 _log.warn("Vertex " + gv + " has NaN location; this will cause doom.");
                 _log.warn(GraphBuilderAnnotation.register(graph, Variety.BOGUS_VERTEX_GEOMETRY, gv));
             }
             
-            for (EdgeNarrative e : filter(gv.getOutgoing(),EdgeNarrative.class)) {
+            for (Edge e : gv.getOutgoing()) {
                 Geometry g = e.getGeometry();
                 if (g == null) {
                     continue;

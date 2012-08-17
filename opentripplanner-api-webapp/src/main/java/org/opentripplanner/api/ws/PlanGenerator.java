@@ -175,7 +175,7 @@ public class PlanGenerator {
         TransitIndexService transitIndex = graph.getService(TransitIndexService.class);
 
         Itinerary itinerary = makeEmptyItinerary(path);
-        Edge postponedAlerts = null;
+        Set<Alert> postponedAlerts = null;
         Leg leg = null;
         CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
         double previousElevation = Double.MAX_VALUE;
@@ -207,10 +207,10 @@ public class PlanGenerator {
             if (backEdge instanceof FreeEdge) {
                 if (backEdge instanceof PreBoardEdge) {
                     // Add boarding alerts to the next leg
-                    postponedAlerts = backEdge;
+                    postponedAlerts = state.getBackAlerts();
                 } else if (backEdge instanceof PreAlightEdge) {
                     // Add alighting alerts to the previous leg
-                    addNotesToLeg(itinerary.legs.get(itinerary.legs.size() - 1), backEdge);
+                    addNotesToLeg(itinerary.legs.get(itinerary.legs.size() - 1), state.getBackAlerts());
                 }
                 continue;
             }
@@ -407,7 +407,7 @@ public class PlanGenerator {
                     postponedAlerts = null;
                 }
 
-                addNotesToLeg(leg, backEdge);
+                addNotesToLeg(leg, state.getBackAlerts());
 
             }
 
@@ -467,8 +467,7 @@ public class PlanGenerator {
         coordinates.clear();
     }
 
-    private Set<Alert> addNotesToLeg(Leg leg, Edge backEdge) {
-        Set<Alert> notes = backEdge.getNotes();
+    private Set<Alert> addNotesToLeg(Leg leg, Set<Alert> notes) {
         if (notes != null) {
             for (Alert note : notes) {
                 leg.addAlert(note);
@@ -803,7 +802,7 @@ public class PlanGenerator {
 
             // increment the total length for this step
             step.distance += edge.getDistance();
-            step.addAlerts(edge.getNotes());
+            step.addAlerts(currState.getBackAlerts());
             lastAngle = DirectionUtils.getLastAngle(geom);
         }
         return steps;
@@ -830,7 +829,7 @@ public class PlanGenerator {
         step.lat = en.getFromVertex().getY();
         step.elevation = encodeElevationProfile(s.getBackEdge(), 0);
         step.bogusName = en.hasBogusName();
-        step.addAlerts(en.getNotes());
+        step.addAlerts(s.getBackAlerts());
         return step;
     }
 

@@ -266,11 +266,6 @@ public class AStarTest {
         }
 
         @Override
-        public TraverseMode getMode() {
-            return null;
-        }
-
-        @Override
         public String getName() {
             return null;
         }

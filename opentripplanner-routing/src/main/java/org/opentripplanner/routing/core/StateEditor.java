@@ -205,10 +205,24 @@ public class StateEditor {
      * Add an alert to this state. This used to use an EdgeNarrative
      */
     public void addAlert(Alert notes) {
+        if (notes == null)
+            return;
+        
         if (this.notes == null)
             this.notes = new HashSet<Alert>();
         
         this.notes.add(notes);
+    }
+    
+    /**
+     * Convenience function to add multiple alerts
+     */
+    public void addAlerts(Iterable<Alert> alerts) {
+        if (alerts == null)
+            return;
+        for (Alert alert : alerts) {
+            this.addAlert(alert);
+        }
     }
 
     /* Incrementors */
@@ -278,7 +292,7 @@ public class StateEditor {
     }
     
     public void setBackMode (TraverseMode mode) {
-        if (mode == child.stateData.backMode)
+        if (mode.equals(child.stateData.backMode))
             return;
         
         cloneStateDataAsNeeded();
@@ -540,11 +554,5 @@ public class StateEditor {
     public void setBikeRentalNetwork(String network) {
         cloneStateDataAsNeeded();
         child.stateData.bikeRentalNetwork = network;
-    }
-
-    public void addAlerts(Set<Alert> notes) {
-        for (Alert note : notes) {
-            addAlert(note);
-        }        
     }
 }
