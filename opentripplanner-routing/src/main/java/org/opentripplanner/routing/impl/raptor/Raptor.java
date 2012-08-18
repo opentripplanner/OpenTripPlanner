@@ -86,7 +86,7 @@ public class Raptor implements PathService {
         options.setBoardSlack(120);
         options.setTransferSlack(240);
          */
-        
+
         RoutingRequest walkOptions = options.clone();
         walkOptions.rctx.pathParsers = new PathParser[0];
         TraverseModeSet modes = options.getModes().clone();
@@ -112,7 +112,7 @@ public class Raptor implements PathService {
         }
 
         routeSet.maxTimeDayIndex = day; 
-        
+
         options.setMaxTransfers(options.maxTransfers + 2);
         
         for (int i = 0; i < options.getMaxTransfers() + 2; ++i) {
@@ -358,7 +358,7 @@ public class Raptor implements PathService {
                     }
 
                     for (RaptorState oldState : newStates) {
-                        if (oldState != newState && eDominates(oldState, newState)) {
+                        if (eDominates(oldState, newState)) {
                             continue CONTINUE;
                         }
                     }
@@ -406,6 +406,8 @@ public class Raptor implements PathService {
 
                     if (stop.stopVertex.isLocal() && nBoardings > 1) {
                         // cannot transfer at a local stop
+                        createdStates.addAll(newStates);
+                        states.addAll(newStates);
                         continue;
                     }
 
@@ -440,11 +442,15 @@ public class Raptor implements PathService {
                             }
                         }
 
+                        //this is unsafe because previous states have 
+                        //only alighted here
+                        /*
                         for (RaptorState state : states) {
                             if (state != oldState && eDominates(state, boardState)) {
                                 continue TRYBOARD;
                             }
                         }
+                        */
                         boardStates.add(boardState);
                     }
                 }
@@ -501,6 +507,7 @@ public class Raptor implements PathService {
                 minTimes.add(regionData.minTime[destinationRegion]);
             }
 */
+
             STARTWALK: for (RaptorState state : createdStates) {
                 if (false) {
                     double maxWalk = options.getMaxWalkDistance() - state.walkDistance
@@ -546,15 +553,15 @@ public class Raptor implements PathService {
 
                 if (targetDistance + state.walkDistance > options.getMaxWalkDistance()) {
                     // can't walk to destination, so we can't alight at a local vertex
-                    /*if (state.stop.stopVertex.isLocal())  -HERE
-                        continue; */
+                    if (state.stop.stopVertex.isLocal())
+                        continue;
                     //and must account for another boarding
                     minTime += boardSlack;
                 }
 
                 //this checks the precomputed table of walk distances by regions to see 
-                //to get a tigther bound on the best posible walk distance to the destination
-                //it (a) causes weird intermitten planner failures, (b) does not make 
+                //to get a tighter bound on the best posible walk distance to the destination
+                //it (a) causes weird intermittent planner failures, (b) does not make 
                 //much of a difference
                 
                 /*
@@ -705,7 +712,7 @@ public class Raptor implements PathService {
                 if (maxTimeForVertex < cur.maxTime) {
                     cur.maxTime = maxTimeForVertex;
                 } else {
-                    if ((state.getTime()  - options.dateTime)+ minTime > cur.maxTime * 1.5) {
+                    if ((state.getTime() - options.dateTime) + minTime > cur.maxTime * 1.5) {
                         continue;
                     }
                 }
@@ -757,11 +764,6 @@ public class Raptor implements PathService {
             cur.visitedEver.add(stop);
             states.add(newState);
 
-        }
-
-        // fill in
-        for (int stop = 0; stop < statesByStop.length; ++stop) {
-            cur.setStates(stop, statesByStop[stop]);
         }
     }
 
