@@ -9,7 +9,7 @@
     <parent>
         <artifactId>opentripplanner</artifactId>
         <groupId>org.opentripplanner</groupId>
-        <version>0.7.10-SNAPSHOT</version>
+        <version>0.7.13-SNAPSHOT</version>
     </parent>
 
 	<dependencies>
@@ -65,9 +65,8 @@
           <artifactId>lombok</artifactId>
         </dependency>
         <dependency>
-			<groupId>net.sf.opencsv</groupId>
-			<artifactId>opencsv</artifactId>
-			<version>2.0</version>
+    		<groupId>net.sourceforge.javacsv</groupId>
+    		<artifactId>javacsv</artifactId>
 		</dependency>
     </dependencies>
 

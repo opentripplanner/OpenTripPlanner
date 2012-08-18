@@ -35,7 +35,8 @@ public class WebMapService extends RoutingResource {
     @InjectParam
     private Renderer renderer;
     
-    @GET @Produces("image/*, text/*")
+    // use of string array in annotation dodges bug in Enunciate, which will be fixed in v1.26
+    @GET @Produces( {"image/*", "text/*"} )
     public Response wmsGet(
            // Mandatory parameters
            @QueryParam("version") @DefaultValue("1.1.1")         WMSVersion version,
