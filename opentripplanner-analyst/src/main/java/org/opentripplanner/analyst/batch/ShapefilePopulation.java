@@ -62,26 +62,29 @@ public class ShapefilePopulation extends BasicPopulation {
                 } else if (geom instanceof MultiPolygon) {
                     point = ((MultiPolygon) geom).getCentroid();
                 } else {
-                    throw new IllegalStateException("Shapefile must contain either points or polygons.");
+                    throw new RuntimeException("Shapefile must contain either points or polygons.");
                 }
-                String id;
+                String label;
                 if (labelAttribute == null) {
-                    id = Integer.toString(i);
+                    label = Integer.toString(i);
                 } else {
-                    id = feature.getAttribute(labelAttribute).toString();
+                    label = feature.getAttribute(labelAttribute).toString();
                 }
-                double data = (Double) feature.getAttribute(inputAttribute);
-
-                Individual individual = individualFactory.build(id, point.getX(), point.getY(), data);
+                double input = 0.0;
+                if (inputAttribute != null) {
+                    input = (Double) feature.getAttribute(inputAttribute);
+                }
+                Individual individual = individualFactory.build(label, point.getX(), point.getY(), input);
                 this.addIndividual(individual);
                 i += 1;
                 if (individual.sample != null)
                     nonNull += 1;
             }
-            LOG.debug("found vertices for {} features out of {}", nonNull, i);
+            LOG.debug("created samples for {} features out of {}", nonNull, i);
             it.close();
         } catch (Exception ex) {
-            throw new IllegalStateException("Error loading population from shapefile ", ex);
+            LOG.error("Error loading population from shapefile: {}", ex.getMessage());
+            throw new RuntimeException(ex);
         }
         LOG.debug("Done loading shapefile.");
     }

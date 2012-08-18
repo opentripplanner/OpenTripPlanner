@@ -1,14 +1,13 @@
 package org.opentripplanner.analyst.batch;
 
-import java.io.FileReader;
-import javax.annotation.PostConstruct;
+import java.nio.charset.Charset;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import lombok.Setter;
+import com.csvreader.CsvReader;
 
-import au.com.bytecode.opencsv.CSVReader;
+import lombok.Setter;
 
 public class CSVPopulation extends BasicPopulation {
 
@@ -27,24 +26,23 @@ public class CSVPopulation extends BasicPopulation {
     public int inputCol = 3;
 
     @Setter
-    public boolean headers = true;
+    public boolean skipHeaders = true;
 
     @Override
     public void createIndividuals() {
         try {
-            CSVReader reader = new CSVReader(new FileReader(sourceFilename));
-            String[] nextLine;
-            if (headers) {
-                reader.readNext();
+            CsvReader reader = new CsvReader(sourceFilename, ',', Charset.forName("UTF8"));
+            if (skipHeaders) {
+                reader.readHeaders();
             }
-            while ((nextLine = reader.readNext()) != null) {
-                double lat = Double.parseDouble(nextLine[latCol]);
-                double lon = Double.parseDouble(nextLine[lonCol]);
-                String label = nextLine[labelCol];
-                Double input = Double.parseDouble(nextLine[inputCol]);
+            while (reader.readRecord()) {
+                double lat = Double.parseDouble(reader.get(latCol));
+                double lon = Double.parseDouble(reader.get(lonCol));
+                String label = reader.get(labelCol);
+                Double input = Double.parseDouble(reader.get(inputCol));
                 Individual individual = individualFactory.build(label, lon, lat, input);
                 this.addIndividual(individual);
-                // LOG.debug(individual.toString());
+                //LOG.debug(individual.toString());
             }
             reader.close();
         } catch (Exception e) {
