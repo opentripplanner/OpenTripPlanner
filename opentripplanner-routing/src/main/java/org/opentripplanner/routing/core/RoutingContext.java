@@ -113,7 +113,9 @@ public class RoutingContext implements Cloneable {
         target = opt.arriveBy ? fromVertex : toVertex;
         calendarService = graph.getCalendarService();
         transferTable = graph.getTransferTable();
-        timetableSnapshot = null;
+        // the graph's snapshot may be frequently updated. 
+        // Grab a reference to ensure a coherent view of the timetables throughout this search.
+        timetableSnapshot = graph.timetableSnapshot; 
         setServiceDays();
         if (opt.batch)
             remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
