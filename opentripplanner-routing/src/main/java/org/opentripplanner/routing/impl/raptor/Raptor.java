@@ -700,9 +700,9 @@ public class Raptor implements PathService {
 
             if (cur.maxTimeDayIndex > 0 && remainingWalk < 3218) { 
                 int maxTimeForVertex = 0;
+                int region = vertex.getGroupIndex();
                 for (StopNearTarget stopNearTarget : cur.stopsNearTarget.values()) {
                     int destinationRegion = stopNearTarget.stop.stopVertex.getGroupIndex();
-                    int region = vertex.getGroupIndex();
                     final int maxTimeFromThisRegion = data.maxTransitRegions.maxTransit[cur.maxTimeDayIndex][destinationRegion][region];
                     int maxTime = (int) ((state.getTime() - options.dateTime) + maxTimeFromThisRegion + stopNearTarget.time);
                     if (maxTime > maxTimeForVertex) {

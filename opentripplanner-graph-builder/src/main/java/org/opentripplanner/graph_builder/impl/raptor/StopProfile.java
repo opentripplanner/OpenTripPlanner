@@ -1,6 +1,5 @@
 package org.opentripplanner.graph_builder.impl.raptor;
 
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -408,6 +407,7 @@ public class StopProfile {
             if (costs.time >= endTime)
                 break;
 
+            //we want the best duration among codominant states
             int bestDuration = Integer.MAX_VALUE;
             for (TimeAndDistance departure : costs.costs) {
                 final int time = departure.duration + costs.time - lastTime;
@@ -415,6 +415,7 @@ public class StopProfile {
                     bestDuration = time;
                 }
             }
+            //but the worst duration over the course of the day
             if (bestDuration > worstDuration) {
                 worstDuration = bestDuration;
             }
