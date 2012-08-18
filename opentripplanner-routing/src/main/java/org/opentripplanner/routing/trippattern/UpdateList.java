@@ -30,6 +30,10 @@ public class UpdateList {
         updates = new ArrayList<Update>();
     }
     
+    /**
+     * An update list can contain updates for several trips. This method will split it into a list
+     * of updates, with each update referencing a single trips.
+     */
     public List<UpdateList> splitByTrip() {
         List<UpdateList> ret = new LinkedList<UpdateList>();
         // Update comparator sorts on tripId
@@ -58,9 +62,13 @@ public class UpdateList {
         return sb.toString();
     }
 
-    /** Check that this UpdateList is internally coherent. */
+    /** 
+     * Check that this UpdateList is internally coherent, meaning that:
+     * 1. all Updates' trip_ids are the same, and match the UpdateList's trip_id
+     * 2. stop sequence numbers are sequential and increasing
+     * 3. all dwell times and run times are positive
+     */
     public boolean isSane() {
-        // check that all Updates' trip_ids are the same, and match the UpdateList's trip_id
         for (Update u : updates)
             if (u == null || ! u.tripId.equals(this.tripId))
                return false;

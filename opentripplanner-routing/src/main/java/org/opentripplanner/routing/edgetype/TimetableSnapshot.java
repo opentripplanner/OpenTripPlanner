@@ -60,6 +60,10 @@ public class TimetableSnapshot {
     }
     
     public void commit() {
+        /* This produces a small delay of typically around 50ms, which is almost entirely due to
+         * the indexing step. Cloning the map is much faster (2ms). 
+         * It is perhaps better to index timetables as they are changed to avoid experiencing all 
+         * this lag at once. The indexing could be made much more efficient as well. */
         // summarize, index, etc. the new timetables
         for (Timetable tt : dirty)
             tt.finish();
@@ -77,6 +81,10 @@ public class TimetableSnapshot {
         TimetableSnapshot ret = new TimetableSnapshot();
         ret.timetables = (HashMap<TableTripPattern, Timetable>) this.timetables.clone();
         return ret;
+    }
+
+    public boolean isDirty() {
+        return dirty.size() > 0;
     }
     
 }
