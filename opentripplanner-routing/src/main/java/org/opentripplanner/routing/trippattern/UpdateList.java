@@ -32,6 +32,7 @@ public class UpdateList {
     
     public List<UpdateList> splitByTrip() {
         List<UpdateList> ret = new LinkedList<UpdateList>();
+        // Update comparator sorts on tripId
         Collections.sort(updates);
         UpdateList ul = null;
         for (Update u : updates) {
