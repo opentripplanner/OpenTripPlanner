@@ -78,10 +78,10 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer {
             for (int n; (n = messageStream.read(b)) != -1;) {
                 buffer.write(b, 0, n);
             }            
-            if (++count % 1 == 0) {
-                LOG.debug("received CTX message #{}: {}", count, msg);
-            }
             ret = parseCTX(buffer.toString());
+            if (++count % 1 == 0) {
+                LOG.debug("decoded gzipped CTX message #{}: {}", count, msg);
+            }
         } catch (Exception e) {
             LOG.error("exception while decoding (unzipping) incoming CTX message: {}", e.getMessage()); 
         } finally {
