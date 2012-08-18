@@ -14,8 +14,10 @@
 package org.opentripplanner.routing.impl.raptor;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -92,6 +94,25 @@ public class Raptor implements PathService {
         walkOptions.setModes(modes);
         RaptorPathSet routeSet = new RaptorPathSet(data.stops.length, options);
 
+        Calendar tripDate = Calendar.getInstance(graph.getTimeZone());
+        tripDate.setTime(new Date(1000L*options.dateTime));
+        
+        Calendar maxTransitStart = Calendar.getInstance(graph.getTimeZone());
+        maxTransitStart.set(Calendar.YEAR, data.maxTransitRegions.startYear);
+        maxTransitStart.set(Calendar.MONTH, data.maxTransitRegions.startMonth);
+        maxTransitStart.set(Calendar.DAY_OF_MONTH, data.maxTransitRegions.startDay);
+        
+        int day = 0;
+        while (tripDate.after(maxTransitStart)) {
+            day++;
+            tripDate.add(Calendar.DAY_OF_MONTH, -1);
+        }
+        if (day > data.maxTransitRegions.maxTransit.length || options.isWheelchairAccessible()) {
+            day = -1;
+        }
+
+        routeSet.maxTimeDayIndex = day; 
+        
         options.setMaxTransfers(options.maxTransfers + 2);
         
         for (int i = 0; i < options.getMaxTransfers() + 2; ++i) {
@@ -447,7 +468,7 @@ public class Raptor implements PathService {
             // also, compute an initial spt from the target so that we can find out what transit
             // stops are nearby and what
             // the time is to them, so that we can start target bounding earlier
-/*
+
             RoutingRequest reversedWalkOptions = walkOptions.clone();
             reversedWalkOptions.setArriveBy(true);
             GenericDijkstra destDijkstra = new GenericDijkstra(reversedWalkOptions);
@@ -467,7 +488,6 @@ public class Raptor implements PathService {
 
                 cur.addStopNearTarget(stop, state.getWalkDistance(), (int) state.getElapsedTime());
             }
-            */
         } else {
 
             final List<MaxWalkState> startPoints = new ArrayList<MaxWalkState>();
@@ -526,8 +546,8 @@ public class Raptor implements PathService {
 
                 if (targetDistance + state.walkDistance > options.getMaxWalkDistance()) {
                     // can't walk to destination, so we can't alight at a local vertex
-                    if (state.stop.stopVertex.isLocal())
-                        continue;
+                    /*if (state.stop.stopVertex.isLocal())  -HERE
+                        continue; */
                     //and must account for another boarding
                     minTime += boardSlack;
                 }
@@ -661,6 +681,36 @@ public class Raptor implements PathService {
                 continue;
             }
 
+            double minWalk = distanceToNearestTransitStop;
+
+            double targetDistance = distanceLibrary.fastDistance(
+                    options.rctx.target.getCoordinate(), vertex.getCoordinate());
+            double minTime = (targetDistance - minWalk) / MAX_TRANSIT_SPEED + minWalk
+                    / options.getSpeedUpperBound();
+            final double remainingWalk = options.maxWalkDistance - state.getWalkDistance();
+            if (targetDistance > remainingWalk)
+                minTime += boardSlack;
+
+            if (cur.maxTimeDayIndex > 0 && remainingWalk < 3218) { 
+                int maxTimeForVertex = 0;
+                for (StopNearTarget stopNearTarget : cur.stopsNearTarget.values()) {
+                    int destinationRegion = stopNearTarget.stop.stopVertex.getGroupIndex();
+                    int region = vertex.getGroupIndex();
+                    final int maxTimeFromThisRegion = data.maxTransitRegions.maxTransit[cur.maxTimeDayIndex][destinationRegion][region];
+                    int maxTime = (int) ((state.getTime() - options.dateTime) + maxTimeFromThisRegion + stopNearTarget.time);
+                    if (maxTime > maxTimeForVertex) {
+                        maxTimeForVertex = maxTime;
+                    }
+                }
+                if (maxTimeForVertex < cur.maxTime) {
+                    cur.maxTime = maxTimeForVertex;
+                } else {
+                    if ((state.getTime()  - options.dateTime)+ minTime > cur.maxTime * 1.5) {
+                        continue;
+                    }
+                }
+            }
+
             List<RaptorState> states = statesByStop[stop.index];
             if (states == null) {
                 states = new ArrayList<RaptorState>();
@@ -687,14 +737,6 @@ public class Raptor implements PathService {
             //the following does not actually speed things up, probably 
             //because we're going to recheck it next round with more info  
 /*
-            double minWalk = distanceToNearestTransitStop;
-
-            double targetDistance = distanceLibrary.fastDistance(
-                    options.rctx.target.getCoordinate(), vertex.getCoordinate());
-            double minTime = (targetDistance - minWalk) / MAX_TRANSIT_SPEED + minWalk
-                    / options.getSpeedUpperBound();
-            if (targetDistance > options.maxWalkDistance - state.getWalkDistance())
-                minTime += boardSlack;
 
             // target state bounding
             for (RaptorState oldState : cur.getTargetStates()) {

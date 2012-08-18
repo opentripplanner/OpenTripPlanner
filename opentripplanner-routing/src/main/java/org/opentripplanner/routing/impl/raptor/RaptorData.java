@@ -25,4 +25,6 @@ public class RaptorData implements Serializable {
     //unused
     public List<T2<Double, RaptorStop>>[] nearbyStops;
 
+    public MaxTransitRegions maxTransitRegions;
+
 }

@@ -37,7 +37,9 @@ public class RaptorPathSet {
 
     public final TargetBound bounder;
     public boolean stalling = false;
-    public int highWater;
+    
+    public int maxTime = Integer.MAX_VALUE;
+    public int maxTimeDayIndex; 
     
     @SuppressWarnings("unchecked")
     RaptorPathSet(int nStops, RoutingRequest options) {

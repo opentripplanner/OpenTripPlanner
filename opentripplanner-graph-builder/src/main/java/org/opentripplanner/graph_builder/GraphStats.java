@@ -17,8 +17,8 @@ import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
-import org.opentripplanner.routing.vertextype.TurnVertex;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
@@ -134,7 +134,7 @@ public class GraphStats {
                     n, radius, useStops ? "stops" : "streets");
             List<Vertex> vertices = new ArrayList<Vertex>();
             GeodeticCalculator gc = new GeodeticCalculator();
-            Class<?> klasse = useStops ? TransitStop.class : TurnVertex.class;
+            Class<?> klasse = useStops ? TransitStop.class : StreetVertex.class;
             for (Vertex v : graph.getVertices())
                 if (klasse.isInstance(v))
                     vertices.add(v);
@@ -147,8 +147,8 @@ public class GraphStats {
             int i = 0;
             for (Vertex v : vertices) {
                 Coordinate c;
-                if (v instanceof TurnVertex) {
-                    LineString ls = ((TurnVertex)v).geometry;
+                if (v instanceof StreetVertex) {
+                    LineString ls = ((StreetVertex)v).getOutgoing().iterator().next().getGeometry();
                     int numPoints = ls.getNumPoints();
                     LocationIndexedLine lil = new LocationIndexedLine(ls);
                     int seg = random.nextInt(numPoints);
