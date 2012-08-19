@@ -112,7 +112,7 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
                 LOG.debug("update block #{} :", uIndex);
                 LOG.trace("{}", updateBlock.toString());
                 updateBlock.filter(true, true, true);
-                if (! updateBlock.isSane()) {
+                if (! updateBlock.isCoherent()) {
                     LOG.debug("incoherent stoptime UpdateList");
                     continue; 
                 }

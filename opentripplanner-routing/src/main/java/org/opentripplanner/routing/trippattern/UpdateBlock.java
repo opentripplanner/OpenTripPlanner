@@ -104,7 +104,7 @@ public class UpdateBlock {
      * 2. stop sequence numbers are sequential and increasing
      * 3. all dwell times and run times are positive
      */
-    public boolean isSane() {
+    public boolean isCoherent() {
         //LOG.debug("{}", this.toString());
         for (Update u : updates)
             if (u == null || ! u.tripId.equals(this.tripId))
