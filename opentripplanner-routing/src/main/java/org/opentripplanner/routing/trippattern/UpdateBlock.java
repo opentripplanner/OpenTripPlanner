@@ -173,15 +173,18 @@ public class UpdateBlock {
             return pi;
         }
         LOG.debug("match failed");
-        for (int i = 0; i < patternStops.size(); i++) {
+        int nStops = patternStops.size();
+        int nHops = nStops - 1;
+        for (int i = 0; i < nStops; i++) {
             Stop s = patternStops.get(i);
             Update u = null; 
             if (i < updates.size())
                 u = updates.get(i);
             int ti = pattern.getTripIndex(this.tripId);
-            int schedArr = pattern.getArrivalTime(i, ti);
-            int schedDep = pattern.getDepartureTime(i, ti);
-            System.out.printf("Stop %02d %s %d %d >>> %s\n", i, s.getId().getId(), 
+            // argh stop-hop conversion
+            int schedArr = (i < 1) ? 0 : pattern.getArrivalTime(i-1, ti);
+            int schedDep = (i >= nHops) ? 0 : pattern.getDepartureTime(i, ti);
+            System.out.printf("Stop %02d %s A%d D%d >>> %s\n", i, s.getId().getId(), 
                     schedArr, schedDep, (u == null) ? "--" : u.toString());
         }
         return -1;
