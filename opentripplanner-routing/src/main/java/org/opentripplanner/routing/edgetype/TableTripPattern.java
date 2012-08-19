@@ -565,15 +565,16 @@ public class TableTripPattern implements TripPattern, Serializable {
         public boolean update(UpdateBlock ul) {
             /* though all timetables have the same trip ordering, some may have extra trips due to 
              * the dynamic addition of unscheduled trips */
-            int tripIndex = getTripIndex(ul.tripId);
+            // checking against *this* timetable, not scheduled one
+            int tripIndex = getTripIndex(ul.tripId); 
             if (tripIndex == -1) {
-                LOG.trace("tripId {} not found", ul.tripId);
+                LOG.debug("tripId {} not found", ul.tripId);
                 return false;
             } else {
-                LOG.trace("tripId {} found at index {}", ul.tripId, tripIndex);
+                LOG.debug("tripId {} found at index {}", ul.tripId, tripIndex);
             }
             int stopIndex = ul.findUpdateStopIndex(TableTripPattern.this);
-            if (stopIndex == -1) {
+            if (stopIndex == UpdateBlock.MATCH_FAILED) {
                 LOG.trace("update block did not match stopIds");
                 return false;
             }

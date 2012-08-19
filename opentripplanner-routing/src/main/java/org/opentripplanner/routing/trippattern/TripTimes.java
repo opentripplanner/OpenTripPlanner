@@ -146,15 +146,15 @@ public class TripTimes implements Cloneable, Serializable {
         return sb.toString();
     }
     
-    public TripTimes updatedClone(UpdateBlock ul, int startIndex) {
+    public TripTimes updatedClone(UpdateBlock block, int startIndex) {
         LOG.trace(this.dumpTimes());
         TripTimes ret = (TripTimes) this.clone();
         // there is certainly a more efficient way than repeatedly decompacting and recompacting
         // but at least it's clear
         ret.decompact();
-        for (int i = 0; i < ul.updates.size(); i++) {
+        for (int i = 0; i < block.updates.size(); i++) {
             int stopIndex = startIndex + i; // stop as in transit stop (not 'end', not 'hop')
-            Update u = ul.updates.get(i);
+            Update u = block.updates.get(i);
             if (stopIndex < ret.departureTimes.length) {
                 // updates may contain a departure time of 0 for the final stop 
                 // but a valid arrival time at that same stop. avoid index out of bounds.

@@ -21,7 +21,7 @@ public class UpdateBlock {
     
     private static final Logger LOG = LoggerFactory.getLogger(UpdateBlock.class);
 
-    private static final int MATCH_FAILED = -1;
+    public static final int MATCH_FAILED = -1;
 
     public final AgencyAndId tripId;
 
