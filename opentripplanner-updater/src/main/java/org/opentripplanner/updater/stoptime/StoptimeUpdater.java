@@ -108,6 +108,7 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
             LOG.debug("updates contains {} trip updates", lul.size());
             for (UpdateList ul : lul) {
                 LOG.trace("{}", ul.toString());
+                ul.filter(true, true, true);
                 if (! ul.isSane()) {
                     LOG.debug("incoherent stoptime UpdateList");
                     continue; 

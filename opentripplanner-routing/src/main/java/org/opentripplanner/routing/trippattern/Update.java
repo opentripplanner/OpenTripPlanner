@@ -20,6 +20,11 @@ public class Update implements Comparable<Update> {
         this.status = status;
     }
 
+    /**
+     * This comparator is useful for breaking lists of mixed-trip updates into single-trip blocks.
+     * We sort on (tripId, stopSequence, departureTime) because there may be duplicate stops in an
+     * update list, and we want them to be in a predictable order for filtering.
+     */
     @Override
     public int compareTo(Update other) {
         int result;
@@ -27,6 +32,9 @@ public class Update implements Comparable<Update> {
         if (result != 0)
             return result;
         result = this.stopSeq - other.stopSeq;
+        if (result != 0)
+            return result;
+        result = this.depart - other.depart;
         return result;
     }
 

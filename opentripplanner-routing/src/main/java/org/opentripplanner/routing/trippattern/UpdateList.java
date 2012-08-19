@@ -2,6 +2,7 @@ package org.opentripplanner.routing.trippattern;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -58,6 +59,37 @@ public class UpdateList {
         }
         return sb.toString();
     }
+    
+    public boolean filter(boolean passed, boolean negativeDwells, boolean duplicateStops) {
+        boolean modified = false;
+        Update u, prev_u = null;
+        for (Iterator<Update> iter = updates.iterator(); iter.hasNext(); prev_u = u) {
+            u = iter.next();
+            if (passed && u.status == Update.Status.PASSED) {
+                iter.remove();
+                modified = true;
+                continue;
+            }
+            if (duplicateStops && prev_u != null && prev_u.stopId.equals(u.stopId)) {
+                // updates with the same sequence number within a block are sorted by departure 
+                // time. keeping the first update (earliest departure) is the more conservative 
+                // option for depart-after trip planning 
+                LOG.warn("filtered duplicate stop {} from update for trip {}", u.stopId, u.tripId);
+                iter.remove();
+                modified = true;
+                continue;
+            }
+            // last update in trip may have 0 departure
+            if (negativeDwells && u.depart < u.arrive && u.depart != 0) {
+                // in KV8 negative dwell times are very common.
+                LOG.warn("filtered negative dwell time at stop {} in update for trip {}",
+                        u.stopId, u.tripId);
+                u.arrive = u.depart;
+                modified = true;
+            }
+        }
+        return modified;
+    }
 
     /** 
      * Check that this UpdateList is internally coherent, meaning that:
@@ -77,13 +109,6 @@ public class UpdateList {
         boolean timesCoherent = true;
         Update prev_u = null;
         for (Update u : updates) {
-            // last update in trip may have 0 departure
-            if (u.depart < u.arrive && u.depart != 0) {
-                // this is so common that we are going to just clean the incoming data
-                // timesCoherent = false;
-                LOG.warn("negative dwell time, patched incoming data");
-                u.arrive = u.depart;
-            }
             if (prev_u != null) {
                 if (u.stopSeq <= prev_u.stopSeq)
                     increasing = false;
