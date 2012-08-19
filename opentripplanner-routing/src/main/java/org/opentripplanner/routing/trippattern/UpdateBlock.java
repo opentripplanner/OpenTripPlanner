@@ -21,6 +21,8 @@ public class UpdateBlock {
     
     private static final Logger LOG = LoggerFactory.getLogger(UpdateBlock.class);
 
+    private static final int MATCH_FAILED = -1;
+
     public final AgencyAndId tripId;
 
     public long timestamp; /// addme
@@ -154,25 +156,18 @@ public class UpdateBlock {
     public int findUpdateStopIndex(TableTripPattern pattern) {
         if (updates == null || updates.size() < 1)
             return -1;
-        List<Stop> patternStops = pattern.getStops();
-        //int high = patternStops.size() - updates.size() ;
-        int high = patternStops.size() - updates.size();
-        PATTERN: for (int pi = 0; pi <= high; pi++) { // index in pattern
-            LOG.trace("---{}", pi);
-            for (int ui = 0; ui < updates.size(); ui++) { // index in update
-                Stop ps = patternStops.get(pi + ui);
-                Update u = updates.get(ui);
-                LOG.trace("{} == {}", ps.getId().getId(), u.stopId);
-                if ( ! ps.getId().getId().equals(u.stopId)) {
-                    // stopId match failed
-                    continue PATTERN;
-                }
-            }
-            // stopId match succeeded
-            LOG.debug("found matching stop block at index {}", pi);
-            return pi;
+        int result = matchBlockSimple(pattern);
+        if (result == MATCH_FAILED) {
+            LOG.debug("simple block matching failed, trying fuzzy matching.");
+            result = matchBlockFuzzy(pattern);
         }
-        LOG.debug("match failed");
+        if (result != MATCH_FAILED) {
+            LOG.debug("found matching stop block at index {}", result);
+            return result;
+        }
+        LOG.warn("update block matching failed completely.");
+        LOG.warn("have a look at the pattern and block:");
+        List<Stop> patternStops = pattern.getStops();
         int nStops = patternStops.size();
         int nHops = nStops - 1;
         for (int i = 0; i < nStops; i++) {
@@ -187,6 +182,68 @@ public class UpdateBlock {
             System.out.printf("Stop %02d %s A%d D%d >>> %s\n", i, s.getId().getId(), 
                     schedArr, schedDep, (u == null) ? "--" : u.toString());
         }
-        return -1;
+        return MATCH_FAILED;
     }
+    
+    private int matchBlockSimple(TableTripPattern pattern) {
+        List<Stop> patternStops = pattern.getStops();
+        // we are matching the whole block 
+        int high = patternStops.size() - updates.size();
+        PATTERN: for (int pi = 0; pi <= high; pi++) { // index in pattern
+            LOG.trace("---{}", pi);
+            for (int ui = 0; ui < updates.size(); ui++) { // index in update
+                Stop ps = patternStops.get(pi + ui);
+                Update u = updates.get(ui);
+                LOG.trace("{} == {}", ps.getId().getId(), u.stopId);
+                if ( ! ps.getId().getId().equals(u.stopId)) {
+                    continue PATTERN; // full-block match failed, try incrementing offset
+                }
+            }
+            /* full-block match succeeded */
+            LOG.debug("found matching stop block at index {}", pi);
+            return pi;
+        }
+        return MATCH_FAILED;
+    }
+    
+    private int matchBlockFuzzy(TableTripPattern pattern) {
+        List<Stop> patternStops = pattern.getStops();
+        int nStops = patternStops.size(); // here we allow matching a subset of the block's updates
+        int[] scores = new int[nStops]; // how bad is the match at each offset into the pattern
+        for (int pi = 0; pi < nStops; pi++) { // index in pattern
+            LOG.trace("---{}", pi);
+            int score = 0;
+            for (int ui = 0; ui < updates.size(); ui++) { // iterate over index within update
+                int si = pi + ui;
+                if (si >= nStops) { 
+                    break; // skip all remaining updates at the end of the list, do not raise score
+                }
+                Stop ps = patternStops.get(si);
+                Update u = updates.get(ui);
+                LOG.trace("{} == {}", ps.getId().getId(), u.stopId);
+                if ( ! ps.getId().getId().equals(u.stopId)) {
+                    continue; // skip one update, do not raise score
+                }
+                score += 1; // raise the score because we did not need to skip this update
+            }
+            scores[pi] = score;
+        }
+        int bestScore = Integer.MIN_VALUE; // higher scores are better
+        int bestStop = -1;
+        // judging could be folded into above loop, and search stopped when nStops - pi < bestScore
+        // but it's not slow enough to bother now, and we can print out a scorecard:
+        LOG.debug("fuzzy matching scores: {}", scores);
+        for (int i=0; i < nStops; i++) {
+            if (scores[i] >= bestScore) { // test equality so we return the latest match
+                bestScore = scores[i];
+                bestStop = i;
+            }
+        }
+        if (bestScore == 0) { // match failed, none of the offsets matched any updates 
+            return MATCH_FAILED;
+        }
+        /* full-block match succeeded */
+        return bestStop;
+    }
+    
 }
