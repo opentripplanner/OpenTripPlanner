@@ -76,6 +76,7 @@ public class TimetableSnapshot {
         return String.format("Timetable snapshot: %d timetables (%s)", timetables.size(), d);
     }
     
+    /* TODO: reverse this procedure - have a method for producing an immutable snapshot of a mutable working buffer */
     @SuppressWarnings("unchecked")
     public TimetableSnapshot mutableCopy() {
         TimetableSnapshot ret = new TimetableSnapshot();

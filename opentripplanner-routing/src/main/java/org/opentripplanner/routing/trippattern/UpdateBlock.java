@@ -12,9 +12,14 @@ import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class UpdateList {
+/**
+ * An UpdateBlock is an ordered list of Updates which all refer to the same trip on the same day.
+ * This class also provides methods for building, filtering, and sanity-checking such lists. 
+ * @author abyrd
+ */
+public class UpdateBlock {
     
-    private static final Logger LOG = LoggerFactory.getLogger(UpdateList.class);
+    private static final Logger LOG = LoggerFactory.getLogger(UpdateBlock.class);
 
     public final AgencyAndId tripId;
 
@@ -22,24 +27,24 @@ public class UpdateList {
     
     public final List<Update> updates;
     
-    private UpdateList(AgencyAndId tripId) {
+    private UpdateBlock(AgencyAndId tripId) {
         this.tripId = tripId;
         updates = new ArrayList<Update>();
     }
     
     /**
      * This method takes a list of updates that may have mixed TripIds, dates, etc. and splits it 
-     * into a list of UpdateLists, with each UpdateList referencing a single trip on a single day.
+     * into a list of UpdateBlocks, with each UpdateBlock referencing a single trip on a single day.
      * TODO: implement date support for updates
      */
-    public static List<UpdateList> splitByTrip(List<Update> mixedUpdates) {
-        List<UpdateList> ret = new LinkedList<UpdateList>();
+    public static List<UpdateBlock> splitByTrip(List<Update> mixedUpdates) {
+        List<UpdateBlock> ret = new LinkedList<UpdateBlock>();
         // Update comparator sorts on (tripId, stopId)
         Collections.sort(mixedUpdates);
-        UpdateList ul = null;
+        UpdateBlock ul = null;
         for (Update u : mixedUpdates) {
             if (ul == null || ! ul.tripId.equals(u.tripId)) {
-                ul = new UpdateList(u.tripId);
+                ul = new UpdateBlock(u.tripId);
                 ret.add(ul);
             }
             ul.updates.add(u);
@@ -92,8 +97,8 @@ public class UpdateList {
     }
 
     /** 
-     * Check that this UpdateList is internally coherent, meaning that:
-     * 1. all Updates' trip_ids are the same, and match the UpdateList's trip_id
+     * Check that this UpdateBlock is internally coherent, meaning that:
+     * 1. all Updates' trip_ids are the same, and match the UpdateBlock's trip_id
      * 2. stop sequence numbers are sequential and increasing
      * 3. all dwell times and run times are positive
      */
@@ -168,8 +173,17 @@ public class UpdateList {
             return pi;
         }
         LOG.debug("match failed");
-        System.out.println(patternStops);
-        System.out.println(updates);
+        for (int i = 0; i < patternStops.size(); i++) {
+            Stop s = patternStops.get(i);
+            Update u = null; 
+            if (i < updates.size())
+                u = updates.get(i);
+            int ti = pattern.getTripIndex(this.tripId);
+            int schedArr = pattern.getArrivalTime(i, ti);
+            int schedDep = pattern.getDepartureTime(i, ti);
+            System.out.printf("Stop %02d %s %d %d >>> %s\n", i, s.getId().getId(), 
+                    schedArr, schedDep, (u == null) ? "--" : u.toString());
+        }
         return -1;
     }
 }

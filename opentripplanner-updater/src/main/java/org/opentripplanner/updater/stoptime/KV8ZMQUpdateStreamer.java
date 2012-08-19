@@ -19,7 +19,7 @@ import lombok.Setter;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.common.CTX;
 import org.opentripplanner.routing.trippattern.Update;
-import org.opentripplanner.routing.trippattern.UpdateList;
+import org.opentripplanner.routing.trippattern.UpdateBlock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeromq.ZFrame;
@@ -98,8 +98,10 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer {
                 logWriter.append('\n');
             }
             ret = parseCTX(buffer.toString());
-            if (++count % 1 == 0) {
-                LOG.debug("decoded gzipped CTX message #{}: {}", count, msg);
+            count += 1;
+            LOG.debug("decoded gzipped CTX message #{}: {}", count, msg);
+            if (count % 1000 == 0) {
+                LOG.info("received {} KV8 messages.", count);
             }
         } catch (Exception e) {
             LOG.error("exception while decoding (unzipping) incoming CTX message: {}", e.getMessage()); 

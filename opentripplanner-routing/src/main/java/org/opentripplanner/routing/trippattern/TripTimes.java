@@ -146,7 +146,7 @@ public class TripTimes implements Cloneable, Serializable {
         return sb.toString();
     }
     
-    public TripTimes updatedClone(UpdateList ul, int startIndex) {
+    public TripTimes updatedClone(UpdateBlock ul, int startIndex) {
         LOG.trace(this.dumpTimes());
         TripTimes ret = (TripTimes) this.clone();
         // there is certainly a more efficient way than repeatedly decompacting and recompacting

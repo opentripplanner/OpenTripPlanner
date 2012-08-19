@@ -31,7 +31,7 @@ import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.routing.trippattern.UpdateList;
+import org.opentripplanner.routing.trippattern.UpdateBlock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -546,7 +546,7 @@ public class TableTripPattern implements TripPattern, Serializable {
         }
 
         /** @return the index of TripTimes for this Trip(Id) in this particular Timetable */
-        private int getTripIndex(AgencyAndId tripId) {
+        public int getTripIndex(AgencyAndId tripId) {
             int ret = 0;
             for (TripTimes tt : tripTimes) {
                 if (tt.trip.getId().equals(tripId)) // replace with indexing in stoptime updater?
@@ -562,7 +562,7 @@ public class TableTripPattern implements TripPattern, Serializable {
             return tripTimes.get(tripIndex);
         }
 
-        public boolean update(UpdateList ul) {
+        public boolean update(UpdateBlock ul) {
             /* though all timetables have the same trip ordering, some may have extra trips due to 
              * the dynamic addition of unscheduled trips */
             int tripIndex = getTripIndex(ul.tripId);

@@ -20,7 +20,7 @@ import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.trippattern.Update;
-import org.opentripplanner.routing.trippattern.UpdateList;
+import org.opentripplanner.routing.trippattern.UpdateBlock;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -104,26 +104,30 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
                 LOG.debug("updates is null");
                 continue;
             } 
-            List<UpdateList> lul = UpdateList.splitByTrip(updates);
-            LOG.debug("updates contains {} trip updates", lul.size());
-            for (UpdateList ul : lul) {
-                LOG.trace("{}", ul.toString());
-                ul.filter(true, true, true);
-                if (! ul.isSane()) {
+            List<UpdateBlock> blocks = UpdateBlock.splitByTrip(updates);
+            LOG.debug("message contains {} trip update blocks", blocks.size());
+            int uIndex = 0;
+            for (UpdateBlock updateBlock : blocks) {
+                uIndex += 1;
+                LOG.debug("update block #{} :", uIndex);
+                LOG.trace("{}", updateBlock.toString());
+                updateBlock.filter(true, true, true);
+                if (! updateBlock.isSane()) {
                     LOG.debug("incoherent stoptime UpdateList");
                     continue; 
                 }
-                TableTripPattern pattern = patternIndex.get(ul.tripId);
+                TableTripPattern pattern = patternIndex.get(updateBlock.tripId);
                 if (pattern == null) {
-                    LOG.debug("pattern not found {}", ul.tripId);
+                    LOG.debug("pattern not found {}", updateBlock.tripId);
                     continue;
                 }
                 // we have a message we actually want to apply
                 synchronized (buffer) {
                     Timetable tt = buffer.modify(pattern);
-                    tt.update(ul);
+                    tt.update(updateBlock);
                 }
             }
+            LOG.debug("end of update message", uIndex);
         }
     }
 

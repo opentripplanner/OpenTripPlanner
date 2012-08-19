@@ -3,7 +3,7 @@ package org.opentripplanner.updater.stoptime;
 import java.util.List;
 
 import org.opentripplanner.routing.trippattern.Update;
-import org.opentripplanner.routing.trippattern.UpdateList;
+import org.opentripplanner.routing.trippattern.UpdateBlock;
 
 public interface UpdateStreamer {
 
