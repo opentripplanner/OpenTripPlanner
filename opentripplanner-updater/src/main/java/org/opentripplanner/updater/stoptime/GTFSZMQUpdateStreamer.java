@@ -5,6 +5,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.trippattern.Update;
@@ -17,18 +19,19 @@ import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 
-public class GTFSZMQUpdateStreamer {
+public class GTFSZMQUpdateStreamer implements UpdateStreamer {
 
     private static final File file = new File("/var/otp/data/nl/gtfs-rt.protobuf");
     
-    public UpdateList getUpdates() {
+    @Override
+    public List<Update> getUpdates() {
         try {
             InputStream is = new FileInputStream(file);
             FeedMessage feed = GtfsRealtime.FeedMessage.parseFrom(is);
             // System.out.println(feed);
             FeedHeader header = feed.getHeader();
             long timestamp = header.getTimestamp();
-            UpdateList updates = new UpdateList(null);
+            List<Update> updates = new ArrayList<Update>();
             for (FeedEntity entity : feed.getEntityList()) {
                 System.out.println(entity);
                 TripUpdate tUpdate = entity.getTripUpdate();
@@ -39,8 +42,9 @@ public class GTFSZMQUpdateStreamer {
                             sUpdate.getStopId(),
                             sUpdate.getStopSequence(), 
                             (int) sUpdate.getArrival().getTime(), 
-                            (int) sUpdate.getDeparture().getTime());
-                    updates.addUpdate(u);
+                            (int) sUpdate.getDeparture().getTime(),
+                            Update.Status.UNKNOWN);
+                    updates.add(u);
                 }
             }
             return updates;
