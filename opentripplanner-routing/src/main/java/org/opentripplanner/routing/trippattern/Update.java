@@ -7,15 +7,17 @@ public class Update implements Comparable<Update> {
     final AgencyAndId tripId;
     final String stopId;
     final int stopSeq;
-    final int arrive; // sec since midnight
+    protected int arrive; // sec since midnight
     final int depart; // sec since midnight
-
-    public Update (AgencyAndId tripId, String stopId, int stopSeq, int arrive, int depart) {
+    final Status status;
+    
+    public Update (AgencyAndId tripId, String stopId, int stopSeq, int arrive, int depart, Status status) {
         this.tripId = tripId;
         this.stopId = stopId;
         this.stopSeq = stopSeq;
         this.arrive = arrive;
         this.depart = depart;
+        this.status = status;
     }
 
     @Override
@@ -30,6 +32,15 @@ public class Update implements Comparable<Update> {
 
     @Override
     public String toString() {
-        return String.format("%s %s %d %s %s", tripId, stopId, stopSeq, arrive, depart);
+        return String.format("Update trip %s Stop #%d:%s (%s) A%s D%s", 
+                tripId, stopSeq, stopId, status, arrive, depart);
     }
+    
+    public static enum Status {
+        PASSED,
+        ARRIVED,
+        PREDICTION,
+        UNKNOWN
+    }
+    
 }

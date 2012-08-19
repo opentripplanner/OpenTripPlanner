@@ -31,8 +31,8 @@ public class UpdateList {
     }
     
     /**
-     * An update list can contain updates for several trips. This method will split it into a list
-     * of updates, with each update referencing a single trips.
+     * An UpdateLst can contain updates for several trips. This method will split it into a list
+     * of UpdateLists, with each UpdateList referencing a single trip.
      */
     public List<UpdateList> splitByTrip() {
         List<UpdateList> ret = new LinkedList<UpdateList>();
@@ -69,6 +69,7 @@ public class UpdateList {
      * 3. all dwell times and run times are positive
      */
     public boolean isSane() {
+        //LOG.debug("{}", this.toString());
         for (Update u : updates)
             if (u == null || ! u.tripId.equals(this.tripId))
                return false;
@@ -79,10 +80,15 @@ public class UpdateList {
         boolean timesCoherent = true;
         Update prev_u = null;
         for (Update u : updates) {
-            if (u.depart < u.arrive && u.depart != 0) // last update in trip may have 0 departure
-                timesCoherent = false;
+            // last update in trip may have 0 departure
+            if (u.depart < u.arrive && u.depart != 0) {
+                // this is so common that we are going to just clean the incoming data
+                // timesCoherent = false;
+                LOG.warn("negative dwell time, patched incoming data");
+                u.arrive = u.depart;
+            }
             if (prev_u != null) {
-                if (u.stopSeq < prev_u.stopSeq)
+                if (u.stopSeq <= prev_u.stopSeq)
                     increasing = false;
                 if (u.stopSeq - prev_u.stopSeq != 1)
                     sequential = false;
@@ -91,10 +97,7 @@ public class UpdateList {
             }
             prev_u = u;
         }
-        if (!increasing || !timesCoherent) // || !sequential)
-            return false;
-        else
-            return true;
+        return increasing && timesCoherent; // || !sequential)
     }
 
     /**        
@@ -125,23 +128,26 @@ public class UpdateList {
         if (updates == null || updates.size() < 1)
             return -1;
         List<Stop> patternStops = pattern.getStops();
-        // because seq numbers are positive (0?) and increasing, match index cannot be < first stopSeq
-        Update firstUpdate = updates.get(0);
-        int low = firstUpdate.stopSeq - 1; 
+        //int high = patternStops.size() - updates.size() ;
         int high = patternStops.size() - updates.size();
-        PATTERN: for (int pi = low; pi <= high; pi++) { // index in pattern
+        PATTERN: for (int pi = 0; pi <= high; pi++) { // index in pattern
+            LOG.trace("---{}", pi);
             for (int ui = 0; ui < updates.size(); ui++) { // index in update
                 Stop ps = patternStops.get(pi + ui);
                 Update u = updates.get(ui);
+                LOG.trace("{} == {}", ps.getId().getId(), u.stopId);
                 if ( ! ps.getId().getId().equals(u.stopId)) {
                     // stopId match failed
                     continue PATTERN;
                 }
             }
             // stopId match succeeded
-            LOG.trace("found matching stop block at index {}", pi);
+            LOG.debug("found matching stop block at index {}", pi);
             return pi;
         }
+        LOG.debug("match failed");
+        System.out.println(patternStops);
+        System.out.println(updates);
         return -1;
     }
 }

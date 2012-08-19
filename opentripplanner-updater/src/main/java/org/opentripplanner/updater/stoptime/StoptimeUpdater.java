@@ -3,6 +3,7 @@ package org.opentripplanner.updater.stoptime;
 import static org.opentripplanner.common.IterableLibrary.filter;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -98,17 +99,21 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
     public void run() {
         while (true) {
             UpdateList updates = updateStreamer.getUpdates(); 
-            if (updates == null)
+            if (updates == null) {
+                LOG.debug("updates is null");
                 continue;
-            for (UpdateList ul : updates.splitByTrip()) {
-                LOG.trace(ul.toString());
+            } 
+            List<UpdateList> lul = updates.splitByTrip();
+            LOG.debug("updates contains {} trip updates", lul.size());
+            for (UpdateList ul : lul) {
+                LOG.trace("{}", ul.toString());
                 if (! ul.isSane()) {
-                    LOG.trace("incoherent stoptime UpdateList");
+                    LOG.debug("incoherent stoptime UpdateList");
                     continue; 
                 }
                 TableTripPattern pattern = patternIndex.get(ul.tripId);
                 if (pattern == null) {
-                    LOG.trace("pattern not found {}", ul.tripId);
+                    LOG.debug("pattern not found {}", ul.tripId);
                     continue;
                 }
                 // we have a message we actually want to apply

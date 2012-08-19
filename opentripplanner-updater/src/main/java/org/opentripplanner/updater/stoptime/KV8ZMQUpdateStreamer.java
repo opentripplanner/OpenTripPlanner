@@ -2,7 +2,10 @@ package org.opentripplanner.updater.stoptime;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -33,11 +36,22 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer {
     @Setter private String defaultAgencyId = "";
     @Setter private String address = "tcp://node01.post.openov.nl:7817";
     @Setter private static String feed = "/GOVI/KV8"; 
+    @Setter private static String messageLogFile;
+    
+    Writer logWriter;
     
     @PostConstruct
     public void connectToFeed() {
         subscriber.connect(address);
         subscriber.subscribe(feed.getBytes());
+        if (messageLogFile != null) {
+            try {
+                logWriter = new FileWriter(messageLogFile);
+            } catch (IOException e) {
+                LOG.warn("problem opening message log file: {}", e);
+                logWriter = null;
+            }
+        }
     }
     
     public UpdateList getUpdates() {
@@ -52,7 +66,7 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer {
         }
         /* 
          * on subscription failure, message will not be null or empty, but its content length 
-         * will be 0 and bomb the gunzip below.
+         * will be 0 and bomb the gunzip below (or does it block forever?)
          */        
         UpdateList ret = null;
         try {
@@ -77,9 +91,13 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer {
             byte[] b = new byte[4096];
             for (int n; (n = messageStream.read(b)) != -1;) {
                 buffer.write(b, 0, n);
-            }            
+            }   
+            if (logWriter != null) {
+                logWriter.write(buffer.toString());
+                logWriter.append('\n');
+            }
             ret = parseCTX(buffer.toString());
-            if (++count % 100 == 0) {
+            if (++count % 1 == 0) {
                 LOG.debug("decoded gzipped CTX message #{}: {}", count, msg);
             }
         } catch (Exception e) {
@@ -91,6 +109,7 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer {
     }
     
     public UpdateList parseCTX(String ctxString) {
+        //LOG.debug(ctxString);
         CTX ctx = new CTX(ctxString);
         UpdateList ret = new UpdateList(null); // indicate that updates may have mixed trip IDs
         for (int i = 0; i < ctx.rows.size(); i++) {
@@ -99,15 +118,18 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer {
             int departure = secondsSinceMidnight(row.get("ExpectedDepartureTime"));
             Update u = new Update(
                     kv7TripId(row),   
-                    row.get("UserStopCode"), 
+                    kv7StopId(row), 
                     Integer.parseInt(row.get("UserStopOrderNumber")), 
-                    arrival, departure);
+                    arrival, departure,
+                    kv8Status(row));
             ret.addUpdate(u);
         }
         return ret;
     }
 
-    /** no good for DST */
+    /** 
+     * no good for DST 
+     */
     private int secondsSinceMidnight(String hhmmss) {
         String[] time = hhmmss.split(":");
         int hours = Integer.parseInt(time[0]);
@@ -131,4 +153,21 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer {
         return new AgencyAndId(row.get("DataOwnerCode"), tripId);
     }
     
+    /** 
+     * Convert KV7 fields into a GTFS stop_id. DataOwnerCode and UserStopCode are the agency's 
+     * internal identifiers for a stop, so should not be used. TimingPointCode is a unique 
+     * nationwide (feed-wide) identifier which includes those UserStopCodes.
+     */
+    public String kv7StopId (HashMap<String, String> row) {
+        return row.get("TimingPointCode");
+    }
+    
+    public Update.Status kv8Status(HashMap<String, String> row) {
+        String s = row.get("TripStopStatus");
+        if (s.equals("DRIVING"))
+            return Update.Status.PREDICTION;
+        else
+            return Update.Status.valueOf(s);
+    }
+
 }
