@@ -402,8 +402,10 @@ public class StopProfile {
         for (CostsAtTime costs : profile) {
 
             // consider only arrivals within the one-day period
-            if (costs.time < startTime)
+            if (costs.time < startTime) {
+                lastTime = costs.time;
                 continue;
+            }
             if (costs.time >= endTime)
                 break;
 
