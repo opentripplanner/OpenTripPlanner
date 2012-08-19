@@ -19,6 +19,7 @@ import org.opentripplanner.routing.edgetype.TimetableSnapshotSource;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
+import org.opentripplanner.routing.trippattern.Update;
 import org.opentripplanner.routing.trippattern.UpdateList;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
 import org.slf4j.Logger;
@@ -98,12 +99,12 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
     @Override
     public void run() {
         while (true) {
-            UpdateList updates = updateStreamer.getUpdates(); 
+            List<Update> updates = updateStreamer.getUpdates(); 
             if (updates == null) {
                 LOG.debug("updates is null");
                 continue;
             } 
-            List<UpdateList> lul = updates.splitByTrip();
+            List<UpdateList> lul = UpdateList.splitByTrip(updates);
             LOG.debug("updates contains {} trip updates", lul.size());
             for (UpdateList ul : lul) {
                 LOG.trace("{}", ul.toString());

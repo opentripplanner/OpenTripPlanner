@@ -21,25 +21,22 @@ public class UpdateList {
     
     public final List<Update> updates;
     
-    public void addUpdate(Update u) {
-        this.updates.add(u);
-    }
-    
-    public UpdateList(AgencyAndId tripId) {
+    private UpdateList(AgencyAndId tripId) {
         this.tripId = tripId;
         updates = new ArrayList<Update>();
     }
     
     /**
-     * An UpdateLst can contain updates for several trips. This method will split it into a list
-     * of UpdateLists, with each UpdateList referencing a single trip.
+     * This method takes a list of updates that may have mixed TripIds, dates, etc. and splits it 
+     * into a list of UpdateLists, with each UpdateList referencing a single trip on a single day.
+     * TODO: implement date support for updates
      */
-    public List<UpdateList> splitByTrip() {
+    public static List<UpdateList> splitByTrip(List<Update> mixedUpdates) {
         List<UpdateList> ret = new LinkedList<UpdateList>();
-        // Update comparator sorts on tripId
-        Collections.sort(updates);
+        // Update comparator sorts on (tripId, stopId)
+        Collections.sort(mixedUpdates);
         UpdateList ul = null;
-        for (Update u : updates) {
+        for (Update u : mixedUpdates) {
             if (ul == null || ! ul.tripId.equals(u.tripId)) {
                 ul = new UpdateList(u.tripId);
                 ret.add(ul);

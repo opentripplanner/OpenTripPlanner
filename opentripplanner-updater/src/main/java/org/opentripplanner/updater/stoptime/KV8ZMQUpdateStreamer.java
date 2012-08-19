@@ -9,6 +9,7 @@ import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.zip.GZIPInputStream;
 
 import javax.annotation.PostConstruct;
@@ -54,7 +55,7 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer {
         }
     }
     
-    public UpdateList getUpdates() {
+    public List<Update> getUpdates() {
         /* recvMsg blocks -- unless you call Socket.setReceiveTimeout() */
         // so when timeout occurs, it does not return null, but a reference to some
         // static ZMsg object?
@@ -68,7 +69,7 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer {
          * on subscription failure, message will not be null or empty, but its content length 
          * will be 0 and bomb the gunzip below (or does it block forever?)
          */        
-        UpdateList ret = null;
+        List<Update> ret = null;
         try {
             Iterator<ZFrame> frames = msg.iterator();
             // pop off first frame, which contains "/GOVI/KV8" (the feed name) (isn't there a method for this?)
@@ -103,15 +104,16 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer {
         } catch (Exception e) {
             LOG.error("exception while decoding (unzipping) incoming CTX message: {}", e.getMessage()); 
         } finally {
-            msg.destroy(); // is this necessary?
+            msg.destroy(); // is this necessary? does ZMQ lib automatically free mem?
         }
         return ret;
     }
     
-    public UpdateList parseCTX(String ctxString) {
+    public List<Update> parseCTX(String ctxString) {
         //LOG.debug(ctxString);
         CTX ctx = new CTX(ctxString);
-        UpdateList ret = new UpdateList(null); // indicate that updates may have mixed trip IDs
+        // at this point, updates may have mixed trip IDs, dates, etc.
+        List<Update> ret = new ArrayList<Update>(); 
         for (int i = 0; i < ctx.rows.size(); i++) {
             HashMap<String, String> row = ctx.rows.get(i);
             int arrival = secondsSinceMidnight(row.get("ExpectedArrivalTime"));
@@ -122,7 +124,7 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer {
                     Integer.parseInt(row.get("UserStopOrderNumber")), 
                     arrival, departure,
                     kv8Status(row));
-            ret.addUpdate(u);
+            ret.add(u);
         }
         return ret;
     }
