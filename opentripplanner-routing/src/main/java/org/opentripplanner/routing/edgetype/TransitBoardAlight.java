@@ -47,7 +47,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @author mattwigway
  */
-public class TransitBoardAlight extends PatternEdge implements OnBoardForwardEdge {
+public class TransitBoardAlight extends PatternEdge implements OnBoardForwardEdge, TimeDependentTrip {
 
     private static final long serialVersionUID = 1042740795612978747L;
 
@@ -394,5 +394,16 @@ public class TransitBoardAlight extends PatternEdge implements OnBoardForwardEdg
         return "TransitBoardAlight(" +
                 (boarding ? "boarding " : "alighting ") +
                 getFromVertex() + " to " + getToVertex() + ")";
+    }
+
+    @Override
+    public String getDirection(int tripIndex) {
+        // TODO: do we ever need to subtract one to make this a hop index?
+        return getPattern().getHeadsign(stopIndex, tripIndex);
+    }
+
+    @Override
+    public Trip getTrip(int tripIndex) {
+        return getPattern().getTrip(tripIndex);
     }
 }
