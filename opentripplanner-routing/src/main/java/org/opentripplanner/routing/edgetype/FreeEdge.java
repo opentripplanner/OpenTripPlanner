@@ -38,9 +38,8 @@ public class FreeEdge extends Edge {
     @Override
     public State traverse(State s0) {
         StateEditor s1 = s0.edit(this);
-        s1.setBackMode(s0.getNonTransitMode(s0.getOptions()));
         s1.incrementWeight(1);
-        // do not change mode
+        // do not change mode, which means it may be null at the start of a trip
         return s1.makeState();
     }
 

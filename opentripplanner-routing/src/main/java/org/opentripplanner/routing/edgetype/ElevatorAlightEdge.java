@@ -14,9 +14,12 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
 
@@ -62,10 +65,21 @@ public class ElevatorAlightEdge extends Edge {
     
     @Override
     public State traverse(State s0) {
-        // we are our own edge narrative
+        RoutingRequest options = s0.getOptions();
+        TraverseMode mode = s0.getNonTransitMode(options);
+        
+        // don't switch to bike when an elevator occurs, but don't specifically tell the user
+        // to switch to walking when the elevator occurs (i.e. if an elevator occurs in the 
+        // middle of a biking leg, don't specifically tell the user to dismount and walk - that
+        // goes without saying)
+        if (mode == TraverseMode.BICYCLE && s0.getBackMode() != TraverseMode.BICYCLE) {
+            options = options.getWalkingOptions();
+            mode = s0.getNonTransitMode(options);
+        }        
+        
         StateEditor s1 = s0.edit(this);
         s1.incrementWeight(1);
-        // don't set back mode, leave it as-is
+        s1.setBackMode(mode);
         return s1.makeState();
     }
 

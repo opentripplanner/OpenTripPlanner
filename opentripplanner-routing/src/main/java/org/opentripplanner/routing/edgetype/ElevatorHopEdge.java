@@ -64,7 +64,16 @@ public class ElevatorHopEdge extends Edge {
             && !permission.allows(StreetTraversalPermission.CAR)) {
             return null;
         }
-
+        
+        // don't switch to bike when an elevator occurs, but don't specifically tell the user
+        // to switch to walking when the elevator occurs (i.e. if an elevator occurs in the 
+        // middle of a biking leg, don't specifically tell the user to dismount and walk - that
+        // goes without saying)
+        // This is not a problem with mode = CAR, since you're not going to walk your car
+        if (mode == TraverseMode.BICYCLE && s0.getBackMode() != TraverseMode.BICYCLE) {
+            options = options.getWalkingOptions();
+            mode = s0.getNonTransitMode(options);
+        }
 
         StateEditor s1 = s0.edit(this);
         s1.setBackMode(mode);
