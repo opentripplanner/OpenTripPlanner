@@ -245,9 +245,9 @@ public class TripTimes implements Cloneable, Serializable {
      * hop or dwell times. We really don't want those being used in routing. Check that all times 
      * are increasing, and issue warnings if this is not the case.
      */
-    public void forcePositive() {
+    public boolean timesIncreasing() {
         // iterate over the new tripTimes, checking that dwells and hops are positive
-        boolean found = false;
+        boolean increasing = true;
         int nHops = getNumHops();
         int prevArr = -1;
         for (int hop = 0; hop < nHops; hop++) {
@@ -255,17 +255,18 @@ public class TripTimes implements Cloneable, Serializable {
             int arr = this.getArrivalTime(hop);
             if (arr < dep) { // negative hop time
                 LOG.error("negative hop time in updated TripTimes at index {}", hop);
-                found = true;
+                increasing = false;
             }
             if (prevArr > dep) { // negative dwell time before this hop
-                found = true;
+                increasing = false;
                 LOG.error("negative dwell time in updated TripTimes at index {}", hop);
             }
             prevArr = arr;
         }
-        if (found) {
+        if (!increasing) {
             LOG.error(this.dumpTimes());
         }
+        return increasing;
     }
 
 }

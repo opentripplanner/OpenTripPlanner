@@ -682,7 +682,7 @@ public class TableTripPattern implements TripPattern, Serializable {
                 return false;
             }
             // One more check, just to make sure.
-            newTimes.forcePositive();
+            newTimes.timesIncreasing();
             LOG.trace(newTimes.dumpTimes());
             newTimes.compact();
             LOG.trace(newTimes.dumpTimes());
