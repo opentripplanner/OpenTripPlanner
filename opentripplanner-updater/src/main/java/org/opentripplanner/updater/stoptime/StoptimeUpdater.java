@@ -34,19 +34,25 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
 
     private static final Logger LOG = LoggerFactory.getLogger(StoptimeUpdater.class);
 
-    public static final int NEVER = Integer.MIN_VALUE;
-    public static final int UPDATED = Integer.MAX_VALUE;
-
     @Autowired private GraphService graphService;
     @Setter    private UpdateStreamer updateStreamer;
-    @Setter    private int maxSnapshotFrequency = 5000; // msec    
+    
+    /** 
+     * If a timetable snapshot is requested less than this number of milliseconds after the previous 
+     * snapshot, just return the same one. Thottles the potentially resource-consuming task of 
+     * duplicating a TripPattern -> Timetable map and indexing the new Timetables.
+     */
+    @Setter private int maxSnapshotFrequency = 500; // msec    
+
     /** 
      * The last committed snapshot that was handed off to a routing thread. This snapshot may be
      * given to more than one routing thread if the maximum snapshot frequency is exceeded. 
      */
     private TimetableSnapshot snapshot = null;
+    
     /** The working copy of the timetable resolver. Should not be visible to routing threads. */
     private TimetableSnapshot buffer = new TimetableSnapshot();
+    
     /** A map from Trip AgencyAndIds to the TripPatterns that contain them */
     private Map<AgencyAndId, TableTripPattern> patternIndex;
     // nothing in the timetable snapshot binds it to one graph. we can use this updater for all
@@ -54,10 +60,13 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
     private Graph graph;
     private long lastSnapshotTime = -1;
     
+    /**
+     * Once the data sources and target graphs have been established, index all trip patterns on the 
+     * tripIds of Trips they contain.
+     */
     @PostConstruct
     public void setup () {
         graph = graphService.getGraph();
-        // index trip patterns on trip ids they contain
         patternIndex = new HashMap<AgencyAndId, TableTripPattern>();
         for (TransitStopDepart tsd : filter(graph.getVertices(), TransitStopDepart.class)) {
             for (TransitBoardAlight tba : filter(tsd.getOutgoing(), TransitBoardAlight.class)) {
@@ -78,6 +87,12 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
         */
     }
     
+    /** 
+     * @return an up-to-date snapshot mapping TripPatterns to Timetables. This snapshot and the
+     * timetable objects it references are guaranteed to never change, so the requesting thread is 
+     * provided a consistent view of all TripTimes. The routing thread need only release its 
+     * reference to the snapshot to release resources.
+     */
     public synchronized TimetableSnapshot getSnapshot() {
         long now = System.currentTimeMillis();
         if (now - lastSnapshotTime > maxSnapshotFrequency) {
@@ -96,6 +111,10 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
         return snapshot;
     }
     
+    /**
+     * Repeatedly makes blocking calls to an UpdateStreamer to retrieve new stop time updates,
+     * and applies those updates to scheduled trips.
+     */
     @Override
     public void run() {
         int appliedBlockCount = 0;
