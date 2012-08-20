@@ -545,7 +545,7 @@ public class TableTripPattern implements TripPattern, Serializable {
             // index();
             
             // break even list size for linear and binary searches was determined to be around 16
-            if (nTrips > 16) {
+            if (nTrips > INDEX_THRESHOLD) {
                 //LOG.debug("indexing pattern with {} trips", nTrips);
                 index(); 
             } else {
