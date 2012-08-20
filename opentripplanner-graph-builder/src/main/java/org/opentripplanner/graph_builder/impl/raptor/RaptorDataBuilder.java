@@ -61,7 +61,11 @@ public class RaptorDataBuilder implements GraphBuilder {
 
     private static final double MIN_SPEED = 1.33;
 
+    private static final double MAX_DISTANCE = 3218;
+
     private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
+
+    private int MAX_TRANSFERS = 7;
 
     @SuppressWarnings("unchecked")
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
@@ -164,8 +168,9 @@ public class RaptorDataBuilder implements GraphBuilder {
 
         // compute stop-to-stop walk times
         HashMap<Vertex, T2<Integer, Double>>[] stopToStopWalkTimes = computeStopToStopWalkTimes(
-                vertices, MIN_SPEED);
+                vertices, MIN_SPEED, MAX_DISTANCE);
         regions.minSpeed = MIN_SPEED;
+        regions.maxDistance = MAX_DISTANCE;
 
         final int NDAYS = 5;
 
@@ -225,14 +230,14 @@ public class RaptorDataBuilder implements GraphBuilder {
     }
 
     private HashMap<Vertex, T2<Integer, Double>>[] computeStopToStopWalkTimes(
-            ArrayList<Vertex> vertices, double minSpeed) {
+            ArrayList<Vertex> vertices, double minSpeed, double maxDistance) {
         log.debug("Finding stop-to-stop walk times");
         @SuppressWarnings("unchecked")
         HashMap<Vertex, T2<Integer, Double>>[] times = new HashMap[AbstractVertex.getMaxIndex()];
         RoutingRequest walkOptions = new RoutingRequest(TraverseMode.WALK);
         walkOptions.setWalkSpeed(minSpeed);
         walkOptions.setArriveBy(true);
-        walkOptions.setMaxWalkDistance(3218);
+        walkOptions.setMaxWalkDistance(maxDistance);
         GenericDijkstra dijkstra = new GenericDijkstra(walkOptions);
         for (Vertex destination : vertices) {
             final HashMap<Vertex, T2<Integer, Double>> timesByDestination = new HashMap<Vertex, T2<Integer, Double>>();
@@ -274,7 +279,7 @@ public class RaptorDataBuilder implements GraphBuilder {
             visitedLastRound.add(v);
         }
 
-        for (int round = 0; round < 7; ++round) {
+        for (int round = 0; round < MAX_TRANSFERS ; ++round) {
             System.out.println("round " + round + " from " + visitedLastRound.size());
             HashSet<Vertex> visitedThisRound = new HashSet<Vertex>();
             // transit phase

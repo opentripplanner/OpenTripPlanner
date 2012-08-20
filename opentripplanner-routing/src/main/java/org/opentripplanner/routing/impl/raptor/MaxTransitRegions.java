@@ -14,4 +14,6 @@ public class MaxTransitRegions implements Serializable {
 
     public double minSpeed;
 
+    public double maxDistance;
+
 }
