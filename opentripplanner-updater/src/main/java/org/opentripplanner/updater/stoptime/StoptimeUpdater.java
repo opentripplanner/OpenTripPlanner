@@ -83,7 +83,7 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
         if (now - lastSnapshotTime > maxSnapshotFrequency) {
             synchronized (buffer) {
                 if (buffer.isDirty()) {
-                    LOG.debug("committing {}", buffer.toString());
+                    LOG.info("committing {}", buffer.toString());
                     buffer.commit();
                     snapshot = buffer;
                     buffer = buffer.mutableCopy();
@@ -91,13 +91,14 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
             }
             lastSnapshotTime = now;
         } else {
-            LOG.debug("Snapshot frequency exceeded. Reusing snapshot {}", snapshot.toString());
+            LOG.info("Snapshot frequency exceeded. Reusing snapshot {}", snapshot.toString());
         }
         return snapshot;
     }
     
     @Override
     public void run() {
+        int appliedBlockCount = 0;
         while (true) {
             List<Update> updates = updateStreamer.getUpdates(); 
             if (updates == null) {
@@ -107,24 +108,35 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
             List<UpdateBlock> blocks = UpdateBlock.splitByTrip(updates);
             LOG.debug("message contains {} trip update blocks", blocks.size());
             int uIndex = 0;
-            for (UpdateBlock updateBlock : blocks) {
+            for (UpdateBlock block : blocks) {
                 uIndex += 1;
-                LOG.debug("update block #{} :", uIndex);
-                LOG.trace("{}", updateBlock.toString());
-                updateBlock.filter(true, true, true);
-                if (! updateBlock.isCoherent()) {
-                    LOG.debug("incoherent stoptime UpdateList");
+                LOG.debug("update block #{} ({} updates) :", uIndex, block.updates.size());
+                LOG.trace("{}", block.toString());
+                block.filter(true, true, true);
+                if (! block.isCoherent()) {
+                    LOG.warn("Incoherent UpdateBlock, skipping.");
                     continue; 
                 }
-                TableTripPattern pattern = patternIndex.get(updateBlock.tripId);
+                if (block.updates.size() < 1) {
+                    LOG.debug("UpdateBlock contains no updates after filtering, skipping.");
+                    continue; 
+                }
+                TableTripPattern pattern = patternIndex.get(block.tripId);
                 if (pattern == null) {
-                    LOG.debug("pattern not found {}", updateBlock.tripId);
+                    LOG.warn("No pattern found for tripId {}, skipping UpdateBlock.", block.tripId);
                     continue;
                 }
                 // we have a message we actually want to apply
+                boolean applied = false;
                 synchronized (buffer) {
                     Timetable tt = buffer.modify(pattern);
-                    tt.update(updateBlock);
+                    applied = tt.update(block);
+                }
+                if (applied) {
+                    appliedBlockCount += 1;
+                    if (appliedBlockCount % 100 == 0) {
+                        LOG.info("applied {} stoptime update blocks.", appliedBlockCount);
+                    }
                 }
             }
             LOG.debug("end of update message", uIndex);

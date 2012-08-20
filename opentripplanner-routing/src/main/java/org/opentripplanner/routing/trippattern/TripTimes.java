@@ -42,7 +42,7 @@ public class TripTimes implements Cloneable, Serializable {
 
     // null means all dwells are 0-length, and arrival times are to be derived from departure times
     @XmlElement
-    protected int[] arrivalTimes; 
+    public int[] arrivalTimes; 
 
     public TripTimes(Trip trip, int index, List<StopTime> stopTimes) {
         // stopTimes are assumed to be pre-filtered / valid / monotonically increasing etc.
@@ -131,6 +131,10 @@ public class TripTimes implements Cloneable, Serializable {
         return true;
     }
 
+    public String toString() {
+        return dumpTimes();
+    }
+    
     public String dumpTimes() {
         StringBuilder sb = new StringBuilder();
         int nHops = getNumHops();
@@ -145,32 +149,7 @@ public class TripTimes implements Cloneable, Serializable {
         }
         return sb.toString();
     }
-    
-    public TripTimes updatedClone(UpdateBlock block, int startIndex) {
-        LOG.trace(this.dumpTimes());
-        TripTimes ret = (TripTimes) this.clone();
-        // there is certainly a more efficient way than repeatedly decompacting and recompacting
-        // but at least it's clear
-        ret.decompact();
-        for (int i = 0; i < block.updates.size(); i++) {
-            int stopIndex = startIndex + i; // stop as in transit stop (not 'end', not 'hop')
-            Update u = block.updates.get(i);
-            if (stopIndex < ret.departureTimes.length) {
-                // updates may contain a departure time of 0 for the final stop 
-                // but a valid arrival time at that same stop. avoid index out of bounds.
-                ret.departureTimes[stopIndex] = u.depart;
-            }
-            if (stopIndex >= 1 && stopIndex <= ret.arrivalTimes.length)  {
-                // first hop is defined by departure from first stop and arrival at second stop.
-                ret.arrivalTimes[stopIndex - 1] = u.arrive; 
-            }
-        }
-        LOG.trace(ret.dumpTimes());
-        ret.compact();
-        LOG.trace(ret.dumpTimes());
-        return ret;
-    }
-    
+        
     @Override
     public TripTimes clone() {
         TripTimes ret = null; 
@@ -259,6 +238,29 @@ public class TripTimes implements Cloneable, Serializable {
                 hi = --mid;
         }
         return mid;
+    }
+
+    public void forcePositive() {
+        // iterate over the new tripTimes, checking that dwells and hops are positive
+        boolean found = false;
+        int nHops = getNumHops();
+        int prevArr = -1;
+        for (int hop = 0; hop < nHops; hop++) {
+            int dep = this.getDepartureTime(hop);
+            int arr = this.getArrivalTime(hop);
+            if (arr < dep) { // negative hop time
+                LOG.error("negative hop time in updated TripTimes at index {}", hop);
+                found = true;
+            }
+            if (prevArr > dep) { // negative dwell time before this hop
+                found = true;
+                LOG.error("negative dwell time in updated TripTimes at index {}", hop);
+            }
+            prevArr = arr;
+        }
+        if (found) {
+            LOG.error(this.dumpTimes());
+        }
     }
 
 }

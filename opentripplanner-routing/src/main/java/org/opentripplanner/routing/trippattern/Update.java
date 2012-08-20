@@ -4,31 +4,41 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 
 public class Update implements Comparable<Update> {
 
-    final AgencyAndId tripId;
-    final String stopId;
-    final int stopSeq;
-    protected int arrive; // sec since midnight
-    final int depart; // sec since midnight
-    final Status status;
+    // these fields can eventually be protected if trippattern is in the same package as update
+    public final AgencyAndId tripId;
+    public final String stopId;
+    public final int stopSeq;
+    public int arrive; // sec since midnight
+    public final int depart; // sec since midnight
+    public final Status status;
+    /** The official timestamp for the update, if one was provided, or the time it was received. */
+    public final long timestamp;
     
-    public Update (AgencyAndId tripId, String stopId, int stopSeq, int arrive, int depart, Status status) {
+    public Update (AgencyAndId tripId, String stopId, int stopSeq, int arrive, int depart, 
+            Status status, long timestamp) {
         this.tripId = tripId;
         this.stopId = stopId;
         this.stopSeq = stopSeq;
         this.arrive = arrive;
         this.depart = depart;
         this.status = status;
+        this.timestamp = timestamp;
     }
 
     /**
-     * This comparator is useful for breaking lists of mixed-trip updates into single-trip blocks.
-     * We sort on (tripId, stopSequence, departureTime) because there may be duplicate stops in an
-     * update list, and we want them to be in a predictable order for filtering.
+     * This ordering is useful for breaking lists of mixed-trip updates into single-trip blocks.
+     * We sort on (tripId, timestamp, stopSequence, depart) because there may be duplicate stops in 
+     * an update list, and we want them to be in a predictable order for filtering. Usually 
+     * duplicate stops are due to multiple updates for the same trip in the same message. In this 
+     * case the two updates will have different timestamps, and we want to apply them in order.
      */
     @Override
     public int compareTo(Update other) {
         int result;
         result = this.tripId.compareTo(other.tripId);
+        if (result != 0)
+            return result;
+        result = (int) (this.timestamp - other.timestamp);
         if (result != 0)
             return result;
         result = this.stopSeq - other.stopSeq;

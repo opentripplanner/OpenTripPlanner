@@ -2,9 +2,11 @@ package org.opentripplanner.updater.stoptime;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,6 +18,9 @@ import javax.annotation.PostConstruct;
 
 import lombok.Setter;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.common.CTX;
 import org.opentripplanner.routing.trippattern.Update;
@@ -38,8 +43,10 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer {
     @Setter private String address = "tcp://node01.post.openov.nl:7817";
     @Setter private static String feed = "/GOVI/KV8"; 
     @Setter private static String messageLogFile;
-    
+
+    @Setter private static String fakeInput = null; //"/home/abyrd/nl.ctx";
     Writer logWriter;
+    Reader fakeInputReader;
     
     @PostConstruct
     public void connectToFeed() {
@@ -53,8 +60,17 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer {
                 logWriter = null;
             }
         }
+        if (fakeInput != null) {
+            try {
+                fakeInputReader = new FileReader(fakeInput);
+            } catch (IOException e) {
+                LOG.warn("problem opening fake input file: {}", e);
+                fakeInputReader = null;
+            }
+        }
     }
     
+
     public List<Update> getUpdates() {
         /* recvMsg blocks -- unless you call Socket.setReceiveTimeout() */
         // so when timeout occurs, it does not return null, but a reference to some
@@ -100,11 +116,12 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer {
             ret = parseCTX(buffer.toString());
             count += 1;
             LOG.debug("decoded gzipped CTX message #{}: {}", count, msg);
-            if (count % 1000 == 0) {
+            if (count % 100 == 0) {
                 LOG.info("received {} KV8 messages.", count);
             }
         } catch (Exception e) {
             LOG.error("exception while decoding (unzipping) incoming CTX message: {}", e.getMessage()); 
+            e.printStackTrace();
         } finally {
             msg.destroy(); // is this necessary? does ZMQ lib automatically free mem?
         }
@@ -112,12 +129,15 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer {
     }
     
     public List<Update> parseCTX(String ctxString) {
-        //LOG.debug(ctxString);
+        //LOG.trace(ctxString);
         CTX ctx = new CTX(ctxString);
         // at this point, updates may have mixed trip IDs, dates, etc.
         List<Update> ret = new ArrayList<Update>(); 
         for (int i = 0; i < ctx.rows.size(); i++) {
             HashMap<String, String> row = ctx.rows.get(i);
+            // there was a field in the CTX all along that indicated the extra non-passenger stops...
+            if (row.get("JourneyStopType").equals("INFOPOINT"))
+                continue;
             int arrival = secondsSinceMidnight(row.get("ExpectedArrivalTime"));
             int departure = secondsSinceMidnight(row.get("ExpectedDepartureTime"));
             Update u = new Update(
@@ -125,7 +145,8 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer {
                     kv7StopId(row), 
                     Integer.parseInt(row.get("UserStopOrderNumber")), 
                     arrival, departure,
-                    kv8Status(row));
+                    kv8Status(row),
+                    kv8Timestamp(row)) ;
             ret.add(u);
         }
         return ret;
@@ -166,6 +187,13 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer {
         return row.get("TimingPointCode");
     }
     
+    public long kv8Timestamp (HashMap<String, String> row) {
+        String timestamp = row.get("LastUpdateTimeStamp");
+        DateTimeFormatter parser = ISODateTimeFormat.dateTimeNoMillis();
+        DateTime dt = parser.parseDateTime(timestamp);
+        return dt.getMillis();
+    }
+
     public Update.Status kv8Status(HashMap<String, String> row) {
         String s = row.get("TripStopStatus");
         if (s.equals("DRIVING"))

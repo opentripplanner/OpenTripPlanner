@@ -31,6 +31,7 @@ import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.routing.trippattern.Update;
 import org.opentripplanner.routing.trippattern.UpdateBlock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -299,7 +300,11 @@ public class TableTripPattern implements TripPattern, Serializable {
 
         private final ArrayList<TripTimes> tripTimes;
 
-        /** if the index is null, this timetable has not been indexed. use a linear search. */
+        /** 
+         * If the index is null, this timetable has not been indexed. use a linear search. 
+         * Unfortunately you really do need 2 indexes, because dwell times for different trips may 
+         * overlap.
+         */
         private TripTimes[][] arrivalsIndex;
         private TripTimes[][] departuresIndex;
         
@@ -562,24 +567,86 @@ public class TableTripPattern implements TripPattern, Serializable {
             return tripTimes.get(tripIndex);
         }
 
-        public boolean update(UpdateBlock ul) {
+        /**
+         * Copy-on-write update of the relevant TripTimes in this Timetable. The existing TripTimes 
+         * must not be modified directly because they may be shared with the underlying scheduled 
+         * timetable, or other updated timetables.
+         */
+        public boolean update(UpdateBlock block) {
             /* though all timetables have the same trip ordering, some may have extra trips due to 
-             * the dynamic addition of unscheduled trips */
-            // checking against *this* timetable, not scheduled one
-            int tripIndex = getTripIndex(ul.tripId); 
+             * the dynamic addition of unscheduled trips.
+             * However, we want to apply trip update blocks on top of *scheduled* times */
+            int tripIndex = scheduledTimetable.getTripIndex(block.tripId); 
             if (tripIndex == -1) {
-                LOG.debug("tripId {} not found", ul.tripId);
+                LOG.info("tripId {} not found in pattern.", block.tripId);
                 return false;
             } else {
-                LOG.debug("tripId {} found at index {}", ul.tripId, tripIndex);
+                LOG.trace("tripId {} found at index {} (in scheduled timetable)", block.tripId, tripIndex);
             }
-            int stopIndex = ul.findUpdateStopIndex(TableTripPattern.this);
+            // stopIndex as in transit stop (not 'end', not 'hop')
+            int stopIndex = block.findUpdateStopIndex(TableTripPattern.this);
             if (stopIndex == UpdateBlock.MATCH_FAILED) {
-                LOG.trace("update block did not match stopIds");
+                LOG.warn("Unable to match update block to stopIds.");
                 return false;
             }
-            TripTimes oldTimes = getTripTimes(tripIndex);
-            TripTimes newTimes = oldTimes.updatedClone(ul, stopIndex);
+            TripTimes oldTimes = scheduledTimetable.getTripTimes(tripIndex);
+            // I originally used an updatedClone method on the triptimes, but this is impractical
+            // when fuzzy matching is in use because tripTimes don't
+            // know what pattern they belong to, or what their stops are.
+            // it's legitimate for the timetable to directly access tripTimes, but some methods 
+            // should probably be changed to protected.
+            // it would also be possible to just pass the list of stops into the updatedCopy method,
+            // but TripPattern, TimeTable, and StopTimes belong in their own package.
+            TripTimes newTimes = oldTimes.clone();
+            LOG.trace(block.toString());
+            LOG.trace(newTimes.dumpTimes());
+            // there is certainly a more efficient way than repeatedly decompacting and recompacting
+            // but at least it's clear
+            newTimes.decompact();
+            // An update block starts from the current known position of a vehicle.
+            // If the vehicle is early, this creates a negative hop time at the boundary between
+            // scheduled and updated times.
+            // We know that the previous stops on this trip are completely useless for trip 
+            // planning since the vehicle has already passed them. 
+            // Just erase them entirely, in a way that still allows compacting the pattern.
+            for (int hop = 0; hop < stopIndex; hop++) {
+                newTimes.departureTimes[hop] = -1;
+                // this will erase the arrival time on the first stop to be updated, but
+                // that's about to get overwritten anyway
+                newTimes.arrivalTimes[hop] = -1;
+                // TODO: the -1s make it easy to compact the pattern, but are going to wreak havoc
+                // on indexing and searching. they must be interpreted at Integer.MAXVALUE.
+            }
+            int nApplied = 0;
+            for (Update u : block.updates) {
+                Stop s = stops[stopIndex];
+                if ( ! s.getId().getId().equals(u.stopId)) {
+                    // be tolerant of update blocks containing extra updates, though filtering
+                    // out INFOPOINTS should eliminate that problem.
+                    continue; 
+                }
+                if (stopIndex < newTimes.departureTimes.length) {
+                    // updates may contain a departure time of 0 for the final stop 
+                    // but a valid arrival time at that same stop. avoid index out of bounds.
+                    newTimes.departureTimes[stopIndex] = u.depart;
+                }
+                if (stopIndex >= 1 && stopIndex <= newTimes.arrivalTimes.length)  {
+                    // first hop is defined by departure from first stop and arrival at second stop.
+                    newTimes.arrivalTimes[stopIndex - 1] = u.arrive; 
+                }
+                nApplied += 1;
+                stopIndex += 1;
+            }
+            if (nApplied < 1) {
+                // this had better not happen, since we just destroyed some stop times above...
+                LOG.error("matched update block was not actually applied! TripTimes may be corrupt.");
+                return false;
+            }
+            // one more check, just to make sure...
+            newTimes.forcePositive();
+            LOG.trace(newTimes.dumpTimes());
+            newTimes.compact();
+            LOG.trace(newTimes.dumpTimes());
             this.tripTimes.set(tripIndex, newTimes);
             return true;
         }

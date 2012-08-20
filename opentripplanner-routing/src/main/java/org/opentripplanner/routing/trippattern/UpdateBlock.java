@@ -25,12 +25,13 @@ public class UpdateBlock {
 
     public final AgencyAndId tripId;
 
-    public long timestamp; /// addme
+    public final long timestamp; 
     
     public final List<Update> updates;
     
-    private UpdateBlock(AgencyAndId tripId) {
+    private UpdateBlock(AgencyAndId tripId, long timestamp) {
         this.tripId = tripId;
+        this.timestamp = timestamp;
         updates = new ArrayList<Update>();
     }
     
@@ -40,16 +41,16 @@ public class UpdateBlock {
      * TODO: implement date support for updates
      */
     public static List<UpdateBlock> splitByTrip(List<Update> mixedUpdates) {
-        List<UpdateBlock> ret = new LinkedList<UpdateBlock>();
-        // Update comparator sorts on (tripId, stopId)
+        List<UpdateBlock> ret = new ArrayList<UpdateBlock>();
+        // Update comparator sorts on (tripId, timestamp, stopSequence, depart)
         Collections.sort(mixedUpdates);
-        UpdateBlock ul = null;
-        for (Update u : mixedUpdates) {
-            if (ul == null || ! ul.tripId.equals(u.tripId)) {
-                ul = new UpdateBlock(u.tripId);
-                ret.add(ul);
+        UpdateBlock block = null;
+        for (Update u : mixedUpdates) { // create a new block when the trip or timestamp changes 
+            if (block == null || ! block.tripId.equals(u.tripId) || block.timestamp != u.timestamp) {
+                block = new UpdateBlock(u.tripId, u.timestamp);
+                ret.add(block);
             }
-            ul.updates.add(u);
+            block.updates.add(u);
         }
         return ret;
     }
@@ -59,10 +60,9 @@ public class UpdateBlock {
         StringBuilder sb = new StringBuilder();
         sb.append("tripId: ");
         sb.append(this.tripId);
-        sb.append('\n');
         for (Update u : updates) {
-            sb.append(u.toString());
             sb.append('\n');
+            sb.append(u.toString());
         }
         return sb.toString();
     }
@@ -80,7 +80,8 @@ public class UpdateBlock {
             if (duplicateStops && prev_u != null && prev_u.stopId.equals(u.stopId)) {
                 // updates with the same sequence number within a block are sorted by departure 
                 // time. keeping the first update (earliest departure) is the more conservative 
-                // option for depart-after trip planning 
+                // option for depart-after trip planning
+                // this should not happen since we are splitting into blocks on tripid and timestamp.
                 LOG.warn("filtered duplicate stop {} from update for trip {}", u.stopId, u.tripId);
                 iter.remove();
                 modified = true;
@@ -88,8 +89,8 @@ public class UpdateBlock {
             }
             // last update in trip may have 0 departure
             if (negativeDwells && u.depart < u.arrive && u.depart != 0) {
-                // in KV8 negative dwell times are very common.
-                LOG.warn("filtered negative dwell time at stop {} in update for trip {}",
+                // in KV8 negative dwell times are very common, so logging them is debug-level
+                LOG.debug("filtered negative dwell time at stop {} in update for trip {}",
                         u.stopId, u.tripId);
                 u.arrive = u.depart;
                 modified = true;
@@ -154,8 +155,10 @@ public class UpdateBlock {
      * @return
      */
     public int findUpdateStopIndex(TableTripPattern pattern) {
-        if (updates == null || updates.size() < 1)
-            return -1;
+        if (updates == null || updates.size() < 1) {
+            LOG.debug("Zzero-length or null update block. Cannot match.");
+            return MATCH_FAILED;
+        }
         int result = matchBlockSimple(pattern);
         if (result == MATCH_FAILED) {
             LOG.debug("simple block matching failed, trying fuzzy matching.");
@@ -199,8 +202,6 @@ public class UpdateBlock {
                     continue PATTERN; // full-block match failed, try incrementing offset
                 }
             }
-            /* full-block match succeeded */
-            LOG.debug("found matching stop block at index {}", pi);
             return pi;
         }
         return MATCH_FAILED;
@@ -213,8 +214,8 @@ public class UpdateBlock {
         for (int pi = 0; pi < nStops; pi++) { // index in pattern
             LOG.trace("---{}", pi);
             int score = 0;
+            int si = pi;
             for (int ui = 0; ui < updates.size(); ui++) { // iterate over index within update
-                int si = pi + ui;
                 if (si >= nStops) { 
                     break; // skip all remaining updates at the end of the list, do not raise score
                 }
@@ -222,8 +223,9 @@ public class UpdateBlock {
                 Update u = updates.get(ui);
                 LOG.trace("{} == {}", ps.getId().getId(), u.stopId);
                 if ( ! ps.getId().getId().equals(u.stopId)) {
-                    continue; // skip one update, do not raise score
+                    continue; // skip one update, do not raise score, do not increment stop
                 }
+                si += 1;
                 score += 1; // raise the score because we did not need to skip this update
             }
             scores[pi] = score;
