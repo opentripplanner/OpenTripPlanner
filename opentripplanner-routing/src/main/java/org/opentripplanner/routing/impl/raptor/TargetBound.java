@@ -86,6 +86,8 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
 
     public List<State> removedBoundingStates = new ArrayList<State>();
 
+    private List<State> transitStopsVisited = new ArrayList<State>();
+
     public TargetBound(RoutingRequest options) {
         this.options = options;
         this.realTarget = options.rctx.target;
@@ -100,7 +102,11 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
     @Override
     public boolean shouldSearchContinue(Vertex origin, Vertex target, State current,
             ShortestPathTree spt, RoutingRequest traverseOptions) {
-        if (current.getVertex() == realTarget) {
+        final Vertex vertex = current.getVertex();
+        if (vertex instanceof TransitStop) {
+            transitStopsVisited.add(current);
+        }
+        if (vertex == realTarget) {
             addBounder(current);
         }
         return true;
@@ -300,6 +306,9 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
 
     public void addSptStates(List<MaxWalkState> states) {
         for (MaxWalkState state : states) {
+            if (state.getVertex() instanceof TransitStop) {
+                transitStopsVisited.add(state);
+            }
             spt.add(state);
         }
     }
@@ -319,5 +328,13 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
             return distanceLibrary.fastDistance(realTargetCoordinate.y, realTargetCoordinate.x,
                     vertex.getY(), vertex.getX());
         }
+    }
+
+    public List<State> getTransitStopsVisited() {
+        return transitStopsVisited;
+    }
+
+    public void prepareForSearch() {
+        transitStopsVisited.clear();
     }
 }

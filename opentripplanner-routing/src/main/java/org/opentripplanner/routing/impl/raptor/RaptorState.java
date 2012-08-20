@@ -77,5 +77,10 @@ public class RaptorState {
             state = state.parent;
         }
     }
-    
+
+    public boolean eDominates(RaptorState oldState) {
+        return nBoardings <= oldState.nBoardings && waitingTime <= oldState.waitingTime
+                && walkDistance <= oldState.walkDistance * 1.1
+                && arrivalTime <= oldState.arrivalTime;
+    }
 }

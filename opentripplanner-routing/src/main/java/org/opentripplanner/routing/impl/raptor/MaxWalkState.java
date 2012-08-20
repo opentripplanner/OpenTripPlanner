@@ -5,7 +5,6 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateData;
 import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
@@ -24,11 +23,6 @@ public class MaxWalkState extends State {
     @Override
     public StateEditor edit(Edge e, EdgeNarrative en) {
         return new MaxWalkStateEditor(this, e, en);
-    }
-
-    @Override
-    public TraverseMode getNonTransitMode(RoutingRequest options) {
-        return TraverseMode.WALK;
     }
 
     @Override

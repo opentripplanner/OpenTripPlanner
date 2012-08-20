@@ -141,8 +141,8 @@ public class RaptorDataBuilder implements GraphBuilder {
         nTotalStops = data.stops.length;
         // initNearbyStops();
 
-        MaxTransitRegions regions = makeMaxTransitRegions(graph, data);
-        data.maxTransitRegions = regions;
+        //MaxTransitRegions regions = makeMaxTransitRegions(graph, data);
+        //data.maxTransitRegions = regions;
         graph.putService(RaptorDataService.class, new RaptorDataService(data));
 
     }
