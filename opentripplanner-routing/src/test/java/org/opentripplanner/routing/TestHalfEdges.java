@@ -305,15 +305,28 @@ public class TestHalfEdges extends TestCase {
         // The alert should be preserved
         // traverse two edges: the FreeEdge from the StreetLocation to the new TurnVertex, and the
         // TurnEdge to the next vertex
-        State traversedOne = new State((Vertex) start, new RoutingRequest());
+        RoutingRequest req = new RoutingRequest();
+        req.setMaxWalkDistance(Double.MAX_VALUE);
+        State traversedOne = new State((Vertex) start, req);
+        State currentState;
         for (Edge e : start.getOutgoing()) {
-            traversedOne = e.traverse(traversedOne);
-            break;
+            currentState = e.traverse(traversedOne);
+            if (currentState != null) {
+                traversedOne = currentState;
+                break;
+            }
         }
         
         for (Edge e : traversedOne.getVertex().getOutgoing()) {
-            traversedOne = e.traverse(traversedOne);
-            break;
+            // we don't want to go back to the split
+            if (!(e instanceof TurnEdge))
+                continue;
+            
+            currentState = e.traverse(traversedOne);
+            if (currentState != null) {
+                traversedOne = currentState;
+                break;
+            }
         }
         
         assertEquals(alert, traversedOne.getBackAlerts());
@@ -329,7 +342,6 @@ public class TestHalfEdges extends TestCase {
         left.setWheelchairNotes(wheelchairAlert);
         leftBack.setWheelchairNotes(wheelchairAlert);
         
-        RoutingRequest req = new RoutingRequest();
         req.setWheelchairAccessible(true);
         
         start = StreetLocation.createStreetLocation(graph, "start", "start",
@@ -338,13 +350,22 @@ public class TestHalfEdges extends TestCase {
         
         traversedOne = new State((Vertex) start, req);
         for (Edge e : start.getOutgoing()) {
-            traversedOne = e.traverse(traversedOne);
-            break;
+            currentState = e.traverse(traversedOne);
+            if (currentState != null) {
+                traversedOne = currentState;
+                break;
+            }
         }
         
         for (Edge e : traversedOne.getVertex().getOutgoing()) {
-            traversedOne = e.traverse(traversedOne);
-            break;
+            if (e instanceof FreeEdge)
+                continue;
+            
+            currentState = e.traverse(traversedOne);
+            if (currentState != null) {
+                traversedOne = currentState;
+                break;
+            }
         }
         
         assertEquals(wheelchairAlert, traversedOne.getBackAlerts());
