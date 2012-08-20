@@ -254,7 +254,7 @@ public class TableTripPattern implements TripPattern, Serializable {
     
     /** 
      * Find the next departure on this pattern at or after the specified time. This method will
-     * make use of any TimetableSnapshot present in the RoutingContext to redirect departure
+     * make use of any TimetableResolver present in the RoutingContext to redirect departure
      * lookups to the appropriate updated Timetable, and will fall back on the scheduled timetable
      * when no updates are available.
      * @return a TripTimes object providing all the arrival and departure times on the best trip.
@@ -262,7 +262,7 @@ public class TableTripPattern implements TripPattern, Serializable {
     public TripTimes getNextTrip(int stopIndex, int afterTime, boolean haveBicycle,
             RoutingRequest options) {
         Timetable timetable;
-        TimetableSnapshot snapshot = options.rctx.timetableSnapshot; 
+        TimetableResolver snapshot = options.rctx.timetableSnapshot; 
         if (snapshot != null)
             timetable = snapshot.resolve(this);
         else
@@ -272,7 +272,7 @@ public class TableTripPattern implements TripPattern, Serializable {
     
     /** 
      * Find the previous departure on this pattern at or before the specified time. This method will
-     * make use of any TimetableSnapshot present in the RoutingContext to redirect departure
+     * make use of any TimetableResolver present in the RoutingContext to redirect departure
      * lookups to the appropriate updated Timetable, and will fall back on the scheduled timetable
      * when no updates are available.
      * @return a TripTimes object providing all the arrival and departure times on the best trip.
@@ -280,7 +280,7 @@ public class TableTripPattern implements TripPattern, Serializable {
     public TripTimes getPreviousTrip(int stopIndex, int beforeTime, boolean haveBicycle, 
             RoutingRequest options) {
         Timetable timetable;
-        TimetableSnapshot snapshot = options.rctx.timetableSnapshot; 
+        TimetableResolver snapshot = options.rctx.timetableSnapshot; 
         if (snapshot != null)
             timetable = snapshot.resolve(this);
         else

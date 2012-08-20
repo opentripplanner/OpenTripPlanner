@@ -11,7 +11,7 @@ import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
-import org.opentripplanner.routing.edgetype.TimetableSnapshot;
+import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.error.TransitTimesException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
@@ -54,7 +54,7 @@ public class RoutingContext implements Cloneable {
     public final Map<AgencyAndId, Set<ServiceDate>> serviceDatesByServiceId = new HashMap<AgencyAndId, Set<ServiceDate>>();
     public RemainingWeightHeuristic remainingWeightHeuristic;
     public final TransferTable transferTable;
-    public final TimetableSnapshot timetableSnapshot; 
+    public final TimetableResolver timetableSnapshot; 
     
     /**
      * Cache lists of which transit services run on which midnight-to-midnight periods. This ties a

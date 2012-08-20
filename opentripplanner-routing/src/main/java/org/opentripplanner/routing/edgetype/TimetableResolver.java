@@ -22,9 +22,9 @@ import org.slf4j.LoggerFactory;
  * 
  * At this point, only one writing thread at a time is supported.
  */
-public class TimetableSnapshot {
+public class TimetableResolver {
     
-    private static final Logger LOG = LoggerFactory.getLogger(TimetableSnapshot.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TimetableResolver.class);
 
     // Use HashMap not Map so we can clone.
     // if this turns out to be slow/spacious we can use an array with integer pattern indexes
@@ -78,8 +78,8 @@ public class TimetableSnapshot {
     
     /* TODO: reverse this procedure - have a method for producing an immutable snapshot of a mutable working buffer */
     @SuppressWarnings("unchecked")
-    public TimetableSnapshot mutableCopy() {
-        TimetableSnapshot ret = new TimetableSnapshot();
+    public TimetableResolver mutableCopy() {
+        TimetableResolver ret = new TimetableResolver();
         ret.timetables = (HashMap<TableTripPattern, Timetable>) this.timetables.clone();
         return ret;
     }

@@ -12,6 +12,6 @@ package org.opentripplanner.routing.edgetype;
  */
 public interface TimetableSnapshotSource {
 
-    public TimetableSnapshot getSnapshot();
+    public TimetableResolver getSnapshot();
     
 }
