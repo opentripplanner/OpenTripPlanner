@@ -58,6 +58,7 @@ public class Update implements Comparable<Update> {
         PASSED,
         ARRIVED,
         PREDICTION,
+        CANCEL,
         UNKNOWN
     }
     

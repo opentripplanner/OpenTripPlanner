@@ -142,7 +142,7 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
                 }
                 TableTripPattern pattern = patternIndex.get(block.tripId);
                 if (pattern == null) {
-                    LOG.warn("No pattern found for tripId {}, skipping UpdateBlock.", block.tripId);
+                    LOG.debug("No pattern found for tripId {}, skipping UpdateBlock.", block.tripId);
                     continue;
                 }
                 // we have a message we actually want to apply

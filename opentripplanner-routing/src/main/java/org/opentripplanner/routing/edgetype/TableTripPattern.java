@@ -648,10 +648,10 @@ public class TableTripPattern implements TripPattern, Serializable {
             // planning since the vehicle has already passed them. 
             // Just erase them entirely, in a way that still allows compacting the pattern.
             for (int hop = 0; hop < stopIndex; hop++) {
-                newTimes.departureTimes[hop] = -1;
+                newTimes.departureTimes[hop] = TripTimes.PASSED;
                 // this will erase the arrival time on the first stop to be updated, but
                 // that's about to get overwritten anyway
-                newTimes.arrivalTimes[hop] = -1;
+                newTimes.arrivalTimes[hop] = TripTimes.PASSED;
                 // TODO: the -1s make it easy to compact the pattern, but are going to wreak havoc
                 // on indexing and searching. they must be interpreted at Integer.MAXVALUE.
             }

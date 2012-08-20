@@ -7,10 +7,12 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
-import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,11 +33,15 @@ public class TripTimes implements Cloneable, Serializable {
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
     public static final int PASSED = -1;
     public static final int CANCELED = -2;
-    public static final int EXPIRED = -3;
     
     public final Trip trip;
 
-    public final int index; // this is kind of ugly, but the headsigns are in the pattern not here
+    /** 
+     * This is kind of ugly, but the headsigns are in the enclosing pattern not here. Also, assuming
+     * we have a reference to the enclosing pattern, this lets us find the equivalent scheduled
+     * TripTimes.
+     */
+    public final int index; 
     
     @XmlElement
     public int[] departureTimes;
@@ -258,8 +264,8 @@ public class TripTimes implements Cloneable, Serializable {
                 increasing = false;
             }
             if (prevArr > dep) { // negative dwell time before this hop
-                increasing = false;
                 LOG.error("negative dwell time in updated TripTimes at index {}", hop);
+                increasing = false;
             }
             prevArr = arr;
         }
@@ -269,4 +275,16 @@ public class TripTimes implements Cloneable, Serializable {
         return increasing;
     }
 
+    /**
+     * Extend this class to 
+     * @author abyrd
+     */
+    @AllArgsConstructor
+    public static class Delegating {
+
+        @NonNull
+        private final TripTimes tt;
+    
+    }
+    
 }

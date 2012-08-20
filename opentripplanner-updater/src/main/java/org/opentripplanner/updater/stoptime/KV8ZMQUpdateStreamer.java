@@ -129,8 +129,8 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer {
     }
     
     public List<Update> parseCTX(String ctxString) {
-        //LOG.trace(ctxString);
         CTX ctx = new CTX(ctxString);
+        //LOG.trace(ctxString);
         // at this point, updates may have mixed trip IDs, dates, etc.
         List<Update> ret = new ArrayList<Update>(); 
         for (int i = 0; i < ctx.rows.size(); i++) {
@@ -166,7 +166,8 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer {
     /** 
      * convert KV7 fields into a GTFS trip_id
      * trip_ids must be data set unique in GTFS, which is why we use the DataOwnerCode (~=agency_id) 
-     * twice, in the trip_id itself and the enclosing AgencyAndId
+     * twice, in the trip_id itself and the enclosing AgencyAndId.
+     * https://github.com/skywave/kv7tools/blob/master/kv7_gtfs.sql#L42
      */
     public AgencyAndId kv7TripId (HashMap<String, String> row) {
         String tripId = String.format("%s_%s_%s_%s_%s",
