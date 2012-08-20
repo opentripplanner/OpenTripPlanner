@@ -17,6 +17,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -30,6 +31,7 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.util.ElevationProfileSegment;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
@@ -171,7 +173,11 @@ public class TestStreetMatcher {
         public SimpleEdge(StreetVertex v1, StreetVertex v2) {
             super(v1, v2);
         }
-
+        
+        public Set<Alert> getNotes () {
+            return null;
+        }
+        
         @Override
         public State traverse(State s0) {
             double d = getDistance();
