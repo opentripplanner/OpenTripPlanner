@@ -13,7 +13,7 @@ import java.util.Iterator;
 public class ArrayBag<T> implements Iterable<T> {
     T[] items;
     int last;
-    public ArrayBagIterator iterator = new ArrayBagIterator();
+    protected ArrayBagIterator iterator = new ArrayBagIterator();
 
     class ArrayBagIterator implements Iterator<T> {
         private int nextIndex;
