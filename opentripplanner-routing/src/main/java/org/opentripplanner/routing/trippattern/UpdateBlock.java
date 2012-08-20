@@ -135,6 +135,9 @@ public class UpdateBlock {
      * are not right-aligned wrt the full trip. They are contiguous, and delay predictions decay 
      * linearly to match scheduled times at the end of the block of updates.
      * 
+     * (actually, apparently they don't in the middle of the night, and maybe we should just throw 
+     * them out if they don't.)
+     * 
      * TODO: verify: does this mean that we can use scheduled times for the rest of the trip? Or
      * are updates cumulative? 
      * 
