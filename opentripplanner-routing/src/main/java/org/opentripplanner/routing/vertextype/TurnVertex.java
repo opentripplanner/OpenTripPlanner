@@ -285,6 +285,10 @@ public class TurnVertex extends StreetVertex {
         return notes;
     }
 
+    public void setNotes(Set<Alert> notes) {
+        this.notes = notes;
+    }
+    
     public boolean hasBogusName() {
         return hasBogusName;
     }

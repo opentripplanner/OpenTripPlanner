@@ -18,6 +18,7 @@ import static org.opentripplanner.common.IterableLibrary.cast;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -40,6 +41,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.location.StreetLocation;
+import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
@@ -280,6 +282,42 @@ public class TestHalfEdges extends TestCase {
             assertNotSame(s.getVertex(), graph.getVertex("right"));
             assertNotSame(s.getVertex(), graph.getVertex("rightBack"));
         }
+    }
+    
+    /**
+     * Test that alerts on split streets are preserved, i.e. if there are alerts on the street that is split
+     * the same alerts should be present on the new street.
+     */
+    public void testStreetSplittingAlerts () {
+        HashSet<Edge> turns = new HashSet<Edge>(left.getOutgoing());
+        turns.addAll(leftBack.getOutgoing());
+
+        Set<Alert> alert = new HashSet<Alert>();
+        alert.add(Alert.createSimpleAlerts("This is the alert"));
+        left.setNotes(alert);
+        leftBack.setNotes(alert);
+                
+        StreetLocation start = StreetLocation.createStreetLocation(graph, "start", "start",
+                cast(turns, StreetEdge.class),
+                new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()));
+        
+        // The alert should be preserved
+        // traverse two edges: the FreeEdge from the StreetLocation to the new TurnVertex, and the
+        // TurnEdge to the next vertex
+        State traversedOne = new State((Vertex) start, new RoutingRequest());
+        for (Edge e : start.getOutgoing()) {
+            traversedOne = e.traverse(traversedOne);
+            break;
+        }
+        
+        for (Edge e : traversedOne.getVertex().getOutgoing()) {
+            traversedOne = e.traverse(traversedOne);
+            break;
+        }
+        
+        assertEquals(alert, traversedOne.getBackAlerts());
+        assertNotSame(left, traversedOne.getBackEdge().getFromVertex());
+        assertNotSame(leftBack, traversedOne.getBackEdge().getFromVertex());
     }
 
     public void testStreetLocationFinder() {
