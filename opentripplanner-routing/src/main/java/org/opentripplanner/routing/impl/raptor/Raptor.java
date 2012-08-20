@@ -47,6 +47,8 @@ public class Raptor implements PathService {
 
     static final double MAX_TRANSIT_SPEED = 25;
 
+    private static final int MAX_WALK_MULTIPLE = 16;
+
     @Autowired
     private GraphService graphService;
 
@@ -93,12 +95,21 @@ public class Raptor implements PathService {
             routeSet.maxTimeDayIndex = day;
         }
 
-        for (int i = 0; i < options.getMaxTransfers() + 2; ++i) {
-            round(data, options, walkOptions, routeSet, i);
+        double initialWalk = options.getMaxWalkDistance();
 
-            if (routeSet.getTargetStates().size() >= options.getNumItineraries())
-                break;
-        }
+        RETRY: do {
+            for (int i = 0; i < options.getMaxTransfers() + 2; ++i) {
+                round(data, options, walkOptions, routeSet, i);
+
+                if (routeSet.getTargetStates().size() >= options.getNumItineraries())
+                    break RETRY;
+            }
+            if (routeSet.getTargetStates().size() > 0)
+                break RETRY;
+
+            options.setMaxWalkDistance(options.getMaxWalkDistance() * 2);
+            routeSet.bounder = new TargetBound(options);
+        } while (options.getMaxWalkDistance() < initialWalk * MAX_WALK_MULTIPLE);
 
         if (routeSet.getTargetStates().isEmpty()) {
             log.info("RAPTOR found no paths (try retrying?)");
@@ -186,7 +197,6 @@ public class Raptor implements PathService {
 
         if (serviceDays.equals(cachedServiceDays))
             return cachedRaptorData;
-        // you are here: need to reduce list of boards
         RaptorData data = graph.getService(RaptorDataService.class).getData();
         RaptorData pruned = new RaptorData();
         pruned.raptorStopsForStopId = data.raptorStopsForStopId;
