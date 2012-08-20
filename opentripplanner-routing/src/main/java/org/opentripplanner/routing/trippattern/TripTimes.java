@@ -240,6 +240,11 @@ public class TripTimes implements Cloneable, Serializable {
         return mid;
     }
 
+    /**
+     * After applying updates to scheduled Triptimes, we could potentially end up with negative
+     * hop or dwell times. We really don't want those being used in routing. Check that all times 
+     * are increasing, and issue warnings if this is not the case.
+     */
     public void forcePositive() {
         // iterate over the new tripTimes, checking that dwells and hops are positive
         boolean found = false;

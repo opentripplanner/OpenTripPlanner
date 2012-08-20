@@ -56,12 +56,15 @@ public class TableTripPattern implements TripPattern, Serializable {
     public static final int NO_PICKUP = 1;
     public static final int FLAG_BIKES_ALLOWED = 32;
     
-    /** an integer index uniquely identifying this pattern among all in the graph.
-     *  this additional level of indirection allows versioning of trip patterns, which is 
-     *  necessary for real-time stop time updates. */
+    /** 
+     * An integer index uniquely identifying this pattern among all in the graph.
+     * This additional level of indirection allows versioning of trip patterns, which is 
+     * necessary for real-time stop time updates. (Currently using a hashmap until that proves to
+     * be too inefficient.) 
+     */
 //    public final int patternIndex;
     
-    /* an arbitrary trip that uses this pattern */
+    /** An arbitrary trip that uses this pattern. Maybe we should just store route, etc. directly. */
     public final Trip exemplar;
 
     // override trip_headsign with stop_headsign where necessary
@@ -71,15 +74,11 @@ public class TableTripPattern implements TripPattern, Serializable {
      * This timetable holds the 'official' stop times from GTFS. If realtime stoptime updates are 
      * applied, trips searches will be conducted using another timetable and this one will serve to 
      * find early/late offsets, or as a fallback if the other timetable becomes corrupted or
-     * expires. 
-     * Via Lombok Delegate, calling timetable methods on a TableTripPattern will call them on its
-     * scheduled timetable.
+     * expires. Via Lombok Delegate, calling timetable methods on a TableTripPattern will call 
+     * them on its scheduled timetable.
      */
     @Delegate
     protected final Timetable scheduledTimetable = new Timetable();
-
-//    @XmlElement
-//    private final ArrayList<Integer> perTripFlags = new ArrayList<Integer>();
 
     // redundant since tripTimes have a trip
     // however it's nice to have for order reference, since all timetables must have tripTimes
@@ -93,20 +92,25 @@ public class TableTripPattern implements TripPattern, Serializable {
      */
     private final ArrayList<Trip> trips = new ArrayList<Trip>();
 
-    // all trips in a pattern have the same stops, so this applies to every trip in this pattern
+    /** 
+     * All trips in a pattern have the same stops, so this array of Stops applies to every trip in 
+     * every timetable in this pattern. 
+     */
     public Stop[] stops; 
 
+    /** Holds stop-specific information such as wheelchair accessibility and pickup/dropoff roles. */
     @XmlElement
     private int[] perStopFlags;
     
-    //@XmlElement
-    //private String[] zones; // use stops instead
-
+    /** For each hop, the best running time. This serves to provide lower bounds on traversal time.
+     * TODO: and should be indexed per timetable, not in patterns. */
     int bestRunningTimes[];
     
+    /** For each stop, the best dwell time. This serves to provide lower bounds on traversal time. */
     int bestDwellTimes[];
 
-    int serviceId; // optimized serviceId code
+    /** Optimized serviceId code. All trips in a pattern are by definition on the same service. */
+    int serviceId; 
     
     public TableTripPattern(Trip exemplar, ScheduledStopPattern stopPattern, int serviceId) {
         this.exemplar = exemplar;
@@ -143,26 +147,6 @@ public class TableTripPattern implements TripPattern, Serializable {
         return Arrays.asList(stops);
     }
 
-    /*
-    // SEEMS UNUSED
-    public boolean getWheelchairAccessible(int stopIndex, int trip) {
-//        if ((perStopFlags[stopIndex] & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
-//            return false;
-//        }
-//        if ((perTripFlags.get(trip) & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
-//            return false;
-//        }
-        return true;
-    }
-
-    // SEEMS UNUSED
-    public boolean getBikesAllowed(int trip) {
-//        return (perTripFlags.get(trip) & FLAG_BIKES_ALLOWED) != 0;
-        return true;
-    }
-     */
-    
-    /** Gets the Trip object for a given trip index */
     public Trip getTrip(int tripIndex) {
         return trips.get(tripIndex);
     }
@@ -188,7 +172,6 @@ public class TableTripPattern implements TripPattern, Serializable {
 
     /** Returns the zone of a given stop */
     public String getZone(int stopIndex) {
-        //return zones[stopIndex];
         return stops[stopIndex].getZoneId();
     }
 
@@ -228,11 +211,18 @@ public class TableTripPattern implements TripPattern, Serializable {
         return (perStopFlags[stopIndex] & MASK_PICKUP) >> SHIFT_PICKUP;
     }
 
-    public int getNumTrips () {
+    /** 
+     * Gets the number of scheduled trips on this pattern. Note that when stop time updates are
+     * being applied, there may be other Timetables for this pattern which contain a larger number
+     * of trips. However, all trips with indexes from 0 through getNumTrips()-1 will always 
+     * correspond to the scheduled trips.
+     */
+    public int getNumScheduledTrips () {
         return trips.size();
     }
     
-//    
+//   TODO: verify and fix headsign compaction
+    
 //    if (headsigns != null) { 
 //        // DO NOT transpose headsigns to allow reusing rows
 //        this.headsigns = new String[nHops][nTrips]; 
@@ -257,12 +247,18 @@ public class TableTripPattern implements TripPattern, Serializable {
 //        }
 //    }
 
-
+    // TODO: Lombokize this boilerplate 
     public int getServiceId() { 
         return serviceId;
     }
     
-        
+    /** 
+     * Find the next departure on this pattern at or after the specified time. This method will
+     * make use of any TimetableSnapshot present in the RoutingContext to redirect departure
+     * lookups to the appropriate updated Timetable, and will fall back on the scheduled timetable
+     * when no updates are available.
+     * @return a TripTimes object providing all the arrival and departure times on the best trip.
+     */
     public TripTimes getNextTrip(int stopIndex, int afterTime, boolean haveBicycle,
             RoutingRequest options) {
         Timetable timetable;
@@ -274,6 +270,13 @@ public class TableTripPattern implements TripPattern, Serializable {
         return timetable.getNextTrip(stopIndex, afterTime, haveBicycle, options);
     }
     
+    /** 
+     * Find the previous departure on this pattern at or before the specified time. This method will
+     * make use of any TimetableSnapshot present in the RoutingContext to redirect departure
+     * lookups to the appropriate updated Timetable, and will fall back on the scheduled timetable
+     * when no updates are available.
+     * @return a TripTimes object providing all the arrival and departure times on the best trip.
+     */
     public TripTimes getPreviousTrip(int stopIndex, int beforeTime, boolean haveBicycle, 
             RoutingRequest options) {
         Timetable timetable;
@@ -285,55 +288,79 @@ public class TableTripPattern implements TripPattern, Serializable {
         return timetable.getPreviousTrip(stopIndex, beforeTime, haveBicycle, options);
     }        
 
-    /* NESTED CLASS */
+    /* --- BEGIN NESTED CLASS --- */
     
     /** 
-     * Timetables provide most of the trippattern functionality. Each trip pattern may need more 
-     * than one if stop time updates are being applied (one for the scheduled stop times, one for
-     * the updated stop times, another for the working buffer of updated stoptimes, etc. 
-     * This is a non-static nested (inner) class so each timetable belongs to a specific 
-     * trippattern, whose fields it can access.
+     * Timetables provide most of the TripPattern functionality. Each TripPattern may possess more 
+     * than one Timetable when stop time updates are being applied: one for the scheduled stop times, 
+     * one for each snapshot of updated stop times, another for a working buffer of updated stop 
+     * times, etc. Timetable is a non-static nested (inner) class, so each Timetable belongs to a 
+     * specific TripPattern, whose fields it can access.
      */
+    // TODO: Timetable is not large enough that it should probably be split out and have an explicit
+    // reference to its owning pattern via a field. However it is super convenient to have access
+    // to the trippattern's fields.
     public class Timetable implements Serializable {
         
         private static final long serialVersionUID = 1L;
 
+        /** 
+         * The Timetable size (number of TripTimes) at which indexes will be built for all stops. 
+         * Below this size, departure and arrival times will be found by linear search. Above this
+         * size, it will be possible to use binary search.
+         */
+        private static final int INDEX_THRESHOLD = 16;
+
+        /** 
+         * Contains one TripTimes object for each scheduled trip (even cancelled ones) and possibly
+         * additional TripTimes objects for unscheduled trips.
+         */
         private final ArrayList<TripTimes> tripTimes;
 
         /** 
-         * If the index is null, this timetable has not been indexed. use a linear search. 
-         * Unfortunately you really do need 2 indexes, because dwell times for different trips may 
-         * overlap.
+         * If the departures index is null, this timetable has not been indexed: use a linear search. 
+         * Unfortunately you really do need 2 indexes, because dwell times for different trips at
+         * the same stop may overlap. The indexes always contain the same elements as the main
+         * tripTimes List, but are re-sorted at each stop to allow binary searches.
          */
         private TripTimes[][] arrivalsIndex;
         private TripTimes[][] departuresIndex;
         
-        public Timetable() {
+        /** Construct an empty Timetable. */
+        private Timetable() {
             tripTimes = new ArrayList<TripTimes>();
         }
         
-        /** copy constructor */
+        /** 
+         * Copy constructor: create an un-indexed Timetable with the same TripTimes as the 
+         * specified timetable. 
+         */
         private Timetable (Timetable tt) {
             tripTimes = new ArrayList<TripTimes>(tt.tripTimes);
         }
         
-        /** copy instance method sees enclosing instance */
+        /** 
+         * This copy instance method can see the enclosing TripPattern instance, while the copy 
+         * constructor does not. The only publically visible way to make a timetable, and it should
+         * probably be protected.
+         */
         public Timetable copy() {
             return new Timetable(this);
         }
         
-        /* It is of course inefficient to call this after updating only one or two trips in a 
-         * pattern, since we can potentially get by with swapping only the new trip
-         * into the already-sorted lists. But let's see realistically how resource-intensive
-         * this is before optimizing it.
+        /**
+         * Produces 2D index arrays that are stop-major and sorted, allowing binary search at any 
+         * given stop. It is of course inefficient to call this after updating only one or two 
+         * trips in a pattern since we can usually get by with swapping only the new trip into the 
+         * existing already-sorted lists. But let's see realistically how resource-intensive this 
+         * is before optimizing it.
          */
         private void index() {
             int nHops = stops.length - 1;
-            // index is stop-major and sorted, allowing binary search at a given stop
             arrivalsIndex = new TripTimes[nHops][];
             departuresIndex = new TripTimes[nHops][];
             for (int hop = 0; hop < nHops; hop++) {
-                // copy arraylist into new arrays
+                // copy canonical TripTimes List into new arrays
                 arrivalsIndex[hop] = tripTimes.toArray(new TripTimes[tripTimes.size()]);
                 departuresIndex[hop] = tripTimes.toArray(new TripTimes[tripTimes.size()]);
                 // TODO: STOP VS HOP
@@ -343,12 +370,11 @@ public class TableTripPattern implements TripPattern, Serializable {
         }
         
         /** 
-         * Get the index of the next trip that has a stop after (or at) 
-         * afterTime at the stop at stopIndex. 
-         * The haveBicycle parameter must be passed in because we cannot determine whether the user
-         * is in possession of a rented bicycle from the options alone.
+         * Get the index of the next trip that departs from the stop at stopIndex at or after the 
+         * time afterTime. The haveBicycle parameter must be passed in because we cannot determine 
+         * whether the user is in possession of a rented bicycle from the options alone.
          */
-        // Method is protected so Lombok won't delegate to it.
+        // This method is protected so Lombok won't delegate to it.
         protected TripTimes getNextTrip(int stopIndex, int afterTime, boolean haveBicycle,
                 RoutingRequest options) {
             boolean pickup = true;
@@ -404,11 +430,12 @@ public class TableTripPattern implements TripPattern, Serializable {
         }
         
         /** 
-         * Gets the index of the previous trip that has a stop before (or at) beforeTime at 
-         * the stop at stopIndex.
+         * Get the index of the next trip that arrives at the stop stopIndex at or before the 
+         * time afterTime. The haveBicycle parameter must be passed in because we cannot determine 
+         * whether the user is in possession of a rented bicycle from the options alone.
          */
-        // Method is protected so Lombok won't delegate to it.
-        // TODO could be merged with departure search, lots of duplicate code
+        // This method is protected so Lombok won't delegate to it.
+        // TODO this could be merged with the departure search, there is lots of duplicate code.
         protected TripTimes getPreviousTrip(int stopIndex, int beforeTime, boolean haveBicycle, 
                 RoutingRequest options) {
             boolean pickup = false;
@@ -456,33 +483,37 @@ public class TableTripPattern implements TripPattern, Serializable {
             return bestTrip;
         }
         
-        /** Gets the departure time for a given stop on a given trip */
+        /** Gets the departure time for a given hop on a given trip */
         public int getDepartureTime(int hop, int trip) {
             return tripTimes.get(trip).getDepartureTime(hop);
         }
 
-        /** Gets the arrival time for a given HOP on a given trip */
+        /** Gets the arrival time for a given hop on a given trip */
         public int getArrivalTime(int hop, int trip) {
             return tripTimes.get(trip).getArrivalTime(hop);
         }
 
-        /** Gets the running time after a given stop (i.e. for the given HOP) on a given trip */
+        /** Gets the running time after a given stop (i.e. for the given hop) on a given trip */
         public int getRunningTime(int stopIndex, int trip) {
             return tripTimes.get(trip).getRunningTime(stopIndex);
         }
 
-        /** Gets the dwell time at a given stop (i.e. before then given HOP) on a given trip */
+        /** Gets the dwell time at a given stop (i.e. before then given hop) on a given trip */
         public int getDwellTime(int hop, int trip) {
             // the dwell time of a hop is the dwell time *before* that hop.
             return tripTimes.get(trip).getDwellTime(hop);
         }
 
-        // finish off the pattern once all times have been added 
-        // cache best (lowest) running times and dwell times; maybe trim arrays too
+        /**
+         * Finish off a TripPattern once all TripTimes have been added to it. This involves caching
+         * lower bounds on the running times and dwell times at each stop, and may perform other
+         * actions to compact the data structure such as trimming and deduplicating arrays.
+         */
         public void finish() {
             int nHops = stops.length - 1;
             int nTrips = trips.size();
-            // TODO: bestRunningTimes is specific to the _updated_ times and should be moved into the inner class
+            // TODO: bestRunningTimes is specific to the _updated_ times and should be moved into 
+            // the inner class
             bestRunningTimes = new int[nHops];
             boolean nullArrivals = false; // TODO: should scan through triptimes?
             if ( ! nullArrivals) {
@@ -508,6 +539,11 @@ public class TableTripPattern implements TripPattern, Serializable {
                     }
                 }
             }
+            
+            // analyze();
+            // compact();
+            // index();
+            
             // break even list size for linear and binary searches was determined to be around 16
             if (nTrips > 16) {
                 //LOG.debug("indexing pattern with {} trips", nTrips);
@@ -561,8 +597,10 @@ public class TableTripPattern implements TripPattern, Serializable {
             return -1;
         }
         
-        /** not private because it's used when traversing interline dwells, which refer to order
-         * in the scheduled trip pattern. */
+        /** 
+         * Not private because it's used when traversing interline dwells, which refer to order
+         * in the scheduled trip pattern. 
+         */
         public TripTimes getTripTimes(int tripIndex) {
             return tripTimes.get(tripIndex);
         }
@@ -570,12 +608,12 @@ public class TableTripPattern implements TripPattern, Serializable {
         /**
          * Copy-on-write update of the relevant TripTimes in this Timetable. The existing TripTimes 
          * must not be modified directly because they may be shared with the underlying scheduled 
-         * timetable, or other updated timetables.
+         * Timetable, or other updated Timetables.
          */
         public boolean update(UpdateBlock block) {
-            /* though all timetables have the same trip ordering, some may have extra trips due to 
-             * the dynamic addition of unscheduled trips.
-             * However, we want to apply trip update blocks on top of *scheduled* times */
+             // Though all timetables have the same trip ordering, some may have extra trips due to 
+             // the dynamic addition of unscheduled trips.
+             // However, we want to apply trip update blocks on top of *scheduled* times 
             int tripIndex = scheduledTimetable.getTripIndex(block.tripId); 
             if (tripIndex == -1) {
                 LOG.info("tripId {} not found in pattern.", block.tripId);
@@ -583,7 +621,7 @@ public class TableTripPattern implements TripPattern, Serializable {
             } else {
                 LOG.trace("tripId {} found at index {} (in scheduled timetable)", block.tripId, tripIndex);
             }
-            // stopIndex as in transit stop (not 'end', not 'hop')
+            // 'stop' Index as in transit stop (not 'end', not 'hop')
             int stopIndex = block.findUpdateStopIndex(TableTripPattern.this);
             if (stopIndex == UpdateBlock.MATCH_FAILED) {
                 LOG.warn("Unable to match update block to stopIds.");
@@ -600,8 +638,8 @@ public class TableTripPattern implements TripPattern, Serializable {
             TripTimes newTimes = oldTimes.clone();
             LOG.trace(block.toString());
             LOG.trace(newTimes.dumpTimes());
-            // there is certainly a more efficient way than repeatedly decompacting and recompacting
-            // but at least it's clear
+            // There is certainly a more efficient way than repeatedly decompacting and recompacting,
+            // but at least it's clear.
             newTimes.decompact();
             // An update block starts from the current known position of a vehicle.
             // If the vehicle is early, this creates a negative hop time at the boundary between
@@ -621,8 +659,9 @@ public class TableTripPattern implements TripPattern, Serializable {
             for (Update u : block.updates) {
                 Stop s = stops[stopIndex];
                 if ( ! s.getId().getId().equals(u.stopId)) {
-                    // be tolerant of update blocks containing extra updates, though filtering
+                    // Be tolerant of update blocks containing extra updates, though filtering
                     // out INFOPOINTS should eliminate that problem.
+                    // Another possibility would be destructive filtering/matching of the update block.
                     continue; 
                 }
                 if (stopIndex < newTimes.departureTimes.length) {
@@ -642,7 +681,7 @@ public class TableTripPattern implements TripPattern, Serializable {
                 LOG.error("matched update block was not actually applied! TripTimes may be corrupt.");
                 return false;
             }
-            // one more check, just to make sure...
+            // One more check, just to make sure.
             newTimes.forcePositive();
             LOG.trace(newTimes.dumpTimes());
             newTimes.compact();
@@ -651,6 +690,11 @@ public class TableTripPattern implements TripPattern, Serializable {
             return true;
         }
         
+        /**
+         * Add a trip to this Timetable. The Timetable must be analyzed, compacted, and indexed
+         * any time trips are added, but this is not done automatically because it is time consuming
+         * and should only be done once after an entire batch of trips are added.
+         */
         public void addTrip(Trip trip, List<StopTime> stopTimes) {
             // TODO: double-check that the stops and pickup/dropoffs are right for this trip
             int nextIndex = tripTimes.size();
@@ -673,7 +717,10 @@ public class TableTripPattern implements TripPattern, Serializable {
             // 1x1 array should always return the same headsign to allow for no change 
         }
 
-        public boolean allDwellsZero(int hopIndex) {
+        /** 
+         * Check that all dwell times at the given stop are zero, which allows removing the dwell edge. 
+         */
+        private boolean allDwellsZero(int hopIndex) {
             for (int t = 0; t < trips.size(); ++t) {
                 if (getDwellTime(hopIndex, t) != 0) {
                     return false;
@@ -682,6 +729,8 @@ public class TableTripPattern implements TripPattern, Serializable {
             return true;
         }
                 
-    } // END Class Timetable
+    } 
+    
+    /* END nested class Timetable */
     
 }
