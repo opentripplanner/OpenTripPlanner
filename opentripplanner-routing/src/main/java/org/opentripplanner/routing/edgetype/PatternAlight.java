@@ -102,6 +102,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             // get the non-transit mode, mostly to determine whether the user is carrying a bike
             // this should maybe be done differently (using mode only for traversal permissions).
             TraverseMode nonTransitMode = state0.getNonTransitMode(options);
+            ServiceDay serviceDay = null;
             for (ServiceDay sd : rctx.serviceDays) {
                 int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
                 // only check for service on days that are not in the future
@@ -121,6 +122,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
                         if (bestWait < 0 || wait < bestWait) {
                             // track the soonest arrival over all relevant schedules
                             bestWait = wait;
+                            serviceDay = sd;
                             bestTripTimes = tripTimes;
                         }
                     }
@@ -168,6 +170,7 @@ public class PatternAlight extends PatternEdge implements OnBoardReverseEdge {
             if (TransitUtils.handleBoardAlightType(s1, type)) {
                 return null;
             }
+            s1.setServiceDay(serviceDay);
             s1.setTripTimes(bestTripTimes);
             s1.incrementTimeInSeconds(bestWait);
             s1.incrementNumBoardings();
