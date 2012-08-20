@@ -156,20 +156,20 @@ public class UpdateBlock {
      */
     public int findUpdateStopIndex(TableTripPattern pattern) {
         if (updates == null || updates.size() < 1) {
-            LOG.debug("Zzero-length or null update block. Cannot match.");
+            LOG.warn("Zero-length or null update block. Cannot match.");
             return MATCH_FAILED;
         }
         int result = matchBlockSimple(pattern);
         if (result == MATCH_FAILED) {
-            LOG.debug("simple block matching failed, trying fuzzy matching.");
+            LOG.debug("Simple block matching failed, trying fuzzy matching.");
             result = matchBlockFuzzy(pattern);
         }
         if (result != MATCH_FAILED) {
-            LOG.debug("found matching stop block at index {}", result);
+            LOG.debug("Found matching stop block at index {}.", result);
             return result;
         }
-        LOG.warn("update block matching failed completely.");
-        LOG.warn("have a look at the pattern and block:");
+        LOG.warn("Update block matching failed completely.");
+        LOG.warn("Have a look at the pattern and block:");
         List<Stop> patternStops = pattern.getStops();
         int nStops = patternStops.size();
         int nHops = nStops - 1;
@@ -179,7 +179,7 @@ public class UpdateBlock {
             if (i < updates.size())
                 u = updates.get(i);
             int ti = pattern.getTripIndex(this.tripId);
-            // argh stop-hop conversion
+            // stop-hop conversion
             int schedArr = (i < 1) ? 0 : pattern.getArrivalTime(i-1, ti);
             int schedDep = (i >= nHops) ? 0 : pattern.getDepartureTime(i, ti);
             System.out.printf("Stop %02d %s A%d D%d >>> %s\n", i, s.getId().getId(), 
@@ -190,7 +190,7 @@ public class UpdateBlock {
     
     private int matchBlockSimple(TableTripPattern pattern) {
         List<Stop> patternStops = pattern.getStops();
-        // we are matching the whole block 
+        // we are matching the whole block so have an upper bound on the starting point 
         int high = patternStops.size() - updates.size();
         PATTERN: for (int pi = 0; pi <= high; pi++) { // index in pattern
             LOG.trace("---{}", pi);
