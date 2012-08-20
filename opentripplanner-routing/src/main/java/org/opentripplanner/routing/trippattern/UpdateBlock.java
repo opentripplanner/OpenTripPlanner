@@ -131,28 +131,25 @@ public class UpdateBlock {
     }
 
     /**        
-     * Unfortunately updates cover subsets of the scheduled stop times, and these update blocks 
-     * are not right-aligned wrt the full trip. They are contiguous, and delay predictions decay 
-     * linearly to match scheduled times at the end of the block of updates.
+     * Updates may cover subsets of the scheduled stop times. In Dutch KV8 data, these update blocks 
+     * are not aligned with respect to the full trip. They are however contiguous, and delay 
+     * predictions decay linearly to match scheduled times at the end of the block of updates.
      * 
-     * (actually, apparently they don't in the middle of the night, and maybe we should just throw 
-     * them out if they don't.)
+     * (Actually, I see that they don't in the middle of the night, and maybe we should just throw 
+     * them out if they don't meet these criteria.)
      * 
-     * TODO: verify: does this mean that we can use scheduled times for the rest of the trip? Or
-     * are updates cumulative? 
-     * 
-     * Note that GTFS sequence number is increasing but not necessarily sequential.
+     * This means that we can use scheduled times for the rest of the trip: updates are not 
+     * cumulative. Note that GTFS sequence numbers are increasing but not necessarily sequential.
      * Though most NL data providers use increasing, sequential values, Arriva Line 315 does not.
      * 
      * OTP does not store stop sequence numbers, since they could potentially be different for each
      * trip in a pattern. Maybe we should, and just reuse the array when they are the same, and set
      * it to null when they are increasing and sequential.
      * 
-     * StopIds cannot be used to match update blocks because routes may contain loops with the same
-     * stop appearing twice.
-     * 
-     * Because of all this we need to do some matching.
-     * This method also verifies that the stopIds match those in the trip, as redundant error checking.
+     * Update blocks cannot be matched to stop blocks on the basis of the first update/stop because 
+     * routes may contain loops with the same stop appearing twice. Because of all this we need to 
+     * do some matching. This method also verifies that the stopIds match those in the trip, 
+     * as redundant error checking.
      * 
      * @param pattern
      * @return
