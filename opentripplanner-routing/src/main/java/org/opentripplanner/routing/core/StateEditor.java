@@ -292,7 +292,7 @@ public class StateEditor {
     }
     
     public void setBackMode (TraverseMode mode) {
-        if (mode.equals(child.stateData.backMode))
+        if (mode == child.stateData.backMode)
             return;
         
         cloneStateDataAsNeeded();
