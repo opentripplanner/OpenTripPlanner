@@ -331,4 +331,8 @@ public class TurnEdge extends StreetEdge {
     public ElevationProfileSegment getElevationProfileSegment() {
         return ((TurnVertex) fromv).getElevationProfileSegment();
     }
+    
+    public Set<Alert> getWheelchairNotes () {
+        return ((TurnVertex) fromv).getWheelchairNotes();
+    }
 }

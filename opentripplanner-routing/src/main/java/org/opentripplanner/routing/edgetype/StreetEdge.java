@@ -49,4 +49,6 @@ public abstract class StreetEdge extends EdgeWithElevation {
     
     public abstract Set<Alert> getNotes ();
     
+    public abstract Set<Alert> getWheelchairNotes ();
+    
 }

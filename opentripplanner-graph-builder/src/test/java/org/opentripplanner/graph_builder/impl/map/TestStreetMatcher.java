@@ -244,6 +244,10 @@ public class TestStreetMatcher {
         public String toString() {
             return "SimpleEdge(" + fromv + ", " + tov + ")";
         }
+        
+        public Set<Alert> getWheelchairNotes () {
+            return null;
+        }
 
         @Override
         public int getStreetClass() {

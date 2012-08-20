@@ -175,6 +175,7 @@ public class StreetLocation extends AbstractVertex {
             newFrom.setPermission(street.getPermission());
             newFrom.setNoThruTraffic(street.isNoThruTraffic());
             newFrom.setStreetClass(street.getStreetClass());
+            newFrom.setWheelchairNotes(street.getWheelchairNotes());
 
             location = new TurnVertex(null, label + " (vertex at splitter)", geometries.getSecond(), street.getName(), lengthOut,
                     false, street.getNotes());
@@ -183,6 +184,7 @@ public class StreetLocation extends AbstractVertex {
             location.setStreetClass(street.getStreetClass());
             location.setNoThruTraffic(street.isNoThruTraffic());
             location.setDistanceToNearestTransitStop(distanceToNearestTransitStop);
+            location.setWheelchairNotes(street.getWheelchairNotes());
             
             cache.put(geometry, new P2<TurnVertex>(newFrom, location));
 

@@ -294,6 +294,7 @@ public class TestHalfEdges extends TestCase {
 
         Set<Alert> alert = new HashSet<Alert>();
         alert.add(Alert.createSimpleAlerts("This is the alert"));
+                
         left.setNotes(alert);
         leftBack.setNotes(alert);
                 
@@ -316,6 +317,37 @@ public class TestHalfEdges extends TestCase {
         }
         
         assertEquals(alert, traversedOne.getBackAlerts());
+        assertNotSame(left, traversedOne.getBackEdge().getFromVertex());
+        assertNotSame(leftBack, traversedOne.getBackEdge().getFromVertex());
+        
+        // now, make sure wheelchair alerts are preserved
+        Set<Alert> wheelchairAlert = new HashSet<Alert>();
+        wheelchairAlert.add(Alert.createSimpleAlerts("This is the wheelchair alert"));
+        
+        left.setNotes(null);
+        leftBack.setNotes(null);
+        left.setWheelchairNotes(wheelchairAlert);
+        leftBack.setWheelchairNotes(wheelchairAlert);
+        
+        RoutingRequest req = new RoutingRequest();
+        req.setWheelchairAccessible(true);
+        
+        start = StreetLocation.createStreetLocation(graph, "start", "start",
+                cast(turns, StreetEdge.class),
+                new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()));
+        
+        traversedOne = new State((Vertex) start, req);
+        for (Edge e : start.getOutgoing()) {
+            traversedOne = e.traverse(traversedOne);
+            break;
+        }
+        
+        for (Edge e : traversedOne.getVertex().getOutgoing()) {
+            traversedOne = e.traverse(traversedOne);
+            break;
+        }
+        
+        assertEquals(wheelchairAlert, traversedOne.getBackAlerts());
         assertNotSame(left, traversedOne.getBackEdge().getFromVertex());
         assertNotSame(leftBack, traversedOne.getBackEdge().getFromVertex());
     }

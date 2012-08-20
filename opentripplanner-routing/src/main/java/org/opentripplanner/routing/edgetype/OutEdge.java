@@ -107,6 +107,10 @@ public class OutEdge extends StreetEdge {
         s1.addAlerts(getNotes());
         return s1.makeState();
     }
+    
+    public Set<Alert> getWheelchairNotes () {
+        return ((TurnVertex) fromv).getWheelchairNotes();
+    }
 
     public String toString() {
         return "OutEdge( " + fromv + ", " + tov + ")";
