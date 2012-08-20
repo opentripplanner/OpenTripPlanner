@@ -674,9 +674,11 @@ public class PlanGenerator {
                 step.setAbsoluteDirection(thisAngle);
                 // new step, set distance to length of first edge
                 distance = edge.getDistance();
-            } else if ((step.streetName != null && !step.streetNameNoParens().equals(streetNameNoParens))
-                    && (!step.bogusName || !edge.hasBogusName())) {
-                /* street name has changed */
+            } else if (((step.streetName != null && !step.streetNameNoParens().equals(streetNameNoParens))
+                    && (!step.bogusName || !edge.hasBogusName())) ||
+                    // if we are on a roundabout now and weren't before, start a new step
+                    edge.isRoundabout() != (roundaboutExit > 0)) {
+                /* street name has changed, or we've changed state from a roundabout to a street */
                 if (roundaboutExit > 0) {
                     // if we were just on a roundabout,
                     // make note of which exit was taken in the existing step
