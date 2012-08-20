@@ -40,6 +40,8 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.DwellEdge;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
+import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
+import org.opentripplanner.routing.edgetype.ElevatorEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.HopEdge;
 import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
@@ -181,6 +183,7 @@ public class PlanGenerator {
         double previousElevation = Double.MAX_VALUE;
         int startWalk = -1;
         int i = -1;
+        boolean foldingElevatorLegIntoCycleLeg = false;
         PlanGenState pgstate = PlanGenState.START;
         String nextName = null;
         for (State state : path.states) {
@@ -294,6 +297,33 @@ public class PlanGenerator {
                 if (leg == null) {
                     leg = makeLeg(itinerary, state);
                 }
+                
+                // If there are elevator edges that have mode == BICYCLE on both sides, they should
+                // be folded into the bicycle leg. But ones with walk on one side or the other should
+                // not
+                if (state.getBackEdge() instanceof ElevatorBoardEdge) {
+                    int j = i + 1;
+                    // proceed forward from the current state until we find one that isn't on an
+                    // elevator, and check the traverse mode
+                    while (path.states.get(j).getBackEdge() instanceof ElevatorEdge)
+                        j++;
+                    
+                    // path.states[j] is not an elevator edge
+                    if (path.states.get(j).getBackMode() == TraverseMode.BICYCLE)
+                        foldingElevatorLegIntoCycleLeg = true;
+                }
+                
+                if (foldingElevatorLegIntoCycleLeg) {
+                    if (state.getBackEdge() instanceof ElevatorEdge) {
+                        break; // from the case
+                    }
+                    else {
+                        foldingElevatorLegIntoCycleLeg = false;
+                        // do not break but allow it to be processed below (which will do nothing)
+                    }
+                }
+                
+                
                 if (mode == TraverseMode.BICYCLE) {
                     // do nothing
                 } else if (mode == TraverseMode.WALK) {
@@ -591,7 +621,7 @@ public class PlanGenerator {
         for (State currState : states) {
             State backState = currState.getBackState();
             Edge edge = currState.getBackEdge();
-            boolean createdNewStep = false;
+            boolean createdNewStep = false, disableZagRemovalForThisStep = false;
             if (edge instanceof FreeEdge) {
                 continue;
             }
@@ -609,6 +639,8 @@ public class PlanGenerator {
             if (edge instanceof ElevatorAlightEdge) {
                 // don't care what came before or comes after
                 step = createWalkStep(currState);
+                createdNewStep = true;
+                disableZagRemovalForThisStep = true;
 
                 // tell the user where to get off the elevator using the exit notation, so the
                 // i18n interface will say 'Elevator to <exit>'
@@ -766,7 +798,7 @@ public class PlanGenerator {
                 }
             }
 
-            if (createdNewStep) {
+            if (createdNewStep && !disableZagRemovalForThisStep) {
                 //check last three steps for zag
                 int last = steps.size() - 1;
                 if (last >= 2) {

@@ -33,7 +33,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author mattwigway
  *
  */
-public class ElevatorAlightEdge extends Edge {
+public class ElevatorAlightEdge extends Edge implements ElevatorEdge {
 
     private static final long serialVersionUID = 3925814840369402222L;
 
@@ -65,21 +65,9 @@ public class ElevatorAlightEdge extends Edge {
     
     @Override
     public State traverse(State s0) {
-        RoutingRequest options = s0.getOptions();
-        TraverseMode mode = s0.getNonTransitMode(options);
-        
-        // don't switch to bike when an elevator occurs, but don't specifically tell the user
-        // to switch to walking when the elevator occurs (i.e. if an elevator occurs in the 
-        // middle of a biking leg, don't specifically tell the user to dismount and walk - that
-        // goes without saying)
-        if (mode == TraverseMode.BICYCLE && s0.getBackMode() != TraverseMode.BICYCLE) {
-            options = options.getWalkingOptions();
-            mode = s0.getNonTransitMode(options);
-        }        
-        
         StateEditor s1 = s0.edit(this);
         s1.incrementWeight(1);
-        s1.setBackMode(mode);
+        s1.setBackMode(TraverseMode.WALK);
         return s1.makeState();
     }
 
