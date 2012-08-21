@@ -1,290 +1,60 @@
 package org.opentripplanner.routing.trippattern;
 
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-
-import javax.xml.bind.annotation.XmlElement;
-
-import lombok.AllArgsConstructor;
-import lombok.NonNull;
-
-import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.common.MavenVersion;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * Holds the arrival / departure times for a single trip in an ArrayTripPattern Also gets carried
- * along by States when routing to ensure that they have a consistent view of the trip when realtime
- * updates are being taken into account. 
- * All times are in seconds since midnight (as in GTFS). The array indexes are actually *hop* indexes,
- * not stop indexes, in the sense that 0 refers to the hop between stops 0 and 1, so arrival 0 is actually
- * an arrival at stop 1. 
- * By making indexes refer to stops not hops we could reuse the departures array for arrivals, 
- * at the cost of an extra entry. This seems more coherent to me (AMB) but would probably break things elsewhere.
+ * A TripTimes represents the arrival and departure times for a single trip in an Timetable. It
+ * is carried along by States when routing to ensure that they have a consistent, fast view of the 
+ * trip when realtime updates are being applied. 
+ * All times are expressed as seconds since midnight (as in GTFS). The indexes into a StopTimes are 
+ * not stop indexes, but inter-stop segment ("hop") indexes, so hop 0 refers to the hop between 
+ * stops 0 and 1, and arrival 0 is actually an arrival at stop 1. The main reason for this is that 
+ * it saves two extra array elements in every stopTimes. It might be worth it to just use stop 
+ * indexes everywhere for simplicity.
  */
-public class TripTimes implements Cloneable, Serializable {
+public interface TripTimes {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TripTimes.class);
-
-    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
     public static final int PASSED = -1;
     public static final int CANCELED = -2;
     
-    public final Trip trip;
+    /** @return the trips whose arrivals and departures are represented by this TripTimes */
+    public Trip getTrip();
+    
+    /** @return the number of inter-stop segments (hops) on this trip */
+    public int getNumHops();
+    
+    /** 
+     * @return the amount of time in seconds that the vehicle waits at the stop *before* traversing 
+     * each inter-stop segment ("hop"). It is undefined for hop 0, and at the end of a trip. 
+     */
+    public int getDwellTime(int hop);
+    
+    /** 
+     * @return the length of time time in seconds that it takes for the vehicle to traverse each 
+     * inter-stop segment ("hop"). 
+     */
+    public int getRunningTime(int hop);
 
     /** 
-     * This is kind of ugly, but the headsigns are in the enclosing pattern not here. Also, assuming
-     * we have a reference to the enclosing pattern, this lets us find the equivalent scheduled
-     * TripTimes.
+     * @return the time in seconds after midnight at which the vehicle begins traversing each 
+     * inter-stop segment ("hop"). 
      */
-    public final int index; 
+    public int getDepartureTime(int hop);
     
-    @XmlElement
-    public int[] departureTimes;
-
-    // null means all dwells are 0-length, and arrival times are to be derived from departure times
-    @XmlElement
-    public int[] arrivalTimes; 
-
-    public TripTimes(Trip trip, int index, List<StopTime> stopTimes) {
-        // stopTimes are assumed to be pre-filtered / valid / monotonically increasing etc.
-        this.trip = trip;
-        this.index = index;
-        int nStops = stopTimes.size();
-        int nHops = nStops - 1;
-        departureTimes = new int[nHops];
-        arrivalTimes = new int[nHops];
-        // this might be clearer if time array indexes were stops instead of hops
-        for (int hop = 0; hop < nHops; hop++) {
-            departureTimes[hop] = stopTimes.get(hop).getDepartureTime();
-            arrivalTimes[hop] = stopTimes.get(hop+1).getArrivalTime();
-        }
-        // if all dwell times are 0, arrival times array is not needed. save some memory.
-        this.compact();
-    }
-    
-    public int getDepartureTime(int hop) {
-        return departureTimes[hop];
-    }
-
-    public int getArrivalTime(int hop) {
-        if (arrivalTimes == null)
-            return departureTimes[hop + 1];
-        return arrivalTimes[hop];
-    }
-
-    /**
-     * The arrivals array may not be present, and the departures array may have grown by 1 due to
-     * compaction, so we can't directly use array lengths as an indicator of number of hops. 
+    /** 
+     * @return the time in seconds after midnight at which the vehicle arrives at the end of each 
+     * inter-stop segment ("hop"). A null value indicates that all dwells are 0-length, and arrival 
+     * times are to be derived from the departure times array. 
      */
-    public int getNumHops() {
-        if (arrivalTimes == null)
-            return departureTimes.length - 1;
-        else
-            return arrivalTimes.length;
-    }
-
-    public int getRunningTime(int hop) {
-        return getArrivalTime(hop) - getDepartureTime(hop);
-    }
-
-    public int getDwellTime(int hop) {
-        // the dwell time of a hop is the dwell time *before* that hop.
-        // Therefore it is undefined for hop 0, and at the end of a trip.
-        // Add range checking and -1 error value?
-        // see GTFSPatternHopFactory.makeTripPattern()
-        int arrivalTime = getArrivalTime(hop-1);
-        int departureTime = getDepartureTime(hop);
-        return departureTime - arrivalTime;
-    }
+    public int getArrivalTime(int hop);
     
-    public Trip getTrip() {
-        return trip;
-    }
-
-    /** replace arrivals array with null if all dwell times are zero */
-    public boolean compact() {
-        if (arrivalTimes == null)
-            return false;
-        // always use arrivalTimes to determine number of hops because departureTimes may grow by 1
-        // due to successive compact/decompact operations
-        int nHops = arrivalTimes.length;
-        // dwell time is undefined for hop 0, because there is no arrival for hop -1
-        for (int hop = 1; hop < nHops; hop++) {
-            if (this.getDwellTime(hop) != 0) {
-                LOG.trace("compact failed: nonzero dwell time before hop {}", hop);
-                return false;
-            }
-        }
-        // extend departureTimes array by 1 to hold final arrival time
-        departureTimes = Arrays.copyOf(departureTimes, nHops+1);
-        departureTimes[nHops] = arrivalTimes[nHops-1];
-        arrivalTimes = null;
-        return true;
-    }
-    
-    public boolean decompact() {
-        if (arrivalTimes != null)
-            return false;
-        int nHops = departureTimes.length;
-        if (nHops < 1)
-            throw new RuntimeException("improper array length in TripTimes");
-        arrivalTimes = Arrays.copyOfRange(departureTimes, 1, nHops);
-        return true;
-    }
-
-    public String toString() {
-        return dumpTimes();
-    }
-    
-    public String dumpTimes() {
-        StringBuilder sb = new StringBuilder();
-        int nHops = getNumHops();
-        sb.append(arrivalTimes == null ? "C " : "U ");
-        for (int hop=0; hop < nHops; hop++) {
-            sb.append(hop); 
-            sb.append(':');
-            sb.append(getDepartureTime(hop)); 
-            sb.append('-');
-            sb.append(getArrivalTime(hop));
-            sb.append(' ');
-        }
-        return sb.toString();
-    }
-        
-    @Override
-    public TripTimes clone() {
-        TripTimes ret = null; 
-        try {
-            ret = (TripTimes) super.clone();
-            if (arrivalTimes == null) // dwell times are all zero
-                ret.arrivalTimes = null;
-            else
-                ret.arrivalTimes = this.arrivalTimes.clone();
-            ret.departureTimes = this.departureTimes.clone();
-        } catch (CloneNotSupportedException e) {
-            // will not happen
-        }
-        return ret;
-    }
-    
-    public static Comparator<TripTimes> getArrivalsComparator(final int hopIndex) {
-        return new Comparator<TripTimes>() {
-            @Override
-            public int compare(TripTimes tt1, TripTimes tt2) {
-                return tt1.getArrivalTime(hopIndex) - tt2.getArrivalTime(hopIndex);
-            }
-        };
-    }
-
-    public static Comparator<TripTimes> getDeparturesComparator(final int hopIndex) {
-        return new Comparator<TripTimes>() {
-            @Override
-            public int compare(TripTimes tt1, TripTimes tt2) {
-                return tt1.getDepartureTime(hopIndex) - tt2.getDepartureTime(hopIndex);
-            }
-        };
-    }
-    
-    /**
-     * Binary search method adapted from GNU Classpath Arrays.java (GPL). 
-     * Range parameters and range checking removed.
-     * Search across an array of TripTimes, looking only at a specific hop number.
-     * 
-     * @return the index at which the key was found, or the index of the first value higher than 
-     * key if it was not found, or a.length if there is no such value. Note that this has been
-     * changed from Arrays.binarysearch.
+    /** 
+     * Request that this TripTimes be analyzed and its memory usage reduced if possible. 
+     * @return whether or not compaction occurred. 
      */
-    public static int binarySearchDepartures(TripTimes[] a, int hop, int key) {
-        int low = 0;
-        int hi = a.length - 1;
-        int mid = 0;
-        while (low <= hi) {
-            mid = (low + hi) >>> 1;
-            final int d = a[mid].getDepartureTime(hop);
-            if (d == key)
-                return mid;
-            else if (d > key)
-                hi = mid - 1;
-            else
-                // This gets the insertion point right on the last loop.
-                low = ++mid;
-        }
-        return mid;
-    }
-
-    /**
-     * Binary search method adapted from GNU Classpath Arrays.java (GPL). 
-     * Range parameters and range checking removed.
-     * Search across an array of TripTimes, looking only at a specific hop number.
-     * 
-     * @return the index at which the key was found, or the index of the first value *lower* than
-     * key if it was not found, or -1 if there is no such value. Note that this has been changed
-     * from Arrays.binarysearch: this is a mirror-image of the departure search algorithm.
-     * 
-     * TODO: I have worked through corner cases but should reverify with some critical distance.
-     */
-    public static int binarySearchArrivals(TripTimes[] a, int hop, int key) {
-        int low = 0;
-        int hi = a.length - 1;
-        int mid = hi;
-        while (low <= hi) {
-            mid = (low + hi) >>> 1;
-            final int d = a[mid].getArrivalTime(hop);
-            if (d == key)
-                return mid;
-            else if (d < key)
-                low = mid + 1;
-            else
-                // This gets the insertion point right on the last loop.
-                hi = --mid;
-        }
-        return mid;
-    }
-
-    /**
-     * After applying updates to scheduled Triptimes, we could potentially end up with negative
-     * hop or dwell times. We really don't want those being used in routing. Check that all times 
-     * are increasing, and issue warnings if this is not the case.
-     */
-    public boolean timesIncreasing() {
-        // iterate over the new tripTimes, checking that dwells and hops are positive
-        boolean increasing = true;
-        int nHops = getNumHops();
-        int prevArr = -1;
-        for (int hop = 0; hop < nHops; hop++) {
-            int dep = this.getDepartureTime(hop);
-            int arr = this.getArrivalTime(hop);
-            if (arr < dep) { // negative hop time
-                LOG.error("negative hop time in updated TripTimes at index {}", hop);
-                increasing = false;
-            }
-            if (prevArr > dep) { // negative dwell time before this hop
-                LOG.error("negative dwell time in updated TripTimes at index {}", hop);
-                increasing = false;
-            }
-            prevArr = arr;
-        }
-        if (!increasing) {
-            LOG.error(this.dumpTimes());
-        }
-        return increasing;
-    }
-
-    /**
-     * Extend this class to 
-     * @author abyrd
-     */
-    @AllArgsConstructor
-    public static class Delegating {
-
-        @NonNull
-        private final TripTimes tt;
+    public boolean compact();
     
-    }
-    
+    /** Not named toString (which is in Object) so Lombok will delegate it */
+    public String dumpTimes(); //toStringVerbose
+
 }
