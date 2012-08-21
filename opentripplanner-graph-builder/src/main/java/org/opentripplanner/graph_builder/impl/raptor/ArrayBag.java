@@ -1,7 +1,6 @@
 package org.opentripplanner.graph_builder.impl.raptor;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
 
 /**

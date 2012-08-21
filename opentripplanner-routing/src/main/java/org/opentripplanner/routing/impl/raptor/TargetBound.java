@@ -26,7 +26,9 @@ import org.opentripplanner.routing.algorithm.strategies.TransitLocalStreetServic
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.PatternAlight;
+import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
+import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.AbstractVertex;
 import org.opentripplanner.routing.graph.Edge;
@@ -58,8 +60,6 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
 
     private double speedUpperBound;
 
-    private List<int[]> minTimesNearEnd;
-
     //this is saved so that it can be reused in various skipping functions
     private double targetDistance;
 
@@ -77,8 +77,6 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
     private RoutingRequest options;
 
     public ShortestPathTree spt = new ArrayMultiShortestPathTree(options);
-
-    //private List<RaptorState> boundingStates;
 
     double[] distance = new double[AbstractVertex.getMaxIndex()];
 
@@ -118,8 +116,9 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
             if (bounder.dominates(old)) {
                 it.remove();
                 removedBoundingStates.add(old);
-            } else if (bounder.getNumBoardings() <= old.getNumBoardings()
-                    && bounder.getTime() + WORST_TIME_DIFFERENCE < old.getTime()) {
+            } else if (bounder.getNumBoardings() <= old.getNumBoardings() && options.arriveBy ? (
+                        bounder.getTime() - WORST_TIME_DIFFERENCE > old.getTime())
+                        : (bounder.getTime() + WORST_TIME_DIFFERENCE < old.getTime())) {
                 it.remove();
                 removedBoundingStates.add(old);
             }
@@ -128,13 +127,19 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
         RaptorState state = (RaptorState) bounder.getExtension("raptorParent");
         RaptorStop stop = state.stop;
         //get previous alight at stop
-        final int previousArriveTime = getPreviousArriveTime(options, state.arrivalTime - options.getAlightSlack() - 2, stop.stopVertex);
-        previousArrivalTime.add((int) (previousArriveTime + options.getAlightSlack() + bounder.getElapsedTime()));
+        if (options.isArriveBy()) {
+            final int nextDepartTime = getNextDepartTime(options, (state.arrivalTime - options.getBoardSlack()) - 2, stop.stopVertex);
+            previousArrivalTime.add((int) ((nextDepartTime - options.getAlightSlack()) - bounder.getElapsedTime()));
+        } else {
+            final int previousArriveTime = getPreviousArriveTime(options, state.arrivalTime - options.getAlightSlack() + 2, stop.stopVertex);
+            previousArrivalTime.add((int) (previousArriveTime + options.getAlightSlack() + bounder.getElapsedTime()));
+        }
     }
 
     @Override
     public boolean shouldSkipTraversalResult(Vertex origin, Vertex target, State parent,
             State current, ShortestPathTree spt, RoutingRequest traverseOptions) {
+        /*
         final Vertex vertex = current.getVertex();
         int vertexIndex = vertex.getIndex();
         if (vertexIndex < distance.length) {
@@ -160,7 +165,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
         if (targetDistance > remainingWalk) {
             // then we must have some transit + some walk.
             minWalk = this.distanceToNearestTransitStop + vertex.getDistanceToNearestTransitStop();
-            minTime = traverseOptions.getBoardSlack();
+            minTime = options.isArriveBy() ? traverseOptions.getAlightSlack() : traverseOptions.getBoardSlack();
 
             if (current.getBackEdge() instanceof StreetEdge && !transitLocalStreets.transferrable(vertex)) {
                 return true;
@@ -180,37 +185,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
         minTime += (targetDistance - minWalk) / Raptor.MAX_TRANSIT_SPEED + minWalk
                 / speedUpperBound;
         
-        //oh well, it was worth a try
-/*
-        int index = vertex.getIndex();
-        if (index < AbstractVertex.getMaxIndex()) {
-            int region = vertex.getGroupIndex();
-            double minPrecomputedTime = Double.POSITIVE_INFINITY;
-            if (region != -1) {
-                for (int[] minTimes : minTimesNearEnd) {
-                    int regionMinTime = minTimes[region];
-                    if (regionMinTime < minPrecomputedTime)
-                        minPrecomputedTime = regionMinTime;
-                }
-                if (minPrecomputedTime > minTime)
-                    minTime = minPrecomputedTime;
-            }
-        }
-*/
-        double stateTime = current.getTime() + minTime - traverseOptions.dateTime;
-        
-        // this makes speed worse for some reason. I have no idea why.
-/*
-        for (RaptorState bounder : boundingStates) {
-            if (optimisticDistance > bounder.walkDistance && current.getTime() + minTime > bounder.arrivalTime)
-                return true;
-                
-                double bounderTime = bounder.arrivalTime - traverseOptions.dateTime;
-                if (bounderTime * 1.5 < stateTime) {
-                    return true;
-                }
-        }
-*/
+        double stateTime = current.getElapsedTime() + minTime;
 
         int i = 0;
         boolean prevBounded = !bounders.isEmpty();
@@ -219,9 +194,9 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
             
             if (optimisticDistance * 1.1 > bounder.getWalkDistance()
                     && current.getNumBoardings() >= bounder.getNumBoardings()) {
-                if (current.getTime() + minTime > bounder.getTime()) {
+                if (current.getElapsedTime() + minTime > bounder.getElapsedTime()) {
                     return true;
-                } else if (current.getTime() + minTime <= prevTime) {
+                } else if (options.arriveBy ? (current.getTime() + minTime <= prevTime) : ((current.getTime() - minTime) >= prevTime)) {
                     prevBounded = false;
                 }
             } else {
@@ -229,13 +204,45 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
             }
 
             //check that the new path is not much longer in time than the bounding path
-            double bounderTime = bounder.getTime() - traverseOptions.dateTime;
-
-            if (bounderTime * timeBoundFactor < stateTime) {
+            if (bounder.getElapsedTime() * timeBoundFactor < stateTime) {
                 return true;
             }
         }
         return prevBounded;
+        */
+        return false;
+    }
+
+
+
+    public static int getNextDepartTime(RoutingRequest request, int departureTime, Vertex stopVertex) {
+
+        int bestArrivalTime = Integer.MAX_VALUE;
+
+        request.arriveBy = false;
+
+        // find the boards
+        for (Edge preboard : stopVertex.getOutgoing()) {
+            if (preboard instanceof PreBoardEdge) {
+                Vertex departure = preboard.getToVertex(); // this is the departure vertex
+                for (Edge board : departure.getOutgoing()) {
+                    if (board instanceof PatternBoard) {
+                        State state = new State(board.getFromVertex(), departureTime, request);
+                        State result = board.traverse(state);
+                        if (result == null)
+                            continue;
+                        int time = (int) result.getTime();
+                        if (time < bestArrivalTime) {
+                            bestArrivalTime = time;
+                        }
+                    }
+                }
+            }
+        }
+
+        request.arriveBy = true;
+        return bestArrivalTime;
+
     }
 
     public static int getPreviousArriveTime(RoutingRequest request, int arrivalTime, Vertex stopVertex) {

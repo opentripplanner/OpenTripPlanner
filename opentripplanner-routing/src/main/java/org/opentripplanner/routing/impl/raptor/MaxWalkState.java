@@ -27,14 +27,13 @@ public class MaxWalkState extends State {
 
     @Override
     public boolean dominates(State other) {
-      //checking absolute time is correct for RAPTOR
 
         if (backEdge != other.getBackEdge() && ((backEdge instanceof PlainStreetEdge)
                 && (!((PlainStreetEdge) backEdge).getTurnRestrictions().isEmpty())))
             return false;
         return walkDistance <= other.getWalkDistance() * 1.10 
-                && this.getTime() <= other.getTime() + 30
-                && getNumBoardings() <= other.getNumBoardings(); 
+                && this.getElapsedTime() <= other.getElapsedTime() + 30
+                && getNumBoardings() <= other.getNumBoardings();
     }
     
     @Override

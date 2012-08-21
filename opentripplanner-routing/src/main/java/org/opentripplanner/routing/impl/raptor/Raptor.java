@@ -18,6 +18,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.ListIterator;
 
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
@@ -133,10 +134,18 @@ public class Raptor implements PathService {
     }
 
     private State getState(RoutingRequest options, RaptorData data, ArrayList<RaptorState> states) {
-        RaptorState cur;
+        if (options.arriveBy) {
+            return getStateArriveBy(options, data, states);
+        } else {
+            return getStateDepartAt(options, data, states);
+        }
+    }
+
+    private State getStateDepartAt(RoutingRequest options, RaptorData data,
+            ArrayList<RaptorState> states) {
         State state = new State(options);
         for (int i = states.size() - 1; i >= 0; --i) {
-            cur = states.get(i);
+            RaptorState cur = states.get(i);
             if (cur.walkPath != null) {
                 GraphPath path = new GraphPath(cur.walkPath, true);
                 for (Edge e : path.edges) {
@@ -172,6 +181,63 @@ public class Raptor implements PathService {
                                         if (e3 instanceof PreAlightEdge) {
                                             if (data.raptorStopsForStopId.get(((TransitStop) e3
                                                     .getToVertex()).getStopId()) == cur.stop) {
+                                                state = e2.traverse(state);
+                                                state = e3.traverse(state);
+                                                break HOP;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return state;
+    }
+
+    private State getStateArriveBy(RoutingRequest options, RaptorData data,
+            ArrayList<RaptorState> states) {
+        State state = new State(options.rctx.origin, options);
+        for (int i = states.size() - 1; i >= 0; --i) {
+            RaptorState cur = states.get(i);
+            if (cur.walkPath != null) {
+                GraphPath path = new GraphPath(cur.walkPath, true);
+                for (ListIterator<Edge> it = path.edges.listIterator(path.edges.size()); it.hasPrevious();) {
+                    Edge e = it.previous();
+                    State oldState = state;
+                    state = e.traverse(state);
+                    if (state == null) {
+                        e.traverse(oldState);
+                    }
+                }
+            } else {
+                // so, cur is at this point at a transit stop; we have a route to alight from
+                for (Edge e : state.getVertex().getIncoming()) {
+                    if (e instanceof PreAlightEdge) {
+                        state = e.traverse(state);
+                    }
+                }
+                PatternAlight alight = cur.route.alights[cur.boardStopSequence - 1][cur.patternIndex];
+                State oldState = state;
+                state = alight.traverse(state);
+                if (state == null) {
+                    state = alight.traverse(oldState);
+                }
+                // now traverse the hops and dwells until we find the board we're looking for
+                HOP: while (true) {
+                    for (Edge e : state.getVertex().getIncoming()) {
+                        if (e instanceof PatternDwell) {
+                            state = e.traverse(state);
+                        } else if (e instanceof PatternHop) {
+                            state = e.traverse(state);
+                            for (Edge e2 : state.getVertex().getIncoming()) {
+                                if (e2 instanceof PatternBoard) {
+                                    for (Edge e3 : e2.getFromVertex().getIncoming()) {
+                                        if (e3 instanceof PreBoardEdge) {
+                                            if (data.raptorStopsForStopId.get(((TransitStop) e3
+                                                    .getFromVertex()).getStopId()) == cur.stop) {
                                                 state = e2.traverse(state);
                                                 state = e3.traverse(state);
                                                 break HOP;

@@ -31,11 +31,7 @@ public class RaptorState {
     double walkDistance;
     int nBoardings;
     int arrivalTime;
-    int waitingTime;
-    
-    public RaptorState() {
-    }
-    
+
     /* if this state has just boarded transit, this is the boarding location */
     RaptorStop boardStop;
     int boardStopSequence = -1; //this is the index in this route
@@ -46,12 +42,21 @@ public class RaptorState {
     /* if has walked to transit,  */
     State walkPath;
     
-    
     /* path info */
     RaptorState parent;
     public ServiceDay serviceDay;
     public RaptorStop stop;
+    private boolean arriveBy;
+
+    public RaptorState(boolean arriveBy) {
+        this.arriveBy = arriveBy;
+    }
     
+    public RaptorState(RaptorState parent) {
+        this.parent = parent;
+        this.arriveBy = parent.arriveBy;
+    }
+
     public String toString() {
         return "at " + stop + " boarded at " + boardStop + " on " + route + " time "
                 + new Date(((long) arrivalTime) * 1000) + " walkDistance " + walkDistance;
@@ -78,9 +83,15 @@ public class RaptorState {
         }
     }
 
-    public boolean eDominates(RaptorState oldState) {
-        return nBoardings <= oldState.nBoardings && waitingTime <= oldState.waitingTime
-                && walkDistance <= oldState.walkDistance * 1.1
-                && arrivalTime <= oldState.arrivalTime;
+    public boolean eDominates(RaptorState other) {
+        if (arriveBy) {
+            return nBoardings <= other.nBoardings
+                    && walkDistance <= other.walkDistance * 1.1
+                    && arrivalTime >= other.arrivalTime;
+        } else {
+            return nBoardings <= other.nBoardings
+                    && walkDistance <= other.walkDistance * 1.1
+                    && arrivalTime <= other.arrivalTime;
+            }
     }
 }

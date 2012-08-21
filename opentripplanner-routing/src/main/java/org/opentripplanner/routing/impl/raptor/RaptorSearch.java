@@ -50,7 +50,7 @@ public class RaptorSearch {
 
     public List<RaptorState> boundingStates = new ArrayList<RaptorState>();
 
-    public final TargetBound bounder;
+    public TargetBound bounder;
 
     public boolean stalling = false;
 
@@ -114,12 +114,31 @@ public class RaptorSearch {
 
         List<RaptorState> createdStates = new ArrayList<RaptorState>();
 
-        int boardSlack = nBoardings == 1 ? options.getBoardSlack()
-                : (options.getTransferSlack() - options.getAlightSlack());
+        int boardSlack;
+        if (options.isArriveBy()) {
+            boardSlack = nBoardings == 1 ? options.getAlightSlack()
+                    : (options.getTransferSlack() - options.getBoardSlack());
+        } else {
+            boardSlack = nBoardings == 1 ? options.getBoardSlack()
+                    : (options.getTransferSlack() - options.getAlightSlack());
+        }
         for (RaptorRoute route : routesToVisit) {
             List<RaptorState> boardStates = new ArrayList<RaptorState>(); // not really states
             boolean started = false;
-            for (int stopNo = 0; stopNo < route.getNStops(); ++stopNo) {
+
+            int firstStop, lastStop, direction, lastBoardStop;
+            if (options.isArriveBy()) {
+                firstStop = route.getNStops() - 1;
+                lastStop = -1;
+                direction = -1;
+                lastBoardStop = 0;
+            } else {
+                firstStop = 0;
+                lastStop = route.getNStops();
+                direction = 1;
+                lastBoardStop = lastStop - 1;
+            }
+            for (int stopNo = firstStop; stopNo != lastStop; stopNo += direction) {
                 // find the current time at this stop
                 RaptorStop stop = route.stops[stopNo];
                 if (!started && !visitedLastRound.contains(stop))
@@ -136,18 +155,26 @@ public class RaptorSearch {
                 // this checks the case of continuing on the current trips.
                 CONTINUE: for (RaptorState boardState : boardStates) {
 
-                    RaptorState newState = new RaptorState();
+                    RaptorState newState = new RaptorState(options.arriveBy);
 
                     ServiceDay sd = boardState.serviceDay;
 
-                    if (!route.boards[0][boardState.patternIndex].getPattern().canAlight(stopNo)) {
-                        continue;
+                    if (options.isArriveBy()) {
+                        if (!route.alights[0][boardState.patternIndex].getPattern().canBoard(stopNo))
+                            continue;
+                        int boardTime = route.getBoardTime(boardState.tripTimes, stopNo);
+                        newState.arrivalTime = (int) sd.time(boardTime);
+                        // add in slack
+                        newState.arrivalTime -= options.getBoardSlack();
+                    } else {
+                        if (!route.boards[0][boardState.patternIndex].getPattern()
+                                .canAlight(stopNo))
+                            continue;
+                        int alightTime = route.getAlightTime(boardState.tripTimes, stopNo);
+                        newState.arrivalTime = (int) sd.time(alightTime);
+                        // add in slack
+                        newState.arrivalTime += options.getAlightSlack();
                     }
-                    int alightTime = route.getAlightTime(boardState.tripTimes, stopNo);
-                    newState.arrivalTime = (int) sd.time(alightTime);
-
-                    // add in slack
-                    newState.arrivalTime += options.getAlightSlack();
 
                     newState.boardStop = boardState.boardStop;
                     newState.boardStopSequence = boardState.boardStopSequence;
@@ -158,7 +185,6 @@ public class RaptorSearch {
                     newState.walkDistance = boardState.walkDistance;
                     newState.parent = boardState.parent;
                     newState.stop = stop;
-                    // todo: waiting time, which presently is not handled
 
                     for (RaptorState oldState : states) {
                         if (oldState.eDominates(newState)) {
@@ -192,7 +218,7 @@ public class RaptorSearch {
                     newStates.add(newState);
                 }
 
-                if (stopNo < route.getNStops() - 1) {
+                if (stopNo != lastBoardStop) {
 
                     if (stop.stopVertex.isLocal() && nBoardings > 1) {
                         // cannot transfer at a local stop
@@ -208,19 +234,24 @@ public class RaptorSearch {
                         if (oldState.route == route)
                             continue; // we got here via this route, so no reason to transfer
 
-                        RaptorBoardSpec boardSpec = route.getTripIndex(options,
-                                oldState.arrivalTime + boardSlack, stopNo);
+                        RaptorBoardSpec boardSpec;
+                        if (options.isArriveBy()) {
+                            boardSpec = route.getTripIndexReverse(options, oldState.arrivalTime
+                                    - boardSlack, stopNo);
+                        } else {
+                            boardSpec = route.getTripIndex(options, oldState.arrivalTime
+                                    + boardSlack, stopNo);
+                        }
                         if (boardSpec == null)
                             continue;
 
-                        RaptorState boardState = new RaptorState();
+                        RaptorState boardState = new RaptorState(oldState);
                         boardState.nBoardings = nBoardings;
                         boardState.boardStop = stop;
                         boardState.boardStopSequence = stopNo;
                         boardState.arrivalTime = boardSpec.departureTime;
                         boardState.patternIndex = boardSpec.patternIndex;
                         boardState.tripTimes = boardSpec.tripTimes;
-                        boardState.parent = oldState;
                         boardState.serviceDay = boardSpec.serviceDay;
                         boardState.route = route;
                         boardState.walkDistance = oldState.walkDistance;
@@ -263,7 +294,7 @@ public class RaptorSearch {
             // the time is to them, so that we can start target bounding earlier
             if (maxTimeDayIndex > 0) {
                 RoutingRequest reversedWalkOptions = walkOptions.clone();
-                reversedWalkOptions.setArriveBy(true);
+                reversedWalkOptions.setArriveBy(!walkOptions.isArriveBy());
                 GenericDijkstra destDijkstra = new GenericDijkstra(reversedWalkOptions);
                 start = new MaxWalkState(options.rctx.target, reversedWalkOptions);
                 ShortestPathTree targetSpt = destDijkstra.getShortestPathTree(start);
@@ -311,13 +342,14 @@ public class RaptorSearch {
 
                 StateEditor dijkstraState = new MaxWalkState.MaxWalkStateEditor(walkOptions,
                         stopVertex);
+                dijkstraState.setStartTime(options.dateTime);
                 dijkstraState.setNumBoardings(state.nBoardings);
                 dijkstraState.setWalkDistance(state.walkDistance);
-                dijkstraState.setStartTime(state.arrivalTime);
                 dijkstraState.setTime(state.arrivalTime);
                 dijkstraState.setExtension("raptorParent", state);
                 dijkstraState.setOptions(walkOptions);
-                dijkstraState.incrementWeight(state.arrivalTime - options.dateTime);
+                dijkstraState.incrementWeight(options.arriveBy ? 
+                        (options.dateTime - state.arrivalTime) : (state.arrivalTime - options.dateTime));
                 MaxWalkState newState = (MaxWalkState) dijkstraState.makeState();
                 startPoints.add(newState);
             }
@@ -346,15 +378,16 @@ public class RaptorSearch {
         final List<? extends State> targetStates = spt.getStates(walkOptions.rctx.target);
         if (targetStates != null) {
             TARGET: for (State targetState : targetStates) {
-                RaptorState state = new RaptorState();
                 RaptorState parent = (RaptorState) targetState.getExtension("raptorParent");
-                state.parent = parent;
+                RaptorState state;
+                if (parent != null) {
+                    state = new RaptorState(parent);
+                    state.nBoardings = parent.nBoardings;
+                } else {
+                    state = new RaptorState(options.arriveBy);
+                }
                 state.walkDistance = targetState.getWalkDistance();
                 state.arrivalTime = (int) targetState.getTime();
-                if (parent != null) {
-                    state.nBoardings = parent.nBoardings;
-                    state.waitingTime = parent.waitingTime;
-                }
                 state.walkPath = targetState;
                 for (RaptorState oldState : getTargetStates()) {
                     if (oldState.eDominates(state)) {
@@ -378,6 +411,7 @@ public class RaptorSearch {
                 continue;
             }
 
+/*
             double minWalk = distanceToNearestTransitStop;
 
             double targetDistance = bounder.getTargetDistance(vertex);
@@ -391,11 +425,12 @@ public class RaptorSearch {
 
                 int maxTimeForVertex = 0;
                 int region = vertex.getGroupIndex();
+                final int elapsedTime = (int) state.getElapsedTime();
                 for (StopNearTarget stopNearTarget : stopsNearTarget.values()) {
                     int destinationRegion = stopNearTarget.stop.stopVertex.getGroupIndex();
                     final int maxTimeFromThisRegion = data.maxTransitRegions.maxTransit[maxTimeDayIndex][destinationRegion][region];
-                    int maxTime = (int) ((state.getTime() - options.dateTime)
-                            + maxTimeFromThisRegion + stopNearTarget.time);
+                    int maxTime = elapsedTime + maxTimeFromThisRegion + stopNearTarget.time;
+
                     if (maxTime > maxTimeForVertex) {
                         maxTimeForVertex = maxTime;
                     }
@@ -403,12 +438,12 @@ public class RaptorSearch {
                 if (maxTimeForVertex < maxTime) {
                     maxTime = maxTimeForVertex;
                 } else {
-                    if ((state.getTime() - options.dateTime) + minTime > maxTime * 1.5) {
+                    if (elapsedTime + minTime > maxTime * 1.5) {
                         continue;
                     }
                 }
             }
-
+*/
             List<RaptorState> states = statesByStop[stop.index];
             if (states == null) {
                 states = new ArrayList<RaptorState>();
@@ -416,7 +451,7 @@ public class RaptorSearch {
             }
 
             RaptorState baseState = (RaptorState) state.getExtension("raptorParent");
-            RaptorState newState = new RaptorState();
+            RaptorState newState = new RaptorState(options.arriveBy);
             if (baseState != null) {
                 newState.nBoardings = baseState.nBoardings;
             }

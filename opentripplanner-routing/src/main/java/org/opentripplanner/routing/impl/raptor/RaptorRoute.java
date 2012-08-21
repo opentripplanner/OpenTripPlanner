@@ -51,14 +51,12 @@ public class RaptorRoute implements Serializable {
         return stops.length;
     }
 
-    public int getBoardTime(int patternIndex, int tripIndex, int stopNo) {
-        PatternBoard board = boards[stopNo][patternIndex];
-        TableTripPattern pattern = board.getPattern();
-        return pattern.getDepartureTime(stopNo, tripIndex);
-    }
-
     public int getAlightTime(TripTimes tripTimes, int stopNo) {
         return tripTimes.getArrivalTime(stopNo - 1);
+    }
+
+    public int getBoardTime(TripTimes tripTimes, int stopNo) {
+        return tripTimes.getDepartureTime(stopNo);
     }
 
     public RaptorBoardSpec getTripIndex(RoutingRequest request, int arrivalTime, int stopNo) {
@@ -91,8 +89,38 @@ public class RaptorRoute implements Serializable {
         return spec;
     }
 
+    public RaptorBoardSpec getTripIndexReverse(RoutingRequest request, int arrivalTime, int stopNo) {
+
+        RaptorBoardSpec spec = new RaptorBoardSpec();
+        spec.departureTime = 0;
+        spec.tripTimes = null;
+        spec.patternIndex = -1;
+
+        for (int i = 0; i < alights[stopNo-1].length; ++i) {
+            PatternAlight alight = alights[stopNo-1][i];
+
+            State state = new State(alight.getToVertex(), arrivalTime, request);
+            State result = alight.traverse(state);
+            if (result == null)
+                continue;
+            int time = (int) result.getTime();
+            if (time > spec.departureTime) {
+                spec.departureTime = time;
+                spec.tripTimes = result.getTripTimes();
+                spec.patternIndex = i;
+                spec.serviceDay = result.getServiceDay();
+            }
+        }
+
+        if (spec.patternIndex == -1)
+            return null;
+
+        return spec;
+    }
+
     public String toString() {
         return GtfsLibrary.getRouteName(boards[0][0].getPattern().getExemplar().getRoute())
                 + " from " + stops[0].stopVertex.getLabel();
     }
+
 }
