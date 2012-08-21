@@ -55,11 +55,11 @@ public class Update implements Comparable<Update> {
     }
     
     public static enum Status {
-        PASSED,
-        ARRIVED,
-        PREDICTION,
-        CANCEL,
-        UNKNOWN
+        PASSED,     // the vehicle has passed this stop, no point trying to board there.
+        ARRIVED,    // the vehicle is at this stop. you could still board right now.
+        PREDICTION, // the vehicle is expected to arrive/depart at the indicated times.
+        CANCEL,     // the vehicle will not pick up or drop off passengers at this stop.
+        UNKNOWN     // unknown.
     }
     
 }
