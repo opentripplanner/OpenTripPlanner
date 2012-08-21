@@ -10,7 +10,7 @@ import lombok.NonNull;
  * overridden.  
  */
 @AllArgsConstructor
-public class DelegatingTripTimes {
+public class DelegatingTripTimes implements TripTimes {
 
     @NonNull @Delegate
     private final TripTimes tt;

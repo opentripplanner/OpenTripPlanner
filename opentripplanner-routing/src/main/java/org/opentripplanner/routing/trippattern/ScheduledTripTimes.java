@@ -80,6 +80,11 @@ public class ScheduledTripTimes implements TripTimes, Serializable {
     }
     
     @Override
+    public ScheduledTripTimes getScheduledTripTimes() {
+        return this;
+    }    
+    
+    @Override
     public int getDwellTime(int hop) {
         // TODO: Add range checking and -1 error value? see GTFSPatternHopFactory.makeTripPattern().
         int arrivalTime = getArrivalTime(hop-1);
@@ -156,5 +161,5 @@ public class ScheduledTripTimes implements TripTimes, Serializable {
         }
         return sb.toString();
     }
-    
+
 }

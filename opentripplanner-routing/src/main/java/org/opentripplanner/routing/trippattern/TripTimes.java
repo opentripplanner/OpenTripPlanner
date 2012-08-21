@@ -20,6 +20,9 @@ public interface TripTimes {
     /** @return the trips whose arrivals and departures are represented by this TripTimes */
     public Trip getTrip();
     
+    /** @return the base trip times which this particular TripTimes represents or modifies */
+    public ScheduledTripTimes getScheduledTripTimes();
+
     /** @return the number of inter-stop segments (hops) on this trip */
     public int getNumHops();
     
