@@ -71,6 +71,7 @@ public class TripTimesUtil {
         return mid;
     }
 
+    /* TODO: CAN BE MOVED INTO ScheduledTimetable since it uses only methods to access arr/dep times. */
     /**
      * After applying updates to scheduled Triptimes, we could potentially end up with negative
      * hop or dwell times. We really don't want those being used in routing. Check that all times 

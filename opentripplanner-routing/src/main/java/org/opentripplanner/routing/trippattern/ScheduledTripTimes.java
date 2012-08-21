@@ -15,9 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@inheritDoc}
  * A ScheduledTripTimes represents the standard published timetable for a trip provided by a transit
- * data feed. When realtime stop time updates are being applied, these scheduled TripTimes can be
+ * data feed. When real-time stop time updates are being applied, these scheduled TripTimes can be
  * wrapped in other TripTimes implementations which replace, cancel, or otherwise modify some of 
  * the timetable information.
  */
