@@ -14,6 +14,10 @@ public class DecayingDelayTripTimes extends DelegatingTripTimes {
     private final double k;
     private final boolean linear;
     private final boolean readThrough;
+
+    public DecayingDelayTripTimes(ScheduledTripTimes sched, int currentStop, int delay) {
+        this(sched, currentStop, delay, 0.7, false, false);
+    }
     
     public DecayingDelayTripTimes(ScheduledTripTimes sched, int currentStop, int delay, 
         double decayParam, boolean linear, boolean readThrough) {
