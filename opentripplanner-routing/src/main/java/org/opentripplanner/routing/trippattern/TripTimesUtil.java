@@ -81,12 +81,12 @@ public abstract class TripTimesUtil {
         // compaction is multi-layered now
         //sb.append(arrivalTimes == null ? "C " : "U ");
         for (int hop=0; hop < nHops; hop++) {
-            sb.append(hop); 
-            sb.append(':');
+            sb.append('[');
+            sb.append(hop);
+            sb.append(']');
             sb.append(tt.getDepartureTime(hop)); 
-            sb.append('-');
-            sb.append(tt.getArrivalTime(hop));
             sb.append(' ');
+            sb.append(tt.getArrivalTime(hop));
         }
         return sb.toString();
     }

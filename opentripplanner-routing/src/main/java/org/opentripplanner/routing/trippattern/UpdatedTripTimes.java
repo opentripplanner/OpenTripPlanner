@@ -63,4 +63,10 @@ public class UpdatedTripTimes extends DelegatingTripTimes implements TripTimes {
         return true;
     }
     
+    public String toString() {
+        String s = String.format("UpdatedTripTimes block size %d at stop %d\n", 
+                departures.length, offset);
+        return s + super.toString();
+    }
+
 }

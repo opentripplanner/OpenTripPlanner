@@ -148,6 +148,7 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
                 // we have a message we actually want to apply
                 boolean applied = false;
                 synchronized (buffer) {
+                    // have update perform the clone, pull the update call out of sync block 
                     Timetable tt = buffer.modify(pattern);
                     applied = tt.update(block);
                 }
