@@ -1,5 +1,9 @@
 package org.opentripplanner.routing.trippattern;
 
+import java.util.Comparator;
+
+import lombok.AllArgsConstructor;
+
 import org.onebusaway.gtfs.model.Trip;
 
 /**
@@ -59,5 +63,25 @@ public interface TripTimes {
     
     /** Not named toString (which is in Object) so Lombok will delegate it */
     public String dumpTimes(); //toStringVerbose
+
+    /* Yes, it's a bit odd to put nested classes in an interface but it gives them nice names. */
+    
+    /** Used for sorting an array of StopTimes based on arrivals for a specific hop. */
+    @AllArgsConstructor
+    public static class ArrivalsComparator implements Comparator<TripTimes> {
+        final int hop; 
+        @Override public int compare(TripTimes tt1, TripTimes tt2) {
+            return tt1.getArrivalTime(hop) - tt2.getArrivalTime(hop);
+        }
+    }
+        
+    /** Used for sorting an array of StopTimes based on departures for a specific hop. */
+    @AllArgsConstructor
+    public static class DeparturesComparator implements Comparator<TripTimes> {
+        final int hop; 
+        @Override public int compare(TripTimes tt1, TripTimes tt2) {
+            return tt1.getDepartureTime(hop) - tt2.getDepartureTime(hop);
+        }
+    }
 
 }

@@ -102,22 +102,4 @@ public class TripTimesUtil {
         return increasing;
     }
 
-    /** Used for sorting an array of StopTimes based on arrivals for a specific hop. */
-    @AllArgsConstructor
-    public static class ArrivalsComparator implements Comparator<TripTimes> {
-        final int hop; 
-        @Override public int compare(TripTimes tt1, TripTimes tt2) {
-            return tt1.getArrivalTime(hop) - tt2.getArrivalTime(hop);
-        }
-    }
-        
-    /** Used for sorting an array of StopTimes based on departures for a specific hop. */
-    @AllArgsConstructor
-    public static class DeparturesComparator implements Comparator<TripTimes> {
-        final int hop; 
-        @Override public int compare(TripTimes tt1, TripTimes tt2) {
-            return tt1.getDepartureTime(hop) - tt2.getDepartureTime(hop);
-        }
-    }
-
 }
