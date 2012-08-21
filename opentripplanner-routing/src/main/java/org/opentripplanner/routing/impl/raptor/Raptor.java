@@ -110,7 +110,7 @@ public class Raptor implements PathService {
 
             options.setMaxWalkDistance(options.getMaxWalkDistance() * 2);
             routeSet.bounder = new TargetBound(options);
-        } while (options.getMaxWalkDistance() < initialWalk * MAX_WALK_MULTIPLE);
+        } while (options.getMaxWalkDistance() < initialWalk * MAX_WALK_MULTIPLE && initialWalk < Double.MAX_VALUE);
 
         if (routeSet.getTargetStates().isEmpty()) {
             log.info("RAPTOR found no paths (try retrying?)");
