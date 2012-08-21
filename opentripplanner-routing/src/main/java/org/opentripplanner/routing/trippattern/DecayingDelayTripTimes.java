@@ -10,13 +10,16 @@ public class DecayingDelayTripTimes extends DelegatingTripTimes implements TripT
     private final int currentStop;
     private final int delay;
     private final double k;
+    private final boolean linear;
     // compute decay lookup table?
     
-    public DecayingDelayTripTimes(ScheduledTripTimes sched, int currentStop, int delay, double decay) {
+    public DecayingDelayTripTimes(ScheduledTripTimes sched, int currentStop, int delay, 
+            double decay, boolean linear) {
         super(sched);
         this.delay = delay;
         this.currentStop = currentStop;
         this.k = decay;
+        this.linear = linear;
     }
 
     @Override public int getDepartureTime(int hop) {
@@ -35,8 +38,12 @@ public class DecayingDelayTripTimes extends DelegatingTripTimes implements TripT
         
     private int decayedDelay(int stop) {
         int n = stop - currentStop;
-        double decay = Math.pow(k, n);
-        return (int) (decay * delay);
+        if (linear) {
+            return delay / n;
+        } else { 
+            double decay = Math.pow(k, n);
+            return (int) (decay * delay);
+        }
     }
     
 }
