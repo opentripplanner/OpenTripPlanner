@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.trippattern;
 
+import lombok.val;
+
 /**
  * An DelayedTripTimes applies an offset to arrival and departure times based on a report that a
  * vehicle is a given number of seconds early or late, and reports that the vehicle has 
@@ -40,12 +42,31 @@ public class DecayingDelayTripTimes extends DelegatingTripTimes implements TripT
         if (delay == 0) 
             return 0;
         int n = stop - currentStop;
-        if (linear) {
-            return delay / n;
-        } else { 
-            double decay = Math.pow(k, n);
-            return (int) (decay * delay);
+        // This would make the decay symmetric about the current stop. Not currently needed, as 
+        // we are reporting PASSED for all stops before currentStop.
+        // n = Math.abs(n);
+        double decay;
+        if (linear)
+            decay = (n > k) ? 0.0 : 1.0 - n / k;
+        else  
+            decay = Math.pow(k, n);
+        return (int) (decay * delay);
+    }
+    
+    public String toString() {
+        val sb = new StringBuilder();
+        sb.append(String.format("%s DecayingDelayTripTimes delay=%d stop=%d param=%3.2f\n", 
+                linear ? "Linear" : "Exponential", delay, currentStop, k));
+        for (int i = 0; i < getNumHops(); i++) {
+            int j = 0;
+            if (i >= currentStop)
+                j = decayedDelay(i);
+            sb.append(j);
+            sb.append(' ');
         }
+        sb.append('\n');
+        sb.append(super.toString());
+        return sb.toString();
     }
     
 }
