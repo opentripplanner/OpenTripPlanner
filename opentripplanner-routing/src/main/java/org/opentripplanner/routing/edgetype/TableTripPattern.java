@@ -617,43 +617,48 @@ public class TableTripPattern implements TripPattern, Serializable {
          * (maybe it should do the cloning and return the new timetable to enforce copy-on-write?) 
          */
         public boolean update(UpdateBlock block) {
-             // Though all timetables have the same trip ordering, some may have extra trips due to 
-             // the dynamic addition of unscheduled trips.
-             // However, we want to apply trip update blocks on top of *scheduled* times 
-            int tripIndex = getTripIndex(block.tripId);
-            if (tripIndex == -1) {
-                LOG.info("tripId {} not found in pattern.", block.tripId);
-                return false;
-            } else {
-                LOG.trace("tripId {} found at index {} (in scheduled timetable)", block.tripId, tripIndex);
-            }
-            // 'stop' Index as in transit stop (not 'end', not 'hop')
-            int stopIndex = block.findUpdateStopIndex(TableTripPattern.this);
-            if (stopIndex == UpdateBlock.MATCH_FAILED) {
-                LOG.warn("Unable to match update block to stopIds.");
-                return false;
-            }
-            TripTimes existingTimes = getTripTimes(tripIndex);
-            ScheduledTripTimes scheduledTimes = existingTimes.getScheduledTripTimes();
-            TripTimes newTimes = new UpdatedTripTimes(scheduledTimes, block, stopIndex);
-            if ( ! newTimes.timesIncreasing()) {
-                LOG.warn("Resulting UpdatedTripTimes has non-increasing times. " +
-                         "Falling back on DecayingDelayTripTimes.");
-                LOG.warn(block.toString());
-                LOG.warn(newTimes.toString());
-                int delay = newTimes.getDepartureDelay(stopIndex);
-                // maybe decay should be applied on top of the update (wrap Updated in Decaying), 
-                // starting at the end of the update block
-                newTimes = new DecayingDelayTripTimes(scheduledTimes, stopIndex, delay);
-                LOG.warn(newTimes.toString());
-                if ( ! newTimes.timesIncreasing()) {
-                    LOG.error("Even these trip times are non-increasing. Underlying schedule problem?");
+            try {
+                 // Though all timetables have the same trip ordering, some may have extra trips due to 
+                 // the dynamic addition of unscheduled trips.
+                 // However, we want to apply trip update blocks on top of *scheduled* times 
+                int tripIndex = getTripIndex(block.tripId);
+                if (tripIndex == -1) {
+                    LOG.info("tripId {} not found in pattern.", block.tripId);
+                    return false;
+                } else {
+                    LOG.trace("tripId {} found at index {} (in scheduled timetable)", block.tripId, tripIndex);
+                }
+                // 'stop' Index as in transit stop (not 'end', not 'hop')
+                int stopIndex = block.findUpdateStopIndex(TableTripPattern.this);
+                if (stopIndex == UpdateBlock.MATCH_FAILED) {
+                    LOG.warn("Unable to match update block to stopIds.");
                     return false;
                 }
+                TripTimes existingTimes = getTripTimes(tripIndex);
+                ScheduledTripTimes scheduledTimes = existingTimes.getScheduledTripTimes();
+                TripTimes newTimes = new UpdatedTripTimes(scheduledTimes, block, stopIndex);
+                if ( ! newTimes.timesIncreasing()) {
+                    LOG.warn("Resulting UpdatedTripTimes has non-increasing times. " +
+                             "Falling back on DecayingDelayTripTimes.");
+                    LOG.warn(block.toString());
+                    LOG.warn(newTimes.toString());
+                    int delay = newTimes.getDepartureDelay(stopIndex);
+                    // maybe decay should be applied on top of the update (wrap Updated in Decaying), 
+                    // starting at the end of the update block
+                    newTimes = new DecayingDelayTripTimes(scheduledTimes, stopIndex, delay);
+                    LOG.warn(newTimes.toString());
+                    if ( ! newTimes.timesIncreasing()) {
+                        LOG.error("Even these trip times are non-increasing. Underlying schedule problem?");
+                        return false;
+                    }
+                }
+                // Update succeeded, save the new TripTimes back into this Timetable.
+                this.tripTimes.set(tripIndex, newTimes);
+                return true;
+            } catch (Exception e) { // prevent server from dying while debugging
+                e.printStackTrace();
+                return false;
             }
-            // Update succeeded, save the new TripTimes back into this Timetable.
-            this.tripTimes.set(tripIndex, newTimes);
-            return true;
         }
         
         /**
