@@ -59,7 +59,8 @@ public class Update implements Comparable<Update> {
         ARRIVED,    // the vehicle is at this stop. you could still board right now.
         PREDICTION, // the vehicle is expected to arrive/depart at the indicated times.
         CANCEL,     // the vehicle will not pick up or drop off passengers at this stop.
-        UNKNOWN     // unknown.
+        PLANNED,    // ??? TODO : find out what this means
+        UNKNOWN     // ???
     }
     
 }
