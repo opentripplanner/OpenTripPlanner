@@ -17,35 +17,38 @@ public class UpdatedTripTimes extends DelegatingTripTimes implements TripTimes {
     public UpdatedTripTimes(ScheduledTripTimes sched, UpdateBlock block, int offset) {
         super(sched);
         this.offset = offset;
-        int nStops = block.updates.size();
-        this.arrivals = new int[nStops];
-        this.departures = new int[nStops];
-        for (Update u : block.updates) {
-            arrivals[offset] = u.arrive;
-            departures[offset] = u.depart;
-            offset += 1;
+        int nUpdates = block.updates.size();
+        this.arrivals = new int[nUpdates];
+        this.departures = new int[nUpdates];
+        int ui = 0;
+        for (Update update : block.updates) {
+            arrivals[ui] = update.arrive;
+            departures[ui] = update.depart;
+            ui += 1;
         }
         this.compact();
     }
 
     @Override public int getDepartureTime(int hop) {
         int stop = hop;
-        if (stop < offset)
+        int update = stop - offset;
+        if (update < 0)
             return TripTimes.PASSED;
-        if (stop >= offset + departures.length)
+        if (update >= departures.length)
             return super.getDepartureTime(hop);
-        return departures[stop];
+        return departures[update];
     }
     
     @Override public int getArrivalTime(int hop) {
         int stop = hop + 1;
-        if (stop < offset)
+        int update = stop - offset;
+        if (update < 0)
             return TripTimes.PASSED;
-        if (stop >= offset + departures.length)
+        if (update >= departures.length)
             return super.getArrivalTime(hop);
         if (arrivals == null)
-            return departures[stop];
-        return arrivals[stop];
+            return departures[update];
+        return arrivals[update];
     }
     
     @Override public boolean compact() {
