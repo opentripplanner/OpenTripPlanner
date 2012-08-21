@@ -26,7 +26,6 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jettison.json.JSONException;
-import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
@@ -59,6 +58,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.sun.jersey.api.spring.Autowire;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 
 // NOTE - /ws/transit is the full path -- see web.xml
 
@@ -537,26 +537,43 @@ public class TransitIndex {
             @QueryParam("routerId") String routerId) throws JSONException {
 
         Graph graph = getGraph(routerId);
+        StopList response = new StopList();
 
         StreetVertexIndexService streetVertexIndexService = graph.streetIndex;
-        Coordinate cOne = new Coordinate(leftUpLat, leftUpLon);
-        Coordinate cTwo = new Coordinate(rightUpLat, rightUpLon);
-        List<TransitStop> stops = streetVertexIndexService.getNearbyTransitStops(cOne, cTwo);
-        TransitIndexService transitIndexService = graph.getService(TransitIndexService.class);
-        if (transitIndexService == null) {
-            return new TransitError(
-                    "No transit index found.  Add TransitIndexBuilder to your graph builder configuration and rebuild your graph.");
-        }
+        if (leftUpLat == null || leftUpLon == null || rightUpLat == null || rightUpLon == null) {
+            double METERS_PER_DEGREE_LAT = 111111;
+            double distance = 2000;
+            for (Vertex gv : graph.getVertices()) {
+                if (gv instanceof TransitStop) {
+                    Coordinate c = gv.getCoordinate();
+                    Envelope env = new Envelope(c);
+                    double meters_per_degree_lon_here = METERS_PER_DEGREE_LAT
+                            * Math.cos(Math.toRadians(c.y));
+                    env.expandBy(distance / meters_per_degree_lon_here, distance
+                            / METERS_PER_DEGREE_LAT);
+                    StopType stop = new StopType(((TransitStop) gv).getStop(), extended);
+                    response.stops.add(stop);
+                }
+            }
+        } else {
+            Coordinate cOne = new Coordinate(leftUpLat, leftUpLon);
+            Coordinate cTwo = new Coordinate(rightUpLat, rightUpLon);
+            List<TransitStop> stops = streetVertexIndexService.getNearbyTransitStops(cOne, cTwo);
+            TransitIndexService transitIndexService = graph.getService(TransitIndexService.class);
+            if (transitIndexService == null) {
+                return new TransitError(
+                        "No transit index found.  Add TransitIndexBuilder to your graph builder configuration and rebuild your graph.");
+            }
 
-        StopList response = new StopList();
-        for (TransitStop transitStop : stops) {
-            AgencyAndId stopId = transitStop.getStopId();
-            if (agency != null && !agency.equals(stopId.getAgencyId()))
-                continue;
-            StopType stop = new StopType(transitStop.getStop(), extended);
-            if (extended != null && extended.equals(true))
-                stop.routes = transitIndexService.getRoutesForStop(stopId);
-            response.stops.add(stop);
+            for (TransitStop transitStop : stops) {
+                AgencyAndId stopId = transitStop.getStopId();
+                if (agency != null && !agency.equals(stopId.getAgencyId()))
+                    continue;
+                StopType stop = new StopType(transitStop.getStop(), extended);
+                if (extended != null && extended.equals(true))
+                    stop.routes = transitIndexService.getRoutesForStop(stopId);
+                response.stops.add(stop);
+            }
         }
 
         return response;
