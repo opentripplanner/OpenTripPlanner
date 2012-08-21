@@ -8,8 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.zip.GZIPInputStream;
@@ -18,13 +16,7 @@ import javax.annotation.PostConstruct;
 
 import lombok.Setter;
 
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.opentripplanner.common.CTX;
 import org.opentripplanner.routing.trippattern.Update;
-import org.opentripplanner.routing.trippattern.UpdateBlock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zeromq.ZFrame;
@@ -69,7 +61,6 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer {
             }
         }
     }
-    
 
     public List<Update> getUpdates() {
         /* recvMsg blocks -- unless you call Socket.setReceiveTimeout() */
@@ -87,34 +78,12 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer {
          */        
         List<Update> ret = null;
         try {
-            Iterator<ZFrame> frames = msg.iterator();
-            // pop off first frame, which contains "/GOVI/KV8" (the feed name) (isn't there a method for this?)
-            frames.next();
-            ByteArrayOutputStream buffer = new ByteArrayOutputStream(); 
-            while (frames.hasNext()) {
-                ZFrame frame = frames.next();
-                byte[] frameData = frame.getData();
-                buffer.write(frameData);
-            }
-            if (buffer.size() == 0) {
-                LOG.debug("received 0-length CTX message {}", msg);
-                return null;
-            }
-            // chain input streams to gunzip contents of byte buffer
-            InputStream gzippedMessageStream = new ByteArrayInputStream(buffer.toByteArray());
-            InputStream messageStream = new GZIPInputStream(gzippedMessageStream);
-            // copy input stream back to output stream
-            buffer.reset();
-            byte[] b = new byte[4096];
-            for (int n; (n = messageStream.read(b)) != -1;) {
-                buffer.write(b, 0, n);
-            }   
+            String kv8ctx = gunzipMultifameZMsg(msg);
             if (logWriter != null) {
-                logWriter.write(buffer.toString());
-                logWriter.append('\n');
+                logWriter.write(kv8ctx);
             }
-            ret = parseCTX(buffer.toString());
-            count += 1;
+            ret = KV8Update.fromCTX(kv8ctx);
+            count += 1; // if we got here there must not have been an exception
             LOG.debug("decoded gzipped CTX message #{}: {}", count, msg);
             if (count % 100 == 0) {
                 LOG.info("received {} KV8 messages.", count);
@@ -128,79 +97,30 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer {
         return ret;
     }
     
-    public List<Update> parseCTX(String ctxString) {
-        CTX ctx = new CTX(ctxString);
-        //LOG.trace(ctxString);
-        // at this point, updates may have mixed trip IDs, dates, etc.
-        List<Update> ret = new ArrayList<Update>(); 
-        for (int i = 0; i < ctx.rows.size(); i++) {
-            HashMap<String, String> row = ctx.rows.get(i);
-            // there was a field in the CTX all along that indicated the extra non-passenger stops...
-            if (row.get("JourneyStopType").equals("INFOPOINT"))
-                continue;
-            int arrival = secondsSinceMidnight(row.get("ExpectedArrivalTime"));
-            int departure = secondsSinceMidnight(row.get("ExpectedDepartureTime"));
-            Update u = new Update(
-                    kv7TripId(row),   
-                    kv7StopId(row), 
-                    Integer.parseInt(row.get("UserStopOrderNumber")), 
-                    arrival, departure,
-                    kv8Status(row),
-                    kv8Timestamp(row)) ;
-            ret.add(u);
+    private static String gunzipMultifameZMsg(ZMsg msg) throws IOException {
+        Iterator<ZFrame> frames = msg.iterator();
+        // pop off first frame, which contains "/GOVI/KV8" (the feed name) (isn't there a method for this?)
+        frames.next();
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream(); 
+        while (frames.hasNext()) {
+            ZFrame frame = frames.next();
+            byte[] frameData = frame.getData();
+            buffer.write(frameData);
         }
-        return ret;
-    }
-
-    /** 
-     * no good for DST 
-     */
-    private int secondsSinceMidnight(String hhmmss) {
-        String[] time = hhmmss.split(":");
-        int hours = Integer.parseInt(time[0]);
-        int minutes = Integer.parseInt(time[1]);
-        int seconds = Integer.parseInt(time[2]);
-        return (hours * 60 + minutes) * 60 + seconds;
-    }
-    
-    /** 
-     * convert KV7 fields into a GTFS trip_id
-     * trip_ids must be data set unique in GTFS, which is why we use the DataOwnerCode (~=agency_id) 
-     * twice, in the trip_id itself and the enclosing AgencyAndId.
-     * https://github.com/skywave/kv7tools/blob/master/kv7_gtfs.sql#L42
-     */
-    public AgencyAndId kv7TripId (HashMap<String, String> row) {
-        String tripId = String.format("%s_%s_%s_%s_%s",
-                row.get("DataOwnerCode"),
-                row.get("LinePlanningNumber"),
-                row.get("LocalServiceLevelCode"),
-                row.get("JourneyNumber"),
-                row.get("FortifyOrderNumber"));
-        return new AgencyAndId(row.get("DataOwnerCode"), tripId);
+        if (buffer.size() == 0) {
+            LOG.debug("received 0-length CTX message {}", msg);
+            return null;
+        }
+        // chain input streams to gunzip contents of byte buffer
+        InputStream gzippedMessageStream = new ByteArrayInputStream(buffer.toByteArray());
+        InputStream messageStream = new GZIPInputStream(gzippedMessageStream);
+        // copy input stream back to output stream
+        buffer.reset();
+        byte[] b = new byte[4096];
+        for (int n; (n = messageStream.read(b)) != -1;) {
+            buffer.write(b, 0, n);
+        }   
+        return buffer.toString();
     }
     
-    /** 
-     * Convert KV7 fields into a GTFS stop_id. DataOwnerCode and UserStopCode are the agency's 
-     * internal identifiers for a stop, so should not be used. TimingPointCode is a unique 
-     * nationwide (feed-wide) identifier which includes those UserStopCodes.
-     */
-    public String kv7StopId (HashMap<String, String> row) {
-        return row.get("TimingPointCode");
-    }
-    
-    public long kv8Timestamp (HashMap<String, String> row) {
-        String timestamp = row.get("LastUpdateTimeStamp");
-        DateTimeFormatter parser = ISODateTimeFormat.dateTimeNoMillis();
-        DateTime dt = parser.parseDateTime(timestamp);
-        return dt.getMillis();
-    }
-
-    public Update.Status kv8Status(HashMap<String, String> row) {
-        String s = row.get("TripStopStatus");
-        if (s.equals("DRIVING"))
-            return Update.Status.PREDICTION;
-        else
-            return Update.Status.valueOf(s);
-    }
-
 }
