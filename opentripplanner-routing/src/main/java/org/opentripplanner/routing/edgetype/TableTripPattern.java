@@ -639,13 +639,15 @@ public class TableTripPattern implements TripPattern, Serializable {
             ScheduledTripTimes scheduledTimes = existingTimes.getScheduledTripTimes();
             TripTimes newTimes = new UpdatedTripTimes(scheduledTimes, block, stopIndex);
             if ( ! TripTimesUtil.timesIncreasing(newTimes)) {
-                LOG.error("Resulting UpdatedTripTimes has non-increasing times.");
-                LOG.error(block.toString());
-                LOG.error(newTimes.toString());
-                LOG.info("Falling back on DecayingDelayTripTimes.");
+                LOG.warn("Resulting UpdatedTripTimes has non-increasing times. " +
+                         "Falling back on DecayingDelayTripTimes.");
+                LOG.debug(block.toString());
+                LOG.debug(newTimes.toString());
                 int delay = newTimes.getDepartureTime(stopIndex) - scheduledTimes.getDepartureTime(stopIndex); 
+                // maybe decay should be applied on top of the update (wrap Updated in Decaying), 
+                // starting at the end of the update block
                 newTimes = new DecayingDelayTripTimes(scheduledTimes, stopIndex, delay, 0.7, false);
-                LOG.error(newTimes.toString());
+                LOG.warn(newTimes.toString());
                 if ( ! TripTimesUtil.timesIncreasing(newTimes)) {
                     LOG.error("Even these trip times are non-increasing. Underlying schedule problem?");
                     return false;
