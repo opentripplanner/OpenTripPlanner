@@ -68,9 +68,6 @@ public interface TripTimes {
      * @return whether or not compaction occurred. 
      */
     public boolean compact();
-    
-    /** Not named toString (which is in Object) so Lombok will delegate it */
-    public String dumpTimes(); //toStringVerbose
 
     /* Yes, it's a bit odd to put nested classes in an interface but it gives them nice names. */
     

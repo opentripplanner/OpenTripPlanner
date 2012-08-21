@@ -142,25 +142,9 @@ public class ScheduledTripTimes implements TripTimes, Serializable {
     }
 
     public String toString() {
-        return dumpTimes();
+        return TripTimesUtil.toString(this);
     }
     
-    @Override
-    public String dumpTimes() {
-        StringBuilder sb = new StringBuilder();
-        int nHops = getNumHops();
-        sb.append(arrivalTimes == null ? "C " : "U ");
-        for (int hop=0; hop < nHops; hop++) {
-            sb.append(hop); 
-            sb.append(':');
-            sb.append(getDepartureTime(hop)); 
-            sb.append('-');
-            sb.append(getArrivalTime(hop));
-            sb.append(' ');
-        }
-        return sb.toString();
-    }
-
     // TODO this is going to require pointers to the enclosing Timetable
     @Override
     public String getHeadsign(int hop) {

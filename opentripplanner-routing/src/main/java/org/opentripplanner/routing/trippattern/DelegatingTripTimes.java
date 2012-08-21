@@ -15,4 +15,8 @@ public class DelegatingTripTimes implements TripTimes {
     @NonNull @Delegate(types=TripTimes.class)
     private final ScheduledTripTimes tt;
     
+    public String toString() {
+        return TripTimesUtil.toString(this);
+    }
+    
 }

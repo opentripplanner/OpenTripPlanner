@@ -636,7 +636,7 @@ public class TableTripPattern implements TripPattern, Serializable {
             }
             TripTimes existingTimes = getTripTimes(tripIndex);
             ScheduledTripTimes scheduledTimes = existingTimes.getScheduledTripTimes();
-            TripTimes newTimes = new UpdatedTripTimes(scheduledTimes, block, stopIndex);
+            UpdatedTripTimes newTimes = new UpdatedTripTimes(scheduledTimes, block, stopIndex);
             if (TripTimesUtil.timesIncreasing(newTimes)) {
                 // update succeeded, save the new TripTimes back into this Timetable
                 this.tripTimes.set(tripIndex, newTimes);
@@ -645,7 +645,7 @@ public class TableTripPattern implements TripPattern, Serializable {
             // update failed, leave Timetable unchanged and communicate failure
             LOG.error("Resulting UpdatedTripTimes has non-increasing times.");
             LOG.error(block.toString());
-            LOG.error(newTimes.dumpTimes());
+            LOG.error(newTimes.toString());
             return false;
         }
         

@@ -1,9 +1,5 @@
 package org.opentripplanner.routing.trippattern;
 
-import java.util.Comparator;
-
-import lombok.AllArgsConstructor;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,7 +7,7 @@ import org.slf4j.LoggerFactory;
  * This class contains static utility methods that operate on or return objects of type TripTimes. 
  * By convention, the name of this class would be the plural of TripTimes, which is already plural.
  */
-public class TripTimesUtil {
+public abstract class TripTimesUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(TripTimesUtil.class);
 
@@ -71,16 +67,35 @@ public class TripTimesUtil {
         return mid;
     }
 
+    /* 
+     * These methods are not in ScheduledTripTimes because we delegate rather than subclass to 
+     * provide other TripTimes implementations. Calls to getDepartureTime and getArrivalTime, etc.
+     * in utility methods would always be bound to the base ScheduledTripTimes instance 
+     * rather than the updated/extended TripTimes.
+     */ 
+
+    /** Builds a string concisely representing all departure and arrival times in this TripTimes. */
+    public static String toString(TripTimes tt) {
+        StringBuilder sb = new StringBuilder();
+        int nHops = tt.getNumHops();
+        // compaction is multi-layered now
+        //sb.append(arrivalTimes == null ? "C " : "U ");
+        for (int hop=0; hop < nHops; hop++) {
+            sb.append(hop); 
+            sb.append(':');
+            sb.append(tt.getDepartureTime(hop)); 
+            sb.append('-');
+            sb.append(tt.getArrivalTime(hop));
+            sb.append(' ');
+        }
+        return sb.toString();
+    }
+
     /**
      * When creating a ScheduledTripTimes or wrapping it in updates, we could potentially imply
      * negative hop or dwell times. We really don't want those being used in routing. 
      * This method check that all times are increasing, and issues warnings if this is not the case.
      * @return whether the times were found to be increasing.
-     * 
-     * This method is not in ScheduledTripTimes to make it clear that it will work on any class
-     * implementing TripTimes (though if it were in ScheduledTripTimes, any class implementing 
-     * TripTimes and fully to a ScheduledTripTimes would be able to use it, since it always 
-     * accesses times via the getter methods).
      */
     public static boolean timesIncreasing(TripTimes tt) {
         // iterate over the new tripTimes, checking that dwells and hops are positive
@@ -91,17 +106,14 @@ public class TripTimesUtil {
             int dep = tt.getDepartureTime(hop);
             int arr = tt.getArrivalTime(hop);
             if (arr < dep) { // negative hop time
-                LOG.error("negative hop time in TripTimes at index {}", hop);
+                LOG.error("Negative hop time in TripTimes at index {}.", hop);
                 increasing = false;
             }
             if (prevArr > dep) { // negative dwell time before this hop
-                LOG.error("negative dwell time in TripTimes at index {}", hop);
+                LOG.error("Negative dwell time in TripTimes at index {}.", hop);
                 increasing = false;
             }
             prevArr = arr;
-        }
-        if (!increasing) {
-            LOG.error(tt.dumpTimes());
         }
         return increasing;
     }
