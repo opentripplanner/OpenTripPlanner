@@ -411,7 +411,7 @@ public class RaptorSearch {
                 continue;
             }
 
-/*
+
             double minWalk = distanceToNearestTransitStop;
 
             double targetDistance = bounder.getTargetDistance(vertex);
@@ -443,7 +443,7 @@ public class RaptorSearch {
                     }
                 }
             }
-*/
+
             List<RaptorState> states = statesByStop[stop.index];
             if (states == null) {
                 states = new ArrayList<RaptorState>();

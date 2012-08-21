@@ -139,7 +139,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
     @Override
     public boolean shouldSkipTraversalResult(Vertex origin, Vertex target, State parent,
             State current, ShortestPathTree spt, RoutingRequest traverseOptions) {
-        /*
+
         final Vertex vertex = current.getVertex();
         int vertexIndex = vertex.getIndex();
         if (vertexIndex < distance.length) {
@@ -209,8 +209,6 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
             }
         }
         return prevBounded;
-        */
-        return false;
     }
 
 
