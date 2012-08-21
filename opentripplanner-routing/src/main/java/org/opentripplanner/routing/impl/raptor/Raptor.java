@@ -37,6 +37,7 @@ import org.opentripplanner.routing.pathparser.BasicPathParser;
 import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
+import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
@@ -57,6 +58,9 @@ public class Raptor implements PathService {
 
     private RaptorData cachedRaptorData;
 
+    //fallback for nontransit trips
+    @Autowired public SPTService sptService;
+
     @Override
     public List<GraphPath> getPaths(RoutingRequest options) {
 
@@ -65,6 +69,11 @@ public class Raptor implements PathService {
             options.rctx.pathParsers = new PathParser[1];
             options.rctx.pathParsers[0] = new BasicPathParser();
         }
+
+        if (!options.getModes().isTransit()) {
+            return sptService.getShortestPathTree(options).getPaths();
+        }
+
         Graph graph = graphService.getGraph(options.getRouterId());
         RaptorData data = graph.getService(RaptorDataService.class).getData();
 
