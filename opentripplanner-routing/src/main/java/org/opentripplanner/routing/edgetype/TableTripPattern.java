@@ -33,8 +33,6 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.trippattern.DecayingDelayTripTimes;
 import org.opentripplanner.routing.trippattern.ScheduledTripTimes;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.routing.trippattern.TripTimesUtil;
-import org.opentripplanner.routing.trippattern.Update;
 import org.opentripplanner.routing.trippattern.UpdateBlock;
 import org.opentripplanner.routing.trippattern.UpdatedTripTimes;
 import org.slf4j.Logger;
@@ -402,7 +400,7 @@ public class TableTripPattern implements TripPattern, Serializable {
                 //     index = departuresIndex[0];
                 // else
                 TripTimes[] index = departuresIndex[stopIndex];
-                int tripIndex = TripTimesUtil.binarySearchDepartures(index, stopIndex, afterTime); 
+                int tripIndex = TripTimes.binarySearchDepartures(index, stopIndex, afterTime); 
                 //these appear to actually be hop indexes, which is what the binary search accepts
                 while (tripIndex < index.length) {
                     TripTimes tt = index[tripIndex];
@@ -456,7 +454,7 @@ public class TableTripPattern implements TripPattern, Serializable {
             if (arrivalsIndex != null) {
                 // search through the sorted list of TripTimes for this particular stop
                 TripTimes[] index = arrivalsIndex[stopIndex];
-                int tripIndex = TripTimesUtil.binarySearchArrivals(index, stopIndex, beforeTime); 
+                int tripIndex = TripTimes.binarySearchArrivals(index, stopIndex, beforeTime); 
                 //these appear to actually be hop indexes, which is what the binary search accepts
                 while (tripIndex >= 0) {
                     TripTimes tt = index[tripIndex];
@@ -638,17 +636,17 @@ public class TableTripPattern implements TripPattern, Serializable {
             TripTimes existingTimes = getTripTimes(tripIndex);
             ScheduledTripTimes scheduledTimes = existingTimes.getScheduledTripTimes();
             TripTimes newTimes = new UpdatedTripTimes(scheduledTimes, block, stopIndex);
-            if ( ! TripTimesUtil.timesIncreasing(newTimes)) {
+            if ( ! newTimes.timesIncreasing()) {
                 LOG.warn("Resulting UpdatedTripTimes has non-increasing times. " +
                          "Falling back on DecayingDelayTripTimes.");
-                LOG.debug(block.toString());
-                LOG.debug(newTimes.toString());
-                int delay = newTimes.getDepartureTime(stopIndex) - scheduledTimes.getDepartureTime(stopIndex); 
+                LOG.warn(block.toString());
+                LOG.warn(newTimes.toString());
+                int delay = newTimes.getDepartureDelay(stopIndex);
                 // maybe decay should be applied on top of the update (wrap Updated in Decaying), 
                 // starting at the end of the update block
-                newTimes = new DecayingDelayTripTimes(scheduledTimes, stopIndex, delay, 0.7, false);
+                newTimes = new DecayingDelayTripTimes(scheduledTimes, stopIndex, delay);
                 LOG.warn(newTimes.toString());
-                if ( ! TripTimesUtil.timesIncreasing(newTimes)) {
+                if ( ! newTimes.timesIncreasing()) {
                     LOG.error("Even these trip times are non-increasing. Underlying schedule problem?");
                     return false;
                 }
