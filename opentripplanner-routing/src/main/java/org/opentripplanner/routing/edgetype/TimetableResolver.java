@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.edgetype.TableTripPattern.Timetable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,8 +31,10 @@ public class TimetableResolver {
     
     private Set<Timetable> dirty = new HashSet<Timetable>();
     
-    /** Returns an updated timetable for the specified pattern if one is available in this snapshot, 
-     * or the originally scheduled timetable if there are no updates in this snapshot. */
+    /** 
+     * Returns an updated timetable for the specified pattern if one is available in this snapshot, 
+     * or the originally scheduled timetable if there are no updates in this snapshot. 
+     */
     public Timetable resolve(TableTripPattern pattern) {
         Timetable timetable = timetables.get(pattern);
         if (timetable == null) {
@@ -45,8 +46,9 @@ public class TimetableResolver {
     }
     
     public Timetable modify(TableTripPattern pattern) {
-        if (dirty == null) // this snapshot was already committed for reading
-            throw new ConcurrentModificationException();
+        if (dirty == null)
+            throw new ConcurrentModificationException(
+                    "This TimetableResolver snapshot was already committed for reading.");
         Timetable existing = resolve(pattern);
         if (dirty.contains(existing)) {
             return existing; // allows modifying multiple trips on a single pattern

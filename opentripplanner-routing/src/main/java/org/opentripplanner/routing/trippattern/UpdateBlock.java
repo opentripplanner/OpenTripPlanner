@@ -207,6 +207,9 @@ public class UpdateBlock {
         return MATCH_FAILED;
     }
     
+    // TODO: TripTimes patching is now not tolerant of mismatched (extra) updates. 
+    // Fuzzy matching will have to be destructive or store the match indices in the update.
+    // I like the second option.
     private int matchBlockFuzzy(TableTripPattern pattern) {
         List<Stop> patternStops = pattern.getStops();
         int nStops = patternStops.size(); // here we allow matching a subset of the block's updates
