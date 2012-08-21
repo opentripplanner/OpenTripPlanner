@@ -20,26 +20,24 @@ import org.slf4j.LoggerFactory;
  * wrapped in other TripTimes implementations which replace, cancel, or otherwise modify some of 
  * the timetable information.
  */
-public class ScheduledTripTimes implements TripTimes, Serializable {
-
-    private static final Logger LOG = LoggerFactory.getLogger(ScheduledTripTimes.class);
+public class ScheduledTripTimes extends TripTimes implements Serializable {
 
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
+    private static final Logger LOG = LoggerFactory.getLogger(ScheduledTripTimes.class);
     
     @Getter private final Trip trip;
 
     /** 
-     * This is kind of ugly, but the headsigns are in the enclosing pattern not here. Also, assuming
-     * we have a reference to the enclosing pattern, this lets us find the equivalent scheduled
-     * TripTimes.
+     * This is kind of ugly, but the headsigns are in the enclosing pattern not here. Assuming
+     * we have a reference to the enclosing pattern, we can fetch things from there. 
+     * Ideally we can get by without exposing this at all to outside callers.
      */
-    public final int index; 
+    private final int index; 
     
     /** 
      * The time in seconds after midnight at which the vehicle begins traversing each inter-stop 
      * segment ("hop"). Field is non-final to support compaction.
-     */
-    @XmlElement
+     */ //@XmlElement
     private int[] departureTimes;
 
     /** 
@@ -47,11 +45,10 @@ public class ScheduledTripTimes implements TripTimes, Serializable {
      * inter-stop segment ("hop"). A null value indicates that all dwells are 0-length, and arrival 
      * times are to be derived from the departure times array. Field is non-final to support 
      * compaction.
-     */
-    @XmlElement
+     */ //@XmlElement
     private int[] arrivalTimes; 
 
-    /** The stopTimes are assumed to be pre-filtered, valid, monotonically increasing, etc. */ 
+    /** The provided stopTimes are assumed to be pre-filtered, valid, and monotonically increasing. */ 
     public ScheduledTripTimes(Trip trip, int index, List<StopTime> stopTimes) {
         this.trip = trip;
         this.index = index;
@@ -64,7 +61,7 @@ public class ScheduledTripTimes implements TripTimes, Serializable {
             departureTimes[hop] = stopTimes.get(hop).getDepartureTime();
             arrivalTimes[hop] = stopTimes.get(hop + 1).getArrivalTime();
         }
-        // if all dwell times are 0, arrival times array is not needed. save some memory.
+        // If all dwell times are 0, arrival times array is not needed. Attempt to save some memory.
         this.compact();
     }
     
@@ -83,19 +80,6 @@ public class ScheduledTripTimes implements TripTimes, Serializable {
         return this;
     }    
     
-    @Override
-    public int getDwellTime(int hop) {
-        // TODO: Add range checking and -1 error value? see GTFSPatternHopFactory.makeTripPattern().
-        int arrivalTime = getArrivalTime(hop-1);
-        int departureTime = getDepartureTime(hop);
-        return departureTime - arrivalTime;
-    }
-    
-    @Override
-    public int getRunningTime(int hop) {
-        return getArrivalTime(hop) - getDepartureTime(hop);
-    }
-
     @Override
     public int getDepartureTime(int hop) {
         return departureTimes[hop];
@@ -142,7 +126,7 @@ public class ScheduledTripTimes implements TripTimes, Serializable {
     }
 
     public String toString() {
-        return TripTimesUtil.toString(this);
+        return "ScheduledTripTimes \n" + super.toString();
     }
     
     // TODO this is going to require pointers to the enclosing Timetable

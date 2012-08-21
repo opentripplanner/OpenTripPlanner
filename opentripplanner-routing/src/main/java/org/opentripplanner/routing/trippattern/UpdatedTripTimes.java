@@ -5,7 +5,7 @@ package org.opentripplanner.routing.trippattern;
  * reading through to the scheduled TripTimes for subsequent stops, and reporting that the vehicle
  * has passed stops preceding the update block.
  */
-public class UpdatedTripTimes extends DelegatingTripTimes implements TripTimes {
+public class UpdatedTripTimes extends DelegatingTripTimes {
 
     private final int offset;
     
@@ -66,7 +66,7 @@ public class UpdatedTripTimes extends DelegatingTripTimes implements TripTimes {
     public String toString() {
         String s = String.format("UpdatedTripTimes block size %d at stop %d\n", 
                 departures.length, offset);
-        return s + super.toString();
+        return s + dumpTimes() + "\nbased on:" + super.toString();
     }
 
 }

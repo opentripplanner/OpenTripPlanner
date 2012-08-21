@@ -4,7 +4,7 @@ package org.opentripplanner.routing.trippattern;
  * A CancelledTripTimes represents the cancellation of an entire trip by reporting that the vehicle
  * has already passed all stops.
  */
-public class CancelledTripTimes extends DelegatingTripTimes implements TripTimes {
+public class CancelledTripTimes extends DelegatingTripTimes {
 
     public CancelledTripTimes(ScheduledTripTimes sched) {
         super(sched);

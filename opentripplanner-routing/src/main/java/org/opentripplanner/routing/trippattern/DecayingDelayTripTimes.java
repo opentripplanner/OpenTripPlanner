@@ -7,34 +7,41 @@ import lombok.val;
  * vehicle is a given number of seconds early or late, and reports that the vehicle has 
  * passed all stops up to a certain point based on a report of vehicle location.
  */
-public class DecayingDelayTripTimes extends DelegatingTripTimes implements TripTimes {
+public class DecayingDelayTripTimes extends DelegatingTripTimes {
 
     private final int currentStop;
     private final int delay;
     private final double k;
     private final boolean linear;
-    // compute decay lookup table?
+    private final boolean readThrough;
     
     public DecayingDelayTripTimes(ScheduledTripTimes sched, int currentStop, int delay, 
-            double decay, boolean linear) {
+        double decayParam, boolean linear, boolean readThrough) {
         super(sched);
         this.delay = delay;
         this.currentStop = currentStop;
-        this.k = decay;
+        this.k = decayParam;
         this.linear = linear;
+        this.readThrough = readThrough;
     }
 
     @Override public int getDepartureTime(int hop) {
         int stop = hop;
-        if (stop < currentStop)
+        if (stop < currentStop) {
+            if (readThrough)
+                return super.getDepartureTime(hop);
             return TripTimes.PASSED;
+        }
         return super.getDepartureTime(hop) + decayedDelay(stop);
     }
     
     @Override public int getArrivalTime(int hop) {
         int stop = hop + 1;
-        if (stop < currentStop)
+        if (stop < currentStop) {
+            if (readThrough)
+                return super.getArrivalTime(hop);
             return TripTimes.PASSED;
+        }
         return super.getArrivalTime(hop) + decayedDelay(stop);
     }
         
@@ -53,20 +60,28 @@ public class DecayingDelayTripTimes extends DelegatingTripTimes implements TripT
         return (int) (decay * delay);
     }
     
-    public String toString() {
+    @Override public String toString() {
         val sb = new StringBuilder();
         sb.append(String.format("%s DecayingDelayTripTimes delay=%d stop=%d param=%3.2f\n", 
                 linear ? "Linear" : "Exponential", delay, currentStop, k));
         for (int i = 0; i < getNumHops(); i++) {
+            sb.append(i);
+            sb.append(':');
             int j = 0;
             if (i >= currentStop)
                 j = decayedDelay(i);
             sb.append(j);
             sb.append(' ');
         }
-        sb.append('\n');
+        sb.append(dumpTimes());
+        sb.append("\nbased on:\n");
         sb.append(super.toString());
         return sb.toString();
+    }
+
+    @Override public boolean compact() {
+        // Nothing much to compact. Maybe compute a decay lookup table?
+        return false;
     }
     
 }
