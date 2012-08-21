@@ -10,23 +10,25 @@ import lombok.val;
 public class DecayingDelayTripTimes extends DelegatingTripTimes {
 
     private final int currentStop;
+    private final int t0;
     private final int delay;
-    private final double k;
     private final boolean linear;
     private final boolean readThrough;
+    private final double lambda;
 
     public DecayingDelayTripTimes(ScheduledTripTimes sched, int currentStop, int delay) {
-        this(sched, currentStop, delay, 0.7, false, false);
+        this(sched, currentStop, delay, 500, true, false);
     }
     
     public DecayingDelayTripTimes(ScheduledTripTimes sched, int currentStop, int delay, 
-        double decayParam, boolean linear, boolean readThrough) {
+        double halfLife, boolean linear, boolean readThrough) {
         super(sched);
+        this.t0 = sched.getDepartureTime(currentStop);
         this.delay = delay;
         this.currentStop = currentStop;
-        this.k = decayParam;
         this.linear = linear;
         this.readThrough = readThrough;
+        this.lambda = 1.0/halfLife;
     }
 
     @Override public int getDepartureTime(int hop) {
@@ -36,7 +38,9 @@ public class DecayingDelayTripTimes extends DelegatingTripTimes {
                 return super.getDepartureTime(hop);
             return TripTimes.PASSED;
         }
-        return super.getDepartureTime(hop) + decayedDelay(stop);
+        int t = super.getDepartureTime(hop);
+        int elapsed = t - t0;
+        return t + decayedDelay(elapsed);
     }
     
     @Override public int getArrivalTime(int hop) {
@@ -46,39 +50,49 @@ public class DecayingDelayTripTimes extends DelegatingTripTimes {
                 return super.getArrivalTime(hop);
             return TripTimes.PASSED;
         }
-        return super.getArrivalTime(hop) + decayedDelay(stop);
+        int t = super.getArrivalTime(hop);
+        int elapsed = t - t0;
+        return t + decayedDelay(elapsed);
     }
         
-    private int decayedDelay(int stop) {
+    private int decayedDelay(int dt) {
         if (delay == 0) 
             return 0;
-        int n = stop - currentStop;
         // This would make the decay symmetric about the current stop. Not currently needed, as 
         // we are reporting PASSED for all stops before currentStop.
         // n = Math.abs(n);
         double decay;
-        if (linear)
-            decay = (n > k) ? 0.0 : 1.0 - n / k;
-        else  
-            decay = Math.pow(k, n);
+        if (linear) {
+            decay = 1 - dt/lambda * 0.5;
+            if (decay < 0)
+                decay = 0;
+        } else {
+            decay = Math.exp(-lambda * dt);
+        }
         return (int) (decay * delay);
     }
     
     @Override public String toString() {
         val sb = new StringBuilder();
-        sb.append(String.format("%s DecayingDelayTripTimes delay=%d stop=%d param=%3.2f\n", 
-                linear ? "Linear" : "Exponential", delay, currentStop, k));
+        sb.append(String.format("%s DecayingDelayTripTimes delay=%d stop=%d halfLife=%03.1f\n", 
+                linear ? "Linear" : "Exponential", delay, currentStop, 1/lambda));
         for (int i = 0; i < getNumHops(); i++) {
-            sb.append(i);
-            sb.append(':');
-            int j = 0;
-            if (i >= currentStop)
-                j = decayedDelay(i);
-            sb.append(j);
-            sb.append(' ');
+            int td = super.getDepartureTime(i);
+            int ed = td - t0;
+            int ta = super.getArrivalTime(i);
+            int ea = ta - t0;
+            int dd = 0;
+            int da = 0;
+            if (i >= currentStop) {
+                dd = decayedDelay(ed);
+                da = decayedDelay(ea);
+            }
+            String s = String.format("(%d)%5d  %5d", i, dd, da);
+            sb.append(s);
         }
+        sb.append('\n');
         sb.append(dumpTimes());
-        sb.append("\nbased on:\n");
+        sb.append("\nbased on: ");
         sb.append(super.toString());
         return sb.toString();
     }

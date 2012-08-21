@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.xml.bind.annotation.XmlElement;
-
 import lombok.Getter;
 
 import org.onebusaway.gtfs.model.StopTime;
@@ -126,7 +124,7 @@ public class ScheduledTripTimes extends TripTimes implements Serializable {
     }
 
     public String toString() {
-        return "ScheduledTripTimes \n" + super.toString();
+        return "ScheduledTripTimes\n" + dumpTimes();
     }
     
     // TODO this is going to require pointers to the enclosing Timetable

@@ -98,12 +98,8 @@ public abstract class TripTimes {
         // compaction is multi-layered now
         //sb.append(arrivalTimes == null ? "C " : "U ");
         for (int hop=0; hop < nHops; hop++) {
-            sb.append('[');
-            sb.append(hop);
-            sb.append(']');
-            sb.append(this.getDepartureTime(hop)); 
-            sb.append(' ');
-            sb.append(this.getArrivalTime(hop));
+            String s = String.format("(%d)%05d__%05d", hop, this.getDepartureTime(hop), this.getArrivalTime(hop));
+            sb.append(s);
         }
         return sb.toString();
     }
