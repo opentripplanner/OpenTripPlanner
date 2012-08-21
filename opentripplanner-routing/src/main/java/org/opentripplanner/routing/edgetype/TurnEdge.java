@@ -216,11 +216,6 @@ public class TurnEdge extends StreetEdge {
         return ((TurnVertex) fromv).getElevationProfile();
     }
 
-    public ElevationProfileSegment getElevationProfileSegment() {
-        return ((TurnVertex) fromv).getElevationProfileSegment();
-    }
-
-
     @Override
     public Vertex getFromVertex() {
         return fromv;
@@ -338,9 +333,12 @@ public class TurnEdge extends StreetEdge {
         return ((TurnVertex) fromv).getStreetClass();
     }
 
-    @Override
     public boolean isWheelchairAccessible() {
         return ((TurnVertex) fromv).isWheelchairAccessible();
     }
 
+    @Override
+    public ElevationProfileSegment getElevationProfileSegment() {
+        return ((TurnVertex) fromv).getElevationProfileSegment();
+    }
 }

@@ -23,12 +23,11 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.PatternAlight;
-import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.AbstractVertex;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -115,7 +114,7 @@ public class RaptorDataBuilder implements GraphBuilder {
                                 route.stops[stop].stopVertex = (TransitStop) e.getFromVertex();
                             }
                         }
-                        route.boards[stop][pattern] = (PatternBoard) segment.board;
+                        route.boards[stop][pattern] = (TransitBoardAlight) segment.board;
                     }
                     if (stop != 0) {
                         for (Edge e : segment.alight.getToVertex().getOutgoing()) {
@@ -124,7 +123,7 @@ public class RaptorDataBuilder implements GraphBuilder {
                             }
                         }
 
-                        route.alights[stop - 1][pattern] = (PatternAlight) segment.alight;
+                        route.alights[stop - 1][pattern] = (TransitBoardAlight) segment.alight;
                     }
                     if (++pattern == nPatterns) {
                         pattern = 0;

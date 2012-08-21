@@ -52,6 +52,7 @@ import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
+import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.common.MavenVersion;
@@ -97,6 +98,8 @@ public class Graph implements Serializable {
     private transient Map<Edge, Integer> idForEdge;
     
     public transient StreetVertexIndexService streetIndex;
+    
+    public transient TimetableSnapshot timetableSnapshot = null;
     
     private List<GraphBuilderAnnotation> graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>();
 

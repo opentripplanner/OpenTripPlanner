@@ -11,8 +11,9 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.patch;
+package org.opentripplanner.routing.transit_index.adapters;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -24,22 +25,22 @@ import org.opentripplanner.util.model.EncodedPolylineBean;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 
-public class LineStringAdapter extends XmlAdapter<EncodedPolylineBean, LineString> {
+public class LineStringAdapter extends XmlAdapter<EncodedPolylineBean, LineString>{
 
-    @Override
-    public LineString unmarshal(EncodedPolylineBean arg) throws Exception {
-        throw new UnsupportedOperationException(
-                "We presently serialize LineString as EncodedPolylineBean, and thus cannot deserialize them");
-    }
+	@Override
+	public LineString unmarshal(EncodedPolylineBean arg) throws Exception {
+	    throw new UnsupportedOperationException("We presently serialize LineString as EncodedPolylineBean, and thus cannot deserialize them");
+	}
 
-    @Override
-    public EncodedPolylineBean marshal(LineString arg) throws Exception {
-        if (arg == null) {
-            return null;
-        }
-        Coordinate[] lineCoords = arg.getCoordinates();
-        List<Coordinate> coords = Arrays.asList(lineCoords);
-        return PolylineEncoder.createEncodings(coords);
-    }
+	@Override
+	public EncodedPolylineBean marshal(LineString arg) throws Exception {
+		if (arg == null) {
+			return null;
+		}
+		Coordinate[] lineCoords = arg.getCoordinates();
+		List<Coordinate> coords = Arrays.asList(lineCoords);
+		return PolylineEncoder.createEncodings(coords);
+	}
 
+	
 }

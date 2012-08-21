@@ -249,17 +249,17 @@ public class TestStreetMatcher {
         }
 
         @Override
-        public ElevationProfileSegment getElevationProfileSegment() {
-            return null;
-        }
-
-        @Override
         public boolean isWheelchairAccessible() {
             return true;
         }
 
         public boolean isElevationFlattened() {
             return false;
+        }
+
+        @Override
+        public ElevationProfileSegment getElevationProfileSegment() {
+            return null;
         }
     }
 }

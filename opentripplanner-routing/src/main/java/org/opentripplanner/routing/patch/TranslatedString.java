@@ -20,12 +20,14 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.opentripplanner.routing.transit_index.adapters.MapAdapter;
+
 @XmlType
 public class TranslatedString implements Serializable {
     private static final long serialVersionUID = 2163930399727941628L;
 
     @XmlElement
-    @XmlJavaTypeAdapter(MapAdaptor.class)
+    @XmlJavaTypeAdapter(MapAdapter.class)
     public TreeMap<String, String> translations = new TreeMap<String, String>();
 
     public TranslatedString(String language, String note) {

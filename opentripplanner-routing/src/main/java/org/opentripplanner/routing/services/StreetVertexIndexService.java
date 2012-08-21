@@ -39,6 +39,8 @@ public interface StreetVertexIndexService {
             List<Edge> extraEdges, Collection<Edge> preferredEdges);
 
     public List<TransitStop> getNearbyTransitStops(Coordinate coordinate, double radius);
+    
+    public List<TransitStop> getNearbyTransitStops(Coordinate coordinateOne, Coordinate coordinateTwo);
 
     Vertex getVertexForPlace(NamedPlace place, RoutingRequest options);
 

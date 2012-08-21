@@ -11,29 +11,28 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.patch;
+package org.opentripplanner.routing.transit_index.adapters;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Stop;
 
-public class AgencyAndIdAdapter extends XmlAdapter<AgencyAndIdType, AgencyAndId>{
+public class StopAgencyAndIdAdapter extends XmlAdapter<AgencyAndIdType, Stop> {
 
-	@Override
-	public AgencyAndId unmarshal(AgencyAndIdType arg) throws Exception {
-		if (arg == null) {
-			return null;
-		}
-		return new AgencyAndId(arg.agency, arg.id);
-	}
+    @Override
+    public Stop unmarshal(AgencyAndIdType arg) throws Exception {
+        throw new UnsupportedOperationException(
+                "We presently serialize stops as AgencyAndId, and thus cannot deserialize them");
+    }
 
-	@Override
-	public AgencyAndIdType marshal(AgencyAndId arg) throws Exception {
-		if (arg == null) {
-			return null;
-		}
-		return new AgencyAndIdType(arg.getAgencyId(), arg.getId());
-	}
+    @Override
+    public AgencyAndIdType marshal(Stop arg) throws Exception {
+        if (arg == null) {
+            return null;
+        }
+        AgencyAndId id = arg.getId();
+        return new AgencyAndIdType(id.getAgencyId(), id.getId());
+    }
 
-	
 }

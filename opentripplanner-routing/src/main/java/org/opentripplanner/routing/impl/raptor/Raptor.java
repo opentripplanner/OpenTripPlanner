@@ -24,13 +24,11 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.Board;
-import org.opentripplanner.routing.edgetype.PatternAlight;
-import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.pathparser.BasicPathParser;
@@ -171,7 +169,7 @@ public class Raptor implements PathService {
                         state = e.traverse(state);
                     }
                 }
-                PatternBoard board = cur.route.boards[cur.boardStopSequence][cur.patternIndex];
+                TransitBoardAlight board = cur.route.boards[cur.boardStopSequence][cur.patternIndex];
                 State oldState = state;
                 state = board.traverse(state);
                 if (state == null) {
@@ -185,7 +183,7 @@ public class Raptor implements PathService {
                         } else if (e instanceof PatternHop) {
                             state = e.traverse(state);
                             for (Edge e2 : state.getVertex().getOutgoing()) {
-                                if (e2 instanceof PatternAlight) {
+                                if (e2 instanceof TransitBoardAlight) {
                                     for (Edge e3 : e2.getToVertex().getOutgoing()) {
                                         if (e3 instanceof PreAlightEdge) {
                                             if (data.raptorStopsForStopId.get(((TransitStop) e3
@@ -228,7 +226,7 @@ public class Raptor implements PathService {
                         state = e.traverse(state);
                     }
                 }
-                PatternAlight alight = cur.route.alights[cur.boardStopSequence - 1][cur.patternIndex];
+                TransitBoardAlight alight = cur.route.alights[cur.boardStopSequence - 1][cur.patternIndex];
                 State oldState = state;
                 state = alight.traverse(state);
                 if (state == null) {
@@ -242,7 +240,7 @@ public class Raptor implements PathService {
                         } else if (e instanceof PatternHop) {
                             state = e.traverse(state);
                             for (Edge e2 : state.getVertex().getIncoming()) {
-                                if (e2 instanceof PatternBoard) {
+                                if (e2 instanceof TransitBoardAlight) {
                                     for (Edge e3 : e2.getFromVertex().getIncoming()) {
                                         if (e3 instanceof PreBoardEdge) {
                                             if (data.raptorStopsForStopId.get(((TransitStop) e3
@@ -285,10 +283,8 @@ public class Raptor implements PathService {
             for (int i = 0; i < route.boards[0].length; ++i) {
                 Edge board = route.boards[0][i];
                 int serviceId;
-                if (board instanceof PatternBoard) {
-                    serviceId = ((PatternBoard) board).getPattern().getServiceId();
-                } else if (board instanceof Board) {
-                    serviceId = ((Board) board).getServiceId();
+                if (board instanceof TransitBoardAlight) {
+                    serviceId = ((TransitBoardAlight) board).getPattern().getServiceId();
                 } else {
                     log.debug("Unexpected nonboard among boards");
                     continue;

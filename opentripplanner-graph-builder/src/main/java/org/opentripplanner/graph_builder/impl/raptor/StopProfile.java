@@ -6,8 +6,8 @@ import java.util.Comparator;
 import java.util.Iterator;
 
 import org.opentripplanner.routing.core.ServiceDay;
-import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.raptor.RaptorRoute;
 
@@ -147,7 +147,7 @@ public class StopProfile {
             int destinationStopIndex, ArrayList<ServiceDay> days, long startTime) {
 
         boolean anyBetter = false;
-        for (PatternBoard board : route.boards[originStopIndex]) {
+        for (TransitBoardAlight board : route.boards[originStopIndex]) {
             anyBetter |= transitTo(destination, board.getPattern(), originStopIndex,
                     destinationStopIndex, days, startTime);
         }

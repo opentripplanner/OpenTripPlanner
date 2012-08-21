@@ -404,10 +404,6 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         return elevationProfileSegment.getElevationProfile(start, end);
     }
 
-    public ElevationProfileSegment getElevationProfileSegment() {
-        return elevationProfileSegment;
-    }
-
     public void setSlopeOverride(boolean slopeOverride) {
         elevationProfileSegment.setSlopeOverride(slopeOverride);
     }
@@ -527,5 +523,10 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
     public int getOutAngle() {
         return outAngle;
+    }
+
+    @Override
+    public ElevationProfileSegment getElevationProfileSegment() {
+        return elevationProfileSegment;
     }
 }

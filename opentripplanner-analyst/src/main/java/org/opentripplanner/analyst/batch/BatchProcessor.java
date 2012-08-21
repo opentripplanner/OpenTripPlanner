@@ -19,12 +19,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
 
 @Data
 public class BatchProcessor {
 
     private static final Logger LOG = LoggerFactory.getLogger(BatchProcessor.class);
-    private static final String CONFIG = "batch-context.xml";
+    private static final String EXAMPLE_CONTEXT = "batch-context.xml";
     
     @Autowired private GraphService graphService;
     @Autowired private SPTService sptService;
@@ -40,11 +41,22 @@ public class BatchProcessor {
     private String outputPath;
 
     public static void main(String[] args) throws IOException {
+        
+        org.springframework.core.io.Resource appContextResource;
+        if( args.length == 0) {
+            LOG.warn("no configuration XML file specified; using example on classpath");
+            appContextResource = new ClassPathResource(EXAMPLE_CONTEXT);
+        } else {
+            String configFile = args[0];
+            appContextResource = new FileSystemResource(configFile);
+        }
+      
         GenericApplicationContext ctx = new GenericApplicationContext();
         XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader(ctx);
-        xmlReader.loadBeanDefinitions(new ClassPathResource(CONFIG));
+        xmlReader.loadBeanDefinitions(appContextResource);
         ctx.refresh();
         ctx.registerShutdownHook();
+        
         BatchProcessor processor = ctx.getBean(BatchProcessor.class);
         if (processor == null)
             LOG.error("No BatchProcessor bean was defined.");

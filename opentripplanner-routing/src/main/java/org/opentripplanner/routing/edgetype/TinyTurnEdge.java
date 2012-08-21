@@ -36,11 +36,18 @@ public class TinyTurnEdge extends FreeEdge {
     
     private StreetTraversalPermission permission;
 
-    public TinyTurnEdge(Vertex from, Vertex to, StreetTraversalPermission permission) {
+    private TurnEdge replaces;
+
+    public TinyTurnEdge(Vertex from, Vertex to, TurnEdge turnEdge) {
         super(from, to);
-        this.permission = permission;
+        this.replaces = turnEdge;
+        this.permission = replaces.getPermission();
     }
     
+    public String getName() {
+        return replaces.getName();
+    }
+
     public boolean canTraverse(RoutingRequest options, TraverseMode mode) {
         if (mode == TraverseMode.WALK && permission.allows(StreetTraversalPermission.PEDESTRIAN)) {
             return true;

@@ -32,8 +32,22 @@ public class MavenVersion implements Serializable {
             return version;
         } catch (Exception e) {
             LOG.error("Error reading version from properties file: {}", e.getMessage());
-            return new MavenVersion("0.0.0-ParseFailure", "0");
+            return new MavenVersion();
         }
+    }
+    
+    private MavenVersion () {
+        // JAXB Marshalling requires classes to have a 0-arg constructor and mutable fields.
+        // otherwise it throws a com.sun.xml.bind.v2.runtime.IllegalAnnotationsException.
+        // It is protecting you against yourself, since you might someday want to
+        // unmarshal that same object in Java.
+        // The 'proper' way of handling this is to make a mutable equivalent of your class,
+        // plus another adapter class that converts between the mutable and immutable 
+        // versions. It would be absurd to produce so much boilerplate and verbosity in this
+        // situation, so I am providing a 0-arg constructor with a totally different role: 
+        // generating a default version when OTP encounters a problem parsing the
+        // maven-version.properties file.
+        this("0.0.0-ParseFailure", "0");
     }
     
     public MavenVersion (String v, String c) {

@@ -25,11 +25,10 @@ import org.opentripplanner.routing.algorithm.strategies.SkipTraverseResultStrate
 import org.opentripplanner.routing.algorithm.strategies.TransitLocalStreetService;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.edgetype.PatternAlight;
-import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.AbstractVertex;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
@@ -224,7 +223,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
             if (preboard instanceof PreBoardEdge) {
                 Vertex departure = preboard.getToVertex(); // this is the departure vertex
                 for (Edge board : departure.getOutgoing()) {
-                    if (board instanceof PatternBoard) {
+                    if (board instanceof TransitBoardAlight) {
                         State state = new State(board.getFromVertex(), departureTime, request);
                         State result = board.traverse(state);
                         if (result == null)
@@ -254,7 +253,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
             if (prealight instanceof PreAlightEdge) {
                 Vertex arrival = prealight.getFromVertex(); // this is the arrival vertex
                 for (Edge alight : arrival.getIncoming()) {
-                    if (alight instanceof PatternAlight) {
+                    if (alight instanceof TransitBoardAlight) {
                         State state = new State(alight.getToVertex(), arrivalTime, request);
                         State result = alight.traverse(state);
                         if (result == null)

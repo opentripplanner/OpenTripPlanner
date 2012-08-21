@@ -65,8 +65,8 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation;
-import org.opentripplanner.routing.edgetype.PatternAlight;
-import org.opentripplanner.routing.edgetype.PatternBoard;
+import org.opentripplanner.routing.edgetype.EdgeWithElevation;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.edgetype.TurnEdge;
@@ -473,6 +473,40 @@ public class VizGui extends JFrame implements VertexSelectionListener {
 
                 /* set up metadata tab */
                 metadataModel.clear();
+                Class<?> c;
+                Field[] fields;
+                getMetadata(selected);
+                //fromv
+                Vertex fromv = selected.getFromVertex();
+                getMetadata(fromv);
+                if (selected instanceof EdgeWithElevation) {
+                    getMetadata(((EdgeWithElevation) selected).getElevationProfileSegment());
+                }
+                metadataList.revalidate();
+                
+                // figure out the pattern, if any
+                TableTripPattern pattern = null;
+                int stopIndex = 0;
+                if (selected instanceof TransitBoardAlight && ((TransitBoardAlight) selected).isBoarding()) {
+                    TransitBoardAlight boardEdge = (TransitBoardAlight) selected;
+                    pattern = boardEdge.getPattern();
+                    stopIndex = boardEdge.getStopIndex();
+                } else if (selected instanceof TransitBoardAlight && !((TransitBoardAlight) selected).isBoarding()) {
+                    TransitBoardAlight alightEdge = (TransitBoardAlight) selected;
+                    pattern = alightEdge.getPattern();
+                    stopIndex = alightEdge.getStopIndex();
+                } else {
+                    departurePattern.removeAll();
+                    return;
+                }
+                ListModel model = new TripPatternListModel(pattern, stopIndex);
+                departurePattern.setModel(model);
+
+                Trip trip = pattern.getExemplar();
+                serviceIdLabel.setText(trip.getServiceId().toString());
+            }
+
+            private void getMetadata(Object selected) {
                 Class<?> c = selected.getClass();
                 Field[] fields;
                 while (c != null && c != Object.class) {
@@ -499,57 +533,6 @@ public class VizGui extends JFrame implements VertexSelectionListener {
                     }
                     c = c.getSuperclass();
                 }
-                //fromv
-                Vertex fromv = selected.getFromVertex();
-                c = fromv.getClass();
-                while (c != null && c != Object.class) {
-                    metadataModel.addElement("From vertex class:" + c);
-                    fields = c.getDeclaredFields();
-                    for (int i = 0; i < fields.length; i++) {
-                    Field field = fields[i];
-                    int modifiers = field.getModifiers();
-                    if ((modifiers & Modifier.STATIC) != 0) {
-                        continue;
-                    }
-                    field.setAccessible(true);
-                    String name = field.getName();
-                    if (name.equals("incoming") || name.equals("outgoing")) {
-                        continue;
-                    }
-                    String value = "(unknown -- see console for stack trace)";
-                    try {
-                        value = "" + field.get(fromv);
-                    } catch (IllegalArgumentException e1) {
-                        e1.printStackTrace();
-                    } catch (IllegalAccessException e1) {
-                        e1.printStackTrace();
-                    }
-                    metadataModel.addElement(name + ": " + value);
-                }
-                c = c.getSuperclass();
-                }
-                metadataList.revalidate();
-                
-                // figure out the pattern, if any
-                TableTripPattern pattern = null;
-                int stopIndex = 0;
-                if (selected instanceof PatternBoard) {
-                    PatternBoard boardEdge = (PatternBoard) selected;
-                    pattern = boardEdge.getPattern();
-                    stopIndex = boardEdge.getStopIndex();
-                } else if (selected instanceof PatternAlight) {
-                    PatternAlight alightEdge = (PatternAlight) selected;
-                    pattern = alightEdge.getPattern();
-                    stopIndex = alightEdge.getStopIndex();
-                } else {
-                    departurePattern.removeAll();
-                    return;
-                }
-                ListModel model = new TripPatternListModel(pattern, stopIndex);
-                departurePattern.setModel(model);
-
-                Trip trip = pattern.getExemplar();
-                serviceIdLabel.setText(trip.getServiceId().toString());
             }
         };
 

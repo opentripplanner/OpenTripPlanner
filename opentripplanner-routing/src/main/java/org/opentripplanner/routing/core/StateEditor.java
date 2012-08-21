@@ -274,6 +274,15 @@ public class StateEditor {
         child.stateData.initialWaitTime = initialWaitTime;
     }
 
+    /** 
+     * The lastNextArrivalDelta is the amount of time between the arrival of the last trip
+     * the planner used and the arrival of the trip after that.
+     */
+    public void setLastNextArrivalDelta (int lastNextArrivalDelta) {
+        cloneStateDataAsNeeded();
+        child.stateData.lastNextArrivalDelta = lastNextArrivalDelta;
+    }
+
     public void setWalkDistance(double walkDistance) {
         child.walkDistance = walkDistance;
     }

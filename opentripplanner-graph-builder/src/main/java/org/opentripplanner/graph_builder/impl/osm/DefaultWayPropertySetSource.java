@@ -98,9 +98,9 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         /* BICYCLE_AND_CAR */
         // trunk and motorway links are often short distances and necessary connections
         setProperties(props, "highway=trunk_link", 
-            StreetTraversalPermission.BICYCLE_AND_CAR, 2.06, 2.06);
+            StreetTraversalPermission.CAR, 2.06, 2.06);
         setProperties(props, "highway=motorway_link", 
-            StreetTraversalPermission.BICYCLE_AND_CAR, 2.06, 2.06);
+            StreetTraversalPermission.CAR, 2.06, 2.06);
                         
          /* CAR */
         setProperties(props, "highway=trunk", 

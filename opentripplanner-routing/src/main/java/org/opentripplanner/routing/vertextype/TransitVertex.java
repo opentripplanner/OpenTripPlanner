@@ -20,7 +20,7 @@ import org.opentripplanner.routing.graph.Graph;
 
 /** Abstract base class for vertices in the GTFS layer of the graph. */
 public abstract class TransitVertex extends AbstractVertex {
-    
+
     private static final long serialVersionUID = 53855622892837370L;
 
     private final Stop stop;
@@ -34,10 +34,15 @@ public abstract class TransitVertex extends AbstractVertex {
     public AgencyAndId getStopId() {
         return stop.getId();
     }
-    
-    /** The passenger-facing stop ID/Code (for systems like TriMet that have this feature).  */
+
+    /** The passenger-facing stop ID/Code (for systems like TriMet that have this feature). */
     public String getStopCode() {
         return stop.getCode();
+    }
+
+    /** Stop information need by API */
+    public Stop getStop() {
+        return stop;
     }
 
 }

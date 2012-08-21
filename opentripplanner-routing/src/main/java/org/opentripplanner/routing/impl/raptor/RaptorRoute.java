@@ -18,9 +18,7 @@ import java.io.Serializable;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.edgetype.PatternAlight;
-import org.opentripplanner.routing.edgetype.PatternBoard;
-import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
 /**
@@ -35,16 +33,16 @@ public class RaptorRoute implements Serializable {
 
     public RaptorStop[] stops;
 
-    public PatternBoard[/* stops - 1 */][/* patterns */] boards;// array of patternboards for each
+    public TransitBoardAlight[/* stops - 1 */][/* patterns */] boards;// array of patternboards for each
                                                                 // stop
 
-    public PatternAlight[/* stops - 1 */][/* patterns */] alights;// array of patternalights for
+    public TransitBoardAlight[/* stops - 1 */][/* patterns */] alights;// array of patternalights for
                                                                   // each stop
 
     public RaptorRoute(int nStops, int nPatterns) {
         stops = new RaptorStop[nStops];
-        boards = new PatternBoard[nStops - 1][nPatterns];
-        alights = new PatternAlight[nStops - 1][nPatterns];
+        boards = new TransitBoardAlight[nStops - 1][nPatterns];
+        alights = new TransitBoardAlight[nStops - 1][nPatterns];
     }
 
     public int getNStops() {
@@ -67,7 +65,7 @@ public class RaptorRoute implements Serializable {
         spec.patternIndex = -1;
 
         for (int i = 0; i < boards[stopNo].length; ++i) {
-            PatternBoard board = boards[stopNo][i];
+            TransitBoardAlight board = boards[stopNo][i];
 
             State state = new State(board.getFromVertex(), arrivalTime, request);
             State result = board.traverse(state);
@@ -97,7 +95,7 @@ public class RaptorRoute implements Serializable {
         spec.patternIndex = -1;
 
         for (int i = 0; i < alights[stopNo-1].length; ++i) {
-            PatternAlight alight = alights[stopNo-1][i];
+            TransitBoardAlight alight = alights[stopNo-1][i];
 
             State state = new State(alight.getToVertex(), arrivalTime, request);
             State result = alight.traverse(state);

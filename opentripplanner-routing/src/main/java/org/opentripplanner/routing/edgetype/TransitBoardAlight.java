@@ -27,40 +27,65 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
+import org.opentripplanner.routing.vertextype.TransitStopArrive;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.LineString;
 
+import lombok.Getter;
+
 
 /**
- * Models boarding a vehicle - that is to say, traveling from a station off vehicle to a station
- * on vehicle. When traversed forward, the the resultant state has the time of the next
- * departure, in addition the pattern that was boarded. When traversed backward, the result
- * state is unchanged. A boarding penalty can also be applied to discourage transfers.
+ * Models boarding or alighting a vehicle - that is to say, traveling from a state off 
+ * vehicle to a state on vehicle. When traversed forward on a boarding or backwards on an 
+ * alighting, the the resultant state has the time of the next departure, in addition the pattern
+ * that was boarded. When traversed backward on a boarding or forward on an alighting, the result
+ * state is unchanged. A boarding penalty can also be applied to discourage transfers. In an on
+ * the fly reverse-optimization search, the overloaded traverse method can be used to give an
+ * initial wait time. Also, in reverse-opimization, board costs are correctly applied.
+ * 
+ * This is the result of combining the classes formerly known as PatternBoard and PatternAlight.
+ * 
+ * @author mattwigway
  */
-public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
+public class TransitBoardAlight extends PatternEdge implements OnBoardForwardEdge {
 
     private static final long serialVersionUID = 1042740795612978747L;
 
-    private static final Logger _log = LoggerFactory.getLogger(PatternBoard.class);
+    private static final Logger _log = LoggerFactory.getLogger(TransitBoardAlight.class);
 
     private int stopIndex;
 
     private int modeMask;
+   
+    @Getter
+    private boolean boarding;
 
-    public PatternBoard(TransitStopDepart fromStopVertex, PatternStopVertex toPatternVertex, 
-            TableTripPattern pattern, int stopIndex, TraverseMode mode) {
+    public TransitBoardAlight (TransitStopDepart fromStopVertex, PatternStopVertex toPatternVertex, 
+            int stopIndex, TraverseMode mode) {
         super(fromStopVertex, toPatternVertex);
         this.stopIndex = stopIndex;
         this.modeMask = new TraverseModeSet(mode).getMask();
+        this.boarding = true;
     }
-
+    
+    public TransitBoardAlight (PatternStopVertex fromPatternStop, TransitStopArrive toStationVertex,
+            int stopIndex, TraverseMode mode) {
+        super(fromPatternStop, toStationVertex);
+        this.stopIndex = stopIndex;
+        this.modeMask = new TraverseModeSet(mode).getMask();
+        this.boarding = false;
+    }
+    
     /** look for pattern in tov (instead of fromv as is done for all other pattern edges) */
     @Override 
     public TableTripPattern getPattern() {
-        return ((PatternStopVertex) tov).getTripPattern();
+        if (boarding)
+            return ((PatternStopVertex) tov).getTripPattern();
+        else
+            return ((PatternStopVertex) fromv).getTripPattern();
     }
                            
     public String getDirection() {
@@ -76,26 +101,49 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
     }
 
     public TraverseMode getMode() {
-        return TraverseMode.BOARDING;
+        return boarding ? TraverseMode.BOARDING : TraverseMode.ALIGHTING;
     }
 
     public String getName() {
-        return "leave street network for transit network";
+        return boarding ? "leave street network for transit network" : 
+            "leave transit network for street network";
     }
 
+    @Override
     public State traverse(State state0) {
+        return traverse(state0, 0);
+    }
+
+    public State traverse(State state0, long arrivalTimeAtStop) {
         RoutingContext rctx = state0.getContext();
         RoutingRequest options = state0.getOptions();
-        if (options.isArriveBy()) {
-            /* reverse traversal, not so much to do */
+        // this method is on State not RoutingRequest because we care whether the user is in
+        // possession of a rented bike.
+        TraverseMode mode = state0.getNonTransitMode(options); 
+
+        // figure out the direction
+        // it's leaving transit iff it's a boarding and is arrive by, or it's not a boarding and
+        // is not arrive by
+        boolean offTransit = (boarding && options.isArriveBy()) || 
+                (!boarding && !options.isArriveBy()); 
+        
+        if (offTransit) {
+            int type;
+            
+            /* leaving transit, not so much to do */
             // do not alight immediately when arrive-depart dwell has been eliminated
             // this affects multi-itinerary searches
-            if (state0.getBackEdge() instanceof PatternAlight) {
+            if (state0.getBackEdge() instanceof TransitBoardAlight) {
                 return null;
             }
             EdgeNarrative en = new TransitNarrative(state0.getTripTimes().trip, this);
             StateEditor s1 = state0.edit(this, en);
-            int type = getPattern().getBoardType(stopIndex);
+            
+            if (boarding)
+                type = getPattern().getBoardType(stopIndex);
+            else
+                type = getPattern().getAlightType(stopIndex + 1);
+                
             if (TransitUtils.handleBoardAlightType(s1, type)) {
                 return null;
             }
@@ -103,17 +151,55 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             s1.setLastAlightedTime(state0.getTime());
             s1.setPreviousStop(fromv);
             s1.setLastPattern(this.getPattern());
+
+            // determine the wait
+            if (arrivalTimeAtStop > 0) {
+                int wait = (int) Math.abs(state0.getTime() - arrivalTimeAtStop);
+                
+                s1.incrementTimeInSeconds(wait);
+                // this should only occur at the beginning
+                s1.incrementWeight(wait * options.waitAtBeginningFactor);
+
+                s1.setInitialWaitTime(wait);
+
+                //_log.debug("Initial wait time set to {} in PatternBoard", wait);
+            }
+            
+            // during reverse optimization, board costs should be applied to PatternBoards
+            // so that comparable trip plans result (comparable to non-optimized plans)
+            if (options.isReverseOptimizing())
+                s1.incrementWeight(options.getBoardCost(mode));
+
+            if (options.isReverseOptimizeOnTheFly()) {
+                int thisDeparture = state0.getTripTimes().getDepartureTime(stopIndex);
+                int numTrips = getPattern().getNumTrips(); 
+                int nextDeparture;
+
+                s1.setLastNextArrivalDelta(Integer.MAX_VALUE);
+
+                for (int tripIndex = 0; tripIndex < numTrips; tripIndex++) {
+                    nextDeparture = getPattern().getDepartureTime(stopIndex, tripIndex);
+        
+                    if (nextDeparture > thisDeparture) {
+                        s1.setLastNextArrivalDelta(nextDeparture - thisDeparture);
+                        break;
+                    }
+                }
+            }            
+
             return s1.makeState();
         } else {
-            /* forward traversal: look for a transit trip on this pattern */
+            /* onto transit: look for a transit trip on this pattern */
+            int wait, type;
+            TripTimes tripTimes;
+            
             if (state0.getLastPattern() == this.getPattern()) {
                 return null;
             }
             if (!options.getModes().get(modeMask)) {
                 return null;
             }
-            /* find next boarding time */
-            /*
+            /* find next boarding/alighting time
              * check lists of transit serviceIds running yesterday, today, and tomorrow (relative to
              * initial state) if this pattern's serviceId is running look for the next boarding time
              * choose the soonest boarding time among trips starting yesterday, today, or tomorrow
@@ -124,20 +210,45 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             int serviceId = getPattern().getServiceId();
             // this method is on State not RoutingRequest because we care whether the user is in
             // possession of a rented bike.
-            TraverseMode mode = state0.getNonTransitMode(options);
             ServiceDay serviceDay = null;
             for (ServiceDay sd : rctx.serviceDays) {
                 int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
                 // only check for service on days that are not in the future
                 // this avoids unnecessarily examining tomorrow's services
-                if (secondsSinceMidnight < 0)
-                    continue;
+
+                // Removed by mattwigway 2012-08-06 following discussion with novalis_dt.
+                // Imagine a state at 23:59 Sunday, that should take a bus departing at 00:01
+                // Monday (and coded on Monday in the GTFS); disallowing Monday's departures would
+                // produce a strange plan. This proved to be a problem when reverse-optimizing
+                // arrive-by trips; trips would get moved earlier for transfer purposes and then
+                // the future days would not be considered.
+
+                // We also can't break off the search after we find trips today, because imagine
+                // a trip on a pattern at 25:00 today and another trip on the same pattern at
+                // 00:30 tommorrow. The 00:30 trip should be taken, but if we stopped the search
+                // after finding today's 25:00 trip we would never find tomorrow's 00:30 trip.
+                //if (secondsSinceMidnight < 0)
+                //    continue;
                 if (sd.serviceIdRunning(serviceId)) {
-                    TripTimes tripTimes = getPattern().getNextTrip(stopIndex, secondsSinceMidnight, 
-                            mode == TraverseMode.BICYCLE, options);
+                    
+                    // make sure we search for boards on board and alights on alight
+                    if (boarding)
+                        tripTimes = getPattern().getNextTrip(stopIndex, 
+                                secondsSinceMidnight, mode == TraverseMode.BICYCLE, options);
+                    else
+                        tripTimes = getPattern().getPreviousTrip(stopIndex, 
+                                secondsSinceMidnight, mode == TraverseMode.BICYCLE, options);
+                    
                     if (tripTimes != null) {
                         // a trip was found, index is valid, wait will be non-negative
-                        int wait = (int) (sd.time(tripTimes.getDepartureTime(stopIndex)) - current_time);
+                        // we care about departures on board and arrivals on alight
+                        if (boarding)
+                        	wait = (int) 
+                        		(sd.time(tripTimes.getDepartureTime(stopIndex)) - current_time);
+                        else
+                        	wait = (int) 
+                    			(current_time - sd.time(tripTimes.getArrivalTime(stopIndex)));
+                        
                         if (wait < 0)
                             _log.error("negative wait time on board");
                         if (bestWait < 0 || wait < bestWait) {
@@ -187,7 +298,12 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
 
             EdgeNarrative en = new TransitNarrative(trip, this);
             StateEditor s1 = state0.edit(this, en);
-            int type = getPattern().getBoardType(stopIndex);
+            
+            if (boarding)
+                type = getPattern().getBoardType(stopIndex);
+            else
+                type = getPattern().getAlightType(stopIndex + 1);
+            
             if (TransitUtils.handleBoardAlightType(s1, type)) {
                 return null;
             }
@@ -200,17 +316,41 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
             s1.setZone(getPattern().getZone(stopIndex));
             s1.setRoute(trip.getRoute().getId());
 
-            long wait_cost = bestWait;
+            double wait_cost = bestWait;
 
-            if (state0.getNumBoardings() == 0) {
+            if (state0.getNumBoardings() == 0 && !options.isReverseOptimizing()) {
                 wait_cost *= options.waitAtBeginningFactor;
                 // this is subtracted out in Analyst searches in lieu of reverse optimization
                 s1.setInitialWaitTime(bestWait);
             } else {
                 wait_cost *= options.waitReluctance;
             }
+            
             s1.incrementWeight(preferences_penalty);
-            s1.incrementWeight(wait_cost + options.getBoardCost(mode));
+
+            // when reverse optimizing, the board cost needs to be applied on
+            // alight to prevent state domination due to free alights
+            if (options.isReverseOptimizing())
+                s1.incrementWeight(wait_cost);
+            else
+                s1.incrementWeight(wait_cost + options.getBoardCost(mode));
+
+            // On-the-fly reverse optimization
+            // determine if this needs to be reverse-optimized.
+            // The last alight can be moved forward by bestWait (but no further) without
+            // impacting the possibility of this trip
+            if (options.isReverseOptimizeOnTheFly() && !options.isReverseOptimizing() && 
+                    state0.getNumBoardings() > 0 && state0.getLastNextArrivalDelta() <= bestWait &&
+                    state0.getLastNextArrivalDelta() > -1) {
+
+                // it is re-reversed by optimize, so this still yields a forward tree
+                State optimized = s1.makeState().optimizeOrReverse(true, true);
+                if (optimized == null)
+                    _log.error("Null optimized state. This shouldn't happen");
+                return optimized;
+            }
+            
+            // if we didn't return an optimized path, return an unoptimized one
             return s1.makeState();
         }
     }
@@ -223,8 +363,8 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
 
     /* See weightLowerBound comment. */
     public double timeLowerBound(RoutingContext rctx) {
-        if (rctx.opt.isArriveBy()) {
-            if (! rctx.opt.getModes().get(modeMask)) {
+        if ((rctx.opt.isArriveBy() && boarding) || (!rctx.opt.isArriveBy() && !boarding)) {
+            if (!rctx.opt.getModes().get(modeMask)) {
                 return Double.POSITIVE_INFINITY;
             }
             int serviceId = getPattern().getServiceId();
@@ -245,7 +385,7 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
      * pattern was already deemed useful.
      */
     public double weightLowerBound(RoutingRequest options) {
-        if (options.isArriveBy())
+        if ((options.isArriveBy() && boarding) || (!options.isArriveBy() && !boarding))
             return timeLowerBound(options);
         else
             return options.getBoardCostLowerBound();
@@ -257,6 +397,8 @@ public class PatternBoard extends PatternEdge implements OnBoardForwardEdge {
     }
 
     public String toString() {
-        return "PatternBoard(" + getFromVertex() + ", " + getToVertex() + ")";
+        return "TransitBoardAlight(" +
+                (boarding ? "boarding " : "alighting ") +
+                getFromVertex() + " to " + getToVertex() + ")";
     }
 }

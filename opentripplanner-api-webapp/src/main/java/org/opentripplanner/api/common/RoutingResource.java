@@ -66,6 +66,9 @@ public abstract class RoutingResource {
     /** The user's walking speed in meters/second. Defaults to approximately 3 MPH. */
     @QueryParam("walkSpeed") protected List<Double> walkSpeed;
 
+    /** The user's biking speed in meters/second. Defaults to approximately 11 MPH, or 9.5 for bikeshare. */
+    @QueryParam("bikeSpeed") protected List<Double> bikeSpeed;
+
     /** For bike triangle routing, how much safety matters (range 0-1). */
     @QueryParam("triangleSafetyFactor") protected List<Double> triangleSafetyFactor;
     
@@ -136,7 +139,14 @@ public abstract class RoutingResource {
      */
     @DefaultValue("0") @QueryParam("clampInitialWait")
     protected List<Long> clampInitialWait;
-    
+
+    /**
+     * If true, this trip will be reverse-optimized on the fly. Otherwise, reverse-optimization
+     * will occur once a trip has been chosen (in Analyst, it will not be done at all).
+     */
+    @QueryParam("reverseOptimizeOnTheFly")
+    protected List<Boolean> reverseOptimizeOnTheFly;
+        
     @DefaultValue("-1") @QueryParam("boardSlack")
     private List<Integer> boardSlack;
     
@@ -204,6 +214,8 @@ public abstract class RoutingResource {
         request.setNumItineraries(get(numItineraries, n, request.getNumItineraries()));
         request.setMaxWalkDistance(get(maxWalkDistance, n, request.getMaxWalkDistance()));
         request.setWalkSpeed(get(walkSpeed, n, request.getWalkSpeed()));
+        double bikeSpeedParam = get(bikeSpeed, n, request.getBikeSpeed());
+        request.setBikeSpeed(bikeSpeedParam);
         OptimizeType opt = get(optimize, n, request.getOptimize());
         {
             Double tsafe =  get(triangleSafetyFactor, n, null);
@@ -253,9 +265,9 @@ public abstract class RoutingResource {
         request.setOptimize(opt);
         TraverseModeSet modeSet = get(modes, n, request.getModes());
         request.setModes(modeSet);
-        if (modeSet.getBicycle() && modeSet.getWalk()) {
+        if (modeSet.getBicycle() && modeSet.getWalk() && bikeSpeedParam == -1) {
             //slower bike speed for bike sharing, based on empirical evidence from DC.
-            request.setBikeSpeed(3.5);
+            request.setBikeSpeed(4.3);
         }
         request.setBoardSlack(get(boardSlack, n, request.getBoardSlack()));
         request.setAlightSlack(get(alightSlack, n, request.getAlightSlack()));
@@ -284,6 +296,9 @@ public abstract class RoutingResource {
         }
         
         request.setClampInitialWait(get(clampInitialWait, n, request.getClampInitialWait()));
+
+        request.setReverseOptimizeOnTheFly(get(reverseOptimizeOnTheFly, n, 
+                                               request.isReverseOptimizeOnTheFly()));
 
         return request;
     }

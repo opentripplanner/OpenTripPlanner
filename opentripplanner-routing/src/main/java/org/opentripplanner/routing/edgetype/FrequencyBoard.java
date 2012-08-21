@@ -82,7 +82,8 @@ public class FrequencyBoard extends AbstractEdge  implements OnBoardForwardEdge 
             /* reverse traversal, not so much to do */
             // do not alight immediately when arrive-depart dwell has been eliminated
             // this affects multi-itinerary searches
-            if (state0.getBackEdge() instanceof PatternAlight) {
+            if (state0.getBackEdge() instanceof TransitBoardAlight && 
+                    !((TransitBoardAlight) state0.getBackEdge()).isBoarding()) {
                 return null;
             }
             EdgeNarrative en = new TransitNarrative(trip, this);

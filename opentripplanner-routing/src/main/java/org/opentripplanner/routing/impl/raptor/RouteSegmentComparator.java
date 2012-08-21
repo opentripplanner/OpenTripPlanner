@@ -3,8 +3,7 @@ package org.opentripplanner.routing.impl.raptor;
 import java.util.Comparator;
 import java.util.HashMap;
 
-import org.opentripplanner.routing.edgetype.PatternAlight;
-import org.opentripplanner.routing.edgetype.PatternBoard;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.transit_index.RouteSegment;
 
@@ -24,12 +23,12 @@ public class RouteSegmentComparator implements Comparator<RouteSegment> {
     
     @Override
     public int compare(RouteSegment arg0, RouteSegment arg1) {
-        PatternBoard board0 = (PatternBoard) arg0.board;
-        PatternBoard board1 = (PatternBoard) arg1.board;
+        TransitBoardAlight board0 = (TransitBoardAlight) arg0.board;
+        TransitBoardAlight board1 = (TransitBoardAlight) arg1.board;
         if (board0 == null) {
             if (board1 == null) {
-                PatternAlight alight0 = (PatternAlight) arg0.alight;
-                PatternAlight alight1 = (PatternAlight) arg1.alight;
+                TransitBoardAlight alight0 = (TransitBoardAlight) arg0.alight;
+                TransitBoardAlight alight1 = (TransitBoardAlight) arg1.alight;
                 // both are last segment
                 if (alight0.getStopIndex() != alight1.getStopIndex()) {
                     System.out.println("DOOM");
