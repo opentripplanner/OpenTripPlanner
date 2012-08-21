@@ -12,7 +12,7 @@ import lombok.NonNull;
 @AllArgsConstructor
 public class DelegatingTripTimes implements TripTimes {
 
-    @NonNull @Delegate
-    private final TripTimes tt;
+    @NonNull @Delegate(types=TripTimes.class)
+    private final ScheduledTripTimes tt;
     
 }
