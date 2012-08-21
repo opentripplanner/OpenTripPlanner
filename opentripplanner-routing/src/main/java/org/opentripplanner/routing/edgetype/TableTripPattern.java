@@ -30,7 +30,9 @@ import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.trippattern.ScheduledTripTimes;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.routing.trippattern.TripTimesUtil;
 import org.opentripplanner.routing.trippattern.Update;
 import org.opentripplanner.routing.trippattern.UpdateBlock;
 import org.slf4j.Logger;
@@ -364,8 +366,8 @@ public class TableTripPattern implements TripPattern, Serializable {
                 arrivalsIndex[hop] = tripTimes.toArray(new TripTimes[tripTimes.size()]);
                 departuresIndex[hop] = tripTimes.toArray(new TripTimes[tripTimes.size()]);
                 // TODO: STOP VS HOP
-                Arrays.sort(arrivalsIndex[hop], TripTimes.getArrivalsComparator(hop));
-                Arrays.sort(departuresIndex[hop], TripTimes.getDeparturesComparator(hop));
+                Arrays.sort(arrivalsIndex[hop], new TripTimes.ArrivalsComparator(hop));
+                Arrays.sort(departuresIndex[hop], new TripTimes.DeparturesComparator(hop));
             }
         }
         
@@ -398,11 +400,11 @@ public class TableTripPattern implements TripPattern, Serializable {
                 //     index = departuresIndex[0];
                 // else
                 TripTimes[] index = departuresIndex[stopIndex];
-                int tripIndex = TripTimes.binarySearchDepartures(index, stopIndex, afterTime); 
+                int tripIndex = TripTimesUtil.binarySearchDepartures(index, stopIndex, afterTime); 
                 //these appear to actually be hop indexes, which is what the binary search accepts
                 while (tripIndex < index.length) {
                     TripTimes tt = index[tripIndex];
-                    Trip t = tt.trip;
+                    Trip t = tt.getTrip();
                     if (tripAcceptable(t, haveBicycle, wheelchair) && 
                         !options.bannedTrips.contains(t.getId())) {
                         return tt;
@@ -420,7 +422,7 @@ public class TableTripPattern implements TripPattern, Serializable {
                 TripTimes currTrip = tripTimes.get(i); 
                 int currTime = currTrip.getDepartureTime(stopIndex);
                 if (currTime >= afterTime && currTime < bestTime && 
-                        tripAcceptable(currTrip.trip, haveBicycle, wheelchair) && 
+                        tripAcceptable(currTrip.getTrip(), haveBicycle, wheelchair) && 
                         ! options.bannedTrips.contains(trips.get(i).getId())) {
                     bestTrip = currTrip;
                     bestTime = currTime;
@@ -452,11 +454,11 @@ public class TableTripPattern implements TripPattern, Serializable {
             if (arrivalsIndex != null) {
                 // search through the sorted list of TripTimes for this particular stop
                 TripTimes[] index = arrivalsIndex[stopIndex];
-                int tripIndex = TripTimes.binarySearchArrivals(index, stopIndex, beforeTime); 
+                int tripIndex = TripTimesUtil.binarySearchArrivals(index, stopIndex, beforeTime); 
                 //these appear to actually be hop indexes, which is what the binary search accepts
                 while (tripIndex >= 0) {
                     TripTimes tt = index[tripIndex];
-                    Trip t = tt.trip;
+                    Trip t = tt.getTrip();
                     if (tripAcceptable(t, haveBicycle, wheelchair) && 
                         !options.bannedTrips.contains(t.getId())) {
                         return tt;
@@ -474,7 +476,7 @@ public class TableTripPattern implements TripPattern, Serializable {
                 TripTimes currTrip = tripTimes.get(i); 
                 int currTime = currTrip.getArrivalTime(stopIndex);
                 if (currTime <= beforeTime && currTime > bestTime && 
-                        tripAcceptable(currTrip.trip, haveBicycle, wheelchair) &&
+                        tripAcceptable(currTrip.getTrip(), haveBicycle, wheelchair) &&
                         ! options.bannedTrips.contains(trips.get(i).getId())) {
                     bestTrip = currTrip;
                     bestTime = currTime;
@@ -571,7 +573,7 @@ public class TableTripPattern implements TripPattern, Serializable {
 
             @Override
             public Integer next() {
-                return tripTimes.get(nextPosition++).departureTimes[stopIndex];
+                return tripTimes.get(nextPosition++).getDepartureTime(stopIndex);
             }
 
             @Override
@@ -590,7 +592,9 @@ public class TableTripPattern implements TripPattern, Serializable {
         public int getTripIndex(AgencyAndId tripId) {
             int ret = 0;
             for (TripTimes tt : tripTimes) {
-                if (tt.trip.getId().equals(tripId)) // replace with indexing in stoptime updater?
+                // could replace linear search with indexing in stoptime updater, but not necessary
+                // at this point since the updater thread is far from pegged.
+                if (tt.getTrip().getId().equals(tripId)) 
                     return ret;
                 ret += 1;
             }
@@ -694,11 +698,16 @@ public class TableTripPattern implements TripPattern, Serializable {
          * Add a trip to this Timetable. The Timetable must be analyzed, compacted, and indexed
          * any time trips are added, but this is not done automatically because it is time consuming
          * and should only be done once after an entire batch of trips are added.
+         * Any new trip that is added is a ScheduledTripTimes. The scheduledTimetable will then 
+         * contain only ScheduledTripTimes, and any updated Timetables will contain TripTimes
+         * that wrap these ScheduledTripTimes, plus any additional trips as ScheduledTripTimes.
+         * Maybe subclass ScheduledTripTimes with an equivalent ExtraTripTimes class to make this 
+         * distinction clear.
          */
         public void addTrip(Trip trip, List<StopTime> stopTimes) {
             // TODO: double-check that the stops and pickup/dropoffs are right for this trip
             int nextIndex = tripTimes.size();
-            tripTimes.add(new TripTimes(trip, nextIndex, stopTimes));
+            tripTimes.add(new ScheduledTripTimes(trip, nextIndex, stopTimes));
             trips.add(trip);
             
             // stoptimes can have headsign info that overrides the trip's headsign
@@ -712,8 +721,9 @@ public class TableTripPattern implements TripPattern, Serializable {
             }
             if (allHeadsignsNull)
                 headsigns = null;
+            // there needs to be some provision for extra trips that are not in the underlying schedule
             TableTripPattern.this.headsigns.add(headsigns);
-            // stoptimes should be transposed later and compacted with reused arrays
+            // headsigns should be transposed later and compacted with reused arrays
             // 1x1 array should always return the same headsign to allow for no change 
         }
 
