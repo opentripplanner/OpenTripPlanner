@@ -71,12 +71,16 @@ public class TripTimesUtil {
         return mid;
     }
 
-    /* TODO: CAN BE MOVED INTO ScheduledTimetable since it uses only methods to access arr/dep times. */
     /**
-     * After applying updates to scheduled Triptimes, we could potentially end up with negative
-     * hop or dwell times. We really don't want those being used in routing. Check that all times 
-     * are increasing, and issue warnings if this is not the case.
+     * When creating a ScheduledTripTimes or wrapping it in updates, we could potentially imply
+     * negative hop or dwell times. We really don't want those being used in routing. 
+     * This method check that all times are increasing, and issues warnings if this is not the case.
      * @return whether the times were found to be increasing.
+     * 
+     * This method is not in ScheduledTripTimes to make it clear that it will work on any class
+     * implementing TripTimes (though if it were in ScheduledTripTimes, any class implementing 
+     * TripTimes and fully to a ScheduledTripTimes would be able to use it, since it always 
+     * accesses times via the getter methods).
      */
     public static boolean timesIncreasing(TripTimes tt) {
         // iterate over the new tripTimes, checking that dwells and hops are positive
