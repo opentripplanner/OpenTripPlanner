@@ -30,6 +30,7 @@ import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.trippattern.DecayingDelayTripTimes;
 import org.opentripplanner.routing.trippattern.ScheduledTripTimes;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.trippattern.TripTimesUtil;
@@ -636,17 +637,23 @@ public class TableTripPattern implements TripPattern, Serializable {
             }
             TripTimes existingTimes = getTripTimes(tripIndex);
             ScheduledTripTimes scheduledTimes = existingTimes.getScheduledTripTimes();
-            UpdatedTripTimes newTimes = new UpdatedTripTimes(scheduledTimes, block, stopIndex);
-            if (TripTimesUtil.timesIncreasing(newTimes)) {
-                // update succeeded, save the new TripTimes back into this Timetable
-                this.tripTimes.set(tripIndex, newTimes);
-                return true;
+            TripTimes newTimes = new UpdatedTripTimes(scheduledTimes, block, stopIndex);
+            if ( ! TripTimesUtil.timesIncreasing(newTimes)) {
+                LOG.error("Resulting UpdatedTripTimes has non-increasing times.");
+                LOG.error(block.toString());
+                LOG.error(newTimes.toString());
+                LOG.info("Falling back on DecayingDelayTripTimes.");
+                int delay = newTimes.getDepartureTime(stopIndex) - scheduledTimes.getDepartureTime(stopIndex); 
+                newTimes = new DecayingDelayTripTimes(scheduledTimes, stopIndex, delay, 0.7, false);
+                LOG.error(newTimes.toString());
+                if ( ! TripTimesUtil.timesIncreasing(newTimes)) {
+                    LOG.error("Even these trip times are non-increasing. Underlying schedule problem?");
+                    return false;
+                }
             }
-            // update failed, leave Timetable unchanged and communicate failure
-            LOG.error("Resulting UpdatedTripTimes has non-increasing times.");
-            LOG.error(block.toString());
-            LOG.error(newTimes.toString());
-            return false;
+            // Update succeeded, save the new TripTimes back into this Timetable.
+            this.tripTimes.set(tripIndex, newTimes);
+            return true;
         }
         
         /**
