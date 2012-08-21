@@ -685,7 +685,7 @@ public class TableTripPattern implements TripPattern, Serializable {
         /** 
          * Check that all dwell times at the given stop are zero, which allows removing the dwell edge. 
          */
-        private boolean allDwellsZero(int hopIndex) {
+        boolean allDwellsZero(int hopIndex) {
             for (int t = 0; t < trips.size(); ++t) {
                 if (getDwellTime(hopIndex, t) != 0) {
                     return false;

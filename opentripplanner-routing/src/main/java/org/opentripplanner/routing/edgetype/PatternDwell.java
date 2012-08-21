@@ -61,7 +61,9 @@ public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnB
         //int trip = state0.getTrip();
         TripTimes tripTimes = state0.getTripTimes();
         int dwellTime = tripTimes.getDwellTime(stopIndex);
-        EdgeNarrative en = new TransitNarrative(tripTimes.trip, getPattern().getHeadsign(stopIndex, tripTimes.index), this);
+        // we wouln't have to look up the headsign for every traversal, only in PlanGenerator
+        EdgeNarrative en = new TransitNarrative(tripTimes.getTrip(), 
+                tripTimes.getHeadsign(stopIndex), this);
         StateEditor s1 = state0.edit(this, en);
         s1.incrementTimeInSeconds(dwellTime);
         s1.incrementWeight(dwellTime);
@@ -104,7 +106,7 @@ public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnB
     }
 
     public boolean allDwellsZero() {
-        return this.getPattern().allDwellsZero(this.stopIndex);
+        return this.getPattern().scheduledTimetable.allDwellsZero(this.stopIndex);
     }
 
 }

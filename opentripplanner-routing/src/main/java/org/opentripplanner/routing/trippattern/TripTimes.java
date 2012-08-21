@@ -24,6 +24,9 @@ public interface TripTimes {
     /** @return the trips whose arrivals and departures are represented by this TripTimes */
     public Trip getTrip();
     
+//    /** @return the index of this TripTimes in the enclosing Timetable */
+//    public Trip getTripIndex();
+
     /** @return the base trip times which this particular TripTimes represents or modifies */
     public ScheduledTripTimes getScheduledTripTimes();
 
@@ -54,6 +57,11 @@ public interface TripTimes {
      * times are to be derived from the departure times array. 
      */
     public int getArrivalTime(int hop);
+
+    /**
+     * It all depends whether we store pointers to the enclosing Timetable in ScheduledTripTimes...
+     */
+    public String getHeadsign(int hop);
     
     /** 
      * Request that this TripTimes be analyzed and its memory usage reduced if possible. 

@@ -161,4 +161,10 @@ public class ScheduledTripTimes implements TripTimes, Serializable {
         return sb.toString();
     }
 
+    // TODO this is going to require pointers to the enclosing Timetable
+    @Override
+    public String getHeadsign(int hop) {
+        return "Headsign";
+    }
+
 }
