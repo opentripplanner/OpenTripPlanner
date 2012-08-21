@@ -37,6 +37,8 @@ public class DecayingDelayTripTimes extends DelegatingTripTimes implements TripT
     }
         
     private int decayedDelay(int stop) {
+        if (delay == 0) 
+            return 0;
         int n = stop - currentStop;
         if (linear) {
             return delay / n;
