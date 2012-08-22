@@ -625,7 +625,7 @@ public class PlanGenerator {
             if (edge instanceof FreeEdge) {
                 continue;
             }
-            if (!currState.getBackMode().isOnStreetNonTransit()) {
+            if (currState.getBackMode() == null || !currState.getBackMode().isOnStreetNonTransit()) {
                 continue; // ignore STLs and the like
             }
             Geometry geom = edge.getGeometry();
