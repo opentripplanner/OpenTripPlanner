@@ -191,11 +191,6 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     }
 
     @Override
-    public TraverseMode getMode() {
-        return TraverseMode.WALK;
-    }
-
-    @Override
     public String getName() {
         return name;
     }
@@ -259,12 +254,14 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         } else {
             weight *= options.walkReluctance;
         }
-        FixedModeEdge en = new FixedModeEdge(this, s0.getNonTransitMode(options));
-        if (wheelchairNotes != null && options.wheelchairAccessible) {
-            en.addNotes(wheelchairNotes);
-        }
-        StateEditor s1 = s0.edit(this, en);
+        
+        StateEditor s1 = s0.edit(this);
+        s1.setBackMode(s0.getNonTransitMode(options));
 
+        if (wheelchairNotes != null && options.wheelchairAccessible) {
+            s1.addAlerts(wheelchairNotes);
+        }
+        
         switch (s0.getNoThruTrafficState()) {
         case INIT:
             if (isNoThruTraffic()) {
@@ -324,6 +321,8 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         s1.incrementWeight(weight);
         if (s1.weHaveWalkedTooFar(options))
             return null;
+        
+        s1.addAlerts(getNotes());
 
         return s1.makeState();
     }

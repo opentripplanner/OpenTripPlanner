@@ -15,15 +15,14 @@ package org.opentripplanner.routing.edgetype;
 
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.graph.AbstractEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 
 import com.vividsolutions.jts.geom.LineString;
 
 /* This edge, because it has no mode, initiates another leg.
  */
-public class LegSwitchingEdge extends AbstractEdge {
+public class LegSwitchingEdge extends Edge {
 
 	private static final long serialVersionUID = 1L;
 
@@ -34,6 +33,7 @@ public class LegSwitchingEdge extends AbstractEdge {
 	@Override
 	public State traverse(State s0) {
 		StateEditor editor = s0.edit(this);
+		editor.setBackMode(null);
 		return editor.makeState();
 	}
 
@@ -44,11 +44,6 @@ public class LegSwitchingEdge extends AbstractEdge {
 
 	@Override
 	public LineString getGeometry() {
-		return null;
-	}
-
-	@Override
-	public TraverseMode getMode() {
 		return null;
 	}
 

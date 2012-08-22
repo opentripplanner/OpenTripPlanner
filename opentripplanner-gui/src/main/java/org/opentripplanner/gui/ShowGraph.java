@@ -30,15 +30,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 
-import org.opentripplanner.common.IterableLibrary;
-import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.routing.vertextype.TurnVertex;
-import org.opentripplanner.routing.edgetype.DelegatingEdgeNarrative;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
@@ -46,7 +42,6 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.PatternEdge;
 import org.opentripplanner.routing.edgetype.TurnEdge;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 
@@ -320,20 +315,16 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     private void drawGraphPath(GraphPath gp) {
         // draw edges in different colors according to mode
     	for (State s : gp.states) {
-        	EdgeNarrative en = s.getBackEdgeNarrative();
-            if(en == null) continue;
+        	TraverseMode mode = s.getBackMode();
 
-        	TraverseMode mode = en.getMode();
-            if(en instanceof DelegatingEdgeNarrative) {
-                en = ((DelegatingEdgeNarrative)en).getBase();
-            }
-
-        	if (!(en instanceof Edge)) continue;
-        	Edge e = (Edge) en;
+        	Edge e = s.getBackEdge();
+        	if (e == null)
+        	    continue;
+        	
         	if (mode.isTransit()) {
-            	stroke(200, 050, 000); 
-            	strokeWeight(6);   
-            	drawEdge(e);
+            	    stroke(200, 050, 000); 
+            	    strokeWeight(6);   
+            	    drawEdge(e);
         	}
         	if (e instanceof StreetEdge) {
         		StreetTraversalPermission stp = ((StreetEdge)e).getPermission();

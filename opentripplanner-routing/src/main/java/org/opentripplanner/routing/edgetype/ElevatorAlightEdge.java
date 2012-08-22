@@ -14,11 +14,12 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.routing.core.EdgeNarrative;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.graph.AbstractEdge;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
 
@@ -32,7 +33,7 @@ import com.vividsolutions.jts.geom.LineString;
  * @author mattwigway
  *
  */
-public class ElevatorAlightEdge extends AbstractEdge implements EdgeNarrative {
+public class ElevatorAlightEdge extends Edge implements ElevatorEdge {
 
     private static final long serialVersionUID = 3925814840369402222L;
 
@@ -64,9 +65,9 @@ public class ElevatorAlightEdge extends AbstractEdge implements EdgeNarrative {
     
     @Override
     public State traverse(State s0) {
-        // we are our own edge narrative
-        StateEditor s1 = s0.edit(this, this);
+        StateEditor s1 = s0.edit(this);
         s1.incrementWeight(1);
+        s1.setBackMode(TraverseMode.WALK);
         return s1.makeState();
     }
 
@@ -78,11 +79,6 @@ public class ElevatorAlightEdge extends AbstractEdge implements EdgeNarrative {
     @Override
     public LineString getGeometry() {
         return the_geom;
-    }
-
-    @Override
-    public TraverseMode getMode() {
-        return TraverseMode.WALK;
     }
 
     /** 

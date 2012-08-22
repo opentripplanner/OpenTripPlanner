@@ -25,8 +25,8 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.graph.AbstractVertex;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
@@ -247,7 +247,7 @@ public class AStarTest {
         }
     }
 
-    private static class SimpleEdge extends AbstractEdge {
+    private static class SimpleEdge extends Edge {
         private static final long serialVersionUID = 1L;
 
         public SimpleEdge(Vertex v1, Vertex v2) {
@@ -263,11 +263,6 @@ public class AStarTest {
             s1.incrementTimeInSeconds(t);
             s1.incrementWeight(d);
             return s1.makeState();
-        }
-
-        @Override
-        public TraverseMode getMode() {
-            return null;
         }
 
         @Override

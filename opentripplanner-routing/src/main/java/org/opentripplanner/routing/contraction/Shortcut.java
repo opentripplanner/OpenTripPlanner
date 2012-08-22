@@ -24,14 +24,13 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.Patch;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 
-public class Shortcut extends AbstractEdge {
+public class Shortcut extends Edge {
     private static final long serialVersionUID = -5813252201367498850L;
     
     Edge edge1;
@@ -59,11 +58,6 @@ public class Shortcut extends AbstractEdge {
     @Override
     public LineString getGeometry() {
         return GeometryUtils.getGeometryFactory().createLineString(new Coordinate[] { getFromVertex().getCoordinate(), getToVertex().getCoordinate() });
-    }
-
-    @Override
-    public TraverseMode getMode() {
-        return mode;
     }
 
     @Override
@@ -95,7 +89,7 @@ public class Shortcut extends AbstractEdge {
                 return null;
             time = (int) Math.abs(s0.getTime() - s2.getTime());
             weight = s2.getWeight() - s0.getWeight();
-            mode = s2.getBackEdgeNarrative().getMode();
+            mode = s2.getBackMode();
             walkDistance = s2.getWalkDistance() - s0.getWalkDistance();
         }
         //StateEditor ret = s0.edit(this, (EdgeNarrative) new FixedModeEdge(this, mode));

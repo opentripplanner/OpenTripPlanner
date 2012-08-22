@@ -870,7 +870,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         GraphPath gp = paths.get(0);
         for (State s : gp.states) {
             System.out.print(s.toString() + " <- ");
-            System.out.println(s.getBackEdgeNarrative());
+            System.out.println(s.getBackEdge());
         }
         showGraph.highlightGraphPath(gp);
     }

@@ -18,6 +18,7 @@ import static org.opentripplanner.common.IterableLibrary.cast;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -40,6 +41,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.location.StreetLocation;
+import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
@@ -280,6 +282,95 @@ public class TestHalfEdges extends TestCase {
             assertNotSame(s.getVertex(), graph.getVertex("right"));
             assertNotSame(s.getVertex(), graph.getVertex("rightBack"));
         }
+    }
+    
+    /**
+     * Test that alerts on split streets are preserved, i.e. if there are alerts on the street that is split
+     * the same alerts should be present on the new street.
+     */
+    public void testStreetSplittingAlerts () {
+        HashSet<Edge> turns = new HashSet<Edge>(left.getOutgoing());
+        turns.addAll(leftBack.getOutgoing());
+
+        Set<Alert> alert = new HashSet<Alert>();
+        alert.add(Alert.createSimpleAlerts("This is the alert"));
+                
+        left.setNotes(alert);
+        leftBack.setNotes(alert);
+                
+        StreetLocation start = StreetLocation.createStreetLocation(graph, "start", "start",
+                cast(turns, StreetEdge.class),
+                new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()));
+        
+        // The alert should be preserved
+        // traverse two edges: the FreeEdge from the StreetLocation to the new TurnVertex, and the
+        // TurnEdge to the next vertex
+        RoutingRequest req = new RoutingRequest();
+        req.setMaxWalkDistance(Double.MAX_VALUE);
+        State traversedOne = new State((Vertex) start, req);
+        State currentState;
+        for (Edge e : start.getOutgoing()) {
+            currentState = e.traverse(traversedOne);
+            if (currentState != null) {
+                traversedOne = currentState;
+                break;
+            }
+        }
+        
+        for (Edge e : traversedOne.getVertex().getOutgoing()) {
+            // we don't want to go back to the split
+            if (!(e instanceof TurnEdge))
+                continue;
+            
+            currentState = e.traverse(traversedOne);
+            if (currentState != null) {
+                traversedOne = currentState;
+                break;
+            }
+        }
+        
+        assertEquals(alert, traversedOne.getBackAlerts());
+        assertNotSame(left, traversedOne.getBackEdge().getFromVertex());
+        assertNotSame(leftBack, traversedOne.getBackEdge().getFromVertex());
+        
+        // now, make sure wheelchair alerts are preserved
+        Set<Alert> wheelchairAlert = new HashSet<Alert>();
+        wheelchairAlert.add(Alert.createSimpleAlerts("This is the wheelchair alert"));
+        
+        left.setNotes(null);
+        leftBack.setNotes(null);
+        left.setWheelchairNotes(wheelchairAlert);
+        leftBack.setWheelchairNotes(wheelchairAlert);
+        
+        req.setWheelchairAccessible(true);
+        
+        start = StreetLocation.createStreetLocation(graph, "start", "start",
+                cast(turns, StreetEdge.class),
+                new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()));
+        
+        traversedOne = new State((Vertex) start, req);
+        for (Edge e : start.getOutgoing()) {
+            currentState = e.traverse(traversedOne);
+            if (currentState != null) {
+                traversedOne = currentState;
+                break;
+            }
+        }
+        
+        for (Edge e : traversedOne.getVertex().getOutgoing()) {
+            if (e instanceof FreeEdge)
+                continue;
+            
+            currentState = e.traverse(traversedOne);
+            if (currentState != null) {
+                traversedOne = currentState;
+                break;
+            }
+        }
+        
+        assertEquals(wheelchairAlert, traversedOne.getBackAlerts());
+        assertNotSame(left, traversedOne.getBackEdge().getFromVertex());
+        assertNotSame(leftBack, traversedOne.getBackEdge().getFromVertex());
     }
 
     public void testStreetLocationFinder() {

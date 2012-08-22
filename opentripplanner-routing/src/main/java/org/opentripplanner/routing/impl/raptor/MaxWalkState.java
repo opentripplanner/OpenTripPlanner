@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.impl.raptor;
 
-import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateData;
@@ -18,11 +17,6 @@ public class MaxWalkState extends State {
     @Override
     public StateEditor edit(Edge e) {
         return new MaxWalkStateEditor(this, e);
-    }
-
-    @Override
-    public StateEditor edit(Edge e, EdgeNarrative en) {
-        return new MaxWalkStateEditor(this, e, en);
     }
 
     @Override
@@ -56,10 +50,6 @@ public class MaxWalkState extends State {
         
         public MaxWalkStateEditor(State parent, Edge e) {
             super(parent, e);
-        }
-
-        public MaxWalkStateEditor(State parent, Edge e, EdgeNarrative en) {
-            super(parent, e, en);
         }
 
         public boolean weHaveWalkedTooFar(RoutingRequest options) {

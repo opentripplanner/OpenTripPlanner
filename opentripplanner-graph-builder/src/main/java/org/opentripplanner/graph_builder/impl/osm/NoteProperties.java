@@ -14,28 +14,16 @@
 package org.opentripplanner.graph_builder.impl.osm;
 
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
+@Data @NoArgsConstructor @AllArgsConstructor
 public class NoteProperties {
 
     private String notePattern;
 
-    public NoteProperties(String pattern) {
-        this.setNotePattern(pattern);
-    }
-
-    public NoteProperties() {
-    }
-
     public String generateNote(OSMWithTags way) {
         return TemplateLibrary.generate(getNotePattern(), way);
     }
-
-    public void setNotePattern(String notePattern) {
-        this.notePattern = notePattern;
-    }
-
-    public String getNotePattern() {
-        return notePattern;
-    }
-
 }

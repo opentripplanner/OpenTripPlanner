@@ -102,11 +102,6 @@ public class TurnEdge extends StreetEdge {
     }
 
     @Override
-    public TraverseMode getMode() {
-        return TraverseMode.WALK;
-    }
-
-    @Override
     public String getName() {
         return fromv.getName();
     }
@@ -160,13 +155,12 @@ public class TurnEdge extends StreetEdge {
             return null;
         }
 
-        /*FixedModeEdge en = new FixedModeEdge(this, traverseMode);
+        StateEditor s1 = s0.edit(this);
+
         Set<Alert> wheelchairNotes = ((TurnVertex) fromv).getWheelchairNotes();
         if (options.wheelchairAccessible) {
-            en.addNotes(wheelchairNotes);
+            s1.addAlerts(wheelchairNotes);
         }
-        */
-        StateEditor s1 = s0.edit(this);
 
         switch (s0.getNoThruTrafficState()) {
         case INIT:
@@ -205,6 +199,7 @@ public class TurnEdge extends StreetEdge {
         if (s1.weHaveWalkedTooFar(options))
             return null;
 
+        s1.addAlerts(((TurnVertex) fromv).getNotes());
         return s1.makeState();
     }
 
@@ -285,11 +280,6 @@ public class TurnEdge extends StreetEdge {
         }
     }
 
-    @Override
-    public Set<Alert> getNotes() {
-        return ((TurnVertex) fromv).getNotes();
-    }
-
     public void setRestrictedModes(TraverseModeSet modes) {
         this.restrictedModes = modes;
     }
@@ -311,6 +301,11 @@ public class TurnEdge extends StreetEdge {
     @Override
     public double weightLowerBound(RoutingRequest options) {
         return timeLowerBound(options) * options.walkReluctance;
+    }
+    
+    @Override
+    public Set<Alert> getNotes () {
+        return ((TurnVertex) fromv).getNotes();
     }
     
     @Override
@@ -340,5 +335,9 @@ public class TurnEdge extends StreetEdge {
     @Override
     public ElevationProfileSegment getElevationProfileSegment() {
         return ((TurnVertex) fromv).getElevationProfileSegment();
+    }
+    
+    public Set<Alert> getWheelchairNotes () {
+        return ((TurnVertex) fromv).getWheelchairNotes();
     }
 }

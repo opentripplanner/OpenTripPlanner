@@ -14,11 +14,13 @@
 package org.opentripplanner.routing.core;
 
 import java.util.HashMap;
+import java.util.Set;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.routing.patch.Alert;
 
 /**
  * StateData contains the components of search state that are unlikely to be changed as often as
@@ -78,6 +80,20 @@ public class StateData implements Cloneable {
      * that could have been taken. It is used to determine if a path needs reverse-optimization.
      */
     protected int lastNextArrivalDelta;
+    
+    /**
+     * This is a list of notes that should be applied to this state.
+     * This means that we clone StateData before and after a notated edge, but notated edges
+     * are rare enough this likely doesn't matter.
+     * 
+     * @author mattwigway
+     */
+    protected Set<Alert> notes = null;
+    
+    /**
+     * The mode that was used to traverse the backEdge
+     */
+    protected TraverseMode backMode;
 
     public String bikeRentalNetwork;
 

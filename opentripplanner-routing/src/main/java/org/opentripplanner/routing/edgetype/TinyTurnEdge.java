@@ -13,7 +13,8 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import org.opentripplanner.routing.core.EdgeNarrative;
+import java.util.Set;
+
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -96,8 +97,8 @@ public class TinyTurnEdge extends FreeEdge {
         double angleLength = turnCost / 20.0;
         double time = angleLength / speed;
         double weight = time * options.walkReluctance + turnCost / 20;
-        EdgeNarrative en = new FixedModeEdge(this, traverseMode);
-        StateEditor s1 = s0.edit(this, en);
+        StateEditor s1 = s0.edit(this);
+        s1.setBackMode(traverseMode);
         s1.incrementWeight(weight);
         s1.incrementTimeInSeconds((int) Math.ceil(time));
         return s1.makeState();

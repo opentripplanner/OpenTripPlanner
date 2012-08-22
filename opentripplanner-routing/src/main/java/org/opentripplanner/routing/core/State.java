@@ -15,22 +15,26 @@ package org.opentripplanner.routing.core;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.automata.AutomatonState;
 import org.opentripplanner.routing.edgetype.OnBoardForwardEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.TimeDependentTrip;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.routing.patch.Alert;
 
 public class State implements Cloneable {
     /* Data which is likely to change at most traversals */
@@ -47,8 +51,6 @@ public class State implements Cloneable {
     protected State backState;
 
     protected Edge backEdge;
-
-    protected EdgeNarrative backEdgeNarrative;
 
     // how many edges away from the initial state
     protected int hops;
@@ -95,7 +97,6 @@ public class State implements Cloneable {
         this.vertex = vertex;
         this.backState = null;
         this.backEdge = null;
-        this.backEdgeNarrative = null;
         this.hops = 0;
         this.stateData = new StateData();
         // note that here we are breaking the circular reference between rctx and options
@@ -121,10 +122,6 @@ public class State implements Cloneable {
      */
     public StateEditor edit(Edge e) {
         return new StateEditor(this, e);
-    }
-
-    public StateEditor edit(Edge e, EdgeNarrative en) {
-        return new StateEditor(this, e, en);
     }
 
     protected State clone() {
@@ -332,12 +329,44 @@ public class State implements Cloneable {
         return this.backEdge instanceof OnBoardForwardEdge;
     }
 
-    public EdgeNarrative getBackEdgeNarrative() {
-        return this.backEdgeNarrative;
-    }
-
     public State getBackState() {
         return this.backState;
+    }
+    
+    public TraverseMode getBackMode () {
+        return stateData.backMode;
+    }
+    
+    public Set<Alert> getBackAlerts () {
+        return stateData.notes;
+    }
+    
+    /**
+     * Get the name of the direction used to get to this state. For transit, it is the headsign,
+     * while for other things it is what you would expect.
+     */
+    public String getBackDirection () {
+        // This can happen when stop_headsign says different things at two trips on the same 
+        // pattern and at the same stop.
+        if (backEdge instanceof TimeDependentTrip) {
+            return ((TimeDependentTrip) backEdge).getDirection(stateData.tripTimes.index);
+        }
+        else {
+            return backEdge.getDirection();
+        }
+    }
+    
+    /**
+     * Get the back trip of the given state. For time dependent transit, State will find the
+     * right thing to do.
+     */
+    public Trip getBackTrip () {
+        if (backEdge instanceof TimeDependentTrip) {
+            return ((TimeDependentTrip) backEdge).getTrip(stateData.tripTimes.index);
+        }
+        else {
+            return backEdge.getTrip();
+        }
     }
 
     public Edge getBackEdge() {
@@ -435,7 +464,7 @@ public class State implements Cloneable {
         System.out.printf("---- FOLLOWING CHAIN OF STATES ----\n");
         State s = this;
         while (s != null) {
-            System.out.printf("%s via %s \n", s, s.backEdgeNarrative);
+            System.out.printf("%s via %s by %s\n", s, s.backEdge, s.getBackMode());
             s = s.backState;
         }
         System.out.printf("---- END CHAIN OF STATES ----\n");
@@ -479,7 +508,7 @@ public class State implements Cloneable {
             if (outState == null) {
                 continue;
             }
-            if (!outState.getBackEdgeNarrative().getMode().equals(requestedMode)) {
+            if (!outState.getBackMode().equals(requestedMode)) {
                 //walking a bike, so, not really an exit
                 continue;
             }
@@ -492,7 +521,7 @@ public class State implements Cloneable {
             boolean found = false;
             for (Edge out2 : tov.getOutgoing()) {
                 State outState2 = out2.traverse(outState);
-                if (outState2 != null && !outState2.getBackEdgeNarrative().getMode().equals(requestedMode)) {
+                if (outState2 != null && !outState2.getBackMode().equals(requestedMode)) {
                     // walking a bike, so, not really an exit
                     continue;
                 }
@@ -609,22 +638,25 @@ public class State implements Cloneable {
                 }
             }
             else {
-                EdgeNarrative narrative = orig.getBackEdgeNarrative();
-                StateEditor editor = ret.edit(edge, narrative);
+                StateEditor editor = ret.edit(edge);
                 // note the distinction between setFromState and setBackState
                 editor.setFromState(orig);
 
                 editor.incrementTimeInSeconds(orig.getAbsTimeDeltaSec());
                 editor.incrementWeight(orig.getWeightDelta());
                 editor.incrementWalkDistance(orig.getWalkDistanceDelta());
+                
+                // propagate the modes and alerts through to the reversed edge
+                editor.setBackMode(orig.getBackMode());
+                editor.addAlerts(orig.getBackAlerts());
 
                 if (orig.isBikeRenting() != orig.getBackState().isBikeRenting())
                     editor.setBikeRenting(!orig.isBikeRenting());
                 ret = editor.makeState();
 
-                EdgeNarrative origNarrative = orig.getBackEdgeNarrative();
-                EdgeNarrative retNarrative = ret.getBackEdgeNarrative();
-                copyExistingNarrativeToNewNarrativeAsAppropriate(origNarrative, retNarrative);
+                //EdgeNarrative origNarrative = orig.getBackEdgeNarrative();
+                //EdgeNarrative retNarrative = ret.getBackEdgeNarrative();
+                //copyExistingNarrativeToNewNarrativeAsAppropriate(origNarrative, retNarrative);
             }
             
             orig = orig.getBackState();
@@ -722,20 +754,5 @@ public class State implements Cloneable {
 
     public boolean getReverseOptimizing () {
         return stateData.opt.reverseOptimizing;
-    }
-
-    private static void copyExistingNarrativeToNewNarrativeAsAppropriate(EdgeNarrative from,
-            EdgeNarrative to) {
-
-        if (!(to instanceof MutableEdgeNarrative))
-            return;
-
-        MutableEdgeNarrative m = (MutableEdgeNarrative) to;
-
-        if (to.getFromVertex() == null)
-            m.setFromVertex(from.getFromVertex());
-
-        if (to.getToVertex() == null)
-            m.setToVertex(from.getToVertex());
     }
 }

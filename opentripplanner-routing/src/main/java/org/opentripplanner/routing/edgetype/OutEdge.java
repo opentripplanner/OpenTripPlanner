@@ -13,12 +13,15 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import java.util.Set;
+
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.util.ElevationProfileSegment;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TurnVertex;
@@ -56,13 +59,12 @@ public class OutEdge extends StreetEdge {
     }
 
     @Override
-    public TraverseMode getMode() {
-        return TraverseMode.WALK;
-    }
-
-    @Override
     public String getName() {
         return ((TurnVertex) fromv).getName();
+    }
+    
+    public Set<Alert> getNotes () {
+        return ((TurnVertex) fromv).getNotes();
     }
 
     @Override
@@ -86,22 +88,28 @@ public class OutEdge extends StreetEdge {
             }
         }
 
-        FixedModeEdge en = new FixedModeEdge(this, traverseMode);
-        if (fromv.getWheelchairNotes() != null && options.wheelchairAccessible) {
-            en.addNotes(fromv.getWheelchairNotes());
-        }
-        StateEditor s1 = s0.edit(this, en);
+        StateEditor s1 = s0.edit(this);
 
+        if (fromv.getWheelchairNotes() != null && options.wheelchairAccessible) {
+            s1.addAlerts(fromv.getWheelchairNotes());
+        }
+        
         double speed = options.getSpeed(traverseMode);
         double time = fromv.getEffectiveLength(traverseMode) / speed;
         double weight = fromv.computeWeight(s0, options, time);
         s1.incrementWalkDistance(fromv.getLength());
         s1.incrementTimeInSeconds((int) time);
         s1.incrementWeight(weight);
+        s1.setBackMode(s0.getNonTransitMode(options));
         if (s1.weHaveWalkedTooFar(options))
             return null;
 
+        s1.addAlerts(getNotes());
         return s1.makeState();
+    }
+    
+    public Set<Alert> getWheelchairNotes () {
+        return ((TurnVertex) fromv).getWheelchairNotes();
     }
 
     public String toString() {

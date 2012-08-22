@@ -12,7 +12,7 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.routing.edgetype;
 
-import org.opentripplanner.routing.graph.AbstractEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.OnboardVertex;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 
@@ -21,7 +21,7 @@ import org.opentripplanner.routing.vertextype.TransitVertex;
  * @author novalis
  *
  */
-public abstract class PatternEdge extends AbstractEdge {
+public abstract class PatternEdge extends Edge {
 
     private static final long serialVersionUID = 1L;
 
