@@ -115,7 +115,10 @@ public class RoutingContext implements Cloneable {
         transferTable = graph.getTransferTable();
         // the graph's snapshot may be frequently updated. 
         // Grab a reference to ensure a coherent view of the timetables throughout this search.
-        timetableSnapshot = graph.timetableSnapshotSource.getSnapshot(); 
+        if (graph.timetableSnapshotSource != null)
+            timetableSnapshot = graph.timetableSnapshotSource.getSnapshot();
+        else
+            timetableSnapshot = null;
         setServiceDays();
         if (opt.batch)
             remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
