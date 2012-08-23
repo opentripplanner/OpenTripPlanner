@@ -90,6 +90,14 @@ public abstract class TripTimes {
     public int getArrivalDelay(int hop) {
         return getArrivalTime(hop) - getScheduledTripTimes().getArrivalTime(hop); 
     }
+    
+    /** 
+     * @return true if this TripTimes represents an unmodified, scheduled trip from a published 
+     * timetable or false if it is a updated, cancelled, or otherwise modified one.
+     */
+    public boolean isScheduled() {
+        return this.getScheduledTripTimes() == this;
+    }
 
     /** Builds a string concisely representing all departure and arrival times in this TripTimes. */
     public String dumpTimes() {
