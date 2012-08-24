@@ -35,6 +35,7 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer {
     @Setter private String address = "tcp://node01.post.openov.nl:7817";
     @Setter private static String feed = "/GOVI/KV8"; 
     @Setter private static String messageLogFile;
+    @Setter private static int logFrequency = 2000;
 
     @Setter private static String fakeInput = null; //"/home/abyrd/nl.ctx";
     Writer logWriter;
@@ -85,7 +86,7 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer {
             ret = KV8Update.fromCTX(kv8ctx);
             count += 1; // if we got here there must not have been an exception
             LOG.debug("decoded gzipped CTX message #{}: {}", count, msg);
-            if (count % 100 == 0) {
+            if (count % logFrequency == 0) {
                 LOG.info("received {} KV8 messages.", count);
             }
         } catch (Exception e) {
