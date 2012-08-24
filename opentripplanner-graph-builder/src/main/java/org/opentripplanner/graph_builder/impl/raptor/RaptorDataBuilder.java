@@ -23,6 +23,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -89,6 +90,7 @@ public class RaptorDataBuilder implements GraphBuilder {
 
                 int nPatterns = variant.getSegments().size() / nStops;
                 RaptorRoute route = new RaptorRoute(nStops, nPatterns);
+                route.mode = ((PatternHop)variant.getSegments().get(0).hopOut).getMode();
                 data.routes.add(route);
 
                 for (int i = 0; i < nStops; ++i) {

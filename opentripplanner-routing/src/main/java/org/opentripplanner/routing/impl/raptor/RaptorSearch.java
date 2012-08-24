@@ -155,7 +155,7 @@ public class RaptorSearch {
                 // this checks the case of continuing on the current trips.
                 CONTINUE: for (RaptorState boardState : boardStates) {
 
-                    RaptorState newState = new RaptorState(options.arriveBy);
+                    RaptorState newState = new RaptorState(boardState.parent);
 
                     ServiceDay sd = boardState.serviceDay;
 
@@ -183,7 +183,6 @@ public class RaptorSearch {
                     newState.tripTimes = boardState.tripTimes;
                     newState.nBoardings = boardState.nBoardings;
                     newState.walkDistance = boardState.walkDistance;
-                    newState.parent = boardState.parent;
                     newState.stop = stop;
 
                     for (RaptorState oldState : states) {
@@ -457,15 +456,18 @@ public class RaptorSearch {
                 statesByStop[stop.index] = states;
             }
 
-            RaptorState baseState = (RaptorState) state.getExtension("raptorParent");
-            RaptorState newState = new RaptorState(options.arriveBy);
-            if (baseState != null) {
-                newState.nBoardings = baseState.nBoardings;
+            RaptorState parent = (RaptorState) state.getExtension("raptorParent");
+            RaptorState newState;
+            if (parent != null) {
+                newState = new RaptorState(parent);
+            } else {
+                //this only happens in round 0
+                newState = new RaptorState(options.arriveBy);
             }
+            newState.nBoardings = nBoardings;
             newState.walkDistance = state.getWalkDistance();
             newState.arrivalTime = (int) state.getTime();
             newState.walkPath = state;
-            newState.parent = baseState;
             newState.stop = stop;
 
             for (RaptorState oldState : states) {

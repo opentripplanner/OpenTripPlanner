@@ -18,6 +18,7 @@ import java.io.Serializable;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
@@ -38,6 +39,8 @@ public class RaptorRoute implements Serializable {
 
     public TransitBoardAlight[/* stops - 1 */][/* patterns */] alights;// array of patternalights for
                                                                   // each stop
+
+    public TraverseMode mode;
 
     public RaptorRoute(int nStops, int nPatterns) {
         stops = new RaptorStop[nStops];
