@@ -12,7 +12,6 @@ import java.util.Iterator;
 public class ArrayBag<T> implements Iterable<T> {
     T[] items;
     int last;
-    protected ArrayBagIterator iterator = new ArrayBagIterator();
 
     class ArrayBagIterator implements Iterator<T> {
         private int nextIndex;
@@ -60,8 +59,7 @@ public class ArrayBag<T> implements Iterable<T> {
     }
 
     public ArrayBagIterator iterator() {
-        iterator.nextIndex = 0;
-        return iterator;
+        return new ArrayBagIterator();
     }
 
     public T item() {

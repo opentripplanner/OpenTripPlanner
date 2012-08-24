@@ -56,16 +56,16 @@ class CostsAtTime {
         return true;
     }
 
-    public boolean codominant(int duration, double distance) {
+    public boolean strictlyDominates(int duration, double distance) {
         for (DurationAndDistance existing : costs) {
             if (existing.duration <= duration && existing.distance <= distance * 1.05) {
-                return false;
-            }
-            if (existing.duration > duration && existing.distance * 1.05 > distance) {
                 return true;
             }
+            if (existing.duration > duration && existing.distance * 1.05 > distance) {
+                return false;
+            }
         }
-        return true;
+        return false;
     }
 
     public String toString() {
@@ -119,7 +119,7 @@ class CostsAtTimeComparator implements Comparator<Object> {
 
 
 /**
- * A profile of trip duration/walk distance for a given stop
+ * A profile of trip duration/walk distance for a given stop across a span of time
  * 
  * @author novalis
  * 
@@ -170,7 +170,7 @@ public class StopProfile {
         }
         ServiceDay[] runningDays = runningList.toArray(new ServiceDay[0]);
         boolean anyBetter = false;
-        for (int trip = nTrips - 1; trip >= 0; --trip) {
+        for (int trip = 0; trip < nTrips; ++trip) {
             int departureSecondsSinceMidnight = pattern.getDepartureTime(originStopIndex, trip);
             int arrivalSecondsSinceMidnight = pattern
                     .getArrivalTime(destinationStopIndex - 1, trip);
@@ -251,7 +251,7 @@ public class StopProfile {
      */
     public boolean walkTo(StopProfile destination, int duration, double distance) {
         if (profile.size() > 1000) {
-            // System.out.println("large profile");
+            //System.out.println("large profile");
         }
 
         boolean anyBetter = false;
@@ -260,10 +260,7 @@ public class StopProfile {
 
         // System.out.println("Walk from " + destination.vertex + " to " + vertex);
         while (destinationIt.hasNext()) {
-            // we need to check previous origin costs (if any) to see if we dominate them; if so, we
-            // will remove them.
             CostsAtTime nextDestination = destinationIt.next();
-            // System.out.println("At  " + nextDestination.time);
             int timeAtOrigin = nextDestination.time - duration;
 
             // find the next (or same-time) departure from here
@@ -294,6 +291,7 @@ public class StopProfile {
                     }
                 }
             }
+            anyBetter = true;
 
             if (originIndex > 0)
                 dominatePreviousDepartures(originIndex);
@@ -308,67 +306,44 @@ public class StopProfile {
 
         int timeAtOrigin = inserted.time;
 
-        int startRemove = -1;
-        boolean shouldContinue = false;
-        while (originIndex >= 0) {
-            CostsAtTime costsAtPrevTime = profile.get(originIndex);
-            int waitTime = timeAtOrigin - costsAtPrevTime.time;
-            ArrayList<DurationAndDistance> toAdd = new ArrayList<DurationAndDistance>();
-            for (Iterator<DurationAndDistance> costsIt = inserted.costs.iterator(); costsIt.hasNext();) {
-                DurationAndDistance costs = costsIt.next();
+        for (Iterator<DurationAndDistance> costsIt = inserted.costs.iterator(); costsIt.hasNext();) {
+            DurationAndDistance costs = costsIt.next();
+            int index = originIndex;
+            BACKWARDSEARCH: while (index >= 0) {
+                boolean shouldContinue = false;
+                CostsAtTime costsAtPrevTime = profile.get(index);
+                int waitTime = timeAtOrigin - costsAtPrevTime.time;
                 int duration = costs.duration + waitTime;
-                boolean add = false;
                 for (Iterator<DurationAndDistance> it = costsAtPrevTime.costs.iterator(); it.hasNext();) {
                     DurationAndDistance prevCost = it.next();
                     if (prevCost.duration >= duration && prevCost.distance * 1.001 >= costs.distance) {
                         // this walk totally dominates the old way
                         it.remove();
-                        add = true;
+                        shouldContinue = true;
                     } else if (prevCost.duration > duration
                             || prevCost.distance > costs.distance * 1.001) {
                         // this walk at least partially dominates the old way
-                        add = true;
+                        shouldContinue = true;
                     } else {
                         //the old way completely dominates this walk 
-                        add = false;
-                        break;
+                        break BACKWARDSEARCH;
                     }
                 }
                 if (costsAtPrevTime.costs.isEmpty()) {
-                    // fixme might optimize this
-                    if (startRemove == -1)
-                        startRemove = originIndex;
-                    shouldContinue = true;
-                    toAdd.clear();
-                } else if (add) {
-                    if (startRemove != -1) {
-                        profile.subList(originIndex + 1, startRemove + 1).clear();
-                        startRemove = -1;
-                    }
-                    toAdd.add(new DurationAndDistance(duration, costs.distance));
-                    shouldContinue = true;
-                    // System.out.println("Add to older");
+                    profile.remove(index);
+                    originIndex -= 1;
+                }
+                if (shouldContinue) {
+                    index--;
+                } else {
+                    break;
                 }
             }
-            for (DurationAndDistance cost : toAdd) {
-                costsAtPrevTime.forceAdd(cost);
-            }
-            if (shouldContinue) {
-                originIndex--;
-            } else {
-                break;
-            }
-        }
-        if (startRemove != -1) {
-            profile.subList(originIndex + 1, startRemove + 1).clear();
         }
     }
 
     private boolean addIfNotDominated(CostsAtTime destinationCosts, int timeAtOrigin,
             int originIndex, int duration, double distance) {
-
-        CostsAtTime costsAtNextTime = profile.get(originIndex);
-        int waitTime = costsAtNextTime.time - timeAtOrigin;
 
         CostsAtTime toInsert = new CostsAtTime(timeAtOrigin);
         for (DurationAndDistance atDestination : destinationCosts.costs) {
@@ -379,22 +354,35 @@ public class StopProfile {
             toInsert.forceAdd(walkDuration, walkDistance);
         }
 
-        for (Iterator<DurationAndDistance> costsIt = toInsert.costs.iterator; costsIt.hasNext();) {
+        for (Iterator<DurationAndDistance> costsIt = toInsert.costs.iterator(); costsIt.hasNext();) {
             DurationAndDistance costs = costsIt.next();
-            if (!costsAtNextTime.codominant(costs.duration + waitTime, costs.distance)) {
-                costsIt.remove();
+            int index = originIndex;
+            FORWARDSEARCH: while (index < profile.size()) {
+                CostsAtTime costsAtNextTime = profile.get(index);
+                int waitTime = costsAtNextTime.time - timeAtOrigin;
+                for (DurationAndDistance nextCosts : costsAtNextTime.costs) {
+                    if (costs.distance * 1.05 >= nextCosts.distance) {
+                        if (costs.duration - waitTime >= nextCosts.duration) {
+                            costsIt.remove();
+                            break FORWARDSEARCH;
+                        }
+                    }
+                }
+                ++index;
             }
         }
 
         if (toInsert.costs.isEmpty()) {
             return false;
         }
-        if (waitTime == 0) {
-            costsAtNextTime = profile.get(originIndex);
+
+        CostsAtTime costsAtNextTime = profile.get(originIndex);
+        if (costsAtNextTime.time - timeAtOrigin == 0) {
+            boolean better = false;
             for (DurationAndDistance costs : toInsert.costs) {
-                costsAtNextTime.add(costs.duration, costs.distance);
+                better |= costsAtNextTime.add(costs.duration, costs.distance);
             }
-            return true;
+            return better;
         } else {
             profile.add(originIndex, toInsert);
             return true;

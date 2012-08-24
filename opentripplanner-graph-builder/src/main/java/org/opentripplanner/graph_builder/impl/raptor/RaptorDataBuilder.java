@@ -142,6 +142,7 @@ public class RaptorDataBuilder implements GraphBuilder {
 
         //MaxTransitRegions regions = makeMaxTransitRegions(graph, data);
         //data.maxTransitRegions = regions;
+        //data.regionData = makeRegions(graph, data);
         graph.putService(RaptorDataService.class, new RaptorDataService(data));
 
     }
@@ -155,7 +156,7 @@ public class RaptorDataBuilder implements GraphBuilder {
         }
 
         ArrayList<ArrayList<Vertex>> verticesForRegion = new ArrayList<ArrayList<Vertex>>();
-        int nRegions = split(verticesForRegion, vertices, 0, true, 1000);
+        int nRegions = split(verticesForRegion, null, vertices, 0, true, vertices.size() / 20);
 
         for (int region = 0; region < verticesForRegion.size(); ++region) {
             for (Vertex vertex : verticesForRegion.get(region)) {
@@ -221,7 +222,7 @@ public class RaptorDataBuilder implements GraphBuilder {
             for (int region = 0; region < nRegions; ++region) {
                 log.debug("Computing max transit data for region " + region);
                 regions.maxTransit[d][region] = computeMaxTransitData(data, serviceDays,
-                        verticesForRegion.get(region), stopToStopWalkTimes, today, nRegions);
+                        verticesForRegion.get(region), stopToStopWalkTimes, today, nRegions, region);
             }
         }
 
@@ -266,7 +267,7 @@ public class RaptorDataBuilder implements GraphBuilder {
 
     private int[] computeMaxTransitData(RaptorData data, ArrayList<ServiceDay> serviceDays,
             ArrayList<Vertex> destinations, HashMap<Vertex, T2<Integer, Double>>[] stopToStopWalk,
-            int startTime, int nRegions) {
+            int startTime, int nRegions, int destinationRegion) {
 
         HashMap<Vertex, StopProfile> stopProfile = new HashMap<Vertex, StopProfile>();
         // initialize stop profiles for destination vertices
@@ -278,8 +279,8 @@ public class RaptorDataBuilder implements GraphBuilder {
             visitedLastRound.add(v);
         }
 
-        for (int round = 0; round < MAX_TRANSFERS ; ++round) {
-            System.out.println("round " + round + " from " + visitedLastRound.size());
+        for (int round = 0; round < 7; ++round) {
+            log.debug("round " + round + " from " + visitedLastRound.size());
             HashSet<Vertex> visitedThisRound = new HashSet<Vertex>();
             // transit phase
             HashSet<StopProfile> newlyBoarded = new HashSet<StopProfile>();
@@ -354,6 +355,10 @@ public class RaptorDataBuilder implements GraphBuilder {
                 log.warn("Missing region for " + vertex);
                 continue; // this should never happen
             }
+            // don't worry about trips within this region
+            if (region == destinationRegion)
+                continue;
+
             StopProfile profile = stopProfile.get(vertex);
             if (profile == null) { // unreachable stop inside this region
                 timeForRegion[region] = Integer.MAX_VALUE;
@@ -368,7 +373,6 @@ public class RaptorDataBuilder implements GraphBuilder {
         return timeForRegion;
     }
 
-    @SuppressWarnings("unused")
     private RegionData makeRegions(Graph graph, RaptorData data) {
         ArrayList<Vertex> vertices = new ArrayList<Vertex>();
         for (Vertex v : graph.getVertices()) {
@@ -378,26 +382,27 @@ public class RaptorDataBuilder implements GraphBuilder {
         }
 
         ArrayList<ArrayList<Vertex>> verticesForRegion = new ArrayList<ArrayList<Vertex>>();
-        int nRegions = split(verticesForRegion, vertices, 0, true, MAX_REGION_SIZE);
-        RegionData regions = new RegionData();
-        // regions.minWalk = new double[verticesForRegion.size()][verticesForRegion.size()];
+        int[] regionsForVertex = new int[AbstractVertex.getMaxIndex()];
+        Arrays.fill(regionsForVertex, -1);
+
+        int nRegions = split(verticesForRegion, regionsForVertex, vertices, 0, true, MAX_REGION_SIZE);
+        RegionData regions = new RegionData(regionsForVertex);
         regions.minTime = new int[nRegions][nRegions];
 
-        // now compute minWalk for each region
+        // now compute minTime for each region
 
         int regionIndex = 0;
         for (ArrayList<Vertex> region : verticesForRegion) {
             if (regionIndex % 5 == 0) {
                 log.debug("Building regions: " + regionIndex + " / " + verticesForRegion.size());
             }
-            // findMinWalkDistance(data, regions, regionIndex, region);
             findMinTime(graph, data, regions, regionIndex, region);
             regionIndex += 1;
         }
 
         return regions;
     }
-
+/*
     @SuppressWarnings("unused")
     private void findMinWalkDistance(RaptorData data, RegionData regions, int regionIndex,
             ArrayList<Vertex> region) {
@@ -449,7 +454,7 @@ public class RaptorDataBuilder implements GraphBuilder {
         for (Map.Entry<Vertex, Double> entry : distances.entrySet()) {
             Vertex v = entry.getKey();
             double distance = entry.getValue();
-            int toRegion = v.getGroupIndex();
+            int toRegion = regionsForVertex[v.getIndex()];
             if (toRegion == -1) {
                 System.out.println("Warning: no region for " + v);
                 continue;
@@ -459,7 +464,7 @@ public class RaptorDataBuilder implements GraphBuilder {
             }
         }
     }
-
+*/
     private void findMinTime(Graph graph, RaptorData data, RegionData regions, int regionIndex,
             ArrayList<Vertex> region) {
         // find initial spt from all nodes in region
@@ -504,7 +509,7 @@ public class RaptorDataBuilder implements GraphBuilder {
             Vertex v = entry.getKey();
             int distance = entry.getValue();
             // int toRegion = regions.regionForVertex[v.getIndex()];
-            int toRegion = v.getGroupIndex();
+            int toRegion = regions.getRegionForVertex(v);
             if (toRegion == -1) {
                 continue;
             }
@@ -536,13 +541,17 @@ public class RaptorDataBuilder implements GraphBuilder {
         }
     }
 
-    private int split(ArrayList<ArrayList<Vertex>> vertexForRegion, List<Vertex> vertices,
+    private int split(ArrayList<ArrayList<Vertex>> vertexForRegion, int[] regionsForVertex, List<Vertex> vertices,
             int index, boolean horiz, int regionSize) {
         if (vertices.size() <= regionSize) {
             final ArrayList<Vertex> region = new ArrayList<Vertex>();
             vertexForRegion.add(region);
             for (Vertex vertex : vertices) {
-                vertex.setGroupIndex(index);
+                if (regionsForVertex == null) {
+                    vertex.setGroupIndex(index);
+                } else {
+                    regionsForVertex[vertex.getIndex()] = index;
+                }
                 region.add(vertex);
             }
             return index + 1;
@@ -566,13 +575,17 @@ public class RaptorDataBuilder implements GraphBuilder {
             final ArrayList<Vertex> region = new ArrayList<Vertex>();
             vertexForRegion.add(region);
             for (Vertex vertex : vertices) {
-                vertex.setGroupIndex(index);
+                if (regionsForVertex == null) {
+                    vertex.setGroupIndex(index);
+                } else {
+                    regionsForVertex[vertex.getIndex()] = index;
+                }
                 region.add(vertex);
             }
             return index + 1;
         }
-        index = split(vertexForRegion, vertices.subList(0, mid), index, !horiz, regionSize);
-        index = split(vertexForRegion, vertices.subList(mid, vertices.size()), index, !horiz,
+        index = split(vertexForRegion, regionsForVertex, vertices.subList(0, mid), index, !horiz, regionSize);
+        index = split(vertexForRegion, regionsForVertex, vertices.subList(mid, vertices.size()), index, !horiz,
                 regionSize);
         return index;
     }
