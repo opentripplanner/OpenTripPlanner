@@ -55,10 +55,7 @@ public abstract class TripTimes {
     /**
      * It all depends whether we store pointers to the enclosing Timetable in ScheduledTripTimes...
      */
-    public String getHeadsign(int hop) {
-        // implementation should always be the same, referring to enclosing timetable 
-        return "The Headsign";
-    }
+    public abstract String getHeadsign(int hop);
         
     /* IMPLEMENTED INSTANCE METHODS */
     

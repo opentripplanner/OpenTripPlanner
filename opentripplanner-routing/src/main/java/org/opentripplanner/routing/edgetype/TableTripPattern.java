@@ -269,6 +269,9 @@ public class TableTripPattern implements TripPattern, Serializable {
             timetable = snapshot.resolve(this);
         else
             timetable = scheduledTimetable;
+//        System.out.println("resolver: " + 
+//            (timetable != scheduledTimetable ? "updated " : "scheduled ") + 
+//            timetable.tripTimes.size() + " trips");
         return timetable.getNextTrip(stopIndex, afterTime, haveBicycle, options);
     }
     
@@ -343,7 +346,7 @@ public class TableTripPattern implements TripPattern, Serializable {
         
         /** 
          * This copy instance method can see the enclosing TripPattern instance, while the copy 
-         * constructor does not. The only publically visible way to make a timetable, and it should
+         * constructor does not. The only publicly visible way to make a timetable, and it should
          * probably be protected.
          */
         public Timetable copy() {
@@ -376,7 +379,6 @@ public class TableTripPattern implements TripPattern, Serializable {
          * time afterTime. The haveBicycle parameter must be passed in because we cannot determine 
          * whether the user is in possession of a rented bicycle from the options alone.
          */
-        // This method is protected so Lombok won't delegate to it.
         protected TripTimes getNextTrip(int stopIndex, int afterTime, boolean haveBicycle,
                 RoutingRequest options) {
             boolean pickup = true;
@@ -420,6 +422,7 @@ public class TableTripPattern implements TripPattern, Serializable {
             for (int i = 0; i < trips.size(); i++) {
                 // grab a reference before tests in case it is swapped out by an update thread
                 TripTimes currTrip = tripTimes.get(i); 
+                //System.out.println("  trip " + (currTrip.isScheduled() ? "sched" : "non"));
                 int currTime = currTrip.getDepartureTime(stopIndex);
                 if (currTime >= afterTime && currTime < bestTime && 
                         tripAcceptable(currTrip.getTrip(), haveBicycle, wheelchair) && 
@@ -436,7 +439,6 @@ public class TableTripPattern implements TripPattern, Serializable {
          * time afterTime. The haveBicycle parameter must be passed in because we cannot determine 
          * whether the user is in possession of a rented bicycle from the options alone.
          */
-        // This method is protected so Lombok won't delegate to it.
         // TODO this could be merged with the departure search, there is lots of duplicate code.
         protected TripTimes getPreviousTrip(int stopIndex, int beforeTime, boolean haveBicycle, 
                 RoutingRequest options) {
@@ -613,6 +615,9 @@ public class TableTripPattern implements TripPattern, Serializable {
          * Apply the UpdateBlock to the appropriate ScheduledTripTimes from this Timetable. 
          * The existing TripTimes must not be modified directly because they may be shared with 
          * the underlying scheduledTimetable, or other updated Timetables.
+         * The StoptimeUpdater performs the protective copying of this Timetable. It is not done in 
+         * this update method to avoid repeatedly cloning the same Timetable when several updates 
+         * are applied to it at once.
          * @return whether or not the timetable actually changed as a result of this operation
          * (maybe it should do the cloning and return the new timetable to enforce copy-on-write?) 
          */
@@ -673,25 +678,8 @@ public class TableTripPattern implements TripPattern, Serializable {
          */
         public void addTrip(Trip trip, List<StopTime> stopTimes) {
             // TODO: double-check that the stops and pickup/dropoffs are right for this trip
-            int nextIndex = tripTimes.size();
-            tripTimes.add(new ScheduledTripTimes(trip, nextIndex, stopTimes));
+            tripTimes.add(new ScheduledTripTimes(trip, stopTimes));
             trips.add(trip);
-            
-            // stoptimes can have headsign info that overrides the trip's headsign
-            ArrayList<String> headsigns = new ArrayList<String>();
-            boolean allHeadsignsNull = true;
-            for (StopTime st : stopTimes) {
-                String headsign = st.getStopHeadsign();
-                if (headsign != null)
-                    allHeadsignsNull = false;
-                headsigns.add(headsign);
-            }
-            if (allHeadsignsNull)
-                headsigns = null;
-            // there needs to be some provision for extra trips that are not in the underlying schedule
-            TableTripPattern.this.headsigns.add(headsigns);
-            // headsigns should be transposed later and compacted with reused arrays
-            // 1x1 array should always return the same headsign to allow for no change 
         }
 
         /** 

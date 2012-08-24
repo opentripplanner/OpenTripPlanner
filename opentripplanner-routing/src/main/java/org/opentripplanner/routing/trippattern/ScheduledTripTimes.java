@@ -25,12 +25,13 @@ public class ScheduledTripTimes extends TripTimes implements Serializable {
     
     @Getter private final Trip trip;
 
-    /** 
-     * This is kind of ugly, but the headsigns are in the enclosing pattern not here. Assuming
-     * we have a reference to the enclosing pattern, we can fetch things from there. 
-     * Ideally we can get by without exposing this at all to outside callers.
+    /**
+     * Each trip has a defined headsign, but this trip_headsign has been overridden by the 
+     * stop_headsign field in stop_times.txt, the headsigns field will point to an array of
+     * headsigns, one for each stop of the trip. If this field is set to null, this TripTimes 
+     * will get its headsign from the Trip object for every stop.
      */
-    private final int index; 
+    private final String[] headsigns;
     
     /** 
      * The time in seconds after midnight at which the vehicle begins traversing each inter-stop 
@@ -47,9 +48,8 @@ public class ScheduledTripTimes extends TripTimes implements Serializable {
     private int[] arrivalTimes; 
 
     /** The provided stopTimes are assumed to be pre-filtered, valid, and monotonically increasing. */ 
-    public ScheduledTripTimes(Trip trip, int index, List<StopTime> stopTimes) {
+    public ScheduledTripTimes(Trip trip, List<StopTime> stopTimes) {
         this.trip = trip;
-        this.index = index;
         int nStops = stopTimes.size();
         int nHops = nStops - 1;
         departureTimes = new int[nHops];
@@ -59,8 +59,27 @@ public class ScheduledTripTimes extends TripTimes implements Serializable {
             departureTimes[hop] = stopTimes.get(hop).getDepartureTime();
             arrivalTimes[hop] = stopTimes.get(hop + 1).getArrivalTime();
         }
+        this.headsigns = makeHeadsignsArray(stopTimes);
         // If all dwell times are 0, arrival times array is not needed. Attempt to save some memory.
         this.compact();
+    }
+    
+    private String[] makeHeadsignsArray(List<StopTime> stopTimes) {
+        String tripHeadsign = trip.getTripHeadsign();
+        String[] hs = new String[stopTimes.size()];
+        boolean useHeadsigns = false;
+        int i = 0;
+        for (StopTime st : stopTimes) {
+            String stopHeadsign = st.getStopHeadsign(); 
+            if (!(tripHeadsign.equals(stopHeadsign))) {
+                useHeadsigns = true;
+            }
+            hs[i++] = stopHeadsign;
+        }
+        if (useHeadsigns)
+            return hs;
+        else
+            return null;
     }
     
     @Override
@@ -127,10 +146,12 @@ public class ScheduledTripTimes extends TripTimes implements Serializable {
         return "ScheduledTripTimes\n" + dumpTimes();
     }
     
-    // TODO this is going to require pointers to the enclosing Timetable
     @Override
     public String getHeadsign(int hop) {
-        return "Headsign";
+        if (headsigns == null)
+            return trip.getTripHeadsign();
+        else
+            return headsigns[hop];
     }
 
 }
