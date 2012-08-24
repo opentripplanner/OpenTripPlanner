@@ -12,6 +12,12 @@ package org.opentripplanner.routing.edgetype;
  */
 public interface TimetableSnapshotSource {
 
+    /** 
+     * @return an up-to-date snapshot mapping TripPatterns to Timetables. This snapshot and the
+     * timetable objects it references are guaranteed to never change, so the requesting thread is 
+     * provided a consistent view of all TripTimes. The routing thread need only release its 
+     * reference to the snapshot to release resources.
+     */
     public TimetableResolver getSnapshot();
     
 }

@@ -13,7 +13,6 @@ import lombok.Setter;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
-import org.opentripplanner.routing.edgetype.TableTripPattern.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.edgetype.TimetableSnapshotSource;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
@@ -43,7 +42,7 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
      * snapshot, just return the same one. Thottles the potentially resource-consuming task of 
      * duplicating a TripPattern -> Timetable map and indexing the new Timetables.
      */
-    @Setter private int maxSnapshotFrequency = 500; // msec    
+    @Setter private int maxSnapshotFrequency = 1000; // msec    
 
     /** 
      * The last committed snapshot that was handed off to a routing thread. This snapshot may be
@@ -56,13 +55,13 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
     
     /** A map from Trip AgencyAndIds to the TripPatterns that contain them */
     private Map<AgencyAndId, TableTripPattern> patternIndex;
-    // nothing in the timetable snapshot binds it to one graph. we can use this updater for all
+    // nothing in the timetable snapshot binds it to one graph. we could use this updater for all
     // graphs at once
     private Graph graph;
     private long lastSnapshotTime = -1;
     
     /**
-     * Once the data sources and target graphs have been established, index all trip patterns on the 
+     * Once the data sources and target graphs have been set, index all trip patterns on the 
      * tripIds of Trips they contain.
      */
     @PostConstruct
@@ -80,34 +79,20 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
             }
         }
         graph.timetableSnapshotSource = this;
-        /*
-        System.out.println("Indexed trips:");
-        for (AgencyAndId tripId : patternForTripId.keySet()) {
-            System.out.println(tripId);
-        }
-        */
     }
     
-    /** 
-     * @return an up-to-date snapshot mapping TripPatterns to Timetables. This snapshot and the
-     * timetable objects it references are guaranteed to never change, so the requesting thread is 
-     * provided a consistent view of all TripTimes. The routing thread need only release its 
-     * reference to the snapshot to release resources.
-     */
     public synchronized TimetableResolver getSnapshot() {
         long now = System.currentTimeMillis();
         if (now - lastSnapshotTime > maxSnapshotFrequency) {
-            synchronized (buffer) {
-                if (buffer.isDirty()) {
-                    LOG.info("committing {}", buffer.toString());
-                    buffer.commit();
-                    snapshot = buffer;
-                    buffer = buffer.mutableCopy();
-                }
+            if (buffer.isDirty()) {
+                LOG.debug("Committing {}", buffer.toString());
+                snapshot = buffer.commit();
+            } else {
+                LOG.debug("Buffer was unchanged, keeping old snapshot.");
             }
-            lastSnapshotTime = now;
+            lastSnapshotTime = System.currentTimeMillis();
         } else {
-            LOG.info("Snapshot frequency exceeded. Reusing snapshot {}", snapshot.toString());
+            LOG.debug("Snapshot frequency exceeded. Reusing snapshot {}", snapshot.toString());
         }
         return snapshot;
     }
@@ -147,20 +132,17 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
                     continue;
                 }
                 // we have a message we actually want to apply
-                boolean applied = false;
-                synchronized (buffer) {
-                    // have update perform the clone, pull the update call out of sync block 
-                    Timetable tt = buffer.modify(pattern);
-                    applied = tt.update(block);
-                }
+                boolean applied = buffer.update(pattern, block);
                 if (applied) {
                     appliedBlockCount += 1;
                     if (appliedBlockCount % logFrequency == 0) {
                         LOG.info("applied {} stoptime update blocks.", appliedBlockCount);
                     }
+                    // consider making a snapshot immediately in anticipation of incoming requests 
+                    getSnapshot(); 
                 }
             }
-            LOG.debug("end of update message", uIndex);
+            LOG.debug("end of update message");
         }
     }
 

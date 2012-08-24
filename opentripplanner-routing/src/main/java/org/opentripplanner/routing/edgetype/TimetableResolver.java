@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.opentripplanner.routing.edgetype.TableTripPattern.Timetable;
+import org.opentripplanner.routing.trippattern.UpdateBlock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,6 +30,7 @@ public class TimetableResolver {
     // if this turns out to be slow/spacious we can use an array with integer pattern indexes
     private HashMap<TableTripPattern, Timetable> timetables = new HashMap<TableTripPattern, Timetable>(); 
     
+    /** A set of all timetables which have been modified and are waiting to be indexed. */
     private Set<Timetable> dirty = new HashSet<Timetable>();
     
     /** 
@@ -40,37 +42,55 @@ public class TimetableResolver {
         if (timetable == null) {
             return pattern.scheduledTimetable;
         } else {
-            //LOG.debug("returning modified timetable");
+            LOG.trace("returning modified timetable");
             return timetable;
         }
     }
     
-    public Timetable modify(TableTripPattern pattern) {
-        if (dirty == null)
-            throw new ConcurrentModificationException(
-                    "This TimetableResolver snapshot was already committed for reading.");
-        Timetable existing = resolve(pattern);
-        if (dirty.contains(existing)) {
-            return existing; // allows modifying multiple trips on a single pattern
-        } else {
-            // OR fresh = pattern.scheduledTimetable.copy();
-            Timetable fresh = existing.copy();
-            timetables.put(pattern, fresh);
-            dirty.add(fresh);
-            return fresh;
-        }        
+    /**
+     * @return whether or not the update was actually applied
+     */
+    public boolean update(TableTripPattern pattern, UpdateBlock block) {
+        // synchronization prevents commits/snapshots while update is in progress
+        synchronized(this) {  
+            if (dirty == null)
+                throw new ConcurrentModificationException("This TimetableResolver is read-only.");
+            Timetable tt = resolve(pattern);
+            // we need to perform the copy of Timetable here rather than in Timetable.update()
+            // to avoid repeatedly copying in case several updates are applied to the same timetable
+            if ( ! dirty.contains(tt)) {
+                tt = tt.copy();
+                timetables.put(pattern, tt);
+                dirty.add(tt);
+            }        
+            return tt.update(block);
+        }
     }
     
-    public void commit() {
-        /* This produces a small delay of typically around 50ms, which is almost entirely due to
-         * the indexing step. Cloning the map is much faster (2ms). 
-         * It is perhaps better to index timetables as they are changed to avoid experiencing all 
-         * this lag at once. The indexing could be made much more efficient as well. */
-        // summarize, index, etc. the new timetables
-        for (Timetable tt : dirty)
-            tt.finish();
-        // mark this snapshot as henceforth immutable
-        dirty = null;
+    /**
+     * This produces a small delay of typically around 50ms, which is almost entirely due to
+     * the indexing step. Cloning the map is much faster (2ms). 
+     * It is perhaps better to index timetables as they are changed to avoid experiencing all 
+     * this lag at once, but we want to avoid re-indexing when receiving multiple updates for
+     * the same timetable in rapid succession. This compromise is expressed by the 
+     * maxSnapshotFrequency property of StoptimeUpdater. The indexing could be made much more 
+     * efficient as well.
+     * @return an immutable copy of this TimetableResolver with all updates applied
+     */
+    @SuppressWarnings("unchecked")
+    public TimetableResolver commit() {
+        TimetableResolver ret = new TimetableResolver();
+        // synchronization prevents updates while commit/snapshot in progress
+        synchronized(this) {
+            if (! this.isDirty())
+                return null;
+            for (Timetable tt : dirty)
+                tt.finish(); // summarize, index, etc. the new timetables
+            ret.timetables = (HashMap<TableTripPattern, Timetable>) this.timetables.clone();
+            this.dirty.clear();
+        }
+        ret.dirty = null; // mark the snapshot as henceforth immutable
+        return ret;
     }
     
     public String toString() {
@@ -78,15 +98,9 @@ public class TimetableResolver {
         return String.format("Timetable snapshot: %d timetables (%s)", timetables.size(), d);
     }
     
-    /* TODO: reverse this procedure - have a method for producing an immutable snapshot of a mutable working buffer */
-    @SuppressWarnings("unchecked")
-    public TimetableResolver mutableCopy() {
-        TimetableResolver ret = new TimetableResolver();
-        ret.timetables = (HashMap<TableTripPattern, Timetable>) this.timetables.clone();
-        return ret;
-    }
-
     public boolean isDirty() {
+        if (dirty == null)
+            return false;
         return dirty.size() > 0;
     }
     
