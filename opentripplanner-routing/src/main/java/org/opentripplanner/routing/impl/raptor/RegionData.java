@@ -17,6 +17,12 @@ public class RegionData implements Serializable {
 
     public int[][] minTime;
 
+    public int[] regionForVertex;
+
+    public RegionData(int[] regionsForVertex) {
+        this.regionForVertex = regionsForVertex;
+    }
+
     public List<Integer> getRegionsForVertex(Vertex vertex) {
         return getRegionsForVertex(vertex, new HashSet<Vertex>());
     }
@@ -26,7 +32,7 @@ public class RegionData implements Serializable {
             return Collections.emptyList();
         }
         seen.add(vertex);
-        int index = vertex.getGroupIndex();
+        int index = regionForVertex[vertex.getIndex()];
         if (index >= 0) {
             return Arrays.asList(index);
         }
@@ -40,6 +46,10 @@ public class RegionData implements Serializable {
             }
         }
         return regions;
+    }
+
+    public int getRegionForVertex(Vertex v) {
+        return regionForVertex[v.getIndex()];
     }
 
 }
