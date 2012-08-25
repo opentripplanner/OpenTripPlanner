@@ -26,7 +26,7 @@ import org.opentripplanner.routing.trippattern.TripTimes;
  * via a transit hop, in which case boardStop etc have been set.
 */
 
-public class RaptorState {
+public class RaptorState implements Comparable<RaptorState> {
     /* dominance characteristics */
     double walkDistance;
     int nBoardings;
@@ -48,6 +48,8 @@ public class RaptorState {
     public RaptorStop stop;
     private boolean arriveBy;
 
+    public double weight;
+
     public RaptorState(boolean arriveBy) {
         this.arriveBy = arriveBy;
     }
@@ -55,6 +57,7 @@ public class RaptorState {
     public RaptorState(RaptorState parent) {
         this.parent = parent;
         this.arriveBy = parent.arriveBy;
+        this.weight = parent.weight;
     }
 
     public String toString() {
@@ -93,5 +96,10 @@ public class RaptorState {
                     && walkDistance <= other.walkDistance * 1.1
                     && arrivalTime <= other.arrivalTime;
             }
+    }
+
+    @Override
+    public int compareTo(RaptorState other) {
+        return (int) Math.signum(weight - other.weight);
     }
 }

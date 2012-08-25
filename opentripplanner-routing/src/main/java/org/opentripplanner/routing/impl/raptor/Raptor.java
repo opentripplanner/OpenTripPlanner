@@ -56,6 +56,22 @@ public class Raptor implements PathService {
 
     private RaptorData cachedRaptorData;
 
+    private double multiPathTimeout = 0; // seconds
+
+    /** Give up on searching for additional itineraries after this many seconds have elapsed. */
+    public void setTimeout (double seconds) {
+        multiPathTimeout = seconds;
+    }
+
+    /**
+     * Stop searching for additional itineraries (beyond the first one) after this many seconds 
+     * have elapsed, relative to the beginning of the search for the first itinerary. 
+     * A negative or zero value means search forever. 
+     */
+    public void setMultiPathTimeout (double seconds) {
+        multiPathTimeout = seconds;
+    }
+
     //fallback for nontransit trips
     @Autowired public SPTService sptService;
 
@@ -75,12 +91,16 @@ public class Raptor implements PathService {
         Graph graph = graphService.getGraph(options.getRouterId());
         RaptorData data = graph.getService(RaptorDataService.class).getData();
 
+        double initialWalk = options.getMaxWalkDistance() * 1.1;
+        //we multiply the initial walk distance by 1.1 to account for epsilon dominance.
+        options.setMaxWalkDistance(initialWalk);
+
         RoutingRequest walkOptions = options.clone();
         walkOptions.rctx.pathParsers = new PathParser[0];
         TraverseModeSet modes = options.getModes().clone();
         modes.setTransit(false);
         walkOptions.setModes(modes);
-        RaptorSearch routeSet = new RaptorSearch(data, options);
+        RaptorSearch search = new RaptorSearch(data, options);
 
         if (data.maxTransitRegions != null) {
             Calendar tripDate = Calendar.getInstance(graph.getTimeZone());
@@ -100,31 +120,49 @@ public class Raptor implements PathService {
                 day = -1;
             }
 
-            routeSet.maxTimeDayIndex = day;
+            search.maxTimeDayIndex = day;
         }
 
-        double initialWalk = options.getMaxWalkDistance();
+        long searchBeginTime = System.currentTimeMillis();
 
+        int bestElapsedTime = Integer.MAX_VALUE;
         RETRY: do {
             for (int i = 0; i < options.getMaxTransfers() + 2; ++i) {
-                round(data, options, walkOptions, routeSet, i);
+                round(data, options, walkOptions, search, i);
 
-                if (routeSet.getTargetStates().size() >= options.getNumItineraries())
+                long elapsed = System.currentTimeMillis() - searchBeginTime;
+                if (elapsed > multiPathTimeout && multiPathTimeout > 0
+                        && search.getTargetStates().size() > 0)
                     break RETRY;
-            }
-            if (routeSet.getTargetStates().size() > 0)
-                break RETRY;
 
+                if (search.getTargetStates().size() >= options.getNumItineraries()) {
+                    int oldBest = bestElapsedTime;
+                    for (RaptorState state : search.getTargetStates()) {
+                        final int elapsedTime = (int) Math
+                                .abs(state.arrivalTime - options.dateTime);
+                        if (elapsedTime < bestElapsedTime) {
+                            bestElapsedTime = elapsedTime;
+                        }
+                    }
+                    int improvement = oldBest - bestElapsedTime;
+                    if (improvement < 600)
+                        break RETRY;
+                }
+
+            }
             options.setMaxWalkDistance(options.getMaxWalkDistance() * 2);
-            routeSet.bounder = new TargetBound(options);
+            search.bounder = new TargetBound(options);
+            break RETRY;
         } while (options.getMaxWalkDistance() < initialWalk * MAX_WALK_MULTIPLE && initialWalk < Double.MAX_VALUE);
 
-        if (routeSet.getTargetStates().isEmpty()) {
+        List<RaptorState> targetStates = search.getTargetStates();
+        if (targetStates.isEmpty()) {
             log.info("RAPTOR found no paths (try retrying?)");
         }
+        Collections.sort(targetStates);
 
         List<GraphPath> paths = new ArrayList<GraphPath>();
-        for (RaptorState targetState : routeSet.getTargetStates()) {
+        for (RaptorState targetState : targetStates) {
             // reconstruct path
             ArrayList<RaptorState> states = new ArrayList<RaptorState>();
             RaptorState cur = targetState;

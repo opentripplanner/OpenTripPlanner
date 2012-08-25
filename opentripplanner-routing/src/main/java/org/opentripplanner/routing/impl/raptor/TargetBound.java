@@ -45,6 +45,8 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
 
     private static final long WORST_TIME_DIFFERENCE = 3600;
 
+    private static final double WORST_WEIGHT_DIFFERENCE_FACTOR = 1.3;
+
     List<State> bounders;
 
     private Vertex realTarget;
@@ -138,7 +140,6 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
     @Override
     public boolean shouldSkipTraversalResult(Vertex origin, Vertex target, State parent,
             State current, ShortestPathTree spt, RoutingRequest traverseOptions) {
-
         final Vertex vertex = current.getVertex();
         int vertexIndex = vertex.getIndex();
         if (vertexIndex < distance.length) {
@@ -181,8 +182,9 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
 
         final double optimisticDistance = current.getWalkDistance() + minWalk;
         
-        minTime += (targetDistance - minWalk) / Raptor.MAX_TRANSIT_SPEED + minWalk
+        final double walkTime = minWalk
                 / speedUpperBound;
+        minTime += (targetDistance - minWalk) / Raptor.MAX_TRANSIT_SPEED + walkTime;
         
         double stateTime = current.getElapsedTime() + minTime;
 
@@ -190,7 +192,10 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
         boolean prevBounded = !bounders.isEmpty();
         for (State bounder : bounders) {
             int prevTime = previousArrivalTime.get(i++);
-            
+
+            if (current.getWeight() + minTime + walkTime * (options.getWalkReluctance() - 1) > bounder.getWeight() * WORST_WEIGHT_DIFFERENCE_FACTOR) {
+                return true;
+            }
             if (optimisticDistance * 1.1 > bounder.getWalkDistance()
                     && current.getNumBoardings() >= bounder.getNumBoardings()) {
                 if (current.getElapsedTime() + minTime > bounder.getElapsedTime()) {

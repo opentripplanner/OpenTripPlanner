@@ -166,6 +166,7 @@ public class RaptorSearch {
                         newState.arrivalTime = (int) sd.time(boardTime);
                         // add in slack
                         newState.arrivalTime -= options.getBoardSlack();
+                        newState.weight += newState.parent.arrivalTime - newState.arrivalTime;
                     } else {
                         if (!route.boards[0][boardState.patternIndex].getPattern()
                                 .canAlight(stopNo))
@@ -174,8 +175,11 @@ public class RaptorSearch {
                         newState.arrivalTime = (int) sd.time(alightTime);
                         // add in slack
                         newState.arrivalTime += options.getAlightSlack();
+                        newState.weight += newState.arrivalTime - newState.parent.arrivalTime;
                     }
 
+                    //TODO: consider transfer penalties
+                    newState.weight += boardState.weight;
                     newState.boardStop = boardState.boardStop;
                     newState.boardStopSequence = boardState.boardStopSequence;
                     newState.route = route;
@@ -204,6 +208,7 @@ public class RaptorSearch {
                             it.remove();
                         }
                     }
+
                     it = newStates.iterator();
                     while (it.hasNext()) {
                         RaptorState oldState = it.next();
@@ -245,6 +250,7 @@ public class RaptorSearch {
                             continue;
 
                         RaptorState boardState = new RaptorState(oldState);
+                        boardState.weight = options.getBoardCost(route.mode);
                         boardState.nBoardings = nBoardings;
                         boardState.boardStop = stop;
                         boardState.boardStopSequence = stopNo;
@@ -255,11 +261,18 @@ public class RaptorSearch {
                         boardState.route = route;
                         boardState.walkDistance = oldState.walkDistance;
 
+                        for (RaptorState state : boardStates) {
+                            if (state.eDominates(boardState)) {
+                                continue TRYBOARD;
+                            }
+                        }
+
                         for (RaptorState state : newStates) {
                             if (state.eDominates(boardState)) {
                                 continue TRYBOARD;
                             }
                         }
+
                         boardStates.add(boardState);
                     }
                 }
@@ -354,8 +367,7 @@ public class RaptorSearch {
                 dijkstraState.setTime(state.arrivalTime);
                 dijkstraState.setExtension("raptorParent", state);
                 dijkstraState.setOptions(walkOptions);
-                dijkstraState.incrementWeight(options.arriveBy ? 
-                        (options.dateTime - state.arrivalTime) : (state.arrivalTime - options.dateTime));
+                dijkstraState.incrementWeight(state.weight);
                 MaxWalkState newState = (MaxWalkState) dijkstraState.makeState();
                 startPoints.add(newState);
             }
@@ -392,12 +404,16 @@ public class RaptorSearch {
                 } else {
                     state = new RaptorState(options.arriveBy);
                 }
+                state.weight = targetState.getWeight();
                 state.walkDistance = targetState.getWalkDistance();
                 state.arrivalTime = (int) targetState.getTime();
                 state.walkPath = targetState;
-                for (RaptorState oldState : getTargetStates()) {
+                for (Iterator<RaptorState> it = getTargetStates().iterator(); it.hasNext();) {
+                    RaptorState oldState = it.next();
                     if (oldState.eDominates(state)) {
                         continue TARGET;
+                    } else if (state.eDominates(oldState)) {
+                        it.remove();
                     }
                 }
                 addTargetState(state);
@@ -416,7 +432,6 @@ public class RaptorSearch {
                 // we have found a stop is totally unused, so skip it
                 continue;
             }
-
 
             double minWalk = distanceToNearestTransitStop;
 
@@ -464,6 +479,7 @@ public class RaptorSearch {
                 //this only happens in round 0
                 newState = new RaptorState(options.arriveBy);
             }
+            newState.weight = state.getWeight();
             newState.nBoardings = nBoardings;
             newState.walkDistance = state.getWalkDistance();
             newState.arrivalTime = (int) state.getTime();
@@ -496,7 +512,7 @@ public class RaptorSearch {
         public <T> OTPPriorityQueue<T> create(int maxSize) {
             BinHeap heap = new BinHeap<T>();
             for (State state : startPoints) {
-                heap.insert(state, 0);
+                heap.insert(state, state.getWeight());
             }
             return heap;
         }
