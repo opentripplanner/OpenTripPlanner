@@ -3,6 +3,7 @@ package org.opentripplanner.graph_builder.impl.raptor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -48,6 +49,7 @@ import org.opentripplanner.routing.transit_index.RouteSegment;
 import org.opentripplanner.routing.transit_index.RouteVariant;
 import org.opentripplanner.routing.vertextype.OnboardVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -168,9 +170,17 @@ public class RaptorDataBuilder implements GraphBuilder {
 
         MaxTransitRegions regions = new MaxTransitRegions();
 
+        //mapping of stops to routes served
+        HashMap<Vertex, List<RaptorRoute>> routesForVertex = new HashMap<Vertex, List<RaptorRoute>>();
+        for (RaptorRoute route : data.routes) {
+            for (RaptorStop stop : route.stops) {
+                MapUtils.addToMapList(routesForVertex, stop.stopVertex, route);
+            }
+        }
+
         // compute stop-to-stop walk times
         HashMap<Vertex, T2<Integer, Double>>[] stopToStopWalkTimes = computeStopToStopWalkTimes(
-                vertices, MIN_SPEED, MAX_DISTANCE);
+                vertices, MIN_SPEED, MAX_DISTANCE, routesForVertex );
         regions.minSpeed = MIN_SPEED;
         regions.maxDistance = MAX_DISTANCE;
 
@@ -232,7 +242,8 @@ public class RaptorDataBuilder implements GraphBuilder {
     }
 
     private HashMap<Vertex, T2<Integer, Double>>[] computeStopToStopWalkTimes(
-            ArrayList<Vertex> vertices, double minSpeed, double maxDistance) {
+            ArrayList<Vertex> vertices, double minSpeed, double maxDistance,
+            HashMap<Vertex, List<RaptorRoute>> routesForVertex) {
         log.debug("Finding stop-to-stop walk times");
         @SuppressWarnings("unchecked")
         HashMap<Vertex, T2<Integer, Double>>[] times = new HashMap[AbstractVertex.getMaxIndex()];
@@ -242,6 +253,8 @@ public class RaptorDataBuilder implements GraphBuilder {
         walkOptions.setMaxWalkDistance(maxDistance);
         GenericDijkstra dijkstra = new GenericDijkstra(walkOptions);
         for (Vertex destination : vertices) {
+            List<RaptorRoute> destinationRoutes = routesForVertex.get(destination);
+
             final HashMap<Vertex, T2<Integer, Double>> timesByDestination = new HashMap<Vertex, T2<Integer, Double>>();
             times[destination.getIndex()] = timesByDestination;
             State initialState = new MaxWalkState(destination, walkOptions);
@@ -249,6 +262,14 @@ public class RaptorDataBuilder implements GraphBuilder {
             for (State state : spt.getAllStates()) {
                 Vertex vertex = state.getVertex();
                 if (vertex instanceof TransitStop) {
+                    final List<RaptorRoute> vertexRoutes = routesForVertex.get(vertex);
+                    if (vertexRoutes == null) {
+                        //this stop is not visited by any routes.
+                        continue;
+                    }
+                    if (isSubsetOf(vertexRoutes, destinationRoutes))
+                        continue;
+
                     T2<Integer, Double> timeAndDistance = new T2<Integer, Double>(
                             (int) state.getElapsedTime(), state.getWalkDistance());
                     timesByDestination.put(vertex, timeAndDistance);
@@ -257,6 +278,17 @@ public class RaptorDataBuilder implements GraphBuilder {
         }
 
         return times;
+    }
+
+    private static <T> boolean isSubsetOf(Collection<T> c1, Collection<T> c2) {
+
+        for (T a : c1) {
+            if (!c2.contains(a)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     class RouteAlight {
@@ -281,7 +313,7 @@ public class RaptorDataBuilder implements GraphBuilder {
             visitedLastRound.add(v);
         }
 
-        for (int round = 0; round < 7; ++round) {
+        for (int round = 0; round < MAX_TRANSFERS; ++round) {
             log.debug("round " + round + " from " + visitedLastRound.size());
             HashSet<Vertex> visitedThisRound = new HashSet<Vertex>();
             // transit phase
