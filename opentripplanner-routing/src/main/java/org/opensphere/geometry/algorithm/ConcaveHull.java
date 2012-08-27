@@ -292,12 +292,14 @@ public class ConcaveHull {
 			Edge edgeA = this.edges.get(this.segments.get(sA));
 			Edge edgeB = this.edges.get(this.segments.get(sB));
 			Edge edgeC = this.edges.get(this.segments.get(sC));
+			if (edgeA == null || edgeB == null || edgeC == null) 
+			    continue;
 
 			Triangle triangle = new Triangle(i, qet.isBorder()?true:false);
 			triangle.addEdge(edgeA);
 			triangle.addEdge(edgeB);
 			triangle.addEdge(edgeC);
-			
+
 			edgeA.addTriangle(triangle);
 			edgeB.addTriangle(triangle);
 			edgeC.addTriangle(triangle);
@@ -308,7 +310,7 @@ public class ConcaveHull {
 
 		// add triangle neighbourood
 		for (Edge edge : this.edges.values()) {
-			if (edge.getTriangles().size() != 1) {
+			if (edge.getTriangles().size() > 1) {
 				Triangle tA = edge.getTriangles().get(0);
 				Triangle tB = edge.getTriangles().get(1);
 				tA.addNeighbour(tB);
