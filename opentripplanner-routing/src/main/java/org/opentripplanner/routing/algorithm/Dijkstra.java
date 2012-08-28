@@ -18,7 +18,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.opentripplanner.common.pqueue.BinHeap;
-import org.opentripplanner.routing.contraction.ContractionHierarchy;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;

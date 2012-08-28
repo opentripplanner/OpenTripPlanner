@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.opentripplanner.graph_builder.services.GraphBuilder;
-import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
@@ -133,12 +132,7 @@ public class GraphBuilderTask implements Runnable {
         HashMap<Class<?>, Object> extra = new HashMap<Class<?>, Object>();
         for (GraphBuilder load : _graphBuilders)
             load.buildGraph(graph, extra);
-        
-        if (_modeList != null) {
-            ContractionHierarchySet chs = new ContractionHierarchySet(graph, _modeList, _contractionFactor);
-            chs.build();
-            graph.setHierarchies(chs);
-        }
+
         GraphBuilderAnnotation.logSummary(graph.getBuilderAnnotations());
         try {
             graph.save(graphFile);

@@ -13,7 +13,9 @@
 
 package org.opentripplanner.routing.core;
 
-import org.opentripplanner.routing.vertextype.TurnVertex;
+import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
@@ -21,27 +23,30 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 
 import junit.framework.TestCase;
 
-public class TestStreetVertex extends TestCase {
+public class TestTurns extends TestCase {
 
     public void testIntersectionVertex() {
 
         GeometryFactory gf = new GeometryFactory();
 
         LineString geometry = gf.createLineString(new Coordinate[] {
-                new Coordinate(-10, 0),
+                new Coordinate(-0.10, 0),
                 new Coordinate(0, 0)
                 });
 
-        TurnVertex leftV = new TurnVertex(null, "morx", geometry, "morx", 10.0, true, null);
+        IntersectionVertex v1 = new IntersectionVertex(null, "v1", -0.10, 0);
+        IntersectionVertex v2 = new IntersectionVertex(null, "v2", 0, 0);
+        
+        PlainStreetEdge leftEdge = new PlainStreetEdge(v1, v2, geometry, "morx", 10.0, StreetTraversalPermission.ALL, true);
 
         LineString geometry2 = gf.createLineString(new Coordinate[] {
                 new Coordinate(0, 0),
-                new Coordinate(-10, 0)
+                new Coordinate(-0.10, 0)
                 });
 
-        TurnVertex rightV = new TurnVertex(null, "fleem", geometry2, "fleem", 10.0, false, null);
+        PlainStreetEdge rightEdge = new PlainStreetEdge(v1, v2, geometry2, "fleem", 10.0, StreetTraversalPermission.ALL, false);
 
-        assertEquals(180, Math.abs(leftV.outAngle - rightV.outAngle));
+        assertEquals(180, Math.abs(leftEdge.outAngle - rightEdge.outAngle));
 
     }
 

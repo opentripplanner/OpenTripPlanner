@@ -634,5 +634,9 @@ public class TableTripPattern implements TripPattern, Serializable {
         }
                 
     } // END Class Timetable
+
+    public Iterator<Integer> getScheduledDepartureTimes(int stopIndex) {
+        return scheduledTimetable.getDepartureTimes(stopIndex);
+    }
     
 }

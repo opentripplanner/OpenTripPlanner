@@ -21,8 +21,6 @@ import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
-import org.opentripplanner.routing.edgetype.TinyTurnEdge;
-import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl.CandidateEdgeBundle;
@@ -342,15 +340,8 @@ public class LinkRequest {
             }
             if (e instanceof StreetEdge)
                 forwardEdge = (StreetEdge) e;
-            if (e instanceof TurnEdge) {
-                final TurnEdge turnEdge = (TurnEdge) e;
-                TinyTurnEdge newTurn = new TinyTurnEdge(newEnd, toVertex, turnEdge);
-                addEdges(newTurn);
-                newTurn.setRestrictedModes(turnEdge.getRestrictedModes());
-                newTurn.setTurnCost(turnEdge.turnCost);
-            } else {
-                addEdges(new FreeEdge(newEnd, toVertex));
-            }
+
+            addEdges(new FreeEdge(newEnd, toVertex));
         }
 
         /* and likewise for start */
@@ -365,15 +356,8 @@ public class LinkRequest {
             }
             if (e instanceof StreetEdge)
                 backwardEdge = (StreetEdge) e;
-            if (e instanceof TurnEdge) {
-                final TurnEdge turnEdge = (TurnEdge) e;
-                TinyTurnEdge newTurn = new TinyTurnEdge(newStart, toVertex, turnEdge);
-                addEdges(newTurn);
-                newTurn.setRestrictedModes(turnEdge.getRestrictedModes());
-                newTurn.setTurnCost(turnEdge.turnCost);
-            } else {
-                addEdges(new FreeEdge(newStart, toVertex));
-            }
+
+            addEdges(new FreeEdge(newStart, toVertex));
         }
 
         /* create a pair of PlainStreetEdges equivalent to the bundle of original (turn)edges */

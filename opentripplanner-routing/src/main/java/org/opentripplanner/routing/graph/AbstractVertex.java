@@ -25,10 +25,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.opentripplanner.common.MavenVersion;
-import org.opentripplanner.routing.edgetype.OutEdge;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -262,7 +259,7 @@ public abstract class AbstractVertex implements Vertex {
     public List<Edge> getOutgoingStreetEdges() {
         List<Edge> result = new ArrayList<Edge>();
         for (Edge out : this.getOutgoing()) {
-            if (!(out instanceof TurnEdge || out instanceof OutEdge || out instanceof PlainStreetEdge)) {
+            if (!(out instanceof StreetEdge)) {
                 continue;
             }
             result.add((StreetEdge) out);

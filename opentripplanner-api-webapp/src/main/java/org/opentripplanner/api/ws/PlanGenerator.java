@@ -48,7 +48,6 @@ import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
-import org.opentripplanner.routing.edgetype.TinyTurnEdge;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
@@ -732,15 +731,9 @@ public class PlanGenerator {
                     // to see if we should generate a "left to continue" instruction.
                     boolean shouldGenerateContinue = false;
                     if (edge instanceof PlainStreetEdge) {
-                        // the next edges will be TinyTurnEdges or PlainStreetEdges, we hope
+                        // the next edges will be PlainStreetEdges, we hope
                         double angleDiff = getAbsoluteAngleDiff(thisAngle, lastAngle);
                         for (Edge alternative : backState.getVertex().getOutgoingStreetEdges()) {
-                            if (alternative instanceof TinyTurnEdge) {
-                                // a tiny turn edge has no geometry, but the next
-                                // edge will be a TurnEdge or PSE and will have direction
-                                alternative = alternative.getToVertex().getOutgoingStreetEdges()
-                                        .get(0);
-                            }
                             if (alternative.getName().equals(streetName)) {
                                 // alternatives that have the same name
                                 // are usually caused by street splits
@@ -754,8 +747,6 @@ public class PlanGenerator {
                                 break;
                             }
                         }
-                    } else if (edge instanceof TinyTurnEdge) {
-                        // do nothing as this will be handled in other cases
                     } else {
                         double angleDiff = getAbsoluteAngleDiff(lastAngle, thisAngle);
                         // in the case of a turn edge, we actually have to go back two steps to see

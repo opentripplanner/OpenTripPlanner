@@ -60,22 +60,20 @@ import javax.swing.event.ListSelectionListener;
 
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.algorithm.GenericAStar;
+import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
-import org.opentripplanner.routing.edgetype.TransitBoardAlight;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
-import org.opentripplanner.routing.edgetype.TurnEdge;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
 import org.opentripplanner.routing.impl.GraphServiceImpl;
-import org.opentripplanner.routing.services.SPTService;
+import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
 
@@ -147,7 +145,7 @@ class TripPatternListModel extends AbstractListModel {
     ArrayList<String> departureTimes = new ArrayList<String>();
 
     public TripPatternListModel(TableTripPattern pattern, int stopIndex) {
-    	Iterator<Integer> departureTimeIterator = pattern.getDepartureTimes(stopIndex);
+    	Iterator<Integer> departureTimeIterator = pattern.getScheduledDepartureTimes(stopIndex);
     	while (departureTimeIterator.hasNext()) {
     	    int dt = departureTimeIterator.next();
 
@@ -430,21 +428,21 @@ public class VizGui extends JFrame implements VertexSelectionListener {
                 showGraph.highlightEdge(selected);
 
                 /* for turns, highlight the outgoing street's ends */
-                if (selected instanceof TurnEdge || selected instanceof PlainStreetEdge) {
+                if (selected instanceof StreetEdge) {
                     List<Vertex> vertices = new ArrayList<Vertex>();
                     List<Edge> edges = new ArrayList<Edge>();
                     Vertex tov = selected.getToVertex();
                     for (Edge og : tov.getOutgoing()) {
-                    	if (og instanceof TurnEdge || og instanceof PlainStreetEdge) {
-                    		edges.add(og);
-                            vertices.add (og.getToVertex());
-                            break;
+                    	if (og instanceof StreetEdge) {
+                    	    edges.add(og);
+                    	    vertices.add (og.getToVertex());
+                    	    break;
                         }
                     }
                     Vertex fromv = selected.getFromVertex();
                     for (Edge ic : fromv.getIncoming()) {
-                        if (ic instanceof TurnEdge || ic instanceof PlainStreetEdge) {
-                    		edges.add(ic);
+                        if (ic instanceof StreetEdge) {
+                            edges.add(ic);
                             vertices.add (ic.getFromVertex());
                             break;
                         }

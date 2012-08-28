@@ -34,14 +34,12 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.TransitStop;
-import org.opentripplanner.routing.vertextype.TurnVertex;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.PatternEdge;
-import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 
@@ -282,14 +280,11 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         visibleStreetEdges.clear();
         visibleTransitEdges.clear();
         for (Edge de : (Iterable<Edge>) edgeIndex.query(modelBounds)) {
-        	if (de instanceof PatternEdge ||
-        		de instanceof StreetTransitLink) {
-        		visibleTransitEdges.add(de);
-        	} else if (de instanceof TurnEdge) {
-        		visibleStreetEdges.add(de);
-        	} else if (de instanceof StreetEdge) {
-        		visibleStreetEdges.add(de);
-        	}
+            if (de instanceof PatternEdge || de instanceof StreetTransitLink) {
+                visibleTransitEdges.add(de);
+            } else if (de instanceof StreetEdge) {
+                visibleStreetEdges.add(de);
+            }
         }
     }
     
@@ -395,16 +390,6 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     private void drawVertex(Vertex v, double r) {
         noStroke();
         ellipse(toScreenX(v.getX()), toScreenY(v.getY()), r, r);
-        if (v instanceof TurnVertex) {
-            Coordinate[] coords = ((TurnVertex) v).getGeometry().getCoordinates();
-            Coordinate c0 = coords[0];
-            Coordinate c1 = coords[coords.length - 1];
-            stroke(255, 255, 50, 127);
-            strokeWeight(3);
-            line((float) toScreenX(c0.x), (float) toScreenY(c0.y), 
-                 (float) toScreenX(c1.x), (float) toScreenY(c1.y));
-            noStroke();
-        }
     }
 
     public synchronized void draw() {

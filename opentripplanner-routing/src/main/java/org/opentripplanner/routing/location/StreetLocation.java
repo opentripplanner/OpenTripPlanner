@@ -14,23 +14,18 @@
 package org.opentripplanner.routing.location;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.TurnEdge;
-import org.opentripplanner.routing.graph.AbstractVertex;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TurnVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -43,7 +38,7 @@ import com.vividsolutions.jts.linearref.LocationIndexedLine;
  * the first and last segments of a trip, for trips that start or end between two intersections.
  * Also for situating bus stops in the middle of street segments.
  */
-public class StreetLocation extends AbstractVertex {
+public class StreetLocation extends StreetVertex {
 
     private static DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
@@ -65,21 +60,16 @@ public class StreetLocation extends AbstractVertex {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Creates a StreetLocation on the given street (set of turns). How far along is controlled by
+     * Creates a StreetLocation on the given street (set of PlainStreetEdges). How far along is controlled by
      * the location parameter, which represents a distance along the edge between 0 (the from
      * vertex) and 1 (the to vertex).
      * 
-     * This is a little bit complicated, because TurnEdges get most of their data from
-     * their fromVertex. So we have to create a separate fromVertex located at the start of the set
-     * of turns, with a free edge into it from the from vertex.
      * @param graph 
      * 
      * @param label
      * @param name
      * @param edges
-     *            A collection of nearby edges, which probably represent one street but might represent a
-     *            more complicated situation (imagine a bus stop at the asterisk: *_||). These are
-     *            ordered by ascending distance from nearestPoint
+     *            A collection of nearby edges, which represent one street.
      * @param nearestPoint
      * 
      * @return the new StreetLocation
@@ -93,44 +83,29 @@ public class StreetLocation extends AbstractVertex {
         StreetLocation location = new StreetLocation(graph, label, nearestPoint, name);
 
         location.setDistanceToNearestTransitStop(Double.MAX_VALUE);
-        HashMap<Geometry, P2<TurnVertex>> cache = new HashMap<Geometry, P2<TurnVertex>>();
         for (StreetEdge street : edges) {
             /* TODO: need to check for crossing uncrossable streets (in 
              * previous elements of edges) */
 
             Vertex fromv = street.getFromVertex();
             Vertex tov = street.getToVertex();
-            if (street instanceof PlainStreetEdge) {
-                wheelchairAccessible |= ((PlainStreetEdge) street).isWheelchairAccessible();
-            } else {
-                wheelchairAccessible |= ((TurnVertex) fromv).isWheelchairAccessible();
-            }
-            boolean seen = cache.containsKey(street.getGeometry());
+            wheelchairAccessible |= ((StreetEdge) street).isWheelchairAccessible();
             /* forward edges and vertices */
             Vertex edgeLocation;
-            if (distanceLibrary .distance(nearestPoint, fromv.getCoordinate()) < 0.0001) {
+            if (distanceLibrary.distance(nearestPoint, fromv.getCoordinate()) < 0.0001) {
                 edgeLocation = fromv;
             } else if (distanceLibrary.distance(nearestPoint, tov.getCoordinate()) < 0.0001) {
                 edgeLocation = tov;
+                new FreeEdge(location, edgeLocation);
+                new FreeEdge(edgeLocation, location);
             } else {
-                edgeLocation = createHalfLocation(graph, location, label + " to "
-                        + tov.getLabel(), name, nearestPoint, street, cache);
-            }
-
-            if (!seen) {
-                FreeEdge l1in = new FreeEdge(location, edgeLocation);
-                FreeEdge l1out = new FreeEdge(edgeLocation, location);
-
-                location.extra.add(l1in);
-                location.extra.add(l1out);
-            }
-            
-            double distance = fromv.getDistanceToNearestTransitStop();
-            if (distance < location.getDistanceToNearestTransitStop()) {
-                location.setDistanceToNearestTransitStop(distance);
+                edgeLocation = location;
+                createHalfLocation(graph, location, label + " to "
+                        + tov.getLabel(), name, nearestPoint, street);
+                double distanceToNearestTransitStop = Math.min(tov.getDistanceToNearestTransitStop(), fromv.getDistanceToNearestTransitStop());
+                edgeLocation.setDistanceToNearestTransitStop(distanceToNearestTransitStop);
             }
         }
-
         location.setWheelchairAccessible(wheelchairAccessible);
         location.setSourceEdges(edges);
         return location;
@@ -148,66 +123,38 @@ public class StreetLocation extends AbstractVertex {
         return edges;
     }
 
-    private static TurnVertex createHalfLocation(Graph graph, StreetLocation base, String label,
-            String name, Coordinate nearestPoint, Edge edge, HashMap<Geometry, P2<TurnVertex>> cache) {
+    private static void createHalfLocation(Graph graph, StreetLocation base, String label,
+            String name, Coordinate nearestPoint, StreetEdge street) {
 
-        StreetEdge street = (StreetEdge) edge;
-        Vertex fromv = street.getFromVertex();
-        TurnVertex newFrom, location;
+        StreetVertex tov = (StreetVertex) street.getToVertex();
+        StreetVertex fromv = (StreetVertex) street.getFromVertex();
         Geometry geometry = street.getGeometry();
-        double distanceToNearestTransitStop = Math.min(edge.getToVertex().getDistanceToNearestTransitStop(), edge.getFromVertex().getDistanceToNearestTransitStop());
-        if (cache.containsKey (geometry)) {
-            P2<TurnVertex> cached = cache.get(geometry);
-            location = cached.getSecond();
-        } else {
-            P2<LineString> geometries = getGeometry(street, nearestPoint);
-
-            double totalGeomLength = geometry.getLength();
-            double lengthRatioIn = geometries.getFirst().getLength() / totalGeomLength;
-
-            double lengthIn = street.getLength() * lengthRatioIn;
-            double lengthOut = street.getLength() * (1 - lengthRatioIn);
-
-            newFrom = new TurnVertex(null, label + " (vertex going in to splitter)", geometries.getFirst(), street.getName(),
-                    lengthIn, false, street.getNotes());
-            newFrom.setDistanceToNearestTransitStop(distanceToNearestTransitStop);
-            newFrom.setElevationProfile(street.getElevationProfile(0, lengthIn), false);
-            newFrom.setPermission(street.getPermission());
-            newFrom.setNoThruTraffic(street.isNoThruTraffic());
-            newFrom.setStreetClass(street.getStreetClass());
-            newFrom.setWheelchairNotes(street.getWheelchairNotes());
-
-            location = new TurnVertex(null, label + " (vertex at splitter)", geometries.getSecond(), street.getName(), lengthOut,
-                    false, street.getNotes());
-            location.setElevationProfile(street.getElevationProfile(lengthIn, lengthIn + lengthOut), false);
-            location.setPermission(street.getPermission());
-            location.setStreetClass(street.getStreetClass());
-            location.setNoThruTraffic(street.isNoThruTraffic());
-            location.setDistanceToNearestTransitStop(distanceToNearestTransitStop);
-            location.setWheelchairNotes(street.getWheelchairNotes());
-            
-            cache.put(geometry, new P2<TurnVertex>(newFrom, location));
-
-            FreeEdge free = new FreeEdge(fromv, newFrom);
-            TurnEdge incoming = new TurnEdge(newFrom, location);
-            base.extra.add(free);
-            base.extra.add(incoming);
-
-        }
-        Vertex tov = street.getToVertex();
-        StreetEdge e;
-        if (tov instanceof TurnVertex) {
-            e = new TurnEdge(location, (TurnVertex) tov);
-            if (edge instanceof TurnEdge) {
-                ((TurnEdge)e).setRestrictedModes(((TurnEdge) edge).getRestrictedModes());
-            }
-        } else {
-            OutEdge outEdge = new OutEdge(location, (StreetVertex) tov);
-            e = outEdge;
-        }
-        base.extra.add(e);
         
-        return location;
+        P2<LineString> geometries = getGeometry(street, nearestPoint);
+
+        double totalGeomLength = geometry.getLength();
+        double lengthRatioIn = geometries.getFirst().getLength() / totalGeomLength;
+
+        double lengthIn = street.getLength() * lengthRatioIn;
+        double lengthOut = street.getLength() * (1 - lengthRatioIn);
+
+        PlainStreetEdge newLeft = new PlainStreetEdge(fromv, base, geometries.getFirst(), name, lengthIn, street.getPermission(), false);
+        PlainStreetEdge newRight = new PlainStreetEdge(base, tov, geometries.getSecond(), name, lengthOut, street.getPermission(), false);
+
+        newLeft.setElevationProfile(street.getElevationProfile(0, lengthIn), false);
+        newLeft.setNoThruTraffic(street.isNoThruTraffic());
+        newLeft.setStreetClass(street.getStreetClass());
+        newLeft.setWheelchairNote(street.getWheelchairNotes());
+        newLeft.setNote(street.getNotes());
+
+        newRight.setElevationProfile(street.getElevationProfile(lengthIn, lengthIn + lengthOut), false);
+        newRight.setStreetClass(street.getStreetClass());
+        newRight.setNoThruTraffic(street.isNoThruTraffic());
+        newRight.setWheelchairNote(street.getWheelchairNotes());
+        newRight.setNote(street.getNotes());
+
+        base.extra.add(newLeft);
+        base.extra.add(newRight);
     }
 
     private static P2<LineString> getGeometry(StreetEdge e, Coordinate nearestPoint) {
@@ -264,7 +211,7 @@ public class StreetLocation extends AbstractVertex {
     public void addExtraEdgeTo(Vertex target) {
         extra.add(new FreeEdge(this, target));
         extra.add(new FreeEdge(target, this));
-    }	
+    }
 
     @Override public int removeTemporaryEdges() {
         int nRemoved = 0;

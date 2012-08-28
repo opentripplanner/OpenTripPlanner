@@ -6,10 +6,11 @@ import javax.annotation.PostConstruct;
 
 import org.opentripplanner.analyst.core.Sample;
 import org.opentripplanner.analyst.core.SampleSource;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.GraphService;
-import org.opentripplanner.routing.vertextype.TurnVertex;
+import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.geometry.HashGrid;
 import org.opentripplanner.common.geometry.HashGrid.RasterizedSegment;
@@ -33,8 +34,10 @@ public class HashGridSampler implements SampleSource {
         index = new HashGrid(50, 2000, 2000);
         Graph graph = graphService.getGraph();
         LOG.debug("Rasterizing streets into index...");
-        for (TurnVertex tv : IterableLibrary.filter(graph.getVertices(), TurnVertex.class)) {
-            index.rasterize(tv.getGeometry(), tv);
+        for (StreetVertex vertex : IterableLibrary.filter(graph.getVertices(), StreetVertex.class)) {
+            for (Edge e: vertex.getOutgoing()) {
+                index.rasterize(e.getGeometry(), e);
+            }
         }
         LOG.debug("Done rasterizing streets into index.");
         //System.out.println(index.densityMap());

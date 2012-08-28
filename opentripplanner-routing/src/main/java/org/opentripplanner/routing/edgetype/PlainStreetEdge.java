@@ -30,11 +30,9 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.util.ElevationProfileSegment;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TurnVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
@@ -49,6 +47,8 @@ import com.vividsolutions.jts.geom.LineString;
 public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
     private static final long serialVersionUID = 1L;
+
+    private static final double GREENWAY_SAFETY_FACTOR = 0.1;
 
     private ElevationProfileSegment elevationProfileSegment;
 
@@ -222,7 +222,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
                 break;
             case GREENWAYS:
                 weight = elevationProfileSegment.getBicycleSafetyEffectiveLength() / speed;
-                if (elevationProfileSegment.getBicycleSafetyEffectiveLength() / length <= TurnVertex.GREENWAY_SAFETY_FACTOR) {
+                if (elevationProfileSegment.getBicycleSafetyEffectiveLength() / length <= GREENWAY_SAFETY_FACTOR) {
                     // greenways are treated as even safer than they really are
                     weight *= 0.66;
                 }
@@ -462,21 +462,6 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
     public Set<Alert> getWheelchairNotes() {
         return wheelchairNotes;
-    }
-
-    public TurnVertex createTurnVertex(Graph graph) {
-        String id = getId();
-        TurnVertex tv = new TurnVertex(graph, id, getGeometry(), getName(),
-                elevationProfileSegment, back, getNotes());
-        tv.setWheelchairNotes(getWheelchairNotes());
-        tv.setWheelchairAccessible(isWheelchairAccessible());
-        tv.setStreetClass(streetClass);
-        tv.setPermission(getPermission());
-        tv.setRoundabout(isRoundabout());
-        tv.setBogusName(hasBogusName());
-        tv.setNoThruTraffic(isNoThruTraffic());
-        tv.setStairs(isStairs());
-        return tv;
     }
 
     public int getStreetClass() {

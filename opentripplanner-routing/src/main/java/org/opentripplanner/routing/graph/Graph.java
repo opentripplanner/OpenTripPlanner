@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -47,7 +46,6 @@ import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.model.GraphBundle;
-import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
 import org.opentripplanner.routing.core.TransferTable;
@@ -86,8 +84,6 @@ public class Graph implements Serializable {
 
     /* vertex index by name is reconstructed from edges */
     private transient Map<String, Vertex> vertices;
-
-    private transient ContractionHierarchySet hierarchies;
     
     private transient CalendarService calendarService;
     
@@ -311,18 +307,10 @@ public class Graph implements Serializable {
     	return this.graphBuilderAnnotations;
     }
 
-    public void setHierarchies(ContractionHierarchySet chs) {
-        this.hierarchies = chs;
-    }
-
-    public ContractionHierarchySet getHierarchies() {
-        return hierarchies;
-    }
-
     /* (de) serialization */
     
     public enum LoadLevel {
-        BASIC, FULL, NO_HIERARCHIES, DEBUG;
+        BASIC, FULL, DEBUG;
     }
     
     public static Graph load(File file, LoadLevel level) throws IOException, ClassNotFoundException {
@@ -370,11 +358,6 @@ public class Graph implements Serializable {
             LOG.info("Main graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
             graph.streetIndex = new StreetVertexIndexServiceImpl(graph);
             LOG.debug("street index built.");
-            if (level == LoadLevel.NO_HIERARCHIES)
-                return graph;
-            graph.hierarchies = (ContractionHierarchySet) in.readObject();
-            if (graph.hierarchies != null)
-                LOG.debug("Contraction hierarchies read.");
             if (level == LoadLevel.FULL)
                 return graph;
             graph.vertexById = (List<Vertex>) in.readObject();
@@ -453,7 +436,6 @@ public class Graph implements Serializable {
         LOG.debug("Writing edges...");
         out.writeObject(this);
         out.writeObject(edges);
-        out.writeObject(this.hierarchies);
         LOG.debug("Writing debug data...");
         out.writeObject(this.vertexById);
         out.writeObject(this.edgeById);

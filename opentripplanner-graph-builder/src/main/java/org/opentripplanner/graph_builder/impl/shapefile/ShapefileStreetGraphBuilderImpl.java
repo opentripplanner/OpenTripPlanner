@@ -228,9 +228,6 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 }
             }
 
-            /* Generate turns */
-            StreetUtils.makeEdgeBased(graph, intersectionsByLocation.values(), null);
-
             it2.close();
 
         } catch (Exception ex) {

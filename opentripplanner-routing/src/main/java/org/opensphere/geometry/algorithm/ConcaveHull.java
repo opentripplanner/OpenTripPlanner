@@ -355,6 +355,7 @@ public class ConcaveHull {
 						this.lengths.remove(e.getId());
 					} else {
 						// management of triangles
+					        if (neighbours.size() < 1) continue; //not sure this is safe
 						Triangle tA = neighbours.get(0);
 						Triangle tB = neighbours.get(1);
 						tA.setBorder(true); // FIXME not necessarily useful

@@ -20,7 +20,6 @@ import org.opentripplanner.routing.TestHalfEdges;
 import org.opentripplanner.routing.algorithm.TestAStar;
 import org.opentripplanner.routing.algorithm.TestGraphPath;
 import org.opentripplanner.routing.core.TestGraph;
-import org.opentripplanner.routing.edgetype.TestTurnEdge;
 import org.opentripplanner.routing.edgetype.loader.TestPatternHopFactory;
 
 public class AllTests {
@@ -33,7 +32,6 @@ public class AllTests {
         suite.addTestSuite(TestGraphPath.class);
         suite.addTestSuite(TestPatternHopFactory.class);
         suite.addTestSuite(TestHalfEdges.class);
-        suite.addTestSuite(TestTurnEdge.class);
         // $JUnit-END$
         return suite;
     }

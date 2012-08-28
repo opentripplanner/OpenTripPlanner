@@ -5,10 +5,10 @@ import java.util.List;
 import org.opentripplanner.analyst.core.GeometryIndex;
 import org.opentripplanner.analyst.core.Sample;
 import org.opentripplanner.analyst.core.SampleSource;
-import org.opentripplanner.routing.vertextype.TurnVertex;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.routing.graph.Edge;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -51,8 +51,8 @@ public class SampleFactory implements SampleSource {
         Point p = GeometryUtils.getGeometryFactory().createPoint(c);
         
         // track best two turn vertices
-        TurnVertex v0 = null;
-        TurnVertex v1 = null;
+        Edge e0 = null;
+        Edge e1 = null;
         DistanceOp o0 = null;
         DistanceOp o1 = null;
         double d0 = Double.MAX_VALUE;
@@ -62,11 +62,11 @@ public class SampleFactory implements SampleSource {
         Envelope env = new Envelope(c);
         env.expandBy(searchRadiusLon, searchRadiusLat);
         @SuppressWarnings("unchecked")
-        List<TurnVertex> vs = (List<TurnVertex>) index.queryPedestrian(env);
+        List<Edge> edges = (List<Edge>) index.queryPedestrian(env);
         // query always returns a (possibly empty) list, but never null
         
         // find two closest among nearby geometries
-        for (TurnVertex v : vs) {
+        for (Edge v : edges) {
             Geometry g = v.getGeometry();
             DistanceOp o = new DistanceOp(p, g);
             double d = o.distance();
@@ -74,14 +74,14 @@ public class SampleFactory implements SampleSource {
                 continue;
             if (d < d1) {
                 if (d < d0) {
-                    v1 = v0;
+                    e1 = e0;
                     o1 = o0;
                     d1 = d0;
-                    v0 = v;
+                    e0 = v;
                     o0 = o;
                     d0 = d;
                 } else {
-                    v1 = v;
+                    e1 = v;
                     o1 = o;
                     d1 = d;
                 }
@@ -89,27 +89,27 @@ public class SampleFactory implements SampleSource {
         }
         
         // if at least one vertex was found make a sample
-        if (v0 != null) { 
-            int t0 = timeToVertex(v0, o0);
-            int t1 = timeToVertex(v1, o1);
-            Sample s = new Sample(v0, t0, v1, t1);
+        if (e0 != null) { 
+            int t0 = timeToEdge(e0, o0);
+            int t1 = timeToEdge(e1, o1);
+            Sample s = new Sample(e0.getFromVertex(), t0, e0.getToVertex(), t1);
             return s;
         }
         return null;
     }
 
-    private static int timeToVertex(TurnVertex v, DistanceOp o) {
-        if (v == null)
+    private static int timeToEdge(Edge e, DistanceOp o) {
+        if (e == null)
             return -1;
         GeometryLocation[] gl = o.nearestLocations();
-        Geometry g = v.getGeometry();
+        Geometry g = e.getGeometry();
         LocationIndexedLine lil = new LocationIndexedLine(g);
         LinearLocation ll = lil.indexOf(gl[1].getCoordinate());
         LineString beginning = (LineString) 
-                lil.extractLine(lil.getStartIndex(), ll);                    
+                lil.extractLine(lil.getStartIndex(), ll);
         // WRONG: using unprojected coordinates
         double lengthRatio = beginning.getLength() / g.getLength();
-        double distOnStreet = v.getLength() * lengthRatio;
+        double distOnStreet = e.getDistance() * lengthRatio;
         double distToStreet = distanceLibrary .fastDistance(
                 gl[0].getCoordinate(), 
                 gl[1].getCoordinate());
