@@ -22,12 +22,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.codehaus.jettison.json.JSONException;
 import org.opentripplanner.api.model.RouterInfo;
 import org.opentripplanner.api.model.RouterList;
+import org.opentripplanner.api.ws.impl.StoredHullService;
+import org.opentripplanner.api.ws.services.HullService;
 import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.sun.jersey.api.spring.Autowire;
+import com.vividsolutions.jts.geom.Geometry;
 
 @Path("/routers")
 @XmlRootElement
@@ -48,9 +51,18 @@ public class Routers {
             RouterInfo routerInfo = new RouterInfo();
             routerInfo.routerId = id;
             Graph graph = graphService.getGraph();
-            routerInfo.polygon = GraphUtils.makeConcaveHull(graph);
+            HullService service = graph.getService(HullService.class);
+            if (service == null) {
+                //TODO: A concave hull would be better, but unfortunately is extremely slow to compute for
+                //large graphs
+                Geometry hull = GraphUtils.makeBuffer(graph);
+                service = new StoredHullService(hull);
+                graph.putService(HullService.class, service);
+            }
+            routerInfo.polygon = service.getHull();
             routerList.routerInfo.add(routerInfo);
         }
         return routerList;
     }
+
 }
