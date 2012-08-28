@@ -336,7 +336,7 @@ public class RaptorDataBuilder implements GraphBuilder {
                     }
                     for (RouteAlight alight : alightings) {
                         if (proflie.transitTo(alight.destinationProfiel, route, stopNo,
-                                alight.stopNo, serviceDays, startTime)) {
+                                alight.stopNo, serviceDays, startTime, round)) {
                             visitedThisRound.add(stopVertex);
 
                             newlyBoarded.add(proflie);
@@ -373,7 +373,7 @@ public class RaptorDataBuilder implements GraphBuilder {
                         nearbyProfile = new StopProfile(nearbyVertex);
                         stopProfile.put(nearbyVertex, nearbyProfile);
                     }
-                    if (nearbyProfile.walkTo(profile, time, distance)) {
+                    if (nearbyProfile.walkTo(profile, time, distance, round)) {
                         visitedThisRound.add(vertex);
                     }
                 }
