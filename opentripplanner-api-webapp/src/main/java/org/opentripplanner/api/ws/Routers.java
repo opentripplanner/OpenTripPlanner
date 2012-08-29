@@ -47,15 +47,16 @@ public class Routers {
     public RouterList getRouterIds()
             throws JSONException {
         RouterList routerList = new RouterList();
+        graphService.loadAllGraphs();
         for (String id : graphService.getGraphIds()) {
             RouterInfo routerInfo = new RouterInfo();
             routerInfo.routerId = id;
-            Graph graph = graphService.getGraph();
+            Graph graph = graphService.getGraph(id);
             HullService service = graph.getService(HullService.class);
             if (service == null) {
                 //TODO: A concave hull would be better, but unfortunately is extremely slow to compute for
                 //large graphs
-                Geometry hull = GraphUtils.makeBuffer(graph);
+                Geometry hull = GraphUtils.makeConvexHull(graph);
                 service = new StoredHullService(hull);
                 graph.putService(HullService.class, service);
             }

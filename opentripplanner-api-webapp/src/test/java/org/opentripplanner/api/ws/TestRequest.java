@@ -125,6 +125,10 @@ class SimpleGraphServiceImpl implements GraphService {
         graphs.put(graphId, graph);
     }
 
+    @Override
+    public void loadAllGraphs() {
+        //nothing to do
+    }
 }
 
 /* This is a hack to hold context and graph data between test runs, since loading it is slow. */

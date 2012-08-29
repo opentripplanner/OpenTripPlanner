@@ -78,8 +78,9 @@ public class Raptor implements PathService {
     @Override
     public List<GraphPath> getPaths(RoutingRequest options) {
 
+        final Graph graph = graphService.getGraph(options.getRouterId());
         if (options.rctx == null) {
-            options.setRoutingContext(graphService.getGraph(options.getRouterId()));
+            options.setRoutingContext(graph);
             options.rctx.pathParsers = new PathParser[1];
             options.rctx.pathParsers[0] = new BasicPathParser();
         }
@@ -88,7 +89,6 @@ public class Raptor implements PathService {
             return sptService.getShortestPathTree(options).getPaths();
         }
 
-        Graph graph = graphService.getGraph(options.getRouterId());
         RaptorData data = graph.getService(RaptorDataService.class).getData();
 
         double initialWalk = options.getMaxWalkDistance() * 1.1;

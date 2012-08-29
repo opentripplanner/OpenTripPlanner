@@ -53,4 +53,7 @@ public interface GraphService {
 
     public Collection<String> getGraphIds();
 
+    /** Forces loading of all known graphs */
+    void loadAllGraphs();
+
 }
