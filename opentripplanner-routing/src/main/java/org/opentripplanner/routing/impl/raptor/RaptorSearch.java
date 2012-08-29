@@ -293,10 +293,10 @@ public class RaptorSearch {
                 .getTransferSlack() - options.getAlightSlack());
         ShortestPathTree spt;
         GenericDijkstra dijkstra = new GenericDijkstra(walkOptions);
+        dijkstra.setShortestPathTreeFactory(bounder);
         List<State> transitStopStates = new ArrayList<State>();
 
         if (nBoardings == 0) {
-            //TODO: use goal direction & bounder if within walk distance of destination
             //TODO: retry min-time bounding with this and with maxtime
 
             if (bounder.getTargetDistance(options.rctx.origin) < options.getMaxWalkDistance())
@@ -379,7 +379,6 @@ public class RaptorSearch {
             dijkstra.setPriorityQueueFactory(new PrefilledPriorityQueueFactory(startPoints.subList(
                     1, startPoints.size())));
 
-            dijkstra.setShortestPathTreeFactory(bounder);
             bounder.addSptStates(startPoints.subList(1, startPoints.size()));
 
             bounder.prepareForSearch();
