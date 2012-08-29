@@ -22,6 +22,7 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
@@ -31,8 +32,10 @@ import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.transit_index.adapters.AgencyAndIdAdapter;
+import org.opentripplanner.routing.transit_index.adapters.AgencyAndIdArrayListAdapter;
 import org.opentripplanner.routing.transit_index.adapters.LineStringAdapter;
 import org.opentripplanner.routing.transit_index.adapters.StopAgencyAndIdAdapter;
+import org.opentripplanner.routing.transit_index.adapters.StopAgencyAndIdArayListAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,10 +70,10 @@ public class RouteVariant implements Serializable {
     private TraverseMode mode;
 
     // @XmlElementWrapper
-    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
+    @XmlJavaTypeAdapter(AgencyAndIdArrayListAdapter.class)
     private ArrayList<AgencyAndId> trips;
 
-    @XmlJavaTypeAdapter(StopAgencyAndIdAdapter.class)
+    @XmlJavaTypeAdapter(StopAgencyAndIdArayListAdapter.class)
     private ArrayList<Stop> stops;
 
     /** An unordered list of all segments for this route */
@@ -121,6 +124,7 @@ public class RouteVariant implements Serializable {
         segments.add(segment);
     }
 
+    @JsonIgnore
     public List<RouteSegment> getSegments() {
         return segments;
     }
@@ -158,6 +162,7 @@ public class RouteVariant implements Serializable {
         }
     }
 
+    @JsonIgnore
     public List<RouteSegment> segmentsAfter(RouteSegment segment) {
         HashMap<Edge, RouteSegment> successors = new HashMap<Edge, RouteSegment>();
         for (RouteSegment s : segments) {
