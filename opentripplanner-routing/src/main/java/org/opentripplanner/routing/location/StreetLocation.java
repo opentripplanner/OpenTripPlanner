@@ -82,7 +82,6 @@ public class StreetLocation extends StreetVertex {
         /* linking vertex with epsilon transitions */
         StreetLocation location = new StreetLocation(graph, label, nearestPoint, name);
 
-        location.setDistanceToNearestTransitStop(Double.MAX_VALUE);
         for (StreetEdge street : edges) {
             /* TODO: need to check for crossing uncrossable streets (in 
              * previous elements of edges) */
