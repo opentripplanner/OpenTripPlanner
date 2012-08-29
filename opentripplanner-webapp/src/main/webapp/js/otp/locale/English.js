@@ -263,7 +263,9 @@ otp.locale.English = {
             intermediate  : "Intermediate Places",
             minimize      : "Show me the",
             maxWalkDistance: "Maximum walk",
+            walkSpeed     : "Maximum walk speed",
             maxBikeDistance: "Maximum bike",
+            maxBikeSpeed  : "Maximum bike speed",
             arriveDepart  : "Arrive by/Depart at",
             mode          : "Travel by",
             wheelchair    : "Wheelchair accessible trip", 
@@ -357,6 +359,15 @@ otp.locale.English = {
             ['80467',  '50 miles'],
             ['160934',  '100 miles']
         ],
+
+	walkSpeed :
+	[
+		['0.447',  '1 mile/h'],
+		['0.894',  '2 miles/h'],
+		['1.341',  '3 miles/h'],
+		['1.788',  '4 miles/h'],
+		['2.235',  '5 miles/h']
+	],
 
         mode : 
         [
