@@ -271,7 +271,7 @@ public class TestRequest extends TestCase {
 
     public void testPlanner() throws Exception {
 
-        Planner planner = new TestPlanner("portland", "113410", "137427");
+        Planner planner = new TestPlanner("portland", "NE 43RD AVE at NE GLISAN ST", "NE 43RD AVE at NE ROYAL CT");
 
         Response response = planner.getItineraries();
         Itinerary itinerary = response.getPlan().itinerary.get(0);
@@ -303,7 +303,7 @@ public class TestRequest extends TestCase {
     public void testAlerts() throws Exception {
 
         // SE 47th and Ash, NE 47th and Davis (note that we cross Burnside, this goes from SE to NE)
-        Planner planner = new TestPlanner("portland", "114789 back", "114237");
+        Planner planner = new TestPlanner("portland", "SE 47TH AVE at SE ASH ST", "NE 47TH AVE at NE COUCH ST");
         Response response = planner.getItineraries();
 
         Itinerary itinerary = response.getPlan().itinerary.get(0);
@@ -323,13 +323,12 @@ public class TestRequest extends TestCase {
 
     public void testIntermediate() throws Exception {
 
-        Graph graph = Context.getInstance().graph;
-        Vertex v1 = graph.getVertex("114080 back");// getVertexByCrossStreets("NW 10TH AVE", "W BURNSIDE ST", false);
-        Vertex v2 = graph.getVertex("115250");// graph.getOutgoing(getVertexByCrossStreets("SE 82ND AVE", "SE ASH ST",
-                                              // false)).iterator().next().getToVertex();
-        Vertex v3 = graph.getVertex("108406");// graph.getOutgoing(getVertexByCrossStreets("NE 21ST AVE", "NE MASON ST",
-                                              // false)).iterator().next().getToVertex();
-        Vertex v4 = graph.getVertex("192532");// getVertexByCrossStreets("SE 92ND AVE", "SE FLAVEL ST", true);
+        Vertex v1 = getVertexByCrossStreets("NW 10TH AVE", "W BURNSIDE ST");
+        Vertex v2 = getVertexByCrossStreets("SE 82ND AVE", "SE ASH ST").getOutgoing().iterator()
+                .next().getToVertex();
+        Vertex v3 = getVertexByCrossStreets("NE 21ST AVE", "NE MASON ST").getOutgoing().iterator()
+                .next().getToVertex();
+        Vertex v4 = getVertexByCrossStreets("SE 92ND AVE", "SE FLAVEL ST");
         Vertex[] vertices = { v1, v3, v2, v4 };
         assertNotNull(v1);
         assertNotNull(v2);
@@ -349,6 +348,15 @@ public class TestRequest extends TestCase {
             }
         }
         assertEquals(4, curVertex); // found all four, in the correct order (1, 3, 2, 4)
+    }
+
+    private Vertex getVertexByCrossStreets(String s1, String s2) {
+        for (Vertex v : Context.getInstance().graph.getVertices()) {
+            if (v.getName().contains(s1) && v.getName().contains(s2)) {
+                return v;
+            }
+        }
+        return null;
     }
 
     public void testBikeRental() {
