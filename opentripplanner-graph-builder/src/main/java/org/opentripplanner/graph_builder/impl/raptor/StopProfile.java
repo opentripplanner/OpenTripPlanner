@@ -86,6 +86,14 @@ class CostsAtTime {
         }
         return "[@" + time + ": " + costStr + "]";
     }
+
+    public int size() {
+        return costs.size();
+    }
+
+    public boolean isEmpty() {
+        return costs.isEmpty();
+    }
 }
 
 class CostsAtTimeComparator implements Comparator<Object> {
@@ -317,47 +325,57 @@ public class StopProfile {
         int timeAtOrigin = inserted.time;
 
         int index = originIndex;
-        BACKWARDSEARCH: while (index >= 0) {
+        while (index >= 0) {
             boolean shouldContinue = false;
             CostsAtTime costsAtPrevTime = profile.get(index);
             int waitTime = timeAtOrigin - costsAtPrevTime.time;
             
             ArrayList<DurationAndDistance> toAdd = new ArrayList<DurationAndDistance>();
+            ArrayList<DurationAndDistance> duplicates = new ArrayList<DurationAndDistance>();
             for (Iterator<DurationAndDistance> costsIt = costsAtDeparture.costs.iterator(); costsIt
                     .hasNext();) {
                 DurationAndDistance costs = costsIt.next();
                 int duration = costs.duration + waitTime;
-
+                boolean add = false;
                 for (Iterator<DurationAndDistance> it = costsAtPrevTime.costs.iterator(); it.hasNext();) {
                     DurationAndDistance prevCost = it.next();
-                    if (prevCost.duration >= duration && prevCost.distance * 1.001 >= costs.distance) {
-                        // this walk totally dominates the old way
-                        toAdd.add(new DurationAndDistance(round, duration, costs.distance));
+                    if (prevCost.duration == duration && prevCost.distance == costs.distance) {
+                        add = false;
+                        duplicates.add(prevCost);
+                        break;
+                    } else if (prevCost.duration >= duration && prevCost.distance >= costs.distance * 1.05) {
+                        // this walk totally dominates this old way
+                        add = true;
                         it.remove();
-                        shouldContinue = true;
                     } else if (prevCost.duration > duration
-                            || prevCost.distance > costs.distance * 1.001) {
+                            || prevCost.distance > costs.distance * 1.05
+                            && (prevCost.duration != duration || prevCost.distance != costs.distance)) {
                         // this walk at least partially dominates the old way
-                        toAdd.add(new DurationAndDistance(round, duration, costs.distance));
-                        shouldContinue = true;
+                        add = true;
                     } else {
-                        //the old way completely dominates this walk 
-                        costsIt.remove();
-                        break BACKWARDSEARCH;
+                        //the old way completely dominates this walk
+                        add = false;
+                        //costsIt.remove();
+                        break;
                     }
                 }
-                if (costsAtPrevTime.costs.isEmpty()) {
-                    profile.remove(index);
-                } else {
-                    for (DurationAndDistance newCosts : toAdd) {
-                        costsAtPrevTime.forceAdd(newCosts);
-                    }
+                if (add) {
+                    shouldContinue = true;
+                    toAdd.add(new DurationAndDistance(round, duration, costs.distance));
                 }
-                if (shouldContinue) {
-                    index--;
-                } else {
-                    break;
+            }
+            if (duplicates.size() == costsAtPrevTime.size() || costsAtPrevTime.isEmpty()) {
+                profile.remove(index);
+            } else {
+                for (DurationAndDistance newCosts : toAdd) {
+                    costsAtPrevTime.forceAdd(newCosts);
                 }
+            }
+
+            if (shouldContinue && ! costsAtDeparture.isEmpty()) {
+                index--;
+            } else {
+                break;
             }
         }
     }
@@ -371,7 +389,7 @@ public class StopProfile {
             if (walkDistance > 3218)
                 continue;
             int walkDuration = duration + atDestination.duration;
-            toInsert.forceAdd(round, walkDuration, walkDistance);
+            toInsert.add(round, walkDuration, walkDistance);
         }
 
         for (Iterator<DurationAndDistance> costsIt = toInsert.costs.iterator(); costsIt.hasNext();) {
@@ -392,7 +410,7 @@ public class StopProfile {
             }
         }
 
-        if (toInsert.costs.isEmpty()) {
+        if (toInsert.isEmpty()) {
             return false;
         }
 
