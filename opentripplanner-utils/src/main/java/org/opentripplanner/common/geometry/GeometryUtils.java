@@ -14,12 +14,14 @@
 package org.opentripplanner.common.geometry;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
 public class GeometryUtils {
 
-    private static GeometryFactory gf = new GeometryFactory();
+    private static CoordinateSequenceFactory csf = new Serializable2DPackedCoordinateSequenceFactory();
+    private static GeometryFactory gf = new GeometryFactory(csf);
 
     public static LineString makeLineString(double... coords) {
         GeometryFactory factory = getGeometryFactory();
