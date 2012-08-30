@@ -17,7 +17,7 @@ public class DecayingDelayTripTimes extends DelegatingTripTimes {
     private final double lambda;
 
     public DecayingDelayTripTimes(ScheduledTripTimes sched, int currentStop, int delay) {
-        this(sched, currentStop, delay, 500, true, false);
+        this(sched, currentStop, delay, 500, false, false);
     }
     
     public DecayingDelayTripTimes(ScheduledTripTimes sched, int currentStop, int delay, 
@@ -63,7 +63,7 @@ public class DecayingDelayTripTimes extends DelegatingTripTimes {
         // n = Math.abs(n);
         double decay;
         if (linear) {
-            decay = 1 - dt/lambda * 0.5;
+            decay = 1 - dt * lambda * 0.5;
             if (decay < 0)
                 decay = 0;
         } else {
