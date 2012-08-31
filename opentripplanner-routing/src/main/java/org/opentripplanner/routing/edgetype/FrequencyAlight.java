@@ -53,7 +53,7 @@ public class FrequencyAlight extends Edge  implements OnBoardReverseEdge {
     }
 
     public String getDirection() {
-        return null;
+        return pattern.getHeadsign(stopIndex);
     }
 
     public double getDistance() {

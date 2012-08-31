@@ -53,7 +53,7 @@ public class FrequencyBoard extends Edge  implements OnBoardForwardEdge {
     }
 
     public String getDirection() {
-        return null;
+        return pattern.getHeadsign(stopIndex);
     }
 
     public double getDistance() {
