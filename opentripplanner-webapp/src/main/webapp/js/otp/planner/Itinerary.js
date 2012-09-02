@@ -359,7 +359,7 @@ otp.planner.Itinerary = {
             var leg = this.m_legStore.getAt(i);
 
             var mode = from.get('mode');
-            if (mode === 'WALK' || mode === 'BICYCLE' || mode === 'TRANSFER') {
+            if (mode === 'WALK' || mode === 'BICYCLE' || mode === 'TRANSFER' || mode == 'CAR') {
                 var geoLine = new OpenLayers.Feature.Vector(leg.get('legGeometry'), null, otp.util.OpenLayersUtils.BLACK_STYLE);
                 var newLine = otp.util.OpenLayersUtils.makeStraightLine(from, this.m_toStore.getAt(i));
                 vectors.push(geoLine);
