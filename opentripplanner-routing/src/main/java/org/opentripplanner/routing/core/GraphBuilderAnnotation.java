@@ -119,7 +119,8 @@ public class GraphBuilderAnnotation implements Serializable {
         		"and %s; using straight-line path instead"), 
         BOGUS_SHAPE_DIST_TRAVELED("The shape_dist_traveled field for stoptime %s is wrong -- either "
                         + "it is the same as the value for the previous stoptime, or it is greater than "
-                        + "the max shape_dist_traveled for the shape in shapes.txt");
+                        + "the max shape_dist_traveled for the shape in shapes.txt"),
+        STREET_CAR_SPEED_ZERO("Street %s has a car speed of 0; it will not be traversable by car");
         
         private final String formatString;
 

@@ -361,6 +361,36 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
             StreetTraversalPermission.BICYCLE_AND_CAR, 7.76, 7.76);
         setProperties(props, "highway=motorway_link;bicycle=designated",
             StreetTraversalPermission.BICYCLE_AND_CAR, 2, 2);
+        
+        /* Automobile speeds in the United States: Based on my (mattwigway) personal experience,
+         * primarily in California */
+        setCarSpeed(props, "highway=motorway", 29); // 29 m/s ~= 65 mph
+        setCarSpeed(props, "highway=motorway_link", 15); // ~= 35 mph
+        setCarSpeed(props, "highway=trunk", 24.6f); // ~= 55 mph
+        setCarSpeed(props, "highway=trunk_link", 15); // ~= 35 mph
+        setCarSpeed(props, "highway=primary", 20); // ~= 45 mph
+        setCarSpeed(props, "highway=primary_link", 11.2f); // ~= 25 mph
+        setCarSpeed(props, "highway=secondary", 15); // ~= 35 mph
+        setCarSpeed(props, "highway=secondary_link", 11.2f); // ~= 25 mph
+        setCarSpeed(props, "highway=tertiary", 11.2f); // ~= 25 mph
+        setCarSpeed(props, "highway=tertiary_link", 11.2f); // ~= 25 mph
+        setCarSpeed(props, "highway=living_street", 2.2f); // ~= 5 mph
+        
+        // generally, these will not allow cars at all, but the docs say
+        // "For roads used mainly/exclusively for pedestrians . . . which may allow access by
+        // motorised vehicles only for very limited periods of the day."
+        // http://wiki.openstreetmap.org/wiki/Key:highway
+        // This of course makes the street network time-dependent
+        setCarSpeed(props, "highway=pedestrian", 2.2f); // ~= 5 mph
+        
+        setCarSpeed(props, "highway=residential", 11.2f); // ~= 25 mph
+        setCarSpeed(props, "highway=unclassified", 11.2f); // ~= 25 mph
+        setCarSpeed(props, "highway=service", 6.7f); // ~= 15 mph
+        setCarSpeed(props, "highway=track", 4.5f); // ~= 10 mph
+        setCarSpeed(props, "highway=road", 11.2f); // ~= 25 mph 
+        
+        // default ~= 25 mph
+        props.setDefaultSpeed(11.2f);
 
         /*** special situations ****/
 
@@ -566,5 +596,12 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         properties.setPermission(permission);
         properties.setSafetyFeatures(new P2<Double>(safety, safetyBack));
         propset.addProperties(new OSMSpecifier(spec), properties, mixin);
+    }
+    
+    private void setCarSpeed(WayPropertySet propset, String spec, float speed) {
+        SpeedPicker picker = new SpeedPicker();
+        picker.setSpecifier(new OSMSpecifier(spec));
+        picker.setSpeed(speed);
+        propset.addSpeedPicker(picker);
     }
 }

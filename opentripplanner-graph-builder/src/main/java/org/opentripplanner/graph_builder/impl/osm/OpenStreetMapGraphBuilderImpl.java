@@ -640,6 +640,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 Set<Edge> edges = new HashSet<Edge>();
 
                 OSMWithTags areaEntity = area.parent;
+                float carSpeed = wayPropertySet.getCarSpeedForWay(areaEntity);
 
                 StreetTraversalPermission areaPermissions = getPermissionsForEntity(areaEntity,
                         StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
@@ -779,7 +780,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                                 PlainStreetEdge street = edgeFactory.createEdge(nodeI, nodeJ, areaEntity, startEndpoint,
                                         endEndpoint, geometry, name, length,
                                         areaPermissions,
-                                        i > j);
+                                        i > j, carSpeed);
                                 street.setId(id);
 
                                 edges.add(street);
@@ -1835,9 +1836,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 length *= 2;
             }
 
+            float carSpeed = wayPropertySet.getCarSpeedForWay(way);
+            
             PlainStreetEdge street = edgeFactory
                     .createEdge(_nodes.get(startNode), _nodes.get(endNode), way, start, end,
-                            geometry, name, length, permissions, back);
+                            geometry, name, length, permissions, back, carSpeed);
             street.setId(id);
 
             String highway = way.getTag("highway");
@@ -1865,6 +1868,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
 
             street.setSlopeOverride(wayPropertySet.getSlopeOverride(way));
+            
+            // < 0.04: account for 
+            if (carSpeed < 0.04) {
+                _log.warn(GraphBuilderAnnotation.register(graph, Variety.STREET_CAR_SPEED_ZERO, street));
+            }
 
             if (customNamer != null) {
                 customNamer.nameWithEdge(way, street);

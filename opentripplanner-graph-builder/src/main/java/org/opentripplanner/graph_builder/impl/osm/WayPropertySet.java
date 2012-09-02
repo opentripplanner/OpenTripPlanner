@@ -37,6 +37,16 @@ public class WayPropertySet {
     private List<CreativeNamerPicker> creativeNamers;
 
     private List<SlopeOverridePicker> slopeOverrides;
+    
+    /**
+     * SpeedPickers for automobile speeds.
+     */
+    private List<SpeedPicker> speedPickers;
+    
+    /**
+     * The speed for street segments that match no speedPicker.    
+     */
+    private Float defaultSpeed;
 
     private List<NotePicker> notes;
 
@@ -47,9 +57,11 @@ public class WayPropertySet {
         defaultProperties = new WayProperties();
         defaultProperties.setSafetyFeatures(new P2<Double>(1.0, 1.0));
         defaultProperties.setPermission(StreetTraversalPermission.ALL);
+        defaultSpeed = 11.2f; // 11.2 m/s, ~25 mph, standard speed limit in the US 
         wayProperties = new ArrayList<WayPropertyPicker>();
         creativeNamers = new ArrayList<CreativeNamerPicker>();
         slopeOverrides = new ArrayList<SlopeOverridePicker>();
+        speedPickers = new ArrayList<SpeedPicker>();
         notes = new ArrayList<NotePicker>();
     }
 
@@ -153,6 +165,29 @@ public class WayPropertySet {
         }
         return bestNamer.generateCreativeName(way);
     }
+    
+    /**
+     * Calculate the automobile speed, in meters per second, for this way.
+     */
+    public float getCarSpeedForWay(OSMWithTags way) {
+        int bestScore = 0;
+        float bestSpeed = -1;
+        int score;
+        
+        for (SpeedPicker picker : speedPickers) {
+            OSMSpecifier specifier = picker.getSpecifier();
+            score = specifier.matchScore(way);
+            if (score > bestScore) {
+                bestScore = score;
+                bestSpeed = picker.getSpeed();
+            }
+        }
+        
+        if (bestSpeed != -1)
+            return bestSpeed;
+        else
+            return this.defaultSpeed;
+    }
 
     public Set<Alert> getNoteForWay(OSMWithTags way) {
         HashSet<Alert> out = new HashSet<Alert>();
@@ -217,5 +252,9 @@ public class WayPropertySet {
     public int hashCode() {
         return defaultProperties.hashCode() + wayProperties.hashCode() + creativeNamers.hashCode()
                 + slopeOverrides.hashCode();
+    }
+
+    public void addSpeedPicker(SpeedPicker picker) {
+        this.speedPickers.add(picker);
     }
 }
