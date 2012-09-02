@@ -475,8 +475,12 @@ public class GTFSPatternHopFactory {
             hop.setGeometry(getHopGeometry(graph, trip.getShapeId(), st0, st1, psv0depart,
                     psv1arrive));
 
+            String headsign = st0.getStopHeadsign();
+            if (headsign == null) {
+                headsign = trip.getTripHeadsign();
+            }
             pattern.addHop(i, departureTime, runningTime, arrivalTime, dwellTime,
-                    st0.getStopHeadsign());
+                    headsign);
 
             TransitStopDepart stopDepart = context.stopDepartNodes.get(s0);
             TransitStopArrive stopArrive = context.stopArriveNodes.get(s1);
