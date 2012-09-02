@@ -464,9 +464,9 @@ public class PlanGenerator {
         Edge en = state.getBackEdge();
         leg.route = en.getName();
         Trip trip = state.getBackTrip();
+        leg.headsign = state.getBackDirection();
         if (trip != null) {
             // this is the stop headsign
-            leg.headsign = state.getBackDirection();
              //leg.headsign = "This is the headsign";
             // handle no stop headsign
             if (leg.headsign == null)            

@@ -52,6 +52,11 @@ public class FrequencyBoard extends Edge  implements OnBoardForwardEdge {
         this.serviceId = serviceId;
     }
 
+    @Override
+    public Trip getTrip() {
+        return pattern.getTrip();
+    }
+
     public String getDirection() {
         return pattern.getHeadsign(stopIndex);
     }

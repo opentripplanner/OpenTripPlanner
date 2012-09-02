@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.gtfs.GtfsLibrary;
@@ -60,7 +61,12 @@ public class FrequencyHop extends Edge implements OnBoardForwardEdge, OnBoardRev
     public String getName() {
         return GtfsLibrary.getRouteName(pattern.getTrip().getRoute());
     }
-    
+
+    @Override
+    public Trip getTrip() {
+        return pattern.getTrip();
+    }
+
     public String getDirection () {
         return pattern.getHeadsign(stopIndex);
     }

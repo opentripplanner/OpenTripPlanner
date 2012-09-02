@@ -52,6 +52,11 @@ public class FrequencyAlight extends Edge  implements OnBoardReverseEdge {
         this.serviceId = serviceId;
     }
 
+    @Override
+    public Trip getTrip() {
+        return pattern.getTrip();
+    }
+
     public String getDirection() {
         return pattern.getHeadsign(stopIndex);
     }
