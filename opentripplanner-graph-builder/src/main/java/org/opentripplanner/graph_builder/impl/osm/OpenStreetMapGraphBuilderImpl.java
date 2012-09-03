@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.opentripplanner.common.RepeatingTimePeriod;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.DistanceLibrary;
@@ -105,6 +106,8 @@ class TurnRestrictionTag {
     TurnRestrictionType type;
 
     Direction direction;
+
+    RepeatingTimePeriod time;    
 
     public List<PlainStreetEdge> possibleFrom = new ArrayList<PlainStreetEdge>();
     public List<PlainStreetEdge> possibleTo = new ArrayList<PlainStreetEdge>();
@@ -556,6 +559,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                             restriction.to = to;
                             restriction.type = restrictionTag.type;
                             restriction.modes = restrictionTag.modes;
+                            restriction.time = restrictionTag.time;
                             from.addTurnRestriction(restriction);
                         }
                     }
@@ -1602,6 +1606,15 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 return;
             }
             tag.modes = new TraverseModeSet(modes);
+            
+            // set the time periods for this restriction, if applicable
+            if (relation.hasTag("day_on") && relation.hasTag("day_off") && 
+                    relation.hasTag("hour_on") && relation.hasTag("hour_off")) {
+                
+                tag.time = RepeatingTimePeriod.parseFromOsmTurnRestriction(
+                        relation.getTag("day_on"), relation.getTag("day_off"), 
+                        relation.getTag("hour_on"), relation.getTag("hour_off"));
+            }
 
             MapUtils.addToMapList(turnRestrictionsByFromWay, from, tag);
             MapUtils.addToMapList(turnRestrictionsByToWay, to, tag);
@@ -1862,6 +1875,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 street.setBogusName(true);
             }
             street.setStairs(steps);
+            
+            if (way.isTagTrue("toll") || way.isTagTrue("toll:motorcar"))
+                street.setToll(true);
+            else
+                street.setToll(false);
 
             /* TODO: This should probably generalized somehow? */
             if (way.isTagFalse("wheelchair") || (steps && !way.isTagTrue("wheelchair"))) {

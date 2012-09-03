@@ -37,8 +37,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 
 /**
- * This represents a street segment. This is unusual in an edge-based graph, but happens when we
- * have to split a set of turns to accommodate a transit stop.
+ * This represents a street segment.
  * 
  * @author novalis
  * 
@@ -82,6 +81,9 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     
     /** The speed in meters per second that an automobile can traverse this street segment at */
     private float carSpeed;
+    
+    /** This street has a toll */
+    private boolean toll;
 
     private Set<Alert> wheelchairNotes;
 
@@ -307,7 +309,8 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             if (turnCost > 180) {
                 turnCost = 360 - turnCost;
             }
-            final double realTurnCost = (turnCost / 20.0) / options.getSpeed(traverseMode);
+            // TODO: This makes the turn cost higher the faster you're going
+            final double realTurnCost = (turnCost / 20.0) / speed;
             
             if (traverseMode != TraverseMode.CAR) 
                 s1.incrementWalkDistance(realTurnCost / 100); //just a tie-breaker
@@ -335,6 +338,9 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             return null;
         
         s1.addAlerts(getNotes());
+        
+        if (this.toll && traverseMode == TraverseMode.CAR)
+            s1.addAlert(Alert.createSimpleAlerts("Toll road"));
 
         return s1.makeState();
     }
@@ -518,11 +524,13 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
              */
 
             if (restriction.type == TurnRestrictionType.ONLY_TURN) {
-                if (restriction.to != e && restriction.modes.contains(mode)) {
+                if (restriction.to != e && restriction.modes.contains(mode) &&
+                        restriction.active(state.getTime())) {
                     return false;
                 }
             } else {
-                if (restriction.to == e && restriction.modes.contains(mode)) {
+                if (restriction.to == e && restriction.modes.contains(mode) &&
+                        restriction.active(state.getTime())) {
                     return false;
                 }
             }
@@ -549,5 +557,13 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     
     public float getCarSpeed() {
         return carSpeed;
+    }
+    
+    public void setToll(boolean toll) {
+        this.toll = toll;
+    }
+    
+    public boolean getToll() {
+        return this.toll;
     }
 }
