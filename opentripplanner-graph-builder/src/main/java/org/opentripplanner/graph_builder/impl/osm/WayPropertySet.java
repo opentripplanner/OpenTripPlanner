@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
@@ -49,7 +51,9 @@ public class WayPropertySet {
     private Float defaultSpeed;
 
     private List<NotePicker> notes;
-
+    
+    private Pattern maxSpeedPattern;
+    
     public WayProperties defaultProperties;
 
     public WayPropertySet() {
@@ -63,6 +67,9 @@ public class WayPropertySet {
         slopeOverrides = new ArrayList<SlopeOverridePicker>();
         speedPickers = new ArrayList<SpeedPicker>();
         notes = new ArrayList<NotePicker>();
+        // regex courtesy http://wiki.openstreetmap.org/wiki/Key:maxspeed
+        // and edited
+        maxSpeedPattern = Pattern.compile("^([0-9][\\.0-9]+?)(?:[ ]?(kmh|km/h|kmph|kph|mph|knots))?$");
     }
 
     public WayProperties getDataForWay(OSMWithTags way) {
@@ -169,7 +176,31 @@ public class WayPropertySet {
     /**
      * Calculate the automobile speed, in meters per second, for this way.
      */
-    public float getCarSpeedForWay(OSMWithTags way) {
+    public float getCarSpeedForWay(OSMWithTags way, boolean back) {
+        // first, check for maxspeed tags
+        float speed = -1;
+        float currentSpeed;
+        
+        if (way.hasTag("maxspeed:motorcar"))
+            speed = getMetersSecondFromSpeed(way.getTag("maxspeed:motorcar"));
+        
+        if (speed == -1 && !back && way.hasTag("maxspeed:forward"))
+            speed = getMetersSecondFromSpeed(way.getTag("maxspeed:motorcar"));
+        
+        if (speed == -1 && back && way.hasTag("maxspeed:reverse"))
+            speed = getMetersSecondFromSpeed(way.getTag("maxspeed:reverse")); 
+            
+        if (speed == -1 && way.hasTag("maxspeed:lanes")) {
+            for (String lane : way.getTag("maxspeed:lanes").split("|")) {
+                currentSpeed = getMetersSecondFromSpeed(lane);
+                if (currentSpeed > speed)
+                    speed = currentSpeed;
+            }
+        }
+        
+        if (way.hasTag("maxspeed") && speed == -1)
+            speed = getMetersSecondFromSpeed(way.getTag("maxspeed"));
+                    
         int bestScore = 0;
         float bestSpeed = -1;
         int score;
@@ -256,5 +287,33 @@ public class WayPropertySet {
 
     public void addSpeedPicker(SpeedPicker picker) {
         this.speedPickers.add(picker);
+    }
+    
+    public float getMetersSecondFromSpeed(String speed) {
+        Matcher m = maxSpeedPattern.matcher(speed);
+        if (!m.matches())
+            return -1;
+        
+        int originalUnits = Integer.parseInt(m.group(1));
+        
+        String units = m.group(2);
+        if (units == null || units.equals(""))
+            units = "kmh";
+        
+        // we'll be doing quite a few string comparisons here
+        units = units.intern();
+        
+        float metersSecond;
+        
+        if (units == "kmh" || units == "km/h" || units == "kmph" || units == "kph")
+            metersSecond = 0.277778f * originalUnits;
+        else if (units == "mph")
+            metersSecond = 0.446944f * originalUnits;
+        else if (units == "knots")
+            metersSecond = 0.514444f * originalUnits;
+        else
+            return -1;
+        
+        return metersSecond;
     }
 }

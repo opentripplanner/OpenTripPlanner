@@ -640,7 +640,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 Set<Edge> edges = new HashSet<Edge>();
 
                 OSMWithTags areaEntity = area.parent;
-                float carSpeed = wayPropertySet.getCarSpeedForWay(areaEntity);
+                // forward and reverse are not well defined for areas, so assume forward
+                float carSpeed = wayPropertySet.getCarSpeedForWay(areaEntity, false);
 
                 StreetTraversalPermission areaPermissions = getPermissionsForEntity(areaEntity,
                         StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
@@ -1836,7 +1837,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 length *= 2;
             }
 
-            float carSpeed = wayPropertySet.getCarSpeedForWay(way);
+            float carSpeed = wayPropertySet.getCarSpeedForWay(way, back);
             
             PlainStreetEdge street = edgeFactory
                     .createEdge(_nodes.get(startNode), _nodes.get(endNode), way, start, end,

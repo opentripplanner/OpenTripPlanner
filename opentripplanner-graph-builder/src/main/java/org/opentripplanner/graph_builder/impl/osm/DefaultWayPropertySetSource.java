@@ -505,7 +505,7 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         createNames(props, "highway=footway", "path");
         createNames(props, "highway=bridleway", "bridleway");
         createNames(props, "highway=footway;bicycle=no", "footpath");
-
+        
         // Platforms
         createNames(props, "otp:route_ref=*", "Route {otp:route_ref}");
         createNames(props, "highway=platform;ref=*", "Platform {ref}");
