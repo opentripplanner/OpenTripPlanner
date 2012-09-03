@@ -815,18 +815,48 @@ public class PlanGenerator {
 
                     if (twoBack.distance < MAX_ZAG_DISTANCE
                             && lastStep.streetNameNoParens().equals(threeBack.streetNameNoParens())) {
-                        // total hack to remove zags.
-                        steps.remove(last);
-                        steps.remove(last - 1);
-                        step = threeBack;
-                        step.distance += twoBack.distance;
-                        distance += step.distance;
-                        if (twoBack.elevation != null) {
-                            if (step.elevation == null) {
-                                step.elevation = twoBack.elevation;
-                            } else {
-                                for (P2<Double> d : twoBack.elevation) {
-                                    step.elevation.add(new P2<Double>(d.getFirst() + step.distance, d.getSecond()));
+                        
+                        if (((lastStep.relativeDirection == RelativeDirection.RIGHT || 
+                                lastStep.relativeDirection == RelativeDirection.HARD_RIGHT) &&
+                                (twoBack.relativeDirection == RelativeDirection.RIGHT ||
+                                twoBack.relativeDirection == RelativeDirection.HARD_RIGHT)) ||
+                                ((lastStep.relativeDirection == RelativeDirection.LEFT || 
+                                lastStep.relativeDirection == RelativeDirection.HARD_LEFT) &&
+                                (twoBack.relativeDirection == RelativeDirection.LEFT ||
+                                twoBack.relativeDirection == RelativeDirection.HARD_LEFT))) {
+                            // in this case, we have two left turns or two right turns in quick 
+                            // succession; this is probably a U-turn.
+                            
+                            steps.remove(last - 1);
+                            
+                            lastStep.distance += twoBack.distance;
+                            
+                            // A U-turn to the left, typical in the US. 
+                            if (lastStep.relativeDirection == RelativeDirection.LEFT || 
+                                    lastStep.relativeDirection == RelativeDirection.HARD_LEFT)
+                                lastStep.relativeDirection = RelativeDirection.UTURN_LEFT;
+                            else
+                                lastStep.relativeDirection = RelativeDirection.UTURN_RIGHT;
+                            
+                            // in this case, we're definitely staying on the same street 
+                            // (since it's zag removal, the street names are the same)
+                            lastStep.stayOn = true;
+                        }
+                                
+                        else {
+                            // total hack to remove zags.
+                            steps.remove(last);
+                            steps.remove(last - 1);
+                            step = threeBack;
+                            step.distance += twoBack.distance;
+                            distance += step.distance;
+                            if (twoBack.elevation != null) {
+                                if (step.elevation == null) {
+                                    step.elevation = twoBack.elevation;
+                                } else {
+                                    for (P2<Double> d : twoBack.elevation) {
+                                        step.elevation.add(new P2<Double>(d.getFirst() + step.distance, d.getSecond()));
+                                    }
                                 }
                             }
                         }
