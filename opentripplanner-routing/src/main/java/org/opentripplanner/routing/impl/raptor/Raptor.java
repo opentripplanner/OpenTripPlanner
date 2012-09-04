@@ -151,8 +151,9 @@ public class Raptor implements PathService {
 
             }
             options.setMaxWalkDistance(options.getMaxWalkDistance() * 2);
-            search.bounder = new TargetBound(options);
-            break RETRY;
+            walkOptions.setMaxWalkDistance(options.getMaxWalkDistance());
+            search.reset(options);
+
         } while (options.getMaxWalkDistance() < initialWalk * MAX_WALK_MULTIPLE && initialWalk < Double.MAX_VALUE);
 
         List<RaptorState> targetStates = search.getTargetStates();

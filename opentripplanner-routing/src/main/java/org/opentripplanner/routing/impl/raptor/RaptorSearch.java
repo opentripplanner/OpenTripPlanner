@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.impl.raptor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -516,6 +517,11 @@ public class RaptorSearch {
             return heap;
         }
 
+    }
+
+    public void reset(RoutingRequest options) {
+        bounder = new TargetBound(options);
+        Arrays.fill(statesByStop, null);
     }
 
 }
