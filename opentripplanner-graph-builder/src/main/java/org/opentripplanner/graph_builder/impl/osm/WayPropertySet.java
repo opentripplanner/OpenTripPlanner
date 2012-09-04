@@ -185,7 +185,7 @@ public class WayPropertySet {
             speed = getMetersSecondFromSpeed(way.getTag("maxspeed:motorcar"));
         
         if (speed == -1 && !back && way.hasTag("maxspeed:forward"))
-            speed = getMetersSecondFromSpeed(way.getTag("maxspeed:motorcar"));
+            speed = getMetersSecondFromSpeed(way.getTag("maxspeed:forward"));
         
         if (speed == -1 && back && way.hasTag("maxspeed:reverse"))
             speed = getMetersSecondFromSpeed(way.getTag("maxspeed:reverse")); 
