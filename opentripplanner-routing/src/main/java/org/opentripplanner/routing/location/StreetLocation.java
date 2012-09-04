@@ -16,6 +16,7 @@ package org.opentripplanner.routing.location;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
@@ -151,7 +152,9 @@ public class StreetLocation extends StreetVertex {
         newRight.setNoThruTraffic(street.isNoThruTraffic());
         newRight.setWheelchairNote(street.getWheelchairNotes());
         newRight.setNote(street.getNotes());
-
+        for (TurnRestriction turnRestriction : street.getTurnRestrictions()) {
+            newRight.addTurnRestriction(turnRestriction);
+        }
         base.extra.add(newLeft);
         base.extra.add(newRight);
     }

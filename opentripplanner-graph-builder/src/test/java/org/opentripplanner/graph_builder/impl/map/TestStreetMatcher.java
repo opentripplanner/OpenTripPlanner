@@ -16,11 +16,13 @@ package org.opentripplanner.graph_builder.impl.map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -265,6 +267,11 @@ public class TestStreetMatcher {
         @Override
         public ElevationProfileSegment getElevationProfileSegment() {
             return null;
+        }
+
+        @Override
+        public List<TurnRestriction> getTurnRestrictions() {
+            return Collections.emptyList();
         }
     }
 }
