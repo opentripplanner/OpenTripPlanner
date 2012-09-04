@@ -23,6 +23,8 @@ import java.util.Map;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 
 /**
@@ -76,8 +78,15 @@ public class BasicShortestPathTree extends AbstractShortestPathTree {
         if (existing == null || state.betterThan(existing)) {
             states.put(here, state);
             return true;
-        } else
+        } else {
+            final Edge backEdge = existing.getBackEdge();
+            if (backEdge != state.getBackEdge()
+                    && ((backEdge instanceof PlainStreetEdge) && (!((PlainStreetEdge) backEdge)
+                            .getTurnRestrictions().isEmpty())))
+                return true;
+
             return false;
+        }
     }
 
     @Override
@@ -96,7 +105,12 @@ public class BasicShortestPathTree extends AbstractShortestPathTree {
 
     @Override
     public boolean visit(State s) {
-        return (s == states.get(s.getVertex()));
+        final State existing = states.get(s.getVertex());
+        final Edge backEdge = existing.getBackEdge();
+        if ((backEdge instanceof PlainStreetEdge) && (!((PlainStreetEdge) backEdge)
+                        .getTurnRestrictions().isEmpty()))
+            return true;
+        return (s == existing);
     }
 
     @Override
