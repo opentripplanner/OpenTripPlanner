@@ -1592,6 +1592,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 tag = new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN, Direction.RIGHT);
             } else if (relation.isTag("restriction", "only_left_turn")) {
                 tag = new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN, Direction.LEFT);
+            } else if (relation.isTag("restriction", "only_u_turn")) {
+                tag = new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN, Direction.U);
             } else {
                 _log.warn(GraphBuilderAnnotation.register(graph, Variety.TURN_RESTRICTION_UNKNOWN,
                         relation.getTag("restriction")));
