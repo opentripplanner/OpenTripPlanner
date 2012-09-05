@@ -152,6 +152,9 @@ public class Raptor implements PathService {
             }
             options.setMaxWalkDistance(options.getMaxWalkDistance() * 2);
             walkOptions.setMaxWalkDistance(options.getMaxWalkDistance());
+
+            options.setWalkReluctance(options.getWalkReluctance() * 2);
+            walkOptions.setWalkReluctance(options.getWalkReluctance());
             search.reset(options);
 
         } while (options.getMaxWalkDistance() < initialWalk * MAX_WALK_MULTIPLE && initialWalk < Double.MAX_VALUE);
