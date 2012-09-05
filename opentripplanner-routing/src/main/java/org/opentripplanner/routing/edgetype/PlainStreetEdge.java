@@ -203,7 +203,8 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     private State doTraverse(State s0, RoutingRequest options) {
         TraverseMode traverseMode = s0.getNonTransitMode(options);
         Edge backEdge = s0.getBackEdge();
-        if (backEdge != null && backEdge.getFromVertex() == tov) {
+        if (backEdge != null && 
+                (options.arriveBy ? (backEdge.getToVertex() == fromv) : (backEdge.getFromVertex() == tov))) {
             //no illegal U-turns
             return null;
         }
@@ -499,6 +500,9 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
     public boolean canTurnOnto(Edge e, State state, TraverseMode mode) {
         for (TurnRestriction restriction : turnRestrictions) {
+            /* FIXME: This is wrong for trips that end in the middle of restriction.to
+             */
+
             if (restriction.to == e && restriction.modes.contains(mode)) {
                 return restriction.type == TurnRestrictionType.ONLY_TURN;
             }
