@@ -197,11 +197,11 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
     @Override
     public State traverse(State s0) {
-        return doTraverse(s0, s0.getOptions());
+        final RoutingRequest options = s0.getOptions();
+        return doTraverse(s0, options, s0.getNonTransitMode(options));
     }
 
-    private State doTraverse(State s0, RoutingRequest options) {
-        TraverseMode traverseMode = s0.getNonTransitMode(options);
+    private State doTraverse(State s0, RoutingRequest options, TraverseMode traverseMode) {
         Edge backEdge = s0.getBackEdge();
         if (backEdge != null && 
                 (options.arriveBy ? (backEdge.getToVertex() == fromv) : (backEdge.getFromVertex() == tov))) {
@@ -211,7 +211,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         if (!canTraverse(options, traverseMode)) {
             if (traverseMode == TraverseMode.BICYCLE) {
                 // try walking bike since you can't ride here
-                return doTraverse(s0, options.getWalkingOptions());
+                return doTraverse(s0, options.getWalkingOptions(), TraverseMode.WALK);
             }
             return null;
         }

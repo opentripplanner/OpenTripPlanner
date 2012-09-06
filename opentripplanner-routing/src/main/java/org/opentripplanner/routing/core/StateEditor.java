@@ -63,8 +63,9 @@ public class StateEditor {
     
     public StateEditor(RoutingRequest options, Vertex v) {
         child = new State(v, options);
-        child.stateData = new StateData();
+        child.stateData = new StateData(options);
     }
+
     public StateEditor(State parent, Edge e) {
         child = parent.clone();
         child.backState = parent;
@@ -363,6 +364,11 @@ public class StateEditor {
     public void setBikeRenting(boolean bikeRenting) {
         cloneStateDataAsNeeded();
         child.stateData.usingRentedBike = bikeRenting;
+        if (bikeRenting) {
+            child.stateData.nonTransitMode = TraverseMode.BICYCLE;
+        } else {
+            child.stateData.nonTransitMode = TraverseMode.WALK;
+        }
     }
 
     public void setPreviousStop(Vertex previousStop) {

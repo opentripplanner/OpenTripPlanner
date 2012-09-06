@@ -40,7 +40,7 @@ public class MaxWalkState extends State {
         public MaxWalkStateEditor(RoutingRequest options, Vertex v) {
             super();
             child = new MaxWalkState(v, options);
-            child.stateData = new StateData();
+            child.stateData = new StateData(options);
         }
 
         @Override

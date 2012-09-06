@@ -98,7 +98,7 @@ public class State implements Cloneable {
         this.backState = null;
         this.backEdge = null;
         this.hops = 0;
-        this.stateData = new StateData();
+        this.stateData = new StateData(options);
         // note that here we are breaking the circular reference between rctx and options
         // this should be harmless since reversed clones are only used when routing has finished
         this.stateData.opt = options;
@@ -439,16 +439,7 @@ public class State implements Cloneable {
     /* will return BICYCLE if routing with an owned bicycle, or if at this state the user is holding
      * on to a rented bicycle */
     public TraverseMode getNonTransitMode(RoutingRequest options) {
-        TraverseModeSet modes = options.getModes();
-        if (modes.getCar())
-            return TraverseMode.CAR;
-        if (modes.getWalk() && !isBikeRenting())
-            return TraverseMode.WALK;
-        if (modes.getBicycle())
-            return TraverseMode.BICYCLE;
-        if (modes.getWalk())
-            return TraverseMode.WALK;
-        return null;
+        return stateData.nonTransitMode;
     }
 
     public State reversedClone() {
