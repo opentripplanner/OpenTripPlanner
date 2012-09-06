@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.impl.raptor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -186,7 +187,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
                 / speedUpperBound;
         minTime += (targetDistance - minWalk) / Raptor.MAX_TRANSIT_SPEED + walkTime;
         
-        double stateTime = current.getElapsedTime() + minTime;
+        double stateTime = current.getOptimizedElapsedTime() + minTime;
 
         int i = 0;
         boolean prevBounded = !bounders.isEmpty();
@@ -208,14 +209,12 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
             }
 
             //check that the new path is not much longer in time than the bounding path
-            if (bounder.getElapsedTime() * timeBoundFactor < stateTime) {
+            if (bounder.getOptimizedElapsedTime() * timeBoundFactor < stateTime) {
                 return true;
             }
         }
         return prevBounded;
     }
-
-
 
     public static int getNextDepartTime(RoutingRequest request, int departureTime, Vertex stopVertex) {
 
@@ -296,6 +295,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
         return computeForwardWeight(s, target);
     }
 
+    /** Reset the heuristic */
     @Override
     public void reset() {
     }
@@ -345,5 +345,21 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
 
     public void prepareForSearch() {
         transitStopsVisited.clear();
+    }
+
+    public void reset(RoutingRequest options) {
+        this.options = options;
+        if (realTarget != options.rctx.target) {
+            this.realTarget = options.rctx.target;
+            this.realTargetCoordinate = realTarget.getCoordinate();
+            this.distanceToNearestTransitStop = realTarget.getDistanceToNearestTransitStop();
+            bounders = new ArrayList<State>();
+            Arrays.fill(distance, -1);
+        }
+        spt = new ArrayMultiShortestPathTree(options);
+        transitLocalStreets = options.rctx.graph.getService(TransitLocalStreetService.class);
+        speedUpperBound = options.getSpeedUpperBound();
+        this.speedWeight = options.getWalkReluctance() / speedUpperBound;
+
     }
 }

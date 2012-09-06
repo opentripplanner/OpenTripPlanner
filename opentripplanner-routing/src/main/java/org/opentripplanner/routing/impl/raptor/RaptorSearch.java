@@ -160,6 +160,7 @@ public class RaptorSearch {
 
                     ServiceDay sd = boardState.serviceDay;
 
+                    int waitTime;
                     if (options.isArriveBy()) {
                         if (!route.alights[0][boardState.patternIndex].getPattern().canBoard(stopNo))
                             continue;
@@ -167,7 +168,7 @@ public class RaptorSearch {
                         newState.arrivalTime = (int) sd.time(boardTime);
                         // add in slack
                         newState.arrivalTime -= options.getBoardSlack();
-                        newState.weight += newState.parent.arrivalTime - newState.arrivalTime;
+                        waitTime = newState.parent.arrivalTime - newState.arrivalTime;
                     } else {
                         if (!route.boards[0][boardState.patternIndex].getPattern()
                                 .canAlight(stopNo))
@@ -176,7 +177,13 @@ public class RaptorSearch {
                         newState.arrivalTime = (int) sd.time(alightTime);
                         // add in slack
                         newState.arrivalTime += options.getAlightSlack();
-                        newState.weight += newState.arrivalTime - newState.parent.arrivalTime;
+                        waitTime = newState.arrivalTime - newState.parent.arrivalTime;
+                    }
+                    if (nBoardings == 1) {
+                        newState.initialWaitTime = waitTime;
+                    } else {
+                        //do not count initial wait time, since it will be optimized away later
+                        newState.weight += waitTime;
                     }
 
                     //TODO: consider transfer penalties
@@ -362,6 +369,7 @@ public class RaptorSearch {
 
                 StateEditor dijkstraState = new MaxWalkState.MaxWalkStateEditor(walkOptions,
                         stopVertex);
+                dijkstraState.setInitialWaitTime(state.initialWaitTime);
                 dijkstraState.setStartTime(options.dateTime);
                 dijkstraState.setNumBoardings(state.nBoardings);
                 dijkstraState.setWalkDistance(state.walkDistance);
@@ -520,7 +528,7 @@ public class RaptorSearch {
     }
 
     public void reset(RoutingRequest options) {
-        bounder = new TargetBound(options);
+        bounder.reset(options);
         Arrays.fill(statesByStop, null);
     }
 

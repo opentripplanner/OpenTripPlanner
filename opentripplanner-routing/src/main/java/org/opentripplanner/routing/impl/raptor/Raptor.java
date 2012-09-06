@@ -47,7 +47,7 @@ public class Raptor implements PathService {
 
     static final double MAX_TRANSIT_SPEED = 25;
 
-    private static final int MAX_WALK_MULTIPLE = 16;
+    private static final int MAX_WALK_MULTIPLE = 8;
 
     @Autowired
     private GraphService graphService;

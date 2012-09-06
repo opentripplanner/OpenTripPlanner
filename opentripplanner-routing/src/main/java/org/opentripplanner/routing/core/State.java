@@ -755,4 +755,8 @@ public class State implements Cloneable {
     public boolean getReverseOptimizing () {
         return stateData.opt.reverseOptimizing;
     }
+
+    public double getOptimizedElapsedTime() {
+        return getElapsedTime() - stateData.initialWaitTime;
+    }
 }

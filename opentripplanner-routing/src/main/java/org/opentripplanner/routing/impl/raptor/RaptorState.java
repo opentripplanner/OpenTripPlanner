@@ -49,6 +49,7 @@ public class RaptorState implements Comparable<RaptorState> {
     private boolean arriveBy;
 
     public double weight;
+    public int initialWaitTime;
 
     public RaptorState(boolean arriveBy) {
         this.arriveBy = arriveBy;
@@ -58,6 +59,7 @@ public class RaptorState implements Comparable<RaptorState> {
         this.parent = parent;
         this.arriveBy = parent.arriveBy;
         this.weight = parent.weight;
+        this.initialWaitTime = parent.initialWaitTime;
     }
 
     public String toString() {
