@@ -503,8 +503,14 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             /* FIXME: This is wrong for trips that end in the middle of restriction.to
              */
 
-            if (restriction.to == e && restriction.modes.contains(mode)) {
-                return restriction.type == TurnRestrictionType.ONLY_TURN;
+            if (restriction.type == TurnRestrictionType.ONLY_TURN) {
+                if (restriction.to != e && restriction.modes.contains(mode)) {
+                    return false;
+                }
+            } else {
+                if (restriction.to == e && restriction.modes.contains(mode)) {
+                    return false;
+                }
             }
         }
         return true;
