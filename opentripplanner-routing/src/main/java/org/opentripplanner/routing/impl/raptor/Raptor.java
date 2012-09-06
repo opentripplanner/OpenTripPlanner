@@ -131,7 +131,7 @@ public class Raptor implements PathService {
                 round(data, options, walkOptions, search, i);
 
                 long elapsed = System.currentTimeMillis() - searchBeginTime;
-                if (elapsed > multiPathTimeout && multiPathTimeout > 0
+                if (elapsed > multiPathTimeout * 1000 && multiPathTimeout > 0
                         && search.getTargetStates().size() > 0)
                     break RETRY;
 
