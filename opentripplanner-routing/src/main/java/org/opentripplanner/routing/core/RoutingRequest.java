@@ -795,4 +795,11 @@ public class RoutingRequest implements Cloneable, Serializable {
     public String getBannedRouteStr() {
         return getRouteSetStr(bannedRoutes);
     }
+
+    public void setMaxWalkDistance(double maxWalkDistance) {
+        this.maxWalkDistance = maxWalkDistance;
+        if (walkingOptions != null && walkingOptions != this) {
+            this.walkingOptions.setMaxWalkDistance(maxWalkDistance);
+        }
+    }
 }
