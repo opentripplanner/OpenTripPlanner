@@ -72,7 +72,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
      * Setting this lower will cut off some less-walking more-time paths.
      * Setting it higher will slow down the search a lot.
      */
-    private double timeBoundFactor = 1.5;
+    private double timeBoundFactor = 2;
 
     private List<Integer> previousArrivalTime = new ArrayList<Integer>();
 
