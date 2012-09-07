@@ -134,4 +134,9 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
     public String toString() {
     	return "PatternHop(" + getFromVertex() + ", " + getToVertex() + ")";
     }
+
+    @Override
+    public int getStopIndex() {
+        return stopIndex;
+    }
 }

@@ -25,6 +25,7 @@ import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.automata.AutomatonState;
 import org.opentripplanner.routing.edgetype.OnBoardForwardEdge;
+import org.opentripplanner.routing.edgetype.PatternEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TimeDependentTrip;
@@ -348,8 +349,8 @@ public class State implements Cloneable {
     public String getBackDirection () {
         // This can happen when stop_headsign says different things at two trips on the same 
         // pattern and at the same stop.
-        if (backEdge instanceof TimeDependentTrip) {
-            return ((TimeDependentTrip) backEdge).getDirection(stateData.tripTimes.index);
+        if (backEdge instanceof PatternEdge) {
+            return stateData.tripTimes.getHeadsign(((PatternEdge)backEdge).getStopIndex());
         }
         else {
             return backEdge.getDirection();
@@ -362,7 +363,7 @@ public class State implements Cloneable {
      */
     public Trip getBackTrip () {
         if (backEdge instanceof TimeDependentTrip) {
-            return ((TimeDependentTrip) backEdge).getTrip(stateData.tripTimes.index);
+            return stateData.tripTimes.getTrip();
         }
         else {
             return backEdge.getTrip();

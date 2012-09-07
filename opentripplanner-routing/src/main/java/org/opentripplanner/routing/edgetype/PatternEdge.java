@@ -33,4 +33,6 @@ public abstract class PatternEdge extends Edge {
         return ((OnboardVertex)fromv).getTripPattern();
     }
 
+    public abstract int getStopIndex();
+
 }

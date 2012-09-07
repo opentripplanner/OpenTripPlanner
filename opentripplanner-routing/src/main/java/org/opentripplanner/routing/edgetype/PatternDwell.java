@@ -110,6 +110,7 @@ public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnB
         this.stopIndex = stopIndex;
     }
 
+    @Override
     public int getStopIndex() {
         return stopIndex;
     }

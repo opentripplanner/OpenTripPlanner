@@ -391,7 +391,7 @@ public class TransitBoardAlight extends PatternEdge implements OnBoardForwardEdg
             return options.getBoardCostLowerBound();
     }
 
-    
+    @Override
     public int getStopIndex() {
         return stopIndex;
     }
