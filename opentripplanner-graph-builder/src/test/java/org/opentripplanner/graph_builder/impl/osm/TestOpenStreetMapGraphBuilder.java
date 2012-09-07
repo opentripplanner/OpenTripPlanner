@@ -25,7 +25,6 @@ import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.impl.FileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -38,7 +37,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
     public void setUp() {
         extra = new HashMap<Class<?>, Object>();
     }
-    
+
     @Test
     public void testGraphBuilder() throws Exception {
 
@@ -55,82 +54,43 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
 
         loader.buildGraph(gg, extra);
 
-        Vertex v2 = gg.getVertex("way 25660216 from 1"); // Kamiennogorska
-        Vertex v2back = gg.getVertex("way 25660216 from 1 back"); // Kamiennogorska
-                                                                  // back
-        Vertex v3 = gg.getVertex("way 25691274 from 0"); // Mariana
-                                                         // Smoluchowskiego,
-                                                         // right from
-                                                         // Kamiennogorska
-        Vertex v3back = gg.getVertex("way 25691274 from 0 back"); // ditto back
-        Vertex v4 = gg.getVertex("way 25691274 from 3"); // Mariana
-                                                         // Smoluchowskiego,
-                                                         // left from
-                                                         // Kamiennogorska
-        Vertex v4back = gg.getVertex("way 25691274 from 3 back"); // ditto back
-        assertNotNull(v2);
-        assertNotNull(v2back);
-        assertNotNull(v3);
-        assertNotNull(v3back);
-        assertNotNull(v4);
-        assertNotNull(v4back);
+        // Kamiennogorska at south end of segment
+        Vertex v1 = gg.getVertex("osm node 280592578");
 
-        assertTrue("name of v2 must be like \"Kamiennog\u00F3rska\"; was " + v2.getName(), v2
+        // Kamiennogorska at Mariana Smoluchowskiego
+        Vertex v2 = gg.getVertex("osm node 288969929");
+
+        // Mariana Smoluchowskiego, north end
+        Vertex v3 = gg.getVertex("osm node 280107802");
+
+        // Mariana Smoluchowskiego, south end (of segment connected to v2)
+        Vertex v4 = gg.getVertex("osm node 288970952");
+
+        assertNotNull(v1);
+        assertNotNull(v2);
+        assertNotNull(v3);
+        assertNotNull(v4);
+
+        Edge e1 = null, e2 = null, e3 = null;
+        for (Edge e: v2.getOutgoing()) {
+            if (e.getToVertex() == v1) {
+                e1 = e;
+            } else if (e.getToVertex() == v3) {
+                e2 = e;
+            } else if (e.getToVertex() == v4) {
+                e3 = e;
+            }
+        }
+
+        assertNotNull(e1);
+        assertNotNull(e2);
+        assertNotNull(e3);
+
+        assertTrue("name of e1 must be like \"Kamiennog\u00F3rska\"; was " + e1.getName(), e1
                 .getName().contains("Kamiennog\u00F3rska"));
-        assertTrue("name of v3 must be like \"Mariana Smoluchowskiego\"; was " + v3.getName(), v3
+        assertTrue("name of e2 must be like \"Mariana Smoluchowskiego\"; was " + e2.getName(), e2
                 .getName().contains("Mariana Smoluchowskiego"));
 
-        boolean v3EdgeExists = false;
-        boolean v4EdgeExists = false;
-        boolean v4BackEdgeExists = false;
-        for (Edge e : v2.getOutgoing()) {
-            if (e instanceof TurnEdge) {
-                TurnEdge t = (TurnEdge) e;
-                Vertex tov = t.getToVertex();
-                if (tov == v3 || tov == v3back) {
-                    assertTrue("Turn cost wrong; expected ~90, was: " + t.turnCost,
-                            Math.abs(t.turnCost - 90) < 3);
-                    v3EdgeExists = true;
-                }
-            }
-        }
-
-        for (Edge e : v2back.getOutgoing()) {
-            if (e instanceof TurnEdge) {
-                TurnEdge t = (TurnEdge) e;
-                Vertex tov = t.getToVertex();
-                if (tov == v3 || tov == v3back) {
-                    assertTrue(Math.abs(t.turnCost - 90) < 5);
-                    v3EdgeExists = true;
-                }
-            }
-        }
-
-        for (Edge e : v3.getOutgoing()) {
-            if (e instanceof TurnEdge) {
-                TurnEdge t = (TurnEdge) e;
-                Vertex tov = t.getToVertex();
-                if (tov == v4) {
-                    assertTrue("Turn cost too big: " + t.turnCost, t.turnCost < 5);
-                    v4EdgeExists = true;
-                }
-            }
-        }
-
-        for (Edge e : v4back.getOutgoing()) {
-            if (e instanceof TurnEdge) {
-                TurnEdge t = (TurnEdge) e;
-                Vertex tov = t.getToVertex();
-                if (tov == v3back) {
-                    assertTrue("Turn cost too big: " + t.turnCost, t.turnCost < 5);
-                    v4BackEdgeExists = true;
-                }
-            }
-        }
-
-        assertTrue("There is no edge from v2 to v3", v3EdgeExists);
-        assertTrue("There is no edge from v3 to v4", v4EdgeExists);
-        assertTrue("There is no edge from v4back to v3back", v4BackEdgeExists);
     }
 
     @Test
@@ -206,17 +166,17 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
                                                                        // from track
         assertEquals(0.75, dataForWay.getSafetyFeatures().getSecond()); // left comes from lane
 
-        
         way = new OSMWay();
         way.addTag("highway", "footway");
         way.addTag("footway", "sidewalk");
         way.addTag("RLIS:reviewed", "no");
         WayPropertySet propset = new WayPropertySet();
         CreativeNamer namer = new CreativeNamer("platform");
-        propset.addCreativeNamer(new OSMSpecifier("railway=platform;highway=footway;footway=sidewalk"), namer);
+        propset.addCreativeNamer(new OSMSpecifier(
+                "railway=platform;highway=footway;footway=sidewalk"), namer);
         namer = new CreativeNamer("sidewalk");
         propset.addCreativeNamer(new OSMSpecifier("highway=footway;footway=sidewalk"), namer);
-        assertEquals ("sidewalk", propset.getCreativeNameForWay(way));
+        assertEquals("sidewalk", propset.getCreativeNameForWay(way));
     }
 
     @Test
@@ -232,18 +192,18 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
                 namer.generateCreativeName(way));
     }
 
-// disabled pending discussion with author (AMB)
-//    @Test
-//    public void testMultipolygon() throws Exception {
-//        Graph gg = new Graph();
-//        OpenStreetMapGraphBuilderImpl loader = new OpenStreetMapGraphBuilderImpl();
-//
-//        FileBasedOpenStreetMapProviderImpl pr = new FileBasedOpenStreetMapProviderImpl();
-//        pr.setPath(new File(getClass().getResource("otp-multipolygon-test.osm").getPath()));
-//        loader.setProvider(pr);
-//
-//        loader.buildGraph(gg, extra);
-//
-//        assertNotNull(gg.getVertex("way -3535 from 4"));
-//    }
+    // disabled pending discussion with author (AMB)
+    // @Test
+    // public void testMultipolygon() throws Exception {
+    // Graph gg = new Graph();
+    // OpenStreetMapGraphBuilderImpl loader = new OpenStreetMapGraphBuilderImpl();
+    //
+    // FileBasedOpenStreetMapProviderImpl pr = new FileBasedOpenStreetMapProviderImpl();
+    // pr.setPath(new File(getClass().getResource("otp-multipolygon-test.osm").getPath()));
+    // loader.setProvider(pr);
+    //
+    // loader.buildGraph(gg, extra);
+    //
+    // assertNotNull(gg.getVertex("way -3535 from 4"));
+    // }
 }

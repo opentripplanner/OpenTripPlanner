@@ -70,4 +70,9 @@ public class GraphServiceBeanImpl implements GraphService {
     public List<String> getGraphIds() {
         return Arrays.asList("default");
     }
+
+    @Override
+    public void loadAllGraphs() {
+        //nothing to do
+    }
 }

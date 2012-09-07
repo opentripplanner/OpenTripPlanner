@@ -13,16 +13,15 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.graph.AbstractEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 
 /**
  * Renting or dropping off a rented bike edge.
@@ -30,7 +29,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author laurent
  * 
  */
-public abstract class RentABikeAbstractEdge extends AbstractEdge {
+public abstract class RentABikeAbstractEdge extends Edge {
 
     private static final long serialVersionUID = 1L;
 
@@ -58,15 +57,15 @@ public abstract class RentABikeAbstractEdge extends AbstractEdge {
         if (options.isUseBikeRentalAvailabilityInformation() && dropoff.getBikesAvailable() == 0) {
             return null;
         }
-        EdgeNarrative en = new FixedModeEdge(this, s0.getNonTransitMode(options));
 
-        StateEditor s1 = s0.edit(this, en);
+        StateEditor s1 = s0.edit(this);
         s1.incrementWeight(options.isArriveBy() ? options.bikeRentalDropoffCost
                 : options.bikeRentalPickupCost);
         s1.incrementTimeInSeconds(options.isArriveBy() ? options.bikeRentalDropoffTime
                 : options.bikeRentalPickupTime);
         s1.setBikeRenting(true);
         s1.setBikeRentalNetwork(network);
+        s1.setBackMode(s0.getNonTransitMode(options));
         State s1b = s1.makeState();
         return s1b;
     }
@@ -82,14 +81,14 @@ public abstract class RentABikeAbstractEdge extends AbstractEdge {
         if (options.isUseBikeRentalAvailabilityInformation() && pickup.getSpacesAvailable() == 0) {
             return null;
         }
-        EdgeNarrative en = new FixedModeEdge(this, s0.getNonTransitMode(options));
 
-        StateEditor s1e = s0.edit(this, en);
+        StateEditor s1e = s0.edit(this);
         s1e.incrementWeight(options.isArriveBy() ? options.bikeRentalPickupCost
                 : options.bikeRentalDropoffCost);
         s1e.incrementTimeInSeconds(options.isArriveBy() ? options.bikeRentalPickupTime
                 : options.bikeRentalDropoffTime);
         s1e.setBikeRenting(false);
+        s1e.setBackMode(s0.getNonTransitMode(options));
         State s1 = s1e.makeState();
         return s1;
     }
@@ -100,13 +99,8 @@ public abstract class RentABikeAbstractEdge extends AbstractEdge {
     }
 
     @Override
-    public Geometry getGeometry() {
+    public LineString getGeometry() {
         return null;
-    }
-
-    @Override
-    public TraverseMode getMode() {
-        return TraverseMode.WALK;
     }
 
     @Override

@@ -104,7 +104,6 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
             for (Edge ee : gv.getOutgoing()) {
                 if (ee instanceof EdgeWithElevation) {
                     EdgeWithElevation edgeWithElevation = (EdgeWithElevation) ee;
-                    // if (ee instanceof TurnEdge && ((TurnVertex)ee.getFromVertex()).is
                     processEdge(graph, edgeWithElevation);
                     if (edgeWithElevation.getElevationProfile() != null && !edgeWithElevation.isElevationFlattened()) {
                         edgesWithElevation.add(edgeWithElevation);

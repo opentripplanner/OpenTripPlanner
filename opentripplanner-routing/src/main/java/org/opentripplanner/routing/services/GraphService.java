@@ -16,7 +16,6 @@ package org.opentripplanner.routing.services;
 import java.util.Collection;
 
 import org.onebusaway.gtfs.services.calendar.CalendarService;
-import org.opentripplanner.routing.contraction.ContractionHierarchySet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,5 +52,8 @@ public interface GraphService {
     public Graph getGraph(String routerId);
 
     public Collection<String> getGraphIds();
+
+    /** Forces loading of all known graphs */
+    void loadAllGraphs();
 
 }

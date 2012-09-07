@@ -25,8 +25,8 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.graph.AbstractEdge;
 import org.opentripplanner.routing.graph.AbstractVertex;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
@@ -34,7 +34,7 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 
 public class AStarTest {
 
@@ -247,7 +247,7 @@ public class AStarTest {
         }
     }
 
-    private static class SimpleEdge extends AbstractEdge {
+    private static class SimpleEdge extends Edge {
         private static final long serialVersionUID = 1L;
 
         public SimpleEdge(Vertex v1, Vertex v2) {
@@ -266,17 +266,12 @@ public class AStarTest {
         }
 
         @Override
-        public TraverseMode getMode() {
-            return null;
-        }
-
-        @Override
         public String getName() {
             return null;
         }
 
         @Override
-        public Geometry getGeometry() {
+        public LineString getGeometry() {
             return null;
         }
 

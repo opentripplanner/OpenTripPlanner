@@ -54,6 +54,7 @@ public class PreBoardEdge extends FreeEdge {
             //apply board slack
             s1.incrementTimeInSeconds(options.getBoardSlack());
             s1.alightTransit();
+            s1.setBackMode(getMode());
             return s1.makeState();
         } else {
             /* Traverse forward: apply stop(pair)-specific costs */
@@ -140,6 +141,7 @@ public class PreBoardEdge extends FreeEdge {
             s1.setEverBoarded(true);
             long wait_cost = board_after - t0;
             s1.incrementWeight(wait_cost + transfer_penalty);
+            s1.setBackMode(getMode());
             return s1.makeState();
         }
     }
@@ -152,6 +154,7 @@ public class PreBoardEdge extends FreeEdge {
         // do not include minimum transfer time in heuristic weight
         // (it is path-dependent)
         StateEditor s1 = s0.edit(this);
+        s1.setBackMode(getMode());
         return s1.makeState();
     }
 

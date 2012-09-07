@@ -17,17 +17,16 @@ import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.graph.AbstractEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 
 
 /**
  *  Models waiting in a station on a vehicle, for frequency-based trips
  */
-public class FrequencyDwell extends AbstractEdge implements OnBoardForwardEdge, OnBoardReverseEdge, DwellEdge {
+public class FrequencyDwell extends Edge implements OnBoardForwardEdge, OnBoardReverseEdge, DwellEdge {
     
     private static final long serialVersionUID = 1L;
 
@@ -49,10 +48,6 @@ public class FrequencyDwell extends AbstractEdge implements OnBoardForwardEdge, 
         return 0;
     }
 
-    public TraverseMode getMode() {
-        return GtfsLibrary.getTraverseMode(pattern.getTrip().getRoute());
-    }
-
     public String getName() {
         return GtfsLibrary.getRouteName(pattern.getTrip().getRoute());
     }
@@ -60,6 +55,7 @@ public class FrequencyDwell extends AbstractEdge implements OnBoardForwardEdge, 
     public State traverse(State state0) {
         int dwellTime = pattern.getDwellTime(stopIndex);
         StateEditor s1 = state0.edit(this);
+        s1.setBackMode(GtfsLibrary.getTraverseMode(pattern.getTrip().getRoute()));
         s1.incrementTimeInSeconds(dwellTime);
         s1.incrementWeight(dwellTime);
         return s1.makeState();
@@ -70,6 +66,7 @@ public class FrequencyDwell extends AbstractEdge implements OnBoardForwardEdge, 
         int dwellTime = pattern.getDwellTime(stopIndex);
         StateEditor s1 = s0.edit(this);
         s1.incrementTimeInSeconds(dwellTime);
+        s1.setBackMode(GtfsLibrary.getTraverseMode(pattern.getTrip().getRoute()));
         s1.incrementWeight(dwellTime);
         return s1.makeState();
     }
@@ -84,7 +81,7 @@ public class FrequencyDwell extends AbstractEdge implements OnBoardForwardEdge, 
         return timeLowerBound(options);
     }
 
-    public Geometry getGeometry() {
+    public LineString getGeometry() {
         return null;
     }
 

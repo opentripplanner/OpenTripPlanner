@@ -13,6 +13,8 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -160,6 +162,23 @@ public class TableTripPattern implements TripPattern, Serializable {
 
     public int getTripIndex(Trip trip) {
         return trips.indexOf(trip);
+    }
+
+// delegate search to scheduled timetable
+//    public int getTripIndex(AgencyAndId tripId) {
+//        int ret = 0;
+//        for (Trip t : trips) {
+//            if (t.getId().equals(tripId)) // replace with indexing in stoptime updater?
+//                return ret;
+//            ret += 1;
+//        }
+//        return -1;
+//    }
+    
+    private void writeObject(ObjectOutputStream outputStream) throws ClassNotFoundException,
+            IOException {
+        finish();
+        outputStream.defaultWriteObject();
     }
 
     /** Returns whether passengers can alight at a given stop */
@@ -694,8 +713,10 @@ public class TableTripPattern implements TripPattern, Serializable {
             return true;
         }
                 
-    } 
-    
-    /* END nested class Timetable */
+    } // END Class Timetable
+
+    public Iterator<Integer> getScheduledDepartureTimes(int stopIndex) {
+        return scheduledTimetable.getDepartureTimes(stopIndex);
+    }
     
 }

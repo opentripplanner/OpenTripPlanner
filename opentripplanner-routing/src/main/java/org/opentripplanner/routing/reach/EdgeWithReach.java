@@ -14,11 +14,18 @@
 package org.opentripplanner.routing.reach;
 
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Vertex;
 
-public interface EdgeWithReach extends Edge {
-    public void setReach(double reach);
+public abstract class EdgeWithReach extends Edge {
+    public EdgeWithReach(Vertex v1, Vertex v2) {
+        super(v1, v2);
+    }
+    
+    private static final long serialVersionUID = 2515505277419161021L;
+    
+    public abstract void setReach(double reach);
     //public void setTransitReach(double reach);
 
-    public double getReach();
+    public abstract double getReach();
     //public double getTransitReach();
 }

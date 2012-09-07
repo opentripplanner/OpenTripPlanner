@@ -17,7 +17,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.graph.AbstractEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -28,7 +28,7 @@ import com.vividsolutions.jts.geom.LineString;
  * This represents the connection between a street vertex and a bike rental station vertex.
  * 
  */
-public class StreetBikeRentalLink extends AbstractEdge {
+public class StreetBikeRentalLink extends Edge {
 
     private static final long serialVersionUID = 1L;
 
@@ -56,11 +56,6 @@ public class StreetBikeRentalLink extends AbstractEdge {
         return null;
     }
 
-    @Override
-    public TraverseMode getMode() {
-        return TraverseMode.WALK;
-    }
-
     public String getName() {
         return bikeRentalStationVertex.getName();
     }
@@ -71,11 +66,12 @@ public class StreetBikeRentalLink extends AbstractEdge {
         // turn restrictions.
         if (s0.getBackEdge() instanceof StreetBikeRentalLink)
             return null;
-        FixedModeEdge en = new FixedModeEdge(this, s0.getNonTransitMode(s0.getOptions()));
-        StateEditor s1 = s0.edit(this, en);
+
+        StateEditor s1 = s0.edit(this);
         //assume bike rental stations are more-or-less on-street
         s1.incrementTimeInSeconds(1);
         s1.incrementWeight(1);
+        s1.setBackMode(s0.getNonTransitMode(s0.getOptions()));
         return s1.makeState();
     }
 

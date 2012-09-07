@@ -13,11 +13,9 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -26,14 +24,14 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.graph.AbstractEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 
-public class FrequencyBoard extends AbstractEdge  implements OnBoardForwardEdge {
+public class FrequencyBoard extends Edge  implements OnBoardForwardEdge {
     private static final long serialVersionUID = 7919511656529752927L;
 
     private static final Logger _log = LoggerFactory.getLogger(FrequencyBoard.class);
@@ -54,15 +52,20 @@ public class FrequencyBoard extends AbstractEdge  implements OnBoardForwardEdge 
         this.serviceId = serviceId;
     }
 
+    @Override
+    public Trip getTrip() {
+        return pattern.getTrip();
+    }
+
     public String getDirection() {
-        return null;
+        return pattern.getHeadsign(stopIndex);
     }
 
     public double getDistance() {
         return 0;
     }
 
-    public Geometry getGeometry() {
+    public LineString getGeometry() {
         return null;
     }
 
@@ -87,14 +90,14 @@ public class FrequencyBoard extends AbstractEdge  implements OnBoardForwardEdge 
                     !((TransitBoardAlight) state0.getBackEdge()).isBoarding()) {
                 return null;
             }
-            EdgeNarrative en = new TransitNarrative(trip, this);
-            StateEditor s1 = state0.edit(this, en);
+            StateEditor s1 = state0.edit(this);
             int type = pattern.getBoardType(stopIndex);
             if (TransitUtils.handleBoardAlightType(s1, type)) {
                 return null;
             }
             s1.setTripId(null);
             s1.setLastAlightedTime(state0.getTime());
+            s1.setBackMode(TraverseMode.BOARDING);
             s1.setPreviousStop(fromv);
             return s1.makeState();
         } else {
@@ -176,8 +179,7 @@ public class FrequencyBoard extends AbstractEdge  implements OnBoardForwardEdge 
                 }
             }
 
-            EdgeNarrative en = new TransitNarrative(trip, this);
-            StateEditor s1 = state0.edit(this, en);
+            StateEditor s1 = state0.edit(this);
             int type = pattern.getBoardType(stopIndex);
             if (TransitUtils.handleBoardAlightType(s1, type)) {
                 return null;
@@ -187,7 +189,8 @@ public class FrequencyBoard extends AbstractEdge  implements OnBoardForwardEdge 
             s1.setTripId(trip.getId());
             s1.setZone(pattern.getZone(stopIndex));
             s1.setRoute(trip.getRoute().getId());
-
+            s1.setBackMode(TraverseMode.BOARDING);
+            
             long wait_cost = bestWait;
             if (state0.getNumBoardings() == 0) {
                 wait_cost *= options.waitAtBeginningFactor;
@@ -203,6 +206,7 @@ public class FrequencyBoard extends AbstractEdge  implements OnBoardForwardEdge 
     public State optimisticTraverse(State state0) {
         StateEditor s1 = state0.edit(this);
         // no cost (see patternalight)
+        s1.setBackMode(TraverseMode.BOARDING);
         return s1.makeState();
     }
 

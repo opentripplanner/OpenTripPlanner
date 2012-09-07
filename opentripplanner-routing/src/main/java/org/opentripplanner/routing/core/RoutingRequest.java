@@ -46,7 +46,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
     private static final Logger LOG = LoggerFactory.getLogger(RoutingRequest.class);
     private static final int CLAMP_ITINERARIES = 3;
-    private static final int CLAMP_TRANSFERS = 4;
+    private static final int CLAMP_TRANSFERS = 6;
 
     /* FIELDS UNIQUELY IDENTIFYING AN SPT REQUEST */
 
@@ -794,5 +794,12 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public String getBannedRouteStr() {
         return getRouteSetStr(bannedRoutes);
+    }
+
+    public void setMaxWalkDistance(double maxWalkDistance) {
+        this.maxWalkDistance = maxWalkDistance;
+        if (walkingOptions != null && walkingOptions != this) {
+            this.walkingOptions.setMaxWalkDistance(maxWalkDistance);
+        }
     }
 }

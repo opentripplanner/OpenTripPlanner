@@ -13,14 +13,12 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.graph.AbstractEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 
 /**
  * An edge represents what GTFS calls a timed transfer. This could also be referred to as a
@@ -32,12 +30,12 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * A TimedTransferEdge should connect a stop_arrive vertex to a stop_depart vertex, bypassing
  * the preboard and prealight edges that handle the transfer table and schedule slack. The cost of
- * boarding a vehicle should is added in (pattern)board edges, so it is still taken into account.
+ * boarding a vehicle should is added in TransitBoardAlight edges, so it is still taken into account.
  * 
  * @author andrewbyrd
  * 
  */
-public class TimedTransferEdge extends AbstractEdge {
+public class TimedTransferEdge extends Edge {
 
     private static final long serialVersionUID = 20110730L; // MMMMDDYY
 
@@ -47,9 +45,9 @@ public class TimedTransferEdge extends AbstractEdge {
 
     @Override
     public State traverse(State s0) {
-        EdgeNarrative en = new FixedModeEdge(this, s0.getNonTransitMode(s0.getOptions()));
-        StateEditor s1 = s0.edit(this, en);
+        StateEditor s1 = s0.edit(this);
         s1.incrementWeight(1);
+        s1.setBackMode(s0.getNonTransitMode(s0.getOptions()));
         return s1.makeState();
     }
 
@@ -59,13 +57,8 @@ public class TimedTransferEdge extends AbstractEdge {
     }
 
     @Override
-    public Geometry getGeometry() {
+    public LineString getGeometry() {
         return null;
-    }
-
-    @Override
-    public TraverseMode getMode() {
-        return TraverseMode.WALK;
     }
 
     @Override

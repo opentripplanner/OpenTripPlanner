@@ -20,15 +20,15 @@ import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.graph.AbstractEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 
 /**
  *  Models waiting in a station on a vehicle. 
  */
-public class Dwell extends AbstractEdge implements DwellEdge {
+public class Dwell extends Edge implements DwellEdge {
 
     /*
      * Models waiting in a station where passengers may remain on the vehicle. This may be useful
@@ -59,6 +59,7 @@ public class Dwell extends AbstractEdge implements DwellEdge {
     	StateEditor state1 = state0.edit(this);
         state1.incrementTimeInSeconds(elapsed);
         state1.incrementWeight(elapsed);
+        state1.setBackMode(getMode());
         return state1.makeState();
     }
 
@@ -87,7 +88,7 @@ public class Dwell extends AbstractEdge implements DwellEdge {
         return GtfsLibrary.getRouteName(stopTime.getTrip().getRoute());
     }
 
-    public Geometry getGeometry() {
+    public LineString getGeometry() {
         return null;
     }
 }

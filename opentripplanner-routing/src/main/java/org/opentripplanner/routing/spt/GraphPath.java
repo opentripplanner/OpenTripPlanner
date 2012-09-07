@@ -19,8 +19,6 @@ import java.util.List;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.core.EdgeNarrative;
-import org.opentripplanner.routing.core.MutableEdgeNarrative;
 import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
@@ -124,8 +122,8 @@ public class GraphPath {
     public List<RouteSpec> getRouteSpecs() {
         List<RouteSpec> ret = new LinkedList<RouteSpec>();
         for (State s : states) {
-            EdgeNarrative e = s.getBackEdgeNarrative();
-            Trip trip = e.getTrip();
+            Edge e = s.getBackEdge();
+            Trip trip = s.getBackTrip();
             if ( trip != null) {
                 String routeName = GtfsLibrary.getRouteName(trip.getRoute());
                 RouteSpec spec = new RouteSpec(trip.getId().getAgencyId(), routeName);
@@ -144,9 +142,9 @@ public class GraphPath {
     public List<AgencyAndId> getTrips() {
         List<AgencyAndId> ret = new LinkedList<AgencyAndId>();
         for (State s : states) {
-            EdgeNarrative e = s.getBackEdgeNarrative();
+            Edge e = s.getBackEdge();
             if (e == null) continue;
-            Trip trip = e.getTrip();
+            Trip trip = s.getBackTrip();
             if (trip != null)
                 ret.add(trip.getId());
         }

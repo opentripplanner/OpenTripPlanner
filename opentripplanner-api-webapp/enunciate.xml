@@ -5,7 +5,7 @@
   don't need. -->
   <disable-rule id="jaxb.noarg.constructor"/>
   <services> 
-    <rest> 
+    <rest defaultRestSubcontext="/ws/">
       <content-types> 
         <content-type type="text/plain" id="txt"/> 
       </content-types> 

@@ -16,10 +16,13 @@ package org.opentripplanner.graph_builder.impl.map;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -30,11 +33,11 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.util.ElevationProfileSegment;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
@@ -171,7 +174,11 @@ public class TestStreetMatcher {
         public SimpleEdge(StreetVertex v1, StreetVertex v2) {
             super(v1, v2);
         }
-
+        
+        public Set<Alert> getNotes () {
+            return null;
+        }
+        
         @Override
         public State traverse(State s0) {
             double d = getDistance();
@@ -184,17 +191,12 @@ public class TestStreetMatcher {
         }
 
         @Override
-        public TraverseMode getMode() {
-            return null;
-        }
-
-        @Override
         public String getName() {
             return null;
         }
 
         @Override
-        public Geometry getGeometry() {
+        public LineString getGeometry() {
             return gf.createLineString(new Coordinate[] { fromv.getCoordinate(),
                     tov.getCoordinate() });
         }
@@ -243,6 +245,10 @@ public class TestStreetMatcher {
         public String toString() {
             return "SimpleEdge(" + fromv + ", " + tov + ")";
         }
+        
+        public Set<Alert> getWheelchairNotes () {
+            return null;
+        }
 
         @Override
         public int getStreetClass() {
@@ -250,6 +256,10 @@ public class TestStreetMatcher {
         }
 
         @Override
+        public boolean isWheelchairAccessible() {
+            return true;
+        }
+
         public boolean isElevationFlattened() {
             return false;
         }
@@ -257,6 +267,11 @@ public class TestStreetMatcher {
         @Override
         public ElevationProfileSegment getElevationProfileSegment() {
             return null;
+        }
+
+        @Override
+        public List<TurnRestriction> getTurnRestrictions() {
+            return Collections.emptyList();
         }
     }
 }

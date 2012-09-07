@@ -14,7 +14,9 @@
 package org.opentripplanner.routing.impl;
 
 import java.util.Collection;
+import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.PostConstruct;
@@ -27,6 +29,7 @@ import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.core.io.support.ResourcePatternResolver;
 
 @Scope("singleton")
 public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
@@ -75,6 +78,32 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
         }
     }
 
+    @Override 
+    public void loadAllGraphs() {
+        if (resourceLoader instanceof ResourcePatternResolver) {
+            ResourcePatternResolver resolver = (ResourcePatternResolver) resourceLoader;
+            try {
+                String resourceName = resourcePattern.replace("{}", "*/");
+                Resource[] resources = resolver.getResources(resourceName + "Graph.obj");
+                for (Resource resource : resources) {
+                    resourceName = resource.getURI().toString();
+                    if (graphs.get(resourceName) != null)
+                        continue;
+                    InputStream is = resource.getInputStream();
+                    Graph graph = Graph.load(is, LoadLevel.FULL);
+                    graphs.put(resourceName, graph);
+                    levels.put(resourceName, LoadLevel.FULL);
+                }
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+    }
+    
     @Override
     public Graph getGraph() {
         return getGraph(null);
@@ -146,7 +175,12 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
 
     @Override
     public Collection<String> getGraphIds() {
-        return graphs.keySet();
+        ArrayList<String> out = new ArrayList<String>();
+        String base = resourcePattern.replace("{}", "");
+        for (String id : graphs.keySet()) {
+            out.add(id.replaceFirst(base, "").replace("/Graph.obj",""));
+        }
+        return out;
     }
 
     @Override

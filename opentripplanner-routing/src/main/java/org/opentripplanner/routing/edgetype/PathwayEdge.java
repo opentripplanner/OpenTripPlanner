@@ -3,8 +3,7 @@ package org.opentripplanner.routing.edgetype;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.graph.AbstractEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -26,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 /**
  * A walking pathway as described in GTFS
  */
-public class PathwayEdge extends AbstractEdge {
+public class PathwayEdge extends Edge {
 
     private int traversalTime;
 
@@ -59,10 +58,6 @@ public class PathwayEdge extends AbstractEdge {
         return GeometryUtils.getGeometryFactory().createLineString(coordinates);
     }
 
-    public TraverseMode getMode() {
-        return TraverseMode.WALK;
-    }
-
     public String getName() {
         return "pathway";
     }
@@ -78,6 +73,7 @@ public class PathwayEdge extends AbstractEdge {
         StateEditor s1 = s0.edit(this);
         s1.incrementTimeInSeconds(time);
         s1.incrementWeight(time);
+        // TODO: leaving mode as previous
         return s1.makeState();
     }
 

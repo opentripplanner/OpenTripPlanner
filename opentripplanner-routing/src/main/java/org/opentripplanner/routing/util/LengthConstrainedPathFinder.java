@@ -7,15 +7,11 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 
-import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.pqueue.BinHeap;
-import org.opentripplanner.routing.edgetype.TurnEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.TurnVertex;
 
 /**
  * Path finder for use in debugging and testing the vehicle location inference
@@ -49,24 +45,18 @@ import org.opentripplanner.routing.vertextype.TurnVertex;
  */
 public class LengthConstrainedPathFinder {
 
-    //these actually represent being somewhere on the linestring, not points
-    private final TurnVertex startVertex, targetVertex; 
+    //these represent being somewhere on the linestring
+    private final Edge startEdge, targetEdge; 
     private final double targetLength, epsilon;
     private Set<State> solutions;
     // cached derived values
     private final boolean reverse; 
     public final Map<Vertex, Double> bounds;
 
-    public LengthConstrainedPathFinder (Edge startEdge, Edge targetEdge, 
+    public LengthConstrainedPathFinder (Edge startVertex, Edge targetVertex, 
            double targetLength, double epsilon, boolean calculateBounds) {
-        this((TurnVertex)(startEdge.getFromVertex()), (TurnVertex)(targetEdge.getFromVertex()), 
-           targetLength, epsilon, calculateBounds);
-        }
-
-    public LengthConstrainedPathFinder (TurnVertex startVertex, TurnVertex targetVertex, 
-           double targetLength, double epsilon, boolean calculateBounds) {
-        this.startVertex = startVertex;
-        this.targetVertex = targetVertex;
+        this.startEdge = startVertex;
+        this.targetEdge = targetVertex;
         reverse = targetLength < 0;
         targetLength = Math.abs(targetLength);
         this.targetLength = targetLength;
@@ -80,14 +70,13 @@ public class LengthConstrainedPathFinder {
     // use reverse search from the target edge to find lower bounds on distance for pruning
     private Map<Vertex, Double> findBounds() {
         Map<Vertex, Double> ret = new HashMap<Vertex, Double>();
-        ret.put(targetVertex, 0.0); 
+        ret.put(targetEdge.getToVertex(), 0.0); 
         BinHeap<Vertex> pq = new BinHeap<Vertex>();
-        pq.insert(targetVertex, 0.0);
+        pq.insert(targetEdge.getToVertex(), 0.0);
         while ( ! pq.empty()) {
             double length0 = pq.peek_min_key();
             Vertex v0 = pq.extract_min();
-            // TODO handle PlainStreetEdges (or not?) they may already work right (before edge...)
-            for (Edge edge : getTurns(v0, !reverse)) {
+            for (Edge edge : getOutgoing(v0, !reverse)) {
                 double length1 = length0 + edge.getDistance();
                 // sense intentionally swapped because this is a search backward from target
                 Vertex v1 = reverse ? edge.getToVertex() : edge.getFromVertex();
@@ -111,7 +100,7 @@ public class LengthConstrainedPathFinder {
     }
     
     /** accounts for negative target distances */
-    private Iterable<Edge> getTurns(Vertex vertex, boolean reverse) {
+    private Iterable<Edge> getOutgoing(Vertex vertex, boolean reverse) {
         if (reverse)
             return vertex.getIncoming();
         else
@@ -140,18 +129,22 @@ public class LengthConstrainedPathFinder {
     /** recursive depth-first search using JVM stack */
     public Set<State> solveDepthFirst() {
         solutions = new HashSet<State>();
-        depthFirst(new State(startVertex));
+        depthFirst(new State(startEdge.getFromVertex()));
         return getSolutions();
     }
 
     private void depthFirst(State s0) {
         if (s0.isSolution())
             solutions.add(s0);
-        for (Edge edge : getTurns(s0.vertex, reverse)) {
+        for (Edge edge : getOutgoing(s0.vertex, reverse)) {
+            //skip direct back-and-forthing
+            if (s0.back != null && (reverse ? edge.getFromVertex() : edge.getToVertex()) == s0.back.vertex) {
+                continue;
+            }
             State s1 = s0.traverse(edge);
             if (s1.isCandidate())
                 depthFirst(s1);
-        }        
+        }
     }
     
     public class State {
@@ -160,10 +153,10 @@ public class LengthConstrainedPathFinder {
         final double minLength; // before traversing the edge, without initial/final edge fragments
         final State back;
         
-        public State(TurnVertex tvertex) { 
+        public State(Vertex vertex) { 
             // make initial state. min distance should be 0 paths of length 2. 
-            // neg is harmless because it is only used as a lower bound 
-            this(tvertex, 0 - tvertex.getLength(), null);
+            // zero is harmless because it is only used as a lower bound 
+            this(vertex, 0, null);
         }
         
         private State(Vertex vertex, double minLength, State back) {
@@ -189,18 +182,17 @@ public class LengthConstrainedPathFinder {
         }
 
         private double getMaxLength() {
-            // TurnVertex has length because it actually represents being on a segment
-            return this.minLength + startVertex.getLength() + targetVertex.getLength(); 
+            return this.minLength; 
         }
 
         private boolean isSolution() {
-            return vertex == targetVertex && 
+            return vertex == targetEdge.getToVertex() && 
                    this.minLength - epsilon <= targetLength && 
                    this.getMaxLength() + epsilon >= targetLength;
         }
         
         private State traverse(Edge edge) {
-            return new State(edge.getToVertex(), this.minLength + edge.getDistance(), this);
+            return new State(reverse ? edge.getFromVertex() : edge.getToVertex(), this.minLength + edge.getDistance(), this);
         }
         
         public String toString() {

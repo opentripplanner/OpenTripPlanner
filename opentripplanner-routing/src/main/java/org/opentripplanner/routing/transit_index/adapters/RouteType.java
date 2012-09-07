@@ -41,6 +41,7 @@ public class RouteType {
     public RouteType(Route route, Boolean extended) {
         this.id = route.getId();
         this.routeShortName = route.getShortName();
+        this.routeType = route.getType();
         this.routeLongName = route.getLongName();
         if (extended != null && extended.equals(true)) {
             this.routeDesc = route.getDesc();
@@ -49,6 +50,10 @@ public class RouteType {
             this.routeColor = route.getColor();
             this.routeTextColor = route.getTextColor();
         }
+    }
+    
+    public AgencyAndId getId(){
+        return this.id;
     }
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
@@ -73,12 +78,12 @@ public class RouteType {
     String routeColor;
 
     @XmlAttribute
-    int routeType;
+    Integer routeType;
 
     @XmlAttribute
     String routeTextColor;
 
     @XmlAttribute
-    int routeBikesAllowed;
+    Integer routeBikesAllowed;
 
 }

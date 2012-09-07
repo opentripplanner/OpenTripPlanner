@@ -34,7 +34,6 @@ import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.edgetype.OutEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
@@ -45,7 +44,6 @@ import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
-import org.opentripplanner.routing.vertextype.TurnVertex;
 import org.opentripplanner.util.JoinedList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -147,7 +145,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 Envelope env = new Envelope(v.getCoordinate());
                 transitStopTree.insert(env, v);
             }
-            if (v instanceof TurnVertex || v instanceof IntersectionVertex) {
+            if (v instanceof IntersectionVertex) {
                 Envelope env = new Envelope(v.getCoordinate());
                 intersectionTree.insert(env, v);
             }
@@ -212,9 +210,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 closest.getExtra().add(e);
                 e = new FreeEdge(v, closest);
                 closest.getExtra().add(e);
-                if (v instanceof TurnVertex && ((TurnVertex) v).isWheelchairAccessible()) {
-                    closest.setWheelchairAccessible(true);
-                }
             }
             return closest;
         }
@@ -450,7 +445,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 nearbyEdges = new JoinedList<StreetEdge>(nearbyEdges, extraStreets);
             }
             for (StreetEdge e : nearbyEdges) {
-                if (e == null || e instanceof OutEdge || e.getFromVertex() == null)
+                if (e == null || e.getFromVertex() == null)
                     continue;
                 if (options != null && (!(e.canTraverse(options) || e.canTraverse(walkingOptions))))
                     continue;

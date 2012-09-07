@@ -26,13 +26,14 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jettison.json.JSONException;
-import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
+import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.api.model.error.TransitError;
 import org.opentripplanner.api.model.transit.AgencyList;
 import org.opentripplanner.api.model.transit.ModeList;
 import org.opentripplanner.api.model.transit.RouteData;
+import org.opentripplanner.api.model.transit.RouteDataList;
 import org.opentripplanner.api.model.transit.RouteList;
 import org.opentripplanner.api.model.transit.ServiceCalendarData;
 import org.opentripplanner.api.model.transit.StopList;
@@ -57,6 +58,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.sun.jersey.api.spring.Autowire;
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 
 // NOTE - /ws/transit is the full path -- see web.xml
 
@@ -107,23 +109,33 @@ public class TransitIndex {
             return new TransitError(
                     "No transit index found.  Add TransitIndexBuilder to your graph builder configuration and rebuild your graph.");
         }
-        RouteData response = new RouteData();
-        AgencyAndId routeId = new AgencyAndId(agency, id);
-        response.id = routeId;
-        List<RouteVariant> variants = transitIndexService.getVariantsForRoute(routeId);
+        RouteDataList respond = new RouteDataList();
 
-        response.variants = variants;
-        response.directions = new ArrayList<String>(
-                transitIndexService.getDirectionsForRoute(routeId));
+        for (String agencyId : getAgenciesIds(agency, routerId)) {
+            AgencyAndId routeId = new AgencyAndId(agencyId, id);
 
-        if (references != null && references.equals(true)) {
-            response.stops = new ArrayList<StopType>();
-            for (org.onebusaway.gtfs.model.Stop stop : transitIndexService
-                    .getStopsForRoute(routeId))
-                response.stops.add(new StopType(stop, extended));
+            List<RouteVariant> variants = transitIndexService.getVariantsForRoute(routeId);
+
+            if (variants.isEmpty())
+                continue;
+
+            RouteData response = new RouteData();
+            response.id = routeId;
+            response.variants = variants;
+            response.directions = new ArrayList<String>(
+                    transitIndexService.getDirectionsForRoute(routeId));
+
+            if (references != null && references.equals(true)) {
+                response.stops = new ArrayList<StopType>();
+                for (org.onebusaway.gtfs.model.Stop stop : transitIndexService
+                        .getStopsForRoute(routeId))
+                    response.stops.add(new StopType(stop, extended));
+            }
+
+            respond.routeData.add(response);
         }
 
-        return response;
+        return respond;
     }
 
     /**
@@ -217,9 +229,13 @@ public class TransitIndex {
                     "No transit index found.  Add TransitIndexBuilder to your graph builder configuration and rebuild your graph.");
         }
 
-        List<AgencyAndId> routes = transitIndexService
-                .getRoutesForStop(new AgencyAndId(agency, id));
-        RouteList result = makeRouteList(routes, null, extended, routerId);
+        RouteList result = new RouteList();
+
+        for (String string : getAgenciesIds(agency, routerId)) {
+            List<AgencyAndId> routes = transitIndexService.getRoutesForStop(new AgencyAndId(string,
+                    id));
+            result.routes.addAll(makeRouteList(routes, null, extended, routerId).routes);
+        }
 
         return result;
     }
@@ -256,14 +272,6 @@ public class TransitIndex {
 
         // if no stopAgency is set try to search through all diffrent agencies
         Graph graph = getGraph(routerId);
-        ArrayList<String> agencyList = new ArrayList<String>();
-        if (stopAgency == null || stopAgency.equals("")) {
-            for (Agency a : graph.getAgencies()) {
-                agencyList.add(a.getId());
-            }
-        } else {
-            agencyList.add(stopAgency);
-        }
 
         // add all departures
         HashSet<TripType> trips = new HashSet<TripType>();
@@ -274,10 +282,12 @@ public class TransitIndex {
             result.routes = new HashSet<Route>();
         }
 
-        for (String stopAgencyId : agencyList) {
+        for (String stopAgencyId : getAgenciesIds(stopAgency, routerId)) {
 
             AgencyAndId stop = new AgencyAndId(stopAgencyId, stopId);
             Edge preBoardEdge = transitIndexService.getPreBoardEdge(stop);
+            if (preBoardEdge == null)
+                break;
             Vertex boarding = preBoardEdge.getToVertex();
 
             RoutingRequest options = makeTraverseOptions(startTime, routerId);
@@ -386,7 +396,7 @@ public class TransitIndex {
                 state = segment.board.traverse(s0);
                 if (state == null)
                     continue;
-                if (state.getBackEdgeNarrative().getTrip().getId().equals(trip)) {
+                if (state.getBackTrip().getId().equals(trip)) {
                     start = segment;
                     StopTime st = new StopTime();
                     st.time = state.getTime();
@@ -437,7 +447,7 @@ public class TransitIndex {
                 break;
             StopTime stopTime = new StopTime();
             stopTime.time = time;
-            stopTime.trip = new TripType(result.getBackEdgeNarrative().getTrip(), extended);
+            stopTime.trip = new TripType(result.getBackTrip(), extended);
             out.add(stopTime);
 
             time += 1; // move to the next board time
@@ -462,7 +472,7 @@ public class TransitIndex {
                 break;
             StopTime stopTime = new StopTime();
             stopTime.time = time;
-            stopTime.trip = new TripType(result.getBackEdgeNarrative().getTrip(), extended);
+            stopTime.trip = new TripType(result.getBackTrip(), extended);
             out.add(stopTime);
             time -= 1; // move to the previous alight time
         } while (true);
@@ -527,29 +537,107 @@ public class TransitIndex {
             @QueryParam("routerId") String routerId) throws JSONException {
 
         Graph graph = getGraph(routerId);
+        StopList response = new StopList();
 
         StreetVertexIndexService streetVertexIndexService = graph.streetIndex;
-        Coordinate cOne = new Coordinate(leftUpLat, leftUpLon);
-        Coordinate cTwo = new Coordinate(rightUpLat, rightUpLon);
-        List<TransitStop> stops = streetVertexIndexService.getNearbyTransitStops(cOne, cTwo);
-        TransitIndexService transitIndexService = graph.getService(TransitIndexService.class);
-        if (transitIndexService == null) {
-            return new TransitError(
-                    "No transit index found.  Add TransitIndexBuilder to your graph builder configuration and rebuild your graph.");
-        }
+        if (leftUpLat == null || leftUpLon == null || rightUpLat == null || rightUpLon == null) {
+            double METERS_PER_DEGREE_LAT = 111111;
+            double distance = 2000;
+            for (Vertex gv : graph.getVertices()) {
+                if (gv instanceof TransitStop) {
+                    Coordinate c = gv.getCoordinate();
+                    Envelope env = new Envelope(c);
+                    double meters_per_degree_lon_here = METERS_PER_DEGREE_LAT
+                            * Math.cos(Math.toRadians(c.y));
+                    env.expandBy(distance / meters_per_degree_lon_here, distance
+                            / METERS_PER_DEGREE_LAT);
+                    StopType stop = new StopType(((TransitStop) gv).getStop(), extended);
+                    response.stops.add(stop);
+                }
+            }
+        } else {
+            Coordinate cOne = new Coordinate(leftUpLat, leftUpLon);
+            Coordinate cTwo = new Coordinate(rightUpLat, rightUpLon);
+            List<TransitStop> stops = streetVertexIndexService.getNearbyTransitStops(cOne, cTwo);
+            TransitIndexService transitIndexService = graph.getService(TransitIndexService.class);
+            if (transitIndexService == null) {
+                return new TransitError(
+                        "No transit index found.  Add TransitIndexBuilder to your graph builder configuration and rebuild your graph.");
+            }
 
-        StopList response = new StopList();
-        for (TransitStop transitStop : stops) {
-            AgencyAndId stopId = transitStop.getStopId();
-            if (agency != null && !agency.equals(stopId.getAgencyId()))
-                continue;
-            StopType stop = new StopType(transitStop.getStop(), extended);
-            if (extended != null && extended.equals(true))
-                stop.routes = transitIndexService.getRoutesForStop(stopId);
-            response.stops.add(stop);
+            for (TransitStop transitStop : stops) {
+                AgencyAndId stopId = transitStop.getStopId();
+                if (agency != null && !agency.equals(stopId.getAgencyId()))
+                    continue;
+                StopType stop = new StopType(transitStop.getStop(), extended);
+                if (extended != null && extended.equals(true))
+                    stop.routes = transitIndexService.getRoutesForStop(stopId);
+                response.stops.add(stop);
+            }
         }
 
         return response;
     }
 
+    /**
+     * Return a list of all routes that operate between start stop and end stop.
+     */
+    @GET
+    @Path("/routesBetweenStops")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    public Object routesBetweenStops(@QueryParam("startAgency") String startAgency,
+            @QueryParam("endAgency") String endAgency,
+            @QueryParam("startStopId") String startStopId,
+            @QueryParam("endStopId") String endStopId, @QueryParam("extended") Boolean extended,
+            @QueryParam("routerId") String routerId) throws JSONException {
+
+        RouteList response = new RouteList();
+
+        RouteList routeList = (RouteList) this.getRoutesForStop(startAgency, startStopId, extended,
+                routerId);
+
+        for (RouteType route : routeList.routes) {
+            for (String agency : getAgenciesIds(null, routerId)) {
+                if (ifRouteBetweenStops(route, agency, routerId, startStopId, endStopId, endAgency))
+                    response.routes.add(route);
+            }
+        }
+
+        return response;
+    }
+
+    private Boolean ifRouteBetweenStops(RouteType route, String agency, String routerId,
+            String startStopId, String endStopId, String endAgency) throws JSONException {
+
+        RouteDataList routeDataList = (RouteDataList) this.getRouteData(agency, route.getId()
+                .getId(), false, false, routerId);
+        for (RouteData routeData : routeDataList.routeData)
+            for (RouteVariant variant : routeData.variants)
+                for (String endStopAgency : getAgenciesIds(endAgency, routerId)) {
+                    Boolean start = false;
+                    for (Stop stop : variant.getStops()) {
+                        if (stop.getId().getId().equals(startStopId))
+                            start = true;
+                        if (start && stop.getId().equals(new AgencyAndId(endStopAgency, endStopId))) {
+                            return true;
+                        }
+                    }
+                }
+        return false;
+    }
+
+    private ArrayList<String> getAgenciesIds(String agency, String routerId) {
+
+        Graph graph = getGraph(routerId);
+
+        ArrayList<String> agencyList = new ArrayList<String>();
+        if (agency == null || agency.equals("")) {
+            for (String a : graph.getAgencyIds()) {
+                agencyList.add(a);
+            }
+        } else {
+            agencyList.add(agency);
+        }
+        return agencyList;
+    }
 }

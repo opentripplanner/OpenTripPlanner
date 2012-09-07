@@ -57,7 +57,7 @@ public class AnalysisUtils {
                 State s1 = e.traverse(s0);
                 if (s1 != null) {
                     Integer component = components.find(e.getFromVertex());
-                    Geometry geometry = s1.getBackEdgeNarrative().getGeometry();
+                    Geometry geometry = s1.getBackEdge().getGeometry();
                     if (geometry != null) {
                         List<Coordinate> coordinates = new ArrayList<Coordinate>(Arrays.asList(geometry.getCoordinates()));
                         for (int i = 0; i < coordinates.size(); ++i) {

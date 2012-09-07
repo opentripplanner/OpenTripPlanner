@@ -98,7 +98,7 @@ public class LocalStopFinder {
                 }
             }
         }
-        
+
         // For each pattern, check if each stop is local
 
         neighborhoods = new HashMap<Stop, HashMap<TableTripPattern, P2<Double>>>();
@@ -144,7 +144,9 @@ public class LocalStopFinder {
                         P2<Double> distance = entry.getValue();
                         P2<Double> previousDistance = previousDistances.get(key);
                         P2<Double> nextDistance = nextDistances.get(key);
-                        if (previousDistance == null) {
+                        if (distance.getFirst() == 0) {
+                            local = false;
+                        } else if (previousDistance == null) {
                             if (nextDistance == null
                                     || nextDistance.getFirst() > distance.getFirst()
                                     || nextDistance.getSecond() > distance.getSecond()) {

@@ -13,37 +13,18 @@
 
 package org.opentripplanner.graph_builder.impl.osm;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+
 /**
  * Defines which OSM ways get notes and what kind of notes they get.
  * 
  * @author novalis
  * 
  */
+@Data @NoArgsConstructor @AllArgsConstructor
 public class NotePicker {
-
     private OSMSpecifier specifier;
-
     private NoteProperties noteProperties;
-
-    public NotePicker(OSMSpecifier specifier, NoteProperties noteProperties) {
-        this.specifier = specifier;
-        this.noteProperties = noteProperties;
-    }
-
-    public void setSpecifier(OSMSpecifier specifier) {
-        this.specifier = specifier;
-    }
-
-    public OSMSpecifier getSpecifier() {
-        return specifier;
-    }
-
-    public void setNoteProperties(NoteProperties noteProperties) {
-        this.noteProperties = noteProperties;
-    }
-
-    public NoteProperties getNoteProperties() {
-        return noteProperties;
-    }
-
 }

@@ -475,8 +475,12 @@ public class GTFSPatternHopFactory {
             hop.setGeometry(getHopGeometry(graph, trip.getShapeId(), st0, st1, psv0depart,
                     psv1arrive));
 
+            String headsign = st0.getStopHeadsign();
+            if (headsign == null) {
+                headsign = trip.getTripHeadsign();
+            }
             pattern.addHop(i, departureTime, runningTime, arrivalTime, dwellTime,
-                    st0.getStopHeadsign());
+                    headsign);
 
             TransitStopDepart stopDepart = context.stopDepartNodes.get(s0);
             TransitStopArrive stopArrive = context.stopArriveNodes.get(s1);
@@ -513,10 +517,19 @@ public class GTFSPatternHopFactory {
             /* set depature time if it is missing */
             st0.setDepartureTime(st0.getArrivalTime());
         }
+        boolean midnightCrossed = false;
+        final int HOUR = 60 * 60;
+
         for (int i = 1; i < stopTimes.size(); i++) {
             boolean st1bogus = false;
-            boolean midnightCrossed = false;
             StopTime st1 = stopTimes.get(i);
+
+            if (midnightCrossed) {
+                if (st1.isDepartureTimeSet())
+                    st1.setDepartureTime(st1.getDepartureTime() + 24 * HOUR);
+                if (st1.isArrivalTimeSet())
+                    st1.setArrivalTime(st1.getArrivalTime() + 24 * HOUR);
+            }
             if (!st1.isDepartureTimeSet() && st1.isArrivalTimeSet()) {
                 /* set departure time if it is missing */
                 st1.setDepartureTime(st1.getArrivalTime());
@@ -526,7 +539,6 @@ public class GTFSPatternHopFactory {
             if ( ! (st1.isArrivalTimeSet() && st1.isDepartureTimeSet())) {
                 continue;
             }
-            final int HOUR = 60 * 60;
             int dwellTime = st0.getDepartureTime() - st0.getArrivalTime(); 
             if (dwellTime < 0) {
                 _log.warn(GraphBuilderAnnotation.register(graph, Variety.NEGATIVE_DWELL_TIME, st0));
@@ -550,7 +562,7 @@ public class GTFSPatternHopFactory {
                 }
             }
             double hopDistance = distanceLibrary.fastDistance(
-                   st0.getStop().getLon(), st0.getStop().getLat(),
+                   st0.getStop().getLat(), st0.getStop().getLon(),
                    st1.getStop().getLon(), st1.getStop().getLat());
             double hopSpeed = hopDistance/runningTime;
             /* zero-distance hops are probably not harmful, though they could be better 
@@ -966,7 +978,7 @@ public class GTFSPatternHopFactory {
     }
     */
     
-    private Geometry getHopGeometry(Graph graph, AgencyAndId shapeId, StopTime st0, StopTime st1,
+    private LineString getHopGeometry(Graph graph, AgencyAndId shapeId, StopTime st0, StopTime st1,
             Vertex startJourney, Vertex endJourney) {
 
         if (shapeId == null || shapeId.getId() == null || shapeId.getId().equals(""))
@@ -1282,7 +1294,7 @@ public class GTFSPatternHopFactory {
             TransferEdge transferEdge = new TransferEdge(fromv, tov, distance, time);
             CoordinateSequence sequence = new PackedCoordinateSequence.Double(new Coordinate[] {
                     fromv.getCoordinate(), tov.getCoordinate() }, 2);
-            Geometry geometry = _geometryFactory.createLineString(sequence);
+            LineString geometry = _geometryFactory.createLineString(sequence);
             transferEdge.setGeometry(geometry);
         }
     }
