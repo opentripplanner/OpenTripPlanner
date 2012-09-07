@@ -220,7 +220,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         double weight;
         if (options.wheelchairAccessible) {
             weight = elevationProfileSegment.getSlopeSpeedEffectiveLength() / speed;
-        } else if (s0.getNonTransitMode(options).equals(TraverseMode.BICYCLE)) {
+        } else if (traverseMode.equals(TraverseMode.BICYCLE)) {
             time = elevationProfileSegment.getSlopeSpeedEffectiveLength() / speed;
             switch (options.optimize) {
             case SAFE:
@@ -262,7 +262,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         }
         
         StateEditor s1 = s0.edit(this);
-        s1.setBackMode(s0.getNonTransitMode(options));
+        s1.setBackMode(traverseMode);
 
         if (wheelchairNotes != null && options.wheelchairAccessible) {
             s1.addAlerts(wheelchairNotes);
