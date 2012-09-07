@@ -14,13 +14,22 @@
 package org.opentripplanner.graph_builder.impl.ned;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.media.jai.InterpolationBilinear;
 
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.Interpolator2D;
+import org.geotools.coverage.processing.CoverageProcessor;
+import org.geotools.referencing.CRS;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.coverage.Coverage;
+import org.opengis.parameter.ParameterValueGroup;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
 import org.opentripplanner.graph_builder.services.ned.NEDGridCoverageFactory;
 import org.opentripplanner.graph_builder.services.ned.NEDTileSource;
 import org.opentripplanner.routing.graph.Graph;
@@ -39,6 +48,20 @@ public class NEDGridCoverageFactoryImpl implements NEDGridCoverageFactory {
     private File cacheDirectory;
 
     private NEDTileSource tileSource = new NEDDownloader();
+
+    private List<VerticalDatum> datums = new ArrayList<VerticalDatum>();
+
+    public NEDGridCoverageFactoryImpl () {
+        String[] filenames = {"g2012a00.gtx","g2012g00.gtx","g2012h00.gtx","g2012p00.gtx","g2012s00.gtx","g2012u00.gtx"};
+        GtxVDatumReader reader = new GtxVDatumReader();
+        try {
+            for (String filename : filenames) {
+                datums.add(reader.read(getClass().getResourceAsStream("g12/" + filename)));
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     /**
      * Set the directory where NED will be cached.
@@ -64,8 +87,9 @@ public class NEDGridCoverageFactoryImpl implements NEDGridCoverageFactory {
                 factory.setPath(path);
                 GridCoverage2D regionCoverage = Interpolator2D.create(factory.getGridCoverage(),
                         new InterpolationBilinear());
+
                 if (coverage == null) {
-                    coverage = new UnifiedGridCoverage("unified", regionCoverage);
+                    coverage = new UnifiedGridCoverage("unified", regionCoverage, datums);
                 } else {
                     coverage.add(regionCoverage);
                 }
