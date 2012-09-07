@@ -1,0 +1,93 @@
+package org.opentripplanner.graph_builder.impl.ned;
+
+/**
+ * A Vertical datum specified as a grid of offsets from NAD83
+ * http://vdatum.noaa.gov/dev/gtx_info.html
+ * 
+ * @author novalis
+ * 
+ */
+public class VerticalDatum {
+    double lowerLeftLatitude;
+
+    double lowerLeftLongitude;
+
+    double deltaLatitude;
+
+    double deltaLongitude;
+
+    float[][] datum;
+
+    public VerticalDatum(double lowerLeftLongitude, double lowerLeftLatitude, double width,
+            double height, float[][] datum) {
+        this.lowerLeftLongitude = lowerLeftLongitude; 
+        this.lowerLeftLatitude = lowerLeftLatitude;
+        this.deltaLongitude = width;
+        this.deltaLatitude = height;
+        this.datum = datum;
+    }
+
+    double interpolatedHeight(double longitude, double latitude) {
+        // because VDatums can cross -180 longitude, there's some complication in interpolating
+        // longitude
+
+        double lowerLeftAdjusted = lowerLeftLongitude;
+        if (lowerLeftLongitude + deltaLongitude > 180) {
+            // then lowerLeftLongitude must be left of 180
+            if (longitude < lowerLeftLongitude) {
+                // lowerLeftLongitude is right of 180 (probablY)
+                lowerLeftAdjusted -= 360; // this transforms lowerLeft so that interpolation will
+                                          // work
+                if (longitude < lowerLeftLongitude) {
+                    throw new RuntimeException("longitude out of range");
+                }
+            }
+        }
+
+        if (longitude > lowerLeftAdjusted + deltaLongitude || longitude < lowerLeftAdjusted) {
+            throw new RuntimeException("longitude out of range");
+        }
+        if (latitude < lowerLeftLatitude || latitude > lowerLeftLatitude + deltaLatitude) {
+            throw new RuntimeException("latitude out of range");
+        }
+
+        double longitudeNormalized = (longitude - lowerLeftAdjusted) / deltaLongitude;
+        double latitudeNormalized = (latitude - lowerLeftLatitude) / deltaLatitude;
+
+        int rows = datum.length;
+        int columns = datum[0].length;
+
+        int x1 = (int) Math.floor(longitudeNormalized * columns);
+        int y1 = (int) Math.floor(latitudeNormalized * rows);
+
+        double gridXFraction = longitudeNormalized * columns - x1;
+        double gridYFraction = latitudeNormalized * rows - y1;
+        return datum[y1][x1] * gridXFraction * gridYFraction + datum[y1][x1 + 1]
+                * (1 - gridXFraction) * gridYFraction + datum[y1 + 1][x1] * gridXFraction
+                * (1 - gridYFraction) + datum[y1 + 1][x1 + 1] * (1 - gridXFraction)
+                * (1 - gridYFraction);
+    }
+
+    boolean covers(double longitude, double latitude) {
+        double lowerLeftAdjusted = lowerLeftLongitude;
+        if (lowerLeftLongitude + deltaLongitude > 180) {
+            // then lowerLeftLongitude must be left of 180
+            if (longitude < lowerLeftLongitude) {
+                // lowerLeftLongitude is right of 180 (probablY)
+                lowerLeftAdjusted -= 360; // this transforms lowerLeft so that interpolation will
+                                          // work
+                if (longitude < lowerLeftLongitude) {
+                    return false;
+                }
+            }
+        }
+
+        if (longitude > lowerLeftAdjusted + deltaLongitude || longitude < lowerLeftAdjusted) {
+            return false;
+        }
+        if (latitude < lowerLeftLatitude || latitude > lowerLeftLatitude + deltaLatitude) {
+            return false;
+        }
+        return true;
+    }
+}
