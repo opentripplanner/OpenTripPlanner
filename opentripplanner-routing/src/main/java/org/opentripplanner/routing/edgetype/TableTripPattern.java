@@ -32,7 +32,7 @@ import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.trippattern.CancelledTripTimes;
+import org.opentripplanner.routing.trippattern.CanceledTripTimes;
 import org.opentripplanner.routing.trippattern.DecayingDelayTripTimes;
 import org.opentripplanner.routing.trippattern.ScheduledTripTimes;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -663,7 +663,7 @@ public class TableTripPattern implements TripPattern, Serializable {
                 ScheduledTripTimes scheduledTimes = existingTimes.getScheduledTripTimes();
                 TripTimes newTimes;
                 if (block.isCancellation()) {
-                    newTimes = new CancelledTripTimes(scheduledTimes);
+                    newTimes = new CanceledTripTimes(scheduledTimes);
                 } 
                 else {
                     newTimes = new UpdatedTripTimes(scheduledTimes, block, stopIndex);
