@@ -66,18 +66,26 @@ public class ScheduledTripTimes extends TripTimes implements Serializable {
     
     private String[] makeHeadsignsArray(List<StopTime> stopTimes) {
         String tripHeadsign = trip.getTripHeadsign();
-        String[] hs = new String[stopTimes.size()];
         boolean useHeadsigns = false;
-        int i = 0;
-        for (StopTime st : stopTimes) {
-            String stopHeadsign = st.getStopHeadsign(); 
-            if (!(tripHeadsign.equals(stopHeadsign))) {
-                useHeadsigns = true;
-            }
-            hs[i++] = stopHeadsign;
+        if (tripHeadsign == null) {
+            useHeadsigns = true;
         }
-        if (useHeadsigns)
+        else {
+            for (StopTime st : stopTimes) {
+                if ( ! (tripHeadsign.equals(st.getStopHeadsign()))) {
+                    useHeadsigns = true;
+                    break;
+                }
+            }
+        }
+        if (useHeadsigns) {
+            int i = 0;
+            String[] hs = new String[stopTimes.size()];
+            for (StopTime st : stopTimes) {
+                hs[i++] = st.getStopHeadsign();
+            }
             return hs;
+        }
         else
             return null;
     }
