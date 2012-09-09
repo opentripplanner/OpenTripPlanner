@@ -98,6 +98,16 @@ public class UpdateBlock {
         }
         return modified;
     }
+    
+    /** @return true if any of the updates in this block is a cancellation */
+    public boolean isCancellation() {
+        for (Update u : updates) {
+            if (u.status == Update.Status.CANCEL) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /** 
      * Check that this UpdateBlock is internally coherent, meaning that:

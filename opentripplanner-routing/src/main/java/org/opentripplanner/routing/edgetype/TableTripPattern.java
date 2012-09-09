@@ -32,6 +32,7 @@ import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.trippattern.CancelledTripTimes;
 import org.opentripplanner.routing.trippattern.DecayingDelayTripTimes;
 import org.opentripplanner.routing.trippattern.ScheduledTripTimes;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -660,20 +661,26 @@ public class TableTripPattern implements TripPattern, Serializable {
                 }
                 TripTimes existingTimes = getTripTimes(tripIndex);
                 ScheduledTripTimes scheduledTimes = existingTimes.getScheduledTripTimes();
-                TripTimes newTimes = new UpdatedTripTimes(scheduledTimes, block, stopIndex);
-                if ( ! newTimes.timesIncreasing()) {
-                    LOG.warn("Resulting UpdatedTripTimes has non-increasing times. " +
-                             "Falling back on DecayingDelayTripTimes.");
-                    LOG.warn(block.toString());
-                    LOG.warn(newTimes.toString());
-                    int delay = newTimes.getDepartureDelay(stopIndex);
-                    // maybe decay should be applied on top of the update (wrap Updated in Decaying), 
-                    // starting at the end of the update block
-                    newTimes = new DecayingDelayTripTimes(scheduledTimes, stopIndex, delay);
-                    LOG.warn(newTimes.toString());
+                TripTimes newTimes;
+                if (block.isCancellation()) {
+                    newTimes = new CancelledTripTimes(scheduledTimes);
+                } 
+                else {
+                    newTimes = new UpdatedTripTimes(scheduledTimes, block, stopIndex);
                     if ( ! newTimes.timesIncreasing()) {
-                        LOG.error("Even these trip times are non-increasing. Underlying schedule problem?");
-                        return false;
+                        LOG.warn("Resulting UpdatedTripTimes has non-increasing times. " +
+                                 "Falling back on DecayingDelayTripTimes.");
+                        LOG.warn(block.toString());
+                        LOG.warn(newTimes.toString());
+                        int delay = newTimes.getDepartureDelay(stopIndex);
+                        // maybe decay should be applied on top of the update (wrap Updated in Decaying), 
+                        // starting at the end of the update block
+                        newTimes = new DecayingDelayTripTimes(scheduledTimes, stopIndex, delay);
+                        LOG.warn(newTimes.toString());
+                        if ( ! newTimes.timesIncreasing()) {
+                            LOG.error("Even these trip times are non-increasing. Underlying schedule problem?");
+                            return false;
+                        }
                     }
                 }
                 // Update succeeded, save the new TripTimes back into this Timetable.

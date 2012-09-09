@@ -11,11 +11,11 @@ public class CancelledTripTimes extends DelegatingTripTimes {
     }
 
     @Override public int getDepartureTime(int hop) {
-        return TripTimes.PASSED;
+        return TripTimes.CANCELED;
     }
     
     @Override public int getArrivalTime(int hop) {
-        return TripTimes.PASSED;
+        return TripTimes.CANCELED;
     }
         
 }
