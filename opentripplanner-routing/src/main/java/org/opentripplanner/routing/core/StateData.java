@@ -67,6 +67,8 @@ public class StateData implements Cloneable {
 
     protected ServiceDay serviceDay;
 
+    protected TraverseMode nonTransitMode;
+
     /** 
      * This is the wait time at the beginning of the trip (or at the end of the trip for
      * reverse searches). In Analyst anyhow, this is is subtracted from total trip length of each
@@ -96,6 +98,18 @@ public class StateData implements Cloneable {
     protected TraverseMode backMode;
 
     public String bikeRentalNetwork;
+
+    public StateData(RoutingRequest options) {
+        TraverseModeSet modes = options.getModes();
+        if (modes.getCar())
+            nonTransitMode = TraverseMode.CAR;
+        else if (modes.getWalk())
+            nonTransitMode =  TraverseMode.WALK;
+        else if (modes.getBicycle())
+            nonTransitMode = TraverseMode.BICYCLE;
+        else
+            nonTransitMode = null;
+    }
 
     protected StateData clone() {
         try {

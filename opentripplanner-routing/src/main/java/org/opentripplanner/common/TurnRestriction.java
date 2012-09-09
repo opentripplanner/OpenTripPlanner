@@ -24,4 +24,8 @@ public class TurnRestriction implements Serializable {
     public Edge from;
     public Edge to;
     public TraverseModeSet modes;
+
+    public String toString() {
+        return type.name() + " from " + from + " to " + to + "(" + modes + ")";
+    }
 }

@@ -197,11 +197,11 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
     @Override
     public State traverse(State s0) {
-        return doTraverse(s0, s0.getOptions());
+        final RoutingRequest options = s0.getOptions();
+        return doTraverse(s0, options, s0.getNonTransitMode(options));
     }
 
-    private State doTraverse(State s0, RoutingRequest options) {
-        TraverseMode traverseMode = s0.getNonTransitMode(options);
+    private State doTraverse(State s0, RoutingRequest options, TraverseMode traverseMode) {
         Edge backEdge = s0.getBackEdge();
         if (backEdge != null && 
                 (options.arriveBy ? (backEdge.getToVertex() == fromv) : (backEdge.getFromVertex() == tov))) {
@@ -211,7 +211,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         if (!canTraverse(options, traverseMode)) {
             if (traverseMode == TraverseMode.BICYCLE) {
                 // try walking bike since you can't ride here
-                return doTraverse(s0, options.getWalkingOptions());
+                return doTraverse(s0, options.getWalkingOptions(), TraverseMode.WALK);
             }
             return null;
         }
@@ -220,7 +220,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         double weight;
         if (options.wheelchairAccessible) {
             weight = elevationProfileSegment.getSlopeSpeedEffectiveLength() / speed;
-        } else if (s0.getNonTransitMode(options).equals(TraverseMode.BICYCLE)) {
+        } else if (traverseMode.equals(TraverseMode.BICYCLE)) {
             time = elevationProfileSegment.getSlopeSpeedEffectiveLength() / speed;
             switch (options.optimize) {
             case SAFE:
@@ -262,7 +262,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         }
         
         StateEditor s1 = s0.edit(this);
-        s1.setBackMode(s0.getNonTransitMode(options));
+        s1.setBackMode(traverseMode);
 
         if (wheelchairNotes != null && options.wheelchairAccessible) {
             s1.addAlerts(wheelchairNotes);
@@ -320,10 +320,18 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             final double realTurnCost = (turnCost / 20.0) / options.getSpeed(traverseMode);
             s1.incrementWalkDistance(realTurnCost / 100); //just a tie-breaker
             weight += realTurnCost;
-            time += Math.ceil(realTurnCost);
+            long turnTime = (long) realTurnCost;
+            if (turnTime != realTurnCost) {
+                turnTime++;
+            }
+            time += turnTime;
         }
         s1.incrementWalkDistance(length);
-        s1.incrementTimeInSeconds((int) Math.ceil(time));
+        int timeLong = (int) time;
+        if (timeLong != time) {
+            timeLong++;
+        }
+        s1.incrementTimeInSeconds(timeLong);
         s1.incrementWeight(weight);
         if (s1.weHaveWalkedTooFar(options))
             return null;

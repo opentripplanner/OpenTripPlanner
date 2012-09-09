@@ -60,16 +60,7 @@ public class TestBikeRental extends TestCase {
         GraphPath path = tree.getPath(v3, false);
         assertNull(path);
 
-        // or biking
-        options = new RoutingRequest(new TraverseModeSet("BICYCLE,TRANSIT"));
-        options.freezeTraverseMode();
-        options.setRoutingContext(graph, v1, v3);
-        tree = aStar.getShortestPathTree(options);
-
-        path = tree.getPath(v3, false);
-        assertNull(path);
-
-        // or even both (assuming walking bikes is disallowed)
+        // or biking + walking (assuming walking bikes is disallowed)
         options = new RoutingRequest(new TraverseModeSet("WALK,BICYCLE,TRANSIT"));
         options.freezeTraverseMode();
         options.setRoutingContext(graph, v1, v3);
