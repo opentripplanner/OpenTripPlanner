@@ -17,9 +17,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
@@ -28,14 +25,15 @@ import org.opentripplanner.routing.edgetype.OnBoardForwardEdge;
 import org.opentripplanner.routing.edgetype.PatternEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.TimeDependentTrip;
-import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.routing.patch.Alert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class State implements Cloneable {
     /* Data which is likely to change at most traversals */
@@ -362,7 +360,7 @@ public class State implements Cloneable {
      * right thing to do.
      */
     public Trip getBackTrip () {
-        if (backEdge instanceof TimeDependentTrip) {
+        if (backEdge instanceof PatternEdge) {
             return stateData.tripTimes.getTrip();
         }
         else {

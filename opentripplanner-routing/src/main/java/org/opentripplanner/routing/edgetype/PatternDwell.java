@@ -13,12 +13,11 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.routing.vertextype.PatternDepartVertex;
@@ -31,7 +30,7 @@ import com.vividsolutions.jts.geom.LineString;
  *  names during this time -- PatternInterlineDwell represents that case.
  */
 public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnBoardReverseEdge, 
-        DwellEdge, TimeDependentTrip {
+        DwellEdge {
     
     private static final long serialVersionUID = 1L;
 
@@ -49,16 +48,7 @@ public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnB
     public double getDistance() {
         return 0;
     }
-    
-    // Get the appropriate headsign for the given tripIndex
-    public String getDirection(int tripIndex) {
-        return getPattern().getHeadsign(stopIndex, tripIndex);
-    }
-    
-    public Trip getTrip(int tripIndex) {
-        return getPattern().getTrip(tripIndex);
-    }
-
+        
     public TraverseMode getMode() {
         return GtfsLibrary.getTraverseMode(getPattern().getExemplar().getRoute());
     }

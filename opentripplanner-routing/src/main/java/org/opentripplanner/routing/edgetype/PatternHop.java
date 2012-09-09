@@ -14,14 +14,13 @@
 package org.opentripplanner.routing.edgetype;
 
 import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 
@@ -33,7 +32,7 @@ import com.vividsolutions.jts.geom.LineString;
  * This version represents a set of such journeys specified by a TripPattern.
  */
 public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoardReverseEdge, 
-        HopEdge, TimeDependentTrip {
+        HopEdge {
 
     private static final long serialVersionUID = 1L;
 
@@ -59,15 +58,6 @@ public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoa
         return GtfsLibrary.getTraverseMode(getPattern().getExemplar().getRoute());
     }
     
-    // Get the appropriate headsign for the given tripIndex
-    public String getDirection(int tripIndex) {
-        return getPattern().getHeadsign(stopIndex, tripIndex);
-    }
-    
-    public Trip getTrip(int tripIndex) {
-        return getPattern().getTrip(tripIndex);
-    }
-
     public String getName() {
         return GtfsLibrary.getRouteName(getPattern().getExemplar().getRoute());
     }
