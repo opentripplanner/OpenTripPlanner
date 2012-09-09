@@ -26,10 +26,10 @@ public class ScheduledTripTimes extends TripTimes implements Serializable {
     @Getter private final Trip trip;
 
     /**
-     * Each trip has a defined headsign, but this trip_headsign has been overridden by the 
-     * stop_headsign field in stop_times.txt, the headsigns field will point to an array of
-     * headsigns, one for each stop of the trip. If this field is set to null, this TripTimes 
-     * will get its headsign from the Trip object for every stop.
+     * Both trip_headsign and stop_headsign (per stop on a particular trip) are optional GTFS 
+     * fields. If the headsigns array is null, we will report the trip_headsign (which may also
+     * be null) at every stop on the trip. If all the stop_headsigns are the same as the 
+     * trip_headsign we may also set the headsigns array to null to save space.
      */
     private final String[] headsigns;
     
@@ -64,30 +64,40 @@ public class ScheduledTripTimes extends TripTimes implements Serializable {
         this.compact();
     }
     
+    /** 
+     * @return either an array of headsigns (one for each stop on this trip) or null if the 
+     * headsign is the same at all stops (including null) and can be found in the Trip object. 
+     */
     private String[] makeHeadsignsArray(List<StopTime> stopTimes) {
         String tripHeadsign = trip.getTripHeadsign();
-        boolean useHeadsigns = false;
+        boolean useStopHeadsigns = false;
         if (tripHeadsign == null) {
-            useHeadsigns = true;
+            useStopHeadsigns = true;
         }
         else {
             for (StopTime st : stopTimes) {
                 if ( ! (tripHeadsign.equals(st.getStopHeadsign()))) {
-                    useHeadsigns = true;
+                    useStopHeadsigns = true;
                     break;
                 }
             }
         }
-        if (useHeadsigns) {
-            int i = 0;
-            String[] hs = new String[stopTimes.size()];
-            for (StopTime st : stopTimes) {
-                hs[i++] = st.getStopHeadsign();
-            }
-            return hs;
+        if ( ! useStopHeadsigns) { 
+            return null; //defer to trip_headsign
         }
-        else
+        boolean allNull = true;
+        int i = 0;
+        String[] hs = new String[stopTimes.size()];
+        for (StopTime st : stopTimes) {
+            String headsign = st.getStopHeadsign();
+            hs[i++] = headsign;
+            if (headsign != null)
+                allNull = false;
+        }
+        if (allNull)
             return null;
+        else
+            return hs;
     }
     
     @Override
