@@ -1,14 +1,15 @@
 package org.opentripplanner.analyst.batch;
 
 import lombok.Data;
+import lombok.Setter;
 
 @Data
 public class InputClampFilter implements IndividualFilter {
 
-    public double rejectMin = 0;
-    private double rejectMax = Double.MAX_VALUE;
-    public double clampMin = 0;
-    public double clampMax = Double.MAX_VALUE;
+    @Setter public double rejectMin = 0;
+    @Setter private double rejectMax = Double.MAX_VALUE;
+    @Setter public double clampMin = 0;
+    @Setter public double clampMax = Double.MAX_VALUE;
     
     @Override
     public boolean filter(Individual individual) {
