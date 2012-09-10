@@ -40,9 +40,8 @@ public class CSVPopulation extends BasicPopulation {
                 double lon = Double.parseDouble(reader.get(lonCol));
                 String label = reader.get(labelCol);
                 Double input = Double.parseDouble(reader.get(inputCol));
-                Individual individual = individualFactory.build(label, lon, lat, input);
+                Individual individual = new Individual(label, lon, lat, input);
                 this.addIndividual(individual);
-                //LOG.debug(individual.toString());
             }
             reader.close();
         } catch (Exception e) {

@@ -13,7 +13,6 @@ import lombok.Setter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.csvreader.CsvWriter;
 
@@ -30,9 +29,6 @@ public class BasicPopulation implements Population {
     @Setter @Getter 
     public List<IndividualFilter> filterChain = null; 
 
-    @Autowired 
-    IndividualFactory individualFactory;
-    
     private boolean[] skip = null;
     
     public BasicPopulation() {  }
@@ -57,12 +53,12 @@ public class BasicPopulation implements Population {
 
     @Override
     public void clearIndividuals(List<Individual> individuals) {
-        //
+        this.individuals.clear();
     }
 
     @Override
     public void createIndividuals() {
-        // nothing to do in basic population case
+        // nothing to do in the basic population case
     }
 
     @Override
@@ -132,6 +128,7 @@ public class BasicPopulation implements Population {
         
     }
 
+    @Override
     public void setup() {
         // call the subclass-specific file loading method
         this.createIndividuals();

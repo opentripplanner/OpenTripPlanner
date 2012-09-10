@@ -2,8 +2,6 @@ package org.opentripplanner.analyst.batch;
 
 import java.io.File;
 
-import javax.annotation.PostConstruct;
-
 import lombok.Setter;
 
 import org.geotools.data.FileDataStore;
@@ -75,7 +73,7 @@ public class ShapefilePopulation extends BasicPopulation {
                     Number n = (Number) feature.getAttribute(inputAttribute);
                     input = n.doubleValue(); 
                 }
-                Individual individual = individualFactory.build(label, point.getX(), point.getY(), input);
+                Individual individual = new Individual(label, point.getX(), point.getY(), input);
                 this.addIndividual(individual);
                 i += 1;
                 if (individual.sample != null)
