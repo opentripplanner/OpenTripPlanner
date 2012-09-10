@@ -1,31 +1,21 @@
 package org.opentripplanner.analyst.batch;
 
-import lombok.Data;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 import org.opentripplanner.analyst.core.Sample;
 
-/**
- * Individual locations that make up Populations for the purpose
- * of many-to-many searches.
- */
-@Data
+/** Individual locations that make up Populations for the purpose of many-to-many searches. */
+@ToString @RequiredArgsConstructor
 public class Individual {
 
-    public String label;
-    public double lon;
-    public double lat;
-    public Sample sample;
-    public double input;
-        
-    public Individual() {
-    	
-    }
+    public final String label;
+    public final double lon;
+    public final double lat;
+    @NonNull public double input;  // not final to allow clamping and scaling by filters
+    public Sample sample= null; // not final, allowing sampling to occur after filterings
     
-    public Individual(String label, Sample sample, double lon, double lat, double input) {
-        this.label = label;
-        this.sample = sample;
-        this.input = input;
-        this.setLon(lon);
-        this.setLat(lat);
-    }
+    // public boolean rejected;
+        
 }
