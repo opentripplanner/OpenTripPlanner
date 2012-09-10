@@ -72,7 +72,8 @@ public class ShapefilePopulation extends BasicPopulation {
                 }
                 double input = 0.0;
                 if (inputAttribute != null) {
-                    input = (Double) feature.getAttribute(inputAttribute);
+                    Number n = (Number) feature.getAttribute(inputAttribute);
+                    input = n.doubleValue(); 
                 }
                 Individual individual = individualFactory.build(label, point.getX(), point.getY(), input);
                 this.addIndividual(individual);
