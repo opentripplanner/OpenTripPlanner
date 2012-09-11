@@ -158,10 +158,16 @@ public class BatchProcessor {
      * should be skipped.
      */
     private void linkIntoGraph(Population p) {
+        LOG.info("linking population {} to the graph...", p);
+        int n = 0, nonNull = 0;
         for (Individual i : p) {
             Sample s = sampleFactory.getSample(i.lon, i.lat);
             i.sample = s;
+            n += 1;
+            if (s != null)
+                nonNull += 1;
         }
+        LOG.debug("successfully linked {} individuals out of {}", nonNull, n);
     }
 
 }
