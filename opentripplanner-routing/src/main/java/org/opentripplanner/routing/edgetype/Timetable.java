@@ -1,7 +1,11 @@
 package org.opentripplanner.routing.edgetype;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import static org.opentripplanner.routing.edgetype.TableTripPattern.FLAG_WHEELCHAIR_ACCESSIBLE;
+import static org.opentripplanner.routing.edgetype.TableTripPattern.MASK_DROPOFF;
+import static org.opentripplanner.routing.edgetype.TableTripPattern.NO_PICKUP;
+import static org.opentripplanner.routing.edgetype.TableTripPattern.SHIFT_DROPOFF;
+import static org.opentripplanner.routing.edgetype.TableTripPattern.SHIFT_PICKUP;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -20,8 +24,6 @@ import org.opentripplanner.routing.trippattern.UpdateBlock;
 import org.opentripplanner.routing.trippattern.UpdatedTripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static org.opentripplanner.routing.edgetype.TableTripPattern.*;
 
 
 /** 
@@ -124,11 +126,11 @@ public class Timetable implements Serializable {
                 arrivalsMatchDepartures = false;
         }
         if (departuresFifo) {
-            LOG.debug("Compressing FIFO Timetable index.");
+            //LOG.debug("Compressing FIFO Timetable index.");
             departuresIndex = Arrays.copyOf(departuresIndex, 1);
         }
         if (arrivalsMatchDepartures) {
-            LOG.debug("Reusing departures index where arrivals index is identical.");
+            //LOG.debug("Reusing departures index where arrivals index is identical.");
             arrivalsIndex = departuresIndex;
         }
     }
@@ -269,7 +271,7 @@ public class Timetable implements Serializable {
         
         // break even list size for linear and binary searches was determined to be around 16
         if (nTrips > INDEX_THRESHOLD) {
-            LOG.debug("indexing pattern with {} trips", nTrips);
+            //LOG.debug("indexing pattern with {} trips", nTrips);
             index(); 
         } else {
             arrivalsIndex = null;
@@ -420,11 +422,6 @@ public class Timetable implements Serializable {
         return true;
     }
     
-    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        finish();
-    }
-            
     /**
      * Once a trip has been found departing or arriving at an appropriate time, check whether that 
      * trip fits other restrictive search criteria such as bicycle and wheelchair accessibility.

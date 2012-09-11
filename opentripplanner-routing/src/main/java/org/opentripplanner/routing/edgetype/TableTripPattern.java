@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.edgetype;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -106,6 +107,14 @@ public class TableTripPattern implements TripPattern, Serializable {
         setStopsFromStopPattern(stopPattern);
     }
 
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        // The serialized graph contains cyclic references TableTripPattern <--> Timetable.
+        // The Timetable must be indexed from here (rather than in its own readObject method) 
+        // to ensure that the stops field it uses in TableTripPattern is already deserialized.
+        this.scheduledTimetable.finish();
+    }
+            
     private void setStopsFromStopPattern(ScheduledStopPattern stopPattern) {
         this.stops = new Stop[stopPattern.stops.size()];
         perStopFlags = new int[stops.length];
@@ -136,13 +145,6 @@ public class TableTripPattern implements TripPattern, Serializable {
 
     public int getTripIndex(Trip trip) {
         return trips.indexOf(trip);
-    }
-
-    private void writeObject(ObjectOutputStream outputStream) throws ClassNotFoundException,
-            IOException {
-        // indexes are now transient
-        //finish();
-        outputStream.defaultWriteObject();
     }
 
     /** Returns whether passengers can alight at a given stop */
