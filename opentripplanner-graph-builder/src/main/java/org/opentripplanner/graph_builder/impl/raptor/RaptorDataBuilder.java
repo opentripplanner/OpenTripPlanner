@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Random;
 import java.util.TimeZone;
 
 import org.onebusaway.gtfs.model.Stop;
@@ -27,8 +29,6 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.AbstractVertex;
 import org.opentripplanner.routing.graph.Edge;
@@ -37,9 +37,12 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.impl.raptor.MaxTransitRegions;
 import org.opentripplanner.routing.impl.raptor.MaxWalkState;
+import org.opentripplanner.routing.impl.raptor.Raptor;
 import org.opentripplanner.routing.impl.raptor.RaptorData;
 import org.opentripplanner.routing.impl.raptor.RaptorDataService;
 import org.opentripplanner.routing.impl.raptor.RaptorRoute;
+import org.opentripplanner.routing.impl.raptor.RaptorState;
+import org.opentripplanner.routing.impl.raptor.RaptorStateSet;
 import org.opentripplanner.routing.impl.raptor.RaptorStop;
 import org.opentripplanner.routing.impl.raptor.RegionData;
 import org.opentripplanner.routing.impl.raptor.RouteSegmentComparator;
@@ -59,11 +62,11 @@ public class RaptorDataBuilder implements GraphBuilder {
 
     private static final Logger log = LoggerFactory.getLogger(RaptorDataBuilder.class);
 
-    private static final int MAX_REGION_SIZE = 80000;
-
     private static final double MIN_SPEED = 1.33;
 
     private static final double MAX_DISTANCE = 3218;
+
+    private static final int N_REGIONS = 100;
 
     private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
@@ -144,10 +147,11 @@ public class RaptorDataBuilder implements GraphBuilder {
         nTotalStops = data.stops.length;
         // initNearbyStops();
 
+        graph.putService(RaptorDataService.class, new RaptorDataService(data));
+
         //MaxTransitRegions regions = makeMaxTransitRegions(graph, data);
         //data.maxTransitRegions = regions;
-        //data.regionData = makeRegions(graph, data);
-        graph.putService(RaptorDataService.class, new RaptorDataService(data));
+        data.regionData = makeRegions(graph, data);
 
     }
 
@@ -407,6 +411,7 @@ public class RaptorDataBuilder implements GraphBuilder {
         return timeForRegion;
     }
 
+    @SuppressWarnings("unchecked")
     private RegionData makeRegions(Graph graph, RaptorData data) {
         ArrayList<Vertex> vertices = new ArrayList<Vertex>();
         for (Vertex v : graph.getVertices()) {
@@ -419,23 +424,98 @@ public class RaptorDataBuilder implements GraphBuilder {
         int[] regionsForVertex = new int[AbstractVertex.getMaxIndex()];
         Arrays.fill(regionsForVertex, -1);
 
-        int nRegions = split(verticesForRegion, regionsForVertex, vertices, 0, true, MAX_REGION_SIZE);
+        int nRegions = split(verticesForRegion, regionsForVertex, vertices, 0, true, vertices.size() / N_REGIONS);
         RegionData regions = new RegionData(regionsForVertex);
         regions.minTime = new int[nRegions][nRegions];
+        regions.routes = new HashSet[nRegions][nRegions];
+        regions.stops = new HashSet[nRegions][nRegions];
 
+        for (int fromRegion = 0; fromRegion < nRegions; ++ fromRegion) {
+            for (int toRegion = 0; toRegion < nRegions; ++ toRegion) {
+                regions.routes[fromRegion][toRegion] = new HashSet<RaptorRoute>();
+                regions.stops[fromRegion][toRegion] = new HashSet<RaptorStop>();
+            }
+        }
+
+        regions.verticesForRegion = verticesForRegion;
+
+        return regions;
+    }
+
+    private void computeMinTimesAndInitialRoutes(Graph graph, RaptorData data) {
         // now compute minTime for each region
 
+        final RegionData regions = data.regionData;
+        ArrayList<ArrayList<Vertex>> verticesForRegion = regions.verticesForRegion;
         int regionIndex = 0;
         for (ArrayList<Vertex> region : verticesForRegion) {
             if (regionIndex % 5 == 0) {
                 log.debug("Building regions: " + regionIndex + " / " + verticesForRegion.size());
             }
             findMinTime(graph, data, regions, regionIndex, region);
+            findRoutes(graph, data, regions, regionIndex, region);
             regionIndex += 1;
         }
-
-        return regions;
     }
+
+    /**
+     * Find some routes used on trips starting from this region, and ending up at all other regions.
+     * This is optional, because we'll collect them at runtime otherwise
+     * @param graph
+     * @param data
+     * @param regions
+     * @param regionIndex
+     * @param region
+     */
+    private void findRoutes(Graph graph, RaptorData data, RegionData regions, int regionIndex,
+            ArrayList<Vertex> region) {
+        Random random = new Random();
+        final HashSet<RaptorRoute>[] routes = regions.routes[regionIndex];
+        for (int j = 0; j < routes.length; ++j) {
+            routes[j] = new HashSet<RaptorRoute>();
+        }
+        final HashSet<RaptorStop>[] stops = regions.stops[regionIndex];
+        for (int j = 0; j < stops.length; ++j) {
+            stops[j] = new HashSet<RaptorStop>();
+        }
+
+        Raptor raptor = new Raptor();
+        int N_TRIPS = 5;
+        for (int i = 0; i < N_TRIPS; ++i) {
+            RoutingRequest options = new RoutingRequest();
+            graph.streetIndex = new StreetVertexIndexServiceImpl(graph);
+            int vertexNo = random.nextInt(region.size());
+            options.setRoutingContext(graph, region.get(vertexNo), null);
+            //assume everything is valid for one week
+            options.dateTime = (int)System.currentTimeMillis() / 1000 + random.nextInt(7*86400);
+            options.rctx.serviceDays = new ArrayList<ServiceDay>();
+            options.rctx.serviceDays.add(ServiceDay.universalService(graph));
+            options.setMaxWalkDistance(MAX_DISTANCE);
+            options.setMaxTransfers(6);
+            RaptorStateSet states = raptor.getStateSet(options);
+
+            for (Entry<Vertex, List<RaptorState>> entry : states.getStates().entrySet()) {
+                Vertex v = entry.getKey();
+                int toRegion = regions.getRegionForVertex(v);
+                if (toRegion == -1) {
+                    continue;
+                }
+                List<RaptorState> statesAtStop = entry.getValue();
+                for (RaptorState state : statesAtStop) {
+                    while (state != null) {
+                        RaptorRoute route = state.getRoute();
+                        if (route != null)
+                            routes[toRegion].add(route);
+                        if (state.stop != null) {
+                            stops[toRegion].add(state.stop);
+                        }
+                        state = state.getParent();
+                    }
+                }
+            }
+        }
+    }
+
 /*
     @SuppressWarnings("unused")
     private void findMinWalkDistance(RaptorData data, RegionData regions, int regionIndex,
@@ -516,7 +596,6 @@ public class RaptorDataBuilder implements GraphBuilder {
         options.rctx.serviceDays = new ArrayList<ServiceDay>();
         options.rctx.serviceDays.add(ServiceDay.universalService(graph));
 
-        // walk-distance free-transit spt computation
         HashSet<Vertex> closed = new HashSet<Vertex>();
         while (!queue.empty()) {
             Vertex u = queue.extract_min();
@@ -585,6 +664,7 @@ public class RaptorDataBuilder implements GraphBuilder {
                     vertex.setGroupIndex(index);
                 } else {
                     regionsForVertex[vertex.getIndex()] = index;
+                    vertex.setGroupIndex(index);
                 }
                 region.add(vertex);
             }
@@ -613,6 +693,7 @@ public class RaptorDataBuilder implements GraphBuilder {
                     vertex.setGroupIndex(index);
                 } else {
                     regionsForVertex[vertex.getIndex()] = index;
+                    vertex.setGroupIndex(index);
                 }
                 region.add(vertex);
             }

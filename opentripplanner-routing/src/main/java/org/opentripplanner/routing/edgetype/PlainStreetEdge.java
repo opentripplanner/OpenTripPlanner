@@ -24,7 +24,6 @@ import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.routing.core.NoThruTrafficState;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -266,34 +265,6 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
         if (wheelchairNotes != null && options.wheelchairAccessible) {
             s1.addAlerts(wheelchairNotes);
-        }
-        
-        switch (s0.getNoThruTrafficState()) {
-        case INIT:
-            if (isNoThruTraffic()) {
-                s1.setNoThruTrafficState(NoThruTrafficState.IN_INITIAL_ISLAND);
-            } else {
-                s1.setNoThruTrafficState(NoThruTrafficState.BETWEEN_ISLANDS);
-            }
-            break;
-        case IN_INITIAL_ISLAND:
-            if (!isNoThruTraffic()) {
-                s1.setNoThruTrafficState(NoThruTrafficState.BETWEEN_ISLANDS);
-            }
-            break;
-        case BETWEEN_ISLANDS:
-            if (isNoThruTraffic()) {
-                s1.setNoThruTrafficState(NoThruTrafficState.IN_FINAL_ISLAND);
-            }
-            break;
-        case IN_FINAL_ISLAND:
-            if (!isNoThruTraffic()) {
-                // we have now passed entirely through a no thru traffic region,
-                // which is
-                // forbidden
-                return null;
-            }
-            break;
         }
 
         PlainStreetEdge backPSE;

@@ -17,9 +17,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
@@ -31,7 +34,9 @@ import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.pathparser.BasicPathParser;
+import org.opentripplanner.routing.pathparser.NoThruTrafficPathParser;
 import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
@@ -81,8 +86,8 @@ public class Raptor implements PathService {
         final Graph graph = graphService.getGraph(options.getRouterId());
         if (options.rctx == null) {
             options.setRoutingContext(graph);
-            options.rctx.pathParsers = new PathParser[1];
-            options.rctx.pathParsers[0] = new BasicPathParser();
+            options.rctx.pathParsers = new PathParser[] { new BasicPathParser(),
+                    new NoThruTrafficPathParser() };
         }
 
         if (!options.getModes().isTransit()) {
@@ -123,19 +128,23 @@ public class Raptor implements PathService {
             search.maxTimeDayIndex = day;
         }
 
+        options.setMaxTransfers(6);
+
+        int rushAheadRound = rushAhead(data, options, walkOptions, search);
+
         long searchBeginTime = System.currentTimeMillis();
 
         int bestElapsedTime = Integer.MAX_VALUE;
         RETRY: do {
-            for (int i = 0; i < options.getMaxTransfers() + 2; ++i) {
-                round(data, options, walkOptions, search, i);
+            for (int round = 0; round < options.getMaxTransfers() + 2; ++round) {
+                round(data, options, walkOptions, search, round);
 
                 long elapsed = System.currentTimeMillis() - searchBeginTime;
                 if (elapsed > multiPathTimeout * 1000 && multiPathTimeout > 0
                         && search.getTargetStates().size() > 0)
                     break RETRY;
 
-                if (search.getTargetStates().size() >= options.getNumItineraries()) {
+                if (search.getTargetStates().size() >= options.getNumItineraries() && round >= rushAheadRound) {
                     int oldBest = bestElapsedTime;
                     for (RaptorState state : search.getTargetStates()) {
                         final int elapsedTime = (int) Math
@@ -159,6 +168,8 @@ public class Raptor implements PathService {
 
         } while (options.getMaxWalkDistance() < initialWalk * MAX_WALK_MULTIPLE && initialWalk < Double.MAX_VALUE);
 
+        collectRoutesUsed(data, options, search.getTargetStates());
+
         List<RaptorState> targetStates = search.getTargetStates();
         if (targetStates.isEmpty()) {
             log.info("RAPTOR found no paths (try retrying?)");
@@ -172,7 +183,7 @@ public class Raptor implements PathService {
             RaptorState cur = targetState;
             while (cur != null) {
                 states.add(cur);
-                cur = cur.parent;
+                cur = cur.getParent();
             }
             // states is in reverse order of time
             State state = getState(options, data, states);
@@ -180,6 +191,157 @@ public class Raptor implements PathService {
         }
 
         return paths;
+    }
+
+    private void collectRoutesUsed(RaptorData data, RoutingRequest options, List<RaptorState> targetStates) {
+        // find start/end regions
+        List<Integer> startRegions = getRegionsForVertex(data.regionData, options.rctx.fromVertex);
+        int startRegion;
+        if (startRegions.size() == 1) {
+            startRegion = startRegions.get(0);
+        } else {
+            // on boundary
+            return;
+        }
+        List<Integer> endRegions = getRegionsForVertex(data.regionData, options.rctx.toVertex);
+        int endRegion;
+        if (endRegions.size() == 1) {
+            endRegion = endRegions.get(0);
+        } else {
+            // on boundary
+            return;
+        }
+
+        HashSet<RaptorRoute> routes = data.regionData.routes[startRegion][endRegion];
+        HashSet<RaptorStop> stops = data.regionData.stops[startRegion][endRegion];
+        TARGETSTATE: for (RaptorState state : targetStates) {
+            for (RaptorState dom : targetStates) {
+                if (dom.nBoardings <= state.nBoardings && dom.arrivalTime < state.arrivalTime) {
+                    continue TARGETSTATE;
+                }
+            }
+            while (state != null) {
+                if (state.route != null)
+                    routes.add(state.route);
+                if (state.stop != null) {
+                    stops.add(state.stop);
+                }
+                state = state.getParent();
+            }
+        }
+    }
+
+    private int rushAhead(RaptorData data, RoutingRequest options, RoutingRequest walkOptions,
+            RaptorSearch search) {
+        //find start/end regions
+        List<Integer> startRegions = getRegionsForVertex(data.regionData, options.rctx.fromVertex);
+        int startRegion;
+        if (startRegions.size() == 1) {
+            startRegion = startRegions.get(0);
+        } else {
+            log.debug("Trip start spans regions, not using rush-ahead optimization");
+            return 0;
+        }
+        List<Integer> endRegions = getRegionsForVertex(data.regionData, options.rctx.toVertex);
+        int endRegion;
+        if (endRegions.size() == 1) {
+            endRegion = endRegions.get(0);
+        } else {
+            log.debug("Trip end spans regions, not using rush-ahead optimization");
+            return 0;
+        }
+
+        // create a reduced set of RaptorData with only the stops/routes previously seen on trips
+        // from the start region to the end region
+
+        RaptorData trimmedData = new RaptorData();
+        trimmedData.raptorStopsForStopId = new HashMap<AgencyAndId, RaptorStop>();
+        HashSet<RaptorStop> stops = data.regionData.stops[startRegion][endRegion];
+        for (RaptorStop stop : stops) {
+            trimmedData.raptorStopsForStopId.put(stop.stopVertex.getStopId(), stop);
+        }
+        trimmedData.regionData = data.regionData;
+        trimmedData.routes = data.regionData.routes[startRegion][endRegion];
+        trimmedData.stops = data.stops;
+        //trimmedData.allowedStops = stops;
+        trimmedData.routesForStop = data.routesForStop;
+        walkOptions.setMaxWalkDistance(6000);
+        if (trimmedData.routes.size() == 0) {
+            log.debug("No cached routes, so not using rush-ahead optimization");
+            return 0; //no precomputed routes
+        }
+
+        RaptorSearch rushSearch = new RaptorSearch(trimmedData, options);
+        int bestElapsedTime = Integer.MAX_VALUE;
+        int round;
+        for (round = 0; round < options.getMaxTransfers() + 2; round++) {
+            round(trimmedData, options, walkOptions,
+                    rushSearch, round);
+
+            if (search.getTargetStates().size() > 0) {
+                int oldBest = bestElapsedTime;
+                for (RaptorState state : search.getTargetStates()) {
+                    final int elapsedTime = (int) Math
+                            .abs(state.arrivalTime - options.dateTime);
+                    if (elapsedTime < bestElapsedTime) {
+                        bestElapsedTime = elapsedTime;
+                    }
+                }
+                int improvement = oldBest - bestElapsedTime;
+                if (improvement < 600)
+                    break;
+            }
+        }
+        for (RaptorState state : rushSearch.getTargetStates()) {
+            search.bounder.addBounder(state.walkPath);
+            search.addTargetState(state);
+        }
+
+        walkOptions.setMaxWalkDistance(options.getMaxWalkDistance());
+        return round;
+    }
+
+    /** 
+     * Some vertices aren't associated with a region, because they're synthetic, or
+     * maybe for some other region.  So instead, we check their connected vertices,
+     * recursively, to try to find their region.
+     *
+     * @param regionData
+     * @param vertex
+     * @return
+     */
+    static List<Integer> getRegionsForVertex(RegionData regionData, Vertex vertex) {
+        return new ArrayList<Integer>(getRegionsForVertex(regionData, vertex, new HashSet<Vertex>(), 0));
+    }
+
+    /**
+     * Internals of getRegionsForVertex; keeps track of seen vertices to avoid loops.
+     * @param regionData
+     * @param vertex
+     * @param seen
+     * @param depth
+     * @return
+     */
+    private static HashSet<Integer> getRegionsForVertex(RegionData regionData, Vertex vertex,
+            HashSet<Vertex> seen, int depth) {
+        seen.add(vertex);
+        HashSet<Integer> regions = new HashSet<Integer>();
+        int region = vertex.getGroupIndex();
+        if (region >= 0) {
+            regions.add(region);
+        } else {
+            for (Edge e: vertex.getOutgoing()) {
+                final Vertex tov = e.getToVertex();
+                if (!seen.contains(tov))
+                    regions.addAll(getRegionsForVertex(regionData, tov, seen, depth + 1));
+            }
+            for (Edge e: vertex.getIncoming()) {
+                final Vertex fromv = e.getFromVertex();
+                if (!seen.contains(fromv))
+                    regions.addAll(getRegionsForVertex(regionData, fromv, seen, depth + 1));
+            }
+        }
+        return regions;
     }
 
     private State getState(RoutingRequest options, RaptorData data, ArrayList<RaptorState> states) {
@@ -211,7 +373,7 @@ public class Raptor implements PathService {
                         state = e.traverse(state);
                     }
                 }
-                TransitBoardAlight board = cur.route.boards[cur.boardStopSequence][cur.patternIndex];
+                TransitBoardAlight board = cur.getRoute().boards[cur.boardStopSequence][cur.patternIndex];
                 State oldState = state;
                 state = board.traverse(state);
                 if (state == null) {
@@ -268,7 +430,7 @@ public class Raptor implements PathService {
                         state = e.traverse(state);
                     }
                 }
-                TransitBoardAlight alight = cur.route.alights[cur.boardStopSequence - 1][cur.patternIndex];
+                TransitBoardAlight alight = cur.getRoute().alights[cur.boardStopSequence - 1][cur.patternIndex];
                 State oldState = state;
                 state = alight.traverse(state);
                 if (state == null) {
@@ -379,6 +541,38 @@ public class Raptor implements PathService {
 
         search.walkPhase(options, walkOptions, nBoardings,
                 createdStates);
+    }
+
+    public RaptorStateSet getStateSet(RoutingRequest options) {
+
+        final Graph graph;
+        if (options.rctx == null) {
+            graph = graphService.getGraph(options.getRouterId());
+            options.setRoutingContext(graph);
+            options.rctx.pathParsers = new PathParser[] { new BasicPathParser(),
+                    new NoThruTrafficPathParser() };
+        } else {
+            graph = options.rctx.graph;
+        }
+
+        RaptorData data = graph.getService(RaptorDataService.class).getData();
+
+        //we multiply the initial walk distance by 1.1 to account for epsilon dominance.
+        options.setMaxWalkDistance(options.getMaxWalkDistance() * 1.1);
+
+        RoutingRequest walkOptions = options.clone();
+        walkOptions.rctx.pathParsers = new PathParser[0];
+        TraverseModeSet modes = options.getModes().clone();
+        modes.setTransit(false);
+        walkOptions.setModes(modes);
+        RaptorSearch search = new RaptorSearch(data, options);
+
+        for (int i = 0; i < options.getMaxTransfers() + 2; ++i) {
+            round(data, options, walkOptions, search, i);
+        }
+        RaptorStateSet result = new RaptorStateSet();
+        result.statesByStop = search.statesByStop;
+        return result;
     }
 
 }

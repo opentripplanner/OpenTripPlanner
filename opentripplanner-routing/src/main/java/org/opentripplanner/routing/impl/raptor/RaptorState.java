@@ -43,7 +43,7 @@ public class RaptorState implements Comparable<RaptorState> {
     State walkPath;
     
     /* path info */
-    RaptorState parent;
+    private RaptorState parent;
     public ServiceDay serviceDay;
     public RaptorStop stop;
     private boolean arriveBy;
@@ -103,5 +103,17 @@ public class RaptorState implements Comparable<RaptorState> {
     @Override
     public int compareTo(RaptorState other) {
         return (int) Math.signum(weight - other.weight);
+    }
+
+    public RaptorState getParent() {
+        return parent;
+    }
+
+    public RaptorRoute getRoute() {
+        return route;
+    }
+
+    public void setRoute(RaptorRoute route) {
+        this.route = route;
     }
 }

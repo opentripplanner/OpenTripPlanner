@@ -61,11 +61,19 @@ public class RaptorSearch {
 
     private RaptorData data;
 
+    private int targetRegion = -1;
+
     @SuppressWarnings("unchecked")
     RaptorSearch(RaptorData data, RoutingRequest options) {
         statesByStop = new List[data.stops.length];
         bounder = new TargetBound(options);
         this.data = data;
+        if (options.rctx.target != null) {
+            List<Integer> targetRegions = Raptor.getRegionsForVertex(data.regionData, options.rctx.target);
+            if (targetRegions.size() == 1) {
+                this.targetRegion = targetRegions.get(0);
+            }
+        }
     }
 
     public void addStates(int stop, List<RaptorState> list) {
@@ -106,9 +114,20 @@ public class RaptorSearch {
 
         Collection<RaptorRoute> routesToVisit = new HashSet<RaptorRoute>();
 
-        for (RaptorStop stop : visitedLastRound) {
-            for (RaptorRoute route : data.routesForStop[stop.index]) {
-                routesToVisit.add(route);
+        if (data.routesForStop == null) {
+            Collection<RaptorRoute> routes = data.routes;
+            for (RaptorStop stop : visitedLastRound) {
+                for (RaptorRoute route : data.routesForStop[stop.index]) {
+                    if (routes.contains(route)) {
+                        routesToVisit.add(route);
+                    }
+                }
+            }
+        } else {
+            for (RaptorStop stop : visitedLastRound) {
+                for (RaptorRoute route : data.routesForStop[stop.index]) {
+                    routesToVisit.add(route);
+                }
             }
         }
         HashSet<RaptorStop> visitedThisRound = new HashSet<RaptorStop>();
@@ -146,6 +165,12 @@ public class RaptorSearch {
                     continue;
                 started = true;
 
+                //skip stops which aren't in this set of data;
+                //this is used for the rush ahead search
+                if (!data.raptorStopsForStopId.containsKey(stop.stopVertex.getStopId())) {
+                    continue;
+                }
+
                 List<RaptorState> states = statesByStop[stop.index];
                 List<RaptorState> newStates = new ArrayList<RaptorState>();
 
@@ -156,7 +181,7 @@ public class RaptorSearch {
                 // this checks the case of continuing on the current trips.
                 CONTINUE: for (RaptorState boardState : boardStates) {
 
-                    RaptorState newState = new RaptorState(boardState.parent);
+                    RaptorState newState = new RaptorState(boardState.getParent());
 
                     ServiceDay sd = boardState.serviceDay;
 
@@ -168,7 +193,7 @@ public class RaptorSearch {
                         newState.arrivalTime = (int) sd.time(boardTime);
                         // add in slack
                         newState.arrivalTime -= options.getBoardSlack();
-                        waitTime = newState.parent.arrivalTime - newState.arrivalTime;
+                        waitTime = newState.getParent().arrivalTime - newState.arrivalTime;
                     } else {
                         if (!route.boards[0][boardState.patternIndex].getPattern()
                                 .canAlight(stopNo))
@@ -177,8 +202,9 @@ public class RaptorSearch {
                         newState.arrivalTime = (int) sd.time(alightTime);
                         // add in slack
                         newState.arrivalTime += options.getAlightSlack();
-                        waitTime = newState.arrivalTime - newState.parent.arrivalTime;
+                        waitTime = newState.arrivalTime - newState.getParent().arrivalTime;
                     }
+
                     if (nBoardings == 1) {
                         newState.initialWaitTime = waitTime;
                     } else {
@@ -243,7 +269,7 @@ public class RaptorSearch {
                     TRYBOARD: for (RaptorState oldState : states) {
                         if (oldState.nBoardings != nBoardings - 1)
                             continue;
-                        if (oldState.route == route)
+                        if (oldState.getRoute() == route)
                             continue; // we got here via this route, so no reason to transfer
 
                         RaptorBoardSpec boardSpec;
@@ -295,8 +321,11 @@ public class RaptorSearch {
     public void walkPhase(RoutingRequest options, RoutingRequest walkOptions, int nBoardings,
             List<RaptorState> createdStates) {
 
-        final double distanceToNearestTransitStop = options.rctx.target
-                .getDistanceToNearestTransitStop();
+        double distanceToNearestTransitStop = 0;
+        if (options.rctx.target != null) {
+            distanceToNearestTransitStop = options.rctx.target.getDistanceToNearestTransitStop();
+        }
+
         final int boardSlack = nBoardings == 1 ? options.getBoardSlack() : (options
                 .getTransferSlack() - options.getAlightSlack());
         ShortestPathTree spt;
@@ -307,7 +336,9 @@ public class RaptorSearch {
         if (nBoardings == 0) {
             //TODO: retry min-time bounding with this and with maxtime
 
-            if (bounder.getTargetDistance(options.rctx.origin) < options.getMaxWalkDistance())
+            if (options.rctx.target != null
+                    && bounder.getTargetDistance(options.rctx.origin) < options
+                            .getMaxWalkDistance())
                 dijkstra.setHeuristic(bounder);
 
             MaxWalkState start = new MaxWalkState(options.rctx.origin, walkOptions);
@@ -353,18 +384,19 @@ public class RaptorSearch {
 
                 Vertex stopVertex = state.stop.stopVertex;
 
-                double minWalk = distanceToNearestTransitStop;
+                if (options.rctx.target != null) {
+                    double minWalk = distanceToNearestTransitStop;
+                    double targetDistance = bounder.getTargetDistance(stopVertex);
 
-                double targetDistance = bounder.getTargetDistance(stopVertex);
+                    if (targetDistance + state.walkDistance > options.getMaxWalkDistance()) {
+                        // can't walk to destination, so we can't alight at a local vertex
+                        if (state.stop.stopVertex.isLocal())
+                            continue;
+                    }
 
-                if (targetDistance + state.walkDistance > options.getMaxWalkDistance()) {
-                    // can't walk to destination, so we can't alight at a local vertex
-                    if (state.stop.stopVertex.isLocal())
+                    if (minWalk + state.walkDistance > options.getMaxWalkDistance()) {
                         continue;
-                }
-
-                if (minWalk + state.walkDistance > options.getMaxWalkDistance()) {
-                    continue;
+                    }
                 }
 
                 StateEditor dijkstraState = new MaxWalkState.MaxWalkStateEditor(walkOptions,
@@ -381,7 +413,7 @@ public class RaptorSearch {
                 startPoints.add(newState);
             }
             if (startPoints.size() == 0) {
-                System.out.println("warning: no walk in round " + nBoardings);
+                log.debug("warning: no walk in round " + nBoardings);
                 return;
             }
             System.out.println("walk starts: " + startPoints.size() + " / " + visitedEver.size());
@@ -393,15 +425,19 @@ public class RaptorSearch {
             bounder.prepareForSearch();
 
             dijkstra.setSearchTerminationStrategy(bounder);
-            dijkstra.setSkipTraverseResultStrategy(bounder);
-            dijkstra.setHeuristic(bounder);
+            if (options.rctx.target != null) {
+                dijkstra.setSkipTraverseResultStrategy(bounder);
+                dijkstra.setHeuristic(bounder);
+            }
 
             // Do local search
             spt = dijkstra.getShortestPathTree(startPoints.get(0));
             transitStopStates = bounder.getTransitStopsVisited();
         }
 
-        final List<? extends State> targetStates = spt.getStates(walkOptions.rctx.target);
+        List<? extends State> targetStates = null;
+        if (walkOptions.rctx.target != null)
+            targetStates = spt.getStates(walkOptions.rctx.target);
         if (targetStates != null) {
             TARGET: for (State targetState : targetStates) {
                 RaptorState parent = (RaptorState) targetState.getExtension("raptorParent");
@@ -440,39 +476,39 @@ public class RaptorSearch {
                 // we have found a stop is totally unused, so skip it
                 continue;
             }
+            if (options.rctx.target != null) {
+                double minWalk = distanceToNearestTransitStop;
 
-            double minWalk = distanceToNearestTransitStop;
+                double targetDistance = bounder.getTargetDistance(vertex);
+                final double remainingWalk = options.maxWalkDistance - state.getWalkDistance();
 
-            double targetDistance = bounder.getTargetDistance(vertex);
-            final double remainingWalk = options.maxWalkDistance - state.getWalkDistance();
+                if (maxTimeDayIndex > 0 && remainingWalk < 3218) {
+                    double minTime = (targetDistance - minWalk) / Raptor.MAX_TRANSIT_SPEED
+                            + minWalk / options.getSpeedUpperBound();
+                    if (targetDistance > remainingWalk)
+                        minTime += boardSlack;
 
-            if (maxTimeDayIndex > 0 && remainingWalk < 3218) {
-                double minTime = (targetDistance - minWalk) / Raptor.MAX_TRANSIT_SPEED + minWalk
-                        / options.getSpeedUpperBound();
-                if (targetDistance > remainingWalk)
-                    minTime += boardSlack;
+                    int maxTimeForVertex = 0;
+                    int region = vertex.getGroupIndex();
+                    final int elapsedTime = (int) state.getElapsedTime();
+                    for (StopNearTarget stopNearTarget : stopsNearTarget.values()) {
+                        int destinationRegion = stopNearTarget.stop.stopVertex.getGroupIndex();
+                        final int maxTimeFromThisRegion = data.maxTransitRegions.maxTransit[maxTimeDayIndex][destinationRegion][region];
+                        int maxTime = elapsedTime + maxTimeFromThisRegion + stopNearTarget.time;
 
-                int maxTimeForVertex = 0;
-                int region = vertex.getGroupIndex();
-                final int elapsedTime = (int) state.getElapsedTime();
-                for (StopNearTarget stopNearTarget : stopsNearTarget.values()) {
-                    int destinationRegion = stopNearTarget.stop.stopVertex.getGroupIndex();
-                    final int maxTimeFromThisRegion = data.maxTransitRegions.maxTransit[maxTimeDayIndex][destinationRegion][region];
-                    int maxTime = elapsedTime + maxTimeFromThisRegion + stopNearTarget.time;
-
-                    if (maxTime > maxTimeForVertex) {
-                        maxTimeForVertex = maxTime;
+                        if (maxTime > maxTimeForVertex) {
+                            maxTimeForVertex = maxTime;
+                        }
                     }
-                }
-                if (maxTimeForVertex < maxTime) {
-                    maxTime = maxTimeForVertex;
-                } else {
-                    if (elapsedTime + minTime > maxTime * 1.5) {
-                        continue;
+                    if (maxTimeForVertex < maxTime) {
+                        maxTime = maxTimeForVertex;
+                    } else {
+                        if (elapsedTime + minTime > maxTime * 1.5) {
+                            continue;
+                        }
                     }
                 }
             }
-
             List<RaptorState> states = statesByStop[stop.index];
             if (states == null) {
                 states = new ArrayList<RaptorState>();

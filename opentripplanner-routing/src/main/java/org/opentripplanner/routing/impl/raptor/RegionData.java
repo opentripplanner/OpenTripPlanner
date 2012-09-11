@@ -19,6 +19,13 @@ public class RegionData implements Serializable {
 
     public int[] regionForVertex;
 
+    public HashSet<RaptorRoute>[][] routes; //routes ever used on a shortest path between regions
+
+    public HashSet<RaptorStop>[][] stops; //stops ever used on a shortest path between regions
+
+    //a list of vertices for each region
+    public ArrayList<ArrayList<Vertex>> verticesForRegion;
+
     public RegionData(int[] regionsForVertex) {
         this.regionForVertex = regionsForVertex;
     }

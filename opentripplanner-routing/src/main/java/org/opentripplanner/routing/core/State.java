@@ -245,10 +245,6 @@ public class State implements Cloneable {
         return stateData.lastAlightedTime;
     }
 
-    public NoThruTrafficState getNoThruTrafficState() {
-        return stateData.noThruTrafficState;
-    }
-
     public double getWalkDistance() {
         return walkDistance;
     }

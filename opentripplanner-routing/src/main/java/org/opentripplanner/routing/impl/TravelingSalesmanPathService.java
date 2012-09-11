@@ -27,6 +27,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.pathparser.BasicPathParser;
+import org.opentripplanner.routing.pathparser.NoThruTrafficPathParser;
 import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
@@ -57,8 +58,8 @@ public class TravelingSalesmanPathService implements PathService {
         Graph graph = graphService.getGraph(options.getRouterId());
         long time = options.dateTime;
         options.setRoutingContext(graph);
-        options.rctx.pathParsers = new PathParser[1];
-        options.rctx.pathParsers[0] = new BasicPathParser();
+        options.rctx.pathParsers = new PathParser[] { new BasicPathParser(),
+                new NoThruTrafficPathParser() };
 
         Vertex fromVertex = options.rctx.fromVertex;
         Vertex toVertex = options.rctx.toVertex;
