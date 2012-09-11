@@ -33,9 +33,6 @@ import org.slf4j.LoggerFactory;
  * times, etc. Timetable is a non-static nested (inner) class, so each Timetable belongs to a 
  * specific TripPattern, whose fields it can access.
  */
-// TODO: Timetable is not large enough that it should probably be split out and have an explicit
-// reference to its owning pattern via a field. However it is super convenient to have access
-// to the trippattern's fields.
 public class Timetable implements Serializable {
     
     private static final long serialVersionUID = 1L;
@@ -45,6 +42,7 @@ public class Timetable implements Serializable {
      * The Timetable size (number of TripTimes) at which indexes will be built for all stops. 
      * Below this size, departure and arrival times will be found by linear search. Above this
      * size, it will be possible to use binary search.
+     * Break even list size for linear and binary searches was determined to be around 16.
      */
     private static final int INDEX_THRESHOLD = 16;
 
@@ -65,8 +63,7 @@ public class Timetable implements Serializable {
     private transient TripTimes[][] arrivalsIndex = null;
     private transient TripTimes[][] departuresIndex = null;
 
-    /** For each hop, the best running time. This serves to provide lower bounds on traversal time.
-     * TODO: should be indexed per timetable, not in patterns, and be transient. */
+    /** For each hop, the best running time. This serves to provide lower bounds on traversal time. */
     private transient int bestRunningTimes[];
     
     /** For each stop, the best dwell time. This serves to provide lower bounds on traversal time. */
@@ -155,12 +152,7 @@ public class Timetable implements Serializable {
         }
         TripTimes[][] tableIndex = boarding ? departuresIndex : arrivalsIndex; 
         // binary search if this timetable has been indexed
-        // TODO: potential optimization: when indexing, check if new sorted trip arrays are the 
-        // same as one for previous stop, and reuse them.
-        // If they are all the same, trip is FIFO and needs no index (ie tripTimes can be used
-        // as index at every stop). 
         if (tableIndex != null) { 
-            // grab the sorted list of TripTimes for this particular stop
             TripTimes[] sorted;
             if (tableIndex.length == 1) // for optimized FIFO patterns
                 sorted = departuresIndex[0];
@@ -237,8 +229,6 @@ public class Timetable implements Serializable {
     public void finish() {
         int nHops = pattern.stops.length - 1;
         int nTrips = tripTimes.size();
-        // TODO: bestRunningTimes is specific to the _updated_ times and should be moved into 
-        // the inner class
         bestRunningTimes = new int[nHops];
         boolean nullArrivals = false; // TODO: should scan through triptimes?
         if ( ! nullArrivals) {
@@ -253,8 +243,8 @@ public class Timetable implements Serializable {
                 }
             }
         }
-        // FIXME: why is incoming running times 1 shorter than departures?
-        // because when there are no arrivals array, the last departure is actually used for an arrival 
+        // Q: Why is incoming running times 1 shorter than departures?
+        // A: Because when there are no arrivals array, the last departure is actually used for an arrival. 
         for (int h = 0; h < nHops; ++h) {
             bestRunningTimes[h] = Integer.MAX_VALUE;
             for (int t = 0; t < nTrips; ++t) { 
@@ -264,12 +254,6 @@ public class Timetable implements Serializable {
                 }
             }
         }
-        
-        // analyze();
-        // compact();
-        // index();
-        
-        // break even list size for linear and binary searches was determined to be around 16
         if (nTrips > INDEX_THRESHOLD) {
             //LOG.debug("indexing pattern with {} trips", nTrips);
             index(); 
