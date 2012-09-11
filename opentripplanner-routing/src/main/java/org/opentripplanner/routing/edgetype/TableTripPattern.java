@@ -344,6 +344,8 @@ public class TableTripPattern implements TripPattern, Serializable {
             int nHops = stops.length - 1;
             arrivalsIndex = new TripTimes[nHops][];
             departuresIndex = new TripTimes[nHops][];
+            boolean departuresFifo = true;
+            boolean arrivalsMatchDepartures = true;
             for (int hop = 0; hop < nHops; hop++) {
                 // copy canonical TripTimes List into new arrays
                 arrivalsIndex[hop] = tripTimes.toArray(new TripTimes[tripTimes.size()]);
@@ -351,6 +353,18 @@ public class TableTripPattern implements TripPattern, Serializable {
                 // TODO: STOP VS HOP
                 Arrays.sort(arrivalsIndex[hop], new TripTimes.ArrivalsComparator(hop));
                 Arrays.sort(departuresIndex[hop], new TripTimes.DeparturesComparator(hop));
+                if (departuresFifo && ! Arrays.equals(departuresIndex[hop], departuresIndex[0]))
+                    departuresFifo = false;
+                if (arrivalsMatchDepartures && ! Arrays.equals(departuresIndex[hop], arrivalsIndex[hop]))
+                    arrivalsMatchDepartures = false;
+            }
+            if (departuresFifo) {
+                LOG.debug("compressing FIFO TripPattern index.");
+                departuresIndex = Arrays.copyOf(departuresIndex, 1);
+            }
+            if (arrivalsMatchDepartures) {
+                LOG.debug("reusing departures index where arrivals index is identical.");
+                arrivalsIndex = departuresIndex;
             }
         }
         
@@ -380,22 +394,23 @@ public class TableTripPattern implements TripPattern, Serializable {
             // as index at every stop). 
             if (tableIndex != null) { 
                 // grab the sorted list of TripTimes for this particular stop
-                // if (departuresIndex.length == 1) // for optimized FIFO patterns
-                //     index = departuresIndex[0];
-                // else
-                TripTimes[] index = tableIndex[stopIndex];
+                TripTimes[] sorted;
+                if (tableIndex.length == 1) // for optimized FIFO patterns
+                    sorted = departuresIndex[0];
+                else
+                    sorted = tableIndex[stopIndex];
                 int tripIndex;
                 if (boarding)
-                    tripIndex = TripTimes.binarySearchDepartures(index, stopIndex, time); 
+                    tripIndex = TripTimes.binarySearchDepartures(sorted, stopIndex, time); 
                 else
-                    tripIndex = TripTimes.binarySearchArrivals(index, stopIndex, time); 
+                    tripIndex = TripTimes.binarySearchArrivals(sorted, stopIndex, time); 
                 // an alternative to conditional increment/decrement would be to sort the arrivals
                 // index in decreasing order, but that would require changing the search algorithm 
                 int increment = boarding ? 1 : -1;
-                int terminate = boarding ? index.length : -1;
+                int terminate = boarding ? sorted.length : -1;
                 //these appear to actually be hop indexes, which is what the binary search accepts
                 while (tripIndex != terminate) { 
-                    TripTimes tt = index[tripIndex];
+                    TripTimes tt = sorted[tripIndex];
                     Trip t = tt.getTrip();
                     if (tripAcceptable(t, haveBicycle, options)) {
                         return tt;
