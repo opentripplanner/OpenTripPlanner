@@ -353,17 +353,21 @@ public class TableTripPattern implements TripPattern, Serializable {
                 // TODO: STOP VS HOP
                 Arrays.sort(arrivalsIndex[hop], new TripTimes.ArrivalsComparator(hop));
                 Arrays.sort(departuresIndex[hop], new TripTimes.DeparturesComparator(hop));
-                if (departuresFifo && ! Arrays.equals(departuresIndex[hop], departuresIndex[0]))
+                if (Arrays.equals(departuresIndex[hop], departuresIndex[0]))
+                    departuresIndex[hop] = departuresIndex[0];
+                else
                     departuresFifo = false;
-                if (arrivalsMatchDepartures && ! Arrays.equals(departuresIndex[hop], arrivalsIndex[hop]))
+                if (Arrays.equals(departuresIndex[hop], arrivalsIndex[hop]))
+                    arrivalsIndex[hop] = departuresIndex[hop];
+                else
                     arrivalsMatchDepartures = false;
             }
             if (departuresFifo) {
-                LOG.debug("compressing FIFO TripPattern index.");
+                LOG.debug("Compressing FIFO Timetable index.");
                 departuresIndex = Arrays.copyOf(departuresIndex, 1);
             }
             if (arrivalsMatchDepartures) {
-                LOG.debug("reusing departures index where arrivals index is identical.");
+                LOG.debug("Reusing departures index where arrivals index is identical.");
                 arrivalsIndex = departuresIndex;
             }
         }
