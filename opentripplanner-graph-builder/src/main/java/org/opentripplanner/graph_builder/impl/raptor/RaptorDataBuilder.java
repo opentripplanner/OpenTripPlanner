@@ -151,7 +151,7 @@ public class RaptorDataBuilder implements GraphBuilder {
 
         //MaxTransitRegions regions = makeMaxTransitRegions(graph, data);
         //data.maxTransitRegions = regions;
-        data.regionData = makeRegions(graph, data);
+        data.regionData = makeRegionsBySubdivision(graph, data);
 
     }
 
@@ -412,7 +412,7 @@ public class RaptorDataBuilder implements GraphBuilder {
     }
 
     @SuppressWarnings("unchecked")
-    private RegionData makeRegions(Graph graph, RaptorData data) {
+    private RegionData makeRegionsBySubdivision(Graph graph, RaptorData data) {
         ArrayList<Vertex> vertices = new ArrayList<Vertex>();
         for (Vertex v : graph.getVertices()) {
             if (!(v instanceof OnboardVertex)) {
