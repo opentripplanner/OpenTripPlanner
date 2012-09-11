@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.edgetype;
 
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -72,9 +73,6 @@ public class TableTripPattern implements TripPattern, Serializable {
     /** An arbitrary trip that uses this pattern. Maybe we should just store route, etc. directly. */
     public final Trip exemplar;
 
-    // override trip_headsign with stop_headsign where necessary
-    private final List<List<String>> headsigns = new ArrayList<List<String>>();
-
     /** 
      * This timetable holds the 'official' stop times from GTFS. If realtime stoptime updates are 
      * applied, trips searches will be conducted using another timetable and this one will serve to 
@@ -108,7 +106,7 @@ public class TableTripPattern implements TripPattern, Serializable {
     private int[] perStopFlags;
     
     /** For each hop, the best running time. This serves to provide lower bounds on traversal time.
-     * TODO: and should be indexed per timetable, not in patterns. */
+     * TODO: should be indexed per timetable, not in patterns, and be transient. */
     int bestRunningTimes[];
     
     /** For each stop, the best dwell time. This serves to provide lower bounds on traversal time. */
@@ -308,8 +306,8 @@ public class TableTripPattern implements TripPattern, Serializable {
          * the same stop may overlap. The indexes always contain the same elements as the main
          * tripTimes List, but are re-sorted at each stop to allow binary searches.
          */
-        private TripTimes[][] arrivalsIndex;
-        private TripTimes[][] departuresIndex;
+        private transient TripTimes[][] arrivalsIndex = null;
+        private transient TripTimes[][] departuresIndex = null;
         
         /** Construct an empty Timetable. */
         private Timetable() {
@@ -508,7 +506,7 @@ public class TableTripPattern implements TripPattern, Serializable {
             
             // break even list size for linear and binary searches was determined to be around 16
             if (nTrips > INDEX_THRESHOLD) {
-                //LOG.debug("indexing pattern with {} trips", nTrips);
+                LOG.debug("indexing pattern with {} trips", nTrips);
                 index(); 
             } else {
                 arrivalsIndex = null;
@@ -656,6 +654,11 @@ public class TableTripPattern implements TripPattern, Serializable {
                 }
             }
             return true;
+        }
+        
+        private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+            in.defaultReadObject();
+            finish();
         }
                 
     } // END Class Timetable
