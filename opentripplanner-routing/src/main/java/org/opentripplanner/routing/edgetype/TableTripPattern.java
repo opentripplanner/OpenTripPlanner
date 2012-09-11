@@ -353,8 +353,8 @@ public class TableTripPattern implements TripPattern, Serializable {
                 // TODO: STOP VS HOP
                 Arrays.sort(arrivalsIndex[hop], new TripTimes.ArrivalsComparator(hop));
                 Arrays.sort(departuresIndex[hop], new TripTimes.DeparturesComparator(hop));
-                if (Arrays.equals(departuresIndex[hop], departuresIndex[0]))
-                    departuresIndex[hop] = departuresIndex[0];
+                if (hop > 0 && Arrays.equals(departuresIndex[hop], departuresIndex[hop - 1]))
+                    departuresIndex[hop] = departuresIndex[hop - 1];
                 else
                     departuresFifo = false;
                 if (Arrays.equals(departuresIndex[hop], arrivalsIndex[hop]))
