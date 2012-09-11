@@ -230,13 +230,9 @@ public class TransitBoardAlight extends PatternEdge implements OnBoardForwardEdg
                 //    continue;
                 if (sd.serviceIdRunning(serviceId)) {
                     
-                    // make sure we search for boards on board and alights on alight
-                    if (boarding)
-                        tripTimes = getPattern().getNextTrip(stopIndex, 
-                                secondsSinceMidnight, mode == TraverseMode.BICYCLE, options);
-                    else
-                        tripTimes = getPattern().getPreviousTrip(stopIndex, 
-                                secondsSinceMidnight, mode == TraverseMode.BICYCLE, options);
+                    // getNextTrip will find next or prev departure depending on final boolean parameter
+                    tripTimes = getPattern().getNextTrip(stopIndex, secondsSinceMidnight, 
+                            mode == TraverseMode.BICYCLE, options, boarding);
                     
                     if (tripTimes != null) {
                         // a trip was found, index is valid, wait will be non-negative

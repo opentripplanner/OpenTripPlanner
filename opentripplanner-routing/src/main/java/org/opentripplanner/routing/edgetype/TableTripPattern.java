@@ -232,49 +232,30 @@ public class TableTripPattern implements TripPattern, Serializable {
         return trips.size();
     }
     
-    // TODO: Lombokize this boilerplate 
+    // TODO: Lombokize all boilerplate... but lombok does not generate javadoc :/ 
     public int getServiceId() { 
         return serviceId;
     }
     
     /** 
-     * Find the next departure on this pattern at or after the specified time. This method will
-     * make use of any TimetableResolver present in the RoutingContext to redirect departure
-     * lookups to the appropriate updated Timetable, and will fall back on the scheduled timetable
-     * when no updates are available.
+     * Find the next (or previous) departure on this pattern at or after (respectively before) the 
+     * specified time. This method will make use of any TimetableResolver present in the 
+     * RoutingContext to redirect departure lookups to the appropriate updated Timetable, and will 
+     * fall back on the scheduled timetable when no updates are available.
      * @return a TripTimes object providing all the arrival and departure times on the best trip.
      */
-    public TripTimes getNextTrip(int stopIndex, int afterTime, boolean haveBicycle,
-            RoutingRequest options) {
-        Timetable timetable;
+    public TripTimes getNextTrip(int stopIndex, int time, boolean haveBicycle,
+            RoutingRequest options, boolean forward) {
+        Timetable timetable = scheduledTimetable;
         TimetableResolver snapshot = options.rctx.timetableSnapshot; 
         if (snapshot != null)
             timetable = snapshot.resolve(this);
+        if (forward)
+            return timetable.getNextTrip(stopIndex, time, haveBicycle, options);
         else
-            timetable = scheduledTimetable;
-//        System.out.println("resolver: " + 
-//            (timetable != scheduledTimetable ? "updated " : "scheduled ") + 
-//            timetable.tripTimes.size() + " trips");
-        return timetable.getNextTrip(stopIndex, afterTime, haveBicycle, options);
+            return timetable.getPreviousTrip(stopIndex, time, haveBicycle, options);
     }
     
-    /** 
-     * Find the previous departure on this pattern at or before the specified time. This method will
-     * make use of any TimetableResolver present in the RoutingContext to redirect departure
-     * lookups to the appropriate updated Timetable, and will fall back on the scheduled timetable
-     * when no updates are available.
-     * @return a TripTimes object providing all the arrival and departure times on the best trip.
-     */
-    public TripTimes getPreviousTrip(int stopIndex, int beforeTime, boolean haveBicycle, 
-            RoutingRequest options) {
-        Timetable timetable;
-        TimetableResolver snapshot = options.rctx.timetableSnapshot; 
-        if (snapshot != null)
-            timetable = snapshot.resolve(this);
-        else
-            timetable = scheduledTimetable;
-        return timetable.getPreviousTrip(stopIndex, beforeTime, haveBicycle, options);
-    }        
 
     /* --- BEGIN NESTED CLASS --- */
     
