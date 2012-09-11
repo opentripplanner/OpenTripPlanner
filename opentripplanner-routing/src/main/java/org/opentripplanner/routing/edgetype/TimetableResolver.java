@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.opentripplanner.routing.edgetype.TableTripPattern.Timetable;
 import org.opentripplanner.routing.trippattern.UpdateBlock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
