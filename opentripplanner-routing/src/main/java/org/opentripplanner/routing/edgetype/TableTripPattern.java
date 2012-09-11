@@ -165,17 +165,6 @@ public class TableTripPattern implements TripPattern, Serializable {
         return trips.indexOf(trip);
     }
 
-// delegate search to scheduled timetable
-//    public int getTripIndex(AgencyAndId tripId) {
-//        int ret = 0;
-//        for (Trip t : trips) {
-//            if (t.getId().equals(tripId)) // replace with indexing in stoptime updater?
-//                return ret;
-//            ret += 1;
-//        }
-//        return -1;
-//    }
-    
     private void writeObject(ObjectOutputStream outputStream) throws ClassNotFoundException,
             IOException {
         finish();
@@ -243,32 +232,6 @@ public class TableTripPattern implements TripPattern, Serializable {
         return trips.size();
     }
     
-//   TODO: verify and fix headsign compaction
-    
-//    if (headsigns != null) { 
-//        // DO NOT transpose headsigns to allow reusing rows
-//        this.headsigns = new String[nHops][nTrips]; 
-//        String[] nullRow = null; 
-//        // headsigns contains 1 less headsign than there are stops, because sign change is pointless at the last stop
-//        for (int s = 0; s < nHops; ++s) { 
-//            boolean rowIsNull = true;
-//            for (int t = 0; t < headsigns[s].size(); ++t) {
-//                this.headsigns[s][t] = headsigns[s].get(t); 
-//                if (this.headsigns[s][t] != null) {
-//                    rowIsNull = false; 
-//                }
-//            }
-//            if (rowIsNull) {
-//                // repeat the same row object when empty row encountered
-//                if (nullRow == null) {
-//                    nullRow = this.headsigns[s];
-//                } else {
-//                    this.headsigns[s] = nullRow;
-//                }
-//            }
-//        }
-//    }
-
     // TODO: Lombokize this boilerplate 
     public int getServiceId() { 
         return serviceId;
