@@ -214,7 +214,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             }
             return null;
         }
-        double speed = options.getSpeed(s0.getNonTransitMode(options));
+        double speed = options.getSpeed(traverseMode);
         double time = length / speed;
         double weight;
         if (options.wheelchairAccessible) {
