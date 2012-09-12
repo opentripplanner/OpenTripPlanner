@@ -499,7 +499,14 @@ public class PlanGenerator {
         leg.endTime = makeCalendar(state.getBackState());
         Geometry geometry = GeometryUtils.getGeometryFactory().createLineString(coordinates);
         leg.legGeometry = PolylineEncoder.createEncodings(geometry);
-        leg.to = makePlace(state, state.getBackEdge().getName(), true);
+        Edge backEdge = state.getBackEdge();
+        String name;
+        if (backEdge instanceof StreetEdge) {
+            name = backEdge.getName();
+        } else {
+            name = state.getVertex().getName();
+        }
+        leg.to = makePlace(state, name, true);
         coordinates.clear();
     }
 
