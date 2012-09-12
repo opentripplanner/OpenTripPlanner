@@ -177,12 +177,12 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
             minWalk = this.distanceToNearestTransitStop + vertex.getDistanceToNearestTransitStop();
             minTime = options.isArriveBy() ? traverseOptions.getAlightSlack() : traverseOptions.getBoardSlack();
 
-            if (current.getBackEdge() instanceof StreetEdge && !transitLocalStreets.transferrable(vertex)) {
+            if (current.getBackEdge() instanceof StreetEdge && transitLocalStreets != null &&  !transitLocalStreets.transferrable(vertex)) {
                 return true;
             }
         } else {
             // could walk directly to destination
-            if (targetDistance < distanceToNearestTransitStop || !transitLocalStreets.transferrable(vertex))
+            if (targetDistance < distanceToNearestTransitStop || transitLocalStreets == null || !transitLocalStreets.transferrable(vertex))
                 minWalk = targetDistance;
             else
                 minWalk = distanceToNearestTransitStop;
