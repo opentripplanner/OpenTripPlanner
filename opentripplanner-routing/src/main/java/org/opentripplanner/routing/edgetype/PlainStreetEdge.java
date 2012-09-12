@@ -288,7 +288,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             if (turnCost > 180) {
                 turnCost = 360 - turnCost;
             }
-            final double realTurnCost = (turnCost / 20.0) / options.getSpeed(traverseMode);
+            final double realTurnCost = (turnCost / 20.0) / speed;
             s1.incrementWalkDistance(realTurnCost / 100); //just a tie-breaker
             weight += realTurnCost;
             long turnTime = (long) realTurnCost;
