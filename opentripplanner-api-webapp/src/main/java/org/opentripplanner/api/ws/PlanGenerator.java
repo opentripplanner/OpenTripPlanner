@@ -48,6 +48,7 @@ import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
@@ -397,7 +398,7 @@ public class PlanGenerator {
                          * any further transit edge, add "from" vertex to intermediate stops
                          */
                         if (!(backEdge instanceof DwellEdge)) {
-                            Place stop = makePlace(state.getBackState(), true);
+                            Place stop = makePlace(state.getBackState(), backEdge.getName(), true);
                             leg.stop.add(stop);
                         } else if (leg.stop.size() > 0) {
                             leg.stop.get(leg.stop.size() - 1).departure = makeCalendar(state);
@@ -498,7 +499,7 @@ public class PlanGenerator {
         leg.endTime = makeCalendar(state.getBackState());
         Geometry geometry = GeometryUtils.getGeometryFactory().createLineString(coordinates);
         leg.legGeometry = PolylineEncoder.createEncodings(geometry);
-        leg.to = makePlace(state, true);
+        leg.to = makePlace(state, state.getBackEdge().getName(), true);
         coordinates.clear();
     }
 
@@ -546,7 +547,14 @@ public class PlanGenerator {
         itinerary.addLeg(leg);
         leg.startTime = makeCalendar(s.getBackState());
         leg.distance = 0.0;
-        leg.from = makePlace(s.getBackState(), false);
+        String name;
+        Edge backEdge = s.getBackEdge();
+        if (backEdge instanceof StreetEdge) {
+            name = backEdge.getName();
+        } else {
+            name = s.getVertex().getName();
+        }
+        leg.from = makePlace(s.getBackState(), name, false);
         leg.mode = s.getBackMode().toString();
         if (s.isBikeRenting()) {
             leg.rentedBike = true; 
@@ -583,10 +591,9 @@ public class PlanGenerator {
      * 
      * @return
      */
-    private Place makePlace(State state, boolean time) {
+    private Place makePlace(State state, String name, boolean time) {
         Vertex v = state.getVertex();
         Coordinate endCoord = v.getCoordinate();
-        String name = v.getName();
         Place place;
         if (time) {
             Calendar timeAtState = makeCalendar(state);
