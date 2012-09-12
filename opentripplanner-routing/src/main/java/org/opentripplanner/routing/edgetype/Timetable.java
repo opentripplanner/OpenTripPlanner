@@ -113,10 +113,12 @@ public class Timetable implements Serializable {
             // TODO: STOP VS HOP
             Arrays.sort(arrivalsIndex[hop], new TripTimes.ArrivalsComparator(hop));
             Arrays.sort(departuresIndex[hop], new TripTimes.DeparturesComparator(hop));
-            if (hop > 0 && Arrays.equals(departuresIndex[hop], departuresIndex[hop - 1]))
-                departuresIndex[hop] = departuresIndex[hop - 1];
-            else
-                departuresFifo = false;
+            if (hop > 0) {
+                if (Arrays.equals(departuresIndex[hop], departuresIndex[hop - 1]))
+                    departuresIndex[hop] = departuresIndex[hop - 1];
+                else
+                    departuresFifo = false;
+            }
             if (Arrays.equals(departuresIndex[hop], arrivalsIndex[hop]))
                 arrivalsIndex[hop] = departuresIndex[hop];
             else
