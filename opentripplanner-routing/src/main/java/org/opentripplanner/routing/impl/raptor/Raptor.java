@@ -98,8 +98,14 @@ public class Raptor implements PathService {
 
         RaptorData data = graph.getService(RaptorDataService.class).getData();
 
-        double initialWalk = options.getMaxWalkDistance() * 1.1;
         //we multiply the initial walk distance by 1.1 to account for epsilon dominance.
+        double initialWalk = options.getMaxWalkDistance() * 1.1;
+        //do not even bother with obviously impossible walks
+        double minWalk = options.rctx.origin.getDistanceToNearestTransitStop() + options.rctx.target.getDistanceToNearestTransitStop();
+        if (initialWalk < minWalk) {
+            initialWalk = minWalk;
+        }
+
         options.setMaxWalkDistance(initialWalk);
 
         RoutingRequest walkOptions = options.clone();
@@ -137,6 +143,7 @@ public class Raptor implements PathService {
         long searchBeginTime = System.currentTimeMillis();
 
         int bestElapsedTime = Integer.MAX_VALUE;
+        int foundSoFar = 0;
         RETRY: do {
             for (int round = 0; round < options.getMaxTransfers() + 2; ++round) {
                 round(data, options, walkOptions, search, round);
@@ -161,6 +168,15 @@ public class Raptor implements PathService {
                 }
 
             }
+
+            if (foundSoFar > search.getTargetStates().size()) {
+                foundSoFar = search.getTargetStates().size();
+            } else if (foundSoFar > 0) {
+                //we didn't find anything new in this round, and we already have
+                //some paths, so bail out
+                break;
+            }
+
             options.setMaxWalkDistance(options.getMaxWalkDistance() * 2);
             walkOptions.setMaxWalkDistance(options.getMaxWalkDistance());
 
