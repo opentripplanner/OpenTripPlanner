@@ -184,16 +184,15 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         _log.debug("Looking for/making a vertex near {}", coordinate);
 
         // first, check for intersections very close by
-        List<StreetVertex> vertices = getIntersectionAt(coordinate, MAX_CORNER_DISTANCE);
-        if (vertices != null && !vertices.isEmpty()) {
+        StreetVertex intersection = getIntersectionAt(coordinate, MAX_CORNER_DISTANCE);
+        if (intersection != null) {
             // coordinate is at a street corner or endpoint
             if (name == null) {
                 // generate names for corners when no name was given
                 // TODO: internationalize
                 Set<String> uniqueNameSet = new HashSet<String>();
-                // filter to avoid using OSM node ids for dead ends
-                for (StreetVertex v : IterableLibrary.filter(vertices, StreetVertex.class))
-                    uniqueNameSet.add(v.getName());
+                for (Edge e : intersection.getOutgoing()) 
+                    uniqueNameSet.add(e.getName());
                 List<String> uniqueNames = new ArrayList<String>(uniqueNameSet);
                 if (uniqueNames.size() > 1)
                     name = String.format("corner of %s and %s", uniqueNames.get(0),
@@ -205,12 +204,10 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             }
             StreetLocation closest = new StreetLocation(graph, "corner " + Math.random(),
                     coordinate, name);
-            for (Vertex v : vertices) {
-                FreeEdge e = new FreeEdge(closest, v);
-                closest.getExtra().add(e);
-                e = new FreeEdge(v, closest);
-                closest.getExtra().add(e);
-            }
+            FreeEdge e = new FreeEdge(closest, intersection);
+            closest.getExtra().add(e);
+            e = new FreeEdge(intersection, closest);
+            closest.getExtra().add(e);
             return closest;
         }
 
@@ -473,25 +470,27 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         return best;
     }
 
-    public List<StreetVertex> getIntersectionAt(Coordinate coordinate) {
+    public StreetVertex getIntersectionAt(Coordinate coordinate) {
         return getIntersectionAt(coordinate, MAX_CORNER_DISTANCE);
     }
 
     @SuppressWarnings("unchecked")
-    public List<StreetVertex> getIntersectionAt(Coordinate coordinate, double distanceError) {
+    public StreetVertex getIntersectionAt(Coordinate coordinate, double distanceError) {
         Envelope envelope = new Envelope(coordinate);
         envelope.expandBy(distanceError * 2);
         List<StreetVertex> nearby = intersectionTree.query(envelope);
-        List<StreetVertex> atIntersection = new ArrayList<StreetVertex>(nearby.size());
+        StreetVertex nearest = null;
+        double bestDistance = Double.POSITIVE_INFINITY;
         for (StreetVertex v : nearby) {
-            if (coordinate.distance(v.getCoordinate()) < distanceError) {
-                atIntersection.add(v);
+            double distance = coordinate.distance(v.getCoordinate());
+            if (distance < distanceError) {
+                if (distance < bestDistance) {
+                    bestDistance = distance;
+                    nearest = v;
+                }
             }
         }
-        if (atIntersection.isEmpty()) {
-            return null;
-        }
-        return atIntersection;
+        return nearest;
     }
 
     @Override

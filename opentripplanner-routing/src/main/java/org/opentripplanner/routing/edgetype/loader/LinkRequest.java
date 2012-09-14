@@ -115,14 +115,14 @@ public class LinkRequest {
         // if the bundle was caught endwise (T intersections and dead ends), 
         // get the intersection instead.
         if (edges.endwise()) {
-            return linker.index.getIntersectionAt(edges.endwiseVertex.getCoordinate());
+            return Arrays.asList(linker.index.getIntersectionAt(edges.endwiseVertex.getCoordinate()));
         } else {
             /* is the stop right at an intersection? */
-            List<StreetVertex> atIntersection = linker.index.getIntersectionAt(coordinate);
+            StreetVertex atIntersection = linker.index.getIntersectionAt(coordinate);
             if (atIntersection != null) {
                 // if so, the stop can be linked directly to all vertices at the intersection
-                if (edges.getScore() > distanceLibrary.distance(atIntersection.get(0).getCoordinate(), coordinate))
-                    return atIntersection;
+                if (edges.getScore() > distanceLibrary.distance(atIntersection.getCoordinate(), coordinate))
+                    return Arrays.asList(atIntersection);
             }
             return getSplitterVertices(vertexLabel, edges.toEdgeList(), coordinate);
         }
