@@ -120,7 +120,7 @@ public class PatternInterlineDwell extends Edge implements OnBoardForwardEdge, O
         // FIXME: ugly!
         TableTripPattern pattern = ((OnboardVertex)s1.getVertex()).getTripPattern();
         s1.incrementTimeInSeconds(dwellData.dwellTime);
-        s1.setTripId(targetTrip.getId()); // TODO: is this right? the targetTrip is more like an exemplar? (AMB)
+        s1.setTripId(dwellData.trip);
         // FIXME: this is interlining to the SCHEDULED timetable, not the updated timetable. use resolver.
         s1.setTripTimes(pattern.getTripTimes(dwellData.patternIndex));
         s1.incrementWeight(dwellData.dwellTime);

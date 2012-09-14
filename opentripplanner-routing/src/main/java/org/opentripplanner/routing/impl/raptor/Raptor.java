@@ -408,21 +408,27 @@ public class Raptor implements PathService {
                                     RaptorState next = states.get(i - 1);
                                     if (e2 instanceof PatternInterlineDwell) {
                                         if (((TransitVertex) e2.getToVertex()).getStop() == next.boardStop.stopVertex.getStop()) {
-                                            state = e2.traverse(state);
+                                            State newState = e2.traverse(state);
+                                            if (newState == null)
+                                                continue;
+                                            if (newState.getTripId() != next.tripId)
+                                                continue;
+                                            state = newState;
                                             break HOP;
                                         }
                                     }
                                 }
-                            }
-                            for (Edge e2 : state.getVertex().getOutgoing()) {
-                                if (e2 instanceof TransitBoardAlight) {
-                                    for (Edge e3 : e2.getToVertex().getOutgoing()) {
-                                        if (e3 instanceof PreAlightEdge) {
-                                            if (data.raptorStopsForStopId.get(((TransitStop) e3
-                                                    .getToVertex()).getStopId()) == cur.stop) {
-                                                state = e2.traverse(state);
-                                                state = e3.traverse(state);
-                                                break HOP;
+                            } else {
+                                for (Edge e2 : state.getVertex().getOutgoing()) {
+                                    if (e2 instanceof TransitBoardAlight) {
+                                        for (Edge e3 : e2.getToVertex().getOutgoing()) {
+                                            if (e3 instanceof PreAlightEdge) {
+                                                if (data.raptorStopsForStopId.get(((TransitStop) e3
+                                                        .getToVertex()).getStopId()) == cur.stop) {
+                                                    state = e2.traverse(state);
+                                                    state = e3.traverse(state);
+                                                    break HOP;
+                                                }
                                             }
                                         }
                                     }
@@ -478,21 +484,27 @@ public class Raptor implements PathService {
                                     RaptorState next = states.get(i - 1);
                                     if (e2 instanceof PatternInterlineDwell) {
                                         if (((TransitVertex) e2.getFromVertex()).getStop() == next.boardStop.stopVertex.getStop()) {
-                                            state = e2.traverse(state);
+                                            State newState = e2.traverse(state);
+                                            if (newState == null)
+                                                continue;
+                                            if (newState.getTripId() != next.tripId)
+                                                continue;
+                                            state = newState;
                                             break HOP;
                                         }
                                     }
                                 }
-                            }
-                            for (Edge e2 : state.getVertex().getIncoming()) {
-                                if (e2 instanceof TransitBoardAlight) {
-                                    for (Edge e3 : e2.getFromVertex().getIncoming()) {
-                                        if (e3 instanceof PreBoardEdge) {
-                                            if (data.raptorStopsForStopId.get(((TransitStop) e3
-                                                    .getFromVertex()).getStopId()) == cur.stop) {
-                                                state = e2.traverse(state);
-                                                state = e3.traverse(state);
-                                                break HOP;
+                            } else {
+                                for (Edge e2 : state.getVertex().getIncoming()) {
+                                    if (e2 instanceof TransitBoardAlight) {
+                                        for (Edge e3 : e2.getFromVertex().getIncoming()) {
+                                            if (e3 instanceof PreBoardEdge) {
+                                                if (data.raptorStopsForStopId.get(((TransitStop) e3
+                                                        .getFromVertex()).getStopId()) == cur.stop) {
+                                                    state = e2.traverse(state);
+                                                    state = e3.traverse(state);
+                                                    break HOP;
+                                                }
                                             }
                                         }
                                     }
