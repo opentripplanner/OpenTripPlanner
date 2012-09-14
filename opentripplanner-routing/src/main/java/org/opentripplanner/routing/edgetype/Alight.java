@@ -92,7 +92,7 @@ public class Alight extends Edge implements OnBoardReverseEdge {
             // backward traversal: find an appropriate transit trip
             if (!options.getModes().contains(hop.getMode()))
                 return null;
-            TraverseMode mode = s0.getNonTransitMode(options);
+            TraverseMode mode = s0.getNonTransitMode();
             if (mode.equals(TraverseMode.BICYCLE) && !hop.getBikesAllowed())
                 return null;
             long current_time = s0.getTime();

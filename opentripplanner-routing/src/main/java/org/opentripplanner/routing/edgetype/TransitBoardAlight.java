@@ -118,7 +118,7 @@ public class TransitBoardAlight extends PatternEdge implements OnBoardForwardEdg
         RoutingRequest options = state0.getOptions();
         // this method is on State not RoutingRequest because we care whether the user is in
         // possession of a rented bike.
-        TraverseMode mode = state0.getNonTransitMode(options); 
+        TraverseMode mode = state0.getNonTransitMode();
 
         // figure out the direction
         // it's leaving transit iff it's a boarding and is arrive by, or it's not a boarding and
@@ -309,7 +309,7 @@ public class TransitBoardAlight extends PatternEdge implements OnBoardForwardEdg
             }
             s1.setServiceDay(serviceDay);
             // save the trip times to ensure that router has a consistent view of them 
-            s1.setTripTimes(bestTripTimes); 
+            s1.setTripTimes(bestTripTimes);
             s1.incrementTimeInSeconds(bestWait);
             s1.incrementNumBoardings();
             s1.setTripId(trip.getId());

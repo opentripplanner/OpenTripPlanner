@@ -48,7 +48,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
             return null;
         }
         
-        TraverseMode mode = s0.getNonTransitMode(options);
+        TraverseMode mode = s0.getNonTransitMode();
 
         if (mode == TraverseMode.WALK && 
             !permission.allows(StreetTraversalPermission.PEDESTRIAN)) {

@@ -45,7 +45,7 @@ public abstract class RentABikeAbstractEdge extends Edge {
         /*
          * If we already have a bike (rented or own) we won't go any faster by having a second one.
          */
-        if (!s0.getNonTransitMode(options).equals(TraverseMode.WALK))
+        if (!s0.getNonTransitMode().equals(TraverseMode.WALK))
             return null;
         /*
          * To rent a bike, we need to have BICYCLE in allowed modes.
@@ -65,7 +65,7 @@ public abstract class RentABikeAbstractEdge extends Edge {
                 : options.bikeRentalPickupTime);
         s1.setBikeRenting(true);
         s1.setBikeRentalNetwork(network);
-        s1.setBackMode(s0.getNonTransitMode(options));
+        s1.setBackMode(s0.getNonTransitMode());
         State s1b = s1.makeState();
         return s1b;
     }
@@ -88,7 +88,7 @@ public abstract class RentABikeAbstractEdge extends Edge {
         s1e.incrementTimeInSeconds(options.isArriveBy() ? options.bikeRentalPickupTime
                 : options.bikeRentalDropoffTime);
         s1e.setBikeRenting(false);
-        s1e.setBackMode(s0.getNonTransitMode(options));
+        s1e.setBackMode(TraverseMode.WALK);
         State s1 = s1e.makeState();
         return s1;
     }

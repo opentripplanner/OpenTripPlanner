@@ -197,7 +197,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     @Override
     public State traverse(State s0) {
         final RoutingRequest options = s0.getOptions();
-        return doTraverse(s0, options, s0.getNonTransitMode(options));
+        return doTraverse(s0, options, s0.getNonTransitMode());
     }
 
     private State doTraverse(State s0, RoutingRequest options, TraverseMode traverseMode) {
@@ -273,12 +273,12 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             int outAngle = 0;
             int inAngle = 0;
             if (options.arriveBy) {
-                if (!canTurnOnto(backPSE, s0, traverseMode))
+                if (!canTurnOnto(backPSE, traverseMode))
                     return null;
                 outAngle = backPSE.getOutAngle();
                 inAngle = getInAngle();
             } else {
-                if (!backPSE.canTurnOnto(this, s0, traverseMode))
+                if (!backPSE.canTurnOnto(this, traverseMode))
                     return null;
                 outAngle = getOutAngle();
                 inAngle = backPSE.getInAngle();
@@ -307,7 +307,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         if (s1.weHaveWalkedTooFar(options))
             return null;
         
-        s1.addAlerts(getNotes());
+        s1.addAlerts(notes);
 
         return s1.makeState();
     }
@@ -477,7 +477,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         return turnRestrictions;
     }
 
-    public boolean canTurnOnto(Edge e, State state, TraverseMode mode) {
+    public boolean canTurnOnto(Edge e, TraverseMode mode) {
         for (TurnRestriction restriction : turnRestrictions) {
             /* FIXME: This is wrong for trips that end in the middle of restriction.to
              */
