@@ -211,7 +211,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
                     && current.getNumBoardings() >= bounder.getNumBoardings()) {
                 if (current.getElapsedTime() + minTime > bounder.getElapsedTime()) {
                     return true;
-                } else if (prevTime < 0 && (options.arriveBy ? (current.getTime() + minTime <= prevTime) : ((current.getTime() - minTime) >= prevTime))) {
+                } else if (prevTime > 0 && (options.arriveBy ? (current.getTime() - minTime >= prevTime) : ((current.getTime() + minTime) <= prevTime))) {
                     prevBounded = false;
                 }
             } else {
