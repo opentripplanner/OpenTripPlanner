@@ -13,7 +13,6 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,26 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.LineString;
-
-/** 
- * A vehicle's wait between the end of one run and the beginning of another run on the same block 
- * */
-class InterlineDwellData implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
-    public int dwellTime;
-
-    public int patternIndex;
-
-    public AgencyAndId trip;
-    
-    public InterlineDwellData(int dwellTime, int patternIndex, AgencyAndId trip) {
-        this.dwellTime = dwellTime;
-        this.patternIndex = patternIndex;
-        this.trip = trip;
-    }
-}
 
 public class PatternInterlineDwell extends Edge implements OnBoardForwardEdge, OnBoardReverseEdge {
     private static final Logger _log = LoggerFactory.getLogger(PatternInterlineDwell.class);
@@ -162,4 +141,12 @@ public class PatternInterlineDwell extends Edge implements OnBoardForwardEdge, O
     public Trip getTrip() {
     	return targetTrip;
     }
+
+    public Map<AgencyAndId, InterlineDwellData> getReverseTripIdToInterlineDwellData() {
+        return reverseTripIdToInterlineDwellData;
+    }
+    public Map<AgencyAndId, InterlineDwellData> getTripIdToInterlineDwellData() {
+        return tripIdToInterlineDwellData;
+    }
+
 }

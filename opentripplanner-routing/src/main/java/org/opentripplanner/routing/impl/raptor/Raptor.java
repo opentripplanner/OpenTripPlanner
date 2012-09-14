@@ -29,6 +29,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
+import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
@@ -43,6 +44,7 @@ import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -357,7 +359,7 @@ public class Raptor implements PathService {
         State state = new State(options);
         for (int i = states.size() - 1; i >= 0; --i) {
             RaptorState cur = states.get(i);
-            if (cur.walkPath != null) {
+            if (cur.walkPath != null) { //a walking step
                 GraphPath path = new GraphPath(cur.walkPath, true);
                 for (Edge e : path.edges) {
                     State oldState = state;
@@ -368,16 +370,15 @@ public class Raptor implements PathService {
                 }
             } else {
                 // so, cur is at this point at a transit stop; we have a route to board
-                for (Edge e : state.getVertex().getOutgoing()) {
-                    if (e instanceof PreBoardEdge) {
-                        state = e.traverse(state);
+                if (cur.getParent() == null || ! cur.getParent().interlining) {
+                    for (Edge e : state.getVertex().getOutgoing()) {
+                        if (e instanceof PreBoardEdge) {
+                            state = e.traverse(state);
+                            break;
+                        }
                     }
-                }
-                TransitBoardAlight board = cur.getRoute().boards[cur.boardStopSequence][cur.patternIndex];
-                State oldState = state;
-                state = board.traverse(state);
-                if (state == null) {
-                    state = board.traverse(oldState);
+                    TransitBoardAlight board = cur.getRoute().boards[cur.boardStopSequence][cur.patternIndex];
+                    state = board.traverse(state);
                 }
                 // now traverse the hops and dwells until we find the alight we're looking for
                 HOP: while (true) {
@@ -386,6 +387,17 @@ public class Raptor implements PathService {
                             state = e.traverse(state);
                         } else if (e instanceof PatternHop) {
                             state = e.traverse(state);
+                            if (cur.interlining) {
+                                for (Edge e2 : state.getVertex().getOutgoing()) {
+                                    RaptorState next = states.get(i - 1);
+                                    if (e2 instanceof PatternInterlineDwell) {
+                                        if (((TransitVertex) e2.getToVertex()).getStop() == next.boardStop.stopVertex.getStop()) {
+                                            state = e2.traverse(state);
+                                            break HOP;
+                                        }
+                                    }
+                                }
+                            }
                             for (Edge e2 : state.getVertex().getOutgoing()) {
                                 if (e2 instanceof TransitBoardAlight) {
                                     for (Edge e3 : e2.getToVertex().getOutgoing()) {
@@ -425,16 +437,18 @@ public class Raptor implements PathService {
                 }
             } else {
                 // so, cur is at this point at a transit stop; we have a route to alight from
-                for (Edge e : state.getVertex().getIncoming()) {
-                    if (e instanceof PreAlightEdge) {
-                        state = e.traverse(state);
+                if (cur.getParent() == null || ! cur.getParent().interlining) {
+                    for (Edge e : state.getVertex().getIncoming()) {
+                        if (e instanceof PreAlightEdge) {
+                            state = e.traverse(state);
+                        }
                     }
-                }
-                TransitBoardAlight alight = cur.getRoute().alights[cur.boardStopSequence - 1][cur.patternIndex];
-                State oldState = state;
-                state = alight.traverse(state);
-                if (state == null) {
-                    state = alight.traverse(oldState);
+                    TransitBoardAlight alight = cur.getRoute().alights[cur.boardStopSequence - 1][cur.patternIndex];
+                    State oldState = state;
+                    state = alight.traverse(state);
+                    if (state == null) {
+                        state = alight.traverse(oldState);
+                    }
                 }
                 // now traverse the hops and dwells until we find the board we're looking for
                 HOP: while (true) {
@@ -443,6 +457,17 @@ public class Raptor implements PathService {
                             state = e.traverse(state);
                         } else if (e instanceof PatternHop) {
                             state = e.traverse(state);
+                            if (cur.interlining) {
+                                for (Edge e2 : state.getVertex().getIncoming()) {
+                                    RaptorState next = states.get(i - 1);
+                                    if (e2 instanceof PatternInterlineDwell) {
+                                        if (((TransitVertex) e2.getFromVertex()).getStop() == next.boardStop.stopVertex.getStop()) {
+                                            state = e2.traverse(state);
+                                            break HOP;
+                                        }
+                                    }
+                                }
+                            }
                             for (Edge e2 : state.getVertex().getIncoming()) {
                                 if (e2 instanceof TransitBoardAlight) {
                                     for (Edge e3 : e2.getFromVertex().getIncoming()) {

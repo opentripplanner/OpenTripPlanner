@@ -14,7 +14,9 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.TimeZone;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -26,7 +28,9 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.InterlineDwellData;
 import org.opentripplanner.routing.edgetype.PatternHop;
+import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
@@ -40,6 +44,7 @@ import org.opentripplanner.routing.impl.raptor.MaxWalkState;
 import org.opentripplanner.routing.impl.raptor.Raptor;
 import org.opentripplanner.routing.impl.raptor.RaptorData;
 import org.opentripplanner.routing.impl.raptor.RaptorDataService;
+import org.opentripplanner.routing.impl.raptor.RaptorInterlineData;
 import org.opentripplanner.routing.impl.raptor.RaptorRoute;
 import org.opentripplanner.routing.impl.raptor.RaptorState;
 import org.opentripplanner.routing.impl.raptor.RaptorStateSet;
@@ -89,6 +94,8 @@ public class RaptorDataBuilder implements GraphBuilder {
         data.stops = new RaptorStop[nTotalStops];
 
         for (String agency : transitIndex.getAllAgencies()) {
+            HashMap<AgencyAndId, RaptorRoute> raptorRouteForTrip = new HashMap<AgencyAndId, RaptorRoute>();
+            ArrayList<PatternInterlineDwell> interlines = new ArrayList<PatternInterlineDwell>();
             for (RouteVariant variant : transitIndex.getVariantsForAgency(agency)) {
                 ArrayList<Stop> variantStops = variant.getStops();
                 final int nStops = variantStops.size();
@@ -97,6 +104,8 @@ public class RaptorDataBuilder implements GraphBuilder {
                 RaptorRoute route = new RaptorRoute(nStops, nPatterns);
                 route.mode = ((PatternHop)variant.getSegments().get(0).hopOut).getMode();
                 data.routes.add(route);
+
+                interlines.addAll(variant.getInterlines());
 
                 for (int i = 0; i < nStops; ++i) {
 
@@ -115,6 +124,11 @@ public class RaptorDataBuilder implements GraphBuilder {
                 int stop = 0;
                 int pattern = 0;
                 for (RouteSegment segment : segments) {
+                    if (stop == 0) {
+                        for (Trip trip : ((TransitBoardAlight)segment.board).getPattern().getTrips()) {
+                            raptorRouteForTrip.put(trip.getId(), route);
+                        }
+                    }
                     if (stop != nStops - 1) {
                         for (Edge e : segment.board.getFromVertex().getIncoming()) {
                             if (e instanceof PreBoardEdge) {
@@ -139,6 +153,61 @@ public class RaptorDataBuilder implements GraphBuilder {
                 }
                 if (stop != nStops || pattern != 0) {
                     throw new RuntimeException("Wrong number of segments");
+                }
+            }
+            for (PatternInterlineDwell interline : interlines) {
+
+                for (Map.Entry<AgencyAndId, InterlineDwellData> entry : interline
+                        .getTripIdToInterlineDwellData().entrySet()) {
+                    InterlineDwellData dwellData = entry.getValue();
+                    AgencyAndId fromTripId = entry.getKey();
+                    AgencyAndId toTripId = dwellData.trip;
+                    RaptorInterlineData interlineData = new RaptorInterlineData();
+                    interlineData.fromTripId = fromTripId;
+                    interlineData.toTripId = toTripId;
+                    interlineData.fromRoute = raptorRouteForTrip.get(fromTripId);
+                    interlineData.toRoute = raptorRouteForTrip.get(toTripId);
+
+                    //figure out which alight this is attached to
+                    final int fromNStops = interlineData.fromRoute.getNStops();
+                    for (int i = 0; i < interlineData.fromRoute.alights[0].length;++i) {
+                        TransitBoardAlight alight = interlineData.fromRoute.alights[fromNStops - 2][i];
+                        if (alight.getFromVertex() == interline.getFromVertex()) {
+                            //found pattern
+                            interlineData.fromPatternIndex = i;
+                            //need to find trip
+                            List<Trip> trips = alight.getPattern().getTrips();
+                            for (int tripIndex = 0; tripIndex < trips.size(); ++ tripIndex) {
+                                Trip trip = trips.get(tripIndex);
+                                if (trip.getId().equals(fromTripId)) {
+                                    interlineData.fromTripIndex = tripIndex;
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                    }
+                    //and which board
+                    for (int i = 0; i < interlineData.toRoute.boards[0].length;++i) {
+                        TransitBoardAlight board = interlineData.toRoute.boards[0][i];
+                        if (board.getToVertex() == interline.getToVertex()) {
+                            //found pattern
+                            interlineData.toPatternIndex = i;
+                            //need to find trip
+                            List<Trip> trips = board.getPattern().getTrips();
+                            for (int tripIndex = 0; tripIndex < trips.size(); ++ tripIndex) {
+                                Trip trip = trips.get(tripIndex);
+                                if (trip.getId().equals(toTripId)) {
+                                    interlineData.toTripIndex = tripIndex;
+                                    break;
+                                }
+                            }
+                            break;
+                        }
+                    }
+
+                    interlineData.fromRoute.interlinesOut.put(fromTripId, interlineData);
+                    interlineData.toRoute.interlinesIn.put(toTripId, interlineData);
                 }
             }
         }

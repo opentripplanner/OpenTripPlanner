@@ -41,6 +41,7 @@ import org.opentripplanner.routing.edgetype.Alight;
 import org.opentripplanner.routing.edgetype.Board;
 import org.opentripplanner.routing.edgetype.Dwell;
 import org.opentripplanner.routing.edgetype.Hop;
+import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
@@ -419,6 +420,9 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                                     segment.alight = e2;
                                 }
                             }
+                        }
+                        if (e instanceof PatternInterlineDwell) {
+                            variant.addInterline((PatternInterlineDwell) e);
                         }
                         if ((e instanceof TransitBoardAlight &&
                                 !((TransitBoardAlight) e).isBoarding())
