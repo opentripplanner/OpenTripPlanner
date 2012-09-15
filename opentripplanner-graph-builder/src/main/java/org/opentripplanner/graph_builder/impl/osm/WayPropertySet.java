@@ -294,7 +294,13 @@ public class WayPropertySet {
         if (!m.matches())
             return -1;
         
-        int originalUnits = Integer.parseInt(m.group(1));
+        float originalUnits;
+        try {
+            originalUnits = (float) Double.parseDouble(m.group(1));
+        } catch (NumberFormatException e) {
+            _log.warn("Could not parse max speed {}", m.group(1));
+            return -1;
+        }
         
         String units = m.group(2);
         if (units == null || units.equals(""))
