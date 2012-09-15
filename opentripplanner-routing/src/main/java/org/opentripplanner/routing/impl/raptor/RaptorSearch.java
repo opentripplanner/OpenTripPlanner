@@ -459,7 +459,14 @@ public class RaptorSearch {
         return started;
     }
 
-    public void walkPhase(RoutingRequest options, RoutingRequest walkOptions, int nBoardings,
+    /**
+     * @param options
+     * @param walkOptions
+     * @param nBoardings
+     * @param createdStates
+     * @return whether search should continue
+     */
+    public boolean walkPhase(RoutingRequest options, RoutingRequest walkOptions, int nBoardings,
             List<RaptorState> createdStates) {
 
         double distanceToNearestTransitStop = 0;
@@ -554,8 +561,7 @@ public class RaptorSearch {
                 startPoints.add(newState);
             }
             if (startPoints.size() == 0) {
-                log.debug("warning: no walk in round " + nBoardings);
-                return;
+                return false;
             }
             System.out.println("walk starts: " + startPoints.size() + " / " + visitedEver.size());
             dijkstra.setPriorityQueueFactory(new PrefilledPriorityQueueFactory(startPoints.subList(
@@ -682,6 +688,7 @@ public class RaptorSearch {
             states.add(newState);
 
         }
+        return true;
     }
 
     class PrefilledPriorityQueueFactory implements OTPPriorityQueueFactory {

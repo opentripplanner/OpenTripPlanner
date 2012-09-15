@@ -136,9 +136,7 @@ public class Raptor implements PathService {
             search.maxTimeDayIndex = day;
         }
 
-        options.setMaxTransfers(6);
-
-        int rushAheadRound = rushAhead(data, options, walkOptions, search);
+        int rushAheadRound = preliminaryRaptorSearch(data, options, walkOptions, search);
 
         long searchBeginTime = System.currentTimeMillis();
 
@@ -146,7 +144,8 @@ public class Raptor implements PathService {
         int foundSoFar = 0;
         RETRY: do {
             for (int round = 0; round < options.getMaxTransfers() + 2; ++round) {
-                round(data, options, walkOptions, search, round);
+                if (!round(data, options, walkOptions, search, round))
+                    break;
 
                 long elapsed = System.currentTimeMillis() - searchBeginTime;
                 if (elapsed > multiPathTimeout * 1000 && multiPathTimeout > 0
@@ -169,7 +168,7 @@ public class Raptor implements PathService {
 
             }
 
-            if (foundSoFar > search.getTargetStates().size()) {
+            if (foundSoFar < search.getTargetStates().size()) {
                 foundSoFar = search.getTargetStates().size();
             } else if (foundSoFar > 0) {
                 //we didn't find anything new in this round, and we already have
@@ -238,67 +237,90 @@ public class Raptor implements PathService {
                     continue TARGETSTATE;
                 }
             }
-            while (state != null) {
-                if (state.route != null)
-                    routes.add(state.route);
-                if (state.stop != null) {
-                    stops.add(state.stop);
+            synchronized(data) {
+                while (state != null) {
+                    if (state.route != null)
+                        routes.add(state.route);
+                    if (state.stop != null) {
+                        stops.add(state.stop);
+                    }
+                    state = state.getParent();
                 }
-                state = state.getParent();
             }
         }
     }
 
-    private int rushAhead(RaptorData data, RoutingRequest options, RoutingRequest walkOptions,
+    /**
+     * This does preliminary search over just routes and stops that have been used in the
+     * past between these regions.
+     */
+    private int preliminaryRaptorSearch(RaptorData data, RoutingRequest options, RoutingRequest walkOptions,
             RaptorSearch search) {
         //find start/end regions
         List<Integer> startRegions = getRegionsForVertex(data.regionData, options.rctx.fromVertex);
         int startRegion;
-        if (startRegions.size() == 1) {
-            startRegion = startRegions.get(0);
-        } else {
-            log.debug("Trip start spans regions, not using rush-ahead optimization");
-            return 0;
-        }
+        //for trips that span regions, we can safely pick either region
+        startRegion = startRegions.get(0);
         List<Integer> endRegions = getRegionsForVertex(data.regionData, options.rctx.toVertex);
         int endRegion;
-        if (endRegions.size() == 1) {
-            endRegion = endRegions.get(0);
-        } else {
-            log.debug("Trip end spans regions, not using rush-ahead optimization");
-            return 0;
-        }
+        endRegion = endRegions.get(0);
 
         // create a reduced set of RaptorData with only the stops/routes previously seen on trips
         // from the start region to the end region
-
         RaptorData trimmedData = new RaptorData();
         trimmedData.raptorStopsForStopId = new HashMap<AgencyAndId, RaptorStop>();
         HashSet<RaptorStop> stops = data.regionData.stops[startRegion][endRegion];
         for (RaptorStop stop : stops) {
             trimmedData.raptorStopsForStopId.put(stop.stopVertex.getStopId(), stop);
         }
+
         trimmedData.regionData = data.regionData;
         trimmedData.routes = data.regionData.routes[startRegion][endRegion];
         trimmedData.stops = data.stops;
         //trimmedData.allowedStops = stops;
         trimmedData.routesForStop = data.routesForStop;
-        walkOptions.setMaxWalkDistance(6000);
-        if (trimmedData.routes.size() == 0) {
-            log.debug("No cached routes, so not using rush-ahead optimization");
-            return 0; //no precomputed routes
+
+        double walkDistance = options.getMaxWalkDistance();
+        if (walkDistance > 4000) {
+            // this is a really long walk. We'll almost never actually need this. So let's do our
+            // preliminary search over just 4km first.
+            options.setMaxWalkDistance(4000);
+            walkOptions.setMaxWalkDistance(4000);
         }
 
+        int round;
+        if (trimmedData.routes.size() > 0) {
+            log.debug("Doing preliminary search on limited route set (" + trimmedData.routes.size() + ", " + stops.size() + ")");
+            round = doPreliminarySearch(options, walkOptions, search, trimmedData);
+        } else {
+            round = 0;
+        }
+
+        if (search.getTargetStates().size() == 0 && walkDistance > 5000) {
+            //nothing found in preliminary search
+            //so we'll do a search with full set of routes & stops, but still limited distance
+            log.debug("Doing preliminary search at limited distance");
+            round = doPreliminarySearch(options, walkOptions, search, data);
+        }
+
+        options.setMaxWalkDistance(walkDistance);
+        walkOptions.setMaxWalkDistance(walkDistance);
+        return round;
+    }
+
+    private int doPreliminarySearch(RoutingRequest options, RoutingRequest walkOptions,
+            RaptorSearch search, RaptorData trimmedData) {
         RaptorSearch rushSearch = new RaptorSearch(trimmedData, options);
         int bestElapsedTime = Integer.MAX_VALUE;
         int round;
         for (round = 0; round < options.getMaxTransfers() + 2; round++) {
-            round(trimmedData, options, walkOptions,
-                    rushSearch, round);
+            if (!round(trimmedData, options, walkOptions,
+                    rushSearch, round))
+                break;
 
-            if (search.getTargetStates().size() > 0) {
+            if (rushSearch.getTargetStates().size() > 0) {
                 int oldBest = bestElapsedTime;
-                for (RaptorState state : search.getTargetStates()) {
+                for (RaptorState state : rushSearch.getTargetStates()) {
                     final int elapsedTime = (int) Math
                             .abs(state.arrivalTime - options.dateTime);
                     if (elapsedTime < bestElapsedTime) {
@@ -314,8 +336,6 @@ public class Raptor implements PathService {
             search.bounder.addBounder(state.walkPath);
             search.addTargetState(state);
         }
-
-        walkOptions.setMaxWalkDistance(options.getMaxWalkDistance());
         return round;
     }
 
@@ -582,7 +602,7 @@ public class Raptor implements PathService {
         return pruned;
     }
 
-    private void round(RaptorData data, RoutingRequest options, RoutingRequest walkOptions,
+    private boolean round(RaptorData data, RoutingRequest options, RoutingRequest walkOptions,
             final RaptorSearch search, int nBoardings) {
 
         log.debug("Round " + nBoardings);
@@ -592,7 +612,7 @@ public class Raptor implements PathService {
 
         /* Phase 3: handle walking paths */
 
-        search.walkPhase(options, walkOptions, nBoardings,
+        return search.walkPhase(options, walkOptions, nBoardings,
                 createdStates);
     }
 
@@ -621,7 +641,8 @@ public class Raptor implements PathService {
         RaptorSearch search = new RaptorSearch(data, options);
 
         for (int i = 0; i < options.getMaxTransfers() + 2; ++i) {
-            round(data, options, walkOptions, search, i);
+            if (!round(data, options, walkOptions, search, i))
+                break;
         }
         RaptorStateSet result = new RaptorStateSet();
         result.statesByStop = search.statesByStop;
