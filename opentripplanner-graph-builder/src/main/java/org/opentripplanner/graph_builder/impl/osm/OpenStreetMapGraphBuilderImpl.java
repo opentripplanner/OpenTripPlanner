@@ -528,6 +528,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     }
                     for (PlainStreetEdge from : restrictionTag.possibleFrom) {
                         for (PlainStreetEdge to : restrictionTag.possibleTo) {
+                            if (from == null || to == null) {
+                                continue;
+                            }
                             int angleDiff = from.getOutAngle() - to.getInAngle();
                             if (angleDiff < 0) {
                                 angleDiff += 360;
