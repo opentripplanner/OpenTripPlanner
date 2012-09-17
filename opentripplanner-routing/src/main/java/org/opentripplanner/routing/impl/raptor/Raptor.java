@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
@@ -427,7 +428,9 @@ public class Raptor implements PathService {
                                 for (Edge e2 : state.getVertex().getOutgoing()) {
                                     RaptorState next = states.get(i - 1);
                                     if (e2 instanceof PatternInterlineDwell) {
-                                        if (((TransitVertex) e2.getToVertex()).getStop() == next.boardStop.stopVertex.getStop()) {
+                                        Stop toStop = ((TransitVertex) e2.getToVertex()).getStop();
+                                        Stop expectedStop = next.boardStop.stopVertex.getStop();
+                                        if (toStop.equals(expectedStop)) {
                                             State newState = e2.traverse(state);
                                             if (newState == null)
                                                 continue;
@@ -503,7 +506,9 @@ public class Raptor implements PathService {
                                 for (Edge e2 : state.getVertex().getIncoming()) {
                                     RaptorState next = states.get(i - 1);
                                     if (e2 instanceof PatternInterlineDwell) {
-                                        if (((TransitVertex) e2.getFromVertex()).getStop() == next.boardStop.stopVertex.getStop()) {
+                                        Stop fromStop = ((TransitVertex) e2.getFromVertex()).getStop();
+                                        Stop expectedStop = next.boardStop.stopVertex.getStop();
+                                        if (fromStop.equals(expectedStop)) {
                                             State newState = e2.traverse(state);
                                             if (newState == null)
                                                 continue;
