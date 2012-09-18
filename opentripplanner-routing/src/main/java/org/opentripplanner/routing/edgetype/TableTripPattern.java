@@ -13,6 +13,12 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import static org.opentripplanner.routing.edgetype.TableTripPattern.FLAG_WHEELCHAIR_ACCESSIBLE;
+import static org.opentripplanner.routing.edgetype.TableTripPattern.MASK_DROPOFF;
+import static org.opentripplanner.routing.edgetype.TableTripPattern.NO_PICKUP;
+import static org.opentripplanner.routing.edgetype.TableTripPattern.SHIFT_DROPOFF;
+import static org.opentripplanner.routing.edgetype.TableTripPattern.SHIFT_PICKUP;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
@@ -203,6 +209,18 @@ public class TableTripPattern implements TripPattern, Serializable {
         TimetableResolver snapshot = options.rctx.timetableSnapshot; 
         if (snapshot != null)
             timetable = snapshot.resolve(this);
+        // check that we can even board/alight the given stop on this pattern with these options
+        int mask = boarding ? TableTripPattern.MASK_PICKUP : MASK_DROPOFF;
+        int shift = boarding ? SHIFT_PICKUP : SHIFT_DROPOFF;
+        int stopOffset = boarding ? 0 : 1;
+        if ((perStopFlags[stopIndex + stopOffset] & mask) >> shift == NO_PICKUP) {
+            return null;
+        }
+        if (options.wheelchairAccessible && 
+           (perStopFlags[stopIndex + stopOffset] & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
+            return null;
+        }
+        // so far so good, delegate to the timetable
         return timetable.getNextTrip(stopIndex, time, haveBicycle, options, boarding, adjacentTimes);
     }
     

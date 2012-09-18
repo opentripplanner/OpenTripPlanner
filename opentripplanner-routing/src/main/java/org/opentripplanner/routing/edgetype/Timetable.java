@@ -149,17 +149,6 @@ public class Timetable implements Serializable {
      */
     protected TripTimes getNextTrip(int stopIndex, int time, boolean haveBicycle,
             RoutingRequest options, boolean boarding, TripTimes[] adjacentTimes) {
-        // pull per-stop checks out to calling function in TripPatten
-        int mask = boarding ? TableTripPattern.MASK_PICKUP : MASK_DROPOFF;
-        int shift = boarding ? SHIFT_PICKUP : SHIFT_DROPOFF;
-        int stopOffset = boarding ? 0 : 1;
-        if ((pattern.perStopFlags[stopIndex + stopOffset] & mask) >> shift == NO_PICKUP) {
-            return null;
-        }
-        if (options.wheelchairAccessible && 
-                (pattern.perStopFlags[stopIndex + stopOffset] & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
-            return null;
-        }
         TripTimes bestTrip = null;
         int idxLo = -1, idxHi = Integer.MAX_VALUE;
         TripTimes[][] tableIndex = boarding ? departuresIndex : arrivalsIndex; 
