@@ -1,11 +1,5 @@
 package org.opentripplanner.routing.edgetype;
 
-import static org.opentripplanner.routing.edgetype.TableTripPattern.FLAG_WHEELCHAIR_ACCESSIBLE;
-import static org.opentripplanner.routing.edgetype.TableTripPattern.MASK_DROPOFF;
-import static org.opentripplanner.routing.edgetype.TableTripPattern.NO_PICKUP;
-import static org.opentripplanner.routing.edgetype.TableTripPattern.SHIFT_DROPOFF;
-import static org.opentripplanner.routing.edgetype.TableTripPattern.SHIFT_PICKUP;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -165,7 +159,7 @@ public class Timetable implements Serializable {
                 idxLo = idxHi = TripTimes.binarySearchDepartures(sorted, stopIndex, time); 
                 for (; idxHi < sorted.length; idxHi++) {
                     TripTimes tt = sorted[idxHi];
-                    if (tripAcceptable(tt.getTrip(), haveBicycle, options)) {
+                    if (tt.tripAcceptable(options, haveBicycle)) {
                         bestTrip = tt;
                         break;
                     }
@@ -174,7 +168,7 @@ public class Timetable implements Serializable {
                 idxLo = idxHi = TripTimes.binarySearchArrivals(sorted, stopIndex, time); 
                 for (; idxLo >= 0; idxLo--) {
                     TripTimes tt = sorted[idxLo];
-                    if (tripAcceptable(tt.getTrip(), haveBicycle, options)) {
+                    if (tt.tripAcceptable(options, haveBicycle)) {
                         bestTrip = tt;
                         break;
                     }
@@ -189,16 +183,14 @@ public class Timetable implements Serializable {
                 // hoping JVM JIT will distribute the loop over the if clauses as needed
                 if (boarding) {
                     int depTime = tt.getDepartureTime(stopIndex);
-                    if (depTime >= time && depTime < bestTime && 
-                            tripAcceptable(tt.getTrip(), haveBicycle, options)) {
+                    if (depTime >= time && depTime < bestTime && tt.tripAcceptable(options, haveBicycle)) {
                         bestTrip = tt;
                         bestTime = depTime;
                         idxLo = idxHi = idx;
                     }
                 } else {
                     int arvTime = tt.getArrivalTime(stopIndex);
-                    if (arvTime <= time && arvTime > bestTime && 
-                            tripAcceptable(tt.getTrip(), haveBicycle, options)) {
+                    if (arvTime <= time && arvTime > bestTime && tt.tripAcceptable(options, haveBicycle)) {
                         bestTrip = tt;
                         bestTime = arvTime;
                         idxLo = idxHi = idx;
@@ -221,7 +213,7 @@ public class Timetable implements Serializable {
                     idxHi += 1;
                     if (idxHi < tripTimes.size()) {
                         TripTimes tt = tripTimes.get(idxHi);
-                        if (tripAcceptable(tt.getTrip(), haveBicycle, options)) {
+                        if (tt.tripAcceptable(options, haveBicycle)) {
                             nFound += 1;
                             adjacentTimes[nFound] = tt;
                             if (nFound == adjacentTimes.length) {
@@ -232,7 +224,7 @@ public class Timetable implements Serializable {
                     idxLo -= 1;
                     if (idxLo >= 0) {
                         TripTimes tt = tripTimes.get(idxLo);
-                        if (tripAcceptable(tt.getTrip(), haveBicycle, options)) {
+                        if (tt.tripAcceptable(options, haveBicycle)) {
                             nFound += 1;
                             adjacentTimes[nFound] = tt;
                             if (nFound == adjacentTimes.length) {
@@ -457,33 +449,6 @@ public class Timetable implements Serializable {
         return true;
     }
     
-    /**
-     * Once a trip has been found departing or arriving at an appropriate time, check whether that 
-     * trip fits other restrictive search criteria such as bicycle and wheelchair accessibility.
-     * 
-     * GTFS bike extensions based on mailing list message at: 
-     * https://groups.google.com/d/msg/gtfs-changes/QqaGOuNmG7o/xyqORy-T4y0J
-     * 2: bikes allowed
-     * 1: no bikes allowed
-     * 0: no information (same as field omitted)
-     * 
-     * If route OR trip explicitly allows bikes, bikes are allowed.
-     * 
-     * TODO move into tripTimes class
-     */
-    private static boolean tripAcceptable(Trip trip, boolean bicycle, RoutingRequest options) {
-        if (options.bannedTrips.contains(trip.getId()))
-            return false;
-        if (options.wheelchairAccessible && trip.getWheelchairAccessible() != 1)
-            return false;
-        if (bicycle)
-            if ((trip.getTripBikesAllowed() != 2) &&    // trip does not explicitly allow bikes and
-                (trip.getRoute().getBikesAllowed() != 2 // route does not explicitly allow bikes or  
-                || trip.getTripBikesAllowed() == 1))    // trip explicitly forbids bikes
-                return false; 
-        return true;
-    }
-
     /** Returns the shortest possible running time for this stop */
     public int getBestRunningTime(int stopIndex) {
         return bestRunningTimes[stopIndex];

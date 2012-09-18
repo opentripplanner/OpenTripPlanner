@@ -5,6 +5,7 @@ import java.util.Comparator;
 import lombok.AllArgsConstructor;
 
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -202,6 +203,33 @@ public abstract class TripTimes {
         }
         return mid;
     }
+
+    /**
+     * Once a trip has been found departing or arriving at an appropriate time, check whether that 
+     * trip fits other restrictive search criteria such as bicycle and wheelchair accessibility.
+     * 
+     * GTFS bike extensions based on mailing list message at: 
+     * https://groups.google.com/d/msg/gtfs-changes/QqaGOuNmG7o/xyqORy-T4y0J
+     * 2: bikes allowed
+     * 1: no bikes allowed
+     * 0: no information (same as field omitted)
+     * 
+     * If route OR trip explicitly allows bikes, bikes are allowed.
+     */
+    public boolean tripAcceptable(RoutingRequest options, boolean bicycle) {
+        Trip trip = this.getTrip();
+        if (options.bannedTrips.contains(trip.getId()))
+            return false;
+        if (options.wheelchairAccessible && trip.getWheelchairAccessible() != 1)
+            return false;
+        if (bicycle)
+            if ((trip.getTripBikesAllowed() != 2) &&    // trip does not explicitly allow bikes and
+                (trip.getRoute().getBikesAllowed() != 2 // route does not explicitly allow bikes or  
+                || trip.getTripBikesAllowed() == 1))    // trip explicitly forbids bikes
+                return false; 
+        return true;
+    }
+
 
     /* NESTED STATIC CLASSES */
     

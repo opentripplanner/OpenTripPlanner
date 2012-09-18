@@ -13,12 +13,6 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import static org.opentripplanner.routing.edgetype.TableTripPattern.FLAG_WHEELCHAIR_ACCESSIBLE;
-import static org.opentripplanner.routing.edgetype.TableTripPattern.MASK_DROPOFF;
-import static org.opentripplanner.routing.edgetype.TableTripPattern.NO_PICKUP;
-import static org.opentripplanner.routing.edgetype.TableTripPattern.SHIFT_DROPOFF;
-import static org.opentripplanner.routing.edgetype.TableTripPattern.SHIFT_PICKUP;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
