@@ -135,13 +135,21 @@ public class Timetable implements Serializable {
     }
     
     /** 
-     * Get the index of the next (previous) trip that departs (arrives) from the specified stop 
+     * Get the next (previous) trip that departs (arrives) from the specified stop 
      * at or after (before) the specified time. The haveBicycle parameter must be passed in 
      * because we cannot determine whether the user is in possession of a rented bicycle from 
-     * the options alone.
+     * the options alone. If a pre-allocated array is passed in via
+     * the optional adjacentTimes parameter, that array will be filled with the main result plus
+     * a suitable number of TripTimes roughly temporally adjacent to the main result. If the main 
+     * result is null, the contents of the adjacentTimes array are undefined. Note that no 
+     * guarantees of exhaustiveness, contiguity, etc. are made about the additional TripTimes objects. 
+     * 
+     * @return the TripTimes object representing the (possibly updated) best trip, or null if no
+     * trip matches both the time and other criteria. 
      */
     protected TripTimes getNextTrip(int stopIndex, int time, boolean haveBicycle,
-            RoutingRequest options, boolean boarding) {
+            RoutingRequest options, boolean boarding, TripTimes[] adjacentTimes) {
+        // pull per-stop checks out to calling function in TripPatten
         int mask = boarding ? TableTripPattern.MASK_PICKUP : MASK_DROPOFF;
         int shift = boarding ? SHIFT_PICKUP : SHIFT_DROPOFF;
         int stopOffset = boarding ? 0 : 1;
@@ -152,51 +160,103 @@ public class Timetable implements Serializable {
                 (pattern.perStopFlags[stopIndex + stopOffset] & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
             return null;
         }
+        TripTimes bestTrip = null;
+        int idxLo = -1, idxHi = Integer.MAX_VALUE;
         TripTimes[][] tableIndex = boarding ? departuresIndex : arrivalsIndex; 
-        // binary search if this timetable has been indexed
-        if (tableIndex != null) { 
+        if (tableIndex != null) {
+            // this timetable has been indexed, use binary search
             TripTimes[] sorted;
             if (tableIndex.length == 1) // for optimized FIFO patterns
-                sorted = departuresIndex[0];
+                sorted = departuresIndex[0]; // is departuresIndex necessarily == arrivalsIndex?
             else
                 sorted = tableIndex[stopIndex];
-            int tripIndex;
-            if (boarding)
-                tripIndex = TripTimes.binarySearchDepartures(sorted, stopIndex, time); 
-            else
-                tripIndex = TripTimes.binarySearchArrivals(sorted, stopIndex, time); 
             // an alternative to conditional increment/decrement would be to sort the arrivals
-            // index in decreasing order, but that would require changing the search algorithm 
-            int increment = boarding ? 1 : -1;
-            int terminate = boarding ? sorted.length : -1;
-            //these appear to actually be hop indexes, which is what the binary search accepts
-            while (tripIndex != terminate) { 
-                TripTimes tt = sorted[tripIndex];
-                Trip t = tt.getTrip();
-                if (tripAcceptable(t, haveBicycle, options)) {
-                    return tt;
+            // index in decreasing order, but that would require changing the search algorithm
+            if (boarding) {
+                idxLo = idxHi = TripTimes.binarySearchDepartures(sorted, stopIndex, time); 
+                for (; idxHi < sorted.length; idxHi++) {
+                    TripTimes tt = sorted[idxHi];
+                    if (tripAcceptable(tt.getTrip(), haveBicycle, options)) {
+                        bestTrip = tt;
+                        break;
+                    }
                 }
-                tripIndex += increment;
+            } else {
+                idxLo = idxHi = TripTimes.binarySearchArrivals(sorted, stopIndex, time); 
+                for (; idxLo >= 0; idxLo--) {
+                    TripTimes tt = sorted[idxLo];
+                    if (tripAcceptable(tt.getTrip(), haveBicycle, options)) {
+                        bestTrip = tt;
+                        break;
+                    }
+                }
             }
-            return null;
+        } else { 
+            // no index present on this timetable. use a linear search:
+            // because trips may change with stoptime updates, we cannot count on them being sorted
+            int bestTime = boarding ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+            int idx = 0;
+            for (TripTimes tt : tripTimes) { 
+                // hoping JVM JIT will distribute the loop over the if clauses as needed
+                if (boarding) {
+                    int depTime = tt.getDepartureTime(stopIndex);
+                    if (depTime >= time && depTime < bestTime && 
+                            tripAcceptable(tt.getTrip(), haveBicycle, options)) {
+                        bestTrip = tt;
+                        bestTime = depTime;
+                        idxLo = idxHi = idx;
+                    }
+                } else {
+                    int arvTime = tt.getArrivalTime(stopIndex);
+                    if (arvTime <= time && arvTime > bestTime && 
+                            tripAcceptable(tt.getTrip(), haveBicycle, options)) {
+                        bestTrip = tt;
+                        bestTime = arvTime;
+                        idxLo = idxHi = idx;
+                    }
+                }
+                ++idx;
+            }
         }
-        // no index. fall through to linear search:
-        // because trips may change with stoptime updates, we cannot count on them being sorted
-        TripTimes bestTrip = null;
-        int bestTime = Integer.MAX_VALUE;
-        if ( ! boarding) // reverse direction of inequalities by negating times
-            time = -time;
-        for (int i = 0; i < tripTimes.size(); i++) {
-            TripTimes currTrip = tripTimes.get(i); 
-            int currTime;
-            if (boarding) 
-                currTime = currTrip.getDepartureTime(stopIndex);
-            else // reverse direction of inequalities by negating times
-                currTime = -(currTrip.getArrivalTime(stopIndex));
-            if (currTime >= time && currTime < bestTime && 
-                    tripAcceptable(currTrip.getTrip(), haveBicycle, options)) {
-                bestTrip = currTrip;
-                bestTime = currTime;
+        // Fill in the retTimes array (if supplied) with TripTimes adjacent to the best one.
+        // In the case where the timetable is not indexed, if the triptimes are sorted at the
+        // first stop this method should still be of some value.
+        if (adjacentTimes != null && adjacentTimes.length >= 1) { 
+            int nFound = 0;
+            // bestTrip will still be null if no suitable trip was found by binary or linear search.
+            if (bestTrip != null) {
+                // output array non-null: caller wants an array of adjacent tripTimes
+                adjacentTimes[0] = bestTrip;
+                ++nFound;
+                while (idxLo >= 0 || idxHi < tripTimes.size()) {
+                    idxHi += 1;
+                    if (idxHi < tripTimes.size()) {
+                        TripTimes tt = tripTimes.get(idxHi);
+                        if (tripAcceptable(tt.getTrip(), haveBicycle, options)) {
+                            nFound += 1;
+                            adjacentTimes[nFound] = tt;
+                            if (nFound == adjacentTimes.length) {
+                                break;
+                            }
+                        }
+                    }
+                    idxLo -= 1;
+                    if (idxLo >= 0) {
+                        TripTimes tt = tripTimes.get(idxLo);
+                        if (tripAcceptable(tt.getTrip(), haveBicycle, options)) {
+                            nFound += 1;
+                            adjacentTimes[nFound] = tt;
+                            if (nFound == adjacentTimes.length) {
+                                break;
+                            }
+                        }
+                    }
+                }
+                // null out any remaining array elements, but only if at least one trip was found
+                // to avoid a lot of useless stores.
+                for (; nFound < adjacentTimes.length; nFound++) {
+                    adjacentTimes[nFound] = null;
+                }
             }
         }
         return bestTrip;

@@ -15,7 +15,6 @@ package org.opentripplanner.routing.edgetype;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -199,12 +198,12 @@ public class TableTripPattern implements TripPattern, Serializable {
      * @return a TripTimes object providing all the arrival and departure times on the best trip.
      */
     public TripTimes getNextTrip(int stopIndex, int time, boolean haveBicycle,
-            RoutingRequest options, boolean boarding) {
+            RoutingRequest options, boolean boarding, TripTimes[] adjacentTimes) {
         Timetable timetable = scheduledTimetable;
         TimetableResolver snapshot = options.rctx.timetableSnapshot; 
         if (snapshot != null)
             timetable = snapshot.resolve(this);
-        return timetable.getNextTrip(stopIndex, time, haveBicycle, options, boarding);
+        return timetable.getNextTrip(stopIndex, time, haveBicycle, options, boarding, adjacentTimes);
     }
     
     public Iterator<Integer> getScheduledDepartureTimes(int stopIndex) {

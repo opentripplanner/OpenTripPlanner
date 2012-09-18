@@ -232,7 +232,7 @@ public class TransitBoardAlight extends PatternEdge implements OnBoardForwardEdg
                     
                     // getNextTrip will find next or prev departure depending on final boolean parameter
                     tripTimes = getPattern().getNextTrip(stopIndex, secondsSinceMidnight, 
-                            mode == TraverseMode.BICYCLE, options, boarding);
+                            mode == TraverseMode.BICYCLE, options, boarding, null);
                     
                     if (tripTimes != null) {
                         // a trip was found, index is valid, wait will be non-negative
