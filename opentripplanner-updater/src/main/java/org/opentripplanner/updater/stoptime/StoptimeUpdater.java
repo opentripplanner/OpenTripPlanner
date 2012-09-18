@@ -92,7 +92,7 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
             }
             lastSnapshotTime = System.currentTimeMillis();
         } else {
-            LOG.debug("Snapshot frequency exceeded. Reusing snapshot {}", snapshot.toString());
+            LOG.debug("Snapshot frequency exceeded. Reusing snapshot {}", snapshot);
         }
         return snapshot;
     }
