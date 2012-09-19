@@ -208,14 +208,14 @@ public class Timetable implements Serializable {
             if (bestTrip != null) {
                 // output array non-null: caller wants an array of adjacent tripTimes
                 adjacentTimes[0] = bestTrip;
-                ++nFound;
+                nFound += 1;
                 while (idxLo >= 0 || idxHi < tripTimes.size()) {
                     idxHi += 1;
                     if (idxHi < tripTimes.size()) {
                         TripTimes tt = tripTimes.get(idxHi);
                         if (tt.tripAcceptable(options, haveBicycle)) {
-                            nFound += 1;
                             adjacentTimes[nFound] = tt;
+                            nFound += 1;
                             if (nFound == adjacentTimes.length) {
                                 break;
                             }
@@ -225,8 +225,8 @@ public class Timetable implements Serializable {
                     if (idxLo >= 0) {
                         TripTimes tt = tripTimes.get(idxLo);
                         if (tt.tripAcceptable(options, haveBicycle)) {
-                            nFound += 1;
                             adjacentTimes[nFound] = tt;
+                            nFound += 1;
                             if (nFound == adjacentTimes.length) {
                                 break;
                             }
