@@ -204,7 +204,7 @@ public class TableTripPattern implements TripPattern, Serializable {
         if (snapshot != null)
             timetable = snapshot.resolve(this);
         // check that we can even board/alight the given stop on this pattern with these options
-        int mask = boarding ? TableTripPattern.MASK_PICKUP : MASK_DROPOFF;
+        int mask = boarding ? MASK_PICKUP : MASK_DROPOFF;
         int shift = boarding ? SHIFT_PICKUP : SHIFT_DROPOFF;
         int stopOffset = boarding ? 0 : 1;
         if ((perStopFlags[stopIndex + stopOffset] & mask) >> shift == NO_PICKUP) {
