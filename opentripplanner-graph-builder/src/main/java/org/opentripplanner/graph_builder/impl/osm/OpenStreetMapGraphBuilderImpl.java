@@ -920,7 +920,15 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 if (permissions == StreetTraversalPermission.NONE)
                     continue;
 
-                List<Long> nodes = way.getNodeRefs();
+                //handle duplicate nodes in OSM ways
+                //this is a workaround for crappy OSM data quality
+                ArrayList<Long> nodes = new ArrayList<Long>(way.getNodeRefs().size());
+                long last = -1;
+                for (long node : way.getNodeRefs()) {
+                    if (node != last)
+                        nodes.add(node);
+                    last = node;
+                }
 
                 IntersectionVertex startEndpoint = null, endEndpoint = null;
 
@@ -933,6 +941,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                  * any other edge, do not create endpoints -- just accumulate them for geometry and
                  * ele tags. For nodes which are shared, create endpoints and StreetVertex
                  * instances.
+                 * One exception: if the next vertex also appears earlier in the way, we need
+                 * to split the way, because otherwise we have a way that loops from a vertex to
+                 * itself, which could cause issues with splitting.
                  */
                 Long startNode = null;
                 //where the current edge should start
@@ -978,7 +989,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                             segmentStartOSMNode.getLat(), segmentStartOSMNode.getLon(),
                             osmEndNode.getLat(), osmEndNode.getLon());
 
-                    if (intersectionNodes.containsKey(endNode) || i == nodes.size() - 2) {
+            if (intersectionNodes.containsKey(endNode)
+                    || i == nodes.size() - 2
+                    || (i < nodes.size() - 2 && nodes.subList(0,
+                            nodes.size() - 2).contains(nodes.get(i + 2)))) {
                         segmentCoordinates.add(getCoordinate(osmEndNode));
                         ele = osmEndNode.getTag("ele");
                         if (ele != null) {
