@@ -96,6 +96,14 @@ public abstract class TripTimes {
     public boolean isScheduled() {
         return this.getScheduledTripTimes() == this;
     }
+    
+    private String formatSeconds(int s) {
+        int m = s / 60;
+        s = s % 60;
+        int h = m / 60;
+        m = m % 60;
+        return String.format("%02d:%02d:%02d", h, m, s);
+    }
 
     /** Builds a string concisely representing all departure and arrival times in this TripTimes. */
     public String dumpTimes() {
@@ -104,7 +112,8 @@ public abstract class TripTimes {
         // compaction is multi-layered now
         //sb.append(arrivalTimes == null ? "C " : "U ");
         for (int hop=0; hop < nHops; hop++) {
-            String s = String.format("(%d)%05d__%05d", hop, this.getDepartureTime(hop), this.getArrivalTime(hop));
+            String s = String.format("(%d)%8s__%8s", hop, formatSeconds(this.getDepartureTime(hop)), 
+                    formatSeconds(this.getArrivalTime(hop)));
             sb.append(s);
         }
         return sb.toString();
