@@ -146,11 +146,14 @@ public class Timetable implements Serializable {
         TripTimes bestTrip = null;
         int idxLo = -1, idxHi = Integer.MAX_VALUE;
         TripTimes[][] tableIndex = boarding ? departuresIndex : arrivalsIndex; 
+        // sorted = tripTimes; ARGH, Array versus List APIs
+        // for the purposes of adjacent trips, guess that unindexed tables are roughly FIFO
+        List<TripTimes> ordered = tripTimes;
         if (tableIndex != null) {
-            // this timetable has been indexed, use binary search
             TripTimes[] sorted;
+            // this timetable has been indexed, use binary search
             if (tableIndex.length == 1) // for optimized FIFO patterns
-                sorted = departuresIndex[0]; // is departuresIndex necessarily == arrivalsIndex?
+                sorted = tableIndex[0]; 
             else
                 sorted = tableIndex[stopIndex];
             // an alternative to conditional increment/decrement would be to sort the arrivals
@@ -174,6 +177,7 @@ public class Timetable implements Serializable {
                     }
                 }
             }
+            ordered = Arrays.asList(sorted); // find adjacent entries in the sorted list
         } else { 
             // no index present on this timetable. use a linear search:
             // because trips may change with stoptime updates, we cannot count on them being sorted
@@ -209,10 +213,10 @@ public class Timetable implements Serializable {
                 // output array non-null: caller wants an array of adjacent tripTimes
                 adjacentTimes[0] = bestTrip;
                 nFound += 1;
-                while (idxLo >= 0 || idxHi < tripTimes.size()) {
+                while (idxLo >= 0 || idxHi < ordered.size()) {
                     idxHi += 1;
-                    if (idxHi < tripTimes.size()) {
-                        TripTimes tt = tripTimes.get(idxHi);
+                    if (idxHi < ordered.size()) {
+                        TripTimes tt = ordered.get(idxHi);
                         if (tt.tripAcceptable(options, haveBicycle)) {
                             adjacentTimes[nFound] = tt;
                             nFound += 1;
@@ -223,7 +227,7 @@ public class Timetable implements Serializable {
                     }
                     idxLo -= 1;
                     if (idxLo >= 0) {
-                        TripTimes tt = tripTimes.get(idxLo);
+                        TripTimes tt = ordered.get(idxLo);
                         if (tt.tripAcceptable(options, haveBicycle)) {
                             adjacentTimes[nFound] = tt;
                             nFound += 1;
