@@ -153,6 +153,18 @@ public class Raptor implements PathService {
                         && search.getTargetStates().size() > 0)
                     break RETRY;
 
+                ArrayList<RaptorState> toRemove = new ArrayList<RaptorState>();
+                for (RaptorState state : search.getTargetStates()) {
+                    if (state.nBoardings == 0 && options.getMaxWalkDistance() > initialWalk) {
+                        toRemove.add(state);
+                        continue;
+                    }
+                }
+                if (search.getTargetStates().size() > 0) {
+                    for (RaptorState state : toRemove) {
+                        search.removeTargetState(state.walkPath);
+                    }
+                }
                 if (search.getTargetStates().size() >= options.getNumItineraries() && round >= rushAheadRound) {
                     int oldBest = bestElapsedTime;
                     for (RaptorState state : search.getTargetStates()) {
@@ -162,6 +174,7 @@ public class Raptor implements PathService {
                             bestElapsedTime = elapsedTime;
                         }
                     }
+
                     int improvement = oldBest - bestElapsedTime;
                     if (improvement < 600)
                         break RETRY;
