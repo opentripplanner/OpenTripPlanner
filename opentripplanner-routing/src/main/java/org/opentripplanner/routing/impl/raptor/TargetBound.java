@@ -201,7 +201,10 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
         int i = 0;
         boolean prevBounded = !bounders.isEmpty();
         for (State bounder : bounders) {
-
+            if (bounder.getWalkDistance() > options.getMaxWalkDistance() && current.getWalkDistance() + minWalk < options.getMaxWalkDistance()) {
+                continue;
+            }
+            
             if (current.getWeight() + minTime + walkTime * (options.getWalkReluctance() - 1) > bounder.getWeight() * WORST_WEIGHT_DIFFERENCE_FACTOR) {
                 return true;
             }
