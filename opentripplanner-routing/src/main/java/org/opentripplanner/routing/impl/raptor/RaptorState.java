@@ -68,8 +68,20 @@ public class RaptorState implements Comparable<RaptorState>, Cloneable {
     }
 
     public String toString() {
-        return "at " + stop + " boarded at " + boardStop + " on " + route + " time "
+        if (stop == null) {
+            String routes = "";
+            RaptorState cur = this;
+            while (cur != null) {
+                if (cur.route != null) {
+                    routes += cur.route + ", ";
+                }
+                cur = cur.parent;
+            }
+            return "(" + routes + ")";
+        } else {
+            return "at " + stop + " boarded at " + boardStop + " on " + route + " time "
                 + new Date(((long) arrivalTime) * 1000) + " walkDistance " + walkDistance;
+        }
     }
 
     public void dump () {
