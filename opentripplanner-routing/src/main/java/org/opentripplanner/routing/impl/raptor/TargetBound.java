@@ -117,6 +117,12 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
     public void addBounder(State bounder) {
         for (Iterator<State> it = bounders.iterator(); it.hasNext(); ) {
             State old = it.next();
+
+            //exact dup
+            if (old.getNumBoardings() == bounder.getNumBoardings()
+                && old.getTime() == bounder.getTime()
+                && old.getWalkDistance() == bounder.getWalkDistance())
+            return;
             if (bounder.dominates(old)) {
                 it.remove();
                 removedBoundingStates.add(old);
@@ -201,10 +207,6 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
         int i = 0;
         boolean prevBounded = !bounders.isEmpty();
         for (State bounder : bounders) {
-            if (bounder.getWalkDistance() > options.getMaxWalkDistance() && current.getWalkDistance() + minWalk < options.getMaxWalkDistance()) {
-                continue;
-            }
-            
             if (current.getWeight() + minTime + walkTime * (options.getWalkReluctance() - 1) > bounder.getWeight() * WORST_WEIGHT_DIFFERENCE_FACTOR) {
                 return true;
             }
