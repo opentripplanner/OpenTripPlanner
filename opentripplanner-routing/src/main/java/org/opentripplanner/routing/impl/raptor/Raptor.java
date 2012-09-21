@@ -24,6 +24,8 @@ import java.util.ListIterator;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
@@ -83,6 +85,8 @@ public class Raptor implements PathService {
     //fallback for nontransit trips
     @Autowired public SPTService sptService;
 
+    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
+
     @Override
     public List<GraphPath> getPaths(RoutingRequest options) {
 
@@ -101,13 +105,13 @@ public class Raptor implements PathService {
 
         //we multiply the initial walk distance by 1.1 to account for epsilon dominance.
         double initialWalk = options.getMaxWalkDistance() * 1.1;
+        options.setMaxWalkDistance(initialWalk);
+
         //do not even bother with obviously impossible walks
         double minWalk = options.rctx.origin.getDistanceToNearestTransitStop() + options.rctx.target.getDistanceToNearestTransitStop();
-        if (initialWalk < minWalk) {
-            initialWalk = minWalk;
+        if (options.getMaxWalkDistance() < minWalk) {
+            options.setMaxWalkDistance(minWalk);
         }
-
-        options.setMaxWalkDistance(initialWalk);
 
         RoutingRequest walkOptions = options.clone();
         walkOptions.rctx.pathParsers = new PathParser[0];
@@ -140,6 +144,9 @@ public class Raptor implements PathService {
         int rushAheadRound = preliminaryRaptorSearch(data, options, walkOptions, search);
 
         long searchBeginTime = System.currentTimeMillis();
+
+        double expectedWorstTime = 1.5 * distanceLibrary.distance(options.rctx.origin.getCoordinate(),
+                options.rctx.target.getCoordinate()) / options.getWalkSpeed();
 
         int bestElapsedTime = Integer.MAX_VALUE;
         int foundSoFar = 0;
@@ -176,7 +183,7 @@ public class Raptor implements PathService {
                     }
 
                     int improvement = oldBest - bestElapsedTime;
-                    if (improvement < 600)
+                    if (improvement < 600 && bestElapsedTime < expectedWorstTime)
                         break RETRY;
                 }
 
