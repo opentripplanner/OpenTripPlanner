@@ -42,6 +42,8 @@ public class WayPropertySet {
 
     public WayProperties defaultProperties;
 
+    private WayPropertySetSource base;
+
     public WayPropertySet() {
         /* sensible defaults */
         defaultProperties = new WayProperties();
@@ -51,6 +53,16 @@ public class WayPropertySet {
         creativeNamers = new ArrayList<CreativeNamerPicker>();
         slopeOverrides = new ArrayList<SlopeOverridePicker>();
         notes = new ArrayList<NotePicker>();
+    }
+
+    public void setBase(WayPropertySetSource base) {
+       this.base = base;
+       WayPropertySet props = base.getWayPropertySet();
+       creativeNamers = props.getCreativeNamers();
+       defaultProperties = props.defaultProperties;
+       notes = props.notes;
+       slopeOverrides = props.slopeOverrides;
+       wayProperties = props.wayProperties;
     }
 
     public WayProperties getDataForWay(OSMWithTags way) {
