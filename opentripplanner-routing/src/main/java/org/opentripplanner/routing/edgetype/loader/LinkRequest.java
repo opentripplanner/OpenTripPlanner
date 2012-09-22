@@ -16,7 +16,6 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -150,11 +149,12 @@ public class LinkRequest {
             replacement = new LinkedList<P2<PlainStreetEdge>>();
             Iterator<StreetEdge> iter = edges.iterator();
             StreetEdge first = iter.next();
-            StreetEdge second;
-            if (iter.hasNext()) {
-                second = iter.next();
-            } else {
-                second = null;
+            StreetEdge second = null;
+            while (iter.hasNext()) {
+                StreetEdge edge = iter.next();
+                if (edge.getFromVertex() == first.getToVertex() && edge.getToVertex() == first.getFromVertex()) {
+                    second = edge;
+                }
             }
             PlainStreetEdge secondClone;
             if (second == null) {
