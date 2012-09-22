@@ -903,7 +903,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             /* build the street segment graph from OSM ways */
             long wayIndex = 0;
 
-            for (OSMWay way : _ways.values()) {
+           WAY: for (OSMWay way : _ways.values()) {
 
                 if (wayIndex % 10000 == 0)
                     _log.debug("ways=" + wayIndex + "/" + _ways.size());
@@ -924,10 +924,16 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 //this is a workaround for crappy OSM data quality
                 ArrayList<Long> nodes = new ArrayList<Long>(way.getNodeRefs().size());
                 long last = -1;
-                for (long node : way.getNodeRefs()) {
-                    if (node != last)
-                        nodes.add(node);
-                    last = node;
+                double lastLat = -1, lastLon = -1;
+                for (long nodeId : way.getNodeRefs()) {
+                    OSMNode node = _nodes.get(nodeId);
+                    if (node == null)
+                        continue WAY;
+                    if (nodeId != last && (node.getLat() != lastLat || node.getLon() != lastLon))
+                        nodes.add(nodeId);
+                    last = nodeId;
+                    lastLon = node.getLon();
+                    lastLat = node.getLat();
                 }
 
                 IntersectionVertex startEndpoint = null, endEndpoint = null;
