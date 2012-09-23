@@ -248,6 +248,24 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean reverseOptimizeOnTheFly = false;
 
     /**
+     * If true, cost turns as they would be in a country where driving occurs on the right; otherwise,
+     * cost them as they would be in a country where driving occurs on the left.
+     */
+    public boolean driveOnRight = true;
+    
+    /**
+     * The deceleration speed of an automobile, in meters per second per second.
+     */
+    // 2.9 m/s/s: 65 mph - 0 mph in 10 seconds 
+    public double carDecelerationSpeed = 2.9;
+    
+    /**
+     * The acceleration speed of an automobile, in meters per second per second.
+     */
+    // 2.9 m/s/s: 0 mph to 65 mph in 10 seconds
+    public double carAccelerationSpeed = 2.9;
+    
+    /**
      * The routing context used to actually carry out this search. It is important to build States 
      * from TraverseOptions rather than RoutingContexts, and just keep a reference to the context 
      * in the TraverseOptions, rather than using RoutingContexts for everything because in some 

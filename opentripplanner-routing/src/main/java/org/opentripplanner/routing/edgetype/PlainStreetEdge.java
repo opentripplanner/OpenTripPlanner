@@ -20,6 +20,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import lombok.Getter;
+
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.DirectionUtils;
@@ -31,6 +33,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.util.ElevationProfileSegment;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -291,27 +294,25 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         PlainStreetEdge backPSE;
         if (backEdge != null && backEdge instanceof PlainStreetEdge) {
             backPSE = (PlainStreetEdge) backEdge;
-            int outAngle = 0;
-            int inAngle = 0;
+            float backSpeed = (float) (traverseMode == TraverseMode.CAR ? backPSE.getCarSpeed() :
+                options.getSpeed(traverseMode));
+            
+            final double realTurnCost;
+            
             if (options.arriveBy) {
                 if (!canTurnOnto(backPSE, s0, traverseMode))
                     return null;
-                outAngle = backPSE.getOutAngle();
-                inAngle = getInAngle();
+
+                realTurnCost = ((IntersectionVertex) tov).computeTraversalCost(
+                        this, backPSE, traverseMode, options, (float) speed, backSpeed);
             } else {
                 if (!backPSE.canTurnOnto(this, s0, traverseMode))
                     return null;
-                outAngle = getOutAngle();
-                inAngle = backPSE.getInAngle();
+                // TODO: fix assumption of same back speed
+                realTurnCost = ((IntersectionVertex) fromv).computeTraversalCost(
+                        backPSE, this, traverseMode, options, backSpeed, (float) speed);
             }
-
-            int turnCost = Math.abs(outAngle - inAngle);
-            if (turnCost > 180) {
-                turnCost = 360 - turnCost;
-            }
-            // TODO: This makes the turn cost higher the faster you're going
-            final double realTurnCost = (turnCost / 20.0) / speed;
-            
+                       
             if (traverseMode != TraverseMode.CAR) 
                 s1.incrementWalkDistance(realTurnCost / 100); //just a tie-breaker
 
