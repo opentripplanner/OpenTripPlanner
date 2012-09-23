@@ -16,7 +16,6 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -115,14 +114,14 @@ public class LinkRequest {
         // if the bundle was caught endwise (T intersections and dead ends), 
         // get the intersection instead.
         if (edges.endwise()) {
-            return linker.index.getIntersectionAt(edges.endwiseVertex.getCoordinate());
+            return Arrays.asList(linker.index.getIntersectionAt(edges.endwiseVertex.getCoordinate()));
         } else {
             /* is the stop right at an intersection? */
-            List<StreetVertex> atIntersection = linker.index.getIntersectionAt(coordinate);
+            StreetVertex atIntersection = linker.index.getIntersectionAt(coordinate);
             if (atIntersection != null) {
                 // if so, the stop can be linked directly to all vertices at the intersection
-                if (edges.getScore() > distanceLibrary.distance(atIntersection.get(0).getCoordinate(), coordinate))
-                    return atIntersection;
+                if (edges.getScore() > distanceLibrary.distance(atIntersection.getCoordinate(), coordinate))
+                    return Arrays.asList(atIntersection);
             }
             return getSplitterVertices(vertexLabel, edges.toEdgeList(), coordinate);
         }
@@ -150,11 +149,12 @@ public class LinkRequest {
             replacement = new LinkedList<P2<PlainStreetEdge>>();
             Iterator<StreetEdge> iter = edges.iterator();
             StreetEdge first = iter.next();
-            StreetEdge second;
-            if (iter.hasNext()) {
-                second = iter.next();
-            } else {
-                second = null;
+            StreetEdge second = null;
+            while (iter.hasNext()) {
+                StreetEdge edge = iter.next();
+                if (edge.getFromVertex() == first.getToVertex() && edge.getToVertex() == first.getFromVertex()) {
+                    second = edge;
+                }
             }
             PlainStreetEdge secondClone;
             if (second == null) {

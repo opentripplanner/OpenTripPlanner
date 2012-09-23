@@ -15,6 +15,7 @@ package org.opentripplanner.routing.impl.raptor;
 
 import java.util.Date;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.ServiceDay;
@@ -26,7 +27,7 @@ import org.opentripplanner.routing.trippattern.TripTimes;
  * via a transit hop, in which case boardStop etc have been set.
 */
 
-public class RaptorState implements Comparable<RaptorState> {
+public class RaptorState implements Comparable<RaptorState>, Cloneable {
     /* dominance characteristics */
     double walkDistance;
     int nBoardings;
@@ -38,6 +39,8 @@ public class RaptorState implements Comparable<RaptorState> {
     RaptorRoute route;
     public int patternIndex = -1; 
     public TripTimes tripTimes = null;
+
+    public AgencyAndId tripId;
 
     /* if has walked to transit,  */
     State walkPath;
@@ -51,6 +54,8 @@ public class RaptorState implements Comparable<RaptorState> {
     public double weight;
     public int initialWaitTime;
 
+    public boolean interlining = false;
+
     public RaptorState(boolean arriveBy) {
         this.arriveBy = arriveBy;
     }
@@ -63,8 +68,20 @@ public class RaptorState implements Comparable<RaptorState> {
     }
 
     public String toString() {
-        return "at " + stop + " boarded at " + boardStop + " on " + route + " time "
+        if (stop == null) {
+            String routes = "";
+            RaptorState cur = this;
+            while (cur != null) {
+                if (cur.route != null) {
+                    routes += cur.route + ", ";
+                }
+                cur = cur.parent;
+            }
+            return "(" + routes + ")";
+        } else {
+            return "at " + stop + " boarded at " + boardStop + " on " + route + " time "
                 + new Date(((long) arrivalTime) * 1000) + " walkDistance " + walkDistance;
+        }
     }
 
     public void dump () {
@@ -115,5 +132,13 @@ public class RaptorState implements Comparable<RaptorState> {
 
     public void setRoute(RaptorRoute route) {
         this.route = route;
+    }
+
+    public RaptorState clone() {
+        try {
+            return (RaptorState) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

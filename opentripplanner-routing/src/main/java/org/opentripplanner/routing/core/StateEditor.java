@@ -21,7 +21,6 @@ import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.automata.AutomatonState;
-import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
@@ -75,11 +74,9 @@ public class StateEditor {
         child.next = null;
         if (e == null) {
             child.backState = null;
-            child.hops = 0;
             child.vertex = parent.vertex;
             child.stateData = child.stateData.clone();
         } else {
-            child.hops = parent.hops + 1;
             // be clever
             // Note that we use equals(), not ==, here to allow for dynamically
             // created vertices

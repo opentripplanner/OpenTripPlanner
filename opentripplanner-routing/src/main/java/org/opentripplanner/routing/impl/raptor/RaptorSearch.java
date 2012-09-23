@@ -30,6 +30,8 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
+import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -144,7 +146,7 @@ public class RaptorSearch {
         }
         for (RaptorRoute route : routesToVisit) {
             List<RaptorState> boardStates = new ArrayList<RaptorState>(); // not really states
-            boolean started = false;
+            boolean started;
 
             int firstStop, lastStop, direction, lastBoardStop;
             if (options.isArriveBy()) {
@@ -152,11 +154,14 @@ public class RaptorSearch {
                 lastStop = -1;
                 direction = -1;
                 lastBoardStop = 0;
+                //check for interlining on the first stop
+                started = checkForInterliningArriveBy(options, nBoardings, route, boardStates);
             } else {
                 firstStop = 0;
                 lastStop = route.getNStops();
                 direction = 1;
                 lastBoardStop = lastStop - 1;
+                started = checkForInterliningDepartAt(options, nBoardings, route, boardStates);
             }
             for (int stopNo = firstStop; stopNo != lastStop; stopNo += direction) {
                 // find the current time at this stop
@@ -181,11 +186,18 @@ public class RaptorSearch {
                 // this checks the case of continuing on the current trips.
                 CONTINUE: for (RaptorState boardState : boardStates) {
 
+                    if (boardState.boardStop == stop) {
+                        // this only happens due to interlines where
+                        // the last stop of the first route is equal to the first stop of the
+                        // subsequent route.
+                        continue;
+                    }
+
                     RaptorState newState = new RaptorState(boardState.getParent());
 
                     ServiceDay sd = boardState.serviceDay;
 
-                    int waitTime;
+                    int travelTime;
                     if (options.isArriveBy()) {
                         if (!route.alights[0][boardState.patternIndex].getPattern().canBoard(stopNo))
                             continue;
@@ -193,7 +205,7 @@ public class RaptorSearch {
                         newState.arrivalTime = (int) sd.time(boardTime);
                         // add in slack
                         newState.arrivalTime -= options.getBoardSlack();
-                        waitTime = newState.getParent().arrivalTime - newState.arrivalTime;
+                        travelTime = newState.getParent().arrivalTime - newState.arrivalTime;
                     } else {
                         if (!route.boards[0][boardState.patternIndex].getPattern()
                                 .canAlight(stopNo))
@@ -202,15 +214,10 @@ public class RaptorSearch {
                         newState.arrivalTime = (int) sd.time(alightTime);
                         // add in slack
                         newState.arrivalTime += options.getAlightSlack();
-                        waitTime = newState.arrivalTime - newState.getParent().arrivalTime;
+                        travelTime = newState.arrivalTime - newState.getParent().arrivalTime;
                     }
 
-                    if (nBoardings == 1) {
-                        newState.initialWaitTime = waitTime;
-                    } else {
-                        //do not count initial wait time, since it will be optimized away later
-                        newState.weight += waitTime;
-                    }
+                    newState.weight += travelTime;
 
                     //TODO: consider transfer penalties
                     newState.weight += boardState.weight;
@@ -221,7 +228,9 @@ public class RaptorSearch {
                     newState.tripTimes = boardState.tripTimes;
                     newState.nBoardings = boardState.nBoardings;
                     newState.walkDistance = boardState.walkDistance;
+                    newState.tripId = boardState.tripId;
                     newState.stop = stop;
+                    newState.serviceDay = boardState.serviceDay;
 
                     for (RaptorState oldState : states) {
                         if (oldState.eDominates(newState)) {
@@ -273,18 +282,29 @@ public class RaptorSearch {
                             continue; // we got here via this route, so no reason to transfer
 
                         RaptorBoardSpec boardSpec;
+                        int waitTime;
                         if (options.isArriveBy()) {
-                            boardSpec = route.getTripIndexReverse(options, oldState.arrivalTime
-                                    - boardSlack, stopNo);
+                            int arrivalTime = oldState.arrivalTime - boardSlack;
+                            boardSpec = route.getTripIndexReverse(options, arrivalTime, stopNo);
+                            if (boardSpec == null)
+                                continue;
+                            waitTime = oldState.arrivalTime - boardSpec.departureTime;
                         } else {
-                            boardSpec = route.getTripIndex(options, oldState.arrivalTime
-                                    + boardSlack, stopNo);
+                            int arrivalTime = oldState.arrivalTime + boardSlack;
+                            boardSpec = route.getTripIndex(options, arrivalTime, stopNo);
+                            if (boardSpec == null)
+                                continue;
+                            waitTime = boardSpec.departureTime - oldState.arrivalTime;
                         }
-                        if (boardSpec == null)
-                            continue;
 
                         RaptorState boardState = new RaptorState(oldState);
-                        boardState.weight = options.getBoardCost(route.mode);
+                        if (nBoardings == 1) {
+                            //do not count initial wait time, since it will be optimized away later
+                            boardState.initialWaitTime = waitTime;
+                            waitTime = 0;
+                        }
+
+                        boardState.weight = options.getBoardCost(route.mode) + waitTime;
                         boardState.nBoardings = nBoardings;
                         boardState.boardStop = stop;
                         boardState.boardStopSequence = stopNo;
@@ -294,6 +314,7 @@ public class RaptorSearch {
                         boardState.serviceDay = boardSpec.serviceDay;
                         boardState.route = route;
                         boardState.walkDistance = oldState.walkDistance;
+                        boardState.tripId = boardSpec.tripId;
 
                         for (RaptorState state : boardStates) {
                             if (state.eDominates(boardState)) {
@@ -318,7 +339,134 @@ public class RaptorSearch {
         return createdStates;
     }
 
-    public void walkPhase(RoutingRequest options, RoutingRequest walkOptions, int nBoardings,
+    private boolean checkForInterliningDepartAt(RoutingRequest options, int nBoardings,
+            RaptorRoute route, List<RaptorState> boardStates) {
+        int firstStop = 0;
+        boolean started = false;
+        final List<RaptorState> oldStates = statesByStop[route.stops[firstStop].index];
+        if (oldStates == null)
+            return false;
+        INTERLINE:for (RaptorState oldState : oldStates) {
+            if (oldState.nBoardings != nBoardings - 1) {
+                continue;
+            }
+            if (oldState.route == null) {
+                continue;
+            }
+            if (oldState.route.stops[oldState.route.getNStops() - 1] != oldState.stop) {
+                continue;
+            }
+            RaptorInterlineData interline = oldState.route.interlinesOut.get(oldState.tripId);
+            if (interline == null || interline.toRoute != route) {
+                continue;
+            }
+            RaptorState stayOn = oldState.clone();
+            stayOn.arrivalTime -= options.getAlightSlack(); // go backwards in time to erase unnecessary slack
+            stayOn.interlining = true;
+
+            // generate a board state for this interline
+            RaptorState boardState = new RaptorState(stayOn);
+            //we need to subtract out the slacks that we are about to mistakenly pay
+            boardState.weight = - options.getBoardSlack() - options.getAlightSlack(); 
+            boardState.nBoardings = nBoardings - 1;
+            boardState.boardStop = route.stops[firstStop];
+            boardState.boardStopSequence = firstStop;
+
+            TransitBoardAlight board = route.boards[firstStop][interline.toPatternIndex];
+            TableTripPattern pattern = board.getPattern();
+
+            boardState.tripTimes = pattern.getTripTimes(interline.toTripIndex);
+            final ServiceDay serviceDay = oldState.serviceDay;
+            boardState.arrivalTime = (int) serviceDay.time(boardState.tripTimes.getDepartureTime(firstStop));
+            boardState.patternIndex = interline.toPatternIndex;
+            boardState.tripId = interline.toTripId;
+
+            boardState.serviceDay = serviceDay;
+            boardState.route = route;
+            boardState.walkDistance = oldState.walkDistance;
+
+            for (RaptorState state : boardStates) {
+                if (state.eDominates(boardState)) {
+                    continue INTERLINE;
+                }
+            }
+
+            boardStates.add(boardState);
+            started = true;
+
+        }
+        return started;
+    }
+
+    private boolean checkForInterliningArriveBy(RoutingRequest options, int nBoardings,
+            RaptorRoute route, List<RaptorState> boardStates) {
+        int firstStop = route.getNStops() - 1;
+        boolean started = false;
+        final List<RaptorState> states = statesByStop[route.stops[firstStop].index];
+        if (states == null)
+            return false;
+        INTERLINE: for (RaptorState oldState : states) {
+            if (oldState.nBoardings != nBoardings - 1) {
+                continue;
+            }
+            if (oldState.route == null) {
+                continue;
+            }
+            if (oldState.route.stops[0] != oldState.stop) {
+                continue;
+            }
+            RaptorInterlineData interline = oldState.route.interlinesIn.get(oldState.tripId);
+            if (interline == null || interline.fromRoute != route) {
+                continue;
+            }
+
+            RaptorState stayOn = oldState.clone();
+            stayOn.arrivalTime += options.getBoardSlack(); // go backwards in time
+            stayOn.interlining = true;
+
+            // generate a board state for this interline
+            RaptorState boardState = new RaptorState(stayOn);
+            //we need to subtract out the boardSlack that we are about to mistakenly pay
+            boardState.weight = -options.getBoardSlack() - options.getAlightSlack();
+            boardState.nBoardings = boardState.nBoardings = nBoardings - 1;
+            boardState.boardStop = route.stops[firstStop];
+            boardState.boardStopSequence = firstStop;
+
+            TransitBoardAlight alight = route.alights[firstStop - 1][interline.fromPatternIndex];
+            TableTripPattern pattern = alight.getPattern();
+
+            boardState.tripTimes = pattern.getTripTimes(interline.fromTripIndex);
+            final ServiceDay serviceDay = oldState.serviceDay;
+            boardState.arrivalTime = (int) serviceDay.time(boardState.tripTimes
+                    .getArrivalTime(firstStop - 1));
+            boardState.patternIndex = interline.fromPatternIndex;
+            boardState.tripId = interline.fromTripId;
+
+            boardState.serviceDay = serviceDay;
+            boardState.route = route;
+            boardState.walkDistance = oldState.walkDistance;
+
+            for (RaptorState state : boardStates) {
+                if (state.eDominates(boardState)) {
+                    continue INTERLINE;
+                }
+            }
+
+            boardStates.add(boardState);
+            started = true;
+        }
+
+        return started;
+    }
+
+    /**
+     * @param options
+     * @param walkOptions
+     * @param nBoardings
+     * @param createdStates
+     * @return whether search should continue
+     */
+    public boolean walkPhase(RoutingRequest options, RoutingRequest walkOptions, int nBoardings,
             List<RaptorState> createdStates) {
 
         double distanceToNearestTransitStop = 0;
@@ -413,8 +561,7 @@ public class RaptorSearch {
                 startPoints.add(newState);
             }
             if (startPoints.size() == 0) {
-                log.debug("warning: no walk in round " + nBoardings);
-                return;
+                return false;
             }
             System.out.println("walk starts: " + startPoints.size() + " / " + visitedEver.size());
             dijkstra.setPriorityQueueFactory(new PrefilledPriorityQueueFactory(startPoints.subList(
@@ -541,6 +688,7 @@ public class RaptorSearch {
             states.add(newState);
 
         }
+        return true;
     }
 
     class PrefilledPriorityQueueFactory implements OTPPriorityQueueFactory {

@@ -56,6 +56,8 @@ public class WayPropertySet {
     
     public WayProperties defaultProperties;
 
+    private WayPropertySetSource base;
+
     public WayPropertySet() {
         /* sensible defaults */
         defaultProperties = new WayProperties();
@@ -70,6 +72,16 @@ public class WayPropertySet {
         // regex courtesy http://wiki.openstreetmap.org/wiki/Key:maxspeed
         // and edited
         maxSpeedPattern = Pattern.compile("^([0-9][\\.0-9]+?)(?:[ ]?(kmh|km/h|kmph|kph|mph|knots))?$");
+    }
+
+    public void setBase(WayPropertySetSource base) {
+       this.base = base;
+       WayPropertySet props = base.getWayPropertySet();
+       creativeNamers = props.getCreativeNamers();
+       defaultProperties = props.defaultProperties;
+       notes = props.notes;
+       slopeOverrides = props.slopeOverrides;
+       wayProperties = props.wayProperties;
     }
 
     public WayProperties getDataForWay(OSMWithTags way) {

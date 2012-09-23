@@ -47,7 +47,7 @@ public class TimedTransferEdge extends Edge {
     public State traverse(State s0) {
         StateEditor s1 = s0.edit(this);
         s1.incrementWeight(1);
-        s1.setBackMode(s0.getNonTransitMode(s0.getOptions()));
+        s1.setBackMode(s0.getNonTransitMode());
         return s1.makeState();
     }
 

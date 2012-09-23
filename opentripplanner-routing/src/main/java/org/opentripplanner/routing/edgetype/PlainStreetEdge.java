@@ -210,7 +210,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     @Override
     public State traverse(State s0) {
         final RoutingRequest options = s0.getOptions();
-        return doTraverse(s0, options, s0.getNonTransitMode(options));
+        return doTraverse(s0, options, s0.getNonTransitMode());
     }
 
     private State doTraverse(State s0, RoutingRequest options, TraverseMode traverseMode) {
@@ -234,7 +234,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         if (traverseMode == TraverseMode.CAR)
             speed = this.calculateCarSpeed(options);
         else
-            double speed = options.getSpeed(traverseMode);
+            speed = options.getSpeed(traverseMode);
          
         double time = length / speed;
         double weight;
@@ -337,7 +337,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         if (s1.weHaveWalkedTooFar(options))
             return null;
         
-        s1.addAlerts(getNotes());
+        s1.addAlerts(notes);
         
         if (this.toll && traverseMode == TraverseMode.CAR)
             s1.addAlert(Alert.createSimpleAlerts("Toll road"));

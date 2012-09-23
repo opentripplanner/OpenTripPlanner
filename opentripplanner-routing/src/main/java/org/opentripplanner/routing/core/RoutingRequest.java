@@ -733,12 +733,14 @@ public class RoutingRequest implements Cloneable, Serializable {
      * @return The road speed for a specific traverse mode.
      */
     public double getSpeed(TraverseMode mode) {
-        if (mode == TraverseMode.WALK)
+        switch (mode) {
+        case WALK:
             return walkSpeed;
-        if (mode == TraverseMode.BICYCLE)
+        case BICYCLE:
             return bikeSpeed;
-        if (mode == TraverseMode.CAR)
+        case CAR:
             return carSpeed;
+        }
         throw new IllegalArgumentException("getSpeed(): Invalid mode " + mode);
     }
 

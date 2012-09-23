@@ -398,7 +398,7 @@ public class PlanGenerator {
                          * any further transit edge, add "from" vertex to intermediate stops
                          */
                         if (!(backEdge instanceof DwellEdge)) {
-                            Place stop = makePlace(state.getBackState(), backEdge.getName(), true);
+                            Place stop = makePlace(state.getBackState(), state.getBackState().getVertex().getName(), true);
                             leg.stop.add(stop);
                         } else if (leg.stop.size() > 0) {
                             leg.stop.get(leg.stop.size() - 1).departure = makeCalendar(state);
