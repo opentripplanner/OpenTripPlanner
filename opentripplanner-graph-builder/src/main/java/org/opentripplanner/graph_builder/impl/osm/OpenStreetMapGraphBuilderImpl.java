@@ -925,15 +925,28 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 ArrayList<Long> nodes = new ArrayList<Long>(way.getNodeRefs().size());
                 long last = -1;
                 double lastLat = -1, lastLon = -1;
+                String lastLevel = null;
                 for (long nodeId : way.getNodeRefs()) {
                     OSMNode node = _nodes.get(nodeId);
                     if (node == null)
                         continue WAY;
-                    if (nodeId != last && (node.getLat() != lastLat || node.getLon() != lastLon))
+                    boolean levelsDiffer = false;
+                    String level = node.getTag("level");
+                    if (lastLevel == null) {
+                        if (level != null) {
+                            levelsDiffer = true;
+                        }
+                    } else {
+                        if (!lastLevel.equals(level)) {
+                            levelsDiffer = true;
+                        }
+                    }
+                    if (nodeId != last && (node.getLat() != lastLat || node.getLon() != lastLon || levelsDiffer))
                         nodes.add(nodeId);
                     last = nodeId;
                     lastLon = node.getLon();
                     lastLat = node.getLat();
+                    lastLevel = level;
                 }
 
                 IntersectionVertex startEndpoint = null, endEndpoint = null;
