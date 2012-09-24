@@ -38,7 +38,7 @@ public class SampleFactory implements SampleSource {
     private double searchRadiusLat;    
 
     public SampleFactory() {
-        this.setSearchRadiusM(200);
+        this.setSearchRadiusM(100);
     }
     
     public void setSearchRadiusM(double radiusMeters) {
@@ -53,8 +53,8 @@ public class SampleFactory implements SampleSource {
         // query always returns a (possibly empty) list, but never null
         Envelope env = new Envelope(c);
         // find scaling factor for equirectangular projection
-        double xscale = Math.cos(c.y);
-        env.expandBy(searchRadiusLat * xscale, searchRadiusLat);
+        double xscale = Math.cos(c.y * Math.PI / 180);
+        env.expandBy(searchRadiusLat / xscale, searchRadiusLat);
         @SuppressWarnings("unchecked")
         List<Edge> edges = (List<Edge>) index.queryPedestrian(env);
         // look for edges and make a sample
@@ -71,10 +71,9 @@ public class SampleFactory implements SampleSource {
      * 
      */
     public Sample findClosest(List<Edge> edges, Coordinate pt, double xscale) {
-        // track the best geometry
         Candidate c = new Candidate();
-        Candidate best0 = new Candidate();
-        Candidate best1 = new Candidate();
+        // track the best geometry
+        Candidate best = new Candidate();
         for (Edge edge : edges) {
             /* LineString.getCoordinates() uses PackedCoordinateSequence.toCoordinateArray() which
              * necessarily builds new Coordinate objects.CoordinateSequence.getOrdinate() reads them 
@@ -83,7 +82,8 @@ public class SampleFactory implements SampleSource {
             LineString ls = (LineString)(edge.getGeometry());
             CoordinateSequence coordSeq = ls.getCoordinateSequence();
             int numCoords = coordSeq.size();
-            for (int seg = 0; seg < numCoords - 1; seg++) { // check each segment of this linestring
+            for (int seg = 0; seg < numCoords - 1; seg++) {
+                c.seg = seg;
                 double x0 = coordSeq.getX(seg);
                 double y0 = coordSeq.getY(seg);
                 double x1 = coordSeq.getX(seg+1);
@@ -94,48 +94,33 @@ public class SampleFactory implements SampleSource {
                 // project to get closest point 
                 c.x = x0 + c.frac * (x1 - x0);
                 c.y = y0 + c.frac * (y1 - y0);
-                // find ersatz distance (do not take root)
+                // find ersatz distance to edge (do not take root)
                 double dx = c.x - pt.x; // * xscale;
                 double dy = c.y - pt.y;
                 c.dist2 = dx * dx + dy * dy;
                 // replace best segments
-                if (c.dist2 < best1.dist2) {
-                    if (c.dist2 < best0.dist2) {
-                        best1.setFrom(best0);
-                        best0.setFrom(c);
-                    } else {
-                        best1.setFrom(c);
-                    }
+                if (c.dist2 < best.dist2) {
+                    best.setFrom(c);
                 }
             } // end loop over segments
         } // end loop over linestrings
 
         // if at least one vertex was found make a sample
-        Sample s = null;
-        if (best0.edge != null) {
-
-            Vertex v0 = best0.edge.getFromVertex();
-            double d0 = best0.distanceTo(pt);
-            if (d0 > searchRadiusM)
+        if (best.edge != null) {
+            Vertex v0 = best.edge.getFromVertex();
+            Vertex v1 = best.edge.getToVertex();
+            double d = best.distanceTo(pt);
+            if (d > searchRadiusM)
                 return null;
-            d0 += best0.distanceAlong();
+            double d0 = d + best.distanceAlong();
             int t0 = (int) (d0 / 1.33);
-            
-            Vertex v1 = null;
-            int t1 = 0;
-            if (best1.edge != null) {
-                double d1 = best1.distanceTo(pt);
-                if (d1 < searchRadiusM) {
-                    v1 = best1.edge.getFromVertex();
-                    d1 += best1.distanceAlong();
-                    t1 = (int) (d1 / 1.33);
-                }
-            }
-            
-            s = new Sample(v0, t0, v1, t1);
+            double d1 = d + best.distanceToEnd();
+            int t1 = (int) (d1 / 1.33);
+            Sample s = new Sample(v0, t0, v1, t1);
             //System.out.println(s.toString());
+            return s;
         } 
-        return s;
+        return null;
     }
 
     private static class Candidate {
@@ -175,7 +160,24 @@ public class SampleFactory implements SampleSource {
             dist += distanceLibrary.fastDistance(y0, x0, y, x); // dist along partial segment 
             return dist;
         }
-    }
+
+        public double distanceToEnd() {
+            CoordinateSequence cs = ( (LineString)(edge.getGeometry()) ).getCoordinateSequence();
+            int s = seg + 1;
+            double x0 = cs.getX(s);
+            double y0 = cs.getY(s);
+            double dist = distanceLibrary.fastDistance(y0, x0, y, x); // dist along partial segment
+            int nc = cs.size();
+            for (; s < nc; s++) { 
+                double x1 = cs.getX(s);
+                double y1 = cs.getY(s);
+                dist += distanceLibrary.fastDistance(y0, x0, y1, x1);
+                x0 = x1;
+                y0 = y1;
+            }
+            return dist;
+        }
+}
     
     /**
      * Adapted from com.vividsolutions.jts.geom.LineSegment 
