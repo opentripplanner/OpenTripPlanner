@@ -45,8 +45,8 @@ public class TemplateTile extends Tile {
                 }
             }
         } catch (Exception e) {
-            LOG.error(e.getMessage());
-            return;
+            LOG.error(e.toString());
+            e.printStackTrace();
         }
     }
     
