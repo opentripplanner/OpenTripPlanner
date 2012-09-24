@@ -39,21 +39,32 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public interface GraphService {
 
-    /** specify whether additional debug information is loaded from the serialized graphs */
+    /** Specify whether additional debug information is loaded from the serialized graphs */
     public void setLoadLevel(LoadLevel level);
     
-    /** Refresh all known graphs. This will usually involve reloading the graph from a file. */
-    public void refreshGraphs();
-
     /** @return the current default graph object */
     public Graph getGraph();
 
-    /** @return the default graph object for the given router ID */
+    /** @return the graph object for the given router ID */
     public Graph getGraph(String routerId);
 
+    /** @return a collection of all valid routerIds for this server */
     public Collection<String> getGraphIds();
 
-    /** Forces loading of all known graphs */
-    void loadAllGraphs();
+    /**
+     * Blocking method to associate the specified graphId with the corresponding graph file on disk, 
+     * load that serialized graph, and enable its use in routing.
+     * @param preEvict when true, release the existing graph (if any) before loading. This will
+     * halve the amount of memory needed for the operation, but routing will fail during the load.
+     * @return whether the operation completed successfully 
+     */
+    public boolean registerGraph(String graphId, boolean preEvict);
+
+    /** 
+     * Dissociate a graphId with the corresponding graph file on disk, and disable that graphId
+     * for use in routing.
+     * @return whether the operation completed successfully 
+     */
+    public boolean evictGraph(String graphId);
 
 }

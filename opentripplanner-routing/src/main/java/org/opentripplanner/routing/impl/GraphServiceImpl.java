@@ -19,7 +19,13 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.annotation.PostConstruct;
+
+import lombok.Setter;
+
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.services.GraphService;
@@ -27,16 +33,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.annotation.Scope;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.ResourcePatternResolver;
 
+/**
+ * The primary implementation of the GraphService interface.
+ * It can handle multiple graphs, each with its own graphId. These graphs are loaded from 
+ * serialized graph files in subdirectories of the specified base resource/file path.
+ */
 @Scope("singleton")
 public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphServiceImpl.class);
 
-    private String resourcePattern;
+    private String resourceBase = "/var/otp/graphs";
 
     private Map<String, Graph> graphs = new HashMap<String, Graph>();
 
@@ -44,62 +56,85 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
 
     private LoadLevel loadLevel = LoadLevel.FULL;
 
-    private String defaultRouterId = "";
+    @Setter private String defaultRouterId = "";
 
-    private ResourceLoader resourceLoader;
+    // this is set by Spring via ResourceLoaderAware interface
+    @Setter private ResourceLoader resourceLoader = null; 
 
-    private boolean preloadGraphs = true;
+    @Setter private boolean scanGraphIds = false;
 
+    @Setter private boolean attemptLoadDefault = true;
+
+    /* graphIds may contain alphanumeric characters, underscores, and dashes only. */
+    private static Pattern graphIdPattern = Pattern.compile("[\\p{Alnum}_-]*");
+    
+    /** 
+     * Sets the base path to serialized graph files in the filesystem.
+     * This does the same thing as setResource, except the parameter is interpreted as a file path.
+     */
     public void setPath(String path) {
-        this.resourcePattern = "file:".concat(path);
+        this.resourceBase = "file:" + path;
     }
 
     /**
-     * This property allows loading a graph from the classpath or a path relative to the webapp root, which can be useful in cloud computing
-     * environments where webapps must be entirely self-contained. If it is present, the placeholder {} will be replaced with the router ID. In normal
-     * client-server operation, the ResourceLoader provided by Spring will be a ServletContextResourceLoader, so the path will be interpreted relative
-     * to the webapp root, and WARs should be handled transparently. If you want to point to a path outside the webapp, or you want to be clear about
-     * exactly where the resource is to be found, it should be prefixed with 'classpath:','file:', or 'url:'.
+     * This property allows loading graphs from the classpath or a path relative to the webapp root, 
+     * which can be useful in cloud computing environments where webapps must be entirely 
+     * self-contained. In normal client-server operation, the ResourceLoader provided by Spring 
+     * will be a ServletContextResourceLoader, so the path will be interpreted relative to the 
+     * webapp root, and WARs should be handled transparently. If you want to point to a path 
+     * outside the webapp, or you want to be clear about exactly where the resource is to be found, 
+     * it should be prefixed with 'classpath:','file:', or 'url:'.
      */
-    public void setResource(String resource) {
-        this.resourcePattern = resource;
+    public void setResource(String resourceBaseName) {
+        this.resourceBase = resourceBaseName;
     }
 
-    @Override
-    public void refreshGraphs() {
-        // ////////////////
-    }
-
-    @PostConstruct
-    // This means it will run on startup
-    public void preloadGraphs() {
-        if (preloadGraphs) {
-            getGraph(null); // pre-load the default graph
+    @PostConstruct // PostConstruct means it will run on startup after all injection has occurred
+    public void autoRegisterGraphs() {
+        LOG.info("routerId scanning : {}", scanGraphIds);
+        if (scanGraphIds) {
+            scanRegister();
+        }
+        if ( ! graphs.containsKey(defaultRouterId)) {
+            LOG.info("Attempting to load graph for default routerId '{}'.", defaultRouterId);
+            registerGraph(defaultRouterId, true);
+        }
+        if (this.getGraphIds().isEmpty()) {
+            LOG.warn("No graphs have been registered or loaded. " +
+                    "You must use the API to register one or more graphs before routing.");
         }
     }
 
-    @Override 
-    public void loadAllGraphs() {
+    /** 
+     * Examine all immediate subdirectories of the base path and register anything that looks like 
+     * a graphId. Also register the empty string if a graph is present in the base directory.
+     */
+    private void scanRegister() {
         if (resourceLoader instanceof ResourcePatternResolver) {
             ResourcePatternResolver resolver = (ResourcePatternResolver) resourceLoader;
+            LOG.info("Scanning for graphs to register under {}", resourceBase);
+            String resourcePattern = resourceBase.concat("/*/Graph.obj");
+            Resource[] resources;
             try {
-                String resourceName = resourcePattern.replace("{}", "*/");
-                Resource[] resources = resolver.getResources(resourceName + "Graph.obj");
-                for (Resource resource : resources) {
-                    resourceName = resource.getURI().toString();
-                    if (graphs.get(resourceName) != null)
-                        continue;
-                    InputStream is = resource.getInputStream();
+                resources = resolver.getResources(resourcePattern);
+            } catch (IOException ioe) {
+                LOG.debug("IO exception while searching for graphs, aborting.");
+                ioe.printStackTrace();
+                return;
+            }
+            for (Resource resource : resources) {
+                try {
+                    String resourceName = resource.getURI().toString();
+                    LOG.info("found graph at {}", resourceName);
+                    InputStream is;
+                        is = resource.getInputStream();
                     Graph graph = Graph.load(is, LoadLevel.FULL);
                     graphs.put(resourceName, graph);
                     levels.put(resourceName, LoadLevel.FULL);
+                } catch (Exception ex) {
+                    LOG.debug("Exception while loading graph, skipping.");
+                    ex.printStackTrace();
                 }
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
             }
         }
     }
@@ -110,82 +145,99 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
     }
 
     @Override
-    public synchronized Graph getGraph(String routerId) {
+    public Graph getGraph(String routerId) {
         if (routerId == null || routerId.isEmpty()) {
             routerId = defaultRouterId;
-            LOG.debug("routerId not specified, set to default of '{}'", routerId);
+            LOG.debug("graphId not specified, set to default of '{}'", routerId);
         }
-        Graph graph;
-        String resourceName;
-        if (routerId.indexOf("../") != -1) {
-            LOG.warn("attempt to navigate up the directory hierarchy using a routerId");
-            return null;
-        } else {
-            resourceName = resourcePattern.replace("{}", routerId);
-        }
-        LOG.debug("graph for routerId '{}' is at {}", routerId, resourceName);
-        graph = graphs.get(resourceName);
-        LoadLevel level = levels.get(resourceName);
-        if (level != loadLevel) {
-            graph = null; // force reload at new load level
-        }
-        if (graph == null) {
-            LOG.debug("this graph was not yet loaded");
-            InputStream is;
-            try {
-                Resource resource = resourceLoader.getResource(resourceName.concat("/Graph.obj"));
-                is = resource.getInputStream();
-            } catch (Exception e) {
-                LOG.warn("graph file not found or not openable at {}", resourceName);
-                if (routerId.equals(defaultRouterId)) {
-                    LOG.warn(
-                            "graph for default routerId {} does not exist or cannot be opened at {}",
-                            routerId, resourceName);
-                    e.printStackTrace();
-                    return null;
-                }
-                return getGraph(null); // fall back on default if graph does not exist
+        synchronized (graphs) {
+            if ( ! graphs.containsKey(routerId)) {
+                LOG.error("no graph registered with the graphId '{}'", routerId);
+                return null;
+            } else {
+                return graphs.get(routerId);
             }
-            try {
-                graph = Graph.load(is, loadLevel);
-                // key on resource name instead of routerId so fallbacks to defaultRouterId will all yield the same Graph
-                graphs.put(resourceName, graph);
-                levels.put(resourceName, loadLevel);
-            } catch (Exception ex) {
-                LOG.error("Exception while loading graph from {}.", resourceName);
-                throw new RuntimeException("error loading graph from " + resourceName, ex);
-            }
-        } else {
-            LOG.debug("returning cached graph {} for routerId '{}'", graph, routerId);
         }
-        return graph;
     }
 
     @Override
     public void setLoadLevel(LoadLevel level) {
         if (level != loadLevel) {
             loadLevel = level;
-            refreshGraphs();
+            reloadGraphs(true);
         }
     }
 
-    public void setDefaultRouterId(String routerId) {
-        this.defaultRouterId = routerId;
+    private Graph loadGraph(String graphId) {
+        if ( ! graphIdLegal(graphId)) {
+            LOG.error("graphId '{}' contains characters other than alphanumeric, underscore, and dash.", graphId);
+            return null;
+        }
+        LOG.debug("loading serialized graph for graphId {}", graphId);
+        String resourceLocation = String.format("%s/%s/Graph.obj", resourceBase, graphId);
+        LOG.debug("graph file should be at {}", resourceLocation);
+        Resource graphResource;
+        InputStream is;
+        try {
+            graphResource = resourceLoader.getResource(resourceLocation);
+            //graphResource = resourceBase.createRelative(graphId);
+            is = graphResource.getInputStream();
+        } catch (IOException ex) {
+            LOG.warn("Graph file not found or not openable for graphId '{}' under {}", graphId, resourceBase);
+            ex.printStackTrace();
+            return null;
+        }
+        try {
+            return Graph.load(is, loadLevel);
+        } catch (Exception ex) {
+            LOG.error("Exception while loading graph from {}.", graphResource);
+            ex.printStackTrace();
+            return null;
+        }
     }
 
+    public boolean reloadGraphs(boolean preEvict) {
+        boolean allSucceeded = true;
+        synchronized (graphs) {
+            for (String graphId : this.getGraphIds()) {
+                boolean success = registerGraph(graphId, preEvict);
+                allSucceeded &= success;
+            }
+        }
+        return allSucceeded;
+    }
+    
     @Override
     public Collection<String> getGraphIds() {
-        ArrayList<String> out = new ArrayList<String>();
-        String base = resourcePattern.replace("{}", "");
-        for (String id : graphs.keySet()) {
-            out.add(id.replaceFirst(base, "").replace("/Graph.obj",""));
-        }
-        return out;
+        return new ArrayList<String>(graphs.keySet());
     }
 
     @Override
-    public void setResourceLoader(ResourceLoader rl) {
-        this.resourceLoader = rl;
+    public boolean registerGraph(String graphId, boolean preEvict) {
+        if (preEvict)
+            evictGraph(graphId);
+        Graph graph = this.loadGraph(graphId);
+        if (graph != null) {
+            synchronized (graphs) {
+                graphs.put(graphId, graph);
+            }
+            levels.put(graphId, loadLevel);
+            return true;
+        }
+        return false;
     }
 
+    @Override
+    public boolean evictGraph(String graphId) {
+        synchronized (graphs) {
+            Graph existing = graphs.remove(graphId);
+            return existing != null;
+        }
+    }
+
+    private boolean graphIdLegal(String graphId) {
+        Matcher m = graphIdPattern.matcher(graphId);
+        return m.matches();
+        
+    }
 }
