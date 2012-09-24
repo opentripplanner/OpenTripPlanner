@@ -39,10 +39,10 @@ public class TileCache extends CacheLoader<TileRequest, Tile>
     /** completes the abstract CacheLoader superclass */
     public Tile load(TileRequest req) throws Exception {
         LOG.debug("tile cache miss; cache size is {}", this.tileCache.size());
-        return new TemplateTile(req, sampleFactory);
+        //return new TemplateTile(req, sampleFactory);
         //return new TemplateTile(req, hashSampler);
         //return new DynamicTile(req, hashSampler);
-        //return new DynamicTile(req, sampleFactory);
+        return new DynamicTile(req, sampleFactory);
     }
 
     /** delegate to the tile LoadingCache */
