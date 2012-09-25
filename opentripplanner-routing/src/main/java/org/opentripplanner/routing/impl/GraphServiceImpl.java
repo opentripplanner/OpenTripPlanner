@@ -175,7 +175,7 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
         }
         LOG.debug("loading serialized graph for graphId {}", graphId);
         String resourceLocation = String.format("%s/%s/Graph.obj", resourceBase, graphId);
-        LOG.debug("graph file should be at {}", resourceLocation);
+        LOG.debug("graph file for routerId {} is at {}", graphId, resourceLocation);
         Resource graphResource;
         InputStream is;
         try {
@@ -187,6 +187,7 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
             ex.printStackTrace();
             return null;
         }
+        LOG.debug("graph input stream successfully opened. now loading.");
         try {
             return Graph.load(is, loadLevel);
         } catch (Exception ex) {
@@ -229,6 +230,7 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
 
     @Override
     public boolean evictGraph(String graphId) {
+        LOG.debug("evicting graph {}", graphId);
         synchronized (graphs) {
             Graph existing = graphs.remove(graphId);
             return existing != null;
