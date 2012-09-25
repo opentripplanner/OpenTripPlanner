@@ -242,4 +242,15 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
         return m.matches();
         
     }
+
+    @Override
+    public boolean registerGraph(String graphId, Graph graph) {
+        Graph existing = graphs.put(graphId, graph);
+        return existing == null;
+    }
+
+    @Override
+    public void evictAll() {
+        graphs.clear();
+    }
 }

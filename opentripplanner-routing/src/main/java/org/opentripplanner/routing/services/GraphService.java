@@ -60,11 +60,19 @@ public interface GraphService {
      */
     public boolean registerGraph(String graphId, boolean preEvict);
 
+    /** Associate the given graphId with the supplied Graph object. */
+    public boolean registerGraph(String graphId, Graph graph);
+
     /** 
-     * Dissociate a graphId with the corresponding graph file on disk, and disable that graphId
+     * Dissociate a graphId with the corresponding graph object, and disable that graphId
      * for use in routing.
      * @return whether the operation completed successfully 
      */
     public boolean evictGraph(String graphId);
+
+    /** 
+     * Release all graphs. Routing will not be possible until new graphs are registered. 
+     */
+    public void evictAll();
 
 }
