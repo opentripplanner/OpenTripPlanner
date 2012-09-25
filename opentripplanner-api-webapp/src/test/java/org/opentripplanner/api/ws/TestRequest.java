@@ -103,10 +103,6 @@ class SimpleGraphServiceImpl implements GraphService {
     }
 
     @Override
-    public void refreshGraphs() {
-    }
-
-    @Override
     public Graph getGraph() {
         return graphs.get(null);
     }
@@ -126,9 +122,25 @@ class SimpleGraphServiceImpl implements GraphService {
     }
 
     @Override
-    public void loadAllGraphs() {
-        //nothing to do
+    public boolean registerGraph(String graphId, boolean preEvict) {
+        return false;
     }
+
+    @Override
+    public boolean registerGraph(String graphId, Graph graph) {
+        return false;
+    }
+
+    @Override
+    public boolean evictGraph(String graphId) {
+        return false;
+    }
+
+    @Override
+    public int evictAll() {
+        return 0;
+    }
+
 }
 
 /* This is a hack to hold context and graph data between test runs, since loading it is slow. */
