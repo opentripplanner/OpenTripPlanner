@@ -250,7 +250,12 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
     }
 
     @Override
-    public void evictAll() {
-        graphs.clear();
+    public int evictAll() {
+        int n;
+        synchronized(graphs) {
+            n = graphs.size(); 
+            graphs.clear();
+        }
+        return n;
     }
 }

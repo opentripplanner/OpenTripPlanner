@@ -73,6 +73,6 @@ public interface GraphService {
     /** 
      * Release all graphs. Routing will not be possible until new graphs are registered. 
      */
-    public void evictAll();
+    public int evictAll();
 
 }

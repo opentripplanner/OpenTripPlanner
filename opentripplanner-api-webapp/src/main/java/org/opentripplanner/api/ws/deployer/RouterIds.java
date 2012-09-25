@@ -106,6 +106,13 @@ public class RouterIds {
         }
     }
 
+    @DELETE @Produces({ MediaType.TEXT_PLAIN })
+    public Response deleteAll() {
+        int nEvicted = graphService.evictAll();
+        String message = String.format("%d graphs evicted.", nEvicted);
+        return Response.status(200).entity(message).build();
+    }
+
     @DELETE @Path("{routerId}") @Produces({ MediaType.TEXT_PLAIN })
     public Response deleteGraphId(@PathParam("routerId") String routerId) {
         boolean existed = graphService.evictGraph(routerId);
