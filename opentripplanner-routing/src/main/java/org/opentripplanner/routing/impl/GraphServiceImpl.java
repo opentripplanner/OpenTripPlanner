@@ -175,7 +175,7 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
         }
         LOG.debug("loading serialized graph for graphId {}", graphId);
         String resourceLocation = String.format("%s/%s/Graph.obj", resourceBase, graphId);
-        LOG.debug("graph file for routerId {} is at {}", graphId, resourceLocation);
+        LOG.debug("graph file for routerId '{}' is at {}", graphId, resourceLocation);
         Resource graphResource;
         InputStream is;
         try {
