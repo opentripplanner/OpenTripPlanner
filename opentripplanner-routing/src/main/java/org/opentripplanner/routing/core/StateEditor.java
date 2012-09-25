@@ -21,7 +21,6 @@ import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.automata.AutomatonState;
-import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
@@ -75,11 +74,9 @@ public class StateEditor {
         child.next = null;
         if (e == null) {
             child.backState = null;
-            child.hops = 0;
             child.vertex = parent.vertex;
             child.stateData = child.stateData.clone();
         } else {
-            child.hops = parent.hops + 1;
             // be clever
             // Note that we use equals(), not ==, here to allow for dynamically
             // created vertices
@@ -108,9 +105,6 @@ public class StateEditor {
                 LOG
                         .error("Actual traversal direction does not match traversal direction in TraverseOptions.");
                 defectiveTraversal = true;
-            }
-            if (parent.stateData.noThruTrafficState == NoThruTrafficState.INIT && !(e instanceof FreeEdge)) {
-                setNoThruTrafficState(NoThruTrafficState.BETWEEN_ISLANDS);
             }
         }
     }
@@ -381,11 +375,6 @@ public class StateEditor {
         child.stateData.lastAlightedTime = lastAlightedTime;
     }
 
-    public void setNoThruTrafficState(NoThruTrafficState noThruTrafficState) {
-        cloneStateDataAsNeeded();
-        child.stateData.noThruTrafficState = noThruTrafficState;
-    }
-
     public void setTime(long t) {
         child.time = t;
     }
@@ -464,10 +453,6 @@ public class StateEditor {
 
     public long getLastAlightedTime() {
         return child.getLastAlightedTime();
-    }
-
-    public NoThruTrafficState getNoThruTrafficState() {
-        return child.stateData.noThruTrafficState;
     }
 
     public double getWalkDistance() {

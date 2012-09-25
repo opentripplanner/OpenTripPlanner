@@ -65,10 +65,6 @@ public class PreBoardEdge extends FreeEdge {
             if (!options.getModes().isTransit())
                 return null;
 
-            // Do not board if the passenger has alighted from a local stop
-            if (s0.isAlightedLocal()) {
-                return null;
-            }
             TransitStop fromVertex = (TransitStop) getFromVertex();
             // Do not board once one has alighted from a local stop
             if (fromVertex.isLocal() && s0.isEverBoarded()) {

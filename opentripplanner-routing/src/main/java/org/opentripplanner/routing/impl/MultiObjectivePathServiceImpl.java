@@ -33,6 +33,7 @@ import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.pathparser.BasicPathParser;
+import org.opentripplanner.routing.pathparser.NoThruTrafficPathParser;
 import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
@@ -110,8 +111,8 @@ public class MultiObjectivePathServiceImpl implements PathService {
         if (options.rctx == null) {
             options.setRoutingContext(graphService.getGraph(options.getRouterId()));
             // move into setRoutingContext ?
-            options.rctx.pathParsers = new PathParser[1];
-            options.rctx.pathParsers[0] = new BasicPathParser();
+            options.rctx.pathParsers = new PathParser[] { new BasicPathParser(),
+                    new NoThruTrafficPathParser() };
         }
 
         RemainingWeightHeuristic heuristic;

@@ -57,7 +57,7 @@ public class CheckGeometryGraphBuilderImpl implements GraphBuilder {
     }
     
     private static final Logger _log = LoggerFactory.getLogger(CheckGeometryGraphBuilderImpl.class);
-    private static final double MAX_VERTEX_SHAPE_ERROR = 100;
+    private static final double MAX_VERTEX_SHAPE_ERROR = 150;
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {

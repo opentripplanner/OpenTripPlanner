@@ -2,6 +2,7 @@ package org.opentripplanner.routing.impl.raptor;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -14,7 +15,7 @@ public class RaptorData implements Serializable {
 
     public RaptorStop[] stops;
 
-    public List<RaptorRoute> routes = new ArrayList<RaptorRoute>();
+    public Collection<RaptorRoute> routes = new ArrayList<RaptorRoute>();
 
     public List<RaptorRoute>[] routesForStop;
 

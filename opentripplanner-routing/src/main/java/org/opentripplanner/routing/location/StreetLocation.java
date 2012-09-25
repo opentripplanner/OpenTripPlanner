@@ -94,6 +94,8 @@ public class StreetLocation extends StreetVertex {
             Vertex edgeLocation;
             if (distanceLibrary.distance(nearestPoint, fromv.getCoordinate()) < 0.0001) {
                 edgeLocation = fromv;
+                new FreeEdge(location, edgeLocation);
+                new FreeEdge(edgeLocation, location);
             } else if (distanceLibrary.distance(nearestPoint, tov.getCoordinate()) < 0.0001) {
                 edgeLocation = tov;
                 new FreeEdge(location, edgeLocation);

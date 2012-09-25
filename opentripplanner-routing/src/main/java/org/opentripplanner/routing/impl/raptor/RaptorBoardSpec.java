@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.impl.raptor;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
@@ -10,4 +11,7 @@ public class RaptorBoardSpec {
     TripTimes tripTimes;
     int patternIndex;
     ServiceDay serviceDay;
+
+    AgencyAndId tripId;
+
 }

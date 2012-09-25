@@ -22,6 +22,7 @@ import java.util.Queue;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.pathparser.BasicPathParser;
+import org.opentripplanner.routing.pathparser.NoThruTrafficPathParser;
 import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
@@ -82,8 +83,8 @@ public class RetryingPathServiceImpl implements PathService {
         // orphan RoutingContexts leaving temporary edges in the graph until GC)
         if (options.rctx == null) {
             options.setRoutingContext(graphService.getGraph(options.getRouterId()));
-            options.rctx.pathParsers = new PathParser[1];
-            options.rctx.pathParsers[0] = new BasicPathParser();
+            options.rctx.pathParsers = new PathParser[] { new BasicPathParser(),
+                    new NoThruTrafficPathParser() };
         }
 
         long searchBeginTime = System.currentTimeMillis();

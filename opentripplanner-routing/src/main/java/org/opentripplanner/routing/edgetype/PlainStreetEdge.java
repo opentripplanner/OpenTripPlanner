@@ -24,7 +24,6 @@ import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.routing.core.NoThruTrafficState;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -211,7 +210,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     @Override
     public State traverse(State s0) {
         final RoutingRequest options = s0.getOptions();
-        return doTraverse(s0, options, s0.getNonTransitMode(options));
+        return doTraverse(s0, options, s0.getNonTransitMode());
     }
 
     private State doTraverse(State s0, RoutingRequest options, TraverseMode traverseMode) {
@@ -228,7 +227,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             }
             return null;
         }
-        double speed = options.getSpeed(s0.getNonTransitMode(options));
+        double speed = options.getSpeed(traverseMode);
         double time = length / speed;
         double weight;
         if (options.wheelchairAccessible) {
@@ -280,34 +279,6 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         if (wheelchairNotes != null && options.wheelchairAccessible) {
             s1.addAlerts(wheelchairNotes);
         }
-        
-        switch (s0.getNoThruTrafficState()) {
-        case INIT:
-            if (isNoThruTraffic()) {
-                s1.setNoThruTrafficState(NoThruTrafficState.IN_INITIAL_ISLAND);
-            } else {
-                s1.setNoThruTrafficState(NoThruTrafficState.BETWEEN_ISLANDS);
-            }
-            break;
-        case IN_INITIAL_ISLAND:
-            if (!isNoThruTraffic()) {
-                s1.setNoThruTrafficState(NoThruTrafficState.BETWEEN_ISLANDS);
-            }
-            break;
-        case BETWEEN_ISLANDS:
-            if (isNoThruTraffic()) {
-                s1.setNoThruTrafficState(NoThruTrafficState.IN_FINAL_ISLAND);
-            }
-            break;
-        case IN_FINAL_ISLAND:
-            if (!isNoThruTraffic()) {
-                // we have now passed entirely through a no thru traffic region,
-                // which is
-                // forbidden
-                return null;
-            }
-            break;
-        }
 
         PlainStreetEdge backPSE;
         if (backEdge != null && backEdge instanceof PlainStreetEdge) {
@@ -315,12 +286,12 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             int outAngle = 0;
             int inAngle = 0;
             if (options.arriveBy) {
-                if (!canTurnOnto(backPSE, s0, traverseMode))
+                if (!canTurnOnto(backPSE, traverseMode))
                     return null;
                 outAngle = backPSE.getOutAngle();
                 inAngle = getInAngle();
             } else {
-                if (!backPSE.canTurnOnto(this, s0, traverseMode))
+                if (!backPSE.canTurnOnto(this, traverseMode))
                     return null;
                 outAngle = getOutAngle();
                 inAngle = backPSE.getInAngle();
@@ -330,7 +301,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             if (turnCost > 180) {
                 turnCost = 360 - turnCost;
             }
-            final double realTurnCost = (turnCost / 20.0) / options.getSpeed(traverseMode);
+            final double realTurnCost = (turnCost / 20.0) / speed;
             s1.incrementWalkDistance(realTurnCost / 100); //just a tie-breaker
             weight += realTurnCost;
             long turnTime = (long) realTurnCost;
@@ -349,7 +320,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         if (s1.weHaveWalkedTooFar(options))
             return null;
         
-        s1.addAlerts(getNotes());
+        s1.addAlerts(notes);
 
         return s1.makeState();
     }
@@ -519,7 +490,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         return turnRestrictions;
     }
 
-    public boolean canTurnOnto(Edge e, State state, TraverseMode mode) {
+    public boolean canTurnOnto(Edge e, TraverseMode mode) {
         for (TurnRestriction restriction : turnRestrictions) {
             /* FIXME: This is wrong for trips that end in the middle of restriction.to
              */

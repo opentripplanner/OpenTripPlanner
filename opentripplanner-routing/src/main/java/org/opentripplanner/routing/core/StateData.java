@@ -55,8 +55,6 @@ public class StateData implements Cloneable {
 
     protected long lastAlightedTime;
 
-    protected NoThruTrafficState noThruTrafficState = NoThruTrafficState.INIT;
-
     protected AgencyAndId[] routeSequence;
 
     protected HashMap<Object, Object> extensions;

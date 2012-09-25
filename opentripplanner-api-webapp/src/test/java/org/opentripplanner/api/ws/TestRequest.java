@@ -455,7 +455,7 @@ public class TestRequest extends TestCase {
 
         RouteList routes = (RouteList) index.getRoutes("TriMet", false, routerId);
         assertTrue(routes.routes.size() > 50);
-        
+
         //without agencyId
         routes = (RouteList) index.getRoutes(null, true, routerId);
         assertTrue(routes.routes.size() > 50);
@@ -484,6 +484,10 @@ public class TestRequest extends TestCase {
         long startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 9, 1, 7, 50, 0) * 1000;
         long endTime = startTime + 60 * 60 * 1000;
         StopTimeList stopTimesForStop = (StopTimeList) index.getStopTimesForStop("TriMet", "10579",
+                startTime, endTime, false, false, null, routerId);
+        assertTrue(stopTimesForStop.stopTimes.size() > 0);
+
+        stopTimesForStop = (StopTimeList) index.getStopTimesForStop(null, "10579",
                 startTime, endTime, false, false, null, routerId);
         assertTrue(stopTimesForStop.stopTimes.size() > 0);
 

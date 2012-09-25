@@ -13,7 +13,6 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,26 +30,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.LineString;
-
-/** 
- * A vehicle's wait between the end of one run and the beginning of another run on the same block 
- * */
-class InterlineDwellData implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
-    public int dwellTime;
-
-    public int patternIndex;
-
-    public AgencyAndId trip;
-    
-    public InterlineDwellData(int dwellTime, int patternIndex, AgencyAndId trip) {
-        this.dwellTime = dwellTime;
-        this.patternIndex = patternIndex;
-        this.trip = trip;
-    }
-}
 
 public class PatternInterlineDwell extends Edge implements OnBoardForwardEdge, OnBoardReverseEdge {
     private static final Logger _log = LoggerFactory.getLogger(PatternInterlineDwell.class);
@@ -141,7 +120,7 @@ public class PatternInterlineDwell extends Edge implements OnBoardForwardEdge, O
         // FIXME: ugly!
         TableTripPattern pattern = ((OnboardVertex)s1.getVertex()).getTripPattern();
         s1.incrementTimeInSeconds(dwellData.dwellTime);
-        s1.setTripId(targetTrip.getId()); // TODO: is this right? the targetTrip is more like an exemplar? (AMB)
+        s1.setTripId(dwellData.trip);
         // FIXME: this is interlining to the SCHEDULED timetable, not the updated timetable. use resolver.
         s1.setTripTimes(pattern.getTripTimes(dwellData.patternIndex));
         s1.incrementWeight(dwellData.dwellTime);
@@ -162,4 +141,12 @@ public class PatternInterlineDwell extends Edge implements OnBoardForwardEdge, O
     public Trip getTrip() {
     	return targetTrip;
     }
+
+    public Map<AgencyAndId, InterlineDwellData> getReverseTripIdToInterlineDwellData() {
+        return reverseTripIdToInterlineDwellData;
+    }
+    public Map<AgencyAndId, InterlineDwellData> getTripIdToInterlineDwellData() {
+        return tripIdToInterlineDwellData;
+    }
+
 }

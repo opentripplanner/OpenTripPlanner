@@ -23,6 +23,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.pathparser.BasicPathParser;
+import org.opentripplanner.routing.pathparser.NoThruTrafficPathParser;
 import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.pathparser.TransitStartPathParser;
 import org.opentripplanner.routing.services.GraphService;
@@ -83,7 +84,8 @@ public class TransitStartPathService implements PathService {
 
             GraphPath toTransit = pathsToTransit.get(0);
             subOptions.setArriveBy(false);
-            subOptions.rctx.pathParsers[0] = new BasicPathParser();
+            options.rctx.pathParsers = new PathParser[] { new BasicPathParser(),
+                    new NoThruTrafficPathParser() };
             State firstState = toTransit.states.getFirst();
             State state = new State(firstState.getVertex(), firstState.getTime(), subOptions);
             LinkedList<Edge> edges = toTransit.edges;

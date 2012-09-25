@@ -30,12 +30,11 @@ import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.transit_index.adapters.AgencyAndIdAdapter;
 import org.opentripplanner.routing.transit_index.adapters.AgencyAndIdArrayListAdapter;
 import org.opentripplanner.routing.transit_index.adapters.LineStringAdapter;
-import org.opentripplanner.routing.transit_index.adapters.StopAgencyAndIdAdapter;
-import org.opentripplanner.routing.transit_index.adapters.StopAgencyAndIdArayListAdapter;
+import org.opentripplanner.routing.transit_index.adapters.StopAgencyAndIdArrayListAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,11 +68,10 @@ public class RouteVariant implements Serializable {
 
     private TraverseMode mode;
 
-    // @XmlElementWrapper
     @XmlJavaTypeAdapter(AgencyAndIdArrayListAdapter.class)
     private ArrayList<AgencyAndId> trips;
 
-    @XmlJavaTypeAdapter(StopAgencyAndIdArayListAdapter.class)
+    @XmlJavaTypeAdapter(StopAgencyAndIdArrayListAdapter.class)
     private ArrayList<Stop> stops;
 
     /** An unordered list of all segments for this route */
@@ -83,6 +81,8 @@ public class RouteVariant implements Serializable {
      * An ordered list of segments that represents one characteristic trip (or trip pattern) on this variant
      */
     private ArrayList<RouteSegment> exemplarSegments;
+
+    private ArrayList<PatternInterlineDwell> interlines;
 
     private Route route;
 
@@ -100,6 +100,7 @@ public class RouteVariant implements Serializable {
         trips = new ArrayList<AgencyAndId>();
         segments = new ArrayList<RouteSegment>();
         exemplarSegments = new ArrayList<RouteSegment>();
+        interlines = new ArrayList<PatternInterlineDwell>();
         this.mode = GtfsLibrary.getTraverseMode(route);
     }
 
@@ -240,5 +241,13 @@ public class RouteVariant implements Serializable {
 
     public void setGeometry(LineString geometry) {
         this.geometry = geometry;
+    }
+
+    public void addInterline(PatternInterlineDwell dwell) {
+        interlines.add(dwell);
+    }
+
+    public List<PatternInterlineDwell> getInterlines() {
+        return interlines;
     }
 }

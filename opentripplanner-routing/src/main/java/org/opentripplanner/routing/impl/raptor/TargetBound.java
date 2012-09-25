@@ -90,13 +90,15 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
 
     public TargetBound(RoutingRequest options) {
         this.options = options;
-        this.realTarget = options.rctx.target;
-        this.realTargetCoordinate = realTarget.getCoordinate();
-        this.distanceToNearestTransitStop = realTarget.getDistanceToNearestTransitStop();
-        bounders = new ArrayList<State>();
-        transitLocalStreets = options.rctx.graph.getService(TransitLocalStreetService.class);
-        speedUpperBound = options.getSpeedUpperBound();
-        this.speedWeight = options.getWalkReluctance() / speedUpperBound;
+        if (options.rctx.target != null) {
+            this.realTarget = options.rctx.target;
+            this.realTargetCoordinate = realTarget.getCoordinate();
+            this.distanceToNearestTransitStop = realTarget.getDistanceToNearestTransitStop();
+            bounders = new ArrayList<State>();
+            transitLocalStreets = options.rctx.graph.getService(TransitLocalStreetService.class);
+            speedUpperBound = options.getSpeedUpperBound();
+            this.speedWeight = options.getWalkReluctance() / speedUpperBound;
+        }
     }
 
     @Override
@@ -112,9 +114,15 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
         return true;
     }
 
-    private void addBounder(State bounder) {
+    public void addBounder(State bounder) {
         for (Iterator<State> it = bounders.iterator(); it.hasNext(); ) {
             State old = it.next();
+
+            //exact dup
+            if (old.getNumBoardings() == bounder.getNumBoardings()
+                && old.getTime() == bounder.getTime()
+                && old.getWalkDistance() == bounder.getWalkDistance())
+            return;
             if (bounder.dominates(old)) {
                 it.remove();
                 removedBoundingStates.add(old);
@@ -127,6 +135,10 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
         }
         bounders.add(bounder);
         RaptorState state = (RaptorState) bounder.getExtension("raptorParent");
+        if (state == null) {
+            previousArrivalTime.add(-1);
+            return;
+        }
         RaptorStop stop = state.stop;
         //get previous alight at stop
         if (options.isArriveBy()) {
@@ -141,6 +153,9 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
     @Override
     public boolean shouldSkipTraversalResult(Vertex origin, Vertex target, State parent,
             State current, ShortestPathTree spt, RoutingRequest traverseOptions) {
+        if (realTarget == null)
+            return false;
+
         final Vertex vertex = current.getVertex();
         int vertexIndex = vertex.getIndex();
         if (vertexIndex < distance.length) {
@@ -168,12 +183,12 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
             minWalk = this.distanceToNearestTransitStop + vertex.getDistanceToNearestTransitStop();
             minTime = options.isArriveBy() ? traverseOptions.getAlightSlack() : traverseOptions.getBoardSlack();
 
-            if (current.getBackEdge() instanceof StreetEdge && !transitLocalStreets.transferrable(vertex)) {
+            if (current.getBackEdge() instanceof StreetEdge && transitLocalStreets != null &&  !transitLocalStreets.transferrable(vertex)) {
                 return true;
             }
         } else {
             // could walk directly to destination
-            if (targetDistance < distanceToNearestTransitStop || !transitLocalStreets.transferrable(vertex))
+            if (targetDistance < distanceToNearestTransitStop || transitLocalStreets == null || !transitLocalStreets.transferrable(vertex))
                 minWalk = targetDistance;
             else
                 minWalk = distanceToNearestTransitStop;
@@ -192,16 +207,16 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
         int i = 0;
         boolean prevBounded = !bounders.isEmpty();
         for (State bounder : bounders) {
-            int prevTime = previousArrivalTime.get(i++);
-
             if (current.getWeight() + minTime + walkTime * (options.getWalkReluctance() - 1) > bounder.getWeight() * WORST_WEIGHT_DIFFERENCE_FACTOR) {
                 return true;
             }
+            int prevTime = previousArrivalTime.get(i++);
+
             if (optimisticDistance * 1.1 > bounder.getWalkDistance()
                     && current.getNumBoardings() >= bounder.getNumBoardings()) {
                 if (current.getElapsedTime() + minTime > bounder.getElapsedTime()) {
                     return true;
-                } else if (options.arriveBy ? (current.getTime() + minTime <= prevTime) : ((current.getTime() - minTime) >= prevTime)) {
+                } else if (prevTime > 0 && (options.arriveBy ? (current.getTime() - minTime >= prevTime) : ((current.getTime() + minTime) <= prevTime))) {
                     prevBounded = false;
                 }
             } else {

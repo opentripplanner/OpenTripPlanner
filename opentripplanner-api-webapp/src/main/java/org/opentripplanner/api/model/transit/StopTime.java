@@ -16,6 +16,9 @@ public class StopTime {
     @XmlAttribute
     public long time;
 
+    @XmlAttribute
+    public String phase;
+
     @JsonSerialize(include=Inclusion.NON_NULL)
     @XmlElement
     public TripType trip;
@@ -23,4 +26,5 @@ public class StopTime {
     @JsonSerialize(include=Inclusion.NON_NULL)
     @XmlElement
     public StopType stop;
+
 }

@@ -14,7 +14,9 @@
 package org.opentripplanner.routing.impl.raptor;
 
 import java.io.Serializable;
+import java.util.HashMap;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -41,6 +43,9 @@ public class RaptorRoute implements Serializable {
                                                                   // each stop
 
     public TraverseMode mode;
+
+    public HashMap<AgencyAndId, RaptorInterlineData> interlinesOut = new HashMap<AgencyAndId, RaptorInterlineData>();
+    public HashMap<AgencyAndId, RaptorInterlineData> interlinesIn = new HashMap<AgencyAndId, RaptorInterlineData>();
 
     public RaptorRoute(int nStops, int nPatterns) {
         stops = new RaptorStop[nStops];
@@ -80,6 +85,7 @@ public class RaptorRoute implements Serializable {
                 spec.tripTimes = result.getTripTimes();
                 spec.patternIndex = i;
                 spec.serviceDay = result.getServiceDay();
+                spec.tripId = result.getTripId();
             }
 
         }
@@ -110,6 +116,7 @@ public class RaptorRoute implements Serializable {
                 spec.tripTimes = result.getTripTimes();
                 spec.patternIndex = i;
                 spec.serviceDay = result.getServiceDay();
+                spec.tripId = result.getTripId();
             }
         }
 

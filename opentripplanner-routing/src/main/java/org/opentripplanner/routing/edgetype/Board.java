@@ -103,7 +103,7 @@ public class Board extends Edge implements OnBoardForwardEdge {
             if (options.bannedTrips.contains(getTrip().getId())) {
                 return null;
             }
-            TraverseMode mode = state0.getNonTransitMode(options);
+            TraverseMode mode = state0.getNonTransitMode();
             // forward traversal: find a relevant transit trip
             if (!options.getModes().contains(hop.getMode())) {
                 return null;

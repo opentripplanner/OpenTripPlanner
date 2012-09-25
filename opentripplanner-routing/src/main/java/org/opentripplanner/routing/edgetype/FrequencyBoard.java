@@ -113,7 +113,7 @@ public class FrequencyBoard extends Edge  implements OnBoardForwardEdge {
              */
             long currentTime = state0.getTime();
             int bestWait = -1;
-            TraverseMode mode = state0.getNonTransitMode(options);
+            TraverseMode mode = state0.getNonTransitMode();
             if (options.bannedTrips.contains(trip.getId())) {
                 //This behaves a little differently than with ordinary trip patterns,
                 //because trips don't really have strong identities in frequency-based

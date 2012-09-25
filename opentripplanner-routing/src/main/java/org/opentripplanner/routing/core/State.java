@@ -51,9 +51,6 @@ public class State implements Cloneable {
 
     protected Edge backEdge;
 
-    // how many edges away from the initial state
-    protected int hops;
-
     // allow traverse result chaining (multiple results)
     protected State next;
 
@@ -96,7 +93,6 @@ public class State implements Cloneable {
         this.vertex = vertex;
         this.backState = null;
         this.backEdge = null;
-        this.hops = 0;
         this.stateData = new StateData(options);
         // note that here we are breaking the circular reference between rctx and options
         // this should be harmless since reversed clones are only used when routing has finished
@@ -244,10 +240,6 @@ public class State implements Cloneable {
         return stateData.lastAlightedTime;
     }
 
-    public NoThruTrafficState getNoThruTrafficState() {
-        return stateData.noThruTrafficState;
-    }
-
     public double getWalkDistance() {
         return walkDistance;
     }
@@ -372,10 +364,6 @@ public class State implements Cloneable {
         return this.backEdge;
     }
 
-    public boolean exceedsHopLimit(int maxHops) {
-        return hops > maxHops;
-    }
-
     public boolean exceedsWeightLimit(double maxWeight) {
         return weight > maxWeight;
     }
@@ -437,7 +425,7 @@ public class State implements Cloneable {
     
     /* will return BICYCLE if routing with an owned bicycle, or if at this state the user is holding
      * on to a rented bicycle */
-    public TraverseMode getNonTransitMode(RoutingRequest options) {
+    public TraverseMode getNonTransitMode() {
         return stateData.nonTransitMode;
     }
 
@@ -486,7 +474,7 @@ public class State implements Cloneable {
 
     public boolean multipleOptionsBefore() {
         boolean foundAlternatePaths = false;
-        TraverseMode requestedMode = getNonTransitMode(getOptions());
+        TraverseMode requestedMode = getNonTransitMode();
         for (Edge out : backState.vertex.getOutgoing()) {
             if (out == backEdge) {
                 continue;

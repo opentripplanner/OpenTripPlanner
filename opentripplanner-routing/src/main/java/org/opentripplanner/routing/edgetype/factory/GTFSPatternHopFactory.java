@@ -1073,9 +1073,9 @@ public class GTFSPatternHopFactory {
         
         Coordinate startCoord = new Coordinate(s0.getLon(), s0.getLat());
         Coordinate endCoord = new Coordinate(s1.getLon(), s1.getLat());
-        if (distanceLibrary.distance(startCoord, geometryStartCoord) > 100) {
+        if (distanceLibrary.distance(startCoord, geometryStartCoord) > 150) {
             return false;
-        } else if (distanceLibrary.distance(endCoord, geometryEndCoord) > 100) {
+        } else if (distanceLibrary.distance(endCoord, geometryEndCoord) > 150) {
             return false;
         }
         return true;
