@@ -198,7 +198,7 @@ public class TableTripPattern implements TripPattern, Serializable {
      * @return a TripTimes object providing all the arrival and departure times on the best trip.
      */
     public TripTimes getNextTrip(int stopIndex, int time, boolean haveBicycle,
-            RoutingRequest options, boolean boarding, TripTimes[] adjacentTimes) {
+            RoutingRequest options, boolean boarding) {
         Timetable timetable = scheduledTimetable;
         TimetableResolver snapshot = options.rctx.timetableSnapshot; 
         if (snapshot != null)
@@ -215,7 +215,7 @@ public class TableTripPattern implements TripPattern, Serializable {
             return null;
         }
         // so far so good, delegate to the timetable
-        return timetable.getNextTrip(stopIndex, time, haveBicycle, options, boarding, adjacentTimes);
+        return timetable.getNextTrip(stopIndex, time, haveBicycle, options, boarding);
     }
     
     public Iterator<Integer> getScheduledDepartureTimes(int stopIndex) {

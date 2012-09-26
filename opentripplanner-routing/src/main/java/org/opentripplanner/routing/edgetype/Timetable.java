@@ -142,7 +142,7 @@ public class Timetable implements Serializable {
      * trip matches both the time and other criteria. 
      */
     protected TripTimes getNextTrip(int stopIndex, int time, boolean haveBicycle,
-            RoutingRequest options, boolean boarding, TripTimes[] adjacentTimes) {
+            RoutingRequest options, boolean boarding) {
         TripTimes bestTrip = null;
         int idxLo = -1, idxHi = Integer.MAX_VALUE;
         TripTimes[][] tableIndex = boarding ? departuresIndex : arrivalsIndex; 
@@ -201,47 +201,6 @@ public class Timetable implements Serializable {
                     }
                 }
                 ++idx;
-            }
-        }
-        // Fill in the retTimes array (if supplied) with TripTimes adjacent to the best one.
-        // In the case where the timetable is not indexed, if the triptimes are sorted at the
-        // first stop this method should still be of some value.
-        if (adjacentTimes != null && adjacentTimes.length >= 1) { 
-            int nFound = 0;
-            // bestTrip will still be null if no suitable trip was found by binary or linear search.
-            if (bestTrip != null) {
-                // output array non-null: caller wants an array of adjacent tripTimes
-                adjacentTimes[0] = bestTrip;
-                nFound += 1;
-                while (idxLo >= 0 || idxHi < ordered.size()) {
-                    idxHi += 1;
-                    if (idxHi < ordered.size()) {
-                        TripTimes tt = ordered.get(idxHi);
-                        if (tt.tripAcceptable(options, haveBicycle)) {
-                            adjacentTimes[nFound] = tt;
-                            nFound += 1;
-                            if (nFound == adjacentTimes.length) {
-                                break;
-                            }
-                        }
-                    }
-                    idxLo -= 1;
-                    if (idxLo >= 0) {
-                        TripTimes tt = ordered.get(idxLo);
-                        if (tt.tripAcceptable(options, haveBicycle)) {
-                            adjacentTimes[nFound] = tt;
-                            nFound += 1;
-                            if (nFound == adjacentTimes.length) {
-                                break;
-                            }
-                        }
-                    }
-                }
-                // null out any remaining array elements, but only if at least one trip was found
-                // to avoid a lot of useless stores.
-                for (; nFound < adjacentTimes.length; nFound++) {
-                    adjacentTimes[nFound] = null;
-                }
             }
         }
         return bestTrip;
