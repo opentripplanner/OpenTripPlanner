@@ -75,13 +75,16 @@ public class RouteVariant implements Serializable {
     private ArrayList<Stop> stops;
 
     /** An unordered list of all segments for this route */
+    @JsonIgnore
     private ArrayList<RouteSegment> segments;
 
     /**
      * An ordered list of segments that represents one characteristic trip (or trip pattern) on this variant
      */
+    @JsonIgnore
     private ArrayList<RouteSegment> exemplarSegments;
 
+    @JsonIgnore
     private ArrayList<PatternInterlineDwell> interlines;
 
     private Route route;
@@ -235,6 +238,7 @@ public class RouteVariant implements Serializable {
         return geometry;
     }
 
+    @JsonIgnore
     public TraverseMode getTraverseMode() {
         return mode;
     }
@@ -247,6 +251,7 @@ public class RouteVariant implements Serializable {
         interlines.add(dwell);
     }
 
+    @JsonIgnore
     public List<PatternInterlineDwell> getInterlines() {
         return interlines;
     }
