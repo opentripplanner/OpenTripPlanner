@@ -1014,8 +1014,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             if (intersectionNodes.containsKey(endNode)
                     || i == nodes.size() - 2
-                    || (i < nodes.size() - 2 && nodes.subList(0,
-                            nodes.size() - 2).contains(nodes.get(i + 2)))) {
+                    || nodes.subList(0, i).contains(nodes.get(i))) {
                         segmentCoordinates.add(getCoordinate(osmEndNode));
                         ele = osmEndNode.getTag("ele");
                         if (ele != null) {
