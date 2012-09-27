@@ -102,7 +102,7 @@ public class StreetUtils {
     	
     	/* remove all tiny subgraphs */
         for (HashSet<Vertex> island : islands) {
-            if (island.size() < 20) {
+            if (island.size() < 40) {
                 _log.warn(GraphBuilderAnnotation.register(graph, Variety.GRAPH_CONNECTIVITY, 
                         island.iterator().next(), island));
                 depedestrianizeOrRemove(graph, island);
