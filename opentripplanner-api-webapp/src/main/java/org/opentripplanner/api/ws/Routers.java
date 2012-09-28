@@ -66,7 +66,7 @@ public class Routers {
     public RouterList getRouterIds()
             throws JSONException {
         RouterList routerList = new RouterList();
-        for (String id : graphService.getGraphIds()) {
+        for (String id : graphService.getRouterIds()) {
             RouterInfo routerInfo = new RouterInfo();
             routerInfo.routerId = id;
             Graph graph = graphService.getGraph(id);

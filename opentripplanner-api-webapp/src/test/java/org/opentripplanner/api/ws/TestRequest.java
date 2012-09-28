@@ -113,7 +113,7 @@ class SimpleGraphServiceImpl implements GraphService {
     }
 
     @Override
-    public Collection<String> getGraphIds() {
+    public Collection<String> getRouterIds() {
         return graphs.keySet();
     }
 
