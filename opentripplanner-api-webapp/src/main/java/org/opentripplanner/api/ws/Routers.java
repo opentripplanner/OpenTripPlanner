@@ -83,6 +83,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * DELETE http://localhost/opentripplanner-api-webapp/ws/routers
  * will de-register all currently registered routerIds.
  * 
+ * The GET methods are not secured, but all other methods are secured under ROLE_DEPLOYER.
  * See documentation for individual methods for additional parameters.
  */
 @Path("/routers")
@@ -94,7 +95,11 @@ public class Routers {
 
     @Autowired GraphService graphService;
     
-    /** Returns a list of routers and their bounds. */
+    /** 
+     * Returns a list of routers and their bounds. 
+     * @return a representation of the graphs and their geographic bounds, in JSON or XML depending
+     * on the Accept header in the HTTP request.
+     */
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public RouterList getRouterIds()
@@ -118,7 +123,10 @@ public class Routers {
         return routerList;
     }
 
-    /** Returns the bounds for a specific routerId, or verifies that it is not registered. */
+    /** 
+     * Returns the bounds for a specific routerId, or verifies whether it is registered. 
+     * @returns status code 200 if the routerId is registered, otherwise a 404.
+     */
     @GET @Path("{routerId}") @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public Response getGraphId(@PathParam("routerId") String routerId) {
         // factor out build one entry
@@ -129,7 +137,9 @@ public class Routers {
             return Response.status(Status.OK).entity(graph.toString()).build();
     }
 
-    /** Reload all registered graphs. */
+    /** 
+     * Reload the graphs for all registered routerIds from disk.
+     */
     @Secured({ "ROLE_DEPLOYER" })
     @PUT @Produces({ MediaType.APPLICATION_JSON })
     public Response reloadGraphs(@QueryParam("path") String path, 
@@ -139,7 +149,13 @@ public class Routers {
         return Response.status(Status.OK).build();
     }
 
-    /** Load the graph for the specified routerId from disk, or from an uploaded serialized graph. */
+    /** 
+     * Load the graph for the specified routerId from disk.
+     * @param preEvict before reloading each graph, evict the existing graph. This will prevent 
+     * memory usage from increasing during the reload, but routing will be unavailable on this 
+     * routerId for the duration of the operation.
+     * @param upload read the graph from the PUT data stream instead of from disk.
+     */
     @Secured({ "ROLE_DEPLOYER" })
     @PUT @Path("{routerId}") @Produces({ MediaType.TEXT_PLAIN })
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
@@ -172,7 +188,7 @@ public class Routers {
         }
     }
 
-    /** Evict all graphs from memory. */
+    /** De-register all registered routerIds, evicting them from memory. */
     @Secured({ "ROLE_DEPLOYER" })
     @DELETE @Produces({ MediaType.TEXT_PLAIN })
     public Response deleteAll() {
@@ -181,7 +197,11 @@ public class Routers {
         return Response.status(200).entity(message).build();
     }
 
-    /** Evict a specific graph from memory, freeing its routerId. */
+    /** 
+     * De-register a specific routerId, evicting the associated graph from memory. 
+     * @return status code 200 if the routerId was de-registered, 
+     * 404 if the routerId was not registered. 
+     */
     @Secured({ "ROLE_DEPLOYER" })
     @DELETE @Path("{routerId}") @Produces({ MediaType.TEXT_PLAIN })
     public Response deleteGraphId(@PathParam("routerId") String routerId) {
