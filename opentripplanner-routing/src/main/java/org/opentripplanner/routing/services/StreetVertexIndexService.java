@@ -28,15 +28,15 @@ import com.vividsolutions.jts.geom.Envelope;
 
 public interface StreetVertexIndexService {
 
-    public Vertex getClosestVertex(final Coordinate location, String name, RoutingRequest options);
+    public Vertex getClosestVertex(final Coordinate location, String name, RoutingRequest request);
 
-    public Vertex getClosestVertex(final Coordinate location, String name, RoutingRequest options,
+    public Vertex getClosestVertex(final Coordinate location, String name, RoutingRequest request,
             List<Edge> extraEdges);
 
     public Collection<Vertex> getVerticesForEnvelope(Envelope envelope);
 
     public CandidateEdgeBundle getClosestEdges(Coordinate coordinate, RoutingRequest options,
-            List<Edge> extraEdges, Collection<Edge> preferredEdges);
+            List<Edge> extraEdges, Collection<Edge> preferredEdges, int restriction);
 
     public List<TransitStop> getNearbyTransitStops(Coordinate coordinate, double radius);
     
