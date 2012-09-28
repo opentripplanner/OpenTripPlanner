@@ -321,7 +321,7 @@ public class TestHalfEdges extends TestCase {
         assertNotNull(end);
 
         extras = end.getExtra();
-        assertEquals(4, extras.size());
+        assertEquals(2, extras.size());
 
         // test that the closest vertex finder also adds an edge to transit
         // stops (if you are really close to the transit stop relative to the

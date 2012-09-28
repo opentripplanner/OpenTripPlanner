@@ -392,6 +392,7 @@ public class NEDDownloader implements NEDTileSource {
         Formatter formatter = new Formatter();
         String filename = formatter.format("%f,%f-%f,%f.urls", extent.getMinX(), extent.getMinY(),
                 extent.getMaxX(), extent.getMaxY()).toString();
+        formatter.close();
         try {
             File file = new File(cacheDirectory, filename);
             List<URL> urls;

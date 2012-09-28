@@ -31,7 +31,6 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.Parser;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.error.VertexNotFoundException;
@@ -132,6 +131,7 @@ public class RunBenchmarkPlanMain {
         JsonNode obj = mapper.readTree(line);
         plans.add(getJsonObjectAsPlan(obj));
     }
+    reader.close();
     return plans;
   }
 

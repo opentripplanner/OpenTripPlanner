@@ -1,7 +1,5 @@
 package org.opentripplanner.analyst.batch;
 
-import javax.annotation.PostConstruct;
-
 import lombok.Setter;
 
 import org.geotools.coverage.grid.GridEnvelope2D;

@@ -16,7 +16,6 @@ package org.opentripplanner.routing.edgetype.loader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation;

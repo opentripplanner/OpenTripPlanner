@@ -64,6 +64,7 @@ public class StreetMatcher {
         index.build();
     }
 
+    @SuppressWarnings("unchecked")
     public List<Edge> match(Geometry routeGeometry) {
         
         routeGeometry = removeDuplicatePoints(routeGeometry);
@@ -84,7 +85,7 @@ public class StreetMatcher {
         envelope.expandBy(distanceThreshold);
 
         BinHeap<MatchState> states = new BinHeap<MatchState>();
-        List nearbyEdges = index.query(envelope);
+        List<Edge> nearbyEdges = index.query(envelope);
         while (nearbyEdges.isEmpty()) {
             envelope.expandBy(distanceThreshold);
             distanceThreshold *= 2;
@@ -92,8 +93,7 @@ public class StreetMatcher {
         }
 
         // compute initial states
-        for (Object obj : nearbyEdges) {
-            Edge initialEdge = (Edge) obj;
+        for (Edge initialEdge : nearbyEdges) {
             Geometry edgeGeometry = initialEdge.getGeometry();
             
             LocationIndexedLine indexedEdge = new LocationIndexedLine(edgeGeometry);

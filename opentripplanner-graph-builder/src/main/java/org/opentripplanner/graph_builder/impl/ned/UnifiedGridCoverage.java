@@ -18,17 +18,12 @@ import java.util.List;
 
 import org.geotools.coverage.AbstractCoverage;
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.GeneralEnvelope;
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.PointOutsideCoverageException;
 import org.opengis.coverage.SampleDimension;
-import org.opengis.coverage.grid.GridCoverage;
 import org.opengis.geometry.DirectPosition;
-import org.opengis.geometry.MismatchedDimensionException;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

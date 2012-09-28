@@ -63,19 +63,12 @@ public class RaptorSearch {
 
     private RaptorData data;
 
-    private int targetRegion = -1;
 
     @SuppressWarnings("unchecked")
     RaptorSearch(RaptorData data, RoutingRequest options) {
         statesByStop = new List[data.stops.length];
         bounder = new TargetBound(options);
         this.data = data;
-        if (options.rctx.target != null) {
-            List<Integer> targetRegions = Raptor.getRegionsForVertex(data.regionData, options.rctx.target);
-            if (targetRegions.size() == 1) {
-                this.targetRegion = targetRegions.get(0);
-            }
-        }
     }
 
     public void addStates(int stop, List<RaptorState> list) {
