@@ -48,8 +48,42 @@ import com.sun.jersey.api.spring.Autowire;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
- * These API endpoints correspond to methods on the GraphService interface.
- * They allow remotely loading, reloading, and evicting graphs on a running server.
+ * This REST API endpoint allows remotely loading, reloading, and evicting graphs on a running server.
+ * 
+ * A GraphService maintains a mapping between routerIds and specific Graph objects.
+ * The HTTP verbs are used as follows to manipulate that mapping:
+ * 
+ * GET - see the registered routerIds and Graphs, verify whether a particular routerId is registered
+ * PUT - create or replace a mapping from a routerId to a Graph loaded from the server filesystem
+ * POST - create or replace a mapping from a routerId to a serialized Graph sent in the request
+ * DELETE - de-register a routerId, releasing the reference to the associated graph
+ * 
+ * The HTTP request URLs are of the form /ws/routers/{routerId}, where the routerId is optional. 
+ * If a routerId is supplied in the URL, the verb will act upon the mapping for that specific 
+ * routerId. If no routerId is given, the verb will act upon all routerIds currently registered.
+ * 
+ * For example:
+ * 
+ * GET http://localhost/opentripplanner-api-webapp/ws/routers
+ * will retrieve a list of all registered routerId -> Graph mappings and their geographic bounds.
+ * 
+ * GET http://localhost/opentripplanner-api-webapp/ws/routers/london
+ * will return status code 200 and a brief description of the 'london' graph including geographic 
+ * bounds, or 404 if the 'london' routerId is not registered.
+ * 
+ * PUT http://localhost/opentripplanner-api-webapp/ws/routers
+ * will reload the graphs for all currently registered routerIds from disk.
+ * 
+ * PUT http://localhost/opentripplanner-api-webapp/ws/routers/paris
+ * will load a Graph from a sub-directory called 'paris' and associate it with the routerId 'paris'.
+ * 
+ * DELETE http://localhost/opentripplanner-api-webapp/ws/routers/paris
+ * will release the Paris Graph and de-register the 'paris' routerId.
+ * 
+ * DELETE http://localhost/opentripplanner-api-webapp/ws/routers
+ * will de-register all currently registered routerIds.
+ * 
+ * See documentation for individual methods for additional parameters.
  */
 @Path("/routers")
 @XmlRootElement
