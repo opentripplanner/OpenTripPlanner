@@ -42,15 +42,6 @@ public class GraphServiceBeanImpl implements GraphService {
         this.graph = graph;
     }
 
-    /****
-     * {@link GraphService} Interface
-     ****/
-
-    @Override
-    public void refreshGraphs() {
-
-    }
-
     @Override
     public Graph getGraph() {
         return graph;
@@ -70,4 +61,25 @@ public class GraphServiceBeanImpl implements GraphService {
     public List<String> getGraphIds() {
         return Arrays.asList("default");
     }
+
+    @Override
+    public boolean registerGraph(String graphId, boolean preEvict) {
+        return false;
+    }
+
+    @Override
+    public boolean registerGraph(String graphId, Graph graph) {
+        return false;
+    }
+
+    @Override
+    public boolean evictGraph(String graphId) {
+        return false;
+    }
+
+    @Override
+    public int evictAll() {
+        return 0;
+    }
+
 }

@@ -25,7 +25,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.BasicShortestPathTree;
-import org.opentripplanner.routing.vertextype.TurnVertex;
+import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,11 +90,11 @@ public class FindMaxWalkDistances {
                 if (v == null)
                     continue;
 
-                double dw = v.getWeight() - u.getWeight();
+                double dw = v.getWeightDelta();
                 if (dw < 0) {
                     throw new NegativeWeightException(String.valueOf(dw));
                 }
-                
+
                 Vertex toVertex = v.getVertex();
 
                 if (closed.contains(toVertex)) {
@@ -103,8 +103,8 @@ public class FindMaxWalkDistances {
 
                 double new_w = v.getWeight();
 
-                if (toVertex instanceof TurnVertex) {
-                    TurnVertex sv = (TurnVertex) toVertex;
+                if (toVertex instanceof StreetVertex) {
+                    StreetVertex sv = (StreetVertex) toVertex;
                     if (sv.getDistanceToNearestTransitStop() <= new_w) {
                         continue;
                     }

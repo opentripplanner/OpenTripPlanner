@@ -13,9 +13,11 @@
 
 package org.opentripplanner.routing.algorithm;
 
+import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.algorithm.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.strategies.SkipTraverseResultStrategy;
+import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -49,6 +51,8 @@ public class GenericDijkstra {
 
     private boolean _verbose = false;
 
+    private RemainingWeightHeuristic heuristic = new TrivialRemainingWeightHeuristic();
+
     public GenericDijkstra(RoutingRequest options) {
         this.options = options;
     }
@@ -79,6 +83,10 @@ public class GenericDijkstra {
     }
 
     public ShortestPathTree getShortestPathTree(State initialState) {
+        Vertex target = null;
+        if (options.rctx != null) {
+            target = initialState.getOptions().rctx.target;
+        }
         ShortestPathTree spt = createShortestPathTree(options);
         OTPPriorityQueue<State> queue = createPriorityQueue();
 
@@ -88,6 +96,10 @@ public class GenericDijkstra {
         while (!queue.empty()) { // Until the priority queue is empty:
             State u = queue.extract_min();
             Vertex u_vertex = u.getVertex();
+
+            if (!spt.getStates(u_vertex).contains(u)) {
+                continue;
+            }
 
             if (_verbose) {
                 System.out.println("min," + u.getWeight());
@@ -122,8 +134,10 @@ public class GenericDijkstra {
                     if (v.exceedsWeightLimit(options.maxWeight))
                         continue;
 
-                    if (spt.add(v))
-                        queue.insert(v, v.getWeight());
+                    if (spt.add(v)) {
+                        double estimate = heuristic.computeForwardWeight(v, target);
+                        queue.insert(v, v.getWeight() + estimate);
+                    }
 
                 }
             }
@@ -142,5 +156,9 @@ public class GenericDijkstra {
         if (_shortestPathTreeFactory != null)
             return _shortestPathTreeFactory.create(options);
         return new BasicShortestPathTree(options);
+    }
+
+    public void setHeuristic(RemainingWeightHeuristic heuristic) {
+        this.heuristic = heuristic;
     }
 }

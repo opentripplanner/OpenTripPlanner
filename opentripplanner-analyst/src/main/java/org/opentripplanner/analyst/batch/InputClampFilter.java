@@ -1,6 +1,7 @@
 package org.opentripplanner.analyst.batch;
 
 import lombok.Data;
+import lombok.Setter;
 
 @Data
 public class InputClampFilter implements IndividualFilter {

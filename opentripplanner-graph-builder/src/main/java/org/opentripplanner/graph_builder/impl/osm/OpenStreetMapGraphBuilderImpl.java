@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.opentripplanner.common.StreetUtils;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.DistanceLibrary;
@@ -55,6 +54,7 @@ import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
@@ -92,6 +92,32 @@ import com.vividsolutions.jts.geom.LineString;
  * Builds a street graph from OpenStreetMap data.
  * 
  */
+enum Direction {
+    LEFT, RIGHT, U, STRAIGHT;
+}
+/**
+ * A temporary holder for turn restrictions while we have only way/node ids but not yet edge
+ * objects
+ */
+class TurnRestrictionTag {
+    long via;
+
+    TurnRestrictionType type;
+
+    Direction direction;
+
+    public List<PlainStreetEdge> possibleFrom = new ArrayList<PlainStreetEdge>();
+    public List<PlainStreetEdge> possibleTo = new ArrayList<PlainStreetEdge>();
+
+    public TraverseModeSet modes;
+
+    TurnRestrictionTag(long via, TurnRestrictionType type, Direction direction) {
+        this.via = via;
+        this.type = type;
+        this.direction = direction;
+    }
+}
+
 public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
     private static Logger _log = LoggerFactory.getLogger(OpenStreetMapGraphBuilderImpl.class);
@@ -222,9 +248,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
         private Map<Long, List<TurnRestrictionTag>> turnRestrictionsByToWay =
                 new HashMap<Long, List<TurnRestrictionTag>>();
-
-        private Map<TurnRestrictionTag, TurnRestriction> turnRestrictionsByTag =
-                new HashMap<TurnRestrictionTag, TurnRestriction>();
 
         class Ring {
             public List<OSMNode> nodes;
@@ -493,10 +516,59 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             buildElevatorEdges(graph);
 
             /* unify turn restrictions */
-            Map<Edge, TurnRestriction> turnRestrictions = new HashMap<Edge, TurnRestriction>();
-            for (TurnRestriction restriction : turnRestrictionsByTag.values()) {
-                turnRestrictions.put(restriction.from, restriction);
+            for (List<TurnRestrictionTag> restrictions: turnRestrictionsByFromWay.values()) {
+                for (TurnRestrictionTag restrictionTag : restrictions) {
+                    if (restrictionTag.possibleFrom.isEmpty()) {
+                        _log.warn("No from edge found for restriction " + restrictionTag);
+                        continue;
+                    }
+                    if (restrictionTag.possibleTo.isEmpty()) {
+                        _log.warn("No to edge found for restriction " + restrictionTag);
+                        continue;
+                    }
+                    for (PlainStreetEdge from : restrictionTag.possibleFrom) {
+                        if (from == null) {
+                            _log.warn("from-edge is null in turn restriction " + restrictionTag);
+                            continue;
+                        }
+                        for (PlainStreetEdge to : restrictionTag.possibleTo) {
+                            if (from == null || to == null) {
+                                continue;
+                            }
+                            int angleDiff = from.getOutAngle() - to.getInAngle();
+                            if (angleDiff < 0) {
+                                angleDiff += 360;
+                            }
+                            switch (restrictionTag.direction) {
+                            case LEFT:
+                                if (angleDiff >= 160) {
+                                    continue; // not a left turn
+                                }
+                                break;
+                            case RIGHT:
+                                if (angleDiff <= 200)
+                                    continue; // not a right turn
+                                break;
+                            case U:
+                                if ((angleDiff <= 150 || angleDiff > 210))
+                                    continue; // not straight
+                                break;
+                            case STRAIGHT:
+                                if (Math.abs(angleDiff) >= 30)
+                                    continue; // not a U turn
+                                break;
+                            }
+                            TurnRestriction restriction = new TurnRestriction();
+                            restriction.from = from;
+                            restriction.to = to;
+                            restriction.type = restrictionTag.type;
+                            restriction.modes = restrictionTag.modes;
+                            from.addTurnRestriction(restriction);
+                        }
+                    }
+                }
             }
+
             if (customNamer != null) {
                 customNamer.postprocess(graph);
             }
@@ -505,8 +577,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             generateElevationProfiles(graph);
 
             applyBikeSafetyFactor(graph);
-            StreetUtils.makeEdgeBased(graph, endpoints, turnRestrictions);
-
         } // END buildGraph()
 
         private void processBikeRentalNodes() {
@@ -834,10 +904,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
         private void buildBasicGraph() {
 
-            /* build an ordinary graph, which we will convert to an edge-based graph */
+            /* build the street segment graph from OSM ways */
             long wayIndex = 0;
 
-            for (OSMWay way : _ways.values()) {
+           WAY: for (OSMWay way : _ways.values()) {
 
                 if (wayIndex % 10000 == 0)
                     _log.debug("ways=" + wayIndex + "/" + _ways.size());
@@ -854,7 +924,34 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 if (permissions == StreetTraversalPermission.NONE)
                     continue;
 
-                List<Long> nodes = way.getNodeRefs();
+                //handle duplicate nodes in OSM ways
+                //this is a workaround for crappy OSM data quality
+                ArrayList<Long> nodes = new ArrayList<Long>(way.getNodeRefs().size());
+                long last = -1;
+                double lastLat = -1, lastLon = -1;
+                String lastLevel = null;
+                for (long nodeId : way.getNodeRefs()) {
+                    OSMNode node = _nodes.get(nodeId);
+                    if (node == null)
+                        continue WAY;
+                    boolean levelsDiffer = false;
+                    String level = node.getTag("level");
+                    if (lastLevel == null) {
+                        if (level != null) {
+                            levelsDiffer = true;
+                        }
+                    } else {
+                        if (!lastLevel.equals(level)) {
+                            levelsDiffer = true;
+                        }
+                    }
+                    if (nodeId != last && (node.getLat() != lastLat || node.getLon() != lastLon || levelsDiffer))
+                        nodes.add(nodeId);
+                    last = nodeId;
+                    lastLon = node.getLon();
+                    lastLat = node.getLat();
+                    lastLevel = level;
+                }
 
                 IntersectionVertex startEndpoint = null, endEndpoint = null;
 
@@ -867,6 +964,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                  * any other edge, do not create endpoints -- just accumulate them for geometry and
                  * ele tags. For nodes which are shared, create endpoints and StreetVertex
                  * instances.
+                 * One exception: if the next vertex also appears earlier in the way, we need
+                 * to split the way, because otherwise we have a way that loops from a vertex to
+                 * itself, which could cause issues with splitting.
                  */
                 Long startNode = null;
                 //where the current edge should start
@@ -912,7 +1012,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                             segmentStartOSMNode.getLat(), segmentStartOSMNode.getLon(),
                             osmEndNode.getLat(), osmEndNode.getLon());
 
-                    if (intersectionNodes.containsKey(endNode) || i == nodes.size() - 2) {
+            if (intersectionNodes.containsKey(endNode)
+                    || i == nodes.size() - 2
+                    || nodes.subList(0, i).contains(nodes.get(i))) {
                         segmentCoordinates.add(getCoordinate(osmEndNode));
                         ele = osmEndNode.getTag("ele");
                         if (ele != null) {
@@ -1099,11 +1201,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             if (restrictionTags != null) {
                 for (TurnRestrictionTag tag : restrictionTags) {
                     if (tag.via == startNode) {
-                        TurnRestriction restriction = turnRestrictionsByTag.get(tag);
-                        restriction.from = backStreet;
+                        tag.possibleFrom.add(backStreet);
                     } else if (tag.via == endNode) {
-                        TurnRestriction restriction = turnRestrictionsByTag.get(tag);
-                        restriction.from = street;
+                        tag.possibleFrom.add(street);
                     }
                 }
             }
@@ -1112,11 +1212,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             if (restrictionTags != null) {
                 for (TurnRestrictionTag tag : restrictionTags) {
                     if (tag.via == startNode) {
-                        TurnRestriction restriction = turnRestrictionsByTag.get(tag);
-                        restriction.to = street;
+                        tag.possibleTo.add(street);
                     } else if (tag.via == endNode) {
-                        TurnRestriction restriction = turnRestrictionsByTag.get(tag);
-                        restriction.to = backStreet;
+                        tag.possibleTo.add(backStreet);
                     }
                 }
             }
@@ -1482,21 +1580,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         /**
-         * A temporary holder for turn restrictions while we have only way/node ids but not yet edge
-         * objects
-         */
-        class TurnRestrictionTag {
-            private long via;
-
-            private TurnRestrictionType type;
-
-            TurnRestrictionTag(long via, TurnRestrictionType type) {
-                this.via = via;
-                this.type = type;
-            }
-        }
-
-        /**
          * Store turn restrictions for use in StreetUtils.makeEdgeBased.
          * 
          * @param relation
@@ -1532,32 +1615,30 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     }
                 }
             }
-            modes = TraverseMode.internSet(modes);
 
             TurnRestrictionTag tag;
             if (relation.isTag("restriction", "no_right_turn")) {
-                tag = new TurnRestrictionTag(via, TurnRestrictionType.NO_TURN);
+                tag = new TurnRestrictionTag(via, TurnRestrictionType.NO_TURN, Direction.RIGHT);
             } else if (relation.isTag("restriction", "no_left_turn")) {
-                tag = new TurnRestrictionTag(via, TurnRestrictionType.NO_TURN);
+                tag = new TurnRestrictionTag(via, TurnRestrictionType.NO_TURN, Direction.LEFT);
             } else if (relation.isTag("restriction", "no_straight_on")) {
-                tag = new TurnRestrictionTag(via, TurnRestrictionType.NO_TURN);
+                tag = new TurnRestrictionTag(via, TurnRestrictionType.NO_TURN, Direction.STRAIGHT);
             } else if (relation.isTag("restriction", "no_u_turn")) {
-                tag = new TurnRestrictionTag(via, TurnRestrictionType.NO_TURN);
+                tag = new TurnRestrictionTag(via, TurnRestrictionType.NO_TURN, Direction.U);
             } else if (relation.isTag("restriction", "only_straight_on")) {
-                tag = new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN);
+                tag = new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN, Direction.STRAIGHT);
             } else if (relation.isTag("restriction", "only_right_turn")) {
-                tag = new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN);
+                tag = new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN, Direction.RIGHT);
             } else if (relation.isTag("restriction", "only_left_turn")) {
-                tag = new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN);
+                tag = new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN, Direction.LEFT);
+            } else if (relation.isTag("restriction", "only_u_turn")) {
+                tag = new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN, Direction.U);
             } else {
                 _log.warn(GraphBuilderAnnotation.register(graph, Variety.TURN_RESTRICTION_UNKNOWN,
                         relation.getTag("restriction")));
                 return;
             }
-            TurnRestriction restriction = new TurnRestriction();
-            restriction.type = tag.type;
-            restriction.modes = modes;
-            turnRestrictionsByTag.put(tag, restriction);
+            tag.modes = new TraverseModeSet(modes);
 
             MapUtils.addToMapList(turnRestrictionsByFromWay, from, tag);
             MapUtils.addToMapList(turnRestrictionsByToWay, to, tag);
@@ -1799,7 +1880,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             street.setId(id);
 
             String highway = way.getTag("highway");
-            if ("footway".equals(highway) && way.isTag("footway", "crossing") && !way.isTag("bicycle", "designated")) {
+            if ("crossing".equals(highway) && !way.isTag("bicycle", "designated")) {
+                street.setStreetClass(StreetEdge.CLASS_CROSSING);
+            } else if ("footway".equals(highway) && way.isTag("footway", "crossing") && !way.isTag("bicycle", "designated")) {
                 street.setStreetClass(StreetEdge.CLASS_CROSSING);
             } else if ("residential".equals(highway) || "tertiary".equals(highway)
                     || "secondary".equals(highway) || "secondary_link".equals(highway)

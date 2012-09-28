@@ -10,6 +10,7 @@ import org.onebusaway.gtfs.model.ServiceCalendarDate;
 public class ServiceCalendarData {
     @XmlElement
     public List<ServiceCalendar> calendars;
+
     @XmlElement
     public List<ServiceCalendarDate> calendarDates;
 }

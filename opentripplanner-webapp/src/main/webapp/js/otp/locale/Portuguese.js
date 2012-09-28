@@ -23,7 +23,7 @@ otp.locale.Portuguese = {
     config : 
     {
         metricsSystem : "international",
-        rightClickMsg : "Clique com o butão direito em cima do mapa para escoger os pontos de origen e destino.",
+        rightClickMsg : "Clique com o botão direito em cima do mapa para escolher os pontos de origem e destino.",
         attribution   : {
             title   : "License Attribution",
             content : "Disclaimer goes here"  // TODO localize
@@ -34,13 +34,13 @@ otp.locale.Portuguese = {
     {
         fromHere         : "Começar uma viagem daqui",
         toHere           : "Acabar uma viagem aqui",
-        intermediateHere : "Adicionar um ponto intermediario",
+        intermediateHere : "Adicionar um ponto intermediário",
 
-        centerHere       : "Center map here",
-        zoomInHere       : "Zoom in",
-        zoomOutHere      : "Zoom out",
-        previous         : "Último posição do mapa",
-        next             : "Próximo posição do mapa"
+        centerHere       : "Centralizar o mapa aqui",
+        zoomInHere       : "Mais zoom",
+        zoomOutHere      : "Menos zoom",
+        previous         : "Última posição do mapa",
+        next             : "Próxima posição do mapa"
     },
 
     // TODO Localize Me
@@ -58,7 +58,7 @@ otp.locale.Portuguese = {
 
     service : 
     {
-        weekdays:  "Dias semanais",
+        weekdays:  "Dias de semana",
         saturday:  "Sábado",
         sunday:    "Domingo",
         schedule:  "Horário"
@@ -67,20 +67,20 @@ otp.locale.Portuguese = {
     indicators : 
     {
         ok         : "OK",
-        date       : "Dato",
+        date       : "Data",
         loading    : "Carregando",
         searching  : "Buscando...",
-        qEmptyText : "Endereço, encruzilhada, ponto de referência ou ID de Parada..."
+        qEmptyText : "Endereço, cruzamento, ponto de referência ou ID de Parada..."
     },
 
     buttons: 
     {
-        reverse       : "Invertar",
-        reverseTip    : "<b>Invertar direções</b><br/>Planejar uma viagem de volta por invertar o origem e destino desse plano e ajustar o tempo pra frente.",
+        reverse       : "Inverter",
+        reverseTip    : "<b>Inverter direções</b><br/>Planejar uma viagem de volta invertendo a origem e o destino desse plano e ajustando o tempo pra frente.",
         reverseMiniTip: "Direções inversas",
 
         edit          : "Editar",
-        editTip       : "<b>Edit trip</b><br/>Volta ao original forma de planeajamento com os detalhes dessa viagem.",
+        editTip       : "<b>Editar viagem</b><br/>Volta ao original forma de planeajamento com os detalhes dessa viagem.",
 
         clear         : "Limpar mapa",
         clearTip      : "<b>Limpar mapa</b><br/>Limpar o mapa e todas as ferramentas ativas.",
@@ -92,18 +92,18 @@ otp.locale.Portuguese = {
         printTip      : "<b>Imprimir</b><br/>Versão de impressão do plano de viagem (sem mapa).",
 
         link          : "Link",
-        linkTip      : "<b>Link</b><br/>Mostra o link url para este plano de viagem
+        linkTip      : "<b>Link</b><br/>Mostra o endereço url para este plano de viagem",
 
         feedback      : "Feedback",
-        feedbackTip   : "<b>Feedback</b><br/>Manda seus experiências ou problemas com o mapa",
+        feedbackTip   : "<b>Feedback</b><br/>Mande suas experiências ou problemas com o mapa",
 
-        submit       : "Entrega",
+        submit       : "Submeter",
         clearButton  : "Limpar",
         ok           : "OK",
         cancel       : "Cancelar",
         yes          : "Sim",
         no           : "Não",
-        showDetails  : "Mostra detalhes...",
+        showDetails  : "Mostrar detalhes...",
         hideDetails  : "Ocultar detalhes..."
     },
 
@@ -121,19 +121,19 @@ otp.locale.Portuguese = {
         bound:          "pelo",
         left:           "esquerda",
         right:          "direito",
-        slightly_left:  "esquerda ligeira",
-        slightly_right: "direito ligeira",
-        hard_left:      "esquerda rápida",
-        hard_right:     "direito rápida",
-        'continue':     "continuar",
+        slightly_left:  "curva suave à esquerda",
+        slightly_right: "curva suave à direita",
+        hard_left:      "curva acentuada à esquerda",
+        hard_right:     "curva acentuada à direita",
+        'continue':     "continue",
         to_continue:    "continuar",
         becomes:        "torna-se",
         at:             "a(o)",
         on:             "no(a)",
         to:             "à",
         via:            "pelo(a)",
-        circle_counterclockwise: "take roundabout counterclockwise",
-        circle_clockwise:        "take roundabout clockwise"
+        circle_counterclockwise: "entre na rotatória em sentido anti-horário",
+        circle_clockwise:        "entre na rotatória em sentido horário"
     },
 
     // see otp.planner.Templates for use
@@ -161,14 +161,14 @@ otp.locale.Portuguese = {
         arrive       : "Chegar",
 
         start_at     : "Começar a",
-        end_at       : "Terminar a
+        end_at       : "Terminar a"
     },
 
     // see otp.planner.Templates for use
     labels : 
     {
         agency_msg   : "Operado por", // TODO
-        agency_msg_tt: "Abre o site da agência num novo página...", // TODO
+        agency_msg_tt: "Abre o site da agência numa nova página...", // TODO
         about        : "Sobre",
         stop_id      : "ID da parada",
         trip_details : "Detalhes da Viagem",
@@ -180,7 +180,7 @@ otp.locale.Portuguese = {
         student_fare : "",
         senior_fare  : "",
 
-        travel       : "Viaga",
+        travel       : "Viagem",
         valid        : "Válido(a)",
         trip_length  : "Tempo",
         with_a_walk  : "com um andamento de",
@@ -262,10 +262,10 @@ otp.locale.Portuguese = {
             from          : "Desde",
             fromHere      : "Daqui",
             intermediate  : "Lugar intermediario",
-            to            : "Á",
+            to            : "À",
             toHere        : "Até aqui",
             minimize      : "Me mostra o(a)",
-            maxWalkDistance: "Distância máxima de andamento",
+            maxWalkDistance: "Distância máxima andando",
             maxBikeDistance: "Distância máxima de bicicleta",
             arriveDepart  : "Chegar por/Embarcar à",
             mode          : "Viaga por",
@@ -294,34 +294,34 @@ otp.locale.Portuguese = {
             working      : "Buscando o endereço ....",
             error        : "Não há resultados",
             msg_title    : "Revisar plano da viagem",
-            msg_content  : "Favor, corrige os errores antes de planejar sua viagem",
-            select_result_title : "Favor, elege um resultado",
+            msg_content  : "Favor, corrija os erros antes de planejar sua viagem",
+            select_result_title : "Favor, escolha um resultado",
             address_header : "Endereço"
         },
 
         error:
         {
-            title        : 'Error de Planjedor de Viagem',
-            deadMsg      : "O Map Trip Planner não está respondendo no momento. Favor, espere uns minutos e tenta de novo, ou usa o planejador de texto (veja o link em baixo).",
-            geoFromMsg   : "Escolhe o 'Origem' da sua viagem: ",
-            geoToMsg     : "Escolhe o 'Destino' da sua viagem: "
+            title        : 'Error de Planejador de Viagem',
+            deadMsg      : "O Map Trip Planner não está respondendo no momento. Favor, espere uns minutos e tente de novo, ou usa o planejador de texto (veja o link em baixo).",
+            geoFromMsg   : "Escolha a 'Origem' da sua viagem: ",
+            geoToMsg     : "Escolha o 'Destino' da sua viagem: "
         },
         
         // default messages from server if a message was not returned
         msgcodes:
         {
             200: "Plano OK",
-            500: "Error do servidor",
+            500: "Erro do servidor",
             400: "Viagem fora dos limites",
             404: "Caminho não encontrado",
-            406: "Sem tempos de tránsito disponíveis",
+            406: "Sem tempos de trânsito disponíveis",
             408: "Solicitação expirou",
-            413: "Parámetro inválido",
+            413: "Parâmetro inválido",
             440: "Geocode do destino não encontrado",
             450: "Geocode do origem não encontrado",
-            460: "Geocodes não encontrado (origem e destino)",
-            470: "Não accesivel por cadiera de rodas",
-            409: "Perto de mais",
+            460: "Geocodes não encontrados (origem e destino)",
+            470: "Não accesivel por cadeira de rodas",
+            409: "Perto demais",
             340: "Ambíguo Geocode de origem",
             350: "Ambíguo Geocode de destino",
             360: "Amíguo Geocodes (origem e destino)"
@@ -329,10 +329,10 @@ otp.locale.Portuguese = {
 
         options: 
         [
-          ['TRANSFERS', 'Menor transferências'],
+          ['TRANSFERS', 'Menos transferências'],
           ['QUICK',     'Viagem curta'],
           ['SAFE',      'Possível por bicicleta'],
-          ['TRIANGLE',  'Viagem personalizado...']
+          ['TRIANGLE',  'Viagem personalizada...']
         ],
     
         arriveDepart: 
@@ -352,14 +352,14 @@ otp.locale.Portuguese = {
 
         mode : 
         [
-            ['TRANSIT,WALK', 'Transit'],
+            ['TRANSIT,WALK', 'Trânsito'],
 // DO WE REALLY NEED THIS?  ISN'T BUS & TRAIN the same as TRANSIT, WALK
 //          ['BUSISH,TRAINISH,WALK', 'Bus & Train'],
-            ['BUSISH,WALK', 'Bus only'],
-            ['TRAINISH,WALK', 'Train only'],
-            ['WALK', 'Walk only'],
-            ['BICYCLE', 'Bicycle'],
-            ['TRANSIT,BICYCLE', 'Transit & Bicycle']
+            ['BUSISH,WALK', 'Apenas ônibus'],
+            ['TRAINISH,WALK', 'Apenas trem'],
+            ['WALK', 'Apenas caminhando'],
+            ['BICYCLE', 'Bicicleta'],
+            ['TRANSIT,BICYCLE', 'Trânsito & Bicicleta']
         ],
 
         wheelchair :

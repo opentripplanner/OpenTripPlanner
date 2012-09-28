@@ -19,12 +19,9 @@ import java.util.List;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.core.EdgeNarrative;
-import org.opentripplanner.routing.core.MutableEdgeNarrative;
 import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;
@@ -71,9 +68,9 @@ public class GraphPath {
         State lastState;
         walkDistance = s.getWalkDistance();
         if (back) {
-            lastState = optimize ? optimize(s) : reverse(s);
+            lastState = optimize ? s.optimize() : s.reverse();
         } else {
-            lastState = optimize ? reverse(optimize(s)) : s;
+            lastState = optimize ? s.optimize().reverse() : s;
         }
         // DEBUG
         // lastState = s;
@@ -125,8 +122,8 @@ public class GraphPath {
     public List<RouteSpec> getRouteSpecs() {
         List<RouteSpec> ret = new LinkedList<RouteSpec>();
         for (State s : states) {
-            EdgeNarrative e = s.getBackEdgeNarrative();
-            Trip trip = e.getTrip();
+            Edge e = s.getBackEdge();
+            Trip trip = s.getBackTrip();
             if ( trip != null) {
                 String routeName = GtfsLibrary.getRouteName(trip.getRoute());
                 RouteSpec spec = new RouteSpec(trip.getId().getAgencyId(), routeName);
@@ -145,9 +142,9 @@ public class GraphPath {
     public List<AgencyAndId> getTrips() {
         List<AgencyAndId> ret = new LinkedList<AgencyAndId>();
         for (State s : states) {
-            EdgeNarrative e = s.getBackEdgeNarrative();
+            Edge e = s.getBackEdge();
             if (e == null) continue;
-            Trip trip = e.getTrip();
+            Trip trip = s.getBackTrip();
             if (trip != null)
                 ret.add(trip.getId());
         }
@@ -177,80 +174,6 @@ public class GraphPath {
     /****
      * Private Methods
      ****/
-
-    /**
-     * Reverse the path implicit in the given state, i.e. produce a new chain of states that leads
-     * from this state to the other end of the implicit path.
-     */
-    private static State reverse(State orig) {
-
-        State ret = orig.reversedClone();
-
-        while (orig.getBackState() != null) {
-            Edge edge = orig.getBackEdge();
-            EdgeNarrative narrative = orig.getBackEdgeNarrative();
-            StateEditor editor = ret.edit(edge, narrative);
-            // note the distinction between setFromState and setBackState
-            editor.setFromState(orig);
-            editor.incrementTimeInSeconds(orig.getAbsTimeDeltaSec());
-            editor.incrementWeight(orig.getWeightDelta());
-            if (orig.isBikeRenting() != orig.getBackState().isBikeRenting())
-            	editor.setBikeRenting(!orig.isBikeRenting());
-            ret  = editor.makeState();
-            orig = orig.getBackState();
-        }
-
-        return ret;
-    }
-
-    /**
-     * Reverse the path implicit in the given state, re-traversing all edges in the opposite
-     * direction so as to remove any unnecessary waiting in the resulting itinerary. This produces a
-     * path that passes through all the same edges, but which may have a shorter overall duration
-     * due to different weights on time-dependent (e.g. transit boarding) edges.
-     * 
-     * @param s
-     *            - a state resulting from a path search
-     * @return a state at the other end of a reversed, optimized path
-     */
-    // optimize is now very similar to reverse, and the two could conceivably be combined
-    private static State optimize(State orig) {
-        State unoptimized = orig;
-    	State ret = orig.reversedClone();
-        Edge edge = null;
-        try {
-            while (orig.getBackState() != null) {
-                edge = orig.getBackEdge();
-                ret = edge.traverse(ret);
-                EdgeNarrative origNarrative = orig.getBackEdgeNarrative();
-                EdgeNarrative retNarrative = ret.getBackEdgeNarrative();
-                copyExistingNarrativeToNewNarrativeAsAppropriate(origNarrative, retNarrative);
-                orig = orig.getBackState();
-            }
-        } catch (NullPointerException e) {
-            LOG.warn("Cannot reverse path at edge: " + edge
-                    + " returning unoptimized path.  If edge is a PatternInterlineDwell,"
-                    + " this is not totally unexpected; otherwise, you might want to"
-                    + " look into it");
-            return reverse(unoptimized);
-        }
-        return ret;
-    }
-
-    private static void copyExistingNarrativeToNewNarrativeAsAppropriate(EdgeNarrative from,
-            EdgeNarrative to) {
-
-        if (!(to instanceof MutableEdgeNarrative))
-            return;
-
-        MutableEdgeNarrative m = (MutableEdgeNarrative) to;
-
-        if (to.getFromVertex() == null)
-            m.setFromVertex(from.getFromVertex());
-
-        if (to.getToVertex() == null)
-            m.setToVertex(from.getToVertex());
-    }
 
     public void dump() {
         System.out.println(" --- BEGIN GRAPHPATH DUMP ---");

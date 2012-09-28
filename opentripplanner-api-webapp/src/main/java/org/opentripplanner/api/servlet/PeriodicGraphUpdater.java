@@ -18,7 +18,6 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-@Component
 public class PeriodicGraphUpdater {
     private UpdateTask updater;
 
@@ -31,7 +30,10 @@ public class PeriodicGraphUpdater {
     public void start() {
         updater = new UpdateTask();
         thread = new Thread(updater);
+        // is there any reason this can't be a daemon thread? seems like a good fit.
         thread.setDaemon(false);
+        // useful to name threads for debugging / profiling
+        thread.setName("Graph Updater Thread");
         thread.start();
     }
 

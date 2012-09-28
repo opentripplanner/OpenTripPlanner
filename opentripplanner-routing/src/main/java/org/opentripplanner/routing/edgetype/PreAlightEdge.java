@@ -131,6 +131,7 @@ public class PreAlightEdge extends FreeEdge {
             s1.setEverBoarded(true);
             long wait_cost = t0 - alight_before;
             s1.incrementWeight(wait_cost + transfer_penalty);
+            s1.setBackMode(getMode());
             return s1.makeState();
         } else {
             /* Forward traversal: not so much to do */
@@ -141,6 +142,7 @@ public class PreAlightEdge extends FreeEdge {
             }
             s1.alightTransit();
             s1.incrementTimeInSeconds(options.getAlightSlack());
+            s1.setBackMode(getMode());
             return s1.makeState();
         }
     }
@@ -153,6 +155,7 @@ public class PreAlightEdge extends FreeEdge {
         // do not include minimum transfer time in heuristic weight
         // (it is path-dependent)
         StateEditor s1 = s0.edit(this);
+        s1.setBackMode(getMode());
         return s1.makeState();
     }
 

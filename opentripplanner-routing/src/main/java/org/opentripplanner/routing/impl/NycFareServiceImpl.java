@@ -27,7 +27,6 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.edgetype.HopEdge;
-import org.opentripplanner.routing.edgetype.PatternBoard;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.services.FareService;
@@ -55,7 +54,7 @@ enum NycFareState {
  * (3) MNR, LIRR, and LI Bus are not supported -- only subways and buses   
  */
 public class NycFareServiceImpl implements FareService, Serializable {
-    private static final Logger _log = LoggerFactory.getLogger(PatternBoard.class);
+        private static final Logger _log = LoggerFactory.getLogger(NycFareServiceImpl.class);
 
 	private static final long serialVersionUID = 1L;
 
@@ -124,7 +123,7 @@ public class NycFareServiceImpl implements FareService, Serializable {
 					newRide.firstStop = ((HopEdge) backEdge).getStartStop();
 
 					newRide.route = routeId;
-					Trip trip = state.getBackEdgeNarrative().getTrip();
+					Trip trip = state.getBackTrip();
 					Route route = trip.getRoute();
 					int type = route.getType();
 					newRide.classifier = type;

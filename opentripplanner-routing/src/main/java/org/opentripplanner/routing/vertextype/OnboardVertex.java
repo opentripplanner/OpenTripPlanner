@@ -21,16 +21,16 @@ public abstract class OnboardVertex extends TransitVertex {
 
     private static final long serialVersionUID = 1L;
 
-    // remember to have optimizetransit builder change these
-    //private final TripPattern tripPattern;
+    private final TableTripPattern tripPattern; // set to null for non-pattern vertices
+    // (or just use patterns for everything, eliminating simple hops)
     
     public OnboardVertex(Graph g, String label, TableTripPattern tripPattern, Stop stop) {
         super(g, label, stop);
-        //this.tripPattern = tripPattern;
+        this.tripPattern = tripPattern;
     }
 
-//    public TripPattern getTripPattern() {
-//        return tripPattern;
-//    }
+    public TableTripPattern getTripPattern() {
+        return tripPattern;
+    }
     
 }

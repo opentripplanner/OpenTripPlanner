@@ -13,6 +13,7 @@
 
 package org.opentripplanner.api.servlet;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -27,17 +28,13 @@ import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
 public class ApiServlet extends SpringServlet {
     private static final long serialVersionUID = -9081567116972786015L;
 
-    private PeriodicGraphUpdater updater;
+    @Autowired(required=false) private PeriodicGraphUpdater updater;
 
-    @Autowired(required=false)
-    public void setPeriodicGraphUpdater(PeriodicGraphUpdater updater) {
-        this.updater = updater;
-        updater.start();
-    }
+//    @Autowired(required=false) private PeriodicGraphUpdater updater;
 
-    public PeriodicGraphUpdater getPeriodicGraphUpdater() {
-        return updater;
-    }
+//    public PeriodicGraphUpdater getPeriodicGraphUpdater() {
+//        return updater;
+//    }
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -46,6 +43,10 @@ public class ApiServlet extends SpringServlet {
         WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
         AutowireCapableBeanFactory autowireCapableBeanFactory = webApplicationContext.getAutowireCapableBeanFactory();
         autowireCapableBeanFactory.autowireBean(this);
+        // do not use a postconstruct method to start threads - 
+        // in this class it would be called before the XML context is prepared
+        if (updater != null)
+            updater.start();
     }
     
     @Override

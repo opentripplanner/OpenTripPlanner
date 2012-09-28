@@ -23,11 +23,11 @@ import java.util.List;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
-import org.opentripplanner.routing.core.EdgeNarrative;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
 import org.opentripplanner.routing.edgetype.HopEdge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +57,7 @@ public class CheckGeometryGraphBuilderImpl implements GraphBuilder {
     }
     
     private static final Logger _log = LoggerFactory.getLogger(CheckGeometryGraphBuilderImpl.class);
-    private static final double MAX_VERTEX_SHAPE_ERROR = 100;
+    private static final double MAX_VERTEX_SHAPE_ERROR = 150;
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
@@ -67,7 +67,8 @@ public class CheckGeometryGraphBuilderImpl implements GraphBuilder {
                 _log.warn(GraphBuilderAnnotation.register(graph, Variety.BOGUS_VERTEX_GEOMETRY, gv));
             }
             
-            for (EdgeNarrative e : filter(gv.getOutgoing(),EdgeNarrative.class)) {
+            // TODO: This was filtered to EdgeNarratives before EdgeNarrative removal
+            for (Edge e : gv.getOutgoing()) {
                 Geometry g = e.getGeometry();
                 if (g == null) {
                     continue;

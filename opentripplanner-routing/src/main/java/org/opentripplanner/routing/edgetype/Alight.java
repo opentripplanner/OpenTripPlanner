@@ -13,7 +13,6 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.ServiceDay;
@@ -21,10 +20,10 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.graph.AbstractEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 
 /**
  * Models alighting from a vehicle - that is to say, traveling from a station on vehicle to a
@@ -32,7 +31,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * previous arrival, in addition the pattern that was boarded. When traversed forwards, the result
  * state is unchanged. An boarding penalty can also be applied to discourage transfers.
  */
-public class Alight extends AbstractEdge implements OnBoardReverseEdge {
+public class Alight extends Edge implements OnBoardReverseEdge {
 
     public Hop hop;
 
@@ -64,7 +63,7 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
         return 0;
     }
 
-    public Geometry getGeometry() {
+    public LineString getGeometry() {
         return null;
     }
 
@@ -93,7 +92,7 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
             // backward traversal: find an appropriate transit trip
             if (!options.getModes().contains(hop.getMode()))
                 return null;
-            TraverseMode mode = s0.getNonTransitMode(options);
+            TraverseMode mode = s0.getNonTransitMode();
             if (mode.equals(TraverseMode.BICYCLE) && !hop.getBikesAllowed())
                 return null;
             long current_time = s0.getTime();
@@ -126,6 +125,7 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
             s1.setTripId(trip.getId());
             s1.setZone(zone);
             s1.setRoute(trip.getRoute().getId());
+            s1.setBackMode(getMode());
             return s1.makeState();
         } else {
             // forward traversal
@@ -134,6 +134,7 @@ public class Alight extends AbstractEdge implements OnBoardReverseEdge {
             s1.setTripId(null);
             s1.setLastAlightedTime(s0.getTime());
             s1.setPreviousStop(tov);
+            s1.setBackMode(getMode());
             return s1.makeState();
         }
     }

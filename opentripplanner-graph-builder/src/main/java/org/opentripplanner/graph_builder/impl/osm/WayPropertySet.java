@@ -26,7 +26,9 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.patch.Alert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import lombok.Data;
 
+@Data
 public class WayPropertySet {
     private static Logger _log = LoggerFactory.getLogger(WayPropertySet.class);
 
@@ -40,6 +42,8 @@ public class WayPropertySet {
 
     public WayProperties defaultProperties;
 
+    private WayPropertySetSource base;
+
     public WayPropertySet() {
         /* sensible defaults */
         defaultProperties = new WayProperties();
@@ -49,6 +53,16 @@ public class WayPropertySet {
         creativeNamers = new ArrayList<CreativeNamerPicker>();
         slopeOverrides = new ArrayList<SlopeOverridePicker>();
         notes = new ArrayList<NotePicker>();
+    }
+
+    public void setBase(WayPropertySetSource base) {
+       this.base = base;
+       WayPropertySet props = base.getWayPropertySet();
+       creativeNamers = props.getCreativeNamers();
+       defaultProperties = props.defaultProperties;
+       notes = props.notes;
+       slopeOverrides = props.slopeOverrides;
+       wayProperties = props.wayProperties;
     }
 
     public WayProperties getDataForWay(OSMWithTags way) {
@@ -193,32 +207,8 @@ public class WayPropertySet {
         getCreativeNamers().add(new CreativeNamerPicker(spec, namer));
     }
 
-    public void setWayProperties(List<WayPropertyPicker> wayProperties) {
-        this.wayProperties = wayProperties;
-    }
-
-    public List<WayPropertyPicker> getWayProperties() {
-        return wayProperties;
-    }
-
-    public void setCreativeNamers(List<CreativeNamerPicker> creativeNamers) {
-        this.creativeNamers = creativeNamers;
-    }
-
-    public List<CreativeNamerPicker> getCreativeNamers() {
-        return creativeNamers;
-    }
-
     public void addNote(OSMSpecifier osmSpecifier, NoteProperties properties) {
         notes.add(new NotePicker(osmSpecifier, properties));
-    }
-
-    public void setSlopeOverrides(List<SlopeOverridePicker> slopeOverrides) {
-        this.slopeOverrides = slopeOverrides;
-    }
-
-    public List<SlopeOverridePicker> getSlopeOverrides() {
-        return slopeOverrides;
     }
 
     public void setSlopeOverride(OSMSpecifier spec, boolean override) {

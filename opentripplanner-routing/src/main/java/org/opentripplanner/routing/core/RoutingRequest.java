@@ -46,7 +46,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
     private static final Logger LOG = LoggerFactory.getLogger(RoutingRequest.class);
     private static final int CLAMP_ITINERARIES = 3;
-    private static final int CLAMP_TRANSFERS = 4;
+    private static final int CLAMP_TRANSFERS = 6;
 
     /* FIELDS UNIQUELY IDENTIFYING AN SPT REQUEST */
 
@@ -242,6 +242,12 @@ public class RoutingRequest implements Cloneable, Serializable {
     public long clampInitialWait;
 
     /**
+     * When true, reverse optimize this search on the fly whenever needed, rather than 
+     * reverse-optimizing the entire path when it's done.
+     */
+    public boolean reverseOptimizeOnTheFly = false;
+
+    /**
      * The routing context used to actually carry out this search. It is important to build States 
      * from TraverseOptions rather than RoutingContexts, and just keep a reference to the context 
      * in the TraverseOptions, rather than using RoutingContexts for everything because in some 
@@ -260,7 +266,6 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /** A transit stop that this trip must start from */
     private AgencyAndId startingTransitStopId;
-    
     
     /* CONSTRUCTORS */
     
@@ -681,7 +686,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && bikeRentalDropoffCost == other.bikeRentalDropoffCost
                 && useBikeRentalAvailabilityInformation == other.useBikeRentalAvailabilityInformation
                 && extensions.equals(other.extensions)
-                && clampInitialWait == other.clampInitialWait;
+                && clampInitialWait == other.clampInitialWait
+                && reverseOptimizeOnTheFly == other.reverseOptimizeOnTheFly;
     }
 
     /** Equality and hashCode should not consider the routing context, to allow SPT caching. */
@@ -702,7 +708,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + new Double(triangleSlopeFactor).hashCode() * 136372361
                 + new Double(triangleTimeFactor).hashCode() * 790052899
                 + new Double(stairsReluctance).hashCode() * 315595321
-                + new Long(clampInitialWait).hashCode() * 209477;
+                + new Long(clampInitialWait).hashCode() * 209477
+                + new Boolean(reverseOptimizeOnTheFly).hashCode() * 95112799;
         if (batch) {
             hashCode *= -1;
             hashCode += to.hashCode() * 1327144003;
@@ -726,12 +733,14 @@ public class RoutingRequest implements Cloneable, Serializable {
      * @return The road speed for a specific traverse mode.
      */
     public double getSpeed(TraverseMode mode) {
-        if (mode == TraverseMode.WALK)
+        switch (mode) {
+        case WALK:
             return walkSpeed;
-        if (mode == TraverseMode.BICYCLE)
+        case BICYCLE:
             return bikeSpeed;
-        if (mode == TraverseMode.CAR)
+        case CAR:
             return carSpeed;
+        }
         throw new IllegalArgumentException("getSpeed(): Invalid mode " + mode);
     }
 
@@ -787,5 +796,12 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public String getBannedRouteStr() {
         return getRouteSetStr(bannedRoutes);
+    }
+
+    public void setMaxWalkDistance(double maxWalkDistance) {
+        this.maxWalkDistance = maxWalkDistance;
+        if (walkingOptions != null && walkingOptions != this) {
+            this.walkingOptions.setMaxWalkDistance(maxWalkDistance);
+        }
     }
 }

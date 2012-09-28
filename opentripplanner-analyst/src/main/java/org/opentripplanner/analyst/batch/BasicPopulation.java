@@ -13,7 +13,6 @@ import lombok.Setter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.csvreader.CsvWriter;
 
@@ -30,9 +29,6 @@ public class BasicPopulation implements Population {
     @Setter @Getter 
     public List<IndividualFilter> filterChain = null; 
 
-    @Autowired 
-    IndividualFactory individualFactory;
-    
     private boolean[] skip = null;
     
     public BasicPopulation() {  }
@@ -57,12 +53,12 @@ public class BasicPopulation implements Population {
 
     @Override
     public void clearIndividuals(List<Individual> individuals) {
-        //
+        this.individuals.clear();
     }
 
     @Override
     public void createIndividuals() {
-        // nothing to do in basic population case
+        // nothing to do in the basic population case
     }
 
     @Override
@@ -101,27 +97,38 @@ public class BasicPopulation implements Population {
         this.writeCsv(outFileName, results);
     }
 
-    /** If a filter chain is specified, apply it to the individuals. To be called after loading individuals. */
+    /** 
+     * If a filter chain is specified, apply it to the individuals. Must be called after loading 
+     * or generating the individuals. Filtering does not actually remove individuals from the 
+     * population, it merely tags them as rejected. This is important for structured populations 
+     * like rasters, where we may need to write out all individuals including those that were 
+     * skipped.
+     */
     private void applyFilterChain() {
-        this.skip = new boolean[individuals.size()]; // init to false
-        if (filterChain == null)
+        this.skip = new boolean[individuals.size()]; // initialized to false
+        if (filterChain == null) // no filter chain, do not reject any individuals
             return;
         for (IndividualFilter filter : filterChain) {
-            LOG.debug("filter {}", filter);
-            int accepted = 0, rejected = 0;
+            LOG.debug("applying filter {}", filter);
+            int rejected = 0;
             int i = 0;
             for (Individual individual : this.individuals) {
                 boolean skipThis = ! filter.filter(individual);
                 if (skipThis)
                     rejected += 1;
-                else
-                    accepted += 1;
                 skip[i++] |= skipThis;
             }
-            LOG.debug("accepted {}, rejected {}", accepted, rejected);
+            LOG.debug("accepted {} rejected {}", skip.length - rejected, rejected);
         }
+        int rejected = 0;
+        for (boolean s : skip)
+            if (s)
+                rejected += 1;
+        LOG.debug("TOTALS: accepted {} rejected {}", skip.length - rejected, rejected);
+        
     }
 
+    @Override
     public void setup() {
         // call the subclass-specific file loading method
         this.createIndividuals();

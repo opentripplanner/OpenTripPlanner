@@ -13,7 +13,6 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.ServiceDay;
@@ -21,17 +20,17 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.graph.AbstractEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 
 /**
  * Models boarding a vehicle - that is to say, traveling from a station off vehicle to a station on
  * vehicle. When traversed forward, the the resultant state has the time of the next departure, in
  * addition the pattern that was boarded. When traversed backward, the result state is unchanged.
  */
-public class Board extends AbstractEdge implements OnBoardForwardEdge {
+public class Board extends Edge implements OnBoardForwardEdge {
 
     String start_id; // a street vertex's id
 
@@ -69,7 +68,7 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
         return 0;
     }
 
-    public Geometry getGeometry() {
+    public LineString getGeometry() {
         return null;
     }
 
@@ -98,12 +97,13 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
             s1.setLastAlightedTime(state0.getTime());
             s1.setPreviousStop(fromv);
             TransitUtils.handleBoardAlightType(s1, pickupType);
+            s1.setBackMode(getMode());
             return s1.makeState();
         } else {
             if (options.bannedTrips.contains(getTrip().getId())) {
                 return null;
             }
-            TraverseMode mode = state0.getNonTransitMode(options);
+            TraverseMode mode = state0.getNonTransitMode();
             // forward traversal: find a relevant transit trip
             if (!options.getModes().contains(hop.getMode())) {
                 return null;
@@ -145,6 +145,7 @@ public class Board extends AbstractEdge implements OnBoardForwardEdge {
             s1.setTripId(trip.getId());
             s1.setZone(zone);
             s1.setRoute(trip.getRoute().getId());
+            s1.setBackMode(getMode());
             return s1.makeState();
         }
     }

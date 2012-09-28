@@ -13,6 +13,8 @@
 
 package org.opentripplanner.api.ws;
 
+import java.util.HashMap;
+
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -33,7 +35,9 @@ import com.sun.jersey.api.spring.Autowire;
 public class Metadata {
 
     @Autowired GraphService graphService;
-    
+
+    HashMap<String, GraphMetadata> metadata = new HashMap<String, GraphMetadata>();
+
     /**
      * Returns metadata about the graph -- presently, this is just the extent of the graph.
      *
@@ -50,6 +54,12 @@ public class Metadata {
     public GraphMetadata getMetadata(
             @DefaultValue("") @QueryParam("routerId") String routerId)
             throws JSONException {
-        return new GraphMetadata(graphService.getGraph(routerId));
+
+        GraphMetadata data = metadata.get(routerId);
+        if (data == null) {
+            data = new GraphMetadata(graphService.getGraph(routerId));
+            metadata.put(routerId, data);
+        }
+        return data;
     }
 }

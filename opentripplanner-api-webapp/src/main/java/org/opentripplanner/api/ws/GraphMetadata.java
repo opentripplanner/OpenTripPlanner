@@ -18,7 +18,6 @@ import java.util.HashSet;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.graph.Edge;
@@ -41,9 +40,6 @@ public class GraphMetadata {
 
     private double centerLongitude;
 
-    @XmlElement
-    private MavenVersion serverVersion = MavenVersion.VERSION; 
-    
     public GraphMetadata() {
     	// 0-arg constructor avoids com.sun.xml.bind.v2.runtime.IllegalAnnotationsException
     }

@@ -15,10 +15,6 @@ package org.opentripplanner.common.geometry;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineSegment;

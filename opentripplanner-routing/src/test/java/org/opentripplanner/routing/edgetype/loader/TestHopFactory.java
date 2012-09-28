@@ -25,8 +25,7 @@ import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.edgetype.PatternAlight;
-import org.opentripplanner.routing.edgetype.PatternBoard;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
@@ -59,17 +58,20 @@ public class TestHopFactory extends TestCase {
         assertEquals(3, stop_b_depart.getDegreeOut());
 
         for (Edge e : stop_a.getOutgoing()) {
-            assertEquals(PatternBoard.class, e.getClass());
+            assertEquals(TransitBoardAlight.class, e.getClass());
+            assertTrue(((TransitBoardAlight) e).isBoarding());
         }
 
-        PatternBoard pb = (PatternBoard) stop_a.getOutgoing().iterator().next();
+        // TODO: could this ever be a PatternAlight? I think not.
+        TransitBoardAlight pb = (TransitBoardAlight) stop_a.getOutgoing().iterator().next();
         Vertex journey_a_1 = pb.getToVertex();
 
         assertEquals(1, journey_a_1.getDegreeIn());
 
         for (Edge e : journey_a_1.getOutgoing()) {
             if (e.getToVertex() instanceof TransitStop) {
-                assertEquals(PatternAlight.class, e.getClass());
+                assertEquals(TransitBoardAlight.class, e.getClass());
+                assertTrue(((TransitBoardAlight) e).isBoarding());
             } else {
                 assertEquals(PatternHop.class, e.getClass());
             }
