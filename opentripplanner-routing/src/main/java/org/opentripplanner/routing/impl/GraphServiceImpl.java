@@ -13,10 +13,10 @@
 
 package org.opentripplanner.routing.impl;
 
-import java.util.Collection;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -33,7 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.annotation.Scope;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.ResourcePatternResolver;
@@ -79,8 +78,9 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
     
     /** 
      * Sets a base path for graph loading from the filesystem. Serialized graph files will be 
-     * retrieved from sub-directories immediately below this directory. This does the same thing 
-     * as setResource, except the parameter is interpreted as a file path.
+     * retrieved from sub-directories immediately below this directory. The routerId of a graph is
+     * the same as the names of its sub-directory. This does the same thing as setResource, except 
+     * the parameter is interpreted as a file path.
      */
     public void setPath(String path) {
         this.resourceBase = "file:" + path;
