@@ -24,6 +24,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.math3.util.FastMath;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Frequency;
@@ -183,44 +184,45 @@ class IndexedLineSegment {
         this.index = index;
         this.start = start;
         this.end = end;
-        this.lineLength = distanceLibrary.distance(start, end);
+        this.lineLength = distanceLibrary.fastDistance(start, end);
     }
 
     // in radians
     static double bearing(Coordinate c1, Coordinate c2) {
-        double deltaLon = (c2.x - c1.x) * Math.PI / 180;
-        double lat1Radians = c1.y * Math.PI / 180;
-        double lat2Radians = c2.y * Math.PI / 180;
-        double y = Math.sin(deltaLon) * Math.cos(lat2Radians);
-        double x = Math.cos(lat1Radians)*Math.sin(lat2Radians) -
-                Math.sin(lat1Radians)*Math.cos(lat2Radians)*Math.cos(deltaLon);
-        return Math.atan2(y, x);
+        double deltaLon = (c2.x - c1.x) * FastMath.PI / 180;
+        double lat1Radians = c1.y * FastMath.PI / 180;
+        double lat2Radians = c2.y * FastMath.PI / 180;
+        double y = FastMath.sin(deltaLon) * FastMath.cos(lat2Radians);
+        double x = FastMath.cos(lat1Radians)*FastMath.sin(lat2Radians) -
+                FastMath.sin(lat1Radians)*FastMath.cos(lat2Radians)*FastMath.cos(deltaLon);
+        return FastMath.atan2(y, x);
     }
 
     double crossTrackError(Coordinate coord) {
-        double distanceFromStart = distanceLibrary.distance(start, coord);
+        double distanceFromStart = distanceLibrary.fastDistance(start, coord);
         double bearingToCoord = bearing(start, coord);
         double bearingToEnd = bearing(start, end);
-        return Math.asin(Math.sin(distanceFromStart / RADIUS)
-            * Math.sin(bearingToCoord - bearingToEnd))
+        return FastMath.asin(FastMath.sin(distanceFromStart / RADIUS)
+            * FastMath.sin(bearingToCoord - bearingToEnd))
             * RADIUS;
     }
 
     double distance(Coordinate coord) {
         //but it is also possible that we are way off one of the ends.  If that is so, the along-track
         //distance will be < 0 or > lineLength
-        double atd = alongTrackDistance(coord);
+        double cte = crossTrackError(coord);
+        double atd = alongTrackDistance(coord, cte);
         if (atd < 0) {
-            return distanceLibrary.distance(coord, start);
+            return distanceLibrary.fastDistance(coord, start);
         } else if (atd > lineLength) {
-            return distanceLibrary.distance(coord, end);
+            return distanceLibrary.fastDistance(coord, end);
         } else {
-            return Math.abs(crossTrackError(coord));
+            return FastMath.abs(cte);
         }
     }
 
     public double fraction(Coordinate coord) {
-        double atd = alongTrackDistance(coord);
+        double atd = alongTrackDistance(coord, crossTrackError(coord));
 
         if (atd < 0) {
             return 0;
@@ -231,10 +233,10 @@ class IndexedLineSegment {
         }
     }
 
-    private double alongTrackDistance(Coordinate coord) {
-        double distanceFromStart = distanceLibrary.distance(start, coord);
-        double alongTrackDistance = Math.acos(Math.cos(distanceFromStart / RADIUS)
-            / Math.cos(crossTrackError(coord) / RADIUS))
+    private double alongTrackDistance(Coordinate coord, double crossTrackError) {
+        double distanceFromStart = distanceLibrary.fastDistance(start, coord);
+        double alongTrackDistance = FastMath.acos(FastMath.cos(distanceFromStart / RADIUS)
+            / FastMath.cos(crossTrackError / RADIUS))
             * RADIUS;
         return alongTrackDistance;
     }
@@ -250,7 +252,7 @@ class IndexedLineSegmentComparator implements Comparator<IndexedLineSegment> {
 
     @Override
     public int compare(IndexedLineSegment a, IndexedLineSegment b) {
-        return (int) Math.signum(a.distance(coord) - b.distance(coord));
+        return (int) FastMath.signum(a.distance(coord) - b.distance(coord));
     }
 }
 
@@ -494,9 +496,11 @@ public class GTFSPatternHopFactory {
         graph.putService(ServiceIdToNumberService.class, new ServiceIdToNumberService(context.serviceIds));
     }
 
+    static int cg = 0;
     private <T extends Edge & HopEdge> void createGeometry(Graph graph, Trip trip,
             List<StopTime> stopTimes, List<T> hops) {
 
+        cg += 1;
         AgencyAndId shapeId = trip.getShapeId();
         if (shapeId == null || shapeId.getId() == null || shapeId.getId().equals(""))
             return;
@@ -553,7 +557,7 @@ public class GTFSPatternHopFactory {
                 Coordinate to = shape.getCoordinateN(j + 1);
                 double xd = from.x - to.x;
                 double yd = from.y - to.y;
-                distanceSoFar += Math.sqrt(xd * xd + yd * yd);
+                distanceSoFar += FastMath.sqrt(xd * xd + yd * yd);
             }
             last = startLocation.getSegmentIndex();
 
@@ -564,7 +568,7 @@ public class GTFSPatternHopFactory {
                 Coordinate to = shape.getCoordinateN(j + 1);
                 double xd = from.x - to.x;
                 double yd = from.y - to.y;
-                distanceSoFar += Math.sqrt(xd * xd + yd * yd);
+                distanceSoFar += FastMath.sqrt(xd * xd + yd * yd);
             }
             last = startLocation.getSegmentIndex();
             double endIndex = distanceSoFar + endLocation.getSegmentFraction() * endLocation.getSegmentLength(shape);
@@ -1197,9 +1201,9 @@ public class GTFSPatternHopFactory {
         
         Coordinate startCoord = new Coordinate(s0.getLon(), s0.getLat());
         Coordinate endCoord = new Coordinate(s1.getLon(), s1.getLat());
-        if (distanceLibrary.distance(startCoord, geometryStartCoord) > MAX_STOP_TO_SHAPE_DISTANCE) {
+        if (distanceLibrary.fastDistance(startCoord, geometryStartCoord) > MAX_STOP_TO_SHAPE_DISTANCE) {
             return false;
-        } else if (distanceLibrary.distance(endCoord, geometryEndCoord) > MAX_STOP_TO_SHAPE_DISTANCE) {
+        } else if (distanceLibrary.fastDistance(endCoord, geometryEndCoord) > MAX_STOP_TO_SHAPE_DISTANCE) {
             return false;
         }
         return true;
