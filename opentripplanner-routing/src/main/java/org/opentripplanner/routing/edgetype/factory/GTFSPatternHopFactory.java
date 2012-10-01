@@ -602,7 +602,7 @@ public class GTFSPatternHopFactory {
         Coordinate stopCoord = new Coordinate(stop.getLon(), stop.getLat());
 
         for (IndexedLineSegment segment : possibleSegmentsForStop.get(index)) {
-            if (segment.index <= prevSegmentIndex) {
+            if (segment.index < prevSegmentIndex) {
                 //can't go backwards along line
                 continue;
             }
