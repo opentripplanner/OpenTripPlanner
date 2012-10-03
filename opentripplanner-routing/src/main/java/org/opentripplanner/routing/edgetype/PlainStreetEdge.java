@@ -315,6 +315,9 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         if (timeLong != time) {
             timeLong++;
         }
+        if (traverseMode == TraverseMode.WALK && s0.getBackMode() == TraverseMode.BICYCLE) {
+            timeLong += 120;
+        }
         s1.incrementTimeInSeconds(timeLong);
         s1.incrementWeight(weight);
         if (s1.weHaveWalkedTooFar(options))
