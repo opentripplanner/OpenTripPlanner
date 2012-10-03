@@ -831,7 +831,7 @@ public class RaptorDataBuilder implements GraphBuilder {
 
     @Override
     public List<String> getPrerequisites() {
-        return Collections.emptyList();
+        return Arrays.asList("transitIndex");
     }
 
     @Override
