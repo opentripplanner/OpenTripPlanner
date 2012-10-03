@@ -191,8 +191,11 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 // generate names for corners when no name was given
                 // TODO: internationalize
                 Set<String> uniqueNameSet = new HashSet<String>();
-                for (Edge e : intersection.getOutgoing()) 
-                    uniqueNameSet.add(e.getName());
+                for (Edge e : intersection.getOutgoing()) {
+                    if (e instanceof StreetEdge) {
+                        uniqueNameSet.add(e.getName());
+                    }
+                }
                 List<String> uniqueNames = new ArrayList<String>(uniqueNameSet);
                 if (uniqueNames.size() > 1)
                     name = String.format("corner of %s and %s", uniqueNames.get(0),
