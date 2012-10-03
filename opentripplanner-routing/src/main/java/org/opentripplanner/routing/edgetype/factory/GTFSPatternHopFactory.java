@@ -208,28 +208,55 @@ class IndexedLineSegment {
     }
 
     double distance(Coordinate coord) {
-        //but it is also possible that we are way off one of the ends.  If that is so, the along-track
-        //distance will be < 0 or > lineLength
         double cte = crossTrackError(coord);
         double atd = alongTrackDistance(coord, cte);
-        if (atd < 0) {
-            return distanceLibrary.fastDistance(coord, start);
-        } else if (atd > lineLength) {
-            return distanceLibrary.fastDistance(coord, end);
+        double inverseAtd = inverseAlongTrackDistance(coord, -cte);
+        double distanceToStart = distanceLibrary.fastDistance(coord, start);
+        double distanceToEnd = distanceLibrary.fastDistance(coord, end);
+
+        if (distanceToStart < distanceToEnd) {
+            //we might be behind the line start
+            if (inverseAtd > lineLength) {
+                //we are behind line start
+                return distanceToStart;
+            } else {
+                //we are within line
+                return Math.abs(cte);
+            }
         } else {
-            return FastMath.abs(cte);
+            //we might be after line end
+            if (atd > lineLength) {
+                //we are behind line end, so we that's the nearest point
+                return distanceToEnd;
+            } else {
+                //we are within line
+                return Math.abs(cte);
+            }
         }
     }
 
-    public double fraction(Coordinate coord) {
-        double atd = alongTrackDistance(coord, crossTrackError(coord));
+    private double inverseAlongTrackDistance(Coordinate coord, double inverseCrossTrackError) {
+        double distanceFromEnd = distanceLibrary.fastDistance(end, coord);
+        double alongTrackDistance = FastMath.acos(FastMath.cos(distanceFromEnd / RADIUS)
+            / FastMath.cos(inverseCrossTrackError / RADIUS))
+            * RADIUS;
+        return alongTrackDistance;
+    }
 
-        if (atd < 0) {
-            return 0;
-        } else if (atd > lineLength) {
-            return 1;
-        } else {
+    public double fraction(Coordinate coord) {
+        double cte = crossTrackError(coord);
+        double distanceToStart = distanceLibrary.fastDistance(coord, start);
+        double distanceToEnd = distanceLibrary.fastDistance(coord, end);
+
+        if (cte < distanceToStart && cte < distanceToEnd) {
+            double atd = alongTrackDistance(coord, cte);
             return atd / lineLength;
+        } else {
+            if (distanceToStart < distanceToEnd) {
+                return 0;
+            } else {
+                return 1;
+            }
         }
     }
 
@@ -518,27 +545,88 @@ public class GTFSPatternHopFactory {
             return;
         }
         LineString shape = getLineStringForShapeId(shapeId);
+        if (shape == null) {
+            for (int i = 0; i < stopTimes.size() - 1; ++i) {
+                st0 = stopTimes.get(i);
+                StopTime st1 = stopTimes.get(i + 1);
+                LineString geometry = createSimpleGeometry(st0.getStop(), st1.getStop());
+                hops.get(i).setGeometry(geometry);
+            }
+            return;
+        }
         ArrayList<IndexedLineSegment> segments = new ArrayList<IndexedLineSegment>();
         for (int i = 0 ; i < shape.getNumPoints() - 1; ++i) {
             segments.add(new IndexedLineSegment(i, shape.getCoordinateN(i), shape.getCoordinateN(i + 1)));
         }
         //get possible segment matches for each stop
         List<List<IndexedLineSegment>> possibleSegmentsForStop = new ArrayList<List<IndexedLineSegment>>();
+        int minSegmentIndex = 0;
         for (int i = 0; i < stopTimes.size() ; ++i) {
             Stop stop = stopTimes.get(i).getStop();
             Coordinate coord = new Coordinate(stop.getLon(), stop.getLat());
             List<IndexedLineSegment> stopSegments = new ArrayList<IndexedLineSegment>();
+            double bestDistance = Double.MAX_VALUE;
+            IndexedLineSegment bestSegment = null;
+            int maxSegmentIndex = -1;
+            int index = -1;
+            int minSegmentIndexForThisStop = -1;
             for (IndexedLineSegment segment : segments) {
+                index ++;
+                if (segment.index < minSegmentIndex) {
+                    continue;
+                }
                 double distance = segment.distance(coord);
                 if (distance < MAX_STOP_TO_SHAPE_DISTANCE) {
                     stopSegments.add(segment);
+                    maxSegmentIndex = index;
+                    if (minSegmentIndexForThisStop == -1)
+                        minSegmentIndexForThisStop = index;
+                } else if (distance < bestDistance) {
+                    bestDistance = distance;
+                    bestSegment = segment;
+                    if (maxSegmentIndex != -1) {
+                        maxSegmentIndex = index;
+                    }
                 }
             }
-            Collections.sort(stopSegments, new IndexedLineSegmentComparator(coord));
+            if (stopSegments.size() == 0) {
+                //no segments within 150m
+                //fall back to nearest segment
+                stopSegments.add(bestSegment);
+                minSegmentIndex = bestSegment.index;
+            } else {
+                minSegmentIndex = minSegmentIndexForThisStop;
+                Collections.sort(stopSegments, new IndexedLineSegmentComparator(coord));
+            }
+
+            for (int j = i - 1; j >= 0; j --) {
+                for (Iterator<IndexedLineSegment> it = possibleSegmentsForStop.get(j).iterator(); it.hasNext(); ) {
+                    IndexedLineSegment segment = it.next();
+                    if (segment.index > maxSegmentIndex) {
+                        it.remove();
+                    }
+                }
+            }
             possibleSegmentsForStop.add(stopSegments);
         }
 
         List<LinearLocation> locations = getStopLocations(possibleSegmentsForStop, stopTimes, 0, -1);
+
+        if (locations == null) {
+            // this only happens on shape which have points very far from
+            // their stop sequence. So we'll fall back to trivial stop-to-stop
+            // linking, even though theoretically we could do better.
+
+            for (int i = 0; i < stopTimes.size() - 1; ++i) {
+                st0 = stopTimes.get(i);
+                StopTime st1 = stopTimes.get(i + 1);
+                LineString geometry = createSimpleGeometry(st0.getStop(), st1.getStop());
+                hops.get(i).setGeometry(geometry);
+                //this warning is not strictly correct, but will do
+                _log.warn(GraphBuilderAnnotation.register(graph, Variety.BOGUS_SHAPE_GEOMETRY_CAUGHT, shapeId, st0, st1));
+            }
+            return;
+        }
 
         Iterator<LinearLocation> locationIt = locations.iterator();
         LinearLocation endLocation = locationIt.next();
