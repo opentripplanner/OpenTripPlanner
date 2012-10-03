@@ -233,7 +233,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
         // then find closest walkable street
         StreetLocation closest_street = null;
-        CandidateEdgeBundle bundle = getClosestEdges(coordinate, options, extraEdges, null, 1);
+        CandidateEdgeBundle bundle = getClosestEdges(coordinate, options, extraEdges, null, false);
         CandidateEdge candidate = bundle.best;
         double closest_street_distance = Double.POSITIVE_INFINITY;
         if (candidate != null) {
@@ -278,6 +278,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
         private static final double SIDEWALK_PREFERENCE = 1.5;
 
+        private static final double CAR_PREFERENCE = 100;
+
         public final DistanceOp op;
 
         public final StreetEdge edge;
@@ -320,10 +322,15 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 // this is kind of a hack, but there's not really a better way to do it
                 score /= PLATFORM_PREFERENCE;
             }
-            if (e.getName().contains("sidewalk")
-                    || !e.getPermission().allows(StreetTraversalPermission.CAR)) {
+            if (e.getName().contains("sidewalk")) {
                 // this is kind of a hack, but there's not really a better way to do it
                 score /= SIDEWALK_PREFERENCE;
+            }
+            if (e.getPermission().allows(StreetTraversalPermission.CAR)) {
+                // we're subtracting here because no matter how close we are to a good
+                //non-car route, we really want to avoid it in case it's a Pedway or other
+                //weird and unlikely starting location
+                score -= CAR_PREFERENCE;
             }
             // break ties by choosing shorter edges; this should cause split streets to be preferred
             score += edge.getLength() / 1000000;
@@ -423,7 +430,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
      */
     @SuppressWarnings("unchecked")
     public CandidateEdgeBundle getClosestEdges(Coordinate coordinate, RoutingRequest request,
-            List<Edge> extraEdges, Collection<Edge> routeEdges, int restriction) {
+            List<Edge> extraEdges, Collection<Edge> routeEdges, boolean possibleTransitLinksOnly) {
         ArrayList<StreetEdge> extraStreets = new ArrayList<StreetEdge>();
         if (extraEdges != null)
             for (StreetEdge se : IterableLibrary.filter(extraEdges, StreetEdge.class))
@@ -458,21 +465,12 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                     continue;
                 if (request != null && (!(e.canTraverse(request) || e.canTraverse(walkingRequest))))
                     continue;
-                switch(restriction) {
-                case 0:
-                    break;
-                case 1:
-                    if (!e.getPermission().allows(StreetTraversalPermission.CAR)) {
-                        continue;
-                    }
-                    break;
-                case 2:
+                if (possibleTransitLinksOnly) {
                     if (!e.getPermission().allows(StreetTraversalPermission.CAR)) {
                         if ((e.getStreetClass() & StreetEdge.CLASS_PLATFORM) == 0) {
                             continue;
                         }
                     }
-                    break;
                 }
                 double preferrence = 1;
                 if (routeEdges != null && routeEdges.contains(e)) {
