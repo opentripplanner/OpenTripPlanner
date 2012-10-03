@@ -219,6 +219,8 @@ public class Raptor implements PathService {
         }
         Collections.sort(targetStates);
 
+        targetStates = targetStates.subList(0, options.getNumItineraries());
+
         List<GraphPath> paths = new ArrayList<GraphPath>();
         for (RaptorState targetState : targetStates) {
             // reconstruct path
