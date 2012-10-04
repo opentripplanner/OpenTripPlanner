@@ -279,8 +279,8 @@ public class VizGui extends JFrame implements VertexSelectionListener {
             e.printStackTrace();
         }
         indexService = graph.streetIndex;
-        pathservice.graphService = graphservice;
-        pathservice.sptService   = sptService;
+        pathservice.setGraphService(graphservice);
+        pathservice.setSptService(sptService);
         setTitle("VizGui: " + graphName);
         init();
     }
