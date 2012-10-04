@@ -265,6 +265,10 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
                 weight = length / speed;
             }
         } else {
+            if (options.isWalkingBike()) {
+                //take slopes into account when walking bikes
+                time = elevationProfileSegment.getSlopeSpeedEffectiveLength() / speed;
+            }
             weight = time;
         }
         if (isStairs()) {
@@ -314,9 +318,6 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         int timeLong = (int) time;
         if (timeLong != time) {
             timeLong++;
-        }
-        if (traverseMode == TraverseMode.WALK && s0.getBackMode() == TraverseMode.BICYCLE) {
-            timeLong += 120;
         }
         s1.incrementTimeInSeconds(timeLong);
         s1.incrementWeight(weight);
