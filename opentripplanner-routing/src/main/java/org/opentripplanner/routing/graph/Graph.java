@@ -97,7 +97,8 @@ public class Graph implements Serializable {
     
     public transient TimetableSnapshotSource timetableSnapshotSource = null;
     
-    private List<GraphBuilderAnnotation> graphBuilderAnnotations = null;
+    private List<GraphBuilderAnnotation> graphBuilderAnnotations = 
+            new LinkedList<GraphBuilderAnnotation>(); // initialize for tests
 
     private Collection<String> agenciesIds = new HashSet<String>();
 
