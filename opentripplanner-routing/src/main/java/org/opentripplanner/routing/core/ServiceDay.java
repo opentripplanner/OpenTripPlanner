@@ -55,6 +55,7 @@ public class ServiceDay implements Serializable {
         
         for (AgencyAndId serviceId : cs.getServiceIdsOnDate(sd)) {
             int n = service.getNumber(serviceId);
+            if (n < 0) continue;
 
             serviceIdsRunning[n / 32] |= (1 << (n % 32));
         }

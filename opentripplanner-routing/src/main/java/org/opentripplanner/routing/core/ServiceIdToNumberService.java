@@ -19,7 +19,7 @@ public class ServiceIdToNumberService implements Serializable {
     public int getNumber(AgencyAndId serviceId) {
         Integer number = numberForServiceId.get(serviceId);
         if (number == null) {
-            return numberForServiceId.size() + 1;
+            return -1;
         }
         return number;
     }
