@@ -18,8 +18,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 import org.opentripplanner.common.IterableLibrary;
-import org.opentripplanner.routing.core.GraphBuilderAnnotation;
-import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
+import org.opentripplanner.gbannotation.BikeRentalStationUnlinked;
+import org.opentripplanner.gbannotation.StopUnlinked;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -69,7 +69,7 @@ public class NetworkLinker {
             if (ts.isEntrance() || !ts.hasEntrances()) {
                 boolean wheelchairAccessible = ts.hasWheelchairEntrance();
                 if (!networkLinkerLibrary.connectVertexToStreets(ts, wheelchairAccessible).getResult()) {
-                    _log.warn(GraphBuilderAnnotation.register(graph, Variety.STOP_UNLINKED, ts));
+                    _log.warn(graph.addBuilderAnnotation(new StopUnlinked(ts)));
                     networkLinkerLibrary.connectVertexToStreets(ts, wheelchairAccessible);
                 }
             }
@@ -90,8 +90,7 @@ public class NetworkLinker {
         for (BikeRentalStationVertex brsv : IterableLibrary.filter(vertices,
                 BikeRentalStationVertex.class)) {
             if (!networkLinkerLibrary.connectVertexToStreets(brsv).getResult()) {
-                _log.warn(GraphBuilderAnnotation.register(graph,
-                        Variety.BIKE_RENTAL_STATION_UNLINKED, brsv));
+                _log.warn(graph.addBuilderAnnotation(new BikeRentalStationUnlinked(brsv)));
             }
         }
     }

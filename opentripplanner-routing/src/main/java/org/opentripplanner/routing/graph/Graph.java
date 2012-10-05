@@ -45,15 +45,15 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
+import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.gbannotation.GraphBuilderAnnotation;
+import org.opentripplanner.gbannotation.NoFutureDates;
 import org.opentripplanner.model.GraphBundle;
-import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
 import org.opentripplanner.routing.core.TransferTable;
-import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
 import org.opentripplanner.routing.edgetype.TimetableSnapshotSource;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
-import org.opentripplanner.common.MavenVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -97,7 +97,7 @@ public class Graph implements Serializable {
     
     public transient TimetableSnapshotSource timetableSnapshotSource = null;
     
-    private List<GraphBuilderAnnotation> graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>();
+    private List<GraphBuilderAnnotation> graphBuilderAnnotations = null;
 
     private Collection<String> agenciesIds = new HashSet<String>();
 
@@ -225,7 +225,7 @@ public class Graph implements Serializable {
         }
         for (String agency : agencies) {
             if (!agenciesWithFutureDates.contains(agency)) {
-                LOG.warn(GraphBuilderAnnotation.register(this, Variety.NO_FUTURE_DATES, agency));
+                LOG.warn(this.addBuilderAnnotation(new NoFutureDates(agency)));
             }
         }
     }
@@ -299,8 +299,21 @@ public class Graph implements Serializable {
         temporaryEdges = Collections.newSetFromMap(new ConcurrentHashMap<Edge, Boolean>()); 
     }
 
-    public void addBuilderAnnotation(GraphBuilderAnnotation gba) {
-    	this.graphBuilderAnnotations.add(gba);
+    /**
+     * Add a graph builder annotation to this graph's list of graph builder annotations.
+     * The return value of this method is the annotation's message, which allows for a single-line
+     * idiom that creates, registers, and logs a new graph builder annotation:
+     * log.warning(graph.addBuilderAnnotation(new SomeKindOfAnnotation(param1, param2)));
+     * 
+     * If the graphBuilderAnnotations field of this graph is null, the annotation is not actually 
+     * saved, but the message is still returned. This allows annotation registration to be turned
+     * off, saving memory and disk space when the user is not interested in annotations.
+     */
+    public String addBuilderAnnotation(GraphBuilderAnnotation gba) {
+        String ret = gba.getMessage();
+        if (this.graphBuilderAnnotations != null)
+            this.graphBuilderAnnotations.add(gba);
+    	return ret;
     }
 
     public List<GraphBuilderAnnotation> getBuilderAnnotations() {
@@ -560,6 +573,13 @@ public class Graph implements Serializable {
             }
         }
         return timeZone;
+    }
+
+    public void enableGraphBuilderAnnotations(boolean enable) {
+        if (enable)
+            graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>();
+        else 
+            graphBuilderAnnotations = null;
     }
 
 }

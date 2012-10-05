@@ -15,9 +15,11 @@ package org.opentripplanner.gbannotation;
 
 import java.io.Serializable;
 
-import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
 
 /**
  * Represents noteworthy events or errors that occur during the graphbuilding process.
@@ -40,11 +42,9 @@ public abstract class GraphBuilderAnnotation implements Serializable {
 
     private static final long serialVersionUID = 20121004L;
 
-    public static String register(Graph graph, GraphBuilderAnnotation gba) {
-        //graph.addBuilderAnnotation(gba);
-        return gba.getMessage() + " (annotation registered)";
-    }
-
+//    /** Generally, this should return the Vertex or Edge that is most relevant to this annotation. */
+//    public abstract Object getReferencedObject();
+    
     public String toString() {
         return "GraphBuilderAnnotation: " + this.getMessage();
     }
@@ -52,13 +52,15 @@ public abstract class GraphBuilderAnnotation implements Serializable {
     public abstract String getMessage();
 
     public static void logSummary(Iterable<GraphBuilderAnnotation> gbas) {
-        // an EnumMap would be nice, but Integers are immutable...
-//        int[] counts = new int[Variety.values().length];
-//        LOG.info("Summary (number of each type of annotation):");
-//        for (GraphBuilderAnnotation gba : gbas)
-//            ++counts[gba.variety.ordinal()];
-//        for (Variety v : Variety.values())
-//            LOG.info("    {} - {}", v.toString(), counts[v.ordinal()]);
+        Multiset<Class<? extends GraphBuilderAnnotation>> classes = HashMultiset.create();
+        LOG.info("Summary (number of each type of annotation):");
+        for (GraphBuilderAnnotation gba : gbas)
+            classes.add(gba.getClass());
+        for (Multiset.Entry<Class<? extends GraphBuilderAnnotation>> e : classes.entrySet()) {
+            String name = e.getElement().getSimpleName();
+            int count = e.getCount();
+            LOG.info("    {} - {}", name, count);
+        }
     }
 
 }

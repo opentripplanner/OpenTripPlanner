@@ -15,7 +15,6 @@ package org.opentripplanner.gbannotation;
 
 import lombok.AllArgsConstructor;
 
-import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
 
 @AllArgsConstructor
@@ -27,15 +26,13 @@ public class HopZeroTime extends GraphBuilderAnnotation {
     
     final float dist;
 
-    final Route route;
-
     final Trip trip;
 
     final int seq;
     
     @Override
     public String getMessage() {
-        return String.format(FMT, dist, route, trip, seq);
+        return String.format(FMT, dist, trip.getRoute().getId(), trip.getId(), seq);
     }
 
 }

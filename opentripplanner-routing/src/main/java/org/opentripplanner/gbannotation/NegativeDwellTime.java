@@ -15,7 +15,7 @@ package org.opentripplanner.gbannotation;
 
 import lombok.AllArgsConstructor;
 
-import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.StopTime;
 
 @AllArgsConstructor
 public class NegativeDwellTime extends GraphBuilderAnnotation {
@@ -24,7 +24,7 @@ public class NegativeDwellTime extends GraphBuilderAnnotation {
 
     public static final String FMT = "Negative time dwell at %s; we will assume it is zero.";
     
-    final Stop stop;
+    final StopTime stop;
     
     @Override
     public String getMessage() {

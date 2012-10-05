@@ -13,22 +13,29 @@
 
 package org.opentripplanner.gbannotation;
 
-import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
-
 import lombok.AllArgsConstructor;
 
+import org.onebusaway.gtfs.model.StopTime;
+
 @AllArgsConstructor
-public class BikeRentalStationUnlinked extends GraphBuilderAnnotation {
+public class StopAtEntrance extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 1L;
 
-    public static final String FMT = "Bike rental station %s not near any streets; it will not be usable.";
+    public static final String FMT = "The stoptime %s stops at an entrance. ";
     
-    final BikeRentalStationVertex station;
+    final StopTime st;
+    final boolean repaired;
     
     @Override
     public String getMessage() {
-        return String.format(FMT, station);
+        String ret;
+        if (repaired) {
+            ret = "We have corrected for this by using the parent station.";
+        } else {
+            ret = "We could not correct for this.";
+        }
+        return String.format(FMT.concat(ret), st);
     }
 
 }

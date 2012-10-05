@@ -26,10 +26,11 @@ public class AgencyNameCollision extends GraphBuilderAnnotation {
     		"to the same agency. Is this intentional?";
     
     final Agency agency;
+    final String prevFeed;
     
     @Override
     public String getMessage() {
-        return String.format(FMT, agency);
+        return String.format(FMT, agency, prevFeed);
     }
 
 }

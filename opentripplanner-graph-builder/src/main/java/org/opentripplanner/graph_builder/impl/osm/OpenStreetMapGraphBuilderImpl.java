@@ -28,11 +28,17 @@ import java.util.Set;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.DistanceLibrary;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.graph_builder.impl.osm.OSMPlainStreetEdgeFactory;
+import org.opentripplanner.gbannotation.ConflictingBikeTags;
+import org.opentripplanner.gbannotation.ElevationFlattened;
+import org.opentripplanner.gbannotation.Graphwide;
+import org.opentripplanner.gbannotation.LevelAmbiguous;
+import org.opentripplanner.gbannotation.TurnRestrictionBad;
+import org.opentripplanner.gbannotation.TurnRestrictionException;
+import org.opentripplanner.gbannotation.TurnRestrictionUnknown;
 import org.opentripplanner.graph_builder.impl.extra_elevation_data.ElevationPoint;
 import org.opentripplanner.graph_builder.impl.extra_elevation_data.ExtraElevationData;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
@@ -49,11 +55,9 @@ import org.opentripplanner.openstreetmap.services.OpenStreetMapContentHandler;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 import org.opentripplanner.routing.algorithm.GenericDijkstra;
 import org.opentripplanner.routing.algorithm.strategies.SkipEdgeStrategy;
-import org.opentripplanner.routing.core.GraphBuilderAnnotation;
-import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
@@ -633,7 +637,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 }
                 // set elevation profile and warn if profile was flattened because it was too steep
                 if(edge.setElevationProfile(new PackedCoordinateSequence.Double(coords), true)) {
-                    _log.warn(GraphBuilderAnnotation.register(graph, Variety.ELEVATION_FLATTENED, edge));
+                    _log.warn(graph.addBuilderAnnotation(new ElevationFlattened(edge)));
                 }
             }
         }
@@ -1237,8 +1241,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     level = OSMLevel.fromString(levelName, OSMLevel.Source.LAYER_TAG, noZeroLevels);
                 } 
                 if (level == null || ( ! level.reliable)) {
-                    _log.warn(GraphBuilderAnnotation.register(graph, Variety.LEVEL_AMBIGUOUS, 
-                        levelName, "OSM way " + way.getId()));
+                    _log.warn(graph.addBuilderAnnotation(new LevelAmbiguous(levelName, way.getId())));
                     level = OSMLevel.DEFAULT;
                 }
                 wayLevels.put(way, level);
@@ -1289,8 +1292,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
          * @param graph
          */
         private void applyBikeSafetyFactor(Graph graph) {
-            _log.info(GraphBuilderAnnotation.register(graph, Variety.GRAPHWIDE,
-                    "Multiplying all bike safety values by " + (1 / bestBikeSafety)));
+            _log.info(graph.addBuilderAnnotation(new Graphwide ("Multiplying all bike safety values by " + (1 / bestBikeSafety))));
             HashSet<Edge> seenEdges = new HashSet<Edge>();
             for (Vertex vertex : graph.getVertices()) {
                 for (Edge e : vertex.getOutgoing()) {
@@ -1597,8 +1599,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 }
             }
             if (from == -1 || to == -1 || via == -1) {
-                _log.warn(GraphBuilderAnnotation.register(graph, Variety.TURN_RESTRICTION_BAD,
-                        relation.getId()));
+                _log.warn(graph.addBuilderAnnotation(new TurnRestrictionBad(relation.getId())));
                 return;
             }
 
@@ -1610,8 +1611,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         modes.remove(TraverseMode.CAR);
                     } else if (m.equals("bicycle")) {
                         modes.remove(TraverseMode.BICYCLE);
-                        _log.warn(GraphBuilderAnnotation.register(graph,
-                                Variety.TURN_RESTRICTION_EXCEPTION, via, from));
+                        _log.warn(graph.addBuilderAnnotation(new TurnRestrictionException(via, from)));
                     }
                 }
             }
@@ -1634,8 +1634,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             } else if (relation.isTag("restriction", "only_u_turn")) {
                 tag = new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN, Direction.U);
             } else {
-                _log.warn(GraphBuilderAnnotation.register(graph, Variety.TURN_RESTRICTION_UNKNOWN,
-                        relation.getTag("restriction")));
+                _log.warn(graph.addBuilderAnnotation(new TurnRestrictionUnknown(relation.getTag("restriction"))));
                 return;
             }
             tag.modes = new TraverseModeSet(modes);
@@ -1781,8 +1780,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             if (way.isTag("cycleway", "dismount") || "dismount".equals(bicycle)) {
                 permissions = permissions.remove(StreetTraversalPermission.BICYCLE);
                 if (forceBikes) {
-                    _log.warn(GraphBuilderAnnotation.register(graph, Variety.CONFLICTING_BIKE_TAGS,
-                            way.getId()));
+                    _log.warn(graph.addBuilderAnnotation(new ConflictingBikeTags(way.getId())));
                 }
             }
             P2<StreetTraversalPermission> permissionPair = getPermissions(permissions, way);

@@ -15,8 +15,6 @@ package org.opentripplanner.gbannotation;
 
 import lombok.AllArgsConstructor;
 
-import org.opentripplanner.routing.graph.Vertex;
-
 @AllArgsConstructor
 public class LevelAmbiguous extends GraphBuilderAnnotation {
 
@@ -28,11 +26,11 @@ public class LevelAmbiguous extends GraphBuilderAnnotation {
     
     final String layerName;
 
-    final Vertex vertex;
+    final long osmNode;
     
     @Override
     public String getMessage() {
-        return String.format(FMT, layerName, vertex);
+        return String.format(FMT, layerName, osmNode);
     }
 
 }

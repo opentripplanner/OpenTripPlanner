@@ -28,16 +28,15 @@ import org.geotools.geometry.DirectPosition2D;
 import org.opengis.coverage.Coverage;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.common.pqueue.BinHeap;
+import org.opentripplanner.gbannotation.ElevationFlattened;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.ned.NEDGridCoverageFactory;
-import org.opentripplanner.routing.core.GraphBuilderAnnotation;
-import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.common.pqueue.BinHeap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -299,7 +298,7 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
                     PackedCoordinateSequence profile = new PackedCoordinateSequence.Double(coords);
 
                     if(edge.setElevationProfile(profile, true)) {
-                        log.trace(GraphBuilderAnnotation.register(graph, Variety.ELEVATION_FLATTENED, edge));
+                        log.trace(graph.addBuilderAnnotation(new ElevationFlattened(edge)));
                     }
                 }
             }
@@ -351,7 +350,7 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
                 coordList.toArray(coordArr));
 
         if(ee.setElevationProfile(elevPCS, false)) {
-            log.trace(GraphBuilderAnnotation.register(graph, Variety.ELEVATION_FLATTENED, ee));
+            log.trace(graph.addBuilderAnnotation(new ElevationFlattened(ee)));
         }
     }
 
