@@ -140,7 +140,7 @@ public class GraphBuilderTask implements Runnable {
         for (GraphBuilder load : _graphBuilders)
             load.buildGraph(graph, extra);
 
-        GraphBuilderAnnotation.logSummary(graph.getBuilderAnnotations());
+        graph.summarizeBuilderAnnotations();
         try {
             graph.save(graphFile);
         } catch (Exception ex) {

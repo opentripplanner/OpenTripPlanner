@@ -57,6 +57,8 @@ import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
@@ -581,6 +583,23 @@ public class Graph implements Serializable {
             graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>();
         else 
             graphBuilderAnnotations = null;
+    }
+
+    public void summarizeBuilderAnnotations() {
+        List<GraphBuilderAnnotation> gbas = this.graphBuilderAnnotations;
+        if (gbas != null) {
+            Multiset<Class<? extends GraphBuilderAnnotation>> classes = HashMultiset.create();
+            LOG.info("Summary (number of each type of annotation):");
+            for (GraphBuilderAnnotation gba : gbas)
+                classes.add(gba.getClass());
+            for (Multiset.Entry<Class<? extends GraphBuilderAnnotation>> e : classes.entrySet()) {
+                String name = e.getElement().getSimpleName();
+                int count = e.getCount();
+                LOG.info("    {} - {}", name, count);
+            }
+        } else {
+            LOG.debug("graph builder annotations disabled.");
+        }
     }
 
 }
