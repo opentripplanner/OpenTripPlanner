@@ -36,6 +36,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Set;
 import java.util.TimeZone;
 
 import javassist.Modifier;
@@ -60,6 +61,7 @@ import javax.swing.event.ListSelectionListener;
 
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.gbannotation.GraphBuilderAnnotation;
+import org.opentripplanner.gbannotation.StopUnlinked;
 import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -77,6 +79,7 @@ import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
 
+import com.beust.jcommander.internal.Sets;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -237,7 +240,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
 
     private JList departurePattern;
 
-    private DefaultListModel annotationMatchesModel;
+    private DefaultListModel<GraphBuilderAnnotation> annotationMatchesModel;
 
     private JList annotationMatches;
 
@@ -274,7 +277,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
             path = path.getParentFile();
         }
         try {
-            graph = Graph.load(new File(graphName), Graph.LoadLevel.FULL);
+            graph = Graph.load(new File(graphName), Graph.LoadLevel.DEBUG);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -703,17 +706,14 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         mdScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         rightPanelTabs.addTab("metadata", mdScrollPane);
 
-        // This is where matched annotations from a search go
+        // This is where matched annotations from an annotation search go
         annotationMatches = new JList();
         annotationMatches.addListSelectionListener(new ListSelectionListener () {
             public void valueChanged(ListSelectionEvent e) {
                 JList theList = (JList) e.getSource();
-                SelectableGraphBuilderAnnotation anno = 
-                    (SelectableGraphBuilderAnnotation) theList.getSelectedValue();
-
+                GraphBuilderAnnotation anno = (GraphBuilderAnnotation) theList.getSelectedValue();
                 if (anno == null) return;
-// TODO: re-implement selection
-//                anno.select(showGraph);
+                showGraph.drawAnotation(anno);
             }
         });    
 
@@ -873,99 +873,37 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         showGraph.highlightGraphPath(gp);
     }
 
-    /** 
-     * This class makes a GraphBuilderAnnotation selectable in VizGui. It also adds a new
-     * toString method that makes more sense in the app.
-     * @author mattwigway
-     */
-    private static class SelectableGraphBuilderAnnotation {
-
-//        @Override
-//        public String toString () {
-//            return getVariety().toString() + " at " + getReferencedObjects();
-//        }
-//
-//        public void select (ShowGraph show) {
-//            Envelope env = new Envelope();
-//
-//            // I think they will always have the same SRID, no reprojection needed
-//            // TODO: handle geometries.
-//            boolean found = false;
-//            
-//            // For highlighting
-//            ArrayList<Vertex> vertices = new ArrayList<Vertex>();
-//
-//            for (Object obj : this.getReferencedObjects()) {
-//                if (obj instanceof Edge) {
-//                    found = true;
-//                    Edge e = (Edge) obj;
-//                    show.enqueueHighlightedEdge(e);
-//                    env.expandToInclude(e.getFromVertex().getCoordinate());
-//                    env.expandToInclude(e.getToVertex().getCoordinate());
-//                }
-//                else if (obj instanceof Vertex) {
-//                    found = true;
-//                    Vertex v = (Vertex) obj;
-//                    env.expandToInclude(v.getCoordinate());
-//                    vertices.add(v);
-//                }
-//            }
-//
-//            // nothing associated
-//            if (!found) return;
-//
-//            // make it a little bigger, especially needed for STOP_UNLINKED
-//            env.expandBy(0.02);
-//
-//            // highlight relevant things
-//            show.clearHighlights();
-//            show.setHighlightedVertices(vertices);
-//
-//            // zoom the graph display
-//            show.zoomToEnvelope(env);
-//            
-//            // and draw
-//            show.draw();
-//        }
-    }
-                
-
     protected void findAnnotation () {
-        // TODO: adapt to new class-based annotations
-//        Object[] options = GraphBuilderAnnotation.Variety.values();
-//
-//        GraphBuilderAnnotation.Variety variety = 
-//            (GraphBuilderAnnotation.Variety) JOptionPane.showInputDialog(
-//                null, // parentComponent; TODO: set correctly
-//                "Select the type of annotation to find", // question
-//                "Select annotation", // title
-//                JOptionPane.QUESTION_MESSAGE, // message type
-//                null, // no icon
-//                options, // options (built above)
-//                GraphBuilderAnnotation.Variety.STOP_UNLINKED // default value
-//            );
-//        
-//        // User clicked cancel
-//        if (variety == null) return;
-//
-//        annotationMatchesModel.clear();
-//
-//        // loop over the annotations and save the ones of the requested type
-//        for (GraphBuilderAnnotation anno : graph.getBuilderAnnotations()) {
-//            if (anno.getVariety() == variety) {
-//                annotationMatchesModel.addElement(
-//                    // TODO: is there a polymorphic way to do this?
-//                    new SelectableGraphBuilderAnnotation(
-//                        anno.getVariety(),
-//                        anno.getReferencedObjects().toArray()
-//                    )
-//                );
-//            }
-//        }
-//
-//        System.out.println("Found " + annotationMatchesModel.getSize() + " annotations of type " + 
-//                           variety);
-       
+        Set<Class<? extends GraphBuilderAnnotation>> gbaClasses = Sets.newHashSet();
+        for (GraphBuilderAnnotation gba : graph.getBuilderAnnotations()) {
+            gbaClasses.add(gba.getClass());
+        }
+        
+        @SuppressWarnings("unchecked")
+        Class<? extends GraphBuilderAnnotation> variety = 
+            (Class<? extends GraphBuilderAnnotation>) JOptionPane.showInputDialog(
+                null, // parentComponent; TODO: set correctly
+                "Select the type of annotation to find", // question
+                "Select annotation", // title
+                JOptionPane.QUESTION_MESSAGE, // message type
+                null, // no icon
+                gbaClasses.toArray(), // options (built above)
+                StopUnlinked.class // default value
+            );
+        
+        // User clicked cancel
+        if (variety == null) return;
+
+        // loop over the annotations and save the ones of the requested type
+        annotationMatchesModel.clear();
+        for (GraphBuilderAnnotation anno : graph.getBuilderAnnotations()) {
+            if (variety.isInstance(anno)) {
+                annotationMatchesModel.addElement(anno);
+            }
+        }
+
+        System.out.println("Found " + annotationMatchesModel.getSize() + " annotations of type " + 
+                           variety);
                                                                  
     }
 

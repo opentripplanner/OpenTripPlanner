@@ -15,6 +15,7 @@ package org.opentripplanner.gbannotation;
 
 import lombok.AllArgsConstructor;
 
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
 @AllArgsConstructor
@@ -31,4 +32,9 @@ public class StopUnlinked extends GraphBuilderAnnotation {
         return String.format(FMT, stop);
     }
 
+    @Override
+    public Vertex getReferencedVertex() {
+        return this.stop;
+    }
+    
 }

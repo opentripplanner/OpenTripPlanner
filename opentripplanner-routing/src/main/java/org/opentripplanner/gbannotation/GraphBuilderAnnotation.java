@@ -15,6 +15,8 @@ package org.opentripplanner.gbannotation;
 
 import java.io.Serializable;
 
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,5 +49,13 @@ public abstract class GraphBuilderAnnotation implements Serializable {
     }
 
     public abstract String getMessage();
+
+    public Edge getReferencedEdge() {
+        return null;
+    }
+
+    public Vertex getReferencedVertex() {
+        return null;
+    }
 
 }

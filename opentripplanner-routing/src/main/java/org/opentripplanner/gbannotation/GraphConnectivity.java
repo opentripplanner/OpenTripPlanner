@@ -31,4 +31,9 @@ public class GraphConnectivity extends GraphBuilderAnnotation {
         return String.format(FMT, vertex);
     }
 
+    @Override
+    public Vertex getReferencedVertex() {
+        return vertex;
+    }
+
 }
