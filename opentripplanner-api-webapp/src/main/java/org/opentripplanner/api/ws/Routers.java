@@ -163,6 +163,7 @@ public class Routers {
             @PathParam("routerId") String routerId, 
             @QueryParam("preEvict") @DefaultValue("true") boolean preEvict, 
             @QueryParam("upload") @DefaultValue("false") boolean upload,
+            //@QueryParam("loadLevel") @DefaultValue("FULL") LoadLevel level,
             InputStream is) {
         Graph graph;
         if (preEvict) {

@@ -89,6 +89,8 @@ public class Graph implements Serializable {
     
     private transient CalendarService calendarService;
     
+    private boolean debugData = true;
+    
     private transient List<Vertex> vertexById;
 
     private transient Map<Integer, Edge> edgeById;
@@ -376,11 +378,15 @@ public class Graph implements Serializable {
             LOG.debug("street index built.");
             if (level == LoadLevel.FULL)
                 return graph;
-            graph.graphBuilderAnnotations = (List<GraphBuilderAnnotation>) in.readObject();
-            graph.vertexById = (List<Vertex>) in.readObject();
-            graph.edgeById = (Map<Integer, Edge>) in.readObject();
-            graph.idForEdge = (Map<Edge, Integer>) in.readObject();
-            LOG.debug("Debug info read.");
+            if (graph.debugData) {
+                graph.graphBuilderAnnotations = (List<GraphBuilderAnnotation>) in.readObject();
+                graph.vertexById = (List<Vertex>) in.readObject();
+                graph.edgeById = (Map<Integer, Edge>) in.readObject();
+                graph.idForEdge = (Map<Edge, Integer>) in.readObject();
+                LOG.debug("Debug info read.");
+            } else {
+                LOG.warn("Graph file does not contain debug data.");
+            }
             return graph;
         } catch (InvalidClassException ex) {
             LOG.error("Stored graph is incompatible with this version of OTP, please rebuild it.");
@@ -452,11 +458,16 @@ public class Graph implements Serializable {
         LOG.debug("Writing edges...");
         out.writeObject(this);
         out.writeObject(edges);
-        LOG.debug("Writing debug data...");
-        out.writeObject(this.graphBuilderAnnotations);
-        out.writeObject(this.vertexById);
-        out.writeObject(this.edgeById);
-        out.writeObject(this.idForEdge);
+        if (debugData) {
+            // should we make debug info generation conditional? 
+            LOG.debug("Writing debug data...");
+            out.writeObject(this.graphBuilderAnnotations);
+            out.writeObject(this.vertexById);
+            out.writeObject(this.edgeById);
+            out.writeObject(this.idForEdge);
+        } else {
+            LOG.debug("Skipping debug data.");
+        }
         LOG.info("Graph written.");
     }
     
@@ -578,27 +589,16 @@ public class Graph implements Serializable {
         return timeZone;
     }
 
-    public void enableGraphBuilderAnnotations(boolean enable) {
-        if (enable)
-            graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>();
-        else 
-            graphBuilderAnnotations = null;
-    }
-
     public void summarizeBuilderAnnotations() {
         List<GraphBuilderAnnotation> gbas = this.graphBuilderAnnotations;
-        if (gbas != null) {
-            Multiset<Class<? extends GraphBuilderAnnotation>> classes = HashMultiset.create();
-            LOG.info("Summary (number of each type of annotation):");
-            for (GraphBuilderAnnotation gba : gbas)
-                classes.add(gba.getClass());
-            for (Multiset.Entry<Class<? extends GraphBuilderAnnotation>> e : classes.entrySet()) {
-                String name = e.getElement().getSimpleName();
-                int count = e.getCount();
-                LOG.info("    {} - {}", name, count);
-            }
-        } else {
-            LOG.debug("graph builder annotations disabled.");
+        Multiset<Class<? extends GraphBuilderAnnotation>> classes = HashMultiset.create();
+        LOG.info("Summary (number of each type of annotation):");
+        for (GraphBuilderAnnotation gba : gbas)
+            classes.add(gba.getClass());
+        for (Multiset.Entry<Class<? extends GraphBuilderAnnotation>> e : classes.entrySet()) {
+            String name = e.getElement().getSimpleName();
+            int count = e.getCount();
+            LOG.info("    {} - {}", name, count);
         }
     }
 
