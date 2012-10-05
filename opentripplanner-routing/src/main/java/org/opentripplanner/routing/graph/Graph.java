@@ -99,7 +99,7 @@ public class Graph implements Serializable {
     
     public transient TimetableSnapshotSource timetableSnapshotSource = null;
     
-    private List<GraphBuilderAnnotation> graphBuilderAnnotations = 
+    private transient List<GraphBuilderAnnotation> graphBuilderAnnotations = 
             new LinkedList<GraphBuilderAnnotation>(); // initialize for tests
 
     private Collection<String> agenciesIds = new HashSet<String>();
@@ -354,7 +354,7 @@ public class Graph implements Serializable {
         throws IOException, ClassNotFoundException {
         try {
             Graph graph = (Graph) in.readObject();
-            LOG.debug("Basic graph info and annotations read.");
+            LOG.debug("Basic graph info read.");
             if (graph.graphVersionMismatch())
                 throw new RuntimeException("Graph version mismatch detected.");
             if (level == LoadLevel.BASIC)
@@ -376,6 +376,7 @@ public class Graph implements Serializable {
             LOG.debug("street index built.");
             if (level == LoadLevel.FULL)
                 return graph;
+            graph.graphBuilderAnnotations = (List<GraphBuilderAnnotation>) in.readObject();
             graph.vertexById = (List<Vertex>) in.readObject();
             graph.edgeById = (Map<Integer, Edge>) in.readObject();
             graph.idForEdge = (Map<Edge, Integer>) in.readObject();
@@ -441,8 +442,7 @@ public class Graph implements Serializable {
         List<Edge> edges = new ArrayList<Edge>(this.countEdges());
         for (Vertex v : getVertices()) {
             // there are assumed to be no edges in an incoming list that are not
-            // in an outgoing
-            // list
+            // in an outgoing list
             edges.addAll(v.getOutgoing());
             if (v.getDegreeOut() + v.getDegreeIn() == 0)
                 LOG.debug("vertex {} has no edges, it will not survive serialization.", v);
@@ -453,10 +453,10 @@ public class Graph implements Serializable {
         out.writeObject(this);
         out.writeObject(edges);
         LOG.debug("Writing debug data...");
+        out.writeObject(this.graphBuilderAnnotations);
         out.writeObject(this.vertexById);
         out.writeObject(this.edgeById);
         out.writeObject(this.idForEdge);
-
         LOG.info("Graph written.");
     }
     
