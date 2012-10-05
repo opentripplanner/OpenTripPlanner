@@ -114,7 +114,9 @@ public class LinkRequest {
         // if the bundle was caught endwise (T intersections and dead ends), 
         // get the intersection instead.
         if (edges.endwise()) {
-            return Arrays.asList(linker.index.getIntersectionAt(edges.endwiseVertex.getCoordinate()));
+            List<StreetVertex> list = Arrays.asList(edges.endwiseVertex);
+            linker.splitVertices.put(v, list);
+            return list;
         } else {
             /* is the stop right at an intersection? */
             StreetVertex atIntersection = linker.index.getIntersectionAt(coordinate);

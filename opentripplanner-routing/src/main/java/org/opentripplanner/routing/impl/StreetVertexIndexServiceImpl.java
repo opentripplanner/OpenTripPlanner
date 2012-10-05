@@ -284,7 +284,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
         public final StreetEdge edge;
 
-        public final Vertex endwiseVertex;
+        public final StreetVertex endwiseVertex;
 
         private double score;
 
@@ -308,9 +308,9 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             nearestPointOnEdge = edgeLocation.getCoordinate();
             Coordinate[] edgeCoords = edgeGeom.getCoordinates();
             if (nearestPointOnEdge.equals(edgeCoords[0]))
-                endwiseVertex = edge.getFromVertex();
+                endwiseVertex = (StreetVertex) edge.getFromVertex();
             else if (nearestPointOnEdge.equals(edgeCoords[edgeCoords.length - 1]))
-                endwiseVertex = edge.getToVertex();
+                endwiseVertex = (StreetVertex) edge.getToVertex();
             else
                 endwiseVertex = null;
             score = distance;
@@ -371,7 +371,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     public static class CandidateEdgeBundle extends ArrayList<CandidateEdge> {
         private static final long serialVersionUID = 20120222L;
 
-        public Vertex endwiseVertex = null;
+        public StreetVertex endwiseVertex = null;
 
         public CandidateEdge best = null;
 
