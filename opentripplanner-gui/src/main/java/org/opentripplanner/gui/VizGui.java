@@ -240,7 +240,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
 
     private JList departurePattern;
 
-    private DefaultListModel<GraphBuilderAnnotation> annotationMatchesModel;
+    private DefaultListModel annotationMatchesModel;
 
     private JList annotationMatches;
 
