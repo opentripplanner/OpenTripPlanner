@@ -558,7 +558,7 @@ public class RaptorDataBuilder implements GraphBuilder {
             //assume everything is valid for one week
             options.dateTime = (int)System.currentTimeMillis() / 1000 + random.nextInt(7*86400);
             options.rctx.serviceDays = new ArrayList<ServiceDay>();
-            options.rctx.serviceDays.add(ServiceDay.universalService(graph));
+            options.rctx.serviceDays.add(new ServiceDay.UniversalService(graph));
             options.setMaxWalkDistance(MAX_DISTANCE);
             options.setMaxTransfers(6);
             RaptorStateSet states = raptor.getStateSet(options);
@@ -663,7 +663,7 @@ public class RaptorDataBuilder implements GraphBuilder {
         graph.streetIndex = new StreetVertexIndexServiceImpl(graph);
         options.setRoutingContext(graph, region.get(0), null);
         options.rctx.serviceDays = new ArrayList<ServiceDay>();
-        options.rctx.serviceDays.add(ServiceDay.universalService(graph));
+        options.rctx.serviceDays.add(new ServiceDay.UniversalService(graph));
 
         HashSet<Vertex> closed = new HashSet<Vertex>();
         while (!queue.empty()) {
