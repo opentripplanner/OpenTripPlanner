@@ -38,7 +38,6 @@ import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
-import org.opentripplanner.routing.edgetype.Alight;
 import org.opentripplanner.routing.edgetype.FrequencyBasedTripPattern;
 import org.opentripplanner.routing.edgetype.FrequencyBoard;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
@@ -125,7 +124,7 @@ public class TestPatternHopFactory extends TestCase {
 
         for (Edge e : journey_a_1.getOutgoing()) {
             if (e.getToVertex() instanceof TransitStop) {
-                assertEquals(Alight.class, e.getClass());
+                assertEquals(TransitBoardAlight.class, e.getClass());
             } else {
                 assertEquals(PatternHop.class, e.getClass());
             }
@@ -340,10 +339,8 @@ public class TestPatternHopFactory extends TestCase {
         GraphPath path = spt.getPath(stop_k, false);
         int num_alights = 0;
         for (State s : path.states) {
-            if (s.getBackEdge() instanceof Alight ||
-                    (s.getBackEdge() instanceof TransitBoardAlight && 
-                            !((TransitBoardAlight) s.getBackEdge()).isBoarding())
-                    ) {
+            if (s.getBackEdge() instanceof TransitBoardAlight
+                && !((TransitBoardAlight) s.getBackEdge()).isBoarding()) {
                 num_alights += 1;
             }
             if (s.getBackEdge() instanceof PatternDwell) {
@@ -359,10 +356,8 @@ public class TestPatternHopFactory extends TestCase {
 //        path.reverse();
         num_alights = 0;
         for (State s : path.states) {
-            if (s.getBackEdge() instanceof Alight ||
-                    (s.getBackEdge() instanceof TransitBoardAlight && 
-                            !((TransitBoardAlight) s.getBackEdge()).isBoarding())
-                    ) {
+            if (s.getBackEdge() instanceof TransitBoardAlight
+                && !((TransitBoardAlight) s.getBackEdge()).isBoarding()) {
                 num_alights += 1;
             }
             if (s.getBackEdge() instanceof PatternDwell) {

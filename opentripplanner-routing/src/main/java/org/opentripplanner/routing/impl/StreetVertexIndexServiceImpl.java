@@ -191,8 +191,11 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 // generate names for corners when no name was given
                 // TODO: internationalize
                 Set<String> uniqueNameSet = new HashSet<String>();
-                for (Edge e : intersection.getOutgoing()) 
-                    uniqueNameSet.add(e.getName());
+                for (Edge e : intersection.getOutgoing()) {
+                    if (e instanceof StreetEdge) {
+                        uniqueNameSet.add(e.getName());
+                    }
+                }
                 List<String> uniqueNames = new ArrayList<String>(uniqueNameSet);
                 if (uniqueNames.size() > 1)
                     name = String.format("corner of %s and %s", uniqueNames.get(0),
@@ -230,7 +233,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
         // then find closest walkable street
         StreetLocation closest_street = null;
-        CandidateEdgeBundle bundle = getClosestEdges(coordinate, options, extraEdges, null);
+        CandidateEdgeBundle bundle = getClosestEdges(coordinate, options, extraEdges, null, 1);
         CandidateEdge candidate = bundle.best;
         double closest_street_distance = Double.POSITIVE_INFINITY;
         if (candidate != null) {
@@ -313,7 +316,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 score *= 1.5;
             }
             score /= preference;
-            if (e.getName().contains("platform")) {
+            if ((e.getStreetClass() & StreetEdge.CLASS_PLATFORM) != 0) {
                 // this is kind of a hack, but there's not really a better way to do it
                 score /= PLATFORM_PREFERENCE;
             }
@@ -409,9 +412,18 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         }
     }
 
+    /**
+     * @param coordinate Point to get edges near
+     * @param request RoutingRequest that must be able to traverse the edge (all edges if null) 
+     * @param extraEdges Any edges not in the graph that might be included (allows trips within one block)
+     * @param routeEdges Which edges have bus routes along them (stop-linking only; otherwise null)
+     * @param restriction 0 = only edges traversable by request; 1 = only edges traversable by request and cars; 
+     * 2 = only edges traversable by request and either traversable by cars or are platforms  
+     * @return
+     */
     @SuppressWarnings("unchecked")
-    public CandidateEdgeBundle getClosestEdges(Coordinate coordinate, RoutingRequest options,
-            List<Edge> extraEdges, Collection<Edge> routeEdges) {
+    public CandidateEdgeBundle getClosestEdges(Coordinate coordinate, RoutingRequest request,
+            List<Edge> extraEdges, Collection<Edge> routeEdges, int restriction) {
         ArrayList<StreetEdge> extraStreets = new ArrayList<StreetEdge>();
         if (extraEdges != null)
             for (StreetEdge se : IterableLibrary.filter(extraEdges, StreetEdge.class))
@@ -422,9 +434,9 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
         Envelope envelope = new Envelope(coordinate);
         Point p = GeometryUtils.getGeometryFactory().createPoint(coordinate);
-        RoutingRequest walkingOptions = null;
-        if (options != null) {
-            walkingOptions = options.getWalkingOptions();
+        RoutingRequest walkingRequest = null;
+        if (request != null) {
+            walkingRequest = request.getWalkingOptions();
         }
         double envelopeGrowthAmount = 0.001; // ~= 100 meters
         double radius = 0;
@@ -444,8 +456,24 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             for (StreetEdge e : nearbyEdges) {
                 if (e == null || e.getFromVertex() == null)
                     continue;
-                if (options != null && (!(e.canTraverse(options) || e.canTraverse(walkingOptions))))
+                if (request != null && (!(e.canTraverse(request) || e.canTraverse(walkingRequest))))
                     continue;
+                switch(restriction) {
+                case 0:
+                    break;
+                case 1:
+                    if (!e.getPermission().allows(StreetTraversalPermission.CAR)) {
+                        continue;
+                    }
+                    break;
+                case 2:
+                    if (!e.getPermission().allows(StreetTraversalPermission.CAR)) {
+                        if ((e.getStreetClass() & StreetEdge.CLASS_PLATFORM) == 0) {
+                            continue;
+                        }
+                    }
+                    break;
+                }
                 double preferrence = 1;
                 if (routeEdges != null && routeEdges.contains(e)) {
                     preferrence = 3.0;

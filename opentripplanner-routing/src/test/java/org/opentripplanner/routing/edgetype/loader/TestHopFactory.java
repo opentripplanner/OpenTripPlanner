@@ -13,7 +13,6 @@
 
 package org.opentripplanner.routing.edgetype.loader;
 
-import static org.opentripplanner.common.IterableLibrary.*;
 import java.io.File;
 
 import junit.framework.TestCase;

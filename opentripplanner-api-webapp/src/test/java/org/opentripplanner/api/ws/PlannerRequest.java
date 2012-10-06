@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.routing.core.OptimizeType;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 
 /**

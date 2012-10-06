@@ -24,7 +24,6 @@ import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
 
 import com.vividsolutions.jts.geom.Envelope;
 

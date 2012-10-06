@@ -1,22 +1,18 @@
 package org.opentripplanner.graph_builder.impl.osm;
 
 import java.io.File;
-import java.io.PrintWriter;
 import java.util.HashMap;
-import java.util.Map.Entry;
 import java.util.Set;
 
+import junit.framework.TestCase;
+
 import org.junit.Test;
-import org.opentripplanner.graph_builder.impl.osm.DefaultWayPropertySetSource;
-import org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl;
 import org.opentripplanner.openstreetmap.impl.FileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.util.LengthConstrainedPathFinder;
 import org.opentripplanner.routing.util.LengthConstrainedPathFinder.State;
-
-import junit.framework.TestCase;
 
 public class TestLengthConstrainedPathFinder extends TestCase {
 

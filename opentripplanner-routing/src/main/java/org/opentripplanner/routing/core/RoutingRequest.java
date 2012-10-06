@@ -740,6 +740,8 @@ public class RoutingRequest implements Cloneable, Serializable {
             return bikeSpeed;
         case CAR:
             return carSpeed;
+        default:
+            break;
         }
         throw new IllegalArgumentException("getSpeed(): Invalid mode " + mode);
     }

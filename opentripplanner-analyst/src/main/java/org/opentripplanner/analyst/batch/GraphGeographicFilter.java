@@ -7,10 +7,6 @@ import javax.annotation.PostConstruct;
 
 import lombok.Data;
 
-import org.geotools.geometry.GeometryBuilder;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.opengis.geometry.coordinate.Position;
-import org.opengis.geometry.primitive.PrimitiveFactory;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -25,7 +21,6 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
-import com.vividsolutions.jts.simplify.DouglasPeuckerSimplifier;
 
 @Data
 public class GraphGeographicFilter implements IndividualFilter {

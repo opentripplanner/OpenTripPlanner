@@ -13,7 +13,6 @@
 package org.opentripplanner.api.common;
 
 import java.util.Locale;
-import java.util.logging.Level;
 
 import org.opentripplanner.util.Properties;
 

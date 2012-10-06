@@ -1,9 +1,7 @@
 package org.opentripplanner.analyst.batch.aggregator;
 
 import org.opentripplanner.analyst.batch.Individual;
-import org.opentripplanner.analyst.batch.Population;
 import org.opentripplanner.analyst.batch.ResultSet;
-import org.opentripplanner.routing.spt.ShortestPathTree;
 
 /**
  * An aggregator that approximates the integral of a cumulative opportunity curve up to a certain threshold distance from the origin. This is vaguely

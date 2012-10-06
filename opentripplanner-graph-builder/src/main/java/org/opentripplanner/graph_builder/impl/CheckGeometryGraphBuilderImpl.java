@@ -13,8 +13,6 @@
 
 package org.opentripplanner.graph_builder.impl;
 
-import static org.opentripplanner.common.IterableLibrary.filter;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,8 +24,8 @@ import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
 import org.opentripplanner.routing.edgetype.HopEdge;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -7,7 +7,6 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
-import org.onebusaway.gtfs.services.GtfsRelationalDao;
 
 /**
  * A ScheduledStopPattern is an intermediate object used when processing GTFS files. It represents an ordered

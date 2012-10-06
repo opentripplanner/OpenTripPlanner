@@ -21,6 +21,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
 /**
  * A euclidian remaining weight strategy that takes into account transit 
@@ -95,9 +96,9 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
                 if (s.isEverBoarded()) {
                     boardCost += options.transferPenalty;
                     if (localStreetService != null) {
-                        if (s.getOptions().getMaxWalkDistance() - s.getWalkDistance() < distanceLibrary
-                                .fastDistance(sv.getCoordinate(), target.getCoordinate())
-                                && !localStreetService.transferrable(sv)) {
+                        if (options.getMaxWalkDistance() - s.getWalkDistance() < euclidianDistance
+                            && sv instanceof IntersectionVertex
+                            && !localStreetService.transferrable(sv)) {
                             return Double.POSITIVE_INFINITY;
                         }
                     }

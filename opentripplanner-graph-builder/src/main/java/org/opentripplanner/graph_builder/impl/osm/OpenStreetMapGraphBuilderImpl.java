@@ -1880,18 +1880,24 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             street.setId(id);
 
             String highway = way.getTag("highway");
+            int cls;
             if ("crossing".equals(highway) && !way.isTag("bicycle", "designated")) {
-                street.setStreetClass(StreetEdge.CLASS_CROSSING);
+                cls = StreetEdge.CLASS_CROSSING;
             } else if ("footway".equals(highway) && way.isTag("footway", "crossing") && !way.isTag("bicycle", "designated")) {
-                street.setStreetClass(StreetEdge.CLASS_CROSSING);
+                cls = StreetEdge.CLASS_CROSSING;
             } else if ("residential".equals(highway) || "tertiary".equals(highway)
                     || "secondary".equals(highway) || "secondary_link".equals(highway)
                     || "primary".equals(highway) || "primary_link".equals(highway)
                     || "trunk".equals(highway) || "trunk_link".equals(highway)) {
-                street.setStreetClass(StreetEdge.CLASS_STREET);
+                cls = StreetEdge.CLASS_STREET;
             } else {
-                street.setStreetClass(StreetEdge.CLASS_OTHERPATH);
+                cls = StreetEdge.CLASS_OTHERPATH;
             }
+
+            if ("platform".equals(highway) || "platform".equals(way.getTag("railway")) || "platform".equals(way.getTag("public_transport"))) {
+                cls |= StreetEdge.CLASS_PLATFORM;
+            }
+            street.setStreetClass(cls);
 
             if (!way.hasTag("name")) {
                 street.setBogusName(true);

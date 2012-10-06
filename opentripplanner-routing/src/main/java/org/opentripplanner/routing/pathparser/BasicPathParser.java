@@ -67,7 +67,7 @@ public class BasicPathParser extends PathParser {
                 Edge edge = state.getBackEdge();
                 if (edge instanceof StreetEdge) {
                     int cls = ((StreetEdge) edge).getStreetClass();
-                    return cls;
+                    return cls & StreetEdge.CROSSING_CLASS_MASK;
                 } else {
                     return StreetEdge.CLASS_OTHERPATH;
                 }

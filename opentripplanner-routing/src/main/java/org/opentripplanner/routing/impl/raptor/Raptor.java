@@ -101,7 +101,12 @@ public class Raptor implements PathService {
             return sptService.getShortestPathTree(options).getPaths();
         }
 
-        RaptorData data = graph.getService(RaptorDataService.class).getData();
+        RaptorDataService service = graph.getService(RaptorDataService.class);
+        if (service == null) {
+            log.warn("No raptor data.  Rebuild with RaptorDataBuilder");
+            return Collections.emptyList();
+        }
+        RaptorData data = service.getData();
 
         //we multiply the initial walk distance by 1.1 to account for epsilon dominance.
         double initialWalk = options.getMaxWalkDistance() * 1.1;
@@ -213,6 +218,9 @@ public class Raptor implements PathService {
             log.info("RAPTOR found no paths (try retrying?)");
         }
         Collections.sort(targetStates);
+
+        if (targetStates.size() > options.getNumItineraries())
+            targetStates = targetStates.subList(0, options.getNumItineraries());
 
         List<GraphPath> paths = new ArrayList<GraphPath>();
         for (RaptorState targetState : targetStates) {

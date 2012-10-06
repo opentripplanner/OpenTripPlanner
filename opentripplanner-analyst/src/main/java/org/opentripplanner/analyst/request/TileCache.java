@@ -1,7 +1,6 @@
 package org.opentripplanner.analyst.request;
 
 import org.opentripplanner.analyst.core.DynamicTile;
-import org.opentripplanner.analyst.core.TemplateTile;
 import org.opentripplanner.analyst.core.Tile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
