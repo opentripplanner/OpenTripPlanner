@@ -11,9 +11,13 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.api.model.analysis;
+package org.opentripplanner.api.model.internals;
 
-public class FeatureCount {
-    public long vertices;
-    public long edges;
+import java.util.ArrayList;
+
+public class SimpleVertexSet extends VertexSet {
+    //this masks the vertices field in the parent class, because
+    //that field cannot hold SimpleVertex instances; the XML,
+    //I think, is correct.
+    public ArrayList<SimpleVertex> vertices;
 }

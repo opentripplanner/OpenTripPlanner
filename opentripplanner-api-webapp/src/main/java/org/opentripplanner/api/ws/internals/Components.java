@@ -25,8 +25,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.opentripplanner.api.model.analysis.GraphComponent;
-import org.opentripplanner.api.model.analysis.GraphComponentPolygons;
+import org.opentripplanner.api.model.internals.GraphComponent;
+import org.opentripplanner.api.model.internals.GraphComponentPolygons;
 import org.opentripplanner.internals.AnalysisUtils;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.core.RouteSpec;

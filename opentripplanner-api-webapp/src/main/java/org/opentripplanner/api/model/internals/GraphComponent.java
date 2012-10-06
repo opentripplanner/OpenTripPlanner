@@ -11,13 +11,18 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.api.model.analysis;
+package org.opentripplanner.api.model.internals;
 
-import java.util.ArrayList;
+import org.codehaus.jackson.map.annotate.JsonDeserialize;
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.opentripplanner.api.model.json_serializers.GeoJSONDeserializer;
+import org.opentripplanner.api.model.json_serializers.GeoJSONSerializer;
 
-public class SimpleVertexSet extends VertexSet {
-    //this masks the vertices field in the parent class, because
-    //that field cannot hold SimpleVertex instances; the XML,
-    //I think, is correct.
-    public ArrayList<SimpleVertex> vertices;
+import com.vividsolutions.jts.geom.Geometry;
+
+public class GraphComponent {
+    
+    @JsonSerialize(using=GeoJSONSerializer.class)
+    @JsonDeserialize(using=GeoJSONDeserializer.class)
+    public Geometry polygon;
 }
