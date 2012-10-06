@@ -107,7 +107,7 @@ class InterliningTrip  implements Comparable<InterliningTrip> {
     
     @Override
     public int compareTo(InterliningTrip o) {
-        return firstStopTime.getArrivalTime() - o.firstStopTime.getArrivalTime();
+        return firstStopTime.getArrivalTime() - o.firstStopTime.getArrivalTime(); 
     }
     
     @Override
@@ -168,7 +168,7 @@ class InterlineSwitchoverKey {
     }
     
     public int hashCode() {
-        return (((s0.hashCode() * 31) + s1.hashCode()) * 31 + pattern1.hashCode()) * 31 + pattern2.hashCode();
+        return (((s0.hashCode() * 31) + s1.hashCode()) * 31 + pattern1.hashCode()) * 31 + pattern2.hashCode(); 
     }
 }
 
@@ -1104,31 +1104,7 @@ public class GTFSPatternHopFactory {
             hops.add(hop);
 
             TransitStopDepart stopDepart = context.stopDepartNodes.get(s0);
-            if (stopDepart == null) {
-                s0 = _dao.getStopForId(new AgencyAndId(s0.getId().getAgencyId(), s0.getParentStation()));
-                stopDepart = context.stopDepartNodes.get(s0);
-                if (stopDepart == null) {
-                    _log.warn(GraphBuilderAnnotation.register(graph,
-                          Variety.STOP_AT_ENTRANCE_IRREPARABLE, st0));
-                    continue;
-                } else {
-                    _log.warn(GraphBuilderAnnotation.register(graph,
-                            Variety.STOP_AT_ENTRANCE, st0));
-                }
-            }
             TransitStopArrive stopArrive = context.stopArriveNodes.get(s1);
-            if (stopArrive == null) {
-                s1 = _dao.getStopForId(new AgencyAndId(s1.getId().getAgencyId(), s1.getParentStation()));
-                stopArrive = context.stopArriveNodes.get(s1);
-                if (stopArrive == null) {
-                    _log.warn(GraphBuilderAnnotation.register(graph,
-                          Variety.STOP_AT_ENTRANCE_IRREPARABLE, st1));
-                    continue;
-                } else {
-                    _log.warn(GraphBuilderAnnotation.register(graph,
-                            Variety.STOP_AT_ENTRANCE, st1));
-                }
-            }
             new TransitBoardAlight(stopDepart, psv0depart, hopIndex, mode);
             new TransitBoardAlight(psv1arrive, stopArrive, hopIndex, mode);
         }        
