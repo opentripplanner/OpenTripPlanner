@@ -22,6 +22,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 
+import javax.annotation.PostConstruct;
+
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.common.geometry.DistanceLibrary;
@@ -39,6 +41,7 @@ import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
 import org.opentripplanner.routing.pathparser.BasicPathParser;
 import org.opentripplanner.routing.pathparser.NoThruTrafficPathParser;
 import org.opentripplanner.routing.pathparser.PathParser;
@@ -67,6 +70,22 @@ public class Raptor implements PathService {
     private RaptorData cachedRaptorData;
 
     private double multiPathTimeout = 0; // seconds
+
+    /**
+     * This is used for short paths (under shortPathCutoff).
+     */
+    RetryingPathServiceImpl shortPathService = new RetryingPathServiceImpl();
+
+    /**
+     * The max length, in meters, that will use the shortPathService.
+     */
+    private double shortPathCutoff = 10000;
+
+    @PostConstruct
+    public void setup() {
+        shortPathService.setGraphService(graphService);
+        shortPathService.setSptService(sptService);
+    }
 
     /** Give up on searching for additional itineraries after this many seconds have elapsed. */
     public void setTimeout (double seconds) {
@@ -99,6 +118,12 @@ public class Raptor implements PathService {
 
         if (!options.getModes().isTransit()) {
             return sptService.getShortestPathTree(options).getPaths();
+        }
+
+        //also fall back to A* for short trips
+        double distance = distanceLibrary.distance(options.rctx.origin.getCoordinate(), options.rctx.target.getCoordinate());
+        if (distance < shortPathCutoff) {
+            return shortPathService.getPaths(options);
         }
 
         RaptorDataService service = graph.getService(RaptorDataService.class);
@@ -680,6 +705,14 @@ public class Raptor implements PathService {
         RaptorStateSet result = new RaptorStateSet();
         result.statesByStop = search.statesByStop;
         return result;
+    }
+
+    public double getShortPathCutoff() {
+        return shortPathCutoff;
+    }
+
+    public void setShortPathCutoff(double shortPathCutoff) {
+        this.shortPathCutoff = shortPathCutoff;
     }
 
 }

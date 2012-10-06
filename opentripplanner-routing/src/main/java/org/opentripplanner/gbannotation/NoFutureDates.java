@@ -15,8 +15,6 @@ package org.opentripplanner.gbannotation;
 
 import lombok.AllArgsConstructor;
 
-import org.onebusaway.gtfs.model.Agency;
-
 @AllArgsConstructor
 public class NoFutureDates extends GraphBuilderAnnotation {
 
@@ -25,7 +23,7 @@ public class NoFutureDates extends GraphBuilderAnnotation {
     public static final String FMT = "Agency %s has no calendar dates which are after today; " +
     		"no trips will be plannable on this agency";
     
-    final Agency agency;
+    final String agency;
     
     @Override
     public String getMessage() {

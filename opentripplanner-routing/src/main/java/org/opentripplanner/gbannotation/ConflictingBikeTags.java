@@ -16,7 +16,7 @@ package org.opentripplanner.gbannotation;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
-public class ConflictngBikeTags extends GraphBuilderAnnotation {
+public class ConflictingBikeTags extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 1L;
 

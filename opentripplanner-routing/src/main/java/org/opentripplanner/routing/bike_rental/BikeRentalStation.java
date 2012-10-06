@@ -12,7 +12,7 @@ public class BikeRentalStation implements Serializable {
     @XmlAttribute
     public String name;
     @XmlAttribute
-    public double x, y; //latitude, longitude
+    public double x, y; //longitude, latitude
     @XmlAttribute
     public int bikesAvailable;
     @XmlAttribute

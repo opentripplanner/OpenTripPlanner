@@ -15,7 +15,8 @@ package org.opentripplanner.gbannotation;
 
 import java.io.Serializable;
 
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,25 +41,21 @@ public abstract class GraphBuilderAnnotation implements Serializable {
 
     private static final long serialVersionUID = 20121004L;
 
-    public static String register(Graph graph, GraphBuilderAnnotation gba) {
-        //graph.addBuilderAnnotation(gba);
-        return gba.getMessage() + " (annotation registered)";
-    }
-
+//    /** Generally, this should return the Vertex or Edge that is most relevant to this annotation. */
+//    public abstract Object getReferencedObject();
+    
     public String toString() {
         return "GraphBuilderAnnotation: " + this.getMessage();
     }
 
     public abstract String getMessage();
 
-    public static void logSummary(Iterable<GraphBuilderAnnotation> gbas) {
-        // an EnumMap would be nice, but Integers are immutable...
-//        int[] counts = new int[Variety.values().length];
-//        LOG.info("Summary (number of each type of annotation):");
-//        for (GraphBuilderAnnotation gba : gbas)
-//            ++counts[gba.variety.ordinal()];
-//        for (Variety v : Variety.values())
-//            LOG.info("    {} - {}", v.toString(), counts[v.ordinal()]);
+    public Edge getReferencedEdge() {
+        return null;
+    }
+
+    public Vertex getReferencedVertex() {
+        return null;
     }
 
 }

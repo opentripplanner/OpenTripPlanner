@@ -200,8 +200,8 @@ class Context {
             throw new RuntimeException(e);
         }
 
-        pathService.sptService = new GenericAStar();
-        pathService.graphService = graphService;
+        pathService.setSptService(new GenericAStar());
+        pathService.setGraphService(graphService);
         planGenerator.pathService = pathService;
     }
 

@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.math3.util.FastMath;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
@@ -88,6 +89,8 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
 
     private List<State> transitStopsVisited = new ArrayList<State>();
 
+    private double transferTimeInWalkDistance;
+
     public TargetBound(RoutingRequest options) {
         this.options = options;
         if (options.rctx.target != null) {
@@ -98,6 +101,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
             transitLocalStreets = options.rctx.graph.getService(TransitLocalStreetService.class);
             speedUpperBound = options.getSpeedUpperBound();
             this.speedWeight = options.getWalkReluctance() / speedUpperBound;
+            this.transferTimeInWalkDistance = options.getTransferSlack() / options.getWalkSpeed();
         }
     }
 
@@ -204,6 +208,8 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
         
         double stateTime = current.getOptimizedElapsedTime() + minTime;
 
+        double walkDistance = FastMath.max(optimisticDistance * 1.1, optimisticDistance + transferTimeInWalkDistance);
+
         int i = 0;
         boolean prevBounded = !bounders.isEmpty();
         for (State bounder : bounders) {
@@ -212,9 +218,9 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
             }
             int prevTime = previousArrivalTime.get(i++);
 
-            if (optimisticDistance * 1.1 > bounder.getWalkDistance()
+            if (walkDistance > bounder.getWalkDistance()
                     && current.getNumBoardings() >= bounder.getNumBoardings()) {
-                if (current.getElapsedTime() + minTime > bounder.getElapsedTime()) {
+                if (current.getElapsedTime() + minTime >= bounder.getElapsedTime()) {
                     return true;
                 } else if (prevTime > 0 && (options.arriveBy ? (current.getTime() - minTime >= prevTime) : ((current.getTime() + minTime) <= prevTime))) {
                     prevBounded = false;

@@ -105,7 +105,7 @@ public class LinkRequest {
         Coordinate coordinate = v.getCoordinate();
 
         /* is there a bundle of edges nearby to use or split? */
-        CandidateEdgeBundle edges = linker.index.getClosestEdges(coordinate, linker.options, null, nearbyRouteEdges, 2);
+        CandidateEdgeBundle edges = linker.index.getClosestEdges(coordinate, linker.options, null, nearbyRouteEdges, true);
         if (edges == null || edges.size() < 1) {
             // no edges were found nearby, or a bidirectional/loop bundle of edges was not identified
             _log.debug("found too few edges: {} {}", v.getName(), v.getCoordinate());
@@ -114,7 +114,9 @@ public class LinkRequest {
         // if the bundle was caught endwise (T intersections and dead ends), 
         // get the intersection instead.
         if (edges.endwise()) {
-            return Arrays.asList(linker.index.getIntersectionAt(edges.endwiseVertex.getCoordinate()));
+            List<StreetVertex> list = Arrays.asList(edges.endwiseVertex);
+            linker.splitVertices.put(v, list);
+            return list;
         } else {
             /* is the stop right at an intersection? */
             StreetVertex atIntersection = linker.index.getIntersectionAt(coordinate);

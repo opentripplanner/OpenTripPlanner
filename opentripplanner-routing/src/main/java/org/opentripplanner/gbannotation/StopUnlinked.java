@@ -13,9 +13,10 @@
 
 package org.opentripplanner.gbannotation;
 
-import org.onebusaway.gtfs.model.Stop;
-
 import lombok.AllArgsConstructor;
+
+import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.TransitStop;
 
 @AllArgsConstructor
 public class StopUnlinked extends GraphBuilderAnnotation {
@@ -24,11 +25,16 @@ public class StopUnlinked extends GraphBuilderAnnotation {
 
     public static final String FMT = "Stop %s not near any streets; it will not be usable.";
     
-    final Stop stop;
+    final TransitStop stop;
     
     @Override
     public String getMessage() {
         return String.format(FMT, stop);
     }
 
+    @Override
+    public Vertex getReferencedVertex() {
+        return this.stop;
+    }
+    
 }

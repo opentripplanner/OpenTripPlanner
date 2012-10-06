@@ -20,13 +20,13 @@ public class TurnRestrictionUnknown extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 1L;
 
-    public static final String FMT = "Invalid turn restriction at %s";
+    public static final String FMT = "Invalid turn restriction %s";
     
-    final long id;
+    final String tagval;
     
     @Override
     public String getMessage() {
-        return String.format(FMT, id);
+        return String.format(FMT, tagval);
     }
 
 }
