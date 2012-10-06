@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
+import java.util.BitSet;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
@@ -35,7 +36,7 @@ public class ServiceDay implements Serializable {
     private static final long serialVersionUID = -1206371243806996680L;
 
     protected long midnight;
-    protected int serviceIdsRunning[];
+    protected BitSet serviceIdsRunning;
     
     /* 
      * make a ServiceDay including the given time's day's starting second and a set of 
@@ -49,7 +50,7 @@ public class ServiceDay implements Serializable {
         ServiceDate sd = new ServiceDate(calendar);
         Date d = sd.getAsDate(timeZone);
         this.midnight = d.getTime() / 1000;
-        serviceIdsRunning = new int[cs.getServiceIds().size() / 32 + 1];
+        serviceIdsRunning = new BitSet(cs.getServiceIds().size());
         
         ServiceIdToNumberService service = graph.getService(ServiceIdToNumberService.class);
         
@@ -57,7 +58,7 @@ public class ServiceDay implements Serializable {
             int n = service.getNumber(serviceId);
             if (n < 0) continue;
 
-            serviceIdsRunning[n / 32] |= (1 << (n % 32));
+            serviceIdsRunning.set(n, true);
         }
     }
 
@@ -65,7 +66,11 @@ public class ServiceDay implements Serializable {
      * Does the given serviceId run on this ServiceDay?
      */
     public boolean serviceIdRunning(int serviceId) {
-        return (this.serviceIdsRunning[serviceId / 32] & (1 << (serviceId % 32))) != 0;
+        try {
+            return this.serviceIdsRunning.get(serviceId);
+        } catch (IndexOutOfBoundsException e) {
+            return false;
+        }
     }
 
     /* 
@@ -93,7 +98,7 @@ public class ServiceDay implements Serializable {
     }
     
     public String toString() {
-        return Long.toString(this.midnight) + Arrays.asList(serviceIdsRunning);
+        return Long.toString(this.midnight) + serviceIdsRunning.toString();
     }
     
     public boolean equals(Object o) {
@@ -111,9 +116,7 @@ public class ServiceDay implements Serializable {
         //FIXME: assumes all service is in the same tz
         final String agencyId = graph.getAgencyIds().iterator().next();
         ServiceDay universal = new ServiceDay(graph, 0, graph.getCalendarService(), agencyId);
-        for (int i = 0; i < universal.serviceIdsRunning.length; ++i) {
-            universal.serviceIdsRunning[i] = 0xffffffff;
-        }
+        universal.serviceIdsRunning.set(0, universal.serviceIdsRunning.size(), true);
         return universal;
     }
 }
