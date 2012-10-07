@@ -14,9 +14,9 @@ public class BikeRentalStation implements Serializable {
     @XmlAttribute
     public double x, y; //longitude, latitude
     @XmlAttribute
-    public int bikesAvailable;
+    public int bikesAvailable = Integer.MAX_VALUE;
     @XmlAttribute
-    public int spacesAvailable;
+    public int spacesAvailable = Integer.MAX_VALUE;
     
     public boolean equals(Object o) {
         if (!(o instanceof BikeRentalStation)) {
