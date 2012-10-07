@@ -15,6 +15,7 @@ package org.opentripplanner.routing.core;
 
 import java.io.Serializable;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
@@ -35,7 +36,7 @@ public class ServiceDay implements Serializable {
     private static final long serialVersionUID = -1206371243806996680L;
 
     protected long midnight;
-    protected int serviceIdsRunning[];
+    protected BitSet serviceIdsRunning;
     
     /* 
      * make a ServiceDay including the given time's day's starting second and a set of 
@@ -49,15 +50,14 @@ public class ServiceDay implements Serializable {
         ServiceDate sd = new ServiceDate(calendar);
         Date d = sd.getAsDate(timeZone);
         this.midnight = d.getTime() / 1000;
-        serviceIdsRunning = new int[cs.getServiceIds().size() / 32 + 1];
+        serviceIdsRunning = new BitSet(cs.getServiceIds().size());
         
         ServiceIdToNumberService service = graph.getService(ServiceIdToNumberService.class);
-        
         for (AgencyAndId serviceId : cs.getServiceIdsOnDate(sd)) {
             int n = service.getNumber(serviceId);
-            if (n < 0) continue;
-
-            serviceIdsRunning[n / 32] |= (1 << (n % 32));
+            if (n < 0)
+                continue;
+            serviceIdsRunning.set(n);
         }
     }
 
@@ -65,7 +65,7 @@ public class ServiceDay implements Serializable {
      * Does the given serviceId run on this ServiceDay?
      */
     public boolean serviceIdRunning(int serviceId) {
-        return (this.serviceIdsRunning[serviceId / 32] & (1 << (serviceId % 32))) != 0;
+        return this.serviceIdsRunning.get(serviceId);
     }
 
     /* 
@@ -107,13 +107,26 @@ public class ServiceDay implements Serializable {
         return (int) midnight;
     }
 
-    public static ServiceDay universalService(Graph graph) {
-        //FIXME: assumes all service is in the same tz
-        final String agencyId = graph.getAgencyIds().iterator().next();
-        ServiceDay universal = new ServiceDay(graph, 0, graph.getCalendarService(), agencyId);
-        for (int i = 0; i < universal.serviceIdsRunning.length; ++i) {
-            universal.serviceIdsRunning[i] = 0xffffffff;
+//    public static ServiceDay universalService(Graph graph) {
+//        //FIXME: assumes all service is in the same tz
+//        final String agencyId = graph.getAgencyIds().iterator().next();
+//        ServiceDay universal = new ServiceDay(graph, 0, graph.getCalendarService(), agencyId);
+//
+//        return universal;
+//    }
+    
+    /** Used in RAPTOR graph analysis to board everything. */
+    public static class UniversalService extends ServiceDay {
+        
+        private static final long serialVersionUID = 1L;
+
+        public UniversalService(Graph graph) {
+            super(graph, 0, graph.getCalendarService(), graph.getAgencyIds().iterator().next());
         }
-        return universal;
+
+        @Override
+        public boolean serviceIdRunning(int serviceId) { return true; }
+        
     }
+    
 }

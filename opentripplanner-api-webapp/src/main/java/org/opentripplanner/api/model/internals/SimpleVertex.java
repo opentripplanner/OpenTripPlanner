@@ -11,7 +11,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.api.model.analysis;
+package org.opentripplanner.api.model.internals;
 
 import org.opentripplanner.routing.graph.Vertex;
 

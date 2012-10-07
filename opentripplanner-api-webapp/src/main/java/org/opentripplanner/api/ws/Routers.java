@@ -83,7 +83,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * DELETE http://localhost/opentripplanner-api-webapp/ws/routers
  * will de-register all currently registered routerIds.
  * 
- * The GET methods are not secured, but all other methods are secured under ROLE_DEPLOYER.
+ * The GET methods are not secured, but all other methods are secured under ROLE_ROUTERS.
  * See documentation for individual methods for additional parameters.
  */
 @Path("/routers")
@@ -140,7 +140,7 @@ public class Routers {
     /** 
      * Reload the graphs for all registered routerIds from disk.
      */
-    @Secured({ "ROLE_DEPLOYER" })
+    @Secured({ "ROLE_ROUTERS" })
     @PUT @Produces({ MediaType.APPLICATION_JSON })
     public Response reloadGraphs(@QueryParam("path") String path, 
             @QueryParam("preEvict") @DefaultValue("true") boolean preEvict) {
@@ -156,7 +156,7 @@ public class Routers {
      * routerId for the duration of the operation.
      * @param upload read the graph from the PUT data stream instead of from disk.
      */
-    @Secured({ "ROLE_DEPLOYER" })
+    @Secured({ "ROLE_ROUTERS" })
     @PUT @Path("{routerId}") @Produces({ MediaType.TEXT_PLAIN })
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
     public Response putGraphId(
@@ -190,7 +190,7 @@ public class Routers {
     }
 
     /** De-register all registered routerIds, evicting them from memory. */
-    @Secured({ "ROLE_DEPLOYER" })
+    @Secured({ "ROLE_ROUTERS" })
     @DELETE @Produces({ MediaType.TEXT_PLAIN })
     public Response deleteAll() {
         int nEvicted = graphService.evictAll();
@@ -203,7 +203,7 @@ public class Routers {
      * @return status code 200 if the routerId was de-registered, 
      * 404 if the routerId was not registered. 
      */
-    @Secured({ "ROLE_DEPLOYER" })
+    @Secured({ "ROLE_ROUTERS" })
     @DELETE @Path("{routerId}") @Produces({ MediaType.TEXT_PLAIN })
     public Response deleteGraphId(@PathParam("routerId") String routerId) {
         boolean existed = graphService.evictGraph(routerId);

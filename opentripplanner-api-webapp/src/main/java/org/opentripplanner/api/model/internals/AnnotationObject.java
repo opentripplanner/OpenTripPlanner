@@ -1,4 +1,4 @@
-package org.opentripplanner.api.model.analysis;
+package org.opentripplanner.api.model.internals;
 
 import javax.xml.bind.annotation.XmlAttribute;
 

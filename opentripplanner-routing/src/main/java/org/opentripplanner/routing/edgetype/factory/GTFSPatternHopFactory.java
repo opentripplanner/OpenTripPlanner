@@ -35,6 +35,7 @@ import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Transfer;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
+import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
@@ -50,6 +51,7 @@ import org.opentripplanner.gbannotation.NegativeDwellTime;
 import org.opentripplanner.gbannotation.NegativeHopTime;
 import org.opentripplanner.gbannotation.StopAtEntrance;
 import org.opentripplanner.gbannotation.TripDegenerate;
+import org.opentripplanner.gbannotation.TripUndefinedService;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.ServiceIdToNumberService;
@@ -304,6 +306,8 @@ public class GTFSPatternHopFactory {
 
     private GtfsRelationalDao _dao;
 
+    private CalendarService _calendarService;
+    
     private Map<ShapeSegmentKey, LineString> _geometriesByShapeSegmentKey = new HashMap<ShapeSegmentKey, LineString>();
 
     private Map<AgencyAndId, LineString> _geometriesByShapeId = new HashMap<AgencyAndId, LineString>();
@@ -329,7 +333,8 @@ public class GTFSPatternHopFactory {
     private static final DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     public GTFSPatternHopFactory(GtfsContext context) {
-        _dao = context.getDao();
+        this._dao = context.getDao();
+        this._calendarService = context.getCalendarService();
     }
 
     
@@ -418,6 +423,11 @@ public class GTFSPatternHopFactory {
             tripCount++;
             if (tripCount % 100000 == 0)
                 _log.debug("trips=" + tripCount + "/" + trips.size());
+            
+            if ( ! _calendarService.getServiceIds().contains(trip.getServiceId())) {
+                _log.warn(graph.addBuilderAnnotation(new TripUndefinedService(trip)));
+            }
+
 
             /* GTFS stop times frequently contain duplicate, missing, or incorrect entries */
             List<StopTime> stopTimes = getNonduplicateStopTimesForTrip(trip); // duplicate stopIds
