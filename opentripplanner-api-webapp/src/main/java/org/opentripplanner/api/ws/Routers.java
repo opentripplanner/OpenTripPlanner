@@ -19,6 +19,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -158,34 +159,45 @@ public class Routers {
      */
     @Secured({ "ROLE_ROUTERS" })
     @PUT @Path("{routerId}") @Produces({ MediaType.TEXT_PLAIN })
-    @Consumes(MediaType.APPLICATION_OCTET_STREAM)
     public Response putGraphId(
             @PathParam("routerId") String routerId, 
-            @QueryParam("preEvict") @DefaultValue("true") boolean preEvict, 
-            @QueryParam("upload") @DefaultValue("false") boolean upload,
-            //@QueryParam("loadLevel") @DefaultValue("FULL") LoadLevel level,
-            InputStream is) {
-        Graph graph;
+            @QueryParam("preEvict") @DefaultValue("true") boolean preEvict) {
         if (preEvict) {
             LOG.debug("pre-evicting graph");
             graphService.evictGraph(routerId);
         }
-        if (upload) {
-            LOG.debug("deserializing graph from PUT data stream...");
-            try {
-                graph = Graph.load(is, LoadLevel.FULL);
-                graphService.registerGraph(routerId, graph);
-                return Response.status(Status.CREATED).entity(graph.toString()).build();
-            } catch (Exception e) {
-                return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
-            }
-        } else { // load from local filesystem
-            LOG.debug("attempting to load graph from server's local filsystem.");
-            boolean success = graphService.registerGraph(routerId, preEvict);
-            if (success)
-                return Response.status(201).entity("graph registered.").build();
-            else
-                return Response.status(404).entity("graph not found or other error.").build();
+        LOG.debug("attempting to load graph from server's local filsystem.");
+        boolean success = graphService.registerGraph(routerId, preEvict);
+        if (success)
+            return Response.status(201).entity("graph registered.").build();
+        else
+            return Response.status(404).entity("graph not found or other error.").build();
+    }
+
+    /** 
+     * Deserialize a graph sent with the HTTP request as POST data, associating it with the given 
+     * routerId.
+     */
+    @Secured({ "ROLE_ROUTERS" })
+    @POST @Path("{routerId}") @Produces({ MediaType.TEXT_PLAIN })
+    @Consumes(MediaType.APPLICATION_OCTET_STREAM)
+    public Response postGraphOverWire (
+            @PathParam("routerId") String routerId, 
+            @QueryParam("preEvict") @DefaultValue("true") boolean preEvict, 
+            @QueryParam("loadLevel") @DefaultValue("FULL") LoadLevel level,
+            InputStream is) {
+        if (preEvict) {
+            LOG.debug("pre-evicting graph");
+            graphService.evictGraph(routerId);
+        }
+        LOG.debug("deserializing graph from POST data stream...");
+        Graph graph;
+        try {
+            graph = Graph.load(is, level);
+            graphService.registerGraph(routerId, graph);
+            return Response.status(Status.CREATED).entity(graph.toString()).build();
+        } catch (Exception e) {
+            return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
         }
     }
 
