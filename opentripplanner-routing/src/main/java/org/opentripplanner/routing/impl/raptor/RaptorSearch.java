@@ -585,6 +585,7 @@ public class RaptorSearch {
                 if (parent != null) {
                     state = new RaptorState(parent);
                     state.nBoardings = parent.nBoardings;
+                    state.rentingBike = targetState.isBikeRenting();
                 } else {
                     state = new RaptorState(options.arriveBy);
                 }
@@ -669,6 +670,7 @@ public class RaptorSearch {
             newState.arrivalTime = (int) state.getTime();
             newState.walkPath = state;
             newState.stop = stop;
+            newState.rentingBike = state.isBikeRenting();
 
             for (RaptorState oldState : states) {
                 if (oldState.eDominates(newState)) {

@@ -22,6 +22,10 @@ public class MaxWalkState extends State {
     @Override
     public boolean dominates(State other) {
 
+        if (isBikeRenting() != other.isBikeRenting()) {
+            return false;
+        }
+
         if (backEdge != other.getBackEdge() && ((backEdge instanceof PlainStreetEdge)
                 && (!((PlainStreetEdge) backEdge).getTurnRestrictions().isEmpty())))
             return false;

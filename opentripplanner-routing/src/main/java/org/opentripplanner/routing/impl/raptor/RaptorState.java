@@ -40,6 +40,8 @@ public class RaptorState implements Comparable<RaptorState>, Cloneable {
     public int patternIndex = -1; 
     public TripTimes tripTimes = null;
 
+    boolean rentingBike;
+
     public AgencyAndId tripId;
 
     /* if has walked to transit,  */
@@ -65,6 +67,7 @@ public class RaptorState implements Comparable<RaptorState>, Cloneable {
         this.arriveBy = parent.arriveBy;
         this.weight = parent.weight;
         this.initialWaitTime = parent.initialWaitTime;
+        this.rentingBike = parent.rentingBike;
     }
 
     public String toString() {
@@ -106,6 +109,8 @@ public class RaptorState implements Comparable<RaptorState>, Cloneable {
     }
 
     public boolean eDominates(RaptorState other) {
+        if (rentingBike != other.rentingBike)
+            return false;
         if (arriveBy) {
             return nBoardings <= other.nBoardings
                     && walkDistance <= other.walkDistance * 1.1
