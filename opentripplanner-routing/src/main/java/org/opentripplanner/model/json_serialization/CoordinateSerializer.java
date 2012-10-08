@@ -11,31 +11,30 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.api.model.json_serializers;
+package org.opentripplanner.model.json_serialization;
 
 import java.io.IOException;
 
-import org.codehaus.jackson.JsonGenerator;
-import org.codehaus.jackson.JsonProcessingException;
-import org.codehaus.jackson.map.JsonSerializer;
-import org.codehaus.jackson.map.SerializerProvider;
-import org.geotools.geojson.geom.GeometryJSON;
 
-import com.vividsolutions.jts.geom.Geometry;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonSerializer;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.vividsolutions.jts.geom.Coordinate;
 
-public class GeoJSONSerializer extends JsonSerializer<Geometry> {
+public class CoordinateSerializer extends JsonSerializer<Coordinate> {
 
     @Override
-    public void serialize(Geometry value, JsonGenerator jgen, SerializerProvider provider)
+    public void serialize(Coordinate value, JsonGenerator jgen, SerializerProvider provider)
             throws IOException, JsonProcessingException {
-        
-        GeometryJSON json = new GeometryJSON();
-        
-        jgen.writeRawValue(json.toString(value));
+        jgen.writeStartArray();
+        jgen.writeObject(value.x);
+        jgen.writeObject(value.y);
+        jgen.writeEndArray();
     }
-
-    @Override
-    public Class<Geometry> handledType() {
-        return Geometry.class;
+    
+    public Class<Coordinate> handledType() {
+        return Coordinate.class;
     }
+    
 }

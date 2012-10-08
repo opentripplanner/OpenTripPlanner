@@ -97,7 +97,7 @@ public class RaptorDataBuilder implements GraphBuilder {
             HashMap<AgencyAndId, RaptorRoute> raptorRouteForTrip = new HashMap<AgencyAndId, RaptorRoute>();
             ArrayList<PatternInterlineDwell> interlines = new ArrayList<PatternInterlineDwell>();
             for (RouteVariant variant : transitIndex.getVariantsForAgency(agency)) {
-                ArrayList<Stop> variantStops = variant.getStops();
+                List<Stop> variantStops = variant.getStops();
                 final int nStops = variantStops.size();
 
                 int nPatterns = variant.getSegments().size() / nStops;

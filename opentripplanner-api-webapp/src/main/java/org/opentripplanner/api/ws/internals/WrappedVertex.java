@@ -13,11 +13,12 @@
 
 package org.opentripplanner.api.ws.internals;
 
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-import org.opentripplanner.api.model.json_serializers.VertexSetJSONSerializer;
-import org.opentripplanner.api.model.json_serializers.WithGraph;
+import org.opentripplanner.model.json_serialization.VertexSetJSONSerializer;
+import org.opentripplanner.model.json_serialization.WithGraph;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 public class WrappedVertex {
 

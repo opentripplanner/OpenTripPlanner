@@ -22,9 +22,10 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.patch.Alert;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * Represents one instruction in walking directions. Three examples from New York City:

@@ -17,11 +17,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-import org.opentripplanner.api.model.json_serializers.EdgeSetJSONSerializer;
-import org.opentripplanner.api.model.json_serializers.WithGraph;
+import org.opentripplanner.model.json_serialization.EdgeSetJSONSerializer;
+import org.opentripplanner.model.json_serialization.WithGraph;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 public class EdgeSet {
     public List<WrappedEdge> edges;

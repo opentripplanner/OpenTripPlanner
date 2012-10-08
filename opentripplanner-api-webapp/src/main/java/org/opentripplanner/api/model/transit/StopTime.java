@@ -3,10 +3,11 @@ package org.opentripplanner.api.model.transit;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.opentripplanner.routing.transit_index.adapters.StopType;
 import org.opentripplanner.routing.transit_index.adapters.TripType;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 public class StopTime {
     /**
@@ -19,11 +20,13 @@ public class StopTime {
     @XmlAttribute
     public String phase;
 
-    @JsonSerialize(include=Inclusion.NON_NULL)
+    @JsonSerialize
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @XmlElement
     public TripType trip;
 
-    @JsonSerialize(include=Inclusion.NON_NULL)
+    @JsonSerialize
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     @XmlElement
     public StopType stop;
 

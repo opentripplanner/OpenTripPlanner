@@ -11,23 +11,20 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.api.model.json_serializers;
+package org.opentripplanner.model.json_serialization;
 
-import org.opentripplanner.routing.graph.Graph;
+import com.vividsolutions.jts.geom.Geometry;
 
-public class WithGraph {
-    private Graph graph;
-    private Object object;
-    public WithGraph(Graph graph, Object object) {
-        this.graph = graph;
-        this.object = object;
+/**
+ * Enunciate requires that we actually be able to construct objects, but 
+ * we won't ever need to use this functionality, since the relevant APIs
+ * don't support XML.  This class is a fake factory class for geometries 
+ * to fool Enunciate. 
+ * @author novalis
+ *
+ */
+public class BogusGeometryFactory {
+    public Geometry neverCreateGeometry() {
+        return null;
     }
-    public Graph getGraph() {
-        return graph;
-    }
-    
-    public Object getObject() {
-        return object;
-    }
-    
 }

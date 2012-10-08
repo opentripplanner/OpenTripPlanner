@@ -11,21 +11,21 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.api.model.json_serializers;
+package org.opentripplanner.model.json_serialization;
 
-import org.codehaus.jackson.Version;
-import org.codehaus.jackson.map.AnnotationIntrospector;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.SerializationConfig;
-import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-import org.codehaus.jackson.map.introspect.JacksonAnnotationIntrospector;
-import org.codehaus.jackson.map.module.SimpleModule;
-import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.Version;
+import com.fasterxml.jackson.databind.AnnotationIntrospector;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
+
 
 public class SerializerUtils {
 
     public static SimpleModule getSerializerModule() {
-        SimpleModule module = new SimpleModule("VertexJSONSerializer", new Version(1, 0, 0, null));
+        SimpleModule module = new SimpleModule("VertexJSONSerializer", new Version(1, 0, 0, null, "com.fasterxml.jackson.module", "jackson-module-jaxb-annotations"));
         module.addSerializer(new GeoJSONSerializer());
         module.addSerializer(new CoordinateSerializer());
         module.addSerializer(new PackedCoordinateSequenceSerializer());
@@ -39,8 +39,8 @@ public class SerializerUtils {
         AnnotationIntrospector secondary = new JaxbAnnotationIntrospector();
         AnnotationIntrospector pair = new AnnotationIntrospector.Pair(primary, secondary);
         mapper.setAnnotationIntrospector(pair);
-        mapper.configure(SerializationConfig.Feature.USE_ANNOTATIONS, true);
-        mapper.getSerializationConfig().withSerializationInclusion(Inclusion.NON_NULL);
+        //REMOVE: mapper.configure(SerializationConfig.Feature.USE_ANNOTATIONS, true);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         return mapper;
 
     }

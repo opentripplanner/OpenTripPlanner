@@ -13,11 +13,11 @@
 
 package org.opentripplanner.api.model.internals;
 
-import org.codehaus.jackson.map.annotate.JsonDeserialize;
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-import org.opentripplanner.api.model.json_serializers.GeoJSONDeserializer;
-import org.opentripplanner.api.model.json_serializers.GeoJSONSerializer;
+import org.opentripplanner.model.json_serialization.GeoJSONDeserializer;
+import org.opentripplanner.model.json_serialization.GeoJSONSerializer;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class GraphComponent {
