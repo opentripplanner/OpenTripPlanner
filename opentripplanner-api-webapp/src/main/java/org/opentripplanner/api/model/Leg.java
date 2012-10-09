@@ -27,6 +27,8 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
  * particular vehicle (or on foot).
@@ -53,6 +55,7 @@ public class Leg {
      * The mode (e.g., <code>Walk</code>) used when traversing this leg.
      */
     @XmlAttribute
+    @JsonSerialize
     public String mode = TraverseMode.WALK.toString();
 
     /**
@@ -60,21 +63,26 @@ public class Leg {
      * the street being traversed.
      */
     @XmlAttribute
+    @JsonSerialize
     public String route = "";
 
     @XmlAttribute
+    @JsonSerialize
     public String agencyName;
 
     @XmlAttribute
+    @JsonSerialize
     public String agencyUrl;
 
     @XmlAttribute
+    @JsonSerialize
     public int agencyTimeZoneOffset;
 
     /**
      * For transit leg, the route's (background) color (if one exists). For non-transit legs, null.
      */
     @XmlAttribute
+    @JsonSerialize
     public String routeColor = null;
     
     /**
@@ -82,18 +90,21 @@ public class Leg {
      * For non-transit legs, null.
      */
     @XmlAttribute
+    @JsonSerialize
     public String routeId = null;
 
     /**
      * For transit leg, the route's text color (if one exists). For non-transit legs, null.
      */
     @XmlAttribute
+    @JsonSerialize
     public String routeTextColor = null;
 
     /**
      * For transit legs, if the rider should stay on the vehicle as it changes route names.
      */
     @XmlAttribute
+    @JsonSerialize
     public Boolean interlineWithPreviousLeg;
 
     
@@ -101,12 +112,14 @@ public class Leg {
      * For transit leg, the trip's short name (if one exists). For non-transit legs, null.
      */
     @XmlAttribute
+    @JsonSerialize
     public String tripShortName = null;
 
     /**
      * For transit legs, the headsign of the bus or train being used. For non-transit legs, null.
      */
     @XmlAttribute
+    @JsonSerialize
     public String headsign = null;
 
     /**
@@ -114,6 +127,7 @@ public class Leg {
      * For non-transit legs, null.
      */
     @XmlAttribute
+    @JsonSerialize
     public String agencyId = null;
     
     /**
@@ -121,6 +135,7 @@ public class Leg {
      * For non-transit legs, null.
      */
     @XmlAttribute
+    @JsonSerialize
     public String tripId = null;
     
     /**
@@ -157,24 +172,31 @@ public class Leg {
      * alerts
      */
     @XmlElement
+    @JsonSerialize
     private List<Note> notes;
 
     @XmlElement
+    @JsonSerialize
     private List<Alert> alerts;
 
     @XmlAttribute
-	public String routeShortName;
+    @JsonSerialize
+    public String routeShortName;
 
     @XmlAttribute
-	public String routeLongName;
+    @JsonSerialize
+    public String routeLongName;
 
     @XmlAttribute
+    @JsonSerialize
     public String boardRule;
 
     @XmlAttribute
+    @JsonSerialize
     public String alightRule;
 
     @XmlAttribute
+    @JsonSerialize
     public Boolean rentedBike;
 
     /**
@@ -199,6 +221,7 @@ public class Leg {
      * The leg's duration in milliseconds
      */
     @XmlElement
+    @JsonSerialize
     public long getDuration() {
         return endTime.getTimeInMillis() - startTime.getTimeInMillis();
     }

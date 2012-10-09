@@ -14,9 +14,11 @@ public class StopTime {
      * These are departure times, except where the stop is the last stop on a particular
      * trip, in which case they are arrivals
      */
+    @JsonSerialize
     @XmlAttribute
     public long time;
 
+    @JsonSerialize
     @XmlAttribute
     public String phase;
 

@@ -20,6 +20,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 @XmlRootElement(name = "route")
 public class RouteType {
 
@@ -63,27 +65,35 @@ public class RouteType {
     AgencyAndId serviceId;
 
     @XmlAttribute
+    @JsonSerialize
     String routeShortName;
 
     @XmlAttribute
+    @JsonSerialize
     String routeLongName;
 
     @XmlAttribute
+    @JsonSerialize
     String routeDesc;
 
     @XmlAttribute
+    @JsonSerialize
     String routeUrl;
 
     @XmlAttribute
+    @JsonSerialize
     String routeColor;
 
     @XmlAttribute
+    @JsonSerialize
     Integer routeType;
 
     @XmlAttribute
+    @JsonSerialize
     String routeTextColor;
 
     @XmlAttribute
+    @JsonSerialize
     Integer routeBikesAllowed;
 
 }
