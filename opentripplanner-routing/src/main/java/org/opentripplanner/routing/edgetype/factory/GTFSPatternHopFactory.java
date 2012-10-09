@@ -820,9 +820,18 @@ public class GTFSPatternHopFactory {
 
         pattern.setStops(stops);
 
-        pattern.setTripFlags(((trip.getWheelchairAccessible() == 1) ? TableTripPattern.FLAG_WHEELCHAIR_ACCESSIBLE : 0)
-        | (((trip.getRoute().getBikesAllowed() == 2 && trip.getTripBikesAllowed() != 1)
-            || trip.getTripBikesAllowed() == 2) ? TableTripPattern.FLAG_BIKES_ALLOWED : 0));
+        int wheelchair = 0;
+        if (trip.getWheelchairAccessible() == 1) {
+            wheelchair = TableTripPattern.FLAG_WHEELCHAIR_ACCESSIBLE;
+        }
+
+        int bikes = 0;
+        if ((trip.getRoute().getBikesAllowed() == 2 && trip.getTripBikesAllowed() != 1)
+                || trip.getTripBikesAllowed() == 2) {
+            bikes = TableTripPattern.FLAG_BIKES_ALLOWED;
+        }
+
+        pattern.setTripFlags(wheelchair | bikes);
 
         return new T2<FrequencyBasedTripPattern, List<FrequencyHop>>(pattern, hops);
     }
