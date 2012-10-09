@@ -427,7 +427,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     
     @Override
     public String toString() {
-        return "PlainStreetEdge(" + fromv + " -> " + tov + ")";
+        return "PlainStreetEdge(" + name + ", " + fromv + " -> " + tov + ")";
     }
 
     public boolean hasBogusName() {

@@ -59,6 +59,8 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.edgetype.AreaEdge;
+import org.opentripplanner.routing.edgetype.AreaEdgeList;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
@@ -763,6 +765,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         continue;
                     }
                     VisibilityGraph vg = new VisibilityGraph(areaEnv, VISIBILITY_EPSILON, visibilityPoints);
+                    AreaEdgeList edgeList = new AreaEdgeList();
                     for (int i = 0; i < nodes.size(); ++i) {
                         OSMNode nodeI = nodes.get(i);
                         for (int j = 0; j < nodes.size(); ++j) {
@@ -787,10 +790,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
                                 double length = distanceLibrary.distance(
                                         startEndpoint.getCoordinate(), endEndpoint.getCoordinate());
-                                PlainStreetEdge street = edgeFactory.createEdge(nodeI, nodeJ, areaEntity, startEndpoint,
+                                AreaEdge street = edgeFactory.createAreaEdge(nodeI, nodeJ, areaEntity, startEndpoint,
                                         endEndpoint, geometry, name, length,
                                         areaPermissions,
-                                        i > j);
+                                        i > j, edgeList);
                                 street.setId(id);
 
                                 edges.add(street);
