@@ -66,6 +66,7 @@ public class StopType {
     }
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
+    @JsonSerialize
     AgencyAndId id;
 
     @XmlAttribute
