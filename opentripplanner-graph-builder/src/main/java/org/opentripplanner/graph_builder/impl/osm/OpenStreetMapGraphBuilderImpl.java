@@ -29,18 +29,15 @@ import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.gbannotation.ConflictingBikeTags;
-import org.opentripplanner.gbannotation.ElevationFlattened;
 import org.opentripplanner.gbannotation.Graphwide;
 import org.opentripplanner.gbannotation.LevelAmbiguous;
 import org.opentripplanner.gbannotation.TurnRestrictionBad;
 import org.opentripplanner.gbannotation.TurnRestrictionException;
 import org.opentripplanner.gbannotation.TurnRestrictionUnknown;
 import org.opentripplanner.graph_builder.impl.extra_elevation_data.ElevationPoint;
-import org.opentripplanner.graph_builder.impl.extra_elevation_data.ExtraElevationData;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
@@ -61,7 +58,6 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.AreaEdgeList;
-import org.opentripplanner.routing.edgetype.EdgeWithElevation;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
 import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
@@ -137,7 +133,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
     private CustomNamer customNamer;
 
-    private ExtraElevationData extraElevationData = new ExtraElevationData();
+    private HashMap<Vertex, Double> elevationData = new HashMap<Vertex, Double>();
 
     private boolean noZeroLevels = true;
 
@@ -587,7 +583,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
 
             // generate elevation profiles
-            generateElevationProfiles(graph);
+            extra.put(ElevationPoint.class, elevationData);
 
             applyBikeSafetyFactor(graph);
         } // END buildGraph()
@@ -620,36 +616,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 new RentABikeOffEdge(station, station, network);
             }
             _log.debug("Created " + n + " bike rental stations.");
-        }
-
-        private void generateElevationProfiles(Graph graph) {
-            Map<EdgeWithElevation, List<ElevationPoint>> data = extraElevationData.data;
-            for (Map.Entry<EdgeWithElevation, List<ElevationPoint>> entry : data.entrySet()) {
-                EdgeWithElevation edge = entry.getKey();
-                List<ElevationPoint> points = entry.getValue();
-                Collections.sort(points);
-
-                if (points.size() == 1) {
-                    ElevationPoint firstPoint = points.get(0);
-                    ElevationPoint endPoint = new ElevationPoint(edge.getDistance(), firstPoint.ele);
-                    points.add(endPoint);
-                }
-                Coordinate[] coords = new Coordinate[points.size()];
-                int i = 0;
-                for (ElevationPoint p : points) {
-                    double d = p.distanceAlongShape;
-                    if (i == 0) {
-                        d = 0;
-                    } else if (i == points.size() - 1) {
-                        d = edge.getDistance();
-                    }
-                    coords[i++] = new Coordinate(d, p.ele);
-                }
-                // set elevation profile and warn if profile was flattened because it was too steep
-                if (edge.setElevationProfile(new PackedCoordinateSequence.Double(coords), true)) {
-                    _log.warn(graph.addBuilderAnnotation(new ElevationFlattened(edge)));
-                }
-            }
         }
 
         private void buildAreas() {
@@ -994,7 +960,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 Long startNode = null;
                 // where the current edge should start
                 OSMNode osmStartNode = null;
-                List<ElevationPoint> elevationPoints = new ArrayList<ElevationPoint>();
                 double distance = 0;
                 for (int i = 0; i < nodes.size() - 1; i++) {
                     OSMNode segmentStartOSMNode = _nodes.get(nodes.get(i));
@@ -1005,7 +970,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     if (osmStartNode == null) {
                         startNode = nodes.get(i);
                         osmStartNode = segmentStartOSMNode;
-                        elevationPoints.clear();
                     }
                     // where the current edge might end
                     OSMNode osmEndNode = _nodes.get(endNode);
@@ -1016,32 +980,21 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     LineString geometry;
 
                     /*
-                     * skip vertices that are not intersections, except that we use them for geometry
+                     * We split segments at intersections, self-intersections, and nodes
+                     * with ele tags; the only processing we do on other nodes is to
+                     * accumulate their geometry
                      */
                     if (segmentCoordinates.size() == 0) {
                         segmentCoordinates.add(getCoordinate(osmStartNode));
-                    }
-                    String ele = segmentStartOSMNode.getTag("ele");
-                    if (ele != null) {
-                        Double elevation = ElevationUtils.parseEleTag(ele);
-                        if (elevation != null) {
-                            elevationPoints.add(new ElevationPoint(distance, elevation));
-                        }
                     }
 
                     distance += distanceLibrary.distance(segmentStartOSMNode.getLat(),
                             segmentStartOSMNode.getLon(), osmEndNode.getLat(), osmEndNode.getLon());
 
                     if (intersectionNodes.containsKey(endNode) || i == nodes.size() - 2
-                            || nodes.subList(0, i).contains(nodes.get(i))) {
+                            || nodes.subList(0, i).contains(nodes.get(i))
+                            || osmEndNode.hasTag("ele")) {
                         segmentCoordinates.add(getCoordinate(osmEndNode));
-                        ele = osmEndNode.getTag("ele");
-                        if (ele != null) {
-                            Double elevation = ElevationUtils.parseEleTag(ele);
-                            if (elevation != null) {
-                                elevationPoints.add(new ElevationPoint(distance, elevation));
-                            }
-                        }
 
                         geometry = GeometryUtils.getGeometryFactory().createLineString(
                                 segmentCoordinates.toArray(new Coordinate[0]));
@@ -1056,12 +1009,25 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         // make or get a shared vertex for flat intersections,
                         // one vertex per level for multilevel nodes like elevators
                         startEndpoint = getVertexForOsmNode(osmStartNode, way);
+                        String ele = segmentStartOSMNode.getTag("ele");
+                        if (ele != null) {
+                            Double elevation = ElevationUtils.parseEleTag(ele);
+                            if (elevation != null) {
+                                elevationData.put(startEndpoint, elevation);
+                            }
+                        }
                     } else { // subsequent iterations
                         startEndpoint = endEndpoint;
                     }
 
                     endEndpoint = getVertexForOsmNode(osmEndNode, way);
-
+                    String ele = osmEndNode.getTag("ele");
+                    if (ele != null) {
+                        Double elevation = ElevationUtils.parseEleTag(ele);
+                        if (elevation != null) {
+                            elevationData.put(endEndpoint, elevation);
+                        }
+                    }
                     P2<PlainStreetEdge> streets = getEdgesForStreet(startEndpoint, endEndpoint,
                             way, i, osmStartNode.getId(), osmEndNode.getId(), permissions, geometry);
 
@@ -1096,8 +1062,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         }
                     }
 
-                    storeExtraElevationData(elevationPoints, street, backStreet, distance);
-
                     applyEdgesToTurnRestrictions(way, startNode, endNode, street, backStreet);
                     startNode = endNode;
                     osmStartNode = _nodes.get(startNode);
@@ -1110,22 +1074,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 String creativeName = wayPropertySet.getCreativeNameForWay(way);
                 if (creativeName != null) {
                     way.addTag("otp:gen_name", creativeName);
-                }
-            }
-        }
-
-        private void storeExtraElevationData(List<ElevationPoint> elevationPoints,
-                PlainStreetEdge street, PlainStreetEdge backStreet, double length) {
-            if (elevationPoints.isEmpty()) {
-                return;
-            }
-
-            for (ElevationPoint p : elevationPoints) {
-                if (street != null) {
-                    MapUtils.addToMapList(extraElevationData.data, street, p);
-                }
-                if (backStreet != null) {
-                    MapUtils.addToMapList(extraElevationData.data, backStreet, p.fromBack(length));
                 }
             }
         }

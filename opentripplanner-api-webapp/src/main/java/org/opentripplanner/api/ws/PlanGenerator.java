@@ -839,7 +839,7 @@ public class PlanGenerator {
                 }
             }
 
-            if (createdNewStep && !disableZagRemovalForThisStep) {
+            if (createdNewStep && !disableZagRemovalForThisStep && currState.getBackMode() == backState.getBackMode()) {
                 //check last three steps for zag
                 int last = steps.size() - 1;
                 if (last >= 2) {
