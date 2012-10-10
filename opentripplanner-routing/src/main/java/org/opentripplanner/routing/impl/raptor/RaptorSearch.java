@@ -360,7 +360,7 @@ public class RaptorSearch {
             // generate a board state for this interline
             RaptorState boardState = new RaptorState(stayOn);
             //we need to subtract out the slacks that we are about to mistakenly pay
-            boardState.weight = - options.getBoardSlack() - options.getAlightSlack(); 
+            boardState.weight -= options.getBoardSlack() - options.getAlightSlack();
             boardState.nBoardings = nBoardings - 1;
             boardState.boardStop = route.stops[firstStop];
             boardState.boardStopSequence = firstStop;
