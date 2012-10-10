@@ -77,9 +77,7 @@ public class Place {
      * @return
      */
     @XmlElement
-    @JsonSerialize(using=GeoJSONSerializer.class)
     String getGeometry() {
-
         return Constants.GEO_JSON_POINT + lon + "," + lat + Constants.GEO_JSON_TAIL;
     }
 
