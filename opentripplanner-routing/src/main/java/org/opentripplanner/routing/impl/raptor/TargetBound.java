@@ -208,7 +208,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
         
         double stateTime = current.getOptimizedElapsedTime() + minTime;
 
-        double walkDistance = FastMath.max(optimisticDistance * 1.1, optimisticDistance + transferTimeInWalkDistance);
+        double walkDistance = FastMath.max(optimisticDistance * Raptor.WALK_EPSILON, optimisticDistance + transferTimeInWalkDistance);
 
         int i = 0;
         boolean prevBounded = !bounders.isEmpty();

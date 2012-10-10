@@ -62,6 +62,8 @@ public class Raptor implements PathService {
 
     private static final int MAX_WALK_MULTIPLE = 8;
 
+    public static final double WALK_EPSILON = 1.10;
+
     @Autowired
     private GraphService graphService;
 
@@ -133,8 +135,8 @@ public class Raptor implements PathService {
         }
         RaptorData data = service.getData();
 
-        //we multiply the initial walk distance by 1.1 to account for epsilon dominance.
-        double initialWalk = options.getMaxWalkDistance() * 1.1;
+        //we multiply the initial walk distance to account for epsilon dominance.
+        double initialWalk = options.getMaxWalkDistance() * WALK_EPSILON;
         options.setMaxWalkDistance(initialWalk);
 
         //do not even bother with obviously impossible walks
@@ -688,8 +690,8 @@ public class Raptor implements PathService {
 
         RaptorData data = graph.getService(RaptorDataService.class).getData();
 
-        //we multiply the initial walk distance by 1.1 to account for epsilon dominance.
-        options.setMaxWalkDistance(options.getMaxWalkDistance() * 1.1);
+        //we multiply the initial walk distance to account for epsilon dominance.
+        options.setMaxWalkDistance(options.getMaxWalkDistance() * WALK_EPSILON);
 
         RoutingRequest walkOptions = options.clone();
         walkOptions.rctx.pathParsers = new PathParser[0];

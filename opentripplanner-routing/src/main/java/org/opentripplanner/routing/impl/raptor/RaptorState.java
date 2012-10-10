@@ -113,11 +113,11 @@ public class RaptorState implements Comparable<RaptorState>, Cloneable {
             return false;
         if (arriveBy) {
             return nBoardings <= other.nBoardings
-                    && walkDistance <= other.walkDistance * 1.1
+                    && walkDistance <= other.walkDistance * Raptor.WALK_EPSILON
                     && arrivalTime >= other.arrivalTime;
         } else {
             return nBoardings <= other.nBoardings
-                    && walkDistance <= other.walkDistance * 1.1
+                    && walkDistance <= other.walkDistance * Raptor.WALK_EPSILON
                     && arrivalTime <= other.arrivalTime;
             }
     }
