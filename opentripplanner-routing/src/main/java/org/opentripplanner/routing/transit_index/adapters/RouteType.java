@@ -59,9 +59,11 @@ public class RouteType {
     }
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
+    @JsonSerialize
     AgencyAndId id;
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
+    @JsonSerialize
     AgencyAndId serviceId;
 
     @XmlAttribute

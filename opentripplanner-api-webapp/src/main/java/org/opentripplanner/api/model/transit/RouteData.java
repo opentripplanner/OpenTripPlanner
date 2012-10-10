@@ -25,10 +25,13 @@ import org.opentripplanner.routing.transit_index.RouteVariant;
 import org.opentripplanner.routing.transit_index.adapters.AgencyAndIdAdapter;
 import org.opentripplanner.routing.transit_index.adapters.StopType;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 @XmlRootElement(name = "RouteData")
 public class RouteData {
     @XmlElement
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
+    @JsonSerialize
     public AgencyAndId id;
 
     @XmlElementWrapper

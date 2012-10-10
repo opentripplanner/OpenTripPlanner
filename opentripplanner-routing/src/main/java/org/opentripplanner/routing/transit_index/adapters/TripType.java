@@ -60,9 +60,11 @@ public class TripType {
     }
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
+    @JsonSerialize
     AgencyAndId id;
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
+    @JsonSerialize
     AgencyAndId serviceId;
 
     @XmlAttribute
@@ -74,6 +76,7 @@ public class TripType {
     String tripHeadsign;
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
+    @JsonSerialize
     AgencyAndId routeId;
 
     @XmlAttribute
@@ -85,6 +88,7 @@ public class TripType {
     String blockId;
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
+    @JsonSerialize
     AgencyAndId shapeId;
 
     @XmlAttribute
