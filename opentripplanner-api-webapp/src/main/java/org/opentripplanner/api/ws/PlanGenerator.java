@@ -518,16 +518,18 @@ public class PlanGenerator {
             CoordinateArrayListSequence coordinates, Itinerary itinerary) {
 
         //this leg has already been added to the itinerary, so we actually want the penultimate leg, if any
-        WalkStep continuation = null;
-        if (itinerary.legs.size() >= 2) {
-            Leg previousLeg = itinerary.legs.get(itinerary.legs.size() - 2);
-            if (previousLeg.walkSteps != null) {
-                continuation = previousLeg.walkSteps.get(previousLeg.walkSteps.size() - 1);
-                end += 1;
+        if (states != null) {
+            WalkStep continuation = null;
+            if (itinerary.legs.size() >= 2) {
+                Leg previousLeg = itinerary.legs.get(itinerary.legs.size() - 2);
+                if (previousLeg.walkSteps != null) {
+                    continuation = previousLeg.walkSteps.get(previousLeg.walkSteps.size() - 1);
+                    end += 1;
+                }
             }
-        }
 
-        leg.walkSteps = getWalkSteps(states.subList(start, end), continuation);
+            leg.walkSteps = getWalkSteps(states.subList(start, end), continuation);
+        }
         leg.endTime = makeCalendar(state.getBackState());
         Geometry geometry = GeometryUtils.getGeometryFactory().createLineString(coordinates);
         leg.legGeometry = PolylineEncoder.createEncodings(geometry);
