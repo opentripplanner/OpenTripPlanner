@@ -106,7 +106,9 @@ public class WalkStep {
     public List<P2<Double>> elevation;
 
     @XmlElement
-	public List<Alert> alerts;
+    public List<Alert> alerts;
+
+    public transient double angle;
     
     public void setDirections(double lastAngle, double thisAngle, boolean roundabout) {
         relativeDirection = getRelativeDirection(lastAngle, thisAngle, roundabout);
