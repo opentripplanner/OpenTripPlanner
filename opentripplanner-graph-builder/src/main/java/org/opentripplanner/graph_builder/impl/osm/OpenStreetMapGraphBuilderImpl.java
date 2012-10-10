@@ -774,6 +774,13 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                                 AreaEdge street = edgeFactory.createAreaEdge(nodeI, nodeJ,
                                         areaEntity, startEndpoint, endEndpoint, geometry, name,
                                         length, areaPermissions, i > j, edgeList);
+                                String highway = areaEntity.getTag("highway");
+                                int cls = StreetEdge.CLASS_OTHERPATH;
+                                if ("platform".equals(highway) || "platform".equals(areaEntity.getTag("railway"))
+                                        || "platform".equals(areaEntity.getTag("public_transport"))) {
+                                    cls |= StreetEdge.CLASS_PLATFORM;
+                                }
+                                street.setStreetClass(cls);
                                 street.setId(id);
 
                                 edges.add(street);
