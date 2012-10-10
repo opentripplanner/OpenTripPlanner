@@ -519,16 +519,20 @@ public class PlanGenerator {
 
         //this leg has already been added to the itinerary, so we actually want the penultimate leg, if any
         if (states != null) {
+            int extra = 0;
             WalkStep continuation = null;
             if (itinerary.legs.size() >= 2) {
                 Leg previousLeg = itinerary.legs.get(itinerary.legs.size() - 2);
                 if (previousLeg.walkSteps != null) {
                     continuation = previousLeg.walkSteps.get(previousLeg.walkSteps.size() - 1);
-                    end += 1;
+                    extra = 1;
                 }
             }
+            if (end == states.size() - 1) {
+                end += 1;
+            }
 
-            leg.walkSteps = getWalkSteps(states.subList(start, end), continuation);
+            leg.walkSteps = getWalkSteps(states.subList(start, end + extra), continuation);
         }
         leg.endTime = makeCalendar(state.getBackState());
         Geometry geometry = GeometryUtils.getGeometryFactory().createLineString(coordinates);
