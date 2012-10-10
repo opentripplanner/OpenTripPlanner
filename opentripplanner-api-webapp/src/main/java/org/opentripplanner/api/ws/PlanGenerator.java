@@ -529,7 +529,7 @@ public class PlanGenerator {
                 }
             }
             if (end == states.size() - 1) {
-                end += 1;
+                extra = 1;
             }
 
             leg.walkSteps = getWalkSteps(states.subList(start, end + extra), continuation);
