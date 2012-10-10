@@ -326,10 +326,11 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 // this is kind of a hack, but there's not really a better way to do it
                 score /= SIDEWALK_PREFERENCE;
             }
-            if (e.getPermission().allows(StreetTraversalPermission.CAR)) {
-                // we're subtracting here because no matter how close we are to a good
-                //non-car route, we really want to avoid it in case it's a Pedway or other
-                //weird and unlikely starting location
+            if (e.getPermission().allows(StreetTraversalPermission.CAR)
+                    || (e.getStreetClass() & StreetEdge.CLASS_PLATFORM) != 0) {
+                // we're subtracting here because no matter how close we are to a good non-car
+                // non-platform edge, we really want to avoid it in case it's a Pedway or other
+                // weird and unlikely starting location.
                 score -= CAR_PREFERENCE;
             }
             // break ties by choosing shorter edges; this should cause split streets to be preferred
