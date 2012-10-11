@@ -6,6 +6,7 @@ import org.opentripplanner.analyst.core.GeometryIndex;
 import org.opentripplanner.analyst.core.Sample;
 import org.opentripplanner.analyst.core.SampleSource;
 import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
@@ -81,7 +82,7 @@ public class SampleFactory implements SampleSource {
                 double y1 = coordSeq.getY(seg+1);
                 // use bounding rectangle to find a lower bound on (squared) distance ?
                 // this would mean more squaring or roots.
-                c.frac = segmentFraction(x0, y0, x1, y1, pt.x, pt.y, xscale);
+                c.frac = GeometryUtils.segmentFraction(x0, y0, x1, y1, pt.x, pt.y, xscale);
                 // project to get closest point 
                 c.x = x0 + c.frac * (x1 - x0);
                 c.y = y0 + c.frac * (y1 - y0);
@@ -170,28 +171,5 @@ public class SampleFactory implements SampleSource {
         }
 }
     
-    /**
-     * Adapted from com.vividsolutions.jts.geom.LineSegment 
-     * Combines segmentFraction and projectionFactor methods.
-     */
-    private static double segmentFraction(double x0, double y0, double x1, double y1, 
-            double xp, double yp, double xscale) {
-        // identity checks are unnecessary, results are identical without them
-        // if (x0 == xp && y0 == yp) return 0.0; // point is at beginning of segment
-        // if (x1 == xp && y1 == yp) return 1.0; // point is at end of segment
-        // Otherwise, use comp.graphics.algorithms Frequently Asked Questions method
-        double dx = x1 - x0;
-        double dy = y1 - y0;
-        double len2 = dx * dx + dy * dy;
-        // this fixes a (reported) divide by zero bug in JTS when line segment has 0 length
-        if (len2 == 0)
-            return 0;
-        double r = ( (xp - x0) * dx + (yp - y0) * dy ) / len2;
-        if (r < 0.0)
-            return 0.0;
-        else if (r > 1.0)
-            return 1.0;
-        return r;
-      }
     
 }

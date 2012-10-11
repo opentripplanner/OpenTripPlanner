@@ -49,14 +49,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.index.SpatialIndex;
 import com.vividsolutions.jts.index.quadtree.Quadtree;
 import com.vividsolutions.jts.index.strtree.STRtree;
-import com.vividsolutions.jts.operation.distance.DistanceOp;
-import com.vividsolutions.jts.operation.distance.GeometryLocation;
 
 /**
  * Indexes all edges and transit vertices of the graph spatially. Has a variety of query methods used during network linking and trip planning.
@@ -273,14 +271,12 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         return intersectionTree.query(envelope);
     }
 
-    public static class CandidateEdge {
+    public class CandidateEdge {
         private static final double PLATFORM_PREFERENCE = 2.0;
 
         private static final double SIDEWALK_PREFERENCE = 1.5;
 
         private static final double CAR_PREFERENCE = 100;
-
-        public final DistanceOp op;
 
         public final StreetEdge edge;
 
@@ -298,18 +294,44 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
         public final double distance;
 
-        public CandidateEdge(StreetEdge e, Point p, double preference) {
+        public CandidateEdge(StreetEdge e, Coordinate p, double preference) {
             edge = e;
-            Geometry edgeGeom = edge.getGeometry();
-            op = new DistanceOp(p, edgeGeom);
-            distance = op.distance();
-            // location on second geometry (edge)
-            GeometryLocation edgeLocation = op.nearestLocations()[1];
-            nearestPointOnEdge = edgeLocation.getCoordinate();
-            Coordinate[] edgeCoords = edgeGeom.getCoordinates();
-            if (nearestPointOnEdge.equals(edgeCoords[0]))
+            LineString edgeGeom = edge.getGeometry();
+            CoordinateSequence coordSeq = edgeGeom.getCoordinateSequence();
+            int numCoords = coordSeq.size();
+            int bestSeg = 0;
+            double bestDist2 = Double.POSITIVE_INFINITY;
+            double bestFrac = 0;
+            nearestPointOnEdge = new Coordinate();
+            double xscale = Math.cos(p.y * Math.PI / 180);
+            for (int seg = 0; seg < numCoords - 1; seg++) {
+                double x0 = coordSeq.getX(seg);
+                double y0 = coordSeq.getY(seg);
+                double x1 = coordSeq.getX(seg+1);
+                double y1 = coordSeq.getY(seg+1);
+                double frac = GeometryUtils.segmentFraction(x0, y0, x1, y1, p.x, p.y, xscale);
+                // project to get closest point
+                double x = x0 + frac * (x1 - x0);
+                double y = y0 + frac * (y1 - y0);
+                // find ersatz distance to edge (do not take root)
+                double dx = x - p.x;
+                double dy = y - p.y;
+                double dist2 = dx * dx * xscale + dy * dy;
+                // replace best segments
+                if (dist2 < bestDist2) {
+                    nearestPointOnEdge.x = x;
+                    nearestPointOnEdge.y = y;
+                    bestFrac = frac;
+                    bestSeg = seg;
+                    bestDist2 = dist2;
+                }
+            } // end loop over segments
+
+            distance = Math.sqrt(bestDist2);//distanceLibrary.distance(p, nearestPointOnEdge);
+
+            if (bestSeg == 0 && bestFrac == 0)
                 endwiseVertex = (StreetVertex) edge.getFromVertex();
-            else if (nearestPointOnEdge.equals(edgeCoords[edgeCoords.length - 1]))
+            else if (bestSeg == numCoords - 1 && bestFrac == 1)
                 endwiseVertex = (StreetVertex) edge.getToVertex();
             else
                 endwiseVertex = null;
@@ -335,12 +357,12 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             }
             // break ties by choosing shorter edges; this should cause split streets to be preferred
             score += edge.getLength() / 1000000;
-            double xd = nearestPointOnEdge.x - p.getX();
-            double yd = nearestPointOnEdge.y - p.getY();
+            double xd = nearestPointOnEdge.x - p.x;
+            double yd = nearestPointOnEdge.y - p.y;
             directionToEdge = Math.atan2(yd, xd);
-            int edgeSegmentIndex = edgeLocation.getSegmentIndex();
-            Coordinate c0 = edgeCoords[edgeSegmentIndex];
-            Coordinate c1 = edgeCoords[edgeSegmentIndex + 1];
+            int edgeSegmentIndex = bestSeg;
+            Coordinate c0 = coordSeq.getCoordinate(edgeSegmentIndex);
+            Coordinate c1 = coordSeq.getCoordinate(edgeSegmentIndex + 1);
             xd = c1.x - c1.y;
             yd = c1.y - c0.y;
             directionOfEdge = Math.atan2(yd, xd);
@@ -441,7 +463,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             extraStreets.add(se);
 
         Envelope envelope = new Envelope(coordinate);
-        Point p = GeometryUtils.getGeometryFactory().createPoint(coordinate);
+
         RoutingRequest walkingRequest = null;
         if (request != null) {
             walkingRequest = request.getWalkingOptions();
@@ -477,7 +499,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 if (routeEdges != null && routeEdges.contains(e)) {
                     preferrence = 3.0;
                 }
-                CandidateEdge ce = new CandidateEdge(e, p, preferrence);
+                CandidateEdge ce = new CandidateEdge(e, coordinate, preferrence);
                 // Even if an edge is outside the query envelope, bounding boxes can
                 // still intersect. In this case, distance to the edge is greater
                 // than the query envelope size.
