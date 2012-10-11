@@ -560,11 +560,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                                 break;
                             case U:
                                 if ((angleDiff <= 150 || angleDiff > 210))
-                                    continue; // not straight
+                                    continue; // not a U turn
                                 break;
                             case STRAIGHT:
-                                if (Math.abs(angleDiff) >= 30)
-                                    continue; // not a U turn
+                                if (angleDiff >= 30 && angleDiff < 330)
+                                    continue; // not straight
                                 break;
                             }
                             TurnRestriction restriction = new TurnRestriction();
