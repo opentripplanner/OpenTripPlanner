@@ -22,7 +22,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 
 public class TransitStop extends OffboardVertex {
-    private TraverseModeSet modes;
+    private TraverseModeSet modes = new TraverseModeSet();
 
     private static final long serialVersionUID = 1L;
 
