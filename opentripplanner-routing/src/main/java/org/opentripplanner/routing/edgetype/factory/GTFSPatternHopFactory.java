@@ -972,11 +972,11 @@ public class GTFSPatternHopFactory {
             
             if (stop.getLocationType() != 2) {
                 //add a vertex representing arriving at the stop
-                TransitStopArrive arrive = new TransitStopArrive(graph, stop);
+                TransitStopArrive arrive = new TransitStopArrive(graph, stop, stopVertex);
                 context.stopArriveNodes.put(stop, arrive);
 
                 //add a vertex representing departing from the stop
-                TransitStopDepart depart = new TransitStopDepart(graph, stop);
+                TransitStopDepart depart = new TransitStopDepart(graph, stop, stopVertex);
                 context.stopDepartNodes.put(stop, depart);
 
                 //add edges from arrive to stop and stop to depart
@@ -1145,6 +1145,7 @@ public class GTFSPatternHopFactory {
                     _log.warn(graph.addBuilderAnnotation(new StopAtEntrance(st1, true)));
                 }
             }
+            stopArrive.getStopVertex().addMode(mode);
             new TransitBoardAlight(stopDepart, psv0depart, hopIndex, mode);
             new TransitBoardAlight(psv1arrive, stopArrive, hopIndex, mode);
         }        

@@ -21,9 +21,14 @@ import org.opentripplanner.routing.graph.Graph;
 public class TransitStopDepart extends OffboardVertex {
 
     private static final long serialVersionUID = 5353034364687763358L;
+    private TransitStop stopVertex;
 
-    public TransitStopDepart(Graph graph, Stop stop) {
+    public TransitStopDepart(Graph graph, Stop stop, TransitStop stopVertex) {
         super(graph, GtfsLibrary.convertIdToString(stop.getId()) + "_depart", stop);
+        this.stopVertex = stopVertex;
     }
 
+    public TransitStop getStopVertex() {
+        return stopVertex;
+    }
 }
