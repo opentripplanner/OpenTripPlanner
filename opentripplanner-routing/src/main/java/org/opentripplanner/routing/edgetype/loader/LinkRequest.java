@@ -16,6 +16,9 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -63,7 +66,7 @@ public class LinkRequest {
      * Sets result to true if the links were successfully added, otherwise false
      */
     public void connectVertexToStreets(BikeRentalStationVertex v) {
-        Collection<StreetVertex> nearbyStreetVertices = getNearbyStreetVertices(v, null);
+        Collection<StreetVertex> nearbyStreetVertices = getNearbyStreetVertices(v, null, null);
         if (nearbyStreetVertices == null) {
             result = false;
         } else {
@@ -92,7 +95,7 @@ public class LinkRequest {
      * Used by both the network linker and for adding temporary "extra" edges at the origin 
      * and destination of a search.
      */
-    private Collection<StreetVertex> getNearbyStreetVertices(Vertex v, Collection<Edge> nearbyRouteEdges) {
+    private Collection<StreetVertex> getNearbyStreetVertices(Vertex v, Collection<Edge> nearbyRouteEdges, RoutingRequest options) {
         Collection<StreetVertex> existing = linker.splitVertices.get(v);
         if (existing != null)
             return existing;
@@ -105,7 +108,7 @@ public class LinkRequest {
         Coordinate coordinate = v.getCoordinate();
 
         /* is there a bundle of edges nearby to use or split? */
-        CandidateEdgeBundle edges = linker.index.getClosestEdges(coordinate, linker.options, null, nearbyRouteEdges, true);
+        CandidateEdgeBundle edges = linker.index.getClosestEdges(coordinate, options, null, nearbyRouteEdges, true);
         if (edges == null || edges.size() < 1) {
             // no edges were found nearby, or a bidirectional/loop bundle of edges was not identified
             _log.debug("found too few edges: {} {}", v.getName(), v.getCoordinate());
@@ -372,7 +375,10 @@ public class LinkRequest {
                 }
             }
         }
-        Collection<StreetVertex> nearbyStreetVertices = getNearbyStreetVertices(v, nearbyEdges);
+        TraverseModeSet modes = v.getModes().clone();
+        modes.setMode(TraverseMode.WALK, true);
+        RoutingRequest request = new RoutingRequest(modes);
+        Collection<StreetVertex> nearbyStreetVertices = getNearbyStreetVertices(v, nearbyEdges, request);
         if (nearbyStreetVertices == null) {
             result = false;
         } else {

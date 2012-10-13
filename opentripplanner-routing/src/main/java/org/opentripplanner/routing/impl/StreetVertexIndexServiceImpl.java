@@ -33,6 +33,8 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -294,7 +296,14 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
         public final double distance;
 
-        public CandidateEdge(StreetEdge e, Coordinate p, double preference) {
+        public CandidateEdge(StreetEdge e, Coordinate p, double preference, TraverseModeSet mode) {
+            int platform = 0;
+            if (mode.contains(TraverseMode.TRAINISH)) {
+                platform |= StreetEdge.CLASS_TRAIN_PLATFORM;
+            }
+            if (mode.contains(TraverseMode.BUSISH)) {
+                platform |= StreetEdge.CLASS_OTHER_PLATFORM;
+            }
             edge = e;
             LineString edgeGeom = edge.getGeometry();
             CoordinateSequence coordSeq = edgeGeom.getCoordinateSequence();
@@ -340,7 +349,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 score *= 1.5;
             }
             score /= preference;
-            if ((e.getStreetClass() & StreetEdge.CLASS_PLATFORM) != 0) {
+            if ((e.getStreetClass() & platform) != 0) {
                 // this is kind of a hack, but there's not really a better way to do it
                 score /= PLATFORM_PREFERENCE;
             }
@@ -349,7 +358,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 score /= SIDEWALK_PREFERENCE;
             }
             if (e.getPermission().allows(StreetTraversalPermission.CAR)
-                    || (e.getStreetClass() & StreetEdge.CLASS_PLATFORM) != 0) {
+                    || (e.getStreetClass() & platform) != 0) {
                 // we're subtracting here because no matter how close we are to a good non-car
                 // non-platform edge, we really want to avoid it in case it's a Pedway or other
                 // weird and unlikely starting location.
@@ -490,7 +499,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                     continue;
                 if (possibleTransitLinksOnly) {
                     if (!e.getPermission().allows(StreetTraversalPermission.CAR)) {
-                        if ((e.getStreetClass() & StreetEdge.CLASS_PLATFORM) == 0) {
+                        if ((e.getStreetClass() & StreetEdge.ANY_PLATFORM_MASK) == 0) {
                             continue;
                         }
                     }
@@ -499,7 +508,11 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 if (routeEdges != null && routeEdges.contains(e)) {
                     preferrence = 3.0;
                 }
-                CandidateEdge ce = new CandidateEdge(e, coordinate, preferrence);
+                TraverseModeSet modes = new TraverseModeSet("");
+                if (request != null) {
+                    modes = request.getModes();
+                }
+                CandidateEdge ce = new CandidateEdge(e, coordinate, preferrence, modes);
                 // Even if an edge is outside the query envelope, bounding boxes can
                 // still intersect. In this case, distance to the edge is greater
                 // than the query envelope size.

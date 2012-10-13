@@ -109,6 +109,8 @@ public class TestHalfEdges extends TestCase {
 
         station1 = new TransitStop(graph, s1);
         station2 = new TransitStop(graph, s2);
+        station1.addMode(TraverseMode.RAIL);
+        station2.addMode(TraverseMode.RAIL);
     }
 
     public void testHalfEdges() {

@@ -774,12 +774,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                                 AreaEdge street = edgeFactory.createAreaEdge(nodeI, nodeJ,
                                         areaEntity, startEndpoint, endEndpoint, geometry, name,
                                         length, areaPermissions, i > j, edgeList);
-                                String highway = areaEntity.getTag("highway");
                                 int cls = StreetEdge.CLASS_OTHERPATH;
-                                if ("platform".equals(highway) || "platform".equals(areaEntity.getTag("railway"))
-                                        || "platform".equals(areaEntity.getTag("public_transport"))) {
-                                    cls |= StreetEdge.CLASS_PLATFORM;
-                                }
+                                cls |= getPlatformClass(areaEntity);
                                 street.setStreetClass(cls);
                                 street.setId(id);
 
@@ -1864,10 +1860,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 cls = StreetEdge.CLASS_OTHERPATH;
             }
 
-            if ("platform".equals(highway) || "platform".equals(way.getTag("railway"))
-                    || "platform".equals(way.getTag("public_transport"))) {
-                cls |= StreetEdge.CLASS_PLATFORM;
-            }
+            cls |= getPlatformClass(way);
             street.setStreetClass(cls);
 
             if (!way.hasTag("name")) {
@@ -1887,6 +1880,21 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
 
             return street;
+        }
+
+        private int getPlatformClass(OSMWithTags way) {
+            String highway = way.getTag("highway");
+            if ("platform".equals(way.getTag("railway"))) {
+                return StreetEdge.CLASS_TRAIN_PLATFORM;
+            }
+            if ("platform".equals(highway)
+                    || "platform".equals(way.getTag("public_transport"))) {
+                if (way.isTagTrue("train") || way.isTagTrue("subway") || way.isTagTrue("tram") || way.isTagTrue("monorail")) {
+                    return StreetEdge.CLASS_TRAIN_PLATFORM;
+                }
+                return StreetEdge.CLASS_OTHER_PLATFORM;
+            }
+            return 0;
         }
 
         private String getNameForWay(OSMWithTags way, String id) {

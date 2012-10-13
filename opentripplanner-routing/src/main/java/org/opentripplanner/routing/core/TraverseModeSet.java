@@ -62,6 +62,9 @@ public class TraverseModeSet implements Cloneable, Serializable {
     public TraverseModeSet(String modelist) {
         modes = 0;
         for (String modeStr : modelist.split(",")) {
+            if (modeStr.length() == 0) {
+                continue;
+            }
             setMode(TraverseMode.valueOf(modeStr), true);
         }
 
