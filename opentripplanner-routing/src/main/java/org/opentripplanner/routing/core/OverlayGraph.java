@@ -24,7 +24,6 @@ import java.util.IdentityHashMap;
 import java.util.List;
 
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 

@@ -40,10 +40,9 @@ import org.opentripplanner.api.model.RelativeDirection;
 import org.opentripplanner.api.model.RouterInfo;
 import org.opentripplanner.api.model.RouterList;
 import org.opentripplanner.api.model.WalkStep;
-import org.opentripplanner.api.model.analysis.EdgeSet;
-import org.opentripplanner.api.model.analysis.FeatureCount;
-import org.opentripplanner.api.model.analysis.VertexSet;
-import org.opentripplanner.api.model.json_serializers.WithGraph;
+import org.opentripplanner.api.model.internals.EdgeSet;
+import org.opentripplanner.api.model.internals.FeatureCount;
+import org.opentripplanner.api.model.internals.VertexSet;
 import org.opentripplanner.api.model.patch.PatchResponse;
 import org.opentripplanner.api.model.transit.AgencyList;
 import org.opentripplanner.api.model.transit.ModeList;
@@ -68,6 +67,7 @@ import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.model.GtfsBundles;
 import org.opentripplanner.graph_builder.services.GraphBuilderWithGtfsDao;
 import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory;
+import org.opentripplanner.model.json_serialization.WithGraph;
 import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
@@ -103,10 +103,6 @@ class SimpleGraphServiceImpl implements GraphService {
     }
 
     @Override
-    public void refreshGraphs() {
-    }
-
-    @Override
     public Graph getGraph() {
         return graphs.get(null);
     }
@@ -117,7 +113,7 @@ class SimpleGraphServiceImpl implements GraphService {
     }
 
     @Override
-    public Collection<String> getGraphIds() {
+    public Collection<String> getRouterIds() {
         return graphs.keySet();
     }
 
@@ -126,9 +122,25 @@ class SimpleGraphServiceImpl implements GraphService {
     }
 
     @Override
-    public void loadAllGraphs() {
-        //nothing to do
+    public boolean registerGraph(String graphId, boolean preEvict) {
+        return false;
     }
+
+    @Override
+    public boolean registerGraph(String graphId, Graph graph) {
+        return false;
+    }
+
+    @Override
+    public boolean evictGraph(String graphId) {
+        return false;
+    }
+
+    @Override
+    public int evictAll() {
+        return 0;
+    }
+
 }
 
 /* This is a hack to hold context and graph data between test runs, since loading it is slow. */
@@ -188,8 +200,8 @@ class Context {
             throw new RuntimeException(e);
         }
 
-        pathService.sptService = new GenericAStar();
-        pathService.graphService = graphService;
+        pathService.setSptService(new GenericAStar());
+        pathService.setGraphService(graphService);
         planGenerator.pathService = pathService;
     }
 

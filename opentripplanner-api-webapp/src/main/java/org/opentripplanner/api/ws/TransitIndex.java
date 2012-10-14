@@ -365,6 +365,29 @@ public class TransitIndex {
         options.setRoutingContext(graph);
         return options;
     }
+    /**
+     * Return variant for a trip
+     */
+    @GET
+    @Path("/variantForTrip")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    public Object getVariantForTrip(@QueryParam("tripAgency") String tripAgency,
+            @QueryParam("tripId") String tripId, @QueryParam("routerId") String routerId)
+            throws JSONException {
+
+        TransitIndexService transitIndexService = getGraph(routerId).getService(
+                TransitIndexService.class);
+
+        if (transitIndexService == null) {
+            return new TransitError(
+                    "No transit index found.  Add TransitIndexBuilder to your graph builder configuration and rebuild your graph.");
+        }
+
+        AgencyAndId trip = new AgencyAndId(tripAgency, tripId);
+        RouteVariant variant = transitIndexService.getVariantForTrip(trip);
+
+        return variant;
+    }
 
     /**
      * Return subsequent stop times for a trip; time is in milliseconds since epoch

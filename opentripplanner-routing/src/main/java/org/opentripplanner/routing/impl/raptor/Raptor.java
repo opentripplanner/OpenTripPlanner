@@ -22,6 +22,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 
+import javax.annotation.PostConstruct;
+
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.common.geometry.DistanceLibrary;
@@ -39,6 +41,7 @@ import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
 import org.opentripplanner.routing.pathparser.BasicPathParser;
 import org.opentripplanner.routing.pathparser.NoThruTrafficPathParser;
 import org.opentripplanner.routing.pathparser.PathParser;
@@ -59,6 +62,8 @@ public class Raptor implements PathService {
 
     private static final int MAX_WALK_MULTIPLE = 8;
 
+    public static final double WALK_EPSILON = 1.10;
+
     @Autowired
     private GraphService graphService;
 
@@ -67,6 +72,22 @@ public class Raptor implements PathService {
     private RaptorData cachedRaptorData;
 
     private double multiPathTimeout = 0; // seconds
+
+    /**
+     * This is used for short paths (under shortPathCutoff).
+     */
+    RetryingPathServiceImpl shortPathService = new RetryingPathServiceImpl();
+
+    /**
+     * The max length, in meters, that will use the shortPathService.
+     */
+    private double shortPathCutoff = 10000;
+
+    @PostConstruct
+    public void setup() {
+        shortPathService.setGraphService(graphService);
+        shortPathService.setSptService(sptService);
+    }
 
     /** Give up on searching for additional itineraries after this many seconds have elapsed. */
     public void setTimeout (double seconds) {
@@ -101,10 +122,21 @@ public class Raptor implements PathService {
             return sptService.getShortestPathTree(options).getPaths();
         }
 
-        RaptorData data = graph.getService(RaptorDataService.class).getData();
+        //also fall back to A* for short trips
+        double distance = distanceLibrary.distance(options.rctx.origin.getCoordinate(), options.rctx.target.getCoordinate());
+        if (distance < shortPathCutoff) {
+            return shortPathService.getPaths(options);
+        }
 
-        //we multiply the initial walk distance by 1.1 to account for epsilon dominance.
-        double initialWalk = options.getMaxWalkDistance() * 1.1;
+        RaptorDataService service = graph.getService(RaptorDataService.class);
+        if (service == null) {
+            log.warn("No raptor data.  Rebuild with RaptorDataBuilder");
+            return Collections.emptyList();
+        }
+        RaptorData data = service.getData();
+
+        //we multiply the initial walk distance to account for epsilon dominance.
+        double initialWalk = options.getMaxWalkDistance() * WALK_EPSILON;
         options.setMaxWalkDistance(initialWalk);
 
         //do not even bother with obviously impossible walks
@@ -213,6 +245,9 @@ public class Raptor implements PathService {
             log.info("RAPTOR found no paths (try retrying?)");
         }
         Collections.sort(targetStates);
+
+        if (targetStates.size() > options.getNumItineraries())
+            targetStates = targetStates.subList(0, options.getNumItineraries());
 
         List<GraphPath> paths = new ArrayList<GraphPath>();
         for (RaptorState targetState : targetStates) {
@@ -655,8 +690,8 @@ public class Raptor implements PathService {
 
         RaptorData data = graph.getService(RaptorDataService.class).getData();
 
-        //we multiply the initial walk distance by 1.1 to account for epsilon dominance.
-        options.setMaxWalkDistance(options.getMaxWalkDistance() * 1.1);
+        //we multiply the initial walk distance to account for epsilon dominance.
+        options.setMaxWalkDistance(options.getMaxWalkDistance() * WALK_EPSILON);
 
         RoutingRequest walkOptions = options.clone();
         walkOptions.rctx.pathParsers = new PathParser[0];
@@ -672,6 +707,14 @@ public class Raptor implements PathService {
         RaptorStateSet result = new RaptorStateSet();
         result.statesByStop = search.statesByStop;
         return result;
+    }
+
+    public double getShortPathCutoff() {
+        return shortPathCutoff;
+    }
+
+    public void setShortPathCutoff(double shortPathCutoff) {
+        this.shortPathCutoff = shortPathCutoff;
     }
 
 }

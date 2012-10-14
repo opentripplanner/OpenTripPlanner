@@ -21,8 +21,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 
-import org.opentripplanner.routing.core.GraphBuilderAnnotation;
-import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
+import org.opentripplanner.gbannotation.GraphConnectivity;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -102,9 +101,8 @@ public class StreetUtils {
     	
     	/* remove all tiny subgraphs */
         for (HashSet<Vertex> island : islands) {
-            if (island.size() < 20) {
-                _log.warn(GraphBuilderAnnotation.register(graph, Variety.GRAPH_CONNECTIVITY, 
-                        island.iterator().next(), island));
+            if (island.size() < 40) {
+                _log.warn(graph.addBuilderAnnotation(new GraphConnectivity(island.iterator().next())));
                 depedestrianizeOrRemove(graph, island);
             }
         }

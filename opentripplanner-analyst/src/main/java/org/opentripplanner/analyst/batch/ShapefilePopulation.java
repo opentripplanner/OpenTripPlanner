@@ -2,8 +2,6 @@ package org.opentripplanner.analyst.batch;
 
 import java.io.File;
 
-import javax.annotation.PostConstruct;
-
 import lombok.Setter;
 
 import org.geotools.data.FileDataStore;
@@ -50,7 +48,7 @@ public class ShapefilePopulation extends BasicPopulation {
             SimpleFeatureCollection featureCollection = featureSource.getFeatures(query);
 
             SimpleFeatureIterator it = featureCollection.features();
-            int i = 0, nonNull = 0;
+            int i = 0;
             while (it.hasNext()) {
                 SimpleFeature feature = it.next();
                 Geometry geom = (Geometry) feature.getDefaultGeometry();
@@ -72,15 +70,14 @@ public class ShapefilePopulation extends BasicPopulation {
                 }
                 double input = 0.0;
                 if (inputAttribute != null) {
-                    input = (Double) feature.getAttribute(inputAttribute);
+                    Number n = (Number) feature.getAttribute(inputAttribute);
+                    input = n.doubleValue(); 
                 }
-                Individual individual = individualFactory.build(label, point.getX(), point.getY(), input);
+                Individual individual = new Individual(label, point.getX(), point.getY(), input);
                 this.addIndividual(individual);
                 i += 1;
-                if (individual.sample != null)
-                    nonNull += 1;
             }
-            LOG.debug("created samples for {} features out of {}", nonNull, i);
+            LOG.debug("loaded {} features", i);
             it.close();
         } catch (Exception ex) {
             LOG.error("Error loading population from shapefile: {}", ex.getMessage());

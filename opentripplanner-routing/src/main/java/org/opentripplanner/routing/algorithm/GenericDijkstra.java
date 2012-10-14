@@ -18,7 +18,6 @@ import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrateg
 import org.opentripplanner.routing.algorithm.strategies.SkipEdgeStrategy;
 import org.opentripplanner.routing.algorithm.strategies.SkipTraverseResultStrategy;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
-import org.opentripplanner.routing.core.OverlayGraph;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
@@ -34,8 +33,6 @@ import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
  * Find the shortest path between graph vertices using Dijkstra's algorithm.
  */
 public class GenericDijkstra {
-
-    private OverlayGraph replacementEdges;
 
     private RoutingRequest options;
 
@@ -55,11 +52,6 @@ public class GenericDijkstra {
 
     public GenericDijkstra(RoutingRequest options) {
         this.options = options;
-    }
-
-    public GenericDijkstra(RoutingRequest options, OverlayGraph replacementEdges) {
-        this.options = options;
-        this.replacementEdges = replacementEdges;
     }
 
     public void setShortestPathTreeFactory(ShortestPathTreeFactory shortestPathTreeFactory) {

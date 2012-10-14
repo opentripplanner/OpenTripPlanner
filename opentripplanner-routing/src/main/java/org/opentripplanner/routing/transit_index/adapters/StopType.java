@@ -24,6 +24,8 @@ import org.opentripplanner.routing.transit_index.adapters.AgencyAndIdAdapter;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 @XmlRootElement(name = "Stop")
 public class StopType {
 
@@ -64,39 +66,51 @@ public class StopType {
     }
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
+    @JsonSerialize
     AgencyAndId id;
 
     @XmlAttribute
+    @JsonSerialize
     String stopName;
 
     @XmlAttribute
+    @JsonSerialize
     Double stopLat;
 
     @XmlAttribute
+    @JsonSerialize
     Double stopLon;
 
     @XmlAttribute
+    @JsonSerialize
     String stopCode;
 
     @XmlAttribute
+    @JsonSerialize
     String stopDesc;
 
     @XmlAttribute
+    @JsonSerialize
     String zoneId;
 
     @XmlAttribute
+    @JsonSerialize
     String stopUrl;
 
     @XmlAttribute
+    @JsonSerialize
     Integer locationType;
 
     @XmlAttribute
+    @JsonSerialize
     String parentStation;
 
     @XmlAttribute
+    @JsonSerialize
     Integer wheelchairBoarding;
 
     @XmlAttribute
+    @JsonSerialize
     String direction;
 
     @XmlElements(value = @XmlElement(name = "route"))

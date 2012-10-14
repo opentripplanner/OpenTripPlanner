@@ -18,7 +18,7 @@ var ROUTER_ID = "";
 
 var map = new L.Map('map', {
 	minZoom : 10,
-	maxZoom : 16,
+	maxZoom : 17,
 	// what we really need is a fade transition between old and new tiles without removing the old ones
 	//fadeAnimation: false
 });
@@ -29,14 +29,14 @@ var aerialURL = "http://{s}.mqcdn.com/naip/{z}/{x}/{y}.png";
 
 var mapboxAttrib = "Tiles from <a href='http://mapbox.com/about/maps' target='_blank'>MapBox Streets</a>";
 var mapboxLayer = new L.TileLayer(mapboxURL, 
-		{subdomains: ["a","b","c","d"], maxZoom: 16, attribution: mapboxAttrib});
+		{subdomains: ["a","b","c","d"], maxZoom: 17, attribution: mapboxAttrib});
 
 var osmAttrib = 'Map data &copy; 2011 OpenStreetMap contributors';
 var osmLayer = new L.TileLayer(OSMURL, 
-		{subdomains: ["otile1","otile2","otile3","otile4"], maxZoom: 16, attribution: osmAttrib});
+		{subdomains: ["otile1","otile2","otile3","otile4"], maxZoom: 18, attribution: osmAttrib});
 
 var aerialLayer = new L.TileLayer(aerialURL, 
-		{subdomains: ["oatile1","oatile2","oatile3","oatile4"], maxZoom: 16, attribution: osmAttrib});
+		{subdomains: ["oatile1","oatile2","oatile3","oatile4"], maxZoom: 18, attribution: osmAttrib});
 
 var flags = {
 	twoEndpoint: false,

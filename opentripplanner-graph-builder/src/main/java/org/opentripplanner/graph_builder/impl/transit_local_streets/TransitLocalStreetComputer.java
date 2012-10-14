@@ -121,7 +121,7 @@ public class TransitLocalStreetComputer implements GraphBuilder {
 
     @Override
     public List<String> getPrerequisites() {
-        return Arrays.asList("streets", "transit");
+        return Arrays.asList("streets", "transit", "linking");
     }
 
     @Override

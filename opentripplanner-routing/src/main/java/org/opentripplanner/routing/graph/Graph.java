@@ -45,18 +45,20 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
+import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.gbannotation.GraphBuilderAnnotation;
+import org.opentripplanner.gbannotation.NoFutureDates;
 import org.opentripplanner.model.GraphBundle;
-import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
 import org.opentripplanner.routing.core.TransferTable;
-import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
-import org.opentripplanner.routing.edgetype.TimetableSnapshot;
+import org.opentripplanner.routing.edgetype.TimetableSnapshotSource;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
-import org.opentripplanner.common.MavenVersion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Multiset;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
@@ -87,6 +89,8 @@ public class Graph implements Serializable {
     
     private transient CalendarService calendarService;
     
+    private boolean debugData = true;
+    
     private transient List<Vertex> vertexById;
 
     private transient Map<Integer, Edge> edgeById;
@@ -95,9 +99,10 @@ public class Graph implements Serializable {
     
     public transient StreetVertexIndexService streetIndex;
     
-    public transient TimetableSnapshot timetableSnapshot = null;
+    public transient TimetableSnapshotSource timetableSnapshotSource = null;
     
-    private List<GraphBuilderAnnotation> graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>();
+    private transient List<GraphBuilderAnnotation> graphBuilderAnnotations = 
+            new LinkedList<GraphBuilderAnnotation>(); // initialize for tests
 
     private Collection<String> agenciesIds = new HashSet<String>();
 
@@ -225,7 +230,7 @@ public class Graph implements Serializable {
         }
         for (String agency : agencies) {
             if (!agenciesWithFutureDates.contains(agency)) {
-                LOG.warn(GraphBuilderAnnotation.register(this, Variety.NO_FUTURE_DATES, agency));
+                LOG.warn(this.addBuilderAnnotation(new NoFutureDates(agency)));
             }
         }
     }
@@ -299,8 +304,21 @@ public class Graph implements Serializable {
         temporaryEdges = Collections.newSetFromMap(new ConcurrentHashMap<Edge, Boolean>()); 
     }
 
-    public void addBuilderAnnotation(GraphBuilderAnnotation gba) {
-    	this.graphBuilderAnnotations.add(gba);
+    /**
+     * Add a graph builder annotation to this graph's list of graph builder annotations.
+     * The return value of this method is the annotation's message, which allows for a single-line
+     * idiom that creates, registers, and logs a new graph builder annotation:
+     * log.warning(graph.addBuilderAnnotation(new SomeKindOfAnnotation(param1, param2)));
+     * 
+     * If the graphBuilderAnnotations field of this graph is null, the annotation is not actually 
+     * saved, but the message is still returned. This allows annotation registration to be turned
+     * off, saving memory and disk space when the user is not interested in annotations.
+     */
+    public String addBuilderAnnotation(GraphBuilderAnnotation gba) {
+        String ret = gba.getMessage();
+        if (this.graphBuilderAnnotations != null)
+            this.graphBuilderAnnotations.add(gba);
+    	return ret;
     }
 
     public List<GraphBuilderAnnotation> getBuilderAnnotations() {
@@ -338,7 +356,7 @@ public class Graph implements Serializable {
         throws IOException, ClassNotFoundException {
         try {
             Graph graph = (Graph) in.readObject();
-            LOG.debug("Basic graph info and annotations read.");
+            LOG.debug("Basic graph info read.");
             if (graph.graphVersionMismatch())
                 throw new RuntimeException("Graph version mismatch detected.");
             if (level == LoadLevel.BASIC)
@@ -360,10 +378,15 @@ public class Graph implements Serializable {
             LOG.debug("street index built.");
             if (level == LoadLevel.FULL)
                 return graph;
-            graph.vertexById = (List<Vertex>) in.readObject();
-            graph.edgeById = (Map<Integer, Edge>) in.readObject();
-            graph.idForEdge = (Map<Edge, Integer>) in.readObject();
-            LOG.debug("Debug info read.");
+            if (graph.debugData) {
+                graph.graphBuilderAnnotations = (List<GraphBuilderAnnotation>) in.readObject();
+                graph.vertexById = (List<Vertex>) in.readObject();
+                graph.edgeById = (Map<Integer, Edge>) in.readObject();
+                graph.idForEdge = (Map<Edge, Integer>) in.readObject();
+                LOG.debug("Debug info read.");
+            } else {
+                LOG.warn("Graph file does not contain debug data.");
+            }
             return graph;
         } catch (InvalidClassException ex) {
             LOG.error("Stored graph is incompatible with this version of OTP, please rebuild it.");
@@ -425,8 +448,7 @@ public class Graph implements Serializable {
         List<Edge> edges = new ArrayList<Edge>(this.countEdges());
         for (Vertex v : getVertices()) {
             // there are assumed to be no edges in an incoming list that are not
-            // in an outgoing
-            // list
+            // in an outgoing list
             edges.addAll(v.getOutgoing());
             if (v.getDegreeOut() + v.getDegreeIn() == 0)
                 LOG.debug("vertex {} has no edges, it will not survive serialization.", v);
@@ -436,11 +458,16 @@ public class Graph implements Serializable {
         LOG.debug("Writing edges...");
         out.writeObject(this);
         out.writeObject(edges);
-        LOG.debug("Writing debug data...");
-        out.writeObject(this.vertexById);
-        out.writeObject(this.edgeById);
-        out.writeObject(this.idForEdge);
-
+        if (debugData) {
+            // should we make debug info generation conditional? 
+            LOG.debug("Writing debug data...");
+            out.writeObject(this.graphBuilderAnnotations);
+            out.writeObject(this.vertexById);
+            out.writeObject(this.edgeById);
+            out.writeObject(this.idForEdge);
+        } else {
+            LOG.debug("Skipping debug data.");
+        }
         LOG.info("Graph written.");
     }
     
@@ -560,6 +587,19 @@ public class Graph implements Serializable {
             }
         }
         return timeZone;
+    }
+
+    public void summarizeBuilderAnnotations() {
+        List<GraphBuilderAnnotation> gbas = this.graphBuilderAnnotations;
+        Multiset<Class<? extends GraphBuilderAnnotation>> classes = HashMultiset.create();
+        LOG.info("Summary (number of each type of annotation):");
+        for (GraphBuilderAnnotation gba : gbas)
+            classes.add(gba.getClass());
+        for (Multiset.Entry<Class<? extends GraphBuilderAnnotation>> e : classes.entrySet()) {
+            String name = e.getElement().getSimpleName();
+            int count = e.getCount();
+            LOG.info("    {} - {}", name, count);
+        }
     }
 
 }

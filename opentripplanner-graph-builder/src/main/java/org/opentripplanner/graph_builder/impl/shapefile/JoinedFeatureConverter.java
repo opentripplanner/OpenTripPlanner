@@ -15,10 +15,10 @@ package org.opentripplanner.graph_builder.impl.shapefile;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 
 import org.geotools.data.FeatureSource;
 import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory;
@@ -84,7 +84,7 @@ public class JoinedFeatureConverter<T> implements SimpleFeatureConverter<T> {
         try {
             FeatureCollection<SimpleFeatureType, SimpleFeature> features = joinedSource
                     .getFeatures();
-            Iterator<SimpleFeature> it = features.iterator();
+            FeatureIterator<SimpleFeature> it = features.features();
             while (it.hasNext()) {
                 SimpleFeature feature = it.next();
                 String joinedKeyValue = toHashableString(feature.getAttribute(joinedKey));
@@ -94,7 +94,7 @@ public class JoinedFeatureConverter<T> implements SimpleFeatureConverter<T> {
                     log.warn("Feature " + feature.getID() + " has null value for its joinedKey (" + joinedKey + ")");
                 }
             }
-            features.close(it);
+            it.close();
 
         } catch (IOException e) {
             throw new RuntimeException("Could not cache values for joined shapefile", e);

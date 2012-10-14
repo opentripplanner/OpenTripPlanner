@@ -20,6 +20,7 @@ import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -83,7 +84,17 @@ public class StreetLocation extends StreetVertex {
         /* linking vertex with epsilon transitions */
         StreetLocation location = new StreetLocation(graph, label, nearestPoint, name);
 
+        List<StreetEdge> allEdges = new ArrayList<StreetEdge>();
         for (StreetEdge street : edges) {
+            allEdges.add(street);
+            if (street instanceof AreaEdge) {
+                for (StreetEdge e :((AreaEdge) street).getArea().getEdges()) {
+                    allEdges.add(e);
+                }
+            }
+        }
+        
+        for (StreetEdge street : allEdges) {
             /* TODO: need to check for crossing uncrossable streets (in 
              * previous elements of edges) */
 
@@ -109,7 +120,7 @@ public class StreetLocation extends StreetVertex {
             }
         }
         location.setWheelchairAccessible(wheelchairAccessible);
-        location.setSourceEdges(edges);
+        location.setSourceEdges(allEdges);
         return location;
 
     }

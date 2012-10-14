@@ -8,7 +8,7 @@
     <parent>
         <groupId>org.opentripplanner</groupId>
         <artifactId>opentripplanner</artifactId>
-        <version>0.7.13-SNAPSHOT</version>
+        <version>0.9.2-SNAPSHOT</version>
     </parent>
 
     <dependencies>
@@ -47,8 +47,8 @@
             <artifactId>jersey-server</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-json</artifactId>
+          <groupId>com.fasterxml.jackson.jaxrs</groupId>
+          <artifactId>jackson-jaxrs-json-provider</artifactId>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
@@ -58,10 +58,6 @@
         <dependency>
             <groupId>com.sun.jersey.contribs</groupId>
             <artifactId>jersey-spring</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>org.geotools</groupId>
-          <artifactId>gt-geojson</artifactId>
         </dependency>
         <dependency>
             <groupId>net.sf.json-lib</groupId>

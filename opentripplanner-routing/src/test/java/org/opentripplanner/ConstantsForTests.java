@@ -14,6 +14,7 @@
 package org.opentripplanner;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.opentripplanner.gtfs.GtfsContext;
@@ -30,6 +31,8 @@ public class ConstantsForTests {
     public static final String PORTLAND_GTFS = "src/test/resources/google_transit.zip";
 
     public static final String FAKE_GTFS = "src/test/resources/testagency.zip";
+
+    public static final String GENERATED_GTFS = "src/test/resources/generated.gtfs.zip";
 
     public static final double WALKING_SPEED = 1.33; // meters/sec
                                                      // (http://en.wikipedia.org/wiki/Walking),
@@ -88,4 +91,20 @@ public class ConstantsForTests {
         NetworkLinker nl = new NetworkLinker(portlandGraph);
         nl.createLinkage();
     }
+    
+    public static Graph buildGraph(String path) {
+        GtfsContext context;
+        try {
+            context = GtfsLibrary.readGtfs(new File(path));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+        Graph graph = new Graph();
+        GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
+        factory.run(graph);
+        graph.putService(CalendarServiceData.class, GtfsLibrary.createCalendarServiceData(context.getDao()));
+        return graph;
+    }
+
 }

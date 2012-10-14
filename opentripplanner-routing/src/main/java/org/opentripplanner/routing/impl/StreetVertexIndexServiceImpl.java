@@ -33,6 +33,8 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -49,14 +51,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.index.SpatialIndex;
 import com.vividsolutions.jts.index.quadtree.Quadtree;
 import com.vividsolutions.jts.index.strtree.STRtree;
-import com.vividsolutions.jts.operation.distance.DistanceOp;
-import com.vividsolutions.jts.operation.distance.GeometryLocation;
 
 /**
  * Indexes all edges and transit vertices of the graph spatially. Has a variety of query methods used during network linking and trip planning.
@@ -191,8 +191,11 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 // generate names for corners when no name was given
                 // TODO: internationalize
                 Set<String> uniqueNameSet = new HashSet<String>();
-                for (Edge e : intersection.getOutgoing()) 
-                    uniqueNameSet.add(e.getName());
+                for (Edge e : intersection.getOutgoing()) {
+                    if (e instanceof StreetEdge) {
+                        uniqueNameSet.add(e.getName());
+                    }
+                }
                 List<String> uniqueNames = new ArrayList<String>(uniqueNameSet);
                 if (uniqueNames.size() > 1)
                     name = String.format("corner of %s and %s", uniqueNames.get(0),
@@ -230,7 +233,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
         // then find closest walkable street
         StreetLocation closest_street = null;
-        CandidateEdgeBundle bundle = getClosestEdges(coordinate, options, extraEdges, null);
+        CandidateEdgeBundle bundle = getClosestEdges(coordinate, options, extraEdges, null, false);
         CandidateEdge candidate = bundle.best;
         double closest_street_distance = Double.POSITIVE_INFINITY;
         if (candidate != null) {
@@ -270,16 +273,16 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         return intersectionTree.query(envelope);
     }
 
-    public static class CandidateEdge {
+    public class CandidateEdge {
         private static final double PLATFORM_PREFERENCE = 2.0;
 
         private static final double SIDEWALK_PREFERENCE = 1.5;
 
-        public final DistanceOp op;
+        private static final double CAR_PREFERENCE = 100;
 
         public final StreetEdge edge;
 
-        public final Vertex endwiseVertex;
+        public final StreetVertex endwiseVertex;
 
         private double score;
 
@@ -293,19 +296,52 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
         public final double distance;
 
-        public CandidateEdge(StreetEdge e, Point p, double preference) {
+        public CandidateEdge(StreetEdge e, Coordinate p, double preference, TraverseModeSet mode) {
+            int platform = 0;
+            if (mode.contains(TraverseMode.TRAINISH)) {
+                platform |= StreetEdge.CLASS_TRAIN_PLATFORM;
+            }
+            if (mode.contains(TraverseMode.BUSISH)) {
+                platform |= StreetEdge.CLASS_OTHER_PLATFORM;
+            }
             edge = e;
-            Geometry edgeGeom = edge.getGeometry();
-            op = new DistanceOp(p, edgeGeom);
-            distance = op.distance();
-            // location on second geometry (edge)
-            GeometryLocation edgeLocation = op.nearestLocations()[1];
-            nearestPointOnEdge = edgeLocation.getCoordinate();
-            Coordinate[] edgeCoords = edgeGeom.getCoordinates();
-            if (nearestPointOnEdge.equals(edgeCoords[0]))
-                endwiseVertex = edge.getFromVertex();
-            else if (nearestPointOnEdge.equals(edgeCoords[edgeCoords.length - 1]))
-                endwiseVertex = edge.getToVertex();
+            LineString edgeGeom = edge.getGeometry();
+            CoordinateSequence coordSeq = edgeGeom.getCoordinateSequence();
+            int numCoords = coordSeq.size();
+            int bestSeg = 0;
+            double bestDist2 = Double.POSITIVE_INFINITY;
+            double bestFrac = 0;
+            nearestPointOnEdge = new Coordinate();
+            double xscale = Math.cos(p.y * Math.PI / 180);
+            for (int seg = 0; seg < numCoords - 1; seg++) {
+                double x0 = coordSeq.getX(seg);
+                double y0 = coordSeq.getY(seg);
+                double x1 = coordSeq.getX(seg+1);
+                double y1 = coordSeq.getY(seg+1);
+                double frac = GeometryUtils.segmentFraction(x0, y0, x1, y1, p.x, p.y, xscale);
+                // project to get closest point
+                double x = x0 + frac * (x1 - x0);
+                double y = y0 + frac * (y1 - y0);
+                // find ersatz distance to edge (do not take root)
+                double dx = x - p.x;
+                double dy = y - p.y;
+                double dist2 = dx * dx * xscale + dy * dy;
+                // replace best segments
+                if (dist2 < bestDist2) {
+                    nearestPointOnEdge.x = x;
+                    nearestPointOnEdge.y = y;
+                    bestFrac = frac;
+                    bestSeg = seg;
+                    bestDist2 = dist2;
+                }
+            } // end loop over segments
+
+            distance = Math.sqrt(bestDist2);//distanceLibrary.distance(p, nearestPointOnEdge);
+
+            if (bestSeg == 0 && bestFrac == 0)
+                endwiseVertex = (StreetVertex) edge.getFromVertex();
+            else if (bestSeg == numCoords - 1 && bestFrac == 1)
+                endwiseVertex = (StreetVertex) edge.getToVertex();
             else
                 endwiseVertex = null;
             score = distance;
@@ -313,23 +349,29 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 score *= 1.5;
             }
             score /= preference;
-            if (e.getName().contains("platform")) {
+            if ((e.getStreetClass() & platform) != 0) {
                 // this is kind of a hack, but there's not really a better way to do it
                 score /= PLATFORM_PREFERENCE;
             }
-            if (e.getName().contains("sidewalk")
-                    || !e.getPermission().allows(StreetTraversalPermission.CAR)) {
+            if (e.getName().contains("sidewalk")) {
                 // this is kind of a hack, but there's not really a better way to do it
                 score /= SIDEWALK_PREFERENCE;
             }
+            if (e.getPermission().allows(StreetTraversalPermission.CAR)
+                    || (e.getStreetClass() & platform) != 0) {
+                // we're subtracting here because no matter how close we are to a good non-car
+                // non-platform edge, we really want to avoid it in case it's a Pedway or other
+                // weird and unlikely starting location.
+                score -= CAR_PREFERENCE;
+            }
             // break ties by choosing shorter edges; this should cause split streets to be preferred
             score += edge.getLength() / 1000000;
-            double xd = nearestPointOnEdge.x - p.getX();
-            double yd = nearestPointOnEdge.y - p.getY();
+            double xd = nearestPointOnEdge.x - p.x;
+            double yd = nearestPointOnEdge.y - p.y;
             directionToEdge = Math.atan2(yd, xd);
-            int edgeSegmentIndex = edgeLocation.getSegmentIndex();
-            Coordinate c0 = edgeCoords[edgeSegmentIndex];
-            Coordinate c1 = edgeCoords[edgeSegmentIndex + 1];
+            int edgeSegmentIndex = bestSeg;
+            Coordinate c0 = coordSeq.getCoordinate(edgeSegmentIndex);
+            Coordinate c1 = coordSeq.getCoordinate(edgeSegmentIndex + 1);
             xd = c1.x - c1.y;
             yd = c1.y - c0.y;
             directionOfEdge = Math.atan2(yd, xd);
@@ -361,7 +403,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     public static class CandidateEdgeBundle extends ArrayList<CandidateEdge> {
         private static final long serialVersionUID = 20120222L;
 
-        public Vertex endwiseVertex = null;
+        public StreetVertex endwiseVertex = null;
 
         public CandidateEdge best = null;
 
@@ -409,9 +451,18 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         }
     }
 
+    /**
+     * @param coordinate Point to get edges near
+     * @param request RoutingRequest that must be able to traverse the edge (all edges if null) 
+     * @param extraEdges Any edges not in the graph that might be included (allows trips within one block)
+     * @param routeEdges Which edges have bus routes along them (stop-linking only; otherwise null)
+     * @param restriction 0 = only edges traversable by request; 1 = only edges traversable by request and cars; 
+     * 2 = only edges traversable by request and either traversable by cars or are platforms  
+     * @return
+     */
     @SuppressWarnings("unchecked")
-    public CandidateEdgeBundle getClosestEdges(Coordinate coordinate, RoutingRequest options,
-            List<Edge> extraEdges, Collection<Edge> routeEdges) {
+    public CandidateEdgeBundle getClosestEdges(Coordinate coordinate, RoutingRequest request,
+            List<Edge> extraEdges, Collection<Edge> routeEdges, boolean possibleTransitLinksOnly) {
         ArrayList<StreetEdge> extraStreets = new ArrayList<StreetEdge>();
         if (extraEdges != null)
             for (StreetEdge se : IterableLibrary.filter(extraEdges, StreetEdge.class))
@@ -421,10 +472,10 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             extraStreets.add(se);
 
         Envelope envelope = new Envelope(coordinate);
-        Point p = GeometryUtils.getGeometryFactory().createPoint(coordinate);
-        RoutingRequest walkingOptions = null;
-        if (options != null) {
-            walkingOptions = options.getWalkingOptions();
+
+        RoutingRequest walkingRequest = null;
+        if (request != null) {
+            walkingRequest = request.getWalkingOptions();
         }
         double envelopeGrowthAmount = 0.001; // ~= 100 meters
         double radius = 0;
@@ -444,13 +495,24 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             for (StreetEdge e : nearbyEdges) {
                 if (e == null || e.getFromVertex() == null)
                     continue;
-                if (options != null && (!(e.canTraverse(options) || e.canTraverse(walkingOptions))))
+                if (request != null && (!(e.canTraverse(request) || e.canTraverse(walkingRequest))))
                     continue;
+                if (possibleTransitLinksOnly) {
+                    if (!e.getPermission().allows(StreetTraversalPermission.CAR)) {
+                        if ((e.getStreetClass() & StreetEdge.ANY_PLATFORM_MASK) == 0) {
+                            continue;
+                        }
+                    }
+                }
                 double preferrence = 1;
                 if (routeEdges != null && routeEdges.contains(e)) {
                     preferrence = 3.0;
                 }
-                CandidateEdge ce = new CandidateEdge(e, p, preferrence);
+                TraverseModeSet modes = new TraverseModeSet("");
+                if (request != null) {
+                    modes = request.getModes();
+                }
+                CandidateEdge ce = new CandidateEdge(e, coordinate, preferrence, modes);
                 // Even if an edge is outside the query envelope, bounding boxes can
                 // still intersect. In this case, distance to the edge is greater
                 // than the query envelope size.

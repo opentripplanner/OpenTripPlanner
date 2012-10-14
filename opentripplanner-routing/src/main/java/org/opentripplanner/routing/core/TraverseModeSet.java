@@ -17,7 +17,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
  * A set of traverse modes -- typically, one non-transit mode (walking, biking, car) and zero or
@@ -63,6 +62,9 @@ public class TraverseModeSet implements Cloneable, Serializable {
     public TraverseModeSet(String modelist) {
         modes = 0;
         for (String modeStr : modelist.split(",")) {
+            if (modeStr.length() == 0) {
+                continue;
+            }
             setMode(TraverseMode.valueOf(modeStr), true);
         }
 

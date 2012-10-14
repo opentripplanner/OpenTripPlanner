@@ -34,6 +34,10 @@ public abstract class StreetEdge extends EdgeWithElevation {
     public static final int CLASS_STREET = 3;
     public static final int CLASS_CROSSING = 4;
     public static final int CLASS_OTHERPATH = 5;
+    public static final int CLASS_OTHER_PLATFORM = 8;
+    public static final int CLASS_TRAIN_PLATFORM = 16;
+    public static final int ANY_PLATFORM_MASK = 24;
+    public static final int CROSSING_CLASS_MASK = 7; //ignore platform
 
     public StreetEdge(StreetVertex v1, StreetVertex v2) {
         super(v1, v2);

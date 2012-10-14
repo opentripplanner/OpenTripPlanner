@@ -22,10 +22,14 @@ public class MaxWalkState extends State {
     @Override
     public boolean dominates(State other) {
 
+        if (isBikeRenting() != other.isBikeRenting()) {
+            return false;
+        }
+
         if (backEdge != other.getBackEdge() && ((backEdge instanceof PlainStreetEdge)
                 && (!((PlainStreetEdge) backEdge).getTurnRestrictions().isEmpty())))
             return false;
-        return walkDistance <= other.getWalkDistance() * 1.10 
+        return walkDistance <= other.getWalkDistance() * Raptor.WALK_EPSILON
                 && this.getElapsedTime() <= other.getElapsedTime() + 30
                 && getNumBoardings() <= other.getNumBoardings();
     }

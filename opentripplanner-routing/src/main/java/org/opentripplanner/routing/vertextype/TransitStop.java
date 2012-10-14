@@ -15,11 +15,15 @@ package org.opentripplanner.routing.vertextype;
 
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 
 public class TransitStop extends OffboardVertex {
+    private TraverseModeSet modes = new TraverseModeSet();
+
     private static final long serialVersionUID = 1L;
 
     private boolean wheelchairEntrance;
@@ -75,5 +79,13 @@ public class TransitStop extends OffboardVertex {
 
     public void setStreetToStopTime(int streetToStopTime) {
         this.streetToStopTime = streetToStopTime;
+    }
+
+    public TraverseModeSet getModes() {
+        return modes;
+    }
+
+    public void addMode(TraverseMode mode) {
+        modes.setMode(mode, true);
     }
 }

@@ -14,12 +14,14 @@
 package org.opentripplanner.api.model; 
 
 import java.util.Calendar;
-import java.util.Date;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement; 
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.model.json_serialization.GeoJSONSerializer;
 import org.opentripplanner.util.Constants; 
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /** 
 * A Place is where a journey starts or ends, or a transit stop along the way.
@@ -63,9 +65,11 @@ public class Place {
     public Calendar departure = null;
 
     @XmlAttribute
+    @JsonSerialize
     public String orig;
 
     @XmlAttribute
+    @JsonSerialize
     public String zoneId;
 
     /**
@@ -74,7 +78,6 @@ public class Place {
      */
     @XmlElement
     String getGeometry() {
-
         return Constants.GEO_JSON_POINT + lon + "," + lat + Constants.GEO_JSON_TAIL;
     }
 

@@ -30,6 +30,7 @@ otp.planner.FormsOptionsManagerStatic = {
     mode:          null,
     optimize:      null,
     maxWalk:       null,
+    walkSpeed:     null,
     wheelchair:    null,
     locale:        null,
     bikeTriangle:  null,
@@ -88,6 +89,7 @@ otp.planner.FormsOptionsManagerStatic = {
         // because it's possible that it's no longer valid
         this.optimize.reset();
         if(this.maxWalk)      this.showComboBox(this.maxWalk);
+        if(this.walkSpeed)    this.showComboBox(this.walkSpeed);
         if(this.wheelchair)   this.showComboBox(this.wheelchair);
         if (this.lastDistance && !this.isBike(mode)) {
             otp.planner.StaticForms.setMaxDistance(this.lastDistance);
@@ -97,14 +99,17 @@ otp.planner.FormsOptionsManagerStatic = {
         if(this.isTransitOrBus(mode)) {
             if (this.isBike(mode)) {
                 this.maxWalk.label.update(this.locale.tripPlanner.labels.maxBikeDistance);
+                this.walkSpeed.label.update(this.locale.tripPlanner.labels.bikeSpeed);
             } else {
                 this.maxWalk.label.update(this.locale.tripPlanner.labels.maxWalkDistance);
+                this.walkSpeed.label.update(this.locale.tripPlanner.labels.walkSpeed);
             }
             showTransitOptions = true;
         } else if(this.isWalk(mode)) {
             if(this.maxWalk)    this.hideComboBox(this.maxWalk, false);
         } else {
             if(this.maxWalk)    this.hideComboBox(this.maxWalk, false);
+            if(this.walkSpeed)  this.hideComboBox(this.walkSpeed, false);
             if(this.wheelchair) this.hideComboBox(this.wheelchair, true);
         }
         if (this.isBike(mode)) {

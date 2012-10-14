@@ -54,6 +54,8 @@ otp.planner.StaticForms = {
 
     m_maxWalkDistanceStore: null,
     m_maxWalkDistanceForm : null,
+    m_walkSpeedStore      : null,
+    m_walkSpeedForm       : null,
     m_optimizeStore       : null,
     m_optimizeForm        : null,
     m_modeStore           : null,
@@ -626,6 +628,8 @@ otp.planner.StaticForms = {
             }
             if(params.maxWalkDistance)
                 forms.m_maxWalkDistanceForm.setValue(params.maxWalkDistance);
+            if(params.walkSpeed)
+                forms.m_walkSpeedForm.setValue(params.walkSpeed);
             if(params.wheelchair && this.planner.options.showWheelchairForm)
                 forms.m_wheelchairForm.setValue(params.wheelchair);
 
@@ -700,6 +704,33 @@ otp.planner.StaticForms = {
         {}
     },
 
+    /** */
+    getWalkSpeed : function()
+    {
+        var retVal = null;
+        try
+        {
+            var self = otp.planner.StaticForms.THIS; 
+            retVal = self.m_walkSpeedForm.getValue();
+        }
+        catch(e)
+        {}
+        return retVal;
+    },
+
+
+    /** */
+    setWalkSpeed : function(val)
+    {
+        try
+        {
+            var self = otp.planner.StaticForms.THIS; 
+            retVal = self.m_walkSpeedForm.setValue(val);
+        }
+        catch(e)
+        {}
+    },
+
     /**
      * returns current state (values) of the trip planner forms
      * used for creating a URL populated with values to the trip planner
@@ -731,6 +762,8 @@ otp.planner.StaticForms = {
         }
         var d = this.m_maxWalkDistanceForm.getValue();
         retVal.maxWalkDistance = d * 1.0;
+        var s = this.m_walkSpeedForm.getValue();
+        retVal.walkSpeed = s * 1.0;
         retVal.mode            = this.m_modeForm.getValue();
         if(this.planner.options.showWheelchairForm)
             retVal.wheelchair      = this.m_wheelchairForm.getValue();
@@ -1205,6 +1238,7 @@ otp.planner.StaticForms = {
     makeOptionForms : function()
     {
         this.m_maxWalkDistanceStore  = otp.util.ExtUtils.makeStaticPullDownStore(this.locale.tripPlanner.maxWalkDistance);
+        this.m_walkSpeedStore  = otp.util.ExtUtils.makeStaticPullDownStore(this.locale.tripPlanner.walkSpeed);
         this.m_optimizeStore = otp.util.ExtUtils.makeStaticPullDownStore(this.locale.tripPlanner.options);
         this.m_modeStore     = otp.util.ExtUtils.makeStaticPullDownStore(this.locale.tripPlanner.mode);
 
@@ -1237,6 +1271,26 @@ otp.planner.StaticForms = {
             fieldLabel:     this.locale.tripPlanner.labels.maxWalkDistance,
             store:          this.m_maxWalkDistanceStore,
             value:          this.m_maxWalkDistanceStore.getAt(2).get('opt'),
+            displayField:   'text',
+            valueField:     'opt',
+            anchor:         this.FIELD_ANCHOR,
+            mode:           'local',
+            triggerAction:  'all',
+            editable:       false,
+            allowBlank:     false,
+            lazyRender:     false,
+            typeAhead:      true,
+            forceSelection: true,
+            selectOnFocus:  true
+        });
+
+        this.m_walkSpeedForm = new Ext.form.ComboBox({
+            id:             'trip-walkspeed-form',
+            name:           'walkSpeed',
+            hiddenName:     'walkSpeed',
+            fieldLabel:     this.locale.tripPlanner.labels.walkSpeed,
+            store:          this.m_walkSpeedStore,
+            value:          this.m_walkSpeedStore.getAt(2).get('opt'),
             displayField:   'text',
             valueField:     'opt',
             anchor:         this.FIELD_ANCHOR,
@@ -1307,6 +1361,7 @@ otp.planner.StaticForms = {
                 mode:         this.m_modeForm,
                 optimize:     this.m_optimizeForm,
                 maxWalk:      this.m_maxWalkDistanceForm,
+                walkSpeed:    this.m_walkSpeedForm,
                 locale:       this.locale,
                 bikeTriangle: this.m_bikeTriangle
             };
@@ -1317,7 +1372,7 @@ otp.planner.StaticForms = {
             this.m_optionsManager = new otp.planner.FormsOptionsManager(usecfg);
         }
 
-        var retVal = [this.m_modeForm, this.m_optimizeForm, this.m_bikeTriangleContainer, this.m_maxWalkDistanceForm];
+        var retVal = [this.m_modeForm, this.m_optimizeForm, this.m_bikeTriangleContainer, this.m_maxWalkDistanceForm, this.m_walkSpeedForm];
         if(this.planner.options.showWheelchairForm)
             retVal.push(this.m_wheelchairForm);
 

@@ -16,6 +16,8 @@ package org.opentripplanner.routing.patch;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 /**
  * Represents a period of time, in terms of seconds in [start, end)
  * @author novalis
@@ -32,9 +34,11 @@ public class TimePeriod {
     }
 
     @XmlAttribute
+    @JsonSerialize
     public long startTime;
 
     @XmlAttribute
+    @JsonSerialize
     public long endTime;
 
     public boolean equals(Object o) {

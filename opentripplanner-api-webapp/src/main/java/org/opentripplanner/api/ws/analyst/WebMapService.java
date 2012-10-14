@@ -11,6 +11,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.geotools.geometry.Envelope2D;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opentripplanner.analyst.request.RenderRequest;
 import org.opentripplanner.analyst.request.Renderer;
@@ -26,8 +28,10 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.sun.jersey.api.core.InjectParam;
+import com.sun.jersey.api.spring.Autowire;
 
 @Path("wms")
+@Autowire
 public class WebMapService extends RoutingResource {
     
     private static final Logger LOG = LoggerFactory.getLogger(WebMapService.class);
@@ -57,18 +61,30 @@ public class WebMapService extends RoutingResource {
            // @QueryParam("time") GregorianCalendar time, // SearchResource will parse time without date 
            // non-WMS parameters
            @QueryParam("resolution")     Double resolution,
+           @QueryParam("reproject")   @DefaultValue("True")       Boolean reproject,
            @Context UriInfo uriInfo ) throws Exception { 
         
         if (request.equals("getCapabilities")) 
             return getCapabilitiesResponse();
             
+        if (version == new WMSVersion("1.3.0") && crs != null)
+            srs = crs;
+
+        //bbox.setCoordinateReferenceSystem(srs);
+        if (reproject) {
+            LOG.info("reprojecting envelope from WGS84 to {}", srs);
+            ReferencedEnvelope renv = new ReferencedEnvelope(bbox, DefaultGeographicCRS.WGS84);
+            LOG.debug("WGS84 = {}", renv);
+            bbox = new Envelope2D(renv.transform(srs, false));
+            LOG.debug("reprojected envelope is {}", bbox);
+        }
+
         if (resolution != null) {
             width  = (int) Math.ceil(bbox.width  / resolution);
             height = (int) Math.ceil(bbox.height / resolution);
+            LOG.debug("resolution set to {}");
+            LOG.debug("resulting raster dimensions are {}w x {}h", width, height);
         }
-
-        if (version == new WMSVersion("1.3.0") && crs != null)
-            srs = crs;
 
         RoutingRequest reqA = this.buildRequest(0);
         RoutingRequest reqB = this.buildRequest(1);
@@ -92,7 +108,6 @@ public class WebMapService extends RoutingResource {
 //            sptRequestB = new SPTRequest(originLonB, originLatB, timeB);
 //        } 
 //        
-        bbox.setCoordinateReferenceSystem(srs);
         TileRequest tileRequest = new TileRequest(bbox, width, height);
         Layer layer = layers.get(0);
         Style style = styles.get(0);

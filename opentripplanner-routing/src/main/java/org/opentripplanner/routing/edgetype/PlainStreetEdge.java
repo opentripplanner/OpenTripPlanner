@@ -35,6 +35,8 @@ import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.util.ElevationProfileSegment;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
@@ -46,6 +48,8 @@ import com.vividsolutions.jts.geom.LineString;
  * 
  */
 public class PlainStreetEdge extends StreetEdge implements Cloneable {
+
+    private static Logger LOG = LoggerFactory.getLogger(PlainStreetEdge.class); 
 
     private static final long serialVersionUID = 1L;
 
@@ -125,15 +129,24 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         this.back = back;
         this.carSpeed = carSpeed;
         if (geometry != null) {
-            for (Coordinate c : geometry.getCoordinates()) {
-                if (Double.isNaN(c.x)) {
-                    System.out.println("DOOM");
+            try {
+                for (Coordinate c : geometry.getCoordinates()) {
+                    if (Double.isNaN(c.x)) {
+                        System.out.println("X DOOM");
+                    }
+                    if (Double.isNaN(c.y)) {
+                        System.out.println("Y DOOM");
+                    }
                 }
+                double angleR = DirectionUtils.getLastAngle(geometry);
+                outAngle = ((int) (180 * angleR / Math.PI) + 180 + 360) % 360;
+                angleR = DirectionUtils.getFirstAngle(geometry);
+                inAngle = ((int) (180 * angleR / Math.PI) + 180 + 360) % 360;
+            } catch (IllegalArgumentException iae) {
+                LOG.error("exception while determining street edge angles. setting to zero. there is probably something wrong with this street segment's geometry.");
+                inAngle = 0;
+                outAngle = 0;
             }
-            double angleR = DirectionUtils.getLastAngle(geometry);
-            outAngle = ((int) (180 * angleR / Math.PI) + 180 + 360) % 360;
-            angleR = DirectionUtils.getFirstAngle(geometry);
-            inAngle = ((int) (180 * angleR / Math.PI) + 180 + 360) % 360;
         }
     }
 
@@ -276,6 +289,10 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
                 weight = length / speed;
             }
         } else {
+            if (options.isWalkingBike()) {
+                //take slopes into account when walking bikes
+                time = elevationProfileSegment.getSlopeSpeedEffectiveLength() / speed;
+            }
             weight = time;
         }
         if (isStairs()) {
@@ -417,10 +434,6 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         out.defaultWriteObject();
     }
 
-    public boolean getSlopeOverride() {
-        return elevationProfileSegment.getSlopeOverride();
-    }
-
     public void setId(String id) {
         this.id = id;
     }
@@ -452,7 +465,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     
     @Override
     public String toString() {
-        return "PlainStreetEdge(" + fromv + " -> " + tov + ")";
+        return "PlainStreetEdge(" + name + ", " + fromv + " -> " + tov + ")";
     }
 
     public boolean hasBogusName() {

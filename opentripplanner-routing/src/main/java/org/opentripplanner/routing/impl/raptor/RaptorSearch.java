@@ -63,19 +63,12 @@ public class RaptorSearch {
 
     private RaptorData data;
 
-    private int targetRegion = -1;
 
     @SuppressWarnings("unchecked")
     RaptorSearch(RaptorData data, RoutingRequest options) {
         statesByStop = new List[data.stops.length];
         bounder = new TargetBound(options);
         this.data = data;
-        if (options.rctx.target != null) {
-            List<Integer> targetRegions = Raptor.getRegionsForVertex(data.regionData, options.rctx.target);
-            if (targetRegions.size() == 1) {
-                this.targetRegion = targetRegions.get(0);
-            }
-        }
     }
 
     public void addStates(int stop, List<RaptorState> list) {
@@ -367,7 +360,7 @@ public class RaptorSearch {
             // generate a board state for this interline
             RaptorState boardState = new RaptorState(stayOn);
             //we need to subtract out the slacks that we are about to mistakenly pay
-            boardState.weight = - options.getBoardSlack() - options.getAlightSlack(); 
+            boardState.weight -= options.getBoardSlack() - options.getAlightSlack();
             boardState.nBoardings = nBoardings - 1;
             boardState.boardStop = route.stops[firstStop];
             boardState.boardStopSequence = firstStop;
@@ -592,6 +585,7 @@ public class RaptorSearch {
                 if (parent != null) {
                     state = new RaptorState(parent);
                     state.nBoardings = parent.nBoardings;
+                    state.rentingBike = targetState.isBikeRenting();
                 } else {
                     state = new RaptorState(options.arriveBy);
                 }
@@ -676,6 +670,7 @@ public class RaptorSearch {
             newState.arrivalTime = (int) state.getTime();
             newState.walkPath = state;
             newState.stop = stop;
+            newState.rentingBike = state.isBikeRenting();
 
             for (RaptorState oldState : states) {
                 if (oldState.eDominates(newState)) {

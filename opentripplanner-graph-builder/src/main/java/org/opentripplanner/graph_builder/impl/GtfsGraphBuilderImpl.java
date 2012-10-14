@@ -27,7 +27,6 @@ import org.onebusaway.csv_entities.EntityHandler;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceDataFactoryImpl;
 import org.onebusaway.gtfs.model.Agency;
-import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.IdentityBean;
 import org.onebusaway.gtfs.model.ShapePoint;
 import org.onebusaway.gtfs.model.Trip;
@@ -36,6 +35,7 @@ import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GenericMutableDao;
 import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
 import org.opentripplanner.calendar.impl.MultiCalendarServiceImpl;
+import org.opentripplanner.gbannotation.AgencyNameCollision;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.model.GtfsBundles;
 import org.opentripplanner.graph_builder.services.EntityReplacementStrategy;
@@ -43,8 +43,6 @@ import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.GraphBuilderWithGtfsDao;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.core.GraphBuilderAnnotation;
-import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.edgetype.factory.GtfsStopContext;
 import org.opentripplanner.routing.graph.Graph;
@@ -210,8 +208,7 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
                 for (Agency agency : reader.getAgencies()) {
                     GtfsBundle existing = agenciesSeen.get(agency);
                     if (existing != null) {
-                        _log.warn(GraphBuilderAnnotation.register(graph,
-                                Variety.AGENCY_NAME_COLLISION, agency, existing.toString()));
+                        _log.warn(graph.addBuilderAnnotation(new AgencyNameCollision(agency, existing.toString())));
                     } else {
                         agenciesSeen.put(agency, gtfsBundle);
                     }

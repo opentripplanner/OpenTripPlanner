@@ -1,7 +1,6 @@
 package org.opentripplanner.analyst.batch;
 
 import java.io.File;
-import javax.annotation.PostConstruct;
 
 import lombok.Setter;
 
@@ -101,6 +100,7 @@ public class RasterPopulation extends BasicPopulation {
         LOG.info("Done loading raster from file.");
     }
     
+    /** Shared internal createIndividuals method allowing synthetic subclass to reuse projection code */
     protected void createIndividuals0() {
         MathTransform tr; 
         try {
@@ -134,7 +134,7 @@ public class RasterPopulation extends BasicPopulation {
                         coverage.evaluate(coord, val); 
                     // add this grid cell to the population
                     String label = row + "_" + col;
-                    Individual individual = individualFactory.build(label, lon, lat, val[band]);
+                    Individual individual = new Individual(label, lon, lat, val[band]);
                     this.addIndividual(individual);
                 } catch (Exception e) {
                     LOG.error("error creating individuals for raster");

@@ -49,7 +49,7 @@ import lombok.Getter;
  * 
  * @author mattwigway
  */
-public class TransitBoardAlight extends PatternEdge implements OnBoardForwardEdge, TimeDependentTrip {
+public class TransitBoardAlight extends PatternEdge implements OnBoardForwardEdge {
 
     private static final long serialVersionUID = 1042740795612978747L;
 
@@ -135,7 +135,6 @@ public class TransitBoardAlight extends PatternEdge implements OnBoardForwardEdg
             if (state0.getBackEdge() instanceof TransitBoardAlight) {
                 return null;
             }
-
             StateEditor s1 = state0.edit(this);
             
             if (boarding)
@@ -171,7 +170,7 @@ public class TransitBoardAlight extends PatternEdge implements OnBoardForwardEdg
 
             if (options.isReverseOptimizeOnTheFly()) {
                 int thisDeparture = state0.getTripTimes().getDepartureTime(stopIndex);
-                int numTrips = getPattern().getNumTrips(); 
+                int numTrips = getPattern().getNumScheduledTrips(); 
                 int nextDeparture;
 
                 s1.setLastNextArrivalDelta(Integer.MAX_VALUE);
@@ -231,13 +230,9 @@ public class TransitBoardAlight extends PatternEdge implements OnBoardForwardEdg
                 //    continue;
                 if (sd.serviceIdRunning(serviceId)) {
                     
-                    // make sure we search for boards on board and alights on alight
-                    if (boarding)
-                        tripTimes = getPattern().getNextTrip(stopIndex, 
-                                secondsSinceMidnight, mode == TraverseMode.BICYCLE, options);
-                    else
-                        tripTimes = getPattern().getPreviousTrip(stopIndex, 
-                                secondsSinceMidnight, mode == TraverseMode.BICYCLE, options);
+                    // getNextTrip will find next or prev departure depending on final boolean parameter
+                    tripTimes = getPattern().getNextTrip(stopIndex, secondsSinceMidnight, 
+                            mode == TraverseMode.BICYCLE, options, boarding);
                     
                     if (tripTimes != null) {
                         // a trip was found, index is valid, wait will be non-negative
@@ -392,7 +387,7 @@ public class TransitBoardAlight extends PatternEdge implements OnBoardForwardEdg
             return options.getBoardCostLowerBound();
     }
 
-    
+    @Override
     public int getStopIndex() {
         return stopIndex;
     }
@@ -403,14 +398,4 @@ public class TransitBoardAlight extends PatternEdge implements OnBoardForwardEdg
                 getFromVertex() + " to " + getToVertex() + ")";
     }
 
-    @Override
-    public String getDirection(int tripIndex) {
-        // TODO: do we ever need to subtract one to make this a hop index?
-        return getPattern().getHeadsign(stopIndex, tripIndex);
-    }
-
-    @Override
-    public Trip getTrip(int tripIndex) {
-        return getPattern().getTrip(tripIndex);
-    }
 }
