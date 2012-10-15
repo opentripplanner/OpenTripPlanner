@@ -10,13 +10,15 @@ public class RenderRequest {
     public final Layer layer; 
     public final Style style; 
     public final boolean transparent;
-
+    public final boolean timestamp;
+    
     public RenderRequest (MIMEImageFormat format, 
-        Layer layer, Style style, boolean transparent) {
+        Layer layer, Style style, boolean transparent, boolean timestamp) {
         this.format = format;
         this.layer = layer;
         this.style = style;
         this.transparent = transparent;
+        this.timestamp = timestamp;
     }
     
     public String toString() {

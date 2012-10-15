@@ -61,7 +61,8 @@ public class WebMapService extends RoutingResource {
            // @QueryParam("time") GregorianCalendar time, // SearchResource will parse time without date 
            // non-WMS parameters
            @QueryParam("resolution")     Double resolution,
-           @QueryParam("reproject")   @DefaultValue("True")       Boolean reproject,
+           @QueryParam("reproject")   @DefaultValue("true")       Boolean reproject,
+           @QueryParam("timestamp")   @DefaultValue("false")      Boolean timestamp,
            @Context UriInfo uriInfo ) throws Exception { 
         
         if (request.equals("getCapabilities")) 
@@ -82,7 +83,7 @@ public class WebMapService extends RoutingResource {
         if (resolution != null) {
             width  = (int) Math.ceil(bbox.width  / resolution);
             height = (int) Math.ceil(bbox.height / resolution);
-            LOG.debug("resolution set to {}");
+            LOG.debug("resolution (pixel size) set to {} map units", resolution);
             LOG.debug("resulting raster dimensions are {}w x {}h", width, height);
         }
 
@@ -111,7 +112,7 @@ public class WebMapService extends RoutingResource {
         TileRequest tileRequest = new TileRequest(bbox, width, height);
         Layer layer = layers.get(0);
         Style style = styles.get(0);
-        RenderRequest renderRequest = new RenderRequest(format, layer, style, transparent);
+        RenderRequest renderRequest = new RenderRequest(format, layer, style, transparent, timestamp);
         
         if (layer != Layer.DIFFERENCE) {
 //            noPurple = req.clone();
