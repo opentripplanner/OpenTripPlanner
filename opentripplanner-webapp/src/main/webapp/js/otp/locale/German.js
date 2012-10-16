@@ -268,7 +268,9 @@ otp.locale.German = {
             intermediate  : "Intermediate Place", // TODO
             minimize      : "anzeineg",
             maxWalkDistance: "maximale  zu Fuß Gehstrecke",
-            maxBikeDistance: "Maximum bike", // TODO
+            walkSpeed     : "Gehgeschwindigkeit", //TODO
+            maxBikeDistance: "Maximale bike ", // TODO
+            bikeSpeed     : "Fahrradgeschwindigkeit", //TODO
             arriveDepart  : "Ankunft innerhalb von/Abfahrt um",
             mode          : "fahren durch",
             wheelchair    : "Route für Rollstuhlfahrer", 
@@ -350,6 +352,14 @@ otp.locale.German = {
             ['10000',  '10 km'],
             ['20000',  '20 km']
         ],
+        walkSpeed :
+        		[
+          			['0.447',  '0.5 km/h'],
+          			['0.894',  '0.9 km/h'],
+          			['1.341',  '1.3 km/h'],
+          			['1.788',  '1.8 km/h'],
+          			['2.235',  '2.3 km/h']
+          		],
     
         mode : 
         [

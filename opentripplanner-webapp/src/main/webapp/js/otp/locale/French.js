@@ -252,7 +252,9 @@ otp.locale.French = {
             intermediate  : "Point de passage",
             minimize : "Optimiser pour",
             maxWalkDistance : "Marche maximum",
+            walkSpeed : "Vitesse à marche",
             maxBikeDistance : "Parcours à vélo maximum",
+            bikeSpeed : "Vitesse à vélo",
             arriveDepart    : "Arriver à/Partir de",
             mode : "Voyager par",
             wheelchair : "Accessible aux fauteuils roulants",
@@ -320,7 +322,16 @@ otp.locale.French = {
         maxWalkDistance : [ [ '200', '200 m' ], [ '500', '500 m' ],
                 [ '1000', '1 km' ], [ '1500', '1,5 km' ], [ '5000', '5 km' ],
                 [ '10000', '10 km' ] ],
-
+                
+        walkSpeed :
+        		[
+          			['0.447',  '0.5 km/h'],
+          			['0.894',  '0.9 km/h'],
+          			['1.341',  '1.3 km/h'],
+          			['1.788',  '1.8 km/h'],
+          			['2.235',  '2.3 km/h']
+          		],
+            		
         mode : [ [ 'TRANSIT,WALK', 'Transports publics' ],
                 [ 'BUSISH,TRAINISH,WALK', 'Bus & Train' ],
                 [ 'BUSISH,WALK', 'Bus seulement' ],

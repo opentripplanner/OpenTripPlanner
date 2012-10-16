@@ -265,7 +265,9 @@ otp.locale.Italian = {
             intermediate  : "Punto intermedio",
             minimize      : "Mostrami",
             maxWalkDistance: "Massimo cammino a piedi",
+            walkSpeed     : "velocità a piedi",
             maxBikeDistance: "Massimo distanza in bici",
+            bikeSpeed     : "velocità in bici",
             arriveDepart  : "Arriva entro/Parti a",
             mode          : "Passa per",
             wheelchair    : "Percorso accessibile ai portatori di sedia a rotelle", 
@@ -347,6 +349,15 @@ otp.locale.Italian = {
             ['10000',  '10 km'],
             ['20000',  '20 km']
         ],
+
+        walkSpeed :
+        		[
+          			['0.447',  '0.5 km/h'],
+          			['0.894',  '0.9 km/h'],
+          			['1.341',  '1.3 km/h'],
+          			['1.788',  '1.8 km/h'],
+          			['2.235',  '2.3 km/h']
+          		],
     
         mode : 
         [

@@ -269,7 +269,9 @@ otp.locale.Turkish = {
             intermediate  : "Intermediate Place",
             minimize      : "Show me the",
             maxWalkDistance: "Maximum walk",
+            walkSpeed     : "Walk speed",
             maxBikeDistance: "Maximum bike",
+            bikeSpeed     : "Bike speed",
             arriveDepart  : "Arrive by/Depart at",
             mode          : "Travel by",
             wheelchair    : "Wheelchair accessible trip", 
@@ -363,6 +365,17 @@ otp.locale.Turkish = {
             ['80467',  '50 mil'],
             ['160934',  '100 mil']
         ],
+
+        walkSpeed :
+        [ //it's not that people in Turkey are 3,600x as speedy
+         //it's that hour in Turkish is "saat".  I bet that gets
+         //confusing!
+          			['0.447',  '0.5 km/s'],
+          			['0.894',  '0.9 km/s'],
+          			['1.341',  '1.3 km/s'],
+          			['1.788',  '1.8 km/s'],
+          			['2.235',  '2.3 km/s']
+          		],
     
         mode : 
         [
