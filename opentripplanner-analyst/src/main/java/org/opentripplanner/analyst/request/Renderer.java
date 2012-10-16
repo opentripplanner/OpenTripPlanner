@@ -1,5 +1,6 @@
 package org.opentripplanner.analyst.request;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -72,8 +73,14 @@ public class Renderer {
             df.setTimeZone(TimeZone.getTimeZone("America/New_York"));
             String ds = df.format(new Date(sptRequestA.dateTime * 1000));
             shadowWrite(image, ds, sptRequestA.from);
+
+            Graphics2D g2d = image.createGraphics();
+            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
+            BufferedImage legend = Tile.getLegend(renderRequest.style, 300, 50);
+            g2d.drawImage(legend, 0, image.getHeight()-50, null);
+            g2d.dispose();
         }
-        
+                
         // geotiff kludge
         if (renderRequest.format.toString().equals("image/geotiff")) {
             GridCoverage2D gc = tile.getGridCoverage2D(image);
