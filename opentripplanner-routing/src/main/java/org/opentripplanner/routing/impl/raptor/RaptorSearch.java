@@ -587,7 +587,7 @@ public class RaptorSearch {
                     state.nBoardings = parent.nBoardings;
                     state.rentingBike = targetState.isBikeRenting();
                 } else {
-                    state = new RaptorState(options.arriveBy);
+                    state = new RaptorState(options);
                 }
                 state.weight = targetState.getWeight();
                 state.walkDistance = targetState.getWalkDistance();
@@ -602,7 +602,7 @@ public class RaptorSearch {
                     }
                 }
                 addTargetState(state);
-                log.debug("Found target at: " + state);
+                log.debug("Found target at: " + state + " on " + state.getTrips());
             }
         }
         for (State state : bounder.removedBoundingStates) {
@@ -662,7 +662,7 @@ public class RaptorSearch {
                 newState = new RaptorState(parent);
             } else {
                 //this only happens in round 0
-                newState = new RaptorState(options.arriveBy);
+                newState = new RaptorState(options);
             }
             newState.weight = state.getWeight();
             newState.nBoardings = nBoardings;
