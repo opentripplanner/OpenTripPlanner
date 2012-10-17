@@ -30,6 +30,7 @@ import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.model.json_serialization.EncodedPolylineJSONSerializer;
 import org.opentripplanner.model.json_serialization.GeoJSONSerializer;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
@@ -227,7 +228,7 @@ public class RouteVariant implements Serializable {
         return direction;
     }
 
-    @JsonSerialize(using=GeoJSONSerializer.class)
+    @JsonSerialize(using=EncodedPolylineJSONSerializer.class)
     @XmlJavaTypeAdapter(LineStringAdapter.class)
     public LineString getGeometry() {
         if (geometry == null) {
