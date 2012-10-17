@@ -231,7 +231,7 @@ public class Raptor implements PathService {
                     break;
                 }
                 options = options.clone();
-                if (search.getTargetStates().size() > 0) {
+                if (search.getTargetStates().size() > 0 && bestElapsedTime < expectedWorstTime) {
                     // we have found some paths so we no longer want to expand the max walk distance
                     break RETRY;
                 } else {
