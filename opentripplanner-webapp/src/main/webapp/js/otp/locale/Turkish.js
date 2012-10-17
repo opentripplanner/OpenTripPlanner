@@ -370,12 +370,20 @@ otp.locale.Turkish = {
         [ //it's not that people in Turkey are 3,600x as speedy
          //it's that hour in Turkish is "saat".  I bet that gets
          //confusing!
-          			['0.447',  '0.5 km/s'],
-          			['0.894',  '0.9 km/s'],
-          			['1.341',  '1.3 km/s'],
-          			['1.788',  '1.8 km/s'],
-          			['2.235',  '2.3 km/s']
-          		],
+     
+        walkSpeed :
+        [
+            ['0.278',  '1 km/s'],
+            ['0.556',  '2 km/s'],
+            ['0.833',  '3 km/s'],
+            ['1.111',  '4 km/s'],
+            ['1.389',  '5 km/s'],
+            ['1.667',  '6 km/s'],
+            ['1.944',  '7 km/s'],
+            ['2.222',  '8 km/s'],
+            ['2.500',  '9 km/s'],
+            ['2.778',  '10 km/s']
+        ],
     
         mode : 
         [
