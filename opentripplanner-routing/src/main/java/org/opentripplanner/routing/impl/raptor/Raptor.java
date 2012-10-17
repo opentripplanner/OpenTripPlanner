@@ -89,11 +89,6 @@ public class Raptor implements PathService {
         shortPathService.setSptService(sptService);
     }
 
-    /** Give up on searching for additional itineraries after this many seconds have elapsed. */
-    public void setTimeout (double seconds) {
-        multiPathTimeout = seconds;
-    }
-
     /**
      * Stop searching for additional itineraries (beyond the first one) after this many seconds 
      * have elapsed, relative to the beginning of the search for the first itinerary. 
