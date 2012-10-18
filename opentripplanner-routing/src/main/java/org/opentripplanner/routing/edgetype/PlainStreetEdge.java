@@ -289,30 +289,45 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             backPSE = (PlainStreetEdge) backEdge;
             int outAngle = 0;
             int inAngle = 0;
+
+            /*
+             * This is a subtle piece of code. Turn costs are evaluated differently during
+             * forward and reverse traversal. During forward traversal of an edge, the turn
+             * *into* that edge is used, while during reverse traversal, the turn *out of*
+             * the edge is used.
+             *
+             * However, over a set of edges, the turn costs must add up the same (for
+             * general correctness and specifically for reverse optimization). This means
+             * that during reverse traversal, we must also use the speed for the mode of
+             * the backEdge, rather than of the current edge.
+             */
+
+            double turnSpeed = speed;
             if (options.arriveBy) {
                 if (!canTurnOnto(backPSE, traverseMode))
                     return null;
-                outAngle = backPSE.getOutAngle();
-                inAngle = getInAngle();
+                outAngle = getOutAngle();
+                inAngle = backPSE.getInAngle();
+                turnSpeed = options.getSpeed(s0.getBackMode());
             } else {
                 if (!backPSE.canTurnOnto(this, traverseMode))
                     return null;
-                outAngle = getOutAngle();
-                inAngle = backPSE.getInAngle();
+                outAngle = backPSE.getOutAngle();
+                inAngle = getInAngle();
             }
 
             int turnCost = Math.abs(outAngle - inAngle);
             if (turnCost > 180) {
                 turnCost = 360 - turnCost;
             }
-            final double realTurnCost = (turnCost / 20.0) / speed;
+            final double realTurnCost = (turnCost / 20.0) / turnSpeed;
             s1.incrementWalkDistance(realTurnCost / 100); //just a tie-breaker
             weight += realTurnCost;
-            long turnTime = (long) realTurnCost;
+            int turnTime = (int) realTurnCost;
             if (turnTime != realTurnCost) {
                 turnTime++;
             }
-            time += turnTime;
+            s1.incrementTimeInSeconds(turnTime);
         }
         s1.incrementWalkDistance(length);
         int timeLong = (int) time;
