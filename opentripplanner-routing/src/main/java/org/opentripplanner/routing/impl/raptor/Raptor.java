@@ -362,6 +362,7 @@ public class Raptor implements PathService {
         trimmedData.routesForStop = data.routesForStop;
 
         double walkDistance = options.getMaxWalkDistance();
+        options = options.clone();
         if (walkDistance > 4000) {
             // this is a really long walk. We'll almost never actually need this. So let's do our
             // preliminary search over just 4km first.
