@@ -22,7 +22,7 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 public abstract class SampleOperator {
 
     /** If true, report smaller values in results. If false, report greater values. */
-    private boolean minimize = true;
+    protected boolean minimize = true;
     
     /** Implement this method to supply logic for converting States to result numbers */
     public abstract int evaluate(State state, double distance);
