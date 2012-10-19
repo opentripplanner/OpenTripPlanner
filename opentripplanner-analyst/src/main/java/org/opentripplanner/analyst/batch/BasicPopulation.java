@@ -97,6 +97,7 @@ public class BasicPopulation implements Population {
         this.writeCsv(outFileName, results);
     }
 
+    // TODO maybe store skip values in the samples themselves?
     /** 
      * If a filter chain is specified, apply it to the individuals. Must be called after loading 
      * or generating the individuals. Filtering does not actually remove individuals from the 
