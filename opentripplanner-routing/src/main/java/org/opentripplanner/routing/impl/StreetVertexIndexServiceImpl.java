@@ -198,7 +198,12 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                     }
                 }
                 List<String> uniqueNames = new ArrayList<String>(uniqueNameSet);
-                Locale locale = options.getLocale();
+                Locale locale;
+                if (options == null) {
+                    locale = new Locale("en");
+                } else {
+                    locale = options.getLocale();
+                }
                 ResourceBundle resources = ResourceBundle.getBundle(
                         "internals", locale);
                 String fmt = resources.getString("corner");
