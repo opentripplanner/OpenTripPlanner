@@ -13,11 +13,14 @@
 
 package org.opentripplanner.routing.impl.raptor;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -57,9 +60,11 @@ public class RaptorState implements Comparable<RaptorState>, Cloneable {
     public int initialWaitTime;
 
     public boolean interlining = false;
+    private RoutingRequest request;
 
-    public RaptorState(boolean arriveBy) {
-        this.arriveBy = arriveBy;
+    public RaptorState(RoutingRequest request) {
+        this.request = request;
+        arriveBy = request.arriveBy;
     }
     
     public RaptorState(RaptorState parent) {
@@ -80,7 +85,7 @@ public class RaptorState implements Comparable<RaptorState>, Cloneable {
                 }
                 cur = cur.parent;
             }
-            return "(" + routes + ")";
+            return "(" + routes + ") at " + new Date(((long) arrivalTime) * 1000);
         } else {
             return "at " + stop + " boarded at " + boardStop + " on " + route + " time "
                 + new Date(((long) arrivalTime) * 1000) + " walkDistance " + walkDistance;
@@ -145,5 +150,23 @@ public class RaptorState implements Comparable<RaptorState>, Cloneable {
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public List<AgencyAndId> getTrips() {
+        ArrayList<AgencyAndId> out = new ArrayList<AgencyAndId>();
+        RaptorState cur = this;
+        while (cur != null) {
+            if (cur.tripId != null)
+                out.add(cur.tripId);
+            cur = cur.parent;
+        }
+        return out;
+    }
+
+    public RoutingRequest getRequest() {
+        if (request == null) {
+            return parent.getRequest();
+        }
+        return request;
     }
 }

@@ -851,6 +851,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
     	// there should be a ui element for walk distance and optimize type
     	options.setOptimize(OptimizeType.QUICK);
         options.setMaxWalkDistance(Double.MAX_VALUE);
+        options.setDateTime(when);
         options.from = from;
         options.to   = to;
         options.numItineraries = 1;

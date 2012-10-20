@@ -18,15 +18,15 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
 
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.patch.Alert;
-
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
@@ -154,8 +154,9 @@ public class Leg {
      * This field is optional i.e. it is always null unless "showIntermediateStops" parameter is set to "true" in the planner request.
      */
     @XmlElementWrapper(name = "intermediateStops")
+    @JsonProperty(value="intermediateStops")
     public List<Place> stop;
-    
+
     /**
      * The leg's geometry.
      */
@@ -165,6 +166,7 @@ public class Leg {
      * A series of turn by turn instructions used for walking, biking and driving. 
      */
     @XmlElementWrapper(name = "steps")
+    @JsonProperty(value="steps")
     public List<WalkStep> walkSteps;
 
     /**

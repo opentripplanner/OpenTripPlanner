@@ -272,7 +272,9 @@ otp.locale.Hungarian = {
             intermediate  : "Intermediate Place",          // TODO
             minimize      : "A következő megjelenítése",
             maxWalkDistance: "Maximális gyaloglás",
-            maxBikeDistance: "Maximális bike",              // TODO
+            walkSpeed     : "Séta sebesség",
+            maxBikeDistance: "Maximális kerékpár",              // TODO
+            bikeDistance  : "Lerékpáros sebesség",
             arriveDepart  : "Érkezés/indulás",
             mode          : "Utazás ezzel",
             wheelchair    : "Kerekesszékkel megtehető útvonal", 
@@ -358,7 +360,21 @@ otp.locale.Hungarian = {
             ['50000', '50 km'],
             ['100000','100 km']
         ],
-    
+
+        walkSpeed :
+        [
+            ['0.278',  '1 km/h'],
+            ['0.556',  '2 km/h'],
+            ['0.833',  '3 km/h'],
+            ['1.111',  '4 km/h'],
+            ['1.389',  '5 km/h'],
+            ['1.667',  '6 km/h'],
+            ['1.944',  '7 km/h'],
+            ['2.222',  '8 km/h'],
+            ['2.500',  '9 km/h'],
+            ['2.778',  '10 km/h']
+        ],
+
         mode : 
         [
             ['TRANSIT,WALK', 'Tömegközlekedés'],

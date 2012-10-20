@@ -442,6 +442,14 @@ public class GTFSPatternHopFactory {
             List<Frequency> frequencies = tripFrequencies.get(trip);
             if(frequencies != null) {
                 // before creating frequency-based trips, check for single-instance frequencies.
+                Collections.sort(frequencies, new Comparator<Frequency>() {
+
+                    @Override
+                    public int compare(Frequency o1, Frequency o2) {
+                        return o1.getStartTime() - o2.getStartTime();
+                    }
+                });
+
                 Frequency frequency = frequencies.get(0);
                 if (frequencies.size() > 1 || 
                     frequency.getStartTime() != stopTimes.get(0).getDepartureTime() ||

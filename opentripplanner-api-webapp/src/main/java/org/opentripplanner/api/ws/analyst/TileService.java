@@ -53,7 +53,7 @@ public class TileService extends RoutingResource {
 
         Layer layer = layers.get(0);
         Style style = styles.get(0);
-        RenderRequest renderRequest = new RenderRequest(format, layer, style, true);
+        RenderRequest renderRequest = new RenderRequest(format, layer, style, true, false);
 
         return renderer.getResponse(tileRequest, sptRequestA, sptRequestB, renderRequest);
     }

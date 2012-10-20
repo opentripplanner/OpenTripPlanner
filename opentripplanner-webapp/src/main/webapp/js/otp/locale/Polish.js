@@ -269,7 +269,9 @@ otp.locale.Polish = {
             intermediate  : "Intermediate Place",            // TODO
             minimize      : "Pokaż",
             maxWalkDistance: "Maksymalny spacer",
-            maxBikeDistance: "Maksymalny bike",              // TODO
+            walkSpeed     : "chodzić prędkość",              // TODO
+            maxBikeDistance: "Maksymalny rower",              // TODO
+            bikeSpeed     : "prędkość rower",              // TODO
             arriveDepart  : "Dojazd/odjazd o",
             mode          : "Podróżuj",
             wheelchair    : "Podróż dostępna dla niepełnosprawnych", 
@@ -355,6 +357,21 @@ otp.locale.Polish = {
             ['10000',  '10 km']
         ],
     
+
+        walkSpeed :
+        [
+            ['0.278',  '1 km/h'],
+            ['0.556',  '2 km/h'],
+            ['0.833',  '3 km/h'],
+            ['1.111',  '4 km/h'],
+            ['1.389',  '5 km/h'],
+            ['1.667',  '6 km/h'],
+            ['1.944',  '7 km/h'],
+            ['2.222',  '8 km/h'],
+            ['2.500',  '9 km/h'],
+            ['2.778',  '10 km/h']
+        ],    
+
         mode : 
         [
             ['TRANSIT,WALK', 'Transport publiczny'],

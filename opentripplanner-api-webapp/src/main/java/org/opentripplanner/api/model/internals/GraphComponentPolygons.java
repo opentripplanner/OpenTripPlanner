@@ -18,10 +18,13 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 @XmlRootElement
 public class GraphComponentPolygons {
 
     @XmlElementWrapper(name="components")
+    @JsonProperty(value="components")
     public List<GraphComponent> components;
     
     
