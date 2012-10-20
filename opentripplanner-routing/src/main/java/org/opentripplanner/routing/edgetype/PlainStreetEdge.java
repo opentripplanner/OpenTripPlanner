@@ -327,18 +327,24 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
              * that during reverse traversal, we must also use the speed for the mode of
              * the backEdge, rather than of the current edge.
              */
-            
-            if (options.arriveBy) {
-                if (!canTurnOnto(backPSE, s0, traverseMode))
-                    return null;
-
-                realTurnCost = ((IntersectionVertex) tov).computeTraversalCost(
-                        this, backPSE, traverseMode, options, (float) speed, backSpeed);
-            } else {
-                if (!backPSE.canTurnOnto(this, s0, traverseMode))
-                    return null;
-                realTurnCost = ((IntersectionVertex) fromv).computeTraversalCost(
-                        backPSE, this, traverseMode, options, backSpeed, (float) speed);
+            if (fromv instanceof IntersectionVertex) {
+                if (options.arriveBy) {
+                    if (!canTurnOnto(backPSE, s0, traverseMode))
+                        return null;
+    
+                    realTurnCost = ((IntersectionVertex) tov).computeTraversalCost(
+                            this, backPSE, traverseMode, options, (float) speed, backSpeed);
+                } else {
+                    if (!backPSE.canTurnOnto(this, s0, traverseMode))
+                        return null;
+                    realTurnCost = ((IntersectionVertex) fromv).computeTraversalCost(
+                            backPSE, this, traverseMode, options, backSpeed, (float) speed);
+                }
+            }
+            else {
+                LOG.warn("PlainStreetEdge originating from non-IntersectionVertex: {}, " +
+                		"setting turn cost to 0", fromv);
+                realTurnCost = 0;
             }
                        
             if (traverseMode != TraverseMode.CAR) 
