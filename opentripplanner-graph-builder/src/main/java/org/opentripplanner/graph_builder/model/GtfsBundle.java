@@ -48,6 +48,8 @@ public class GtfsBundle {
 
     private int defaultStreetToStopTime;
 
+    private double maxStopToShapeSnapDistance = 150;
+
     public void setPath(File path) {
         this.path = path;
     }
@@ -178,5 +180,13 @@ public class GtfsBundle {
             }
         }
 
+    }
+
+    public double getMaxStopToShapeSnapDistance() {
+        return maxStopToShapeSnapDistance;
+    }
+
+    public void setMaxStopToShapeSnapDistance(double maxStopToShapeSnapDistance) {
+        this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
     }
 }

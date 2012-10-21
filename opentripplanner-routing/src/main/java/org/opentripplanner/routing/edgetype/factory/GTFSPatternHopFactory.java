@@ -298,8 +298,6 @@ class IndexedLineSegmentComparator implements Comparator<IndexedLineSegment> {
  */
 public class GTFSPatternHopFactory {
 
-    private static final double MAX_STOP_TO_SHAPE_DISTANCE = 150;
-
     private static final Logger _log = LoggerFactory.getLogger(GTFSPatternHopFactory.class);
 
     private static GeometryFactory _geometryFactory = GeometryUtils.getGeometryFactory();
@@ -331,6 +329,8 @@ public class GTFSPatternHopFactory {
     private int defaultStreetToStopTime;
 
     private static final DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
+
+    private double maxStopToShapeSnapDistance = 150;
 
     public GTFSPatternHopFactory(GtfsContext context) {
         this._dao = context.getDao();
@@ -602,7 +602,7 @@ public class GTFSPatternHopFactory {
                     continue;
                 }
                 double distance = segment.distance(coord);
-                if (distance < MAX_STOP_TO_SHAPE_DISTANCE) {
+                if (distance < maxStopToShapeSnapDistance) {
                     stopSegments.add(segment);
                     maxSegmentIndex = index;
                     if (minSegmentIndexForThisStop == -1)
@@ -1337,9 +1337,9 @@ public class GTFSPatternHopFactory {
         
         Coordinate startCoord = new Coordinate(s0.getLon(), s0.getLat());
         Coordinate endCoord = new Coordinate(s1.getLon(), s1.getLat());
-        if (distanceLibrary.fastDistance(startCoord, geometryStartCoord) > MAX_STOP_TO_SHAPE_DISTANCE) {
+        if (distanceLibrary.fastDistance(startCoord, geometryStartCoord) > maxStopToShapeSnapDistance) {
             return false;
-        } else if (distanceLibrary.fastDistance(endCoord, geometryEndCoord) > MAX_STOP_TO_SHAPE_DISTANCE) {
+        } else if (distanceLibrary.fastDistance(endCoord, geometryEndCoord) > maxStopToShapeSnapDistance) {
             return false;
         }
         return true;
@@ -1580,6 +1580,16 @@ public class GTFSPatternHopFactory {
 
     public void setStopContext(GtfsStopContext context) {
         this.context = context;
+    }
+
+
+    public double getMaxStopToShapeSnapDistance() {
+        return maxStopToShapeSnapDistance;
+    }
+
+
+    public void setMaxStopToShapeSnapDistance(double maxStopToShapeSnapDistance) {
+        this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
     }
 
 }

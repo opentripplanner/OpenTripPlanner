@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -93,6 +94,8 @@ public class RoutingRequest implements Cloneable, Serializable {
     private double walkSpeed;
     private double bikeSpeed;
     private double carSpeed;
+
+    private Locale locale = new Locale("en", "US");
 
     /**
      * When optimizing for few transfers, we don't actually optimize for fewest transfers, as this

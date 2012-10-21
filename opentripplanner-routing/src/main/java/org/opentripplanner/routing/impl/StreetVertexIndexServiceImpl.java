@@ -20,8 +20,10 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -189,7 +191,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             // coordinate is at a street corner or endpoint
             if (name == null) {
                 // generate names for corners when no name was given
-                // TODO: internationalize
                 Set<String> uniqueNameSet = new HashSet<String>();
                 for (Edge e : intersection.getOutgoing()) {
                     if (e instanceof StreetEdge) {
@@ -197,13 +198,22 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                     }
                 }
                 List<String> uniqueNames = new ArrayList<String>(uniqueNameSet);
-                if (uniqueNames.size() > 1)
-                    name = String.format("corner of %s and %s", uniqueNames.get(0),
+                Locale locale;
+                if (options == null) {
+                    locale = new Locale("en");
+                } else {
+                    locale = options.getLocale();
+                }
+                ResourceBundle resources = ResourceBundle.getBundle(
+                        "internals", locale);
+                String fmt = resources.getString("corner");
+                if (uniqueNames.size() > 1) {
+                    name = String.format(fmt, uniqueNames.get(0),
                             uniqueNames.get(1));
-                else if (uniqueNames.size() == 1)
+                } else if (uniqueNames.size() == 1)
                     name = uniqueNames.get(0);
                 else
-                    name = "unnamed street";
+                    name = resources.getString("unnamedStreet");
             }
             StreetLocation closest = new StreetLocation(graph, "corner " + Math.random(),
                     coordinate, name);

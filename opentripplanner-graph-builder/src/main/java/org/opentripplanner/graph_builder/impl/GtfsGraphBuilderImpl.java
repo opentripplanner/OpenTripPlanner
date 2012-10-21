@@ -133,6 +133,7 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
                 GTFSPatternHopFactory hf = new GTFSPatternHopFactory(context);
                 hf.setStopContext(stopContext);
                 hf.setFareServiceFactory(_fareServiceFactory);
+                hf.setMaxStopToShapeSnapDistance(gtfsBundle.getMaxStopToShapeSnapDistance());
 
                 if (generateFeedIds && gtfsBundle.getDefaultAgencyId() == null) {
                     gtfsBundle.setDefaultAgencyId("FEED#" + bundleIndex);

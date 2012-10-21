@@ -31,7 +31,7 @@ public class ResultSet {
         return new ResultSet(population, results);
     }
     
-    private ResultSet(Population population, double[] results) {
+    public ResultSet(Population population, double[] results) {
         this.population = population;
         this.results = results;
     }

@@ -2,6 +2,7 @@ package org.opentripplanner.api.common;
 
 import java.util.List;
 import java.util.Date;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import javax.ws.rs.DefaultValue;
@@ -152,6 +153,9 @@ public abstract class RoutingResource {
     
     @DefaultValue("-1") @QueryParam("alightSlack")
     private List<Integer> alightSlack;
+
+    @DefaultValue("en_US") @QueryParam("locale")
+    private List<String> locale;
     
     /* 
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
@@ -300,6 +304,25 @@ public abstract class RoutingResource {
         request.setReverseOptimizeOnTheFly(get(reverseOptimizeOnTheFly, n, 
                                                request.isReverseOptimizeOnTheFly()));
 
+        String localeSpec = get(locale, n, "en");
+        String[] localeSpecParts = localeSpec.split("_");
+        Locale locale;
+        switch (localeSpecParts.length) {
+            case 1:
+                locale = new Locale(localeSpecParts[0]);
+                break;
+            case 2:
+                locale = new Locale(localeSpecParts[0]);
+                break;
+            case 3:
+                locale = new Locale(localeSpecParts[0]);
+                break;
+            default:
+                LOG.debug("Bogus locale " + localeSpec + ", defaulting to en");
+                locale = new Locale("en");
+        }
+
+        request.setLocale(locale);
         return request;
     }
     
