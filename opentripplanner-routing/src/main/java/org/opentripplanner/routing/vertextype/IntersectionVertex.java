@@ -96,7 +96,7 @@ public class IntersectionVertex extends StreetVertex {
             // calculate the delay by multiplying the average delay if one is stopped by the
             // probability one will be stopped, and calculating the probability one will have to
             // stop the same way                 
-            
+            // TODO: make configurable
             if (this.trafficLight) {            
                 // estimate the amount of time stopped at the intersection
                 if (turnAngle < 135) {
