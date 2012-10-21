@@ -603,7 +603,8 @@ public class State implements Cloneable {
                 if (ret == null) {
                     LOG.warn("Cannot reverse path at edge: " + edge +
                              ", returning unoptimized path. If edge is a " +
-                             "PatternInterlineDwell, this is not totally unexpected; " +
+                             "PatternInterlineDwell or if there is a time-dependent turn " +
+                             "restriction here, this is not totally unexpected; " +
                              "otherwise, you might want to look into it");
 
                     // re-enable path parsing
