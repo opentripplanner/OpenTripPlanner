@@ -250,7 +250,7 @@ public class LinkRequest {
 
         // Split each edge independently. If a only one splitter vertex is used, routing may take 
         // shortcuts thought the splitter vertex to avoid turn penalties.
-        StreetVertex e1midpoint = new IntersectionVertex(linker.graph, "split 1 at " + label, midCoord, name);
+        StreetVertex e1midpoint = new IntersectionVertex(linker.graph, "split 1 at " + label, midCoord.x, midCoord.y, name);
         // We are replacing two edges with four edges
         PlainStreetEdge forward1 = new PlainStreetEdge(e1v1, e1midpoint, toMidpoint, name, lengthIn,
                 e1.getPermission(), false);
@@ -263,7 +263,7 @@ public class LinkRequest {
         PlainStreetEdge backward2 = null;
         IntersectionVertex e2midpoint = null;
         if (e2 != null) {
-            e2midpoint  = new IntersectionVertex(linker.graph, "split 2 at " + label, midCoord, name);
+            e2midpoint  = new IntersectionVertex(linker.graph, "split 2 at " + label, midCoord.x, midCoord.y, name);
             backward1 = new PlainStreetEdge(e2v1, e2midpoint, backGeometryPair.getFirst(),
                     name, lengthOut, e2.getPermission(), false);
             backward2 = new PlainStreetEdge(e2midpoint, e2v2, backGeometryPair.getSecond(),

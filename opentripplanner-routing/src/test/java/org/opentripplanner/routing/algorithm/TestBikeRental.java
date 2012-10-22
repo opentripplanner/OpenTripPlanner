@@ -37,11 +37,11 @@ public class TestBikeRental extends TestCase {
     public void testBasic() throws Exception {
         // generate a very simple graph
         Graph graph = new Graph();
-        StreetVertex v1 = new IntersectionVertex(graph, "v1", new Coordinate(-77.0492, 38.856),
+        StreetVertex v1 = new IntersectionVertex(graph, "v1", -77.0492, 38.856,
                 "v1");
-        StreetVertex v2 = new IntersectionVertex(graph, "v2", new Coordinate(-77.0492, 38.857),
+        StreetVertex v2 = new IntersectionVertex(graph, "v2", -77.0492, 38.857,
                 "v2");
-        StreetVertex v3 = new IntersectionVertex(graph, "v3", new Coordinate(-77.0492, 38.858),
+        StreetVertex v3 = new IntersectionVertex(graph, "v3", -77.0492, 38.858,
                 "v3");
 
         Edge walk = new PlainStreetEdge(v1, v2, GeometryUtils.makeLineString(-77.0492, 38.856,
