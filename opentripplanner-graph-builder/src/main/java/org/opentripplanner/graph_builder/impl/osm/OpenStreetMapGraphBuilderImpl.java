@@ -1883,7 +1883,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             cls |= getPlatformClass(way);
             street.setStreetClass(cls);
 
-            if (!way.hasTag("name")) {
+            if (!way.hasTag("name") && !way.hasTag("ref")) {
                 street.setBogusName(true);
             }
             street.setStairs(steps);
