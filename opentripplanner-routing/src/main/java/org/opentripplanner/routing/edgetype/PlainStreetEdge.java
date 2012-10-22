@@ -20,16 +20,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import lombok.Getter;
-
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.util.ElevationProfileSegment;

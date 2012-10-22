@@ -81,6 +81,7 @@ import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
+import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.util.MapUtils;
 import org.opentripplanner.visibility.Environment;
@@ -784,7 +785,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                                         areaEntity, startEndpoint, endEndpoint, geometry, name,
                                         length, areaPermissions, i > j, carSpeed, edgeList);
                                 int cls = StreetEdge.CLASS_OTHERPATH;
-                                cls |= getPlatformClass(areaEntity);
+                                cls |= getStreetClasses(areaEntity);
                                 street.setStreetClass(cls);
                                 street.setId(id);
 
@@ -1880,7 +1881,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 cls = StreetEdge.CLASS_OTHERPATH;
             }
 
-            cls |= getPlatformClass(way);
+            cls |= getStreetClasses(way);
             street.setStreetClass(cls);
 
             if (!way.hasTag("name") && !way.hasTag("ref")) {
@@ -1912,6 +1913,15 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             return street;
         }
 
+        private int getStreetClasses(OSMWithTags way) {
+            int link = 0;
+            String highway = way.getTag("highway");
+            if (highway != null && highway.endsWith(("_link"))) {
+                link = StreetEdge.CLASS_LINK;
+            }
+            return getPlatformClass(way) | link;
+        }
+        
         private int getPlatformClass(OSMWithTags way) {
             String highway = way.getTag("highway");
             if ("platform".equals(way.getTag("railway"))) {
@@ -2082,7 +2092,19 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             if (iv == null) {
                 Coordinate coordinate = getCoordinate(node);
                 String label = "osm node " + nid;
-                iv = new IntersectionVertex(graph, label, coordinate.x, coordinate.y, label);
+                String highway = node.getTag("highway");
+                if ("motorway_junction".equals(highway)) {
+                    String ref = node.getTag("ref");
+                    if (ref != null) {
+                        ExitVertex ev = new ExitVertex(graph, label, coordinate.x, coordinate.y);
+                        ev.setExitName(ref);
+                        iv = ev;
+                    }
+                } 
+
+                if (iv == null) {
+                    iv = new IntersectionVertex(graph, label, coordinate.x, coordinate.y, label);
+                }
                 intersectionNodes.put(nid, iv);
                 endpoints.add(iv);
             }

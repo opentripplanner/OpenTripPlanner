@@ -61,6 +61,7 @@ import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
@@ -734,7 +735,9 @@ public class PlanGenerator {
             } else if (((step.streetName != null && !step.streetNameNoParens().equals(streetNameNoParens))
                     && (!step.bogusName || !edge.hasBogusName())) ||
                     // if we are on a roundabout now and weren't before, start a new step
-                    edge.isRoundabout() != (roundaboutExit > 0)) {
+                    edge.isRoundabout() != (roundaboutExit > 0) ||
+                    isLink(edge) && !isLink(backState.getBackEdge())
+                    ) {
                 /* street name has changed, or we've changed state from a roundabout to a street */
                 if (roundaboutExit > 0) {
                     // if we were just on a roundabout,
@@ -745,6 +748,9 @@ public class PlanGenerator {
                     }
                     // localization
                     roundaboutExit = 0;
+                }
+                if (backState.getVertex() instanceof ExitVertex) {
+                    step.exit = ((ExitVertex) backState.getVertex()).getExitName();
                 }
                 /* start a new step */
                 step = createWalkStep(currState);
@@ -892,6 +898,10 @@ public class PlanGenerator {
             lastAngle = DirectionUtils.getLastAngle(geom);
         }
         return steps;
+    }
+
+    private boolean isLink(Edge edge) {
+        return (((StreetEdge)edge).getStreetClass() & StreetEdge.CLASS_LINK) == StreetEdge.CLASS_LINK;
     }
 
     private double getAbsoluteAngleDiff(double thisAngle, double lastAngle) {
