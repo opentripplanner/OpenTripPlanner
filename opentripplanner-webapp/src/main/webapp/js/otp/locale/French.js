@@ -252,7 +252,7 @@ otp.locale.French = {
             intermediate  : "Point de passage",
             minimize : "Optimiser pour",
             maxWalkDistance : "Marche maximum",
-            walkSpeed : "Vitesse à marche",
+            walkSpeed : "Vitesse de marche",
             maxBikeDistance : "Parcours à vélo maximum",
             bikeSpeed : "Vitesse à vélo",
             arriveDepart    : "Arriver à/Partir de",
