@@ -103,6 +103,9 @@ public abstract class AbstractVertex implements Vertex {
     
     @Override
     public boolean removeOutgoing(Edge ee) {
+        if (!outgoing.contains(ee)) {
+            LOG.error("Removing edge which isn't connected to this vertex");
+        }
         boolean removed = outgoing.remove(ee);
         if (outgoing.contains(ee)) {
             LOG.error("edge {} still in edgelist of {} after removed. there must have been multiple copies.");
@@ -127,6 +130,9 @@ public abstract class AbstractVertex implements Vertex {
     
     @Override
     public boolean removeIncoming(Edge ee) {
+        if (!incoming.contains(ee)) {
+            LOG.error("Removing edge which isn't connected to this vertex");
+        }
         boolean removed = incoming.remove(ee);
         if (incoming.contains(ee)) {
             LOG.error("edge {} still in edgelist of {} after removed. there must have been multiple copies.");

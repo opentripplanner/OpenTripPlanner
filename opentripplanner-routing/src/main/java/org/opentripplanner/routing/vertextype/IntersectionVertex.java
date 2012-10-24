@@ -21,8 +21,6 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.graph.Graph;
 
-import com.vividsolutions.jts.geom.Coordinate;
-
 /** Represents an ordinary location in space, typically an intersection */
 public class IntersectionVertex extends StreetVertex {
 

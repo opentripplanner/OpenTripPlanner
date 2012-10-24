@@ -99,7 +99,7 @@ public abstract class Edge implements Serializable {
         return null;
     }
     
-    private boolean detachFrom() {
+    protected boolean detachFrom() {
         boolean detached = false;
         if (fromv != null) {
             detached = fromv.removeOutgoing(this);
@@ -108,7 +108,7 @@ public abstract class Edge implements Serializable {
         return detached;
     }
 
-    private boolean detachTo() {
+    protected boolean detachTo() {
         boolean detached = false;
         if (tov != null) {
             detached = tov.removeIncoming(this);
