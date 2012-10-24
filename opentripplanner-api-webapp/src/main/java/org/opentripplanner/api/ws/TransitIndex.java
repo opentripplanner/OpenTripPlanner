@@ -292,7 +292,7 @@ public class TransitIndex {
             AgencyAndId stop = new AgencyAndId(stopAgencyId, stopId);
             Edge preBoardEdge = transitIndexService.getPreBoardEdge(stop);
             if (preBoardEdge == null)
-                break;
+                continue;
             Vertex boarding = preBoardEdge.getToVertex();
 
             RoutingRequest options = makeTraverseOptions(startTime, routerId);
