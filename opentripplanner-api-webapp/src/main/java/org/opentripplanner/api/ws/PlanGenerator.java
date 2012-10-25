@@ -930,7 +930,7 @@ public class PlanGenerator {
     }
 
     private boolean isLink(Edge edge) {
-        return (((StreetEdge)edge).getStreetClass() & StreetEdge.CLASS_LINK) == StreetEdge.CLASS_LINK;
+        return edge instanceof StreetEdge && (((StreetEdge)edge).getStreetClass() & StreetEdge.CLASS_LINK) == StreetEdge.CLASS_LINK;
     }
 
     private double getAbsoluteAngleDiff(double thisAngle, double lastAngle) {
