@@ -112,9 +112,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         // use a default car speed of ~25 mph for splitter vertices and the like
         this(v1, v2, geometry, name, length, permission, back, 11.2f);
     }
-    
-    // Presently, we have plainstreetedges that connect both IntersectionVertexes and
-    // TurnVertexes
+
     public PlainStreetEdge(StreetVertex v1, StreetVertex v2, LineString geometry, 
             String name, double length,
             StreetTraversalPermission permission, boolean back, float carSpeed) {
