@@ -335,7 +335,8 @@ public class TraverseModeSet implements Cloneable, Serializable {
     public String toString() {
         StringBuilder out = new StringBuilder();
         for (TraverseMode mode : TraverseMode.values()) {
-            if ((modes & getMaskForMode(mode)) != 0) {
+            int mask = getMaskForMode(mode);
+            if (mask != 0 && (modes & mask) == mask) {
                 if (out.length() != 0) {
                     out.append(", ");
                 }
