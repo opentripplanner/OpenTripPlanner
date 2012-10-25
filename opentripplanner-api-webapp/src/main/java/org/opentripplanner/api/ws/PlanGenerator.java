@@ -37,6 +37,7 @@ import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.DwellEdge;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
@@ -956,6 +957,9 @@ public class PlanGenerator {
         step.bogusName = en.hasBogusName();
         step.addAlerts(s.getBackAlerts());
         step.angle = DirectionUtils.getFirstAngle(s.getBackEdge().getGeometry());
+        if (s.getBackEdge() instanceof AreaEdge) {
+            step.area = true;
+        }
         return step;
     }
 
