@@ -231,6 +231,7 @@ public class Raptor implements PathService {
                     break;
                 }
                 options = options.clone();
+                walkOptions = walkOptions.clone();
                 if (search.getTargetStates().size() > 0 && bestElapsedTime < expectedWorstTime) {
                     // we have found some paths so we no longer want to expand the max walk distance
                     break RETRY;
@@ -247,6 +248,7 @@ public class Raptor implements PathService {
                     && initialWalk < Double.MAX_VALUE);
 
             options = options.clone();
+            walkOptions = walkOptions.clone();
             for (RaptorState state : search.getTargetStates()) {
                 for (AgencyAndId trip : state.getTrips()) {
                     options.bannedTrips.add(trip);
@@ -257,6 +259,7 @@ public class Raptor implements PathService {
                 break; // no paths found; searching more won't help
 
             options.setMaxWalkDistance(firstWalkDistance);
+            walkOptions.setMaxWalkDistance(firstWalkDistance);
 
             targetStates.addAll(search.getTargetStates());
             search = new RaptorSearch(data, options);
@@ -363,6 +366,7 @@ public class Raptor implements PathService {
 
         double walkDistance = options.getMaxWalkDistance();
         options = options.clone();
+        walkOptions = walkOptions.clone();
         if (walkDistance > 4000) {
             // this is a really long walk. We'll almost never actually need this. So let's do our
             // preliminary search over just 4km first.
