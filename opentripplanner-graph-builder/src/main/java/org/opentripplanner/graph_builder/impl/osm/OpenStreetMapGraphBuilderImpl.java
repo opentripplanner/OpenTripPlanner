@@ -36,7 +36,6 @@ import org.opentripplanner.gbannotation.ConflictingBikeTags;
 import org.opentripplanner.gbannotation.Graphwide;
 import org.opentripplanner.gbannotation.LevelAmbiguous;
 import org.opentripplanner.gbannotation.StreetCarSpeedZero;
-import org.opentripplanner.gbannotation.TripDegenerate;
 import org.opentripplanner.gbannotation.TurnRestrictionBad;
 import org.opentripplanner.gbannotation.TurnRestrictionException;
 import org.opentripplanner.gbannotation.TurnRestrictionUnknown;
@@ -973,7 +972,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 Long startNode = null;
                 // where the current edge should start
                 OSMNode osmStartNode = null;
-                double distance = 0;
+
                 for (int i = 0; i < nodes.size() - 1; i++) {
                     OSMNode segmentStartOSMNode = _nodes.get(nodes.get(i));
                     if (segmentStartOSMNode == null) {
@@ -1000,9 +999,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     if (segmentCoordinates.size() == 0) {
                         segmentCoordinates.add(getCoordinate(osmStartNode));
                     }
-
-                    distance += distanceLibrary.distance(segmentStartOSMNode.getLat(),
-                            segmentStartOSMNode.getLon(), osmEndNode.getLat(), osmEndNode.getLon());
 
                     if (intersectionNodes.containsKey(endNode) || i == nodes.size() - 2
                             || nodes.subList(0, i).contains(nodes.get(i))
