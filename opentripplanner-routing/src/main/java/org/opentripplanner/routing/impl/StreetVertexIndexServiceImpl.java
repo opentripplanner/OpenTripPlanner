@@ -350,7 +350,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
             if (bestSeg == 0 && bestFrac == 0)
                 endwiseVertex = (StreetVertex) edge.getFromVertex();
-            else if (bestSeg == numCoords - 1 && bestFrac == 1)
+            else if (bestSeg == numCoords - 2 && bestFrac == 1)
                 endwiseVertex = (StreetVertex) edge.getToVertex();
             else
                 endwiseVertex = null;
