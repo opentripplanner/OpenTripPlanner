@@ -49,7 +49,7 @@ import lombok.Getter;
  * 
  * @author mattwigway
  */
-public class TransitBoardAlight extends PatternEdge implements OnBoardForwardEdge {
+public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwardEdge {
 
     private static final long serialVersionUID = 1042740795612978747L;
 
