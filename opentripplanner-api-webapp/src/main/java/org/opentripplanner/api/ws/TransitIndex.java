@@ -42,8 +42,6 @@ import org.opentripplanner.api.model.transit.ServiceCalendarData;
 import org.opentripplanner.api.model.transit.StopList;
 import org.opentripplanner.api.model.transit.StopTime;
 import org.opentripplanner.api.model.transit.StopTimeList;
-import org.opentripplanner.common.model.P2;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -183,21 +181,30 @@ public class TransitIndex {
     }
 
     /**
-     * Return stops near a point
+     * Return stops near a point.  The default search radius is 200m,
+     * but this can be changed with the radius parameter (in meters)
      */
     @GET
     @Path("/stopsNearPoint")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public Object getStopsNearPoint(@QueryParam("agency") String agency,
             @QueryParam("lat") Double lat, @QueryParam("lon") Double lon,
-            @QueryParam("extended") Boolean extended, @QueryParam("routerId") String routerId)
+            @QueryParam("extended") Boolean extended, @QueryParam("routerId") String routerId,
+	     @QueryParam("radius") Double radius)
             throws JSONException {
 
-        Graph graph = getGraph(routerId);
+       // default search radius.
+       Double searchRadius = (radius == null) ? STOP_SEARCH_RADIUS : radius;
+
+       Graph graph = getGraph(routerId);
+
+       if (Double.isNaN(searchRadius) || searchRadius <= 0) {
+           searchRadius = STOP_SEARCH_RADIUS;
+       }
 
         StreetVertexIndexService streetVertexIndexService = graph.streetIndex;
         List<TransitStop> stops = streetVertexIndexService.getNearbyTransitStops(new Coordinate(
-                lon, lat), STOP_SEARCH_RADIUS);
+                lon, lat), searchRadius);
         TransitIndexService transitIndexService = graph.getService(TransitIndexService.class);
         if (transitIndexService == null) {
             return new TransitError(
@@ -299,7 +306,6 @@ public class TransitIndex {
 
             HashMap<Long, Edge> seen = new HashMap();
             OUTER: for (Edge e : boarding.getOutgoing()) {
-                System.out.println("HERE: " + e);
                 // each of these edges boards a separate set of trips
                 for (StopTime st : getStopTimesForBoardEdge(startTime, endTime, options, e,
                         extended)) {
@@ -494,7 +500,6 @@ public class TransitIndex {
             result = e.traverse(s0);
             if (result == null)
                 break;
-            System.out.println("boarding at " + time + " on " + result.getBackTrip());
             time = result.getTime();
             if (time > endTime)
                 break;

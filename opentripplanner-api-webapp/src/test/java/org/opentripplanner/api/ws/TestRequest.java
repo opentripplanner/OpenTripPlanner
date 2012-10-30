@@ -478,7 +478,7 @@ public class TestRequest extends TestCase {
         // assertEquals("MAX Red Line", routesForStop.routes.get(0).routeLongName);
 
         StopList stopsNearPoint = (StopList) index.getStopsNearPoint("TriMet", 45.464783,
-                -122.578918, false, routerId);
+                -122.578918, false, routerId, null);
         assertTrue(stopsNearPoint.stops.size() > 0);
 
         long startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 9, 1, 7, 50, 0) * 1000;
