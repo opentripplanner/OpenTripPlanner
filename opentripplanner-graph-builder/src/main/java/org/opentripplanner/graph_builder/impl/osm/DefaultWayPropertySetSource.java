@@ -292,7 +292,8 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         setProperties(props, "highway=primary_link;cycleway=opposite", 
             StreetTraversalPermission.ALL, 2.06, 2.99);
                         
-        /* path */
+        /* path designed for bicycles (should be treated exactly as a cycleway is), this is a 
+           multi-use path (MUP)*/
         setProperties(props, "highway=path;bicycle=designated",
             StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, 0.60, 0.60);
 
