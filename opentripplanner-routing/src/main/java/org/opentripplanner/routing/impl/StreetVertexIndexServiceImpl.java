@@ -354,7 +354,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 endwiseVertex = (StreetVertex) edge.getToVertex();
             else
                 endwiseVertex = null;
-            score = distance;
+            score = distance * SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_KM * 1000 / 360.0;
             if (endwise()) {
                 score *= 1.5;
             }
@@ -418,10 +418,10 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         public CandidateEdge best = null;
 
         public boolean add(CandidateEdge ce) {
-            if (ce.endwiseVertex != null)
-                this.endwiseVertex = ce.endwiseVertex;
-            if (best == null || ce.score < best.score)
+            if (best == null || ce.score < best.score) {
+                endwiseVertex = ce.endwiseVertex;
                 best = ce;
+            }
             return super.add(ce);
         }
 
