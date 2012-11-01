@@ -46,7 +46,7 @@ var flags = {
 
 var params = {
     layers: 'traveltime',
-    styles: 'mask',
+    styles: 'color30',
     batch: true,
 };
 
