@@ -23,7 +23,7 @@ otp.locale.German = {
     config :
     {
         metricsSystem : "international",
-        rightClickMsg : "klicken Sie mit der rechte Maustaste auf die Karte um Startpunkt und Endpunkt auszuwählen",
+        rightClickMsg : "Klicken Sie mit der rechte Maustaste auf die Karte um Startpunkt und Endpunkt auszuwählen",
         attribution   : {
             title   : "Lizenz",
             content : "Nutzungsbedingungen"
@@ -32,8 +32,8 @@ otp.locale.German = {
 
     contextMenu : 
     {
-        fromHere         : "Ausgangspunkt",
-        toHere           : "Zielort",
+        fromHere         : "Startpunkt",
+        toHere           : "Zielpunkt",
         intermediateHere : "Zwischenstop",
 
         centerHere       : "hier die Karte zentrieren",
@@ -74,24 +74,24 @@ otp.locale.German = {
 
     buttons: 
     {
-        reverse       : "umkehren",
-        reverseTip    : "<b>umgekehrter Richtung</b><br/>Vertauscht Start- und Endpunkt ändert den Startzeitpunkt",
+        reverse       : "Umkehren",
+        reverseTip    : "<b>umgekehrte Richtung</b><br/>Vertauscht Start- und Zielpunkt, und ändert den Startzeitpunkt",
         reverseMiniTip: "umgekehrter Richtung",
 
-        edit          : "ändern",
+        edit          : "Ändern",
         editTip       : "<b>Reise ändern</b><br/>Zurück zur Startseite mit den Details der geplanten Reise.",
 
-        clear         : "löschen",
+        clear         : "Löschen",
         clearTip      : "<b>löschen</b><br/>Karte und alle Aktivität löschen.",
 
         fullScreen    : "Vollansicht",
         fullScreenTip : "<b>Vollansicht</b><br/>Symbolleiste zeigen oder ausblenden",
 
         print         : "Drucken",
-        printTip      : "<b>Drucken</b><br/>drucken Sie eine vereinfachte Version der Strecke (ohne Karte).",
+        printTip      : "<b>Drucken</b><br/>Drucken Sie eine vereinfachte Version der Strecke (ohne Karte).",
 
-        link          : "Link",
-        linkTip      : "<b>Link</b><br/>den Link für die gewählte Strecke zeigen.",
+        link          : "Links",
+        linkTip      : "<b>Link</b><br/>Den Link für die gewählte Strecke zeigen.",
 
         feedback      : "Rückmeldung",
         feedbackTip   : "<b>Rückmeldung</b><br/>Rückmeldung geben",
@@ -118,31 +118,31 @@ otp.locale.German = {
         south:          "Süden",
         east:           "Osten",
         bound:          "Grenze",
-        left:           "links",
-        right:          "rechts",
-        slightly_left:  "links halten",
-        slightly_right: "rechts halten",
-        hard_left:      "Links abbiegen",
-        hard_right:     "Rechts abbiegen",
-        'continue':     "weiterfahren",
-        to_continue:    "weiterfahren",
+        left:           "Nach Links",
+        right:          "Nach Rechts",
+        slightly_left:  "links halten,",
+        slightly_right: "rechts halten,",
+        hard_left:      "Links Abbiegen",
+        hard_right:     "Rechts Abbiegen",
+        'continue':     "weiter",
+        to_continue:    "weiter über",
         becomes:        "wird",
         at:             "um",
-        on:             "auf",
-        to:             "bis",
+        on:             "entlang der",
+        to:             "nach",
         via:            "Straße",
         circle_counterclockwise: "nehmen Sie den Kreisverkehr gegen den Uhrzeigersinn",
         circle_clockwise:        "nehmen Sie den Kreisverkehr im Uhrzeigersinn",
         // rather than just being a direction, this should be
         // full-fledged to take just the exit name at the end
-        elevator: "Aufzug benutzen, nach"     // TODO   
+        elevator: "Aufzug benutzen, nach"  
     },
 
     // see otp.planner.Templates for use
     instructions :
     {
         walk         : "zu Fuß",
-        walk_toward  : "gehen",
+        walk_toward  : "Gehe nach",
         walk_verb    : "gehen",
         bike         : "Fahrrad",
         bike_toward  : "Radfahren",
@@ -153,8 +153,8 @@ otp.locale.German = {
         move         : "weiterfahren",
         move_toward  : "weiterfahren",
 
-        transfer     : "Wechsel",
-        transfers    : "Wechsel",
+        transfer     : "Umstiegshalt",
+        transfers    : "Umstiegshalte",
 
         continue_as  : "Weiterfahren",
         stay_aboard  : "an Bord bleiben",
@@ -163,7 +163,7 @@ otp.locale.German = {
         arrive       : "Ankunft",
 
         start_at     : "Start",
-        end_at       : "Ende"
+        end_at       : "Ziel"
     },
 
     // see otp.planner.Templates for use
@@ -171,9 +171,9 @@ otp.locale.German = {
     {
         agency_msg   : "Ein Service von",
         agency_msg_tt: "Internetseite des Service-Anbieters in neuem Fenster...",
-        about        : "Informationen",
-        stop_id      : "ID Haltstelle",
-        trip_details : "Reisedetails",
+        about        : "Strecke:",
+        stop_id      : "Haltstellen-Nummer",
+        trip_details : "Reise Übersicht",
         fare         : "Preis",
         fare_symbol  : "\u20ac",
 
@@ -183,10 +183,10 @@ otp.locale.German = {
         senior_fare  : "",
 
         travel       : "Reise",
-        valid        : "gültig",
+        valid        : "Erstellt am",
         trip_length  : "Reisezeit",
         with_a_walk  : "Zu Fuß",
-        alert_for_rt : "achten Sie auf den Weg"
+        alert_for_rt : "Achten Sie auf den Weg!"
     },
 
     modes : 
@@ -231,9 +231,9 @@ otp.locale.German = {
         minutes_abbrev : "min.",
         second_abbrev  : "s.",
         seconds_abbrev : "s.",
-        format         : "T, J M Std:Min",
-        date_format    : "T-M-J",
-        time_format    : "Std:Min",
+        format         : "d.m.Y \\u\\m H:i",
+        date_format    : "d.m.Y",
+        time_format    : "H:i",
         months         : ['Jan.', 'Feb.', 'Mär.', 'Apr.', 'Mai', 'Juni', 'Juli', 'Aug.', 'Sep.', 'Okt.', 'Nov.', 'Dez.']
     },
 
@@ -265,23 +265,23 @@ otp.locale.German = {
             toHere        : "nach hier",
             intermediate  : "Zwischenstop",
             minimize      : "Anzeigen von",
-            maxWalkDistance: "maximale Gehstrecke",
+            maxWalkDistance: "Maximale Gehdistanz",
             walkSpeed     : "Geh-Geschwindigkeit",
             maxBikeDistance: "Maximale Distanz für Fahrradnutzung ",
             bikeSpeed     : "Fahrrad-Geschwindigkeit",
             arriveDepart  : "Ankunft innerhalb von/Abfahrt um",
-            mode          : "benutzen von",
-            wheelchair    : "Route für Rollstuhlfahrer", 
-            go            : "gehen",
-            planTrip      : "Eine Strecke planen",
+            mode          : "Benutzen von",
+            wheelchair    : "Rollstuhlfahrer geeignet", 
+            go            : "gehe nach",
+            planTrip      : "Strecken berechnen",
             newTrip       : "Neue Strecke"
         },
 
         // see otp/config.js for where these values are used
         link : 
         {
-            text           : "link zu dieser Reise",
-            trip_separator : "Diese Reise basiert auf einem anderem Streckenplaner",
+            text           : "Link dieser Reise",
+            trip_separator : "Diese Reise in einem anderen Streckenplaner",
             bike_separator : "Anderer Fahhrad-Strecken-Planer",
             walk_separator : "Anderer Geh-Strecken-Planer",
             google_transit : "Google Transit",
@@ -296,8 +296,8 @@ otp.locale.German = {
             working      : "Adresse suchen ....",
             error        : "keine Ergebnisse gefunden",
             msg_title    : "Streckenplanung",
-            msg_content  : "Fehler korrigieren bevor Suche",
-            select_result_title : "bitte, wählen Sie ein Ergebnis",
+            msg_content  : "Fehler vor Suche korrigieren",
+            select_result_title : "Bitte wählen Sie eine Reiseplan",
             address_header : "Adresse"
         },
 
@@ -330,7 +330,7 @@ otp.locale.German = {
 
         options: 
         [
-          ['TRANSFERS', 'wenig Umsteigen'],
+          ['TRANSFERS', 'wenigste Umstiegshalte'],
           ['QUICK',     'schnellste Strecke'],
           ['SAFE',      'sicherste Strecke'],
           ['TRIANGLE',  'Anpassen...']
@@ -367,13 +367,13 @@ otp.locale.German = {
     
         mode : 
         [
-            ['TRANSIT,WALK', 'ÖPNV'], // TODO
+            ['TRANSIT,WALK', 'ÖPNV'],
             ['BUSISH,TRAINISH,WALK', 'Bus und Zug'],
             ['BUSISH,WALK', 'nur Bus'],
             ['TRAINISH,WALK', 'nur Zug'],
             ['WALK', 'nur zu Fuß'],
-            ['BICYCLE', 'Fahrrad'], // TODO
-            ['TRANSIT,BICYCLE', 'ÖPNV & Fahrrad'] // TODO
+            ['BICYCLE', 'Fahrrad'],
+            ['TRANSIT,BICYCLE', 'ÖPNV & Fahrrad']
         ],
 
         wheelchair :
