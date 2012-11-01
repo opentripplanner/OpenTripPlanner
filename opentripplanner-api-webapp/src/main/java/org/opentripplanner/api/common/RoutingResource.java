@@ -13,8 +13,8 @@
 
 package org.opentripplanner.api.common;
 
-import java.util.List;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -24,12 +24,13 @@ import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.core.OptimizeType;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import com.sun.jersey.api.core.InjectParam;
 
 /**
  * This class defines all the JAX-RS query parameters for a path search as fields, allowing them to 
@@ -178,10 +179,10 @@ public abstract class RoutingResource {
      * Alternatively, we could eliminate the separate RoutingRequest objects and just resolve
      * vertices and timezones here right away, but just ignore them in semantic equality checks.
      */
-    @Autowired
+    @InjectParam
     protected GraphService graphService;
 
-    @Autowired
+    @InjectParam
     protected RoutingRequest prototypeRoutingRequest;
 
 

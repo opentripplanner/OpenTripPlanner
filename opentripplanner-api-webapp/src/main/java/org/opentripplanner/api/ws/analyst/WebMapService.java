@@ -133,7 +133,6 @@ public class WebMapService extends RoutingResource {
             reqB = null;
         }
         
-        
         return renderer.getResponse(tileRequest, reqA, reqB, renderRequest);
     }
 
