@@ -333,9 +333,9 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 double x = x0 + frac * (x1 - x0);
                 double y = y0 + frac * (y1 - y0);
                 // find ersatz distance to edge (do not take root)
-                double dx = x - p.x;
+                double dx = (x - p.x) * xscale;
                 double dy = y - p.y;
-                double dist2 = dx * dx * xscale + dy * dy;
+                double dist2 = dx * dx + dy * dy;
                 // replace best segments
                 if (dist2 < bestDist2) {
                     nearestPointOnEdge.x = x;
@@ -348,16 +348,13 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
             distance = Math.sqrt(bestDist2);//distanceLibrary.distance(p, nearestPointOnEdge);
 
-            if (bestSeg == 0 && bestFrac == 0)
+            if (bestSeg == 0 && Math.abs(bestFrac) < 0.000001)
                 endwiseVertex = (StreetVertex) edge.getFromVertex();
-            else if (bestSeg == numCoords - 2 && bestFrac == 1)
+            else if (bestSeg == numCoords - 2 && Math.abs(bestFrac - 1.0) < 0.000001)
                 endwiseVertex = (StreetVertex) edge.getToVertex();
             else
                 endwiseVertex = null;
-            score = distance;
-            if (endwise()) {
-                score *= 1.5;
-            }
+            score = distance * SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_KM * 1000 / 360.0;
             score /= preference;
             if ((e.getStreetClass() & platform) != 0) {
                 // this is kind of a hack, but there's not really a better way to do it
@@ -408,6 +405,10 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         public double getScore() {
             return score;
         }
+
+        public String toString() {
+            return "CE(" + edge + ", " + score + ")";
+        }
     }
 
     public static class CandidateEdgeBundle extends ArrayList<CandidateEdge> {
@@ -418,10 +419,10 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         public CandidateEdge best = null;
 
         public boolean add(CandidateEdge ce) {
-            if (ce.endwiseVertex != null)
-                this.endwiseVertex = ce.endwiseVertex;
-            if (best == null || ce.score < best.score)
+            if (best == null || ce.score < best.score) {
+                endwiseVertex = ce.endwiseVertex;
                 best = ce;
+            }
             return super.add(ce);
         }
 
@@ -432,19 +433,30 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             return ret;
         }
 
+        static class DistanceAndAngle {
+            double distance;
+            double angle;
+            boolean endwise;
+            public DistanceAndAngle(double distance, double angle, boolean endwise) {
+                this.distance = distance;
+                this.angle = angle;
+                this.endwise = endwise;
+            }
+        }
         public Collection<CandidateEdgeBundle> binByDistanceAndAngle() {
-            Map<P2<Double>, CandidateEdgeBundle> bins = new HashMap<P2<Double>, CandidateEdgeBundle>(); // (r, theta)
+            Map<DistanceAndAngle, CandidateEdgeBundle> bins = new HashMap<DistanceAndAngle, CandidateEdgeBundle>(); // (r, theta)
             CANDIDATE: for (CandidateEdge ce : this) {
-                for (Entry<P2<Double>, CandidateEdgeBundle> bin : bins.entrySet()) {
-                    double distance = bin.getKey().getFirst();
-                    double direction = bin.getKey().getSecond();
+                for (Entry<DistanceAndAngle, CandidateEdgeBundle> bin : bins.entrySet()) {
+                    double distance = bin.getKey().distance;
+                    double direction = bin.getKey().angle;
                     if (Math.abs(direction - ce.directionToEdge) < DIRECTION_ERROR
-                            && Math.abs(distance - ce.distance) < DISTANCE_ERROR) {
+                            && Math.abs(distance - ce.distance) < DISTANCE_ERROR
+                            && ce.endwise() == bin.getKey().endwise) {
                         bin.getValue().add(ce);
                         continue CANDIDATE;
                     }
                 }
-                P2<Double> rTheta = new P2<Double>(ce.distance, ce.directionToEdge);
+                DistanceAndAngle rTheta = new DistanceAndAngle(ce.distance, ce.directionToEdge, ce.endwise());
                 CandidateEdgeBundle bundle = new CandidateEdgeBundle();
                 bundle.add(ce);
                 bins.put(rTheta, bundle);

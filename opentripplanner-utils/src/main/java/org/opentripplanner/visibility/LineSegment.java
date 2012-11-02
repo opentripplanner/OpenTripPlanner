@@ -26,9 +26,9 @@ package org.opentripplanner.visibility;
 
 public class LineSegment {
 
-    Point[] endpoints;
+    VLPoint[] endpoints;
 
-    double distance(Point point_temp) {
+    double distance(VLPoint point_temp) {
         return point_temp.distance(this);
     }
 
@@ -50,43 +50,43 @@ public class LineSegment {
             endpoints = null;
             break;
         case 1:
-            endpoints = new Point[1];
+            endpoints = new VLPoint[1];
             endpoints[0] = line_segment_temp.endpoints[0].clone();
             break;
         case 2:
-            endpoints = new Point[2];
+            endpoints = new VLPoint[2];
             endpoints[0] = line_segment_temp.endpoints[0].clone();
             endpoints[1] = line_segment_temp.endpoints[1].clone();
         }
     }
 
-    LineSegment(Point point_temp) {
-        endpoints = new Point[1];
+    LineSegment(VLPoint point_temp) {
+        endpoints = new VLPoint[1];
         endpoints[0] = point_temp;
     }
 
-    LineSegment(Point first_point_temp, Point second_point_temp) {
+    LineSegment(VLPoint first_point_temp, VLPoint second_point_temp) {
         this(first_point_temp, second_point_temp, 0);
     }
 
-    LineSegment(Point first_point_temp, Point second_point_temp, double epsilon) {
+    LineSegment(VLPoint first_point_temp, VLPoint second_point_temp, double epsilon) {
         if (first_point_temp.distance(second_point_temp) <= epsilon) {
-            endpoints = new Point[1];
+            endpoints = new VLPoint[1];
             endpoints[0] = first_point_temp;
         } else {
-            endpoints = new Point[2];
+            endpoints = new VLPoint[2];
             endpoints[0] = first_point_temp;
             endpoints[1] = second_point_temp;
         }
     }
 
-    Point first() {
+    VLPoint first() {
         assert (size() > 0);
 
         return endpoints[0];
     }
 
-    Point second() {
+    VLPoint second() {
         assert (size() > 0);
 
         if (size() == 2)
@@ -95,7 +95,7 @@ public class LineSegment {
             return endpoints[0];
     }
 
-    Point midpoint() {
+    VLPoint midpoint() {
         assert (size() > 0);
 
         return first().plus(second()).times(0.5);
@@ -125,11 +125,11 @@ public class LineSegment {
      * = line_segment_temp.endpoints[1]; size_ = 2; } return *this; }
      */
 
-    void set_first(Point point_temp, double epsilon) {
-        Point second_point_temp;
+    void set_first(VLPoint point_temp, double epsilon) {
+        VLPoint second_point_temp;
         switch (size()) {
         case 0:
-            endpoints = new Point[1];
+            endpoints = new VLPoint[1];
             endpoints[0] = point_temp;
             break;
         case 1:
@@ -138,7 +138,7 @@ public class LineSegment {
                 return;
             }
             second_point_temp = endpoints[0];
-            endpoints = new Point[2];
+            endpoints = new VLPoint[2];
             endpoints[0] = point_temp;
             endpoints[1] = second_point_temp;
             break;
@@ -147,16 +147,16 @@ public class LineSegment {
                 endpoints[0] = point_temp;
                 return;
             }
-            endpoints = new Point[1];
+            endpoints = new VLPoint[1];
             endpoints[0] = point_temp;
         }
     }
 
-    void set_second(Point point_temp, double epsilon) {
-        Point first_point_temp;
+    void set_second(VLPoint point_temp, double epsilon) {
+        VLPoint first_point_temp;
         switch (size()) {
         case 0:
-            endpoints = new Point[1];
+            endpoints = new VLPoint[1];
             endpoints[0] = point_temp;
             break;
         case 1:
@@ -165,7 +165,7 @@ public class LineSegment {
                 return;
             }
             first_point_temp = endpoints[0];
-            endpoints = new Point[2];
+            endpoints = new VLPoint[2];
             endpoints[0] = first_point_temp;
             endpoints[1] = point_temp;
             break;
@@ -174,7 +174,7 @@ public class LineSegment {
                 endpoints[1] = point_temp;
                 return;
             }
-            endpoints = new Point[1];
+            endpoints = new VLPoint[1];
             endpoints[0] = point_temp;
             break;
         }
@@ -183,7 +183,7 @@ public class LineSegment {
     void reverse() {
         if (size() < 2)
             return;
-        Point point_temp = endpoints[0];
+        VLPoint point_temp = endpoints[0];
         endpoints[0] = endpoints[1];
         endpoints[1] = point_temp;
     }
@@ -242,7 +242,7 @@ public class LineSegment {
         return running_min;
     }
 
-    double boundary_distance(Polygon polygon) {
+    double boundary_distance(VLPolygon polygon) {
         assert (size() > 0 && polygon.n() > 0);
 
         double running_min = distance(polygon.get(0));
@@ -272,10 +272,10 @@ public class LineSegment {
             return false;
 
         // Declare new vars just for readability.
-        Point a = new Point(first());
-        Point b = new Point(second());
-        Point c = new Point(line_segment2.first());
-        Point d = new Point(line_segment2.second());
+        VLPoint a = new VLPoint(first());
+        VLPoint b = new VLPoint(second());
+        VLPoint c = new VLPoint(line_segment2.first());
+        VLPoint d = new VLPoint(line_segment2.second());
         // First find the minimum of the distances between all 4 endpoints
         // and their respective projections onto the opposite line segment.
         double running_min, distance_temp;
@@ -312,10 +312,10 @@ public class LineSegment {
         if (!intersect(line_segment2, epsilon))
             return line_segment_temp;
         // Declare new vars just for readability.
-        Point a = new Point(first());
-        Point b = new Point(second());
-        Point c = new Point(line_segment2.first());
-        Point d = new Point(line_segment2.second());
+        VLPoint a = new VLPoint(first());
+        VLPoint b = new VLPoint(second());
+        VLPoint c = new VLPoint(line_segment2.first());
+        VLPoint d = new VLPoint(line_segment2.second());
         if (intersect_proper(line_segment2, epsilon)) {
             // Use formula from O'Rourke's "Computational Geometry in C", p. 221.
             // Note D=0 iff the line segments are parallel.

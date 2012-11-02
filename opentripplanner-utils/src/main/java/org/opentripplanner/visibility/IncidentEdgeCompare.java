@@ -30,13 +30,13 @@ import java.util.Comparator;
  * 
  */
 class IncidentEdgeCompare implements Comparator<PolarEdge> {
-    Point observer_pointer;
+    VLPoint observer_pointer;
 
     PolarPointWithEdgeInfo current_vertex_pointer;
 
     double epsilon;
 
-    public IncidentEdgeCompare(Point observer, PolarPointWithEdgeInfo current_vertex,
+    public IncidentEdgeCompare(VLPoint observer, PolarPointWithEdgeInfo current_vertex,
             double epsilon_temp) {
 
         observer_pointer = observer;

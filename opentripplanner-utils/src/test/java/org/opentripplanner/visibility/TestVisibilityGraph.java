@@ -28,18 +28,18 @@ import java.util.ArrayList;
 import junit.framework.TestCase;
 
 import org.opentripplanner.visibility.Environment;
-import org.opentripplanner.visibility.Point;
-import org.opentripplanner.visibility.Polygon;
+import org.opentripplanner.visibility.VLPoint;
+import org.opentripplanner.visibility.VLPolygon;
 import org.opentripplanner.visibility.VisibilityGraph;
 
 public class TestVisibilityGraph extends TestCase {
 
     // test the polygon.reverse() function
     public void testPolygonReverse() {
-        Polygon poly = poly(12.3402039, 45.4342526, 12.3401691, 45.4343433, 12.3401433, 45.4343973,
+        VLPolygon poly = poly(12.3402039, 45.4342526, 12.3401691, 45.4343433, 12.3401433, 45.4343973,
                 12.3402433, 45.4344174, 12.3402845, 45.4344296, 12.3404923, 45.4338996, 12.3401159,
                 45.4338161, 12.339956, 45.43421);
-        Polygon poly2 = poly(12.3402039, 45.4342526, 12.339956, 45.43421, 12.3401159, 45.4338161,
+        VLPolygon poly2 = poly(12.3402039, 45.4342526, 12.339956, 45.43421, 12.3401159, 45.4338161,
                 12.3404923, 45.4338996, 12.3402845, 45.4344296, 12.3402433, 45.4344174, 12.3401433,
                 45.4343973, 12.3401691, 45.4343433);
         poly.reverse();
@@ -48,7 +48,7 @@ public class TestVisibilityGraph extends TestCase {
 
     // Another Venice test case
     public void testPalazzo() {
-        Polygon poly = poly(12.3402039, 45.4342526, 12.339956, 45.43421, 12.3401159, 45.4338161,
+        VLPolygon poly = poly(12.3402039, 45.4342526, 12.339956, 45.43421, 12.3401159, 45.4338161,
                 12.3404923, 45.4338996, 12.3402845, 45.4344296, 12.3402433, 45.4344174, 12.3401433,
                 45.4343973, 12.3401691, 45.4343433);
 
@@ -74,7 +74,7 @@ public class TestVisibilityGraph extends TestCase {
 
     // The Piazza San Marco in Venice, from OSM.
     public void testSanMarco() {
-        Polygon poly = poly(12.3389861, 45.4339415, 12.3389153, 45.4340763, 12.3390769, 45.4341172,
+        VLPolygon poly = poly(12.3389861, 45.4339415, 12.3389153, 45.4340763, 12.3390769, 45.4341172,
                 12.3391694, 45.4341388, 12.3392136, 45.4340533, 12.3397036, 45.434177, 12.339797,
                 45.4341939, 12.3397873, 45.4342286, 12.339706, 45.4342158, 12.3396866, 45.4342575,
                 12.3393905, 45.434195, 12.3391779, 45.4346848, 12.3391272, 45.4347845, 12.3390937,
@@ -128,7 +128,7 @@ public class TestVisibilityGraph extends TestCase {
     // A massively reduced version of the Piazza San Marco, which
     // caused problems when the code was buggy
     public void testConcavePolygon2() {
-        Polygon poly = poly(17.0, 14.0, 70.0, 18.0, 69.0, 26.0, 39.0, 20.0, 13.0, 78.0, -111.0,
+        VLPolygon poly = poly(17.0, 14.0, 70.0, 18.0, 69.0, 26.0, 39.0, 20.0, 13.0, 78.0, -111.0,
                 24.0
 
         );
@@ -151,7 +151,7 @@ public class TestVisibilityGraph extends TestCase {
     }
 
     public void testConcavePolygon() {
-        Polygon poly = poly(1, 1, 5, 1, 5, 5, 3, 5, 3, 4, 4, 4, 4, 2, 2, 2, 2, 3, 1, 3);
+        VLPolygon poly = poly(1, 1, 5, 1, 5, 5, 3, 5, 3, 4, 4, 4, 4, 2, 2, 2, 2, 3, 1, 3);
 
         if (poly.area() < 0) {
             poly.reverse();
@@ -227,13 +227,13 @@ public class TestVisibilityGraph extends TestCase {
 
     }
 
-    public static Polygon poly(double... coords) {
-        ArrayList<Point> points = new ArrayList<Point>();
+    public static VLPolygon poly(double... coords) {
+        ArrayList<VLPoint> points = new ArrayList<VLPoint>();
         for (int i = 0; i < coords.length; i += 2) {
-            Point point = new Point(coords[i], coords[i + 1]);
+            VLPoint point = new VLPoint(coords[i], coords[i + 1]);
             points.add(point);
         }
-        return new Polygon(points);
+        return new VLPolygon(points);
     }
 
 }
