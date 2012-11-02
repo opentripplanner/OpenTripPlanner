@@ -355,9 +355,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             else
                 endwiseVertex = null;
             score = distance * SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_KM * 1000 / 360.0;
-            if (endwise()) {
-                score *= 1.5;
-            }
             score /= preference;
             if ((e.getStreetClass() & platform) != 0) {
                 // this is kind of a hack, but there's not really a better way to do it
@@ -408,6 +405,10 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         public double getScore() {
             return score;
         }
+
+        public String toString() {
+            return "CE(" + edge + ", " + score + ")";
+        }
     }
 
     public static class CandidateEdgeBundle extends ArrayList<CandidateEdge> {
@@ -432,19 +433,30 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             return ret;
         }
 
+        static class DistanceAndAngle {
+            double distance;
+            double angle;
+            boolean endwise;
+            public DistanceAndAngle(double distance, double angle, boolean endwise) {
+                this.distance = distance;
+                this.angle = angle;
+                this.endwise = endwise;
+            }
+        }
         public Collection<CandidateEdgeBundle> binByDistanceAndAngle() {
-            Map<P2<Double>, CandidateEdgeBundle> bins = new HashMap<P2<Double>, CandidateEdgeBundle>(); // (r, theta)
+            Map<DistanceAndAngle, CandidateEdgeBundle> bins = new HashMap<DistanceAndAngle, CandidateEdgeBundle>(); // (r, theta)
             CANDIDATE: for (CandidateEdge ce : this) {
-                for (Entry<P2<Double>, CandidateEdgeBundle> bin : bins.entrySet()) {
-                    double distance = bin.getKey().getFirst();
-                    double direction = bin.getKey().getSecond();
+                for (Entry<DistanceAndAngle, CandidateEdgeBundle> bin : bins.entrySet()) {
+                    double distance = bin.getKey().distance;
+                    double direction = bin.getKey().angle;
                     if (Math.abs(direction - ce.directionToEdge) < DIRECTION_ERROR
-                            && Math.abs(distance - ce.distance) < DISTANCE_ERROR) {
+                            && Math.abs(distance - ce.distance) < DISTANCE_ERROR
+                            && ce.endwise() == bin.getKey().endwise) {
                         bin.getValue().add(ce);
                         continue CANDIDATE;
                     }
                 }
-                P2<Double> rTheta = new P2<Double>(ce.distance, ce.directionToEdge);
+                DistanceAndAngle rTheta = new DistanceAndAngle(ce.distance, ce.directionToEdge, ce.endwise());
                 CandidateEdgeBundle bundle = new CandidateEdgeBundle();
                 bundle.add(ce);
                 bins.put(rTheta, bundle);
