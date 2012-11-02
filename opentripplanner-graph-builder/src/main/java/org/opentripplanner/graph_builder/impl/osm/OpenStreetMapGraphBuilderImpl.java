@@ -329,13 +329,31 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 GeometryFactory factory = GeometryUtils.getGeometryFactory();
 
                 LinearRing shell = factory.createLinearRing(toCoordinates(geometry));
-                LinearRing[] lrholes = new LinearRing[holes.size()];
-                int i = 0;
+
+                //we need to merge connected holes here, because JTS does not believe in
+                //holes that touch at multiple points (and, weirdly, does not have a method
+                //to detect this other than this crazy DE-9IM stuff
+
+                List<Polygon> polygonHoles = new ArrayList<Polygon>();
                 for (Ring ring : holes) {
-                    lrholes[i++] = factory.createLinearRing(toCoordinates(ring.geometry));
+                    LinearRing linearRing = factory.createLinearRing(toCoordinates(ring.geometry));
+                    Polygon polygon = factory.createPolygon(linearRing, new LinearRing[0]);
+                    for (Iterator<Polygon> it = polygonHoles.iterator(); it.hasNext(); ) {
+                        Polygon otherHole = it.next();
+                        if (otherHole.relate(polygon, "F***1****")) {
+                            polygon = (Polygon) polygon.union(otherHole);
+                            it.remove();
+                        }
+                    }
+                    polygonHoles.add(polygon);
                 }
 
-                jtsPolygon = factory.createPolygon(shell, lrholes);
+                LinearRing[] lrholes = new LinearRing[polygonHoles.size()];
+                int i = 0;
+                for (Polygon hole : polygonHoles) {
+                    lrholes[i++] = (LinearRing) hole.getBoundary();
+                }
+                jtsPolygon = factory.createPolygon(shell, lrholes );
                 return jtsPolygon;
             }
 
@@ -427,29 +445,30 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     return Collections.emptyList();
                 }
 
+                List<List<Long>> closedRings = new ArrayList<List<Long>>();
+
                 HashMap<Long, List<OSMWay>> waysByEndpoint = new HashMap<Long, List<OSMWay>>();
                 for (OSMWay way : ways) {
                     List<Long> refs = way.getNodeRefs();
-                    MapUtils.addToMapList(waysByEndpoint, refs.get(0), way);
-                    MapUtils.addToMapList(waysByEndpoint, refs.get(refs.size() - 1), way);
+
+                    long start = refs.get(0);
+                    long end = refs.get(refs.size() - 1);
+                    if (start == end) {
+                        ArrayList<Long> ring = new ArrayList<Long>(refs);
+                        closedRings.add(ring);
+                    } else {
+                        MapUtils.addToMapList(waysByEndpoint, start, way);
+                        MapUtils.addToMapList(waysByEndpoint, end, way);
+                    }
                 }
 
-                List<List<Long>> closedRings = new ArrayList<List<Long>>();
-                // precheck for impossible situations and precompute one-way rings
-
+                // precheck for impossible situations
                 List<Long> toRemove = new ArrayList<Long>();
                 for (Map.Entry<Long, List<OSMWay>> entry : waysByEndpoint.entrySet()) {
                     Long key = entry.getKey();
                     List<OSMWay> list = entry.getValue();
                     if (list.size() % 2 == 1) {
                         return null;
-                    }
-                    OSMWay way1 = list.get(0);
-                    OSMWay way2 = list.get(1);
-                    if (list.size() == 2 && way1 == way2) {
-                        ArrayList<Long> ring = new ArrayList<Long>(way1.getNodeRefs());
-                        closedRings.add(ring);
-                        toRemove.add(key);
                     }
                 }
                 for (Long key : toRemove) {
@@ -593,9 +612,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     }
                 }
                 GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
-                Geometry u = geometryFactory.createGeometryCollection(allRings
-                        .toArray(new Geometry[allRings.size()]));
+                Geometry u = geometryFactory.createMultiPolygon(allRings
+                        .toArray(new Polygon[allRings.size()]));
                 u = u.union();
+
                 if (u instanceof GeometryCollection) {
                     GeometryCollection mp = (GeometryCollection) u;
                     for (int i = 0; i < mp.getNumGeometries(); ++i) {
@@ -849,6 +869,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     if (!ring.toJtsPolygon().contains(area.toJTSMultiPolygon())) {
                         continue;
                     }
+
                     for (Ring outerRing : area.outermostRings) {
                         for (int i = 0; i < outerRing.nodes.size(); ++i) {
                             OSMNode node = outerRing.nodes.get(i);
