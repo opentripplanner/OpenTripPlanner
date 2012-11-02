@@ -26,16 +26,16 @@ package org.opentripplanner.visibility;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Polygon {
+public class VLPolygon {
 
-    public ArrayList<Point> vertices;
+    public ArrayList<VLPoint> vertices;
 
-    public Polygon() {
+    public VLPolygon() {
 
-        vertices = new ArrayList<Point>();
+        vertices = new ArrayList<VLPoint>();
     }
 
-    double boundary_distance(Point point_temp) {
+    double boundary_distance(VLPoint point_temp) {
         return point_temp.boundary_distance(this);
     }
 
@@ -43,16 +43,16 @@ public class Polygon {
         return line_segment.boundary_distance(this);
     }
 
-    public Polygon(List<Point> vertices_temp) {
-        vertices = new ArrayList<Point>(vertices_temp);
+    public VLPolygon(List<VLPoint> vertices_temp) {
+        vertices = new ArrayList<VLPoint>(vertices_temp);
     }
 
     public int n() {
         return vertices.size();
     }
 
-    public Polygon(Point point0, Point point1, Point point2) {
-        vertices = new ArrayList<Point>();
+    public VLPolygon(VLPoint point0, VLPoint point1, VLPoint point2) {
+        vertices = new ArrayList<VLPoint>();
         vertices.add(point0);
         vertices.add(point1);
         vertices.add(point2);
@@ -123,7 +123,7 @@ public class Polygon {
         return area_temp / 2.0;
     }
 
-    public Point centroid() {
+    public VLPoint centroid() {
         assert (vertices.size() > 0);
 
         double area_temp = area();
@@ -136,7 +136,7 @@ public class Polygon {
         for (int i = 0; i <= n() - 1; i++)
             y_temp += (get(i).y + get(i + 1).y)
                     * (get(i).x * get(i + 1).y - get(i + 1).x * get(i).y);
-        return new Point(x_temp / (6 * area_temp), y_temp / (6 * area_temp));
+        return new VLPoint(x_temp / (6 * area_temp), y_temp / (6 * area_temp));
     }
 
     public double diameter() {
@@ -181,13 +181,13 @@ public class Polygon {
         return bounding_box;
     }
 
-    ArrayList<Point> random_points(int count, double epsilon) {
+    ArrayList<VLPoint> random_points(int count, double epsilon) {
         // Precondition: nonempty Polygon.
         assert (vertices.size() > 0);
 
         BoundingBox bounding_box = bbox();
-        ArrayList<Point> pts_in_polygon = new ArrayList<Point>(count);
-        Point pt_temp = new Point(
+        ArrayList<VLPoint> pts_in_polygon = new ArrayList<VLPoint>(count);
+        VLPoint pt_temp = new VLPoint(
                 Util.uniform_random_sample(bounding_box.x_min, bounding_box.x_max),
                 Util.uniform_random_sample(bounding_box.y_min, bounding_box.y_max));
         while (pts_in_polygon.size() < count) {
@@ -205,7 +205,7 @@ public class Polygon {
     public void enforce_standard_form() {
         int point_count = vertices.size();
         if (point_count > 1) { // if more than one point in the polygon.
-            ArrayList<Point> vertices_temp = new ArrayList<Point>(point_count);
+            ArrayList<VLPoint> vertices_temp = new ArrayList<VLPoint>(point_count);
             // Find index of lexicographically smallest point.
             int index_of_smallest = 0;
             int i; // counter.
@@ -227,7 +227,7 @@ public class Polygon {
             return;
 
         // Store new minimal length list of vertices.
-        ArrayList<Point> vertices_temp = new ArrayList<Point>(vertices.size());
+        ArrayList<VLPoint> vertices_temp = new ArrayList<VLPoint>(vertices.size());
 
         // Place holders.
         int first = 0;
@@ -265,7 +265,7 @@ public class Polygon {
         if (n > 2) {
             // reverse, leaving the first point in its place
             for (int i = 1; i < (n+1) / 2; ++i) {
-                Point temp = vertices.get(i);
+                VLPoint temp = vertices.get(i);
                 vertices.set(i, vertices.get((n - i)));
                 vertices.set((n - i), temp);
             }
@@ -273,10 +273,10 @@ public class Polygon {
     }
 
     public boolean equals(Object o) {
-        if (!(o instanceof Polygon)) {
+        if (!(o instanceof VLPolygon)) {
             return false;
         }
-        Polygon polygon2 = (Polygon) o;
+        VLPolygon polygon2 = (VLPolygon) o;
         if (n() != polygon2.n() || n() == 0 || polygon2.n() == 0)
             return false;
         for (int i = 0; i < n(); i++)
@@ -289,11 +289,11 @@ public class Polygon {
         return vertices.hashCode() + 1;
     }
 
-    public Point get(int i) {
+    public VLPoint get(int i) {
         return vertices.get(i % vertices.size());
     }
 
-    boolean equivalent(Polygon polygon2, double epsilon) {
+    boolean equivalent(VLPolygon polygon2, double epsilon) {
         if (n() == 0 || polygon2.n() == 0)
             return false;
         if (n() != polygon2.n())
@@ -314,7 +314,7 @@ public class Polygon {
         return false;
     }
 
-    double boundary_distance(Polygon polygon2) {
+    double boundary_distance(VLPolygon polygon2) {
         assert (n() > 0 && polygon2.n() > 0);
 
         // Handle single point degeneracy.
@@ -345,8 +345,8 @@ public class Polygon {
         return outs;
     }
 
-    public boolean hasPointInside(Polygon container) {
-        for (Point point : vertices) {
+    public boolean hasPointInside(VLPolygon container) {
+        for (VLPoint point : vertices) {
             if (point.in(container)) {
                 return true;
             }

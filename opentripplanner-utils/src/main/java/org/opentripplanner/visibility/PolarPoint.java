@@ -22,9 +22,9 @@
 
 package org.opentripplanner.visibility;
 
-class PolarPoint extends Point implements Comparable<Point> {
+class PolarPoint extends VLPoint implements Comparable<VLPoint> {
 
-    Point polar_origin;
+    VLPoint polar_origin;
 
     // Polar coordinates where radius always positive, and angle
     // measured ccw from the world coordinate system's x-axis.
@@ -32,11 +32,11 @@ class PolarPoint extends Point implements Comparable<Point> {
 
     Angle bearing = new Angle(Double.NaN);
 
-    public PolarPoint(Point polar_origin_temp, Point point_temp) {
+    public PolarPoint(VLPoint polar_origin_temp, VLPoint point_temp) {
         this(polar_origin_temp, point_temp, 0);
     }
 
-    public PolarPoint(Point polar_origin_temp, Point point_temp, double epsilon) {
+    public PolarPoint(VLPoint polar_origin_temp, VLPoint point_temp, double epsilon) {
         super(point_temp);
         polar_origin = polar_origin_temp.clone();
         if (polar_origin.distance(point_temp) <= epsilon) {
@@ -49,8 +49,8 @@ class PolarPoint extends Point implements Comparable<Point> {
         }
     }
 
-    public void set_polar_origin(Point polar_origin_temp) {
-        PolarPoint newPoint = new PolarPoint(polar_origin_temp, new Point(x, y));
+    public void set_polar_origin(VLPoint polar_origin_temp) {
+        PolarPoint newPoint = new PolarPoint(polar_origin_temp, new VLPoint(x, y));
         setFromPolarPoint(newPoint);
     }
 
@@ -69,12 +69,12 @@ class PolarPoint extends Point implements Comparable<Point> {
     }
 
     public void set_x(double x_temp) {
-        PolarPoint newPoint = new PolarPoint(polar_origin, new Point(x_temp, y));
+        PolarPoint newPoint = new PolarPoint(polar_origin, new VLPoint(x_temp, y));
         setFromPolarPoint(newPoint);
     }
 
     public void set_y(double y_temp) {
-        PolarPoint newPoint = new PolarPoint(polar_origin, new Point(x, y_temp));
+        PolarPoint newPoint = new PolarPoint(polar_origin, new VLPoint(x, y_temp));
         setFromPolarPoint(newPoint);
     }
 
@@ -99,7 +99,7 @@ class PolarPoint extends Point implements Comparable<Point> {
                 && bearing.equals(polar_point2.bearing);
     }
 
-    public int compareTo(Point point2) {
+    public int compareTo(VLPoint point2) {
         if (!(point2 instanceof PolarPoint)) {
             return super.compareTo(point2);
         }
