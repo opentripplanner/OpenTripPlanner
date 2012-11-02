@@ -333,9 +333,9 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 double x = x0 + frac * (x1 - x0);
                 double y = y0 + frac * (y1 - y0);
                 // find ersatz distance to edge (do not take root)
-                double dx = x - p.x;
+                double dx = (x - p.x) * xscale;
                 double dy = y - p.y;
-                double dist2 = dx * dx * xscale + dy * dy;
+                double dist2 = dx * dx + dy * dy;
                 // replace best segments
                 if (dist2 < bestDist2) {
                     nearestPointOnEdge.x = x;
@@ -348,9 +348,9 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
             distance = Math.sqrt(bestDist2);//distanceLibrary.distance(p, nearestPointOnEdge);
 
-            if (bestSeg == 0 && bestFrac == 0)
+            if (bestSeg == 0 && Math.abs(bestFrac) < 0.000001)
                 endwiseVertex = (StreetVertex) edge.getFromVertex();
-            else if (bestSeg == numCoords - 2 && bestFrac == 1)
+            else if (bestSeg == numCoords - 2 && Math.abs(bestFrac - 1.0) < 0.000001)
                 endwiseVertex = (StreetVertex) edge.getToVertex();
             else
                 endwiseVertex = null;

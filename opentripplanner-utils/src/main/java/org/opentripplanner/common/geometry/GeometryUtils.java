@@ -43,13 +43,13 @@ public class GeometryUtils {
     public static double segmentFraction(double x0, double y0, double x1, double y1, 
             double xp, double yp, double xscale) {
         // Use comp.graphics.algorithms Frequently Asked Questions method
-        double dx = x1 - x0;
+        double dx = (x1 - x0) * xscale;
         double dy = y1 - y0;
-        double len2 = dx * dx * xscale + dy * dy;
+        double len2 = dx * dx + dy * dy;
         // this fixes a (reported) divide by zero bug in JTS when line segment has 0 length
         if (len2 == 0)
             return 0;
-        double r = ( (xp - x0) * dx * xscale + (yp - y0) * dy ) / len2;
+        double r = ( (xp - x0) * xscale * dx + (yp - y0) * dy ) / len2;
         if (r < 0.0)
             return 0.0;
         else if (r > 1.0)
