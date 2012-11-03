@@ -84,7 +84,7 @@ public class RepeatingTimePeriod implements Serializable {
                 "saturday", "sunday", "monday", "tuesday", "wednesday", "thursday", "friday",
                 "saturday", "sunday"}) {
             
-            if (day_on.toLowerCase().equals(today))
+            if (today.startsWith(day_on.toLowerCase()))
                 active = true;
             
             if (active) {
@@ -110,7 +110,7 @@ public class RepeatingTimePeriod implements Serializable {
                     ret.setSunday(onOff);
             }
                 
-            if (day_off.toLowerCase().equals(today))
+            if (today.startsWith(day_off.toLowerCase()))
                 active = false;
         }
         
@@ -172,6 +172,11 @@ public class RepeatingTimePeriod implements Serializable {
         case Calendar.SUNDAY:
             times = sunday;
             break;
+        }
+
+        if (times == null) {
+            //no restriction today
+            return false;
         }
         
         int timeOfDay = cal.get(Calendar.HOUR_OF_DAY) * 3600 + cal.get(Calendar.MINUTE) * 60 +
