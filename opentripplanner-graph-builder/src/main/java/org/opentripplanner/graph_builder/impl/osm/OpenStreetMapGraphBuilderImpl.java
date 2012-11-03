@@ -425,6 +425,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         }
                     }
                 }
+                //run this at end of ctor so that exception
+                //can be caught in the right place
+                toJTSMultiPolygon();
             }
 
             public MultiPolygon toJTSMultiPolygon() {
@@ -434,6 +437,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         polygons.add(ring.toJtsPolygon());
                     }
                     jtsMultiPolygon = GeometryUtils.getGeometryFactory().createMultiPolygon(polygons.toArray(new Polygon[0]));
+                    if (!jtsMultiPolygon.isValid()) {
+                        throw new AreaConstructionException();
+                    }
                 }
 
                 return jtsMultiPolygon;
@@ -1058,6 +1064,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     intersects.add(area);
                 }
             }
+            if (intersects.size() == 0) {
+                //apparently our intersection here was bogus
+                return;
+            }
             //do we need to recurse?
             if (intersects.size() == 1) {
                 Area area = intersects.get(0);
@@ -1117,10 +1127,19 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         //this is either a LineString or a MultiLineString (we hope)
                         if (lineParts instanceof MultiLineString) {
                             MultiLineString mls = (MultiLineString) lineParts;
+                            boolean found = false;
                             for (int i = 0; i < mls.getNumGeometries(); ++i) {
                                 LineString segment = (LineString) mls.getGeometryN(i);
-                                if (segment.contains(startPoint) || segment.getBoundary().contains(startPoint)) {
+                                if (found) {
                                     edgeCoordinate = segment.getEndPoint().getCoordinate();
+                                    break;
+                                }
+                                if (segment.contains(startPoint) || segment.getBoundary().contains(startPoint)) {
+                                    found = true;
+                                    if (segment.getLength() > 0.000001) {
+                                        edgeCoordinate = segment.getEndPoint().getCoordinate();
+                                        break;
+                                    }
                                 }
                             }
                         } else if (lineParts instanceof LineString) {
