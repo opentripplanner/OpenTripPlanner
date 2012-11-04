@@ -471,7 +471,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 // precheck for impossible situations
                 List<Long> toRemove = new ArrayList<Long>();
                 for (Map.Entry<Long, List<OSMWay>> entry : waysByEndpoint.entrySet()) {
-                    Long key = entry.getKey();
                     List<OSMWay> list = entry.getValue();
                     if (list.size() % 2 == 1) {
                         return null;
