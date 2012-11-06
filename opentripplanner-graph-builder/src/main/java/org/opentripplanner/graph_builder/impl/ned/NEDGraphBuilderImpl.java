@@ -153,8 +153,13 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
         BinHeap<ElevationRepairState> pq = new BinHeap<ElevationRepairState>();
 
         // elevation for each vertex (known or interpolated)
-        @SuppressWarnings("unchecked")
-        HashMap<Vertex, Double> elevations = (HashMap<Vertex, Double>) knownElevations.clone();
+        // knownElevations will be null if there are no ElevationPoints in the data
+        // for instance, with the Shapefile loader.)
+        HashMap<Vertex, Double> elevations; 
+        if (knownElevations != null)
+            elevations = (HashMap<Vertex, Double>) knownElevations.clone();
+        else
+            elevations = new HashMap<Vertex, Double>();
 
         HashSet<Vertex> closed = new HashSet<Vertex>();
 
