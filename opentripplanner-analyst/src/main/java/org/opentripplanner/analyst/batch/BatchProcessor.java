@@ -15,6 +15,10 @@ package org.opentripplanner.analyst.batch;
 
 import java.io.IOException;
 import java.util.TimeZone;
+import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.annotation.Resource;
 
@@ -52,11 +56,25 @@ public class BatchProcessor {
     @Setter private Aggregator aggregator;
     @Setter private Accumulator accumulator;
     
+    /**
+     * Empirical results for a 4-core processor (with 8 fake hyperthreading cores):
+     * Throughput increases linearly with nThreads, up to the number of physical cores. 
+     * Diminishing returns beyond 4 threads, but some improvement is seen up to 8 threads.
+     * The default value includes the hyperthreading cores, so you may want to set nThreads 
+     * manually in your IoC XML. 
+     */
+    @Setter private int nThreads = Runtime.getRuntime().availableProcessors(); 
+
     @Setter private String date = "2011-02-04";
     @Setter private String time = "08:00 AM";
     @Setter private TimeZone timeZone = TimeZone.getDefault();
     @Setter private String outputPath = "/tmp/analystOutput";
-
+    
+    enum Mode { BASIC, AGGREGATE, ACCUMULATE };
+    private Mode mode;
+    private long startTime = -1;
+    private ResultSet aggregateResultSet = null;
+    
     public static void main(String[] args) throws IOException {
         org.springframework.core.io.Resource appContextResource;
         if( args.length == 0) {
@@ -79,70 +97,64 @@ public class BatchProcessor {
     }
 
     private void run() {
-
         origins.setup();
         destinations.setup();
         linkIntoGraph(destinations);
-        
-        int nOrigins = origins.getIndividuals().size();
+        // Set up a thread pool to execute searches in parallel
+        LOG.debug("Number of threads: {}", nThreads);
+        ExecutorService threadPool = Executors.newFixedThreadPool(nThreads);
+        // ECS enqueues results in the order they complete (unlike invokeAll, which blocks)
+        CompletionService<Void> ecs = new ExecutorCompletionService<Void>(threadPool);
         if (aggregator != null) {
-            ResultSet aggregates = new ResultSet(origins);
-            int i = 0;
-            for (Individual oi : origins) {
-                LOG.debug("individual {}: {}", i, oi);
-                if (i%100 == 0)
-                    LOG.info("individual {}/{}", i, nOrigins);
-                RoutingRequest req = buildRequest(oi);
-                if (req != null) {
-                    ShortestPathTree spt = sptService.getShortestPathTree(req);
-                    ResultSet result = ResultSet.forTravelTimes(destinations, spt);
-                    aggregates.results[i] = aggregator.computeAggregate(result);
-                    req.cleanup();
-                }
-                i += 1;
-            }
-            aggregates.writeAppropriateFormat(outputPath);
+            /* aggregate over destinations and save one value per origin */
+            mode = Mode.AGGREGATE;
+            aggregateResultSet = new ResultSet(origins); // results shaped like origins
         } else if (accumulator != null) { 
-            ResultSet accumulated = new ResultSet(destinations);
-            int i = 0;
-            for (Individual oi : origins) {
-                LOG.debug("individual {}: {}", i, oi);
-                if (i%100 == 0)
-                    LOG.info("individual {}/{}", i, nOrigins);
-                RoutingRequest req = buildRequest(oi);
-                if (req != null) {
-                    ShortestPathTree spt = sptService.getShortestPathTree(req);
-                    ResultSet times = ResultSet.forTravelTimes(destinations, spt);
-                    accumulator.accumulate(oi.input, times, accumulated);
-                    req.cleanup();
-                }
-                i += 1;
-            }
-            accumulator.finish();
-            accumulated.writeAppropriateFormat(outputPath);
+            /* accumulate data for each origin into all destinations */
+            mode = Mode.ACCUMULATE;
+            aggregateResultSet = new ResultSet(destinations); // results shaped like destinations
         } else { 
-            // neither aggregator nor accumlator
-            if (nOrigins > 1 && !outputPath.contains("{}")) {
+            /* neither aggregator nor accumulator, save a bunch of results */
+            mode = Mode.BASIC;
+            aggregateResultSet = null;
+            if (!outputPath.contains("{}")) {
                 LOG.error("output filename must contain origin placeholder.");
-                return;
-            }
-            int i = 0;
-            for (Individual oi : origins) {
-                RoutingRequest req = buildRequest(oi);
-                if (req != null) {
-                    ShortestPathTree spt = sptService.getShortestPathTree(req);
-                    ResultSet result = ResultSet.forTravelTimes(destinations, spt);
-                    if (nOrigins == 1) {
-                        result.writeAppropriateFormat(outputPath);
-                    } else {
-                        String subName = outputPath.replace("{}", String.format("%d_%s", i, oi.label));
-                        result.writeAppropriateFormat(subName);
-                    }
-                    req.cleanup();
-                    i += 1;
-                }
+                System.exit(-1);
             }
         }
+        startTime = System.currentTimeMillis();
+        int nTasks = 0;
+        for (Individual oi : origins) { // using filtered iterator
+            ecs.submit(new BatchAnalystTask(nTasks, oi), null);
+            ++nTasks;
+        }
+        LOG.debug("created {} tasks.", nTasks);
+        int nCompleted = 0;
+        try { // pull Futures off the queue as tasks are finished
+            while (nCompleted < nTasks) {
+                ecs.take(); 
+                ++nCompleted;
+                LOG.debug("got result {}/{}", nCompleted, nTasks);
+                projectRunTime(nCompleted, nTasks);
+            }
+        } catch (InterruptedException e) {
+            LOG.warn("run was interrupted after {} tasks", nCompleted);
+        } 
+        threadPool.shutdown();
+        if (accumulator != null)
+            accumulator.finish();
+        if (aggregateResultSet != null)
+            aggregateResultSet.writeAppropriateFormat(outputPath);
+        LOG.info("DONE.");
+    }
+
+    private void projectRunTime(int current, int total) {
+        long currentTime = System.currentTimeMillis();
+        double runTimeMin = (currentTime - startTime) / 1000.0 / 60.0;
+        double projectedMin = (total - current) * (runTimeMin / current);
+        LOG.debug("===== running {} min remaining {} min (projected)", (int)runTimeMin, (int)projectedMin);
+        if (runTimeMin > 6)
+            System.exit(0);
     }
     
     private RoutingRequest buildRequest(Individual i) {
@@ -182,6 +194,49 @@ public class BatchProcessor {
         }
         LOG.debug("successfully linked {} individuals out of {}", nonNull, n);
     }
-
+        
+    /** 
+     * A single computation to perform for a single origin.
+     * Runnable, not Callable. We want accumulation to happen in the worker thread. 
+     * Handling all accumulation in the controller thread risks amassing a queue of large 
+     * result sets. 
+     */
+    private class BatchAnalystTask implements Runnable {
+        
+        protected final int i;
+        protected final Individual oi;
+        
+        public BatchAnalystTask(int i, Individual oi) {
+            this.i = i;
+            this.oi = oi;
+        }
+        
+        @Override
+        public void run() {
+            LOG.debug("calling origin : {}", oi);
+            RoutingRequest req = buildRequest(oi);
+            if (req != null) {
+                ShortestPathTree spt = sptService.getShortestPathTree(req);
+                // ResultSet should be a local to avoid memory leak
+                ResultSet results = ResultSet.forTravelTimes(destinations, spt);
+                req.cleanup();
+                switch (mode) {
+                case AGGREGATE:
+                    synchronized (aggregateResultSet) {
+                        accumulator.accumulate(oi.input, results, aggregateResultSet);
+                    }
+                    break;
+                case ACCUMULATE:
+                    aggregateResultSet.results[i] = aggregator.computeAggregate(results);
+                    break;
+                default:
+                    String subName = outputPath.replace("{}", String.format("%d_%s", i, oi.label));
+                    results.writeAppropriateFormat(subName);
+                }
+                    
+            }
+        }        
+    }    
+    
 }
 
