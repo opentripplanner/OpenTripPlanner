@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<!--[if lt IE 7 ]> <html dir="ltr" lang="en-US" class="ie6"> <![endif]-->
+<!--[if IE 7 ]>    <html dir="ltr" lang="en-US" class="ie7"> <![endif]-->
+<!--[if IE 8 ]>    <html dir="ltr" lang="en-US" class="ie8"> <![endif]-->
+<!--[if IE 9 ]>    <html dir="ltr" lang="en-US" class="ie9"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--> <html dir="ltr" lang="en-US"> <!--<![endif]-->
+
+<head>
+<title>OpenTripPlanner</title>
+
+<!--  Mobile Viewport Fix -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  
+<!-- Google WebFonts -->
+<link href='http://fonts.googleapis.com/css?family=Dancing+Script:700' rel='stylesheet' type='text/css'>
+
+<!-- leaflet -->
+<script src="js/lib/leaflet/leaflet.js"></script>
+<link rel="stylesheet" href="js/lib/leaflet/leaflet.css" />
+<!--[if lte IE 8]>
+    <link rel="stylesheet" href="js/lib/leaflet/leaflet.ie.css" />
+<![endif]-->
+
+<!-- json support -->
+<script src="js/lib/json2.js"></script>
+
+<!-- jquery -->
+<script src="js/lib/jquery/jquery-1.7.2.js"></script>
+
+<!-- jquery-ui -->
+<script src="js/lib/jquery-ui/js/jquery-ui-1.8.20.custom.min.js"></script>
+<link rel="stylesheet" href="js/lib/jquery-ui/css/smoothness/jquery-ui-1.8.20.custom.css" />
+
+<!-- raphael -->
+<script src="js/lib/raphael/raphael-min.js"></script>
+
+<!-- otp-specific imports -->
+<script src="js/otp/otp.js?v=1"></script>
+<script src="js/otp/config.js?v=1"></script>
+<script src="js/otp/util/leaflet.js?v=1"></script>
+<script src="js/otp/util/Time.js?v=1"></script>
+<script src="js/otp/util/Polyline.js?v=1"></script>
+<script src="js/otp/util/Logger.js?v=1"></script>
+<script src="js/otp/util/DataStorage.js?v=1"></script>
+<script src="js/otp/core/Webapp.js?v=1"></script>
+<script src="js/otp/core/Map.js?v=1"></script>
+
+<script src="js/otp/modules/Module.js?v=1"></script>
+<script src="js/otp/modules/planner/PlannerModule.js?v=1"></script>
+<script src="js/otp/modules/planner/IconFactory.js?v=1"></script>
+<script src="js/otp/modules/bikeshare/BikeShareModule.js?v=1"></script>
+<script src="js/otp/modules/annotations/AnnotationsModule.js?v=1"></script>
+
+<script src="js/otp/widgets/Widget.js?v=1"></script>
+<script src="js/otp/widgets/TripSummaryWidget.js?v=1"></script>
+<script src="js/otp/widgets/BikeTrianglePanel.js?v=1"></script>
+<script src="js/otp/widgets/BikeStationsWidget.js?v=1"></script>
+<script src="js/otp/widgets/InfoWidget.js?v=1"></script>
+<link rel="stylesheet" href="style.css?v=1" />
+
+<!-- make legacy Internet Explorer play nice(r) -->
+<!--[if lt IE 9]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <script src="js/lib/respond.min.js"></script>
+<![endif]-->
+
+<!-- create the webapp at startups -->
+<script type="text/javascript" language="javascript">
+$(document).ready(function() {
+    new otp.core.Webapp();
+
+});
+</script>
+
+</head>
+<body>
+
+<header id="branding" role="banner" class="clearfix">
+  
+  <!--<hgroup id="logo">
+    <div class="ribbon">
+      <h1 id="site-title"><span><a href="/" title="cibi.me" rel="home">cibi.me</a></span></h1>
+      <h2 id="site-description">Where can you bike to?</h2>
+    </div>
+  </hgroup>-->
+
+  <!--<p id="splash-text"><span>Bike share is coming to NYC this summer!</span> <span>How will you use it to get around?</span></p>-->
+
+ <!--
+  <div class="search">
+    
+    <input type="text" name="location_search" placeholder="Search for a location&hellip;" />
+  </div>
+ -->
+</header><!-- #branding -->
+
+<div id="map"></div>
+
+<div id="otp-spinner"><img src="images/spinner.gif"></div>
+
+<!-- <div id="foo"></div> -->
+
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-8102379-22']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+</body>
+</html>
