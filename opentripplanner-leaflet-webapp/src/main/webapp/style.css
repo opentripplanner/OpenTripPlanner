@@ -179,27 +179,9 @@ body {
 }
 
 
-.otp_moduleMenu {
-  position: fixed;
-  left: 100px;
-  top: 0px;
-  width: 300px;
-  background: white;
-  z-index: 1000;
-  display: none;
-}
-
-.otp_moduleMenuLabel {
-  font-size: 20px;
-  font-weight: bold;
-  padding: 2px;
-  /*border-top: 1px solid gray;*/
-  background: #bbb;
-  cursor: pointer;
-}
-
-.otp_moduleMenuLabel:hover {
-  font-size: 30px;
+#otp_moduleSelector {
+  font-size: 11px;
+  margin: 6px 10px;
 }
 
 
@@ -682,6 +664,13 @@ p#splash-text span {
   #branding {
     height: 4em;
   }
+
+  #otp_moduleSelector {
+    font-size: 16px;
+    margin: 13px 20px;
+  }
+
+
   #map {
     top: 4em;
   }

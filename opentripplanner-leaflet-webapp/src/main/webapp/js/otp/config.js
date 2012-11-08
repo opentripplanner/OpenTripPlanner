@@ -24,7 +24,7 @@ otp.config = {
 
     showLogo:           true,
     showTitle:          true,
-    showModuleSelector: false,
+    showModuleSelector: true,
 
     logoGraphic :       'images/openplans-logo-40x40.png',
 

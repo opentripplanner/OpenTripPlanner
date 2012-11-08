@@ -51,31 +51,7 @@ otp.core.Webapp = otp.Class({
         this.map = new otp.core.Map(this);        
         
         
-        // create the module selector
-        
-        if(otp.config.showModuleSelector) {
-            
-            $("<div id='otp_topbutton'>OTP &raquo;</div>").appendTo('#branding');
-            $("<div id='otp_toptitle'>").appendTo('#branding');
-       
-            
-            $('#otp_topbutton').click(function() {
-                if(this_.moduleMenu == null) {
-                    this_.moduleMenu = $('<div class="otp_moduleMenu">').appendTo('body');
-                    
-                    $.each(this_.modules, function() {
-                        var module = this;
-                        var labelDiv = $('<div class="otp_moduleMenuLabel">'+module.moduleName+'</div>').appendTo(this_.moduleMenu);
-                        $(labelDiv).click(function() {
-                            $(this_.moduleMenu).hide();
-                            this_.setActiveModule(module);
-                        });
-                    });
-                }
-                
-                $(this_.moduleMenu).show();
-            });
-        }
+
         
         // initialize the AddThis widget
         
@@ -128,10 +104,26 @@ otp.core.Webapp = otp.Class({
 
         // set up some modules (TODO: generalize using config file)
         
-        //this.addModule(new otp.modules.annotations.AnnotationsModule(this), false);
+        this.addModule(new otp.modules.annotations.AnnotationsModule(this), false);
         this.addModule(new otp.modules.bikeshare.BikeShareModule(this), true);
 
+
+        // create the module selector
         
+        if(otp.config.showModuleSelector && this.modules.length > 1) {
+
+            var selector = $('<select id="otp_moduleSelector"></select>').appendTo('#branding');
+            for(i in this.modules) {
+                var module = this.modules[i];
+                console.log(module);
+                var option = $('<option'+(module == this_.activeModule ? ' selected' : '')+'>'+module.moduleName+'</option>').appendTo(selector);
+            }        
+            selector.change(function() {
+                this_.setActiveModule(this_.modules[this.selectedIndex]);
+            });
+                       
+        }
+                
         // retrieve a saved trip, if applicable
 		        
 		if(window.location.hash !== "")
