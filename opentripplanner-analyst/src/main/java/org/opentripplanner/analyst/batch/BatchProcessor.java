@@ -161,7 +161,7 @@ public class BatchProcessor {
         RoutingRequest req = prototypeRoutingRequest.clone();
         req.setDateTime(date, time, timeZone);
         // TODO PARAMETERIZE
-        req.worstTime = req.dateTime + 3600;
+        // req.worstTime = req.dateTime + 3600;
         String latLon = String.format("%f,%f", i.lat, i.lon);
         req.batch = true;
         if (req.arriveBy)
