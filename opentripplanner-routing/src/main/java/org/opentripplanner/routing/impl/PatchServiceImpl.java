@@ -72,7 +72,7 @@ public class PatchServiceImpl implements PatchService {
             }
             AgencyAndId route = alertPatch.getRoute();
             if (route != null) {
-                MapUtils.addToMapList(patchesByRoute, stop, patch);
+                MapUtils.addToMapList(patchesByRoute, route, patch);
             }
         }
 
