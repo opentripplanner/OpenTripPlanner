@@ -56,6 +56,9 @@ public class BatchProcessor {
     @Setter private Aggregator aggregator;
     @Setter private Accumulator accumulator;
     
+    /** Cut off the search instead of building a full path tree. Can greatly improve run times. */
+    @Setter private int searchCutoffSeconds = -1;
+    
     /**
      * Empirical results for a 4-core processor (with 8 fake hyperthreading cores):
      * Throughput increases linearly with nThreads, up to the number of physical cores. 
@@ -158,8 +161,9 @@ public class BatchProcessor {
     private RoutingRequest buildRequest(Individual i) {
         RoutingRequest req = prototypeRoutingRequest.clone();
         req.setDateTime(date, time, timeZone);
-        // TODO PARAMETERIZE
-        //req.worstTime = req.dateTime + 3600;
+        if (searchCutoffSeconds > 0) {
+            req.worstTime = req.dateTime + (req.arriveBy ? -searchCutoffSeconds : searchCutoffSeconds);
+        }
         String latLon = String.format("%f,%f", i.lat, i.lon);
         req.batch = true;
         if (req.arriveBy)
