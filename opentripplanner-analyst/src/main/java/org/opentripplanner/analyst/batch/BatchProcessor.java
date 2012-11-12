@@ -153,15 +153,13 @@ public class BatchProcessor {
         double runTimeMin = (currentTime - startTime) / 1000.0 / 60.0;
         double projectedMin = (total - current) * (runTimeMin / current);
         LOG.debug("===== running {} min remaining {} min (projected)", (int)runTimeMin, (int)projectedMin);
-        if (runTimeMin > 6)
-            System.exit(0);
     }
     
     private RoutingRequest buildRequest(Individual i) {
         RoutingRequest req = prototypeRoutingRequest.clone();
         req.setDateTime(date, time, timeZone);
         // TODO PARAMETERIZE
-        // req.worstTime = req.dateTime + 3600;
+        //req.worstTime = req.dateTime + 3600;
         String latLon = String.format("%f,%f", i.lat, i.lon);
         req.batch = true;
         if (req.arriveBy)
