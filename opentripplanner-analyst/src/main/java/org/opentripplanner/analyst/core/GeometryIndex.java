@@ -15,6 +15,10 @@ package org.opentripplanner.analyst.core;
 
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
+import lombok.Setter;
+
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.CRS;
 import org.opengis.geometry.BoundingBox;
@@ -42,14 +46,20 @@ public class GeometryIndex implements GeometryIndexService {
     private static final double SEARCH_RADIUS_M = 100; // meters
     private static final double SEARCH_RADIUS_DEG = SphericalDistanceLibrary.metersToDegrees(SEARCH_RADIUS_M);
     
+    @Autowired @Setter 
+    GraphService graphService;
+    
     private STRtree pedestrianIndex;
     private STRtree index;
     
-    @Autowired
-    public void setGraphService(GraphService graphService) {
+    @PostConstruct
+    public void initialzeComponent() {
         Graph graph = graphService.getGraph();
-        if (graph == null) // analyst currently depends on there being a single default graph
-        	return;
+        if (graph == null) { // analyst currently depends on there being a single default graph
+            String message = "Could not retrieve default Graph from GraphService. Check its configuration.";
+            LOG.error(message);
+            throw new IllegalStateException(message);
+        }
         // build a spatial index of road geometries
         pedestrianIndex = new STRtree();
         index = new STRtree();
@@ -66,7 +76,7 @@ public class GeometryIndex implements GeometryIndexService {
         index.build();
         LOG.debug("spatial index size: {}", pedestrianIndex.size());
     }
-
+    
     @SuppressWarnings("rawtypes")
     public List queryPedestrian(Envelope env) {
         return pedestrianIndex.query(env);
