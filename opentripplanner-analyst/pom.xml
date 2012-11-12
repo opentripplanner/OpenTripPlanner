@@ -71,16 +71,50 @@
     </dependencies>
     <build>
       <plugins>
+        <!-- We want to create a standalone batch processor/analyst jar that can 
+          be run on the command line. Java does not really allow this - you cannot place jars
+          inside of jars. You must either provide all the dependency jars to the user in the original 
+          directory structure (usually lib/ under the directory containing the runnable jar) or 
+          explode all the jars and repackage them into a single jar.
+          The problem is that while class files are nicely organized into the package namespace and
+          should not collide, the META-INF directories of the jars will collide. Maven's standard
+          assembly plugin does not account for this and will just clobber metadata. This then
+          causes runtime errors, particularly with Spring.
+          Instead, we use the shade plugin which has transformers that will for example append files
+          of the same name rather than overwrite them in the combined JAR. NB: Don't use a version 
+          of the shade plugin older than 1.3.2, as it fixed MSHADE-76 (files not merged properly 
+          if some input files are missing a terminating newline) -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-jar-plugin</artifactId>
-          <configuration>
-            <archive>
-              <manifest>
-                <mainClass>org.opentripplanner.analyst.batch.BatchProcessor</mainClass>
-              </manifest>
-            </archive>
-          </configuration>
+          <artifactId>maven-shade-plugin</artifactId>
+          <version>2.0</version>
+          <executions>
+            <execution>
+              <phase>package</phase>
+              <goals>
+                <goal>shade</goal>
+              </goals>
+              <configuration>
+                <finalName>otp-analyst</finalName> <!-- the shaded jar file's name --> 
+                <transformers>
+                  <transformer
+                    implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                    <mainClass>org.opentripplanner.analyst.batch.BatchProcessor</mainClass>
+                  </transformer>
+                  <transformer
+                    implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                    <resource>META-INF/spring.handlers</resource>
+                  </transformer>
+                  <transformer
+                    implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                    <resource>META-INF/spring.schemas</resource>
+                  </transformer>
+                  <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+                </transformers>
+                <shadedArtifactAttached>true</shadedArtifactAttached>
+              </configuration>
+            </execution>
+          </executions>
         </plugin>
       </plugins>
     </build>
