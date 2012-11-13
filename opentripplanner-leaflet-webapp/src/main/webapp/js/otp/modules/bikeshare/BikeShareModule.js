@@ -171,57 +171,6 @@ otp.modules.bikeshare.BikeShareModule =
             }
         }, this);
         
-//        for(var i=0; i<this.stations.length; i++) {
-//            var station = this.stations[i].BikeRentalStation;
-//            if(Math.abs(station.x - start.lng) < tol && Math.abs(station.y - start.lat) < tol) {
-//                // start station
-//                this.stationsLayer.removeLayer(station.marker);                        
-//                var marker = new L.Marker(station.marker.getLatLng(), {icon: this.icons.startBike});
-//                marker.bindPopup(this.constructStationInfo("PICK UP BIKE", station));
-//                this.stationsLayer.addLayer(marker);
-//                station.marker = marker;
-//                start_and_end_stations['start'] = station;
-//            }
-//            else if(this.distance(station.x, station.y, this.startLatLng.lng, this.startLatLng.lat) < distTol && 
-//                    parseInt(station.bikesAvailable) > 0) {
-//                // start-adjacent station
-//                this.stationsLayer.removeLayer(station.marker);
-//                              
-//                var icon = this.distance(station.x, station.y, this.startLatLng.lng, this.startLatLng.lat) < distTol/2 ?  this.icons.getLarge(station) : this.icons.getMedium(station);
-//                var marker = new L.Marker(station.marker.getLatLng(), { icon: icon }); 
-//                marker.bindPopup(this.constructStationInfo("ALTERNATE PICKUP", station));
-//                this.stationsLayer.addLayer(marker);                        
-//                station.marker = marker;
-//            }
-//            else if(Math.abs(station.x - end.lng) < tol && Math.abs(station.y - end.lat) < tol) {
-//                // end station
-//                this.stationsLayer.removeLayer(station.marker);                        
-//                var marker = new L.Marker(station.marker.getLatLng(), {icon: this.icons.endBike});
-//                marker.bindPopup(this.constructStationInfo("DROP OFF BIKE", station));
-//                this.stationsLayer.addLayer(marker);
-//                station.marker = marker;
-//                start_and_end_stations['end'] = station;
-//            }
-//            else if(this.distance(station.x, station.y, this.endLatLng.lng, this.endLatLng.lat) < distTol && 
-//                    parseInt(station.bikesAvailable) > 0) {
-//                // end-adjacent station
-//                this.stationsLayer.removeLayer(station.marker);                        
-
-//                var icon = this.distance(station.x, station.y, this.endLatLng.lng, this.endLatLng.lat) < distTol/2 ?  this.icons.getLarge(station) : this.icons.getMedium(station);
-//                var marker = new L.Marker(station.marker.getLatLng(), {icon: icon}); 
-//                marker.bindPopup(this.constructStationInfo("ALTERNATE DROP OFF", station));
-//                this.stationsLayer.addLayer(marker);                        
-//                station.marker = marker;
-//            }
-//            else {
-//                this.stationsLayer.removeLayer(station.marker);                        
-//                var marker = new L.Marker(station.marker.getLatLng(), {icon: this.icons.getSmall(station)}); 
-//                marker.bindPopup(this.constructStationInfo("BIKE STATION", station));
-//                this.stationsLayer.addLayer(marker);                        
-//                station.marker = marker;
-//            }
-//        }
-        
         return start_and_end_stations;
     },
     
