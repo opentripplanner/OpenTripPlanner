@@ -14,6 +14,29 @@
 
 otp.namespace("otp.modules.bikeshare");
 
+otp.modules.bikeshare.StationModel = 
+    Backbone.Model.extend({});
+
+otp.modules.bikeshare.StationCollection = 
+    Backbone.Collection.extend({
+    
+    url: otp.config.hostname + '/opentripplanner-api-webapp/ws/bike_rental',
+    model: otp.modules.bikeshare.StationModel,
+    
+    sync: function(method, model, options) {
+        options.dataType = 'jsonp';
+        options.data = options.data || {};
+        if(otp.config.routerId !== undefined) {
+            options.data.routerId = otp.config.routerId;
+        }
+        return Backbone.sync(method, model, options);
+    },
+    
+    parse: function(data) {
+        var stations = _.pluck(data.stations, 'BikeRentalStation');
+        return Backbone.Collection.prototype.parse.call(stations);
+    }
+});
 
 otp.modules.bikeshare.BikeShareModule = 
     otp.Class(otp.modules.planner.PlannerModule, {
@@ -45,7 +68,7 @@ otp.modules.bikeshare.BikeShareModule =
     },
 
     planTripStart : function() {
-        this.resetStations();
+//        this.resetStations();
     },
     
     processItinerary : function(itin, data) {
@@ -61,7 +84,7 @@ otp.modules.bikeshare.BikeShareModule =
                 }
                 else { // "my own bike" trip
                 	polyline.bindPopup('Your bike route');
-                	this.resetStations();
+//                	this.resetStations();
                 }	
             }
             else if(itin.legs[i].mode === 'WALK' && data.mode === 'WALK,BICYCLE') { 
@@ -146,77 +169,114 @@ otp.modules.bikeshare.BikeShareModule =
         return start_and_end_stations;
     },
     
-    resetStations : function(start, end) {
-        if(this.stations == null) return;
+//    resetStations : function(start, end) {
+//        if(this.stations == null) return;
+//    
+//        var this_ = this;
+//        var tol = .001, distTol = .01;
+//        var start_and_end_stations = [];
+//        
+//        for(var i=0; i<this.stations.length; i++) {
+//            var station = this.stations[i].BikeRentalStation;
+//            this.stationsLayer.removeLayer(station.marker);                        
+//            var marker = new L.Marker(station.marker.getLatLng(), {icon: this.icons.getSmall(station)}); 
+//            marker.bindPopup(this.constructStationInfo("BIKE STATION", station));
+//            this.stationsLayer.addLayer(marker);                        
+//            station.marker = marker;
+//        }
+//    },
     
-        var tol = .001, distTol = .01;
-        var start_and_end_stations = [];
-        
-        for(var i=0; i<this.stations.length; i++) {
-            var station = this.stations[i].BikeRentalStation;
-            this.stationsLayer.removeLayer(station.marker);                        
-            var marker = new L.Marker(station.marker.getLatLng(), {icon: this.icons.getSmall(station)}); 
-            marker.bindPopup(this.constructStationInfo("BIKE STATION", station));
-            this.stationsLayer.addLayer(marker);                        
-            station.marker = marker;
-        }
+    onResetStations : function(stations) {
+        this.resetStationMarkers();
+    },
+    
+    resetStationMarkers : function() {
+        this.clearStationMarkers();
+        this.stations.each(this.addStationMarker, this);
     },
 
+    clearStationMarkers : function() {
+        _.each(_.keys(this.markers), this.removeStationMarker, this);
+    },
+    
+    removeStationMarker : function(stationId) {
+        var marker = this.markers[stationId];
+        this.stationsLayer.removeLayer(marker);
+    },
+    
+    addStationMarker : function(station) {
+        var stationData = station.toJSON(),
+            stationIcon = this.icons.getSmall(stationData),
+            marker = new L.Marker(new L.LatLng(stationData.y, stationData.x), {icon: stationIcon});
+        
+        marker.bindPopup(this.constructStationInfo("BIKE STATION", stationData));
+        this.markers[station.id] = marker;
+    },
+    
     initStations : function() {
         //console.log('init stations');
         var this_ = this;
-        this.downloadStationData(function(stations) {
-            this_.stations = stations;
-            for(var i=0; i<this_.stations.length; i++) {
-                var station = this_.stations[i].BikeRentalStation;
-                var stationIcon = this_.icons.getSmall(station);
-                var marker = new L.Marker(new L.LatLng(station.y, station.x), {icon: stationIcon}); 
-                marker.bindPopup(this_.constructStationInfo("BIKE STATION", station));
-                this_.stationsLayer.addLayer(marker)
-                station.marker = marker;
-                this_.stationLookup[station.id] = station;
-            }
-        });
+        
+        this.markers = {};
+        this.stations = new otp.modules.bikeshare.StationCollection();
+        this.stations.on('reset', this.onResetStations, this);
+        
+        this.stations.fetch();
+        
+//        this.downloadStationData(function(stations) {
+//            this_.stations = stations;
+//            for(var i=0; i<this_.stations.length; i++) {
+//                var station = this_.stations[i].BikeRentalStation;
+//                var stationIcon = this_.icons.getSmall(station);
+//                marker.bindPopup(this_.constructStationInfo("BIKE STATION", station));
+//                this_.stationsLayer.addLayer(marker)
+//                station.marker = marker;
+//                this_.stationLookup[station.id] = station;
+//            }
+//        });
     },
 
     reloadStations : function(stations) {
         //console.log('update stations');
         var this_ = this;
-        this.downloadStationData(function(newStations) {
-            for(var i=0; i<newStations.length; i++) {
-                var newStation = newStations[i].BikeRentalStation;
-                var station = this_.stationLookup[newStation.id];
-                station.bikesAvailable = newStation.bikesAvailable;               
-                station.spacesAvailable = newStation.spacesAvailable;               
-                station.marker.bindPopup(this_.constructStationInfo(null, station)); 
-            }    
-        });
+        
+        this.stations.fetch();
+        
+//        this.downloadStationData(function(newStations) {
+//            for(var i=0; i<newStations.length; i++) {
+//                var newStation = newStations[i].BikeRentalStation;
+//                var station = this_.stationLookup[newStation.id];
+//                station.bikesAvailable = newStation.bikesAvailable;               
+//                station.spacesAvailable = newStation.spacesAvailable;               
+//                station.marker.bindPopup(this_.constructStationInfo(null, station)); 
+//            }    
+//        });
     },
     
-    downloadStationData : function(callback) {
-        //var url = "http://localhost/newui/feed/bixi.xml"
-        var url = otp.config.hostname + '/opentripplanner-api-webapp/ws/bike_rental';
-        var this_ = this;
-        var data_ = { };
-        if(otp.config.routerId !== undefined) {
-            data_ = { routerId : otp.config.routerId }
-        }
-        
-        $.ajax(url, {
-            data:       data_,
-            dataType:   'jsonp',
-                
-            success: function(data) {
-                //this_.stations = data.stations;
-                callback(data.stations);
-            }
-        });
-    },
+//    downloadStationData : function(callback) {
+//        //var url = "http://localhost/newui/feed/bixi.xml"
+//        var url = otp.config.hostname + '/opentripplanner-api-webapp/ws/bike_rental';
+//        var this_ = this;
+//        var data_ = { };
+//        if(otp.config.routerId !== undefined) {
+//            data_ = { routerId : otp.config.routerId }
+//        }
+//        
+//        $.ajax(url, {
+//            data:       data_,
+//            dataType:   'jsonp',
+//                
+//            success: function(data) {
+//                //this_.stations = data.stations;
+//                callback(data.stations);
+//            }
+//        });
+//    },
         
             
     constructStationInfo : function(title, station) {
         if(title == null) {
-            title = (station.markerTitle !== undefined) ? station.markerTitle : "BIKE STATION";
+            title = (station.get('markerTitle') !== undefined) ? station.markerTitle : "BIKE STATION";
         }
         var info = "<strong>"+title+"</strong><br/>";
         station.markerTitle = title;
