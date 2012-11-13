@@ -28,7 +28,15 @@ otp.widgets.Widget = otp.Class({
         this.div.setAttribute('id', this.id);
         this.div.className = 'otp-widget';
         document.body.appendChild(this.div);
-        //$(this.div).draggable();
+        var this_ = this;
+        $(this.div).draggable({ 
+            containment: "#map",
+            start: function(event, ui) {
+                console.log("dragging: "+$(this_.div).css('bottom'));
+                $(this_.div).css({'bottom' : 'auto'});
+            }
+        });
+        //$(this.div).resizable();
     },
     
     setContent : function(content) {
@@ -41,6 +49,10 @@ otp.widgets.Widget = otp.Class({
 
     hide : function() {
         $(this.div).fadeOut();//hide();
+    },
+    
+    $ : function() {
+        return $(this.div);
     },
     
     CLASS_NAME : "otp.widgets.Widget"

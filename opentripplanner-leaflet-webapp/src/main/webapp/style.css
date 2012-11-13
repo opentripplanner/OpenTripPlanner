@@ -38,7 +38,7 @@ hr { display:block; height:1px; border:0; border-top:1px solid #ccc; margin:1em 
 input, select { vertical-align:middle; }
 
 
-/* =Base Typography
+/* Base Typography
 -------------------------------------------------------------- */
 
 body { font:13px/1.231 sans-serif; *font-size:small; }
@@ -46,8 +46,9 @@ select, input, textarea, button { font:99% sans-serif; }
 pre, code, kbd, samp { font-family: monospace, sans-serif; }
 
 
-/* =Base Styles
+/* Base Styles
 -------------------------------------------------------------- */
+
 
 body, select, input, textarea {
   /* #444 looks better than black: twitter.com/H_FJ/statuses/11800719859 */
@@ -143,7 +144,7 @@ button {width: auto; overflow: visible;}
 .clearfix { zoom: 1; }
 
 
-/* =Structure
+/* Structure
 -------------------------------------------------------------- */
 
 body {
@@ -151,8 +152,58 @@ body {
 }
 
 
-/* =Header
+/* Header
 -------------------------------------------------------------- */
+
+
+/* Branding (top bar) */
+
+#branding {
+  height: 2.25em;
+  overflow: visible;
+  position: relative;
+  z-index: 100;
+  color: #fff;
+
+  background-color: #444;
+
+  background-image: linear-gradient(bottom, rgb(68,68,68) 0%, rgb(102,102,102) 100%);
+  background-image: -o-linear-gradient(bottom, rgb(68,68,68) 0%, rgb(102,102,102) 100%);
+  background-image: -moz-linear-gradient(bottom, rgb(68,68,68) 0%, rgb(102,102,102) 100%);
+  background-image: -webkit-linear-gradient(bottom, rgb(68,68,68) 0%, rgb(102,102,102) 100%);
+  background-image: -ms-linear-gradient(bottom, rgb(68,68,68) 0%, rgb(102,102,102) 100%);
+
+  background-image: -webkit-gradient(
+  	linear,
+  	left bottom,
+  	left top,
+  	color-stop(0, rgb(68,68,68)),
+  	color-stop(1, rgb(102,102,102))
+  );
+}
+
+@media only screen and (min-width: 768px) {
+  #branding {
+    height: 4em;
+  }
+}
+
+/* Module Selector */
+
+#otp_moduleSelector {
+  font-size: 11px;
+  margin: 6px 10px;
+}
+
+@media only screen and (min-width: 768px) {
+
+  #otp_moduleSelector {
+    font-size: 16px;
+    margin: 13px 20px;
+  }
+}
+
+
 
 #otp_topbutton {
   float: left;
@@ -179,35 +230,7 @@ body {
 }
 
 
-#otp_moduleSelector {
-  font-size: 11px;
-  margin: 6px 10px;
-}
 
-
-#branding {
-  height: 2.25em;
-  overflow: visible;
-  position: relative;
-  z-index: 100;
-  color: #fff;
-
-  background-color: #444;
-
-  background-image: linear-gradient(bottom, rgb(68,68,68) 0%, rgb(102,102,102) 100%);
-  background-image: -o-linear-gradient(bottom, rgb(68,68,68) 0%, rgb(102,102,102) 100%);
-  background-image: -moz-linear-gradient(bottom, rgb(68,68,68) 0%, rgb(102,102,102) 100%);
-  background-image: -webkit-linear-gradient(bottom, rgb(68,68,68) 0%, rgb(102,102,102) 100%);
-  background-image: -ms-linear-gradient(bottom, rgb(68,68,68) 0%, rgb(102,102,102) 100%);
-
-  background-image: -webkit-gradient(
-  	linear,
-  	left bottom,
-  	left top,
-  	color-stop(0, rgb(68,68,68)),
-  	color-stop(1, rgb(102,102,102))
-  );
-}
 
 #addthis {
   display: none;
@@ -374,39 +397,9 @@ body {
   background-color: #333;
 }
 
-/* Location Search Form */
-#branding .search {
-  padding: 1em;
-}
-#branding .search input {
-  width: 15em;
-  padding: 0.5em;
-  background: #eee;
-  border: 0;
-  font-weight: bold;
-  -webkit-border-radius: 3px;
-     -moz-border-radius: 3px;
-          border-radius: 3px;
-
-  background-image: linear-gradient(bottom, rgb(229,229,229) 0%, rgb(208,208,208) 100%);
-  background-image: -o-linear-gradient(bottom, rgb(229,229,229) 0%, rgb(208,208,208) 100%);
-  background-image: -moz-linear-gradient(bottom, rgb(229,229,229) 0%, rgb(208,208,208) 100%);
-  background-image: -webkit-linear-gradient(bottom, rgb(229,229,229) 0%, rgb(208,208,208) 100%);
-  background-image: -ms-linear-gradient(bottom, rgb(229,229,229) 0%, rgb(208,208,208) 100%);
-
-  background-image: -webkit-gradient(
-  	linear,
-  	left bottom,
-  	left top,
-  	color-stop(0, rgb(229,229,229)),
-  	color-stop(1, rgb(208,208,208))
-  );
-}
-#branding .search ::-webkit-input-placeholder { color: #777; }
-#branding .search :-moz-placeholder { color: #777; }
 
 
-/* =The Map
+/* The Map
 -------------------------------------------------------------- */
 
 #map {
@@ -418,25 +411,27 @@ body {
   z-index: 1;
 }
 
-.leaflet-control-zoom {
-  display: none;
+@media only screen and (min-width: 768px) {
+  #map {
+    top: 4em;
+  }
 }
+
+
+/*.leaflet-control-zoom {
+  display: none;
+}*/
 
 .leaflet-container .leaflet-control-attribution {
   font-size: 6px;
 }
+
+
+/* Widgets
+-------------------------------------------------------------- */
   
-.ui-dialog-titlebar {
-  font-size: 14px;
-  padding:2px;
-}
-
-.ui-dialog-content {
-  font-size: 12px;
-}
-
 .otp-widget {
-  position : fixed;
+  position : absolute;
   z-index: 10;
   padding: 10px;
   background: #eee;
@@ -542,6 +537,17 @@ body {
 	font-size: 1em;
 }
 
+.ui-dialog-titlebar {
+  font-size: 14px;
+  padding:2px;
+}
+
+.ui-dialog-content {
+  font-size: 12px;
+}
+
+/* TripSummaryWidget */
+
 #otp-mainTSW {
   width: auto;
   left: 0.5em;
@@ -549,6 +555,25 @@ body {
   top: 3em;
   padding: 0.25em 0.5em;
 }
+
+#otp-mainTSW hr {
+  display: none;
+}
+
+@media only screen and (min-width: 768px) {
+  #otp-mainTSW {
+    width: 240px;
+    top: auto;
+    left: 20px;
+    bottom: 100px;
+    padding: 10px;
+  }
+
+  #otp-mainTSW hr {
+    display: block;
+  }
+}
+
 
 h3.your-trip,
 h6.drag-to-change {
@@ -584,14 +609,12 @@ ul.otp-stats li strong {
   font-size: 2em;
 }
 
-
 #otp-tsw-timeSummary {
     text-align: right;
     margin-bottom: .5em;
     font-style: italic;
 }
 
-#otp-mainTSW hr,
 #share-route-header,
 #share-route {
   display: none;
@@ -636,14 +659,7 @@ p#splash-text span {
   display: none;
 }
 
-/* 
- * 
- * "MOBILE FIRST!" they say. We agree. 
- * 
- * Everything above is for mobile.
- * Everything below is for resposive/adaptive layout. 
- * 
- */
+
 
 
 /* =Media Queries for Responsive Layout
@@ -655,25 +671,8 @@ p#splash-text span {
   }  
 }
 
-@media only screen and (min-width: 480px) {
-
-}
 
 @media only screen and (min-width: 768px) {
-
-  #branding {
-    height: 4em;
-  }
-
-  #otp_moduleSelector {
-    font-size: 16px;
-    margin: 13px 20px;
-  }
-
-
-  #map {
-    top: 4em;
-  }
 
   #logo {
     display: block;
@@ -816,14 +815,6 @@ p#splash-text span {
   	background-color: #555;
   }
 
-  #otp-mainTSW {
-    width: 240px;
-    top: auto;
-    left: 20px;
-    bottom: 100px;
-    padding: 10px;
-  }
-
   h6.drag-to-change {
     display: block;
   }
@@ -851,7 +842,7 @@ p#splash-text span {
   ul.otp-stats li strong { 
 /*    display: inline;*/
   }
-  #otp-mainTSW hr,
+
   #share-route-header,
   #share-route {
     display: block;

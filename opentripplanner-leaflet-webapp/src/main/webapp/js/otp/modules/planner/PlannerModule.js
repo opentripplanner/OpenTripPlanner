@@ -88,7 +88,7 @@ otp.modules.planner.PlannerModule =
     },
     
     trianglePlanTrip : function() {
-        var triParams = this.resultsWidget.bikeTriangle.getFormData();
+        var triParams = this.resultsWidget.panels['triangle'].bikeTriangle.getFormData();
         this.triangleTimeFactor = triParams.triangleTimeFactor;
         this.triangleSlopeFactor = triParams.triangleSlopeFactor;
         this.triangleSafetyFactor = triParams.triangleSafetyFactor;
@@ -184,7 +184,24 @@ otp.modules.planner.PlannerModule =
                 $('#otp-spinner').hide();
             	
             	if(this_.resultsWidget == null) {
-                    this_.resultsWidget = new otp.widgets.TripSummaryWidget('otp-mainTSW', function() {
+
+                    this_.resultsWidget = new otp.widgets.TripWidget('otp-mainTSW', function() {
+                        this_.trianglePlanTrip();
+                    });
+                    this_.widgets.push(this_.resultsWidget);
+                    
+                    this_.resultsWidget.addPanel("summary", new otp.widgets.TW_TripSummary(this_.resultsWidget));
+                    this_.resultsWidget.addSeparator();
+                    this_.resultsWidget.addPanel("triangle", new otp.widgets.TW_BikeTriangle(this_.resultsWidget));
+                    this_.resultsWidget.addSeparator();
+                    this_.resultsWidget.addPanel("biketype", new otp.widgets.TW_BikeType(this_.resultsWidget));
+                    
+                    if(existingData !== null) {
+                        this_.resultsWidget.restorePlan(existingData);
+                    }
+                    this_.resultsWidget.show();
+                                	
+                    /*this_.resultsWidget = new otp.widgets.TripSummaryWidget('otp-mainTSW', function() {
                         this_.trianglePlanTrip();
                     });
                     this_.widgets.push(this_.resultsWidget);
@@ -192,7 +209,7 @@ otp.modules.planner.PlannerModule =
                     if(existingData !== null) {
                         this_.resultsWidget.restorePlan(existingData);
                     }
-                    this_.resultsWidget.show();
+                    this_.resultsWidget.show();*/
 
                 }
                 
@@ -205,7 +222,7 @@ otp.modules.planner.PlannerModule =
 
                     this_.resultsWidget.show();
 
-                    this_.resultsWidget.updateMetrics(itin);
+                    this_.resultsWidget.newItinerary(itin);
                     this_.updateTipStep(3);
                     
                     if(!skipSave)
@@ -217,6 +234,8 @@ otp.modules.planner.PlannerModule =
                     this_.noTripWidget.setContent(data.error.msg);
                     this_.noTripWidget.show();
                 }
+                
+                this_.webapp.queryLogger.logQuery(data_.fromPlace, data_.toPlace);
             }
         });
         
