@@ -22,7 +22,7 @@ otp.modules.bikeshare.StationModel =
                 Math.abs(this.get('y') - point.lat) < tolerance);
     },
     
-    isNearish: function(point, tolerance) {
+    isNearishTo: function(point, tolerance) {
         return (this.distanceTo(point) < tolerance && 
                 parseInt(this.get('bikesAvailable')) > 0);
     },
@@ -48,9 +48,9 @@ otp.modules.bikeshare.StationCollection =
         return Backbone.sync(method, model, options);
     },
     
-    parse: function(data, options) {
-        var stations = _.pluck(data.stations, 'BikeRentalStation');
-        return Backbone.Collection.prototype.parse.call(this, stations, options);
+    parse: function(rawData, options) {
+        var stationsData = _.pluck(rawData.stations, 'BikeRentalStation');
+        return Backbone.Collection.prototype.parse.call(this, stationsData, options);
     }
 });
 
@@ -90,7 +90,7 @@ otp.modules.bikeshare.BikeShareModule =
     },
 
     planTripStart : function() {
-//        this.resetStations();
+        this.resetStationMarkers();
     },
     
     processItinerary : function(itin, data) {
@@ -106,7 +106,7 @@ otp.modules.bikeshare.BikeShareModule =
                 }
                 else { // "my own bike" trip
                 	polyline.bindPopup('Your bike route');
-//                	this.resetStations();
+                	this.resetStationMarkers();
                 }	
             }
             else if(itin.legs[i].mode === 'WALK' && data.mode === 'WALK,BICYCLE') { 
@@ -149,7 +149,7 @@ otp.modules.bikeshare.BikeShareModule =
                 this.resetStationMarker(station, "PICK UP BIKE", this.icons.startBike);
                 start_and_end_stations['start'] = station;
             }
-            else if (station.isNearish(this.startLatLng, distTol)) {
+            else if (station.isNearishTo(this.startLatLng, distTol)) {
                 // start-adjacent station
                 var distanceToStart = station.distanceTo(this.startLatLng);
                 var icon = distanceToStart < distTol/2 ? this.icons.getLarge(stationData) : this.icons.getMedium(stationData);
@@ -160,7 +160,7 @@ otp.modules.bikeshare.BikeShareModule =
                 this.resetStationMarker(station, "DROP OFF BIKE", this.icons.endBike);
                 start_and_end_stations['end'] = station;
             }
-            else if (station.isNearish(this.endLatLng, distTol)) {
+            else if (station.isNearishTo(this.endLatLng, distTol)) {
                 // end-adjacent station
                 var distanceToEnd = station.distanceTo(this.endLatLng);
                 var icon = distanceToEnd < distTol/2 ? this.icons.getLarge(stationData) : this.icons.getMedium(stationData);
@@ -175,10 +175,10 @@ otp.modules.bikeshare.BikeShareModule =
     },
     
     onResetStations : function(stations) {
-        this.reresetStationMarkers();
+        this.resetStationMarkers();
     },
     
-    reresetStationMarkers : function() {
+    resetStationMarkers : function() {
         this.clearStationMarkers();
         this.stations.each(function(station) {
             this.addStationMarker(station); }, this);
