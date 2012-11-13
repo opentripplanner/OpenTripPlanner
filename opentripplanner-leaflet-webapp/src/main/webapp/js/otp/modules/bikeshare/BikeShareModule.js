@@ -169,23 +169,6 @@ otp.modules.bikeshare.BikeShareModule =
         return start_and_end_stations;
     },
     
-//    resetStations : function(start, end) {
-//        if(this.stations == null) return;
-//    
-//        var this_ = this;
-//        var tol = .001, distTol = .01;
-//        var start_and_end_stations = [];
-//        
-//        for(var i=0; i<this.stations.length; i++) {
-//            var station = this.stations[i].BikeRentalStation;
-//            this.stationsLayer.removeLayer(station.marker);                        
-//            var marker = new L.Marker(station.marker.getLatLng(), {icon: this.icons.getSmall(station)}); 
-//            marker.bindPopup(this.constructStationInfo("BIKE STATION", station));
-//            this.stationsLayer.addLayer(marker);                        
-//            station.marker = marker;
-//        }
-//    },
-    
     onResetStations : function(stations) {
         this.resetStationMarkers();
     },
@@ -216,64 +199,17 @@ otp.modules.bikeshare.BikeShareModule =
     
     initStations : function() {
         //console.log('init stations');
-        var this_ = this;
-        
         this.markers = {};
         this.stations = new otp.modules.bikeshare.StationCollection();
         this.stations.on('reset', this.onResetStations, this);
         
         this.stations.fetch();
-        
-//        this.downloadStationData(function(stations) {
-//            this_.stations = stations;
-//            for(var i=0; i<this_.stations.length; i++) {
-//                var station = this_.stations[i].BikeRentalStation;
-//                var stationIcon = this_.icons.getSmall(station);
-//                marker.bindPopup(this_.constructStationInfo("BIKE STATION", station));
-//                this_.stationsLayer.addLayer(marker)
-//                station.marker = marker;
-//                this_.stationLookup[station.id] = station;
-//            }
-//        });
     },
 
     reloadStations : function(stations) {
         //console.log('update stations');
-        var this_ = this;
-        
         this.stations.fetch();
-        
-//        this.downloadStationData(function(newStations) {
-//            for(var i=0; i<newStations.length; i++) {
-//                var newStation = newStations[i].BikeRentalStation;
-//                var station = this_.stationLookup[newStation.id];
-//                station.bikesAvailable = newStation.bikesAvailable;               
-//                station.spacesAvailable = newStation.spacesAvailable;               
-//                station.marker.bindPopup(this_.constructStationInfo(null, station)); 
-//            }    
-//        });
     },
-    
-//    downloadStationData : function(callback) {
-//        //var url = "http://localhost/newui/feed/bixi.xml"
-//        var url = otp.config.hostname + '/opentripplanner-api-webapp/ws/bike_rental';
-//        var this_ = this;
-//        var data_ = { };
-//        if(otp.config.routerId !== undefined) {
-//            data_ = { routerId : otp.config.routerId }
-//        }
-//        
-//        $.ajax(url, {
-//            data:       data_,
-//            dataType:   'jsonp',
-//                
-//            success: function(data) {
-//                //this_.stations = data.stations;
-//                callback(data.stations);
-//            }
-//        });
-//    },
-        
             
     constructStationInfo : function(title, station) {
         if(title == null) {
