@@ -33,7 +33,9 @@ otp.widgets.BikeStationsWidget =
 	    this.hide();
 	},
 	
-	setContentAndShow: function(start, end) {
+	setContentAndShow: function(startStation, endStation, module) {
+	    var start = startStation.toJSON(),
+	        end = endStation.toJSON();
 
 		// Fit station names to widget:
 		start.name = start.name.length > 50 ? start.name.substring(0,50) + "..." : start.name;
@@ -54,8 +56,8 @@ otp.widgets.BikeStationsWidget =
 		    this.show();
 		}
 		
-        var start_marker = start.marker;
-        var end_marker = end.marker;
+        var start_marker = module.getStationMarker(startStation);
+        var end_marker = module.getStationMarker(endStation);
 
         this.start_button.click(function(e) {
         	e.preventDefault();

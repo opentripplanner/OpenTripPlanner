@@ -120,10 +120,11 @@ otp.modules.bikeshare.BikeShareModule =
         }
 
         if(start_and_end_stations !== undefined && data.mode === 'WALK,BICYCLE') {
-            if(start_and_end_stations['start'] !== null && start_and_end_stations['end'] !== null) {
+            if(start_and_end_stations['start'] && start_and_end_stations['end']) {
            	    this.bikestationsWidget.setContentAndShow(
-           	        start_and_end_stations['start'].toJSON(), 
-           	        start_and_end_stations['end'].toJSON());
+           	        start_and_end_stations['start'], 
+           	        start_and_end_stations['end'],
+           	        this);
            	    this.bikestationsWidget.show();
            	}
            	else
@@ -189,9 +190,17 @@ otp.modules.bikeshare.BikeShareModule =
             this.removeStationMarker(stationId); }, this);
     },
     
-    removeStationMarker : function(stationId) {
-        var marker = this.markers[stationId];
-        this.stationsLayer.removeLayer(marker);
+    getStationMarker : function(station) {
+        if (station instanceof Backbone.Model)
+            return this.markers[station.id];
+        else
+            return this.markers[station];
+    },
+    
+    removeStationMarker : function(station) {
+        var marker = this.getStationMarker(station);
+        if (marker)
+            this.stationsLayer.removeLayer(marker);
     },
     
     addStationMarker : function(station, title, icon) {
@@ -207,9 +216,7 @@ otp.modules.bikeshare.BikeShareModule =
     },
     
     resetStationMarker : function(station, title, icon) {
-        if (station.id in this.markers) {
-            this.removeStationMarker(station.id);
-        }
+        this.removeStationMarker(station);
         this.addStationMarker(station, title, icon)
     },
     
