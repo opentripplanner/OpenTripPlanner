@@ -123,7 +123,7 @@ public class BasicPopulation implements Population {
         if (filterChain == null) // no filter chain, do not reject any individuals
             return;
         for (IndividualFilter filter : filterChain) {
-            LOG.debug("applying filter {}", filter);
+            LOG.info("applying filter {}", filter);
             int rejected = 0;
             int i = 0;
             for (Individual individual : this.individuals) {
@@ -132,13 +132,13 @@ public class BasicPopulation implements Population {
                     rejected += 1;
                 skip[i++] |= skipThis;
             }
-            LOG.debug("accepted {} rejected {}", skip.length - rejected, rejected);
+            LOG.info("accepted {} rejected {}", skip.length - rejected, rejected);
         }
         int rejected = 0;
         for (boolean s : skip)
             if (s)
                 rejected += 1;
-        LOG.debug("TOTALS: accepted {} rejected {}", skip.length - rejected, rejected);
+        LOG.info("TOTALS: accepted {} rejected {}", skip.length - rejected, rejected);
         
     }
 

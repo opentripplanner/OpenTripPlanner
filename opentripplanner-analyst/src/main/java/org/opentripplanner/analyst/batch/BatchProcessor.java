@@ -55,6 +55,7 @@ public class BatchProcessor {
 
     @Setter private Aggregator aggregator;
     @Setter private Accumulator accumulator;
+    @Setter private int logThrottleSeconds = 4;
     
     /** Cut off the search instead of building a full path tree. Can greatly improve run times. */
     @Setter private int searchCutoffSeconds = -1;
@@ -76,6 +77,7 @@ public class BatchProcessor {
     enum Mode { BASIC, AGGREGATE, ACCUMULATE };
     private Mode mode;
     private long startTime = -1;
+    private long lastLogTime = 0;
     private ResultSet aggregateResultSet = null;
     
     public static void main(String[] args) throws IOException {
@@ -104,7 +106,7 @@ public class BatchProcessor {
         destinations.setup();
         linkIntoGraph(destinations);
         // Set up a thread pool to execute searches in parallel
-        LOG.debug("Number of threads: {}", nThreads);
+        LOG.info("Number of threads: {}", nThreads);
         ExecutorService threadPool = Executors.newFixedThreadPool(nThreads);
         // ECS enqueues results in the order they complete (unlike invokeAll, which blocks)
         CompletionService<Void> ecs = new ExecutorCompletionService<Void>(threadPool);
@@ -131,7 +133,7 @@ public class BatchProcessor {
             ecs.submit(new BatchAnalystTask(nTasks, oi), null);
             ++nTasks;
         }
-        LOG.debug("created {} tasks.", nTasks);
+        LOG.info("created {} tasks.", nTasks);
         int nCompleted = 0;
         try { // pull Futures off the queue as tasks are finished
             while (nCompleted < nTasks) {
@@ -153,9 +155,14 @@ public class BatchProcessor {
 
     private void projectRunTime(int current, int total) {
         long currentTime = System.currentTimeMillis();
-        double runTimeMin = (currentTime - startTime) / 1000.0 / 60.0;
-        double projectedMin = (total - current) * (runTimeMin / current);
-        LOG.debug("===== running {} min remaining {} min (projected)", (int)runTimeMin, (int)projectedMin);
+        // not threadsafe, but the worst thing that will happen is a double log message 
+        if (currentTime > lastLogTime + logThrottleSeconds * 1000) {
+            lastLogTime = currentTime;
+            double runTimeMin = (currentTime - startTime) / 1000.0 / 60.0;
+            double projectedMin = (total - current) * (runTimeMin / current);
+            LOG.info("received {} results out of {}", current, total);
+            LOG.info("running {} min, {} min remaining (projected)", (int)runTimeMin, (int)projectedMin);
+        }
     }
     
     private RoutingRequest buildRequest(Individual i) {
@@ -194,7 +201,7 @@ public class BatchProcessor {
             if (s != null)
                 nonNull += 1;
         }
-        LOG.debug("successfully linked {} individuals out of {}", nonNull, n);
+        LOG.info("successfully linked {} individuals out of {}", nonNull, n);
     }
         
     /** 
