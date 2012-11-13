@@ -23,6 +23,8 @@ otp.core.Webapp = otp.Class({
     
     activeModule : null,
     
+    queryLogger : null,
+    
     infoWidgets     : { },
     
     initialize : function() {
@@ -46,12 +48,14 @@ otp.core.Webapp = otp.Class({
             }
         }
         
-        // create the map
+        // create the Webapp-owned objects
         
         this.map = new otp.core.Map(this);        
+        this.queryLogger = new otp.core.QueryLogger();        
         
         
-
+        
+        this.queryLogger
         
         // initialize the AddThis widget
         
@@ -106,6 +110,7 @@ otp.core.Webapp = otp.Class({
         
         this.addModule(new otp.modules.annotations.AnnotationsModule(this), false);
         this.addModule(new otp.modules.bikeshare.BikeShareModule(this), true);
+        this.addModule(new otp.modules.calltaker.CallTakerModule(this), false);
 
 
         // create the module selector
