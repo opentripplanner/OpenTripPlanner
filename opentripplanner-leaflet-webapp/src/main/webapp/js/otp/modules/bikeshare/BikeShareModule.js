@@ -32,9 +32,9 @@ otp.modules.bikeshare.StationCollection =
         return Backbone.sync(method, model, options);
     },
     
-    parse: function(data) {
+    parse: function(data, options) {
         var stations = _.pluck(data.stations, 'BikeRentalStation');
-        return Backbone.Collection.prototype.parse.call(stations);
+        return Backbone.Collection.prototype.parse.call(this, stations, options);
     }
 });
 
@@ -211,6 +211,7 @@ otp.modules.bikeshare.BikeShareModule =
         
         marker.bindPopup(this.constructStationInfo("BIKE STATION", stationData));
         this.markers[station.id] = marker;
+        this.stationsLayer.addLayer(marker);
     },
     
     initStations : function() {
