@@ -97,10 +97,6 @@
                 <finalName>otp-analyst</finalName> <!-- the shaded jar file's name --> 
                 <transformers>
                   <transformer
-                    implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                    <mainClass>org.opentripplanner.analyst.batch.BatchProcessor</mainClass>
-                  </transformer>
-                  <transformer
                     implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                     <resource>META-INF/spring.handlers</resource>
                   </transformer>
@@ -109,6 +105,22 @@
                     <resource>META-INF/spring.schemas</resource>
                   </transformer>
                   <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+                  <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                    <!-- JAI-ImageIO will throw an IllegalArgumentException complaining that 
+                         vendorName == null because it depends on information from the manifest.
+                         This information is clobbered by the shading process and must be re-added.
+                         See: http://www.java.net/node/695773 -->
+                    <manifestEntries>
+                        <Main-Class>org.opentripplanner.analyst.batch.BatchProcessor</Main-Class>
+                        <Specification-Title>Java Advanced Imaging Image I/O Tools</Specification-Title>
+                        <Specification-Version>1.1</Specification-Version>
+                        <Specification-Vendor>Sun Microsystems, Inc.</Specification-Vendor>
+                        <Implementation-Title>com.sun.media.imageio</Implementation-Title>
+                        <Implementation-Version>1.1</Implementation-Version>
+                        <Implementation-Vendor>Sun Microsystems, Inc.</Implementation-Vendor>
+                        <Extension-Name>com.sun.media.imageio</Extension-Name>
+                    </manifestEntries>
+                  </transformer>
                 </transformers>
                 <shadedArtifactAttached>true</shadedArtifactAttached>
               </configuration>
