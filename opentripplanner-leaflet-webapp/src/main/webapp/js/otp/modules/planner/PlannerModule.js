@@ -19,6 +19,7 @@ otp.modules.planner.PlannerModule =
     otp.Class(otp.modules.Module, {
 
     moduleName  : "Trip Planner",
+    moduleId    : "planner",
         
     startLatLng : null,
     endLatLng   : null,
@@ -185,7 +186,7 @@ otp.modules.planner.PlannerModule =
             	
             	if(this_.resultsWidget == null) {
 
-                    this_.resultsWidget = new otp.widgets.TripWidget('otp-mainTSW', function() {
+                    this_.resultsWidget = new otp.widgets.TripWidget('otp-'+this_.moduleId+'-tripWidget', function() {
                         this_.trianglePlanTrip();
                     });
                     this_.widgets.push(this_.resultsWidget);
@@ -200,17 +201,6 @@ otp.modules.planner.PlannerModule =
                         this_.resultsWidget.restorePlan(existingData);
                     }
                     this_.resultsWidget.show();
-                                	
-                    /*this_.resultsWidget = new otp.widgets.TripSummaryWidget('otp-mainTSW', function() {
-                        this_.trianglePlanTrip();
-                    });
-                    this_.widgets.push(this_.resultsWidget);
-                    
-                    if(existingData !== null) {
-                        this_.resultsWidget.restorePlan(existingData);
-                    }
-                    this_.resultsWidget.show();*/
-
                 }
                 
                 //console.log(data);

@@ -19,6 +19,7 @@ otp.modules.multimodal.MultimodalPlannerModule =
     otp.Class(otp.modules.planner.PlannerModule, {
 
     moduleName  : "Multimodal Trip Planner",
+    moduleId    : "multimodal",
     
     initialize : function(webapp) {
         otp.modules.planner.PlannerModule.prototype.initialize.apply(this, arguments);

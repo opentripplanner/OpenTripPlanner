@@ -548,7 +548,7 @@ body {
 
 /* TripSummaryWidget */
 
-#otp-mainTSW {
+.otp-defaultTripWidget {
   width: auto;
   left: 0.5em;
   bottom: auto;
@@ -556,12 +556,12 @@ body {
   padding: 0.25em 0.5em;
 }
 
-#otp-mainTSW hr {
+.otp-defaultTripWidget hr {
   display: none;
 }
 
 @media only screen and (min-width: 768px) {
-  #otp-mainTSW {
+  .otp-defaultTripWidget {
     width: 240px;
     top: auto;
     left: 20px;
@@ -569,7 +569,7 @@ body {
     padding: 10px;
   }
 
-  #otp-mainTSW hr {
+  .otp-defaultTripWidget hr {
     display: block;
   }
 }
@@ -580,9 +580,21 @@ h6.drag-to-change {
   display: none;
 }
 
-#otp-tsw-bikeTriangle {
+/* Bike Triangle */
+
+.otp-bikeTriangle {
   display: none;
 }
+
+
+@media only screen and (min-width: 768px) {  
+  .otp-bikeTriangle {
+    display: block;
+    height: 100px;
+    margin: 0 0 1em;
+  }
+}
+  
 
 /*ul.otp-stats {
   list-style: none;
@@ -597,19 +609,19 @@ ul.otp-stats li strong {
   display: none;
 }*/
 
-#otp-tsw-distance {
+.otp-tripSummary-distance {
   float: left;
   font-weight: bold;
   font-size: 2em;
 }
 
-#otp-tsw-duration {
+.otp-tripSummary-duration {
   font-weight: bold;
   text-align: right; 
   font-size: 2em;
 }
 
-#otp-tsw-timeSummary {
+.otp-tripSummary-timeSummary {
     text-align: right;
     margin-bottom: .5em;
     font-style: italic;
@@ -818,12 +830,7 @@ p#splash-text span {
   h6.drag-to-change {
     display: block;
   }
-  
-  #otp-tsw-bikeTriangle {
-    display: block;
-    height: 100px;
-    margin: 0 0 1em;
-  }
+
   
   #otp-tsw-bikeTypeRow {
     margin: .5em 0;

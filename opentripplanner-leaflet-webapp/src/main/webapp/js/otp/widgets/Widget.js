@@ -16,8 +16,8 @@ otp.namespace("otp.widgets");
 
 otp.widgets.Widget = otp.Class({
     
-    div :   null,
-    id :    null,
+    div :       null,
+    id :        null,
     
     initialize : function(id) {
         //otp.configure(this, config);

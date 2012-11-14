@@ -19,6 +19,7 @@ otp.modules.calltaker.CallTakerModule =
     otp.Class(otp.modules.planner.PlannerModule, {
 
     moduleName  : "Call Taker Interface",
+    moduleId    : "calltaker",
     
     initialize : function(webapp) {
         otp.modules.planner.PlannerModule.prototype.initialize.apply(this, arguments);

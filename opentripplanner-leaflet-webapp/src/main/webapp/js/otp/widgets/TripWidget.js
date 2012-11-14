@@ -23,6 +23,8 @@ otp.widgets.TripWidget =
     initialize : function(id, planTripCallback) {
     
         otp.widgets.Widget.prototype.initialize.apply(this, arguments);
+        this.$().addClass('otp-defaultTripWidget');
+        
         this.planTripCallback = planTripCallback;
         
         this.panels = { };       
@@ -94,15 +96,19 @@ otp.widgets.TripWidgetPanel = otp.Class({
 otp.widgets.TW_TripSummary = 
     otp.Class(otp.widgets.TripWidgetPanel, {
        
+    id  : null,
+    
     initialize : function(tripWidget) {
         otp.widgets.TripWidgetPanel.prototype.initialize.apply(this, arguments);
+        this.id = tripWidget.id+"-tripSummary";
+        console.log("ts id="+this.id);
         
+                
         var content = '';
-        content += '<div id="otp-tsw-distance"></div>';
-        content += '<div id="otp-tsw-duration"></div>';
-        content += '<div id="otp-tsw-timeSummary"></div>';    
+        content += '<div id="'+this.id+'-distance" class="otp-tripSummary-distance"></div>';
+        content += '<div id="'+this.id+'-duration" class="otp-tripSummary-duration"></div>';
+        content += '<div id="'+this.id+'-timeSummary" class="otp-tripSummary-timeSummary"></div>';    
         this.setContent(content);
-        console.log("tsp set content");
     },
 
     newItinerary : function(itin) {
@@ -114,8 +120,8 @@ otp.widgets.TW_TripSummary =
     		dist += itin.legs[i].distance;
         }
     	
-        $("#otp-tsw-distance").html(Math.round(100*(dist/1609.344))/100+" mi.");
-        $("#otp-tsw-duration").html(otp.util.Time.msToHrMin(itin.duration));	
+        $("#"+this.id+"-distance").html(Math.round(100*(dist/1609.344))/100+" mi.");
+        $("#"+this.id+"-duration").html(otp.util.Time.msToHrMin(itin.duration));	
         
         var timeByMode = { };
         for(var i=0; i < itin.legs.length; i++) {
@@ -132,7 +138,7 @@ otp.widgets.TW_TripSummary =
             summaryStr += otp.util.Time.msToHrMin(timeByMode[mode]) + " " + this.getModeName(mode) + " / ";
         }
         summaryStr = summaryStr.slice(0, -3);
-        $("#otp-tsw-timeSummary").html(summaryStr);	
+        $("#"+this.id+"-timeSummary").html(summaryStr);	
     },    
 
     getModeName : function(mode) {
@@ -150,23 +156,24 @@ otp.widgets.TW_TripSummary =
 otp.widgets.TW_BikeTriangle = 
     otp.Class(otp.widgets.TripWidgetPanel, {
     
+    id           :  null,
     bikeTriangle :  null,
        
     initialize : function(tripWidget) {
-        console.log(this);
         otp.widgets.TripWidgetPanel.prototype.initialize.apply(this, arguments);
+        this.id = tripWidget.id+"-bikeTriangle";
         
         var content = '';
         content += '<h6 class="drag-to-change">Drag to Change Trip:</h6>';
-        content += '<div id="otp-tsw-bikeTriangle"></div>';
+        content += '<div id="'+this.id+'" class="otp-bikeTriangle"></div>';
         
         this.setContent(content);
     },
 
     doAfterLayout : function() {
-        this.bikeTriangle = new otp.widgets.BikeTrianglePanel('otp-tsw-bikeTriangle');
+        this.bikeTriangle = new otp.widgets.BikeTrianglePanel(this.id);
         this.bikeTriangle.onChanged = this.tripWidget.planTripCallback;
-        this.tripWidget.$().draggable({ cancel: "#otp-tsw-bikeTriangle" });
+        this.tripWidget.$().draggable({ cancel: "#"+this.id });
     },
 
     restorePlan : function(data) {
@@ -180,29 +187,32 @@ otp.widgets.TW_BikeTriangle =
 
 otp.widgets.TW_BikeType = 
     otp.Class(otp.widgets.TripWidgetPanel, {
+
+    id           :  null,
        
     initialize : function(tripWidget) {
         otp.widgets.TripWidgetPanel.prototype.initialize.apply(this, arguments);
+        this.id = tripWidget.id+"-bikeType";
 
         var content = '';        
         content += 'Use: ';
-        content += '<input id="myOwnBikeRBtn" type="radio" name="bikeType" value="my_bike" checked> My Own Bike&nbsp;&nbsp;';
-        content += '<input id="sharedBikeRBtn" type="radio" name="bikeType" value="shared_bike"> A Shared Bike';
+        content += '<input id="'+this.id+'-myOwnBikeRBtn" type="radio" name="bikeType" value="my_bike" checked> My Own Bike&nbsp;&nbsp;';
+        content += '<input id="'+this.id+'-sharedBikeRBtn" type="radio" name="bikeType" value="shared_bike"> A Shared Bike';
         
         this.setContent(content);
     },
 
     doAfterLayout : function() {
-        document.getElementById('myOwnBikeRBtn').onclick = this.tripWidget.planTripCallback;
-        document.getElementById('sharedBikeRBtn').onclick = this.tripWidget.planTripCallback;
+        $('#'+this.id+'-myOwnBikeRBtn').on("click", this.tripWidget.planTripCallback);
+        $('#'+this.id+'-sharedBikeRBtn').on("click", this.tripWidget.planTripCallback);
     },
     
     restorePlan : function(data) {
         if(data.mode === "BICYCLE") {
-            $('#myOwnBikeRBtn').attr('checked', 'checked');
+            $('#'+this.id+'-myOwnBikeRBtn').attr('checked', 'checked');
         }
         if(data.mode === "WALK,BICYCLE") {
-            $('#sharedBikeRBtn').attr('checked', 'checked');
+            $('#'+this.id+'-sharedBikeRBtn').attr('checked', 'checked');
         }
     }
         
