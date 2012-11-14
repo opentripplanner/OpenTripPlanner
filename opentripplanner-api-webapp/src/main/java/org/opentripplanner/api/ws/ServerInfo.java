@@ -23,6 +23,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import lombok.Getter;
@@ -31,7 +32,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.opentripplanner.common.MavenVersion;
 
 @Path("/serverinfo")
-@XmlRootElement // fields must be public or have a public getter to be auto-serialized to JSON
+@XmlRootElement 
 public class ServerInfo {
     
     private static final ServerInfo SERVER_INFO = new ServerInfo();
@@ -41,12 +42,18 @@ public class ServerInfo {
     public static ServerInfo getServerInfo() throws JSONException {
         return SERVER_INFO;
     }    
+    
+    /* fields must be public or have a public getter to be auto-serialized to JSON;
+    they are annotated with @XmlElement to be serialized to XML */
 
-    @Getter private MavenVersion serverVersion = MavenVersion.VERSION; 
+    @XmlElement @Getter
+    private MavenVersion serverVersion = MavenVersion.VERSION; 
     
-    @Getter private String cpuName = "unknown";
+    @XmlElement @Getter
+    private String cpuName = "unknown";
     
-    @Getter private int nCores = 0;
+    @XmlElement @Getter
+    private int nCores = 0;
 
     /**
      * Determine the OTP version and CPU type of the running server. This information should not
