@@ -56,9 +56,7 @@ public class BatchProcessor {
 
     @Setter private Aggregator aggregator;
     @Setter private Accumulator accumulator;
-    @Setter private int logThrottleSeconds = 4;
-    
-    /** Cut off the search instead of building a full path tree. Can greatly improve run times. */
+    @Setter private int logThrottleSeconds = 4;    
     @Setter private int searchCutoffSeconds = -1;
     
     /**
@@ -74,13 +72,19 @@ public class BatchProcessor {
     @Setter private String time = "08:00 AM";
     @Setter private TimeZone timeZone = TimeZone.getDefault();
     @Setter private String outputPath = "/tmp/analystOutput";
-    @Setter private int checkpointIntervalSeconds = -1;
+    @Setter private float checkpointIntervalMinutes = -1;
     
     enum Mode { BASIC, AGGREGATE, ACCUMULATE };
     private Mode mode;
     private long startTime = -1;
     private long lastLogTime = 0;
+    private long lastCheckpointTime = 0;
     private ResultSet aggregateResultSet = null;
+    
+    /** Cut off the search instead of building a full path tree. Can greatly improve run times. */
+    public void setSearchCutoffMinutes(int minutes) {
+        this.searchCutoffSeconds = minutes * 60;
+    }
     
     public static void main(String[] args) throws IOException {
         org.springframework.core.io.Resource appContextResource;
@@ -143,12 +147,14 @@ public class BatchProcessor {
                 ++nCompleted;
                 LOG.debug("got result {}/{}", nCompleted, nTasks);
                 projectRunTime(nCompleted, nTasks);
+                if (checkpoint()) {
+                    LOG.info("checkpoint written.");
+                }
             }
         } catch (InterruptedException e) {
             LOG.warn("run was interrupted after {} tasks", nCompleted);
         } catch (ExecutionException e) {
-            LOG.error("Exception in thread task: {}", e);
-            System.exit(-1);
+            LOG.error("exception in thread task: {}", e);
         }
         threadPool.shutdown();
         if (accumulator != null)
@@ -161,6 +167,7 @@ public class BatchProcessor {
     private void projectRunTime(int current, int total) {
         long currentTime = System.currentTimeMillis();
         // not threadsafe, but the worst thing that will happen is a double log message 
+        // anyway we are using this in the controller thread now
         if (currentTime > lastLogTime + logThrottleSeconds * 1000) {
             lastLogTime = currentTime;
             double runTimeMin = (currentTime - startTime) / 1000.0 / 60.0;
@@ -168,6 +175,20 @@ public class BatchProcessor {
             LOG.info("received {} results out of {}", current, total);
             LOG.info("running {} min, {} min remaining (projected)", (int)runTimeMin, (int)projectedMin);
         }
+    }
+    
+    private boolean checkpoint() {
+        if (checkpointIntervalMinutes < 0 || aggregateResultSet == null)
+            return false;
+        long currentTime = System.currentTimeMillis();
+        // not threadsafe, but the worst thing that will happen is a double checkpoint
+        // anyway, this is being called in the controller thread now
+        if (currentTime > lastCheckpointTime + checkpointIntervalMinutes * 60 * 1000) {
+            lastCheckpointTime = currentTime;
+            aggregateResultSet.writeAppropriateFormat(outputPath);
+            return true;
+        }
+        return false;
     }
     
     private RoutingRequest buildRequest(Individual i) {
