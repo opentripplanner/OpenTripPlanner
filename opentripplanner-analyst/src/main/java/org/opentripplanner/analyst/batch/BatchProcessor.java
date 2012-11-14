@@ -16,6 +16,7 @@ package org.opentripplanner.analyst.batch;
 import java.io.IOException;
 import java.util.TimeZone;
 import java.util.concurrent.CompletionService;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -73,6 +74,7 @@ public class BatchProcessor {
     @Setter private String time = "08:00 AM";
     @Setter private TimeZone timeZone = TimeZone.getDefault();
     @Setter private String outputPath = "/tmp/analystOutput";
+    @Setter private int checkpointIntervalSeconds = -1;
     
     enum Mode { BASIC, AGGREGATE, ACCUMULATE };
     private Mode mode;
@@ -137,14 +139,17 @@ public class BatchProcessor {
         int nCompleted = 0;
         try { // pull Futures off the queue as tasks are finished
             while (nCompleted < nTasks) {
-                ecs.take(); 
+                ecs.take().get(); // call get to check for exceptions in the completed task
                 ++nCompleted;
                 LOG.debug("got result {}/{}", nCompleted, nTasks);
                 projectRunTime(nCompleted, nTasks);
             }
         } catch (InterruptedException e) {
             LOG.warn("run was interrupted after {} tasks", nCompleted);
-        } 
+        } catch (ExecutionException e) {
+            LOG.error("Exception in thread task: {}", e);
+            System.exit(-1);
+        }
         threadPool.shutdown();
         if (accumulator != null)
             accumulator.finish();
