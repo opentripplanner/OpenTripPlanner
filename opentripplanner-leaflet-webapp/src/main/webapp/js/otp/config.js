@@ -36,7 +36,7 @@ otp.config = {
 
     // loggerUrl : '[link]',
     // dataStorageUrl : '[link]',
-        
+            
     infoWidgets: [
         {
             title: 'About',

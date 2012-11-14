@@ -17,15 +17,17 @@ otp.namespace("otp.widgets");
 otp.widgets.TripWidget = 
     otp.Class(otp.widgets.Widget, {
     
-    planTripCallback : null,
+    //planTripCallback : null,
     panels : null,
+    module : null,
         
-    initialize : function(id, planTripCallback) {
+    initialize : function(id, module) {
     
         otp.widgets.Widget.prototype.initialize.apply(this, arguments);
         this.$().addClass('otp-defaultTripWidget');
         
-        this.planTripCallback = planTripCallback;
+        //this.planTripCallback = planTripCallback;
+        this.module = module;
         
         this.panels = { };       
     },
@@ -168,7 +170,14 @@ otp.widgets.TW_BikeTriangle =
 
     doAfterLayout : function() {
         this.bikeTriangle = new otp.widgets.BikeTrianglePanel(this.id);
-        this.bikeTriangle.onChanged = this.tripWidget.planTripCallback;
+        var this_ = this;
+        this.bikeTriangle.onChanged = function() {
+            var formData = this_.bikeTriangle.getFormData();
+            this_.tripWidget.module.triangleTimeFactor = formData.triangleTimeFactor;
+            this_.tripWidget.module.triangleSlopeFactor = formData.triangleSlopeFactor;
+            this_.tripWidget.module.triangleSafetyFactor = formData.triangleSafetyFactor;
+            this_.tripWidget.module.planTrip();
+        };
         this.tripWidget.$().draggable({ cancel: "#"+this.id });
     },
 
@@ -199,8 +208,15 @@ otp.widgets.TW_BikeType =
     },
 
     doAfterLayout : function() {
-        $('#'+this.id+'-myOwnBikeRBtn').on("click", this.tripWidget.planTripCallback);
-        $('#'+this.id+'-sharedBikeRBtn').on("click", this.tripWidget.planTripCallback);
+        var module = this.tripWidget.module;
+        $('#'+this.id+'-myOwnBikeRBtn').click(function() {
+            module.mode = "BICYCLE";
+            module.planTrip();
+        });
+        $('#'+this.id+'-sharedBikeRBtn').click(function() {
+            module.mode = "WALK,BICYCLE";
+            module.planTrip();
+        });
     },
     
     restorePlan : function(data) {

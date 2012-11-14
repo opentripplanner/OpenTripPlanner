@@ -60,11 +60,16 @@ otp.modules.bikeshare.Utils = {
     }    
 };
 
+/* main class */
+
 otp.modules.bikeshare.BikeShareModule = 
     otp.Class(otp.modules.planner.PlannerModule, {
     
     moduleName  : "Bike Share Planner",
     moduleId    : "bikeshare",
+
+    resultsWidget   : null,
+    
     stations    : null,    
     stationLookup :   { },
     stationsLayer   : null,
@@ -76,6 +81,7 @@ otp.modules.bikeshare.BikeShareModule =
     activate : function() {
         if(this.activated) return;
         otp.modules.planner.PlannerModule.prototype.activate.apply(this);
+        this.mode = "BICYCLE";
         
         this.stationsLayer = new L.LayerGroup();
         this.addLayer("Bike Stations", this.stationsLayer);
@@ -93,14 +99,39 @@ otp.modules.bikeshare.BikeShareModule =
         this.resetStationMarkers();
     },
     
-    processItinerary : function(itin, data) {
+    processPlan : function(tripPlan, queryParams, restoring) {
+        var itin = tripPlan.itineraries[0];
+        var this_ = this;
+        
+	    if(this.resultsWidget == null) {
+
+            this.resultsWidget = new otp.widgets.TripWidget('otp-'+this.moduleId+'-tripWidget', this);
+            /*this.resultsWidget = new otp.widgets.TripWidget('otp-'+this.moduleId+'-tripWidget', function() {
+                this_.trianglePlanTrip();
+            });*/
+            this.widgets.push(this.resultsWidget);
+            
+            this.resultsWidget.addPanel("summary", new otp.widgets.TW_TripSummary(this.resultsWidget));
+            this.resultsWidget.addSeparator();
+            this.resultsWidget.addPanel("triangle", new otp.widgets.TW_BikeTriangle(this.resultsWidget));
+            this.resultsWidget.addSeparator();
+            this.resultsWidget.addPanel("biketype", new otp.widgets.TW_BikeType(this.resultsWidget));
+            
+            if(restoring) { //existingQueryParams !== null) {
+                console.log("restoring");
+                this.resultsWidget.restorePlan(queryParams);
+            }
+            this.resultsWidget.show();
+        }
+                        
+        
         for(var i=0; i < itin.legs.length; i++) {
             //console.log(itin);
             var polyline = new L.Polyline(otp.util.Polyline.decode(itin.legs[i].legGeometry.points));
             polyline.setStyle({ color : this.getModeColor(itin.legs[i].mode), weight: 8});
             this.pathLayer.addLayer(polyline);
             if(itin.legs[i].mode === 'BICYCLE') {
-                if(data.mode === 'WALK,BICYCLE') { // bikeshare trip
+                if(queryParams.mode === 'WALK,BICYCLE') { // bikeshare trip
                 	polyline.bindPopup('Your '+otp.config.bikeshareName+' route!');
                     var start_and_end_stations = this.processStations(polyline.getLatLngs()[0], polyline.getLatLngs()[polyline.getLatLngs().length-1]);
                 }
@@ -109,7 +140,7 @@ otp.modules.bikeshare.BikeShareModule =
                 	this.resetStationMarkers();
                 }	
             }
-            else if(itin.legs[i].mode === 'WALK' && data.mode === 'WALK,BICYCLE') { 
+            else if(itin.legs[i].mode === 'WALK' && queryParams.mode === 'WALK,BICYCLE') { 
                 if(i == 0) {
                 	polyline.bindPopup('Walk to the '+otp.config.bikeshareName+' dock.');
                 }
@@ -119,7 +150,10 @@ otp.modules.bikeshare.BikeShareModule =
             }
         }
 
-        if(start_and_end_stations !== undefined && data.mode === 'WALK,BICYCLE') {
+        this_.resultsWidget.show();
+        this_.resultsWidget.newItinerary(itin);
+                    
+        if(start_and_end_stations !== undefined && queryParams.mode === 'WALK,BICYCLE') {
             if(start_and_end_stations['start'] && start_and_end_stations['end']) {
            	    this.bikestationsWidget.setContentAndShow(
            	        start_and_end_stations['start'], 
@@ -135,7 +169,10 @@ otp.modules.bikeshare.BikeShareModule =
        	}
     },
     
-    
+    noTripFound : function() {
+        this.resultsWidget.hide();
+    },
+        
     processStations : function(start, end) {
         var this_ = this;
         var tol = .0005, distTol = .01;

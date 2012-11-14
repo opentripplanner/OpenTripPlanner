@@ -20,14 +20,10 @@ otp.modules.planner.PlannerModule =
 
     moduleName  : "Trip Planner",
     moduleId    : "planner",
-        
-    startLatLng : null,
-    endLatLng   : null,
     
     markerLayer     : null,
     pathLayer       : null,
     
-    resultsWidget   : null,
     tipWidget       : null,
     noTripWidget    : null,
     tipStep         : 0,
@@ -36,9 +32,13 @@ otp.modules.planner.PlannerModule =
     currentHash : null,
 
 
-    triangleTimeFactor     : 0.333,
-    triangleSlopeFactor    : 0.333,
-    triangleSafetyFactor   : 0.334,
+    // current trip query parameters:
+    startLatLng             : null,
+    endLatLng               : null,
+    mode                    : "TRANSIT,WALK",
+    triangleTimeFactor      : 0.333,
+    triangleSlopeFactor     : 0.333,
+    triangleSafetyFactor    : 0.334,
     
     icons       : null,
                         
@@ -88,13 +88,13 @@ otp.modules.planner.PlannerModule =
         }
     },
     
-    trianglePlanTrip : function() {
+    /*trianglePlanTrip : function() {
         var triParams = this.resultsWidget.panels['triangle'].bikeTriangle.getFormData();
         this.triangleTimeFactor = triParams.triangleTimeFactor;
         this.triangleSlopeFactor = triParams.triangleSlopeFactor;
         this.triangleSafetyFactor = triParams.triangleSafetyFactor;
         this.planTrip();
-    },
+    },*/
     
     setStartPoint : function(latlng, update) {
     
@@ -130,7 +130,7 @@ otp.modules.planner.PlannerModule =
    },
     
     
-    planTrip : function(existingData, skipSave) {
+    planTrip : function(existingQueryParams, skipSave) {
     
         $('#otp-spinner').show();
 
@@ -151,91 +151,63 @@ otp.modules.planner.PlannerModule =
         
         var this_ = this;
         
-        var data_ = null;
+        var queryParams = null;
         
-        if(existingData)
-        	data_ = existingData;
+        if(existingQueryParams)
+        	queryParams = existingQueryParams;
         else
         {
-            var bikeType = $('input:radio[name=bikeType]:checked').val();
-            var mode = 'BICYCLE'; //'WALK,BICYCLE';
-            if(bikeType !== undefined)
-                mode = (bikeType == "shared_bike") ? 'WALK,BICYCLE' : 'BICYCLE';
-       	    data_ = {             
+       	    queryParams = {             
                 fromPlace: this.startLatLng.lat+','+this.startLatLng.lng,
                 toPlace: this.endLatLng.lat+','+this.endLatLng.lng,
-                mode: mode,
+                mode: this.mode,
                 optimize: 'TRIANGLE',
                 triangleTimeFactor: this_.triangleTimeFactor,
                 triangleSlopeFactor: this_.triangleSlopeFactor,
                 triangleSafetyFactor: this_.triangleSafetyFactor
             };
             if(otp.config.routerId !== undefined) {
-                data_.routerId = otp.config.routerId;
+                queryParams.routerId = otp.config.routerId;
             }
         } 	
         
 
         this.currentRequest = $.ajax(url, {
-            data:       data_,
+            data:       queryParams,
             dataType:   'jsonp',
                 
             success: function(data) {
-            
                 $('#otp-spinner').hide();
-            	
-            	if(this_.resultsWidget == null) {
-
-                    this_.resultsWidget = new otp.widgets.TripWidget('otp-'+this_.moduleId+'-tripWidget', function() {
-                        this_.trianglePlanTrip();
-                    });
-                    this_.widgets.push(this_.resultsWidget);
-                    
-                    this_.resultsWidget.addPanel("summary", new otp.widgets.TW_TripSummary(this_.resultsWidget));
-                    this_.resultsWidget.addSeparator();
-                    this_.resultsWidget.addPanel("triangle", new otp.widgets.TW_BikeTriangle(this_.resultsWidget));
-                    this_.resultsWidget.addSeparator();
-                    this_.resultsWidget.addPanel("biketype", new otp.widgets.TW_BikeType(this_.resultsWidget));
-                    
-                    if(existingData !== null) {
-                        this_.resultsWidget.restorePlan(existingData);
-                    }
-                    this_.resultsWidget.show();
-                }
                 
-                //console.log(data);
-                var resultsContent = '';
-
                 if(data.plan) {
                     var itin = data.plan.itineraries[0];
-                    this_.processItinerary(itin, data_);
+                    this_.processPlan(data.plan, queryParams, (existingQueryParams !== undefined));
 
-                    this_.resultsWidget.show();
-
-                    this_.resultsWidget.newItinerary(itin);
                     this_.updateTipStep(3);
                     
                     if(!skipSave)
-                    	this_.savePlan(data_);
+                    	this_.savePlan(queryParams);
                     
                 }
                 else {
-                    this_.resultsWidget.hide();
+                    this_.noTripFound();
                     this_.noTripWidget.setContent(data.error.msg);
                     this_.noTripWidget.show();
                 }
                 
-                this_.webapp.queryLogger.logQuery(data_.fromPlace, data_.toPlace);
+                this_.webapp.queryLogger.logQuery(queryParams.fromPlace, queryParams.toPlace);
             }
         });
-        
-        //console.log("rw "+this.resultsWidget);
+
     },
     
-    processItinerary : function(itin, data) {
+    processPlan : function(tripPlan, queryParams, restoring) {
     },
     
-    savePlan : function(data){
+    noTripFound : function() {
+    },
+    
+    savePlan : function(data) {
     	
     	var data_ = {data: data, startLat: this.startLatLng.lat, startLon: this.startLatLng.lng, endLat: this.endLatLng.lat, endLon: this.endLatLng.lng, parrent : this.currentHash };
     	otp.util.DataStorage.store(data_, this );
@@ -265,9 +237,9 @@ otp.modules.planner.PlannerModule =
     	
     	window.location.hash = this.currentHash;
     	
-        var shareRoute = $("#share-route");
+        /*var shareRoute = $("#share-route");
         shareRoute.find(".addthis_toolbox").attr("addthis:url", otp.config.siteURL+"/#"+this.currentHash);
-        addthis.toolbox(".addthis_toolbox_route");
+        addthis.toolbox(".addthis_toolbox_route");*/
     },
     
     distance : function(x1, y1, x2, y2) {
