@@ -143,18 +143,20 @@ public class BatchProcessor {
         int nCompleted = 0;
         try { // pull Futures off the queue as tasks are finished
             while (nCompleted < nTasks) {
-                ecs.take().get(); // call get to check for exceptions in the completed task
-                ++nCompleted;
-                LOG.debug("got result {}/{}", nCompleted, nTasks);
-                projectRunTime(nCompleted, nTasks);
-                if (checkpoint()) {
-                    LOG.info("checkpoint written.");
+                try {
+                    ecs.take().get(); // call get to check for exceptions in the completed task
+                    LOG.debug("got result {}/{}", nCompleted, nTasks);
+                    if (checkpoint()) {
+                        LOG.info("checkpoint written.");
+                    }
+                } catch (ExecutionException e) {
+                    LOG.error("exception in thread task: {}", e);
                 }
+                ++nCompleted;
+                projectRunTime(nCompleted, nTasks);
             }
         } catch (InterruptedException e) {
             LOG.warn("run was interrupted after {} tasks", nCompleted);
-        } catch (ExecutionException e) {
-            LOG.error("exception in thread task: {}", e);
         }
         threadPool.shutdown();
         if (accumulator != null)
