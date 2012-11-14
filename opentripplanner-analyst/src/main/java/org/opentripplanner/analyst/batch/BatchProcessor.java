@@ -235,12 +235,12 @@ public class BatchProcessor {
                 ResultSet results = ResultSet.forTravelTimes(destinations, spt);
                 req.cleanup();
                 switch (mode) {
-                case AGGREGATE:
+                case ACCUMULATE:
                     synchronized (aggregateResultSet) {
                         accumulator.accumulate(oi.input, results, aggregateResultSet);
                     }
                     break;
-                case ACCUMULATE:
+                case AGGREGATE:
                     aggregateResultSet.results[i] = aggregator.computeAggregate(results);
                     break;
                 default:
