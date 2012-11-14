@@ -75,7 +75,6 @@ otp.widgets.TripWidgetPanel = otp.Class({
     
     setContent : function(content) {
         this.div.innerHTML = content;
-        console.log("twp seting:"+content)
     },
         
     doAfterLayout : function() {
@@ -101,7 +100,6 @@ otp.widgets.TW_TripSummary =
     initialize : function(tripWidget) {
         otp.widgets.TripWidgetPanel.prototype.initialize.apply(this, arguments);
         this.id = tripWidget.id+"-tripSummary";
-        console.log("ts id="+this.id);
         
                 
         var content = '';
@@ -112,8 +110,6 @@ otp.widgets.TW_TripSummary =
     },
 
     newItinerary : function(itin) {
-    	console.log("TS newItin");
-    	
     	var dist = 0;
     	
     	for(var i=0; i < itin.legs.length; i++) {
