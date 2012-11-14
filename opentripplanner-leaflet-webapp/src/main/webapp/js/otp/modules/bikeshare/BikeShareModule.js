@@ -147,28 +147,29 @@ otp.modules.bikeshare.BikeShareModule =
             
             if (station.isWalkableFrom(start, tol)) {
                 // start station
-                this.resetStationMarker(station, "PICK UP BIKE", this.icons.startBike);
+                this.setStationMarker(station, "PICK UP BIKE", this.icons.startBike);
                 start_and_end_stations['start'] = station;
             }
             else if (station.isNearishTo(this.startLatLng, distTol)) {
                 // start-adjacent station
                 var distanceToStart = station.distanceTo(this.startLatLng);
                 var icon = distanceToStart < distTol/2 ? this.icons.getLarge(stationData) : this.icons.getMedium(stationData);
-                this.resetStationMarker(station, "ALTERNATE PICKUP", icon);
+                this.setStationMarker(station, "ALTERNATE PICKUP", icon);
             }
             else if (station.isWalkableFrom(end, tol)) {
                 // end station
-                this.resetStationMarker(station, "DROP OFF BIKE", this.icons.endBike);
+                this.setStationMarker(station, "DROP OFF BIKE", this.icons.endBike);
                 start_and_end_stations['end'] = station;
             }
             else if (station.isNearishTo(this.endLatLng, distTol)) {
                 // end-adjacent station
                 var distanceToEnd = station.distanceTo(this.endLatLng);
                 var icon = distanceToEnd < distTol/2 ? this.icons.getLarge(stationData) : this.icons.getMedium(stationData);
-                this.resetStationMarker(station, "ALTERNATE DROP OFF", icon);
+                this.setStationMarker(station, "ALTERNATE DROP OFF", icon);
             }
             else {
-                this.resetStationMarker(station);
+                icon = icon || this.icons.getSmall(stationData);
+                this.setStationMarker(station, "BIKE STATION", icon);
             }
         }, this);
         
@@ -180,9 +181,8 @@ otp.modules.bikeshare.BikeShareModule =
     },
     
     resetStationMarkers : function() {
-        this.clearStationMarkers();
         this.stations.each(function(station) {
-            this.addStationMarker(station); }, this);
+            this.setStationMarker(station); }, this);
     },
 
     clearStationMarkers : function() {
@@ -206,18 +206,28 @@ otp.modules.bikeshare.BikeShareModule =
     addStationMarker : function(station, title, icon) {
         var stationData = station.toJSON(),
             marker;
-        
         icon = icon || this.icons.getSmall(stationData);
         
         marker = new L.Marker(new L.LatLng(stationData.y, stationData.x), {icon: icon});
-        marker.bindPopup(this.constructStationInfo(title, stationData));
         this.markers[station.id] = marker;
         this.stationsLayer.addLayer(marker);
+        marker.bindPopup(this.constructStationInfo(title, stationData));
     },
     
-    resetStationMarker : function(station, title, icon) {
-        this.removeStationMarker(station);
-        this.addStationMarker(station, title, icon)
+    setStationMarker : function(station, title, icon) {
+        var marker = this.getStationMarker(station);
+        if (!marker)
+            marker = this.addStationMarker(station, title, icon);
+        else {
+            this.updateStationMarker(marker, station, title, icon);
+        }
+    },
+    
+    updateStationMarker : function(marker, station, title, icon) {
+        var stationData = station.toJSON();
+        
+        if (icon) marker.setIcon(icon);
+        marker.bindPopup(this.constructStationInfo(title, stationData));
     },
     
     initStations : function() {
