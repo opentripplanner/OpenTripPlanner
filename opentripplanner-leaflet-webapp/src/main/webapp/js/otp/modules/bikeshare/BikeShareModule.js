@@ -96,6 +96,7 @@ otp.modules.bikeshare.BikeShareModule =
     },
 
     planTripStart : function() {
+        console.log("rsm");
         this.resetStationMarkers();
     },
     
@@ -124,34 +125,18 @@ otp.modules.bikeshare.BikeShareModule =
             this.resultsWidget.show();
         }
                         
+        this.drawItinerary(itin);
         
-        for(var i=0; i < itin.legs.length; i++) {
-            //console.log(itin);
-            var polyline = new L.Polyline(otp.util.Polyline.decode(itin.legs[i].legGeometry.points));
-            polyline.setStyle({ color : this.getModeColor(itin.legs[i].mode), weight: 8});
-            this.pathLayer.addLayer(polyline);
-            if(itin.legs[i].mode === 'BICYCLE') {
-                if(queryParams.mode === 'WALK,BICYCLE') { // bikeshare trip
-                	polyline.bindPopup('Your '+otp.config.bikeshareName+' route!');
-                    var start_and_end_stations = this.processStations(polyline.getLatLngs()[0], polyline.getLatLngs()[polyline.getLatLngs().length-1]);
-                }
-                else { // "my own bike" trip
-                	polyline.bindPopup('Your bike route');
-                	this.resetStationMarkers();
-                }	
-            }
-            else if(itin.legs[i].mode === 'WALK' && queryParams.mode === 'WALK,BICYCLE') { 
-                if(i == 0) {
-                	polyline.bindPopup('Walk to the '+otp.config.bikeshareName+' dock.');
-                }
-                if(i == 2) {
-                	polyline.bindPopup('Walk from the '+otp.config.bikeshareName+' dock to your destination.');
-                }
-            }
+        if(queryParams.mode === 'WALK,BICYCLE') { // bikeshare trip
+            var polyline = new L.Polyline(otp.util.Polyline.decode(itin.legs[1].legGeometry.points));
+            var start_and_end_stations = this.processStations(polyline.getLatLngs()[0], polyline.getLatLngs()[polyline.getLatLngs().length-1]);
         }
+        else { // "my own bike" trip
+           	this.resetStationMarkers();
+        }	
 
-        this_.resultsWidget.show();
-        this_.resultsWidget.newItinerary(itin);
+        this.resultsWidget.show();
+        this.resultsWidget.newItinerary(itin);
                     
         if(start_and_end_stations !== undefined && queryParams.mode === 'WALK,BICYCLE') {
             if(start_and_end_stations['start'] && start_and_end_stations['end']) {

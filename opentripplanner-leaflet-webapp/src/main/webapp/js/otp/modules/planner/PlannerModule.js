@@ -40,6 +40,9 @@ otp.modules.planner.PlannerModule =
     triangleSlopeFactor     : 0.333,
     triangleSafetyFactor    : 0.334,
     
+    // copy of query param set from last /plan request
+    lastQueryParams : null,
+    
     icons       : null,
                         
     initialize : function(webapp) {
@@ -160,7 +163,7 @@ otp.modules.planner.PlannerModule =
             }
         } 	
         
-
+        this.lastQueryParams = queryParams;
         this.currentRequest = $.ajax(url, {
             data:       queryParams,
             dataType:   'jsonp',
@@ -196,6 +199,49 @@ otp.modules.planner.PlannerModule =
     noTripFound : function() {
     },
     
+    drawItinerary : function(itin) {
+        var queryParams = this.lastQueryParams;
+        this.pathLayer.clearLayers(); 
+
+        for(var i=0; i < itin.legs.length; i++) {
+            var polyline = new L.Polyline(otp.util.Polyline.decode(itin.legs[i].legGeometry.points));
+            polyline.setStyle({ color : this.getModeColor(itin.legs[i].mode), weight: 8});
+            this.pathLayer.addLayer(polyline);
+            if(itin.legs[i].mode === 'BICYCLE') {
+                if(queryParams.mode === 'WALK,BICYCLE') { // bikeshare trip
+                	polyline.bindPopup('Your '+otp.config.bikeshareName+' route');
+                    //var start_and_end_stations = this.processStations(polyline.getLatLngs()[0], polyline.getLatLngs()[polyline.getLatLngs().length-1]);
+                }
+                else { // regular bike trip
+                	polyline.bindPopup('Your bike route');
+                	//this.resetStationMarkers();
+                }	
+            }
+            else if(itin.legs[i].mode === 'WALK') {
+                if(queryParams.mode === 'WALK,BICYCLE') { 
+                    if(i == 0) {
+                    	polyline.bindPopup('Walk to the '+otp.config.bikeshareName+' dock.');
+                    }
+                    if(i == 2) {
+                    	polyline.bindPopup('Walk from the '+otp.config.bikeshareName+' dock to your destination.');
+                    }
+                }
+                else { // regular walking trip
+                	polyline.bindPopup('Your walk route');
+                	//this.resetStationMarkers();
+                }
+            }
+        }
+    },
+
+    getModeColor : function(mode) {
+        if(mode === "WALK") return '#444';
+        if(mode === "BICYCLE") return '#0073e5';
+        if(mode === "SUBWAY") return '#f00';
+        if(mode === "BUS") return '#080';
+        return '#aaa';
+    },
+        
     savePlan : function(data) {
     	
     	var data_ = {data: data, startLat: this.startLatLng.lat, startLon: this.startLatLng.lng, endLat: this.endLatLng.lat, endLon: this.endLatLng.lng, parrent : this.currentHash };
@@ -215,11 +261,6 @@ otp.modules.planner.PlannerModule =
     	this.planTrip(data.data, true);
     },
         
-    getModeColor : function(mode) {
-        if(mode === "WALK") return '#444';
-        if(mode === "BICYCLE") return '#0073e5';
-        return '#aaa';
-    },
     
     newTrip : function(hash) {
     	this.currentHash = hash;	

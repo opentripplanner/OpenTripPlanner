@@ -17,12 +17,15 @@ otp.namespace("otp.widgets");
 otp.widgets.ItinerariesWidget = 
     otp.Class(otp.widgets.Widget, {
 
+    module : null,
+    
     header : null,
     itinsAccord : null,
     
-    initialize : function(id) {
+    initialize : function(id, module) {
     
         otp.widgets.Widget.prototype.initialize.apply(this, arguments);
+        this.module = module;
         this.$().addClass('otp-itinWidget');
         this.$().resizable();
         this.header = $("<div>X Itineraries Returned:</div>").appendTo(this.$());
@@ -55,14 +58,23 @@ otp.widgets.ItinerariesWidget =
         
         this.itinsAccord = $(html).appendTo(this.$());
         this.itinsAccord.accordion({
-            heightStyle: "fill"
+            heightStyle: "fill",
+            activate: function(event, ui) {
+                var arr = ui.newHeader.attr('id').split('-');
+                var index = parseInt(arr[arr.length-1]);
+                this_.module.drawItinerary(itins[index]);
+            }
         });
         
         this.$().resize(function(){
             this_.itinsAccord.accordion("resize");
         });
 
-        this.$().draggable({ cancel: "#"+divId });        
+        this.$().draggable({ cancel: "#"+divId });
+        
+        /*this.itinsAccord.on('activate', function(event, ui) {
+            console.log("act");
+        });*/
     }
     
 });

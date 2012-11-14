@@ -29,11 +29,13 @@ otp.modules.multimodal.MultimodalPlannerModule =
     
     processPlan : function(tripPlan, queryParams, restoring) {
         if(this.itinWidget == null) {
-            this.itinWidget = new otp.widgets.ItinerariesWidget(this.moduleId+"itinWidget");
+            this.itinWidget = new otp.widgets.ItinerariesWidget(this.moduleId+"itinWidget", this);
             this.widgets.push(this.itinWidget);
         }
         this.itinWidget.updateItineraries(tripPlan.itineraries);
         this.itinWidget.show();
+        
+        this.drawItinerary(tripPlan.itineraries[0], queryParams);
     },
         
     CLASS_NAME : "otp.modules.multimodal.MultimodalPlannerModule"
