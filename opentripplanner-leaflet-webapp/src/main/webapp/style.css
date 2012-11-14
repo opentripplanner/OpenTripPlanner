@@ -594,7 +594,25 @@ h6.drag-to-change {
     margin: 0 0 1em;
   }
 }
-  
+ 
+/* Itineraries Widget */
+
+.otp-itinWidget {
+  top: 60px;
+  left: 50px;
+  width: 300px;
+  height: 250px;
+}
+
+
+.otp-itinsAccord {
+  font-size: 12px;
+}
+
+.otp-itinsAccord h3 {
+  font-size: 12px;
+}
+
 
 /*ul.otp-stats {
   list-style: none;

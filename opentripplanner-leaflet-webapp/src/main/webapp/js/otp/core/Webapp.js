@@ -109,8 +109,8 @@ otp.core.Webapp = otp.Class({
         // set up some modules (TODO: generalize using config file)
         
         this.addModule(new otp.modules.annotations.AnnotationsModule(this), false);
-        this.addModule(new otp.modules.bikeshare.BikeShareModule(this), true);
-        this.addModule(new otp.modules.calltaker.CallTakerModule(this), false);
+        this.addModule(new otp.modules.bikeshare.BikeShareModule(this), false);
+        this.addModule(new otp.modules.calltaker.CallTakerModule(this), true);
 
 
         // create the module selector

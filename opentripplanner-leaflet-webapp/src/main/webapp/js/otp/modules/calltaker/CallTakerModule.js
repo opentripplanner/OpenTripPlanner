@@ -16,13 +16,13 @@ otp.namespace("otp.modules.calltaker");
 
 
 otp.modules.calltaker.CallTakerModule = 
-    otp.Class(otp.modules.planner.PlannerModule, {
+    otp.Class(otp.modules.multimodal.MultimodalPlannerModule, {
 
     moduleName  : "Call Taker Interface",
     moduleId    : "calltaker",
     
     initialize : function(webapp) {
-        otp.modules.planner.PlannerModule.prototype.initialize.apply(this, arguments);
+        otp.modules.multimodal.MultimodalPlannerModule.prototype.initialize.apply(this, arguments);
     },
         
     CLASS_NAME : "otp.modules.calltaker.CallTakerModule"

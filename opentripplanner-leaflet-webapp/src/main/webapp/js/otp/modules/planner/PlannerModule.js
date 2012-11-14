@@ -75,8 +75,6 @@ otp.modules.planner.PlannerModule =
     
 
     handleClick : function(event) {
-        //console.log('bikeshare click at '+event.latlng.lat+", "+event.latlng.lng);
-        
         if(this.startLatLng == null) {
         	this.startLatLng = new L.LatLng(event.latlng.lat, event.latlng.lng);
         	this.setStartPoint(this.startLatLng, true);
@@ -87,14 +85,6 @@ otp.modules.planner.PlannerModule =
         	this.setEndPoint(this.endLatLng, true);
         }
     },
-    
-    /*trianglePlanTrip : function() {
-        var triParams = this.resultsWidget.panels['triangle'].bikeTriangle.getFormData();
-        this.triangleTimeFactor = triParams.triangleTimeFactor;
-        this.triangleSlopeFactor = triParams.triangleSlopeFactor;
-        this.triangleSafetyFactor = triParams.triangleSafetyFactor;
-        this.planTrip();
-    },*/
     
     setStartPoint : function(latlng, update) {
     
@@ -147,7 +137,6 @@ otp.modules.planner.PlannerModule =
     	
         var url = otp.config.hostname + '/opentripplanner-api-webapp/ws/plan';
         this.pathLayer.clearLayers();        
-        //this.stationsLayer.clearLayers(); 
         
         var this_ = this;
         
@@ -195,7 +184,7 @@ otp.modules.planner.PlannerModule =
                     this_.noTripWidget.show();
                 }
                 
-                this_.webapp.queryLogger.logQuery(queryParams.fromPlace, queryParams.toPlace);
+                //this_.webapp.queryLogger.logQuery(queryParams.fromPlace, queryParams.toPlace);
             }
         });
 

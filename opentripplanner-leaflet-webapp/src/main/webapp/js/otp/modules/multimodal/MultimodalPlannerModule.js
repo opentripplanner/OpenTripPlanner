@@ -21,8 +21,19 @@ otp.modules.multimodal.MultimodalPlannerModule =
     moduleName  : "Multimodal Trip Planner",
     moduleId    : "multimodal",
     
+    itinWidget  : null,
+    
     initialize : function(webapp) {
         otp.modules.planner.PlannerModule.prototype.initialize.apply(this, arguments);
+    },
+    
+    processPlan : function(tripPlan, queryParams, restoring) {
+        if(this.itinWidget == null) {
+            this.itinWidget = new otp.widgets.ItinerariesWidget(this.moduleId+"itinWidget");
+            this.widgets.push(this.itinWidget);
+        }
+        this.itinWidget.updateItineraries(tripPlan.itineraries);
+        this.itinWidget.show();
     },
         
     CLASS_NAME : "otp.modules.multimodal.MultimodalPlannerModule"
