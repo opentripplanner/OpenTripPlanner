@@ -27,15 +27,20 @@ otp.core.QueryLogger = otp.Class({
         this.serverURL = "http://localhost:9000";
     },
     
-    logQuery : function(queryParams, userName) {
+    logQuery : function(queryParams, userName, fromPlaceName, toPlaceName) {
         if(this.serverURL == null) return;
         var this_ = this;
+        
+        // use truncated lat/lng if geocoded names not provided
+        fromPlaceName = fromPlaceName || this.truncatedLatLng(queryParams.fromPlace);
+        toPlaceName = toPlaceName || this.truncatedLatLng(queryParams.toPlace);
         
         this.currentRequest = $.ajax(this.serverURL+"/newQuery", {
             type: 'POST',
             data: {
-                fromPlace : queryParams.fromPlace,
-                toPlace : queryParams.toPlace,
+                queryParams : JSON.stringify(queryParams),
+                fromPlace : fromPlaceName,
+                toPlace : toPlaceName,
                 userName : userName 
             },
                 
@@ -48,6 +53,11 @@ otp.core.QueryLogger = otp.Class({
                 console.log("error logging query (post): from "+fromPlace+" to "+toPlace+" by "+this_.userName);
             }
         });
+    },
+    
+    truncatedLatLng : function(latLngStr) {
+        var ll = otp.util.Geo.stringToLatLng(latLngStr);
+        return Math.round(ll.lat*100000)/100000+","+Math.round(ll.lng*100000)/100000;
     },
 
     CLASS_NAME : "otp.core.QueryLogger"

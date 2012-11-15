@@ -120,8 +120,19 @@ otp.modules.planner.PlannerModule =
          
          if(update)
         	 this.planTrip();
-   },
+    },
     
+    restoreTrip : function(queryParams) {
+    
+        this.markerLayer.clearLayers(); 
+      	this.startLatLng = otp.util.Geo.stringToLatLng(queryParams.fromPlace);
+    	this.setStartPoint(this.startLatLng, false);
+    	
+      	this.endLatLng = otp.util.Geo.stringToLatLng(queryParams.toPlace);
+    	this.setEndPoint(this.endLatLng, false);
+
+        this.planTrip(queryParams);
+    },
     
     planTrip : function(existingQueryParams, skipSave) {
     
@@ -146,7 +157,7 @@ otp.modules.planner.PlannerModule =
         var queryParams = null;
         
         if(existingQueryParams)
-        	queryParams = existingQueryParams;
+        	queryParams = existingQueryParams; 	        	
         else
         {
        	    queryParams = {             
@@ -246,6 +257,7 @@ otp.modules.planner.PlannerModule =
     	otp.util.DataStorage.store(data_, this );
     },
     
+    // legacy -- deprecated by restoreTrip (above)
     restorePlan : function(data){
     	
     	this.startLatLng = new L.LatLng(data.startLat, data.startLon);

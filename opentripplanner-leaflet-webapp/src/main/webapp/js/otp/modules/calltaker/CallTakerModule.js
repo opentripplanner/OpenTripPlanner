@@ -28,28 +28,9 @@ otp.modules.calltaker.PastQueryCollection =
         options.data = options.data || {};
         return Backbone.sync(method, model, options);
     },
+    
 });    
 
-
-/*otp.modules.calltaker.PastQueryWidget = 
-    otp.Class(otp.widgets.Widget, {
-
-    //module : null,
-    
-    header : null,
-    queryList : null,
-    
-    initialize : function(id) {//, module) {
-    
-        otp.widgets.Widget.prototype.initialize.apply(this, arguments);
-        //this.module = module;
-        this.$().addClass('otp-pastQueryWidget');
-        this.$().resizable();
-        this.header = $("<div>Past Queries:</div>").appendTo(this.$());
-        this.queryList = $("<div class='otp-pastQueryList'>Past Queries:</div>").appendTo(this.$());
-    },
-});*/    
-        
 
 otp.modules.calltaker.CallTakerModule = 
     otp.Class(otp.modules.multimodal.MultimodalPlannerModule, {
@@ -66,20 +47,23 @@ otp.modules.calltaker.CallTakerModule =
         this.queryLogger = new otp.core.QueryLogger(this);        
         this.userName = "demory";
         
+        // set up history widget        
+        this.pastQueriesWidget = new otp.widgets.PastQueriesWidget(this.moduleId+"pastQueriesWidget", this);
+        this.widgets.push(this.pastQueriesWidget);
+        this.pastQueriesWidget.show();
+                
         this.pastQueries = new otp.modules.calltaker.PastQueryCollection();
         this.pastQueries.on('reset', this.onResetQueries, this);
         this.fetchQueries();
     },
     
     onResetQueries : function(queries) {
-        console.log("reset, size="+queries.length);
-        queries.each(function(query) {
-        }, this);
+        this.pastQueriesWidget.updateQueries(queries);
     },
     
     processPlan : function(tripPlan, queryParams, restoring) {
         otp.modules.multimodal.MultimodalPlannerModule.prototype.processPlan.apply(this, arguments);
-        this.queryLogger.logQuery(queryParams, this.userName);    
+        if(!restoring) this.queryLogger.logQuery(queryParams, this.userName);    
     },
 
     queryLogged : function() {
@@ -87,7 +71,7 @@ otp.modules.calltaker.CallTakerModule =
     },
     
     fetchQueries : function() {
-        this.pastQueries.fetch({ data: { userName: this.userName }});
+        this.pastQueries.fetch({ data: { userName: this.userName, limit: 10 }});
     },  
         
     CLASS_NAME : "otp.modules.calltaker.CallTakerModule"

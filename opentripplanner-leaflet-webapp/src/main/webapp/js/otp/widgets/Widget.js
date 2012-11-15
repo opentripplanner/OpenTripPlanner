@@ -33,7 +33,7 @@ otp.widgets.Widget = otp.Class({
             containment: "#map",
             start: function(event, ui) {
                 console.log("dragging: "+$(this_.div).css('bottom'));
-                $(this_.div).css({'bottom' : 'auto'});
+                $(this_.div).css({'bottom' : 'auto', 'right' : 'auto'});
             }
         });
         //$(this.div).resizable();

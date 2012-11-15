@@ -613,6 +613,48 @@ h6.drag-to-change {
   font-size: 12px;
 }
 
+/* Past Queries Widget */
+
+.otp-pastQueriesWidget {
+  top: 60px;
+  right: 20px;
+}
+
+.otp-pastQueriesHeader {
+  height: 24px;
+  font-size: 16px;
+  font-weight: bold;
+  overflow: hidden;
+}
+
+.otp-pastQueriesList {
+  width: 300px;
+  height: 200px;
+  padding: 4px;
+  background: white;
+  border: 1px solid black;
+  overflow: auto;
+}
+
+.otp-pastQueryRow {
+  border-bottom: 2px solid #ccc;
+  padding-bottom: 3px;
+  margin-bottom: 3px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.otp-pastQueryRowTime {
+  color: red;
+  font-weight: bold;
+  float: left;
+  text-align: right;
+  width: 70px;
+}
+
+.otp-pastQueryRowDesc {
+  margin-left: 80px;
+}
 
 /*ul.otp-stats {
   list-style: none;
