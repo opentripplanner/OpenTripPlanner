@@ -37,6 +37,6 @@ otp.modules.multimodal.MultimodalPlannerModule =
         
         this.drawItinerary(tripPlan.itineraries[0], queryParams);
     },
-        
+    
     CLASS_NAME : "otp.modules.multimodal.MultimodalPlannerModule"
 });

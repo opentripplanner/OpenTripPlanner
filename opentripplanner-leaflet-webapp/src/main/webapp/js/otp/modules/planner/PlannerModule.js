@@ -186,8 +186,6 @@ otp.modules.planner.PlannerModule =
                     this_.noTripWidget.setContent(data.error.msg);
                     this_.noTripWidget.show();
                 }
-                
-                //this_.webapp.queryLogger.logQuery(queryParams.fromPlace, queryParams.toPlace);
             }
         });
 

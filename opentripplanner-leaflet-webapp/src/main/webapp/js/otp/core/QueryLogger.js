@@ -16,29 +16,33 @@ otp.namespace("otp.core");
 
 otp.core.QueryLogger = otp.Class({
     
-    userName   : null,
-    server     : null,
+    serverURL  : null,
     
-    initialize : function() {
-        this.userName = "demory";
+    module     : null,
+    
+    queryLoggedCallback : null,
+    
+    initialize : function(module) {
+        this.module = module;
         this.serverURL = "http://localhost:9000";
     },
     
-    logQuery : function(fromPlace, toPlace) {
+    logQuery : function(queryParams, userName) {
         if(this.serverURL == null) return;
         var this_ = this;
         
         this.currentRequest = $.ajax(this.serverURL+"/newQuery", {
             type: 'POST',
             data: {
-                fromPlace : fromPlace,
-                toPlace : toPlace,
-                userName : this_.userName 
+                fromPlace : queryParams.fromPlace,
+                toPlace : queryParams.toPlace,
+                userName : userName 
             },
                 
-            /*success: function(data) {
-                console.log("logged query (post): from "+fromPlace+" to "+toPlace+" by "+this_.userName);
-            },*/
+            success: function(data) {
+                //console.log("logged query (post): from "+fromPlace+" to "+toPlace+" by "+this_.userName);
+                this_.module.queryLogged();
+            },
             
             error: function(data) {
                 console.log("error logging query (post): from "+fromPlace+" to "+toPlace+" by "+this_.userName);
