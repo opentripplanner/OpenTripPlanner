@@ -20,9 +20,9 @@ otp.modules.calltaker.PastQueryModel =
 otp.modules.calltaker.PastQueryCollection = 
     Backbone.Collection.extend({
     
-    url: 'http://localhost:9000/getQueries',
+    url: otp.config.loggerURL+'/getQueries',
     model: otp.modules.calltaker.PastQueryModel,
-    
+   
     sync: function(method, model, options) {
         //options.dataType = 'jsonp';
         options.data = options.data || {};

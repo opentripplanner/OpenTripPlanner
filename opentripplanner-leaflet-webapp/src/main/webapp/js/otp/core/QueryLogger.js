@@ -24,7 +24,7 @@ otp.core.QueryLogger = otp.Class({
     
     initialize : function(module) {
         this.module = module;
-        this.serverURL = "http://localhost:9000";
+        this.serverURL = otp.config.loggerURL;
     },
     
     logQuery : function(queryParams, userName, fromPlaceName, toPlaceName) {
