@@ -23,6 +23,7 @@ otp.modules.planner.PlannerModule =
     
     markerLayer     : null,
     pathLayer       : null,
+    highlightLayer  : null,
     
     tipWidget       : null,
     noTripWidget    : null,
@@ -55,7 +56,9 @@ otp.modules.planner.PlannerModule =
         
         this.markerLayer = new L.LayerGroup();
         this.pathLayer = new L.LayerGroup();
+        this.highlightLayer = new L.LayerGroup();
     
+        this.addLayer("Highlights", this.highlightLayer);
         this.addLayer("Paths", this.pathLayer);
         this.addLayer("Path Markers", this.markerLayer);
         
@@ -241,6 +244,16 @@ otp.modules.planner.PlannerModule =
                 }
             }
         }
+    },
+    
+    highlightLeg : function(leg) {
+        var polyline = new L.Polyline(otp.util.Polyline.decode(leg.legGeometry.points));
+        polyline.setStyle({ color : "yellow", weight: 16, opacity: 0.3 });
+        this.highlightLayer.addLayer(polyline);
+    },
+    
+    clearHighlights : function() {
+        this.highlightLayer.clearLayers(); 
     },
 
     getModeColor : function(mode) {

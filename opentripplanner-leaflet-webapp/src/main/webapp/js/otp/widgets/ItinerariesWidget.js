@@ -67,29 +67,23 @@ otp.widgets.ItinerariesWidget =
     },
     
     renderItinerary : function(itin, i) {
-        /*var html = "<div>";
-        for(var l=0; l<itin.legs.length; l++) {
-            var leg = itin.legs[l];
-            html += (l+1)+". <b>"+leg.mode+"</b>";
-            if(leg.agencyId !== null) html += ": "+leg.agencyId+", ("+leg.route+") "+leg.routeLongName;
-            html += "<br>";
-        }
-        html += "</div>";*/
+        var this_ = this;
         
         var divId = this.moduleId+"-itinAccord-"+i;
         var html = "<div id='"+divId+"' class='otp-itinAccord'></div>";
         var itinAccord = $(html);
-        console.log(itin);
 
         for(var l=0; l<itin.legs.length; l++) {
             var leg = itin.legs[l];
             var headerHtml = "<b>"+leg.mode+"</b>";
             if(leg.mode === "WALK" || leg.mode === "BICYCLE") headerHtml += " to "+leg.to.name;
             else if(leg.agencyId !== null) headerHtml += ": "+leg.agencyId+", ("+leg.route+") "+leg.routeLongName;
-            $("<h3>"+headerHtml+"</h3>").appendTo(itinAccord).click(function(evt) {
-                /*var arr = evt.target.id.split('-');
+            $("<h3>"+headerHtml+"</h3>").appendTo(itinAccord).hover(function(evt) {
+                var arr = evt.target.id.split('-');
                 var index = parseInt(arr[arr.length-1]);
-                this_.module.drawItinerary(itins[index]);*/
+                this_.module.highlightLeg(itin.legs[index]);
+            }, function(evt) {
+                this_.module.clearHighlights();
             });
             $("<div>Leg details go here</div>").appendTo(itinAccord);
         }
@@ -98,7 +92,7 @@ otp.widgets.ItinerariesWidget =
             heightStyle: "content",
             collapsible: true
         });
-        return itinAccord; //$(html) 
+        return itinAccord;
     }
     
 });
