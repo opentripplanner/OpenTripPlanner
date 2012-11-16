@@ -312,7 +312,8 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             
             final double realTurnCost;
             
-            /*
+            /* Compute turn cost.
+             * 
              * This is a subtle piece of code. Turn costs are evaluated differently during
              * forward and reverse traversal. During forward traversal of an edge, the turn
              * *into* that edge is used, while during reverse traversal, the turn *out of*
@@ -323,24 +324,18 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
              * that during reverse traversal, we must also use the speed for the mode of
              * the backEdge, rather than of the current edge.
              */
-            if (fromv instanceof IntersectionVertex) {
-                if (options.arriveBy) {
-                    if (!canTurnOnto(backPSE, s0, traverseMode))
-                        return null;
-    
-                    realTurnCost = ((IntersectionVertex) tov).computeTraversalCost(
-                            this, backPSE, traverseMode, options, (float) speed, backSpeed);
-                } else {
-                    if (!backPSE.canTurnOnto(this, s0, traverseMode))
-                        return null;
-                    realTurnCost = ((IntersectionVertex) fromv).computeTraversalCost(
-                            backPSE, this, traverseMode, options, backSpeed, (float) speed);
-                }
-            }
-            else {
-                LOG.warn("PlainStreetEdge originating from non-IntersectionVertex: {}, " +
-                		"setting turn cost to 0", fromv);
-                realTurnCost = 0;
+            if (options.arriveBy && tov instanceof IntersectionVertex) { // arrive-by search
+                if (!canTurnOnto(backPSE, s0, traverseMode))
+                    return null;
+                realTurnCost = ((IntersectionVertex) tov).computeTraversalCost(
+                        this, backPSE, traverseMode, options, (float) speed, backSpeed);
+            } else if (fromv instanceof IntersectionVertex) { // depart-after search
+                if (!backPSE.canTurnOnto(this, s0, traverseMode))
+                    return null;
+                realTurnCost = ((IntersectionVertex) fromv).computeTraversalCost(
+                        backPSE, this, traverseMode, options, backSpeed, (float) speed);
+            } else { // in case this is a temporary edge not connected to an IntersectionVertex
+                realTurnCost = 0; 
             }
                        
             if (traverseMode != TraverseMode.CAR) 
