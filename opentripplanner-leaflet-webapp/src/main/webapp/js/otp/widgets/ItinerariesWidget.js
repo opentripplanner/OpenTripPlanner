@@ -40,30 +40,22 @@ otp.widgets.ItinerariesWidget =
             this.itinsAccord.remove();
         }
         var divId = this.moduleId+"-itinsAccord";
-        var html = "<div id='"+divId+"' class='otp-itinsAccord'>";
+        var html = "<div id='"+divId+"' class='otp-itinsAccord'></div>";
+        this.itinsAccord = $(html).appendTo(this.$());
+
         for(var i=0; i<itins.length; i++) {
             var itin = itins[i];
             var timeStr = otp.util.Time.msToHrMin(itin.endTime-itin.startTime);            
-            html += "<h3><b>Itinerary "+(i+1)+"</b>: "+timeStr+"</h3>";
-            html += "<div>";
-            for(var l=0; l<itin.legs.length; l++) {
-                var leg = itin.legs[l];
-                html += (l+1)+". <b>"+leg.mode+"</b>";
-                if(leg.agencyId !== null) html += ": "+leg.agencyId+", ("+leg.route+") "+leg.routeLongName;
-                html += "<br>";
-            }
-            html += "</div>";                        
-        }
-        html += "</div>";
-        
-        this.itinsAccord = $(html).appendTo(this.$());
-        this.itinsAccord.accordion({
-            heightStyle: "fill",
-            activate: function(event, ui) {
-                var arr = ui.newHeader.attr('id').split('-');
+            $("<h3><b>Itinerary "+(i+1)+"</b>: "+timeStr+"</h3>").appendTo(this.itinsAccord).click(function(evt) {
+                var arr = evt.target.id.split('-');
                 var index = parseInt(arr[arr.length-1]);
                 this_.module.drawItinerary(itins[index]);
-            }
+            });
+            this.renderItinerary(itin, i).appendTo(this.itinsAccord);
+        }
+        
+        this.itinsAccord.accordion({
+            heightStyle: "fill"
         });
         
         this.$().resize(function(){
@@ -72,9 +64,41 @@ otp.widgets.ItinerariesWidget =
 
         this.$().draggable({ cancel: "#"+divId });
         
-        /*this.itinsAccord.on('activate', function(event, ui) {
-            console.log("act");
-        });*/
+    },
+    
+    renderItinerary : function(itin, i) {
+        /*var html = "<div>";
+        for(var l=0; l<itin.legs.length; l++) {
+            var leg = itin.legs[l];
+            html += (l+1)+". <b>"+leg.mode+"</b>";
+            if(leg.agencyId !== null) html += ": "+leg.agencyId+", ("+leg.route+") "+leg.routeLongName;
+            html += "<br>";
+        }
+        html += "</div>";*/
+        
+        var divId = this.moduleId+"-itinAccord-"+i;
+        var html = "<div id='"+divId+"' class='otp-itinAccord'></div>";
+        var itinAccord = $(html);
+        console.log(itin);
+
+        for(var l=0; l<itin.legs.length; l++) {
+            var leg = itin.legs[l];
+            var headerHtml = "<b>"+leg.mode+"</b>";
+            if(leg.mode === "WALK" || leg.mode === "BICYCLE") headerHtml += " to "+leg.to.name;
+            else if(leg.agencyId !== null) headerHtml += ": "+leg.agencyId+", ("+leg.route+") "+leg.routeLongName;
+            $("<h3>"+headerHtml+"</h3>").appendTo(itinAccord).click(function(evt) {
+                /*var arr = evt.target.id.split('-');
+                var index = parseInt(arr[arr.length-1]);
+                this_.module.drawItinerary(itins[index]);*/
+            });
+            $("<div>Leg details go here</div>").appendTo(itinAccord);
+        }
+        itinAccord.accordion({
+            active: false,
+            heightStyle: "content",
+            collapsible: true
+        });
+        return itinAccord; //$(html) 
     }
     
 });
