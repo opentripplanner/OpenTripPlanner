@@ -47,6 +47,14 @@ otp.modules.calltaker.CallTakerModule =
         this.queryLogger = new otp.core.QueryLogger(this);        
         this.userName = "demory";
         
+    },
+    
+    activate : function() {
+    
+        otp.modules.multimodal.MultimodalPlannerModule.prototype.activate.apply(this);
+        
+        this.tipWidget.$().css('display','none');
+
         // set up history widget        
         this.pastQueriesWidget = new otp.widgets.PastQueriesWidget(this.moduleId+"pastQueriesWidget", this);
         this.widgets.push(this.pastQueriesWidget);
