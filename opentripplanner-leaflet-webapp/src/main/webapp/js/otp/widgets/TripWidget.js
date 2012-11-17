@@ -160,18 +160,19 @@ otp.widgets.TW_ModeSelector =
     otp.Class(otp.widgets.TripWidgetPanel, {
     
     id           :  null,
+
+    modes        : { "TRANSIT,WALK" : "Walk to Transit", 
+                     "TRANSIT,BICYCLE" : "Bike to Transit", 
+                     "WALK" : 'Walk Only',
+                     "BICYCLE" : 'Bike Only' },
        
     initialize : function(tripWidget) {
         otp.widgets.TripWidgetPanel.prototype.initialize.apply(this, arguments);
         this.id = tripWidget.id+"-modeSelector";
-        var modes = { "TRANSIT,WALK" : "Walk to Transit", 
-                      "TRANSIT,BICYCLE" : "Bike to Transit", 
-                      "WALK" : 'Walk Only',
-                      "BICYCLE" : 'Bike Only' }
         
         var html = "<div class='notDraggable'>Travel by: ";
         html += '<select id="'+this.id+'">';
-        _.each(modes, function(text, key) {
+        _.each(this.modes, function(text, key) {
             html += '<option>'+text+'</option>';            
         });
         html += '</select>';
@@ -182,6 +183,10 @@ otp.widgets.TW_ModeSelector =
     },
 
     doAfterLayout : function() {
+        var this_ = this;
+        $("#"+this.id).change(function() {
+            this_.tripWidget.module.mode = _.keys(this_.modes)[this.selectedIndex];
+        });
     },
 
     restorePlan : function(data) {
@@ -206,18 +211,8 @@ otp.widgets.TW_TimeSelector =
         html += '<option>Arrive</option>';
         html += '</select>';
         
-        /*for(i in this.modules) {
-            var module = this.modules[i];
-            console.log(module);
-            var option = $('<option'+(module == this_.activeModule ? ' selected' : '')+'>'+module.moduleName+'</option>').appendTo(selector);
-        }        
-        selector.change(function() {
-            this_.setActiveModule(this_.modules[this.selectedIndex]);
-        });*/
-            
-
         var inputId = this.id+'-picker';
-        html += '&nbsp;<input type="text" name="'+inputId+'" id="'+inputId+'" />';
+        html += '&nbsp;<input type="text" name="'+inputId+'" id="'+inputId+'" class="otp-datepicker-input" />';
         
         html += '</div>';
         $(html).appendTo(this.$());
@@ -225,8 +220,20 @@ otp.widgets.TW_TimeSelector =
     },
 
     doAfterLayout : function() {
+        var this_ = this;
+
+        $("#"+this.id+'-depArr').change(function() {
+            this_.tripWidget.module.arriveBy = (this.selectedIndex == 1);
+        });
+
+
         $('#'+this.id+'-picker').datetimepicker({
             timeFormat: "hh:mmtt", 
+            onSelect: function(dateTime) {
+                var dateTimeArr = dateTime.split(' ');
+                this_.tripWidget.module.date = dateTimeArr[0];
+                this_.tripWidget.module.time = dateTimeArr[1];
+            }
         });
         $('#'+this.id+'-picker').datepicker("setDate", new Date());
     },

@@ -591,6 +591,11 @@ h6.drag-to-change {
     font-size: 11px;
 }
 
+.otp-datepicker-input {
+    text-align: center;
+    width: 150px;
+}
+
 /* Bike Triangle */
 
 .otp-bikeTriangle {

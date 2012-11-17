@@ -175,6 +175,7 @@ otp.modules.planner.PlannerModule =
             };
             if(this.time !== null) _.extend(queryParams, { time : this.time } );
             if(this.date !== null) _.extend(queryParams, { date : this.date } );
+            if(this.arriveBy !== null) _.extend(queryParams, { arriveBy : this.arriveBy } );
             if(this.optimize !== null) _.extend(queryParams, { optimize : this.optimize } );
             if(this.optimize === 'TRIANGLE') {
                 _.extend(queryParams, {
