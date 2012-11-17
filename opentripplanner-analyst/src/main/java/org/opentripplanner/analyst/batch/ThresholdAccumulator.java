@@ -22,8 +22,12 @@ public class ThresholdAccumulator implements Accumulator {
     private static final Logger LOG = LoggerFactory.getLogger(ThresholdAccumulator.class);
 
     @Setter 
-    int threshold = 60 * 90; // 1.5 hours in seconds
+    int thresholdSeconds = 60 * 90; // 1.5 hours in seconds
 
+    public void setThresholdMinutes(int minutes) {
+        this.thresholdSeconds = minutes * 60;
+    }
+    
     @Override
     public void accumulate(double amount, ResultSet current, ResultSet accumulated) {
         if (current.population != accumulated.population) {
@@ -32,7 +36,7 @@ public class ThresholdAccumulator implements Accumulator {
         int n = accumulated.population.size();
         for (int i = 0; i < n; i++) {
             double t = current.results[i]; 
-            if (t > 0 && t < threshold) {
+            if (t > 0 && t < thresholdSeconds) {
                 accumulated.results[i] += amount;
             }
         }
