@@ -143,8 +143,6 @@ otp.modules.planner.PlannerModule =
     
     planTrip : function(existingQueryParams, skipSave) {
     
-        $('#otp-spinner').show();
-
         if(typeof this.planTripStart == 'function') this.planTripStart();
         
         this.noTripWidget.hide();
@@ -167,6 +165,10 @@ otp.modules.planner.PlannerModule =
         	queryParams = existingQueryParams; 	        	
         else
         {
+            if(this.startLatLng == null || this.endLatLng == null) {
+                // TODO: alert user
+                return;
+            }
             
        	    queryParams = {             
                 fromPlace: this.startLatLng.lat+','+this.startLatLng.lng,
@@ -188,6 +190,8 @@ otp.modules.planner.PlannerModule =
                 queryParams.routerId = otp.config.routerId;
             }
         } 	
+        
+        $('#otp-spinner').show();
         
         this.lastQueryParams = queryParams;
         this.currentRequest = $.ajax(url, {
