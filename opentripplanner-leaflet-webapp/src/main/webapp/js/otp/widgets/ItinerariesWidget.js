@@ -68,11 +68,11 @@ otp.widgets.ItinerariesWidget =
     
     renderItinerary : function(itin, i) {
         var this_ = this;
-        
-        var divId = this.moduleId+"-itinAccord-"+i;
-        var html = "<div id='"+divId+"' class='otp-itinAccord'></div>";
-        var itinAccord = $(html);
 
+        // render legs
+        var divId = this.moduleId+"-itinAccord-"+i;
+        var accordHtml = "<div id='"+divId+"' class='otp-itinAccord'></div>";
+        var itinAccord = $(accordHtml);
         for(var l=0; l<itin.legs.length; l++) {
             var leg = itin.legs[l];
             var headerHtml = "<b>"+leg.mode+"</b>";
@@ -92,7 +92,17 @@ otp.widgets.ItinerariesWidget =
             heightStyle: "content",
             collapsible: true
         });
-        return itinAccord;
+
+        var itinDiv = $("<div></div>");
+
+        // add start and end time rows        
+        itinDiv.append("<div class='otp-itinStartRow'><b>Start</b>: "+moment(itin.startTime).format("h:mma, MMM. Do YYYY")+"</div>");
+        itinDiv.append(itinAccord);
+        itinDiv.append("<div class='otp-itinEndRow'><b>End</b>: "+moment(itin.endTime).format("h:mma, MMM. Do YYYY")+"</div>");
+
+        // TODO: add trip summary
+        
+        return itinDiv;
     }
     
 });

@@ -97,7 +97,7 @@ pre {
 hr {
   background-color: #fff;
   border-top: 1px solid #ccc;
-  margin:0 0 1em 0; 
+  margin: .5em 0 .5em 0; 
 }
 textarea { overflow: auto; } /* thnx ivannikolic! www.sitepoint.com/blogs/2010/08/20/ie-remove-textarea-scrollbars/ */
 .ie6 legend, .ie7 legend { margin-left: -7px; } /* thnx ivannikolic! */
@@ -580,6 +580,17 @@ h6.drag-to-change {
   display: none;
 }
 
+#otp-calltaker-optionsWidget {
+    bottom: 25px;
+    left: 50px;
+}
+
+/* Date/Time Picker */
+
+.ui-datepicker {
+    font-size: 11px;
+}
+
 /* Bike Triangle */
 
 .otp-bikeTriangle {
@@ -611,6 +622,14 @@ h6.drag-to-change {
 
 .otp-itinsAccord h3 {
   font-size: 12px;
+}
+
+.otp-itinStartRow {
+    margin-bottom: .5em;
+}
+
+.otp-itinEndRow {
+    margin-top: .5em;
 }
 
 /* Past Queries Widget */

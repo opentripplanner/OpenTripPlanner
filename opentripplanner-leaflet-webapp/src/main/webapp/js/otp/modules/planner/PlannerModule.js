@@ -36,7 +36,11 @@ otp.modules.planner.PlannerModule =
     // current trip query parameters:
     startLatLng             : null,
     endLatLng               : null,
+    time                    : null,
+    date                    : null,
+    arriveBy                : false,
     mode                    : "TRANSIT,WALK",
+    optimize                : null,
     triangleTimeFactor      : 0.333,
     triangleSlopeFactor     : 0.333,
     triangleSafetyFactor    : 0.334,
@@ -163,15 +167,22 @@ otp.modules.planner.PlannerModule =
         	queryParams = existingQueryParams; 	        	
         else
         {
+            
        	    queryParams = {             
                 fromPlace: this.startLatLng.lat+','+this.startLatLng.lng,
                 toPlace: this.endLatLng.lat+','+this.endLatLng.lng,
-                mode: this.mode,
-                optimize: 'TRIANGLE',
-                triangleTimeFactor: this_.triangleTimeFactor,
-                triangleSlopeFactor: this_.triangleSlopeFactor,
-                triangleSafetyFactor: this_.triangleSafetyFactor
+                mode: this.mode
             };
+            if(this.time !== null) _.extend(queryParams, { time : this.time } );
+            if(this.date !== null) _.extend(queryParams, { date : this.date } );
+            if(this.optimize !== null) _.extend(queryParams, { optimize : this.optimize } );
+            if(this.optimize === 'TRIANGLE') {
+                _.extend(queryParams, {
+                    triangleTimeFactor: this_.triangleTimeFactor,
+                    triangleSlopeFactor: this_.triangleSlopeFactor,
+                    triangleSafetyFactor: this_.triangleSafetyFactor
+                });
+            } 
             if(otp.config.routerId !== undefined) {
                 queryParams.routerId = otp.config.routerId;
             }

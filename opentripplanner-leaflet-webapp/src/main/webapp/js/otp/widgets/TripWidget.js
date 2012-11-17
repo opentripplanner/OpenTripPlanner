@@ -43,6 +43,10 @@ otp.widgets.TripWidget =
         $("<hr />").appendTo(this.$());
     },
     
+    addVerticalSpace : function(pixels) {
+        $('<div style="height: '+pixels+'px;"></div>').appendTo(this.$());
+    },
+
     restorePlan : function(data) {
 	    if(data == null) return;
 
@@ -151,6 +155,87 @@ otp.widgets.TW_TripSummary =
 });
 
 
+
+otp.widgets.TW_ModeSelector = 
+    otp.Class(otp.widgets.TripWidgetPanel, {
+    
+    id           :  null,
+       
+    initialize : function(tripWidget) {
+        otp.widgets.TripWidgetPanel.prototype.initialize.apply(this, arguments);
+        this.id = tripWidget.id+"-modeSelector";
+        var modes = { "TRANSIT,WALK" : "Walk to Transit", 
+                      "TRANSIT,BICYCLE" : "Bike to Transit", 
+                      "WALK" : 'Walk Only',
+                      "BICYCLE" : 'Bike Only' }
+        
+        var html = "<div class='notDraggable'>Travel by: ";
+        html += '<select id="'+this.id+'">';
+        _.each(modes, function(text, key) {
+            html += '<option>'+text+'</option>';            
+        });
+        html += '</select>';
+        html += "</div>";
+              
+        $(html).appendTo(this.$());
+        //this.setContent(content);
+    },
+
+    doAfterLayout : function() {
+    },
+
+    restorePlan : function(data) {
+    }
+        
+});
+
+otp.widgets.TW_TimeSelector = 
+    otp.Class(otp.widgets.TripWidgetPanel, {
+    
+    id           :  null,
+       
+    initialize : function(tripWidget) {
+        otp.widgets.TripWidgetPanel.prototype.initialize.apply(this, arguments);
+        this.id = tripWidget.id+"-timeSelector";
+
+        var html = '<div id="'+this.id+'" class="notDraggable">';
+
+        var depArrId = this.id+'-depArr';
+        html += '<select id="'+depArrId+'">';
+        html += '<option>Depart</option>';
+        html += '<option>Arrive</option>';
+        html += '</select>';
+        
+        /*for(i in this.modules) {
+            var module = this.modules[i];
+            console.log(module);
+            var option = $('<option'+(module == this_.activeModule ? ' selected' : '')+'>'+module.moduleName+'</option>').appendTo(selector);
+        }        
+        selector.change(function() {
+            this_.setActiveModule(this_.modules[this.selectedIndex]);
+        });*/
+            
+
+        var inputId = this.id+'-picker';
+        html += '&nbsp;<input type="text" name="'+inputId+'" id="'+inputId+'" />';
+        
+        html += '</div>';
+        $(html).appendTo(this.$());
+        
+    },
+
+    doAfterLayout : function() {
+        $('#'+this.id+'-picker').datetimepicker({
+            timeFormat: "hh:mmtt", 
+        });
+        $('#'+this.id+'-picker').datepicker("setDate", new Date());
+    },
+
+    restorePlan : function(data) {
+    }
+        
+});
+
 otp.widgets.TW_BikeTriangle = 
     otp.Class(otp.widgets.TripWidgetPanel, {
     
@@ -163,7 +248,7 @@ otp.widgets.TW_BikeTriangle =
         
         var content = '';
         content += '<h6 class="drag-to-change">Drag to Change Trip:</h6>';
-        content += '<div id="'+this.id+'" class="otp-bikeTriangle"></div>';
+        content += '<div id="'+this.id+'" class="otp-bikeTriangle notDraggable"></div>';
         
         this.setContent(content);
     },
@@ -178,7 +263,6 @@ otp.widgets.TW_BikeTriangle =
             this_.tripWidget.module.triangleSafetyFactor = formData.triangleSafetyFactor;
             this_.tripWidget.module.planTrip();
         };
-        this.tripWidget.$().draggable({ cancel: "#"+this.id });
     },
 
     restorePlan : function(data) {
@@ -235,7 +319,7 @@ otp.widgets.TW_BikeType =
 otp.widgets.TW_AddThis = 
     otp.Class(otp.widgets.TripWidgetPanel, {
        
-    initialize : function() {
+    initialize : function(tripWidget) {
         otp.widgets.TripWidgetPanel.prototype.initialize.apply(this, arguments);
         
         var content = '';
@@ -257,5 +341,26 @@ otp.widgets.TW_AddThis =
         addthisElement.appendTo("#share-route");
         addthisElement.attr("addthis:title", "Check out my trip planned on "+otp.config.siteName);
         addthisElement.attr("addthis:description", otp.config.siteDescription);    
+    }
+});
+
+otp.widgets.TW_Submit = 
+    otp.Class(otp.widgets.TripWidgetPanel, {
+       
+    initialize : function(tripWidget) {
+        otp.widgets.TripWidgetPanel.prototype.initialize.apply(this, arguments);
+        this.id = tripWidget.id+"-submit";
+
+        $('<div class="notDraggable"><button id="'+this.id+'-button">Plan Trip</button></div>').appendTo(this.$());
+        //console.log(this.id+'-button')
+        
+    },
+    
+    doAfterLayout : function() {
+        var this_ = this;
+        $('#'+this.id+'-button').button().click(function() {
+            //this_.tripWidget.pushSettingsToModule();
+            this_.tripWidget.module.planTrip();
+        });
     }
 });

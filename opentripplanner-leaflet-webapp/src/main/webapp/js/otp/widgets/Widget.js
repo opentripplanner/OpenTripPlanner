@@ -34,7 +34,8 @@ otp.widgets.Widget = otp.Class({
             start: function(event, ui) {
                 console.log("dragging: "+$(this_.div).css('bottom'));
                 $(this_.div).css({'bottom' : 'auto', 'right' : 'auto'});
-            }
+            },
+            cancel: '.notDraggable'
         });
         //$(this.div).resizable();
     },
