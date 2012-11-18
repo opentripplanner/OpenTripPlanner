@@ -14,6 +14,8 @@
 package org.opentripplanner.analyst.core;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
@@ -35,8 +37,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.index.strtree.STRtree;
 
 @Component
@@ -50,7 +57,6 @@ public class GeometryIndex implements GeometryIndexService {
     GraphService graphService;
     
     private STRtree pedestrianIndex;
-    private STRtree index;
     
     @PostConstruct
     public void initialzeComponent() {
@@ -60,20 +66,22 @@ public class GeometryIndex implements GeometryIndexService {
             LOG.error(message);
             throw new IllegalStateException(message);
         }
-        // build a spatial index of road geometries
-        pedestrianIndex = new STRtree();
-        index = new STRtree();
+        Map<ReversibleLineStringWrapper, StreetEdge> edges = Maps.newHashMap();
         for (StreetVertex vertex : IterableLibrary.filter(graph.getVertices(), StreetVertex.class)) {
             for (StreetEdge e: IterableLibrary.filter(vertex.getOutgoing(), StreetEdge.class)) {
-                Geometry geom = e.getGeometry();
+                LineString geom = e.getGeometry();
                 if (e.getPermission().allows(StreetTraversalPermission.PEDESTRIAN)) {
-                    pedestrianIndex.insert(geom.getEnvelopeInternal(), e);
+                    edges.put(new ReversibleLineStringWrapper(geom), e);
                 }
-                index.insert(geom.getEnvelopeInternal(), e);
             }
         }
+        // insert unique edges
+        pedestrianIndex = new STRtree();
+        for (StreetEdge e : edges.values()) {
+            LineString geom = e.getGeometry();
+            pedestrianIndex.insert(geom.getEnvelopeInternal(), e);
+        }
         pedestrianIndex.build();
-        index.build();
         LOG.debug("spatial index size: {}", pedestrianIndex.size());
     }
     
@@ -82,21 +90,57 @@ public class GeometryIndex implements GeometryIndexService {
         return pedestrianIndex.query(env);
     }
     
-    @SuppressWarnings("rawtypes")
-    public List query(Envelope env) {
-        return index.query(env);
-    }
-
     @Override
     public BoundingBox getBoundingBox(CoordinateReferenceSystem crs) {
         try {
-            Envelope bounds = (Envelope) index.getRoot().getBounds();
+            Envelope bounds = (Envelope) pedestrianIndex.getRoot().getBounds();
             ReferencedEnvelope refEnv = new ReferencedEnvelope(bounds, CRS.decode("EPSG:4326", true));
             return refEnv.toBounds(crs);
         } catch (Exception e) {
             LOG.error("error transforming graph bounding box to request CRS : {}", crs);
             return null;
         }
+    }
+    
+    class ReversibleLineStringWrapper {
+        
+        LineString ls;
+        
+        public ReversibleLineStringWrapper(LineString ls) {
+            this.ls = ls;
+        }
+        
+        /** Equality is defined as having the same number of coordinates with first and last 
+         * coordinates matching either forward or in reverse. */
+        @Override
+        public boolean equals(Object other) {
+            if ( ! (other instanceof ReversibleLineStringWrapper)) 
+                return false;
+            ReversibleLineStringWrapper that = (ReversibleLineStringWrapper) other;
+            CoordinateSequence cs0 = ls.getCoordinateSequence();
+            CoordinateSequence cs1 = that.ls.getCoordinateSequence();
+            if (cs0.size() != cs1.size())
+                return false;
+            Coordinate c00 = cs0.getCoordinate(0);
+            Coordinate c0n = cs0.getCoordinate(cs0.size() - 1);
+            Coordinate c10 = cs1.getCoordinate(0);
+            Coordinate c1n = cs1.getCoordinate(cs1.size() - 1);
+            if (c00.equals(c10) && c0n.equals(c1n))
+                return true;
+            if (c00.equals(c1n) && c0n.equals(c10))
+                return true;
+            return false;
+        }
+        
+        @Override
+        public int hashCode() {
+            CoordinateSequence cs = ls.getCoordinateSequence();
+            int maxIdx = cs.size() - 1;
+            int x = (int)(cs.getX(0) * 1000000) + (int)(cs.getX(maxIdx) * 1000000);
+            int y = (int)(cs.getY(0) * 1000000) + (int)(cs.getY(maxIdx) * 1000000);
+            return x + y * 101149 + maxIdx * 7883;
+        }
+        
     }
     
 }
