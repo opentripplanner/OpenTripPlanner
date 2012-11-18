@@ -99,8 +99,18 @@ public class RoutingContext implements Cloneable {
         this.graph = graph;
         if (findPlaces) {
             // normal mode, search for vertices based on fromPlace and toPlace
-            fromVertex = graph.streetIndex.getVertexForPlace(opt.getFromPlace(), opt);
-            toVertex = graph.streetIndex.getVertexForPlace(opt.getToPlace(), opt, fromVertex);
+            if ( ! opt.batch || opt.arriveBy) {
+                // non-batch mode, or arriveBy: we need a to vertex
+                toVertex = graph.streetIndex.getVertexForPlace(opt.getToPlace(), opt);
+            } else {
+                toVertex = null;
+            }
+            if ( ! opt.batch || ! opt.arriveBy) {
+                // non-batch mode, or depart-after: we need a from vertex
+                fromVertex = graph.streetIndex.getVertexForPlace(opt.getFromPlace(), opt, toVertex);                
+            } else {
+                fromVertex = null;
+            }
             if (opt.intermediatePlaces != null) {
                 for (NamedPlace intermediate : opt.intermediatePlaces) {
                     Vertex vertex = graph.streetIndex.getVertexForPlace(intermediate, opt);
