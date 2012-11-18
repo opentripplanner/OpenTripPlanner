@@ -663,6 +663,8 @@ public class RoutingRequest implements Cloneable, Serializable {
         if ( ! (o instanceof RoutingRequest))
             return false;
         RoutingRequest other = (RoutingRequest) o;
+        if (this.batch != other.batch)
+            return false;
         boolean endpointsMatch;
         if (this.batch) {
             if (this.arriveBy) {
