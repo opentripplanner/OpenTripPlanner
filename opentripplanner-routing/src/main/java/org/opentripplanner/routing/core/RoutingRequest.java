@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.common.MavenVersion;
@@ -41,7 +43,7 @@ import org.slf4j.LoggerFactory;
  * 
  * NOTE this is the result of merging what used to be called a REQUEST and a TRAVERSEOPTIONS
  */
-@Data
+@Getter @Setter
 public class RoutingRequest implements Cloneable, Serializable {
     
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
@@ -58,11 +60,11 @@ public class RoutingRequest implements Cloneable, Serializable {
     public String routerId = "";
     /** The start location -- either a Vertex name or latitude, longitude in degrees */
     // TODO change this to Doubles and a Vertex
-    public String from;
+    public String from = ""; // allow missing 'from' for batch requests
     /** The start location's user-visible name */
     public String fromName;
     /** The end location (see the from field for format). */
-    public String to;
+    public String to = ""; // allow missing 'to' for batch requests
     /** The end location's user-visible name */
     public String toName;
     /** An unordered list of intermediate locations to be visited (see the from field for format). */
@@ -717,8 +719,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Equality and hashCode should not consider the routing context, to allow SPT caching. */
     @Override
     public int hashCode() {
-        int hashCode = from.hashCode() * 524287  
-                + new Double(walkSpeed).hashCode() + new Double(bikeSpeed).hashCode() 
+        int hashCode =  new Double(walkSpeed).hashCode() + new Double(bikeSpeed).hashCode() 
                 + new Double(carSpeed).hashCode() + new Double(maxWeight).hashCode()
                 + (int) (worstTime & 0xffffffff) + getModes().hashCode()
                 + (isArriveBy() ? 8966786 : 0) + (wheelchairAccessible ? 731980 : 0)
@@ -736,8 +737,17 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + new Boolean(reverseOptimizeOnTheFly).hashCode() * 95112799;
         if (batch) {
             hashCode *= -1;
+            // batch mode, only one of two endpoints matters
+            if (arriveBy) {
+                hashCode += to.hashCode() * 1327144003;
+            } else {
+                hashCode += from.hashCode() * 524287;
+            }
+            hashCode += numItineraries; // why is this only present here?
+        } else {
+            // non-batch, both endpoints matter
+            hashCode += from.hashCode() * 524287;
             hashCode += to.hashCode() * 1327144003;
-            hashCode += numItineraries;
         }
         return hashCode;
     }
