@@ -3,97 +3,140 @@
 <head>
 	<meta charset="utf-8" />
 	<title>OTP Analyst Client</title>
-	<link rel="stylesheet" type="text/css" href="js/lib/leaflet/leaflet.css" />
-	<script src="js/lib/leaflet/leaflet.js"></script>
+	<link rel="stylesheet" href="js/lib/leaflet/leaflet.css" />
+	<script src="js/lib/leaflet/leaflet.js" ></script>
+	<!-- leaflet 0.4.5 from CDN spews lots of benign but annoying errors -->
+	<!-- 	
+	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.css" />
+    <script src="http://cdn.leafletjs.com/leaflet-0.4.5/leaflet.js"></script>	 
+    -->
 	<script src="js/lib/proj4js-1.0.3/lib/proj4js-compressed.js"></script>
+	<!-- use unminified jquery for easier debugging 	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script> 
+	-->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.js"></script>
 	<link rel="stylesheet" type="text/css" href="client.css" />
 </head>
 
 <body>
 	<div id="toolbox">
 		<h1>OpenTripPlanner Analyst</h1>
-		<form>
-			<span>
-				<input type="button" value="Add Purple Line" onclick="purpleOn()" />
-				<input type="button" value="Remove Purple Line" onclick="purpleOff()" />
-			</span>	
-		</form>
-		<form>		
-			<h2>Layer Style</h2>
-			<span>
-				<input type="button" value="Color30" onclick="color30()" />
-				<input type="button" value="Gray" onclick="gray()" />
-				<input type="button" value="Difference" onclick="difference()" /> 
-				<input type="button" value="H&auml;gerstrand" onclick="hagerstrand()" />
-			</span>
-		</form>
-		<form>
-			<h2>Origin Setup</h2>
-			<span>
-				<label for="setupTimeSlider">Time of day:</label>
-				<input type="range" name="setupTimeSlider" min="0" max="24" step="0.25" value="8.0" onchange="setOriginTime(setupTimeSlider.value)" />
-			</span> 
-			<span>
-				<!-- times are in agency timezone unless suffixed by Z  -->
-				<label for="setupTime">Date and time: *</label>
-				<input type="text" class="wideInput" id="setupTime" value="2012-06-06T08:00:00" />
-			</span> 
-			<span>
-				<label for="setupMode">Mode:</label> 
-				<select id="setupMode">
-					<option value="TRANSIT,WALK">Transit</option>
-					<option value="BUSISH,WALK">Bus only</option>
-					<option value="TRAINISH,WALK">Train only</option>
-					<option value="WALK">Walk only</option>
-					<option value="BICYCLE">Bicycle</option>
-					<option value="WALK,BICYCLE">Rented Bicycle</option>
-					<option value="TRANSIT,BICYCLE">Transit &amp; Bicycle</option>
-					<option value="TRANSIT,WALK,BICYCLE">Transit &amp; Rented Bicycle</option>
-				</select>
-			</span>
-			<span>
-				<label for="setupMaxDistance" class="autoWidth">Max on-street distance (m):</label> 
-				<input type="text" id="setupMaxDistance" class="narrowInput" value="2000" /> 
-			</span>
-		</form>
-		<form>
-			<h2>Destination Setup</h2>
-			<span>
-				<label for="setupRelativeTime2">Time relative to origin:</label> 	
-				<select id="setupRelativeTime2" default="+2.0" onchange="setDestinationTime(setupRelativeTime2.value)" >
-					<option value="+0">Same as Origin</option>
-					<option value="+0.25"> +15 minutes</option>
-					<option value="+0.5" > +30 minutes</option>
-					<option value="+0.75"> +45 minutes</option>
-					<option value="+1.0" >  +1 hour</option>
-					<option value="+1.5" >+1.5 hours</option>
-					<option value="+2.0" >  +2 hours</option>
-					<option value="+2.5" >+2.5 hours</option>
-					<option value="+3.0" >  +3 hours</option>
-				</select>
-			</span>
-			<span>
-				<label for="setupTime2">Date and time: *</label> 	
-				<input type="text" id="setupTime2" value="2012-06-06T10:00:00" />
-			</span>
-			<span>
-				<label for="setupMode2">Mode:</label> 
-				<select id="setupMode2">
-					<option value="same">Same as Origin</option>
-					<option value="TRANSIT,WALK">Transit</option>
-					<option value="BUSISH,WALK">Bus only</option>
-					<option value="TRAINISH,WALK">Train only</option>
-					<option value="WALK">Walk only</option>
-					<option value="BICYCLE">Bicycle</option>
-					<option value="WALK,BICYCLE">Rented Bicycle</option>
-					<option value="TRANSIT,BICYCLE">Transit &amp; Bicycle</option>
-					<option value="TRANSIT,WALK,BICYCLE">Transit &amp; Rented Bicycle</option>
-				</select>
-			</span>
-			<span>
-				<label for="setupMaxDistance2">Maximum Walking Distance (m):</label> 
-				<input type="text" id="setupMaxDistance2" class="narrowInput" value="same" /> 
-			</span>
+		<form id="searchTypeForm">		
+			<h2>Search Type</h2>
+			<select id="searchTypeSelect" class="fullwidth" >
+				<option value="single">Single origin/destination</option>
+				<option value="ppa">Potential path area</option>
+				<option value="diff2">Two-origin difference</option>
+				<option value="diff1">Single-origin difference</option>
+			</select>
+			<div id="endpointAControls">
+				<h2><img src="js/lib/leaflet/images/marker-green-rot.png">Origin Setup</h2>
+				<span>
+					<label for="timeSlider">Time of day:</label>
+					<input type="range" id="timeSlider" min="0" max="24" step="0.25" value="8.0" />
+				</span> 
+				<span class="timeEntry">
+					<select id="arriveByA">
+						<option value="true">Arrive by</option>
+						<option value="false">Depart after</option>
+					</select>
+					<!-- times are in agency timezone unless suffixed by Z  -->
+					<input type="text" class="wideInput" id="setupTime" disabled="disabled" />
+				</span> 
+				<span>
+					<label for="setupMode">Mode:</label> 
+					<select id="setupMode" >
+						<option value="TRANSIT,WALK">Transit</option>
+						<option value="BUSISH,WALK">Bus only</option>
+						<option value="TRAINISH,WALK">Train only</option>
+						<option value="WALK">Walk only</option>
+						<option value="BICYCLE">Bicycle</option>
+						<option value="WALK,BICYCLE">Rented Bicycle</option>
+						<option value="TRANSIT,BICYCLE">Transit &amp; Bicycle</option>
+						<option value="TRANSIT,WALK,BICYCLE">Transit &amp; Rented Bicycle</option>
+					</select>
+				</span>
+				<span>
+					<label for="setupMaxDistance" class="autoWidth">Max walk/bike:</label> 
+					<select id="setupMaxDistance">
+						<option value="500">500m</option>
+						<option value="1000">1km</option>
+						<option value="2000">2km</option>
+						<option value="4000" selected="selected">4km</option>
+						<option value="8000">8km</option>
+						<option value="200000">Unlimited</option>
+					</select>
+				</span>
+				<span>
+					<label for="compressWaits" class="autoWidth">Compress wait times:</label> 
+					<select id="compressWaits">
+						<option value="initial">Initial</option>
+						<option value="optimize">Initial and transfers</option>
+					</select>
+				</span>
+				<span>
+					<label for="timeLenience">Time lenience:</label> 
+					<select id="timeLenience">
+						<option value="5">none</option>
+						<option value="5">up to 5 min</option>
+						<option value="10">up to 10 min</option>
+						<option value="20">up to 20 min</option>
+						<option value="30" selected="selected">up to 30 min</option>
+						<option value="60">up to 1 hour</option>
+						<option value="120">up to 2 hours</option>
+					</select>
+				</span>
+			</div> <!-- END endpointAControls -->
+			<div id="endpointBControls">
+				<h2><img src="js/lib/leaflet/images/marker-red-rot.png"/>Destination Setup</h2>
+				<span>
+					<label for="setupRelativeTime2">Time relative to origin:</label> 	
+					<select id="setupRelativeTime2" onchange="setDestinationTime(setupRelativeTime2.value)" >
+						<option value="+0">Same as Origin</option>
+						<option value="+0.25"> +15 minutes</option>
+						<option value="+0.5" > +30 minutes</option>
+						<option value="+0.75"> +45 minutes</option>
+						<option value="+1.0" >  +1 hour</option>
+						<option value="+1.5" >+1.5 hours</option>
+						<option value="+2.0" selected="selected">  +2 hours</option>
+						<option value="+2.5" >+2.5 hours</option>
+						<option value="+3.0" >  +3 hours</option>
+					</select>
+				</span>
+				<span class="timeEntry">
+					<select id="arriveByB" >
+						<option value="true">Arrive by</option>
+						<option value="false">Depart after</option>
+					</select>
+					<input type="text" id="setupTime2" disabled="disabled" />
+				</span>
+				<span>
+					<label for="setupMode2">Mode:</label> 
+					<select id="setupMode2">
+						<option value="same">Same as Origin</option>
+						<option value="TRANSIT,WALK">Transit</option>
+						<option value="BUSISH,WALK">Bus only</option>
+						<option value="TRAINISH,WALK">Train only</option>
+						<option value="WALK">Walk only</option>
+						<option value="BICYCLE">Bicycle</option>
+						<option value="WALK,BICYCLE">Rented Bicycle</option>
+						<option value="TRANSIT,BICYCLE">Transit &amp; Bicycle</option>
+						<option value="TRANSIT,WALK,BICYCLE">Transit &amp; Rented Bicycle</option>
+					</select>
+				</span>
+				<span>
+					<label for="setupMaxDistance2" class="autoWidth">Max walk/bike:</label> 
+					<select id="setupMaxDistance">
+						<option value="same" selected="selected">Same as origin</option>
+						<option value="500">500m</option>
+						<option value="1000">1km</option>
+						<option value="2000">2km</option>
+						<option value="4000">4km</option>
+						<option value="8000">8km</option>
+						<option value="200000">Unlimited</option>
+					</select>
+				</span>
+			</div> <!-- END endpointBControls -->
 		</form>
 		<form>
 			<input type="button" value="Refresh Map" onclick="mapSetupTool()" class="fullWidth" />
@@ -101,6 +144,13 @@
 				* Times must be expressed in ISO8601 combined date/time format: YYYY-MM-DDTHH:MM:SS
 			</p>
 		</form>	
+		<form name="purpleForm">
+			<span>
+				<input type="button" value="Add Purple Line" onclick="purpleOn()" />
+				<input type="button" value="Remove Purple Line" onclick="purpleOff()" />
+			</span>	
+		</form>
+		
 		<img id="legend">
 		<!-- download tool is commented out to avoid over-filling the cache in public use
 		<form>
