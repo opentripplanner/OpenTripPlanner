@@ -321,9 +321,9 @@ var displayTimes = function(fractionalHours, fractionalHoursOffset) {
 	console.log("fhour", fractionalHours);
 	// console.log("offset", fractionalHoursOffset);
 	var msec = BASE_DATE_MSEC + fractionalHours * MSEC_PER_HOUR; 
-	setupTime.value = new Date(msec).toISOString().substring(0,19);
+	document.getElementById('setupTime').value = new Date(msec).toISOString().substring(0,19);
 	msec += fractionalHoursOffset * MSEC_PER_HOUR; 
-	setupTime2.value = new Date(msec).toISOString().substring(0,19);
+	document.getElementById('setupTime2').value = new Date(msec).toISOString().substring(0,19);
 };
 
 function setFormDisabled(formName, disabled) {
