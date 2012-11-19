@@ -16,10 +16,10 @@ var INIT_LOCATION = new L.LatLng(38.9538, -76.8851); // new carrolton
 var AUTO_CENTER_MAP = true;
 var ROUTER_ID = "";
 var MSEC_PER_HOUR = 60 * 60 * 1000;
-var MSEC_PER_DAY = 86400000;
-// var BASE_DATE_MSEC = Date.parse('2012-11-15');
+var MSEC_PER_DAY = MSEC_PER_HOUR * 24;
 // Note: time zone does not matter since we are turning this back into text before sending it
 var BASE_DATE_MSEC = new Date().getTime() - new Date().getTime() % MSEC_PER_DAY; 
+// var BASE_DATE_MSEC = Date.parse('2012-11-15');
 
 
 var map = new L.Map('map', {
@@ -171,7 +171,6 @@ if (AUTO_CENTER_MAP) {
 }
 map.setView(initLocation, 12);
 var initLocation2 = new L.LatLng(initLocation.lat + 0.05, initLocation.lng + 0.05);
-console.log(initLocation, initLocation2);
 
 //Marker icons
 
@@ -180,9 +179,7 @@ var redMarkerIcon = new L.Icon({ iconUrl: 'js/lib/leaflet/images/marker-red.png'
 var origMarker = new L.Marker(initLocation,  {draggable: true, icon: greenMarkerIcon });
 var destMarker = new L.Marker(initLocation2, {draggable: true, icon: redMarkerIcon });
 origMarker.on('dragend', mapSetupTool);
-origMarker.bindPopup("I am the origin.");
 destMarker.on('dragend', mapSetupTool);
-destMarker.bindPopup("I am the destination.");
 
 // add layers to map 
 // do not add analyst layer yet -- it will be added in refresh() once params are pulled in
