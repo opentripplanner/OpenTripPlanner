@@ -15,7 +15,7 @@ package org.opentripplanner.routing.edgetype;
 
 import java.io.Serializable;
 
-import com.vividsolutions.jts.geom.Polygon;
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * A named area is a subset of an area with a certain set of properties
@@ -27,7 +27,7 @@ import com.vividsolutions.jts.geom.Polygon;
 public class NamedArea implements Serializable {
     private static final long serialVersionUID = 3570078249065754760L;
 
-    private Polygon originalEdges;
+    private Geometry originalEdges;
 
     private String name;
 
@@ -45,11 +45,11 @@ public class NamedArea implements Serializable {
         this.name = name;
     }
 
-    public Polygon getPolygon() {
+    public Geometry getPolygon() {
         return originalEdges;
     }
 
-    public void setOriginalEdges(Polygon originalEdges) {
+    public void setOriginalEdges(Geometry originalEdges) {
         this.originalEdges = originalEdges;
     }
 

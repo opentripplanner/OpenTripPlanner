@@ -1037,7 +1037,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 Double safety = wayData.getSafetyFeatures().getFirst();
                 namedArea.setBicycleSafetyMultiplier(safety);
 
-                namedArea.setOriginalEdges((Polygon) intersection);
+                namedArea.setOriginalEdges(intersection);
 
                 StreetTraversalPermission permission = getPermissionsForEntity(areaEntity,
                         StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);

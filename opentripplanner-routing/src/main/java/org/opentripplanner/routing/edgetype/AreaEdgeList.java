@@ -123,7 +123,7 @@ public class AreaEdgeList implements Serializable {
 
         List<NamedArea> intersects = new ArrayList<NamedArea>();
         for (NamedArea area : areas) {
-            Polygon polygon = area.getPolygon();
+            Geometry polygon = area.getPolygon();
             Geometry intersection = polygon.intersection(line);
             if (intersection.getLength() > 0.000001) {
                 intersects.add(area);
@@ -147,7 +147,7 @@ public class AreaEdgeList implements Serializable {
             Coordinate startCoordinate = from.getCoordinate();
             Point startPoint = geometryFactory.createPoint(startCoordinate);
             for (NamedArea area : intersects) {
-                Polygon polygon = area.getPolygon();
+                Geometry polygon = area.getPolygon();
                 if (!polygon.intersects(startPoint))
                     continue;
                 Geometry lineParts = line.intersection(polygon);
