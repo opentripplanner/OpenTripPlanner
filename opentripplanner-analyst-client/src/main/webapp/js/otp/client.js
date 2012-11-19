@@ -12,12 +12,15 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 */
 
-var INIT_DATE = "2012-11-15";
 var INIT_LOCATION = new L.LatLng(38.9538, -76.8851); // new carrolton
 var AUTO_CENTER_MAP = true;
 var ROUTER_ID = "";
 var MSEC_PER_HOUR = 60 * 60 * 1000;
-var baseDateMsec = Date.parse(INIT_DATE); 
+var MSEC_PER_DAY = 86400000;
+// var BASE_DATE_MSEC = Date.parse('2012-11-15');
+// Note: time zone does not matter since we are turning this back into text before sending it
+var BASE_DATE_MSEC = new Date().getTime() - new Date().getTime() % MSEC_PER_DAY; 
+
 
 var map = new L.Map('map', {
 	minZoom : 10,
@@ -314,16 +317,13 @@ var downloadTool = function () {
     return false;
 };
 
-var setOriginTime = function(fractionalHours) {
+var displayTimes = function(fractionalHours, fractionalHoursOffset) {
 	console.log("fhour", fractionalHours);
-	var msec = baseDateMsec + fractionalHours * MSEC_PER_HOUR; 
+	// console.log("offset", fractionalHoursOffset);
+	var msec = BASE_DATE_MSEC + fractionalHours * MSEC_PER_HOUR; 
 	setupTime.value = new Date(msec).toISOString().substring(0,19);
-	setDestinationTime(setupRelativeTime2.value);
-};
-
-var setDestinationTime = function(fractionalHours) {
-	var seconds = Date.parse(setupTime.value) + fractionalHours * MSEC_PER_HOUR; 
-	setupTime2.value = new Date(seconds).toISOString().substring(0,19);
+	msec += fractionalHoursOffset * MSEC_PER_HOUR; 
+	setupTime2.value = new Date(msec).toISOString().substring(0,19);
 };
 
 function setFormDisabled(formName, disabled) {
@@ -361,16 +361,18 @@ function setTwoEndpoint(two) {
 $('#searchTypeForm').change( mapSetupTool );
 
 // intercept slider change event bubbling to avoid frequent map rendering
-(function(elem) {
-	setOriginTime(elem.val());
-    elem.bind('change', function() {
-    	setOriginTime(this.value); 
+(function(slider, offset) {
+    slider.bind('change', function() {
+    	displayTimes(slider.val(), offset.val()); 
         return false; // block event propagation
+    }).change();
+    slider.bind('mouseup', function() {
+    	slider.parent().trigger('change');
     });
-    elem.bind('mouseup', function() {
-    	elem.parent().trigger('change');
+    offset.bind('change', function() {
+    	displayTimes(slider.val(), offset.val()); 
     });
-}) ($("#timeSlider"));
+}) ($("#timeSlider"), $('#setupRelativeTime2'));
 
 //hide some UI elements when they are irrelevant
 $('#searchTypeSelect').change( function() { 

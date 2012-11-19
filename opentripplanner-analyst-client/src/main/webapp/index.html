@@ -33,7 +33,8 @@
 				<h2><img src="js/lib/leaflet/images/marker-green-rot.png">Origin Setup</h2>
 				<span>
 					<label for="timeSlider">Time of day:</label>
-					<input type="range" id="timeSlider" min="0" max="24" step="0.25" value="8.0" />
+					<input type="range" id="timeSlider" class="timeController" 
+					       min="0" max="24" step="0.25" value="8.0" />
 				</span> 
 				<span class="timeEntry">
 					<select id="arriveByA">
@@ -91,7 +92,7 @@
 				<h2><img src="js/lib/leaflet/images/marker-red-rot.png"/>Destination Setup</h2>
 				<span>
 					<label for="setupRelativeTime2">Time relative to origin:</label> 	
-					<select id="setupRelativeTime2" onchange="setDestinationTime(setupRelativeTime2.value)" >
+					<select id="setupRelativeTime2" class="timeController" >
 						<option value="+0">Same as Origin</option>
 						<option value="+0.25"> +15 minutes</option>
 						<option value="+0.5" > +30 minutes</option>
