@@ -13,6 +13,8 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,7 +45,7 @@ import com.vividsolutions.jts.geom.Polygon;
 public class AreaEdgeList implements Serializable {
     private static final long serialVersionUID = 969137349467214074L;
 
-    private List<AreaEdge> edges = new ArrayList<AreaEdge>();
+    private ArrayList<AreaEdge> edges = new ArrayList<AreaEdge>();
 
     private HashSet<IntersectionVertex> vertices = new HashSet<IntersectionVertex>();
 
@@ -60,7 +62,7 @@ public class AreaEdgeList implements Serializable {
         return edges;
     }
 
-    public void setEdges(List<AreaEdge> edges) {
+    public void setEdges(ArrayList<AreaEdge> edges) {
         this.edges = edges;
         for (AreaEdge edge : edges) {
             vertices.add((IntersectionVertex) edge.getFromVertex());
@@ -198,5 +200,10 @@ public class AreaEdgeList implements Serializable {
 
     public List<NamedArea> getAreas() {
         return areas;
+    }
+
+    private void writeObject(ObjectOutputStream out) throws IOException {
+        edges.trimToSize();
+        out.defaultWriteObject();
     }
 }
