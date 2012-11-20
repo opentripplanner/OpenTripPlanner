@@ -32,6 +32,7 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.common.geometry.ReversibleLineStringWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,47 +101,6 @@ public class GeometryIndex implements GeometryIndexService {
             LOG.error("error transforming graph bounding box to request CRS : {}", crs);
             return null;
         }
-    }
-    
-    class ReversibleLineStringWrapper {
-        
-        LineString ls;
-        
-        public ReversibleLineStringWrapper(LineString ls) {
-            this.ls = ls;
-        }
-        
-        /** Equality is defined as having the same number of coordinates with first and last 
-         * coordinates matching either forward or in reverse. */
-        @Override
-        public boolean equals(Object other) {
-            if ( ! (other instanceof ReversibleLineStringWrapper)) 
-                return false;
-            ReversibleLineStringWrapper that = (ReversibleLineStringWrapper) other;
-            CoordinateSequence cs0 = ls.getCoordinateSequence();
-            CoordinateSequence cs1 = that.ls.getCoordinateSequence();
-            if (cs0.size() != cs1.size())
-                return false;
-            Coordinate c00 = cs0.getCoordinate(0);
-            Coordinate c0n = cs0.getCoordinate(cs0.size() - 1);
-            Coordinate c10 = cs1.getCoordinate(0);
-            Coordinate c1n = cs1.getCoordinate(cs1.size() - 1);
-            if (c00.equals(c10) && c0n.equals(c1n))
-                return true;
-            if (c00.equals(c1n) && c0n.equals(c10))
-                return true;
-            return false;
-        }
-        
-        @Override
-        public int hashCode() {
-            CoordinateSequence cs = ls.getCoordinateSequence();
-            int maxIdx = cs.size() - 1;
-            int x = (int)(cs.getX(0) * 1000000) + (int)(cs.getX(maxIdx) * 1000000);
-            int y = (int)(cs.getY(0) * 1000000) + (int)(cs.getY(maxIdx) * 1000000);
-            return x + y * 101149 + maxIdx * 7883;
-        }
-        
     }
     
 }
