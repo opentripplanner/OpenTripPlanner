@@ -53,6 +53,7 @@ import org.opentripplanner.api.model.transit.StopList;
 import org.opentripplanner.api.model.transit.StopTimeList;
 import org.opentripplanner.api.ws.internals.Components;
 import org.opentripplanner.api.ws.internals.GraphInternals;
+import org.opentripplanner.api.ws.services.MetadataService;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
@@ -392,7 +393,9 @@ public class TestRequest extends TestCase {
 
     public void testMetadata() throws JSONException {
         Metadata metadata = new Metadata();
-        metadata.graphService = Context.getInstance().graphService;
+        MetadataService metadataService = new MetadataService();
+        metadata.setMetadataService(metadataService);
+        metadataService.setGraphService(Context.getInstance().graphService);
         GraphMetadata data1 = metadata.getMetadata(null);
         assertTrue("centerLatitude is not 40.005; got " + data1.getCenterLatitude(),
                 Math.abs(40.005 - data1.getCenterLatitude()) < 0.000001);
