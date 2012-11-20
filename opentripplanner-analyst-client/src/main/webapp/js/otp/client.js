@@ -44,7 +44,8 @@ var aerialLayer = new L.TileLayer(aerialURL,
 		{subdomains: ["oatile1","oatile2","oatile3","oatile4"], maxZoom: 18, attribution: osmAttrib});
 
 var flags = {
-	twoEndpoint: false
+	twoEndpoint: false,
+	twoSearch: false
 };
 
 // convert a map of query parameters into a query string, 
@@ -228,21 +229,34 @@ function mapSetupTool() {
 		break;
 	}
 	params.time = [$('#setupTime').val()];
-    if (flags.twoEndpoint)
-        params.time.push( $('#setupTime2').val() );
-    params.mode = $('#setupMode').val();
-    params.maxWalkDistance = $('#setupMaxDistance').val();
+	params.mode = [$('#setupMode').val()];
+	params.maxWalkDistance = [$('#setupMaxDistance').val()];
+	params.arriveBy = [$('#arriveByA').val()];
 
+	if (flags.twoSearch) {
+		var pushIfDifferent = function (elementId, paramName) {
+			console.log(elementId);
+			var elemval = document.getElementById(elementId).value;
+			if (elemval != 'same') {
+				params[paramName].push(elemval);
+			}
+		};
+		var args = [['setupTime2', 'time'],
+		            ['setupMode2', 'mode'],
+		            ['setupMaxDistance2', 'maxWalkDistance'],
+		            ['arriveByB', 'arriveBy']];
+		for (i in args) {
+			pushIfDifferent.apply(this, args[i]);
+		}
+	}
+    
     // get origin and destination coordinate from map markers
 	var o = origMarker.getLatLng();
 	params.fromPlace = [o.lat + ',' + o.lng];
-	params.arriveBy = [$('#arriveByA').val()];
     if (flags.twoEndpoint) {
     	var d = destMarker.getLatLng();
     	params.fromPlace.push(d.lat + ',' + d.lng);
-    	params.arriveBy.push($('#arriveByB').val());
     }
-	
 	// set from and to places to the same string(s) so they work for both arriveBy and departAfter
 	params.toPlace = params.fromPlace;
     	
@@ -333,26 +347,8 @@ function setFormDisabled(formName, disabled) {
     }
 }
 
-function setTwoEndpoint(two) {
-	if (two) {
-		if (!(flags.twoEndpoint)) {
-			var llo = origMarker.getLatLng();
-			var lld = destMarker.getLatLng();
-			lld.lat = llo.lat;
-			lld.lng = llo.lng + 0.02;
-		}
-		//$('#endpointBControls').show( 200 );
-		$('#endpointBControls').fadeIn( 500 );
-		map.addLayer(destMarker);
-	} else {
-		//$('#endpointBControls').hide( 800 );
-		$('#endpointBControls').fadeOut( 500 );
-		map.removeLayer(destMarker);
-	}
-	flags.twoEndpoint = two;
-}
 
-// bind js functions to HTML element events (handle almost everything at the form level)
+/* Bind JS functions to events (handle almost everything at the form level) */
 
 // anytime a form element changes, refresh the map
 $('#searchTypeForm').change( mapSetupTool );
@@ -375,9 +371,43 @@ $('#searchTypeForm').change( mapSetupTool );
 $('#searchTypeSelect').change( function() { 
 	var type = this.value;
 	console.log('search type changed to', type);
-	if (type == 'single')
-		setTwoEndpoint(false);
-	else
-		setTwoEndpoint(true); // but in diff1 we should hide the second marker
+	if (type == 'single' || type == 'diff1') {
+		// switch to or stay in one-endpoint mode
+		map.removeLayer(destMarker);
+		flags.twoEndpoint = false;
+	} else { 
+		if (!(flags.twoEndpoint)) { 
+			// switch from one-endpoint to two-endpoint mode
+			var llo = origMarker.getLatLng();
+			var lld = destMarker.getLatLng();
+			lld.lat = llo.lat;
+			lld.lng = llo.lng + 0.02;
+			map.addLayer(destMarker);
+			flags.twoEndpoint = true;
+		}
+	}
+	if (type == 'single') {
+		$('.secondaryControl').fadeOut( 500 );
+		flags.twoSearch = false;
+	} else { 
+		$('.secondaryControl').fadeIn( 500 );
+		flags.twoSearch = true;
+	}
+	if (type == 'ppa') {
+		// lock arriveBy selectors and rename endpoints
+		$('#headerA').text('Origin Setup');
+		$('#headerB').text('Destination Setup');
+		$('#arriveByA').val('false').prop('disabled', true);
+		$('#arriveByB').val('true').prop('disabled', true);
+	} else {
+		$('#arriveByA').prop('disabled', false);
+		$('#arriveByB').prop('disabled', false);
+		if (type == 'single') {
+			$('#headerA').text('Search Setup');
+		} else {
+			$('#headerA').text('Search A Setup');
+			$('#headerB').text('Search B Setup');
+		}
+	}
 }).change(); // trigger this event (and implicitly a form change event) immediately upon binding
 

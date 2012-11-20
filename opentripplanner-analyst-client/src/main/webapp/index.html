@@ -29,8 +29,28 @@
 				<option value="diff2">Two-origin difference</option>
 				<option value="diff1">Single-origin difference</option>
 			</select>
+			<span>
+				<label for="timeLenience">Time lenience:</label> 
+				<select id="timeLenience">
+					<option value="5">none</option>
+					<option value="5">up to 5 min</option>
+					<option value="10">up to 10 min</option>
+					<option value="20">up to 20 min</option>
+					<option value="30" selected="selected">up to 30 min</option>
+					<option value="60">up to 1 hour</option>
+					<option value="120">up to 2 hours</option>
+				</select>
+			</span>
+			<span>
+				<label for="compressWaits" class="autoWidth">Lenience at:</label> 
+				<select id="compressWaits">
+					<option value="initial">Initial</option>
+					<option value="optimize">Initial and transfers</option>
+				</select>
+			</span>
 			<div id="endpointAControls">
-				<h2><img src="js/lib/leaflet/images/marker-green-rot.png">Origin Setup</h2>
+				<img src="js/lib/leaflet/images/marker-green-rot.png">
+				<h2 id="headerA">Origin Setup</h2>
 				<span>
 					<label for="timeSlider">Time of day:</label>
 					<input type="range" id="timeSlider" class="timeController" 
@@ -68,32 +88,14 @@
 						<option value="200000">Unlimited</option>
 					</select>
 				</span>
-				<span>
-					<label for="compressWaits" class="autoWidth">Compress wait times:</label> 
-					<select id="compressWaits">
-						<option value="initial">Initial</option>
-						<option value="optimize">Initial and transfers</option>
-					</select>
-				</span>
-				<span>
-					<label for="timeLenience">Time lenience:</label> 
-					<select id="timeLenience">
-						<option value="5">none</option>
-						<option value="5">up to 5 min</option>
-						<option value="10">up to 10 min</option>
-						<option value="20">up to 20 min</option>
-						<option value="30" selected="selected">up to 30 min</option>
-						<option value="60">up to 1 hour</option>
-						<option value="120">up to 2 hours</option>
-					</select>
-				</span>
 			</div> <!-- END endpointAControls -->
-			<div id="endpointBControls">
-				<h2><img src="js/lib/leaflet/images/marker-red-rot.png"/>Destination Setup</h2>
+			<div id="endpointBControls" class="secondaryControl">
+				<img src="js/lib/leaflet/images/marker-red-rot.png"/>
+				<h2 id="headerB" class="secondaryControl">Destination Setup</h2>
 				<span>
 					<label for="setupRelativeTime2">Time relative to origin:</label> 	
 					<select id="setupRelativeTime2" class="timeController" >
-						<option value="+0">Same as Origin</option>
+						<option value="+0">Same as Above</option>
 						<option value="+0.25"> +15 minutes</option>
 						<option value="+0.5" > +30 minutes</option>
 						<option value="+0.75"> +45 minutes</option>
@@ -114,7 +116,7 @@
 				<span>
 					<label for="setupMode2">Mode:</label> 
 					<select id="setupMode2">
-						<option value="same">Same as Origin</option>
+						<option value="same">Same as Above</option>
 						<option value="TRANSIT,WALK">Transit</option>
 						<option value="BUSISH,WALK">Bus only</option>
 						<option value="TRAINISH,WALK">Train only</option>
@@ -127,8 +129,8 @@
 				</span>
 				<span>
 					<label for="setupMaxDistance2" class="autoWidth">Max walk/bike:</label> 
-					<select id="setupMaxDistance">
-						<option value="same" selected="selected">Same as origin</option>
+					<select id="setupMaxDistance2">
+						<option value="same" selected="selected">Same as Above</option>
 						<option value="500">500m</option>
 						<option value="1000">1km</option>
 						<option value="2000">2km</option>
