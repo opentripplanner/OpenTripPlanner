@@ -137,7 +137,7 @@ public abstract class RoutingResource {
     /** If true, goal direction is turned off and a full path tree is built (specify only once) */
     @DefaultValue("false") @QueryParam("batch") protected List<Boolean> batch;
 
-    /** A transit stop required to be the first stop in the search */
+    /** A transit stop required to be the first stop in the search (AgencyId_StopId) */
     @DefaultValue("") @QueryParam("startTransitStopId") protected List<String> startTransitStopId;
 
     /**
