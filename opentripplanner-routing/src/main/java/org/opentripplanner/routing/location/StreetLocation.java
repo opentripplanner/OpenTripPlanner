@@ -14,7 +14,9 @@
 package org.opentripplanner.routing.location;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.DistanceLibrary;
@@ -84,11 +86,11 @@ public class StreetLocation extends StreetVertex {
         /* linking vertex with epsilon transitions */
         StreetLocation location = new StreetLocation(graph, label, nearestPoint, name);
 
-        List<StreetEdge> allEdges = new ArrayList<StreetEdge>();
+        Set<StreetEdge> allEdges = new HashSet<StreetEdge>();
         for (StreetEdge street : edges) {
             allEdges.add(street);
             if (street instanceof AreaEdge) {
-                for (StreetEdge e :((AreaEdge) street).getArea().getEdges()) {
+                for (StreetEdge e : ((AreaEdge) street).getArea().getEdges()) {
                     allEdges.add(e);
                 }
             }
