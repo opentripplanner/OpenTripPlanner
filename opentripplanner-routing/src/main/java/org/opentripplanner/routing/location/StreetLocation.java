@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.location;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -22,6 +23,7 @@ import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
@@ -29,6 +31,7 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.impl.CandidateEdge;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -79,37 +82,55 @@ public class StreetLocation extends StreetVertex {
      * @return the new StreetLocation
      */
     public static StreetLocation createStreetLocation(Graph graph, String label, String name,
-            Iterable<StreetEdge> edges, Coordinate nearestPoint) {
-
-        boolean wheelchairAccessible = false;
+            Iterable<StreetEdge> edges, Coordinate nearestPoint, Coordinate originalCoordinate) {
 
         /* linking vertex with epsilon transitions */
-        StreetLocation location = new StreetLocation(graph, label, nearestPoint, name);
+        StreetLocation location = createStreetLocation(graph, label, name, edges, nearestPoint);
 
+        /* Extra edges for this area */
         Set<StreetEdge> allEdges = new HashSet<StreetEdge>();
+        TraverseModeSet modes = new TraverseModeSet();
         for (StreetEdge street : edges) {
             allEdges.add(street);
             if (street instanceof AreaEdge) {
                 for (StreetEdge e : ((AreaEdge) street).getArea().getEdges()) {
-                    allEdges.add(e);
+                    if (!allEdges.contains(e)) {
+                        CandidateEdge ce = new CandidateEdge(e, originalCoordinate, 0, modes);
+                        if (ce.endwise() || ce.distance > .0005) //skip inappropriate area edges
+                            continue;
+                        StreetLocation areaSplitter = createStreetLocation(graph, label, name, Arrays.asList(e), ce.nearestPointOnEdge);
+                        location.extra.addAll(areaSplitter.getExtra());
+                        location.extra.add(new FreeEdge(location, areaSplitter));
+                        location.extra.add(new FreeEdge(areaSplitter, location));
+                        allEdges.add(e);
+                    }
                 }
             }
         }
-        
-        for (StreetEdge street : allEdges) {
-            /* TODO: need to check for crossing uncrossable streets (in 
-             * previous elements of edges) */
+        location.setSourceEdges(allEdges);
 
+        return location;
+    }
+
+    public static StreetLocation createStreetLocation(Graph graph, String label, String name,
+                Iterable<StreetEdge> edges, Coordinate nearestPoint) {
+
+        boolean wheelchairAccessible = false;
+
+        StreetLocation location = new StreetLocation(graph, label, nearestPoint, name);
+        for (StreetEdge street : edges) {
             Vertex fromv = street.getFromVertex();
             Vertex tov = street.getToVertex();
             wheelchairAccessible |= ((StreetEdge) street).isWheelchairAccessible();
             /* forward edges and vertices */
             Vertex edgeLocation;
-            if (distanceLibrary.distance(nearestPoint, fromv.getCoordinate()) < 0.0001) {
+            if (distanceLibrary.distance(nearestPoint, fromv.getCoordinate()) < 1) {
+                //no need to link to area edges caught on-end
                 edgeLocation = fromv;
                 new FreeEdge(location, edgeLocation);
                 new FreeEdge(edgeLocation, location);
-            } else if (distanceLibrary.distance(nearestPoint, tov.getCoordinate()) < 0.0001) {
+            } else if (distanceLibrary.distance(nearestPoint, tov.getCoordinate()) < 1) {
+                //no need to link to area edges caught on-end
                 edgeLocation = tov;
                 new FreeEdge(location, edgeLocation);
                 new FreeEdge(edgeLocation, location);
@@ -122,7 +143,6 @@ public class StreetLocation extends StreetVertex {
             }
         }
         location.setWheelchairAccessible(wheelchairAccessible);
-        location.setSourceEdges(allEdges);
         return location;
 
     }
