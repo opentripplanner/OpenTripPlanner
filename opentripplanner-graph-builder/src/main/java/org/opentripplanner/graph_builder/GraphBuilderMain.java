@@ -34,11 +34,13 @@ public class GraphBuilderMain {
 
     public static void main(String[] args) throws IOException {
 
-        if( args.length == 0) {
+        if (args.length == 0) {
             System.err.println("usage: config.xml");
             System.exit(-1);
         }
-        
+
+        long startTime = System.currentTimeMillis();
+
         List<String> paths = new ArrayList<String>();
         paths.add("classpath:org/opentripplanner/graph_builder/application-context.xml");
         for (String arg : args)
@@ -47,6 +49,10 @@ public class GraphBuilderMain {
         ApplicationContext context = createContext(paths, new HashMap<String, BeanDefinition>());
         GraphBuilderTask task = (GraphBuilderTask) context.getBean("graphBuilderTask");
         task.run();
+
+        long totalTime = System.currentTimeMillis() - startTime;
+        double totalTimeSeconds = ((double) totalTime) / 1000.0;
+        System.out.println(String.format("Total graph build time: %.1f seconds", totalTimeSeconds));
     }
 
     public static ApplicationContext createContext(Iterable<String> paths,
