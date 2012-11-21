@@ -4,7 +4,7 @@
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  *  @generated
  */
-package org.opentripplanner.api.thrift.service;
+package org.opentripplanner.api.thrift.definition;
 
 import org.apache.thrift.scheme.IScheme;
 import org.apache.thrift.scheme.SchemeFactory;
@@ -27,22 +27,22 @@ import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Location implements org.apache.thrift.TBase<Location, Location._Fields>, java.io.Serializable, Cloneable {
-  private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("Location");
+public class TripDurationResponse implements org.apache.thrift.TBase<TripDurationResponse, TripDurationResponse._Fields>, java.io.Serializable, Cloneable {
+  private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("TripDurationResponse");
 
-  private static final org.apache.thrift.protocol.TField LAT_LNG_FIELD_DESC = new org.apache.thrift.protocol.TField("lat_lng", org.apache.thrift.protocol.TType.STRUCT, (short)1);
+  private static final org.apache.thrift.protocol.TField EXPECTED_TRIP_DURATION_FIELD_DESC = new org.apache.thrift.protocol.TField("expected_trip_duration", org.apache.thrift.protocol.TType.I32, (short)1);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
-    schemes.put(StandardScheme.class, new LocationStandardSchemeFactory());
-    schemes.put(TupleScheme.class, new LocationTupleSchemeFactory());
+    schemes.put(StandardScheme.class, new TripDurationResponseStandardSchemeFactory());
+    schemes.put(TupleScheme.class, new TripDurationResponseTupleSchemeFactory());
   }
 
-  public LatLng lat_lng; // required
+  private int expected_trip_duration; // required
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-    LAT_LNG((short)1, "lat_lng");
+    EXPECTED_TRIP_DURATION((short)1, "expected_trip_duration");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -57,8 +57,8 @@ public class Location implements org.apache.thrift.TBase<Location, Location._Fie
      */
     public static _Fields findByThriftId(int fieldId) {
       switch(fieldId) {
-        case 1: // LAT_LNG
-          return LAT_LNG;
+        case 1: // EXPECTED_TRIP_DURATION
+          return EXPECTED_TRIP_DURATION;
         default:
           return null;
       }
@@ -99,74 +99,76 @@ public class Location implements org.apache.thrift.TBase<Location, Location._Fie
   }
 
   // isset id assignments
+  private static final int __EXPECTED_TRIP_DURATION_ISSET_ID = 0;
+  private BitSet __isset_bit_vector = new BitSet(1);
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
-    tmpMap.put(_Fields.LAT_LNG, new org.apache.thrift.meta_data.FieldMetaData("lat_lng", org.apache.thrift.TFieldRequirementType.REQUIRED, 
-        new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, LatLng.class)));
+    tmpMap.put(_Fields.EXPECTED_TRIP_DURATION, new org.apache.thrift.meta_data.FieldMetaData("expected_trip_duration", org.apache.thrift.TFieldRequirementType.REQUIRED, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
-    org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(Location.class, metaDataMap);
+    org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(TripDurationResponse.class, metaDataMap);
   }
 
-  public Location() {
+  public TripDurationResponse() {
   }
 
-  public Location(
-    LatLng lat_lng)
+  public TripDurationResponse(
+    int expected_trip_duration)
   {
     this();
-    this.lat_lng = lat_lng;
+    this.expected_trip_duration = expected_trip_duration;
+    setExpected_trip_durationIsSet(true);
   }
 
   /**
    * Performs a deep copy on <i>other</i>.
    */
-  public Location(Location other) {
-    if (other.isSetLat_lng()) {
-      this.lat_lng = new LatLng(other.lat_lng);
-    }
+  public TripDurationResponse(TripDurationResponse other) {
+    __isset_bit_vector.clear();
+    __isset_bit_vector.or(other.__isset_bit_vector);
+    this.expected_trip_duration = other.expected_trip_duration;
   }
 
-  public Location deepCopy() {
-    return new Location(this);
+  public TripDurationResponse deepCopy() {
+    return new TripDurationResponse(this);
   }
 
   @Override
   public void clear() {
-    this.lat_lng = null;
+    setExpected_trip_durationIsSet(false);
+    this.expected_trip_duration = 0;
   }
 
-  public LatLng getLat_lng() {
-    return this.lat_lng;
+  public int getExpected_trip_duration() {
+    return this.expected_trip_duration;
   }
 
-  public Location setLat_lng(LatLng lat_lng) {
-    this.lat_lng = lat_lng;
-    return this;
+  public void setExpected_trip_duration(int expected_trip_duration) {
+    this.expected_trip_duration = expected_trip_duration;
+    setExpected_trip_durationIsSet(true);
   }
 
-  public void unsetLat_lng() {
-    this.lat_lng = null;
+  public void unsetExpected_trip_duration() {
+    __isset_bit_vector.clear(__EXPECTED_TRIP_DURATION_ISSET_ID);
   }
 
-  /** Returns true if field lat_lng is set (has been assigned a value) and false otherwise */
-  public boolean isSetLat_lng() {
-    return this.lat_lng != null;
+  /** Returns true if field expected_trip_duration is set (has been assigned a value) and false otherwise */
+  public boolean isSetExpected_trip_duration() {
+    return __isset_bit_vector.get(__EXPECTED_TRIP_DURATION_ISSET_ID);
   }
 
-  public void setLat_lngIsSet(boolean value) {
-    if (!value) {
-      this.lat_lng = null;
-    }
+  public void setExpected_trip_durationIsSet(boolean value) {
+    __isset_bit_vector.set(__EXPECTED_TRIP_DURATION_ISSET_ID, value);
   }
 
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
-    case LAT_LNG:
+    case EXPECTED_TRIP_DURATION:
       if (value == null) {
-        unsetLat_lng();
+        unsetExpected_trip_duration();
       } else {
-        setLat_lng((LatLng)value);
+        setExpected_trip_duration((Integer)value);
       }
       break;
 
@@ -175,8 +177,8 @@ public class Location implements org.apache.thrift.TBase<Location, Location._Fie
 
   public Object getFieldValue(_Fields field) {
     switch (field) {
-    case LAT_LNG:
-      return getLat_lng();
+    case EXPECTED_TRIP_DURATION:
+      return Integer.valueOf(getExpected_trip_duration());
 
     }
     throw new IllegalStateException();
@@ -189,8 +191,8 @@ public class Location implements org.apache.thrift.TBase<Location, Location._Fie
     }
 
     switch (field) {
-    case LAT_LNG:
-      return isSetLat_lng();
+    case EXPECTED_TRIP_DURATION:
+      return isSetExpected_trip_duration();
     }
     throw new IllegalStateException();
   }
@@ -199,21 +201,21 @@ public class Location implements org.apache.thrift.TBase<Location, Location._Fie
   public boolean equals(Object that) {
     if (that == null)
       return false;
-    if (that instanceof Location)
-      return this.equals((Location)that);
+    if (that instanceof TripDurationResponse)
+      return this.equals((TripDurationResponse)that);
     return false;
   }
 
-  public boolean equals(Location that) {
+  public boolean equals(TripDurationResponse that) {
     if (that == null)
       return false;
 
-    boolean this_present_lat_lng = true && this.isSetLat_lng();
-    boolean that_present_lat_lng = true && that.isSetLat_lng();
-    if (this_present_lat_lng || that_present_lat_lng) {
-      if (!(this_present_lat_lng && that_present_lat_lng))
+    boolean this_present_expected_trip_duration = true;
+    boolean that_present_expected_trip_duration = true;
+    if (this_present_expected_trip_duration || that_present_expected_trip_duration) {
+      if (!(this_present_expected_trip_duration && that_present_expected_trip_duration))
         return false;
-      if (!this.lat_lng.equals(that.lat_lng))
+      if (this.expected_trip_duration != that.expected_trip_duration)
         return false;
     }
 
@@ -225,20 +227,20 @@ public class Location implements org.apache.thrift.TBase<Location, Location._Fie
     return 0;
   }
 
-  public int compareTo(Location other) {
+  public int compareTo(TripDurationResponse other) {
     if (!getClass().equals(other.getClass())) {
       return getClass().getName().compareTo(other.getClass().getName());
     }
 
     int lastComparison = 0;
-    Location typedOther = (Location)other;
+    TripDurationResponse typedOther = (TripDurationResponse)other;
 
-    lastComparison = Boolean.valueOf(isSetLat_lng()).compareTo(typedOther.isSetLat_lng());
+    lastComparison = Boolean.valueOf(isSetExpected_trip_duration()).compareTo(typedOther.isSetExpected_trip_duration());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    if (isSetLat_lng()) {
-      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.lat_lng, typedOther.lat_lng);
+    if (isSetExpected_trip_duration()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.expected_trip_duration, typedOther.expected_trip_duration);
       if (lastComparison != 0) {
         return lastComparison;
       }
@@ -260,15 +262,11 @@ public class Location implements org.apache.thrift.TBase<Location, Location._Fie
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder("Location(");
+    StringBuilder sb = new StringBuilder("TripDurationResponse(");
     boolean first = true;
 
-    sb.append("lat_lng:");
-    if (this.lat_lng == null) {
-      sb.append("null");
-    } else {
-      sb.append(this.lat_lng);
-    }
+    sb.append("expected_trip_duration:");
+    sb.append(this.expected_trip_duration);
     first = false;
     sb.append(")");
     return sb.toString();
@@ -276,9 +274,10 @@ public class Location implements org.apache.thrift.TBase<Location, Location._Fie
 
   public void validate() throws org.apache.thrift.TException {
     // check for required fields
-    if (lat_lng == null) {
-      throw new org.apache.thrift.protocol.TProtocolException("Required field 'lat_lng' was not present! Struct: " + toString());
+    if (!isSetExpected_trip_duration()) {
+      throw new org.apache.thrift.protocol.TProtocolException("Required field 'expected_trip_duration' is unset! Struct:" + toString());
     }
+
   }
 
   private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
@@ -291,21 +290,23 @@ public class Location implements org.apache.thrift.TBase<Location, Location._Fie
 
   private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
     try {
+      // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
+      __isset_bit_vector = new BitSet(1);
       read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
     } catch (org.apache.thrift.TException te) {
       throw new java.io.IOException(te);
     }
   }
 
-  private static class LocationStandardSchemeFactory implements SchemeFactory {
-    public LocationStandardScheme getScheme() {
-      return new LocationStandardScheme();
+  private static class TripDurationResponseStandardSchemeFactory implements SchemeFactory {
+    public TripDurationResponseStandardScheme getScheme() {
+      return new TripDurationResponseStandardScheme();
     }
   }
 
-  private static class LocationStandardScheme extends StandardScheme<Location> {
+  private static class TripDurationResponseStandardScheme extends StandardScheme<TripDurationResponse> {
 
-    public void read(org.apache.thrift.protocol.TProtocol iprot, Location struct) throws org.apache.thrift.TException {
+    public void read(org.apache.thrift.protocol.TProtocol iprot, TripDurationResponse struct) throws org.apache.thrift.TException {
       org.apache.thrift.protocol.TField schemeField;
       iprot.readStructBegin();
       while (true)
@@ -315,11 +316,10 @@ public class Location implements org.apache.thrift.TBase<Location, Location._Fie
           break;
         }
         switch (schemeField.id) {
-          case 1: // LAT_LNG
-            if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
-              struct.lat_lng = new LatLng();
-              struct.lat_lng.read(iprot);
-              struct.setLat_lngIsSet(true);
+          case 1: // EXPECTED_TRIP_DURATION
+            if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+              struct.expected_trip_duration = iprot.readI32();
+              struct.setExpected_trip_durationIsSet(true);
             } else { 
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
@@ -330,46 +330,41 @@ public class Location implements org.apache.thrift.TBase<Location, Location._Fie
         iprot.readFieldEnd();
       }
       iprot.readStructEnd();
-
-      // check for required fields of primitive type, which can't be checked in the validate method
       struct.validate();
     }
 
-    public void write(org.apache.thrift.protocol.TProtocol oprot, Location struct) throws org.apache.thrift.TException {
+    public void write(org.apache.thrift.protocol.TProtocol oprot, TripDurationResponse struct) throws org.apache.thrift.TException {
       struct.validate();
 
       oprot.writeStructBegin(STRUCT_DESC);
-      if (struct.lat_lng != null) {
-        oprot.writeFieldBegin(LAT_LNG_FIELD_DESC);
-        struct.lat_lng.write(oprot);
-        oprot.writeFieldEnd();
-      }
+      oprot.writeFieldBegin(EXPECTED_TRIP_DURATION_FIELD_DESC);
+      oprot.writeI32(struct.expected_trip_duration);
+      oprot.writeFieldEnd();
       oprot.writeFieldStop();
       oprot.writeStructEnd();
     }
 
   }
 
-  private static class LocationTupleSchemeFactory implements SchemeFactory {
-    public LocationTupleScheme getScheme() {
-      return new LocationTupleScheme();
+  private static class TripDurationResponseTupleSchemeFactory implements SchemeFactory {
+    public TripDurationResponseTupleScheme getScheme() {
+      return new TripDurationResponseTupleScheme();
     }
   }
 
-  private static class LocationTupleScheme extends TupleScheme<Location> {
+  private static class TripDurationResponseTupleScheme extends TupleScheme<TripDurationResponse> {
 
     @Override
-    public void write(org.apache.thrift.protocol.TProtocol prot, Location struct) throws org.apache.thrift.TException {
+    public void write(org.apache.thrift.protocol.TProtocol prot, TripDurationResponse struct) throws org.apache.thrift.TException {
       TTupleProtocol oprot = (TTupleProtocol) prot;
-      struct.lat_lng.write(oprot);
+      oprot.writeI32(struct.expected_trip_duration);
     }
 
     @Override
-    public void read(org.apache.thrift.protocol.TProtocol prot, Location struct) throws org.apache.thrift.TException {
+    public void read(org.apache.thrift.protocol.TProtocol prot, TripDurationResponse struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
-      struct.lat_lng = new LatLng();
-      struct.lat_lng.read(iprot);
-      struct.setLat_lngIsSet(true);
+      struct.expected_trip_duration = iprot.readI32();
+      struct.setExpected_trip_durationIsSet(true);
     }
   }
 

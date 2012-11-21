@@ -4,7 +4,7 @@
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  *  @generated
  */
-package org.opentripplanner.api.thrift.service;
+package org.opentripplanner.api.thrift.definition;
 
 import org.apache.thrift.scheme.IScheme;
 import org.apache.thrift.scheme.SchemeFactory;
@@ -40,9 +40,9 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
     schemes.put(TupleScheme.class, new TripParametersTupleSchemeFactory());
   }
 
-  public Location origin; // required
-  public Location destination; // required
-  public Set<TravelMode> allowed_modes; // optional
+  private Location origin; // required
+  private Location destination; // required
+  private Set<TravelMode> allowed_modes; // optional
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -170,9 +170,8 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
     return this.origin;
   }
 
-  public TripParameters setOrigin(Location origin) {
+  public void setOrigin(Location origin) {
     this.origin = origin;
-    return this;
   }
 
   public void unsetOrigin() {
@@ -194,9 +193,8 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
     return this.destination;
   }
 
-  public TripParameters setDestination(Location destination) {
+  public void setDestination(Location destination) {
     this.destination = destination;
-    return this;
   }
 
   public void unsetDestination() {
@@ -233,9 +231,8 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
     return this.allowed_modes;
   }
 
-  public TripParameters setAllowed_modes(Set<TravelMode> allowed_modes) {
+  public void setAllowed_modes(Set<TravelMode> allowed_modes) {
     this.allowed_modes = allowed_modes;
-    return this;
   }
 
   public void unsetAllowed_modes() {
@@ -451,12 +448,14 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
 
   public void validate() throws org.apache.thrift.TException {
     // check for required fields
-    if (origin == null) {
-      throw new org.apache.thrift.protocol.TProtocolException("Required field 'origin' was not present! Struct: " + toString());
+    if (!isSetOrigin()) {
+      throw new org.apache.thrift.protocol.TProtocolException("Required field 'origin' is unset! Struct:" + toString());
     }
-    if (destination == null) {
-      throw new org.apache.thrift.protocol.TProtocolException("Required field 'destination' was not present! Struct: " + toString());
+
+    if (!isSetDestination()) {
+      throw new org.apache.thrift.protocol.TProtocolException("Required field 'destination' is unset! Struct:" + toString());
     }
+
   }
 
   private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
@@ -535,8 +534,6 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
         iprot.readFieldEnd();
       }
       iprot.readStructEnd();
-
-      // check for required fields of primitive type, which can't be checked in the validate method
       struct.validate();
     }
 

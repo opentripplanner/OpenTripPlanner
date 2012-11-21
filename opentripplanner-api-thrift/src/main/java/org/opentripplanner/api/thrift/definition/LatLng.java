@@ -4,7 +4,7 @@
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  *  @generated
  */
-package org.opentripplanner.api.thrift.service;
+package org.opentripplanner.api.thrift.definition;
 
 import org.apache.thrift.scheme.IScheme;
 import org.apache.thrift.scheme.SchemeFactory;
@@ -39,8 +39,8 @@ public class LatLng implements org.apache.thrift.TBase<LatLng, LatLng._Fields>, 
     schemes.put(TupleScheme.class, new LatLngTupleSchemeFactory());
   }
 
-  public double lat; // required
-  public double lng; // required
+  private double lat; // required
+  private double lng; // required
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -158,10 +158,9 @@ public class LatLng implements org.apache.thrift.TBase<LatLng, LatLng._Fields>, 
     return this.lat;
   }
 
-  public LatLng setLat(double lat) {
+  public void setLat(double lat) {
     this.lat = lat;
     setLatIsSet(true);
-    return this;
   }
 
   public void unsetLat() {
@@ -181,10 +180,9 @@ public class LatLng implements org.apache.thrift.TBase<LatLng, LatLng._Fields>, 
     return this.lng;
   }
 
-  public LatLng setLng(double lng) {
+  public void setLng(double lng) {
     this.lng = lng;
     setLngIsSet(true);
-    return this;
   }
 
   public void unsetLng() {
@@ -348,8 +346,14 @@ public class LatLng implements org.apache.thrift.TBase<LatLng, LatLng._Fields>, 
 
   public void validate() throws org.apache.thrift.TException {
     // check for required fields
-    // alas, we cannot check 'lat' because it's a primitive and you chose the non-beans generator.
-    // alas, we cannot check 'lng' because it's a primitive and you chose the non-beans generator.
+    if (!isSetLat()) {
+      throw new org.apache.thrift.protocol.TProtocolException("Required field 'lat' is unset! Struct:" + toString());
+    }
+
+    if (!isSetLng()) {
+      throw new org.apache.thrift.protocol.TProtocolException("Required field 'lng' is unset! Struct:" + toString());
+    }
+
   }
 
   private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
@@ -410,14 +414,6 @@ public class LatLng implements org.apache.thrift.TBase<LatLng, LatLng._Fields>, 
         iprot.readFieldEnd();
       }
       iprot.readStructEnd();
-
-      // check for required fields of primitive type, which can't be checked in the validate method
-      if (!struct.isSetLat()) {
-        throw new org.apache.thrift.protocol.TProtocolException("Required field 'lat' was not found in serialized data! Struct: " + toString());
-      }
-      if (!struct.isSetLng()) {
-        throw new org.apache.thrift.protocol.TProtocolException("Required field 'lng' was not found in serialized data! Struct: " + toString());
-      }
       struct.validate();
     }
 

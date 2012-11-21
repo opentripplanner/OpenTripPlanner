@@ -4,7 +4,7 @@
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  *  @generated
  */
-package org.opentripplanner.api.thrift.service;
+package org.opentripplanner.api.thrift.definition;
 
 import org.apache.thrift.scheme.IScheme;
 import org.apache.thrift.scheme.SchemeFactory;
@@ -38,7 +38,7 @@ public class TripDurationRequest implements org.apache.thrift.TBase<TripDuration
     schemes.put(TupleScheme.class, new TripDurationRequestTupleSchemeFactory());
   }
 
-  public TripParameters trip; // required
+  private TripParameters trip; // required
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -140,9 +140,8 @@ public class TripDurationRequest implements org.apache.thrift.TBase<TripDuration
     return this.trip;
   }
 
-  public TripDurationRequest setTrip(TripParameters trip) {
+  public void setTrip(TripParameters trip) {
     this.trip = trip;
-    return this;
   }
 
   public void unsetTrip() {
@@ -276,9 +275,10 @@ public class TripDurationRequest implements org.apache.thrift.TBase<TripDuration
 
   public void validate() throws org.apache.thrift.TException {
     // check for required fields
-    if (trip == null) {
-      throw new org.apache.thrift.protocol.TProtocolException("Required field 'trip' was not present! Struct: " + toString());
+    if (!isSetTrip()) {
+      throw new org.apache.thrift.protocol.TProtocolException("Required field 'trip' is unset! Struct:" + toString());
     }
+
   }
 
   private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
@@ -330,8 +330,6 @@ public class TripDurationRequest implements org.apache.thrift.TBase<TripDuration
         iprot.readFieldEnd();
       }
       iprot.readStructEnd();
-
-      // check for required fields of primitive type, which can't be checked in the validate method
       struct.validate();
     }
 

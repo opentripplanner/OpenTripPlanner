@@ -12,9 +12,9 @@
  * @version draft
  */
  
-namespace cpp opentripplanner.api.thrift.service
-namespace java org.opentripplanner.api.thrift.service
-namespace py opentripplanner.api.thrift.service
+namespace cpp opentripplanner.api.thrift.definition
+namespace java org.opentripplanner.api.thrift.definition
+namespace py opentripplanner.api.thrift.definition
 
 // Modes of travel. 
 // TODO(flamholz): should we expose them all?

@@ -4,7 +4,7 @@
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  *  @generated
  */
-package org.opentripplanner.api.thrift.service;
+package org.opentripplanner.api.thrift.definition;
 
 
 import java.util.Map;

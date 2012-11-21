@@ -4,7 +4,7 @@
  * DO NOT EDIT UNLESS YOU ARE SURE THAT YOU KNOW WHAT YOU ARE DOING
  *  @generated
  */
-package org.opentripplanner.api.thrift.service;
+package org.opentripplanner.api.thrift.definition;
 
 import org.apache.thrift.scheme.IScheme;
 import org.apache.thrift.scheme.SchemeFactory;
@@ -188,7 +188,7 @@ public class OTPService {
       schemes.put(TupleScheme.class, new GetTripDuration_argsTupleSchemeFactory());
     }
 
-    public TripDurationRequest req; // required
+    private TripDurationRequest req; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -290,9 +290,8 @@ public class OTPService {
       return this.req;
     }
 
-    public GetTripDuration_args setReq(TripDurationRequest req) {
+    public void setReq(TripDurationRequest req) {
       this.req = req;
-      return this;
     }
 
     public void unsetReq() {
@@ -477,8 +476,6 @@ public class OTPService {
           iprot.readFieldEnd();
         }
         iprot.readStructEnd();
-
-        // check for required fields of primitive type, which can't be checked in the validate method
         struct.validate();
       }
 
@@ -543,7 +540,7 @@ public class OTPService {
       schemes.put(TupleScheme.class, new GetTripDuration_resultTupleSchemeFactory());
     }
 
-    public TripDurationResponse success; // required
+    private TripDurationResponse success; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -645,9 +642,8 @@ public class OTPService {
       return this.success;
     }
 
-    public GetTripDuration_result setSuccess(TripDurationResponse success) {
+    public void setSuccess(TripDurationResponse success) {
       this.success = success;
-      return this;
     }
 
     public void unsetSuccess() {
@@ -832,8 +828,6 @@ public class OTPService {
           iprot.readFieldEnd();
         }
         iprot.readStructEnd();
-
-        // check for required fields of primitive type, which can't be checked in the validate method
         struct.validate();
       }
 
