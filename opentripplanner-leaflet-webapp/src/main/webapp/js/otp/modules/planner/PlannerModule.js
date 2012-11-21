@@ -141,7 +141,7 @@ otp.modules.planner.PlannerModule =
         this.planTrip(queryParams);
     },
     
-    planTrip : function(existingQueryParams, skipSave) {
+    planTrip : function(existingQueryParams, apiMethod) {
     
         if(typeof this.planTripStart == 'function') this.planTripStart();
         
@@ -154,7 +154,8 @@ otp.modules.planner.PlannerModule =
         	this.currentRequest = null;
         }
     	
-        var url = otp.config.hostname + '/opentripplanner-api-webapp/ws/plan';
+    	apiMethod = apiMethod || 'plan';
+        var url = otp.config.hostname + '/opentripplanner-api-webapp/ws/'+apiMethod;
         this.pathLayer.clearLayers();        
         
         var this_ = this;
@@ -207,8 +208,8 @@ otp.modules.planner.PlannerModule =
 
                     this_.updateTipStep(3);
                     
-                    if(!skipSave)
-                    	this_.savePlan(queryParams);
+                    /*if(!skipSave)
+                    	this_.savePlan(queryParams);*/
                     
                 }
                 else {

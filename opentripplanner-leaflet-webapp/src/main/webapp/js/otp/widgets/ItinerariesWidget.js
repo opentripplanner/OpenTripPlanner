@@ -21,27 +21,35 @@ otp.widgets.ItinerariesWidget =
     
     header : null,
     itinsAccord : null,
+    footer : null,
+    
+    itineraries : null,
+    activeIndex : 0,
     
     initialize : function(id, module) {
     
         otp.widgets.Widget.prototype.initialize.apply(this, arguments);
         this.module = module;
-        this.$().addClass('otp-itinWidget');
+        this.$().addClass('otp-itinsWidget');
         this.$().resizable();
         this.header = $("<div>X Itineraries Returned:</div>").appendTo(this.$());
     },
     
     updateItineraries : function(itins) {
         var this_ = this;
-
+        this.itineraries = itins;
         this.header.html(itins.length+" Itineraries Returned:");
         
         if(this.itinsAccord !== null) {
             this.itinsAccord.remove();
         }
+        if(this.footer !== null) {
+            this.footer.remove();
+        }
         var divId = this.moduleId+"-itinsAccord";
         var html = "<div id='"+divId+"' class='otp-itinsAccord'></div>";
         this.itinsAccord = $(html).appendTo(this.$());
+        this.appendFooter();
 
         for(var i=0; i<itins.length; i++) {
             var itin = itins[i];
@@ -50,9 +58,11 @@ otp.widgets.ItinerariesWidget =
                 var arr = evt.target.id.split('-');
                 var index = parseInt(arr[arr.length-1]);
                 this_.module.drawItinerary(itins[index]);
+                this.activeIndex = index;
             });
             this.renderItinerary(itin, i).appendTo(this.itinsAccord);
         }
+        this.activeIndex = 0;
         
         this.itinsAccord.accordion({
             heightStyle: "fill"
@@ -65,6 +75,30 @@ otp.widgets.ItinerariesWidget =
         this.$().draggable({ cancel: "#"+divId });
         
     },
+    
+    appendFooter : function() {
+        var this_ = this;
+        this.footer = $("<div class='otp-itinsButtonRow'></div>").appendTo(this.$());
+        $('<button>First</button>').button().appendTo(this.footer).click(function() {
+            var params = this_.module.lastQueryParams;
+            console.log(this_.itineraries[this_.activeIndex]);
+            var stopId = otp.util.Itin.getFirstStop(this_.itineraries[this_.activeIndex]);
+            console.log("required stop: "+stopId);
+            _.extend(params, { startTransitStopId :  stopId });
+            this_.module.planTrip(params,'plan/first');
+        });
+        $('<button>Previous</button>').button().appendTo(this.footer).click(function() {
+            console.log('previous');
+        });
+        $('<button>Next</button>').button().appendTo(this.footer).click(function() {
+            console.log('next');
+        });
+        $('<button>Last</button>').button().appendTo(this.footer).click(function() {
+            this_.module.planTrip(null,'plan/last');
+        });
+    },
+    
+    
     
     renderItinerary : function(itin, i) {
         var this_ = this;

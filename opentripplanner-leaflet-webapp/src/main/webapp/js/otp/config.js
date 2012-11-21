@@ -6,7 +6,7 @@ if(typeof(otp.config) == "undefined" || otp.config == null) otp.config = {};
 
 // step 2: create an object of default otp.config default values (see step3 where we apply this to any existing config)
 otp.config = {
-
+/*
     // OTP server address and routerId (if applicable)
     hostname : "http://nyc.deployer.opentripplanner.org",
     routerId : "req-241",
@@ -20,7 +20,21 @@ otp.config = {
     initLatLng : new L.LatLng(40.7195,-74), // (NYC)
     initZoom : 14,
     minZoom : 13,
-    maxZoom : 17,
+    maxZoom : 17,*/
+    // OTP server address and routerId (if applicable)
+    hostname : "http://otpna-c.deployer.opentripplanner.org",
+    routerId : "req-699",
+
+    // Base map tiles settings:
+    tileUrl : 'http://{s}.tiles.mapbox.com/v3/mapbox.mapbox-streets/{z}/{x}/{y}.png',
+    // overlayTileUrl : [link to tileset to overlay on base layer],
+    tileAttrib : 'Routing powered by <a href="http://opentripplanner.org/">OpenTripPlanner</a>, Map tiles from MapBox (<a href="http://mapbox.com/about/maps/">terms</a>) and OpenStreetMap ',
+    
+    // map start location and zoom settings 
+    initLatLng : new L.LatLng(45.523307,-122.676086),
+    initZoom : 14,
+    minZoom : 13,
+    maxZoom : 17,    
 
     showLogo:           true,
     showTitle:          true,

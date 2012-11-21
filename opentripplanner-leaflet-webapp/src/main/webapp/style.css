@@ -613,7 +613,7 @@ h6.drag-to-change {
  
 /* Itineraries Widget */
 
-.otp-itinWidget {
+.otp-itinsWidget {
   top: 60px;
   left: 50px;
   width: 300px;
@@ -635,6 +635,11 @@ h6.drag-to-change {
 
 .otp-itinEndRow {
     margin-top: .5em;
+}
+
+.otp-itinsButtonRow {
+    margin-top: .5em;    
+    text-align: center;
 }
 
 /* Past Queries Widget */

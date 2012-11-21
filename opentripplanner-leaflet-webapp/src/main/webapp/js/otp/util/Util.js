@@ -26,3 +26,20 @@ otp.util.Geo = {
     }
 
 };
+
+otp.util.Itin = {
+
+    getFirstStop : function(itin) {
+        for(var l=0; l<itin.legs.length; l++) {
+            var leg = itin.legs[l];
+            if(otp.util.Itin.isTransit(leg.mode)) {
+                return leg.from.stopId.agencyId+"_"+leg.from.stopId.id;
+            }
+        }
+        return null;
+    },
+    
+    isTransit : function(mode) {
+        return mode === "TRANSIT" || mode === "SUBWAY" || mode === "BUS" || mode === "TRAM";
+    }
+}
