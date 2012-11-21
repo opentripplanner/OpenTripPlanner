@@ -1,0 +1,216 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <artifactId>opentripplanner-api-thrift</artifactId>
+    <packaging>jar</packaging>
+    <name>OpenTripPlanner Thrift API Server</name>
+
+    <parent>
+        <groupId>org.opentripplanner</groupId>
+        <artifactId>opentripplanner</artifactId>
+        <version>0.9.2-SNAPSHOT</version>
+    </parent>
+
+    <dependencies>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>opentripplanner-routing</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>opentripplanner-graph-builder</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>opentripplanner-updater</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>opentripplanner-utils</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+		<dependency>
+    	    <groupId>org.apache.thrift</groupId>
+            <artifactId>libthrift</artifactId>
+            <version>0.8.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.5.8</version>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.14</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-aop</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-beans</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-context</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-core</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-web</artifactId>
+        </dependency>
+        <dependency>
+      	  <groupId>org.springframework.security</groupId>
+      	  <artifactId>spring-security-core</artifactId>
+        </dependency>
+        <dependency>
+      	  <groupId>org.springframework.security</groupId>
+      	  <artifactId>spring-security-config</artifactId>
+        </dependency>
+        <dependency>
+      	  <groupId>org.springframework.security</groupId>
+      	  <artifactId>spring-security-web</artifactId>
+        </dependency>
+        <dependency>
+      	  <groupId>javax.annotation</groupId>
+      	  <artifactId>jsr250-api</artifactId>
+      	  <version>1.0</version>
+        </dependency>
+        <dependency>
+      	  <groupId>cglib</groupId>
+      	  <artifactId>cglib</artifactId>
+      	  <version>2.2.2</version>
+        </dependency>
+        <dependency>
+          <groupId>org.mockito</groupId>
+          <artifactId>mockito-all</artifactId>
+          <version>1.9.0</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.projectlombok</groupId>
+          <artifactId>lombok</artifactId>
+        </dependency>
+    </dependencies>
+
+
+    <build>
+        <finalName>opentripplanner-api-thrift</finalName>
+
+        <plugins>
+	    <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                </configuration>
+            </plugin>
+
+            <!-- Copy in a couple of default resources if they are not already present -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <!-- bind to the generate-resources phase, which comes just before 
+                        process-resources. the WAR packaging type automatically defines a
+                        resources:resources execution in the process-resources phase, which copies 
+                        resources from /src/main/resources to target/classes, and this automatic 
+                        execution will happen _before_ any manually declared execution in the same 
+                        phase, copying the resources into target before the defaults are provided. -->
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/src/main/resources</outputDirectory>
+                            <overwrite>false</overwrite>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/src/defaults/resources</directory>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+				</executions>
+			</plugin>
+
+            <plugin>
+                <groupId>org.codehaus.enunciate</groupId>
+                <artifactId>maven-enunciate-plugin</artifactId>
+                <version>1.25</version>
+                <executions>
+                  <execution>
+                    <!-- default binding for docs goal is process-sources phase -->
+                    <phase>site</phase>
+                    <goals>
+                      <goal>docs</goal>
+                    </goals>
+                  </execution>
+                </executions>
+                <configuration>
+                  <!-- change this to wherever you want the docs -->
+                  <docsDir>${project.build.directory}/site/enunciate</docsDir>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <!-- If we are running in hudson -->
+    <profiles>
+        <profile>
+            <id>hudson</id>
+            <activation>
+                <property>
+                    <name>BUILD_NUMBER</name>
+                </property>
+            </activation>
+
+            <distributionManagement>
+                <site>
+                    <id>opentripplanner-docs</id> 
+                    <name>OpenTripPlanner Docs</name>
+                    <url>scp://opentripplanner.org/home/mavendeploy/otp-maven-site/webapi</url>
+                </site>
+            </distributionManagement>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <version>2.5</version>
+                        <configuration>
+                            <disableXmlReport>false</disableXmlReport>
+                            <argLine>-Xmx1000m</argLine>
+                        </configuration>
+                	</plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+
+</project>
