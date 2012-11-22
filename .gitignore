@@ -27,6 +27,7 @@ opentripplanner-webapp/src/main/webapp/js/otp-min.js
 *.ipr
 *.iml
 *.iws
+*.swp
 .externalToolBuilders
 gen-java/
 gen-javabean/
