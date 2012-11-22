@@ -17,7 +17,7 @@ namespace java org.opentripplanner.api.thrift.definition
 namespace py opentripplanner.api.thrift.definition
 
 // Modes of travel. 
-// TODO(flamholz): should we expose them all?
+// TODO(flamholz): expose them all?
 enum TravelMode {
 	BICYCLE, WALK, CAR, TRAM, SUBWAY,
 	RAIL, ANY_TRAIN, ANY_TRANSIT
@@ -53,6 +53,10 @@ struct TripDurationResponse {
 	1: required i32 expected_trip_duration;
 }
 
+// Raised when there is no route found for the input trip
+exception NoPathFoundError {
+	1: required string message;
+}
 
 /**
  * Thrift service definition exposed to clients.
@@ -62,7 +66,8 @@ service OTPService {
 	/**
 	 * Calculate the duration of a trip.
 	 */
-	TripDurationResponse GetTripDuration(1:TripDurationRequest req);
+	TripDurationResponse GetTripDuration(1:TripDurationRequest req)
+		throws (1: NoPathFoundError path_err);
 }
 
 
