@@ -11,20 +11,41 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.api.thrift;  
+package org.opentripplanner.api.thrift;
 
 import lombok.Data;
 
+import org.apache.thrift.server.TServer;
+import org.apache.thrift.server.THsHaServer;
+import org.apache.thrift.transport.TNonblockingServerSocket;
+import org.apache.thrift.transport.TNonblockingServerTransport;
+
+import org.opentripplanner.api.thrift.definition.OTPService;
 import org.opentripplanner.api.thrift.impl.OTPServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Data
 public class OTPServerTask implements Runnable {
-    
-    private static Logger LOG = LoggerFactory.getLogger(OTPServerTask.class); 
 
-    private OTPServiceImpl handler;
-    
-    public void run() {        }
+	private static Logger LOG = LoggerFactory.getLogger(OTPServerTask.class);
+	private OTPServiceImpl handler;
+	private int port;
+
+	public void run() {
+		try {
+			OTPService.Processor<OTPServiceImpl> processor = new OTPService.Processor<OTPServiceImpl>(
+					handler);
+			
+			// TODO(flamholz): make the transport and server type be configurable?
+			TNonblockingServerTransport serverTransport = new TNonblockingServerSocket(port);
+			THsHaServer.Args args = new THsHaServer.Args(serverTransport).processor(processor);
+			TServer server = new THsHaServer(args);
+			
+			LOG.info("Starting the OTPService on port {}", port);
+			server.serve();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+    }
 }

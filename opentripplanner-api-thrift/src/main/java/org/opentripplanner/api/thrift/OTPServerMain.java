@@ -11,7 +11,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.api.thrift;  
+package org.opentripplanner.api.thrift;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -40,7 +40,6 @@ public class OTPServerMain {
 			System.exit(-1);
 		}
 
-
 		List<String> paths = new ArrayList<String>();
 		paths.add("classpath:org/opentripplanner/api_thrift/application-context.xml");
 		for (String arg : args)
@@ -48,8 +47,8 @@ public class OTPServerMain {
 
 		ApplicationContext context = createContext(paths,
 				new HashMap<String, BeanDefinition>());
-		GraphBuilderTask task = (GraphBuilderTask) context
-				.getBean("graphBuilderTask");
+		OTPServerTask task = (OTPServerTask) context
+				.getBean("otpServerTask");
 		task.run();
 	}
 

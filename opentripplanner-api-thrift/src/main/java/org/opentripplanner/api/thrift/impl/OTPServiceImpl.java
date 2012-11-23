@@ -6,6 +6,8 @@ import lombok.Data;
 
 import org.apache.thrift.TException;
 import org.opentripplanner.api.thrift.OTPServerTask;
+import org.opentripplanner.api.thrift.definition.GraphVerticesRequest;
+import org.opentripplanner.api.thrift.definition.GraphVerticesResponse;
 import org.opentripplanner.api.thrift.definition.NoPathFoundError;
 import org.opentripplanner.api.thrift.definition.OTPService;
 import org.opentripplanner.api.thrift.definition.TripDurationRequest;
@@ -33,7 +35,10 @@ public class OTPServiceImpl implements OTPService.Iface {
 		
 		TripParameters trip = req.getTrip();
 		RoutingRequest options = TripUtil.initRoutingRequest(trip);
+		// For now, only get 1 itinerary.
+		options.setNumItineraries(1);	
 		options.setRoutingContext(graphService.getGraph());
+			
 		List<GraphPath> paths = pathService.getPaths(options);
 		
 		// TODO(flamholz): do something reasonable when > 1 path found.
@@ -47,6 +52,14 @@ public class OTPServiceImpl implements OTPService.Iface {
 			throw new NoPathFoundError("No path found for your trip.");
 		}
 		
+		return res;
+	}
+
+	@Override
+	public GraphVerticesResponse GetVertices(GraphVerticesRequest req)
+			throws TException {
+		GraphVerticesResponse res = new GraphVerticesResponse();
+		res.setVertices(GraphUtil.getGraphVertices(graphService.getGraph()));
 		return res;
 	}
 	

@@ -32,7 +32,16 @@ struct Location {
 	1: required LatLng lat_lng;
 	
 	// TODO(flamholz): add more parameters later.
-	// e.g. bearing, azimuth, accuracy, historical data.
+	// e.g. bearing, azimuth, accuracy.
+}
+
+struct GraphVertex {
+	1: required string label;
+	2: required Location location; 
+	
+	3: optional string name;
+	4: optional i32 in_degree;
+	5: optional i32 out_degree;
 }
 
 struct TripParameters {
@@ -53,6 +62,15 @@ struct TripDurationResponse {
 	1: required i32 expected_trip_duration;
 }
 
+// Request to get vertices in the graph.
+struct GraphVerticesRequest {
+	// TODO(flamholz): add parameters about which graph, etc.
+}
+
+struct GraphVerticesResponse {
+	1: required list<GraphVertex> vertices;
+}
+
 // Raised when there is no route found for the input trip
 exception NoPathFoundError {
 	1: required string message;
@@ -62,6 +80,11 @@ exception NoPathFoundError {
  * Thrift service definition exposed to clients.
  */
 service OTPService {
+
+	/**
+	 * Get the graph vertices.
+	 */
+	GraphVerticesResponse GetVertices(1:GraphVerticesRequest req);
 
 	/**
 	 * Calculate the duration of a trip.
