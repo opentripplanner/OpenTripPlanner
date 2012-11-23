@@ -348,12 +348,22 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     polygonHoles.add(polygon);
                 }
 
-                LinearRing[] lrholes = new LinearRing[polygonHoles.size()];
-                int i = 0;
+                ArrayList<LinearRing> lrholelist = new ArrayList<LinearRing>(polygonHoles.size());
+
                 for (Polygon hole : polygonHoles) {
-                    lrholes[i++] = (LinearRing) hole.getBoundary();
+                    Geometry boundary = hole.getBoundary();
+                    if (boundary instanceof LinearRing) {
+                        lrholelist.add((LinearRing) boundary);
+                    } else {
+                        //this is a case of a hole inside a hole.  OSM technically
+                        //allows this, but it would be a giant hassle to get right.  So:
+                        LineString line = hole.getExteriorRing();
+                        LinearRing ring = factory.createLinearRing(line.getCoordinates());
+                        lrholelist.add(ring);
+                    }
                 }
-                jtsPolygon = factory.createPolygon(shell, lrholes );
+                LinearRing[] lrholes = lrholelist.toArray(new LinearRing[lrholelist.size()]);
+                jtsPolygon = factory.createPolygon(shell, lrholes);
                 return jtsPolygon;
             }
 

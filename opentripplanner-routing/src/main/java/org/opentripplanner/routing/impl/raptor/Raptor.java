@@ -120,6 +120,7 @@ public class Raptor implements PathService {
         //also fall back to A* for short trips
         double distance = distanceLibrary.distance(options.rctx.origin.getCoordinate(), options.rctx.target.getCoordinate());
         if (distance < shortPathCutoff) {
+            log.debug("Falling back to A* for very short path");
             return shortPathService.getPaths(options);
         }
 
