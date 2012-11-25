@@ -1,4 +1,4 @@
-package org.opentripplanner.api.thrift.impl;
+package org.opentripplanner.api.thrift.util;
 
 import org.opentripplanner.api.thrift.definition.LatLng;
 import org.opentripplanner.api.thrift.definition.Location;

@@ -1,4 +1,4 @@
-package org.opentripplanner.api.thrift.impl;
+package org.opentripplanner.api.thrift.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
