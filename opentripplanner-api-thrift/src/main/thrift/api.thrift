@@ -57,9 +57,17 @@ struct TripDurationRequest {
 	1: required TripParameters trip;
 }
 
-// Request to calculate the time a trip will take.
 struct TripDurationResponse {
 	1: required i32 expected_trip_duration;
+}
+
+// Request to calculate the time several trips will take.
+struct BulkTripDurationRequest {
+	1: required list<TripParameters> trips;
+}
+
+struct BulkTripDurationResponse {
+	1: required list<i32> expected_trip_durations;
 }
 
 // Request to get vertices in the graph.
@@ -91,6 +99,11 @@ service OTPService {
 	 */
 	TripDurationResponse GetTripDuration(1:TripDurationRequest req)
 		throws (1: NoPathFoundError path_err);
+	
+	/**
+	 * Calculate the duration of a trip.
+	 */
+	BulkTripDurationResponse GetManyTripDurations(1:BulkTripDurationRequest req);
 }
 
 
