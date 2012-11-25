@@ -16,6 +16,8 @@
         <property name="port" value="8889" />
 	<property name="otpServiceImpl">
 	    <bean class="org.opentripplanner.api.thrift.impl.OTPServiceImpl">
+	    	<property name="graphService" ref="graphService" />
+	    	<property name="pathService" ref="pathService" />
 	    </bean>
 	</property>
     </bean>

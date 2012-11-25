@@ -43,7 +43,7 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
   }
 
   private String label; // required
-  private Location location; // required
+  private Location location; // optional
   private String name; // optional
   private int in_degree; // optional
   private int out_degree; // optional
@@ -122,13 +122,13 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
   private static final int __IN_DEGREE_ISSET_ID = 0;
   private static final int __OUT_DEGREE_ISSET_ID = 1;
   private BitSet __isset_bit_vector = new BitSet(2);
-  private _Fields optionals[] = {_Fields.NAME,_Fields.IN_DEGREE,_Fields.OUT_DEGREE};
+  private _Fields optionals[] = {_Fields.LOCATION,_Fields.NAME,_Fields.IN_DEGREE,_Fields.OUT_DEGREE};
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
     tmpMap.put(_Fields.LABEL, new org.apache.thrift.meta_data.FieldMetaData("label", org.apache.thrift.TFieldRequirementType.REQUIRED, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
-    tmpMap.put(_Fields.LOCATION, new org.apache.thrift.meta_data.FieldMetaData("location", org.apache.thrift.TFieldRequirementType.REQUIRED, 
+    tmpMap.put(_Fields.LOCATION, new org.apache.thrift.meta_data.FieldMetaData("location", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
         new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, Location.class)));
     tmpMap.put(_Fields.NAME, new org.apache.thrift.meta_data.FieldMetaData("name", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
@@ -144,12 +144,10 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
   }
 
   public GraphVertex(
-    String label,
-    Location location)
+    String label)
   {
     this();
     this.label = label;
-    this.location = location;
   }
 
   /**
@@ -537,14 +535,16 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
       sb.append(this.label);
     }
     first = false;
-    if (!first) sb.append(", ");
-    sb.append("location:");
-    if (this.location == null) {
-      sb.append("null");
-    } else {
-      sb.append(this.location);
+    if (isSetLocation()) {
+      if (!first) sb.append(", ");
+      sb.append("location:");
+      if (this.location == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.location);
+      }
+      first = false;
     }
-    first = false;
     if (isSetName()) {
       if (!first) sb.append(", ");
       sb.append("name:");
@@ -575,10 +575,6 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
     // check for required fields
     if (!isSetLabel()) {
       throw new org.apache.thrift.protocol.TProtocolException("Required field 'label' is unset! Struct:" + toString());
-    }
-
-    if (!isSetLocation()) {
-      throw new org.apache.thrift.protocol.TProtocolException("Required field 'location' is unset! Struct:" + toString());
     }
 
   }
@@ -679,9 +675,11 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
         oprot.writeFieldEnd();
       }
       if (struct.location != null) {
-        oprot.writeFieldBegin(LOCATION_FIELD_DESC);
-        struct.location.write(oprot);
-        oprot.writeFieldEnd();
+        if (struct.isSetLocation()) {
+          oprot.writeFieldBegin(LOCATION_FIELD_DESC);
+          struct.location.write(oprot);
+          oprot.writeFieldEnd();
+        }
       }
       if (struct.name != null) {
         if (struct.isSetName()) {
@@ -718,18 +716,23 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
     public void write(org.apache.thrift.protocol.TProtocol prot, GraphVertex struct) throws org.apache.thrift.TException {
       TTupleProtocol oprot = (TTupleProtocol) prot;
       oprot.writeString(struct.label);
-      struct.location.write(oprot);
       BitSet optionals = new BitSet();
-      if (struct.isSetName()) {
+      if (struct.isSetLocation()) {
         optionals.set(0);
       }
-      if (struct.isSetIn_degree()) {
+      if (struct.isSetName()) {
         optionals.set(1);
       }
-      if (struct.isSetOut_degree()) {
+      if (struct.isSetIn_degree()) {
         optionals.set(2);
       }
-      oprot.writeBitSet(optionals, 3);
+      if (struct.isSetOut_degree()) {
+        optionals.set(3);
+      }
+      oprot.writeBitSet(optionals, 4);
+      if (struct.isSetLocation()) {
+        struct.location.write(oprot);
+      }
       if (struct.isSetName()) {
         oprot.writeString(struct.name);
       }
@@ -746,19 +749,21 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
       TTupleProtocol iprot = (TTupleProtocol) prot;
       struct.label = iprot.readString();
       struct.setLabelIsSet(true);
-      struct.location = new Location();
-      struct.location.read(iprot);
-      struct.setLocationIsSet(true);
-      BitSet incoming = iprot.readBitSet(3);
+      BitSet incoming = iprot.readBitSet(4);
       if (incoming.get(0)) {
+        struct.location = new Location();
+        struct.location.read(iprot);
+        struct.setLocationIsSet(true);
+      }
+      if (incoming.get(1)) {
         struct.name = iprot.readString();
         struct.setNameIsSet(true);
       }
-      if (incoming.get(1)) {
+      if (incoming.get(2)) {
         struct.in_degree = iprot.readI32();
         struct.setIn_degreeIsSet(true);
       }
-      if (incoming.get(2)) {
+      if (incoming.get(3)) {
         struct.out_degree = iprot.readI32();
         struct.setOut_degreeIsSet(true);
       }

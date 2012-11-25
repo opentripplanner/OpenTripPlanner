@@ -38,10 +38,7 @@ public class OTPServiceImpl implements OTPService.Iface {
 		LOG.info("Received GetVerticesRequest");
 		GraphVerticesResponse res = new GraphVerticesResponse();
 		Graph g = graphService.getGraph();
-		if (g == null) {
-			LOG.warn("Graph is null");
-		}
-		res.setVertices(GraphUtil.getGraphVertices(graphService.getGraph()));
+		res.setVertices(GraphUtil.getGraphVertices(g));
 		return res;
 	}
 
@@ -50,6 +47,9 @@ public class OTPServiceImpl implements OTPService.Iface {
 		// For now, only get 1 itinerary.
 		options.setNumItineraries(1);	
 		options.setRoutingContext(graphService.getGraph());
+		
+		// For now, always use the default router.
+		options.setRouterId("");
 			
 		List<GraphPath> paths = pathService.getPaths(options);
 		

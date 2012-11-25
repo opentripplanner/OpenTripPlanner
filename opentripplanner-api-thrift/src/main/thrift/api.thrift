@@ -37,8 +37,7 @@ struct Location {
 
 struct GraphVertex {
 	1: required string label;
-	2: required Location location; 
-	
+	2: optional Location location;
 	3: optional string name;
 	4: optional i32 in_degree;
 	5: optional i32 out_degree;

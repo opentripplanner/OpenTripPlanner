@@ -7,6 +7,8 @@ from thrift.transport import TTransport
 from thrift.protocol import TBinaryProtocol
 from opentripplanner.api.thrift.definition import OTPService
 
+import time
+
 
 def Connect(host, port):
     try:
@@ -46,10 +48,14 @@ def Main():
     assert client, 'Failed to connect'
     
     req = OTPService.GraphVerticesRequest()
+    start_t = time.time()
     res = client.GetVertices(req)
+    total_t = time.time() - start_t
+    print 'GraphVertices.Request took %.6f seconds' % total_t 
+    print '\tReturned %d vertices' % len(res.vertices)
     
-    for v in res.vertices:
-        print v.label
+    #for v in res.vertices:
+    #    print v.label
     
     return
         

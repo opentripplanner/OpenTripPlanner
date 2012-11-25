@@ -9,6 +9,8 @@ import org.opentripplanner.api.thrift.definition.Location;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 
+import com.vividsolutions.jts.geom.Coordinate;
+
 public class GraphUtil {
 
 	/**
@@ -20,8 +22,10 @@ public class GraphUtil {
 	public static GraphVertex makeGraphVertex(Vertex v) {
 		GraphVertex gv = new GraphVertex();
 		gv.setLabel(v.getLabel());
-		Location loc = LocationUtil.makeLocation(v.getCoordinate());
-		gv.setLocation(loc);
+		Coordinate coord = v.getCoordinate();
+		if (coord != null) {
+			gv.setLocation(LocationUtil.makeLocation(coord));
+		}
 
 		gv.setName(v.getName());
 		gv.setIn_degree(v.getDegreeIn());
