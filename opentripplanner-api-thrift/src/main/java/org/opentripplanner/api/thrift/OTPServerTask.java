@@ -16,9 +16,9 @@ package org.opentripplanner.api.thrift;
 import lombok.Data;
 
 import org.apache.thrift.server.TServer;
-import org.apache.thrift.server.THsHaServer;
-import org.apache.thrift.transport.TNonblockingServerSocket;
-import org.apache.thrift.transport.TNonblockingServerTransport;
+import org.apache.thrift.server.TSimpleServer;
+import org.apache.thrift.transport.TServerSocket;
+import org.apache.thrift.transport.TServerTransport;
 
 import org.opentripplanner.api.thrift.definition.OTPService;
 import org.opentripplanner.api.thrift.impl.OTPServiceImpl;
@@ -38,9 +38,9 @@ public class OTPServerTask implements Runnable {
 					handler);
 			
 			// TODO(flamholz): make the transport and server type be configurable?
-			TNonblockingServerTransport serverTransport = new TNonblockingServerSocket(port);
-			THsHaServer.Args args = new THsHaServer.Args(serverTransport).processor(processor);
-			TServer server = new THsHaServer(args);
+			TServerTransport serverTransport = new TServerSocket(port);
+			TSimpleServer.Args args = new TSimpleServer.Args(serverTransport).processor(processor);
+			TServer server = new TSimpleServer(args);
 			
 			LOG.info("Starting the OTPService on port {}", port);
 			server.serve();

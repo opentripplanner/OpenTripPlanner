@@ -27,22 +27,22 @@ import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerticesResponse, GraphVerticesResponse._Fields>, java.io.Serializable, Cloneable {
-  private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("GraphVerticesResponse");
+public class BulkTripDurationRequest implements org.apache.thrift.TBase<BulkTripDurationRequest, BulkTripDurationRequest._Fields>, java.io.Serializable, Cloneable {
+  private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("BulkTripDurationRequest");
 
-  private static final org.apache.thrift.protocol.TField VERTICES_FIELD_DESC = new org.apache.thrift.protocol.TField("vertices", org.apache.thrift.protocol.TType.LIST, (short)1);
+  private static final org.apache.thrift.protocol.TField TRIPS_FIELD_DESC = new org.apache.thrift.protocol.TField("trips", org.apache.thrift.protocol.TType.LIST, (short)1);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
-    schemes.put(StandardScheme.class, new GraphVerticesResponseStandardSchemeFactory());
-    schemes.put(TupleScheme.class, new GraphVerticesResponseTupleSchemeFactory());
+    schemes.put(StandardScheme.class, new BulkTripDurationRequestStandardSchemeFactory());
+    schemes.put(TupleScheme.class, new BulkTripDurationRequestTupleSchemeFactory());
   }
 
-  private List<GraphVertex> vertices; // required
+  private List<TripParameters> trips; // required
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-    VERTICES((short)1, "vertices");
+    TRIPS((short)1, "trips");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -57,8 +57,8 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
      */
     public static _Fields findByThriftId(int fieldId) {
       switch(fieldId) {
-        case 1: // VERTICES
-          return VERTICES;
+        case 1: // TRIPS
+          return TRIPS;
         default:
           return null;
       }
@@ -102,90 +102,90 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
-    tmpMap.put(_Fields.VERTICES, new org.apache.thrift.meta_data.FieldMetaData("vertices", org.apache.thrift.TFieldRequirementType.REQUIRED, 
+    tmpMap.put(_Fields.TRIPS, new org.apache.thrift.meta_data.FieldMetaData("trips", org.apache.thrift.TFieldRequirementType.REQUIRED, 
         new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
-            new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, GraphVertex.class))));
+            new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, TripParameters.class))));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
-    org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(GraphVerticesResponse.class, metaDataMap);
+    org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(BulkTripDurationRequest.class, metaDataMap);
   }
 
-  public GraphVerticesResponse() {
+  public BulkTripDurationRequest() {
   }
 
-  public GraphVerticesResponse(
-    List<GraphVertex> vertices)
+  public BulkTripDurationRequest(
+    List<TripParameters> trips)
   {
     this();
-    this.vertices = vertices;
+    this.trips = trips;
   }
 
   /**
    * Performs a deep copy on <i>other</i>.
    */
-  public GraphVerticesResponse(GraphVerticesResponse other) {
-    if (other.isSetVertices()) {
-      List<GraphVertex> __this__vertices = new ArrayList<GraphVertex>();
-      for (GraphVertex other_element : other.vertices) {
-        __this__vertices.add(new GraphVertex(other_element));
+  public BulkTripDurationRequest(BulkTripDurationRequest other) {
+    if (other.isSetTrips()) {
+      List<TripParameters> __this__trips = new ArrayList<TripParameters>();
+      for (TripParameters other_element : other.trips) {
+        __this__trips.add(new TripParameters(other_element));
       }
-      this.vertices = __this__vertices;
+      this.trips = __this__trips;
     }
   }
 
-  public GraphVerticesResponse deepCopy() {
-    return new GraphVerticesResponse(this);
+  public BulkTripDurationRequest deepCopy() {
+    return new BulkTripDurationRequest(this);
   }
 
   @Override
   public void clear() {
-    this.vertices = null;
+    this.trips = null;
   }
 
-  public int getVerticesSize() {
-    return (this.vertices == null) ? 0 : this.vertices.size();
+  public int getTripsSize() {
+    return (this.trips == null) ? 0 : this.trips.size();
   }
 
-  public java.util.Iterator<GraphVertex> getVerticesIterator() {
-    return (this.vertices == null) ? null : this.vertices.iterator();
+  public java.util.Iterator<TripParameters> getTripsIterator() {
+    return (this.trips == null) ? null : this.trips.iterator();
   }
 
-  public void addToVertices(GraphVertex elem) {
-    if (this.vertices == null) {
-      this.vertices = new ArrayList<GraphVertex>();
+  public void addToTrips(TripParameters elem) {
+    if (this.trips == null) {
+      this.trips = new ArrayList<TripParameters>();
     }
-    this.vertices.add(elem);
+    this.trips.add(elem);
   }
 
-  public List<GraphVertex> getVertices() {
-    return this.vertices;
+  public List<TripParameters> getTrips() {
+    return this.trips;
   }
 
-  public void setVertices(List<GraphVertex> vertices) {
-    this.vertices = vertices;
+  public void setTrips(List<TripParameters> trips) {
+    this.trips = trips;
   }
 
-  public void unsetVertices() {
-    this.vertices = null;
+  public void unsetTrips() {
+    this.trips = null;
   }
 
-  /** Returns true if field vertices is set (has been assigned a value) and false otherwise */
-  public boolean isSetVertices() {
-    return this.vertices != null;
+  /** Returns true if field trips is set (has been assigned a value) and false otherwise */
+  public boolean isSetTrips() {
+    return this.trips != null;
   }
 
-  public void setVerticesIsSet(boolean value) {
+  public void setTripsIsSet(boolean value) {
     if (!value) {
-      this.vertices = null;
+      this.trips = null;
     }
   }
 
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
-    case VERTICES:
+    case TRIPS:
       if (value == null) {
-        unsetVertices();
+        unsetTrips();
       } else {
-        setVertices((List<GraphVertex>)value);
+        setTrips((List<TripParameters>)value);
       }
       break;
 
@@ -194,8 +194,8 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
 
   public Object getFieldValue(_Fields field) {
     switch (field) {
-    case VERTICES:
-      return getVertices();
+    case TRIPS:
+      return getTrips();
 
     }
     throw new IllegalStateException();
@@ -208,8 +208,8 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
     }
 
     switch (field) {
-    case VERTICES:
-      return isSetVertices();
+    case TRIPS:
+      return isSetTrips();
     }
     throw new IllegalStateException();
   }
@@ -218,21 +218,21 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
   public boolean equals(Object that) {
     if (that == null)
       return false;
-    if (that instanceof GraphVerticesResponse)
-      return this.equals((GraphVerticesResponse)that);
+    if (that instanceof BulkTripDurationRequest)
+      return this.equals((BulkTripDurationRequest)that);
     return false;
   }
 
-  public boolean equals(GraphVerticesResponse that) {
+  public boolean equals(BulkTripDurationRequest that) {
     if (that == null)
       return false;
 
-    boolean this_present_vertices = true && this.isSetVertices();
-    boolean that_present_vertices = true && that.isSetVertices();
-    if (this_present_vertices || that_present_vertices) {
-      if (!(this_present_vertices && that_present_vertices))
+    boolean this_present_trips = true && this.isSetTrips();
+    boolean that_present_trips = true && that.isSetTrips();
+    if (this_present_trips || that_present_trips) {
+      if (!(this_present_trips && that_present_trips))
         return false;
-      if (!this.vertices.equals(that.vertices))
+      if (!this.trips.equals(that.trips))
         return false;
     }
 
@@ -244,20 +244,20 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
     return 0;
   }
 
-  public int compareTo(GraphVerticesResponse other) {
+  public int compareTo(BulkTripDurationRequest other) {
     if (!getClass().equals(other.getClass())) {
       return getClass().getName().compareTo(other.getClass().getName());
     }
 
     int lastComparison = 0;
-    GraphVerticesResponse typedOther = (GraphVerticesResponse)other;
+    BulkTripDurationRequest typedOther = (BulkTripDurationRequest)other;
 
-    lastComparison = Boolean.valueOf(isSetVertices()).compareTo(typedOther.isSetVertices());
+    lastComparison = Boolean.valueOf(isSetTrips()).compareTo(typedOther.isSetTrips());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    if (isSetVertices()) {
-      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.vertices, typedOther.vertices);
+    if (isSetTrips()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.trips, typedOther.trips);
       if (lastComparison != 0) {
         return lastComparison;
       }
@@ -279,14 +279,14 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder("GraphVerticesResponse(");
+    StringBuilder sb = new StringBuilder("BulkTripDurationRequest(");
     boolean first = true;
 
-    sb.append("vertices:");
-    if (this.vertices == null) {
+    sb.append("trips:");
+    if (this.trips == null) {
       sb.append("null");
     } else {
-      sb.append(this.vertices);
+      sb.append(this.trips);
     }
     first = false;
     sb.append(")");
@@ -295,8 +295,8 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
 
   public void validate() throws org.apache.thrift.TException {
     // check for required fields
-    if (!isSetVertices()) {
-      throw new org.apache.thrift.protocol.TProtocolException("Required field 'vertices' is unset! Struct:" + toString());
+    if (!isSetTrips()) {
+      throw new org.apache.thrift.protocol.TProtocolException("Required field 'trips' is unset! Struct:" + toString());
     }
 
   }
@@ -317,15 +317,15 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
     }
   }
 
-  private static class GraphVerticesResponseStandardSchemeFactory implements SchemeFactory {
-    public GraphVerticesResponseStandardScheme getScheme() {
-      return new GraphVerticesResponseStandardScheme();
+  private static class BulkTripDurationRequestStandardSchemeFactory implements SchemeFactory {
+    public BulkTripDurationRequestStandardScheme getScheme() {
+      return new BulkTripDurationRequestStandardScheme();
     }
   }
 
-  private static class GraphVerticesResponseStandardScheme extends StandardScheme<GraphVerticesResponse> {
+  private static class BulkTripDurationRequestStandardScheme extends StandardScheme<BulkTripDurationRequest> {
 
-    public void read(org.apache.thrift.protocol.TProtocol iprot, GraphVerticesResponse struct) throws org.apache.thrift.TException {
+    public void read(org.apache.thrift.protocol.TProtocol iprot, BulkTripDurationRequest struct) throws org.apache.thrift.TException {
       org.apache.thrift.protocol.TField schemeField;
       iprot.readStructBegin();
       while (true)
@@ -335,21 +335,21 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
           break;
         }
         switch (schemeField.id) {
-          case 1: // VERTICES
+          case 1: // TRIPS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list24 = iprot.readListBegin();
-                struct.vertices = new ArrayList<GraphVertex>(_list24.size);
-                for (int _i25 = 0; _i25 < _list24.size; ++_i25)
+                org.apache.thrift.protocol.TList _list8 = iprot.readListBegin();
+                struct.trips = new ArrayList<TripParameters>(_list8.size);
+                for (int _i9 = 0; _i9 < _list8.size; ++_i9)
                 {
-                  GraphVertex _elem26; // required
-                  _elem26 = new GraphVertex();
-                  _elem26.read(iprot);
-                  struct.vertices.add(_elem26);
+                  TripParameters _elem10; // required
+                  _elem10 = new TripParameters();
+                  _elem10.read(iprot);
+                  struct.trips.add(_elem10);
                 }
                 iprot.readListEnd();
               }
-              struct.setVerticesIsSet(true);
+              struct.setTripsIsSet(true);
             } else { 
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
@@ -363,17 +363,17 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
       struct.validate();
     }
 
-    public void write(org.apache.thrift.protocol.TProtocol oprot, GraphVerticesResponse struct) throws org.apache.thrift.TException {
+    public void write(org.apache.thrift.protocol.TProtocol oprot, BulkTripDurationRequest struct) throws org.apache.thrift.TException {
       struct.validate();
 
       oprot.writeStructBegin(STRUCT_DESC);
-      if (struct.vertices != null) {
-        oprot.writeFieldBegin(VERTICES_FIELD_DESC);
+      if (struct.trips != null) {
+        oprot.writeFieldBegin(TRIPS_FIELD_DESC);
         {
-          oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.vertices.size()));
-          for (GraphVertex _iter27 : struct.vertices)
+          oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.trips.size()));
+          for (TripParameters _iter11 : struct.trips)
           {
-            _iter27.write(oprot);
+            _iter11.write(oprot);
           }
           oprot.writeListEnd();
         }
@@ -385,41 +385,41 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
 
   }
 
-  private static class GraphVerticesResponseTupleSchemeFactory implements SchemeFactory {
-    public GraphVerticesResponseTupleScheme getScheme() {
-      return new GraphVerticesResponseTupleScheme();
+  private static class BulkTripDurationRequestTupleSchemeFactory implements SchemeFactory {
+    public BulkTripDurationRequestTupleScheme getScheme() {
+      return new BulkTripDurationRequestTupleScheme();
     }
   }
 
-  private static class GraphVerticesResponseTupleScheme extends TupleScheme<GraphVerticesResponse> {
+  private static class BulkTripDurationRequestTupleScheme extends TupleScheme<BulkTripDurationRequest> {
 
     @Override
-    public void write(org.apache.thrift.protocol.TProtocol prot, GraphVerticesResponse struct) throws org.apache.thrift.TException {
+    public void write(org.apache.thrift.protocol.TProtocol prot, BulkTripDurationRequest struct) throws org.apache.thrift.TException {
       TTupleProtocol oprot = (TTupleProtocol) prot;
       {
-        oprot.writeI32(struct.vertices.size());
-        for (GraphVertex _iter28 : struct.vertices)
+        oprot.writeI32(struct.trips.size());
+        for (TripParameters _iter12 : struct.trips)
         {
-          _iter28.write(oprot);
+          _iter12.write(oprot);
         }
       }
     }
 
     @Override
-    public void read(org.apache.thrift.protocol.TProtocol prot, GraphVerticesResponse struct) throws org.apache.thrift.TException {
+    public void read(org.apache.thrift.protocol.TProtocol prot, BulkTripDurationRequest struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
       {
-        org.apache.thrift.protocol.TList _list29 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
-        struct.vertices = new ArrayList<GraphVertex>(_list29.size);
-        for (int _i30 = 0; _i30 < _list29.size; ++_i30)
+        org.apache.thrift.protocol.TList _list13 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+        struct.trips = new ArrayList<TripParameters>(_list13.size);
+        for (int _i14 = 0; _i14 < _list13.size; ++_i14)
         {
-          GraphVertex _elem31; // required
-          _elem31 = new GraphVertex();
-          _elem31.read(iprot);
-          struct.vertices.add(_elem31);
+          TripParameters _elem15; // required
+          _elem15 = new TripParameters();
+          _elem15.read(iprot);
+          struct.trips.add(_elem15);
         }
       }
-      struct.setVerticesIsSet(true);
+      struct.setTripsIsSet(true);
     }
   }
 
