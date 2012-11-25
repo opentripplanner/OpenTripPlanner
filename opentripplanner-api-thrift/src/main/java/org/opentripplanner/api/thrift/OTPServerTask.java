@@ -29,13 +29,19 @@ import org.slf4j.LoggerFactory;
 public class OTPServerTask implements Runnable {
 
 	private static Logger LOG = LoggerFactory.getLogger(OTPServerTask.class);
-	private OTPServiceImpl handler;
+	private OTPServiceImpl otpServiceImpl;
 	private int port;
 
 	public void run() {
 		try {
+			LOG.info("Run called, port {}", port);
+			if (otpServiceImpl == null) {
+				LOG.warn("otpServiceImpl is null, bailing");
+				return;
+			}
+			
 			OTPService.Processor<OTPServiceImpl> processor = new OTPService.Processor<OTPServiceImpl>(
-					handler);
+					otpServiceImpl);
 			
 			// TODO(flamholz): make the transport and server type be configurable?
 			TServerTransport serverTransport = new TServerSocket(port);
