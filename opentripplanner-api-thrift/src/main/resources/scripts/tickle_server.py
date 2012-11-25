@@ -8,6 +8,7 @@ from thrift.protocol import TBinaryProtocol
 from opentripplanner.api.thrift.definition import OTPService
 
 import time
+import random
 
 
 def Connect(host, port):
@@ -51,13 +52,56 @@ def Main():
     start_t = time.time()
     res = client.GetVertices(req)
     total_t = time.time() - start_t
-    print 'GraphVertices.Request took %.6f seconds' % total_t 
-    print '\tReturned %d vertices' % len(res.vertices)
     
-    #for v in res.vertices:
-    #    print v.label
+    vertices = res.vertices
+    print 'GraphVerticesRequest took %.6f seconds' % total_t 
+    print '\tReturned %d vertices' % len(vertices)
     
-    return
+    # Sample an origin and a destination (deterministically)
+    random.seed(12345)
+    origin, dest = random.sample(vertices, 2)
+    origin_loc = origin.location
+    dest_loc = dest.location
+    
+    # Request a walking trip between them.
+    trip_params = OTPService.TripParameters(
+        origin=origin_loc, destination=dest_loc,
+        allowed_modes=set([OTPService.TravelMode.WALK]))
+    req = OTPService.TripDurationRequest(trip=trip_params)
+    try:
+        start_t = time.time()
+        res = client.GetTripDuration(req)
+        total_t = time.time() - start_t
+        
+        print 'TripDurationRequest took %.6f seconds' % total_t 
+        print 'Trip expected to take %d seconds' % res.expected_trip_duration
+    except OTPService.NoPathFoundError, e:
+        print e
+    
+    # Sample 10 origins and a destinations (deterministically)
+    random.seed(12345)
+    origins = random.sample(vertices, 100)
+    dests = random.sample(vertices, 100)
+    
+    trip_params = []
+    for origin, dest in zip(origins, dests):
+        origin_loc = origin.location
+        dest_loc = dest.location
+        trip_params.append(OTPService.TripParameters(
+            origin=origin_loc, destination=dest_loc,
+            allowed_modes=set([OTPService.TravelMode.WALK])))
+
+    req = OTPService.BulkTripDurationRequest(trips=trip_params)
+    
+    try:
+        start_t = time.time()
+        res = client.GetManyTripDurations(req)
+        total_t = time.time() - start_t
+        
+        print ('BulkTripDurationRequest took %.6f seconds '
+               'for %d trips ' % (total_t, len(origins))) 
+    except OTPService.NoPathFoundError, e:
+        print e
         
         
 if __name__ == '__main__':

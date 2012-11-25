@@ -27,8 +27,8 @@ import org.slf4j.LoggerFactory;
 @Data
 public class OTPServiceImpl implements OTPService.Iface {
 
-    private static Logger LOG = LoggerFactory.getLogger(OTPServerTask.class);
-	
+	private static Logger LOG = LoggerFactory.getLogger(OTPServerTask.class);
+
 	private GraphService graphService;
 	private PathService pathService;
 
@@ -54,17 +54,18 @@ public class OTPServiceImpl implements OTPService.Iface {
 		List<GraphPath> paths = pathService.getPaths(options);
 		
 		// TODO(flamholz): do something reasonable when > 1 path found.
-		if (paths.size() > 0) {
-			GraphPath p = paths.get(0);
-			return p.getDuration();
-		} else {
+		if (paths == null || paths.size() == 0) {
 			// TODO(flamholz): return some identifying information about the trip
 			// inside the error.
 			LOG.warn("Found no path for trip");
 			throw new NoPathFoundError("No path found for your trip.");
 		}
+		else {
+			GraphPath p = paths.get(0);
+			return p.getDuration();			
+		}
 	}
-	
+
 	@Override
 	public TripDurationResponse GetTripDuration(TripDurationRequest req)
 			throws NoPathFoundError, TException {
@@ -78,17 +79,17 @@ public class OTPServiceImpl implements OTPService.Iface {
 			BulkTripDurationRequest req) throws TException {
 		BulkTripDurationResponse res = new BulkTripDurationResponse();
 		List<Integer> expectedTimes = new ArrayList<Integer>(req.getTripsSize());
-		
+
 		for (TripParameters trip : req.getTrips()) {
 			try {
 				expectedTimes.add(computePathDuration(trip));
 			} catch (NoPathFoundError e) {
-				expectedTimes.add(-1);  // Sentinel.
+				expectedTimes.add(-1); // Sentinel.
 			}
 		}
-		
+
 		res.setExpected_trip_durations(expectedTimes);
 		return res;
 	}
-	
+
 }

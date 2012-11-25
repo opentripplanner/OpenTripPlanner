@@ -59,9 +59,13 @@ public class TripUtil {
 	public static RoutingRequest initRoutingRequest(final TripParameters tripParams) {
 		RoutingRequest options = new RoutingRequest();
 		
-		for (TravelMode m : tripParams.getAllowed_modes()) {
-			TraverseMode tm = getTraverseMode(m);
-			if (tm != null) options.addMode(tm);
+		if (tripParams.isSetAllowed_modes()) {
+			options.clearModes();
+			
+			for (TravelMode m : tripParams.getAllowed_modes()) {
+				TraverseMode tm = getTraverseMode(m);
+				if (tm != null) options.addMode(tm);
+			}
 		}
 		
 		Location origin = tripParams.getOrigin();
