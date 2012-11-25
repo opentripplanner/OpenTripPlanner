@@ -24,6 +24,11 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Concrete implementation of the Thrift interface.
+ *
+ * @author flamholz
+ */
 @Data
 public class OTPServiceImpl implements OTPService.Iface {
 
@@ -38,7 +43,7 @@ public class OTPServiceImpl implements OTPService.Iface {
 		LOG.info("Received GetVerticesRequest");
 		GraphVerticesResponse res = new GraphVerticesResponse();
 		Graph g = graphService.getGraph();
-		res.setVertices(GraphUtil.getGraphVertices(g));
+		res.setVertices(GraphUtil.makeGraphVertices(g));
 		return res;
 	}
 
