@@ -16,6 +16,8 @@ import org.opentripplanner.api.thrift.definition.OTPService;
 import org.opentripplanner.api.thrift.definition.TripDurationRequest;
 import org.opentripplanner.api.thrift.definition.TripDurationResponse;
 import org.opentripplanner.api.thrift.definition.TripParameters;
+import org.opentripplanner.api.thrift.util.GraphUtil;
+import org.opentripplanner.api.thrift.util.TripUtil;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
