@@ -4,12 +4,12 @@ opentripplanner-api-thrift
 Overview
 ============================
 
-This is the subproject for a Thrift API to OpenTripPlanner. The Thrift API
+This subproject contains a Thrift API to OpenTripPlanner. The Thrift API
 was designed and built to support lower-level queries than the 
-already-exposed REST JSON/XML API. For example, it supports the calculation
-of the expected duration of a trip from A to B without actually calculating 
-the directions narrative between those points, thereby making the calculation
-much faster (< 10 ms instead of ~200 ms). 
+already-exposed REST JSON/XML API. For example, the Thrift interface supports 
+calculation of the expected duration of a trip from A to B without actually
+calculating the directions narrative between those points. This makes the 
+calculation much faster, about < 10 ms instead of ~200 ms. 
 
 Installation
 ============================
