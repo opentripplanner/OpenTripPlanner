@@ -1539,12 +1539,11 @@ public class GTFSPatternHopFactory {
             int type = transfer.getTransferType();
             if (type == 3)
                 continue;
-
+            if (transfer.getFromStop().equals(transfer.getToStop())) {
+                continue;
+            }
             Vertex fromv = context.stopArriveNodes.get(transfer.getFromStop());
             Vertex tov = context.stopDepartNodes.get(transfer.getToStop());
-
-            if (fromv.equals(tov))
-                continue;
 
             double distance = distanceLibrary.distance(fromv.getCoordinate(), tov.getCoordinate());
             int time;
