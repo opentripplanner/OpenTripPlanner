@@ -27,7 +27,7 @@ public class GraphUtil {
 		Collection<Vertex> verts = g.getVertices();
 		List<GraphVertex> l = new ArrayList<GraphVertex>(verts.size());
 		for (Vertex v : verts) {
-			l.add((GraphVertex) new GraphVertexExtension(v));
+			l.add(new GraphVertexExtension(v));
 		}
 		return l;
 	}
