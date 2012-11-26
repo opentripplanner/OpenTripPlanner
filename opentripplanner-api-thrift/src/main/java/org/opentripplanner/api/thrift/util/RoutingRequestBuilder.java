@@ -58,15 +58,22 @@ public class RoutingRequestBuilder {
 	public RoutingRequestBuilder addTripParameters(TripParameters tripParams) {
 		if (tripParams.isSetAllowed_modes()) {
 			Set<TravelMode> allowedModes = tripParams.getAllowed_modes();
-			TravelModeSet travelModeSet = new TravelModeSet(allowedModes);
-			routingRequest.setModes(travelModeSet.toTraverseModeSet());
+			setTravelModes(new TravelModeSet(allowedModes));
 		}
 
-		Location origin = tripParams.getOrigin();
-		Location destination = tripParams.getDestination();
-		setOrigin(origin.getLat_lng());
-		setDestination(destination.getLat_lng());
+		setOrigin(tripParams.getOrigin().getLat_lng());
+		setDestination(tripParams.getDestination().getLat_lng());
 
+		return this;
+	}
+	
+	/**
+	 * Overwrite the set of allowed TravelModes.
+	 * @param modes
+	 * @return
+	 */
+	public RoutingRequestBuilder setTravelModes(TravelModeSet modes) {
+		routingRequest.setModes(modes.toTraverseModeSet());
 		return this;
 	}
 	
