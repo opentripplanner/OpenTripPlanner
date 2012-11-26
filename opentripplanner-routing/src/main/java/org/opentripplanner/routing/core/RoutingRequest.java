@@ -852,6 +852,8 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     public void setMaxWalkDistance(double maxWalkDistance) {
+        if (maxWalkDistance == 0) 
+            return;
         this.maxWalkDistance = maxWalkDistance;
         if (walkingOptions != null && walkingOptions != this) {
             this.walkingOptions.setMaxWalkDistance(maxWalkDistance);
