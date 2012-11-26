@@ -26,7 +26,7 @@ public class RoutingRequestBuilder {
 
 	private final RoutingRequest routingRequest = new RoutingRequest();
 	private Graph graph;
-	
+
 	/**
 	 * Initialize with given TripParameters.
 	 * 
@@ -66,9 +66,10 @@ public class RoutingRequestBuilder {
 
 		return this;
 	}
-	
+
 	/**
 	 * Overwrite the set of allowed TravelModes.
+	 * 
 	 * @param modes
 	 * @return
 	 */
@@ -76,9 +77,10 @@ public class RoutingRequestBuilder {
 		routingRequest.setModes(modes.toTraverseModeSet());
 		return this;
 	}
-	
+
 	/**
 	 * Set the trip origin.
+	 * 
 	 * @param from
 	 * @return self reference
 	 */
@@ -89,6 +91,7 @@ public class RoutingRequestBuilder {
 
 	/**
 	 * Set the trip origin.
+	 * 
 	 * @param from
 	 * @return self reference
 	 */
@@ -96,9 +99,10 @@ public class RoutingRequestBuilder {
 		routingRequest.setFrom(latLngToString(origin));
 		return this;
 	}
-	
+
 	/**
 	 * Set the trip destination.
+	 * 
 	 * @param from
 	 * @return self reference
 	 */
@@ -109,6 +113,7 @@ public class RoutingRequestBuilder {
 
 	/**
 	 * Set the trip destination.
+	 * 
 	 * @param from
 	 * @return self reference
 	 */
@@ -116,9 +121,10 @@ public class RoutingRequestBuilder {
 		routingRequest.setTo(latLngToString(dest));
 		return this;
 	}
-	
+
 	/**
 	 * Set the graph to route on.
+	 * 
 	 * @param g
 	 * @return self reference.
 	 */
@@ -126,9 +132,10 @@ public class RoutingRequestBuilder {
 		graph = g;
 		return this;
 	}
-	
+
 	/**
 	 * Set the number of itineraries to return.
+	 * 
 	 * @param n
 	 * @return self reference.
 	 */
@@ -136,7 +143,7 @@ public class RoutingRequestBuilder {
 		routingRequest.setNumItineraries(n);
 		return this;
 	}
-	
+
 	/**
 	 * Build a RoutingRequest from the accumulated parameters.
 	 * 
