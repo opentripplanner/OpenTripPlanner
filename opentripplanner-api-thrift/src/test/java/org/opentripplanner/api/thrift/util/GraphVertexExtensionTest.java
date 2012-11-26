@@ -13,10 +13,7 @@
 
 package org.opentripplanner.api.thrift.util;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.ArrayList;
-import java.util.List;
+import junit.framework.TestCase;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -28,12 +25,11 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
 /**
- * Tests for GraphUtil class. 
+ * Tests for TripUtil class.
  * 
  * @author flamholz
  */
-public class GraphUtilTest {
-    
+public class GraphVertexExtensionTest extends TestCase {
     private Graph _graph;
 
     @Before
@@ -42,28 +38,30 @@ public class GraphUtilTest {
     }
     
     @Test
-    public void testMakeGraphVertices() {
-    	List<Vertex> vs = new ArrayList<Vertex>(3);
-    	vs.add(vertex("fake1", 47.666863,  -122.382106));
-    	vs.add(vertex("fake2", 47.666854,  -122.382103));
-    	vs.add(vertex("fake3", 47.666891,  -122.382112));
-    	
-    	List<GraphVertex> gvs = GraphUtil.makeGraphVertices(_graph);
-    	assertEquals(vs.size(), gvs.size());
-    	
-    	// TODO(flamholz): compare actual vertices.
-    	// This is annoying because the graph stores them in an unordered
-    	// fashion, meaning I need to write a set comparator for vertices. 
-    	// not worth the time.
+    public void testConstructFromVertex() {
+    	Vertex v = vertex("fake", 75.0239, -45.139023);
+    	GraphVertexExtension graphVert = new GraphVertexExtension(v);
+    	assertVertexEquals(v, graphVert);
     }
     
     /****
      * Private Methods
      ****/
-
     private SimpleVertex vertex(String label, double lat, double lon) {
         SimpleVertex v = new SimpleVertex(_graph, label, lat, lon);
         return v;
+    }
+    
+    private void assertVertexEquals(Vertex v, GraphVertex gv) {
+    	assertEquals(gv.getLabel(), v.getLabel());
+    	assertEquals(gv.getName(), v.getName());
+    	assertEquals(gv.getIn_degree(), v.getDegreeIn());
+    	assertEquals(gv.getOut_degree(), v.getDegreeOut());
+    	
+    	Location loc = gv.getLocation();
+    	LatLng ll = loc.getLat_lng();
+    	assertEquals(ll.getLat(), v.getY());
+    	assertEquals(ll.getLng(), v.getX());
     }
 
     private static class SimpleVertex extends StreetVertex {
@@ -74,5 +72,4 @@ public class GraphUtilTest {
             super(g, label, lon, lat, label);
         }
     }
-
 }

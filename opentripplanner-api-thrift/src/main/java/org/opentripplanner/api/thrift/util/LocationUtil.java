@@ -15,8 +15,8 @@ public class LocationUtil {
 	public static Location makeLocation(Coordinate c) {
 		Location loc = new Location();
 		// lat, lng = y, x
-		LatLng ll = new LatLng(c.y, c.x);
-		loc.setLat_lng(ll);
+		LatLng latlng = new LatLng(c.y, c.x);
+		loc.setLat_lng(latlng);
 		return loc;
 	}
 }

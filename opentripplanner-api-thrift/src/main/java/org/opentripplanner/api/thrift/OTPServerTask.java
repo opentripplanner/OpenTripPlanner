@@ -19,6 +19,7 @@ import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TSimpleServer;
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TServerTransport;
+import org.apache.thrift.transport.TTransportException;
 
 import org.opentripplanner.api.thrift.definition.OTPService;
 import org.opentripplanner.api.thrift.impl.OTPServiceImpl;
@@ -33,24 +34,26 @@ public class OTPServerTask implements Runnable {
 	private int port;
 
 	public void run() {
+		LOG.info("Run called, port {}", port);
+		if (otpServiceImpl == null) {
+			LOG.warn("otpServiceImpl is null, bailing");
+			return;
+		}
+
 		try {
-			LOG.info("Run called, port {}", port);
-			if (otpServiceImpl == null) {
-				LOG.warn("otpServiceImpl is null, bailing");
-				return;
-			}
-			
 			OTPService.Processor<OTPServiceImpl> processor = new OTPService.Processor<OTPServiceImpl>(
 					otpServiceImpl);
 			
 			// TODO(flamholz): make the transport and server type be configurable?
-			TServerTransport serverTransport = new TServerSocket(port);
+			TServerTransport serverTransport;
+			serverTransport = new TServerSocket(port);
+
 			TSimpleServer.Args args = new TSimpleServer.Args(serverTransport).processor(processor);
 			TServer server = new TSimpleServer(args);
 			
 			LOG.info("Starting the OTPService on port {}", port);
 			server.serve();
-		} catch (Exception e) {
+		} catch (TTransportException e) {
 			e.printStackTrace();
 		}
     }

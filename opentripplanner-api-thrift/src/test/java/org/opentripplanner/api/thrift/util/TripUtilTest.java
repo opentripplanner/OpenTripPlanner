@@ -13,11 +13,10 @@
 
 package org.opentripplanner.api.thrift.util;
 
-import java.util.HashMap;
-import java.util.Map;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-import junit.framework.TestCase;
-
+import org.junit.Test;
 import org.opentripplanner.api.thrift.definition.LatLng;
 import org.opentripplanner.api.thrift.definition.Location;
 import org.opentripplanner.api.thrift.definition.TravelMode;
@@ -31,44 +30,21 @@ import org.opentripplanner.routing.core.TraverseModeSet;
  * 
  * @author flamholz
  */
-public class TripUtilTest extends TestCase {
-
-	public void testLatLngToString() {
-		LatLng ll = new LatLng(1.0, 2.5);
-		assertEquals("1.0,2.5", TripUtil.latLngToString(ll));
-
-		ll = new LatLng(-3.0, 9.7);
-		assertEquals("-3.0,9.7", TripUtil.latLngToString(ll));
-	}
-
-	/**
-	 * Check mapping for select TraverseMode, TravelMode pairs.
-	 */
-	public void testGetTraverseMode() {
-		Map<TravelMode, TraverseMode> m = new HashMap<TravelMode, TraverseMode>();
-		m.put(TravelMode.BICYCLE, TraverseMode.BICYCLE);
-		m.put(TravelMode.WALK, TraverseMode.WALK);
-		m.put(TravelMode.CAR, TraverseMode.CAR);
-		m.put(TravelMode.ANY_TRANSIT, TraverseMode.TRANSIT);
-
-		for (TravelMode tm : m.keySet()) {
-			TraverseMode expectedTraverse = m.get(tm);
-			assertEquals(expectedTraverse, TripUtil.getTraverseMode(tm));
-		}
-	}
+public class TripUtilTest {
 
 	/**
 	 * Test behavior for a simple trip.
 	 */
+	@Test
 	public void testInitRoutingRequest() {
 		TripParameters tp = new TripParameters();
 		tp.addToAllowed_modes(TravelMode.WALK);
 		tp.addToAllowed_modes(TravelMode.CAR);
 
-		LatLng originLatLng = new LatLng(1.0, 2.0);
+		LatLng originLatLng = new LatLng(1.0, 2.5);
 		Location origin = new Location(originLatLng);
 
-		LatLng destLatLng = new LatLng(3.0, 2.0);
+		LatLng destLatLng = new LatLng(-3.0, 9.7);
 		Location dest = new Location(destLatLng);
 
 		tp.setOrigin(origin);
@@ -76,12 +52,13 @@ public class TripUtilTest extends TestCase {
 
 		RoutingRequest rr = TripUtil.initRoutingRequest(tp);
 
-		assertEquals(TripUtil.latLngToString(originLatLng), rr.getFrom());
-		assertEquals(TripUtil.latLngToString(destLatLng), rr.getTo());
+		assertEquals("1.0000000,2.5000000", rr.getFrom());
+		assertEquals("-3.0000000,9.7000000", rr.getTo());
 
 		for (TravelMode tm : tp.getAllowed_modes()) {
 			TraverseModeSet modeSet = rr.getModes();
-			TraverseMode traverseMode = TripUtil.getTraverseMode(tm);
+			TraverseMode traverseMode = (new TravelModeWrapper(tm))
+					.toTraverseMode();
 			assertTrue(modeSet.contains(traverseMode));
 		}
 	}
