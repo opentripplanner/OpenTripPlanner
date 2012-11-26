@@ -24,19 +24,20 @@ import org.opentripplanner.api.thrift.definition.TripParameters;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.graph.Graph;
 
 /**
  * Tests for TripUtil class.
  * 
  * @author flamholz
  */
-public class TripUtilTest {
+public class RoutingRequestBuilderTest {
 
 	/**
 	 * Test behavior for a simple trip.
 	 */
 	@Test
-	public void testInitRoutingRequest() {
+	public void testAddTripParameters() {
 		TripParameters tp = new TripParameters();
 		tp.addToAllowed_modes(TravelMode.WALK);
 		tp.addToAllowed_modes(TravelMode.CAR);
@@ -50,7 +51,9 @@ public class TripUtilTest {
 		tp.setOrigin(origin);
 		tp.setDestination(dest);
 
-		RoutingRequest rr = TripUtil.initRoutingRequest(tp);
+		RoutingRequest rr = (new RoutingRequestBuilder())
+				.addTripParameters(tp)
+				.build();
 
 		assertEquals("1.0000000,2.5000000", rr.getFrom());
 		assertEquals("-3.0000000,9.7000000", rr.getTo());
@@ -61,6 +64,28 @@ public class TripUtilTest {
 					.toTraverseMode();
 			assertTrue(modeSet.contains(traverseMode));
 		}
+	}
+	
+	@Test
+	public void testSetNumItineraries() {
+		int n = 3;
+		RoutingRequest rr = (new RoutingRequestBuilder())
+				.setNumItineraries(n)
+				.build();
+		assertEquals(n, rr.getNumItineraries().intValue());
+	}
+	
+	@Test
+	public void testSetOriginDestination() {
+		LatLng origin = new LatLng(1.0, 2.5);
+		LatLng dest = new LatLng(-3.0, 9.7);
+		
+		RoutingRequest rr = (new RoutingRequestBuilder())
+				.setOrigin(origin)
+				.setDestination(dest)
+				.build();
+		assertEquals("1.0000000,2.5000000", rr.getFrom());
+		assertEquals("-3.0000000,9.7000000", rr.getTo());
 	}
 
 }

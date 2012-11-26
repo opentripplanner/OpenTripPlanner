@@ -17,7 +17,7 @@ import org.opentripplanner.api.thrift.definition.TripDurationRequest;
 import org.opentripplanner.api.thrift.definition.TripDurationResponse;
 import org.opentripplanner.api.thrift.definition.TripParameters;
 import org.opentripplanner.api.thrift.util.GraphUtil;
-import org.opentripplanner.api.thrift.util.TripUtil;
+import org.opentripplanner.api.thrift.util.RoutingRequestBuilder;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
@@ -50,11 +50,11 @@ public class OTPServiceImpl implements OTPService.Iface {
 	}
 
 	private int computePathDuration(TripParameters trip) throws NoPathFoundError {
-		RoutingRequest options = TripUtil.initRoutingRequest(trip);
-		// For now, only get 1 itinerary.
-		options.setNumItineraries(1);	
-		options.setRoutingContext(graphService.getGraph());
-		
+		RoutingRequest options = (new RoutingRequestBuilder(trip))
+				.setGraph(graphService.getGraph())
+				.setNumItineraries(1)	// For now, only get 1 itinerary.
+				.build();
+				
 		// For now, always use the default router.
 		options.setRouterId("");
 			
