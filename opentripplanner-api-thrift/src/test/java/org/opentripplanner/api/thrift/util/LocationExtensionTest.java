@@ -25,18 +25,18 @@ import com.vividsolutions.jts.geom.Coordinate;
  * 
  * @author flamholz
  */
-public class LocationUtilTest extends TestCase {
+public class LocationExtensionTest extends TestCase {
 
 	public void testMakeLocation() {
 		Coordinate c = new Coordinate(1.2, 2.3);
-		Location loc = LocationUtil.makeLocation(c);
+		Location loc = new LocationExtension(c);
 		LatLng ll = loc.getLat_lng();
 
 		assertCoordEquals(c, ll);
 
 		// Setting a z value should affect nothing.
 		c = new Coordinate(1.2, 2.3, 19.5);
-		loc = LocationUtil.makeLocation(c);
+		loc = new LocationExtension(c);
 		ll = loc.getLat_lng();
 
 		assertCoordEquals(c, ll);
