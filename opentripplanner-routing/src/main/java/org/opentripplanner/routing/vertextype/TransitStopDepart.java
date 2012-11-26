@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.vertextype;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.graph.Graph;
@@ -30,5 +31,10 @@ public class TransitStopDepart extends OffboardVertex {
 
     public TransitStop getStopVertex() {
         return stopVertex;
+    }
+
+    @Override
+    public AgencyAndId getStopId() {
+        return stopVertex.getStopId();
     }
 }
