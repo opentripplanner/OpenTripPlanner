@@ -127,7 +127,7 @@ public abstract class RoutingResource {
     /** The comma-separated list of banned trips.  The format is agency_route[:stop*], so:
      * TriMet_24601 or TriMet_24601:0:1:2:17:18:19
      */
-    @DefaultValue("TriMet_3322548:0:1:30:31:32:33") @QueryParam("bannedTrips") protected List<String> bannedTrips;
+    @DefaultValue("") @QueryParam("bannedTrips") protected List<String> bannedTrips;
 
     /** An additional penalty added to boardings after the first.  The value is in OTP's
      *  internal weight units, which are roughly equivalent to seconds.  Set this to a high
