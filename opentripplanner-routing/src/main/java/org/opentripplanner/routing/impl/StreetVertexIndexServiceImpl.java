@@ -353,12 +353,15 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     public CandidateEdgeBundle getClosestEdges(Coordinate coordinate, RoutingRequest request,
             List<Edge> extraEdges, Collection<Edge> routeEdges, boolean possibleTransitLinksOnly) {
         ArrayList<StreetEdge> extraStreets = new ArrayList<StreetEdge>();
-        if (extraEdges != null)
-            for (StreetEdge se : IterableLibrary.filter(extraEdges, StreetEdge.class))
-                extraStreets.add(se);
-
-        for (StreetEdge se : IterableLibrary.filter(graph.getTemporaryEdges(), StreetEdge.class))
+        if (extraEdges != null) {
+            for (StreetEdge se : IterableLibrary.filter(extraEdges, StreetEdge.class)) {
+            	extraStreets.add(se);
+            }
+        }
+            
+        for (StreetEdge se : IterableLibrary.filter(graph.getTemporaryEdges(), StreetEdge.class)) {
             extraStreets.add(se);
+        }
 
         Envelope envelope = new Envelope(coordinate);
 
