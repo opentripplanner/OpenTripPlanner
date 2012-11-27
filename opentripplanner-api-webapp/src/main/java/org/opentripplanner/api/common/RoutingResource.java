@@ -14,6 +14,7 @@
 package org.opentripplanner.api.common;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -26,6 +27,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,8 +121,13 @@ public abstract class RoutingResource {
      *  Atlantic Avenue should be included. */
     @DefaultValue("false") @QueryParam("showIntermediateStops") protected List<Boolean> showIntermediateStops;
 
-    /** The list of banned routes.  The format is agency_route, so TriMet_100. */
+    /** The comma-separated list of banned routes.  The format is agency_route, so TriMet_100. */
     @DefaultValue("") @QueryParam("bannedRoutes") protected List<String> bannedRoutes;
+    
+    /** The comma-separated list of banned trips.  The format is agency_route[:stop*], so:
+     * TriMet_24601 or TriMet_24601:0:1:2:17:18:19
+     */
+    @DefaultValue("TriMet_3322548:0:1:30:31:32:33") @QueryParam("bannedTrips") protected List<String> bannedTrips;
 
     /** An additional penalty added to boardings after the first.  The value is in OTP's
      *  internal weight units, which are roughly equivalent to seconds.  Set this to a high
@@ -271,6 +278,11 @@ public abstract class RoutingResource {
         request.setPreferredRoutes(get(preferredRoutes, n, request.getPreferredRouteStr()));
         request.setUnpreferredRoutes(get(unpreferredRoutes, n, request.getUnpreferredRouteStr()));
         request.setBannedRoutes(get(bannedRoutes, n, request.getBannedRouteStr()));
+        HashMap<AgencyAndId, BannedStopSet> bannedTripMap = makeBannedTripMap(get(bannedTrips, n, null));
+        if (bannedTripMap != null) {
+            request.setBannedTrips(bannedTripMap);
+        }
+        
         // replace deprecated optimization preference
         // opt has already been assigned above
         if (opt == OptimizeType.TRANSFERS) {
@@ -340,6 +352,31 @@ public abstract class RoutingResource {
         return request;
     }
     
+    private HashMap<AgencyAndId, BannedStopSet> makeBannedTripMap(String banned) {
+        if (banned == null) {
+            return null;
+        }
+        
+        HashMap<AgencyAndId, BannedStopSet> bannedTripMap = new HashMap<AgencyAndId, BannedStopSet>();
+        String[] tripStrings = banned.split(",");
+        for (String tripString : tripStrings) {
+            String[] parts = tripString.split(":");
+            String tripIdString = parts[0];
+            AgencyAndId tripId = AgencyAndId.convertFromString(tripIdString);
+            BannedStopSet bannedStops;
+            if (parts.length == 1) {
+                bannedStops = BannedStopSet.ALL;
+            } else {
+                bannedStops = new BannedStopSet();
+                for (int i = 1; i < parts.length; ++i) {
+                    bannedStops.add(Integer.parseInt(parts[i]));
+                }
+            }
+            bannedTripMap.put(tripId, bannedStops);
+        }
+        return bannedTripMap;
+    }
+
 /**
  * @param l list of query parameter values
  * @param n requested item index 

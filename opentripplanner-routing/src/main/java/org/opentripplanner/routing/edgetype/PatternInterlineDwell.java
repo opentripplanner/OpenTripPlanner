@@ -25,6 +25,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.routing.vertextype.OnboardVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,8 +113,10 @@ public class PatternInterlineDwell extends Edge implements OnBoardForwardEdge, O
         if (dwellData == null) {
             return null;
         }
-        if (options.bannedTrips.contains(dwellData.trip)) {
-            return null;
+        BannedStopSet banned = options.bannedTrips.get(dwellData.trip);
+        if (banned != null) {
+            if (banned.contains(0)) 
+                return null;
         }
 
         StateEditor s1 = state0.edit(this);

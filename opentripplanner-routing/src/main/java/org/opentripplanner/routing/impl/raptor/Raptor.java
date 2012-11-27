@@ -252,7 +252,7 @@ public class Raptor implements PathService {
             walkOptions = walkOptions.clone();
             for (RaptorState state : search.getTargetStates()) {
                 for (AgencyAndId trip : state.getTrips()) {
-                    options.bannedTrips.add(trip);
+                    options.banTrip(trip);
                 }
             }
 

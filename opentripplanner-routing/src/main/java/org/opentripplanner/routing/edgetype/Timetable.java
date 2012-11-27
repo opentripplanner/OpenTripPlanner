@@ -175,7 +175,7 @@ public class Timetable implements Serializable {
                 idxLo = idxHi = TripTimes.binarySearchDepartures(sorted, stopIndex, time); 
                 for (; idxHi < sorted.length; idxHi++) {
                     TripTimes tt = sorted[idxHi];
-                    if (tt.tripAcceptable(options, haveBicycle)) {
+                    if (tt.tripAcceptable(options, haveBicycle, stopIndex)) {
                         bestTrip = tt;
                         break;
                     }
@@ -184,7 +184,7 @@ public class Timetable implements Serializable {
                 idxLo = idxHi = TripTimes.binarySearchArrivals(sorted, stopIndex, time); 
                 for (; idxLo >= 0; idxLo--) {
                     TripTimes tt = sorted[idxLo];
-                    if (tt.tripAcceptable(options, haveBicycle)) {
+                    if (tt.tripAcceptable(options, haveBicycle, stopIndex)) {
                         bestTrip = tt;
                         break;
                     }
@@ -200,14 +200,14 @@ public class Timetable implements Serializable {
                 // hoping JVM JIT will distribute the loop over the if clauses as needed
                 if (boarding) {
                     int depTime = tt.getDepartureTime(stopIndex);
-                    if (depTime >= time && depTime < bestTime && tt.tripAcceptable(options, haveBicycle)) {
+                    if (depTime >= time && depTime < bestTime && tt.tripAcceptable(options, haveBicycle, stopIndex)) {
                         bestTrip = tt;
                         bestTime = depTime;
                         idxLo = idxHi = idx;
                     }
                 } else {
                     int arvTime = tt.getArrivalTime(stopIndex);
-                    if (arvTime <= time && arvTime > bestTime && tt.tripAcceptable(options, haveBicycle)) {
+                    if (arvTime <= time && arvTime > bestTime && tt.tripAcceptable(options, haveBicycle, stopIndex)) {
                         bestTrip = tt;
                         bestTime = arvTime;
                         idxLo = idxHi = idx;
