@@ -70,6 +70,8 @@ import org.opentripplanner.routing.transit_index.RouteSegment;
 import org.opentripplanner.routing.transit_index.RouteVariant;
 import org.opentripplanner.routing.vertextype.OnboardVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.TransitStopArrive;
+import org.opentripplanner.routing.vertextype.TransitStopDepart;
 import org.opentripplanner.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -146,6 +148,7 @@ public class RaptorDataBuilder implements GraphBuilder {
                         for (Edge e : segment.board.getFromVertex().getIncoming()) {
                             if (e instanceof PreBoardEdge) {
                                 route.stops[stop].stopVertex = (TransitStop) e.getFromVertex();
+                                route.stops[stop].departVertex = (TransitStopDepart) e.getToVertex();
                             }
                         }
                         route.boards[stop][pattern] = (TransitBoardAlight) segment.board;
@@ -154,6 +157,7 @@ public class RaptorDataBuilder implements GraphBuilder {
                         for (Edge e : segment.alight.getToVertex().getOutgoing()) {
                             if (e instanceof PreAlightEdge) {
                                 route.stops[stop].stopVertex = (TransitStop) e.getToVertex();
+                                route.stops[stop].arriveVertex = (TransitStopArrive) e.getFromVertex();
                             }
                         }
 

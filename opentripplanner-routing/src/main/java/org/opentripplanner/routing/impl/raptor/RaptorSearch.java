@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.common.pqueue.OTPPriorityQueue;
 import org.opentripplanner.common.pqueue.OTPPriorityQueueFactory;
@@ -34,7 +35,10 @@ import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.vertextype.OffboardVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.TransitStopArrive;
+import org.opentripplanner.routing.vertextype.TransitStopDepart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -485,7 +489,7 @@ public class RaptorSearch {
             MaxWalkState start = new MaxWalkState(options.rctx.origin, walkOptions);
             spt = dijkstra.getShortestPathTree(start);
             for (State state : spt.getAllStates()) {
-                if (state.getVertex() instanceof TransitStop)
+                if (state.getVertex() instanceof TransitStop || state.getVertex() instanceof TransitStopArrive || state.getVertex() instanceof TransitStopDepart)
                     transitStopStates.add(state);
             }
             // also, compute an initial spt from the target so that we can find out what transit
@@ -523,7 +527,10 @@ public class RaptorSearch {
                 // this reduces the number of initial vertices
                 // and the state space size
 
-                Vertex stopVertex = state.stop.stopVertex;
+                Vertex stopVertex = options.isArriveBy() ? state.stop.departVertex : state.stop.arriveVertex;
+                if (stopVertex == null) {
+                    stopVertex = state.stop.stopVertex;
+                }
 
                 if (options.rctx.target != null) {
                     double minWalk = distanceToNearestTransitStop;
@@ -612,11 +619,12 @@ public class RaptorSearch {
         SPTSTATE: for (State state : transitStopStates) {
             final Vertex vertex = state.getVertex();
 
-            RaptorStop stop = data.raptorStopsForStopId.get(((TransitStop) vertex).getStopId());
+            RaptorStop stop = data.raptorStopsForStopId.get(((OffboardVertex) vertex).getStopId());
             if (stop == null) {
                 // we have found a stop is totally unused, so skip it
                 continue;
             }
+
             if (options.rctx.target != null) {
                 double minWalk = distanceToNearestTransitStop;
 
