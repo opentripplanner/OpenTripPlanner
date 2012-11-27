@@ -280,7 +280,7 @@ public class PlanGenerator {
                     coordinates = new CoordinateArrayListSequence();
                     coordinates.add(state.getBackState().getVertex().getCoordinate());
                     coordinates.add(state.getVertex().getCoordinate());
-                    finalizeLeg(leg, state, path.states, i, i, coordinates, null);
+                    finalizeLeg(leg, state, path.states, i, i, coordinates, itinerary);
                     coordinates.clear();
                 } else {
                     LOG.error("Unexpected state (in START): " + mode);
