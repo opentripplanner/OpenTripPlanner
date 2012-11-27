@@ -152,9 +152,9 @@ public class RoutingRequestBuilder {
 	public RoutingRequest build() {
 		// Set the graph at the end to avoid certain complications.
 		if (graph != null) {
-			LOG.warn("Graph is null. This better be a test.");
 			routingRequest.setRoutingContext(graph);
 		}
+		
 		return routingRequest;
 	}
 }
