@@ -3,10 +3,10 @@
 # ~~~~
 
 # Home page
-GET     /                                       Application.index
-GET     /getQueries                             Application.getQueries
-POST    /newQuery                               Application.newQuery
-GET     /deleteQuery                            Application.deleteQuery
+GET     /                                       Calltaker.index
+GET     /getQueries                             Calltaker.getQueries
+POST    /newQuery                               Calltaker.newQuery
+POST    /deleteQuery                            Calltaker.deleteQuery
 
 # Ignore favicon requests
 GET     /favicon.ico                            404

@@ -17,34 +17,5 @@ public class Application extends Controller {
         hd.values.add("*");
         Http.Response.current().headers.put("Access-Control-Allow-Origin",hd);      
     }
-        
-    public static void index() {
-        List<OTPQuery> queries = OTPQuery.all().fetch(10);
-        render(queries);
-    }
-    
-    public static void getQueries(String userName, Integer limit) {
-        List<OTPQuery> queries;
-        if(limit == null)
-            queries = OTPQuery.find("userName", userName).fetch();
-        else {
-            queries = OTPQuery.find("userName = '"+userName+"' order by timeStamp desc").fetch(limit);
-            System.out.println("fetched w/ limit = "+limit);
-        }
-        renderJSON(queries);
-    }
-    
-    public static void newQuery(String userName, String queryParams, String fromPlace, String toPlace) {
-        OTPQuery query = new OTPQuery(userName, queryParams, fromPlace, toPlace);
-        query.save();
-        Long id = query.id;
-        render(userName, id);
-    }
 
-    public static void deleteQuery(Long id) {
-        OTPQuery query = OTPQuery.findById(id);  
-        query.delete();
-        render(id);
-    }  
-   
 }
