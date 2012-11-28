@@ -29,6 +29,10 @@ otp.util.Time = {
     
         return str;
     },
+    
+    formatItinTime : function(timestamp, formatStr) {
+        return moment(timestamp).add("hours", otp.config.timeOffset).format(formatStr);
+    },
 
     CLASS_NAME: "otp.util.Time"
 };

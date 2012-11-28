@@ -174,10 +174,10 @@ otp.modules.planner.PlannerModule =
        	    queryParams = {             
                 fromPlace: this.startLatLng.lat+','+this.startLatLng.lng,
                 toPlace: this.endLatLng.lat+','+this.endLatLng.lng,
+                time : (this.time) ? this.time : moment().format("h:mma"),
+                date : (this.date) ? this.date : moment().format("MM-DD-YYYY"),
                 mode: this.mode
             };
-            if(this.time !== null) _.extend(queryParams, { time : this.time } );
-            if(this.date !== null) _.extend(queryParams, { date : this.date } );
             if(this.arriveBy !== null) _.extend(queryParams, { arriveBy : this.arriveBy } );
             if(this.optimize !== null) _.extend(queryParams, { optimize : this.optimize } );
             if(this.optimize === 'TRIANGLE') {

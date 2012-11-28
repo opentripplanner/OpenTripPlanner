@@ -26,6 +26,9 @@ otp.widgets.ItinerariesWidget =
     itineraries : null,
     activeIndex : 0,
     
+    // set to true by next/previous/etc. to indicate to only refresh the currently active itinerary
+    refreshActiveOnly : false,
+    
     initialize : function(id, module) {
     
         otp.widgets.Widget.prototype.initialize.apply(this, arguments);
@@ -37,6 +40,18 @@ otp.widgets.ItinerariesWidget =
     
     updateItineraries : function(itins) {
         var this_ = this;
+        var divId = this.id+"-itinsAccord";
+        
+        if(this.refreshActiveOnly == true) {
+            this.itineraries[this.activeIndex] = itins[0];
+            var itinHeader = $('#'+divId+'-headerContent-'+this.activeIndex);
+            itinHeader.html(this.headerContent(itins[0], this.activeIndex));
+            var itinContainer = $('#'+divId+'-'+this.activeIndex);
+            itinContainer.empty();
+            this.renderItinerary(itins[0], this.activeIndex).appendTo(itinContainer);
+            this.refreshActiveOnly = false;
+            return;
+        }            
         this.itineraries = itins;
         this.header.html(itins.length+" Itineraries Returned:");
         
@@ -46,21 +61,19 @@ otp.widgets.ItinerariesWidget =
         if(this.footer !== null) {
             this.footer.remove();
         }
-        var divId = this.moduleId+"-itinsAccord";
         var html = "<div id='"+divId+"' class='otp-itinsAccord'></div>";
         this.itinsAccord = $(html).appendTo(this.$());
         this.appendFooter();
 
         for(var i=0; i<itins.length; i++) {
             var itin = itins[i];
-            var timeStr = otp.util.Time.msToHrMin(itin.endTime-itin.startTime);            
-            $("<h3><b>Itinerary "+(i+1)+"</b>: "+timeStr+"</h3>").appendTo(this.itinsAccord).click(function(evt) {
+            $('<h3><span id='+divId+'-headerContent-'+i+'>'+this.headerContent(itin, i)+'<span></h3>').appendTo(this.itinsAccord).click(function(evt) {
                 var arr = evt.target.id.split('-');
                 var index = parseInt(arr[arr.length-1]);
                 this_.module.drawItinerary(itins[index]);
-                this.activeIndex = index;
+                this_.activeIndex = index;
             });
-            this.renderItinerary(itin, i).appendTo(this.itinsAccord);
+            $('<div id="'+divId+'-'+i+'"></div>').appendTo(this.itinsAccord).append(this.renderItinerary(itin, i));
         }
         this.activeIndex = 0;
         
@@ -81,25 +94,45 @@ otp.widgets.ItinerariesWidget =
         this.footer = $("<div class='otp-itinsButtonRow'></div>").appendTo(this.$());
         $('<button>First</button>').button().appendTo(this.footer).click(function() {
             var params = this_.module.lastQueryParams;
-            console.log(this_.itineraries[this_.activeIndex]);
             var stopId = otp.util.Itin.getFirstStop(this_.itineraries[this_.activeIndex]);
-            console.log("required stop: "+stopId);
-            _.extend(params, { startTransitStopId :  stopId });
-            this_.module.planTrip(params,'plan/first');
+            _.extend(params, { startTransitStopId :  stopId, time : "04:00am", arriveBy : false });
+            this_.refreshActiveOnly = true;
+            this_.module.planTrip(params);
         });
         $('<button>Previous</button>').button().appendTo(this.footer).click(function() {
-            console.log('previous');
+            var endTime = this_.itineraries[this_.activeIndex].endTime;
+            var params = this_.module.lastQueryParams;
+            var newEndTime = this_.itineraries[this_.activeIndex].endTime - 90000;
+            var stopId = otp.util.Itin.getFirstStop(this_.itineraries[this_.activeIndex]);
+            _.extend(params, { startTransitStopId :  stopId, time : otp.util.Time.formatItinTime(newEndTime, "h:mma"), date : otp.util.Time.formatItinTime(newEndTime, "MM-DD-YYYY"), arriveBy : true });
+            this_.refreshActiveOnly = true;
+            this_.module.planTrip(params);            
         });
         $('<button>Next</button>').button().appendTo(this.footer).click(function() {
-            console.log('next');
+            var endTime = this_.itineraries[this_.activeIndex].endTime;
+            var params = this_.module.lastQueryParams;
+            var newStartTime = this_.itineraries[this_.activeIndex].startTime + 90000;
+            var stopId = otp.util.Itin.getFirstStop(this_.itineraries[this_.activeIndex]);
+            _.extend(params, { startTransitStopId :  stopId, time : otp.util.Time.formatItinTime(newStartTime, "h:mma"), date : otp.util.Time.formatItinTime(newStartTime, "MM-DD-YYYY"), arriveBy : false });
+            this_.refreshActiveOnly = true;
+            this_.module.planTrip(params);      
         });
         $('<button>Last</button>').button().appendTo(this.footer).click(function() {
-            this_.module.planTrip(null,'plan/last');
+            var params = this_.module.lastQueryParams;
+            var stopId = otp.util.Itin.getFirstStop(this_.itineraries[this_.activeIndex]);
+            _.extend(params, { startTransitStopId :  stopId, date : moment().add('days', 1).format("MM-DD-YYYY"), time : "04:00am", arriveBy : true });
+            this_.refreshActiveOnly = true;
+            this_.module.planTrip(params);
         });
     },
     
+    // returns HTML text
+    headerContent : function(itin, i) {
+        var timeStr = otp.util.Time.msToHrMin(itin.endTime-itin.startTime);
+        return '<b>Itinerary '+(i+1)+'</b>: '+timeStr;
+    },
     
-    
+    // returns jQuery object
     renderItinerary : function(itin, i) {
         var this_ = this;
 
@@ -130,9 +163,9 @@ otp.widgets.ItinerariesWidget =
         var itinDiv = $("<div></div>");
 
         // add start and end time rows        
-        itinDiv.append("<div class='otp-itinStartRow'><b>Start</b>: "+moment(itin.startTime).format("h:mma, MMM. Do YYYY")+"</div>");
+        itinDiv.append("<div class='otp-itinStartRow'><b>Start</b>: "+otp.util.Time.formatItinTime(itin.startTime, "h:mma, MMM. Do YYYY")+"</div>");
         itinDiv.append(itinAccord);
-        itinDiv.append("<div class='otp-itinEndRow'><b>End</b>: "+moment(itin.endTime).format("h:mma, MMM. Do YYYY")+"</div>");
+        itinDiv.append("<div class='otp-itinEndRow'><b>End</b>: "+otp.util.Time.formatItinTime(itin.endTime, "h:mma, MMM. Do YYYY")+"</div>");
 
         // TODO: add trip summary
         

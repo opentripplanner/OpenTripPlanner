@@ -49,6 +49,7 @@ otp.widgets.PastQueriesWidget =
             html += '<div class="otp-pastQueryRowDesc">'+query.fromPlace+' to '+query.toPlace+'</div>';
             html += '</div>';
             $(html).appendTo(this.queryList).click(function() {
+                console.log(query.queryParams);
                 this_.module.restoreTrip(JSON.parse(query.queryParams));
             });
         }, this);        
