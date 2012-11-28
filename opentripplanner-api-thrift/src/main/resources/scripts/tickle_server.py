@@ -78,6 +78,20 @@ def Main():
     except OTPService.NoPathFoundError, e:
         print e
     
+    path_opts = OTPService.PathOptions(num_paths=1, return_detailed_path=True)
+    req = OTPService.FindPathsRequest(trip=trip_params)
+    start_t = time.time()
+    res = client.FindPaths(req)
+    total_t = time.time() - start_t
+    
+    print 'FindPathsRequest took %.6f seconds' % total_t
+    paths = res.paths
+    if paths.no_paths_found:
+        print 'Found no paths'
+    else:
+        expected_duration = paths.paths[0].duration
+        print 'Trip expected to take %d seconds' % expected_duration
+    
     # Sample 10 origins and a destinations (deterministically)
     random.seed(12345)
     origins = random.sample(vertices, 100)

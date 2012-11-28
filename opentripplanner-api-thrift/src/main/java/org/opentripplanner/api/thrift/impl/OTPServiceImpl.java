@@ -77,6 +77,8 @@ public class OTPServiceImpl implements OTPService.Iface {
 	@Override
 	public GraphVerticesResponse GetVertices(GraphVerticesRequest req)
 			throws TException {
+		LOG.debug("GetVertices called");
+		
 		GraphVerticesResponse res = new GraphVerticesResponse();
 		Graph g = graphService.getGraph();
 		res.setVertices(makeGraphVertices(g));
@@ -122,6 +124,8 @@ public class OTPServiceImpl implements OTPService.Iface {
 	@Override
 	public TripDurationResponse GetTripDuration(TripDurationRequest req)
 			throws NoPathFoundError, TException {
+		LOG.debug("GetTripDuration called");
+		
 		TripDurationResponse res = new TripDurationResponse();
 		res.setExpected_trip_duration(computePathDuration(req.getTrip()));
 		return res;
@@ -130,6 +134,8 @@ public class OTPServiceImpl implements OTPService.Iface {
 	@Override
 	public BulkTripDurationResponse GetManyTripDurations(
 			BulkTripDurationRequest req) throws TException {
+		LOG.debug("GetManyTripDurations called");
+		
 		BulkTripDurationResponse res = new BulkTripDurationResponse();
 		List<Integer> expectedTimes = new ArrayList<Integer>(req.getTripsSize());
 
@@ -148,6 +154,8 @@ public class OTPServiceImpl implements OTPService.Iface {
 	@Override
 	public FindPathsResponse FindPaths(FindPathsRequest req)
 			throws NoPathFoundError, TException {
+		LOG.debug("FindPaths called");
+		
 		TripParameters trip = req.getTrip();
 		TripPaths outPaths = new TripPaths();
 		outPaths.setTrip(trip);
@@ -163,6 +171,8 @@ public class OTPServiceImpl implements OTPService.Iface {
 
 	@Override
 	public BulkPathsResponse BulkFindPaths(BulkPathsRequest req) throws TException {
+		LOG.debug("BulkFindPaths called");
+		
 		PathOptions pathOptions = req.getOptions();
 		BulkPathsResponse res = new BulkPathsResponse();
 		for (TripParameters trip : req.getTrips()) {
