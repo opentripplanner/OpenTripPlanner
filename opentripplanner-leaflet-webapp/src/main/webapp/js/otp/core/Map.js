@@ -22,7 +22,7 @@ otp.core.Map = otp.Class({
     layerControl    : null,
     
     initialize : function(webapp) {
-    
+        var this_ = this;
         this.webapp = webapp;
         
         var tileLayer = new L.TileLayer(otp.config.tileUrl, {attribution: otp.config.tileAttrib});
@@ -31,20 +31,37 @@ otp.core.Map = otp.Class({
     	    tileLayer.getTileUrl = otp.config.getTileUrl;
         }
         
-        this.lmap = new L.Map('map', {
-            minZoom : otp.config.minZoom,
-            maxZoom : otp.config.maxZoom,
-            center  : otp.config.initLatLng,
-            zoom    : otp.config.initZoom,
-            layers  : [ tileLayer ]
-        });
+        var mapProps = { 
+            layers  : [ tileLayer ],
+            center : (otp.config.initLatLng || new L.LatLng(0,0)),
+            zoom : (otp.config.initZoom || 2)
+        }
+        if(otp.config.minZoom) _.extend(mapProps, { minZoom : otp.config.minZoom });
+        if(otp.config.maxZoom) _.extend(mapProps, { maxZoom : otp.config.minZoom });
 
+        this.lmap = new L.Map('map', mapProps);
 
-        var baseMaps = {
+        if(!otp.config.initLatLng) {
+            console.log("no initLL, reading metadata");
+            var url = otp.config.hostname + '/opentripplanner-api-webapp/ws/metadata';
+            $.ajax(url, {
+                data: { routerId : otp.config.routerId },            
+                dataType:   'jsonp',
+                
+                success: function(data) {
+                    console.log(data);
+                    this_.lmap.fitBounds([
+                        [data.lowerLeftLatitude, data.lowerLeftLongitude],
+                        [data.upperRightLatitude, data.upperRightLongitude]
+                    ]);
+                }
+            });
+        }
+       
+
+        /*var baseMaps = {
             'Base Layer' : tileLayer 
-        };
-        
-        //this.lmap.setView(otp.config.initLatLng, otp.config.initZoom); //.addLayer(tileLayer);
+        };*/
         
         var overlays = { };
         
