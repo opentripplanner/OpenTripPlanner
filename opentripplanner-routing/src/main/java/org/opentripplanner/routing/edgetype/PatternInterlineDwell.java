@@ -152,4 +152,9 @@ public class PatternInterlineDwell extends Edge implements OnBoardForwardEdge, O
         return tripIdToInterlineDwellData;
     }
 
+    @Override
+    public int getStopIndex() {
+        return -1; //special case.
+    }
+
 }

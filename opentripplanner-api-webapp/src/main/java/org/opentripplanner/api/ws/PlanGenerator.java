@@ -46,6 +46,7 @@ import org.opentripplanner.routing.edgetype.ElevatorEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.HopEdge;
 import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
+import org.opentripplanner.routing.edgetype.OnBoardForwardEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
@@ -392,6 +393,7 @@ public class PlanGenerator {
                         LOG.error("leg unexpectedly not null (boarding loop)");
                     } else {
                         leg = makeLeg(itinerary, state);
+                        leg.from.stopIndex = ((OnBoardForwardEdge)backEdge).getStopIndex();
                         leg.stop = new ArrayList<Place>();
                         itinerary.transfers++;
                         leg.boardRule = (String) state.getExtension("boardAlightRule");
@@ -651,6 +653,10 @@ public class PlanGenerator {
 
         if (v instanceof TransitVertex) {
             TransitVertex transitVertex = (TransitVertex) v;
+            Edge backEdge = state.getBackEdge();
+            if (backEdge instanceof OnBoardForwardEdge) {
+                place.stopIndex = ((OnBoardForwardEdge)backEdge).getStopIndex() + 1;
+            }
             place.stopId = transitVertex.getStopId();
             place.stopCode = transitVertex.getStopCode();
             place.zoneId = state.getZone();
