@@ -278,6 +278,7 @@ otp.modules.planner.PlannerModule =
         if(mode === "BICYCLE") return '#0073e5';
         if(mode === "SUBWAY") return '#f00';
         if(mode === "BUS") return '#080';
+        if(mode === "TRAM") return '#800';
         return '#aaa';
     },
         
