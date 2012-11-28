@@ -338,13 +338,13 @@ public class BulkTripDurationResponse implements org.apache.thrift.TBase<BulkTri
           case 1: // EXPECTED_TRIP_DURATIONS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list16 = iprot.readListBegin();
-                struct.expected_trip_durations = new ArrayList<Integer>(_list16.size);
-                for (int _i17 = 0; _i17 < _list16.size; ++_i17)
+                org.apache.thrift.protocol.TList _list56 = iprot.readListBegin();
+                struct.expected_trip_durations = new ArrayList<Integer>(_list56.size);
+                for (int _i57 = 0; _i57 < _list56.size; ++_i57)
                 {
-                  int _elem18; // required
-                  _elem18 = iprot.readI32();
-                  struct.expected_trip_durations.add(_elem18);
+                  int _elem58; // required
+                  _elem58 = iprot.readI32();
+                  struct.expected_trip_durations.add(_elem58);
                 }
                 iprot.readListEnd();
               }
@@ -370,9 +370,9 @@ public class BulkTripDurationResponse implements org.apache.thrift.TBase<BulkTri
         oprot.writeFieldBegin(EXPECTED_TRIP_DURATIONS_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.I32, struct.expected_trip_durations.size()));
-          for (int _iter19 : struct.expected_trip_durations)
+          for (int _iter59 : struct.expected_trip_durations)
           {
-            oprot.writeI32(_iter19);
+            oprot.writeI32(_iter59);
           }
           oprot.writeListEnd();
         }
@@ -397,9 +397,9 @@ public class BulkTripDurationResponse implements org.apache.thrift.TBase<BulkTri
       TTupleProtocol oprot = (TTupleProtocol) prot;
       {
         oprot.writeI32(struct.expected_trip_durations.size());
-        for (int _iter20 : struct.expected_trip_durations)
+        for (int _iter60 : struct.expected_trip_durations)
         {
-          oprot.writeI32(_iter20);
+          oprot.writeI32(_iter60);
         }
       }
     }
@@ -408,13 +408,13 @@ public class BulkTripDurationResponse implements org.apache.thrift.TBase<BulkTri
     public void read(org.apache.thrift.protocol.TProtocol prot, BulkTripDurationResponse struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
       {
-        org.apache.thrift.protocol.TList _list21 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.I32, iprot.readI32());
-        struct.expected_trip_durations = new ArrayList<Integer>(_list21.size);
-        for (int _i22 = 0; _i22 < _list21.size; ++_i22)
+        org.apache.thrift.protocol.TList _list61 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.I32, iprot.readI32());
+        struct.expected_trip_durations = new ArrayList<Integer>(_list61.size);
+        for (int _i62 = 0; _i62 < _list61.size; ++_i62)
         {
-          int _elem23; // required
-          _elem23 = iprot.readI32();
-          struct.expected_trip_durations.add(_elem23);
+          int _elem63; // required
+          _elem63 = iprot.readI32();
+          struct.expected_trip_durations.add(_elem63);
         }
       }
       struct.setExpected_trip_durationsIsSet(true);

@@ -43,12 +43,83 @@ struct GraphVertex {
 	5: optional i32 out_degree;
 }
 
+struct TravelState {
+	// Time upon arriving at this state. Seconds since the epoch.
+	1: required i64 arrival_time;
+	
+	// Vertex associated with this state.
+	2: required GraphVertex vertex;
+	
+	// TODO(flamholz): include the mode of travel used to reach this state.
+}
+
+struct GraphEdge {
+	// Head and tail of the directed edge.
+	1: required GraphVertex head;
+	2: required GraphVertex tail;
+
+	// TODO(flamholz): add more fields, like the street name etc.
+}
+
+struct Path {
+	// Expected traversal duration, seconds.
+	1: required i32 duration;
+	
+	// Starting and ending time, seconds since the epoch.
+	2: required i64 start_time;
+	3: required i64 end_time;
+	
+	4: optional list<TravelState> states;
+	5: optional list<GraphEdge> edges;
+	
+	// TODO(flamholz): Add more fields like total distance, distance walked.
+}
+
 struct TripParameters {
 	1: required Location origin;
 	2: required Location destination;
 	
 	// Restrict allowed travel modes.
 	3: optional set<TravelMode> allowed_modes;	
+}
+
+struct TripPaths {
+	// Echos the input trip parameters.
+	1: required TripParameters trip;
+	2: required list<Path> paths;
+	
+	// Set to true in the bulk API when no paths are found.
+	3: optional bool no_paths_found = false;
+}
+
+struct PathOptions {
+	// The number of paths to return per trip.
+	1: optional i32 num_paths = 1;
+	
+	// Whether to return the full path (true) or just summary info (false).
+	2: optional bool return_detailed_path = true;
+}
+
+// Request to find paths for a single trip.
+struct FindPathsRequest {
+	1: required TripParameters trip;
+	2: required PathOptions options;
+}
+
+// Response containing resulting paths.
+struct FindPathsResponse {
+	1: required TripPaths paths;
+}
+
+// Request to find paths for a single trip.
+struct BulkPathsRequest {
+	1: required list<TripParameters> trips;
+	2: required PathOptions options;
+}
+
+// Response containing paths for each trip.
+struct BulkPathsResponse {
+	1: required list<TripPaths> paths;
 }
 
 // Request to calculate the time a trip will take.
@@ -103,6 +174,16 @@ service OTPService {
 	 * Calculate the duration of a trip.
 	 */
 	BulkTripDurationResponse GetManyTripDurations(1:BulkTripDurationRequest req);
+	
+	/**
+	 * Find paths for a single trip.
+	 */
+	FindPathsResponse FindPaths(1:FindPathsRequest req);
+		
+	/**
+	 * Find paths for a single trip.
+	 */
+	BulkPathsResponse BulkFindPaths(1:BulkPathsRequest req);
 }
 
 

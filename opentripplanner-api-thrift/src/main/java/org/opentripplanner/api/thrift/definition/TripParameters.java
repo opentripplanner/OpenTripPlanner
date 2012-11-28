@@ -513,13 +513,13 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
           case 3: // ALLOWED_MODES
             if (schemeField.type == org.apache.thrift.protocol.TType.SET) {
               {
-                org.apache.thrift.protocol.TSet _set0 = iprot.readSetBegin();
-                struct.allowed_modes = new HashSet<TravelMode>(2*_set0.size);
-                for (int _i1 = 0; _i1 < _set0.size; ++_i1)
+                org.apache.thrift.protocol.TSet _set16 = iprot.readSetBegin();
+                struct.allowed_modes = new HashSet<TravelMode>(2*_set16.size);
+                for (int _i17 = 0; _i17 < _set16.size; ++_i17)
                 {
-                  TravelMode _elem2; // required
-                  _elem2 = TravelMode.findByValue(iprot.readI32());
-                  struct.allowed_modes.add(_elem2);
+                  TravelMode _elem18; // required
+                  _elem18 = TravelMode.findByValue(iprot.readI32());
+                  struct.allowed_modes.add(_elem18);
                 }
                 iprot.readSetEnd();
               }
@@ -556,9 +556,9 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
           oprot.writeFieldBegin(ALLOWED_MODES_FIELD_DESC);
           {
             oprot.writeSetBegin(new org.apache.thrift.protocol.TSet(org.apache.thrift.protocol.TType.I32, struct.allowed_modes.size()));
-            for (TravelMode _iter3 : struct.allowed_modes)
+            for (TravelMode _iter19 : struct.allowed_modes)
             {
-              oprot.writeI32(_iter3.getValue());
+              oprot.writeI32(_iter19.getValue());
             }
             oprot.writeSetEnd();
           }
@@ -592,9 +592,9 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
       if (struct.isSetAllowed_modes()) {
         {
           oprot.writeI32(struct.allowed_modes.size());
-          for (TravelMode _iter4 : struct.allowed_modes)
+          for (TravelMode _iter20 : struct.allowed_modes)
           {
-            oprot.writeI32(_iter4.getValue());
+            oprot.writeI32(_iter20.getValue());
           }
         }
       }
@@ -612,13 +612,13 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
       BitSet incoming = iprot.readBitSet(1);
       if (incoming.get(0)) {
         {
-          org.apache.thrift.protocol.TSet _set5 = new org.apache.thrift.protocol.TSet(org.apache.thrift.protocol.TType.I32, iprot.readI32());
-          struct.allowed_modes = new HashSet<TravelMode>(2*_set5.size);
-          for (int _i6 = 0; _i6 < _set5.size; ++_i6)
+          org.apache.thrift.protocol.TSet _set21 = new org.apache.thrift.protocol.TSet(org.apache.thrift.protocol.TType.I32, iprot.readI32());
+          struct.allowed_modes = new HashSet<TravelMode>(2*_set21.size);
+          for (int _i22 = 0; _i22 < _set21.size; ++_i22)
           {
-            TravelMode _elem7; // required
-            _elem7 = TravelMode.findByValue(iprot.readI32());
-            struct.allowed_modes.add(_elem7);
+            TravelMode _elem23; // required
+            _elem23 = TravelMode.findByValue(iprot.readI32());
+            struct.allowed_modes.add(_elem23);
           }
         }
         struct.setAllowed_modesIsSet(true);

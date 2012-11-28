@@ -8,6 +8,11 @@ import com.vividsolutions.jts.geom.Coordinate;
 public class LocationExtension extends Location {
 
 	/**
+	 * Required for serialization.
+	 */
+	private static final long serialVersionUID = -3538274254083456847L;
+
+	/**
 	 * Default constructor.
 	 * 
 	 * TODO(flamholz): figure out if lombok calls superclass constructor?

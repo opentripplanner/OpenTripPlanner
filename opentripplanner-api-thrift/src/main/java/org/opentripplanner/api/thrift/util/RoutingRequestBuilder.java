@@ -2,15 +2,12 @@ package org.opentripplanner.api.thrift.util;
 
 import java.util.Set;
 
-import org.opentripplanner.api.thrift.OTPServerTask;
 import org.opentripplanner.api.thrift.definition.LatLng;
 import org.opentripplanner.api.thrift.definition.Location;
 import org.opentripplanner.api.thrift.definition.TravelMode;
 import org.opentripplanner.api.thrift.definition.TripParameters;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import lombok.NoArgsConstructor;
 
@@ -21,8 +18,6 @@ import lombok.NoArgsConstructor;
  */
 @NoArgsConstructor
 public class RoutingRequestBuilder {
-
-	private static Logger LOG = LoggerFactory.getLogger(OTPServerTask.class);
 
 	private final RoutingRequest routingRequest = new RoutingRequest();
 	private Graph graph;
@@ -119,6 +114,17 @@ public class RoutingRequestBuilder {
 	 */
 	public RoutingRequestBuilder setDestination(LatLng dest) {
 		routingRequest.setTo(latLngToString(dest));
+		return this;
+	}
+
+	/**
+	 * Set whether to search in batch mode.
+	 * 
+	 * @param batch
+	 * @return
+	 */
+	public RoutingRequestBuilder setBatch(boolean batch) {
+		routingRequest.setBatch(batch);
 		return this;
 	}
 

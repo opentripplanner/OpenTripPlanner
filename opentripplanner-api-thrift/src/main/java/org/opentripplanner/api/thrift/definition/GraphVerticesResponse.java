@@ -338,14 +338,14 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
           case 1: // VERTICES
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list24 = iprot.readListBegin();
-                struct.vertices = new ArrayList<GraphVertex>(_list24.size);
-                for (int _i25 = 0; _i25 < _list24.size; ++_i25)
+                org.apache.thrift.protocol.TList _list64 = iprot.readListBegin();
+                struct.vertices = new ArrayList<GraphVertex>(_list64.size);
+                for (int _i65 = 0; _i65 < _list64.size; ++_i65)
                 {
-                  GraphVertex _elem26; // required
-                  _elem26 = new GraphVertex();
-                  _elem26.read(iprot);
-                  struct.vertices.add(_elem26);
+                  GraphVertex _elem66; // required
+                  _elem66 = new GraphVertex();
+                  _elem66.read(iprot);
+                  struct.vertices.add(_elem66);
                 }
                 iprot.readListEnd();
               }
@@ -371,9 +371,9 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
         oprot.writeFieldBegin(VERTICES_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.vertices.size()));
-          for (GraphVertex _iter27 : struct.vertices)
+          for (GraphVertex _iter67 : struct.vertices)
           {
-            _iter27.write(oprot);
+            _iter67.write(oprot);
           }
           oprot.writeListEnd();
         }
@@ -398,9 +398,9 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
       TTupleProtocol oprot = (TTupleProtocol) prot;
       {
         oprot.writeI32(struct.vertices.size());
-        for (GraphVertex _iter28 : struct.vertices)
+        for (GraphVertex _iter68 : struct.vertices)
         {
-          _iter28.write(oprot);
+          _iter68.write(oprot);
         }
       }
     }
@@ -409,14 +409,14 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
     public void read(org.apache.thrift.protocol.TProtocol prot, GraphVerticesResponse struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
       {
-        org.apache.thrift.protocol.TList _list29 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
-        struct.vertices = new ArrayList<GraphVertex>(_list29.size);
-        for (int _i30 = 0; _i30 < _list29.size; ++_i30)
+        org.apache.thrift.protocol.TList _list69 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+        struct.vertices = new ArrayList<GraphVertex>(_list69.size);
+        for (int _i70 = 0; _i70 < _list69.size; ++_i70)
         {
-          GraphVertex _elem31; // required
-          _elem31 = new GraphVertex();
-          _elem31.read(iprot);
-          struct.vertices.add(_elem31);
+          GraphVertex _elem71; // required
+          _elem71 = new GraphVertex();
+          _elem71.read(iprot);
+          struct.vertices.add(_elem71);
         }
       }
       struct.setVerticesIsSet(true);

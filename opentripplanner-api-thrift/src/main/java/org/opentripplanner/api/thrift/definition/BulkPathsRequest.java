@@ -27,22 +27,25 @@ import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class BulkTripDurationRequest implements org.apache.thrift.TBase<BulkTripDurationRequest, BulkTripDurationRequest._Fields>, java.io.Serializable, Cloneable {
-  private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("BulkTripDurationRequest");
+public class BulkPathsRequest implements org.apache.thrift.TBase<BulkPathsRequest, BulkPathsRequest._Fields>, java.io.Serializable, Cloneable {
+  private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("BulkPathsRequest");
 
   private static final org.apache.thrift.protocol.TField TRIPS_FIELD_DESC = new org.apache.thrift.protocol.TField("trips", org.apache.thrift.protocol.TType.LIST, (short)1);
+  private static final org.apache.thrift.protocol.TField OPTIONS_FIELD_DESC = new org.apache.thrift.protocol.TField("options", org.apache.thrift.protocol.TType.STRUCT, (short)2);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
-    schemes.put(StandardScheme.class, new BulkTripDurationRequestStandardSchemeFactory());
-    schemes.put(TupleScheme.class, new BulkTripDurationRequestTupleSchemeFactory());
+    schemes.put(StandardScheme.class, new BulkPathsRequestStandardSchemeFactory());
+    schemes.put(TupleScheme.class, new BulkPathsRequestTupleSchemeFactory());
   }
 
   private List<TripParameters> trips; // required
+  private PathOptions options; // required
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-    TRIPS((short)1, "trips");
+    TRIPS((short)1, "trips"),
+    OPTIONS((short)2, "options");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -59,6 +62,8 @@ public class BulkTripDurationRequest implements org.apache.thrift.TBase<BulkTrip
       switch(fieldId) {
         case 1: // TRIPS
           return TRIPS;
+        case 2: // OPTIONS
+          return OPTIONS;
         default:
           return null;
       }
@@ -105,24 +110,28 @@ public class BulkTripDurationRequest implements org.apache.thrift.TBase<BulkTrip
     tmpMap.put(_Fields.TRIPS, new org.apache.thrift.meta_data.FieldMetaData("trips", org.apache.thrift.TFieldRequirementType.REQUIRED, 
         new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
             new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, TripParameters.class))));
+    tmpMap.put(_Fields.OPTIONS, new org.apache.thrift.meta_data.FieldMetaData("options", org.apache.thrift.TFieldRequirementType.REQUIRED, 
+        new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, PathOptions.class)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
-    org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(BulkTripDurationRequest.class, metaDataMap);
+    org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(BulkPathsRequest.class, metaDataMap);
   }
 
-  public BulkTripDurationRequest() {
+  public BulkPathsRequest() {
   }
 
-  public BulkTripDurationRequest(
-    List<TripParameters> trips)
+  public BulkPathsRequest(
+    List<TripParameters> trips,
+    PathOptions options)
   {
     this();
     this.trips = trips;
+    this.options = options;
   }
 
   /**
    * Performs a deep copy on <i>other</i>.
    */
-  public BulkTripDurationRequest(BulkTripDurationRequest other) {
+  public BulkPathsRequest(BulkPathsRequest other) {
     if (other.isSetTrips()) {
       List<TripParameters> __this__trips = new ArrayList<TripParameters>();
       for (TripParameters other_element : other.trips) {
@@ -130,15 +139,19 @@ public class BulkTripDurationRequest implements org.apache.thrift.TBase<BulkTrip
       }
       this.trips = __this__trips;
     }
+    if (other.isSetOptions()) {
+      this.options = new PathOptions(other.options);
+    }
   }
 
-  public BulkTripDurationRequest deepCopy() {
-    return new BulkTripDurationRequest(this);
+  public BulkPathsRequest deepCopy() {
+    return new BulkPathsRequest(this);
   }
 
   @Override
   public void clear() {
     this.trips = null;
+    this.options = null;
   }
 
   public int getTripsSize() {
@@ -179,6 +192,29 @@ public class BulkTripDurationRequest implements org.apache.thrift.TBase<BulkTrip
     }
   }
 
+  public PathOptions getOptions() {
+    return this.options;
+  }
+
+  public void setOptions(PathOptions options) {
+    this.options = options;
+  }
+
+  public void unsetOptions() {
+    this.options = null;
+  }
+
+  /** Returns true if field options is set (has been assigned a value) and false otherwise */
+  public boolean isSetOptions() {
+    return this.options != null;
+  }
+
+  public void setOptionsIsSet(boolean value) {
+    if (!value) {
+      this.options = null;
+    }
+  }
+
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
     case TRIPS:
@@ -189,6 +225,14 @@ public class BulkTripDurationRequest implements org.apache.thrift.TBase<BulkTrip
       }
       break;
 
+    case OPTIONS:
+      if (value == null) {
+        unsetOptions();
+      } else {
+        setOptions((PathOptions)value);
+      }
+      break;
+
     }
   }
 
@@ -196,6 +240,9 @@ public class BulkTripDurationRequest implements org.apache.thrift.TBase<BulkTrip
     switch (field) {
     case TRIPS:
       return getTrips();
+
+    case OPTIONS:
+      return getOptions();
 
     }
     throw new IllegalStateException();
@@ -210,6 +257,8 @@ public class BulkTripDurationRequest implements org.apache.thrift.TBase<BulkTrip
     switch (field) {
     case TRIPS:
       return isSetTrips();
+    case OPTIONS:
+      return isSetOptions();
     }
     throw new IllegalStateException();
   }
@@ -218,12 +267,12 @@ public class BulkTripDurationRequest implements org.apache.thrift.TBase<BulkTrip
   public boolean equals(Object that) {
     if (that == null)
       return false;
-    if (that instanceof BulkTripDurationRequest)
-      return this.equals((BulkTripDurationRequest)that);
+    if (that instanceof BulkPathsRequest)
+      return this.equals((BulkPathsRequest)that);
     return false;
   }
 
-  public boolean equals(BulkTripDurationRequest that) {
+  public boolean equals(BulkPathsRequest that) {
     if (that == null)
       return false;
 
@@ -236,6 +285,15 @@ public class BulkTripDurationRequest implements org.apache.thrift.TBase<BulkTrip
         return false;
     }
 
+    boolean this_present_options = true && this.isSetOptions();
+    boolean that_present_options = true && that.isSetOptions();
+    if (this_present_options || that_present_options) {
+      if (!(this_present_options && that_present_options))
+        return false;
+      if (!this.options.equals(that.options))
+        return false;
+    }
+
     return true;
   }
 
@@ -244,13 +302,13 @@ public class BulkTripDurationRequest implements org.apache.thrift.TBase<BulkTrip
     return 0;
   }
 
-  public int compareTo(BulkTripDurationRequest other) {
+  public int compareTo(BulkPathsRequest other) {
     if (!getClass().equals(other.getClass())) {
       return getClass().getName().compareTo(other.getClass().getName());
     }
 
     int lastComparison = 0;
-    BulkTripDurationRequest typedOther = (BulkTripDurationRequest)other;
+    BulkPathsRequest typedOther = (BulkPathsRequest)other;
 
     lastComparison = Boolean.valueOf(isSetTrips()).compareTo(typedOther.isSetTrips());
     if (lastComparison != 0) {
@@ -258,6 +316,16 @@ public class BulkTripDurationRequest implements org.apache.thrift.TBase<BulkTrip
     }
     if (isSetTrips()) {
       lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.trips, typedOther.trips);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetOptions()).compareTo(typedOther.isSetOptions());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetOptions()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.options, typedOther.options);
       if (lastComparison != 0) {
         return lastComparison;
       }
@@ -279,7 +347,7 @@ public class BulkTripDurationRequest implements org.apache.thrift.TBase<BulkTrip
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder("BulkTripDurationRequest(");
+    StringBuilder sb = new StringBuilder("BulkPathsRequest(");
     boolean first = true;
 
     sb.append("trips:");
@@ -287,6 +355,14 @@ public class BulkTripDurationRequest implements org.apache.thrift.TBase<BulkTrip
       sb.append("null");
     } else {
       sb.append(this.trips);
+    }
+    first = false;
+    if (!first) sb.append(", ");
+    sb.append("options:");
+    if (this.options == null) {
+      sb.append("null");
+    } else {
+      sb.append(this.options);
     }
     first = false;
     sb.append(")");
@@ -297,6 +373,10 @@ public class BulkTripDurationRequest implements org.apache.thrift.TBase<BulkTrip
     // check for required fields
     if (!isSetTrips()) {
       throw new org.apache.thrift.protocol.TProtocolException("Required field 'trips' is unset! Struct:" + toString());
+    }
+
+    if (!isSetOptions()) {
+      throw new org.apache.thrift.protocol.TProtocolException("Required field 'options' is unset! Struct:" + toString());
     }
 
   }
@@ -317,15 +397,15 @@ public class BulkTripDurationRequest implements org.apache.thrift.TBase<BulkTrip
     }
   }
 
-  private static class BulkTripDurationRequestStandardSchemeFactory implements SchemeFactory {
-    public BulkTripDurationRequestStandardScheme getScheme() {
-      return new BulkTripDurationRequestStandardScheme();
+  private static class BulkPathsRequestStandardSchemeFactory implements SchemeFactory {
+    public BulkPathsRequestStandardScheme getScheme() {
+      return new BulkPathsRequestStandardScheme();
     }
   }
 
-  private static class BulkTripDurationRequestStandardScheme extends StandardScheme<BulkTripDurationRequest> {
+  private static class BulkPathsRequestStandardScheme extends StandardScheme<BulkPathsRequest> {
 
-    public void read(org.apache.thrift.protocol.TProtocol iprot, BulkTripDurationRequest struct) throws org.apache.thrift.TException {
+    public void read(org.apache.thrift.protocol.TProtocol iprot, BulkPathsRequest struct) throws org.apache.thrift.TException {
       org.apache.thrift.protocol.TField schemeField;
       iprot.readStructBegin();
       while (true)
@@ -338,18 +418,27 @@ public class BulkTripDurationRequest implements org.apache.thrift.TBase<BulkTrip
           case 1: // TRIPS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list48 = iprot.readListBegin();
-                struct.trips = new ArrayList<TripParameters>(_list48.size);
-                for (int _i49 = 0; _i49 < _list48.size; ++_i49)
+                org.apache.thrift.protocol.TList _list32 = iprot.readListBegin();
+                struct.trips = new ArrayList<TripParameters>(_list32.size);
+                for (int _i33 = 0; _i33 < _list32.size; ++_i33)
                 {
-                  TripParameters _elem50; // required
-                  _elem50 = new TripParameters();
-                  _elem50.read(iprot);
-                  struct.trips.add(_elem50);
+                  TripParameters _elem34; // required
+                  _elem34 = new TripParameters();
+                  _elem34.read(iprot);
+                  struct.trips.add(_elem34);
                 }
                 iprot.readListEnd();
               }
               struct.setTripsIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
+          case 2: // OPTIONS
+            if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
+              struct.options = new PathOptions();
+              struct.options.read(iprot);
+              struct.setOptionsIsSet(true);
             } else { 
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
@@ -363,7 +452,7 @@ public class BulkTripDurationRequest implements org.apache.thrift.TBase<BulkTrip
       struct.validate();
     }
 
-    public void write(org.apache.thrift.protocol.TProtocol oprot, BulkTripDurationRequest struct) throws org.apache.thrift.TException {
+    public void write(org.apache.thrift.protocol.TProtocol oprot, BulkPathsRequest struct) throws org.apache.thrift.TException {
       struct.validate();
 
       oprot.writeStructBegin(STRUCT_DESC);
@@ -371,12 +460,17 @@ public class BulkTripDurationRequest implements org.apache.thrift.TBase<BulkTrip
         oprot.writeFieldBegin(TRIPS_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.trips.size()));
-          for (TripParameters _iter51 : struct.trips)
+          for (TripParameters _iter35 : struct.trips)
           {
-            _iter51.write(oprot);
+            _iter35.write(oprot);
           }
           oprot.writeListEnd();
         }
+        oprot.writeFieldEnd();
+      }
+      if (struct.options != null) {
+        oprot.writeFieldBegin(OPTIONS_FIELD_DESC);
+        struct.options.write(oprot);
         oprot.writeFieldEnd();
       }
       oprot.writeFieldStop();
@@ -385,41 +479,45 @@ public class BulkTripDurationRequest implements org.apache.thrift.TBase<BulkTrip
 
   }
 
-  private static class BulkTripDurationRequestTupleSchemeFactory implements SchemeFactory {
-    public BulkTripDurationRequestTupleScheme getScheme() {
-      return new BulkTripDurationRequestTupleScheme();
+  private static class BulkPathsRequestTupleSchemeFactory implements SchemeFactory {
+    public BulkPathsRequestTupleScheme getScheme() {
+      return new BulkPathsRequestTupleScheme();
     }
   }
 
-  private static class BulkTripDurationRequestTupleScheme extends TupleScheme<BulkTripDurationRequest> {
+  private static class BulkPathsRequestTupleScheme extends TupleScheme<BulkPathsRequest> {
 
     @Override
-    public void write(org.apache.thrift.protocol.TProtocol prot, BulkTripDurationRequest struct) throws org.apache.thrift.TException {
+    public void write(org.apache.thrift.protocol.TProtocol prot, BulkPathsRequest struct) throws org.apache.thrift.TException {
       TTupleProtocol oprot = (TTupleProtocol) prot;
       {
         oprot.writeI32(struct.trips.size());
-        for (TripParameters _iter52 : struct.trips)
+        for (TripParameters _iter36 : struct.trips)
         {
-          _iter52.write(oprot);
+          _iter36.write(oprot);
         }
       }
+      struct.options.write(oprot);
     }
 
     @Override
-    public void read(org.apache.thrift.protocol.TProtocol prot, BulkTripDurationRequest struct) throws org.apache.thrift.TException {
+    public void read(org.apache.thrift.protocol.TProtocol prot, BulkPathsRequest struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
       {
-        org.apache.thrift.protocol.TList _list53 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
-        struct.trips = new ArrayList<TripParameters>(_list53.size);
-        for (int _i54 = 0; _i54 < _list53.size; ++_i54)
+        org.apache.thrift.protocol.TList _list37 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+        struct.trips = new ArrayList<TripParameters>(_list37.size);
+        for (int _i38 = 0; _i38 < _list37.size; ++_i38)
         {
-          TripParameters _elem55; // required
-          _elem55 = new TripParameters();
-          _elem55.read(iprot);
-          struct.trips.add(_elem55);
+          TripParameters _elem39; // required
+          _elem39 = new TripParameters();
+          _elem39.read(iprot);
+          struct.trips.add(_elem39);
         }
       }
       struct.setTripsIsSet(true);
+      struct.options = new PathOptions();
+      struct.options.read(iprot);
+      struct.setOptionsIsSet(true);
     }
   }
 
