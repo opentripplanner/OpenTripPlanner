@@ -130,8 +130,10 @@ public class BikeRentalUpdater implements Runnable {
             if (stationSet.contains(station))
                 continue;
             BikeRentalStationVertex vertex = entry.getValue();
-            graph.removeVertexAndEdges(vertex);
-            toRemove.add(vertex);
+            if (graph.containsVertex(vertex)) {
+                graph.removeVertexAndEdges(vertex);
+                toRemove.add(vertex);
+            }
             service.removeStation(station);
             //TODO: need to unsplit any streets that were split
         }
