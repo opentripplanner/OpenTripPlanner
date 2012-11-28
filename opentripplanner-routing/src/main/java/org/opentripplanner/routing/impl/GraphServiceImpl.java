@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.impl;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -163,7 +164,17 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
             return null;
         }
         LOG.debug("loading serialized graph for routerId {}", routerId);
-        String resourceLocation = String.format("%s/%s/Graph.obj", resourceBase, routerId);
+        StringBuilder sb = new StringBuilder(resourceBase);
+        // S3 is intolerant of extra slashes in the URL, so only add them as needed
+        if (! (resourceBase.endsWith("/") || resourceBase.endsWith(File.pathSeparator))) {
+            sb.append("/");
+        }
+        if (routerId.length() > 0) { 
+            sb.append(routerId);
+            sb.append("/");
+        }
+        sb.append("Graph.obj");
+        String resourceLocation = sb.toString();
         LOG.debug("graph file for routerId '{}' is at {}", routerId, resourceLocation);
         Resource graphResource;
         InputStream is;
