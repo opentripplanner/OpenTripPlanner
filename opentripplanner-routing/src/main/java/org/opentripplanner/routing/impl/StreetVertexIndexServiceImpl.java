@@ -295,8 +295,9 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
         public List<StreetEdge> toEdgeList() {
             List<StreetEdge> ret = new ArrayList<StreetEdge>();
-            for (CandidateEdge ce : this)
+            for (CandidateEdge ce : this) {
                 ret.add(ce.edge);
+            }
             return ret;
         }
 
@@ -310,6 +311,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 this.endwise = endwise;
             }
         }
+        
         public Collection<CandidateEdgeBundle> binByDistanceAndAngle() {
             Map<DistanceAndAngle, CandidateEdgeBundle> bins = new HashMap<DistanceAndAngle, CandidateEdgeBundle>(); // (r, theta)
             CANDIDATE: for (CandidateEdge ce : this) {
