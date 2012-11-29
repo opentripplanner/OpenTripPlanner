@@ -153,6 +153,24 @@ public class RoutingRequestBuilderTest {
 				.build();
 		assertEquals(n, rr.getNumItineraries().intValue());
 	}
+	
+	@Test
+	public void testSetStartTime() {
+		long now = this.getTimeSeconds();
+		RoutingRequest rr = (new RoutingRequestBuilder()).setStartTime(now)
+				.build();
+		assertEquals(now, rr.dateTime);
+		assertFalse(rr.arriveBy);
+	}
+	
+	@Test
+	public void testSetArriveBy() {
+		long t = this.getTimeSeconds() + 30*60;
+		RoutingRequest rr = (new RoutingRequestBuilder()).setArriveBy(t)
+				.build();
+		assertEquals(t, rr.dateTime);
+		assertTrue(rr.arriveBy);
+	}
 
 	@Test
 	public void testSetOriginDestination() {
