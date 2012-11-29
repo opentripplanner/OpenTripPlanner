@@ -381,6 +381,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
      * pattern was already deemed useful.
      */
     public double weightLowerBound(RoutingRequest options) {
+//        return 0;
         if ((options.isArriveBy() && boarding) || (!options.isArriveBy() && !boarding))
             return timeLowerBound(options);
         else

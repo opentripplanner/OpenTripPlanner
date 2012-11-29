@@ -98,6 +98,7 @@ public class SimplifiedPathServiceImpl implements PathService {
         }
         // We order the list of returned paths by the time of arrival or departure (not path duration)
         //Collections.sort(paths, new PathComparator(options.isArriveBy()));
+        // paths.get(0).dump();
         return paths;
     }
 
