@@ -96,7 +96,7 @@ public class SimplifiedPathServiceImpl implements PathService {
             LOG.warn("SPT was null.");
             return null;
         }
-        spt.getPaths().get(0).dump();
+        //spt.getPaths().get(0).dump();
         return spt.getPaths();
         
         /*
