@@ -197,7 +197,7 @@ public class ThreadedBidirectionalHeuristic implements RemainingWeightHeuristic 
 
     private List<State> streetSearch (RoutingRequest rr, boolean fromTarget) {
         rr = rr.clone();
-        rr.setMaxWalkDistance(3000);
+        rr.setMaxWalkDistance(5000);
         if (fromTarget)
             rr.setArriveBy( ! rr.isArriveBy());
         List<State> stopStates = Lists.newArrayList();
