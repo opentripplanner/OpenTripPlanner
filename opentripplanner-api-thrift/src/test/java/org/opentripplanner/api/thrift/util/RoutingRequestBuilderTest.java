@@ -14,6 +14,7 @@
 package org.opentripplanner.api.thrift.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -42,10 +43,12 @@ public class RoutingRequestBuilderTest {
 		tp.addToAllowed_modes(TravelMode.CAR);
 
 		LatLng originLatLng = new LatLng(1.0, 2.5);
-		Location origin = new Location(originLatLng);
+		Location origin = new Location();
+		origin.setLat_lng(originLatLng);
 
 		LatLng destLatLng = new LatLng(-3.0, 9.7);
-		Location dest = new Location(destLatLng);
+		Location dest = new Location();
+		dest.setLat_lng(destLatLng);
 
 		tp.setOrigin(origin);
 		tp.setDestination(dest);
@@ -63,7 +66,86 @@ public class RoutingRequestBuilderTest {
 			assertTrue(modeSet.contains(traverseMode));
 		}
 	}
+	
+	@Test
+	public void testAddTripParametersWithStartTime() {
+		TripParameters tp = new TripParameters();
+		tp.setStart_time(getTimeSeconds());
 
+		LatLng originLatLng = new LatLng(1.0, 2.5);
+		Location origin = new Location();
+		origin.setLat_lng(originLatLng);
+
+		LatLng destLatLng = new LatLng(-3.0, 9.7);
+		Location dest = new Location();
+		dest.setLat_lng(destLatLng);
+
+		tp.setOrigin(origin);
+		tp.setDestination(dest);
+
+		RoutingRequest rr = (new RoutingRequestBuilder()).addTripParameters(tp)
+				.build();
+
+		assertEquals("1.0000000,2.5000000", rr.getFrom());
+		assertEquals("-3.0000000,9.7000000", rr.getTo());
+		assertEquals(tp.getStart_time(), rr.dateTime);
+		assertFalse(rr.arriveBy);
+	}
+	
+	@Test
+	public void testAddTripParametersWithArriveBy() {
+		TripParameters tp = new TripParameters();
+		tp.setArrive_by(getTimeSeconds() + 60*30);
+
+		LatLng originLatLng = new LatLng(1.0, 2.5);
+		Location origin = new Location();
+		origin.setLat_lng(originLatLng);
+
+		LatLng destLatLng = new LatLng(-3.0, 9.7);
+		Location dest = new Location();
+		dest.setLat_lng(destLatLng);
+
+		tp.setOrigin(origin);
+		tp.setDestination(dest);
+
+		RoutingRequest rr = (new RoutingRequestBuilder()).addTripParameters(tp)
+				.build();
+
+		assertEquals("1.0000000,2.5000000", rr.getFrom());
+		assertEquals("-3.0000000,9.7000000", rr.getTo());
+		assertEquals(tp.getArrive_by(), rr.dateTime);
+		assertTrue(rr.arriveBy);
+	}
+
+	@Test
+	public void testAddTripParametersWithBothTimes() {
+		TripParameters tp = new TripParameters();
+		long now = getTimeSeconds();
+		tp.setStart_time(now);
+		tp.setArrive_by(now + 60*30);
+
+		LatLng originLatLng = new LatLng(1.0, 2.5);
+		Location origin = new Location();
+		origin.setLat_lng(originLatLng);
+
+		LatLng destLatLng = new LatLng(-3.0, 9.7);
+		Location dest = new Location();
+		dest.setLat_lng(destLatLng);
+
+		tp.setOrigin(origin);
+		tp.setDestination(dest);
+
+		RoutingRequest rr = (new RoutingRequestBuilder()).addTripParameters(tp)
+				.build();
+
+		assertEquals("1.0000000,2.5000000", rr.getFrom());
+		assertEquals("-3.0000000,9.7000000", rr.getTo());
+		
+		// Start time takes precedence
+		assertEquals(tp.getStart_time(), rr.dateTime);
+		assertFalse(rr.arriveBy);
+	}
+	
 	@Test
 	public void testSetNumItineraries() {
 		int n = 3;
@@ -83,4 +165,10 @@ public class RoutingRequestBuilderTest {
 		assertEquals("-3.0000000,9.7000000", rr.getTo());
 	}
 
+	/**
+	 * @return Current time in seconds.
+	 */
+	private long getTimeSeconds() {
+		return System.currentTimeMillis() / 1000;
+	}
 }

@@ -153,7 +153,7 @@ public class OTPServiceImpl implements OTPService.Iface {
 
 	@Override
 	public FindPathsResponse FindPaths(FindPathsRequest req)
-			throws NoPathFoundError, TException {
+			throws TException {
 		LOG.debug("FindPaths called");
 		
 		TripParameters trip = req.getTrip();

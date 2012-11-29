@@ -32,7 +32,9 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
 
   private static final org.apache.thrift.protocol.TField ORIGIN_FIELD_DESC = new org.apache.thrift.protocol.TField("origin", org.apache.thrift.protocol.TType.STRUCT, (short)1);
   private static final org.apache.thrift.protocol.TField DESTINATION_FIELD_DESC = new org.apache.thrift.protocol.TField("destination", org.apache.thrift.protocol.TType.STRUCT, (short)2);
-  private static final org.apache.thrift.protocol.TField ALLOWED_MODES_FIELD_DESC = new org.apache.thrift.protocol.TField("allowed_modes", org.apache.thrift.protocol.TType.SET, (short)3);
+  private static final org.apache.thrift.protocol.TField START_TIME_FIELD_DESC = new org.apache.thrift.protocol.TField("start_time", org.apache.thrift.protocol.TType.I64, (short)3);
+  private static final org.apache.thrift.protocol.TField ARRIVE_BY_FIELD_DESC = new org.apache.thrift.protocol.TField("arrive_by", org.apache.thrift.protocol.TType.I64, (short)4);
+  private static final org.apache.thrift.protocol.TField ALLOWED_MODES_FIELD_DESC = new org.apache.thrift.protocol.TField("allowed_modes", org.apache.thrift.protocol.TType.SET, (short)5);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
@@ -42,13 +44,17 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
 
   private Location origin; // required
   private Location destination; // required
+  private long start_time; // optional
+  private long arrive_by; // optional
   private Set<TravelMode> allowed_modes; // optional
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
     ORIGIN((short)1, "origin"),
     DESTINATION((short)2, "destination"),
-    ALLOWED_MODES((short)3, "allowed_modes");
+    START_TIME((short)3, "start_time"),
+    ARRIVE_BY((short)4, "arrive_by"),
+    ALLOWED_MODES((short)5, "allowed_modes");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -67,7 +73,11 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
           return ORIGIN;
         case 2: // DESTINATION
           return DESTINATION;
-        case 3: // ALLOWED_MODES
+        case 3: // START_TIME
+          return START_TIME;
+        case 4: // ARRIVE_BY
+          return ARRIVE_BY;
+        case 5: // ALLOWED_MODES
           return ALLOWED_MODES;
         default:
           return null;
@@ -109,7 +119,10 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
   }
 
   // isset id assignments
-  private _Fields optionals[] = {_Fields.ALLOWED_MODES};
+  private static final int __START_TIME_ISSET_ID = 0;
+  private static final int __ARRIVE_BY_ISSET_ID = 1;
+  private BitSet __isset_bit_vector = new BitSet(2);
+  private _Fields optionals[] = {_Fields.START_TIME,_Fields.ARRIVE_BY,_Fields.ALLOWED_MODES};
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
@@ -117,6 +130,10 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
         new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, Location.class)));
     tmpMap.put(_Fields.DESTINATION, new org.apache.thrift.meta_data.FieldMetaData("destination", org.apache.thrift.TFieldRequirementType.REQUIRED, 
         new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, Location.class)));
+    tmpMap.put(_Fields.START_TIME, new org.apache.thrift.meta_data.FieldMetaData("start_time", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I64)));
+    tmpMap.put(_Fields.ARRIVE_BY, new org.apache.thrift.meta_data.FieldMetaData("arrive_by", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I64)));
     tmpMap.put(_Fields.ALLOWED_MODES, new org.apache.thrift.meta_data.FieldMetaData("allowed_modes", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
         new org.apache.thrift.meta_data.SetMetaData(org.apache.thrift.protocol.TType.SET, 
             new org.apache.thrift.meta_data.EnumMetaData(org.apache.thrift.protocol.TType.ENUM, TravelMode.class))));
@@ -140,12 +157,16 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
    * Performs a deep copy on <i>other</i>.
    */
   public TripParameters(TripParameters other) {
+    __isset_bit_vector.clear();
+    __isset_bit_vector.or(other.__isset_bit_vector);
     if (other.isSetOrigin()) {
       this.origin = new Location(other.origin);
     }
     if (other.isSetDestination()) {
       this.destination = new Location(other.destination);
     }
+    this.start_time = other.start_time;
+    this.arrive_by = other.arrive_by;
     if (other.isSetAllowed_modes()) {
       Set<TravelMode> __this__allowed_modes = new HashSet<TravelMode>();
       for (TravelMode other_element : other.allowed_modes) {
@@ -163,6 +184,10 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
   public void clear() {
     this.origin = null;
     this.destination = null;
+    setStart_timeIsSet(false);
+    this.start_time = 0;
+    setArrive_byIsSet(false);
+    this.arrive_by = 0;
     this.allowed_modes = null;
   }
 
@@ -210,6 +235,50 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
     if (!value) {
       this.destination = null;
     }
+  }
+
+  public long getStart_time() {
+    return this.start_time;
+  }
+
+  public void setStart_time(long start_time) {
+    this.start_time = start_time;
+    setStart_timeIsSet(true);
+  }
+
+  public void unsetStart_time() {
+    __isset_bit_vector.clear(__START_TIME_ISSET_ID);
+  }
+
+  /** Returns true if field start_time is set (has been assigned a value) and false otherwise */
+  public boolean isSetStart_time() {
+    return __isset_bit_vector.get(__START_TIME_ISSET_ID);
+  }
+
+  public void setStart_timeIsSet(boolean value) {
+    __isset_bit_vector.set(__START_TIME_ISSET_ID, value);
+  }
+
+  public long getArrive_by() {
+    return this.arrive_by;
+  }
+
+  public void setArrive_by(long arrive_by) {
+    this.arrive_by = arrive_by;
+    setArrive_byIsSet(true);
+  }
+
+  public void unsetArrive_by() {
+    __isset_bit_vector.clear(__ARRIVE_BY_ISSET_ID);
+  }
+
+  /** Returns true if field arrive_by is set (has been assigned a value) and false otherwise */
+  public boolean isSetArrive_by() {
+    return __isset_bit_vector.get(__ARRIVE_BY_ISSET_ID);
+  }
+
+  public void setArrive_byIsSet(boolean value) {
+    __isset_bit_vector.set(__ARRIVE_BY_ISSET_ID, value);
   }
 
   public int getAllowed_modesSize() {
@@ -268,6 +337,22 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
       }
       break;
 
+    case START_TIME:
+      if (value == null) {
+        unsetStart_time();
+      } else {
+        setStart_time((Long)value);
+      }
+      break;
+
+    case ARRIVE_BY:
+      if (value == null) {
+        unsetArrive_by();
+      } else {
+        setArrive_by((Long)value);
+      }
+      break;
+
     case ALLOWED_MODES:
       if (value == null) {
         unsetAllowed_modes();
@@ -287,6 +372,12 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
     case DESTINATION:
       return getDestination();
 
+    case START_TIME:
+      return Long.valueOf(getStart_time());
+
+    case ARRIVE_BY:
+      return Long.valueOf(getArrive_by());
+
     case ALLOWED_MODES:
       return getAllowed_modes();
 
@@ -305,6 +396,10 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
       return isSetOrigin();
     case DESTINATION:
       return isSetDestination();
+    case START_TIME:
+      return isSetStart_time();
+    case ARRIVE_BY:
+      return isSetArrive_by();
     case ALLOWED_MODES:
       return isSetAllowed_modes();
     }
@@ -339,6 +434,24 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
       if (!(this_present_destination && that_present_destination))
         return false;
       if (!this.destination.equals(that.destination))
+        return false;
+    }
+
+    boolean this_present_start_time = true && this.isSetStart_time();
+    boolean that_present_start_time = true && that.isSetStart_time();
+    if (this_present_start_time || that_present_start_time) {
+      if (!(this_present_start_time && that_present_start_time))
+        return false;
+      if (this.start_time != that.start_time)
+        return false;
+    }
+
+    boolean this_present_arrive_by = true && this.isSetArrive_by();
+    boolean that_present_arrive_by = true && that.isSetArrive_by();
+    if (this_present_arrive_by || that_present_arrive_by) {
+      if (!(this_present_arrive_by && that_present_arrive_by))
+        return false;
+      if (this.arrive_by != that.arrive_by)
         return false;
     }
 
@@ -383,6 +496,26 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
     }
     if (isSetDestination()) {
       lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.destination, typedOther.destination);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetStart_time()).compareTo(typedOther.isSetStart_time());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetStart_time()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.start_time, typedOther.start_time);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetArrive_by()).compareTo(typedOther.isSetArrive_by());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetArrive_by()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.arrive_by, typedOther.arrive_by);
       if (lastComparison != 0) {
         return lastComparison;
       }
@@ -432,6 +565,18 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
       sb.append(this.destination);
     }
     first = false;
+    if (isSetStart_time()) {
+      if (!first) sb.append(", ");
+      sb.append("start_time:");
+      sb.append(this.start_time);
+      first = false;
+    }
+    if (isSetArrive_by()) {
+      if (!first) sb.append(", ");
+      sb.append("arrive_by:");
+      sb.append(this.arrive_by);
+      first = false;
+    }
     if (isSetAllowed_modes()) {
       if (!first) sb.append(", ");
       sb.append("allowed_modes:");
@@ -468,6 +613,8 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
 
   private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
     try {
+      // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
+      __isset_bit_vector = new BitSet(1);
       read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
     } catch (org.apache.thrift.TException te) {
       throw new java.io.IOException(te);
@@ -510,7 +657,23 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
-          case 3: // ALLOWED_MODES
+          case 3: // START_TIME
+            if (schemeField.type == org.apache.thrift.protocol.TType.I64) {
+              struct.start_time = iprot.readI64();
+              struct.setStart_timeIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
+          case 4: // ARRIVE_BY
+            if (schemeField.type == org.apache.thrift.protocol.TType.I64) {
+              struct.arrive_by = iprot.readI64();
+              struct.setArrive_byIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
+          case 5: // ALLOWED_MODES
             if (schemeField.type == org.apache.thrift.protocol.TType.SET) {
               {
                 org.apache.thrift.protocol.TSet _set16 = iprot.readSetBegin();
@@ -551,6 +714,16 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
         struct.destination.write(oprot);
         oprot.writeFieldEnd();
       }
+      if (struct.isSetStart_time()) {
+        oprot.writeFieldBegin(START_TIME_FIELD_DESC);
+        oprot.writeI64(struct.start_time);
+        oprot.writeFieldEnd();
+      }
+      if (struct.isSetArrive_by()) {
+        oprot.writeFieldBegin(ARRIVE_BY_FIELD_DESC);
+        oprot.writeI64(struct.arrive_by);
+        oprot.writeFieldEnd();
+      }
       if (struct.allowed_modes != null) {
         if (struct.isSetAllowed_modes()) {
           oprot.writeFieldBegin(ALLOWED_MODES_FIELD_DESC);
@@ -585,10 +758,22 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
       struct.origin.write(oprot);
       struct.destination.write(oprot);
       BitSet optionals = new BitSet();
-      if (struct.isSetAllowed_modes()) {
+      if (struct.isSetStart_time()) {
         optionals.set(0);
       }
-      oprot.writeBitSet(optionals, 1);
+      if (struct.isSetArrive_by()) {
+        optionals.set(1);
+      }
+      if (struct.isSetAllowed_modes()) {
+        optionals.set(2);
+      }
+      oprot.writeBitSet(optionals, 3);
+      if (struct.isSetStart_time()) {
+        oprot.writeI64(struct.start_time);
+      }
+      if (struct.isSetArrive_by()) {
+        oprot.writeI64(struct.arrive_by);
+      }
       if (struct.isSetAllowed_modes()) {
         {
           oprot.writeI32(struct.allowed_modes.size());
@@ -609,8 +794,16 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
       struct.destination = new Location();
       struct.destination.read(iprot);
       struct.setDestinationIsSet(true);
-      BitSet incoming = iprot.readBitSet(1);
+      BitSet incoming = iprot.readBitSet(3);
       if (incoming.get(0)) {
+        struct.start_time = iprot.readI64();
+        struct.setStart_timeIsSet(true);
+      }
+      if (incoming.get(1)) {
+        struct.arrive_by = iprot.readI64();
+        struct.setArrive_byIsSet(true);
+      }
+      if (incoming.get(2)) {
         {
           org.apache.thrift.protocol.TSet _set21 = new org.apache.thrift.protocol.TSet(org.apache.thrift.protocol.TType.I32, iprot.readI32());
           struct.allowed_modes = new HashSet<TravelMode>(2*_set21.size);

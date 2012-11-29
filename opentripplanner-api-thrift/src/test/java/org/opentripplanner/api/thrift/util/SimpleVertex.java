@@ -26,8 +26,7 @@ class SimpleVertex extends StreetVertex {
     				 gv.getOut_degree() == getDegreeOut());
     	if (!b) return false;
     	
-    	Location loc = gv.getLocation();
-    	LatLng ll = loc.getLat_lng();
+    	LatLng ll = gv.getLat_lng();
     	b = (ll.getLat() == getY() &&
     		 ll.getLng() == getX());
     	return b;

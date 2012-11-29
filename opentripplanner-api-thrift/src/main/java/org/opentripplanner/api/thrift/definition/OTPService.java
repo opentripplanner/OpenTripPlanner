@@ -60,7 +60,7 @@ public class OTPService {
      * 
      * @param req
      */
-    public FindPathsResponse FindPaths(FindPathsRequest req) throws NoPathFoundError, org.apache.thrift.TException;
+    public FindPathsResponse FindPaths(FindPathsRequest req) throws org.apache.thrift.TException;
 
     /**
      * Find paths for a single trip.
@@ -177,7 +177,7 @@ public class OTPService {
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "GetManyTripDurations failed: unknown result");
     }
 
-    public FindPathsResponse FindPaths(FindPathsRequest req) throws NoPathFoundError, org.apache.thrift.TException
+    public FindPathsResponse FindPaths(FindPathsRequest req) throws org.apache.thrift.TException
     {
       send_FindPaths(req);
       return recv_FindPaths();
@@ -190,15 +190,12 @@ public class OTPService {
       sendBase("FindPaths", args);
     }
 
-    public FindPathsResponse recv_FindPaths() throws NoPathFoundError, org.apache.thrift.TException
+    public FindPathsResponse recv_FindPaths() throws org.apache.thrift.TException
     {
       FindPaths_result result = new FindPaths_result();
       receiveBase(result, "FindPaths");
       if (result.isSetSuccess()) {
         return result.success;
-      }
-      if (result.path_err != null) {
-        throw result.path_err;
       }
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "FindPaths failed: unknown result");
     }
@@ -362,7 +359,7 @@ public class OTPService {
         prot.writeMessageEnd();
       }
 
-      public FindPathsResponse getResult() throws NoPathFoundError, org.apache.thrift.TException {
+      public FindPathsResponse getResult() throws org.apache.thrift.TException {
         if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
           throw new IllegalStateException("Method call not finished!");
         }
@@ -488,11 +485,7 @@ public class OTPService {
 
       protected FindPaths_result getResult(I iface, FindPaths_args args) throws org.apache.thrift.TException {
         FindPaths_result result = new FindPaths_result();
-        try {
-          result.success = iface.FindPaths(args.req);
-        } catch (NoPathFoundError path_err) {
-          result.path_err = path_err;
-        }
+        result.success = iface.FindPaths(args.req);
         return result;
       }
     }
@@ -3084,7 +3077,6 @@ public class OTPService {
     private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("FindPaths_result");
 
     private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.STRUCT, (short)0);
-    private static final org.apache.thrift.protocol.TField PATH_ERR_FIELD_DESC = new org.apache.thrift.protocol.TField("path_err", org.apache.thrift.protocol.TType.STRUCT, (short)1);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
@@ -3093,12 +3085,10 @@ public class OTPService {
     }
 
     private FindPathsResponse success; // required
-    private NoPathFoundError path_err; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-      SUCCESS((short)0, "success"),
-      PATH_ERR((short)1, "path_err");
+      SUCCESS((short)0, "success");
 
       private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -3115,8 +3105,6 @@ public class OTPService {
         switch(fieldId) {
           case 0: // SUCCESS
             return SUCCESS;
-          case 1: // PATH_ERR
-            return PATH_ERR;
           default:
             return null;
         }
@@ -3162,8 +3150,6 @@ public class OTPService {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
       tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
           new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, FindPathsResponse.class)));
-      tmpMap.put(_Fields.PATH_ERR, new org.apache.thrift.meta_data.FieldMetaData("path_err", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
       org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(FindPaths_result.class, metaDataMap);
     }
@@ -3172,12 +3158,10 @@ public class OTPService {
     }
 
     public FindPaths_result(
-      FindPathsResponse success,
-      NoPathFoundError path_err)
+      FindPathsResponse success)
     {
       this();
       this.success = success;
-      this.path_err = path_err;
     }
 
     /**
@@ -3186,9 +3170,6 @@ public class OTPService {
     public FindPaths_result(FindPaths_result other) {
       if (other.isSetSuccess()) {
         this.success = new FindPathsResponse(other.success);
-      }
-      if (other.isSetPath_err()) {
-        this.path_err = new NoPathFoundError(other.path_err);
       }
     }
 
@@ -3199,7 +3180,6 @@ public class OTPService {
     @Override
     public void clear() {
       this.success = null;
-      this.path_err = null;
     }
 
     public FindPathsResponse getSuccess() {
@@ -3225,29 +3205,6 @@ public class OTPService {
       }
     }
 
-    public NoPathFoundError getPath_err() {
-      return this.path_err;
-    }
-
-    public void setPath_err(NoPathFoundError path_err) {
-      this.path_err = path_err;
-    }
-
-    public void unsetPath_err() {
-      this.path_err = null;
-    }
-
-    /** Returns true if field path_err is set (has been assigned a value) and false otherwise */
-    public boolean isSetPath_err() {
-      return this.path_err != null;
-    }
-
-    public void setPath_errIsSet(boolean value) {
-      if (!value) {
-        this.path_err = null;
-      }
-    }
-
     public void setFieldValue(_Fields field, Object value) {
       switch (field) {
       case SUCCESS:
@@ -3258,14 +3215,6 @@ public class OTPService {
         }
         break;
 
-      case PATH_ERR:
-        if (value == null) {
-          unsetPath_err();
-        } else {
-          setPath_err((NoPathFoundError)value);
-        }
-        break;
-
       }
     }
 
@@ -3273,9 +3222,6 @@ public class OTPService {
       switch (field) {
       case SUCCESS:
         return getSuccess();
-
-      case PATH_ERR:
-        return getPath_err();
 
       }
       throw new IllegalStateException();
@@ -3290,8 +3236,6 @@ public class OTPService {
       switch (field) {
       case SUCCESS:
         return isSetSuccess();
-      case PATH_ERR:
-        return isSetPath_err();
       }
       throw new IllegalStateException();
     }
@@ -3315,15 +3259,6 @@ public class OTPService {
         if (!(this_present_success && that_present_success))
           return false;
         if (!this.success.equals(that.success))
-          return false;
-      }
-
-      boolean this_present_path_err = true && this.isSetPath_err();
-      boolean that_present_path_err = true && that.isSetPath_err();
-      if (this_present_path_err || that_present_path_err) {
-        if (!(this_present_path_err && that_present_path_err))
-          return false;
-        if (!this.path_err.equals(that.path_err))
           return false;
       }
 
@@ -3353,16 +3288,6 @@ public class OTPService {
           return lastComparison;
         }
       }
-      lastComparison = Boolean.valueOf(isSetPath_err()).compareTo(typedOther.isSetPath_err());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      if (isSetPath_err()) {
-        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.path_err, typedOther.path_err);
-        if (lastComparison != 0) {
-          return lastComparison;
-        }
-      }
       return 0;
     }
 
@@ -3388,14 +3313,6 @@ public class OTPService {
         sb.append("null");
       } else {
         sb.append(this.success);
-      }
-      first = false;
-      if (!first) sb.append(", ");
-      sb.append("path_err:");
-      if (this.path_err == null) {
-        sb.append("null");
-      } else {
-        sb.append(this.path_err);
       }
       first = false;
       sb.append(")");
@@ -3449,15 +3366,6 @@ public class OTPService {
                 org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
               }
               break;
-            case 1: // PATH_ERR
-              if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
-                struct.path_err = new NoPathFoundError();
-                struct.path_err.read(iprot);
-                struct.setPath_errIsSet(true);
-              } else { 
-                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
-              }
-              break;
             default:
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
           }
@@ -3474,11 +3382,6 @@ public class OTPService {
         if (struct.success != null) {
           oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
           struct.success.write(oprot);
-          oprot.writeFieldEnd();
-        }
-        if (struct.path_err != null) {
-          oprot.writeFieldBegin(PATH_ERR_FIELD_DESC);
-          struct.path_err.write(oprot);
           oprot.writeFieldEnd();
         }
         oprot.writeFieldStop();
@@ -3502,31 +3405,20 @@ public class OTPService {
         if (struct.isSetSuccess()) {
           optionals.set(0);
         }
-        if (struct.isSetPath_err()) {
-          optionals.set(1);
-        }
-        oprot.writeBitSet(optionals, 2);
+        oprot.writeBitSet(optionals, 1);
         if (struct.isSetSuccess()) {
           struct.success.write(oprot);
-        }
-        if (struct.isSetPath_err()) {
-          struct.path_err.write(oprot);
         }
       }
 
       @Override
       public void read(org.apache.thrift.protocol.TProtocol prot, FindPaths_result struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
-        BitSet incoming = iprot.readBitSet(2);
+        BitSet incoming = iprot.readBitSet(1);
         if (incoming.get(0)) {
           struct.success = new FindPathsResponse();
           struct.success.read(iprot);
           struct.setSuccessIsSet(true);
-        }
-        if (incoming.get(1)) {
-          struct.path_err = new NoPathFoundError();
-          struct.path_err.read(iprot);
-          struct.setPath_errIsSet(true);
         }
       }
     }

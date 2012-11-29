@@ -38,7 +38,7 @@ public class Location implements org.apache.thrift.TBase<Location, Location._Fie
     schemes.put(TupleScheme.class, new LocationTupleSchemeFactory());
   }
 
-  private LatLng lat_lng; // required
+  private LatLng lat_lng; // optional
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -99,23 +99,17 @@ public class Location implements org.apache.thrift.TBase<Location, Location._Fie
   }
 
   // isset id assignments
+  private _Fields optionals[] = {_Fields.LAT_LNG};
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
-    tmpMap.put(_Fields.LAT_LNG, new org.apache.thrift.meta_data.FieldMetaData("lat_lng", org.apache.thrift.TFieldRequirementType.REQUIRED, 
+    tmpMap.put(_Fields.LAT_LNG, new org.apache.thrift.meta_data.FieldMetaData("lat_lng", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
         new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, LatLng.class)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(Location.class, metaDataMap);
   }
 
   public Location() {
-  }
-
-  public Location(
-    LatLng lat_lng)
-  {
-    this();
-    this.lat_lng = lat_lng;
   }
 
   /**
@@ -262,23 +256,21 @@ public class Location implements org.apache.thrift.TBase<Location, Location._Fie
     StringBuilder sb = new StringBuilder("Location(");
     boolean first = true;
 
-    sb.append("lat_lng:");
-    if (this.lat_lng == null) {
-      sb.append("null");
-    } else {
-      sb.append(this.lat_lng);
+    if (isSetLat_lng()) {
+      sb.append("lat_lng:");
+      if (this.lat_lng == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.lat_lng);
+      }
+      first = false;
     }
-    first = false;
     sb.append(")");
     return sb.toString();
   }
 
   public void validate() throws org.apache.thrift.TException {
     // check for required fields
-    if (!isSetLat_lng()) {
-      throw new org.apache.thrift.protocol.TProtocolException("Required field 'lat_lng' is unset! Struct:" + toString());
-    }
-
   }
 
   private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
@@ -338,9 +330,11 @@ public class Location implements org.apache.thrift.TBase<Location, Location._Fie
 
       oprot.writeStructBegin(STRUCT_DESC);
       if (struct.lat_lng != null) {
-        oprot.writeFieldBegin(LAT_LNG_FIELD_DESC);
-        struct.lat_lng.write(oprot);
-        oprot.writeFieldEnd();
+        if (struct.isSetLat_lng()) {
+          oprot.writeFieldBegin(LAT_LNG_FIELD_DESC);
+          struct.lat_lng.write(oprot);
+          oprot.writeFieldEnd();
+        }
       }
       oprot.writeFieldStop();
       oprot.writeStructEnd();
@@ -359,15 +353,25 @@ public class Location implements org.apache.thrift.TBase<Location, Location._Fie
     @Override
     public void write(org.apache.thrift.protocol.TProtocol prot, Location struct) throws org.apache.thrift.TException {
       TTupleProtocol oprot = (TTupleProtocol) prot;
-      struct.lat_lng.write(oprot);
+      BitSet optionals = new BitSet();
+      if (struct.isSetLat_lng()) {
+        optionals.set(0);
+      }
+      oprot.writeBitSet(optionals, 1);
+      if (struct.isSetLat_lng()) {
+        struct.lat_lng.write(oprot);
+      }
     }
 
     @Override
     public void read(org.apache.thrift.protocol.TProtocol prot, Location struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
-      struct.lat_lng = new LatLng();
-      struct.lat_lng.read(iprot);
-      struct.setLat_lngIsSet(true);
+      BitSet incoming = iprot.readBitSet(1);
+      if (incoming.get(0)) {
+        struct.lat_lng = new LatLng();
+        struct.lat_lng.read(iprot);
+        struct.setLat_lngIsSet(true);
+      }
     }
   }
 

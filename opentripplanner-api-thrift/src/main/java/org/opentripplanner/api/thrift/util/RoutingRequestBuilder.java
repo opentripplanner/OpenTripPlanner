@@ -1,5 +1,6 @@
 package org.opentripplanner.api.thrift.util;
 
+import java.util.Date;
 import java.util.Set;
 
 import org.opentripplanner.api.thrift.definition.LatLng;
@@ -45,6 +46,30 @@ public class RoutingRequestBuilder {
 	}
 
 	/**
+	 * Sets the trip start time.
+	 * 
+	 * @param startTime seconds since the epoch.
+	 * @return
+	 */
+	public RoutingRequestBuilder setStartTime(long startTime) {
+		routingRequest.dateTime = startTime;
+		routingRequest.setArriveBy(false);
+		return this;
+	}
+	
+	/**
+	 * Set the requested arrival time of the trip.
+	 * 
+	 * @param arriveBy seconds since the epoch.
+	 * @return
+	 */
+	public RoutingRequestBuilder setArriveBy(long arriveBy) {
+		routingRequest.dateTime = arriveBy;
+		routingRequest.setArriveBy(true);
+		return this;
+	}
+	
+	/**
 	 * Adds TripParameters to the RoutingRequest.
 	 * 
 	 * @param tripParams
@@ -56,6 +81,13 @@ public class RoutingRequestBuilder {
 			setTravelModes(new TravelModeSet(allowedModes));
 		}
 
+		// Set trip timing information
+		if (tripParams.isSetStart_time()) {
+			setStartTime(tripParams.getStart_time());
+		} else if (tripParams.isSetArrive_by()) {
+			setArriveBy(tripParams.getArrive_by());
+		}
+		
 		setOrigin(tripParams.getOrigin().getLat_lng());
 		setDestination(tripParams.getDestination().getLat_lng());
 

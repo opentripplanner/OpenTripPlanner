@@ -31,7 +31,7 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
   private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("GraphVertex");
 
   private static final org.apache.thrift.protocol.TField LABEL_FIELD_DESC = new org.apache.thrift.protocol.TField("label", org.apache.thrift.protocol.TType.STRING, (short)1);
-  private static final org.apache.thrift.protocol.TField LOCATION_FIELD_DESC = new org.apache.thrift.protocol.TField("location", org.apache.thrift.protocol.TType.STRUCT, (short)2);
+  private static final org.apache.thrift.protocol.TField LAT_LNG_FIELD_DESC = new org.apache.thrift.protocol.TField("lat_lng", org.apache.thrift.protocol.TType.STRUCT, (short)2);
   private static final org.apache.thrift.protocol.TField NAME_FIELD_DESC = new org.apache.thrift.protocol.TField("name", org.apache.thrift.protocol.TType.STRING, (short)3);
   private static final org.apache.thrift.protocol.TField IN_DEGREE_FIELD_DESC = new org.apache.thrift.protocol.TField("in_degree", org.apache.thrift.protocol.TType.I32, (short)4);
   private static final org.apache.thrift.protocol.TField OUT_DEGREE_FIELD_DESC = new org.apache.thrift.protocol.TField("out_degree", org.apache.thrift.protocol.TType.I32, (short)5);
@@ -43,7 +43,7 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
   }
 
   private String label; // required
-  private Location location; // optional
+  private LatLng lat_lng; // optional
   private String name; // optional
   private int in_degree; // optional
   private int out_degree; // optional
@@ -51,7 +51,7 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
     LABEL((short)1, "label"),
-    LOCATION((short)2, "location"),
+    LAT_LNG((short)2, "lat_lng"),
     NAME((short)3, "name"),
     IN_DEGREE((short)4, "in_degree"),
     OUT_DEGREE((short)5, "out_degree");
@@ -71,8 +71,8 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
       switch(fieldId) {
         case 1: // LABEL
           return LABEL;
-        case 2: // LOCATION
-          return LOCATION;
+        case 2: // LAT_LNG
+          return LAT_LNG;
         case 3: // NAME
           return NAME;
         case 4: // IN_DEGREE
@@ -122,14 +122,14 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
   private static final int __IN_DEGREE_ISSET_ID = 0;
   private static final int __OUT_DEGREE_ISSET_ID = 1;
   private BitSet __isset_bit_vector = new BitSet(2);
-  private _Fields optionals[] = {_Fields.LOCATION,_Fields.NAME,_Fields.IN_DEGREE,_Fields.OUT_DEGREE};
+  private _Fields optionals[] = {_Fields.LAT_LNG,_Fields.NAME,_Fields.IN_DEGREE,_Fields.OUT_DEGREE};
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
     tmpMap.put(_Fields.LABEL, new org.apache.thrift.meta_data.FieldMetaData("label", org.apache.thrift.TFieldRequirementType.REQUIRED, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
-    tmpMap.put(_Fields.LOCATION, new org.apache.thrift.meta_data.FieldMetaData("location", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
-        new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, Location.class)));
+    tmpMap.put(_Fields.LAT_LNG, new org.apache.thrift.meta_data.FieldMetaData("lat_lng", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
+        new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, LatLng.class)));
     tmpMap.put(_Fields.NAME, new org.apache.thrift.meta_data.FieldMetaData("name", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
     tmpMap.put(_Fields.IN_DEGREE, new org.apache.thrift.meta_data.FieldMetaData("in_degree", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
@@ -159,8 +159,8 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
     if (other.isSetLabel()) {
       this.label = other.label;
     }
-    if (other.isSetLocation()) {
-      this.location = new Location(other.location);
+    if (other.isSetLat_lng()) {
+      this.lat_lng = new LatLng(other.lat_lng);
     }
     if (other.isSetName()) {
       this.name = other.name;
@@ -176,7 +176,7 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
   @Override
   public void clear() {
     this.label = null;
-    this.location = null;
+    this.lat_lng = null;
     this.name = null;
     setIn_degreeIsSet(false);
     this.in_degree = 0;
@@ -207,26 +207,26 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
     }
   }
 
-  public Location getLocation() {
-    return this.location;
+  public LatLng getLat_lng() {
+    return this.lat_lng;
   }
 
-  public void setLocation(Location location) {
-    this.location = location;
+  public void setLat_lng(LatLng lat_lng) {
+    this.lat_lng = lat_lng;
   }
 
-  public void unsetLocation() {
-    this.location = null;
+  public void unsetLat_lng() {
+    this.lat_lng = null;
   }
 
-  /** Returns true if field location is set (has been assigned a value) and false otherwise */
-  public boolean isSetLocation() {
-    return this.location != null;
+  /** Returns true if field lat_lng is set (has been assigned a value) and false otherwise */
+  public boolean isSetLat_lng() {
+    return this.lat_lng != null;
   }
 
-  public void setLocationIsSet(boolean value) {
+  public void setLat_lngIsSet(boolean value) {
     if (!value) {
-      this.location = null;
+      this.lat_lng = null;
     }
   }
 
@@ -307,11 +307,11 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
       }
       break;
 
-    case LOCATION:
+    case LAT_LNG:
       if (value == null) {
-        unsetLocation();
+        unsetLat_lng();
       } else {
-        setLocation((Location)value);
+        setLat_lng((LatLng)value);
       }
       break;
 
@@ -347,8 +347,8 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
     case LABEL:
       return getLabel();
 
-    case LOCATION:
-      return getLocation();
+    case LAT_LNG:
+      return getLat_lng();
 
     case NAME:
       return getName();
@@ -372,8 +372,8 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
     switch (field) {
     case LABEL:
       return isSetLabel();
-    case LOCATION:
-      return isSetLocation();
+    case LAT_LNG:
+      return isSetLat_lng();
     case NAME:
       return isSetName();
     case IN_DEGREE:
@@ -406,12 +406,12 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
         return false;
     }
 
-    boolean this_present_location = true && this.isSetLocation();
-    boolean that_present_location = true && that.isSetLocation();
-    if (this_present_location || that_present_location) {
-      if (!(this_present_location && that_present_location))
+    boolean this_present_lat_lng = true && this.isSetLat_lng();
+    boolean that_present_lat_lng = true && that.isSetLat_lng();
+    if (this_present_lat_lng || that_present_lat_lng) {
+      if (!(this_present_lat_lng && that_present_lat_lng))
         return false;
-      if (!this.location.equals(that.location))
+      if (!this.lat_lng.equals(that.lat_lng))
         return false;
     }
 
@@ -468,12 +468,12 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
         return lastComparison;
       }
     }
-    lastComparison = Boolean.valueOf(isSetLocation()).compareTo(typedOther.isSetLocation());
+    lastComparison = Boolean.valueOf(isSetLat_lng()).compareTo(typedOther.isSetLat_lng());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    if (isSetLocation()) {
-      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.location, typedOther.location);
+    if (isSetLat_lng()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.lat_lng, typedOther.lat_lng);
       if (lastComparison != 0) {
         return lastComparison;
       }
@@ -535,13 +535,13 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
       sb.append(this.label);
     }
     first = false;
-    if (isSetLocation()) {
+    if (isSetLat_lng()) {
       if (!first) sb.append(", ");
-      sb.append("location:");
-      if (this.location == null) {
+      sb.append("lat_lng:");
+      if (this.lat_lng == null) {
         sb.append("null");
       } else {
-        sb.append(this.location);
+        sb.append(this.lat_lng);
       }
       first = false;
     }
@@ -623,11 +623,11 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
-          case 2: // LOCATION
+          case 2: // LAT_LNG
             if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
-              struct.location = new Location();
-              struct.location.read(iprot);
-              struct.setLocationIsSet(true);
+              struct.lat_lng = new LatLng();
+              struct.lat_lng.read(iprot);
+              struct.setLat_lngIsSet(true);
             } else { 
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
@@ -674,10 +674,10 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
         oprot.writeString(struct.label);
         oprot.writeFieldEnd();
       }
-      if (struct.location != null) {
-        if (struct.isSetLocation()) {
-          oprot.writeFieldBegin(LOCATION_FIELD_DESC);
-          struct.location.write(oprot);
+      if (struct.lat_lng != null) {
+        if (struct.isSetLat_lng()) {
+          oprot.writeFieldBegin(LAT_LNG_FIELD_DESC);
+          struct.lat_lng.write(oprot);
           oprot.writeFieldEnd();
         }
       }
@@ -717,7 +717,7 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
       TTupleProtocol oprot = (TTupleProtocol) prot;
       oprot.writeString(struct.label);
       BitSet optionals = new BitSet();
-      if (struct.isSetLocation()) {
+      if (struct.isSetLat_lng()) {
         optionals.set(0);
       }
       if (struct.isSetName()) {
@@ -730,8 +730,8 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
         optionals.set(3);
       }
       oprot.writeBitSet(optionals, 4);
-      if (struct.isSetLocation()) {
-        struct.location.write(oprot);
+      if (struct.isSetLat_lng()) {
+        struct.lat_lng.write(oprot);
       }
       if (struct.isSetName()) {
         oprot.writeString(struct.name);
@@ -751,9 +751,9 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
       struct.setLabelIsSet(true);
       BitSet incoming = iprot.readBitSet(4);
       if (incoming.get(0)) {
-        struct.location = new Location();
-        struct.location.read(iprot);
-        struct.setLocationIsSet(true);
+        struct.lat_lng = new LatLng();
+        struct.lat_lng.read(iprot);
+        struct.setLat_lngIsSet(true);
       }
       if (incoming.get(1)) {
         struct.name = iprot.readString();
