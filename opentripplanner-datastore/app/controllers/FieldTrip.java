@@ -21,7 +21,7 @@ public class FieldTrip extends Application {
     public static void getCalendar(int year, int month, int day) {
         List<FieldTrip> fieldTrips;
 
-        fieldTrips = ScheduledFieldTrip.find("year(departure) == ? and month(departure) == ? and day(departure) == ? " +
+        fieldTrips = ScheduledFieldTrip.find("year(departure) = ? and month(departure) = ? and day(departure) = ? " +
                                               "order by departure", 
                                               year, month, day).fetch();
 
