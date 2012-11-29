@@ -24,7 +24,9 @@ import org.opentripplanner.routing.graph.AbstractVertex;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl;
 import org.opentripplanner.routing.location.StreetLocation;
+import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,10 +36,10 @@ public class ThreadedBidirectionalHeuristic implements RemainingWeightHeuristic 
 
     private static Logger LOG = LoggerFactory.getLogger(LBGRemainingWeightHeuristic.class);
 
+    private boolean aborted = false;
+    
     Vertex target;
 
-    double cutoff;
-    
     // it is important that whenever a thread sees a higher maxFound, the preceding writes to the 
     // node table are also visible. Since Java 1.5 (JSR133) the memory model specifies that 
     // accessing a volatile will flush caches. Word tearing is also avoided by volatile.
@@ -59,7 +61,7 @@ public class ThreadedBidirectionalHeuristic implements RemainingWeightHeuristic 
 
     @Override
     public double computeInitialWeight(State s, Vertex target) {
-        if (target == this.target && s.getOptions().maxWeight <= this.cutoff) {
+        if (target == this.target) {
             LOG.debug("reusing existing heuristic");
         } else {
             // make sure array is initialized before starting thread
@@ -113,7 +115,6 @@ public class ThreadedBidirectionalHeuristic implements RemainingWeightHeuristic 
         @Override
         public void run() {
             LOG.debug("recalc");
-            cutoff = options.maxWeight;
             BinHeap<Vertex> q = new BinHeap<Vertex>();
             long t0 = System.currentTimeMillis();
             if (target instanceof StreetLocation) {
@@ -138,11 +139,13 @@ public class ThreadedBidirectionalHeuristic implements RemainingWeightHeuristic 
                 q.insert(target, 0);
             }
             while (!q.empty()) {
+                if (aborted) {
+                    LOG.debug("aborted threaded heuristic calculation.");
+                    break;
+                }
                 double uw = q.peek_min_key();
                 Vertex u = q.extract_min();
                 maxFound = uw;
-                if (uw > cutoff)
-                    break;
                 if (u == origin) { // searching backward from target to origin
                     LOG.debug("hit origin.");
                     //break;
@@ -178,5 +181,9 @@ public class ThreadedBidirectionalHeuristic implements RemainingWeightHeuristic 
         }
         
     }
-    
+
+    public synchronized void abort () {
+        this.aborted = true;
+    }
+
 }
