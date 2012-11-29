@@ -22,6 +22,10 @@ public class SimpleTransfer extends Edge {
 
     @Override
     public State traverse(State s0) {
+        // use transfer edges only to transfer 
+        // otherwise they are used as shortcuts or break the itinerary generator 
+        if ( ! s0.isEverBoarded())
+            return null;
         if (s0.getBackEdge() instanceof SimpleTransfer)
             return null;
         RoutingRequest rr = s0.getOptions();
