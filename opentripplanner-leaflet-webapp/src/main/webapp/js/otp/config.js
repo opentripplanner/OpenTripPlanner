@@ -22,8 +22,8 @@ otp.config = {
     minZoom : 13,
     maxZoom : 17,*/
     // OTP server address and routerId (if applicable)
-    hostname : "http://otpna-c.deployer.opentripplanner.org",
-    routerId : "req-1028",
+    hostname : "http://localhost:8080",
+    routerId : "",
 
     // Base map tiles settings:
     tileUrl : 'http://{s}.tiles.mapbox.com/v3/mapbox.mapbox-streets/{z}/{x}/{y}.png',
