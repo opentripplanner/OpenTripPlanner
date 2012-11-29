@@ -1,6 +1,7 @@
 package controllers;
 
 import play.*;
+import play.cache.*;
 import play.mvc.*;
 
 import java.util.*;
@@ -18,4 +19,30 @@ public class Application extends Controller {
         Http.Response.current().headers.put("Access-Control-Allow-Origin",hd);      
     }
 
+    @Before
+    public static void checkPassword() {
+        request.user = null;
+
+        String username = params.get("userName");
+        String password = params.get("password");
+        User user = Cache.get(username, User.class);
+        if (user == null) {
+            Logger.debug("no user in cache");
+            user = User.find("byUsername", username).first();
+            if (user == null) {
+                Logger.debug("no user by this username: count = %s", User.count());
+                forbidden();
+            }
+        }
+        if (user.checkPassword(password)) {
+            request.user = username;
+        } else {
+            Logger.debug("bad password");
+            forbidden();
+        }
+    }
+
+    static User getUser() {
+        return User.find("byUsername", request.user).first();
+    }
 }

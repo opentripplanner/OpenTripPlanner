@@ -14,7 +14,12 @@ public class GroupTrip extends Model {
     @ManyToOne
     public GroupItinerary groupItinerary;
 
-    public Trip trip;
+    private Trip trip;
+
+    @Column
+    public void setTrip(Trip trip) {
+        this.trip = trip.createInstance();
+    }
 
     /** */
     @OneToMany(mappedBy="groupTrip", cascade=CascadeType.ALL)

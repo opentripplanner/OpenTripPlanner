@@ -16,6 +16,7 @@ public class GroupItinerary extends Model {
     public ScheduledFieldTrip fieldTrip;
 
     /** How many passengers are on this set of trips */
+    @Column(nullable=false)
     public int passengers;
 
     @OneToMany(mappedBy="groupItinerary")

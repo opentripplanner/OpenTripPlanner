@@ -8,6 +8,20 @@ GET     /getQueries                             Calltaker.getQueries
 POST    /newQuery                               Calltaker.newQuery
 POST    /deleteQuery                            Calltaker.deleteQuery
 
+#Field trip
+GET     /fieldTrip                              FieldTrip.index
+GET     /fieldTrip/calendar                     FieldTrip.getCalendar
+POST    /fieldTrip/newTrip                      FieldTrip.newTrip
+POST    /fieldTrip/addItinerary                 FieldTrip.addItinerary
+POST    /fieldTrip/addTripFeedback              FieldTrip.addTripFeedback
+POST    /fieldTrip/deleteTrip                   FieldTrip.deleteTrip
+
+#Users
+GET      /users                                 UserManagement.getUsers
+POST     /users/delete                          UserManagement.deleteUser
+POST     /users/add                             UserManagement.addUser
+
+
 # Ignore favicon requests
 GET     /favicon.ico                            404
 
