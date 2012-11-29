@@ -22,7 +22,7 @@ otp.util.Logger = {
 
     log : function(type, data) {
     
-		$.ajax(otp.config.loggerUrl , {dataType: 'jsonp', data: {type: type, data: data}});
+		$.ajax(otp.config.loggerURL , {dataType: 'jsonp', data: {type: type, data: data}});
 	
     },
 

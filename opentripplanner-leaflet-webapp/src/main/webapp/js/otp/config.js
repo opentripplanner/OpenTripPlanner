@@ -48,7 +48,7 @@ otp.config = {
     
     // bikeshareName : "",
 
-    loggerUrl : 'http://localhost:9000',
+    loggerURL : 'http://localhost:9000',
     // dataStorageUrl : '[link]',
             
     timeOffset : -3,
