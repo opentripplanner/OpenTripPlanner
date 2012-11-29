@@ -20,7 +20,9 @@ import lombok.Setter;
 
 import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.ThreadedBidirectionalHeuristic;
+import org.opentripplanner.routing.automata.DFA;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
@@ -63,7 +65,13 @@ public class SimplifiedPathServiceImpl implements PathService {
 
         options.setMaxTransfers(Integer.MAX_VALUE);
         options.setMaxWalkDistance(Double.MAX_VALUE);
-
+        //options.setMaxWalkDistance(60000);
+        options.setWalkBoardCost(60*20);
+        options.setBikeBoardCost(60*25);
+        options.setTransferSlack(60*4);
+        options.setBoardSlack(60*2);
+        options.setAlightSlack(60*2);
+        
         // always use the threaded heuristic
         ThreadedBidirectionalHeuristic heuristic = 
                 new ThreadedBidirectionalHeuristic(options.rctx.graph);
@@ -72,7 +80,7 @@ public class SimplifiedPathServiceImpl implements PathService {
         long searchBeginTime = System.currentTimeMillis();
         LOG.debug("BEGIN SEARCH");
         ShortestPathTree spt = sptService.getShortestPathTree(options, timeout);
-        LOG.debug("END SUBSEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
+        LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
         heuristic.abort();
         
         if (spt == null) { // timeout or other fail
@@ -89,8 +97,25 @@ public class SimplifiedPathServiceImpl implements PathService {
             return null;
         }
         // We order the list of returned paths by the time of arrival or departure (not path duration)
-        Collections.sort(paths, new PathComparator(options.isArriveBy()));
+        //Collections.sort(paths, new PathComparator(options.isArriveBy()));
         return paths;
     }
 
+    public static class Parser extends PathParser {
+
+        @Override
+        public int terminalFor(State state) {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        @Override
+        protected DFA getDFA() {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        
+    }
+    
 }
+
