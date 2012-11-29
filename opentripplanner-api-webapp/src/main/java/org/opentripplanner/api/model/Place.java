@@ -73,6 +73,13 @@ public class Place {
     public String zoneId;
 
     /**
+     * For transit trips, the stop index (numbered from zero from the start of the trip
+     */
+    @XmlAttribute
+    @JsonSerialize
+    public Integer stopIndex;
+
+    /**
      * Returns the geometry in GeoJSON format
      * @return
      */

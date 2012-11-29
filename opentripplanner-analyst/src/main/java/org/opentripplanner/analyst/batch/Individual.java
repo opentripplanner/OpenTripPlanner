@@ -15,20 +15,31 @@ package org.opentripplanner.analyst.batch;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 import org.opentripplanner.analyst.core.Sample;
 
 /** Individual locations that make up Populations for the purpose of many-to-many searches. */
-@ToString @RequiredArgsConstructor
+@ToString 
 public class Individual {
 
-    public final String label;
-    public final double lon;
-    public final double lat;
-    @NonNull public double input;  // not final to allow clamping and scaling by filters
+    @Setter public String label;
+    @Setter public double lon;
+    @Setter public double lat;
+    @Setter @NonNull public double input;  // not final to allow clamping and scaling by filters
     public Sample sample= null; // not final, allowing sampling to occur after filterings
     
+    public Individual(String label, double lon, double lat, double input) {
+        this.label = label;
+        this.lon = lon;
+        this.lat = lat;
+        this.input = input;
+    }
+
+    public Individual() { }
+ 
     // public boolean rejected;
-        
+
+    
 }

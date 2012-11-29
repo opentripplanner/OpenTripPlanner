@@ -340,6 +340,26 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         public double getScore() {
             return best.score;
         }
+
+        public boolean isPlatform() {
+            for (CandidateEdge ce : CandidateEdgeBundle.this) {
+                StreetEdge e = ce.edge;
+                if ((e.getStreetClass() & StreetEdge.ANY_PLATFORM_MASK) != 0) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public boolean allowsCars() {
+            for (CandidateEdge ce : CandidateEdgeBundle.this) {
+                StreetEdge e = ce.edge;
+                if (e.getPermission().allows(StreetTraversalPermission.CAR)) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     /**
@@ -380,24 +400,19 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             radius += envelopeGrowthAmount;
             if (radius > MAX_DISTANCE_FROM_STREET)
                 return candidateEdges; // empty list
-            // envelopeGrowthAmount *= 2;
             List<StreetEdge> nearbyEdges = edgeTree.query(envelope);
 
             if (nearbyEdges != null) {
                 nearbyEdges = new JoinedList<StreetEdge>(nearbyEdges, extraStreets);
             }
+            //oh.  This is part of the problem: we're not linking to one-way
+            //streets, even though that is a perfectly reasonable thing to do.
+            //we need to handle that using bundles.
             for (StreetEdge e : nearbyEdges) {
                 if (e == null || e.getFromVertex() == null)
                     continue;
                 if (request != null && (!(e.canTraverse(request) || e.canTraverse(walkingRequest))))
                     continue;
-                if (possibleTransitLinksOnly) {
-                    if (!e.getPermission().allows(StreetTraversalPermission.CAR)) {
-                        if ((e.getStreetClass() & StreetEdge.ANY_PLATFORM_MASK) == 0) {
-                            continue;
-                        }
-                    }
-                }
                 double preferrence = 1;
                 if (routeEdges != null && routeEdges.contains(e)) {
                     preferrence = 3.0;
@@ -419,8 +434,13 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         // initially set best bundle to the closest bundle
         CandidateEdgeBundle best = null;
         for (CandidateEdgeBundle bundle : bundles) {
-            if (best == null || bundle.best.score < best.best.score)
+            if (best == null || bundle.best.score < best.best.score) {
+                if (possibleTransitLinksOnly) {
+                    if (!(bundle.allowsCars() || bundle.isPlatform()))
+                        continue;
+                }
                 best = bundle;
+            }
         }
 
         return best;

@@ -73,7 +73,6 @@ public class NetworkLinker {
                 boolean wheelchairAccessible = ts.hasWheelchairEntrance();
                 if (!networkLinkerLibrary.connectVertexToStreets(ts, wheelchairAccessible).getResult()) {
                     _log.warn(graph.addBuilderAnnotation(new StopUnlinked(ts)));
-                    networkLinkerLibrary.connectVertexToStreets(ts, wheelchairAccessible);
                 }
             }
         }

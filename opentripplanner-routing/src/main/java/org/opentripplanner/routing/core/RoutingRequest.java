@@ -23,7 +23,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -32,6 +31,7 @@ import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -172,7 +172,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public HashSet<RouteSpec> bannedRoutes = new HashSet<RouteSpec>();
     
     /** Do not use certain trips */
-    public HashSet<AgencyAndId> bannedTrips = new HashSet<AgencyAndId>();
+    public HashMap<AgencyAndId, BannedStopSet> bannedTrips = new HashMap<AgencyAndId, BannedStopSet>();
 
     /** Set of preferred routes by user. */
     public HashSet<RouteSpec> preferredRoutes = new HashSet<RouteSpec>();
@@ -604,7 +604,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         try {
             RoutingRequest clone = (RoutingRequest) super.clone();
             clone.bannedRoutes = (HashSet<RouteSpec>) bannedRoutes.clone();
-            clone.bannedTrips = (HashSet<AgencyAndId>) bannedTrips.clone();
+            clone.bannedTrips = (HashMap<AgencyAndId, BannedStopSet>) bannedTrips.clone();
             if (this.walkingOptions != this)
                 clone.walkingOptions = this.walkingOptions.clone();
             else
@@ -858,5 +858,9 @@ public class RoutingRequest implements Cloneable, Serializable {
         if (walkingOptions != null && walkingOptions != this) {
             this.walkingOptions.setMaxWalkDistance(maxWalkDistance);
         }
+    }
+
+    public void banTrip(AgencyAndId trip) {
+        bannedTrips.put(trip, BannedStopSet.ALL);
     }
 }

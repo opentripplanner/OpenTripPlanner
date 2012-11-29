@@ -960,9 +960,9 @@ public class GTFSPatternHopFactory {
             Vertex fromVertex = context.stopNodes.get(pathway.getFromStop());
             Vertex toVertex = context.stopNodes.get(pathway.getToStop());
             if (pathway.isWheelchairTraversalTimeSet()) {
-                new PathwayEdge(fromVertex, toVertex, pathway.getTraversalTime());
-            } else {
                 new PathwayEdge(fromVertex, toVertex, pathway.getTraversalTime(), pathway.getWheelchairTraversalTime());
+            } else {
+                new PathwayEdge(fromVertex, toVertex, pathway.getTraversalTime());
             }
         }
     }

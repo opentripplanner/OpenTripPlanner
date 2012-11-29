@@ -171,7 +171,7 @@ public class RetryingPathServiceImpl implements PathService {
                     LOG.debug("New trips: {}", path.getTrips());
                     RoutingRequest newOptions = currOptions.clone();
                     for (AgencyAndId trip : path.getTrips()) {
-                        newOptions.bannedTrips.add(trip);
+                        newOptions.banTrip(trip);
                     }
                     if (!optionQueue.contains(newOptions)) {
                         optionQueue.add(newOptions);

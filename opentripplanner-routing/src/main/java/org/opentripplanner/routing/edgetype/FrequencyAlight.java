@@ -93,11 +93,13 @@ public class FrequencyAlight extends Edge  implements OnBoardReverseEdge {
             long currentTime = state0.getTime();
             int bestWait = -1;
             TraverseMode mode = state0.getNonTransitMode();
-            if (options.bannedTrips.contains(trip.getId())) {
+            if (options.bannedTrips.containsKey(trip.getId())) {
                 //This behaves a little differently than with ordinary trip patterns,
                 //because trips don't really have strong identities in frequency-based
                 //plans.  I expect that reasonable plans will still be produced, since
-                //we used to use route banning and that was not so bad.
+                //we used to use route banning and that was not so bad.  Also, 
+                //partial trip banning is unsupported (the whole trip will be treated
+                //as banned)
                 return null;
             }
 

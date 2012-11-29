@@ -19,6 +19,7 @@ import lombok.AllArgsConstructor;
 
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.BannedStopSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -237,11 +238,16 @@ public abstract class TripTimes {
      * 0: no information (same as field omitted)
      * 
      * If route OR trip explicitly allows bikes, bikes are allowed.
+     * @param stopIndex 
      */
-    public boolean tripAcceptable(RoutingRequest options, boolean bicycle) {
+    public boolean tripAcceptable(RoutingRequest options, boolean bicycle, int stopIndex) {
         Trip trip = this.getTrip();
-        if (options.bannedTrips.contains(trip.getId()))
-            return false;
+        BannedStopSet banned = options.bannedTrips.get(trip.getId());
+        if (banned != null) {
+            if (banned.contains(stopIndex) || banned == BannedStopSet.ALL) {
+                return false;
+            }
+        }
         if (options.wheelchairAccessible && trip.getWheelchairAccessible() != 1)
             return false;
         if (bicycle)
