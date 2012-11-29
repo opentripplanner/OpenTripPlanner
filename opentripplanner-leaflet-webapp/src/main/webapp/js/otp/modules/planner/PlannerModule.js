@@ -203,6 +203,11 @@ otp.modules.planner.PlannerModule =
                 $('#otp-spinner').hide();
                 
                 if(data.plan) {
+
+                    // compare returned plan.date to sent date/time to determine timezone offset (unless set explicitly in config.js)
+                    otp.config.timeOffset = (otp.config.timeOffset) ||
+                        (moment(queryParams.date+" "+queryParams.time, "MM-DD-YYYY h:mma") - moment(data.plan.date))/3600000;
+                        
                     var itin = data.plan.itineraries[0];
                     this_.processPlan(data.plan, queryParams, (existingQueryParams !== undefined));
 
