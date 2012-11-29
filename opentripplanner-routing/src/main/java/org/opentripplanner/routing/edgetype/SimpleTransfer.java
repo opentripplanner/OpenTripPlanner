@@ -11,6 +11,8 @@ import org.opentripplanner.routing.vertextype.TransitStop;
  */
 public class SimpleTransfer extends Edge {
     
+    private static final long serialVersionUID = 1L;
+
     private int distance;
     
     public SimpleTransfer(TransitStop from, TransitStop to, int distance) {
@@ -20,6 +22,8 @@ public class SimpleTransfer extends Edge {
 
     @Override
     public State traverse(State s0) {
+        if (s0.getBackEdge() instanceof SimpleTransfer)
+            return null;
         RoutingRequest rr = s0.getOptions();
         double walkspeed = rr.getWalkSpeed();
         StateEditor se = s0.edit(this);
@@ -34,6 +38,10 @@ public class SimpleTransfer extends Edge {
         return "Simple Transfer";
     }
 
-    
+    @Override
+    public double weightLowerBound(RoutingRequest rr) {
+        int time = (int) (distance / rr.getWalkSpeed()); 
+        return (time * rr.walkReluctance);
+    }
     
 }
