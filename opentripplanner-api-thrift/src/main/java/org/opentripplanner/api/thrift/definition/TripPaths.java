@@ -41,7 +41,7 @@ public class TripPaths implements org.apache.thrift.TBase<TripPaths, TripPaths._
   }
 
   private TripParameters trip; // required
-  private List<Path> paths; // required
+  private List<Path> paths; // optional
   private boolean no_paths_found; // optional
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
@@ -111,13 +111,13 @@ public class TripPaths implements org.apache.thrift.TBase<TripPaths, TripPaths._
   // isset id assignments
   private static final int __NO_PATHS_FOUND_ISSET_ID = 0;
   private BitSet __isset_bit_vector = new BitSet(1);
-  private _Fields optionals[] = {_Fields.NO_PATHS_FOUND};
+  private _Fields optionals[] = {_Fields.PATHS,_Fields.NO_PATHS_FOUND};
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
     tmpMap.put(_Fields.TRIP, new org.apache.thrift.meta_data.FieldMetaData("trip", org.apache.thrift.TFieldRequirementType.REQUIRED, 
         new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, TripParameters.class)));
-    tmpMap.put(_Fields.PATHS, new org.apache.thrift.meta_data.FieldMetaData("paths", org.apache.thrift.TFieldRequirementType.REQUIRED, 
+    tmpMap.put(_Fields.PATHS, new org.apache.thrift.meta_data.FieldMetaData("paths", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
         new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
             new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, Path.class))));
     tmpMap.put(_Fields.NO_PATHS_FOUND, new org.apache.thrift.meta_data.FieldMetaData("no_paths_found", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
@@ -132,12 +132,10 @@ public class TripPaths implements org.apache.thrift.TBase<TripPaths, TripPaths._
   }
 
   public TripPaths(
-    TripParameters trip,
-    List<Path> paths)
+    TripParameters trip)
   {
     this();
     this.trip = trip;
-    this.paths = paths;
   }
 
   /**
@@ -428,14 +426,16 @@ public class TripPaths implements org.apache.thrift.TBase<TripPaths, TripPaths._
       sb.append(this.trip);
     }
     first = false;
-    if (!first) sb.append(", ");
-    sb.append("paths:");
-    if (this.paths == null) {
-      sb.append("null");
-    } else {
-      sb.append(this.paths);
+    if (isSetPaths()) {
+      if (!first) sb.append(", ");
+      sb.append("paths:");
+      if (this.paths == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.paths);
+      }
+      first = false;
     }
-    first = false;
     if (isSetNo_paths_found()) {
       if (!first) sb.append(", ");
       sb.append("no_paths_found:");
@@ -450,10 +450,6 @@ public class TripPaths implements org.apache.thrift.TBase<TripPaths, TripPaths._
     // check for required fields
     if (!isSetTrip()) {
       throw new org.apache.thrift.protocol.TProtocolException("Required field 'trip' is unset! Struct:" + toString());
-    }
-
-    if (!isSetPaths()) {
-      throw new org.apache.thrift.protocol.TProtocolException("Required field 'paths' is unset! Struct:" + toString());
     }
 
   }
@@ -549,16 +545,18 @@ public class TripPaths implements org.apache.thrift.TBase<TripPaths, TripPaths._
         oprot.writeFieldEnd();
       }
       if (struct.paths != null) {
-        oprot.writeFieldBegin(PATHS_FIELD_DESC);
-        {
-          oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.paths.size()));
-          for (Path _iter27 : struct.paths)
+        if (struct.isSetPaths()) {
+          oprot.writeFieldBegin(PATHS_FIELD_DESC);
           {
-            _iter27.write(oprot);
+            oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.paths.size()));
+            for (Path _iter27 : struct.paths)
+            {
+              _iter27.write(oprot);
+            }
+            oprot.writeListEnd();
           }
-          oprot.writeListEnd();
+          oprot.writeFieldEnd();
         }
-        oprot.writeFieldEnd();
       }
       if (struct.isSetNo_paths_found()) {
         oprot.writeFieldBegin(NO_PATHS_FOUND_FIELD_DESC);
@@ -583,18 +581,23 @@ public class TripPaths implements org.apache.thrift.TBase<TripPaths, TripPaths._
     public void write(org.apache.thrift.protocol.TProtocol prot, TripPaths struct) throws org.apache.thrift.TException {
       TTupleProtocol oprot = (TTupleProtocol) prot;
       struct.trip.write(oprot);
-      {
-        oprot.writeI32(struct.paths.size());
-        for (Path _iter28 : struct.paths)
-        {
-          _iter28.write(oprot);
-        }
-      }
       BitSet optionals = new BitSet();
-      if (struct.isSetNo_paths_found()) {
+      if (struct.isSetPaths()) {
         optionals.set(0);
       }
-      oprot.writeBitSet(optionals, 1);
+      if (struct.isSetNo_paths_found()) {
+        optionals.set(1);
+      }
+      oprot.writeBitSet(optionals, 2);
+      if (struct.isSetPaths()) {
+        {
+          oprot.writeI32(struct.paths.size());
+          for (Path _iter28 : struct.paths)
+          {
+            _iter28.write(oprot);
+          }
+        }
+      }
       if (struct.isSetNo_paths_found()) {
         oprot.writeBool(struct.no_paths_found);
       }
@@ -606,20 +609,22 @@ public class TripPaths implements org.apache.thrift.TBase<TripPaths, TripPaths._
       struct.trip = new TripParameters();
       struct.trip.read(iprot);
       struct.setTripIsSet(true);
-      {
-        org.apache.thrift.protocol.TList _list29 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
-        struct.paths = new ArrayList<Path>(_list29.size);
-        for (int _i30 = 0; _i30 < _list29.size; ++_i30)
-        {
-          Path _elem31; // required
-          _elem31 = new Path();
-          _elem31.read(iprot);
-          struct.paths.add(_elem31);
-        }
-      }
-      struct.setPathsIsSet(true);
-      BitSet incoming = iprot.readBitSet(1);
+      BitSet incoming = iprot.readBitSet(2);
       if (incoming.get(0)) {
+        {
+          org.apache.thrift.protocol.TList _list29 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+          struct.paths = new ArrayList<Path>(_list29.size);
+          for (int _i30 = 0; _i30 < _list29.size; ++_i30)
+          {
+            Path _elem31; // required
+            _elem31 = new Path();
+            _elem31.read(iprot);
+            struct.paths.add(_elem31);
+          }
+        }
+        struct.setPathsIsSet(true);
+      }
+      if (incoming.get(1)) {
         struct.no_paths_found = iprot.readBool();
         struct.setNo_paths_foundIsSet(true);
       }

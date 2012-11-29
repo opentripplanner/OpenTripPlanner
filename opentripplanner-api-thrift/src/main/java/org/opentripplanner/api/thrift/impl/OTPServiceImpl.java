@@ -10,8 +10,8 @@ import org.apache.thrift.TException;
 import org.opentripplanner.api.thrift.OTPServerTask;
 import org.opentripplanner.api.thrift.definition.BulkPathsRequest;
 import org.opentripplanner.api.thrift.definition.BulkPathsResponse;
-import org.opentripplanner.api.thrift.definition.BulkTripDurationRequest;
-import org.opentripplanner.api.thrift.definition.BulkTripDurationResponse;
+import org.opentripplanner.api.thrift.definition.FindNearestVertexRequest;
+import org.opentripplanner.api.thrift.definition.FindNearestVertexResponse;
 import org.opentripplanner.api.thrift.definition.FindPathsRequest;
 import org.opentripplanner.api.thrift.definition.FindPathsResponse;
 import org.opentripplanner.api.thrift.definition.GraphVertex;
@@ -20,11 +20,10 @@ import org.opentripplanner.api.thrift.definition.GraphVerticesResponse;
 import org.opentripplanner.api.thrift.definition.NoPathFoundError;
 import org.opentripplanner.api.thrift.definition.OTPService;
 import org.opentripplanner.api.thrift.definition.PathOptions;
-import org.opentripplanner.api.thrift.definition.TripDurationRequest;
-import org.opentripplanner.api.thrift.definition.TripDurationResponse;
 import org.opentripplanner.api.thrift.definition.TripParameters;
 import org.opentripplanner.api.thrift.definition.TripPaths;
 import org.opentripplanner.api.thrift.util.GraphVertexExtension;
+import org.opentripplanner.api.thrift.util.LatLngExtension;
 import org.opentripplanner.api.thrift.util.RoutingRequestBuilder;
 import org.opentripplanner.api.thrift.util.TripPathsExtension;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -36,6 +35,8 @@ import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.vividsolutions.jts.geom.Coordinate;
 
 /**
  * Concrete implementation of the Thrift interface.
@@ -77,14 +78,44 @@ public class OTPServiceImpl implements OTPService.Iface {
 	@Override
 	public GraphVerticesResponse GetVertices(GraphVerticesRequest req)
 			throws TException {
-		LOG.debug("GetVertices called");
-		
+		LOG.info("GetVertices called");
+
 		GraphVerticesResponse res = new GraphVerticesResponse();
 		Graph g = graphService.getGraph();
 		res.setVertices(makeGraphVertices(g));
 		return res;
 	}
-	
+
+	@Override
+	public FindNearestVertexResponse FindNearestVertex(
+			FindNearestVertexRequest req) throws TException {
+		LOG.info("FindNearestVertex called");
+
+		// NOTE(flamholz): can't set the graph here because we are not
+		// actually doing any routing and don't have a to/from. From the
+		// perspective of the street indes, RoutingRequest is really just
+		// a container for the TraversalModes, which is a weird design
+		// but it's what we've got to work with.
+		RoutingRequestBuilder rrb = new RoutingRequestBuilder();
+		if (req.isSetAllowed_modes()) {
+			rrb.setTravelModes(req.getAllowed_modes());
+		}
+		RoutingRequest rr = rrb.build();
+
+		// Get the nearest vertex
+		StreetVertexIndexService streetVertexIndex = getStreetIndex();
+		Coordinate c = new LatLngExtension(req.getLocation().getLat_lng())
+				.toCoordinate();
+		// NOTE(flamholz): We don't currently provide a name. 
+		// I guess this would speed things up somewhat?
+		Vertex closest = streetVertexIndex.getClosestVertex(c, null, rr);
+
+		FindNearestVertexResponse res = new FindNearestVertexResponse();
+		res.setNearest_vertex(new GraphVertexExtension(closest));
+		return res;
+
+	}
+
 	/**
 	 * Computes the GraphPath for the given trip.
 	 * 
@@ -103,81 +134,36 @@ public class OTPServiceImpl implements OTPService.Iface {
 
 		return pathService.getPaths(options);
 	}
-	
-	private int computePathDuration(TripParameters trip)
-			throws NoPathFoundError {
-		// Request paths with default PathOptions.
-		List<GraphPath> paths = this.computePaths(trip, new PathOptions());
-
-		// TODO(flamholz): do something reasonable when > 1 path found.
-		if (paths == null || paths.size() == 0) {
-			// TODO(flamholz): return some identifying information about the
-			// trip inside the error.
-			LOG.warn("Found no path for trip: {}", trip);
-			throw new NoPathFoundError("No path found for your trip.");
-		} else {
-			GraphPath p = paths.get(0);
-			return p.getDuration();
-		}
-	}
 
 	@Override
-	public TripDurationResponse GetTripDuration(TripDurationRequest req)
-			throws NoPathFoundError, TException {
-		LOG.debug("GetTripDuration called");
-		
-		TripDurationResponse res = new TripDurationResponse();
-		res.setExpected_trip_duration(computePathDuration(req.getTrip()));
-		return res;
-	}
+	public FindPathsResponse FindPaths(FindPathsRequest req) throws TException {
+		LOG.info("FindPaths called");
 
-	@Override
-	public BulkTripDurationResponse GetManyTripDurations(
-			BulkTripDurationRequest req) throws TException {
-		LOG.debug("GetManyTripDurations called");
-		
-		BulkTripDurationResponse res = new BulkTripDurationResponse();
-		List<Integer> expectedTimes = new ArrayList<Integer>(req.getTripsSize());
-
-		for (TripParameters trip : req.getTrips()) {
-			try {
-				expectedTimes.add(computePathDuration(trip));
-			} catch (NoPathFoundError e) {
-				expectedTimes.add(-1); // Sentinel.
-			}
-		}
-
-		res.setExpected_trip_durations(expectedTimes);
-		return res;
-	}
-
-	@Override
-	public FindPathsResponse FindPaths(FindPathsRequest req)
-			throws TException {
-		LOG.debug("FindPaths called");
-		
 		TripParameters trip = req.getTrip();
 		TripPaths outPaths = new TripPaths();
 		outPaths.setTrip(trip);
-		
+
 		List<GraphPath> computedPaths = computePaths(trip, req.getOptions());
-		TripPathsExtension tripPaths = new TripPathsExtension(trip, computedPaths);
-		
+		TripPathsExtension tripPaths = new TripPathsExtension(trip,
+				computedPaths);
+
 		FindPathsResponse res = new FindPathsResponse();
 		res.setPaths(tripPaths);
-		
+
 		return res;
 	}
 
 	@Override
-	public BulkPathsResponse BulkFindPaths(BulkPathsRequest req) throws TException {
-		LOG.debug("BulkFindPaths called");
-		
+	public BulkPathsResponse BulkFindPaths(BulkPathsRequest req)
+			throws TException {
+		LOG.info("BulkFindPaths called");
+
 		PathOptions pathOptions = req.getOptions();
 		BulkPathsResponse res = new BulkPathsResponse();
 		for (TripParameters trip : req.getTrips()) {
 			List<GraphPath> computedPaths = computePaths(trip, pathOptions);
-			TripPathsExtension tripPaths = new TripPathsExtension(trip, computedPaths);
+			TripPathsExtension tripPaths = new TripPathsExtension(trip,
+					computedPaths);
 			res.addToPaths(tripPaths);
 		}
 		return res;

@@ -60,26 +60,27 @@ def Main():
     # Sample an origin and a destination (deterministically)
     random.seed(12345)
     origin, dest = random.sample(vertices, 2)
-    origin_loc = origin.location
-    dest_loc = dest.location
+    origin_ll = origin.lat_lng
+    dest_ll = dest.lat_lng
+    origin_loc = OTPService.Location(lat_lng=origin_ll)
+    dest_loc = OTPService.Location(lat_lng=origin_ll)
+    
+    # Run a geocoding request
+    req = OTPService.FindNearestVertexRequest(location=origin_loc)
+    start_t = time.time()
+    res = client.FindNearestVertex(req) 
+    total_t = time.time() - start_t
+    
+    print 'FindNearestVertexRequest took %.6f seconds' % total_t
+    print 'Nearest vertex: ', res.nearest_vertex
     
     # Request a walking trip between them.
     trip_params = OTPService.TripParameters(
         origin=origin_loc, destination=dest_loc,
-        allowed_modes=set([OTPService.TravelMode.WALK]))
-    req = OTPService.TripDurationRequest(trip=trip_params)
-    try:
-        start_t = time.time()
-        res = client.GetTripDuration(req)
-        total_t = time.time() - start_t
-        
-        print 'TripDurationRequest took %.6f seconds' % total_t 
-        print 'Trip expected to take %d seconds' % res.expected_trip_duration
-    except OTPService.NoPathFoundError, e:
-        print e
-    
+        allowed_modes=set([OTPService.TravelMode.WALK]))    
     path_opts = OTPService.PathOptions(num_paths=1, return_detailed_path=True)
-    req = OTPService.FindPathsRequest(trip=trip_params)
+    req = OTPService.FindPathsRequest(trip=trip_params,
+                                      options=path_opts)
     start_t = time.time()
     res = client.FindPaths(req)
     total_t = time.time() - start_t
@@ -99,20 +100,21 @@ def Main():
     
     trip_params = []
     for origin, dest in zip(origins, dests):
-        origin_loc = origin.location
-        dest_loc = dest.location
+        origin_loc = OTPService.Location(lat_lng=origin.lat_lng)
+        dest_loc = OTPService.Location(lat_lng=dest.lat_lng)
         trip_params.append(OTPService.TripParameters(
             origin=origin_loc, destination=dest_loc,
             allowed_modes=set([OTPService.TravelMode.WALK])))
 
-    req = OTPService.BulkTripDurationRequest(trips=trip_params)
+    req = OTPService.BulkPathsRequest(trips=trip_params,
+                                      options=path_opts)
     
     try:
         start_t = time.time()
-        res = client.GetManyTripDurations(req)
+        res = client.BulkFindPaths(req)
         total_t = time.time() - start_t
         
-        print ('BulkTripDurationRequest took %.6f seconds '
+        print ('BulkFindPaths took %.6f seconds '
                'for %d trips ' % (total_t, len(origins))) 
     except OTPService.NoPathFoundError, e:
         print e

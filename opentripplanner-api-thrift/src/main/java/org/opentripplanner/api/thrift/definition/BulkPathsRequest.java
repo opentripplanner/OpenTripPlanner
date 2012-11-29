@@ -40,7 +40,7 @@ public class BulkPathsRequest implements org.apache.thrift.TBase<BulkPathsReques
   }
 
   private List<TripParameters> trips; // required
-  private PathOptions options; // required
+  private PathOptions options; // optional
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -104,13 +104,14 @@ public class BulkPathsRequest implements org.apache.thrift.TBase<BulkPathsReques
   }
 
   // isset id assignments
+  private _Fields optionals[] = {_Fields.OPTIONS};
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
     tmpMap.put(_Fields.TRIPS, new org.apache.thrift.meta_data.FieldMetaData("trips", org.apache.thrift.TFieldRequirementType.REQUIRED, 
         new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
             new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, TripParameters.class))));
-    tmpMap.put(_Fields.OPTIONS, new org.apache.thrift.meta_data.FieldMetaData("options", org.apache.thrift.TFieldRequirementType.REQUIRED, 
+    tmpMap.put(_Fields.OPTIONS, new org.apache.thrift.meta_data.FieldMetaData("options", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
         new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, PathOptions.class)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(BulkPathsRequest.class, metaDataMap);
@@ -120,12 +121,10 @@ public class BulkPathsRequest implements org.apache.thrift.TBase<BulkPathsReques
   }
 
   public BulkPathsRequest(
-    List<TripParameters> trips,
-    PathOptions options)
+    List<TripParameters> trips)
   {
     this();
     this.trips = trips;
-    this.options = options;
   }
 
   /**
@@ -357,14 +356,16 @@ public class BulkPathsRequest implements org.apache.thrift.TBase<BulkPathsReques
       sb.append(this.trips);
     }
     first = false;
-    if (!first) sb.append(", ");
-    sb.append("options:");
-    if (this.options == null) {
-      sb.append("null");
-    } else {
-      sb.append(this.options);
+    if (isSetOptions()) {
+      if (!first) sb.append(", ");
+      sb.append("options:");
+      if (this.options == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.options);
+      }
+      first = false;
     }
-    first = false;
     sb.append(")");
     return sb.toString();
   }
@@ -373,10 +374,6 @@ public class BulkPathsRequest implements org.apache.thrift.TBase<BulkPathsReques
     // check for required fields
     if (!isSetTrips()) {
       throw new org.apache.thrift.protocol.TProtocolException("Required field 'trips' is unset! Struct:" + toString());
-    }
-
-    if (!isSetOptions()) {
-      throw new org.apache.thrift.protocol.TProtocolException("Required field 'options' is unset! Struct:" + toString());
     }
 
   }
@@ -469,9 +466,11 @@ public class BulkPathsRequest implements org.apache.thrift.TBase<BulkPathsReques
         oprot.writeFieldEnd();
       }
       if (struct.options != null) {
-        oprot.writeFieldBegin(OPTIONS_FIELD_DESC);
-        struct.options.write(oprot);
-        oprot.writeFieldEnd();
+        if (struct.isSetOptions()) {
+          oprot.writeFieldBegin(OPTIONS_FIELD_DESC);
+          struct.options.write(oprot);
+          oprot.writeFieldEnd();
+        }
       }
       oprot.writeFieldStop();
       oprot.writeStructEnd();
@@ -497,7 +496,14 @@ public class BulkPathsRequest implements org.apache.thrift.TBase<BulkPathsReques
           _iter36.write(oprot);
         }
       }
-      struct.options.write(oprot);
+      BitSet optionals = new BitSet();
+      if (struct.isSetOptions()) {
+        optionals.set(0);
+      }
+      oprot.writeBitSet(optionals, 1);
+      if (struct.isSetOptions()) {
+        struct.options.write(oprot);
+      }
     }
 
     @Override
@@ -515,9 +521,12 @@ public class BulkPathsRequest implements org.apache.thrift.TBase<BulkPathsReques
         }
       }
       struct.setTripsIsSet(true);
-      struct.options = new PathOptions();
-      struct.options.read(iprot);
-      struct.setOptionsIsSet(true);
+      BitSet incoming = iprot.readBitSet(1);
+      if (incoming.get(0)) {
+        struct.options = new PathOptions();
+        struct.options.read(iprot);
+        struct.setOptionsIsSet(true);
+      }
     }
   }
 

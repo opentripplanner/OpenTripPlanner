@@ -27,22 +27,22 @@ import java.util.Arrays;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TripDurationRequest implements org.apache.thrift.TBase<TripDurationRequest, TripDurationRequest._Fields>, java.io.Serializable, Cloneable {
-  private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("TripDurationRequest");
+public class FindNearestVertexResponse implements org.apache.thrift.TBase<FindNearestVertexResponse, FindNearestVertexResponse._Fields>, java.io.Serializable, Cloneable {
+  private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("FindNearestVertexResponse");
 
-  private static final org.apache.thrift.protocol.TField TRIP_FIELD_DESC = new org.apache.thrift.protocol.TField("trip", org.apache.thrift.protocol.TType.STRUCT, (short)1);
+  private static final org.apache.thrift.protocol.TField NEAREST_VERTEX_FIELD_DESC = new org.apache.thrift.protocol.TField("nearest_vertex", org.apache.thrift.protocol.TType.STRUCT, (short)1);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
-    schemes.put(StandardScheme.class, new TripDurationRequestStandardSchemeFactory());
-    schemes.put(TupleScheme.class, new TripDurationRequestTupleSchemeFactory());
+    schemes.put(StandardScheme.class, new FindNearestVertexResponseStandardSchemeFactory());
+    schemes.put(TupleScheme.class, new FindNearestVertexResponseTupleSchemeFactory());
   }
 
-  private TripParameters trip; // required
+  private GraphVertex nearest_vertex; // required
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-    TRIP((short)1, "trip");
+    NEAREST_VERTEX((short)1, "nearest_vertex");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -57,8 +57,8 @@ public class TripDurationRequest implements org.apache.thrift.TBase<TripDuration
      */
     public static _Fields findByThriftId(int fieldId) {
       switch(fieldId) {
-        case 1: // TRIP
-          return TRIP;
+        case 1: // NEAREST_VERTEX
+          return NEAREST_VERTEX;
         default:
           return null;
       }
@@ -102,70 +102,70 @@ public class TripDurationRequest implements org.apache.thrift.TBase<TripDuration
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
-    tmpMap.put(_Fields.TRIP, new org.apache.thrift.meta_data.FieldMetaData("trip", org.apache.thrift.TFieldRequirementType.REQUIRED, 
-        new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, TripParameters.class)));
+    tmpMap.put(_Fields.NEAREST_VERTEX, new org.apache.thrift.meta_data.FieldMetaData("nearest_vertex", org.apache.thrift.TFieldRequirementType.REQUIRED, 
+        new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, GraphVertex.class)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
-    org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(TripDurationRequest.class, metaDataMap);
+    org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(FindNearestVertexResponse.class, metaDataMap);
   }
 
-  public TripDurationRequest() {
+  public FindNearestVertexResponse() {
   }
 
-  public TripDurationRequest(
-    TripParameters trip)
+  public FindNearestVertexResponse(
+    GraphVertex nearest_vertex)
   {
     this();
-    this.trip = trip;
+    this.nearest_vertex = nearest_vertex;
   }
 
   /**
    * Performs a deep copy on <i>other</i>.
    */
-  public TripDurationRequest(TripDurationRequest other) {
-    if (other.isSetTrip()) {
-      this.trip = new TripParameters(other.trip);
+  public FindNearestVertexResponse(FindNearestVertexResponse other) {
+    if (other.isSetNearest_vertex()) {
+      this.nearest_vertex = new GraphVertex(other.nearest_vertex);
     }
   }
 
-  public TripDurationRequest deepCopy() {
-    return new TripDurationRequest(this);
+  public FindNearestVertexResponse deepCopy() {
+    return new FindNearestVertexResponse(this);
   }
 
   @Override
   public void clear() {
-    this.trip = null;
+    this.nearest_vertex = null;
   }
 
-  public TripParameters getTrip() {
-    return this.trip;
+  public GraphVertex getNearest_vertex() {
+    return this.nearest_vertex;
   }
 
-  public void setTrip(TripParameters trip) {
-    this.trip = trip;
+  public void setNearest_vertex(GraphVertex nearest_vertex) {
+    this.nearest_vertex = nearest_vertex;
   }
 
-  public void unsetTrip() {
-    this.trip = null;
+  public void unsetNearest_vertex() {
+    this.nearest_vertex = null;
   }
 
-  /** Returns true if field trip is set (has been assigned a value) and false otherwise */
-  public boolean isSetTrip() {
-    return this.trip != null;
+  /** Returns true if field nearest_vertex is set (has been assigned a value) and false otherwise */
+  public boolean isSetNearest_vertex() {
+    return this.nearest_vertex != null;
   }
 
-  public void setTripIsSet(boolean value) {
+  public void setNearest_vertexIsSet(boolean value) {
     if (!value) {
-      this.trip = null;
+      this.nearest_vertex = null;
     }
   }
 
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
-    case TRIP:
+    case NEAREST_VERTEX:
       if (value == null) {
-        unsetTrip();
+        unsetNearest_vertex();
       } else {
-        setTrip((TripParameters)value);
+        setNearest_vertex((GraphVertex)value);
       }
       break;
 
@@ -174,8 +174,8 @@ public class TripDurationRequest implements org.apache.thrift.TBase<TripDuration
 
   public Object getFieldValue(_Fields field) {
     switch (field) {
-    case TRIP:
-      return getTrip();
+    case NEAREST_VERTEX:
+      return getNearest_vertex();
 
     }
     throw new IllegalStateException();
@@ -188,8 +188,8 @@ public class TripDurationRequest implements org.apache.thrift.TBase<TripDuration
     }
 
     switch (field) {
-    case TRIP:
-      return isSetTrip();
+    case NEAREST_VERTEX:
+      return isSetNearest_vertex();
     }
     throw new IllegalStateException();
   }
@@ -198,21 +198,21 @@ public class TripDurationRequest implements org.apache.thrift.TBase<TripDuration
   public boolean equals(Object that) {
     if (that == null)
       return false;
-    if (that instanceof TripDurationRequest)
-      return this.equals((TripDurationRequest)that);
+    if (that instanceof FindNearestVertexResponse)
+      return this.equals((FindNearestVertexResponse)that);
     return false;
   }
 
-  public boolean equals(TripDurationRequest that) {
+  public boolean equals(FindNearestVertexResponse that) {
     if (that == null)
       return false;
 
-    boolean this_present_trip = true && this.isSetTrip();
-    boolean that_present_trip = true && that.isSetTrip();
-    if (this_present_trip || that_present_trip) {
-      if (!(this_present_trip && that_present_trip))
+    boolean this_present_nearest_vertex = true && this.isSetNearest_vertex();
+    boolean that_present_nearest_vertex = true && that.isSetNearest_vertex();
+    if (this_present_nearest_vertex || that_present_nearest_vertex) {
+      if (!(this_present_nearest_vertex && that_present_nearest_vertex))
         return false;
-      if (!this.trip.equals(that.trip))
+      if (!this.nearest_vertex.equals(that.nearest_vertex))
         return false;
     }
 
@@ -224,20 +224,20 @@ public class TripDurationRequest implements org.apache.thrift.TBase<TripDuration
     return 0;
   }
 
-  public int compareTo(TripDurationRequest other) {
+  public int compareTo(FindNearestVertexResponse other) {
     if (!getClass().equals(other.getClass())) {
       return getClass().getName().compareTo(other.getClass().getName());
     }
 
     int lastComparison = 0;
-    TripDurationRequest typedOther = (TripDurationRequest)other;
+    FindNearestVertexResponse typedOther = (FindNearestVertexResponse)other;
 
-    lastComparison = Boolean.valueOf(isSetTrip()).compareTo(typedOther.isSetTrip());
+    lastComparison = Boolean.valueOf(isSetNearest_vertex()).compareTo(typedOther.isSetNearest_vertex());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    if (isSetTrip()) {
-      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.trip, typedOther.trip);
+    if (isSetNearest_vertex()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.nearest_vertex, typedOther.nearest_vertex);
       if (lastComparison != 0) {
         return lastComparison;
       }
@@ -259,14 +259,14 @@ public class TripDurationRequest implements org.apache.thrift.TBase<TripDuration
 
   @Override
   public String toString() {
-    StringBuilder sb = new StringBuilder("TripDurationRequest(");
+    StringBuilder sb = new StringBuilder("FindNearestVertexResponse(");
     boolean first = true;
 
-    sb.append("trip:");
-    if (this.trip == null) {
+    sb.append("nearest_vertex:");
+    if (this.nearest_vertex == null) {
       sb.append("null");
     } else {
-      sb.append(this.trip);
+      sb.append(this.nearest_vertex);
     }
     first = false;
     sb.append(")");
@@ -275,8 +275,8 @@ public class TripDurationRequest implements org.apache.thrift.TBase<TripDuration
 
   public void validate() throws org.apache.thrift.TException {
     // check for required fields
-    if (!isSetTrip()) {
-      throw new org.apache.thrift.protocol.TProtocolException("Required field 'trip' is unset! Struct:" + toString());
+    if (!isSetNearest_vertex()) {
+      throw new org.apache.thrift.protocol.TProtocolException("Required field 'nearest_vertex' is unset! Struct:" + toString());
     }
 
   }
@@ -297,15 +297,15 @@ public class TripDurationRequest implements org.apache.thrift.TBase<TripDuration
     }
   }
 
-  private static class TripDurationRequestStandardSchemeFactory implements SchemeFactory {
-    public TripDurationRequestStandardScheme getScheme() {
-      return new TripDurationRequestStandardScheme();
+  private static class FindNearestVertexResponseStandardSchemeFactory implements SchemeFactory {
+    public FindNearestVertexResponseStandardScheme getScheme() {
+      return new FindNearestVertexResponseStandardScheme();
     }
   }
 
-  private static class TripDurationRequestStandardScheme extends StandardScheme<TripDurationRequest> {
+  private static class FindNearestVertexResponseStandardScheme extends StandardScheme<FindNearestVertexResponse> {
 
-    public void read(org.apache.thrift.protocol.TProtocol iprot, TripDurationRequest struct) throws org.apache.thrift.TException {
+    public void read(org.apache.thrift.protocol.TProtocol iprot, FindNearestVertexResponse struct) throws org.apache.thrift.TException {
       org.apache.thrift.protocol.TField schemeField;
       iprot.readStructBegin();
       while (true)
@@ -315,11 +315,11 @@ public class TripDurationRequest implements org.apache.thrift.TBase<TripDuration
           break;
         }
         switch (schemeField.id) {
-          case 1: // TRIP
+          case 1: // NEAREST_VERTEX
             if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
-              struct.trip = new TripParameters();
-              struct.trip.read(iprot);
-              struct.setTripIsSet(true);
+              struct.nearest_vertex = new GraphVertex();
+              struct.nearest_vertex.read(iprot);
+              struct.setNearest_vertexIsSet(true);
             } else { 
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
@@ -333,13 +333,13 @@ public class TripDurationRequest implements org.apache.thrift.TBase<TripDuration
       struct.validate();
     }
 
-    public void write(org.apache.thrift.protocol.TProtocol oprot, TripDurationRequest struct) throws org.apache.thrift.TException {
+    public void write(org.apache.thrift.protocol.TProtocol oprot, FindNearestVertexResponse struct) throws org.apache.thrift.TException {
       struct.validate();
 
       oprot.writeStructBegin(STRUCT_DESC);
-      if (struct.trip != null) {
-        oprot.writeFieldBegin(TRIP_FIELD_DESC);
-        struct.trip.write(oprot);
+      if (struct.nearest_vertex != null) {
+        oprot.writeFieldBegin(NEAREST_VERTEX_FIELD_DESC);
+        struct.nearest_vertex.write(oprot);
         oprot.writeFieldEnd();
       }
       oprot.writeFieldStop();
@@ -348,26 +348,26 @@ public class TripDurationRequest implements org.apache.thrift.TBase<TripDuration
 
   }
 
-  private static class TripDurationRequestTupleSchemeFactory implements SchemeFactory {
-    public TripDurationRequestTupleScheme getScheme() {
-      return new TripDurationRequestTupleScheme();
+  private static class FindNearestVertexResponseTupleSchemeFactory implements SchemeFactory {
+    public FindNearestVertexResponseTupleScheme getScheme() {
+      return new FindNearestVertexResponseTupleScheme();
     }
   }
 
-  private static class TripDurationRequestTupleScheme extends TupleScheme<TripDurationRequest> {
+  private static class FindNearestVertexResponseTupleScheme extends TupleScheme<FindNearestVertexResponse> {
 
     @Override
-    public void write(org.apache.thrift.protocol.TProtocol prot, TripDurationRequest struct) throws org.apache.thrift.TException {
+    public void write(org.apache.thrift.protocol.TProtocol prot, FindNearestVertexResponse struct) throws org.apache.thrift.TException {
       TTupleProtocol oprot = (TTupleProtocol) prot;
-      struct.trip.write(oprot);
+      struct.nearest_vertex.write(oprot);
     }
 
     @Override
-    public void read(org.apache.thrift.protocol.TProtocol prot, TripDurationRequest struct) throws org.apache.thrift.TException {
+    public void read(org.apache.thrift.protocol.TProtocol prot, FindNearestVertexResponse struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
-      struct.trip = new TripParameters();
-      struct.trip.read(iprot);
-      struct.setTripIsSet(true);
+      struct.nearest_vertex = new GraphVertex();
+      struct.nearest_vertex.read(iprot);
+      struct.setNearest_vertexIsSet(true);
     }
   }
 

@@ -93,7 +93,8 @@ struct TripParameters {
 struct TripPaths {
 	// Echos the input trip parameters.
 	1: required TripParameters trip;
-	2: required list<Path> paths;
+	// If unset, no paths were found.
+	2: optional list<Path> paths;
 	
 	// Set to true in the bulk API when no paths are found.
 	// If true, paths list is not set.
@@ -122,7 +123,7 @@ struct FindPathsResponse {
 // Request to find paths for a single trip.
 struct BulkPathsRequest {
 	1: required list<TripParameters> trips;
-	2: required PathOptions options;
+	2: optional PathOptions options;
 }
 
 // Response containing paths for each trip.
@@ -130,22 +131,17 @@ struct BulkPathsResponse {
 	1: required list<TripPaths> paths;
 }
 
-// Request to calculate the time a trip will take.
-struct TripDurationRequest {
-	1: required TripParameters trip;
+// Request to find the nearest vertex.
+struct FindNearestVertexRequest {
+	// Find vertex near this location.
+	1: required Location location;
+	
+	// Find vertex accessible to one of these modes.
+	2: optional set<TravelMode> allowed_modes;	
 }
 
-struct TripDurationResponse {
-	1: required i32 expected_trip_duration;
-}
-
-// Request to calculate the time several trips will take.
-struct BulkTripDurationRequest {
-	1: required list<TripParameters> trips;
-}
-
-struct BulkTripDurationResponse {
-	1: required list<i32> expected_trip_durations;
+struct FindNearestVertexResponse {
+	1: required GraphVertex nearest_vertex;
 }
 
 // Request to get vertices in the graph.
@@ -173,16 +169,10 @@ service OTPService {
 	GraphVerticesResponse GetVertices(1:GraphVerticesRequest req);
 
 	/**
-	 * Calculate the duration of a trip.
+	 * Find the nearest graph vertex.
 	 */
-	TripDurationResponse GetTripDuration(1:TripDurationRequest req)
-		throws (1: NoPathFoundError path_err);
-	
-	/**
-	 * Calculate the duration of a trip.
-	 */
-	BulkTripDurationResponse GetManyTripDurations(1:BulkTripDurationRequest req);
-	
+	FindNearestVertexResponse FindNearestVertex(1:FindNearestVertexRequest req);
+
 	/**
 	 * Find paths for a single trip.
 	 */

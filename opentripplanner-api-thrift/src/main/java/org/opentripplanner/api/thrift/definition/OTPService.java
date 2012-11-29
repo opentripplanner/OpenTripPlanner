@@ -42,18 +42,11 @@ public class OTPService {
     public GraphVerticesResponse GetVertices(GraphVerticesRequest req) throws org.apache.thrift.TException;
 
     /**
-     * Calculate the duration of a trip.
+     * Find the nearest graph vertex.
      * 
      * @param req
      */
-    public TripDurationResponse GetTripDuration(TripDurationRequest req) throws NoPathFoundError, org.apache.thrift.TException;
-
-    /**
-     * Calculate the duration of a trip.
-     * 
-     * @param req
-     */
-    public BulkTripDurationResponse GetManyTripDurations(BulkTripDurationRequest req) throws org.apache.thrift.TException;
+    public FindNearestVertexResponse FindNearestVertex(FindNearestVertexRequest req) throws org.apache.thrift.TException;
 
     /**
      * Find paths for a single trip.
@@ -75,9 +68,7 @@ public class OTPService {
 
     public void GetVertices(GraphVerticesRequest req, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.GetVertices_call> resultHandler) throws org.apache.thrift.TException;
 
-    public void GetTripDuration(TripDurationRequest req, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.GetTripDuration_call> resultHandler) throws org.apache.thrift.TException;
-
-    public void GetManyTripDurations(BulkTripDurationRequest req, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.GetManyTripDurations_call> resultHandler) throws org.apache.thrift.TException;
+    public void FindNearestVertex(FindNearestVertexRequest req, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.FindNearestVertex_call> resultHandler) throws org.apache.thrift.TException;
 
     public void FindPaths(FindPathsRequest req, org.apache.thrift.async.AsyncMethodCallback<AsyncClient.FindPaths_call> resultHandler) throws org.apache.thrift.TException;
 
@@ -128,53 +119,27 @@ public class OTPService {
       throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "GetVertices failed: unknown result");
     }
 
-    public TripDurationResponse GetTripDuration(TripDurationRequest req) throws NoPathFoundError, org.apache.thrift.TException
+    public FindNearestVertexResponse FindNearestVertex(FindNearestVertexRequest req) throws org.apache.thrift.TException
     {
-      send_GetTripDuration(req);
-      return recv_GetTripDuration();
+      send_FindNearestVertex(req);
+      return recv_FindNearestVertex();
     }
 
-    public void send_GetTripDuration(TripDurationRequest req) throws org.apache.thrift.TException
+    public void send_FindNearestVertex(FindNearestVertexRequest req) throws org.apache.thrift.TException
     {
-      GetTripDuration_args args = new GetTripDuration_args();
+      FindNearestVertex_args args = new FindNearestVertex_args();
       args.setReq(req);
-      sendBase("GetTripDuration", args);
+      sendBase("FindNearestVertex", args);
     }
 
-    public TripDurationResponse recv_GetTripDuration() throws NoPathFoundError, org.apache.thrift.TException
+    public FindNearestVertexResponse recv_FindNearestVertex() throws org.apache.thrift.TException
     {
-      GetTripDuration_result result = new GetTripDuration_result();
-      receiveBase(result, "GetTripDuration");
+      FindNearestVertex_result result = new FindNearestVertex_result();
+      receiveBase(result, "FindNearestVertex");
       if (result.isSetSuccess()) {
         return result.success;
       }
-      if (result.path_err != null) {
-        throw result.path_err;
-      }
-      throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "GetTripDuration failed: unknown result");
-    }
-
-    public BulkTripDurationResponse GetManyTripDurations(BulkTripDurationRequest req) throws org.apache.thrift.TException
-    {
-      send_GetManyTripDurations(req);
-      return recv_GetManyTripDurations();
-    }
-
-    public void send_GetManyTripDurations(BulkTripDurationRequest req) throws org.apache.thrift.TException
-    {
-      GetManyTripDurations_args args = new GetManyTripDurations_args();
-      args.setReq(req);
-      sendBase("GetManyTripDurations", args);
-    }
-
-    public BulkTripDurationResponse recv_GetManyTripDurations() throws org.apache.thrift.TException
-    {
-      GetManyTripDurations_result result = new GetManyTripDurations_result();
-      receiveBase(result, "GetManyTripDurations");
-      if (result.isSetSuccess()) {
-        return result.success;
-      }
-      throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "GetManyTripDurations failed: unknown result");
+      throw new org.apache.thrift.TApplicationException(org.apache.thrift.TApplicationException.MISSING_RESULT, "FindNearestVertex failed: unknown result");
     }
 
     public FindPathsResponse FindPaths(FindPathsRequest req) throws org.apache.thrift.TException
@@ -273,67 +238,35 @@ public class OTPService {
       }
     }
 
-    public void GetTripDuration(TripDurationRequest req, org.apache.thrift.async.AsyncMethodCallback<GetTripDuration_call> resultHandler) throws org.apache.thrift.TException {
+    public void FindNearestVertex(FindNearestVertexRequest req, org.apache.thrift.async.AsyncMethodCallback<FindNearestVertex_call> resultHandler) throws org.apache.thrift.TException {
       checkReady();
-      GetTripDuration_call method_call = new GetTripDuration_call(req, resultHandler, this, ___protocolFactory, ___transport);
+      FindNearestVertex_call method_call = new FindNearestVertex_call(req, resultHandler, this, ___protocolFactory, ___transport);
       this.___currentMethod = method_call;
       ___manager.call(method_call);
     }
 
-    public static class GetTripDuration_call extends org.apache.thrift.async.TAsyncMethodCall {
-      private TripDurationRequest req;
-      public GetTripDuration_call(TripDurationRequest req, org.apache.thrift.async.AsyncMethodCallback<GetTripDuration_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
+    public static class FindNearestVertex_call extends org.apache.thrift.async.TAsyncMethodCall {
+      private FindNearestVertexRequest req;
+      public FindNearestVertex_call(FindNearestVertexRequest req, org.apache.thrift.async.AsyncMethodCallback<FindNearestVertex_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
         super(client, protocolFactory, transport, resultHandler, false);
         this.req = req;
       }
 
       public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
-        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("GetTripDuration", org.apache.thrift.protocol.TMessageType.CALL, 0));
-        GetTripDuration_args args = new GetTripDuration_args();
+        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("FindNearestVertex", org.apache.thrift.protocol.TMessageType.CALL, 0));
+        FindNearestVertex_args args = new FindNearestVertex_args();
         args.setReq(req);
         args.write(prot);
         prot.writeMessageEnd();
       }
 
-      public TripDurationResponse getResult() throws NoPathFoundError, org.apache.thrift.TException {
+      public FindNearestVertexResponse getResult() throws org.apache.thrift.TException {
         if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
           throw new IllegalStateException("Method call not finished!");
         }
         org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
         org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
-        return (new Client(prot)).recv_GetTripDuration();
-      }
-    }
-
-    public void GetManyTripDurations(BulkTripDurationRequest req, org.apache.thrift.async.AsyncMethodCallback<GetManyTripDurations_call> resultHandler) throws org.apache.thrift.TException {
-      checkReady();
-      GetManyTripDurations_call method_call = new GetManyTripDurations_call(req, resultHandler, this, ___protocolFactory, ___transport);
-      this.___currentMethod = method_call;
-      ___manager.call(method_call);
-    }
-
-    public static class GetManyTripDurations_call extends org.apache.thrift.async.TAsyncMethodCall {
-      private BulkTripDurationRequest req;
-      public GetManyTripDurations_call(BulkTripDurationRequest req, org.apache.thrift.async.AsyncMethodCallback<GetManyTripDurations_call> resultHandler, org.apache.thrift.async.TAsyncClient client, org.apache.thrift.protocol.TProtocolFactory protocolFactory, org.apache.thrift.transport.TNonblockingTransport transport) throws org.apache.thrift.TException {
-        super(client, protocolFactory, transport, resultHandler, false);
-        this.req = req;
-      }
-
-      public void write_args(org.apache.thrift.protocol.TProtocol prot) throws org.apache.thrift.TException {
-        prot.writeMessageBegin(new org.apache.thrift.protocol.TMessage("GetManyTripDurations", org.apache.thrift.protocol.TMessageType.CALL, 0));
-        GetManyTripDurations_args args = new GetManyTripDurations_args();
-        args.setReq(req);
-        args.write(prot);
-        prot.writeMessageEnd();
-      }
-
-      public BulkTripDurationResponse getResult() throws org.apache.thrift.TException {
-        if (getState() != org.apache.thrift.async.TAsyncMethodCall.State.RESPONSE_READ) {
-          throw new IllegalStateException("Method call not finished!");
-        }
-        org.apache.thrift.transport.TMemoryInputTransport memoryTransport = new org.apache.thrift.transport.TMemoryInputTransport(getFrameBuffer().array());
-        org.apache.thrift.protocol.TProtocol prot = client.getProtocolFactory().getProtocol(memoryTransport);
-        return (new Client(prot)).recv_GetManyTripDurations();
+        return (new Client(prot)).recv_FindNearestVertex();
       }
     }
 
@@ -415,8 +348,7 @@ public class OTPService {
 
     private static <I extends Iface> Map<String,  org.apache.thrift.ProcessFunction<I, ? extends  org.apache.thrift.TBase>> getProcessMap(Map<String,  org.apache.thrift.ProcessFunction<I, ? extends  org.apache.thrift.TBase>> processMap) {
       processMap.put("GetVertices", new GetVertices());
-      processMap.put("GetTripDuration", new GetTripDuration());
-      processMap.put("GetManyTripDurations", new GetManyTripDurations());
+      processMap.put("FindNearestVertex", new FindNearestVertex());
       processMap.put("FindPaths", new FindPaths());
       processMap.put("BulkFindPaths", new BulkFindPaths());
       return processMap;
@@ -438,38 +370,18 @@ public class OTPService {
       }
     }
 
-    private static class GetTripDuration<I extends Iface> extends org.apache.thrift.ProcessFunction<I, GetTripDuration_args> {
-      public GetTripDuration() {
-        super("GetTripDuration");
+    private static class FindNearestVertex<I extends Iface> extends org.apache.thrift.ProcessFunction<I, FindNearestVertex_args> {
+      public FindNearestVertex() {
+        super("FindNearestVertex");
       }
 
-      protected GetTripDuration_args getEmptyArgsInstance() {
-        return new GetTripDuration_args();
+      protected FindNearestVertex_args getEmptyArgsInstance() {
+        return new FindNearestVertex_args();
       }
 
-      protected GetTripDuration_result getResult(I iface, GetTripDuration_args args) throws org.apache.thrift.TException {
-        GetTripDuration_result result = new GetTripDuration_result();
-        try {
-          result.success = iface.GetTripDuration(args.req);
-        } catch (NoPathFoundError path_err) {
-          result.path_err = path_err;
-        }
-        return result;
-      }
-    }
-
-    private static class GetManyTripDurations<I extends Iface> extends org.apache.thrift.ProcessFunction<I, GetManyTripDurations_args> {
-      public GetManyTripDurations() {
-        super("GetManyTripDurations");
-      }
-
-      protected GetManyTripDurations_args getEmptyArgsInstance() {
-        return new GetManyTripDurations_args();
-      }
-
-      protected GetManyTripDurations_result getResult(I iface, GetManyTripDurations_args args) throws org.apache.thrift.TException {
-        GetManyTripDurations_result result = new GetManyTripDurations_result();
-        result.success = iface.GetManyTripDurations(args.req);
+      protected FindNearestVertex_result getResult(I iface, FindNearestVertex_args args) throws org.apache.thrift.TException {
+        FindNearestVertex_result result = new FindNearestVertex_result();
+        result.success = iface.FindNearestVertex(args.req);
         return result;
       }
     }
@@ -1212,18 +1124,18 @@ public class OTPService {
 
   }
 
-  public static class GetTripDuration_args implements org.apache.thrift.TBase<GetTripDuration_args, GetTripDuration_args._Fields>, java.io.Serializable, Cloneable   {
-    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("GetTripDuration_args");
+  public static class FindNearestVertex_args implements org.apache.thrift.TBase<FindNearestVertex_args, FindNearestVertex_args._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("FindNearestVertex_args");
 
     private static final org.apache.thrift.protocol.TField REQ_FIELD_DESC = new org.apache.thrift.protocol.TField("req", org.apache.thrift.protocol.TType.STRUCT, (short)1);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
-      schemes.put(StandardScheme.class, new GetTripDuration_argsStandardSchemeFactory());
-      schemes.put(TupleScheme.class, new GetTripDuration_argsTupleSchemeFactory());
+      schemes.put(StandardScheme.class, new FindNearestVertex_argsStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new FindNearestVertex_argsTupleSchemeFactory());
     }
 
-    private TripDurationRequest req; // required
+    private FindNearestVertexRequest req; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -1288,16 +1200,16 @@ public class OTPService {
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
       tmpMap.put(_Fields.REQ, new org.apache.thrift.meta_data.FieldMetaData("req", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, TripDurationRequest.class)));
+          new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, FindNearestVertexRequest.class)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
-      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(GetTripDuration_args.class, metaDataMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(FindNearestVertex_args.class, metaDataMap);
     }
 
-    public GetTripDuration_args() {
+    public FindNearestVertex_args() {
     }
 
-    public GetTripDuration_args(
-      TripDurationRequest req)
+    public FindNearestVertex_args(
+      FindNearestVertexRequest req)
     {
       this();
       this.req = req;
@@ -1306,14 +1218,14 @@ public class OTPService {
     /**
      * Performs a deep copy on <i>other</i>.
      */
-    public GetTripDuration_args(GetTripDuration_args other) {
+    public FindNearestVertex_args(FindNearestVertex_args other) {
       if (other.isSetReq()) {
-        this.req = new TripDurationRequest(other.req);
+        this.req = new FindNearestVertexRequest(other.req);
       }
     }
 
-    public GetTripDuration_args deepCopy() {
-      return new GetTripDuration_args(this);
+    public FindNearestVertex_args deepCopy() {
+      return new FindNearestVertex_args(this);
     }
 
     @Override
@@ -1321,11 +1233,11 @@ public class OTPService {
       this.req = null;
     }
 
-    public TripDurationRequest getReq() {
+    public FindNearestVertexRequest getReq() {
       return this.req;
     }
 
-    public void setReq(TripDurationRequest req) {
+    public void setReq(FindNearestVertexRequest req) {
       this.req = req;
     }
 
@@ -1350,7 +1262,7 @@ public class OTPService {
         if (value == null) {
           unsetReq();
         } else {
-          setReq((TripDurationRequest)value);
+          setReq((FindNearestVertexRequest)value);
         }
         break;
 
@@ -1383,12 +1295,12 @@ public class OTPService {
     public boolean equals(Object that) {
       if (that == null)
         return false;
-      if (that instanceof GetTripDuration_args)
-        return this.equals((GetTripDuration_args)that);
+      if (that instanceof FindNearestVertex_args)
+        return this.equals((FindNearestVertex_args)that);
       return false;
     }
 
-    public boolean equals(GetTripDuration_args that) {
+    public boolean equals(FindNearestVertex_args that) {
       if (that == null)
         return false;
 
@@ -1409,13 +1321,13 @@ public class OTPService {
       return 0;
     }
 
-    public int compareTo(GetTripDuration_args other) {
+    public int compareTo(FindNearestVertex_args other) {
       if (!getClass().equals(other.getClass())) {
         return getClass().getName().compareTo(other.getClass().getName());
       }
 
       int lastComparison = 0;
-      GetTripDuration_args typedOther = (GetTripDuration_args)other;
+      FindNearestVertex_args typedOther = (FindNearestVertex_args)other;
 
       lastComparison = Boolean.valueOf(isSetReq()).compareTo(typedOther.isSetReq());
       if (lastComparison != 0) {
@@ -1444,7 +1356,7 @@ public class OTPService {
 
     @Override
     public String toString() {
-      StringBuilder sb = new StringBuilder("GetTripDuration_args(");
+      StringBuilder sb = new StringBuilder("FindNearestVertex_args(");
       boolean first = true;
 
       sb.append("req:");
@@ -1478,15 +1390,15 @@ public class OTPService {
       }
     }
 
-    private static class GetTripDuration_argsStandardSchemeFactory implements SchemeFactory {
-      public GetTripDuration_argsStandardScheme getScheme() {
-        return new GetTripDuration_argsStandardScheme();
+    private static class FindNearestVertex_argsStandardSchemeFactory implements SchemeFactory {
+      public FindNearestVertex_argsStandardScheme getScheme() {
+        return new FindNearestVertex_argsStandardScheme();
       }
     }
 
-    private static class GetTripDuration_argsStandardScheme extends StandardScheme<GetTripDuration_args> {
+    private static class FindNearestVertex_argsStandardScheme extends StandardScheme<FindNearestVertex_args> {
 
-      public void read(org.apache.thrift.protocol.TProtocol iprot, GetTripDuration_args struct) throws org.apache.thrift.TException {
+      public void read(org.apache.thrift.protocol.TProtocol iprot, FindNearestVertex_args struct) throws org.apache.thrift.TException {
         org.apache.thrift.protocol.TField schemeField;
         iprot.readStructBegin();
         while (true)
@@ -1498,7 +1410,7 @@ public class OTPService {
           switch (schemeField.id) {
             case 1: // REQ
               if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
-                struct.req = new TripDurationRequest();
+                struct.req = new FindNearestVertexRequest();
                 struct.req.read(iprot);
                 struct.setReqIsSet(true);
               } else { 
@@ -1514,7 +1426,7 @@ public class OTPService {
         struct.validate();
       }
 
-      public void write(org.apache.thrift.protocol.TProtocol oprot, GetTripDuration_args struct) throws org.apache.thrift.TException {
+      public void write(org.apache.thrift.protocol.TProtocol oprot, FindNearestVertex_args struct) throws org.apache.thrift.TException {
         struct.validate();
 
         oprot.writeStructBegin(STRUCT_DESC);
@@ -1529,16 +1441,16 @@ public class OTPService {
 
     }
 
-    private static class GetTripDuration_argsTupleSchemeFactory implements SchemeFactory {
-      public GetTripDuration_argsTupleScheme getScheme() {
-        return new GetTripDuration_argsTupleScheme();
+    private static class FindNearestVertex_argsTupleSchemeFactory implements SchemeFactory {
+      public FindNearestVertex_argsTupleScheme getScheme() {
+        return new FindNearestVertex_argsTupleScheme();
       }
     }
 
-    private static class GetTripDuration_argsTupleScheme extends TupleScheme<GetTripDuration_args> {
+    private static class FindNearestVertex_argsTupleScheme extends TupleScheme<FindNearestVertex_args> {
 
       @Override
-      public void write(org.apache.thrift.protocol.TProtocol prot, GetTripDuration_args struct) throws org.apache.thrift.TException {
+      public void write(org.apache.thrift.protocol.TProtocol prot, FindNearestVertex_args struct) throws org.apache.thrift.TException {
         TTupleProtocol oprot = (TTupleProtocol) prot;
         BitSet optionals = new BitSet();
         if (struct.isSetReq()) {
@@ -1551,11 +1463,11 @@ public class OTPService {
       }
 
       @Override
-      public void read(org.apache.thrift.protocol.TProtocol prot, GetTripDuration_args struct) throws org.apache.thrift.TException {
+      public void read(org.apache.thrift.protocol.TProtocol prot, FindNearestVertex_args struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
         BitSet incoming = iprot.readBitSet(1);
         if (incoming.get(0)) {
-          struct.req = new TripDurationRequest();
+          struct.req = new FindNearestVertexRequest();
           struct.req.read(iprot);
           struct.setReqIsSet(true);
         }
@@ -1564,823 +1476,18 @@ public class OTPService {
 
   }
 
-  public static class GetTripDuration_result implements org.apache.thrift.TBase<GetTripDuration_result, GetTripDuration_result._Fields>, java.io.Serializable, Cloneable   {
-    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("GetTripDuration_result");
+  public static class FindNearestVertex_result implements org.apache.thrift.TBase<FindNearestVertex_result, FindNearestVertex_result._Fields>, java.io.Serializable, Cloneable   {
+    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("FindNearestVertex_result");
 
     private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.STRUCT, (short)0);
-    private static final org.apache.thrift.protocol.TField PATH_ERR_FIELD_DESC = new org.apache.thrift.protocol.TField("path_err", org.apache.thrift.protocol.TType.STRUCT, (short)1);
 
     private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
     static {
-      schemes.put(StandardScheme.class, new GetTripDuration_resultStandardSchemeFactory());
-      schemes.put(TupleScheme.class, new GetTripDuration_resultTupleSchemeFactory());
+      schemes.put(StandardScheme.class, new FindNearestVertex_resultStandardSchemeFactory());
+      schemes.put(TupleScheme.class, new FindNearestVertex_resultTupleSchemeFactory());
     }
 
-    private TripDurationResponse success; // required
-    private NoPathFoundError path_err; // required
-
-    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
-    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-      SUCCESS((short)0, "success"),
-      PATH_ERR((short)1, "path_err");
-
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
-
-      static {
-        for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byName.put(field.getFieldName(), field);
-        }
-      }
-
-      /**
-       * Find the _Fields constant that matches fieldId, or null if its not found.
-       */
-      public static _Fields findByThriftId(int fieldId) {
-        switch(fieldId) {
-          case 0: // SUCCESS
-            return SUCCESS;
-          case 1: // PATH_ERR
-            return PATH_ERR;
-          default:
-            return null;
-        }
-      }
-
-      /**
-       * Find the _Fields constant that matches fieldId, throwing an exception
-       * if it is not found.
-       */
-      public static _Fields findByThriftIdOrThrow(int fieldId) {
-        _Fields fields = findByThriftId(fieldId);
-        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
-        return fields;
-      }
-
-      /**
-       * Find the _Fields constant that matches name, or null if its not found.
-       */
-      public static _Fields findByName(String name) {
-        return byName.get(name);
-      }
-
-      private final short _thriftId;
-      private final String _fieldName;
-
-      _Fields(short thriftId, String fieldName) {
-        _thriftId = thriftId;
-        _fieldName = fieldName;
-      }
-
-      public short getThriftFieldId() {
-        return _thriftId;
-      }
-
-      public String getFieldName() {
-        return _fieldName;
-      }
-    }
-
-    // isset id assignments
-    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
-    static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
-      tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, TripDurationResponse.class)));
-      tmpMap.put(_Fields.PATH_ERR, new org.apache.thrift.meta_data.FieldMetaData("path_err", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT)));
-      metaDataMap = Collections.unmodifiableMap(tmpMap);
-      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(GetTripDuration_result.class, metaDataMap);
-    }
-
-    public GetTripDuration_result() {
-    }
-
-    public GetTripDuration_result(
-      TripDurationResponse success,
-      NoPathFoundError path_err)
-    {
-      this();
-      this.success = success;
-      this.path_err = path_err;
-    }
-
-    /**
-     * Performs a deep copy on <i>other</i>.
-     */
-    public GetTripDuration_result(GetTripDuration_result other) {
-      if (other.isSetSuccess()) {
-        this.success = new TripDurationResponse(other.success);
-      }
-      if (other.isSetPath_err()) {
-        this.path_err = new NoPathFoundError(other.path_err);
-      }
-    }
-
-    public GetTripDuration_result deepCopy() {
-      return new GetTripDuration_result(this);
-    }
-
-    @Override
-    public void clear() {
-      this.success = null;
-      this.path_err = null;
-    }
-
-    public TripDurationResponse getSuccess() {
-      return this.success;
-    }
-
-    public void setSuccess(TripDurationResponse success) {
-      this.success = success;
-    }
-
-    public void unsetSuccess() {
-      this.success = null;
-    }
-
-    /** Returns true if field success is set (has been assigned a value) and false otherwise */
-    public boolean isSetSuccess() {
-      return this.success != null;
-    }
-
-    public void setSuccessIsSet(boolean value) {
-      if (!value) {
-        this.success = null;
-      }
-    }
-
-    public NoPathFoundError getPath_err() {
-      return this.path_err;
-    }
-
-    public void setPath_err(NoPathFoundError path_err) {
-      this.path_err = path_err;
-    }
-
-    public void unsetPath_err() {
-      this.path_err = null;
-    }
-
-    /** Returns true if field path_err is set (has been assigned a value) and false otherwise */
-    public boolean isSetPath_err() {
-      return this.path_err != null;
-    }
-
-    public void setPath_errIsSet(boolean value) {
-      if (!value) {
-        this.path_err = null;
-      }
-    }
-
-    public void setFieldValue(_Fields field, Object value) {
-      switch (field) {
-      case SUCCESS:
-        if (value == null) {
-          unsetSuccess();
-        } else {
-          setSuccess((TripDurationResponse)value);
-        }
-        break;
-
-      case PATH_ERR:
-        if (value == null) {
-          unsetPath_err();
-        } else {
-          setPath_err((NoPathFoundError)value);
-        }
-        break;
-
-      }
-    }
-
-    public Object getFieldValue(_Fields field) {
-      switch (field) {
-      case SUCCESS:
-        return getSuccess();
-
-      case PATH_ERR:
-        return getPath_err();
-
-      }
-      throw new IllegalStateException();
-    }
-
-    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
-    public boolean isSet(_Fields field) {
-      if (field == null) {
-        throw new IllegalArgumentException();
-      }
-
-      switch (field) {
-      case SUCCESS:
-        return isSetSuccess();
-      case PATH_ERR:
-        return isSetPath_err();
-      }
-      throw new IllegalStateException();
-    }
-
-    @Override
-    public boolean equals(Object that) {
-      if (that == null)
-        return false;
-      if (that instanceof GetTripDuration_result)
-        return this.equals((GetTripDuration_result)that);
-      return false;
-    }
-
-    public boolean equals(GetTripDuration_result that) {
-      if (that == null)
-        return false;
-
-      boolean this_present_success = true && this.isSetSuccess();
-      boolean that_present_success = true && that.isSetSuccess();
-      if (this_present_success || that_present_success) {
-        if (!(this_present_success && that_present_success))
-          return false;
-        if (!this.success.equals(that.success))
-          return false;
-      }
-
-      boolean this_present_path_err = true && this.isSetPath_err();
-      boolean that_present_path_err = true && that.isSetPath_err();
-      if (this_present_path_err || that_present_path_err) {
-        if (!(this_present_path_err && that_present_path_err))
-          return false;
-        if (!this.path_err.equals(that.path_err))
-          return false;
-      }
-
-      return true;
-    }
-
-    @Override
-    public int hashCode() {
-      return 0;
-    }
-
-    public int compareTo(GetTripDuration_result other) {
-      if (!getClass().equals(other.getClass())) {
-        return getClass().getName().compareTo(other.getClass().getName());
-      }
-
-      int lastComparison = 0;
-      GetTripDuration_result typedOther = (GetTripDuration_result)other;
-
-      lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      if (isSetSuccess()) {
-        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.success, typedOther.success);
-        if (lastComparison != 0) {
-          return lastComparison;
-        }
-      }
-      lastComparison = Boolean.valueOf(isSetPath_err()).compareTo(typedOther.isSetPath_err());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      if (isSetPath_err()) {
-        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.path_err, typedOther.path_err);
-        if (lastComparison != 0) {
-          return lastComparison;
-        }
-      }
-      return 0;
-    }
-
-    public _Fields fieldForId(int fieldId) {
-      return _Fields.findByThriftId(fieldId);
-    }
-
-    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
-      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
-    }
-
-    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
-      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
-      }
-
-    @Override
-    public String toString() {
-      StringBuilder sb = new StringBuilder("GetTripDuration_result(");
-      boolean first = true;
-
-      sb.append("success:");
-      if (this.success == null) {
-        sb.append("null");
-      } else {
-        sb.append(this.success);
-      }
-      first = false;
-      if (!first) sb.append(", ");
-      sb.append("path_err:");
-      if (this.path_err == null) {
-        sb.append("null");
-      } else {
-        sb.append(this.path_err);
-      }
-      first = false;
-      sb.append(")");
-      return sb.toString();
-    }
-
-    public void validate() throws org.apache.thrift.TException {
-      // check for required fields
-    }
-
-    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
-      try {
-        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
-      } catch (org.apache.thrift.TException te) {
-        throw new java.io.IOException(te);
-      }
-    }
-
-    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
-      try {
-        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
-      } catch (org.apache.thrift.TException te) {
-        throw new java.io.IOException(te);
-      }
-    }
-
-    private static class GetTripDuration_resultStandardSchemeFactory implements SchemeFactory {
-      public GetTripDuration_resultStandardScheme getScheme() {
-        return new GetTripDuration_resultStandardScheme();
-      }
-    }
-
-    private static class GetTripDuration_resultStandardScheme extends StandardScheme<GetTripDuration_result> {
-
-      public void read(org.apache.thrift.protocol.TProtocol iprot, GetTripDuration_result struct) throws org.apache.thrift.TException {
-        org.apache.thrift.protocol.TField schemeField;
-        iprot.readStructBegin();
-        while (true)
-        {
-          schemeField = iprot.readFieldBegin();
-          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
-            break;
-          }
-          switch (schemeField.id) {
-            case 0: // SUCCESS
-              if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
-                struct.success = new TripDurationResponse();
-                struct.success.read(iprot);
-                struct.setSuccessIsSet(true);
-              } else { 
-                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
-              }
-              break;
-            case 1: // PATH_ERR
-              if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
-                struct.path_err = new NoPathFoundError();
-                struct.path_err.read(iprot);
-                struct.setPath_errIsSet(true);
-              } else { 
-                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
-              }
-              break;
-            default:
-              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
-          }
-          iprot.readFieldEnd();
-        }
-        iprot.readStructEnd();
-        struct.validate();
-      }
-
-      public void write(org.apache.thrift.protocol.TProtocol oprot, GetTripDuration_result struct) throws org.apache.thrift.TException {
-        struct.validate();
-
-        oprot.writeStructBegin(STRUCT_DESC);
-        if (struct.success != null) {
-          oprot.writeFieldBegin(SUCCESS_FIELD_DESC);
-          struct.success.write(oprot);
-          oprot.writeFieldEnd();
-        }
-        if (struct.path_err != null) {
-          oprot.writeFieldBegin(PATH_ERR_FIELD_DESC);
-          struct.path_err.write(oprot);
-          oprot.writeFieldEnd();
-        }
-        oprot.writeFieldStop();
-        oprot.writeStructEnd();
-      }
-
-    }
-
-    private static class GetTripDuration_resultTupleSchemeFactory implements SchemeFactory {
-      public GetTripDuration_resultTupleScheme getScheme() {
-        return new GetTripDuration_resultTupleScheme();
-      }
-    }
-
-    private static class GetTripDuration_resultTupleScheme extends TupleScheme<GetTripDuration_result> {
-
-      @Override
-      public void write(org.apache.thrift.protocol.TProtocol prot, GetTripDuration_result struct) throws org.apache.thrift.TException {
-        TTupleProtocol oprot = (TTupleProtocol) prot;
-        BitSet optionals = new BitSet();
-        if (struct.isSetSuccess()) {
-          optionals.set(0);
-        }
-        if (struct.isSetPath_err()) {
-          optionals.set(1);
-        }
-        oprot.writeBitSet(optionals, 2);
-        if (struct.isSetSuccess()) {
-          struct.success.write(oprot);
-        }
-        if (struct.isSetPath_err()) {
-          struct.path_err.write(oprot);
-        }
-      }
-
-      @Override
-      public void read(org.apache.thrift.protocol.TProtocol prot, GetTripDuration_result struct) throws org.apache.thrift.TException {
-        TTupleProtocol iprot = (TTupleProtocol) prot;
-        BitSet incoming = iprot.readBitSet(2);
-        if (incoming.get(0)) {
-          struct.success = new TripDurationResponse();
-          struct.success.read(iprot);
-          struct.setSuccessIsSet(true);
-        }
-        if (incoming.get(1)) {
-          struct.path_err = new NoPathFoundError();
-          struct.path_err.read(iprot);
-          struct.setPath_errIsSet(true);
-        }
-      }
-    }
-
-  }
-
-  public static class GetManyTripDurations_args implements org.apache.thrift.TBase<GetManyTripDurations_args, GetManyTripDurations_args._Fields>, java.io.Serializable, Cloneable   {
-    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("GetManyTripDurations_args");
-
-    private static final org.apache.thrift.protocol.TField REQ_FIELD_DESC = new org.apache.thrift.protocol.TField("req", org.apache.thrift.protocol.TType.STRUCT, (short)1);
-
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
-    static {
-      schemes.put(StandardScheme.class, new GetManyTripDurations_argsStandardSchemeFactory());
-      schemes.put(TupleScheme.class, new GetManyTripDurations_argsTupleSchemeFactory());
-    }
-
-    private BulkTripDurationRequest req; // required
-
-    /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
-    public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-      REQ((short)1, "req");
-
-      private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
-
-      static {
-        for (_Fields field : EnumSet.allOf(_Fields.class)) {
-          byName.put(field.getFieldName(), field);
-        }
-      }
-
-      /**
-       * Find the _Fields constant that matches fieldId, or null if its not found.
-       */
-      public static _Fields findByThriftId(int fieldId) {
-        switch(fieldId) {
-          case 1: // REQ
-            return REQ;
-          default:
-            return null;
-        }
-      }
-
-      /**
-       * Find the _Fields constant that matches fieldId, throwing an exception
-       * if it is not found.
-       */
-      public static _Fields findByThriftIdOrThrow(int fieldId) {
-        _Fields fields = findByThriftId(fieldId);
-        if (fields == null) throw new IllegalArgumentException("Field " + fieldId + " doesn't exist!");
-        return fields;
-      }
-
-      /**
-       * Find the _Fields constant that matches name, or null if its not found.
-       */
-      public static _Fields findByName(String name) {
-        return byName.get(name);
-      }
-
-      private final short _thriftId;
-      private final String _fieldName;
-
-      _Fields(short thriftId, String fieldName) {
-        _thriftId = thriftId;
-        _fieldName = fieldName;
-      }
-
-      public short getThriftFieldId() {
-        return _thriftId;
-      }
-
-      public String getFieldName() {
-        return _fieldName;
-      }
-    }
-
-    // isset id assignments
-    public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
-    static {
-      Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
-      tmpMap.put(_Fields.REQ, new org.apache.thrift.meta_data.FieldMetaData("req", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, BulkTripDurationRequest.class)));
-      metaDataMap = Collections.unmodifiableMap(tmpMap);
-      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(GetManyTripDurations_args.class, metaDataMap);
-    }
-
-    public GetManyTripDurations_args() {
-    }
-
-    public GetManyTripDurations_args(
-      BulkTripDurationRequest req)
-    {
-      this();
-      this.req = req;
-    }
-
-    /**
-     * Performs a deep copy on <i>other</i>.
-     */
-    public GetManyTripDurations_args(GetManyTripDurations_args other) {
-      if (other.isSetReq()) {
-        this.req = new BulkTripDurationRequest(other.req);
-      }
-    }
-
-    public GetManyTripDurations_args deepCopy() {
-      return new GetManyTripDurations_args(this);
-    }
-
-    @Override
-    public void clear() {
-      this.req = null;
-    }
-
-    public BulkTripDurationRequest getReq() {
-      return this.req;
-    }
-
-    public void setReq(BulkTripDurationRequest req) {
-      this.req = req;
-    }
-
-    public void unsetReq() {
-      this.req = null;
-    }
-
-    /** Returns true if field req is set (has been assigned a value) and false otherwise */
-    public boolean isSetReq() {
-      return this.req != null;
-    }
-
-    public void setReqIsSet(boolean value) {
-      if (!value) {
-        this.req = null;
-      }
-    }
-
-    public void setFieldValue(_Fields field, Object value) {
-      switch (field) {
-      case REQ:
-        if (value == null) {
-          unsetReq();
-        } else {
-          setReq((BulkTripDurationRequest)value);
-        }
-        break;
-
-      }
-    }
-
-    public Object getFieldValue(_Fields field) {
-      switch (field) {
-      case REQ:
-        return getReq();
-
-      }
-      throw new IllegalStateException();
-    }
-
-    /** Returns true if field corresponding to fieldID is set (has been assigned a value) and false otherwise */
-    public boolean isSet(_Fields field) {
-      if (field == null) {
-        throw new IllegalArgumentException();
-      }
-
-      switch (field) {
-      case REQ:
-        return isSetReq();
-      }
-      throw new IllegalStateException();
-    }
-
-    @Override
-    public boolean equals(Object that) {
-      if (that == null)
-        return false;
-      if (that instanceof GetManyTripDurations_args)
-        return this.equals((GetManyTripDurations_args)that);
-      return false;
-    }
-
-    public boolean equals(GetManyTripDurations_args that) {
-      if (that == null)
-        return false;
-
-      boolean this_present_req = true && this.isSetReq();
-      boolean that_present_req = true && that.isSetReq();
-      if (this_present_req || that_present_req) {
-        if (!(this_present_req && that_present_req))
-          return false;
-        if (!this.req.equals(that.req))
-          return false;
-      }
-
-      return true;
-    }
-
-    @Override
-    public int hashCode() {
-      return 0;
-    }
-
-    public int compareTo(GetManyTripDurations_args other) {
-      if (!getClass().equals(other.getClass())) {
-        return getClass().getName().compareTo(other.getClass().getName());
-      }
-
-      int lastComparison = 0;
-      GetManyTripDurations_args typedOther = (GetManyTripDurations_args)other;
-
-      lastComparison = Boolean.valueOf(isSetReq()).compareTo(typedOther.isSetReq());
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-      if (isSetReq()) {
-        lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.req, typedOther.req);
-        if (lastComparison != 0) {
-          return lastComparison;
-        }
-      }
-      return 0;
-    }
-
-    public _Fields fieldForId(int fieldId) {
-      return _Fields.findByThriftId(fieldId);
-    }
-
-    public void read(org.apache.thrift.protocol.TProtocol iprot) throws org.apache.thrift.TException {
-      schemes.get(iprot.getScheme()).getScheme().read(iprot, this);
-    }
-
-    public void write(org.apache.thrift.protocol.TProtocol oprot) throws org.apache.thrift.TException {
-      schemes.get(oprot.getScheme()).getScheme().write(oprot, this);
-    }
-
-    @Override
-    public String toString() {
-      StringBuilder sb = new StringBuilder("GetManyTripDurations_args(");
-      boolean first = true;
-
-      sb.append("req:");
-      if (this.req == null) {
-        sb.append("null");
-      } else {
-        sb.append(this.req);
-      }
-      first = false;
-      sb.append(")");
-      return sb.toString();
-    }
-
-    public void validate() throws org.apache.thrift.TException {
-      // check for required fields
-    }
-
-    private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
-      try {
-        write(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(out)));
-      } catch (org.apache.thrift.TException te) {
-        throw new java.io.IOException(te);
-      }
-    }
-
-    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
-      try {
-        read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
-      } catch (org.apache.thrift.TException te) {
-        throw new java.io.IOException(te);
-      }
-    }
-
-    private static class GetManyTripDurations_argsStandardSchemeFactory implements SchemeFactory {
-      public GetManyTripDurations_argsStandardScheme getScheme() {
-        return new GetManyTripDurations_argsStandardScheme();
-      }
-    }
-
-    private static class GetManyTripDurations_argsStandardScheme extends StandardScheme<GetManyTripDurations_args> {
-
-      public void read(org.apache.thrift.protocol.TProtocol iprot, GetManyTripDurations_args struct) throws org.apache.thrift.TException {
-        org.apache.thrift.protocol.TField schemeField;
-        iprot.readStructBegin();
-        while (true)
-        {
-          schemeField = iprot.readFieldBegin();
-          if (schemeField.type == org.apache.thrift.protocol.TType.STOP) { 
-            break;
-          }
-          switch (schemeField.id) {
-            case 1: // REQ
-              if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
-                struct.req = new BulkTripDurationRequest();
-                struct.req.read(iprot);
-                struct.setReqIsSet(true);
-              } else { 
-                org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
-              }
-              break;
-            default:
-              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
-          }
-          iprot.readFieldEnd();
-        }
-        iprot.readStructEnd();
-        struct.validate();
-      }
-
-      public void write(org.apache.thrift.protocol.TProtocol oprot, GetManyTripDurations_args struct) throws org.apache.thrift.TException {
-        struct.validate();
-
-        oprot.writeStructBegin(STRUCT_DESC);
-        if (struct.req != null) {
-          oprot.writeFieldBegin(REQ_FIELD_DESC);
-          struct.req.write(oprot);
-          oprot.writeFieldEnd();
-        }
-        oprot.writeFieldStop();
-        oprot.writeStructEnd();
-      }
-
-    }
-
-    private static class GetManyTripDurations_argsTupleSchemeFactory implements SchemeFactory {
-      public GetManyTripDurations_argsTupleScheme getScheme() {
-        return new GetManyTripDurations_argsTupleScheme();
-      }
-    }
-
-    private static class GetManyTripDurations_argsTupleScheme extends TupleScheme<GetManyTripDurations_args> {
-
-      @Override
-      public void write(org.apache.thrift.protocol.TProtocol prot, GetManyTripDurations_args struct) throws org.apache.thrift.TException {
-        TTupleProtocol oprot = (TTupleProtocol) prot;
-        BitSet optionals = new BitSet();
-        if (struct.isSetReq()) {
-          optionals.set(0);
-        }
-        oprot.writeBitSet(optionals, 1);
-        if (struct.isSetReq()) {
-          struct.req.write(oprot);
-        }
-      }
-
-      @Override
-      public void read(org.apache.thrift.protocol.TProtocol prot, GetManyTripDurations_args struct) throws org.apache.thrift.TException {
-        TTupleProtocol iprot = (TTupleProtocol) prot;
-        BitSet incoming = iprot.readBitSet(1);
-        if (incoming.get(0)) {
-          struct.req = new BulkTripDurationRequest();
-          struct.req.read(iprot);
-          struct.setReqIsSet(true);
-        }
-      }
-    }
-
-  }
-
-  public static class GetManyTripDurations_result implements org.apache.thrift.TBase<GetManyTripDurations_result, GetManyTripDurations_result._Fields>, java.io.Serializable, Cloneable   {
-    private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("GetManyTripDurations_result");
-
-    private static final org.apache.thrift.protocol.TField SUCCESS_FIELD_DESC = new org.apache.thrift.protocol.TField("success", org.apache.thrift.protocol.TType.STRUCT, (short)0);
-
-    private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
-    static {
-      schemes.put(StandardScheme.class, new GetManyTripDurations_resultStandardSchemeFactory());
-      schemes.put(TupleScheme.class, new GetManyTripDurations_resultTupleSchemeFactory());
-    }
-
-    private BulkTripDurationResponse success; // required
+    private FindNearestVertexResponse success; // required
 
     /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
     public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -2445,16 +1552,16 @@ public class OTPService {
     static {
       Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
       tmpMap.put(_Fields.SUCCESS, new org.apache.thrift.meta_data.FieldMetaData("success", org.apache.thrift.TFieldRequirementType.DEFAULT, 
-          new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, BulkTripDurationResponse.class)));
+          new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, FindNearestVertexResponse.class)));
       metaDataMap = Collections.unmodifiableMap(tmpMap);
-      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(GetManyTripDurations_result.class, metaDataMap);
+      org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(FindNearestVertex_result.class, metaDataMap);
     }
 
-    public GetManyTripDurations_result() {
+    public FindNearestVertex_result() {
     }
 
-    public GetManyTripDurations_result(
-      BulkTripDurationResponse success)
+    public FindNearestVertex_result(
+      FindNearestVertexResponse success)
     {
       this();
       this.success = success;
@@ -2463,14 +1570,14 @@ public class OTPService {
     /**
      * Performs a deep copy on <i>other</i>.
      */
-    public GetManyTripDurations_result(GetManyTripDurations_result other) {
+    public FindNearestVertex_result(FindNearestVertex_result other) {
       if (other.isSetSuccess()) {
-        this.success = new BulkTripDurationResponse(other.success);
+        this.success = new FindNearestVertexResponse(other.success);
       }
     }
 
-    public GetManyTripDurations_result deepCopy() {
-      return new GetManyTripDurations_result(this);
+    public FindNearestVertex_result deepCopy() {
+      return new FindNearestVertex_result(this);
     }
 
     @Override
@@ -2478,11 +1585,11 @@ public class OTPService {
       this.success = null;
     }
 
-    public BulkTripDurationResponse getSuccess() {
+    public FindNearestVertexResponse getSuccess() {
       return this.success;
     }
 
-    public void setSuccess(BulkTripDurationResponse success) {
+    public void setSuccess(FindNearestVertexResponse success) {
       this.success = success;
     }
 
@@ -2507,7 +1614,7 @@ public class OTPService {
         if (value == null) {
           unsetSuccess();
         } else {
-          setSuccess((BulkTripDurationResponse)value);
+          setSuccess((FindNearestVertexResponse)value);
         }
         break;
 
@@ -2540,12 +1647,12 @@ public class OTPService {
     public boolean equals(Object that) {
       if (that == null)
         return false;
-      if (that instanceof GetManyTripDurations_result)
-        return this.equals((GetManyTripDurations_result)that);
+      if (that instanceof FindNearestVertex_result)
+        return this.equals((FindNearestVertex_result)that);
       return false;
     }
 
-    public boolean equals(GetManyTripDurations_result that) {
+    public boolean equals(FindNearestVertex_result that) {
       if (that == null)
         return false;
 
@@ -2566,13 +1673,13 @@ public class OTPService {
       return 0;
     }
 
-    public int compareTo(GetManyTripDurations_result other) {
+    public int compareTo(FindNearestVertex_result other) {
       if (!getClass().equals(other.getClass())) {
         return getClass().getName().compareTo(other.getClass().getName());
       }
 
       int lastComparison = 0;
-      GetManyTripDurations_result typedOther = (GetManyTripDurations_result)other;
+      FindNearestVertex_result typedOther = (FindNearestVertex_result)other;
 
       lastComparison = Boolean.valueOf(isSetSuccess()).compareTo(typedOther.isSetSuccess());
       if (lastComparison != 0) {
@@ -2601,7 +1708,7 @@ public class OTPService {
 
     @Override
     public String toString() {
-      StringBuilder sb = new StringBuilder("GetManyTripDurations_result(");
+      StringBuilder sb = new StringBuilder("FindNearestVertex_result(");
       boolean first = true;
 
       sb.append("success:");
@@ -2635,15 +1742,15 @@ public class OTPService {
       }
     }
 
-    private static class GetManyTripDurations_resultStandardSchemeFactory implements SchemeFactory {
-      public GetManyTripDurations_resultStandardScheme getScheme() {
-        return new GetManyTripDurations_resultStandardScheme();
+    private static class FindNearestVertex_resultStandardSchemeFactory implements SchemeFactory {
+      public FindNearestVertex_resultStandardScheme getScheme() {
+        return new FindNearestVertex_resultStandardScheme();
       }
     }
 
-    private static class GetManyTripDurations_resultStandardScheme extends StandardScheme<GetManyTripDurations_result> {
+    private static class FindNearestVertex_resultStandardScheme extends StandardScheme<FindNearestVertex_result> {
 
-      public void read(org.apache.thrift.protocol.TProtocol iprot, GetManyTripDurations_result struct) throws org.apache.thrift.TException {
+      public void read(org.apache.thrift.protocol.TProtocol iprot, FindNearestVertex_result struct) throws org.apache.thrift.TException {
         org.apache.thrift.protocol.TField schemeField;
         iprot.readStructBegin();
         while (true)
@@ -2655,7 +1762,7 @@ public class OTPService {
           switch (schemeField.id) {
             case 0: // SUCCESS
               if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
-                struct.success = new BulkTripDurationResponse();
+                struct.success = new FindNearestVertexResponse();
                 struct.success.read(iprot);
                 struct.setSuccessIsSet(true);
               } else { 
@@ -2671,7 +1778,7 @@ public class OTPService {
         struct.validate();
       }
 
-      public void write(org.apache.thrift.protocol.TProtocol oprot, GetManyTripDurations_result struct) throws org.apache.thrift.TException {
+      public void write(org.apache.thrift.protocol.TProtocol oprot, FindNearestVertex_result struct) throws org.apache.thrift.TException {
         struct.validate();
 
         oprot.writeStructBegin(STRUCT_DESC);
@@ -2686,16 +1793,16 @@ public class OTPService {
 
     }
 
-    private static class GetManyTripDurations_resultTupleSchemeFactory implements SchemeFactory {
-      public GetManyTripDurations_resultTupleScheme getScheme() {
-        return new GetManyTripDurations_resultTupleScheme();
+    private static class FindNearestVertex_resultTupleSchemeFactory implements SchemeFactory {
+      public FindNearestVertex_resultTupleScheme getScheme() {
+        return new FindNearestVertex_resultTupleScheme();
       }
     }
 
-    private static class GetManyTripDurations_resultTupleScheme extends TupleScheme<GetManyTripDurations_result> {
+    private static class FindNearestVertex_resultTupleScheme extends TupleScheme<FindNearestVertex_result> {
 
       @Override
-      public void write(org.apache.thrift.protocol.TProtocol prot, GetManyTripDurations_result struct) throws org.apache.thrift.TException {
+      public void write(org.apache.thrift.protocol.TProtocol prot, FindNearestVertex_result struct) throws org.apache.thrift.TException {
         TTupleProtocol oprot = (TTupleProtocol) prot;
         BitSet optionals = new BitSet();
         if (struct.isSetSuccess()) {
@@ -2708,11 +1815,11 @@ public class OTPService {
       }
 
       @Override
-      public void read(org.apache.thrift.protocol.TProtocol prot, GetManyTripDurations_result struct) throws org.apache.thrift.TException {
+      public void read(org.apache.thrift.protocol.TProtocol prot, FindNearestVertex_result struct) throws org.apache.thrift.TException {
         TTupleProtocol iprot = (TTupleProtocol) prot;
         BitSet incoming = iprot.readBitSet(1);
         if (incoming.get(0)) {
-          struct.success = new BulkTripDurationResponse();
+          struct.success = new FindNearestVertexResponse();
           struct.success.read(iprot);
           struct.setSuccessIsSet(true);
         }

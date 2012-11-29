@@ -1,5 +1,6 @@
 package org.opentripplanner.api.thrift.util;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 
@@ -102,6 +103,18 @@ public class RoutingRequestBuilder {
 	 */
 	public RoutingRequestBuilder setTravelModes(TravelModeSet modes) {
 		routingRequest.setModes(modes.toTraverseModeSet());
+		return this;
+	}
+	
+	/**
+	 * Overwrite the set of allowed TravelModes.
+	 * 
+	 * @param modes
+	 * @return
+	 */
+	public RoutingRequestBuilder setTravelModes(Collection<TravelMode> modes) {
+		TravelModeSet modeSet = new TravelModeSet(modes);
+		routingRequest.setModes(modeSet.toTraverseModeSet());
 		return this;
 	}
 

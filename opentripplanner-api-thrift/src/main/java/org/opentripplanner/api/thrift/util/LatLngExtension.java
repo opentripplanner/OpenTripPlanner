@@ -25,6 +25,17 @@ public class LatLngExtension extends LatLng {
 		this();
 		setCoordinate(c);
 	}
+	
+	/**
+	 * Copy constructor...
+	 * @param other
+	 */
+	public LatLngExtension(LatLng other) {
+		this();
+		
+		setLat(other.getLat());
+		setLng(other.getLng());
+	}
 
 	/**
 	 * Set lat and lng correctly mapping y, x = lat, lng
@@ -35,5 +46,14 @@ public class LatLngExtension extends LatLng {
 		// lat, lng = y, x
 		setLat(c.y);
 		setLng(c.x);
+	}
+	
+	/**
+	 * Create a coordinate.
+	 * 
+	 * @return
+	 */
+	public Coordinate toCoordinate() {
+		return new Coordinate(getLng(), getLat());
 	}
 }
