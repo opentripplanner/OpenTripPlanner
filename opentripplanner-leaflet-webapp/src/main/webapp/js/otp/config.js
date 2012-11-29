@@ -68,5 +68,7 @@ otp.config = {
     //addThisPubId    : 'your-addthis-id',
     //addThisTitle    : 'Your title for AddThis sharing messages',
     
+    timeFormat  : "h:mma",
+    dateFormat  : "MMM. Do YYYY"
 };
 
