@@ -13,7 +13,7 @@
 
 package org.opentripplanner.api.thrift.util;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -24,7 +24,7 @@ import org.opentripplanner.routing.graph.Graph;
  * 
  * @author flamholz
  */
-public class GraphVertexExtensionTest extends TestCase {
+public class GraphVertexExtensionTest {
 	private Graph _graph;
 
 	@Before

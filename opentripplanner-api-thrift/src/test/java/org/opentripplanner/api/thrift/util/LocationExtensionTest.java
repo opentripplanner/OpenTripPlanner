@@ -13,8 +13,9 @@
 
 package org.opentripplanner.api.thrift.util;
 
-import junit.framework.TestCase;
+import static org.junit.Assert.*;
 
+import org.junit.Test;
 import org.opentripplanner.api.thrift.definition.LatLng;
 import org.opentripplanner.api.thrift.definition.Location;
 
@@ -25,8 +26,9 @@ import com.vividsolutions.jts.geom.Coordinate;
  * 
  * @author flamholz
  */
-public class LocationExtensionTest extends TestCase {
+public class LocationExtensionTest {
 
+	@Test
 	public void testMakeLocation() {
 		Coordinate c = new Coordinate(1.2, 2.3);
 		Location loc = new LocationExtension(c);
@@ -43,8 +45,8 @@ public class LocationExtensionTest extends TestCase {
 	}
 
 	private void assertCoordEquals(Coordinate c, LatLng ll) {
-		assertEquals(c.x, ll.getLng());
-		assertEquals(c.y, ll.getLat());
+		assertEquals(c.x, ll.getLng(), 1e-7);
+		assertEquals(c.y, ll.getLat(), 1e-7);
 	}
 
 }
