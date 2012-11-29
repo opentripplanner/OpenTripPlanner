@@ -37,7 +37,7 @@ otp.core.Map = otp.Class({
             zoom : (otp.config.initZoom || 2)
         }
         if(otp.config.minZoom) _.extend(mapProps, { minZoom : otp.config.minZoom });
-        if(otp.config.maxZoom) _.extend(mapProps, { maxZoom : otp.config.minZoom });
+        if(otp.config.maxZoom) _.extend(mapProps, { maxZoom : otp.config.maxZoom });
 
         this.lmap = new L.Map('map', mapProps);
 
