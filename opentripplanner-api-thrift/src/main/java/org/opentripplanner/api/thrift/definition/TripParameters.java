@@ -42,8 +42,8 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
     schemes.put(TupleScheme.class, new TripParametersTupleSchemeFactory());
   }
 
-  private Location origin; // required
-  private Location destination; // required
+  private org.opentripplanner.api.thrift.definition.Location origin; // required
+  private org.opentripplanner.api.thrift.definition.Location destination; // required
   private long start_time; // optional
   private long arrive_by; // optional
   private Set<TravelMode> allowed_modes; // optional
@@ -127,9 +127,9 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
     tmpMap.put(_Fields.ORIGIN, new org.apache.thrift.meta_data.FieldMetaData("origin", org.apache.thrift.TFieldRequirementType.REQUIRED, 
-        new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, Location.class)));
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT        , "Location")));
     tmpMap.put(_Fields.DESTINATION, new org.apache.thrift.meta_data.FieldMetaData("destination", org.apache.thrift.TFieldRequirementType.REQUIRED, 
-        new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, Location.class)));
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT        , "Location")));
     tmpMap.put(_Fields.START_TIME, new org.apache.thrift.meta_data.FieldMetaData("start_time", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I64)));
     tmpMap.put(_Fields.ARRIVE_BY, new org.apache.thrift.meta_data.FieldMetaData("arrive_by", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
@@ -145,8 +145,8 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
   }
 
   public TripParameters(
-    Location origin,
-    Location destination)
+    org.opentripplanner.api.thrift.definition.Location origin,
+    org.opentripplanner.api.thrift.definition.Location destination)
   {
     this();
     this.origin = origin;
@@ -160,10 +160,10 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
     __isset_bit_vector.clear();
     __isset_bit_vector.or(other.__isset_bit_vector);
     if (other.isSetOrigin()) {
-      this.origin = new Location(other.origin);
+      this.origin = other.origin;
     }
     if (other.isSetDestination()) {
-      this.destination = new Location(other.destination);
+      this.destination = other.destination;
     }
     this.start_time = other.start_time;
     this.arrive_by = other.arrive_by;
@@ -191,11 +191,11 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
     this.allowed_modes = null;
   }
 
-  public Location getOrigin() {
+  public org.opentripplanner.api.thrift.definition.Location getOrigin() {
     return this.origin;
   }
 
-  public void setOrigin(Location origin) {
+  public void setOrigin(org.opentripplanner.api.thrift.definition.Location origin) {
     this.origin = origin;
   }
 
@@ -214,11 +214,11 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
     }
   }
 
-  public Location getDestination() {
+  public org.opentripplanner.api.thrift.definition.Location getDestination() {
     return this.destination;
   }
 
-  public void setDestination(Location destination) {
+  public void setDestination(org.opentripplanner.api.thrift.definition.Location destination) {
     this.destination = destination;
   }
 
@@ -325,7 +325,7 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
       if (value == null) {
         unsetOrigin();
       } else {
-        setOrigin((Location)value);
+        setOrigin((org.opentripplanner.api.thrift.definition.Location)value);
       }
       break;
 
@@ -333,7 +333,7 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
       if (value == null) {
         unsetDestination();
       } else {
-        setDestination((Location)value);
+        setDestination((org.opentripplanner.api.thrift.definition.Location)value);
       }
       break;
 
@@ -641,7 +641,7 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
         switch (schemeField.id) {
           case 1: // ORIGIN
             if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
-              struct.origin = new Location();
+              struct.origin = new org.opentripplanner.api.thrift.definition.Location();
               struct.origin.read(iprot);
               struct.setOriginIsSet(true);
             } else { 
@@ -650,7 +650,7 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
             break;
           case 2: // DESTINATION
             if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
-              struct.destination = new Location();
+              struct.destination = new org.opentripplanner.api.thrift.definition.Location();
               struct.destination.read(iprot);
               struct.setDestinationIsSet(true);
             } else { 
@@ -788,10 +788,10 @@ public class TripParameters implements org.apache.thrift.TBase<TripParameters, T
     @Override
     public void read(org.apache.thrift.protocol.TProtocol prot, TripParameters struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
-      struct.origin = new Location();
+      struct.origin = new org.opentripplanner.api.thrift.definition.Location();
       struct.origin.read(iprot);
       struct.setOriginIsSet(true);
-      struct.destination = new Location();
+      struct.destination = new org.opentripplanner.api.thrift.definition.Location();
       struct.destination.read(iprot);
       struct.setDestinationIsSet(true);
       BitSet incoming = iprot.readBitSet(3);

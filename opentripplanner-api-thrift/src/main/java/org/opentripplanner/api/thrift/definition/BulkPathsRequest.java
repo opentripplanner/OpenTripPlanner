@@ -39,8 +39,8 @@ public class BulkPathsRequest implements org.apache.thrift.TBase<BulkPathsReques
     schemes.put(TupleScheme.class, new BulkPathsRequestTupleSchemeFactory());
   }
 
-  private List<TripParameters> trips; // required
-  private PathOptions options; // optional
+  private List<org.opentripplanner.api.thrift.definition.TripParameters> trips; // required
+  private org.opentripplanner.api.thrift.definition.PathOptions options; // optional
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -110,9 +110,9 @@ public class BulkPathsRequest implements org.apache.thrift.TBase<BulkPathsReques
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
     tmpMap.put(_Fields.TRIPS, new org.apache.thrift.meta_data.FieldMetaData("trips", org.apache.thrift.TFieldRequirementType.REQUIRED, 
         new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
-            new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, TripParameters.class))));
+            new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT            , "TripParameters"))));
     tmpMap.put(_Fields.OPTIONS, new org.apache.thrift.meta_data.FieldMetaData("options", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
-        new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, PathOptions.class)));
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT        , "PathOptions")));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(BulkPathsRequest.class, metaDataMap);
   }
@@ -121,7 +121,7 @@ public class BulkPathsRequest implements org.apache.thrift.TBase<BulkPathsReques
   }
 
   public BulkPathsRequest(
-    List<TripParameters> trips)
+    List<org.opentripplanner.api.thrift.definition.TripParameters> trips)
   {
     this();
     this.trips = trips;
@@ -132,14 +132,14 @@ public class BulkPathsRequest implements org.apache.thrift.TBase<BulkPathsReques
    */
   public BulkPathsRequest(BulkPathsRequest other) {
     if (other.isSetTrips()) {
-      List<TripParameters> __this__trips = new ArrayList<TripParameters>();
-      for (TripParameters other_element : other.trips) {
-        __this__trips.add(new TripParameters(other_element));
+      List<org.opentripplanner.api.thrift.definition.TripParameters> __this__trips = new ArrayList<org.opentripplanner.api.thrift.definition.TripParameters>();
+      for (org.opentripplanner.api.thrift.definition.TripParameters other_element : other.trips) {
+        __this__trips.add(other_element);
       }
       this.trips = __this__trips;
     }
     if (other.isSetOptions()) {
-      this.options = new PathOptions(other.options);
+      this.options = other.options;
     }
   }
 
@@ -157,22 +157,22 @@ public class BulkPathsRequest implements org.apache.thrift.TBase<BulkPathsReques
     return (this.trips == null) ? 0 : this.trips.size();
   }
 
-  public java.util.Iterator<TripParameters> getTripsIterator() {
+  public java.util.Iterator<org.opentripplanner.api.thrift.definition.TripParameters> getTripsIterator() {
     return (this.trips == null) ? null : this.trips.iterator();
   }
 
-  public void addToTrips(TripParameters elem) {
+  public void addToTrips(org.opentripplanner.api.thrift.definition.TripParameters elem) {
     if (this.trips == null) {
-      this.trips = new ArrayList<TripParameters>();
+      this.trips = new ArrayList<org.opentripplanner.api.thrift.definition.TripParameters>();
     }
     this.trips.add(elem);
   }
 
-  public List<TripParameters> getTrips() {
+  public List<org.opentripplanner.api.thrift.definition.TripParameters> getTrips() {
     return this.trips;
   }
 
-  public void setTrips(List<TripParameters> trips) {
+  public void setTrips(List<org.opentripplanner.api.thrift.definition.TripParameters> trips) {
     this.trips = trips;
   }
 
@@ -191,11 +191,11 @@ public class BulkPathsRequest implements org.apache.thrift.TBase<BulkPathsReques
     }
   }
 
-  public PathOptions getOptions() {
+  public org.opentripplanner.api.thrift.definition.PathOptions getOptions() {
     return this.options;
   }
 
-  public void setOptions(PathOptions options) {
+  public void setOptions(org.opentripplanner.api.thrift.definition.PathOptions options) {
     this.options = options;
   }
 
@@ -220,7 +220,7 @@ public class BulkPathsRequest implements org.apache.thrift.TBase<BulkPathsReques
       if (value == null) {
         unsetTrips();
       } else {
-        setTrips((List<TripParameters>)value);
+        setTrips((List<org.opentripplanner.api.thrift.definition.TripParameters>)value);
       }
       break;
 
@@ -228,7 +228,7 @@ public class BulkPathsRequest implements org.apache.thrift.TBase<BulkPathsReques
       if (value == null) {
         unsetOptions();
       } else {
-        setOptions((PathOptions)value);
+        setOptions((org.opentripplanner.api.thrift.definition.PathOptions)value);
       }
       break;
 
@@ -415,14 +415,14 @@ public class BulkPathsRequest implements org.apache.thrift.TBase<BulkPathsReques
           case 1: // TRIPS
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list32 = iprot.readListBegin();
-                struct.trips = new ArrayList<TripParameters>(_list32.size);
-                for (int _i33 = 0; _i33 < _list32.size; ++_i33)
+                org.apache.thrift.protocol.TList _list0 = iprot.readListBegin();
+                struct.trips = new ArrayList<org.opentripplanner.api.thrift.definition.TripParameters>(_list0.size);
+                for (int _i1 = 0; _i1 < _list0.size; ++_i1)
                 {
-                  TripParameters _elem34; // required
-                  _elem34 = new TripParameters();
-                  _elem34.read(iprot);
-                  struct.trips.add(_elem34);
+                  org.opentripplanner.api.thrift.definition.TripParameters _elem2; // required
+                  _elem2 = new org.opentripplanner.api.thrift.definition.TripParameters();
+                  _elem2.read(iprot);
+                  struct.trips.add(_elem2);
                 }
                 iprot.readListEnd();
               }
@@ -433,7 +433,7 @@ public class BulkPathsRequest implements org.apache.thrift.TBase<BulkPathsReques
             break;
           case 2: // OPTIONS
             if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
-              struct.options = new PathOptions();
+              struct.options = new org.opentripplanner.api.thrift.definition.PathOptions();
               struct.options.read(iprot);
               struct.setOptionsIsSet(true);
             } else { 
@@ -457,9 +457,9 @@ public class BulkPathsRequest implements org.apache.thrift.TBase<BulkPathsReques
         oprot.writeFieldBegin(TRIPS_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.trips.size()));
-          for (TripParameters _iter35 : struct.trips)
+          for (org.opentripplanner.api.thrift.definition.TripParameters _iter3 : struct.trips)
           {
-            _iter35.write(oprot);
+            _iter3.write(oprot);
           }
           oprot.writeListEnd();
         }
@@ -491,9 +491,9 @@ public class BulkPathsRequest implements org.apache.thrift.TBase<BulkPathsReques
       TTupleProtocol oprot = (TTupleProtocol) prot;
       {
         oprot.writeI32(struct.trips.size());
-        for (TripParameters _iter36 : struct.trips)
+        for (org.opentripplanner.api.thrift.definition.TripParameters _iter4 : struct.trips)
         {
-          _iter36.write(oprot);
+          _iter4.write(oprot);
         }
       }
       BitSet optionals = new BitSet();
@@ -510,20 +510,20 @@ public class BulkPathsRequest implements org.apache.thrift.TBase<BulkPathsReques
     public void read(org.apache.thrift.protocol.TProtocol prot, BulkPathsRequest struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
       {
-        org.apache.thrift.protocol.TList _list37 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
-        struct.trips = new ArrayList<TripParameters>(_list37.size);
-        for (int _i38 = 0; _i38 < _list37.size; ++_i38)
+        org.apache.thrift.protocol.TList _list5 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+        struct.trips = new ArrayList<org.opentripplanner.api.thrift.definition.TripParameters>(_list5.size);
+        for (int _i6 = 0; _i6 < _list5.size; ++_i6)
         {
-          TripParameters _elem39; // required
-          _elem39 = new TripParameters();
-          _elem39.read(iprot);
-          struct.trips.add(_elem39);
+          org.opentripplanner.api.thrift.definition.TripParameters _elem7; // required
+          _elem7 = new org.opentripplanner.api.thrift.definition.TripParameters();
+          _elem7.read(iprot);
+          struct.trips.add(_elem7);
         }
       }
       struct.setTripsIsSet(true);
       BitSet incoming = iprot.readBitSet(1);
       if (incoming.get(0)) {
-        struct.options = new PathOptions();
+        struct.options = new org.opentripplanner.api.thrift.definition.PathOptions();
         struct.options.read(iprot);
         struct.setOptionsIsSet(true);
       }

@@ -38,7 +38,7 @@ public class FindPathsResponse implements org.apache.thrift.TBase<FindPathsRespo
     schemes.put(TupleScheme.class, new FindPathsResponseTupleSchemeFactory());
   }
 
-  private TripPaths paths; // required
+  private org.opentripplanner.api.thrift.definition.TripPaths paths; // required
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -103,7 +103,7 @@ public class FindPathsResponse implements org.apache.thrift.TBase<FindPathsRespo
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
     tmpMap.put(_Fields.PATHS, new org.apache.thrift.meta_data.FieldMetaData("paths", org.apache.thrift.TFieldRequirementType.REQUIRED, 
-        new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, TripPaths.class)));
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT        , "TripPaths")));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(FindPathsResponse.class, metaDataMap);
   }
@@ -112,7 +112,7 @@ public class FindPathsResponse implements org.apache.thrift.TBase<FindPathsRespo
   }
 
   public FindPathsResponse(
-    TripPaths paths)
+    org.opentripplanner.api.thrift.definition.TripPaths paths)
   {
     this();
     this.paths = paths;
@@ -123,7 +123,7 @@ public class FindPathsResponse implements org.apache.thrift.TBase<FindPathsRespo
    */
   public FindPathsResponse(FindPathsResponse other) {
     if (other.isSetPaths()) {
-      this.paths = new TripPaths(other.paths);
+      this.paths = other.paths;
     }
   }
 
@@ -136,11 +136,11 @@ public class FindPathsResponse implements org.apache.thrift.TBase<FindPathsRespo
     this.paths = null;
   }
 
-  public TripPaths getPaths() {
+  public org.opentripplanner.api.thrift.definition.TripPaths getPaths() {
     return this.paths;
   }
 
-  public void setPaths(TripPaths paths) {
+  public void setPaths(org.opentripplanner.api.thrift.definition.TripPaths paths) {
     this.paths = paths;
   }
 
@@ -165,7 +165,7 @@ public class FindPathsResponse implements org.apache.thrift.TBase<FindPathsRespo
       if (value == null) {
         unsetPaths();
       } else {
-        setPaths((TripPaths)value);
+        setPaths((org.opentripplanner.api.thrift.definition.TripPaths)value);
       }
       break;
 
@@ -317,7 +317,7 @@ public class FindPathsResponse implements org.apache.thrift.TBase<FindPathsRespo
         switch (schemeField.id) {
           case 1: // PATHS
             if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
-              struct.paths = new TripPaths();
+              struct.paths = new org.opentripplanner.api.thrift.definition.TripPaths();
               struct.paths.read(iprot);
               struct.setPathsIsSet(true);
             } else { 
@@ -365,7 +365,7 @@ public class FindPathsResponse implements org.apache.thrift.TBase<FindPathsRespo
     @Override
     public void read(org.apache.thrift.protocol.TProtocol prot, FindPathsResponse struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
-      struct.paths = new TripPaths();
+      struct.paths = new org.opentripplanner.api.thrift.definition.TripPaths();
       struct.paths.read(iprot);
       struct.setPathsIsSet(true);
     }

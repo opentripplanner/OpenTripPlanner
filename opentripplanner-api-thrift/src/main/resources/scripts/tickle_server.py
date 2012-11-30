@@ -6,6 +6,10 @@ from thrift.transport import TSocket
 from thrift.transport import TTransport
 from thrift.protocol import TBinaryProtocol
 from opentripplanner.api.thrift.definition import OTPService
+from opentripplanner.api.thrift.definition.location.ttypes import Location
+from opentripplanner.api.thrift.definition.trip.ttypes import PathOptions
+from opentripplanner.api.thrift.definition.trip.ttypes import TravelMode
+from opentripplanner.api.thrift.definition.trip.ttypes import TripParameters
 
 import time
 import random
@@ -62,8 +66,8 @@ def Main():
     origin, dest = random.sample(vertices, 2)
     origin_ll = origin.lat_lng
     dest_ll = dest.lat_lng
-    origin_loc = OTPService.Location(lat_lng=origin_ll)
-    dest_loc = OTPService.Location(lat_lng=origin_ll)
+    origin_loc = Location(lat_lng=origin_ll)
+    dest_loc = Location(lat_lng=dest_ll)
     
     # Run a geocoding request
     req = OTPService.FindNearestVertexRequest(location=origin_loc)
@@ -75,10 +79,10 @@ def Main():
     print 'Nearest vertex: ', res.nearest_vertex
     
     # Request a walking trip between them.
-    trip_params = OTPService.TripParameters(
+    trip_params = TripParameters(
         origin=origin_loc, destination=dest_loc,
-        allowed_modes=set([OTPService.TravelMode.WALK]))    
-    path_opts = OTPService.PathOptions(num_paths=1, return_detailed_path=True)
+        allowed_modes=set([TravelMode.WALK]))    
+    path_opts = PathOptions(num_paths=1, return_detailed_path=True)
     req = OTPService.FindPathsRequest(trip=trip_params,
                                       options=path_opts)
     start_t = time.time()
@@ -100,11 +104,11 @@ def Main():
     
     trip_params = []
     for origin, dest in zip(origins, dests):
-        origin_loc = OTPService.Location(lat_lng=origin.lat_lng)
-        dest_loc = OTPService.Location(lat_lng=dest.lat_lng)
-        trip_params.append(OTPService.TripParameters(
+        origin_loc = Location(lat_lng=origin.lat_lng)
+        dest_loc = Location(lat_lng=dest.lat_lng)
+        trip_params.append(TripParameters(
             origin=origin_loc, destination=dest_loc,
-            allowed_modes=set([OTPService.TravelMode.WALK])))
+            allowed_modes=set([TravelMode.WALK])))
 
     req = OTPService.BulkPathsRequest(trips=trip_params,
                                       options=path_opts)

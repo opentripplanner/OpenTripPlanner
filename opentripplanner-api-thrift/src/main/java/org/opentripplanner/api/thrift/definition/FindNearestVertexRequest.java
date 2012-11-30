@@ -39,8 +39,8 @@ public class FindNearestVertexRequest implements org.apache.thrift.TBase<FindNea
     schemes.put(TupleScheme.class, new FindNearestVertexRequestTupleSchemeFactory());
   }
 
-  private Location location; // required
-  private Set<TravelMode> allowed_modes; // optional
+  private org.opentripplanner.api.thrift.definition.Location location; // required
+  private Set<org.opentripplanner.api.thrift.definition.TravelMode> allowed_modes; // optional
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -109,10 +109,10 @@ public class FindNearestVertexRequest implements org.apache.thrift.TBase<FindNea
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
     tmpMap.put(_Fields.LOCATION, new org.apache.thrift.meta_data.FieldMetaData("location", org.apache.thrift.TFieldRequirementType.REQUIRED, 
-        new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, Location.class)));
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT        , "Location")));
     tmpMap.put(_Fields.ALLOWED_MODES, new org.apache.thrift.meta_data.FieldMetaData("allowed_modes", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
         new org.apache.thrift.meta_data.SetMetaData(org.apache.thrift.protocol.TType.SET, 
-            new org.apache.thrift.meta_data.EnumMetaData(org.apache.thrift.protocol.TType.ENUM, TravelMode.class))));
+            new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.ENUM            , "TravelMode"))));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(FindNearestVertexRequest.class, metaDataMap);
   }
@@ -121,7 +121,7 @@ public class FindNearestVertexRequest implements org.apache.thrift.TBase<FindNea
   }
 
   public FindNearestVertexRequest(
-    Location location)
+    org.opentripplanner.api.thrift.definition.Location location)
   {
     this();
     this.location = location;
@@ -132,11 +132,11 @@ public class FindNearestVertexRequest implements org.apache.thrift.TBase<FindNea
    */
   public FindNearestVertexRequest(FindNearestVertexRequest other) {
     if (other.isSetLocation()) {
-      this.location = new Location(other.location);
+      this.location = other.location;
     }
     if (other.isSetAllowed_modes()) {
-      Set<TravelMode> __this__allowed_modes = new HashSet<TravelMode>();
-      for (TravelMode other_element : other.allowed_modes) {
+      Set<org.opentripplanner.api.thrift.definition.TravelMode> __this__allowed_modes = new HashSet<org.opentripplanner.api.thrift.definition.TravelMode>();
+      for (org.opentripplanner.api.thrift.definition.TravelMode other_element : other.allowed_modes) {
         __this__allowed_modes.add(other_element);
       }
       this.allowed_modes = __this__allowed_modes;
@@ -153,11 +153,11 @@ public class FindNearestVertexRequest implements org.apache.thrift.TBase<FindNea
     this.allowed_modes = null;
   }
 
-  public Location getLocation() {
+  public org.opentripplanner.api.thrift.definition.Location getLocation() {
     return this.location;
   }
 
-  public void setLocation(Location location) {
+  public void setLocation(org.opentripplanner.api.thrift.definition.Location location) {
     this.location = location;
   }
 
@@ -180,22 +180,22 @@ public class FindNearestVertexRequest implements org.apache.thrift.TBase<FindNea
     return (this.allowed_modes == null) ? 0 : this.allowed_modes.size();
   }
 
-  public java.util.Iterator<TravelMode> getAllowed_modesIterator() {
+  public java.util.Iterator<org.opentripplanner.api.thrift.definition.TravelMode> getAllowed_modesIterator() {
     return (this.allowed_modes == null) ? null : this.allowed_modes.iterator();
   }
 
-  public void addToAllowed_modes(TravelMode elem) {
+  public void addToAllowed_modes(org.opentripplanner.api.thrift.definition.TravelMode elem) {
     if (this.allowed_modes == null) {
-      this.allowed_modes = new HashSet<TravelMode>();
+      this.allowed_modes = new HashSet<org.opentripplanner.api.thrift.definition.TravelMode>();
     }
     this.allowed_modes.add(elem);
   }
 
-  public Set<TravelMode> getAllowed_modes() {
+  public Set<org.opentripplanner.api.thrift.definition.TravelMode> getAllowed_modes() {
     return this.allowed_modes;
   }
 
-  public void setAllowed_modes(Set<TravelMode> allowed_modes) {
+  public void setAllowed_modes(Set<org.opentripplanner.api.thrift.definition.TravelMode> allowed_modes) {
     this.allowed_modes = allowed_modes;
   }
 
@@ -220,7 +220,7 @@ public class FindNearestVertexRequest implements org.apache.thrift.TBase<FindNea
       if (value == null) {
         unsetLocation();
       } else {
-        setLocation((Location)value);
+        setLocation((org.opentripplanner.api.thrift.definition.Location)value);
       }
       break;
 
@@ -228,7 +228,7 @@ public class FindNearestVertexRequest implements org.apache.thrift.TBase<FindNea
       if (value == null) {
         unsetAllowed_modes();
       } else {
-        setAllowed_modes((Set<TravelMode>)value);
+        setAllowed_modes((Set<org.opentripplanner.api.thrift.definition.TravelMode>)value);
       }
       break;
 
@@ -414,7 +414,7 @@ public class FindNearestVertexRequest implements org.apache.thrift.TBase<FindNea
         switch (schemeField.id) {
           case 1: // LOCATION
             if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
-              struct.location = new Location();
+              struct.location = new org.opentripplanner.api.thrift.definition.Location();
               struct.location.read(iprot);
               struct.setLocationIsSet(true);
             } else { 
@@ -424,13 +424,13 @@ public class FindNearestVertexRequest implements org.apache.thrift.TBase<FindNea
           case 2: // ALLOWED_MODES
             if (schemeField.type == org.apache.thrift.protocol.TType.SET) {
               {
-                org.apache.thrift.protocol.TSet _set48 = iprot.readSetBegin();
-                struct.allowed_modes = new HashSet<TravelMode>(2*_set48.size);
-                for (int _i49 = 0; _i49 < _set48.size; ++_i49)
+                org.apache.thrift.protocol.TSet _set16 = iprot.readSetBegin();
+                struct.allowed_modes = new HashSet<org.opentripplanner.api.thrift.definition.TravelMode>(2*_set16.size);
+                for (int _i17 = 0; _i17 < _set16.size; ++_i17)
                 {
-                  TravelMode _elem50; // required
-                  _elem50 = TravelMode.findByValue(iprot.readI32());
-                  struct.allowed_modes.add(_elem50);
+                  org.opentripplanner.api.thrift.definition.TravelMode _elem18; // required
+                  _elem18 = org.opentripplanner.api.thrift.definition.TravelMode.findByValue(iprot.readI32());
+                  struct.allowed_modes.add(_elem18);
                 }
                 iprot.readSetEnd();
               }
@@ -462,9 +462,9 @@ public class FindNearestVertexRequest implements org.apache.thrift.TBase<FindNea
           oprot.writeFieldBegin(ALLOWED_MODES_FIELD_DESC);
           {
             oprot.writeSetBegin(new org.apache.thrift.protocol.TSet(org.apache.thrift.protocol.TType.I32, struct.allowed_modes.size()));
-            for (TravelMode _iter51 : struct.allowed_modes)
+            for (org.opentripplanner.api.thrift.definition.TravelMode _iter19 : struct.allowed_modes)
             {
-              oprot.writeI32(_iter51.getValue());
+              oprot.writeI32(_iter19.getValue());
             }
             oprot.writeSetEnd();
           }
@@ -497,9 +497,9 @@ public class FindNearestVertexRequest implements org.apache.thrift.TBase<FindNea
       if (struct.isSetAllowed_modes()) {
         {
           oprot.writeI32(struct.allowed_modes.size());
-          for (TravelMode _iter52 : struct.allowed_modes)
+          for (org.opentripplanner.api.thrift.definition.TravelMode _iter20 : struct.allowed_modes)
           {
-            oprot.writeI32(_iter52.getValue());
+            oprot.writeI32(_iter20.getValue());
           }
         }
       }
@@ -508,19 +508,19 @@ public class FindNearestVertexRequest implements org.apache.thrift.TBase<FindNea
     @Override
     public void read(org.apache.thrift.protocol.TProtocol prot, FindNearestVertexRequest struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
-      struct.location = new Location();
+      struct.location = new org.opentripplanner.api.thrift.definition.Location();
       struct.location.read(iprot);
       struct.setLocationIsSet(true);
       BitSet incoming = iprot.readBitSet(1);
       if (incoming.get(0)) {
         {
-          org.apache.thrift.protocol.TSet _set53 = new org.apache.thrift.protocol.TSet(org.apache.thrift.protocol.TType.I32, iprot.readI32());
-          struct.allowed_modes = new HashSet<TravelMode>(2*_set53.size);
-          for (int _i54 = 0; _i54 < _set53.size; ++_i54)
+          org.apache.thrift.protocol.TSet _set21 = new org.apache.thrift.protocol.TSet(org.apache.thrift.protocol.TType.I32, iprot.readI32());
+          struct.allowed_modes = new HashSet<org.opentripplanner.api.thrift.definition.TravelMode>(2*_set21.size);
+          for (int _i22 = 0; _i22 < _set21.size; ++_i22)
           {
-            TravelMode _elem55; // required
-            _elem55 = TravelMode.findByValue(iprot.readI32());
-            struct.allowed_modes.add(_elem55);
+            org.opentripplanner.api.thrift.definition.TravelMode _elem23; // required
+            _elem23 = org.opentripplanner.api.thrift.definition.TravelMode.findByValue(iprot.readI32());
+            struct.allowed_modes.add(_elem23);
           }
         }
         struct.setAllowed_modesIsSet(true);

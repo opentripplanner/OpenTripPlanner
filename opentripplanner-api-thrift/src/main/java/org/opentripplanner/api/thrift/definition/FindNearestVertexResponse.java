@@ -38,7 +38,7 @@ public class FindNearestVertexResponse implements org.apache.thrift.TBase<FindNe
     schemes.put(TupleScheme.class, new FindNearestVertexResponseTupleSchemeFactory());
   }
 
-  private GraphVertex nearest_vertex; // required
+  private org.opentripplanner.api.thrift.definition.GraphVertex nearest_vertex; // optional
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -99,11 +99,12 @@ public class FindNearestVertexResponse implements org.apache.thrift.TBase<FindNe
   }
 
   // isset id assignments
+  private _Fields optionals[] = {_Fields.NEAREST_VERTEX};
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
-    tmpMap.put(_Fields.NEAREST_VERTEX, new org.apache.thrift.meta_data.FieldMetaData("nearest_vertex", org.apache.thrift.TFieldRequirementType.REQUIRED, 
-        new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, GraphVertex.class)));
+    tmpMap.put(_Fields.NEAREST_VERTEX, new org.apache.thrift.meta_data.FieldMetaData("nearest_vertex", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT        , "GraphVertex")));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(FindNearestVertexResponse.class, metaDataMap);
   }
@@ -111,19 +112,12 @@ public class FindNearestVertexResponse implements org.apache.thrift.TBase<FindNe
   public FindNearestVertexResponse() {
   }
 
-  public FindNearestVertexResponse(
-    GraphVertex nearest_vertex)
-  {
-    this();
-    this.nearest_vertex = nearest_vertex;
-  }
-
   /**
    * Performs a deep copy on <i>other</i>.
    */
   public FindNearestVertexResponse(FindNearestVertexResponse other) {
     if (other.isSetNearest_vertex()) {
-      this.nearest_vertex = new GraphVertex(other.nearest_vertex);
+      this.nearest_vertex = other.nearest_vertex;
     }
   }
 
@@ -136,11 +130,11 @@ public class FindNearestVertexResponse implements org.apache.thrift.TBase<FindNe
     this.nearest_vertex = null;
   }
 
-  public GraphVertex getNearest_vertex() {
+  public org.opentripplanner.api.thrift.definition.GraphVertex getNearest_vertex() {
     return this.nearest_vertex;
   }
 
-  public void setNearest_vertex(GraphVertex nearest_vertex) {
+  public void setNearest_vertex(org.opentripplanner.api.thrift.definition.GraphVertex nearest_vertex) {
     this.nearest_vertex = nearest_vertex;
   }
 
@@ -165,7 +159,7 @@ public class FindNearestVertexResponse implements org.apache.thrift.TBase<FindNe
       if (value == null) {
         unsetNearest_vertex();
       } else {
-        setNearest_vertex((GraphVertex)value);
+        setNearest_vertex((org.opentripplanner.api.thrift.definition.GraphVertex)value);
       }
       break;
 
@@ -262,23 +256,21 @@ public class FindNearestVertexResponse implements org.apache.thrift.TBase<FindNe
     StringBuilder sb = new StringBuilder("FindNearestVertexResponse(");
     boolean first = true;
 
-    sb.append("nearest_vertex:");
-    if (this.nearest_vertex == null) {
-      sb.append("null");
-    } else {
-      sb.append(this.nearest_vertex);
+    if (isSetNearest_vertex()) {
+      sb.append("nearest_vertex:");
+      if (this.nearest_vertex == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.nearest_vertex);
+      }
+      first = false;
     }
-    first = false;
     sb.append(")");
     return sb.toString();
   }
 
   public void validate() throws org.apache.thrift.TException {
     // check for required fields
-    if (!isSetNearest_vertex()) {
-      throw new org.apache.thrift.protocol.TProtocolException("Required field 'nearest_vertex' is unset! Struct:" + toString());
-    }
-
   }
 
   private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
@@ -317,7 +309,7 @@ public class FindNearestVertexResponse implements org.apache.thrift.TBase<FindNe
         switch (schemeField.id) {
           case 1: // NEAREST_VERTEX
             if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
-              struct.nearest_vertex = new GraphVertex();
+              struct.nearest_vertex = new org.opentripplanner.api.thrift.definition.GraphVertex();
               struct.nearest_vertex.read(iprot);
               struct.setNearest_vertexIsSet(true);
             } else { 
@@ -338,9 +330,11 @@ public class FindNearestVertexResponse implements org.apache.thrift.TBase<FindNe
 
       oprot.writeStructBegin(STRUCT_DESC);
       if (struct.nearest_vertex != null) {
-        oprot.writeFieldBegin(NEAREST_VERTEX_FIELD_DESC);
-        struct.nearest_vertex.write(oprot);
-        oprot.writeFieldEnd();
+        if (struct.isSetNearest_vertex()) {
+          oprot.writeFieldBegin(NEAREST_VERTEX_FIELD_DESC);
+          struct.nearest_vertex.write(oprot);
+          oprot.writeFieldEnd();
+        }
       }
       oprot.writeFieldStop();
       oprot.writeStructEnd();
@@ -359,15 +353,25 @@ public class FindNearestVertexResponse implements org.apache.thrift.TBase<FindNe
     @Override
     public void write(org.apache.thrift.protocol.TProtocol prot, FindNearestVertexResponse struct) throws org.apache.thrift.TException {
       TTupleProtocol oprot = (TTupleProtocol) prot;
-      struct.nearest_vertex.write(oprot);
+      BitSet optionals = new BitSet();
+      if (struct.isSetNearest_vertex()) {
+        optionals.set(0);
+      }
+      oprot.writeBitSet(optionals, 1);
+      if (struct.isSetNearest_vertex()) {
+        struct.nearest_vertex.write(oprot);
+      }
     }
 
     @Override
     public void read(org.apache.thrift.protocol.TProtocol prot, FindNearestVertexResponse struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
-      struct.nearest_vertex = new GraphVertex();
-      struct.nearest_vertex.read(iprot);
-      struct.setNearest_vertexIsSet(true);
+      BitSet incoming = iprot.readBitSet(1);
+      if (incoming.get(0)) {
+        struct.nearest_vertex = new org.opentripplanner.api.thrift.definition.GraphVertex();
+        struct.nearest_vertex.read(iprot);
+        struct.setNearest_vertexIsSet(true);
+      }
     }
   }
 

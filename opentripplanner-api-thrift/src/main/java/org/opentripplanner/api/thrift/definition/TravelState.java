@@ -40,7 +40,7 @@ public class TravelState implements org.apache.thrift.TBase<TravelState, TravelS
   }
 
   private long arrival_time; // required
-  private GraphVertex vertex; // required
+  private org.opentripplanner.api.thrift.definition.GraphVertex vertex; // required
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -112,7 +112,7 @@ public class TravelState implements org.apache.thrift.TBase<TravelState, TravelS
     tmpMap.put(_Fields.ARRIVAL_TIME, new org.apache.thrift.meta_data.FieldMetaData("arrival_time", org.apache.thrift.TFieldRequirementType.REQUIRED, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I64)));
     tmpMap.put(_Fields.VERTEX, new org.apache.thrift.meta_data.FieldMetaData("vertex", org.apache.thrift.TFieldRequirementType.REQUIRED, 
-        new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, GraphVertex.class)));
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT        , "GraphVertex")));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(TravelState.class, metaDataMap);
   }
@@ -122,7 +122,7 @@ public class TravelState implements org.apache.thrift.TBase<TravelState, TravelS
 
   public TravelState(
     long arrival_time,
-    GraphVertex vertex)
+    org.opentripplanner.api.thrift.definition.GraphVertex vertex)
   {
     this();
     this.arrival_time = arrival_time;
@@ -138,7 +138,7 @@ public class TravelState implements org.apache.thrift.TBase<TravelState, TravelS
     __isset_bit_vector.or(other.__isset_bit_vector);
     this.arrival_time = other.arrival_time;
     if (other.isSetVertex()) {
-      this.vertex = new GraphVertex(other.vertex);
+      this.vertex = other.vertex;
     }
   }
 
@@ -175,11 +175,11 @@ public class TravelState implements org.apache.thrift.TBase<TravelState, TravelS
     __isset_bit_vector.set(__ARRIVAL_TIME_ISSET_ID, value);
   }
 
-  public GraphVertex getVertex() {
+  public org.opentripplanner.api.thrift.definition.GraphVertex getVertex() {
     return this.vertex;
   }
 
-  public void setVertex(GraphVertex vertex) {
+  public void setVertex(org.opentripplanner.api.thrift.definition.GraphVertex vertex) {
     this.vertex = vertex;
   }
 
@@ -212,7 +212,7 @@ public class TravelState implements org.apache.thrift.TBase<TravelState, TravelS
       if (value == null) {
         unsetVertex();
       } else {
-        setVertex((GraphVertex)value);
+        setVertex((org.opentripplanner.api.thrift.definition.GraphVertex)value);
       }
       break;
 
@@ -406,7 +406,7 @@ public class TravelState implements org.apache.thrift.TBase<TravelState, TravelS
             break;
           case 2: // VERTEX
             if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
-              struct.vertex = new GraphVertex();
+              struct.vertex = new org.opentripplanner.api.thrift.definition.GraphVertex();
               struct.vertex.read(iprot);
               struct.setVertexIsSet(true);
             } else { 
@@ -460,7 +460,7 @@ public class TravelState implements org.apache.thrift.TBase<TravelState, TravelS
       TTupleProtocol iprot = (TTupleProtocol) prot;
       struct.arrival_time = iprot.readI64();
       struct.setArrival_timeIsSet(true);
-      struct.vertex = new GraphVertex();
+      struct.vertex = new org.opentripplanner.api.thrift.definition.GraphVertex();
       struct.vertex.read(iprot);
       struct.setVertexIsSet(true);
     }

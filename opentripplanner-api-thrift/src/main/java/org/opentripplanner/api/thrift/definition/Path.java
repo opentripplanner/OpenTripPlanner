@@ -46,7 +46,7 @@ public class Path implements org.apache.thrift.TBase<Path, Path._Fields>, java.i
   private long start_time; // required
   private long end_time; // required
   private List<TravelState> states; // optional
-  private List<GraphEdge> edges; // optional
+  private List<org.opentripplanner.api.thrift.definition.GraphEdge> edges; // optional
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
@@ -138,7 +138,7 @@ public class Path implements org.apache.thrift.TBase<Path, Path._Fields>, java.i
             new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, TravelState.class))));
     tmpMap.put(_Fields.EDGES, new org.apache.thrift.meta_data.FieldMetaData("edges", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
         new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
-            new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, GraphEdge.class))));
+            new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT            , "GraphEdge"))));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(Path.class, metaDataMap);
   }
@@ -177,9 +177,9 @@ public class Path implements org.apache.thrift.TBase<Path, Path._Fields>, java.i
       this.states = __this__states;
     }
     if (other.isSetEdges()) {
-      List<GraphEdge> __this__edges = new ArrayList<GraphEdge>();
-      for (GraphEdge other_element : other.edges) {
-        __this__edges.add(new GraphEdge(other_element));
+      List<org.opentripplanner.api.thrift.definition.GraphEdge> __this__edges = new ArrayList<org.opentripplanner.api.thrift.definition.GraphEdge>();
+      for (org.opentripplanner.api.thrift.definition.GraphEdge other_element : other.edges) {
+        __this__edges.add(other_element);
       }
       this.edges = __this__edges;
     }
@@ -309,22 +309,22 @@ public class Path implements org.apache.thrift.TBase<Path, Path._Fields>, java.i
     return (this.edges == null) ? 0 : this.edges.size();
   }
 
-  public java.util.Iterator<GraphEdge> getEdgesIterator() {
+  public java.util.Iterator<org.opentripplanner.api.thrift.definition.GraphEdge> getEdgesIterator() {
     return (this.edges == null) ? null : this.edges.iterator();
   }
 
-  public void addToEdges(GraphEdge elem) {
+  public void addToEdges(org.opentripplanner.api.thrift.definition.GraphEdge elem) {
     if (this.edges == null) {
-      this.edges = new ArrayList<GraphEdge>();
+      this.edges = new ArrayList<org.opentripplanner.api.thrift.definition.GraphEdge>();
     }
     this.edges.add(elem);
   }
 
-  public List<GraphEdge> getEdges() {
+  public List<org.opentripplanner.api.thrift.definition.GraphEdge> getEdges() {
     return this.edges;
   }
 
-  public void setEdges(List<GraphEdge> edges) {
+  public void setEdges(List<org.opentripplanner.api.thrift.definition.GraphEdge> edges) {
     this.edges = edges;
   }
 
@@ -381,7 +381,7 @@ public class Path implements org.apache.thrift.TBase<Path, Path._Fields>, java.i
       if (value == null) {
         unsetEdges();
       } else {
-        setEdges((List<GraphEdge>)value);
+        setEdges((List<org.opentripplanner.api.thrift.definition.GraphEdge>)value);
       }
       break;
 
@@ -708,11 +708,11 @@ public class Path implements org.apache.thrift.TBase<Path, Path._Fields>, java.i
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
                 org.apache.thrift.protocol.TList _list3 = iprot.readListBegin();
-                struct.edges = new ArrayList<GraphEdge>(_list3.size);
+                struct.edges = new ArrayList<org.opentripplanner.api.thrift.definition.GraphEdge>(_list3.size);
                 for (int _i4 = 0; _i4 < _list3.size; ++_i4)
                 {
-                  GraphEdge _elem5; // required
-                  _elem5 = new GraphEdge();
+                  org.opentripplanner.api.thrift.definition.GraphEdge _elem5; // required
+                  _elem5 = new org.opentripplanner.api.thrift.definition.GraphEdge();
                   _elem5.read(iprot);
                   struct.edges.add(_elem5);
                 }
@@ -764,7 +764,7 @@ public class Path implements org.apache.thrift.TBase<Path, Path._Fields>, java.i
           oprot.writeFieldBegin(EDGES_FIELD_DESC);
           {
             oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.edges.size()));
-            for (GraphEdge _iter7 : struct.edges)
+            for (org.opentripplanner.api.thrift.definition.GraphEdge _iter7 : struct.edges)
             {
               _iter7.write(oprot);
             }
@@ -813,7 +813,7 @@ public class Path implements org.apache.thrift.TBase<Path, Path._Fields>, java.i
       if (struct.isSetEdges()) {
         {
           oprot.writeI32(struct.edges.size());
-          for (GraphEdge _iter9 : struct.edges)
+          for (org.opentripplanner.api.thrift.definition.GraphEdge _iter9 : struct.edges)
           {
             _iter9.write(oprot);
           }
@@ -848,11 +848,11 @@ public class Path implements org.apache.thrift.TBase<Path, Path._Fields>, java.i
       if (incoming.get(1)) {
         {
           org.apache.thrift.protocol.TList _list13 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
-          struct.edges = new ArrayList<GraphEdge>(_list13.size);
+          struct.edges = new ArrayList<org.opentripplanner.api.thrift.definition.GraphEdge>(_list13.size);
           for (int _i14 = 0; _i14 < _list13.size; ++_i14)
           {
-            GraphEdge _elem15; // required
-            _elem15 = new GraphEdge();
+            org.opentripplanner.api.thrift.definition.GraphEdge _elem15; // required
+            _elem15 = new org.opentripplanner.api.thrift.definition.GraphEdge();
             _elem15.read(iprot);
             struct.edges.add(_elem15);
           }

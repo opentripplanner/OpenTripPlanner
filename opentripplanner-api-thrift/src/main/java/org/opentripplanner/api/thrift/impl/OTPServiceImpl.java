@@ -17,7 +17,6 @@ import org.opentripplanner.api.thrift.definition.FindPathsResponse;
 import org.opentripplanner.api.thrift.definition.GraphVertex;
 import org.opentripplanner.api.thrift.definition.GraphVerticesRequest;
 import org.opentripplanner.api.thrift.definition.GraphVerticesResponse;
-import org.opentripplanner.api.thrift.definition.NoPathFoundError;
 import org.opentripplanner.api.thrift.definition.OTPService;
 import org.opentripplanner.api.thrift.definition.PathOptions;
 import org.opentripplanner.api.thrift.definition.TripParameters;

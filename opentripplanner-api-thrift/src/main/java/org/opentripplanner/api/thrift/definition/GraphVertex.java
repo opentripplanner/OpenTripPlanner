@@ -43,7 +43,7 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
   }
 
   private String label; // required
-  private LatLng lat_lng; // optional
+  private org.opentripplanner.api.thrift.definition.LatLng lat_lng; // optional
   private String name; // optional
   private int in_degree; // optional
   private int out_degree; // optional
@@ -129,7 +129,7 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
     tmpMap.put(_Fields.LABEL, new org.apache.thrift.meta_data.FieldMetaData("label", org.apache.thrift.TFieldRequirementType.REQUIRED, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
     tmpMap.put(_Fields.LAT_LNG, new org.apache.thrift.meta_data.FieldMetaData("lat_lng", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
-        new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, LatLng.class)));
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT        , "LatLng")));
     tmpMap.put(_Fields.NAME, new org.apache.thrift.meta_data.FieldMetaData("name", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
     tmpMap.put(_Fields.IN_DEGREE, new org.apache.thrift.meta_data.FieldMetaData("in_degree", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
@@ -160,7 +160,7 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
       this.label = other.label;
     }
     if (other.isSetLat_lng()) {
-      this.lat_lng = new LatLng(other.lat_lng);
+      this.lat_lng = other.lat_lng;
     }
     if (other.isSetName()) {
       this.name = other.name;
@@ -207,11 +207,11 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
     }
   }
 
-  public LatLng getLat_lng() {
+  public org.opentripplanner.api.thrift.definition.LatLng getLat_lng() {
     return this.lat_lng;
   }
 
-  public void setLat_lng(LatLng lat_lng) {
+  public void setLat_lng(org.opentripplanner.api.thrift.definition.LatLng lat_lng) {
     this.lat_lng = lat_lng;
   }
 
@@ -311,7 +311,7 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
       if (value == null) {
         unsetLat_lng();
       } else {
-        setLat_lng((LatLng)value);
+        setLat_lng((org.opentripplanner.api.thrift.definition.LatLng)value);
       }
       break;
 
@@ -625,7 +625,7 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
             break;
           case 2: // LAT_LNG
             if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
-              struct.lat_lng = new LatLng();
+              struct.lat_lng = new org.opentripplanner.api.thrift.definition.LatLng();
               struct.lat_lng.read(iprot);
               struct.setLat_lngIsSet(true);
             } else { 
@@ -751,7 +751,7 @@ public class GraphVertex implements org.apache.thrift.TBase<GraphVertex, GraphVe
       struct.setLabelIsSet(true);
       BitSet incoming = iprot.readBitSet(4);
       if (incoming.get(0)) {
-        struct.lat_lng = new LatLng();
+        struct.lat_lng = new org.opentripplanner.api.thrift.definition.LatLng();
         struct.lat_lng.read(iprot);
         struct.setLat_lngIsSet(true);
       }
