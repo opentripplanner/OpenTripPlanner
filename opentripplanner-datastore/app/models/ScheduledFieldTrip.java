@@ -20,6 +20,13 @@ public class ScheduledFieldTrip extends Model {
     @Column(nullable=false)
     public Date timeStamp;
 
+    @PrePersist
+    public void prePersist() {
+        if (timeStamp == null) {
+            timeStamp = new Date();
+        }
+    }
+
     /** When the trip is scheduled to depart, which is not 
         necessarily the time that any of the users actually depart.
         This is in local time.
@@ -71,6 +78,7 @@ public class ScheduledFieldTrip extends Model {
         return passengers == (int)query.getSingleResult();
     }
 
+
     public ScheduledFieldTrip(String createdBy, Date departure, String origin, String destination, 
                      String description, int passengers) {
         this.createdBy = createdBy;
@@ -81,7 +89,6 @@ public class ScheduledFieldTrip extends Model {
         this.destination = destination;
         this.description = description;
         this.passengers = passengers;
-        this.timeStamp = new Date();
     }
 
     public String toString() {
