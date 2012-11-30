@@ -73,9 +73,14 @@ public class ScheduledFieldTrip extends Model {
     
 
     public boolean isScheduled() {
-        Query query = JPA.em().createQuery("select sum(passengers) from GroupItinerary where fieldTripId = ?");
-        query.setParameter(0, this.id);
-        return passengers == (int)query.getSingleResult();
+        Query query = JPA.em().createQuery("select sum(passengers) from GroupItinerary where fieldTrip_Id = ?");
+        query.setParameter(1, this.id);
+        Object result = query.getSingleResult();
+        if (result == null) {
+            //for some idiotic reason, the sum of an empty list is null rather than zero.
+            return false;
+        }
+        return passengers == (int) result;
     }
 
 
