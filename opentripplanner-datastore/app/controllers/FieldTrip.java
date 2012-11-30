@@ -43,6 +43,14 @@ public class FieldTrip extends Application {
     }
 
     public static void newTrip(ScheduledFieldTrip trip) {
+        //TODO: is setting id to null the right way to ensure that an
+        //existing trip is not overwritten?
+        trip.id = null;
+        User user = getUser();
+        if (!user.canScheduleFieldTrips()) {
+            //TODO: is this safe if those itineraries exist?
+            trip.groupItineraries.clear();
+        }
         trip.save();
         Long id = trip.id;
         render(id);
