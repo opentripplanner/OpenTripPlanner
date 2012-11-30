@@ -236,5 +236,18 @@ public class ThreadedBidirectionalHeuristic implements RemainingWeightHeuristic 
         LOG.debug("hit stops: {}", stopStates);
         return stopStates;
     }
+ 
+    public static class Factory implements RemainingWeightHeuristicFactory {
+        @Override
+        public RemainingWeightHeuristic getInstanceForSearch(RoutingRequest opt) {
+            if (opt.getModes().isTransit()) {
+                LOG.debug("Transit itinerary requested.");
+                return new ThreadedBidirectionalHeuristic (opt.rctx.graph);
+            } else {
+                LOG.debug("Non-transit itinerary requested.");
+                return new DefaultRemainingWeightHeuristic();
+            }
+        }
+    }
     
 }
