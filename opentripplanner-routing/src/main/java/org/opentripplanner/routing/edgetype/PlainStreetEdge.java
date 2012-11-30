@@ -65,8 +65,6 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
     private StreetTraversalPermission permission;
 
-    private String id;
-
     private int streetClass = CLASS_OTHERPATH;
 
     public boolean back;
@@ -438,17 +436,9 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         return wheelchairAccessible;
     }
 
-    public String getId() {
-        return id;
-    }
-
     private void writeObject(ObjectOutputStream out) throws IOException {
         id = null; 
         out.defaultWriteObject();
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     @Override

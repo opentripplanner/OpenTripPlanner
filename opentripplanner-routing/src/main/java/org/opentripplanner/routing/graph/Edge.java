@@ -23,11 +23,13 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlTransient;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.patch.Patch;
 
 import com.vividsolutions.jts.geom.LineString;
@@ -40,6 +42,9 @@ public abstract class Edge implements Serializable {
 
 	private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
+	@Getter @Setter
+	protected String id;
+
 	protected Vertex fromv;
 
 	protected Vertex tov;
@@ -47,11 +52,27 @@ public abstract class Edge implements Serializable {
 	private List<Patch> patches;
 
 	protected Edge(Vertex v1, Vertex v2) {
-		if (v1 == null || v2 == null)
-			throw new IllegalStateException(this.getClass()
-					+ " constructed with null vertex : " + v1 + " " + v2);
+		this(v1, v2, null);
+	}
+
+	/**
+	 * Constructor with label.
+	 * 
+	 * @param v1
+	 * @param v2
+	 * @param label if null or empty, ignored.
+	 */
+	protected Edge(Vertex v1, Vertex v2, String id) {
+		if (v1 == null || v2 == null) {
+			String err = String.format(
+					"%s constructed with null vertex : %s %s", this.getClass(),
+					v1, v2);
+			throw new IllegalStateException(err);
+		}
+		
 		this.fromv = v1;
 		this.tov = v2;
+		
 		// if (! vertexTypesValid()) {
 		// throw new IllegalStateException(this.getClass() +
 		// " constructed with bad vertex types");
@@ -59,6 +80,10 @@ public abstract class Edge implements Serializable {
 
 		fromv.addOutgoing(this);
 		tov.addIncoming(this);
+
+		if (id != null && id.length() > 0) {
+			this.id = id;
+		}
 	}
 
 	public Vertex getFromVertex() {
@@ -126,8 +151,12 @@ public abstract class Edge implements Serializable {
 	 */
 	public int detach() {
 		int nDetached = 0;
-		if (detachFrom()) { ++nDetached; }
-		if (detachTo()) { ++nDetached; }
+		if (detachFrom()) {
+			++nDetached;
+		}
+		if (detachTo()) {
+			++nDetached;
+		}
 		return nDetached;
 	}
 
@@ -219,7 +248,11 @@ public abstract class Edge implements Serializable {
 	}
 
 	public String toString() {
-		return getClass().getName() + "(" + fromv + " -> " + tov + ")";
+		if (id != null) {
+			return String.format("%s:%s (%s -> %s)", getClass().getName(),
+					id, fromv, tov);
+		}
+		return String.format("%s (%s -> %s)", getClass().getName(), fromv, tov);
 	}
 
 	// The next few functions used to live in EdgeNarrative, which has now been
