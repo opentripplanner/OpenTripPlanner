@@ -13,9 +13,11 @@ import play.db.jpa.*;
 public class ScheduledFieldTrip extends Model {
  
     /** The username of the user who created this trip */
+    @Column(nullable=false)
     public String createdBy;
 
     /** When the trip was created */
+    @Column(nullable=false)
     public Date timeStamp;
 
     /** When the trip is scheduled to depart, which is not 
@@ -23,11 +25,13 @@ public class ScheduledFieldTrip extends Model {
         This is in local time.
     */
     @Temporal(TemporalType.TIME)
+    @Column(nullable=false)
     public Date departure;
 
     /** Service day for the trip (service days are defined in local time, and it
         is assumed that all trips for a given field trip happen on the same service day) */
     @Temporal(TemporalType.DATE)
+    @Column(nullable=false)
     public Date serviceDay;
 
     /**
@@ -48,6 +52,8 @@ public class ScheduledFieldTrip extends Model {
      */
     public String teacher;
 
+    @Column(nullable=false)
+    public boolean mailed = false;
 
     /** The number of passengers on the trip.  A trip is not complete
         unless passengers == sum(passengers) over all group itineraries
