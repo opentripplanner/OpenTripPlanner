@@ -71,20 +71,13 @@ public class SimplifiedPathServiceImpl implements PathService {
             options.rctx.pathParsers = new PathParser[] { new Parser() };
         }
 
-        options.setMaxTransfers(Integer.MAX_VALUE);
+        // ideally reset walk distance after initializing heuristic with specified maxWalk
         options.setMaxWalkDistance(Double.MAX_VALUE);
-        //options.setMaxWalkDistance(60000);
-        options.setWalkBoardCost(60*20);
-        options.setBikeBoardCost(60*20);
-        options.setWalkReluctance(1.25);
-        options.setTransferSlack(60*4);
-        options.setBoardSlack(60*2);
-        options.setAlightSlack(60*2);
+        LOG.debug("rreq={}", options);
         
         // always use the threaded heuristic
         ThreadedBidirectionalHeuristic heuristic = 
                 new ThreadedBidirectionalHeuristic(options.rctx.graph);
-
         options.rctx.remainingWeightHeuristic = heuristic;
         long searchBeginTime = System.currentTimeMillis();
         LOG.debug("BEGIN SEARCH");
