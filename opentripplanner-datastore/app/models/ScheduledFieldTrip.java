@@ -101,7 +101,7 @@ public class ScheduledFieldTrip extends Model {
         calendar.setTime(departure);
         String timeString = String.format("%d:%02d %s", calendar.get(Calendar.HOUR),
                                           calendar.get(Calendar.MINUTE),
-                                          calendar.get(Calendar.AM_PM));
+                                          (calendar.get(Calendar.AM_PM) == 0 ? "AM" : "PM"));
         String scheduled = isScheduled() ? "scheduled" : "unscheduled";
         return timeString + " " + description + " (" + passengers + " passengers) " + scheduled;
     }
