@@ -44,6 +44,7 @@ public class Application extends Controller {
         if (user == null) {
             Logger.debug("no user in cache");
             user = User.find("byUsername", username).first();
+            Cache.set(username, user);
         }
         return user;
     }
