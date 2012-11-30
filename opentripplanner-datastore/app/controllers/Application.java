@@ -25,14 +25,10 @@ public class Application extends Controller {
 
         String username = params.get("userName");
         String password = params.get("password");
-        User user = Cache.get(username, User.class);
+        User user = getUser(username);
         if (user == null) {
-            Logger.debug("no user in cache");
-            user = User.find("byUsername", username).first();
-            if (user == null) {
-                Logger.debug("no user by this username: count = %s", User.count());
-                forbidden();
-            }
+            Logger.debug("no user by this username: count = %s", User.count());
+            forbidden();
         }
         if (user.checkPassword(password)) {
             request.user = username;
@@ -43,7 +39,16 @@ public class Application extends Controller {
         }
     }
 
+    static User getUser(String username) {
+        User user = Cache.get(username, User.class);
+        if (user == null) {
+            Logger.debug("no user in cache");
+            user = User.find("byUsername", username).first();
+        }
+        return user;
+    }
+
     static User getUser() {
-        return User.find("byUsername", request.user).first();
+        return getUser(request.user);
     }
 }
