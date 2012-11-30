@@ -1,7 +1,23 @@
 Field trips for ${monthName} ${day}, ${year}:
 <ul>
-#{list items:fieldTrips, as:'trip'}
-    <li class="tripLink" data-tripid="${trip.id}">${trip}</li>
+#{list items:fieldTrips, as:'fieldTrip'}
+    <li class="tripLink" data-tripid="${fieldTrip.id}">${fieldTrip}
+      <div class="itineraryList">
+        #{list items:fieldTrip.groupItineraries, as:'itinerary'}
+        <div class="itinerary">
+          ${itinerary.passengers} passengers on: </br>
+          #{list items:itinerary.trips, as:'groupTrip'}
+          <div class="groupTrip">
+            Route: ${trip.trip.route}<br/>
+            Depart: ${depart}<br/>
+            Arrive: ${arrive}<br/>
+          </div>
+          #{/list}
+          <div class="trip">
+        </div>
+        #{/list}
+      </div>
+    </li>
 #{/list}
 </ul>
 
