@@ -27,7 +27,7 @@ public class Application extends Controller {
         String password = params.get("password");
         User user = getUser(username);
         if (user == null) {
-            Logger.debug("no user by this username: count = %s", User.count());
+            Logger.debug("no user by this username: %s (count = %s)", username, User.count());
             forbidden();
         }
         if (user.checkPassword(password)) {
