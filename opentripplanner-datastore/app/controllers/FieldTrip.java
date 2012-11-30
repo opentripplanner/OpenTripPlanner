@@ -3,6 +3,7 @@ package controllers;
 import play.*;
 import play.mvc.*;
 
+import java.text.DateFormatSymbols;
 import java.util.*;
 
 import models.*;
@@ -30,11 +31,14 @@ public class FieldTrip extends Application {
     public static void getCalendar(int year, int month, int day) {
         List<FieldTrip> fieldTrips;
 
-        fieldTrips = ScheduledFieldTrip.find("year(departure) = ? and month(departure) = ? and day(departure) = ? " +
+        fieldTrips = ScheduledFieldTrip.find("year(serviceDay) = ? and month(serviceDay) = ? and day(serviceDay) = ? " +
                                               "order by departure", 
                                               year, month, day).fetch();
 
-        renderJSON(fieldTrips);
+        DateFormatSymbols dfs = new DateFormatSymbols();
+        String[] months = dfs.getMonths();
+        String monthName = months[month - 1];
+        render(fieldTrips, year, month, monthName, day);
     }
 
     public static void getFieldTrip(int id) {
@@ -53,7 +57,7 @@ public class FieldTrip extends Application {
         }
         trip.save();
         Long id = trip.id;
-        render(id);
+        renderJSON(id);
     }
 
     public static void addTripFeedback(FieldTripFeedback feedback) {
