@@ -34,6 +34,7 @@ public class Trip extends Model {
             save();
             return this;
         } catch (PersistenceException e) {
+            JPA.em().clear();
             Trip trip = Trip.find("agencyId = ? and tripId = ?", agencyId, tripId).first();
             return trip;
         }
