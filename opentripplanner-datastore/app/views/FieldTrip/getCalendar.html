@@ -1,7 +1,7 @@
 Field trips for ${monthName} ${day}, ${year}:
 <ul>
 #{list items:fieldTrips, as:'trip'}
-    <li>${trip}</li>
+    <li class="tripLink" data-tripid="${trip.id}">${trip}</li>
 #{/list}
 </ul>
 
