@@ -29,7 +29,7 @@ public class FieldTrip extends Application {
      * y/m/d are the day for which we would like a calendar.
      */
     public static void getCalendar(int year, int month, int day) {
-        List<FieldTrip> fieldTrips;
+        List<ScheduledFieldTrip> fieldTrips;
 
         fieldTrips = ScheduledFieldTrip.find("year(serviceDay) = ? and month(serviceDay) = ? and day(serviceDay) = ? " +
                                               "order by departure", 
