@@ -47,10 +47,14 @@ public class User extends Model {
     public String email;
 
     /** The role is one of admin, calltaker, field trip scheduler, or teacher */
+    @Column(nullable=false)
     public String role;
 
     public boolean isAdmin() {
         return role.equals("admin");
     }
 
+    public boolean canScheduleFieldTrips() {
+        return isAdmin() || role.equals("field trip scheduler");
+    }
 }

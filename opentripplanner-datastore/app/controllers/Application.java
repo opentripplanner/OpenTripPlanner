@@ -19,7 +19,7 @@ public class Application extends Controller {
         Http.Response.current().headers.put("Access-Control-Allow-Origin",hd);      
     }
 
-    @Before
+    @Before(priority=0)
     public static void checkPassword() {
         request.user = null;
 
@@ -36,6 +36,7 @@ public class Application extends Controller {
         }
         if (user.checkPassword(password)) {
             request.user = username;
+            Logger.debug("Logged in %s", user.userName);
         } else {
             Logger.debug("bad password");
             forbidden();

@@ -7,8 +7,17 @@ import java.util.*;
 
 import models.*;
 
+
+
 public class FieldTrip extends Application {
 
+    @Before(unless={"newTrip","addTripFeedback"}, priority=1)
+    public static void checkLogin () {
+        User user = getUser();
+        if (!user.canScheduleFieldTrips()) {
+            forbidden();
+        }
+    }
 
     public static void index() {
         //index at present does nothing

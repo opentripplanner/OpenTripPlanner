@@ -2,6 +2,6 @@ User(admin):
     userName: admin
     email: admin@example.com
     password: secret
-
+    role: admin
 
  
