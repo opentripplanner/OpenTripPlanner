@@ -29,7 +29,7 @@ public class EdgeTest {
 
 	@Test
 	public void testConstruct() {
-		String id = "fake_id";
+		int id = 1;
 		Vertex head = new SimpleConcreteVertex(
 				_graph, "head", 47.669457, -122.387577);
 		Vertex tail = new SimpleConcreteVertex(
@@ -57,9 +57,9 @@ public class EdgeTest {
 	@Test
 	public void testGetSetId() {
 		Edge e = makeSimpleEdge();
-		assertNull(e.getId());
+		assertEquals(-1, e.getId());
 
-		String id = "fake_id";
+		int id = 1;
 		e.setId(id);
 		assertEquals(id, e.getId());
 	}

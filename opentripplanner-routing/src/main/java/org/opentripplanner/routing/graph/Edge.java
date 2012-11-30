@@ -42,8 +42,11 @@ public abstract class Edge implements Serializable {
 
 	private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
+	/**
+	 * Identifier of the edge. Negative means not set. 
+	 */
 	@Getter @Setter
-	protected String id;
+	protected int id = -1;
 
 	protected Vertex fromv;
 
@@ -52,17 +55,6 @@ public abstract class Edge implements Serializable {
 	private List<Patch> patches;
 
 	protected Edge(Vertex v1, Vertex v2) {
-		this(v1, v2, null);
-	}
-
-	/**
-	 * Constructor with label.
-	 * 
-	 * @param v1
-	 * @param v2
-	 * @param label if null or empty, ignored.
-	 */
-	protected Edge(Vertex v1, Vertex v2, String id) {
 		if (v1 == null || v2 == null) {
 			String err = String.format(
 					"%s constructed with null vertex : %s %s", this.getClass(),
@@ -80,10 +72,18 @@ public abstract class Edge implements Serializable {
 
 		fromv.addOutgoing(this);
 		tov.addIncoming(this);
+	}
 
-		if (id != null && id.length() > 0) {
-			this.id = id;
-		}
+	/**
+	 * Constructor with label.
+	 * 
+	 * @param v1
+	 * @param v2
+	 * @param label if null or empty, ignored.
+	 */
+	protected Edge(Vertex v1, Vertex v2, int id) {
+		this(v1, v2);
+		this.id = id;
 	}
 
 	public Vertex getFromVertex() {
@@ -248,7 +248,7 @@ public abstract class Edge implements Serializable {
 	}
 
 	public String toString() {
-		if (id != null) {
+		if (id >= 0) {
 			return String.format("%s:%s (%s -> %s)", getClass().getName(),
 					id, fromv, tov);
 		}

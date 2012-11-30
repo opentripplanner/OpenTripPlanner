@@ -40,7 +40,7 @@ public class SimpleConcreteEdge extends Edge {
      * @param v2
      * @param id
      */
-    public SimpleConcreteEdge(Vertex v1, Vertex v2, String id) {
+    public SimpleConcreteEdge(Vertex v1, Vertex v2, int id) {
     	super(v1, v2, id);
     }
 
