@@ -39,6 +39,16 @@ public class ScheduledFieldTrip extends Model {
      */
     public String description;
 
+
+    /** The name of the school.
+     */
+    public String school;
+
+    /** The name of the teacher leading the trip.
+     */
+    public String teacher;
+
+
     /** The number of passengers on the trip.  A trip is not complete
         unless passengers == sum(passengers) over all group itineraries
      */
