@@ -9,6 +9,9 @@
  *
  * This API is NOT designed to be a replica of the REST API in Thrift.
  *
+ * NOTE(flamholz): as this is a draft API it is likely to change a number of times
+ * before it reaches a stable build of OTP. You have been warned.
+ *
  * @version draft
  */
  
