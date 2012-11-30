@@ -136,8 +136,6 @@ otp.widgets.ItinerariesWidget =
     renderItinerary : function(itin, i) {
         var this_ = this;
 
-        console.log(itin);
-        
         // render legs
         var divId = this.moduleId+"-itinAccord-"+i;
         var accordHtml = "<div id='"+divId+"' class='otp-itinAccord'></div>";

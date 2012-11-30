@@ -23,6 +23,7 @@ otp.modules.planner.PlannerModule =
     
     markerLayer     : null,
     pathLayer       : null,
+    pathMarkerLayer : null,
     highlightLayer  : null,
     
     tipWidget       : null,
@@ -31,6 +32,8 @@ otp.modules.planner.PlannerModule =
     
     currentRequest  : null,
     currentHash : null,
+    
+    itinMarkers : [],
 
 
     // current trip query parameters:
@@ -60,11 +63,13 @@ otp.modules.planner.PlannerModule =
         
         this.markerLayer = new L.LayerGroup();
         this.pathLayer = new L.LayerGroup();
+        this.pathMarkerLayer = new L.LayerGroup();
         this.highlightLayer = new L.LayerGroup();
     
         this.addLayer("Highlights", this.highlightLayer);
+        this.addLayer("Start/End Markers", this.markerLayer);
         this.addLayer("Paths", this.pathLayer);
-        this.addLayer("Path Markers", this.markerLayer);
+        this.addLayer("Path Markers", this.pathMarkerLayer);
         
         /*this.mapLayers.push(this.pathLayer);
         this.mapLayers.push(this.markerLayer);
@@ -235,13 +240,32 @@ otp.modules.planner.PlannerModule =
     
     drawItinerary : function(itin) {
         var queryParams = this.lastQueryParams;
-        this.pathLayer.clearLayers(); 
+        this.pathLayer.clearLayers();
+        this.pathMarkerLayer.clearLayers();
+/*        
+        for(m in this.itinMarkers) {
+            console.log("removing marker");
+            this.markerLayer.removeLayer(m);
+        }*/
 
         for(var i=0; i < itin.legs.length; i++) {
-            var polyline = new L.Polyline(otp.util.Polyline.decode(itin.legs[i].legGeometry.points));
-            polyline.setStyle({ color : this.getModeColor(itin.legs[i].mode), weight: 8});
+            var leg = itin.legs[i];
+            var polyline = new L.Polyline(otp.util.Polyline.decode(leg.legGeometry.points));
+            polyline.setStyle({ color : this.getModeColor(leg.mode), weight: 8});
             this.pathLayer.addLayer(polyline);
-            if(itin.legs[i].mode === 'BICYCLE') {
+            if(otp.util.Itin.isTransit(leg.mode)) {
+                var timeIcon = L.divIcon({
+                    className: 'otp-itin-div-icon',
+                    iconSize: [30,30],
+                    iconAnchor: [30,30],
+                    html: '<div class="otp-itin-iconModeSymbol"></div>'+otp.util.Time.formatItinTime(leg.startTime, "h:mm")
+                });
+                var marker = L.marker([leg.from.lat, leg.from.lon], {icon: timeIcon});
+                //this.itinMarkers.push(marker);
+                //marker.addTo(this.markerLayer);
+                this.pathMarkerLayer.addLayer(marker);
+            }
+            else if(itin.legs[i].mode === 'BICYCLE') {
                 if(queryParams.mode === 'WALK,BICYCLE') { // bikeshare trip
                 	polyline.bindPopup('Your '+otp.config.bikeshareName+' route');
                     //var start_and_end_stations = this.processStations(polyline.getLatLngs()[0], polyline.getLatLngs()[polyline.getLatLngs().length-1]);

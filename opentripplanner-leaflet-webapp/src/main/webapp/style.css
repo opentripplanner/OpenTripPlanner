@@ -665,6 +665,21 @@ h6.drag-to-change {
     padding: .8em 0em .8em .5em;
 }
 
+.otp-itin-iconModeSymbol {
+    width: 16px;
+    height: 16px;
+    margin-left: 7px;
+    background: black;
+}
+
+.otp-itin-div-icon {
+    width: 20px;
+    height: 30px;
+    background: white;
+    text-align: center;
+    font-size: 9px;
+}
+
 /* Past Queries Widget */
 
 .otp-pastQueriesWidget {
