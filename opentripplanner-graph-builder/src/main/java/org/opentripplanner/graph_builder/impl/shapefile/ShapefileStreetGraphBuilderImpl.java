@@ -143,17 +143,17 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 LineString geom = toLineString((Geometry) feature.getDefaultGeometry());
 
                 Object o = streetIdConverter.convert(feature);
-                String id = "" + o;
-                if (o != null && seen.contains(id)) {
+                String label = "" + o;
+                if (o != null && seen.contains(label)) {
                     continue;
                 }
-                seen.add(id);
+                seen.add(label);
                 String name = streetNameConverter.convert(feature);
                 Coordinate[] coordinates = geom.getCoordinates();
 
                 if (coordinates.length < 2) {
                     //not a real linestring
-                    log.warn("Bad geometry for street with id " + id + " name " + name);
+                    log.warn("Bad geometry for street with label " + label + " name " + name);
                     continue;
                 }
                 
@@ -198,11 +198,11 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 P2<StreetTraversalPermission> permissions = permissionConverter.convert(feature);
 
                 PlainStreetEdge street = new PlainStreetEdge(startIntersection, endIntersection, geom, name, length, permissions.getFirst(), false);
-                street.setId(id);
+                street.setLabel(label);
 
                 LineString reversed = (LineString) geom.reverse();
                 PlainStreetEdge backStreet = new PlainStreetEdge(endIntersection, startIntersection, reversed, name, length, permissions.getSecond(), true);
-                backStreet.setId(id);
+                backStreet.setLabel(label);
 
                 if (noteConverter != null) {
                 	String note = noteConverter.convert(feature);
