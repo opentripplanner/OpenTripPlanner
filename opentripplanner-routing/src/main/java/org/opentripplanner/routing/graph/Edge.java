@@ -24,13 +24,14 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlTransient;
 
 import lombok.Getter;
-import lombok.Setter;
 
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.patch.Patch;
+import org.opentripplanner.routing.util.IncrementingIdGenerator;
+import org.opentripplanner.routing.util.UniqueIdGenerator;
 
 import com.vividsolutions.jts.geom.LineString;
 
@@ -43,10 +44,15 @@ public abstract class Edge implements Serializable {
 	private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
 	/**
+	 * Generates globally unique edge IDs.
+	 */
+	private static final UniqueIdGenerator<Edge> idGenerator = new IncrementingIdGenerator<Edge>();
+	
+	/**
 	 * Identifier of the edge. Negative means not set. 
 	 */
-	@Getter @Setter
-	protected int id = -1;
+	@Getter
+	private int id;
 
 	protected Vertex fromv;
 
@@ -64,6 +70,7 @@ public abstract class Edge implements Serializable {
 		
 		this.fromv = v1;
 		this.tov = v2;
+		this.id = idGenerator.getId(this);
 		
 		// if (! vertexTypesValid()) {
 		// throw new IllegalStateException(this.getClass() +

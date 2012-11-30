@@ -55,12 +55,8 @@ public class EdgeTest {
 	}
 
 	@Test
-	public void testGetSetId() {
+	public void testGetId() {
 		Edge e = makeSimpleEdge();
-		assertEquals(-1, e.getId());
-
-		int id = 1;
-		e.setId(id);
-		assertEquals(id, e.getId());
+		assertTrue(e.getId() >= 0);
 	}
 }
