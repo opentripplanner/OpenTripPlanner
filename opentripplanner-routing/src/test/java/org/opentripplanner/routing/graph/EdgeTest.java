@@ -29,16 +29,15 @@ public class EdgeTest {
 
 	@Test
 	public void testConstruct() {
-		int id = 1;
 		Vertex head = new SimpleConcreteVertex(
 				_graph, "head", 47.669457, -122.387577);
 		Vertex tail = new SimpleConcreteVertex(
 				_graph, "tail", 47.669462, -122.384739);
-		Edge e = new SimpleConcreteEdge(head, tail, id);
+		Edge e = new SimpleConcreteEdge(head, tail);
 
 		assertEquals(head, e.getFromVertex());
 		assertEquals(tail, e.getToVertex());
-		assertEquals(id, e.getId());
+		assertTrue(e.getId() >= 0);
 	}
 
 	/**

@@ -81,18 +81,6 @@ public abstract class Edge implements Serializable {
 		tov.addIncoming(this);
 	}
 
-	/**
-	 * Constructor with label.
-	 * 
-	 * @param v1
-	 * @param v2
-	 * @param label if null or empty, ignored.
-	 */
-	protected Edge(Vertex v1, Vertex v2, int id) {
-		this(v1, v2);
-		this.id = id;
-	}
-
 	public Vertex getFromVertex() {
 		return fromv;
 	}

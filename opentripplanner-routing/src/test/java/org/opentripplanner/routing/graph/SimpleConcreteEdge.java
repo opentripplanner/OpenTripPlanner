@@ -32,17 +32,6 @@ public class SimpleConcreteEdge extends Edge {
     public SimpleConcreteEdge(Vertex v1, Vertex v2) {
         super(v1, v2);
     }
-    
-    /**
-     * Constructor with ID.
-     * 
-     * @param v1
-     * @param v2
-     * @param id
-     */
-    public SimpleConcreteEdge(Vertex v1, Vertex v2, int id) {
-    	super(v1, v2, id);
-    }
 
     @Override
     public State traverse(State s0) {
