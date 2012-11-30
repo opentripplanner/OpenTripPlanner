@@ -367,6 +367,13 @@ public class TraverseModeSet implements Cloneable, Serializable {
             throw new RuntimeException(e);
         }
     }
+    
+    /**
+     * Clear the mode set so that no modes are included.
+     */
+    public void clear() {
+    	modes = 0;
+    }
 
     /**
      * @param restrictedModes A set of restricted modes

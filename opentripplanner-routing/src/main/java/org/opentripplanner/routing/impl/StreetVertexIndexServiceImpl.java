@@ -32,7 +32,6 @@ import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.NamedPlace;
-import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.FreeEdge;
@@ -296,8 +295,9 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
         public List<StreetEdge> toEdgeList() {
             List<StreetEdge> ret = new ArrayList<StreetEdge>();
-            for (CandidateEdge ce : this)
+            for (CandidateEdge ce : this) {
                 ret.add(ce.edge);
+            }
             return ret;
         }
 
@@ -311,6 +311,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 this.endwise = endwise;
             }
         }
+        
         public Collection<CandidateEdgeBundle> binByDistanceAndAngle() {
             Map<DistanceAndAngle, CandidateEdgeBundle> bins = new HashMap<DistanceAndAngle, CandidateEdgeBundle>(); // (r, theta)
             CANDIDATE: for (CandidateEdge ce : this) {
@@ -374,12 +375,15 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     public CandidateEdgeBundle getClosestEdges(Coordinate coordinate, RoutingRequest request,
             List<Edge> extraEdges, Collection<Edge> routeEdges, boolean possibleTransitLinksOnly) {
         ArrayList<StreetEdge> extraStreets = new ArrayList<StreetEdge>();
-        if (extraEdges != null)
-            for (StreetEdge se : IterableLibrary.filter(extraEdges, StreetEdge.class))
-                extraStreets.add(se);
-
-        for (StreetEdge se : IterableLibrary.filter(graph.getTemporaryEdges(), StreetEdge.class))
+        if (extraEdges != null) {
+            for (StreetEdge se : IterableLibrary.filter(extraEdges, StreetEdge.class)) {
+            	extraStreets.add(se);
+            }
+        }
+            
+        for (StreetEdge se : IterableLibrary.filter(graph.getTemporaryEdges(), StreetEdge.class)) {
             extraStreets.add(se);
+        }
 
         Envelope envelope = new Envelope(coordinate);
 
