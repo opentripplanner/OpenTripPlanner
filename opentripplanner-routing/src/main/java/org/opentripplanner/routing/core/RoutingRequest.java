@@ -471,10 +471,25 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
     }
 
+    /**
+     * Clear the allowed modes.
+     */
+    public void clearModes() {
+    	modes.clear();
+    }
+    
+    /**
+     * Add a TraverseMode to the set of allowed modes.
+     * @param mode
+     */
     public void addMode(TraverseMode mode) { 
         modes.setMode(mode, true); 
     }
-
+    
+    /**
+     * Add multiple modes to the set of allowed modes.
+     * @param mList
+     */
     public void addMode(List<TraverseMode> mList) {
         for (TraverseMode m : mList) {
             addMode(m);

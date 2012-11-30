@@ -89,14 +89,26 @@ public class GraphPath {
         }
     }
 
+    /**
+     * Returns the start time of the trip in seconds since the epoch.
+     * @return
+     */
     public long getStartTime() {
         return states.getFirst().getTime();
     }
 
+    /**
+     * Returns the end time of the trip in seconds since the epoch.
+     * @return
+     */
     public long getEndTime() {
         return states.getLast().getTime();
     }
 
+    /**
+     * Returns the duration of the trip in seconds.
+     * @return
+     */
     public int getDuration() {
         // test to see if it is the same as getStartTime - getEndTime;
         return (int) states.getLast().getElapsedTime();
