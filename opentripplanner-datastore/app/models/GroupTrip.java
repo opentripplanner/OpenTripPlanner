@@ -12,7 +12,7 @@ A segment of a trip which is part of an itinerary
 @Entity
 public class GroupTrip extends Model {
  
-    @ManyToOne
+    @ManyToOne(optional=false)
     public GroupItinerary groupItinerary;
 
     @Temporal(TemporalType.TIME)

@@ -66,10 +66,13 @@ public class FieldTrip extends Application {
         render();
     }
 
-    public static void addItinerary(GroupItinerary itinerary) {
+    public static void addItinerary(long fieldTripId, GroupItinerary itinerary) {
+        ScheduledFieldTrip fieldTrip = ScheduledFieldTrip.findById(fieldTripId);
+        itinerary.fieldTrip = fieldTrip;
+        fieldTrip.groupItineraries.add(itinerary);
         itinerary.save();
         Long id = itinerary.id;
-        render(id);
+        renderJSON(id);
     }
 
     public static void deleteTrip(Long id) {

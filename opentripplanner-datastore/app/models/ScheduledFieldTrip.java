@@ -68,7 +68,7 @@ public class ScheduledFieldTrip extends Model {
     public int passengers;
 
     /** The itineraries for this trip */
-    @OneToMany(mappedBy="fieldTrip")
+    @OneToMany(mappedBy="fieldTrip", cascade=CascadeType.ALL)
     public List<GroupItinerary> groupItineraries;
     
 

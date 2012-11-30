@@ -12,13 +12,13 @@ import play.db.jpa.*;
 public class GroupItinerary extends Model {
 
     /** The trip that this belongs to */
-    @ManyToOne
+    @ManyToOne(optional=false)
     public ScheduledFieldTrip fieldTrip;
 
     /** How many passengers are on this set of trips */
     @Column(nullable=false)
     public int passengers;
 
-    @OneToMany(mappedBy="groupItinerary")
+    @OneToMany(mappedBy="groupItinerary", cascade=CascadeType.ALL)
     public List<GroupTrip> trips;
 }

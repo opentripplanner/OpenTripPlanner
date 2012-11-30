@@ -10,7 +10,7 @@ A stop on a trip for a group
  */
 @Entity
 public class GroupTripStop extends Model {
-    @ManyToOne
+    @ManyToOne(optional=false)
     public GroupTrip groupTrip;
     public int stopIndex;
 }
