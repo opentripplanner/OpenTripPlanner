@@ -1,9 +1,12 @@
 package models;
  
 import java.util.Date;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
+
 import javax.persistence.*;
- 
+
 import play.db.jpa.*;
  
 @Entity
@@ -64,5 +67,14 @@ public class ScheduledFieldTrip extends Model {
         this.passengers = passengers;
         this.timeStamp = new Date();
     }
-    
+
+    public String toString() {
+        GregorianCalendar calendar = new GregorianCalendar();
+        calendar.setTime(departure);
+        String timeString = String.format("%d:%02d %s", calendar.get(Calendar.HOUR),
+                                          calendar.get(Calendar.MINUTE),
+                                          calendar.get(Calendar.AM_PM));
+        String scheduled = isScheduled() ? "scheduled" : "unscheduled";
+        return timeString + " " + description + " (" + passengers + " passengers) " + scheduled;
+    }
 }
