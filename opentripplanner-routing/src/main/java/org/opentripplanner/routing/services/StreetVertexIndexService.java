@@ -20,7 +20,7 @@ import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl.CandidateEdgeBundle;
+import org.opentripplanner.routing.impl.CandidateEdgeBundle;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -28,23 +28,71 @@ import com.vividsolutions.jts.geom.Envelope;
 
 public interface StreetVertexIndexService {
 
-    public Vertex getClosestVertex(final Coordinate location, String name, RoutingRequest request);
+	/**
+	 * Get the closest vertex that can be traversed by this request.
+	 * 
+	 * @param location
+	 *            the location around which to search
+	 * @param name
+	 *            the name to attach to the vertex
+	 * @param request
+	 * @return
+	 */
+	public Vertex getClosestVertex(final Coordinate location, String name,
+			RoutingRequest request);
 
-    public Vertex getClosestVertex(final Coordinate location, String name, RoutingRequest request,
-            List<Edge> extraEdges);
+	/**
+	 * Get the closest vertex that can be traversed by this request.
+	 * 
+	 * @param location
+	 *            the location around which to search
+	 * @param name
+	 *            the name to attach to the vertex
+	 * @param request
+	 * @param extraEdges
+	 *            edges not in the graph that should be included in the search
+	 * @return
+	 */
+	public Vertex getClosestVertex(final Coordinate location, String name,
+			RoutingRequest request, List<Edge> extraEdges);
 
-    public Collection<Vertex> getVerticesForEnvelope(Envelope envelope);
+	/**
+	 * Returns the vertices intersecting with the specified envelope.
+	 * 
+	 * @param envelope
+	 * @return
+	 */
+	public Collection<Vertex> getVerticesForEnvelope(Envelope envelope);
 
-    public CandidateEdgeBundle getClosestEdges(Coordinate coordinate, RoutingRequest options,
-            List<Edge> extraEdges, Collection<Edge> preferredEdges, boolean possibleTransitLinksOnly);
+	/**
+	 * Get the closest edges to this location.
+	 * 
+	 * @param coordinate
+	 *            location around which to search.
+	 * @param options
+	 *            request which must be able to traverse the edges.
+	 * @param extraEdges
+	 *            additional edges to consider (may be null)
+	 * @param preferredEdges
+	 *            edges which are preferred (may be null)
+	 * @param possibleTransitLinksOnly
+	 *            only include possible transit links.
+	 * @return
+	 */
+	public CandidateEdgeBundle getClosestEdges(Coordinate coordinate,
+			RoutingRequest options, List<Edge> extraEdges,
+			Collection<Edge> preferredEdges, boolean possibleTransitLinksOnly);
 
-    public List<TransitStop> getNearbyTransitStops(Coordinate coordinate, double radius);
-    
-    public List<TransitStop> getNearbyTransitStops(Coordinate coordinateOne, Coordinate coordinateTwo);
+	public List<TransitStop> getNearbyTransitStops(Coordinate coordinate,
+			double radius);
 
-    Vertex getVertexForPlace(NamedPlace place, RoutingRequest options);
+	public List<TransitStop> getNearbyTransitStops(Coordinate coordinateOne,
+			Coordinate coordinateTwo);
 
-    Vertex getVertexForPlace(NamedPlace place, RoutingRequest options, Vertex other);
+	Vertex getVertexForPlace(NamedPlace place, RoutingRequest options);
 
-    boolean isAccessible(NamedPlace place, RoutingRequest options);
+	Vertex getVertexForPlace(NamedPlace place, RoutingRequest options,
+			Vertex other);
+
+	boolean isAccessible(NamedPlace place, RoutingRequest options);
 }

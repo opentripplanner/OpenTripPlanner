@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.impl;
 
+import lombok.Getter;
+
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -19,12 +21,22 @@ public class CandidateEdge {
 
     private static final double CAR_PREFERENCE = 100;
 
+    /**
+     * The edge itself.
+     */
     public final StreetEdge edge;
 
     public final StreetVertex endwiseVertex;
 
-    double score;
+    /**
+     * Score of the match. Lower is better.
+     */
+    @Getter
+    protected double score;
 
+    /**
+     * The coordinate of the nearest point on the edge.
+     */
     public final Coordinate nearestPointOnEdge;
 
     public final double directionToEdge;
@@ -75,14 +87,15 @@ public class CandidateEdge {
             }
         } // end loop over segments
 
-        distance = Math.sqrt(bestDist2);//distanceLibrary.distance(p, nearestPointOnEdge);
-
-        if (bestSeg == 0 && Math.abs(bestFrac) < 0.000001)
-            endwiseVertex = (StreetVertex) edge.getFromVertex();
-        else if (bestSeg == numCoords - 2 && Math.abs(bestFrac - 1.0) < 0.000001)
-            endwiseVertex = (StreetVertex) edge.getToVertex();
-        else
-            endwiseVertex = null;
+        distance = Math.sqrt(bestDist2); //distanceLibrary.distance(p, nearestPointOnEdge);
+		if (bestSeg == 0 && Math.abs(bestFrac) < 0.000001) {
+			endwiseVertex = (StreetVertex) edge.getFromVertex();
+		} else if (bestSeg == numCoords - 2
+				   && Math.abs(bestFrac - 1.0) < 0.000001) {
+			endwiseVertex = (StreetVertex) edge.getToVertex();
+		} else {
+			endwiseVertex = null;
+		}
         score = distance * SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_KM * 1000 / 360.0;
         score /= preference;
         if ((e.getStreetClass() & platform) != 0) {
@@ -113,10 +126,11 @@ public class CandidateEdge {
         directionOfEdge = Math.atan2(yd, xd);
         double absDiff = Math.abs(directionToEdge - directionOfEdge);
         directionDifference = Math.min(2 * Math.PI - absDiff, absDiff);
-        if (Double.isNaN(directionToEdge) || Double.isNaN(directionOfEdge)
-                || Double.isNaN(directionDifference)) {
-            StreetVertexIndexServiceImpl._log.warn("direction to/of edge is NaN (0 length?): {}", edge);
-        }
+		if (Double.isNaN(directionToEdge) || Double.isNaN(directionOfEdge)
+				|| Double.isNaN(directionDifference)) {
+			StreetVertexIndexServiceImpl._log.warn(
+					"direction to/of edge is NaN (0 length?): {}", edge);
+		}
     }
 
     public boolean endwise() {
@@ -129,10 +143,6 @@ public class CandidateEdge {
 
     public boolean perpendicular() {
         return !parallel();
-    }
-
-    public double getScore() {
-        return score;
     }
 
     public String toString() {

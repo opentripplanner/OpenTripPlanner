@@ -58,45 +58,65 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
     private ElevationProfileSegment elevationProfileSegment;
 
+    @Getter
     private double length;
 
+    @Getter
     private LineString geometry;
     
+    @Getter @Setter
     private String name;
 
+    @Getter @Setter
     private boolean wheelchairAccessible = true;
 
+    @Getter @Setter
     private StreetTraversalPermission permission;
 
+    @Getter @Setter
     private int streetClass = CLASS_OTHERPATH;
 
     public boolean back;
     
+    @Getter @Setter
     private boolean roundabout = false;
 
+    @Getter
     private Set<Alert> notes;
 
+    @Setter
     private boolean hasBogusName;
 
+    @Getter @Setter
     private boolean noThruTraffic;
 
     /**
      * This street is a staircase
      */
+    @Getter @Setter
     private boolean stairs;
     
-    /** The speed in meters per second that an automobile can traverse this street segment at */
+    /**
+     * The speed (meters / sec) at which an automobile can traverse
+     * this street segment.
+     */
+    @Getter @Setter
     private float carSpeed;
     
     /** This street has a toll */
+    @Getter @Setter
     private boolean toll;
 
+    @Getter
     private Set<Alert> wheelchairNotes;
 
+    @Getter
     private List<TurnRestriction> turnRestrictions = Collections.emptyList();
 
+    @Getter
     public int inAngle;
 
+    @Getter
     public int outAngle;
 
     /**
@@ -208,16 +228,6 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     @Override
     public double getDistance() {
         return length;
-    }
-
-    @Override
-    public LineString getGeometry() {
-        return geometry;
-    }
-
-    @Override
-    public String getName() {
-        return name;
     }
 
     @Override
@@ -419,26 +429,6 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         return elevationProfileSegment.getBicycleSafetyEffectiveLength();
     }
 
-    public double getLength() {
-        return length;
-    }
-
-    public StreetTraversalPermission getPermission() {
-        return permission;
-    }
-
-    public void setPermission(StreetTraversalPermission permission) {
-        this.permission = permission;
-    }
-
-    public void setWheelchairAccessible(boolean wheelchairAccessible) {
-        this.wheelchairAccessible = wheelchairAccessible;
-    }
-
-    public boolean isWheelchairAccessible() {
-        return wheelchairAccessible;
-    }
-
     private void writeObject(ObjectOutputStream out) throws IOException {
         out.defaultWriteObject();
     }
@@ -450,18 +440,6 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
     public void setSlopeOverride(boolean slopeOverride) {
         elevationProfileSegment.setSlopeOverride(slopeOverride);
-    }
-
-    public void setRoundabout(boolean roundabout) {
-        this.roundabout = roundabout;
-    }
-
-    public boolean isRoundabout() {
-        return roundabout;
-    }
-
-    public Set<Alert> getNotes() {
-    	return notes;
     }
     
     public void setNote(Set<Alert> notes) {
@@ -476,45 +454,9 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     public boolean hasBogusName() {
         return hasBogusName;
     }
-    
-    public void setBogusName(boolean hasBogusName) {
-        this.hasBogusName = hasBogusName;
-    }
-
-    public void setNoThruTraffic(boolean noThruTraffic) {
-        this.noThruTraffic = noThruTraffic;
-    }
-
-    public boolean isNoThruTraffic() {
-        return noThruTraffic;
-    }
-
-    public boolean isStairs() {
-        return stairs;
-    }
-
-    public void setStairs(boolean stairs) {
-        this.stairs = stairs;
-    }
-
-    public void setName(String name) {
-       this.name = name;
-    }
 
     public void setWheelchairNote(Set<Alert> wheelchairNotes) {
         this.wheelchairNotes = wheelchairNotes;
-    }
-
-    public Set<Alert> getWheelchairNotes() {
-        return wheelchairNotes;
-    }
-
-    public int getStreetClass() {
-        return streetClass;
-    }
-
-    public void setStreetClass(int streetClass) {
-        this.streetClass = streetClass;
     }
 
     public void addTurnRestriction(TurnRestriction turnRestriction) {
@@ -531,10 +473,6 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public List<TurnRestriction> getTurnRestrictions() {
-        return turnRestrictions;
     }
 
     public boolean canTurnOnto(Edge e, State state, TraverseMode mode) {
@@ -557,29 +495,9 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         return true;
     }
 
-    public int getInAngle() {
-        return inAngle;
-    }
-
-    public int getOutAngle() {
-        return outAngle;
-    }
-
     @Override
     public ElevationProfileSegment getElevationProfileSegment() {
         return elevationProfileSegment;
-    }
-
-    public void setCarSpeed(float carSpeed) {
-        this.carSpeed = carSpeed;         
-    }
-    
-    public float getCarSpeed() {
-        return carSpeed;
-    }
-    
-    public void setToll(boolean toll) {
-        this.toll = toll;
     }
     
     public boolean getToll() {

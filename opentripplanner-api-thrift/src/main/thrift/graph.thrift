@@ -15,21 +15,34 @@ include "location.thrift"
 
 typedef location.LatLng LatLng
 
-
 // A vertex in the graph.
 struct GraphVertex {
+	// Unique label
 	1: required string label;
-	2: optional LatLng lat_lng;
-	3: optional string name;
-	4: optional i32 in_degree;
-	5: optional i32 out_degree;
+
+	// Unique identifier
+	2: required i32 id;
+	
+	// Location of the vertex
+	3: optional LatLng lat_lng;
+	
+	// Name of the vertex
+	4: optional string name;
+
+	// Directed degree
+	5: optional i32 in_degree;
+	6: optional i32 out_degree;
 }
 
 // An edge in the graph.
 struct GraphEdge {
+	// Unique id.
+	1: required i32 id;
+	
 	// Head and tail of the directed edge.
-	1: required GraphVertex head;
-	2: required GraphVertex tail;
+	2: required GraphVertex head;
+	3: required GraphVertex tail;
 
-	// TODO(flamholz): add more fields, like the street name etc.
+	// Name of the dge
+	4: optional string name;
 }
