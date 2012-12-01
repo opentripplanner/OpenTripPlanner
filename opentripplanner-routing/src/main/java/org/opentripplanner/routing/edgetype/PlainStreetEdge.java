@@ -20,6 +20,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.DirectionUtils;
@@ -58,14 +61,12 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     private double length;
 
     private LineString geometry;
-
+    
     private String name;
 
     private boolean wheelchairAccessible = true;
 
     private StreetTraversalPermission permission;
-
-    private String id;
 
     private int streetClass = CLASS_OTHERPATH;
 
@@ -438,17 +439,8 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         return wheelchairAccessible;
     }
 
-    public String getId() {
-        return id;
-    }
-
     private void writeObject(ObjectOutputStream out) throws IOException {
-        id = null; 
         out.defaultWriteObject();
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     @Override
