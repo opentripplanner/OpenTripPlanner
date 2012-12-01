@@ -25,6 +25,9 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -71,6 +74,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     private STRtree intersectionTree;
 
+    @Getter @Setter
     private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     // private static final double SEARCH_RADIUS_M = 100; // meters
@@ -465,13 +469,4 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         }
         return true;
     }
-
-    public DistanceLibrary getDistanceLibrary() {
-        return distanceLibrary;
-    }
-
-    public void setDistanceLibrary(DistanceLibrary distanceLibrary) {
-        this.distanceLibrary = distanceLibrary;
-    }
-
 }

@@ -56,7 +56,12 @@ public interface StreetVertexIndexService {
 	public Vertex getClosestVertex(final Coordinate location, String name,
 			RoutingRequest request, List<Edge> extraEdges);
 
-	
+	/**
+	 * Returns the vertices intersecting with the specified envelope.
+	 * 
+	 * @param envelope
+	 * @return
+	 */
 	public Collection<Vertex> getVerticesForEnvelope(Envelope envelope);
 
 	/**
