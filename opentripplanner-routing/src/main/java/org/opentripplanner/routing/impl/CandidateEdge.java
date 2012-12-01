@@ -87,14 +87,15 @@ public class CandidateEdge {
             }
         } // end loop over segments
 
-        distance = Math.sqrt(bestDist2);//distanceLibrary.distance(p, nearestPointOnEdge);
-
-        if (bestSeg == 0 && Math.abs(bestFrac) < 0.000001)
-            endwiseVertex = (StreetVertex) edge.getFromVertex();
-        else if (bestSeg == numCoords - 2 && Math.abs(bestFrac - 1.0) < 0.000001)
-            endwiseVertex = (StreetVertex) edge.getToVertex();
-        else
-            endwiseVertex = null;
+        distance = Math.sqrt(bestDist2); //distanceLibrary.distance(p, nearestPointOnEdge);
+		if (bestSeg == 0 && Math.abs(bestFrac) < 0.000001) {
+			endwiseVertex = (StreetVertex) edge.getFromVertex();
+		} else if (bestSeg == numCoords - 2
+				   && Math.abs(bestFrac - 1.0) < 0.000001) {
+			endwiseVertex = (StreetVertex) edge.getToVertex();
+		} else {
+			endwiseVertex = null;
+		}
         score = distance * SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_KM * 1000 / 360.0;
         score /= preference;
         if ((e.getStreetClass() & platform) != 0) {
@@ -125,10 +126,11 @@ public class CandidateEdge {
         directionOfEdge = Math.atan2(yd, xd);
         double absDiff = Math.abs(directionToEdge - directionOfEdge);
         directionDifference = Math.min(2 * Math.PI - absDiff, absDiff);
-        if (Double.isNaN(directionToEdge) || Double.isNaN(directionOfEdge)
-                || Double.isNaN(directionDifference)) {
-            StreetVertexIndexServiceImpl._log.warn("direction to/of edge is NaN (0 length?): {}", edge);
-        }
+		if (Double.isNaN(directionToEdge) || Double.isNaN(directionOfEdge)
+				|| Double.isNaN(directionDifference)) {
+			StreetVertexIndexServiceImpl._log.warn(
+					"direction to/of edge is NaN (0 length?): {}", edge);
+		}
     }
 
     public boolean endwise() {

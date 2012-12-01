@@ -66,8 +66,8 @@ public class CandidateEdgeBundle extends ArrayList<CandidateEdge> {
 	}
 
 	public Collection<CandidateEdgeBundle> binByDistanceAndAngle() {
-		Map<DistanceAndAngle, CandidateEdgeBundle> bins = new HashMap<DistanceAndAngle, CandidateEdgeBundle>(); // (r,
-																												// theta)
+		// Map of from distance, angle pairs to bundles of edges.
+		Map<DistanceAndAngle, CandidateEdgeBundle> bins = new HashMap<DistanceAndAngle, CandidateEdgeBundle>();
 		CANDIDATE: for (CandidateEdge ce : this) {
 			for (Entry<DistanceAndAngle, CandidateEdgeBundle> bin : bins
 					.entrySet()) {
