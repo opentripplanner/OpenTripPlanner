@@ -24,9 +24,11 @@ public class GraphEdgeExtension extends GraphEdge {
 	 */
 	public GraphEdgeExtension(Edge e) {
 		super();
-		
+
+		setId(e.getId());
 		setHead(new GraphVertexExtension(e.getFromVertex()));
 		setTail(new GraphVertexExtension(e.getToVertex()));
+		setName(e.getName());
 	}
 
 }

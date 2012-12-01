@@ -30,8 +30,10 @@ import org.slf4j.LoggerFactory;
 public class GraphEdge implements org.apache.thrift.TBase<GraphEdge, GraphEdge._Fields>, java.io.Serializable, Cloneable {
   private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("GraphEdge");
 
-  private static final org.apache.thrift.protocol.TField HEAD_FIELD_DESC = new org.apache.thrift.protocol.TField("head", org.apache.thrift.protocol.TType.STRUCT, (short)1);
-  private static final org.apache.thrift.protocol.TField TAIL_FIELD_DESC = new org.apache.thrift.protocol.TField("tail", org.apache.thrift.protocol.TType.STRUCT, (short)2);
+  private static final org.apache.thrift.protocol.TField ID_FIELD_DESC = new org.apache.thrift.protocol.TField("id", org.apache.thrift.protocol.TType.I32, (short)1);
+  private static final org.apache.thrift.protocol.TField HEAD_FIELD_DESC = new org.apache.thrift.protocol.TField("head", org.apache.thrift.protocol.TType.STRUCT, (short)2);
+  private static final org.apache.thrift.protocol.TField TAIL_FIELD_DESC = new org.apache.thrift.protocol.TField("tail", org.apache.thrift.protocol.TType.STRUCT, (short)3);
+  private static final org.apache.thrift.protocol.TField NAME_FIELD_DESC = new org.apache.thrift.protocol.TField("name", org.apache.thrift.protocol.TType.STRING, (short)4);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
@@ -39,13 +41,17 @@ public class GraphEdge implements org.apache.thrift.TBase<GraphEdge, GraphEdge._
     schemes.put(TupleScheme.class, new GraphEdgeTupleSchemeFactory());
   }
 
+  private int id; // required
   private GraphVertex head; // required
   private GraphVertex tail; // required
+  private String name; // optional
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-    HEAD((short)1, "head"),
-    TAIL((short)2, "tail");
+    ID((short)1, "id"),
+    HEAD((short)2, "head"),
+    TAIL((short)3, "tail"),
+    NAME((short)4, "name");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -60,10 +66,14 @@ public class GraphEdge implements org.apache.thrift.TBase<GraphEdge, GraphEdge._
      */
     public static _Fields findByThriftId(int fieldId) {
       switch(fieldId) {
-        case 1: // HEAD
+        case 1: // ID
+          return ID;
+        case 2: // HEAD
           return HEAD;
-        case 2: // TAIL
+        case 3: // TAIL
           return TAIL;
+        case 4: // NAME
+          return NAME;
         default:
           return null;
       }
@@ -104,13 +114,20 @@ public class GraphEdge implements org.apache.thrift.TBase<GraphEdge, GraphEdge._
   }
 
   // isset id assignments
+  private static final int __ID_ISSET_ID = 0;
+  private BitSet __isset_bit_vector = new BitSet(1);
+  private _Fields optionals[] = {_Fields.NAME};
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+    tmpMap.put(_Fields.ID, new org.apache.thrift.meta_data.FieldMetaData("id", org.apache.thrift.TFieldRequirementType.REQUIRED, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
     tmpMap.put(_Fields.HEAD, new org.apache.thrift.meta_data.FieldMetaData("head", org.apache.thrift.TFieldRequirementType.REQUIRED, 
         new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, GraphVertex.class)));
     tmpMap.put(_Fields.TAIL, new org.apache.thrift.meta_data.FieldMetaData("tail", org.apache.thrift.TFieldRequirementType.REQUIRED, 
         new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, GraphVertex.class)));
+    tmpMap.put(_Fields.NAME, new org.apache.thrift.meta_data.FieldMetaData("name", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRING)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(GraphEdge.class, metaDataMap);
   }
@@ -119,10 +136,13 @@ public class GraphEdge implements org.apache.thrift.TBase<GraphEdge, GraphEdge._
   }
 
   public GraphEdge(
+    int id,
     GraphVertex head,
     GraphVertex tail)
   {
     this();
+    this.id = id;
+    setIdIsSet(true);
     this.head = head;
     this.tail = tail;
   }
@@ -131,11 +151,17 @@ public class GraphEdge implements org.apache.thrift.TBase<GraphEdge, GraphEdge._
    * Performs a deep copy on <i>other</i>.
    */
   public GraphEdge(GraphEdge other) {
+    __isset_bit_vector.clear();
+    __isset_bit_vector.or(other.__isset_bit_vector);
+    this.id = other.id;
     if (other.isSetHead()) {
       this.head = new GraphVertex(other.head);
     }
     if (other.isSetTail()) {
       this.tail = new GraphVertex(other.tail);
+    }
+    if (other.isSetName()) {
+      this.name = other.name;
     }
   }
 
@@ -145,8 +171,33 @@ public class GraphEdge implements org.apache.thrift.TBase<GraphEdge, GraphEdge._
 
   @Override
   public void clear() {
+    setIdIsSet(false);
+    this.id = 0;
     this.head = null;
     this.tail = null;
+    this.name = null;
+  }
+
+  public int getId() {
+    return this.id;
+  }
+
+  public void setId(int id) {
+    this.id = id;
+    setIdIsSet(true);
+  }
+
+  public void unsetId() {
+    __isset_bit_vector.clear(__ID_ISSET_ID);
+  }
+
+  /** Returns true if field id is set (has been assigned a value) and false otherwise */
+  public boolean isSetId() {
+    return __isset_bit_vector.get(__ID_ISSET_ID);
+  }
+
+  public void setIdIsSet(boolean value) {
+    __isset_bit_vector.set(__ID_ISSET_ID, value);
   }
 
   public GraphVertex getHead() {
@@ -195,8 +246,39 @@ public class GraphEdge implements org.apache.thrift.TBase<GraphEdge, GraphEdge._
     }
   }
 
+  public String getName() {
+    return this.name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public void unsetName() {
+    this.name = null;
+  }
+
+  /** Returns true if field name is set (has been assigned a value) and false otherwise */
+  public boolean isSetName() {
+    return this.name != null;
+  }
+
+  public void setNameIsSet(boolean value) {
+    if (!value) {
+      this.name = null;
+    }
+  }
+
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
+    case ID:
+      if (value == null) {
+        unsetId();
+      } else {
+        setId((Integer)value);
+      }
+      break;
+
     case HEAD:
       if (value == null) {
         unsetHead();
@@ -213,16 +295,30 @@ public class GraphEdge implements org.apache.thrift.TBase<GraphEdge, GraphEdge._
       }
       break;
 
+    case NAME:
+      if (value == null) {
+        unsetName();
+      } else {
+        setName((String)value);
+      }
+      break;
+
     }
   }
 
   public Object getFieldValue(_Fields field) {
     switch (field) {
+    case ID:
+      return Integer.valueOf(getId());
+
     case HEAD:
       return getHead();
 
     case TAIL:
       return getTail();
+
+    case NAME:
+      return getName();
 
     }
     throw new IllegalStateException();
@@ -235,10 +331,14 @@ public class GraphEdge implements org.apache.thrift.TBase<GraphEdge, GraphEdge._
     }
 
     switch (field) {
+    case ID:
+      return isSetId();
     case HEAD:
       return isSetHead();
     case TAIL:
       return isSetTail();
+    case NAME:
+      return isSetName();
     }
     throw new IllegalStateException();
   }
@@ -255,6 +355,15 @@ public class GraphEdge implements org.apache.thrift.TBase<GraphEdge, GraphEdge._
   public boolean equals(GraphEdge that) {
     if (that == null)
       return false;
+
+    boolean this_present_id = true;
+    boolean that_present_id = true;
+    if (this_present_id || that_present_id) {
+      if (!(this_present_id && that_present_id))
+        return false;
+      if (this.id != that.id)
+        return false;
+    }
 
     boolean this_present_head = true && this.isSetHead();
     boolean that_present_head = true && that.isSetHead();
@@ -274,6 +383,15 @@ public class GraphEdge implements org.apache.thrift.TBase<GraphEdge, GraphEdge._
         return false;
     }
 
+    boolean this_present_name = true && this.isSetName();
+    boolean that_present_name = true && that.isSetName();
+    if (this_present_name || that_present_name) {
+      if (!(this_present_name && that_present_name))
+        return false;
+      if (!this.name.equals(that.name))
+        return false;
+    }
+
     return true;
   }
 
@@ -290,6 +408,16 @@ public class GraphEdge implements org.apache.thrift.TBase<GraphEdge, GraphEdge._
     int lastComparison = 0;
     GraphEdge typedOther = (GraphEdge)other;
 
+    lastComparison = Boolean.valueOf(isSetId()).compareTo(typedOther.isSetId());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetId()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.id, typedOther.id);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
     lastComparison = Boolean.valueOf(isSetHead()).compareTo(typedOther.isSetHead());
     if (lastComparison != 0) {
       return lastComparison;
@@ -306,6 +434,16 @@ public class GraphEdge implements org.apache.thrift.TBase<GraphEdge, GraphEdge._
     }
     if (isSetTail()) {
       lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.tail, typedOther.tail);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetName()).compareTo(typedOther.isSetName());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetName()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.name, typedOther.name);
       if (lastComparison != 0) {
         return lastComparison;
       }
@@ -330,6 +468,10 @@ public class GraphEdge implements org.apache.thrift.TBase<GraphEdge, GraphEdge._
     StringBuilder sb = new StringBuilder("GraphEdge(");
     boolean first = true;
 
+    sb.append("id:");
+    sb.append(this.id);
+    first = false;
+    if (!first) sb.append(", ");
     sb.append("head:");
     if (this.head == null) {
       sb.append("null");
@@ -345,12 +487,26 @@ public class GraphEdge implements org.apache.thrift.TBase<GraphEdge, GraphEdge._
       sb.append(this.tail);
     }
     first = false;
+    if (isSetName()) {
+      if (!first) sb.append(", ");
+      sb.append("name:");
+      if (this.name == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.name);
+      }
+      first = false;
+    }
     sb.append(")");
     return sb.toString();
   }
 
   public void validate() throws org.apache.thrift.TException {
     // check for required fields
+    if (!isSetId()) {
+      throw new org.apache.thrift.protocol.TProtocolException("Required field 'id' is unset! Struct:" + toString());
+    }
+
     if (!isSetHead()) {
       throw new org.apache.thrift.protocol.TProtocolException("Required field 'head' is unset! Struct:" + toString());
     }
@@ -371,6 +527,8 @@ public class GraphEdge implements org.apache.thrift.TBase<GraphEdge, GraphEdge._
 
   private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
     try {
+      // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
+      __isset_bit_vector = new BitSet(1);
       read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
     } catch (org.apache.thrift.TException te) {
       throw new java.io.IOException(te);
@@ -395,7 +553,15 @@ public class GraphEdge implements org.apache.thrift.TBase<GraphEdge, GraphEdge._
           break;
         }
         switch (schemeField.id) {
-          case 1: // HEAD
+          case 1: // ID
+            if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
+              struct.id = iprot.readI32();
+              struct.setIdIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
+          case 2: // HEAD
             if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
               struct.head = new GraphVertex();
               struct.head.read(iprot);
@@ -404,11 +570,19 @@ public class GraphEdge implements org.apache.thrift.TBase<GraphEdge, GraphEdge._
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
-          case 2: // TAIL
+          case 3: // TAIL
             if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
               struct.tail = new GraphVertex();
               struct.tail.read(iprot);
               struct.setTailIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
+          case 4: // NAME
+            if (schemeField.type == org.apache.thrift.protocol.TType.STRING) {
+              struct.name = iprot.readString();
+              struct.setNameIsSet(true);
             } else { 
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
@@ -426,6 +600,9 @@ public class GraphEdge implements org.apache.thrift.TBase<GraphEdge, GraphEdge._
       struct.validate();
 
       oprot.writeStructBegin(STRUCT_DESC);
+      oprot.writeFieldBegin(ID_FIELD_DESC);
+      oprot.writeI32(struct.id);
+      oprot.writeFieldEnd();
       if (struct.head != null) {
         oprot.writeFieldBegin(HEAD_FIELD_DESC);
         struct.head.write(oprot);
@@ -435,6 +612,13 @@ public class GraphEdge implements org.apache.thrift.TBase<GraphEdge, GraphEdge._
         oprot.writeFieldBegin(TAIL_FIELD_DESC);
         struct.tail.write(oprot);
         oprot.writeFieldEnd();
+      }
+      if (struct.name != null) {
+        if (struct.isSetName()) {
+          oprot.writeFieldBegin(NAME_FIELD_DESC);
+          oprot.writeString(struct.name);
+          oprot.writeFieldEnd();
+        }
       }
       oprot.writeFieldStop();
       oprot.writeStructEnd();
@@ -453,19 +637,35 @@ public class GraphEdge implements org.apache.thrift.TBase<GraphEdge, GraphEdge._
     @Override
     public void write(org.apache.thrift.protocol.TProtocol prot, GraphEdge struct) throws org.apache.thrift.TException {
       TTupleProtocol oprot = (TTupleProtocol) prot;
+      oprot.writeI32(struct.id);
       struct.head.write(oprot);
       struct.tail.write(oprot);
+      BitSet optionals = new BitSet();
+      if (struct.isSetName()) {
+        optionals.set(0);
+      }
+      oprot.writeBitSet(optionals, 1);
+      if (struct.isSetName()) {
+        oprot.writeString(struct.name);
+      }
     }
 
     @Override
     public void read(org.apache.thrift.protocol.TProtocol prot, GraphEdge struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
+      struct.id = iprot.readI32();
+      struct.setIdIsSet(true);
       struct.head = new GraphVertex();
       struct.head.read(iprot);
       struct.setHeadIsSet(true);
       struct.tail = new GraphVertex();
       struct.tail.read(iprot);
       struct.setTailIsSet(true);
+      BitSet incoming = iprot.readBitSet(1);
+      if (incoming.get(0)) {
+        struct.name = iprot.readString();
+        struct.setNameIsSet(true);
+      }
     }
   }
 

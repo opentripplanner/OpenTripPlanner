@@ -53,7 +53,9 @@ public class GraphEdgeExtensionTest {
 	}
 
 	private void assertEdgeEquals(Edge e, GraphEdge ge) {
+		assertEquals(e.getId(), ge.getId());
 		assertTrue(((SimpleVertex) e.getFromVertex()).equals(ge.getHead()));
 		assertTrue(((SimpleVertex) e.getToVertex()).equals(ge.getTail()));
+		assertEquals(e.getName(), ge.getName());
 	}
 }

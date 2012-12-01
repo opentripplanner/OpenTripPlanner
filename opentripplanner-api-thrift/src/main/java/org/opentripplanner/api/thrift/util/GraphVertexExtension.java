@@ -26,6 +26,7 @@ public class GraphVertexExtension extends GraphVertex {
 	public GraphVertexExtension(Vertex v) {
 		super();
 		
+		setId(v.getIndex());
 		setLabel(v.getLabel());
 		Coordinate coord = v.getCoordinate();
 		if (coord != null) {
