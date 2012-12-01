@@ -142,7 +142,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
     private List<OpenStreetMapProvider> _providers = new ArrayList<OpenStreetMapProvider>();
 
-    private Map<Object, Object> _uniques = new HashMap<Object, Object>();
+    private Set<Object> _uniques = new HashSet<Object>();
 
     private WayPropertySet wayPropertySet = new WayPropertySet();
 
@@ -216,12 +216,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
     @SuppressWarnings("unchecked")
     private <T> T unique(T value) {
-        Object v = _uniques.get(value);
-        if (v == null) {
-            _uniques.put(value, value);
-            v = value;
+        if (!_uniques.contains(value)) {
+            _uniques.add(value);
         }
-        return (T) v;
+        return (T) value;
     }
 
     public void setWayPropertySet(WayPropertySet wayDataSet) {
@@ -1102,7 +1100,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         startEndpoint, endEndpoint, line, name, length, areaPermissions, false,
                         carSpeed, edgeList);
 
-                street.setLabel(label);
                 street.setStreetClass(cls);
                 edges.add(street);
 
@@ -1115,7 +1112,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         endEndpoint, startEndpoint, (LineString) line.reverse(), name, length,
                         areaPermissions, true, carSpeed, edgeList);
 
-                backStreet.setLabel(label);
                 backStreet.setStreetClass(cls);
                 edges.add(backStreet);
 
@@ -2351,8 +2347,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             PlainStreetEdge street = edgeFactory
                     .createEdge(_nodes.get(startNode), _nodes.get(endNode), way, start, end,
                             geometry, name, length, permissions, back, carSpeed);
-            street.setLabel(label);
-
+            
             String highway = way.getTag("highway");
             int cls;
             if ("crossing".equals(highway) && !way.isTag("bicycle", "designated")) {

@@ -61,9 +61,6 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     private double length;
 
     private LineString geometry;
-
-    @Getter @Setter
-    private transient String label;
     
     private String name;
 
@@ -443,7 +440,6 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     }
 
     private void writeObject(ObjectOutputStream out) throws IOException {
-        label = null; 
         out.defaultWriteObject();
     }
 

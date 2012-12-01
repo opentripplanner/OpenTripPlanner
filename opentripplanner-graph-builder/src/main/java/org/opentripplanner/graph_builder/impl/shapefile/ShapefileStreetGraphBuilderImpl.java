@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.geotools.data.FeatureSource;
@@ -119,8 +120,8 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
 
             SimpleFeatureConverter<Boolean> featureSelector = _schema.getFeatureSelector();
             
-            //keep track of features that are duplicated so we don't have duplicate streets
-            HashSet<Object> seen = new HashSet<Object>();
+            // Keep track of features that are duplicated so we don't have duplicate streets
+            Set<Object> seen = new HashSet<Object>();
 
             List<SimpleFeature> featureList = new ArrayList<SimpleFeature>();
             FeatureIterator<SimpleFeature> it2 = features.features();
@@ -197,12 +198,11 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
                 }
                 P2<StreetTraversalPermission> permissions = permissionConverter.convert(feature);
 
-                PlainStreetEdge street = new PlainStreetEdge(startIntersection, endIntersection, geom, name, length, permissions.getFirst(), false);
-                street.setLabel(label);
-
+                PlainStreetEdge street = new PlainStreetEdge(startIntersection, endIntersection,
+                        geom, name, length, permissions.getFirst(), false);
                 LineString reversed = (LineString) geom.reverse();
-                PlainStreetEdge backStreet = new PlainStreetEdge(endIntersection, startIntersection, reversed, name, length, permissions.getSecond(), true);
-                backStreet.setLabel(label);
+                PlainStreetEdge backStreet = new PlainStreetEdge(endIntersection,
+                        startIntersection, reversed, name, length, permissions.getSecond(), true);
 
                 if (noteConverter != null) {
                 	String note = noteConverter.convert(feature);
