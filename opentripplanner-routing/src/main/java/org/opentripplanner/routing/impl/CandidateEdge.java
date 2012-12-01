@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.impl;
 
+import lombok.Getter;
+
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -19,12 +21,22 @@ public class CandidateEdge {
 
     private static final double CAR_PREFERENCE = 100;
 
+    /**
+     * The edge itself.
+     */
     public final StreetEdge edge;
 
     public final StreetVertex endwiseVertex;
 
-    double score;
+    /**
+     * Score of the match. Lower is better.
+     */
+    @Getter
+    private double score;
 
+    /**
+     * The coordinate of the nearest point on the edge.
+     */
     public final Coordinate nearestPointOnEdge;
 
     public final double directionToEdge;
@@ -129,10 +141,6 @@ public class CandidateEdge {
 
     public boolean perpendicular() {
         return !parallel();
-    }
-
-    public double getScore() {
-        return score;
     }
 
     public String toString() {
