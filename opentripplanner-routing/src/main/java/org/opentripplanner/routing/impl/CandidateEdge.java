@@ -32,7 +32,7 @@ public class CandidateEdge {
      * Score of the match. Lower is better.
      */
     @Getter
-    private double score;
+    protected double score;
 
     /**
      * The coordinate of the nearest point on the edge.
