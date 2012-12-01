@@ -91,8 +91,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     // if a point is within MAX_CORNER_DISTANCE, it is treated as at the corner
     private static final double MAX_CORNER_DISTANCE = 0.0001;
 
-    private static final double DIRECTION_ERROR = 0.05;
-
     static final Logger _log = LoggerFactory.getLogger(StreetVertexIndexServiceImpl.class);
 
     public StreetVertexIndexServiceImpl(Graph graph) {
@@ -278,102 +276,26 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         return intersectionTree.query(envelope);
     }
 
-    public static class CandidateEdgeBundle extends ArrayList<CandidateEdge> {
-        private static final long serialVersionUID = 20120222L;
-
-        public StreetVertex endwiseVertex = null;
-
-        public CandidateEdge best = null;
-
-        public boolean add(CandidateEdge ce) {
-            if (best == null || ce.score < best.score) {
-                endwiseVertex = ce.endwiseVertex;
-                best = ce;
-            }
-            return super.add(ce);
-        }
-
-        public List<StreetEdge> toEdgeList() {
-            List<StreetEdge> ret = new ArrayList<StreetEdge>();
-            for (CandidateEdge ce : this) {
-                ret.add(ce.edge);
-            }
-            return ret;
-        }
-
-        static class DistanceAndAngle {
-            double distance;
-            double angle;
-            boolean endwise;
-            public DistanceAndAngle(double distance, double angle, boolean endwise) {
-                this.distance = distance;
-                this.angle = angle;
-                this.endwise = endwise;
-            }
-        }
-        
-        public Collection<CandidateEdgeBundle> binByDistanceAndAngle() {
-            Map<DistanceAndAngle, CandidateEdgeBundle> bins = new HashMap<DistanceAndAngle, CandidateEdgeBundle>(); // (r, theta)
-            CANDIDATE: for (CandidateEdge ce : this) {
-                for (Entry<DistanceAndAngle, CandidateEdgeBundle> bin : bins.entrySet()) {
-                    double distance = bin.getKey().distance;
-                    double direction = bin.getKey().angle;
-                    if (Math.abs(direction - ce.directionToEdge) < DIRECTION_ERROR
-                            && Math.abs(distance - ce.distance) < DISTANCE_ERROR
-                            && ce.endwise() == bin.getKey().endwise) {
-                        bin.getValue().add(ce);
-                        continue CANDIDATE;
-                    }
-                }
-                DistanceAndAngle rTheta = new DistanceAndAngle(ce.distance, ce.directionToEdge, ce.endwise());
-                CandidateEdgeBundle bundle = new CandidateEdgeBundle();
-                bundle.add(ce);
-                bins.put(rTheta, bundle);
-            }
-            return bins.values();
-        }
-
-        public boolean endwise() {
-            return endwiseVertex != null;
-        }
-
-        public double getScore() {
-            return best.score;
-        }
-
-        public boolean isPlatform() {
-            for (CandidateEdge ce : CandidateEdgeBundle.this) {
-                StreetEdge e = ce.edge;
-                if ((e.getStreetClass() & StreetEdge.ANY_PLATFORM_MASK) != 0) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public boolean allowsCars() {
-            for (CandidateEdge ce : CandidateEdgeBundle.this) {
-                StreetEdge e = ce.edge;
-                if (e.getPermission().allows(StreetTraversalPermission.CAR)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-    }
-
-    /**
-     * @param coordinate Point to get edges near
-     * @param request RoutingRequest that must be able to traverse the edge (all edges if null) 
-     * @param extraEdges Any edges not in the graph that might be included (allows trips within one block)
-     * @param routeEdges Which edges have bus routes along them (stop-linking only; otherwise null)
-     * @param restriction 0 = only edges traversable by request; 1 = only edges traversable by request and cars; 
-     * 2 = only edges traversable by request and either traversable by cars or are platforms  
-     * @return
-     */
+	/**
+	 * Find edges closest to the given location.
+	 * 
+	 * @param coordinate
+	 *            Point to get edges near
+	 * @param request
+	 *            RoutingRequest that must be able to traverse the edge (all
+	 *            edges if null)
+	 * @param extraEdges
+	 *            Any edges not in the graph that might be included (allows
+	 *            trips within one block)
+	 * @param preferredEdges
+	 *            Any edges to prefer in the search
+	 * @param possibleTransitLinksOnly
+	 *            only return edges traversable by cars or are platforms
+	 * @return
+	 */
     @SuppressWarnings("unchecked")
     public CandidateEdgeBundle getClosestEdges(Coordinate coordinate, RoutingRequest request,
-            List<Edge> extraEdges, Collection<Edge> routeEdges, boolean possibleTransitLinksOnly) {
+            List<Edge> extraEdges, Collection<Edge> preferredEdges, boolean possibleTransitLinksOnly) {
         ArrayList<StreetEdge> extraStreets = new ArrayList<StreetEdge>();
         if (extraEdges != null) {
             for (StreetEdge se : IterableLibrary.filter(extraEdges, StreetEdge.class)) {
@@ -414,7 +336,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 if (request != null && (!(e.canTraverse(request) || e.canTraverse(walkingRequest))))
                     continue;
                 double preferrence = 1;
-                if (routeEdges != null && routeEdges.contains(e)) {
+                if (preferredEdges != null && preferredEdges.contains(e)) {
                     preferrence = 3.0;
                 }
                 TraverseModeSet modes = new TraverseModeSet("");
