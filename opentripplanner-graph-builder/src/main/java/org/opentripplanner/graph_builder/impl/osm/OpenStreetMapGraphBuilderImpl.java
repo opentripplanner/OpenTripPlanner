@@ -142,7 +142,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
     private List<OpenStreetMapProvider> _providers = new ArrayList<OpenStreetMapProvider>();
 
-    private Map<Object, Object> _uniques = new HashMap<Object, Object>();
+    private Set<Object> _uniques = new HashSet<Object>();
 
     private WayPropertySet wayPropertySet = new WayPropertySet();
 
@@ -216,12 +216,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
     @SuppressWarnings("unchecked")
     private <T> T unique(T value) {
-        Object v = _uniques.get(value);
-        if (v == null) {
-            _uniques.put(value, value);
-            v = value;
+        if (!_uniques.contains(value)) {
+            _uniques.add(value);
         }
-        return (T) v;
+        return (T) value;
     }
 
     public void setWayPropertySet(WayPropertySet wayDataSet) {
@@ -1093,29 +1091,27 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 int cls = StreetEdge.CLASS_OTHERPATH;
                 cls |= getStreetClasses(areaEntity);
 
-                String id = "way (area) " + areaEntity.getId() + " from "
+                String label = "way (area) " + areaEntity.getId() + " from "
                         + startEndpoint.getLabel() + " to " + endEndpoint.getLabel();
-                id = unique(id);
-                String name = getNameForWay(areaEntity, id);
+                label = unique(label);
+                String name = getNameForWay(areaEntity, label);
 
                 AreaEdge street = edgeFactory.createAreaEdge(fromNode, toNode, areaEntity,
                         startEndpoint, endEndpoint, line, name, length, areaPermissions, false,
                         carSpeed, edgeList);
 
-                street.setId(id);
                 street.setStreetClass(cls);
                 edges.add(street);
 
-                 id = "way (area) " + areaEntity.getId() + " from "
+                label = "way (area) " + areaEntity.getId() + " from "
                         + endEndpoint.getLabel() + " to " + startEndpoint.getLabel();
-                id = unique(id);
-                name = getNameForWay(areaEntity, id);
+                label = unique(label);
+                name = getNameForWay(areaEntity, label);
 
                 AreaEdge backStreet = edgeFactory.createAreaEdge(toNode, fromNode, areaEntity,
                         endEndpoint, startEndpoint, (LineString) line.reverse(), name, length,
                         areaPermissions, true, carSpeed, edgeList);
 
-                backStreet.setId(id);
                 backStreet.setStreetClass(cls);
                 edges.add(backStreet);
 
@@ -2336,10 +2332,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 OSMWithTags way, int index, long startNode, long endNode, double length,
                 StreetTraversalPermission permissions, LineString geometry, boolean back) {
 
-            String id = "way " + way.getId() + " from " + index;
-            id = unique(id);
-
-            String name = getNameForWay(way, id);
+            String label = "way " + way.getId() + " from " + index;
+            label = unique(label);
+            String name = getNameForWay(way, label);
 
             boolean steps = "steps".equals(way.getTag("highway"));
             if (steps) {
@@ -2352,8 +2347,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             PlainStreetEdge street = edgeFactory
                     .createEdge(_nodes.get(startNode), _nodes.get(endNode), way, start, end,
                             geometry, name, length, permissions, back, carSpeed);
-            street.setId(id);
-
+            
             String highway = way.getTag("highway");
             int cls;
             if ("crossing".equals(highway) && !way.isTag("bicycle", "designated")) {

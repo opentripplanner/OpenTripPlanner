@@ -28,6 +28,8 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.AbstractVertex;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.SimpleConcreteEdge;
+import org.opentripplanner.routing.graph.SimpleConcreteVertex;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -157,11 +159,11 @@ public class AStarTest {
         StreetLocation fromLocation = new StreetLocation(_graph, "near_shilshole_22nd", new Coordinate(
                 -122.385050, 47.666620), "near_shilshole_22nd");
         fromLocation.getExtra().add(
-                new SimpleEdge(fromLocation, _graph.getVertex("shilshole_22nd")));
+                new SimpleConcreteEdge(fromLocation, _graph.getVertex("shilshole_22nd")));
 
         StreetLocation toLocation = new StreetLocation(_graph, "near_56th_20th", new Coordinate(
                 -122.382347, 47.669518), "near_56th_20th");
-        toLocation.getExtra().add(new SimpleEdge(_graph.getVertex("56th_20th"), toLocation));
+        toLocation.getExtra().add(new SimpleConcreteEdge(_graph.getVertex("56th_20th"), toLocation));
 
         options.setRoutingContext(_graph, fromLocation, toLocation);
         ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
@@ -193,11 +195,11 @@ public class AStarTest {
         StreetLocation fromLocation = new StreetLocation(_graph, "near_shilshole_22nd", new Coordinate(
                 -122.385050, 47.666620), "near_shilshole_22nd");
         fromLocation.getExtra().add(
-                new SimpleEdge(fromLocation, _graph.getVertex("shilshole_22nd")));
+                new SimpleConcreteEdge(fromLocation, _graph.getVertex("shilshole_22nd")));
 
         StreetLocation toLocation = new StreetLocation(_graph, "near_56th_20th", new Coordinate(
                 -122.382347, 47.669518), "near_56th_20th");
-        toLocation.getExtra().add(new SimpleEdge(_graph.getVertex("56th_20th"), toLocation));
+        toLocation.getExtra().add(new SimpleConcreteEdge(_graph.getVertex("56th_20th"), toLocation));
 
         options.setRoutingContext(_graph, fromLocation, toLocation);
         ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
@@ -223,8 +225,8 @@ public class AStarTest {
      * Private Methods
      ****/
 
-    private SimpleVertex vertex(String label, double lat, double lon) {
-        SimpleVertex v = new SimpleVertex(_graph, label, lat, lon);
+    private SimpleConcreteVertex vertex(String label, double lat, double lon) {
+        SimpleConcreteVertex v = new SimpleConcreteVertex(_graph, label, lat, lon);
         return v;
     }
 
@@ -233,52 +235,8 @@ public class AStarTest {
             Vertex vA = _graph.getVertex(vLabels[i]);
             Vertex vB = _graph.getVertex(vLabels[i + 1]);
 
-            new SimpleEdge(vA, vB);
-            new SimpleEdge(vB, vA);
-        }
-    }
-
-    private static class SimpleVertex extends AbstractVertex {
-
-        private static final long serialVersionUID = 1L;
-
-        public SimpleVertex(Graph g, String label, double lat, double lon) {
-            super(g, label, lon, lat);
-        }
-    }
-
-    private static class SimpleEdge extends Edge {
-        private static final long serialVersionUID = 1L;
-
-        public SimpleEdge(Vertex v1, Vertex v2) {
-            super(v1, v2);
-        }
-
-        @Override
-        public State traverse(State s0) {
-            double d = getDistance();
-            TraverseMode mode = s0.getNonTransitMode();
-            int t = (int) (d / s0.getOptions().getSpeed(mode));
-            StateEditor s1 = s0.edit(this);
-            s1.incrementTimeInSeconds(t);
-            s1.incrementWeight(d);
-            return s1.makeState();
-        }
-
-        @Override
-        public String getName() {
-            return null;
-        }
-
-        @Override
-        public LineString getGeometry() {
-            return null;
-        }
-
-        @Override
-        public double getDistance() {
-            return SphericalDistanceLibrary.getInstance().distance(getFromVertex().getCoordinate(), getToVertex()
-                    .getCoordinate());
+            new SimpleConcreteEdge(vA, vB);
+            new SimpleConcreteEdge(vB, vA);
         }
     }
 }

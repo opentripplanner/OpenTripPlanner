@@ -94,9 +94,7 @@ public class Graph implements Serializable {
     private transient List<Vertex> vertexById;
 
     private transient Map<Integer, Edge> edgeById;
-    
-    private transient Map<Edge, Integer> idForEdge;
-    
+        
     public transient StreetVertexIndexService streetIndex;
     
     public transient TimetableSnapshotSource timetableSnapshotSource = null;
@@ -272,28 +270,15 @@ public class Graph implements Serializable {
             vertexById.set(v.getIndex(), v);
         }
         //Collections.sort(this.vertexById, getVertexComparatorFactory().getComparator(vertexById));
+        
+        // Create map from edge ids to edges.
         this.edgeById = new HashMap<Integer, Edge>();
-        this.idForEdge = new HashMap<Edge, Integer>();
-        // need to renumber vertices before edges, because vertex indices are
-        // used as hashcodes, and vertex hashcodes are used for edge hashcodes
-        int i = 0;
-        /*
-        for (Vertex v : this.vertexById) {
-            v.setIndex(i++);
-        }
-        i = 0;
-        */
         for (Vertex v : this.vertexById) {
             if (v == null) continue;
-            int j = 0;
             for (Edge e : v.getOutgoing()) {
-                int eid = (i*100) + j;
                 // check for non-null?
-                this.edgeById.put(eid, e);
-                this.idForEdge.put(e, eid);
-                ++j;
+                this.edgeById.put(e.getId(), e);
             }
-            ++i;
         }
     }
 
@@ -382,7 +367,6 @@ public class Graph implements Serializable {
                 graph.graphBuilderAnnotations = (List<GraphBuilderAnnotation>) in.readObject();
                 graph.vertexById = (List<Vertex>) in.readObject();
                 graph.edgeById = (Map<Integer, Edge>) in.readObject();
-                graph.idForEdge = (Map<Edge, Integer>) in.readObject();
                 LOG.debug("Debug info read.");
             } else {
                 LOG.warn("Graph file does not contain debug data.");
@@ -464,7 +448,6 @@ public class Graph implements Serializable {
             out.writeObject(this.graphBuilderAnnotations);
             out.writeObject(this.vertexById);
             out.writeObject(this.edgeById);
-            out.writeObject(this.idForEdge);
         } else {
             LOG.debug("Skipping debug data.");
         }
@@ -489,7 +472,7 @@ public class Graph implements Serializable {
     }
 
     public Integer getIdForEdge(Edge edge) {
-        return idForEdge.get(edge);
+        return edge.getId();
     }
 
     public CalendarService getCalendarService() {
