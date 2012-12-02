@@ -2368,7 +2368,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             street.setStreetClass(cls);
 
             if (!way.hasTag("name") && !way.hasTag("ref")) {
-                street.setBogusName(true);
+                street.setHasBogusName(true);
             }
             street.setStairs(steps);
             

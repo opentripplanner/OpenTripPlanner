@@ -24,6 +24,7 @@ include "location.thrift"
 include "trip.thrift"
 
 typedef graph.GraphVertex GraphVertex
+typedef graph.EdgeMatch EdgeMatch
 typedef location.Location Location
 typedef trip.TravelMode TravelMode
 typedef trip.PathOptions PathOptions
@@ -70,6 +71,24 @@ struct FindNearestVertexResponse {
 	1: optional GraphVertex nearest_vertex;
 }
 
+// Request to find nearby edges
+struct FindNearestEdgesRequest {
+	// Find edges near this location.
+	// TODO(flamholz): allow input of bearing, historical location info.
+	1: required Location location;
+	
+	// Find vertex accessible to one of these modes.
+	2: optional set<TravelMode> allowed_modes;
+	
+	// Maximum number of edges to return.
+	3: optional i32 max_edges;
+}
+
+struct FindNearestEdgesResponse {
+	// The list of nearby edges.
+	1: required list<EdgeMatch> nearest_edges;
+}
+
 // Request to get vertices in the graph.
 struct GraphVerticesRequest {
 	// TODO(flamholz): add parameters about which graph, etc.
@@ -98,6 +117,11 @@ service OTPService {
 	 * Find the nearest graph vertex.
 	 */
 	FindNearestVertexResponse FindNearestVertex(1:FindNearestVertexRequest req);
+	
+	/**
+	 * Find the nearest graph edges.
+	 */
+	FindNearestEdgesResponse FindNearestEdges(1:FindNearestEdgesRequest req);
 
 	/**
 	 * Find paths for a single trip.

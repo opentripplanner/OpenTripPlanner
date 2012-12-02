@@ -1,7 +1,6 @@
 package org.opentripplanner.api.thrift.util;
 
 import java.util.Collection;
-import java.util.Date;
 import java.util.Set;
 
 import org.opentripplanner.api.thrift.definition.LatLng;
