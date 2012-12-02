@@ -10,6 +10,8 @@ import org.apache.thrift.TException;
 import org.opentripplanner.api.thrift.OTPServerTask;
 import org.opentripplanner.api.thrift.definition.BulkPathsRequest;
 import org.opentripplanner.api.thrift.definition.BulkPathsResponse;
+import org.opentripplanner.api.thrift.definition.FindNearestEdgesRequest;
+import org.opentripplanner.api.thrift.definition.FindNearestEdgesResponse;
 import org.opentripplanner.api.thrift.definition.FindNearestVertexRequest;
 import org.opentripplanner.api.thrift.definition.FindNearestVertexResponse;
 import org.opentripplanner.api.thrift.definition.FindPathsRequest;
@@ -21,6 +23,7 @@ import org.opentripplanner.api.thrift.definition.OTPService;
 import org.opentripplanner.api.thrift.definition.PathOptions;
 import org.opentripplanner.api.thrift.definition.TripParameters;
 import org.opentripplanner.api.thrift.definition.TripPaths;
+import org.opentripplanner.api.thrift.util.EdgeMatchExtension;
 import org.opentripplanner.api.thrift.util.GraphVertexExtension;
 import org.opentripplanner.api.thrift.util.LatLngExtension;
 import org.opentripplanner.api.thrift.util.RoutingRequestBuilder;
@@ -28,6 +31,8 @@ import org.opentripplanner.api.thrift.util.TripPathsExtension;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.impl.CandidateEdge;
+import org.opentripplanner.routing.impl.CandidateEdgeBundle;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
@@ -112,7 +117,39 @@ public class OTPServiceImpl implements OTPService.Iface {
 		FindNearestVertexResponse res = new FindNearestVertexResponse();
 		res.setNearest_vertex(new GraphVertexExtension(closest));
 		return res;
+	}
+	
+	@Override
+	public FindNearestEdgesResponse FindNearestEdges(FindNearestEdgesRequest req)
+			throws TException {
+		LOG.info("FindNearestEdges called");
 
+		// NOTE(flamholz): can't set the graph here because we are not
+		// actually doing any routing and don't have a to/from. From the
+		// perspective of the street index, RoutingRequest is really just
+		// a container for the TraversalModes, which is a weird design
+		// but it's what we've got to work with.
+		RoutingRequestBuilder rrb = new RoutingRequestBuilder();
+		if (req.isSetAllowed_modes()) {
+			rrb.setTravelModes(req.getAllowed_modes());
+		}
+		RoutingRequest rr = rrb.build();
+
+		// Get the nearest edges.
+		StreetVertexIndexService streetVertexIndex = getStreetIndex();
+		Coordinate c = new LatLngExtension(req.getLocation().getLat_lng())
+				.toCoordinate();
+		
+		// Add matches to the response.
+		FindNearestEdgesResponse res = new FindNearestEdgesResponse();
+		CandidateEdgeBundle edges = streetVertexIndex.getClosestEdges(c, rr, null, null, false);
+		int maxEdges = req.getMax_edges();
+		for (CandidateEdge e : edges) {
+			if (res.getNearest_edgesSize() >= maxEdges) break;
+			res.addToNearest_edges(new EdgeMatchExtension(e));
+		}
+		
+		return res;
 	}
 
 	/**
