@@ -20,7 +20,8 @@ class SimpleVertex extends StreetVertex {
     }
     
     public boolean equals(GraphVertex gv) {
-    	boolean b = (gv.getLabel() == getLabel() &&
+    	boolean b = (gv.getId() == getIndex() &&
+    				 gv.getLabel() == getLabel() &&
     				 gv.getName() == getName() &&
     				 gv.getIn_degree() == getDegreeIn() &&
     				 gv.getOut_degree() == getDegreeOut());
