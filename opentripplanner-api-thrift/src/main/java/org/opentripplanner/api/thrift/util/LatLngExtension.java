@@ -7,6 +7,11 @@ import com.vividsolutions.jts.geom.Coordinate;
 public class LatLngExtension extends LatLng {
 
 	/**
+	 * Required for serialization.
+	 */
+	private static final long serialVersionUID = 1L;
+
+	/**
 	 * Default constructor.
 	 * 
 	 * TODO(flamholz): figure out if lombok calls superclass constructor?

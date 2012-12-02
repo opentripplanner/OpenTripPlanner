@@ -46,3 +46,17 @@ struct GraphEdge {
 	// Name of the dge
 	4: optional string name;
 }
+
+// An edge that matches a geographic search.
+struct EdgeMatch {
+	// The edge itself.
+	1: required GraphEdge edge;
+	
+	// The closest point along the edge.
+	2: required LatLng closest_point;
+	
+	// Score of the match. Lower is better.
+	3: required double score;
+	
+	// TODO(flamholz): add more information, including distance and angle.
+}
