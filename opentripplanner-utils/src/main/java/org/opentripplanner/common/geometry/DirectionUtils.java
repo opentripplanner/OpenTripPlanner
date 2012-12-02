@@ -39,6 +39,20 @@ public class DirectionUtils {
     }
 
     /**
+     * Returns the azimuth between Coordinates A and B.
+     * 
+     * @param a
+     * @param b
+     * @return
+     */
+    public static synchronized double getAzimuth(Coordinate a, Coordinate b) {
+    	DirectionUtils utils = getInstance();
+        utils.geodeticCalculator.setStartingGeographicPoint(a.x, a.y);
+        utils.geodeticCalculator.setDestinationGeographicPoint(b.x, b.y);
+    	return utils.geodeticCalculator.getAzimuth();
+    }
+    
+    /**
      * Computes the angle of the last segment of a LineString or MultiLineString
      *
      * @param geometry
