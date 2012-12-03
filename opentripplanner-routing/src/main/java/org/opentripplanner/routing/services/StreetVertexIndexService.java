@@ -17,7 +17,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.opentripplanner.common.model.NamedPlace;
-import org.opentripplanner.routing.core.LocationInformation;
+import org.opentripplanner.routing.core.LocationObservation;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.graph.Edge;
@@ -81,7 +81,7 @@ public interface StreetVertexIndexService {
 	 *            Only include possible transit links.
 	 * @return
 	 */
-	public CandidateEdgeBundle getClosestEdges(LocationInformation location,
+	public CandidateEdgeBundle getClosestEdges(LocationObservation location,
 			TraversalRequirements reqs, List<Edge> extraEdges,
 			Collection<Edge> preferredEdges, boolean possibleTransitLinksOnly);
 	
@@ -95,7 +95,7 @@ public interface StreetVertexIndexService {
 	 * @param prefs
 	 * @return
 	 */
-	public CandidateEdgeBundle getClosestEdges(LocationInformation location,
+	public CandidateEdgeBundle getClosestEdges(LocationObservation location,
 			TraversalRequirements reqs);
 	
 	/**

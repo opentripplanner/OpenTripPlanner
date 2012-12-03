@@ -32,7 +32,7 @@ import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.NamedPlace;
-import org.opentripplanner.routing.core.LocationInformation;
+import org.opentripplanner.routing.core.LocationObservation;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -280,10 +280,10 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 	
     @Override
     @SuppressWarnings("unchecked")
-	public CandidateEdgeBundle getClosestEdges(LocationInformation location,
+	public CandidateEdgeBundle getClosestEdges(LocationObservation location,
 			TraversalRequirements reqs, List<Edge> extraEdges,
 			Collection<Edge> preferredEdges, boolean possibleTransitLinksOnly) {
-    	Coordinate coordinate = location.getCurrentLocation().getCoordinate();
+    	Coordinate coordinate = location.getCoordinate();
     	Envelope envelope = new Envelope(coordinate);
     	boolean hasWalkingReqs = reqs.hasWalkingRequirements();
     	TraversalRequirements walkingReqs = reqs.getWalkingRequirements();
@@ -367,7 +367,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 	}
 
 	@Override
-	public CandidateEdgeBundle getClosestEdges(LocationInformation location,
+	public CandidateEdgeBundle getClosestEdges(LocationObservation location,
 			TraversalRequirements reqs) {
 		return getClosestEdges(location, reqs, null, null, false);
 	}
@@ -392,7 +392,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     public CandidateEdgeBundle getClosestEdges(Coordinate coordinate, RoutingRequest request,
             List<Edge> extraEdges, Collection<Edge> preferredEdges, boolean possibleTransitLinksOnly) {
     	TraversalRequirements reqs = new TraversalRequirements(request);
-    	LocationInformation loc = new LocationInformation(coordinate);
+    	LocationObservation loc = new LocationObservation(coordinate);
     	return getClosestEdges(loc, reqs, extraEdges, preferredEdges, possibleTransitLinksOnly);
     }
 
