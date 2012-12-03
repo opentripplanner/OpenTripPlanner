@@ -28,6 +28,8 @@ public class DirectionUtils {
     private GeodeticCalculator geodeticCalculator;
 
     private DirectionUtils() {
+        // TODO(flamholz): Is constructing GeodeticCalculator really so
+        // heavyweight that we need this synchronization?
         geodeticCalculator = new GeodeticCalculator();
     }
 
@@ -39,7 +41,8 @@ public class DirectionUtils {
     }
 
     /**
-     * Returns the azimuth between Coordinates A and B.
+     * Returns the azimuth in decimal degrees from (-180° to +180°) between
+     * Coordinates A and B.
      * 
      * @param a
      * @param b
