@@ -17,7 +17,9 @@ import java.util.Collection;
 import java.util.List;
 
 import org.opentripplanner.common.model.NamedPlace;
+import org.opentripplanner.routing.core.LocationInformation;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.CandidateEdgeBundle;
@@ -65,6 +67,38 @@ public interface StreetVertexIndexService {
 	public Collection<Vertex> getVerticesForEnvelope(Envelope envelope);
 
 	/**
+	 * Get the closest edges to this location are traversable given these
+	 * preferences.
+	 * 
+	 * @param location
+	 * @param prefs
+	 *            Must be able to traverse these edges given these preferences.
+	 * @param extraEdges
+	 *            Additional edges to consider, may be null
+	 * @param preferredEdges
+	 *            Edges which are preferred, may be null
+	 * @param possibleTransitLinksOnly
+	 *            Only include possible transit links.
+	 * @return
+	 */
+	public CandidateEdgeBundle getClosestEdges(LocationInformation location,
+			TraversalRequirements reqs, List<Edge> extraEdges,
+			Collection<Edge> preferredEdges, boolean possibleTransitLinksOnly);
+	
+	/**
+	 * Get the closest edges to this location are traversable given these
+	 * preferences.
+	 * 
+	 * Convenience wrapper for above.
+	 * 
+	 * @param location
+	 * @param prefs
+	 * @return
+	 */
+	public CandidateEdgeBundle getClosestEdges(LocationInformation location,
+			TraversalRequirements reqs);
+	
+	/**
 	 * Get the closest edges to this location.
 	 * 
 	 * @param coordinate
@@ -82,7 +116,7 @@ public interface StreetVertexIndexService {
 	public CandidateEdgeBundle getClosestEdges(Coordinate coordinate,
 			RoutingRequest options, List<Edge> extraEdges,
 			Collection<Edge> preferredEdges, boolean possibleTransitLinksOnly);
-
+	
 	public List<TransitStop> getNearbyTransitStops(Coordinate coordinate,
 			double radius);
 

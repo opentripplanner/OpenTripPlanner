@@ -32,7 +32,9 @@ import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.NamedPlace;
+import org.opentripplanner.routing.core.LocationInformation;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -275,28 +277,17 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     public Collection<Vertex> getVerticesForEnvelope(Envelope envelope) {
         return intersectionTree.query(envelope);
     }
-
-	/**
-	 * Find edges closest to the given location.
-	 * 
-	 * @param coordinate
-	 *            Point to get edges near
-	 * @param request
-	 *            RoutingRequest that must be able to traverse the edge (all
-	 *            edges if null)
-	 * @param extraEdges
-	 *            Any edges not in the graph that might be included (allows
-	 *            trips within one block)
-	 * @param preferredEdges
-	 *            Any edges to prefer in the search
-	 * @param possibleTransitLinksOnly
-	 *            only return edges traversable by cars or are platforms
-	 * @return
-	 */
+	
+    @Override
     @SuppressWarnings("unchecked")
-    public CandidateEdgeBundle getClosestEdges(Coordinate coordinate, RoutingRequest request,
-            List<Edge> extraEdges, Collection<Edge> preferredEdges, boolean possibleTransitLinksOnly) {
-        ArrayList<StreetEdge> extraStreets = new ArrayList<StreetEdge>();
+	public CandidateEdgeBundle getClosestEdges(LocationInformation location,
+			TraversalRequirements reqs, List<Edge> extraEdges,
+			Collection<Edge> preferredEdges, boolean possibleTransitLinksOnly) {
+    	Coordinate coordinate = location.getCurrentLocation().getCoordinate();
+    	Envelope envelope = new Envelope(coordinate);
+    	TraversalRequirements walkingReqs = reqs.getWalkingRequirements();
+    	
+    	ArrayList<StreetEdge> extraStreets = new ArrayList<StreetEdge>();
         if (extraEdges != null) {
             for (StreetEdge se : IterableLibrary.filter(extraEdges, StreetEdge.class)) {
             	extraStreets.add(se);
@@ -307,12 +298,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             extraStreets.add(se);
         }
 
-        Envelope envelope = new Envelope(coordinate);
-
-        RoutingRequest walkingRequest = null;
-        if (request != null) {
-            walkingRequest = request.getWalkingOptions();
-        }
         double envelopeGrowthAmount = 0.001; // ~= 100 meters
         double radius = 0;
         CandidateEdgeBundle candidateEdges = new CandidateEdgeBundle();
@@ -327,28 +312,36 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             if (nearbyEdges != null) {
                 nearbyEdges = new JoinedList<StreetEdge>(nearbyEdges, extraStreets);
             }
+            
             //oh.  This is part of the problem: we're not linking to one-way
             //streets, even though that is a perfectly reasonable thing to do.
             //we need to handle that using bundles.
             for (StreetEdge e : nearbyEdges) {
-                if (e == null || e.getFromVertex() == null)
+            	// Ignore invalid edges.
+                if (e == null || e.getFromVertex() == null) {
                     continue;
-                if (request != null && (!(e.canTraverse(request) || e.canTraverse(walkingRequest))))
-                    continue;
+                }
+                
+                // Ignore edges we can't traverse.
+                if (!reqs.canBeTraversed(e) && !walkingReqs.canBeTraversed(e)) {
+                	continue;
+                }
+
+                // Compute preference value
                 double preferrence = 1;
                 if (preferredEdges != null && preferredEdges.contains(e)) {
                     preferrence = 3.0;
                 }
-                TraverseModeSet modes = new TraverseModeSet("");
-                if (request != null) {
-                    modes = request.getModes();
-                }
+
+                TraverseModeSet modes = reqs.getModes();
                 CandidateEdge ce = new CandidateEdge(e, coordinate, preferrence, modes);
+                
                 // Even if an edge is outside the query envelope, bounding boxes can
                 // still intersect. In this case, distance to the edge is greater
                 // than the query envelope size.
-                if (ce.distance < radius)
+                if (ce.distance < radius) {
                     candidateEdges.add(ce);
+                }
             }
         }
 
@@ -366,6 +359,36 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         }
 
         return best;
+	}
+
+	@Override
+	public CandidateEdgeBundle getClosestEdges(LocationInformation location,
+			TraversalRequirements reqs) {
+		return getClosestEdges(location, reqs, null, null, false);
+	}
+	
+	/**
+	 * Find edges closest to the given location.
+	 * 
+	 * @param coordinate
+	 *            Point to get edges near
+	 * @param request
+	 *            RoutingRequest that must be able to traverse the edge (all
+	 *            edges if null)
+	 * @param extraEdges
+	 *            Any edges not in the graph that might be included (allows
+	 *            trips within one block)
+	 * @param preferredEdges
+	 *            Any edges to prefer in the search
+	 * @param possibleTransitLinksOnly
+	 *            only return edges traversable by cars or are platforms
+	 * @return
+	 */
+    public CandidateEdgeBundle getClosestEdges(Coordinate coordinate, RoutingRequest request,
+            List<Edge> extraEdges, Collection<Edge> preferredEdges, boolean possibleTransitLinksOnly) {
+    	TraversalRequirements reqs = new TraversalRequirements(request);
+    	LocationInformation loc = new LocationInformation(coordinate);
+    	return getClosestEdges(loc, reqs, extraEdges, preferredEdges, possibleTransitLinksOnly);
     }
 
     public StreetVertex getIntersectionAt(Coordinate coordinate) {
