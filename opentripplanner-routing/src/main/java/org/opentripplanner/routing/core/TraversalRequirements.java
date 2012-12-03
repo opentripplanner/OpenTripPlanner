@@ -4,6 +4,7 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Preferences for how to traverse the graph.
@@ -39,7 +40,7 @@ public class TraversalRequirements {
 	/**
 	 * Specific requirements for walking.
 	 * 
-	 * Do we actually need this? I think it may be extraneous...
+	 * TODO(flamholz): Do we actually need this? I think it may be extraneous...
 	 */
 	private TraversalRequirements walkingRequirements;
 	
@@ -54,6 +55,13 @@ public class TraversalRequirements {
 	 * @param options
 	 */
 	public TraversalRequirements(RoutingRequest options) {
+		this();
+
+		if (options == null) {
+			return;
+		}
+
+		// Initialize self.
 		initFromRoutingRequest(this, options);
 		
 		// Initialize walking requirements if any given.
@@ -77,10 +85,6 @@ public class TraversalRequirements {
 		req.maxWalkDistance = options.maxWalkDistance;
 	}
 	
-	/**
-	 * True if walking requirements are defined. 
-	 * @return
-	 */
 	public boolean hasWalkingRequirements() {
 		return walkingRequirements != null;
 	}

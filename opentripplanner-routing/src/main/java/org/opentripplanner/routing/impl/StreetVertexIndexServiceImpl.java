@@ -285,6 +285,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 			Collection<Edge> preferredEdges, boolean possibleTransitLinksOnly) {
     	Coordinate coordinate = location.getCurrentLocation().getCoordinate();
     	Envelope envelope = new Envelope(coordinate);
+    	boolean hasWalkingReqs = reqs.hasWalkingRequirements();
     	TraversalRequirements walkingReqs = reqs.getWalkingRequirements();
     	
     	ArrayList<StreetEdge> extraStreets = new ArrayList<StreetEdge>();
@@ -322,9 +323,13 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                     continue;
                 }
                 
-                // Ignore edges we can't traverse.
-                if (!reqs.canBeTraversed(e) && !walkingReqs.canBeTraversed(e)) {
-                	continue;
+                // Ignore those edges we can't traverse
+                // If we can't traverse this edge
+                if (!reqs.canBeTraversed(e)) {
+                	// And we can't traverse it by walking
+                	if (hasWalkingReqs && !walkingReqs.canBeTraversed(e)) {
+                		continue;	// Move on.
+                	}
                 }
 
                 // Compute preference value
