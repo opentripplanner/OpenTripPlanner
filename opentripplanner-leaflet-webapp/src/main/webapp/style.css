@@ -629,10 +629,26 @@ h6.drag-to-change {
   font-size: 12px;
 }
 
-.otp-itinsAccord-header-block {
-  float: left;
-  margin-right: .5em;
-  
+.otp-itinsAccord-header-number {
+    float: left;
+    font-weight: bold;
+    font-size: 1.5em;
+    height: 1.2em;
+    padding-top:.1em  
+}
+
+.otp-itinsAccord-header-icons {
+    float:left;
+    height: 1.2em;
+    padding-top: .35em;
+    margin-left: .6em;
+}
+
+.otp-itinsAccord-header-duration {
+    float: left;
+    height: 1.2em;
+    margin-left: .8em;
+    padding-top:.45em
 }
 
 .otp-itinStartRow {
@@ -703,7 +719,7 @@ h6.drag-to-change {
 }
 
 .otp-itin-div-icon-nw-highlight {
-    background: url('images/mode/mode_bubble_nw_highlight.png');
+    background: url('images/mode/mode_bubble_nw.png');
 }
 
 .otp-itin-div-icon-ne-highlight {

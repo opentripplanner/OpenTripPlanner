@@ -41,5 +41,15 @@ otp.util.Itin = {
     
     isTransit : function(mode) {
         return mode === "TRANSIT" || mode === "SUBWAY" || mode === "BUS" || mode === "TRAM" || mode === "GONDOLA";
-    }
+    },
+    
+    getIconSummaryHTML : function(itin, padding) {
+        var html = '';
+        for(var i=0; i<itin.legs.length; i++) {
+            html += '<img src="images/mode/'+itin.legs[i].mode.toLowerCase()+'.png" >';
+            if(i < itin.legs.length-1) html += '<img src="images/mode/arrow.png" style="margin: 0px '+(padding || '3')+'px;">';
+        }
+        return html;
+    }   
+    
 }
