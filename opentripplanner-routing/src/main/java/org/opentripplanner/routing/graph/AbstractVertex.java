@@ -25,6 +25,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -219,7 +220,17 @@ public abstract class AbstractVertex implements Vertex {
     public Coordinate getCoordinate() {
         return new Coordinate(getX(), getY());
     }
+    
+    @Override
+    public double azimuthTo(Coordinate other) {
+    	return DirectionUtils.getAzimuth(getCoordinate(), other);
+    }
 
+    @Override
+    public double azimuthTo(Vertex other) {
+    	return azimuthTo(other.getCoordinate());
+    }
+    
     /** Get this vertex's unique index, that can serve as a hashcode or an index into a table */
     @XmlTransient
     public int getIndex() {

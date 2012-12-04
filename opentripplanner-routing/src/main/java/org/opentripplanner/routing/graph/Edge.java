@@ -257,6 +257,16 @@ public abstract class Edge implements Serializable {
 	public LineString getGeometry() {
 		return null;
 	}
+	
+	/**
+	 * Returns the azimuth of this edge from head to tail.
+	 * 
+	 * @return
+	 */
+	public double getAzimuth() {
+		// TODO(flamholz): cache?
+		return getFromVertex().azimuthTo(getToVertex());
+	}
 
 	public double getDistance() {
 		return 0;

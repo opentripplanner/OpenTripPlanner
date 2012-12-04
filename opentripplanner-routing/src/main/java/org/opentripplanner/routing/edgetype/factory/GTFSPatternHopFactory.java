@@ -183,7 +183,7 @@ class InterlineSwitchoverKey {
 }
 
 class IndexedLineSegment {
-    private static final double RADIUS = SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_KM * 1000;
+    private static final double RADIUS = SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_M;
     int index;
     Coordinate start;
     Coordinate end;
