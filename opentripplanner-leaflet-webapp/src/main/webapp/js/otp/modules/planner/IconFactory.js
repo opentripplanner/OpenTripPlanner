@@ -311,9 +311,9 @@ otp.modules.planner.IconFactory = otp.Class({
         quadrant = quadrant.toLowerCase();
         mode = mode.toLowerCase();
         var html = '<div class="otp-itin-div-icon-topRow-'+quadrant[0]+'">';
-        if(!isOrigin) html += '<img src="images/mode/arrow.png">';
+        if(!isOrigin) html += '<img src="images/mode/arrow.png" style="margin-right:2px;">';
         html += '<img src="images/mode/'+mode+'.png">';
-        if(isOrigin) html += '<img src="images/mode/arrow.png">';
+        if(isOrigin) html += '<img src="images/mode/arrow.png" style="margin-left:2px;">';
         html += '</div>';
         html +=  otp.util.Time.formatItinTime(time, "h:mm");
         

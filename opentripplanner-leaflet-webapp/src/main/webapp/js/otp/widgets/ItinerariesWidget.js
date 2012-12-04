@@ -138,7 +138,7 @@ otp.widgets.ItinerariesWidget =
         html += '<div style="float:left; height: 1.2em; padding-top: .35em; margin-left: .6em; ">';
         for(var i=0; i<itin.legs.length; i++) {
             html += '<img src="images/mode/'+itin.legs[i].mode.toLowerCase()+'.png" >';
-            if(i < itin.legs.length-1) html += '<img src="images/mode/arrow.png" style="margin: 0px 1px;">';
+            if(i < itin.legs.length-1) html += '<img src="images/mode/arrow.png" style="margin: 0px 3px;">';
         }
         html += '</div>';
         
