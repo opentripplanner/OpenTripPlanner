@@ -99,6 +99,7 @@ public class ClosestEdgesTest {
 		CandidateEdgeBundle edges = finder.getClosestEdges(loc, reqs);
 		assertTrue(minResults <= edges.size());
 
+		// Double check that all the edges returned can be traversed.
 		for (CandidateEdge e : edges) {
 			assertTrue(reqs.canBeTraversed(e.edge));
 		}
