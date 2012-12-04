@@ -248,6 +248,7 @@ otp.modules.planner.PlannerModule =
             this.markerLayer.removeLayer(m);
         }*/
 
+        console.log(itin);
         for(var i=0; i < itin.legs.length; i++) {
             var leg = itin.legs[i];
             var polyline = new L.Polyline(otp.util.Polyline.decode(leg.legGeometry.points));

@@ -67,7 +67,10 @@ otp.widgets.ItinerariesWidget =
 
         for(var i=0; i<itins.length; i++) {
             var itin = itins[i];
-            $('<h3><span id='+divId+'-headerContent-'+i+'>'+this.headerContent(itin, i)+'<span></h3>').appendTo(this.itinsAccord).click(function(evt) {
+            //$('<h3><span id='+divId+'-headerContent-'+i+'>'+this.headerContent(itin, i)+'<span></h3>').appendTo(this.itinsAccord).click(function(evt) {
+            //$('<h3>'+this.headerContent(itin, i)+'</h3>').appendTo(this.itinsAccord).click(function(evt) {
+            $('<h3><div id='+divId+'-headerContent-'+i+'>'+this.headerContent(itin, i)+'</div></h3>').appendTo(this.itinsAccord).click(function(evt) {
+                console.log(evt.target);
                 var arr = evt.target.id.split('-');
                 var index = parseInt(arr[arr.length-1]);
                 this_.module.drawItinerary(itins[index]);
@@ -127,9 +130,26 @@ otp.widgets.ItinerariesWidget =
     },
     
     // returns HTML text
-    headerContent : function(itin, i) {
-        var timeStr = otp.util.Time.msToHrMin(itin.endTime-itin.startTime);
-        return '<b>Itinerary '+(i+1)+'</b>: '+timeStr;
+    headerContent : function(itin, index) {
+        // show number of this itinerary (e.g. "1.")
+        var html= '<div style="float: left; font-weight: bold; font-size: 1.5em; height: 1.2em; padding-top:.1em">'+(index+1)+'.</div>';
+        
+        // show iconographic trip leg summary  
+        html += '<div style="float:left; height: 1.2em; padding-top: .35em; margin-left: .6em; ">';
+        for(var i=0; i<itin.legs.length; i++) {
+            html += '<img src="images/mode/'+itin.legs[i].mode.toLowerCase()+'.png" >';
+            if(i < itin.legs.length-1) html += '<img src="images/mode/arrow.png" style="margin: 0px 1px;">';
+        }
+        html += '</div>';
+        
+        // show trip duration
+        html += '<div style="float: left; height: 1.2em; margin-left: .8em; padding-top:.45em">';
+        html += '('+otp.util.Time.msToHrMin(itin.endTime-itin.startTime)+")";
+        html += '</div>';
+        
+        // clear div
+        html += '<div style="clear:both;"></div>';
+        return html;
     },
     
     // returns jQuery object

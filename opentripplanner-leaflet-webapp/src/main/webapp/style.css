@@ -629,6 +629,12 @@ h6.drag-to-change {
   font-size: 12px;
 }
 
+.otp-itinsAccord-header-block {
+  float: left;
+  margin-right: .5em;
+  
+}
+
 .otp-itinStartRow {
     margin-bottom: .5em;
 }
