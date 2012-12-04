@@ -74,8 +74,12 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     private StreetTraversalPermission permission;
 
     @Getter @Setter
-    private int streetClass = CLASS_OTHERPATH;
-
+	private int streetClass = CLASS_OTHERPATH;
+	
+    /**
+	 * Marks that this edge is the reverse of the one defined in the source
+	 * data. Does NOT mean fromv/tov are reversed.
+	 */
     public boolean back;
     
     @Getter @Setter

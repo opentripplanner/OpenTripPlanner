@@ -46,10 +46,10 @@ import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
-import org.opentripplanner.util.JoinedList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Iterables;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.index.SpatialIndex;
@@ -285,19 +285,15 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 			Collection<Edge> preferredEdges, boolean possibleTransitLinksOnly) {
     	Coordinate coordinate = location.getCoordinate();
     	Envelope envelope = new Envelope(coordinate);
-    	boolean hasWalkingReqs = reqs.hasWalkingRequirements();
-    	TraversalRequirements walkingReqs = reqs.getWalkingRequirements();
-    	
-    	ArrayList<StreetEdge> extraStreets = new ArrayList<StreetEdge>();
-        if (extraEdges != null) {
-            for (StreetEdge se : IterableLibrary.filter(extraEdges, StreetEdge.class)) {
-            	extraStreets.add(se);
-            }
-        }
-            
-        for (StreetEdge se : IterableLibrary.filter(graph.getTemporaryEdges(), StreetEdge.class)) {
-            extraStreets.add(se);
-        }
+
+    	// Collect the extra StreetEdges to consider.
+		Iterable<StreetEdge> extraStreets = IterableLibrary.filter(
+				graph.getTemporaryEdges(), StreetEdge.class);
+		if (extraEdges != null) {
+			extraStreets = Iterables.concat(
+					IterableLibrary.filter(extraEdges, StreetEdge.class),
+					extraStreets);
+		}
 
         double envelopeGrowthAmount = 0.001; // ~= 100 meters
         double radius = 0;
@@ -306,12 +302,13 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             // expand envelope -- assumes many close searches and occasional far ones
             envelope.expandBy(envelopeGrowthAmount);
             radius += envelopeGrowthAmount;
-            if (radius > MAX_DISTANCE_FROM_STREET)
+            if (radius > MAX_DISTANCE_FROM_STREET) {
                 return candidateEdges; // empty list
-            List<StreetEdge> nearbyEdges = edgeTree.query(envelope);
-
+            }
+            
+            Iterable<StreetEdge> nearbyEdges = edgeTree.query(envelope);
             if (nearbyEdges != null) {
-                nearbyEdges = new JoinedList<StreetEdge>(nearbyEdges, extraStreets);
+                nearbyEdges = Iterables.concat(nearbyEdges, extraStreets);
             }
             
             //oh.  This is part of the problem: we're not linking to one-way
@@ -324,12 +321,10 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 }
                 
                 // Ignore those edges we can't traverse
-                // If we can't traverse this edge
                 if (!reqs.canBeTraversed(e)) {
-                	// And we can't traverse it by walking
-                	if (hasWalkingReqs && !walkingReqs.canBeTraversed(e)) {
-                		continue;	// Move on.
-                	}
+                	// NOTE(flamholz): canBeTraversed checks internally if we
+                	// can walk our bike on this StreetEdge.
+                	continue;
                 }
 
                 // Compute preference value
@@ -391,8 +386,13 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 	 */
     public CandidateEdgeBundle getClosestEdges(Coordinate coordinate, RoutingRequest request,
             List<Edge> extraEdges, Collection<Edge> preferredEdges, boolean possibleTransitLinksOnly) {
-    	TraversalRequirements reqs = new TraversalRequirements(request);
+    	// Make a LocationObservation from a coordinate.
     	LocationObservation loc = new LocationObservation(coordinate);
+    	
+    	// NOTE(flamholz): if request is null, will initialize TraversalRequirements
+    	// that accept all modes of travel.
+    	TraversalRequirements reqs = new TraversalRequirements(request);
+    	
     	return getClosestEdges(loc, reqs, extraEdges, preferredEdges, possibleTransitLinksOnly);
     }
 

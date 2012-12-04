@@ -15,16 +15,16 @@ import lombok.NoArgsConstructor;
 public class TraversalRequirements {
 
 	/**
-	 * Modes allowed in graph traversal.
+	 * Modes allowed in graph traversal. Defaults to allowing all.
 	 */
-	private TraverseModeSet modes = new TraverseModeSet();
-	
+	private TraverseModeSet modes = TraverseModeSet.allModes();
+
 	/**
 	 * The maximum distance (meters) the user is willing to walk. Defaults to
 	 * 1/2 mile.
 	 */
 	private double maxWalkDistance = 800;
-	
+
 	/**
 	 * If true, trip must be wheelchair accessible.
 	 */
@@ -38,17 +38,18 @@ public class TraversalRequirements {
 	private double maxWheelchairSlope = 0.0833333333333;
 
 	/**
-	 * Specific requirements for walking.
-	 * 
-	 * TODO(flamholz): Do we actually need this? I think it may be extraneous...
+	 * Specific requirements for walking a bicycle.
 	 */
-	private TraversalRequirements walkingRequirements;
-	
+	private TraversalRequirements bikeWalkingRequirements;
+
 	/**
 	 * Default constructor.
+	 * 
+	 * By default, accepts all modes of travel and does not require wheelchair
+	 * access.
 	 */
 	public TraversalRequirements() {}
-	
+
 	/**
 	 * Construct from RoutingRequest.
 	 * 
@@ -63,39 +64,45 @@ public class TraversalRequirements {
 
 		// Initialize self.
 		initFromRoutingRequest(this, options);
-		
+
 		// Initialize walking requirements if any given.
 		RoutingRequest walkOptions = options.getWalkingOptions();
 		if (walkOptions != null) {
-			walkingRequirements = new TraversalRequirements();
-			initFromRoutingRequest(walkingRequirements, walkOptions);
+			bikeWalkingRequirements = new TraversalRequirements();
+			initFromRoutingRequest(bikeWalkingRequirements, walkOptions);
 		}
 	}
-	
+
 	/**
 	 * Initialize TraversalRequirements from a RoutingRequest.
 	 * 
 	 * @param req
 	 * @param options
 	 */
-	private static void initFromRoutingRequest(TraversalRequirements req, RoutingRequest options) {
+	private static void initFromRoutingRequest(TraversalRequirements req,
+			RoutingRequest options) {
 		req.modes = options.getModes().clone();
 		req.wheelchairAccessible = options.wheelchairAccessible;
 		req.maxWheelchairSlope = options.maxSlope;
 		req.maxWalkDistance = options.maxWalkDistance;
 	}
-	
-	public boolean hasWalkingRequirements() {
-		return walkingRequirements != null;
+
+	/**
+	 * Returns true if bike walking requirements are defined.
+	 * 
+	 * @return
+	 */
+	public boolean hasBikeWalkingRequirements() {
+		return bikeWalkingRequirements != null;
 	}
-	
+
 	/**
 	 * Returns true if this StreetEdge can be traversed.
 	 * 
 	 * @param e
 	 * @return
 	 */
-	public boolean canBeTraversed(StreetEdge e) {
+	private boolean canBeTraversedInternal(StreetEdge e) {
 		if (wheelchairAccessible) {
 			if (!e.isWheelchairAccessible()) {
 				return false;
@@ -103,17 +110,37 @@ public class TraversalRequirements {
 			if (e.getElevationProfileSegment().getMaxSlope() > maxWheelchairSlope) {
 				return false;
 			}
-        }
-        if (modes.getWalk() && e.getPermission().allows(StreetTraversalPermission.PEDESTRIAN)) {
-            return true;
-        }
-        if (modes.getBicycle() && e.getPermission().allows(StreetTraversalPermission.BICYCLE)) {
-            return true;
-        }
-        if (modes.getCar() && e.getPermission().allows(StreetTraversalPermission.CAR)) {
-            return true;
-        }
-        return false;
+		}
+		if (modes.getWalk()
+				&& e.getPermission().allows(
+						StreetTraversalPermission.PEDESTRIAN)) {
+			return true;
+		}
+		if (modes.getBicycle()
+				&& e.getPermission().allows(StreetTraversalPermission.BICYCLE)) {
+			return true;
+		}
+		if (modes.getCar()
+				&& e.getPermission().allows(StreetTraversalPermission.CAR)) {
+			return true;
+		}
+		return false;
 	}
-	
+
+	/**
+	 * Returns true if this StreetEdge can be traversed.
+	 * 
+	 * @param e
+	 * @return
+	 */
+	public boolean canBeTraversed(StreetEdge e) {
+		if (canBeTraversedInternal(e)) {
+			return true;
+		} else if (hasBikeWalkingRequirements()
+				&& bikeWalkingRequirements.canBeTraversedInternal(e)) {
+			return true;
+		}
+		return false;
+	}
+
 }
