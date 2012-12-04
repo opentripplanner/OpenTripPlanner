@@ -40,6 +40,6 @@ otp.util.Itin = {
     },
     
     isTransit : function(mode) {
-        return mode === "TRANSIT" || mode === "SUBWAY" || mode === "BUS" || mode === "TRAM";
+        return mode === "TRANSIT" || mode === "SUBWAY" || mode === "BUS" || mode === "TRAM" || mode === "GONDOLA";
     }
 }

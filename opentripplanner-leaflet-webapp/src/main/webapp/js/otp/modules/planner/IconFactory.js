@@ -303,7 +303,32 @@ otp.modules.planner.IconFactory = otp.Class({
         if(pct <= this.lowerCutoff) return this.large25;
         if(pct >= this.upperCutoff) return this.large75;
         return this.large50;
-    },  
+    },
+    
+    // mode bubble icons
+    
+    getModeBubble : function(quadrant, time, mode, isOrigin) {
+        quadrant = quadrant.toLowerCase();
+        mode = mode.toLowerCase();
+        var html = '<div class="otp-itin-div-icon-topRow-'+quadrant[0]+'">';
+        if(!isOrigin) html += '<img src="images/mode/arrow.png">';
+        html += '<img src="images/mode/'+mode+'.png">';
+        if(isOrigin) html += '<img src="images/mode/arrow.png">';
+        html += '</div>';
+        html +=  otp.util.Time.formatItinTime(time, "h:mm");
+        
+        if(quadrant === 'nw') anchor = [32,44];
+        if(quadrant === 'ne') anchor = [0,44];
+        if(quadrant === 'sw') anchor = [32,0];
+        if(quadrant === 'se') anchor = [0,0];
+
+        return L.divIcon({
+            className: 'otp-itin-div-icon '+'otp-itin-div-icon-'+quadrant,
+            iconSize: [32,44],
+            iconAnchor: anchor,
+            html: html 
+        });
+    },
                 
     CLASS_NAME : "otp.modules.planner.IconFactory"
 });    

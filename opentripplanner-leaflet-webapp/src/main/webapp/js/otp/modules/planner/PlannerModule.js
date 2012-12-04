@@ -254,16 +254,16 @@ otp.modules.planner.PlannerModule =
             polyline.setStyle({ color : this.getModeColor(leg.mode), weight: 8});
             this.pathLayer.addLayer(polyline);
             if(otp.util.Itin.isTransit(leg.mode)) {
-                var timeIcon = L.divIcon({
-                    className: 'otp-itin-div-icon',
-                    iconSize: [30,30],
-                    iconAnchor: [30,30],
-                    html: '<div class="otp-itin-iconModeSymbol"></div>'+otp.util.Time.formatItinTime(leg.startTime, "h:mm")
-                });
-                var marker = L.marker([leg.from.lat, leg.from.lon], {icon: timeIcon});
-                //this.itinMarkers.push(marker);
-                //marker.addTo(this.markerLayer);
+
+                var quadrant = (leg.from.lat < leg.to.lat ? 's' : 'n')+(leg.from.lon < leg.to.lon ? 'w' : 'e');
+                var modeIcon = this.icons.getModeBubble(quadrant, leg.startTime, leg.mode, true);
+                var marker = L.marker([leg.from.lat, leg.from.lon], {icon: modeIcon});
                 this.pathMarkerLayer.addLayer(marker);
+
+                /*quadrant = (leg.from.lat < leg.to.lat ? 's' : 'n')+(leg.from.lon < leg.to.lon ? 'w' : 'e');
+                modeIcon = this.icons.getModeBubble(quadrant, leg.endTime, leg.mode, false);
+                marker = L.marker([leg.to.lat, leg.to.lon], {icon: modeIcon});
+                this.pathMarkerLayer.addLayer(marker);*/
             }
             else if(itin.legs[i].mode === 'BICYCLE') {
                 if(queryParams.mode === 'WALK,BICYCLE') { // bikeshare trip

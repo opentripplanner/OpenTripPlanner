@@ -675,9 +675,35 @@ h6.drag-to-change {
 .otp-itin-div-icon {
     width: 20px;
     height: 30px;
-    background: white;
     text-align: center;
     font-size: 9px;
+    font-weight: bold;
+}
+
+.otp-itin-div-icon-nw {
+    background: url('images/mode/mode_bubble_nw.png');
+}
+
+.otp-itin-div-icon-ne {
+    background: url('images/mode/mode_bubble_ne.png');
+}
+
+.otp-itin-div-icon-sw {
+    background: url('images/mode/mode_bubble_sw.png');
+}
+
+.otp-itin-div-icon-se {
+    background: url('images/mode/mode_bubble_se.png');
+}
+
+.otp-itin-div-icon-topRow-n {
+    height: 16px;
+    margin-top: 3px;
+}
+
+.otp-itin-div-icon-topRow-s {
+    height: 16px;
+    margin-top: 16px;
 }
 
 /* Past Queries Widget */
