@@ -4,7 +4,6 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 /**
  * Preferences for how to traverse the graph.
@@ -66,10 +65,10 @@ public class TraversalRequirements {
 		initFromRoutingRequest(this, options);
 
 		// Initialize walking requirements if any given.
-		RoutingRequest walkOptions = options.getWalkingOptions();
-		if (walkOptions != null) {
+		RoutingRequest bikeWalkOptions = options.getBikeWalkingOptions();
+		if (bikeWalkOptions != null) {
 			bikeWalkingRequirements = new TraversalRequirements();
-			initFromRoutingRequest(bikeWalkingRequirements, walkOptions);
+			initFromRoutingRequest(bikeWalkingRequirements, bikeWalkOptions);
 		}
 	}
 

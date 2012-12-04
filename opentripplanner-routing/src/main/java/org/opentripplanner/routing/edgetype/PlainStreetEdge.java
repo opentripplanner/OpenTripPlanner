@@ -251,7 +251,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 		if (!canTraverse(options, traverseMode)) {
 			if (traverseMode == TraverseMode.BICYCLE) {
 				// try walking bike since you can't ride here
-				return doTraverse(s0, options.getWalkingOptions(),
+				return doTraverse(s0, options.getBikeWalkingOptions(),
 						TraverseMode.WALK);
 			}
 			return null;

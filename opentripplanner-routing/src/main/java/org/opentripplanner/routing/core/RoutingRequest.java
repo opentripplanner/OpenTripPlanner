@@ -226,8 +226,10 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** For the bike triangle, how important safety is */
     public double triangleSafetyFactor;
 
-    /** A sub-traverse options for another mode */
-    public RoutingRequest walkingOptions;
+    /**
+     * Options specifically for the case that you are walking a bicycle.
+     */
+    public RoutingRequest bikeWalkingOptions;
     
     /** This is true when a GraphPath is being traversed in reverse for optimization purposes. */
     public boolean reverseOptimizing = false;
@@ -300,7 +302,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         bikeSpeed = 5; // 5 m/s, ~11 mph, a random bicycling speed
         carSpeed = 15; // 15 m/s, ~35 mph, a random driving speed        
         setModes(new TraverseModeSet(new TraverseMode[] { TraverseMode.WALK, TraverseMode.TRANSIT }));
-        walkingOptions = this;
+        bikeWalkingOptions = this;
     }
 
     public RoutingRequest(TraverseModeSet modes) {
@@ -336,7 +338,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public void setArriveBy(boolean arriveBy) {
         this.arriveBy = arriveBy;
-        walkingOptions.arriveBy = arriveBy;
+        bikeWalkingOptions.arriveBy = arriveBy;
         if (worstTime == Long.MAX_VALUE || worstTime == 0)
             worstTime = arriveBy ? 0 : Long.MAX_VALUE;
     }
@@ -348,29 +350,29 @@ public class RoutingRequest implements Cloneable, Serializable {
     public void setModes(TraverseModeSet modes) {
         this.modes = modes;
         if (modes.getBicycle()) {
-            walkingOptions = new RoutingRequest();
-            walkingOptions.setArriveBy(this.isArriveBy());
-            walkingOptions.maxWalkDistance = maxWalkDistance;
-            walkingOptions.walkSpeed *= 0.8; //walking bikes is slow
-            walkingOptions.walkReluctance *= 2.7; //and painful
-            walkingOptions.optimize = optimize;
-            walkingOptions.modes = modes.clone();
-            walkingOptions.modes.setBicycle(false);
-            walkingOptions.modes.setWalk(true);
-            walkingOptions.walkingBike = true;
+            bikeWalkingOptions = new RoutingRequest();
+            bikeWalkingOptions.setArriveBy(this.isArriveBy());
+            bikeWalkingOptions.maxWalkDistance = maxWalkDistance;
+            bikeWalkingOptions.walkSpeed *= 0.8; //walking bikes is slow
+            bikeWalkingOptions.walkReluctance *= 2.7; //and painful
+            bikeWalkingOptions.optimize = optimize;
+            bikeWalkingOptions.modes = modes.clone();
+            bikeWalkingOptions.modes.setBicycle(false);
+            bikeWalkingOptions.modes.setWalk(true);
+            bikeWalkingOptions.walkingBike = true;
         } else if (modes.getCar()) {
-            walkingOptions = new RoutingRequest();
-            walkingOptions.setArriveBy(this.isArriveBy());
-            walkingOptions.maxWalkDistance = maxWalkDistance;
-            walkingOptions.modes = modes.clone();
-            walkingOptions.modes.setBicycle(false);
-            walkingOptions.modes.setWalk(true);
+            bikeWalkingOptions = new RoutingRequest();
+            bikeWalkingOptions.setArriveBy(this.isArriveBy());
+            bikeWalkingOptions.maxWalkDistance = maxWalkDistance;
+            bikeWalkingOptions.modes = modes.clone();
+            bikeWalkingOptions.modes.setBicycle(false);
+            bikeWalkingOptions.modes.setWalk(true);
         }
     }
 
     public void setOptimize(OptimizeType optimize) {
         this.optimize = optimize;
-        walkingOptions.optimize = optimize;
+        bikeWalkingOptions.optimize = optimize;
     }
 
     public void setWheelchairAccessible(boolean wheelchairAccessible) {
@@ -382,8 +384,8 @@ public class RoutingRequest implements Cloneable, Serializable {
      * contraction to reduce the number of possible paths.
      */
     public void freezeTraverseMode() {
-        walkingOptions = clone();
-        walkingOptions.walkingOptions = new RoutingRequest(new TraverseModeSet());
+        bikeWalkingOptions = clone();
+        bikeWalkingOptions.bikeWalkingOptions = new RoutingRequest(new TraverseModeSet());
     }
 
     /**
@@ -568,17 +570,17 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public void setTriangleSafetyFactor(double triangleSafetyFactor) {
         this.triangleSafetyFactor = triangleSafetyFactor;
-        walkingOptions.triangleSafetyFactor = triangleSafetyFactor;
+        bikeWalkingOptions.triangleSafetyFactor = triangleSafetyFactor;
     }
 
     public void setTriangleSlopeFactor(double triangleSlopeFactor) {
         this.triangleSlopeFactor = triangleSlopeFactor;
-        walkingOptions.triangleSlopeFactor = triangleSlopeFactor;
+        bikeWalkingOptions.triangleSlopeFactor = triangleSlopeFactor;
     }
 
     public void setTriangleTimeFactor(double triangleTimeFactor) {
         this.triangleTimeFactor = triangleTimeFactor;
-        walkingOptions.triangleTimeFactor = triangleTimeFactor;
+        bikeWalkingOptions.triangleTimeFactor = triangleTimeFactor;
     }
 
     public void setMaxTransfers(int maxTransfers) {
@@ -605,10 +607,10 @@ public class RoutingRequest implements Cloneable, Serializable {
             RoutingRequest clone = (RoutingRequest) super.clone();
             clone.bannedRoutes = (HashSet<RouteSpec>) bannedRoutes.clone();
             clone.bannedTrips = (HashMap<AgencyAndId, BannedStopSet>) bannedTrips.clone();
-            if (this.walkingOptions != this)
-                clone.walkingOptions = this.walkingOptions.clone();
+            if (this.bikeWalkingOptions != this)
+                clone.bikeWalkingOptions = this.bikeWalkingOptions.clone();
             else
-                clone.walkingOptions = clone;
+                clone.bikeWalkingOptions = clone;
             return clone;
         } catch (CloneNotSupportedException e) {
             /* this will never happen since our super is the cloneable object */
@@ -855,8 +857,8 @@ public class RoutingRequest implements Cloneable, Serializable {
         if (maxWalkDistance == 0) 
             return;
         this.maxWalkDistance = maxWalkDistance;
-        if (walkingOptions != null && walkingOptions != this) {
-            this.walkingOptions.setMaxWalkDistance(maxWalkDistance);
+        if (bikeWalkingOptions != null && bikeWalkingOptions != this) {
+            this.bikeWalkingOptions.setMaxWalkDistance(maxWalkDistance);
         }
     }
 
