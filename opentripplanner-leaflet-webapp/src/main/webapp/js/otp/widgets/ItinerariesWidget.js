@@ -169,8 +169,13 @@ otp.widgets.ItinerariesWidget =
                 var arr = evt.target.id.split('-');
                 var index = parseInt(arr[arr.length-1]);
                 this_.module.highlightLeg(itin.legs[index]);
+                this_.module.pathMarkerLayer.clearLayers();
+                this_.module.drawStartBubble(itin.legs[index], true);
+                this_.module.drawEndBubble(itin.legs[index], true);
             }, function(evt) {
                 this_.module.clearHighlights();
+                this_.module.pathMarkerLayer.clearLayers();
+                this_.module.drawAllStartBubbles(itin);
             });
             this_.renderLeg(leg, (l>0 ? itin.legs[l-1] : null)).appendTo(itinAccord);
         }

@@ -239,32 +239,53 @@ otp.modules.planner.PlannerModule =
     },
     
     drawItinerary : function(itin) {
+        var this_ = this;
+        
         var queryParams = this.lastQueryParams;
         this.pathLayer.clearLayers();
         this.pathMarkerLayer.clearLayers();
-/*        
-        for(m in this.itinMarkers) {
-            console.log("removing marker");
-            this.markerLayer.removeLayer(m);
-        }*/
-
+    
         console.log(itin);
         for(var i=0; i < itin.legs.length; i++) {
             var leg = itin.legs[i];
+
+            // draw the polyline
             var polyline = new L.Polyline(otp.util.Polyline.decode(leg.legGeometry.points));
-            polyline.setStyle({ color : this.getModeColor(leg.mode), weight: 8});
+            var weight = 8;
+            polyline.setStyle({ color : this.getModeColor(leg.mode), weight: weight});
             this.pathLayer.addLayer(polyline);
+            polyline.leg = leg;
+            polyline.bindPopup("("+leg.routeShortName+") "+leg.routeLongName);
+
+            /* Attempt at hover functionality for trip segments on map; disabled due to "flickering" problem
+               Alt. future approach: create invisible polygon buffers around polylines
+            
+            polyline.on('mouseover', function(e) {
+                if(e.target.hover) return;
+                console.log('mouseover');
+                this_.highlightLeg(e.target.leg);
+                this_.pathMarkerLayer.clearLayers();
+                this_.drawStartBubble(e.target.leg, true);
+                this_.drawEndBubble(e.target.leg, true);
+                e.target.hover = true;
+            });
+            polyline.on('mouseout', function(e) {
+                var lpt = e.layerPoint, minDist = 100;
+                for(var p=0; p<e.target._parts[0].length-1; p++) {
+                    var dist = L.LineUtil.pointToSegmentDistance(lpt, e.target._parts[0][p], e.target._parts[0][p+1]);
+                    minDist = Math.min(minDist, dist)
+                }
+                console.log("minDist: "+minDist);
+                if(minDist < weight/2) return;
+                this_.clearHighlights();
+                this_.pathMarkerLayer.clearLayers();
+                this_.drawAllStartBubbles(itin);
+                e.target.hover = false;
+            });
+            */
+            
             if(otp.util.Itin.isTransit(leg.mode)) {
-
-                var quadrant = (leg.from.lat < leg.to.lat ? 's' : 'n')+(leg.from.lon < leg.to.lon ? 'w' : 'e');
-                var modeIcon = this.icons.getModeBubble(quadrant, leg.startTime, leg.mode, true);
-                var marker = L.marker([leg.from.lat, leg.from.lon], {icon: modeIcon});
-                this.pathMarkerLayer.addLayer(marker);
-
-                /*quadrant = (leg.from.lat < leg.to.lat ? 's' : 'n')+(leg.from.lon < leg.to.lon ? 'w' : 'e');
-                modeIcon = this.icons.getModeBubble(quadrant, leg.endTime, leg.mode, false);
-                marker = L.marker([leg.to.lat, leg.to.lon], {icon: modeIcon});
-                this.pathMarkerLayer.addLayer(marker);*/
+                this.drawStartBubble(leg, false);
             }
             else if(itin.legs[i].mode === 'BICYCLE') {
                 if(queryParams.mode === 'WALK,BICYCLE') { // bikeshare trip
@@ -302,7 +323,30 @@ otp.modules.planner.PlannerModule =
     clearHighlights : function() {
         this.highlightLayer.clearLayers(); 
     },
+    
+    drawStartBubble : function(leg, highlight) {
+        var quadrant = (leg.from.lat < leg.to.lat ? 's' : 'n')+(leg.from.lon < leg.to.lon ? 'w' : 'e');
+        var modeIcon = this.icons.getModeBubble(quadrant, leg.startTime, leg.mode, true, highlight);
+        var marker = L.marker([leg.from.lat, leg.from.lon], {icon: modeIcon});
+        this.pathMarkerLayer.addLayer(marker);
+    },
 
+    drawEndBubble : function(leg, highlight) {
+        var quadrant = (leg.from.lat < leg.to.lat ? 'n' : 's')+(leg.from.lon < leg.to.lon ? 'e' : 'w');
+        var modeIcon = this.icons.getModeBubble(quadrant, leg.endTime, leg.mode, false, highlight);
+        var marker = L.marker([leg.to.lat, leg.to.lon], {icon: modeIcon});
+        this.pathMarkerLayer.addLayer(marker);
+    },
+    
+    drawAllStartBubbles : function(itin) {
+        for(var i=0; i < itin.legs.length; i++) {
+            var leg = itin.legs[i];
+            if(otp.util.Itin.isTransit(leg.mode)) {
+                this.drawStartBubble(leg, false);        
+            }
+        }
+    },
+    
     getModeColor : function(mode) {
         if(mode === "WALK") return '#444';
         if(mode === "BICYCLE") return '#0073e5';

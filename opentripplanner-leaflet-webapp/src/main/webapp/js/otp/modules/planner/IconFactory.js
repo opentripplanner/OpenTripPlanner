@@ -307,9 +307,10 @@ otp.modules.planner.IconFactory = otp.Class({
     
     // mode bubble icons
     
-    getModeBubble : function(quadrant, time, mode, isOrigin) {
+    getModeBubble : function(quadrant, time, mode, isOrigin, highlight) {
         quadrant = quadrant.toLowerCase();
         mode = mode.toLowerCase();
+        highlight = highlight || false;
         var html = '<div class="otp-itin-div-icon-topRow-'+quadrant[0]+'">';
         if(!isOrigin) html += '<img src="images/mode/arrow.png" style="margin-right:2px;">';
         html += '<img src="images/mode/'+mode+'.png">';
@@ -323,7 +324,7 @@ otp.modules.planner.IconFactory = otp.Class({
         if(quadrant === 'se') anchor = [0,0];
 
         return L.divIcon({
-            className: 'otp-itin-div-icon '+'otp-itin-div-icon-'+quadrant,
+            className: 'otp-itin-div-icon '+'otp-itin-div-icon-'+quadrant+(highlight ? "-highlight" : ""),
             iconSize: [32,44],
             iconAnchor: anchor,
             html: html 

@@ -702,6 +702,23 @@ h6.drag-to-change {
     background: url('images/mode/mode_bubble_se.png');
 }
 
+.otp-itin-div-icon-nw-highlight {
+    background: url('images/mode/mode_bubble_nw_highlight.png');
+}
+
+.otp-itin-div-icon-ne-highlight {
+    background: url('images/mode/mode_bubble_ne_highlight.png');
+}
+
+.otp-itin-div-icon-sw-highlight {
+    background: url('images/mode/mode_bubble_sw_highlight.png');
+}
+
+.otp-itin-div-icon-se-highlight {
+    background: url('images/mode/mode_bubble_se_highlight.png');
+}
+
+
 .otp-itin-div-icon-topRow-n {
     height: 16px;
     margin-top: 3px;
