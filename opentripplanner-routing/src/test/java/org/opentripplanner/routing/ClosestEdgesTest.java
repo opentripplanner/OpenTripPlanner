@@ -190,7 +190,7 @@ public class ClosestEdgesTest {
 			// Location along the top edge, traveling with the forward edge
 			// exactly.
 			LocationObservation.Builder builder = new LocationObservation.Builder()
-					.setCoordinate(c);
+			.setCoordinate(c);
 			builder.setHeading(top.getAzimuth() + degreeOff);
 
 			// The top edge should be returned in all cases.

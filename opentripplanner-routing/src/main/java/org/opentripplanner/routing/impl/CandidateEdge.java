@@ -21,9 +21,9 @@ public class CandidateEdge {
 	private static final double SIDEWALK_PREFERENCE = 1.5;
 
 	private static final double CAR_PREFERENCE = 100;
-	
+
 	private static final double MAX_DIRECTION_DIFFERENCE = 180.0;
-	
+
 	private static final double MAX_ABS_DIRECTION_DIFFERENCE = 360.0;
 
 	/**
@@ -86,7 +86,7 @@ public class CandidateEdge {
 	 */
 	@Getter
 	protected double directionToEdge;
-	
+
 	/**
 	 * Azimuth of the subsegment of the edge to which the input point is
 	 * closest.
@@ -114,7 +114,7 @@ public class CandidateEdge {
 	protected double score;
 
 	/**
-	 * Construct from a LocationObservation. 
+	 * Construct from a LocationObservation.
 	 * 
 	 * @param e
 	 * @param loc
@@ -127,7 +127,7 @@ public class CandidateEdge {
 		edge = e;
 		edgeCoords = e.getGeometry().getCoordinateSequence();
 		numEdgeCoords = edgeCoords.size();
-		platform = calcPlatform(mode);		
+		platform = calcPlatform(mode);
 		nearestPointOnEdge = new Coordinate();
 
 		// Initializes nearestPointOnEdge, nearestSegmentIndex,
@@ -150,16 +150,16 @@ public class CandidateEdge {
 		heading = loc.getHeading();
 		if (heading != null) {
 			double absDiff = Math.abs(heading - directionOfEdge);
-			directionDifference = Math.min(
-					MAX_ABS_DIRECTION_DIFFERENCE - absDiff, absDiff);
+			directionDifference = Math.min(MAX_ABS_DIRECTION_DIFFERENCE
+					- absDiff, absDiff);
 		}
 
 		// Calculate the score last so it can use all other data.
 		score = calcScore();
 	}
-	
+
 	/**
-	 * Construct from a Coordinate. 
+	 * Construct from a Coordinate.
 	 * 
 	 * @param e
 	 * @param p
@@ -171,7 +171,6 @@ public class CandidateEdge {
 		this(e, new LocationObservation(p), pref, mode);
 	}
 
-	
 	public boolean endwise() {
 		return endwiseVertex != null;
 	}
@@ -185,7 +184,7 @@ public class CandidateEdge {
 	/**
 	 * Private methods
 	 */
-	
+
 	/**
 	 * Initializes this.nearestPointOnEdge and other distance-related variables.
 	 * 
@@ -225,7 +224,7 @@ public class CandidateEdge {
 		nearestSegmentIndex = bestSeg;
 		nearestSegmentFraction = bestFrac;
 		return Math.sqrt(bestDist2); // distanceLibrary.distance(p,
-										// nearestPointOnEdge);
+		// nearestPointOnEdge);
 	}
 
 	/**
@@ -298,7 +297,7 @@ public class CandidateEdge {
 			// If you are moving against the edge, score is penalized by 1.
 			myScore += (directionDifference / MAX_DIRECTION_DIFFERENCE);
 		}
-		
+
 		// break ties by choosing shorter edges; this should cause split streets
 		// to be preferred
 		myScore += edge.getLength() / 1000000;
