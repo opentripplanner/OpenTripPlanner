@@ -90,21 +90,28 @@ public class StreetLocation extends StreetVertex {
         /* Extra edges for this area */
         Set<StreetEdge> allEdges = new HashSet<StreetEdge>();
         TraverseModeSet modes = new TraverseModeSet();
-        for (StreetEdge street : edges) {
-            allEdges.add(street);
-            if (street instanceof AreaEdge) {
-                for (StreetEdge e : ((AreaEdge) street).getArea().getEdges()) {
-                    if (!allEdges.contains(e)) {
-                        CandidateEdge ce = new CandidateEdge(e, originalCoordinate, 0, modes);
-                        if (ce.endwise() || ce.distance > .0005) //skip inappropriate area edges
-                            continue;
-                        StreetLocation areaSplitter = createStreetLocation(graph, label, name, Arrays.asList(e), ce.nearestPointOnEdge);
-                        location.extra.addAll(areaSplitter.getExtra());
-                        location.extra.add(new FreeEdge(location, areaSplitter));
-                        location.extra.add(new FreeEdge(areaSplitter, location));
-                        allEdges.add(e);
-                    }
-                }
+		for (StreetEdge street : edges) {
+			allEdges.add(street);
+			if (street instanceof AreaEdge) {
+				for (StreetEdge e : ((AreaEdge) street).getArea().getEdges()) {
+					if (!allEdges.contains(e)) {
+						CandidateEdge ce = new CandidateEdge(e,
+								originalCoordinate, 0, modes);
+						if (ce.endwise() || ce.getDistance() > .0005) {
+							// skip inappropriate area edges
+							continue;
+						}
+						StreetLocation areaSplitter = createStreetLocation(
+								graph, label, name, Arrays.asList(e),
+								ce.getNearestPointOnEdge());
+						location.extra.addAll(areaSplitter.getExtra());
+						location.extra
+								.add(new FreeEdge(location, areaSplitter));
+						location.extra
+								.add(new FreeEdge(areaSplitter, location));
+						allEdges.add(e);
+					}
+				}
             }
         }
         location.setSourceEdges(allEdges);

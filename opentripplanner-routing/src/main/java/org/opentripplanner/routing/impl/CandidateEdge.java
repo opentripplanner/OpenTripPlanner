@@ -21,16 +21,31 @@ public class CandidateEdge {
 
     private static final double CAR_PREFERENCE = 100;
 
-    private int platform;
+    /**
+     * The edge itself.
+     */
+    @Getter
+    protected final StreetEdge edge;
     
-    private double preference; 
-    
-    private CoordinateSequence edgeCoords;
+    /**
+     * Pointer to the coordinates of the edge.
+     */
+    private final CoordinateSequence edgeCoords;
     
     /**
      * Number of coordinates on the edge.
      */
-    private int numEdgeCoords;
+    private final int numEdgeCoords;
+    
+    /**
+     * Whether point is located at a platform.
+     */
+    private final int platform;
+    
+    /**
+     * Preference value passed in.
+     */
+    private final double preference; 
     
     /**
      * Index of the closest segment along the edge.
@@ -42,31 +57,49 @@ public class CandidateEdge {
      */
     private double nearestSegmentFraction;
     
+
+	/**
+	 * Set when to the closest endpoint of the edge when the input location is
+	 * really sitting on that endpoint (within some tolerance).
+	 */
+	@Getter
+	protected StreetVertex endwiseVertex;
+
     /**
-     * The edge itself.
+     * The coordinate of the nearest point on the edge.
      */
-    public final StreetEdge edge;
+    @Getter
+    protected Coordinate nearestPointOnEdge;
+    
+    /**
+     * Azimuth from nearest point on edge to the input point.
+     */
+    @Getter
+    protected double directionToEdge;
 
-    public final StreetVertex endwiseVertex;
+    /**
+     * Azimuth of the subsegment of the edge to which the input point is closest.
+     */
+    @Getter
+    protected double directionOfEdge;
 
+    /**
+     * Difference in direction between edge and point.
+     */
+    @Getter
+    protected double directionDifference;
+
+    /**
+     * Distance from edge and point.
+     */
+    @Getter
+    protected double distance;
+    
     /**
      * Score of the match. Lower is better.
      */
     @Getter
     protected double score;
-
-    /**
-     * The coordinate of the nearest point on the edge.
-     */
-    public final Coordinate nearestPointOnEdge;
-        
-    public final double directionToEdge;
-
-    public final double directionOfEdge;
-
-    public final double directionDifference;
-
-    public final double distance;
     
     public CandidateEdge(StreetEdge e, Coordinate p, double pref, TraverseModeSet mode) {
     	preference = pref;
@@ -76,7 +109,7 @@ public class CandidateEdge {
         nearestPointOnEdge = new Coordinate();
     	
     	// Initializes this.platform
-    	calcPlatform(mode);
+    	platform = calcPlatform(mode);
         // Initializes nearestPointOnEdge, nearestSegmentIndex, nearestSegmentFraction.
     	distance = calcNearestPoint(p);
     	
@@ -181,7 +214,7 @@ public class CandidateEdge {
      * @param mode
      * @return
      */
-    private void calcPlatform(TraverseModeSet mode) {
+    private int calcPlatform(TraverseModeSet mode) {
     	int out = 0;
         if (mode.getTrainish()) {
             out |= StreetEdge.CLASS_TRAIN_PLATFORM;
@@ -189,7 +222,7 @@ public class CandidateEdge {
         if (mode.getBusish()) {
             out |= StreetEdge.CLASS_OTHER_PLATFORM;
         }
-        platform = out;
+        return out;
 	}
 
     /**
