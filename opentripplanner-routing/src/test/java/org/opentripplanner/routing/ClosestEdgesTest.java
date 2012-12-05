@@ -101,7 +101,7 @@ public class ClosestEdgesTest {
 
 		// Double check that all the edges returned can be traversed.
 		for (CandidateEdge e : edges) {
-			assertTrue(reqs.canBeTraversed(e.edge));
+			assertTrue(reqs.canBeTraversed(e.getEdge()));
 		}
 	}
 
@@ -141,6 +141,20 @@ public class ClosestEdgesTest {
         modes.setBicycle(true);
         reqs.setModes(modes);
         checkClosestEdgeModes(loc, reqs, 2);
+    }
+    
+    @Test
+    public void testInteriorEdgeCase() {
+    	// Lies smack in the middle of the box
+        Coordinate c = new Coordinate(-74.005, 40.005);
+        LocationObservation loc = new LocationObservation(c);
+        TraversalRequirements reqs = new TraversalRequirements();
+        
+        // Should only return 2 edges even though all edges are equidistant.
+        // TODO(flamholz): this doesn't feel like the right behavior to me.
+        // Consider fixing it.
+		CandidateEdgeBundle edges = finder.getClosestEdges(loc, reqs);
+		assertEquals(2, edges.size());
     }
     
     @Test
