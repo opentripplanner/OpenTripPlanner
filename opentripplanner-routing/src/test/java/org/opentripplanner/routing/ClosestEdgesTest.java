@@ -39,7 +39,7 @@ import com.vividsolutions.jts.geom.LineString;
 public class ClosestEdgesTest {
 
     private Graph graph;
-    
+
     private StreetVertexIndexService finder;
 
     private PlainStreetEdge top, bottom, left, right;
@@ -54,87 +54,84 @@ public class ClosestEdgesTest {
         return factory.createLineString(cs);
     }
 
-	@Before
-	public void before() {
-		graph = new Graph();
-		// a 0.1 degree x 0.1 degree square
-		tl = new IntersectionVertex(graph, "tl", -74.01, 40.01);
-		tr = new IntersectionVertex(graph, "tr", -74.0, 40.01);
-		bl = new IntersectionVertex(graph, "bl", -74.01, 40.0);
-		br = new IntersectionVertex(graph, "br", -74.00, 40.0);
+    @Before
+    public void before() {
+        graph = new Graph();
+        // a 0.1 degree x 0.1 degree square
+        tl = new IntersectionVertex(graph, "tl", -74.01, 40.01);
+        tr = new IntersectionVertex(graph, "tr", -74.0, 40.01);
+        bl = new IntersectionVertex(graph, "bl", -74.01, 40.0);
+        br = new IntersectionVertex(graph, "br", -74.00, 40.0);
 
-		top = new PlainStreetEdge(tl, tr, GeometryUtils.makeLineString(-74.01,
-				40.01, -74.0, 40.01), "top", 1500,
-				StreetTraversalPermission.CAR, false);
-		bottom = new PlainStreetEdge(br, bl, GeometryUtils.makeLineString(
-				-74.01, 40.0, -74.0, 40.0), "bottom", 1500,
-				StreetTraversalPermission.BICYCLE_AND_CAR, false);
-		left = new PlainStreetEdge(bl, tl, GeometryUtils.makeLineString(-74.01,
-				40.0, -74.01, 40.01), "left", 1500,
-				StreetTraversalPermission.BICYCLE_AND_CAR, false);
-		right = new PlainStreetEdge(br, tr, GeometryUtils.makeLineString(-74.0,
-				40.0, -74.0, 40.01), "right", 1500,
-				StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, false);
+        top = new PlainStreetEdge(tl, tr,
+                GeometryUtils.makeLineString(-74.01, 40.01, -74.0, 40.01), "top", 1500,
+                StreetTraversalPermission.CAR, false);
+        bottom = new PlainStreetEdge(br, bl,
+                GeometryUtils.makeLineString(-74.01, 40.0, -74.0, 40.0), "bottom", 1500,
+                StreetTraversalPermission.BICYCLE_AND_CAR, false);
+        left = new PlainStreetEdge(bl, tl,
+                GeometryUtils.makeLineString(-74.01, 40.0, -74.01, 40.01), "left", 1500,
+                StreetTraversalPermission.BICYCLE_AND_CAR, false);
+        right = new PlainStreetEdge(br, tr,
+                GeometryUtils.makeLineString(-74.0, 40.0, -74.0, 40.01), "right", 1500,
+                StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, false);
 
-		StreetEdge topBack = new PlainStreetEdge(tr, tl, (LineString) top
-				.getGeometry().reverse(), "topBack", 1500,
-				StreetTraversalPermission.CAR, true);
-		StreetEdge bottomBack = new PlainStreetEdge(br, bl, (LineString) bottom
-				.getGeometry().reverse(), "bottomBack", 1500,
-				StreetTraversalPermission.BICYCLE_AND_CAR, true);
-		StreetEdge leftBack = new PlainStreetEdge(tl, bl, (LineString) left
-				.getGeometry().reverse(), "leftBack", 1500,
-				StreetTraversalPermission.BICYCLE_AND_CAR, true);
-		StreetEdge rightBack = new PlainStreetEdge(tr, br, (LineString) right
-				.getGeometry().reverse(), "rightBack", 1500,
-				StreetTraversalPermission.CAR, true);
+        StreetEdge topBack = new PlainStreetEdge(tr, tl, (LineString) top.getGeometry().reverse(),
+                "topBack", 1500, StreetTraversalPermission.CAR, true);
+        StreetEdge bottomBack = new PlainStreetEdge(br, bl, (LineString) bottom.getGeometry()
+                .reverse(), "bottomBack", 1500, StreetTraversalPermission.BICYCLE_AND_CAR, true);
+        StreetEdge leftBack = new PlainStreetEdge(tl, bl,
+                (LineString) left.getGeometry().reverse(), "leftBack", 1500,
+                StreetTraversalPermission.BICYCLE_AND_CAR, true);
+        StreetEdge rightBack = new PlainStreetEdge(tr, br, (LineString) right.getGeometry()
+                .reverse(), "rightBack", 1500, StreetTraversalPermission.CAR, true);
 
-		StreetVertexIndexServiceImpl myFinder = new StreetVertexIndexServiceImpl(graph);
+        StreetVertexIndexServiceImpl myFinder = new StreetVertexIndexServiceImpl(graph);
         myFinder.setup();
         finder = myFinder;
-	}
+    }
 
-	private void checkClosestEdgeModes(LocationObservation loc,
-			TraversalRequirements reqs, int minResults) {
-		CandidateEdgeBundle edges = finder.getClosestEdges(loc, reqs);
-		assertTrue(minResults <= edges.size());
+    private void checkClosestEdgeModes(LocationObservation loc, TraversalRequirements reqs,
+            int minResults) {
+        CandidateEdgeBundle edges = finder.getClosestEdges(loc, reqs);
+        assertTrue(minResults <= edges.size());
 
-		// Double check that all the edges returned can be traversed.
-		for (CandidateEdge e : edges) {
-			assertTrue(reqs.canBeTraversed(e.getEdge()));
-		}
-	}
+        // Double check that all the edges returned can be traversed.
+        for (CandidateEdge e : edges) {
+            assertTrue(reqs.canBeTraversed(e.getEdge()));
+        }
+    }
 
     @Test
     public void testModeRestriction() {
-    	// Lies along the top right edge
+        // Lies along the top right edge
         Coordinate c = new Coordinate(-74.005000001, 40.01);
         LocationObservation loc = new LocationObservation(c);
         TraversalRequirements reqs = new TraversalRequirements();
-        
+
         // Default traversal requirements allow any traversal mode.
         checkClosestEdgeModes(loc, reqs, 1);
-        
+
         // Only allow walking
         TraverseModeSet modes = new TraverseModeSet();
         modes.setWalk(true);
         reqs.setModes(modes);
-        
-        // There's only one walkable edge.        
+
+        // There's only one walkable edge.
         checkClosestEdgeModes(loc, reqs, 1);
-        
+
         // Only allow biking: there are 5 bikeable edges.
         modes = new TraverseModeSet();
         modes.setBicycle(true);
         reqs.setModes(modes);
         checkClosestEdgeModes(loc, reqs, 2);
-        
+
         // Only allow driving: there are 7 driveable edges.
         modes = new TraverseModeSet();
         modes.setCar(true);
         reqs.setModes(modes);
         checkClosestEdgeModes(loc, reqs, 2);
-        
+
         // Allow driving and biking: all 8 edges can be traversed.
         modes = new TraverseModeSet();
         modes.setCar(true);
@@ -142,40 +139,61 @@ public class ClosestEdgesTest {
         reqs.setModes(modes);
         checkClosestEdgeModes(loc, reqs, 2);
     }
-    
+
     @Test
     public void testInteriorEdgeCase() {
-    	// Lies smack in the middle of the box
+        // Lies smack in the middle of the box
         Coordinate c = new Coordinate(-74.005, 40.005);
         LocationObservation loc = new LocationObservation(c);
         TraversalRequirements reqs = new TraversalRequirements();
-        
+
         // Should only return 2 edges even though all edges are equidistant.
         // TODO(flamholz): this doesn't feel like the right behavior to me.
         // Consider fixing it.
-		CandidateEdgeBundle edges = finder.getClosestEdges(loc, reqs);
-		assertEquals(2, edges.size());
+        CandidateEdgeBundle edges = finder.getClosestEdges(loc, reqs);
+        assertEquals(2, edges.size());
     }
-    
+
+    /**
+     * Checks that the best edge found is this one and that the number of edges found matches.
+     * 
+     * @param reqs
+     * @param loc
+     * @param expectedBest
+     * @param expectedCandidates
+     */
+    private void checkBest(TraversalRequirements reqs, LocationObservation loc,
+            StreetEdge expectedBest, int expectedCandidates) {
+        // Should give me the top edge as the best edge.
+        // topBack is worse because of the heading.
+        CandidateEdgeBundle candidates = finder.getClosestEdges(loc, reqs);
+        assertEquals(expectedBest, candidates.best.getEdge());
+        assertEquals(expectedCandidates, candidates.size());
+    }
+
     @Test
     public void testHeading() {
-		// TODO(flamholz): update this code once we include the difference between the heading and
-    	// heading in the edge ranking.
-
-    	// Lies along the top edge
-    	Coordinate c = new Coordinate(-74.005000001, 40.01);
-    	
-    	// Location along the top edge, traveling with the forward edge exactly.
-		LocationObservation loc = new LocationObservation.Builder()
-				.setCoordinate(c).setHeading(top.getAzimuth()).build();
-		
-		// Request only car edges: top edge is car only.
-		TraversalRequirements reqs = new TraversalRequirements();
-		TraverseModeSet modes = new TraverseModeSet();
+        // Lies along the top edge
+        Coordinate c = new Coordinate(-74.005000001, 40.01);
+        // Request only car edges: top edge is car only.
+        TraversalRequirements reqs = new TraversalRequirements();
+        TraverseModeSet modes = new TraverseModeSet();
         modes.setCar(true);
         reqs.setModes(modes);
-        
-        // Both directions are car-only.
-        checkClosestEdgeModes(loc, reqs, 2);
+
+        for (double degreeOff = 0.0; degreeOff < 30.0; degreeOff += 3.0) {
+            // Location along the top edge, traveling with the forward edge
+            // exactly.
+            LocationObservation.Builder builder = new LocationObservation.Builder()
+                    .setCoordinate(c);
+            builder.setHeading(top.getAzimuth() + degreeOff);
+
+            // The top edge should be returned in all cases.
+            checkBest(reqs, builder.build(), top, 2);
+
+            // Try when we're off in the opposite direction
+            builder.setHeading(top.getAzimuth() - degreeOff);
+            checkBest(reqs, builder.build(), top, 2);
+        }
     }
 }
