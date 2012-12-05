@@ -2,9 +2,9 @@ package org.opentripplanner.routing.impl;
 
 import lombok.Getter;
 
+import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -85,15 +85,11 @@ public class CandidateEdge {
 		score = calcScore();
         
 		// Calculate the directional info.
-        double xd = nearestPointOnEdge.x - p.x;
-        double yd = nearestPointOnEdge.y - p.y;
-        directionToEdge = Math.atan2(yd, xd);
-        int edgeSegmentIndex = nearestSegmentIndex;
-        Coordinate c0 = edgeCoords.getCoordinate(edgeSegmentIndex);
+		int edgeSegmentIndex = nearestSegmentIndex;
+		Coordinate c0 = edgeCoords.getCoordinate(edgeSegmentIndex);
         Coordinate c1 = edgeCoords.getCoordinate(edgeSegmentIndex + 1);
-        xd = c1.x - c1.y;
-        yd = c1.y - c0.y;
-        directionOfEdge = Math.atan2(yd, xd);
+		directionOfEdge = DirectionUtils.getAzimuth(c0, c1);
+        directionToEdge = DirectionUtils.getAzimuth(nearestPointOnEdge, p);
         double absDiff = Math.abs(directionToEdge - directionOfEdge);
         directionDifference = Math.min(2 * Math.PI - absDiff, absDiff);
 		if (Double.isNaN(directionToEdge) || Double.isNaN(directionOfEdge)
@@ -232,4 +228,5 @@ public class CandidateEdge {
     	
     	return myScore;
     }
+	
 }
