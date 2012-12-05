@@ -28,10 +28,13 @@
                 <property name="cacheDirectory" value="/home/otp/osm" />
             </bean>
         </property>
-	<property name="defaultWayPropertySetSource">
+	    <property name="defaultWayPropertySetSource">
           <bean class="org.opentripplanner.graph_builder.impl.osm.DefaultWayPropertySetSource" />
-	</property>
+	    </property>
+    </bean>
 
+    <bean id="floatingIslands" class="org.opentripplanner.graph_builder.impl.PruneFloatingIslands">
+        <property name="maxIslandSize" value="5"/>
     </bean>
 
     <bean id="transitStreetLink" class="org.opentripplanner.graph_builder.impl.TransitToStreetNetworkGraphBuilderImpl" />
@@ -46,6 +49,7 @@
                 <ref bean="osmBuilder" />
                 <ref bean="transitStreetLink" />
                 <ref bean="optimizeTransit" />
+                <ref bean="floatingIslands" />
             </list>
         </property>
     </bean>
