@@ -17,8 +17,8 @@ public class EdgeMatchExtension extends EdgeMatch {
 	 * @param candidate
 	 */
 	public EdgeMatchExtension(CandidateEdge candidate) {
-		setEdge(new GraphEdgeExtension(candidate.edge));
-		setClosest_point(new LatLngExtension(candidate.nearestPointOnEdge));
+		setEdge(new GraphEdgeExtension(candidate.getEdge()));
+		setClosest_point(new LatLngExtension(candidate.getNearestPointOnEdge()));
 		setScore(candidate.getScore());
 	}
 }
