@@ -196,12 +196,34 @@ otp.widgets.ItinerariesWidget =
             var legDiv = $('<div></div>');
             
             $('<div class="otp-itin-leg-leftcol">'+otp.util.Time.formatItinTime(leg.startTime, "h:mma")+"</div>").appendTo(legDiv);
-            $('<div class="otp-itin-leg-endpointDesc"><b>Board</b> at '+leg.from.name+'</div>').appendTo(legDiv);
+
+            $('<div class="otp-itin-leg-endpointDesc"><b>Board</b> at '+leg.from.name+'</div>')
+            .appendTo(legDiv)
+            .click(function(evt) {
+                this_.module.webapp.map.lmap.panTo(new L.LatLng(leg.from.lat, leg.from.lon));
+            }).hover(function(evt) {
+                this_.module.pathMarkerLayer.clearLayers();
+                this_.module.drawStartBubble(leg, true);            
+            }, function(evt) {
+                this_.module.pathMarkerLayer.clearLayers();
+                this_.module.drawAllStartBubbles(this_.itineraries[this_.activeIndex]);
+            });
 
             $('<div class="otp-itin-leg-elapsedDesc">Time in transit: '+otp.util.Time.msToHrMin(leg.duration)+'</div>').appendTo(legDiv);
 
             $('<div class="otp-itin-leg-leftcol">'+otp.util.Time.formatItinTime(leg.endTime, "h:mma")+"</div>").appendTo(legDiv);
-            $('<div class="otp-itin-leg-endpointDesc"><b>Alight</b> at '+leg.to.name+'</div>').appendTo(legDiv);
+
+            $('<div class="otp-itin-leg-endpointDesc"><b>Alight</b> at '+leg.to.name+'</div>')
+            .appendTo(legDiv)
+            .click(function(evt) {
+                this_.module.webapp.map.lmap.panTo(new L.LatLng(leg.to.lat, leg.to.lon));
+            }).hover(function(evt) {
+                this_.module.pathMarkerLayer.clearLayers();
+                this_.module.drawEndBubble(leg, true);            
+            }, function(evt) {
+                this_.module.pathMarkerLayer.clearLayers();
+                this_.module.drawAllStartBubbles(this_.itineraries[this_.activeIndex]);
+            });
             
             return legDiv;
 
@@ -230,12 +252,11 @@ otp.widgets.ItinerariesWidget =
                     distArr[0]+'</span><br>'+distArr[1]+'</div>';
                 html += '<div class="otp-itin-step-text">'+text+'</div>';
                 html += '<div style="clear:both;"></div></div>';
-                var jq = $(html);
 
-                jq.data("step", step);
-                jq.data("stepText", text);
-
-                jq.appendTo(legDiv).click(function(evt) {
+                $(html).appendTo(legDiv)
+                .data("step", step)
+                .data("stepText", text)
+                .click(function(evt) {
                     var step = $(this).data("step");
                     this_.module.webapp.map.lmap.panTo(new L.LatLng(step.lat, step.lon));
                 }).hover(function(evt) {

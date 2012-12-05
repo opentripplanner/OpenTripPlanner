@@ -676,6 +676,7 @@ h6.drag-to-change {
     border-left: 1px solid #ccc;
     margin-left: 5em;
     padding-left: .5em;
+    cursor: pointer;
 }
 
 .otp-itin-leg-elapsedDesc {
@@ -746,10 +747,10 @@ h6.drag-to-change {
 }
 
 .otp-itin-step-row {
-    /*height: 2.5em;*/
     background: #e8e8e8;
     margin-bottom: .3em;
     padding: .3em;
+    cursor: pointer;
 }
 
 .otp-itin-step-icon {
