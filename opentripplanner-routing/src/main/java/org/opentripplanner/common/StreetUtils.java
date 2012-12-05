@@ -98,11 +98,11 @@ public class StreetUtils {
             }
             islands.add(subgraph);
         }
-    	
-    	/* remove all tiny subgraphs */
+        _log.debug(islands.size() + " sub graphs found");
+        /* remove all tiny subgraphs */
         for (HashSet<Vertex> island : islands) {
             if (island.size() < 40) {
-                _log.warn(graph.addBuilderAnnotation(new GraphConnectivity(island.iterator().next())));
+                _log.warn(graph.addBuilderAnnotation(new GraphConnectivity(island.iterator().next(), island.size())));
                 depedestrianizeOrRemove(graph, island);
             }
         }
