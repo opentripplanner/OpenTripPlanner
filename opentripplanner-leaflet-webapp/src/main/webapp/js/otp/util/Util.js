@@ -27,6 +27,14 @@ otp.util.Geo = {
 
 };
 
+
+otp.util.Text = {
+
+    capitalizeFirstChar : function(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    }
+}
+
 otp.util.Itin = {
 
     getFirstStop : function(itin) {
@@ -50,6 +58,35 @@ otp.util.Itin = {
             if(i < itin.legs.length-1) html += '<img src="images/mode/arrow.png" style="margin: 0px '+(padding || '3')+'px;">';
         }
         return html;
-    }   
+    },
     
+    getLegStepText : function(step) {
+        var text = '';
+        if(step.relativeDirection == "CIRCLE_COUNTERCLOCKWISE" || step.relativeDirection == "CIRCLE_CLOCKWISE") {
+            text += 'Take roundabout ' +
+                (step.relativeDirection == "CIRCLE_COUNTERCLOCKWISE" ? 'counter' : '')+'clockwise to ' +
+                step.exit+'__ exit on '+step.streetName;
+        }
+        else {
+            if(!step.relativeDirection) text += "Start on <b>"+step.streetName+"</b>";
+            else {
+                text += '<b>'+otp.util.Text.capitalizeFirstChar(this.directionString(step.relativeDirection))+'</b> '+
+                            (step.stayOn ? "to continue on" : "on to")  + ' <b>' +step.streetName+"</b>";
+            }
+        }
+        return text + ' and proceed <b>'+otp.util.Itin.distanceString(step.distance)+'</b>';
+    },
+
+    // placeholder until localization is addressed
+    directionString : function(dir) {
+        return dir.toLowerCase().replace('_',' ').replace('ly','');
+    },
+    
+    distanceString : function(m) {
+        var ft = m*3.28084;
+        if(ft < 528) return Math.round(ft) + ' ft.';
+        return Math.round(ft/528)/10+" mi.";
+    }
+    
+       
 }

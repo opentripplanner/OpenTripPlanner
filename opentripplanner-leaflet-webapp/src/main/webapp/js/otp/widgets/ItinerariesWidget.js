@@ -192,8 +192,6 @@ otp.widgets.ItinerariesWidget =
     
     renderLeg : function(leg, previousLeg) {
         if(otp.util.Itin.isTransit(leg.mode)) {
-            var html = '<div>';
-            
             var legDiv = $('<div></div>');
             
             $('<div class="otp-itin-leg-leftcol">'+otp.util.Time.formatItinTime(leg.startTime, "h:mma")+"</div>").appendTo(legDiv);
@@ -211,6 +209,28 @@ otp.widgets.ItinerariesWidget =
                 html += '<div class="otp-itin-leg-endpointDesc">Arrive at '+leg.from.name+'</div>';
                 html += '<div class="otp-itin-leg-elapsedDesc">Wait time: '+otp.util.Time.msToHrMin(leg.startTime-previousLeg.endTime)+'</div>';
             }*/
+        }
+        else { // walk / bike / car
+            var legDiv = $('<div></div>');
+            
+            for(var i=0; i<leg.steps.length; i++) {
+                var step = leg.steps[i];
+                
+                var html = '<div class="otp-itin-step-row">';
+                html += '<div class="otp-itin-step-icon">';
+                if(step.relativeDirection) html += '<img src="images/directions/'+step.relativeDirection.toLowerCase()+'.png">';
+                html += '</div>';                
+                html += '<div class="otp-itin-step-text">'+otp.util.Itin.getLegStepText(step)+'</div>';
+                html += '<div style="clear:both;"></div></div>';
+                $(html).appendTo(legDiv).click(function(evt) {
+                    console.log("click");    
+                }).hover(function(evt) {
+                    $(evt.delegateTarget).css('background', '#f0f0f0');
+                }, function(evt) {
+                    $(evt.delegateTarget).css('background', '#e8e8e8');
+                });
+            }
+            return legDiv;                        
         }
         return $("<div>Leg details go here</div>");
     }

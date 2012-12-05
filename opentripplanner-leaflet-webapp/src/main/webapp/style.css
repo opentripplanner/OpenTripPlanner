@@ -745,6 +745,25 @@ h6.drag-to-change {
     margin-top: 16px;
 }
 
+.otp-itin-step-row {
+    /*height: 2.5em;*/
+    background: #e8e8e8;
+    margin-bottom: .3em;
+    padding: .3em;
+}
+
+.otp-itin-step-icon {
+    margin: 3px 8px 3px 4px;
+    width: 20px;
+    height: 20px;
+    float: left;
+}
+
+.otp-itin-step-text {
+    font-size: .8em;
+}
+
+
 /* Past Queries Widget */
 
 .otp-pastQueriesWidget {
