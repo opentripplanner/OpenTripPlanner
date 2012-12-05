@@ -78,6 +78,16 @@ def Main():
     print 'FindNearestVertexRequest took %.6f seconds' % total_t
     print 'Nearest vertex: ', res.nearest_vertex
     
+    
+    req = OTPService.FindNearestEdgesRequest(location=origin_loc,
+                                             allowed_modes=set([TravelMode.CAR]))
+    start_t = time.time()
+    res = client.FindNearestEdges(req)
+    total_t = time.time() - start_t
+    
+    print 'FindNearestEdgesRequest took %.6f seconds' % total_t
+    print 'Nearest edges: ', res.nearest_edges
+    
     # Request a walking trip between them.
     trip_params = TripParameters(
         origin=origin_loc, destination=dest_loc,
