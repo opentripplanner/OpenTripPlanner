@@ -144,6 +144,20 @@ public class ClosestEdgesTest {
     }
     
     @Test
+    public void testInteriorEdgeCase() {
+    	// Lies smack in the middle of the box
+        Coordinate c = new Coordinate(-74.005, 40.005);
+        LocationObservation loc = new LocationObservation(c);
+        TraversalRequirements reqs = new TraversalRequirements();
+        
+        // Should only return 2 edges even though all edges are equidistant.
+        // TODO(flamholz): this doesn't feel like the right behavior to me.
+        // Consider fixing it.
+		CandidateEdgeBundle edges = finder.getClosestEdges(loc, reqs);
+		assertEquals(2, edges.size());
+    }
+    
+    @Test
     public void testHeading() {
 		// TODO(flamholz): update this code once we include the difference between the heading and
     	// heading in the edge ranking.
