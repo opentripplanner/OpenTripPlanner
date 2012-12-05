@@ -334,12 +334,12 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 }
 
                 TraverseModeSet modes = reqs.getModes();
-                CandidateEdge ce = new CandidateEdge(e, coordinate, preferrence, modes);
+                CandidateEdge ce = new CandidateEdge(e, location, preferrence, modes);
                 
                 // Even if an edge is outside the query envelope, bounding boxes can
                 // still intersect. In this case, distance to the edge is greater
                 // than the query envelope size.
-                if (ce.distance < radius) {
+                if (ce.getDistance() < radius) {
                     candidateEdges.add(ce);
                 }
             }

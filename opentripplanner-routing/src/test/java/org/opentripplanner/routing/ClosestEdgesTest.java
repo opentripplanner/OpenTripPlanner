@@ -157,25 +157,46 @@ public class ClosestEdgesTest {
 		assertEquals(2, edges.size());
     }
     
+    /**
+     * Checks that the best edge found is this one and that the number of edges found matches.
+     * 
+     * @param reqs
+     * @param loc
+     * @param expectedBest
+     * @param expectedCandidates
+     */
+    private void checkBest(TraversalRequirements reqs, LocationObservation loc,
+    		StreetEdge expectedBest, int expectedCandidates) {        
+        // Should give me the top edge as the best edge.
+        // topBack is worse because of the heading.
+		CandidateEdgeBundle candidates = finder.getClosestEdges(loc, reqs);
+		assertEquals(expectedBest, candidates.best.getEdge());
+		assertEquals(expectedCandidates, candidates.size());
+    }
+    
     @Test
     public void testHeading() {
-		// TODO(flamholz): update this code once we include the difference between the heading and
-    	// heading in the edge ranking.
-
     	// Lies along the top edge
     	Coordinate c = new Coordinate(-74.005000001, 40.01);
-    	
-    	// Location along the top edge, traveling with the forward edge exactly.
-		LocationObservation loc = new LocationObservation.Builder()
-				.setCoordinate(c).setHeading(top.getAzimuth()).build();
-		
 		// Request only car edges: top edge is car only.
 		TraversalRequirements reqs = new TraversalRequirements();
 		TraverseModeSet modes = new TraverseModeSet();
         modes.setCar(true);
         reqs.setModes(modes);
-        
-        // Both directions are car-only.
-        checkClosestEdgeModes(loc, reqs, 2);
+    	
+    	for (double degreeOff = 0.0; degreeOff < 15.0; degreeOff += 3.0) {
+	    	// Location along the top edge, traveling with the forward edge exactly.
+    		LocationObservation.Builder builder = new LocationObservation.Builder().setCoordinate(c);
+			builder.setHeading(top.getAzimuth() + degreeOff);
+			
+			System.out.println(degreeOff);
+			
+			// The top edge should be returned in all cases.
+			checkBest(reqs, builder.build(), top, 2);
+			
+			// Try when we're off in the opposite direction
+			builder.setHeading(top.getAzimuth() - degreeOff);
+			checkBest(reqs, builder.build(), top, 2);
+    	}
     }
 }

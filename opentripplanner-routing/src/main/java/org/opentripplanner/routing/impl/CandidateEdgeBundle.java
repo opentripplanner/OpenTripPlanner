@@ -73,7 +73,7 @@ public class CandidateEdgeBundle extends ArrayList<CandidateEdge> {
 					.entrySet()) {
 				double distance = bin.getKey().distance;
 				double direction = bin.getKey().angle;
-				if (Math.abs(direction - ce.directionToEdge) < DIRECTION_ERROR
+				if (Math.abs(direction - ce.getDirectionToEdge()) < DIRECTION_ERROR
 						&& Math.abs(distance - ce.distance) < DISTANCE_ERROR
 						&& ce.endwise() == bin.getKey().endwise) {
 					bin.getValue().add(ce);
@@ -81,7 +81,7 @@ public class CandidateEdgeBundle extends ArrayList<CandidateEdge> {
 				}
 			}
 			DistanceAndAngle rTheta = new DistanceAndAngle(ce.distance,
-					ce.directionToEdge, ce.endwise());
+					ce.getDirectionToEdge(), ce.endwise());
 			CandidateEdgeBundle bundle = new CandidateEdgeBundle();
 			bundle.add(ce);
 			bins.put(rTheta, bundle);
