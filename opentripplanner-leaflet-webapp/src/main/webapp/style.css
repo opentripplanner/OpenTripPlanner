@@ -719,7 +719,7 @@ h6.drag-to-change {
 }
 
 .otp-itin-div-icon-nw-highlight {
-    background: url('images/mode/mode_bubble_nw.png');
+    background: url('images/mode/mode_bubble_nw_highlight.png');
 }
 
 .otp-itin-div-icon-ne-highlight {
@@ -759,8 +759,19 @@ h6.drag-to-change {
     float: left;
 }
 
+.otp-itin-step-dist {
+    margin: 0px 4px 0px 8px;
+    font-size: .8em;
+    width: 25px;
+    float: right;
+    text-align: center;
+    color: gray;
+    
+}
+
 .otp-itin-step-text {
     font-size: .8em;
+    margin: 0px 30px;
 }
 
 

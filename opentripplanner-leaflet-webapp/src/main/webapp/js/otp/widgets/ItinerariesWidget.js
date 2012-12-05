@@ -191,6 +191,7 @@ otp.widgets.ItinerariesWidget =
     },
     
     renderLeg : function(leg, previousLeg) {
+        var this_ = this;
         if(otp.util.Itin.isTransit(leg.mode)) {
             var legDiv = $('<div></div>');
             
@@ -215,19 +216,38 @@ otp.widgets.ItinerariesWidget =
             
             for(var i=0; i<leg.steps.length; i++) {
                 var step = leg.steps[i];
+                var text = otp.util.Itin.getLegStepText(step);
                 
-                var html = '<div class="otp-itin-step-row">';
+                var html = '<div id="foo-'+i+'" class="otp-itin-step-row">';
                 html += '<div class="otp-itin-step-icon">';
-                if(step.relativeDirection) html += '<img src="images/directions/'+step.relativeDirection.toLowerCase()+'.png">';
+                if(step.relativeDirection)
+                    html += '<img src="images/directions/' +
+                        step.relativeDirection.toLowerCase()+'.png">';
                 html += '</div>';                
-                html += '<div class="otp-itin-step-text">'+otp.util.Itin.getLegStepText(step)+'</div>';
+                var distArr= otp.util.Itin.distanceString(step.distance).split(" ");
+                html += '<div class="otp-itin-step-dist">' +
+                    '<span style="font-weight:bold; font-size: 1.2em;">' + 
+                    distArr[0]+'</span><br>'+distArr[1]+'</div>';
+                html += '<div class="otp-itin-step-text">'+text+'</div>';
                 html += '<div style="clear:both;"></div></div>';
-                $(html).appendTo(legDiv).click(function(evt) {
-                    console.log("click");    
+                var jq = $(html);
+
+                jq.data("step", step);
+                jq.data("stepText", text);
+
+                jq.appendTo(legDiv).click(function(evt) {
+                    var step = $(this).data("step");
+                    this_.module.webapp.map.lmap.panTo(new L.LatLng(step.lat, step.lon));
                 }).hover(function(evt) {
-                    $(evt.delegateTarget).css('background', '#f0f0f0');
+                    var step = $(this).data("step");
+                    $(this).css('background', '#f0f0f0');
+                    var popup = L.popup()
+                        .setLatLng(new L.LatLng(step.lat, step.lon))
+                        .setContent($(this).data("stepText"))
+                        .openOn(this_.module.webapp.map.lmap);
                 }, function(evt) {
-                    $(evt.delegateTarget).css('background', '#e8e8e8');
+                    $(this).css('background', '#e8e8e8');
+                    this_.module.webapp.map.lmap.closePopup();
                 });
             }
             return legDiv;                        

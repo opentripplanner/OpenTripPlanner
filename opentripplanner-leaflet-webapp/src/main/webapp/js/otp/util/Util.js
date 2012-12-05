@@ -32,6 +32,16 @@ otp.util.Text = {
 
     capitalizeFirstChar : function(str) {
         return str.charAt(0).toUpperCase() + str.slice(1);
+    },
+    
+    ordinal : function(n) {
+        if(n > 10 && n < 14) return n+"th";
+        switch(n % 10) {
+            case 1: return n+"st";
+            case 2: return n+"nd";
+            case 3: return n+"rd";
+        }
+        return n+"th";
     }
 }
 
@@ -65,7 +75,7 @@ otp.util.Itin = {
         if(step.relativeDirection == "CIRCLE_COUNTERCLOCKWISE" || step.relativeDirection == "CIRCLE_CLOCKWISE") {
             text += 'Take roundabout ' +
                 (step.relativeDirection == "CIRCLE_COUNTERCLOCKWISE" ? 'counter' : '')+'clockwise to ' +
-                step.exit+'__ exit on '+step.streetName;
+                otp.util.Text.ordinal(step.exit)+' exit on '+step.streetName;
         }
         else {
             if(!step.relativeDirection) text += "Start on <b>"+step.streetName+"</b>";
@@ -74,7 +84,7 @@ otp.util.Itin = {
                             (step.stayOn ? "to continue on" : "on to")  + ' <b>' +step.streetName+"</b>";
             }
         }
-        return text + ' and proceed <b>'+otp.util.Itin.distanceString(step.distance)+'</b>';
+        return text; // + ' and proceed <b>'+otp.util.Itin.distanceString(step.distance)+'</b>';
     },
 
     // placeholder until localization is addressed
@@ -84,8 +94,8 @@ otp.util.Itin = {
     
     distanceString : function(m) {
         var ft = m*3.28084;
-        if(ft < 528) return Math.round(ft) + ' ft.';
-        return Math.round(ft/528)/10+" mi.";
+        if(ft < 528) return Math.round(ft) + ' feet';
+        return Math.round(ft/528)/10+" miles";
     }
     
        
