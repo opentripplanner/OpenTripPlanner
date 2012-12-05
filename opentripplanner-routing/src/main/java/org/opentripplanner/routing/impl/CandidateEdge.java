@@ -255,7 +255,7 @@ public class CandidateEdge {
     /**
      * Internal calculator for the score.
      * 
-     * Assumes that edge, platform and distance are initialized. TODO(flamholz): account for direction of travel here.
+     * Assumes that edge, platform and distance are initialized.
      * 
      * @return
      */
