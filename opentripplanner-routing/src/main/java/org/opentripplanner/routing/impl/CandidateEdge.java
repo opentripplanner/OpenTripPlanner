@@ -25,6 +25,23 @@ public class CandidateEdge {
     
     private double preference; 
     
+    private CoordinateSequence edgeCoords;
+    
+    /**
+     * Number of coordinates on the edge.
+     */
+    private int numEdgeCoords;
+    
+    /**
+     * Index of the closest segment along the edge.
+     */
+    private int nearestSegmentIndex;
+    
+    /**
+     * Fractional distance along the closest segment.
+     */
+    private double nearestSegmentFraction;
+    
     /**
      * The edge itself.
      */
@@ -42,7 +59,7 @@ public class CandidateEdge {
      * The coordinate of the nearest point on the edge.
      */
     public final Coordinate nearestPointOnEdge;
-
+        
     public final double directionToEdge;
 
     public final double directionOfEdge;
@@ -50,63 +67,30 @@ public class CandidateEdge {
     public final double directionDifference;
 
     public final double distance;
-
+    
     public CandidateEdge(StreetEdge e, Coordinate p, double pref, TraverseModeSet mode) {
     	preference = pref;
-    	platform = calcPlatform(mode);
-        edge = e;
-
-        LineString edgeGeom = edge.getGeometry();
-        CoordinateSequence coordSeq = edgeGeom.getCoordinateSequence();
-        int numCoords = coordSeq.size();
-        int bestSeg = 0;
-        double bestDist2 = Double.POSITIVE_INFINITY;
-        double bestFrac = 0;
+    	edge = e;
+    	edgeCoords = e.getGeometry().getCoordinateSequence();
+        numEdgeCoords = edgeCoords.size();
         nearestPointOnEdge = new Coordinate();
-        double xscale = Math.cos(p.y * Math.PI / 180);
-        for (int seg = 0; seg < numCoords - 1; seg++) {
-            double x0 = coordSeq.getX(seg);
-            double y0 = coordSeq.getY(seg);
-            double x1 = coordSeq.getX(seg+1);
-            double y1 = coordSeq.getY(seg+1);
-            double frac = GeometryUtils.segmentFraction(x0, y0, x1, y1, p.x, p.y, xscale);
-            // project to get closest point
-            double x = x0 + frac * (x1 - x0);
-            double y = y0 + frac * (y1 - y0);
-            // find ersatz distance to edge (do not take root)
-            double dx = (x - p.x) * xscale;
-            double dy = y - p.y;
-            double dist2 = dx * dx + dy * dy;
-            // replace best segments
-            if (dist2 < bestDist2) {
-                nearestPointOnEdge.x = x;
-                nearestPointOnEdge.y = y;
-                bestFrac = frac;
-                bestSeg = seg;
-                bestDist2 = dist2;
-            }
-        } // end loop over segments
-
-        distance = Math.sqrt(bestDist2); //distanceLibrary.distance(p, nearestPointOnEdge);
-		if (bestSeg == 0 && Math.abs(bestFrac) < 0.000001) {
-			endwiseVertex = (StreetVertex) edge.getFromVertex();
-		} else if (bestSeg == numCoords - 2
-				   && Math.abs(bestFrac - 1.0) < 0.000001) {
-			endwiseVertex = (StreetVertex) edge.getToVertex();
-		} else {
-			endwiseVertex = null;
-		}
-    
-		// Calculate the score.
+    	
+    	// Initializes this.platform
+    	calcPlatform(mode);
+        // Initializes nearestPointOnEdge, nearestSegmentIndex, nearestSegmentFraction.
+    	distance = calcNearestPoint(p);
+    	
+    	// 
+    	endwiseVertex = calcEndwiseVertex();
 		score = calcScore();
         
 		// Calculate the directional info.
         double xd = nearestPointOnEdge.x - p.x;
         double yd = nearestPointOnEdge.y - p.y;
         directionToEdge = Math.atan2(yd, xd);
-        int edgeSegmentIndex = bestSeg;
-        Coordinate c0 = coordSeq.getCoordinate(edgeSegmentIndex);
-        Coordinate c1 = coordSeq.getCoordinate(edgeSegmentIndex + 1);
+        int edgeSegmentIndex = nearestSegmentIndex;
+        Coordinate c0 = edgeCoords.getCoordinate(edgeSegmentIndex);
+        Coordinate c1 = edgeCoords.getCoordinate(edgeSegmentIndex + 1);
         xd = c1.x - c1.y;
         yd = c1.y - c0.y;
         directionOfEdge = Math.atan2(yd, xd);
@@ -140,12 +124,68 @@ public class CandidateEdge {
      */
     
     /**
+     * Initializes this.nearestPointOnEdge and other distance-related variables.
+     * 
+     * @param p
+     */
+    private double calcNearestPoint(Coordinate p) {
+    	LineString edgeGeom = edge.getGeometry();
+        CoordinateSequence coordSeq = edgeGeom.getCoordinateSequence();
+        int bestSeg = 0;
+        double bestDist2 = Double.POSITIVE_INFINITY;
+        double bestFrac = 0;
+        double xscale = Math.cos(p.y * Math.PI / 180);
+        for (int seg = 0; seg < numEdgeCoords - 1; seg++) {
+            double x0 = coordSeq.getX(seg);
+            double y0 = coordSeq.getY(seg);
+            double x1 = coordSeq.getX(seg+1);
+            double y1 = coordSeq.getY(seg+1);
+            double frac = GeometryUtils.segmentFraction(x0, y0, x1, y1, p.x, p.y, xscale);
+            // project to get closest point
+            double x = x0 + frac * (x1 - x0);
+            double y = y0 + frac * (y1 - y0);
+            // find ersatz distance to edge (do not take root)
+            double dx = (x - p.x) * xscale;
+            double dy = y - p.y;
+            double dist2 = dx * dx + dy * dy;
+            // replace best segments
+            if (dist2 < bestDist2) {
+                nearestPointOnEdge.x = x;
+                nearestPointOnEdge.y = y;
+                bestFrac = frac;
+                bestSeg = seg;
+                bestDist2 = dist2;
+            }
+        } // end loop over segments
+        
+        nearestSegmentIndex = bestSeg;
+        nearestSegmentFraction = bestFrac;
+        return Math.sqrt(bestDist2); // distanceLibrary.distance(p, nearestPointOnEdge);
+    }
+    
+
+    /**
+     * 
+     * @return
+     */
+    private StreetVertex calcEndwiseVertex() {
+    	StreetVertex retV = null;
+		if (nearestSegmentIndex == 0 && Math.abs(nearestSegmentFraction) < 0.000001) {
+			retV = (StreetVertex) edge.getFromVertex();
+		} else if (nearestSegmentIndex == numEdgeCoords - 2
+				   && Math.abs(nearestSegmentFraction - 1.0) < 0.000001) {
+			retV = (StreetVertex) edge.getToVertex();
+		} 
+		return retV;
+    }
+    
+    /**
      * Calculate the platform int.
      * 
      * @param mode
      * @return
      */
-    private int calcPlatform(TraverseModeSet mode) {
+    private void calcPlatform(TraverseModeSet mode) {
     	int out = 0;
         if (mode.getTrainish()) {
             out |= StreetEdge.CLASS_TRAIN_PLATFORM;
@@ -153,7 +193,7 @@ public class CandidateEdge {
         if (mode.getBusish()) {
             out |= StreetEdge.CLASS_OTHER_PLATFORM;
         }
-        return out;
+        platform = out;
 	}
 
     /**
