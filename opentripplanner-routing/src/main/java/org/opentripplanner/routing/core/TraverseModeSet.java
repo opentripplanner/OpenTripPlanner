@@ -56,6 +56,8 @@ public class TraverseModeSet implements Cloneable, Serializable {
     private static final int MODE_BUSISH = MODE_CABLE_CAR | MODE_BUS;
 
     private static final int MODE_TRANSIT = MODE_TRAINISH | MODE_BUSISH | MODE_FERRY;
+    
+    private static final int MODE_ALL = MODE_TRANSIT | MODE_CAR | MODE_WALK | MODE_BICYCLE;
 
     private int modes = 0;
 
@@ -74,6 +76,17 @@ public class TraverseModeSet implements Cloneable, Serializable {
         for (TraverseMode mode : modes) {
             this.modes |= getMaskForMode(mode);
         }
+    }
+    
+    /**
+     * Returns a mode set containing all modes.
+     * 
+     * @return
+     */
+    public static TraverseModeSet allModes() {
+    	TraverseModeSet modes = new TraverseModeSet();
+    	modes.modes = MODE_ALL;
+    	return modes;
     }
 
     private final int getMaskForMode(TraverseMode mode) {

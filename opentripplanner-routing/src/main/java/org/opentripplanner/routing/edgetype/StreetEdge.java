@@ -53,7 +53,7 @@ public abstract class StreetEdge extends EdgeWithElevation {
 	 * @return
 	 */
 	public abstract boolean canTraverse(RoutingRequest options);
-
+	
 	public abstract double getLength();
 
 	public abstract StreetTraversalPermission getPermission();

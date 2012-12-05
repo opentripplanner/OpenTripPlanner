@@ -74,8 +74,12 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     private StreetTraversalPermission permission;
 
     @Getter @Setter
-    private int streetClass = CLASS_OTHERPATH;
-
+	private int streetClass = CLASS_OTHERPATH;
+	
+    /**
+	 * Marks that this edge is the reverse of the one defined in the source
+	 * data. Does NOT mean fromv/tov are reversed.
+	 */
     public boolean back;
     
     @Getter @Setter
@@ -247,7 +251,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 		if (!canTraverse(options, traverseMode)) {
 			if (traverseMode == TraverseMode.BICYCLE) {
 				// try walking bike since you can't ride here
-				return doTraverse(s0, options.getWalkingOptions(),
+				return doTraverse(s0, options.getBikeWalkingOptions(),
 						TraverseMode.WALK);
 			}
 			return null;

@@ -21,6 +21,10 @@ public class CandidateEdge {
 
     private static final double CAR_PREFERENCE = 100;
 
+    private int platform;
+    
+    private double preference; 
+    
     /**
      * The edge itself.
      */
@@ -47,15 +51,11 @@ public class CandidateEdge {
 
     public final double distance;
 
-    public CandidateEdge(StreetEdge e, Coordinate p, double preference, TraverseModeSet mode) {
-        int platform = 0;
-        if (mode.contains(TraverseMode.TRAINISH)) {
-            platform |= StreetEdge.CLASS_TRAIN_PLATFORM;
-        }
-        if (mode.contains(TraverseMode.BUSISH)) {
-            platform |= StreetEdge.CLASS_OTHER_PLATFORM;
-        }
+    public CandidateEdge(StreetEdge e, Coordinate p, double pref, TraverseModeSet mode) {
+    	preference = pref;
+    	platform = calcPlatform(mode);
         edge = e;
+
         LineString edgeGeom = edge.getGeometry();
         CoordinateSequence coordSeq = edgeGeom.getCoordinateSequence();
         int numCoords = coordSeq.size();
@@ -96,25 +96,11 @@ public class CandidateEdge {
 		} else {
 			endwiseVertex = null;
 		}
-        score = distance * SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_KM * 1000 / 360.0;
-        score /= preference;
-        if ((e.getStreetClass() & platform) != 0) {
-            // this is kind of a hack, but there's not really a better way to do it
-            score /= PLATFORM_PREFERENCE;
-        }
-        if (e.getName().contains("sidewalk")) {
-            // this is kind of a hack, but there's not really a better way to do it
-            score /= SIDEWALK_PREFERENCE;
-        }
-        if (e.getPermission().allows(StreetTraversalPermission.CAR)
-                || (e.getStreetClass() & platform) != 0) {
-            // we're subtracting here because no matter how close we are to a good non-car
-            // non-platform edge, we really want to avoid it in case it's a Pedway or other
-            // weird and unlikely starting location.
-            score -= CAR_PREFERENCE;
-        }
-        // break ties by choosing shorter edges; this should cause split streets to be preferred
-        score += edge.getLength() / 1000000;
+    
+		// Calculate the score.
+		score = calcScore();
+        
+		// Calculate the directional info.
         double xd = nearestPointOnEdge.x - p.x;
         double yd = nearestPointOnEdge.y - p.y;
         directionToEdge = Math.atan2(yd, xd);
@@ -147,5 +133,63 @@ public class CandidateEdge {
 
     public String toString() {
         return "CE(" + edge + ", " + score + ")";
+    }
+    
+    /**
+     * Private methods
+     */
+    
+    /**
+     * Calculate the platform int.
+     * 
+     * @param mode
+     * @return
+     */
+    private int calcPlatform(TraverseModeSet mode) {
+    	int out = 0;
+        if (mode.getTrainish()) {
+            out |= StreetEdge.CLASS_TRAIN_PLATFORM;
+        }
+        if (mode.getBusish()) {
+            out |= StreetEdge.CLASS_OTHER_PLATFORM;
+        }
+        return out;
+	}
+
+    /**
+     * Internal calculator for the score.
+     * 
+     * Assumes that edge, platform and distance are initialized.
+     * TODO(flamholz): account for direction of travel here.
+     * 
+     * @return
+     */
+	private double calcScore() {
+		double myScore = 0;
+
+		myScore = distance * SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_M
+				/ 360.0;
+		myScore /= preference;
+		if ((edge.getStreetClass() & platform) != 0) {
+			// this a hack, but there's not really a better way to do it
+			myScore /= PLATFORM_PREFERENCE;
+		}
+		if (edge.getName().contains("sidewalk")) {
+			// this is a hack, but there's not really a better way to do it
+			myScore /= SIDEWALK_PREFERENCE;
+		}
+		if (edge.getPermission().allows(StreetTraversalPermission.CAR)
+				|| (edge.getStreetClass() & platform) != 0) {
+			// we're subtracting here because no matter how close we are to a
+			// good non-car non-platform edge, we really want to avoid it in
+			// case it's a Pedway or other weird and unlikely starting location.
+			myScore -= CAR_PREFERENCE;
+		}
+		
+		// break ties by choosing shorter edges; this should cause split streets
+		// to be preferred
+		myScore += edge.getLength() / 1000000;
+    	
+    	return myScore;
     }
 }
