@@ -184,13 +184,11 @@ public class ClosestEdgesTest {
         modes.setCar(true);
         reqs.setModes(modes);
     	
-    	for (double degreeOff = 0.0; degreeOff < 15.0; degreeOff += 3.0) {
+    	for (double degreeOff = 0.0; degreeOff < 30.0; degreeOff += 3.0) {
 	    	// Location along the top edge, traveling with the forward edge exactly.
     		LocationObservation.Builder builder = new LocationObservation.Builder().setCoordinate(c);
 			builder.setHeading(top.getAzimuth() + degreeOff);
-			
-			System.out.println(degreeOff);
-			
+						
 			// The top edge should be returned in all cases.
 			checkBest(reqs, builder.build(), top, 2);
 			
