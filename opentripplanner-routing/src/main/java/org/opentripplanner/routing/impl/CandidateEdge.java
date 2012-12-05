@@ -161,8 +161,6 @@ public class CandidateEdge {
 	/**
 	 * Construct from a Coordinate. 
 	 * 
-	 * Deprecated.
-	 * 
 	 * @param e
 	 * @param p
 	 * @param pref

@@ -38,21 +38,21 @@ import com.vividsolutions.jts.geom.LineString;
 
 public class ClosestEdgesTest {
 
-    private Graph graph;
-    
-    private StreetVertexIndexService finder;
+	private Graph graph;
 
-    private PlainStreetEdge top, bottom, left, right;
+	private StreetVertexIndexService finder;
 
-    private IntersectionVertex br, tr, bl, tl;
+	private PlainStreetEdge top, bottom, left, right;
 
-    public LineString createGeometry(Vertex a, Vertex b) {
-        GeometryFactory factory = new GeometryFactory();
-        Coordinate[] cs = new Coordinate[2];
-        cs[0] = a.getCoordinate();
-        cs[1] = b.getCoordinate();
-        return factory.createLineString(cs);
-    }
+	private IntersectionVertex br, tr, bl, tl;
+
+	public LineString createGeometry(Vertex a, Vertex b) {
+		GeometryFactory factory = new GeometryFactory();
+		Coordinate[] cs = new Coordinate[2];
+		cs[0] = a.getCoordinate();
+		cs[1] = b.getCoordinate();
+		return factory.createLineString(cs);
+	}
 
 	@Before
 	public void before() {
@@ -89,9 +89,10 @@ public class ClosestEdgesTest {
 				.getGeometry().reverse(), "rightBack", 1500,
 				StreetTraversalPermission.CAR, true);
 
-		StreetVertexIndexServiceImpl myFinder = new StreetVertexIndexServiceImpl(graph);
-        myFinder.setup();
-        finder = myFinder;
+		StreetVertexIndexServiceImpl myFinder = new StreetVertexIndexServiceImpl(
+				graph);
+		myFinder.setup();
+		finder = myFinder;
 	}
 
 	private void checkClosestEdgeModes(LocationObservation loc,
@@ -105,96 +106,99 @@ public class ClosestEdgesTest {
 		}
 	}
 
-    @Test
-    public void testModeRestriction() {
-    	// Lies along the top right edge
-        Coordinate c = new Coordinate(-74.005000001, 40.01);
-        LocationObservation loc = new LocationObservation(c);
-        TraversalRequirements reqs = new TraversalRequirements();
-        
-        // Default traversal requirements allow any traversal mode.
-        checkClosestEdgeModes(loc, reqs, 1);
-        
-        // Only allow walking
-        TraverseModeSet modes = new TraverseModeSet();
-        modes.setWalk(true);
-        reqs.setModes(modes);
-        
-        // There's only one walkable edge.        
-        checkClosestEdgeModes(loc, reqs, 1);
-        
-        // Only allow biking: there are 5 bikeable edges.
-        modes = new TraverseModeSet();
-        modes.setBicycle(true);
-        reqs.setModes(modes);
-        checkClosestEdgeModes(loc, reqs, 2);
-        
-        // Only allow driving: there are 7 driveable edges.
-        modes = new TraverseModeSet();
-        modes.setCar(true);
-        reqs.setModes(modes);
-        checkClosestEdgeModes(loc, reqs, 2);
-        
-        // Allow driving and biking: all 8 edges can be traversed.
-        modes = new TraverseModeSet();
-        modes.setCar(true);
-        modes.setBicycle(true);
-        reqs.setModes(modes);
-        checkClosestEdgeModes(loc, reqs, 2);
-    }
-    
-    @Test
-    public void testInteriorEdgeCase() {
-    	// Lies smack in the middle of the box
-        Coordinate c = new Coordinate(-74.005, 40.005);
-        LocationObservation loc = new LocationObservation(c);
-        TraversalRequirements reqs = new TraversalRequirements();
-        
-        // Should only return 2 edges even though all edges are equidistant.
-        // TODO(flamholz): this doesn't feel like the right behavior to me.
-        // Consider fixing it.
+	@Test
+	public void testModeRestriction() {
+		// Lies along the top right edge
+		Coordinate c = new Coordinate(-74.005000001, 40.01);
+		LocationObservation loc = new LocationObservation(c);
+		TraversalRequirements reqs = new TraversalRequirements();
+
+		// Default traversal requirements allow any traversal mode.
+		checkClosestEdgeModes(loc, reqs, 1);
+
+		// Only allow walking
+		TraverseModeSet modes = new TraverseModeSet();
+		modes.setWalk(true);
+		reqs.setModes(modes);
+
+		// There's only one walkable edge.
+		checkClosestEdgeModes(loc, reqs, 1);
+
+		// Only allow biking: there are 5 bikeable edges.
+		modes = new TraverseModeSet();
+		modes.setBicycle(true);
+		reqs.setModes(modes);
+		checkClosestEdgeModes(loc, reqs, 2);
+
+		// Only allow driving: there are 7 driveable edges.
+		modes = new TraverseModeSet();
+		modes.setCar(true);
+		reqs.setModes(modes);
+		checkClosestEdgeModes(loc, reqs, 2);
+
+		// Allow driving and biking: all 8 edges can be traversed.
+		modes = new TraverseModeSet();
+		modes.setCar(true);
+		modes.setBicycle(true);
+		reqs.setModes(modes);
+		checkClosestEdgeModes(loc, reqs, 2);
+	}
+
+	@Test
+	public void testInteriorEdgeCase() {
+		// Lies smack in the middle of the box
+		Coordinate c = new Coordinate(-74.005, 40.005);
+		LocationObservation loc = new LocationObservation(c);
+		TraversalRequirements reqs = new TraversalRequirements();
+
+		// Should only return 2 edges even though all edges are equidistant.
+		// TODO(flamholz): this doesn't feel like the right behavior to me.
+		// Consider fixing it.
 		CandidateEdgeBundle edges = finder.getClosestEdges(loc, reqs);
 		assertEquals(2, edges.size());
-    }
-    
-    /**
-     * Checks that the best edge found is this one and that the number of edges found matches.
-     * 
-     * @param reqs
-     * @param loc
-     * @param expectedBest
-     * @param expectedCandidates
-     */
-    private void checkBest(TraversalRequirements reqs, LocationObservation loc,
-    		StreetEdge expectedBest, int expectedCandidates) {        
-        // Should give me the top edge as the best edge.
-        // topBack is worse because of the heading.
+	}
+
+	/**
+	 * Checks that the best edge found is this one and that the number of edges
+	 * found matches.
+	 * 
+	 * @param reqs
+	 * @param loc
+	 * @param expectedBest
+	 * @param expectedCandidates
+	 */
+	private void checkBest(TraversalRequirements reqs, LocationObservation loc,
+			StreetEdge expectedBest, int expectedCandidates) {
+		// Should give me the top edge as the best edge.
+		// topBack is worse because of the heading.
 		CandidateEdgeBundle candidates = finder.getClosestEdges(loc, reqs);
 		assertEquals(expectedBest, candidates.best.getEdge());
 		assertEquals(expectedCandidates, candidates.size());
-    }
-    
-    @Test
-    public void testHeading() {
-    	// Lies along the top edge
-    	Coordinate c = new Coordinate(-74.005000001, 40.01);
+	}
+
+	@Test
+	public void testHeading() {
+		// Lies along the top edge
+		Coordinate c = new Coordinate(-74.005000001, 40.01);
 		// Request only car edges: top edge is car only.
 		TraversalRequirements reqs = new TraversalRequirements();
 		TraverseModeSet modes = new TraverseModeSet();
-        modes.setCar(true);
-        reqs.setModes(modes);
-    	
-    	for (double degreeOff = 0.0; degreeOff < 30.0; degreeOff += 3.0) {
-	    	// Location along the top edge, traveling with the forward edge exactly.
-    		LocationObservation.Builder builder = new LocationObservation.Builder().setCoordinate(c);
+		modes.setCar(true);
+		reqs.setModes(modes);
+
+		for (double degreeOff = 0.0; degreeOff < 30.0; degreeOff += 3.0) {
+			// Location along the top edge, traveling with the forward edge
+			// exactly.
+			LocationObservation.Builder builder = new LocationObservation.Builder()
+					.setCoordinate(c);
 			builder.setHeading(top.getAzimuth() + degreeOff);
-						
+
 			// The top edge should be returned in all cases.
 			checkBest(reqs, builder.build(), top, 2);
-			
+
 			// Try when we're off in the opposite direction
 			builder.setHeading(top.getAzimuth() - degreeOff);
 			checkBest(reqs, builder.build(), top, 2);
-    	}
-    }
+		}
+	}
 }
