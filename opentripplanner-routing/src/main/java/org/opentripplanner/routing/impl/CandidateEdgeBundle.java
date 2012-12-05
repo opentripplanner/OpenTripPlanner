@@ -39,7 +39,7 @@ public class CandidateEdgeBundle extends ArrayList<CandidateEdge> {
 
 	public boolean add(CandidateEdge ce) {
 		if (best == null || ce.score < best.score) {
-			endwiseVertex = ce.endwiseVertex;
+			endwiseVertex = ce.getEndwiseVertex();
 			best = ce;
 		}
 		return super.add(ce);
@@ -48,7 +48,7 @@ public class CandidateEdgeBundle extends ArrayList<CandidateEdge> {
 	public List<StreetEdge> toEdgeList() {
 		List<StreetEdge> ret = new ArrayList<StreetEdge>();
 		for (CandidateEdge ce : this) {
-			ret.add(ce.edge);
+			ret.add(ce.getEdge());
 		}
 		return ret;
 	}
@@ -99,7 +99,7 @@ public class CandidateEdgeBundle extends ArrayList<CandidateEdge> {
 
 	public boolean isPlatform() {
 		for (CandidateEdge ce : CandidateEdgeBundle.this) {
-			StreetEdge e = ce.edge;
+			StreetEdge e = ce.getEdge();
 			if ((e.getStreetClass() & StreetEdge.ANY_PLATFORM_MASK) != 0) {
 				return true;
 			}
@@ -109,7 +109,7 @@ public class CandidateEdgeBundle extends ArrayList<CandidateEdge> {
 
 	public boolean allowsCars() {
 		for (CandidateEdge ce : CandidateEdgeBundle.this) {
-			StreetEdge e = ce.edge;
+			StreetEdge e = ce.getEdge();
 			if (e.getPermission().allows(StreetTraversalPermission.CAR)) {
 				return true;
 			}
