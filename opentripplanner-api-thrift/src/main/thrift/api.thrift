@@ -85,7 +85,7 @@ struct FindNearestEdgesRequest {
 	3: optional double heading;
 	
 	// Maximum number of edges to return.
-	10: optional i32 max_edges;
+	10: optional i32 max_edges = 10;
 }
 
 struct FindNearestEdgesResponse {

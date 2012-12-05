@@ -135,6 +135,8 @@ public class FindNearestEdgesRequest implements org.apache.thrift.TBase<FindNear
   }
 
   public FindNearestEdgesRequest() {
+    this.max_edges = 10;
+
   }
 
   public FindNearestEdgesRequest(
@@ -174,8 +176,8 @@ public class FindNearestEdgesRequest implements org.apache.thrift.TBase<FindNear
     this.allowed_modes = null;
     setHeadingIsSet(false);
     this.heading = 0.0;
-    setMax_edgesIsSet(false);
-    this.max_edges = 0;
+    this.max_edges = 10;
+
   }
 
   public org.opentripplanner.api.thrift.definition.Location getLocation() {
