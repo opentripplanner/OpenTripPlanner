@@ -89,8 +89,8 @@ struct FindNearestEdgesRequest {
 }
 
 struct FindNearestEdgesResponse {
-	// The list of nearby edges.
-	1: required list<EdgeMatch> nearest_edges;
+	// The list of nearby edges if any.
+	1: optional list<EdgeMatch> nearest_edges;
 }
 
 // Request to get vertices in the graph.
