@@ -7,40 +7,39 @@ import com.vividsolutions.jts.geom.Coordinate;
 
 public class LocationExtension extends Location {
 
-	/**
-	 * Required for serialization.
-	 */
-	private static final long serialVersionUID = -3538274254083456847L;
+    /**
+     * Required for serialization.
+     */
+    private static final long serialVersionUID = -3538274254083456847L;
 
-	/**
-	 * Default constructor.
-	 * 
-	 * TODO(flamholz): figure out if lombok calls superclass constructor?
-	 */
-	public LocationExtension() {
-		super();
-	}
+    /**
+     * Default constructor.
+     * 
+     * TODO(flamholz): figure out if lombok calls superclass constructor?
+     */
+    public LocationExtension() {
+        super();
+    }
 
-	/**
-	 * Makes a Thrift Location structure from a Coordinate.
-	 * 
-	 * @param c
-	 * @return
-	 */
-	public LocationExtension(Coordinate c) {
-		this();
-		setCoordinate(c);
-	}
+    /**
+     * Makes a Thrift Location structure from a Coordinate.
+     * 
+     * @param c
+     * @return
+     */
+    public LocationExtension(Coordinate c) {
+        this();
+        setCoordinate(c);
+    }
 
-	/**
-	 * Set the internal LatLng to a Coordinate, correctly mapping y, x = lat,
-	 * lng
-	 * 
-	 * @param c
-	 */
-	public void setCoordinate(Coordinate c) {
-		// lat, lng = y, x
-		LatLng latlng = new LatLng(c.y, c.x);
-		this.setLat_lng(latlng);
-	}
+    /**
+     * Set the internal LatLng to a Coordinate, correctly mapping y, x = lat, lng
+     * 
+     * @param c
+     */
+    public void setCoordinate(Coordinate c) {
+        // lat, lng = y, x
+        LatLng latlng = new LatLng(c.y, c.x);
+        this.setLat_lng(latlng);
+    }
 }

@@ -14,41 +14,40 @@ import org.opentripplanner.routing.core.TraverseModeSet;
  */
 public class TravelModeSet extends HashSet<TravelMode> {
 
-	/**
-	 * Serialization ID is required.
-	 */
-	private static final long serialVersionUID = 1L;
+    /**
+     * Serialization ID is required.
+     */
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * Default constructor.
-	 */
-	public TravelModeSet() {
-		super();
-	}
+    /**
+     * Default constructor.
+     */
+    public TravelModeSet() {
+        super();
+    }
 
-	/**
-	 * Construct from a pre-initialized collection of modes.
-	 * 
-	 * @param modes
-	 */
-	public TravelModeSet(Collection<TravelMode> modes) {
-		super(modes);
-	}
+    /**
+     * Construct from a pre-initialized collection of modes.
+     * 
+     * @param modes
+     */
+    public TravelModeSet(Collection<TravelMode> modes) {
+        super(modes);
+    }
 
-	/**
-	 * Convert in to a TraverseModeSet.
-	 * 
-	 * @return
-	 */
-	public TraverseModeSet toTraverseModeSet() {
-		TraverseModeSet modeSet = new TraverseModeSet();
-		for (TravelMode travelMode : this) {
-			TraverseMode traverseMode = (new TravelModeWrapper(travelMode))
-					.toTraverseMode();
-			modeSet.setMode(traverseMode, true);
-		}
+    /**
+     * Convert in to a TraverseModeSet.
+     * 
+     * @return
+     */
+    public TraverseModeSet toTraverseModeSet() {
+        TraverseModeSet modeSet = new TraverseModeSet();
+        for (TravelMode travelMode : this) {
+            TraverseMode traverseMode = (new TravelModeWrapper(travelMode)).toTraverseMode();
+            modeSet.setMode(traverseMode, true);
+        }
 
-		return modeSet;
-	}
+        return modeSet;
+    }
 
 }

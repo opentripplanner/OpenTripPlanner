@@ -26,56 +26,52 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 
+public class OTPServerMain {
 
-public class OTPServerMain {  
-	
-	private static final String CLASSPATH_PREFIX = "classpath:";
+    private static final String CLASSPATH_PREFIX = "classpath:";
 
-	private static final String FILE_PREFIX = "file:";
+    private static final String FILE_PREFIX = "file:";
 
-	public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {
 
-		if (args.length == 0) {
-			System.err.println("usage: config.xml");
-			System.exit(-1);
-		}
+        if (args.length == 0) {
+            System.err.println("usage: config.xml");
+            System.exit(-1);
+        }
 
-		List<String> paths = new ArrayList<String>();
-		paths.add("classpath:org/opentripplanner/api_thrift/application-context.xml");
-		for (String arg : args)
-			paths.add(arg);
+        List<String> paths = new ArrayList<String>();
+        paths.add("classpath:org/opentripplanner/api_thrift/application-context.xml");
+        for (String arg : args)
+            paths.add(arg);
 
-		ApplicationContext context = createContext(paths,
-				new HashMap<String, BeanDefinition>());
-		OTPServerTask task = (OTPServerTask) context
-				.getBean("otpServerTask");
-		task.run();
-	}
+        ApplicationContext context = createContext(paths, new HashMap<String, BeanDefinition>());
+        OTPServerTask task = (OTPServerTask) context.getBean("otpServerTask");
+        task.run();
+    }
 
-	public static ApplicationContext createContext(Iterable<String> paths,
-			Map<String, BeanDefinition> additionalBeans) {
+    public static ApplicationContext createContext(Iterable<String> paths,
+            Map<String, BeanDefinition> additionalBeans) {
 
-		GenericApplicationContext ctx = new GenericApplicationContext();
-		XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader(ctx);
+        GenericApplicationContext ctx = new GenericApplicationContext();
+        XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader(ctx);
 
-		for (String path : paths) {
-			if (path.startsWith(CLASSPATH_PREFIX)) {
-				path = path.substring(CLASSPATH_PREFIX.length());
-				xmlReader.loadBeanDefinitions(new ClassPathResource(path));
-			} else if (path.startsWith(FILE_PREFIX)) {
-				path = path.substring(FILE_PREFIX.length());
-				xmlReader.loadBeanDefinitions(new FileSystemResource(path));
-			} else {
-				xmlReader.loadBeanDefinitions(new FileSystemResource(path));
-			}
-		}
+        for (String path : paths) {
+            if (path.startsWith(CLASSPATH_PREFIX)) {
+                path = path.substring(CLASSPATH_PREFIX.length());
+                xmlReader.loadBeanDefinitions(new ClassPathResource(path));
+            } else if (path.startsWith(FILE_PREFIX)) {
+                path = path.substring(FILE_PREFIX.length());
+                xmlReader.loadBeanDefinitions(new FileSystemResource(path));
+            } else {
+                xmlReader.loadBeanDefinitions(new FileSystemResource(path));
+            }
+        }
 
-		for (Map.Entry<String, BeanDefinition> entry : additionalBeans
-				.entrySet())
-			ctx.registerBeanDefinition(entry.getKey(), entry.getValue());
+        for (Map.Entry<String, BeanDefinition> entry : additionalBeans.entrySet())
+            ctx.registerBeanDefinition(entry.getKey(), entry.getValue());
 
-		ctx.refresh();
-		ctx.registerShutdownHook();
-		return ctx;
-	}
+        ctx.refresh();
+        ctx.registerShutdownHook();
+        return ctx;
+    }
 }

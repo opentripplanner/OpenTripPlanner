@@ -29,32 +29,34 @@ import org.slf4j.LoggerFactory;
 @Data
 public class OTPServerTask implements Runnable {
 
-	private static Logger LOG = LoggerFactory.getLogger(OTPServerTask.class);
-	private OTPServiceImpl otpServiceImpl;
-	private int port;
+    private static Logger LOG = LoggerFactory.getLogger(OTPServerTask.class);
 
-	public void run() {
-		LOG.info("Run called, port {}", port);
-		if (otpServiceImpl == null) {
-			LOG.warn("otpServiceImpl is null, bailing");
-			return;
-		}
+    private OTPServiceImpl otpServiceImpl;
 
-		try {
-			OTPService.Processor<OTPServiceImpl> processor = new OTPService.Processor<OTPServiceImpl>(
-					otpServiceImpl);
-			
-			// TODO(flamholz): make the transport and server type be configurable?
-			TServerTransport serverTransport;
-			serverTransport = new TServerSocket(port);
+    private int port;
 
-			TSimpleServer.Args args = new TSimpleServer.Args(serverTransport).processor(processor);
-			TServer server = new TSimpleServer(args);
-			
-			LOG.info("Starting the OTPService on port {}", port);
-			server.serve();
-		} catch (TTransportException e) {
-			e.printStackTrace();
-		}
+    public void run() {
+        LOG.info("Run called, port {}", port);
+        if (otpServiceImpl == null) {
+            LOG.warn("otpServiceImpl is null, bailing");
+            return;
+        }
+
+        try {
+            OTPService.Processor<OTPServiceImpl> processor = new OTPService.Processor<OTPServiceImpl>(
+                    otpServiceImpl);
+
+            // TODO(flamholz): make the transport and server type be configurable?
+            TServerTransport serverTransport;
+            serverTransport = new TServerSocket(port);
+
+            TSimpleServer.Args args = new TSimpleServer.Args(serverTransport).processor(processor);
+            TServer server = new TSimpleServer(args);
+
+            LOG.info("Starting the OTPService on port {}", port);
+            server.serve();
+        } catch (TTransportException e) {
+            e.printStackTrace();
+        }
     }
 }
