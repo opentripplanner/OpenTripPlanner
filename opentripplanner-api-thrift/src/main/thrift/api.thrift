@@ -74,14 +74,18 @@ struct FindNearestVertexResponse {
 // Request to find nearby edges
 struct FindNearestEdgesRequest {
 	// Find edges near this location.
-	// TODO(flamholz): allow input of bearing, historical location info.
+	// TODO(flamholz): allow input of historical location info.
 	1: required Location location;
 	
 	// Find vertex accessible to one of these modes.
 	2: optional set<TravelMode> allowed_modes;
 	
+	// Direction of travel as an azimuth relative to true north in degrees.
+	// Ranges from -180 to +180.
+	3: optional double heading;
+	
 	// Maximum number of edges to return.
-	3: optional i32 max_edges;
+	10: optional i32 max_edges;
 }
 
 struct FindNearestEdgesResponse {

@@ -125,22 +125,24 @@ public class OTPServiceImpl implements OTPService.Iface {
     public FindNearestEdgesResponse FindNearestEdges(FindNearestEdgesRequest req) throws TException {
         LOG.info("FindNearestEdges called");
 
+        // Set up the TraversalRequirements.
         TraversalRequirements requirements = new TraversalRequirements();
         requirements.setModes(new TravelModeSet(req.getAllowed_modes()).toTraverseModeSet());
 
-        // Get the nearest edges.
-        StreetVertexIndexService streetVertexIndex = getStreetIndex();
+        // Set up the LocationObservation.
         Coordinate c = new LatLngExtension(req.getLocation().getLat_lng()).toCoordinate();
-        LocationObservation loc = new LocationObservation(c);
+        LocationObservation.Builder builder = new LocationObservation.Builder().setCoordinate(c);
+        if (req.isSetHeading()) builder.setHeading(req.getHeading());
+        
+        // Find the candidate edges.
+        StreetVertexIndexService streetVertexIndex = getStreetIndex();
+        CandidateEdgeBundle edges = streetVertexIndex.getClosestEdges(builder.build(), requirements);
 
         // Add matches to the response.
         FindNearestEdgesResponse res = new FindNearestEdgesResponse();
-
-        CandidateEdgeBundle edges = streetVertexIndex.getClosestEdges(loc, requirements);
         int maxEdges = req.getMax_edges();
         for (CandidateEdge e : edges) {
-            if (res.getNearest_edgesSize() >= maxEdges)
-                break;
+            if (res.getNearest_edgesSize() >= maxEdges) break;
             res.addToNearest_edges(new EdgeMatchExtension(e));
         }
 
