@@ -134,7 +134,9 @@ public class OTPServiceImpl implements OTPService.Iface {
         LocationObservation.Builder builder = new LocationObservation.Builder().setCoordinate(c);
         if (req.isSetHeading()) builder.setHeading(req.getHeading());
         
-        // Find the candidate edges.
+        // Find the candidate edges. 
+        // NOTE(flamholz): for now this will return at smallish number of edges because of
+        // the internal binning that's going on. I'd rather get more edges just in case...
         StreetVertexIndexService streetVertexIndex = getStreetIndex();
         CandidateEdgeBundle edges = streetVertexIndex.getClosestEdges(builder.build(), requirements);
 
