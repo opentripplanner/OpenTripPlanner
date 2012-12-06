@@ -34,13 +34,16 @@ otp.core.Map = otp.Class({
         var mapProps = { 
             layers  : [ tileLayer ],
             center : (otp.config.initLatLng || new L.LatLng(0,0)),
-            zoom : (otp.config.initZoom || 2)
+            zoom : (otp.config.initZoom || 2),
+            zoomControl : false
         }
         if(otp.config.minZoom) _.extend(mapProps, { minZoom : otp.config.minZoom });
         if(otp.config.maxZoom) _.extend(mapProps, { maxZoom : otp.config.maxZoom });
 
         this.lmap = new L.Map('map', mapProps);
 
+        this.lmap.addControl(new L.Control.Zoom({ position : 'topright' }));
+        
         if(!otp.config.initLatLng) {
             console.log("no initLL, reading metadata");
             var url = otp.config.hostname + '/opentripplanner-api-webapp/ws/metadata';

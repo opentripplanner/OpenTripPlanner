@@ -581,8 +581,8 @@ h6.drag-to-change {
 }
 
 #otp-calltaker-optionsWidget {
-    bottom: 25px;
-    left: 50px;
+    bottom: 10px;
+    left: 10px;
 }
 
 /* Date/Time Picker */
@@ -615,7 +615,7 @@ h6.drag-to-change {
 
 .otp-itinsWidget {
   top: 60px;
-  left: 50px;
+  left: 10px;
   width: 300px;
   height: 250px;
 }
@@ -779,8 +779,8 @@ h6.drag-to-change {
 /* Past Queries Widget */
 
 .otp-pastQueriesWidget {
-  top: 60px;
-  right: 20px;
+  bottom: 20px;
+  right: 10px;
 }
 
 .otp-pastQueriesHeader {
