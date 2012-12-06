@@ -45,6 +45,10 @@ otp.modules.Module = otp.Class({
         return widget;
     },
     
+    addWidget : function(widget) {
+        this.widgets.push(widget);
+    },
+    
     activate : function() {
     },
      

@@ -33,7 +33,7 @@ otp.modules.multimodal.MultimodalPlannerModule =
         otp.modules.planner.PlannerModule.prototype.activate.apply(this);
 
         this.optionsWidget = new otp.widgets.TripWidget('otp-'+this.moduleId+'-optionsWidget', this);
-        this.widgets.push(this.optionsWidget);
+        this.addWidget(this.optionsWidget);
         
         this.optionsWidget.addPanel("time", new otp.widgets.TW_TimeSelector(this.optionsWidget));
         this.optionsWidget.addVerticalSpace(12);

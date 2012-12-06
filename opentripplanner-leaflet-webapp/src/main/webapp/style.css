@@ -692,15 +692,24 @@ h6.drag-to-change {
 .otp-itin-leg-leftcol {
     font-size: .9em;
     color: gray;
-    width: 4em;
+    width: 50px;
     float: left;
 }
 
 .otp-itin-leg-endpointDesc {
     font-size: .9em;
     border-left: 1px solid #ccc;
-    margin-left: 5em;
-    padding: .0em 0 0 .5em;
+    margin-left: 55px;
+    padding: .0em 0 0 5px;
+    cursor: pointer;
+}
+
+.otp-itin-leg-endpointDescSub {
+    font-size: .8em;
+    border-left: 1px solid #ccc;
+    margin-left: 55px;
+    padding: .0em 0 0 5px;
+    color: gray;
     cursor: pointer;
 }
 
@@ -708,8 +717,7 @@ h6.drag-to-change {
     font-size: .9em;
     height: .9em;
     border-left: 1px solid #ccc;
-    margin-left: 5em;
-    padding-left: 5em;
+    margin-left: 55px;
 }
 
 .otp-itin-leg-elapsedDesc {
@@ -717,16 +725,16 @@ h6.drag-to-change {
     font-style: italic;
     border-left: 1px solid #ccc;
     color: gray;
-    margin-left: 5em;
-    padding-left: .5em;
+    margin-left: 55px;
+    padding-left: 5px;
 }
 
 .otp-itin-leg-intStops {
     background: #ddd;
     font-size: .9em;
-    padding: .5em 0 .5em .5em;
+    padding: .5em 0 .5em 5px;
     border-left: 1px solid #ccc;
-    margin-left: 5em;
+    margin-left: 55px;
 }
 
 .otp-itin-leg-intStopsHeader {
@@ -833,6 +841,16 @@ h6.drag-to-change {
 .otp-itin-step-text {
     font-size: .8em;
     margin: 0px 30px;
+}
+
+/* Stop Times Widget */
+
+.otp-stopTimes-list {
+    width: 80px;
+    height: 120px;
+    overflow: auto;
+    background: white;
+    border: 1px solid black;
 }
 
 
