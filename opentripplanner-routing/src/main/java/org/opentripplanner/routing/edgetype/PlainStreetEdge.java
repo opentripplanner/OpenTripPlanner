@@ -34,6 +34,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.util.ElevationProfileSegment;
+import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.slf4j.Logger;
@@ -307,6 +308,21 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
                 time = elevationProfileSegment.getSlopeSpeedEffectiveLength() / speed;
             }
             weight = time;
+            if (traverseMode.equals(TraverseMode.WALK)) {
+                // take slopes into account when walking
+                double costs = ElevationUtils.getWalkCostsForSlope(length, elevationProfileSegment.getMaxSlope());
+                // as the cost walkspeed is assumed to be for 4.8km/h (= 1.333 m/sec) we need to adjust
+                // for the walkspeed set by the user
+                weight = costs * ( 1.3333 / speed );
+                time = weight; //treat cost as time, as in the current model it actually is the same (this can be checked for maxSlope == 0)
+                /*
+                // debug code
+                if(weight > 100){
+                    double timeflat = length / speed;
+                    System.out.format("line length: %.1f m, slope: %.3f ---> slope costs: %.1f , weight: %.1f , time (flat):  %.1f %n", length, elevationProfileSegment.getMaxSlope(), costs, weight, timeflat);
+                }
+                */
+            }
         }
         if (isStairs()) {
             weight *= options.stairsReluctance;
