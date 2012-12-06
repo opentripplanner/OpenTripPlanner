@@ -412,27 +412,32 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         
         /* surface=* mixins */
 
-        /* sand and fine gravel are deadly for bikes */
-        setProperties(props, "surface=fine_gravel", 
-            StreetTraversalPermission.ALL, 100.0, 100.0, true);
-        setProperties(props, "surface=sand", 
-            StreetTraversalPermission.ALL, 100.0, 100.0, true);
+       /* The following tags have been removed from surface weights because they are no
+        * more of an impedence to bicycling than a paved surface
+        * surface=paving_stones
+        * surface=fine_gravel (sounds counter-intuitive but see the definition on the OSM Wiki)
+        * surface=tartan (this what running tracks are usually made of)
+        */
 
-        /* unpaved, etc */
         setProperties(props, "surface=unpaved", 
             StreetTraversalPermission.ALL, 1.18, 1.18, true);
         setProperties(props, "surface=compacted", 
             StreetTraversalPermission.ALL, 1.18, 1.18, true);
+        setProperties(props, "surface=wood", 
+            StreetTraversalPermission.ALL, 1.18, 1.18, true);
+        
         setProperties(props, "surface=cobblestone", 
-            StreetTraversalPermission.ALL, 1.5, 1.5, true);
-        setProperties(props, "surface=paving_stones", 
-            StreetTraversalPermission.ALL, 1.5, 1.5, true);
+            StreetTraversalPermission.ALL, 1.3, 1.3, true);
+        setProperties(props, "surface=cobblestone:flattened", 
+            StreetTraversalPermission.ALL, 1.3, 1.3, true);
         setProperties(props, "surface=grass_paver", 
-            StreetTraversalPermission.ALL, 1.5, 1.5, true);
+            StreetTraversalPermission.ALL, 1.3, 1.3, true);
         setProperties(props, "surface=pebblestone", 
-            StreetTraversalPermission.ALL, 1.5, 1.5, true);
-        setProperties(props, "surface=gravel",
-            StreetTraversalPermission.ALL, 1.5, 1.5, true);
+            StreetTraversalPermission.ALL, 1.3, 1.3, true);   
+        // Can be slick if wet, but otherwise not unfavorable to bikes
+        StreetTraversalPermission.ALL, 1.3, 1.3, true);
+            setProperties(props, "surface=metal", 
+        
         setProperties(props, "surface=ground", 
             StreetTraversalPermission.ALL, 1.5, 1.5, true);
         setProperties(props, "surface=dirt", 
@@ -443,16 +448,16 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
             StreetTraversalPermission.ALL, 1.5, 1.5, true);
         setProperties(props, "surface=mud", 
             StreetTraversalPermission.ALL, 1.5, 1.5, true);
-        setProperties(props, "surface=wood", 
+        setProperties(props, "surface=woodchip", 
             StreetTraversalPermission.ALL, 1.5, 1.5, true);
-        setProperties(props, "surface=metal", 
+        setProperties(props, "surface=gravel",
             StreetTraversalPermission.ALL, 1.5, 1.5, true);
         setProperties(props, "surface=artifical_turf", 
             StreetTraversalPermission.ALL, 1.5, 1.5, true);
-                        
-        // it is extremly unsafe to ride directly on the Scotsman
-        setProperties(props, "surface=tartan", 
-            StreetTraversalPermission.ALL, 3.0, 3.0, true);
+        
+        /* sand is deadly for bikes */       
+        setProperties(props, "surface=sand", 
+            StreetTraversalPermission.ALL, 100.0, 100.0, true);     
         
         /* Portland-local mixins */
         
