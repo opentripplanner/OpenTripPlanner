@@ -427,6 +427,31 @@ body {
 }
 
 
+#otp-map-contextMenu {
+  position : fixed;
+  z-index: 1000;
+  padding: 0px;
+  background: #eee;
+  border: 1px solid #acacac;
+  border-top: 1px solid #bfbfbf;
+  border-bottom: 1px solid #9a9a9a;
+  -webkit-border-radius: 3px;
+     -moz-border-radius: 3px;
+          border-radius: 3px;
+     -moz-box-shadow: inset 0 2px 0 rgba(255,255,255,0.5);
+  -webkit-box-shadow: inset 0 2px 0 rgba(255,255,255,0.5);
+          box-shadow: inset 0 2px 0 rgba(255,255,255,0.5);
+}
+
+.otp-map-contextMenu-item {
+    padding: .4em;
+    cursor: pointer;
+}
+
+.otp-map-contextMenu-item:hover {
+    background: #f8f8f8;
+}
+
 /* Widgets
 -------------------------------------------------------------- */
   

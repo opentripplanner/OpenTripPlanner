@@ -26,6 +26,9 @@ otp.modules.planner.PlannerModule =
     pathMarkerLayer : null,
     highlightLayer  : null,
     
+    startMarker     : null,
+    endMarker       : null,
+    
     tipWidget       : null,
     noTripWidget    : null,
     tipStep         : 0,
@@ -52,7 +55,7 @@ otp.modules.planner.PlannerModule =
     lastQueryParams : null,
     
     icons       : null,
-                        
+
     initialize : function(webapp) {
         otp.modules.Module.prototype.initialize.apply(this, arguments);
         this.icons = new otp.modules.planner.IconFactory();        
@@ -84,54 +87,71 @@ otp.modules.planner.PlannerModule =
         this.noTripWidget = new otp.widgets.Widget('otp-noTripWidget');
         this.widgets.push(this.noTripWidget);
         //this.noTripWidget.hide();
-                
-        this.activated = true;
+
+        var this_ = this;
+        this.webapp.map.addContextMenuItem("Set as Start Location", function(latlng) {
+            this_.setStartPoint(latlng, true);
+        });
+        this.webapp.map.addContextMenuItem("Set as End Location", function(latlng) {
+            this_.setEndPoint(latlng, true);
+        });
     },
     
 
     handleClick : function(event) {
         if(this.startLatLng == null) {
-        	this.startLatLng = new L.LatLng(event.latlng.lat, event.latlng.lng);
-        	this.setStartPoint(this.startLatLng, true);
+        	this.setStartPoint(new L.LatLng(event.latlng.lat, event.latlng.lng), true);
         }
         
         else if(this.endLatLng == null) {
-        	this.endLatLng = new L.LatLng(event.latlng.lat, event.latlng.lng);
-        	this.setEndPoint(this.endLatLng, true);
+        	this.setEndPoint(new L.LatLng(event.latlng.lat, event.latlng.lng), true);
         }
     },
     
     setStartPoint : function(latlng, update) {
     
-    	 var this_ = this;
-    	 
-         var start = new L.Marker(this.startLatLng, {icon: this.icons.startFlag, draggable: true}); 
-         start.bindPopup('<strong>Start</strong>');
-         start.on('dragend', function() {
-        	 this_.webapp.hideSplash();
-             this_.startLatLng = start.getLatLng();
-             this_.planTrip();
-         });
-         this.markerLayer.addLayer(start);
-         
-         if(update)
-        	 this.updateTipStep(2);         
+        var this_ = this;
+        this.startLatLng = latlng;
+        if(this.startMarker == null) {
+            this.startMarker = new L.Marker(this.startLatLng, {icon: this.icons.startFlag, draggable: true});
+            this.startMarker.bindPopup('<strong>Start</strong>');
+            this.startMarker.on('dragend', function() {
+                this_.webapp.hideSplash();
+                this_.startLatLng = this_.startMarker.getLatLng();
+                this_.planTrip();
+            });
+            this.markerLayer.addLayer(this.startMarker);
+        }
+        else { // marker already exists
+            this.startMarker.setLatLng(latlng);
+        }
+        
+        if(update) {
+            this.updateTipStep(2);
+            if(this.endLatLng) this.planTrip(); 
+        }
     },
     
     setEndPoint : function(latlng, update) {
-    	 var this_ = this;
-    	 
-         var end = new L.Marker(this.endLatLng, {icon: this.icons.endFlag, draggable: true}); 
-         end.bindPopup('<strong>Destination</strong>');
-         this.markerLayer.addLayer(end);
-         end.on('dragend', function() {
-        	 this_.webapp.hideSplash();
-             this_.endLatLng = end.getLatLng();
-             this_.planTrip();
-         });
-         
-         if(update)
-        	 this.planTrip();
+        var this_ = this;
+        this.endLatLng = latlng;    	 
+        if(this.endMarker == null) {
+            this.endMarker = new L.Marker(this.endLatLng, {icon: this.icons.endFlag, draggable: true}); 
+            this.endMarker.bindPopup('<strong>Destination</strong>');
+            this.endMarker.on('dragend', function() {
+                this_.webapp.hideSplash();
+                this_.endLatLng = this_.endMarker.getLatLng();
+                this_.planTrip();
+            });
+            this.markerLayer.addLayer(this.endMarker);
+        }
+        else { // marker already exists
+            this.endMarker.setLatLng(latlng);
+        }
+                 
+        if(update) {
+            if(this.startLatLng) this.planTrip();
+        }
     },
     
     restoreTrip : function(queryParams) {
