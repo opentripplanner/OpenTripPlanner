@@ -690,43 +690,63 @@ h6.drag-to-change {
 }
 
 .otp-itin-leg-leftcol {
-    font-size: .8em;
+    font-size: .9em;
     color: gray;
     width: 4em;
     float: left;
 }
 
 .otp-itin-leg-endpointDesc {
-    font-size: .8em;
+    font-size: .9em;
     border-left: 1px solid #ccc;
     margin-left: 5em;
-    padding: .8em 0 0 .5em;
+    padding: .0em 0 0 .5em;
     cursor: pointer;
 }
 
+.otp-itin-leg-buffer {
+    font-size: .9em;
+    height: .9em;
+    border-left: 1px solid #ccc;
+    margin-left: 5em;
+    padding-left: 5em;
+}
+
 .otp-itin-leg-elapsedDesc {
-    font-size: .8em;
+    font-size: .9em;
     font-style: italic;
     border-left: 1px solid #ccc;
     color: gray;
     margin-left: 5em;
-    padding: .8em 0em .8em .5em;
+    padding-left: .5em;
+}
+
+.otp-itin-leg-intStops {
+    background: #ddd;
+    font-size: .9em;
+    padding: .5em 0 .5em .5em;
+    border-left: 1px solid #ccc;
+    margin-left: 5em;
 }
 
 .otp-itin-leg-intStopsHeader {
-    font-size: .8em;
+    background: #ddd;
+    padding: .2em .4em;
+    font-style: italic;
     font-weight: bold;
-    padding: 0 0 .5em .5em;
-    border-left: 1px solid #ccc;
-    margin-left: 5em;
+    cursor: pointer;
 }
 
 .otp-itin-leg-intStopsList {
-    font-size: .8em;
-    padding: 0 0 0 .5em;
-    border-left: 1px solid #ccc;
-    margin-left: 5em;
+    background: #ddd;
+    padding: .4em;
 }
+
+.otp-itin-leg-intStopsListItem {
+    padding-bottom: .3em;
+    cursor: pointer;
+}
+
 
 .otp-itin-iconModeSymbol {
     width: 16px;

@@ -195,6 +195,8 @@ otp.widgets.ItinerariesWidget =
         if(otp.util.Itin.isTransit(leg.mode)) {
             var legDiv = $('<div></div>');
             
+            // show the start time and stop
+
             $('<div class="otp-itin-leg-leftcol">'+otp.util.Time.formatItinTime(leg.startTime, "h:mma")+"</div>").appendTo(legDiv);
 
             $('<div class="otp-itin-leg-endpointDesc"><b>Board</b> at '+leg.from.name+'</div>')
@@ -209,18 +211,57 @@ otp.widgets.ItinerariesWidget =
                 this_.module.drawAllStartBubbles(this_.itineraries[this_.activeIndex]);
             });
 
+            $('<div class="otp-itin-leg-buffer"></div>').appendTo(legDiv);            
+
+            // show the "time in transit" line
+
             $('<div class="otp-itin-leg-elapsedDesc">Time in transit: '+otp.util.Time.msToHrMin(leg.duration)+'</div>').appendTo(legDiv);
 
+            // show the intermediate stops, if applicable
+            
             if(this.module.showIntermediateStops) {
-                $('<div class="otp-itin-leg-intStopsHeader">'+leg.intermediateStops.length+' Intermediate Stops</div>').appendTo(legDiv);
-                var intStopsDiv = $('<div class="otp-itin-leg-intStopsList"></div>').appendTo(legDiv);
+
+                $('<div class="otp-itin-leg-buffer"></div>').appendTo(legDiv);            
+                var intStopsDiv = $('<div class="otp-itin-leg-intStops"></div>').appendTo(legDiv);
+                
+                var intStopsListDiv = $('<div class="otp-itin-leg-intStopsList"></div>')
+                
+                $('<div class="otp-itin-leg-intStopsHeader">'+leg.intermediateStops.length+' Intermediate Stops</div>')
+                .appendTo(intStopsDiv)
+                .click(function(event) {
+                    intStopsListDiv.toggle();
+                });
+                
+                intStopsListDiv.appendTo(intStopsDiv);
+                
                 for(var i=0; i < leg.intermediateStops.length; i++) {
                     var stop = leg.intermediateStops[i];
-                    $('<div class="otp-itin-leg-intStopsListItem">'+(i+1)+'. '+stop.name+' (ID #'+stop.stopId.id+')</div>').appendTo(intStopsDiv);
+                    $('<div class="otp-itin-leg-intStopsListItem">'+(i+1)+'. '+stop.name+' (ID #'+stop.stopId.id+')</div>').
+                    appendTo(intStopsListDiv)
+                    .data("stop", stop)
+                    .click(function(evt) {
+                        var stop = $(this).data("stop");
+                        this_.module.webapp.map.lmap.panTo(new L.LatLng(stop.lat, stop.lon));
+                    }).hover(function(evt) {
+                        var stop = $(this).data("stop");
+                        $(this).css('color', 'red');
+                        var popup = L.popup()
+                            .setLatLng(new L.LatLng(stop.lat, stop.lon))
+                            .setContent(stop.name)
+                            .openOn(this_.module.webapp.map.lmap);
+                    }, function(evt) {
+                        $(this).css('color', 'black');
+                        this_.module.webapp.map.lmap.closePopup();
+                    });                    
                 }
+                intStopsListDiv.hide();
             }
 
-            $('<div class="otp-itin-leg-leftcol">'+otp.util.Time.formatItinTime(leg.endTime, "h:mma")+"</div>").appendTo(legDiv);
+            // show the end time and stop
+
+            $('<div class="otp-itin-leg-buffer"></div>').appendTo(legDiv);            
+
+            $('<div class="otp-itin-leg-leftcol">'+otp.util.Time.formatItinTime(leg.endTime, "h:mma")+"</div>").appendTo(legDiv);           
 
             $('<div class="otp-itin-leg-endpointDesc"><b>Alight</b> at '+leg.to.name+'</div>')
             .appendTo(legDiv)
