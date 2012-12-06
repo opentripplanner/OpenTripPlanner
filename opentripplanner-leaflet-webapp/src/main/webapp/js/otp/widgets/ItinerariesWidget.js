@@ -211,6 +211,15 @@ otp.widgets.ItinerariesWidget =
 
             $('<div class="otp-itin-leg-elapsedDesc">Time in transit: '+otp.util.Time.msToHrMin(leg.duration)+'</div>').appendTo(legDiv);
 
+            if(this.module.showIntermediateStops) {
+                $('<div class="otp-itin-leg-intStopsHeader">'+leg.intermediateStops.length+' Intermediate Stops</div>').appendTo(legDiv);
+                var intStopsDiv = $('<div class="otp-itin-leg-intStopsList"></div>').appendTo(legDiv);
+                for(var i=0; i < leg.intermediateStops.length; i++) {
+                    var stop = leg.intermediateStops[i];
+                    $('<div class="otp-itin-leg-intStopsListItem">'+(i+1)+'. '+stop.name+' (ID #'+stop.stopId.id+')</div>').appendTo(intStopsDiv);
+                }
+            }
+
             $('<div class="otp-itin-leg-leftcol">'+otp.util.Time.formatItinTime(leg.endTime, "h:mma")+"</div>").appendTo(legDiv);
 
             $('<div class="otp-itin-leg-endpointDesc"><b>Alight</b> at '+leg.to.name+'</div>')

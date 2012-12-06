@@ -23,6 +23,8 @@ otp.modules.multimodal.MultimodalPlannerModule =
     
     itinWidget  : null,
     
+    showIntermediateStops : false,
+    
     initialize : function(webapp) {
         otp.modules.planner.PlannerModule.prototype.initialize.apply(this, arguments);
     },
@@ -41,7 +43,11 @@ otp.modules.multimodal.MultimodalPlannerModule =
         this.optionsWidget.addSeparator();
         this.optionsWidget.addPanel("submit", new otp.widgets.TW_Submit(this.optionsWidget));
     },
-        
+    
+    getExtendedQueryParams : function() {
+        return { showIntermediateStops : this.showIntermediateStops };
+    },
+            
     processPlan : function(tripPlan, queryParams, restoring) {
         if(this.itinWidget == null) {
             this.itinWidget = new otp.widgets.ItinerariesWidget(this.moduleId+"-itinWidget", this);

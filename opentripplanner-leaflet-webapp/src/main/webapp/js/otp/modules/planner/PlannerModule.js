@@ -212,6 +212,7 @@ otp.modules.planner.PlannerModule =
                     triangleSafetyFactor: this_.triangleSafetyFactor
                 });
             } 
+            _.extend(queryParams, this.getExtendedQueryParams());
             if(otp.config.routerId !== undefined) {
                 queryParams.routerId = otp.config.routerId;
             }
@@ -250,6 +251,10 @@ otp.modules.planner.PlannerModule =
             }
         });
 
+    },
+    
+    getExtendedQueryParams : function() {
+        return { };
     },
     
     processPlan : function(tripPlan, queryParams, restoring) {

@@ -47,6 +47,8 @@ otp.modules.calltaker.CallTakerModule =
         this.queryLogger = new otp.core.QueryLogger(this);        
         this.userName = "demory";
         
+        this.showIntermediateStops = true;
+        
     },
     
     activate : function() {
@@ -68,7 +70,7 @@ otp.modules.calltaker.CallTakerModule =
     onResetQueries : function(queries) {
         this.pastQueriesWidget.updateQueries(queries);
     },
-    
+
     processPlan : function(tripPlan, queryParams, restoring) {
         otp.modules.multimodal.MultimodalPlannerModule.prototype.processPlan.apply(this, arguments);
         if(!restoring) this.queryLogger.logQuery(queryParams, this.userName);    

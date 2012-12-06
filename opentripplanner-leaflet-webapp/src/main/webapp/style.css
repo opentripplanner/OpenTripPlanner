@@ -700,7 +700,7 @@ h6.drag-to-change {
     font-size: .8em;
     border-left: 1px solid #ccc;
     margin-left: 5em;
-    padding-left: .5em;
+    padding: .8em 0 0 .5em;
     cursor: pointer;
 }
 
@@ -711,6 +711,21 @@ h6.drag-to-change {
     color: gray;
     margin-left: 5em;
     padding: .8em 0em .8em .5em;
+}
+
+.otp-itin-leg-intStopsHeader {
+    font-size: .8em;
+    font-weight: bold;
+    padding: 0 0 .5em .5em;
+    border-left: 1px solid #ccc;
+    margin-left: 5em;
+}
+
+.otp-itin-leg-intStopsList {
+    font-size: .8em;
+    padding: 0 0 0 .5em;
+    border-left: 1px solid #ccc;
+    margin-left: 5em;
 }
 
 .otp-itin-iconModeSymbol {
