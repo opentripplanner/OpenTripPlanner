@@ -71,9 +71,9 @@ otp.modules.calltaker.CallTakerModule =
         this.pastQueriesWidget.updateQueries(queries);
     },
 
-    processPlan : function(tripPlan, queryParams, restoring) {
+    processPlan : function(tripPlan, restoring) {
         otp.modules.multimodal.MultimodalPlannerModule.prototype.processPlan.apply(this, arguments);
-        if(!restoring) this.queryLogger.logQuery(queryParams, this.userName);    
+        if(!restoring) this.queryLogger.logQuery(tripPlan.queryParams, this.userName);    
     },
 
     queryLogged : function() {

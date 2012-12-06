@@ -230,12 +230,12 @@ otp.modules.planner.PlannerModule =
                 
                 if(data.plan) {
 
+                    var tripPlan = new otp.modules.planner.TripPlan(data.plan, queryParams);
                     // compare returned plan.date to sent date/time to determine timezone offset (unless set explicitly in config.js)
                     otp.config.timeOffset = (otp.config.timeOffset) ||
                         (moment(queryParams.date+" "+queryParams.time, "MM-DD-YYYY h:mma") - moment(data.plan.date))/3600000;
-                        
-                    var itin = data.plan.itineraries[0];
-                    this_.processPlan(data.plan, queryParams, (existingQueryParams !== undefined));
+
+                    this_.processPlan(tripPlan, (existingQueryParams !== undefined));
 
                     this_.updateTipStep(3);
                     
@@ -257,7 +257,7 @@ otp.modules.planner.PlannerModule =
         return { };
     },
     
-    processPlan : function(tripPlan, queryParams, restoring) {
+    processPlan : function(tripPlan, restoring) {
     },
     
     noTripFound : function() {
@@ -265,11 +265,13 @@ otp.modules.planner.PlannerModule =
     
     drawItinerary : function(itin) {
         var this_ = this;
-        
-        var queryParams = this.lastQueryParams;
+                
         this.pathLayer.clearLayers();
         this.pathMarkerLayer.clearLayers();
     
+        var queryParams = itin.tripPlan.queryParams;
+        itin = itin.itinData;
+        
         console.log(itin);
         for(var i=0; i < itin.legs.length; i++) {
             var leg = itin.legs[i];
@@ -364,6 +366,7 @@ otp.modules.planner.PlannerModule =
     },
     
     drawAllStartBubbles : function(itin) {
+        itin = itin.itinData;
         for(var i=0; i < itin.legs.length; i++) {
             var leg = itin.legs[i];
             if(otp.util.Itin.isTransit(leg.mode)) {

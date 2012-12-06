@@ -47,27 +47,18 @@ otp.util.Text = {
 
 otp.util.Itin = {
 
-    getFirstStop : function(itin) {
-        for(var l=0; l<itin.legs.length; l++) {
-            var leg = itin.legs[l];
-            if(otp.util.Itin.isTransit(leg.mode)) {
-                return leg.from.stopId.agencyId+"_"+leg.from.stopId.id;
-            }
-        }
-        return null;
-    },
-    
     isTransit : function(mode) {
         return mode === "TRANSIT" || mode === "SUBWAY" || mode === "BUS" || mode === "TRAM" || mode === "GONDOLA";
     },
     
-    getIconSummaryHTML : function(itin, padding) {
-        var html = '';
-        for(var i=0; i<itin.legs.length; i++) {
-            html += '<img src="images/mode/'+itin.legs[i].mode.toLowerCase()+'.png" >';
-            if(i < itin.legs.length-1) html += '<img src="images/mode/arrow.png" style="margin: 0px '+(padding || '3')+'px;">';
-        }
-        return html;
+    directionString : function(dir) { // placeholder until localization is addressed
+        return dir.toLowerCase().replace('_',' ').replace('ly','');
+    },
+    
+    distanceString : function(m) {
+        var ft = m*3.28084;
+        if(ft < 528) return Math.round(ft) + ' feet';
+        return Math.round(ft/528)/10+" miles";
     },
     
     getLegStepText : function(step) {
@@ -85,18 +76,5 @@ otp.util.Itin = {
             }
         }
         return text; // + ' and proceed <b>'+otp.util.Itin.distanceString(step.distance)+'</b>';
-    },
-
-    // placeholder until localization is addressed
-    directionString : function(dir) {
-        return dir.toLowerCase().replace('_',' ').replace('ly','');
-    },
-    
-    distanceString : function(m) {
-        var ft = m*3.28084;
-        if(ft < 528) return Math.round(ft) + ' feet';
-        return Math.round(ft/528)/10+" miles";
-    }
-    
-       
+    }     
 }

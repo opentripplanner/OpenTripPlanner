@@ -48,15 +48,15 @@ otp.modules.multimodal.MultimodalPlannerModule =
         return { showIntermediateStops : this.showIntermediateStops };
     },
             
-    processPlan : function(tripPlan, queryParams, restoring) {
+    processPlan : function(tripPlan, restoring) {
         if(this.itinWidget == null) {
             this.itinWidget = new otp.widgets.ItinerariesWidget(this.moduleId+"-itinWidget", this);
             this.widgets.push(this.itinWidget);
         }
-        this.itinWidget.updateItineraries(tripPlan.itineraries);
+        this.itinWidget.updateItineraries(tripPlan);
         this.itinWidget.show();
         
-        this.drawItinerary(tripPlan.itineraries[0], queryParams);
+        this.drawItinerary(tripPlan.itineraries[0]);
     },
     
     CLASS_NAME : "otp.modules.multimodal.MultimodalPlannerModule"
