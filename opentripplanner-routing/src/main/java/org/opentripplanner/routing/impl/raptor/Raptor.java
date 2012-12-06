@@ -562,6 +562,11 @@ public class Raptor implements PathService {
             RaptorState cur = states.get(i);
             if (cur.walkPath != null) {
                 GraphPath path = new GraphPath(cur.walkPath, false);
+                Edge edge0 = path.edges.getLast();
+                if (edge0.getToVertex() != state.getVertex()) {
+                    state = state.getBackState();
+                }
+
                 for (ListIterator<Edge> it = path.edges.listIterator(path.edges.size()); it.hasPrevious();) {
                     Edge e = it.previous();
                     state = e.traverse(state);
