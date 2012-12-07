@@ -435,9 +435,8 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         setProperties(props, "surface=pebblestone", 
             StreetTraversalPermission.ALL, 1.3, 1.3, true);   
         // Can be slick if wet, but otherwise not unfavorable to bikes
-        StreetTraversalPermission.ALL, 1.3, 1.3, true);
-            setProperties(props, "surface=metal", 
-        
+        setProperties(props, "surface=metal", 
+            StreetTraversalPermission.ALL, 1.3, 1.3, true);
         setProperties(props, "surface=ground", 
             StreetTraversalPermission.ALL, 1.5, 1.5, true);
         setProperties(props, "surface=dirt", 
