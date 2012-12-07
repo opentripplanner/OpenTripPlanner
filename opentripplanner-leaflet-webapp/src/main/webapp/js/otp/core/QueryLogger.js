@@ -27,7 +27,7 @@ otp.core.QueryLogger = otp.Class({
         this.serverURL = otp.config.loggerURL;
     },
     
-    logQuery : function(queryParams, userName, fromPlaceName, toPlaceName) {
+    logQuery : function(queryParams, userName, password, fromPlaceName, toPlaceName) {
         if(this.serverURL == null) return;
         var this_ = this;
         
@@ -41,7 +41,8 @@ otp.core.QueryLogger = otp.Class({
                 queryParams : JSON.stringify(queryParams),
                 fromPlace : fromPlaceName,
                 toPlace : toPlaceName,
-                userName : userName 
+                userName : userName,
+                password : password 
             },
                 
             success: function(data) {

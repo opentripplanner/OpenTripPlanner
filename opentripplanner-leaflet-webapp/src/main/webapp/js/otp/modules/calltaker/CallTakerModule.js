@@ -45,7 +45,8 @@ otp.modules.calltaker.CallTakerModule =
         otp.modules.multimodal.MultimodalPlannerModule.prototype.initialize.apply(this, arguments);
 
         this.queryLogger = new otp.core.QueryLogger(this);        
-        this.userName = "demory";
+        this.userName = "testct";
+        this.password = "secret";
         
         this.showIntermediateStops = true;
         
@@ -73,7 +74,7 @@ otp.modules.calltaker.CallTakerModule =
 
     processPlan : function(tripPlan, restoring) {
         otp.modules.multimodal.MultimodalPlannerModule.prototype.processPlan.apply(this, arguments);
-        if(!restoring) this.queryLogger.logQuery(tripPlan.queryParams, this.userName);    
+        if(!restoring) this.queryLogger.logQuery(tripPlan.queryParams, this.userName, this.password);    
     },
 
     queryLogged : function() {
@@ -81,7 +82,7 @@ otp.modules.calltaker.CallTakerModule =
     },
     
     fetchQueries : function() {
-        this.pastQueries.fetch({ data: { userName: this.userName, limit: 10 }});
+        this.pastQueries.fetch({ data: { userName: this.userName, password: this.password, limit: 10 }});
     },  
         
     CLASS_NAME : "otp.modules.calltaker.CallTakerModule"
