@@ -21,14 +21,39 @@ otp.widgets.StopTimesWidget =
     
         otp.widgets.Widget.prototype.initialize.apply(this, arguments);
         this.$().addClass('otp-stopTimesWidget');
-        this.$().resizable();
+        
         $('<div><b>Route</b>: '+routeName+'</div>').appendTo(this.$());
         $('<div><b>Stop</b>: '+stopID+'</div>').appendTo(this.$());
+        
         var timesDiv = $('<div class="otp-stopTimes-list notDraggable"></div>');
+        var highlightIndex = 0;
         for(var i=0; i<stopTimes.length; i++) {
-            $('<div>'+otp.util.Time.formatItinTime(stopTimes[i], "h:mma")+'</div>').appendTo(timesDiv);
+            var html = '<div class="otp-stopTimes-list-item">';
+            if(stopTimes[i] == highlightTime) html += "<b>";
+            html += otp.util.Time.formatItinTime(stopTimes[i], "h:mma")
+            html += '</div>';
+            if(stopTimes[i] == highlightTime) html += "</b>";
+            $(html).appendTo(timesDiv);
+            if(stopTimes[i] == highlightTime) highlightIndex = i;
         }
         timesDiv.appendTo(this.$());
+        console.log("scr h="+timesDiv[0].scrollHeight);
+        console.log(timesDiv[0]);
+        console.log("pct="+highlightIndex/stopTimes.length);
+        var scrollY = timesDiv[0].scrollHeight*highlightIndex/stopTimes.length
+        if(highlightIndex>0) scrollY = scrollY - timesDiv.height()/2 + 10;
+        timesDiv.scrollTop(scrollY);
+        
+        this.$().resizable({
+            alsoResize: timesDiv,
+        });
+
+        var this_ = this;
+        $('<div class="otp-stopTimes-close">[<a href="#">CLOSE</a>]</div>')
+        .appendTo(this.$())
+        .click(function() {
+            this_.$().hide();
+        });
         
     }
     

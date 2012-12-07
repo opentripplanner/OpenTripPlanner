@@ -249,9 +249,9 @@ otp.widgets.ItinerariesWidget =
             .click(function(evt) {
                 var stopID = leg.from.stopId.id;
                 var times = this_.activeItin().stopTimesMap[stopID];
-                console.log("getting "+stopID);
-                console.log(times);
-                var stopsWidget = new otp.widgets.StopTimesWidget(this_.id+"-stopWidget-"+stopID, stopID, leg.routeShortName, times);
+                console.log(evt);
+                var stopsWidget = new otp.widgets.StopTimesWidget(this_.id+"-stopWidget-"+stopID, stopID, leg.routeShortName, times, leg.startTime);
+                stopsWidget.$().offset({top: evt.clientY, left: evt.clientX});
                 this_.module.addWidget(stopsWidget);
             });
 

@@ -851,8 +851,18 @@ h6.drag-to-change {
     overflow: auto;
     background: white;
     border: 1px solid black;
+    margin-top: 5px;
 }
 
+.otp-stopTimes-list-item {
+    margin: .2em 0 .2em .5em;
+}
+
+.otp-stopTimes-close {
+    text-align:center;
+    margin-top: 8px;
+    font-size: .8em;
+}
 
 /* Past Queries Widget */
 
