@@ -253,7 +253,7 @@ public class ElevationUtils {
      * and hence maxSlope may be smaller than in the real world.
      * @param verticalDistance the vertical distance of the line segment
      * @param maxSlope the slope of the segment
-     * @return modified walk speed in meter/sec
+     * @return walk costs dependent on slope (in seconds)
      */
     public static double getWalkCostsForSlope(double verticalDistance, double maxSlope) {
         /*
