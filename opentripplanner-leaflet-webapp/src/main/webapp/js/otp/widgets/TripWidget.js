@@ -197,6 +197,43 @@ otp.widgets.TW_ModeSelector =
         
 });
 
+otp.widgets.TW_MaxWalkSelector = 
+    otp.Class(otp.widgets.TripWidgetPanel, {
+    
+    id           :  null,
+
+    values        : [0.1, 0.25, 0.5, 0.75, 1, 2, 3, 4, 5, 10, 15, 20, 30, 40, 50, 100],
+       
+    initialize : function(tripWidget) {
+        otp.widgets.TripWidgetPanel.prototype.initialize.apply(this, arguments);
+        this.id = tripWidget.id+"-maxWalkSelector";
+        
+        var html = "<div class='notDraggable'>Maximum walk: ";
+        html += '<select id="'+this.id+'">';
+        for(var i=0; i<this.values.length; i++) {
+            html += '<option'+(this.values[i] == .5 ? ' selected' : '')+'>'+this.values[i]+'</option>';            
+        }
+        html += '</select> mi.';
+        html += "</div>";
+              
+        $(html).appendTo(this.$());
+        //this.setContent(content);
+    },
+
+    doAfterLayout : function() {
+        var this_ = this;
+        $("#"+this.id).change(function() {
+            var m =this_.values[this.selectedIndex]*1609.34;
+            console.log("setting val="+m);
+            this_.tripWidget.module.maxWalkDistance = m;
+        });
+    },
+
+    restorePlan : function(data) {
+    }
+        
+});
+
 otp.widgets.TW_TimeSelector = 
     otp.Class(otp.widgets.TripWidgetPanel, {
     
