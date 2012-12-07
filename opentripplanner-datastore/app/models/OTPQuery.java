@@ -2,13 +2,19 @@ package models;
  
 import java.util.Date;
 import javax.persistence.*;
+import play.data.validation.MaxSize;
  
 import play.db.jpa.*;
  
 @Entity
 public class OTPQuery extends Model {
  
-    public String userName, queryParams;
+    public String userName;
+    
+    //@Column(columnDefinition = "TEXT")
+    @Column(length=1000)
+    public String queryParams;
+    
     public String fromPlace;
     public String toPlace;
     public Date timeStamp;
