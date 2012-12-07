@@ -491,6 +491,13 @@ body {
 	color: red;
 }
 
+.otp-widget-header {
+  font-size: 16px;
+  text-shadow: -1px 1px 0 #ffffff;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
 #otp-tripResultsWidget {
   width: 230px;
   height: auto;
@@ -642,9 +649,20 @@ h6.drag-to-change {
   top: 60px;
   left: 10px;
   width: 300px;
-  height: 250px;
+  height: 300px;
 }
 
+@media only screen and (min-width: 1024px) {
+  .otp-itinsWidget {
+    width: 450px;
+  }
+}
+
+@media only screen and (min-height: 768px) {
+  .otp-itinsWidget {
+    hieght: 350px;
+  }
+}
 
 .otp-itinsAccord {
   font-size: 12px;

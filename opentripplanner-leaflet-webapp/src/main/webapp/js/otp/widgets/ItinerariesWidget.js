@@ -35,7 +35,7 @@ otp.widgets.ItinerariesWidget =
         this.module = module;
         this.$().addClass('otp-itinsWidget');
         this.$().resizable();
-        this.header = $("<div>X Itineraries Returned:</div>").appendTo(this.$());
+        this.header = $("<div class='otp-widget-header'>X Itineraries Returned:</div>").appendTo(this.$());
     },
     
     activeItin : function() {

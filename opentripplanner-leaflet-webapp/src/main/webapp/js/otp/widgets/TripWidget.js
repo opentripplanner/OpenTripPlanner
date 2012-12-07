@@ -358,7 +358,7 @@ otp.widgets.TW_Submit =
         otp.widgets.TripWidgetPanel.prototype.initialize.apply(this, arguments);
         this.id = tripWidget.id+"-submit";
 
-        $('<div class="notDraggable"><button id="'+this.id+'-button">Plan Trip</button></div>').appendTo(this.$());
+        $('<div class="notDraggable" style="text-align:center;"><button id="'+this.id+'-button">Plan Trip</button></div>').appendTo(this.$());
         //console.log(this.id+'-button')
         
     },

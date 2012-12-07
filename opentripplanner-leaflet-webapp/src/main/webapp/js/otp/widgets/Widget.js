@@ -39,7 +39,11 @@ otp.widgets.Widget = otp.Class({
         });
         //$(this.div).resizable();
     },
-    
+
+    addHeader : function(title) {
+        this.$().append('<div class="otp-widget-header">'+title+'</div>');
+    },
+        
     setContent : function(content) {
         this.div.innerHTML = content;
     },
