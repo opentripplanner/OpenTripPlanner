@@ -69,8 +69,11 @@ otp.widgets.ItinerariesWidget =
         }
         var html = "<div id='"+divId+"' class='otp-itinsAccord'></div>";
         this.itinsAccord = $(html).appendTo(this.$());
-        this.appendFooter();
-
+        
+        if(tripPlan.queryParams.mode !== "WALK" && tripPlan.queryParams.mode !== "BICYCLE") {
+            this.appendFooter();
+        }
+        
         for(var i=0; i<this.itineraries.length; i++) {
             var itin = this.itineraries[i];
             //$('<h3><span id='+divId+'-headerContent-'+i+'>'+this.headerContent(itin, i)+'<span></h3>').appendTo(this.itinsAccord).click(function(evt) {
