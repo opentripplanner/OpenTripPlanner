@@ -34,6 +34,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.util.ElevationProfileSegment;
+import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.slf4j.Logger;
@@ -74,12 +75,12 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     private StreetTraversalPermission permission;
 
     @Getter @Setter
-	private int streetClass = CLASS_OTHERPATH;
-	
+    private int streetClass = CLASS_OTHERPATH;
+    
     /**
-	 * Marks that this edge is the reverse of the one defined in the source
-	 * data. Does NOT mean fromv/tov are reversed.
-	 */
+     * Marks that this edge is the reverse of the one defined in the source
+     * data. Does NOT mean fromv/tov are reversed.
+     */
     public boolean back;
     
     @Getter @Setter
@@ -241,23 +242,23 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     }
 
     private State doTraverse(State s0, RoutingRequest options, TraverseMode traverseMode) {
-		Edge backEdge = s0.getBackEdge();
-		if (backEdge != null
-				&& (options.arriveBy ? (backEdge.getToVertex() == fromv)
-						: (backEdge.getFromVertex() == tov))) {
-			// no illegal U-turns
-			return null;
-		}
-		if (!canTraverse(options, traverseMode)) {
-			if (traverseMode == TraverseMode.BICYCLE) {
-				// try walking bike since you can't ride here
-				return doTraverse(s0, options.getBikeWalkingOptions(),
-						TraverseMode.WALK);
-			}
-			return null;
-		}
+        Edge backEdge = s0.getBackEdge();
+        if (backEdge != null
+                && (options.arriveBy ? (backEdge.getToVertex() == fromv)
+                        : (backEdge.getFromVertex() == tov))) {
+            // no illegal U-turns
+            return null;
+        }
+        if (!canTraverse(options, traverseMode)) {
+            if (traverseMode == TraverseMode.BICYCLE) {
+                // try walking bike since you can't ride here
+                return doTraverse(s0, options.getBikeWalkingOptions(),
+                        TraverseMode.WALK);
+            }
+            return null;
+        }
 
-		double speed;
+        double speed;
         
         // Automobiles have variable speeds depending on the edge type
         if (traverseMode == TraverseMode.CAR)
@@ -303,10 +304,25 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             }
         } else {
             if (options.isWalkingBike()) {
-                //take slopes into account when walking bikes
+                // take slopes into account when walking bikes
                 time = elevationProfileSegment.getSlopeSpeedEffectiveLength() / speed;
             }
             weight = time;
+            if (traverseMode.equals(TraverseMode.WALK)) {
+                // take slopes into account when walking
+                double costs = ElevationUtils.getWalkCostsForSlope(length, elevationProfileSegment.getMaxSlope());
+                // as the cost walkspeed is assumed to be for 4.8km/h (= 1.333 m/sec) we need to adjust
+                // for the walkspeed set by the user
+                weight = costs * ( 1.3333 / speed );
+                time = weight; //treat cost as time, as in the current model it actually is the same (this can be checked for maxSlope == 0)
+                /*
+                // debug code
+                if(weight > 100){
+                    double timeflat = length / speed;
+                    System.out.format("line length: %.1f m, slope: %.3f ---> slope costs: %.1f , weight: %.1f , time (flat):  %.1f %n", length, elevationProfileSegment.getMaxSlope(), costs, weight, timeflat);
+                }
+                */
+            }
         }
         if (isStairs()) {
             weight *= options.stairsReluctance;
@@ -388,16 +404,16 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         return s1.makeState();
     }
 
-	/**
-	 * Calculate the average automobile traversal speed of this segment, given
-	 * the RoutingRequest, and return it in meters per second.
-	 * 
-	 * @param options
-	 * @return
-	 */
-	private double calculateCarSpeed(RoutingRequest options) {
-		return this.carSpeed;
-	}
+    /**
+     * Calculate the average automobile traversal speed of this segment, given
+     * the RoutingRequest, and return it in meters per second.
+     * 
+     * @param options
+     * @return
+     */
+    private double calculateCarSpeed(RoutingRequest options) {
+        return this.carSpeed;
+    }
 
     @Override
     public double weightLowerBound(RoutingRequest options) {
@@ -447,7 +463,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     }
     
     public void setNote(Set<Alert> notes) {
-    	this.notes = notes;
+        this.notes = notes;
     }
     
     @Override

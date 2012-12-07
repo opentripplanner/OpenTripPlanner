@@ -35,7 +35,7 @@ public class ElevationUtils {
     private static final double ENERGY_SLOPE_FACTOR = 4000;
 
     public static double getLengthMultiplierFromElevation(CoordinateSequence elev) {
-        
+
         double trueLength = 0;
         double flatLength = 0;
         double lastX = elev.getX(0);
@@ -55,7 +55,7 @@ public class ElevationUtils {
         return trueLength / flatLength;
     }
 
-    /** 
+    /**
      * 
      * @param elev The elevatioon profile, where each (x, y) is (distance along edge, elevation)
      * @param slopeLimit Whether the slope should be limited to 0.35, which is the max slope for
@@ -84,7 +84,7 @@ public class ElevationUtils {
             // usage approximation breaks down at extreme slopes, and
             // gives negative weights
             if ((slopeLimit && (slope > 0.35 || slope < -0.35)) || slope > 1.0 || slope < -1.0) {
-                slope = 0; 
+                slope = 0;
                 flattened = true;
             }
             if (maxSlope < Math.abs(slope)) {
@@ -236,6 +236,57 @@ public class ElevationUtils {
         }
 
         return temp;
+    }
+
+
+    /** parameter A in the Rees (2004) slope-dependent walk cost model **/
+    private static double walkParA = 0.75;
+    /** parameter C in the Rees (2004) slope-dependent walk cost model **/
+    private static double walkParC = 14.6;
+
+    /**
+     * The cost for walking in hilly/mountain terrain dependent on slope using an empirical function by
+     * WG Rees (Comp & Geosc, 2004), that overhauls the Naismith rule for mountaineering.<br>
+     * For a slope of 0 = 0 degree a cost is returned that approximates a speed of 1.333 m/sec = 4.8km/h<br>
+     * TODO: Not sure if it makes sense to use maxSlope as input and instead better use
+     * a lower estimate / average value. However, the DEM is most likely generalized/smoothed
+     * and hence maxSlope may be smaller than in the real world.
+     * @param verticalDistance the vertical distance of the line segment
+     * @param maxSlope the slope of the segment
+     * @return walk costs dependent on slope (in seconds)
+     */
+    public static double getWalkCostsForSlope(double verticalDistance, double maxSlope) {
+        /*
+        Naismith (1892):
+        "an hour for every three miles on the map, with an additional hour for
+        every 2,000 feet of ascent.'
+        -------
+        in S. Fritz and S. Carver (GISRUK 1998):
+        Naismith's Rule: 5 km/h plus 1 hour per 600m ascent; minus 10 minutes per 300 m
+        descent for slopes between 5 and 12 degrees; plus 10 minutes per 300m descent
+        for slopes greater than 12 degrees.
+        ...
+        In the case of a 50m grid resolution DEM for every m climbed, 6 seconds are added.
+        2 seconds are added in case of a ascent of more than 12 degrees and 2 seconds are
+        subtracted if the ascent is between 5-12 degrees.
+        -------
+        Naismith's rule was overhauled by W.G. Rees (2004), who developed a quadratic
+        function for speed estimation:
+                1/v = a + b*m + c*m^2
+        with a= 0.75 sec/m, b=0.09 s/m, c=14.6 s/m
+
+        As for b=0 there are no big differences the derived cost function is:
+                 k = a*d + c * (h*h) / d
+        with d= distance, and h = vertical separation
+
+        */
+        if (verticalDistance == 0){
+            return 0;
+        }
+        double costs = 0;
+        double h = maxSlope * verticalDistance;
+        costs = (walkParA * verticalDistance) + (  walkParC * (h * h) / verticalDistance); 
+        return  costs;
     }
 
     public static PackedCoordinateSequence getPartialElevationProfile(
