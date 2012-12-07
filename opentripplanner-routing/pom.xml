@@ -76,11 +76,6 @@
           <groupId>org.geotools</groupId>
           <artifactId>gt-geojson</artifactId>
         </dependency>
-       <dependency>
-         <groupId>com.google.collections</groupId>
-         <artifactId>google-collections</artifactId>
-         <version>1.0</version>
-       </dependency> 
     </dependencies>
     <repositories>
         <repository>
