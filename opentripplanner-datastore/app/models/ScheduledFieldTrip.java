@@ -80,7 +80,7 @@ public class ScheduledFieldTrip extends Model {
             //for some idiotic reason, the sum of an empty list is null rather than zero.
             return false;
         }
-        return passengers == (int) result;
+        return passengers == (Integer) result;
     }
 
 
