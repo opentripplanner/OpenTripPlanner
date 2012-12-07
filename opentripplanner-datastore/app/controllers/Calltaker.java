@@ -8,7 +8,16 @@ import java.util.*;
 import models.*;
 
 public class Calltaker extends Application {
-
+    
+  @Before
+    public static void setCORS()  {
+        Http.Header hd = new Http.Header();
+        hd.name = "Access-Control-Allow-Origin";
+        hd.values = new ArrayList<String>();
+        hd.values.add("*");
+        Http.Response.current().headers.put("Access-Control-Allow-Origin",hd);      
+    }
+    
     public static void index() {
         List<OTPQuery> queries = OTPQuery.all().fetch(10);
         render(queries);
