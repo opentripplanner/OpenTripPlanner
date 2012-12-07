@@ -161,10 +161,13 @@ otp.widgets.TW_ModeSelector =
     
     id           :  null,
 
-    modes        : { "TRANSIT,WALK" : "Walk to Transit", 
-                     "TRANSIT,BICYCLE" : "Bike to Transit", 
+    modes        : { "TRANSIT,WALK" : "Transit", 
+                     "BUSISH,WALK" : "Bus Only", 
+                     "TRAINISH,WALK" : "Rail Only", 
+                     "BICYCLE" : 'Bicycle Only',
                      "WALK" : 'Walk Only',
-                     "BICYCLE" : 'Bike Only' },
+                     "TRANSIT,BICYCLE" : "Bicycle &amp; Transit" 
+                   },
        
     initialize : function(tripWidget) {
         otp.widgets.TripWidgetPanel.prototype.initialize.apply(this, arguments);
