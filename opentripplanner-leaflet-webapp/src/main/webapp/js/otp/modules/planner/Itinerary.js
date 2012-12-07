@@ -69,7 +69,7 @@ otp.modules.planner.Itinerary = otp.Class({
 
     getFirstStopID : function() {
         if(this.firstStopIDs.length == 0) return null;
-        console.log(this.firstStopIDs[0].agencyId+"_"+this.firstStopIDs[0].id);
+        //console.log(this.firstStopIDs[0].agencyId+"_"+this.firstStopIDs[0].id);
         return this.firstStopIDs[0].agencyId+"_"+this.firstStopIDs[0].id;
     },
 
@@ -80,7 +80,8 @@ otp.modules.planner.Itinerary = otp.Class({
     getIconSummaryHTML : function(padding) {
         var html = '';
         for(var i=0; i<this.itinData.legs.length; i++) {
-            html += '<img src="images/mode/'+this.itinData.legs[i].mode.toLowerCase()+'.png" >';
+            var exceedsWalk = (this.itinData.legs[i].mode == "WALK" && this.itinData.legs[i].distance > this.tripPlan.queryParams.maxWalkDistance);            
+            html += '<img src="images/mode/'+this.itinData.legs[i].mode.toLowerCase()+'.png" '+(exceedsWalk ? 'style="background:#f88; padding: 0px 2px;"' : "")+'>';
             if(i < this.itinData.legs.length-1)
                 html += '<img src="images/mode/arrow.png" style="margin: 0px '+(padding || '3')+'px;">';
         }

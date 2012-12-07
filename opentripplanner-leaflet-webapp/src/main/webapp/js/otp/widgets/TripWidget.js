@@ -223,8 +223,7 @@ otp.widgets.TW_MaxWalkSelector =
     doAfterLayout : function() {
         var this_ = this;
         $("#"+this.id).change(function() {
-            var m =this_.values[this.selectedIndex]*1609.34;
-            console.log("setting val="+m);
+            var m = this_.values[this.selectedIndex]*1609.34;
             this_.tripWidget.module.maxWalkDistance = m;
         });
     },
