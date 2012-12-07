@@ -68,6 +68,13 @@ otp.modules.calltaker.CallTakerModule =
         this.fetchQueries();
     },
     
+    getExtendedQueryParams : function() {
+        return { 
+            showIntermediateStops : this.showIntermediateStops,
+            minTransferTime : 300 
+        };
+    },
+        
     onResetQueries : function(queries) {
         this.pastQueriesWidget.updateQueries(queries);
     },

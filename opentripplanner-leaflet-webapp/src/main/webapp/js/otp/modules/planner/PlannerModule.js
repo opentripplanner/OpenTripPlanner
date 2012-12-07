@@ -52,6 +52,8 @@ otp.modules.planner.PlannerModule =
     triangleSlopeFactor     : 0.333,
     triangleSafetyFactor    : 0.334,
     
+    startTimePadding        : 0,
+    
     // copy of query param set from last /plan request
     lastQueryParams : null,
     
@@ -197,10 +199,12 @@ otp.modules.planner.PlannerModule =
                 return;
             }
             
+            var addToStart = this.arriveBy ? 0 : this.startTimePadding;
        	    queryParams = {             
                 fromPlace: this.startLatLng.lat+','+this.startLatLng.lng,
                 toPlace: this.endLatLng.lat+','+this.endLatLng.lng,
                 time : (this.time) ? this.time : moment().format("h:mma"),
+                //time : (this.time) ? moment(this.time).add("s", addToStart).format("h:mma") : moment().add("s", addToStart).format("h:mma"),
                 date : (this.date) ? this.date : moment().format("MM-DD-YYYY"),
                 mode: this.mode,
                 maxWalkDistance: this.maxWalkDistance

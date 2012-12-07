@@ -586,6 +586,7 @@ body {
   bottom: auto;
   top: 3em;
   padding: 0.25em 0.5em;
+  z-index: 50;
 }
 
 .otp-defaultTripWidget hr {
@@ -650,6 +651,7 @@ h6.drag-to-change {
   left: 10px;
   width: 300px;
   height: 300px;
+  z-index: 5;
 }
 
 @media only screen and (min-width: 1024px) {
