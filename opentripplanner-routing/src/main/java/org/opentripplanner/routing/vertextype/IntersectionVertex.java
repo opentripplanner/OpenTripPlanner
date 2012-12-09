@@ -136,12 +136,18 @@ public class IntersectionVertex extends StreetVertex {
                 }
             }
             
+            // note that both acceleration and deceleration are multipled by 0.5, because half
+            // of the acceleration/deceleration time has already been accounted for in the base
+            // time calculations (this requires some algebra, but is correct).
+
             // calculate deceleration by multiplying the time for deceleration by the probability
             // of stopping (expected value)
-            turnCost += (fromSpeed / options.carDecelerationSpeed) * probabilityStopToTurn;
+            double decelerationTime = fromSpeed / options.carDecelerationSpeed;
+            turnCost += decelerationTime * 0.5 * probabilityStopToTurn;
             
             // calculate acceleration the same way
-            turnCost += (toSpeed / options.carAccelerationSpeed) * probabilityStopToTurn;            
+            double accelerationTime = (toSpeed / options.carAccelerationSpeed);
+            turnCost += accelerationTime * 0.5 * probabilityStopToTurn;
       
             return turnCost;
         }
