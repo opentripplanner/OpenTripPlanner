@@ -28,9 +28,10 @@
                 <property name="cacheDirectory" value="/home/otp/osm" />
             </bean>
         </property>
-	    <property name="defaultWayPropertySetSource">
+	<property name="defaultWayPropertySetSource">
           <bean class="org.opentripplanner.graph_builder.impl.osm.DefaultWayPropertySetSource" />
-	    </property>
+	</property>
+
     </bean>
 
     <bean id="floatingIslands" class="org.opentripplanner.graph_builder.impl.PruneFloatingIslands">
