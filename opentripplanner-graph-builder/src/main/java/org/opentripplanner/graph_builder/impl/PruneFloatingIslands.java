@@ -40,7 +40,7 @@ public class PruneFloatingIslands implements GraphBuilder {
     
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
-        StreetUtils.pruneFloatingIslands(graph);
+        StreetUtils.pruneFloatingIslands(graph, maxIslandSize);
     }
 
     @Override
