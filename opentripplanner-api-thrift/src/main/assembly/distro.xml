@@ -6,16 +6,6 @@
         <format>zip</format>
     </formats>
     <includeBaseDirectory>false</includeBaseDirectory>
-    <files>
-        <file>
-            <source>src/main/scripts/start-otp-thrift.sh</source>
-            <outputDirectory>/bin</outputDirectory>
-        </file>
-        <file>
-            <source>src/main/resources/org/opentripplanner/api_thrift/example-service-config.xml</source>
-            <outputDirectory>/conf</outputDirectory>
-        </file>
-    </files>
     <dependencySets>
         <dependencySet>
             <outputDirectory>/lib</outputDirectory>
