@@ -2116,9 +2116,13 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             if (relation.hasTag("day_on") && relation.hasTag("day_off") && 
                     relation.hasTag("hour_on") && relation.hasTag("hour_off")) {
                 
-                tag.time = RepeatingTimePeriod.parseFromOsmTurnRestriction(
-                        relation.getTag("day_on"), relation.getTag("day_off"), 
-                        relation.getTag("hour_on"), relation.getTag("hour_off"));
+                try {
+                    tag.time = RepeatingTimePeriod.parseFromOsmTurnRestriction(
+                            relation.getTag("day_on"), relation.getTag("day_off"), 
+                            relation.getTag("hour_on"), relation.getTag("hour_off"));
+                } catch (NumberFormatException e) {
+                    _log.info("Unparseable turn restriction: " + relation.getId());
+                }
             }
 
             MapUtils.addToMapList(turnRestrictionsByFromWay, from, tag);
