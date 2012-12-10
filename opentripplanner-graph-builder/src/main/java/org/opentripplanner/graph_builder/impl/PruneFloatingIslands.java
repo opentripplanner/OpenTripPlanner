@@ -18,11 +18,17 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.opentripplanner.common.StreetUtils;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
 
 public class PruneFloatingIslands implements GraphBuilder {
+
+    @Getter
+    @Setter
+    private int maxIslandSize = 40;
 
     public List<String> provides() {
         return Collections.emptyList();
@@ -31,10 +37,10 @@ public class PruneFloatingIslands implements GraphBuilder {
     public List<String> getPrerequisites() {
         return Arrays.asList("streets");
     }
-    
+
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
-        StreetUtils.pruneFloatingIslands(graph);
+        StreetUtils.pruneFloatingIslands(graph, maxIslandSize);
     }
 
     @Override

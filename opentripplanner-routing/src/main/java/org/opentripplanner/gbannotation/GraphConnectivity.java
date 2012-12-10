@@ -22,13 +22,14 @@ public class GraphConnectivity extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 1L;
 
-    public static final String FMT = "Removed/depedestrianized disconnected subgraph containing: %s";
-    
+    public static final String FMT = "Removed/depedestrianized disconnected subgraph containing: %s at: (%f, %f), with %d";
+
     final Vertex vertex;
-    
+    final int size;
+
     @Override
     public String getMessage() {
-        return String.format(FMT, vertex);
+        return String.format(FMT, vertex, vertex.getCoordinate().x, vertex.getCoordinate().y, size);
     }
 
     @Override
