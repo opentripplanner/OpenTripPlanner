@@ -40,7 +40,7 @@ public class StreetUtils {
 
     private static Logger _log = LoggerFactory.getLogger(StreetUtils.class);
 
-    public static void pruneFloatingIslands(Graph graph) {
+    public static void pruneFloatingIslands(Graph graph, int maxIslandSize) {
         _log.debug("pruning");
         Map<Vertex, HashSet<Vertex>> subgraphs = new HashMap<Vertex, HashSet<Vertex>>();
         Map<Vertex, ArrayList<Vertex>> neighborsForVertex = new HashMap<Vertex, ArrayList<Vertex>>();
@@ -98,11 +98,11 @@ public class StreetUtils {
             }
             islands.add(subgraph);
         }
-    	
-    	/* remove all tiny subgraphs */
+        _log.debug(islands.size() + " sub graphs found");
+        /* remove all tiny subgraphs */
         for (HashSet<Vertex> island : islands) {
-            if (island.size() < 40) {
-                _log.warn(graph.addBuilderAnnotation(new GraphConnectivity(island.iterator().next())));
+            if (island.size() < maxIslandSize) {
+                _log.warn(graph.addBuilderAnnotation(new GraphConnectivity(island.iterator().next(), island.size())));
                 depedestrianizeOrRemove(graph, island);
             }
         }
