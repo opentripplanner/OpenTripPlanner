@@ -19,6 +19,9 @@ otp.widgets.Widget = otp.Class({
     div :       null,
     id :        null,
     minimizable : false,
+    minimized   : false,
+    minimizedTab : null,
+    header      : null,
     title       : null,
     
     initialize : function(id) {
@@ -45,30 +48,36 @@ otp.widgets.Widget = otp.Class({
     addHeader : function(title) {
         var this_ = this;
         this.title = title;
-        var header = $('<div class="otp-widget-header">'+title+'</div>').appendTo(this.$());
+        this.header = $('<div class="otp-widget-header">'+title+'</div>').appendTo(this.$());
         var buttons = $('<div class="otp-widget-header-buttons"></div>').appendTo(this.$());
         if(this.minimizable) {
             $('<div class="otp-widget-header-minimize">&ndash;</div>').appendTo(buttons)
             .click(function(evt) {
-                console.log("minimize");
                 this_.minimize();
             });
         }
-        return header;
+    },
+    
+    setTitle : function(title) {
+        this.title = title;
+        this.header.html(title);    
     },
 
     minimize : function() {
         var this_ = this;
         this.hide();
-        var mintab = $('<div class="otp-minimized-tab">'+this.title+'</div>')
-        mintab.appendTo($('#otp-minimize-tray')).click(function () {
-            this_.unminimize(mintab);
+        this.minimizedTab = $('<div class="otp-minimized-tab">'+this.title+'</div>')
+        .appendTo($('#otp-minimize-tray'))
+        .click(function () {
+            this_.unminimize();
         });
+        this.minimized = true;
     },
 
     unminimize : function(tab) {
         this.show();
-        tab.hide();
+        this.minimizedTab.hide();
+        this.minimized = false;
     },
             
     setContent : function(content) {

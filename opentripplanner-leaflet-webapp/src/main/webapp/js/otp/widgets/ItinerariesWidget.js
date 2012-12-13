@@ -19,7 +19,7 @@ otp.widgets.ItinerariesWidget =
 
     module : null,
     
-    header : null,
+    //header : null,
     itinsAccord : null,
     footer : null,
     
@@ -36,7 +36,7 @@ otp.widgets.ItinerariesWidget =
         this.$().addClass('otp-itinsWidget');
         this.$().resizable();
         this.minimizable = true;
-        this.header = this.addHeader("X Itineraries Returned");
+        this.addHeader("X Itineraries Returned");
         //this.header = $("<div class='otp-widget-header'>X Itineraries Returned:</div>").appendTo(this.$());
     },
     
@@ -48,6 +48,8 @@ otp.widgets.ItinerariesWidget =
         
         var this_ = this;
         var divId = this.id+"-itinsAccord";
+
+        if(this.minimized) this.unminimize();
         
         if(this.refreshActiveOnly == true) {
             var newItin = tripPlan.itineraries[0];
@@ -61,7 +63,8 @@ otp.widgets.ItinerariesWidget =
             return;
         }            
         this.itineraries = tripPlan.itineraries;
-        this.header.html(this.itineraries.length+" Itineraries Returned:");
+        //this.header.html(this.itineraries.length+" Itineraries Returned:");
+        this.setTitle(this.itineraries.length+" Itineraries Returned:");
         
         if(this.itinsAccord !== null) {
             this.itinsAccord.remove();
