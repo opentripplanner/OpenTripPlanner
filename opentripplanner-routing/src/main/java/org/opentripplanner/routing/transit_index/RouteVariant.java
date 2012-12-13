@@ -91,6 +91,8 @@ public class RouteVariant implements Serializable {
     @JsonIgnore
     private ArrayList<PatternInterlineDwell> interlines;
 
+    private ArrayList<String> tripHeadsigns;
+    
     private Route route;
 
     private String direction;
@@ -109,6 +111,7 @@ public class RouteVariant implements Serializable {
         exemplarSegments = new ArrayList<RouteSegment>();
         interlines = new ArrayList<PatternInterlineDwell>();
         this.mode = GtfsLibrary.getTraverseMode(route);
+        tripHeadsigns = new ArrayList<String>();
     }
 
     public void addTrip(Trip trip) {
@@ -116,6 +119,7 @@ public class RouteVariant implements Serializable {
             trips.add(trip.getId());
             if (direction == null) {
                 direction = trip.getDirectionId();
+                tripHeadsigns.add(trip.getTripHeadsign());
             } else {
                 if (!direction.equals(trip.getDirectionId())) {
                     direction = MULTIDIRECTION;
@@ -265,5 +269,15 @@ public class RouteVariant implements Serializable {
     @JsonIgnore
     public List<PatternInterlineDwell> getInterlines() {
         return interlines;
+    }
+
+    public void addTripHeadsign(String tripHeadsigns) {
+        this.tripHeadsigns.add(tripHeadsigns);
+    }
+
+    @XmlElementWrapper
+    @XmlElement(name = "headsign")
+    public ArrayList<String> getTripHeadsigns() {
+        return tripHeadsigns;
     }
 }
