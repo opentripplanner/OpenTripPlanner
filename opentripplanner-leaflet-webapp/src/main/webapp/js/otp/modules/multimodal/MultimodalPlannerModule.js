@@ -36,7 +36,9 @@ otp.modules.multimodal.MultimodalPlannerModule =
         this.optionsWidget.$().resizable();
         this.addWidget(this.optionsWidget);
         
+        this.optionsWidget.minimizable = true;
         this.optionsWidget.addHeader("Trip Options");
+        
         this.optionsWidget.addPanel("time", new otp.widgets.TW_TimeSelector(this.optionsWidget));
         this.optionsWidget.addVerticalSpace(12);
         this.optionsWidget.addPanel("mode", new otp.widgets.TW_ModeSelector(this.optionsWidget));

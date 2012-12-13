@@ -18,6 +18,8 @@ otp.widgets.Widget = otp.Class({
     
     div :       null,
     id :        null,
+    minimizable : false,
+    title       : null,
     
     initialize : function(id) {
         //otp.configure(this, config);
@@ -41,9 +43,34 @@ otp.widgets.Widget = otp.Class({
     },
 
     addHeader : function(title) {
-        this.$().append('<div class="otp-widget-header">'+title+'</div>');
+        var this_ = this;
+        this.title = title;
+        var header = $('<div class="otp-widget-header">'+title+'</div>').appendTo(this.$());
+        var buttons = $('<div class="otp-widget-header-buttons"></div>').appendTo(this.$());
+        if(this.minimizable) {
+            $('<div class="otp-widget-header-minimize">&ndash;</div>').appendTo(buttons)
+            .click(function(evt) {
+                console.log("minimize");
+                this_.minimize();
+            });
+        }
+        return header;
     },
-        
+
+    minimize : function() {
+        var this_ = this;
+        this.hide();
+        var mintab = $('<div class="otp-minimized-tab">'+this.title+'</div>')
+        mintab.appendTo($('#otp-minimize-tray')).click(function () {
+            this_.unminimize(mintab);
+        });
+    },
+
+    unminimize : function(tab) {
+        this.show();
+        tab.hide();
+    },
+            
     setContent : function(content) {
         this.div.innerHTML = content;
     },

@@ -27,7 +27,9 @@ otp.widgets.PastQueriesWidget =
         this.module = module;
         this.$().addClass('otp-pastQueriesWidget');
         this.$().resizable();
-        this.header = $("<div class='otp-pastQueriesHeader'>Past 10 Queries for user "+module.userName+"</div>").appendTo(this.$());
+        this.minimizable = true;
+        //this.header = $("<div class='otp-pastQueriesHeader'>Past 10 Queries for user "+module.userName+"</div>").appendTo(this.$());
+        this.addHeader("Past 10 Queries for user "+module.userName);
         this.queryList = $("<div id='"+this.id+"-queryList' class='otp-pastQueriesList'></div>").appendTo(this.$());
                
         this.$().resizable({
@@ -36,6 +38,7 @@ otp.widgets.PastQueriesWidget =
         this.$().draggable({
             cancel: '#'+this.id+'-queryList'
         });
+        
     },
     
     updateQueries : function(queries) {
