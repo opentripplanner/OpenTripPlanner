@@ -13,13 +13,38 @@
 
 package org.opentripplanner.routing.services;
 
+import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
 public interface SPTService {
     
-    public ShortestPathTree getShortestPathTree(RoutingRequest req); // traverseoptions should be renamed SPTRequest
-    
-    public ShortestPathTree getShortestPathTree(RoutingRequest req, double timeoutSeconds); 
+    /**
+     * Generate a shortest path tree for this RoutingRequest.
+     * 
+     * @param req
+     * @return
+     */
+    public ShortestPathTree getShortestPathTree(RoutingRequest req); 
+
+    /**
+     * Generate SPT, controlling the timeout externally.
+     * 
+     * @param req
+     * @param timeoutSeconds
+     * @return
+     */
+    public ShortestPathTree getShortestPathTree(RoutingRequest req, double timeoutSeconds);
+
+    /**
+     * Find a shortest path tree and control when the search terminates.
+     * 
+     * @param req
+     * @param timeoutSeconds
+     * @param terminationStrategy
+     * @return
+     */
+    public ShortestPathTree getShortestPathTree(RoutingRequest req, double timeoutSeconds,
+            SearchTerminationStrategy terminationStrategy);
 
 }

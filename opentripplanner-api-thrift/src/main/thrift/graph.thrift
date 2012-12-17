@@ -43,7 +43,7 @@ struct GraphEdge {
 	2: required GraphVertex head;
 	3: required GraphVertex tail;
 
-	// Name of the dge
+	// Name of the edge
 	4: optional string name;
 }
 
