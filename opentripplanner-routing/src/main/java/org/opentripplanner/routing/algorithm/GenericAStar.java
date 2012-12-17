@@ -68,13 +68,25 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         _searchTerminationStrategy = searchTerminationStrategy;
     }
     
+    /**
+     * Compute SPT using default timeout and termination strategy.
+     */
     @Override
     public ShortestPathTree getShortestPathTree(RoutingRequest req) {
-        return getShortestPathTree(req, -1); // negative timeout means no timeout
+        return getShortestPathTree(req, -1, _searchTerminationStrategy); // negative timeout means no timeout
+    }
+    
+    /**
+     * Compute SPT using default termination strategy.
+     */
+    @Override
+    public ShortestPathTree getShortestPathTree(RoutingRequest req, double timeoutSeconds) {
+        return this.getShortestPathTree(req, timeoutSeconds, _searchTerminationStrategy);
     }
 
     /** @return the shortest path, or null if none is found */
-    public ShortestPathTree getShortestPathTree(RoutingRequest options, double relTimeout) {
+    public ShortestPathTree getShortestPathTree(RoutingRequest options, double relTimeout,
+            SearchTerminationStrategy terminationStrategy) {
 
         RoutingContext rctx = options.getRoutingContext();
         long abortTime = DateUtils.absoluteTimeout(relTimeout);
@@ -149,8 +161,8 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
             /**
              * Should we terminate the search?
              */
-            if (_searchTerminationStrategy != null) {
-                if (!_searchTerminationStrategy.shouldSearchContinue(
+            if (terminationStrategy != null) {
+                if (!terminationStrategy.shouldSearchContinue(
                     rctx.origin, rctx.target, u, spt, options))
                     break;
             // TODO AMB: Replace isFinal with bicycle conditions in BasicPathParser
@@ -272,5 +284,4 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     public void setTraverseVisitor(TraverseVisitor traverseVisitor) {
         this.traverseVisitor = traverseVisitor;
     }
-
 }

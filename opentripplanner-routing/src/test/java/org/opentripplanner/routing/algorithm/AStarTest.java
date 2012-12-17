@@ -15,18 +15,18 @@ package org.opentripplanner.routing.algorithm;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.routing.algorithm.strategies.MultiTargetTerminationStrategy;
+import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.graph.AbstractVertex;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SimpleConcreteEdge;
 import org.opentripplanner.routing.graph.SimpleConcreteVertex;
@@ -36,7 +36,6 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
 
 public class AStarTest {
 
@@ -219,6 +218,30 @@ public class AStarTest {
         assertEquals("market_20th", states.get(6).getVertex().getLabel());
         assertEquals("56th_20th", states.get(7).getVertex().getLabel());
         assertEquals("near_56th_20th", states.get(8).getVertex().getLabel());
+    }
+    
+    @Test
+    public void testMultipleTargets() {
+        RoutingRequest options = new RoutingRequest();
+        options.setWalkSpeed(1.0);
+        options.setBatch(true);
+        options.setRoutingContext(_graph, _graph.getVertex("56th_24th"),
+                _graph.getVertex("leary_20th"));
+
+        Set<Vertex> targets = new HashSet<Vertex>();
+        targets.add(_graph.getVertex("shilshole_22nd"));
+        targets.add(_graph.getVertex("market_russell"));
+        targets.add(_graph.getVertex("56th_20th"));
+        targets.add(_graph.getVertex("leary_20th"));
+        
+        SearchTerminationStrategy strategy = new MultiTargetTerminationStrategy(targets);
+        ShortestPathTree tree = new GenericAStar().getShortestPathTree(options, -1, strategy);
+
+        for (Vertex v : targets) {
+            GraphPath path = tree.getPath(v, false);
+            assertNotNull("No path found for target " + v.getLabel(),
+                    path);
+        }
     }
 
     /****
