@@ -59,8 +59,9 @@ otp.modules.planner.Itinerary = otp.Class({
             success: function(data) {
                 var stopTimes = [];
                 for(var i=0; i<data.stopTimes.length; i++) {
-                    if(data.stopTimes[i].phase == 'departure')
-                        stopTimes.push(data.stopTimes[i].time*1000);
+                    var st = data.stopTimes[i].StopTime || data.stopTimes[i];
+                    if(st.phase == 'departure')
+                        stopTimes.push(st.time*1000);
                 }
                 this_.stopTimesMap[stopId.id] = stopTimes;
             }
