@@ -159,7 +159,7 @@ otp.modules.planner.PlannerModule =
     
     restoreTrip : function(queryParams) {
     
-        this.markerLayer.clearLayers(); 
+        //this.markerLayer.clearLayers(); 
       	this.startLatLng = otp.util.Geo.stringToLatLng(queryParams.fromPlace);
     	this.setStartPoint(this.startLatLng, false);
     	
