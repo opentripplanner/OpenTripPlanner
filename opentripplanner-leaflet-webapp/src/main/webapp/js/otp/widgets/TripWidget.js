@@ -49,7 +49,7 @@ otp.widgets.TripWidget =
 
     restorePlan : function(data) {
 	    if(data == null) return;
-
+	    
         for(var id in this.panels) {
             this.panels[id].restorePlan(data);
         }
@@ -168,6 +168,8 @@ otp.widgets.TW_ModeSelector =
                      "WALK" : 'Walk Only',
                      "TRANSIT,BICYCLE" : "Bicycle &amp; Transit" 
                    },
+    
+    optionLookup : { },
        
     initialize : function(tripWidget) {
         otp.widgets.TripWidgetPanel.prototype.initialize.apply(this, arguments);
@@ -180,7 +182,7 @@ otp.widgets.TW_ModeSelector =
         });
         html += '</select>';
         html += "</div>";
-              
+        
         $(html).appendTo(this.$());
         //this.setContent(content);
     },
@@ -193,6 +195,7 @@ otp.widgets.TW_ModeSelector =
     },
 
     restorePlan : function(data) {
+        //$('#'+this.id+' option:eq(0)').prop('selected', true);    
     }
         
 });

@@ -67,6 +67,9 @@ otp.modules.multimodal.MultimodalPlannerModule =
         }
         this.itinWidget.show();
         
+        if(restoring) {
+            this.optionsWidget.restorePlan(tripPlan);
+        }
         this.drawItinerary(tripPlan.itineraries[0]);
     },
     
