@@ -230,7 +230,15 @@ otp.widgets.ItinerariesWidget =
         // add trip summary
         
         var html = '<div class="otp-itinTripSummary">';
-        html += '[<a href="'+itin.getLink(i)+'">Link to Itinerary</a>]';
+        html += '<div class="otp-itinTripSummaryHeader">Trip Summary</div>';
+        html += '<div class="otp-itinTripSummaryLabel">Travel</div><div class="otp-itinTripSummaryText">'+itin.getStartTimeStr()+'</div>';
+        html += '<div class="otp-itinTripSummaryLabel">Time</div><div class="otp-itinTripSummaryText">'+itin.getDurationStr()+'</div>';
+        if(itin.hasTransit) {
+            html += '<div class="otp-itinTripSummaryLabel">Transfers</div><div class="otp-itinTripSummaryText">'+itin.itinData.transfers+'</div>';
+            html += '<div class="otp-itinTripSummaryLabel">Fare</div><div class="otp-itinTripSummaryText">'+itin.getFareStr()+'</div>';
+        }
+        html += '<div class="otp-itinTripSummaryFooter">Valid ' + moment().format('MMM Do YYYY, h:mma') + ' | <a href="'+itin.getLink(i)+'">Link to Itinerary</a></div>';
+        
         html += '</div>';
         itinDiv.append(html);
         

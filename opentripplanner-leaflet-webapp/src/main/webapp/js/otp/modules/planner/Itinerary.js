@@ -21,7 +21,9 @@ otp.modules.planner.Itinerary = otp.Class({
     
     firstStopIDs    : null,
     stopTimesMap     : null,
-    
+
+    hasTransit  : false,
+        
     initialize : function(itinData, tripPlan) {
         this.itinData = itinData;
         this.tripPlan = tripPlan;
@@ -32,6 +34,7 @@ otp.modules.planner.Itinerary = otp.Class({
         for(var l=0; l<this.itinData.legs.length; l++) {
             var leg = this.itinData.legs[l];
             if(otp.util.Itin.isTransit(leg.mode)) {
+                this.hasTransit = true;
                 this.firstStopIDs.push(leg.from.stopId);
                 this.runStopTimesQuery(leg.from.stopId, leg.routeId, leg.startTime);
             }
@@ -74,10 +77,6 @@ otp.modules.planner.Itinerary = otp.Class({
         return this.firstStopIDs[0].agencyId+"_"+this.firstStopIDs[0].id;
     },
 
-    isTransit : function(mode) {
-        return otp.util.itin.isTransit(this.itinData.mode);
-    },
-    
     getIconSummaryHTML : function(padding) {
         var html = '';
         for(var i=0; i<this.itinData.legs.length; i++) {
@@ -99,6 +98,16 @@ otp.modules.planner.Itinerary = otp.Class({
     
     getDurationStr : function() {
         return otp.util.Time.msToHrMin(this.itinData.duration);
+    },
+    
+    getFareStr : function() {
+    
+        if(this.itinData.fare.fare.regular) {
+            var decimalPlaces = this.itinData.fare.fare.regular.currency.defaultFractionDigits;
+            return this.itinData.fare.fare.regular.currency.symbol +
+                (this.itinData.fare.fare.regular.cents/Math.pow(10,decimalPlaces)).toFixed(decimalPlaces);
+        }
+        return "N/A";
     },
     
     getLink : function(itinIndex) {

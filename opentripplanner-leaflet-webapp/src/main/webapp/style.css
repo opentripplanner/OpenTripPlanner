@@ -782,7 +782,32 @@ h6.drag-to-change {
 .otp-itinTripSummary {
     margin-top: 15px;
     padding: 5px;
-    border: 2px solid #ccc;
+    border: 1px solid #bbb;
+    background: #eee;
+}
+
+.otp-itinTripSummaryHeader {
+    font-size: 1.3em;
+    font-weight: bold;
+    color: #aaa;
+    margin-bottom: .5em;
+}
+
+.otp-itinTripSummaryLabel {
+    float: left;
+    font-weight: bold;
+    width: 70px;
+}
+
+.otp-itinTripSummaryText {
+    margin-left: 75px;    
+}
+
+.otp-itinTripSummaryFooter {
+    font-size: .9em;
+    margin-top: 1.2em;
+    color: gray;
+    text-align: center;
 }
 
 .otp-itinsButtonRow {
