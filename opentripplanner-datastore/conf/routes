@@ -4,9 +4,15 @@
 
 # Home page
 GET     /                                       Calltaker.index
-GET     /getQueries                             Calltaker.getQueries
-POST    /newQuery                               Calltaker.newQuery
-POST    /deleteQuery                            Calltaker.deleteQuery
+
+
+GET     /call                                   Calltaker.getCall
+POST    /call                                   Calltaker.newCall
+OPTIONS /call                                   Calltaker.options
+
+GET     /callQuery                              Calltaker.getQuery
+POST    /callQuery                              Calltaker.newQuery
+DELETE  /callQuery                              Calltaker.deleteQuery
 
 #Field trip
 GET     /fieldTrip                              FieldTrip.index
