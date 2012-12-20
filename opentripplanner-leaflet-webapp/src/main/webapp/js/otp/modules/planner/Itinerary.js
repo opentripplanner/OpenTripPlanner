@@ -101,4 +101,14 @@ otp.modules.planner.Itinerary = otp.Class({
         return otp.util.Time.msToHrMin(this.itinData.duration);
     },
     
+    getLink : function(itinIndex) {
+        var appendChar = "?", paramStr = "";
+        for(param in this.tripPlan.queryParams) {
+            paramStr += appendChar+param+"="+ encodeURIComponent(this.tripPlan.queryParams[param]);
+            appendChar = "&";
+        }
+        if(itinIndex) paramStr += appendChar+"itinIndex="+itinIndex;
+        return paramStr;
+    }
+    
 });

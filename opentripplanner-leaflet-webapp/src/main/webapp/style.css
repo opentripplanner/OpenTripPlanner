@@ -779,6 +779,12 @@ h6.drag-to-change {
     margin-top: .5em;
 }
 
+.otp-itinTripSummary {
+    margin-top: 15px;
+    padding: 5px;
+    border: 2px solid #ccc;
+}
+
 .otp-itinsButtonRow {
     margin-top: .5em;    
     text-align: center;

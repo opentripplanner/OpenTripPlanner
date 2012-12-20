@@ -25,13 +25,28 @@ otp.core.Webapp = otp.Class({
     
     infoWidgets     : { },
     
+    urlParams : null,
+
     initialize : function() {
+
 
         // misc. housekeeping
         
         if(typeof console == 'undefined') console = { log: function(str) {} };
         var this_ = this;
-       
+
+        // init url params
+        this.urlParams = { };
+        var match,
+            pl     = /\+/g,  // Regex for replacing addition symbol with a space
+            search = /([^&=]+)=?([^&]*)/g,
+            decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+            query  = window.location.search.substring(1);
+
+        while (match = search.exec(query))
+            this.urlParams[decode(match[1])] = decode(match[2]);
+            
+        
         // set the logo & title
         
         if(otp.config.showLogo) {
@@ -123,10 +138,11 @@ otp.core.Webapp = otp.Class({
                        
         }
                 
+
+
         // retrieve a saved trip, if applicable
-		        
-		if(window.location.hash !== "")
-			otp.util.DataStorage.retrieve(window.location.hash.replace("#", ""), this.activeModule);
+		//if(window.location.hash !== "")
+		//	otp.util.DataStorage.retrieve(window.location.hash.replace("#", ""), this.activeModule);
 			
 		
     },

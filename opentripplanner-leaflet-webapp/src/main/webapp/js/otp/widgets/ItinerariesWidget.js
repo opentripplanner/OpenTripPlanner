@@ -44,7 +44,7 @@ otp.widgets.ItinerariesWidget =
         return this.itineraries[this.activeIndex];
     },
     
-    updateItineraries : function(tripPlan) {
+    updateItineraries : function(tripPlan, itinIndex) {
         
         var this_ = this;
         var divId = this.id+"-itinsAccord";
@@ -98,9 +98,10 @@ otp.widgets.ItinerariesWidget =
             .appendTo(this.itinsAccord)
             .append(this.renderItinerary(itin, i));
         }
-        this.activeIndex = 0;
+        this.activeIndex = parseInt(itinIndex) || 0;
         
         this.itinsAccord.accordion({
+            active: this.activeIndex,
             heightStyle: "fill"
         });
         
@@ -226,7 +227,12 @@ otp.widgets.ItinerariesWidget =
         itinDiv.append(itinAccord);
         itinDiv.append("<div class='otp-itinEndRow'><b>End</b>: "+itin.getEndTimeStr()+"</div>");
 
-        // TODO: add trip summary
+        // add trip summary
+        
+        var html = '<div class="otp-itinTripSummary">';
+        html += '[<a href="'+itin.getLink(i)+'">Link to Itinerary</a>]';
+        html += '</div>';
+        itinDiv.append(html);
         
         return itinDiv;
     },

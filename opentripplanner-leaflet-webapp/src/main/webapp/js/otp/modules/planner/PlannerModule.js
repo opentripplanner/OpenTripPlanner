@@ -66,7 +66,9 @@ otp.modules.planner.PlannerModule =
     
     activate : function() {
         if(this.activated) return;
-        
+        var this_ = this;
+
+        // set up layers        
         this.markerLayer = new L.LayerGroup();
         this.pathLayer = new L.LayerGroup();
         this.pathMarkerLayer = new L.LayerGroup();
@@ -77,10 +79,7 @@ otp.modules.planner.PlannerModule =
         this.addLayer("Paths", this.pathLayer);
         this.addLayer("Path Markers", this.pathMarkerLayer);
         
-        /*this.mapLayers.push(this.pathLayer);
-        this.mapLayers.push(this.markerLayer);
-        this.mapLayers.push(this.stationsLayer);*/
-
+        // set up primary widgets
         this.tipWidget = this.createWidget("otp-tipWidget", "");
         this.updateTipStep(1);
         
@@ -91,13 +90,19 @@ otp.modules.planner.PlannerModule =
         this.widgets.push(this.noTripWidget);
         //this.noTripWidget.hide();
 
-        var this_ = this;
+        // set up map planner-specific map context menu items
         this.webapp.map.addContextMenuItem("Set as Start Location", function(latlng) {
             this_.setStartPoint(latlng, true);
         });
         this.webapp.map.addContextMenuItem("Set as End Location", function(latlng) {
             this_.setEndPoint(latlng, true);
         });
+        
+        // check URL params for restored trip
+        if("fromPlace" in this.webapp.urlParams && "toPlace" in this.webapp.urlParams) {
+            if("itinIndex" in this.webapp.urlParams) this.restoredItinIndex = this.webapp.urlParams["itinIndex"];
+            this.restoreTrip(_.omit(this.webapp.urlParams, "itinIndex"));
+        }
     },
     
 
