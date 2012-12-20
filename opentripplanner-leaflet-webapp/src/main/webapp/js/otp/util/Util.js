@@ -23,6 +23,11 @@ otp.util.Geo = {
     stringToLatLng : function(str) {
         var arr = str.split(',');
         return new L.LatLng(parseFloat(arr[0]), parseFloat(arr[1]));
+    },
+    
+    truncatedLatLng : function(latLngStr) {
+        var ll = otp.util.Geo.stringToLatLng(latLngStr);
+        return Math.round(ll.lat*100000)/100000+","+Math.round(ll.lng*100000)/100000;
     }
 
 };

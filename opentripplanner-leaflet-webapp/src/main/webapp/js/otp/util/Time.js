@@ -30,6 +30,17 @@ otp.util.Time = {
         return str;
     },
     
+    msToHrMinSec : function(ms) {
+        var hrs = Math.floor(ms / 3600000);
+        var mins = Math.floor(ms / 60000) % 60;
+        var secs = Math.floor(ms / 1000) % 60;
+        
+        // TODO: localization
+        var str = (hrs > 0 ? (hrs +" hr, ") : "") + (mins > 0 ? (mins +" min, ") : "") + secs + " sec";
+    
+        return str;
+    },
+        
     formatItinTime : function(timestamp, formatStr) {
         formatStr = formatStr || otp.config.timeFormat+", "+otp.config.dateFormat;
         return moment(timestamp).add("hours", otp.config.timeOffset).format(formatStr);

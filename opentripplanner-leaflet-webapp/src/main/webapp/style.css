@@ -959,7 +959,65 @@ h6.drag-to-change {
     font-size: .8em;
 }
 
-/* Past Queries Widget */
+/*  Call History / Past Queries Widget */
+
+.otp-callHistoryWidget {
+  bottom: 20px;
+  right: 10px;
+}
+
+.otp-callHistory-buttonRow {
+    height: 30px;
+    margin: 8px 0px 10px 0px;
+    background: #666;
+    padding: 6px 8px;
+}
+
+.otp-callHistory-buttonRowText {
+    text-align: right;
+    font-size: 16px;
+    font-weight: bold;
+    padding-top: 5px;
+    color: white;
+}
+
+.otp-callHistory-callListContainer {
+    float: left;
+    width: 120px
+    border: 2px solid red;
+}
+
+.otp-callHistory-callList {
+    background: #bbb;
+    border: 1px solid black;
+    overflow: auto;
+    width: 120px;
+    height: 200px;
+}
+
+.otp-callHistory-queryListContainer {
+    margin-left: 130px
+}
+
+.otp-callHistory-queryList {
+    background: #bbb;
+    border: 1px solid black;
+    overflow: auto;    
+    width: 250px;
+    height: 200px;
+}
+
+.otp-callHistory-callListItem {
+    background: white;
+    padding: 2px;
+    margin: 3px;
+    /*border-bottom: 2px solid gray;*/
+    cursor: pointer;
+}
+
+.otp-callHistory-callListItem:hover {
+    background: #eee;
+}
 
 .otp-pastQueriesWidget {
   bottom: 20px;
