@@ -29,7 +29,13 @@ otp.core.Map = otp.Class({
         var this_ = this;
         this.webapp = webapp;
         
-        var tileLayer = new L.TileLayer(otp.config.tileUrl, {attribution: otp.config.tileAttrib});
+        tileLayerProps = {
+            attribution: otp.config.tileAttrib
+        };
+        
+        if(otp.config.tileSubdomains) tileLayerProps['subdomains'] = otp.config.tileSubdomains;
+
+        var tileLayer = new L.TileLayer(otp.config.tileUrl, tileLayerProps);
 	    
 	    if(typeof otp.config.getTileUrl != 'undefined') {
     	    tileLayer.getTileUrl = otp.config.getTileUrl;
@@ -41,9 +47,9 @@ otp.core.Map = otp.Class({
             zoom : (otp.config.initZoom || 2),
             zoomControl : false
         }
-        if(otp.config.minZoom) _.extend(mapProps, { minZoom : otp.config.minZoom });
-        if(otp.config.maxZoom) _.extend(mapProps, { maxZoom : otp.config.maxZoom });
-
+        if(otp.config.minZoom) mapProps['minZoom'] = otp.config.minZoom;  //_.extend(mapProps, { minZoom : otp.config.minZoom });
+        if(otp.config.maxZoom) mapProps['maxZoom'] = otp.config.maxZoom; //_.extend(mapProps, { maxZoom : otp.config.maxZoom });
+        
         this.lmap = new L.Map('map', mapProps);
 
         this.lmap.addControl(new L.Control.Zoom({ position : 'topright' }));
