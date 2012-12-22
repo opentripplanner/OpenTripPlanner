@@ -195,7 +195,14 @@ otp.widgets.TW_ModeSelector =
     },
 
     restorePlan : function(data) {
-        //$('#'+this.id+' option:eq(0)').prop('selected', true);    
+        var i = 0;
+        for(mode in this.modes) {
+            if(mode === data.queryParams.mode) {
+                $('#'+this.id+' option:eq('+i+')').prop('selected', true);    
+                return;
+            }
+            i++;
+        }
     }
         
 });
