@@ -198,6 +198,7 @@ otp.widgets.TW_ModeSelector =
         var i = 0;
         for(mode in this.modes) {
             if(mode === data.queryParams.mode) {
+                this.tripWidget.module.mode = data.queryParams.mode; 
                 $('#'+this.id+' option:eq('+i+')').prop('selected', true);    
                 return;
             }
