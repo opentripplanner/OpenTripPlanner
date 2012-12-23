@@ -29,30 +29,48 @@ otp.core.Map = otp.Class({
         var this_ = this;
         this.webapp = webapp;
         
-        tileLayerProps = {
-            attribution: otp.config.tileAttrib
-        };
         
-        if(otp.config.tileSubdomains) tileLayerProps['subdomains'] = otp.config.tileSubdomains;
+                
+        var baseLayers = {};
+        var defaultBaseLayer = null;
+        
+        for(var i=0; i<otp.config.baseLayers.length; i++) { //otp.config.baseLayers.length-1; i >= 0; i--) {
+            var layerConfig = otp.config.baseLayers[i];
 
-        var tileLayer = new L.TileLayer(otp.config.tileUrl, tileLayerProps);
-	    
-	    if(typeof otp.config.getTileUrl != 'undefined') {
-    	    tileLayer.getTileUrl = otp.config.getTileUrl;
+            var layerProps = { };
+            if(layerConfig.attribution) layerProps['attribution'] = layerConfig.attribution;
+            if(layerConfig.subdomains) layerProps['subdomains'] = layerConfig.subdomains;
+
+            var layer = new L.TileLayer(layerConfig.tileUrl, layerProps);
+
+	        baseLayers[layerConfig.name] = layer;
+            if(i == 0) defaultBaseLayer = layer;            
+	        
+	        if(typeof layerConfig.getTileUrl != 'undefined') {
+        	    layer.getTileUrl = otp.config.getTileUrl;
+            }
         }
         
+
         var mapProps = { 
-            layers  : [ tileLayer ],
+            layers  : [ defaultBaseLayer ],
             center : (otp.config.initLatLng || new L.LatLng(0,0)),
             zoom : (otp.config.initZoom || 2),
             zoomControl : false
         }
         if(otp.config.minZoom) mapProps['minZoom'] = otp.config.minZoom;  //_.extend(mapProps, { minZoom : otp.config.minZoom });
         if(otp.config.maxZoom) mapProps['maxZoom'] = otp.config.maxZoom; //_.extend(mapProps, { maxZoom : otp.config.maxZoom });
-        
+
         this.lmap = new L.Map('map', mapProps);
 
-        this.lmap.addControl(new L.Control.Zoom({ position : 'topright' }));
+        L.control.layers(baseLayers).addTo(this.lmap);
+        L.control.zoom({ position : 'topright' }).addTo(this.lmap);
+        //this.lmap.addControl(new L.Control.Zoom({ position : 'topright' }));
+        
+        
+
+
+
         
         if(!otp.config.initLatLng) {
             console.log("no initLL, reading metadata");
