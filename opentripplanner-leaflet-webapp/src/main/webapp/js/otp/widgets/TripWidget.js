@@ -288,6 +288,13 @@ otp.widgets.TW_TimeSelector =
     },
 
     restorePlan : function(data) {
+        $('#'+this.id+'-picker').datepicker('setDate', data.queryParams.date+" "+data.queryParams.time);
+        this.tripWidget.module.date = data.queryParams.date;
+        this.tripWidget.module.time = data.queryParams.time;
+        if(data.queryParams.arriveBy === true || data.queryParams.arriveBy === "true") {
+            this.tripWidget.module.arriveBy = true;
+            $('#'+this.id+'-depArr option:eq(1)').prop('selected', true);  
+        }
     }
         
 });
