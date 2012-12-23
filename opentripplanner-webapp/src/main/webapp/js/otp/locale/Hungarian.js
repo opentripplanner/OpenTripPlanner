@@ -21,9 +21,8 @@ otp.locale.Hungarian = {
 
     config :
     {
-// TODO
         metricsSystem : "international",
-        rightClickMsg : "TODO - localize me and tripPlanner.link below - Right-click on the map to designate the start and end of your trip.",
+        rightClickMsg : "A jobb gombbal kijelölheted a térképen az utazásod kezdő és végpontját.",
         attribution   : {
             title   : "License Attribution",
             content : "Disclaimer goes here"
@@ -32,9 +31,9 @@ otp.locale.Hungarian = {
 
     contextMenu : 
     {
-        fromHere         : "Útvonal kezdete itt",
-        toHere           : "Útvonal vége itt",
-        intermediateHere : "Add intermediate point",  // TODO localize
+        fromHere         : "Útvonal innen",
+        toHere           : "Útvonal ide",
+        intermediateHere : "Közbenső pont hozzáadása",
 
         centerHere       : "Térkép középre helyezése ide",
         zoomInHere       : "Közelítés ide",
@@ -43,17 +42,16 @@ otp.locale.Hungarian = {
         next             : "Következő térképpozíció"
     },
 
-    // TODO Localize Me
     bikeTriangle : 
     {
-        safeName : "Bike friendly",
+        safeName : "Kerékpárbarát",
         safeSym  : "B",
 
-        hillName : "Flat",
-        hillSym  : "F",
+        hillName : "Lapos",
+        hillSym  : "L",
 
-        timeName : "Quick",
-        timeSym  : "Q"
+        timeName : "Gyors",
+        timeSym  : "Gy"
     },
 
     service : 
@@ -70,17 +68,17 @@ otp.locale.Hungarian = {
         date       : "Dátum",
         loading    : "Betöltés",
         searching  : "Keresés...",
-        qEmptyText : "Cím, útkereszteződés, jellegzetes pont vagy megálló azonosító..."
+        qEmptyText : "Cím, útkereszteződés, jellegzetes pont vagy megállókód..."
     },
 
     buttons: 
     {
-        reverse       : "Megfordítás",
+        reverse       : "Visszafele",
         reverseTip    : "<b>Irány megfordítása</b><br/>Visszaút tervezése a kezdő- és végpont megfordításával, és az idő későbbre állításával.",
         reverseMiniTip: "Irány megfordítása",
 
-        edit          : "Szerkesztés",
-        editTip       : "<b>Útvonal szerkesztése</b><br/>Vissza a fő útvonaltervező beviteli űrlaphoz ennek az útvonalnak a részleteivel.",
+        edit          : "Modosítás",
+        editTip       : "<b>Útvonal modosítása</b><br/>Vissza a fő útvonaltervező beviteli űrlaphoz ennek az útvonalnak a részleteivel.",
 
         clear         : "Törlés",
         clearTip      : "<b>Törlés</b><br/>A térkép és az összes aktív eszköz törlése.",
@@ -92,7 +90,7 @@ otp.locale.Hungarian = {
         printTip      : "<b>Nyomtatás</b><br/>Az útvonalterv nyomtatóbarát változata (térkép nélkül).",
 
         link          : "Hivatkozás",
-        linkTip      : "<b>Hivatkozás</b><br/>Hivatkozó URL megjelenítése ehhez az útvonaltervhez.",
+        linkTip       : "<b>Hivatkozás</b><br/>Hivatkozó URL megjelenítése az útvonaltervhez.",
 
         feedback      : "Visszajelzés",
         feedbackTip   : "<b>Visszajelzés</b><br/>Küldje el gondolatait vagy tapasztalatait a térképpel kapcsolatban",
@@ -103,9 +101,8 @@ otp.locale.Hungarian = {
         cancel       : "Mégse",
         yes          : "Igen",
         no           : "Nem",
-// TODO
-        showDetails  : "Show details...",
-        hideDetails  : "Hide details..."
+        showDetails  : "&darr; Részletek... &darr;",
+        hideDetails  : "&uarr; Elrejtés... &uarr;"
     },
 
     // note: keep these lower case (and uppercase via template / code if needed)
@@ -130,19 +127,23 @@ otp.locale.Hungarian = {
         to_continue:    "haladjon ezen:",
         becomes:        "evvé válik:",
         at:             "ide:",
+
 // TODO
         on:             "on",
         to:             "to",
         via:            "via",
-        circle_counterclockwise: "take roundabout counterclockwise",
-        circle_clockwise:        "take roundabout clockwise"
+        circle_counterclockwise: "a körforgalomban balra",
+        circle_clockwise:        "a körforgalomban jobbra",
+        // rather than just being a direction, this should be
+        // full-fledged to take just the exit name at the end
+        elevator: "take elevator to"
     },
 
-    // see otp.planner.Templates for use ... these are used on the trip itinerary 
+    // see otp.planner.Templates for use
     instructions :
     {
 // TODO
-        walk         : "Walk",
+        walk         : "Séta",
         walk_toward  : "Walk",
         walk_verb    : "Walk",
         bike         : "Bike",
@@ -154,111 +155,104 @@ otp.locale.Hungarian = {
         move         : "Proceed",
         move_toward  : "Proceed",
 
-        transfer     : "transfer",
-        transfers    : "transfers",
+        transfer     : "átszállás",
+        transfers    : "átszállás",
 
-        continue_as  : "Continues as",
-        stay_aboard  : "stay on board",
+        continue_as  : "Folytatodik mint:",
+        stay_aboard  : "Maradjon a fedélzeten",
 
-        depart       : "Depart",
-        arrive       : "Arrive",
+        depart       : "Indul",
+        arrive       : "Érkezik",
 
-        start_at     : "Start at",
-        end_at       : "End at"
+        start_at     : "Kezdés",
+        end_at       : "Érkezés"
     },
 
     // see otp.planner.Templates for use
     labels : 
     {
-// TODO
-        agency_msg   : "Service run by", // TODO
-        agency_msg_tt: "Open agency website in separate window...", // TODO
-        about        : "About",
-        stop_id      : "Stop ID",
-        trip_details : "útvonal Details",
-        fare         : "Fare",
-        fare_symbol  : "\u20ac",
-
-        // TODO  -- used in the Trip Details summary to describe different fares 
-        regular_fare : "",
-        student_fare : "",
-        senior_fare  : "",
-
-        travel       : "Travel",
-        valid        : "Valid",
-        trip_length  : "Time",
-        with_a_walk  : "with a walk of",
-        alert_for_rt : "Alert for route"
+        agency_msg   : "Üzemeltető: ",
+        agency_msg_tt: "Honlap megnyítása uj ablakban...",
+        about        : "Körülbelül",
+        stop_id      : "Megállókód: ",
+        trip_details : "Útvonal részletek",
+        travel       : "Utazás",
+        valid        : "Érvényes",
+        trip_length  : "Hossz",
+        with_a_walk  : "Séta",
+        alert_for_rt : "Alert for route",
+        fare         : "Ár",
+        regular_fare : "Normál",
+        student_fare : "Diák",
+        senior_fare  : "Nyugdíjas",
+        fare_symbol  : "HUF"
     },
 
     // see otp.planner.Templates for use -- one output are the itinerary leg headers
     modes :
     {
-// TODO
-        WALK:           "WALK",
-        BICYCLE:        "BICYCLE",
-        CAR:            "CAR",
-        TRAM:           "TRAM",
-        SUBWAY:         "SUBWAY",
-        RAIL:           "RAIL",
-        BUS:            "BUS",
-        FERRY:          "FERRY",
-        CABLE_CAR:      "CABLE CAR",
+        WALK:           "SÉTA",
+        BICYCLE:        "KERÉKPÁR",
+        CAR:            "AUTÓ",
+        TRAM:           "VILLAMOS",
+        SUBWAY:         "METRÓ",
+        RAIL:           "VASÚT",
+        BUS:            "BUSZ",
+        FERRY:          "KOMP",
+        CABLE_CAR:      "LIBEGŐ",
         GONDOLA:        "GONDOLA",
-        FUNICULAR:      "FUNICULAR"
+        FUNICULAR:      "SIKLÓ"
     },
 
     ordinal_exit:
     {
-// TODO
-        1:  "to first exit",
-        2:  "to second exit",
-        3:  "to third exit",
-        4:  "to fourth exit",
-        5:  "to fifth exit",
-        6:  "to sixth exit",
-        7:  "to seventh exit",
-        8:  "to eighth exit",
-        9:  "to ninth exit",
-        10: "to tenth exit"
+        1:  "az első kijáratig",
+        2:  "a második kijáratig",
+        3:  "a harmadik kijáratig",
+        4:  "a negyedik kijáratig",
+        5:  "az ötödik kijáratig",
+        6:  "a hatodik kijáratig",
+        7:  "a hetedik kijáratig",
+        8:  "a nyolcadik kijáratig",
+        9:  "a kilencedik kijáratig",
+        10: "a tízedik kijáratig"
     },
 
     time:
     {
-        // TODO
-        hour_abbrev    : "hour",
-        hours_abbrev   : "hours",
-        hour           : "hour",
-        hours          : "hours",
+        hour_abbrev    : "óra",
+        hours_abbrev   : "óra",
+        hour           : "óra",
+        hours          : "óra",
 
-// TODO
-        format        : "D, j M H:i",
-        date_format   : "d-m-Y",
-        time_format   : "H:i",
-        minute        : "minute",
-        minutes       : "minutes",
+        minute        : "perc",
+        minutes       : "perc",
         minute_abbrev : "perc",
         minutes_abbrev: "perc",
-        second_abbrev : "másodperc",
-        seconds_abbrev: "másodperc",
-        months:         ['jan', 'feb', 'már', 'ápr', 'máj', 'jún', 'júl', 'aug', 'szep', 'okt', 'nov', 'dec']
+        second_abbrev : "mp",
+        seconds_abbrev: "mp",
+        format        : "D, j M H:i",
+        date_format   : "Y-m-d",
+        time_format   : "H:i",
+        months        : ['jan', 'feb', 'már', 'ápr', 'máj', 'jún', 'júl', 'aug', 'szep', 'okt', 'nov', 'dec']
     },
-    
+
     systemmap :
     {
         labels :
         {
-            panelTitle : "Rendszertérkép"
+            panelTitle : "Vonalhálozat"
         }
     },
 
     tripPlanner :
     {
+        // see otp/planner/*.js for where these values are used
         labels : 
         {
-            panelTitle    : "Útvonaltervező",
-            tabTitle      : "Útvonal tervezése",
-            inputTitle    : "Útvonal részletei",
+            panelTitle    : "Útazástervező",
+            tabTitle      : "Útazástervező",
+            inputTitle    : "Útvonal részletek",
             optTitle      : "Útvonal beállításai (opcionális)",
             submitMsg     : "Útvonal tervezése...",
             optionalTitle : "",
@@ -269,14 +263,14 @@ otp.locale.Hungarian = {
             fromHere      : "Innen",
             to            : "Hová",
             toHere        : "Ide",
-            intermediate  : "Intermediate Place",          // TODO
+            intermediate  : "Közbenső pont",
             minimize      : "A következő megjelenítése",
             maxWalkDistance: "Maximális gyaloglás",
-            walkSpeed     : "Séta sebesség",
-            maxBikeDistance: "Maximális kerékpár",              // TODO
+            walkSpeed     : "Séta sebessége",
+            maxBikeDistance: "Maximális kerékpározás",
             bikeDistance  : "Lerékpáros sebesség",
             arriveDepart  : "Érkezés/indulás",
-            mode          : "Utazás ezzel",
+            mode          : "Közlekedés",
             wheelchair    : "Kerekesszékkel megtehető útvonal", 
             go            : "Menj",
             planTrip      : "Útvonal tervezése",
@@ -300,8 +294,7 @@ otp.locale.Hungarian = {
         // see otp.planner.Forms for use
         geocoder:
         {
-//TODO
-            working      : "Looking up address ....",
+            working      : "Cím keresése ....",
             error        : "Did not receive any results",
             msg_title    : "Kérem review trip plan",
             msg_content  : "Kérem correct errors before planning your trip",
@@ -311,8 +304,8 @@ otp.locale.Hungarian = {
 
         error:
         {
-            title        : 'Útvonaltervező hiba',
-            deadMsg      : "A térképes útvonaltervező jelenleg nem válaszol. Kérem, várjon néhány percet, és próbálja újra, vagy próbálja a szöveges útvonaltervezővel (lásd a hivatkozást alább).",
+            title        : 'Útvonaltervezési hiba',
+            deadMsg      : "A térképes útvonaltervező jelenleg nem válaszol. Kérem, várjon néhány percet, és próbálja újra.",
             geoFromMsg   : "Kérem, válasszon kezdőpontot az útvonalhoz: ",
             geoToMsg     : "Kérem, válasszon végpontot az útvonalhoz: "
         },
@@ -338,10 +331,10 @@ otp.locale.Hungarian = {
 
         options: 
         [
-          ['TRANSFERS', 'Legkevesebb átszállással'],
-          ['QUICK',     'Leggyorsabb útvonal'],
-          ['SAFE',      'Legbiztonságosabb útvonal'],
-          ['TRIANGLE',  'Custom trip...']  // TODO localize
+          ['TRANSFERS', 'Kevés átszállással'],
+          ['QUICK',     'Gyors útvonallal'],
+          ['SAFE',      'Biztonságos útvonallal'],
+          ['TRIANGLE',  'Egyedi...']
         ],
     
         arriveDepart: 
@@ -352,38 +345,47 @@ otp.locale.Hungarian = {
     
         maxWalkDistance : 
         [
-            ['100',   '100 m'],
-            ['500',   '500 m'],
-            ['1000',  '1 km'],
-            ['5000',  '5 km'],
-            ['10000', '10 km'],
-            ['50000', '50 km'],
-            ['100000','100 km']
+            [   '100',  '100 m'],
+            [   '500',  '500 m'],
+            [  '1000',   '1 km'],
+            [  '5000',   '5 km'],
+            [ '10000',  '10 km'],
+            [ '50000',  '50 km'],
+            ['100000', '100 km']
         ],
 
         walkSpeed :
         [
-            ['0.278',  '1 km/h'],
             ['0.556',  '2 km/h'],
-            ['0.833',  '3 km/h'],
             ['1.111',  '4 km/h'],
-            ['1.389',  '5 km/h'],
             ['1.667',  '6 km/h'],
-            ['1.944',  '7 km/h'],
             ['2.222',  '8 km/h'],
-            ['2.500',  '9 km/h'],
-            ['2.778',  '10 km/h']
+            ['2.778', '10 km/h']
         ],
 
         mode : 
         [
-            ['TRANSIT,WALK', 'Tömegközlekedés'],
-            ['BUSISH,TRAINISH,WALK', 'Busz és vonat'],
-            ['BUSISH,WALK', 'Csak busz'],
-            ['TRAINISH,WALK', 'Csak vonat'],
-            ['WALK', 'Csak gyalog'],
-            ['BICYCLE', 'Kerékpár'],
-            ['TRANSIT,BICYCLE', 'Tömegközlekedés és kerékpár']
+            ['TRANSIT,WALK', 'közösségi közlekedéssel'],
+            ['BUSISH,WALK', 'busszal'],
+            ['TRAINISH,WALK', 'vonattal'],
+            ['WALK', 'gyalog'],
+            ['BICYCLE', 'kerékpárral'],
+            ['TRANSIT,BICYCLE', 'közösségi közlekedéssel és kerékpárral']
+        ],
+
+        // TODO: remove this hack, and provide code that allows the mode array to be configured with different transit modes.
+        //       (note that we've been broken for awhile here, since many agencies don't have a 'Train' mode either...this needs attention)
+        // IDEA: maybe we start with a big array (like below), and the pull out modes from this array when turning off various modes...
+        with_bikeshare_mode : 
+        [
+            ['TRANSIT,WALK', 'közösségi közlekedéssel'],
+            ['BUSISH,WALK', 'busszal'],
+            ['TRAINISH,WALK', 'vonattal'],
+            ['WALK', 'gyalog'],
+            ['BICYCLE', 'kerékpárral'],
+            ['WALK,BICYCLE', 'közbringával (Bubi)'],
+            ['TRANSIT,BICYCLE', 'közösségi közlekedéssel és kerékpárral'],
+            ['TRANSIT,WALK,BICYCLE', 'közösségi közlekedéssel és közbringával']
         ],
 
         wheelchair :
