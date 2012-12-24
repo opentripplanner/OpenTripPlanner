@@ -213,18 +213,19 @@ otp.widgets.TW_MaxWalkSelector =
     
     id           :  null,
 
-    values        : [0.1, 0.25, 0.5, 0.75, 1, 2, 3, 4, 5, 10, 15, 20, 30, 40, 50, 100],
+    presets      : [0.1, 0.2, 0.25, 0.3, 0.4, 0.5, 0.75, 1, 2, 3, 4, 5],
        
     initialize : function(tripWidget) {
         otp.widgets.TripWidgetPanel.prototype.initialize.apply(this, arguments);
         this.id = tripWidget.id+"-maxWalkSelector";
         
-        var html = "<div class='notDraggable'>Maximum walk: ";
-        html += '<select id="'+this.id+'">';
-        for(var i=0; i<this.values.length; i++) {
-            html += '<option'+(this.values[i] == .5 ? ' selected' : '')+'>'+this.values[i]+'</option>';            
+        var html = '<div class="notDraggable">Maximum walk: <input id="'+this.id+'-value" type="text" style="width:30px;" value="0.5" /> mi.&nbsp;';
+        html += '<select id="'+this.id+'-presets"><option>Presets:</option>';
+        for(var i=0; i<this.presets.length; i++) {
+            //html += '<option'+(this.values[i] == .5 ? ' selected' : '')+'>'+this.values[i]+'</option>';            
+            html += '<option>'+this.presets[i]+' mi.</option>';            
         }
-        html += '</select> mi.';
+        html += '</select>';
         html += "</div>";
               
         $(html).appendTo(this.$());
@@ -233,13 +234,24 @@ otp.widgets.TW_MaxWalkSelector =
 
     doAfterLayout : function() {
         var this_ = this;
-        $("#"+this.id).change(function() {
-            var m = this_.values[this.selectedIndex]*1609.34;
+        $('#'+this.id+'-value').change(function() {
+            this_.tripWidget.module.maxWalkDistance = parseFloat($('#'+this_.id+'-value').val())*1609.34;
+        });
+        
+        $('#'+this.id+'-presets').change(function() {
+            var presetVal = this_.presets[this.selectedIndex-1];
+            $('#'+this_.id+'-value').val(presetVal);    
+
+            var m = presetVal*1609.34;
             this_.tripWidget.module.maxWalkDistance = m;
+
+            $('#'+this_.id+'-presets option:eq(0)').prop('selected', true);    
         });
     },
 
     restorePlan : function(data) {
+        $('#'+this.id+'-value').val(data.queryParams.maxWalkDistance/1609.34);  
+        this.tripWidget.module.maxWalkDistance = data.queryParams.maxWalkDistance;
     }
         
 });
@@ -289,7 +301,8 @@ otp.widgets.TW_TimeSelector =
     },
 
     restorePlan : function(data) {
-        $('#'+this.id+'-picker').datepicker('setDate', data.queryParams.date+" "+data.queryParams.time);
+        var m = moment(data.queryParams.date+" "+data.queryParams.time, "MM-DD-YYYY h:mma");
+        $('#'+this.id+'-picker').datepicker("setDate", new Date(m));
         this.tripWidget.module.date = data.queryParams.date;
         this.tripWidget.module.time = data.queryParams.time;
         if(data.queryParams.arriveBy === true || data.queryParams.arriveBy === "true") {
