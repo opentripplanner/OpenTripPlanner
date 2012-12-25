@@ -20,6 +20,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.aspectj.weaver.tools.ISupportsMessageContext;
 import org.geotools.referencing.GeodeticCalculator;
 import org.opensphere.geometry.algorithm.ConcaveHull;
 import org.opentripplanner.analyst.core.GeometryIndex;
@@ -92,7 +93,10 @@ public class IsoChrone extends RoutingResource{
     public static final String RESULT_TYPE_SHED = "SHED";
     public static final String RESULT_TYPE_EDGES = "EDGES";
     
+    private boolean showTooFastEdgesAsDebugGeomsANDnotUShapes = true;
     private List debugGeoms = null;
+    private List tooFastTraversedEdgeGeoms = null;
+    
     @Autowired GraphService graphService;
     @Autowired private SPTService sptService; 
     
@@ -125,6 +129,7 @@ public class IsoChrone extends RoutingResource{
     		) throws Exception {
 	
     	this.debugGeoms = new ArrayList();
+    	this.tooFastTraversedEdgeGeoms = new ArrayList();
     	
         RoutingRequest sptRequestA = buildRequest(0);
         String from = sptRequestA.getFrom();
@@ -422,6 +427,13 @@ public class IsoChrone extends RoutingResource{
         		//-- for debugging, i.e. display of detected u-shapes/crescents
         		ArrayList<LineString> withinTimeEdges = this.getLinesAndSubEdgesWithinMaxTime(maxTime, allConnectingEdges, sptA, 
         				angleLimitForUShapeDetection, distanceToleranceForUShapeDetection, maxUserSpeed, usesCar, doSpeedTest);
+        		if(this.showTooFastEdgesAsDebugGeomsANDnotUShapes){
+        			LOG.debug("displaying edges that are traversed too fast");
+        			this.debugGeoms = this.tooFastTraversedEdgeGeoms;
+        		}
+        		else{
+        			LOG.debug("displaying detected u-shaped roads/crescents");
+        		}
         		LineString edges[] = new LineString[this.debugGeoms.size()];
                 int k=0;
                 for (Iterator iterator = debugGeoms.iterator(); iterator.hasNext();) {
@@ -510,6 +522,7 @@ public class IsoChrone extends RoutingResource{
     		if((sFrom != null) && (sTo != null) ){
     			long fromTime = sFrom.getElapsedTime();
     			long toTime = sTo.getElapsedTime();
+    			long dt = Math.abs(toTime - fromTime);
     			Geometry edgeGeom = edge.getGeometry();
     			if ((edgeGeom != null) && (edgeGeom instanceof LineString)){
     				LineString ls = (LineString)edgeGeom;
@@ -539,13 +552,13 @@ public class IsoChrone extends RoutingResource{
 							LineString inputLS = ls;
 							double fraction = 1.0;
     						if(fromTime < toTime){
-    							double distanceToWalkInTimeMissing = distanceToMoveInRemainingTime(maxTime, fromTime, (toTime - fromTime), userSpeed, edge, hasCar);
+    							double distanceToWalkInTimeMissing = distanceToMoveInRemainingTime(maxTime, fromTime, dt , userSpeed, edge, hasCar, uShapeOrLonger);
 								fraction = (double)distanceToWalkInTimeMissing / (double)lineDist;
     						}
     						else{
     							// toTime < fromTime : invert the edge direction
     							inputLS = (LineString)ls.reverse();
-								double distanceToWalkInTimeMissing = distanceToMoveInRemainingTime(maxTime, toTime, (fromTime - toTime), userSpeed, edge, hasCar);
+								double distanceToWalkInTimeMissing = distanceToMoveInRemainingTime(maxTime, toTime, dt, userSpeed, edge, hasCar, uShapeOrLonger);
 								fraction = (double)distanceToWalkInTimeMissing / (double)lineDist;
     						}
     						// get the subedge
@@ -584,7 +597,8 @@ public class IsoChrone extends RoutingResource{
 			LineString ls, boolean hasCar) {
 		
 		//check if the u-shape can be traveled within the remaining time
-		double distanceToMoveInTimeMissing = distanceToMoveInRemainingTime(maxTime, fromTime, (toTime - fromTime), userSpeed, edge, hasCar);
+		long dt = Math.abs(toTime - fromTime);
+		double distanceToMoveInTimeMissing = distanceToMoveInRemainingTime(maxTime, fromTime, dt, userSpeed, edge, hasCar, true);
 		double lineDist = edge.getDistance();
 		double fraction = (double)distanceToMoveInTimeMissing / (double)lineDist;
 		// get the sub-edge geom
@@ -595,7 +609,7 @@ public class IsoChrone extends RoutingResource{
 			walkShedEdges.add(subLine);
 			// if it is smaller we need also to calculate the LS from the other side
 			LineString reversedLine = (LineString)ls.reverse();
-			double distanceToMoveInTimeMissing2 = distanceToMoveInRemainingTime(maxTime, toTime, (toTime - fromTime), userSpeed, edge, hasCar);
+			double distanceToMoveInTimeMissing2 = distanceToMoveInRemainingTime(maxTime, toTime, dt, userSpeed, edge, hasCar, true);
 			double fraction2 = (double)distanceToMoveInTimeMissing2 / (double)lineDist;
 			LineString secondsubLine = this.getSubLineString(reversedLine, fraction2);;
 			walkShedEdges.add(secondsubLine);
@@ -639,9 +653,10 @@ public class IsoChrone extends RoutingResource{
 				if(performSpeedTest){
 					// Use also a distance based criteria since the angle criteria may fail.
 					// However a distance based one may fail as well for steep terrain.
+					long dt = Math.abs(toTime - fromTime);
 					double lineDist = edge.getDistance();
-					double distanceToWalkInTimeMissing = distanceToMoveInRemainingTime(maxTime, fromTime, (toTime - fromTime), 
-							userSpeed, edge, hasCar);
+					double distanceToWalkInTimeMissing = distanceToMoveInRemainingTime(maxTime, fromTime, dt, 
+							userSpeed, edge, hasCar, false);
 					double approxWalkableDistanceInTime = distanceToWalkInTimeMissing * distanceTolerance;
 					if((approxWalkableDistanceInTime < lineDist)){
 						return true;
@@ -662,11 +677,13 @@ public class IsoChrone extends RoutingResource{
 	 * @param userSpeed in m/sec, dependent on traversal mode
 	 * @param edge the edge itself (used to the get the speed in car mode)
 	 * @param usesCar if we traverse the edge in car mode
+	 * @param hasUshape if know, indicate if the edge has a u-shape
 	 * @return the distance in meter that can be moved until maxTime
 	 */
-	double distanceToMoveInRemainingTime(long maxTime, long fromTime, double traverseTime, double userSpeed, Edge edge, boolean usesCar){
+	double distanceToMoveInRemainingTime(long maxTime, long fromTime, double traverseTime, double userSpeed, 
+			Edge edge, boolean usesCar, boolean hasUshape){
 
-		boolean hasTooFastCar = false;
+		boolean isTooFast = false;
 		String msg = "";
 		
 		double originalTravelSpeed = edge.getDistance() / traverseTime; //this may be wrong for u-shapes
@@ -687,11 +704,19 @@ public class IsoChrone extends RoutingResource{
 			double vdiff = Math.abs(originalTravelSpeed - userSpeed);
 			double vDiffPercent = vdiff/ (userSpeed/100.0);
 			if(vDiffPercent > 20){
-				hasTooFastCar = true;
-				msg = "v_traversed is much faster than (allowed) v_user [m/s] >>> v_traversed=" + (int)Math.floor(originalTravelSpeed) + ", v_maxUser=" + (int)Math.floor(userSpeed);			
-				if(!usesCar){
-					LOG.debug(msg);
+				isTooFast = true;
+				// [sstein Dec 2012]: Note, it seems like most of these edges are indeed of u-shape type,
+				// i.e. small roads that come from and return from (the same) main road
+				msg = "v_traversed is much faster than (allowed) v_user, edgeName: " + edge.getName() + 
+						", >>> (in m/s): v_traversed=" + (int)Math.floor(originalTravelSpeed) + 
+						", v_maxUser=" + (int)Math.floor(userSpeed);
+				if(hasUshape){
+					msg = msg + ", known u-shape, ";
 				}
+				if((usesCar == false) && (hasUshape == false)){
+					this.tooFastTraversedEdgeGeoms.add(edge.getGeometry());
+					LOG.debug(msg);
+				} //otherwise we print msg below
 			}
 		}
 		// correct speed for car use, as each road has its speed limits
@@ -699,8 +724,10 @@ public class IsoChrone extends RoutingResource{
 			if(edge instanceof PlainStreetEdge){
 				PlainStreetEdge pe = (PlainStreetEdge)edge;
 				userSpeed = pe.getCarSpeed();
-				if(hasTooFastCar){
-					LOG.debug(msg + "; setting v_PlainStreetEdge=" + (int)Math.floor(userSpeed) + " [m/s]");
+				// we need to check again if the originalTravelSpeed is faster
+				if((isTooFast == true) && (originalTravelSpeed > userSpeed) && (hasUshape == false)){
+					this.tooFastTraversedEdgeGeoms.add(edge.getGeometry());
+					LOG.debug(msg + "; setting v_PlainStreetEdge=" + (int)Math.floor(userSpeed));
 				}
 			}
 		}
