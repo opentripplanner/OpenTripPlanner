@@ -23,7 +23,7 @@ otp.widgets.TripWidget =
         
     initialize : function(id, module) {
     
-        otp.widgets.Widget.prototype.initialize.apply(this, arguments);
+        otp.widgets.Widget.prototype.initialize.call(this, id, module.webapp.widgetManager);
         this.$().addClass('otp-defaultTripWidget');
         
         //this.planTripCallback = planTripCallback;

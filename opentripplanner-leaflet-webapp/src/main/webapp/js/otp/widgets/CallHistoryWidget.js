@@ -17,7 +17,7 @@ otp.widgets.CallHistoryWidget =
     otp.Class(otp.widgets.Widget, {
 
     module : null,
-    
+
     header : null,
     queryList : null,
     
@@ -31,11 +31,11 @@ otp.widgets.CallHistoryWidget =
     
     
     initialize : function(id, module) {
-    
         var this_ = this;  
-
-        otp.widgets.Widget.prototype.initialize.apply(this, arguments);
+        
         this.module = module;
+
+        otp.widgets.Widget.prototype.initialize.call(this, id, module.webapp.widgetManager);
         this.$().addClass('otp-callHistoryWidget');
         this.$().resizable();
         this.minimizable = true;

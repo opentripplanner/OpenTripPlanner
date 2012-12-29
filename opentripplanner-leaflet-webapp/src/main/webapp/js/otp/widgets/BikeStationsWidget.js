@@ -23,7 +23,7 @@ otp.widgets.BikeStationsWidget =
 	
 	end_button: null,
 		 
-	initialize : function(id, config) {
+	initialize : function(id, module) {
 	    otp.configure(this, id);
 	    otp.widgets.Widget.prototype.initialize.apply(this, arguments);
 	     

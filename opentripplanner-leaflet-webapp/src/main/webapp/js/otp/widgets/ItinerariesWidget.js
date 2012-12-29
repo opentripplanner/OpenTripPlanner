@@ -19,7 +19,6 @@ otp.widgets.ItinerariesWidget =
 
     module : null,
     
-    //header : null,
     itinsAccord : null,
     footer : null,
     
@@ -30,14 +29,13 @@ otp.widgets.ItinerariesWidget =
     refreshActiveOnly : false,
     
     initialize : function(id, module) {
-    
-        otp.widgets.Widget.prototype.initialize.apply(this, arguments);
         this.module = module;
+
+        otp.widgets.Widget.prototype.initialize.call(this, id, module.webapp.widgetManager);
         this.$().addClass('otp-itinsWidget');
         this.$().resizable();
         this.minimizable = true;
         this.addHeader("X Itineraries Returned");
-        //this.header = $("<div class='otp-widget-header'>X Itineraries Returned:</div>").appendTo(this.$());
     },
     
     activeItin : function() {

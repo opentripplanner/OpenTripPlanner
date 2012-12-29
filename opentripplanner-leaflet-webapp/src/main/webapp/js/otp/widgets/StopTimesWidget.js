@@ -17,9 +17,9 @@ otp.namespace("otp.widgets");
 otp.widgets.StopTimesWidget = 
     otp.Class(otp.widgets.Widget, {
 
-    initialize : function(id, stopID, routeName, stopTimes, highlightTime) {
+    initialize : function(id, stopID, routeName, stopTimes, highlightTime, module) {
     
-        otp.widgets.Widget.prototype.initialize.apply(this, arguments);
+        otp.widgets.Widget.prototype.initialize.call(this, id, module);
         this.$().addClass('otp-stopTimesWidget');
         
         $('<div><b>Route</b>: '+routeName+'</div>').appendTo(this.$());

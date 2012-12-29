@@ -16,20 +16,17 @@
 otp.widgets.PastQueriesWidget = 
     otp.Class(otp.widgets.Widget, {
 
-    module : null,
-    
     header : null,
     queryList : null,
     
     initialize : function(id, module) {
     
         otp.widgets.Widget.prototype.initialize.apply(this, arguments);
-        this.module = module;
         this.$().addClass('otp-pastQueriesWidget');
         this.$().resizable();
         this.minimizable = true;
         //this.header = $("<div class='otp-pastQueriesHeader'>Past 10 Queries for user "+module.userName+"</div>").appendTo(this.$());
-        this.addHeader("Past 10 Queries for user "+module.userName);
+        this.addHeader("Past 10 Queries for user "+this.module.userName);
         this.queryList = $("<div id='"+this.id+"-queryList' class='otp-pastQueriesList'></div>").appendTo(this.$());
                
         this.$().resizable({

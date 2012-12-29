@@ -23,6 +23,7 @@ otp.core.Webapp = otp.Class({
     
     activeModule : null,
     
+    widgetManager   : null,
     infoWidgets     : { },
     
     urlParams : null,
@@ -64,6 +65,7 @@ otp.core.Webapp = otp.Class({
         // create the Webapp-owned objects
         
         this.map = new otp.core.Map(this);        
+        this.widgetManager = new otp.widgets.WidgetManager();
         
        
         // initialize the AddThis widget
@@ -102,7 +104,7 @@ otp.core.Webapp = otp.Class({
     
                 var id = "infoWidget-"+i;            
     
-                this.infoWidgets[id] = new otp.widgets.InfoWidget(otp.config.infoWidgets[i].styleId);
+                this.infoWidgets[id] = new otp.widgets.InfoWidget(otp.config.infoWidgets[i].styleId, this.widgetManager);
                 this.infoWidgets[id].setContent(otp.config.infoWidgets[i].content);
                 this.infoWidgets[id].hide();
                 

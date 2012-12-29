@@ -427,9 +427,9 @@ body {
 }
 
 
-#otp-map-contextMenu {
+.otp-map-contextMenu {
   position : fixed;
-  z-index: 1000;
+  z-index: 10001;
   padding: 0px;
   background: #eee;
   border: 1px solid #acacac;
@@ -461,11 +461,12 @@ body {
     bottom: 0;
     left: 0;
     height: 28px;
-    z-index: 1000;
+    z-index: 10000;
 }
 
 .otp-minimized-tab {
     float: left;
+    z-index: 10000;
     font-size: 14px;
     text-shadow: -1px 1px 0 #ffffff;
     font-weight: bold;
@@ -499,7 +500,7 @@ body {
   
 .otp-widget {
   position : absolute;
-  z-index: 10;
+  z-index: 1000;
   padding: 5px 10px;
   background: #eee;
   border: 1px solid #acacac;
@@ -524,7 +525,7 @@ body {
 	position: absolute;
 	right: 0;
 	top: 0;
-	z-index: 1000;
+	z-index: 10000;
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   border-radius: 4px;
@@ -563,7 +564,7 @@ body {
 	position: absolute;
 	right: 0;
 	top: 0;
-	z-index: 1000;
+	z-index: 10000;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
@@ -584,7 +585,7 @@ body {
 #otp-noTripWidget {
   left: 0.5em;
   right: 0.5em;
-  bottom: 5em;
+  bottomm: 5em;
   font-size: 85%;
   background-color: #ffa07a;
   background-color: rgba(255,160,122,0.85);
@@ -617,7 +618,7 @@ body {
   top: 2.5em;
   right: 0.25em;
   left: 0.25em;
-  z-index: 100;
+  z-index: 2000;
 }
 
 #otp-aboutWidget .content, #otp-contactWidget .content {
@@ -661,7 +662,7 @@ body {
   bottom: auto;
   top: 3em;
   padding: 0.25em 0.5em;
-  z-index: 50;
+  z-index: 1100;
 }
 
 .otp-defaultTripWidget hr {
@@ -726,7 +727,6 @@ h6.drag-to-change {
   left: 10px;
   width: 300px;
   height: 300px;
-  z-index: 5;
 }
 
 @media only screen and (min-width: 1024px) {
@@ -1163,7 +1163,7 @@ p#splash-text span {
   margin-left: -16px;
   top: 50%;
   margin-top: -16px;  
-  z-index: 1000;
+  z-index: 10000;
   display: none;
 }
 

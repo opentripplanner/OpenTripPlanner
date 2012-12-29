@@ -19,14 +19,14 @@ otp.modules.Module = otp.Class({
     webapp      : null,
 
     moduleName  : "N/A",
-    mapLayers   : null,
     widgets     : null,
+    mapLayers   : null,
     
     activated   : false,
         
     initialize : function(webapp) {
         this.webapp = webapp;
-        this.widgets = [ ];
+        this.widgets = [];
         this.mapLayers = { };
     },
     
@@ -38,15 +38,15 @@ otp.modules.Module = otp.Class({
         this.mapLayers[name] = layer;
     },
     
-    createWidget : function(id, content) {
-        var widget = new otp.widgets.Widget(id); 
-        widget.setContent(content);
-        this.widgets.push(widget);
-        return widget;
-    },
-    
     addWidget : function(widget) {
         this.widgets.push(widget);
+    },
+    
+    createWidget : function(id, content) {
+        var widget = new otp.widgets.Widget(id, this.webapp.widgetManager); 
+        widget.setContent(content);
+        //this.widgets.push(widget);
+        return widget;
     },
     
     activate : function() {

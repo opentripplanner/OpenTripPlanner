@@ -80,14 +80,15 @@ otp.modules.planner.PlannerModule =
         this.addLayer("Path Markers", this.pathMarkerLayer);
         
         // set up primary widgets
-        this.tipWidget = this.createWidget("otp-tipWidget", "");
+        this.tipWidget = this.createWidget("otp-tipWidget", "", this);
+        this.addWidget(this.tipWidget);
         this.updateTipStep(1);
         
-        this.bikestationsWidget = new otp.widgets.BikeStationsWidget('otp-bikestationsWidget');
-        this.widgets.push(this.bikestationsWidget);
+        this.bikestationsWidget = new otp.widgets.BikeStationsWidget('otp-bikestationsWidget', this);
+        this.addWidget(this.bikestationsWidget);
 
-        this.noTripWidget = new otp.widgets.Widget('otp-noTripWidget');
-        this.widgets.push(this.noTripWidget);
+        this.noTripWidget = new otp.widgets.Widget('otp-noTripWidget', this);
+        this.addWidget(this.noTripWidget);
         //this.noTripWidget.hide();
 
         // set up map planner-specific map context menu items

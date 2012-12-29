@@ -1,5 +1,5 @@
 /* This program is free software: you can redistribute it and/or
-   modify it under the terms of the GNU Lesser General Public License
+   modify it under the teMap.jsrms of the GNU Lesser General Public License
    as published by the Free Software Foundation, either version 3 of
    the License, or (at your option) any later version.
    
@@ -67,11 +67,7 @@ otp.core.Map = otp.Class({
         L.control.zoom({ position : 'topright' }).addTo(this.lmap);
         //this.lmap.addControl(new L.Control.Zoom({ position : 'topright' }));
         
-        
-
-
-
-        
+      
         if(!otp.config.initLatLng) {
             console.log("no initLL, reading metadata");
             var url = otp.config.hostname + '/opentripplanner-api-webapp/ws/metadata';
@@ -111,46 +107,14 @@ otp.core.Map = otp.Class({
         
         // setup context menu
         var this_ = this;
-        this.contextMenu = $('<div id="otp-map-contextMenu"></div>');
         
-        this.contextMenuModuleItems = $('<div style="border-bottom: 1px solid #ccc;"></div>').appendTo(this.contextMenu);
-        
-        $('<div class="otp-map-contextMenu-item">Recenter Map Here</div>')
-        .appendTo(this.contextMenu).click(function(evt) {
-            this_.lmap.panTo(this_.contextMenuLatLng);
-        });
-        $('<div class="otp-map-contextMenu-item">Zoom In</div>')
-        .appendTo(this.contextMenu).click(function(evt) {
-            this_.lmap.zoomIn();
-        });
-        $('<div class="otp-map-contextMenu-item">Zoom Out</div>')
-        .appendTo(this.contextMenu).click(function(evt) {
-            this_.lmap.zoomOut();
-        });
-                        
-        this.lmap.on('contextmenu', function(event) {
-            this_.contextMenu.show();
-            this_.contextMenu.offset({ 
-                top: event.containerPoint.y + $('#map').offset().top,
-                left: event.containerPoint.x
-            }).appendTo("body");//$('#map'));
-            this_.contextMenuLatLng = event.latlng;
-        });
-        
-        $(document).bind("click", function(event) {
-            this_.contextMenu.hide();
-        });                 
+        this.contextMenu = new otp.core.MapContextMenu(this);
+      
         this.activated = true;        
     },
     
     addContextMenuItem : function(text, clickHandler) {
-        var this_ = this;
-        console.log("adding cm: "+text);
-        $('<div class="otp-map-contextMenu-item">'+text+'</div>')
-        .appendTo($(this_.contextMenuModuleItems))
-        .click(function(evt) {
-            clickHandler.call(this, this_.contextMenuLatLng);
-        });
+        this.contextMenu.addModuleItem(text, clickHandler);
     },
     
     activeModuleChanged : function(oldModule, newModule) {
@@ -176,6 +140,10 @@ otp.core.Map = otp.Class({
     setBounds : function(bounds)
     {
     	this.lmap.fitBounds(bounds);
+    },
+    
+    $ : function() {
+        return $("#map");
     },
     
     CLASS_NAME : "otp.core.Map"

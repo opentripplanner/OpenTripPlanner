@@ -16,6 +16,7 @@ otp.namespace("otp.widgets");
 
 otp.widgets.Widget = otp.Class({
     
+    widgetManager :   null,  
     div :       null,
     id :        null,
     minimizable : false,
@@ -24,10 +25,11 @@ otp.widgets.Widget = otp.Class({
     header      : null,
     title       : null,
     
-    initialize : function(id) {
+    initialize : function(id, manager) {
         //otp.configure(this, config);
         this.id = id;
         //console.log('widget constructor: '+this.id);
+        this.widgetManager = manager;
         
         this.div = document.createElement('div');
         this.div.setAttribute('id', this.id);
@@ -42,7 +44,10 @@ otp.widgets.Widget = otp.Class({
             },
             cancel: '.notDraggable'
         });
-        //$(this.div).resizable();
+        
+        this.widgetManager.addWidget(this);
+        
+        
     },
 
     addHeader : function(title) {
@@ -56,6 +61,19 @@ otp.widgets.Widget = otp.Class({
                 this_.minimize();
             });
         }
+        // set up context menu
+        this.contextMenu = new otp.core.ContextMenu(this.$(), function() {
+            //console.log("widget cm clicked");
+        });
+        this.contextMenu.addItem("Minimize", function() {
+            this_.minimize();
+        }).addItem("Bring to Front", function() {
+            this_.bringToFront();            
+        }).addItem("Send to Back", function() {
+            this_.sendToBack();            
+        });/*.addItem("Close", function() {
+            this_.close();
+        });*/
     },
     
     setTitle : function(title) {
@@ -78,6 +96,21 @@ otp.widgets.Widget = otp.Class({
         this.show();
         this.minimizedTab.hide();
         this.minimized = false;
+    },
+    
+    bringToFront : function() {
+        var frontIndex = this.widgetManager.getFrontZIndex();
+        this.$().css("zIndex", frontIndex+1);
+    },
+
+    sendToBack : function() {
+        var backIndex = this.widgetManager.getBackZIndex();
+        this.$().css("zIndex", backIndex-1);
+    },
+    
+    
+    close : function() {
+        console.log("close");
     },
             
     setContent : function(content) {
