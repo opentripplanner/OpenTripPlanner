@@ -53,9 +53,33 @@ otp.util.Text = {
 otp.util.Itin = {
 
     isTransit : function(mode) {
-        return mode === "TRANSIT" || mode === "SUBWAY" || mode === "BUS" || mode === "TRAM" || mode === "GONDOLA";
+        return mode === "TRANSIT" || mode === "SUBWAY" || mode === "BUS" || mode === "TRAM" || mode === "GONDOLA" || mode === "TRAINISH" || mode === "BUSISH";
     },
     
+    includesTransit : function(mode) {
+        var modeArr = mode.split(",");
+        for(var i = 0; i < modeArr.length; i++) {
+            if(this.isTransit(modeArr[i])) return true;
+        }
+        return false;
+    },
+    
+    includesWalk : function(mode) {
+        var modeArr = mode.split(",");
+        for(var i = 0; i < modeArr.length; i++) {
+            if(modeArr[i] === "WALK") return true;
+        }
+        return false;
+    },
+
+    includesBicycle : function(mode) {
+        var modeArr = mode.split(",");
+        for(var i = 0; i < modeArr.length; i++) {
+            if(modeArr[i] === "BICYCLE") return true;
+        }
+        return false;
+    },
+
     directionString : function(dir) { // placeholder until localization is addressed
         return dir.toLowerCase().replace('_',' ').replace('ly','');
     },

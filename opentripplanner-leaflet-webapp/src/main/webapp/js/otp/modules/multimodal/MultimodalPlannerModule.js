@@ -41,13 +41,22 @@ otp.modules.multimodal.MultimodalPlannerModule =
         
         this.optionsWidget.addPanel("time", new otp.widgets.TW_TimeSelector(this.optionsWidget));
         this.optionsWidget.addVerticalSpace(12);
-        this.optionsWidget.addPanel("mode", new otp.widgets.TW_ModeSelector(this.optionsWidget));
+        
+        
+        var modeSelector = new otp.widgets.TW_ModeSelector(this.optionsWidget);
+        this.optionsWidget.addPanel("mode", modeSelector);
+
+        modeSelector.addModeWidget(new otp.widgets.TW_MaxWalkSelector(this.optionsWidget));
+        modeSelector.addModeWidget(new otp.widgets.TW_BikeTriangle(this.optionsWidget));
+
+        modeSelector.refreshModeWidgets();        
         //this.optionsWidget.addVerticalSpace(12);
         //this.optionsWidget.addPanel("triangle", new otp.widgets.TW_BikeTriangle(this.optionsWidget));
-        this.optionsWidget.addVerticalSpace(12);
-        this.optionsWidget.addPanel("maxWalk", new otp.widgets.TW_MaxWalkSelector(this.optionsWidget));
+        //this.optionsWidget.addVerticalSpace(12);
+        //this.optionsWidget.addPanel("maxWalk", new otp.widgets.TW_MaxWalkSelector(this.optionsWidget));
         this.optionsWidget.addSeparator();
         this.optionsWidget.addPanel("submit", new otp.widgets.TW_Submit(this.optionsWidget));
+        
     },
     
     getExtendedQueryParams : function() {

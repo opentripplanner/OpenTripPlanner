@@ -66,7 +66,7 @@ otp.widgets.TripWidget =
 });
 
 
-/** PANEL CLASSES */
+//** PANEL CLASSES **//
 
 otp.widgets.TripWidgetPanel = otp.Class({
     
@@ -91,6 +91,10 @@ otp.widgets.TripWidgetPanel = otp.Class({
     
     newItinerary : function(itin) {
     },
+    
+    isApplicableForMode : function(mode) {
+        return false;
+    },
 
     $ : function() {
         return $(this.div);
@@ -98,63 +102,7 @@ otp.widgets.TripWidgetPanel = otp.Class({
 });
 
 
-otp.widgets.TW_TripSummary = 
-    otp.Class(otp.widgets.TripWidgetPanel, {
-       
-    id  : null,
-    
-    initialize : function(tripWidget) {
-        otp.widgets.TripWidgetPanel.prototype.initialize.apply(this, arguments);
-        this.id = tripWidget.id+"-tripSummary";
-        
-                
-        var content = '';
-        content += '<div id="'+this.id+'-distance" class="otp-tripSummary-distance"></div>';
-        content += '<div id="'+this.id+'-duration" class="otp-tripSummary-duration"></div>';
-        content += '<div id="'+this.id+'-timeSummary" class="otp-tripSummary-timeSummary"></div>';    
-        this.setContent(content);
-    },
-
-    newItinerary : function(itin) {
-    	var dist = 0;
-    	
-    	for(var i=0; i < itin.legs.length; i++) {
-    		dist += itin.legs[i].distance;
-        }
-    	
-        $("#"+this.id+"-distance").html(Math.round(100*(dist/1609.344))/100+" mi.");
-        $("#"+this.id+"-duration").html(otp.util.Time.msToHrMin(itin.duration));	
-        
-        var timeByMode = { };
-        for(var i=0; i < itin.legs.length; i++) {
-            if(itin.legs[i].mode in timeByMode) {
-                timeByMode[itin.legs[i].mode] = timeByMode[itin.legs[i].mode] + itin.legs[i].duration;
-            }
-            else {
-                timeByMode[itin.legs[i].mode] = itin.legs[i].duration;
-            }
-        }
-        
-        var summaryStr = "";
-        for(mode in timeByMode) {
-            summaryStr += otp.util.Time.msToHrMin(timeByMode[mode]) + " " + this.getModeName(mode) + " / ";
-        }
-        summaryStr = summaryStr.slice(0, -3);
-        $("#"+this.id+"-timeSummary").html(summaryStr);	
-    },    
-
-    getModeName : function(mode) {
-        switch(mode) {
-            case 'WALK':
-                return "walking";
-            case 'BICYCLE':
-                return "biking";
-        }
-        return "n/a";
-    }
-});
-
-
+//** ModeSelector **//
 
 otp.widgets.TW_ModeSelector = 
     otp.Class(otp.widgets.TripWidgetPanel, {
@@ -170,7 +118,9 @@ otp.widgets.TW_ModeSelector =
                    },
     
     optionLookup : { },
-       
+
+    modeWidgets : [ ],
+           
     initialize : function(tripWidget) {
         otp.widgets.TripWidgetPanel.prototype.initialize.apply(this, arguments);
         this.id = tripWidget.id+"-modeSelector";
@@ -181,6 +131,7 @@ otp.widgets.TW_ModeSelector =
             html += '<option>'+text+'</option>';            
         });
         html += '</select>';
+        html += '<div id="'+this.id+'-widgets"></div>';
         html += "</div>";
         
         $(html).appendTo(this.$());
@@ -191,6 +142,7 @@ otp.widgets.TW_ModeSelector =
         var this_ = this;
         $("#"+this.id).change(function() {
             this_.tripWidget.module.mode = _.keys(this_.modes)[this.selectedIndex];
+            this_.refreshModeWidgets();
         });
     },
 
@@ -204,9 +156,33 @@ otp.widgets.TW_ModeSelector =
             }
             i++;
         }
+    },
+    
+    widgetPadding : "8px",
+    
+    refreshModeWidgets : function() {
+        var container = $("#"+this.id+'-widgets');
+        container.empty();
+        var mode = _.keys(this.modes)[document.getElementById(this.id).selectedIndex];
+        console.log("refreshing widgets for mode: "+mode);
+        for(var i = 0; i < this.modeWidgets.length; i++) {
+            var widget = this.modeWidgets[i];
+            if(widget.isApplicableForMode(mode)) {
+                container.append($('<div style="height: '+this.widgetPadding+';"></div>'));
+                container.append(widget.$());
+                widget.doAfterLayout();
+            }
+        }
+    },
+    
+    addModeWidget : function(widget) {
+        this.modeWidgets.push(widget);
     }
         
 });
+
+
+//** MaxWalkSelector **//
 
 otp.widgets.TW_MaxWalkSelector = 
     otp.Class(otp.widgets.TripWidgetPanel, {
@@ -252,9 +228,15 @@ otp.widgets.TW_MaxWalkSelector =
     restorePlan : function(data) {
         $('#'+this.id+'-value').val(data.queryParams.maxWalkDistance/1609.34);  
         this.tripWidget.module.maxWalkDistance = data.queryParams.maxWalkDistance;
-    }
-        
+    },
+ 
+    isApplicableForMode : function(mode) {
+        return otp.util.Itin.includesTransit(mode) && otp.util.Itin.includesWalk(mode);
+    }       
 });
+
+
+//** TimeSelector **//
 
 otp.widgets.TW_TimeSelector = 
     otp.Class(otp.widgets.TripWidgetPanel, {
@@ -313,6 +295,9 @@ otp.widgets.TW_TimeSelector =
         
 });
 
+
+//** BikeTriangle **//
+
 otp.widgets.TW_BikeTriangle = 
     otp.Class(otp.widgets.TripWidgetPanel, {
     
@@ -324,14 +309,14 @@ otp.widgets.TW_BikeTriangle =
         this.id = tripWidget.id+"-bikeTriangle";
         
         var content = '';
-        content += '<h6 class="drag-to-change">Drag to Change Trip:</h6>';
+        //content += '<h6 class="drag-to-change">Drag to Change Trip:</h6>';
         content += '<div id="'+this.id+'" class="otp-bikeTriangle notDraggable"></div>';
         
         this.setContent(content);
     },
 
     doAfterLayout : function() {
-        this.bikeTriangle = new otp.widgets.BikeTrianglePanel(this.id);
+        if(!this.bikeTriangle) this.bikeTriangle = new otp.widgets.BikeTrianglePanel(this.id);
         var this_ = this;
         this.bikeTriangle.onChanged = function() {
             var formData = this_.bikeTriangle.getFormData();
@@ -346,10 +331,16 @@ otp.widgets.TW_BikeTriangle =
         if(data.optimize === 'TRIANGLE') {
             this.bikeTriangle.setValues(data.triangleTimeFactor, data.triangleSlopeFactor, data.triangleSafetyFactor);
         }
-    }
+    },
+    
+    isApplicableForMode : function(mode) {
+        return otp.util.Itin.includesBicycle(mode);
+    }      
         
 });
 
+
+//** BikeType **//
 
 otp.widgets.TW_BikeType = 
     otp.Class(otp.widgets.TripWidgetPanel, {
@@ -387,11 +378,75 @@ otp.widgets.TW_BikeType =
         if(data.mode === "WALK,BICYCLE") {
             $('#'+this.id+'-sharedBikeRBtn').attr('checked', 'checked');
         }
-    }
+    },
+    
+    isApplicableForMode : function(mode) {
+        return otp.util.Itin.includesBicycle(mode) && otp.util.Itin.includesWalk(mode);
+    }    
         
 });
 
 
+//** TripSummary **//
+
+otp.widgets.TW_TripSummary = 
+    otp.Class(otp.widgets.TripWidgetPanel, {
+       
+    id  : null,
+    
+    initialize : function(tripWidget) {
+        otp.widgets.TripWidgetPanel.prototype.initialize.apply(this, arguments);
+        this.id = tripWidget.id+"-tripSummary";
+        
+                
+        var content = '';
+        content += '<div id="'+this.id+'-distance" class="otp-tripSummary-distance"></div>';
+        content += '<div id="'+this.id+'-duration" class="otp-tripSummary-duration"></div>';
+        content += '<div id="'+this.id+'-timeSummary" class="otp-tripSummary-timeSummary"></div>';    
+        this.setContent(content);
+    },
+
+    newItinerary : function(itin) {
+    	var dist = 0;
+    	
+    	for(var i=0; i < itin.legs.length; i++) {
+    		dist += itin.legs[i].distance;
+        }
+    	
+        $("#"+this.id+"-distance").html(Math.round(100*(dist/1609.344))/100+" mi.");
+        $("#"+this.id+"-duration").html(otp.util.Time.msToHrMin(itin.duration));	
+        
+        var timeByMode = { };
+        for(var i=0; i < itin.legs.length; i++) {
+            if(itin.legs[i].mode in timeByMode) {
+                timeByMode[itin.legs[i].mode] = timeByMode[itin.legs[i].mode] + itin.legs[i].duration;
+            }
+            else {
+                timeByMode[itin.legs[i].mode] = itin.legs[i].duration;
+            }
+        }
+        
+        var summaryStr = "";
+        for(mode in timeByMode) {
+            summaryStr += otp.util.Time.msToHrMin(timeByMode[mode]) + " " + this.getModeName(mode) + " / ";
+        }
+        summaryStr = summaryStr.slice(0, -3);
+        $("#"+this.id+"-timeSummary").html(summaryStr);	
+    },    
+
+    getModeName : function(mode) {
+        switch(mode) {
+            case 'WALK':
+                return "walking";
+            case 'BICYCLE':
+                return "biking";
+        }
+        return "n/a";
+    }
+});
+
+
+//** AddThis **//
 
 otp.widgets.TW_AddThis = 
     otp.Class(otp.widgets.TripWidgetPanel, {
@@ -420,6 +475,9 @@ otp.widgets.TW_AddThis =
         addthisElement.attr("addthis:description", otp.config.siteDescription);    
     }
 });
+
+
+//** Submit **//
 
 otp.widgets.TW_Submit = 
     otp.Class(otp.widgets.TripWidgetPanel, {
