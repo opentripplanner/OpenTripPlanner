@@ -102,8 +102,7 @@ public class StateEditor {
                 defectiveTraversal = true;
             }
             if (traversingBackward != parent.getOptions().isArriveBy()) {
-                LOG
-                        .error("Actual traversal direction does not match traversal direction in TraverseOptions.");
+                LOG.error("Actual traversal direction does not match traversal direction in TraverseOptions.");
                 defectiveTraversal = true;
             }
         }

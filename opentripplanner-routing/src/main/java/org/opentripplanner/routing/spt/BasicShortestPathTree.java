@@ -82,8 +82,9 @@ public class BasicShortestPathTree extends AbstractShortestPathTree {
             final Edge backEdge = existing.getBackEdge();
             if (backEdge != state.getBackEdge()
                     && ((backEdge instanceof PlainStreetEdge) && (!((PlainStreetEdge) backEdge)
-                            .getTurnRestrictions().isEmpty())))
+                            .getTurnRestrictions().isEmpty()))) {
                 return true;
+            }
 
             return false;
         }
@@ -108,8 +109,9 @@ public class BasicShortestPathTree extends AbstractShortestPathTree {
         final State existing = states.get(s.getVertex());
         final Edge backEdge = existing.getBackEdge();
         if ((backEdge instanceof PlainStreetEdge) && (!((PlainStreetEdge) backEdge)
-                        .getTurnRestrictions().isEmpty()))
+                        .getTurnRestrictions().isEmpty())) {
             return true;
+        }
         return (s == existing);
     }
 

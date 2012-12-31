@@ -58,6 +58,8 @@ public class State implements Cloneable {
     public StateData stateData;
 
     // how far have we walked
+    // TODO(flamholz): this is a very confusing name as it actually applies to all non-transit modes.
+    // we should DEFINITELY rename this variable and the associated methods.
     protected double walkDistance;
 
     // track the states of all path parsers -- probably changes frequently

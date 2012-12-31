@@ -97,6 +97,7 @@ public class RoutingContext implements Cloneable {
                           Vertex from, Vertex to, boolean findPlaces) {
         this.opt = traverseOptions;
         this.graph = graph;
+        
         if (findPlaces) {
             // normal mode, search for vertices based on fromPlace and toPlace
             if ( ! opt.batch || opt.arriveBy) {
