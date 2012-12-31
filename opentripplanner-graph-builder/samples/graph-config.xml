@@ -35,6 +35,7 @@
 
     <bean id="floatingIslands" class="org.opentripplanner.graph_builder.impl.PruneFloatingIslands">
         <property name="maxIslandSize" value="5"/>
+        <property name="islandLogFile" value="c:\isolatedTest"/>
     </bean>
 
     <bean id="transitStreetLink" class="org.opentripplanner.graph_builder.impl.TransitToStreetNetworkGraphBuilderImpl" />

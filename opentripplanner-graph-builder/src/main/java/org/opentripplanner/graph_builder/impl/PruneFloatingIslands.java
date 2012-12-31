@@ -13,6 +13,7 @@
 
 package org.opentripplanner.graph_builder.impl;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,15 +21,24 @@ import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.log4j.*;
+import org.apache.log4j.Logger;
 import org.opentripplanner.common.StreetUtils;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
+import org.slf4j.*;
 
 public class PruneFloatingIslands implements GraphBuilder {
+
+    private static org.slf4j.Logger _log = LoggerFactory.getLogger(PruneFloatingIslands.class);
 
     @Getter
     @Setter
     private int maxIslandSize = 40;
+
+    @Getter
+    @Setter
+    private String islandLogFile = "";
 
     public List<String> provides() {
         return Collections.emptyList();
@@ -40,12 +50,26 @@ public class PruneFloatingIslands implements GraphBuilder {
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
-        StreetUtils.pruneFloatingIslands(graph, maxIslandSize);
+        StreetUtils.pruneFloatingIslands(graph, maxIslandSize, createLogger());
     }
 
     @Override
     public void checkInputs() {
         //no inputs
+    }
+
+    private String createLogger() {
+        if (islandLogFile.isEmpty()) return null;
+        try{
+            PatternLayout layout =  new PatternLayout("%m\n");
+            FileAppender appender = new RollingFileAppender(layout, islandLogFile, false);
+            Logger.getLogger("islands").addAppender(appender);
+        }catch (IOException ioe){
+            _log.warn("could not create file appender for " + islandLogFile + " duo to: " + ioe.getMessage());
+            return null;
+        }
+        return "islands";
+
     }
 
 }

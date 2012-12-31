@@ -21,6 +21,10 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 
+import com.vividsolutions.jts.algorithm.ConvexHull;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
 import org.opentripplanner.gbannotation.GraphConnectivity;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -33,15 +37,24 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class StreetUtils {
 
     private static Logger _log = LoggerFactory.getLogger(StreetUtils.class);
+    //private static Logger _islandLog = LoggerFactory.getLogger("islands");
+    private static int islandCounter = 0;
 
-    public static void pruneFloatingIslands(Graph graph, int maxIslandSize) {
+    public static void pruneFloatingIslands(Graph graph, int maxIslandSize, String islandLogName) {
         _log.debug("pruning");
+
+        Logger islandLog = null;
+        if(islandLogName != null){
+            islandLog = LoggerFactory.getLogger(islandLogName);
+            islandLog.info(String.format("%s\t%s\t%s","id","size","wkt"));
+        }
         Map<Vertex, HashSet<Vertex>> subgraphs = new HashMap<Vertex, HashSet<Vertex>>();
         Map<Vertex, ArrayList<Vertex>> neighborsForVertex = new HashMap<Vertex, ArrayList<Vertex>>();
 
@@ -98,9 +111,12 @@ public class StreetUtils {
             }
             islands.add(subgraph);
         }
-        _log.debug(islands.size() + " sub graphs found");
+        _log.info(islands.size() + " sub graphs found");
         /* remove all tiny subgraphs */
         for (HashSet<Vertex> island : islands) {
+            if (islandLog != null) {
+                WriteNodesInSubGraph(island, islandLog);
+            }
             if (island.size() < maxIslandSize) {
                 _log.warn(graph.addBuilderAnnotation(new GraphConnectivity(island.iterator().next(), island.size())));
                 depedestrianizeOrRemove(graph, island);
@@ -151,4 +167,25 @@ public class StreetUtils {
         }
         return subgraph;
     }
+
+    private static void WriteNodesInSubGraph(HashSet<Vertex> subgraph, Logger islandLog){
+
+        Coordinate[] subGraphCoor = new Coordinate[subgraph.size()];
+        int i = 0;
+        for(Vertex v:subgraph){
+
+            subGraphCoor[i] = v.getCoordinate();
+            i++;
+        }
+        i++;
+        ConvexHull convexHull = new ConvexHull(subGraphCoor, new GeometryFactory());
+        Geometry convexHullGeom = convexHull.getConvexHull();
+        if(convexHullGeom.getGeometryType().equalsIgnoreCase("LINESTRING")){
+            convexHullGeom = convexHullGeom.buffer(0.0001,5);
+        }
+        islandLog.info(String.format("%d\t%d\t%s",
+                islandCounter,subgraph.size(),convexHullGeom));
+        islandCounter++;
+    }
+
 }
