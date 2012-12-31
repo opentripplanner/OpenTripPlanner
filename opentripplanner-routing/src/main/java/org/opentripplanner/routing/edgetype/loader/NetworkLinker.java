@@ -26,7 +26,9 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.factory.FindMaxWalkDistances;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
@@ -67,6 +69,16 @@ public class NetworkLinker {
         vertices.addAll(graph.getVertices());
 
         for (TransitStop ts : IterableLibrary.filter(vertices, TransitStop.class)) {
+            // if the street is already linked there is no need to linked it again,
+            // could happened if using the prune isolated island
+            boolean alreadyLinked = false;
+            for(Edge e:ts.getOutgoing()){
+                if(e instanceof StreetTransitLink) {
+                    alreadyLinked = true;
+                    break;
+                }
+            }
+            if(alreadyLinked) continue;
             // only connect transit stops that (a) are entrances, or (b) have no associated
             // entrances
             if (ts.isEntrance() || !ts.hasEntrances()) {

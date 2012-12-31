@@ -26,19 +26,24 @@ import org.apache.log4j.Logger;
 import org.opentripplanner.common.StreetUtils;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.slf4j.*;
 
 public class PruneFloatingIslands implements GraphBuilder {
 
     private static org.slf4j.Logger _log = LoggerFactory.getLogger(PruneFloatingIslands.class);
 
-    @Getter
     @Setter
     private int maxIslandSize = 40;
 
-    @Getter
+    @Setter
+    private int islandWithStopMaxSize = 5;
+
     @Setter
     private String islandLogFile = "";
+
+    @Setter
+    private TransitToStreetNetworkGraphBuilderImpl transitToStreetNetwork;
 
     public List<String> provides() {
         return Collections.emptyList();
@@ -50,7 +55,12 @@ public class PruneFloatingIslands implements GraphBuilder {
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
-        StreetUtils.pruneFloatingIslands(graph, maxIslandSize, createLogger());
+        if(graph.getService(StreetVertexIndexService.class) == null) {
+            //TODO:log and throw error
+        }
+        StreetUtils.pruneFloatingIslands(graph, maxIslandSize, islandWithStopMaxSize, createLogger());
+        //reconnect stops on small islands (that removed)
+        transitToStreetNetwork.buildGraph(graph,extra);
     }
 
     @Override
@@ -69,7 +79,6 @@ public class PruneFloatingIslands implements GraphBuilder {
             return null;
         }
         return "islands";
-
     }
 
 }
