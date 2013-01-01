@@ -52,6 +52,10 @@ public class TurnRestrictionTest {
 
     private Graph _graph;
 
+    private Vertex topRight;
+
+    private Vertex bottomLeft;
+
     @Before
     public void before() {
         _graph = new Graph();
@@ -89,44 +93,43 @@ public class TurnRestrictionTest {
         PlainStreetEdge maple_main3 = edge(maple3, main3, 100.0, false);
         PlainStreetEdge main_broad3 = edge(main3, broad3, 100.0, false);
 
-        // Turn restrictions 
+        // Turn restrictions
         // - can't turn from 1st onto Main.
         // - can't turn from 2nd onto Main.
         // - can't turn from 2nd onto Broad.
         DisallowTurn(maple_main1, main1_2);
         DisallowTurn(maple_main2, main2_3);
         DisallowTurn(main_broad2, broad2_3);
+
+        // Hold onto some vertices for the tests
+        topRight = maple1;
+        bottomLeft = broad3;
     }
 
     @Test
     public void testForward() {
-        Vertex origin = _graph.getVertex("maple_1st");
-        Vertex destination = _graph.getVertex("broad_3rd");
-        assertNotNull(origin);
-        assertNotNull(destination);
-
         RoutingRequest options = new RoutingRequest();
         options.setWalkSpeed(1.0);
 
-        options.setRoutingContext(_graph, origin, destination);
+        options.setRoutingContext(_graph, topRight, bottomLeft);
         ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
 
-        GraphPath path = tree.getPath(destination, false);
+        GraphPath path = tree.getPath(bottomLeft, false);
         assertNotNull(path);
-        
+
         // If not for turn restrictions, the shortest path would be to take 1st to Main,
-        // Main to 2nd, 2nd to Broad and Broad until the corner of Broad and 3rd. 
+        // Main to 2nd, 2nd to Broad and Broad until the corner of Broad and 3rd.
         // However, most of these turns are not allowed. Instead, the shortest allowed
         // path is 1st to Broad, Broad to 3rd.
 
-         List<State> states = path.states;
-         assertEquals(5, states.size());
-         
-         assertEquals("maple_1st", states.get(0).getVertex().getLabel()); 
-         assertEquals("main_1st", states.get(1).getVertex().getLabel()); 
-         assertEquals("broad_1st", states.get(2).getVertex().getLabel()); 
-         assertEquals("broad_2nd", states.get(3).getVertex().getLabel()); 
-         assertEquals("broad_3rd", states.get(4).getVertex().getLabel());
+        List<State> states = path.states;
+        assertEquals(5, states.size());
+
+        assertEquals("maple_1st", states.get(0).getVertex().getLabel());
+        assertEquals("main_1st", states.get(1).getVertex().getLabel());
+        assertEquals("broad_1st", states.get(2).getVertex().getLabel());
+        assertEquals("broad_2nd", states.get(3).getVertex().getLabel());
+        assertEquals("broad_3rd", states.get(4).getVertex().getLabel());
     }
 
     /****
