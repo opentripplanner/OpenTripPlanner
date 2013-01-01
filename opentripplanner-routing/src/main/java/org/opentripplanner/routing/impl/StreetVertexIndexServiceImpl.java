@@ -204,10 +204,11 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 String fmt = resources.getString("corner");
                 if (uniqueNames.size() > 1) {
                     name = String.format(fmt, uniqueNames.get(0), uniqueNames.get(1));
-                } else if (uniqueNames.size() == 1)
+                } else if (uniqueNames.size() == 1) {
                     name = uniqueNames.get(0);
-                else
+                } else {
                     name = resources.getString("unnamedStreet");
+                }
             }
             StreetLocation closest = new StreetLocation(graph, "corner " + Math.random(),
                     coordinate, name);
@@ -220,55 +221,57 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
         // if no intersection vertices were found, then find the closest transit stop
         // (we can return stops here because this method is not used when street-transit linking)
-        double closest_stop_distance = Double.POSITIVE_INFINITY;
-        Vertex closest_stop = null;
+        double closestStopDistance = Double.POSITIVE_INFINITY;
+        Vertex closestStop = null;
         // elsewhere options=null means no restrictions, find anything.
         // here we skip examining stops, as they are really only relevant when transit is being used
         if (options != null && options.getModes().isTransit()) {
             for (Vertex v : getLocalTransitStops(coordinate, 1000)) {
                 double d = distanceLibrary.distance(v.getCoordinate(), coordinate);
-                if (d < closest_stop_distance) {
-                    closest_stop_distance = d;
-                    closest_stop = v;
+                if (d < closestStopDistance) {
+                    closestStopDistance = d;
+                    closestStop = v;
                 }
             }
         }
-        _log.debug(" best stop: {} distance: {}", closest_stop, closest_stop_distance);
+        _log.debug(" best stop: {} distance: {}", closestStop, closestStopDistance);
 
         // then find closest walkable street
-        StreetLocation closest_street = null;
+        StreetLocation closestStreet = null;
         CandidateEdgeBundle bundle = getClosestEdges(coordinate, options, extraEdges, null, false);
         CandidateEdge candidate = bundle.best;
-        double closest_street_distance = Double.POSITIVE_INFINITY;
+        double closestStreetDistance = Double.POSITIVE_INFINITY;
         if (candidate != null) {
             StreetEdge bestStreet = candidate.edge;
             Coordinate nearestPoint = candidate.nearestPointOnEdge;
-            closest_street_distance = distanceLibrary.distance(coordinate, nearestPoint);
-            _log.debug("best street: {} dist: {}", bestStreet.toString(), closest_street_distance);
+            closestStreetDistance = distanceLibrary.distance(coordinate, nearestPoint);
+            _log.debug("best street: {} dist: {}", bestStreet.toString(), closestStreetDistance);
             if (name == null) {
                 name = bestStreet.getName();
             }
-            closest_street = StreetLocation.createStreetLocation(graph, bestStreet.getName() + "_"
-                    + coordinate.toString(), name, bundle.toEdgeList(), nearestPoint, coordinate);
+            String closestName = String
+                    .format("%s_%s", bestStreet.getName(), coordinate.toString());
+            closestStreet = StreetLocation.createStreetLocation(graph, closestName, name,
+                    bundle.toEdgeList(), nearestPoint, coordinate);
         }
 
         // decide whether to return street, or street + stop
-        if (closest_street == null) {
+        if (closestStreet == null) {
             // no street found, return closest stop or null
             _log.debug("returning only transit stop (no street found)");
-            return closest_stop; // which will be null if none was found
+            return closestStop; // which will be null if none was found
         } else {
             // street found
-            if (closest_stop != null) {
+            if (closestStop != null) {
                 // both street and stop found
-                double relativeStopDistance = closest_stop_distance / closest_street_distance;
+                double relativeStopDistance = closestStopDistance / closestStreetDistance;
                 if (relativeStopDistance < 1.5) {
                     _log.debug("linking transit stop to street (distances are comparable)");
-                    closest_street.addExtraEdgeTo(closest_stop);
+                    closestStreet.addExtraEdgeTo(closestStop);
                 }
             }
             _log.debug("returning split street");
-            return closest_street;
+            return closestStreet;
         }
     }
 
@@ -456,8 +459,10 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     @Override
     public Vertex getVertexForPlace(NamedPlace place, RoutingRequest options, Vertex other) {
-        if (place == null || place.place == null)
+        if (place == null || place.place == null) {
             return null;
+        }
+
         Matcher matcher = _latLonPattern.matcher(place.place);
         if (matcher.matches()) {
             double lat = Double.parseDouble(matcher.group(1));
@@ -470,6 +475,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 return getClosestVertex(location, place.name, options);
             }
         }
+
         // did not match lat/lon, interpret place as a vertex label.
         // this should probably only be used in tests.
         return graph.getVertex(place.place);

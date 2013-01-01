@@ -24,7 +24,7 @@ def Connect(host, port):
         transport = TTransport.TBufferedTransport(transport)
         
         # Wrap in a protocol
-        protocol = TBinaryProtocol.TBinaryProtocolAccelerated(transport)
+        protocol = TBinaryProtocol.TBinaryProtocol(transport)
         
         # Create a client to use the protocol encoder
         client = OTPService.Client(protocol)

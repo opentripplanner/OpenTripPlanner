@@ -15,8 +15,12 @@ package org.opentripplanner.api.thrift;
 
 import lombok.Data;
 
+import org.apache.thrift.protocol.TBinaryProtocol;
+import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.server.TServer;
-import org.apache.thrift.server.TSimpleServer;
+import org.apache.thrift.server.TThreadPoolServer;
+import org.apache.thrift.transport.TNonblockingServerSocket;
+import org.apache.thrift.transport.TNonblockingServerTransport;
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TServerTransport;
 import org.apache.thrift.transport.TTransportException;
@@ -46,12 +50,13 @@ public class OTPServerTask implements Runnable {
             OTPService.Processor<OTPServiceImpl> processor = new OTPService.Processor<OTPServiceImpl>(
                     otpServiceImpl);
 
-            // TODO(flamholz): make the transport and server type be configurable?
-            TServerTransport serverTransport;
-            serverTransport = new TServerSocket(port);
-
-            TSimpleServer.Args args = new TSimpleServer.Args(serverTransport).processor(processor);
-            TServer server = new TSimpleServer(args);
+            // TODO(flamholz): make the transport, protocol and server type be configurable?
+            TServerTransport serverTransport = new TServerSocket(port);
+            TProtocolFactory protocolFactory = new TBinaryProtocol.Factory(true, true);
+            TThreadPoolServer.Args args = new TThreadPoolServer.Args(serverTransport)
+                .processor(processor)
+                .protocolFactory(protocolFactory);
+            TServer server = new TThreadPoolServer(args);
 
             LOG.info("Starting the OTPService on port {}", port);
             server.serve();
