@@ -221,20 +221,20 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
         // if no intersection vertices were found, then find the closest transit stop
         // (we can return stops here because this method is not used when street-transit linking)
-        double closest_stop_distance = Double.POSITIVE_INFINITY;
-        Vertex closest_stop = null;
+        double closestStopDistance = Double.POSITIVE_INFINITY;
+        Vertex closestStop = null;
         // elsewhere options=null means no restrictions, find anything.
         // here we skip examining stops, as they are really only relevant when transit is being used
         if (options != null && options.getModes().isTransit()) {
             for (Vertex v : getLocalTransitStops(coordinate, 1000)) {
                 double d = distanceLibrary.distance(v.getCoordinate(), coordinate);
-                if (d < closest_stop_distance) {
-                    closest_stop_distance = d;
-                    closest_stop = v;
+                if (d < closestStopDistance) {
+                    closestStopDistance = d;
+                    closestStop = v;
                 }
             }
         }
-        _log.debug(" best stop: {} distance: {}", closest_stop, closest_stop_distance);
+        _log.debug(" best stop: {} distance: {}", closestStop, closestStopDistance);
 
         // then find closest walkable street
         StreetLocation closestStreet = null;
@@ -244,7 +244,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         if (candidate != null) {
             StreetEdge bestStreet = candidate.edge;
             Coordinate nearestPoint = candidate.nearestPointOnEdge;
-            closestStreetDistance = candidate.getDistance();
+            closestStreetDistance = distanceLibrary.distance(coordinate, nearestPoint);
             _log.debug("best street: {} dist: {}", bestStreet.toString(), closestStreetDistance);
             if (name == null) {
                 name = bestStreet.getName();
@@ -260,15 +260,15 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         if (closestStreet == null) {
             // no street found, return closest stop or null
             _log.debug("returning only transit stop (no street found)");
-            return closest_stop; // which will be null if none was found
+            return closestStop; // which will be null if none was found
         } else {
             // street found
-            if (closest_stop != null) {
+            if (closestStop != null) {
                 // both street and stop found
-                double relativeStopDistance = closest_stop_distance / closestStreetDistance;
+                double relativeStopDistance = closestStopDistance / closestStreetDistance;
                 if (relativeStopDistance < 1.5) {
                     _log.debug("linking transit stop to street (distances are comparable)");
-                    closestStreet.addExtraEdgeTo(closest_stop);
+                    closestStreet.addExtraEdgeTo(closestStop);
                 }
             }
             _log.debug("returning split street");
