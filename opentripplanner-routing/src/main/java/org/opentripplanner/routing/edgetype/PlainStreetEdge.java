@@ -247,6 +247,8 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
                 && (options.arriveBy ? (backEdge.getToVertex() == fromv)
                         : (backEdge.getFromVertex() == tov))) {
             // no illegal U-turns
+            // NOTE(flamholz): unclear how this handles legal U-turns. e.g. when 
+            // you need to pull a U to turn left at the previous intersection.
             return null;
         }
         if (!canTraverse(options, traverseMode)) {
@@ -258,16 +260,12 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             return null;
         }
 
-        double speed;
-        
         // Automobiles have variable speeds depending on the edge type
-        if (traverseMode == TraverseMode.CAR)
-            speed = this.calculateCarSpeed(options);
-        else
-            speed = options.getSpeed(traverseMode);
-         
+        double speed = calculateSpeed(options, traverseMode);
+        
         double time = length / speed;
         double weight;
+        // TODO(flamholz): factor out this bike, wheelchair and walking specific logic to somewhere central.
         if (options.wheelchairAccessible) {
             weight = elevationProfileSegment.getSlopeSpeedEffectiveLength() / speed;
         } else if (traverseMode.equals(TraverseMode.BICYCLE)) {
@@ -340,9 +338,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         PlainStreetEdge backPSE;
         if (backEdge != null && backEdge instanceof PlainStreetEdge) {
             backPSE = (PlainStreetEdge) backEdge;
-            float backSpeed = (float) (traverseMode == TraverseMode.CAR ? backPSE.getCarSpeed() :
-                options.getSpeed(traverseMode));
-            
+            double backSpeed = backPSE.calculateSpeed(options, traverseMode);
             final double realTurnCost;
             
             /* Compute turn cost.
@@ -358,25 +354,28 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
              * the backEdge, rather than of the current edge.
              */
             if (options.arriveBy && tov instanceof IntersectionVertex) { // arrive-by search
-                if (!canTurnOnto(backPSE, s0, traverseMode))
+                if (!canTurnOnto(backPSE, s0, traverseMode)) {
                     return null;
+                }
                 realTurnCost = ((IntersectionVertex) tov).computeTraversalCost(
-                        this, backPSE, traverseMode, options, (float) speed, backSpeed);
+                        this, backPSE, traverseMode, options, (float) speed, (float) backSpeed);
             } else if (fromv instanceof IntersectionVertex) { // depart-after search
-                if (!backPSE.canTurnOnto(this, s0, traverseMode))
+                if (!backPSE.canTurnOnto(this, s0, traverseMode)) {
                     return null;
+                }
                 realTurnCost = ((IntersectionVertex) fromv).computeTraversalCost(
-                        backPSE, this, traverseMode, options, backSpeed, (float) speed);
+                        backPSE, this, traverseMode, options, (float) backSpeed, (float) speed);
             } else { // in case this is a temporary edge not connected to an IntersectionVertex
                 realTurnCost = 0; 
             }
-                       
-            if (traverseMode != TraverseMode.CAR) 
+            
+            if (traverseMode != TraverseMode.CAR) {
                 s1.incrementWalkDistance(realTurnCost / 100); //just a tie-breaker
+            }
 
             weight += realTurnCost;
             long turnTime = (long) realTurnCost;
-            if (turnTime != realTurnCost) {
+            if (turnTime != realTurnCost) {  // round up.
                 turnTime++;
             }
             time += turnTime;
@@ -389,18 +388,22 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         }
         s1.incrementTimeInSeconds(timeLong);
         
-        if (traverseMode != TraverseMode.CAR)
+        if (traverseMode != TraverseMode.CAR) {
+            // TODO(flamholz): are we incrementing 2x for non-car modes?
             s1.incrementWalkDistance(length);
+        }
 
         s1.incrementWeight(weight);
-        if (s1.weHaveWalkedTooFar(options))
+        if (s1.weHaveWalkedTooFar(options)) {
             return null;
+        }
         
         s1.addAlerts(notes);
         
-        if (this.toll && traverseMode == TraverseMode.CAR)
+        if (this.toll && traverseMode == TraverseMode.CAR) {
             s1.addAlert(Alert.createSimpleAlerts("Toll road"));
-
+        }
+        
         return s1.makeState();
     }
 
@@ -412,7 +415,22 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
      * @return
      */
     private double calculateCarSpeed(RoutingRequest options) {
-        return this.carSpeed;
+        return carSpeed;
+    }
+    
+    /**
+     * Calculate the speed appropriately given the RoutingRequest and traverseMode.
+     * 
+     * @param options
+     * @param traverseMode
+     * @return
+     */
+    private double calculateSpeed(RoutingRequest options, TraverseMode traverseMode) {
+        if (traverseMode == TraverseMode.CAR) {
+            // NOTE: Automobiles have variable speeds depending on the edge type
+            return calculateCarSpeed(options);
+        }
+        return options.getSpeed(traverseMode);
     }
 
     @Override

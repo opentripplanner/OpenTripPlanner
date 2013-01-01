@@ -35,6 +35,22 @@ public class TurnRestriction implements Serializable {
     }
     
     /**
+     * Convenience constructor.
+     * 
+     * @param from
+     * @param to
+     * @param type
+     */
+    public TurnRestriction(Edge from, Edge to, TurnRestrictionType type,
+            TraverseModeSet modes) {
+        this();
+        this.from = from;
+        this.to = to;
+        this.type = type;
+        this.modes = modes;
+    }
+    
+    /**
      * Return true if the turn restriction is in force at the time described by the long.
      * @param time
      * @return
