@@ -47,6 +47,10 @@ otp.util.Text = {
             case 3: return n+"rd";
         }
         return n+"th";
+    },
+    
+    isNumber : function(str) {
+        return !isNaN(parseFloat(str)) && isFinite(str);
     }
 }
 

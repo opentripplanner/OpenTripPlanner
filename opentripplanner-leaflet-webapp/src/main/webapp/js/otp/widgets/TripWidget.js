@@ -18,7 +18,7 @@ otp.widgets.TripWidget =
     otp.Class(otp.widgets.Widget, {
     
     //planTripCallback : null,
-    panels : null,
+    controls : null,
     module : null,
         
     initialize : function(id, module) {
@@ -29,14 +29,14 @@ otp.widgets.TripWidget =
         //this.planTripCallback = planTripCallback;
         this.module = module;
         
-        this.panels = { };       
+        this.controls = { };       
     },
 
-    addPanel : function(id, panel) {
-        panel.$().appendTo(this.$());
+    addControl : function(id, control) {
+        control.$().appendTo(this.$());
         //$("<hr />").appendTo(this.$());
-        panel.doAfterLayout();
-        this.panels[id] = panel;
+        control.doAfterLayout();
+        this.controls[id] = control;
     },
     
     addSeparator : function() {
@@ -50,14 +50,14 @@ otp.widgets.TripWidget =
     restorePlan : function(data) {
 	    if(data == null) return;
 	    
-        for(var id in this.panels) {
-            this.panels[id].restorePlan(data);
+	    for(var id in this.controls) {
+            this.controls[id].restorePlan(data);
         }
     },
     
     newItinerary : function(itin) {
-        for(var id in this.panels) {
-            this.panels[id].newItinerary(itin);
+        for(var id in this.controls) {
+            this.controls[id].newItinerary(itin);
         }
     },
     
@@ -66,9 +66,9 @@ otp.widgets.TripWidget =
 });
 
 
-//** PANEL CLASSES **//
+//** CONTROL CLASSES **//
 
-otp.widgets.TripWidgetPanel = otp.Class({
+otp.widgets.TripWidgetControl = otp.Class({
     
     div :   null,
     tripWidget : null,
@@ -102,149 +102,15 @@ otp.widgets.TripWidgetPanel = otp.Class({
 });
 
 
-//** ModeSelector **//
-
-otp.widgets.TW_ModeSelector = 
-    otp.Class(otp.widgets.TripWidgetPanel, {
-    
-    id           :  null,
-
-    modes        : { "TRANSIT,WALK" : "Transit", 
-                     "BUSISH,WALK" : "Bus Only", 
-                     "TRAINISH,WALK" : "Rail Only", 
-                     "BICYCLE" : 'Bicycle Only',
-                     "WALK" : 'Walk Only',
-                     "TRANSIT,BICYCLE" : "Bicycle &amp; Transit" 
-                   },
-    
-    optionLookup : { },
-
-    modeWidgets : [ ],
-           
-    initialize : function(tripWidget) {
-        otp.widgets.TripWidgetPanel.prototype.initialize.apply(this, arguments);
-        this.id = tripWidget.id+"-modeSelector";
-        
-        var html = "<div class='notDraggable'>Travel by: ";
-        html += '<select id="'+this.id+'">';
-        _.each(this.modes, function(text, key) {
-            html += '<option>'+text+'</option>';            
-        });
-        html += '</select>';
-        html += '<div id="'+this.id+'-widgets"></div>';
-        html += "</div>";
-        
-        $(html).appendTo(this.$());
-        //this.setContent(content);
-    },
-
-    doAfterLayout : function() {
-        var this_ = this;
-        $("#"+this.id).change(function() {
-            this_.tripWidget.module.mode = _.keys(this_.modes)[this.selectedIndex];
-            this_.refreshModeWidgets();
-        });
-    },
-
-    restorePlan : function(data) {
-        var i = 0;
-        for(mode in this.modes) {
-            if(mode === data.queryParams.mode) {
-                this.tripWidget.module.mode = data.queryParams.mode; 
-                $('#'+this.id+' option:eq('+i+')').prop('selected', true);    
-                return;
-            }
-            i++;
-        }
-    },
-    
-    widgetPadding : "8px",
-    
-    refreshModeWidgets : function() {
-        var container = $("#"+this.id+'-widgets');
-        container.empty();
-        var mode = _.keys(this.modes)[document.getElementById(this.id).selectedIndex];
-        console.log("refreshing widgets for mode: "+mode);
-        for(var i = 0; i < this.modeWidgets.length; i++) {
-            var widget = this.modeWidgets[i];
-            if(widget.isApplicableForMode(mode)) {
-                container.append($('<div style="height: '+this.widgetPadding+';"></div>'));
-                container.append(widget.$());
-                widget.doAfterLayout();
-            }
-        }
-    },
-    
-    addModeWidget : function(widget) {
-        this.modeWidgets.push(widget);
-    }
-        
-});
-
-
-//** MaxWalkSelector **//
-
-otp.widgets.TW_MaxWalkSelector = 
-    otp.Class(otp.widgets.TripWidgetPanel, {
-    
-    id           :  null,
-
-    presets      : [0.1, 0.2, 0.25, 0.3, 0.4, 0.5, 0.75, 1, 2, 3, 4, 5],
-       
-    initialize : function(tripWidget) {
-        otp.widgets.TripWidgetPanel.prototype.initialize.apply(this, arguments);
-        this.id = tripWidget.id+"-maxWalkSelector";
-        
-        var html = '<div class="notDraggable">Maximum walk: <input id="'+this.id+'-value" type="text" style="width:30px;" value="0.5" /> mi.&nbsp;';
-        html += '<select id="'+this.id+'-presets"><option>Presets:</option>';
-        for(var i=0; i<this.presets.length; i++) {
-            //html += '<option'+(this.values[i] == .5 ? ' selected' : '')+'>'+this.values[i]+'</option>';            
-            html += '<option>'+this.presets[i]+' mi.</option>';            
-        }
-        html += '</select>';
-        html += "</div>";
-              
-        $(html).appendTo(this.$());
-        //this.setContent(content);
-    },
-
-    doAfterLayout : function() {
-        var this_ = this;
-        $('#'+this.id+'-value').change(function() {
-            this_.tripWidget.module.maxWalkDistance = parseFloat($('#'+this_.id+'-value').val())*1609.34;
-        });
-        
-        $('#'+this.id+'-presets').change(function() {
-            var presetVal = this_.presets[this.selectedIndex-1];
-            $('#'+this_.id+'-value').val(presetVal);    
-
-            var m = presetVal*1609.34;
-            this_.tripWidget.module.maxWalkDistance = m;
-
-            $('#'+this_.id+'-presets option:eq(0)').prop('selected', true);    
-        });
-    },
-
-    restorePlan : function(data) {
-        $('#'+this.id+'-value').val(data.queryParams.maxWalkDistance/1609.34);  
-        this.tripWidget.module.maxWalkDistance = data.queryParams.maxWalkDistance;
-    },
- 
-    isApplicableForMode : function(mode) {
-        return otp.util.Itin.includesTransit(mode) && otp.util.Itin.includesWalk(mode);
-    }       
-});
-
-
 //** TimeSelector **//
 
 otp.widgets.TW_TimeSelector = 
-    otp.Class(otp.widgets.TripWidgetPanel, {
+    otp.Class(otp.widgets.TripWidgetControl, {
     
     id           :  null,
        
     initialize : function(tripWidget) {
-        otp.widgets.TripWidgetPanel.prototype.initialize.apply(this, arguments);
+        otp.widgets.TripWidgetControl.prototype.initialize.apply(this, arguments);
         this.id = tripWidget.id+"-timeSelector";
 
         var html = '<div id="'+this.id+'" class="notDraggable">';
@@ -296,16 +162,231 @@ otp.widgets.TW_TimeSelector =
 });
 
 
+//** ModeSelector **//
+
+otp.widgets.TW_ModeSelector = 
+    otp.Class(otp.widgets.TripWidgetControl, {
+    
+    id           :  null,
+
+    modes        : { "TRANSIT,WALK" : "Transit", 
+                     "BUSISH,WALK" : "Bus Only", 
+                     "TRAINISH,WALK" : "Rail Only", 
+                     "BICYCLE" : 'Bicycle Only',
+                     "WALK" : 'Walk Only',
+                     "TRANSIT,BICYCLE" : "Bicycle &amp; Transit" 
+                   },
+    
+    optionLookup : { },
+
+    modeControls : [ ],
+           
+    initialize : function(tripWidget) {
+        otp.widgets.TripWidgetControl.prototype.initialize.apply(this, arguments);
+        this.id = tripWidget.id+"-modeSelector";
+        
+        var html = "<div class='notDraggable'>Travel by: ";
+        html += '<select id="'+this.id+'">';
+        _.each(this.modes, function(text, key) {
+            html += '<option>'+text+'</option>';            
+        });
+        html += '</select>';
+        html += '<div id="'+this.id+'-widgets"></div>';
+        html += "</div>";
+        
+        $(html).appendTo(this.$());
+        //this.setContent(content);
+    },
+
+    doAfterLayout : function() {
+        var this_ = this;
+        $("#"+this.id).change(function() {
+            this_.tripWidget.module.mode = _.keys(this_.modes)[this.selectedIndex];
+            this_.refreshModeControls();
+        });
+    },
+
+    restorePlan : function(data) {
+        var i = 0;
+        for(mode in this.modes) {
+            if(mode === data.queryParams.mode) {
+                this.tripWidget.module.mode = data.queryParams.mode; 
+                $('#'+this.id+' option:eq('+i+')').prop('selected', true);    
+            }
+            i++;
+        }
+        
+        for(i = 0; i < this.modeControls.length; i++) {
+            this.modeControls[i].restorePlan(data);
+        }
+    },
+    
+    controlPadding : "8px",
+    
+    refreshModeControls : function() {
+        var container = $("#"+this.id+'-widgets');
+        container.empty();
+        var mode = _.keys(this.modes)[document.getElementById(this.id).selectedIndex];
+        console.log("refreshing widgets for mode: "+mode);
+        for(var i = 0; i < this.modeControls.length; i++) {
+            var control = this.modeControls[i];
+            if(control.isApplicableForMode(mode)) {
+                container.append($('<div style="height: '+this.controlPadding+';"></div>'));
+                container.append(control.$());
+                control.doAfterLayout();
+            }
+        }
+    },
+    
+    addModeControl : function(widget) {
+        this.modeControls.push(widget);
+    }
+        
+});
+
+
+//** MaxWalkSelector **//
+
+otp.widgets.TW_MaxWalkSelector = 
+    otp.Class(otp.widgets.TripWidgetControl, {
+    
+    id           :  null,
+
+    presets      : [0.1, 0.2, 0.25, 0.3, 0.4, 0.5, 0.75, 1, 2, 3, 4, 5],
+       
+    initialize : function(tripWidget) {
+        otp.widgets.TripWidgetControl.prototype.initialize.apply(this, arguments);
+        this.id = tripWidget.id+"-maxWalkSelector";
+        
+        var html = '<div class="notDraggable">Maximum walk: <input id="'+this.id+'-value" type="text" style="width:30px;" value="0.5" /> mi.&nbsp;';
+        html += '<select id="'+this.id+'-presets"><option>Presets:</option>';
+        for(var i=0; i<this.presets.length; i++) {
+            //html += '<option'+(this.values[i] == .5 ? ' selected' : '')+'>'+this.values[i]+'</option>';            
+            html += '<option>'+this.presets[i]+' mi.</option>';            
+        }
+        html += '</select>';
+        html += "</div>";
+              
+        $(html).appendTo(this.$());
+        //this.setContent(content);
+    },
+
+    doAfterLayout : function() {
+        var this_ = this;
+        $('#'+this.id+'-value').change(function() {
+            this_.tripWidget.module.maxWalkDistance = parseFloat($('#'+this_.id+'-value').val())*1609.34;
+        });
+        
+        $('#'+this.id+'-presets').change(function() {
+            var presetVal = this_.presets[this.selectedIndex-1];
+            $('#'+this_.id+'-value').val(presetVal);    
+
+            var m = presetVal*1609.34;
+            this_.tripWidget.module.maxWalkDistance = m;
+
+            $('#'+this_.id+'-presets option:eq(0)').prop('selected', true);    
+        });
+    },
+
+    restorePlan : function(data) {
+        $('#'+this.id+'-value').val(data.queryParams.maxWalkDistance/1609.34);  
+        this.tripWidget.module.maxWalkDistance = data.queryParams.maxWalkDistance;
+    },
+ 
+    isApplicableForMode : function(mode) {
+        return otp.util.Itin.includesTransit(mode) && otp.util.Itin.includesWalk(mode);
+    }       
+});
+
+
+//** PreferredRoutes **//
+
+otp.widgets.TW_PreferredRoutes = 
+    otp.Class(otp.widgets.TripWidgetControl, {
+    
+    id           :  null,
+    
+    selectorWidget : null,
+       
+    initialize : function(tripWidget) {
+        otp.widgets.TripWidgetControl.prototype.initialize.apply(this, arguments);
+        this.id = tripWidget.id+"-preferredRoutes";
+        
+        var html = '<div class="notDraggable">';
+        var html = '<div style="float:right; font-size: 12px;"><button id="'+this.id+'-button">Edit..</button></div>';
+        html += 'Preferred Routes: <span id="'+this.id+'-list">(None)</span>';
+        html += '<div style="clear:both;"></div></div>';
+        
+        $(html).appendTo(this.$());
+        
+        this.selectorWidget = new otp.widgets.PreferredRoutesSelectorWidget(this.id+"-selectorWidget", this);
+    },
+
+    doAfterLayout : function() {
+        var this_ = this;
+        $('#'+this.id+'-button').button().click(function() {
+            console.log("edit pref rtes");
+            if(this.selectorWidget == null) {
+                
+            }
+            this_.selectorWidget.updateRouteList();
+
+            this_.selectorWidget.show();
+            this_.selectorWidget.bringToFront();
+        });
+    },
+
+    setRoutes : function(paramStr, displayStr) {
+        this.tripWidget.module.preferredRoutes = paramStr;
+        $('#'+this.id+'-list').html(displayStr);
+    },
+    
+    restorePlan : function(planData) {
+        if(planData.queryParams.preferredRoutes) {
+            var this_ = this;
+            this.selectorWidget.restoredRouteIds = planData.queryParams.preferredRoutes;
+            this.tripWidget.module.preferredRoutes = planData.queryParams.preferredRoutes;
+            
+            // resolve the IDs to user-friendly names
+            var url = otp.config.hostname + '/opentripplanner-api-webapp/ws/transit/routes';
+            this.currentRequest = $.ajax(url, {
+                dataType:   'jsonp',
+                    
+                success: function(ajaxData) {
+                    var displayStr = '', count = 0;
+                    var routeIdArr = planData.queryParams.preferredRoutes.split(',');
+                    for(var i = 0; i < ajaxData.routes.length; i++) {
+                        var route = ajaxData.routes[i];
+                        var combinedId = route.id.agencyId+"_"+route.id.id;
+                        if(_.contains(routeIdArr, combinedId)) {
+                            displayStr += (route.routeShortName || route.routeLongName);
+                            if(count < routeIdArr.length-1) displayStr += ", ";
+                            count++;
+                        }
+                    }
+                    $('#'+this_.id+'-list').html(displayStr);
+                }
+            });            
+        }
+    },
+    
+    isApplicableForMode : function(mode) {
+        return otp.util.Itin.includesTransit(mode);
+    }      
+        
+});
+
+
 //** BikeTriangle **//
 
 otp.widgets.TW_BikeTriangle = 
-    otp.Class(otp.widgets.TripWidgetPanel, {
+    otp.Class(otp.widgets.TripWidgetControl, {
     
     id           :  null,
     bikeTriangle :  null,
        
     initialize : function(tripWidget) {
-        otp.widgets.TripWidgetPanel.prototype.initialize.apply(this, arguments);
+        otp.widgets.TripWidgetControl.prototype.initialize.apply(this, arguments);
         this.id = tripWidget.id+"-bikeTriangle";
         
         var content = '';
@@ -343,12 +424,12 @@ otp.widgets.TW_BikeTriangle =
 //** BikeType **//
 
 otp.widgets.TW_BikeType = 
-    otp.Class(otp.widgets.TripWidgetPanel, {
+    otp.Class(otp.widgets.TripWidgetControl, {
 
     id           :  null,
        
     initialize : function(tripWidget) {
-        otp.widgets.TripWidgetPanel.prototype.initialize.apply(this, arguments);
+        otp.widgets.TripWidgetControl.prototype.initialize.apply(this, arguments);
         this.id = tripWidget.id+"-bikeType";
 
         var content = '';        
@@ -390,12 +471,12 @@ otp.widgets.TW_BikeType =
 //** TripSummary **//
 
 otp.widgets.TW_TripSummary = 
-    otp.Class(otp.widgets.TripWidgetPanel, {
+    otp.Class(otp.widgets.TripWidgetControl, {
        
     id  : null,
     
     initialize : function(tripWidget) {
-        otp.widgets.TripWidgetPanel.prototype.initialize.apply(this, arguments);
+        otp.widgets.TripWidgetControl.prototype.initialize.apply(this, arguments);
         this.id = tripWidget.id+"-tripSummary";
         
                 
@@ -449,10 +530,10 @@ otp.widgets.TW_TripSummary =
 //** AddThis **//
 
 otp.widgets.TW_AddThis = 
-    otp.Class(otp.widgets.TripWidgetPanel, {
+    otp.Class(otp.widgets.TripWidgetControl, {
        
     initialize : function(tripWidget) {
-        otp.widgets.TripWidgetPanel.prototype.initialize.apply(this, arguments);
+        otp.widgets.TripWidgetControl.prototype.initialize.apply(this, arguments);
         
         var content = '';
         content += '<h6 id="share-route-header">Share this Trip:</h6>';
@@ -480,10 +561,10 @@ otp.widgets.TW_AddThis =
 //** Submit **//
 
 otp.widgets.TW_Submit = 
-    otp.Class(otp.widgets.TripWidgetPanel, {
+    otp.Class(otp.widgets.TripWidgetControl, {
        
     initialize : function(tripWidget) {
-        otp.widgets.TripWidgetPanel.prototype.initialize.apply(this, arguments);
+        otp.widgets.TripWidgetControl.prototype.initialize.apply(this, arguments);
         this.id = tripWidget.id+"-submit";
 
         $('<div class="notDraggable" style="text-align:center;"><button id="'+this.id+'-button">Plan Trip</button></div>').appendTo(this.$());

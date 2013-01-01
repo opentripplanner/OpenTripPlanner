@@ -990,6 +990,30 @@ h6.drag-to-change {
     font-size: .8em;
 }
 
+/* Preferred Routes Selector Widget */
+
+.otp-preferredRoutesSelectorWidget {
+    width: 400px;
+}
+
+.otp-preferredRoutesSelectorWidget-buttonRow {
+    text-align: center;
+    font-size: 12px;
+    margin-top: 10px;
+}
+
+.otp-preferredRoutesSelectorWidget-list {
+    width: 170px;
+    background:white;
+}
+
+.otp-preferredRoutesSelectorWidget-middle {
+    padding-top: 32px;
+    margin: 0px 180px;
+    text-align:center;
+    font-size:12px;
+}
+
 /*  Call History / Past Queries Widget */
 
 .otp-callHistoryWidget {

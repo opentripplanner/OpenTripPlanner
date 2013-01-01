@@ -47,6 +47,7 @@ otp.modules.planner.PlannerModule =
     arriveBy                : false,
     mode                    : "TRANSIT,WALK",
     maxWalkDistance         : 804.672, // 1/2 mi.
+    preferredRoutes         : null,
     optimize                : null,
     triangleTimeFactor      : 0.333,
     triangleSlopeFactor     : 0.333,
@@ -216,6 +217,7 @@ otp.modules.planner.PlannerModule =
                 maxWalkDistance: this.maxWalkDistance
             };
             if(this.arriveBy !== null) _.extend(queryParams, { arriveBy : this.arriveBy } );
+            if(this.preferredRoutes !== null) _.extend(queryParams, { preferredRoutes : this.preferredRoutes } );
             if(this.optimize !== null) _.extend(queryParams, { optimize : this.optimize } );
             if(this.optimize === 'TRIANGLE') {
                 _.extend(queryParams, {

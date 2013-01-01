@@ -39,23 +39,21 @@ otp.modules.multimodal.MultimodalPlannerModule =
         this.optionsWidget.minimizable = true;
         this.optionsWidget.addHeader("Trip Options");
         
-        this.optionsWidget.addPanel("time", new otp.widgets.TW_TimeSelector(this.optionsWidget));
+        this.optionsWidget.addControl("time", new otp.widgets.TW_TimeSelector(this.optionsWidget));
         this.optionsWidget.addVerticalSpace(12);
         
         
         var modeSelector = new otp.widgets.TW_ModeSelector(this.optionsWidget);
-        this.optionsWidget.addPanel("mode", modeSelector);
+        this.optionsWidget.addControl("mode", modeSelector);
 
-        modeSelector.addModeWidget(new otp.widgets.TW_MaxWalkSelector(this.optionsWidget));
-        modeSelector.addModeWidget(new otp.widgets.TW_BikeTriangle(this.optionsWidget));
+        modeSelector.addModeControl(new otp.widgets.TW_MaxWalkSelector(this.optionsWidget));
+        modeSelector.addModeControl(new otp.widgets.TW_BikeTriangle(this.optionsWidget));
+        modeSelector.addModeControl(new otp.widgets.TW_PreferredRoutes(this.optionsWidget));
 
-        modeSelector.refreshModeWidgets();        
-        //this.optionsWidget.addVerticalSpace(12);
-        //this.optionsWidget.addPanel("triangle", new otp.widgets.TW_BikeTriangle(this.optionsWidget));
-        //this.optionsWidget.addVerticalSpace(12);
-        //this.optionsWidget.addPanel("maxWalk", new otp.widgets.TW_MaxWalkSelector(this.optionsWidget));
+        modeSelector.refreshModeControls();
+
         this.optionsWidget.addSeparator();
-        this.optionsWidget.addPanel("submit", new otp.widgets.TW_Submit(this.optionsWidget));
+        this.optionsWidget.addControl("submit", new otp.widgets.TW_Submit(this.optionsWidget));
         
     },
     

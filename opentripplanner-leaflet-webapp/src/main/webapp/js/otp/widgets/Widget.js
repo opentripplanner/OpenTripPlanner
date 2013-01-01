@@ -108,6 +108,12 @@ otp.widgets.Widget = otp.Class({
         this.$().css("zIndex", backIndex-1);
     },
     
+    center : function() {
+        var left = $(window).width()/2 - this.$().width()/2;
+        var top = $(window).height()/2 - this.$().height()/2;
+        
+        this.$().offset({ top : top, left: left });
+    },
     
     close : function() {
         console.log("close");
