@@ -22,6 +22,8 @@ import java.util.List;
 
 import lombok.Setter;
 
+import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.ThreadedBidirectionalHeuristic;
 import org.opentripplanner.routing.automata.DFA;
 import org.opentripplanner.routing.automata.Nonterminal;
@@ -75,15 +77,20 @@ public class SimplifiedPathServiceImpl implements PathService {
         options.setMaxWalkDistance(Double.MAX_VALUE);
         LOG.debug("rreq={}", options);
         
-        // always use the threaded heuristic
-        ThreadedBidirectionalHeuristic heuristic = 
-                new ThreadedBidirectionalHeuristic(options.rctx.graph);
+        // only use the threaded bidi heuristic for transit
+        RemainingWeightHeuristic heuristic;
+        if (options.modes.isTransit())
+            heuristic = new ThreadedBidirectionalHeuristic(options.rctx.graph);
+        else {
+            heuristic = new DefaultRemainingWeightHeuristic();
+        }
         options.rctx.remainingWeightHeuristic = heuristic;
         long searchBeginTime = System.currentTimeMillis();
         LOG.debug("BEGIN SEARCH");
         ShortestPathTree spt = sptService.getShortestPathTree(options, timeout);
         LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
-        heuristic.abort();
+        if (heuristic instanceof ThreadedBidirectionalHeuristic)
+            ((ThreadedBidirectionalHeuristic)heuristic).abort();
         
         if (spt == null) { // timeout or other fail
             LOG.warn("SPT was null.");
