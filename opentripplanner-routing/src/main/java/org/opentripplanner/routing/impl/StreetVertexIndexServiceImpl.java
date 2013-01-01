@@ -251,8 +251,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             }
             String closestName = String
                     .format("%s_%s", bestStreet.getName(), coordinate.toString());
-            closestStreet = StreetLocation.createStreetLocation(
-                    graph, closestName, name,
+            closestStreet = StreetLocation.createStreetLocation(graph, closestName, name,
                     bundle.toEdgeList(), nearestPoint, coordinate);
         }
 
