@@ -89,7 +89,10 @@ public class TurnRestrictionTest {
         PlainStreetEdge maple_main3 = edge(maple3, main3, 100.0, false);
         PlainStreetEdge main_broad3 = edge(main3, broad3, 100.0, false);
 
-        // Turn restrictions
+        // Turn restrictions 
+        // - can't turn from 1st onto Main.
+        // - can't turn from 2nd onto Main.
+        // - can't turn from 2nd onto Broad.
         DisallowTurn(maple_main1, main1_2);
         DisallowTurn(maple_main2, main2_3);
         DisallowTurn(main_broad2, broad2_3);
