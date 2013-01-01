@@ -195,9 +195,14 @@ otp.widgets.ItinerariesWidget =
         var itinAccord = $(accordHtml);
         for(var l=0; l<itin.itinData.legs.length; l++) {
             var leg = itin.itinData.legs[l];
-            var headerHtml = "<b>"+leg.mode+"</b>";
+            var headerHtml = "<b>"+otp.util.Itin.modeString(leg.mode).toUpperCase()+"</b>";
             if(leg.mode === "WALK" || leg.mode === "BICYCLE") headerHtml += " "+otp.util.Itin.distanceString(leg.distance)+ " to "+leg.to.name;
-            else if(leg.agencyId !== null) headerHtml += ": "+leg.agencyId+", ("+leg.route+") "+leg.routeLongName;
+            else if(leg.agencyId !== null) {
+                headerHtml += ": "+leg.agencyId+", ";
+                if(leg.route !== leg.routeLongName) headerHtml += "("+leg.route+") ";
+                headerHtml += leg.routeLongName;
+                if(leg.headsign) headerHtml +=  " toward " + leg.headsign;
+            }
             $("<h3>"+headerHtml+"</h3>").appendTo(itinAccord).hover(function(evt) {
                 var arr = evt.target.id.split('-');
                 var index = parseInt(arr[arr.length-1]);

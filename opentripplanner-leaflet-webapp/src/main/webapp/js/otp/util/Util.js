@@ -94,6 +94,18 @@ otp.util.Itin = {
         return Math.round(ft/528)/10+" miles";
     },
     
+    modeStrings : {
+        'BUS' : 'Bus',
+        'SUBWAY' : 'Subway',
+        'TRAM' : 'Light Rail',
+        'GONDOLA' : 'Aerial Tram',
+    },
+    
+    modeString : function(mode) {
+        if(mode in this.modeStrings) return this.modeStrings[mode];
+        return mode;
+    },
+    
     getLegStepText : function(step) {
         var text = '';
         if(step.relativeDirection == "CIRCLE_COUNTERCLOCKWISE" || step.relativeDirection == "CIRCLE_CLOCKWISE") {
