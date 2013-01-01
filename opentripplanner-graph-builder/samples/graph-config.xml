@@ -34,7 +34,10 @@
     </bean>
 
     <bean id="floatingIslands" class="org.opentripplanner.graph_builder.impl.PruneFloatingIslands">
-        <property name="maxIslandSize" value="5"/>
+        <property name="maxIslandSize" value="1000 "/>
+        <property name="islandLogFile" value="{graphPath}/island.csv"/>
+        <property name="islandWithStopMaxSize" value="20"/>
+        <property name="transitToStreetNetwork" ref ="transitStreetLink"/>
     </bean>
 
     <bean id="transitStreetLink" class="org.opentripplanner.graph_builder.impl.TransitToStreetNetworkGraphBuilderImpl" />
@@ -47,9 +50,11 @@
                 <!-- GTFS comes before OSM, because we use the loaded set of stops to determine our OSM coverage -->
                 <ref bean="gtfsBuilder" />
                 <ref bean="osmBuilder" />
+                <!-- the transmit link should became before the floating islands in order to find islands with stops-->
                 <ref bean="transitStreetLink" />
-                <ref bean="optimizeTransit" />
                 <ref bean="floatingIslands" />
+                <ref bean="optimizeTransit" />
+
             </list>
         </property>
     </bean>
