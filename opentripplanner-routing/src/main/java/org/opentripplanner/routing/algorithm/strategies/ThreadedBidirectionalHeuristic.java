@@ -93,6 +93,8 @@ public class ThreadedBidirectionalHeuristic implements RemainingWeightHeuristic 
             // all valid street vertices should be explored before the main search starts
             if (v instanceof StreetVertex)
                 return h;
+            if (v instanceof StreetLocation) // temp locations might not be found in walk search
+                return 0;
             // but many transit vertices may not yet be explored when the search starts
             else
                 return Double.isInfinite(h) ? maxFound : h;
@@ -214,8 +216,9 @@ public class ThreadedBidirectionalHeuristic implements RemainingWeightHeuristic 
             
             if (!fromTarget) // only save distances on reverse search
                 w = 0;
-            if (weights[vi] > w)
-                weights[vi] = w;
+            if (vi < weights.length)
+                if (weights[vi] > w)
+                    weights[vi] = w;
             //LOG.debug("{} at v={}", w, v);
             
             if (v instanceof TransitStop) {
