@@ -774,6 +774,14 @@ h6.drag-to-change {
     margin-bottom: .5em;
 }
 
+.otp-itinAlertRow {
+    background: #C00000;
+    color: white;
+    padding: 3px;
+    font-size: .8em;
+    margin-bottom: .5em;
+}
+
 .otp-itinEndRow {
     margin-top: .5em;
 }

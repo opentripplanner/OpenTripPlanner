@@ -51,12 +51,19 @@ otp.widgets.ItinerariesWidget =
         
         if(this.refreshActiveOnly == true) {
             var newItin = tripPlan.itineraries[0];
+            var oldItin = this.itineraries[this.activeIndex];
+            //console.log("uI: "+oldItin.itinData.startTime+" to "+newItin.itinData.startTime);
+            //console.log(oldItin);
+            var alerts = null;
+            if(newItin.differentServiceDayFrom(oldItin)) {
+                alerts = [ "This itinerary departs on a different day from the previous one"];
+            }
             this.itineraries[this.activeIndex] = newItin;
             var itinHeader = $('#'+divId+'-headerContent-'+this.activeIndex);
             itinHeader.html(this.headerContent(newItin, this.activeIndex));
             var itinContainer = $('#'+divId+'-'+this.activeIndex);
             itinContainer.empty();
-            this.renderItinerary(newItin, this.activeIndex).appendTo(itinContainer);
+            this.renderItinerary(newItin, this.activeIndex, alerts).appendTo(itinContainer);
             this.refreshActiveOnly = false;
             return;
         }            
@@ -188,7 +195,7 @@ otp.widgets.ItinerariesWidget =
     municoderResultId : 0,
     
     // returns jQuery object
-    renderItinerary : function(itin, i) {
+    renderItinerary : function(itin, i, alerts) {
         var this_ = this;
 
         // render legs
@@ -232,7 +239,17 @@ otp.widgets.ItinerariesWidget =
 
         var itinDiv = $("<div></div>");
 
-        // add start and end time rows        
+        // add alerts, if applicable
+        alerts = alerts || [];
+        if(itin.totalWalk > itin.tripPlan.queryParams.maxWalkDistance && itin.tripPlan.queryParams.maxWalkDistance > 804) {
+            alerts.push("Total walk distance for this trip exceeds specified maximum");
+        }
+        
+        for(var i = 0; i < alerts.length; i++) {
+            itinDiv.append("<div class='otp-itinAlertRow'>"+alerts[i]+"</div>");
+        }
+        
+        // add start and end time rows and the main leg accordian display 
         itinDiv.append("<div class='otp-itinStartRow'><b>Start</b>: "+itin.getStartTimeStr()+"</div>");
         itinDiv.append(itinAccord);
         itinDiv.append("<div class='otp-itinEndRow'><b>End</b>: "+itin.getEndTimeStr()+"</div>");

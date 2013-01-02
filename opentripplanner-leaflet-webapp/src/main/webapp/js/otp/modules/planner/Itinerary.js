@@ -23,6 +23,7 @@ otp.modules.planner.Itinerary = otp.Class({
     stopTimesMap     : null,
 
     hasTransit  : false,
+    totalWalk : 0,
         
     initialize : function(itinData, tripPlan) {
         this.itinData = itinData;
@@ -38,6 +39,7 @@ otp.modules.planner.Itinerary = otp.Class({
                 this.firstStopIDs.push(leg.from.stopId);
                 this.runStopTimesQuery(leg.from.stopId, leg.routeId, leg.startTime);
             }
+            if(leg.mode === "WALK") this.totalWalk += leg.distance;
         }
     },
     
@@ -118,6 +120,13 @@ otp.modules.planner.Itinerary = otp.Class({
         }
         if(itinIndex) paramStr += appendChar+"itinIndex="+itinIndex;
         return paramStr;
+    },
+    
+    differentServiceDayFrom : function(itin, offsetHrs) {
+        offsetHrs = offsetHrs || 4; // default to 4 hrs; i.e. use 4am as breakpoint between days
+        var time1 = moment(this.itinData.startTime).add("hours", otp.config.timeOffset-offsetHrs).format('D');
+        var time2 = moment(itin.itinData.startTime).add("hours", otp.config.timeOffset-offsetHrs).format('D');
+        return time1 !== time2;
     }
     
 });
