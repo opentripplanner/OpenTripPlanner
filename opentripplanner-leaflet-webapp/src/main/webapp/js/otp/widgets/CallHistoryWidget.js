@@ -60,7 +60,7 @@ otp.widgets.CallHistoryWidget =
 
         this.callListView = new otp.widgets.CallListView(this.id+'-callList', this.module);
 
-        var queryListContainer = $("<div class='otp-callHistory-queryListContainer'>Queries for Call X:</div>").appendTo(this.$());
+        var queryListContainer = $("<div class='otp-callHistory-queryListContainer'>Queries for selected call:</div>").appendTo(this.$());
         this.queryList = $("<div id='"+this.id+"-queryList' class='otp-callHistory-queryList notDraggable'></div>").appendTo(queryListContainer);
 
         this.queryListView = new otp.widgets.QueryListView(this.id+'-queryList', this.module);
