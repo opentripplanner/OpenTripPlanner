@@ -185,6 +185,8 @@ otp.widgets.ItinerariesWidget =
         return html;
     },
     
+    municoderResultId : 0,
+    
     // returns jQuery object
     renderItinerary : function(itin, i) {
         var this_ = this;
@@ -196,7 +198,12 @@ otp.widgets.ItinerariesWidget =
         for(var l=0; l<itin.itinData.legs.length; l++) {
             var leg = itin.itinData.legs[l];
             var headerHtml = "<b>"+otp.util.Itin.modeString(leg.mode).toUpperCase()+"</b>";
-            if(leg.mode === "WALK" || leg.mode === "BICYCLE") headerHtml += " "+otp.util.Itin.distanceString(leg.distance)+ " to "+leg.to.name;
+            if(leg.mode === "WALK" || leg.mode === "BICYCLE") {
+                headerHtml += " "+otp.util.Itin.distanceString(leg.distance)+ " to "+leg.to.name;
+                
+                var spanId = this.newMunicoderRequest(leg.to.lat, leg.to.lon);
+                headerHtml += '<span id="'+spanId+'"></span>';
+            }
             else if(leg.agencyId !== null) {
                 headerHtml += ": "+leg.agencyId+", ";
                 if(leg.route !== leg.routeLongName) headerHtml += "("+leg.route+") ";
@@ -257,7 +264,8 @@ otp.widgets.ItinerariesWidget =
 
             $('<div class="otp-itin-leg-leftcol">'+otp.util.Time.formatItinTime(leg.startTime, "h:mma")+"</div>").appendTo(legDiv);
 
-            $('<div class="otp-itin-leg-endpointDesc"><b>Board</b> at '+leg.from.name+'</div>')
+            var spanId = this.newMunicoderRequest(leg.from.lat, leg.from.lon);
+            $('<div class="otp-itin-leg-endpointDesc"><b>Board</b> at '+leg.from.name+'<span id="'+spanId+'"></span></div>')
             .appendTo(legDiv)
             .click(function(evt) {
                 this_.module.webapp.map.lmap.panTo(new L.LatLng(leg.from.lat, leg.from.lon));
@@ -332,7 +340,8 @@ otp.widgets.ItinerariesWidget =
 
             $('<div class="otp-itin-leg-leftcol">'+otp.util.Time.formatItinTime(leg.endTime, "h:mma")+"</div>").appendTo(legDiv);           
 
-            $('<div class="otp-itin-leg-endpointDesc"><b>Alight</b> at '+leg.to.name+'</div>')
+            spanId = this.newMunicoderRequest(leg.to.lat, leg.to.lon);
+            $('<div class="otp-itin-leg-endpointDesc"><b>Alight</b> at '+leg.to.name+'<span id="'+spanId+'"></span></div>')
             .appendTo(legDiv)
             .click(function(evt) {
                 this_.module.webapp.map.lmap.panTo(new L.LatLng(leg.to.lat, leg.to.lon));
@@ -393,6 +402,25 @@ otp.widgets.ItinerariesWidget =
             return legDiv;                        
         }
         return $("<div>Leg details go here</div>");
+    },
+    
+    newMunicoderRequest : function(lat, lon) {
+    
+        this.municoderResultId++;
+        var spanId = 'otp-municoderResult-'+this.municoderResultId;
+        
+        $.ajax(otp.config.municoderHostname+"/opentripplanner-municoder/municoder", {
+        
+            data : { location : lat+","+lon },           
+            dataType:   'jsonp',
+                
+            success: function(data) {
+                if(data.name) {
+                    $('#'+spanId).html(", "+data.name);
+                }
+            }
+        });
+        return spanId;
     }
     
 });

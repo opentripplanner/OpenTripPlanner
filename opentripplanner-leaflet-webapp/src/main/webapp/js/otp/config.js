@@ -25,6 +25,7 @@ otp.config = {
     //hostname : "http://otpna-c.deployer.opentripplanner.org",
     //routerId : "req-1028",
     hostname : "http://localhost:8080",
+    municoderHostname : "http://localhost:8080",
         
     baseLayers: [
         {
