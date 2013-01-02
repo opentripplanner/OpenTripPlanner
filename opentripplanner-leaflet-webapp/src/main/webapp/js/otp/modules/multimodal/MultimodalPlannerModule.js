@@ -39,12 +39,12 @@ otp.modules.multimodal.MultimodalPlannerModule =
         this.optionsWidget.minimizable = true;
         this.optionsWidget.addHeader("Trip Options");
         
-        this.optionsWidget.addControl("time", new otp.widgets.TW_TimeSelector(this.optionsWidget));
-        this.optionsWidget.addVerticalSpace(12);
+        this.optionsWidget.addControl("time", new otp.widgets.TW_TimeSelector(this.optionsWidget), true);
+        this.optionsWidget.addVerticalSpace(12, true);
         
         
         var modeSelector = new otp.widgets.TW_ModeSelector(this.optionsWidget);
-        this.optionsWidget.addControl("mode", modeSelector);
+        this.optionsWidget.addControl("mode", modeSelector, true);
 
         modeSelector.addModeControl(new otp.widgets.TW_MaxWalkSelector(this.optionsWidget));
         modeSelector.addModeControl(new otp.widgets.TW_BikeTriangle(this.optionsWidget));

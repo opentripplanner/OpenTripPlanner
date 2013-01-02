@@ -20,7 +20,9 @@ otp.widgets.TripWidget =
     //planTripCallback : null,
     controls : null,
     module : null,
-        
+
+    scrollPanel : null,
+            
     initialize : function(id, module) {
     
         otp.widgets.Widget.prototype.initialize.call(this, id, module.webapp.widgetManager);
@@ -32,19 +34,48 @@ otp.widgets.TripWidget =
         this.controls = { };       
     },
 
-    addControl : function(id, control) {
-        control.$().appendTo(this.$());
+    addControl : function(id, control, scrollable) {
+    
+        if(scrollable) {
+            if(this.scrollPanel == null) this.initScrollPanel();
+            control.$().appendTo(this.scrollPanel);
+        }
+        else {
+            control.$().appendTo(this.$());
+        }
         //$("<hr />").appendTo(this.$());
         control.doAfterLayout();
         this.controls[id] = control;
     },
     
-    addSeparator : function() {
-        $("<hr />").appendTo(this.$());
+    initScrollPanel : function() {
+        this.scrollPanel = $('<div style="overflow: auto;"></div>').appendTo(this.$());
+        this.$().resizable({
+            minHeight: 80,
+            alsoResize: this.scrollPanel
+        });
     },
     
-    addVerticalSpace : function(pixels) {
-        $('<div style="height: '+pixels+'px;"></div>').appendTo(this.$());
+    addSeparator : function(scrollable) {
+        var hr = $("<hr />")
+        if(scrollable) {
+            if(this.scrollPanel == null) this.initScrollPanel();
+            hr.appendTo(this.scrollPanel);
+        }
+        else {
+            hr.appendTo(this.$());
+        }
+    },
+    
+    addVerticalSpace : function(pixels, scrollable) {
+        var vSpace = $('<div style="height: '+pixels+'px;"></div>');
+        if(scrollable) {
+            if(this.scrollPanel == null) this.initScrollPanel();
+            vSpace.appendTo(this.scrollPanel);
+        }
+        else {
+            vSpace.appendTo(this.$());
+        }
     },
 
     restorePlan : function(data) {
