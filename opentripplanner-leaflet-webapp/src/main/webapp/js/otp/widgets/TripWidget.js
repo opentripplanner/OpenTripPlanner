@@ -49,7 +49,7 @@ otp.widgets.TripWidget =
     },
     
     initScrollPanel : function() {
-        this.scrollPanel = $('<div style="overflow: auto;"></div>').appendTo(this.$());
+        this.scrollPanel = $('<div id="'+this.id+'-scollPanel" style="overflow: auto;"></div>').appendTo(this.$());
         this.$().resizable({
             minHeight: 80,
             alsoResize: this.scrollPanel
@@ -208,13 +208,14 @@ otp.widgets.TW_ModeSelector =
                      "TRANSIT,BICYCLE" : "Bicycle &amp; Transit" 
                    },
     
-    optionLookup : { },
-
-    modeControls : [ ],
+    optionLookup : null,
+    modeControls : null,
            
     initialize : function(tripWidget) {
         otp.widgets.TripWidgetControl.prototype.initialize.apply(this, arguments);
         this.id = tripWidget.id+"-modeSelector";
+        this.modeControls = [];
+        this.optionLookup = {};
         
         var html = "<div class='notDraggable'>Travel by: ";
         html += '<select id="'+this.id+'">';

@@ -119,10 +119,11 @@ otp.core.Webapp = otp.Class({
 
         // set up some modules (TODO: generalize using config file)
         
-        this.addModule(new otp.modules.annotations.AnnotationsModule(this), false);
-        this.addModule(new otp.modules.bikeshare.BikeShareModule(this), false);
+        //this.addModule(new otp.modules.annotations.AnnotationsModule(this), false);
+        //this.addModule(new otp.modules.bikeshare.BikeShareModule(this), false);
         this.addModule(new otp.modules.calltaker.CallTakerModule(this), true);
-
+        this.addModule(new otp.modules.fieldtrip.FieldTripModule(this), false);
+        
 
         // create the module selector
         
@@ -158,7 +159,7 @@ otp.core.Webapp = otp.Class({
     },
     
     setActiveModule : function(module) {
-        //console.log("set active module: "+module.moduleName);
+        console.log("set active module: "+module.moduleName);
         if(this.activeModule != null) {
             this.activeModule.deactivate();
             
@@ -170,6 +171,7 @@ otp.core.Webapp = otp.Class({
         $('#otp_toptitle').html(module.moduleName);
         
         for(var i = 0; i < module.widgets.length; i++) {
+            console.log(" - showing widget: "+module.widgets[i].id);
             module.widgets[i].show();
         }
         

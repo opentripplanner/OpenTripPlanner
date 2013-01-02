@@ -51,11 +51,11 @@ otp.modules.calltaker.CallTakerModule =
         
     },
     
-    activate : function() {
-    
+    activate : function() {    
+        if(this.activated) return;
         otp.modules.multimodal.MultimodalPlannerModule.prototype.activate.apply(this);
-        
-        this.tipWidget.$().css('display','none');
+        console.log("activate ctm");        
+        //this.tipWidget.$().css('display','none');
 
         this.callHistoryWidget = new otp.widgets.CallHistoryWidget(this.moduleId+"-callHistoryWidget", this);
         this.widgets.push(this.callHistoryWidget);

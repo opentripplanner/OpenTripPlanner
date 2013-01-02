@@ -658,9 +658,11 @@ body {
 
 .otp-defaultTripWidget {
   width: auto;
-  left: 0.5em;
+  /*left: 0.5em;
   bottom: auto;
-  top: 3em;
+  top: 3em;*/
+  bottom: 10px;
+  left: 10px;
   padding: 0.25em 0.5em;
   z-index: 1100;
 }
@@ -672,9 +674,10 @@ body {
 @media only screen and (min-width: 768px) {
   .otp-defaultTripWidget {
     width: 240px;
-    top: auto;
+    /*top: auto;
     left: 20px;
-    bottom: 100px;
+    bottom: 100px;*/
+    
     padding: 10px;
   }
 
@@ -689,10 +692,15 @@ h6.drag-to-change {
   display: none;
 }
 
-#otp-calltaker-optionsWidget {
+/*#otp-fieldtrip-optionsWidget {
     bottom: 10px;
     left: 10px;
 }
+
+#otp-calltaker-optionsWidget {
+    bottom: 10px;
+    left: 10px;
+}*/
 
 /* Date/Time Picker */
 

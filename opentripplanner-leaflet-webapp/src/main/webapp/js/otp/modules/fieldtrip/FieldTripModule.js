@@ -12,14 +12,14 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 */
 
-otp.namespace("otp.modules.multimodal");
+otp.namespace("otp.modules.fieldtrip");
 
 
-otp.modules.multimodal.MultimodalPlannerModule = 
+otp.modules.fieldtrip.FieldTripModule = 
     otp.Class(otp.modules.planner.PlannerModule, {
 
-    moduleName  : "Multimodal Trip Planner",
-    moduleId    : "multimodal",
+    moduleName  : "Field Trip Planner",
+    moduleId    : "fieldtrip",
     
     itinWidget  : null,
     
@@ -50,8 +50,8 @@ otp.modules.multimodal.MultimodalPlannerModule =
         this.optionsWidget.addControl("mode", modeSelector, true);
 
         modeSelector.addModeControl(new otp.widgets.TW_MaxWalkSelector(this.optionsWidget));
-        modeSelector.addModeControl(new otp.widgets.TW_BikeTriangle(this.optionsWidget));
-        modeSelector.addModeControl(new otp.widgets.TW_PreferredRoutes(this.optionsWidget));
+        //modeSelector.addModeControl(new otp.widgets.TW_BikeTriangle(this.optionsWidget));
+        //modeSelector.addModeControl(new otp.widgets.TW_PreferredRoutes(this.optionsWidget));
 
         modeSelector.refreshModeControls();
 
@@ -69,19 +69,19 @@ otp.modules.multimodal.MultimodalPlannerModule =
             this.itinWidget = new otp.widgets.ItinerariesWidget(this.moduleId+"-itinWidget", this);
             this.widgets.push(this.itinWidget);
         }
-        if(restoring && this.restoredItinIndex) {
+        /*if(restoring && this.restoredItinIndex) {
             this.itinWidget.updateItineraries(tripPlan, this.restoredItinIndex);
             this.restoredItinIndex = null;
         } else  {
             this.itinWidget.updateItineraries(tripPlan);
-        }
+        }*/
+        this.itinWidget.updateItineraries(tripPlan);
         this.itinWidget.show();
         
-        if(restoring) {
+        /*if(restoring) {
             this.optionsWidget.restorePlan(tripPlan);
-        }
+        }*/
         this.drawItinerary(tripPlan.itineraries[0]);
     },
     
-    CLASS_NAME : "otp.modules.multimodal.MultimodalPlannerModule"
 });

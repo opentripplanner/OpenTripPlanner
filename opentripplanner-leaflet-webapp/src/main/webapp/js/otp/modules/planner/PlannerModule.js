@@ -80,8 +80,8 @@ otp.modules.planner.PlannerModule =
         this.addLayer("Paths", this.pathLayer);
         this.addLayer("Path Markers", this.pathMarkerLayer);
         
-        // set up primary widgets
-        this.tipWidget = this.createWidget("otp-tipWidget", "", this);
+        // set up primary widgets (TODO: move to bike planner module)
+        /*this.tipWidget = this.createWidget("otp-tipWidget", "", this);
         this.addWidget(this.tipWidget);
         this.updateTipStep(1);
         
@@ -89,8 +89,8 @@ otp.modules.planner.PlannerModule =
         this.addWidget(this.bikestationsWidget);
 
         this.noTripWidget = new otp.widgets.Widget('otp-noTripWidget', this);
-        this.addWidget(this.noTripWidget);
-        //this.noTripWidget.hide();
+        this.addWidget(this.noTripWidget);*/
+
 
         // set up map planner-specific map context menu items
         this.webapp.map.addContextMenuItem("Set as Start Location", function(latlng) {
@@ -105,6 +105,9 @@ otp.modules.planner.PlannerModule =
             if("itinIndex" in this.webapp.urlParams) this.restoredItinIndex = this.webapp.urlParams["itinIndex"];
             this.restoreTrip(_.omit(this.webapp.urlParams, "itinIndex"));
         }
+        
+        this.activated = true;
+        
     },
     
 
@@ -180,7 +183,7 @@ otp.modules.planner.PlannerModule =
     
         if(typeof this.planTripStart == 'function') this.planTripStart();
         
-        this.noTripWidget.hide();
+        //this.noTripWidget.hide();
     	
     	if(this.currentRequest !== null)
         {
@@ -258,9 +261,9 @@ otp.modules.planner.PlannerModule =
                     
                 }
                 else {
-                    this_.noTripFound();
-                    this_.noTripWidget.setContent(data.error.msg);
-                    this_.noTripWidget.show();
+                    this_.noTripFound(data.error);
+                    //this_.noTripWidget.setContent(data.error.msg);
+                    //this_.noTripWidget.show();
                 }
             }
         });
@@ -274,7 +277,7 @@ otp.modules.planner.PlannerModule =
     processPlan : function(tripPlan, restoring) {
     },
     
-    noTripFound : function() {
+    noTripFound : function(error) {
     },
     
     drawItinerary : function(itin) {
@@ -433,13 +436,13 @@ otp.modules.planner.PlannerModule =
         return Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2));
     },
     
-    updateTipStep : function(step) {
-        if (step <= this.tipStep) return;
+    updateTipStep : function(step) { // TODO: factor out to widget class
+        /*if (step <= this.tipStep) return;
         if(step == 1) this.tipWidget.setContent("To Start: Click on the Map to Plan a Trip.");
         if(step == 2) this.tipWidget.setContent("Next: Click Again to Add Your Trip's End Point.");
         if(step == 3) this.tipWidget.setContent("Tip: Drag the Start or End Flags to Modify Your Trip.");
         
-        this.tipStep = step;
+        this.tipStep = step;*/
     },
     
     CLASS_NAME : "otp.modules.planner.PlannerModule"

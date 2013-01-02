@@ -93,9 +93,9 @@ otp.widgets.Widget = otp.Class({
     },
 
     unminimize : function(tab) {
+        this.minimized = false;
         this.show();
         this.minimizedTab.hide();
-        this.minimized = false;
     },
     
     bringToFront : function() {
@@ -124,11 +124,13 @@ otp.widgets.Widget = otp.Class({
     },
     
     show : function() {
-        $(this.div).fadeIn();//show();
+        if(this.minimized) this.minimizedTab.show();
+        else $(this.div).fadeIn();//show();
     },
 
     hide : function() {
-        $(this.div).fadeOut();//hide();
+        if(this.minimized) this.minimizedTab.hide();
+        else $(this.div).fadeOut();//hide();
     },
     
     $ : function() {
