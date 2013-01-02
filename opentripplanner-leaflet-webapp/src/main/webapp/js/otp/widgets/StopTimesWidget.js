@@ -17,35 +17,19 @@ otp.namespace("otp.widgets");
 otp.widgets.StopTimesWidget = 
     otp.Class(otp.widgets.Widget, {
 
-    initialize : function(id, stopID, routeName, stopTimes, highlightTime, module) {
+    initialize : function(id, widgetManager) {
     
-        otp.widgets.Widget.prototype.initialize.call(this, id, module);
+        otp.widgets.Widget.prototype.initialize.call(this, id, widgetManager);
         this.$().addClass('otp-stopTimesWidget');
+        this.$().css('display','none');
         
-        $('<div><b>Route</b>: '+routeName+'</div>').appendTo(this.$());
-        $('<div><b>Stop</b>: '+stopID+'</div>').appendTo(this.$());
+        this.routeLabel = $('<div></div>').appendTo(this.$());
+        this.stopLabel = $('<div></div>').appendTo(this.$());
         
-        var timesDiv = $('<div class="otp-stopTimes-list notDraggable"></div>');
-        var highlightIndex = 0;
-        for(var i=0; i<stopTimes.length; i++) {
-            var html = '<div class="otp-stopTimes-list-item">';
-            if(stopTimes[i] == highlightTime) html += "<b>";
-            html += otp.util.Time.formatItinTime(stopTimes[i], "h:mma")
-            html += '</div>';
-            if(stopTimes[i] == highlightTime) html += "</b>";
-            $(html).appendTo(timesDiv);
-            if(stopTimes[i] == highlightTime) highlightIndex = i;
-        }
-        timesDiv.appendTo(this.$());
-        console.log("scr h="+timesDiv[0].scrollHeight);
-        console.log(timesDiv[0]);
-        console.log("pct="+highlightIndex/stopTimes.length);
-        var scrollY = timesDiv[0].scrollHeight*highlightIndex/stopTimes.length
-        if(highlightIndex>0) scrollY = scrollY - timesDiv.height()/2 + 10;
-        timesDiv.scrollTop(scrollY);
+        this.timesDiv = $('<div class="otp-stopTimes-list notDraggable"></div>').appendTo(this.$());
         
         this.$().resizable({
-            alsoResize: timesDiv,
+            alsoResize: this.timesDiv,
         });
 
         var this_ = this;
@@ -55,6 +39,31 @@ otp.widgets.StopTimesWidget =
             this_.$().hide();
         });
         
+    },
+    
+    update : function(stopID, routeName, stopTimes, highlightTime) {
+        this.routeLabel.html('<b>Route</b>: '+routeName);
+        this.stopLabel.html('<b>Stop</b>: '+stopID);
+
+        this.timesDiv.empty();
+        var highlightIndex = 0;
+        for(var i=0; i<stopTimes.length; i++) {
+            var html = '<div class="otp-stopTimes-list-item">';
+            if(stopTimes[i] == highlightTime) html += "<b>";
+            html += otp.util.Time.formatItinTime(stopTimes[i], "h:mma")
+            html += '</div>';
+            if(stopTimes[i] == highlightTime) html += "</b>";
+            $(html).appendTo(this.timesDiv);
+            if(stopTimes[i] == highlightTime) highlightIndex = i;
+        }
+
+        console.log("scr h="+this.timesDiv[0].scrollHeight);
+        console.log(this.timesDiv[0]);
+        console.log("pct="+highlightIndex/stopTimes.length);
+
+        var scrollY = this.timesDiv[0].scrollHeight*highlightIndex/stopTimes.length
+        if(highlightIndex>0) scrollY = scrollY - this.timesDiv.height()/2 + 10;
+        this.timesDiv.scrollTop(scrollY);
     }
     
 });

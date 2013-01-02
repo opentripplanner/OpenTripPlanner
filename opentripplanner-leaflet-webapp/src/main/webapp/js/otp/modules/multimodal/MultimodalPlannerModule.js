@@ -25,6 +25,8 @@ otp.modules.multimodal.MultimodalPlannerModule =
     
     showIntermediateStops : false,
     
+    stopsWidget: false,
+    
     initialize : function(webapp) {
         otp.modules.planner.PlannerModule.prototype.initialize.apply(this, arguments);
     },
@@ -54,7 +56,7 @@ otp.modules.multimodal.MultimodalPlannerModule =
 
         this.optionsWidget.addSeparator();
         this.optionsWidget.addControl("submit", new otp.widgets.TW_Submit(this.optionsWidget));
-        
+
     },
     
     getExtendedQueryParams : function() {

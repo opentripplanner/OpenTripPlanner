@@ -283,9 +283,15 @@ otp.widgets.ItinerariesWidget =
                 var stopID = leg.from.stopId.id;
                 var times = this_.activeItin().stopTimesMap[stopID];
                 console.log(evt);
-                var stopsWidget = new otp.widgets.StopTimesWidget(this_.id+"-stopWidget-"+stopID, stopID, leg.routeShortName, times, leg.startTime);
-                stopsWidget.$().offset({top: evt.clientY, left: evt.clientX});
-                this_.module.addWidget(stopsWidget);
+                //var stopsWidget = new otp.widgets.StopTimesWidget(this_.id+"-stopWidget-"+stopID, this_.widgetManager);
+                if(!this_.module.stopsWidget) {
+                    this_.module.stopsWidget = new otp.widgets.StopTimesWidget("otp-"+this.moduleId+"-stopsWidget", this_.widgetManager);
+                    this_.module.stopsWidget.$().offset({top: evt.clientY, left: evt.clientX});
+                }
+                this_.module.stopsWidget.show();
+                this_.module.stopsWidget.update(stopID, (leg.routeShortName || leg.routeLongName), times, leg.startTime);
+                this_.module.stopsWidget.bringToFront();
+                //this_.widgetManager.addWidget(stopsWidget);
             });
 
             $('<div class="otp-itin-leg-buffer"></div>').appendTo(legDiv);            
