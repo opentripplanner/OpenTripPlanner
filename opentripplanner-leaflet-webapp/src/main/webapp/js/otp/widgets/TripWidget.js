@@ -283,7 +283,7 @@ otp.widgets.TW_MaxWalkSelector =
     
     id           :  null,
 
-    presets      : [0.1, 0.2, 0.25, 0.3, 0.4, 0.5, 0.75, 1, 2, 3, 4, 5],
+    presets      : [0.1, 0.2, 0.25, 0.3, 0.4, 0.5, 0.75, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5],
        
     initialize : function(tripWidget) {
         otp.widgets.TripWidgetControl.prototype.initialize.apply(this, arguments);
