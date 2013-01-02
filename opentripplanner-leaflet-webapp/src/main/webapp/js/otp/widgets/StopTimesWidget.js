@@ -57,10 +57,6 @@ otp.widgets.StopTimesWidget =
             if(stopTimes[i] == highlightTime) highlightIndex = i;
         }
 
-        console.log("scr h="+this.timesDiv[0].scrollHeight);
-        console.log(this.timesDiv[0]);
-        console.log("pct="+highlightIndex/stopTimes.length);
-
         var scrollY = this.timesDiv[0].scrollHeight*highlightIndex/stopTimes.length
         if(highlightIndex>0) scrollY = scrollY - this.timesDiv.height()/2 + 10;
         this.timesDiv.scrollTop(scrollY);
