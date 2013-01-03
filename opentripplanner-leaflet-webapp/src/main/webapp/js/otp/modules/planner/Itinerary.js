@@ -127,6 +127,46 @@ otp.modules.planner.Itinerary = otp.Class({
         var time1 = moment(this.itinData.startTime).add("hours", otp.config.timeOffset-offsetHrs).format('D');
         var time2 = moment(itin.itinData.startTime).add("hours", otp.config.timeOffset-offsetHrs).format('D');
         return time1 !== time2;
+    },
+    
+    getTripSegments : function() {
+        var segments = [];
+        for(var l=0; l<this.itinData.legs.length; l++) {
+            var leg = this.itinData.legs[l];
+            if(otp.util.Itin.isTransit(leg.mode)) {
+                var tripString = leg.agencyId + "_"+leg.tripId + ":";
+                if(leg.from.stopIndex !== null) tripString += leg.from.stopIndex + ":";
+                if(leg.intermediateStops) {
+                    for(var s = 0; s < leg.intermediateStops.length; s++) {
+                        if(s == 0 && leg.from.stopIndex == null) { // temp workaround for apparent backend bug
+                            tripString += (leg.intermediateStops[s].stopIndex-1) + ":";
+                        }
+                        tripString += leg.intermediateStops[s].stopIndex+':';
+                    }
+                }
+                tripString += leg.to.stopIndex;
+                //console.log("leg "+l+": "+tripString);
+                segments.push(tripString);
+            } 
+        }
+        return segments;
+    },
+    
+    getGroupTripCapacity : function() {
+        var capacity = 100000;
+        for(var l=0; l<this.itinData.legs.length; l++) {
+            var leg = this.itinData.legs[l];
+            if(otp.util.Itin.isTransit(leg.mode)) {
+                capacity = Math.min(capacity, this.getModeCapacity(leg.mode));
+            }
+        }
+        return capacity;
+    },
+    
+    getModeCapacity : function(mode) {
+        if(mode === "SUBWAY" || mode === "TRAM") return 80;
+        if(mode === "BUS") return 40;
+        return 0;
     }
     
 });

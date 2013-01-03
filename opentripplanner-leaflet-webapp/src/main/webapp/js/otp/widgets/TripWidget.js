@@ -608,7 +608,41 @@ otp.widgets.TW_Submit =
         var this_ = this;
         $('#'+this.id+'-button').button().click(function() {
             //this_.tripWidget.pushSettingsToModule();
+            if(typeof this_.tripWidget.module.userPlanTripStart == 'function') this_.tripWidget.module.userPlanTripStart();
             this_.tripWidget.module.planTrip();
         });
     }
+});
+
+//** Group Trip **//
+
+otp.widgets.TW_GroupTripOptions = 
+    otp.Class(otp.widgets.TripWidgetControl, {
+
+       
+    initialize : function(tripWidget, label) {
+        otp.widgets.TripWidgetControl.prototype.initialize.apply(this, arguments);
+        this.id = tripWidget.id+"-groupTripOptions";
+        
+        label = label || "Group size: ";
+        var html = '<div class="notDraggable">'+label+'<input id="'+this.id+'-value" type="text" style="width:30px;" value="100" />';
+        html += "</div>";
+              
+        $(html).appendTo(this.$());
+    },
+
+    doAfterLayout : function() {
+        var this_ = this;
+        $('#'+this.id+'-value').change(function() {
+            console.log("new groupSize");
+            this_.tripWidget.module.groupSize = parseInt($('#'+this_.id+'-value').val());
+        });
+    },
+
+    restorePlan : function(data) {
+    },
+ 
+    isApplicableForMode : function(mode) {
+        return otp.util.Itin.includesTransit(mode);
+    }       
 });

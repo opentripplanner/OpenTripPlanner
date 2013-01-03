@@ -778,6 +778,14 @@ h6.drag-to-change {
     padding-top:.45em
 }
 
+.otp-itinsAccord-header-groupSize {
+    float: left;
+    height: 1.2em;
+    margin-left: .8em;
+    padding-top:.45em;
+    font-weight: bold;
+}
+
 .otp-itinStartRow {
     margin-bottom: .5em;
 }

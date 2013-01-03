@@ -48,6 +48,7 @@ otp.modules.planner.PlannerModule =
     mode                    : "TRANSIT,WALK",
     maxWalkDistance         : 804.672, // 1/2 mi.
     preferredRoutes         : null,
+    bannedTrips             : null,
     optimize                : null,
     triangleTimeFactor      : 0.333,
     triangleSlopeFactor     : 0.333,
@@ -131,6 +132,7 @@ otp.modules.planner.PlannerModule =
             this.startMarker.on('dragend', function() {
                 this_.webapp.hideSplash();
                 this_.startLatLng = this_.startMarker.getLatLng();
+                if(typeof this_.userPlanTripStart == 'function') this_.userPlanTripStart();
                 this_.planTrip();
             });
             this.markerLayer.addLayer(this.startMarker);
@@ -141,7 +143,10 @@ otp.modules.planner.PlannerModule =
         
         if(update) {
             this.updateTipStep(2);
-            if(this.endLatLng) this.planTrip(); 
+            if(this.endLatLng) {
+                if(typeof this.userPlanTripStart == 'function') this.userPlanTripStart();
+                this.planTrip(); 
+            }
         }
     },
     
@@ -154,6 +159,7 @@ otp.modules.planner.PlannerModule =
             this.endMarker.on('dragend', function() {
                 this_.webapp.hideSplash();
                 this_.endLatLng = this_.endMarker.getLatLng();
+                if(typeof this_.userPlanTripStart == 'function') this_.userPlanTripStart();
                 this_.planTrip();
             });
             this.markerLayer.addLayer(this.endMarker);
@@ -163,7 +169,10 @@ otp.modules.planner.PlannerModule =
         }
                  
         if(update) {
-            if(this.startLatLng) this.planTrip();
+            if(this.startLatLng) {
+                if(typeof this.userPlanTripStart == 'function') this.userPlanTripStart();
+                this.planTrip();
+            }
         }
     },
     
@@ -221,6 +230,7 @@ otp.modules.planner.PlannerModule =
             };
             if(this.arriveBy !== null) _.extend(queryParams, { arriveBy : this.arriveBy } );
             if(this.preferredRoutes !== null) _.extend(queryParams, { preferredRoutes : this.preferredRoutes } );
+            if(this.bannedTrips !== null) _.extend(queryParams, { bannedTrips : this.bannedTrips } );
             if(this.optimize !== null) _.extend(queryParams, { optimize : this.optimize } );
             if(this.optimize === 'TRIANGLE') {
                 _.extend(queryParams, {
@@ -359,6 +369,7 @@ otp.modules.planner.PlannerModule =
     },
     
     highlightLeg : function(leg) {
+        if(!leg.legGeometry) return;
         var polyline = new L.Polyline(otp.util.Polyline.decode(leg.legGeometry.points));
         polyline.setStyle({ color : "yellow", weight: 16, opacity: 0.3 });
         this.highlightLayer.addLayer(polyline);

@@ -42,7 +42,7 @@ otp.widgets.ItinerariesWidget =
         return this.itineraries[this.activeIndex];
     },
     
-    updateItineraries : function(tripPlan, itinIndex) {
+    updateItineraries : function(itineraries, queryParams, itinIndex) {
         
         var this_ = this;
         var divId = this.id+"-itinsAccord";
@@ -50,7 +50,7 @@ otp.widgets.ItinerariesWidget =
         if(this.minimized) this.unminimize();
         
         if(this.refreshActiveOnly == true) {
-            var newItin = tripPlan.itineraries[0];
+            var newItin = itineraries[0];
             var oldItin = this.itineraries[this.activeIndex];
             //console.log("uI: "+oldItin.itinData.startTime+" to "+newItin.itinData.startTime);
             //console.log(oldItin);
@@ -67,7 +67,7 @@ otp.widgets.ItinerariesWidget =
             this.refreshActiveOnly = false;
             return;
         }            
-        this.itineraries = tripPlan.itineraries;
+        this.itineraries = itineraries;
         //this.header.html(this.itineraries.length+" Itineraries Returned:");
         this.setTitle(this.itineraries.length+" Itineraries Returned:");
         
@@ -80,7 +80,7 @@ otp.widgets.ItinerariesWidget =
         var html = "<div id='"+divId+"' class='otp-itinsAccord'></div>";
         this.itinsAccord = $(html).appendTo(this.$());
         
-        if(tripPlan.queryParams.mode !== "WALK" && tripPlan.queryParams.mode !== "BICYCLE") {
+        if(queryParams.mode !== "WALK" && queryParams.mode !== "BICYCLE") {
             this.appendFooter();
         }
         
@@ -186,7 +186,10 @@ otp.widgets.ItinerariesWidget =
         
         // show trip duration
         html += '<div class="otp-itinsAccord-header-duration">('+itin.getDurationStr()+')</div>';
-        
+    
+        if(itin.groupSize) {
+            html += '<div class="otp-itinsAccord-header-groupSize">[Group size: '+itin.groupSize+']</div>';
+        }    
         // clear div
         html += '<div style="clear:both;"></div>';
         return html;

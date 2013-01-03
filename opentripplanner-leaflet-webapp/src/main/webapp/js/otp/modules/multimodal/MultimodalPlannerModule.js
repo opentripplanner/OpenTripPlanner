@@ -70,10 +70,10 @@ otp.modules.multimodal.MultimodalPlannerModule =
             this.widgets.push(this.itinWidget);
         }
         if(restoring && this.restoredItinIndex) {
-            this.itinWidget.updateItineraries(tripPlan, this.restoredItinIndex);
+            this.itinWidget.updateItineraries(tripPlan.itineraries, tripPlan.queryParams, this.restoredItinIndex);
             this.restoredItinIndex = null;
         } else  {
-            this.itinWidget.updateItineraries(tripPlan);
+            this.itinWidget.updateItineraries(tripPlan.itineraries, tripPlan.queryParams);
         }
         this.itinWidget.show();
         

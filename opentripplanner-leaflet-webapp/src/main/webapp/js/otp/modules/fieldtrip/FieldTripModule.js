@@ -23,7 +23,11 @@ otp.modules.fieldtrip.FieldTripModule =
     
     itinWidget  : null,
     
-    showIntermediateStops : false,
+    groupSize   : 100,
+    bannedSegments : null,
+    itineraries : null,
+    
+    showIntermediateStops : true,
     
     stopsWidget: false,
     
@@ -50,6 +54,7 @@ otp.modules.fieldtrip.FieldTripModule =
         this.optionsWidget.addControl("mode", modeSelector, true);
 
         modeSelector.addModeControl(new otp.widgets.TW_MaxWalkSelector(this.optionsWidget));
+        modeSelector.addModeControl(new otp.widgets.TW_GroupTripOptions(this.optionsWidget, "Number of Students: "));
         //modeSelector.addModeControl(new otp.widgets.TW_BikeTriangle(this.optionsWidget));
         //modeSelector.addModeControl(new otp.widgets.TW_PreferredRoutes(this.optionsWidget));
 
@@ -63,7 +68,14 @@ otp.modules.fieldtrip.FieldTripModule =
     getExtendedQueryParams : function() {
         return { showIntermediateStops : this.showIntermediateStops };
     },
-            
+    
+    userPlanTripStart : function() {
+        console.log("uPTS");
+        this.currentGroupSize = this.groupSize;
+        this.bannedSegments = [];
+        this.itineraries = [];
+    },
+    
     processPlan : function(tripPlan, restoring) {
         if(this.itinWidget == null) {
             this.itinWidget = new otp.widgets.ItinerariesWidget(this.moduleId+"-itinWidget", this);
@@ -75,13 +87,42 @@ otp.modules.fieldtrip.FieldTripModule =
         } else  {
             this.itinWidget.updateItineraries(tripPlan);
         }*/
-        this.itinWidget.updateItineraries(tripPlan);
-        this.itinWidget.show();
+        //this.itinWidget.updateItineraries(tripPlan);
+        //this.itinWidget.show();
         
         /*if(restoring) {
             this.optionsWidget.restorePlan(tripPlan);
         }*/
-        this.drawItinerary(tripPlan.itineraries[0]);
+        //this.drawItinerary(tripPlan.itineraries[0]);
+        
+        //var itin = new otp.modules.planner.Itinerary(tripPlan.itineraries[0], tripPlan);
+        var itin = tripPlan.itineraries[0];
+        var capacity = itin.getGroupTripCapacity();
+        console.log("cur grp size:"+this.currentGroupSize+", cap="+capacity);
+        
+        this.itineraries.push(itin);
+        
+        var segments = itin.getTripSegments();
+        this.bannedSegments = this.bannedSegments.concat(segments);
+        console.log(this.bannedSegments.join(','));
+        this.bannedTrips = this.bannedSegments.join(',');     
+        
+        
+        if(this.currentGroupSize > capacity) {
+            this.currentGroupSize -= capacity;
+            itin.groupSize = capacity;
+            console.log("remaining: "+this.currentGroupSize);
+            this.planTrip();
+        }
+        else {
+            console.log("done!");
+            itin.groupSize = this.currentGroupSize;
+            this.drawItinerary(this.itineraries[0]);
+            this.itinWidget.updateItineraries(this.itineraries, tripPlan.queryParams);
+            this.itinWidget.show();
+            this.itinWidget.bringToFront();
+        }
+        
     },
     
 });
