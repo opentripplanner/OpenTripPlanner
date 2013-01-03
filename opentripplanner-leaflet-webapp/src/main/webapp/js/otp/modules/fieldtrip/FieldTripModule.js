@@ -27,6 +27,9 @@ otp.modules.fieldtrip.FieldTripModule =
     bannedSegments : null,
     itineraries : null,
     
+    userName : "admin",
+    password : "secret",
+    
     showIntermediateStops : true,
     
     stopsWidget: false,
@@ -62,6 +65,10 @@ otp.modules.fieldtrip.FieldTripModule =
 
         this.optionsWidget.addSeparator();
         this.optionsWidget.addControl("submit", new otp.widgets.TW_Submit(this.optionsWidget));
+
+
+        this.fieldTripWidget = new otp.widgets.FieldTripWidget('otp-'+this.moduleId+'-fieldTripWidget', this);
+
 
     },
     
