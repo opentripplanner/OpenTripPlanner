@@ -1,0 +1,43 @@
+/* Field Trip Widget */
+
+.otp-fieldTripManager {
+  bottom: 20px;
+  right: 10px;
+}
+
+.otp-fieldTripManager-callListContainer {
+    background: white;
+    border: 1px solid black;
+    width: 200px;
+    float: left;
+    margin-right: 10px;
+}
+
+.otp-fieldTripManager-callListHeader {
+    padding: 4px;
+    line-height: 18px;
+    height: 42px;
+    background: #ddd;
+}
+
+.otp-fieldTripManager-callList {
+    overflow: auto;
+    height: 200px;
+}
+
+.otp-fieldTripManager-callInfo {
+    padding: 4px;
+    height: 244px;
+    background: #fff;
+    overflow: auto;
+    width: 200px;
+}
+
+.otp-fieldTrip-buttonRow {
+    padding: 10px 0px 5px 0px;
+    text-align: center;
+}
+
+.otp-saveFieldTripWidget {
+}
+

@@ -172,8 +172,12 @@ otp.widgets.TW_TimeSelector =
             timeFormat: "hh:mmtt", 
             onSelect: function(dateTime) {
                 var dateTimeArr = dateTime.split(' ');
+                //vare date = 
                 this_.tripWidget.module.date = dateTimeArr[0];
                 this_.tripWidget.module.time = dateTimeArr[1];
+                console.log(dateTime);
+                this_.epoch = 1000*moment(dateTime, "MM/DD/YYYY hh:mma").unix();
+                console.log(this_.epoch);
             }
         });
         $('#'+this.id+'-picker').datepicker("setDate", new Date());

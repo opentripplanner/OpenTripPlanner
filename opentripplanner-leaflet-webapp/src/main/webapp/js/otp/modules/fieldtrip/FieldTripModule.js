@@ -49,7 +49,8 @@ otp.modules.fieldtrip.FieldTripModule =
         this.optionsWidget.minimizable = true;
         this.optionsWidget.addHeader("Trip Options");
         
-        this.optionsWidget.addControl("time", new otp.widgets.TW_TimeSelector(this.optionsWidget), true);
+        this.optionsWidget.addControl("timeleaving", new otp.widgets.TW_TimeSelector(this.optionsWidget), true);
+        this.optionsWidget.addControl("timereturning", new otp.widgets.TW_TimeSelector(this.optionsWidget), true);
         this.optionsWidget.addVerticalSpace(12, true);
         
         
@@ -67,7 +68,7 @@ otp.modules.fieldtrip.FieldTripModule =
         this.optionsWidget.addControl("submit", new otp.widgets.TW_Submit(this.optionsWidget));
 
 
-        this.fieldTripWidget = new otp.widgets.FieldTripWidget('otp-'+this.moduleId+'-fieldTripWidget', this);
+        this.fieldTripWidget = new otp.modules.fieldtrip.FieldTripManagerWidget('otp-'+this.moduleId+'-fieldTripWidget', this);
 
 
     },
@@ -132,4 +133,47 @@ otp.modules.fieldtrip.FieldTripModule =
         
     },
     
+    showSaveWidget : function() {
+        new otp.modules.fieldtrip.SaveFieldTripWidget('otp-'+this.moduleId+'-saveFieldTripWidget', this);
+    },
+    
+    saveTrip : function(desc) {
+        console.log("saving trip: "+desc);
+        console.log();
+        /*
+        var data = {
+            userName : this.userName,
+            password : this.password,
+            trip.origin : this.this.startLatLng,
+            trip.destination : this.this.endLatLng,
+            trip.description : desc,
+            trip.createdBy : this.userName,
+            trip.passengers : this.groupSize,            
+            trip.departure : moment().format("YYYY-MM-DDTHH:mm:ss")
+        };
+        
+        console.log(data);
+        $.ajax(otp.config.loggerURL+'/fieldTrip/newTrip', {
+            type: 'POST',
+            
+            data: data,
+                
+            success: function(data) {
+                console.log("success saving trip");
+                //console.log(data);
+                //model.id = data;
+                //if(successCallback) successCallback.call(this, model);
+            },
+            
+            error: function(data) {
+                console.log("error saving trip");
+            }
+        });*/
+        
+        
+                
+    }
+    
+    
+
 });

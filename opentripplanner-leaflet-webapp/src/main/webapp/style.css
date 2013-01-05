@@ -1140,41 +1140,6 @@ h6.drag-to-change {
 }
 
 
-/* Field Trip Widget */
-
-/*  Call History / Past Queries Widget */
-
-.otp-fieldTripWidget {
-  bottom: 20px;
-  right: 10px;
-}
-
-.otp-fieldTrip-callListContainer {
-    background: white;
-    border: 1px solid black;
-    padding: 4px;
-    height: 250px;
-    width: 200px;
-    float: left;
-    margin-right: 10px;
-}
-
-.otp-fieldTrip-callListHeader {
-}
-
-.otp-fieldTrip-callList {
-    overflow: auto;
-}
-
-.otp-fieldTrip-callInfo {
-    padding: 4px;
-    height: 252px;
-    background: #ddd;
-    overflow: auto;
-    width: 200px;
-}
-
-
 /*ul.otp-stats {
   list-style: none;
   margin: 0;
