@@ -31,6 +31,8 @@ import org.slf4j.*;
 
 public class PruneFloatingIslands implements GraphBuilder {
 
+    private static org.slf4j.Logger _log = LoggerFactory.getLogger(PruneFloatingIslands.class);
+
     @Setter
     private int maxIslandSize = 40;
 
@@ -48,18 +50,22 @@ public class PruneFloatingIslands implements GraphBuilder {
     }
 
     public List<String> getPrerequisites() {
+//        return Arrays.asList("streets","linking");
         return Arrays.asList("streets");
     }
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
-        if(graph.getService(StreetVertexIndexService.class) == null) {
-            //TODO:log and throw error
-        }
+        _log.warn("Pruning isolated islands ...");
         StreetUtils.pruneFloatingIslands(graph, maxIslandSize, islandWithStopMaxSize,
                 LoggerAppenderProvider.createCsvFile4LoggerCat(islandLogFile, "islands"));
-        //reconnect stops on small islands (that removed)
-        transitToStreetNetwork.buildGraph(graph,extra);
+        if(transitToStreetNetwork == null){
+            _log.warn("Could not reconnect stop, TransitToStreetNetworkGraphBuilder was not provided");
+        }else{
+            //reconnect stops on small islands (that removed)
+            transitToStreetNetwork.buildGraph(graph,extra);
+        }
+        _log.warn("Done pruning isolated islands");
     }
 
     @Override
