@@ -31,8 +31,6 @@ import org.slf4j.*;
 
 public class PruneFloatingIslands implements GraphBuilder {
 
-    private static org.slf4j.Logger _log = LoggerFactory.getLogger(PruneFloatingIslands.class);
-
     @Setter
     private int maxIslandSize = 40;
 
@@ -58,7 +56,8 @@ public class PruneFloatingIslands implements GraphBuilder {
         if(graph.getService(StreetVertexIndexService.class) == null) {
             //TODO:log and throw error
         }
-        StreetUtils.pruneFloatingIslands(graph, maxIslandSize, islandWithStopMaxSize, createLogger());
+        StreetUtils.pruneFloatingIslands(graph, maxIslandSize, islandWithStopMaxSize,
+                LoggerAppenderProvider.createCsvFile4LoggerCat(islandLogFile, "islands"));
         //reconnect stops on small islands (that removed)
         transitToStreetNetwork.buildGraph(graph,extra);
     }
@@ -66,19 +65,6 @@ public class PruneFloatingIslands implements GraphBuilder {
     @Override
     public void checkInputs() {
         //no inputs
-    }
-
-    private String createLogger() {
-        if (islandLogFile.isEmpty()) return null;
-        try{
-            PatternLayout layout =  new PatternLayout("%m\n");
-            FileAppender appender = new RollingFileAppender(layout, islandLogFile, false);
-            Logger.getLogger("islands").addAppender(appender);
-        }catch (IOException ioe){
-            _log.warn("could not create file appender for " + islandLogFile + " duo to: " + ioe.getMessage());
-            return null;
-        }
-        return "islands";
     }
 
 }
