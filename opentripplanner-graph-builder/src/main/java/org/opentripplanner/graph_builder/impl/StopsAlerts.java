@@ -35,22 +35,18 @@ public class StopsAlerts implements GraphBuilder {
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
-//        if(graph.getService(StreetVertexIndexService.class) == null) {
-//            //TODO:check if necessary and throw expansion
-//            throw new RuntimeException("could not find Street Vertex Index Service");
-//        }
         Logger stopsLog = LoggerFactory.getLogger(LoggerAppenderProvider.createCsvFile4LoggerCat(logFile,"stops"));
-        stopsLog.info(String.format("%s,%s,%s","lon","lat","types"));
+        stopsLog.info(String.format("%s,%s,%s,%s","stopId","lon","lat","types"));
         for (TransitStop ts : IterableLibrary.filter(graph.getVertices(), TransitStop.class)) {
             StringBuilder types = new StringBuilder();
             for(IStopTester stopTester:stopTesters){
                 if(stopTester.fulfillDemands(ts,graph)){
-                    if(types.length() > 0) types.append(",");
+                    if(types.length() > 0) types.append(";");
                     types.append(stopTester.getType());
                 }
             }
             if(types.length() > 0) {
-                stopsLog.info(String.format("%f,%f,%s",ts.getCoordinate().x,ts.getCoordinate().y,types.toString()));
+                stopsLog.info(String.format("%s,%f,%f,%s",ts.getIndex() ,ts.getCoordinate().x,ts.getCoordinate().y,types.toString()));
             }
         }
     }
