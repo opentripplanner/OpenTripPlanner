@@ -15,10 +15,7 @@ package org.opentripplanner.common;
 
 import java.util.*;
 
-import com.vividsolutions.jts.algorithm.ConvexHull;
-import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import org.opentripplanner.common.geometry.Subgraph;
 import org.opentripplanner.gbannotation.GraphConnectivity;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -32,11 +29,8 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.services.StreetVertexIndexService;
-import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
-import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,8 +41,6 @@ public class StreetUtils {
 
     public static void pruneFloatingIslands(Graph graph, int maxIslandSize, int islandWithStopMaxSize, String islandLogName) {
         _log.debug("pruning");
-
-        StreetVertexIndexService streetVertexIndex = graph.getService(StreetVertexIndexService.class);
 
         Logger islandLog = null;
         if(islandLogName != null){
