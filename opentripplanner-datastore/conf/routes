@@ -16,6 +16,7 @@ DELETE  /callQuery                              Calltaker.deleteQuery
 
 #Field trip
 GET     /fieldTrip                              FieldTrip.index
+GET     /fieldTrip/getTrips                     FieldTrip.getFieldTrips
 GET     /fieldTrip/calendar                     FieldTrip.getCalendar
 POST    /fieldTrip/newTrip                      FieldTrip.newTrip
 POST    /fieldTrip/addItinerary                 FieldTrip.addItinerary

@@ -1,23 +1,35 @@
 package models;
  
+import com.google.gson.annotations.Expose;
 import java.util.Date;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.persistence.*;
+import play.data.binding.As;
 
 import play.db.jpa.*;
  
 @Entity
-public class ScheduledFieldTrip extends Model {
+public class ScheduledFieldTrip extends GenericModel {
  
+    //@Expose
+    ////public long idCopy
+            
+    @Id
+    @GeneratedValue
+    @Expose
+    public Long id;
+    
     /** The username of the user who created this trip */
     @Column(nullable=false)
+    @Expose
     public String createdBy;
 
     /** When the trip was created */
     @Column(nullable=false)
+    @Expose
     public Date timeStamp;
 
     @PrePersist
@@ -33,21 +45,26 @@ public class ScheduledFieldTrip extends Model {
     */
     @Temporal(TemporalType.TIME)
     @Column(nullable=false)
+    @As("yyyy-MM-dd'T'HH:mm:ss")
+    @Expose
     public Date departure;
 
     /** Service day for the trip (service days are defined in local time, and it
         is assumed that all trips for a given field trip happen on the same service day) */
     @Temporal(TemporalType.DATE)
     @Column(nullable=false)
+    @Expose
     public Date serviceDay;
 
     /**
        The origin/destination of the trip in OTP format (lat,lon::name)
      */
+    @Expose
     public String origin, destination;
 
     /** A description of the trip ("Morx Elementary school 3rd grade trip to zoo") 
      */
+    @Expose
     public String description;
 
 
@@ -60,15 +77,18 @@ public class ScheduledFieldTrip extends Model {
     public String teacher;
 
     @Column(nullable=false)
+    @Expose
     public boolean mailed = false;
 
     /** The number of passengers on the trip.  A trip is not complete
         unless passengers == sum(passengers) over all group itineraries
      */
+    @Expose
     public int passengers;
 
     /** The itineraries for this trip */
     @OneToMany(mappedBy="fieldTrip", cascade=CascadeType.ALL)
+    @Expose
     public List<GroupItinerary> groupItineraries;
     
 
@@ -86,6 +106,7 @@ public class ScheduledFieldTrip extends Model {
 
     public ScheduledFieldTrip(String createdBy, Date departure, String origin, String destination, 
                      String description, int passengers) {
+      
         this.createdBy = createdBy;
         //fixme: not quite sure that this is safe
         this.departure = departure;

@@ -2,7 +2,8 @@ package models;
  
 import java.util.List;
 import javax.persistence.*;
- 
+
+import com.google.gson.annotations.Expose;
 import play.db.jpa.*;
  
 /**
@@ -17,8 +18,15 @@ public class GroupItinerary extends Model {
 
     /** How many passengers are on this set of trips */
     @Column(nullable=false)
+    @Expose
     public int passengers;
 
     @OneToMany(mappedBy="groupItinerary", cascade=CascadeType.ALL)
+    //@OneToMany(cascade=CascadeType.ALL)
+    @Expose
     public List<GroupTrip> trips;
+    
+    public GroupItinerary(int passengers) {
+        this.passengers = passengers;
+    }
 }
