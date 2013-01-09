@@ -34,17 +34,163 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**  
+ * Analyst 8-bit tile format:
+ * Seconds are converted to minutes.
+ * Minutes are clamped to +-120
+ * Unreachable pixels are set to Byte.MIN_VALUE (-128)
+ * Result is stored in image pixel as a signed byte.
+ * 
+ * So:
+ *  -119 to +119 are interpreted literally,
+ *  +120 means >= +120,
+ *  -120 means <= -120,
+ *  -128 means "unreachable".
+ */
 public abstract class Tile {
 
     /* STATIC */
     private static final Logger LOG = LoggerFactory.getLogger(Tile.class);
+
+    /**
+     *  Creates an interpolated 8-bit color map from the supplied array of color values.
+     *  Each row in the input array is a 5-element array consisting of:
+     *  colorIndex, red, green, blue, alpha
+     *  Color indexes must be in increasing order. Negative indexes will be stored as signed
+     *  bytes, so -1 is 0xFF etc. 
+     */
+    private static IndexColorModel interpolatedColorMap(int[][] breaks) {
+        byte[][] vals = new byte[4][256];
+        int[] br0 = null;
+        for (int[] br1 : breaks) {
+            if (br0 != null) {
+                int i0 = br0[0];
+                int i1 = br1[0];
+                int steps = i1 - i0;
+                for (int channel = 0; channel < 4; ++channel) {
+                    int v0 = br0[channel+1];
+                    int v1 = br1[channel+1];
+                    float delta = (v1 - v0) / (float) steps;
+                    for (int i = 0; i < steps; i++) {
+                        int v = v0 + (int)(delta * i);
+                        // handle negative indexes
+                        int byte_i = 0x000000FF & (i0 + i);
+                        vals[channel][byte_i] = (byte)v;
+                    }
+                }
+            }
+            br0 = br1;
+        }
+        return new IndexColorModel(8, 256, vals[0], vals[1], vals[2], vals[3]);        
+    }
+
+    /*
+     * Pixels are travel times in minutes, stored as signed bytes. This allows us to represent
+     * times and time differences with absolute values up to 2 hours.
+     */
+    private static final IndexColorModel ICM_SMOOTH_COLOR_15 = interpolatedColorMap( new int[][] { 
+        {0,     0,   0,   0,  0},  
+        {15,  100, 100, 100, 80},  
+        {30,    0, 200,   0, 80},  
+        {45,    0,   0, 200, 80},
+        {60,  200, 200,   0, 80},
+        {75,  200,   0,   0, 80},
+        {90,  200,   0, 200, 50},
+        {120, 200,   0, 200,  0} 
+    }); 
+    
+    private static final IndexColorModel ICM_STEP_COLOR_15 = interpolatedColorMap( new int[][] { 
+        {-128, 100, 100, 100, 200}, // for unreachable places 
+        {0,   100, 100, 100,  0},  
+        {15,  100, 100, 100, 90},  
+        {15,    0, 140,   0, 10},  
+        {30,    0, 140,   0, 90},  
+        {30,    0,   0, 140, 10},  
+        {45,    0,   0, 140, 90},
+        {45,  140, 140,   0, 10},
+        {60,  140, 140,   0, 90},
+        {60,  140,   0,   0, 10},
+        {75,  140,   0,   0, 90},
+        {75,  140,   0, 140, 10},
+        {90,  140,   0, 140, 90},
+        {90,  100, 100, 100, 50},
+        {121, 100, 100, 100, 200} 
+    });
+    
+    private static final IndexColorModel ICM_DIFFERENCE_15 = interpolatedColorMap( new int[][] { 
+        {-128,   0,   0, 0,   0},
+        {-127, 150,   0, 0,  80},
+        {-60,  150,   0, 0,  80},  
+        {-15,  150, 150, 0, 80},
+        {0, 150,  150,   0,  0},
+        {0,    0,   0,   0,  0},
+        {15,   0,   0, 150, 80},
+        {45,   0, 150,   0, 90},
+        {60, 100, 150, 100, 99},
+        {127, 50, 150,  50, 99}
+    });
+
+    // SAMENESS bands (northern lights color scheme)
+    private static final IndexColorModel ICM_SAMENESS_5 = interpolatedColorMap( new int[][] { 
+        {-20,  80,  80,  80,   0},
+        {-15, 100,   0, 100,  80},
+        {-10,   0,   0, 150,  80},  
+        {-5,    0, 150,   0,  80},
+        { 0,    0, 150,   0, 150},
+        { 5,    0, 150,   0,  80},
+        { 10,   0,   0, 150,  80},
+        { 15, 100,   0, 100,  80},
+        { 20,  80,  80,  80,   0},
+        {-20,   0,   0,   0,   0} // wrap around to hide inaccessible areas
+    });
+
+    private static final IndexColorModel ICM_GRAY_60 = interpolatedColorMap( new int[][] { 
+        {-128, 0, 0, 0, 255}, // black out neg/missing/unreachable
+        {   0, 0, 0, 0, 255},
+        {  60, 0, 0, 0,   0},
+        { 120, 0, 0, 0,   0}
+    });
+
+    private static final IndexColorModel ICM_MASK_60 = interpolatedColorMap( new int[][] { 
+        { 0, 0, 0, 0, 255},
+        {60, 0, 0, 0,   0}
+    });
+
+//  int[][] breaks = { 
+//  // break, r, g, b, a
+//  {0,     0, 150,   0, 20},  
+//  {15,    0, 150,   0, 80},  
+//  {20,    0,   0,  50, 80},  
+//  {30,    0,   0, 150, 80},  
+//  {40,   50,  50,   0, 80},  
+//  {60,  150, 150,   0, 80},  
+//  {70,  150,  50,   0, 80},  
+//  {90,  150,   0,   0, 80},  
+//  {255, 150,   0, 150,  0}
+//}; 
+//int[][] breaks = { 
+//      // break, r, g, b, a
+//      {0,   100, 100, 100, 80},  
+//      {15,  100, 100, 100, 80},  
+//      {15,    0, 150,   0, 80},  
+//      {30,    0, 150,   0, 80},  
+//      {30,    0,   0, 150, 80},  
+//      {45,    0,   0, 150, 80},
+//      {45,  150, 150,   0, 80},
+//      {60,  150, 150,   0, 80},
+//      {60,  150,   0,   0, 80},
+//      {75,  150,   0,   0, 80},
+//      {75,    0, 100, 100, 80},
+//      {255,   0, 100, 100,  0}
+//  }; 
+
     public static final Map<Style, IndexColorModel> modelsByStyle; 
     static {
         modelsByStyle = new EnumMap<Style, IndexColorModel>(Style.class);
-        modelsByStyle.put(Style.COLOR30, buildDefaultColorMap());
-        modelsByStyle.put(Style.DIFFERENCE, buildDifferenceColorMap());
-        modelsByStyle.put(Style.TRANSPARENT, buildTransparentColorMap());
-        modelsByStyle.put(Style.MASK, buildMaskColorMap(90));
+        modelsByStyle.put(Style.COLOR30, ICM_STEP_COLOR_15);
+        modelsByStyle.put(Style.DIFFERENCE, ICM_DIFFERENCE_15);
+        modelsByStyle.put(Style.TRANSPARENT, ICM_GRAY_60); 
+        modelsByStyle.put(Style.MASK, ICM_MASK_60);
         modelsByStyle.put(Style.BOARDINGS, buildBoardingColorMap());
     }
     
@@ -62,7 +208,7 @@ public abstract class Tile {
         this.height = gridEnv.height;
     }
     
-    private static IndexColorModel buildDefaultColorMap() {
+    private static IndexColorModel buildOldDefaultColorMap() {
     	Color[] palette = new Color[256];
     	final int ALPHA = 0x60FFFFFF; // ARGB
     	for (int i = 0; i < 28; i++) {
@@ -95,87 +241,7 @@ public abstract class Tile {
         }
         return new IndexColorModel(8, 256, r, g, b, a);
     }
-
-    private static IndexColorModel buildOldDefaultColorMap() {
-        byte[] r = new byte[256];
-        byte[] g = new byte[256];
-        byte[] b = new byte[256];
-        byte[] a = new byte[256];
-        Arrays.fill(a, (byte)0);
-        for (int i=0; i<30; i++) {
-            g[i + 00]  =  // <  30 green 
-            a[i + 00]  =  
-            b[i + 30]  =  // >= 30 blue
-            a[i + 30]  =  
-            g[i + 60]  =  // >= 60 yellow 
-            r[i + 60]  =
-            a[i + 60]  =  
-            r[i + 90]  =  // >= 90 red
-            a[i + 90]  =  
-            b[i + 120] =  // >=120 pink fading to transparent 
-            a[i + 120] =  
-            r[i + 120] = (byte) (255 - (42 - i) * 6);
-        }
-        return new IndexColorModel(8, 256, r, g, b, a);
-    }
     
-    private static IndexColorModel buildDifferenceColorMap() {
-        byte[] r = new byte[256];
-        byte[] g = new byte[256];
-        byte[] b = new byte[256];
-        byte[] a = new byte[256];
-        Arrays.fill(a, (byte) 64);
-        for (int i=0; i<118; i++) {
-            g[117 - i] = (byte) (i * 2);
-            r[137 + i] = (byte) (i * 2);
-            a[117 - i] = (byte) (64+(i * 2));
-            a[137 + i] = (byte) (64+(i * 2));
-            //b[128 + i] = g[128 - i] = (byte)120; 
-        }
-//        for (int i=0; i<10; i++) {
-//            byte v = (byte) (255 - i * 25);
-//            g[127 - i] = v;
-//            g[128 + i] = v;
-//        }
-//        a[255] = 64;
-        return new IndexColorModel(8, 256, r, g, b, a);
-    }
-
-    private static IndexColorModel buildTransparentColorMap() {
-        byte[] r = new byte[256];
-        byte[] g = new byte[256];
-        byte[] b = new byte[256];
-        byte[] a = new byte[256];
-        for (int i=0; i<60; i++) {
-            int alpha = 240 - i * 4;
-            a[i] = (byte) alpha;
-        }
-        for (int i=60; i<255; i++) {
-            a[i] = 0;
-        }
-        a[255] = (byte) 240;
-        return new IndexColorModel(8, 256, r, g, b, a);
-    }
-
-    private static IndexColorModel buildMaskColorMap(int max) {
-        byte[] r = new byte[256];
-        byte[] g = new byte[256];
-        byte[] b = new byte[256];
-        byte[] a = new byte[256];
-        for (int i=0; i<max; i++) {
-            int alpha = (i * 210 / max);
-            a[i] = (byte) alpha;
-        }
-        for (int i=max; i<=255; i++) {
-            a[i] = (byte)210;
-//            r[i] = (byte)255;
-//            g[i] = (byte)128;
-//            b[i] = (byte)128;
-        }
-        //a[255] = (byte) 240;
-        return new IndexColorModel(8, 256, r, g, b, a);
-    }
-
     private static IndexColorModel buildBoardingColorMap() {
         byte[] r = new byte[256];
         byte[] g = new byte[256];
@@ -199,22 +265,33 @@ public abstract class Tile {
             return new BufferedImage(width, height, BufferedImage.TYPE_BYTE_INDEXED, colorModel);
     }
     
+    final byte UNREACHABLE = Byte.MIN_VALUE;
+
     public BufferedImage generateImage(ShortestPathTree spt, RenderRequest renderRequest) {
         long t0 = System.currentTimeMillis();
         BufferedImage image = getEmptyImage(renderRequest.style);
         byte[] imagePixelData = ((DataBufferByte)image.getRaster().getDataBuffer()).getData();
         int i = 0;
-        final byte TRANSPARENT = (byte) 255;
         for (Sample s : getSamples()) {
             byte pixel;
             if (s != null) {
                 if (renderRequest.style == Style.BOARDINGS) {
                     pixel = s.evalBoardings(spt);
                 } else {
-                    pixel = s.evalByte(spt); // renderRequest.style
+                    long t = s.eval(spt); // renderRequest.style
+                    if (t == Long.MAX_VALUE)
+                        pixel = UNREACHABLE;
+                    else {
+                        t /= 60;
+                        if (t < -120)
+                            t = -120;
+                        else if (t > 120)
+                            t = 120;
+                        pixel = (byte) t;
+                    }
                 }
             } else {
-                pixel = TRANSPARENT;
+                pixel = UNREACHABLE;
             }
             imagePixelData[i] = pixel;
             i++;
@@ -232,16 +309,19 @@ public abstract class Tile {
         BufferedImage image = getEmptyImage(renderRequest.style);
         byte[] imagePixelData = ((DataBufferByte)image.getRaster().getDataBuffer()).getData();
         int i = 0;
-        final byte TRANSPARENT = (byte) 255;
         for (Sample s : getSamples()) {
-            byte pixel;
+            byte pixel = UNREACHABLE;
             if (s != null) {
-                double t = (k1 * s.eval(spt1) + k2 * s.eval(spt2)) / 60 + intercept; 
-                if (t < 0 || t > 255)
-                    t = TRANSPARENT;
-                pixel = (byte) t;
-            } else {
-                pixel = TRANSPARENT;
+                long t1 = s.eval(spt1);
+                long t2 = s.eval(spt2);
+                if (t1 != Long.MAX_VALUE && t2 != Long.MAX_VALUE) {
+                    double t = (k1 * t1 + k2 * t2) / 60 + intercept; 
+                    if (t < -120)
+                        t = -120;
+                    else if (t > 120)
+                        t = 120;
+                    pixel = (byte) t;
+                }
             }
             imagePixelData[i] = pixel;
             i++;
