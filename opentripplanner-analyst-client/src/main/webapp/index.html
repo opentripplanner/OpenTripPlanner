@@ -108,6 +108,7 @@
 				</span>
 				<span class="timeEntry">
 					<select id="arriveByB" >
+						<option value="same">Same as Above</option>
 						<option value="true">Arrive by</option>
 						<option value="false">Depart after</option>
 					</select>
@@ -139,6 +140,10 @@
 						<option value="200000">Unlimited</option>
 					</select>
 				</span>
+<!-- 				<span> -->
+<!-- 					<label for="checkBanPurple" class="autoWidth">Ban purple line:</label>  -->
+<!-- 					<input type="checkbox" id="checkBanPurple"> -->
+<!-- 				</span> -->
 			</div> <!-- END endpointBControls -->
 		</form>
 		<form>
@@ -147,12 +152,6 @@
 				* Times must be expressed in ISO8601 combined date/time format: YYYY-MM-DDTHH:MM:SS
 			</p>
 		</form>	
-		<form name="purpleForm">
-			<span>
-				<input type="button" value="Add Purple Line" onclick="purpleOn()" />
-				<input type="button" value="Remove Purple Line" onclick="purpleOff()" />
-			</span>	
-		</form>
 		
 		<img id="legend">
 		<!-- download tool is commented out to avoid over-filling the cache in public use
