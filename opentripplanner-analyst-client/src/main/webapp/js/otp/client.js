@@ -194,7 +194,6 @@ function mapSetupTool() {
 
 	var params = { 
 		batch: true,
-		bannedRoutes: ""
 	};
 
 	// pull search parameters from form
@@ -217,11 +216,19 @@ function mapSetupTool() {
 		params.bannedRoutes = ["Test_Purple", ""];
 		break;
 	}
+	// store one-element arrays so we can append as needed for the second search
 	params.time = [$('#setupTime').val()];
 	params.mode = [$('#setupMode').val()];
 	params.maxWalkDistance = [$('#setupMaxDistance').val()];
 	params.arriveBy = [$('#arriveByA').val()];
-
+	switch($('#compressWaits').val()) {
+		case 'optimize':
+			params.reverseOptimizeOnTheFly = ['true'];
+			break;
+		case 'initial':
+		default:
+			params.clampInitialWait = [$('#timeLenience').val() * 60];
+	}
 	if (flags.twoSearch) {
 		var pushIfDifferent = function (elementId, paramName) {
 			console.log(elementId);
