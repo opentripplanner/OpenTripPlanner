@@ -27,6 +27,8 @@ otp.modules.fieldtrip.FieldTripModule =
     bannedSegments : null,
     itineraries : null,
     
+    datastoreUrl : otp.config.loggerURL,
+    
     userName : "admin",
     password : "secret",
     
@@ -36,6 +38,8 @@ otp.modules.fieldtrip.FieldTripModule =
     
     initialize : function(webapp) {
         otp.modules.planner.PlannerModule.prototype.initialize.apply(this, arguments);
+        
+        this.planTripFunction = this.ftPlanTrip;
     },
 
     activate : function() {
@@ -49,8 +53,7 @@ otp.modules.fieldtrip.FieldTripModule =
         this.optionsWidget.minimizable = true;
         this.optionsWidget.addHeader("Trip Options");
         
-        this.optionsWidget.addControl("timeleaving", new otp.widgets.TW_TimeSelector(this.optionsWidget), true);
-        this.optionsWidget.addControl("timereturning", new otp.widgets.TW_TimeSelector(this.optionsWidget), true);
+        this.optionsWidget.addControl("time", new otp.widgets.TW_TimeSelector(this.optionsWidget), true);
         this.optionsWidget.addVerticalSpace(12, true);
         
         
@@ -65,23 +68,52 @@ otp.modules.fieldtrip.FieldTripModule =
         modeSelector.refreshModeControls();
 
         this.optionsWidget.addSeparator();
+        //this.optionsWidget.addControl("submit", new otp.widgets.TW_GroupTripSubmit(this.optionsWidget));
         this.optionsWidget.addControl("submit", new otp.widgets.TW_Submit(this.optionsWidget));
 
+        this.fieldTripManager = new otp.modules.fieldtrip.FieldTripManagerWidget('otp-'+this.moduleId+'-fieldTripWidget', this);
 
-        this.fieldTripWidget = new otp.modules.fieldtrip.FieldTripManagerWidget('otp-'+this.moduleId+'-fieldTripWidget', this);
-
-
+        this.refreshTrips();
     },
     
     getExtendedQueryParams : function() {
         return { showIntermediateStops : this.showIntermediateStops };
     },
     
-    userPlanTripStart : function() {
-        console.log("uPTS");
+    ftPlanTrip : function() {
+        var planDate = moment(this.optionsWidget.controls['time'].epoch).format("YYYY-MM-DD");
         this.currentGroupSize = this.groupSize;
         this.bannedSegments = [];
         this.itineraries = [];
+
+        var this_ = this;
+        $.ajax(this.datastoreUrl+'/fieldTrip/getTrips', {
+            data: {
+                userName : this.userName,
+                password : this.password,                
+                date : planDate,
+                limit : 100,
+            },
+                
+            success: function(data) {
+                for(var t = 0; t < data.length; t++) {
+                    var fieldTrip = data[t];
+                    for(var i = 0; i < fieldTrip.groupItineraries.length; i++) {
+                        var grpItin = fieldTrip.groupItineraries[i];
+                        for(var gt =0 ; gt < grpItin.trips.length; gt++) {
+                            this_.bannedSegments.push(grpItin.trips[gt].tripString);
+                        }
+                    }
+                }
+                this_.planTrip();
+            },
+            
+            error: function(data) {
+                console.log("error retrieving trips");
+                console.log(data);
+            }
+        });
+                
     },
     
     processPlan : function(tripPlan, restoring) {
@@ -106,24 +138,25 @@ otp.modules.fieldtrip.FieldTripModule =
         //var itin = new otp.modules.planner.Itinerary(tripPlan.itineraries[0], tripPlan);
         var itin = tripPlan.itineraries[0];
         var capacity = itin.getGroupTripCapacity();
-        console.log("cur grp size:"+this.currentGroupSize+", cap="+capacity);
+        //console.log("cur grp size:"+this.currentGroupSize+", cap="+capacity);
         
         this.itineraries.push(itin);
         
-        var segments = itin.getTripSegments();
-        this.bannedSegments = this.bannedSegments.concat(segments);
-        console.log(this.bannedSegments.join(','));
+        var segments = itin.getTransitSegments();
+        for(var s = 0; s < segments.length; s++) {
+            this.bannedSegments.push(segments[s].tripString);
+        }
+
         this.bannedTrips = this.bannedSegments.join(',');     
         
         
         if(this.currentGroupSize > capacity) {
             this.currentGroupSize -= capacity;
             itin.groupSize = capacity;
-            console.log("remaining: "+this.currentGroupSize);
+            //console.log("remaining: "+this.currentGroupSize);
             this.planTrip();
         }
         else {
-            console.log("done!");
             itin.groupSize = this.currentGroupSize;
             this.drawItinerary(this.itineraries[0]);
             this.itinWidget.updateItineraries(this.itineraries, tripPlan.queryParams);
@@ -132,48 +165,144 @@ otp.modules.fieldtrip.FieldTripModule =
         }
         
     },
+
+    refreshTrips : function(date) {
+        var this_ = this;
+        $.ajax(this.datastoreUrl+'/fieldTrip/getTrips', {
+            data: {
+                userName : this.userName,
+                password : this.password,                
+                date : this.fieldTripManager.selectedDate,
+                limit : 100,
+            },
+                
+            success: function(data) {
+                //console.log("all trips:")
+                //console.log(data);
+                this_.fieldTripManager.updateTrips(data);
+            },
+            
+            error: function(data) {
+                console.log("error retrieving trips");
+                console.log(data);
+            }
+        });
+    },
     
     showSaveWidget : function() {
         new otp.modules.fieldtrip.SaveFieldTripWidget('otp-'+this.moduleId+'-saveFieldTripWidget', this);
     },
-    
+        
     saveTrip : function(desc) {
+        var this_ = this;
         console.log("saving trip: "+desc);
-        console.log();
-        /*
+        console.log(moment(this.optionsWidget.controls['time'].epoch).format("YYYY-MM-DDTHH:mm:ss"));
+        
         var data = {
             userName : this.userName,
             password : this.password,
-            trip.origin : this.this.startLatLng,
-            trip.destination : this.this.endLatLng,
-            trip.description : desc,
-            trip.createdBy : this.userName,
-            trip.passengers : this.groupSize,            
-            trip.departure : moment().format("YYYY-MM-DDTHH:mm:ss")
+            'trip.origin' : this.getStartOTPString(),
+            'trip.destination' : this.getEndOTPString(),
+            'trip.description' : desc,
+            'trip.createdBy' : this.userName,
+            'trip.passengers' : this.groupSize,            
+            'trip.departure' : moment(this.optionsWidget.controls['time'].epoch).format("YYYY-MM-DDTHH:mm:ss")
         };
         
         console.log(data);
-        $.ajax(otp.config.loggerURL+'/fieldTrip/newTrip', {
+        $.ajax(this.datastoreUrl+'/fieldTrip/newTrip', {
             type: 'POST',
             
             data: data,
                 
             success: function(data) {
-                console.log("success saving trip");
-                //console.log(data);
-                //model.id = data;
-                //if(successCallback) successCallback.call(this, model);
+                this_.saveItineraries(data);
             },
             
             error: function(data) {
                 console.log("error saving trip");
+                console.log(data);
             }
-        });*/
-        
-        
+        });
+    },
+    
+    
+    saveItineraries : function(tripId) {
+        var this_ = this;
+        this.itinsSaved = 0;
+        for(var i = 0; i < this.itineraries.length; i++) {
+            var itin = this.itineraries[i];
+            //console.log("saving itin for trip "+tripId);
+            //console.log(itin);
+
+            var data = {
+                userName : this.userName,
+                password : this.password,
+                fieldTripId : tripId,
+                'itinerary.passengers' : itin.groupSize  
+            };
+            
+            var segments = itin.getTransitSegments()
+            for(var s = 0; s < segments.length; s++) {
+                var seg = segments[s];
+                data['trips['+s+'].depart'] = moment(seg.leg.startTime).format("HH:mm:ss"); 
+                data['trips['+s+'].arrive'] = moment(seg.leg.endTime).format("HH:mm:ss"); 
+                data['trips['+s+'].tripString'] = seg.tripString; 
+                /*for(var si = 0; si < seg.stopIndices.length; si++) {
+                    data['itinerary.trips['+s+'].stops['+si+'].stopIndex'] = seg.stopIndices[si];                     
+                }*/
+            }
+            
+            $.ajax(this.datastoreUrl+'/fieldTrip/addItinerary', {
+                type: 'POST',
                 
-    }
+                data: data,
+                    
+                success: function(data) {
+                    //console.log("success saving itinerary");
+                    //console.log(data);       
+                    this_.itinsSaved++;
+                    if(this_.itinsSaved == this_.itineraries.length) {
+                        //console.log("all itins saved");
+                        this_.refreshTrips();
+                    }
+                                 
+                },
+                
+                error: function(data) {
+                    console.log("error saving itinerary");
+                    console.log(data);
+                }
+            });
+                    
+        }
+    },
     
-    
+    deleteTrip : function(trip) {
+        var this_ = this;
+        
+        var data = {
+                userName : this.userName,
+                password : this.password,
+                id : trip.id
+        };
+        
+        console.log("delete");
+        console.log(data);
+        $.ajax(this.datastoreUrl+'/fieldTrip/deleteTrip', {
+            type: 'POST',
+            
+            data: data,
+                  
+            success: function(data) {
+                this_.refreshTrips();
+            },
+            
+            error: function(data) {
+                console.log("error deleting trip:");
+                console.log(data);
+            }
+        });
+    } 
 
 });

@@ -38,6 +38,7 @@ otp.modules.planner.PlannerModule =
     
     itinMarkers : [],
 
+    planTripFunction : null,
 
     // current trip query parameters:
     startLatLng             : null,
@@ -63,7 +64,9 @@ otp.modules.planner.PlannerModule =
 
     initialize : function(webapp) {
         otp.modules.Module.prototype.initialize.apply(this, arguments);
-        this.icons = new otp.modules.planner.IconFactory();        
+        this.icons = new otp.modules.planner.IconFactory();
+        
+        this.planTripFunction = this.planTrip;    
     },
     
     activate : function() {
@@ -133,7 +136,7 @@ otp.modules.planner.PlannerModule =
                 this_.webapp.hideSplash();
                 this_.startLatLng = this_.startMarker.getLatLng();
                 if(typeof this_.userPlanTripStart == 'function') this_.userPlanTripStart();
-                this_.planTrip();
+                this_.planTripFunction.apply(this_);//planTrip();
             });
             this.markerLayer.addLayer(this.startMarker);
         }
@@ -145,7 +148,7 @@ otp.modules.planner.PlannerModule =
             this.updateTipStep(2);
             if(this.endLatLng) {
                 if(typeof this.userPlanTripStart == 'function') this.userPlanTripStart();
-                this.planTrip(); 
+                this_.planTripFunction.apply(this);//this.planTrip(); 
             }
         }
     },
@@ -160,7 +163,7 @@ otp.modules.planner.PlannerModule =
                 this_.webapp.hideSplash();
                 this_.endLatLng = this_.endMarker.getLatLng();
                 if(typeof this_.userPlanTripStart == 'function') this_.userPlanTripStart();
-                this_.planTrip();
+                this_.planTripFunction.apply(this_);//this_.planTrip();
             });
             this.markerLayer.addLayer(this.endMarker);
         }
@@ -171,11 +174,19 @@ otp.modules.planner.PlannerModule =
         if(update) {
             if(this.startLatLng) {
                 if(typeof this.userPlanTripStart == 'function') this.userPlanTripStart();
-                this.planTrip();
+                this_.planTripFunction.apply(this);//this.planTrip();
             }
         }
     },
     
+    getStartOTPString : function() {
+        return this.startLatLng.lat+','+this.startLatLng.lng;
+    },
+
+    getEndOTPString : function() {
+        return this.endLatLng.lat+','+this.endLatLng.lng;
+    },
+        
     restoreTrip : function(queryParams) {
     
         //this.markerLayer.clearLayers(); 
@@ -185,7 +196,7 @@ otp.modules.planner.PlannerModule =
       	this.endLatLng = otp.util.Geo.stringToLatLng(queryParams.toPlace);
     	this.setEndPoint(this.endLatLng, false);
 
-        this.planTrip(queryParams);
+        this_.planTripFunction.call(this, queryParams);//this.planTrip(queryParams);
     },
     
     planTrip : function(existingQueryParams, apiMethod) {
@@ -220,8 +231,8 @@ otp.modules.planner.PlannerModule =
             
             var addToStart = this.arriveBy ? 0 : this.startTimePadding;
        	    queryParams = {             
-                fromPlace: this.startLatLng.lat+','+this.startLatLng.lng,
-                toPlace: this.endLatLng.lat+','+this.endLatLng.lng,
+                fromPlace: this.getStartOTPString(),
+                toPlace: this.getEndOTPString(),
                 time : (this.time) ? this.time : moment().format("h:mma"),
                 //time : (this.time) ? moment(this.time).add("s", addToStart).format("h:mma") : moment().add("s", addToStart).format("h:mma"),
                 date : (this.date) ? this.date : moment().format("MM-DD-YYYY"),

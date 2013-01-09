@@ -19,6 +19,11 @@ otp.modules.fieldtrip.FieldTripManagerWidget =
 
     module : null,
 
+    trips : null,
+    selectedTrip : null,
+    
+    selectedDate : null,
+    
     initialize : function(id, module) {
         var this_ = this;  
         
@@ -36,18 +41,30 @@ otp.modules.fieldtrip.FieldTripManagerWidget =
         $('<input type="radio" name="'+this.id+'+-selectGroup" checked />').appendTo(selectRow)
         .click(function() {
             console.log("all");
+            this_.selectedDate = null;
+            this_.module.refreshTrips();
         });
         $('<span>&nbsp;Show all trips&nbsp;&nbsp;<br></span>').appendTo(selectRow);
-        $('<input type="radio" name="'+this.id+'+-selectGroup" />').appendTo(selectRow)
+        this.dateRadio = $('<input type="radio" name="'+this.id+'+-selectGroup" />').appendTo(selectRow)
         .click(function() {
             console.log("date");
+            this_.selectedDate = this_.datePicker.val();
+            this_.module.refreshTrips();
         });
         $('<span>&nbsp;Show trips on:&nbsp;</span>').appendTo(selectRow);
-        $('<input type="text" style="font-size:11px; width: 60px;" />').datepicker().appendTo(selectRow);
+        this.datePicker = $('<input type="text" style="font-size:11px; width: 60px;" />').datepicker({
+            onSelect: function(date) {
+                console.log(date);
+                this_.selectedDate = date;
+                this_.dateRadio.prop('checked',true);
+                this_.module.refreshTrips();
+            }
+        }).appendTo(selectRow);
+        this.datePicker.datepicker("setDate", new Date());
         
         this.tripList = $('<div class="otp-fieldTripManager-callList"></div>').appendTo(tripListContainer);
 
-        this.tripInfo = $('<div class="otp-fieldTripManager-callInfo"></div>').appendTo(this.$());
+        this.tripInfo = $('<div class="otp-fieldTripManager-callInfo notDraggable"></div>').appendTo(this.$());
         
         var buttonRow = $('<div class="otp-fieldTrip-buttonRow" />').appendTo(this.$());
         
@@ -56,7 +73,46 @@ otp.modules.fieldtrip.FieldTripManagerWidget =
         .appendTo(buttonRow).click(function() {
             this_.module.showSaveWidget();
         });
-                
+        $('<button id="'+this.id+'-deleteButton">Delete Selected Trip</button>').button()
+        .appendTo(buttonRow).click(function() {
+            this_.deleteSelectedTrip();
+        });
+    },
+    
+    updateTrips : function(trips) {
+        var this_ = this;
+        this.trips = trips;
+        this.tripList.empty();
+        for(var i=0; i < trips.length; i++) {
+            var trip = trips[i]; 
+            $('<div class="otp-fieldTripManager-tripRow">'+trip.description+', '+trip.serviceDay+'</div>')
+            .prependTo(this.tripList)
+            .data('trip', trip)
+            .click(function() {
+                this_.selectedTrip =  $(this).data('trip');
+                this_.showTripDetails(this_.selectedTrip);
+            });
+        }
+    },
+    
+    showTripDetails : function(trip) {
+        var html = "<h3>Trip Details</h3>"
+        html += '<div class="otp-fieldTripManager-tripDetail"><b>Description</b>: '+trip.description+"</div>";
+        html += '<div class="otp-fieldTripManager-tripDetail"><b>Origin</b>: '+trip.origin+"</div>";
+        html += '<div class="otp-fieldTripManager-tripDetail"><b>Destination</b>: '+trip.destination+"</div>";
+        html += '<div class="otp-fieldTripManager-tripDetail"><b>Day of Travel</b>: '+trip.serviceDay+"</div>";
+        html += '<div class="otp-fieldTripManager-tripDetail"><b>Time of Travel</b>: '+trip.departure+"</div>";
+        html += '<div class="otp-fieldTripManager-tripDetail"><b>Group Size</b>: '+trip.passengers+"</div>";
+        html += '<div class="otp-fieldTripManager-tripDetail"><b>Created by</b>: '+trip.createdBy+"</div>";
+        html += '<div class="otp-fieldTripManager-tripDetail"><b>Created</b>: '+trip.timeStamp+"</div>";
+        this.tripInfo.html(html);
+    },
+    
+    deleteSelectedTrip : function() {
+        if(this.selectedTrip == null) {
+            return;
+        }
         
+        this.module.deleteTrip(this.selectedTrip);        
     }
 });

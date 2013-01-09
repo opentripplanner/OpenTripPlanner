@@ -41,3 +41,14 @@
 .otp-saveFieldTripWidget {
 }
 
+.otp-fieldTripManager-tripRow {
+    background: #eee;
+    margin: 4px;
+    padding: 4px;
+    cursor: pointer;
+}
+
+.otp-fieldTripManager-tripDetail {
+    margin-bottom: 4px;
+}
+

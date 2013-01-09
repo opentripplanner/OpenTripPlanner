@@ -129,7 +129,37 @@ otp.modules.planner.Itinerary = otp.Class({
         return time1 !== time2;
     },
     
-    getTripSegments : function() {
+    getTransitSegments : function() {
+        var segments = [];
+        for(var l=0; l<this.itinData.legs.length; l++) {
+            var leg = this.itinData.legs[l];
+            if(otp.util.Itin.isTransit(leg.mode)) {
+                var stopIndices = [];
+                if(leg.from.stopIndex !== null) {
+                    stopIndices.push(leg.from.stopIndex);
+                }
+                if(leg.intermediateStops) {
+                    for(var s = 0; s < leg.intermediateStops.length; s++) {
+                        if(s == 0 && leg.from.stopIndex == null) { // temp workaround for apparent backend bug
+                            stopIndices.push(leg.intermediateStops[s].stopIndex-1);
+                        }
+                        stopIndices.push(leg.intermediateStops[s].stopIndex);
+                    }
+                }
+                stopIndices.push(leg.to.stopIndex);
+                
+                var segment = {
+                    leg : leg,
+                    stopIndices : stopIndices,
+                    tripString : leg.agencyId + "_" + leg.tripId + ":" + stopIndices.join(':')
+                }
+                segments.push(segment);
+            } 
+        }
+        return segments;
+    },
+    
+    /*getTripSegments : function() {
         var segments = [];
         for(var l=0; l<this.itinData.legs.length; l++) {
             var leg = this.itinData.legs[l];
@@ -150,8 +180,8 @@ otp.modules.planner.Itinerary = otp.Class({
             } 
         }
         return segments;
-    },
-    
+    },*/
+        
     getGroupTripCapacity : function() {
         var capacity = 100000;
         for(var l=0; l<this.itinData.legs.length; l++) {

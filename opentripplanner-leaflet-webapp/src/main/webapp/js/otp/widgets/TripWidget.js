@@ -31,7 +31,7 @@ otp.widgets.TripWidget =
         //this.planTripCallback = planTripCallback;
         this.module = module;
         
-        this.controls = { };       
+        this.controls = { };
     },
 
     addControl : function(id, control, scrollable) {
@@ -138,8 +138,9 @@ otp.widgets.TripWidgetControl = otp.Class({
 otp.widgets.TW_TimeSelector = 
     otp.Class(otp.widgets.TripWidgetControl, {
     
-    id           :  null,
-       
+    id          :  null,
+    epoch       : null,   
+    
     initialize : function(tripWidget) {
         otp.widgets.TripWidgetControl.prototype.initialize.apply(this, arguments);
         this.id = tripWidget.id+"-timeSelector";
@@ -157,7 +158,8 @@ otp.widgets.TW_TimeSelector =
         
         html += '</div>';
         $(html).appendTo(this.$());
-        
+    
+        this.epoch = moment().unix()*1000;    
     },
 
     doAfterLayout : function() {
@@ -613,7 +615,7 @@ otp.widgets.TW_Submit =
         $('#'+this.id+'-button').button().click(function() {
             //this_.tripWidget.pushSettingsToModule();
             if(typeof this_.tripWidget.module.userPlanTripStart == 'function') this_.tripWidget.module.userPlanTripStart();
-            this_.tripWidget.module.planTrip();
+            this_.tripWidget.module.planTripFunction.apply(this_.tripWidget.module);
         });
     }
 });
@@ -650,3 +652,23 @@ otp.widgets.TW_GroupTripOptions =
         return otp.util.Itin.includesTransit(mode);
     }       
 });
+
+/*otp.widgets.TW_GroupTripSubmit = 
+    otp.Class(otp.widgets.TripWidgetControl, {
+       
+    initialize : function(tripWidget) {
+        otp.widgets.TripWidgetControl.prototype.initialize.apply(this, arguments);
+        this.id = tripWidget.id+"-gtSubmit";
+
+        $('<div class="notDraggable" style="text-align:center;"><button id="'+this.id+'-button">Plan Trip</button></div>').appendTo(this.$());
+        //console.log(this.id+'-button')
+        
+    },
+    
+    doAfterLayout : function() {
+        var this_ = this;
+        $('#'+this.id+'-button').button().click(function() {
+            this_.tripWidget.module.groupTripSubmit();
+        });
+    }
+});*/
