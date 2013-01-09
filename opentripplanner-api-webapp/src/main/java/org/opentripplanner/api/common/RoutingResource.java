@@ -157,9 +157,11 @@ public abstract class RoutingResource {
      * one is taking a cross-country Amtrak train from Emeryville to Chicago. Has no effect in
      * stock OTP, only in Analyst.
      *
-     * A value of 0 (the default) disables.
+     * A value of 0 means that initial wait time will not be subtracted out (will be clamped to 0).
+     * A value of -1 (the default) means that clamping is disabled, so any amount of initial wait 
+     * time will be subtracted out.
      */
-    @DefaultValue("0") @QueryParam("clampInitialWait")
+    @DefaultValue("-1") @QueryParam("clampInitialWait")
     protected List<Long> clampInitialWait;
 
     /**
