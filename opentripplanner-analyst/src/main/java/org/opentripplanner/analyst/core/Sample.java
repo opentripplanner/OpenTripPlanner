@@ -27,7 +27,7 @@ public class Sample {
         this.v1 = v1;
         this.t1 = t1;
     }
-    
+
     public byte evalBoardings(ShortestPathTree spt) {
         State s0 = spt.getState(v0);
         State s1 = spt.getState(v1);
@@ -38,13 +38,6 @@ public class Sample {
         if (s1 != null)
             m1 = (s1.getNumBoardings()); 
         return (byte) ((m0 < m1) ? m0 : m1); 
-    }
-    
-    public byte evalByte(ShortestPathTree spt) {
-        long t = eval(spt) / 60;
-        if (t >= 255)
-            t = 255;
-        return (byte) t;
     }
     
     public long eval(ShortestPathTree spt) {
