@@ -29,7 +29,7 @@ import org.opentripplanner.util.model.EncodedPolylineBean;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-/**
+ /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
  * particular vehicle (or on foot).
  */
@@ -84,6 +84,16 @@ public class Leg {
     @XmlAttribute
     @JsonSerialize
     public String routeColor = null;
+
+    /**
+     * For transit legs, the type of the route. Non transit -1
+     * When 0-7: 0 Tram, 1 Subway, 2 Train, 3 Bus, 4 Ferry, 5 Cable Car, 6 Gondola, 7 Funicular
+     * When equal or highter than 100, it is coded using the Hierarchical Vehicle Type (HVT) codes from the European TPEG standard
+     * Also see http://groups.google.com/group/gtfs-changes/msg/ed917a69cf8c5bef
+     */
+    @XmlAttribute
+    @JsonSerialize
+    public Integer routeType = null;
     
     /**
      * For transit legs, the ID of the route.
