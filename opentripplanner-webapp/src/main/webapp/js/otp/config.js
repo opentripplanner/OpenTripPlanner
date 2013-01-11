@@ -133,12 +133,12 @@ otp.config_defaults = {
         // If only one layer is defined in the baseLayer array, the layer switcher is disabled.
         // If there are several layers in the baseLayer array, the layer switcher is enabled and the first layer in the array becomes the default layer
         baseLayer: [
-	        // Regular Open Street Map server
-	        new OpenLayers.Layer.OSM(
-	            "Open Street Map"
-	        )
-	        /* comment here to test single / multiple basemaps & layer switcher on/off */
-	        ,
+           // Regular Open Street Map server
+           new OpenLayers.Layer.OSM(
+               "Open Street Map"
+           )
+           /* comment here to test single / multiple basemaps & layer switcher on/off */
+           ,
            // MapBox Streets Layer
            new OpenLayers.Layer.OSM(
                "Mapbox Streets", [
