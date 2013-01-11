@@ -56,8 +56,6 @@ public class ThreadedBidirectionalHeuristic implements RemainingWeightHeuristic 
 
     double[] weights;
 
-    private int maxIdx;
-
     Graph g;
 
     public ThreadedBidirectionalHeuristic(Graph graph) {
@@ -100,7 +98,7 @@ public class ThreadedBidirectionalHeuristic implements RemainingWeightHeuristic 
             // but many transit vertices may not yet be explored when the search starts
             else
                 return Double.isInfinite(h) ? maxFound : h;
-        } else
+        } else // this vertex was created after this heuristic was calculated
             return 0;
     }
 
@@ -124,7 +122,6 @@ public class ThreadedBidirectionalHeuristic implements RemainingWeightHeuristic 
             LOG.debug("initializing heuristic computation thread");
             int nVertices = AbstractVertex.getMaxIndex();
             weights = new double[nVertices];
-            maxIdx = nVertices - 1;
             Arrays.fill(weights, Double.POSITIVE_INFINITY);
             // make sure street distances are known before starting thread
             LOG.debug("street searches");
@@ -159,20 +156,20 @@ public class ThreadedBidirectionalHeuristic implements RemainingWeightHeuristic 
                         continue;
                     Vertex v = options.isArriveBy() ? e.getToVertex() : e.getFromVertex();
                     int vi = v.getIndex();
-                    // handle case where the edge's to vertex has been created after this worker 
-                    if (vi > maxIdx) 
-                        continue;
-                    double ew = e.weightLowerBound(options);
-                    if (ew < 0) {
-                        LOG.error("negative edge weight {} qt {}", ew, e);
-                        continue;
-                    }
-                    double vw = uw + ew;
-                    if (weights[vi] > vw) {
-                        weights[vi] = vw;
-                        // selectively rekeying did not seem to offer any speed advantage
-                        q.insert(v, vw);
-                        // System.out.println("Insert " + v + " weight " + vw);
+                    // check for case where the edge's to vertex has been created after this worker
+                    if (vi < weights.length) {
+                        double ew = e.weightLowerBound(options);
+                        if (ew < 0) {
+                            LOG.error("negative edge weight {} qt {}", ew, e);
+                            continue;
+                        }
+                        double vw = uw + ew;
+                        if (weights[vi] > vw) {
+                            weights[vi] = vw;
+                            // selectively rekeying did not seem to offer any speed advantage
+                            q.insert(v, vw);
+                            // System.out.println("Insert " + v + " weight " + vw);
+                        }
                     }
                 }
             }            
