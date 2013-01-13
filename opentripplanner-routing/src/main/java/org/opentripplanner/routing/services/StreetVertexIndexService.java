@@ -20,6 +20,7 @@ import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.routing.core.LocationObservation;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraversalRequirements;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.CandidateEdgeBundle;
@@ -65,6 +66,8 @@ public interface StreetVertexIndexService {
 	 * @return
 	 */
 	public Collection<Vertex> getVerticesForEnvelope(Envelope envelope);
+
+    public Collection<StreetEdge> getEdgesForEnvelope(Envelope envelope);
 
 	/**
 	 * Get the closest edges to this location are traversable given these
