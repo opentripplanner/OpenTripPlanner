@@ -55,7 +55,7 @@ public class Renderer {
         BufferedImage image;
         switch (renderRequest.layer) {
         case DIFFERENCE :
-            image = tile.linearCombination(1, sptA, -1, sptB, 128, renderRequest);
+            image = tile.linearCombination(1, sptA, -1, sptB, 0, renderRequest);
             break;
         case HAGERSTRAND :
             long elapsed = Math.abs(sptRequestB.dateTime - sptRequestA.dateTime);

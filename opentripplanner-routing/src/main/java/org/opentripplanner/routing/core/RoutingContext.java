@@ -101,13 +101,13 @@ public class RoutingContext implements Cloneable {
         if (findPlaces) {
             // normal mode, search for vertices based on fromPlace and toPlace
             if ( ! opt.batch || opt.arriveBy) {
-                // non-batch mode, or arriveBy: we need a to vertex
+                // non-batch mode, or arriveBy batch mode: we need a to vertex
                 toVertex = graph.streetIndex.getVertexForPlace(opt.getToPlace(), opt);
             } else {
                 toVertex = null;
             }
             if ( ! opt.batch || ! opt.arriveBy) {
-                // non-batch mode, or depart-after: we need a from vertex
+                // non-batch mode, or depart-after batch mode: we need a from vertex
                 fromVertex = graph.streetIndex.getVertexForPlace(opt.getFromPlace(), opt, toVertex);                
             } else {
                 fromVertex = null;

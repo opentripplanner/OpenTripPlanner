@@ -186,6 +186,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         if (intersection != null) {
             // coordinate is at a street corner or endpoint
             if (name == null) {
+                _log.debug("found intersection {}. not splitting.", intersection);
                 // generate names for corners when no name was given
                 Set<String> uniqueNameSet = new HashSet<String>();
                 for (Edge e : intersection.getOutgoing()) {
@@ -462,6 +463,11 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         return getVertexForPlace(place, options, null);
     }
 
+    /**
+     * @param other: non-null when another vertex has already been found. When the from vertex has
+     * already been made/found, that vertex is passed in when finding/creating the to vertex. 
+     * TODO: This appears to be for reusing the extra edges list -- is this still needed?
+     */
     @Override
     public Vertex getVertexForPlace(NamedPlace place, RoutingRequest options, Vertex other) {
         if (place == null || place.place == null) {

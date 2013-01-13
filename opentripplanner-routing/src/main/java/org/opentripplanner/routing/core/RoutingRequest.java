@@ -584,9 +584,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     public void setMaxTransfers(int maxTransfers) {
-        if (maxTransfers > CLAMP_TRANSFERS) {
-            maxTransfers = CLAMP_TRANSFERS;
-        }
+//        if (maxTransfers > CLAMP_TRANSFERS) {
+//            maxTransfers = CLAMP_TRANSFERS;
+//        }
         this.maxTransfers = maxTransfers;
     }
 

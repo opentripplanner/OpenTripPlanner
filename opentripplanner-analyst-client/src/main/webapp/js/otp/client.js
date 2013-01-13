@@ -28,13 +28,12 @@ var map = new L.Map('map', {
 	// what we really need is a fade transition between old and new tiles without removing the old ones
 });
 
-var mapboxURL = "http://{s}.tiles.mapbox.com/v3/mapbox.mapbox-light/{z}/{x}/{y}.png";
+var mapboxURL = "https://tiles.mapbox.com/v3/username.map-abcdefgh/{z}/{x}/{y}.png";
 var OSMURL    = "http://{s}.mqcdn.com/tiles/1.0.0/osm/{z}/{x}/{y}.png";
 var aerialURL = "http://{s}.mqcdn.com/naip/{z}/{x}/{y}.png";
 
-var mapboxAttrib = "Tiles from <a href='http://mapbox.com/about/maps' target='_blank'>MapBox Streets</a>";
-var mapboxLayer = new L.TileLayer(mapboxURL, 
-		{subdomains: ["a","b","c","d"], maxZoom: 17, attribution: mapboxAttrib});
+var mapboxAttrib = "Tiles from <a href='http://mapbox.com/about/maps' target='_blank'> Streets</a>";
+var mapboxLayer = new L.TileLayer(mapboxURL, {maxZoom: 17, attribution: mapboxAttrib});
 
 var osmAttrib = 'Map data &copy; 2011 OpenStreetMap contributors';
 var osmLayer = new L.TileLayer(OSMURL, 
@@ -59,7 +58,8 @@ var buildQuery = function(params) {
 		for (i in vals) { 
 			val = vals[i]; // js iterates over indices not values!
 			// skip params that are empty or stated to be the same as previous
-			if (val == '' || val == 'same')
+			// if (val == '' || val == 'same')
+			if (val == 'same') // empty string needed for non-banning
 				continue;
 			param = [encodeURIComponent(key), encodeURIComponent(val)].join('=');
 			ret.push(param);
@@ -141,8 +141,8 @@ var purpleLineAlignmentLayer = new L.GeoJSON(purpleLineAlignmentFeature);
 map.addLayer(purpleLineAlignmentLayer);
 
 var baseMaps = {
-	"MapBox": mapboxLayer,
     "OSM": osmLayer,
+    "MapBox": mapboxLayer,
     "Aerial Photo": aerialLayer
 };
 	        
@@ -185,28 +185,15 @@ destMarker.on('dragend', mapSetupTool);
 // add layers to map 
 // do not add analyst layer yet -- it will be added in refresh() once params are pulled in
 
-map.addLayer(mapboxLayer);
+map.addLayer(osmLayer);
 map.addLayer(origMarker);
 map.addControl(new L.Control.Layers(baseMaps, overlayMaps));
-
-// tools
-
-var purpleOn = function () {
-    params.bannedRoutes = "";
-    refresh();
-};
-
-var purpleOff = function () {
-    params.bannedRoutes = "Test_Purple";
-    refresh();
-};
 
 // use function statement rather than expression to allow hoisting -- is there a better way?
 function mapSetupTool() {
 
 	var params = { 
-		batch: true
-		//bannedRoutes = ["", "Test_Purple"];
+		batch: true,
 	};
 
 	// pull search parameters from form
@@ -226,13 +213,22 @@ function mapSetupTool() {
 	case 'diff1':
 		params.layers = 'difference';
 		params.styles = 'difference';
+		params.bannedRoutes = ["Test_Purple", ""];
 		break;
 	}
+	// store one-element arrays so we can append as needed for the second search
 	params.time = [$('#setupTime').val()];
 	params.mode = [$('#setupMode').val()];
 	params.maxWalkDistance = [$('#setupMaxDistance').val()];
 	params.arriveBy = [$('#arriveByA').val()];
-
+	switch($('#compressWaits').val()) {
+		case 'optimize':
+			params.reverseOptimizeOnTheFly = ['true'];
+			break;
+		case 'initial':
+		default:
+			params.clampInitialWait = [$('#timeLenience').val() * 60];
+	}
 	if (flags.twoSearch) {
 		var pushIfDifferent = function (elementId, paramName) {
 			console.log(elementId);

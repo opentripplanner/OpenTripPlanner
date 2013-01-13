@@ -175,22 +175,30 @@ public class State implements Cloneable {
         return stateData.tripTimes;
     }
 
-    /** returns the length of the trip in seconds up to this time, not including the initial wait.
-        It subtracts out the initial wait or a clamp value specified in the request.
-        This is used in lieu of reverse optimization in Analyst. */
+    /** 
+     * Returns the length of the trip in seconds up to this time, not including the initial wait.
+     * It subtracts out the initial wait, up to a clamp value specified in the request.
+     * If the clamp value is set to -1, no clamping will occur.
+     * If the clamp value is set to 0, the initial wait time will not be subtracted out 
+     * (i.e. it will be clamped to zero).
+     * This is used in lieu of reverse optimization in Analyst.
+     */
     public long getActiveTime () {
         long clampInitialWait = stateData.opt.clampInitialWait;
 
         long initialWait = stateData.initialWaitTime;
 
         // only subtract up the clamp value
-        if (clampInitialWait > 0 && initialWait > clampInitialWait)
+        if (clampInitialWait >= 0 && initialWait > clampInitialWait)
             initialWait = clampInitialWait;            
 
         long activeTime = getElapsedTime() - initialWait;
-        // TODO: what should be done here?
-        if (activeTime < 0)
+
+        // TODO: what should be done here? (Does this ever happen?)
+        if (activeTime < 0) {
+            LOG.warn("initial wait was greater than elapsed time.");
             activeTime = getElapsedTime();
+        }
 
         return activeTime;            
     }

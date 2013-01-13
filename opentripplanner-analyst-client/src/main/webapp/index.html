@@ -32,11 +32,11 @@
 			<span>
 				<label for="timeLenience">Time lenience:</label> 
 				<select id="timeLenience">
-					<option value="5">none</option>
+					<option value="0">none</option>
 					<option value="5">up to 5 min</option>
-					<option value="10">up to 10 min</option>
+					<option value="10" selected="selected">up to 10 min</option>
 					<option value="20">up to 20 min</option>
-					<option value="30" selected="selected">up to 30 min</option>
+					<option value="30">up to 30 min</option>
 					<option value="60">up to 1 hour</option>
 					<option value="120">up to 2 hours</option>
 				</select>
@@ -108,6 +108,7 @@
 				</span>
 				<span class="timeEntry">
 					<select id="arriveByB" >
+						<option value="same">Same as Above</option>
 						<option value="true">Arrive by</option>
 						<option value="false">Depart after</option>
 					</select>
@@ -139,6 +140,10 @@
 						<option value="200000">Unlimited</option>
 					</select>
 				</span>
+<!-- 				<span> -->
+<!-- 					<label for="checkBanPurple" class="autoWidth">Ban purple line:</label>  -->
+<!-- 					<input type="checkbox" id="checkBanPurple"> -->
+<!-- 				</span> -->
 			</div> <!-- END endpointBControls -->
 		</form>
 		<form>
@@ -147,12 +152,6 @@
 				* Times must be expressed in ISO8601 combined date/time format: YYYY-MM-DDTHH:MM:SS
 			</p>
 		</form>	
-		<form name="purpleForm">
-			<span>
-				<input type="button" value="Add Purple Line" onclick="purpleOn()" />
-				<input type="button" value="Remove Purple Line" onclick="purpleOff()" />
-			</span>	
-		</form>
 		
 		<img id="legend">
 		<!-- download tool is commented out to avoid over-filling the cache in public use
