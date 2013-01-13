@@ -57,7 +57,8 @@ public class PruneFloatingIslands implements GraphBuilder {
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         _log.warn("Pruning isolated islands ...");
-        StreetUtils.pruneFloatingIslands(graph, maxIslandSize, islandWithStopMaxSize, createLogger());
+        StreetUtils.pruneFloatingIslands(graph, maxIslandSize, islandWithStopMaxSize,
+                LoggerAppenderProvider.createCsvFile4LoggerCat(islandLogFile, "islands"));
         if(transitToStreetNetwork == null){
             _log.warn("Could not reconnect stop, TransitToStreetNetworkGraphBuilder was not provided");
         }else{
@@ -70,19 +71,6 @@ public class PruneFloatingIslands implements GraphBuilder {
     @Override
     public void checkInputs() {
         //no inputs
-    }
-
-    private String createLogger() {
-        if (islandLogFile.isEmpty()) return null;
-        try{
-            PatternLayout layout =  new PatternLayout("%m\n");
-            FileAppender appender = new RollingFileAppender(layout, islandLogFile, false);
-            Logger.getLogger("islands").addAppender(appender);
-        }catch (IOException ioe){
-            _log.warn("could not create file appender for " + islandLogFile + " duo to: " + ioe.getMessage());
-            return null;
-        }
-        return "islands";
     }
 
 }
