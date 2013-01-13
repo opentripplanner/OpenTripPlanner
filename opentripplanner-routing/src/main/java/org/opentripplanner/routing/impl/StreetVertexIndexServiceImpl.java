@@ -282,6 +282,11 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     }
 
     @Override
+    public Collection<StreetEdge> getEdgesForEnvelope(Envelope envelope){
+        return edgeTree.query(envelope);
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public CandidateEdgeBundle getClosestEdges(LocationObservation location,
             TraversalRequirements reqs, List<Edge> extraEdges, Collection<Edge> preferredEdges,
