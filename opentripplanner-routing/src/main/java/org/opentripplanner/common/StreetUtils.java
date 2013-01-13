@@ -165,6 +165,7 @@ public class StreetUtils {
             Collection<Edge> outgoing = new ArrayList<Edge>(v.getOutgoing());
             for (Edge e : outgoing) {
                 if (e instanceof StreetTransitLink) {
+                    e.detach();
                 }
             }
         }
