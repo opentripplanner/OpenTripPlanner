@@ -5,7 +5,7 @@
 
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
-		<param-value>classpath:data-sources.xml classpath:/org/opentripplanner/api/security-application-context.xml</param-value>
+		<param-value>file:${TRANZMATE_HOME}/data-sources.xml file:${TRANZMATE_HOME}/security-application-context.xml</param-value>
 	</context-param>
 
 	<listener>
