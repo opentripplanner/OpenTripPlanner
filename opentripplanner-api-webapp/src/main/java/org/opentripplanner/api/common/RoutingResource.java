@@ -124,6 +124,9 @@ public abstract class RoutingResource {
     /** The comma-separated list of banned routes.  The format is agency_route, so TriMet_100. */
     @DefaultValue("") @QueryParam("bannedRoutes") protected List<String> bannedRoutes;
     
+    /** The comma-separated list of banned agencies. */
+    @DefaultValue("") @QueryParam("bannedAgencies") protected List<String> bannedAgencies;
+    
     /** The comma-separated list of banned trips.  The format is agency_route[:stop*], so:
      * TriMet_24601 or TriMet_24601:0:1:2:17:18:19
      */
@@ -280,6 +283,7 @@ public abstract class RoutingResource {
         request.setPreferredRoutes(get(preferredRoutes, n, request.getPreferredRouteStr()));
         request.setUnpreferredRoutes(get(unpreferredRoutes, n, request.getUnpreferredRouteStr()));
         request.setBannedRoutes(get(bannedRoutes, n, request.getBannedRouteStr()));
+        request.setBannedAgencies(get(bannedAgencies, n, request.getBannedAgenciesStr()));
         HashMap<AgencyAndId, BannedStopSet> bannedTripMap = makeBannedTripMap(get(bannedTrips, n, null));
         if (bannedTripMap != null) {
             request.setBannedTrips(bannedTripMap);
@@ -353,8 +357,8 @@ public abstract class RoutingResource {
         request.setLocale(locale);
         return request;
     }
-    
-    private HashMap<AgencyAndId, BannedStopSet> makeBannedTripMap(String banned) {
+
+	private HashMap<AgencyAndId, BannedStopSet> makeBannedTripMap(String banned) {
         if (banned == null) {
             return null;
         }
