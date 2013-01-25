@@ -259,6 +259,13 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
                 return null;
             }
             Trip trip = bestTripTimes.getTrip();
+            
+            /* check if agency is banned for this plan */
+            if (options.bannedAgencies != null) {
+            	if (options.bannedAgencies.contains(trip.getId().getAgencyId())) {
+            		return null;
+            	}
+            }
 
             /* check if route banned for this plan */
             if (options.bannedRoutes != null) {
