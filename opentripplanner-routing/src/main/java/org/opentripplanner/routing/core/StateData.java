@@ -95,7 +95,7 @@ public class StateData implements Cloneable {
      */
     protected TraverseMode backMode;
 
-    public String bikeRentalNetwork;
+    public Set<String> bikeRentalNetworks;
 
     public StateData(RoutingRequest options) {
         TraverseModeSet modes = options.getModes();

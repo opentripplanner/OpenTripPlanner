@@ -13,9 +13,15 @@
 
 package org.opentripplanner.routing.algorithm;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
+import junit.framework.TestCase;
+
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
@@ -29,10 +35,6 @@ import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
-import com.vividsolutions.jts.geom.Coordinate;
-
-import junit.framework.TestCase;
-
 public class TestBikeRental extends TestCase {
     public void testBasic() throws Exception {
         // generate a very simple graph
@@ -44,9 +46,11 @@ public class TestBikeRental extends TestCase {
         StreetVertex v3 = new IntersectionVertex(graph, "v3", -77.0492, 38.858,
                 "v3");
 
+        @SuppressWarnings("unused")
         Edge walk = new PlainStreetEdge(v1, v2, GeometryUtils.makeLineString(-77.0492, 38.856,
                 -77.0492, 38.857), "S. Crystal Dr", 87, StreetTraversalPermission.PEDESTRIAN, false);
 
+        @SuppressWarnings("unused")
         Edge mustBike = new PlainStreetEdge(v2, v3, GeometryUtils.makeLineString(-77.0492, 38.857,
                 -77.0492, 38.858), "S. Crystal Dr", 87, StreetTraversalPermission.BICYCLE, false);
 
@@ -74,8 +78,9 @@ public class TestBikeRental extends TestCase {
                 36.856, "station", 10);
         new StreetBikeRentalLink(station, v2);
         new StreetBikeRentalLink(v2, station);
-        new RentABikeOnEdge(station, station, "default");
-        new RentABikeOffEdge(station, station, "default");
+        Set<String> networks = new HashSet<String>(Arrays.asList("default"));
+        new RentABikeOnEdge(station, station, networks);
+        new RentABikeOffEdge(station, station, networks);
         
         // but we can't get off the bike at v3, so we still fail
         options = new RoutingRequest(new TraverseModeSet("WALK,BICYCLE,TRANSIT"));
@@ -91,8 +96,8 @@ public class TestBikeRental extends TestCase {
                 36.857, "station", 10);
         new StreetBikeRentalLink(station2, v3);
         new StreetBikeRentalLink(v3, station2);
-        new RentABikeOnEdge(station2, station2, "default");
-        new RentABikeOffEdge(station2, station2, "default");
+        new RentABikeOnEdge(station2, station2, networks);
+        new RentABikeOffEdge(station2, station2, networks);
         
         // now we succeed!
         options = new RoutingRequest(new TraverseModeSet("WALK,BICYCLE,TRANSIT"));

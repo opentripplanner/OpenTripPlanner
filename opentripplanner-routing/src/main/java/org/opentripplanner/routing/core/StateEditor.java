@@ -556,8 +556,8 @@ public class StateEditor {
         child.stateData.serviceDay = day;
     }
 
-    public void setBikeRentalNetwork(String network) {
+    public void setBikeRentalNetwork(Set<String> networks) {
         cloneStateDataAsNeeded();
-        child.stateData.bikeRentalNetwork = network;
+        child.stateData.bikeRentalNetworks = networks;
     }
 }
