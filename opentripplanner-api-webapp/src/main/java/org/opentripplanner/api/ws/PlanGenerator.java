@@ -527,7 +527,7 @@ public class PlanGenerator {
             WalkStep continuation = null;
             if (itinerary.legs.size() >= 2) {
                 Leg previousLeg = itinerary.legs.get(itinerary.legs.size() - 2);
-                if (previousLeg.walkSteps != null) {
+                if (previousLeg.walkSteps != null && !previousLeg.walkSteps.isEmpty()) {
                     continuation = previousLeg.walkSteps.get(previousLeg.walkSteps.size() - 1);
                     extra = 1;
                 }

@@ -13,14 +13,17 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import java.util.Set;
+
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 
+import com.google.common.collect.Sets;
 import com.vividsolutions.jts.geom.LineString;
 
 /**
@@ -33,11 +36,11 @@ public abstract class RentABikeAbstractEdge extends Edge {
 
     private static final long serialVersionUID = 1L;
 
-    private String network;
+    private Set<String> networks;
 
-    public RentABikeAbstractEdge(Vertex from, Vertex to, String network) {
+    public RentABikeAbstractEdge(Vertex from, Vertex to, Set<String> networks) {
         super(from, to);
-        this.network = network;
+        this.networks = networks;
     }
 
     protected State traverseRent(State s0) {
@@ -64,7 +67,7 @@ public abstract class RentABikeAbstractEdge extends Edge {
         s1.incrementTimeInSeconds(options.isArriveBy() ? options.bikeRentalDropoffTime
                 : options.bikeRentalPickupTime);
         s1.setBikeRenting(true);
-        s1.setBikeRentalNetwork(network);
+        s1.setBikeRentalNetwork(networks);
         s1.setBackMode(s0.getNonTransitMode());
         State s1b = s1.makeState();
         return s1b;
@@ -75,7 +78,7 @@ public abstract class RentABikeAbstractEdge extends Edge {
         /*
          * To dropoff a bike, we need to have rented one.
          */
-        if (!s0.isBikeRenting() || !s0.getBikeRentalNetwork().equals(network))
+        if (!s0.isBikeRenting() || !hasCompatibleNetworks(networks, s0.getBikeRentalNetworks()))
             return null;
         BikeRentalStationVertex pickup = (BikeRentalStationVertex) tov;
         if (options.isUseBikeRentalAvailabilityInformation() && pickup.getSpacesAvailable() == 0) {
@@ -111,5 +114,17 @@ public abstract class RentABikeAbstractEdge extends Edge {
     @Override
     public boolean hasBogusName() {
         return false;
+    }
+
+    /**
+     * @param stationNetworks The station where we want to drop the bike off.
+     * @param rentedNetworks The set of networks of the station we rented the bike from.
+     * @return true if the bike can be dropped off here, false if not.
+     */
+    private boolean hasCompatibleNetworks(Set<String> stationNetworks, Set<String> rentedNetworks) {
+        /*
+         * Two stations are compatible if they share at least one network.
+         */
+        return !Sets.intersection(stationNetworks, rentedNetworks).isEmpty();
     }
 }

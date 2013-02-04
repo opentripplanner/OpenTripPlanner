@@ -806,27 +806,34 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             int n = 0;
             for (OSMNode node : _bikeRentalNodes) {
                 n++;
+                String creativeName = wayPropertySet.getCreativeNameForWay(node);
                 int capacity = Integer.MAX_VALUE;
                 if (node.hasTag("capacity")) {
                     try {
                         capacity = Integer.parseInt(node.getTag("capacity"));
                     } catch (NumberFormatException e) {
-                        _log.warn("Capacity is not a number: " + node.getTag("capacity"));
+                        _log.warn("Capacity for osm node " + node.getId() + " (" + creativeName
+                                + ") is not a number: " + node.getTag("capacity"));
                     }
                 }
-                String network = node.getTag("network");
-                if (network == null) {
-                    _log.warn("Bike rental station at osm node " + node.getId()
-                            + " with no network; not including");
+                String networks = node.getTag("network");
+                String operators = node.getTag("operator");
+                Set<String> networkSet = new HashSet<String>();
+                if (networks != null)
+                    networkSet.addAll(Arrays.asList(networks.split(";")));
+                if (operators != null)
+                    networkSet.addAll(Arrays.asList(operators.split(";")));
+                if (networkSet.isEmpty()) {
+                    _log.warn("Bike rental station at osm node " + node.getId() + " ("
+                            + creativeName + ") with no network; not including");
                     continue;
                 }
-                String creativeName = wayPropertySet.getCreativeNameForWay(node);
                 BikeRentalStationVertex station = new BikeRentalStationVertex(graph, ""
                         + node.getId(), "bike rental " + node.getId(), node.getLon(),
                         node.getLat(), creativeName, capacity);
 
-                new RentABikeOnEdge(station, station, network);
-                new RentABikeOffEdge(station, station, network);
+                new RentABikeOnEdge(station, station, networkSet);
+                new RentABikeOffEdge(station, station, networkSet);
             }
             _log.debug("Created " + n + " bike rental stations.");
         }
