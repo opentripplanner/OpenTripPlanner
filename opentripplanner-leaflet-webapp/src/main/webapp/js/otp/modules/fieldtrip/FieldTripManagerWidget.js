@@ -84,7 +84,7 @@ otp.modules.fieldtrip.FieldTripManagerWidget =
         this.trips = trips;
         this.tripList.empty();
         for(var i=0; i < trips.length; i++) {
-            var trip = trips[i]; 
+            var trip = trips[i];
             $('<div class="otp-fieldTripManager-tripRow">'+trip.description+', '+trip.serviceDay+'</div>')
             .prependTo(this.tripList)
             .data('trip', trip)

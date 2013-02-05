@@ -98,6 +98,7 @@ otp.modules.fieldtrip.FieldTripModule =
             },
                 
             success: function(data) {
+                if((typeof data) == "string") data = jQuery.parseJSON(data);
                 for(var t = 0; t < data.length; t++) {
                     var fieldTrip = data[t];
                     for(var i = 0; i < fieldTrip.groupItineraries.length; i++) {
@@ -179,8 +180,7 @@ otp.modules.fieldtrip.FieldTripModule =
             },
                 
             success: function(data) {
-                //console.log("all trips:")
-                //console.log(data);
+                if((typeof data) == "string") data = jQuery.parseJSON(data);
                 this_.fieldTripManager.updateTrips(data);
             },
             
@@ -218,6 +218,7 @@ otp.modules.fieldtrip.FieldTripModule =
             data: data,
                 
             success: function(data) {
+                if((typeof data) == "string") data = jQuery.parseJSON(data);
                 this_.saveItineraries(data);
             },
             
@@ -261,6 +262,7 @@ otp.modules.fieldtrip.FieldTripModule =
                 data: data,
                     
                 success: function(data) {
+                    if((typeof data) == "string") data = jQuery.parseJSON(data);
                     //console.log("success saving itinerary");
                     //console.log(data);       
                     this_.itinsSaved++;
