@@ -72,6 +72,8 @@ otp.modules.fieldtrip.FieldTripModule =
         this.optionsWidget.addControl("submit", new otp.widgets.TW_Submit(this.optionsWidget));
 
         this.fieldTripManager = new otp.modules.fieldtrip.FieldTripManagerWidget('otp-'+this.moduleId+'-fieldTripWidget', this);
+        this.widgets.push(this.fieldTripManager);
+
 
         this.refreshTrips();
     },
