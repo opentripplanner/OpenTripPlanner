@@ -31,6 +31,7 @@ public class FindPathsResponse implements org.apache.thrift.TBase<FindPathsRespo
   private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("FindPathsResponse");
 
   private static final org.apache.thrift.protocol.TField PATHS_FIELD_DESC = new org.apache.thrift.protocol.TField("paths", org.apache.thrift.protocol.TType.STRUCT, (short)1);
+  private static final org.apache.thrift.protocol.TField COMPUTE_TIME_MILLIS_FIELD_DESC = new org.apache.thrift.protocol.TField("compute_time_millis", org.apache.thrift.protocol.TType.I64, (short)10);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
@@ -39,10 +40,12 @@ public class FindPathsResponse implements org.apache.thrift.TBase<FindPathsRespo
   }
 
   private org.opentripplanner.api.thrift.definition.TripPaths paths; // required
+  private long compute_time_millis; // optional
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-    PATHS((short)1, "paths");
+    PATHS((short)1, "paths"),
+    COMPUTE_TIME_MILLIS((short)10, "compute_time_millis");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -59,6 +62,8 @@ public class FindPathsResponse implements org.apache.thrift.TBase<FindPathsRespo
       switch(fieldId) {
         case 1: // PATHS
           return PATHS;
+        case 10: // COMPUTE_TIME_MILLIS
+          return COMPUTE_TIME_MILLIS;
         default:
           return null;
       }
@@ -99,11 +104,16 @@ public class FindPathsResponse implements org.apache.thrift.TBase<FindPathsRespo
   }
 
   // isset id assignments
+  private static final int __COMPUTE_TIME_MILLIS_ISSET_ID = 0;
+  private BitSet __isset_bit_vector = new BitSet(1);
+  private _Fields optionals[] = {_Fields.COMPUTE_TIME_MILLIS};
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
     tmpMap.put(_Fields.PATHS, new org.apache.thrift.meta_data.FieldMetaData("paths", org.apache.thrift.TFieldRequirementType.REQUIRED, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT        , "TripPaths")));
+    tmpMap.put(_Fields.COMPUTE_TIME_MILLIS, new org.apache.thrift.meta_data.FieldMetaData("compute_time_millis", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I64)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(FindPathsResponse.class, metaDataMap);
   }
@@ -122,9 +132,12 @@ public class FindPathsResponse implements org.apache.thrift.TBase<FindPathsRespo
    * Performs a deep copy on <i>other</i>.
    */
   public FindPathsResponse(FindPathsResponse other) {
+    __isset_bit_vector.clear();
+    __isset_bit_vector.or(other.__isset_bit_vector);
     if (other.isSetPaths()) {
       this.paths = other.paths;
     }
+    this.compute_time_millis = other.compute_time_millis;
   }
 
   public FindPathsResponse deepCopy() {
@@ -134,6 +147,8 @@ public class FindPathsResponse implements org.apache.thrift.TBase<FindPathsRespo
   @Override
   public void clear() {
     this.paths = null;
+    setCompute_time_millisIsSet(false);
+    this.compute_time_millis = 0;
   }
 
   public org.opentripplanner.api.thrift.definition.TripPaths getPaths() {
@@ -159,6 +174,28 @@ public class FindPathsResponse implements org.apache.thrift.TBase<FindPathsRespo
     }
   }
 
+  public long getCompute_time_millis() {
+    return this.compute_time_millis;
+  }
+
+  public void setCompute_time_millis(long compute_time_millis) {
+    this.compute_time_millis = compute_time_millis;
+    setCompute_time_millisIsSet(true);
+  }
+
+  public void unsetCompute_time_millis() {
+    __isset_bit_vector.clear(__COMPUTE_TIME_MILLIS_ISSET_ID);
+  }
+
+  /** Returns true if field compute_time_millis is set (has been assigned a value) and false otherwise */
+  public boolean isSetCompute_time_millis() {
+    return __isset_bit_vector.get(__COMPUTE_TIME_MILLIS_ISSET_ID);
+  }
+
+  public void setCompute_time_millisIsSet(boolean value) {
+    __isset_bit_vector.set(__COMPUTE_TIME_MILLIS_ISSET_ID, value);
+  }
+
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
     case PATHS:
@@ -169,6 +206,14 @@ public class FindPathsResponse implements org.apache.thrift.TBase<FindPathsRespo
       }
       break;
 
+    case COMPUTE_TIME_MILLIS:
+      if (value == null) {
+        unsetCompute_time_millis();
+      } else {
+        setCompute_time_millis((Long)value);
+      }
+      break;
+
     }
   }
 
@@ -176,6 +221,9 @@ public class FindPathsResponse implements org.apache.thrift.TBase<FindPathsRespo
     switch (field) {
     case PATHS:
       return getPaths();
+
+    case COMPUTE_TIME_MILLIS:
+      return Long.valueOf(getCompute_time_millis());
 
     }
     throw new IllegalStateException();
@@ -190,6 +238,8 @@ public class FindPathsResponse implements org.apache.thrift.TBase<FindPathsRespo
     switch (field) {
     case PATHS:
       return isSetPaths();
+    case COMPUTE_TIME_MILLIS:
+      return isSetCompute_time_millis();
     }
     throw new IllegalStateException();
   }
@@ -216,6 +266,15 @@ public class FindPathsResponse implements org.apache.thrift.TBase<FindPathsRespo
         return false;
     }
 
+    boolean this_present_compute_time_millis = true && this.isSetCompute_time_millis();
+    boolean that_present_compute_time_millis = true && that.isSetCompute_time_millis();
+    if (this_present_compute_time_millis || that_present_compute_time_millis) {
+      if (!(this_present_compute_time_millis && that_present_compute_time_millis))
+        return false;
+      if (this.compute_time_millis != that.compute_time_millis)
+        return false;
+    }
+
     return true;
   }
 
@@ -238,6 +297,16 @@ public class FindPathsResponse implements org.apache.thrift.TBase<FindPathsRespo
     }
     if (isSetPaths()) {
       lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.paths, typedOther.paths);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetCompute_time_millis()).compareTo(typedOther.isSetCompute_time_millis());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetCompute_time_millis()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.compute_time_millis, typedOther.compute_time_millis);
       if (lastComparison != 0) {
         return lastComparison;
       }
@@ -269,6 +338,12 @@ public class FindPathsResponse implements org.apache.thrift.TBase<FindPathsRespo
       sb.append(this.paths);
     }
     first = false;
+    if (isSetCompute_time_millis()) {
+      if (!first) sb.append(", ");
+      sb.append("compute_time_millis:");
+      sb.append(this.compute_time_millis);
+      first = false;
+    }
     sb.append(")");
     return sb.toString();
   }
@@ -291,6 +366,8 @@ public class FindPathsResponse implements org.apache.thrift.TBase<FindPathsRespo
 
   private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
     try {
+      // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
+      __isset_bit_vector = new BitSet(1);
       read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
     } catch (org.apache.thrift.TException te) {
       throw new java.io.IOException(te);
@@ -324,6 +401,14 @@ public class FindPathsResponse implements org.apache.thrift.TBase<FindPathsRespo
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
+          case 10: // COMPUTE_TIME_MILLIS
+            if (schemeField.type == org.apache.thrift.protocol.TType.I64) {
+              struct.compute_time_millis = iprot.readI64();
+              struct.setCompute_time_millisIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
           default:
             org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
         }
@@ -340,6 +425,11 @@ public class FindPathsResponse implements org.apache.thrift.TBase<FindPathsRespo
       if (struct.paths != null) {
         oprot.writeFieldBegin(PATHS_FIELD_DESC);
         struct.paths.write(oprot);
+        oprot.writeFieldEnd();
+      }
+      if (struct.isSetCompute_time_millis()) {
+        oprot.writeFieldBegin(COMPUTE_TIME_MILLIS_FIELD_DESC);
+        oprot.writeI64(struct.compute_time_millis);
         oprot.writeFieldEnd();
       }
       oprot.writeFieldStop();
@@ -360,6 +450,14 @@ public class FindPathsResponse implements org.apache.thrift.TBase<FindPathsRespo
     public void write(org.apache.thrift.protocol.TProtocol prot, FindPathsResponse struct) throws org.apache.thrift.TException {
       TTupleProtocol oprot = (TTupleProtocol) prot;
       struct.paths.write(oprot);
+      BitSet optionals = new BitSet();
+      if (struct.isSetCompute_time_millis()) {
+        optionals.set(0);
+      }
+      oprot.writeBitSet(optionals, 1);
+      if (struct.isSetCompute_time_millis()) {
+        oprot.writeI64(struct.compute_time_millis);
+      }
     }
 
     @Override
@@ -368,6 +466,11 @@ public class FindPathsResponse implements org.apache.thrift.TBase<FindPathsRespo
       struct.paths = new org.opentripplanner.api.thrift.definition.TripPaths();
       struct.paths.read(iprot);
       struct.setPathsIsSet(true);
+      BitSet incoming = iprot.readBitSet(1);
+      if (incoming.get(0)) {
+        struct.compute_time_millis = iprot.readI64();
+        struct.setCompute_time_millisIsSet(true);
+      }
     }
   }
 
