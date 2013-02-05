@@ -41,6 +41,9 @@ struct FindPathsRequest {
 // Response containing resulting paths.
 struct FindPathsResponse {
 	1: required TripPaths paths;
+
+	// The computation time in milliseconds.
+	10: optional i64 compute_time_millis;
 }
 
 // Request to find paths for a single trip.
@@ -55,6 +58,9 @@ struct BulkPathsRequest {
 struct BulkPathsResponse {
 	// Paths for each trip given.
 	1: required list<TripPaths> paths;
+
+	// The computation time in milliseconds.
+	10: optional i64 compute_time_millis;
 }
 
 // Request to find the nearest vertex.
@@ -69,6 +75,9 @@ struct FindNearestVertexRequest {
 struct FindNearestVertexResponse {
 	// If vertex not set, none found.
 	1: optional GraphVertex nearest_vertex;
+	
+	// The computation time in milliseconds.
+	10: optional i64 compute_time_millis;
 }
 
 // Request to find nearby edges
@@ -91,6 +100,9 @@ struct FindNearestEdgesRequest {
 struct FindNearestEdgesResponse {
 	// The list of nearby edges if any.
 	1: optional list<EdgeMatch> nearest_edges;
+
+	// The computation time in milliseconds.
+	10: optional i64 compute_time_millis;
 }
 
 // Request to get vertices in the graph.
@@ -100,6 +112,9 @@ struct GraphVerticesRequest {
 
 struct GraphVerticesResponse {
 	1: required list<GraphVertex> vertices;
+
+	// The computation time in milliseconds.
+	10: optional i64 compute_time_millis;
 }
 
 // Raised when there is no route found for the input trip

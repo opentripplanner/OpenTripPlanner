@@ -26,16 +26,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class TrivialPathServiceImpl implements PathService {
 
-    @Autowired GraphService graphService;
-    
-    @Autowired SPTService sptService;
-    
+    @Autowired
+    GraphService graphService;
+
+    @Autowired
+    SPTService sptService;
+
     @Override
     public List<GraphPath> getPaths(RoutingRequest options) {
         ShortestPathTree spt = sptService.getShortestPathTree(options);
-        if (spt == null)
+        if (spt == null) {
             return Collections.emptyList();
+        }
         return spt.getPaths();
     }
-
 }

@@ -86,10 +86,12 @@ public class OTPServiceImpl implements OTPService.Iface {
     @Override
     public GraphVerticesResponse GetVertices(GraphVerticesRequest req) throws TException {
         LOG.info("GetVertices called");
+        long startTime = System.currentTimeMillis();
 
         GraphVerticesResponse res = new GraphVerticesResponse();
         Graph g = graphService.getGraph();
         res.setVertices(makeGraphVertices(g));
+        res.setCompute_time_millis(System.currentTimeMillis() - startTime);
         return res;
     }
 
@@ -97,6 +99,7 @@ public class OTPServiceImpl implements OTPService.Iface {
     public FindNearestVertexResponse FindNearestVertex(FindNearestVertexRequest req)
             throws TException {
         LOG.info("FindNearestVertex called");
+        long startTime = System.currentTimeMillis();
 
         // NOTE(flamholz): can't set the graph here because we are not
         // actually doing any routing and don't have a to/from. From the
@@ -118,12 +121,14 @@ public class OTPServiceImpl implements OTPService.Iface {
 
         FindNearestVertexResponse res = new FindNearestVertexResponse();
         res.setNearest_vertex(new GraphVertexExtension(closest));
+        res.setCompute_time_millis(System.currentTimeMillis() - startTime);
         return res;
     }
 
     @Override
     public FindNearestEdgesResponse FindNearestEdges(FindNearestEdgesRequest req) throws TException {
         LOG.info("FindNearestEdges called");
+        long startTime = System.currentTimeMillis();
 
         // Set up the TraversalRequirements.
         TraversalRequirements requirements = new TraversalRequirements();
@@ -147,7 +152,8 @@ public class OTPServiceImpl implements OTPService.Iface {
             if (res.getNearest_edgesSize() >= maxEdges) break;
             res.addToNearest_edges(new EdgeMatchExtension(e));
         }
-
+        
+        res.setCompute_time_millis(System.currentTimeMillis() - startTime);
         return res;
     }
 
@@ -172,6 +178,7 @@ public class OTPServiceImpl implements OTPService.Iface {
     @Override
     public FindPathsResponse FindPaths(FindPathsRequest req) throws TException {
         LOG.info("FindPaths called");
+        long startTime = System.currentTimeMillis();
 
         TripParameters trip = req.getTrip();
         TripPaths outPaths = new TripPaths();
@@ -182,6 +189,7 @@ public class OTPServiceImpl implements OTPService.Iface {
 
         FindPathsResponse res = new FindPathsResponse();
         res.setPaths(tripPaths);
+        res.setCompute_time_millis(System.currentTimeMillis() - startTime);
 
         return res;
     }
@@ -189,6 +197,7 @@ public class OTPServiceImpl implements OTPService.Iface {
     @Override
     public BulkPathsResponse BulkFindPaths(BulkPathsRequest req) throws TException {
         LOG.info("BulkFindPaths called");
+        long startTime = System.currentTimeMillis();
 
         PathOptions pathOptions = req.getOptions();
         BulkPathsResponse res = new BulkPathsResponse();
@@ -197,6 +206,7 @@ public class OTPServiceImpl implements OTPService.Iface {
             TripPathsExtension tripPaths = new TripPathsExtension(trip, computedPaths);
             res.addToPaths(tripPaths);
         }
+        res.setCompute_time_millis(System.currentTimeMillis() - startTime);
         return res;
     }
 

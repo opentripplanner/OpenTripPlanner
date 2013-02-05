@@ -1,4 +1,4 @@
-#!.usr.bin.env python
+#!/usr/bin/python
  
 from optparse import OptionParser
 from thrift import Thrift
@@ -24,7 +24,7 @@ def Connect(host, port):
         transport = TTransport.TBufferedTransport(transport)
         
         # Wrap in a protocol
-        protocol = TBinaryProtocol.TBinaryProtocol(transport)
+        protocol = TBinaryProtocol.TBinaryProtocolAccelerated(transport)
         
         # Create a client to use the protocol encoder
         client = OTPService.Client(protocol)
@@ -58,7 +58,9 @@ def Main():
     total_t = time.time() - start_t
     
     vertices = res.vertices
+    reported_compute_time = float(res.compute_time_millis) / 1000.0
     print 'GraphVerticesRequest took %.6f seconds' % total_t 
+    print 'Server computation time %.6f seconds' % reported_compute_time
     print '\tReturned %d vertices' % len(vertices)
     
     # Sample an origin and a destination (deterministically)
@@ -75,7 +77,9 @@ def Main():
     res = client.FindNearestVertex(req) 
     total_t = time.time() - start_t
     
+    reported_compute_time = float(res.compute_time_millis) / 1000.0
     print 'FindNearestVertexRequest took %.6f seconds' % total_t
+    print 'Server computation time %.6f seconds' % reported_compute_time
     print 'Nearest vertex: ', res.nearest_vertex
     
     
@@ -85,7 +89,9 @@ def Main():
     res = client.FindNearestEdges(req)
     total_t = time.time() - start_t
     
+    reported_compute_time = float(res.compute_time_millis) / 1000.0
     print 'FindNearestEdgesRequest took %.6f seconds' % total_t
+    print 'Server computation time %.6f seconds' % reported_compute_time
     print 'Nearest edges: ', res.nearest_edges
     
     # Request a walking trip between them.
@@ -98,8 +104,10 @@ def Main():
     start_t = time.time()
     res = client.FindPaths(req)
     total_t = time.time() - start_t
-    
+
+    reported_compute_time = float(res.compute_time_millis) / 1000.0
     print 'FindPathsRequest took %.6f seconds' % total_t
+    print 'Server computation time %.6f seconds' % reported_compute_time
     paths = res.paths
     if paths.no_paths_found:
         print 'Found no paths'
@@ -120,6 +128,7 @@ def Main():
             origin=origin_loc, destination=dest_loc,
             allowed_modes=set([TravelMode.WALK])))
 
+    path_opts = PathOptions(num_paths=1, return_detailed_path=False)
     req = OTPService.BulkPathsRequest(trips=trip_params,
                                       options=path_opts)
     
@@ -127,9 +136,11 @@ def Main():
         start_t = time.time()
         res = client.BulkFindPaths(req)
         total_t = time.time() - start_t
-        
+
+        reported_compute_time = float(res.compute_time_millis) / 1000.0
         print ('BulkFindPaths took %.6f seconds '
                'for %d trips ' % (total_t, len(origins))) 
+        print 'Server computation time %.6f seconds' % reported_compute_time
     except OTPService.NoPathFoundError, e:
         print e
         

@@ -31,6 +31,7 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
   private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("GraphVerticesResponse");
 
   private static final org.apache.thrift.protocol.TField VERTICES_FIELD_DESC = new org.apache.thrift.protocol.TField("vertices", org.apache.thrift.protocol.TType.LIST, (short)1);
+  private static final org.apache.thrift.protocol.TField COMPUTE_TIME_MILLIS_FIELD_DESC = new org.apache.thrift.protocol.TField("compute_time_millis", org.apache.thrift.protocol.TType.I64, (short)10);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
@@ -39,10 +40,12 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
   }
 
   private List<org.opentripplanner.api.thrift.definition.GraphVertex> vertices; // required
+  private long compute_time_millis; // optional
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-    VERTICES((short)1, "vertices");
+    VERTICES((short)1, "vertices"),
+    COMPUTE_TIME_MILLIS((short)10, "compute_time_millis");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -59,6 +62,8 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
       switch(fieldId) {
         case 1: // VERTICES
           return VERTICES;
+        case 10: // COMPUTE_TIME_MILLIS
+          return COMPUTE_TIME_MILLIS;
         default:
           return null;
       }
@@ -99,12 +104,17 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
   }
 
   // isset id assignments
+  private static final int __COMPUTE_TIME_MILLIS_ISSET_ID = 0;
+  private BitSet __isset_bit_vector = new BitSet(1);
+  private _Fields optionals[] = {_Fields.COMPUTE_TIME_MILLIS};
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
     tmpMap.put(_Fields.VERTICES, new org.apache.thrift.meta_data.FieldMetaData("vertices", org.apache.thrift.TFieldRequirementType.REQUIRED, 
         new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
             new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT            , "GraphVertex"))));
+    tmpMap.put(_Fields.COMPUTE_TIME_MILLIS, new org.apache.thrift.meta_data.FieldMetaData("compute_time_millis", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I64)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(GraphVerticesResponse.class, metaDataMap);
   }
@@ -123,6 +133,8 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
    * Performs a deep copy on <i>other</i>.
    */
   public GraphVerticesResponse(GraphVerticesResponse other) {
+    __isset_bit_vector.clear();
+    __isset_bit_vector.or(other.__isset_bit_vector);
     if (other.isSetVertices()) {
       List<org.opentripplanner.api.thrift.definition.GraphVertex> __this__vertices = new ArrayList<org.opentripplanner.api.thrift.definition.GraphVertex>();
       for (org.opentripplanner.api.thrift.definition.GraphVertex other_element : other.vertices) {
@@ -130,6 +142,7 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
       }
       this.vertices = __this__vertices;
     }
+    this.compute_time_millis = other.compute_time_millis;
   }
 
   public GraphVerticesResponse deepCopy() {
@@ -139,6 +152,8 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
   @Override
   public void clear() {
     this.vertices = null;
+    setCompute_time_millisIsSet(false);
+    this.compute_time_millis = 0;
   }
 
   public int getVerticesSize() {
@@ -179,6 +194,28 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
     }
   }
 
+  public long getCompute_time_millis() {
+    return this.compute_time_millis;
+  }
+
+  public void setCompute_time_millis(long compute_time_millis) {
+    this.compute_time_millis = compute_time_millis;
+    setCompute_time_millisIsSet(true);
+  }
+
+  public void unsetCompute_time_millis() {
+    __isset_bit_vector.clear(__COMPUTE_TIME_MILLIS_ISSET_ID);
+  }
+
+  /** Returns true if field compute_time_millis is set (has been assigned a value) and false otherwise */
+  public boolean isSetCompute_time_millis() {
+    return __isset_bit_vector.get(__COMPUTE_TIME_MILLIS_ISSET_ID);
+  }
+
+  public void setCompute_time_millisIsSet(boolean value) {
+    __isset_bit_vector.set(__COMPUTE_TIME_MILLIS_ISSET_ID, value);
+  }
+
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
     case VERTICES:
@@ -189,6 +226,14 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
       }
       break;
 
+    case COMPUTE_TIME_MILLIS:
+      if (value == null) {
+        unsetCompute_time_millis();
+      } else {
+        setCompute_time_millis((Long)value);
+      }
+      break;
+
     }
   }
 
@@ -196,6 +241,9 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
     switch (field) {
     case VERTICES:
       return getVertices();
+
+    case COMPUTE_TIME_MILLIS:
+      return Long.valueOf(getCompute_time_millis());
 
     }
     throw new IllegalStateException();
@@ -210,6 +258,8 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
     switch (field) {
     case VERTICES:
       return isSetVertices();
+    case COMPUTE_TIME_MILLIS:
+      return isSetCompute_time_millis();
     }
     throw new IllegalStateException();
   }
@@ -236,6 +286,15 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
         return false;
     }
 
+    boolean this_present_compute_time_millis = true && this.isSetCompute_time_millis();
+    boolean that_present_compute_time_millis = true && that.isSetCompute_time_millis();
+    if (this_present_compute_time_millis || that_present_compute_time_millis) {
+      if (!(this_present_compute_time_millis && that_present_compute_time_millis))
+        return false;
+      if (this.compute_time_millis != that.compute_time_millis)
+        return false;
+    }
+
     return true;
   }
 
@@ -258,6 +317,16 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
     }
     if (isSetVertices()) {
       lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.vertices, typedOther.vertices);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetCompute_time_millis()).compareTo(typedOther.isSetCompute_time_millis());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetCompute_time_millis()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.compute_time_millis, typedOther.compute_time_millis);
       if (lastComparison != 0) {
         return lastComparison;
       }
@@ -289,6 +358,12 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
       sb.append(this.vertices);
     }
     first = false;
+    if (isSetCompute_time_millis()) {
+      if (!first) sb.append(", ");
+      sb.append("compute_time_millis:");
+      sb.append(this.compute_time_millis);
+      first = false;
+    }
     sb.append(")");
     return sb.toString();
   }
@@ -311,6 +386,8 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
 
   private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
     try {
+      // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
+      __isset_bit_vector = new BitSet(1);
       read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
     } catch (org.apache.thrift.TException te) {
       throw new java.io.IOException(te);
@@ -354,6 +431,14 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
+          case 10: // COMPUTE_TIME_MILLIS
+            if (schemeField.type == org.apache.thrift.protocol.TType.I64) {
+              struct.compute_time_millis = iprot.readI64();
+              struct.setCompute_time_millisIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
           default:
             org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
         }
@@ -377,6 +462,11 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
           }
           oprot.writeListEnd();
         }
+        oprot.writeFieldEnd();
+      }
+      if (struct.isSetCompute_time_millis()) {
+        oprot.writeFieldBegin(COMPUTE_TIME_MILLIS_FIELD_DESC);
+        oprot.writeI64(struct.compute_time_millis);
         oprot.writeFieldEnd();
       }
       oprot.writeFieldStop();
@@ -403,6 +493,14 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
           _iter44.write(oprot);
         }
       }
+      BitSet optionals = new BitSet();
+      if (struct.isSetCompute_time_millis()) {
+        optionals.set(0);
+      }
+      oprot.writeBitSet(optionals, 1);
+      if (struct.isSetCompute_time_millis()) {
+        oprot.writeI64(struct.compute_time_millis);
+      }
     }
 
     @Override
@@ -420,6 +518,11 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
         }
       }
       struct.setVerticesIsSet(true);
+      BitSet incoming = iprot.readBitSet(1);
+      if (incoming.get(0)) {
+        struct.compute_time_millis = iprot.readI64();
+        struct.setCompute_time_millisIsSet(true);
+      }
     }
   }
 
