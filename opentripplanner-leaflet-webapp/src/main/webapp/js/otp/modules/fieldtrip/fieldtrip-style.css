@@ -3,6 +3,9 @@
 .otp-fieldTripManager {
   bottom: 20px;
   right: 10px;
+  background: blue;
+  height: 325px;
+  width: 425px;
 }
 
 .otp-fieldTripManager-callListContainer {
