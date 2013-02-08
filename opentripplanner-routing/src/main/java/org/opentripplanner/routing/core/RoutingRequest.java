@@ -29,6 +29,7 @@ import lombok.Setter;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -59,17 +60,15 @@ public class RoutingRequest implements Cloneable, Serializable {
     public final HashMap<String, String> parameters = new HashMap<String, String>();
     /** The router ID -- internal ID to switch between router implementation (or graphs) */
     public String routerId = "";
-    /** The start location -- either a Vertex name or latitude, longitude in degrees */
-    // TODO change this to Doubles and a Vertex
-    public String from = ""; // allow missing 'from' for batch requests
-    /** The start location's user-visible name */
-    public String fromName;
-    /** The end location (see the from field for format). */
-    public String to = ""; // allow missing 'to' for batch requests
-    /** The end location's user-visible name */
-    public String toName;
-    /** An unordered list of intermediate locations to be visited (see the from field for format). */
-    public List<NamedPlace> intermediatePlaces;
+    
+    /** The start location */
+    public GenericLocation from;
+    
+    /** The end location */
+    public GenericLocation to;
+    
+    /** An unordered list of intermediate locations to be visited. */
+    public List<GenericLocation> intermediatePlaces;
     public boolean intermediatePlacesOrdered;
     /** The maximum distance (in meters) the user is willing to walk. Defaults to 1/2 mile. */
     public double maxWalkDistance = 800;
@@ -307,6 +306,10 @@ public class RoutingRequest implements Cloneable, Serializable {
         carSpeed = 15; // 15 m/s, ~35 mph, a random driving speed        
         setModes(new TraverseModeSet(new TraverseMode[] { TraverseMode.WALK, TraverseMode.TRANSIT }));
         bikeWalkingOptions = this;
+        
+        // So that they are never null.
+        from = new GenericLocation();
+        to = new GenericLocation();
     }
 
     public RoutingRequest(TraverseModeSet modes) {
@@ -461,25 +464,12 @@ public class RoutingRequest implements Cloneable, Serializable {
         return s;
     }
 
-    // TODO factor out splitting code which appears in 3 places
     public void setFrom(String from) {
-        if (from.contains("::")) {
-            String[] parts = from.split("::");
-            this.fromName = parts[0];
-            this.from = parts[1];
-        } else {
-            this.from = from;
-        }
+        this.from = GenericLocation.fromOldStyleString(from);
     }
 
     public void setTo(String to) {
-        if (to.contains("::")) {
-            String[] parts = to.split("::");
-            this.toName = parts[0];
-            this.to = parts[1];
-        } else {
-            this.to = to;
-        }
+        this.to = GenericLocation.fromOldStyleString(to);
     }
 
     /**
@@ -557,23 +547,16 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     public void setIntermediatePlaces(List<String> intermediates) {
-        this.intermediatePlaces = new ArrayList<NamedPlace>(intermediates.size());
-        for (String place : intermediates) {
-            String name = place;
-            if (place.contains("::")) {
-                String[] parts = place.split("::");
-                name = parts[0];
-                place = parts[1];
-            }
-            NamedPlace intermediate = new NamedPlace(name, place);
-            intermediatePlaces.add(intermediate);
+        this.intermediatePlaces = new ArrayList<GenericLocation>(intermediates.size());
+        for (String place : intermediates) {            
+            intermediatePlaces.add(GenericLocation.fromOldStyleString(place));
         }
     }
 
     /**
      * @return the intermediatePlaces
      */
-    public List<NamedPlace> getIntermediatePlaces() {
+    public List<GenericLocation> getIntermediatePlaces() {
         return intermediatePlaces;
     }
 
@@ -599,12 +582,12 @@ public class RoutingRequest implements Cloneable, Serializable {
         this.maxTransfers = maxTransfers;
     }
 
-    public NamedPlace getFromPlace() {
-        return new NamedPlace(fromName, from);
+    public NamedPlace getFromPlace() {        
+        return this.from.getNamedPlace();
     }
 
-    public NamedPlace getToPlace() {
-        return new NamedPlace(toName, to);
+    public NamedPlace getToPlace() {        
+        return this.to.getNamedPlace();
     }
     
     /* INSTANCE METHODS */
