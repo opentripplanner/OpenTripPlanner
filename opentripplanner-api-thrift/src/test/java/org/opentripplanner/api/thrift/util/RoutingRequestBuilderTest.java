@@ -22,9 +22,12 @@ import org.opentripplanner.api.thrift.definition.LatLng;
 import org.opentripplanner.api.thrift.definition.Location;
 import org.opentripplanner.api.thrift.definition.TravelMode;
 import org.opentripplanner.api.thrift.definition.TripParameters;
+import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+
+import com.vividsolutions.jts.geom.Coordinate;
 
 /**
  * Tests for TripUtil class.
@@ -33,160 +36,180 @@ import org.opentripplanner.routing.core.TraverseModeSet;
  */
 public class RoutingRequestBuilderTest {
 
-	/**
-	 * Test behavior for a simple trip.
-	 */
-	@Test
-	public void testAddTripParameters() {
-		TripParameters tp = new TripParameters();
-		tp.addToAllowed_modes(TravelMode.WALK);
-		tp.addToAllowed_modes(TravelMode.CAR);
+    /**
+     * Test behavior for a simple trip.
+     */
+    @Test
+    public void testAddTripParameters() {
+        TripParameters tp = new TripParameters();
+        tp.addToAllowed_modes(TravelMode.WALK);
+        tp.addToAllowed_modes(TravelMode.CAR);
 
-		LatLng originLatLng = new LatLng(1.0, 2.5);
-		Location origin = new Location();
-		origin.setLat_lng(originLatLng);
+        LatLng originLatLng = new LatLng(1.0, 2.5);
+        Location origin = new Location();
+        origin.setLat_lng(originLatLng);
 
-		LatLng destLatLng = new LatLng(-3.0, 9.7);
-		Location dest = new Location();
-		dest.setLat_lng(destLatLng);
+        LatLng destLatLng = new LatLng(-3.0, 9.7);
+        Location dest = new Location();
+        dest.setLat_lng(destLatLng);
 
-		tp.setOrigin(origin);
-		tp.setDestination(dest);
+        tp.setOrigin(origin);
+        tp.setDestination(dest);
 
-		RoutingRequest rr = (new RoutingRequestBuilder()).addTripParameters(tp)
-				.build();
+        RoutingRequest rr = (new RoutingRequestBuilder()).addTripParameters(tp).build();
 
-		assertEquals("1.0000000,2.5000000", rr.getFrom());
-		assertEquals("-3.0000000,9.7000000", rr.getTo());
+        GenericLocation from = rr.getFrom();
+        Coordinate expectedFromCoord = new Coordinate(2.5, 1.0);
+        assertEquals(expectedFromCoord, from.getCoordinate());
 
-		for (TravelMode tm : tp.getAllowed_modes()) {
-			TraverseModeSet modeSet = rr.getModes();
-			TraverseMode traverseMode = (new TravelModeWrapper(tm))
-					.toTraverseMode();
-			assertTrue(modeSet.contains(traverseMode));
-		}
-	}
-	
-	@Test
-	public void testAddTripParametersWithStartTime() {
-		TripParameters tp = new TripParameters();
-		tp.setStart_time(getTimeSeconds());
+        GenericLocation to = rr.getTo();
+        Coordinate expectedToCoord = new Coordinate(9.7, -3.0);
+        assertEquals(expectedToCoord, to.getCoordinate());
 
-		LatLng originLatLng = new LatLng(1.0, 2.5);
-		Location origin = new Location();
-		origin.setLat_lng(originLatLng);
+        for (TravelMode tm : tp.getAllowed_modes()) {
+            TraverseModeSet modeSet = rr.getModes();
+            TraverseMode traverseMode = (new TravelModeWrapper(tm)).toTraverseMode();
+            assertTrue(modeSet.contains(traverseMode));
+        }
+    }
 
-		LatLng destLatLng = new LatLng(-3.0, 9.7);
-		Location dest = new Location();
-		dest.setLat_lng(destLatLng);
+    @Test
+    public void testAddTripParametersWithStartTime() {
+        TripParameters tp = new TripParameters();
+        tp.setStart_time(getTimeSeconds());
 
-		tp.setOrigin(origin);
-		tp.setDestination(dest);
+        LatLng originLatLng = new LatLng(1.0, 2.5);
+        Location origin = new Location();
+        origin.setLat_lng(originLatLng);
 
-		RoutingRequest rr = (new RoutingRequestBuilder()).addTripParameters(tp)
-				.build();
+        LatLng destLatLng = new LatLng(-3.0, 9.7);
+        Location dest = new Location();
+        dest.setLat_lng(destLatLng);
 
-		assertEquals("1.0000000,2.5000000", rr.getFrom());
-		assertEquals("-3.0000000,9.7000000", rr.getTo());
-		assertEquals(tp.getStart_time(), rr.dateTime);
-		assertFalse(rr.arriveBy);
-	}
-	
-	@Test
-	public void testAddTripParametersWithArriveBy() {
-		TripParameters tp = new TripParameters();
-		tp.setArrive_by(getTimeSeconds() + 60*30);
+        tp.setOrigin(origin);
+        tp.setDestination(dest);
 
-		LatLng originLatLng = new LatLng(1.0, 2.5);
-		Location origin = new Location();
-		origin.setLat_lng(originLatLng);
+        RoutingRequest rr = (new RoutingRequestBuilder()).addTripParameters(tp).build();
 
-		LatLng destLatLng = new LatLng(-3.0, 9.7);
-		Location dest = new Location();
-		dest.setLat_lng(destLatLng);
+        GenericLocation from = rr.getFrom();
+        Coordinate expectedFromCoord = new Coordinate(2.5, 1.0);
+        assertEquals(expectedFromCoord, from.getCoordinate());
 
-		tp.setOrigin(origin);
-		tp.setDestination(dest);
+        GenericLocation to = rr.getTo();
+        Coordinate expectedToCoord = new Coordinate(9.7, -3.0);
+        assertEquals(expectedToCoord, to.getCoordinate());
 
-		RoutingRequest rr = (new RoutingRequestBuilder()).addTripParameters(tp)
-				.build();
+        assertEquals(tp.getStart_time(), rr.dateTime);
+        assertFalse(rr.arriveBy);
+    }
 
-		assertEquals("1.0000000,2.5000000", rr.getFrom());
-		assertEquals("-3.0000000,9.7000000", rr.getTo());
-		assertEquals(tp.getArrive_by(), rr.dateTime);
-		assertTrue(rr.arriveBy);
-	}
+    @Test
+    public void testAddTripParametersWithArriveBy() {
+        TripParameters tp = new TripParameters();
+        tp.setArrive_by(getTimeSeconds() + 60 * 30);
 
-	@Test
-	public void testAddTripParametersWithBothTimes() {
-		TripParameters tp = new TripParameters();
-		long now = getTimeSeconds();
-		tp.setStart_time(now);
-		tp.setArrive_by(now + 60*30);
+        LatLng originLatLng = new LatLng(1.0, 2.5);
+        Location origin = new Location();
+        origin.setLat_lng(originLatLng);
 
-		LatLng originLatLng = new LatLng(1.0, 2.5);
-		Location origin = new Location();
-		origin.setLat_lng(originLatLng);
+        LatLng destLatLng = new LatLng(-3.0, 9.7);
+        Location dest = new Location();
+        dest.setLat_lng(destLatLng);
 
-		LatLng destLatLng = new LatLng(-3.0, 9.7);
-		Location dest = new Location();
-		dest.setLat_lng(destLatLng);
+        tp.setOrigin(origin);
+        tp.setDestination(dest);
 
-		tp.setOrigin(origin);
-		tp.setDestination(dest);
+        RoutingRequest rr = (new RoutingRequestBuilder()).addTripParameters(tp).build();
 
-		RoutingRequest rr = (new RoutingRequestBuilder()).addTripParameters(tp)
-				.build();
+        GenericLocation from = rr.getFrom();
+        Coordinate expectedFromCoord = new Coordinate(2.5, 1.0);
+        assertEquals(expectedFromCoord, from.getCoordinate());
 
-		assertEquals("1.0000000,2.5000000", rr.getFrom());
-		assertEquals("-3.0000000,9.7000000", rr.getTo());
-		
-		// Start time takes precedence
-		assertEquals(tp.getStart_time(), rr.dateTime);
-		assertFalse(rr.arriveBy);
-	}
-	
-	@Test
-	public void testSetNumItineraries() {
-		int n = 3;
-		RoutingRequest rr = (new RoutingRequestBuilder()).setNumItineraries(n)
-				.build();
-		assertEquals(n, rr.getNumItineraries().intValue());
-	}
-	
-	@Test
-	public void testSetStartTime() {
-		long now = this.getTimeSeconds();
-		RoutingRequest rr = (new RoutingRequestBuilder()).setStartTime(now)
-				.build();
-		assertEquals(now, rr.dateTime);
-		assertFalse(rr.arriveBy);
-	}
-	
-	@Test
-	public void testSetArriveBy() {
-		long t = this.getTimeSeconds() + 30*60;
-		RoutingRequest rr = (new RoutingRequestBuilder()).setArriveBy(t)
-				.build();
-		assertEquals(t, rr.dateTime);
-		assertTrue(rr.arriveBy);
-	}
+        GenericLocation to = rr.getTo();
+        Coordinate expectedToCoord = new Coordinate(9.7, -3.0);
+        assertEquals(expectedToCoord, to.getCoordinate());
 
-	@Test
-	public void testSetOriginDestination() {
-		LatLng origin = new LatLng(1.0, 2.5);
-		LatLng dest = new LatLng(-3.0, 9.7);
+        assertEquals(tp.getArrive_by(), rr.dateTime);
+        assertTrue(rr.arriveBy);
+    }
 
-		RoutingRequest rr = (new RoutingRequestBuilder()).setOrigin(origin)
-				.setDestination(dest).build();
-		assertEquals("1.0000000,2.5000000", rr.getFrom());
-		assertEquals("-3.0000000,9.7000000", rr.getTo());
-	}
+    @Test
+    public void testAddTripParametersWithBothTimes() {
+        TripParameters tp = new TripParameters();
+        long now = getTimeSeconds();
+        tp.setStart_time(now);
+        tp.setArrive_by(now + 60 * 30);
 
-	/**
-	 * @return Current time in seconds.
-	 */
-	private long getTimeSeconds() {
-		return System.currentTimeMillis() / 1000;
-	}
+        LatLng originLatLng = new LatLng(1.0, 2.5);
+        Location origin = new Location();
+        origin.setLat_lng(originLatLng);
+
+        LatLng destLatLng = new LatLng(-3.0, 9.7);
+        Location dest = new Location();
+        dest.setLat_lng(destLatLng);
+
+        tp.setOrigin(origin);
+        tp.setDestination(dest);
+
+        RoutingRequest rr = (new RoutingRequestBuilder()).addTripParameters(tp).build();
+
+        GenericLocation from = rr.getFrom();
+        Coordinate expectedFromCoord = new Coordinate(2.5, 1.0);
+        assertEquals(expectedFromCoord, from.getCoordinate());
+
+        GenericLocation to = rr.getTo();
+        Coordinate expectedToCoord = new Coordinate(9.7, -3.0);
+        assertEquals(expectedToCoord, to.getCoordinate());
+
+        // Start time takes precedence
+        assertEquals(tp.getStart_time(), rr.dateTime);
+        assertFalse(rr.arriveBy);
+    }
+
+    @Test
+    public void testSetNumItineraries() {
+        int n = 3;
+        RoutingRequest rr = (new RoutingRequestBuilder()).setNumItineraries(n).build();
+        assertEquals(n, rr.getNumItineraries().intValue());
+    }
+
+    @Test
+    public void testSetStartTime() {
+        long now = this.getTimeSeconds();
+        RoutingRequest rr = (new RoutingRequestBuilder()).setStartTime(now).build();
+        assertEquals(now, rr.dateTime);
+        assertFalse(rr.arriveBy);
+    }
+
+    @Test
+    public void testSetArriveBy() {
+        long t = this.getTimeSeconds() + 30 * 60;
+        RoutingRequest rr = (new RoutingRequestBuilder()).setArriveBy(t).build();
+        assertEquals(t, rr.dateTime);
+        assertTrue(rr.arriveBy);
+    }
+
+    @Test
+    public void testSetOriginDestination() {
+        LatLng origin = new LatLng(1.0, 2.5);
+        LatLng dest = new LatLng(-3.0, 9.7);
+
+        RoutingRequest rr = (new RoutingRequestBuilder()).setOrigin(origin).setDestination(dest)
+                .build();
+        
+        GenericLocation from = rr.getFrom();
+        Coordinate expectedFromCoord = new Coordinate(2.5, 1.0);
+        assertEquals(expectedFromCoord, from.getCoordinate());
+        
+        GenericLocation to = rr.getTo();
+        Coordinate expectedToCoord = new Coordinate(9.7, -3.0);
+        assertEquals(expectedToCoord, to.getCoordinate());
+    }
+
+    /**
+     * @return Current time in seconds.
+     */
+    private long getTimeSeconds() {
+        return System.currentTimeMillis() / 1000;
+    }
 }

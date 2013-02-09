@@ -16,6 +16,7 @@ package org.opentripplanner.routing.services;
 import java.util.Collection;
 import java.util.List;
 
+import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.routing.core.LocationObservation;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -126,8 +127,43 @@ public interface StreetVertexIndexService {
 	public List<TransitStop> getNearbyTransitStops(Coordinate coordinateOne,
 			Coordinate coordinateTwo);
 
+	/**
+	 * Finds the appropriate vertex for this location.
+	 * 
+	 * @param location
+	 * @param options
+	 * @return
+	 */
+	Vertex getVertexForLocation(GenericLocation location, RoutingRequest options);
+	
+	/**
+	 * Finds the appropriate vertex for this location.
+	 * 
+	 * @param place
+	 * @param options
+	 * @param other non-null when another vertex has already been found. Passed in
+	 * so that any extra edges made when locating the previous vertex may be used
+	 * to locate this one as well. 
+	 * @return
+	 */
+	Vertex getVertexForLocation(GenericLocation place, RoutingRequest options,
+                Vertex other);
+	
+	/**
+	 * DEPRECATED. Use getVertexForLocation.
+	 * @param place
+	 * @param options
+	 * @return
+	 */
 	Vertex getVertexForPlace(NamedPlace place, RoutingRequest options);
 
+	/**
+	 * DEPRECATED. Use getVertexForLocation.
+	 * @param place
+	 * @param options
+	 * @param other
+	 * @return
+	 */
 	Vertex getVertexForPlace(NamedPlace place, RoutingRequest options,
 			Vertex other);
 

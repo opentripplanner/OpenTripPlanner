@@ -21,6 +21,7 @@ import java.util.Set;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
+import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
@@ -102,19 +103,19 @@ public class RoutingContext implements Cloneable {
             // normal mode, search for vertices based on fromPlace and toPlace
             if ( ! opt.batch || opt.arriveBy) {
                 // non-batch mode, or arriveBy batch mode: we need a to vertex
-                toVertex = graph.streetIndex.getVertexForPlace(opt.getToPlace(), opt);
+                toVertex = graph.streetIndex.getVertexForLocation(opt.getTo(), opt);
             } else {
                 toVertex = null;
             }
             if ( ! opt.batch || ! opt.arriveBy) {
                 // non-batch mode, or depart-after batch mode: we need a from vertex
-                fromVertex = graph.streetIndex.getVertexForPlace(opt.getFromPlace(), opt, toVertex);                
+                fromVertex = graph.streetIndex.getVertexForLocation(opt.getFrom(), opt, toVertex);                
             } else {
                 fromVertex = null;
             }
             if (opt.intermediatePlaces != null) {
-                for (NamedPlace intermediate : opt.intermediatePlaces) {
-                    Vertex vertex = graph.streetIndex.getVertexForPlace(intermediate, opt);
+                for (GenericLocation intermediate : opt.intermediatePlaces) {
+                    Vertex vertex = graph.streetIndex.getVertexForLocation(intermediate, opt);
                     intermediateVertices.add(vertex);
                 }
             }
