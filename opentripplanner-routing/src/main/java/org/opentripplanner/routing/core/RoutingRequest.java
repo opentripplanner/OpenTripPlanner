@@ -70,6 +70,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** An unordered list of intermediate locations to be visited. */
     public List<GenericLocation> intermediatePlaces;
     public boolean intermediatePlacesOrdered;
+
     /** The maximum distance (in meters) the user is willing to walk. Defaults to 1/2 mile. */
     public double maxWalkDistance = 800;
     /** The worst possible time (latest for depart-by and earliest for arrive-by) to accept */
@@ -464,10 +465,18 @@ public class RoutingRequest implements Cloneable, Serializable {
         return s;
     }
 
+    public void setFrom(GenericLocation from) {
+        this.from = from;
+    }
+    
     public void setFrom(String from) {
         this.from = GenericLocation.fromOldStyleString(from);
     }
 
+    public void setTo(GenericLocation to) {
+        this.to = to;
+    }
+    
     public void setTo(String to) {
         this.to = GenericLocation.fromOldStyleString(to);
     }
