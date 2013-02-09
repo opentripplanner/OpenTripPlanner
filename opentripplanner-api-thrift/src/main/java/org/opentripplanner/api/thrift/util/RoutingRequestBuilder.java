@@ -138,7 +138,7 @@ public class RoutingRequestBuilder {
      * @return self reference
      */
     public RoutingRequestBuilder setOrigin(LatLng origin) {
-        routingRequest.from = makeGenericLocation(origin);
+        routingRequest.setFrom(makeGenericLocation(origin));
         return this;
     }
 
@@ -159,7 +159,7 @@ public class RoutingRequestBuilder {
      * @return self reference
      */
     public RoutingRequestBuilder setDestination(LatLng dest) {
-        routingRequest.to = makeGenericLocation(dest);
+        routingRequest.setTo(makeGenericLocation(dest));
         return this;
     }
 
