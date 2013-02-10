@@ -452,13 +452,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         return out;
     }
 
-    /* EX-GENERICPATHSERVICE */
-
-    private static final String _doublePattern = "-{0,1}\\d+(\\.\\d+){0,1}";
-
-    private static final Pattern _latLonPattern = Pattern.compile("^\\s*(" + _doublePattern
-            + ")(\\s*,\\s*|\\s+)(" + _doublePattern + ")\\s*$");
-
     @Override
     public Vertex getVertexForLocation(GenericLocation location, RoutingRequest options) {
         return getVertexForLocation(location, options, null);
