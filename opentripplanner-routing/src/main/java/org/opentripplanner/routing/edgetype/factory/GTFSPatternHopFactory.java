@@ -1496,16 +1496,18 @@ public class GTFSPatternHopFactory {
     }
 
     /**
-     * Create transfer edges between stops which are listed in transfers.txt.
+     * 1. Create edges between stops and their parent stations.
+     * 2. Create transfer edges between stops which are listed in transfers.txt.
+     * 
      * This is not usually useful, but it's nice for the NYC subway system, where
      * it's important to provide in-station transfers for fare computation.
+     * 
+     * NOTE: this method is only called when transfersTxtDefinesStationPaths is set to
+     * True for a given GFTS feed. 
      */
     public void createStationTransfers(Graph graph) {
 
-        /* connect stops to their parent stations
-         * TODO: provide a cost for these edges when stations and
-         * stops have different locations 
-         */
+        /*  1. Connect stops to their parent stations. */
         for (Stop stop : _dao.getAllStops()) {
             String parentStation = stop.getParentStation();
             if (parentStation != null) {
@@ -1532,12 +1534,15 @@ public class GTFSPatternHopFactory {
                 new FreeEdge(parentStopDepartVertex, stopDepartVertex);
                 new FreeEdge(stopDepartVertex, parentStopDepartVertex);
 
+                // TODO: provide a cost for these edges when stations and
+                // stops have different locations 
             }
         }
+        /* 2. Create transfer edges based on transfers.txt. */
         for (Transfer transfer : _dao.getAllTransfers()) {
 
             int type = transfer.getTransferType();
-            if (type == 3)
+            if (type == 3) // type 3 = transfer not possible
                 continue;
             if (transfer.getFromStop().equals(transfer.getToStop())) {
                 continue;
@@ -1570,7 +1575,7 @@ public class GTFSPatternHopFactory {
     }
 
     /**
-     * you might not want to delete dwell edges when using realtime updates, because new dwells 
+     * You might not want to delete dwell edges when using realtime updates, because new dwells 
      * might be introduced via trip updates.
      */
     public void setDeleteUselessDwells(boolean delete) {
