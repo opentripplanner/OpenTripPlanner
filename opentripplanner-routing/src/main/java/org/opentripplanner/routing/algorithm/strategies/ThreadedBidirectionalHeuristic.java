@@ -150,6 +150,10 @@ public class ThreadedBidirectionalHeuristic implements RemainingWeightHeuristic 
             for (State stopState : streetSearch(options, true)) { // backward street search
                 q.insert(stopState.getVertex(), stopState.getWeight());
             }
+            // once street searches are done, raise the walk limit to max
+            // because hard walk limiting is incorrect and is observed to cause problems 
+            // for trips near the cutoff
+            options.setMaxWalkDistance(Double.MAX_VALUE);
         }
         
         @Override
@@ -244,8 +248,6 @@ public class ThreadedBidirectionalHeuristic implements RemainingWeightHeuristic 
     private List<State> streetSearch (RoutingRequest rr, boolean fromTarget) {
 //        final double RADIUS = 5000;
         rr = rr.clone();
-        // it is not clear why this should be set higher than the value specified in the incoming request
-        rr.setMaxWalkDistance(5000);
         if (fromTarget)
             rr.setArriveBy( ! rr.isArriveBy());
         List<State> stopStates = Lists.newArrayList();
