@@ -72,7 +72,7 @@ public class Renderer {
             DateFormat df = DateFormat.getDateTimeInstance();
             df.setTimeZone(TimeZone.getTimeZone("America/New_York"));
             String ds = df.format(new Date(sptRequestA.dateTime * 1000));
-            shadowWrite(image, ds, sptRequestA.from);
+            shadowWrite(image, ds, sptRequestA.from.toString());
 
             Graphics2D g2d = image.createGraphics();
             g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
