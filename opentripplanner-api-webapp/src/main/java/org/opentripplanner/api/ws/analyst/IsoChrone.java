@@ -132,7 +132,7 @@ public class IsoChrone extends RoutingResource{
     	this.tooFastTraversedEdgeGeoms = new ArrayList();
     	
         RoutingRequest sptRequestA = buildRequest(0);
-        String from = sptRequestA.getFrom();
+        String from = sptRequestA.getFrom().toString();
         int pos = 1; float lat = 0; float lon = 0;
         for (String s : from.split(",")) {
             if (s.isEmpty()){
