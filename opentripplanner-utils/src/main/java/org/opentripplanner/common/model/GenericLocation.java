@@ -101,7 +101,7 @@ public class GenericLocation {
      * @return
      */
     public static GenericLocation fromOldStyleString(String input) {
-        String name = input;
+        String name = "";
         String place = input;
         if (input.contains("::")) {
             String[] parts = input.split("::");
@@ -124,5 +124,19 @@ public class GenericLocation {
             return null;
         }
         return new Coordinate(this.lng, this.lat);
+    }
+    
+    /**
+     * Represents the location as an old-style string for clients that relied on that behavior.
+     * 
+     * TODO(flamholz): clients should stop relying on these being strings and then we can return a string here that fully represents the contents of
+     * the object.
+     */
+    @Override
+    public String toString() {
+        if (this.name == null || this.name.isEmpty()) {
+            return this.place;
+        }
+        return String.format("%s::%s", this.name, this.place);
     }
 }

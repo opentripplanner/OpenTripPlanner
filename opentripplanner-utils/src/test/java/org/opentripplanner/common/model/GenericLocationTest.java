@@ -81,5 +81,20 @@ public class GenericLocationTest {
         assertEquals(new Double(2.5), loc.getLng());
         assertEquals(new Coordinate(2.5, 1.0), loc.getCoordinate());
     }
+ 
+    @Test
+    public void testToString() {
+        String input = "name::1.0,2.5";
+        GenericLocation loc = GenericLocation.fromOldStyleString(input);
+        assertEquals(input, loc.toString());
+        
+        input = "name::12345";
+        loc = GenericLocation.fromOldStyleString(input);
+        assertEquals(input, loc.toString());
+        
+        input = "name";
+        loc = GenericLocation.fromOldStyleString(input);
+        assertEquals(input, loc.toString());
+    }
     
 }
