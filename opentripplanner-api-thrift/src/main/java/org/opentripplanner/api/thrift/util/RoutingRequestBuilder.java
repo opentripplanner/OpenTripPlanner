@@ -7,6 +7,7 @@ import org.opentripplanner.api.thrift.definition.LatLng;
 import org.opentripplanner.api.thrift.definition.Location;
 import org.opentripplanner.api.thrift.definition.TravelMode;
 import org.opentripplanner.api.thrift.definition.TripParameters;
+import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 
@@ -41,9 +42,11 @@ public class RoutingRequestBuilder {
      * @param latlng
      * @return String that is accepted internally as a LatLng.
      */
-    private static String latLngToString(final LatLng latlng) {
-        // NOTE: 7 decimal places means better than cm resolution.
-        return String.format("%.7f,%.7f", latlng.getLat(), latlng.getLng());
+    private static GenericLocation makeGenericLocation(final LatLng latlng) {
+        GenericLocation loc = new GenericLocation();
+        loc.setLat(latlng.getLat());
+        loc.setLng(latlng.getLng());
+        return loc;        
     }
 
     /**
@@ -125,8 +128,7 @@ public class RoutingRequestBuilder {
      * @return self reference
      */
     public RoutingRequestBuilder setOrigin(Location origin) {
-        routingRequest.setFrom(latLngToString(origin.getLat_lng()));
-        return this;
+        return setOrigin(origin.getLat_lng());
     }
 
     /**
@@ -136,7 +138,7 @@ public class RoutingRequestBuilder {
      * @return self reference
      */
     public RoutingRequestBuilder setOrigin(LatLng origin) {
-        routingRequest.setFrom(latLngToString(origin));
+        routingRequest.setFrom(makeGenericLocation(origin));
         return this;
     }
 
@@ -147,8 +149,7 @@ public class RoutingRequestBuilder {
      * @return self reference
      */
     public RoutingRequestBuilder setDestination(Location dest) {
-        routingRequest.setTo(latLngToString(dest.getLat_lng()));
-        return this;
+        return setDestination(dest.getLat_lng());
     }
 
     /**
@@ -158,7 +159,7 @@ public class RoutingRequestBuilder {
      * @return self reference
      */
     public RoutingRequestBuilder setDestination(LatLng dest) {
-        routingRequest.setTo(latLngToString(dest));
+        routingRequest.setTo(makeGenericLocation(dest));
         return this;
     }
 

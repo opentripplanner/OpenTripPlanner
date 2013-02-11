@@ -31,6 +31,7 @@
             <groupId>${project.groupId}</groupId>
             <artifactId>opentripplanner-utils</artifactId>
             <version>${project.version}</version>
+            <scope>compile</scope>
         </dependency>
 		<dependency>
     	    <groupId>org.apache.thrift</groupId>
