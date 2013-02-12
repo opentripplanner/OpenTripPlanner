@@ -73,8 +73,6 @@ public class SimplifiedPathServiceImpl implements PathService {
             options.rctx.pathParsers = new PathParser[] { new Parser() };
         }
 
-        // ideally reset walk distance after initializing heuristic with specified maxWalk
-        options.setMaxWalkDistance(Double.MAX_VALUE);
         LOG.debug("rreq={}", options);
         
         // only use the threaded bidi heuristic for transit
