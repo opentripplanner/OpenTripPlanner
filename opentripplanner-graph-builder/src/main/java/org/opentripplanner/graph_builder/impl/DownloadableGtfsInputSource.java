@@ -23,6 +23,8 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.zip.ZipFile;
 
+import lombok.Setter;
+
 import org.onebusaway.csv_entities.CsvInputSource;
 import org.onebusaway.csv_entities.ZipFileCsvInputSource;
 import org.slf4j.Logger;
@@ -37,6 +39,8 @@ public class DownloadableGtfsInputSource implements CsvInputSource {
     private File _cacheDirectory;
 
     private String _defaultAgencyId;
+    
+    @Setter private boolean useCached = false;
 
     // Pattern: Decorator
     private ZipFileCsvInputSource _zip;
@@ -88,7 +92,7 @@ public class DownloadableGtfsInputSource implements CsvInputSource {
             String fileName = cacheFile + "_gtfs.zip";
             File gtfsFile = new File(tmpDir, fileName);
 
-            if (gtfsFile.exists()) {
+            if (useCached && gtfsFile.exists()) {
                 _log.info("using already downloaded gtfs file: path=" + gtfsFile);
                 return gtfsFile;
             }
