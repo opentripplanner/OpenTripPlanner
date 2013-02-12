@@ -40,7 +40,7 @@ public class DownloadableGtfsInputSource implements CsvInputSource {
 
     private String _defaultAgencyId;
     
-    @Setter private boolean useCached = false;
+    @Setter private boolean useCached = true;
 
     // Pattern: Decorator
     private ZipFileCsvInputSource _zip;
@@ -92,9 +92,12 @@ public class DownloadableGtfsInputSource implements CsvInputSource {
             String fileName = cacheFile + "_gtfs.zip";
             File gtfsFile = new File(tmpDir, fileName);
 
-            if (useCached && gtfsFile.exists()) {
-                _log.info("using already downloaded gtfs file: path=" + gtfsFile);
-                return gtfsFile;
+            if (gtfsFile.exists()) {
+                if (useCached) {
+                    _log.info("using already downloaded gtfs file: path=" + gtfsFile);
+                    return gtfsFile;
+                }
+                _log.info("useCached=false; GTFS will be re-downloaded." + gtfsFile);
             }
 
             _log.info("downloading gtfs: url=" + _url + " path=" + gtfsFile);
