@@ -13,20 +13,15 @@
 
 package org.opentripplanner.graph_builder.impl;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import lombok.Getter;
 import lombok.Setter;
-import org.apache.log4j.*;
-import org.apache.log4j.Logger;
 import org.opentripplanner.common.StreetUtils;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.slf4j.*;
 
 public class PruneFloatingIslands implements GraphBuilder {

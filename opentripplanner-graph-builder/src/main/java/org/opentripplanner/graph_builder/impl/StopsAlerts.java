@@ -18,7 +18,6 @@ import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.graph_builder.impl.stopsAlerts.IStopTester;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
