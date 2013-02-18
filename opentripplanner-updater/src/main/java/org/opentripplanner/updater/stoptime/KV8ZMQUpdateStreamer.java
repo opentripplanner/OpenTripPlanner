@@ -19,9 +19,9 @@ import lombok.Setter;
 import org.opentripplanner.routing.trippattern.Update;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zeromq.ZFrame;
-import org.zeromq.ZMQ;
-import org.zeromq.ZMsg;
+import org.jeromq.ZFrame;
+import org.jeromq.ZMQ;
+import org.jeromq.ZMsg;
 
 /** StoptimeUpdateStreamer for CTX-encoded Dutch KV8 realtime updates over ZeroMQ */
 public class KV8ZMQUpdateStreamer implements UpdateStreamer {

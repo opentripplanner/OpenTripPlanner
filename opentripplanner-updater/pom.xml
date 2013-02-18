@@ -26,9 +26,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.zeromq</groupId>
-            <artifactId>jzmq</artifactId>
-            <version>1.0.0</version>
+            <groupId>org.jeromq</groupId>
+            <artifactId>jeromq</artifactId>
+            <version>0.2.0</version>
         </dependency>
         <dependency>
 	        <groupId>org.projectlombok</groupId>
