@@ -25,25 +25,26 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
+import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A heuristic that performs a single-source / all destinations shortest path search backward from
- * the target of the main search, using lower bounds on the weight of each edge.
+ * A heuristic that performs a single-source / all destinations shortest path search backward from the target of the main search, using lower bounds
+ * on the weight of each edge.
  * 
  * @author andrewbyrd
  */
-public class BidirectionalRemainingWeightHeuristic implements 
-    RemainingWeightHeuristic, RemainingTimeHeuristic {
+public class BidirectionalRemainingWeightHeuristic implements RemainingWeightHeuristic,
+        RemainingTimeHeuristic {
 
     private static final long serialVersionUID = 20111002L;
 
-    private static Logger LOG = LoggerFactory.getLogger(LBGRemainingWeightHeuristic.class);
+    private static Logger LOG = LoggerFactory.getLogger(BidirectionalRemainingWeightHeuristic.class);
 
     Vertex target;
-    
+
     double cutoff;
 
     double[] weights;
@@ -94,7 +95,9 @@ public class BidirectionalRemainingWeightHeuristic implements
                         && !localStreetService.transferrable(v)) {
                     return Double.MAX_VALUE;
                 }
-                if (s.isAlightedLocal() || (!s.isOnboard() && s.getNumBoardings() > s.getOptions().getMaxTransfers())) {
+                if (s.isAlightedLocal()
+                        || (!s.isOnboard() && s.getNumBoardings() > s.getOptions()
+                                .getMaxTransfers())) {
                     double d = distanceLibrary.fastDistance(v.getCoordinate(),
                             target.getCoordinate());
                     if (d > s.getOptions().getMaxWalkDistance() - s.getWalkDistance()) {
@@ -105,17 +108,18 @@ public class BidirectionalRemainingWeightHeuristic implements
                 }
             }
             // System.out.printf("h=%f at %s\n", h, s.getVertex());
-            // return infinite heuristic values 
+            // return infinite heuristic values
             // so transit boarding is not even attempted useless patterns
 
             return h;
-            //return h == Double.POSITIVE_INFINITY ? 0 : h;
-            
+            // return h == Double.POSITIVE_INFINITY ? 0 : h;
+
         } else
             return 0;
     }
 
-    private void recalculate(Vertex origin, Vertex target, RoutingRequest options, boolean timeNotWeight) {
+    private void recalculate(Vertex origin, Vertex target, RoutingRequest options,
+            boolean timeNotWeight) {
         if (target != this.target || options.maxWeight > this.cutoff) {
             LOG.debug("recalc");
             this.target = target;
@@ -163,10 +167,9 @@ public class BidirectionalRemainingWeightHeuristic implements
                 else
                     edges = u.getIncoming();
                 for (Edge e : edges) {
-                    Vertex v = options.isArriveBy() ? 
-                        e.getToVertex() : e.getFromVertex();
-                    double ew = timeNotWeight ? 
-                           e.timeLowerBound(options) : e.weightLowerBound(options);
+                    Vertex v = options.isArriveBy() ? e.getToVertex() : e.getFromVertex();
+                    double ew = timeNotWeight ? e.timeLowerBound(options) : e
+                            .weightLowerBound(options);
                     if (ew < 0) {
                         LOG.error("negative edge weight {} qt {}", ew, e);
                         continue;
@@ -200,6 +203,19 @@ public class BidirectionalRemainingWeightHeuristic implements
     @Override
     public double timeLowerBound(State s) {
         return computeReverseWeight(s, null);
+    }
+
+    public static class Factory implements RemainingWeightHeuristicFactory {
+        @Override
+        public RemainingWeightHeuristic getInstanceForSearch(RoutingRequest opt) {
+            if (opt.getModes().isTransit()) {
+                LOG.debug("Transit itinerary requested.");
+                return new BidirectionalRemainingWeightHeuristic (opt.rctx.graph);
+            } else {
+                LOG.debug("Non-transit itinerary requested.");
+                return new DefaultRemainingWeightHeuristic();
+            }   
+        }
     }
 
 }
