@@ -45,7 +45,7 @@ public class StopsAlerts implements GraphBuilder {
                 }
             }
             if(types.length() > 0) {
-                stopsLog.info(String.format("%s,%f,%f,%s",ts.getIndex() ,ts.getCoordinate().x,ts.getCoordinate().y,types.toString()));
+                stopsLog.info(String.format("%s,%f,%f,%s",ts.getStopId(), ts.getCoordinate().x,ts.getCoordinate().y,types.toString()));
             }
         }
     }

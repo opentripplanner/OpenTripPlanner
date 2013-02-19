@@ -135,6 +135,7 @@ public class GraphPath {
         List<RouteSpec> ret = new LinkedList<RouteSpec>();
         for (State s : states) {
             Edge e = s.getBackEdge();
+            if (e == null) continue;
             Trip trip = s.getBackTrip();
             if ( trip != null) {
                 String routeName = GtfsLibrary.getRouteName(trip.getRoute());
