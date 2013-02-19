@@ -112,8 +112,14 @@ public abstract class RoutingResource {
     /** The list of preferred routes.  The format is agency_route, so TriMet_100. */
     @DefaultValue("") @QueryParam("preferredRoutes") protected List<String> preferredRoutes;
     
+    /** The comma-separated list of preferred agencies. */
+    @DefaultValue("") @QueryParam("preferredAgencies") protected List<String> preferredAgencies;
+    
     /** The list of unpreferred routes.  The format is agency_route, so TriMet_100. */
     @DefaultValue("") @QueryParam("unpreferredRoutes") protected List<String> unpreferredRoutes;
+    
+    /** The comma-separated list of unpreferred agencies. */
+    @DefaultValue("") @QueryParam("unpreferredAgencies") protected List<String> unpreferredAgencies;
 
     /** Whether intermediate stops -- those that the itinerary passes in a vehicle, but 
      *  does not board or alight at -- should be returned in the response.  For example,
@@ -281,7 +287,9 @@ public abstract class RoutingResource {
             intermediatePlacesOrdered = request.isIntermediatePlacesOrdered();
         request.setIntermediatePlacesOrdered(intermediatePlacesOrdered);
         request.setPreferredRoutes(get(preferredRoutes, n, request.getPreferredRouteStr()));
+        request.setPreferredAgencies(get(preferredAgencies, n, request.getPreferredAgenciesStr()));
         request.setUnpreferredRoutes(get(unpreferredRoutes, n, request.getUnpreferredRouteStr()));
+        request.setUnpreferredAgencies(get(unpreferredAgencies, n, request.getUnpreferredAgenciesStr()));
         request.setBannedRoutes(get(bannedRoutes, n, request.getBannedRouteStr()));
         request.setBannedAgencies(get(bannedAgencies, n, request.getBannedAgenciesStr()));
         HashMap<AgencyAndId, BannedStopSet> bannedTripMap = makeBannedTripMap(get(bannedTrips, n, null));
