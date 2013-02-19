@@ -20,6 +20,7 @@ import java.util.Set;
 import junit.framework.TestCase;
 
 import org.junit.Test;
+import org.opentripplanner.graph_builder.impl.osm.wayProperties.DefaultWayPropertySetSource;
 import org.opentripplanner.openstreetmap.impl.FileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
