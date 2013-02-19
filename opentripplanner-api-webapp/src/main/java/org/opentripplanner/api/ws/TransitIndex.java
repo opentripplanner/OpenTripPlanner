@@ -282,7 +282,7 @@ public class TransitIndex {
                     "No transit index found.  Add TransitIndexBuilder to your graph builder configuration and rebuild your graph.");
         }
 
-        // if no stopAgency is set try to search through all diffrent agencies
+        // if no stopAgency is set try to search through all different agencies
         Graph graph = getGraph(routerId);
 
         // add all departures
@@ -309,7 +309,7 @@ public class TransitIndex {
                 // each of these edges boards a separate set of trips
                 for (StopTime st : getStopTimesForBoardEdge(startTime, endTime, options, e,
                         extended)) {
-                    // diffrent parameters
+                    // different parameters
                     st.phase = "departure";
                     if (extended != null && extended.equals(true)) {
                         if (routeId != null && !routeId.equals("")
