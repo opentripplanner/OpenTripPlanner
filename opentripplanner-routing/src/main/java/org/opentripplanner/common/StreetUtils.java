@@ -162,8 +162,9 @@ public class StreetUtils {
         //remove street conncetion form
         for (Iterator<Vertex> vIter = island.stopIterator(); vIter.hasNext();) {
             Vertex v = vIter.next();
-            Collection<Edge> outgoing = new ArrayList<Edge>(v.getOutgoing());
-            for (Edge e : outgoing) {
+            Collection<Edge> edges = new ArrayList<Edge>(v.getOutgoing());
+            edges.addAll(v.getIncoming());
+            for (Edge e : edges) {
                 if (e instanceof StreetTransitLink) {
                     e.detach();
                 }

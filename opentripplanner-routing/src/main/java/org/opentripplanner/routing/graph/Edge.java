@@ -29,6 +29,7 @@ import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.patch.Patch;
 import org.opentripplanner.routing.util.IncrementingIdGenerator;
 import org.opentripplanner.routing.util.UniqueIdGenerator;
@@ -284,10 +285,14 @@ public abstract class Edge implements Serializable {
 
 	private void writeObject(ObjectOutputStream out) throws IOException,
 			ClassNotFoundException {
-		if (fromv == null)
+		if (fromv == null){
+            if(this instanceof PlainStreetEdge) System.out.println(((PlainStreetEdge)this).getGeometry());
 			System.out.printf("fromv null %s \n", this);
-		if (tov == null)
+        }
+		if (tov == null){
+            if(this instanceof PlainStreetEdge) System.out.println(((PlainStreetEdge)this).getGeometry());
 			System.out.printf("tov null %s \n", this);
+        }
 		out.defaultWriteObject();
 	}
 
