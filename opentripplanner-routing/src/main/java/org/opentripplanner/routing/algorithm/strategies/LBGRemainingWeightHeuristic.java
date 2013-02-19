@@ -26,12 +26,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Intended primarily for testing of and experimentation with heuristics based on the triangle
- * inequality and metric embeddings.
+ * Intended primarily for testing of and experimentation with heuristics based on the triangle inequality and metric embeddings.
  * 
- * A heuristic that performs a single-source / all destinations shortest path search in a weighted,
- * directed graph whose shortest path metric is a lower bound on path weight in our main,
- * time-dependent graph.
+ * A heuristic that performs a single-source / all destinations shortest path search in a weighted, directed graph whose shortest path metric is a
+ * lower bound on path weight in our main, time-dependent graph.
  * 
  * @author andrewbyrd
  */
@@ -41,8 +39,7 @@ public class LBGRemainingWeightHeuristic implements RemainingWeightHeuristic {
 
     private static Logger LOG = LoggerFactory.getLogger(LBGRemainingWeightHeuristic.class);
 
-    private static HashMap<GraphAndDirection, LowerBoundGraph> 
-        lbgCache = new HashMap<GraphAndDirection, LowerBoundGraph>();
+    private static HashMap<GraphAndDirection, LowerBoundGraph> lbgCache = new HashMap<GraphAndDirection, LowerBoundGraph>();
 
     LowerBoundGraph lbg;
 
@@ -58,7 +55,7 @@ public class LBGRemainingWeightHeuristic implements RemainingWeightHeuristic {
             LOG.debug("BEGIN Making lower bound graph");
             if (opt.isArriveBy())
                 this.lbg = new LowerBoundGraph(g, LowerBoundGraph.OUTGOING);
-            else 
+            else
                 this.lbg = new LowerBoundGraph(g, LowerBoundGraph.INCOMING);
             LOG.debug("END   Making lower bound graph");
             lbgCache.put(key, this.lbg);
@@ -94,7 +91,7 @@ public class LBGRemainingWeightHeuristic implements RemainingWeightHeuristic {
             this.target = target;
             if (target instanceof StreetLocation)
                 this.weights = lbg.sssp((StreetLocation) target);
-            else 
+            else
                 this.weights = lbg.sssp(target);
         }
     }
@@ -102,9 +99,10 @@ public class LBGRemainingWeightHeuristic implements RemainingWeightHeuristic {
     @Override
     public void reset() {
     }
-    
+
     private static class GraphAndDirection extends T2<Graph, Boolean> {
         private static final long serialVersionUID = 20110901L;
+
         public GraphAndDirection(Graph g, Boolean i) {
             super(g, i);
         }
