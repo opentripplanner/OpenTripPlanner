@@ -40,7 +40,7 @@ public class VisibilityGraph {
         this(environment, epsilon, null);
     }
 
-    public VisibilityGraph(Environment environment, double epsilon, Collection<Point> origins) {
+    public VisibilityGraph(Environment environment, double epsilon, Collection<VLPoint> origins) {
         n = environment.n();
 
         // fill vertex_counts
@@ -48,21 +48,19 @@ public class VisibilityGraph {
         for (int i = 0; i < environment.h(); i++)
             vertex_counts.add(environment.get(i).n());
 
-        adjacency_matrix = new boolean[n][];
-        for (int i = 0; i < n; i++)
-            adjacency_matrix[i] = new boolean[n];
+        adjacency_matrix = new boolean[n][n];
         // fill adjacency matrix by checking for inclusion in the
         // visibility polygons
         for (int k1 = 0; k1 < n; k1++) {
-            Point point1 = environment.kth_point(k1);
+            VLPoint point1 = environment.kth_point(k1);
             if (origins != null && !origins.contains(point1)) 
                     continue;
-            Polygon polygon_temp = new VisibilityPolygon(point1, environment, epsilon);
+            VLPolygon polygon_temp = new VisibilityPolygon(point1, environment, epsilon);
             for (int k2 = 0; k2 < n; k2++) {
                 if (k1 == k2)
                     adjacency_matrix[k1][k1] = true;
                 else {
-                    Point point2 = environment.kth_point(k2);
+                    VLPoint point2 = environment.kth_point(k2);
                     if (origins == null || origins.contains(point2)) {
                         adjacency_matrix[k1][k2] = adjacency_matrix[k2][k1] = point2.in(
                                 polygon_temp, epsilon);
@@ -72,20 +70,18 @@ public class VisibilityGraph {
         }
     }
 
-    VisibilityGraph(ArrayList<Point> points, Environment environment, double epsilon) {
+    public VisibilityGraph(ArrayList<VLPoint> points, Environment environment, double epsilon) {
         vertex_counts = new ArrayList<Integer>(environment.h());
         n = points.size();
 
         // fill vertex_counts
         vertex_counts.add(n);
 
-        adjacency_matrix = new boolean[n][];
-        for (int i = 0; i < n; i++)
-            adjacency_matrix[i] = new boolean[n];
+        adjacency_matrix = new boolean[n][n];
 
         // fill adjacency matrix by checking for inclusion in the
         // visibility polygons
-        Polygon polygontemp;
+        VLPolygon polygontemp;
         for (int k1 = 0; k1 < n; k1++) {
             polygontemp = new VisibilityPolygon(points.get(k1), environment, epsilon);
             for (int k2 = 0; k2 < n; k2++) {

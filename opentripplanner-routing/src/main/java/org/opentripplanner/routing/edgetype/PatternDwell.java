@@ -29,7 +29,7 @@ import com.vividsolutions.jts.geom.LineString;
  *  Models waiting in a station on a vehicle.  The vehicle is not permitted to change 
  *  names during this time -- PatternInterlineDwell represents that case.
  */
-public class PatternDwell extends PatternEdge implements OnBoardForwardEdge, OnBoardReverseEdge, 
+public class PatternDwell extends TablePatternEdge implements OnBoardForwardEdge, OnBoardReverseEdge, 
         DwellEdge {
     
     private static final long serialVersionUID = 1L;

@@ -1,7 +1,22 @@
+/* This program is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
 package org.opentripplanner.api.common;
 
-import java.util.List;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import javax.ws.rs.DefaultValue;
@@ -10,12 +25,14 @@ import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.core.OptimizeType;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import com.sun.jersey.api.core.InjectParam;
 
 /**
  * This class defines all the JAX-RS query parameters for a path search as fields, allowing them to 
@@ -104,8 +121,16 @@ public abstract class RoutingResource {
      *  Atlantic Avenue should be included. */
     @DefaultValue("false") @QueryParam("showIntermediateStops") protected List<Boolean> showIntermediateStops;
 
-    /** The list of banned routes.  The format is agency_route, so TriMet_100. */
+    /** The comma-separated list of banned routes.  The format is agency_route, so TriMet_100. */
     @DefaultValue("") @QueryParam("bannedRoutes") protected List<String> bannedRoutes;
+    
+    /** The comma-separated list of banned agencies. */
+    @DefaultValue("") @QueryParam("bannedAgencies") protected List<String> bannedAgencies;
+    
+    /** The comma-separated list of banned trips.  The format is agency_route[:stop*], so:
+     * TriMet_24601 or TriMet_24601:0:1:2:17:18:19
+     */
+    @DefaultValue("") @QueryParam("bannedTrips") protected List<String> bannedTrips;
 
     /** An additional penalty added to boardings after the first.  The value is in OTP's
      *  internal weight units, which are roughly equivalent to seconds.  Set this to a high
@@ -122,7 +147,7 @@ public abstract class RoutingResource {
     /** If true, goal direction is turned off and a full path tree is built (specify only once) */
     @DefaultValue("false") @QueryParam("batch") protected List<Boolean> batch;
 
-    /** A transit stop required to be the first stop in the search */
+    /** A transit stop required to be the first stop in the search (AgencyId_StopId) */
     @DefaultValue("") @QueryParam("startTransitStopId") protected List<String> startTransitStopId;
 
     /**
@@ -135,9 +160,11 @@ public abstract class RoutingResource {
      * one is taking a cross-country Amtrak train from Emeryville to Chicago. Has no effect in
      * stock OTP, only in Analyst.
      *
-     * A value of 0 (the default) disables.
+     * A value of 0 means that initial wait time will not be subtracted out (will be clamped to 0).
+     * A value of -1 (the default) means that clamping is disabled, so any amount of initial wait 
+     * time will be subtracted out.
      */
-    @DefaultValue("0") @QueryParam("clampInitialWait")
+    @DefaultValue("-1") @QueryParam("clampInitialWait")
     protected List<Long> clampInitialWait;
 
     /**
@@ -152,6 +179,9 @@ public abstract class RoutingResource {
     
     @DefaultValue("-1") @QueryParam("alightSlack")
     private List<Integer> alightSlack;
+
+    @DefaultValue("en_US") @QueryParam("locale")
+    private List<String> locale;
     
     /* 
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
@@ -161,10 +191,10 @@ public abstract class RoutingResource {
      * Alternatively, we could eliminate the separate RoutingRequest objects and just resolve
      * vertices and timezones here right away, but just ignore them in semantic equality checks.
      */
-    @Autowired
+    @InjectParam
     protected GraphService graphService;
 
-    @Autowired
+    @InjectParam
     protected RoutingRequest prototypeRoutingRequest;
 
 
@@ -253,6 +283,12 @@ public abstract class RoutingResource {
         request.setPreferredRoutes(get(preferredRoutes, n, request.getPreferredRouteStr()));
         request.setUnpreferredRoutes(get(unpreferredRoutes, n, request.getUnpreferredRouteStr()));
         request.setBannedRoutes(get(bannedRoutes, n, request.getBannedRouteStr()));
+        request.setBannedAgencies(get(bannedAgencies, n, request.getBannedAgenciesStr()));
+        HashMap<AgencyAndId, BannedStopSet> bannedTripMap = makeBannedTripMap(get(bannedTrips, n, null));
+        if (bannedTripMap != null) {
+            request.setBannedTrips(bannedTripMap);
+        }
+        
         // replace deprecated optimization preference
         // opt has already been assigned above
         if (opt == OptimizeType.TRANSFERS) {
@@ -300,9 +336,53 @@ public abstract class RoutingResource {
         request.setReverseOptimizeOnTheFly(get(reverseOptimizeOnTheFly, n, 
                                                request.isReverseOptimizeOnTheFly()));
 
+        String localeSpec = get(locale, n, "en");
+        String[] localeSpecParts = localeSpec.split("_");
+        Locale locale;
+        switch (localeSpecParts.length) {
+            case 1:
+                locale = new Locale(localeSpecParts[0]);
+                break;
+            case 2:
+                locale = new Locale(localeSpecParts[0]);
+                break;
+            case 3:
+                locale = new Locale(localeSpecParts[0]);
+                break;
+            default:
+                LOG.debug("Bogus locale " + localeSpec + ", defaulting to en");
+                locale = new Locale("en");
+        }
+
+        request.setLocale(locale);
         return request;
     }
-    
+
+	private HashMap<AgencyAndId, BannedStopSet> makeBannedTripMap(String banned) {
+        if (banned == null) {
+            return null;
+        }
+        
+        HashMap<AgencyAndId, BannedStopSet> bannedTripMap = new HashMap<AgencyAndId, BannedStopSet>();
+        String[] tripStrings = banned.split(",");
+        for (String tripString : tripStrings) {
+            String[] parts = tripString.split(":");
+            String tripIdString = parts[0];
+            AgencyAndId tripId = AgencyAndId.convertFromString(tripIdString);
+            BannedStopSet bannedStops;
+            if (parts.length == 1) {
+                bannedStops = BannedStopSet.ALL;
+            } else {
+                bannedStops = new BannedStopSet();
+                for (int i = 1; i < parts.length; ++i) {
+                    bannedStops.add(Integer.parseInt(parts[i]));
+                }
+            }
+            bannedTripMap.put(tripId, bannedStops);
+        }
+        return bannedTripMap;
+    }
+
 /**
  * @param l list of query parameter values
  * @param n requested item index 

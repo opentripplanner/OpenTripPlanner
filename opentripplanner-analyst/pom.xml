@@ -9,7 +9,7 @@
     <parent>
         <artifactId>opentripplanner</artifactId>
         <groupId>org.opentripplanner</groupId>
-        <version>0.7.13-SNAPSHOT</version>
+        <version>0.9.2-SNAPSHOT</version>
     </parent>
 
 	<dependencies>
@@ -69,5 +69,64 @@
     		<artifactId>javacsv</artifactId>
 		</dependency>
     </dependencies>
-
+    <build>
+      <plugins>
+        <!-- We want to create a standalone batch processor/analyst jar that can 
+          be run on the command line. Java does not really allow this - you cannot place jars
+          inside of jars. You must either provide all the dependency jars to the user in the original 
+          directory structure (usually lib/ under the directory containing the runnable jar) or 
+          explode all the jars and repackage them into a single jar.
+          The problem is that while class files are nicely organized into the package namespace and
+          should not collide, the META-INF directories of the jars will collide. Maven's standard
+          assembly plugin does not account for this and will just clobber metadata. This then
+          causes runtime errors, particularly with Spring.
+          Instead, we use the shade plugin which has transformers that will for example append files
+          of the same name rather than overwrite them in the combined JAR. NB: Don't use a version 
+          of the shade plugin older than 1.3.2, as it fixed MSHADE-76 (files not merged properly 
+          if some input files are missing a terminating newline) -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-shade-plugin</artifactId>
+          <executions>
+            <execution>
+              <phase>package</phase>
+              <goals>
+                <goal>shade</goal>
+              </goals>
+              <configuration>
+                <finalName>otp-analyst</finalName> <!-- the shaded jar file's name --> 
+                <transformers>
+                  <transformer
+                    implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                    <resource>META-INF/spring.handlers</resource>
+                  </transformer>
+                  <transformer
+                    implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                    <resource>META-INF/spring.schemas</resource>
+                  </transformer>
+                  <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+                  <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                    <!-- JAI-ImageIO will throw an IllegalArgumentException complaining that 
+                         vendorName == null because it depends on information from the manifest.
+                         This information is clobbered by the shading process and must be re-added.
+                         See: http://www.java.net/node/695773 -->
+                    <manifestEntries>
+                        <Main-Class>org.opentripplanner.analyst.batch.BatchProcessor</Main-Class>
+                        <Specification-Title>Java Advanced Imaging Image I/O Tools</Specification-Title>
+                        <Specification-Version>1.1</Specification-Version>
+                        <Specification-Vendor>Sun Microsystems, Inc.</Specification-Vendor>
+                        <Implementation-Title>com.sun.media.imageio</Implementation-Title>
+                        <Implementation-Version>1.1</Implementation-Version>
+                        <Implementation-Vendor>Sun Microsystems, Inc.</Implementation-Vendor>
+                        <Extension-Name>com.sun.media.imageio</Extension-Name>
+                    </manifestEntries>
+                  </transformer>
+                </transformers>
+                <shadedArtifactAttached>true</shadedArtifactAttached>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </build>
 </project>

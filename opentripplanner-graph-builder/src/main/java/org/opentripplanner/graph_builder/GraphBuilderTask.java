@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.opentripplanner.graph_builder.services.GraphBuilder;
-import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
@@ -38,13 +37,11 @@ public class GraphBuilderTask implements Runnable {
     private boolean _alwaysRebuild = true;
 
     private List<RoutingRequest> _modeList;
-
-    private double _contractionFactor = 1.0;
     
     private String _baseGraph = null;
     
     private Graph graph = new Graph();
-    
+
     public void addGraphBuilder(GraphBuilder loader) {
         _graphBuilders.add(loader);
     }
@@ -72,10 +69,6 @@ public class GraphBuilderTask implements Runnable {
 
     public void setModes(List<RoutingRequest> modeList) {
         _modeList = modeList;
-    }
-
-    public void setContractionFactor(double contractionFactor) {
-        _contractionFactor = contractionFactor;
     }
     
     public void setPath (String path) {
@@ -128,12 +121,12 @@ public class GraphBuilderTask implements Runnable {
         for (GraphBuilder builder : _graphBuilders) {
             builder.checkInputs();
         }
-
+        
         HashMap<Class<?>, Object> extra = new HashMap<Class<?>, Object>();
         for (GraphBuilder load : _graphBuilders)
             load.buildGraph(graph, extra);
 
-        GraphBuilderAnnotation.logSummary(graph.getBuilderAnnotations());
+        graph.summarizeBuilderAnnotations();
         try {
             graph.save(graphFile);
         } catch (Exception ex) {

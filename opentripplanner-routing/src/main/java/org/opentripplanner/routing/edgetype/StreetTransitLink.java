@@ -78,21 +78,6 @@ public class StreetTransitLink extends Edge {
         if (s0.getOptions().wheelchairAccessible && !wheelchairAccessible) {
             return null;
         }
-        // disallow traversing two StreetTransitLinks in a row.
-        // prevents router using transit stops as shortcuts to get around turn restrictions.
-        // also disallow going through stop -> station -> stop as a shortcut.
-        Edge backEdge = s0.getBackEdge();
-        Edge bbackEdge = s0.getBackState() != null ? s0.getBackState()
-                .getBackEdge() : null;
-        Edge bbbackEdge = s0.getBackState() != null
-                && s0.getBackState().getBackState() != null ? s0.getBackState()
-                .getBackState().getBackEdge() : null;
-        if (backEdge instanceof StreetTransitLink)
-            return null;
-        if (backEdge instanceof FreeEdge && bbackEdge instanceof StreetTransitLink)
-            return null;
-        if (backEdge instanceof FreeEdge && bbackEdge instanceof FreeEdge && bbbackEdge instanceof StreetTransitLink)
-            return null;
         // Do not check here whether transit modes are selected. A check for the presence of 
         // transit modes will instead be done in the following PreBoard edge.
         // This allows finding transit stops with walk-only options.

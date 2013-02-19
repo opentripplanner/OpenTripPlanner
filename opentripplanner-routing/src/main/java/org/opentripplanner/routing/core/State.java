@@ -22,7 +22,7 @@ import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.automata.AutomatonState;
 import org.opentripplanner.routing.edgetype.OnBoardForwardEdge;
-import org.opentripplanner.routing.edgetype.PatternEdge;
+import org.opentripplanner.routing.edgetype.TablePatternEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
@@ -58,6 +58,8 @@ public class State implements Cloneable {
     public StateData stateData;
 
     // how far have we walked
+    // TODO(flamholz): this is a very confusing name as it actually applies to all non-transit modes.
+    // we should DEFINITELY rename this variable and the associated methods.
     protected double walkDistance;
 
     // track the states of all path parsers -- probably changes frequently
@@ -173,22 +175,30 @@ public class State implements Cloneable {
         return stateData.tripTimes;
     }
 
-    /** returns the length of the trip in seconds up to this time, not including the initial wait.
-        It subtracts out the initial wait or a clamp value specified in the request.
-        This is used in lieu of reverse optimization in Analyst. */
+    /** 
+     * Returns the length of the trip in seconds up to this time, not including the initial wait.
+     * It subtracts out the initial wait, up to a clamp value specified in the request.
+     * If the clamp value is set to -1, no clamping will occur.
+     * If the clamp value is set to 0, the initial wait time will not be subtracted out 
+     * (i.e. it will be clamped to zero).
+     * This is used in lieu of reverse optimization in Analyst.
+     */
     public long getActiveTime () {
         long clampInitialWait = stateData.opt.clampInitialWait;
 
         long initialWait = stateData.initialWaitTime;
 
         // only subtract up the clamp value
-        if (clampInitialWait > 0 && initialWait > clampInitialWait)
+        if (clampInitialWait >= 0 && initialWait > clampInitialWait)
             initialWait = clampInitialWait;            
 
         long activeTime = getElapsedTime() - initialWait;
-        // TODO: what should be done here?
-        if (activeTime < 0)
+
+        // TODO: what should be done here? (Does this ever happen?)
+        if (activeTime < 0) {
+            LOG.warn("initial wait was greater than elapsed time.");
             activeTime = getElapsedTime();
+        }
 
         return activeTime;            
     }
@@ -339,8 +349,8 @@ public class State implements Cloneable {
     public String getBackDirection () {
         // This can happen when stop_headsign says different things at two trips on the same 
         // pattern and at the same stop.
-        if (backEdge instanceof PatternEdge) {
-            return stateData.tripTimes.getHeadsign(((PatternEdge)backEdge).getStopIndex());
+        if (backEdge instanceof TablePatternEdge) {
+            return stateData.tripTimes.getHeadsign(((TablePatternEdge)backEdge).getStopIndex());
         }
         else {
             return backEdge.getDirection();
@@ -352,7 +362,7 @@ public class State implements Cloneable {
      * right thing to do.
      */
     public Trip getBackTrip () {
-        if (backEdge instanceof PatternEdge) {
+        if (backEdge instanceof TablePatternEdge) {
             return stateData.tripTimes.getTrip();
         }
         else {
@@ -546,8 +556,8 @@ public class State implements Cloneable {
         stateData.serviceDay = sd;
     }
 
-    public String getBikeRentalNetwork() {
-        return stateData.bikeRentalNetwork;
+    public Set<String> getBikeRentalNetworks() {
+        return stateData.bikeRentalNetworks;
     }
 
     /**
@@ -603,7 +613,8 @@ public class State implements Cloneable {
                 if (ret == null) {
                     LOG.warn("Cannot reverse path at edge: " + edge +
                              ", returning unoptimized path. If edge is a " +
-                             "PatternInterlineDwell, this is not totally unexpected; " +
+                             "PatternInterlineDwell or if there is a time-dependent turn " +
+                             "restriction here, this is not totally unexpected; " +
                              "otherwise, you might want to look into it");
 
                     // re-enable path parsing

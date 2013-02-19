@@ -16,7 +16,6 @@ package org.opentripplanner.api.ws.internals;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 import javax.ws.rs.GET;
@@ -28,17 +27,17 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.IdentityBean;
-import org.opentripplanner.api.model.analysis.Annotation;
-import org.opentripplanner.api.model.analysis.AnnotationObject;
-import org.opentripplanner.api.model.analysis.Annotations;
-import org.opentripplanner.api.model.analysis.EdgeSet;
-import org.opentripplanner.api.model.analysis.EdgesForVertex;
-import org.opentripplanner.api.model.analysis.FeatureCount;
-import org.opentripplanner.api.model.analysis.SimpleVertex;
-import org.opentripplanner.api.model.analysis.SimpleVertexSet;
-import org.opentripplanner.api.model.analysis.VertexSet;
-import org.opentripplanner.api.model.analysis.WrappedEdge;
-import org.opentripplanner.routing.core.GraphBuilderAnnotation;
+import org.opentripplanner.api.model.internals.Annotation;
+import org.opentripplanner.api.model.internals.AnnotationObject;
+import org.opentripplanner.api.model.internals.Annotations;
+import org.opentripplanner.api.model.internals.EdgeSet;
+import org.opentripplanner.api.model.internals.EdgesForVertex;
+import org.opentripplanner.api.model.internals.FeatureCount;
+import org.opentripplanner.api.model.internals.SimpleVertex;
+import org.opentripplanner.api.model.internals.SimpleVertexSet;
+import org.opentripplanner.api.model.internals.VertexSet;
+import org.opentripplanner.api.model.internals.WrappedEdge;
+import org.opentripplanner.gbannotation.GraphBuilderAnnotation;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -335,22 +334,25 @@ public class GraphInternals {
     public Object getAnnotations(@QueryParam("routerId") String routerId) {
         Graph graph = graphService.getGraph(routerId);
         List<GraphBuilderAnnotation> builderAnnotations = graph.getBuilderAnnotations();
-
+        Annotations annotations = new Annotations();
         List<Annotation> out = new ArrayList<Annotation>();
-        for (GraphBuilderAnnotation annotation : builderAnnotations) {
-            Annotation outAnnotation = new Annotation();
-            out.add(outAnnotation);
-            outAnnotation.annotation = annotation.getVariety().name();
-            Collection<Object> referencedObjects = annotation.getReferencedObjects();
-            for (Object object : referencedObjects) {
-                AnnotationObject annotationObj = new AnnotationObject();
-                applyObjectToAnnotation(graph, annotationObj, object);
-                outAnnotation.addObject(annotationObj);
+        annotations.annotations = out;
+
+        if (builderAnnotations != null) {
+            for (GraphBuilderAnnotation annotation : builderAnnotations) {
+                Annotation outAnnotation = new Annotation();
+                out.add(outAnnotation);
+                outAnnotation.annotation = annotation.getClass().toString();
+                // TODO: adapt to class annotations rather than generic enum-based annotations
+//                Collection<Object> referencedObjects = annotation.getReferencedObjects();
+//                for (Object object : referencedObjects) {
+//                    AnnotationObject annotationObj = new AnnotationObject();
+//                    applyObjectToAnnotation(graph, annotationObj, object);
+//                    outAnnotation.addObject(annotationObj);
+//                }
             }
         }
 
-        Annotations annotations = new Annotations();
-        annotations.annotations = out;
         return annotations;
     }
 

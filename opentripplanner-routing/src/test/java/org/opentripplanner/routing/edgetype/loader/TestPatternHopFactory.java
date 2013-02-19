@@ -17,37 +17,33 @@ import static org.opentripplanner.common.IterableLibrary.filter;
 
 import java.io.File;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.GregorianCalendar;
-import java.util.Iterator;
 import java.util.TimeZone;
 
 import junit.framework.TestCase;
 
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
-import org.onebusaway.gtfs.model.StopTime;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.gbannotation.GraphBuilderAnnotation;
+import org.opentripplanner.gbannotation.NegativeHopTime;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.GenericAStar;
-import org.opentripplanner.routing.core.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
-import org.opentripplanner.routing.edgetype.Alight;
 import org.opentripplanner.routing.edgetype.FrequencyBasedTripPattern;
 import org.opentripplanner.routing.edgetype.FrequencyBoard;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
+import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.SimpleEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -93,13 +89,9 @@ public class TestPatternHopFactory extends TestCase {
     public void testAnnotation() {
         boolean found = false;
         for (GraphBuilderAnnotation annotation : graph.getBuilderAnnotations()) {
-            if (annotation.getVariety().equals(Variety.NEGATIVE_HOP_TIME)) {
-                Collection<Object> objects = annotation.getReferencedObjects();
-                assertTrue(objects.size() == 2);
-                Iterator<Object> iter = objects.iterator();
-                StopTime st0 = (StopTime) iter.next();
-                StopTime st1 = (StopTime) iter.next();
-                assertTrue(st0.getDepartureTime() > st1.getArrivalTime());
+            if (annotation instanceof NegativeHopTime) {
+                NegativeHopTime nht = (NegativeHopTime) annotation;
+                assertTrue(nht.st0.getDepartureTime() > nht.st1.getArrivalTime());
                 found = true;
             }
         }
@@ -125,7 +117,7 @@ public class TestPatternHopFactory extends TestCase {
 
         for (Edge e : journey_a_1.getOutgoing()) {
             if (e.getToVertex() instanceof TransitStop) {
-                assertEquals(Alight.class, e.getClass());
+                assertEquals(TransitBoardAlight.class, e.getClass());
             } else {
                 assertEquals(PatternHop.class, e.getClass());
             }
@@ -340,10 +332,8 @@ public class TestPatternHopFactory extends TestCase {
         GraphPath path = spt.getPath(stop_k, false);
         int num_alights = 0;
         for (State s : path.states) {
-            if (s.getBackEdge() instanceof Alight ||
-                    (s.getBackEdge() instanceof TransitBoardAlight && 
-                            !((TransitBoardAlight) s.getBackEdge()).isBoarding())
-                    ) {
+            if (s.getBackEdge() instanceof TransitBoardAlight
+                && !((TransitBoardAlight) s.getBackEdge()).isBoarding()) {
                 num_alights += 1;
             }
             if (s.getBackEdge() instanceof PatternDwell) {
@@ -359,10 +349,8 @@ public class TestPatternHopFactory extends TestCase {
 //        path.reverse();
         num_alights = 0;
         for (State s : path.states) {
-            if (s.getBackEdge() instanceof Alight ||
-                    (s.getBackEdge() instanceof TransitBoardAlight && 
-                            !((TransitBoardAlight) s.getBackEdge()).isBoarding())
-                    ) {
+            if (s.getBackEdge() instanceof TransitBoardAlight
+                && !((TransitBoardAlight) s.getBackEdge()).isBoarding()) {
                 num_alights += 1;
             }
             if (s.getBackEdge() instanceof PatternDwell) {

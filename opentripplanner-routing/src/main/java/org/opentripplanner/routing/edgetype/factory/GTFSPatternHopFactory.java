@@ -17,10 +17,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.math3.util.FastMath;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Frequency;
@@ -31,15 +35,25 @@ import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Transfer;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
+import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.common.geometry.DistanceLibrary;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.T2;
+import org.opentripplanner.gbannotation.BogusShapeDistanceTraveled;
+import org.opentripplanner.gbannotation.BogusShapeGeometry;
+import org.opentripplanner.gbannotation.BogusShapeGeometryCaught;
+import org.opentripplanner.gbannotation.HopSpeedFast;
+import org.opentripplanner.gbannotation.HopSpeedSlow;
+import org.opentripplanner.gbannotation.HopZeroTime;
+import org.opentripplanner.gbannotation.NegativeDwellTime;
+import org.opentripplanner.gbannotation.NegativeHopTime;
+import org.opentripplanner.gbannotation.StopAtEntrance;
+import org.opentripplanner.gbannotation.TripDegenerate;
+import org.opentripplanner.gbannotation.TripUndefinedService;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.core.GraphBuilderAnnotation;
-import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
 import org.opentripplanner.routing.core.ServiceIdToNumberService;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -49,17 +63,18 @@ import org.opentripplanner.routing.edgetype.FrequencyBasedTripPattern;
 import org.opentripplanner.routing.edgetype.FrequencyBoard;
 import org.opentripplanner.routing.edgetype.FrequencyDwell;
 import org.opentripplanner.routing.edgetype.FrequencyHop;
+import org.opentripplanner.routing.edgetype.HopEdge;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
-import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.edgetype.ScheduledStopPattern;
+import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.edgetype.TimedTransferEdge;
 import org.opentripplanner.routing.edgetype.TransferEdge;
-import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -102,7 +117,7 @@ class InterliningTrip  implements Comparable<InterliningTrip> {
     
     @Override
     public int compareTo(InterliningTrip o) {
-        return firstStopTime.getArrivalTime() - o.firstStopTime.getArrivalTime(); 
+        return firstStopTime.getArrivalTime() - o.firstStopTime.getArrivalTime();
     }
     
     @Override
@@ -163,7 +178,118 @@ class InterlineSwitchoverKey {
     }
     
     public int hashCode() {
-        return (((s0.hashCode() * 31) + s1.hashCode()) * 31 + pattern1.hashCode()) * 31 + pattern2.hashCode(); 
+        return (((s0.hashCode() * 31) + s1.hashCode()) * 31 + pattern1.hashCode()) * 31 + pattern2.hashCode();
+    }
+}
+
+class IndexedLineSegment {
+    private static final double RADIUS = SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_M;
+    int index;
+    Coordinate start;
+    Coordinate end;
+    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
+    private double lineLength;
+
+    public IndexedLineSegment(int index, Coordinate start, Coordinate end) {
+        this.index = index;
+        this.start = start;
+        this.end = end;
+        this.lineLength = distanceLibrary.fastDistance(start, end);
+    }
+
+    // in radians
+    static double bearing(Coordinate c1, Coordinate c2) {
+        double deltaLon = (c2.x - c1.x) * FastMath.PI / 180;
+        double lat1Radians = c1.y * FastMath.PI / 180;
+        double lat2Radians = c2.y * FastMath.PI / 180;
+        double y = FastMath.sin(deltaLon) * FastMath.cos(lat2Radians);
+        double x = FastMath.cos(lat1Radians)*FastMath.sin(lat2Radians) -
+                FastMath.sin(lat1Radians)*FastMath.cos(lat2Radians)*FastMath.cos(deltaLon);
+        return FastMath.atan2(y, x);
+    }
+
+    double crossTrackError(Coordinate coord) {
+        double distanceFromStart = distanceLibrary.fastDistance(start, coord);
+        double bearingToCoord = bearing(start, coord);
+        double bearingToEnd = bearing(start, end);
+        return FastMath.asin(FastMath.sin(distanceFromStart / RADIUS)
+            * FastMath.sin(bearingToCoord - bearingToEnd))
+            * RADIUS;
+    }
+
+    double distance(Coordinate coord) {
+        double cte = crossTrackError(coord);
+        double atd = alongTrackDistance(coord, cte);
+        double inverseAtd = inverseAlongTrackDistance(coord, -cte);
+        double distanceToStart = distanceLibrary.fastDistance(coord, start);
+        double distanceToEnd = distanceLibrary.fastDistance(coord, end);
+
+        if (distanceToStart < distanceToEnd) {
+            //we might be behind the line start
+            if (inverseAtd > lineLength) {
+                //we are behind line start
+                return distanceToStart;
+            } else {
+                //we are within line
+                return Math.abs(cte);
+            }
+        } else {
+            //we might be after line end
+            if (atd > lineLength) {
+                //we are behind line end, so we that's the nearest point
+                return distanceToEnd;
+            } else {
+                //we are within line
+                return Math.abs(cte);
+            }
+        }
+    }
+
+    private double inverseAlongTrackDistance(Coordinate coord, double inverseCrossTrackError) {
+        double distanceFromEnd = distanceLibrary.fastDistance(end, coord);
+        double alongTrackDistance = FastMath.acos(FastMath.cos(distanceFromEnd / RADIUS)
+            / FastMath.cos(inverseCrossTrackError / RADIUS))
+            * RADIUS;
+        return alongTrackDistance;
+    }
+
+    public double fraction(Coordinate coord) {
+        double cte = crossTrackError(coord);
+        double distanceToStart = distanceLibrary.fastDistance(coord, start);
+        double distanceToEnd = distanceLibrary.fastDistance(coord, end);
+
+        if (cte < distanceToStart && cte < distanceToEnd) {
+            double atd = alongTrackDistance(coord, cte);
+            return atd / lineLength;
+        } else {
+            if (distanceToStart < distanceToEnd) {
+                return 0;
+            } else {
+                return 1;
+            }
+        }
+    }
+
+    private double alongTrackDistance(Coordinate coord, double crossTrackError) {
+        double distanceFromStart = distanceLibrary.fastDistance(start, coord);
+        double alongTrackDistance = FastMath.acos(FastMath.cos(distanceFromStart / RADIUS)
+            / FastMath.cos(crossTrackError / RADIUS))
+            * RADIUS;
+        return alongTrackDistance;
+    }
+}
+
+class IndexedLineSegmentComparator implements Comparator<IndexedLineSegment> {
+
+    private Coordinate coord;
+
+    public IndexedLineSegmentComparator(Coordinate coord) {
+        this.coord = coord;
+    }
+
+    @Override
+    public int compare(IndexedLineSegment a, IndexedLineSegment b) {
+        return (int) FastMath.signum(a.distance(coord) - b.distance(coord));
     }
 }
 
@@ -178,6 +304,8 @@ public class GTFSPatternHopFactory {
 
     private GtfsRelationalDao _dao;
 
+    private CalendarService _calendarService;
+    
     private Map<ShapeSegmentKey, LineString> _geometriesByShapeSegmentKey = new HashMap<ShapeSegmentKey, LineString>();
 
     private Map<AgencyAndId, LineString> _geometriesByShapeId = new HashMap<AgencyAndId, LineString>();
@@ -200,10 +328,13 @@ public class GTFSPatternHopFactory {
 
     private int defaultStreetToStopTime;
 
-    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
+    private static final DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
+
+    private double maxStopToShapeSnapDistance = 150;
 
     public GTFSPatternHopFactory(GtfsContext context) {
-        _dao = context.getDao();
+        this._dao = context.getDao();
+        this._calendarService = context.getCalendarService();
     }
 
     
@@ -292,13 +423,18 @@ public class GTFSPatternHopFactory {
             tripCount++;
             if (tripCount % 100000 == 0)
                 _log.debug("trips=" + tripCount + "/" + trips.size());
+            
+            if ( ! _calendarService.getServiceIds().contains(trip.getServiceId())) {
+                _log.warn(graph.addBuilderAnnotation(new TripUndefinedService(trip)));
+            }
+
 
             /* GTFS stop times frequently contain duplicate, missing, or incorrect entries */
             List<StopTime> stopTimes = getNonduplicateStopTimesForTrip(trip); // duplicate stopIds
             filterStopTimes(stopTimes, graph); // duplicate times (0-time), negative, fast or slow hops
             interpolateStopTimes(stopTimes); // interpolate between timepoints
             if (stopTimes.size() < 2) {
-                _log.warn(GraphBuilderAnnotation.register(graph, Variety.TRIP_DEGENERATE, trip));
+                _log.warn(graph.addBuilderAnnotation(new TripDegenerate(trip)));
                 continue TRIP;
             }
             
@@ -306,15 +442,25 @@ public class GTFSPatternHopFactory {
             List<Frequency> frequencies = tripFrequencies.get(trip);
             if(frequencies != null) {
                 // before creating frequency-based trips, check for single-instance frequencies.
+                Collections.sort(frequencies, new Comparator<Frequency>() {
+
+                    @Override
+                    public int compare(Frequency o1, Frequency o2) {
+                        return o1.getStartTime() - o2.getStartTime();
+                    }
+                });
+
                 Frequency frequency = frequencies.get(0);
                 if (frequencies.size() > 1 || 
                     frequency.getStartTime() != stopTimes.get(0).getDepartureTime() ||
                     frequency.getEndTime() - frequency.getStartTime() > frequency.getHeadwaySecs()) {
-                    // rename to FrequencyTripPattern to make lines shorter?
-                    FrequencyBasedTripPattern frequencyPattern = 
+                    T2<FrequencyBasedTripPattern,List<FrequencyHop>> patternAndHops =
                             makeFrequencyPattern(graph, trip, stopTimes);
+                    List<FrequencyHop> hops = patternAndHops.getSecond();
+                    FrequencyBasedTripPattern frequencyPattern = patternAndHops.getFirst();
                     if (frequencyPattern != null) 
                         frequencyPattern.createRanges(frequencies);
+                    createGeometry(graph, trip, stopTimes, hops);
                     continue TRIP;
                 } // else fall through and treat this as a normal trip
             }
@@ -325,7 +471,10 @@ public class GTFSPatternHopFactory {
             TableTripPattern tripPattern = patterns.get(stopPattern);
             if (tripPattern == null) {
                 // it's the first time we are encountering this stops+pickups+serviceId combination
-                tripPattern = makePatternVerticesAndEdges(graph, trip, stopPattern, stopTimes);
+                T2<TableTripPattern, List<PatternHop>> patternAndHops = makePatternVerticesAndEdges(graph, trip, stopPattern, stopTimes);
+                List<PatternHop> hops = patternAndHops.getSecond();
+                createGeometry(graph, trip, stopTimes, hops);
+                tripPattern = patternAndHops.getFirst();
                 patterns.put(stopPattern, tripPattern);
             } 
             tripPattern.addTrip(trip, stopTimes);
@@ -400,7 +549,193 @@ public class GTFSPatternHopFactory {
         graph.putService(ServiceIdToNumberService.class, new ServiceIdToNumberService(context.serviceIds));
     }
 
-    private FrequencyBasedTripPattern makeFrequencyPattern(Graph graph, Trip trip,
+    static int cg = 0;
+    private <T extends Edge & HopEdge> void createGeometry(Graph graph, Trip trip,
+            List<StopTime> stopTimes, List<T> hops) {
+
+        cg += 1;
+        AgencyAndId shapeId = trip.getShapeId();
+        if (shapeId == null || shapeId.getId() == null || shapeId.getId().equals(""))
+            return;
+
+        //Treat shape_dist_traveled on a per-trip basis
+        StopTime st0 = stopTimes.get(0);
+        boolean hasShapeDist = st0.isShapeDistTraveledSet();
+        if (hasShapeDist) {
+            for (int i = 0; i < hops.size(); ++i) {
+                Edge hop = hops.get(i);
+                st0 = stopTimes.get(i);
+                StopTime st1 = stopTimes.get(i + 1);
+                ((HopEdge)hop).setGeometry(getHopGeometryViaShapeDistTraveled(graph, shapeId, st0, st1, hop.getFromVertex(), hop.getToVertex()));
+            }
+            return;
+        }
+        LineString shape = getLineStringForShapeId(shapeId);
+        if (shape == null) {
+            for (int i = 0; i < stopTimes.size() - 1; ++i) {
+                st0 = stopTimes.get(i);
+                StopTime st1 = stopTimes.get(i + 1);
+                LineString geometry = createSimpleGeometry(st0.getStop(), st1.getStop());
+                hops.get(i).setGeometry(geometry);
+            }
+            return;
+        }
+        ArrayList<IndexedLineSegment> segments = new ArrayList<IndexedLineSegment>();
+        for (int i = 0 ; i < shape.getNumPoints() - 1; ++i) {
+            segments.add(new IndexedLineSegment(i, shape.getCoordinateN(i), shape.getCoordinateN(i + 1)));
+        }
+        //get possible segment matches for each stop
+        List<List<IndexedLineSegment>> possibleSegmentsForStop = new ArrayList<List<IndexedLineSegment>>();
+        int minSegmentIndex = 0;
+        for (int i = 0; i < stopTimes.size() ; ++i) {
+            Stop stop = stopTimes.get(i).getStop();
+            Coordinate coord = new Coordinate(stop.getLon(), stop.getLat());
+            List<IndexedLineSegment> stopSegments = new ArrayList<IndexedLineSegment>();
+            double bestDistance = Double.MAX_VALUE;
+            IndexedLineSegment bestSegment = null;
+            int maxSegmentIndex = -1;
+            int index = -1;
+            int minSegmentIndexForThisStop = -1;
+            for (IndexedLineSegment segment : segments) {
+                index ++;
+                if (segment.index < minSegmentIndex) {
+                    continue;
+                }
+                double distance = segment.distance(coord);
+                if (distance < maxStopToShapeSnapDistance) {
+                    stopSegments.add(segment);
+                    maxSegmentIndex = index;
+                    if (minSegmentIndexForThisStop == -1)
+                        minSegmentIndexForThisStop = index;
+                } else if (distance < bestDistance) {
+                    bestDistance = distance;
+                    bestSegment = segment;
+                    if (maxSegmentIndex != -1) {
+                        maxSegmentIndex = index;
+                    }
+                }
+            }
+            if (stopSegments.size() == 0) {
+                //no segments within 150m
+                //fall back to nearest segment
+                stopSegments.add(bestSegment);
+                minSegmentIndex = bestSegment.index;
+            } else {
+                minSegmentIndex = minSegmentIndexForThisStop;
+                Collections.sort(stopSegments, new IndexedLineSegmentComparator(coord));
+            }
+
+            for (int j = i - 1; j >= 0; j --) {
+                for (Iterator<IndexedLineSegment> it = possibleSegmentsForStop.get(j).iterator(); it.hasNext(); ) {
+                    IndexedLineSegment segment = it.next();
+                    if (segment.index > maxSegmentIndex) {
+                        it.remove();
+                    }
+                }
+            }
+            possibleSegmentsForStop.add(stopSegments);
+        }
+
+        List<LinearLocation> locations = getStopLocations(possibleSegmentsForStop, stopTimes, 0, -1);
+
+        if (locations == null) {
+            // this only happens on shape which have points very far from
+            // their stop sequence. So we'll fall back to trivial stop-to-stop
+            // linking, even though theoretically we could do better.
+
+            for (int i = 0; i < stopTimes.size() - 1; ++i) {
+                st0 = stopTimes.get(i);
+                StopTime st1 = stopTimes.get(i + 1);
+                LineString geometry = createSimpleGeometry(st0.getStop(), st1.getStop());
+                hops.get(i).setGeometry(geometry);
+                //this warning is not strictly correct, but will do
+                _log.warn(graph.addBuilderAnnotation(new BogusShapeGeometryCaught(shapeId, st0, st1)));
+            }
+            return;
+        }
+
+        Iterator<LinearLocation> locationIt = locations.iterator();
+        LinearLocation endLocation = locationIt.next();
+        double distanceSoFar = 0;
+        int last = 0;
+        for (int i = 0; i < hops.size(); ++i) {
+            Edge hop = hops.get(i);
+            LinearLocation startLocation = endLocation;
+            endLocation = locationIt.next();
+
+            //convert from LinearLocation to distance
+            //advance distanceSoFar up to start of segment containing startLocation;
+            //it does not matter at all if this is accurate so long as it is consistent
+            for (int j = last; j < startLocation.getSegmentIndex(); ++j) {
+                Coordinate from = shape.getCoordinateN(j);
+                Coordinate to = shape.getCoordinateN(j + 1);
+                double xd = from.x - to.x;
+                double yd = from.y - to.y;
+                distanceSoFar += FastMath.sqrt(xd * xd + yd * yd);
+            }
+            last = startLocation.getSegmentIndex();
+
+            double startIndex = distanceSoFar + startLocation.getSegmentFraction() * startLocation.getSegmentLength(shape);
+            //advance distanceSoFar up to start of segment containing endLocation
+            for (int j = last; j < endLocation.getSegmentIndex(); ++j) {
+                Coordinate from = shape.getCoordinateN(j);
+                Coordinate to = shape.getCoordinateN(j + 1);
+                double xd = from.x - to.x;
+                double yd = from.y - to.y;
+                distanceSoFar += FastMath.sqrt(xd * xd + yd * yd);
+            }
+            last = startLocation.getSegmentIndex();
+            double endIndex = distanceSoFar + endLocation.getSegmentFraction() * endLocation.getSegmentLength(shape);
+
+            ShapeSegmentKey key = new ShapeSegmentKey(shapeId, startIndex, endIndex);
+            LineString geometry = _geometriesByShapeSegmentKey.get(key);
+
+            if (geometry == null) {
+                LocationIndexedLine locationIndexed = new LocationIndexedLine(shape);
+                geometry = (LineString) locationIndexed.extractLine(startLocation, endLocation);
+
+                // Pack the resulting line string
+                CoordinateSequence sequence = new PackedCoordinateSequence.Double(geometry
+                        .getCoordinates(), 2);
+                geometry = _geometryFactory.createLineString(sequence);
+            }
+            ((HopEdge)hop).setGeometry(geometry);
+        }
+    }
+
+    /**
+     * Find a consistent, increasing list of LinearLocations along a shape for a set of stops.
+     * Handles loops routes.
+     * @return
+     */
+    private List<LinearLocation> getStopLocations(List<List<IndexedLineSegment>> possibleSegmentsForStop,
+            List<StopTime> stopTimes, int index, int prevSegmentIndex) {
+
+        if (index == stopTimes.size()) {
+            return new LinkedList<LinearLocation>();
+        }
+
+        StopTime st = stopTimes.get(index);
+        Stop stop = st.getStop();
+        Coordinate stopCoord = new Coordinate(stop.getLon(), stop.getLat());
+
+        for (IndexedLineSegment segment : possibleSegmentsForStop.get(index)) {
+            if (segment.index < prevSegmentIndex) {
+                //can't go backwards along line
+                continue;
+            }
+            List<LinearLocation> locations = getStopLocations(possibleSegmentsForStop, stopTimes, index + 1, segment.index);
+            if (locations != null) {
+                LinearLocation location = new LinearLocation(0, segment.index, segment.fraction(stopCoord));
+                locations.add(0, location);
+                return locations; //we found one!
+            }
+        }
+
+        return null;
+    }
+
+    private T2<FrequencyBasedTripPattern, List<FrequencyHop>> makeFrequencyPattern(Graph graph, Trip trip,
             List<StopTime> stopTimes) {
         
         FrequencyBasedTripPattern pattern = new FrequencyBasedTripPattern(trip, stopTimes.size(), getServiceId(trip));
@@ -415,6 +750,7 @@ public class GTFSPatternHopFactory {
         ArrayList<Vertex> createdVertices = new ArrayList<Vertex>();
         List<Stop> stops = new ArrayList<Stop>();
         int offset = stopTimes.get(0).getDepartureTime();
+        ArrayList<FrequencyHop> hops = new ArrayList<FrequencyHop>();
         for (i = 0; i < lastStop; i++) {    
             StopTime st0 = stopTimes.get(i);
             Stop s0 = st0.getStop();
@@ -431,8 +767,7 @@ public class GTFSPatternHopFactory {
             int runningTime = arrivalTime - departureTime;
 
             if (runningTime < 0) {
-                _log.warn(GraphBuilderAnnotation.register(graph,
-                        Variety.NEGATIVE_HOP_TIME, st0, st1));
+                _log.warn(graph.addBuilderAnnotation(new NegativeHopTime(st0, st1)));
                 //back out hops and give up
                 for (Edge e: createdEdges) {
                     e.getFromVertex().removeOutgoing(e);
@@ -472,8 +807,7 @@ public class GTFSPatternHopFactory {
             FrequencyHop hop = new FrequencyHop(psv0depart, psv1arrive, s0, s1, i,
                     pattern);
             createdEdges.add(hop);
-            hop.setGeometry(getHopGeometry(graph, trip.getShapeId(), st0, st1, psv0depart,
-                    psv1arrive));
+            hops.add(hop);
 
             String headsign = st0.getStopHeadsign();
             if (headsign == null) {
@@ -494,11 +828,20 @@ public class GTFSPatternHopFactory {
 
         pattern.setStops(stops);
 
-        pattern.setTripFlags(((trip.getWheelchairAccessible() == 1) ? TableTripPattern.FLAG_WHEELCHAIR_ACCESSIBLE : 0)
-        | (((trip.getRoute().getBikesAllowed() == 2 && trip.getTripBikesAllowed() != 1)
-            || trip.getTripBikesAllowed() == 2) ? TableTripPattern.FLAG_BIKES_ALLOWED : 0));
+        int wheelchair = 0;
+        if (trip.getWheelchairAccessible() == 1) {
+            wheelchair = TableTripPattern.FLAG_WHEELCHAIR_ACCESSIBLE;
+        }
 
-        return pattern;
+        int bikes = 0;
+        if ((trip.getRoute().getBikesAllowed() == 2 && trip.getTripBikesAllowed() != 1)
+                || trip.getTripBikesAllowed() == 2) {
+            bikes = TableTripPattern.FLAG_BIKES_ALLOWED;
+        }
+
+        pattern.setTripFlags(wheelchair | bikes);
+
+        return new T2<FrequencyBasedTripPattern, List<FrequencyHop>>(pattern, hops);
     }
 
     /**
@@ -541,7 +884,7 @@ public class GTFSPatternHopFactory {
             }
             int dwellTime = st0.getDepartureTime() - st0.getArrivalTime(); 
             if (dwellTime < 0) {
-                _log.warn(GraphBuilderAnnotation.register(graph, Variety.NEGATIVE_DWELL_TIME, st0));
+                _log.warn(graph.addBuilderAnnotation(new NegativeDwellTime(st0)));
                 if (st0.getArrivalTime() > 23 * HOUR && st0.getDepartureTime() < 1 * HOUR) {
                     midnightCrossed = true;
                     st0.setDepartureTime(st0.getDepartureTime() + 24 * HOUR);
@@ -552,7 +895,7 @@ public class GTFSPatternHopFactory {
             int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
 
             if (runningTime < 0) {
-                _log.warn(GraphBuilderAnnotation.register(graph, Variety.NEGATIVE_HOP_TIME, new StopTime(st0), new StopTime(st1)));
+                _log.warn(graph.addBuilderAnnotation(new NegativeHopTime(new StopTime(st0), new StopTime(st1))));
                 // negative hops are usually caused by incorrect coding of midnight crossings
                 midnightCrossed = true;
                 if (st0.getDepartureTime() > 23 * HOUR && st1.getArrivalTime() < 1 * HOUR) {
@@ -563,7 +906,7 @@ public class GTFSPatternHopFactory {
             }
             double hopDistance = distanceLibrary.fastDistance(
                    st0.getStop().getLat(), st0.getStop().getLon(),
-                   st1.getStop().getLon(), st1.getStop().getLat());
+                   st1.getStop().getLat(), st1.getStop().getLon());
             double hopSpeed = hopDistance/runningTime;
             /* zero-distance hops are probably not harmful, though they could be better 
              * represented as dwell times
@@ -579,10 +922,8 @@ public class GTFSPatternHopFactory {
                 st0.getDepartureTime() == st1.getDepartureTime()) {
                 _log.trace("{} {}", st0, st1);
                 // series of identical stop times at different stops
-                _log.trace(GraphBuilderAnnotation.register(graph, 
-                          Variety.HOP_ZERO_TIME, hopDistance, 
-                          st1.getTrip().getRoute(), 
-                          st1.getTrip().getId(), st1.getStopSequence()));
+                _log.trace(graph.addBuilderAnnotation(new HopZeroTime((float) hopDistance, 
+                          st1.getTrip(), st1.getStopSequence())));
                 // clear stoptimes that are obviously wrong, causing them to later be interpolated
 /* FIXME (lines commented out because they break routability in multi-feed NYC for some reason -AMB) */
 //                st1.clearArrivalTime();
@@ -591,16 +932,12 @@ public class GTFSPatternHopFactory {
             } else if (hopSpeed > 45) {
                 // 45 m/sec ~= 100 miles/hr
                 // elapsed time of 0 will give speed of +inf
-                _log.trace(GraphBuilderAnnotation.register(graph,
-                          Variety.HOP_SPEED_FAST, hopSpeed, hopDistance,
-                          st0.getTrip().getRoute(),
-                          st0.getTrip().getId(), st0.getStopSequence()));
+                _log.trace(graph.addBuilderAnnotation(new HopSpeedFast((float) hopSpeed, 
+                        (float) hopDistance, st0.getTrip(), st0.getStopSequence())));
             } else if (hopSpeed < 0.1) {
                 // 0.1 m/sec ~= 0.2 miles/hr
-                _log.trace(GraphBuilderAnnotation.register(graph,
-                          Variety.HOP_SPEED_SLOW, hopSpeed, hopDistance,
-                          st0.getTrip().getRoute(),
-                          st0.getTrip().getId(), st0.getStopSequence()));
+                _log.trace(graph.addBuilderAnnotation(new HopSpeedSlow((float) hopSpeed, 
+                        (float) hopDistance, st0.getTrip(), st0.getStopSequence())));
             }
             // st0 should reflect the last stoptime that was not clearly incorrect
             if ( ! st1bogus)  
@@ -623,9 +960,9 @@ public class GTFSPatternHopFactory {
             Vertex fromVertex = context.stopNodes.get(pathway.getFromStop());
             Vertex toVertex = context.stopNodes.get(pathway.getToStop());
             if (pathway.isWheelchairTraversalTimeSet()) {
-                new PathwayEdge(fromVertex, toVertex, pathway.getTraversalTime());
-            } else {
                 new PathwayEdge(fromVertex, toVertex, pathway.getTraversalTime(), pathway.getWheelchairTraversalTime());
+            } else {
+                new PathwayEdge(fromVertex, toVertex, pathway.getTraversalTime());
             }
         }
     }
@@ -643,11 +980,11 @@ public class GTFSPatternHopFactory {
             
             if (stop.getLocationType() != 2) {
                 //add a vertex representing arriving at the stop
-                TransitStopArrive arrive = new TransitStopArrive(graph, stop);
+                TransitStopArrive arrive = new TransitStopArrive(graph, stop, stopVertex);
                 context.stopArriveNodes.put(stop, arrive);
 
                 //add a vertex representing departing from the stop
-                TransitStopDepart depart = new TransitStopDepart(graph, stop);
+                TransitStopDepart depart = new TransitStopDepart(graph, stop, stopVertex);
                 context.stopDepartNodes.put(stop, depart);
 
                 //add edges from arrive to stop and stop to depart
@@ -759,7 +1096,7 @@ public class GTFSPatternHopFactory {
      * StopTimes are passed in instead of Stops only because they are needed for shape distances.
      * The TripPattern returned is empty; trips should be added to the TripPattern later.
      */
-    private TableTripPattern makePatternVerticesAndEdges(Graph graph, Trip trip, 
+    private T2<TableTripPattern, List<PatternHop>> makePatternVerticesAndEdges(Graph graph, Trip trip,
             ScheduledStopPattern stopPattern, List<StopTime> stopTimes) {
 
         TableTripPattern tripPattern = new TableTripPattern(trip, stopPattern, getServiceId(trip));
@@ -770,6 +1107,8 @@ public class GTFSPatternHopFactory {
         getTripPatternIndex(tripPattern);
         TraverseMode mode = GtfsLibrary.getTraverseMode(trip.getRoute());
         
+        ArrayList<PatternHop> hops = new ArrayList<PatternHop>();
+
         // create journey vertices
         PatternArriveVertex psv0arrive, psv1arrive = null;
         PatternDepartVertex psv0depart;
@@ -790,15 +1129,36 @@ public class GTFSPatternHopFactory {
             context.patternArriveNodes.put(new T2<Stop, Trip>(st1.getStop(), trip), psv1arrive);
 
             PatternHop hop = new PatternHop(psv0depart, psv1arrive, s0, s1, hopIndex);
-            hop.setGeometry(getHopGeometry(graph, trip.getShapeId(), st0, st1, psv0depart, psv1arrive));
+            hops.add(hop);
 
             TransitStopDepart stopDepart = context.stopDepartNodes.get(s0);
+            if (stopDepart == null) {
+                s0 = _dao.getStopForId(new AgencyAndId(s0.getId().getAgencyId(), s0.getParentStation()));
+                stopDepart = context.stopDepartNodes.get(s0);
+                if (stopDepart == null) {
+                    _log.warn(graph.addBuilderAnnotation(new StopAtEntrance(st0, false)));
+                    continue;
+                } else {
+                    _log.warn(graph.addBuilderAnnotation(new StopAtEntrance(st0, true)));
+                }
+            }
             TransitStopArrive stopArrive = context.stopArriveNodes.get(s1);
+            if (stopArrive == null) {
+                s1 = _dao.getStopForId(new AgencyAndId(s1.getId().getAgencyId(), s1.getParentStation()));
+                stopArrive = context.stopArriveNodes.get(s1);
+                if (stopArrive == null) {
+                    _log.warn(graph.addBuilderAnnotation(new StopAtEntrance(st1, false)));
+                    continue;
+                } else {
+                    _log.warn(graph.addBuilderAnnotation(new StopAtEntrance(st1, true)));
+                }
+            }
+            stopArrive.getStopVertex().addMode(mode);
             new TransitBoardAlight(stopDepart, psv0depart, hopIndex, mode);
             new TransitBoardAlight(psv1arrive, stopArrive, hopIndex, mode);
         }        
         
-        return tripPattern;
+        return new T2<TableTripPattern, List<PatternHop>>(tripPattern, hops);
     }
     
     
@@ -906,136 +1266,40 @@ public class GTFSPatternHopFactory {
         }
     }
 
-    /// This should become unnecessary with unsorted trip patterns
-    /*
-    private void createSimpleHops(Graph graph, Trip trip, List<StopTime> stopTimes) {
-
-        ArrayList<Hop> hops = new ArrayList<Hop>();
-        boolean tripWheelchairAccessible = trip.getWheelchairAccessible() == 1;
-
-        PatternStopVertex psv0arrive, psv0depart, psv1arrive = null;
-        ArrayList<Edge> created = new ArrayList<Edge>();
-        
-        int serviceId = getServiceId(trip);
-        
-        for (int i = 0; i < stopTimes.size() - 1; i++) {
-            StopTime st0 = stopTimes.get(i);
-            Stop s0 = st0.getStop();
-            StopTime st1 = stopTimes.get(i + 1);
-            Stop s1 = st1.getStop();
-
-            int dwellTime = st0.getDepartureTime() - st0.getArrivalTime();
-            int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
-            if (runningTime < 0) {
-                _log.warn(GraphBuilderAnnotation.register(graph,
-                        Variety.NEGATIVE_HOP_TIME, st0, st1));
-                //back out trip and give up
-                for (Edge e: created) {
-                    e.getFromVertex().removeOutgoing(e);
-                    e.getToVertex().removeIncoming(e);
-                }
-                return;
-            }
-            if (dwellTime < 0) {
-                _log.warn(GraphBuilderAnnotation.register(graph, Variety.NEGATIVE_DWELL_TIME, st0));
-                dwellTime = 0;
-            }
-
-            Vertex startStation = context.stopDepartNodes.get(s0);
-            Vertex endStation = context.stopArriveNodes.get(s1);
-
-            // create and connect journey vertices
-            if (psv1arrive == null) { 
-                // first iteration
-                psv0arrive = new PatternArriveVertex(graph, trip, st0); 
-            } else { 
-                // subsequent iterations
-                psv0arrive = psv1arrive; 
-            }
-            psv0depart = new PatternDepartVertex(graph, trip, st0);
-            psv1arrive = new PatternArriveVertex(graph, trip, st1);
-
-            new Dwell(psv0arrive, psv0depart, st0);
-            Hop hop = new Hop(psv0depart, psv1arrive, st0, st1, trip, serviceId);
-            created.add(hop);
-            hop.setGeometry(getHopGeometry(graph, trip.getShapeId(), st0, st1, psv0depart,
-                    psv1arrive));
-            hops.add(hop);
-
-            if (st0.getPickupType() != 1) {
-                Edge board = new Board(startStation, psv0depart, hop,
-                    tripWheelchairAccessible && s0.getWheelchairBoarding() == 1,
-                    st0.getStop().getZoneId(), trip, st0.getPickupType());
-                created.add(board);
-            }
-            if (st0.getDropOffType() != 1) {
-                Edge alight = new Alight(psv1arrive, endStation, hop, 
-                    tripWheelchairAccessible && s1.getWheelchairBoarding() == 1,
-                    st0.getStop().getZoneId(), trip, st0.getDropOffType());
-                created.add(alight);
-            }
-        }
-    }
-    */
     
-    private LineString getHopGeometry(Graph graph, AgencyAndId shapeId, StopTime st0, StopTime st1,
+    private LineString getHopGeometryViaShapeDistTraveled(Graph graph, AgencyAndId shapeId, StopTime st0, StopTime st1,
             Vertex startJourney, Vertex endJourney) {
-
-        if (shapeId == null || shapeId.getId() == null || shapeId.getId().equals(""))
-            return null;
 
         double startDistance = st0.getShapeDistTraveled();
         double endDistance = st1.getShapeDistTraveled();
 
-        boolean hasShapeDist = st0.isShapeDistTraveledSet() && st1.isShapeDistTraveledSet();
+        ShapeSegmentKey key = new ShapeSegmentKey(shapeId, startDistance, endDistance);
+        LineString geometry = _geometriesByShapeSegmentKey.get(key);
+        if (geometry != null)
+            return geometry;
 
-        if (hasShapeDist) {
+        double[] distances = getDistanceForShapeId(shapeId);
 
-            ShapeSegmentKey key = new ShapeSegmentKey(shapeId, startDistance, endDistance);
-            LineString geometry = _geometriesByShapeSegmentKey.get(key);
-            if (geometry != null)
-                return geometry;
-
-            double[] distances = getDistanceForShapeId(shapeId);
-
-            if (distances == null) {
-                _log.warn(GraphBuilderAnnotation.register(graph, 
-                        Variety.BOGUS_SHAPE_GEOMETRY, shapeId));
-                return null;
-            } else {
-                LinearLocation startIndex = getSegmentFraction(distances, startDistance);
-                LinearLocation endIndex = getSegmentFraction(distances, endDistance);
-
-                if (equals(startIndex, endIndex)) {
-                    //bogus shape_dist_traveled 
-                    GraphBuilderAnnotation.register(graph, Variety.BOGUS_SHAPE_DIST_TRAVELED, st1);
-                    return createSimpleGeometry(st0.getStop(), st1.getStop());
-                }
-                LineString line = getLineStringForShapeId(shapeId);
-                LocationIndexedLine lol = new LocationIndexedLine(line);
-
-                geometry = getSegmentGeometry(graph, shapeId, lol, startIndex, endIndex, startDistance,
-                        endDistance, st0, st1);
-                
-                return geometry;
-            }
-        }
-
-        LineString line = getLineStringForShapeId(shapeId);
-        if (line == null) {
-            _log.warn(GraphBuilderAnnotation.register(graph, 
-                    Variety.BOGUS_SHAPE_GEOMETRY, shapeId));
+        if (distances == null) {
+            _log.warn(graph.addBuilderAnnotation(new BogusShapeGeometry(shapeId)));
             return null;
+        } else {
+            LinearLocation startIndex = getSegmentFraction(distances, startDistance);
+            LinearLocation endIndex = getSegmentFraction(distances, endDistance);
+
+            if (equals(startIndex, endIndex)) {
+                //bogus shape_dist_traveled 
+                graph.addBuilderAnnotation(new BogusShapeDistanceTraveled(st1));
+                return createSimpleGeometry(st0.getStop(), st1.getStop());
+            }
+            LineString line = getLineStringForShapeId(shapeId);
+            LocationIndexedLine lol = new LocationIndexedLine(line);
+
+            geometry = getSegmentGeometry(graph, shapeId, lol, startIndex, endIndex, startDistance,
+                    endDistance, st0, st1);
+
+            return geometry;
         }
-        LocationIndexedLine lol = new LocationIndexedLine(line);
-
-        LinearLocation startCoord = lol.indexOf(startJourney.getCoordinate());
-        LinearLocation endCoord = lol.indexOf(endJourney.getCoordinate());
-
-        double distanceFrom = startCoord.getSegmentLength(line);
-        double distanceTo = endCoord.getSegmentLength(line);
-
-        return getSegmentGeometry(graph, shapeId, lol, startCoord, endCoord, distanceFrom, distanceTo, st0, st1);
     }
 
     private static boolean equals(LinearLocation startIndex, LinearLocation endIndex) {
@@ -1073,9 +1337,9 @@ public class GTFSPatternHopFactory {
         
         Coordinate startCoord = new Coordinate(s0.getLon(), s0.getLat());
         Coordinate endCoord = new Coordinate(s1.getLon(), s1.getLat());
-        if (distanceLibrary.distance(startCoord, geometryStartCoord) > 150) {
+        if (distanceLibrary.fastDistance(startCoord, geometryStartCoord) > maxStopToShapeSnapDistance) {
             return false;
-        } else if (distanceLibrary.distance(endCoord, geometryEndCoord) > 150) {
+        } else if (distanceLibrary.fastDistance(endCoord, geometryEndCoord) > maxStopToShapeSnapDistance) {
             return false;
         }
         return true;
@@ -1099,8 +1363,7 @@ public class GTFSPatternHopFactory {
             geometry = _geometryFactory.createLineString(sequence);
             
             if (!isValid(geometry, st0.getStop(), st1.getStop())) {
-                _log.warn(GraphBuilderAnnotation.register(graph, Variety.BOGUS_SHAPE_GEOMETRY_CAUGHT, shapeId, st0, st1));
-
+                _log.warn(graph.addBuilderAnnotation(new BogusShapeGeometryCaught(shapeId, st0, st1)));
                 //fall back to trivial geometry
                 geometry = createSimpleGeometry(st0.getStop(), st1.getStop());
             }
@@ -1233,16 +1496,18 @@ public class GTFSPatternHopFactory {
     }
 
     /**
-     * Create transfer edges between stops which are listed in transfers.txt.
+     * 1. Create edges between stops and their parent stations.
+     * 2. Create transfer edges between stops which are listed in transfers.txt.
+     * 
      * This is not usually useful, but it's nice for the NYC subway system, where
      * it's important to provide in-station transfers for fare computation.
+     * 
+     * NOTE: this method is only called when transfersTxtDefinesStationPaths is set to
+     * True for a given GFTS feed. 
      */
     public void createStationTransfers(Graph graph) {
 
-        /* connect stops to their parent stations
-         * TODO: provide a cost for these edges when stations and
-         * stops have different locations 
-         */
+        /*  1. Connect stops to their parent stations. */
         for (Stop stop : _dao.getAllStops()) {
             String parentStation = stop.getParentStation();
             if (parentStation != null) {
@@ -1269,19 +1534,21 @@ public class GTFSPatternHopFactory {
                 new FreeEdge(parentStopDepartVertex, stopDepartVertex);
                 new FreeEdge(stopDepartVertex, parentStopDepartVertex);
 
+                // TODO: provide a cost for these edges when stations and
+                // stops have different locations 
             }
         }
+        /* 2. Create transfer edges based on transfers.txt. */
         for (Transfer transfer : _dao.getAllTransfers()) {
 
             int type = transfer.getTransferType();
-            if (type == 3)
+            if (type == 3) // type 3 = transfer not possible
                 continue;
-
+            if (transfer.getFromStop().equals(transfer.getToStop())) {
+                continue;
+            }
             Vertex fromv = context.stopArriveNodes.get(transfer.getFromStop());
             Vertex tov = context.stopDepartNodes.get(transfer.getToStop());
-
-            if (fromv.equals(tov))
-                continue;
 
             double distance = distanceLibrary.distance(fromv.getCoordinate(), tov.getCoordinate());
             int time;
@@ -1308,7 +1575,7 @@ public class GTFSPatternHopFactory {
     }
 
     /**
-     * you might not want to delete dwell edges when using realtime updates, because new dwells 
+     * You might not want to delete dwell edges when using realtime updates, because new dwells 
      * might be introduced via trip updates.
      */
     public void setDeleteUselessDwells(boolean delete) {
@@ -1317,6 +1584,16 @@ public class GTFSPatternHopFactory {
 
     public void setStopContext(GtfsStopContext context) {
         this.context = context;
+    }
+
+
+    public double getMaxStopToShapeSnapDistance() {
+        return maxStopToShapeSnapDistance;
+    }
+
+
+    public void setMaxStopToShapeSnapDistance(double maxStopToShapeSnapDistance) {
+        this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
     }
 
 }

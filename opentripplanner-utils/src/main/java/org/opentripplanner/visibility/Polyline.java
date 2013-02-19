@@ -28,9 +28,9 @@ import java.util.Collections;
 
 class Polyline {
 
-    ArrayList<Point> vertices = new ArrayList<Point>();
+    ArrayList<VLPoint> vertices = new ArrayList<VLPoint>();
 
-    Point get(int i) {
+    VLPoint get(int i) {
         return vertices.get(i);
     }
 
@@ -38,7 +38,7 @@ class Polyline {
         return vertices.size();
     }
 
-    double distance(Point point_temp) {
+    double distance(VLPoint point_temp) {
         return point_temp.distance(this);
     }
 
@@ -97,7 +97,7 @@ class Polyline {
             return;
 
         // Store new minimal length list of vertices
-        ArrayList<Point> vertices_temp = new ArrayList<Point>(vertices.size());
+        ArrayList<VLPoint> vertices_temp = new ArrayList<VLPoint>(vertices.size());
 
         // Place holders
         int first = 0;

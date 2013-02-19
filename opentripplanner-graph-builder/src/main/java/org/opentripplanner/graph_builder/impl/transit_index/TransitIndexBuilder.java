@@ -37,10 +37,6 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.services.GraphBuilderWithGtfsDao;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.Alight;
-import org.opentripplanner.routing.edgetype.Board;
-import org.opentripplanner.routing.edgetype.Dwell;
-import org.opentripplanner.routing.edgetype.Hop;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.PatternDwell;
@@ -338,8 +334,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                 if (!(e instanceof Edge)) {
                     continue;
                 }
-                if (e instanceof PatternHop || e instanceof Alight || e instanceof PatternDwell
-                        || e instanceof Dwell) {
+                if (e instanceof PatternHop || e instanceof PatternDwell) {
                     noStart = true;
                 }
                 if (e instanceof TransitBoardAlight) {
@@ -350,10 +345,6 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                         trip = pattern.getExemplar();
                         start = true;
                     }
-                }
-                if (e instanceof Board) {
-                    trip = ((Board) e).getTrip();
-                    start = true;
                 }
                 if (e instanceof PreBoardEdge) {
                     TransitStop stop = (TransitStop) e.getFromVertex();
@@ -387,36 +378,33 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                     RouteSegment segment = new RouteSegment(gv.getStopId());
                     segment.hopIn = prevHop;
                     for (Edge e : gv.getIncoming()) {
-                        if (e instanceof Board || 
-                                (e instanceof TransitBoardAlight && 
-                                        ((TransitBoardAlight) e).isBoarding())) {
+                        if (e instanceof TransitBoardAlight && 
+                                        ((TransitBoardAlight) e).isBoarding()) {
                             segment.board = e;
                         }
                     }
                     Collection<Edge> outgoing = gv.getOutgoing();
                     gv = null;
                     for (Edge e : outgoing) {
-                        if (e instanceof PatternHop || e instanceof Hop) {
+                        if (e instanceof PatternHop) {
                             segment.hopOut = e;
                             gv = (TransitVertex) e.getToVertex();
                         }
-                        if (e instanceof PatternDwell || e instanceof Dwell) {
+                        if (e instanceof PatternDwell) {
                             segment.dwell = e;
                             for (Edge e2 : e.getToVertex().getIncoming()) {
-                                if (e2 instanceof Board || 
-                                        (e2 instanceof TransitBoardAlight && 
-                                         ((TransitBoardAlight) e2).isBoarding())) {
+                                if (e2 instanceof TransitBoardAlight && 
+                                         ((TransitBoardAlight) e2).isBoarding()) {
                                     segment.board = e2;
                                 }
                             }
                             for (Edge e2 : e.getToVertex().getOutgoing()) {
-                                if (e2 instanceof PatternHop || e2 instanceof Hop) {
+                                if (e2 instanceof PatternHop) {
                                     segment.hopOut = e2;
                                     gv = (TransitVertex) e2.getToVertex();
                                 }
-                                if ((e2 instanceof TransitBoardAlight &&
-                                        !((TransitBoardAlight) e2).isBoarding())
-                                        || e2 instanceof Alight) {
+                                if (e2 instanceof TransitBoardAlight &&
+                                        !((TransitBoardAlight) e2).isBoarding()) {
                                     segment.alight = e2;
                                 }
                             }
@@ -424,9 +412,8 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                         if (e instanceof PatternInterlineDwell) {
                             variant.addInterline((PatternInterlineDwell) e);
                         }
-                        if ((e instanceof TransitBoardAlight &&
-                                !((TransitBoardAlight) e).isBoarding())
-                                || e instanceof Alight) {
+                        if (e instanceof TransitBoardAlight &&
+                                !((TransitBoardAlight) e).isBoarding()) {
                             segment.alight = e;
                         }
                     }

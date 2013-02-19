@@ -18,6 +18,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.onebusaway.gtfs.model.Agency;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 @XmlRootElement(name = "Agency")
 public class AgencyType {
 
@@ -46,24 +48,31 @@ public class AgencyType {
     }
 
     @XmlAttribute
+    @JsonSerialize
     String id;
 
     @XmlAttribute
+    @JsonSerialize
     String name;
 
     @XmlAttribute
+    @JsonSerialize
     String url;
 
     @XmlAttribute
+    @JsonSerialize
     String timezone;
 
     @XmlAttribute
+    @JsonSerialize
     String lang;
 
     @XmlAttribute
+    @JsonSerialize
     String phone;
 
     @XmlAttribute
+    @JsonSerialize
     String fareUrl;
 
 }

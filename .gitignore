@@ -23,8 +23,14 @@ opentripplanner-webapp/src/main/webapp/js/otp-min.js
 *~
 .classpath
 .project
+.pydevproject
 .settings
 *.ipr
 *.iml
 *.iws
+*.swp
 .externalToolBuilders
+gen-java/
+gen-javabean/
+gen-py/
+.idea/

@@ -30,6 +30,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 
+import org.opentripplanner.gbannotation.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -706,4 +707,39 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         highlightedEdges = edges;
         drawLevel = DRAW_ALL;
     }
+
+    public void drawAnotation(GraphBuilderAnnotation anno) {
+        Envelope env = new Envelope();
+
+        Edge e = anno.getReferencedEdge();
+        if (e != null) {
+            this.enqueueHighlightedEdge(e);
+            env.expandToInclude(e.getFromVertex().getCoordinate());
+            env.expandToInclude(e.getToVertex().getCoordinate());
+        }
+        
+        ArrayList<Vertex> vertices = new ArrayList<Vertex>();
+        Vertex v = anno.getReferencedVertex();
+        if (v != null) {
+            env.expandToInclude(v.getCoordinate());
+            vertices.add(v);
+        }
+        
+        if (e == null && v == null) 
+            return;
+
+        // make it a little bigger, especially needed for STOP_UNLINKED
+        env.expandBy(0.02);
+
+        // highlight relevant things
+        this.clearHighlights();
+        this.setHighlightedVertices(vertices);
+
+        // zoom the graph display
+        this.zoomToEnvelope(env);
+        
+        // and draw
+        this.draw();
+    }
+
 }

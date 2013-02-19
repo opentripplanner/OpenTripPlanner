@@ -28,6 +28,8 @@ public class DirectionUtils {
     private GeodeticCalculator geodeticCalculator;
 
     private DirectionUtils() {
+        // TODO(flamholz): Is constructing GeodeticCalculator really so
+        // heavyweight that we need this synchronization?
         geodeticCalculator = new GeodeticCalculator();
     }
 
@@ -38,6 +40,21 @@ public class DirectionUtils {
         return instance;
     }
 
+    /**
+     * Returns the azimuth in decimal degrees from (-180° to +180°) between
+     * Coordinates A and B.
+     * 
+     * @param a
+     * @param b
+     * @return
+     */
+    public static synchronized double getAzimuth(Coordinate a, Coordinate b) {
+    	DirectionUtils utils = getInstance();
+        utils.geodeticCalculator.setStartingGeographicPoint(a.x, a.y);
+        utils.geodeticCalculator.setDestinationGeographicPoint(b.x, b.y);
+    	return utils.geodeticCalculator.getAzimuth();
+    }
+    
     /**
      * Computes the angle of the last segment of a LineString or MultiLineString
      *

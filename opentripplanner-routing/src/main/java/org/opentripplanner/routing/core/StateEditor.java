@@ -102,8 +102,7 @@ public class StateEditor {
                 defectiveTraversal = true;
             }
             if (traversingBackward != parent.getOptions().isArriveBy()) {
-                LOG
-                        .error("Actual traversal direction does not match traversal direction in TraverseOptions.");
+                LOG.error("Actual traversal direction does not match traversal direction in TraverseOptions.");
                 defectiveTraversal = true;
             }
         }
@@ -557,8 +556,8 @@ public class StateEditor {
         child.stateData.serviceDay = day;
     }
 
-    public void setBikeRentalNetwork(String network) {
+    public void setBikeRentalNetwork(Set<String> networks) {
         cloneStateDataAsNeeded();
-        child.stateData.bikeRentalNetwork = network;
+        child.stateData.bikeRentalNetworks = networks;
     }
 }

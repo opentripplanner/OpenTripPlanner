@@ -68,13 +68,25 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         _searchTerminationStrategy = searchTerminationStrategy;
     }
     
+    /**
+     * Compute SPT using default timeout and termination strategy.
+     */
     @Override
     public ShortestPathTree getShortestPathTree(RoutingRequest req) {
-        return getShortestPathTree(req, -1); // negative timeout means no timeout
+        return getShortestPathTree(req, -1, _searchTerminationStrategy); // negative timeout means no timeout
+    }
+    
+    /**
+     * Compute SPT using default termination strategy.
+     */
+    @Override
+    public ShortestPathTree getShortestPathTree(RoutingRequest req, double timeoutSeconds) {
+        return this.getShortestPathTree(req, timeoutSeconds, _searchTerminationStrategy);
     }
 
     /** @return the shortest path, or null if none is found */
-    public ShortestPathTree getShortestPathTree(RoutingRequest options, double relTimeout) {
+    public ShortestPathTree getShortestPathTree(RoutingRequest options, double relTimeout,
+            SearchTerminationStrategy terminationStrategy) {
 
         RoutingContext rctx = options.getRoutingContext();
         long abortTime = DateUtils.absoluteTimeout(relTimeout);
@@ -92,9 +104,15 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         double initialWeight = heuristic.computeInitialWeight(initialState, rctx.target);
         spt.add(initialState);
 
-        // Priority Queue
+        // Priority Queue.
+        // NOTE(flamholz): the queue is self-resizing, so we initialize it to have 
+        // size = O(sqrt(|V|)) << |V|. For reference, a random, undirected search
+        // on a uniform 2d grid will examine roughly sqrt(|V|) vertices before
+        // reaching its target. 
         OTPPriorityQueueFactory qFactory = BinHeap.FACTORY;
-        OTPPriorityQueue<State> pq = qFactory.create(rctx.graph.getVertices().size());
+        int initialSize = rctx.graph.getVertices().size();
+        initialSize = (int) Math.ceil(2 * (Math.sqrt((double) initialSize + 1)));
+        OTPPriorityQueue<State> pq = qFactory.create(initialSize);
         // this would allow continuing a search from an existing state
         pq.insert(initialState, initialWeight);
 
@@ -129,8 +147,9 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
             State u = pq.extract_min();
             // check that this state has not been dominated
             // and mark vertex as visited
-            if (!spt.visit(u))
+            if (!spt.visit(u)) {
                 continue;
+            }
 
             if (traverseVisitor != null) {
                 traverseVisitor.visitVertex(u);
@@ -149,8 +168,8 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
             /**
              * Should we terminate the search?
              */
-            if (_searchTerminationStrategy != null) {
-                if (!_searchTerminationStrategy.shouldSearchContinue(
+            if (terminationStrategy != null) {
+                if (!terminationStrategy.shouldSearchContinue(
                     rctx.origin, rctx.target, u, spt, options))
                     break;
             // TODO AMB: Replace isFinal with bicycle conditions in BasicPathParser
@@ -184,8 +203,9 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 
                     if (_skipTraversalResultStrategy != null
                             && _skipTraversalResultStrategy.shouldSkipTraversalResult(
-                                    rctx.origin, rctx.target, u, v, spt, options))
+                                    rctx.origin, rctx.target, u, v, spt, options)) {
                         continue;
+                    }
 
                     double remaining_w = computeRemainingWeight(heuristic, v, rctx.target, options);
                     if (remaining_w < 0 || Double.isInfinite(remaining_w) ) {
@@ -235,10 +255,11 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
             Vertex target, RoutingRequest options) {
         // actually, the heuristic could figure this out from the TraverseOptions.
         // set private member back=options.isArriveBy() on initial weight computation.
-        if (options.isArriveBy())
+        if (options.isArriveBy()) {
             return heuristic.computeReverseWeight(v, target);
-        else
+        } else {
             return heuristic.computeForwardWeight(v, target);
+        }
     }
 
     private boolean isWorstTimeExceeded(State v, RoutingRequest opt) {
@@ -272,5 +293,4 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     public void setTraverseVisitor(TraverseVisitor traverseVisitor) {
         this.traverseVisitor = traverseVisitor;
     }
-
 }

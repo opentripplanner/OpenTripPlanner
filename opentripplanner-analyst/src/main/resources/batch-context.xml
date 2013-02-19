@@ -11,13 +11,12 @@
     </bean>
     <bean class="org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl"/>
     <bean class="org.opentripplanner.routing.algorithm.GenericAStar"/>
-    <bean class="org.opentripplanner.analyst.batch.IndividualFactory" />
     <bean class="org.opentripplanner.analyst.core.GeometryIndex" />
     
     <!-- specify a GraphService, configuring the path to the serialized Graphs -->
     
     <bean id="graphService" class="org.opentripplanner.routing.impl.GraphServiceImpl">
-        <property name="path" value="/var/otp/graphs/{}/" />
+        <property name="path" value="/var/otp/graphs/" />
         <property name="defaultRouterId" value="arbor" />
     </bean>
 

@@ -58,7 +58,7 @@ public class GraphServiceBeanImpl implements GraphService {
     }
 
     @Override
-    public List<String> getGraphIds() {
+    public List<String> getRouterIds() {
         return Arrays.asList("default");
     }
 

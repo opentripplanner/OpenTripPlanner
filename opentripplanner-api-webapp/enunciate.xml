@@ -16,8 +16,6 @@
     <obj-c disabled="true"/> 
     <csharp disabled="true"/> 
     <jaxws-client disabled="true"/> 
-    <docs title="OpenTripPlanner API"
-          base="src/main/resources/docs-theme"
-          disableRestMountpoint="true"/>
+    <docs title="OpenTripPlanner API" disableRestMountpoint="true"/>
   </modules> 
 </enunciate> 

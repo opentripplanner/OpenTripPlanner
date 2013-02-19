@@ -16,7 +16,10 @@ package org.opentripplanner.routing.transit_index;
 import java.io.Serializable;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.model.json_serialization.GeoJSONSerializer;
 import org.opentripplanner.routing.graph.Edge;
+
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
@@ -35,6 +38,8 @@ public class RouteSegment implements Serializable  {
 	public RouteSegment(AgencyAndId stop) {
 		this.stop = stop;
 	}
+
+	@JsonSerialize(using=GeoJSONSerializer.class)
 	public Geometry getGeometry() {
 	    return hopOut.getGeometry();
 	}

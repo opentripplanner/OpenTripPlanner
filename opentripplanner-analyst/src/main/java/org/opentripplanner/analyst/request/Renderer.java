@@ -1,7 +1,15 @@
 package org.opentripplanner.analyst.request;
 
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.OutputStream;
+import java.text.DateFormat;
+import java.util.Date;
+import java.util.TimeZone;
 
 import javax.imageio.ImageIO;
 import javax.ws.rs.WebApplicationException;
@@ -47,7 +55,7 @@ public class Renderer {
         BufferedImage image;
         switch (renderRequest.layer) {
         case DIFFERENCE :
-            image = tile.linearCombination(1, sptA, -1, sptB, 128, renderRequest);
+            image = tile.linearCombination(1, sptA, -1, sptB, 0, renderRequest);
             break;
         case HAGERSTRAND :
             long elapsed = Math.abs(sptRequestB.dateTime - sptRequestA.dateTime);
@@ -58,6 +66,21 @@ public class Renderer {
             image = tile.generateImage(sptA, renderRequest);
         }
         
+        // add a timestamp to the image if requested. 
+        // of course this will make it useless as a raster for analysis, but it's good for animations.
+        if (renderRequest.timestamp) {
+            DateFormat df = DateFormat.getDateTimeInstance();
+            df.setTimeZone(TimeZone.getTimeZone("America/New_York"));
+            String ds = df.format(new Date(sptRequestA.dateTime * 1000));
+            shadowWrite(image, ds, sptRequestA.from.toString());
+
+            Graphics2D g2d = image.createGraphics();
+            g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
+            BufferedImage legend = Tile.getLegend(renderRequest.style, 300, 50);
+            g2d.drawImage(legend, 0, image.getHeight()-50, null);
+            g2d.dispose();
+        }
+                
         // geotiff kludge
         if (renderRequest.format.toString().equals("image/geotiff")) {
             GridCoverage2D gc = tile.getGridCoverage2D(image);
@@ -65,6 +88,31 @@ public class Renderer {
         } else {
             return generateStreamingImageResponse(image, renderRequest.format);
         }
+    }
+    
+    private void shadowWrite(BufferedImage image, String... strings) {
+        Graphics2D g2d = image.createGraphics();
+        g2d.setFont(new Font("Sans", Font.PLAIN, 25));
+        FontMetrics fm = g2d.getFontMetrics();
+        int dy = fm.getHeight();
+        int xsize = 0;
+        for (String s : strings) {
+            int w = fm.stringWidth(s);
+            if (w > xsize)
+                xsize = w;
+        }
+        int y = 5;
+        int x = 5;
+        //g2d.fillRect(x, y, xsize, dy * strings.length + fm.getDescent());
+        y += dy;
+        for (String s : strings) {
+            g2d.setPaint(Color.black);
+            g2d.drawString(s, x+1, y+1);
+            g2d.setPaint(Color.white);
+            g2d.drawString(s, x, y);
+            y += dy;
+        }
+        g2d.dispose();
     }
         
     public static Response generateStreamingImageResponse(

@@ -49,7 +49,7 @@ import lombok.Getter;
  * 
  * @author mattwigway
  */
-public class TransitBoardAlight extends PatternEdge implements OnBoardForwardEdge {
+public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwardEdge {
 
     private static final long serialVersionUID = 1042740795612978747L;
 
@@ -232,7 +232,7 @@ public class TransitBoardAlight extends PatternEdge implements OnBoardForwardEdg
                     
                     // getNextTrip will find next or prev departure depending on final boolean parameter
                     tripTimes = getPattern().getNextTrip(stopIndex, secondsSinceMidnight, 
-                            mode == TraverseMode.BICYCLE, options, boarding, null);
+                            mode == TraverseMode.BICYCLE, options, boarding);
                     
                     if (tripTimes != null) {
                         // a trip was found, index is valid, wait will be non-negative
@@ -259,6 +259,13 @@ public class TransitBoardAlight extends PatternEdge implements OnBoardForwardEdg
                 return null;
             }
             Trip trip = bestTripTimes.getTrip();
+            
+            /* check if agency is banned for this plan */
+            if (options.bannedAgencies != null) {
+            	if (options.bannedAgencies.contains(trip.getId().getAgencyId())) {
+            		return null;
+            	}
+            }
 
             /* check if route banned for this plan */
             if (options.bannedRoutes != null) {
@@ -381,6 +388,7 @@ public class TransitBoardAlight extends PatternEdge implements OnBoardForwardEdg
      * pattern was already deemed useful.
      */
     public double weightLowerBound(RoutingRequest options) {
+//        return 0;
         if ((options.isArriveBy() && boarding) || (!options.isArriveBy() && !boarding))
             return timeLowerBound(options);
         else

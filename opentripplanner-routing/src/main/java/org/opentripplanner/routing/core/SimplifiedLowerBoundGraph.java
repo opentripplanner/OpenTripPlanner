@@ -23,7 +23,6 @@ import java.util.Map.Entry;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.edgetype.Hop;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -110,7 +109,7 @@ public class SimplifiedLowerBoundGraph {
                     int to_gindex = v.getGroupIndex();
                     if (to_gindex == from_gindex)
                         continue;
-                    if (e instanceof PatternHop || e instanceof Hop)
+                    if (e instanceof PatternHop)
                         putIfBetter(distEdges, from_gindex, to_gindex, e.timeLowerBound(dummyOptions));
                     else 
                         putIfBetter(distEdges, from_gindex, to_gindex, e.getDistance());

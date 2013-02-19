@@ -40,10 +40,9 @@ import org.opentripplanner.api.model.RelativeDirection;
 import org.opentripplanner.api.model.RouterInfo;
 import org.opentripplanner.api.model.RouterList;
 import org.opentripplanner.api.model.WalkStep;
-import org.opentripplanner.api.model.analysis.EdgeSet;
-import org.opentripplanner.api.model.analysis.FeatureCount;
-import org.opentripplanner.api.model.analysis.VertexSet;
-import org.opentripplanner.api.model.json_serializers.WithGraph;
+import org.opentripplanner.api.model.internals.EdgeSet;
+import org.opentripplanner.api.model.internals.FeatureCount;
+import org.opentripplanner.api.model.internals.VertexSet;
 import org.opentripplanner.api.model.patch.PatchResponse;
 import org.opentripplanner.api.model.transit.AgencyList;
 import org.opentripplanner.api.model.transit.ModeList;
@@ -54,6 +53,7 @@ import org.opentripplanner.api.model.transit.StopList;
 import org.opentripplanner.api.model.transit.StopTimeList;
 import org.opentripplanner.api.ws.internals.Components;
 import org.opentripplanner.api.ws.internals.GraphInternals;
+import org.opentripplanner.api.ws.services.MetadataService;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
@@ -68,6 +68,7 @@ import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.model.GtfsBundles;
 import org.opentripplanner.graph_builder.services.GraphBuilderWithGtfsDao;
 import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory;
+import org.opentripplanner.model.json_serialization.WithGraph;
 import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
@@ -113,7 +114,7 @@ class SimpleGraphServiceImpl implements GraphService {
     }
 
     @Override
-    public Collection<String> getGraphIds() {
+    public Collection<String> getRouterIds() {
         return graphs.keySet();
     }
 
@@ -200,8 +201,8 @@ class Context {
             throw new RuntimeException(e);
         }
 
-        pathService.sptService = new GenericAStar();
-        pathService.graphService = graphService;
+        pathService.setSptService(new GenericAStar());
+        pathService.setGraphService(graphService);
         planGenerator.pathService = pathService;
     }
 
@@ -392,7 +393,9 @@ public class TestRequest extends TestCase {
 
     public void testMetadata() throws JSONException {
         Metadata metadata = new Metadata();
-        metadata.graphService = Context.getInstance().graphService;
+        MetadataService metadataService = new MetadataService();
+        metadata.setMetadataService(metadataService);
+        metadataService.setGraphService(Context.getInstance().graphService);
         GraphMetadata data1 = metadata.getMetadata(null);
         assertTrue("centerLatitude is not 40.005; got " + data1.getCenterLatitude(),
                 Math.abs(40.005 - data1.getCenterLatitude()) < 0.000001);
@@ -478,7 +481,7 @@ public class TestRequest extends TestCase {
         // assertEquals("MAX Red Line", routesForStop.routes.get(0).routeLongName);
 
         StopList stopsNearPoint = (StopList) index.getStopsNearPoint("TriMet", 45.464783,
-                -122.578918, false, routerId);
+                -122.578918, false, routerId, null);
         assertTrue(stopsNearPoint.stops.size() > 0);
 
         long startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 9, 1, 7, 50, 0) * 1000;

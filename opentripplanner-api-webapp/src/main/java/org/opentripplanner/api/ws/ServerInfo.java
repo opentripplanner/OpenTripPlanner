@@ -26,11 +26,13 @@ import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import lombok.Getter;
+
 import org.codehaus.jettison.json.JSONException;
 import org.opentripplanner.common.MavenVersion;
 
 @Path("/serverinfo")
-@XmlRootElement
+@XmlRootElement 
 public class ServerInfo {
     
     private static final ServerInfo SERVER_INFO = new ServerInfo();
@@ -40,14 +42,17 @@ public class ServerInfo {
     public static ServerInfo getServerInfo() throws JSONException {
         return SERVER_INFO;
     }    
+    
+    /* fields must be public or have a public getter to be auto-serialized to JSON;
+    they are annotated with @XmlElement to be serialized to XML */
 
-    @XmlElement
+    @XmlElement @Getter
     private MavenVersion serverVersion = MavenVersion.VERSION; 
     
-    @XmlElement
+    @XmlElement @Getter
     private String cpuName = "unknown";
     
-    @XmlElement
+    @XmlElement @Getter
     private int nCores = 0;
 
     /**

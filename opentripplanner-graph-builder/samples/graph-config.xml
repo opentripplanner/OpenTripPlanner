@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:context="http://www.springframework.org/schema/context"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
 
     <bean id="gtfsBuilder" class="org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl">
@@ -11,7 +11,7 @@
                     <list>
                         <bean class="org.opentripplanner.graph_builder.model.GtfsBundle">
                             <property name="path" value="/home/otp/gtfs" />
-			    <property name="defaultBikesAllowed" value="true" />
+                            <property name="defaultBikesAllowed" value="true" />
                         </bean>
                     </list>
                 </property>
@@ -28,10 +28,16 @@
                 <property name="cacheDirectory" value="/home/otp/osm" />
             </bean>
         </property>
-	<property name="defaultWayPropertySetSource">
-          <bean class="org.opentripplanner.graph_builder.impl.osm.DefaultWayPropertySetSource" />
-	</property>
+        <property name="defaultWayPropertySetSource">
+            <bean class="org.opentripplanner.graph_builder.impl.osm.DefaultWayPropertySetSource" />
+        </property>
+    </bean>
 
+    <bean id="floatingIslands" class="org.opentripplanner.graph_builder.impl.PruneFloatingIslands">
+        <property name="maxIslandSize" value="1000 "/>
+        <property name="islandLogFile" value="{graphPath}/island.csv"/>
+        <property name="islandWithStopMaxSize" value="20"/>
+        <property name="transitToStreetNetwork" ref ="transitStreetLink"/>
     </bean>
 
     <bean id="transitStreetLink" class="org.opentripplanner.graph_builder.impl.TransitToStreetNetworkGraphBuilderImpl" />
@@ -44,8 +50,11 @@
                 <!-- GTFS comes before OSM, because we use the loaded set of stops to determine our OSM coverage -->
                 <ref bean="gtfsBuilder" />
                 <ref bean="osmBuilder" />
+                <!-- the transmit link should became before the floating islands in order to find islands with stops-->
                 <ref bean="transitStreetLink" />
+                <ref bean="floatingIslands" />
                 <ref bean="optimizeTransit" />
+
             </list>
         </property>
     </bean>

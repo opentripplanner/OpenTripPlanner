@@ -92,6 +92,10 @@ form span select {
 	width: 150px;
 }
 
+form span.timeEntry select {
+	float: left;
+}
+
 .autoWidth {
 	width: auto;
 }

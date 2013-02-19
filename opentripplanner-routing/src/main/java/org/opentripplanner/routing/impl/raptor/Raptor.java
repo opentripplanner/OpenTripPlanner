@@ -22,6 +22,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 
+import javax.annotation.PostConstruct;
+
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.common.geometry.DistanceLibrary;
@@ -39,6 +41,7 @@ import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
 import org.opentripplanner.routing.pathparser.BasicPathParser;
 import org.opentripplanner.routing.pathparser.NoThruTrafficPathParser;
 import org.opentripplanner.routing.pathparser.PathParser;
@@ -59,6 +62,8 @@ public class Raptor implements PathService {
 
     private static final int MAX_WALK_MULTIPLE = 8;
 
+    public static final double WALK_EPSILON = 1.10;
+
     @Autowired
     private GraphService graphService;
 
@@ -68,9 +73,20 @@ public class Raptor implements PathService {
 
     private double multiPathTimeout = 0; // seconds
 
-    /** Give up on searching for additional itineraries after this many seconds have elapsed. */
-    public void setTimeout (double seconds) {
-        multiPathTimeout = seconds;
+    /**
+     * This is used for short paths (under shortPathCutoff).
+     */
+    RetryingPathServiceImpl shortPathService = new RetryingPathServiceImpl();
+
+    /**
+     * The max length, in meters, that will use the shortPathService.
+     */
+    private double shortPathCutoff = 10000;
+
+    @PostConstruct
+    public void setup() {
+        shortPathService.setGraphService(graphService);
+        shortPathService.setSptService(sptService);
     }
 
     /**
@@ -101,10 +117,22 @@ public class Raptor implements PathService {
             return sptService.getShortestPathTree(options).getPaths();
         }
 
-        RaptorData data = graph.getService(RaptorDataService.class).getData();
+        //also fall back to A* for short trips
+        double distance = distanceLibrary.distance(options.rctx.origin.getCoordinate(), options.rctx.target.getCoordinate());
+        if (distance < shortPathCutoff) {
+            log.debug("Falling back to A* for very short path");
+            return shortPathService.getPaths(options);
+        }
 
-        //we multiply the initial walk distance by 1.1 to account for epsilon dominance.
-        double initialWalk = options.getMaxWalkDistance() * 1.1;
+        RaptorDataService service = graph.getService(RaptorDataService.class);
+        if (service == null) {
+            log.warn("No raptor data.  Rebuild with RaptorDataBuilder");
+            return Collections.emptyList();
+        }
+        RaptorData data = service.getData();
+
+        //we multiply the initial walk distance to account for epsilon dominance.
+        double initialWalk = options.getMaxWalkDistance() * WALK_EPSILON;
         options.setMaxWalkDistance(initialWalk);
 
         //do not even bother with obviously impossible walks
@@ -148,71 +176,106 @@ public class Raptor implements PathService {
         double expectedWorstTime = 1.5 * distanceLibrary.distance(options.rctx.origin.getCoordinate(),
                 options.rctx.target.getCoordinate()) / options.getWalkSpeed();
 
-        int bestElapsedTime = Integer.MAX_VALUE;
         int foundSoFar = 0;
-        RETRY: do {
-            for (int round = 0; round < options.getMaxTransfers() + 2; ++round) {
-                if (!round(data, options, walkOptions, search, round))
-                    break;
 
-                long elapsed = System.currentTimeMillis() - searchBeginTime;
-                if (elapsed > multiPathTimeout * 1000 && multiPathTimeout > 0
-                        && search.getTargetStates().size() > 0)
-                    break RETRY;
+        double firstWalkDistance = 0;
+        List<RaptorState> targetStates = new ArrayList<RaptorState>();
 
-                ArrayList<RaptorState> toRemove = new ArrayList<RaptorState>();
-                for (RaptorState state : search.getTargetStates()) {
-                    if (state.nBoardings == 0 && options.getMaxWalkDistance() > initialWalk) {
-                        toRemove.add(state);
-                        continue;
-                    }
-                }
-                if (search.getTargetStates().size() > 0) {
-                    for (RaptorState state : toRemove) {
-                        search.removeTargetState(state.walkPath);
-                    }
-                }
-                if (search.getTargetStates().size() >= options.getNumItineraries() && round >= rushAheadRound) {
-                    int oldBest = bestElapsedTime;
+        do {
+            int bestElapsedTime = Integer.MAX_VALUE;
+            RETRY: do {
+                for (int round = 0; round < options.getMaxTransfers() + 2; ++round) {
+                    if (!round(data, options, walkOptions, search, round))
+                        break;
+
+                    long elapsed = System.currentTimeMillis() - searchBeginTime;
+                    if (elapsed > multiPathTimeout * 1000 && multiPathTimeout > 0
+                            && targetStates.size() > 0)
+                        break RETRY;
+
+                    ArrayList<RaptorState> toRemove = new ArrayList<RaptorState>();
                     for (RaptorState state : search.getTargetStates()) {
-                        final int elapsedTime = (int) Math
-                                .abs(state.arrivalTime - options.dateTime);
-                        if (elapsedTime < bestElapsedTime) {
-                            bestElapsedTime = elapsedTime;
+                        if (state.nBoardings == 0 && options.getMaxWalkDistance() > initialWalk) {
+                            toRemove.add(state);
                         }
                     }
+                    if (search.getTargetStates().size() > 0) {
+                        if (firstWalkDistance == 0) {
+                            firstWalkDistance = options.getMaxWalkDistance();
+                        }
+                        for (RaptorState state : toRemove) {
+                            search.removeTargetState(state.walkPath);
+                        }
+                    }
+                    if (targetStates.size() >= options.getNumItineraries()
+                            && round >= rushAheadRound) {
+                        int oldBest = bestElapsedTime;
+                        for (RaptorState state : search.getTargetStates()) {
+                            final int elapsedTime = (int) Math.abs(state.arrivalTime
+                                    - options.dateTime);
+                            if (elapsedTime < bestElapsedTime) {
+                                bestElapsedTime = elapsedTime;
+                            }
+                        }
 
-                    int improvement = oldBest - bestElapsedTime;
-                    if (improvement < 600 && bestElapsedTime < expectedWorstTime)
-                        break RETRY;
+                        int improvement = oldBest - bestElapsedTime;
+                        if (improvement < 600 && bestElapsedTime < expectedWorstTime)
+                            break RETRY;
+                    }
                 }
 
+                if (foundSoFar < search.getTargetStates().size()) {
+                    foundSoFar = search.getTargetStates().size();
+                } else if (foundSoFar > 0) {
+                    // we didn't find anything new in this round, and we already have
+                    // some paths, so bail out
+                    break;
+                }
+                options = options.clone();
+                walkOptions = walkOptions.clone();
+                if (search.getTargetStates().size() > 0 && bestElapsedTime < expectedWorstTime) {
+                    // we have found some paths so we no longer want to expand the max walk distance
+                    break RETRY;
+                } else {
+                    options.setMaxWalkDistance(options.getMaxWalkDistance() * 2);
+                    walkOptions.setMaxWalkDistance(options.getMaxWalkDistance());
+
+                    options.setWalkReluctance(options.getWalkReluctance() * 2);
+                    walkOptions.setWalkReluctance(options.getWalkReluctance());
+                }
+                search.reset(options);
+
+            } while (options.getMaxWalkDistance() < initialWalk * MAX_WALK_MULTIPLE
+                    && initialWalk < Double.MAX_VALUE);
+
+            options = options.clone();
+            walkOptions = walkOptions.clone();
+            for (RaptorState state : search.getTargetStates()) {
+                for (AgencyAndId trip : state.getTrips()) {
+                    options.banTrip(trip);
+                }
             }
 
-            if (foundSoFar < search.getTargetStates().size()) {
-                foundSoFar = search.getTargetStates().size();
-            } else if (foundSoFar > 0) {
-                //we didn't find anything new in this round, and we already have
-                //some paths, so bail out
-                break;
-            }
+            if (search.getTargetStates().size() == 0)
+                break; // no paths found; searching more won't help
 
-            options.setMaxWalkDistance(options.getMaxWalkDistance() * 2);
-            walkOptions.setMaxWalkDistance(options.getMaxWalkDistance());
+            options.setMaxWalkDistance(firstWalkDistance);
+            walkOptions.setMaxWalkDistance(firstWalkDistance);
 
-            options.setWalkReluctance(options.getWalkReluctance() * 2);
-            walkOptions.setWalkReluctance(options.getWalkReluctance());
-            search.reset(options);
+            targetStates.addAll(search.getTargetStates());
+            search = new RaptorSearch(data, options);
 
-        } while (options.getMaxWalkDistance() < initialWalk * MAX_WALK_MULTIPLE && initialWalk < Double.MAX_VALUE);
+        } while (targetStates.size() < options.getNumItineraries());
 
-        collectRoutesUsed(data, options, search.getTargetStates());
+        collectRoutesUsed(data, options, targetStates);
 
-        List<RaptorState> targetStates = search.getTargetStates();
         if (targetStates.isEmpty()) {
-            log.info("RAPTOR found no paths (try retrying?)");
+            log.info("RAPTOR found no paths");
         }
         Collections.sort(targetStates);
+
+        if (targetStates.size() > options.getNumItineraries())
+            targetStates = targetStates.subList(0, options.getNumItineraries());
 
         List<GraphPath> paths = new ArrayList<GraphPath>();
         for (RaptorState targetState : targetStates) {
@@ -224,14 +287,15 @@ public class Raptor implements PathService {
                 cur = cur.getParent();
             }
             // states is in reverse order of time
-            State state = getState(options, data, states);
+            State state = getState(targetState.getRequest(), data, states);
             paths.add(new GraphPath(state, true));
         }
 
         return paths;
     }
 
-    private void collectRoutesUsed(RaptorData data, RoutingRequest options, List<RaptorState> targetStates) {
+    private void collectRoutesUsed(RaptorData data, RoutingRequest options,
+            List<RaptorState> targetStates) {
         // find start/end regions
         List<Integer> startRegions = getRegionsForVertex(data.regionData, options.rctx.fromVertex);
         int startRegion;
@@ -302,6 +366,8 @@ public class Raptor implements PathService {
         trimmedData.routesForStop = data.routesForStop;
 
         double walkDistance = options.getMaxWalkDistance();
+        options = options.clone();
+        walkOptions = walkOptions.clone();
         if (walkDistance > 4000) {
             // this is a really long walk. We'll almost never actually need this. So let's do our
             // preliminary search over just 4km first.
@@ -311,21 +377,20 @@ public class Raptor implements PathService {
 
         int round;
         if (trimmedData.routes.size() > 0) {
-            log.debug("Doing preliminary search on limited route set (" + trimmedData.routes.size() + ", " + stops.size() + ")");
+            log.debug("Doing preliminary search on limited route set (" + trimmedData.routes.size()
+                    + ", " + stops.size() + ")");
             round = doPreliminarySearch(options, walkOptions, search, trimmedData);
         } else {
             round = 0;
         }
 
         if (search.getTargetStates().size() == 0 && walkDistance > 5000) {
-            //nothing found in preliminary search
-            //so we'll do a search with full set of routes & stops, but still limited distance
+            // nothing found in preliminary search
+            // so we'll do a search with full set of routes & stops, but still limited distance
             log.debug("Doing preliminary search at limited distance");
             round = doPreliminarySearch(options, walkOptions, search, data);
         }
 
-        options.setMaxWalkDistance(walkDistance);
-        walkOptions.setMaxWalkDistance(walkDistance);
         return round;
     }
 
@@ -405,29 +470,34 @@ public class Raptor implements PathService {
 
     private State getState(RoutingRequest options, RaptorData data, ArrayList<RaptorState> states) {
         if (options.arriveBy) {
-            return getStateArriveBy(options, data, states);
+            return getStateArriveBy(data, states);
         } else {
-            return getStateDepartAt(options, data, states);
+            return getStateDepartAt(data, states);
         }
     }
 
-    private State getStateDepartAt(RoutingRequest options, RaptorData data,
-            ArrayList<RaptorState> states) {
-        State state = new State(options);
+    private State getStateDepartAt(RaptorData data, ArrayList<RaptorState> states) {
+        State state = new State(states.get(0).getRequest());
         for (int i = states.size() - 1; i >= 0; --i) {
             RaptorState cur = states.get(i);
             if (cur.walkPath != null) { //a walking step
-                GraphPath path = new GraphPath(cur.walkPath, true);
+                GraphPath path = new GraphPath(cur.walkPath, false);
+                Edge edge0 = path.edges.getFirst();
+                if (edge0.getFromVertex() != state.getVertex()) {
+                    state = state.getBackState();
+                }
                 for (Edge e : path.edges) {
-                    State oldState = state;
                     state = e.traverse(state);
-                    if (state == null) {
-                        e.traverse(oldState);
-                    }
                 }
             } else {
                 // so, cur is at this point at a transit stop; we have a route to board
                 if (cur.getParent() == null || ! cur.getParent().interlining) {
+                    for (Edge e : state.getVertex().getOutgoing()) {
+                        if (e instanceof PreAlightEdge) {
+                            state = e.traverse(state);
+                            break;
+                        }
+                    }
                     for (Edge e : state.getVertex().getOutgoing()) {
                         if (e instanceof PreBoardEdge) {
                             state = e.traverse(state);
@@ -485,23 +555,24 @@ public class Raptor implements PathService {
         return state;
     }
 
-    private State getStateArriveBy(RoutingRequest options, RaptorData data,
-            ArrayList<RaptorState> states) {
+    private State getStateArriveBy(RaptorData data, ArrayList<RaptorState> states) {
+        RoutingRequest options = states.get(0).getRequest();
         State state = new State(options.rctx.origin, options);
         for (int i = states.size() - 1; i >= 0; --i) {
             RaptorState cur = states.get(i);
             if (cur.walkPath != null) {
-                GraphPath path = new GraphPath(cur.walkPath, true);
+                GraphPath path = new GraphPath(cur.walkPath, false);
+                Edge edge0 = path.edges.getLast();
+                if (edge0.getToVertex() != state.getVertex()) {
+                    state = state.getBackState();
+                }
+
                 for (ListIterator<Edge> it = path.edges.listIterator(path.edges.size()); it.hasPrevious();) {
                     Edge e = it.previous();
-                    State oldState = state;
                     state = e.traverse(state);
-                    if (state == null) {
-                        e.traverse(oldState);
-                    }
                 }
             } else {
-                // so, cur is at this point at a transit stop; we have a route to alight from
+                // so, cur is at this point at a transit stop departure; we have a route to alight from
                 if (cur.getParent() == null || ! cur.getParent().interlining) {
                     for (Edge e : state.getVertex().getIncoming()) {
                         if (e instanceof PreAlightEdge) {
@@ -509,11 +580,7 @@ public class Raptor implements PathService {
                         }
                     }
                     TransitBoardAlight alight = cur.getRoute().alights[cur.boardStopSequence - 1][cur.patternIndex];
-                    State oldState = state;
                     state = alight.traverse(state);
-                    if (state == null) {
-                        state = alight.traverse(oldState);
-                    }
                 }
                 // now traverse the hops and dwells until we find the board we're looking for
                 HOP: while (true) {
@@ -655,8 +722,8 @@ public class Raptor implements PathService {
 
         RaptorData data = graph.getService(RaptorDataService.class).getData();
 
-        //we multiply the initial walk distance by 1.1 to account for epsilon dominance.
-        options.setMaxWalkDistance(options.getMaxWalkDistance() * 1.1);
+        //we multiply the initial walk distance to account for epsilon dominance.
+        options.setMaxWalkDistance(options.getMaxWalkDistance() * WALK_EPSILON);
 
         RoutingRequest walkOptions = options.clone();
         walkOptions.rctx.pathParsers = new PathParser[0];
@@ -672,6 +739,14 @@ public class Raptor implements PathService {
         RaptorStateSet result = new RaptorStateSet();
         result.statesByStop = search.statesByStop;
         return result;
+    }
+
+    public double getShortPathCutoff() {
+        return shortPathCutoff;
+    }
+
+    public void setShortPathCutoff(double shortPathCutoff) {
+        this.shortPathCutoff = shortPathCutoff;
     }
 
 }

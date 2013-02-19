@@ -1,3 +1,16 @@
+/* This program is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
 package org.opentripplanner.routing.core;
 
 import java.util.ArrayList;
@@ -8,6 +21,7 @@ import java.util.Set;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
+import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
@@ -84,13 +98,24 @@ public class RoutingContext implements Cloneable {
                           Vertex from, Vertex to, boolean findPlaces) {
         this.opt = traverseOptions;
         this.graph = graph;
+        
         if (findPlaces) {
             // normal mode, search for vertices based on fromPlace and toPlace
-            fromVertex = graph.streetIndex.getVertexForPlace(opt.getFromPlace(), opt);
-            toVertex = graph.streetIndex.getVertexForPlace(opt.getToPlace(), opt, fromVertex);
+            if ( ! opt.batch || opt.arriveBy) {
+                // non-batch mode, or arriveBy batch mode: we need a to vertex
+                toVertex = graph.streetIndex.getVertexForLocation(opt.getTo(), opt);
+            } else {
+                toVertex = null;
+            }
+            if ( ! opt.batch || ! opt.arriveBy) {
+                // non-batch mode, or depart-after batch mode: we need a from vertex
+                fromVertex = graph.streetIndex.getVertexForLocation(opt.getFrom(), opt, toVertex);                
+            } else {
+                fromVertex = null;
+            }
             if (opt.intermediatePlaces != null) {
-                for (NamedPlace intermediate : opt.intermediatePlaces) {
-                    Vertex vertex = graph.streetIndex.getVertexForPlace(intermediate, opt);
+                for (GenericLocation intermediate : opt.intermediatePlaces) {
+                    Vertex vertex = graph.streetIndex.getVertexForLocation(intermediate, opt);
                     intermediateVertices.add(vertex);
                 }
             }

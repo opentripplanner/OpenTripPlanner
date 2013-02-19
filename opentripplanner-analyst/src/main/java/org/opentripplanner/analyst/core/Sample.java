@@ -1,3 +1,16 @@
+/* This program is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
 package org.opentripplanner.analyst.core;
 
 import org.opentripplanner.routing.core.State;
@@ -14,7 +27,7 @@ public class Sample {
         this.v1 = v1;
         this.t1 = t1;
     }
-    
+
     public byte evalBoardings(ShortestPathTree spt) {
         State s0 = spt.getState(v0);
         State s1 = spt.getState(v1);
@@ -25,13 +38,6 @@ public class Sample {
         if (s1 != null)
             m1 = (s1.getNumBoardings()); 
         return (byte) ((m0 < m1) ? m0 : m1); 
-    }
-    
-    public byte evalByte(ShortestPathTree spt) {
-        long t = eval(spt) / 60;
-        if (t >= 255)
-            t = 255;
-        return (byte) t;
     }
     
     public long eval(ShortestPathTree spt) {

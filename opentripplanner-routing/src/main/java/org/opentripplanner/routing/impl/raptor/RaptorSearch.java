@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.common.pqueue.OTPPriorityQueue;
 import org.opentripplanner.common.pqueue.OTPPriorityQueueFactory;
@@ -34,7 +35,10 @@ import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.vertextype.OffboardVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.TransitStopArrive;
+import org.opentripplanner.routing.vertextype.TransitStopDepart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,19 +67,12 @@ public class RaptorSearch {
 
     private RaptorData data;
 
-    private int targetRegion = -1;
 
     @SuppressWarnings("unchecked")
     RaptorSearch(RaptorData data, RoutingRequest options) {
         statesByStop = new List[data.stops.length];
         bounder = new TargetBound(options);
         this.data = data;
-        if (options.rctx.target != null) {
-            List<Integer> targetRegions = Raptor.getRegionsForVertex(data.regionData, options.rctx.target);
-            if (targetRegions.size() == 1) {
-                this.targetRegion = targetRegions.get(0);
-            }
-        }
     }
 
     public void addStates(int stop, List<RaptorState> list) {
@@ -367,7 +364,7 @@ public class RaptorSearch {
             // generate a board state for this interline
             RaptorState boardState = new RaptorState(stayOn);
             //we need to subtract out the slacks that we are about to mistakenly pay
-            boardState.weight = - options.getBoardSlack() - options.getAlightSlack(); 
+            boardState.weight -= options.getBoardSlack() - options.getAlightSlack();
             boardState.nBoardings = nBoardings - 1;
             boardState.boardStop = route.stops[firstStop];
             boardState.boardStopSequence = firstStop;
@@ -492,7 +489,7 @@ public class RaptorSearch {
             MaxWalkState start = new MaxWalkState(options.rctx.origin, walkOptions);
             spt = dijkstra.getShortestPathTree(start);
             for (State state : spt.getAllStates()) {
-                if (state.getVertex() instanceof TransitStop)
+                if (state.getVertex() instanceof TransitStop || state.getVertex() instanceof TransitStopArrive || state.getVertex() instanceof TransitStopDepart)
                     transitStopStates.add(state);
             }
             // also, compute an initial spt from the target so that we can find out what transit
@@ -530,7 +527,10 @@ public class RaptorSearch {
                 // this reduces the number of initial vertices
                 // and the state space size
 
-                Vertex stopVertex = state.stop.stopVertex;
+                Vertex stopVertex = options.isArriveBy() ? state.stop.departVertex : state.stop.arriveVertex;
+                if (stopVertex == null) {
+                    stopVertex = state.stop.stopVertex;
+                }
 
                 if (options.rctx.target != null) {
                     double minWalk = distanceToNearestTransitStop;
@@ -592,8 +592,9 @@ public class RaptorSearch {
                 if (parent != null) {
                     state = new RaptorState(parent);
                     state.nBoardings = parent.nBoardings;
+                    state.rentingBike = targetState.isBikeRenting();
                 } else {
-                    state = new RaptorState(options.arriveBy);
+                    state = new RaptorState(options);
                 }
                 state.weight = targetState.getWeight();
                 state.walkDistance = targetState.getWalkDistance();
@@ -608,7 +609,7 @@ public class RaptorSearch {
                     }
                 }
                 addTargetState(state);
-                log.debug("Found target at: " + state);
+                log.debug("Found target at: " + state + " on " + state.getTrips());
             }
         }
         for (State state : bounder.removedBoundingStates) {
@@ -618,11 +619,12 @@ public class RaptorSearch {
         SPTSTATE: for (State state : transitStopStates) {
             final Vertex vertex = state.getVertex();
 
-            RaptorStop stop = data.raptorStopsForStopId.get(((TransitStop) vertex).getStopId());
+            RaptorStop stop = data.raptorStopsForStopId.get(((OffboardVertex) vertex).getStopId());
             if (stop == null) {
                 // we have found a stop is totally unused, so skip it
                 continue;
             }
+
             if (options.rctx.target != null) {
                 double minWalk = distanceToNearestTransitStop;
 
@@ -668,7 +670,7 @@ public class RaptorSearch {
                 newState = new RaptorState(parent);
             } else {
                 //this only happens in round 0
-                newState = new RaptorState(options.arriveBy);
+                newState = new RaptorState(options);
             }
             newState.weight = state.getWeight();
             newState.nBoardings = nBoardings;
@@ -676,6 +678,7 @@ public class RaptorSearch {
             newState.arrivalTime = (int) state.getTime();
             newState.walkPath = state;
             newState.stop = stop;
+            newState.rentingBike = state.isBikeRenting();
 
             for (RaptorState oldState : states) {
                 if (oldState.eDominates(newState)) {

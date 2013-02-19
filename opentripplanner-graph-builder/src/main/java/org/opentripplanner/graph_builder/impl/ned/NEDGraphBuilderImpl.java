@@ -28,16 +28,16 @@ import org.geotools.geometry.DirectPosition2D;
 import org.opengis.coverage.Coverage;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.common.pqueue.BinHeap;
+import org.opentripplanner.gbannotation.ElevationFlattened;
+import org.opentripplanner.graph_builder.impl.extra_elevation_data.ElevationPoint;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.ned.NEDGridCoverageFactory;
-import org.opentripplanner.routing.core.GraphBuilderAnnotation;
-import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.common.pqueue.BinHeap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,7 +115,9 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
             }
         }
 
-        assignMissingElevations(graph, edgesWithElevation);
+        @SuppressWarnings("unchecked")
+        HashMap<Vertex, Double> extraElevation = (HashMap<Vertex, Double>) extra.get(ElevationPoint.class);
+        assignMissingElevations(graph, edgesWithElevation, extraElevation);
     }
 
     class ElevationRepairState {
@@ -141,16 +143,23 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
     }
 
     /**
-     * 
+     * Assign missing elevations by interpolating from nearby points with known
+     * elevation; also handle osm ele tags
      */
-    private void assignMissingElevations(Graph graph, List<EdgeWithElevation> edgesWithElevation) {
+    private void assignMissingElevations(Graph graph, List<EdgeWithElevation> edgesWithElevation, HashMap<Vertex, Double> knownElevations) {
 
         log.debug("Assigning missing elevations");
 
         BinHeap<ElevationRepairState> pq = new BinHeap<ElevationRepairState>();
 
         // elevation for each vertex (known or interpolated)
-        HashMap<Vertex, Double> elevations = new HashMap<Vertex, Double>();
+        // knownElevations will be null if there are no ElevationPoints in the data
+        // for instance, with the Shapefile loader.)
+        HashMap<Vertex, Double> elevations; 
+        if (knownElevations != null)
+            elevations = (HashMap<Vertex, Double>) knownElevations.clone();
+        else
+            elevations = new HashMap<Vertex, Double>();
 
         HashSet<Vertex> closed = new HashSet<Vertex>();
 
@@ -179,7 +188,6 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
         // elevation is not known. when a branch hits a region with known elevation, follow the
         // back pointers through the region of unknown elevation, setting elevations via interpolation.
         while (!pq.empty()) {
-            double key = pq.peek_min_key();
             ElevationRepairState state = pq.extract_min();
 
             if (closed.contains(state.vertex)) continue;
@@ -299,7 +307,7 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
                     PackedCoordinateSequence profile = new PackedCoordinateSequence.Double(coords);
 
                     if(edge.setElevationProfile(profile, true)) {
-                        log.trace(GraphBuilderAnnotation.register(graph, Variety.ELEVATION_FLATTENED, edge));
+                        log.trace(graph.addBuilderAnnotation(new ElevationFlattened(edge)));
                     }
                 }
             }
@@ -351,7 +359,7 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
                 coordList.toArray(coordArr));
 
         if(ee.setElevationProfile(elevPCS, false)) {
-            log.trace(GraphBuilderAnnotation.register(graph, Variety.ELEVATION_FLATTENED, ee));
+            log.trace(graph.addBuilderAnnotation(new ElevationFlattened(ee)));
         }
     }
 

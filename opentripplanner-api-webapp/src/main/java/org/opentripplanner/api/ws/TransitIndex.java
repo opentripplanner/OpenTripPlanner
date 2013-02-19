@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -180,21 +181,30 @@ public class TransitIndex {
     }
 
     /**
-     * Return stops near a point
+     * Return stops near a point.  The default search radius is 200m,
+     * but this can be changed with the radius parameter (in meters)
      */
     @GET
     @Path("/stopsNearPoint")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public Object getStopsNearPoint(@QueryParam("agency") String agency,
             @QueryParam("lat") Double lat, @QueryParam("lon") Double lon,
-            @QueryParam("extended") Boolean extended, @QueryParam("routerId") String routerId)
+            @QueryParam("extended") Boolean extended, @QueryParam("routerId") String routerId,
+	     @QueryParam("radius") Double radius)
             throws JSONException {
 
-        Graph graph = getGraph(routerId);
+       // default search radius.
+       Double searchRadius = (radius == null) ? STOP_SEARCH_RADIUS : radius;
+
+       Graph graph = getGraph(routerId);
+
+       if (Double.isNaN(searchRadius) || searchRadius <= 0) {
+           searchRadius = STOP_SEARCH_RADIUS;
+       }
 
         StreetVertexIndexService streetVertexIndexService = graph.streetIndex;
         List<TransitStop> stops = streetVertexIndexService.getNearbyTransitStops(new Coordinate(
-                lon, lat), STOP_SEARCH_RADIUS);
+                lon, lat), searchRadius);
         TransitIndexService transitIndexService = graph.getService(TransitIndexService.class);
         if (transitIndexService == null) {
             return new TransitError(
@@ -272,7 +282,7 @@ public class TransitIndex {
                     "No transit index found.  Add TransitIndexBuilder to your graph builder configuration and rebuild your graph.");
         }
 
-        // if no stopAgency is set try to search through all diffrent agencies
+        // if no stopAgency is set try to search through all different agencies
         Graph graph = getGraph(routerId);
 
         // add all departures
@@ -289,16 +299,17 @@ public class TransitIndex {
             AgencyAndId stop = new AgencyAndId(stopAgencyId, stopId);
             Edge preBoardEdge = transitIndexService.getPreBoardEdge(stop);
             if (preBoardEdge == null)
-                break;
+                continue;
             Vertex boarding = preBoardEdge.getToVertex();
 
             RoutingRequest options = makeTraverseOptions(startTime, routerId);
 
-            for (Edge e : boarding.getOutgoing()) {
+            HashMap<Long, Edge> seen = new HashMap();
+            OUTER: for (Edge e : boarding.getOutgoing()) {
                 // each of these edges boards a separate set of trips
                 for (StopTime st : getStopTimesForBoardEdge(startTime, endTime, options, e,
                         extended)) {
-                    // diffrent parameters
+                    // different parameters
                     st.phase = "departure";
                     if (extended != null && extended.equals(true)) {
                         if (routeId != null && !routeId.equals("")
@@ -310,9 +321,17 @@ public class TransitIndex {
                     } else
                         result.stopTimes.add(st);
                     trips.add(st.trip);
+                    if (seen.containsKey(st.time)) {
+                        Edge old = seen.get(st.time);
+                        System.out.println("DUP: " + old);
+                        getStopTimesForBoardEdge(startTime, endTime, options, e,
+                                extended);
+                        //break OUTER;
+                    }
+                    seen.put(st.time, e);
                 }
             }
-
+/*
             // add the arriving stop times for cases where there are no departures
             Edge preAlightEdge = transitIndexService.getPreAlightEdge(stop);
             Vertex alighting = preAlightEdge.getFromVertex();
@@ -334,6 +353,7 @@ public class TransitIndex {
                     }
                 }
             }
+            */
         }
         Collections.sort(result.stopTimes, new Comparator<StopTime>(){
 
@@ -364,6 +384,29 @@ public class TransitIndex {
         options.setTo(it.next().getLabel());
         options.setRoutingContext(graph);
         return options;
+    }
+    /**
+     * Return variant for a trip
+     */
+    @GET
+    @Path("/variantForTrip")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    public Object getVariantForTrip(@QueryParam("tripAgency") String tripAgency,
+            @QueryParam("tripId") String tripId, @QueryParam("routerId") String routerId)
+            throws JSONException {
+
+        TransitIndexService transitIndexService = getGraph(routerId).getService(
+                TransitIndexService.class);
+
+        if (transitIndexService == null) {
+            return new TransitError(
+                    "No transit index found.  Add TransitIndexBuilder to your graph builder configuration and rebuild your graph.");
+        }
+
+        AgencyAndId trip = new AgencyAndId(tripAgency, tripId);
+        RouteVariant variant = transitIndexService.getVariantForTrip(trip);
+
+        return variant;
     }
 
     /**

@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.math3.util.FastMath;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
@@ -37,6 +38,8 @@ import org.opentripplanner.routing.spt.ArrayMultiShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.TransitStopArrive;
+import org.opentripplanner.routing.vertextype.TransitStopDepart;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -88,6 +91,8 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
 
     private List<State> transitStopsVisited = new ArrayList<State>();
 
+    private double transferTimeInWalkDistance;
+
     public TargetBound(RoutingRequest options) {
         this.options = options;
         if (options.rctx.target != null) {
@@ -98,6 +103,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
             transitLocalStreets = options.rctx.graph.getService(TransitLocalStreetService.class);
             speedUpperBound = options.getSpeedUpperBound();
             this.speedWeight = options.getWalkReluctance() / speedUpperBound;
+            this.transferTimeInWalkDistance = options.getTransferSlack() / options.getWalkSpeed();
         }
     }
 
@@ -105,7 +111,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
     public boolean shouldSearchContinue(Vertex origin, Vertex target, State current,
             ShortestPathTree spt, RoutingRequest traverseOptions) {
         final Vertex vertex = current.getVertex();
-        if (vertex instanceof TransitStop) {
+        if (vertex instanceof TransitStop || vertex instanceof TransitStopDepart || vertex instanceof TransitStopArrive) {
             transitStopsVisited.add(current);
         }
         if (vertex == realTarget) {
@@ -204,17 +210,21 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
         
         double stateTime = current.getOptimizedElapsedTime() + minTime;
 
+        double walkDistance = FastMath.max(optimisticDistance * Raptor.WALK_EPSILON, optimisticDistance + transferTimeInWalkDistance);
+
         int i = 0;
         boolean prevBounded = !bounders.isEmpty();
         for (State bounder : bounders) {
+            if (removedBoundingStates.contains(bounder))
+                continue;
             if (current.getWeight() + minTime + walkTime * (options.getWalkReluctance() - 1) > bounder.getWeight() * WORST_WEIGHT_DIFFERENCE_FACTOR) {
                 return true;
             }
             int prevTime = previousArrivalTime.get(i++);
 
-            if (optimisticDistance * 1.1 > bounder.getWalkDistance()
+            if (walkDistance > bounder.getWalkDistance()
                     && current.getNumBoardings() >= bounder.getNumBoardings()) {
-                if (current.getElapsedTime() + minTime > bounder.getElapsedTime()) {
+                if (current.getElapsedTime() + minTime >= bounder.getElapsedTime()) {
                     return true;
                 } else if (prevTime > 0 && (options.arriveBy ? (current.getTime() - minTime >= prevTime) : ((current.getTime() + minTime) <= prevTime))) {
                     prevBounded = false;

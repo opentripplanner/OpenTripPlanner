@@ -13,8 +13,6 @@
 
 package org.opentripplanner.graph_builder.impl;
 
-import static org.opentripplanner.common.IterableLibrary.filter;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -22,12 +20,13 @@ import java.util.List;
 
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.gbannotation.BogusEdgeGeometry;
+import org.opentripplanner.gbannotation.BogusVertexGeometry;
+import org.opentripplanner.gbannotation.VertexShapeError;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
-import org.opentripplanner.routing.core.GraphBuilderAnnotation;
-import org.opentripplanner.routing.core.GraphBuilderAnnotation.Variety;
 import org.opentripplanner.routing.edgetype.HopEdge;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,7 +63,7 @@ public class CheckGeometryGraphBuilderImpl implements GraphBuilder {
         for (Vertex gv : graph.getVertices()) {
             if (Double.isNaN(gv.getCoordinate().x) || Double.isNaN(gv.getCoordinate().y)) {
                 _log.warn("Vertex " + gv + " has NaN location; this will cause doom.");
-                _log.warn(GraphBuilderAnnotation.register(graph, Variety.BOGUS_VERTEX_GEOMETRY, gv));
+                _log.warn(graph.addBuilderAnnotation(new BogusVertexGeometry(gv)));
             }
             
             // TODO: This was filtered to EdgeNarratives before EdgeNarrative removal
@@ -75,7 +74,7 @@ public class CheckGeometryGraphBuilderImpl implements GraphBuilder {
                 }
                 for (Coordinate c : g.getCoordinates()) {
                     if (Double.isNaN(c.x) || Double.isNaN(c.y)) {
-                        _log.warn(GraphBuilderAnnotation.register(graph, Variety.BOGUS_EDGE_GEOMETRY, e));
+                        _log.warn(graph.addBuilderAnnotation(new BogusEdgeGeometry(e)));
                     }
                 }
                 if (e instanceof HopEdge) {
@@ -83,15 +82,15 @@ public class CheckGeometryGraphBuilderImpl implements GraphBuilder {
                     Coordinate edgeEndCoord = e.getToVertex().getCoordinate();
                     Coordinate[] geometryCoordinates = g.getCoordinates();
                     if (geometryCoordinates.length < 2) {
-                        _log.warn(GraphBuilderAnnotation.register(graph, Variety.BOGUS_EDGE_GEOMETRY, e));
+                        _log.warn(graph.addBuilderAnnotation(new BogusEdgeGeometry(e)));
                         continue;
                     }
                     Coordinate geometryStartCoord = geometryCoordinates[0];
                     Coordinate geometryEndCoord = geometryCoordinates[geometryCoordinates.length - 1];
                     if (getDistanceLibrary().distance(edgeStartCoord, geometryStartCoord) > MAX_VERTEX_SHAPE_ERROR) {
-                        _log.warn(GraphBuilderAnnotation.register(graph, Variety.VERTEX_SHAPE_ERROR, e));
+                        _log.warn(graph.addBuilderAnnotation(new VertexShapeError(e)));
                     } else if (getDistanceLibrary().distance(edgeEndCoord, geometryEndCoord) > MAX_VERTEX_SHAPE_ERROR) {
-                        _log.warn(GraphBuilderAnnotation.register(graph, Variety.VERTEX_SHAPE_ERROR, e));
+                        _log.warn(graph.addBuilderAnnotation(new VertexShapeError(e)));
                     }
                 }
             }

@@ -14,6 +14,7 @@
 package org.opentripplanner.updater.bike_rental;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -60,7 +61,7 @@ public class BikeRentalUpdater implements Runnable {
     public void setRouterId(String routerId) {
         this.routerId = routerId;
     }
-    
+
     public void setNetwork(String network) {
         this.network = network;
     }
@@ -103,6 +104,7 @@ public class BikeRentalUpdater implements Runnable {
         }
         List<BikeRentalStation> stations = source.getStations();
         Set<BikeRentalStation> stationSet = new HashSet<BikeRentalStation>();
+        Set<String> networks = new HashSet<String>(Arrays.asList(network));
         for (BikeRentalStation station : stations) {
             service.addStation(station);
             String id = station.id;
@@ -117,8 +119,8 @@ public class BikeRentalUpdater implements Runnable {
                     graph.addTemporaryEdge(e);
                 }
                 verticesByStation.put(station, vertex);
-                new RentABikeOnEdge(vertex, vertex, network);
-                new RentABikeOffEdge(vertex, vertex, network);
+                new RentABikeOnEdge(vertex, vertex, networks);
+                new RentABikeOffEdge(vertex, vertex, networks);
             } else {
                 vertex.setBikesAvailable(station.bikesAvailable);
                 vertex.setSpacesAvailable(station.spacesAvailable);
@@ -130,13 +132,14 @@ public class BikeRentalUpdater implements Runnable {
             if (stationSet.contains(station))
                 continue;
             BikeRentalStationVertex vertex = entry.getValue();
-            graph.removeVertexAndEdges(vertex);
-            toRemove.add(vertex);
+            if (graph.containsVertex(vertex)) {
+                graph.removeVertexAndEdges(vertex);
+                toRemove.add(vertex);
+            }
             service.removeStation(station);
-            //TODO: need to unsplit any streets that were split
+            // TODO: need to unsplit any streets that were split
         }
         verticesByStation.keySet().removeAll(toRemove);
 
     }
-
 }

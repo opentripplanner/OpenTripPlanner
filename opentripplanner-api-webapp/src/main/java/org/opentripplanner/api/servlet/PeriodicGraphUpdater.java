@@ -16,8 +16,6 @@ package org.opentripplanner.api.servlet;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.springframework.stereotype.Component;
-
 public class PeriodicGraphUpdater {
     private UpdateTask updater;
 

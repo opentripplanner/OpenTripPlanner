@@ -1,3 +1,16 @@
+/* This program is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
 package org.opentripplanner.api.ws.analyst;
  
 import java.io.InputStream;
@@ -11,6 +24,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.geotools.geometry.Envelope2D;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opentripplanner.analyst.request.RenderRequest;
 import org.opentripplanner.analyst.request.Renderer;
@@ -26,8 +41,10 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.sun.jersey.api.core.InjectParam;
+import com.sun.jersey.api.spring.Autowire;
 
 @Path("wms")
+@Autowire
 public class WebMapService extends RoutingResource {
     
     private static final Logger LOG = LoggerFactory.getLogger(WebMapService.class);
@@ -57,18 +74,31 @@ public class WebMapService extends RoutingResource {
            // @QueryParam("time") GregorianCalendar time, // SearchResource will parse time without date 
            // non-WMS parameters
            @QueryParam("resolution")     Double resolution,
+           @QueryParam("reproject")   @DefaultValue("true")       Boolean reproject,
+           @QueryParam("timestamp")   @DefaultValue("false")      Boolean timestamp,
            @Context UriInfo uriInfo ) throws Exception { 
         
         if (request.equals("getCapabilities")) 
             return getCapabilitiesResponse();
             
+        if (version == new WMSVersion("1.3.0") && crs != null)
+            srs = crs;
+
+        //bbox.setCoordinateReferenceSystem(srs);
+        if (reproject) {
+            LOG.info("reprojecting envelope from WGS84 to {}", srs);
+            ReferencedEnvelope renv = new ReferencedEnvelope(bbox, DefaultGeographicCRS.WGS84);
+            LOG.debug("WGS84 = {}", renv);
+            bbox = new Envelope2D(renv.transform(srs, false));
+            LOG.debug("reprojected envelope is {}", bbox);
+        }
+
         if (resolution != null) {
             width  = (int) Math.ceil(bbox.width  / resolution);
             height = (int) Math.ceil(bbox.height / resolution);
+            LOG.debug("resolution (pixel size) set to {} map units", resolution);
+            LOG.debug("resulting raster dimensions are {}w x {}h", width, height);
         }
-
-        if (version == new WMSVersion("1.3.0") && crs != null)
-            srs = crs;
 
         RoutingRequest reqA = this.buildRequest(0);
         RoutingRequest reqB = this.buildRequest(1);
@@ -92,18 +122,16 @@ public class WebMapService extends RoutingResource {
 //            sptRequestB = new SPTRequest(originLonB, originLatB, timeB);
 //        } 
 //        
-        bbox.setCoordinateReferenceSystem(srs);
         TileRequest tileRequest = new TileRequest(bbox, width, height);
         Layer layer = layers.get(0);
         Style style = styles.get(0);
-        RenderRequest renderRequest = new RenderRequest(format, layer, style, transparent);
+        RenderRequest renderRequest = new RenderRequest(format, layer, style, transparent, timestamp);
         
         if (layer != Layer.DIFFERENCE) {
 //            noPurple = req.clone();
 //            noPurple.setBannedRoutes("Test_Purple");
             reqB = null;
         }
-        
         
         return renderer.getResponse(tileRequest, reqA, reqB, renderRequest);
     }

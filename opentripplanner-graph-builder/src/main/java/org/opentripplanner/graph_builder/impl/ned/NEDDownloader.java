@@ -164,7 +164,7 @@ public class NEDDownloader implements NEDTileSource {
         List<URL> urls = new ArrayList<URL>();
         List<String> payloads = getValidateElements();
         log.debug("Getting urls from request validation service");
-        String RTendpointURL = "http://igskmncnwb010.cr.usgs.gov/requestValidationService/services/RequestValidationService";
+        String RTendpointURL = "http://extract.cr.usgs.gov/requestValidationService/services/RequestValidationService";
 
         try {
             for (String payload : payloads) {
@@ -204,7 +204,6 @@ public class NEDDownloader implements NEDTileSource {
                     String urlString = node.getTextContent().trim();
                     log.debug("Adding NED URL:" + urlString);
                     // use one specific, less-broken server at usgs
-                    urlString = urlString.replaceFirst("http://extract.", "http://igskmncnwb010.");
                     urlString = urlString.replaceAll(" ", "+"); // urls returned are broken
                     // sometimes.
                     URL url = new URL(urlString);
@@ -392,6 +391,7 @@ public class NEDDownloader implements NEDTileSource {
         Formatter formatter = new Formatter();
         String filename = formatter.format("%f,%f-%f,%f.urls", extent.getMinX(), extent.getMinY(),
                 extent.getMaxX(), extent.getMaxY()).toString();
+        formatter.close();
         try {
             File file = new File(cacheDirectory, filename);
             List<URL> urls;
@@ -488,7 +488,7 @@ public class NEDDownloader implements NEDTileSource {
             log.debug("Starting download " + key);
             File path = getPathToNEDArchive(key);
             URL downloadUrl = new URL(
-                    "http://igskmncnwb010.cr.usgs.gov/axis2/services/DownloadService/getData?downloadID="
+                    "http://extract.cr.usgs.gov/axis2/services/DownloadService/getData?downloadID="
                             + token);
             URLConnection connection = downloadUrl.openConnection();
             HttpURLConnection httpconnection = (HttpURLConnection) connection;
@@ -514,7 +514,7 @@ public class NEDDownloader implements NEDTileSource {
         }
         try {
             URL cleanupURL = new URL(
-                    "http://igskmncnwb010.cr.usgs.gov/axis2/services/DownloadService/setDownloadComplete?downloadID="
+                    "http://extract.cr.usgs.gov/axis2/services/DownloadService/setDownloadComplete?downloadID="
                             + token);
             cleanupURL.openStream().close();
         } catch (Exception e) {
@@ -540,7 +540,7 @@ public class NEDDownloader implements NEDTileSource {
 
     private boolean downloadReady(String token) {
         try {
-            String url = "http://igskmncnwb010.cr.usgs.gov/axis2/services/DownloadService/getDownloadStatus?downloadID="
+            String url = "http://extract.cr.usgs.gov/axis2/services/DownloadService/getDownloadStatus?downloadID="
                     + token;
             Document doc = getXMLFromURL(new URL(url), true);
             if (doc == null) {

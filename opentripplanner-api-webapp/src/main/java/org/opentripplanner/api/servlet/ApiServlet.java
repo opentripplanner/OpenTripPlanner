@@ -13,7 +13,6 @@
 
 package org.opentripplanner.api.servlet;
 
-import javax.annotation.PostConstruct;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;

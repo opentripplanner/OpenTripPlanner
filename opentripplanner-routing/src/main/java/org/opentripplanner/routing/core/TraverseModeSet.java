@@ -17,7 +17,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
  * A set of traverse modes -- typically, one non-transit mode (walking, biking, car) and zero or
@@ -57,12 +56,17 @@ public class TraverseModeSet implements Cloneable, Serializable {
     private static final int MODE_BUSISH = MODE_CABLE_CAR | MODE_BUS;
 
     private static final int MODE_TRANSIT = MODE_TRAINISH | MODE_BUSISH | MODE_FERRY;
+    
+    private static final int MODE_ALL = MODE_TRANSIT | MODE_CAR | MODE_WALK | MODE_BICYCLE;
 
     private int modes = 0;
 
     public TraverseModeSet(String modelist) {
         modes = 0;
         for (String modeStr : modelist.split(",")) {
+            if (modeStr.length() == 0) {
+                continue;
+            }
             setMode(TraverseMode.valueOf(modeStr), true);
         }
 
@@ -72,6 +76,17 @@ public class TraverseModeSet implements Cloneable, Serializable {
         for (TraverseMode mode : modes) {
             this.modes |= getMaskForMode(mode);
         }
+    }
+    
+    /**
+     * Returns a mode set containing all modes.
+     * 
+     * @return
+     */
+    public static TraverseModeSet allModes() {
+    	TraverseModeSet modes = new TraverseModeSet();
+    	modes.modes = MODE_ALL;
+    	return modes;
     }
 
     private final int getMaskForMode(TraverseMode mode) {
@@ -333,7 +348,8 @@ public class TraverseModeSet implements Cloneable, Serializable {
     public String toString() {
         StringBuilder out = new StringBuilder();
         for (TraverseMode mode : TraverseMode.values()) {
-            if ((modes & getMaskForMode(mode)) != 0) {
+            int mask = getMaskForMode(mode);
+            if (mask != 0 && (modes & mask) == mask) {
                 if (out.length() != 0) {
                     out.append(", ");
                 }
@@ -363,6 +379,13 @@ public class TraverseModeSet implements Cloneable, Serializable {
             /* this will never happen since our super is the cloneable object */
             throw new RuntimeException(e);
         }
+    }
+    
+    /**
+     * Clear the mode set so that no modes are included.
+     */
+    public void clear() {
+    	modes = 0;
     }
 
     /**

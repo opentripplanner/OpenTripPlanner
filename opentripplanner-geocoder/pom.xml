@@ -8,7 +8,7 @@
   <parent>
     <artifactId>opentripplanner</artifactId>
     <groupId>org.opentripplanner</groupId>
-    <version>0.7.13-SNAPSHOT</version>
+    <version>0.9.2-SNAPSHOT</version>
   </parent>
 
   <url>http://www.opentripplanner.org</url>
@@ -41,8 +41,8 @@
       <artifactId>jersey-server</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-json</artifactId>
+      <groupId>com.fasterxml.jackson.jaxrs</groupId>
+      <artifactId>jackson-jaxrs-json-provider</artifactId>
     </dependency>
     <dependency>
       <groupId>com.sun.jersey</groupId>

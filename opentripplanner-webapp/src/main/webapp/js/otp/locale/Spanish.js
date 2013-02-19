@@ -266,7 +266,9 @@ otp.locale.Spanish = {
             intermediate  : "Intermediate Place",          // TODO
             minimize      : "Mostrar el",
             maxWalkDistance: "M\xE1xima distancia hasta la parada",
+            walkSpeed     : "velocidad de caminar",
             maxBikeDistance: "M\xE1xima distancia hasta la bicicletas",               // TODO
+            walkSpeed     : "velocidad de bicicleta",
             arriveDepart  : "Llegada/Salida a",
             mode          : "Modo de viaje",
             wheelchair    : "Viaje con accesibilidad",
@@ -341,7 +343,21 @@ otp.locale.Spanish = {
           ['false', 'Salida'], 
           ['true',  'Llegada']
         ],
-    
+
+        walkSpeed :
+        [
+            ['0.278',  '1 km/h'],
+            ['0.556',  '2 km/h'],
+            ['0.833',  '3 km/h'],
+            ['1.111',  '4 km/h'],
+            ['1.389',  '5 km/h'],
+            ['1.667',  '6 km/h'],
+            ['1.944',  '7 km/h'],
+            ['2.222',  '8 km/h'],
+            ['2.500',  '9 km/h'],
+            ['2.778',  '10 km/h']
+        ],
+
         maxWalkDistance : 
         [
             ['500',   '500 metros'],

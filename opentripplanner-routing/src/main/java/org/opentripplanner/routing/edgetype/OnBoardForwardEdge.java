@@ -19,4 +19,6 @@ package org.opentripplanner.routing.edgetype;
  */
 public interface OnBoardForwardEdge {
 
+    int getStopIndex();
+
 }

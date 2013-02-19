@@ -20,7 +20,6 @@ import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.util.SlopeCosts;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
@@ -36,8 +35,8 @@ public class TestTriangle extends TestCase {
         Coordinate c1 = new Coordinate(-122.575033, 45.456773);
         Coordinate c2 = new Coordinate(-122.576668, 45.451426);
 
-        StreetVertex v1 = new IntersectionVertex(null, "v1", c1, null);
-        StreetVertex v2 = new IntersectionVertex(null, "v2", c2, null);
+        StreetVertex v1 = new IntersectionVertex(null, "v1", c1.x, c1.y, null);
+        StreetVertex v2 = new IntersectionVertex(null, "v2", c2.x, c2.y, null);
 
         GeometryFactory factory = new GeometryFactory();
         LineString geometry = factory.createLineString(new Coordinate[] { c1, c2 });

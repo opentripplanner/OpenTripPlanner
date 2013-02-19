@@ -15,7 +15,6 @@ package org.opentripplanner.routing.services;
 
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.graph.Vertex;
 
 /**
  * An interface for classes which produce RemainingWeightHeuristic instances 
