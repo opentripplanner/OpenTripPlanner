@@ -13,6 +13,7 @@
 
 package org.opentripplanner.graph_builder.impl;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -22,6 +23,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+
+import lombok.Setter;
 
 import org.onebusaway.csv_entities.EntityHandler;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
@@ -78,6 +81,12 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
     private FareServiceFactory _fareServiceFactory;
 
+    /** will be applied to all bundles which do not have the cacheDirectory property set */
+    @Setter private File cacheDirectory; 
+    
+    /** will be applied to all bundles which do not have the useCached property set */
+    @Setter private Boolean useCached; 
+
     Map<Agency, GtfsBundle> agenciesSeen = new HashMap<Agency, GtfsBundle>();
 
     private boolean generateFeedIds = false;
@@ -128,6 +137,11 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
             int bundleIndex = 0;
             for (GtfsBundle gtfsBundle : _gtfsBundles.getBundles()) {
                 bundleIndex += 1;
+                // apply global defaults to individual GTFSBundles (if globals have been set) 
+                if (cacheDirectory != null && gtfsBundle.getCacheDirectory() == null)
+                    gtfsBundle.setCacheDirectory(cacheDirectory);
+                if (useCached != null && gtfsBundle.getUseCached() == null)
+                    gtfsBundle.setUseCached(useCached);
                 GtfsMutableRelationalDao dao = new GtfsRelationalDaoImpl();
                 GtfsContext context = GtfsLibrary.createContext(dao, service);
                 GTFSPatternHopFactory hf = new GTFSPatternHopFactory(context);

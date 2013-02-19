@@ -20,6 +20,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipFile;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import org.apache.http.client.ClientProtocolException;
 import org.onebusaway.csv_entities.CsvInputSource;
 import org.onebusaway.csv_entities.ZipFileCsvInputSource;
@@ -50,6 +53,12 @@ public class GtfsBundle {
 
     private double maxStopToShapeSnapDistance = 150;
 
+    @Getter @Setter 
+    private Boolean useCached = null; // null means use global default from GtfsGB || true
+
+    @Getter @Setter 
+    private File cacheDirectory = null; // null means use default from GtfsGB || system temp dir 
+
     public void setPath(File path) {
         this.path = path;
     }
@@ -73,6 +82,10 @@ public class GtfsBundle {
             } else if (url != null) {
             	DownloadableGtfsInputSource isrc = new DownloadableGtfsInputSource();
             	isrc.setUrl(url);
+            	if (cacheDirectory != null)
+            	    isrc.setCacheDirectory(cacheDirectory);
+                if (useCached != null)
+                    isrc.setUseCached(useCached);
                 csvInputSource = isrc;
             }
     	}
