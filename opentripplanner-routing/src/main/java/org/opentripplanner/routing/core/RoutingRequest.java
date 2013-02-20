@@ -939,47 +939,45 @@ public class RoutingRequest implements Cloneable, Serializable {
     
     public boolean tripIsBanned(Trip trip) {
     	/* check if agency is banned for this plan */
-        if (bannedAgencies != null) {
-        	if (bannedAgencies.contains(trip.getId().getAgencyId())) {
-        		return true;
-        	}
-        }
-        
-        /* check if route banned for this plan */
-        if (bannedRoutes != null) {
-            Route route = trip.getRoute();
-            RouteSpec spec = new RouteSpec(route.getId().getAgencyId(),
-                    GtfsLibrary.getRouteName(route));
-            if (bannedRoutes.contains(spec)) {
-                return true;
-            }
-        }
-        
-        return false;
+    	if (bannedAgencies != null) {
+    		if (bannedAgencies.contains(trip.getId().getAgencyId())) {
+    			return true;
+    		}
+    	}
+
+    	/* check if route banned for this plan */
+    	if (bannedRoutes != null) {
+    		Route route = trip.getRoute();
+    		RouteSpec spec = new RouteSpec(route.getId().getAgencyId(),
+    				GtfsLibrary.getRouteName(route));
+    		if (bannedRoutes.contains(spec)) {
+    			return true;
+    		}
+    	}
+
+    	return false;
     }
-    
+
     public long preferencesPenaltyForTrip(Trip trip) {
     	/* check if route is preferred for this plan */
-        long preferences_penalty = 0;
-        if (preferredRoutes != null && preferredRoutes.size() > 0) {
-            Route route = trip.getRoute();
-            RouteSpec spec = new RouteSpec(route.getId().getAgencyId(),
-                    GtfsLibrary.getRouteName(route));
-            if (!preferredRoutes.contains(spec)) {
-                preferences_penalty += useAnotherThanPreferredRoutesPenalty;
-            }
-        }
+    	long preferences_penalty = 0;
 
-        /* check if route is unpreferred for this plan */
-        if (unpreferredRoutes != null && unpreferredRoutes.size() > 0) {
-            Route route = trip.getRoute();
-            RouteSpec spec = new RouteSpec(route.getId().getAgencyId(),
-                    GtfsLibrary.getRouteName(route));
-            if (unpreferredRoutes.contains(spec)) {
-                preferences_penalty += useUnpreferredRoutesPenalty;
-            }
-        }
-        
-        return preferences_penalty;
+    	Route route = trip.getRoute();
+    	String agencyID = route.getId().getAgencyId();
+    	RouteSpec spec = new RouteSpec(agencyID, GtfsLibrary.getRouteName(route));
+
+    	boolean isPreferedRoute = preferredRoutes != null && preferredRoutes.contains(spec);
+    	boolean isPreferedAgency = preferredAgencies != null && preferredAgencies.contains(agencyID); 
+    	if (!isPreferedRoute && !isPreferedAgency) {
+    		preferences_penalty += useAnotherThanPreferredRoutesPenalty;
+    	}
+
+    	boolean isUnpreferedRoute = unpreferredRoutes != null && unpreferredRoutes.contains(spec);
+    	boolean isUnpreferedAgency = unpreferredAgencies != null && unpreferredAgencies.contains(agencyID); 
+    	if (isUnpreferedRoute && isUnpreferedAgency) {
+    		preferences_penalty += useUnpreferredRoutesPenalty;
+    	}
+
+    	return preferences_penalty;
     }
 }
