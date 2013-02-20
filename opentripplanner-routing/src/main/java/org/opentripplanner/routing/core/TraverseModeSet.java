@@ -50,6 +50,8 @@ public class TraverseModeSet implements Cloneable, Serializable {
     private static final int MODE_GONDOLA = 1024;
 
     private static final int MODE_FUNICULAR = 2048;
+    
+    private static final int MODE_CUSTOM_MOTOR_VEHICLE = 4096;
 
     private static final int MODE_TRAINISH = MODE_TRAM | MODE_RAIL | MODE_SUBWAY | MODE_FUNICULAR | MODE_GONDOLA;
 
@@ -57,7 +59,9 @@ public class TraverseModeSet implements Cloneable, Serializable {
 
     private static final int MODE_TRANSIT = MODE_TRAINISH | MODE_BUSISH | MODE_FERRY;
     
-    private static final int MODE_ALL = MODE_TRANSIT | MODE_CAR | MODE_WALK | MODE_BICYCLE;
+    private static final int MODE_DRIVING = MODE_CAR | MODE_CUSTOM_MOTOR_VEHICLE;
+    
+    private static final int MODE_ALL = MODE_TRANSIT | MODE_DRIVING | MODE_WALK | MODE_BICYCLE;
 
     private int modes = 0;
 
@@ -151,6 +155,14 @@ public class TraverseModeSet implements Cloneable, Serializable {
     public boolean getCar() {
         return (modes & MODE_CAR) != 0;
     }
+    
+    public boolean getCustomMotorVehicle() {
+        return (modes & MODE_CUSTOM_MOTOR_VEHICLE) != 0;
+    }
+    
+    public boolean getDriving() {
+        return (modes & MODE_DRIVING) != 0;
+    }
 
     public boolean getTram() {
         return (modes & MODE_TRAM) != 0;
@@ -213,6 +225,22 @@ public class TraverseModeSet implements Cloneable, Serializable {
             modes |= MODE_CAR;
         } else {
             modes &= ~MODE_CAR;
+        }
+    }
+    
+    public void setCustomMotorVehicle(boolean cmv) {
+        if (cmv) {
+            modes |= MODE_CUSTOM_MOTOR_VEHICLE;
+        } else {
+            modes &= ~MODE_CUSTOM_MOTOR_VEHICLE;
+        }
+    }
+    
+    public void setDriving(boolean driving) {
+        if (driving) {
+            modes |= MODE_DRIVING;
+        } else {
+            modes &= ~MODE_DRIVING;
         }
     }
 
