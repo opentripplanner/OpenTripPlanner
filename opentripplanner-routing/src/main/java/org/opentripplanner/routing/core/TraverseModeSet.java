@@ -429,6 +429,8 @@ public class TraverseModeSet implements Cloneable, Serializable {
             return false;
         if (getCar() && !restrictedModes.contains(TraverseMode.CAR))
             return false;
+        if (getCustomMotorVehicle() && !restrictedModes.contains(TraverseMode.CAR))
+            return false;
         return true;
     }
 

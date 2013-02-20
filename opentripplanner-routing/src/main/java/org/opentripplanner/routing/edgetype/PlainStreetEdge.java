@@ -188,7 +188,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         if (options.getModes().getBicycle() && permission.allows(StreetTraversalPermission.BICYCLE)) {
             return true;
         }
-        if (options.getModes().getCar() && permission.allows(StreetTraversalPermission.CAR)) {
+        if (options.getModes().getDriving() && permission.allows(StreetTraversalPermission.CAR)) {
             return true;
         }
         return false;
@@ -209,7 +209,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         if (mode == TraverseMode.BICYCLE && permission.allows(StreetTraversalPermission.BICYCLE)) {
             return true;
         }
-        if (mode == TraverseMode.CAR && permission.allows(StreetTraversalPermission.CAR)) {
+        if (mode.isDriving() && permission.allows(StreetTraversalPermission.CAR)) {
             return true;
         }
         return false;

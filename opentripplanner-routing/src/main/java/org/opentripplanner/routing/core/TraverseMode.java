@@ -57,5 +57,9 @@ public enum TraverseMode {
     public boolean isOnStreetNonTransit() {
         return this == WALK || this == BICYCLE || this == CAR || this == CUSTOM_MOTOR_VEHICLE;
     }
+    
+    public boolean isDriving() {
+        return this == CAR || this == CUSTOM_MOTOR_VEHICLE;
+    }
 
 }
