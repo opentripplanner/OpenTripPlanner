@@ -279,6 +279,13 @@ public class TestRequest extends TestCase {
         assertTrue(request.getModes().getCar());
         request.removeMode(TraverseMode.CAR);
         assertFalse(request.getModes().getCar());
+        
+        request.addMode(TraverseMode.CUSTOM_MOTOR_VEHICLE);
+        assertFalse(request.getModes().getCar());
+        assertTrue(request.getModes().getDriving());
+        request.removeMode(TraverseMode.CUSTOM_MOTOR_VEHICLE);
+        assertFalse(request.getModes().getCar());
+        assertFalse(request.getModes().getDriving());
 
         request.setModes(new TraverseModeSet("BICYCLE,WALK"));
         assertFalse(request.getModes().getCar());
