@@ -965,11 +965,16 @@ public class RoutingRequest implements Cloneable, Serializable {
     	Route route = trip.getRoute();
     	String agencyID = route.getId().getAgencyId();
     	RouteSpec spec = new RouteSpec(agencyID, GtfsLibrary.getRouteName(route));
-
-    	boolean isPreferedRoute = preferredRoutes != null && preferredRoutes.contains(spec);
-    	boolean isPreferedAgency = preferredAgencies != null && preferredAgencies.contains(agencyID); 
-    	if (!isPreferedRoute && !isPreferedAgency) {
-    		preferences_penalty += useAnotherThanPreferredRoutesPenalty;
+    	
+    	if ((preferredRoutes != null && !preferredRoutes.isEmpty()) || (preferredAgencies != null && !preferredAgencies.isEmpty())) {
+    		boolean isPreferedRoute = preferredRoutes != null && preferredRoutes.contains(spec);
+    		boolean isPreferedAgency = preferredAgencies != null && preferredAgencies.contains(agencyID); 
+    		if (!isPreferedRoute && !isPreferedAgency) {
+    			preferences_penalty += useAnotherThanPreferredRoutesPenalty;
+    		}
+    		else {
+    			preferences_penalty = 0;
+    		}
     	}
 
     	boolean isUnpreferedRoute = unpreferredRoutes != null && unpreferredRoutes.contains(spec);
