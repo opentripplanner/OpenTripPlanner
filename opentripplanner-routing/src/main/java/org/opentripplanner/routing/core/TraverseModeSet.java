@@ -101,6 +101,8 @@ public class TraverseModeSet implements Cloneable, Serializable {
             return MODE_WALK;
         case CAR:
             return MODE_CAR;
+        case CUSTOM_MOTOR_VEHICLE:
+            return MODE_CUSTOM_MOTOR_VEHICLE;
         case BUS:
             return MODE_BUS;
         case TRAM:
