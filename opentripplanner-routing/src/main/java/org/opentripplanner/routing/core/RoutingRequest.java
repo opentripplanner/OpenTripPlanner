@@ -534,7 +534,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         setDateTime(dateObject);
     }
 
-    public Integer getNumItineraries() {
+    public int getNumItineraries() { 
         if (getModes().isTransit()) {
             return numItineraries;
         } else {
