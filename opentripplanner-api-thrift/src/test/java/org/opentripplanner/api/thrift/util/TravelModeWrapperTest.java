@@ -16,6 +16,7 @@ public class TravelModeWrapperTest {
 		Map<TravelMode, TraverseMode> modeMap = new HashMap<TravelMode, TraverseMode>();
 		modeMap.put(TravelMode.BICYCLE, TraverseMode.BICYCLE);
 		modeMap.put(TravelMode.CAR, TraverseMode.CAR);
+		modeMap.put(TravelMode.CUSTOM_MOTOR_VEHICLE, TraverseMode.CUSTOM_MOTOR_VEHICLE);
 		modeMap.put(TravelMode.WALK, TraverseMode.WALK);
 		modeMap.put(TravelMode.ANY_TRAIN, TraverseMode.TRAINISH);
 		modeMap.put(TravelMode.ANY_TRANSIT, TraverseMode.TRANSIT);
