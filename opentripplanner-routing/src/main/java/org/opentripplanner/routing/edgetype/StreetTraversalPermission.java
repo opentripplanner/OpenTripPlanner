@@ -17,6 +17,8 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.EnumSet;
 
+import lombok.Getter;
+
 /**
  * Who can traverse a street in a single direction.
  * 
@@ -29,7 +31,10 @@ public enum StreetTraversalPermission {
     CAR(4),
     PEDESTRIAN_AND_CAR(4 | 1),
     BICYCLE_AND_CAR(4 | 2),
+    // This is a configurable motor vehicle that is not a vanilla car.
+    // e.g. truck, motor bike, etc.
     CUSTOM_MOTOR_VEHICLE(8),
+    ALL_DRIVING(8 | 4),
     ALL(8 | 4 | 2 | 1),
     CROSSHATCHED(16); // this street exists in both Beszel and Ul Qoma; traffic direction may depend on which city you're in.
 
@@ -40,14 +45,11 @@ public enum StreetTraversalPermission {
             lookup.put(s.getCode(), s);
     }
 
+    @Getter
     private int code;
 
     private StreetTraversalPermission(int code) {
         this.code = code;
-    }
-
-    public int getCode() {
-        return code;
     }
 
     public static StreetTraversalPermission get(int code) {
