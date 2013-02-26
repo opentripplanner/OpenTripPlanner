@@ -25,12 +25,13 @@ public enum StreetTraversalPermission {
     NONE(0),
     PEDESTRIAN(1),
     BICYCLE(2),
-    PEDESTRIAN_AND_BICYCLE(3),
+    PEDESTRIAN_AND_BICYCLE(2 | 1),
     CAR(4),
-    PEDESTRIAN_AND_CAR(5),
-    BICYCLE_AND_CAR(6),
-    ALL(7),
-    CROSSHATCHED(15); // this street exists in both Beszel and Ul Qoma; traffic direction may depend on which city you're in.
+    PEDESTRIAN_AND_CAR(4 | 1),
+    BICYCLE_AND_CAR(4 | 2),
+    CUSTOM_MOTOR_VEHICLE(8),
+    ALL(8 | 4 | 2 | 1),
+    CROSSHATCHED(16); // this street exists in both Beszel and Ul Qoma; traffic direction may depend on which city you're in.
 
     private static final Map<Integer, StreetTraversalPermission> lookup = new HashMap<Integer, StreetTraversalPermission>();
 
