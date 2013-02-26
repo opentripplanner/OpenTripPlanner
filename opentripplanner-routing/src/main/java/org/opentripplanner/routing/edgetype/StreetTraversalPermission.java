@@ -17,13 +17,12 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.EnumSet;
 
-/** 
+/**
  * Who can traverse a street in a single direction.
- *
+ * 
  */
 public enum StreetTraversalPermission {
     NONE(0),
-
     PEDESTRIAN(1),
     BICYCLE(2),
     PEDESTRIAN_AND_BICYCLE(3),
@@ -31,12 +30,12 @@ public enum StreetTraversalPermission {
     PEDESTRIAN_AND_CAR(5),
     BICYCLE_AND_CAR(6),
     ALL(7),
-    CROSSHATCHED(15); //this street exists in both Beszel and Ul Qoma; traffic direction may depend on which city you're in.
+    CROSSHATCHED(15); // this street exists in both Beszel and Ul Qoma; traffic direction may depend on which city you're in.
 
-    private static final Map<Integer,StreetTraversalPermission> lookup = new HashMap<Integer,StreetTraversalPermission>();
+    private static final Map<Integer, StreetTraversalPermission> lookup = new HashMap<Integer, StreetTraversalPermission>();
 
     static {
-        for(StreetTraversalPermission s : EnumSet.allOf(StreetTraversalPermission.class))
+        for (StreetTraversalPermission s : EnumSet.allOf(StreetTraversalPermission.class))
             lookup.put(s.getCode(), s);
     }
 
@@ -46,7 +45,9 @@ public enum StreetTraversalPermission {
         this.code = code;
     }
 
-    public int getCode() { return code; }
+    public int getCode() {
+        return code;
+    }
 
     public static StreetTraversalPermission get(int code) {
         return lookup.get(code);
