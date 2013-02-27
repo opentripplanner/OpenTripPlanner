@@ -30,32 +30,30 @@ import org.opentripplanner.routing.graph.Graph;
  * @author flamholz
  */
 public class GraphEdgeExtensionTest {
-	private Graph _graph;
+    private Graph _graph;
 
-	@Before
-	public void before() {
-		_graph = new Graph();
-	}
+    @Before
+    public void before() {
+        _graph = new Graph();
+    }
 
-	@Test
-	public void testConstructFromEdge() {
-		SimpleVertex head = new SimpleVertex(_graph, "head", 75.0239,
-				-45.139023);
-		SimpleVertex tail = new SimpleVertex(_graph, "tail", 75.0239,
-				-45.139023);
+    @Test
+    public void testConstructFromEdge() {
+        SimpleVertex head = new SimpleVertex(_graph, "head", 75.0239, -45.139023);
+        SimpleVertex tail = new SimpleVertex(_graph, "tail", 75.0239, -45.139023);
 
-		StreetEdge e = new PlainStreetEdge(head, tail, null, "fake", 1.0,
-				StreetTraversalPermission.BICYCLE_AND_CAR, false);
+        StreetEdge e = new PlainStreetEdge(head, tail, null, "fake", 1.0,
+                StreetTraversalPermission.BICYCLE_AND_CAR, false);
 
-		GraphEdgeExtension graphEdge = new GraphEdgeExtension(e);
+        GraphEdgeExtension graphEdge = new GraphEdgeExtension(e);
 
-		assertEdgeEquals(e, graphEdge);
-	}
+        assertEdgeEquals(e, graphEdge);
+    }
 
-	private void assertEdgeEquals(Edge e, GraphEdge ge) {
-		assertEquals(e.getId(), ge.getId());
-		assertTrue(((SimpleVertex) e.getFromVertex()).equals(ge.getHead()));
-		assertTrue(((SimpleVertex) e.getToVertex()).equals(ge.getTail()));
-		assertEquals(e.getName(), ge.getName());
-	}
+    private void assertEdgeEquals(Edge e, GraphEdge ge) {
+        assertEquals(e.getId(), ge.getId());
+        assertTrue(((SimpleVertex) e.getFromVertex()).equals(ge.getHead()));
+        assertTrue(((SimpleVertex) e.getToVertex()).equals(ge.getTail()));
+        assertEquals(e.getName(), ge.getName());
+    }
 }
