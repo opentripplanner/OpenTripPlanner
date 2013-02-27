@@ -17,6 +17,9 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.EnumSet;
 
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
+
 import lombok.Getter;
 
 /**
@@ -70,5 +73,43 @@ public enum StreetTraversalPermission {
 
     public boolean allows(StreetTraversalPermission perm) {
         return (code & perm.code) != 0;
+    }
+    
+    /**
+     * Returns true if any of these modes are allowed.
+     * @param modes
+     * @return
+     */
+    public boolean allows(TraverseModeSet modes) {
+        if (modes.getWalk() && allows(StreetTraversalPermission.PEDESTRIAN)) {
+            return true;
+        } else if (modes.getBicycle() && allows(StreetTraversalPermission.BICYCLE)) {
+            return true;
+        } else if (modes.getCar() && allows(StreetTraversalPermission.CAR)) {
+            return true;
+        } else if (modes.getCustomMotorVehicle()
+                && allows(StreetTraversalPermission.CUSTOM_MOTOR_VEHICLE)) {
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * Returns true if this mode is allowed.
+     * @param mode
+     * @return
+     */
+    public boolean allows(TraverseMode mode) {
+        if (mode == TraverseMode.WALK && allows(StreetTraversalPermission.PEDESTRIAN)) {
+            return true;
+        } else if (mode == TraverseMode.BICYCLE && allows(StreetTraversalPermission.BICYCLE)) {
+            return true;
+        } else if (mode == TraverseMode.CAR && allows(StreetTraversalPermission.CAR)) {
+            return true;
+        } else if (mode == TraverseMode.CUSTOM_MOTOR_VEHICLE
+                && allows(StreetTraversalPermission.CUSTOM_MOTOR_VEHICLE)) {
+            return true;
+        }
+        return false;
     }
 }

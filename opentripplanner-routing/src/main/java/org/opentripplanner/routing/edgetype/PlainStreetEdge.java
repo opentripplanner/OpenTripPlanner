@@ -182,16 +182,8 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
                 return false;
             }
         }
-        if (options.getModes().getWalk() && permission.allows(StreetTraversalPermission.PEDESTRIAN)) {
-            return true;
-        }
-        if (options.getModes().getBicycle() && permission.allows(StreetTraversalPermission.BICYCLE)) {
-            return true;
-        }
-        if (options.getModes().getDriving() && permission.allows(StreetTraversalPermission.CAR)) {
-            return true;
-        }
-        return false;
+        
+        return permission.allows(options.getModes());
     }
 
     private boolean canTraverse(RoutingRequest options, TraverseMode mode) {
@@ -203,16 +195,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
                 return false;
             }
         }
-        if (mode == TraverseMode.WALK && permission.allows(StreetTraversalPermission.PEDESTRIAN)) {
-            return true;
-        }
-        if (mode == TraverseMode.BICYCLE && permission.allows(StreetTraversalPermission.BICYCLE)) {
-            return true;
-        }
-        if (mode.isDriving() && permission.allows(StreetTraversalPermission.CAR)) {
-            return true;
-        }
-        return false;
+        return permission.allows(mode);
     }
 
     @Override
