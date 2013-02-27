@@ -45,6 +45,7 @@ import org.opentripplanner.api.model.transit.ServiceCalendarData;
 import org.opentripplanner.api.model.transit.StopList;
 import org.opentripplanner.api.model.transit.StopTime;
 import org.opentripplanner.api.model.transit.StopTimeList;
+import org.opentripplanner.graph_builder.impl.transit_index.TransitIndexBuilder;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -62,6 +63,8 @@ import org.opentripplanner.routing.transit_index.adapters.ServiceCalendarType;
 import org.opentripplanner.routing.transit_index.adapters.StopType;
 import org.opentripplanner.routing.transit_index.adapters.TripType;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.sun.jersey.api.spring.Autowire;
@@ -74,6 +77,8 @@ import com.vividsolutions.jts.geom.Envelope;
 @XmlRootElement
 @Autowire
 public class TransitIndex {
+    
+    private static final Logger _log = LoggerFactory.getLogger(TransitIndex.class);
 
     private static final double STOP_SEARCH_RADIUS = 200;
 
@@ -437,18 +442,21 @@ public class TransitIndex {
                     "No transit index found.  Add TransitIndexBuilder to your graph builder configuration and rebuild your graph.");
         }
 
-        List<ServiceCalendar> scList = transitIndexService.getCalendarsByAgency(agency);
-        List<ServiceCalendarDate> scdList = transitIndexService.getCalendarDatesByAgency(agency);
-
         CalendarData response = new CalendarData();
         response.calendarList = new ArrayList<ServiceCalendarType>();
         response.calendarDatesList = new ArrayList<ServiceCalendarDateType>();
-        if (scList != null)
-            for (ServiceCalendar sc : scList)
-                response.calendarList.add(new ServiceCalendarType(sc));
-        if (scdList != null)
-            for (ServiceCalendarDate scd : scdList)
-                response.calendarDatesList.add(new ServiceCalendarDateType(scd));
+       
+        for (String agencyId : getAgenciesIds(agency, routerId)) {
+            List<ServiceCalendar> scList = transitIndexService.getCalendarsByAgency(agencyId);
+            List<ServiceCalendarDate> scdList = transitIndexService.getCalendarDatesByAgency(agencyId);
+
+            if (scList != null)
+                for (ServiceCalendar sc : scList)
+                    response.calendarList.add(new ServiceCalendarType(sc));
+            if (scdList != null)
+                for (ServiceCalendarDate scd : scdList)
+                    response.calendarDatesList.add(new ServiceCalendarDateType(scd));
+        }
 
         return response;
     }

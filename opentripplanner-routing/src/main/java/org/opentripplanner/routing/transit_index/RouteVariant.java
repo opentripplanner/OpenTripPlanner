@@ -36,6 +36,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.transit_index.adapters.AgencyAndIdAdapter;
+import org.opentripplanner.routing.transit_index.adapters.HeadsignsInfo;
 import org.opentripplanner.routing.transit_index.adapters.LineStringAdapter;
 import org.opentripplanner.routing.transit_index.adapters.StopAgencyAndIdAdapter;
 import org.slf4j.Logger;
@@ -91,7 +92,8 @@ public class RouteVariant implements Serializable {
     @JsonIgnore
     private ArrayList<PatternInterlineDwell> interlines;
 
-    private ArrayList<String> tripHeadsigns;
+    
+    private ArrayList<HeadsignsInfo> tripHeadsigns;
     
     private Route route;
 
@@ -111,7 +113,7 @@ public class RouteVariant implements Serializable {
         exemplarSegments = new ArrayList<RouteSegment>();
         interlines = new ArrayList<PatternInterlineDwell>();
         this.mode = GtfsLibrary.getTraverseMode(route);
-        tripHeadsigns = new ArrayList<String>();
+        tripHeadsigns = new ArrayList<HeadsignsInfo>();
     }
 
     public void addTrip(Trip trip) {
@@ -119,7 +121,6 @@ public class RouteVariant implements Serializable {
             trips.add(trip.getId());
             if (direction == null) {
                 direction = trip.getDirectionId();
-                tripHeadsigns.add(trip.getTripHeadsign());
             } else {
                 if (!direction.equals(trip.getDirectionId())) {
                     direction = MULTIDIRECTION;
@@ -271,13 +272,13 @@ public class RouteVariant implements Serializable {
         return interlines;
     }
 
-    public void addTripHeadsign(String tripHeadsigns) {
-        this.tripHeadsigns.add(tripHeadsigns);
+    public void addTripHeadsign(String tripHeadsigns, Integer number, String calendarId) {
+        this.tripHeadsigns.add(new HeadsignsInfo(tripHeadsigns, number, calendarId));
     }
 
     @XmlElementWrapper
     @XmlElement(name = "headsign")
-    public ArrayList<String> getTripHeadsigns() {
+    public ArrayList<HeadsignsInfo> getTripHeadsigns() {
         return tripHeadsigns;
     }
 }

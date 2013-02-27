@@ -366,6 +366,9 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                             addModeFromTrip(trip2);
                             variantsByTrip.put(trip2.getId(), variant);
                         }
+                        variant.addTripHeadsign(trip.getTripHeadsign(), pattern.getTrips().size(), trip.getServiceId().getId());
+                    } else {
+                    	variant.addTripHeadsign(trip.getTripHeadsign(), 1, trip.getServiceId().getId());
                     }
                 } else {
                     continue;
