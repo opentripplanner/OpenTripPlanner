@@ -85,14 +85,16 @@ public class BasicPopulation implements Population {
             CsvWriter writer = new CsvWriter(outFileName, ',', Charset.forName("UTF8"));
             writer.writeRecord( new String[] {"label", "lat", "lon", "input", "output"} );
             int i = 0;
+            int j = 0;
             // using internal list rather than filtered iterator
             for (Individual indiv : this.individuals) {
                 if ( ! this.skip[i]) {
                     String[] entries = new String[] { 
                             indiv.label, Double.toString(indiv.lat), Double.toString(indiv.lon), 
-                            Double.toString(indiv.input), Double.toString(results.results[i]) 
+                            Double.toString(indiv.input), Double.toString(results.results[j]) 
                     };
                     writer.writeRecord(entries);
+                    j++;
                 }
                 i++;
             }
