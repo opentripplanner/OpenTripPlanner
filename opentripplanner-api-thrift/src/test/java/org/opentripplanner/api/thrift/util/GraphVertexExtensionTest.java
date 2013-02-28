@@ -25,17 +25,17 @@ import org.opentripplanner.routing.graph.Graph;
  * @author flamholz
  */
 public class GraphVertexExtensionTest {
-	private Graph _graph;
+    private Graph _graph;
 
-	@Before
-	public void before() {
-		_graph = new Graph();
-	}
+    @Before
+    public void before() {
+        _graph = new Graph();
+    }
 
-	@Test
-	public void testConstructFromVertex() {
-		SimpleVertex v = new SimpleVertex(_graph, "fake", 75.0239, -45.139023);
-		GraphVertexExtension graphVert = new GraphVertexExtension(v);
-		assertTrue(v.equals(graphVert));
-	}
+    @Test
+    public void testConstructFromVertex() {
+        SimpleVertex v = new SimpleVertex(_graph, "fake", 75.0239, -45.139023);
+        GraphVertexExtension graphVert = new GraphVertexExtension(v);
+        assertTrue(v.equals(graphVert));
+    }
 }

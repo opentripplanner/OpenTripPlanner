@@ -20,9 +20,10 @@ typedef location.Location Location
 
 
 // Modes of travel. 
-// TODO(flamholz): expose them all?
 enum TravelMode {
-	BICYCLE, WALK, CAR, TRAM, SUBWAY,
+	BICYCLE, WALK,
+	CAR, CUSTOM_MOTOR_VEHICLE,
+	TRAM, SUBWAY,
 	RAIL, ANY_TRAIN, ANY_TRANSIT
 }
 

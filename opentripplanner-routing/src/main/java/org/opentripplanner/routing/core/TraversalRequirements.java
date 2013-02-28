@@ -108,16 +108,8 @@ public class TraversalRequirements {
                 return false;
             }
         }
-        if (modes.getWalk() && e.getPermission().allows(StreetTraversalPermission.PEDESTRIAN)) {
-            return true;
-        }
-        if (modes.getBicycle() && e.getPermission().allows(StreetTraversalPermission.BICYCLE)) {
-            return true;
-        }
-        if (modes.getDriving() && e.getPermission().allows(StreetTraversalPermission.CAR)) {
-            return true;
-        }
-        return false;
+        
+        return e.getPermission().allows(modes);        
     }
 
     /**

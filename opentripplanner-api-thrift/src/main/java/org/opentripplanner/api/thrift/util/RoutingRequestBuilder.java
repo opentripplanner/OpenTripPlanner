@@ -46,7 +46,7 @@ public class RoutingRequestBuilder {
         GenericLocation loc = new GenericLocation();
         loc.setLat(latlng.getLat());
         loc.setLng(latlng.getLng());
-        return loc;        
+        return loc;
     }
 
     /**
