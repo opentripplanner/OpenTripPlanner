@@ -380,8 +380,8 @@ public class TransitIndex {
         Graph graph = getGraph(routerId);
         Collection<Vertex> vertices = graph.getVertices();
         Iterator<Vertex> it = vertices.iterator();
-        options.setFrom(it.next().getLabel());
-        options.setTo(it.next().getLabel());
+        options.setFromString(it.next().getLabel());
+        options.setToString(it.next().getLabel());
         options.setRoutingContext(graph);
         return options;
     }
