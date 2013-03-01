@@ -54,8 +54,6 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     private static final int CLAMP_ITINERARIES = 3;
 
-    private static final int CLAMP_TRANSFERS = 6;
-
     /* FIELDS UNIQUELY IDENTIFYING AN SPT REQUEST */
 
     /* TODO no defaults should be set here, they should all be handled in one place (searchresource) */
