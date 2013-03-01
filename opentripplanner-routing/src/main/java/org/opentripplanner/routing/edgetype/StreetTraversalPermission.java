@@ -38,6 +38,8 @@ public enum StreetTraversalPermission {
     // e.g. truck, motor bike, etc.
     CUSTOM_MOTOR_VEHICLE(8),
     ALL_DRIVING(8 | 4),
+    BICYCLE_AND_DRIVING(8 | 4 | 2),
+    PEDESTRIAN_AND_DRIVING(8 | 4 | 1),
     ALL(8 | 4 | 2 | 1),
     CROSSHATCHED(16); // this street exists in both Beszel and Ul Qoma; traffic direction may depend on which city you're in.
 
