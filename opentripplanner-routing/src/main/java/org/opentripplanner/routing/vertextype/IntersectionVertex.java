@@ -155,7 +155,7 @@ public class IntersectionVertex extends StreetVertex {
 
     public IntersectionVertex(Graph g, String label, double x, double y, String name) {
         super(g, label, x, y, name);
-        freeFlowing = true;
+        freeFlowing = false;
         trafficLight = false;
     }
     
