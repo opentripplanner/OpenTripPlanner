@@ -67,7 +67,14 @@ public class StreetTraversalPermissionTest {
         StreetTraversalPermission perm = StreetTraversalPermission.ALL_DRIVING;
         assertTrue(perm.allows(TraverseMode.CAR));
         assertTrue(perm.allows(TraverseMode.CUSTOM_MOTOR_VEHICLE));
-        assertFalse(perm.allows(TraverseMode.BICYCLE));    
+        assertFalse(perm.allows(TraverseMode.BICYCLE));
+        
+        perm = StreetTraversalPermission.BICYCLE_AND_DRIVING;
+        assertTrue(perm.allows(TraverseMode.CAR));
+        assertTrue(perm.allows(TraverseMode.CUSTOM_MOTOR_VEHICLE));
+        assertTrue(perm.allows(TraverseMode.BICYCLE));
+        assertFalse(perm.allows(TraverseMode.BUS));
+        assertFalse(perm.allows(TraverseMode.WALK));
     }
 
     @Test
