@@ -54,14 +54,19 @@ public class IntersectionVertex extends StreetVertex {
         int outAngle = to.getOutAngle();
         int inAngle = from.getInAngle();
         
-        if (this.freeFlowing)
+        if (this.freeFlowing) {
             return 0;
+        }
         
         // hack to infer freeflowing (freeway) operation
-        if (fromSpeed > 25 && toSpeed > 25 && Math.abs(fromSpeed - toSpeed) < 7)
+        // TODO(flamholz): this is a silly hack and it should be removed.
+        // It seems like the best approach is to make a model for turn costs 
+        // and set the parameters on the intersection vertex at graph-building time.
+        if (fromSpeed > 25 && toSpeed > 25 && Math.abs(fromSpeed - toSpeed) < 7) {
             return 0;
+        }
         
-        if (mode != TraverseMode.CAR) {
+        if (!mode.isDriving()) {
             int turnCost = Math.abs(outAngle - inAngle);
             if (turnCost > 180) {
                 turnCost = 360 - turnCost;
@@ -155,7 +160,7 @@ public class IntersectionVertex extends StreetVertex {
 
     public IntersectionVertex(Graph g, String label, double x, double y, String name) {
         super(g, label, x, y, name);
-        freeFlowing = true;
+        freeFlowing = false;
         trafficLight = false;
     }
     
