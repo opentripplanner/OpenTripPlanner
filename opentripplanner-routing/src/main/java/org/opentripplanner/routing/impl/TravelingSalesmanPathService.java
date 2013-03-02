@@ -41,20 +41,24 @@ public class TravelingSalesmanPathService implements PathService {
 
     private static final Logger LOG = LoggerFactory.getLogger(TravelingSalesmanPathService.class);
 
-    @Autowired public GraphService graphService;
+    @Autowired
+    public GraphService graphService;
+
     // @Resource("name") or @Qualifier
-    @Autowired public SPTService tspSptService;
+    @Autowired
+    public SPTService tspSptService;
+
     private PathService chainedPathService;
-    
+
     @Override
     public List<GraphPath> getPaths(RoutingRequest options) {
         if (options.getIntermediatePlaces() == null || options.getIntermediatePlaces().size() == 0) {
             LOG.debug("No intermediates places given, calling underlying path service.");
-            
+
             // no intermediate places specified, chain to main path service
             return chainedPathService.getPaths(options);
         }
-        
+
         /* intermediate places present, intercept request */
         Graph graph = graphService.getGraph(options.getRouterId());
         long time = options.dateTime;
@@ -66,7 +70,7 @@ public class TravelingSalesmanPathService implements PathService {
         Vertex toVertex = options.rctx.toVertex;
         if (options.intermediatePlacesOrdered) {
             LOG.debug("Intermediates are ordered.");
-            
+
             List<Vertex> vertices = options.rctx.intermediateVertices;
             vertices.add(toVertex);
             options.intermediatePlaces.clear();
@@ -85,7 +89,7 @@ public class TravelingSalesmanPathService implements PathService {
                 time = path.getEndTime();
             }
             return Arrays.asList(joinPaths(paths));
-        } 
+        }
 
         // Difficult case: intermediate places can occur in any order (Traveling Salesman Problem)
         LOG.debug("Intermediates are not ordered: attempting to optimize ordering.");
@@ -133,8 +137,8 @@ public class TravelingSalesmanPathService implements PathService {
         // compute shortest path overall
         HashSet<Vertex> verticesCopy = new HashSet<Vertex>();
         verticesCopy.addAll(intermediates);
-        return Arrays.asList(TSPPathFinder.findShortestPath(toVertex,
-                fromVertex, paths, verticesCopy, time, options));
+        return Arrays.asList(TSPPathFinder.findShortestPath(toVertex, fromVertex, paths,
+                verticesCopy, time, options));
     }
 
     private GraphPath joinPaths(List<GraphPath> paths) {
