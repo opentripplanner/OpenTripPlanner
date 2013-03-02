@@ -20,9 +20,13 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.graph.Graph;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** Represents an ordinary location in space, typically an intersection */
 public class IntersectionVertex extends StreetVertex {
+    
+    private static final Logger LOG = LoggerFactory.getLogger(IntersectionVertex.class);
 
     private static final long serialVersionUID = 1L;
     
@@ -54,14 +58,17 @@ public class IntersectionVertex extends StreetVertex {
         int outAngle = to.getOutAngle();
         int inAngle = from.getInAngle();
         
-        if (this.freeFlowing) {
+        if (freeFlowing) {
+            return 0;
+        }
+        
+        if (inferredFreeFlowing()) {
+            LOG.debug("Inferred that IntersectionVertex {} is free-flowing", getIndex());
             return 0;
         }
         
         // hack to infer freeflowing (freeway) operation
         // TODO(flamholz): this is a silly hack and it should be removed.
-        // It seems like the best approach is to make a model for turn costs 
-        // and set the parameters on the intersection vertex at graph-building time.
         if (fromSpeed > 25 && toSpeed > 25 && Math.abs(fromSpeed - toSpeed) < 7) {
             return 0;
         }
@@ -156,6 +163,10 @@ public class IntersectionVertex extends StreetVertex {
       
             return turnCost;
         }
+    }
+    
+    protected boolean inferredFreeFlowing() {
+        return getDegreeIn() == 1 && getDegreeOut() == 1 && !this.trafficLight;
     }
 
     public IntersectionVertex(Graph g, String label, double x, double y, String name) {
