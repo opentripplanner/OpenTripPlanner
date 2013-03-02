@@ -23,7 +23,12 @@ import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** Represents an ordinary location in space, typically an intersection */
+/** 
+ * Represents an ordinary location in space, typically an intersection.
+ * 
+ * TODO(flamholz): the various constants in this class should be factored out and configurable.
+ * Likely calls for another class. TurnCostModel or something of the like.
+ */
 public class IntersectionVertex extends StreetVertex {
     
     private static final Logger LOG = LoggerFactory.getLogger(IntersectionVertex.class);
@@ -66,13 +71,7 @@ public class IntersectionVertex extends StreetVertex {
             LOG.debug("Inferred that IntersectionVertex {} is free-flowing", getIndex());
             return 0;
         }
-        
-        // hack to infer freeflowing (freeway) operation
-        // TODO(flamholz): this is a silly hack and it should be removed.
-        if (fromSpeed > 25 && toSpeed > 25 && Math.abs(fromSpeed - toSpeed) < 7) {
-            return 0;
-        }
-        
+                
         if (!mode.isDriving()) {
             int turnCost = Math.abs(outAngle - inAngle);
             if (turnCost > 180) {
