@@ -206,6 +206,7 @@ public class WayPropertySet {
             for (String lane : way.getTag("maxspeed:lanes").split("\\|")) {
                 currentSpeed = getMetersSecondFromSpeed(lane);
                 // Pick the largest speed from the tag
+                // currentSpeed might be null if it was invalid, for instance 10|fast|20
                 if (currentSpeed != null && (speed == null || currentSpeed > speed))
                     speed = currentSpeed;
             }
@@ -216,8 +217,9 @@ public class WayPropertySet {
         
         // this would be bad, as the segment could never be traversed by an automobile
         // The small epsilon is to account for possible rounding errors
-        if (speed != null && Math.abs(speed) < 0.0001)
-            _log.warn("Zero automobile speed detected at {} based on OSM tags; ignoring", this);
+        if (speed != null && speed < 0.0001)
+            _log.warn("Zero or negative automobile speed detected at {} based on OSM maxspeed tags;" +
+            		" ignoring these tags", this);
         
         // if there was a defined speed and it's not 0, we're done
         if (speed != null)
@@ -226,7 +228,7 @@ public class WayPropertySet {
         // otherwise, we use the speedPickers
         
         int bestScore = 0;
-        float bestSpeed = -1;
+        Float bestSpeed = null;
         int score;
         
         // SpeedPickers are constructed in DefaultWayPropertySetSource with an OSM specifier
@@ -240,7 +242,7 @@ public class WayPropertySet {
             }
         }
         
-        if (bestSpeed != -1)
+        if (bestSpeed != null)
             return bestSpeed;
         else
             return this.defaultSpeed;
