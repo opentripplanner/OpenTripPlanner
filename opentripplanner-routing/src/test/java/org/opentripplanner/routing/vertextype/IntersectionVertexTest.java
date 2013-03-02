@@ -79,6 +79,45 @@ public class IntersectionVertexTest {
         assertEquals(0.0,
                 iv.computeTraversalCost(fromEdge, straightAheadEdge, mode, options, fromSpeed, toSpeed), 0.0);
     }
+    
+    @Test
+    public void testInferredFreeFlowing() {
+        IntersectionVertex iv = new IntersectionVertex(_graph, "vertex", 1.0, 2.0);
+        assertFalse(iv.isTrafficLight());
+        assertFalse(iv.inferredFreeFlowing());
+        assertEquals(0, iv.getDegreeIn());
+        assertEquals(0, iv.getDegreeOut());
+        
+        iv.setTrafficLight(true);  
+        assertTrue(iv.isTrafficLight());
+        assertFalse(iv.inferredFreeFlowing());
+        
+        iv.addIncoming(fromEdge);
+        assertEquals(1, iv.getDegreeIn());
+        assertEquals(0, iv.getDegreeOut());
+        assertFalse(iv.inferredFreeFlowing());
+        
+        iv.addOutgoing(straightAheadEdge);
+        assertEquals(1, iv.getDegreeIn());
+        assertEquals(1, iv.getDegreeOut());
+        assertFalse(iv.inferredFreeFlowing());
+        
+        iv.setTrafficLight(false);  
+        assertFalse(iv.isTrafficLight());
+        assertTrue(iv.inferredFreeFlowing());
+        
+        // Set the freeFlowing bit to false.
+        iv.setFreeFlowing(false);
+        assertFalse(iv.isFreeFlowing());
+       
+        // Should still infer free-flowingness and not penalize the traversal.
+        TraverseMode mode = TraverseMode.BICYCLE;
+        RoutingRequest options = new RoutingRequest();
+        float fromSpeed = 4.5f;
+        float toSpeed = 4.5f;
+        assertEquals(0.0,
+                iv.computeTraversalCost(fromEdge, straightAheadEdge, mode, options, fromSpeed, toSpeed), 0.0);
+    }
 
     @Test
     public void testNotFreeFlowingBike() {
