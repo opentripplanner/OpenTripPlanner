@@ -40,7 +40,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class TravelingSalesmanPathService implements PathService {
 
     private static final Logger LOG = LoggerFactory.getLogger(TravelingSalesmanPathService.class);
-    private static final int MAX_INTERMEDIATES = 4;
 
     @Autowired public GraphService graphService;
     // @Resource("name") or @Qualifier
