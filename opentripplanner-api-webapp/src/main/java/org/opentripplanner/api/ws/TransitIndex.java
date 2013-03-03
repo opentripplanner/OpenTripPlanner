@@ -45,7 +45,6 @@ import org.opentripplanner.api.model.transit.ServiceCalendarData;
 import org.opentripplanner.api.model.transit.StopList;
 import org.opentripplanner.api.model.transit.StopTime;
 import org.opentripplanner.api.model.transit.StopTimeList;
-import org.opentripplanner.graph_builder.impl.transit_index.TransitIndexBuilder;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -77,14 +76,14 @@ import com.vividsolutions.jts.geom.Envelope;
 @XmlRootElement
 @Autowire
 public class TransitIndex {
-    
+
     private static final Logger _log = LoggerFactory.getLogger(TransitIndex.class);
 
     private static final double STOP_SEARCH_RADIUS = 200;
 
     private GraphService graphService;
 
-    private static final long MAX_STOP_TIME_QUERY_INTERVAL = 86400*2;
+    private static final long MAX_STOP_TIME_QUERY_INTERVAL = 86400 * 2;
 
     @Autowired
     public void setGraphService(GraphService graphService) {
@@ -287,7 +286,8 @@ public class TransitIndex {
         }
 
         if (endTime - startTime > MAX_STOP_TIME_QUERY_INTERVAL) {
-            return new TransitError("Max stop time query interval is " + (endTime - startTime) + " > " + MAX_STOP_TIME_QUERY_INTERVAL);
+            return new TransitError("Max stop time query interval is " + (endTime - startTime)
+                    + " > " + MAX_STOP_TIME_QUERY_INTERVAL);
         }
         TransitIndexService transitIndexService = getGraph(routerId).getService(
                 TransitIndexService.class);
@@ -445,10 +445,11 @@ public class TransitIndex {
         CalendarData response = new CalendarData();
         response.calendarList = new ArrayList<ServiceCalendarType>();
         response.calendarDatesList = new ArrayList<ServiceCalendarDateType>();
-       
+
         for (String agencyId : getAgenciesIds(agency, routerId)) {
             List<ServiceCalendar> scList = transitIndexService.getCalendarsByAgency(agencyId);
-            List<ServiceCalendarDate> scdList = transitIndexService.getCalendarDatesByAgency(agencyId);
+            List<ServiceCalendarDate> scdList = transitIndexService
+                    .getCalendarDatesByAgency(agencyId);
 
             if (scList != null)
                 for (ServiceCalendar sc : scList)

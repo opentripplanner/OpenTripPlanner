@@ -366,9 +366,9 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                             addModeFromTrip(trip2);
                             variantsByTrip.put(trip2.getId(), variant);
                         }
-                        variant.addTripHeadsign(trip.getTripHeadsign(), pattern.getTrips().size(), trip.getServiceId().getId());
+                      variant.addTrip(trip, pattern.getTrips().size());
                     } else {
-                    	variant.addTripHeadsign(trip.getTripHeadsign(), 1, trip.getServiceId().getId());
+                      variant.addTrip(trip, 1);
                     }
                 } else {
                     continue;
@@ -600,7 +600,6 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
         // have we seen this trip before?
         RouteVariant variant = variantsByTrip.get(trip.getId());
         if (variant != null) {
-            variant.addTrip(trip);
             return variant;
         }
 
@@ -657,7 +656,6 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
             agencyVariants.add(variant);
         }
         variantsByTrip.put(trip.getId(), variant);
-        variant.addTrip(trip);
         return variant;
     }
 
