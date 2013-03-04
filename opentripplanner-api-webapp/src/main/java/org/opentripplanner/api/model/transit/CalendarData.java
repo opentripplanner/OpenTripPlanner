@@ -17,33 +17,21 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.opentripplanner.routing.transit_index.RouteVariant;
-import org.opentripplanner.routing.transit_index.adapters.AgencyAndIdAdapter;
-import org.opentripplanner.routing.transit_index.adapters.RouteType;
-import org.opentripplanner.routing.transit_index.adapters.StopType;
+import org.opentripplanner.routing.transit_index.adapters.ServiceCalendarDateType;
+import org.opentripplanner.routing.transit_index.adapters.ServiceCalendarType;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
-@XmlRootElement(name = "RouteData")
-public class RouteData {
-    @XmlElement
-    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
-    @JsonSerialize
-    public AgencyAndId id;
+@XmlRootElement(name = "CalendarData")
+public class CalendarData {
 
     @XmlElementWrapper
-    public List<StopType> stops;
-
-    @XmlElementWrapper
-    public List<RouteVariant> variants;
-
-    @XmlElementWrapper
-    public List<String> directions;
+    @XmlElements(value = { @XmlElement(name = "calendar") })
+    public List<ServiceCalendarType> calendarList;
     
-    @XmlElement(name = "route")
-    public RouteType route;
+    @XmlElementWrapper
+    @XmlElements(value = { @XmlElement(name = "calendarDate") })
+    public List<ServiceCalendarDateType> calendarDatesList;
+
 }

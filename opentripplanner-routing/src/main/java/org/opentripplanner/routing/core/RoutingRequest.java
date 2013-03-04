@@ -54,8 +54,6 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     private static final int CLAMP_ITINERARIES = 3;
 
-    private static final int CLAMP_TRANSFERS = 6;
-
     /* FIELDS UNIQUELY IDENTIFYING AN SPT REQUEST */
 
     /* TODO no defaults should be set here, they should all be handled in one place (searchresource) */
@@ -66,12 +64,15 @@ public class RoutingRequest implements Cloneable, Serializable {
     public String routerId = "";
 
     /** The start location */
+    @Getter @Setter
     public GenericLocation from;
 
     /** The end location */
+    @Getter @Setter
     public GenericLocation to;
 
     /** An unordered list of intermediate locations to be visited. */
+    @Getter @Setter
     public List<GenericLocation> intermediatePlaces;
 
     public boolean intermediatePlacesOrdered;
@@ -470,19 +471,11 @@ public class RoutingRequest implements Cloneable, Serializable {
         return s;
     }
 
-    public void setFrom(GenericLocation from) {
-        this.from = from;
-    }
-
-    public void setFrom(String from) {
+    public void setFromString(String from) {
         this.from = GenericLocation.fromOldStyleString(from);
     }
 
-    public void setTo(GenericLocation to) {
-        this.to = to;
-    }
-
-    public void setTo(String to) {
+    public void setToString(String to) {
         this.to = GenericLocation.fromOldStyleString(to);
     }
 
@@ -562,18 +555,11 @@ public class RoutingRequest implements Cloneable, Serializable {
         modes.setMode(mode, false);
     }
 
-    public void setIntermediatePlaces(List<String> intermediates) {
+    public void setIntermediatePlacesFromStrings(List<String> intermediates) {
         this.intermediatePlaces = new ArrayList<GenericLocation>(intermediates.size());
         for (String place : intermediates) {
             intermediatePlaces.add(GenericLocation.fromOldStyleString(place));
         }
-    }
-
-    /**
-     * @return the intermediatePlaces
-     */
-    public List<GenericLocation> getIntermediatePlaces() {
-        return intermediatePlaces;
     }
 
     public void setTriangleSafetyFactor(double triangleSafetyFactor) {

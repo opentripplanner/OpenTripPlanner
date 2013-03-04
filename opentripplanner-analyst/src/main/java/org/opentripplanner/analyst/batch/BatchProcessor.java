@@ -28,6 +28,7 @@ import lombok.Setter;
 import org.opentripplanner.analyst.batch.aggregator.Aggregator;
 import org.opentripplanner.analyst.core.Sample;
 import org.opentripplanner.analyst.request.SampleFactory;
+import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.services.GraphService;
@@ -199,7 +200,7 @@ public class BatchProcessor {
         if (searchCutoffSeconds > 0) {
             req.worstTime = req.dateTime + (req.arriveBy ? -searchCutoffSeconds : searchCutoffSeconds);
         }
-        String latLon = String.format("%f,%f", i.lat, i.lon);
+        GenericLocation latLon = new GenericLocation(i.lat, i.lon);
         req.batch = true;
         if (req.arriveBy)
             req.setTo(latLon);

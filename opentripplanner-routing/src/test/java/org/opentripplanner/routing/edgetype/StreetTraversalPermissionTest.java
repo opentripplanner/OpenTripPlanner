@@ -13,15 +13,16 @@ public class StreetTraversalPermissionTest {
         StreetTraversalPermission perm1 = StreetTraversalPermission.ALL_DRIVING;
         StreetTraversalPermission perm2 = StreetTraversalPermission.get(perm1.getCode());
         assertEquals(perm1, perm2);
-        
+
         StreetTraversalPermission perm3 = StreetTraversalPermission.BICYCLE;
         assertFalse(perm1.equals(perm3));
     }
-    
+
     @Test
     public void testAdd() {
         StreetTraversalPermission perm1 = StreetTraversalPermission.CAR;
-        StreetTraversalPermission all_driving = perm1.add(StreetTraversalPermission.CUSTOM_MOTOR_VEHICLE);
+        StreetTraversalPermission all_driving = perm1
+                .add(StreetTraversalPermission.CUSTOM_MOTOR_VEHICLE);
         assertEquals(StreetTraversalPermission.ALL_DRIVING, all_driving);
     }
 
@@ -31,7 +32,7 @@ public class StreetTraversalPermissionTest {
         StreetTraversalPermission none = perm1.remove(StreetTraversalPermission.CAR);
         assertEquals(StreetTraversalPermission.NONE, none);
     }
-    
+
     @Test
     public void testAllowsStreetTraversalPermission() {
         StreetTraversalPermission perm1 = StreetTraversalPermission.ALL;
@@ -41,10 +42,15 @@ public class StreetTraversalPermissionTest {
         assertTrue(perm1.allows(StreetTraversalPermission.BICYCLE));
         assertTrue(perm1.allows(StreetTraversalPermission.PEDESTRIAN));
         assertTrue(perm1.allows(StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE));
-        
+
         StreetTraversalPermission perm = StreetTraversalPermission.ALL_DRIVING;
         assertTrue(perm.allows(StreetTraversalPermission.CUSTOM_MOTOR_VEHICLE));
-        assertFalse(perm.allows(StreetTraversalPermission.BICYCLE));    
+        assertFalse(perm.allows(StreetTraversalPermission.BICYCLE));
+
+        perm = StreetTraversalPermission.BICYCLE_AND_DRIVING;
+        assertTrue(perm.allows(StreetTraversalPermission.CUSTOM_MOTOR_VEHICLE));
+        assertTrue(perm.allows(StreetTraversalPermission.BICYCLE));
+        assertFalse(perm.allows(StreetTraversalPermission.PEDESTRIAN));
     }
 
     @Test
@@ -54,30 +60,35 @@ public class StreetTraversalPermissionTest {
         assertTrue(perm1.allows(TraverseMode.WALK));
         assertTrue(perm1.allows(TraverseMode.CUSTOM_MOTOR_VEHICLE));
         assertTrue(perm1.allows(TraverseMode.WALK));
-        
+
         // StreetTraversalPermission appears not to be used for public transit.
         assertFalse(perm1.allows(TraverseMode.BUS));
         assertFalse(perm1.allows(TraverseMode.TRAINISH));
-        
+
         StreetTraversalPermission perm = StreetTraversalPermission.ALL_DRIVING;
         assertTrue(perm.allows(TraverseMode.CAR));
         assertTrue(perm.allows(TraverseMode.CUSTOM_MOTOR_VEHICLE));
-        assertFalse(perm.allows(TraverseMode.BICYCLE));    
+        assertFalse(perm.allows(TraverseMode.BICYCLE));
+
+        perm = StreetTraversalPermission.BICYCLE_AND_DRIVING;
+        assertTrue(perm.allows(TraverseMode.CAR));
+        assertTrue(perm.allows(TraverseMode.CUSTOM_MOTOR_VEHICLE));
+        assertTrue(perm.allows(TraverseMode.BICYCLE));
+        assertFalse(perm.allows(TraverseMode.BUS));
+        assertFalse(perm.allows(TraverseMode.WALK));
     }
 
     @Test
     public void testAllowsTraverseModeSet() {
         StreetTraversalPermission perm1 = StreetTraversalPermission.ALL_DRIVING;
         assertTrue(perm1.allows(TraverseModeSet.allModes()));
-        assertTrue(perm1.allows(new TraverseModeSet(TraverseMode.CAR,
-                TraverseMode.BICYCLE)));
+        assertTrue(perm1.allows(new TraverseModeSet(TraverseMode.CAR, TraverseMode.BICYCLE)));
         assertTrue(perm1.allows(new TraverseModeSet(TraverseMode.CUSTOM_MOTOR_VEHICLE,
                 TraverseMode.TRAINISH, TraverseMode.FERRY)));
-        
+
         // This one has no driving modes.
-        assertFalse(perm1.allows(new TraverseModeSet(TraverseMode.BICYCLE,
-                TraverseMode.TRAINISH, TraverseMode.FERRY)));
+        assertFalse(perm1.allows(new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.TRAINISH,
+                TraverseMode.FERRY)));
     }
-    
-    
+
 }
