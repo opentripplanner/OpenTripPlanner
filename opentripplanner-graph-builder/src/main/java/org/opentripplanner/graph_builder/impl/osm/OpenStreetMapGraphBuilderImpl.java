@@ -2088,6 +2088,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 for (String m : exceptModes.split(";")) {
                     if (m.equals("motorcar")) {
                         modes.remove(TraverseMode.CAR);
+                        modes.remove(TraverseMode.CUSTOM_MOTOR_VEHICLE);
                     } else if (m.equals("bicycle")) {
                         modes.remove(TraverseMode.BICYCLE);
                         _log.warn(graph
