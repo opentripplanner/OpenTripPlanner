@@ -2081,7 +2081,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 return;
             }
 
-            Set<TraverseMode> modes = EnumSet.of(TraverseMode.BICYCLE, TraverseMode.CAR);
+            Set<TraverseMode> modes = EnumSet.of(TraverseMode.BICYCLE, TraverseMode.CAR,
+                    TraverseMode.CUSTOM_MOTOR_VEHICLE);
             String exceptModes = relation.getTag("except");
             if (exceptModes != null) {
                 for (String m : exceptModes.split(";")) {
