@@ -155,6 +155,10 @@ public class Graph implements Serializable {
     public Collection<Vertex> getVertices() {
         return this.vertices.values();
     }
+    
+    public Collection<Edge> getEdges() {
+        return this.edgeById.values();
+    }
 
     public boolean containsVertex(Vertex v) {
         return (v != null) &&
