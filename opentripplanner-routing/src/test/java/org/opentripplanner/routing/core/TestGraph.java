@@ -13,10 +13,16 @@
 
 package org.opentripplanner.routing.core;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import junit.framework.TestCase;
 
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
@@ -45,5 +51,33 @@ public class TestGraph extends TestCase {
         Vertex b = new IntersectionVertex(g, "B", 6, 6);
         FreeEdge ee = new FreeEdge(a,b);
         assertNotNull(ee);
+    }
+    
+    public void testGetEdgesOneEdge() {
+        Graph g = new Graph();
+        Vertex a = new IntersectionVertex(g, "A", 5, 5);
+        Vertex b = new IntersectionVertex(g, "B", 6, 6);
+        FreeEdge ee = new FreeEdge(a,b);
+        
+        List<Edge> edges = new ArrayList<Edge>(g.getEdges());
+        assertEquals(1, edges.size());
+        assertEquals(ee, edges.get(0));
+    }
+    
+    public void testGetEdgesMultiple() {
+        Graph g = new Graph();
+        Vertex a = new IntersectionVertex(g, "A", 5, 5);
+        Vertex b = new IntersectionVertex(g, "B", 6, 6);
+        Vertex c = new IntersectionVertex(g, "C", 3, 2);
+        
+        Set<Edge> expectedEdges = new HashSet<Edge>(4);
+        expectedEdges.add(new FreeEdge(a, b));
+        expectedEdges.add(new FreeEdge(b, c));
+        expectedEdges.add(new FreeEdge(c, b));
+        expectedEdges.add(new FreeEdge(c, a));
+        
+        Set<Edge> edges = new HashSet<Edge>(g.getEdges());
+        assertEquals(4, edges.size());
+        assertEquals(expectedEdges, edges);
     }
 }

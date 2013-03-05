@@ -157,7 +157,14 @@ public class Graph implements Serializable {
     }
     
     public Collection<Edge> getEdges() {
-        return this.edgeById.values();
+        Collection<Vertex> vertices = this.getVertices();
+        Set<Edge> edges = new HashSet<Edge>();
+
+        for (Vertex v : vertices) {
+            edges.addAll(v.getIncoming());
+            edges.addAll(v.getOutgoing());
+        }
+        return edges;
     }
 
     public boolean containsVertex(Vertex v) {
@@ -341,8 +348,8 @@ public class Graph implements Serializable {
     }
 
     @SuppressWarnings("unchecked")
-	public static Graph load(ObjectInputStream in, LoadLevel level) 
-        throws IOException, ClassNotFoundException {
+    public static Graph load(ObjectInputStream in, LoadLevel level) throws IOException,
+            ClassNotFoundException {
         try {
             Graph graph = (Graph) in.readObject();
             LOG.debug("Basic graph info read.");
@@ -354,10 +361,11 @@ public class Graph implements Serializable {
             // vertex list is transient because it can be reconstructed from edges
             LOG.debug("Loading edges...");
             List<Edge> edges = (ArrayList<Edge>) in.readObject();
-            graph.vertices = new HashMap<String, Vertex>();;
+            graph.vertices = new HashMap<String, Vertex>();
+            ;
             for (Edge e : edges) {
-               graph.vertices.put(e.getFromVertex().getLabel(), e.getFromVertex());
-               graph.vertices.put(e.getToVertex().getLabel(),   e.getToVertex());
+                graph.vertices.put(e.getFromVertex().getLabel(), e.getFromVertex());
+                graph.vertices.put(e.getToVertex().getLabel(), e.getToVertex());
             }
             // trim edge lists to length
             for (Vertex v : graph.getVertices())
