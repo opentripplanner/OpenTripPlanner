@@ -24,6 +24,7 @@ include "location.thrift"
 include "trip.thrift"
 
 typedef graph.GraphVertex GraphVertex
+typedef graph.GraphEdge GraphEdge
 typedef graph.EdgeMatch EdgeMatch
 typedef location.Location Location
 typedef trip.TravelMode TravelMode
@@ -117,6 +118,18 @@ struct GraphVerticesResponse {
 	10: optional i64 compute_time_millis;
 }
 
+// Request to get vertices in the graph.
+struct GraphEdgesRequest {
+	// TODO(flamholz): add parameters about which graph, etc.
+}
+
+struct GraphEdgesResponse {
+	1: required list<GraphEdge> edges;
+
+	// The computation time in milliseconds.
+	10: optional i64 compute_time_millis;
+}
+
 // Raised when there is no route found for the input trip
 exception NoPathFoundError {
 	1: required string message;
@@ -131,6 +144,11 @@ service OTPService {
 	 * Get the graph vertices.
 	 */
 	GraphVerticesResponse GetVertices(1:GraphVerticesRequest req);
+
+	/**
+	 * Get the graph edges.
+	 */
+	GraphEdgesResponse GetEdges(1:GraphEdgesRequest req);
 
 	/**
 	 * Find the nearest graph vertex.
