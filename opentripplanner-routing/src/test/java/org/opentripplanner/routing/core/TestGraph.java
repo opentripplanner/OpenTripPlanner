@@ -128,7 +128,6 @@ public class TestGraph extends TestCase {
      * @param vA
      * @param vB
      * @param length
-     * @param back true if this is a reverse edge
      */
     private PlainStreetEdge edge(StreetVertex vA, StreetVertex vB, double length) {
         String labelA = vA.getLabel();
