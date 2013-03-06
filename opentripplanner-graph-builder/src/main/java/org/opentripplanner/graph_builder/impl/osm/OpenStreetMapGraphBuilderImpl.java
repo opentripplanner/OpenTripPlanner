@@ -2081,16 +2081,15 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 return;
             }
 
-            Set<TraverseMode> modes = EnumSet.of(TraverseMode.BICYCLE, TraverseMode.CAR,
+            TraverseModeSet modes = new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.CAR,
                     TraverseMode.CUSTOM_MOTOR_VEHICLE);
             String exceptModes = relation.getTag("except");
             if (exceptModes != null) {
                 for (String m : exceptModes.split(";")) {
                     if (m.equals("motorcar")) {
-                        modes.remove(TraverseMode.CAR);
-                        modes.remove(TraverseMode.CUSTOM_MOTOR_VEHICLE);
+                        modes.setDriving(false);
                     } else if (m.equals("bicycle")) {
-                        modes.remove(TraverseMode.BICYCLE);
+                        modes.setBicycle(false);
                         _log.warn(graph
                                 .addBuilderAnnotation(new TurnRestrictionException(via, from)));
                     }
@@ -2119,7 +2118,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         .getTag("restriction"))));
                 return;
             }
-            tag.modes = new TraverseModeSet(modes);
+            tag.modes = modes.clone();
             
             // set the time periods for this restriction, if applicable
             if (relation.hasTag("day_on") && relation.hasTag("day_off") && 
@@ -2308,11 +2307,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             StreetTraversalPermission permissionsBack = permissions;
 
             if (way.isTagTrue("oneway") || "roundabout".equals(way.getTag("junction"))) {
-                permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE_AND_CAR);
+                permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE_AND_DRIVING);
             }
             if (way.isTag("oneway", "-1")) {
                 permissionsFront = permissionsFront
-                        .remove(StreetTraversalPermission.BICYCLE_AND_CAR);
+                        .remove(StreetTraversalPermission.BICYCLE_AND_DRIVING);
             }
             String oneWayBicycle = way.getTag("oneway:bicycle");
             if (OSMWithTags.isTrue(oneWayBicycle) || way.isTagFalse("bicycle:backwards")) {
@@ -2469,7 +2468,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     // this can actually be overridden
                     permission = StreetTraversalPermission.NONE;
                     if (entity.doesTagAllowAccess("motorcar")) {
-                        permission = permission.add(StreetTraversalPermission.CAR);
+                        permission = permission.add(StreetTraversalPermission.ALL_DRIVING);
                     }
                     if (entity.doesTagAllowAccess("bicycle")) {
                         permission = permission.add(StreetTraversalPermission.BICYCLE);
@@ -2486,9 +2485,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             if (motorcar != null) {
                 if ("no".equals(motorcar) || "license".equals(motorcar)) {
-                    permission = permission.remove(StreetTraversalPermission.CAR);
+                    permission = permission.remove(StreetTraversalPermission.ALL_DRIVING);
                 } else {
-                    permission = permission.add(StreetTraversalPermission.CAR);
+                    permission = permission.add(StreetTraversalPermission.ALL_DRIVING);
                 }
             }
 
