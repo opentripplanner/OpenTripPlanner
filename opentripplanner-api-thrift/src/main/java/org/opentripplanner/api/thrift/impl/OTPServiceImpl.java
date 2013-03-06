@@ -2,7 +2,9 @@ package org.opentripplanner.api.thrift.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import lombok.Data;
 
@@ -36,6 +38,8 @@ import org.opentripplanner.api.thrift.util.TripPathsExtension;
 import org.opentripplanner.routing.core.LocationObservation;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraversalRequirements;
+import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -106,8 +110,30 @@ public class OTPServiceImpl implements OTPService.Iface {
      * @param g
      * @return
      */
-    private static List<GraphEdge> makeGraphEdges(Graph g) {
-        Collection<Edge> edges = g.getEdges();
+    private static List<GraphEdge> makeGraphEdges(Graph g, GraphEdgesRequest req) {
+        Collection<Edge> edges;
+        if (!req.isSetStreet_edges_only()) {
+            // Get all edges.
+            edges = g.getEdges();
+        } else {
+            // Get only street edges
+            Collection<StreetEdge> ses = g.getStreetEdges();
+            
+            // Filter the StreetEdges by allowed traversal modes.
+            TraverseModeSet allowedModes = TraverseModeSet.allModes();
+            if (req.isSetCan_be_traversed_by()) {
+                allowedModes = new TravelModeSet(req.getCan_be_traversed_by()).toTraverseModeSet();
+            }
+            
+            Set<Edge> traversableStreetEdges = new HashSet<Edge>();
+            for (StreetEdge se : ses) {
+                if (se.canTraverse(allowedModes)) {
+                    traversableStreetEdges.add(se);
+                }
+            }
+            edges = traversableStreetEdges;
+        }
+        
         List<GraphEdge> l = new ArrayList<GraphEdge>(edges.size());
         for (Edge e : edges) {
             l.add(new GraphEdgeExtension(e));
@@ -116,13 +142,13 @@ public class OTPServiceImpl implements OTPService.Iface {
     }
     
     @Override
-    public GraphEdgesResponse GetEdges(GraphEdgesRequest arg0) throws TException {
+    public GraphEdgesResponse GetEdges(GraphEdgesRequest req) throws TException {
         LOG.info("GetEdges called");
         long startTime = System.currentTimeMillis();
 
         GraphEdgesResponse res = new GraphEdgesResponse();
-        Graph g = graphService.getGraph();
-        res.setEdges(makeGraphEdges(g));
+        Graph g = graphService.getGraph();      
+        res.setEdges(makeGraphEdges(g, req));
         res.setCompute_time_millis(System.currentTimeMillis() - startTime);
         return res;
     }
