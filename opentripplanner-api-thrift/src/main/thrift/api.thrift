@@ -120,6 +120,12 @@ struct GraphVerticesResponse {
 
 // Request to get vertices in the graph.
 struct GraphEdgesRequest {
+	1: optional bool street_edges_only = false;
+	
+	// If street_edges_only, you can specify the modes which
+	// must be able to traverse those street edges.
+	2: optional set<TravelMode> can_be_traversed_by;
+
 	// TODO(flamholz): add parameters about which graph, etc.
 }
 
