@@ -191,7 +191,6 @@ public class Graph implements Serializable {
         return edges;
     }    
     
-    
     public boolean containsVertex(Vertex v) {
         return (v != null) && vertices.get(v.getLabel()) == v;
     }
