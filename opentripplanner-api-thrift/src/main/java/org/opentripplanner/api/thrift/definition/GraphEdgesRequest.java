@@ -30,6 +30,8 @@ import org.slf4j.LoggerFactory;
 public class GraphEdgesRequest implements org.apache.thrift.TBase<GraphEdgesRequest, GraphEdgesRequest._Fields>, java.io.Serializable, Cloneable {
   private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("GraphEdgesRequest");
 
+  private static final org.apache.thrift.protocol.TField STREET_EDGES_ONLY_FIELD_DESC = new org.apache.thrift.protocol.TField("street_edges_only", org.apache.thrift.protocol.TType.BOOL, (short)1);
+  private static final org.apache.thrift.protocol.TField CAN_BE_TRAVERSED_BY_FIELD_DESC = new org.apache.thrift.protocol.TField("can_be_traversed_by", org.apache.thrift.protocol.TType.SET, (short)2);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
@@ -37,10 +39,13 @@ public class GraphEdgesRequest implements org.apache.thrift.TBase<GraphEdgesRequ
     schemes.put(TupleScheme.class, new GraphEdgesRequestTupleSchemeFactory());
   }
 
+  private boolean street_edges_only; // optional
+  private Set<org.opentripplanner.api.thrift.definition.TravelMode> can_be_traversed_by; // optional
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-;
+    STREET_EDGES_ONLY((short)1, "street_edges_only"),
+    CAN_BE_TRAVERSED_BY((short)2, "can_be_traversed_by");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -55,6 +60,10 @@ public class GraphEdgesRequest implements org.apache.thrift.TBase<GraphEdgesRequ
      */
     public static _Fields findByThriftId(int fieldId) {
       switch(fieldId) {
+        case 1: // STREET_EDGES_ONLY
+          return STREET_EDGES_ONLY;
+        case 2: // CAN_BE_TRAVERSED_BY
+          return CAN_BE_TRAVERSED_BY;
         default:
           return null;
       }
@@ -93,20 +102,42 @@ public class GraphEdgesRequest implements org.apache.thrift.TBase<GraphEdgesRequ
       return _fieldName;
     }
   }
+
+  // isset id assignments
+  private static final int __STREET_EDGES_ONLY_ISSET_ID = 0;
+  private BitSet __isset_bit_vector = new BitSet(1);
+  private _Fields optionals[] = {_Fields.STREET_EDGES_ONLY,_Fields.CAN_BE_TRAVERSED_BY};
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
+    tmpMap.put(_Fields.STREET_EDGES_ONLY, new org.apache.thrift.meta_data.FieldMetaData("street_edges_only", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.BOOL)));
+    tmpMap.put(_Fields.CAN_BE_TRAVERSED_BY, new org.apache.thrift.meta_data.FieldMetaData("can_be_traversed_by", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
+        new org.apache.thrift.meta_data.SetMetaData(org.apache.thrift.protocol.TType.SET, 
+            new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.ENUM            , "TravelMode"))));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(GraphEdgesRequest.class, metaDataMap);
   }
 
   public GraphEdgesRequest() {
+    this.street_edges_only = false;
+
   }
 
   /**
    * Performs a deep copy on <i>other</i>.
    */
   public GraphEdgesRequest(GraphEdgesRequest other) {
+    __isset_bit_vector.clear();
+    __isset_bit_vector.or(other.__isset_bit_vector);
+    this.street_edges_only = other.street_edges_only;
+    if (other.isSetCan_be_traversed_by()) {
+      Set<org.opentripplanner.api.thrift.definition.TravelMode> __this__can_be_traversed_by = new HashSet<org.opentripplanner.api.thrift.definition.TravelMode>();
+      for (org.opentripplanner.api.thrift.definition.TravelMode other_element : other.can_be_traversed_by) {
+        __this__can_be_traversed_by.add(other_element);
+      }
+      this.can_be_traversed_by = __this__can_be_traversed_by;
+    }
   }
 
   public GraphEdgesRequest deepCopy() {
@@ -115,15 +146,100 @@ public class GraphEdgesRequest implements org.apache.thrift.TBase<GraphEdgesRequ
 
   @Override
   public void clear() {
+    this.street_edges_only = false;
+
+    this.can_be_traversed_by = null;
+  }
+
+  public boolean isStreet_edges_only() {
+    return this.street_edges_only;
+  }
+
+  public void setStreet_edges_only(boolean street_edges_only) {
+    this.street_edges_only = street_edges_only;
+    setStreet_edges_onlyIsSet(true);
+  }
+
+  public void unsetStreet_edges_only() {
+    __isset_bit_vector.clear(__STREET_EDGES_ONLY_ISSET_ID);
+  }
+
+  /** Returns true if field street_edges_only is set (has been assigned a value) and false otherwise */
+  public boolean isSetStreet_edges_only() {
+    return __isset_bit_vector.get(__STREET_EDGES_ONLY_ISSET_ID);
+  }
+
+  public void setStreet_edges_onlyIsSet(boolean value) {
+    __isset_bit_vector.set(__STREET_EDGES_ONLY_ISSET_ID, value);
+  }
+
+  public int getCan_be_traversed_bySize() {
+    return (this.can_be_traversed_by == null) ? 0 : this.can_be_traversed_by.size();
+  }
+
+  public java.util.Iterator<org.opentripplanner.api.thrift.definition.TravelMode> getCan_be_traversed_byIterator() {
+    return (this.can_be_traversed_by == null) ? null : this.can_be_traversed_by.iterator();
+  }
+
+  public void addToCan_be_traversed_by(org.opentripplanner.api.thrift.definition.TravelMode elem) {
+    if (this.can_be_traversed_by == null) {
+      this.can_be_traversed_by = new HashSet<org.opentripplanner.api.thrift.definition.TravelMode>();
+    }
+    this.can_be_traversed_by.add(elem);
+  }
+
+  public Set<org.opentripplanner.api.thrift.definition.TravelMode> getCan_be_traversed_by() {
+    return this.can_be_traversed_by;
+  }
+
+  public void setCan_be_traversed_by(Set<org.opentripplanner.api.thrift.definition.TravelMode> can_be_traversed_by) {
+    this.can_be_traversed_by = can_be_traversed_by;
+  }
+
+  public void unsetCan_be_traversed_by() {
+    this.can_be_traversed_by = null;
+  }
+
+  /** Returns true if field can_be_traversed_by is set (has been assigned a value) and false otherwise */
+  public boolean isSetCan_be_traversed_by() {
+    return this.can_be_traversed_by != null;
+  }
+
+  public void setCan_be_traversed_byIsSet(boolean value) {
+    if (!value) {
+      this.can_be_traversed_by = null;
+    }
   }
 
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
+    case STREET_EDGES_ONLY:
+      if (value == null) {
+        unsetStreet_edges_only();
+      } else {
+        setStreet_edges_only((Boolean)value);
+      }
+      break;
+
+    case CAN_BE_TRAVERSED_BY:
+      if (value == null) {
+        unsetCan_be_traversed_by();
+      } else {
+        setCan_be_traversed_by((Set<org.opentripplanner.api.thrift.definition.TravelMode>)value);
+      }
+      break;
+
     }
   }
 
   public Object getFieldValue(_Fields field) {
     switch (field) {
+    case STREET_EDGES_ONLY:
+      return Boolean.valueOf(isStreet_edges_only());
+
+    case CAN_BE_TRAVERSED_BY:
+      return getCan_be_traversed_by();
+
     }
     throw new IllegalStateException();
   }
@@ -135,6 +251,10 @@ public class GraphEdgesRequest implements org.apache.thrift.TBase<GraphEdgesRequ
     }
 
     switch (field) {
+    case STREET_EDGES_ONLY:
+      return isSetStreet_edges_only();
+    case CAN_BE_TRAVERSED_BY:
+      return isSetCan_be_traversed_by();
     }
     throw new IllegalStateException();
   }
@@ -152,6 +272,24 @@ public class GraphEdgesRequest implements org.apache.thrift.TBase<GraphEdgesRequ
     if (that == null)
       return false;
 
+    boolean this_present_street_edges_only = true && this.isSetStreet_edges_only();
+    boolean that_present_street_edges_only = true && that.isSetStreet_edges_only();
+    if (this_present_street_edges_only || that_present_street_edges_only) {
+      if (!(this_present_street_edges_only && that_present_street_edges_only))
+        return false;
+      if (this.street_edges_only != that.street_edges_only)
+        return false;
+    }
+
+    boolean this_present_can_be_traversed_by = true && this.isSetCan_be_traversed_by();
+    boolean that_present_can_be_traversed_by = true && that.isSetCan_be_traversed_by();
+    if (this_present_can_be_traversed_by || that_present_can_be_traversed_by) {
+      if (!(this_present_can_be_traversed_by && that_present_can_be_traversed_by))
+        return false;
+      if (!this.can_be_traversed_by.equals(that.can_be_traversed_by))
+        return false;
+    }
+
     return true;
   }
 
@@ -168,6 +306,26 @@ public class GraphEdgesRequest implements org.apache.thrift.TBase<GraphEdgesRequ
     int lastComparison = 0;
     GraphEdgesRequest typedOther = (GraphEdgesRequest)other;
 
+    lastComparison = Boolean.valueOf(isSetStreet_edges_only()).compareTo(typedOther.isSetStreet_edges_only());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetStreet_edges_only()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.street_edges_only, typedOther.street_edges_only);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetCan_be_traversed_by()).compareTo(typedOther.isSetCan_be_traversed_by());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetCan_be_traversed_by()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.can_be_traversed_by, typedOther.can_be_traversed_by);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
     return 0;
   }
 
@@ -188,6 +346,21 @@ public class GraphEdgesRequest implements org.apache.thrift.TBase<GraphEdgesRequ
     StringBuilder sb = new StringBuilder("GraphEdgesRequest(");
     boolean first = true;
 
+    if (isSetStreet_edges_only()) {
+      sb.append("street_edges_only:");
+      sb.append(this.street_edges_only);
+      first = false;
+    }
+    if (isSetCan_be_traversed_by()) {
+      if (!first) sb.append(", ");
+      sb.append("can_be_traversed_by:");
+      if (this.can_be_traversed_by == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.can_be_traversed_by);
+      }
+      first = false;
+    }
     sb.append(")");
     return sb.toString();
   }
@@ -206,6 +379,8 @@ public class GraphEdgesRequest implements org.apache.thrift.TBase<GraphEdgesRequ
 
   private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
     try {
+      // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
+      __isset_bit_vector = new BitSet(1);
       read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
     } catch (org.apache.thrift.TException te) {
       throw new java.io.IOException(te);
@@ -230,6 +405,32 @@ public class GraphEdgesRequest implements org.apache.thrift.TBase<GraphEdgesRequ
           break;
         }
         switch (schemeField.id) {
+          case 1: // STREET_EDGES_ONLY
+            if (schemeField.type == org.apache.thrift.protocol.TType.BOOL) {
+              struct.street_edges_only = iprot.readBool();
+              struct.setStreet_edges_onlyIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
+          case 2: // CAN_BE_TRAVERSED_BY
+            if (schemeField.type == org.apache.thrift.protocol.TType.SET) {
+              {
+                org.apache.thrift.protocol.TSet _set48 = iprot.readSetBegin();
+                struct.can_be_traversed_by = new HashSet<org.opentripplanner.api.thrift.definition.TravelMode>(2*_set48.size);
+                for (int _i49 = 0; _i49 < _set48.size; ++_i49)
+                {
+                  org.opentripplanner.api.thrift.definition.TravelMode _elem50; // required
+                  _elem50 = org.opentripplanner.api.thrift.definition.TravelMode.findByValue(iprot.readI32());
+                  struct.can_be_traversed_by.add(_elem50);
+                }
+                iprot.readSetEnd();
+              }
+              struct.setCan_be_traversed_byIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
           default:
             org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
         }
@@ -243,6 +444,25 @@ public class GraphEdgesRequest implements org.apache.thrift.TBase<GraphEdgesRequ
       struct.validate();
 
       oprot.writeStructBegin(STRUCT_DESC);
+      if (struct.isSetStreet_edges_only()) {
+        oprot.writeFieldBegin(STREET_EDGES_ONLY_FIELD_DESC);
+        oprot.writeBool(struct.street_edges_only);
+        oprot.writeFieldEnd();
+      }
+      if (struct.can_be_traversed_by != null) {
+        if (struct.isSetCan_be_traversed_by()) {
+          oprot.writeFieldBegin(CAN_BE_TRAVERSED_BY_FIELD_DESC);
+          {
+            oprot.writeSetBegin(new org.apache.thrift.protocol.TSet(org.apache.thrift.protocol.TType.I32, struct.can_be_traversed_by.size()));
+            for (org.opentripplanner.api.thrift.definition.TravelMode _iter51 : struct.can_be_traversed_by)
+            {
+              oprot.writeI32(_iter51.getValue());
+            }
+            oprot.writeSetEnd();
+          }
+          oprot.writeFieldEnd();
+        }
+      }
       oprot.writeFieldStop();
       oprot.writeStructEnd();
     }
@@ -260,11 +480,49 @@ public class GraphEdgesRequest implements org.apache.thrift.TBase<GraphEdgesRequ
     @Override
     public void write(org.apache.thrift.protocol.TProtocol prot, GraphEdgesRequest struct) throws org.apache.thrift.TException {
       TTupleProtocol oprot = (TTupleProtocol) prot;
+      BitSet optionals = new BitSet();
+      if (struct.isSetStreet_edges_only()) {
+        optionals.set(0);
+      }
+      if (struct.isSetCan_be_traversed_by()) {
+        optionals.set(1);
+      }
+      oprot.writeBitSet(optionals, 2);
+      if (struct.isSetStreet_edges_only()) {
+        oprot.writeBool(struct.street_edges_only);
+      }
+      if (struct.isSetCan_be_traversed_by()) {
+        {
+          oprot.writeI32(struct.can_be_traversed_by.size());
+          for (org.opentripplanner.api.thrift.definition.TravelMode _iter52 : struct.can_be_traversed_by)
+          {
+            oprot.writeI32(_iter52.getValue());
+          }
+        }
+      }
     }
 
     @Override
     public void read(org.apache.thrift.protocol.TProtocol prot, GraphEdgesRequest struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
+      BitSet incoming = iprot.readBitSet(2);
+      if (incoming.get(0)) {
+        struct.street_edges_only = iprot.readBool();
+        struct.setStreet_edges_onlyIsSet(true);
+      }
+      if (incoming.get(1)) {
+        {
+          org.apache.thrift.protocol.TSet _set53 = new org.apache.thrift.protocol.TSet(org.apache.thrift.protocol.TType.I32, iprot.readI32());
+          struct.can_be_traversed_by = new HashSet<org.opentripplanner.api.thrift.definition.TravelMode>(2*_set53.size);
+          for (int _i54 = 0; _i54 < _set53.size; ++_i54)
+          {
+            org.opentripplanner.api.thrift.definition.TravelMode _elem55; // required
+            _elem55 = org.opentripplanner.api.thrift.definition.TravelMode.findByValue(iprot.readI32());
+            struct.can_be_traversed_by.add(_elem55);
+          }
+        }
+        struct.setCan_be_traversed_byIsSet(true);
+      }
     }
   }
 

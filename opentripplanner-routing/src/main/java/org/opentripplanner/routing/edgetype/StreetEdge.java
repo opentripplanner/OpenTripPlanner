@@ -18,6 +18,7 @@ import java.util.Set;
 
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
@@ -54,6 +55,8 @@ public abstract class StreetEdge extends EdgeWithElevation {
 	 */
 	public abstract boolean canTraverse(RoutingRequest options);
 	
+	public abstract boolean canTraverse(TraverseModeSet modes);
+		
 	public abstract double getLength();
 
 	public abstract StreetTraversalPermission getPermission();
