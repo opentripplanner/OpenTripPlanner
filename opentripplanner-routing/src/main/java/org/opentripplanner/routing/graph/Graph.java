@@ -13,6 +13,8 @@
 
 package org.opentripplanner.routing.graph;
 
+import static org.opentripplanner.common.IterableLibrary.filter;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -51,6 +53,7 @@ import org.opentripplanner.gbannotation.NoFutureDates;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
 import org.opentripplanner.routing.core.TransferTable;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TimetableSnapshotSource;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
@@ -154,6 +157,10 @@ public class Graph implements Serializable {
         return this.vertices.values();
     }
 
+    /**
+     * Return all the edges in the graph.
+     * @return
+     */
     public Collection<Edge> getEdges() {
         Collection<Vertex> vertices = this.getVertices();
         Set<Edge> edges = new HashSet<Edge>();
@@ -165,6 +172,26 @@ public class Graph implements Serializable {
         return edges;
     }
 
+    /**
+     * Return only the StreetEdges in the graph.
+     * @return
+     */
+    public Collection<StreetEdge> getStreetEdges() {
+        Collection<Vertex> vertices = this.getVertices();
+        Set<StreetEdge> edges = new HashSet<StreetEdge>();
+
+        for (Vertex v : vertices) {
+            for (StreetEdge se : filter(v.getIncoming(), StreetEdge.class)) {
+                edges.add(se);
+            }
+            for (StreetEdge se : filter(v.getOutgoing(), StreetEdge.class)) {
+                edges.add(se);
+            }
+        }
+        return edges;
+    }    
+    
+    
     public boolean containsVertex(Vertex v) {
         return (v != null) && vertices.get(v.getLabel()) == v;
     }
