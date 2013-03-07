@@ -52,6 +52,17 @@ def Main():
     client = Connect(options.host, options.port)
     assert client, 'Failed to connect'
     
+    req = OTPService.GraphEdgesRequest()
+    start_t = time.time()
+    res = client.GetEdges(req)
+    total_t = time.time() - start_t    
+
+    edges = res.edges
+    reported_compute_time = float(res.compute_time_millis) / 1000.0
+    print 'GraphEdgesRequest took %.6f seconds' % total_t 
+    print 'Server computation time %.6f seconds' % reported_compute_time
+    print '\tReturned %d edges' % len(edges)    
+    
     req = OTPService.GraphVerticesRequest()
     start_t = time.time()
     res = client.GetVertices(req)

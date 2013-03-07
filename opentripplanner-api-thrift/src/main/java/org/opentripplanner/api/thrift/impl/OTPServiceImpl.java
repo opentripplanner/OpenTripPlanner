@@ -2,7 +2,9 @@ package org.opentripplanner.api.thrift.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import lombok.Data;
 
@@ -16,6 +18,9 @@ import org.opentripplanner.api.thrift.definition.FindNearestVertexRequest;
 import org.opentripplanner.api.thrift.definition.FindNearestVertexResponse;
 import org.opentripplanner.api.thrift.definition.FindPathsRequest;
 import org.opentripplanner.api.thrift.definition.FindPathsResponse;
+import org.opentripplanner.api.thrift.definition.GraphEdge;
+import org.opentripplanner.api.thrift.definition.GraphEdgesRequest;
+import org.opentripplanner.api.thrift.definition.GraphEdgesResponse;
 import org.opentripplanner.api.thrift.definition.GraphVertex;
 import org.opentripplanner.api.thrift.definition.GraphVerticesRequest;
 import org.opentripplanner.api.thrift.definition.GraphVerticesResponse;
@@ -24,6 +29,7 @@ import org.opentripplanner.api.thrift.definition.PathOptions;
 import org.opentripplanner.api.thrift.definition.TripParameters;
 import org.opentripplanner.api.thrift.definition.TripPaths;
 import org.opentripplanner.api.thrift.util.EdgeMatchExtension;
+import org.opentripplanner.api.thrift.util.GraphEdgeExtension;
 import org.opentripplanner.api.thrift.util.GraphVertexExtension;
 import org.opentripplanner.api.thrift.util.LatLngExtension;
 import org.opentripplanner.api.thrift.util.RoutingRequestBuilder;
@@ -32,6 +38,9 @@ import org.opentripplanner.api.thrift.util.TripPathsExtension;
 import org.opentripplanner.routing.core.LocationObservation;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraversalRequirements;
+import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.CandidateEdge;
@@ -82,7 +91,7 @@ public class OTPServiceImpl implements OTPService.Iface {
         }
         return l;
     }
-
+    
     @Override
     public GraphVerticesResponse GetVertices(GraphVerticesRequest req) throws TException {
         LOG.info("GetVertices called");
@@ -95,6 +104,55 @@ public class OTPServiceImpl implements OTPService.Iface {
         return res;
     }
 
+    /**
+     * Returns all edges in the graph as GraphEdges.
+     * 
+     * @param g
+     * @return
+     */
+    private static List<GraphEdge> makeGraphEdges(Graph g, GraphEdgesRequest req) {
+        Collection<Edge> edges;
+        if (!req.isSetStreet_edges_only()) {
+            // Get all edges.
+            edges = g.getEdges();
+        } else {
+            // Get only street edges
+            Collection<StreetEdge> ses = g.getStreetEdges();
+            
+            // Filter the StreetEdges by allowed traversal modes.
+            TraverseModeSet allowedModes = TraverseModeSet.allModes();
+            if (req.isSetCan_be_traversed_by()) {
+                allowedModes = new TravelModeSet(req.getCan_be_traversed_by()).toTraverseModeSet();
+            }
+            
+            Set<Edge> traversableStreetEdges = new HashSet<Edge>();
+            for (StreetEdge se : ses) {
+                if (se.canTraverse(allowedModes)) {
+                    traversableStreetEdges.add(se);
+                }
+            }
+            edges = traversableStreetEdges;
+        }
+        
+        List<GraphEdge> l = new ArrayList<GraphEdge>(edges.size());
+        for (Edge e : edges) {
+            l.add(new GraphEdgeExtension(e));
+        }
+        return l;
+    }
+    
+    @Override
+    public GraphEdgesResponse GetEdges(GraphEdgesRequest req) throws TException {
+        LOG.info("GetEdges called");
+        long startTime = System.currentTimeMillis();
+
+        GraphEdgesResponse res = new GraphEdgesResponse();
+        Graph g = graphService.getGraph();      
+        res.setEdges(makeGraphEdges(g, req));
+        res.setCompute_time_millis(System.currentTimeMillis() - startTime);
+        return res;
+    }
+    
     @Override
     public FindNearestVertexResponse FindNearestVertex(FindNearestVertexRequest req)
             throws TException {
