@@ -118,4 +118,21 @@ public enum StreetTraversalPermission {
         }
         return false;
     }
+
+    /**
+     * Returns true if there are any modes allowed by this permission.
+     * @return
+     */
+    public boolean allowsAnything() {
+        return !this.allowsNothing();
+    }
+    
+    /**
+     * Returns true if there no modes are by this permission.
+     * @return
+     */
+    public boolean allowsNothing() {
+        // TODO(flamholz): what about CROSSHATCHED?
+        return this == StreetTraversalPermission.NONE;
+    }
 }
