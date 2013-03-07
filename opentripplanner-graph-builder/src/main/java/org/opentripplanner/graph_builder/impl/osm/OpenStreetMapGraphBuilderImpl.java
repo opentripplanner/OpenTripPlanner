@@ -17,13 +17,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import lombok.Setter;
+import lombok.Getter;
 
 import org.opentripplanner.common.DisjointSet;
 import org.opentripplanner.common.RepeatingTimePeriod;
@@ -140,22 +142,51 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
     private static Logger _log = LoggerFactory.getLogger(OpenStreetMapGraphBuilderImpl.class);
 
-    private List<OpenStreetMapProvider> _providers = new ArrayList<OpenStreetMapProvider>();
-
+    // Private members that are only read or written internally.
+    
     private Set<Object> _uniques = new HashSet<Object>();
-
-    private WayPropertySet wayPropertySet = new WayPropertySet();
-
-    private CustomNamer customNamer;
 
     private HashMap<Vertex, Double> elevationData = new HashMap<Vertex, Double>();
 
-    private boolean noZeroLevels = true;
+    // Members that can be set by clients.
+    
+    /**
+     * WayPropertySet computes edge properties from OSM way data.
+     */
+    @Setter
+    private WayPropertySet wayPropertySet = new WayPropertySet();
 
-    private boolean staticBikeRental;
+    /**
+     * Providers of OSM data.
+     */
+    private List<OpenStreetMapProvider> _providers = new ArrayList<OpenStreetMapProvider>();
 
+    /**
+     * Allows for arbitrary custom naming of edges.
+     */
+    @Setter
+    private CustomNamer customNamer;
+    
+    /**
+     * Allows for alternate PlainStreetEdge implementations; this is intended for users who want to provide more info in PSE than OTP normally keeps
+     * around.
+     */
+    @Setter
     private OSMPlainStreetEdgeFactory edgeFactory = new DefaultOSMPlainStreetEdgeFactory();
 
+    /**
+     * If true, disallow zero floors and add 1 to non-negative numeric floors, as is generally done in the United States. This does not affect floor
+     * names from level maps.
+     */
+    @Setter
+    private boolean noZeroLevels = true;
+    
+    /**
+     * Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs.
+     */
+    @Setter
+    private boolean staticBikeRental = false;
+    
     public List<String> provides() {
         return Arrays.asList("streets", "turns");
     }
@@ -179,28 +210,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
     }
 
     /**
-     * Allows for alternate PlainStreetEdge implementations; this is intended for users who want to provide more info in PSE than OTP normally keeps
-     * around.
-     */
-    public void setEdgeFactory(OSMPlainStreetEdgeFactory edgeFactory) {
-        this.edgeFactory = edgeFactory;
-    }
-
-    /**
      * Set the way properties from a {@link WayPropertySetSource} source.
      * 
      * @param source the way properties source
      */
     public void setDefaultWayPropertySetSource(WayPropertySetSource source) {
         wayPropertySet = source.getWayPropertySet();
-    }
-
-    /**
-     * If true, disallow zero floors and add 1 to non-negative numeric floors, as is generally done in the United States. This does not affect floor
-     * names from level maps. Default: true.
-     */
-    public void setNoZeroLevels(boolean nz) {
-        noZeroLevels = nz;
     }
 
     @Override
@@ -220,25 +235,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             _uniques.add(value);
         }
         return (T) value;
-    }
-
-    public void setWayPropertySet(WayPropertySet wayDataSet) {
-        this.wayPropertySet = wayDataSet;
-    }
-
-    public WayPropertySet getWayPropertySet() {
-        return wayPropertySet;
-    }
-
-    /**
-     * Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs.
-     */
-    public void setStaticBikeRental(boolean b) {
-        this.staticBikeRental = b;
-    }
-
-    public boolean getStaticBikeRental() {
-        return staticBikeRental;
     }
 
     private class Handler implements OpenStreetMapContentHandler {
@@ -2610,14 +2606,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         public void doneRelations() {
             // nothing to do here
         }
-    }
-
-    public CustomNamer getCustomNamer() {
-        return customNamer;
-    }
-
-    public void setCustomNamer(CustomNamer customNamer) {
-        this.customNamer = customNamer;
     }
 
     @Override
