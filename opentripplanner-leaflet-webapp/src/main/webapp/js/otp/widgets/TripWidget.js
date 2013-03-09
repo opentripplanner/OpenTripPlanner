@@ -49,7 +49,7 @@ otp.widgets.TripWidget =
     },
     
     initScrollPanel : function() {
-        this.scrollPanel = $('<div id="'+this.id+'-scollPanel" style="overflow: auto;"></div>').appendTo(this.$());
+        this.scrollPanel = $('<div id="'+this.id+'-scollPanel" class="notDraggable" style="overflow: auto;"></div>').appendTo(this.$());
         this.$().resizable({
             minHeight: 80,
             alsoResize: this.scrollPanel
@@ -130,6 +130,80 @@ otp.widgets.TripWidgetControl = otp.Class({
     $ : function() {
         return $(this.div);
     }
+});
+
+//** LocationsSelector **//
+
+otp.widgets.TW_LocationsSelector = 
+    otp.Class(otp.widgets.TripWidgetControl, {
+    
+    id           :  null,
+    geocoder     :  null,
+    
+    resultLookup :  null,
+
+    initialize : function(tripWidget, geocoder) {
+        console.log("init loc");
+        this.geocoder = geocoder;
+        
+        otp.widgets.TripWidgetControl.prototype.initialize.apply(this, arguments);
+        this.id = tripWidget.id+"-locSelector";
+        
+        var html = '<div style="width: 2.5em; float:left;">';
+        html += '<div style="height: 2em;">Start:</div>';
+        html += '<div>End:</div>';
+        html += "</div>";
+        
+        html += '<div class="notDraggable" style="margin-left: 2.5em; text-align:right;">';
+        html += '<div style="height: 2em;"><input id="'+this.id+'-start" style="width:95%;"></div>';
+        html += '<div><input id="'+this.id+'-end" style="width:95%;"></div>';
+        html += "</div>";
+
+        html += '<div style="clear:both;"></div>';
+        
+        $(html).appendTo(this.$());
+    },
+
+    doAfterLayout : function() {
+        var startInput = $("#"+this.id+"-start");
+        console.log("startInput "+startInput);
+        this.initInput(startInput, this.tripWidget.module.setStartPoint);
+        this.initInput($("#"+this.id+"-end"), this.tripWidget.module.setEndPoint);
+    },
+        
+    initInput : function(input, setterFunction) {
+        var this_ = this;
+        input.autocomplete({
+            source: function(request, response) {
+                this_.geocoder.geocode(request.term, function(results) {
+                    response.call(this, _.pluck(results, 'description'));
+                    this_.updateResultLookup(results);
+                });
+            },
+            select: function(event, ui) {
+                var result = this_.resultLookup[ui.item.value];
+                var latlng = new L.LatLng(result.lat, result.lng);
+                this_.tripWidget.module.webapp.map.lmap.panTo(latlng);
+                setterFunction.call(this_.tripWidget.module, latlng, true);
+            }
+        })
+        .click(function() {
+            $(this).select();
+        })
+        .change(function() {
+        });
+    },
+    
+    updateResultLookup : function(results) {
+        this.resultLookup = {};
+        for(var i=0; i<results.length; i++) {
+            this.resultLookup[results[i].description] = results[i];
+        }    
+    },
+    
+    restorePlan : function(data) {
+    }    
+        
 });
 
 

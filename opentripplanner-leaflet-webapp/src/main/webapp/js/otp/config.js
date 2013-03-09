@@ -24,8 +24,10 @@ otp.config = {
     // OTP server address and routerId (if applicable)
     //hostname : "http://otpna-c.deployer.opentripplanner.org",
     //routerId : "req-1028",
-    hostname : "http://localhost:8080",
-    municoderHostname : "http://localhost:8080",
+    hostname : "http://trimet-tomcat.deployer.opentripplanner.org",
+    municoderHostname : "http://trimet-tomcat.deployer.opentripplanner.org",
+    //hostname : "http://localhost:8080",
+    //municoderHostname : "http://localhost:8080",
         
     baseLayers: [
         {
@@ -60,8 +62,14 @@ otp.config = {
     
     // bikeshareName : "",
 
-    loggerURL : 'http://localhost:9000',
+    loggerURL : 'http://trimet-logger.deployer.opentripplanner.org',
+    //loggerURL : 'http://localhost:9000',
     // dataStorageUrl : '[link]',
+    
+    geocoder : {
+        url : 'http://maps5.trimet.org/geocoder/geocode',
+        addressParam : 'address'
+    },
             
     infoWidgets: [
         {

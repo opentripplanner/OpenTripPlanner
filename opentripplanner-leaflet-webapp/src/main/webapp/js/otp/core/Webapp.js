@@ -25,6 +25,8 @@ otp.core.Webapp = otp.Class({
     
     widgetManager   : null,
     infoWidgets     : { },
+
+    geocoder : null,
     
     urlParams : null,
 
@@ -67,6 +69,9 @@ otp.core.Webapp = otp.Class({
         this.map = new otp.core.Map(this);        
         this.widgetManager = new otp.widgets.WidgetManager();
         
+        if(otp.config.geocoder) {
+            this.geocoder = new otp.core.Geocoder(otp.config.geocoder.url, otp.config.geocoder.addressParam);
+        }
        
         // initialize the AddThis widget
         
@@ -121,8 +126,8 @@ otp.core.Webapp = otp.Class({
         
         //this.addModule(new otp.modules.annotations.AnnotationsModule(this), false);
         //this.addModule(new otp.modules.bikeshare.BikeShareModule(this), false);
-        this.addModule(new otp.modules.calltaker.CallTakerModule(this), false);
-        this.addModule(new otp.modules.fieldtrip.FieldTripModule(this), true);
+        this.addModule(new otp.modules.calltaker.CallTakerModule(this), true);
+        this.addModule(new otp.modules.fieldtrip.FieldTripModule(this), false);
         
 
         // create the module selector
