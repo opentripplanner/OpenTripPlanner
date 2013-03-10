@@ -13,6 +13,8 @@
 
 package org.opentripplanner.routing.graph;
 
+import static org.opentripplanner.common.IterableLibrary.filter;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -51,6 +53,7 @@ import org.opentripplanner.gbannotation.NoFutureDates;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
 import org.opentripplanner.routing.core.TransferTable;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TimetableSnapshotSource;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
@@ -62,8 +65,7 @@ import com.google.common.collect.Multiset;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
- * A graph is really just one or more indexes into a set of vertexes. It used to keep edgelists for
- * each vertex, but those are in the vertex now.
+ * A graph is really just one or more indexes into a set of vertexes. It used to keep edgelists for each vertex, but those are in the vertex now.
  */
 public class Graph implements Serializable {
 
@@ -86,21 +88,20 @@ public class Graph implements Serializable {
 
     /* vertex index by name is reconstructed from edges */
     private transient Map<String, Vertex> vertices;
-    
+
     private transient CalendarService calendarService;
-    
+
     private boolean debugData = true;
-    
+
     private transient List<Vertex> vertexById;
 
     private transient Map<Integer, Edge> edgeById;
-        
+
     public transient StreetVertexIndexService streetIndex;
-    
+
     public transient TimetableSnapshotSource timetableSnapshotSource = null;
-    
-    private transient List<GraphBuilderAnnotation> graphBuilderAnnotations = 
-            new LinkedList<GraphBuilderAnnotation>(); // initialize for tests
+
+    private transient List<GraphBuilderAnnotation> graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>(); // initialize for tests
 
     private Collection<String> agenciesIds = new HashSet<String>();
 
@@ -123,9 +124,7 @@ public class Graph implements Serializable {
     }
 
     /**
-     * Add the given vertex to the graph.
-     * Ideally, only vertices should add themselves to the graph, 
-     * when they are constructed or deserialized.
+     * Add the given vertex to the graph. Ideally, only vertices should add themselves to the graph, when they are constructed or deserialized.
      * 
      * @param vv the vertex to add
      */
@@ -134,7 +133,7 @@ public class Graph implements Serializable {
         if (old != null) {
             if (old == v)
                 LOG.error("repeatedly added the same vertex: {}", v);
-            else 
+            else
                 LOG.error("duplicate vertex label in graph (added vertex to graph anyway): {}", v);
         }
     }
@@ -143,7 +142,9 @@ public class Graph implements Serializable {
     // could makeEdgeBased be moved into Graph or graph package?
     public void removeVertex(Vertex v) {
         if (vertices.remove(v.getLabel()) != v)
-            LOG.error("attempting to remove vertex that is not in graph (or mapping value was null): {}", v);
+            LOG.error(
+                    "attempting to remove vertex that is not in graph (or mapping value was null): {}",
+                    v);
     }
 
     /* convenient in tests and such, but avoid using in general */
@@ -156,9 +157,42 @@ public class Graph implements Serializable {
         return this.vertices.values();
     }
 
+    /**
+     * Return all the edges in the graph.
+     * @return
+     */
+    public Collection<Edge> getEdges() {
+        Collection<Vertex> vertices = this.getVertices();
+        Set<Edge> edges = new HashSet<Edge>();
+
+        for (Vertex v : vertices) {
+            edges.addAll(v.getIncoming());
+            edges.addAll(v.getOutgoing());
+        }
+        return edges;
+    }
+
+    /**
+     * Return only the StreetEdges in the graph.
+     * @return
+     */
+    public Collection<StreetEdge> getStreetEdges() {
+        Collection<Vertex> vertices = this.getVertices();
+        Set<StreetEdge> edges = new HashSet<StreetEdge>();
+
+        for (Vertex v : vertices) {
+            for (StreetEdge se : filter(v.getIncoming(), StreetEdge.class)) {
+                edges.add(se);
+            }
+            for (StreetEdge se : filter(v.getOutgoing(), StreetEdge.class)) {
+                edges.add(se);
+            }
+        }
+        return edges;
+    }    
+    
     public boolean containsVertex(Vertex v) {
-        return (v != null) &&
-                vertices.get(v.getLabel()) == v;
+        return (v != null) && vertices.get(v.getLabel()) == v;
     }
 
     @SuppressWarnings("unchecked")
@@ -180,7 +214,7 @@ public class Graph implements Serializable {
     }
 
     public void removeVertexAndEdges(Vertex vertex) {
-        if (! containsVertex(vertex)) {
+        if (!containsVertex(vertex)) {
             throw new IllegalStateException("attempting to remove vertex that is not in graph.");
         }
         for (Edge e : vertex.getIncoming()) {
@@ -244,15 +278,15 @@ public class Graph implements Serializable {
 
     public void setBundle(GraphBundle bundle) {
         this.bundle = bundle;
-    }    
-    
+    }
+
     public int countVertices() {
         return vertices.size();
     }
 
     /**
-     * Find the total number of edges in this Graph. There are assumed to be no Edges 
-     * in an incoming edge list that are not in an outgoing edge list. 
+     * Find the total number of edges in this Graph. There are assumed to be no Edges in an incoming edge list that are not in an outgoing edge list.
+     * 
      * @return number of outgoing edges in the graph
      */
     public int countEdges() {
@@ -262,19 +296,20 @@ public class Graph implements Serializable {
         }
         return ne;
     }
-    
+
     /* this will require a rehash of any existing hashtables keyed on vertices */
     public void renumberVerticesAndEdges() {
         this.vertexById = Arrays.asList(new Vertex[AbstractVertex.getMaxIndex()]);
         for (Vertex v : getVertices()) {
             vertexById.set(v.getIndex(), v);
         }
-        //Collections.sort(this.vertexById, getVertexComparatorFactory().getComparator(vertexById));
-        
+        // Collections.sort(this.vertexById, getVertexComparatorFactory().getComparator(vertexById));
+
         // Create map from edge ids to edges.
         this.edgeById = new HashMap<Integer, Edge>();
         for (Vertex v : this.vertexById) {
-            if (v == null) continue;
+            if (v == null)
+                continue;
             for (Edge e : v.getOutgoing()) {
                 // check for non-null?
                 this.edgeById.put(e.getId(), e);
@@ -286,59 +321,57 @@ public class Graph implements Serializable {
             IOException {
         inputStream.defaultReadObject();
 
-        temporaryEdges = Collections.newSetFromMap(new ConcurrentHashMap<Edge, Boolean>()); 
+        temporaryEdges = Collections.newSetFromMap(new ConcurrentHashMap<Edge, Boolean>());
     }
 
     /**
-     * Add a graph builder annotation to this graph's list of graph builder annotations.
-     * The return value of this method is the annotation's message, which allows for a single-line
-     * idiom that creates, registers, and logs a new graph builder annotation:
+     * Add a graph builder annotation to this graph's list of graph builder annotations. The return value of this method is the annotation's message,
+     * which allows for a single-line idiom that creates, registers, and logs a new graph builder annotation:
      * log.warning(graph.addBuilderAnnotation(new SomeKindOfAnnotation(param1, param2)));
      * 
-     * If the graphBuilderAnnotations field of this graph is null, the annotation is not actually 
-     * saved, but the message is still returned. This allows annotation registration to be turned
-     * off, saving memory and disk space when the user is not interested in annotations.
+     * If the graphBuilderAnnotations field of this graph is null, the annotation is not actually saved, but the message is still returned. This
+     * allows annotation registration to be turned off, saving memory and disk space when the user is not interested in annotations.
      */
     public String addBuilderAnnotation(GraphBuilderAnnotation gba) {
         String ret = gba.getMessage();
         if (this.graphBuilderAnnotations != null)
             this.graphBuilderAnnotations.add(gba);
-    	return ret;
+        return ret;
     }
 
     public List<GraphBuilderAnnotation> getBuilderAnnotations() {
-    	return this.graphBuilderAnnotations;
+        return this.graphBuilderAnnotations;
     }
 
     /* (de) serialization */
-    
+
     public enum LoadLevel {
         BASIC, FULL, DEBUG;
     }
-    
+
     public static Graph load(File file, LoadLevel level) throws IOException, ClassNotFoundException {
         LOG.info("Reading graph " + file.getAbsolutePath() + " ...");
         // cannot use getClassLoader() in static context
-        ObjectInputStream in = new ObjectInputStream (new FileInputStream(file));
+        ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
         return load(in, level);
     }
 
     public static Graph load(ClassLoader classLoader, File file, LoadLevel level)
             throws IOException, ClassNotFoundException {
         LOG.info("Reading graph " + file.getAbsolutePath() + " with alternate classloader ...");
-        ObjectInputStream in = new GraphObjectInputStream(
-                new BufferedInputStream (new FileInputStream(file)), classLoader);
+        ObjectInputStream in = new GraphObjectInputStream(new BufferedInputStream(
+                new FileInputStream(file)), classLoader);
         return load(in, level);
     }
 
-    public static Graph load(InputStream is, LoadLevel level) 
-    	throws ClassNotFoundException, IOException {
-    	return load(new ObjectInputStream(is), level);
+    public static Graph load(InputStream is, LoadLevel level) throws ClassNotFoundException,
+            IOException {
+        return load(new ObjectInputStream(is), level);
     }
 
     @SuppressWarnings("unchecked")
-	public static Graph load(ObjectInputStream in, LoadLevel level) 
-        throws IOException, ClassNotFoundException {
+    public static Graph load(ObjectInputStream in, LoadLevel level) throws IOException,
+            ClassNotFoundException {
         try {
             Graph graph = (Graph) in.readObject();
             LOG.debug("Basic graph info read.");
@@ -350,10 +383,11 @@ public class Graph implements Serializable {
             // vertex list is transient because it can be reconstructed from edges
             LOG.debug("Loading edges...");
             List<Edge> edges = (ArrayList<Edge>) in.readObject();
-            graph.vertices = new HashMap<String, Vertex>();;
+            graph.vertices = new HashMap<String, Vertex>();
+            ;
             for (Edge e : edges) {
-               graph.vertices.put(e.getFromVertex().getLabel(), e.getFromVertex());
-               graph.vertices.put(e.getToVertex().getLabel(),   e.getToVertex());
+                graph.vertices.put(e.getFromVertex().getLabel(), e.getFromVertex());
+                graph.vertices.put(e.getToVertex().getLabel(), e.getToVertex());
             }
             // trim edge lists to length
             for (Vertex v : graph.getVertices())
@@ -379,29 +413,29 @@ public class Graph implements Serializable {
     }
 
     /**
-     * Compares the OTP version number stored in the graph with that of the currently running 
-     * instance. Logs warnings explaining that mismatched versions can cause problems.
-     * @return false if Maven versions match (even if commit ids do not match),
-     * true if Maven version of graph does not match this version of OTP or graphs are otherwise
-     * obviously incompatible.
+     * Compares the OTP version number stored in the graph with that of the currently running instance. Logs warnings explaining that mismatched
+     * versions can cause problems.
+     * 
+     * @return false if Maven versions match (even if commit ids do not match), true if Maven version of graph does not match this version of OTP or
+     *         graphs are otherwise obviously incompatible.
      */
     private boolean graphVersionMismatch() {
         MavenVersion v = MavenVersion.VERSION;
         MavenVersion gv = this.mavenVersion;
         LOG.info("Graph version: {}", gv);
         LOG.info("OTP version:   {}", v);
-        if ( ! v.equals(gv)) {
+        if (!v.equals(gv)) {
             LOG.error("This graph was built with a different version of OTP. Please rebuild it.");
             return true; // do not allow graph use
-        } else if ( ! v.commit.equals(gv.commit)) {
+        } else if (!v.commit.equals(gv.commit)) {
             if (v.qualifier.equals("SNAPSHOT")) {
-                LOG.warn("This graph was built with the same SNAPSHOT version of OTP, but a " +
-                         "different commit. Please rebuild the graph if you experience incorrect " +
-                         "behavior. ");
+                LOG.warn("This graph was built with the same SNAPSHOT version of OTP, but a "
+                        + "different commit. Please rebuild the graph if you experience incorrect "
+                        + "behavior. ");
                 return false; // graph might still work
-            } else { 
-                LOG.error("Commit mismatch in non-SNAPSHOT version. This implies a problem with " +
-            		 "the build or release process.");
+            } else {
+                LOG.error("Commit mismatch in non-SNAPSHOT version. This implies a problem with "
+                        + "the build or release process.");
                 return true; // major problem
             }
         } else {
@@ -443,7 +477,7 @@ public class Graph implements Serializable {
         out.writeObject(this);
         out.writeObject(edges);
         if (debugData) {
-            // should we make debug info generation conditional? 
+            // should we make debug info generation conditional?
             LOG.debug("Writing debug data...");
             out.writeObject(this.graphBuilderAnnotations);
             out.writeObject(this.vertexById);
@@ -453,14 +487,16 @@ public class Graph implements Serializable {
         }
         LOG.info("Graph written.");
     }
-    
+
     /* deserialization for org.opentripplanner.customize */
     private static class GraphObjectInputStream extends ObjectInputStream {
         ClassLoader classLoader;
+
         public GraphObjectInputStream(InputStream in, ClassLoader classLoader) throws IOException {
             super(in);
             this.classLoader = classLoader;
         }
+
         @Override
         public Class<?> resolveClass(ObjectStreamClass osc) {
             try {
@@ -479,18 +515,18 @@ public class Graph implements Serializable {
         if (calendarService == null) {
             CalendarServiceData data = this.getService(CalendarServiceData.class);
             if (data != null) {
-              CalendarServiceImpl calendarService = new CalendarServiceImpl();
-              calendarService.setData(data);
-              this.calendarService = calendarService;
+                CalendarServiceImpl calendarService = new CalendarServiceImpl();
+                calendarService.setData(data);
+                this.calendarService = calendarService;
             }
         }
         return this.calendarService;
     }
-    
+
     public Edge getEdgeById(int id) {
         return edgeById.get(id);
     }
-    
+
     public int removeEdgelessVertices() {
         int removed = 0;
         List<Vertex> toRemove = new LinkedList<Vertex>();
@@ -541,17 +577,15 @@ public class Graph implements Serializable {
     public void setVertexComparatorFactory(VertexComparatorFactory vertexComparatorFactory) {
         this.vertexComparatorFactory = vertexComparatorFactory;
     }
-    
+
     /**
-     * Returns the time zone for the first agency in this graph. This is used to interpret
-     * times in API requests. The JVM default time zone cannot be used because we support 
-     * multiple graphs on one server via the routerId.
-     * Ideally we would want to interpret times in the time zone of the geographic location
-     * where the origin/destination vertex or board/alight event is located. This may become
-     * necessary when we start making graphs with long distance train, boat, or air services. 
+     * Returns the time zone for the first agency in this graph. This is used to interpret times in API requests. The JVM default time zone cannot be
+     * used because we support multiple graphs on one server via the routerId. Ideally we would want to interpret times in the time zone of the
+     * geographic location where the origin/destination vertex or board/alight event is located. This may become necessary when we start making graphs
+     * with long distance train, boat, or air services.
      */
     public TimeZone getTimeZone() {
-        if (timeZone  == null) {
+        if (timeZone == null) {
             Collection<String> agencyIds = this.getAgencyIds();
             if (agencyIds.size() == 0) {
                 timeZone = TimeZone.getTimeZone("GMT");
@@ -563,7 +597,7 @@ public class Graph implements Serializable {
                     if (timeZone == null) {
                         LOG.debug("graph time zone set to {}", tz);
                         timeZone = tz;
-                    } else if ( ! timeZone.equals(tz)) {
+                    } else if (!timeZone.equals(tz)) {
                         LOG.error("agency time zone differs from graph time zone: {}", tz);
                     }
                 }

@@ -190,33 +190,49 @@ public class WayPropertySet {
      */
     public float getCarSpeedForWay(OSMWithTags way, boolean back) {
         // first, check for maxspeed tags
-        float speed = -1;
-        float currentSpeed;
+        Float speed = null;
+        Float currentSpeed;
         
         if (way.hasTag("maxspeed:motorcar"))
             speed = getMetersSecondFromSpeed(way.getTag("maxspeed:motorcar"));
         
-        if (speed == -1 && !back && way.hasTag("maxspeed:forward"))
+        if (speed == null && !back && way.hasTag("maxspeed:forward"))
             speed = getMetersSecondFromSpeed(way.getTag("maxspeed:forward"));
         
-        if (speed == -1 && back && way.hasTag("maxspeed:reverse"))
+        if (speed == null && back && way.hasTag("maxspeed:reverse"))
             speed = getMetersSecondFromSpeed(way.getTag("maxspeed:reverse")); 
             
-        if (speed == -1 && way.hasTag("maxspeed:lanes")) {
-            for (String lane : way.getTag("maxspeed:lanes").split("|")) {
+        if (speed == null && way.hasTag("maxspeed:lanes")) {
+            for (String lane : way.getTag("maxspeed:lanes").split("\\|")) {
                 currentSpeed = getMetersSecondFromSpeed(lane);
-                if (currentSpeed > speed)
+                // Pick the largest speed from the tag
+                // currentSpeed might be null if it was invalid, for instance 10|fast|20
+                if (currentSpeed != null && (speed == null || currentSpeed > speed))
                     speed = currentSpeed;
             }
         }
         
-        if (way.hasTag("maxspeed") && speed == -1)
+        if (way.hasTag("maxspeed") && speed == null)
             speed = getMetersSecondFromSpeed(way.getTag("maxspeed"));
+        
+        // this would be bad, as the segment could never be traversed by an automobile
+        // The small epsilon is to account for possible rounding errors
+        if (speed != null && speed < 0.0001)
+            _log.warn("Zero or negative automobile speed detected at {} based on OSM maxspeed tags;" +
+            		" ignoring these tags", this);
+        
+        // if there was a defined speed and it's not 0, we're done
+        if (speed != null)
+            return speed;
                     
+        // otherwise, we use the speedPickers
+        
         int bestScore = 0;
-        float bestSpeed = -1;
+        Float bestSpeed = null;
         int score;
         
+        // SpeedPickers are constructed in DefaultWayPropertySetSource with an OSM specifier
+        // (e.g. highway=motorway) and a default speed for that segment.
         for (SpeedPicker picker : speedPickers) {
             OSMSpecifier specifier = picker.getSpecifier();
             score = specifier.matchScore(way);
@@ -226,7 +242,7 @@ public class WayPropertySet {
             }
         }
         
-        if (bestSpeed != -1)
+        if (bestSpeed != null)
             return bestSpeed;
         else
             return this.defaultSpeed;
@@ -301,17 +317,17 @@ public class WayPropertySet {
         this.speedPickers.add(picker);
     }
     
-    public float getMetersSecondFromSpeed(String speed) {
+    public Float getMetersSecondFromSpeed(String speed) {
         Matcher m = maxSpeedPattern.matcher(speed);
         if (!m.matches())
-            return -1;
+            return null;
         
         float originalUnits;
         try {
             originalUnits = (float) Double.parseDouble(m.group(1));
         } catch (NumberFormatException e) {
             _log.warn("Could not parse max speed {}", m.group(1));
-            return -1;
+            return null;
         }
         
         String units = m.group(2);
@@ -330,7 +346,7 @@ public class WayPropertySet {
         else if (units == "knots")
             metersSecond = 0.514444f * originalUnits;
         else
-            return -1;
+            return null;
         
         return metersSecond;
     }

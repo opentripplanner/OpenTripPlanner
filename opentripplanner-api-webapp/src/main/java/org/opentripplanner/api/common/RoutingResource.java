@@ -215,8 +215,8 @@ public abstract class RoutingResource {
     protected RoutingRequest buildRequest(int n) throws ParameterException {
         RoutingRequest request = prototypeRoutingRequest.clone();
         request.setRouterId(get(routerId, n, request.getRouterId()));
-        request.setFrom(get(fromPlace, n, request.getFromPlace().getRepresentation()));
-        request.setTo(get(toPlace, n, request.getToPlace().getRepresentation()));
+        request.setFromString(get(fromPlace, n, request.getFromPlace().getRepresentation()));
+        request.setToString(get(toPlace, n, request.getToPlace().getRepresentation()));
         {
             //FIXME: get defaults for these from request
             String d = get(date, n, null);
@@ -275,7 +275,7 @@ public abstract class RoutingResource {
         /* intermediate places and their ordering are shared because they are themselves a list */
         if (intermediatePlaces != null && intermediatePlaces.size() > 0 
             && ! intermediatePlaces.get(0).equals("")) {
-            request.setIntermediatePlaces(intermediatePlaces);
+            request.setIntermediatePlacesFromStrings(intermediatePlaces);
         }
         if (intermediatePlacesOrdered == null)
             intermediatePlacesOrdered = request.isIntermediatePlacesOrdered();

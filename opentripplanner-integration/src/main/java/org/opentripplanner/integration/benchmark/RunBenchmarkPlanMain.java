@@ -31,6 +31,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.Parser;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.error.VertexNotFoundException;
@@ -100,9 +101,8 @@ public class RunBenchmarkPlanMain {
         for (int i = 0; i < _repetitions; i++) {
             for (Plan plan : plans) {
 
-                String from = plan.latFrom + " " + plan.lonFrom;
-                String to = plan.latTo + " " + plan.lonTo;
-
+                GenericLocation from = new GenericLocation(plan.latFrom, plan.lonTo);
+                GenericLocation to = new GenericLocation(plan.latTo, plan.lonTo);
                 try {
                     RoutingRequest opt = new RoutingRequest();
                     opt.setDateTime(plan.time);

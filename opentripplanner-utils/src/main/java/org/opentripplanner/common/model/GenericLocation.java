@@ -55,11 +55,21 @@ public class GenericLocation {
             + ")(\\s*,\\s*|\\s+)(" + _doublePattern + ")\\s*$");
 
     /**
-     * Constructs an empty GenericLocation.
+     * Constructs a GenericLocation with coordinates only.
      */
     public GenericLocation() {
         this.name = "";
         this.place = "";
+    }
+
+    /**
+     * Constructs an empty GenericLocation.
+     */
+    public GenericLocation(double lat, double lng) {
+        this.name = "";
+        this.place = "";
+        this.lat = lat;
+        this.lng = lng;
     }
     
     /**
