@@ -311,8 +311,6 @@ public abstract class RoutingResource {
         if (opt == OptimizeType.TRANSFERS) {
             opt = OptimizeType.QUICK;
             request.setTransferPenalty(get(transferPenalty, n, 0) + 1800);
-            //has been changed for testing
-//            request.setTransferPenalty(get(transferPenalty, n, request.getTransferPenalty()));
         } else {
             request.setTransferPenalty(get(transferPenalty, n, request.getTransferPenalty()));
         }
