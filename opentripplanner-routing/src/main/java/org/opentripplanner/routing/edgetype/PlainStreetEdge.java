@@ -370,7 +370,6 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             time += turnTime;
         }
 
-        s1.incrementWalkDistance(length);
         int timeLong = (int) time;
         if (timeLong != time) {
             timeLong++;
@@ -378,7 +377,6 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         s1.incrementTimeInSeconds(timeLong);
         
         if (traverseMode != TraverseMode.CAR) {
-            // TODO(flamholz): are we incrementing 2x for non-car modes?
             s1.incrementWalkDistance(length);
         }
 
