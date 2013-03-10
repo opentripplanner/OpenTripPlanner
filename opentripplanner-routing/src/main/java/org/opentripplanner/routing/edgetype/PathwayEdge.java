@@ -3,7 +3,6 @@ package org.opentripplanner.routing.edgetype;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 
@@ -75,7 +74,6 @@ public class PathwayEdge extends Edge {
         s1.incrementTimeInSeconds(time);
         s1.incrementWeight(time);
         // TODO: leaving mode as previous
-        s1.setBackMode(TraverseMode.TRANSFER);
         return s1.makeState();
     }
 
