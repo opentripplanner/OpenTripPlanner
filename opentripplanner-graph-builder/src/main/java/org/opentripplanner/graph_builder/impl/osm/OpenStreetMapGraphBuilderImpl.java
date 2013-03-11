@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Set;
 
 import lombok.Setter;
-import lombok.Getter;
 
 import org.opentripplanner.common.DisjointSet;
 import org.opentripplanner.common.RepeatingTimePeriod;
