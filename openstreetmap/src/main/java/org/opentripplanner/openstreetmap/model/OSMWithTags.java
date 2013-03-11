@@ -113,7 +113,7 @@ public class OSMWithTags {
         tag = tag.toLowerCase();
         String value = getTag(tag);
         return ("designated".equals(value) || "official".equals(value)
-             || "permissive".equals(value) || "unknown".equals(value));
+                || "permissive".equals(value) || "unknown".equals(value));
     }
 
     /**
@@ -125,7 +125,7 @@ public class OSMWithTags {
             return _tags.get(tag);
 
         return null;
-    }    
+    }
 
     /**
      * Checks is a tag contains the specified value.
@@ -137,12 +137,10 @@ public class OSMWithTags {
 
         return false;
     }
-    
+
     /**
-     * Returns a name-like value for an entity (if one exists). The otp: namespaced tags are created
-     * by
-     * {@link org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl#processRelations
-     * processRelations}
+     * Returns a name-like value for an entity (if one exists). The otp: namespaced tags are created by
+     * {@link org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl#processRelations processRelations}
      */
     public String getAssumedName() {
         if (_tags.containsKey("name"))
@@ -165,28 +163,29 @@ public class OSMWithTags {
 
     public Map<String, String> getTagsByPrefix(String prefix) {
         Map<String, String> out = new HashMap<String, String>();
-       for (Map.Entry<String, String> entry : _tags.entrySet()) {
-           String k = entry.getKey();
-           if (k.equals(prefix) || k.startsWith(prefix + ":")) {
-               out.put(k, entry.getValue());
-           }
-       }
+        for (Map.Entry<String, String> entry : _tags.entrySet()) {
+            String k = entry.getKey();
+            if (k.equals(prefix) || k.startsWith(prefix + ":")) {
+                out.put(k, entry.getValue());
+            }
+        }
 
-       if (out.isEmpty())
-           return null;
-       return out;
+        if (out.isEmpty())
+            return null;
+        return out;
     }
 
     public static boolean isFalse(String tagValue) {
         return ("no".equals(tagValue) || "0".equals(tagValue) || "false".equals(tagValue));
-      }
+    }
 
     public static boolean isTrue(String tagValue) {
         return ("yes".equals(tagValue) || "1".equals(tagValue) || "true".equals(tagValue));
     }
-    
+
     /**
      * Returns true if this element is under construction.
+     * 
      * @return
      */
     public boolean isUnderConstruction() {
@@ -194,9 +193,10 @@ public class OSMWithTags {
         String cycleway = getTag("cycleway");
         return "construction".equals(highway) || "construction".equals(cycleway);
     }
-    
+
     /**
      * Returns true if this tag is explicitly access to this entity.
+     * 
      * @param tagName
      * @return
      */
@@ -204,33 +204,37 @@ public class OSMWithTags {
         String tagValue = getTag(tagName);
         return "no".equals(tagValue) || "license".equals(tagValue);
     }
-    
+
     /**
      * Returns true if access is generally denied to this element (potentially with exceptions).
+     * 
      * @return
      */
     public boolean isGeneralAccessDenied() {
         return isTagDeniedAccess("access");
     }
-    
+
     /**
      * Returns true if cars are explicitly denied access.
+     * 
      * @return
      */
     public boolean isMotorcarExplicitlyDenied() {
         return isTagDeniedAccess("motorcar");
     }
-    
+
     /**
      * Returns true if cars are explicitly allowed.
+     * 
      * @return
      */
     public boolean isMotorcarExplicitlyAllowed() {
         return doesTagAllowAccess("motorcar");
     }
-    
+
     /**
      * Returns true if bikes are explicitly denied access.
+     * 
      * @return
      */
     public boolean isBicycleExplicitlyDenied() {
@@ -239,14 +243,16 @@ public class OSMWithTags {
 
     /**
      * Returns true if bikes are explicitly allowed.
+     * 
      * @return
      */
     public boolean isBicycleExplicitlyAllowed() {
         return doesTagAllowAccess("bicycle");
     }
-    
+
     /**
      * Returns true if pedestrians are explicitly denied access.
+     * 
      * @return
      */
     public boolean isPedestrianExplicitlyDenied() {
@@ -255,6 +261,7 @@ public class OSMWithTags {
 
     /**
      * Returns true if pedestrians are explicitly allowed.
+     * 
      * @return
      */
     public boolean isPedestrianExplicitlyAllowed() {

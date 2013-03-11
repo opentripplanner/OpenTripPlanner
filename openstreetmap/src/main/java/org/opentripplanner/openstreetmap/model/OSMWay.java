@@ -61,12 +61,13 @@ public class OSMWay extends OSMWithTags {
 
     /**
      * Returns true if these are steps.
+     * 
      * @return
      */
     public boolean isSteps() {
         return "steps".equals(getTag("highway"));
     }
-    
+
     /**
      * Is this way a roundabout?
      * 
