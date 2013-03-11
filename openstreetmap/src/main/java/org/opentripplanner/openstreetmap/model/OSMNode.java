@@ -41,4 +41,14 @@ public class OSMNode extends OSMWithTags {
   public String toString() {
     return "osm node " + id;
   }
+  
+  /**
+   * Is this a multi-level node that should be decomposed to multiple coincident nodes? Currently returns true only for elevators.
+   * 
+   * @return whether the node is multi-level
+   * @author mattwigway
+   */
+  public boolean isMultiLevel() {
+      return hasTag("highway") && "elevator".equals(getTag("highway"));
+  }
 }

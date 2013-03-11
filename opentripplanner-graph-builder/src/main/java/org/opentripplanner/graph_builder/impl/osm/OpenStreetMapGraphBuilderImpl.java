@@ -2523,17 +2523,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         /**
-         * Is this a multi-level node that should be decomposed to multiple coincident nodes? Currently returns true only for elevators.
-         * 
-         * @param node
-         * @return whether the node is multi-level
-         * @author mattwigway
-         */
-        private boolean isMultiLevelNode(OSMNode node) {
-            return node.hasTag("highway") && "elevator".equals(node.getTag("highway"));
-        }
-
-        /**
          * Record the level of the way for this node, e.g. if the way is at level 5, mark that this node is active at level 5.
          * 
          * @param the way that has the level
@@ -2576,7 +2565,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             // use the numeric level because it is unique, the human level may not be (although
             // it will likely lead to some head-scratching if it is not).
             IntersectionVertex iv = null;
-            if (isMultiLevelNode(node)) {
+            if (node.isMultiLevel()) {
                 // make a separate node for every level
                 return recordLevel(node, way);
             }
