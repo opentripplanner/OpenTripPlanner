@@ -21,21 +21,131 @@ import java.util.List;
 
 public class OSMWay extends OSMWithTags {
 
-  private List<Long> _nodes = new ArrayList<Long>();
+    private List<Long> _nodes = new ArrayList<Long>();
 
-  public void addNodeRef(OSMNodeRef nodeRef) {
-    _nodes.add(nodeRef.getRef());
-  }
+    public void addNodeRef(OSMNodeRef nodeRef) {
+        _nodes.add(nodeRef.getRef());
+    }
 
-  public void addNodeRef(long nodeRef) {
-    _nodes.add(nodeRef);
-  }
+    public void addNodeRef(long nodeRef) {
+        _nodes.add(nodeRef);
+    }
 
-  public List<Long> getNodeRefs() {
-    return _nodes;
-  }
+    public List<Long> getNodeRefs() {
+        return _nodes;
+    }
 
-  public String toString() {
-    return "osm way " + id;
-  }
+    public String toString() {
+        return "osm way " + id;
+    }
+
+    /**
+     * Returns true if bikes are allowed.
+     * 
+     * @return
+     */
+    public boolean isBicycleAllowed() {
+        String bicycle = getTag("bicycle");
+        return "yes".equals(bicycle) || "designated".equals(bicycle);
+    }
+
+    /**
+     * Returns true if bicycle dismounts are forced.
+     * 
+     * @return
+     */
+    public boolean isBicycleDismountForced() {
+        String bicycle = getTag("bicycle");
+        return isTag("cycleway", "dismount") || "dismount".equals(bicycle);
+    }
+
+    /**
+     * Returns true if these are steps.
+     * 
+     * @return
+     */
+    public boolean isSteps() {
+        return "steps".equals(getTag("highway"));
+    }
+
+    /**
+     * Is this way a roundabout?
+     * 
+     * @return
+     */
+    public boolean isRoundabout() {
+        return "roundabout".equals(getTag("junction"));
+    }
+
+    /**
+     * Returns true if this is a one-way street for driving.
+     * 
+     * @return
+     */
+    public boolean isOneWayForwardDriving() {
+        return isTagTrue("oneway");
+    }
+
+    /**
+     * Returns true if this way is one-way in the opposite direction of its definition.
+     * 
+     * @return
+     */
+    public boolean isOneWayReverseDriving() {
+        return isTag("oneway", "-1");
+    }
+
+    /**
+     * Returns true if bikes can only go forward.
+     * 
+     * @return
+     */
+    public boolean isOneWayForwardBicycle() {
+        String oneWayBicycle = getTag("oneway:bicycle");
+        return isTrue(oneWayBicycle) || isTagFalse("bicycle:backwards");
+    }
+
+    /**
+     * Returns true if bikes can only go in the reverse direction.
+     * 
+     * @return
+     */
+    public boolean isOneWayReverseBicycle() {
+        return "-1".equals(getTag("oneway:bicycle"));
+    }
+
+    /**
+     * Some cycleways allow contraflow biking.
+     * 
+     * @return
+     */
+    public boolean isOpposableCycleway() {
+        // any cycleway which is opposite* allows contraflow biking
+        String cycleway = getTag("cycleway");
+        String cyclewayLeft = getTag("cycleway:left");
+        String cyclewayRight = getTag("cycleway:right");
+
+        return (cycleway != null && cycleway.startsWith("opposite"))
+                || (cyclewayLeft != null && cyclewayLeft.startsWith("opposite"))
+                || (cyclewayRight != null && cyclewayRight.startsWith("opposite"));
+    }
+
+    /**
+     * Return true if pedestrians are allowed.
+     * 
+     * @return
+     */
+    public boolean isPedestrianAllowed() {
+        String foot = getTag("foot");
+        return "yes".equals(foot) || "designated".equals(foot);
+    }
+
+    /**
+     * Return true if the way explicitly disallows pedestrians.
+     * 
+     * @return
+     */
+    public boolean isPedestrianExplicitlyDisallowed() {
+        return isFalse(getTag("foot"));
+    }
 }
