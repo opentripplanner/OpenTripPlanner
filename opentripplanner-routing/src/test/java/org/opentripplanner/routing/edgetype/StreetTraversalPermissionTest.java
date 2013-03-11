@@ -91,4 +91,14 @@ public class StreetTraversalPermissionTest {
                 TraverseMode.FERRY)));
     }
 
+    @Test
+    public void testAllowsAnythingNothing() {
+        StreetTraversalPermission perm = StreetTraversalPermission.ALL_DRIVING;
+        assertTrue(perm.allowsAnything());
+        assertFalse(perm.allowsNothing());
+        
+        perm = StreetTraversalPermission.NONE;
+        assertFalse(perm.allowsAnything());
+        assertTrue(perm.allowsNothing());
+    }
 }
