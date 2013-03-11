@@ -18,37 +18,37 @@ package org.opentripplanner.openstreetmap.model;
 
 public class OSMNode extends OSMWithTags {
 
-  private double lat;
+    private double lat;
 
-  private double lon;
+    private double lon;
 
-  public double getLat() {
-    return lat;
-  }
+    public double getLat() {
+        return lat;
+    }
 
-  public void setLat(double lat) {
-    this.lat = lat;
-  }
+    public void setLat(double lat) {
+        this.lat = lat;
+    }
 
-  public double getLon() {
-    return lon;
-  }
+    public double getLon() {
+        return lon;
+    }
 
-  public void setLon(double lon) {
-    this.lon = lon;
-  }
+    public void setLon(double lon) {
+        this.lon = lon;
+    }
 
-  public String toString() {
-    return "osm node " + id;
-  }
-  
-  /**
-   * Is this a multi-level node that should be decomposed to multiple coincident nodes? Currently returns true only for elevators.
-   * 
-   * @return whether the node is multi-level
-   * @author mattwigway
-   */
-  public boolean isMultiLevel() {
-      return hasTag("highway") && "elevator".equals(getTag("highway"));
-  }
+    public String toString() {
+        return "osm node " + id;
+    }
+
+    /**
+     * Is this a multi-level node that should be decomposed to multiple coincident nodes? Currently returns true only for elevators.
+     * 
+     * @return whether the node is multi-level
+     * @author mattwigway
+     */
+    public boolean isMultiLevel() {
+        return hasTag("highway") && "elevator".equals(getTag("highway"));
+    }
 }
