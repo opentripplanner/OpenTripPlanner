@@ -1848,11 +1848,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             if (way.isGeneralAccessDenied()) {
                 // There are exceptions.
-                if (way.isMotorcarExplicitlyAllowed() || way.isBicycleExplicitlyAllowed() || way.isPedestrianExplicitlyAllowed()) {
-                    return true;
-                }
-                return false;
+                return (way.isMotorcarExplicitlyAllowed() || way.isBicycleExplicitlyAllowed() || way
+                        .isPedestrianExplicitlyAllowed());
             }
+            
             return true;
         }
 
