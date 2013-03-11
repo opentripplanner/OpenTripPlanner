@@ -2499,15 +2499,15 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
              */
 
             // Compute pedestrian permissions.
-            if (way.isPedestrianAllowed()) {
+            if (way.isPedestrianExplicitlyAllowed()) {
                 permissions = permissions.add(StreetTraversalPermission.PEDESTRIAN);
-            } else if (way.isPedestrianExplicitlyDisallowed()) {
+            } else if (way.isPedestrianExplicitlyDenied()) {
                 permissions = permissions.remove(StreetTraversalPermission.PEDESTRIAN);
             }
 
             // Compute bike permissions, check consistency.
             boolean forceBikes = false;
-            if (way.isBicycleAllowed()) {
+            if (way.isBicycleExplicitlyAllowed()) {
                 permissions = permissions.add(StreetTraversalPermission.BICYCLE);
                 forceBikes = true;
             }
