@@ -804,7 +804,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 int capacity = Integer.MAX_VALUE;
                 if (node.hasTag("capacity")) {
                     try {
-                        capacity = Integer.parseInt(node.getTag("capacity"));
+                        capacity = node.getCapacity();
                     } catch (NumberFormatException e) {
                         _log.warn("Capacity for osm node " + node.getId() + " (" + creativeName
                                 + ") is not a number: " + node.getTag("capacity"));
@@ -1524,10 +1524,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             Set<Alert> note = wayPropertySet.getNoteForWay(way);
             Set<Alert> wheelchairNote = getWheelchairNotes(way);
-            String access = way.getTag("access");
-            boolean noThruTraffic = "destination".equals(access) || "private".equals(access)
-                    || "customers".equals(access) || "delivery".equals(access)
-                    || "forestry".equals(access) || "agricultural".equals(access);
+            boolean noThruTraffic = way.isThroughTrafficExplicitlyDisallowed();
 
             if (street != null) {
                 double safety = wayData.getSafetyFeatures().getFirst();
@@ -1849,21 +1846,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                             .equals("raceway")))
                 return false;
 
-            String access = way.getTag("access");
-
-            if (access != null) {
-                if ("no".equals(access) || "license".equals(access)) {
-                    if (way.doesTagAllowAccess("motorcar")) {
-                        return true;
-                    }
-                    if (way.doesTagAllowAccess("bicycle")) {
-                        return true;
-                    }
-                    if (way.doesTagAllowAccess("foot")) {
-                        return true;
-                    }
-                    return false;
+            if (way.isGeneralAccessDenied()) {
+                // There are exceptions.
+                if (way.isMotorcarExplicitlyAllowed() || way.isBicycleExplicitlyAllowed() || way.isPedestrianExplicitlyAllowed()) {
+                    return true;
                 }
+                return false;
             }
             return true;
         }

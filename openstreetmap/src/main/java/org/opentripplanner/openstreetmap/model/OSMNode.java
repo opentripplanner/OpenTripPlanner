@@ -19,17 +19,32 @@ package org.opentripplanner.openstreetmap.model;
 import lombok.Setter;
 import lombok.Getter;
 
-
 public class OSMNode extends OSMWithTags {
 
-    @Setter @Getter
+    @Setter
+    @Getter
     private double lat;
 
-    @Setter @Getter
+    @Setter
+    @Getter
     private double lon;
 
     public String toString() {
         return "osm node " + id;
+    }
+
+    /**
+     * Returns the capacity of this node if defined, or 0.
+     * 
+     * @return
+     */
+    public int getCapacity() throws NumberFormatException {
+        String capacity = getTag("capacity");
+        if (capacity == null) {
+            return 0;
+        }
+        
+        return Integer.parseInt(getTag("capacity"));
     }
 
     /**
@@ -41,4 +56,5 @@ public class OSMNode extends OSMWithTags {
     public boolean isMultiLevel() {
         return hasTag("highway") && "elevator".equals(getTag("highway"));
     }
+
 }
