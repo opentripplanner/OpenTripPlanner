@@ -89,7 +89,7 @@ public class OSMWithTags {
         if (_tags == null)
             return false;
 
-        return ("no".equals(getTag(tag)) || "0".equals(getTag(tag)) || "false".equals(getTag(tag)));
+        return isFalse(getTag(tag));
     }
 
     /**
@@ -100,7 +100,7 @@ public class OSMWithTags {
         if (_tags == null)
             return false;
 
-        return ("yes".equals(getTag(tag)) || "1".equals(getTag(tag)) || "true".equals(getTag(tag)));
+        return isTrue(getTag(tag));
     }
 
     public boolean doesTagAllowAccess(String tag) {
@@ -125,7 +125,7 @@ public class OSMWithTags {
             return _tags.get(tag);
 
         return null;
-    }
+    }    
 
     /**
      * Checks is a tag contains the specified value.
@@ -137,7 +137,7 @@ public class OSMWithTags {
 
         return false;
     }
-
+    
     /**
      * Returns a name-like value for an entity (if one exists). The otp: namespaced tags are created
      * by
@@ -183,5 +183,81 @@ public class OSMWithTags {
 
     public static boolean isTrue(String tagValue) {
         return ("yes".equals(tagValue) || "1".equals(tagValue) || "true".equals(tagValue));
+    }
+    
+    /**
+     * Returns true if this element is under construction.
+     * @return
+     */
+    public boolean isUnderConstruction() {
+        String highway = getTag("highway");
+        String cycleway = getTag("cycleway");
+        return "construction".equals(highway) || "construction".equals(cycleway);
+    }
+    
+    /**
+     * Returns true if this tag is explicitly access to this entity.
+     * @param tagName
+     * @return
+     */
+    private boolean isTagDeniedAccess(String tagName) {
+        String tagValue = getTag(tagName);
+        return "no".equals(tagValue) || "license".equals(tagValue);
+    }
+    
+    /**
+     * Returns true if access is generally denied to this element (potentially with exceptions).
+     * @return
+     */
+    public boolean isGeneralAccessDenied() {
+        return isTagDeniedAccess("access");
+    }
+    
+    /**
+     * Returns true if cars are explicitly denied access.
+     * @return
+     */
+    public boolean isMotorcarExplicitlyDenied() {
+        return isTagDeniedAccess("motorcar");
+    }
+    
+    /**
+     * Returns true if cars are explicitly allowed.
+     * @return
+     */
+    public boolean isMotorcarExplicitlyAllowed() {
+        return doesTagAllowAccess("motorcar");
+    }
+    
+    /**
+     * Returns true if bikes are explicitly denied access.
+     * @return
+     */
+    public boolean isBicycleExplicitlyDenied() {
+        return isTagDeniedAccess("bicycle");
+    }
+
+    /**
+     * Returns true if bikes are explicitly allowed.
+     * @return
+     */
+    public boolean isBicycleExplicitlyAllowed() {
+        return doesTagAllowAccess("bicycle");
+    }
+    
+    /**
+     * Returns true if pedestrians are explicitly denied access.
+     * @return
+     */
+    public boolean isPedestrianExplicitlyDenied() {
+        return isTagDeniedAccess("foot");
+    }
+
+    /**
+     * Returns true if pedestrians are explicitly allowed.
+     * @return
+     */
+    public boolean isPedestrianExplicitlyAllowed() {
+        return doesTagAllowAccess("foot");
     }
 }

@@ -584,7 +584,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
         }
 
-        /** A group of possibly-contiguous areas sharing the same level
+        /** 
+         * A group of possibly-contiguous areas sharing the same level
          */
         class AreaGroup {
             /*
@@ -1387,9 +1388,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
                 setWayName(way);
 
-                StreetTraversalPermission permissions = getPermissionsForEntity(way,
+                StreetTraversalPermission permissions = getPermissionsForWay(way,
                         wayData.getPermission());
-                if (permissions == StreetTraversalPermission.NONE)
+                if (permissions.allowsNothing())
                     continue;
 
                 // handle duplicate nodes in OSM ways
@@ -2208,6 +2209,19 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         /**
+         * Returns the length of the geometry in meters.
+         * @param geometry
+         * @return
+         */
+        private double getGeometryLengthMeters(Geometry geometry) {
+            Coordinate[] coordinates = geometry.getCoordinates();
+            double d = 0;
+            for (int i = 1; i < coordinates.length; ++i) {
+                d += distanceLibrary.distance(coordinates[i - 1], coordinates[i]);
+            }
+            return d;
+        }
+        /**
          * Handle oneway streets, cycleways, and other per-mode and universal access controls. See http://wiki.openstreetmap.org/wiki/Bicycle for
          * various scenarios, along with http://wiki.openstreetmap.org/wiki/OSM_tags_for_routing#Oneway.
          * 
@@ -2215,75 +2229,32 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
          * @param start
          */
         private P2<PlainStreetEdge> getEdgesForStreet(IntersectionVertex start,
-                IntersectionVertex end, OSMWithTags way, int index, long startNode, long endNode,
+                IntersectionVertex end, OSMWay way, int index, long startNode, long endNode,
                 StreetTraversalPermission permissions, LineString geometry) {
-            // get geometry length in meters, irritatingly.
-            Coordinate[] coordinates = geometry.getCoordinates();
-            double d = 0;
-            for (int i = 1; i < coordinates.length; ++i) {
-                d += distanceLibrary.distance(coordinates[i - 1], coordinates[i]);
-            }
-
-            LineString backGeometry = (LineString) geometry.reverse();
-
-            Map<String, String> tags = way.getTags();
-
-            if (permissions == StreetTraversalPermission.NONE)
+            // No point in returning edges that can't be traversed by anyone.
+            if (permissions.allowsNothing()) {
                 return new P2<PlainStreetEdge>(null, null);
-
+            }
+            
+            LineString backGeometry = (LineString) geometry.reverse();
             PlainStreetEdge street = null, backStreet = null;
-
-            /*
-             * pedestrian rules: everything is two-way (assuming pedestrians are allowed at all) bicycle rules: default: permissions;
-             * 
-             * cycleway=dismount means walk your bike -- the engine will automatically try walking bikes any time it is forbidden to ride them, so the
-             * only thing to do here is to remove bike permissions
-             * 
-             * oneway=... sets permissions for cars and bikes oneway:bicycle overwrites these permissions for bikes only
-             * 
-             * now, cycleway=opposite_lane, opposite, opposite_track can allow once oneway has been set by oneway:bicycle, but should give a warning
-             * if it conflicts with oneway:bicycle
-             * 
-             * bicycle:backward=yes works like oneway:bicycle=no bicycle:backwards=no works like oneway:bicycle=yes
-             */
-
-            String foot = way.getTag("foot");
-            if ("yes".equals(foot) || "designated".equals(foot)) {
-                permissions = permissions.add(StreetTraversalPermission.PEDESTRIAN);
-            }
-
-            if (OSMWithTags.isFalse(foot)) {
-                permissions = permissions.remove(StreetTraversalPermission.PEDESTRIAN);
-            }
-
-            boolean forceBikes = false;
-            String bicycle = way.getTag("bicycle");
-            if ("yes".equals(bicycle) || "designated".equals(bicycle)) {
-                permissions = permissions.add(StreetTraversalPermission.BICYCLE);
-                forceBikes = true;
-            }
-
-            if (way.isTag("cycleway", "dismount") || "dismount".equals(bicycle)) {
-                permissions = permissions.remove(StreetTraversalPermission.BICYCLE);
-                if (forceBikes) {
-                    _log.warn(graph.addBuilderAnnotation(new ConflictingBikeTags(way.getId())));
-                }
-            }
+            double length = this.getGeometryLengthMeters(geometry);
+                        
             P2<StreetTraversalPermission> permissionPair = getPermissions(permissions, way);
             StreetTraversalPermission permissionsFront = permissionPair.getFirst();
             StreetTraversalPermission permissionsBack = permissionPair.getSecond();
 
-            if (permissionsFront != StreetTraversalPermission.NONE) {
-                street = getEdgeForStreet(start, end, way, index, startNode, endNode, d,
+            if (permissionsFront.allowsAnything()) {
+                street = getEdgeForStreet(start, end, way, index, startNode, endNode, length,
                         permissionsFront, geometry, false);
             }
-            if (permissionsBack != StreetTraversalPermission.NONE) {
-                backStreet = getEdgeForStreet(end, start, way, index, endNode, startNode, d,
+            if (permissionsBack.allowsAnything()) {
+                backStreet = getEdgeForStreet(end, start, way, index, endNode, startNode, length,
                         permissionsBack, backGeometry, true);
             }
 
             /* mark edges that are on roundabouts */
-            if ("roundabout".equals(tags.get("junction"))) {
+            if (way.isRoundabout()) {
                 if (street != null)
                     street.setRoundabout(true);
                 if (backStreet != null)
@@ -2297,25 +2268,30 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
          * Check OSM tags for various one-way and one-way-by-mode tags and return a pair of permissions for travel along and against the way.
          */
         private P2<StreetTraversalPermission> getPermissions(StreetTraversalPermission permissions,
-                OSMWithTags way) {
+                OSMWay way) {
 
             StreetTraversalPermission permissionsFront = permissions;
             StreetTraversalPermission permissionsBack = permissions;
-
-            if (way.isTagTrue("oneway") || "roundabout".equals(way.getTag("junction"))) {
+            
+            // Check driving direction restrictions.
+            if (way.isOneWayForwardDriving() || way.isRoundabout()) {
                 permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE_AND_DRIVING);
             }
-            if (way.isTag("oneway", "-1")) {
+            if (way.isOneWayReverseDriving()) {
                 permissionsFront = permissionsFront
                         .remove(StreetTraversalPermission.BICYCLE_AND_DRIVING);
             }
-            String oneWayBicycle = way.getTag("oneway:bicycle");
-            if (OSMWithTags.isTrue(oneWayBicycle) || way.isTagFalse("bicycle:backwards")) {
+            
+            // Check bike direction restrictions.
+            if (way.isOneWayForwardBicycle()) {
                 permissionsBack = permissionsBack.remove(StreetTraversalPermission.BICYCLE);
             }
-            if ("-1".equals(oneWayBicycle)) {
+            if (way.isOneWayReverseBicycle()) {
                 permissionsFront = permissionsFront.remove(StreetTraversalPermission.BICYCLE);
             }
+
+            // TODO(flamholz): figure out what this is for.
+            String oneWayBicycle = way.getTag("oneway:bicycle");
             if (OSMWithTags.isFalse(oneWayBicycle) || way.isTagTrue("bicycle:backwards")) {
                 if (permissions.allows(StreetTraversalPermission.BICYCLE)) {
                     permissionsFront = permissionsFront.add(StreetTraversalPermission.BICYCLE);
@@ -2323,30 +2299,23 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 }
             }
 
-            // any cycleway which is opposite* allows contraflow biking
-            String cycleway = way.getTag("cycleway");
-            String cyclewayLeft = way.getTag("cycleway:left");
-            String cyclewayRight = way.getTag("cycleway:right");
-            if ((cycleway != null && cycleway.startsWith("opposite"))
-                    || (cyclewayLeft != null && cyclewayLeft.startsWith("opposite"))
-                    || (cyclewayRight != null && cyclewayRight.startsWith("opposite"))) {
-
+            if (way.isOpposableCycleway()) {
                 permissionsBack = permissionsBack.add(StreetTraversalPermission.BICYCLE);
             }
             return new P2<StreetTraversalPermission>(permissionsFront, permissionsBack);
         }
 
         private PlainStreetEdge getEdgeForStreet(IntersectionVertex start, IntersectionVertex end,
-                OSMWithTags way, int index, long startNode, long endNode, double length,
+                OSMWay way, int index, long startNode, long endNode, double length,
                 StreetTraversalPermission permissions, LineString geometry, boolean back) {
 
             String label = "way " + way.getId() + " from " + index;
             label = unique(label);
             String name = getNameForWay(way, label);
 
-            boolean steps = "steps".equals(way.getTag("highway"));
+            // consider the elevation gain of stairs, roughly
+            boolean steps = way.isSteps();
             if (steps) {
-                // consider the elevation gain of stairs, roughly
                 length *= 2;
             }
 
@@ -2443,15 +2412,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
         private StreetTraversalPermission getPermissionsForEntity(OSMWithTags entity,
                 StreetTraversalPermission def) {
-            Map<String, String> tags = entity.getTags();
             StreetTraversalPermission permission = null;
-
-            String highway = tags.get("highway");
-            String cycleway = tags.get("cycleway");
-            String access = tags.get("access");
-            String motorcar = tags.get("motorcar");
-            String bicycle = tags.get("bicycle");
-            String foot = tags.get("foot");
 
             /*
              * Only a few tags are examined here, because we only care about modes supported by OTP (wheelchairs are not of concern here)
@@ -2459,64 +2420,96 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
              * Only a few values are checked for, all other values are presumed to be permissive (=> This may not be perfect, but is closer to
              * reality, since most people don't follow the rules perfectly ;-)
              */
-            if (access != null) {
-                if ("no".equals(access) || "license".equals(access)) {
-                    // this can actually be overridden
-                    permission = StreetTraversalPermission.NONE;
-                    if (entity.doesTagAllowAccess("motorcar")) {
-                        permission = permission.add(StreetTraversalPermission.ALL_DRIVING);
-                    }
-                    if (entity.doesTagAllowAccess("bicycle")) {
-                        permission = permission.add(StreetTraversalPermission.BICYCLE);
-                    }
-                    if (entity.doesTagAllowAccess("foot")) {
-                        permission = permission.add(StreetTraversalPermission.PEDESTRIAN);
-                    }
-                } else {
-                    permission = def;
+            if (entity.isGeneralAccessDenied()) {
+                // this can actually be overridden
+                permission = StreetTraversalPermission.NONE;
+                if (entity.isMotorcarExplicitlyAllowed()) {
+                    permission = permission.add(StreetTraversalPermission.ALL_DRIVING);
                 }
-            } else if (motorcar != null || bicycle != null || foot != null) {
+                if (entity.isBicycleExplicitlyAllowed()) {
+                    permission = permission.add(StreetTraversalPermission.BICYCLE);
+                }
+                if (entity.isPedestrianExplicitlyAllowed()) {
+                    permission = permission.add(StreetTraversalPermission.PEDESTRIAN);
+                }
+            } else {
                 permission = def;
             }
 
-            if (motorcar != null) {
-                if ("no".equals(motorcar) || "license".equals(motorcar)) {
-                    permission = permission.remove(StreetTraversalPermission.ALL_DRIVING);
-                } else {
-                    permission = permission.add(StreetTraversalPermission.ALL_DRIVING);
-                }
+            if (entity.isMotorcarExplicitlyDenied()) {
+                permission = permission.remove(StreetTraversalPermission.ALL_DRIVING);
+            } else if (entity.hasTag("motorcar")) {
+                permission = permission.add(StreetTraversalPermission.ALL_DRIVING);
             }
 
-            if (bicycle != null) {
-                if ("no".equals(bicycle) || "license".equals(bicycle)) {
-                    permission = permission.remove(StreetTraversalPermission.BICYCLE);
-                } else {
-                    permission = permission.add(StreetTraversalPermission.BICYCLE);
-                }
+            if (entity.isBicycleExplicitlyDenied()) {
+                permission = permission.remove(StreetTraversalPermission.BICYCLE);
+            } else if (entity.hasTag("bicycle")) {
+                permission = permission.add(StreetTraversalPermission.BICYCLE);
             }
 
-            if (foot != null) {
-                if ("no".equals(foot) || "license".equals(foot)) {
-                    permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
-                } else {
-                    permission = permission.add(StreetTraversalPermission.PEDESTRIAN);
-                }
+            if (entity.isPedestrianExplicitlyDenied()) {
+                permission = permission.remove(StreetTraversalPermission.PEDESTRIAN);
+            } else if (entity.hasTag("foot")) {
+                permission = permission.add(StreetTraversalPermission.PEDESTRIAN);
             }
 
-            if (highway != null) {
-                if ("construction".equals(highway)) {
-                    permission = StreetTraversalPermission.NONE;
-                }
-            } else {
-                if ("construction".equals(cycleway)) {
-                    permission = StreetTraversalPermission.NONE;
-                }
+            if (entity.isUnderConstruction()) {
+                permission = StreetTraversalPermission.NONE;
             }
 
             if (permission == null)
                 return def;
 
             return permission;
+        }
+        
+        /**
+         * Computes permissions for an OSMWay.
+         * @param way
+         * @param def
+         * @return
+         */
+        private StreetTraversalPermission getPermissionsForWay(OSMWay way,
+                StreetTraversalPermission def) {
+            StreetTraversalPermission permissions = getPermissionsForEntity(way, def);
+            
+            /*
+             * pedestrian rules: everything is two-way (assuming pedestrians are allowed at all) bicycle rules: default: permissions;
+             * 
+             * cycleway=dismount means walk your bike -- the engine will automatically try walking bikes any time it is forbidden to ride them, so the
+             * only thing to do here is to remove bike permissions
+             * 
+             * oneway=... sets permissions for cars and bikes oneway:bicycle overwrites these permissions for bikes only
+             * 
+             * now, cycleway=opposite_lane, opposite, opposite_track can allow once oneway has been set by oneway:bicycle, but should give a warning
+             * if it conflicts with oneway:bicycle
+             * 
+             * bicycle:backward=yes works like oneway:bicycle=no bicycle:backwards=no works like oneway:bicycle=yes
+             */
+
+            // Compute pedestrian permissions.
+            if (way.isPedestrianAllowed()) {
+                permissions = permissions.add(StreetTraversalPermission.PEDESTRIAN);
+            } else if (way.isPedestrianExplicitlyDisallowed()) {
+                permissions = permissions.remove(StreetTraversalPermission.PEDESTRIAN);
+            }
+
+            // Compute bike permissions, check consistency.
+            boolean forceBikes = false;
+            if (way.isBicycleAllowed()) {
+                permissions = permissions.add(StreetTraversalPermission.BICYCLE);
+                forceBikes = true;
+            }
+
+            if (way.isBicycleDismountForced()) {
+                permissions = permissions.remove(StreetTraversalPermission.BICYCLE);
+                if (forceBikes) {
+                    _log.warn(graph.addBuilderAnnotation(new ConflictingBikeTags(way.getId())));
+                }
+            }
+            
+            return permissions;
         }
 
         /**
