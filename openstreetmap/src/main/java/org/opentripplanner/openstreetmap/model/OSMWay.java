@@ -40,16 +40,6 @@ public class OSMWay extends OSMWithTags {
     }
 
     /**
-     * Returns true if bikes are allowed.
-     * 
-     * @return
-     */
-    public boolean isBicycleAllowed() {
-        String bicycle = getTag("bicycle");
-        return "yes".equals(bicycle) || "designated".equals(bicycle);
-    }
-
-    /**
      * Returns true if bicycle dismounts are forced.
      * 
      * @return
@@ -128,24 +118,5 @@ public class OSMWay extends OSMWithTags {
         return (cycleway != null && cycleway.startsWith("opposite"))
                 || (cyclewayLeft != null && cyclewayLeft.startsWith("opposite"))
                 || (cyclewayRight != null && cyclewayRight.startsWith("opposite"));
-    }
-
-    /**
-     * Return true if pedestrians are allowed.
-     * 
-     * @return
-     */
-    public boolean isPedestrianAllowed() {
-        String foot = getTag("foot");
-        return "yes".equals(foot) || "designated".equals(foot);
-    }
-
-    /**
-     * Return true if the way explicitly disallows pedestrians.
-     * 
-     * @return
-     */
-    public boolean isPedestrianExplicitlyDisallowed() {
-        return isFalse(getTag("foot"));
     }
 }
