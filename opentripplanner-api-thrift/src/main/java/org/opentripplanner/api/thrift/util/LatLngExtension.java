@@ -1,6 +1,7 @@
 package org.opentripplanner.api.thrift.util;
 
 import org.opentripplanner.api.thrift.definition.LatLng;
+import org.opentripplanner.common.model.GenericLocation;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -60,6 +61,16 @@ public class LatLngExtension extends LatLng {
      * @return
      */
     public Coordinate toCoordinate() {
+        // Coordinates are x,y meaning lng,lat.
         return new Coordinate(getLng(), getLat());
+    }
+
+    /**
+     * Create a GenericLocation.
+     * 
+     * @return
+     */
+    public GenericLocation toGenericLocation() {
+        return new GenericLocation(getLat(), getLng());
     }
 }
