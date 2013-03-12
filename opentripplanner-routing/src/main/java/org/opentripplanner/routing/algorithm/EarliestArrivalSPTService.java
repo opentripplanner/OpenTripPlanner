@@ -17,9 +17,7 @@ import java.util.Collection;
 
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.common.pqueue.OTPPriorityQueue;
-import org.opentripplanner.common.pqueue.OTPPriorityQueueFactory;
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
@@ -27,7 +25,6 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.EarliestArrivalShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,8 +37,6 @@ import org.slf4j.LoggerFactory;
 public class EarliestArrivalSPTService implements SPTService { 
 
     private static final Logger LOG = LoggerFactory.getLogger(EarliestArrivalSPTService.class);
-
-    private boolean _verbose = false;
 
     @Override
     public ShortestPathTree getShortestPathTree(RoutingRequest req) {
@@ -56,25 +51,20 @@ public class EarliestArrivalSPTService implements SPTService {
     public ShortestPathTree getShortestPathTree(RoutingRequest options, double relTimeout,
             SearchTerminationStrategy terminationStrategy) {
 
-        RoutingContext rctx = options.getRoutingContext();
-        long abortTime = DateUtils.absoluteTimeout(relTimeout);
+        // options.setClampInitialWait(60 * 30);
+        // options.setMaxTransfers(1000);
         ShortestPathTree spt = new EarliestArrivalShortestPathTree(options); 
         State initialState = new State(options);
         spt.add(initialState);
 
-        OTPPriorityQueueFactory qFactory = BinHeap.FACTORY;
-        int initialSize = rctx.graph.getVertices().size();
-        initialSize = (int) Math.ceil(2 * (Math.sqrt((double) initialSize + 1)));
-        OTPPriorityQueue<State> pq = qFactory.create(initialSize);
+        OTPPriorityQueue<State> pq = new BinHeap<State>();
         pq.insert(initialState, 0);
 
-        while (!pq.empty()) { // Until the priority queue is empty:
-//            if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
-//                LOG.warn("Search timeout. origin={} target={}", rctx.origin, rctx.target);
-//                return null;
-//            }
+        while (!pq.empty()) {
             State u = pq.extract_min();
             Vertex u_vertex = u.getVertex();
+            if (!spt.visit(u))
+                continue;
             Collection<Edge> edges = options.isArriveBy() ? u_vertex.getIncoming() : u_vertex.getOutgoing();
             for (Edge edge : edges) {
                 for (State v = edge.traverse(u); v != null; v = v.getNextResult()) {
@@ -82,7 +72,7 @@ public class EarliestArrivalSPTService implements SPTService {
                         continue;
                     }
                     if (spt.add(v)) {
-                        pq.insert(v, v.getElapsedTime()); // activeTime?
+                        pq.insert(v, v.getActiveTime()); // activeTime?
                     } 
                 }
             }
@@ -90,6 +80,7 @@ public class EarliestArrivalSPTService implements SPTService {
         return spt;
     }
 
+    // Move this into State
     private boolean isWorstTimeExceeded(State v, RoutingRequest opt) {
         if (opt.isArriveBy())
             return v.getTime() < opt.worstTime;
