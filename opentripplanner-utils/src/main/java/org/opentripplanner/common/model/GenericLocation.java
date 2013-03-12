@@ -84,6 +84,13 @@ public class GenericLocation {
     }
     
     /**
+     * Constructs a GenericLocation with coordinates only.
+     */
+    public GenericLocation(Coordinate coord) {
+        this(coord.y, coord.x);
+    }
+    
+    /**
      * Constructs a GenericLocation with coordinates and heading.
      */
     public GenericLocation(double lat, double lng, double heading) {

@@ -113,4 +113,12 @@ public class GenericLocationTest {
         assertEquals(137.2, loc.getHeading().doubleValue(), 0.0);
         assertEquals("1.0,2.0", loc.toString());
     }
+    
+    @Test
+    public void testFromCoord() {
+        Coordinate expectedCoord = new Coordinate(2.0, 1.0);
+        GenericLocation loc = new GenericLocation(expectedCoord);
+        assertEquals(expectedCoord, loc.getCoordinate());
+        assertEquals("1.0,2.0", loc.toString());
+    }
 }
