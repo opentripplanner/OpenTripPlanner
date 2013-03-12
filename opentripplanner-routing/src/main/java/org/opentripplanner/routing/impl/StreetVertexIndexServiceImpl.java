@@ -83,13 +83,14 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     /* all distance constants here are plate-carée Euclidean, 0.001 ~= 100m at equator */
 
-    // edges will only be found if they are closer than this distance
+    // Edges will only be found if they are closer than this distance
     public static final double MAX_DISTANCE_FROM_STREET = 0.01000;
 
-    // maximum difference in distance for two geometries to be considered coincident
+    // Maximum difference in distance for two geometries to be considered coincident
     public static final double DISTANCE_ERROR = 0.000001;
 
-    // if a point is within MAX_CORNER_DISTANCE, it is treated as at the corner
+    // If a point is within MAX_CORNER_DISTANCE, it is treated as at the corner.
+    // This distance is a euclidean distance in lat/lng space.
     private static final double MAX_CORNER_DISTANCE = 0.0001;
 
     static final Logger _log = LoggerFactory.getLogger(StreetVertexIndexServiceImpl.class);
@@ -171,16 +172,17 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     /**
      * Gets the closest vertex to a coordinate. If necessary, this vertex will be created by splitting nearby edges (non-permanently).
      */
-    private Vertex getClosestVertex(final Coordinate coordinate, String name, RoutingRequest options) {
-        return getClosestVertex(coordinate, name, options, null);
+    private Vertex getClosestVertex(final GenericLocation location, String name, RoutingRequest options) {
+        return getClosestVertex(location, name, options, null);
     }
 
-    private Vertex getClosestVertex(final Coordinate coordinate, String name,
+    private Vertex getClosestVertex(final GenericLocation location, String name,
             RoutingRequest options, List<Edge> extraEdges) {
-        _log.debug("Looking for/making a vertex near {}", coordinate);
+        _log.debug("Looking for/making a vertex near {}", location);
 
         // first, check for intersections very close by
-        StreetVertex intersection = getIntersectionAt(coordinate, MAX_CORNER_DISTANCE);
+        Coordinate coord = location.getCoordinate();
+        StreetVertex intersection = getIntersectionAt(coord, MAX_CORNER_DISTANCE);
         if (intersection != null) {
             // coordinate is at a street corner or endpoint
             if (name == null) {
@@ -210,7 +212,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 }
             }
             StreetLocation closest = new StreetLocation(graph, "corner " + Math.random(),
-                    coordinate, name);
+                    coord, name);
             FreeEdge e = new FreeEdge(closest, intersection);
             closest.getExtra().add(e);
             e = new FreeEdge(intersection, closest);
@@ -225,8 +227,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         // elsewhere options=null means no restrictions, find anything.
         // here we skip examining stops, as they are really only relevant when transit is being used
         if (options != null && options.getModes().isTransit()) {
-            for (Vertex v : getLocalTransitStops(coordinate, 1000)) {
-                double d = distanceLibrary.distance(v.getCoordinate(), coordinate);
+            for (Vertex v : getLocalTransitStops(coord, 1000)) {
+                double d = distanceLibrary.distance(v.getCoordinate(), coord);
                 if (d < closestStopDistance) {
                     closestStopDistance = d;
                     closestStop = v;
@@ -237,21 +239,21 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
         // then find closest walkable street
         StreetLocation closestStreet = null;
-        CandidateEdgeBundle bundle = getClosestEdges(coordinate, options, extraEdges, null, false);
+        CandidateEdgeBundle bundle = getClosestEdges(coord, options, extraEdges, null, false);
         CandidateEdge candidate = bundle.best;
         double closestStreetDistance = Double.POSITIVE_INFINITY;
         if (candidate != null) {
             StreetEdge bestStreet = candidate.edge;
             Coordinate nearestPoint = candidate.nearestPointOnEdge;
-            closestStreetDistance = distanceLibrary.distance(coordinate, nearestPoint);
+            closestStreetDistance = distanceLibrary.distance(coord, nearestPoint);
             _log.debug("best street: {} dist: {}", bestStreet.toString(), closestStreetDistance);
             if (name == null) {
                 name = bestStreet.getName();
             }
             String closestName = String
-                    .format("%s_%s", bestStreet.getName(), coordinate.toString());
+                    .format("%s_%s", bestStreet.getName(), location.toString());
             closestStreet = StreetLocation.createStreetLocation(graph, closestName, name,
-                    bundle.toEdgeList(), nearestPoint, coordinate);
+                    bundle.toEdgeList(), nearestPoint, coord);
         }
 
         // decide whether to return street, or street + stop
@@ -465,10 +467,10 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         Coordinate c = loc.getCoordinate();
         if (c != null) {
             if (other instanceof StreetLocation) {
-                return getClosestVertex(c, loc.getName(), options,
+                return getClosestVertex(loc, loc.getName(), options,
                         ((StreetLocation) other).getExtra());
             } else {
-                return getClosestVertex(c, loc.getName(), options);
+                return getClosestVertex(loc, loc.getName(), options);
             }
         }
 
