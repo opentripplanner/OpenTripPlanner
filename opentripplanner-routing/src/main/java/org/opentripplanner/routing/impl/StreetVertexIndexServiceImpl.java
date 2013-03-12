@@ -171,11 +171,11 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     /**
      * Gets the closest vertex to a coordinate. If necessary, this vertex will be created by splitting nearby edges (non-permanently).
      */
-    public Vertex getClosestVertex(final Coordinate coordinate, String name, RoutingRequest options) {
+    private Vertex getClosestVertex(final Coordinate coordinate, String name, RoutingRequest options) {
         return getClosestVertex(coordinate, name, options, null);
     }
 
-    public Vertex getClosestVertex(final Coordinate coordinate, String name,
+    private Vertex getClosestVertex(final Coordinate coordinate, String name,
             RoutingRequest options, List<Edge> extraEdges) {
         _log.debug("Looking for/making a vertex near {}", coordinate);
 
@@ -454,6 +454,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         return getVertexForLocation(location, options, null);
     }
 
+    
+    
     /**
      * @param other: non-null when another vertex has already been found. When the from vertex has already been made/found, that vertex is passed in
      *        when finding/creating the to vertex. TODO: This appears to be for reusing the extra edges list -- is this still needed?
@@ -480,4 +482,5 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         // this should probably only be used in tests.
         return graph.getVertex(place);
     }
+    
 }
