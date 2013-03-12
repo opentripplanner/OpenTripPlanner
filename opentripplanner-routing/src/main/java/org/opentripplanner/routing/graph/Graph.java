@@ -88,7 +88,7 @@ public class Graph implements Serializable {
 
     /* vertex index by name is reconstructed from edges */
     private transient Map<String, Vertex> vertices;
-
+    
     private transient CalendarService calendarService;
 
     private boolean debugData = true;
@@ -384,7 +384,7 @@ public class Graph implements Serializable {
             LOG.debug("Loading edges...");
             List<Edge> edges = (ArrayList<Edge>) in.readObject();
             graph.vertices = new HashMap<String, Vertex>();
-            ;
+            
             for (Edge e : edges) {
                 graph.vertices.put(e.getFromVertex().getLabel(), e.getFromVertex());
                 graph.vertices.put(e.getToVertex().getLabel(), e.getToVertex());
