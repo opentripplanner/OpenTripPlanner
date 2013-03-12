@@ -50,9 +50,19 @@ public class EarliestArrivalSPTService implements SPTService {
 
     public ShortestPathTree getShortestPathTree(RoutingRequest options, double relTimeout,
             SearchTerminationStrategy terminationStrategy) {
+        
+        // clone options before modifying, otherwise disabling resource limiting will cause 
+        // SPT cache misses for subsequent requests.
+        options = options.clone();
+        
+        // disable any resource limiting, which is algorithmically invalid here
+        options.setMaxTransfers(Integer.MAX_VALUE);
+        options.setMaxWalkDistance(Double.MAX_VALUE);
+        if (options.getClampInitialWait() < 0)
+            options.setClampInitialWait(60 * 30);
 
-        // options.setClampInitialWait(60 * 30);
-        // options.setMaxTransfers(1000);
+        // SPT cache does not look at routing request in SPT to perform lookup, 
+        // so it's OK to construct with the local cloned one
         ShortestPathTree spt = new EarliestArrivalShortestPathTree(options); 
         State initialState = new State(options);
         spt.add(initialState);
