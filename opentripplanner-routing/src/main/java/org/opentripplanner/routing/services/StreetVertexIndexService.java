@@ -67,19 +67,6 @@ public interface StreetVertexIndexService {
     public CandidateEdgeBundle getClosestEdges(LocationObservation location,
             TraversalRequirements reqs);
 
-    /**
-     * Get the closest edges to this location.
-     * 
-     * @param coordinate location around which to search.
-     * @param options request which must be able to traverse the edges.
-     * @param extraEdges additional edges to consider (may be null)
-     * @param preferredEdges edges which are preferred (may be null)
-     * @param possibleTransitLinksOnly only include possible transit links.
-     * @return
-     */
-    public CandidateEdgeBundle getClosestEdges(Coordinate coordinate, RoutingRequest options,
-            List<Edge> extraEdges, Collection<Edge> preferredEdges, boolean possibleTransitLinksOnly);
-
     public List<TransitStop> getNearbyTransitStops(Coordinate coordinate, double radius);
 
     public List<TransitStop> getNearbyTransitStops(Coordinate coordinateOne,
