@@ -36,7 +36,6 @@ import org.opentripplanner.api.thrift.util.RoutingRequestBuilder;
 import org.opentripplanner.api.thrift.util.TravelModeSet;
 import org.opentripplanner.api.thrift.util.TripPathsExtension;
 import org.opentripplanner.common.model.GenericLocation;
-import org.opentripplanner.routing.core.LocationObservation;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -53,7 +52,6 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.geom.Coordinate;
 
 /**
  * Concrete implementation of the Thrift interface.
