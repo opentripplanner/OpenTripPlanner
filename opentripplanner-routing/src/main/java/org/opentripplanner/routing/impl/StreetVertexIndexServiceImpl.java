@@ -283,7 +283,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     }
 
     @Override
-    public Collection<StreetEdge> getEdgesForEnvelope(Envelope envelope){
+    public Collection<StreetEdge> getEdgesForEnvelope(Envelope envelope) {
         return edgeTree.query(envelope);
     }
 
@@ -458,9 +458,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     }
 
     /**
-     * @param other: non-null when another vertex has already been found. When the from vertex has
-     * already been made/found, that vertex is passed in when finding/creating the to vertex. 
-     * TODO: This appears to be for reusing the extra edges list -- is this still needed?
+     * @param other: non-null when another vertex has already been found. When the from vertex has already been made/found, that vertex is passed in
+     *        when finding/creating the to vertex. TODO: This appears to be for reusing the extra edges list -- is this still needed?
      */
     @Override
     public Vertex getVertexForLocation(GenericLocation loc, RoutingRequest options, Vertex other) {
@@ -473,7 +472,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 return getClosestVertex(c, loc.getName(), options);
             }
         }
-        
+
         // No Coordinate available.
         String place = loc.getPlace();
         if (place == null) {
@@ -482,6 +481,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
         // did not match lat/lon, interpret place as a vertex label.
         // this should probably only be used in tests.
-        return graph.getVertex(place);        
+        return graph.getVertex(place);
     }
 }
