@@ -68,7 +68,7 @@ public class IntersectionVertex extends StreetVertex {
         }
         
         if (inferredFreeFlowing()) {
-            LOG.debug("Inferred that IntersectionVertex {} is free-flowing", getIndex());
+            //LOG.debug("Inferred that IntersectionVertex {} is free-flowing", getIndex());
             return 0;
         }
                 
