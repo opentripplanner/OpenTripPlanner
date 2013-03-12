@@ -32,28 +32,6 @@ import com.vividsolutions.jts.geom.Envelope;
 public interface StreetVertexIndexService {
 
     /**
-     * Get the closest vertex that can be traversed by this request.
-     * 
-     * @param location the location around which to search
-     * @param name the name to attach to the vertex
-     * @param request
-     * @return
-     */
-    public Vertex getClosestVertex(final Coordinate location, String name, RoutingRequest request);
-
-    /**
-     * Get the closest vertex that can be traversed by this request.
-     * 
-     * @param location the location around which to search
-     * @param name the name to attach to the vertex
-     * @param request
-     * @param extraEdges edges not in the graph that should be included in the search
-     * @return
-     */
-    public Vertex getClosestVertex(final Coordinate location, String name, RoutingRequest request,
-            List<Edge> extraEdges);
-
-    /**
      * Returns the vertices intersecting with the specified envelope.
      * 
      * @param envelope

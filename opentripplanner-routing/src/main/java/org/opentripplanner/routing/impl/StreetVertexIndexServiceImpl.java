@@ -22,8 +22,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -32,7 +30,6 @@ import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.GenericLocation;
-import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.routing.core.LocationObservation;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraversalRequirements;
