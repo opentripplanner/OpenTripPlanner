@@ -645,7 +645,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         // FIXME here, or in test, and/or in other places like TSP that use this method
         // if (rctx != null)
         // this.rctx.destroy();
-        this.rctx = new RoutingContext(this, graph, from, to, false);
+        this.rctx = new RoutingContext(this, graph, from, to);
     }
 
     /** For use in tests. Force RoutingContext to specific vertices rather than making temp edges. */

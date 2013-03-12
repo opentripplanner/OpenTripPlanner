@@ -119,6 +119,8 @@ public class RoutingContext implements Cloneable {
     /**
      * Flexible constructor which may compute to/from vertices.
      * 
+     * TODO(flamholz): delete this flexible constructor and move the logic to constructors above appropriately.
+     * 
      * @param routingRequest
      * @param graph
      * @param from
