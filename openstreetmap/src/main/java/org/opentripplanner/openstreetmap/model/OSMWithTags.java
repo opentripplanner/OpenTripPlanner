@@ -267,4 +267,17 @@ public class OSMWithTags {
     public boolean isPedestrianExplicitlyAllowed() {
         return doesTagAllowAccess("foot");
     }
+
+    /**
+     * Returns true if through traffic is not allowed.
+     * 
+     * @return
+     */
+    public boolean isThroughTrafficExplicitlyDisallowed() {
+        String access = getTag("access");
+        boolean noThruTraffic = "destination".equals(access) || "private".equals(access)
+                || "customers".equals(access) || "delivery".equals(access)
+                || "forestry".equals(access) || "agricultural".equals(access);
+        return noThruTraffic;
+    }
 }

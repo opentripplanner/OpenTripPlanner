@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Set;
 
 import lombok.Setter;
-import lombok.Getter;
 
 import org.opentripplanner.common.DisjointSet;
 import org.opentripplanner.common.RepeatingTimePeriod;
@@ -805,7 +804,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 int capacity = Integer.MAX_VALUE;
                 if (node.hasTag("capacity")) {
                     try {
-                        capacity = Integer.parseInt(node.getTag("capacity"));
+                        capacity = node.getCapacity();
                     } catch (NumberFormatException e) {
                         _log.warn("Capacity for osm node " + node.getId() + " (" + creativeName
                                 + ") is not a number: " + node.getTag("capacity"));
@@ -1525,10 +1524,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             Set<Alert> note = wayPropertySet.getNoteForWay(way);
             Set<Alert> wheelchairNote = getWheelchairNotes(way);
-            String access = way.getTag("access");
-            boolean noThruTraffic = "destination".equals(access) || "private".equals(access)
-                    || "customers".equals(access) || "delivery".equals(access)
-                    || "forestry".equals(access) || "agricultural".equals(access);
+            boolean noThruTraffic = way.isThroughTrafficExplicitlyDisallowed();
 
             if (street != null) {
                 double safety = wayData.getSafetyFeatures().getFirst();
@@ -1850,22 +1846,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                             .equals("raceway")))
                 return false;
 
-            String access = way.getTag("access");
-
-            if (access != null) {
-                if ("no".equals(access) || "license".equals(access)) {
-                    if (way.doesTagAllowAccess("motorcar")) {
-                        return true;
-                    }
-                    if (way.doesTagAllowAccess("bicycle")) {
-                        return true;
-                    }
-                    if (way.doesTagAllowAccess("foot")) {
-                        return true;
-                    }
-                    return false;
-                }
+            if (way.isGeneralAccessDenied()) {
+                // There are exceptions.
+                return (way.isMotorcarExplicitlyAllowed() || way.isBicycleExplicitlyAllowed() || way
+                        .isPedestrianExplicitlyAllowed());
             }
+            
             return true;
         }
 
@@ -2499,15 +2485,15 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
              */
 
             // Compute pedestrian permissions.
-            if (way.isPedestrianAllowed()) {
+            if (way.isPedestrianExplicitlyAllowed()) {
                 permissions = permissions.add(StreetTraversalPermission.PEDESTRIAN);
-            } else if (way.isPedestrianExplicitlyDisallowed()) {
+            } else if (way.isPedestrianExplicitlyDenied()) {
                 permissions = permissions.remove(StreetTraversalPermission.PEDESTRIAN);
             }
 
             // Compute bike permissions, check consistency.
             boolean forceBikes = false;
-            if (way.isBicycleAllowed()) {
+            if (way.isBicycleExplicitlyAllowed()) {
                 permissions = permissions.add(StreetTraversalPermission.BICYCLE);
                 forceBikes = true;
             }
@@ -2520,17 +2506,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
 
             return permissions;
-        }
-
-        /**
-         * Is this a multi-level node that should be decomposed to multiple coincident nodes? Currently returns true only for elevators.
-         * 
-         * @param node
-         * @return whether the node is multi-level
-         * @author mattwigway
-         */
-        private boolean isMultiLevelNode(OSMNode node) {
-            return node.hasTag("highway") && "elevator".equals(node.getTag("highway"));
         }
 
         /**
@@ -2576,7 +2551,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             // use the numeric level because it is unique, the human level may not be (although
             // it will likely lead to some head-scratching if it is not).
             IntersectionVertex iv = null;
-            if (isMultiLevelNode(node)) {
+            if (node.isMultiLevel()) {
                 // make a separate node for every level
                 return recordLevel(node, way);
             }
