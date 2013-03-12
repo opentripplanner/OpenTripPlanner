@@ -21,10 +21,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.opentripplanner.common.MavenVersion;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
-import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Vertex;
 
 /**
@@ -112,7 +110,6 @@ public class EarliestArrivalShortestPathTree extends AbstractShortestPathTree {
     @Override
     public boolean visit(State s) {
         final State existing = states.get(s.getVertex());
-        
         return (s == existing);
     }
 
