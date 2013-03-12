@@ -51,7 +51,7 @@ public interface StreetVertexIndexService {
      * @param possibleTransitLinksOnly Only include possible transit links.
      * @return
      */
-    public CandidateEdgeBundle getClosestEdges(LocationObservation location,
+    public CandidateEdgeBundle getClosestEdges(GenericLocation location,
             TraversalRequirements reqs, List<Edge> extraEdges, Collection<Edge> preferredEdges,
             boolean possibleTransitLinksOnly);
 
@@ -64,7 +64,7 @@ public interface StreetVertexIndexService {
      * @param prefs
      * @return
      */
-    public CandidateEdgeBundle getClosestEdges(LocationObservation location,
+    public CandidateEdgeBundle getClosestEdges(GenericLocation location,
             TraversalRequirements reqs);
 
     public List<TransitStop> getNearbyTransitStops(Coordinate coordinate, double radius);

@@ -239,7 +239,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
         // then find closest walkable street
         StreetLocation closestStreet = null;
-        CandidateEdgeBundle bundle = getClosestEdges(coord, options, extraEdges, null, false);
+        CandidateEdgeBundle bundle = getClosestEdges(location, options, extraEdges, null, false);
         CandidateEdge candidate = bundle.best;
         double closestStreetDistance = Double.POSITIVE_INFINITY;
         if (candidate != null) {
@@ -288,7 +288,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     @Override
     @SuppressWarnings("unchecked")
-    public CandidateEdgeBundle getClosestEdges(LocationObservation location,
+    public CandidateEdgeBundle getClosestEdges(GenericLocation location,
             TraversalRequirements reqs, List<Edge> extraEdges, Collection<Edge> preferredEdges,
             boolean possibleTransitLinksOnly) {
         Coordinate coordinate = location.getCoordinate();
@@ -369,7 +369,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     }
 
     @Override
-    public CandidateEdgeBundle getClosestEdges(LocationObservation location,
+    public CandidateEdgeBundle getClosestEdges(GenericLocation location,
             TraversalRequirements reqs) {
         return getClosestEdges(location, reqs, null, null, false);
     }
@@ -384,16 +384,13 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
      * @param possibleTransitLinksOnly only return edges traversable by cars or are platforms
      * @return
      */
-    public CandidateEdgeBundle getClosestEdges(Coordinate coordinate, RoutingRequest request,
+    private CandidateEdgeBundle getClosestEdges(GenericLocation location, RoutingRequest request,
             List<Edge> extraEdges, Collection<Edge> preferredEdges, boolean possibleTransitLinksOnly) {
-        // Make a LocationObservation from a coordinate.
-        LocationObservation loc = new LocationObservation(coordinate);
-
         // NOTE(flamholz): if request is null, will initialize TraversalRequirements
         // that accept all modes of travel.
         TraversalRequirements reqs = new TraversalRequirements(request);
 
-        return getClosestEdges(loc, reqs, extraEdges, preferredEdges, possibleTransitLinksOnly);
+        return getClosestEdges(location, reqs, extraEdges, preferredEdges, possibleTransitLinksOnly);
     }
 
     public StreetVertex getIntersectionAt(Coordinate coordinate) {

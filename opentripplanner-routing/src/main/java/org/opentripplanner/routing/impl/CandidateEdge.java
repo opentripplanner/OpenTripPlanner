@@ -5,6 +5,7 @@ import lombok.Getter;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.core.LocationObservation;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -118,7 +119,7 @@ public class CandidateEdge {
      * @param pref
      * @param mode
      */
-    public CandidateEdge(StreetEdge e, LocationObservation loc, double pref, TraverseModeSet mode) {
+    public CandidateEdge(StreetEdge e, GenericLocation loc, double pref, TraverseModeSet mode) {
         preference = pref;
         edge = e;
         edgeCoords = e.getGeometry().getCoordinateSequence();
@@ -161,7 +162,7 @@ public class CandidateEdge {
      * @param mode
      */
     public CandidateEdge(StreetEdge e, Coordinate p, double pref, TraverseModeSet mode) {
-        this(e, new LocationObservation(p), pref, mode);
+        this(e, new GenericLocation(p), pref, mode);
     }
 
     public boolean endwise() {
