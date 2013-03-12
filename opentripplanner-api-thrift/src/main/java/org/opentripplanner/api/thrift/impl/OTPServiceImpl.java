@@ -194,15 +194,14 @@ public class OTPServiceImpl implements OTPService.Iface {
         requirements.setModes(new TravelModeSet(req.getAllowed_modes()).toTraverseModeSet());
 
         // Set up the LocationObservation.
-        Coordinate c = new LatLngExtension(req.getLocation().getLat_lng()).toCoordinate();
-        LocationObservation.Builder builder = new LocationObservation.Builder().setCoordinate(c);
-        if (req.isSetHeading()) builder.setHeading(req.getHeading());
+        GenericLocation loc = new LatLngExtension(req.getLocation().getLat_lng()).toGenericLocation();
+        if (req.isSetHeading()) loc.setHeading(req.getHeading());
         
-        // Find the candidate edges. 
+        // Find the candidate edges.
         // NOTE(flamholz): for now this will return at smallish number of edges because of
         // the internal binning that's going on. I'd rather get more edges just in case...
         StreetVertexIndexService streetVertexIndex = getStreetIndex();
-        CandidateEdgeBundle edges = streetVertexIndex.getClosestEdges(builder.build(), requirements);
+        CandidateEdgeBundle edges = streetVertexIndex.getClosestEdges(loc, requirements);
 
         // Add matches to the response.
         FindNearestEdgesResponse res = new FindNearestEdgesResponse();
