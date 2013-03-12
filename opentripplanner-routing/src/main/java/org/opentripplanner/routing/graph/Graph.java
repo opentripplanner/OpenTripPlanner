@@ -55,7 +55,9 @@ import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TimetableSnapshotSource;
+import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
+import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -369,9 +371,31 @@ public class Graph implements Serializable {
         return load(new ObjectInputStream(is), level);
     }
 
-    @SuppressWarnings("unchecked")
+    /**
+     * Default load. Uses DefaultStreetVertexIndexFactory.
+     * @param in
+     * @param level
+     * @return
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
     public static Graph load(ObjectInputStream in, LoadLevel level) throws IOException,
             ClassNotFoundException {
+        return load(in, level, new DefaultStreetVertexIndexFactory());
+    }
+    
+    /**
+     * Loading which allows you to specify StreetVertexIndexFactory and inject other implementation.
+     * @param in
+     * @param level
+     * @param indexFactory
+     * @return
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
+    @SuppressWarnings("unchecked")
+    public static Graph load(ObjectInputStream in, LoadLevel level,
+            StreetVertexIndexFactory indexFactory) throws IOException, ClassNotFoundException {
         try {
             Graph graph = (Graph) in.readObject();
             LOG.debug("Basic graph info read.");
@@ -393,10 +417,13 @@ public class Graph implements Serializable {
             for (Vertex v : graph.getVertices())
                 v.compact();
             LOG.info("Main graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
-            graph.streetIndex = new StreetVertexIndexServiceImpl(graph);
+            
+            graph.streetIndex = indexFactory.newIndex(graph);
             LOG.debug("street index built.");
+            
             if (level == LoadLevel.FULL)
                 return graph;
+            
             if (graph.debugData) {
                 graph.graphBuilderAnnotations = (List<GraphBuilderAnnotation>) in.readObject();
                 graph.vertexById = (List<Vertex>) in.readObject();
