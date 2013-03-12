@@ -97,4 +97,20 @@ public class GenericLocationTest {
         assertEquals(input, loc.toString());
     }
     
+    @Test
+    public void testFromLatLng() {
+        GenericLocation loc = new GenericLocation(1.0, 2.0);
+        Coordinate expectedCoord = new Coordinate(2.0, 1.0);
+        assertEquals(expectedCoord, loc.getCoordinate());
+        assertEquals("1.0,2.0", loc.toString());
+    }
+    
+    @Test
+    public void testFromLatLngHeading() {
+        GenericLocation loc = new GenericLocation(1.0, 2.0, 137.2);
+        Coordinate expectedCoord = new Coordinate(2.0, 1.0);
+        assertEquals(expectedCoord, loc.getCoordinate());
+        assertEquals(137.2, loc.getHeading().doubleValue(), 0.0);
+        assertEquals("1.0,2.0", loc.toString());
+    }
 }

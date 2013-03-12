@@ -47,6 +47,17 @@ public class GenericLocation {
     private Double lat;
 
     private Double lng;
+    
+    /**
+     * Observed heading if any.
+     * 
+     * Direction of travel in decimal degrees from -180° to +180° relative to
+     * true north.
+     * 
+     * 0      = heading true north.
+     * +/-180 = heading south.
+     */
+    private Double heading;
 
     // Pattern for parsing lat,lng strings.
     private static final String _doublePattern = "-{0,1}\\d+(\\.\\d+){0,1}";
@@ -55,7 +66,7 @@ public class GenericLocation {
             + ")(\\s*,\\s*|\\s+)(" + _doublePattern + ")\\s*$");
 
     /**
-     * Constructs a GenericLocation with coordinates only.
+     * Constructs an empty GenericLocation.
      */
     public GenericLocation() {
         this.name = "";
@@ -63,13 +74,24 @@ public class GenericLocation {
     }
 
     /**
-     * Constructs an empty GenericLocation.
+     * Constructs a GenericLocation with coordinates only.
      */
     public GenericLocation(double lat, double lng) {
         this.name = "";
         this.place = "";
         this.lat = lat;
         this.lng = lng;
+    }
+    
+    /**
+     * Constructs a GenericLocation with coordinates and heading.
+     */
+    public GenericLocation(double lat, double lng, double heading) {
+        this.name = "";
+        this.place = "";
+        this.lat = lat;
+        this.lng = lng;
+        this.heading = heading;
     }
     
     /**
@@ -144,9 +166,14 @@ public class GenericLocation {
      */
     @Override
     public String toString() {
-        if (this.name == null || this.name.isEmpty()) {
-            return this.place;
+        if (this.place != null && !this.place.isEmpty()) {
+            if (this.name == null || this.name.isEmpty()) {
+                return this.place;
+            } else {
+                return String.format("%s::%s", this.name, this.place);
+            }
         }
-        return String.format("%s::%s", this.name, this.place);
+        
+        return String.format("%s,%s", this.lat, this.lng);
     }
 }
