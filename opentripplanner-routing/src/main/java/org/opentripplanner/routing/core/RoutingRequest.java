@@ -261,7 +261,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     private boolean useBikeRentalAvailabilityInformation = false;
 
     /**
-     * The maximum wait time the user is willing to delay trip start. Only effective in Analyst.
+     * The maximum wait time in seconds the user is willing to delay trip start. Only effective in Analyst.
      */
     public long clampInitialWait;
 
