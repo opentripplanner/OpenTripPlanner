@@ -56,7 +56,6 @@ import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TimetableSnapshotSource;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
-import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.slf4j.Logger;
@@ -300,7 +299,7 @@ public class Graph implements Serializable {
     }
 
     /* this will require a rehash of any existing hashtables keyed on vertices */
-    public void renumberVerticesAndEdges() {
+    public void rebuildVertexAndEdgeIndices() {
         this.vertexById = Arrays.asList(new Vertex[AbstractVertex.getMaxIndex()]);
         for (Vertex v : getVertices()) {
             vertexById.set(v.getIndex(), v);
@@ -312,6 +311,8 @@ public class Graph implements Serializable {
         for (Vertex v : this.vertexById) {
             if (v == null)
                 continue;
+            
+            // Assumes that all the edges appear in at least one outgoing edge list.
             for (Edge e : v.getOutgoing()) {
                 // check for non-null?
                 this.edgeById.put(e.getId(), e);
@@ -499,7 +500,7 @@ public class Graph implements Serializable {
                 LOG.debug("vertex {} has no edges, it will not survive serialization.", v);
         }
         LOG.debug("Assigning vertex/edge ID numbers...");
-        this.renumberVerticesAndEdges();
+        this.rebuildVertexAndEdgeIndices();
         LOG.debug("Writing edges...");
         out.writeObject(this);
         out.writeObject(edges);
