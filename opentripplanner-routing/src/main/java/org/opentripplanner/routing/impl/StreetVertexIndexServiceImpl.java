@@ -59,23 +59,24 @@ import com.vividsolutions.jts.index.strtree.STRtree;
  * Creates a StreetLocation representing a location on a street that's not at an intersection, based on input latitude and longitude. Instantiating
  * this class is expensive, because it creates a spatial index of all of the intersections in the graph.
  */
-// @Component
 public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
-    private Graph graph;
+    // Members are protected so that custom subclasses can access them.
+    
+    protected Graph graph;
 
     /**
      * Contains only instances of {@link StreetEdge}
      */
-    private SpatialIndex edgeTree;
+    protected SpatialIndex edgeTree;
 
-    private STRtree transitStopTree;
+    protected STRtree transitStopTree;
 
-    private STRtree intersectionTree;
+    protected STRtree intersectionTree;
 
     @Getter
     @Setter
-    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
+    protected DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     // private static final double SEARCH_RADIUS_M = 100; // meters
     // private static final double SEARCH_RADIUS_DEG = DistanceLibrary.metersToDegrees(SEARCH_RADIUS_M);
@@ -167,15 +168,33 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         }
         return results;
     }
-
+    
     /**
-     * Gets the closest vertex to a coordinate. If necessary, this vertex will be created by splitting nearby edges (non-permanently).
+     * Convenience helper for when extraEdges is empty/null.
+     * 
+     * @param location
+     * @param name
+     * @param options
+     * @return
      */
-    private Vertex getClosestVertex(final GenericLocation location, String name, RoutingRequest options) {
+    private Vertex getClosestVertex(final GenericLocation location, String name,
+            RoutingRequest options) {
         return getClosestVertex(location, name, options, null);
     }
 
-    private Vertex getClosestVertex(final GenericLocation location, String name,
+    /**
+     * Returns the closest vertex for this GenericLocation. If necessary, this vertex will be created by splitting nearby edges (non-permanently).
+     * 
+     * This method is the heart of the logic that searches for the start and endpoints of RideRequests. As such, it is protected so that subclasses
+     * can override the search behavior.
+     * 
+     * @param location
+     * @param name
+     * @param options
+     * @param extraEdges
+     * @return
+     */
+    protected Vertex getClosestVertex(final GenericLocation location, String name,
             RoutingRequest options, List<Edge> extraEdges) {
         _log.debug("Looking for/making a vertex near {}", location);
 
@@ -376,6 +395,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     /**
      * Find edges closest to the given location.
      * 
+     * TODO(flamholz): consider deleting.
+     * 
      * @param coordinate Point to get edges near
      * @param request RoutingRequest that must be able to traverse the edge (all edges if null)
      * @param extraEdges Any edges not in the graph that might be included (allows trips within one block)
@@ -383,7 +404,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
      * @param possibleTransitLinksOnly only return edges traversable by cars or are platforms
      * @return
      */
-    private CandidateEdgeBundle getClosestEdges(GenericLocation location, RoutingRequest request,
+    protected CandidateEdgeBundle getClosestEdges(GenericLocation location, RoutingRequest request,
             List<Edge> extraEdges, Collection<Edge> preferredEdges, boolean possibleTransitLinksOnly) {
         // NOTE(flamholz): if request is null, will initialize TraversalRequirements
         // that accept all modes of travel.
@@ -392,6 +413,11 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         return getClosestEdges(location, reqs, extraEdges, preferredEdges, possibleTransitLinksOnly);
     }
 
+    /**
+     * Convenience wrapper that uses MAX_CORNER_DISTANCE.
+     * @param coordinate
+     * @return
+     */
     public StreetVertex getIntersectionAt(Coordinate coordinate) {
         return getIntersectionAt(coordinate, MAX_CORNER_DISTANCE);
     }
