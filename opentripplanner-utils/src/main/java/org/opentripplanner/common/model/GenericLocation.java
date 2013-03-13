@@ -150,6 +150,22 @@ public class GenericLocation {
         return new GenericLocation(name, place);
     }
     
+    /**
+     * Returns true if this.heading is not null.
+     * @return
+     */
+    public boolean hasHeading() {
+        return heading != null;
+    }
+    
+    /**
+     * Returns true if getCoordinate() will not return null.
+     * @return
+     */
+    public boolean hasCoordinate() {
+        return this.lat != null && this.lng != null;
+    }
+    
     public NamedPlace getNamedPlace() {
         return new NamedPlace(this.name, this.place);
     }
