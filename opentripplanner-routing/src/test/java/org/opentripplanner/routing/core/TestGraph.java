@@ -57,33 +57,33 @@ public class TestGraph extends TestCase {
         Graph g = new Graph();
         Vertex a = new IntersectionVertex(g, "A", 5, 5);
         Vertex b = new IntersectionVertex(g, "B", 6, 6);
-        FreeEdge ee = new FreeEdge(a,b);
+        FreeEdge ee = new FreeEdge(a, b);
         assertNotNull(ee);
     }
-    
+
     public void testGetEdgesOneEdge() {
         Graph g = new Graph();
         Vertex a = new IntersectionVertex(g, "A", 5, 5);
         Vertex b = new IntersectionVertex(g, "B", 6, 6);
-        FreeEdge ee = new FreeEdge(a,b);        
-        
+        FreeEdge ee = new FreeEdge(a, b);
+
         List<Edge> edges = new ArrayList<Edge>(g.getEdges());
         assertEquals(1, edges.size());
         assertEquals(ee, edges.get(0));
     }
-    
+
     public void testGetEdgesMultiple() {
         Graph g = new Graph();
         Vertex a = new IntersectionVertex(g, "A", 5, 5);
         Vertex b = new IntersectionVertex(g, "B", 6, 6);
         Vertex c = new IntersectionVertex(g, "C", 3, 2);
-        
+
         Set<Edge> expectedEdges = new HashSet<Edge>(4);
         expectedEdges.add(new FreeEdge(a, b));
         expectedEdges.add(new FreeEdge(b, c));
         expectedEdges.add(new FreeEdge(c, b));
-        expectedEdges.add(new FreeEdge(c, a));        
-        
+        expectedEdges.add(new FreeEdge(c, a));
+
         Set<Edge> edges = new HashSet<Edge>(g.getEdges());
         assertEquals(4, edges.size());
         assertEquals(expectedEdges, edges);
@@ -94,13 +94,13 @@ public class TestGraph extends TestCase {
         Vertex a = new IntersectionVertex(g, "A", 5, 5);
         Vertex b = new IntersectionVertex(g, "B", 6, 6);
         Vertex c = new IntersectionVertex(g, "C", 3, 2);
-        
+
         Set<Edge> allEdges = new HashSet<Edge>(4);
         allEdges.add(new FreeEdge(a, b));
         allEdges.add(new FreeEdge(b, c));
         allEdges.add(new FreeEdge(c, b));
         allEdges.add(new FreeEdge(c, a));
-        
+
         Set<StreetEdge> edges = new HashSet<StreetEdge>(g.getStreetEdges());
         assertEquals(0, edges.size());
     }
@@ -110,13 +110,13 @@ public class TestGraph extends TestCase {
         StreetVertex a = new IntersectionVertex(g, "A", 5, 5);
         StreetVertex b = new IntersectionVertex(g, "B", 6, 6);
         StreetVertex c = new IntersectionVertex(g, "C", 3, 2);
-        
+
         Set<Edge> allStreetEdges = new HashSet<Edge>(4);
         allStreetEdges.add(edge(a, b, 1.0));
         allStreetEdges.add(edge(b, c, 1.0));
         allStreetEdges.add(edge(c, b, 1.0));
         allStreetEdges.add(edge(c, a, 1.0));
-        
+
         Set<StreetEdge> edges = new HashSet<StreetEdge>(g.getStreetEdges());
         assertEquals(4, edges.size());
         assertEquals(allStreetEdges, edges);
@@ -127,32 +127,32 @@ public class TestGraph extends TestCase {
         StreetVertex a = new IntersectionVertex(g, "A", 5, 5);
         StreetVertex b = new IntersectionVertex(g, "B", 6, 6);
         StreetVertex c = new IntersectionVertex(g, "C", 3, 2);
-        
+
         Set<Edge> allEdges = new HashSet<Edge>(4);
         allEdges.add(edge(a, b, 1.0));
         allEdges.add(edge(b, c, 1.0));
         allEdges.add(edge(c, b, 1.0));
         allEdges.add(edge(c, a, 1.0));
-        
+
         // Before rebuilding the indices, they are empty.
         for (Edge e : allEdges) {
             assertNull(g.getEdgeById(e.getId()));
         }
-        
+
         for (Vertex v : g.getVertices()) {
             assertNull(g.getVertexById(v.getIndex()));
         }
-        
+
         g.rebuildVertexAndEdgeIndices();
         for (Edge e : allEdges) {
             assertEquals(e, g.getEdgeById(e.getId()));
         }
-        
+
         for (Vertex v : g.getVertices()) {
             assertEquals(v, g.getVertexById(v.getIndex()));
         }
     }
-    
+
     /**
      * Create an edge. If twoWay, create two edges (back and forth).
      * 
@@ -172,5 +172,5 @@ public class TestGraph extends TestCase {
         StreetTraversalPermission perm = StreetTraversalPermission.ALL;
         return new PlainStreetEdge(vA, vB, geom, name, length, perm, false);
     }
-    
+
 }
