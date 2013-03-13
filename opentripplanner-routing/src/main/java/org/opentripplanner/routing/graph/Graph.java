@@ -28,7 +28,6 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectStreamClass;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -62,6 +61,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -94,7 +94,7 @@ public class Graph implements Serializable {
 
     private boolean debugData = true;
 
-    private transient List<Vertex> vertexById;
+    private transient Map<Integer, Vertex> vertexById;
 
     private transient Map<Integer, Edge> edgeById;
 
@@ -121,9 +121,11 @@ public class Graph implements Serializable {
 
     public Graph() {
         this.vertices = new ConcurrentHashMap<String, Vertex>();
-        temporaryEdges = Collections.newSetFromMap(new ConcurrentHashMap<Edge, Boolean>());
+        this.temporaryEdges = Collections.newSetFromMap(new ConcurrentHashMap<Edge, Boolean>());
+        this.edgeById = new ConcurrentHashMap<Integer, Edge>();
+        this.vertexById = new ConcurrentHashMap<Integer, Vertex>();
     }
-
+    
     /**
      * Add the given vertex to the graph. Ideally, only vertices should add themselves to the graph, when they are constructed or deserialized.
      * 
@@ -139,13 +141,19 @@ public class Graph implements Serializable {
         }
     }
 
-    // called from streetutils, must be public for now
-    // could makeEdgeBased be moved into Graph or graph package?
+    /**
+     * Removes a vertex from the graph.
+     * 
+     * Called from streetutils, must be public for now
+     * 
+     * @param v
+     */
     public void removeVertex(Vertex v) {
-        if (vertices.remove(v.getLabel()) != v)
+        if (vertices.remove(v.getLabel()) != v) {
             LOG.error(
                     "attempting to remove vertex that is not in graph (or mapping value was null): {}",
                     v);
+        }        
     }
 
     /* convenient in tests and such, but avoid using in general */
@@ -153,21 +161,48 @@ public class Graph implements Serializable {
     public Vertex getVertex(String label) {
         return vertices.get(label);
     }
+    
+    /**
+     * Returns the vertex with the given ID or null if none is present.
+     * 
+     * NOTE: you may need to run rebuildVertexAndEdgeIndices() for the indices
+     * to be accurate.
+     * 
+     * @param id
+     * @return
+     */
+    public Vertex getVertexById(int id) {
+        return this.vertexById.get(id);
+    }
 
+    /**
+     * Get all the vertices in the graph.
+     * @return
+     */
     public Collection<Vertex> getVertices() {
         return this.vertices.values();
     }
-
+    
+    /**
+     * Returns the edge with the given ID or null if none is present.
+     * 
+     * NOTE: you may need to run rebuildVertexAndEdgeIndices() for the indices
+     * to be accurate.
+     * 
+     * @param id
+     * @return
+     */
+    public Edge getEdgeById(int id) {
+        return edgeById.get(id);
+    }
+    
     /**
      * Return all the edges in the graph.
      * @return
      */
     public Collection<Edge> getEdges() {
-        Collection<Vertex> vertices = this.getVertices();
         Set<Edge> edges = new HashSet<Edge>();
-
-        for (Vertex v : vertices) {
-            edges.addAll(v.getIncoming());
+        for (Vertex v : this.getVertices()) {
             edges.addAll(v.getOutgoing());
         }
         return edges;
@@ -178,18 +213,8 @@ public class Graph implements Serializable {
      * @return
      */
     public Collection<StreetEdge> getStreetEdges() {
-        Collection<Vertex> vertices = this.getVertices();
-        Set<StreetEdge> edges = new HashSet<StreetEdge>();
-
-        for (Vertex v : vertices) {
-            for (StreetEdge se : filter(v.getIncoming(), StreetEdge.class)) {
-                edges.add(se);
-            }
-            for (StreetEdge se : filter(v.getOutgoing(), StreetEdge.class)) {
-                edges.add(se);
-            }
-        }
-        return edges;
+        Collection<Edge> allEdges = this.getEdges();
+        return Lists.newArrayList(filter(allEdges, StreetEdge.class));
     }    
     
     public boolean containsVertex(Vertex v) {
@@ -298,25 +323,43 @@ public class Graph implements Serializable {
         return ne;
     }
 
-    /* this will require a rehash of any existing hashtables keyed on vertices */
-    public void rebuildVertexAndEdgeIndices() {
-        this.vertexById = Arrays.asList(new Vertex[AbstractVertex.getMaxIndex()]);
-        for (Vertex v : getVertices()) {
-            vertexById.set(v.getIndex(), v);
+    /**
+     * Add a collection of edges from the edgesById index.
+     * @param es
+     */
+    private void addEdgesToIndex(Collection<Edge> es) {
+        for (Edge e : es) {
+            this.edgeById.put(e.getId(), e);
         }
-        // Collections.sort(this.vertexById, getVertexComparatorFactory().getComparator(vertexById));
+    }
+    
+    /**
+     * Rebuilds any indices on the basis of current vertex and edge IDs.
+     * 
+     * If you want the index to be accurate, you must run this every time the 
+     * vertex or edge set changes.
+     * 
+     * TODO(flamholz): keep the indices up to date with changes to the graph.
+     * This is not simple because the Vertex constructor may add itself to the graph
+     * before the Vertex has any edges, so updating indices on addVertex is insufficient.
+     */
+    public void rebuildVertexAndEdgeIndices() {
+        this.vertexById = new HashMap<Integer, Vertex>(AbstractVertex.getMaxIndex());
+        Collection<Vertex> vertices = getVertices();
+        for (Vertex v : vertices) {
+            vertexById.put(v.getIndex(), v);
+        }
 
         // Create map from edge ids to edges.
         this.edgeById = new HashMap<Integer, Edge>();
-        for (Vertex v : this.vertexById) {
-            if (v == null)
+        for (Vertex v : vertices) {
+            // TODO(flamholz): this check seems superfluous.
+            if (v == null) {
                 continue;
-            
-            // Assumes that all the edges appear in at least one outgoing edge list.
-            for (Edge e : v.getOutgoing()) {
-                // check for non-null?
-                this.edgeById.put(e.getId(), e);
             }
+
+            // Assumes that all the edges appear in at least one outgoing edge list.
+            addEdgesToIndex(v.getOutgoing());
         }
     }
 
@@ -422,13 +465,15 @@ public class Graph implements Serializable {
             graph.streetIndex = indexFactory.newIndex(graph);
             LOG.debug("street index built.");
             
-            if (level == LoadLevel.FULL)
+            LOG.debug("Rebuilding edge and vertex indices");
+            graph.rebuildVertexAndEdgeIndices();
+            
+            if (level == LoadLevel.FULL) {
                 return graph;
+            }
             
             if (graph.debugData) {
                 graph.graphBuilderAnnotations = (List<GraphBuilderAnnotation>) in.readObject();
-                graph.vertexById = (List<Vertex>) in.readObject();
-                graph.edgeById = (Map<Integer, Edge>) in.readObject();
                 LOG.debug("Debug info read.");
             } else {
                 LOG.warn("Graph file does not contain debug data.");
@@ -549,10 +594,6 @@ public class Graph implements Serializable {
             }
         }
         return this.calendarService;
-    }
-
-    public Edge getEdgeById(int id) {
-        return edgeById.get(id);
     }
 
     public int removeEdgelessVertices() {
