@@ -62,7 +62,7 @@ import com.vividsolutions.jts.index.strtree.STRtree;
 public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     // Members are protected so that custom subclasses can access them.
-    
+
     protected Graph graph;
 
     /**
@@ -168,7 +168,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         }
         return results;
     }
-    
+
     /**
      * Convenience helper for when extraEdges is empty/null.
      * 
@@ -229,8 +229,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                     name = resources.getString("unnamedStreet");
                 }
             }
-            StreetLocation closest = new StreetLocation(graph, "corner " + Math.random(),
-                    coord, name);
+            StreetLocation closest = new StreetLocation(graph, "corner " + Math.random(), coord,
+                    name);
             FreeEdge e = new FreeEdge(closest, intersection);
             closest.getExtra().add(e);
             e = new FreeEdge(intersection, closest);
@@ -268,8 +268,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             if (name == null) {
                 name = bestStreet.getName();
             }
-            String closestName = String
-                    .format("%s_%s", bestStreet.getName(), location.toString());
+            String closestName = String.format("%s_%s", bestStreet.getName(), location.toString());
             closestStreet = StreetLocation.createStreetLocation(graph, closestName, name,
                     bundle.toEdgeList(), nearestPoint, coord);
         }
@@ -387,8 +386,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     }
 
     @Override
-    public CandidateEdgeBundle getClosestEdges(GenericLocation location,
-            TraversalRequirements reqs) {
+    public CandidateEdgeBundle getClosestEdges(GenericLocation location, TraversalRequirements reqs) {
         return getClosestEdges(location, reqs, null, null, false);
     }
 
@@ -415,6 +413,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     /**
      * Convenience wrapper that uses MAX_CORNER_DISTANCE.
+     * 
      * @param coordinate
      * @return
      */
@@ -478,8 +477,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         return getVertexForLocation(location, options, null);
     }
 
-    
-    
     /**
      * @param other: non-null when another vertex has already been found. When the from vertex has already been made/found, that vertex is passed in
      *        when finding/creating the to vertex. TODO: This appears to be for reusing the extra edges list -- is this still needed?
@@ -506,5 +503,5 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         // this should probably only be used in tests.
         return graph.getVertex(place);
     }
-    
+
 }
