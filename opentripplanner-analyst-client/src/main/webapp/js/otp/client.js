@@ -189,10 +189,12 @@ map.addLayer(osmLayer);
 map.addLayer(origMarker);
 map.addControl(new L.Control.Layers(baseMaps, overlayMaps));
 
+var params;
+
 // use function statement rather than expression to allow hoisting -- is there a better way?
 function mapSetupTool() {
 
-	var params = { 
+	params = { 
 		batch: true,
 	};
 
