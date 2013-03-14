@@ -52,7 +52,7 @@ public class TravelingSalesmanPathService implements PathService {
 
     @Override
     public List<GraphPath> getPaths(RoutingRequest options) {
-        if (options.getIntermediatePlaces() == null || options.getIntermediatePlaces().size() == 0) {
+        if (!options.hasIntermediatePlaces()) {
             LOG.debug("No intermediates places given, calling underlying path service.");
 
             // no intermediate places specified, chain to main path service
@@ -68,12 +68,12 @@ public class TravelingSalesmanPathService implements PathService {
 
         Vertex fromVertex = options.rctx.fromVertex;
         Vertex toVertex = options.rctx.toVertex;
-        if (options.intermediatePlacesOrdered) {
+        if (options.intermediatesEffectivelyOrdered()) {
             LOG.debug("Intermediates are ordered.");
 
             List<Vertex> vertices = options.rctx.intermediateVertices;
             vertices.add(toVertex);
-            options.intermediatePlaces.clear();
+            options.clearIntermediatePlaces();
             // simple case: intermediate places are in order.
             List<GraphPath> paths = new ArrayList<GraphPath>();
             Vertex previousVertex = fromVertex;

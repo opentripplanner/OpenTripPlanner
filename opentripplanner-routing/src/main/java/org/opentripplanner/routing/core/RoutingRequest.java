@@ -342,7 +342,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         this.setModes(modeSet);
     }
 
-    /* ACCESSOR METHODS */
+    /* ACCESSOR/SETTER METHODS */
 
     public boolean transitAllowed() {
         return modes.isTransit();
@@ -488,8 +488,6 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /**
      * Add a TraverseMode to the set of allowed modes.
-     * 
-     * @param mode
      */
     public void addMode(TraverseMode mode) {
         modes.setMode(mode, true);
@@ -497,8 +495,6 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /**
      * Add multiple modes to the set of allowed modes.
-     * 
-     * @param mList
      */
     public void addMode(List<TraverseMode> mList) {
         for (TraverseMode m : mList) {
@@ -555,11 +551,46 @@ public class RoutingRequest implements Cloneable, Serializable {
         modes.setMode(mode, false);
     }
 
+    /**
+     * Sets intermediatePlaces by parsing GenericLocations from a list of string.
+     */
     public void setIntermediatePlacesFromStrings(List<String> intermediates) {
         this.intermediatePlaces = new ArrayList<GenericLocation>(intermediates.size());
         for (String place : intermediates) {
             intermediatePlaces.add(GenericLocation.fromOldStyleString(place));
         }
+    }
+    
+    /** Clears any intermediate places from this request. */
+    public void clearIntermediatePlaces() {
+        if (this.intermediatePlaces != null) {
+            this.intermediatePlaces.clear();
+        }
+    }
+    
+    /**
+     * Returns true if there are any intermediate places set.
+     */
+    public boolean hasIntermediatePlaces() {
+        return this.intermediatePlaces != null && this.intermediatePlaces.size() > 0;
+    }
+
+    /**
+     * Adds a GenericLocation to the end of the intermediatePlaces list. Will initialize intermediatePlaces if it is null.
+     */
+    public void addIntermediatePlace(GenericLocation location) {
+        if (this.intermediatePlaces == null) {
+            this.intermediatePlaces = new ArrayList<GenericLocation>();
+        }
+        this.intermediatePlaces.add(location);
+    }
+    
+    /**
+     * Returns true if intermediate places are marked ordered, or there is only one of them.
+     */
+    public boolean intermediatesEffectivelyOrdered() {
+        boolean exactlyOneIntermediate = (this.intermediatePlaces != null && this.intermediatePlaces.size() == 1);
+        return this.intermediatePlacesOrdered || exactlyOneIntermediate;
     }
 
     public void setTriangleSafetyFactor(double triangleSafetyFactor) {
