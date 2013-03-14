@@ -623,7 +623,8 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public void setRoutingContext(Graph graph) {
         if (rctx == null) {
-            this.rctx = new RoutingContext(this, graph, null, null, true); // graphService.getGraph(routerId)
+            // graphService.getGraph(routerId)
+            this.rctx = new RoutingContext(this, graph);
             // check after back reference is established, to allow temp edge cleanup on exceptions
             this.rctx.check();
         } else {
@@ -644,7 +645,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         // FIXME here, or in test, and/or in other places like TSP that use this method
         // if (rctx != null)
         // this.rctx.destroy();
-        this.rctx = new RoutingContext(this, graph, from, to, false);
+        this.rctx = new RoutingContext(this, graph, from, to);
     }
 
     /** For use in tests. Force RoutingContext to specific vertices rather than making temp edges. */
