@@ -141,4 +141,15 @@ public class GenericLocationTest {
         assertTrue(loc.hasCoordinate());
         assertFalse(loc.hasHeading());
     }
+    
+    public void testClone() {
+        Coordinate expectedCoord = new Coordinate(2.0, 1.0);
+        GenericLocation loc = new GenericLocation(expectedCoord);
+        loc.setHeading(137.2);
+        GenericLocation cloned = loc.clone();
+        
+        assertEquals(expectedCoord, cloned.getCoordinate());
+        assertEquals(loc.getHeading(), cloned.getHeading());
+        assertEquals(loc.getNamedPlace(), cloned.getNamedPlace());
+    }
 }

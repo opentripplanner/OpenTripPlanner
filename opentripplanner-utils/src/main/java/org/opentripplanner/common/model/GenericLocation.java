@@ -29,7 +29,7 @@ import lombok.Data;
  * @author avi
  */
 @Data
-public class GenericLocation {
+public class GenericLocation implements Cloneable {
 
     /**
      * The name of the place, if provided.
@@ -198,5 +198,15 @@ public class GenericLocation {
         }
         
         return String.format("%s,%s", this.lat, this.lng);
+    }
+    
+    @Override
+    public GenericLocation clone() {
+        try {
+            return (GenericLocation) super.clone();
+        } catch (CloneNotSupportedException e) {
+            /* this will never happen since our super is the cloneable object */
+            throw new RuntimeException(e);
+        }
     }
 }
