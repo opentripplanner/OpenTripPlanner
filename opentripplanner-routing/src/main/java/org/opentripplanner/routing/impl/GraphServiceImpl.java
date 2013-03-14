@@ -16,6 +16,7 @@ package org.opentripplanner.routing.impl;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -31,6 +32,7 @@ import lombok.Setter;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.services.GraphService;
+import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ResourceLoaderAware;
@@ -56,17 +58,24 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
     private Map<String, LoadLevel> levels = new HashMap<String, LoadLevel>();
 
     private LoadLevel loadLevel = LoadLevel.FULL;
+    
+    @Setter
+    private StreetVertexIndexFactory indexFactory = new DefaultStreetVertexIndexFactory();
 
-    @Setter private String defaultRouterId = "";
+    @Setter
+    private String defaultRouterId = "";
 
     /** The resourceLoader setter is called by Spring via ResourceLoaderAware interface. */
-    @Setter private ResourceLoader resourceLoader = null; 
+    @Setter
+    private ResourceLoader resourceLoader = null;
 
     /** A list of routerIds to automatically register and load at startup */
-    @Setter private List<String> autoRegister;
+    @Setter
+    private List<String> autoRegister;
 
     /** If true, on startup register the graph in the location defaultRouterId. */
-    @Setter private boolean attemptRegisterDefault = true;
+    @Setter
+    private boolean attemptRegisterDefault = true;
 
     /** 
      * Router IDs may contain alphanumeric characters, underscores, and dashes only. 
@@ -189,7 +198,7 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
         }
         LOG.debug("graph input stream successfully opened. now loading.");
         try {
-            return Graph.load(is, loadLevel);
+            return Graph.load(new ObjectInputStream(is), loadLevel, indexFactory);
         } catch (Exception ex) {
             LOG.error("Exception while loading graph from {}.", graphResource);
             ex.printStackTrace();
