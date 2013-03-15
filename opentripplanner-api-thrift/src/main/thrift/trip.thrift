@@ -34,6 +34,10 @@ struct TravelState {
 	// Vertex associated with this state.
 	2: required GraphVertex vertex;
 	
+	// The previous edge. Optional since it may be empty at the
+	// beginning of the route.
+	3: optional GraphEdge back_edge;
+	
 	// TODO(flamholz): include the mode of travel used to reach this state.
 }
 
