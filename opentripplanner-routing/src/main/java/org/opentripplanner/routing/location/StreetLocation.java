@@ -135,9 +135,13 @@ public class StreetLocation extends StreetVertex {
                 new FreeEdge(location, edgeLocation);
                 new FreeEdge(edgeLocation, location);
             } else {
+                // location is somewhere in the middle of the edge.
                 edgeLocation = location;
+                
+                // creates links from street head -> location -> street tail.
                 createHalfLocation(graph, location, label + " to " + tov.getLabel(), name,
                         nearestPoint, street);
+                
                 double distanceToNearestTransitStop = Math.min(
                         tov.getDistanceToNearestTransitStop(),
                         fromv.getDistanceToNearestTransitStop());
