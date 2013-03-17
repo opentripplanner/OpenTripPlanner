@@ -879,7 +879,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         return bikeBoardCost;
     }
     
-    private String getRouteOrAgencieStr(HashSet<String> strings) {
+    private String getRouteOrAgencyStr(HashSet<String> strings) {
     	StringBuilder builder = new StringBuilder();
         for (String agency : strings) {
             builder.append(agency);
@@ -897,7 +897,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         for (RouteSpec spec : routes) {
         	routesRepresentation.add(spec.getRepresentation());
         }
-        return getRouteOrAgencieStr(routesRepresentation);
+        return getRouteOrAgencyStr(routesRepresentation);
     }
 
     public String getPreferredRouteStr() {
@@ -905,7 +905,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
     
     public String getPreferredAgenciesStr() {
-    	return getRouteOrAgencieStr(preferredAgencies);
+    	return getRouteOrAgencyStr(preferredAgencies);
     }
 
     public String getUnpreferredRouteStr() {
@@ -913,7 +913,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
     
     public String getUnpreferredAgenciesStr() {
-    	return getRouteOrAgencieStr(unpreferredAgencies);
+    	return getRouteOrAgencyStr(unpreferredAgencies);
     }
 
     public String getBannedRouteStr() {
@@ -921,7 +921,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     public String getBannedAgenciesStr() {
-    	return getRouteOrAgencieStr(bannedAgencies);
+    	return getRouteOrAgencyStr(bannedAgencies);
     }
 
     public void setMaxWalkDistance(double maxWalkDistance) {
