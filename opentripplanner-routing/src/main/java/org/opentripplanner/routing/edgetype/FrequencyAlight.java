@@ -13,10 +13,7 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
@@ -131,42 +128,11 @@ public class FrequencyAlight extends Edge  implements OnBoardReverseEdge {
             }
             
             /* check if agency is banned for this plan */
-            if (options.bannedAgencies != null) {
-            	if (options.bannedAgencies.contains(trip.getId().getAgencyId())) {
-            		return null;
-            	}
-            }
-
-            /* check if route banned for this plan */
-            if (options.bannedRoutes != null) {
-                Route route = trip.getRoute();
-                RouteSpec spec = new RouteSpec(route.getId().getAgencyId(),
-                        GtfsLibrary.getRouteName(route));
-                if (options.bannedRoutes.contains(spec)) {
-                    return null;
-                }
-            }
+            if (options.tripIsBanned(trip))
+            	return null;
 
             /* check if route is preferred for this plan */
-            long preferences_penalty = 0;
-            if (options.preferredRoutes != null && options.preferredRoutes.size() > 0) {
-                Route route = trip.getRoute();
-                RouteSpec spec = new RouteSpec(route.getId().getAgencyId(),
-                        GtfsLibrary.getRouteName(route));
-                if (!options.preferredRoutes.contains(spec)) {
-                    preferences_penalty += options.useAnotherThanPreferredRoutesPenalty;
-                }
-            }
-
-            /* check if route is unpreferred for this plan */
-            if (options.unpreferredRoutes != null && options.unpreferredRoutes.size() > 0) {
-                Route route = trip.getRoute();
-                RouteSpec spec = new RouteSpec(route.getId().getAgencyId(),
-                        GtfsLibrary.getRouteName(route));
-                if (options.unpreferredRoutes.contains(spec)) {
-                    preferences_penalty += options.useUnpreferredRoutesPenalty;
-                }
-            }
+            long preferences_penalty = options.preferencesPenaltyForTrip(trip);
 
             StateEditor s1 = state0.edit(this);
             int type = pattern.getBoardType(stopIndex);
