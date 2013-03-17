@@ -854,8 +854,8 @@ public class VizGui extends JFrame implements VertexSelectionListener {
     	options.setOptimize(OptimizeType.QUICK);
         options.setMaxWalkDistance(Double.MAX_VALUE);
         options.setDateTime(when);
-        options.setFrom(from);
-        options.setTo(to);
+        options.setFromString(from);
+        options.setToString(to);
         options.numItineraries = 1;
         System.out.println("--------");
         System.out.println("Path from " + from + " to " + to + " at " + when);

@@ -34,14 +34,13 @@
     </bean>
 
     <bean id="floatingIslands" class="org.opentripplanner.graph_builder.impl.PruneFloatingIslands">
-        <property name="maxIslandSize" value="1000 "/>
+        <property name="islandWithoutStopsMaxSize" value="1000 "/>
         <property name="islandLogFile" value="{graphPath}/island.csv"/>
-        <property name="islandWithStopMaxSize" value="20"/>
+        <property name="islandWithStopsMaxSize" value="20"/>
         <property name="transitToStreetNetwork" ref ="transitStreetLink"/>
     </bean>
 
     <bean id="transitStreetLink" class="org.opentripplanner.graph_builder.impl.TransitToStreetNetworkGraphBuilderImpl" />
-    <bean id="optimizeTransit" class="org.opentripplanner.graph_builder.impl.OptimizeTransitGraphBuilderImpl" />
 
     <bean id="graphBuilderTask" class="org.opentripplanner.graph_builder.GraphBuilderTask">
         <property name="path" value="/home/otp/graph-bundle" />
@@ -53,7 +52,6 @@
                 <!-- the transmit link should became before the floating islands in order to find islands with stops-->
                 <ref bean="transitStreetLink" />
                 <ref bean="floatingIslands" />
-                <ref bean="optimizeTransit" />
 
             </list>
         </property>

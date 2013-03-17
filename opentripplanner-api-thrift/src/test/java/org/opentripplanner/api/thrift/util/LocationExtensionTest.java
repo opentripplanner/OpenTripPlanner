@@ -28,25 +28,25 @@ import com.vividsolutions.jts.geom.Coordinate;
  */
 public class LocationExtensionTest {
 
-	@Test
-	public void testMakeLocation() {
-		Coordinate c = new Coordinate(1.2, 2.3);
-		Location loc = new LocationExtension(c);
-		LatLng ll = loc.getLat_lng();
+    @Test
+    public void testMakeLocation() {
+        Coordinate c = new Coordinate(1.2, 2.3);
+        Location loc = new LocationExtension(c);
+        LatLng ll = loc.getLat_lng();
 
-		assertCoordEquals(c, ll);
+        assertCoordEquals(c, ll);
 
-		// Setting a z value should affect nothing.
-		c = new Coordinate(1.2, 2.3, 19.5);
-		loc = new LocationExtension(c);
-		ll = loc.getLat_lng();
+        // Setting a z value should affect nothing.
+        c = new Coordinate(1.2, 2.3, 19.5);
+        loc = new LocationExtension(c);
+        ll = loc.getLat_lng();
 
-		assertCoordEquals(c, ll);
-	}
+        assertCoordEquals(c, ll);
+    }
 
-	private void assertCoordEquals(Coordinate c, LatLng ll) {
-		assertEquals(c.x, ll.getLng(), 1e-7);
-		assertEquals(c.y, ll.getLat(), 1e-7);
-	}
+    private void assertCoordEquals(Coordinate c, LatLng ll) {
+        assertEquals(c.x, ll.getLng(), 1e-7);
+        assertEquals(c.y, ll.getLat(), 1e-7);
+    }
 
 }

@@ -29,7 +29,7 @@ import lombok.Data;
  * @author avi
  */
 @Data
-public class GenericLocation {
+public class GenericLocation implements Cloneable {
 
     /**
      * The name of the place, if provided.
@@ -47,6 +47,17 @@ public class GenericLocation {
     private Double lat;
 
     private Double lng;
+    
+    /**
+     * Observed heading if any.
+     * 
+     * Direction of travel in decimal degrees from -180° to +180° relative to
+     * true north.
+     * 
+     * 0      = heading true north.
+     * +/-180 = heading south.
+     */
+    private Double heading;
 
     // Pattern for parsing lat,lng strings.
     private static final String _doublePattern = "-{0,1}\\d+(\\.\\d+){0,1}";
@@ -60,6 +71,34 @@ public class GenericLocation {
     public GenericLocation() {
         this.name = "";
         this.place = "";
+    }
+
+    /**
+     * Constructs a GenericLocation with coordinates only.
+     */
+    public GenericLocation(double lat, double lng) {
+        this.name = "";
+        this.place = "";
+        this.lat = lat;
+        this.lng = lng;
+    }
+    
+    /**
+     * Constructs a GenericLocation with coordinates only.
+     */
+    public GenericLocation(Coordinate coord) {
+        this(coord.y, coord.x);
+    }
+    
+    /**
+     * Constructs a GenericLocation with coordinates and heading.
+     */
+    public GenericLocation(double lat, double lng, double heading) {
+        this.name = "";
+        this.place = "";
+        this.lat = lat;
+        this.lng = lng;
+        this.heading = heading;
     }
     
     /**
@@ -111,6 +150,22 @@ public class GenericLocation {
         return new GenericLocation(name, place);
     }
     
+    /**
+     * Returns true if this.heading is not null.
+     * @return
+     */
+    public boolean hasHeading() {
+        return heading != null;
+    }
+    
+    /**
+     * Returns true if getCoordinate() will not return null.
+     * @return
+     */
+    public boolean hasCoordinate() {
+        return this.lat != null && this.lng != null;
+    }
+    
     public NamedPlace getNamedPlace() {
         return new NamedPlace(this.name, this.place);
     }
@@ -134,9 +189,24 @@ public class GenericLocation {
      */
     @Override
     public String toString() {
-        if (this.name == null || this.name.isEmpty()) {
-            return this.place;
+        if (this.place != null && !this.place.isEmpty()) {
+            if (this.name == null || this.name.isEmpty()) {
+                return this.place;
+            } else {
+                return String.format("%s::%s", this.name, this.place);
+            }
         }
-        return String.format("%s::%s", this.name, this.place);
+        
+        return String.format("%s,%s", this.lat, this.lng);
+    }
+    
+    @Override
+    public GenericLocation clone() {
+        try {
+            return (GenericLocation) super.clone();
+        } catch (CloneNotSupportedException e) {
+            /* this will never happen since our super is the cloneable object */
+            throw new RuntimeException(e);
+        }
     }
 }

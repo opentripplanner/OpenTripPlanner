@@ -37,8 +37,6 @@ public class RoutingRequestBuilder {
     /**
      * Convert a LatLng structure into an internal String representation.
      * 
-     * TODO(flamholz): put this on something inheriting from LatLng?
-     * 
      * @param latlng
      * @return String that is accepted internally as a LatLng.
      */
@@ -46,7 +44,21 @@ public class RoutingRequestBuilder {
         GenericLocation loc = new GenericLocation();
         loc.setLat(latlng.getLat());
         loc.setLng(latlng.getLng());
-        return loc;        
+        return loc;
+    }
+    
+    /**
+     * Convert a Location structure into an internal String representation.
+     * 
+     * @param latlng
+     * @return String that is accepted internally as a LatLng.
+     */
+    private static GenericLocation makeGenericLocation(final Location loc) {
+        GenericLocation genericLoc = makeGenericLocation(loc.getLat_lng());
+        if (loc.isSetHeading()) {
+            genericLoc.setHeading(loc.getHeading());
+        }
+        return genericLoc;
     }
 
     /**
@@ -92,8 +104,8 @@ public class RoutingRequestBuilder {
             setArriveBy(tripParams.getArrive_by());
         }
 
-        setOrigin(tripParams.getOrigin().getLat_lng());
-        setDestination(tripParams.getDestination().getLat_lng());
+        setOrigin(tripParams.getOrigin());
+        setDestination(tripParams.getDestination());
 
         return this;
     }
@@ -128,7 +140,8 @@ public class RoutingRequestBuilder {
      * @return self reference
      */
     public RoutingRequestBuilder setOrigin(Location origin) {
-        return setOrigin(origin.getLat_lng());
+        routingRequest.setFrom(makeGenericLocation(origin));
+        return this;
     }
 
     /**
@@ -149,7 +162,8 @@ public class RoutingRequestBuilder {
      * @return self reference
      */
     public RoutingRequestBuilder setDestination(Location dest) {
-        return setDestination(dest.getLat_lng());
+        routingRequest.setTo(makeGenericLocation(dest));
+        return this;
     }
 
     /**

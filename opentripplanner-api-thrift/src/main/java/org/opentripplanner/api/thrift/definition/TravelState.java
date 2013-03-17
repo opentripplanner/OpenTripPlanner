@@ -32,6 +32,7 @@ public class TravelState implements org.apache.thrift.TBase<TravelState, TravelS
 
   private static final org.apache.thrift.protocol.TField ARRIVAL_TIME_FIELD_DESC = new org.apache.thrift.protocol.TField("arrival_time", org.apache.thrift.protocol.TType.I64, (short)1);
   private static final org.apache.thrift.protocol.TField VERTEX_FIELD_DESC = new org.apache.thrift.protocol.TField("vertex", org.apache.thrift.protocol.TType.STRUCT, (short)2);
+  private static final org.apache.thrift.protocol.TField BACK_EDGE_FIELD_DESC = new org.apache.thrift.protocol.TField("back_edge", org.apache.thrift.protocol.TType.STRUCT, (short)3);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
@@ -41,11 +42,13 @@ public class TravelState implements org.apache.thrift.TBase<TravelState, TravelS
 
   private long arrival_time; // required
   private org.opentripplanner.api.thrift.definition.GraphVertex vertex; // required
+  private org.opentripplanner.api.thrift.definition.GraphEdge back_edge; // optional
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
     ARRIVAL_TIME((short)1, "arrival_time"),
-    VERTEX((short)2, "vertex");
+    VERTEX((short)2, "vertex"),
+    BACK_EDGE((short)3, "back_edge");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -64,6 +67,8 @@ public class TravelState implements org.apache.thrift.TBase<TravelState, TravelS
           return ARRIVAL_TIME;
         case 2: // VERTEX
           return VERTEX;
+        case 3: // BACK_EDGE
+          return BACK_EDGE;
         default:
           return null;
       }
@@ -106,6 +111,7 @@ public class TravelState implements org.apache.thrift.TBase<TravelState, TravelS
   // isset id assignments
   private static final int __ARRIVAL_TIME_ISSET_ID = 0;
   private BitSet __isset_bit_vector = new BitSet(1);
+  private _Fields optionals[] = {_Fields.BACK_EDGE};
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
@@ -113,6 +119,8 @@ public class TravelState implements org.apache.thrift.TBase<TravelState, TravelS
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I64)));
     tmpMap.put(_Fields.VERTEX, new org.apache.thrift.meta_data.FieldMetaData("vertex", org.apache.thrift.TFieldRequirementType.REQUIRED, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT        , "GraphVertex")));
+    tmpMap.put(_Fields.BACK_EDGE, new org.apache.thrift.meta_data.FieldMetaData("back_edge", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT        , "GraphEdge")));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(TravelState.class, metaDataMap);
   }
@@ -140,6 +148,9 @@ public class TravelState implements org.apache.thrift.TBase<TravelState, TravelS
     if (other.isSetVertex()) {
       this.vertex = other.vertex;
     }
+    if (other.isSetBack_edge()) {
+      this.back_edge = other.back_edge;
+    }
   }
 
   public TravelState deepCopy() {
@@ -151,6 +162,7 @@ public class TravelState implements org.apache.thrift.TBase<TravelState, TravelS
     setArrival_timeIsSet(false);
     this.arrival_time = 0;
     this.vertex = null;
+    this.back_edge = null;
   }
 
   public long getArrival_time() {
@@ -198,6 +210,29 @@ public class TravelState implements org.apache.thrift.TBase<TravelState, TravelS
     }
   }
 
+  public org.opentripplanner.api.thrift.definition.GraphEdge getBack_edge() {
+    return this.back_edge;
+  }
+
+  public void setBack_edge(org.opentripplanner.api.thrift.definition.GraphEdge back_edge) {
+    this.back_edge = back_edge;
+  }
+
+  public void unsetBack_edge() {
+    this.back_edge = null;
+  }
+
+  /** Returns true if field back_edge is set (has been assigned a value) and false otherwise */
+  public boolean isSetBack_edge() {
+    return this.back_edge != null;
+  }
+
+  public void setBack_edgeIsSet(boolean value) {
+    if (!value) {
+      this.back_edge = null;
+    }
+  }
+
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
     case ARRIVAL_TIME:
@@ -216,6 +251,14 @@ public class TravelState implements org.apache.thrift.TBase<TravelState, TravelS
       }
       break;
 
+    case BACK_EDGE:
+      if (value == null) {
+        unsetBack_edge();
+      } else {
+        setBack_edge((org.opentripplanner.api.thrift.definition.GraphEdge)value);
+      }
+      break;
+
     }
   }
 
@@ -226,6 +269,9 @@ public class TravelState implements org.apache.thrift.TBase<TravelState, TravelS
 
     case VERTEX:
       return getVertex();
+
+    case BACK_EDGE:
+      return getBack_edge();
 
     }
     throw new IllegalStateException();
@@ -242,6 +288,8 @@ public class TravelState implements org.apache.thrift.TBase<TravelState, TravelS
       return isSetArrival_time();
     case VERTEX:
       return isSetVertex();
+    case BACK_EDGE:
+      return isSetBack_edge();
     }
     throw new IllegalStateException();
   }
@@ -274,6 +322,15 @@ public class TravelState implements org.apache.thrift.TBase<TravelState, TravelS
       if (!(this_present_vertex && that_present_vertex))
         return false;
       if (!this.vertex.equals(that.vertex))
+        return false;
+    }
+
+    boolean this_present_back_edge = true && this.isSetBack_edge();
+    boolean that_present_back_edge = true && that.isSetBack_edge();
+    if (this_present_back_edge || that_present_back_edge) {
+      if (!(this_present_back_edge && that_present_back_edge))
+        return false;
+      if (!this.back_edge.equals(that.back_edge))
         return false;
     }
 
@@ -313,6 +370,16 @@ public class TravelState implements org.apache.thrift.TBase<TravelState, TravelS
         return lastComparison;
       }
     }
+    lastComparison = Boolean.valueOf(isSetBack_edge()).compareTo(typedOther.isSetBack_edge());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetBack_edge()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.back_edge, typedOther.back_edge);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
     return 0;
   }
 
@@ -344,6 +411,16 @@ public class TravelState implements org.apache.thrift.TBase<TravelState, TravelS
       sb.append(this.vertex);
     }
     first = false;
+    if (isSetBack_edge()) {
+      if (!first) sb.append(", ");
+      sb.append("back_edge:");
+      if (this.back_edge == null) {
+        sb.append("null");
+      } else {
+        sb.append(this.back_edge);
+      }
+      first = false;
+    }
     sb.append(")");
     return sb.toString();
   }
@@ -413,6 +490,15 @@ public class TravelState implements org.apache.thrift.TBase<TravelState, TravelS
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
+          case 3: // BACK_EDGE
+            if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
+              struct.back_edge = new org.opentripplanner.api.thrift.definition.GraphEdge();
+              struct.back_edge.read(iprot);
+              struct.setBack_edgeIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
           default:
             org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
         }
@@ -434,6 +520,13 @@ public class TravelState implements org.apache.thrift.TBase<TravelState, TravelS
         struct.vertex.write(oprot);
         oprot.writeFieldEnd();
       }
+      if (struct.back_edge != null) {
+        if (struct.isSetBack_edge()) {
+          oprot.writeFieldBegin(BACK_EDGE_FIELD_DESC);
+          struct.back_edge.write(oprot);
+          oprot.writeFieldEnd();
+        }
+      }
       oprot.writeFieldStop();
       oprot.writeStructEnd();
     }
@@ -453,6 +546,14 @@ public class TravelState implements org.apache.thrift.TBase<TravelState, TravelS
       TTupleProtocol oprot = (TTupleProtocol) prot;
       oprot.writeI64(struct.arrival_time);
       struct.vertex.write(oprot);
+      BitSet optionals = new BitSet();
+      if (struct.isSetBack_edge()) {
+        optionals.set(0);
+      }
+      oprot.writeBitSet(optionals, 1);
+      if (struct.isSetBack_edge()) {
+        struct.back_edge.write(oprot);
+      }
     }
 
     @Override
@@ -463,6 +564,12 @@ public class TravelState implements org.apache.thrift.TBase<TravelState, TravelS
       struct.vertex = new org.opentripplanner.api.thrift.definition.GraphVertex();
       struct.vertex.read(iprot);
       struct.setVertexIsSet(true);
+      BitSet incoming = iprot.readBitSet(1);
+      if (incoming.get(0)) {
+        struct.back_edge = new org.opentripplanner.api.thrift.definition.GraphEdge();
+        struct.back_edge.read(iprot);
+        struct.setBack_edgeIsSet(true);
+      }
     }
   }
 

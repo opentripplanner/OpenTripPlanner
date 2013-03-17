@@ -31,6 +31,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.util.ElevationProfileSegment;
@@ -182,18 +183,15 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
                 return false;
             }
         }
-        if (options.getModes().getWalk() && permission.allows(StreetTraversalPermission.PEDESTRIAN)) {
-            return true;
-        }
-        if (options.getModes().getBicycle() && permission.allows(StreetTraversalPermission.BICYCLE)) {
-            return true;
-        }
-        if (options.getModes().getCar() && permission.allows(StreetTraversalPermission.CAR)) {
-            return true;
-        }
-        return false;
+        
+        return canTraverse(options.getModes());
     }
-
+    
+    @Override
+    public boolean canTraverse(TraverseModeSet modes) {
+        return permission.allows(modes);
+    }
+    
     private boolean canTraverse(RoutingRequest options, TraverseMode mode) {
         if (options.wheelchairAccessible) {
             if (!wheelchairAccessible) {
@@ -203,16 +201,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
                 return false;
             }
         }
-        if (mode == TraverseMode.WALK && permission.allows(StreetTraversalPermission.PEDESTRIAN)) {
-            return true;
-        }
-        if (mode == TraverseMode.BICYCLE && permission.allows(StreetTraversalPermission.BICYCLE)) {
-            return true;
-        }
-        if (mode == TraverseMode.CAR && permission.allows(StreetTraversalPermission.CAR)) {
-            return true;
-        }
-        return false;
+        return permission.allows(mode);
     }
 
     @Override
@@ -381,7 +370,6 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             time += turnTime;
         }
 
-        s1.incrementWalkDistance(length);
         int timeLong = (int) time;
         if (timeLong != time) {
             timeLong++;
@@ -389,7 +377,6 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         s1.incrementTimeInSeconds(timeLong);
         
         if (traverseMode != TraverseMode.CAR) {
-            // TODO(flamholz): are we incrementing 2x for non-car modes?
             s1.incrementWalkDistance(length);
         }
 

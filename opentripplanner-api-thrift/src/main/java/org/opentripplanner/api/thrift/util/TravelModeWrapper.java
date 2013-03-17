@@ -25,6 +25,8 @@ public class TravelModeWrapper {
             return TraverseMode.WALK;
         case CAR:
             return TraverseMode.CAR;
+        case CUSTOM_MOTOR_VEHICLE:
+            return TraverseMode.CUSTOM_MOTOR_VEHICLE;
         case TRAM:
             return TraverseMode.TRAM;
         case SUBWAY:

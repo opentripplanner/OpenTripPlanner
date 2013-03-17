@@ -18,7 +18,7 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.routing.core.LocationObservation;
+import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
@@ -91,7 +91,7 @@ public class ClosestEdgesTest {
         finder = myFinder;
     }
 
-    private void checkClosestEdgeModes(LocationObservation loc, TraversalRequirements reqs,
+    private void checkClosestEdgeModes(GenericLocation loc, TraversalRequirements reqs,
             int minResults) {
         CandidateEdgeBundle edges = finder.getClosestEdges(loc, reqs);
         assertTrue(minResults <= edges.size());
@@ -106,7 +106,7 @@ public class ClosestEdgesTest {
     public void testModeRestriction() {
         // Lies along the top right edge
         Coordinate c = new Coordinate(-74.005000001, 40.01);
-        LocationObservation loc = new LocationObservation(c);
+        GenericLocation loc = new GenericLocation(c);
         TraversalRequirements reqs = new TraversalRequirements();
 
         // Default traversal requirements allow any traversal mode.
@@ -144,7 +144,7 @@ public class ClosestEdgesTest {
     public void testInteriorEdgeCase() {
         // Lies smack in the middle of the box
         Coordinate c = new Coordinate(-74.005, 40.005);
-        LocationObservation loc = new LocationObservation(c);
+        GenericLocation loc = new GenericLocation(c);
         TraversalRequirements reqs = new TraversalRequirements();
 
         // Should only return 2 edges even though all edges are equidistant.
@@ -162,7 +162,7 @@ public class ClosestEdgesTest {
      * @param expectedBest
      * @param expectedCandidates
      */
-    private void checkBest(TraversalRequirements reqs, LocationObservation loc,
+    private void checkBest(TraversalRequirements reqs, GenericLocation loc,
             StreetEdge expectedBest, int expectedCandidates) {
         // Should give me the top edge as the best edge.
         // topBack is worse because of the heading.
@@ -184,16 +184,15 @@ public class ClosestEdgesTest {
         for (double degreeOff = 0.0; degreeOff < 30.0; degreeOff += 3.0) {
             // Location along the top edge, traveling with the forward edge
             // exactly.
-            LocationObservation.Builder builder = new LocationObservation.Builder()
-                    .setCoordinate(c);
-            builder.setHeading(top.getAzimuth() + degreeOff);
+            GenericLocation loc = new GenericLocation(c);
+            loc.setHeading(top.getAzimuth() + degreeOff);
 
             // The top edge should be returned in all cases.
-            checkBest(reqs, builder.build(), top, 2);
+            checkBest(reqs, loc, top, 2);
 
             // Try when we're off in the opposite direction
-            builder.setHeading(top.getAzimuth() - degreeOff);
-            checkBest(reqs, builder.build(), top, 2);
+            loc.setHeading(top.getAzimuth() - degreeOff);
+            checkBest(reqs, loc, top, 2);
         }
     }
 }
