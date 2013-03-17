@@ -28,9 +28,12 @@ import lombok.Getter;
 import lombok.Setter;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Route;
+import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.NamedPlace;
+import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.request.BannedStopSet;
@@ -194,7 +197,10 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /** Set of preferred routes by user. */
     public HashSet<RouteSpec> preferredRoutes = new HashSet<RouteSpec>();
-
+    
+    /** Set of preferred agencies by user. */
+    public HashSet<String> preferredAgencies = new HashSet<String>();
+    
     /**
      * Penalty added for using every route that is not preferred if user set any route as preferred. We return number of seconds that we are willing
      * to wait for preferred route.
@@ -203,6 +209,9 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /** Set of unpreferred routes for given user. */
     public HashSet<RouteSpec> unpreferredRoutes = new HashSet<RouteSpec>();
+    
+    /** Set of unpreferred agencies for given user. */
+    public HashSet<String> unpreferredAgencies = new HashSet<String>();
 
     /**
      * Penalty added for using every unpreferred route. We return number of seconds that we are willing to wait for preferred route.
@@ -430,12 +439,22 @@ public class RoutingRequest implements Cloneable, Serializable {
             return maxWalkDistance;
         }
     }
+    
+    public void setPreferredAgencies(String s) {
+        if (s != null && !s.equals(""))
+            preferredAgencies = new HashSet<String>(Arrays.asList(s.split(",")));
+    }
 
     public void setPreferredRoutes(String s) {
         if (s != null && !s.equals(""))
             preferredRoutes = new HashSet<RouteSpec>(RouteSpec.listFromString(s));
     }
-
+    
+    public void setUnpreferredAgencies(String s) {
+        if (s != null && !s.equals(""))
+            unpreferredAgencies = new HashSet<String>(Arrays.asList(s.split(",")));
+    }
+    
     public void setUnpreferredRoutes(String s) {
         if (s != null && !s.equals(""))
             unpreferredRoutes = new HashSet<RouteSpec>(RouteSpec.listFromString(s));
@@ -515,7 +534,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         setDateTime(dateObject);
     }
 
-    public Integer getNumItineraries() {
+    public int getNumItineraries() { 
         if (getModes().isTransit()) {
             return numItineraries;
         } else {
@@ -859,35 +878,10 @@ public class RoutingRequest implements Cloneable, Serializable {
             return walkBoardCost;
         return bikeBoardCost;
     }
-
-    private String getRouteSetStr(HashSet<RouteSpec> routes) {
-        StringBuilder builder = new StringBuilder();
-        for (RouteSpec spec : routes) {
-            builder.append(spec.getRepresentation());
-            builder.append(",");
-        }
-        if (builder.length() > 0) {
-            // trim trailing comma
-            builder.setLength(builder.length() - 1);
-        }
-        return builder.toString();
-    }
-
-    public String getPreferredRouteStr() {
-        return getRouteSetStr(preferredRoutes);
-    }
-
-    public String getUnpreferredRouteStr() {
-        return getRouteSetStr(unpreferredRoutes);
-    }
-
-    public String getBannedRouteStr() {
-        return getRouteSetStr(bannedRoutes);
-    }
-
-    public String getBannedAgenciesStr() {
-        StringBuilder builder = new StringBuilder();
-        for (String agency : bannedAgencies) {
+    
+    private String getRouteOrAgencieStr(HashSet<String> strings) {
+    	StringBuilder builder = new StringBuilder();
+        for (String agency : strings) {
             builder.append(agency);
             builder.append(",");
         }
@@ -896,6 +890,38 @@ public class RoutingRequest implements Cloneable, Serializable {
             builder.setLength(builder.length() - 1);
         }
         return builder.toString();
+    }
+
+    private String getRouteSetStr(HashSet<RouteSpec> routes) {
+        HashSet<String> routesRepresentation = new HashSet<String>();
+        for (RouteSpec spec : routes) {
+        	routesRepresentation.add(spec.getRepresentation());
+        }
+        return getRouteOrAgencieStr(routesRepresentation);
+    }
+
+    public String getPreferredRouteStr() {
+        return getRouteSetStr(preferredRoutes);
+    }
+    
+    public String getPreferredAgenciesStr() {
+    	return getRouteOrAgencieStr(preferredAgencies);
+    }
+
+    public String getUnpreferredRouteStr() {
+        return getRouteSetStr(unpreferredRoutes);
+    }
+    
+    public String getUnpreferredAgenciesStr() {
+    	return getRouteOrAgencieStr(unpreferredAgencies);
+    }
+
+    public String getBannedRouteStr() {
+        return getRouteSetStr(bannedRoutes);
+    }
+
+    public String getBannedAgenciesStr() {
+    	return getRouteOrAgencieStr(bannedAgencies);
     }
 
     public void setMaxWalkDistance(double maxWalkDistance) {
@@ -909,5 +935,54 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public void banTrip(AgencyAndId trip) {
         bannedTrips.put(trip, BannedStopSet.ALL);
+    }
+    
+    public boolean tripIsBanned(Trip trip) {
+    	/* check if agency is banned for this plan */
+    	if (bannedAgencies != null) {
+    		if (bannedAgencies.contains(trip.getId().getAgencyId())) {
+    			return true;
+    		}
+    	}
+
+    	/* check if route banned for this plan */
+    	if (bannedRoutes != null) {
+    		Route route = trip.getRoute();
+    		RouteSpec spec = new RouteSpec(route.getId().getAgencyId(),
+    				GtfsLibrary.getRouteName(route));
+    		if (bannedRoutes.contains(spec)) {
+    			return true;
+    		}
+    	}
+
+    	return false;
+    }
+
+    public long preferencesPenaltyForTrip(Trip trip) {
+    	/* check if route is preferred for this plan */
+    	long preferences_penalty = 0;
+
+    	Route route = trip.getRoute();
+    	String agencyID = route.getId().getAgencyId();
+    	RouteSpec spec = new RouteSpec(agencyID, GtfsLibrary.getRouteName(route));
+    	
+    	if ((preferredRoutes != null && !preferredRoutes.isEmpty()) || (preferredAgencies != null && !preferredAgencies.isEmpty())) {
+    		boolean isPreferedRoute = preferredRoutes != null && preferredRoutes.contains(spec);
+    		boolean isPreferedAgency = preferredAgencies != null && preferredAgencies.contains(agencyID); 
+    		if (!isPreferedRoute && !isPreferedAgency) {
+    			preferences_penalty += useAnotherThanPreferredRoutesPenalty;
+    		}
+    		else {
+    			preferences_penalty = 0;
+    		}
+    	}
+
+    	boolean isUnpreferedRoute = unpreferredRoutes != null && unpreferredRoutes.contains(spec);
+    	boolean isUnpreferedAgency = unpreferredAgencies != null && unpreferredAgencies.contains(agencyID); 
+    	if (isUnpreferedRoute && isUnpreferedAgency) {
+    		preferences_penalty += useUnpreferredRoutesPenalty;
+    	}
+
+    	return preferences_penalty;
     }
 }
