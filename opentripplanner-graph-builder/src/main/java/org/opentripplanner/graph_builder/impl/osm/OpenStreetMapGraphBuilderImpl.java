@@ -819,8 +819,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     networkSet.addAll(Arrays.asList(operators.split(";")));
                 if (networkSet.isEmpty()) {
                     _log.warn("Bike rental station at osm node " + node.getId() + " ("
-                            + creativeName + ") with no network; not including");
-                    continue;
+                            + creativeName + ") with no network; including as compatible-with-all.");
+                    networkSet.add("*"); // Special "catch-all" value
                 }
                 BikeRentalStationVertex station = new BikeRentalStationVertex(graph, ""
                         + node.getId(), "bike rental " + node.getId(), node.getLon(),
