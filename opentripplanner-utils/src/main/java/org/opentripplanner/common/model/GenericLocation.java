@@ -200,6 +200,25 @@ public class GenericLocation implements Cloneable {
         return String.format("%s,%s", this.lat, this.lng);
     }
     
+    /**
+     * Represents the location as an old-style string for clients that relied on that behavior.
+     * 
+     * TODO(flamholz): clients should stop relying on these being strings and then we can return a string here that fully represents the contents of
+     * the object.
+     */
+    @Override
+    public String toString() {
+        if (this.place != null && !this.place.isEmpty()) {
+            if (this.name == null || this.name.isEmpty()) {
+                return this.place;
+            } else {
+                return String.format("%s::%s", this.name, this.place);
+            }
+        }
+        
+        return String.format("%s,%s", this.lat, this.lng);
+    }
+    
     @Override
     public GenericLocation clone() {
         try {
