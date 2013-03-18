@@ -2,6 +2,7 @@ package org.opentripplanner.api.thrift.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,6 +25,7 @@ import org.opentripplanner.api.thrift.definition.GraphEdgesResponse;
 import org.opentripplanner.api.thrift.definition.GraphVertex;
 import org.opentripplanner.api.thrift.definition.GraphVerticesRequest;
 import org.opentripplanner.api.thrift.definition.GraphVerticesResponse;
+import org.opentripplanner.api.thrift.definition.Location;
 import org.opentripplanner.api.thrift.definition.OTPService;
 import org.opentripplanner.api.thrift.definition.PathOptions;
 import org.opentripplanner.api.thrift.definition.TripParameters;
@@ -44,6 +46,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.CandidateEdge;
+import org.opentripplanner.routing.impl.CandidateEdge.CandidateEdgeScoreComparator;
 import org.opentripplanner.routing.impl.CandidateEdgeBundle;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
@@ -184,23 +187,28 @@ public class OTPServiceImpl implements OTPService.Iface {
 
     @Override
     public FindNearestEdgesResponse FindNearestEdges(FindNearestEdgesRequest req) throws TException {
-        LOG.info("FindNearestEdges called");
+        LOG.info("FindNearestEdges called with query {}", req.getLocation());
         long startTime = System.currentTimeMillis();
 
         // Set up the TraversalRequirements.
         TraversalRequirements requirements = new TraversalRequirements();
         requirements.setModes(new TravelModeSet(req.getAllowed_modes()).toTraverseModeSet());
-
-        // Set up the LocationObservation.
-        GenericLocation loc = new LatLngExtension(req.getLocation().getLat_lng()).toGenericLocation();
-        if (req.isSetHeading()) loc.setHeading(req.getHeading());
         
+        // Set up the LocationObservation.
+        Location queryLoc = req.getLocation();
+        GenericLocation loc = new LatLngExtension(queryLoc.getLat_lng()).toGenericLocation();
+        if (queryLoc.isSetHeading()) loc.setHeading(queryLoc.getHeading());
+                
         // Find the candidate edges.
         // NOTE(flamholz): for now this will return at smallish number of edges because of
         // the internal binning that's going on. I'd rather get more edges just in case...
         StreetVertexIndexService streetVertexIndex = getStreetIndex();
         CandidateEdgeBundle edges = streetVertexIndex.getClosestEdges(loc, requirements);
 
+        // Sort them by score.
+        CandidateEdgeScoreComparator comp = new CandidateEdgeScoreComparator();
+        Collections.sort(edges, comp);
+        
         // Add matches to the response.
         FindNearestEdgesResponse res = new FindNearestEdgesResponse();
         int maxEdges = req.getMax_edges();
