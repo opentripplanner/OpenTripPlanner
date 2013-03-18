@@ -367,12 +367,10 @@ otp.locale.Turkish = {
         ],
 
         walkSpeed :
-        [ //it's not that people in Turkey are 3,600x as speedy
-         //it's that hour in Turkish is "saat".  I bet that gets
-         //confusing!
-     
-        walkSpeed :
         [
+            //it's not that people in Turkey are 3,600x as speedy
+            //it's that hour in Turkish is "saat".  I bet that gets
+            //confusing!
             ['0.278',  '1 km/s'],
             ['0.556',  '2 km/s'],
             ['0.833',  '3 km/s'],

@@ -173,7 +173,7 @@ public class RoutingRequestBuilderTest {
     public void testSetNumItineraries() {
         int n = 3;
         RoutingRequest rr = (new RoutingRequestBuilder()).setNumItineraries(n).build();
-        assertEquals(n, rr.getNumItineraries().intValue());
+        assertEquals(n, rr.getNumItineraries());
     }
 
     @Test
