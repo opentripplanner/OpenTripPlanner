@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.impl;
 
+import java.util.Comparator;
+
 import lombok.Getter;
 
 import org.opentripplanner.common.geometry.DirectionUtils;
@@ -110,6 +112,24 @@ public class CandidateEdge {
     @Getter
     protected double score;
 
+    /**
+     * Sorts CandidateEdges by best score first (lower = better).
+     * @author avi
+     */
+    public static class CandidateEdgeScoreComparator implements Comparator<CandidateEdge> {
+        @Override
+        public int compare(CandidateEdge arg0, CandidateEdge arg1) {
+            double score1 = arg0.getScore();
+            double score2 = arg1.getScore();
+            if (score1 == score2) {
+                return 0;
+            } else if (score1 < score2) {
+                return -1;
+            }
+            return 1;        
+        }
+    }
+    
     /**
      * Construct from a LocationObservation.
      * 
