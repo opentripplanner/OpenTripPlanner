@@ -107,13 +107,10 @@ public class BikeRentalUpdater implements Runnable {
         Set<String> networks = new HashSet<String>(Arrays.asList(network));
         for (BikeRentalStation station : stations) {
             service.addStation(station);
-            String id = station.id;
             stationSet.add(station);
             BikeRentalStationVertex vertex = verticesByStation.get(station);
             if (vertex == null) {
-                String name = "bike rental station " + id;
-                vertex = new BikeRentalStationVertex(graph, id, name, station.x,
-                        station.y, station.name, station.bikesAvailable, station.spacesAvailable);
+                vertex = new BikeRentalStationVertex(graph, station);
                 LinkRequest request = networkLinkerLibrary.connectVertexToStreets(vertex);
                 for (Edge e : request.getEdgesAdded()) {
                     graph.addTemporaryEdge(e);
