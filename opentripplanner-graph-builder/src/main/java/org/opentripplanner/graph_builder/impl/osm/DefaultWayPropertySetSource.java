@@ -589,7 +589,7 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
     private String localize(String key) {
         try {
             String retval = getResourceBundle().getString(key);
-            _log.info(String.format("Localized '%s' using '%s'", key, retval));
+            _log.debug(String.format("Localized '%s' using '%s'", key, retval));
             return retval;
         } catch (MissingResourceException e) {
             _log.warn("Missing translation for key: " + key);
