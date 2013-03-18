@@ -201,22 +201,16 @@ public class GenericLocation implements Cloneable {
     }
     
     /**
-     * Represents the location as an old-style string for clients that relied on that behavior.
-     * 
-     * TODO(flamholz): clients should stop relying on these being strings and then we can return a string here that fully represents the contents of
-     * the object.
+     * Returns a descriptive string that has the information that I wish toString() returned.
      */
-    @Override
-    public String toString() {
-        if (this.place != null && !this.place.isEmpty()) {
-            if (this.name == null || this.name.isEmpty()) {
-                return this.place;
-            } else {
-                return String.format("%s::%s", this.name, this.place);
-            }
+    public String toDescriptiveString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("<GenericLocation lat,lng=").append(this.lat).append(",").append(this.lng);
+        if (this.hasHeading()) {
+            sb.append(" heading=").append(this.heading);
         }
-        
-        return String.format("%s,%s", this.lat, this.lng);
+        sb.append(">");
+        return sb.toString();
     }
     
     @Override
