@@ -33,6 +33,8 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.CandidateEdge;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -46,6 +48,8 @@ import com.vividsolutions.jts.linearref.LocationIndexedLine;
  */
 public class StreetLocation extends StreetVertex {
 
+    private static final Logger LOG = LoggerFactory.getLogger(StreetLocation.class);
+    
     private static DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     private ArrayList<Edge> extra = new ArrayList<Edge>();
@@ -196,7 +200,10 @@ public class StreetLocation extends StreetVertex {
         newRight.setNoThruTraffic(street.isNoThruTraffic());
         newRight.setWheelchairNote(street.getWheelchairNotes());
         newRight.setNote(street.getNotes());
+        
+        LOG.debug("Copying {} TurnRestrictions", street.getTurnRestrictions().size());
         for (TurnRestriction turnRestriction : street.getTurnRestrictions()) {
+            LOG.debug("Adding TurnRestriction {}", turnRestriction);
             newRight.addTurnRestriction(turnRestriction);
         }
         base.extra.add(newLeft);
