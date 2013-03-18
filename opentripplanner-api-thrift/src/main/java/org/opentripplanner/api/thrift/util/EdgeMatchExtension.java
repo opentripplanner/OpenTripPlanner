@@ -19,5 +19,7 @@ public class EdgeMatchExtension extends EdgeMatch {
         setEdge(new GraphEdgeExtension(candidate.getEdge()));
         setClosest_point(new LatLngExtension(candidate.getNearestPointOnEdge()));
         setScore(candidate.getScore());
+        setDistance_from_query(candidate.getDistance());
+        setHeading_at_closest_point(candidate.getDirectionOfEdge());
     }
 }

@@ -33,6 +33,8 @@ public class EdgeMatch implements org.apache.thrift.TBase<EdgeMatch, EdgeMatch._
   private static final org.apache.thrift.protocol.TField EDGE_FIELD_DESC = new org.apache.thrift.protocol.TField("edge", org.apache.thrift.protocol.TType.STRUCT, (short)1);
   private static final org.apache.thrift.protocol.TField CLOSEST_POINT_FIELD_DESC = new org.apache.thrift.protocol.TField("closest_point", org.apache.thrift.protocol.TType.STRUCT, (short)2);
   private static final org.apache.thrift.protocol.TField SCORE_FIELD_DESC = new org.apache.thrift.protocol.TField("score", org.apache.thrift.protocol.TType.DOUBLE, (short)3);
+  private static final org.apache.thrift.protocol.TField DISTANCE_FROM_QUERY_FIELD_DESC = new org.apache.thrift.protocol.TField("distance_from_query", org.apache.thrift.protocol.TType.DOUBLE, (short)4);
+  private static final org.apache.thrift.protocol.TField HEADING_AT_CLOSEST_POINT_FIELD_DESC = new org.apache.thrift.protocol.TField("heading_at_closest_point", org.apache.thrift.protocol.TType.DOUBLE, (short)5);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
@@ -43,12 +45,16 @@ public class EdgeMatch implements org.apache.thrift.TBase<EdgeMatch, EdgeMatch._
   private GraphEdge edge; // required
   private org.opentripplanner.api.thrift.definition.LatLng closest_point; // required
   private double score; // required
+  private double distance_from_query; // optional
+  private double heading_at_closest_point; // optional
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
     EDGE((short)1, "edge"),
     CLOSEST_POINT((short)2, "closest_point"),
-    SCORE((short)3, "score");
+    SCORE((short)3, "score"),
+    DISTANCE_FROM_QUERY((short)4, "distance_from_query"),
+    HEADING_AT_CLOSEST_POINT((short)5, "heading_at_closest_point");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -69,6 +75,10 @@ public class EdgeMatch implements org.apache.thrift.TBase<EdgeMatch, EdgeMatch._
           return CLOSEST_POINT;
         case 3: // SCORE
           return SCORE;
+        case 4: // DISTANCE_FROM_QUERY
+          return DISTANCE_FROM_QUERY;
+        case 5: // HEADING_AT_CLOSEST_POINT
+          return HEADING_AT_CLOSEST_POINT;
         default:
           return null;
       }
@@ -110,7 +120,10 @@ public class EdgeMatch implements org.apache.thrift.TBase<EdgeMatch, EdgeMatch._
 
   // isset id assignments
   private static final int __SCORE_ISSET_ID = 0;
-  private BitSet __isset_bit_vector = new BitSet(1);
+  private static final int __DISTANCE_FROM_QUERY_ISSET_ID = 1;
+  private static final int __HEADING_AT_CLOSEST_POINT_ISSET_ID = 2;
+  private BitSet __isset_bit_vector = new BitSet(3);
+  private _Fields optionals[] = {_Fields.DISTANCE_FROM_QUERY,_Fields.HEADING_AT_CLOSEST_POINT};
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
@@ -119,6 +132,10 @@ public class EdgeMatch implements org.apache.thrift.TBase<EdgeMatch, EdgeMatch._
     tmpMap.put(_Fields.CLOSEST_POINT, new org.apache.thrift.meta_data.FieldMetaData("closest_point", org.apache.thrift.TFieldRequirementType.REQUIRED, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT        , "LatLng")));
     tmpMap.put(_Fields.SCORE, new org.apache.thrift.meta_data.FieldMetaData("score", org.apache.thrift.TFieldRequirementType.REQUIRED, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.DOUBLE)));
+    tmpMap.put(_Fields.DISTANCE_FROM_QUERY, new org.apache.thrift.meta_data.FieldMetaData("distance_from_query", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.DOUBLE)));
+    tmpMap.put(_Fields.HEADING_AT_CLOSEST_POINT, new org.apache.thrift.meta_data.FieldMetaData("heading_at_closest_point", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.DOUBLE)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(EdgeMatch.class, metaDataMap);
@@ -152,6 +169,8 @@ public class EdgeMatch implements org.apache.thrift.TBase<EdgeMatch, EdgeMatch._
       this.closest_point = other.closest_point;
     }
     this.score = other.score;
+    this.distance_from_query = other.distance_from_query;
+    this.heading_at_closest_point = other.heading_at_closest_point;
   }
 
   public EdgeMatch deepCopy() {
@@ -164,6 +183,10 @@ public class EdgeMatch implements org.apache.thrift.TBase<EdgeMatch, EdgeMatch._
     this.closest_point = null;
     setScoreIsSet(false);
     this.score = 0.0;
+    setDistance_from_queryIsSet(false);
+    this.distance_from_query = 0.0;
+    setHeading_at_closest_pointIsSet(false);
+    this.heading_at_closest_point = 0.0;
   }
 
   public GraphEdge getEdge() {
@@ -234,6 +257,50 @@ public class EdgeMatch implements org.apache.thrift.TBase<EdgeMatch, EdgeMatch._
     __isset_bit_vector.set(__SCORE_ISSET_ID, value);
   }
 
+  public double getDistance_from_query() {
+    return this.distance_from_query;
+  }
+
+  public void setDistance_from_query(double distance_from_query) {
+    this.distance_from_query = distance_from_query;
+    setDistance_from_queryIsSet(true);
+  }
+
+  public void unsetDistance_from_query() {
+    __isset_bit_vector.clear(__DISTANCE_FROM_QUERY_ISSET_ID);
+  }
+
+  /** Returns true if field distance_from_query is set (has been assigned a value) and false otherwise */
+  public boolean isSetDistance_from_query() {
+    return __isset_bit_vector.get(__DISTANCE_FROM_QUERY_ISSET_ID);
+  }
+
+  public void setDistance_from_queryIsSet(boolean value) {
+    __isset_bit_vector.set(__DISTANCE_FROM_QUERY_ISSET_ID, value);
+  }
+
+  public double getHeading_at_closest_point() {
+    return this.heading_at_closest_point;
+  }
+
+  public void setHeading_at_closest_point(double heading_at_closest_point) {
+    this.heading_at_closest_point = heading_at_closest_point;
+    setHeading_at_closest_pointIsSet(true);
+  }
+
+  public void unsetHeading_at_closest_point() {
+    __isset_bit_vector.clear(__HEADING_AT_CLOSEST_POINT_ISSET_ID);
+  }
+
+  /** Returns true if field heading_at_closest_point is set (has been assigned a value) and false otherwise */
+  public boolean isSetHeading_at_closest_point() {
+    return __isset_bit_vector.get(__HEADING_AT_CLOSEST_POINT_ISSET_ID);
+  }
+
+  public void setHeading_at_closest_pointIsSet(boolean value) {
+    __isset_bit_vector.set(__HEADING_AT_CLOSEST_POINT_ISSET_ID, value);
+  }
+
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
     case EDGE:
@@ -260,6 +327,22 @@ public class EdgeMatch implements org.apache.thrift.TBase<EdgeMatch, EdgeMatch._
       }
       break;
 
+    case DISTANCE_FROM_QUERY:
+      if (value == null) {
+        unsetDistance_from_query();
+      } else {
+        setDistance_from_query((Double)value);
+      }
+      break;
+
+    case HEADING_AT_CLOSEST_POINT:
+      if (value == null) {
+        unsetHeading_at_closest_point();
+      } else {
+        setHeading_at_closest_point((Double)value);
+      }
+      break;
+
     }
   }
 
@@ -273,6 +356,12 @@ public class EdgeMatch implements org.apache.thrift.TBase<EdgeMatch, EdgeMatch._
 
     case SCORE:
       return Double.valueOf(getScore());
+
+    case DISTANCE_FROM_QUERY:
+      return Double.valueOf(getDistance_from_query());
+
+    case HEADING_AT_CLOSEST_POINT:
+      return Double.valueOf(getHeading_at_closest_point());
 
     }
     throw new IllegalStateException();
@@ -291,6 +380,10 @@ public class EdgeMatch implements org.apache.thrift.TBase<EdgeMatch, EdgeMatch._
       return isSetClosest_point();
     case SCORE:
       return isSetScore();
+    case DISTANCE_FROM_QUERY:
+      return isSetDistance_from_query();
+    case HEADING_AT_CLOSEST_POINT:
+      return isSetHeading_at_closest_point();
     }
     throw new IllegalStateException();
   }
@@ -332,6 +425,24 @@ public class EdgeMatch implements org.apache.thrift.TBase<EdgeMatch, EdgeMatch._
       if (!(this_present_score && that_present_score))
         return false;
       if (this.score != that.score)
+        return false;
+    }
+
+    boolean this_present_distance_from_query = true && this.isSetDistance_from_query();
+    boolean that_present_distance_from_query = true && that.isSetDistance_from_query();
+    if (this_present_distance_from_query || that_present_distance_from_query) {
+      if (!(this_present_distance_from_query && that_present_distance_from_query))
+        return false;
+      if (this.distance_from_query != that.distance_from_query)
+        return false;
+    }
+
+    boolean this_present_heading_at_closest_point = true && this.isSetHeading_at_closest_point();
+    boolean that_present_heading_at_closest_point = true && that.isSetHeading_at_closest_point();
+    if (this_present_heading_at_closest_point || that_present_heading_at_closest_point) {
+      if (!(this_present_heading_at_closest_point && that_present_heading_at_closest_point))
+        return false;
+      if (this.heading_at_closest_point != that.heading_at_closest_point)
         return false;
     }
 
@@ -381,6 +492,26 @@ public class EdgeMatch implements org.apache.thrift.TBase<EdgeMatch, EdgeMatch._
         return lastComparison;
       }
     }
+    lastComparison = Boolean.valueOf(isSetDistance_from_query()).compareTo(typedOther.isSetDistance_from_query());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetDistance_from_query()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.distance_from_query, typedOther.distance_from_query);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
+    lastComparison = Boolean.valueOf(isSetHeading_at_closest_point()).compareTo(typedOther.isSetHeading_at_closest_point());
+    if (lastComparison != 0) {
+      return lastComparison;
+    }
+    if (isSetHeading_at_closest_point()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.heading_at_closest_point, typedOther.heading_at_closest_point);
+      if (lastComparison != 0) {
+        return lastComparison;
+      }
+    }
     return 0;
   }
 
@@ -420,6 +551,18 @@ public class EdgeMatch implements org.apache.thrift.TBase<EdgeMatch, EdgeMatch._
     sb.append("score:");
     sb.append(this.score);
     first = false;
+    if (isSetDistance_from_query()) {
+      if (!first) sb.append(", ");
+      sb.append("distance_from_query:");
+      sb.append(this.distance_from_query);
+      first = false;
+    }
+    if (isSetHeading_at_closest_point()) {
+      if (!first) sb.append(", ");
+      sb.append("heading_at_closest_point:");
+      sb.append(this.heading_at_closest_point);
+      first = false;
+    }
     sb.append(")");
     return sb.toString();
   }
@@ -502,6 +645,22 @@ public class EdgeMatch implements org.apache.thrift.TBase<EdgeMatch, EdgeMatch._
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
             break;
+          case 4: // DISTANCE_FROM_QUERY
+            if (schemeField.type == org.apache.thrift.protocol.TType.DOUBLE) {
+              struct.distance_from_query = iprot.readDouble();
+              struct.setDistance_from_queryIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
+          case 5: // HEADING_AT_CLOSEST_POINT
+            if (schemeField.type == org.apache.thrift.protocol.TType.DOUBLE) {
+              struct.heading_at_closest_point = iprot.readDouble();
+              struct.setHeading_at_closest_pointIsSet(true);
+            } else { 
+              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
+            }
+            break;
           default:
             org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
         }
@@ -528,6 +687,16 @@ public class EdgeMatch implements org.apache.thrift.TBase<EdgeMatch, EdgeMatch._
       oprot.writeFieldBegin(SCORE_FIELD_DESC);
       oprot.writeDouble(struct.score);
       oprot.writeFieldEnd();
+      if (struct.isSetDistance_from_query()) {
+        oprot.writeFieldBegin(DISTANCE_FROM_QUERY_FIELD_DESC);
+        oprot.writeDouble(struct.distance_from_query);
+        oprot.writeFieldEnd();
+      }
+      if (struct.isSetHeading_at_closest_point()) {
+        oprot.writeFieldBegin(HEADING_AT_CLOSEST_POINT_FIELD_DESC);
+        oprot.writeDouble(struct.heading_at_closest_point);
+        oprot.writeFieldEnd();
+      }
       oprot.writeFieldStop();
       oprot.writeStructEnd();
     }
@@ -548,6 +717,20 @@ public class EdgeMatch implements org.apache.thrift.TBase<EdgeMatch, EdgeMatch._
       struct.edge.write(oprot);
       struct.closest_point.write(oprot);
       oprot.writeDouble(struct.score);
+      BitSet optionals = new BitSet();
+      if (struct.isSetDistance_from_query()) {
+        optionals.set(0);
+      }
+      if (struct.isSetHeading_at_closest_point()) {
+        optionals.set(1);
+      }
+      oprot.writeBitSet(optionals, 2);
+      if (struct.isSetDistance_from_query()) {
+        oprot.writeDouble(struct.distance_from_query);
+      }
+      if (struct.isSetHeading_at_closest_point()) {
+        oprot.writeDouble(struct.heading_at_closest_point);
+      }
     }
 
     @Override
@@ -561,6 +744,15 @@ public class EdgeMatch implements org.apache.thrift.TBase<EdgeMatch, EdgeMatch._
       struct.setClosest_pointIsSet(true);
       struct.score = iprot.readDouble();
       struct.setScoreIsSet(true);
+      BitSet incoming = iprot.readBitSet(2);
+      if (incoming.get(0)) {
+        struct.distance_from_query = iprot.readDouble();
+        struct.setDistance_from_queryIsSet(true);
+      }
+      if (incoming.get(1)) {
+        struct.heading_at_closest_point = iprot.readDouble();
+        struct.setHeading_at_closest_pointIsSet(true);
+      }
     }
   }
 

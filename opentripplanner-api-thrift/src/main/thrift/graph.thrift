@@ -58,5 +58,9 @@ struct EdgeMatch {
 	// Score of the match. Lower is better.
 	3: required double score;
 	
-	// TODO(flamholz): add more information, including distance and angle.
+	// The distance in meters from the query point.
+	4: optional double distance_from_query;
+	
+	// The heading of the edge geometry at the match point.
+	5: optional double heading_at_closest_point;
 }
