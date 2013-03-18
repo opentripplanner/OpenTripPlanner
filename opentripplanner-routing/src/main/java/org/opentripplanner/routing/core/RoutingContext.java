@@ -127,7 +127,7 @@ public class RoutingContext implements Cloneable {
      * @param to
      * @param findPlaces
      */
-    public RoutingContext(RoutingRequest routingRequest, Graph graph, Vertex from, Vertex to,
+    private RoutingContext(RoutingRequest routingRequest, Graph graph, Vertex from, Vertex to,
             boolean findPlaces) {
         this.opt = routingRequest;
         this.graph = graph;
