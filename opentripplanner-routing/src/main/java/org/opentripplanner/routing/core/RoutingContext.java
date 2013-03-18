@@ -95,10 +95,7 @@ public class RoutingContext implements Cloneable {
     /* CONSTRUCTORS */
     
     /**
-     * Constructor that automatically computes to/from vertices from RoutingRequest.
-     * 
-     * @param routingRequest
-     * @param graph
+     * Constructor that automatically computes origin/target from RoutingRequest.
      */
     public RoutingContext(RoutingRequest routingRequest, Graph graph) {
         this(routingRequest, graph, null, null, true);
@@ -106,11 +103,6 @@ public class RoutingContext implements Cloneable {
 
     /**
      * Constructor that takes to/from vertices as input.
-     * 
-     * @param routingRequest
-     * @param graph
-     * @param from
-     * @param to
      */
     public RoutingContext(RoutingRequest routingRequest, Graph graph, Vertex from, Vertex to) {
         this(routingRequest, graph, from, to, false);
@@ -121,11 +113,7 @@ public class RoutingContext implements Cloneable {
      * 
      * TODO(flamholz): delete this flexible constructor and move the logic to constructors above appropriately.
      * 
-     * @param routingRequest
-     * @param graph
-     * @param from
-     * @param to
-     * @param findPlaces
+     * @param findPlaces if true, compute origin and target from RoutingRequest using spatial indices.
      */
     private RoutingContext(RoutingRequest routingRequest, Graph graph, Vertex from, Vertex to,
             boolean findPlaces) {
