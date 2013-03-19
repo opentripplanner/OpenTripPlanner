@@ -15,6 +15,8 @@ package org.opentripplanner.graph_builder.impl.osm;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -35,7 +37,7 @@ import org.opentripplanner.routing.graph.Vertex;
 public class TestOpenStreetMapGraphBuilder extends TestCase {
 
     private HashMap<Class<?>, Object> extra;
-
+    
     @Before
     public void setUp() {
         extra = new HashMap<Class<?>, Object>();
@@ -115,7 +117,17 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
 
         loader.buildGraph(gg, extra);
         
+        Set<P2<Integer>> edgeEndpoints = new HashSet<P2<Integer>>();
         for (StreetEdge se : gg.getStreetEdges()) {
+            P2<Integer> endpoints = new P2<Integer>(se.getFromVertex().getIndex(),
+                    se.getToVertex().getIndex());
+            
+            // Check that we don't get any duplicate edges on this small graph.
+            if (edgeEndpoints.contains(endpoints)) {
+                assertFalse(true);
+            }
+            edgeEndpoints.add(endpoints);
+            
             StreetTraversalPermission perm = se.getPermission();
             
             // CAR and CUSTOM_MOTOR_VEHICLE should always have the same permissions.
