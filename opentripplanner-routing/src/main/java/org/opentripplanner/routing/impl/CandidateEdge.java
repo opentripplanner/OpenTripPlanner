@@ -1,11 +1,13 @@
 package org.opentripplanner.routing.impl;
 
+import java.util.Comparator;
+
 import lombok.Getter;
 
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.core.LocationObservation;
+import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -111,6 +113,24 @@ public class CandidateEdge {
     protected double score;
 
     /**
+     * Sorts CandidateEdges by best score first (lower = better).
+     * @author avi
+     */
+    public static class CandidateEdgeScoreComparator implements Comparator<CandidateEdge> {
+        @Override
+        public int compare(CandidateEdge arg0, CandidateEdge arg1) {
+            double score1 = arg0.getScore();
+            double score2 = arg1.getScore();
+            if (score1 == score2) {
+                return 0;
+            } else if (score1 < score2) {
+                return -1;
+            }
+            return 1;        
+        }
+    }
+    
+    /**
      * Construct from a LocationObservation.
      * 
      * @param e
@@ -118,7 +138,7 @@ public class CandidateEdge {
      * @param pref
      * @param mode
      */
-    public CandidateEdge(StreetEdge e, LocationObservation loc, double pref, TraverseModeSet mode) {
+    public CandidateEdge(StreetEdge e, GenericLocation loc, double pref, TraverseModeSet mode) {
         preference = pref;
         edge = e;
         edgeCoords = e.getGeometry().getCoordinateSequence();
@@ -161,7 +181,7 @@ public class CandidateEdge {
      * @param mode
      */
     public CandidateEdge(StreetEdge e, Coordinate p, double pref, TraverseModeSet mode) {
-        this(e, new LocationObservation(p), pref, mode);
+        this(e, new GenericLocation(p), pref, mode);
     }
 
     public boolean endwise() {

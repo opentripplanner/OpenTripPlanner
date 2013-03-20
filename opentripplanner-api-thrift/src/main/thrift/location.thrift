@@ -19,6 +19,12 @@ struct LatLng {
 struct Location {
 	1: optional LatLng lat_lng;
 	
+	// Direction of travel in decimal degrees from -180° to +180° relative to
+    // true north.
+    // 0      = heading true north.
+    // +/-180 = heading south.
+	3: optional double heading;
+	
 	// TODO(flamholz): add more parameters later.
-	// e.g. bearing, azimuth, accuracy.
+	// e.g. azimuth, elevation, accuracy.
 }

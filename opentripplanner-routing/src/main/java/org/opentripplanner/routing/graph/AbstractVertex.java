@@ -83,7 +83,14 @@ public abstract class AbstractVertex implements Vertex {
 
     @Override
     public String toString() {
-        return "<" + this.label + ">";
+        StringBuilder sb = new StringBuilder();
+        sb.append("<").append(this.getLabel());
+        if (this.getCoordinate() != null) {
+            sb.append(" lat,lng=").append(this.getCoordinate().y);
+            sb.append(",").append(this.getCoordinate().x);
+        }
+        sb.append(">");
+        return sb.toString();
     }
 
     public int hashCode() {

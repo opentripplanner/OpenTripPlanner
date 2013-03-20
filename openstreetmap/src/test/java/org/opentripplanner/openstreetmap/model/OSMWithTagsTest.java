@@ -106,4 +106,22 @@ public class OSMWithTagsTest {
         o.addTag("access", "no");
         assertTrue(o.isGeneralAccessDenied());
     }
+    
+    @Test
+    public void testIsThroughTrafficExplicitlyDisallowed() {
+        OSMWithTags o = new OSMWithTags();
+        assertFalse(o.isThroughTrafficExplicitlyDisallowed());
+        
+        o.addTag("access", "something");
+        assertFalse(o.isThroughTrafficExplicitlyDisallowed());
+        
+        o.addTag("access", "destination");
+        assertTrue(o.isThroughTrafficExplicitlyDisallowed());
+
+        o.addTag("access", "forestry");
+        assertTrue(o.isThroughTrafficExplicitlyDisallowed());
+        
+        o.addTag("access", "private");
+        assertTrue(o.isThroughTrafficExplicitlyDisallowed());
+    }   
 }

@@ -48,6 +48,7 @@ public class RoutingRequestBuilderTest {
         LatLng originLatLng = new LatLng(1.0, 2.5);
         Location origin = new Location();
         origin.setLat_lng(originLatLng);
+        origin.setHeading(137.2);
 
         LatLng destLatLng = new LatLng(-3.0, 9.7);
         Location dest = new Location();
@@ -61,10 +62,12 @@ public class RoutingRequestBuilderTest {
         GenericLocation from = rr.getFrom();
         Coordinate expectedFromCoord = new Coordinate(2.5, 1.0);
         assertEquals(expectedFromCoord, from.getCoordinate());
+        assertEquals(origin.getHeading(), from.getHeading(), 0.0);
 
         GenericLocation to = rr.getTo();
         Coordinate expectedToCoord = new Coordinate(9.7, -3.0);
         assertEquals(expectedToCoord, to.getCoordinate());
+        assertFalse(to.hasHeading());
 
         for (TravelMode tm : tp.getAllowed_modes()) {
             TraverseModeSet modeSet = rr.getModes();
@@ -170,7 +173,7 @@ public class RoutingRequestBuilderTest {
     public void testSetNumItineraries() {
         int n = 3;
         RoutingRequest rr = (new RoutingRequestBuilder()).setNumItineraries(n).build();
-        assertEquals(n, rr.getNumItineraries().intValue());
+        assertEquals(n, rr.getNumItineraries());
     }
 
     @Test
@@ -204,6 +207,29 @@ public class RoutingRequestBuilderTest {
         GenericLocation to = rr.getTo();
         Coordinate expectedToCoord = new Coordinate(9.7, -3.0);
         assertEquals(expectedToCoord, to.getCoordinate());
+    }
+    
+    @Test
+    public void testSetOriginDestinationAsLocations() {
+        Location origin = new Location();
+        origin.setLat_lng(new LatLng(1.0, 2.5));
+        origin.setHeading(137.0);
+        Location dest = new Location();
+        dest.setLat_lng(new LatLng(-3.0, 9.7));
+        dest.setHeading(-12.998);
+
+        RoutingRequest rr = (new RoutingRequestBuilder()).setOrigin(origin).setDestination(dest)
+                .build();
+
+        GenericLocation from = rr.getFrom();
+        Coordinate expectedFromCoord = new Coordinate(2.5, 1.0);
+        assertEquals(expectedFromCoord, from.getCoordinate());
+        assertEquals(origin.getHeading(), from.getHeading(), 0.0);
+
+        GenericLocation to = rr.getTo();
+        Coordinate expectedToCoord = new Coordinate(9.7, -3.0);
+        assertEquals(expectedToCoord, to.getCoordinate());
+        assertEquals(dest.getHeading(), to.getHeading(), 0.0);
     }
 
     /**

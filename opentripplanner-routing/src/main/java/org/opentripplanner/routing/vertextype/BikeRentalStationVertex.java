@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.vertextype;
 
 import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.graph.AbstractVertex;
 import org.opentripplanner.routing.graph.Graph;
 
@@ -32,21 +33,12 @@ public class BikeRentalStationVertex extends AbstractVertex {
     private int spacesAvailable;
 
     private String id;
-
-    public BikeRentalStationVertex(Graph g, String id, String label, double x, double y, String name,
-            int capacity) {
-        super(g, label, x, y, name);
-        this.setId(id);
-        this.bikesAvailable = capacity / 2;
-        this.spacesAvailable = capacity / 2;
-    }
-
-    public BikeRentalStationVertex(Graph g, String id, String label, double x, double y, String name,
-            int bikes, int spaces) {
-        super(g, label, x, y, name);
-        this.setId(id);
-        this.bikesAvailable = bikes;
-        this.spacesAvailable = spaces;
+    
+    public BikeRentalStationVertex(Graph g, BikeRentalStation station) {
+        super(g, "bike rental station " + station.id, station.x, station.y, station.name);
+        this.setId(station.id);
+        this.setBikesAvailable(station.bikesAvailable);
+        this.setSpacesAvailable(station.spacesAvailable);
     }
 
     public int getBikesAvailable() {

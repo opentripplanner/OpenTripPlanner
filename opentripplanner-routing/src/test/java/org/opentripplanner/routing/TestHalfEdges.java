@@ -25,6 +25,7 @@ import junit.framework.TestCase;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -309,17 +310,17 @@ public class TestHalfEdges extends TestCase {
         StreetVertexIndexServiceImpl finder = new StreetVertexIndexServiceImpl(graph);
         finder.setup();
         // test that the local stop finder finds stops
-        Coordinate c = new Coordinate(-74.005000001, 40.01);
-        assertTrue(finder.getLocalTransitStops(c, 100).size() > 0);
+        GenericLocation loc = new GenericLocation(40.01, -74.005000001);
+        assertTrue(finder.getLocalTransitStops(loc.getCoordinate(), 100).size() > 0);
 
         // test that the closest vertex finder returns the closest vertex
-        StreetLocation some = (StreetLocation) finder.getClosestVertex(
-                new Coordinate(-74.00, 40.00), null, null);
+        StreetLocation some = (StreetLocation) finder.getVertexForLocation(
+                new GenericLocation(40.00, -74.00), null);
         assertNotNull(some);
 
         // test that the closest vertex finder correctly splits streets
-        StreetLocation start = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.01,
-                40.004), null, null);
+        StreetLocation start = (StreetLocation) finder.getVertexForLocation(
+                new GenericLocation(40.004, -74.01), null);
         assertNotNull(start);
         assertTrue("wheelchair accessibility is correctly set (splitting)",
                 start.isWheelchairAccessible());
@@ -328,8 +329,8 @@ public class TestHalfEdges extends TestCase {
         assertEquals(4, extras.size());
 
         RoutingRequest biking = new RoutingRequest(new TraverseModeSet(TraverseMode.BICYCLE));
-        StreetLocation end = (StreetLocation) finder.getClosestVertex(
-                new Coordinate(-74.0, 40.008), null, biking);
+        StreetLocation end = (StreetLocation) finder.getVertexForLocation(
+                new GenericLocation(40.008, -74.0), biking);
         assertNotNull(end);
 
         extras = end.getExtra();
@@ -338,8 +339,8 @@ public class TestHalfEdges extends TestCase {
         // test that the closest vertex finder also adds an edge to transit
         // stops (if you are really close to the transit stop relative to the
         // street)
-        StreetLocation location = (StreetLocation) finder.getClosestVertex(new Coordinate(
-                -74.004999, 40.00999), null, new RoutingRequest());
+        StreetLocation location = (StreetLocation) finder.getVertexForLocation(
+                new GenericLocation(40.00999, -74.004999), new RoutingRequest());
         assertTrue(location.isWheelchairAccessible());
         boolean found = false;
         for (Edge extra : location.getExtra()) {
@@ -351,10 +352,11 @@ public class TestHalfEdges extends TestCase {
 
         // test that it is possible to travel between two splits on the same street
         RoutingRequest walking = new RoutingRequest(TraverseMode.WALK);
-        start = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.0, 40.004), null,
+        start = (StreetLocation) finder.getVertexForLocation(new GenericLocation(40.004, -74.0),
                 walking);
-        end = (StreetLocation) finder.getClosestVertex(new Coordinate(-74.0, 40.008), null,
-                walking, start.getExtra());
+        end = (StreetLocation) finder.getVertexForLocation(new GenericLocation(40.008, -74.0),
+                walking);
+        //, start.getExtra());
         assertNotNull(end);
         walking.setRoutingContext(graph, start, end);
         ShortestPathTree spt = aStar.getShortestPathTree(walking);

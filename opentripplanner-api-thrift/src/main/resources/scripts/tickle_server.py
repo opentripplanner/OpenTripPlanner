@@ -75,7 +75,7 @@ def Main():
     print '\tReturned %d vertices' % len(vertices)
     
     # Sample an origin and a destination (deterministically)
-    random.seed(12345)
+    random.seed(123456)
     origin, dest = random.sample(vertices, 2)
     origin_ll = origin.lat_lng
     dest_ll = dest.lat_lng
@@ -120,10 +120,12 @@ def Main():
     print 'FindPathsRequest took %.6f seconds' % total_t
     print 'Server computation time %.6f seconds' % reported_compute_time
     paths = res.paths
+    print paths
     if paths.no_paths_found:
         print 'Found no paths'
     else:
         expected_duration = paths.paths[0].duration
+        print 'Found path', res.paths[0]
         print 'Trip expected to take %d seconds' % expected_duration
     
     # Sample 10 origins and a destinations (deterministically)
@@ -151,7 +153,7 @@ def Main():
         reported_compute_time = float(res.compute_time_millis) / 1000.0
         print ('BulkFindPaths took %.6f seconds '
                'for %d trips ' % (total_t, len(origins))) 
-        print 'Server computation time %.6f seconds' % reported_compute_time
+        print 'Server computation time %.6f seconds' % reported_compute_time        
     except OTPService.NoPathFoundError, e:
         print e
         

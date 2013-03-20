@@ -94,22 +94,43 @@ public class RoutingContext implements Cloneable {
     
     /* CONSTRUCTORS */
     
-    public RoutingContext(RoutingRequest traverseOptions, Graph graph, 
-                          Vertex from, Vertex to, boolean findPlaces) {
-        this.opt = traverseOptions;
+    /**
+     * Constructor that automatically computes origin/target from RoutingRequest.
+     */
+    public RoutingContext(RoutingRequest routingRequest, Graph graph) {
+        this(routingRequest, graph, null, null, true);
+    }
+
+    /**
+     * Constructor that takes to/from vertices as input.
+     */
+    public RoutingContext(RoutingRequest routingRequest, Graph graph, Vertex from, Vertex to) {
+        this(routingRequest, graph, from, to, false);
+    }
+
+    /**
+     * Flexible constructor which may compute to/from vertices.
+     * 
+     * TODO(flamholz): delete this flexible constructor and move the logic to constructors above appropriately.
+     * 
+     * @param findPlaces if true, compute origin and target from RoutingRequest using spatial indices.
+     */
+    private RoutingContext(RoutingRequest routingRequest, Graph graph, Vertex from, Vertex to,
+            boolean findPlaces) {
+        this.opt = routingRequest;
         this.graph = graph;
-        
+
         if (findPlaces) {
-            // normal mode, search for vertices based on fromPlace and toPlace
-            if ( ! opt.batch || opt.arriveBy) {
+            // normal mode, search for vertices based RoutingRequest
+            if (!opt.batch || opt.arriveBy) {
                 // non-batch mode, or arriveBy batch mode: we need a to vertex
                 toVertex = graph.streetIndex.getVertexForLocation(opt.getTo(), opt);
             } else {
                 toVertex = null;
             }
-            if ( ! opt.batch || ! opt.arriveBy) {
+            if (!opt.batch || !opt.arriveBy) {
                 // non-batch mode, or depart-after batch mode: we need a from vertex
-                fromVertex = graph.streetIndex.getVertexForLocation(opt.getFrom(), opt, toVertex);                
+                fromVertex = graph.streetIndex.getVertexForLocation(opt.getFrom(), opt, toVertex);
             } else {
                 fromVertex = null;
             }
@@ -119,7 +140,7 @@ public class RoutingContext implements Cloneable {
                     intermediateVertices.add(vertex);
                 }
             }
-        } else { 
+        } else {
             // debug mode, force endpoint vertices to those specified rather than searching
             fromVertex = from;
             toVertex = to;
@@ -127,9 +148,9 @@ public class RoutingContext implements Cloneable {
         if (opt.getStartingTransitStopId() != null) {
             TransitIndexService tis = graph.getService(TransitIndexService.class);
             if (tis == null) {
-                throw new RuntimeException("Next/Previous/First/Last trip " + 
-                        "functionality depends on the transit index. Rebuild " +
-                        "the graph with TransitIndexBuilder");
+                throw new RuntimeException("Next/Previous/First/Last trip "
+                        + "functionality depends on the transit index. Rebuild "
+                        + "the graph with TransitIndexBuilder");
             }
             AgencyAndId stopId = opt.getStartingTransitStopId();
             startingStop = tis.getPreBoardEdge(stopId).getToVertex();
@@ -138,7 +159,7 @@ public class RoutingContext implements Cloneable {
         target = opt.arriveBy ? fromVertex : toVertex;
         calendarService = graph.getCalendarService();
         transferTable = graph.getTransferTable();
-        // the graph's snapshot may be frequently updated. 
+        // the graph's snapshot may be frequently updated.
         // Grab a reference to ensure a coherent view of the timetables throughout this search.
         if (graph.timetableSnapshotSource != null)
             timetableSnapshot = graph.timetableSnapshotSource.getSnapshot();
@@ -149,6 +170,14 @@ public class RoutingContext implements Cloneable {
             remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
         else
             remainingWeightHeuristic = heuristicFactory.getInstanceForSearch(opt);
+        
+        LOG.debug("Origin vertex {}", this.origin);
+        LOG.debug("Origin vertex inbound edges {}", this.origin.getIncoming());
+        LOG.debug("Origin vertex outbound edges {}", this.origin.getOutgoing());
+        
+        LOG.debug("Destination vertex {}", this.target);
+        LOG.debug("Destination vertex inbound edges {}", this.target.getIncoming());
+        LOG.debug("Destination vertex outbound edges {}", this.target.getOutgoing());
     }
     
     

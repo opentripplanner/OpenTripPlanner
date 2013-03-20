@@ -124,7 +124,10 @@ public abstract class RentABikeAbstractEdge extends Edge {
     private boolean hasCompatibleNetworks(Set<String> stationNetworks, Set<String> rentedNetworks) {
         /*
          * Two stations are compatible if they share at least one network.
+         * Special case for "*" networks (no network defined in OSM).
          */
+        if (stationNetworks.contains("*") || rentedNetworks.contains("*"))
+            return true;
         return !Sets.intersection(stationNetworks, rentedNetworks).isEmpty();
     }
 }

@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Set;
 
 import lombok.Setter;
-import lombok.Getter;
 
 import org.opentripplanner.common.DisjointSet;
 import org.opentripplanner.common.RepeatingTimePeriod;
@@ -57,6 +56,8 @@ import org.opentripplanner.openstreetmap.services.OpenStreetMapContentHandler;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 import org.opentripplanner.routing.algorithm.GenericDijkstra;
 import org.opentripplanner.routing.algorithm.strategies.SkipEdgeStrategy;
+import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -799,13 +800,15 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         private void processBikeRentalNodes() {
             _log.debug("Processing bike rental nodes...");
             int n = 0;
+            BikeRentalStationService bikeRentalService = new BikeRentalStationService();
+            graph.putService(BikeRentalStationService.class, bikeRentalService);
             for (OSMNode node : _bikeRentalNodes) {
                 n++;
                 String creativeName = wayPropertySet.getCreativeNameForWay(node);
                 int capacity = Integer.MAX_VALUE;
                 if (node.hasTag("capacity")) {
                     try {
-                        capacity = Integer.parseInt(node.getTag("capacity"));
+                        capacity = node.getCapacity();
                     } catch (NumberFormatException e) {
                         _log.warn("Capacity for osm node " + node.getId() + " (" + creativeName
                                 + ") is not a number: " + node.getTag("capacity"));
@@ -820,15 +823,20 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     networkSet.addAll(Arrays.asList(operators.split(";")));
                 if (networkSet.isEmpty()) {
                     _log.warn("Bike rental station at osm node " + node.getId() + " ("
-                            + creativeName + ") with no network; not including");
-                    continue;
+                            + creativeName + ") with no network; including as compatible-with-all.");
+                    networkSet.add("*"); // Special "catch-all" value
                 }
-                BikeRentalStationVertex station = new BikeRentalStationVertex(graph, ""
-                        + node.getId(), "bike rental " + node.getId(), node.getLon(),
-                        node.getLat(), creativeName, capacity);
-
-                new RentABikeOnEdge(station, station, networkSet);
-                new RentABikeOffEdge(station, station, networkSet);
+                BikeRentalStation station = new BikeRentalStation();
+                station.id = "" + node.getId();
+                station.name = creativeName;
+                station.x = node.getLon();
+                station.y = node.getLat();
+                station.spacesAvailable = capacity / 2;
+                station.bikesAvailable = capacity / 2;
+                bikeRentalService.addStation(station);
+                BikeRentalStationVertex stationVertex = new BikeRentalStationVertex(graph, station);
+                new RentABikeOnEdge(stationVertex, stationVertex, networkSet);
+                new RentABikeOffEdge(stationVertex, stationVertex, networkSet);
             }
             _log.debug("Created " + n + " bike rental stations.");
         }
@@ -1525,10 +1533,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
             Set<Alert> note = wayPropertySet.getNoteForWay(way);
             Set<Alert> wheelchairNote = getWheelchairNotes(way);
-            String access = way.getTag("access");
-            boolean noThruTraffic = "destination".equals(access) || "private".equals(access)
-                    || "customers".equals(access) || "delivery".equals(access)
-                    || "forestry".equals(access) || "agricultural".equals(access);
+            boolean noThruTraffic = way.isThroughTrafficExplicitlyDisallowed();
 
             if (street != null) {
                 double safety = wayData.getSafetyFeatures().getFirst();
@@ -1850,22 +1855,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                             .equals("raceway")))
                 return false;
 
-            String access = way.getTag("access");
-
-            if (access != null) {
-                if ("no".equals(access) || "license".equals(access)) {
-                    if (way.doesTagAllowAccess("motorcar")) {
-                        return true;
-                    }
-                    if (way.doesTagAllowAccess("bicycle")) {
-                        return true;
-                    }
-                    if (way.doesTagAllowAccess("foot")) {
-                        return true;
-                    }
-                    return false;
-                }
+            if (way.isGeneralAccessDenied()) {
+                // There are exceptions.
+                return (way.isMotorcarExplicitlyAllowed() || way.isBicycleExplicitlyAllowed() || way
+                        .isPedestrianExplicitlyAllowed());
             }
+            
             return true;
         }
 
@@ -2499,15 +2494,15 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
              */
 
             // Compute pedestrian permissions.
-            if (way.isPedestrianAllowed()) {
+            if (way.isPedestrianExplicitlyAllowed()) {
                 permissions = permissions.add(StreetTraversalPermission.PEDESTRIAN);
-            } else if (way.isPedestrianExplicitlyDisallowed()) {
+            } else if (way.isPedestrianExplicitlyDenied()) {
                 permissions = permissions.remove(StreetTraversalPermission.PEDESTRIAN);
             }
 
             // Compute bike permissions, check consistency.
             boolean forceBikes = false;
-            if (way.isBicycleAllowed()) {
+            if (way.isBicycleExplicitlyAllowed()) {
                 permissions = permissions.add(StreetTraversalPermission.BICYCLE);
                 forceBikes = true;
             }
@@ -2520,17 +2515,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
 
             return permissions;
-        }
-
-        /**
-         * Is this a multi-level node that should be decomposed to multiple coincident nodes? Currently returns true only for elevators.
-         * 
-         * @param node
-         * @return whether the node is multi-level
-         * @author mattwigway
-         */
-        private boolean isMultiLevelNode(OSMNode node) {
-            return node.hasTag("highway") && "elevator".equals(node.getTag("highway"));
         }
 
         /**
@@ -2576,7 +2560,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             // use the numeric level because it is unique, the human level may not be (although
             // it will likely lead to some head-scratching if it is not).
             IntersectionVertex iv = null;
-            if (isMultiLevelNode(node)) {
+            if (node.isMultiLevel()) {
                 // make a separate node for every level
                 return recordLevel(node, way);
             }

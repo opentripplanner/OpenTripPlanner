@@ -2,6 +2,7 @@ package org.opentripplanner.api.thrift.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -24,6 +25,7 @@ import org.opentripplanner.api.thrift.definition.GraphEdgesResponse;
 import org.opentripplanner.api.thrift.definition.GraphVertex;
 import org.opentripplanner.api.thrift.definition.GraphVerticesRequest;
 import org.opentripplanner.api.thrift.definition.GraphVerticesResponse;
+import org.opentripplanner.api.thrift.definition.Location;
 import org.opentripplanner.api.thrift.definition.OTPService;
 import org.opentripplanner.api.thrift.definition.PathOptions;
 import org.opentripplanner.api.thrift.definition.TripParameters;
@@ -35,7 +37,7 @@ import org.opentripplanner.api.thrift.util.LatLngExtension;
 import org.opentripplanner.api.thrift.util.RoutingRequestBuilder;
 import org.opentripplanner.api.thrift.util.TravelModeSet;
 import org.opentripplanner.api.thrift.util.TripPathsExtension;
-import org.opentripplanner.routing.core.LocationObservation;
+import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -44,6 +46,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.CandidateEdge;
+import org.opentripplanner.routing.impl.CandidateEdge.CandidateEdgeScoreComparator;
 import org.opentripplanner.routing.impl.CandidateEdgeBundle;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
@@ -52,7 +55,6 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.geom.Coordinate;
 
 /**
  * Concrete implementation of the Thrift interface.
@@ -172,10 +174,10 @@ public class OTPServiceImpl implements OTPService.Iface {
 
         // Get the nearest vertex
         StreetVertexIndexService streetVertexIndex = getStreetIndex();
-        Coordinate c = new LatLngExtension(req.getLocation().getLat_lng()).toCoordinate();
+        GenericLocation gl = new LatLngExtension(req.getLocation().getLat_lng()).toGenericLocation();
         // NOTE(flamholz): We don't currently provide a name.
         // I guess this would speed things up somewhat?
-        Vertex closest = streetVertexIndex.getClosestVertex(c, null, rr);
+        Vertex closest = streetVertexIndex.getVertexForLocation(gl, rr);
 
         FindNearestVertexResponse res = new FindNearestVertexResponse();
         res.setNearest_vertex(new GraphVertexExtension(closest));
@@ -185,24 +187,28 @@ public class OTPServiceImpl implements OTPService.Iface {
 
     @Override
     public FindNearestEdgesResponse FindNearestEdges(FindNearestEdgesRequest req) throws TException {
-        LOG.info("FindNearestEdges called");
+        LOG.info("FindNearestEdges called with query {}", req.getLocation());
         long startTime = System.currentTimeMillis();
 
         // Set up the TraversalRequirements.
         TraversalRequirements requirements = new TraversalRequirements();
         requirements.setModes(new TravelModeSet(req.getAllowed_modes()).toTraverseModeSet());
-
-        // Set up the LocationObservation.
-        Coordinate c = new LatLngExtension(req.getLocation().getLat_lng()).toCoordinate();
-        LocationObservation.Builder builder = new LocationObservation.Builder().setCoordinate(c);
-        if (req.isSetHeading()) builder.setHeading(req.getHeading());
         
-        // Find the candidate edges. 
+        // Set up the LocationObservation.
+        Location queryLoc = req.getLocation();
+        GenericLocation loc = new LatLngExtension(queryLoc.getLat_lng()).toGenericLocation();
+        if (queryLoc.isSetHeading()) loc.setHeading(queryLoc.getHeading());
+                
+        // Find the candidate edges.
         // NOTE(flamholz): for now this will return at smallish number of edges because of
         // the internal binning that's going on. I'd rather get more edges just in case...
         StreetVertexIndexService streetVertexIndex = getStreetIndex();
-        CandidateEdgeBundle edges = streetVertexIndex.getClosestEdges(builder.build(), requirements);
+        CandidateEdgeBundle edges = streetVertexIndex.getClosestEdges(loc, requirements);
 
+        // Sort them by score.
+        CandidateEdgeScoreComparator comp = new CandidateEdgeScoreComparator();
+        Collections.sort(edges, comp);
+        
         // Add matches to the response.
         FindNearestEdgesResponse res = new FindNearestEdgesResponse();
         int maxEdges = req.getMax_edges();

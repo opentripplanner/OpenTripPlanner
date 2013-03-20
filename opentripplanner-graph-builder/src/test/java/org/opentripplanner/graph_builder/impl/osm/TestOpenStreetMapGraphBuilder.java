@@ -15,15 +15,20 @@ package org.opentripplanner.graph_builder.impl.osm;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.impl.FileBasedOpenStreetMapProviderImpl;
+import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -32,7 +37,7 @@ import org.opentripplanner.routing.graph.Vertex;
 public class TestOpenStreetMapGraphBuilder extends TestCase {
 
     private HashMap<Class<?>, Object> extra;
-
+    
     @Before
     public void setUp() {
         extra = new HashMap<Class<?>, Object>();
@@ -90,7 +95,55 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
                 .getName().contains("Kamiennog\u00F3rska"));
         assertTrue("name of e2 must be like \"Mariana Smoluchowskiego\"; was " + e2.getName(), e2
                 .getName().contains("Mariana Smoluchowskiego"));
+    }
 
+    /**
+     * Detailed testing of OSM graph building using a very small chunk of NYC (SOHO-ish).
+     * @throws Exception
+     */
+    @Test
+    public void testBuildGraphDetailed() throws Exception {
+
+        Graph gg = new Graph();
+
+        OpenStreetMapGraphBuilderImpl loader = new OpenStreetMapGraphBuilderImpl();
+        loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
+        FileBasedOpenStreetMapProviderImpl provider = new FileBasedOpenStreetMapProviderImpl();
+
+        File file = new File(getClass().getResource("NYC_small.osm.gz").getFile());
+
+        provider.setPath(file);
+        loader.setProvider(provider);
+
+        loader.buildGraph(gg, extra);
+        
+        Set<P2<Integer>> edgeEndpoints = new HashSet<P2<Integer>>();
+        for (StreetEdge se : gg.getStreetEdges()) {
+            P2<Integer> endpoints = new P2<Integer>(se.getFromVertex().getIndex(),
+                    se.getToVertex().getIndex());
+            
+            // Check that we don't get any duplicate edges on this small graph.
+            if (edgeEndpoints.contains(endpoints)) {
+                assertFalse(true);
+            }
+            edgeEndpoints.add(endpoints);
+            
+            StreetTraversalPermission perm = se.getPermission();
+            
+            // CAR and CUSTOM_MOTOR_VEHICLE should always have the same permissions.
+            assertEquals(perm.allows(StreetTraversalPermission.CAR),
+                    perm.allows(StreetTraversalPermission.CUSTOM_MOTOR_VEHICLE));
+
+            // Check turn restriction consistency.
+            // NOTE(flamholz): currently there don't appear to be any turn restrictions
+            // in the OSM file we are loading.
+            for (TurnRestriction tr : se.getTurnRestrictions()) {                
+                // All turn restrictions should apply equally to
+                // CAR and CUSTOM_MOTOR_VEHICLE.
+                TraverseModeSet modes = tr.modes;
+                assertEquals(modes.getCar(), modes.getCustomMotorVehicle());
+            }
+        }
     }
 
     @Test
