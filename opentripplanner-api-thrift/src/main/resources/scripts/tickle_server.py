@@ -97,6 +97,20 @@ def Main():
     print 'Server computation time %.6f seconds' % reported_compute_time
     print 'Nearest vertex: ', result.nearest_vertex
     
+    # Run a bulk vertex search geocoding request
+    req = OTPService.BulkFindNearestVertexRequest(
+        queries=[VertexQuery(location=origin_loc),
+               VertexQuery(location=dest_loc)])
+    start_t = time.time()
+    res = client.BulkFindNearestVertex(req) 
+    total_t = time.time() - start_t
+    
+    results = res.results
+    reported_compute_time = float(res.compute_time_millis) / 1000.0
+    print 'BulkFindNearestVertexRequest took %.6f seconds' % total_t
+    print 'Server computation time %.6f seconds' % reported_compute_time
+    print 'Results: ', results
+    
     q = NearestEdgesQuery(location=origin_loc,
                           allowed_modes=set([TravelMode.CAR]))
     req = OTPService.FindNearestEdgesRequest(query=q)
@@ -109,6 +123,19 @@ def Main():
     print 'FindNearestEdgesRequest took %.6f seconds' % total_t
     print 'Server computation time %.6f seconds' % reported_compute_time
     print 'Nearest edges: ', result.nearest_edges
+    
+    q2 = NearestEdgesQuery(location=dest_loc,
+                           allowed_modes=set([TravelMode.CAR]))
+    req = OTPService.BulkFindNearestEdgesRequest(queries=[q, q2])
+    start_t = time.time()
+    res = client.BulkFindNearestEdges(req)
+    total_t = time.time() - start_t
+    
+    results = res.results
+    reported_compute_time = float(res.compute_time_millis) / 1000.0
+    print 'BulkFindNearestEdgesRequest took %.6f seconds' % total_t
+    print 'Server computation time %.6f seconds' % reported_compute_time
+    print 'Results: ', results
     
     # Request a walking trip between them.
     trip_params = TripParameters(
