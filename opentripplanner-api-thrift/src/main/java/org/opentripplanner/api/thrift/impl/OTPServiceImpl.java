@@ -163,19 +163,13 @@ public class OTPServiceImpl implements OTPService.Iface {
         return res;
     }
     
-    @Override
-    public FindNearestVertexResponse FindNearestVertex(FindNearestVertexRequest req)
-            throws TException {
-        LOG.info("FindNearestVertex called");
-        long startTime = System.currentTimeMillis();
-
+    private VertexResult findNearbyVertex(VertexQuery q) {
         // NOTE(flamholz): can't set the graph here because we are not
         // actually doing any routing and don't have a to/from. From the
         // perspective of the street indes, RoutingRequest is really just
         // a container for the TraversalModes, which is a weird design
         // but it's what we've got to work with.
         RoutingRequestBuilder rrb = new RoutingRequestBuilder();
-        VertexQuery q = req.getQuery();
         if (q.isSetAllowed_modes()) {
             rrb.setTravelModes(q.getAllowed_modes());
         }
@@ -190,20 +184,34 @@ public class OTPServiceImpl implements OTPService.Iface {
         VertexResult result = new VertexResult();
         result.setNearest_vertex(new GraphVertexExtension(closest));
         
+        rr.cleanup();
+        return result;
+    }
+    
+    @Override
+    public FindNearestVertexResponse FindNearestVertex(FindNearestVertexRequest req)
+            throws TException {
+        LOG.info("FindNearestVertex called");
+        long startTime = System.currentTimeMillis();
+        VertexQuery q = req.getQuery();
+        VertexResult result = findNearbyVertex(q);
+        
         FindNearestVertexResponse res = new FindNearestVertexResponse();
         res.setResult(result);
         res.setCompute_time_millis(System.currentTimeMillis() - startTime);
         return res;
     }
-
+    
     @Override
-    public FindNearestEdgesResponse FindNearestEdges(FindNearestEdgesRequest req) throws TException {
-        LOG.info("FindNearestEdges called");
-        long startTime = System.currentTimeMillis();
+    public BulkFindNearestVertexResponse BulkFindNearestVertex(BulkFindNearestVertexRequest req)
+            throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
+    private NearestEdgesResult findNearestEdges(NearestEdgesQuery q) {
         // Set up the TraversalRequirements.
         TraversalRequirements requirements = new TraversalRequirements();
-        NearestEdgesQuery q = req.getQuery();
         requirements.setModes(new TravelModeSet(q.getAllowed_modes()).toTraverseModeSet());
         
         // Set up the LocationObservation.
@@ -228,11 +236,29 @@ public class OTPServiceImpl implements OTPService.Iface {
             if (result.getNearest_edgesSize() >= maxEdges) break;
             result.addToNearest_edges(new EdgeMatchExtension(e));
         }
+        
+        return result;
+    }
+    
+    @Override
+    public FindNearestEdgesResponse FindNearestEdges(FindNearestEdgesRequest req) throws TException {
+        LOG.info("FindNearestEdges called");
+        long startTime = System.currentTimeMillis();
+
+        NearestEdgesQuery q = req.getQuery();
+        NearestEdgesResult result = findNearestEdges(q);
 
         FindNearestEdgesResponse res = new FindNearestEdgesResponse();
         res.setResult(result);
         res.setCompute_time_millis(System.currentTimeMillis() - startTime);
         return res;
+    }
+    
+    @Override
+    public BulkFindNearestEdgesResponse BulkFindNearestEdges(BulkFindNearestEdgesRequest req)
+            throws TException {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     /**
@@ -289,20 +315,6 @@ public class OTPServiceImpl implements OTPService.Iface {
         }
         res.setCompute_time_millis(System.currentTimeMillis() - startTime);
         return res;
-    }
-
-    @Override
-    public BulkFindNearestVertexResponse BulkFindNearestVertex(BulkFindNearestVertexRequest req)
-            throws TException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public BulkFindNearestEdgesResponse BulkFindNearestEdges(BulkFindNearestEdgesRequest req)
-            throws TException {
-        // TODO Auto-generated method stub
-        return null;
     }
 
 }
