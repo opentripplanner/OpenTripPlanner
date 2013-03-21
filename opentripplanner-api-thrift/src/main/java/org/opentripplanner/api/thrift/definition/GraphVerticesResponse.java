@@ -415,14 +415,14 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
           case 1: // VERTICES
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list16 = iprot.readListBegin();
-                struct.vertices = new ArrayList<org.opentripplanner.api.thrift.definition.GraphVertex>(_list16.size);
-                for (int _i17 = 0; _i17 < _list16.size; ++_i17)
+                org.apache.thrift.protocol.TList _list48 = iprot.readListBegin();
+                struct.vertices = new ArrayList<org.opentripplanner.api.thrift.definition.GraphVertex>(_list48.size);
+                for (int _i49 = 0; _i49 < _list48.size; ++_i49)
                 {
-                  org.opentripplanner.api.thrift.definition.GraphVertex _elem18; // required
-                  _elem18 = new org.opentripplanner.api.thrift.definition.GraphVertex();
-                  _elem18.read(iprot);
-                  struct.vertices.add(_elem18);
+                  org.opentripplanner.api.thrift.definition.GraphVertex _elem50; // required
+                  _elem50 = new org.opentripplanner.api.thrift.definition.GraphVertex();
+                  _elem50.read(iprot);
+                  struct.vertices.add(_elem50);
                 }
                 iprot.readListEnd();
               }
@@ -456,9 +456,9 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
         oprot.writeFieldBegin(VERTICES_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.vertices.size()));
-          for (org.opentripplanner.api.thrift.definition.GraphVertex _iter19 : struct.vertices)
+          for (org.opentripplanner.api.thrift.definition.GraphVertex _iter51 : struct.vertices)
           {
-            _iter19.write(oprot);
+            _iter51.write(oprot);
           }
           oprot.writeListEnd();
         }
@@ -488,9 +488,9 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
       TTupleProtocol oprot = (TTupleProtocol) prot;
       {
         oprot.writeI32(struct.vertices.size());
-        for (org.opentripplanner.api.thrift.definition.GraphVertex _iter20 : struct.vertices)
+        for (org.opentripplanner.api.thrift.definition.GraphVertex _iter52 : struct.vertices)
         {
-          _iter20.write(oprot);
+          _iter52.write(oprot);
         }
       }
       BitSet optionals = new BitSet();
@@ -507,14 +507,14 @@ public class GraphVerticesResponse implements org.apache.thrift.TBase<GraphVerti
     public void read(org.apache.thrift.protocol.TProtocol prot, GraphVerticesResponse struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
       {
-        org.apache.thrift.protocol.TList _list21 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
-        struct.vertices = new ArrayList<org.opentripplanner.api.thrift.definition.GraphVertex>(_list21.size);
-        for (int _i22 = 0; _i22 < _list21.size; ++_i22)
+        org.apache.thrift.protocol.TList _list53 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+        struct.vertices = new ArrayList<org.opentripplanner.api.thrift.definition.GraphVertex>(_list53.size);
+        for (int _i54 = 0; _i54 < _list53.size; ++_i54)
         {
-          org.opentripplanner.api.thrift.definition.GraphVertex _elem23; // required
-          _elem23 = new org.opentripplanner.api.thrift.definition.GraphVertex();
-          _elem23.read(iprot);
-          struct.vertices.add(_elem23);
+          org.opentripplanner.api.thrift.definition.GraphVertex _elem55; // required
+          _elem55 = new org.opentripplanner.api.thrift.definition.GraphVertex();
+          _elem55.read(iprot);
+          struct.vertices.add(_elem55);
         }
       }
       struct.setVerticesIsSet(true);

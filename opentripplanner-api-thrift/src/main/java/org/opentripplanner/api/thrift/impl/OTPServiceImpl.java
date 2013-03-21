@@ -11,6 +11,10 @@ import lombok.Data;
 
 import org.apache.thrift.TException;
 import org.opentripplanner.api.thrift.OTPServerTask;
+import org.opentripplanner.api.thrift.definition.BulkFindNearestEdgesRequest;
+import org.opentripplanner.api.thrift.definition.BulkFindNearestEdgesResponse;
+import org.opentripplanner.api.thrift.definition.BulkFindNearestVertexRequest;
+import org.opentripplanner.api.thrift.definition.BulkFindNearestVertexResponse;
 import org.opentripplanner.api.thrift.definition.BulkPathsRequest;
 import org.opentripplanner.api.thrift.definition.BulkPathsResponse;
 import org.opentripplanner.api.thrift.definition.FindNearestEdgesRequest;
@@ -285,6 +289,20 @@ public class OTPServiceImpl implements OTPService.Iface {
         }
         res.setCompute_time_millis(System.currentTimeMillis() - startTime);
         return res;
+    }
+
+    @Override
+    public BulkFindNearestVertexResponse BulkFindNearestVertex(BulkFindNearestVertexRequest req)
+            throws TException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public BulkFindNearestEdgesResponse BulkFindNearestEdges(BulkFindNearestEdgesRequest req)
+            throws TException {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

@@ -96,6 +96,34 @@ struct FindNearestEdgesResponse {
 	10: optional i64 compute_time_millis;
 }
 
+// Request to find the nearest vertex.
+struct BulkFindNearestVertexRequest {
+	//  A list of vertex queries
+	1: required list<VertexQuery> queries;
+}
+
+struct BulkFindNearestVertexResponse {
+	// Results for queries in the same order.
+	1: required list<VertexResult> results;
+	
+	// The computation time in milliseconds.
+	10: optional i64 compute_time_millis;
+}
+
+// Request to find nearby edges
+struct BulkFindNearestEdgesRequest {
+	// Query for the nearest edges.
+	1: required list<NearestEdgesQuery> queries;
+}
+
+struct BulkFindNearestEdgesResponse {
+	// Results for queries in the same order given in the request.
+	1: required list<NearestEdgesResult> results;
+
+	// The computation time in milliseconds.
+	10: optional i64 compute_time_millis;
+}
+
 // Request to get vertices in the graph.
 struct GraphVerticesRequest {
 	// TODO(flamholz): add parameters about which graph, etc.
@@ -155,6 +183,16 @@ service OTPService {
 	 * Find the nearest graph edges.
 	 */
 	FindNearestEdgesResponse FindNearestEdges(1:FindNearestEdgesRequest req);
+	
+	/**
+	 * Bulk querying for nearest vertices. 
+	 */
+	BulkFindNearestVertexResponse BulkFindNearestVertex(1:BulkFindNearestVertexRequest req);
+	
+	/**
+	 * Bulk querying for nearest edges.
+	 */
+	BulkFindNearestEdgesResponse BulkFindNearestEdges(1:BulkFindNearestEdgesRequest req);
 
 	/**
 	 * Find paths for a single trip.
