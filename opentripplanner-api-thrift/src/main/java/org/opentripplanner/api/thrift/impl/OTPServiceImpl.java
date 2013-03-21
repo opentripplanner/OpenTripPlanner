@@ -11,6 +11,10 @@ import lombok.Data;
 
 import org.apache.thrift.TException;
 import org.opentripplanner.api.thrift.OTPServerTask;
+import org.opentripplanner.api.thrift.definition.BulkFindNearestEdgesRequest;
+import org.opentripplanner.api.thrift.definition.BulkFindNearestEdgesResponse;
+import org.opentripplanner.api.thrift.definition.BulkFindNearestVertexRequest;
+import org.opentripplanner.api.thrift.definition.BulkFindNearestVertexResponse;
 import org.opentripplanner.api.thrift.definition.BulkPathsRequest;
 import org.opentripplanner.api.thrift.definition.BulkPathsResponse;
 import org.opentripplanner.api.thrift.definition.FindNearestEdgesRequest;
@@ -26,10 +30,14 @@ import org.opentripplanner.api.thrift.definition.GraphVertex;
 import org.opentripplanner.api.thrift.definition.GraphVerticesRequest;
 import org.opentripplanner.api.thrift.definition.GraphVerticesResponse;
 import org.opentripplanner.api.thrift.definition.Location;
+import org.opentripplanner.api.thrift.definition.NearestEdgesQuery;
+import org.opentripplanner.api.thrift.definition.NearestEdgesResult;
 import org.opentripplanner.api.thrift.definition.OTPService;
 import org.opentripplanner.api.thrift.definition.PathOptions;
 import org.opentripplanner.api.thrift.definition.TripParameters;
 import org.opentripplanner.api.thrift.definition.TripPaths;
+import org.opentripplanner.api.thrift.definition.VertexQuery;
+import org.opentripplanner.api.thrift.definition.VertexResult;
 import org.opentripplanner.api.thrift.util.EdgeMatchExtension;
 import org.opentripplanner.api.thrift.util.GraphEdgeExtension;
 import org.opentripplanner.api.thrift.util.GraphVertexExtension;
@@ -155,47 +163,68 @@ public class OTPServiceImpl implements OTPService.Iface {
         return res;
     }
     
-    @Override
-    public FindNearestVertexResponse FindNearestVertex(FindNearestVertexRequest req)
-            throws TException {
-        LOG.info("FindNearestVertex called");
-        long startTime = System.currentTimeMillis();
-
+    private VertexResult findNearbyVertex(VertexQuery q) {
         // NOTE(flamholz): can't set the graph here because we are not
         // actually doing any routing and don't have a to/from. From the
         // perspective of the street indes, RoutingRequest is really just
         // a container for the TraversalModes, which is a weird design
         // but it's what we've got to work with.
         RoutingRequestBuilder rrb = new RoutingRequestBuilder();
-        if (req.isSetAllowed_modes()) {
-            rrb.setTravelModes(req.getAllowed_modes());
+        if (q.isSetAllowed_modes()) {
+            rrb.setTravelModes(q.getAllowed_modes());
         }
         RoutingRequest rr = rrb.build();
 
         // Get the nearest vertex
         StreetVertexIndexService streetVertexIndex = getStreetIndex();
-        GenericLocation gl = new LatLngExtension(req.getLocation().getLat_lng()).toGenericLocation();
+        GenericLocation gl = new LatLngExtension(q.getLocation().getLat_lng()).toGenericLocation();
         // NOTE(flamholz): We don't currently provide a name.
         // I guess this would speed things up somewhat?
         Vertex closest = streetVertexIndex.getVertexForLocation(gl, rr);
-
+        VertexResult result = new VertexResult();
+        result.setNearest_vertex(new GraphVertexExtension(closest));
+        
+        rr.cleanup();
+        return result;
+    }
+    
+    @Override
+    public FindNearestVertexResponse FindNearestVertex(FindNearestVertexRequest req)
+            throws TException {
+        LOG.info("FindNearestVertex called");
+        long startTime = System.currentTimeMillis();
+        VertexQuery q = req.getQuery();
+        VertexResult result = findNearbyVertex(q);
+        
         FindNearestVertexResponse res = new FindNearestVertexResponse();
-        res.setNearest_vertex(new GraphVertexExtension(closest));
+        res.setResult(result);
+        res.setCompute_time_millis(System.currentTimeMillis() - startTime);
+        return res;
+    }
+    
+    @Override
+    public BulkFindNearestVertexResponse BulkFindNearestVertex(BulkFindNearestVertexRequest req)
+            throws TException {
+        LOG.info("BulkFindNearestVertex called");
+        long startTime = System.currentTimeMillis();
+        
+        BulkFindNearestVertexResponse res = new BulkFindNearestVertexResponse();
+        for (VertexQuery q : req.getQueries()) {
+            VertexResult result = findNearbyVertex(q);
+            res.addToResults(result);
+        }
+        
         res.setCompute_time_millis(System.currentTimeMillis() - startTime);
         return res;
     }
 
-    @Override
-    public FindNearestEdgesResponse FindNearestEdges(FindNearestEdgesRequest req) throws TException {
-        LOG.info("FindNearestEdges called with query {}", req.getLocation());
-        long startTime = System.currentTimeMillis();
-
+    private NearestEdgesResult findNearestEdges(NearestEdgesQuery q) {
         // Set up the TraversalRequirements.
         TraversalRequirements requirements = new TraversalRequirements();
-        requirements.setModes(new TravelModeSet(req.getAllowed_modes()).toTraverseModeSet());
+        requirements.setModes(new TravelModeSet(q.getAllowed_modes()).toTraverseModeSet());
         
         // Set up the LocationObservation.
-        Location queryLoc = req.getLocation();
+        Location queryLoc = q.getLocation();
         GenericLocation loc = new LatLngExtension(queryLoc.getLat_lng()).toGenericLocation();
         if (queryLoc.isSetHeading()) loc.setHeading(queryLoc.getHeading());
                 
@@ -210,11 +239,40 @@ public class OTPServiceImpl implements OTPService.Iface {
         Collections.sort(edges, comp);
         
         // Add matches to the response.
-        FindNearestEdgesResponse res = new FindNearestEdgesResponse();
-        int maxEdges = req.getMax_edges();
+        NearestEdgesResult result = new NearestEdgesResult();
+        int maxEdges = q.getMax_edges();
         for (CandidateEdge e : edges) {
-            if (res.getNearest_edgesSize() >= maxEdges) break;
-            res.addToNearest_edges(new EdgeMatchExtension(e));
+            if (result.getNearest_edgesSize() >= maxEdges) break;
+            result.addToNearest_edges(new EdgeMatchExtension(e));
+        }
+        
+        return result;
+    }
+    
+    @Override
+    public FindNearestEdgesResponse FindNearestEdges(FindNearestEdgesRequest req) throws TException {
+        LOG.info("FindNearestEdges called");
+        long startTime = System.currentTimeMillis();
+
+        NearestEdgesQuery q = req.getQuery();
+        NearestEdgesResult result = findNearestEdges(q);
+
+        FindNearestEdgesResponse res = new FindNearestEdgesResponse();
+        res.setResult(result);
+        res.setCompute_time_millis(System.currentTimeMillis() - startTime);
+        return res;
+    }
+    
+    @Override
+    public BulkFindNearestEdgesResponse BulkFindNearestEdges(BulkFindNearestEdgesRequest req)
+            throws TException {
+        LOG.info("BulkFindNearestEdges called");
+        long startTime = System.currentTimeMillis();
+
+        BulkFindNearestEdgesResponse res = new BulkFindNearestEdgesResponse();
+        for (NearestEdgesQuery q : req.getQueries()) {
+            NearestEdgesResult result = findNearestEdges(q);
+            res.addToResults(result);
         }
         
         res.setCompute_time_millis(System.currentTimeMillis() - startTime);
@@ -227,7 +285,7 @@ public class OTPServiceImpl implements OTPService.Iface {
      * @param trip
      * @return
      */
-    private List<GraphPath> computePaths(TripParameters trip, PathOptions pathOptions) {
+    private TripPaths computePaths(TripParameters trip, PathOptions pathOptions) {
         // Build the RoutingRequest. For now, get only one itinerary.
         RoutingRequest options = (new RoutingRequestBuilder(trip))
                 .setGraph(graphService.getGraph()).setNumItineraries(pathOptions.getNum_paths())
@@ -236,7 +294,12 @@ public class OTPServiceImpl implements OTPService.Iface {
         // For now, always use the default router.
         options.setRouterId("");
 
-        return pathService.getPaths(options);
+        List<GraphPath> paths = pathService.getPaths(options);
+        TripPathsExtension tripPaths = new TripPathsExtension(trip, paths);
+
+        // Need to call RoutingRequest.cleanup() to cleanup the temp edges.
+        options.cleanup();
+        return tripPaths;
     }
 
     @Override
@@ -248,8 +311,7 @@ public class OTPServiceImpl implements OTPService.Iface {
         TripPaths outPaths = new TripPaths();
         outPaths.setTrip(trip);
 
-        List<GraphPath> computedPaths = computePaths(trip, req.getOptions());
-        TripPathsExtension tripPaths = new TripPathsExtension(trip, computedPaths);
+        TripPaths tripPaths = computePaths(trip, req.getOptions());
 
         FindPathsResponse res = new FindPathsResponse();
         res.setPaths(tripPaths);
@@ -266,8 +328,7 @@ public class OTPServiceImpl implements OTPService.Iface {
         PathOptions pathOptions = req.getOptions();
         BulkPathsResponse res = new BulkPathsResponse();
         for (TripParameters trip : req.getTrips()) {
-            List<GraphPath> computedPaths = computePaths(trip, pathOptions);
-            TripPathsExtension tripPaths = new TripPathsExtension(trip, computedPaths);
+            TripPaths tripPaths = computePaths(trip, pathOptions);
             res.addToPaths(tripPaths);
         }
         res.setCompute_time_millis(System.currentTimeMillis() - startTime);

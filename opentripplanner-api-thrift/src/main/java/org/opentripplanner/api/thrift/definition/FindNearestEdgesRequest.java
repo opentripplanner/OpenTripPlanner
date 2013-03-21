@@ -30,9 +30,7 @@ import org.slf4j.LoggerFactory;
 public class FindNearestEdgesRequest implements org.apache.thrift.TBase<FindNearestEdgesRequest, FindNearestEdgesRequest._Fields>, java.io.Serializable, Cloneable {
   private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("FindNearestEdgesRequest");
 
-  private static final org.apache.thrift.protocol.TField LOCATION_FIELD_DESC = new org.apache.thrift.protocol.TField("location", org.apache.thrift.protocol.TType.STRUCT, (short)1);
-  private static final org.apache.thrift.protocol.TField ALLOWED_MODES_FIELD_DESC = new org.apache.thrift.protocol.TField("allowed_modes", org.apache.thrift.protocol.TType.SET, (short)2);
-  private static final org.apache.thrift.protocol.TField MAX_EDGES_FIELD_DESC = new org.apache.thrift.protocol.TField("max_edges", org.apache.thrift.protocol.TType.I32, (short)10);
+  private static final org.apache.thrift.protocol.TField QUERY_FIELD_DESC = new org.apache.thrift.protocol.TField("query", org.apache.thrift.protocol.TType.STRUCT, (short)1);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
   static {
@@ -40,15 +38,11 @@ public class FindNearestEdgesRequest implements org.apache.thrift.TBase<FindNear
     schemes.put(TupleScheme.class, new FindNearestEdgesRequestTupleSchemeFactory());
   }
 
-  private org.opentripplanner.api.thrift.definition.Location location; // required
-  private Set<org.opentripplanner.api.thrift.definition.TravelMode> allowed_modes; // optional
-  private int max_edges; // optional
+  private org.opentripplanner.api.thrift.definition.NearestEdgesQuery query; // required
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-    LOCATION((short)1, "location"),
-    ALLOWED_MODES((short)2, "allowed_modes"),
-    MAX_EDGES((short)10, "max_edges");
+    QUERY((short)1, "query");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
 
@@ -63,12 +57,8 @@ public class FindNearestEdgesRequest implements org.apache.thrift.TBase<FindNear
      */
     public static _Fields findByThriftId(int fieldId) {
       switch(fieldId) {
-        case 1: // LOCATION
-          return LOCATION;
-        case 2: // ALLOWED_MODES
-          return ALLOWED_MODES;
-        case 10: // MAX_EDGES
-          return MAX_EDGES;
+        case 1: // QUERY
+          return QUERY;
         default:
           return null;
       }
@@ -109,52 +99,32 @@ public class FindNearestEdgesRequest implements org.apache.thrift.TBase<FindNear
   }
 
   // isset id assignments
-  private static final int __MAX_EDGES_ISSET_ID = 0;
-  private BitSet __isset_bit_vector = new BitSet(1);
-  private _Fields optionals[] = {_Fields.ALLOWED_MODES,_Fields.MAX_EDGES};
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
-    tmpMap.put(_Fields.LOCATION, new org.apache.thrift.meta_data.FieldMetaData("location", org.apache.thrift.TFieldRequirementType.REQUIRED, 
-        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT        , "Location")));
-    tmpMap.put(_Fields.ALLOWED_MODES, new org.apache.thrift.meta_data.FieldMetaData("allowed_modes", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
-        new org.apache.thrift.meta_data.SetMetaData(org.apache.thrift.protocol.TType.SET, 
-            new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.ENUM            , "TravelMode"))));
-    tmpMap.put(_Fields.MAX_EDGES, new org.apache.thrift.meta_data.FieldMetaData("max_edges", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
-        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I32)));
+    tmpMap.put(_Fields.QUERY, new org.apache.thrift.meta_data.FieldMetaData("query", org.apache.thrift.TFieldRequirementType.REQUIRED, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT        , "NearestEdgesQuery")));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
     org.apache.thrift.meta_data.FieldMetaData.addStructMetaDataMap(FindNearestEdgesRequest.class, metaDataMap);
   }
 
   public FindNearestEdgesRequest() {
-    this.max_edges = 10;
-
   }
 
   public FindNearestEdgesRequest(
-    org.opentripplanner.api.thrift.definition.Location location)
+    org.opentripplanner.api.thrift.definition.NearestEdgesQuery query)
   {
     this();
-    this.location = location;
+    this.query = query;
   }
 
   /**
    * Performs a deep copy on <i>other</i>.
    */
   public FindNearestEdgesRequest(FindNearestEdgesRequest other) {
-    __isset_bit_vector.clear();
-    __isset_bit_vector.or(other.__isset_bit_vector);
-    if (other.isSetLocation()) {
-      this.location = other.location;
+    if (other.isSetQuery()) {
+      this.query = other.query;
     }
-    if (other.isSetAllowed_modes()) {
-      Set<org.opentripplanner.api.thrift.definition.TravelMode> __this__allowed_modes = new HashSet<org.opentripplanner.api.thrift.definition.TravelMode>();
-      for (org.opentripplanner.api.thrift.definition.TravelMode other_element : other.allowed_modes) {
-        __this__allowed_modes.add(other_element);
-      }
-      this.allowed_modes = __this__allowed_modes;
-    }
-    this.max_edges = other.max_edges;
   }
 
   public FindNearestEdgesRequest deepCopy() {
@@ -163,118 +133,39 @@ public class FindNearestEdgesRequest implements org.apache.thrift.TBase<FindNear
 
   @Override
   public void clear() {
-    this.location = null;
-    this.allowed_modes = null;
-    this.max_edges = 10;
-
+    this.query = null;
   }
 
-  public org.opentripplanner.api.thrift.definition.Location getLocation() {
-    return this.location;
+  public org.opentripplanner.api.thrift.definition.NearestEdgesQuery getQuery() {
+    return this.query;
   }
 
-  public void setLocation(org.opentripplanner.api.thrift.definition.Location location) {
-    this.location = location;
+  public void setQuery(org.opentripplanner.api.thrift.definition.NearestEdgesQuery query) {
+    this.query = query;
   }
 
-  public void unsetLocation() {
-    this.location = null;
+  public void unsetQuery() {
+    this.query = null;
   }
 
-  /** Returns true if field location is set (has been assigned a value) and false otherwise */
-  public boolean isSetLocation() {
-    return this.location != null;
+  /** Returns true if field query is set (has been assigned a value) and false otherwise */
+  public boolean isSetQuery() {
+    return this.query != null;
   }
 
-  public void setLocationIsSet(boolean value) {
+  public void setQueryIsSet(boolean value) {
     if (!value) {
-      this.location = null;
+      this.query = null;
     }
-  }
-
-  public int getAllowed_modesSize() {
-    return (this.allowed_modes == null) ? 0 : this.allowed_modes.size();
-  }
-
-  public java.util.Iterator<org.opentripplanner.api.thrift.definition.TravelMode> getAllowed_modesIterator() {
-    return (this.allowed_modes == null) ? null : this.allowed_modes.iterator();
-  }
-
-  public void addToAllowed_modes(org.opentripplanner.api.thrift.definition.TravelMode elem) {
-    if (this.allowed_modes == null) {
-      this.allowed_modes = new HashSet<org.opentripplanner.api.thrift.definition.TravelMode>();
-    }
-    this.allowed_modes.add(elem);
-  }
-
-  public Set<org.opentripplanner.api.thrift.definition.TravelMode> getAllowed_modes() {
-    return this.allowed_modes;
-  }
-
-  public void setAllowed_modes(Set<org.opentripplanner.api.thrift.definition.TravelMode> allowed_modes) {
-    this.allowed_modes = allowed_modes;
-  }
-
-  public void unsetAllowed_modes() {
-    this.allowed_modes = null;
-  }
-
-  /** Returns true if field allowed_modes is set (has been assigned a value) and false otherwise */
-  public boolean isSetAllowed_modes() {
-    return this.allowed_modes != null;
-  }
-
-  public void setAllowed_modesIsSet(boolean value) {
-    if (!value) {
-      this.allowed_modes = null;
-    }
-  }
-
-  public int getMax_edges() {
-    return this.max_edges;
-  }
-
-  public void setMax_edges(int max_edges) {
-    this.max_edges = max_edges;
-    setMax_edgesIsSet(true);
-  }
-
-  public void unsetMax_edges() {
-    __isset_bit_vector.clear(__MAX_EDGES_ISSET_ID);
-  }
-
-  /** Returns true if field max_edges is set (has been assigned a value) and false otherwise */
-  public boolean isSetMax_edges() {
-    return __isset_bit_vector.get(__MAX_EDGES_ISSET_ID);
-  }
-
-  public void setMax_edgesIsSet(boolean value) {
-    __isset_bit_vector.set(__MAX_EDGES_ISSET_ID, value);
   }
 
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
-    case LOCATION:
+    case QUERY:
       if (value == null) {
-        unsetLocation();
+        unsetQuery();
       } else {
-        setLocation((org.opentripplanner.api.thrift.definition.Location)value);
-      }
-      break;
-
-    case ALLOWED_MODES:
-      if (value == null) {
-        unsetAllowed_modes();
-      } else {
-        setAllowed_modes((Set<org.opentripplanner.api.thrift.definition.TravelMode>)value);
-      }
-      break;
-
-    case MAX_EDGES:
-      if (value == null) {
-        unsetMax_edges();
-      } else {
-        setMax_edges((Integer)value);
+        setQuery((org.opentripplanner.api.thrift.definition.NearestEdgesQuery)value);
       }
       break;
 
@@ -283,14 +174,8 @@ public class FindNearestEdgesRequest implements org.apache.thrift.TBase<FindNear
 
   public Object getFieldValue(_Fields field) {
     switch (field) {
-    case LOCATION:
-      return getLocation();
-
-    case ALLOWED_MODES:
-      return getAllowed_modes();
-
-    case MAX_EDGES:
-      return Integer.valueOf(getMax_edges());
+    case QUERY:
+      return getQuery();
 
     }
     throw new IllegalStateException();
@@ -303,12 +188,8 @@ public class FindNearestEdgesRequest implements org.apache.thrift.TBase<FindNear
     }
 
     switch (field) {
-    case LOCATION:
-      return isSetLocation();
-    case ALLOWED_MODES:
-      return isSetAllowed_modes();
-    case MAX_EDGES:
-      return isSetMax_edges();
+    case QUERY:
+      return isSetQuery();
     }
     throw new IllegalStateException();
   }
@@ -326,30 +207,12 @@ public class FindNearestEdgesRequest implements org.apache.thrift.TBase<FindNear
     if (that == null)
       return false;
 
-    boolean this_present_location = true && this.isSetLocation();
-    boolean that_present_location = true && that.isSetLocation();
-    if (this_present_location || that_present_location) {
-      if (!(this_present_location && that_present_location))
+    boolean this_present_query = true && this.isSetQuery();
+    boolean that_present_query = true && that.isSetQuery();
+    if (this_present_query || that_present_query) {
+      if (!(this_present_query && that_present_query))
         return false;
-      if (!this.location.equals(that.location))
-        return false;
-    }
-
-    boolean this_present_allowed_modes = true && this.isSetAllowed_modes();
-    boolean that_present_allowed_modes = true && that.isSetAllowed_modes();
-    if (this_present_allowed_modes || that_present_allowed_modes) {
-      if (!(this_present_allowed_modes && that_present_allowed_modes))
-        return false;
-      if (!this.allowed_modes.equals(that.allowed_modes))
-        return false;
-    }
-
-    boolean this_present_max_edges = true && this.isSetMax_edges();
-    boolean that_present_max_edges = true && that.isSetMax_edges();
-    if (this_present_max_edges || that_present_max_edges) {
-      if (!(this_present_max_edges && that_present_max_edges))
-        return false;
-      if (this.max_edges != that.max_edges)
+      if (!this.query.equals(that.query))
         return false;
     }
 
@@ -369,32 +232,12 @@ public class FindNearestEdgesRequest implements org.apache.thrift.TBase<FindNear
     int lastComparison = 0;
     FindNearestEdgesRequest typedOther = (FindNearestEdgesRequest)other;
 
-    lastComparison = Boolean.valueOf(isSetLocation()).compareTo(typedOther.isSetLocation());
+    lastComparison = Boolean.valueOf(isSetQuery()).compareTo(typedOther.isSetQuery());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    if (isSetLocation()) {
-      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.location, typedOther.location);
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-    }
-    lastComparison = Boolean.valueOf(isSetAllowed_modes()).compareTo(typedOther.isSetAllowed_modes());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    if (isSetAllowed_modes()) {
-      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.allowed_modes, typedOther.allowed_modes);
-      if (lastComparison != 0) {
-        return lastComparison;
-      }
-    }
-    lastComparison = Boolean.valueOf(isSetMax_edges()).compareTo(typedOther.isSetMax_edges());
-    if (lastComparison != 0) {
-      return lastComparison;
-    }
-    if (isSetMax_edges()) {
-      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.max_edges, typedOther.max_edges);
+    if (isSetQuery()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.query, typedOther.query);
       if (lastComparison != 0) {
         return lastComparison;
       }
@@ -419,37 +262,21 @@ public class FindNearestEdgesRequest implements org.apache.thrift.TBase<FindNear
     StringBuilder sb = new StringBuilder("FindNearestEdgesRequest(");
     boolean first = true;
 
-    sb.append("location:");
-    if (this.location == null) {
+    sb.append("query:");
+    if (this.query == null) {
       sb.append("null");
     } else {
-      sb.append(this.location);
+      sb.append(this.query);
     }
     first = false;
-    if (isSetAllowed_modes()) {
-      if (!first) sb.append(", ");
-      sb.append("allowed_modes:");
-      if (this.allowed_modes == null) {
-        sb.append("null");
-      } else {
-        sb.append(this.allowed_modes);
-      }
-      first = false;
-    }
-    if (isSetMax_edges()) {
-      if (!first) sb.append(", ");
-      sb.append("max_edges:");
-      sb.append(this.max_edges);
-      first = false;
-    }
     sb.append(")");
     return sb.toString();
   }
 
   public void validate() throws org.apache.thrift.TException {
     // check for required fields
-    if (!isSetLocation()) {
-      throw new org.apache.thrift.protocol.TProtocolException("Required field 'location' is unset! Struct:" + toString());
+    if (!isSetQuery()) {
+      throw new org.apache.thrift.protocol.TProtocolException("Required field 'query' is unset! Struct:" + toString());
     }
 
   }
@@ -464,8 +291,6 @@ public class FindNearestEdgesRequest implements org.apache.thrift.TBase<FindNear
 
   private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
     try {
-      // it doesn't seem like you should have to do this, but java serialization is wacky, and doesn't call the default constructor.
-      __isset_bit_vector = new BitSet(1);
       read(new org.apache.thrift.protocol.TCompactProtocol(new org.apache.thrift.transport.TIOStreamTransport(in)));
     } catch (org.apache.thrift.TException te) {
       throw new java.io.IOException(te);
@@ -490,37 +315,11 @@ public class FindNearestEdgesRequest implements org.apache.thrift.TBase<FindNear
           break;
         }
         switch (schemeField.id) {
-          case 1: // LOCATION
+          case 1: // QUERY
             if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
-              struct.location = new org.opentripplanner.api.thrift.definition.Location();
-              struct.location.read(iprot);
-              struct.setLocationIsSet(true);
-            } else { 
-              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
-            }
-            break;
-          case 2: // ALLOWED_MODES
-            if (schemeField.type == org.apache.thrift.protocol.TType.SET) {
-              {
-                org.apache.thrift.protocol.TSet _set24 = iprot.readSetBegin();
-                struct.allowed_modes = new HashSet<org.opentripplanner.api.thrift.definition.TravelMode>(2*_set24.size);
-                for (int _i25 = 0; _i25 < _set24.size; ++_i25)
-                {
-                  org.opentripplanner.api.thrift.definition.TravelMode _elem26; // required
-                  _elem26 = org.opentripplanner.api.thrift.definition.TravelMode.findByValue(iprot.readI32());
-                  struct.allowed_modes.add(_elem26);
-                }
-                iprot.readSetEnd();
-              }
-              struct.setAllowed_modesIsSet(true);
-            } else { 
-              org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
-            }
-            break;
-          case 10: // MAX_EDGES
-            if (schemeField.type == org.apache.thrift.protocol.TType.I32) {
-              struct.max_edges = iprot.readI32();
-              struct.setMax_edgesIsSet(true);
+              struct.query = new org.opentripplanner.api.thrift.definition.NearestEdgesQuery();
+              struct.query.read(iprot);
+              struct.setQueryIsSet(true);
             } else { 
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
@@ -538,28 +337,9 @@ public class FindNearestEdgesRequest implements org.apache.thrift.TBase<FindNear
       struct.validate();
 
       oprot.writeStructBegin(STRUCT_DESC);
-      if (struct.location != null) {
-        oprot.writeFieldBegin(LOCATION_FIELD_DESC);
-        struct.location.write(oprot);
-        oprot.writeFieldEnd();
-      }
-      if (struct.allowed_modes != null) {
-        if (struct.isSetAllowed_modes()) {
-          oprot.writeFieldBegin(ALLOWED_MODES_FIELD_DESC);
-          {
-            oprot.writeSetBegin(new org.apache.thrift.protocol.TSet(org.apache.thrift.protocol.TType.I32, struct.allowed_modes.size()));
-            for (org.opentripplanner.api.thrift.definition.TravelMode _iter27 : struct.allowed_modes)
-            {
-              oprot.writeI32(_iter27.getValue());
-            }
-            oprot.writeSetEnd();
-          }
-          oprot.writeFieldEnd();
-        }
-      }
-      if (struct.isSetMax_edges()) {
-        oprot.writeFieldBegin(MAX_EDGES_FIELD_DESC);
-        oprot.writeI32(struct.max_edges);
+      if (struct.query != null) {
+        oprot.writeFieldBegin(QUERY_FIELD_DESC);
+        struct.query.write(oprot);
         oprot.writeFieldEnd();
       }
       oprot.writeFieldStop();
@@ -579,53 +359,15 @@ public class FindNearestEdgesRequest implements org.apache.thrift.TBase<FindNear
     @Override
     public void write(org.apache.thrift.protocol.TProtocol prot, FindNearestEdgesRequest struct) throws org.apache.thrift.TException {
       TTupleProtocol oprot = (TTupleProtocol) prot;
-      struct.location.write(oprot);
-      BitSet optionals = new BitSet();
-      if (struct.isSetAllowed_modes()) {
-        optionals.set(0);
-      }
-      if (struct.isSetMax_edges()) {
-        optionals.set(1);
-      }
-      oprot.writeBitSet(optionals, 2);
-      if (struct.isSetAllowed_modes()) {
-        {
-          oprot.writeI32(struct.allowed_modes.size());
-          for (org.opentripplanner.api.thrift.definition.TravelMode _iter28 : struct.allowed_modes)
-          {
-            oprot.writeI32(_iter28.getValue());
-          }
-        }
-      }
-      if (struct.isSetMax_edges()) {
-        oprot.writeI32(struct.max_edges);
-      }
+      struct.query.write(oprot);
     }
 
     @Override
     public void read(org.apache.thrift.protocol.TProtocol prot, FindNearestEdgesRequest struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
-      struct.location = new org.opentripplanner.api.thrift.definition.Location();
-      struct.location.read(iprot);
-      struct.setLocationIsSet(true);
-      BitSet incoming = iprot.readBitSet(2);
-      if (incoming.get(0)) {
-        {
-          org.apache.thrift.protocol.TSet _set29 = new org.apache.thrift.protocol.TSet(org.apache.thrift.protocol.TType.I32, iprot.readI32());
-          struct.allowed_modes = new HashSet<org.opentripplanner.api.thrift.definition.TravelMode>(2*_set29.size);
-          for (int _i30 = 0; _i30 < _set29.size; ++_i30)
-          {
-            org.opentripplanner.api.thrift.definition.TravelMode _elem31; // required
-            _elem31 = org.opentripplanner.api.thrift.definition.TravelMode.findByValue(iprot.readI32());
-            struct.allowed_modes.add(_elem31);
-          }
-        }
-        struct.setAllowed_modesIsSet(true);
-      }
-      if (incoming.get(1)) {
-        struct.max_edges = iprot.readI32();
-        struct.setMax_edgesIsSet(true);
-      }
+      struct.query = new org.opentripplanner.api.thrift.definition.NearestEdgesQuery();
+      struct.query.read(iprot);
+      struct.setQueryIsSet(true);
     }
   }
 

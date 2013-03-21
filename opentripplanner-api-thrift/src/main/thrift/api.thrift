@@ -21,12 +21,16 @@ namespace py opentripplanner.api.thrift.definition
 
 include "graph.thrift"
 include "location.thrift"
+include "query.thrift"
 include "trip.thrift"
 
 typedef graph.GraphVertex GraphVertex
 typedef graph.GraphEdge GraphEdge
-typedef graph.EdgeMatch EdgeMatch
 typedef location.Location Location
+typedef query.NearestEdgesQuery NearestEdgesQuery
+typedef query.NearestEdgesResult NearestEdgesResult
+typedef query.VertexQuery VertexQuery
+typedef query.VertexResult VertexResult
 typedef trip.TravelMode TravelMode
 typedef trip.PathOptions PathOptions
 typedef trip.TripParameters TripParameters
@@ -66,16 +70,13 @@ struct BulkPathsResponse {
 
 // Request to find the nearest vertex.
 struct FindNearestVertexRequest {
-	// Find vertex near this location.
-	1: required Location location;
-	
-	// Find vertex accessible to one of these modes.
-	2: optional set<TravelMode> allowed_modes;	
+	// The query for the a nearby vertex.
+	1: required VertexQuery query;
 }
 
 struct FindNearestVertexResponse {
-	// If vertex not set, none found.
-	1: optional GraphVertex nearest_vertex;
+	// The result to the singular query.
+	1: required VertexResult result;
 	
 	// The computation time in milliseconds.
 	10: optional i64 compute_time_millis;
@@ -83,20 +84,41 @@ struct FindNearestVertexResponse {
 
 // Request to find nearby edges
 struct FindNearestEdgesRequest {
-	// Find edges near this location.
-	// TODO(flamholz): allow input of historical location info.
-	1: required Location location;
-	
-	// Find vertex accessible to one of these modes.
-	2: optional set<TravelMode> allowed_modes;
-	
-	// Maximum number of edges to return.
-	10: optional i32 max_edges = 10;
+	// Query for the nearest edges.
+	1: required NearestEdgesQuery query;
 }
 
 struct FindNearestEdgesResponse {
-	// The list of nearby edges if any.
-	1: optional list<EdgeMatch> nearest_edges;
+	// The result of the query.
+	1: required NearestEdgesResult result;
+
+	// The computation time in milliseconds.
+	10: optional i64 compute_time_millis;
+}
+
+// Request to find the nearest vertex.
+struct BulkFindNearestVertexRequest {
+	//  A list of vertex queries
+	1: required list<VertexQuery> queries;
+}
+
+struct BulkFindNearestVertexResponse {
+	// Results for queries in the same order.
+	1: required list<VertexResult> results;
+	
+	// The computation time in milliseconds.
+	10: optional i64 compute_time_millis;
+}
+
+// Request to find nearby edges
+struct BulkFindNearestEdgesRequest {
+	// Query for the nearest edges.
+	1: required list<NearestEdgesQuery> queries;
+}
+
+struct BulkFindNearestEdgesResponse {
+	// Results for queries in the same order given in the request.
+	1: required list<NearestEdgesResult> results;
 
 	// The computation time in milliseconds.
 	10: optional i64 compute_time_millis;
@@ -161,6 +183,16 @@ service OTPService {
 	 * Find the nearest graph edges.
 	 */
 	FindNearestEdgesResponse FindNearestEdges(1:FindNearestEdgesRequest req);
+	
+	/**
+	 * Bulk querying for nearest vertices. 
+	 */
+	BulkFindNearestVertexResponse BulkFindNearestVertex(1:BulkFindNearestVertexRequest req);
+	
+	/**
+	 * Bulk querying for nearest edges.
+	 */
+	BulkFindNearestEdgesResponse BulkFindNearestEdges(1:BulkFindNearestEdgesRequest req);
 
 	/**
 	 * Find paths for a single trip.

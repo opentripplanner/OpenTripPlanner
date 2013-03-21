@@ -128,6 +128,9 @@ public class TestHalfEdges extends TestCase {
         // the shortest half-edge from the start vertex takes you down, but the shortest total path
         // is up and over
 
+        int nVertices = graph.getVertices().size();
+        int nEdges = graph.getEdges().size();
+        
         RoutingRequest options = new RoutingRequest();
 
         HashSet<Edge> turns = new HashSet<Edge>();
@@ -195,6 +198,11 @@ public class TestHalfEdges extends TestCase {
             assertNotSame(s.getVertex(), graph.getVertex("bottomBack"));
         }
 
+        // Number of vertices and edges should be the same as before after a cleanup.
+        options.cleanup();
+        assertEquals(nVertices, graph.getVertices().size());
+        assertEquals(nEdges, graph.getEdges().size());
+        
         /*
          * Now, the right edge is not bikeable. But the user can walk their bike. So here are some tests that prove (a) that walking bikes works, but
          * that (b) it is not preferred to riding a tiny bit longer.
@@ -220,6 +228,11 @@ public class TestHalfEdges extends TestCase {
             assertNotSame(s.getVertex(), graph.getVertex("leftBack"));
         }
 
+        // Number of vertices and edges should be the same as before after a cleanup.
+        options.cleanup();
+        assertEquals(nVertices, graph.getVertices().size());
+        assertEquals(nEdges, graph.getEdges().size());
+        
         start = StreetLocation.createStreetLocation(graph, "start2", "start2",
                 cast(turns, StreetEdge.class),
                 new LinearLocation(0, 0.55).getCoordinate(top.getGeometry()));
@@ -238,6 +251,11 @@ public class TestHalfEdges extends TestCase {
             assertNotSame(s.getVertex(), graph.getVertex("right"));
             assertNotSame(s.getVertex(), graph.getVertex("rightBack"));
         }
+        
+        // Number of vertices and edges should be the same as before after a cleanup.
+        options.cleanup();
+        assertEquals(nVertices, graph.getVertices().size());
+        assertEquals(nEdges, graph.getEdges().size());
     }
 
     /**

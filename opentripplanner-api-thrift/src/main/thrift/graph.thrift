@@ -46,21 +46,3 @@ struct GraphEdge {
 	// Name of the edge
 	4: optional string name;
 }
-
-// An edge that matches a geographic search.
-struct EdgeMatch {
-	// The edge itself.
-	1: required GraphEdge edge;
-	
-	// The closest point along the edge.
-	2: required LatLng closest_point;
-	
-	// Score of the match. Lower is better.
-	3: required double score;
-	
-	// The distance in meters from the query point.
-	4: optional double distance_from_query;
-	
-	// The heading of the edge geometry at the match point.
-	5: optional double heading_at_closest_point;
-}

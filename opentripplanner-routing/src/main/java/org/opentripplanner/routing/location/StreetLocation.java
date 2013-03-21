@@ -278,9 +278,17 @@ public class StreetLocation extends StreetVertex {
         return nRemoved;
     }
 
+    /**
+     * This finalizer is intended as a failsafe to prevent memory leakage in case someone does
+     * not remove temporary edges. It could even be considered an error if it does any work.
+     * removeTemporaryEdges is called by both this finalizer and the RoutingContext.destroy() 
+     * method, which is in turn called by the RoutingRequest.cleanup() method. You need to call 
+     * one of these after you handle a request and know that you no longer need the context.
+     */
     @Override
     public void finalize() {
-        removeTemporaryEdges();
+        if (removeTemporaryEdges() > 0)
+            LOG.error("Temporary edges were removed by finalizer: this is a memory leak.");
     }
 
 }
