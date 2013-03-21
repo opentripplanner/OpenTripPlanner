@@ -415,14 +415,14 @@ public class GraphEdgesResponse implements org.apache.thrift.TBase<GraphEdgesRes
           case 1: // EDGES
             if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
               {
-                org.apache.thrift.protocol.TList _list56 = iprot.readListBegin();
-                struct.edges = new ArrayList<org.opentripplanner.api.thrift.definition.GraphEdge>(_list56.size);
-                for (int _i57 = 0; _i57 < _list56.size; ++_i57)
+                org.apache.thrift.protocol.TList _list32 = iprot.readListBegin();
+                struct.edges = new ArrayList<org.opentripplanner.api.thrift.definition.GraphEdge>(_list32.size);
+                for (int _i33 = 0; _i33 < _list32.size; ++_i33)
                 {
-                  org.opentripplanner.api.thrift.definition.GraphEdge _elem58; // required
-                  _elem58 = new org.opentripplanner.api.thrift.definition.GraphEdge();
-                  _elem58.read(iprot);
-                  struct.edges.add(_elem58);
+                  org.opentripplanner.api.thrift.definition.GraphEdge _elem34; // required
+                  _elem34 = new org.opentripplanner.api.thrift.definition.GraphEdge();
+                  _elem34.read(iprot);
+                  struct.edges.add(_elem34);
                 }
                 iprot.readListEnd();
               }
@@ -456,9 +456,9 @@ public class GraphEdgesResponse implements org.apache.thrift.TBase<GraphEdgesRes
         oprot.writeFieldBegin(EDGES_FIELD_DESC);
         {
           oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.edges.size()));
-          for (org.opentripplanner.api.thrift.definition.GraphEdge _iter59 : struct.edges)
+          for (org.opentripplanner.api.thrift.definition.GraphEdge _iter35 : struct.edges)
           {
-            _iter59.write(oprot);
+            _iter35.write(oprot);
           }
           oprot.writeListEnd();
         }
@@ -488,9 +488,9 @@ public class GraphEdgesResponse implements org.apache.thrift.TBase<GraphEdgesRes
       TTupleProtocol oprot = (TTupleProtocol) prot;
       {
         oprot.writeI32(struct.edges.size());
-        for (org.opentripplanner.api.thrift.definition.GraphEdge _iter60 : struct.edges)
+        for (org.opentripplanner.api.thrift.definition.GraphEdge _iter36 : struct.edges)
         {
-          _iter60.write(oprot);
+          _iter36.write(oprot);
         }
       }
       BitSet optionals = new BitSet();
@@ -507,14 +507,14 @@ public class GraphEdgesResponse implements org.apache.thrift.TBase<GraphEdgesRes
     public void read(org.apache.thrift.protocol.TProtocol prot, GraphEdgesResponse struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
       {
-        org.apache.thrift.protocol.TList _list61 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
-        struct.edges = new ArrayList<org.opentripplanner.api.thrift.definition.GraphEdge>(_list61.size);
-        for (int _i62 = 0; _i62 < _list61.size; ++_i62)
+        org.apache.thrift.protocol.TList _list37 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
+        struct.edges = new ArrayList<org.opentripplanner.api.thrift.definition.GraphEdge>(_list37.size);
+        for (int _i38 = 0; _i38 < _list37.size; ++_i38)
         {
-          org.opentripplanner.api.thrift.definition.GraphEdge _elem63; // required
-          _elem63 = new org.opentripplanner.api.thrift.definition.GraphEdge();
-          _elem63.read(iprot);
-          struct.edges.add(_elem63);
+          org.opentripplanner.api.thrift.definition.GraphEdge _elem39; // required
+          _elem39 = new org.opentripplanner.api.thrift.definition.GraphEdge();
+          _elem39.read(iprot);
+          struct.edges.add(_elem39);
         }
       }
       struct.setEdgesIsSet(true);

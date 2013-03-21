@@ -416,13 +416,13 @@ public class GraphEdgesRequest implements org.apache.thrift.TBase<GraphEdgesRequ
           case 2: // CAN_BE_TRAVERSED_BY
             if (schemeField.type == org.apache.thrift.protocol.TType.SET) {
               {
-                org.apache.thrift.protocol.TSet _set48 = iprot.readSetBegin();
-                struct.can_be_traversed_by = new HashSet<org.opentripplanner.api.thrift.definition.TravelMode>(2*_set48.size);
-                for (int _i49 = 0; _i49 < _set48.size; ++_i49)
+                org.apache.thrift.protocol.TSet _set24 = iprot.readSetBegin();
+                struct.can_be_traversed_by = new HashSet<org.opentripplanner.api.thrift.definition.TravelMode>(2*_set24.size);
+                for (int _i25 = 0; _i25 < _set24.size; ++_i25)
                 {
-                  org.opentripplanner.api.thrift.definition.TravelMode _elem50; // required
-                  _elem50 = org.opentripplanner.api.thrift.definition.TravelMode.findByValue(iprot.readI32());
-                  struct.can_be_traversed_by.add(_elem50);
+                  org.opentripplanner.api.thrift.definition.TravelMode _elem26; // required
+                  _elem26 = org.opentripplanner.api.thrift.definition.TravelMode.findByValue(iprot.readI32());
+                  struct.can_be_traversed_by.add(_elem26);
                 }
                 iprot.readSetEnd();
               }
@@ -454,9 +454,9 @@ public class GraphEdgesRequest implements org.apache.thrift.TBase<GraphEdgesRequ
           oprot.writeFieldBegin(CAN_BE_TRAVERSED_BY_FIELD_DESC);
           {
             oprot.writeSetBegin(new org.apache.thrift.protocol.TSet(org.apache.thrift.protocol.TType.I32, struct.can_be_traversed_by.size()));
-            for (org.opentripplanner.api.thrift.definition.TravelMode _iter51 : struct.can_be_traversed_by)
+            for (org.opentripplanner.api.thrift.definition.TravelMode _iter27 : struct.can_be_traversed_by)
             {
-              oprot.writeI32(_iter51.getValue());
+              oprot.writeI32(_iter27.getValue());
             }
             oprot.writeSetEnd();
           }
@@ -494,9 +494,9 @@ public class GraphEdgesRequest implements org.apache.thrift.TBase<GraphEdgesRequ
       if (struct.isSetCan_be_traversed_by()) {
         {
           oprot.writeI32(struct.can_be_traversed_by.size());
-          for (org.opentripplanner.api.thrift.definition.TravelMode _iter52 : struct.can_be_traversed_by)
+          for (org.opentripplanner.api.thrift.definition.TravelMode _iter28 : struct.can_be_traversed_by)
           {
-            oprot.writeI32(_iter52.getValue());
+            oprot.writeI32(_iter28.getValue());
           }
         }
       }
@@ -512,13 +512,13 @@ public class GraphEdgesRequest implements org.apache.thrift.TBase<GraphEdgesRequ
       }
       if (incoming.get(1)) {
         {
-          org.apache.thrift.protocol.TSet _set53 = new org.apache.thrift.protocol.TSet(org.apache.thrift.protocol.TType.I32, iprot.readI32());
-          struct.can_be_traversed_by = new HashSet<org.opentripplanner.api.thrift.definition.TravelMode>(2*_set53.size);
-          for (int _i54 = 0; _i54 < _set53.size; ++_i54)
+          org.apache.thrift.protocol.TSet _set29 = new org.apache.thrift.protocol.TSet(org.apache.thrift.protocol.TType.I32, iprot.readI32());
+          struct.can_be_traversed_by = new HashSet<org.opentripplanner.api.thrift.definition.TravelMode>(2*_set29.size);
+          for (int _i30 = 0; _i30 < _set29.size; ++_i30)
           {
-            org.opentripplanner.api.thrift.definition.TravelMode _elem55; // required
-            _elem55 = org.opentripplanner.api.thrift.definition.TravelMode.findByValue(iprot.readI32());
-            struct.can_be_traversed_by.add(_elem55);
+            org.opentripplanner.api.thrift.definition.TravelMode _elem31; // required
+            _elem31 = org.opentripplanner.api.thrift.definition.TravelMode.findByValue(iprot.readI32());
+            struct.can_be_traversed_by.add(_elem31);
           }
         }
         struct.setCan_be_traversed_byIsSet(true);

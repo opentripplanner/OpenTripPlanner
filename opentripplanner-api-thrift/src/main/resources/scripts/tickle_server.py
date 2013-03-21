@@ -1,18 +1,20 @@
 #!/usr/bin/python
- 
-from optparse import OptionParser
-from thrift import Thrift
-from thrift.transport import TSocket
-from thrift.transport import TTransport
-from thrift.protocol import TBinaryProtocol
+
 from opentripplanner.api.thrift.definition import OTPService
 from opentripplanner.api.thrift.definition.location.ttypes import Location
+from opentripplanner.api.thrift.definition.query.ttypes import NearestEdgesQuery
+from opentripplanner.api.thrift.definition.query.ttypes import VertexQuery
 from opentripplanner.api.thrift.definition.trip.ttypes import PathOptions
 from opentripplanner.api.thrift.definition.trip.ttypes import TravelMode
 from opentripplanner.api.thrift.definition.trip.ttypes import TripParameters
+from optparse import OptionParser
+from thrift import Thrift
+from thrift.protocol import TBinaryProtocol
+from thrift.transport import TSocket
+from thrift.transport import TTransport
 
-import time
 import random
+import time
 
 
 def Connect(host, port):
@@ -83,27 +85,30 @@ def Main():
     dest_loc = Location(lat_lng=dest_ll)
     
     # Run a geocoding request
-    req = OTPService.FindNearestVertexRequest(location=origin_loc)
+    req = OTPService.FindNearestVertexRequest(
+        query=VertexQuery(location=origin_loc))
     start_t = time.time()
     res = client.FindNearestVertex(req) 
     total_t = time.time() - start_t
     
+    result = res.result
     reported_compute_time = float(res.compute_time_millis) / 1000.0
     print 'FindNearestVertexRequest took %.6f seconds' % total_t
     print 'Server computation time %.6f seconds' % reported_compute_time
-    print 'Nearest vertex: ', res.nearest_vertex
+    print 'Nearest vertex: ', result.nearest_vertex
     
-    
-    req = OTPService.FindNearestEdgesRequest(location=origin_loc,
-                                             allowed_modes=set([TravelMode.CAR]))
+    q = NearestEdgesQuery(location=origin_loc,
+                          allowed_modes=set([TravelMode.CAR]))
+    req = OTPService.FindNearestEdgesRequest(query=q)
     start_t = time.time()
     res = client.FindNearestEdges(req)
     total_t = time.time() - start_t
     
+    result = res.result
     reported_compute_time = float(res.compute_time_millis) / 1000.0
     print 'FindNearestEdgesRequest took %.6f seconds' % total_t
     print 'Server computation time %.6f seconds' % reported_compute_time
-    print 'Nearest edges: ', res.nearest_edges
+    print 'Nearest edges: ', result.nearest_edges
     
     # Request a walking trip between them.
     trip_params = TripParameters(
@@ -130,8 +135,8 @@ def Main():
     
     # Sample 10 origins and a destinations (deterministically)
     random.seed(12345)
-    origins = random.sample(vertices, 100)
-    dests = random.sample(vertices, 100)
+    origins = random.sample(vertices, 10)
+    dests = random.sample(vertices, 10)
     
     trip_params = []
     for origin, dest in zip(origins, dests):

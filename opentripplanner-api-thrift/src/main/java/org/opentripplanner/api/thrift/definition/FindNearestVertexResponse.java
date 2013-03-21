@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 public class FindNearestVertexResponse implements org.apache.thrift.TBase<FindNearestVertexResponse, FindNearestVertexResponse._Fields>, java.io.Serializable, Cloneable {
   private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("FindNearestVertexResponse");
 
-  private static final org.apache.thrift.protocol.TField NEAREST_VERTEX_FIELD_DESC = new org.apache.thrift.protocol.TField("nearest_vertex", org.apache.thrift.protocol.TType.STRUCT, (short)1);
+  private static final org.apache.thrift.protocol.TField RESULT_FIELD_DESC = new org.apache.thrift.protocol.TField("result", org.apache.thrift.protocol.TType.STRUCT, (short)1);
   private static final org.apache.thrift.protocol.TField COMPUTE_TIME_MILLIS_FIELD_DESC = new org.apache.thrift.protocol.TField("compute_time_millis", org.apache.thrift.protocol.TType.I64, (short)10);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
@@ -39,12 +39,12 @@ public class FindNearestVertexResponse implements org.apache.thrift.TBase<FindNe
     schemes.put(TupleScheme.class, new FindNearestVertexResponseTupleSchemeFactory());
   }
 
-  private org.opentripplanner.api.thrift.definition.GraphVertex nearest_vertex; // optional
+  private org.opentripplanner.api.thrift.definition.VertexResult result; // required
   private long compute_time_millis; // optional
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-    NEAREST_VERTEX((short)1, "nearest_vertex"),
+    RESULT((short)1, "result"),
     COMPUTE_TIME_MILLIS((short)10, "compute_time_millis");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
@@ -60,8 +60,8 @@ public class FindNearestVertexResponse implements org.apache.thrift.TBase<FindNe
      */
     public static _Fields findByThriftId(int fieldId) {
       switch(fieldId) {
-        case 1: // NEAREST_VERTEX
-          return NEAREST_VERTEX;
+        case 1: // RESULT
+          return RESULT;
         case 10: // COMPUTE_TIME_MILLIS
           return COMPUTE_TIME_MILLIS;
         default:
@@ -106,12 +106,12 @@ public class FindNearestVertexResponse implements org.apache.thrift.TBase<FindNe
   // isset id assignments
   private static final int __COMPUTE_TIME_MILLIS_ISSET_ID = 0;
   private BitSet __isset_bit_vector = new BitSet(1);
-  private _Fields optionals[] = {_Fields.NEAREST_VERTEX,_Fields.COMPUTE_TIME_MILLIS};
+  private _Fields optionals[] = {_Fields.COMPUTE_TIME_MILLIS};
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
-    tmpMap.put(_Fields.NEAREST_VERTEX, new org.apache.thrift.meta_data.FieldMetaData("nearest_vertex", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
-        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT        , "GraphVertex")));
+    tmpMap.put(_Fields.RESULT, new org.apache.thrift.meta_data.FieldMetaData("result", org.apache.thrift.TFieldRequirementType.REQUIRED, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT        , "VertexResult")));
     tmpMap.put(_Fields.COMPUTE_TIME_MILLIS, new org.apache.thrift.meta_data.FieldMetaData("compute_time_millis", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I64)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
@@ -121,14 +121,21 @@ public class FindNearestVertexResponse implements org.apache.thrift.TBase<FindNe
   public FindNearestVertexResponse() {
   }
 
+  public FindNearestVertexResponse(
+    org.opentripplanner.api.thrift.definition.VertexResult result)
+  {
+    this();
+    this.result = result;
+  }
+
   /**
    * Performs a deep copy on <i>other</i>.
    */
   public FindNearestVertexResponse(FindNearestVertexResponse other) {
     __isset_bit_vector.clear();
     __isset_bit_vector.or(other.__isset_bit_vector);
-    if (other.isSetNearest_vertex()) {
-      this.nearest_vertex = other.nearest_vertex;
+    if (other.isSetResult()) {
+      this.result = other.result;
     }
     this.compute_time_millis = other.compute_time_millis;
   }
@@ -139,31 +146,31 @@ public class FindNearestVertexResponse implements org.apache.thrift.TBase<FindNe
 
   @Override
   public void clear() {
-    this.nearest_vertex = null;
+    this.result = null;
     setCompute_time_millisIsSet(false);
     this.compute_time_millis = 0;
   }
 
-  public org.opentripplanner.api.thrift.definition.GraphVertex getNearest_vertex() {
-    return this.nearest_vertex;
+  public org.opentripplanner.api.thrift.definition.VertexResult getResult() {
+    return this.result;
   }
 
-  public void setNearest_vertex(org.opentripplanner.api.thrift.definition.GraphVertex nearest_vertex) {
-    this.nearest_vertex = nearest_vertex;
+  public void setResult(org.opentripplanner.api.thrift.definition.VertexResult result) {
+    this.result = result;
   }
 
-  public void unsetNearest_vertex() {
-    this.nearest_vertex = null;
+  public void unsetResult() {
+    this.result = null;
   }
 
-  /** Returns true if field nearest_vertex is set (has been assigned a value) and false otherwise */
-  public boolean isSetNearest_vertex() {
-    return this.nearest_vertex != null;
+  /** Returns true if field result is set (has been assigned a value) and false otherwise */
+  public boolean isSetResult() {
+    return this.result != null;
   }
 
-  public void setNearest_vertexIsSet(boolean value) {
+  public void setResultIsSet(boolean value) {
     if (!value) {
-      this.nearest_vertex = null;
+      this.result = null;
     }
   }
 
@@ -191,11 +198,11 @@ public class FindNearestVertexResponse implements org.apache.thrift.TBase<FindNe
 
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
-    case NEAREST_VERTEX:
+    case RESULT:
       if (value == null) {
-        unsetNearest_vertex();
+        unsetResult();
       } else {
-        setNearest_vertex((org.opentripplanner.api.thrift.definition.GraphVertex)value);
+        setResult((org.opentripplanner.api.thrift.definition.VertexResult)value);
       }
       break;
 
@@ -212,8 +219,8 @@ public class FindNearestVertexResponse implements org.apache.thrift.TBase<FindNe
 
   public Object getFieldValue(_Fields field) {
     switch (field) {
-    case NEAREST_VERTEX:
-      return getNearest_vertex();
+    case RESULT:
+      return getResult();
 
     case COMPUTE_TIME_MILLIS:
       return Long.valueOf(getCompute_time_millis());
@@ -229,8 +236,8 @@ public class FindNearestVertexResponse implements org.apache.thrift.TBase<FindNe
     }
 
     switch (field) {
-    case NEAREST_VERTEX:
-      return isSetNearest_vertex();
+    case RESULT:
+      return isSetResult();
     case COMPUTE_TIME_MILLIS:
       return isSetCompute_time_millis();
     }
@@ -250,12 +257,12 @@ public class FindNearestVertexResponse implements org.apache.thrift.TBase<FindNe
     if (that == null)
       return false;
 
-    boolean this_present_nearest_vertex = true && this.isSetNearest_vertex();
-    boolean that_present_nearest_vertex = true && that.isSetNearest_vertex();
-    if (this_present_nearest_vertex || that_present_nearest_vertex) {
-      if (!(this_present_nearest_vertex && that_present_nearest_vertex))
+    boolean this_present_result = true && this.isSetResult();
+    boolean that_present_result = true && that.isSetResult();
+    if (this_present_result || that_present_result) {
+      if (!(this_present_result && that_present_result))
         return false;
-      if (!this.nearest_vertex.equals(that.nearest_vertex))
+      if (!this.result.equals(that.result))
         return false;
     }
 
@@ -284,12 +291,12 @@ public class FindNearestVertexResponse implements org.apache.thrift.TBase<FindNe
     int lastComparison = 0;
     FindNearestVertexResponse typedOther = (FindNearestVertexResponse)other;
 
-    lastComparison = Boolean.valueOf(isSetNearest_vertex()).compareTo(typedOther.isSetNearest_vertex());
+    lastComparison = Boolean.valueOf(isSetResult()).compareTo(typedOther.isSetResult());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    if (isSetNearest_vertex()) {
-      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.nearest_vertex, typedOther.nearest_vertex);
+    if (isSetResult()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.result, typedOther.result);
       if (lastComparison != 0) {
         return lastComparison;
       }
@@ -324,15 +331,13 @@ public class FindNearestVertexResponse implements org.apache.thrift.TBase<FindNe
     StringBuilder sb = new StringBuilder("FindNearestVertexResponse(");
     boolean first = true;
 
-    if (isSetNearest_vertex()) {
-      sb.append("nearest_vertex:");
-      if (this.nearest_vertex == null) {
-        sb.append("null");
-      } else {
-        sb.append(this.nearest_vertex);
-      }
-      first = false;
+    sb.append("result:");
+    if (this.result == null) {
+      sb.append("null");
+    } else {
+      sb.append(this.result);
     }
+    first = false;
     if (isSetCompute_time_millis()) {
       if (!first) sb.append(", ");
       sb.append("compute_time_millis:");
@@ -345,6 +350,10 @@ public class FindNearestVertexResponse implements org.apache.thrift.TBase<FindNe
 
   public void validate() throws org.apache.thrift.TException {
     // check for required fields
+    if (!isSetResult()) {
+      throw new org.apache.thrift.protocol.TProtocolException("Required field 'result' is unset! Struct:" + toString());
+    }
+
   }
 
   private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
@@ -383,11 +392,11 @@ public class FindNearestVertexResponse implements org.apache.thrift.TBase<FindNe
           break;
         }
         switch (schemeField.id) {
-          case 1: // NEAREST_VERTEX
+          case 1: // RESULT
             if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
-              struct.nearest_vertex = new org.opentripplanner.api.thrift.definition.GraphVertex();
-              struct.nearest_vertex.read(iprot);
-              struct.setNearest_vertexIsSet(true);
+              struct.result = new org.opentripplanner.api.thrift.definition.VertexResult();
+              struct.result.read(iprot);
+              struct.setResultIsSet(true);
             } else { 
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
@@ -413,12 +422,10 @@ public class FindNearestVertexResponse implements org.apache.thrift.TBase<FindNe
       struct.validate();
 
       oprot.writeStructBegin(STRUCT_DESC);
-      if (struct.nearest_vertex != null) {
-        if (struct.isSetNearest_vertex()) {
-          oprot.writeFieldBegin(NEAREST_VERTEX_FIELD_DESC);
-          struct.nearest_vertex.write(oprot);
-          oprot.writeFieldEnd();
-        }
+      if (struct.result != null) {
+        oprot.writeFieldBegin(RESULT_FIELD_DESC);
+        struct.result.write(oprot);
+        oprot.writeFieldEnd();
       }
       if (struct.isSetCompute_time_millis()) {
         oprot.writeFieldBegin(COMPUTE_TIME_MILLIS_FIELD_DESC);
@@ -442,17 +449,12 @@ public class FindNearestVertexResponse implements org.apache.thrift.TBase<FindNe
     @Override
     public void write(org.apache.thrift.protocol.TProtocol prot, FindNearestVertexResponse struct) throws org.apache.thrift.TException {
       TTupleProtocol oprot = (TTupleProtocol) prot;
+      struct.result.write(oprot);
       BitSet optionals = new BitSet();
-      if (struct.isSetNearest_vertex()) {
+      if (struct.isSetCompute_time_millis()) {
         optionals.set(0);
       }
-      if (struct.isSetCompute_time_millis()) {
-        optionals.set(1);
-      }
-      oprot.writeBitSet(optionals, 2);
-      if (struct.isSetNearest_vertex()) {
-        struct.nearest_vertex.write(oprot);
-      }
+      oprot.writeBitSet(optionals, 1);
       if (struct.isSetCompute_time_millis()) {
         oprot.writeI64(struct.compute_time_millis);
       }
@@ -461,13 +463,11 @@ public class FindNearestVertexResponse implements org.apache.thrift.TBase<FindNe
     @Override
     public void read(org.apache.thrift.protocol.TProtocol prot, FindNearestVertexResponse struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
-      BitSet incoming = iprot.readBitSet(2);
+      struct.result = new org.opentripplanner.api.thrift.definition.VertexResult();
+      struct.result.read(iprot);
+      struct.setResultIsSet(true);
+      BitSet incoming = iprot.readBitSet(1);
       if (incoming.get(0)) {
-        struct.nearest_vertex = new org.opentripplanner.api.thrift.definition.GraphVertex();
-        struct.nearest_vertex.read(iprot);
-        struct.setNearest_vertexIsSet(true);
-      }
-      if (incoming.get(1)) {
         struct.compute_time_millis = iprot.readI64();
         struct.setCompute_time_millisIsSet(true);
       }

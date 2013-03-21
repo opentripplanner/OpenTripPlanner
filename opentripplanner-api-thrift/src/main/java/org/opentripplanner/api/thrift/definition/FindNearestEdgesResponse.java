@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 public class FindNearestEdgesResponse implements org.apache.thrift.TBase<FindNearestEdgesResponse, FindNearestEdgesResponse._Fields>, java.io.Serializable, Cloneable {
   private static final org.apache.thrift.protocol.TStruct STRUCT_DESC = new org.apache.thrift.protocol.TStruct("FindNearestEdgesResponse");
 
-  private static final org.apache.thrift.protocol.TField NEAREST_EDGES_FIELD_DESC = new org.apache.thrift.protocol.TField("nearest_edges", org.apache.thrift.protocol.TType.LIST, (short)1);
+  private static final org.apache.thrift.protocol.TField RESULT_FIELD_DESC = new org.apache.thrift.protocol.TField("result", org.apache.thrift.protocol.TType.STRUCT, (short)1);
   private static final org.apache.thrift.protocol.TField COMPUTE_TIME_MILLIS_FIELD_DESC = new org.apache.thrift.protocol.TField("compute_time_millis", org.apache.thrift.protocol.TType.I64, (short)10);
 
   private static final Map<Class<? extends IScheme>, SchemeFactory> schemes = new HashMap<Class<? extends IScheme>, SchemeFactory>();
@@ -39,12 +39,12 @@ public class FindNearestEdgesResponse implements org.apache.thrift.TBase<FindNea
     schemes.put(TupleScheme.class, new FindNearestEdgesResponseTupleSchemeFactory());
   }
 
-  private List<org.opentripplanner.api.thrift.definition.EdgeMatch> nearest_edges; // optional
+  private org.opentripplanner.api.thrift.definition.NearestEdgesResult result; // required
   private long compute_time_millis; // optional
 
   /** The set of fields this struct contains, along with convenience methods for finding and manipulating them. */
   public enum _Fields implements org.apache.thrift.TFieldIdEnum {
-    NEAREST_EDGES((short)1, "nearest_edges"),
+    RESULT((short)1, "result"),
     COMPUTE_TIME_MILLIS((short)10, "compute_time_millis");
 
     private static final Map<String, _Fields> byName = new HashMap<String, _Fields>();
@@ -60,8 +60,8 @@ public class FindNearestEdgesResponse implements org.apache.thrift.TBase<FindNea
      */
     public static _Fields findByThriftId(int fieldId) {
       switch(fieldId) {
-        case 1: // NEAREST_EDGES
-          return NEAREST_EDGES;
+        case 1: // RESULT
+          return RESULT;
         case 10: // COMPUTE_TIME_MILLIS
           return COMPUTE_TIME_MILLIS;
         default:
@@ -106,13 +106,12 @@ public class FindNearestEdgesResponse implements org.apache.thrift.TBase<FindNea
   // isset id assignments
   private static final int __COMPUTE_TIME_MILLIS_ISSET_ID = 0;
   private BitSet __isset_bit_vector = new BitSet(1);
-  private _Fields optionals[] = {_Fields.NEAREST_EDGES,_Fields.COMPUTE_TIME_MILLIS};
+  private _Fields optionals[] = {_Fields.COMPUTE_TIME_MILLIS};
   public static final Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> metaDataMap;
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
-    tmpMap.put(_Fields.NEAREST_EDGES, new org.apache.thrift.meta_data.FieldMetaData("nearest_edges", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
-        new org.apache.thrift.meta_data.ListMetaData(org.apache.thrift.protocol.TType.LIST, 
-            new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT            , "EdgeMatch"))));
+    tmpMap.put(_Fields.RESULT, new org.apache.thrift.meta_data.FieldMetaData("result", org.apache.thrift.TFieldRequirementType.REQUIRED, 
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT        , "NearestEdgesResult")));
     tmpMap.put(_Fields.COMPUTE_TIME_MILLIS, new org.apache.thrift.meta_data.FieldMetaData("compute_time_millis", org.apache.thrift.TFieldRequirementType.OPTIONAL, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.I64)));
     metaDataMap = Collections.unmodifiableMap(tmpMap);
@@ -122,18 +121,21 @@ public class FindNearestEdgesResponse implements org.apache.thrift.TBase<FindNea
   public FindNearestEdgesResponse() {
   }
 
+  public FindNearestEdgesResponse(
+    org.opentripplanner.api.thrift.definition.NearestEdgesResult result)
+  {
+    this();
+    this.result = result;
+  }
+
   /**
    * Performs a deep copy on <i>other</i>.
    */
   public FindNearestEdgesResponse(FindNearestEdgesResponse other) {
     __isset_bit_vector.clear();
     __isset_bit_vector.or(other.__isset_bit_vector);
-    if (other.isSetNearest_edges()) {
-      List<org.opentripplanner.api.thrift.definition.EdgeMatch> __this__nearest_edges = new ArrayList<org.opentripplanner.api.thrift.definition.EdgeMatch>();
-      for (org.opentripplanner.api.thrift.definition.EdgeMatch other_element : other.nearest_edges) {
-        __this__nearest_edges.add(other_element);
-      }
-      this.nearest_edges = __this__nearest_edges;
+    if (other.isSetResult()) {
+      this.result = other.result;
     }
     this.compute_time_millis = other.compute_time_millis;
   }
@@ -144,46 +146,31 @@ public class FindNearestEdgesResponse implements org.apache.thrift.TBase<FindNea
 
   @Override
   public void clear() {
-    this.nearest_edges = null;
+    this.result = null;
     setCompute_time_millisIsSet(false);
     this.compute_time_millis = 0;
   }
 
-  public int getNearest_edgesSize() {
-    return (this.nearest_edges == null) ? 0 : this.nearest_edges.size();
+  public org.opentripplanner.api.thrift.definition.NearestEdgesResult getResult() {
+    return this.result;
   }
 
-  public java.util.Iterator<org.opentripplanner.api.thrift.definition.EdgeMatch> getNearest_edgesIterator() {
-    return (this.nearest_edges == null) ? null : this.nearest_edges.iterator();
+  public void setResult(org.opentripplanner.api.thrift.definition.NearestEdgesResult result) {
+    this.result = result;
   }
 
-  public void addToNearest_edges(org.opentripplanner.api.thrift.definition.EdgeMatch elem) {
-    if (this.nearest_edges == null) {
-      this.nearest_edges = new ArrayList<org.opentripplanner.api.thrift.definition.EdgeMatch>();
-    }
-    this.nearest_edges.add(elem);
+  public void unsetResult() {
+    this.result = null;
   }
 
-  public List<org.opentripplanner.api.thrift.definition.EdgeMatch> getNearest_edges() {
-    return this.nearest_edges;
+  /** Returns true if field result is set (has been assigned a value) and false otherwise */
+  public boolean isSetResult() {
+    return this.result != null;
   }
 
-  public void setNearest_edges(List<org.opentripplanner.api.thrift.definition.EdgeMatch> nearest_edges) {
-    this.nearest_edges = nearest_edges;
-  }
-
-  public void unsetNearest_edges() {
-    this.nearest_edges = null;
-  }
-
-  /** Returns true if field nearest_edges is set (has been assigned a value) and false otherwise */
-  public boolean isSetNearest_edges() {
-    return this.nearest_edges != null;
-  }
-
-  public void setNearest_edgesIsSet(boolean value) {
+  public void setResultIsSet(boolean value) {
     if (!value) {
-      this.nearest_edges = null;
+      this.result = null;
     }
   }
 
@@ -211,11 +198,11 @@ public class FindNearestEdgesResponse implements org.apache.thrift.TBase<FindNea
 
   public void setFieldValue(_Fields field, Object value) {
     switch (field) {
-    case NEAREST_EDGES:
+    case RESULT:
       if (value == null) {
-        unsetNearest_edges();
+        unsetResult();
       } else {
-        setNearest_edges((List<org.opentripplanner.api.thrift.definition.EdgeMatch>)value);
+        setResult((org.opentripplanner.api.thrift.definition.NearestEdgesResult)value);
       }
       break;
 
@@ -232,8 +219,8 @@ public class FindNearestEdgesResponse implements org.apache.thrift.TBase<FindNea
 
   public Object getFieldValue(_Fields field) {
     switch (field) {
-    case NEAREST_EDGES:
-      return getNearest_edges();
+    case RESULT:
+      return getResult();
 
     case COMPUTE_TIME_MILLIS:
       return Long.valueOf(getCompute_time_millis());
@@ -249,8 +236,8 @@ public class FindNearestEdgesResponse implements org.apache.thrift.TBase<FindNea
     }
 
     switch (field) {
-    case NEAREST_EDGES:
-      return isSetNearest_edges();
+    case RESULT:
+      return isSetResult();
     case COMPUTE_TIME_MILLIS:
       return isSetCompute_time_millis();
     }
@@ -270,12 +257,12 @@ public class FindNearestEdgesResponse implements org.apache.thrift.TBase<FindNea
     if (that == null)
       return false;
 
-    boolean this_present_nearest_edges = true && this.isSetNearest_edges();
-    boolean that_present_nearest_edges = true && that.isSetNearest_edges();
-    if (this_present_nearest_edges || that_present_nearest_edges) {
-      if (!(this_present_nearest_edges && that_present_nearest_edges))
+    boolean this_present_result = true && this.isSetResult();
+    boolean that_present_result = true && that.isSetResult();
+    if (this_present_result || that_present_result) {
+      if (!(this_present_result && that_present_result))
         return false;
-      if (!this.nearest_edges.equals(that.nearest_edges))
+      if (!this.result.equals(that.result))
         return false;
     }
 
@@ -304,12 +291,12 @@ public class FindNearestEdgesResponse implements org.apache.thrift.TBase<FindNea
     int lastComparison = 0;
     FindNearestEdgesResponse typedOther = (FindNearestEdgesResponse)other;
 
-    lastComparison = Boolean.valueOf(isSetNearest_edges()).compareTo(typedOther.isSetNearest_edges());
+    lastComparison = Boolean.valueOf(isSetResult()).compareTo(typedOther.isSetResult());
     if (lastComparison != 0) {
       return lastComparison;
     }
-    if (isSetNearest_edges()) {
-      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.nearest_edges, typedOther.nearest_edges);
+    if (isSetResult()) {
+      lastComparison = org.apache.thrift.TBaseHelper.compareTo(this.result, typedOther.result);
       if (lastComparison != 0) {
         return lastComparison;
       }
@@ -344,15 +331,13 @@ public class FindNearestEdgesResponse implements org.apache.thrift.TBase<FindNea
     StringBuilder sb = new StringBuilder("FindNearestEdgesResponse(");
     boolean first = true;
 
-    if (isSetNearest_edges()) {
-      sb.append("nearest_edges:");
-      if (this.nearest_edges == null) {
-        sb.append("null");
-      } else {
-        sb.append(this.nearest_edges);
-      }
-      first = false;
+    sb.append("result:");
+    if (this.result == null) {
+      sb.append("null");
+    } else {
+      sb.append(this.result);
     }
+    first = false;
     if (isSetCompute_time_millis()) {
       if (!first) sb.append(", ");
       sb.append("compute_time_millis:");
@@ -365,6 +350,10 @@ public class FindNearestEdgesResponse implements org.apache.thrift.TBase<FindNea
 
   public void validate() throws org.apache.thrift.TException {
     // check for required fields
+    if (!isSetResult()) {
+      throw new org.apache.thrift.protocol.TProtocolException("Required field 'result' is unset! Struct:" + toString());
+    }
+
   }
 
   private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
@@ -403,21 +392,11 @@ public class FindNearestEdgesResponse implements org.apache.thrift.TBase<FindNea
           break;
         }
         switch (schemeField.id) {
-          case 1: // NEAREST_EDGES
-            if (schemeField.type == org.apache.thrift.protocol.TType.LIST) {
-              {
-                org.apache.thrift.protocol.TList _list32 = iprot.readListBegin();
-                struct.nearest_edges = new ArrayList<org.opentripplanner.api.thrift.definition.EdgeMatch>(_list32.size);
-                for (int _i33 = 0; _i33 < _list32.size; ++_i33)
-                {
-                  org.opentripplanner.api.thrift.definition.EdgeMatch _elem34; // required
-                  _elem34 = new org.opentripplanner.api.thrift.definition.EdgeMatch();
-                  _elem34.read(iprot);
-                  struct.nearest_edges.add(_elem34);
-                }
-                iprot.readListEnd();
-              }
-              struct.setNearest_edgesIsSet(true);
+          case 1: // RESULT
+            if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
+              struct.result = new org.opentripplanner.api.thrift.definition.NearestEdgesResult();
+              struct.result.read(iprot);
+              struct.setResultIsSet(true);
             } else { 
               org.apache.thrift.protocol.TProtocolUtil.skip(iprot, schemeField.type);
             }
@@ -443,19 +422,10 @@ public class FindNearestEdgesResponse implements org.apache.thrift.TBase<FindNea
       struct.validate();
 
       oprot.writeStructBegin(STRUCT_DESC);
-      if (struct.nearest_edges != null) {
-        if (struct.isSetNearest_edges()) {
-          oprot.writeFieldBegin(NEAREST_EDGES_FIELD_DESC);
-          {
-            oprot.writeListBegin(new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, struct.nearest_edges.size()));
-            for (org.opentripplanner.api.thrift.definition.EdgeMatch _iter35 : struct.nearest_edges)
-            {
-              _iter35.write(oprot);
-            }
-            oprot.writeListEnd();
-          }
-          oprot.writeFieldEnd();
-        }
+      if (struct.result != null) {
+        oprot.writeFieldBegin(RESULT_FIELD_DESC);
+        struct.result.write(oprot);
+        oprot.writeFieldEnd();
       }
       if (struct.isSetCompute_time_millis()) {
         oprot.writeFieldBegin(COMPUTE_TIME_MILLIS_FIELD_DESC);
@@ -479,23 +449,12 @@ public class FindNearestEdgesResponse implements org.apache.thrift.TBase<FindNea
     @Override
     public void write(org.apache.thrift.protocol.TProtocol prot, FindNearestEdgesResponse struct) throws org.apache.thrift.TException {
       TTupleProtocol oprot = (TTupleProtocol) prot;
+      struct.result.write(oprot);
       BitSet optionals = new BitSet();
-      if (struct.isSetNearest_edges()) {
+      if (struct.isSetCompute_time_millis()) {
         optionals.set(0);
       }
-      if (struct.isSetCompute_time_millis()) {
-        optionals.set(1);
-      }
-      oprot.writeBitSet(optionals, 2);
-      if (struct.isSetNearest_edges()) {
-        {
-          oprot.writeI32(struct.nearest_edges.size());
-          for (org.opentripplanner.api.thrift.definition.EdgeMatch _iter36 : struct.nearest_edges)
-          {
-            _iter36.write(oprot);
-          }
-        }
-      }
+      oprot.writeBitSet(optionals, 1);
       if (struct.isSetCompute_time_millis()) {
         oprot.writeI64(struct.compute_time_millis);
       }
@@ -504,22 +463,11 @@ public class FindNearestEdgesResponse implements org.apache.thrift.TBase<FindNea
     @Override
     public void read(org.apache.thrift.protocol.TProtocol prot, FindNearestEdgesResponse struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
-      BitSet incoming = iprot.readBitSet(2);
+      struct.result = new org.opentripplanner.api.thrift.definition.NearestEdgesResult();
+      struct.result.read(iprot);
+      struct.setResultIsSet(true);
+      BitSet incoming = iprot.readBitSet(1);
       if (incoming.get(0)) {
-        {
-          org.apache.thrift.protocol.TList _list37 = new org.apache.thrift.protocol.TList(org.apache.thrift.protocol.TType.STRUCT, iprot.readI32());
-          struct.nearest_edges = new ArrayList<org.opentripplanner.api.thrift.definition.EdgeMatch>(_list37.size);
-          for (int _i38 = 0; _i38 < _list37.size; ++_i38)
-          {
-            org.opentripplanner.api.thrift.definition.EdgeMatch _elem39; // required
-            _elem39 = new org.opentripplanner.api.thrift.definition.EdgeMatch();
-            _elem39.read(iprot);
-            struct.nearest_edges.add(_elem39);
-          }
-        }
-        struct.setNearest_edgesIsSet(true);
-      }
-      if (incoming.get(1)) {
         struct.compute_time_millis = iprot.readI64();
         struct.setCompute_time_millisIsSet(true);
       }

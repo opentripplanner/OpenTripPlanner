@@ -42,7 +42,7 @@ public class EdgeMatch implements org.apache.thrift.TBase<EdgeMatch, EdgeMatch._
     schemes.put(TupleScheme.class, new EdgeMatchTupleSchemeFactory());
   }
 
-  private GraphEdge edge; // required
+  private org.opentripplanner.api.thrift.definition.GraphEdge edge; // required
   private org.opentripplanner.api.thrift.definition.LatLng closest_point; // required
   private double score; // required
   private double distance_from_query; // optional
@@ -128,7 +128,7 @@ public class EdgeMatch implements org.apache.thrift.TBase<EdgeMatch, EdgeMatch._
   static {
     Map<_Fields, org.apache.thrift.meta_data.FieldMetaData> tmpMap = new EnumMap<_Fields, org.apache.thrift.meta_data.FieldMetaData>(_Fields.class);
     tmpMap.put(_Fields.EDGE, new org.apache.thrift.meta_data.FieldMetaData("edge", org.apache.thrift.TFieldRequirementType.REQUIRED, 
-        new org.apache.thrift.meta_data.StructMetaData(org.apache.thrift.protocol.TType.STRUCT, GraphEdge.class)));
+        new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT        , "GraphEdge")));
     tmpMap.put(_Fields.CLOSEST_POINT, new org.apache.thrift.meta_data.FieldMetaData("closest_point", org.apache.thrift.TFieldRequirementType.REQUIRED, 
         new org.apache.thrift.meta_data.FieldValueMetaData(org.apache.thrift.protocol.TType.STRUCT        , "LatLng")));
     tmpMap.put(_Fields.SCORE, new org.apache.thrift.meta_data.FieldMetaData("score", org.apache.thrift.TFieldRequirementType.REQUIRED, 
@@ -145,7 +145,7 @@ public class EdgeMatch implements org.apache.thrift.TBase<EdgeMatch, EdgeMatch._
   }
 
   public EdgeMatch(
-    GraphEdge edge,
+    org.opentripplanner.api.thrift.definition.GraphEdge edge,
     org.opentripplanner.api.thrift.definition.LatLng closest_point,
     double score)
   {
@@ -163,7 +163,7 @@ public class EdgeMatch implements org.apache.thrift.TBase<EdgeMatch, EdgeMatch._
     __isset_bit_vector.clear();
     __isset_bit_vector.or(other.__isset_bit_vector);
     if (other.isSetEdge()) {
-      this.edge = new GraphEdge(other.edge);
+      this.edge = other.edge;
     }
     if (other.isSetClosest_point()) {
       this.closest_point = other.closest_point;
@@ -189,11 +189,11 @@ public class EdgeMatch implements org.apache.thrift.TBase<EdgeMatch, EdgeMatch._
     this.heading_at_closest_point = 0.0;
   }
 
-  public GraphEdge getEdge() {
+  public org.opentripplanner.api.thrift.definition.GraphEdge getEdge() {
     return this.edge;
   }
 
-  public void setEdge(GraphEdge edge) {
+  public void setEdge(org.opentripplanner.api.thrift.definition.GraphEdge edge) {
     this.edge = edge;
   }
 
@@ -307,7 +307,7 @@ public class EdgeMatch implements org.apache.thrift.TBase<EdgeMatch, EdgeMatch._
       if (value == null) {
         unsetEdge();
       } else {
-        setEdge((GraphEdge)value);
+        setEdge((org.opentripplanner.api.thrift.definition.GraphEdge)value);
       }
       break;
 
@@ -621,7 +621,7 @@ public class EdgeMatch implements org.apache.thrift.TBase<EdgeMatch, EdgeMatch._
         switch (schemeField.id) {
           case 1: // EDGE
             if (schemeField.type == org.apache.thrift.protocol.TType.STRUCT) {
-              struct.edge = new GraphEdge();
+              struct.edge = new org.opentripplanner.api.thrift.definition.GraphEdge();
               struct.edge.read(iprot);
               struct.setEdgeIsSet(true);
             } else { 
@@ -736,7 +736,7 @@ public class EdgeMatch implements org.apache.thrift.TBase<EdgeMatch, EdgeMatch._
     @Override
     public void read(org.apache.thrift.protocol.TProtocol prot, EdgeMatch struct) throws org.apache.thrift.TException {
       TTupleProtocol iprot = (TTupleProtocol) prot;
-      struct.edge = new GraphEdge();
+      struct.edge = new org.opentripplanner.api.thrift.definition.GraphEdge();
       struct.edge.read(iprot);
       struct.setEdgeIsSet(true);
       struct.closest_point = new org.opentripplanner.api.thrift.definition.LatLng();

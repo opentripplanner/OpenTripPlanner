@@ -26,10 +26,14 @@ import org.opentripplanner.api.thrift.definition.GraphVertex;
 import org.opentripplanner.api.thrift.definition.GraphVerticesRequest;
 import org.opentripplanner.api.thrift.definition.GraphVerticesResponse;
 import org.opentripplanner.api.thrift.definition.Location;
+import org.opentripplanner.api.thrift.definition.NearestEdgesQuery;
+import org.opentripplanner.api.thrift.definition.NearestEdgesResult;
 import org.opentripplanner.api.thrift.definition.OTPService;
 import org.opentripplanner.api.thrift.definition.PathOptions;
 import org.opentripplanner.api.thrift.definition.TripParameters;
 import org.opentripplanner.api.thrift.definition.TripPaths;
+import org.opentripplanner.api.thrift.definition.VertexQuery;
+import org.opentripplanner.api.thrift.definition.VertexResult;
 import org.opentripplanner.api.thrift.util.EdgeMatchExtension;
 import org.opentripplanner.api.thrift.util.GraphEdgeExtension;
 import org.opentripplanner.api.thrift.util.GraphVertexExtension;
@@ -167,35 +171,39 @@ public class OTPServiceImpl implements OTPService.Iface {
         // a container for the TraversalModes, which is a weird design
         // but it's what we've got to work with.
         RoutingRequestBuilder rrb = new RoutingRequestBuilder();
-        if (req.isSetAllowed_modes()) {
-            rrb.setTravelModes(req.getAllowed_modes());
+        VertexQuery q = req.getQuery();
+        if (q.isSetAllowed_modes()) {
+            rrb.setTravelModes(q.getAllowed_modes());
         }
         RoutingRequest rr = rrb.build();
 
         // Get the nearest vertex
         StreetVertexIndexService streetVertexIndex = getStreetIndex();
-        GenericLocation gl = new LatLngExtension(req.getLocation().getLat_lng()).toGenericLocation();
+        GenericLocation gl = new LatLngExtension(q.getLocation().getLat_lng()).toGenericLocation();
         // NOTE(flamholz): We don't currently provide a name.
         // I guess this would speed things up somewhat?
         Vertex closest = streetVertexIndex.getVertexForLocation(gl, rr);
-
+        VertexResult result = new VertexResult();
+        result.setNearest_vertex(new GraphVertexExtension(closest));
+        
         FindNearestVertexResponse res = new FindNearestVertexResponse();
-        res.setNearest_vertex(new GraphVertexExtension(closest));
+        res.setResult(result);
         res.setCompute_time_millis(System.currentTimeMillis() - startTime);
         return res;
     }
 
     @Override
     public FindNearestEdgesResponse FindNearestEdges(FindNearestEdgesRequest req) throws TException {
-        LOG.info("FindNearestEdges called with query {}", req.getLocation());
+        LOG.info("FindNearestEdges called");
         long startTime = System.currentTimeMillis();
 
         // Set up the TraversalRequirements.
         TraversalRequirements requirements = new TraversalRequirements();
-        requirements.setModes(new TravelModeSet(req.getAllowed_modes()).toTraverseModeSet());
+        NearestEdgesQuery q = req.getQuery();
+        requirements.setModes(new TravelModeSet(q.getAllowed_modes()).toTraverseModeSet());
         
         // Set up the LocationObservation.
-        Location queryLoc = req.getLocation();
+        Location queryLoc = q.getLocation();
         GenericLocation loc = new LatLngExtension(queryLoc.getLat_lng()).toGenericLocation();
         if (queryLoc.isSetHeading()) loc.setHeading(queryLoc.getHeading());
                 
@@ -210,13 +218,15 @@ public class OTPServiceImpl implements OTPService.Iface {
         Collections.sort(edges, comp);
         
         // Add matches to the response.
-        FindNearestEdgesResponse res = new FindNearestEdgesResponse();
-        int maxEdges = req.getMax_edges();
+        NearestEdgesResult result = new NearestEdgesResult();
+        int maxEdges = q.getMax_edges();
         for (CandidateEdge e : edges) {
-            if (res.getNearest_edgesSize() >= maxEdges) break;
-            res.addToNearest_edges(new EdgeMatchExtension(e));
+            if (result.getNearest_edgesSize() >= maxEdges) break;
+            result.addToNearest_edges(new EdgeMatchExtension(e));
         }
-        
+
+        FindNearestEdgesResponse res = new FindNearestEdgesResponse();
+        res.setResult(result);
         res.setCompute_time_millis(System.currentTimeMillis() - startTime);
         return res;
     }

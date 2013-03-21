@@ -21,12 +21,16 @@ namespace py opentripplanner.api.thrift.definition
 
 include "graph.thrift"
 include "location.thrift"
+include "query.thrift"
 include "trip.thrift"
 
 typedef graph.GraphVertex GraphVertex
 typedef graph.GraphEdge GraphEdge
-typedef graph.EdgeMatch EdgeMatch
 typedef location.Location Location
+typedef query.NearestEdgesQuery NearestEdgesQuery
+typedef query.NearestEdgesResult NearestEdgesResult
+typedef query.VertexQuery VertexQuery
+typedef query.VertexResult VertexResult
 typedef trip.TravelMode TravelMode
 typedef trip.PathOptions PathOptions
 typedef trip.TripParameters TripParameters
@@ -66,16 +70,13 @@ struct BulkPathsResponse {
 
 // Request to find the nearest vertex.
 struct FindNearestVertexRequest {
-	// Find vertex near this location.
-	1: required Location location;
-	
-	// Find vertex accessible to one of these modes.
-	2: optional set<TravelMode> allowed_modes;	
+	// The query for the a nearby vertex.
+	1: required VertexQuery query;
 }
 
 struct FindNearestVertexResponse {
-	// If vertex not set, none found.
-	1: optional GraphVertex nearest_vertex;
+	// The result to the singular query.
+	1: required VertexResult result;
 	
 	// The computation time in milliseconds.
 	10: optional i64 compute_time_millis;
@@ -83,20 +84,13 @@ struct FindNearestVertexResponse {
 
 // Request to find nearby edges
 struct FindNearestEdgesRequest {
-	// Find edges near this location.
-	// TODO(flamholz): allow input of historical location info.
-	1: required Location location;
-	
-	// Find vertex accessible to one of these modes.
-	2: optional set<TravelMode> allowed_modes;
-	
-	// Maximum number of edges to return.
-	10: optional i32 max_edges = 10;
+	// Query for the nearest edges.
+	1: required NearestEdgesQuery query;
 }
 
 struct FindNearestEdgesResponse {
-	// The list of nearby edges if any.
-	1: optional list<EdgeMatch> nearest_edges;
+	// The result of the query.
+	1: required NearestEdgesResult result;
 
 	// The computation time in milliseconds.
 	10: optional i64 compute_time_millis;
