@@ -308,11 +308,10 @@ otp.modules.planner.PlannerModule =
         this.pathMarkerLayer.clearLayers();
     
         var queryParams = itin.tripPlan.queryParams;
-        itin = itin.itinData;
         
-        console.log(itin);
-        for(var i=0; i < itin.legs.length; i++) {
-            var leg = itin.legs[i];
+        console.log(itin.itinData);
+        for(var i=0; i < itin.itinData.legs.length; i++) {
+            var leg = itin.itinData.legs[i];
 
             // draw the polyline
             var polyline = new L.Polyline(otp.util.Polyline.decode(leg.legGeometry.points));
@@ -352,7 +351,7 @@ otp.modules.planner.PlannerModule =
             if(otp.util.Itin.isTransit(leg.mode)) {
                 this.drawStartBubble(leg, false);
             }
-            else if(itin.legs[i].mode === 'BICYCLE') {
+            else if(leg.mode === 'BICYCLE') {
                 if(queryParams.mode === 'WALK,BICYCLE') { // bikeshare trip
                 	polyline.bindPopup('Your '+otp.config.bikeshareName+' route');
                     //var start_and_end_stations = this.processStations(polyline.getLatLngs()[0], polyline.getLatLngs()[polyline.getLatLngs().length-1]);
@@ -362,7 +361,7 @@ otp.modules.planner.PlannerModule =
                 	//this.resetStationMarkers();
                 }	
             }
-            else if(itin.legs[i].mode === 'WALK') {
+            else if(leg.mode === 'WALK') {
                 if(queryParams.mode === 'WALK,BICYCLE') { 
                     if(i == 0) {
                     	polyline.bindPopup('Walk to the '+otp.config.bikeshareName+' dock.');
@@ -377,6 +376,8 @@ otp.modules.planner.PlannerModule =
                 }
             }
         }
+        
+        this.webapp.map.lmap.fitBounds(itin.getBoundsArray());
     },
     
     highlightLeg : function(leg) {

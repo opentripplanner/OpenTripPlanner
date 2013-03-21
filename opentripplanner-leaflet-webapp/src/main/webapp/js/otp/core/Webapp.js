@@ -26,7 +26,7 @@ otp.core.Webapp = otp.Class({
     widgetManager   : null,
     infoWidgets     : { },
 
-    geocoder : null,
+    geocoders : [ ],
     
     urlParams : null,
 
@@ -69,8 +69,20 @@ otp.core.Webapp = otp.Class({
         this.map = new otp.core.Map(this);        
         this.widgetManager = new otp.widgets.WidgetManager();
         
-        if(otp.config.geocoder) {
-            this.geocoder = new otp.core.Geocoder(otp.config.geocoder.url, otp.config.geocoder.addressParam);
+        if(otp.config.geocoders) {
+            for(var i=0; i<otp.config.geocoders.length; i++) {
+                var gcConfig = otp.config.geocoders[i];
+                console.log('init geocoder: '+gcConfig.name);
+                //var geocoder = window[gcConfig.classname](gcConfig.url, gcConfig.addressParam);
+                
+                var gcClass = this.stringToFunction(gcConfig.className);
+                var geocoder = new gcClass(gcConfig.url, gcConfig.addressParam);
+                geocoder.name = gcConfig.name;
+                //console.log(geocoder);
+                
+                this.geocoders.push(geocoder);
+                //var geocoder = new otp.core.Geocoder(otp.config.geocoder.url, otp.config.geocoder.addressParam);
+            }
         }
        
         // initialize the AddThis widget
@@ -212,6 +224,24 @@ otp.core.Webapp = otp.Class({
         this.activeModule.handleClick(event);
     },
     
+    
+    stringToFunction : function(str) {
+        var arr = str.split(".");
+        console.log(arr);
+
+        var fn = (window || this);
+        for(var i = 0, len = arr.length; i < len; i++) {
+            fn = fn[arr[i]];
+            console.log("- "+fn);
+        }
+
+        if(typeof fn !== "function") {
+            throw new Error("function not found");
+        }
+
+        return  fn;
+    },
+
     CLASS_NAME : "otp.core.Webapp"
 });
 

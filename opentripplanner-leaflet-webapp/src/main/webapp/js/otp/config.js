@@ -66,10 +66,20 @@ otp.config = {
     //loggerURL : 'http://localhost:9000',
     // dataStorageUrl : '[link]',
     
-    geocoder : {
-        url : 'http://maps5.trimet.org/geocoder/geocode',
-        addressParam : 'address'
-    },
+    geocoders : [
+        {
+            name : 'TriMet Default',
+            className : 'otp.core.Geocoder',
+            url : 'http://maps5.trimet.org/geocoder/geocode',
+            addressParam : 'address'
+        },
+        {
+            name : 'SOLR',
+            className : 'otp.core.SOLRGeocoder',
+            url : 'http://maps5.trimet.org/solr/select',
+            addressParam : 'q'
+        }
+    ],
             
     infoWidgets: [
         {

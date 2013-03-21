@@ -138,13 +138,14 @@ otp.widgets.TW_LocationsSelector =
     otp.Class(otp.widgets.TripWidgetControl, {
     
     id           :  null,
-    geocoder     :  null,
+    geocoders    :  null,
     
     resultLookup :  null,
+    activeIndex  :  0,
 
-    initialize : function(tripWidget, geocoder) {
+    initialize : function(tripWidget, geocoders) {
         console.log("init loc");
-        this.geocoder = geocoder;
+        this.geocoders = geocoders;
         
         otp.widgets.TripWidgetControl.prototype.initialize.apply(this, arguments);
         this.id = tripWidget.id+"-locSelector";
@@ -160,22 +161,37 @@ otp.widgets.TW_LocationsSelector =
         html += "</div>";
 
         html += '<div style="clear:both;"></div>';
+
+        html += '<div style="margin-top:5px;">Geocoder: <select id="'+this.id+'-selector">';
+        for(var i=0; i<geocoders.length; i++) {
+            html += '<option>'+geocoders[i].name+'</option>';
         
+        }
+        html += '</select></div>';
+ 
         $(html).appendTo(this.$());
     },
 
     doAfterLayout : function() {
+        var this_ = this;
+        
         var startInput = $("#"+this.id+"-start");
         console.log("startInput "+startInput);
         this.initInput(startInput, this.tripWidget.module.setStartPoint);
         this.initInput($("#"+this.id+"-end"), this.tripWidget.module.setEndPoint);
+
+        var selector = $("#"+this.id+"-selector");
+        selector.change(function() {
+            this_.activeIndex = this.selectedIndex;
+        });
+
     },
         
     initInput : function(input, setterFunction) {
         var this_ = this;
         input.autocomplete({
             source: function(request, response) {
-                this_.geocoder.geocode(request.term, function(results) {
+                this_.geocoders[this_.activeIndex].geocode(request.term, function(results) {
                     response.call(this, _.pluck(results, 'description'));
                     this_.updateResultLookup(results);
                 });
