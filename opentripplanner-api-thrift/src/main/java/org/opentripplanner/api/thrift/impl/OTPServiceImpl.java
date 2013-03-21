@@ -205,8 +205,17 @@ public class OTPServiceImpl implements OTPService.Iface {
     @Override
     public BulkFindNearestVertexResponse BulkFindNearestVertex(BulkFindNearestVertexRequest req)
             throws TException {
-        // TODO Auto-generated method stub
-        return null;
+        LOG.info("BulkFindNearestVertex called");
+        long startTime = System.currentTimeMillis();
+        
+        BulkFindNearestVertexResponse res = new BulkFindNearestVertexResponse();
+        for (VertexQuery q : req.getQueries()) {
+            VertexResult result = findNearbyVertex(q);
+            res.addToResults(result);
+        }
+        
+        res.setCompute_time_millis(System.currentTimeMillis() - startTime);
+        return res;
     }
 
     private NearestEdgesResult findNearestEdges(NearestEdgesQuery q) {
@@ -257,8 +266,17 @@ public class OTPServiceImpl implements OTPService.Iface {
     @Override
     public BulkFindNearestEdgesResponse BulkFindNearestEdges(BulkFindNearestEdgesRequest req)
             throws TException {
-        // TODO Auto-generated method stub
-        return null;
+        LOG.info("BulkFindNearestEdges called");
+        long startTime = System.currentTimeMillis();
+
+        BulkFindNearestEdgesResponse res = new BulkFindNearestEdgesResponse();
+        for (NearestEdgesQuery q : req.getQueries()) {
+            NearestEdgesResult result = findNearestEdges(q);
+            res.addToResults(result);
+        }
+        
+        res.setCompute_time_millis(System.currentTimeMillis() - startTime);
+        return res;
     }
 
     /**
