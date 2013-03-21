@@ -227,7 +227,7 @@ public class OTPServiceImpl implements OTPService.Iface {
      * @param trip
      * @return
      */
-    private List<GraphPath> computePaths(TripParameters trip, PathOptions pathOptions) {
+    private TripPaths computePaths(TripParameters trip, PathOptions pathOptions) {
         // Build the RoutingRequest. For now, get only one itinerary.
         RoutingRequest options = (new RoutingRequestBuilder(trip))
                 .setGraph(graphService.getGraph()).setNumItineraries(pathOptions.getNum_paths())
@@ -236,7 +236,12 @@ public class OTPServiceImpl implements OTPService.Iface {
         // For now, always use the default router.
         options.setRouterId("");
 
-        return pathService.getPaths(options);
+        List<GraphPath> paths = pathService.getPaths(options);
+        TripPathsExtension tripPaths = new TripPathsExtension(trip, paths);
+
+        // Need to call RoutingRequest.cleanup() to cleanup the temp edges.
+        options.cleanup();
+        return tripPaths;
     }
 
     @Override
@@ -248,8 +253,7 @@ public class OTPServiceImpl implements OTPService.Iface {
         TripPaths outPaths = new TripPaths();
         outPaths.setTrip(trip);
 
-        List<GraphPath> computedPaths = computePaths(trip, req.getOptions());
-        TripPathsExtension tripPaths = new TripPathsExtension(trip, computedPaths);
+        TripPaths tripPaths = computePaths(trip, req.getOptions());
 
         FindPathsResponse res = new FindPathsResponse();
         res.setPaths(tripPaths);
@@ -266,8 +270,7 @@ public class OTPServiceImpl implements OTPService.Iface {
         PathOptions pathOptions = req.getOptions();
         BulkPathsResponse res = new BulkPathsResponse();
         for (TripParameters trip : req.getTrips()) {
-            List<GraphPath> computedPaths = computePaths(trip, pathOptions);
-            TripPathsExtension tripPaths = new TripPathsExtension(trip, computedPaths);
+            TripPaths tripPaths = computePaths(trip, pathOptions);
             res.addToPaths(tripPaths);
         }
         res.setCompute_time_millis(System.currentTimeMillis() - startTime);
