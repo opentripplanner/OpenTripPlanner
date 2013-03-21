@@ -287,7 +287,8 @@ public class StreetLocation extends StreetVertex {
      */
     @Override
     public void finalize() {
-        removeTemporaryEdges();
+        if (removeTemporaryEdges() > 0)
+            LOG.error("Temporary edges were removed by finalizer: this is a memory leak.");
     }
 
 }
