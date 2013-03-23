@@ -25,7 +25,7 @@ otp.config = {
     //hostname : "http://otpna-c.deployer.opentripplanner.org",
     //routerId : "req-1028",
     hostname : "http://trimet-tomcat.deployer.opentripplanner.org",
-    municoderHostname : "http://trimet-tomcat.deployer.opentripplanner.org",
+    //municoderHostname : "http://trimet-tomcat.deployer.opentripplanner.org",
     //hostname : "http://localhost:8080",
     //municoderHostname : "http://localhost:8080",
         

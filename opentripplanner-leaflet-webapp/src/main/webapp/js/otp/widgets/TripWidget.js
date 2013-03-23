@@ -162,13 +162,15 @@ otp.widgets.TW_LocationsSelector =
 
         html += '<div style="clear:both;"></div>';
 
-        html += '<div style="margin-top:5px;">Geocoder: <select id="'+this.id+'-selector">';
-        for(var i=0; i<geocoders.length; i++) {
-            html += '<option>'+geocoders[i].name+'</option>';
-        
+        if(geocoders.length > 1) {
+            html += '<div style="margin-top:5px;">Geocoder: <select id="'+this.id+'-selector">';
+            for(var i=0; i<geocoders.length; i++) {
+                html += '<option>'+geocoders[i].name+'</option>';
+            
+            }
+            html += '</select></div>';
         }
-        html += '</select></div>';
- 
+         
         $(html).appendTo(this.$());
     },
 
@@ -180,11 +182,12 @@ otp.widgets.TW_LocationsSelector =
         this.initInput(startInput, this.tripWidget.module.setStartPoint);
         this.initInput($("#"+this.id+"-end"), this.tripWidget.module.setEndPoint);
 
-        var selector = $("#"+this.id+"-selector");
-        selector.change(function() {
-            this_.activeIndex = this.selectedIndex;
-        });
-
+        if(this.geocoders.length > 1) {
+            var selector = $("#"+this.id+"-selector");
+            selector.change(function() {
+                this_.activeIndex = this.selectedIndex;
+            });
+        }
     },
         
     initInput : function(input, setterFunction) {
