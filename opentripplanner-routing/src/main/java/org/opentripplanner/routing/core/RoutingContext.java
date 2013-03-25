@@ -171,13 +171,16 @@ public class RoutingContext implements Cloneable {
         else
             remainingWeightHeuristic = heuristicFactory.getInstanceForSearch(opt);
         
-        LOG.debug("Origin vertex {}", this.origin);
-        LOG.debug("Origin vertex inbound edges {}", this.origin.getIncoming());
-        LOG.debug("Origin vertex outbound edges {}", this.origin.getOutgoing());
-        
-        LOG.debug("Destination vertex {}", this.target);
-        LOG.debug("Destination vertex inbound edges {}", this.target.getIncoming());
-        LOG.debug("Destination vertex outbound edges {}", this.target.getOutgoing());
+        if (this.origin != null) {
+            LOG.debug("Origin vertex inbound edges {}", this.origin.getIncoming());
+            LOG.debug("Origin vertex outbound edges {}", this.origin.getOutgoing());
+        }
+        // target is where search will terminate, can be origin or destination depending on arriveBy
+        LOG.debug("Target vertex {}", this.target);
+        if (this.target!= null) {
+            LOG.debug("Destination vertex inbound edges {}", this.target.getIncoming());
+            LOG.debug("Destination vertex outbound edges {}", this.target.getOutgoing());
+        }
     }
     
     
