@@ -18,13 +18,14 @@ import java.util.Random;
 
 import junit.framework.TestCase;
 
+import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.RouteSpec;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
@@ -90,20 +91,28 @@ public class TestAStar extends TestCase {
          * a pretty good test case for banned routes, since if one is banned, you can always take 
          * another.
          */
-        String[] maxLines = { "MAX Red Line", "MAX Blue Line", "MAX Green Line" };
+        String[][] maxLines = { { "MAX Red Line", null }, { "MAX Blue Line", null },
+                { "MAX Green Line", null }, { null, "90" }, { null, "100" }, { null, "200" } };
         for (int i = 0; i < maxLines.length; ++i) {
-            String line = maxLines[i];
-            options.bannedRoutes.add(new RouteSpec("TriMet", line));
+            String lineName = maxLines[i][0];
+            String lineId = maxLines[i][1];
+            String routeSpecStr = "TriMet_" + (lineName != null ? lineName : "")
+                    + (lineId != null ? "_" + lineId : "");
+            RouteSpec bannedRouteSpec = new RouteSpec(routeSpecStr);
+            options.bannedRoutes.add(bannedRouteSpec);
             spt = aStar.getShortestPathTree(options);
             GraphPath path = spt.getPath(end, true);
             for (State s : path.states) {
                 if (s.getBackEdge() instanceof PatternHop) {
-                	PatternHop e = (PatternHop) s.getBackEdge();
-                    assertFalse(e.getName().equals(line));
+                    PatternHop e = (PatternHop) s.getBackEdge();
+                    Route route = e.getPattern().getExemplar().getRoute();
+                    RouteSpec routeSpec = new RouteSpec(route.getId().getAgencyId(),
+                            GtfsLibrary.getRouteName(route), route.getId().getId());
+                    assertFalse(routeSpec.equals(bannedRouteSpec));
                     boolean foundMaxLine = false;
                     for (int j = 0; j < maxLines.length; ++j) {
                         if (j != i) {
-                            if (e.getName().equals(maxLines[j])) {
+                            if (e.getName().equals(maxLines[j][0])) {
                                 foundMaxLine = true;
                             }
                         }

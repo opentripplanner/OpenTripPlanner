@@ -127,7 +127,7 @@ public abstract class RoutingResource {
      *  Atlantic Avenue should be included. */
     @DefaultValue("false") @QueryParam("showIntermediateStops") protected List<Boolean> showIntermediateStops;
 
-    /** The comma-separated list of banned routes.  The format is agency_route, so TriMet_100. */
+    /** The comma-separated list of banned routes.  The format is agency_[routename][_routeid], so TriMet_100 or Trimet__42. */
     @DefaultValue("") @QueryParam("bannedRoutes") protected List<String> bannedRoutes;
     
     /** The comma-separated list of banned agencies. */
