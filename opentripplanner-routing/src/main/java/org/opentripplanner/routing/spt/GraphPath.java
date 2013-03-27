@@ -137,9 +137,10 @@ public class GraphPath {
             Edge e = s.getBackEdge();
             if (e == null) continue;
             Trip trip = s.getBackTrip();
-            if ( trip != null) {
+            if (trip != null) {
                 String routeName = GtfsLibrary.getRouteName(trip.getRoute());
-                RouteSpec spec = new RouteSpec(trip.getId().getAgencyId(), routeName);
+                RouteSpec spec = new RouteSpec(trip.getId().getAgencyId(), routeName, trip
+                        .getRoute().getId().getId());
                 ret.add(spec);
                 // TODO: Check implementation, use edge list in graphpath
             }

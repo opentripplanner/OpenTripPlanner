@@ -17,6 +17,8 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.springframework.util.ObjectUtils;
+
 /** 
  * A particular route as a user would see it for the purposes of multiple itineraries.
  */
@@ -25,6 +27,7 @@ public class RouteSpec implements Cloneable, Serializable {
 
     public String agency;
     public String routeName;
+    public String routeId;
     
     public RouteSpec(String agency, String routeName) {
         if (agency == null) {
@@ -37,13 +40,31 @@ public class RouteSpec implements Cloneable, Serializable {
         this.routeName = routeName;
     }
 
-    public RouteSpec(String agencyAndRouteName) {
-        String[] routeSpec = agencyAndRouteName.split("_", 2);
-        if (routeSpec.length != 2) {
-            throw new IllegalArgumentException("AgencyId or routeId not set");
+    public RouteSpec(String agency, String routeName, String routeId) {
+        if (agency == null) {
+            throw new IllegalArgumentException("Agency must not be null");
+        }
+        if (routeName == null && routeId == null) {
+            throw new IllegalArgumentException("Route name and Id must not be both null");
+        }
+        this.agency = agency;
+        this.routeName = routeName;
+        this.routeId = routeId;
+    }
+
+    public RouteSpec(String agencyAndRouteNameId) {
+        String[] routeSpec = agencyAndRouteNameId.split("_", 3);
+        if (routeSpec.length != 2 && routeSpec.length != 3) {
+            throw new IllegalArgumentException("AgencyId or routeName/Id not set");
         }
         agency = routeSpec[0];
         routeName = routeSpec[1];
+        if (routeName.length() == 0)
+            routeName = null;
+        routeId = routeSpec.length > 2 ? routeSpec[2] : null;
+        if (routeName != null && routeName == null) {
+            throw new IllegalArgumentException("Can't set both route name and ID");
+        }
     }
 
     public static List<RouteSpec> listFromString(String list) {
@@ -53,27 +74,48 @@ public class RouteSpec implements Cloneable, Serializable {
         return ret;
     }
 
+    /**
+     * Please note the specific contract for equals. Since we want to compare
+     * routes based on name OR ids, but we sometime have a mix of one or both, we consider two routes
+     * to be equals iff: agency ID is equals and route name and route id do not differs when defined.
+     * 
+     * This function should really be called something like "matches", but that would prevent us
+     * from using the standard Java collection framework (map.contains(), ...)
+     */
     @Override
     public boolean equals(Object other) {
         if (other instanceof RouteSpec) {
             RouteSpec otherRs = (RouteSpec) other;
-            return otherRs.agency.equals(agency) && otherRs.routeName.equals(routeName);
+            boolean routeNameDiffers = routeName != null && otherRs.routeName != null
+                    && !routeName.equals(otherRs.routeName);
+            boolean routeIdDiffers = routeId != null && otherRs.routeId != null
+                    && !routeId.equals(otherRs.routeId);
+            return otherRs.agency.equals(agency)
+                    && !routeNameDiffers && !routeIdDiffers
+                    && ObjectUtils.nullSafeEquals(routeName, otherRs.routeName)
+                    || ObjectUtils.nullSafeEquals(routeId, otherRs.routeId);
         }
         return false;
     }
-    
+
     @Override
     public int hashCode() {
-        return agency.hashCode() ^ routeName.hashCode();
+        int retval = agency.hashCode();
+        /*
+         * Since different routeName+routeId can be equals, we can't include them in the hashCode() function to respect hashCode/equals contract (see
+         * equals).
+         */
+        return retval;
     }
 
     public String getRepresentation() {
-        return agency + "_" + routeName;
+        return agency + "_" + (routeName != null ? routeName : "")
+                + (routeId != null ? "_" + routeId : "");
     }
 
     @Override
     public String toString() {
-    	return String.format("RouteSpec<agency=%s name=%s>", agency, routeName);
+    	return String.format("RouteSpec<agency=%s name=%s id=%s>", agency, routeName, routeId);
     }
 
     public RouteSpec clone() {

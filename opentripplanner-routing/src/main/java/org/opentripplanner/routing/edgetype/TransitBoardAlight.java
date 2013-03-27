@@ -257,7 +257,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
             }
             Trip trip = bestTripTimes.getTrip();
             
-            /* check if agency is banned for this plan */
+            /* check if trip is banned for this plan */
             if (options.tripIsBanned(trip))
             	return null;
 

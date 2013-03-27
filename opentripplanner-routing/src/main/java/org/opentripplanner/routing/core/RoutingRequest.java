@@ -938,24 +938,24 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
     
     public boolean tripIsBanned(Trip trip) {
-    	/* check if agency is banned for this plan */
-    	if (bannedAgencies != null) {
-    		if (bannedAgencies.contains(trip.getId().getAgencyId())) {
-    			return true;
-    		}
-    	}
+        /* check if agency is banned for this plan */
+        if (bannedAgencies != null) {
+            if (bannedAgencies.contains(trip.getId().getAgencyId())) {
+                return true;
+            }
+        }
 
-    	/* check if route banned for this plan */
-    	if (bannedRoutes != null) {
-    		Route route = trip.getRoute();
-    		RouteSpec spec = new RouteSpec(route.getId().getAgencyId(),
-    				GtfsLibrary.getRouteName(route));
-    		if (bannedRoutes.contains(spec)) {
-    			return true;
-    		}
-    	}
+        /* check if route banned for this plan */
+        if (bannedRoutes != null) {
+            Route route = trip.getRoute();
+            RouteSpec spec = new RouteSpec(route.getId().getAgencyId(),
+                    GtfsLibrary.getRouteName(route), route.getId().getId());
+            if (bannedRoutes.contains(spec)) {
+                return true;
+            }
+        }
 
-    	return false;
+        return false;
     }
 
     public long preferencesPenaltyForTrip(Trip trip) {
@@ -964,7 +964,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     	Route route = trip.getRoute();
     	String agencyID = route.getId().getAgencyId();
-    	RouteSpec spec = new RouteSpec(agencyID, GtfsLibrary.getRouteName(route));
+    	RouteSpec spec = new RouteSpec(agencyID, GtfsLibrary.getRouteName(route), route.getId().getId());
     	
     	if ((preferredRoutes != null && !preferredRoutes.isEmpty()) || (preferredAgencies != null && !preferredAgencies.isEmpty())) {
     		boolean isPreferedRoute = preferredRoutes != null && preferredRoutes.contains(spec);
