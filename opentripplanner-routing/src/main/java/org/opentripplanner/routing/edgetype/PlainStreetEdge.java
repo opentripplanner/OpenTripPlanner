@@ -480,6 +480,10 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     public boolean hasBogusName() {
         return hasBogusName;
     }
+    
+    public boolean hasExplicitTurnRestrictions() {
+        return this.turnRestrictions != null && this.turnRestrictions.size() > 0;
+    }
 
     public void setWheelchairNote(Set<Alert> wheelchairNotes) {
         this.wheelchairNotes = wheelchairNotes;

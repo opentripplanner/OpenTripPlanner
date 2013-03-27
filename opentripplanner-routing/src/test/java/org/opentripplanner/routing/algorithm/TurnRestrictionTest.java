@@ -13,40 +13,29 @@
 
 package org.opentripplanner.routing.algorithm;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.routing.algorithm.strategies.MultiTargetTerminationStrategy;
-import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
-import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.SimpleConcreteEdge;
-import org.opentripplanner.routing.graph.SimpleConcreteVertex;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 
 public class TurnRestrictionTest {
@@ -56,6 +45,8 @@ public class TurnRestrictionTest {
     private Vertex topRight;
 
     private Vertex bottomLeft;
+    
+    private PlainStreetEdge maple_main1, broad1_2;
 
     @Before
     public void before() {
@@ -81,11 +72,11 @@ public class TurnRestrictionTest {
         PlainStreetEdge main1_2 = edge(main1, main2, 100.0, false);
         PlainStreetEdge main2_3 = edge(main2, main3, 100.0, false);
 
-        PlainStreetEdge broad1_2 = edge(broad1, broad2, 100.0, false);
+        broad1_2 = edge(broad1, broad2, 100.0, false);
         PlainStreetEdge broad2_3 = edge(broad2, broad3, 100.0, false);
 
         // Each cross-street connects
-        PlainStreetEdge maple_main1 = edge(maple1, main1, 50.0, false);
+        maple_main1 = edge(maple1, main1, 50.0, false);
         PlainStreetEdge main_broad1 = edge(main1, broad1, 100.0, false);
 
         PlainStreetEdge maple_main2 = edge(maple2, main2, 50.0, false);
@@ -107,6 +98,12 @@ public class TurnRestrictionTest {
         bottomLeft = broad3;
     }
 
+    @Test
+    public void testHasExplicitTurnRestrictions() {
+        assertTrue(this.maple_main1.hasExplicitTurnRestrictions());
+        assertFalse(this.broad1_2.hasExplicitTurnRestrictions());
+    }
+    
     @Test
     public void testForwardDefault() {
         RoutingRequest options = new RoutingRequest();
