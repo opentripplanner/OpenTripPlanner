@@ -25,6 +25,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -45,6 +46,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 
+import com.sun.jersey.api.NotFoundException;
+import com.sun.jersey.api.Responses;
 import com.sun.jersey.api.spring.Autowire;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -107,19 +110,7 @@ public class Routers {
             throws JSONException {
         RouterList routerList = new RouterList();
         for (String id : graphService.getRouterIds()) {
-            RouterInfo routerInfo = new RouterInfo();
-            routerInfo.routerId = id;
-            Graph graph = graphService.getGraph(id);
-            HullService service = graph.getService(HullService.class);
-            if (service == null) {
-                //TODO: A concave hull would be better, but unfortunately is extremely slow to compute for
-                //large graphs
-                Geometry hull = GraphUtils.makeConvexHull(graph);
-                service = new StoredHullService(hull);
-                graph.putService(HullService.class, service);
-            }
-            routerInfo.polygon = service.getHull();
-            routerList.routerInfo.add(routerInfo);
+            routerList.routerInfo.add(getRouterInfo(id));
         }
         return routerList;
     }
@@ -129,13 +120,30 @@ public class Routers {
      * @returns status code 200 if the routerId is registered, otherwise a 404.
      */
     @GET @Path("{routerId}") @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public Response getGraphId(@PathParam("routerId") String routerId) {
+    public RouterInfo getGraphId(@PathParam("routerId") String routerId) {
         // factor out build one entry
+        RouterInfo routerInfo = getRouterInfo(routerId);
+        if (routerInfo == null)
+            throw new WebApplicationException(Responses.notFound()
+                    .entity("Graph id '" + routerId + "' not registered.").type("text/plain")
+                    .build());
+        return routerInfo;
+    }
+    
+    private RouterInfo getRouterInfo(String routerId) {
         Graph graph = graphService.getGraph(routerId);
         if (graph == null)
-            return Response.status(Status.NOT_FOUND).entity("graph id not registered.").build();
-        else
-            return Response.status(Status.OK).entity(graph.toString()).build();
+            return null;
+        RouterInfo routerInfo = new RouterInfo();
+        routerInfo.routerId = routerId;
+        HullService service = graph.getService(HullService.class);
+        if (service == null) {
+            Geometry hull = GraphUtils.makeConvexHull(graph);
+            service = new StoredHullService(hull);
+            graph.putService(HullService.class, service);
+        }
+        routerInfo.polygon = service.getHull();
+        return routerInfo;
     }
 
     /** 

@@ -88,14 +88,7 @@ public class Components {
         RoutingRequest options = new RoutingRequest(modes);
         options.bannedRoutes = new HashSet<RouteSpec>();
         if (bannedRoutes.length() > 0) {
-            for (String element : bannedRoutes.split(",")) {
-                String[] routeSpec = element.split("_", 2);
-                if (routeSpec.length != 2) {
-                    throw new IllegalArgumentException(
-                            "AgencyId or routeId not set in bannedRoutes list");
-                }
-                options.bannedRoutes.add(new RouteSpec(routeSpec[0], routeSpec[1]));
-            }
+        	options.bannedRoutes.addAll(RouteSpec.listFromString(bannedRoutes));
         }
 
         Graph graph = graphService.getGraph(routerId);
