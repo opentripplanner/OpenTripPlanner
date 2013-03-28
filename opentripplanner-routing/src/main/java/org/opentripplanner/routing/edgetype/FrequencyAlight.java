@@ -127,7 +127,7 @@ public class FrequencyAlight extends Edge  implements OnBoardReverseEdge {
                 return null;
             }
             
-            /* check if agency is banned for this plan */
+            /* check if trip is banned for this plan */
             if (options.tripIsBanned(trip))
             	return null;
 
