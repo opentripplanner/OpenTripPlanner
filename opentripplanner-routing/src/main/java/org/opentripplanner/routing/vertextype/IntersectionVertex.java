@@ -57,11 +57,12 @@ public class IntersectionVertex extends StreetVertex {
      * TODO(flamholz): this is a weird place to inject the model. We do it here for historical reasons - this is where costs have usually been
      * computed. Consider doing it higher up, like inside the search code?
      */
-    private IntersectionTraversalCostModel costModel = new SimpleIntersectionTraversalCostModel();
+    private static IntersectionTraversalCostModel costModel = new SimpleIntersectionTraversalCostModel();
 
     /** Computes the cost of traversing this intersection in seconds */
     public double computeTraversalCost(PlainStreetEdge from, PlainStreetEdge to, TraverseMode mode,
             RoutingRequest options, float fromSpeed, float toSpeed) {
+        // TODO(flamholz): move this free-flowing check into the cost model?
         if (freeFlowing) {
             return 0;
         }
