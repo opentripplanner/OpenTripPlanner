@@ -119,9 +119,11 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     @Getter
     private List<TurnRestriction> turnRestrictions = Collections.emptyList();
 
+    /** 0 -> 360 degree angle - the angle at the start of the edge geometry */
     @Getter
     public int inAngle;
 
+    /** 0 -> 360 degree angle - the angle at the end of the edge geometry */
     @Getter
     public int outAngle;
 
