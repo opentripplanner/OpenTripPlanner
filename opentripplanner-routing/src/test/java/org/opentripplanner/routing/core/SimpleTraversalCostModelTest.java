@@ -14,6 +14,13 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 
+/**
+ * Tests for SimpleIntersectionTraversalCostModel.
+ * 
+ * TODO(flamholz): add tests for traversal with traffic lights and without a car.
+ * 
+ * @author avi
+ */
 public class SimpleTraversalCostModelTest {
     
     private Graph _graph;
