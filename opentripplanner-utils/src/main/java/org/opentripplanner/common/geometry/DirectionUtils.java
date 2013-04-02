@@ -74,6 +74,7 @@ public class DirectionUtils {
         Coordinate coord0 = line.getCoordinateN(numPoints - 2);
         Coordinate coord1 = line.getCoordinateN(numPoints - 1);
         int i = numPoints - 3;
+        // TODO(flamholz): what are the units of "10" here?
         while (distanceLibrary.fastDistance(coord0, coord1) < 10 && i >= 0) {
             coord0 = line.getCoordinateN(i--);
         }
@@ -81,7 +82,8 @@ public class DirectionUtils {
         DirectionUtils utils = getInstance();
         utils.geodeticCalculator.setStartingGeographicPoint(coord0.x, coord0.y);
         utils.geodeticCalculator.setDestinationGeographicPoint(coord1.x, coord1.y);
-        return utils.geodeticCalculator.getAzimuth() * Math.PI / 180;
+        double az = utils.geodeticCalculator.getAzimuth();
+        return az * Math.PI / 180;
     }
 
     /**
@@ -103,6 +105,7 @@ public class DirectionUtils {
         Coordinate coord0 = line.getCoordinateN(0);
         Coordinate coord1 = line.getCoordinateN(1);
         int i = 2;
+        // TODO(flamholz): what are the units of "10" here?
         while (distanceLibrary.fastDistance(coord0, coord1) < 10 && i < line.getNumPoints()) {
             coord1 = line.getCoordinateN(i++);
         }
@@ -110,6 +113,7 @@ public class DirectionUtils {
         DirectionUtils utils = getInstance();
         utils.geodeticCalculator.setStartingGeographicPoint(coord0.x, coord0.y);
         utils.geodeticCalculator.setDestinationGeographicPoint(coord1.x, coord1.y);
-        return utils.geodeticCalculator.getAzimuth() * Math.PI / 180;
+        double az = utils.geodeticCalculator.getAzimuth();
+        return az * Math.PI / 180;
     }
 }
