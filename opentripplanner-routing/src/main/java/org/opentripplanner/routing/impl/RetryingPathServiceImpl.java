@@ -122,7 +122,7 @@ public class RetryingPathServiceImpl implements PathService {
             if (spt == null) // timeout or other fail
                 break;
             List<GraphPath> somePaths = spt.getPaths();
-            LOG.debug("END SUBSEARCH ({} msec of {} msec total)", 
+            LOG.debug("END SUBSEARCH ({} msec of {} msec total)",
                     System.currentTimeMillis() - subsearchBeginTime,
                     System.currentTimeMillis() - searchBeginTime);
             if (somePaths == null) {
