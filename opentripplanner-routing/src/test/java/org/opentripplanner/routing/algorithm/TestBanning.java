@@ -133,7 +133,7 @@ public class TestBanning extends TestCase {
                 // Pick a random used trip to ban
                 List<AgencyAndId> usedTripIdsList = new ArrayList<AgencyAndId>(usedTripIds);
                 AgencyAndId tripToBan = usedTripIdsList.get(rand.nextInt(usedTripIds.size()));
-                options.bannedTrips.put(tripToBan, BannedStopSet.ALL);
+                options.banTrip(tripToBan);
             }
             options.bannedTrips.clear();
         }
