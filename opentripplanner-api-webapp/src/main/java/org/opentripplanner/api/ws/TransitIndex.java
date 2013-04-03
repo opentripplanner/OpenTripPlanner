@@ -643,15 +643,15 @@ public class TransitIndex {
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public Object stopsInRectangle(@QueryParam("agency") String agency,
             @QueryParam("leftUpLat") Double leftUpLat, @QueryParam("leftUpLon") Double leftUpLon,
-            @QueryParam("rightUpLat") Double rightUpLat,
-            @QueryParam("rightUpLon") Double rightUpLon, @QueryParam("extended") Boolean extended,
+            @QueryParam("rightDownLat") Double rightDownLat,
+            @QueryParam("rightDownLon") Double rightDownLon, @QueryParam("extended") Boolean extended,
             @QueryParam("routerId") String routerId) throws JSONException {
 
         Graph graph = getGraph(routerId);
         StopList response = new StopList();
 
         StreetVertexIndexService streetVertexIndexService = graph.streetIndex;
-        if (leftUpLat == null || leftUpLon == null || rightUpLat == null || rightUpLon == null) {
+        if (leftUpLat == null || leftUpLon == null || rightDownLat == null || rightDownLon == null) {
             double METERS_PER_DEGREE_LAT = 111111;
             double distance = 2000;
             for (Vertex gv : graph.getVertices()) {
@@ -668,7 +668,7 @@ public class TransitIndex {
             }
         } else {
             Coordinate cOne = new Coordinate(leftUpLat, leftUpLon);
-            Coordinate cTwo = new Coordinate(rightUpLat, rightUpLon);
+            Coordinate cTwo = new Coordinate(rightDownLat, rightDownLon);
             List<TransitStop> stops = streetVertexIndexService.getNearbyTransitStops(cOne, cTwo);
             TransitIndexService transitIndexService = graph.getService(TransitIndexService.class);
             if (transitIndexService == null) {
