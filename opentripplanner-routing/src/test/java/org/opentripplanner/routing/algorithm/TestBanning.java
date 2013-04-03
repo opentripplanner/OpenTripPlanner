@@ -24,11 +24,13 @@ import junit.framework.TestCase;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.common.model.T2;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.PatternHop;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.request.BannedStopSet;
@@ -89,14 +91,25 @@ public class TestBanning extends TestCase {
         }
     }
 
+    public void testWholeBannedTrips() {
+        doTestBannedTrips(false, 42);
+    }
+
+    public void testPartialBannedTrips() {
+        doTestBannedTrips(true, 43);
+    }
+
     /**
      * Test trip banning. We compute a set of shortest routes between two random stops in the Portland graph. We then ban, for each route, up to a
      * certain amount of trips used in this route, one by one, and recompute the path. The banned trips must not appear in the new computed route.
+     * 
+     * @param partial True to test partial trip banning, false for complete trip
+     * @param seed Value to use for random generator seed -- Keep the same value for consistency.
      */
-    public void testBannedTrips() {
+    public void doTestBannedTrips(boolean partial, int seed) {
 
         Graph graph = ConstantsForTests.getInstance().getPortlandGraph();
-        Random rand = new Random(42); // Make test reproducible... Do not change this constant
+        Random rand = new Random(seed);
 
         for (int i = 0; i < 20; i++) {
             RoutingRequest options = new RoutingRequest();
@@ -118,22 +131,41 @@ public class TestBanning extends TestCase {
                 GraphPath path = spt.getPath(end, true);
                 if (path == null || spt == null)
                     break; // No path found
-                Set<AgencyAndId> usedTripIds = new HashSet<AgencyAndId>();
+                // List of used [trip,stop index] in the path
+                Set<T2<AgencyAndId, BannedStopSet>> usedTripDefs = new HashSet<T2<AgencyAndId, BannedStopSet>>();
                 for (State s : path.states) {
-                    AgencyAndId tripId = s.getTripId();
-                    // Ban the trip for next round
-                    if (tripId != null)
-                        usedTripIds.add(tripId);
+                    if (s.getBackEdge() instanceof TransitBoardAlight) {
+                        TransitBoardAlight tbae = (TransitBoardAlight) s.getBackEdge();
+                        int boardingStopIndex = tbae.getStopIndex();
+                        AgencyAndId tripId = s.getTripId();
+                        BannedStopSet stopSet;
+                        if (partial) {
+                            stopSet = new BannedStopSet();
+                            stopSet.add(boardingStopIndex);
+                        } else {
+                            stopSet = BannedStopSet.ALL;
+                        }
+                        if (tripId != null)
+                            usedTripDefs.add(new T2<AgencyAndId, BannedStopSet>(tripId, stopSet));
+                    }
                 }
                 // Used trips should not contains a banned trip
-                for (AgencyAndId usedTripId : usedTripIds)
-                    assertFalse(options.bannedTrips.containsKey(usedTripId));
-                if (usedTripIds.size() == 0)
+                for (T2<AgencyAndId, BannedStopSet> usedTripDef : usedTripDefs) {
+                    BannedStopSet bannedStopSet = options.bannedTrips.get(usedTripDef.getFirst());
+                    if (bannedStopSet != null) {
+                        for (Integer stopIndex : usedTripDef.getSecond()) {
+                            assertFalse(bannedStopSet.contains(stopIndex));
+                        }
+                    }
+                }
+                if (usedTripDefs.size() == 0)
                     break; // Not a transit trip, no sense to ban trip any longer
-                // Pick a random used trip to ban
-                List<AgencyAndId> usedTripIdsList = new ArrayList<AgencyAndId>(usedTripIds);
-                AgencyAndId tripToBan = usedTripIdsList.get(rand.nextInt(usedTripIds.size()));
-                options.banTrip(tripToBan);
+                // Pick a random used trip + stop set to ban
+                List<T2<AgencyAndId, BannedStopSet>> usedTripDefsList = new ArrayList<T2<AgencyAndId, BannedStopSet>>(
+                        usedTripDefs);
+                T2<AgencyAndId, BannedStopSet> tripDefToBan = usedTripDefsList.get(rand
+                        .nextInt(usedTripDefs.size()));
+                options.bannedTrips.put(tripDefToBan.getFirst(), tripDefToBan.getSecond());
             }
             options.bannedTrips.clear();
         }
