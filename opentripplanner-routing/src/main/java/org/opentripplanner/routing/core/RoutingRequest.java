@@ -62,9 +62,9 @@ public class RoutingRequest implements Cloneable, Serializable {
      * 
      * TODO(flamholz): this is a weird place to inject this model. We do it here because, for historical reasons, this is 
      * the most reasonable place to inject it.
-     * TODO(flamholz): allow autowiring of the model?
      */
-    private static IntersectionTraversalCostModel TRAVERSAL_COST_MODEL = new SimpleIntersectionTraversalCostModel();
+    @Setter
+    private IntersectionTraversalCostModel traversalCostModel = new SimpleIntersectionTraversalCostModel();
 
     /* FIELDS UNIQUELY IDENTIFYING AN SPT REQUEST */
 
@@ -441,7 +441,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /** Returns the model that computes the cost of intersection traversal. */
     public IntersectionTraversalCostModel getIntersectionTraversalCostModel() {
-        return TRAVERSAL_COST_MODEL;
+        return traversalCostModel;
     }
     
     /** @return the (soft) maximum walk distance */
