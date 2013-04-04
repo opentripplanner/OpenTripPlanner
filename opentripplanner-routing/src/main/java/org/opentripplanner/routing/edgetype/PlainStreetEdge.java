@@ -119,9 +119,11 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     @Getter
     private List<TurnRestriction> turnRestrictions = Collections.emptyList();
 
+    /** 0 -> 360 degree angle - the angle at the start of the edge geometry */
     @Getter
     public int inAngle;
 
+    /** 0 -> 360 degree angle - the angle at the end of the edge geometry */
     @Getter
     public int outAngle;
 
@@ -347,14 +349,18 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
                 if (!canTurnOnto(backPSE, s0, traverseMode)) {
                     return null;
                 }
-                realTurnCost = ((IntersectionVertex) tov).computeTraversalCost(
-                        this, backPSE, traverseMode, options, (float) speed, (float) backSpeed);
+                IntersectionVertex traversedVertex = ((IntersectionVertex) tov);
+                realTurnCost = options.getIntersectionTraversalCostModel().computeTraversalCost(
+                        traversedVertex, this, backPSE, traverseMode, options, (float) speed,
+                        (float) backSpeed);
             } else if (fromv instanceof IntersectionVertex) { // depart-after search
                 if (!backPSE.canTurnOnto(this, s0, traverseMode)) {
                     return null;
                 }
-                realTurnCost = ((IntersectionVertex) fromv).computeTraversalCost(
-                        backPSE, this, traverseMode, options, (float) backSpeed, (float) speed);
+                IntersectionVertex traversedVertex = ((IntersectionVertex) fromv);
+                realTurnCost = options.getIntersectionTraversalCostModel().computeTraversalCost(
+                        traversedVertex, backPSE, this, traverseMode, options, (float) backSpeed,
+                        (float) speed);                
             } else { // in case this is a temporary edge not connected to an IntersectionVertex
                 realTurnCost = 0; 
             }

@@ -72,7 +72,7 @@ public class GenericLocation implements Cloneable {
         this.name = "";
         this.place = "";
     }
-
+    
     /**
      * Constructs a GenericLocation with coordinates only.
      */
@@ -156,6 +156,16 @@ public class GenericLocation implements Cloneable {
      */
     public boolean hasHeading() {
         return heading != null;
+    }
+    
+    /** Returns true if this.name is set. */
+    public boolean hasName() {
+        return name != null && !name.isEmpty();
+    }
+    
+    /** Returns true if this.place is set. */
+    public boolean hasPlace() {
+        return place != null && !place.isEmpty();
     }
     
     /**

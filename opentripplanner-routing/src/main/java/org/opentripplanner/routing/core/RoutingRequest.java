@@ -57,6 +57,15 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     private static final int CLAMP_ITINERARIES = 3;
 
+    /**
+     * The model that computes turn/traversal costs.
+     * 
+     * TODO(flamholz): this is a weird place to inject this model. We do it here because, for historical reasons, this is 
+     * the most reasonable place to inject it.
+     */
+    @Setter
+    private IntersectionTraversalCostModel traversalCostModel = new SimpleIntersectionTraversalCostModel();
+
     /* FIELDS UNIQUELY IDENTIFYING AN SPT REQUEST */
 
     /* TODO no defaults should be set here, they should all be handled in one place (searchresource) */
@@ -430,6 +439,11 @@ public class RoutingRequest implements Cloneable, Serializable {
         return (T) extensions.get(key);
     }
 
+    /** Returns the model that computes the cost of intersection traversal. */
+    public IntersectionTraversalCostModel getIntersectionTraversalCostModel() {
+        return traversalCostModel;
+    }
+    
     /** @return the (soft) maximum walk distance */
     // If transit is not to be used, disable walk limit.
     public double getMaxWalkDistance() {
