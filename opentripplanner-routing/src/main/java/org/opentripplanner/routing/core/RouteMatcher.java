@@ -64,7 +64,11 @@ public class RouteMatcher implements Cloneable, Serializable {
         if (routeSpecList == null)
             return emptyMatcher();
         RouteMatcher retval = new RouteMatcher();
+        int n = 0;
         for (String element : routeSpecList.split(",")) {
+            if (element.length() == 0)
+                continue;
+            n++;
             String[] routeSpec = element.split("_", 3);
             if (routeSpec.length != 2 && routeSpec.length != 3) {
                 throw new IllegalArgumentException("Wrong route spec format: " + element);
@@ -91,10 +95,15 @@ public class RouteMatcher implements Cloneable, Serializable {
                 throw new IllegalArgumentException("Wrong route spec format: " + element);
             }
         }
+        if (n == 0)
+            return emptyMatcher();
         return retval;
     }
 
     public boolean matches(RouteSpec routeSpec) {
+        // Optimize for common case, since default HashSet implementation does not optimize empty sets, it still compute a hash.
+        if (this == EMPTY_MATCHER)
+            return false;
         String routeName = routeSpec.routeName.replace("_", " ");
         if (agencyAndRouteIds.contains(new AgencyAndId(routeSpec.agency, routeSpec.routeId)))
             return true;
@@ -106,6 +115,8 @@ public class RouteMatcher implements Cloneable, Serializable {
     }
 
     public boolean matches(Route route) {
+        if (this == EMPTY_MATCHER)
+            return false;
         if (agencyAndRouteIds.contains(route.getId()))
             return true;
         String routeName = GtfsLibrary.getRouteName(route).replace("_", " ");
