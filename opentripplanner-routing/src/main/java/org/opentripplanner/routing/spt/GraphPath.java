@@ -19,7 +19,6 @@ import java.util.List;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
@@ -124,30 +123,6 @@ public class GraphPath {
 
     public Vertex getEndVertex() {
         return states.getLast().getVertex();
-    }
-
-    /**
-     * Get a list containing one RouteSpec object for each vehicle boarded in this path.
-     * 
-     * TODO This function is never called. To remove?
-     * 
-     * @return a list of RouteSpec objects for this path
-     */
-    public List<RouteSpec> getRouteSpecs() {
-        List<RouteSpec> ret = new LinkedList<RouteSpec>();
-        for (State s : states) {
-            Edge e = s.getBackEdge();
-            if (e == null) continue;
-            Trip trip = s.getBackTrip();
-            if (trip != null) {
-                String routeName = GtfsLibrary.getRouteName(trip.getRoute());
-                RouteSpec spec = new RouteSpec(trip.getId().getAgencyId(), routeName, trip
-                        .getRoute().getId().getId());
-                ret.add(spec);
-                // TODO: Check implementation, use edge list in graphpath
-            }
-        }
-        return ret;
     }
 
     /**

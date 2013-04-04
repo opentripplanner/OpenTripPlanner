@@ -100,20 +100,6 @@ public class RouteMatcher implements Cloneable, Serializable {
         return retval;
     }
 
-    public boolean matches(RouteSpec routeSpec) {
-        // Optimize for common case, since default HashSet implementation does not optimize empty sets, it still compute a hash.
-        if (this == EMPTY_MATCHER)
-            return false;
-        String routeName = routeSpec.routeName.replace("_", " ");
-        if (agencyAndRouteIds.contains(new AgencyAndId(routeSpec.agency, routeSpec.routeId)))
-            return true;
-        if (agencyIdAndRouteNames.contains(new T2<String, String>(routeSpec.agency, routeName)))
-            return true;
-        if (routeNames.contains(routeName))
-            return true;
-        return false;
-    }
-
     public boolean matches(Route route) {
         if (this == EMPTY_MATCHER)
             return false;
