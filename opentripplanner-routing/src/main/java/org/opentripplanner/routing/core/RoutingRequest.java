@@ -974,8 +974,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     	boolean isUnpreferedRoute = unpreferredRoutes != null && unpreferredRoutes.matches(route);
     	boolean isUnpreferedAgency = unpreferredAgencies != null && unpreferredAgencies.contains(agencyID); 
-        /* TODO (Laurent) Check this: this does not seem right, should not we use an OR instead? */
-    	if (isUnpreferedRoute && isUnpreferedAgency) {
+    	if (isUnpreferedRoute || isUnpreferedAgency) {
     		preferences_penalty += useUnpreferredRoutesPenalty;
     	}
 
