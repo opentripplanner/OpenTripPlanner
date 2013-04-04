@@ -177,8 +177,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
      * @param options
      * @return
      */
-    private Vertex getClosestVertex(final GenericLocation location,
-            RoutingRequest options) {
+    private Vertex getClosestVertex(final GenericLocation location, RoutingRequest options) {
         return getClosestVertex(location, options, null);
     }
 
@@ -194,18 +193,18 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
      * @param extraEdges
      * @return
      */
-    protected Vertex getClosestVertex(final GenericLocation location,
-            RoutingRequest options, List<Edge> extraEdges) {
+    protected Vertex getClosestVertex(final GenericLocation location, RoutingRequest options,
+            List<Edge> extraEdges) {
         _log.debug("Looking for/making a vertex near {}", location);
 
         // first, check for intersections very close by
         Coordinate coord = location.getCoordinate();
         StreetVertex intersection = getIntersectionAt(coord, MAX_CORNER_DISTANCE);
         String calculatedName = location.getName();
-        
+
         if (intersection != null) {
             // coordinate is at a street corner or endpoint
-            if (!location.hasName()) {          
+            if (!location.hasName()) {
                 _log.debug("found intersection {}. not splitting.", intersection);
                 // generate names for corners when no name was given
                 Set<String> uniqueNameSet = new HashSet<String>();
