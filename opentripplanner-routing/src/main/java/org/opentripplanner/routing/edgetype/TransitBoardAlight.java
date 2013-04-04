@@ -180,7 +180,9 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
                         break;
                     }
                 }
-            }            
+            }
+
+            s1.setEverBoarded(true);
 
             s1.setBackMode(getMode());
             return s1.makeState();
