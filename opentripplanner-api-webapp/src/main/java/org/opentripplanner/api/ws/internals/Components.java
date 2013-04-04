@@ -86,9 +86,8 @@ public class Components {
             @QueryParam("routerId") String routerId) {
 
         RoutingRequest options = new RoutingRequest(modes);
-        options.bannedRoutes = new HashSet<RouteSpec>();
         if (bannedRoutes.length() > 0) {
-        	options.bannedRoutes.addAll(RouteSpec.listFromString(bannedRoutes));
+            options.setBannedRoutes(bannedRoutes);
         }
 
         Graph graph = graphService.getGraph(routerId);

@@ -129,6 +129,8 @@ public class GraphPath {
     /**
      * Get a list containing one RouteSpec object for each vehicle boarded in this path.
      * 
+     * TODO This function is never called. To remove?
+     * 
      * @return a list of RouteSpec objects for this path
      */
     public List<RouteSpec> getRouteSpecs() {
