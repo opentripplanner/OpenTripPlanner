@@ -73,7 +73,7 @@ public class SimpleTraversalCostModelTest {
     }
     
     @Test
-    public void testIsTurnDirectionChecking() {
+    public void testTurnDirectionChecking() {
         // 3 points on a roughly on line
         Coordinate a = new Coordinate(-73.990989, 40.750167);
         Coordinate b = new Coordinate(-73.988049, 40.749094);
@@ -96,6 +96,59 @@ public class SimpleTraversalCostModelTest {
     }
     
     @Test
+    public void testFreeFlowing() {
+        // 3 points on a roughly on line
+        Coordinate a = new Coordinate(-73.990989, 40.750167);
+        Coordinate b = new Coordinate(-73.988049, 40.749094);
+        Coordinate c = new Coordinate(-73.984981, 40.747761);
+        
+        // A vertex for each. No light.
+        IntersectionVertex u = vertex("from_v", a, false);
+        IntersectionVertex v = vertex("intersection", b, false);
+        IntersectionVertex w = vertex("to_v", c, false);
+        v.setFreeFlowing(true);
+        
+        // Two edges.
+        PlainStreetEdge fromEdge = edge(u, v, 1.0, false);
+        PlainStreetEdge toEdge = edge(v, w, 1.0, false);
+        
+        float fromSpeed = 1.0f;
+        float toSpeed = 1.0f;
+        TraverseMode mode = TraverseMode.CAR;
+        
+        double traversalCost = costModel.computeTraversalCost(v, fromEdge, toEdge, mode, options, fromSpeed, toSpeed);
+        
+        // Vertex is free-flowing so cost should be 0.0.
+        assertEquals(0.0, traversalCost, 0.0);
+    }
+    
+    @Test
+    public void testInferredFreeFlowing() {
+        // 3 points on a roughly on line
+        Coordinate a = new Coordinate(-73.990989, 40.750167);
+        Coordinate b = new Coordinate(-73.988049, 40.749094);
+        Coordinate c = new Coordinate(-73.984981, 40.747761);
+        
+        // A vertex for each. No light.
+        IntersectionVertex u = vertex("from_v", a, false);
+        IntersectionVertex v = vertex("intersection", b, false);
+        IntersectionVertex w = vertex("to_v", c, false);
+        
+        // Two edges - will infer that the vertex is free-flowing since there is no light.
+        PlainStreetEdge fromEdge = edge(u, v, 1.0, false);
+        PlainStreetEdge toEdge = edge(v, w, 1.0, false);
+        
+        float fromSpeed = 1.0f;
+        float toSpeed = 1.0f;
+        TraverseMode mode = TraverseMode.CAR;
+        
+        double traversalCost = costModel.computeTraversalCost(v, fromEdge, toEdge, mode, options, fromSpeed, toSpeed);
+        
+        // Vertex is free-flowing so cost should be 0.0.
+        assertEquals(0.0, traversalCost, 0.0);
+    }
+    
+    @Test
     public void testStraightNoLightInCar() {
         // 3 points on a roughly on line
         Coordinate a = new Coordinate(-73.990989, 40.750167);
@@ -110,6 +163,9 @@ public class SimpleTraversalCostModelTest {
         // Two edges.
         PlainStreetEdge fromEdge = edge(u, v, 1.0, false);
         PlainStreetEdge toEdge = edge(v, w, 1.0, false);
+        
+        // 3rd edge prevents inferral of free-flowingness
+        PlainStreetEdge extraEdge = edge(v, u, 1.0, false);
                 
         float fromSpeed = 1.0f;
         float toSpeed = 1.0f;
@@ -136,6 +192,9 @@ public class SimpleTraversalCostModelTest {
         // Two edges.
         PlainStreetEdge fromEdge = edge(u, v, 1.0, false);
         PlainStreetEdge toEdge = edge(v, w, 1.0, false);
+        
+        // 3rd edge prevents inferral of free-flowingness
+        PlainStreetEdge extraEdge = edge(v, u, 1.0, false);
                 
         int turnAngle = costModel.calculateTurnAngle(fromEdge, toEdge, options);
         assertTrue(costModel.isRightTurn(turnAngle));
@@ -166,6 +225,9 @@ public class SimpleTraversalCostModelTest {
         // Two edges.
         PlainStreetEdge fromEdge = edge(u, v, 1.0, false);
         PlainStreetEdge toEdge = edge(v, w, 1.0, false);
+        
+        // 3rd edge prevents inferral of free-flowingness
+        PlainStreetEdge extraEdge = edge(v, u, 1.0, false);
                 
         int turnAngle = costModel.calculateTurnAngle(fromEdge, toEdge, options);
         assertFalse(costModel.isRightTurn(turnAngle));

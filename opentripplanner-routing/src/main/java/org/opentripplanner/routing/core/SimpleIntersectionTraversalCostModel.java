@@ -84,7 +84,11 @@ public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTr
     @Override
     public double computeTraversalCost(IntersectionVertex v, PlainStreetEdge from, PlainStreetEdge to, TraverseMode mode,
             RoutingRequest options, float fromSpeed, float toSpeed) {
-
+        // If the vertex is free-flowing then (by definition) there is no cost to traverse it.
+        if (v.inferredFreeFlowing()) {
+            return 0;
+        }
+        
         // Non-driving cases are much simpler. Handled generically in the base class.
         if (!mode.isDriving()) {
             return computeNonDrivingTraversalCost(v, from, to, fromSpeed, toSpeed);

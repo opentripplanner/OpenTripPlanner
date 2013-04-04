@@ -16,24 +16,12 @@ package org.opentripplanner.routing.vertextype;
 import lombok.Getter;
 import lombok.Setter;
 
-import org.opentripplanner.routing.core.IntersectionTraversalCostModel;
-import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.SimpleIntersectionTraversalCostModel;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.graph.Graph;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Represents an ordinary location in space, typically an intersection.
- * 
- * TODO(flamholz): the various constants in this class should be factored out and configurable. Likely calls for another class. TurnCostModel or
- * something of the like.
  */
 public class IntersectionVertex extends StreetVertex {
-
-    private static final Logger LOG = LoggerFactory.getLogger(IntersectionVertex.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -50,32 +38,13 @@ public class IntersectionVertex extends StreetVertex {
     @Getter
     @Setter
     private boolean freeFlowing;
-    
-    /**
-     * The model that computes turn/traversal costs.
-     * 
-     * TODO(flamholz): this is a weird place to inject the model. We do it here for historical reasons - this is where costs have usually been
-     * computed. Consider doing it higher up, like inside the search code?
-     */
-    private static IntersectionTraversalCostModel costModel = new SimpleIntersectionTraversalCostModel();
 
-    /** Computes the cost of traversing this intersection in seconds */
-    public double computeTraversalCost(PlainStreetEdge from, PlainStreetEdge to, TraverseMode mode,
-            RoutingRequest options, float fromSpeed, float toSpeed) {
-        // TODO(flamholz): move this free-flowing check into the cost model?
-        if (freeFlowing) {
-            return 0;
-        }
-
-        if (inferredFreeFlowing()) {
-            LOG.debug("Inferred that IntersectionVertex {} is free-flowing", getIndex());
-            return 0;
+    /** Returns true if this.freeFlowing or if it appears that this vertex is free-flowing */
+    public boolean inferredFreeFlowing() {
+        if (this.freeFlowing) {
+            return true;
         }
         
-        return costModel.computeTraversalCost(this, from, to, mode, options, fromSpeed, toSpeed);
-    }
-
-    protected boolean inferredFreeFlowing() {
         return getDegreeIn() == 1 && getDegreeOut() == 1 && !this.trafficLight;
     }
 
