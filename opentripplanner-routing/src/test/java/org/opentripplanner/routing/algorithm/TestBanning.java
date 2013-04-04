@@ -25,8 +25,6 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.PatternHop;
@@ -65,17 +63,14 @@ public class TestBanning extends TestCase {
             String lineId = maxLines[i][1];
             String routeSpecStr = "TriMet_" + (lineName != null ? lineName : "")
                     + (lineId != null ? "_" + lineId : "");
-            RouteSpec bannedRouteSpec = new RouteSpec(routeSpecStr);
-            options.bannedRoutes.add(bannedRouteSpec);
+            options.setBannedRoutes(routeSpecStr);
             spt = aStar.getShortestPathTree(options);
             GraphPath path = spt.getPath(end, true);
             for (State s : path.states) {
                 if (s.getBackEdge() instanceof PatternHop) {
                     PatternHop e = (PatternHop) s.getBackEdge();
                     Route route = e.getPattern().getExemplar().getRoute();
-                    RouteSpec routeSpec = new RouteSpec(route.getId().getAgencyId(),
-                            GtfsLibrary.getRouteName(route), route.getId().getId());
-                    assertFalse(routeSpec.equals(bannedRouteSpec));
+                    assertFalse(options.bannedRoutes.matches(route));
                     boolean foundMaxLine = false;
                     for (int j = 0; j < maxLines.length; ++j) {
                         if (j != i) {
@@ -87,7 +82,6 @@ public class TestBanning extends TestCase {
                     assertTrue(foundMaxLine);
                 }
             }
-            options.bannedRoutes.clear();
         }
     }
 
