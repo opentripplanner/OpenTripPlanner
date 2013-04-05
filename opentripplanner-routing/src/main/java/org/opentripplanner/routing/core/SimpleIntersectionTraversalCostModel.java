@@ -102,13 +102,13 @@ public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTr
             // Use constants that apply when there are stop lights.
             if (isRightTurn(turnAngle)) {
                 turnCost = expectedRightAtLightTimeSec;
-                probabilityStopToTurn = rightTurnActiveProb;
+                probabilityStopToTurn = 1.0 - rightTurnActiveProb;
             } else if (isLeftTurn(turnAngle)) {
                 turnCost = expectedLeftAtLightTimeSec;
-                probabilityStopToTurn = leftTurnActiveProb;
+                probabilityStopToTurn = 1.0 - leftTurnActiveProb;
             } else {
                 turnCost = expectedStraightAtLightTimeSec;
-                probabilityStopToTurn = continueStraightActiveProb;
+                probabilityStopToTurn = 1.0 - continueStraightActiveProb;
             }
         } else {
             // Use constants that apply when no stop lights.
