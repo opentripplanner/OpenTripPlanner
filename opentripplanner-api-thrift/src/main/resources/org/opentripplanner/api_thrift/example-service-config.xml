@@ -11,6 +11,17 @@
     	<property name="path" value="/home/avi/otp/graph-bundle" />
     </bean>
 
+    <bean id="traversalCostModel" class="org.opentripplanner.routing.core.SimpleIntersectionTraversalCostModel">
+	<!-- reconfigure turn costs for cities where there is no right on red. -->
+	<property name="expectedRightAtLightTimeSec" value="26.2666666667" />    
+	<property name="expectedStraightAtLightTimeSec" value="26.2666666667" />	
+	<property name="expectedLeftAtLightTimeSec" value="41.666666667" />
+    </bean>
+
+    <bean id="prototypeRoutingRequest" class="org.opentripplanner.routing.core.RoutingRequest">
+    	<property name="traversalCostModel" ref="traversalCostModel" />
+    </bean>
+
     <!-- Configure the OTPServerTask -->
     <bean id="otpServerTask" class="org.opentripplanner.api.thrift.OTPServerTask">
         <property name="port" value="8889" />
@@ -18,6 +29,7 @@
 	    <bean class="org.opentripplanner.api.thrift.impl.OTPServiceImpl">
 	    	<property name="graphService" ref="graphService" />
 	    	<property name="pathService" ref="pathService" />
+		<property name="prototypeRoutingRequest" ref="prototypeRoutingRequest" />
 	    </bean>
 	</property>
     </bean>
