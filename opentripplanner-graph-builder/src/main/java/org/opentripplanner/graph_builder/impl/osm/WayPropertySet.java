@@ -218,8 +218,8 @@ public class WayPropertySet {
         // this would be bad, as the segment could never be traversed by an automobile
         // The small epsilon is to account for possible rounding errors
         if (speed != null && speed < 0.0001)
-            _log.warn("Zero or negative automobile speed detected at {} based on OSM maxspeed tags;" +
-            		" ignoring these tags", this);
+            _log.warn("Zero or negative automobile speed detected at {} based on OSM " +
+            		"maxspeed tags; ignoring these tags", this);
         
         // if there was a defined speed and it's not 0, we're done
         if (speed != null)
