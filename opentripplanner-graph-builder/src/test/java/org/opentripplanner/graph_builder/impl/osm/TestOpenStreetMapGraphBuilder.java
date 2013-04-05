@@ -33,6 +33,7 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
 public class TestOpenStreetMapGraphBuilder extends TestCase {
 
@@ -116,6 +117,26 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         loader.setProvider(provider);
 
         loader.buildGraph(gg, extra);
+        
+        // These vertices are labeled in the OSM file as having traffic lights.
+        IntersectionVertex iv1 = (IntersectionVertex) gg.getVertex("osm node 1919595918");
+        IntersectionVertex iv2 = (IntersectionVertex) gg.getVertex("osm node 42442273");
+        IntersectionVertex iv3 = (IntersectionVertex) gg.getVertex("osm node 1919595927");
+        IntersectionVertex iv4 = (IntersectionVertex) gg.getVertex("osm node 42452026");
+        assertTrue(iv1.isTrafficLight());
+        assertTrue(iv2.isTrafficLight());
+        assertTrue(iv3.isTrafficLight());
+        assertTrue(iv4.isTrafficLight());
+        
+        // These are not.
+        IntersectionVertex iv5 = (IntersectionVertex) gg.getVertex("osm node 42435485");
+        IntersectionVertex iv6 = (IntersectionVertex) gg.getVertex("osm node 42439335");
+        IntersectionVertex iv7 = (IntersectionVertex) gg.getVertex("osm node 42436761");
+        IntersectionVertex iv8 = (IntersectionVertex) gg.getVertex("osm node 42442291");
+        assertFalse(iv5.isTrafficLight());
+        assertFalse(iv6.isTrafficLight());
+        assertFalse(iv7.isTrafficLight());
+        assertFalse(iv8.isTrafficLight());
         
         Set<P2<Integer>> edgeEndpoints = new HashSet<P2<Integer>>();
         for (StreetEdge se : gg.getStreetEdges()) {
