@@ -145,6 +145,10 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /** Used instead of walk reluctance for stairs */
     public double stairsReluctance = 2.0;
+    
+    /** Multiplicative factor on expected turning time. */
+    @Setter
+    public double turnReluctance = 1.0;
 
     /**
      * How long does it take to get an elevator, on average (actually, it probably should be a bit *more* than average, to prevent optimistic trips)?

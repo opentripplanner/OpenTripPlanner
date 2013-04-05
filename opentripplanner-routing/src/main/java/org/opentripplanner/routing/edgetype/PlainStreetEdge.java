@@ -371,7 +371,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
             long turnTime = (long) Math.ceil(realTurnCost);
             time += turnTime;
-            weight += realTurnCost;
+            weight += options.turnReluctance * realTurnCost;
         }
 
         int timeLong = (int) Math.ceil(time);
