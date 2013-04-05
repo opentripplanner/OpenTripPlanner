@@ -364,37 +364,32 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             } else { // in case this is a temporary edge not connected to an IntersectionVertex
                 realTurnCost = 0; 
             }
-            
-            if (traverseMode != TraverseMode.CAR) {
-                s1.incrementWalkDistance(realTurnCost / 100); //just a tie-breaker
+
+            if (!traverseMode.isDriving()) {
+                s1.incrementWalkDistance(realTurnCost / 100);  //just a tie-breaker
             }
 
-            weight += realTurnCost;
-            long turnTime = (long) realTurnCost;
-            if (turnTime != realTurnCost) {  // round up.
-                turnTime++;
-            }
+            long turnTime = (long) Math.ceil(realTurnCost);
             time += turnTime;
+            weight += realTurnCost;
         }
 
-        int timeLong = (int) time;
-        if (timeLong != time) {
-            timeLong++;
-        }
+        int timeLong = (int) Math.ceil(time);
         s1.incrementTimeInSeconds(timeLong);
         
-        if (traverseMode != TraverseMode.CAR) {
+        s1.incrementWeight(weight);
+        if (!traverseMode.isDriving()) {
             s1.incrementWalkDistance(length);
         }
-
-        s1.incrementWeight(weight);
+        
         if (s1.weHaveWalkedTooFar(options)) {
+            LOG.debug("Too much walking. Bailing.");
             return null;
         }
         
         s1.addAlerts(notes);
         
-        if (this.toll && traverseMode == TraverseMode.CAR) {
+        if (this.isToll() && traverseMode.isDriving()) {
             s1.addAlert(Alert.createSimpleAlerts("Toll road"));
         }
         
@@ -534,10 +529,6 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     @Override
     public ElevationProfileSegment getElevationProfileSegment() {
         return elevationProfileSegment;
-    }
-    
-    public boolean getToll() {
-        return this.toll;
     }
 
     protected boolean detachFrom() {
