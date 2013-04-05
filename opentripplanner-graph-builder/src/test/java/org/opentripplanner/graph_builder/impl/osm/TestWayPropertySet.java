@@ -122,5 +122,11 @@ public class TestWayPropertySet extends TestCase {
        way.addTag("highway", "motorway");
        assertTrue(within(kmhAsMs(100), wps.getCarSpeedForWay(way, false), epsilon));
        assertTrue(within(kmhAsMs(100), wps.getCarSpeedForWay(way, true), epsilon));
+       
+       // make sure that 0-speed ways can't exist
+       way = new OSMWithTags();
+       way.addTag("maxspeed", "0");
+       assertTrue(within(kmhAsMs(25), wps.getCarSpeedForWay(way, false), epsilon));
+       assertTrue(within(kmhAsMs(25), wps.getCarSpeedForWay(way, true), epsilon));
     }
 }
