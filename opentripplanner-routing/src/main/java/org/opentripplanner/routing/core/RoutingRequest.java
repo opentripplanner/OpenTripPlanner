@@ -994,7 +994,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         	Route route = trip.getRoute();
         	
         	for (Integer integer : bannedRouteTypes) {
-        		if (route.getType() == integer.intValue());
+        		if (route.getType() == integer.intValue())
         			return true;
         	}
         }
@@ -1006,7 +1006,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         		List<String>components = Arrays.asList(agencyRouteType.split("_"));
         		
         		String agencyID = components.get(0);
-        		Integer routeType = Integer.getInteger(components.get(1));
+        		Integer routeType = Integer.parseInt(components.get(1));
         		
         		if (agencyID.equals(route.getId().getAgencyId()) && routeType.intValue() == route.getType())
         			return true;
