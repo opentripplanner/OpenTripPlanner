@@ -138,9 +138,18 @@ otp.core.Webapp = otp.Class({
         
         //this.addModule(new otp.modules.annotations.AnnotationsModule(this), false);
         //this.addModule(new otp.modules.bikeshare.BikeShareModule(this), false);
-        this.addModule(new otp.modules.calltaker.CallTakerModule(this), true);
-        this.addModule(new otp.modules.fieldtrip.FieldTripModule(this), false);
-        
+        //this.addModule(new otp.modules.multimodal.MultimodalPlannerModule(this), true);
+        //this.addModule(new otp.modules.calltaker.CallTakerModule(this), false);
+        //this.addModule(new otp.modules.fieldtrip.FieldTripModule(this), false);
+
+        if(otp.config.modules) {
+            for(var i=0; i<otp.config.modules.length; i++) {
+                var modConfig = otp.config.modules[i];
+                var modClass = this.stringToFunction(modConfig.className);
+                var module = new modClass(this);
+                this.addModule(module, modConfig.isDefault || false);
+            }
+        }                
 
         // create the module selector
         
@@ -227,12 +236,10 @@ otp.core.Webapp = otp.Class({
     
     stringToFunction : function(str) {
         var arr = str.split(".");
-        console.log(arr);
 
         var fn = (window || this);
         for(var i = 0, len = arr.length; i < len; i++) {
             fn = fn[arr[i]];
-            console.log("- "+fn);
         }
 
         if(typeof fn !== "function") {
