@@ -13,6 +13,10 @@
 
 package org.opentripplanner.analyst.request;
 
+import javax.annotation.PostConstruct;
+
+import lombok.Setter;
+
 import org.opentripplanner.analyst.core.DynamicTile;
 import org.opentripplanner.analyst.core.TemplateTile;
 import org.opentripplanner.analyst.core.Tile;
@@ -41,13 +45,18 @@ public class TileCache extends CacheLoader<TileRequest, Tile>
 //    @Autowired
 //    private SampleCache sampleCache;
 
-    private final LoadingCache<TileRequest, Tile> tileCache = CacheBuilder
-            .newBuilder()
-            .concurrencyLevel(32)
-            .maximumSize(900)
-            //.softValues()
-            .build(this);
-
+    private LoadingCache<TileRequest, Tile> tileCache;
+    @Setter private int size = 200;
+    @Setter private int concurrency = 16;
+            
+    @PostConstruct
+    private void runAfterInjection() {
+        this.tileCache = CacheBuilder.newBuilder()
+                .concurrencyLevel(concurrency)
+                .maximumSize(size)
+                .build(this);
+    }
+    
     @Override
     /** completes the abstract CacheLoader superclass */
     public Tile load(TileRequest req) throws Exception {

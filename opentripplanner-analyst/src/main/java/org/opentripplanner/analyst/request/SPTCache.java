@@ -13,6 +13,10 @@
 
 package org.opentripplanner.analyst.request;
 
+import javax.annotation.PostConstruct;
+
+import lombok.Setter;
+
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.SPTService;
@@ -35,12 +39,19 @@ public class SPTCache extends CacheLoader<RoutingRequest, ShortestPathTree> {
     
     @Autowired private GraphService graphService; 
 
-    private LoadingCache<RoutingRequest, ShortestPathTree> sptCache = CacheBuilder
-            .newBuilder()
-            .concurrencyLevel(16)
-            .maximumSize(16)
-            .build(this);
+    private LoadingCache<RoutingRequest, ShortestPathTree> sptCache;
 
+    @Setter private int size = 200;
+    @Setter private int concurrency = 16;
+            
+    @PostConstruct
+    private void runAfterInjection() {
+        this.sptCache = CacheBuilder.newBuilder()
+                .concurrencyLevel(concurrency)
+                .maximumSize(size)
+                .build(this);
+    }
+ 
     @Override /** completes the abstract CacheLoader superclass */
     public ShortestPathTree load(RoutingRequest req) throws Exception {
         LOG.debug("spt cache miss : {}", req);
