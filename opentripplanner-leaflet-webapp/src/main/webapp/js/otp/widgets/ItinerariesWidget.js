@@ -211,8 +211,10 @@ otp.widgets.ItinerariesWidget =
             if(leg.mode === "WALK" || leg.mode === "BICYCLE") {
                 headerHtml += " "+otp.util.Itin.distanceString(leg.distance)+ " to "+leg.to.name;
                 
-                var spanId = this.newMunicoderRequest(leg.to.lat, leg.to.lon);
-                headerHtml += '<span id="'+spanId+'"></span>';
+                if(otp.config.municoderHostname) {
+                    var spanId = this.newMunicoderRequest(leg.to.lat, leg.to.lon);
+                    headerHtml += '<span id="'+spanId+'"></span>';
+                }
             }
             else if(leg.agencyId !== null) {
                 headerHtml += ": "+leg.agencyId+", ";
@@ -284,9 +286,14 @@ otp.widgets.ItinerariesWidget =
 
             $('<div class="otp-itin-leg-leftcol">'+otp.util.Time.formatItinTime(leg.startTime, "h:mma")+"</div>").appendTo(legDiv);
 
-            var spanId = this.newMunicoderRequest(leg.from.lat, leg.from.lon);
-            $('<div class="otp-itin-leg-endpointDesc"><b>Board</b> at '+leg.from.name+'<span id="'+spanId+'"></span></div>')
-            .appendTo(legDiv)
+            var startHtml = '<div class="otp-itin-leg-endpointDesc"><b>Board</b> at '+leg.from.name;
+            if(otp.config.municoderHostname) {
+                var spanId = this.newMunicoderRequest(leg.from.lat, leg.from.lon);
+                startHtml += '<span id="'+spanId+'"></span>';
+            }
+            startHtml += '</div>';
+            
+            $(startHtml).appendTo(legDiv)
             .click(function(evt) {
                 this_.module.webapp.map.lmap.panTo(new L.LatLng(leg.from.lat, leg.from.lon));
             }).hover(function(evt) {
@@ -366,9 +373,14 @@ otp.widgets.ItinerariesWidget =
 
             $('<div class="otp-itin-leg-leftcol">'+otp.util.Time.formatItinTime(leg.endTime, "h:mma")+"</div>").appendTo(legDiv);           
 
-            spanId = this.newMunicoderRequest(leg.to.lat, leg.to.lon);
-            $('<div class="otp-itin-leg-endpointDesc"><b>Alight</b> at '+leg.to.name+'<span id="'+spanId+'"></span></div>')
-            .appendTo(legDiv)
+            var endHtml = '<div class="otp-itin-leg-endpointDesc"><b>Alight</b> at '+leg.to.name;
+            if(otp.config.municoderHostname) {
+                spanId = this.newMunicoderRequest(leg.to.lat, leg.to.lon);
+                endHtml += '<span id="'+spanId+'"></span>';
+            }
+            endHtml += '</div>';
+            
+            $(endHtml).appendTo(legDiv)
             .click(function(evt) {
                 this_.module.webapp.map.lmap.panTo(new L.LatLng(leg.to.lat, leg.to.lon));
             }).hover(function(evt) {
