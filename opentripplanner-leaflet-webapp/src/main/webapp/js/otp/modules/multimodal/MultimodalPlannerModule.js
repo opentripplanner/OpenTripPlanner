@@ -42,9 +42,11 @@ otp.modules.multimodal.MultimodalPlannerModule =
         this.optionsWidget.minimizable = true;
         this.optionsWidget.addHeader("Trip Options");
         
-        this.optionsWidget.addControl("locations", new otp.widgets.TW_LocationsSelector(this.optionsWidget, this.webapp.geocoders), true);
-        this.optionsWidget.addVerticalSpace(12, true);
-        
+        if(this.webapp.geocoders && this.webapp.geocoders.length > 0) {
+            this.optionsWidget.addControl("locations", new otp.widgets.TW_LocationsSelector(this.optionsWidget, this.webapp.geocoders), true);
+            this.optionsWidget.addVerticalSpace(12, true);
+        }
+                
         this.optionsWidget.addControl("time", new otp.widgets.TW_TimeSelector(this.optionsWidget), true);
         this.optionsWidget.addVerticalSpace(12, true);
         
