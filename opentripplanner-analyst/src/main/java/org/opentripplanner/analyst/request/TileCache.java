@@ -17,20 +17,17 @@ import javax.annotation.PostConstruct;
 
 import lombok.Setter;
 
-import org.opentripplanner.analyst.core.DynamicTile;
 import org.opentripplanner.analyst.core.TemplateTile;
 import org.opentripplanner.analyst.core.Tile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.cache.Weigher;
 
-@Component
 public class TileCache extends CacheLoader<TileRequest, Tile> 
     implements  Weigher<TileRequest, Tile> { 
     

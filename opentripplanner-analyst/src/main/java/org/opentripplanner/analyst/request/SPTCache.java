@@ -24,13 +24,11 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
-@Component
 public class SPTCache extends CacheLoader<RoutingRequest, ShortestPathTree> {
 
     private static final Logger LOG = LoggerFactory.getLogger(SPTCache.class);
