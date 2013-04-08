@@ -104,7 +104,7 @@ otp.modules.planner.Itinerary = otp.Class({
     
     getFareStr : function() {
     
-        if(this.itinData.fare.fare.regular) {
+        if(this.itinData.fare && this.itinData.fare.fare.regular) {
             var decimalPlaces = this.itinData.fare.fare.regular.currency.defaultFractionDigits;
             return this.itinData.fare.fare.regular.currency.symbol +
                 (this.itinData.fare.fare.regular.cents/Math.pow(10,decimalPlaces)).toFixed(decimalPlaces);
