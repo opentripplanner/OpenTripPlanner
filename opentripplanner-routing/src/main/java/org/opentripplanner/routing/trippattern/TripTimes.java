@@ -244,7 +244,7 @@ public abstract class TripTimes {
         Trip trip = this.getTrip();
         BannedStopSet banned = options.bannedTrips.get(trip.getId());
         if (banned != null) {
-            if (banned.contains(stopIndex) || banned == BannedStopSet.ALL) {
+            if (banned.contains(stopIndex)) {
                 return false;
             }
         }

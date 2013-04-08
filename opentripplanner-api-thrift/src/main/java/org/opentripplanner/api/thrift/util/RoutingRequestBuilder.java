@@ -18,20 +18,31 @@ import lombok.NoArgsConstructor;
  * 
  * @author avi
  */
-@NoArgsConstructor
 public class RoutingRequestBuilder {
 
-    private final RoutingRequest routingRequest = new RoutingRequest();
+    private final RoutingRequest routingRequest;
 
     private Graph graph;
 
+    public RoutingRequestBuilder() {
+        routingRequest = new RoutingRequest();
+    }
+    
     /**
      * Initialize with given TripParameters.
      * 
      * @param tripParams
      */
     public RoutingRequestBuilder(TripParameters tripParams) {
+        this();
         addTripParameters(tripParams);
+    }
+    
+    /**
+     * Initialize with a prototype RoutingRequest (which will be copied).
+     */
+    public RoutingRequestBuilder(RoutingRequest prototypeRequest) {
+        routingRequest = prototypeRequest.clone();
     }
 
     /**

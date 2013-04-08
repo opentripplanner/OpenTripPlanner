@@ -20,6 +20,8 @@ public class GenericLocationTest {
         assertNull(loc.getLat());
         assertNull(loc.getLng());
         assertNull(loc.getCoordinate());
+        assertFalse(loc.hasName());
+        assertFalse(loc.hasPlace());
     }
 
     @Test
@@ -34,6 +36,8 @@ public class GenericLocationTest {
         
         assertFalse(loc.hasCoordinate());
         assertFalse(loc.hasHeading());
+        assertTrue(loc.hasName());
+        assertTrue(loc.hasPlace());
         assertNull(loc.getLat());
         assertNull(loc.getLng());
         assertNull(loc.getCoordinate());
@@ -48,6 +52,8 @@ public class GenericLocationTest {
         NamedPlace np = loc.getNamedPlace();
         assertEquals("name", np.name);
         assertEquals("1.0,2.5", np.place);
+        assertTrue(loc.hasName());
+        assertTrue(loc.hasPlace());
         
         assertTrue(loc.hasCoordinate());
         assertFalse(loc.hasHeading());
@@ -65,6 +71,8 @@ public class GenericLocationTest {
         NamedPlace np = loc.getNamedPlace();
         assertEquals("name", np.name);
         assertEquals("12345", np.place);
+        assertTrue(loc.hasName());
+        assertTrue(loc.hasPlace());
         
         assertFalse(loc.hasCoordinate());
         assertFalse(loc.hasHeading());
@@ -82,6 +90,8 @@ public class GenericLocationTest {
         NamedPlace np = loc.getNamedPlace();
         assertEquals("name", np.name);
         assertEquals("1.0,2.5", np.place);
+        assertTrue(loc.hasName());
+        assertTrue(loc.hasPlace());
         
         assertTrue(loc.hasCoordinate());
         assertFalse(loc.hasHeading());
@@ -119,6 +129,9 @@ public class GenericLocationTest {
         assertEquals("1.0,2.0", loc.toString());
         assertTrue(loc.hasCoordinate());
         assertFalse(loc.hasHeading());
+        
+        assertFalse(loc.hasName());
+        assertFalse(loc.hasPlace());   
     }
     
     @Test
@@ -130,6 +143,9 @@ public class GenericLocationTest {
         assertEquals("1.0,2.0", loc.toString());
         assertTrue(loc.hasCoordinate());
         assertTrue(loc.hasHeading());
+        
+        assertFalse(loc.hasName());
+        assertFalse(loc.hasPlace());
     }
     
     @Test
