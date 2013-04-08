@@ -936,13 +936,6 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
         return builder.toString();
     }
-
-    private String getRouteSetStr(HashSet<RouteSpec> routes) {
-        HashSet<String> routesRepresentation = new HashSet<String>();
-        for (RouteSpec spec : routes) 
-        	routesRepresentation.add(spec.getRepresentation());
-        return getRouteOrAgencyStr(routesRepresentation);
-    }
     
     private String getRouteTypeStr(HashSet<Integer> routeTypes) {
         HashSet<String> routesRepresentation = new HashSet<String>();
