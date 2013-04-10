@@ -234,6 +234,10 @@ public class VizGui extends JFrame implements VertexSelectionListener {
 
     private JCheckBox transitCheckBox;
 
+    private JCheckBox carCheckBox;
+    
+    private JCheckBox cmvCheckBox;
+    
     private JTextField searchDate;
     
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
@@ -366,6 +370,10 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         routingPanel.add(ferryCheckBox);
         transitCheckBox = new JCheckBox("transit");
         routingPanel.add(transitCheckBox);
+        carCheckBox = new JCheckBox("car");
+        routingPanel.add(carCheckBox);
+        cmvCheckBox = new JCheckBox("custom vehicle");
+        routingPanel.add(cmvCheckBox);
         
         // row: boarding penalty
         JLabel boardPenaltyLabel = new JLabel("Boarding penalty (min):");
@@ -841,6 +849,8 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         modeSet.setFerry(ferryCheckBox.isSelected());
         modeSet.setTrainish(trainCheckBox.isSelected());
         modeSet.setBusish(busCheckBox.isSelected());
+        modeSet.setCar(carCheckBox.isSelected());
+        modeSet.setCustomMotorVehicle(cmvCheckBox.isSelected());
         // must set generic transit mode last, and only when it is checked
         // otherwise 'false' will clear trainish and busish 
         if (transitCheckBox.isSelected())
