@@ -105,6 +105,7 @@ public class BikeRentalUpdater implements Runnable {
         List<BikeRentalStation> stations = source.getStations();
         Set<BikeRentalStation> stationSet = new HashSet<BikeRentalStation>();
         Set<String> networks = new HashSet<String>(Arrays.asList(network));
+        /* add any new stations and update bike counts for existing stations */
         for (BikeRentalStation station : stations) {
             service.addStation(station);
             stationSet.add(station);
@@ -123,7 +124,8 @@ public class BikeRentalUpdater implements Runnable {
                 vertex.setSpacesAvailable(station.spacesAvailable);
             }
         }
-        List<BikeRentalStationVertex> toRemove = new ArrayList<BikeRentalStationVertex>();
+        /* remove existing stations that were not present in the update */
+        List<BikeRentalStation> toRemove = new ArrayList<BikeRentalStation>();
         for (Entry<BikeRentalStation, BikeRentalStationVertex> entry : verticesByStation.entrySet()) {
             BikeRentalStation station = entry.getKey();
             if (stationSet.contains(station))
@@ -131,12 +133,15 @@ public class BikeRentalUpdater implements Runnable {
             BikeRentalStationVertex vertex = entry.getValue();
             if (graph.containsVertex(vertex)) {
                 graph.removeVertexAndEdges(vertex);
-                toRemove.add(vertex);
             }
+            toRemove.add(station);
             service.removeStation(station);
             // TODO: need to unsplit any streets that were split
         }
-        verticesByStation.keySet().removeAll(toRemove);
+        for (BikeRentalStation station : toRemove) {
+            // post-iteration removal to avoid concurrent modification
+            verticesByStation.remove(station); 
+        }
 
     }
 }

@@ -15,7 +15,6 @@ package org.opentripplanner.analyst.core;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
@@ -26,28 +25,26 @@ import org.geotools.referencing.CRS;
 import org.opengis.geometry.BoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opentripplanner.common.IterableLibrary;
+import org.opentripplanner.common.geometry.ReversibleLineStringWrapper;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.common.geometry.ReversibleLineStringWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.index.strtree.STRtree;
 
-@Component
+/**
+ * This index is used in Analyst and does not need to be instantiated if you are not performing
+ * Analyst requests.
+ */
 public class GeometryIndex implements GeometryIndexService {
     
     private static final Logger LOG = LoggerFactory.getLogger(GeometryIndex.class);
