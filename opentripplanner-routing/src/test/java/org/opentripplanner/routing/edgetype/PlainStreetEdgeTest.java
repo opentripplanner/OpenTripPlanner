@@ -29,6 +29,29 @@ public class PlainStreetEdgeTest {
     }
     
     @Test
+    public void testInAndOutAngles() {
+        PlainStreetEdge e1 = edge(v1, v2, 1.0, StreetTraversalPermission.ALL);
+        
+        // Edge has same first and last angle.
+        assertEquals(91, e1.getInAngle());
+        assertEquals(91, e1.getOutAngle());
+        
+        // 2 new ones
+        StreetVertex u = vertex("test1", 2.0, 1.0);
+        StreetVertex v = vertex("test2", 2.0, 2.0);
+        
+        // Second edge
+        PlainStreetEdge e2 = edge(u, v, 1.0, StreetTraversalPermission.ALL);
+
+        assertEquals(180, e2.getInAngle());
+        assertEquals(180, e2.getOutAngle());
+        
+        // Difference should be about 90.
+        int diff = (e1.getOutAngle() - e2.getInAngle());
+        assertEquals(-89, diff);
+    }
+    
+    @Test
     public void testModeSetCanTraverse() {
         PlainStreetEdge e = edge(v1, v2, 1.0, StreetTraversalPermission.ALL);
         

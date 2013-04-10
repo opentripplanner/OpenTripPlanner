@@ -9,11 +9,10 @@
            http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-2.0.xsd">
 
     <import resource="classpath:org/opentripplanner/application-context.xml" />
-
-    <context:component-scan base-package="org.opentripplanner.analyst"/>
+    
     <context:component-scan base-package="org.opentripplanner.api"/>
-	<context:component-scan base-package="org.opentripplanner.routing.impl"/>
-
+    <context:component-scan base-package="org.opentripplanner.routing.impl"/>
+  
 	<bean id="prototypeRoutingRequest" class="org.opentripplanner.routing.core.RoutingRequest">
 		<!-- Set default routing parameters here -->
 	</bean>
@@ -22,7 +21,7 @@
         <property name="firstPathTimeout" value="10.0" />
         <property name="multiPathTimeout" value="1.0" />
 	</bean>
- 
+
 	<!-- Replacement pathService for testing multi-objective search -->
 	<!--
 	<bean id="pathService" class="org.opentripplanner.routing.impl.MultiObjectivePathServiceImpl">
@@ -38,9 +37,28 @@
         <property name="maxPaths" value="4" />
 	</bean>
 	-->
- 
-  <bean id="heuristicFactory" class="org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl"/>
+  
+  <!-- 
+  optional Analyst modules, comment out to save memory. 
+  Note that we no longer component-scan for certain Analyst modules because they use memory
+  or have settable properties.
+  -->
+  <context:component-scan base-package="org.opentripplanner.analyst"/>
+  <bean class="org.opentripplanner.analyst.core.GeometryIndex"/>
+  <bean class="org.opentripplanner.analyst.request.SPTCache">
+      <property name="size" value="20" />
+  </bean>
+  <bean class="org.opentripplanner.analyst.request.TileCache">
+      <property name="size" value="900" />
+  </bean>
+  <!-- end of optional Analyst modules -->
+
+   
+  <!--   
+  <bean class="org.opentripplanner.routing.algorithm.EarliestArrivalSPTService"/>
+   -->
   <bean id="sptService" class="org.opentripplanner.routing.algorithm.GenericAStar"/>
+  <bean id="heuristicFactory" class="org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl"/>
   <bean id="jsonpCallbackFilter" class="org.opentripplanner.jsonp.JsonpCallbackFilter" />
 
 </beans>
