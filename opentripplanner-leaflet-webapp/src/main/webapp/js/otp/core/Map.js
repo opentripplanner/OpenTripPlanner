@@ -25,13 +25,15 @@ otp.core.Map = otp.Class({
     contextMenuModuleItems  : null,
     contextMenuLatLng       : null,
     
+    baseLayers  : {},
+    
     initialize : function(webapp) {
         var this_ = this;
         this.webapp = webapp;
         
         
                 
-        var baseLayers = {};
+        //var baseLayers = {};
         var defaultBaseLayer = null;
         
         for(var i=0; i<otp.config.baseLayers.length; i++) { //otp.config.baseLayers.length-1; i >= 0; i--) {
@@ -43,7 +45,7 @@ otp.core.Map = otp.Class({
 
             var layer = new L.TileLayer(layerConfig.tileUrl, layerProps);
 
-	        baseLayers[layerConfig.name] = layer;
+	        this.baseLayers[layerConfig.name] = layer;
             if(i == 0) defaultBaseLayer = layer;            
 	        
 	        if(typeof layerConfig.getTileUrl != 'undefined') {
@@ -63,7 +65,7 @@ otp.core.Map = otp.Class({
 
         this.lmap = new L.Map('map', mapProps);
 
-        L.control.layers(baseLayers).addTo(this.lmap);
+        L.control.layers(this.baseLayers).addTo(this.lmap);
         L.control.zoom({ position : 'topright' }).addTo(this.lmap);
         //this.lmap.addControl(new L.Control.Zoom({ position : 'topright' }));
         
@@ -134,6 +136,16 @@ otp.core.Map = otp.Class({
             var layer = newModule.mapLayers[layerName];
             this.lmap.addLayer(layer);
             var this_ = this;
+        }
+        
+        if(newModule.defaultBaseLayer) {
+            for(layerName in this.baseLayers) {
+                var baseLayer = this.baseLayers[layerName];
+                if(layerName == newModule.defaultBaseLayer)
+                    this.lmap.addLayer(baseLayer);
+                else 
+                    this.lmap.removeLayer(baseLayer);
+            }
         }
     },
     
