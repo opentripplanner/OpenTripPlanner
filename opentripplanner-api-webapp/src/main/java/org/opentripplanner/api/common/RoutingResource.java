@@ -142,13 +142,13 @@ public abstract class RoutingResource {
     /** The comma-separated list of banned agencies. */
     @DefaultValue("") @QueryParam("bannedAgencies") protected List<String> bannedAgencies;
     
-    /**
-     * The list of preferred routes. The format is agency_[routename][_routeid], so TriMet_100 (100 is route short name) or Trimet__42 (two
-     * underscores, 42 is the route internal ID).
-     */
+    /** The comma-separated list of banned route types as found in GTFS route_types. */
     @DefaultValue("") @QueryParam("bannedRouteTypes") protected List<String> bannedRouteTypes;
     
-    /** The comma-separated list of preferred agencies. */
+    /**
+     * The comma-separated list of banned routes. The format is agency_[routename][_routeid], so TriMet_100 (100 is route short name) or Trimet__42
+     * (two underscores, 42 is the route internal ID).
+     */
     @DefaultValue("") @QueryParam("bannedAgencyRouteTypes") protected List<String> bannedAgencyRouteTypes;
    
     
