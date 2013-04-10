@@ -146,8 +146,7 @@ public abstract class RoutingResource {
     @DefaultValue("") @QueryParam("bannedRouteTypes") protected List<String> bannedRouteTypes;
     
     /**
-     * The comma-separated list of banned routes. The format is agency_[routename][_routeid], so TriMet_100 (100 is route short name) or Trimet__42
-     * (two underscores, 42 is the route internal ID).
+     * The comma-separated list of banned route types on a per agency basis. The format is agency_routeType, so TriMet_1 will ban evey TriMet subways.
      */
     @DefaultValue("") @QueryParam("bannedAgencyRouteTypes") protected List<String> bannedAgencyRouteTypes;
    
