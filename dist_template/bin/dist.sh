@@ -11,6 +11,9 @@ cd $BASE
 #mvn clean package
 rm -rf $BASE/dist
 cp -R $BASE/dist_template $BASE/dist
+mkdir -p $BASE/dist/webapps
+mkdir -p $BASE/dist/common_libs
+mkdir -p $BASE/dist/data
 
 # fetch winstone 0.9.10 if it is not in the template -- this avoids checking it into the repo
 if [ ! -f $BASE/dist/bin/winstone.jar ];
