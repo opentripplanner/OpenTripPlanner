@@ -304,7 +304,7 @@ otp.widgets.ItinerariesWidget =
                 this_.module.drawAllStartBubbles(this_.itineraries[this_.activeIndex]);
             });
             
-            $('<div class="otp-itin-leg-endpointDescSub">Stop #'+leg.from.stopId.id+' [<a href="#">Show other departures</a>]</div>')
+            /*$('<div class="otp-itin-leg-endpointDescSub">Stop #'+leg.from.stopId.id+' [<a href="#">Show other departures</a>]</div>')
             .appendTo(legDiv)
             .click(function(evt) {
                 var stopID = leg.from.stopId.id;
@@ -319,7 +319,25 @@ otp.widgets.ItinerariesWidget =
                 this_.module.stopsWidget.update(stopID, (leg.routeShortName || leg.routeLongName), times, leg.startTime);
                 this_.module.stopsWidget.bringToFront();
                 //this_.widgetManager.addWidget(stopsWidget);
+            });*/
+
+            $('<div class="otp-itin-leg-endpointDescSub">Stop #'+leg.from.stopId.id+' [<a href="#">Stop Viewer</a>]</div>')
+            .appendTo(legDiv)
+            .click(function(evt) {
+                //var stopID = leg.from.stopId.id;
+                //var times = this_.activeItin().stopTimesMap[stopID];
+                //console.log(evt);
+                //var stopsWidget = new otp.widgets.StopTimesWidget(this_.id+"-stopWidget-"+stopID, this_.widgetManager);
+                if(!this_.module.stopViewerWidget) {
+                    this_.module.stopViewerWidget = new otp.modules.multimodal.StopViewerWidget("otp-"+this.moduleId+"-stopViewerWidget", this_.module);
+                    this_.module.stopViewerWidget.$().offset({top: evt.clientY, left: evt.clientX});
+                }
+                this_.module.stopViewerWidget.show();
+                this_.module.stopViewerWidget.update(leg);
+                this_.module.stopViewerWidget.bringToFront();
+                //this_.widgetManager.addWidget(stopsWidget);
             });
+
 
             $('<div class="otp-itin-leg-buffer"></div>').appendTo(legDiv);            
 

@@ -27,6 +27,8 @@ otp.modules.multimodal.MultimodalPlannerModule =
     
     stopsWidget: false,
     
+    routeData : null,
+    
     initialize : function(webapp) {
         otp.modules.planner.PlannerModule.prototype.initialize.apply(this, arguments);
     },
@@ -35,6 +37,8 @@ otp.modules.multimodal.MultimodalPlannerModule =
         if(this.activated) return;
         otp.modules.planner.PlannerModule.prototype.activate.apply(this);
 
+        // setup options widget
+        
         this.optionsWidget = new otp.widgets.TripWidget('otp-'+this.moduleId+'-optionsWidget', this);
         this.optionsWidget.$().resizable();
         this.addWidget(this.optionsWidget);
@@ -62,7 +66,7 @@ otp.modules.multimodal.MultimodalPlannerModule =
 
         this.optionsWidget.addSeparator();
         this.optionsWidget.addControl("submit", new otp.widgets.TW_Submit(this.optionsWidget));
-
+        
     },
     
     getExtendedQueryParams : function() {
