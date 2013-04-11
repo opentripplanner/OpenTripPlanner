@@ -95,6 +95,19 @@ public class MultiShortestPathTree extends AbstractShortestPathTree {
 		return stateSets.keySet().size();
 	}
 
+	/**
+	 * Check that a state coming out of the queue is still in the Pareto-optimal set for this 
+	 * vertex, which indicates that it has not been ruled out as a state on an optimal path.
+	 * Many shortest path algorithms will decrease the key of an entry in the priority queue 
+	 * when it is updated, or remove it when it is dominated. 
+	 * 
+	 * When the Fibonacci heap was replaced with a binary heap, the decrease-key operation 
+	 * was removed for the same reason: both improve theoretical run time complexity, at the 
+	 * cost of high constant factors and more complex code.
+	 * 
+	 * So there can be dominated (useless) states in the queue. When they come out we want to 
+	 * ignore them rather than spend time branching out from them.
+	 */
 	@Override
 	public boolean visit(State state) {
 		boolean ret = false;
