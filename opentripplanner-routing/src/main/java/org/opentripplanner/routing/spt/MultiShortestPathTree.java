@@ -27,7 +27,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Vertex;
 
 public class MultiShortestPathTree extends AbstractShortestPathTree {
-    
+
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
     public static final ShortestPathTreeFactory FACTORY = new FactoryImpl();
@@ -38,7 +38,7 @@ public class MultiShortestPathTree extends AbstractShortestPathTree {
         super(options);
         stateSets = new IdentityHashMap<Vertex, List<State>>();
     }
-    
+
     public Set<Vertex> getVertices() {
         return stateSets.keySet();
     }
@@ -49,7 +49,7 @@ public class MultiShortestPathTree extends AbstractShortestPathTree {
 
     @Override
     public boolean add(State newState) {
-    	Vertex vertex = newState.getVertex();
+        Vertex vertex = newState.getVertex();
         List<State> states = stateSets.get(vertex);
         if (states == null) {
             states = new ArrayList<State>();
@@ -63,64 +63,64 @@ public class MultiShortestPathTree extends AbstractShortestPathTree {
             // order is important, because in the case of a tie
             // we want to reject the new state
             if (oldState.dominates(newState))
-            	return false;
+                return false;
             if (newState.dominates(oldState))
-            	it.remove();
+                it.remove();
         }
         states.add(newState);
         return true;
     }
 
-	@Override
-	public State getState(Vertex dest) {
-		Collection<State> states = stateSets.get(dest);
-		if (states == null)
-			return null;
-		State ret = null;
-		for (State s : states) {
-			if ((ret == null || s.betterThan(ret)) && s.isFinal() && s.allPathParsersAccept()) {
-				ret = s;
-			}
-		}
-		return ret;
-	}
+    @Override
+    public State getState(Vertex dest) {
+        Collection<State> states = stateSets.get(dest);
+        if (states == null)
+            return null;
+        State ret = null;
+        for (State s : states) {
+            if ((ret == null || s.betterThan(ret)) && s.isFinal() && s.allPathParsersAccept()) {
+                ret = s;
+            }
+        }
+        return ret;
+    }
 
-	@Override
-	public List<State> getStates(Vertex dest) {
-		return stateSets.get(dest);
-	}
+    @Override
+    public List<State> getStates(Vertex dest) {
+        return stateSets.get(dest);
+    }
 
-	@Override
-	public int getVertexCount() {
-		return stateSets.keySet().size();
-	}
+    @Override
+    public int getVertexCount() {
+        return stateSets.keySet().size();
+    }
 
-	/**
-	 * Check that a state coming out of the queue is still in the Pareto-optimal set for this 
-	 * vertex, which indicates that it has not been ruled out as a state on an optimal path.
-	 * Many shortest path algorithms will decrease the key of an entry in the priority queue 
-	 * when it is updated, or remove it when it is dominated. 
-	 * 
-	 * When the Fibonacci heap was replaced with a binary heap, the decrease-key operation 
-	 * was removed for the same reason: both improve theoretical run time complexity, at the 
-	 * cost of high constant factors and more complex code.
-	 * 
-	 * So there can be dominated (useless) states in the queue. When they come out we want to 
-	 * ignore them rather than spend time branching out from them.
-	 */
-	@Override
-	public boolean visit(State state) {
-		boolean ret = false;
-		for (State s : stateSets.get(state.getVertex())) {
-			if (s == state) {
-				ret = true;
-				break;
-			}
-		}
-		return ret;
-	}
+    /**
+     * Check that a state coming out of the queue is still in the Pareto-optimal set for this vertex, 
+     * which indicates that it has not been ruled out as a state on an optimal path. Many shortest 
+     * path algorithms will decrease the key of an entry in the priority queue when it is updated, or
+     * remove it when it is dominated.
+     * 
+     * When the Fibonacci heap was replaced with a binary heap, the decrease-key operation was 
+     * removed for the same reason: both improve theoretical run time complexity, at the cost of 
+     * high constant factors and more complex code.
+     * 
+     * So there can be dominated (useless) states in the queue. When they come out we want to 
+     * ignore them rather than spend time branching out from them.
+     */
+    @Override
+    public boolean visit(State state) {
+        boolean ret = false;
+        for (State s : stateSets.get(state.getVertex())) {
+            if (s == state) {
+                ret = true;
+                break;
+            }
+        }
+        return ret;
+    }
 
-	public String toString() {
+    public String toString() {
         return "MultiSPT(" + this.stateSets.size() + " vertices)";
     }
 
