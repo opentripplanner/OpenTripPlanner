@@ -122,6 +122,8 @@ otp.core.Map = otp.Class({
     activeModuleChanged : function(oldModule, newModule) {
         
         //console.log("actModChanged: "+oldModule+", "+newModule);
+        
+        // hide module-specific layers for "old" module, if applicable
         if(oldModule != null) {
             for(var layerName in oldModule.mapLayers) {
                 
@@ -131,22 +133,27 @@ otp.core.Map = otp.Class({
             }
         }
 
+        // show module-specific layers for "new" module
         for(var layerName in newModule.mapLayers) {
-        
             var layer = newModule.mapLayers[layerName];
             this.lmap.addLayer(layer);
             var this_ = this;
         }
         
+        // change default BaseLayer, if specified
         if(newModule.defaultBaseLayer) {
             for(layerName in this.baseLayers) {
                 var baseLayer = this.baseLayers[layerName];
                 if(layerName == newModule.defaultBaseLayer)
-                    this.lmap.addLayer(baseLayer);
+                    this.lmap.addLayer(baseLayer, true);
                 else 
                     this.lmap.removeLayer(baseLayer);
             }
         }
+        
+        // refresh the map context menu
+        this.contextMenu.clearModuleItems();
+        newModule.addMapContextMenuItems();
     },
     
     setBounds : function(bounds)

@@ -96,14 +96,6 @@ otp.modules.planner.PlannerModule =
         this.addWidget(this.noTripWidget);*/
 
 
-        // set up map planner-specific map context menu items
-        this.webapp.map.addContextMenuItem("Set as Start Location", function(latlng) {
-            this_.setStartPoint(latlng, true);
-        });
-        this.webapp.map.addContextMenuItem("Set as End Location", function(latlng) {
-            this_.setEndPoint(latlng, true);
-        });
-        
         // check URL params for restored trip
         if("fromPlace" in this.webapp.urlParams && "toPlace" in this.webapp.urlParams) {
             if("itinIndex" in this.webapp.urlParams) this.restoredItinIndex = this.webapp.urlParams["itinIndex"];
@@ -114,6 +106,15 @@ otp.modules.planner.PlannerModule =
         
     },
     
+    addMapContextMenuItems : function() {
+        var this_ = this;
+        this.webapp.map.addContextMenuItem("Set as Start Location", function(latlng) {
+            this_.setStartPoint(latlng, true);
+        });
+        this.webapp.map.addContextMenuItem("Set as End Location", function(latlng) {
+            this_.setEndPoint(latlng, true);
+        });
+    },
 
     handleClick : function(event) {
         if(this.startLatLng == null) {

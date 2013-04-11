@@ -60,4 +60,8 @@ otp.core.MapContextMenu =
         return this; // for chaining
     },
     
+    clearModuleItems : function() {
+        this.moduleItems.empty();
+    }
+    
 });

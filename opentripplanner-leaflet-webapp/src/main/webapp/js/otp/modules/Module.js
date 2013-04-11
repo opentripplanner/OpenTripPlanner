@@ -54,6 +54,9 @@ otp.modules.Module = otp.Class({
      
     deactivate : function() {
     },
+
+    addMapContextMenuItems : function() {
+    },
        
     CLASS_NAME : "otp.modules.Module"
 });
