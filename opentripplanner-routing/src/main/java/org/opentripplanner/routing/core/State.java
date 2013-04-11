@@ -273,7 +273,11 @@ public class State implements Cloneable {
             return false;
         }
         // Multi-state (bike rental) - no domination for different states
+        // TODO: I think this isn't necessary now that we have the check below
         if (isBikeRenting() != other.isBikeRenting())
+            return false;
+        
+        if (!stateData.nonTransitMode.equals(other.stateData.nonTransitMode))
             return false;
 
         if (backEdge != other.getBackEdge() && ((backEdge instanceof PlainStreetEdge)
