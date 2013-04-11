@@ -94,21 +94,20 @@ public class StateData implements Cloneable {
      * The mode that was used to traverse the backEdge
      */
     protected TraverseMode backMode;
+    
+    /**
+     * The mode that should be in use at the end of this SPT (already corrected for arriveBy, so
+     * a value of WALK indicates that the user should be walking at the edges of the SPT,
+     * regardless of whether that represents the origin or the destination)
+     */
+    protected TraverseMode lastMode;
 
     public Set<String> bikeRentalNetworks;
 
     public StateData(RoutingRequest options) {
-        TraverseModeSet modes = options.getModes();
-        if (modes.getCar())
-            nonTransitMode = TraverseMode.CAR;
-        else if (modes.getCustomMotorVehicle())
-            nonTransitMode = TraverseMode.CUSTOM_MOTOR_VEHICLE;
-        else if (modes.getWalk())
-            nonTransitMode =  TraverseMode.WALK;
-        else if (modes.getBicycle())
-            nonTransitMode = TraverseMode.BICYCLE;
-        else
-            nonTransitMode = null;
+        // Set the non-transit mode to the mode at the proper vertex 
+        nonTransitMode = options.arriveBy ? options.destMode : options.origMode;
+        lastMode = options.arriveBy ? options.origMode : options.destMode;
     }
 
     protected StateData clone() {

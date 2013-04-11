@@ -101,6 +101,12 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** The set of TraverseModes that a user is willing to use. Defaults to WALK | TRANSIT. */
     public TraverseModeSet modes = new TraverseModeSet("TRANSIT,WALK"); // defaults in constructor
 
+    /** The mode at the origin of the trip */
+    public TraverseMode origMode = null;
+    
+    /** The mode at the destination of the trip */
+    public TraverseMode destMode = null;
+    
     /** The set of characteristics that the user wants to optimize for -- defaults to QUICK, or optimize for transit time. */
     public OptimizeType optimize = OptimizeType.QUICK;
 
@@ -387,6 +393,8 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public void setModes(TraverseModeSet modes) {
         this.modes = modes;
+        
+        // TODO: how do origin and destination modes affect walking bikes?
         if (modes.getBicycle()) {
             bikeWalkingOptions = new RoutingRequest();
             bikeWalkingOptions.setArriveBy(this.isArriveBy());
@@ -398,6 +406,7 @@ public class RoutingRequest implements Cloneable, Serializable {
             bikeWalkingOptions.modes.setBicycle(false);
             bikeWalkingOptions.modes.setWalk(true);
             bikeWalkingOptions.walkingBike = true;
+            bikeWalkingOptions.guessModes();
         } else if (modes.getDriving()) {
             bikeWalkingOptions = new RoutingRequest();
             bikeWalkingOptions.setArriveBy(this.isArriveBy());
@@ -405,7 +414,34 @@ public class RoutingRequest implements Cloneable, Serializable {
             bikeWalkingOptions.modes = modes.clone();
             bikeWalkingOptions.modes.setBicycle(false);
             bikeWalkingOptions.modes.setWalk(true);
+            bikeWalkingOptions.guessModes();
         }
+        
+        this.guessModes();
+    }
+
+    /** Guess the origMode and destMode, if not specified */
+    public void guessModes() {
+        TraverseMode nonTransitMode;
+        // This code used to be in the constructor for StateData
+        if (modes.getCar())
+            nonTransitMode = TraverseMode.CAR;
+        else if (modes.getCustomMotorVehicle())
+            nonTransitMode = TraverseMode.CUSTOM_MOTOR_VEHICLE;
+        else if (modes.getWalk())
+            nonTransitMode =  TraverseMode.WALK;
+        else if (modes.getBicycle())
+            nonTransitMode = TraverseMode.BICYCLE;
+        else
+            nonTransitMode = null;
+        
+        if (this.origMode == null)
+            this.origMode = nonTransitMode;
+        
+        if (this.destMode == null)
+            this.destMode = nonTransitMode;
+        
+        return;
     }
 
     public void setOptimize(OptimizeType optimize) {

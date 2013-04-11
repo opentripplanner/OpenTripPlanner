@@ -560,4 +560,15 @@ public class StateEditor {
         cloneStateDataAsNeeded();
         child.stateData.bikeRentalNetworks = networks;
     }
+
+    /**
+     * Set the non-transit mode for this state and its children.
+     * @param mode
+     */
+    public void setNonTransitMode(TraverseMode mode) {
+        // TODO: should we have a check to make sure the mode is in the allowed modes, or assume
+        // that anyone who changes the mode knows what they're doing?
+        cloneStateDataAsNeeded();
+        child.stateData.nonTransitMode = mode;
+    }
 }

@@ -26,6 +26,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.routing.services.GraphService;
@@ -100,6 +101,16 @@ public abstract class RoutingResource {
     
     /** The set of modes that a user is willing to use. */
     @DefaultValue("TRANSIT,WALK") @QueryParam("mode") protected List<TraverseModeSet> modes;
+    
+    // no default values for these two, they should be null if not specified (they're then
+    // reconstructed in RoutingRequest)
+    /** The mode at the origin, filled in automatically from modeset if not specified */
+    @QueryParam("origMode") protected List<TraverseMode> origMode;
+    
+    /** The mode at the destination, filled in automatically based on overall modeset
+     *  if not specified */
+    @QueryParam("destMode") protected List<TraverseMode> destMode;
+    
 
     /** The minimum time, in seconds, between successive trips on different vehicles.
      *  This is designed to allow for imperfect schedule adherence.  This is a minimum;
@@ -318,6 +329,9 @@ public abstract class RoutingResource {
         request.setOptimize(opt);
         TraverseModeSet modeSet = get(modes, n, request.getModes());
         request.setModes(modeSet);
+        request.setOrigMode(get(origMode, n, request.getOrigMode()));
+        request.setDestMode(get(destMode, n, request.getDestMode()));
+        
         if (modeSet.getBicycle() && modeSet.getWalk() && bikeSpeedParam == -1) {
             //slower bike speed for bike sharing, based on empirical evidence from DC.
             request.setBikeSpeed(4.3);

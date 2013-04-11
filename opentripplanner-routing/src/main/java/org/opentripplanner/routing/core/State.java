@@ -236,10 +236,12 @@ public class State implements Cloneable {
     }
 
     /**
+     * Check to make sure that a) any rented bikes have been returned and b) the mode is correct
+     * for the destination
      * @return True if the state at vertex can be the end of path.
      */
     public boolean isFinal() {
-        return !isBikeRenting();
+        return (!isBikeRenting() && stateData.nonTransitMode.equals(stateData.lastMode));
     }
 
     public Vertex getPreviousStop() {
