@@ -807,6 +807,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && worstTime == other.worstTime
                 && maxTransfers == other.maxTransfers
                 && getModes().equals(other.getModes())
+                && origMode.equals(other.origMode)
+                && destMode.equals(other.destMode)
                 && wheelchairAccessible == other.wheelchairAccessible
                 && optimize.equals(other.optimize)
                 && maxWalkDistance == other.maxWalkDistance
@@ -850,6 +852,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         int hashCode = new Double(walkSpeed).hashCode() + new Double(bikeSpeed).hashCode()
                 + new Double(carSpeed).hashCode() + new Double(maxWeight).hashCode()
                 + (int) (worstTime & 0xffffffff) + getModes().hashCode()
+                + origMode.hashCode() * 2474431 + destMode.hashCode() * 3085553
                 + (isArriveBy() ? 8966786 : 0) + (wheelchairAccessible ? 731980 : 0)
                 + optimize.hashCode() + new Double(maxWalkDistance).hashCode()
                 + new Double(transferPenalty).hashCode() + new Double(maxSlope).hashCode()
