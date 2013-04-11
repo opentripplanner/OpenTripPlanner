@@ -6,29 +6,13 @@ if(typeof(otp.config) == "undefined" || otp.config == null) otp.config = {};
 
 // step 2: create an object of default otp.config default values (see step3 where we apply this to any existing config)
 otp.config = {
-/*
-    // OTP server address and routerId (if applicable)
-    hostname : "http://nyc.deployer.opentripplanner.org",
-    routerId : "req-241",
 
-    // Base map tiles settings:
-    tileUrl : 'http://{s}.tiles.mapbox.com/v3/mapbox.mapbox-streets/{z}/{x}/{y}.png',
-    // overlayTileUrl : [link to tileset to overlay on base layer],
-    tileAttrib : 'Routing powered by <a href="http://opentripplanner.org/">OpenTripPlanner</a>, Map tiles from MapBox (<a href="http://mapbox.com/about/maps/">terms</a>) and OpenStreetMap ',
-    
-    // map start location and zoom settings 
-    initLatLng : new L.LatLng(40.7195,-74), // (NYC)
-    initZoom : 14,
-    minZoom : 13,
-    maxZoom : 17,*/
-    // OTP server address and routerId (if applicable)
-    //hostname : "http://otpna-c.deployer.opentripplanner.org",
-    //routerId : "req-1028",
-    hostname : "http://trimet-tomcat.deployer.opentripplanner.org",
+    //hostname : "http://trimet-tomcat.deployer.opentripplanner.org",
     //municoderHostname : "http://trimet-tomcat.deployer.opentripplanner.org",
-    //hostname : "http://localhost:8080",
+    
+    hostname : "http://localhost:8080",
     //municoderHostname : "http://localhost:8080",
-        
+      
     baseLayers: [
         {
             name: 'MapQuest OSM',
@@ -42,6 +26,13 @@ otp.config = {
             subdomains : ['otile1','otile2','otile3','otile4'],
             attribution : 'Data, imagery and map information provided by <a href="http://open.mapquest.com" target="_blank">MapQuest</a>, <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors.'
         },           
+        {
+            name: 'MapBox Light',
+            tileUrl: 'http://{s}.tiles.mapbox.com/v3/demory.map-hmr94f0d/{z}/{x}/{y}.png',
+            //subdomains : ['otile1','otile2','otile3','otile4'],
+            attribution : 'Data, imagery and map information provided by <a href="http://www.mapbox.com" target="_blank">MapBox</a>, <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors.'
+        },           
+        
     ],
     
     // map start location and zoom settings 
@@ -54,7 +45,7 @@ otp.config = {
     showTitle:          true,
     showModuleSelector: true,
 
-    logoGraphic :       'images/openplans-logo-40x40.png',
+    logoGraphic :       'images/otp_logo_darkbg_40px.png',
 
     siteName    : "My OTP Instance",
     siteURL     : "[link to site]",
@@ -62,9 +53,29 @@ otp.config = {
     
     // bikeshareName : "",
 
-    loggerURL : 'http://trimet-logger.deployer.opentripplanner.org',
+    //loggerURL : 'http://trimet-logger.deployer.opentripplanner.org',
     //loggerURL : 'http://localhost:9000',
     // dataStorageUrl : '[link]',
+    
+    modules : [
+        {
+            className : 'otp.modules.calltaker.CallTakerModule',
+            defaultBaseLayer : 'MapQuest OSM'
+        },
+        {
+            className : 'otp.modules.fieldtrip.FieldTripModule',
+            defaultBaseLayer : 'MapQuest OSM'
+        },
+        {
+            className : 'otp.modules.multimodal.MultimodalPlannerModule',
+            defaultBaseLayer : 'MapQuest OSM',
+            isDefault: true
+        },
+        {
+            className : 'otp.modules.analyst.AnalystModule',
+            defaultBaseLayer : 'MapBox Light'
+        }
+    ],
     
     geocoders : [
         {
