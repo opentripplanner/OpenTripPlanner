@@ -28,6 +28,8 @@ otp.core.Webapp = otp.Class({
 
     geocoders : [ ],
     
+    transitIndex : null,
+    
     urlParams : null,
 
     initialize : function() {
@@ -67,7 +69,9 @@ otp.core.Webapp = otp.Class({
         // create the Webapp-owned objects
         
         this.map = new otp.core.Map(this);        
+        this.transitIndex = new otp.core.TransitIndex(this);
         this.widgetManager = new otp.widgets.WidgetManager();
+        
         
         if(otp.config.geocoders) {
             for(var i=0; i<otp.config.geocoders.length; i++) {
@@ -168,8 +172,6 @@ otp.core.Webapp = otp.Class({
                        
         }
                 
-
-
         // retrieve a saved trip, if applicable
 		//if(window.location.hash !== "")
 		//	otp.util.DataStorage.retrieve(window.location.hash.replace("#", ""), this.activeModule);
