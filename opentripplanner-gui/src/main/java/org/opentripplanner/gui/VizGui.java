@@ -64,6 +64,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.gbannotation.GraphBuilderAnnotation;
 import org.opentripplanner.gbannotation.StopUnlinked;
 import org.opentripplanner.routing.algorithm.GenericAStar;
@@ -82,7 +83,9 @@ import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.GraphServiceImpl;
 import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
+import org.opentripplanner.routing.spt.DefaultShortestPathTreeFactory;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
 
 import com.beust.jcommander.internal.Sets;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -256,6 +259,8 @@ public class VizGui extends JFrame implements VertexSelectionListener {
     
     private StreetVertexIndexFactory indexFactory = new DefaultStreetVertexIndexFactory();
 
+    private ShortestPathTreeFactory sptFactory = new DefaultShortestPathTreeFactory();
+    
     private Graph graph;
 
     private GraphServiceImpl graphservice = new GraphServiceImpl() {
@@ -292,8 +297,10 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        sptService.setShortestPathTreeFactory(sptFactory);
         pathservice.setGraphService(graphservice);
         pathservice.setSptService(sptService);
+        
         setTitle("VizGui: " + graphName);
         init();
     }
@@ -699,6 +706,24 @@ public class VizGui extends JFrame implements VertexSelectionListener {
             }
         });
         buttonPanel.add(annotationButton);
+        
+        JButton snapButton = new JButton("Snap location");
+        snapButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String locString = (String) JOptionPane.showInputDialog(frame, "Location string",
+                        "");
+                GenericLocation loc = GenericLocation.fromOldStyleString(locString);
+                RoutingRequest rr = new RoutingRequest();
+                Vertex v = graph.streetIndex.getVertexForLocation(
+                        loc, rr);
+                showGraph.highlightVertex(v);
+                List<Edge> l = new ArrayList<Edge>();
+                //l.addAll(v.getIncoming());
+                //l.addAll(v.getOutgoing());
+                //showGraph.setHighlightedEdges(l);                
+            }
+        });
+        buttonPanel.add(snapButton);
 
         /* right panel holds trip pattern and stop metadata */
         JPanel rightPanel = new JPanel();
@@ -889,7 +914,9 @@ public class VizGui extends JFrame implements VertexSelectionListener {
             System.out.print(s.toString() + " <- ");
             System.out.println(s.getBackEdge());
         }
+        
         showGraph.highlightGraphPath(gp);
+        options.cleanup();
     }
 
     protected void findAnnotation() {
