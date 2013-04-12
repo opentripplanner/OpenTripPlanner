@@ -144,10 +144,13 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 
             // get the lowest-weight state in the queue
             State u = pq.extract_min();
+            
             // check that this state has not been dominated
             // and mark vertex as visited
             if (!spt.visit(u)) {
-                continue;
+                // state has been dominated since it was added to the priority queue, so it is
+                // not in any optimal path. drop it on the floor and try the next one.
+                continue;  
             }
 
             if (traverseVisitor != null) {
