@@ -114,9 +114,9 @@ otp.planner.TopoRendererStatic = {
                 for (var ei = 1; ei < elevArr.length; ei+=2) {
                     var elev;
                     if(this.metricsSystem == 'international')
-                    	elev = elevArr[ei]; //convert to feet 
-                    else // english - convert to feet
-                    	elev = elevArr[ei] * 3.2808399;
+                    	elev = elevArr[ei]; // international -- leave as meters 
+                    else 
+                    	elev = elevArr[ei] * 3.2808399; // english -- convert to feet
                     if (elev < this.minElev) {
                         this.minElev = elev;
                     }
