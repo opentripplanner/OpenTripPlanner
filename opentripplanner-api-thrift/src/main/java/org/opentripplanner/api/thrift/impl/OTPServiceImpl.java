@@ -299,6 +299,9 @@ public class OTPServiceImpl implements OTPService.Iface {
         options.setRouterId("");
 
         List<GraphPath> paths = pathService.getPaths(options);
+        if (paths == null || paths.size() == 0) {
+            LOG.warn("Found 0 paths for trip {}", trip);
+        }
         TripPathsExtension tripPaths = new TripPathsExtension(trip, paths);
 
         // Need to call RoutingRequest.cleanup() to cleanup the temp edges.
