@@ -353,7 +353,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
             if (e == null)
                 continue;
 
-            if (mode.isTransit()) {
+            if (mode != null && mode.isTransit()) {
                 stroke(200, 050, 000);
                 strokeWeight(6);
                 drawEdge(e);
