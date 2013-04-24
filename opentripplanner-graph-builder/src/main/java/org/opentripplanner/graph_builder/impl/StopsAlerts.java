@@ -45,7 +45,7 @@ public class StopsAlerts implements GraphBuilder {
                 }
             }
             if(types.length() > 0) {
-                stopsLog.info(String.format("%s,%s,%s,%f,%f,%s",ts.getStopId(),ts.getStop().getId() ,ts.getStop().getName() ,
+                stopsLog.info(String.format("%s,%s,\"%s\",%f,%f,%s",ts.getIndex(), ts.getStopId() ,ts.getStop().getName() ,
                         ts.getCoordinate().x,ts.getCoordinate().y,types.toString()));
             }
         }
@@ -58,7 +58,8 @@ public class StopsAlerts implements GraphBuilder {
 
     @Override
     public List<String> getPrerequisites() {
-        return Arrays.asList("transit","streets");
+//        return Arrays.asList("transit","streets");
+        return Arrays.asList("transit");
     }
 
     @Override
