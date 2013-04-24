@@ -706,6 +706,23 @@ public class VizGui extends JFrame implements VertexSelectionListener {
             }
         });
         buttonPanel.add(annotationButton);
+
+        JButton findEdgeByIdButton = new JButton("Find edge ID");
+        findEdgeByIdButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String edgeIdStr = (String) JOptionPane.showInputDialog(frame, "Edge ID",
+                        JOptionPane.PLAIN_MESSAGE);
+                Integer edgeId = Integer.parseInt(edgeIdStr);
+                Edge edge = getGraph().getEdgeById(edgeId);
+                if (edge != null) {
+                    showGraph.highlightEdge(edge);
+                    showGraph.highlightVertex(edge.getFromVertex());
+                } else {
+                    System.out.println("Found no edge with ID " + edgeIdStr);
+                }
+            }
+        });
+        buttonPanel.add(findEdgeByIdButton);
         
         JButton snapButton = new JButton("Snap location");
         snapButton.addActionListener(new ActionListener() {
@@ -717,10 +734,6 @@ public class VizGui extends JFrame implements VertexSelectionListener {
                 Vertex v = graph.streetIndex.getVertexForLocation(
                         loc, rr);
                 showGraph.highlightVertex(v);
-                List<Edge> l = new ArrayList<Edge>();
-                //l.addAll(v.getIncoming());
-                //l.addAll(v.getOutgoing());
-                //showGraph.setHighlightedEdges(l);                
             }
         });
         buttonPanel.add(snapButton);
