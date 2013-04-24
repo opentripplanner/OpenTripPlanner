@@ -190,8 +190,8 @@ public class CandidateEdge {
 
     public String toString() {
         return String
-                .format("CandidateEdge<edge=\"%s\" score=\"%f\" heading=\"%s\" directionDifference=\"%s\">",
-                        edge, score, heading, directionDifference);
+                .format("CandidateEdge<edge=\"%s\" score=\"%f\" heading=\"%s\" directionDifference=\"%s\" nearestPoint=\"%s\">",
+                        edge, score, heading, directionDifference, nearestPointOnEdge);
     }
 
     /**
