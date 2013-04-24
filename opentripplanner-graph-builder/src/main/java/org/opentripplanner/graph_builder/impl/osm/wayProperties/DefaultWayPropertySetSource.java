@@ -18,6 +18,7 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.graph_builder.impl.osm.*;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
