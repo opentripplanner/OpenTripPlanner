@@ -54,7 +54,7 @@ otp.config = {
     // bikeshareName : "",
 
     //loggerURL : 'http://trimet-logger.deployer.opentripplanner.org',
-    //loggerURL : 'http://localhost:9000',
+    loggerURL : 'http://localhost:9000',
     // dataStorageUrl : '[link]',
     
     modules : [

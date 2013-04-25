@@ -113,6 +113,31 @@ otp.core.Webapp = otp.Class({
 		    $.getScript("http://s7.addthis.com/js/250/addthis_widget.js#pubid="+otp.config.addThisPubId);
         }		
         
+        // create the widget manager menu & icon
+        
+        this.widgetManagerMenu = new otp.core.PopupMenu();
+        this.widgetManagerMenu.menu.addClass('otp-widgetManagerMenu').hide();
+        this.widgetManagerMenu.addItem("Minimize all", function() {
+            for(var i = 0; i < this_.widgetManager.widgets.length; i++) {
+                var widget = this_.widgetManager.widgets[i];
+                if(widget.isVisible() && widget.minimizable) widget.minimize();
+            }
+        });
+        this.widgetManagerMenu.addItem("Unminimize all", function() {
+            for(var i = 0; i < this_.widgetManager.widgets.length; i++) {
+                var widget = this_.widgetManager.widgets[i];
+                if(widget.minimized) widget.unminimize();
+            }        
+        });
+        this.widgetManagerMenu.menu.appendTo('body');
+
+        var widgetManagerIcon = $('<div id="otp-widgetManager"></div>')
+        .appendTo('#branding')
+        .click(function(event) {
+            this_.showWidgetManagerMenu();
+        });
+        
+        
         // create the info widgets and links along header bar
         
         if(otp.config.infoWidgets !== undefined && otp.config.infoWidgets.length > 0) {
@@ -138,14 +163,8 @@ otp.core.Webapp = otp.Class({
         }
 
 
-        // set up some modules (TODO: generalize using config file)
+        // initialize the modules 
         
-        //this.addModule(new otp.modules.annotations.AnnotationsModule(this), false);
-        //this.addModule(new otp.modules.bikeshare.BikeShareModule(this), false);
-        //this.addModule(new otp.modules.multimodal.MultimodalPlannerModule(this), true);
-        //this.addModule(new otp.modules.calltaker.CallTakerModule(this), false);
-        //this.addModule(new otp.modules.fieldtrip.FieldTripModule(this), false);
-
         if(otp.config.modules) {
             for(var i=0; i<otp.config.modules.length; i++) {
                 var modConfig = otp.config.modules[i];
@@ -236,6 +255,10 @@ otp.core.Webapp = otp.Class({
         this.activeModule.handleClick(event);
     },
     
+    showWidgetManagerMenu : function() {
+        this.widgetManagerMenu.suppressHide = true;
+        this.widgetManagerMenu.menu.show().appendTo('body');
+    },
     
     stringToFunction : function(str) {
         var arr = str.split(".");

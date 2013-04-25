@@ -15,16 +15,17 @@
 otp.namespace("otp.core");
 
 
-otp.core.ContextMenu = otp.Class({
+otp.core.ContextMenu = 
+    otp.Class(otp.core.PopupMenu, {
 
-    menu    : null,
     parent  : null,
     
     initialize : function(parent, menuClicked) {
+        otp.core.PopupMenu.prototype.initialize.apply(this, arguments);
+        
         var this_ = this;
         
         this.parent = parent;
-        this.menu = $('<div class="otp-map-contextMenu"></div>');
         
         parent.on('contextmenu', function(event) {
             if(event.preventDefault) event.preventDefault();
@@ -33,23 +34,5 @@ otp.core.ContextMenu = otp.Class({
 
             if(menuClicked) menuClicked.call(this, event);
         });
-        
-        $(document).bind("click", function(event) {
-            this_.menu.hide();
-        });
     },
-    
-    getOffset : function(event) {
-        return { 
-            top: event.clientY,
-            left: event.clientX
-        };
-    },
-    
-    addItem : function(text, clickHandler) {
-        $('<div class="otp-map-contextMenu-item">'+text+'</div>')
-        .appendTo($(this.menu))
-        .click(clickHandler);        
-        return this; // for chaining
-    },    
 });    

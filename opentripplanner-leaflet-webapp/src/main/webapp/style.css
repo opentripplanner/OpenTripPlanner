@@ -229,8 +229,21 @@ body {
   padding: 6px 0px 4px 12px;
 }
 
+#otp-widgetManager {
+    float: right;
+    width: 30px;
+    height: 30px;
+    margin: 10px 10px 0 0;
+    background: url('images/gear.svg');
+    background-size: 30px 30px;
+    cursor: pointer;
+}
 
-
+.otp-widgetManagerMenu {
+    top: 40px;
+    right: 10px;
+    text-align: right;
+}
 
 #addthis {
   display: none;
@@ -427,7 +440,7 @@ body {
 }
 
 
-.otp-map-contextMenu {
+.otp-map-popupMenu {
   position : fixed;
   z-index: 10001;
   padding: 0px;
@@ -443,12 +456,12 @@ body {
           box-shadow: inset 0 2px 0 rgba(255,255,255,0.5);
 }
 
-.otp-map-contextMenu-item {
+.otp-map-popupMenu-item {
     padding: .4em;
     cursor: pointer;
 }
 
-.otp-map-contextMenu-item:hover {
+.otp-map-popupMenu-item:hover {
     background: #f8f8f8;
 }
 

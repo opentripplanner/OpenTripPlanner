@@ -52,7 +52,7 @@ otp.core.MapContextMenu =
         
     addModuleItem : function(text, clickHandler) {
         var this_ = this;
-        $('<div class="otp-map-contextMenu-item">'+text+'</div>')
+        $('<div class="otp-map-popupMenu-item">'+text+'</div>')
         .appendTo($(this.moduleItems))
         .click(function() {
             clickHandler.call(this, this_.contextMenuLatLng);

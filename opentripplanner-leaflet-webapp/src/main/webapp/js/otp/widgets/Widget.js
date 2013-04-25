@@ -133,6 +133,10 @@ otp.widgets.Widget = otp.Class({
         else $(this.div).fadeOut();//hide();
     },
     
+    isVisible : function() {
+        return $(this.div).is(":visible");
+    },
+    
     $ : function() {
         return $(this.div);
     },
