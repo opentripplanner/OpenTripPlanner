@@ -197,7 +197,7 @@ otp.modules.planner.PlannerModule =
       	this.endLatLng = otp.util.Geo.stringToLatLng(queryParams.toPlace);
     	this.setEndPoint(this.endLatLng, false);
 
-        this_.planTripFunction.call(this, queryParams);//this.planTrip(queryParams);
+        this.planTripFunction.call(this, queryParams);//this.planTrip(queryParams);
     },
     
     planTrip : function(existingQueryParams, apiMethod) {
