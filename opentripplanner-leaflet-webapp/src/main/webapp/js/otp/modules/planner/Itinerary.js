@@ -43,6 +43,8 @@ otp.modules.planner.Itinerary = otp.Class({
         }
     },
     
+    
+    // TODO : use version in TransitIndex.js instead
     runStopTimesQuery : function(stopId, routeId, time) {
         var this_ = this;
         var hrs = 4;

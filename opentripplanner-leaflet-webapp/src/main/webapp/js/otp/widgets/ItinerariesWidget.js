@@ -324,8 +324,8 @@ otp.widgets.ItinerariesWidget =
             $('<div class="otp-itin-leg-endpointDescSub">Stop #'+leg.from.stopId.id+' [<a href="#">Stop Viewer</a>]</div>')
             .appendTo(legDiv)
             .click(function(evt) {
-                //var stopID = leg.from.stopId.id;
-                //var times = this_.activeItin().stopTimesMap[stopID];
+                var stopId = leg.from.stopId.id;
+                var times = this_.activeItin().stopTimesMap[stopId];
                 //console.log(evt);
                 //var stopsWidget = new otp.widgets.StopTimesWidget(this_.id+"-stopWidget-"+stopID, this_.widgetManager);
                 if(!this_.module.stopViewerWidget) {
@@ -333,7 +333,7 @@ otp.widgets.ItinerariesWidget =
                     this_.module.stopViewerWidget.$().offset({top: evt.clientY, left: evt.clientX});
                 }
                 this_.module.stopViewerWidget.show();
-                this_.module.stopViewerWidget.update(leg);
+                this_.module.stopViewerWidget.update(leg, times);
                 this_.module.stopViewerWidget.bringToFront();
                 //this_.widgetManager.addWidget(stopsWidget);
             });
