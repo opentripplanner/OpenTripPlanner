@@ -440,7 +440,7 @@ body {
 }
 
 
-.otp-map-popupMenu {
+.otp-popupMenu {
   position : fixed;
   z-index: 10001;
   padding: 0px;
@@ -456,12 +456,12 @@ body {
           box-shadow: inset 0 2px 0 rgba(255,255,255,0.5);
 }
 
-.otp-map-popupMenu-item {
+.otp-popupMenu-item {
     padding: .4em;
     cursor: pointer;
 }
 
-.otp-map-popupMenu-item:hover {
+.otp-popupMenu-item:hover {
     background: #f8f8f8;
 }
 

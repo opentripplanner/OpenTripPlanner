@@ -24,7 +24,7 @@ otp.core.MapContextMenu =
     
     initialize : function(map, menuClicked) {
         var this_ = this;
-        
+
         otp.core.ContextMenu.prototype.initialize.call(this, map.lmap, function(event) {
             this_.contextMenuLatLng = event.latlng;
         });
@@ -52,7 +52,7 @@ otp.core.MapContextMenu =
         
     addModuleItem : function(text, clickHandler) {
         var this_ = this;
-        $('<div class="otp-map-popupMenu-item">'+text+'</div>')
+        $('<div class="otp-popupMenu-item">'+text+'</div>')
         .appendTo($(this.moduleItems))
         .click(function() {
             clickHandler.call(this, this_.contextMenuLatLng);

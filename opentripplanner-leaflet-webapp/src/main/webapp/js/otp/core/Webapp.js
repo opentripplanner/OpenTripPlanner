@@ -115,26 +115,12 @@ otp.core.Webapp = otp.Class({
         
         // create the widget manager menu & icon
         
-        this.widgetManagerMenu = new otp.core.PopupMenu();
-        this.widgetManagerMenu.menu.addClass('otp-widgetManagerMenu').hide();
-        this.widgetManagerMenu.addItem("Minimize all", function() {
-            for(var i = 0; i < this_.widgetManager.widgets.length; i++) {
-                var widget = this_.widgetManager.widgets[i];
-                if(widget.isVisible() && widget.minimizable) widget.minimize();
-            }
-        });
-        this.widgetManagerMenu.addItem("Unminimize all", function() {
-            for(var i = 0; i < this_.widgetManager.widgets.length; i++) {
-                var widget = this_.widgetManager.widgets[i];
-                if(widget.minimized) widget.unminimize();
-            }        
-        });
-        this.widgetManagerMenu.menu.appendTo('body');
+        this.widgetManagerMenu = new otp.core.WidgetManagerMenu(this);
 
         var widgetManagerIcon = $('<div id="otp-widgetManager"></div>')
         .appendTo('#branding')
         .click(function(event) {
-            this_.showWidgetManagerMenu();
+            this_.widgetManagerMenu.show(); // showWidgetManagerMenu();
         });
         
         
@@ -255,10 +241,11 @@ otp.core.Webapp = otp.Class({
         this.activeModule.handleClick(event);
     },
     
-    showWidgetManagerMenu : function() {
+    /*showWidgetManagerMenu : function() {
+        this.widgetManagerMenu.refreshWidgets();
         this.widgetManagerMenu.suppressHide = true;
         this.widgetManagerMenu.menu.show().appendTo('body');
-    },
+    },*/
     
     stringToFunction : function(str) {
         var arr = str.split(".");

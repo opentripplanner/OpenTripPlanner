@@ -24,14 +24,13 @@ otp.core.PopupMenu = otp.Class({
     initialize : function() {
         var this_ = this;
         
-        this.menu = $('<div class="otp-map-popupMenu"></div>');
+        this.menu = $('<div class="otp-popupMenu"></div>');
         
         $(document).bind("click", function(event) {
             if(this_.suppressHide) {
                 this_.suppressHide = false;
                 return;
             }
-            console.log("hiding menu");
             this_.menu.hide();
         });
     },
@@ -48,10 +47,13 @@ otp.core.PopupMenu = otp.Class({
     },
     
     addItem : function(text, clickHandler) {
-        $('<div class="otp-map-popupMenu-item">'+text+'</div>')
+        $('<div class="otp-popupMenu-item">'+text+'</div>')
         .appendTo($(this.menu))
         .click(clickHandler);        
         return this; // for chaining
     },
     
+    addSeparator : function(scrollable) {
+        $("<hr />").appendTo($(this.menu));
+    },
 });    
