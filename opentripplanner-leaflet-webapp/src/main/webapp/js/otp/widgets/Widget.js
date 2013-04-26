@@ -74,6 +74,10 @@ otp.widgets.Widget = otp.Class({
         });/*.addItem("Close", function() {
             this_.close();
         });*/
+        
+        this.header.dblclick(function() {
+            this_.bringToFront();            
+        });
     },
     
     setTitle : function(title) {
