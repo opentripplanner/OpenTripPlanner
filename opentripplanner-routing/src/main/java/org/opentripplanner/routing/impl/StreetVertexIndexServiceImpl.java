@@ -376,7 +376,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         for (CandidateEdgeBundle bundle : bundles) {
             if (best == null || bundle.best.score < best.best.score) {
                 if (possibleTransitLinksOnly) {
-                    if (!(bundle.allowsCars() || bundle.isPlatform()))
+                    if (!(bundle.allowsCars() || bundle.isPlatform() || bundle.allowsBicycle()))
                         continue;
                 }
                 best = bundle;
