@@ -28,8 +28,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.SPTService;
-import org.opentripplanner.routing.spt.BasicShortestPathTree;
-import org.opentripplanner.routing.spt.MultiShortestPathTree;
+import org.opentripplanner.routing.spt.DefaultShortestPathTreeFactory;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
 import org.opentripplanner.util.DateUtils;
@@ -48,7 +47,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 
     private boolean _verbose = false;
 
-    private ShortestPathTreeFactory _shortestPathTreeFactory;
+    private ShortestPathTreeFactory _shortestPathTreeFactory = new DefaultShortestPathTreeFactory();
 
     private SkipTraverseResultStrategy _skipTraversalResultStrategy;
 
@@ -145,10 +144,13 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 
             // get the lowest-weight state in the queue
             State u = pq.extract_min();
+            
             // check that this state has not been dominated
             // and mark vertex as visited
             if (!spt.visit(u)) {
-                continue;
+                // state has been dominated since it was added to the priority queue, so it is
+                // not in any optimal path. drop it on the floor and try the next one.
+                continue;  
             }
 
             if (traverseVisitor != null) {
@@ -270,24 +272,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     }
 
     private ShortestPathTree createShortestPathTree(RoutingRequest opts) {
-
-        // Return Tree
-        ShortestPathTree spt = null;
-
-        if (_shortestPathTreeFactory != null)
-            spt = _shortestPathTreeFactory.create(opts);
-
-        if (spt == null) {
-            // Use MultiShortestPathTree if transit OR bike rental.
-            if (opts.getModes().isTransit() || 
-                opts.getModes().getWalk() && opts.getModes().getBicycle()) {
-                spt = new MultiShortestPathTree(opts);
-            } else {
-                spt = new BasicShortestPathTree(opts);
-            }
-        }
-
-        return spt;
+        return _shortestPathTreeFactory.create(opts);
     }
 
     public void setTraverseVisitor(TraverseVisitor traverseVisitor) {

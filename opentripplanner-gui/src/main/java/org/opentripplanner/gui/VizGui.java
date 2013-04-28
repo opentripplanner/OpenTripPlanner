@@ -22,6 +22,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -62,6 +64,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.gbannotation.GraphBuilderAnnotation;
 import org.opentripplanner.gbannotation.StopUnlinked;
 import org.opentripplanner.routing.algorithm.GenericAStar;
@@ -76,14 +79,16 @@ import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.GraphServiceImpl;
 import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
-import org.opentripplanner.routing.services.StreetVertexIndexService;
+import org.opentripplanner.routing.services.StreetVertexIndexFactory;
+import org.opentripplanner.routing.spt.DefaultShortestPathTreeFactory;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
 
 import com.beust.jcommander.internal.Sets;
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * Exit on window close.
@@ -115,8 +120,7 @@ class DisplayVertex {
 }
 
 /**
- * This is a ListModel that holds Edges. It gets its edges from a PatternBoard/PatternAlight, hence
- * the iterable.
+ * This is a ListModel that holds Edges. It gets its edges from a PatternBoard/PatternAlight, hence the iterable.
  */
 class EdgeListModel extends AbstractListModel {
 
@@ -150,14 +154,14 @@ class TripPatternListModel extends AbstractListModel {
     ArrayList<String> departureTimes = new ArrayList<String>();
 
     public TripPatternListModel(TableTripPattern pattern, int stopIndex) {
-    	Iterator<Integer> departureTimeIterator = pattern.getScheduledDepartureTimes(stopIndex);
-    	while (departureTimeIterator.hasNext()) {
-    	    int dt = departureTimeIterator.next();
+        Iterator<Integer> departureTimeIterator = pattern.getScheduledDepartureTimes(stopIndex);
+        while (departureTimeIterator.hasNext()) {
+            int dt = departureTimeIterator.next();
 
             Calendar c = new GregorianCalendar();
             c.setTimeInMillis(dt * 1000);
             Date date = c.getTime();
-            //adjust the time for the system's timezone.  This is kind of a hack.
+            // adjust the time for the system's timezone. This is kind of a hack.
             int tzAdjust = TimeZone.getDefault().getOffset(date.getTime());
             c.setTimeInMillis(dt * 1000 - tzAdjust);
             date = c.getTime();
@@ -198,9 +202,8 @@ class VertexList extends AbstractListModel {
 };
 
 /**
- * A simple visualizer for graphs. It shows (using ShowGraph) a map of the graph, intersections and
- * TransitStops only, and allows a user to select stops, examine incoming and outgoing edges, and
- * examine trip patterns. It's meant mainly for debugging, so it's totally OK if it develops (say) a
+ * A simple visualizer for graphs. It shows (using ShowGraph) a map of the graph, intersections and TransitStops only, and allows a user to select
+ * stops, examine incoming and outgoing edges, and examine trip patterns. It's meant mainly for debugging, so it's totally OK if it develops (say) a
  * bunch of weird buttons designed to debug specific cases.
  * 
  */
@@ -219,9 +222,9 @@ public class VizGui extends JFrame implements VertexSelectionListener {
     private JList incomingEdges;
 
     private JTextField sourceVertex;
-    
+
     private JTextField sinkVertex;
-    
+
     private JCheckBox walkCheckBox;
 
     private JCheckBox bikeCheckBox;
@@ -234,11 +237,15 @@ public class VizGui extends JFrame implements VertexSelectionListener {
 
     private JCheckBox transitCheckBox;
 
+    private JCheckBox carCheckBox;
+
+    private JCheckBox cmvCheckBox;
+
     private JTextField searchDate;
-    
+
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-       
-    private JTextField boardingPenaltyField; 
+
+    private JTextField boardingPenaltyField;
 
     private JList departurePattern;
 
@@ -249,14 +256,18 @@ public class VizGui extends JFrame implements VertexSelectionListener {
     private JLabel serviceIdLabel;
 
     private RetryingPathServiceImpl pathservice = new RetryingPathServiceImpl();
+    
+    private StreetVertexIndexFactory indexFactory = new DefaultStreetVertexIndexFactory();
 
+    private ShortestPathTreeFactory sptFactory = new DefaultShortestPathTreeFactory();
+    
     private Graph graph;
 
     private GraphServiceImpl graphservice = new GraphServiceImpl() {
-        public Graph getGraph(String routerId) { return graph; }
+        public Graph getGraph(String routerId) {
+            return graph;
+        }
     };
-
-    private StreetVertexIndexService indexService;
 
     private GenericAStar sptService = new GenericAStar();
 
@@ -279,17 +290,21 @@ public class VizGui extends JFrame implements VertexSelectionListener {
             path = path.getParentFile();
         }
         try {
-            graph = Graph.load(new File(graphName), Graph.LoadLevel.DEBUG);
+            ObjectInputStream oiStream = new ObjectInputStream(
+                    new FileInputStream(new File(graphName)));
+            graph = Graph.load(oiStream, Graph.LoadLevel.DEBUG,
+                    this.indexFactory);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        indexService = graph.streetIndex;
+        sptService.setShortestPathTreeFactory(sptFactory);
         pathservice.setGraphService(graphservice);
         pathservice.setSptService(sptService);
+        
         setTitle("VizGui: " + graphName);
         init();
     }
-    
+
     public void init() {
         BorderLayout layout = new BorderLayout();
         setLayout(layout);
@@ -300,8 +315,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         sptService.setTraverseVisitor(new VisualTraverseVisitor(showGraph));
 
         /*
-         * left panel, top-to-bottom: list of nearby vertices, list of edges for selected vertex,
-         * buttons
+         * left panel, top-to-bottom: list of nearby vertices, list of edges for selected vertex, buttons
          */
         leftPanel = new JPanel();
         leftPanel.setLayout(new BorderLayout());
@@ -317,29 +331,29 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         JButton setSourceVertexButton = new JButton("set source");
         setSourceVertexButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-            	Object selected = nearbyVertices.getSelectedValue();
+                Object selected = nearbyVertices.getSelectedValue();
                 if (selected != null) {
-                	sourceVertex.setText(selected.toString());
+                    sourceVertex.setText(selected.toString());
                 }
             }
         });
         routingPanel.add(setSourceVertexButton);
         sourceVertex = new JTextField();
-        routingPanel.add(sourceVertex);      
-        
+        routingPanel.add(sourceVertex);
+
         // row: sink vertex
         JButton setSinkVertexButton = new JButton("set sink");
         setSinkVertexButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-            	Object selected = nearbyVertices.getSelectedValue();
+                Object selected = nearbyVertices.getSelectedValue();
                 if (selected != null) {
-                	sinkVertex.setText(selected.toString());
+                    sinkVertex.setText(selected.toString());
                 }
             }
         });
         routingPanel.add(setSinkVertexButton);
         sinkVertex = new JTextField();
-        routingPanel.add(sinkVertex);        
+        routingPanel.add(sinkVertex);
 
         // row: set date
         JButton resetSearchDateButton = new JButton("now ->");
@@ -351,7 +365,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         routingPanel.add(resetSearchDateButton);
         searchDate = new JTextField();
         searchDate.setText(dateFormat.format(new Date()));
-        routingPanel.add(searchDate);        
+        routingPanel.add(searchDate);
 
         // 2 rows: transport mode options
         walkCheckBox = new JCheckBox("walk");
@@ -360,19 +374,23 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         routingPanel.add(bikeCheckBox);
         trainCheckBox = new JCheckBox("trainish");
         routingPanel.add(trainCheckBox);
-        busCheckBox  = new JCheckBox("busish");
+        busCheckBox = new JCheckBox("busish");
         routingPanel.add(busCheckBox);
         ferryCheckBox = new JCheckBox("ferry");
         routingPanel.add(ferryCheckBox);
         transitCheckBox = new JCheckBox("transit");
         routingPanel.add(transitCheckBox);
-        
+        carCheckBox = new JCheckBox("car");
+        routingPanel.add(carCheckBox);
+        cmvCheckBox = new JCheckBox("custom vehicle");
+        routingPanel.add(cmvCheckBox);
+
         // row: boarding penalty
         JLabel boardPenaltyLabel = new JLabel("Boarding penalty (min):");
         routingPanel.add(boardPenaltyLabel);
         boardingPenaltyField = new JTextField("5");
-        routingPanel.add(boardingPenaltyField);      
-        
+        routingPanel.add(boardingPenaltyField);
+
         // row: launch and clear path search
         JButton routeButton = new JButton("path search");
         routeButton.addActionListener(new ActionListener() {
@@ -391,7 +409,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
             }
         });
         routingPanel.add(clearRouteButton);
-                
+
         /* VERTEX INFO SUBPANEL */
         JPanel vertexDataPanel = new JPanel();
         vertexDataPanel.setLayout(new BoxLayout(vertexDataPanel, BoxLayout.PAGE_AXIS));
@@ -401,7 +419,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         JLabel nvLabel = new JLabel("Vertices");
         vertexDataPanel.add(nvLabel);
         nearbyVertices = new JList();
-        //nearbyVertices.setPrototypeCellValue("Bite the wax tadpole right on the nose");
+        // nearbyVertices.setPrototypeCellValue("Bite the wax tadpole right on the nose");
         nearbyVertices.setVisibleRowCount(4);
         JScrollPane nvScrollPane = new JScrollPane(nearbyVertices);
         vertexDataPanel.add(nvScrollPane);
@@ -438,21 +456,21 @@ public class VizGui extends JFrame implements VertexSelectionListener {
                     List<Edge> edges = new ArrayList<Edge>();
                     Vertex tov = selected.getToVertex();
                     for (Edge og : tov.getOutgoing()) {
-                    	if (og instanceof StreetEdge) {
-                    	    edges.add(og);
-                    	    vertices.add (og.getToVertex());
-                    	    break;
+                        if (og instanceof StreetEdge) {
+                            edges.add(og);
+                            vertices.add(og.getToVertex());
+                            break;
                         }
                     }
                     Vertex fromv = selected.getFromVertex();
                     for (Edge ic : fromv.getIncoming()) {
                         if (ic instanceof StreetEdge) {
                             edges.add(ic);
-                            vertices.add (ic.getFromVertex());
+                            vertices.add(ic.getFromVertex());
                             break;
                         }
                     }
-                    //showGraph.setHighlightedVertices(vertices);
+                    // showGraph.setHighlightedVertices(vertices);
                     showGraph.setHighlightedEdges(edges);
                 }
 
@@ -479,22 +497,24 @@ public class VizGui extends JFrame implements VertexSelectionListener {
                 Class<?> c;
                 Field[] fields;
                 getMetadata(selected);
-                //fromv
+                // fromv
                 Vertex fromv = selected.getFromVertex();
                 getMetadata(fromv);
                 if (selected instanceof EdgeWithElevation) {
                     getMetadata(((EdgeWithElevation) selected).getElevationProfileSegment());
                 }
                 metadataList.revalidate();
-                
+
                 // figure out the pattern, if any
                 TableTripPattern pattern = null;
                 int stopIndex = 0;
-                if (selected instanceof TransitBoardAlight && ((TransitBoardAlight) selected).isBoarding()) {
+                if (selected instanceof TransitBoardAlight
+                        && ((TransitBoardAlight) selected).isBoarding()) {
                     TransitBoardAlight boardEdge = (TransitBoardAlight) selected;
                     pattern = boardEdge.getPattern();
                     stopIndex = boardEdge.getStopIndex();
-                } else if (selected instanceof TransitBoardAlight && !((TransitBoardAlight) selected).isBoarding()) {
+                } else if (selected instanceof TransitBoardAlight
+                        && !((TransitBoardAlight) selected).isBoarding()) {
                     TransitBoardAlight alightEdge = (TransitBoardAlight) selected;
                     pattern = alightEdge.getPattern();
                     stopIndex = alightEdge.getStopIndex();
@@ -573,50 +593,51 @@ public class VizGui extends JFrame implements VertexSelectionListener {
 
         JButton zoomToNodeButton = new JButton("Zoom to node");
         zoomToNodeButton.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-        		String nodeName = (String) JOptionPane.showInputDialog(frame, "Node id", JOptionPane.PLAIN_MESSAGE);
-        		Vertex v = getGraph().getVertex(nodeName);
-        		if (v == null) {
-        			System.out.println("no such node " + nodeName);
-        		} else {
-        			showGraph.zoomToVertex(v);
-        		}
-        	}
+            public void actionPerformed(ActionEvent e) {
+                String nodeName = (String) JOptionPane.showInputDialog(frame, "Node id",
+                        JOptionPane.PLAIN_MESSAGE);
+                Vertex v = getGraph().getVertex(nodeName);
+                if (v == null) {
+                    System.out.println("no such node " + nodeName);
+                } else {
+                    showGraph.zoomToVertex(v);
+                }
+            }
         });
         buttonPanel.add(zoomToNodeButton);
-        
+
         JButton zoomToLocationButton = new JButton("Zoom to location");
         zoomToLocationButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-              String result = JOptionPane.showInputDialog("Enter the location (lat lon)");
-              if( result == null || result.length() == 0)
-                return;
-              String[] tokens = result.split("[\\s,]+");
-              double lat = Double.parseDouble(tokens[0]);
-              double lon = Double.parseDouble(tokens[1]);
-              Coordinate c = new Coordinate(lon,lat);
-              showGraph.zoomToLocation(c);
+                String result = JOptionPane.showInputDialog("Enter the location (lat lon)");
+                if (result == null || result.length() == 0)
+                    return;
+                String[] tokens = result.split("[\\s,]+");
+                double lat = Double.parseDouble(tokens[0]);
+                double lon = Double.parseDouble(tokens[1]);
+                Coordinate c = new Coordinate(lon, lat);
+                showGraph.zoomToLocation(c);
             }
         });
         buttonPanel.add(zoomToLocationButton);
-        
+
         JButton zoomOutButton = new JButton("Zoom out");
         zoomOutButton.addActionListener(new ActionListener() {
-          public void actionPerformed(ActionEvent e) {
-            showGraph.zoomOut();
-          }
+            public void actionPerformed(ActionEvent e) {
+                showGraph.zoomOut();
+            }
         });
         buttonPanel.add(zoomOutButton);
-        
+
         JButton routeButton2 = new JButton("Route");
         routeButton2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-//                String initialFrom = "";
-//                Object selected = nearbyVertices.getSelectedValue();
-//                if (selected != null) {
-//                    initialFrom = selected.toString();
-//                }
-//                RouteDialog dlg = new RouteDialog(frame, initialFrom); // modal
+                // String initialFrom = "";
+                // Object selected = nearbyVertices.getSelectedValue();
+                // if (selected != null) {
+                // initialFrom = selected.toString();
+                // }
+                // RouteDialog dlg = new RouteDialog(frame, initialFrom); // modal
                 String from = sourceVertex.getText();
                 String to = sinkVertex.getText();
                 route(from, to);
@@ -648,7 +669,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
                 String edgeName = (String) JOptionPane.showInputDialog(frame, "Edge name like",
                         JOptionPane.PLAIN_MESSAGE);
                 for (Vertex gv : getGraph().getVertices()) {
-                	for (Edge edge : gv.getOutgoing()) {
+                    for (Edge edge : gv.getOutgoing()) {
                         if (edge.getName() != null && edge.getName().contains(edgeName)) {
                             showGraph.highlightVertex(gv);
                             ArrayList<Vertex> l = new ArrayList<Vertex>();
@@ -685,7 +706,38 @@ public class VizGui extends JFrame implements VertexSelectionListener {
             }
         });
         buttonPanel.add(annotationButton);
-                    
+
+        JButton findEdgeByIdButton = new JButton("Find edge ID");
+        findEdgeByIdButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String edgeIdStr = (String) JOptionPane.showInputDialog(frame, "Edge ID",
+                        JOptionPane.PLAIN_MESSAGE);
+                Integer edgeId = Integer.parseInt(edgeIdStr);
+                Edge edge = getGraph().getEdgeById(edgeId);
+                if (edge != null) {
+                    showGraph.highlightEdge(edge);
+                    showGraph.highlightVertex(edge.getFromVertex());
+                } else {
+                    System.out.println("Found no edge with ID " + edgeIdStr);
+                }
+            }
+        });
+        buttonPanel.add(findEdgeByIdButton);
+        
+        JButton snapButton = new JButton("Snap location");
+        snapButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String locString = (String) JOptionPane.showInputDialog(frame, "Location string",
+                        "");
+                GenericLocation loc = GenericLocation.fromOldStyleString(locString);
+                RoutingRequest rr = new RoutingRequest();
+                Vertex v = graph.streetIndex.getVertexForLocation(
+                        loc, rr);
+                showGraph.highlightVertex(v);
+            }
+        });
+        buttonPanel.add(snapButton);
+
         /* right panel holds trip pattern and stop metadata */
         JPanel rightPanel = new JPanel();
         rightPanel.setLayout(new BorderLayout());
@@ -696,7 +748,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         rightPanel.add(rightPanelTabs, BorderLayout.LINE_END);
         serviceIdLabel = new JLabel("[service id]");
         rightPanel.add(serviceIdLabel, BorderLayout.PAGE_END);
-        
+
         departurePattern = new JList();
         JScrollPane dpScrollPane = new JScrollPane(departurePattern);
         rightPanelTabs.addTab("trip pattern", dpScrollPane);
@@ -710,14 +762,15 @@ public class VizGui extends JFrame implements VertexSelectionListener {
 
         // This is where matched annotations from an annotation search go
         annotationMatches = new JList();
-        annotationMatches.addListSelectionListener(new ListSelectionListener () {
+        annotationMatches.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
                 JList theList = (JList) e.getSource();
                 GraphBuilderAnnotation anno = (GraphBuilderAnnotation) theList.getSelectedValue();
-                if (anno == null) return;
+                if (anno == null)
+                    return;
                 showGraph.drawAnotation(anno);
             }
-        });    
+        });
 
         annotationMatchesModel = new DefaultListModel();
         annotationMatches.setModel(annotationMatchesModel);
@@ -756,28 +809,28 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         HashSet<Vertex> newOpen = new HashSet<Vertex>();
         for (Vertex v2 : open) {
             closed.add(v2);
-            for (Edge e: v2.getOutgoing()) {
+            for (Edge e : v2.getOutgoing()) {
                 Vertex target = e.getToVertex();
                 if (closed.contains(target)) {
                     continue;
                 }
                 newOpen.add(target);
-            }      
+            }
         }
         seen.addAll(newOpen);
         open = newOpen;
         showGraph.setHighlightedVertices(seen);
     }
-    
+
     protected void traceOld() {
         HashSet<Vertex> seenVertices = new HashSet<Vertex>();
         DisplayVertex selected = (DisplayVertex) nearbyVertices.getSelectedValue();
         if (selected == null) {
-            System.out.println ("no vertex selected");
+            System.out.println("no vertex selected");
             return;
         }
         Vertex v = selected.vertex;
-        System.out.println ("initial vertex: " + v);
+        System.out.println("initial vertex: " + v);
         Queue<Vertex> toExplore = new LinkedList<Vertex>();
         toExplore.add(v);
         seenVertices.add(v);
@@ -791,15 +844,15 @@ public class VizGui extends JFrame implements VertexSelectionListener {
                 }
             }
         }
-        showGraph.setHighlightedVertices(seenVertices);   
+        showGraph.setHighlightedVertices(seenVertices);
     }
 
     protected void checkGraph() {
-        
+
         HashSet<Vertex> seenVertices = new HashSet<Vertex>();
         Collection<Vertex> allVertices = getGraph().getVertices();
         Vertex v = allVertices.iterator().next();
-        System.out.println ("initial vertex: " + v);
+        System.out.println("initial vertex: " + v);
         Queue<Vertex> toExplore = new LinkedList<Vertex>();
         toExplore.add(v);
         seenVertices.add(v);
@@ -814,26 +867,26 @@ public class VizGui extends JFrame implements VertexSelectionListener {
             }
         }
 
-        System.out.println("After investigation, visited " + seenVertices.size() + " of " + allVertices.size());
-        
-        /*now, let's find an unvisited vertex */
+        System.out.println("After investigation, visited " + seenVertices.size() + " of "
+                + allVertices.size());
+
+        /* now, let's find an unvisited vertex */
         for (Vertex u : allVertices) {
             if (!seenVertices.contains(u)) {
-                System.out.println ("unvisited vertex" + u);
+                System.out.println("unvisited vertex" + u);
                 break;
             }
         }
     }
 
     protected void route(String from, String to) {
-    	// TraverseOptions is initialized to reasonable values in constructor?
-    	Date when;
-    	// Year + 1900
+        Date when;
+        // Year + 1900
         try {
-        	 when = dateFormat.parse(searchDate.getText());
+            when = dateFormat.parse(searchDate.getText());
         } catch (ParseException e) {
-        	searchDate.setText("Format: " + dateFormat.toPattern());
-        	return;
+            searchDate.setText("Format: " + dateFormat.toPattern());
+            return;
         }
         TraverseModeSet modeSet = new TraverseModeSet();
         modeSet.setWalk(walkCheckBox.isSelected());
@@ -841,17 +894,18 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         modeSet.setFerry(ferryCheckBox.isSelected());
         modeSet.setTrainish(trainCheckBox.isSelected());
         modeSet.setBusish(busCheckBox.isSelected());
+        modeSet.setCar(carCheckBox.isSelected());
+        modeSet.setCustomMotorVehicle(cmvCheckBox.isSelected());
         // must set generic transit mode last, and only when it is checked
-        // otherwise 'false' will clear trainish and busish 
+        // otherwise 'false' will clear trainish and busish
         if (transitCheckBox.isSelected())
             modeSet.setTransit(true);
-    	RoutingRequest options = new RoutingRequest(modeSet);
-    	VisualTraverseVisitor visitor = new VisualTraverseVisitor(showGraph);
-    	options.setWalkBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60); // override low 2-4 minute values
-    	// TODO LG Add ui element for bike board cost (for now bike = 2 * walk)
-    	options.setBikeBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60 * 2);
-    	// there should be a ui element for walk distance and optimize type
-    	options.setOptimize(OptimizeType.QUICK);
+        RoutingRequest options = new RoutingRequest(modeSet);
+        options.setWalkBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60); // override low 2-4 minute values
+        // TODO LG Add ui element for bike board cost (for now bike = 2 * walk)
+        options.setBikeBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60 * 2);
+        // there should be a ui element for walk distance and optimize type
+        options.setOptimize(OptimizeType.QUICK);
         options.setMaxWalkDistance(Double.MAX_VALUE);
         options.setDateTime(when);
         options.setFromString(from);
@@ -873,29 +927,31 @@ public class VizGui extends JFrame implements VertexSelectionListener {
             System.out.print(s.toString() + " <- ");
             System.out.println(s.getBackEdge());
         }
+        
         showGraph.highlightGraphPath(gp);
+        options.cleanup();
     }
 
-    protected void findAnnotation () {
+    protected void findAnnotation() {
         Set<Class<? extends GraphBuilderAnnotation>> gbaClasses = Sets.newHashSet();
         for (GraphBuilderAnnotation gba : graph.getBuilderAnnotations()) {
             gbaClasses.add(gba.getClass());
         }
-        
+
         @SuppressWarnings("unchecked")
-        Class<? extends GraphBuilderAnnotation> variety = 
-            (Class<? extends GraphBuilderAnnotation>) JOptionPane.showInputDialog(
-                null, // parentComponent; TODO: set correctly
-                "Select the type of annotation to find", // question
-                "Select annotation", // title
-                JOptionPane.QUESTION_MESSAGE, // message type
-                null, // no icon
-                gbaClasses.toArray(), // options (built above)
-                StopUnlinked.class // default value
-            );
-        
+        Class<? extends GraphBuilderAnnotation> variety = (Class<? extends GraphBuilderAnnotation>) JOptionPane
+                .showInputDialog(null, // parentComponent; TODO: set correctly
+                        "Select the type of annotation to find", // question
+                        "Select annotation", // title
+                        JOptionPane.QUESTION_MESSAGE, // message type
+                        null, // no icon
+                        gbaClasses.toArray(), // options (built above)
+                        StopUnlinked.class // default value
+                );
+
         // User clicked cancel
-        if (variety == null) return;
+        if (variety == null)
+            return;
 
         // loop over the annotations and save the ones of the requested type
         annotationMatchesModel.clear();
@@ -905,36 +961,36 @@ public class VizGui extends JFrame implements VertexSelectionListener {
             }
         }
 
-        System.out.println("Found " + annotationMatchesModel.getSize() + " annotations of type " + 
-                           variety);
-                                                                 
+        System.out.println("Found " + annotationMatchesModel.getSize() + " annotations of type "
+                + variety);
+
     }
 
     public static void main(String args[]) {
         VizGui gui = null;
-    	if (args.length != 1) {
-    	    System.out.println("Usage: VizGui /path/to/Graph.obj");
-    	    System.exit(1);
-    	} else {
-    	    gui = new VizGui(args[0]);
-    	}
+        if (args.length != 1) {
+            System.out.println("Usage: VizGui /path/to/Graph.obj");
+            System.exit(1);
+        } else {
+            gui = new VizGui(args[0]);
+        }
         gui.setVisible(true);
 
     }
 
     public void verticesSelected(final List<Vertex> selected) {
-        //sort vertices by name
+        // sort vertices by name
         Collections.sort(selected, new Comparator<Vertex>() {
             @Override
             public int compare(Vertex arg0, Vertex arg1) {
                 return arg0.getLabel().compareTo(arg1.getLabel());
             }
-            
+
         });
         ListModel data = new VertexList(selected);
         nearbyVertices.setModel(data);
     }
-    
+
     public Graph getGraph() {
         return graph;
     }

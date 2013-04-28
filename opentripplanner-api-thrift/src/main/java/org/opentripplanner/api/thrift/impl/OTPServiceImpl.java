@@ -298,7 +298,13 @@ public class OTPServiceImpl implements OTPService.Iface {
         // For now, always use the default router.
         options.setRouterId("");
 
+        // TODO(flamholz): respect the return_detailed_path option.
         List<GraphPath> paths = pathService.getPaths(options);
+        if (paths == null || paths.size() == 0) {
+            LOG.warn("Found 0 paths for trip {}", trip);
+            LOG.warn("Origin {}", options.getFrom());
+            LOG.warn("Destination {}", options.getTo());
+        }
         TripPathsExtension tripPaths = new TripPathsExtension(trip, paths);
 
         // Need to call RoutingRequest.cleanup() to cleanup the temp edges.

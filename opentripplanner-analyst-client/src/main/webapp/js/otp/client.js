@@ -189,6 +189,24 @@ map.addLayer(osmLayer);
 map.addLayer(origMarker);
 map.addControl(new L.Control.Layers(baseMaps, overlayMaps));
 
+var nclicks = 0;
+function mapClick(e) {
+	++nclicks;
+	if (nclicks == 1) {
+		setTimeout(function(){
+	          if(nclicks == 1) {
+	        	  // after n ms there was no other click: this is a single click
+        	    origMarker.setLatLng(e.latlng);
+        	    mapSetupTool();	            
+	          } else {
+	            // double clicked
+	          }
+	          nclicks = 0;
+		}, 500);
+	}
+}
+map.on('click', mapClick);
+
 var params;
 
 // use function statement rather than expression to allow hoisting -- is there a better way?

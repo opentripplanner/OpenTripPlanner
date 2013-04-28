@@ -106,8 +106,23 @@ public class TransitIndex {
     }
 
     /**
-     * Return data about a route, such as its variants and directions, that OneBusAway's API doesn't handle
-     */
+
+     Return data about a route, such as its names, color, variants,
+     stops, and directions.
+
+     A variant represents a particular stop pattern (ordered list of
+     stops) on a particular route. For example, the N train has at
+     least four different variants: express (over the Manhattan
+     bridge), and local (via lower Manhattan and the tunnel) x to
+     Astoria and to Coney Island.
+
+     Variant names are machine-generated, and are guaranteed to be
+     unique (among variants for a route) but not stable across graph
+     builds.
+
+     A route's stops include stops made by any variant of the route.
+
+    */
     @GET
     @Path("/routeData")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })

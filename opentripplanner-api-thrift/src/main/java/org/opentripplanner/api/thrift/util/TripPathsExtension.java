@@ -30,6 +30,7 @@ public class TripPathsExtension extends TripPaths {
         if (paths == null || paths.size() == 0) {
             setNo_paths_found(true);
         } else {
+            setNo_paths_found(false);
             for (GraphPath path : paths) {
                 addToPaths(new PathExtension(path));
             }

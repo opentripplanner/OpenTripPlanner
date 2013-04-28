@@ -9,6 +9,7 @@ opentripplanner-routing/bin/
 opentripplanner-utils/bin/
 opentripplanner-webapp/bin/
 target/
+dist/
 opentripplanner-admin-webapp/src/main/webapp/js/otp-min.js
 opentripplanner-api-extended/src/main/resources/data-sources.xml
 opentripplanner-api-webapp/src/main/resources/Message.properties
