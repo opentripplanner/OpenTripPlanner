@@ -92,16 +92,25 @@ otp.modules.planner.Itinerary = otp.Class({
         return html;
     },
     
+    getStartTime : function() {
+        return this.itinData.legs[0].startTime;
+    },
+    
+    getEndTime : function() {
+        return this.itinData.legs[this.itinData.legs.length-1].endTime;
+    },
+
     getStartTimeStr : function() {
-        return otp.util.Time.formatItinTime(this.itinData.startTime);
+        return otp.util.Time.formatItinTime(this.getStartTime());
     },
     
     getEndTimeStr : function() {
-        return otp.util.Time.formatItinTime(this.itinData.endTime);
+        return otp.util.Time.formatItinTime(this.getEndTime());
     },
+
     
     getDurationStr : function() {
-        return otp.util.Time.msToHrMin(this.itinData.duration);
+        return otp.util.Time.msToHrMin(this.getEndTime() - this.getStartTime());
     },
     
     getFareStr : function() {

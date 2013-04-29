@@ -51,6 +51,10 @@ otp.util.Text = {
     
     isNumber : function(str) {
         return !isNaN(parseFloat(str)) && isFinite(str);
+    },
+    
+    endsWith : function(str, suffix) {
+        return str.indexOf(suffix, str.length - suffix.length) !== -1;
     }
 }
 

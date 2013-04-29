@@ -21,6 +21,9 @@ otp.modules.planner.TripPlan = otp.Class({
     
     itineraries   : null,
     
+    earliestStartTime : null,
+    latestEndTime : null,
+    
     initialize : function(planData, queryParams) {
         this.planData = planData;
         this.queryParams = queryParams;
@@ -30,6 +33,28 @@ otp.modules.planner.TripPlan = otp.Class({
             var itinData = this.planData.itineraries[i];
             this.itineraries.push(new otp.modules.planner.Itinerary(itinData, this));
         }
+        this.calculateTimeBounds();  
+    },
+    
+    replaceItinerary : function(index, itin) {
+        this.itineraries[index] = itin;
+        itin.tripPlan = this;
+        this.calculateTimeBounds();
+    },
+    
+    calculateTimeBounds : function() {
+        this.earliestStartTime = this.latestEndTime = null;
+        for(var i=0; i<this.itineraries.length; i++) {
+            var itin = this.itineraries[i];
+            this.earliestStartTime = (this.earliestStartTime == null || 
+                                      itin.getStartTime() < this.earliestStartTime) ?
+                                         itin.getStartTime() : this.earliestStartTime; 
+            this.latestEndTime = (this.latestEndTime == null || 
+                                  itin.getEndTime() > this.latestEndTime) ?
+                                    itin.getEndTime() : this.latestEndTime; 
+        }
+        //console.log("earlist start: "+otp.util.Time.formatItinTime(this.earliestStartTime));
+        //console.log("latest end: "+otp.util.Time.formatItinTime(this.latestEndTime));
     }
          
 });

@@ -40,6 +40,16 @@ otp.core.Webapp = otp.Class({
         if(typeof console == 'undefined') console = { log: function(str) {} };
         var this_ = this;
 
+        // set the urlRoot variable, if needed
+        /*if(!otp.config.urlRoot) {
+            otp.config.urlRoot = window.location.pathname;
+            if(otp.util.Text.endsWith(otp.config.urlRoot, "index.html"))
+                otp.config.urlRoot = otp.config.urlRoot.substring(0, otp.config.urlRoot.length-10);
+        }
+        if(!otp.util.Text.endsWith(otp.config.urlRoot, "/"))
+            otp.config.urlRoot += "/";
+        console.log("urlRoot "+otp.config.urlRoot);*/
+
         // init url params
         this.urlParams = { };
         var match,
