@@ -256,7 +256,18 @@ otp.widgets.ItinerariesWidget =
             var leftPx = startPx + startPct * pxSpan + 1;
             var widthPx = pxSpan * (leg.endTime - leg.startTime) / maxSpan - 1;
     
-            div.append('<div class="otp-itinsAccord-header-segment" style="width: '+widthPx+'px; left: '+leftPx+'px; background: '+this.getModeColor(leg.mode)+' url(images/mode/'+leg.mode.toLowerCase()+'.png) center no-repeat;"></div>');
+            //div.append('<div class="otp-itinsAccord-header-segment" style="width: '+widthPx+'px; left: '+leftPx+'px; background: '+this.getModeColor(leg.mode)+' url(images/mode/'+leg.mode.toLowerCase()+'.png) center no-repeat;"></div>');
+            
+            var showRouteLabel = widthPx > 40 && otp.util.Itin.isTransit(leg.mode) && leg.routeShortName && leg.routeShortName.length <= 6;
+            var segment = $('<div class="otp-itinsAccord-header-segment" />')
+            .css({
+                width: widthPx,
+                left: leftPx,
+                //background: this.getModeColor(leg.mode)
+                background: this.getModeColor(leg.mode)+' url(images/mode/'+leg.mode.toLowerCase()+'.png) center no-repeat'
+            })
+            .appendTo(div);
+            if(showRouteLabel) segment.append('<div style="margin-left:'+(widthPx/2+9)+'px;">'+leg.routeShortName+'</div>');
 
         }
         

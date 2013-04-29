@@ -86,7 +86,11 @@
 .otp-itinsAccord-header-segment {
     position:absolute;
     top: 0px;
-    height: 20px;
+    height: 17px;
+    font-weight: bold;
+    text-shadow: none;
+    padding-top:3px;
+    text-align: left;
 }
 
 .otp-itinStartRow {
