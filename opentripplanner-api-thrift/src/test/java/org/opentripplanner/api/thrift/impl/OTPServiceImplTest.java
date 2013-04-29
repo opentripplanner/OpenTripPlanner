@@ -17,6 +17,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentripplanner.api.thrift.definition.BulkPathsRequest;
 import org.opentripplanner.api.thrift.definition.BulkPathsResponse;
+import org.opentripplanner.api.thrift.definition.FindNearestVertexRequest;
+import org.opentripplanner.api.thrift.definition.FindNearestVertexResponse;
 import org.opentripplanner.api.thrift.definition.FindPathsRequest;
 import org.opentripplanner.api.thrift.definition.FindPathsResponse;
 import org.opentripplanner.api.thrift.definition.GraphEdge;
@@ -32,6 +34,7 @@ import org.opentripplanner.api.thrift.definition.PathOptions;
 import org.opentripplanner.api.thrift.definition.TravelMode;
 import org.opentripplanner.api.thrift.definition.TripParameters;
 import org.opentripplanner.api.thrift.definition.TripPaths;
+import org.opentripplanner.api.thrift.definition.VertexQuery;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.impl.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl;
@@ -212,4 +215,28 @@ public class OTPServiceImplTest {
             checkPath(p);
         }
     }
+    
+    @Test
+    public void testFindNearestVertex() throws TException {
+        for (Vertex v : graph.getVertices()) {
+            FindNearestVertexRequest req = new FindNearestVertexRequest();
+            VertexQuery q = new VertexQuery();
+            q.setLocation(getLocationForVertex(v));
+            req.setQuery(q);
+            
+            FindNearestVertexResponse res = serviceImpl.FindNearestVertex(req);
+            
+            GraphVertex gv = res.getResult().getNearest_vertex();
+            int expectedId = v.getIndex();
+            int actualId = gv.getId();
+            
+            if (expectedId != actualId) {
+                // If not equal, then the distance should be approaching 0.
+                LatLng ll = gv.getLat_lng();
+                Coordinate outCoord = new Coordinate(ll.getLng(), ll.getLat());
+                assertTrue(v.getCoordinate().distance(outCoord) < 0.00001);
+            }            
+        }
+    }
+    
 }
