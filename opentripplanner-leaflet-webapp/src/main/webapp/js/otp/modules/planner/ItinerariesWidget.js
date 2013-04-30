@@ -27,6 +27,7 @@ otp.widgets.ItinerariesWidget =
     
     // set to true by next/previous/etc. to indicate to only refresh the currently active itinerary
     refreshActiveOnly : false,
+    showFooter : true,
     
     initialize : function(id, module) {
         this.module = module;
@@ -91,7 +92,7 @@ otp.widgets.ItinerariesWidget =
         var html = "<div id='"+divId+"' class='otp-itinsAccord'></div>";
         this.itinsAccord = $(html).appendTo(this.$());
         
-        if(queryParams.mode !== "WALK" && queryParams.mode !== "BICYCLE") {
+        if(this.showFooter && queryParams.mode !== "WALK" && queryParams.mode !== "BICYCLE") {
             this.appendFooter();
         }
         

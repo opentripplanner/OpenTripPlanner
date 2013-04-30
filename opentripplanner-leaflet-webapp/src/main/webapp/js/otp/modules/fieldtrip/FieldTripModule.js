@@ -128,6 +128,7 @@ otp.modules.fieldtrip.FieldTripModule =
 
         if(this.itinWidget == null) {
             this.itinWidget = new otp.widgets.ItinerariesWidget(this.moduleId+"-itinWidget", this);
+            this.itinWidget.showFooter = false;
             this.widgets.push(this.itinWidget);
         }
         /*if(restoring && this.restoredItinIndex) {
