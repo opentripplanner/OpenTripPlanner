@@ -39,7 +39,6 @@ import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.CandidateEdgeBundle;
-import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -227,11 +226,11 @@ public class LinkRequest {
             e2v1 = (StreetVertex) e2.getFromVertex();
             e2v2 = (StreetVertex) e2.getToVertex();
             LineString backGeometry = e2.getGeometry();
-            backGeometryPair = StreetLocation.splitGeometryAtPoint(backGeometry,
+            backGeometryPair = GeometryUtils.splitGeometryAtPoint(backGeometry,
                     coordinate);
         }
         
-        P2<LineString> forwardGeometryPair = StreetLocation.splitGeometryAtPoint(forwardGeometry,
+        P2<LineString> forwardGeometryPair = GeometryUtils.splitGeometryAtPoint(forwardGeometry,
                 coordinate);
 
         LineString toMidpoint = forwardGeometryPair.getFirst();
