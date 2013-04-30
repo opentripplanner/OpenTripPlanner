@@ -92,6 +92,22 @@
     text-align: left;
 }
 
+.otp-itinsAccord-header-groupSize {
+    position:absolute;
+    top: 0px;
+    right: 0px;
+    height: 19px;
+    width: 37px;
+    font-size: 14px;
+    font-weight: bold;
+    text-shadow: none;
+    padding-top: 1px;
+    padding-right: 3px;
+    text-align: right;
+    background: #ccc url(images/user_icon.png) 3px 2px no-repeat;
+    border-radius: 3px;
+}
+
 .otp-itinStartRow {
     margin-bottom: .5em;
 }

@@ -238,7 +238,7 @@ otp.widgets.ItinerariesWidget =
         var startPct = (itin.itinData.startTime - itin.tripPlan.earliestStartTime) / maxSpan;
         var itinSpan = itin.getEndTime() - itin.getStartTime();
         var timeWidth = 32;
-        var startPx = 20+timeWidth, endPx = div.width()-timeWidth;
+        var startPx = 20+timeWidth, endPx = div.width()-timeWidth - (itin.groupSize ? 48 : 0);
         var pxSpan = endPx-startPx;
         var leftPx = startPx + startPct * pxSpan;
         var widthPx = pxSpan * (itinSpan / maxSpan);
@@ -273,6 +273,11 @@ otp.widgets.ItinerariesWidget =
             .appendTo(div);
             if(showRouteLabel) segment.append('<div style="margin-left:'+(widthPx/2+9)+'px;">'+leg.routeShortName+'</div>');
 
+        }
+        
+        if(itin.groupSize) {
+            var segment = $('<div class="otp-itinsAccord-header-groupSize">'+itin.groupSize+'</div>')
+            .appendTo(div);
         }
         
     },
