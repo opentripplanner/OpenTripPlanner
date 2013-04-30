@@ -1528,9 +1528,10 @@ public class GTFSPatternHopFactory {
                 new FreeEdge(parentStopVertex, stopVertex);
                 new FreeEdge(stopVertex, parentStopVertex);
 
+                // Stops with location_type=2 (entrances as defined in the pathways.txt 
+                // proposal) have no arrive/depart vertices, hence the null checks.
                 Vertex stopArriveVertex = context.stopArriveNodes.get(stop);
                 Vertex parentStopArriveVertex = context.stopArriveNodes.get(parentStop);
-
                 if (stopArriveVertex != null && parentStopArriveVertex != null) {
                     new FreeEdge(parentStopArriveVertex, stopArriveVertex);
                     new FreeEdge(stopArriveVertex, parentStopArriveVertex);
@@ -1538,7 +1539,6 @@ public class GTFSPatternHopFactory {
 
                 Vertex stopDepartVertex = context.stopDepartNodes.get(stop);
                 Vertex parentStopDepartVertex = context.stopDepartNodes.get(parentStop);
-
                 if (stopDepartVertex != null && parentStopDepartVertex != null) {
                     new FreeEdge(parentStopDepartVertex, stopDepartVertex);
                     new FreeEdge(stopDepartVertex, parentStopDepartVertex);
