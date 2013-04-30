@@ -238,6 +238,7 @@ otp.core.Webapp = otp.Class({
         }
         
         module.activate();
+        module.applyParameters();
         
         this.map.activeModuleChanged(this.activeModule, module);
         

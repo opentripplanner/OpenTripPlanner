@@ -28,6 +28,9 @@ otp.widgets.ItinerariesWidget =
     // set to true by next/previous/etc. to indicate to only refresh the currently active itinerary
     refreshActiveOnly : false,
     showFooter : true,
+    showItineraryLink : true,
+    showSearchLink : false,
+    
     
     initialize : function(id, module) {
         this.module = module;
@@ -94,6 +97,14 @@ otp.widgets.ItinerariesWidget =
         
         if(this.showFooter && queryParams.mode !== "WALK" && queryParams.mode !== "BICYCLE") {
             this.appendFooter();
+        }
+        if(this.showSearchLink) {
+            console.log("showSearchLink, QPs:");
+            console.log(queryParams);
+            var link = this.constructLink(queryParams, 
+                                          jQuery.isFunction(this.module.getAdditionalUrlParams) ?
+                                              this.module.getAdditionalUrlParams() : null);
+            this.$().append('<div class="otp-itinsWidget-searchLink">[<a href="'+link+'">Link to Search</a>]</div>');
         }
         
         var header;
@@ -296,11 +307,11 @@ otp.widgets.ItinerariesWidget =
     municoderResultId : 0,
     
     // returns jQuery object
-    renderItinerary : function(itin, i, alerts) {
+    renderItinerary : function(itin, index, alerts) {
         var this_ = this;
 
         // render legs
-        var divId = this.moduleId+"-itinAccord-"+i;
+        var divId = this.moduleId+"-itinAccord-"+index;
         var accordHtml = "<div id='"+divId+"' class='otp-itinAccord'></div>";
         var itinAccord = $(accordHtml);
         for(var l=0; l<itin.itinData.legs.length; l++) {
@@ -367,14 +378,24 @@ otp.widgets.ItinerariesWidget =
             html += '<div class="otp-itinTripSummaryLabel">Transfers</div><div class="otp-itinTripSummaryText">'+itin.itinData.transfers+'</div>';
             html += '<div class="otp-itinTripSummaryLabel">Fare</div><div class="otp-itinTripSummaryText">'+itin.getFareStr()+'</div>';
         }
-        html += '<div class="otp-itinTripSummaryFooter">Valid ' + moment().format('MMM Do YYYY, h:mma') + ' | <a href="'+itin.getLink(i)+'">Link to Itinerary</a></div>';
+        
+        
+        
+        html += '<div class="otp-itinTripSummaryFooter">Valid ' + moment().format('MMM Do YYYY, h:mma');
+        
+        if(this.showItineraryLink) {
+        
+           
+            var itinLink = this.constructLink(itin.tripPlan.queryParams, { itinIndex : index });
+            html += ' | <a href="'+itinLink+'">Link to Itinerary</a></div>';
+        }
         
         html += '</div>';
         itinDiv.append(html);
         
         return itinDiv;
     },
-    
+
     renderLeg : function(leg, previousLeg) {
         var this_ = this;
         if(otp.util.Itin.isTransit(leg.mode)) {
@@ -558,6 +579,12 @@ otp.widgets.ItinerariesWidget =
         return $("<div>Leg details go here</div>");
     },
     
+    constructLink : function(queryParams, additionalParams) {
+        additionalParams = additionalParams ||  { };
+        return '?module=' + this.module.id + "&" +  
+            otp.util.Text.constructUrlParamString(_.extend(_.clone(queryParams), additionalParams));
+    },
+        
     newMunicoderRequest : function(lat, lon) {
     
         this.municoderResultId++;
@@ -576,6 +603,7 @@ otp.widgets.ItinerariesWidget =
         });
         return spanId;
     }
+
     
 });
 

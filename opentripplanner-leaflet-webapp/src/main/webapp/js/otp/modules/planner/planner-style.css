@@ -21,6 +21,13 @@
   }
 }
 
+.otp-itinsWidget-searchLink {
+    font-size: .9em;
+    padding: .2em;
+    text-align: center;
+}
+
+
 .otp-itinsAccord {
   font-size: 12px;
 }
@@ -107,6 +114,7 @@
     background: #ccc url(images/user_icon.png) 3px 2px no-repeat;
     border-radius: 3px;
 }
+
 
 .otp-itinStartRow {
     margin-bottom: .5em;

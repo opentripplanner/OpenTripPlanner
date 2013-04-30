@@ -64,6 +64,6 @@ otp.modules.planner.TripPlan = otp.Class({
         }
         //console.log("earliest start: "+otp.util.Time.formatItinTime(this.earliestStartTime));
         //console.log("latest end: "+otp.util.Time.formatItinTime(this.latestEndTime));
-    }
-         
+    },
+    
 });

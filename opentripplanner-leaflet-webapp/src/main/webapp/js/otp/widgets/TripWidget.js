@@ -739,6 +739,9 @@ otp.widgets.TW_GroupTripOptions =
     },
 
     restorePlan : function(data) {
+        if(_.has(data.queryParams, 'groupSize')) {
+            $('#'+this.id+'-value').val(data.queryParams['groupSize']);
+        }
     },
  
     isApplicableForMode : function(mode) {

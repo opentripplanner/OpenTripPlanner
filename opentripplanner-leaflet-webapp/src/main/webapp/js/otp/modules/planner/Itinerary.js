@@ -123,16 +123,6 @@ otp.modules.planner.Itinerary = otp.Class({
         return "N/A";
     },
     
-    getLink : function(itinIndex) {
-        var appendChar = "?", paramStr = "";
-        for(param in this.tripPlan.queryParams) {
-            paramStr += appendChar+param+"="+ encodeURIComponent(this.tripPlan.queryParams[param]);
-            appendChar = "&";
-        }
-        if(itinIndex) paramStr += appendChar+"itinIndex="+itinIndex;
-        return paramStr;
-    },
-    
     differentServiceDayFrom : function(itin, offsetHrs) {
         offsetHrs = offsetHrs || 4; // default to 4 hrs; i.e. use 4am as breakpoint between days
         var time1 = moment(this.itinData.startTime).add("hours", otp.config.timeOffset-offsetHrs).format('D');

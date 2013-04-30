@@ -51,6 +51,9 @@ otp.modules.Module = otp.Class({
     
     activate : function() {
     },
+
+    applyParameters : function() {
+    },
      
     deactivate : function() {
     },

@@ -55,7 +55,16 @@ otp.util.Text = {
     
     endsWith : function(str, suffix) {
         return str.indexOf(suffix, str.length - suffix.length) !== -1;
+    },
+    
+    constructUrlParamString : function(params) {
+        var encodedParams = [];
+        for(param in params) {
+            encodedParams.push(param+"="+ encodeURIComponent(params[param]));
+        }
+        return encodedParams.join("&");
     }
+    
 }
 
 otp.util.Itin = {

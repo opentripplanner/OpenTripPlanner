@@ -94,16 +94,14 @@ otp.modules.planner.PlannerModule =
 
         this.noTripWidget = new otp.widgets.Widget('otp-noTripWidget', this);
         this.addWidget(this.noTripWidget);*/
-
-
+    },
+    
+    applyParameters : function() {
         // check URL params for restored trip
         if("fromPlace" in this.webapp.urlParams && "toPlace" in this.webapp.urlParams) {
             if("itinIndex" in this.webapp.urlParams) this.restoredItinIndex = this.webapp.urlParams["itinIndex"];
-            this.restoreTrip(_.omit(this.webapp.urlParams, "itinIndex"));
+            this.restoreTrip(_.omit(this.webapp.urlParams, ["module", "itinIndex"]));
         }
-        
-        this.activated = true;
-        
     },
     
     addMapContextMenuItems : function() {

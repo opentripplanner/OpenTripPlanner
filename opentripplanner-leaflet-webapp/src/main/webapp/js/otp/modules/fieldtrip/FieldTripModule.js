@@ -45,6 +45,7 @@ otp.modules.fieldtrip.FieldTripModule =
 
     activate : function() {
         if(this.activated) return;
+        console.log("activate "+this.id);
         otp.modules.planner.PlannerModule.prototype.activate.apply(this);
 
         this.optionsWidget = new otp.widgets.TripWidget('otp-'+this.moduleId+'-optionsWidget', this);
@@ -79,10 +80,22 @@ otp.modules.fieldtrip.FieldTripModule =
         this.refreshTrips();
     },
     
+    applyParameters : function() {
+        if(_.has(this.webapp.urlParams, 'groupSize')) {
+            this.groupSize = parseInt(this.webapp.urlParams['groupSize']);
+        }        
+        this.optionsWidget.restorePlan({queryParams : this.webapp.urlParams});
+        otp.modules.planner.PlannerModule.prototype.applyParameters.apply(this);
+    },    
+    
     getExtendedQueryParams : function() {
         return { showIntermediateStops : this.showIntermediateStops };
     },
-    
+
+    getAdditionalUrlParams : function() {
+        return { groupSize : this.groupSize };
+    },
+        
     ftPlanTrip : function() {
         var planDate = moment(this.optionsWidget.controls['time'].epoch).format("YYYY-MM-DD");
         this.currentGroupSize = this.groupSize;
@@ -129,6 +142,8 @@ otp.modules.fieldtrip.FieldTripModule =
         if(this.itinWidget == null) {
             this.itinWidget = new otp.widgets.ItinerariesWidget(this.moduleId+"-itinWidget", this);
             this.itinWidget.showFooter = false;
+            this.itinWidget.showItineraryLink = false;
+            this.itinWidget.showSearchLink = true;
             this.widgets.push(this.itinWidget);
         }
         /*if(restoring && this.restoredItinIndex) {
