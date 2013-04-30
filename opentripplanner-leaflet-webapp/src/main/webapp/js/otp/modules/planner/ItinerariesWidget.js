@@ -244,7 +244,7 @@ otp.widgets.ItinerariesWidget =
         var leftPx = startPx + startPct * pxSpan;
         var widthPx = pxSpan * (itinSpan / maxSpan);
 
-        div.append('<div style="position:absolute; width: '+(widthPx+1)+'px; height: 2px; left: '+leftPx+'px; top: 9px; background: black;" />');
+        div.append('<div style="position:absolute; width: '+(widthPx+5)+'px; height: 2px; left: '+(leftPx-2)+'px; top: 9px; background: black;" />');
         
         var timeStr = otp.util.Time.formatItinTime(itin.getStartTime(), 'h:mma');
         timeStr = timeStr.substring(0, timeStr.length - 1);
