@@ -262,8 +262,9 @@ public class State implements Cloneable {
         return stateData.lastNextArrivalDelta;
     }
 
-    /**
-     * Multicriteria comparison. Returns true if this state is better than the other one (or equal)
+   /**
+     * Multicriteria comparison of states. 
+     * @return True if this state is better than the other one (or equal) 
      * both in terms of time and weight.
      */
     public boolean dominates(State other) {
