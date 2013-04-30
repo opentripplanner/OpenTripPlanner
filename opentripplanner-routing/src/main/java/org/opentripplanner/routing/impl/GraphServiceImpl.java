@@ -206,7 +206,8 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
             ex.printStackTrace();
             return null;
         }
-        LOG.debug("graph input stream successfully opened. now loading.");
+        LOG.debug("graph input stream successfully opened.");
+        LOG.info("Loading graph...");
         try {
             return Graph.load(new ObjectInputStream(is), loadLevel, indexFactory);
         } catch (Exception ex) {
