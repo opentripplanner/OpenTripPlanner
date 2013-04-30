@@ -87,7 +87,29 @@ public abstract class Edge implements Serializable {
     public Vertex getToVertex() {
         return tov;
     }
-
+    
+    /**
+     * Returns true if this edge is partial - overriden by subclasses.
+     */
+    public boolean isPartial() {
+        return false;
+    }
+    
+    /**
+     * Checks equivalency to another edge. Default implementation is trivial equality, but subclasses may want to do something more tricky.
+     */
+    public boolean isEquivalentTo(Edge e) {
+        return this == e;
+    }
+    
+    /**
+     * Returns true if this edge is the reverse of another.
+     */
+    public boolean isReverseOf(Edge e) {
+        return (this.getFromVertex() == e.getToVertex() &&
+                this.getToVertex() == e.getFromVertex());
+    }
+    
     public void attachFrom(Vertex fromv) {
         detachFrom();
         if (fromv == null)
@@ -169,6 +191,9 @@ public abstract class Edge implements Serializable {
         return fromv.hashCode() * 31 + tov.hashCode();
     }
 
+    /**
+     * Edges are not roundabouts by default.
+     */
     public boolean isRoundabout() {
         return false;
     }

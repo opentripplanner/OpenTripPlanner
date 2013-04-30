@@ -13,10 +13,15 @@
 
 package org.opentripplanner.common.geometry;
 
+import org.opentripplanner.common.model.P2;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.linearref.LinearLocation;
+import com.vividsolutions.jts.linearref.LocationIndexedLine;
 
 public class GeometryUtils {
 
@@ -34,6 +39,31 @@ public class GeometryUtils {
 
     public static GeometryFactory getGeometryFactory() {
         return gf;
+    }
+    
+    /**
+     * Splits the input geometry into two LineStrings at the given point.
+     */
+    public static P2<LineString> splitGeometryAtPoint(Geometry geometry, Coordinate nearestPoint) {
+        LocationIndexedLine line = new LocationIndexedLine(geometry);
+        LinearLocation l = line.indexOf(nearestPoint);
+
+        LineString beginning = (LineString) line.extractLine(line.getStartIndex(), l);
+        LineString ending = (LineString) line.extractLine(l, line.getEndIndex());
+
+        return new P2<LineString>(beginning, ending);
+    }
+    
+    /**
+     * Returns the chunk of the given geometry between the two given coordinates.
+     * 
+     * Assumes that "second" is after "first" along the input geometry.
+     */
+    public static LineString getInteriorSegment(Geometry geomerty, Coordinate first,
+            Coordinate second) {
+        P2<LineString> splitGeom = GeometryUtils.splitGeometryAtPoint(geomerty, first);
+        splitGeom = GeometryUtils.splitGeometryAtPoint(splitGeom.getSecond(), second);
+        return splitGeom.getFirst();
     }
 
     /**
