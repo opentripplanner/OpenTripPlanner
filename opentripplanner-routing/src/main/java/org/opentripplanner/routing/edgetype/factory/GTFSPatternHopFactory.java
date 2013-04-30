@@ -1531,14 +1531,18 @@ public class GTFSPatternHopFactory {
                 Vertex stopArriveVertex = context.stopArriveNodes.get(stop);
                 Vertex parentStopArriveVertex = context.stopArriveNodes.get(parentStop);
 
-                new FreeEdge(parentStopArriveVertex, stopArriveVertex);
-                new FreeEdge(stopArriveVertex, parentStopArriveVertex);
+                if (stopArriveVertex != null && parentStopArriveVertex != null) {
+                    new FreeEdge(parentStopArriveVertex, stopArriveVertex);
+                    new FreeEdge(stopArriveVertex, parentStopArriveVertex);
+                }
 
                 Vertex stopDepartVertex = context.stopDepartNodes.get(stop);
                 Vertex parentStopDepartVertex = context.stopDepartNodes.get(parentStop);
 
-                new FreeEdge(parentStopDepartVertex, stopDepartVertex);
-                new FreeEdge(stopDepartVertex, parentStopDepartVertex);
+                if (stopDepartVertex != null && parentStopDepartVertex != null) {
+                    new FreeEdge(parentStopDepartVertex, stopDepartVertex);
+                    new FreeEdge(stopDepartVertex, parentStopDepartVertex);
+                }
 
                 // TODO: provide a cost for these edges when stations and
                 // stops have different locations 
