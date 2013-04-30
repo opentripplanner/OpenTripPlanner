@@ -64,12 +64,12 @@ otp.config = {
         },
         {
             className : 'otp.modules.fieldtrip.FieldTripModule',
-            defaultBaseLayer : 'MapQuest OSM'
+            defaultBaseLayer : 'MapQuest OSM',
+            isDefault: true
         },
         {
             className : 'otp.modules.multimodal.MultimodalPlannerModule',
             defaultBaseLayer : 'MapQuest OSM',
-            isDefault: true
         },
         {
             className : 'otp.modules.analyst.AnalystModule',

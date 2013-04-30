@@ -25,7 +25,8 @@ otp.modules.fieldtrip.FieldTripModule =
     
     groupSize   : 100,
     bannedSegments : null,
-    itineraries : null,
+    //itineraries : null,
+    groupPlan : null,
     
     datastoreUrl : otp.config.loggerURL,
     
@@ -86,7 +87,9 @@ otp.modules.fieldtrip.FieldTripModule =
         var planDate = moment(this.optionsWidget.controls['time'].epoch).format("YYYY-MM-DD");
         this.currentGroupSize = this.groupSize;
         this.bannedSegments = [];
-        this.itineraries = [];
+        console.log("RESET SEGMENTS");
+        //this.itineraries = [];
+        this.groupPlan = null;
 
         var this_ = this;
         $.ajax(this.datastoreUrl+'/fieldTrip/getTrips', {
@@ -116,10 +119,13 @@ otp.modules.fieldtrip.FieldTripModule =
                 console.log(data);
             }
         });
-                
+        this.setBannedTrips();
     },
     
     processPlan : function(tripPlan, restoring) {
+        if(this.groupPlan == null)
+            this.groupPlan = new otp.modules.planner.TripPlan(null, tripPlan.queryParams);
+
         if(this.itinWidget == null) {
             this.itinWidget = new otp.widgets.ItinerariesWidget(this.moduleId+"-itinWidget", this);
             this.widgets.push(this.itinWidget);
@@ -143,30 +149,38 @@ otp.modules.fieldtrip.FieldTripModule =
         var capacity = itin.getGroupTripCapacity();
         //console.log("cur grp size:"+this.currentGroupSize+", cap="+capacity);
         
-        this.itineraries.push(itin);
+        console.log("FT returned trip:");
+        console.log(itin);        
+        //this.itineraries.push(itin);
+        this.groupPlan.addItinerary(itin);
         
         var segments = itin.getTransitSegments();
         for(var s = 0; s < segments.length; s++) {
             this.bannedSegments.push(segments[s].tripString);
         }
 
-        this.bannedTrips = this.bannedSegments.join(',');     
+        this.setBannedTrips();// = this.bannedSegments.join(',');     
+        console.log("added "+segments.length+" banned segments, total="+this.bannedSegments.length);
         
-        
-        if(this.currentGroupSize > capacity) {
+        if(this.currentGroupSize > capacity) { // group members remain; plan another trip
             this.currentGroupSize -= capacity;
             itin.groupSize = capacity;
             //console.log("remaining: "+this.currentGroupSize);
             this.planTrip();
         }
-        else {
+        else { // we're done; show the results
             itin.groupSize = this.currentGroupSize;
-            this.drawItinerary(this.itineraries[0]);
-            this.itinWidget.updateItineraries(this.itineraries, tripPlan.queryParams);
+            this.drawItinerary(this.groupPlan.itineraries[0]);
+            //this.itinWidget.updateItineraries(this.itineraries, tripPlan.queryParams);
+            this.itinWidget.updatePlan(this.groupPlan);
             this.itinWidget.show();
             this.itinWidget.bringToFront();
         }
         
+    },
+    
+    setBannedTrips : function() {
+        this.bannedTrips = this.bannedSegments.length > 0 ? this.bannedSegments.join(',') : null;     
     },
 
     refreshTrips : function(date) {

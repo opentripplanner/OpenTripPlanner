@@ -41,7 +41,11 @@ otp.widgets.ItinerariesWidget =
     activeItin : function() {
         return this.itineraries[this.activeIndex];
     },
-    
+
+    updatePlan : function(plan) {
+        this.updateItineraries(plan.itineraries, plan.queryParams);
+    },
+        
     updateItineraries : function(itineraries, queryParams, itinIndex) {
         
         var this_ = this;
