@@ -161,13 +161,31 @@ otp.core.Webapp = otp.Class({
 
         // initialize the modules 
         
+        if(this.urlParams['module'])
+            console.log("startup module: "+this.urlParams['module'])
         if(otp.config.modules) {
+            var setDefault = false, defaultModule = null;
             for(var i=0; i<otp.config.modules.length; i++) {
                 var modConfig = otp.config.modules[i];
                 var modClass = this.stringToFunction(modConfig.className);
                 var module = new modClass(this);
-                module.defaultBaseLayer = modConfig.defaultBaseLayer;
-                this.addModule(module, modConfig.isDefault || false);
+                if(modConfig.id) module.id = modConfig.id;
+                if(modConfig.defaultBaseLayer) module.defaultBaseLayer = modConfig.defaultBaseLayer;
+                
+                var isDefault = false;
+                if(_.has(this.urlParams, 'module') && this.urlParams['module'] === module.id) {
+                    isDefault = setDefault = true;
+                }
+                if(modConfig.isDefault) {
+                    if(!_.has(this.urlParams, 'module')) isDefault = true;
+                    defaultModule = module;
+                }
+                    
+                this.addModule(module, isDefault);//modConfig.isDefault || false);
+            }
+            if(_.has(this.urlParams, 'module') && !setDefault) {
+                console.log("OTP module with id="+this.urlParams['module']+" not found");
+                if(defaultModule) this.setActiveModule(defaultModule);
             }
         }                
 

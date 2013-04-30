@@ -59,19 +59,23 @@ otp.config = {
     
     modules : [
         {
+            id : 'ct',
             className : 'otp.modules.calltaker.CallTakerModule',
             defaultBaseLayer : 'MapQuest OSM'
         },
         {
+            id : 'ft',
             className : 'otp.modules.fieldtrip.FieldTripModule',
             defaultBaseLayer : 'MapQuest OSM',
             isDefault: true
         },
         {
+            id : 'planner',
             className : 'otp.modules.multimodal.MultimodalPlannerModule',
             defaultBaseLayer : 'MapQuest OSM',
         },
         {
+            id : 'analyst',
             className : 'otp.modules.analyst.AnalystModule',
             defaultBaseLayer : 'MapBox Light'
         }
