@@ -107,7 +107,7 @@ otp.modules.fieldtrip.FieldTripModule =
                     for(var i = 0; i < fieldTrip.groupItineraries.length; i++) {
                         var grpItin = fieldTrip.groupItineraries[i];
                         for(var gt =0 ; gt < grpItin.trips.length; gt++) {
-                            this_.bannedSegments.push(grpItin.trips[gt].tripString);
+                            //this_.bannedSegments.push(grpItin.trips[gt].tripString);
                         }
                     }
                 }
@@ -180,7 +180,14 @@ otp.modules.fieldtrip.FieldTripModule =
     },
     
     setBannedTrips : function() {
-        this.bannedTrips = this.bannedSegments.length > 0 ? this.bannedSegments.join(',') : null;     
+        var tripIdsOnly = [];
+        for(var i=0; i<this.bannedSegments.length; i++) {
+            tripIdsOnly.push(this.bannedSegments[i].split(":")[0]);
+        }
+    
+        this.bannedTrips = tripIdsOnly.length > 0 ? tripIdsOnly.join(',') : null;     
+        //this.bannedTrips = this.bannedSegments.length > 0 ? this.bannedSegments.join(',') : null;     
+        console.log("set bannedTrips: "+this.bannedTrips);
     },
 
     refreshTrips : function(date) {
