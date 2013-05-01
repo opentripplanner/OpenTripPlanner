@@ -186,16 +186,17 @@ otp.modules.planner.PlannerModule =
         return this.endLatLng.lat+','+this.endLatLng.lng;
     },
         
-    restoreTrip : function(queryParams) {
+    restoreTrip : function(queryParams) {    
+        this.restoreMarkers(queryParams);
+        this.planTripFunction.call(this, queryParams);
+    },
     
-        //this.markerLayer.clearLayers(); 
+    restoreMarkers : function(queryParams) {
       	this.startLatLng = otp.util.Geo.stringToLatLng(queryParams.fromPlace);
     	this.setStartPoint(this.startLatLng, false);
     	
       	this.endLatLng = otp.util.Geo.stringToLatLng(queryParams.toPlace);
     	this.setEndPoint(this.endLatLng, false);
-
-        this.planTripFunction.call(this, queryParams);//this.planTrip(queryParams);
     },
     
     planTrip : function(existingQueryParams, apiMethod) {

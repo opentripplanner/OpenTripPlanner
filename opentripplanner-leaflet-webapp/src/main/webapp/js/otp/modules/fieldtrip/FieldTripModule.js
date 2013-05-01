@@ -378,7 +378,9 @@ otp.modules.fieldtrip.FieldTripModule =
                 }
                 if(this_.itinWidget == null) this_.createItinerariesWidget();
                 this_.showResults();
-                this_.optionsWidget.restorePlan({ queryParams : JSON.parse(data.queryParams) });
+                var queryParams = JSON.parse(data.queryParams);
+                this_.restoreMarkers(queryParams);
+                this_.optionsWidget.restorePlan({ queryParams : queryParams });
             },
             
             error: function(data) {
