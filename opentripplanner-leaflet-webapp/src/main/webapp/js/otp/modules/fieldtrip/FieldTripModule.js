@@ -139,7 +139,7 @@ otp.modules.fieldtrip.FieldTripModule =
     
     processPlan : function(tripPlan, restoring) {
         if(this.groupPlan == null)
-            this.groupPlan = new otp.modules.planner.TripPlan(null, tripPlan.queryParams);
+            this.groupPlan = new otp.modules.planner.TripPlan(null, _.extend(tripPlan.queryParams, { groupSize : this.groupSize }));
 
         if(this.itinWidget == null) this.createItinerariesWidget();
         /*if(restoring && this.restoredItinIndex) {
