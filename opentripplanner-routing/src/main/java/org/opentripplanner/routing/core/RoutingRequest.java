@@ -953,6 +953,11 @@ public class RoutingRequest implements Cloneable, Serializable {
         bannedTrips.put(trip, BannedStopSet.ALL);
     }
     
+    /** 
+     * tripIsBanned is a misnomer: this checks whether the agency or route are banned.
+     * banning of individual trips is actually performed inside the trip search, 
+     * in TripTimes.tripAcceptable.
+     */
     public boolean tripIsBanned(Trip trip) {
         /* check if agency is banned for this plan */
         if (bannedAgencies != null) {
