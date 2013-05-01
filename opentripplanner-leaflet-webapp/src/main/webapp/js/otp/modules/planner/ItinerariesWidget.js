@@ -27,7 +27,7 @@ otp.widgets.ItinerariesWidget =
     
     // set to true by next/previous/etc. to indicate to only refresh the currently active itinerary
     refreshActiveOnly : false,
-    showFooter : true,
+    showButtonRow : true,
     showItineraryLink : true,
     showSearchLink : false,
     
@@ -86,17 +86,15 @@ otp.widgets.ItinerariesWidget =
         //this.header.html(this.itineraries.length+" Itineraries Returned:");
         this.setTitle(this.itineraries.length+" Itineraries Returned:");
         
-        if(this.itinsAccord !== null) {
-            this.itinsAccord.remove();
-        }
-        if(this.footer !== null) {
-            this.footer.remove();
-        }
+        if(this.itinsAccord !== null) this.itinsAccord.remove();
+        if(this.footer !== null) this.footer.remove();
+
         var html = "<div id='"+divId+"' class='otp-itinsAccord'></div>";
         this.itinsAccord = $(html).appendTo(this.$());
-        
-        if(this.showFooter && queryParams.mode !== "WALK" && queryParams.mode !== "BICYCLE") {
-            this.appendFooter();
+
+        this.footer = $('<div class="otp-itinsWidget-footer" />').appendTo(this.$());
+        if(this.showButtonRow && queryParams.mode !== "WALK" && queryParams.mode !== "BICYCLE") {
+            this.renderButtonRow();
         }
         if(this.showSearchLink) {
             console.log("showSearchLink, QPs:");
@@ -104,7 +102,7 @@ otp.widgets.ItinerariesWidget =
             var link = this.constructLink(queryParams, 
                                           jQuery.isFunction(this.module.getAdditionalUrlParams) ?
                                               this.module.getAdditionalUrlParams() : null);
-            this.$().append('<div class="otp-itinsWidget-searchLink">[<a href="'+link+'">Link to Search</a>]</div>');
+            $('<div class="otp-itinsWidget-searchLink">[<a href="'+link+'">Link to Search</a>]</div>').appendTo(this.footer);
         }
         
         var header;
@@ -152,10 +150,10 @@ otp.widgets.ItinerariesWidget =
         
     },
     
-    appendFooter : function() {
+    renderButtonRow : function() {
         var this_ = this;
-        this.footer = $("<div class='otp-itinsButtonRow'></div>").appendTo(this.$());
-        $('<button>First</button>').button().appendTo(this.footer).click(function() {
+        var buttonRow = $("<div class='otp-itinsButtonRow'></div>").appendTo(this.footer);
+        $('<button>First</button>').button().appendTo(buttonRow).click(function() {
             var itin = this_.itineraries[this_.activeIndex];
             var params = itin.tripPlan.queryParams;
             var stopId = itin.getFirstStopID();
@@ -167,7 +165,7 @@ otp.widgets.ItinerariesWidget =
             this_.refreshActiveOnly = true;
             this_.module.planTrip(params);
         });
-        $('<button>Previous</button>').button().appendTo(this.footer).click(function() {
+        $('<button>Previous</button>').button().appendTo(buttonRow).click(function() {
             var itin = this_.itineraries[this_.activeIndex];
             var params = itin.tripPlan.queryParams;
             var newEndTime = itin.itinData.endTime - 90000;
@@ -181,7 +179,7 @@ otp.widgets.ItinerariesWidget =
             this_.refreshActiveOnly = true;
             this_.module.planTrip(params);            
         });
-        $('<button>Next</button>').button().appendTo(this.footer).click(function() {
+        $('<button>Next</button>').button().appendTo(buttonRow).click(function() {
             var itin = this_.itineraries[this_.activeIndex];
             var params = itin.tripPlan.queryParams;
             var newStartTime = itin.itinData.startTime + 90000;
@@ -195,7 +193,7 @@ otp.widgets.ItinerariesWidget =
             this_.refreshActiveOnly = true;
             this_.module.planTrip(params);      
         });
-        $('<button>Last</button>').button().appendTo(this.footer).click(function() {
+        $('<button>Last</button>').button().appendTo(buttonRow).click(function() {
             var itin = this_.itineraries[this_.activeIndex];
             var params = itin.tripPlan.queryParams;
             var stopId = itin.getFirstStopID();

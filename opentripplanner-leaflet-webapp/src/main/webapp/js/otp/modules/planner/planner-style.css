@@ -21,9 +21,13 @@
   }
 }
 
+.otp-itinsWidget-footer {
+    padding-bottom: .4em;
+}
+
 .otp-itinsWidget-searchLink {
     font-size: .9em;
-    padding: .2em;
+    padding-top: .3em;
     text-align: center;
 }
 

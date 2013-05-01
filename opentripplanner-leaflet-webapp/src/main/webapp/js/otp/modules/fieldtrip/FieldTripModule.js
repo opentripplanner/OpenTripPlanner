@@ -198,7 +198,7 @@ otp.modules.fieldtrip.FieldTripModule =
         
     createItinerariesWidget : function() {
         this.itinWidget = new otp.widgets.ItinerariesWidget(this.moduleId+"-itinWidget", this);
-        this.itinWidget.showFooter = false;
+        this.itinWidget.showButtonRow = false;
         this.itinWidget.showItineraryLink = false;
         this.itinWidget.showSearchLink = true;
         this.widgets.push(this.itinWidget);
