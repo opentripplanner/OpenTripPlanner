@@ -288,12 +288,40 @@ public class TestHalfEdges extends TestCase {
         ShortestPathTree spt = aStar.getShortestPathTree(options);
 
         GraphPath path = spt.getPath(end, false);
-        assertNotNull("There must be a path from start to end", path);
-        
-        for (Edge e : path.edges) {
-            System.out.println(e);
-        }
+        assertNotNull("There must be a path from start to end", path);        
         assertEquals(1, path.edges.size());
+    }
+
+    public void testRouteToSameEdgeBackwards() {
+        RoutingRequest options = new RoutingRequest();
+
+        // Sits only on the leftmost edge, not on its reverse.
+        HashSet<Edge> turns = new HashSet<Edge>();
+        turns.add(left);
+
+        StreetLocation start = StreetLocation.createStreetLocation(graph, "start", "start",
+                cast(turns, StreetEdge.class),
+                new LinearLocation(0, 0.8).getCoordinate(left.getGeometry()));
+        
+        StreetLocation end = StreetLocation.createStreetLocation(graph, "end", "end",
+                cast(turns, StreetEdge.class),
+                new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()));
+
+        assertEquals(start.getX(), end.getX());
+        assertTrue(start.getY() > end.getY());
+
+        List<Edge> extra = end.getExtra();
+        assertEquals(2, extra.size());
+
+        long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 11, 1, 12, 34, 25);
+        options.dateTime = startTime;
+        options.setRoutingContext(graph, start, end);
+        options.setMaxWalkDistance(Double.MAX_VALUE);
+        ShortestPathTree spt = aStar.getShortestPathTree(options);
+
+        GraphPath path = spt.getPath(end, false);
+        assertNotNull("There must be a path from start to end", path);        
+        assertTrue(path.edges.size() > 1);
     }
 
     /**
