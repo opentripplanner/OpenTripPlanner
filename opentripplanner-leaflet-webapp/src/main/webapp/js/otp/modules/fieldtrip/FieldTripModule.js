@@ -285,20 +285,13 @@ otp.modules.fieldtrip.FieldTripModule =
             //console.log("saving itin for trip "+tripId);
             //console.log(itin);
 
-            var itinDataJson = JSON.stringify(itin.itinData);
-            console.log("json len="+itinDataJson.length);
-            var lzw = this.lzw_encode(itinDataJson);
-            console.log("lzw len="+lzw.length);
-            
             var data = {
                 userName : this.userName,
                 password : this.password,
                 fieldTripId : tripId,
                 'itinerary.passengers' : itin.groupSize,
-                'itinerary.itinData' : lzw  
+                'itinerary.itinData' : otp.util.Text.lzwEncode(JSON.stringify(itin.itinData))
             };
-            
-            //console.log("itin json: "+JSON.stringify(itin.itinData));
             
             var segments = itin.getTransitSegments()
             for(var s = 0; s < segments.length; s++) {
@@ -380,7 +373,7 @@ otp.modules.fieldtrip.FieldTripModule =
                 console.log(data);
                 this_.groupPlan = new otp.modules.planner.TripPlan(null, JSON.parse(data.queryParams));
                 for(var i = 0; i < data.groupItineraries.length; i++) {
-                    var itinData = JSON.parse(this_.lzw_decode(data.groupItineraries[i].itinData));
+                    var itinData = JSON.parse(otp.util.Text.lzwDecode(data.groupItineraries[i].itinData));
                     this_.groupPlan.addItinerary(new otp.modules.planner.Itinerary(itinData, this_.groupPlan));
                 }
                 if(this_.itinWidget == null) this_.createItinerariesWidget();
@@ -396,58 +389,4 @@ otp.modules.fieldtrip.FieldTripModule =
 
     },
     
-    // LZW-compress a string
- 
-    lzw_encode : function(s) {
-        var dict = {};
-        var data = (s + "").split("");
-        var out = [];
-        var currChar;
-        var phrase = data[0];
-        var code = 256;
-        for (var i=1; i<data.length; i++) {
-            currChar=data[i];
-            if (dict[phrase + currChar] != null) {
-                phrase += currChar;
-            }
-            else {
-                out.push(phrase.length > 1 ? dict[phrase] : phrase.charCodeAt(0));
-                dict[phrase + currChar] = code;
-                code++;
-                phrase=currChar;
-            }
-        }
-        out.push(phrase.length > 1 ? dict[phrase] : phrase.charCodeAt(0));
-        for (var i=0; i<out.length; i++) {
-            out[i] = String.fromCharCode(out[i]);
-        }
-        return out.join("");
-    },
-
-    // Decompress an LZW-encoded string
-    lzw_decode : function(s) {
-        var dict = {};
-        var data = (s + "").split("");
-        var currChar = data[0];
-        var oldPhrase = currChar;
-        var out = [currChar];
-        var code = 256;
-        var phrase;
-        for (var i=1; i<data.length; i++) {
-            var currCode = data[i].charCodeAt(0);
-            if (currCode < 256) {
-                phrase = data[i];
-            }
-            else {
-               phrase = dict[currCode] ? dict[currCode] : (oldPhrase + currChar);
-            }
-            out.push(phrase);
-            currChar = phrase.charAt(0);
-            dict[code] = oldPhrase + currChar;
-            code++;
-            oldPhrase = phrase;
-        }
-        return out.join("");
-    }
-
 });
