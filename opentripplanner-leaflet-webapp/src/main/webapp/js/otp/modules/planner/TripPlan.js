@@ -38,11 +38,10 @@ otp.modules.planner.TripPlan = otp.Class({
     },
     
     addItinerary : function(itin) {
-        //console.log("adding itin");
         this.itineraries.push(itin);
         itin.tripPlan = this;
         this.calculateTimeBounds();
-        console.log("added itin, n="+this.itineraries.length);
+        //console.log("added itin, n="+this.itineraries.length);
     },
     
     replaceItinerary : function(index, itin) {

@@ -100,7 +100,6 @@ otp.modules.fieldtrip.FieldTripManagerWidget =
     },
     
     showTripDetails : function(trip) {
-        console.log(trip);
         var html = "<h3>Trip Details</h3>"
         html += '<div class="otp-fieldTripManager-tripDetail"><b>Description</b>: '+trip.description+"</div>";
         html += '<div class="otp-fieldTripManager-tripDetail"><b>Origin</b>: '+trip.origin+"</div>";

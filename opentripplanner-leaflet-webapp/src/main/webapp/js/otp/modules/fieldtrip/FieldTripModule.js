@@ -359,7 +359,6 @@ otp.modules.fieldtrip.FieldTripModule =
     
     renderTrip : function(trip) {
         var this_ = this;
-        console.log("render trip "+trip.id);
         $.ajax(this.datastoreUrl+'/fieldTrip', {
             data: {
                 userName : this.userName,
@@ -369,8 +368,6 @@ otp.modules.fieldtrip.FieldTripModule =
                 
             success: function(data) {
                 if((typeof data) == "string") data = jQuery.parseJSON(data);
-                console.log("retrieved trip:");
-                console.log(data);
                 this_.groupPlan = new otp.modules.planner.TripPlan(null, JSON.parse(data.queryParams));
                 for(var i = 0; i < data.groupItineraries.length; i++) {
                     var itinData = JSON.parse(otp.util.Text.lzwDecode(data.groupItineraries[i].itinData));

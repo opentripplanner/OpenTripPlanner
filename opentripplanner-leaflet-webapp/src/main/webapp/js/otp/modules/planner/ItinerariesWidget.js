@@ -97,8 +97,6 @@ otp.widgets.ItinerariesWidget =
             this.renderButtonRow();
         }
         if(this.showSearchLink) {
-            console.log("showSearchLink, QPs:");
-            console.log(queryParams);
             var link = this.constructLink(queryParams, 
                                           jQuery.isFunction(this.module.getAdditionalUrlParams) ?
                                               this.module.getAdditionalUrlParams() : null);
