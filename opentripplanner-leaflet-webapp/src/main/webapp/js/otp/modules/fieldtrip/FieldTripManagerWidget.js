@@ -73,9 +73,13 @@ otp.modules.fieldtrip.FieldTripManagerWidget =
         .appendTo(buttonRow).click(function() {
             this_.module.showSaveWidget();
         });
-        $('<button id="'+this.id+'-deleteButton">Delete Selected Trip</button>').button()
+        $('<button id="'+this.id+'-deleteButton">Delete</button>').button()
         .appendTo(buttonRow).click(function() {
             this_.deleteSelectedTrip();
+        });
+        $('<button id="'+this.id+'-renderButton">Render</button>').button()
+        .appendTo(buttonRow).click(function() {
+            if(this_.selectedTrip !== null) this_.module.renderTrip(this_.selectedTrip);
         });
     },
     
@@ -96,6 +100,7 @@ otp.modules.fieldtrip.FieldTripManagerWidget =
     },
     
     showTripDetails : function(trip) {
+        console.log(trip);
         var html = "<h3>Trip Details</h3>"
         html += '<div class="otp-fieldTripManager-tripDetail"><b>Description</b>: '+trip.description+"</div>";
         html += '<div class="otp-fieldTripManager-tripDetail"><b>Origin</b>: '+trip.origin+"</div>";
