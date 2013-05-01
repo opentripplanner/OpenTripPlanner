@@ -21,6 +21,10 @@ public class GroupItinerary extends Model {
     @Expose
     public int passengers;
 
+    @Column(length=10000, nullable=false)
+    @Expose  
+    public String itinData;
+    
     @OneToMany(mappedBy="groupItinerary", cascade=CascadeType.ALL)
     //@OneToMany(cascade=CascadeType.ALL)
     @Expose

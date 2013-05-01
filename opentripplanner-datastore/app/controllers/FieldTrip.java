@@ -44,9 +44,12 @@ public class FieldTrip extends Application {
         render(fieldTrips, year, month, monthName, day);
     }
 
-    public static void getFieldTrip(int id) {
+    public static void getFieldTrip(long id) {
         ScheduledFieldTrip fieldTrip = ScheduledFieldTrip.findById(id);
-        renderJSON(fieldTrip);
+        Gson gson = new GsonBuilder()
+          .excludeFieldsWithoutExposeAnnotation()  
+          .create();
+        renderJSON(gson.toJson(fieldTrip));
     }
     
     public static void getFieldTrips(@As("MM/dd/yyyy") Date date, Integer limit) {

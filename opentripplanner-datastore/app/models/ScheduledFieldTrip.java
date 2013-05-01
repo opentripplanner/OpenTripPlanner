@@ -32,6 +32,10 @@ public class ScheduledFieldTrip extends GenericModel {
     @Expose
     public Date timeStamp;
 
+    @Column(length=1000, nullable=false)
+    @Expose
+    public String queryParams;
+    
     @PrePersist
     public void prePersist() {
         if (timeStamp == null) {
