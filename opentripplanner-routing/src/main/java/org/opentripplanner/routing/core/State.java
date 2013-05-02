@@ -158,7 +158,7 @@ public class State implements Cloneable {
                 " w=" + this.getWeight() + 
                 " t=" + this.getElapsedTime() + 
                 " d=" + this.getWalkDistance() + 
-                " b=" + this.getNumBoardings();
+                " b=" + this.getNumBoardings() + ">";
     }
     
     /** Returns time in seconds since epoch */
