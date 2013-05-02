@@ -45,6 +45,7 @@ import org.opentripplanner.api.thrift.definition.Location;
 import org.opentripplanner.api.thrift.definition.Path;
 import org.opentripplanner.api.thrift.definition.PathOptions;
 import org.opentripplanner.api.thrift.definition.TravelMode;
+import org.opentripplanner.api.thrift.definition.TravelState;
 import org.opentripplanner.api.thrift.definition.TripParameters;
 import org.opentripplanner.api.thrift.definition.TripPaths;
 import org.opentripplanner.api.thrift.definition.VertexQuery;
@@ -154,6 +155,12 @@ public class OTPServiceImplTest {
         loc.setLat_lng(new LatLng(c.y, c.x));
         return loc;
     }
+    
+    private Location getLocationForTravelState(TravelState ts) {
+        Location loc = new Location();
+        loc.setLat_lng(ts.getVertex().getLat_lng());
+        return loc;
+    }
 
     private P2<Location> pickOriginAndDest() {
         List<Vertex> vList = new ArrayList<Vertex>(graph.getVertices());
@@ -197,6 +204,37 @@ public class OTPServiceImplTest {
         assertEquals(1, paths.getPathsSize());
         Path p = paths.getPaths().get(0);
         checkPath(p);
+        
+        // Check what happens when we decompose this path into subpaths.
+        int expectedTotalDuration = p.getDuration();
+        int subPathDurations = 0;
+        for (int i = 1; i < p.getStatesSize(); ++i) {
+            TravelState firstState = p.getStates().get(i - 1);
+            TravelState secondState = p.getStates().get(i);
+            
+            Location startLoc = getLocationForTravelState(firstState);
+            Location endLoc = getLocationForTravelState(secondState);
+            
+            trip.setOrigin(startLoc);
+            trip.setDestination(endLoc);
+            
+            req = new FindPathsRequest();
+            req.setOptions(opts);
+            req.setTrip(trip);
+            req.validate();
+            
+            res = serviceImpl.FindPaths(req);
+            paths = res.getPaths();
+            assertEquals(1, paths.getPathsSize());
+            Path subPath = paths.getPaths().get(0);
+            checkPath(subPath);
+            
+            subPathDurations += subPath.getDuration();
+        }
+        
+        // Subpaths may take less time because they need not start on the
+        // the same edges as the original path.
+        assertTrue(subPathDurations <= expectedTotalDuration); 
     }
 
     @Test
