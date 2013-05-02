@@ -41,7 +41,7 @@ public class PartialPlainStreetEdge extends PlainStreetEdge {
     public PartialPlainStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2,
             LineString geometry, String name, double length, StreetTraversalPermission permission,
             boolean back) {
-        super(v1, v2, geometry, name, length, permission, back);
+        super(v1, v2, geometry, name, length, permission, back, parentEdge.getCarSpeed());
 
         this.parentEdge = parentEdge;
     }
@@ -68,6 +68,22 @@ public class PartialPlainStreetEdge extends PlainStreetEdge {
     @Override
     public int getId() {
         return parentEdge.getId();
+    }
+    
+    /**
+     * Have the inbound angle of  their parent.
+     */
+    @Override
+    public int getInAngle() {
+        return parentEdge.getInAngle();
+    }
+    
+    /**
+     * Have the outbound angle of  their parent.
+     */
+    @Override
+    public int getOutAngle() {
+        return parentEdge.getInAngle();
     }
     
     /**
@@ -101,7 +117,8 @@ public class PartialPlainStreetEdge extends PlainStreetEdge {
     @Override
     public String toString() {
         return "PartialPlainStreetEdge(" + this.getName() + ", " + this.getFromVertex() + " -> "
-                + this.getToVertex() + " parentEdge=" + parentEdge + ")";
+                + this.getToVertex() + " length=" + this.getLength() + " carSpeed="
+                + this.getCarSpeed() + " parentEdge=" + parentEdge + ")";
     }
 
 }

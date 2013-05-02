@@ -335,7 +335,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         if (backEdge != null && backEdge instanceof PlainStreetEdge) {
             backPSE = (PlainStreetEdge) backEdge;
             double backSpeed = backPSE.calculateSpeed(options, traverseMode);
-            final double realTurnCost;
+            final double realTurnCost;  // Units are seconds.
             
             /* Compute turn cost.
              * 
@@ -366,11 +366,12 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
                         traversedVertex, backPSE, this, traverseMode, options, (float) backSpeed,
                         (float) speed);                
             } else { // in case this is a temporary edge not connected to an IntersectionVertex
+                LOG.info("Not computing turn cost for edge {}", this);
                 realTurnCost = 0; 
             }
 
             if (!traverseMode.isDriving()) {
-                s1.incrementWalkDistance(realTurnCost / 100);  //just a tie-breaker
+                s1.incrementWalkDistance(realTurnCost / 100);  // just a tie-breaker
             }
 
             long turnTime = (long) Math.ceil(realTurnCost);
@@ -479,7 +480,8 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     
     @Override
     public String toString() {
-        return "PlainStreetEdge(" + getId() + ", " + name + ", " + fromv + " -> " + tov + ")";
+        return "PlainStreetEdge(" + getId() + ", " + name + ", " + fromv + " -> " + tov
+                + " length=" + this.getLength() + " carSpeed=" + this.getCarSpeed() + ")";
     }
 
     public boolean hasBogusName() {
