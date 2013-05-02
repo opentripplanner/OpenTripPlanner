@@ -81,7 +81,7 @@ otp.widgets.PreferredRoutesSelectorWidget =
             for(var i = 0; i < this_.selectedRouteIndices.length; i++) {
                 var route = this_.routeData[this_.selectedRouteIndices[i]];
 
-                paramStr += route.id.agencyId+"_"+route.id.id + (i < this_.selectedRouteIndices.length-1 ? ',' : '');
+                paramStr += route.id.agencyId+"__"+route.id.id + (i < this_.selectedRouteIndices.length-1 ? ',' : '');
                 displayStr += (route.routeShortName || route.routeLongName) + (i < this_.selectedRouteIndices.length-1 ? ', ' : '');
 
             }
