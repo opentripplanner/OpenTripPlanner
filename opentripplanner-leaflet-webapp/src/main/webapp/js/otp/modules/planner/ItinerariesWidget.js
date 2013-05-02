@@ -380,11 +380,14 @@ otp.widgets.ItinerariesWidget =
         html += '<div class="otp-itinTripSummaryFooter">Valid ' + moment().format('MMM Do YYYY, h:mma');
         
         if(this.showItineraryLink) {
-        
-           
             var itinLink = this.constructLink(itin.tripPlan.queryParams, { itinIndex : index });
-            html += ' | <a href="'+itinLink+'">Link to Itinerary</a></div>';
+            html += ' | <a href="'+itinLink+'">Link to Itinerary</a>';
         }
+        
+        var subject = "Your Trip";
+        var body = "Test";
+        html += ' | <a href="mailto:?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body)+'" target="_blank">Email</a>';
+        html += '</div>';
         
         html += '</div>';
         itinDiv.append(html);
