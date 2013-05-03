@@ -62,7 +62,7 @@ otp.widgets.Widget = otp.Class({
             });
         }
         // set up context menu
-        /*this.contextMenu = new otp.core.ContextMenu(this.$(), function() {
+        this.contextMenu = new otp.core.ContextMenu(this.$(), function() {
             //console.log("widget cm clicked");
         });
         this.contextMenu.addItem("Minimize", function() {
@@ -71,9 +71,7 @@ otp.widgets.Widget = otp.Class({
             this_.bringToFront();            
         }).addItem("Send to Back", function() {
             this_.sendToBack();            
-        });*/ /*.addItem("Close", function() {
-            this_.close();
-        });*/
+        });
         
         this.header.dblclick(function() {
             this_.bringToFront();            
