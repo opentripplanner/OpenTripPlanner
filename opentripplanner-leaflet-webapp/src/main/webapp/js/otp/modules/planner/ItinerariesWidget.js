@@ -29,6 +29,8 @@ otp.widgets.ItinerariesWidget =
     refreshActiveOnly : false,
     showButtonRow : true,
     showItineraryLink : true,
+    showPrintLink : true,
+    showEmailLink : true,
     showSearchLink : false,
     
     
@@ -307,7 +309,7 @@ otp.widgets.ItinerariesWidget =
         var this_ = this;
 
         // render legs
-        var divId = this.moduleId+"-itinAccord-"+index;
+        var divId = this.module.id+"-itinAccord-"+index;
         var accordHtml = "<div id='"+divId+"' class='otp-itinAccord'></div>";
         var itinAccord = $(accordHtml);
         for(var l=0; l<itin.itinData.legs.length; l++) {
@@ -365,8 +367,49 @@ otp.widgets.ItinerariesWidget =
         itinDiv.append("<div class='otp-itinEndRow'><b>End</b>: "+itin.getEndTimeStr()+"</div>");
 
         // add trip summary
+
+        var tripSummary = $('<div class="otp-itinTripSummary" />')
+        .append('<div class="otp-itinTripSummaryHeader">Trip Summary</div>')
+        .append('<div class="otp-itinTripSummaryLabel">Travel</div><div class="otp-itinTripSummaryText">'+itin.getStartTimeStr()+'</div>')
+        .append('<div class="otp-itinTripSummaryLabel">Time</div><div class="otp-itinTripSummaryText">'+itin.getDurationStr()+'</div>');
+        if(itin.hasTransit) {
+            tripSummary.append('<div class="otp-itinTripSummaryLabel">Transfers</div><div class="otp-itinTripSummaryText">'+itin.itinData.transfers+'</div>')
+            .append('<div class="otp-itinTripSummaryLabel">Fare</div><div class="otp-itinTripSummaryText">'+itin.getFareStr()+'</div>');
+        }
         
-        var html = '<div class="otp-itinTripSummary">';
+        
+        
+        var tripSummaryFooter = $('<div class="otp-itinTripSummaryFooter" />');
+        
+        tripSummaryFooter.append('Valid ' + moment().format('MMM Do YYYY, h:mma'));
+        
+        if(this.showItineraryLink) {
+            var itinLink = this.constructLink(itin.tripPlan.queryParams, { itinIndex : index });
+            tripSummaryFooter.append(' | <a href="'+itinLink+'">Link to Itinerary</a>');
+        }
+        
+        if(this.showPrintLink) {
+            tripSummaryFooter.append(' | ');
+            $('<a href="#">Print</a>').click(function(evt) {
+                evt.preventDefault();
+
+                var printWindow = window.open('','OpenTripPlanner Results','toolbar=yes, scrollbars=yes, height=500, width=800');
+                printWindow.document.write(itin.getHtmlNarrative());
+                
+            }).appendTo(tripSummaryFooter);
+        }
+        if(this.showEmailLink) {
+            var subject = "Your Trip";
+            var body = itin.getTextNarrative();
+            tripSummaryFooter.append(' | <a href="mailto:?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body)+'" target="_blank">Email</a>');
+        }
+        
+        tripSummary.append(tripSummaryFooter)
+        .appendTo(itinDiv);
+        //itinDiv.append(tripSummary);
+
+        
+        /*var html = '<div class="otp-itinTripSummary">';
         html += '<div class="otp-itinTripSummaryHeader">Trip Summary</div>';
         html += '<div class="otp-itinTripSummaryLabel">Travel</div><div class="otp-itinTripSummaryText">'+itin.getStartTimeStr()+'</div>';
         html += '<div class="otp-itinTripSummaryLabel">Time</div><div class="otp-itinTripSummaryText">'+itin.getDurationStr()+'</div>';
@@ -384,14 +427,21 @@ otp.widgets.ItinerariesWidget =
             html += ' | <a href="'+itinLink+'">Link to Itinerary</a>';
         }
         
+        html += ' | <div id="'+divId+'-print">Print</div>';
+
         var subject = "Your Trip";
-        var body = "Test";
+        var body = "Test\nfoo";
         html += ' | <a href="mailto:?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body)+'" target="_blank">Email</a>';
-        html += '</div>';
-        
+
+
+        html += '</div>';        
         html += '</div>';
         itinDiv.append(html);
         
+        $('#'+divId+'-print').click(function() {
+            console.log("print");
+        });
+        console.log('#'+divId+'-print');*/
         return itinDiv;
     },
 

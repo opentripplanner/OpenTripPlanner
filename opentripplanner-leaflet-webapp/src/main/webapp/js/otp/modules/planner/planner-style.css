@@ -327,5 +327,27 @@
     margin: 0px 30px;
 }
 
+/* print window style */
 
+.otp-itin-printWindow {
+    font-family: sans-serif;
+}
 
+.otp-itin-printWindow h4 {
+    border-bottom: 3px solid #ccc;
+    padding-bottom: .1em;
+    margin-top: 1.5em;
+    margin-bottom: .8em;
+}
+
+.otp-itin-printWindow ul {
+    font-size: .9em;
+}
+
+.otp-itin-printWindow li {
+    margin-left: -8px;
+}
+
+.otp-itin-print-step {
+    margin-top: .5em;
+}

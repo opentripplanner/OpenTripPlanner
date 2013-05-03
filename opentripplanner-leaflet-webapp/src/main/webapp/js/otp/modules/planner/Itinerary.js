@@ -108,6 +108,15 @@ otp.modules.planner.Itinerary = otp.Class({
         return otp.util.Time.formatItinTime(this.getEndTime());
     },
 
+    getStartLocationStr : function() {
+        var from = this.itinData.legs[0].from;
+        return from.name || "(" + from.lat.toFixed(5) + ", " + from.lon.toFixed(5) +  ")";
+    },
+    
+    getEndLocationStr : function() {
+        var to = this.itinData.legs[this.itinData.legs.length-1].to;
+        return to.name || "(" + to.lat.toFixed(5) + ", " + to.lon.toFixed(5)+  ")";
+    },
     
     getDurationStr : function() {
         return otp.util.Time.msToHrMin(this.getEndTime() - this.getStartTime());
@@ -208,6 +217,111 @@ otp.modules.planner.Itinerary = otp.Class({
         var end = this.itinData.legs[this.itinData.legs.length-1].to;
         return [[Math.min(start.lat, end.lat), Math.min(start.lon, end.lon)],
                 [Math.max(start.lat, end.lat), Math.max(start.lon, end.lon)]];
+    },
+    
+    getHtmlNarrative : function() {
+        var html = "";
+        html += '<link rel="stylesheet" href="js/otp/modules/planner/planner-style.css" />';
+        html += '<div class="otp-itin-printWindow">';
+        
+        html += '<h3>Start: '+this.getStartLocationStr()+' at '+this.getStartTimeStr()+'</h3>';
+        
+        for(var l=0; l<this.itinData.legs.length; l++) {
+            var leg = this.itinData.legs[l];
+
+            // header
+            html += '<h4>'+(l+1)+'. '+otp.util.Itin.modeString(leg.mode).toUpperCase();//
+            if(otp.util.Itin.isTransit(leg.mode)) {
+                html += ': ';
+                if(leg.route !== leg.routeLongName) html += "("+leg.route+") ";
+                html += leg.routeLongName;
+                if(leg.headsign) html +=  " toward " + leg.headsign;
+            }
+            else { // walk / bike / car
+                html += " "+otp.util.Itin.distanceString(leg.distance)+ " to "+leg.to.name;
+            }
+            html += '</h4>'
+            
+            // content
+            if(otp.util.Itin.isTransit(leg.mode)) {
+                html += '<ul>';
+                html += '<li><b>Board</b>: '+leg.from.name+', '+otp.util.Time.formatItinTime(leg.startTime, "h:mma")+'</li>';
+                html += '<li><i>Time in transit: '+otp.util.Time.msToHrMin(leg.duration)+'</i></li>';
+                html += '<li><b>Alight</b>: '+leg.to.name+', '+otp.util.Time.formatItinTime(leg.endTime, "h:mma")+'</li>';
+                
+                html += '</ul>';
+            }
+            else { // walk / bike / car
+            
+                for(var i=0; i<leg.steps.length; i++) {
+                    var step = leg.steps[i];
+                    var text = otp.util.Itin.getLegStepText(step);
+                    
+                    html += '<div class="otp-itin-print-step" style="margin-top: .5em;">';
+                    html += '<div class="otp-itin-step-icon">';
+                    if(step.relativeDirection)
+                        html += '<img src="images/directions/' +
+                            step.relativeDirection.toLowerCase()+'.png">';
+                    html += '</div>';                
+                    var dist = otp.util.Itin.distanceString(step.distance);
+                    //html += '<div class="otp-itin-step-dist">' +
+                    //    '<span style="font-weight:bold; font-size: 1.2em;">' + 
+                    //    distArr[0]+'</span><br>'+distArr[1]+'</div>';
+                    html += '<div class="otp-itin-step-text">'+text+'<br>'+dist+'</div>';
+                    html += '<div style="clear:both;"></div></div>';
+                }            
+            }
+            
+        }
+        
+        html += '<h3>End: '+this.getEndLocationStr()+' at '+this.getEndTimeStr()+'</h3>';
+        html += '</div>';
+        
+        return html;
+    },
+    
+    getTextNarrative : function() {
+        var text = ''
+        text += 'Start: '+this.getStartLocationStr()+' at '+this.getStartTimeStr()+'\n\n';
+        
+        for(var l=0; l<this.itinData.legs.length; l++) {
+            var leg = this.itinData.legs[l];
+
+            // header
+            text += (l+1)+'. '+otp.util.Itin.modeString(leg.mode).toUpperCase();
+            if(otp.util.Itin.isTransit(leg.mode)) {
+                text += ': ';
+                if(leg.route !== leg.routeLongName) text += "("+leg.route+") ";
+                text += leg.routeLongName;
+                if(leg.headsign) text +=  " toward " + leg.headsign;
+            }
+            else { // walk / bike / car
+                text += ' '+ otp.util.Itin.distanceString(leg.distance)+ " to "+leg.to.name;
+            }
+            text += '\n';
+            
+            // content
+            if(otp.util.Itin.isTransit(leg.mode)) {
+                text += ' - Board: '+leg.from.name+', '+otp.util.Time.formatItinTime(leg.startTime, "h:mma") + '\n';
+                text += ' - Time in transit: '+otp.util.Time.msToHrMin(leg.duration) + '\n';
+                text += ' - Alight: '+leg.to.name+', '+otp.util.Time.formatItinTime(leg.endTime, "h:mma")+ '\n';
+            }
+            else { // walk / bike / car
+            
+                for(var i=0; i<leg.steps.length; i++) {
+                    var step = leg.steps[i];
+                    var desc = otp.util.Itin.getLegStepText(step);                    
+                    var dist = otp.util.Itin.distanceString(step.distance);
+                    text += ' - ' + desc + '('+ dist + ')\n';
+
+                }            
+            }
+            text += '\n';
+            
+        }
+        
+        text += 'End: '+this.getEndLocationStr()+' at '+this.getEndTimeStr()+'\n';
+        return text;
     }
     
 });
