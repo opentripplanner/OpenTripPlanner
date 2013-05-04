@@ -383,8 +383,8 @@ otp.widgets.ItinerariesWidget =
         
         tripSummaryFooter.append('Valid ' + moment().format('MMM Do YYYY, h:mma'));
         
+        var itinLink = this.constructLink(itin.tripPlan.queryParams, { itinIndex : index });
         if(this.showItineraryLink) {
-            var itinLink = this.constructLink(itin.tripPlan.queryParams, { itinIndex : index });
             tripSummaryFooter.append(' | <a href="'+itinLink+'">Link to Itinerary</a>');
         }
         
@@ -400,7 +400,7 @@ otp.widgets.ItinerariesWidget =
         }
         if(this.showEmailLink) {
             var subject = "Your Trip";
-            var body = itin.getTextNarrative();
+            var body = itin.getTextNarrative(itinLink);
             tripSummaryFooter.append(' | <a href="mailto:?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body)+'" target="_blank">Email</a>');
         }
         
@@ -630,7 +630,7 @@ otp.widgets.ItinerariesWidget =
     
     constructLink : function(queryParams, additionalParams) {
         additionalParams = additionalParams ||  { };
-        return '?module=' + this.module.id + "&" +  
+        return otp.config.siteUrl + '?module=' + this.module.id + "&" +  
             otp.util.Text.constructUrlParamString(_.extend(_.clone(queryParams), additionalParams));
     },
         

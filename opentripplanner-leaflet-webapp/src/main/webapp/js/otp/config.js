@@ -48,7 +48,6 @@ otp.config = {
     logoGraphic :       'images/otp_logo_darkbg_40px.png',
 
     siteName    : "My OTP Instance",
-    siteURL     : "[link to site]",
     siteDescription  : "An OpenTripPlanner deployment.",
     
     // bikeshareName : "",

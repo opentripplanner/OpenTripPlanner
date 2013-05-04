@@ -62,6 +62,12 @@ otp.core.Webapp = otp.Class({
             this.urlParams[decode(match[1])] = decode(match[2]);
             
         
+        // init siteUrl, if necessary
+        
+        if(typeof otp.config.siteUrl === 'undefined') {
+            otp.config.siteUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
+        }
+            
         // set the logo & title
         
         if(otp.config.showLogo) {

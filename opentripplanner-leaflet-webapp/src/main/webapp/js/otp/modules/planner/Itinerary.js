@@ -280,7 +280,7 @@ otp.modules.planner.Itinerary = otp.Class({
         return html;
     },
     
-    getTextNarrative : function() {
+    getTextNarrative : function(itinLink) {
         var text = ''
         text += 'Start: '+this.getStartLocationStr()+' at '+this.getStartTimeStr()+'\n\n';
         
@@ -321,6 +321,10 @@ otp.modules.planner.Itinerary = otp.Class({
         }
         
         text += 'End: '+this.getEndLocationStr()+' at '+this.getEndTimeStr()+'\n';
+        
+        if(itinLink) {
+            text += '\nView itinerary online:\n' + itinLink + '\n';
+        }
         return text;
     }
     
