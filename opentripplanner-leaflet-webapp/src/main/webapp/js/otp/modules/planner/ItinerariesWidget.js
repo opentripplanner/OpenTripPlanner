@@ -361,7 +361,7 @@ otp.widgets.ItinerariesWidget =
             itinDiv.append("<div class='otp-itinAlertRow'>"+alerts[i]+"</div>");
         }
         
-        // add start and end time rows and the main leg accordian display 
+        // add start and end time rows and the main leg accordion display 
         itinDiv.append("<div class='otp-itinStartRow'><b>Start</b>: "+itin.getStartTimeStr()+"</div>");
         itinDiv.append(itinAccord);
         itinDiv.append("<div class='otp-itinEndRow'><b>End</b>: "+itin.getEndTimeStr()+"</div>");
@@ -511,11 +511,26 @@ otp.widgets.ItinerariesWidget =
 
             // show the "time in transit" line
 
-            $('<div class="otp-itin-leg-elapsedDesc">Time in transit: '+otp.util.Time.msToHrMin(leg.duration)+'</div>').appendTo(legDiv);
+            var inTransitDiv = $('<div class="otp-itin-leg-elapsedDesc" />').appendTo(legDiv);
 
-            // show the intermediate stops, if applicable
+            $('<span><i>Time in transit: '+otp.util.Time.msToHrMin(leg.duration)+'</i></span>').appendTo(inTransitDiv);
+
+            $('<span>&nbsp;[<a href="#">Trip Viewer</a>]</span>')
+            .appendTo(inTransitDiv)
+            .click(function(evt) {
+                if(!this_.module.tripViewerWidget) {
+                    this_.module.tripViewerWidget = new otp.widgets.transit.TripViewerWidget("otp-"+this.moduleId+"-tripViewerWidget", this_.module);
+                    this_.module.tripViewerWidget.$().offset({top: evt.clientY, left: evt.clientX});
+                }
+                this_.module.tripViewerWidget.show();
+                if(this_.module.tripViewerWidget.minimized) this_.module.tripViewerWidget.unminimize();
+                this_.module.tripViewerWidget.update(leg);
+                this_.module.tripViewerWidget.bringToFront();
+            });
             
-            if(this.module.showIntermediateStops) {
+            // show the intermediate stops, if applicable -- REPLACED BY TRIP VIEWER
+            
+            /*if(this.module.showIntermediateStops) {
 
                 $('<div class="otp-itin-leg-buffer"></div>').appendTo(legDiv);            
                 var intStopsDiv = $('<div class="otp-itin-leg-intStops"></div>').appendTo(legDiv);
@@ -551,7 +566,7 @@ otp.widgets.ItinerariesWidget =
                     });                    
                 }
                 intStopsListDiv.hide();
-            }
+            }*/
 
             // show the end time and stop
 
