@@ -177,9 +177,7 @@ otp.util.Itin = {
     },
     
     getLegStepText : function(step, asHtml) {
-        console.log("1 asHtml = "+asHtml);
         asHtml = (typeof asHtml === "undefined") ? true : asHtml;
-        console.log("2 asHtml = "+asHtml);
         var text = '';
         if(step.relativeDirection == "CIRCLE_COUNTERCLOCKWISE" || step.relativeDirection == "CIRCLE_CLOCKWISE") {
             text += 'Take roundabout ' +
