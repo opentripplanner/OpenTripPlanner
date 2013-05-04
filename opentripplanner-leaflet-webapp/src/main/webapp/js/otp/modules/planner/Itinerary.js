@@ -310,9 +310,9 @@ otp.modules.planner.Itinerary = otp.Class({
             
                 for(var i=0; i<leg.steps.length; i++) {
                     var step = leg.steps[i];
-                    var desc = otp.util.Itin.getLegStepText(step);                    
+                    var desc = otp.util.Itin.getLegStepText(step, false);                    
                     var dist = otp.util.Itin.distanceString(step.distance);
-                    text += ' - ' + desc + '('+ dist + ')\n';
+                    text += ' - ' + desc + ' ('+ dist + ')\n';
 
                 }            
             }

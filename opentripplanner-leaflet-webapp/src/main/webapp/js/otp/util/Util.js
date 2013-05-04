@@ -176,7 +176,10 @@ otp.util.Itin = {
         return mode;
     },
     
-    getLegStepText : function(step) {
+    getLegStepText : function(step, asHtml) {
+        console.log("1 asHtml = "+asHtml);
+        asHtml = (typeof asHtml === "undefined") ? true : asHtml;
+        console.log("2 asHtml = "+asHtml);
         var text = '';
         if(step.relativeDirection == "CIRCLE_COUNTERCLOCKWISE" || step.relativeDirection == "CIRCLE_CLOCKWISE") {
             text += 'Take roundabout ' +
@@ -184,10 +187,11 @@ otp.util.Itin = {
                 otp.util.Text.ordinal(step.exit)+' exit on '+step.streetName;
         }
         else {
-            if(!step.relativeDirection) text += "Start on <b>"+step.streetName+"</b>";
+            if(!step.relativeDirection) text += "Start on" + (asHtml ? " <b>" : " ") + step.streetName + (asHtml ? "</b>" : "");
             else {
-                text += '<b>'+otp.util.Text.capitalizeFirstChar(this.directionString(step.relativeDirection))+'</b> '+
-                            (step.stayOn ? "to continue on" : "on to")  + ' <b>' +step.streetName+"</b>";
+                text += (asHtml ? "<b>" : "") + otp.util.Text.capitalizeFirstChar(this.directionString(step.relativeDirection)) +
+                            (asHtml ? "</b>" : "") + ' ' + (step.stayOn ? "to continue on" : "on to")  + (asHtml ? " <b>" : " ") +
+                            step.streetName + (asHtml ? "</b>" : "");
             }
         }
         return text; // + ' and proceed <b>'+otp.util.Itin.distanceString(step.distance)+'</b>';
