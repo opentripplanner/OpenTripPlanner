@@ -126,6 +126,32 @@ otp.util.Text = {
 
 otp.util.Itin = {
 
+    /** 
+     * Extracts the "place" from an OTP "name::place" string, where "place" is
+     * a latitude,longitude string or a vertex ID.
+     *
+     * @param {string} locationStr an OTP GenericLocation string
+     * @return {string} the "place" component of an OTP location string 
+     */
+     
+    getLocationPlace : function(locationStr) {
+        return locationStr.indexOf("::") != -1 ? 
+            locationStr.split("::")[1] : locationStr;
+    },
+
+
+    /** 
+     * Extracts the "name" from an OTP "name::place" string, if present
+     *
+     * @param {string} locationStr an OTP GenericLocation string
+     * @return {string} the "name" component of an OTP location string, null if not present 
+     */
+
+    getLocationName : function(locationStr) {
+        return locationStr.indexOf("::") != -1 ? 
+            locationStr.split("::")[0] : null;
+    },
+    
     isTransit : function(mode) {
         return mode === "TRANSIT" || mode === "SUBWAY" || mode === "BUS" || mode === "TRAM" || mode === "GONDOLA" || mode === "TRAINISH" || mode === "BUSISH";
     },

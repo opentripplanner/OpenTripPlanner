@@ -41,6 +41,8 @@ otp.modules.planner.PlannerModule =
     planTripFunction : null,
 
     // current trip query parameters:
+    startName               : null,
+    endName                 : null,
     startLatLng             : null,
     endLatLng               : null,
     time                    : null,
@@ -124,9 +126,9 @@ otp.modules.planner.PlannerModule =
         }
     },
     
-    setStartPoint : function(latlng, update) {
-    
+    setStartPoint : function(latlng, update, name) {
         var this_ = this;
+        this.startName = (typeof name !== 'undefined') ? name : null;
         this.startLatLng = latlng;
         if(this.startMarker == null) {
             this.startMarker = new L.Marker(this.startLatLng, {icon: this.icons.startFlag, draggable: true});
@@ -152,8 +154,9 @@ otp.modules.planner.PlannerModule =
         }
     },
     
-    setEndPoint : function(latlng, update) {
+    setEndPoint : function(latlng, update, name) {
         var this_ = this;
+        this.endName = (typeof name !== 'undefined') ? name : null;
         this.endLatLng = latlng;    	 
         if(this.endMarker == null) {
             this.endMarker = new L.Marker(this.endLatLng, {icon: this.icons.endFlag, draggable: true}); 
@@ -179,11 +182,13 @@ otp.modules.planner.PlannerModule =
     },
     
     getStartOTPString : function() {
-        return this.startLatLng.lat+','+this.startLatLng.lng;
+        return (this.startName !== null ? this.startName + "::" : "")
+                 + this.startLatLng.lat + ',' + this.startLatLng.lng;
     },
 
     getEndOTPString : function() {
-        return this.endLatLng.lat+','+this.endLatLng.lng;
+        return (this.endName !== null ? this.endName + "::" : "")
+                + this.endLatLng.lat+','+this.endLatLng.lng;
     },
         
     restoreTrip : function(queryParams) {    
@@ -192,10 +197,10 @@ otp.modules.planner.PlannerModule =
     },
     
     restoreMarkers : function(queryParams) {
-      	this.startLatLng = otp.util.Geo.stringToLatLng(queryParams.fromPlace);
+      	this.startLatLng = otp.util.Geo.stringToLatLng(otp.util.Itin.getLocationPlace(queryParams.fromPlace));
     	this.setStartPoint(this.startLatLng, false);
     	
-      	this.endLatLng = otp.util.Geo.stringToLatLng(queryParams.toPlace);
+      	this.endLatLng = otp.util.Geo.stringToLatLng(otp.util.Itin.getLocationPlace(queryParams.toPlace));
     	this.setEndPoint(this.endLatLng, false);
     },
     
@@ -220,8 +225,9 @@ otp.modules.planner.PlannerModule =
         
         var queryParams = null;
         
-        if(existingQueryParams)
+        if(existingQueryParams) {
         	queryParams = existingQueryParams; 	        	
+        }
         else
         {
             if(this.startLatLng == null || this.endLatLng == null) {
@@ -255,7 +261,6 @@ otp.modules.planner.PlannerModule =
                 queryParams.routerId = otp.config.routerId;
             }
         } 	
-        
         $('#otp-spinner').show();
         
         this.lastQueryParams = queryParams;

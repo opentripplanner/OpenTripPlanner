@@ -203,7 +203,7 @@ otp.widgets.TW_LocationsSelector =
                 var result = this_.resultLookup[ui.item.value];
                 var latlng = new L.LatLng(result.lat, result.lng);
                 this_.tripWidget.module.webapp.map.lmap.panTo(latlng);
-                setterFunction.call(this_.tripWidget.module, latlng, true);
+                setterFunction.call(this_.tripWidget.module, latlng, true, result.description);
             }
         })
         .click(function() {
@@ -221,6 +221,17 @@ otp.widgets.TW_LocationsSelector =
     },
     
     restorePlan : function(data) {
+        var fromName = otp.util.Itin.getLocationName(data.queryParams.fromPlace);
+        if(fromName) {
+            $("#"+this.id+"-start").val(fromName);
+            this.tripWidget.module.startName = fromName;
+        }
+
+        var toName = otp.util.Itin.getLocationName(data.queryParams.toPlace);
+        if(toName) {
+            $("#"+this.id+"-end").val(toName);
+            this.tripWidget.module.endName = toName;
+        }
     }    
         
 });
