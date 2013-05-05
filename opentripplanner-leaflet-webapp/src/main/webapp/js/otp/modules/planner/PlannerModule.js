@@ -304,6 +304,10 @@ otp.modules.planner.PlannerModule =
     },
     
     noTripFound : function(error) {
+        $('<div>' + error.msg + ' (Error ' + error.id + ')</div>').dialog({
+            title : "No Trip Found",
+            modal: true
+        });
     },
     
     drawItinerary : function(itin) {
