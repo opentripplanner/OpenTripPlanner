@@ -398,7 +398,6 @@ public class Graph implements Serializable {
     public static Graph load(File file, LoadLevel level) throws IOException, ClassNotFoundException {
         LOG.info("Reading graph " + file.getAbsolutePath() + " ...");
         // cannot use getClassLoader() in static context
-        //TODO: buffering
         ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file)));
         return load(in, level);
     }
@@ -413,7 +412,6 @@ public class Graph implements Serializable {
 
     public static Graph load(InputStream is, LoadLevel level) throws ClassNotFoundException,
             IOException {
-            // TODO:  buffering
         return load(new BufferedInputStream(new ObjectInputStream(is)), level);
     }
 
