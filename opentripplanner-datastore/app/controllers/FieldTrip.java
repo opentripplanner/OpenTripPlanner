@@ -76,7 +76,40 @@ public class FieldTrip extends Application {
         renderJSON(gson.toJson(trips));
         //renderJSON(trips);
     }
+    
+    public static void getGTFSTripsInUse(@As("MM/dd/yyyy") Date date, Integer limit) {
+        System.out.println("getFTs, date="+date);
+        List<ScheduledFieldTrip> trips;
+        String sql = "";
+        if(date != null) {          
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(date);
+            sql = "year(serviceDay) = " + cal.get(Calendar.YEAR) + 
+                  " and month(serviceDay) = " + (cal.get(Calendar.MONTH)+1) + 
+                  " and day(serviceDay) = "+cal.get(Calendar.DAY_OF_MONTH)+" ";
+        }
+        sql += "order by departure";
+        if(limit == null)
+            trips = ScheduledFieldTrip.find(sql).fetch();
+        else {
+            trips = ScheduledFieldTrip.find(sql).fetch(limit);
+        }
 
+        Set<GTFSTrip> gtfsTrips = new HashSet<GTFSTrip>();
+        for(ScheduledFieldTrip fieldTrip : trips) {
+            for(GroupItinerary itin : fieldTrip.groupItineraries) {
+                for(GTFSTrip gtfsTrip : itin.trips) {
+                    gtfsTrips.add(gtfsTrip);
+                }
+            }
+        }
+        Gson gson = new GsonBuilder()
+          .excludeFieldsWithoutExposeAnnotation()  
+          .create();
+        renderJSON(gson.toJson(gtfsTrips));
+    }
+
+    
     public static void newTrip(ScheduledFieldTrip trip) {
         //TODO: is setting id to null the right way to ensure that an
         //existing trip is not overwritten?
@@ -101,7 +134,7 @@ public class FieldTrip extends Application {
         render();
     }
 
-    public static void addItinerary(long fieldTripId, GroupItinerary itinerary, GroupTrip[] trips) {
+    public static void addItinerary(long fieldTripId, GroupItinerary itinerary, GTFSTrip[] trips) {
         ScheduledFieldTrip fieldTrip = ScheduledFieldTrip.findById(fieldTripId);
         itinerary.fieldTrip = fieldTrip;
         fieldTrip.groupItineraries.add(itinerary);
@@ -109,8 +142,8 @@ public class FieldTrip extends Application {
         Long id = itinerary.id;
         //GroupItinerary itin2 = GroupItinerary.findById(id);
         
-        itinerary.trips = new ArrayList<GroupTrip>();
-        for(GroupTrip gtrip : trips) {
+        itinerary.trips = new ArrayList<GTFSTrip>();
+        for(GTFSTrip gtrip : trips) {
           gtrip.groupItinerary = itinerary;
           itinerary.trips.add(gtrip);
           gtrip.save();

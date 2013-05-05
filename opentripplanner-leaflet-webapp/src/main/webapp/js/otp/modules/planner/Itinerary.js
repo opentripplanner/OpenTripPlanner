@@ -139,7 +139,7 @@ otp.modules.planner.Itinerary = otp.Class({
         return time1 !== time2;
     },
     
-    getTransitSegments : function() {
+    /*getTransitSegments : function() {
         var segments = [];
         for(var l=0; l<this.itinData.legs.length; l++) {
             var leg = this.itinData.legs[l];
@@ -167,7 +167,19 @@ otp.modules.planner.Itinerary = otp.Class({
             } 
         }
         return segments;
+    },*/
+
+    getTransitLegs : function() {
+        var legs = [];
+        for(var l=0; l<this.itinData.legs.length; l++) {
+            var leg = this.itinData.legs[l];
+            if(otp.util.Itin.isTransit(leg.mode)) {
+                legs.push(leg);
+            } 
+        }
+        return legs;
     },
+    
     
     /*getTripSegments : function() {
         var segments = [];

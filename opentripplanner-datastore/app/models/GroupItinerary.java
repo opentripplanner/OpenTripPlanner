@@ -28,7 +28,7 @@ public class GroupItinerary extends Model {
     @OneToMany(mappedBy="groupItinerary", cascade=CascadeType.ALL)
     //@OneToMany(cascade=CascadeType.ALL)
     @Expose
-    public List<GroupTrip> trips;
+    public List<GTFSTrip> trips;
     
     public GroupItinerary(int passengers) {
         this.passengers = passengers;

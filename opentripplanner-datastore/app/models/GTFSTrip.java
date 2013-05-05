@@ -8,10 +8,11 @@ import play.data.binding.As;
 import play.db.jpa.Model;
  
 /**
-A segment of a trip which is part of an itinerary
+ *  A segment of a GTFS-defined trip which is part of a group itinerary
  */
+
 @Entity
-public class GroupTrip extends Model {
+public class GTFSTrip extends Model {
  
     @ManyToOne(optional=false)
     public GroupItinerary groupItinerary;
@@ -25,10 +26,15 @@ public class GroupTrip extends Model {
     @Expose
     @As("HH:mm:ss")
     public Date arrive;
-
     
     @Expose
-    public String tripString;
+    public String agencyAndId;
+
+    @Expose
+    public Integer fromStopIndex;
+
+    @Expose
+    public Integer toStopIndex;
     
     /*@ManyToOne
     @Expose

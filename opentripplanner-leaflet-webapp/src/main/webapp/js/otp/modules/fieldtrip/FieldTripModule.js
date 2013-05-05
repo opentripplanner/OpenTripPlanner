@@ -107,8 +107,7 @@ otp.modules.fieldtrip.FieldTripModule =
         var planDate = moment(this.optionsWidget.controls['time'].epoch).format("YYYY-MM-DD");
         this.currentGroupSize = this.groupSize;
         this.bannedSegments = [];
-        console.log("RESET SEGMENTS");
-        //this.itineraries = [];
+        //console.log("RESET SEGMENTS");
         this.groupPlan = null;
 
         var this_ = this;
@@ -128,6 +127,12 @@ otp.modules.fieldtrip.FieldTripModule =
                         var grpItin = fieldTrip.groupItineraries[i];
                         for(var gt =0 ; gt < grpItin.trips.length; gt++) {
                             //this_.bannedSegments.push(grpItin.trips[gt].tripString);
+                            var gtfsTrip = grpItin.trips[gt];
+                            this_.bannedSegments.push({
+                                agencyAndId : gtfsTrip.agencyAndId,
+                                fromStopIndex : gtfsTrip.stopIndex,
+                                toStopIndex : gtfsTrip.stopIndex,
+                            });
                         }
                     }
                 }
@@ -171,13 +176,18 @@ otp.modules.fieldtrip.FieldTripModule =
         //this.itineraries.push(itin);
         this.groupPlan.addItinerary(itin);
         
-        var segments = itin.getTransitSegments();
-        for(var s = 0; s < segments.length; s++) {
-            this.bannedSegments.push(segments[s].tripString);
+        var transitLegs = itin.getTransitLegs();
+        for(var i = 0; i < transitLegs.length; i++) {
+            var leg = transitLegs[i];
+            this.bannedSegments.push({
+                agencyAndId : leg.agencyId + "_" + leg.tripId,
+                fromStopIndex : leg.from.stopIndex,
+                toStopIndex : leg.to.stopIndex,
+            });
         }
 
         this.setBannedTrips();// = this.bannedSegments.join(',');     
-        console.log("added "+segments.length+" banned segments, total="+this.bannedSegments.length);
+        console.log("added "+transitLegs.length+" banned segments, total="+this.bannedSegments.length);
         
         if(this.currentGroupSize > capacity) { // group members remain; plan another trip
             this.currentGroupSize -= capacity;
@@ -210,13 +220,12 @@ otp.modules.fieldtrip.FieldTripModule =
     },
     
     setBannedTrips : function() {
-        var tripIdsOnly = [];
+        var tripIds = [];
         for(var i=0; i<this.bannedSegments.length; i++) {
-            tripIdsOnly.push(this.bannedSegments[i].split(":")[0]);
+            tripIds.push(this.bannedSegments[i].agencyAndId);
         }
     
-        this.bannedTrips = tripIdsOnly.length > 0 ? tripIdsOnly.join(',') : null;     
-        //this.bannedTrips = this.bannedSegments.length > 0 ? this.bannedSegments.join(',') : null;     
+        this.bannedTrips = tripIds.length > 0 ? tripIds.join(',') : null;     
         console.log("set bannedTrips: "+this.bannedTrips);
     },
 
@@ -298,15 +307,14 @@ otp.modules.fieldtrip.FieldTripModule =
                 'itinerary.itinData' : otp.util.Text.lzwEncode(JSON.stringify(itin.itinData))
             };
             
-            var segments = itin.getTransitSegments()
-            for(var s = 0; s < segments.length; s++) {
-                var seg = segments[s];
-                data['trips['+s+'].depart'] = moment(seg.leg.startTime).format("HH:mm:ss"); 
-                data['trips['+s+'].arrive'] = moment(seg.leg.endTime).format("HH:mm:ss"); 
-                data['trips['+s+'].tripString'] = seg.tripString; 
-                /*for(var si = 0; si < seg.stopIndices.length; si++) {
-                    data['itinerary.trips['+s+'].stops['+si+'].stopIndex'] = seg.stopIndices[si];                     
-                }*/
+            var legs = itin.getTransitLegs();
+            for(var l = 0; l < legs.length; l++) {
+                var leg = legs[l];
+                data['trips['+l+'].depart'] = moment(leg.startTime).format("HH:mm:ss"); 
+                data['trips['+l+'].arrive'] = moment(leg.endTime).format("HH:mm:ss"); 
+                data['trips['+l+'].agencyAndId'] = leg.agencyId + "_" + leg.tripId;
+                data['trips['+l+'].fromStopIndex'] = leg.from.stopIndex;
+                data['trips['+l+'].toStopIndex'] = leg.to.stopIndex;
             }
             
             $.ajax(this.datastoreUrl+'/fieldTrip/addItinerary', {
