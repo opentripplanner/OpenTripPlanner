@@ -9,9 +9,11 @@ otp.config = {
 
     //hostname : "http://trimet-tomcat.deployer.opentripplanner.org",
     //municoderHostname : "http://trimet-tomcat.deployer.opentripplanner.org",
+    //loggerURL : 'http://trimet-logger.deployer.opentripplanner.org',
     
     hostname : "http://localhost:8080",
     //municoderHostname : "http://localhost:8080",
+    loggerURL : 'http://localhost:9000',
       
     baseLayers: [
         {
@@ -52,9 +54,6 @@ otp.config = {
     
     // bikeshareName : "",
 
-    //loggerURL : 'http://trimet-logger.deployer.opentripplanner.org',
-    loggerURL : 'http://localhost:9000',
-    // dataStorageUrl : '[link]',
     
     modules : [
         {
@@ -113,6 +112,6 @@ otp.config = {
     //addThisTitle    : 'Your title for AddThis sharing messages',
     
     timeFormat  : "h:mma",
-    dateFormat  : "MMM. Do YYYY"
+    dateFormat  : "MMM Do YYYY"
 };
 
