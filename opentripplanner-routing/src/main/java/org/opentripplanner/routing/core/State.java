@@ -545,6 +545,7 @@ public class State implements Cloneable {
 		return sb.toString();
 	}
 
+    /** @return the last TripPattern used in this path (which is set when leaving the vehicle). */
     public TripPattern getLastPattern() {
         return stateData.lastPattern;
     }

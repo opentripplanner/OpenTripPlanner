@@ -68,6 +68,7 @@ public class RoutingContext implements Cloneable {
     public final Map<AgencyAndId, Set<ServiceDate>> serviceDatesByServiceId = new HashMap<AgencyAndId, Set<ServiceDate>>();
     public RemainingWeightHeuristic remainingWeightHeuristic;
     public final TransferTable transferTable;
+    /** The timetableSnapshot is a {@link TimetableResolver} for looking up real-time updates. */
     public final TimetableResolver timetableSnapshot; 
     
     /**
