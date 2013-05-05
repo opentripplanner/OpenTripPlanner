@@ -32,6 +32,7 @@ otp.widgets.transit.TripViewerWidget =
     initialize : function(id, module) {
     
         otp.widgets.Widget.prototype.initialize.call(this, id, module.webapp.widgetManager);
+        module.addWidget(this);
         
         this.module = module;
         
