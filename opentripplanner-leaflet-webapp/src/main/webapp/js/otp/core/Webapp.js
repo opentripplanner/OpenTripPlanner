@@ -38,6 +38,7 @@ otp.core.Webapp = otp.Class({
         // misc. housekeeping
         
         if(typeof console == 'undefined') console = { log: function(str) {} };
+        $.support.cors = true;
         var this_ = this;
 
         // set the urlRoot variable, if needed
