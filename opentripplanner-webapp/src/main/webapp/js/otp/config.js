@@ -118,7 +118,10 @@ otp.config_defaults = {
         // The default extent to zoom the map to when the web app loads.
         // This can either be an OpenLayers.Bounds object or the string "automatic"
         // If set to "automatic", the client will ask the server for the default extent.
-        defaultExtent: "automatic",
+        
+        // set default bounds to Philly/NJ/NYC area
+        defaultExtent: new OpenLayers.Bounds(-77.36, 38.81, -71.91, 41.52),
+        //defaultExtent: "automatic",
 
         // These options are passed directly to the OpenLayers.Map constructor.
         options : {
@@ -216,13 +219,12 @@ otp.config_defaults = {
 
     // presents a dialog on initial startup of the app, with a message for your customers
     splashScreen : {
-        enabled: false,
+        enabled: true,
         timeout: 20,   // seconds to stay open - if <= ZERO, then dialog does not timeout and requires the customer to close the dialog
-        title:   'Important: Please read',
+        title:   'Greetings!',
         html:    '<p class="splash-screen">'
-                 + 'Please note that the trip routing presented here is for demonstration purposes of the <a href="http://opentripplanner.com" target="#">OpenTripPlanner (OTP)</a> only, '
-                 + 'and not intended as a travel resource.  You will begin to see improvements in the planned trips as the project matures.  A public beta is scheduled for spring 2011. '
-                 + '</p>'
+                 + 'This is a test deployment of Open Trip Planner, containing data for ' +
+                 'the Philadelphia, New Jersey, and New York City areas.</p>'
     },
 
     systemMap : {
