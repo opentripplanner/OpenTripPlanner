@@ -294,5 +294,12 @@ public class TestStreetMatcher {
         public int getOutAngle() {
             return 0;
         }
+
+        @Override
+        public void setCarSpeed(float carSpeed) {
+            // TODO Auto-generated method stub
+            
+        }
+
     }
 }
