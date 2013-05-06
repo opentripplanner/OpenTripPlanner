@@ -49,9 +49,6 @@ public abstract class StreetEdge extends EdgeWithElevation {
 
 	/**
 	 * Returns true if this RoutingRequest can traverse this edge.
-	 * 
-	 * @param options
-	 * @return
 	 */
 	public abstract boolean canTraverse(RoutingRequest options);
 	
@@ -60,6 +57,8 @@ public abstract class StreetEdge extends EdgeWithElevation {
 	public abstract double getLength();
 	
 	public abstract float getCarSpeed();
+	
+	public abstract void setCarSpeed(float carSpeed);
 	
 	public abstract int getInAngle();
 	
