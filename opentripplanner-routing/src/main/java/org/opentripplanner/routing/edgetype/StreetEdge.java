@@ -58,6 +58,12 @@ public abstract class StreetEdge extends EdgeWithElevation {
 	public abstract boolean canTraverse(TraverseModeSet modes);
 		
 	public abstract double getLength();
+	
+	public abstract float getCarSpeed();
+	
+	public abstract int getInAngle();
+	
+	public abstract int getOutAngle();
 
 	public abstract StreetTraversalPermission getPermission();
 

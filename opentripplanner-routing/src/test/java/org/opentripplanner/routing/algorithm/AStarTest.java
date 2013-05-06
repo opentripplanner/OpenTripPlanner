@@ -94,10 +94,10 @@ public class AStarTest {
 
     @Test
     public void testForward() {
-
         RoutingRequest options = new RoutingRequest();
         options.setWalkSpeed(1.0);
-        options.setRoutingContext(_graph, _graph.getVertex("56th_24th"), _graph.getVertex("leary_20th"));
+        options.setRoutingContext(_graph, _graph.getVertex("56th_24th"),
+                _graph.getVertex("leary_20th"));
         ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
 
         GraphPath path = tree.getPath(_graph.getVertex("leary_20th"), false);
@@ -121,7 +121,8 @@ public class AStarTest {
         RoutingRequest options = new RoutingRequest();
         options.setWalkSpeed(1.0);
         options.setArriveBy(true);
-        options.setRoutingContext(_graph, _graph.getVertex("56th_24th"), _graph.getVertex("leary_20th"));
+        options.setRoutingContext(_graph, _graph.getVertex("56th_24th"),
+                _graph.getVertex("leary_20th"));
         ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
 
         GraphPath path = tree.getPath(_graph.getVertex("56th_24th"), false);
@@ -131,22 +132,22 @@ public class AStarTest {
         assertTrue(states.size() == 6 || states.size() == 7);
 
         assertEquals("56th_24th", states.get(0).getVertex().getLabel());
-        
+
         int n;
-        //we could go either way around the block formed by 56th, 22nd, market, and 24th.
-		if (states.size() == 7) {
-        	assertEquals("market_24th", states.get(1).getVertex().getLabel());
-        	assertEquals("market_ballard", states.get(2).getVertex().getLabel());
-        	n = 0;
+        // we could go either way around the block formed by 56th, 22nd, market, and 24th.
+        if (states.size() == 7) {
+            assertEquals("market_24th", states.get(1).getVertex().getLabel());
+            assertEquals("market_ballard", states.get(2).getVertex().getLabel());
+            n = 0;
         } else {
-        	assertEquals("56th_22nd", states.get(1).getVertex().getLabel());
-        	n = -1;
+            assertEquals("56th_22nd", states.get(1).getVertex().getLabel());
+            n = -1;
         }
-        
-        assertEquals("market_22nd", states.get(n+3).getVertex().getLabel());
-        assertEquals("market_leary", states.get(n+4).getVertex().getLabel());
-        assertEquals("leary_vernon", states.get(n+5).getVertex().getLabel());
-        assertEquals("leary_20th", states.get(n+6).getVertex().getLabel());
+
+        assertEquals("market_22nd", states.get(n + 3).getVertex().getLabel());
+        assertEquals("market_leary", states.get(n + 4).getVertex().getLabel());
+        assertEquals("leary_vernon", states.get(n + 5).getVertex().getLabel());
+        assertEquals("leary_20th", states.get(n + 6).getVertex().getLabel());
     }
 
     @Test
@@ -155,14 +156,15 @@ public class AStarTest {
         RoutingRequest options = new RoutingRequest();
         options.setWalkSpeed(1.0);
 
-        StreetLocation fromLocation = new StreetLocation(_graph, "near_shilshole_22nd", new Coordinate(
-                -122.385050, 47.666620), "near_shilshole_22nd");
+        StreetLocation fromLocation = new StreetLocation(_graph, "near_shilshole_22nd",
+                new Coordinate(-122.385050, 47.666620), "near_shilshole_22nd");
         fromLocation.getExtra().add(
                 new SimpleConcreteEdge(fromLocation, _graph.getVertex("shilshole_22nd")));
 
         StreetLocation toLocation = new StreetLocation(_graph, "near_56th_20th", new Coordinate(
                 -122.382347, 47.669518), "near_56th_20th");
-        toLocation.getExtra().add(new SimpleConcreteEdge(_graph.getVertex("56th_20th"), toLocation));
+        toLocation.getExtra()
+                .add(new SimpleConcreteEdge(_graph.getVertex("56th_20th"), toLocation));
 
         options.setRoutingContext(_graph, fromLocation, toLocation);
         ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
@@ -191,14 +193,15 @@ public class AStarTest {
         options.setWalkSpeed(1.0);
         options.setArriveBy(true);
 
-        StreetLocation fromLocation = new StreetLocation(_graph, "near_shilshole_22nd", new Coordinate(
-                -122.385050, 47.666620), "near_shilshole_22nd");
+        StreetLocation fromLocation = new StreetLocation(_graph, "near_shilshole_22nd",
+                new Coordinate(-122.385050, 47.666620), "near_shilshole_22nd");
         fromLocation.getExtra().add(
                 new SimpleConcreteEdge(fromLocation, _graph.getVertex("shilshole_22nd")));
 
         StreetLocation toLocation = new StreetLocation(_graph, "near_56th_20th", new Coordinate(
                 -122.382347, 47.669518), "near_56th_20th");
-        toLocation.getExtra().add(new SimpleConcreteEdge(_graph.getVertex("56th_20th"), toLocation));
+        toLocation.getExtra()
+                .add(new SimpleConcreteEdge(_graph.getVertex("56th_20th"), toLocation));
 
         options.setRoutingContext(_graph, fromLocation, toLocation);
         ShortestPathTree tree = new GenericAStar().getShortestPathTree(options);
@@ -219,7 +222,7 @@ public class AStarTest {
         assertEquals("56th_20th", states.get(7).getVertex().getLabel());
         assertEquals("near_56th_20th", states.get(8).getVertex().getLabel());
     }
-    
+
     @Test
     public void testMultipleTargets() {
         RoutingRequest options = new RoutingRequest();
@@ -233,14 +236,13 @@ public class AStarTest {
         targets.add(_graph.getVertex("market_russell"));
         targets.add(_graph.getVertex("56th_20th"));
         targets.add(_graph.getVertex("leary_20th"));
-        
+
         SearchTerminationStrategy strategy = new MultiTargetTerminationStrategy(targets);
         ShortestPathTree tree = new GenericAStar().getShortestPathTree(options, -1, strategy);
 
         for (Vertex v : targets) {
             GraphPath path = tree.getPath(v, false);
-            assertNotNull("No path found for target " + v.getLabel(),
-                    path);
+            assertNotNull("No path found for target " + v.getLabel(), path);
         }
     }
 
