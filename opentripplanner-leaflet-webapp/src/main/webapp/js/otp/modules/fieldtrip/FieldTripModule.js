@@ -400,5 +400,34 @@ otp.modules.fieldtrip.FieldTripModule =
         });
 
     },
+
+    showRequests : function() {
+        if(!this.requestsWidget) {
+            this.requestsWidget = new otp.modules.fieldtrip.FieldTripRequestsWidget('otp-'+this.moduleId+'-requestsWidget', this);
+        }
+        if(this.requestsWidget.minimized) this.requestsWidget.unminimize();
+        this.requestsWidget.bringToFront();
+    },
     
+    loadRequests : function() {
+        var this_ = this;
+        $.ajax(this.datastoreUrl+'/fieldTrip/getRequests', {
+            data: {
+                userName : this.userName,
+                password : this.password,                
+                limit : 100,
+            },
+                
+            success: function(data) {
+                if((typeof data) == "string") data = jQuery.parseJSON(data);
+                this_.requestsWidget.updateRequests(data);
+            },
+            
+            error: function(data) {
+                console.log("error retrieving requests");
+                console.log(data);
+            }
+        });
+    },
+        
 });

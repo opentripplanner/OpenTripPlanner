@@ -64,21 +64,28 @@ otp.modules.fieldtrip.FieldTripManagerWidget =
         
         this.tripList = $('<div class="otp-fieldTripManager-callList"></div>').appendTo(tripListContainer);
 
-        this.tripInfo = $('<div class="otp-fieldTripManager-callInfo notDraggable"></div>').appendTo(this.$());
+        var tripInfoContainer = $('<div class="notDraggable" style="height:250px;"></div>').appendTo(this.$());
+        this.tripInfo = $('<div class="otp-fieldTripManager-callInfo notDraggable"></div>').appendTo(tripInfoContainer);
+        var tripButtonRow = $('<div style="margin-top: 4px; text-align: center;" />').appendTo(tripInfoContainer);
         
-        var buttonRow = $('<div class="otp-fieldTrip-buttonRow" />').appendTo(this.$());
+        var mainButtonRow = $('<div class="otp-fieldTrip-buttonRow" />').appendTo(this.$());
         
-        //$('#'+this.id+'-saveButton')
+        
+        $('<button id="'+this.id+'-saveButton">View Requests</button>').button()
+        .appendTo(mainButtonRow).click(function() {
+            this_.module.showRequests();
+        });        
         $('<button id="'+this.id+'-saveButton">Save Current Planned Trip</button>').button()
-        .appendTo(buttonRow).click(function() {
+        .appendTo(mainButtonRow).click(function() {
             this_.module.showSaveWidget();
         });
+        
         $('<button id="'+this.id+'-deleteButton">Delete</button>').button()
-        .appendTo(buttonRow).click(function() {
+        .appendTo(tripButtonRow).click(function() {
             this_.deleteSelectedTrip();
         });
         $('<button id="'+this.id+'-renderButton">Render</button>').button()
-        .appendTo(buttonRow).click(function() {
+        .appendTo(tripButtonRow).click(function() {
             if(this_.selectedTrip !== null) this_.module.renderTrip(this_.selectedTrip);
         });
     },

@@ -30,7 +30,7 @@
 
 .otp-fieldTripManager-callInfo {
     padding: 4px;
-    height: 244px;
+    height: 200px;
     background: #fff;
     overflow: auto;
     width: 200px;
@@ -55,3 +55,25 @@
     margin-bottom: 4px;
 }
 
+.otp-fieldTripRequestsWidget {
+  width: 300px;
+  bottom: 20px;
+  right: 460px;
+  height: 325px;
+}
+
+.otp-fieldTripRequests-list {
+    height: 250px;
+    background: white;
+    border: 1px solid black;
+    overflow: auto;
+}
+
+.otp-fieldTripRequests-buttonRow {
+    text-align: center;
+    margin-top: 8px;
+}
+
+.otp-fieldTripRequests-listRow {
+    padding: 4px;
+}

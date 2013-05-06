@@ -113,17 +113,14 @@ public class FieldTrip extends Application {
     public static void newTrip(ScheduledFieldTrip trip) {
         //TODO: is setting id to null the right way to ensure that an
         //existing trip is not overwritten?
-        System.out.println("trip gi="+ trip.groupItineraries);
         trip.id = null;
         trip.serviceDay = trip.departure;
         User user = getUser();
         if (!user.canScheduleFieldTrips()) {
             //TODO: is this safe if those itineraries exist?
             trip.groupItineraries.clear();
-            System.out.println("trip gi2="+ trip.groupItineraries);
         }
         trip.save();
-        System.out.println("trip gi3="+ trip.groupItineraries);
         Long id = trip.id;
         renderJSON(id);
     }
@@ -157,4 +154,25 @@ public class FieldTrip extends Application {
         renderJSON(id);
     }
 
+    public static void newRequest(FieldTripRequest request) {
+        request.id = null;
+        request.save();
+        Long id = request.id;
+        renderJSON(id);
+    }
+    
+    public static void getRequests(Integer limit) {
+        List<FieldTripRequest> requests;
+        String sql = "";
+        if(limit == null)
+            requests = FieldTripRequest.find(sql).fetch();
+        else {
+            requests = FieldTripRequest.find(sql).fetch(limit);
+        }
+
+        Gson gson = new GsonBuilder()
+          .excludeFieldsWithoutExposeAnnotation()  
+          .create();
+        renderJSON(gson.toJson(requests));
+    }
 }

@@ -23,6 +23,8 @@ POST    /fieldTrip/newTrip                      FieldTrip.newTrip
 POST    /fieldTrip/addItinerary                 FieldTrip.addItinerary
 POST    /fieldTrip/addTripFeedback              FieldTrip.addTripFeedback
 POST    /fieldTrip/deleteTrip                   FieldTrip.deleteTrip
+POST    /fieldTrip/newRequest                   FieldTrip.newRequest
+GET     /fieldTrip/getRequests                  FieldTrip.getRequests
 
 #Users
 GET      /users                                 UserManagement.getUsers
