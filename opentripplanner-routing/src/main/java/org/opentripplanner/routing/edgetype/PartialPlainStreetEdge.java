@@ -23,7 +23,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * Represents a segment of a StreetEdge.
+ * Represents a sub-segment of a StreetEdge.
  * 
  * @author avi
  */
@@ -96,8 +96,13 @@ public class PartialPlainStreetEdge extends PlainStreetEdge {
     
     @Override
     public boolean isReverseOf(Edge e) {
+        Edge other = e;
+        if (e instanceof PartialPlainStreetEdge) {
+            other = ((PartialPlainStreetEdge) e).getParentEdge();
+        }
+        
         // TODO(flamholz): is there a case where a partial edge has a reverse of its own?
-        return parentEdge.isReverseOf(e);
+        return parentEdge.isReverseOf(other);
     }
     
     @Override

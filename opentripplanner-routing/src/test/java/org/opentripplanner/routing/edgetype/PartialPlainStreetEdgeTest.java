@@ -32,7 +32,7 @@ public class PartialPlainStreetEdgeTest {
     
     private Graph _graph;
     private StreetVertex v1, v2;
-    private PlainStreetEdge e1;
+    private PlainStreetEdge e1, e2;
     
     @Before
     public void setUp() throws Exception {
@@ -43,6 +43,7 @@ public class PartialPlainStreetEdgeTest {
         v2 = vertex("maple_2nd", 1.0, 2.0);
         
         e1 = edge(v1, v2, 1.0, StreetTraversalPermission.ALL);
+        e2 = edge(v2, v1, 1.0, StreetTraversalPermission.ALL);
     }
 
     @Test
@@ -54,6 +55,8 @@ public class PartialPlainStreetEdgeTest {
         assertTrue(pEdge.isEquivalentTo(e1));
         assertTrue(pEdge.isPartial());
         assertTrue(pEdge.isBack());
+        assertFalse(pEdge.isReverseOf(e1));
+        assertTrue(pEdge.isReverseOf(e2));
         assertEquals(e1.getId(), pEdge.getId());
         assertEquals(perm, pEdge.getPermission());
         assertEquals(e1.getCarSpeed(), pEdge.getCarSpeed(), 0.0);
@@ -65,6 +68,8 @@ public class PartialPlainStreetEdgeTest {
         assertTrue(pEdge.isEquivalentTo(e1));
         assertTrue(pEdge.isPartial());
         assertFalse(pEdge.isBack());
+        assertFalse(pEdge.isReverseOf(e1));
+        assertTrue(pEdge.isReverseOf(e2));
         assertEquals(e1.getId(), pEdge.getId());
         assertEquals(e1.getPermission(), pEdge.getPermission());
         assertEquals(e1.getCarSpeed(), pEdge.getCarSpeed(), 0.0);
@@ -90,6 +95,27 @@ public class PartialPlainStreetEdgeTest {
         assertEquals(s1.getTime(), partialS1.getTime());
         assertEquals(s1.getElapsedTime(), partialS1.getElapsedTime());
         assertEquals(s1.getWeight(), partialS1.getWeight(), 0.0);
+    }
+    
+    @Test
+    public void testReverseEdge() {
+        PartialPlainStreetEdge pEdge1 = new PartialPlainStreetEdge(e1, v1, v2, e1.getGeometry(),
+                "partial e1", e1.getLength());
+        PartialPlainStreetEdge pEdge2 = new PartialPlainStreetEdge(e2, v2, v1, e2.getGeometry(),
+                "partial e2", e2.getLength());
+        
+        assertFalse(e1.isReverseOf(pEdge1));
+        assertFalse(pEdge1.isReverseOf(e1));
+        
+        assertFalse(e2.isReverseOf(pEdge2));
+        assertFalse(pEdge2.isReverseOf(e2));
+        
+        assertTrue(e1.isReverseOf(pEdge2));
+        assertTrue(e2.isReverseOf(pEdge1));
+        assertTrue(e2.isReverseOf(e1));
+        assertTrue(e1.isReverseOf(e2));
+        assertTrue(pEdge1.isReverseOf(pEdge2));
+        assertTrue(pEdge2.isReverseOf(pEdge1));
     }
     
     /****
