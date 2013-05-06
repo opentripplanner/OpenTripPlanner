@@ -333,7 +333,7 @@ otp.widgets.TW_ModeSelector =
             html += '<option>'+text+'</option>';            
         });
         html += '</select>';
-        html += '<div id="'+this.id+'-widgets"></div>';
+        html += '<div id="'+this.id+'-widgets" style="overflow: hidden;"></div>';
         html += "</div>";
         
         $(html).appendTo(this.$());
