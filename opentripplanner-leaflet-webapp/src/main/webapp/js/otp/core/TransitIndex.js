@@ -144,5 +144,27 @@ otp.core.TransitIndex = otp.Class({
             }
         });
     },
+
+    runStopTimesQuery2 : function(agencyId, stopId, startTime, endTime, callbackTarget, callback) {
+        //var this_ = this;
+        var params = {
+            agency: agencyId,
+            id: stopId,
+            startTime : startTime,
+            endTime : endTime
+        };
+        if(otp.config.routerId !== undefined) {
+            params.routerId = otp.config.routerId;
+        }
         
+        var url = otp.config.hostname + '/opentripplanner-api-webapp/ws/transit/stopTimesForStop';
+        $.ajax(url, {
+            data:       params,
+            dataType:   'jsonp',
+                
+            success: function(data) {
+                callback.call(callbackTarget, data);                
+            }
+        });
+    },        
 });

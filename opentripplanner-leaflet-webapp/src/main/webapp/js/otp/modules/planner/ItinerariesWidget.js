@@ -497,11 +497,14 @@ otp.widgets.ItinerariesWidget =
                 //console.log(evt);
                 //var stopsWidget = new otp.widgets.StopTimesWidget(this_.id+"-stopWidget-"+stopID, this_.widgetManager);
                 if(!this_.module.stopViewerWidget) {
-                    this_.module.stopViewerWidget = new otp.modules.multimodal.StopViewerWidget("otp-"+this.moduleId+"-stopViewerWidget", this_.module);
+                    //this_.module.stopViewerWidget = new otp.modules.multimodal.StopViewerWidget("otp-"+this.moduleId+"-stopViewerWidget", this_.module);
+                    this_.module.stopViewerWidget = new otp.widgets.transit.StopViewerWidget("otp-"+this.moduleId+"-stopViewerWidget", this_.module);
                     this_.module.stopViewerWidget.$().offset({top: evt.clientY, left: evt.clientX});
                 }
                 this_.module.stopViewerWidget.show();
-                this_.module.stopViewerWidget.update(leg, times);
+                //this_.module.stopViewerWidget.update(leg, times);
+                this_.module.stopViewerWidget.activeTime = leg.startTime;
+                this_.module.stopViewerWidget.setStop(leg.from.stopId.agencyId, leg.from.stopId.id, leg.from.name);
                 this_.module.stopViewerWidget.bringToFront();
                 //this_.widgetManager.addWidget(stopsWidget);
             });

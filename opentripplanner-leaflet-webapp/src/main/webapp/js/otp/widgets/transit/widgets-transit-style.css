@@ -49,3 +49,15 @@
 .otp-tripViewer-stopRow-idLine a:hover {
     text-decoration: underline;
 }
+
+.otp-stopViewer-infoRow {
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.otp-stopViewer-dateRow {
+    font-size: 14px;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
