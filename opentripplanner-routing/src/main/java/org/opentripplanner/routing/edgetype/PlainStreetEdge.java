@@ -70,6 +70,9 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     private String name;
 
     @Getter @Setter
+    private String label;
+    
+    @Getter @Setter
     private boolean wheelchairAccessible = true;
 
     @Getter @Setter
