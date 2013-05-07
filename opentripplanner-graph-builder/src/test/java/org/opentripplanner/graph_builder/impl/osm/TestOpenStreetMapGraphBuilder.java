@@ -61,16 +61,16 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         loader.buildGraph(gg, extra);
 
         // Kamiennogorska at south end of segment
-        Vertex v1 = gg.getVertex("osm node 280592578");
+        Vertex v1 = gg.getVertex("osm:node:280592578");
 
         // Kamiennogorska at Mariana Smoluchowskiego
-        Vertex v2 = gg.getVertex("osm node 288969929");
+        Vertex v2 = gg.getVertex("osm:node:288969929");
 
         // Mariana Smoluchowskiego, north end
-        Vertex v3 = gg.getVertex("osm node 280107802");
+        Vertex v3 = gg.getVertex("osm:node:280107802");
 
         // Mariana Smoluchowskiego, south end (of segment connected to v2)
-        Vertex v4 = gg.getVertex("osm node 288970952");
+        Vertex v4 = gg.getVertex("osm:node:288970952");
 
         assertNotNull(v1);
         assertNotNull(v2);
@@ -119,20 +119,20 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         loader.buildGraph(gg, extra);
         
         // These vertices are labeled in the OSM file as having traffic lights.
-        IntersectionVertex iv1 = (IntersectionVertex) gg.getVertex("osm node 1919595918");
-        IntersectionVertex iv2 = (IntersectionVertex) gg.getVertex("osm node 42442273");
-        IntersectionVertex iv3 = (IntersectionVertex) gg.getVertex("osm node 1919595927");
-        IntersectionVertex iv4 = (IntersectionVertex) gg.getVertex("osm node 42452026");
+        IntersectionVertex iv1 = (IntersectionVertex) gg.getVertex("osm:node:1919595918");
+        IntersectionVertex iv2 = (IntersectionVertex) gg.getVertex("osm:node:42442273");
+        IntersectionVertex iv3 = (IntersectionVertex) gg.getVertex("osm:node:1919595927");
+        IntersectionVertex iv4 = (IntersectionVertex) gg.getVertex("osm:node:42452026");
         assertTrue(iv1.isTrafficLight());
         assertTrue(iv2.isTrafficLight());
         assertTrue(iv3.isTrafficLight());
         assertTrue(iv4.isTrafficLight());
         
         // These are not.
-        IntersectionVertex iv5 = (IntersectionVertex) gg.getVertex("osm node 42435485");
-        IntersectionVertex iv6 = (IntersectionVertex) gg.getVertex("osm node 42439335");
-        IntersectionVertex iv7 = (IntersectionVertex) gg.getVertex("osm node 42436761");
-        IntersectionVertex iv8 = (IntersectionVertex) gg.getVertex("osm node 42442291");
+        IntersectionVertex iv5 = (IntersectionVertex) gg.getVertex("osm:node:42435485");
+        IntersectionVertex iv6 = (IntersectionVertex) gg.getVertex("osm:node:42439335");
+        IntersectionVertex iv7 = (IntersectionVertex) gg.getVertex("osm:node:42436761");
+        IntersectionVertex iv8 = (IntersectionVertex) gg.getVertex("osm:node:42442291");
         assertFalse(iv5.isTrafficLight());
         assertFalse(iv6.isTrafficLight());
         assertFalse(iv7.isTrafficLight());

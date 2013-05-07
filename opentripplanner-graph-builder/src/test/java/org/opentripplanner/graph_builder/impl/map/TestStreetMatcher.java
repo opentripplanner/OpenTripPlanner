@@ -301,5 +301,10 @@ public class TestStreetMatcher {
             
         }
 
+        @Override
+        public String getLabel() {
+            return "label";
+        }
+
     }
 }
