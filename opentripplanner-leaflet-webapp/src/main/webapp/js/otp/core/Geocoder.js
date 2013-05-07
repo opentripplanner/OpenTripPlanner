@@ -34,8 +34,8 @@ otp.core.Geocoder = otp.Class({
             data : params,
             
             success: function(data) {
+                if((typeof data) == "string") data = jQuery.parseXML(data);
                 var results = [];
-                
                 $(data).find("geocoderResults").find("results").find("result").each(function () {
                     var resultXml = $(this);
                     

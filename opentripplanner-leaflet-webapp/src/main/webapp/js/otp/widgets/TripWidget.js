@@ -195,6 +195,7 @@ otp.widgets.TW_LocationsSelector =
         input.autocomplete({
             source: function(request, response) {
                 this_.geocoders[this_.activeIndex].geocode(request.term, function(results) {
+                    console.log("got results "+results.length);
                     response.call(this, _.pluck(results, 'description'));
                     this_.updateResultLookup(results);
                 });
