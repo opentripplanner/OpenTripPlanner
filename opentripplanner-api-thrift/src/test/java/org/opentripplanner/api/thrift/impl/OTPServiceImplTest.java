@@ -95,7 +95,7 @@ public class OTPServiceImplTest {
 
     @Before
     public void before() {
-        rand = new Random(12345);
+        rand = new Random(1234);
 
         GraphServiceImpl graphService = new GraphServiceImpl();
         graphService.registerGraph("", graph);
