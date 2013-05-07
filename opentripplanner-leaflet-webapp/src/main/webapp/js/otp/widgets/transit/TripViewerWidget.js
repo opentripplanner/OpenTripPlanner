@@ -236,8 +236,17 @@ otp.widgets.transit.TripViewerWidget =
                 this_.module.webapp.map.lmap.panTo(new L.LatLng(stop.lat, stop.lon));
             });
             $('<span>&nbsp;[<a href="#">Viewer</a>]</span>').appendTo(idLine)
+            .data("stop", stop)
             .click(function(evt) {
-                console.log("Stop Viewer");
+                var stop = $(this).data("stop");
+                if(!this_.module.stopViewerWidget) {
+                    this_.module.stopViewerWidget = new otp.widgets.transit.StopViewerWidget("otp-"+this_.module.id+"-stopViewerWidget", this_.module);
+                    this_.module.stopViewerWidget.$().offset({top: evt.clientY, left: evt.clientX});
+                }
+                this_.module.stopViewerWidget.show();
+                //this_.module.stopViewerWidget.activeTime = leg.startTime;
+                this_.module.stopViewerWidget.setStop(stop.id.agencyId, stop.id.id, stop.name);
+                this_.module.stopViewerWidget.bringToFront();
             });
             
             // highlight the boarded stops
