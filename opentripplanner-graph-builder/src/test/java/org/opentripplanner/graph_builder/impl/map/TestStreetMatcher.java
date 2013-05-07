@@ -296,10 +296,7 @@ public class TestStreetMatcher {
         }
 
         @Override
-        public void setCarSpeed(float carSpeed) {
-            // TODO Auto-generated method stub
-            
-        }
+        public void setCarSpeed(float carSpeed) {}
 
         @Override
         public String getLabel() {
