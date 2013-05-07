@@ -34,6 +34,7 @@ import org.opentripplanner.gbannotation.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
@@ -44,6 +45,7 @@ import org.opentripplanner.routing.edgetype.PatternEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.index.strtree.STRtree;
@@ -506,6 +508,11 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
             for (Vertex v : visibleVertices) {
                 if (drawTransitStopVertices && v instanceof TransitStop) {
                     drawVertex(v, 5);
+                } else if (v instanceof IntersectionVertex) {
+                    IntersectionVertex iv = (IntersectionVertex) v;
+                    if (iv.isTrafficLight()) {
+                        drawVertex(v, 7);
+                    }
                 }
             }
             /* Draw highlighted edges in another color */
