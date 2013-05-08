@@ -1,19 +1,14 @@
-// step 1: make sure we have some type of otp.config, and otp.config.locale defined
+// make sure we have otp.config and otp.config.locale defined
 if(typeof(otp) == "undefined" || otp == null) otp = {};
 if(typeof(otp.config) == "undefined" || otp.config == null) otp.config = {};
 //if(typeof(otp.config.locale) == "undefined" || otp.config.locale == null) otp.config.locale = otp.locale.English;
 
 
-// step 2: create an object of default otp.config default values (see step3 where we apply this to any existing config)
 otp.config = {
 
-    //hostname : "http://trimet-tomcat.deployer.opentripplanner.org",
-    //municoderHostname : "http://trimet-tomcat.deployer.opentripplanner.org",
-    //loggerURL : 'http://trimet-logger.deployer.opentripplanner.org',
-    
     hostname : "http://localhost:8080",
-    //municoderHostname : "http://localhost:8080",
-    loggerURL : 'http://localhost:9000',
+    municoderHostname : "http://localhost:8080",
+    datastoreUrl : 'http://localhost:9000',
       
     baseLayers: [
         {
@@ -57,6 +52,12 @@ otp.config = {
     
     modules : [
         {
+            id : 'planner',
+            className : 'otp.modules.multimodal.MultimodalPlannerModule',
+            defaultBaseLayer : 'MapQuest OSM',
+            isDefault: true
+        },
+        {
             id : 'ct',
             className : 'otp.modules.calltaker.CallTakerModule',
             defaultBaseLayer : 'MapQuest OSM'
@@ -64,12 +65,6 @@ otp.config = {
         {
             id : 'ft',
             className : 'otp.modules.fieldtrip.FieldTripModule',
-            defaultBaseLayer : 'MapQuest OSM',
-            isDefault: true
-        },
-        {
-            id : 'planner',
-            className : 'otp.modules.multimodal.MultimodalPlannerModule',
             defaultBaseLayer : 'MapQuest OSM',
         },
         {

@@ -28,7 +28,7 @@ otp.modules.fieldtrip.FieldTripModule =
     //itineraries : null,
     groupPlan : null,
     
-    datastoreUrl : otp.config.loggerURL,
+    datastoreUrl : otp.config.datastoreUrl,
     
     userName : "admin",
     password : "secret",

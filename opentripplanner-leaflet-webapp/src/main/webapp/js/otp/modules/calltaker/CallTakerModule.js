@@ -20,7 +20,7 @@ otp.namespace("otp.modules.calltaker");
 otp.modules.calltaker.PastQueryCollection = 
     Backbone.Collection.extend({
     
-    url: otp.config.loggerURL+'/getQueries',
+    url: otp.config.datastoreUrl+'/getQueries',
     model: otp.modules.calltaker.PastQueryModel,
    
     sync: function(method, model, options) {
@@ -181,7 +181,7 @@ otp.modules.calltaker.CallTaker = otp.Class({
 
 otp.modules.calltaker.Call = Backbone.Model.extend({
     
-    url : otp.config.loggerURL+'/call',
+    url : otp.config.datastoreUrl+'/call',
     playName : 'call',
     queries : null,   
     
@@ -198,13 +198,13 @@ otp.modules.calltaker.Call = Backbone.Model.extend({
 
 otp.modules.calltaker.CallList = Backbone.Collection.extend({
     model: otp.modules.calltaker.Call,
-    url: otp.config.loggerURL+'/call',
+    url: otp.config.datastoreUrl+'/call',
 });
 
 
 otp.modules.calltaker.Query = Backbone.Model.extend({
     
-    url : otp.config.loggerURL+'/callQuery',
+    url : otp.config.datastoreUrl+'/callQuery',
     playName : 'query'
    
 });
@@ -212,7 +212,7 @@ otp.modules.calltaker.Query = Backbone.Model.extend({
 otp.modules.calltaker.QueryList = Backbone.Collection.extend({
 
     model: otp.modules.calltaker.Query,
-    url: otp.config.loggerURL+'/callQuery',
+    url: otp.config.datastoreUrl+'/callQuery',
        
 });
 
