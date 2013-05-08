@@ -547,7 +547,7 @@ otp.widgets.TW_BikeTriangle =
             this_.tripWidget.module.triangleTimeFactor = formData.triangleTimeFactor;
             this_.tripWidget.module.triangleSlopeFactor = formData.triangleSlopeFactor;
             this_.tripWidget.module.triangleSafetyFactor = formData.triangleSafetyFactor;
-            this_.tripWidget.module.planTrip();
+            if(this_.tripWidget.module.planTrip) this_.tripWidget.module.planTrip();
         };
     },
 

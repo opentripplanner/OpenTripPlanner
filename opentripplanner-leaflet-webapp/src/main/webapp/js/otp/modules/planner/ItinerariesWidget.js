@@ -656,7 +656,8 @@ otp.widgets.ItinerariesWidget =
     
         this.municoderResultId++;
         var spanId = 'otp-municoderResult-'+this.municoderResultId;
-        
+
+        console.log("muniReq");        
         $.ajax(otp.config.municoderHostname+"/opentripplanner-municoder/municoder", {
         
             data : { location : lat+","+lon },           

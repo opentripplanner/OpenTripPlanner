@@ -51,10 +51,10 @@ otp.modules.analyst.AnalystModule =
         this.optionsWidget.minimizable = true;
         this.optionsWidget.addHeader("Travel Options");
         
-        if(this.webapp.geocoders && this.webapp.geocoders.length > 0) {
+        /*if(this.webapp.geocoders && this.webapp.geocoders.length > 0) {
             this.optionsWidget.addControl("locations", new otp.widgets.TW_LocationsSelector(this.optionsWidget, this.webapp.geocoders), true);
             this.optionsWidget.addVerticalSpace(12, true);
-        }
+        }*/
                 
         this.optionsWidget.addControl("time", new otp.widgets.TW_TimeSelector(this.optionsWidget), true);
         this.optionsWidget.addVerticalSpace(12, true);
@@ -69,7 +69,15 @@ otp.modules.analyst.AnalystModule =
 
         modeSelector.refreshModeControls();
 
+        var buttonRow = $('<div style="text-align: center; margin-top: 6px;"></div>')
+        .appendTo(this.optionsWidget.$());
+        
+        $('<button>Refresh</button>').button().click(function() {
+            this_.runAnalystQuery();            
+        }).appendTo(buttonRow);
 
+        // set up legend widget 
+        this.legendWidget = new otp.modules.analyst.AnalystLegendWidget(this.id + 'legend', this, 300, 40);
         // set up location marker
         this.startLatLng = this.webapp.map.lmap.getCenter();
         
@@ -79,7 +87,6 @@ otp.modules.analyst.AnalystModule =
             this_.webapp.hideSplash();
             this_.startLatLng = this_.locMarker.getLatLng();
             this_.runAnalystQuery();
-            console.log("dragged");
         });
         this.markerLayer.addLayer(this.locMarker);
 
@@ -129,6 +136,7 @@ otp.modules.analyst.AnalystModule =
 	    this.analystLayer._url = URL;
         this.webapp.map.lmap.addLayer(this.analystLayer);
 
+        this.legendWidget.refresh(params);
 	    //legend.src = "/opentripplanner-api-webapp/ws/legend.png?width=300&height=40&styles=" + params.styles;
 	    //return false;*/
     },     
