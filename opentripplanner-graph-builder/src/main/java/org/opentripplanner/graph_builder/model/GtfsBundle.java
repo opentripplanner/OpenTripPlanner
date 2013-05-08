@@ -187,9 +187,9 @@ public class GtfsBundle {
             try {
                 HttpUtils.testUrl(url.toExternalForm());
             } catch (ClientProtocolException e) {
-                throw new RuntimeException("GTFS url " + url.toExternalForm() + " is invalid.");
+                throw new RuntimeException("Error connecting to " + url.toExternalForm() + "\n" + e);
             } catch (IOException e) {
-                throw new RuntimeException("GTFS url " + url.toExternalForm() + " is invalid.");
+                throw new RuntimeException("GTFS url " + url.toExternalForm() + " cannot be read.\n" + e);
             }
         }
 
