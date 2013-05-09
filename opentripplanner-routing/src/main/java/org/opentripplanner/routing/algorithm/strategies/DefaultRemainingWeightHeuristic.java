@@ -81,23 +81,26 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
         if (useTransit) {
             double streetSpeed = options.getStreetSpeedUpperBound();
             if (s.isAlightedLocal() || euclideanDistance < target.getDistanceToNearestTransitStop()) { 
-                // search allows using transit, passenger is alighted local or within mandatory 
-                // walking distance of the target.
+                // Search allows using transit, passenger is alighted local or within mandatory 
+                // walking distance of the target. We will not reach the target via transit.
                 if (euclideanDistance + s.getWalkDistance() > options.getMaxWalkDistance()) {
                     return -1; // impossible to reach destination
                 }
                 return options.walkReluctance * euclideanDistance / streetSpeed;
             }
-            // Search allows using transit, not alighted local and not within walking distance of
-            // the target. It is impossible to reach the destination without transit.
+            // Search allows using transit, passenger is not alighted local and is not within 
+            // mandatory walking distance of the target: It is possible we will reach the 
+            // destination using transit. Find lower bound on cost of this hypothetical trip.
             int boardCost;
             if (s.isOnboard()) {
+                // onboard: we might not need any more boardings (remember this is a lower bound).
                 boardCost = 0;
             } else {
-                // offboard: we know that at least one boarding must occur to reach the destination
+                // offboard: we know that using transit to reach the destination would require at
+                // least one boarding.
                 boardCost = options.getBoardCostLowerBound();
                 if (s.isEverBoarded()) {
-                    // the expected boarding will be a transfer, because we've boarded before
+                    // the boarding would be a transfer, because we've boarded before.
                     boardCost += options.transferPenalty;
                     if (localStreetService != null) {
                         if (options.getMaxWalkDistance() - s.getWalkDistance() < euclideanDistance
@@ -108,14 +111,19 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
                     }
                 }
             }
+            // Find how much mandatory walking is needed to use transit from here.
+            // If the passenger is onboard, the second term is zero.
             double mandatoryWalkDistance = target.getDistanceToNearestTransitStop()
                     + sv.getDistanceToNearestTransitStop();
             if (mandatoryWalkDistance + s.getWalkDistance() > options.getMaxWalkDistance()) {
-                return -1;
+                return -1; // impossible to reach target via transit? SEEMS INCORRECT since transit trip is hypothetical (abyrd)
             }
-            double distance = (euclideanDistance - mandatoryWalkDistance) / maxSpeed
-                    + mandatoryWalkDistance * options.walkReluctance / streetSpeed + boardCost;
-            return Math.min(distance, options.walkReluctance * euclideanDistance / streetSpeed);
+            double transitCost = (euclideanDistance - mandatoryWalkDistance) / maxSpeed + boardCost; 
+            double transitStreetCost = mandatoryWalkDistance * options.walkReluctance / streetSpeed; 
+            // Compare transit use with the cost of just walking all the way to the destination, 
+            // and return the lower of the two.
+            return Math.min(transitCost + transitStreetCost, 
+                            options.walkReluctance * euclideanDistance / streetSpeed);
         } else {
             // search disallows using transit: all travel is on-street
             return options.walkReluctance * euclideanDistance / maxSpeed;
