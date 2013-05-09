@@ -92,15 +92,18 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
                 if (s.isOnboard()) {
                     boardCost = 0;
                 } else {
+                    // offboard, and impossible to reach the destination without transit
+                    // we know that at least one boarding must occur to reach the destination
                     boardCost = options.getBoardCostLowerBound();
-                }
-                if (s.isEverBoarded()) {
-                    boardCost += options.transferPenalty;
-                    if (localStreetService != null) {
-                        if (options.getMaxWalkDistance() - s.getWalkDistance() < euclideanDistance
-                                && sv instanceof IntersectionVertex
-                                && !localStreetService.transferrable(sv)) {
-                            return Double.POSITIVE_INFINITY;
+                    if (s.isEverBoarded()) {
+                        // the expected boarding will be a transfer, because we've boarded before
+                        boardCost += options.transferPenalty;
+                        if (localStreetService != null) {
+                            if (options.getMaxWalkDistance() - s.getWalkDistance() < euclideanDistance
+                                    && sv instanceof IntersectionVertex
+                                    && !localStreetService.transferrable(sv)) {
+                                return Double.POSITIVE_INFINITY;
+                            }
                         }
                     }
                 }
