@@ -884,7 +884,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     /** @return The highest speed for all possible road-modes. */
-    public double getRoadSpeedUpperBound() {
+    public double getStreetSpeedUpperBound() {
         // Assume carSpeed > bikeSpeed > walkSpeed
         if (modes.getDriving())
             return carSpeed;

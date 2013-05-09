@@ -633,7 +633,7 @@ public class RaptorSearch {
 
                 if (maxTimeDayIndex > 0 && remainingWalk < 3218) {
                     double minTime = (targetDistance - minWalk) / Raptor.MAX_TRANSIT_SPEED
-                            + minWalk / options.getRoadSpeedUpperBound();
+                            + minWalk / options.getStreetSpeedUpperBound();
                     if (targetDistance > remainingWalk)
                         minTime += boardSlack;
 

@@ -81,12 +81,12 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
          *     walking.
          */
         if (useTransit) {
-            double speed = options.getRoadSpeedUpperBound();
+            double streetSpeed = options.getStreetSpeedUpperBound();
             if (s.isAlightedLocal()) {
                 if (euclidianDistance + s.getWalkDistance() > options.getMaxWalkDistance()) {
                     return -1;
                 }
-                return options.walkReluctance * euclidianDistance / speed;
+                return options.walkReluctance * euclidianDistance / streetSpeed;
             } else {
                 int boardCost;
                 if (s.isOnboard()) {
@@ -108,7 +108,7 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
                     if (euclidianDistance + s.getWalkDistance() > options.getMaxWalkDistance()) {
                         return -1;
                     }
-                    return options.walkReluctance * euclidianDistance / speed;
+                    return options.walkReluctance * euclidianDistance / streetSpeed;
                 } else {
                     double mandatoryWalkDistance = target.getDistanceToNearestTransitStop()
                             + sv.getDistanceToNearestTransitStop();
@@ -116,8 +116,8 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
                         return -1;
                     }
                     double distance = (euclidianDistance - mandatoryWalkDistance) / maxSpeed
-                            + mandatoryWalkDistance * options.walkReluctance / speed + boardCost;
-                    return Math.min(distance, options.walkReluctance * euclidianDistance / speed);
+                            + mandatoryWalkDistance * options.walkReluctance / streetSpeed + boardCost;
+                    return Math.min(distance, options.walkReluctance * euclidianDistance / streetSpeed);
                 }
             }
         } else {
@@ -136,7 +136,7 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
                 target.getCoordinate());
 
         if (useTransit) {
-            double speed = options.getRoadSpeedUpperBound();
+            double speed = options.getStreetSpeedUpperBound();
             if (s.isAlightedLocal()) {
                 if (euclidianDistance + s.getWalkDistance() > options.getMaxWalkDistance()) {
                     return -1;
@@ -180,11 +180,11 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
             return 10;
         } else {
             if (options.optimize == OptimizeType.QUICK) {
-                return options.getRoadSpeedUpperBound();
+                return options.getStreetSpeedUpperBound();
             } else {
                 // assume that the best route is no more than 10 times better than
                 // the as-the-crow-flies flat base route.
-                return options.getRoadSpeedUpperBound() * 10;
+                return options.getStreetSpeedUpperBound() * 10;
             }
         }
     }

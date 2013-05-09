@@ -103,7 +103,7 @@ public class BidirectionalRemainingWeightHeuristic implements RemainingWeightHeu
                     if (d > s.getOptions().getMaxWalkDistance() - s.getWalkDistance()) {
                         return Double.MAX_VALUE;
                     }
-                    double walk = d / s.getOptions().getRoadSpeedUpperBound();
+                    double walk = d / s.getOptions().getStreetSpeedUpperBound();
                     return Math.max(h, walk);
                 }
             }
