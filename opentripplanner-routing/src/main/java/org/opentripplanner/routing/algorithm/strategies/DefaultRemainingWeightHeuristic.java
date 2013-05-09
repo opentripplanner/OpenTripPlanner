@@ -80,59 +80,53 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
                 targetX);
         if (useTransit) {
             double streetSpeed = options.getStreetSpeedUpperBound();
-            if (s.isAlightedLocal()) {
-                // search allows using transit, alighted local
+            if (s.isAlightedLocal() || euclideanDistance < target.getDistanceToNearestTransitStop()) { 
+                // search allows using transit, passenger is alighted local or within mandatory 
+                // walking distance of the target.
                 if (euclideanDistance + s.getWalkDistance() > options.getMaxWalkDistance()) {
-                    return -1;
+                    return -1; // impossible to reach destination
                 }
                 return options.walkReluctance * euclideanDistance / streetSpeed;
+            }
+            // Search allows using transit, not alighted local and not within walking distance of
+            // the target. It is impossible to reach the destination without transit.
+            int boardCost;
+            if (s.isOnboard()) {
+                boardCost = 0;
             } else {
-                // search allows using transit, not alighted local
-                int boardCost;
-                if (s.isOnboard()) {
-                    boardCost = 0;
-                } else {
-                    // offboard, and impossible to reach the destination without transit
-                    // we know that at least one boarding must occur to reach the destination
-                    boardCost = options.getBoardCostLowerBound();
-                    if (s.isEverBoarded()) {
-                        // the expected boarding will be a transfer, because we've boarded before
-                        boardCost += options.transferPenalty;
-                        if (localStreetService != null) {
-                            if (options.getMaxWalkDistance() - s.getWalkDistance() < euclideanDistance
-                                    && sv instanceof IntersectionVertex
-                                    && !localStreetService.transferrable(sv)) {
-                                return Double.POSITIVE_INFINITY;
-                            }
+                // offboard: we know that at least one boarding must occur to reach the destination
+                boardCost = options.getBoardCostLowerBound();
+                if (s.isEverBoarded()) {
+                    // the expected boarding will be a transfer, because we've boarded before
+                    boardCost += options.transferPenalty;
+                    if (localStreetService != null) {
+                        if (options.getMaxWalkDistance() - s.getWalkDistance() < euclideanDistance
+                                && sv instanceof IntersectionVertex
+                                && !localStreetService.transferrable(sv)) {
+                            return Double.POSITIVE_INFINITY;
                         }
                     }
                 }
-                if (euclideanDistance < target.getDistanceToNearestTransitStop()) {
-                    // search allows using transit, not alighted local, 
-                    // within obligatory walking dist of target
-                    if (euclideanDistance + s.getWalkDistance() > options.getMaxWalkDistance()) {
-                        return -1;
-                    }
-                    return options.walkReluctance * euclideanDistance / streetSpeed;
-                } else {
-                    // search allows using transit, not alighted local, 
-                    // outside obligatory walking dist of target
-                    double mandatoryWalkDistance = target.getDistanceToNearestTransitStop()
-                            + sv.getDistanceToNearestTransitStop();
-                    if (mandatoryWalkDistance + s.getWalkDistance() > options.getMaxWalkDistance()) {
-                        return -1;
-                    }
-                    double distance = (euclideanDistance - mandatoryWalkDistance) / maxSpeed
-                            + mandatoryWalkDistance * options.walkReluctance / streetSpeed + boardCost;
-                    return Math.min(distance, options.walkReluctance * euclideanDistance / streetSpeed);
-                }
             }
+            double mandatoryWalkDistance = target.getDistanceToNearestTransitStop()
+                    + sv.getDistanceToNearestTransitStop();
+            if (mandatoryWalkDistance + s.getWalkDistance() > options.getMaxWalkDistance()) {
+                return -1;
+            }
+            double distance = (euclideanDistance - mandatoryWalkDistance) / maxSpeed
+                    + mandatoryWalkDistance * options.walkReluctance / streetSpeed + boardCost;
+            return Math.min(distance, options.walkReluctance * euclideanDistance / streetSpeed);
         } else {
             // search disallows using transit: all travel is on-street
             return options.walkReluctance * euclideanDistance / maxSpeed;
         }
     }
 
+    /** 
+     * WARNING due to changes in progress, reverse method is different than forward method.
+     * This should probably be resolved by merging the two, rather than trying to keep the two
+     * in sync.
+     */
     @Override
     public double computeReverseWeight(State s, Vertex target) {
         // from and to are interpreted in the direction of traversal
