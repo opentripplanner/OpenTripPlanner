@@ -306,8 +306,8 @@ public abstract class RoutingResource {
             request.setBannedTrips(bannedTripMap);
         }
         
-        // replace deprecated optimization preference
-        // opt has already been assigned above
+        // "Least transfers" optimization is accomplished via an increased transfer penalty.
+        // See comment on RoutingRequest.transferPentalty.
         if (opt == OptimizeType.TRANSFERS) {
             opt = OptimizeType.QUICK;
             request.setTransferPenalty(get(transferPenalty, n, 0) + 1800);
