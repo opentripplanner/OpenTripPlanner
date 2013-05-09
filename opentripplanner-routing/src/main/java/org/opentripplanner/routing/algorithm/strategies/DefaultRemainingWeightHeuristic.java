@@ -24,7 +24,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
 /**
- * A euclidian remaining weight strategy that takes into account transit boarding costs where applicable.
+ * A Euclidean remaining weight strategy that takes into account transit boarding costs where applicable.
  * 
  */
 public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic {
@@ -61,33 +61,33 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
                 targetX) / maxSpeed;
     }
 
+    /**
+     * On a non-transit trip, the remaining weight is simply distance / speed.
+     * On a transit trip, there are two cases: 
+     * (1) we're not on a transit vehicle. In this case, there are two possible ways to compute 
+     *     the remaining distance, and we take whichever is smaller: 
+     *     (a) walking distance / walking speed 
+     *     (b) boarding cost + transit distance / transit speed (this is complicated a bit when 
+     *         we know that there is some walking portion of the trip). 
+     * (2) we are on a transit vehicle, in which case the remaining weight is simply transit 
+     *     distance / transit speed (no need for boarding cost), again considering any mandatory 
+     *     walking.
+     */
     @Override
     public double computeForwardWeight(State s, Vertex target) {
-
         Vertex sv = s.getVertex();
-        double euclidianDistance = distanceLibrary.fastDistance(sv.getY(), sv.getX(), targetY,
+        double euclideanDistance = distanceLibrary.fastDistance(sv.getY(), sv.getX(), targetY,
                 targetX);
-
-        /*
-         * On a non-transit trip, the remaining weight is simply distance / speed.
-         * On a transit trip, there are two cases: 
-         * (1) we're not on a transit vehicle. In this case, there are two possible ways to compute 
-         *     the remaining distance, and we take whichever is smaller: 
-         *     (a) walking distance / walking speed 
-         *     (b) boarding cost + transit distance / transit speed (this is complicated a bit when 
-         *         we know that there is some walking portion of the trip). 
-         * (2) we are on a transit vehicle, in which case the remaining weight is simply transit 
-         *     distance / transit speed (no need for boarding cost), again considering any mandatory 
-         *     walking.
-         */
         if (useTransit) {
             double streetSpeed = options.getStreetSpeedUpperBound();
             if (s.isAlightedLocal()) {
-                if (euclidianDistance + s.getWalkDistance() > options.getMaxWalkDistance()) {
+                // using transit, alighted local
+                if (euclideanDistance + s.getWalkDistance() > options.getMaxWalkDistance()) {
                     return -1;
                 }
-                return options.walkReluctance * euclidianDistance / streetSpeed;
+                return options.walkReluctance * euclideanDistance / streetSpeed;
             } else {
+                // using transit, not alighted local
                 int boardCost;
                 if (s.isOnboard()) {
                     boardCost = 0;
@@ -97,31 +97,34 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
                 if (s.isEverBoarded()) {
                     boardCost += options.transferPenalty;
                     if (localStreetService != null) {
-                        if (options.getMaxWalkDistance() - s.getWalkDistance() < euclidianDistance
+                        if (options.getMaxWalkDistance() - s.getWalkDistance() < euclideanDistance
                                 && sv instanceof IntersectionVertex
                                 && !localStreetService.transferrable(sv)) {
                             return Double.POSITIVE_INFINITY;
                         }
                     }
                 }
-                if (euclidianDistance < target.getDistanceToNearestTransitStop()) {
-                    if (euclidianDistance + s.getWalkDistance() > options.getMaxWalkDistance()) {
+                if (euclideanDistance < target.getDistanceToNearestTransitStop()) {
+                    // using transit, not alighted local, within obligatory walking dist of target
+                    if (euclideanDistance + s.getWalkDistance() > options.getMaxWalkDistance()) {
                         return -1;
                     }
-                    return options.walkReluctance * euclidianDistance / streetSpeed;
+                    return options.walkReluctance * euclideanDistance / streetSpeed;
                 } else {
+                    // using transit, not alighted local, outside obligatory walking dist of target
                     double mandatoryWalkDistance = target.getDistanceToNearestTransitStop()
                             + sv.getDistanceToNearestTransitStop();
                     if (mandatoryWalkDistance + s.getWalkDistance() > options.getMaxWalkDistance()) {
                         return -1;
                     }
-                    double distance = (euclidianDistance - mandatoryWalkDistance) / maxSpeed
+                    double distance = (euclideanDistance - mandatoryWalkDistance) / maxSpeed
                             + mandatoryWalkDistance * options.walkReluctance / streetSpeed + boardCost;
-                    return Math.min(distance, options.walkReluctance * euclidianDistance / streetSpeed);
+                    return Math.min(distance, options.walkReluctance * euclideanDistance / streetSpeed);
                 }
             }
         } else {
-            return options.walkReluctance * euclidianDistance / maxSpeed;
+            // not using transit, all travel in on-street
+            return options.walkReluctance * euclideanDistance / maxSpeed;
         }
     }
 
@@ -173,6 +176,10 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
         }
     }
 
+    /** 
+     * Get the maximum expected speed over all modes. This should probably be moved to
+     * RoutingRequest. 
+     */
     public static double getMaxSpeed(RoutingRequest options) {
         if (options.getModes().contains(TraverseMode.TRANSIT)) {
             // assume that the max average transit speed over a hop is 10 m/s, which is roughly
