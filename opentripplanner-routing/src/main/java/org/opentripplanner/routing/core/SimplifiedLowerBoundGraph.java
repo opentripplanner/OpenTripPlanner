@@ -166,7 +166,7 @@ public class SimplifiedLowerBoundGraph {
             result[toGroup] = 0;
             q.insert(toGroup, 0);
         }
-        double walkScale = -1 / options.getSpeedUpperBound() * options.walkReluctance;
+        double walkScale = -1 / options.getRoadSpeedUpperBound() * options.walkReluctance;
         LOG.info("Performing SSSP");
         long t0 = System.currentTimeMillis();
         while (!q.empty()) {

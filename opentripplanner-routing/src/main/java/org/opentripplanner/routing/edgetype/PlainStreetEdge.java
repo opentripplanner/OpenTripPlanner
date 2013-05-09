@@ -437,7 +437,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
 
     @Override
     public double timeLowerBound(RoutingRequest options) {
-        return this.length / options.getSpeedUpperBound();
+        return this.length / options.getRoadSpeedUpperBound();
     }
 
     public void setSlopeSpeedEffectiveLength(double slopeSpeedEffectiveLength) {

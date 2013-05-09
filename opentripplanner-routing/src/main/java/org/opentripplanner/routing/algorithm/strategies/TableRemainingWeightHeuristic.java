@@ -129,7 +129,7 @@ public class TableRemainingWeightHeuristic implements RemainingWeightHeuristic {
     @Override
     public double computeForwardWeight(State s0, Vertex target) {
         final double BOARD_COST = options.getBoardCostLowerBound();
-        final double speed = s0.getOptions().getSpeedUpperBound();
+        final double speed = s0.getOptions().getRoadSpeedUpperBound();
         Vertex v = s0.getVertex();
         // keep a cache (vertex->weight) here for multi-itinerary searches
         if (weightCache.containsKey(v))
