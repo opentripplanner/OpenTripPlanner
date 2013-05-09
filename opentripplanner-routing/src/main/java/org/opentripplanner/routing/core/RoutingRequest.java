@@ -45,10 +45,11 @@ import org.slf4j.LoggerFactory;
  * A trip planning request. Some parameters may not be honored by the trip planner for some or all itineraries. For example, maxWalkDistance may be
  * relaxed if the alternative is to not provide a route.
  * 
- * NOTE this is the result of merging what used to be called a REQUEST and a TRAVERSEOPTIONS
+ * NOTE this is the result of merging what used to be called a REQUEST and a TRAVERSEOPTIONS.
+ * The Lombok Getter/Setter annotations serve to create getter and setter methods on all fields,
+ * so defaults can be supplied in a PrototypeRoutingRequest bean via Spring.
  */
-@Getter
-@Setter
+@Getter @Setter 
 public class RoutingRequest implements Cloneable, Serializable {
 
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
