@@ -81,13 +81,13 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
         if (useTransit) {
             double streetSpeed = options.getStreetSpeedUpperBound();
             if (s.isAlightedLocal()) {
-                // using transit, alighted local
+                // search allows using transit, alighted local
                 if (euclideanDistance + s.getWalkDistance() > options.getMaxWalkDistance()) {
                     return -1;
                 }
                 return options.walkReluctance * euclideanDistance / streetSpeed;
             } else {
-                // using transit, not alighted local
+                // search allows using transit, not alighted local
                 int boardCost;
                 if (s.isOnboard()) {
                     boardCost = 0;
@@ -105,13 +105,15 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
                     }
                 }
                 if (euclideanDistance < target.getDistanceToNearestTransitStop()) {
-                    // using transit, not alighted local, within obligatory walking dist of target
+                    // search allows using transit, not alighted local, 
+                    // within obligatory walking dist of target
                     if (euclideanDistance + s.getWalkDistance() > options.getMaxWalkDistance()) {
                         return -1;
                     }
                     return options.walkReluctance * euclideanDistance / streetSpeed;
                 } else {
-                    // using transit, not alighted local, outside obligatory walking dist of target
+                    // search allows using transit, not alighted local, 
+                    // outside obligatory walking dist of target
                     double mandatoryWalkDistance = target.getDistanceToNearestTransitStop()
                             + sv.getDistanceToNearestTransitStop();
                     if (mandatoryWalkDistance + s.getWalkDistance() > options.getMaxWalkDistance()) {
@@ -123,7 +125,7 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
                 }
             }
         } else {
-            // not using transit, all travel in on-street
+            // search disallows using transit: all travel is on-street
             return options.walkReluctance * euclideanDistance / maxSpeed;
         }
     }
