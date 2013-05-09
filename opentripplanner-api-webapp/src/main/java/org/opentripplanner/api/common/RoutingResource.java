@@ -306,8 +306,8 @@ public abstract class RoutingResource {
             request.setBannedTrips(bannedTripMap);
         }
         
-        // replace deprecated optimization preference
-        // opt has already been assigned above
+        // "Least transfers" optimization is accomplished via an increased transfer penalty.
+        // See comment on RoutingRequest.transferPentalty.
         if (opt == OptimizeType.TRANSFERS) {
             opt = OptimizeType.QUICK;
             request.setTransferPenalty(get(transferPenalty, n, 0) + 1800);
@@ -401,6 +401,17 @@ public abstract class RoutingResource {
     }
 
 /**
+ * Gets the nth item in a list, or the item with the highest index if there are less than n 
+ * elements, or the default value if the list is empty or null.
+ * Throughout buildRequest() you will see the following idiom:
+ * request.setParamX(get(paramX, n, request.getParamX));
+ * 
+ * This checks a query parameter field from Jersey (which is a list, one element for each occurrence
+ * of the parameter in the query string) for the nth occurrence, or the one with the highest index.
+ * If a parameter was supplied, it replaces the value in the RoutingRequest under construction 
+ * (which was cloned from the prototypeRoutingRequest). If not, it uses the value already in that
+ * RoutingRequest as a default (i.e. it uses the value cloned from the PrototypeRoutingRequest). 
+ * 
  * @param l list of query parameter values
  * @param n requested item index 
  * @return nth item if it exists, closest existing item otherwise, or defaultValue if the list l 

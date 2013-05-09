@@ -101,7 +101,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
             this.distanceToNearestTransitStop = realTarget.getDistanceToNearestTransitStop();
             bounders = new ArrayList<State>();
             transitLocalStreets = options.rctx.graph.getService(TransitLocalStreetService.class);
-            speedUpperBound = options.getSpeedUpperBound();
+            speedUpperBound = options.getStreetSpeedUpperBound();
             this.speedWeight = options.getWalkReluctance() / speedUpperBound;
             this.transferTimeInWalkDistance = options.getTransferSlack() / options.getWalkSpeed();
         }
@@ -383,7 +383,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
         }
         spt = new ArrayMultiShortestPathTree(options);
         transitLocalStreets = options.rctx.graph.getService(TransitLocalStreetService.class);
-        speedUpperBound = options.getSpeedUpperBound();
+        speedUpperBound = options.getStreetSpeedUpperBound();
         this.speedWeight = options.getWalkReluctance() / speedUpperBound;
 
     }

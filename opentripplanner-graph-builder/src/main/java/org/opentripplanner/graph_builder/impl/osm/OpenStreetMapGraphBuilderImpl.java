@@ -242,6 +242,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
         private static final double VISIBILITY_EPSILON = 0.000000001;
 
+        private static final String nodeLabelFormat = "osm:node:%d";
+        
+        private static final String levelnodeLabelFormat = nodeLabelFormat + ":level:%s";
+
         private Map<Long, OSMNode> _nodes = new HashMap<Long, OSMNode>();
 
         private Map<Long, OSMWay> _ways = new HashMap<Long, OSMWay>();
@@ -1899,6 +1903,14 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             return osmEntity.hasTag("highway") || osmEntity.isTag("public_transport", "platform")
                     || osmEntity.isTag("railway", "platform");
         }
+        
+        private String getNodeLabel(OSMNode node) {
+            return String.format(nodeLabelFormat, node.getId());
+        }
+        
+        private String getLevelNodeLabel(OSMNode node, OSMLevel level) {
+            return String.format(levelnodeLabelFormat, node.getId(), level.shortName);
+        }
 
         public void secondPhase() {
             // This copies relevant tags to the ways (highway=*) where it doesn't exist, so that
@@ -2058,7 +2070,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         /**
-         * Store turn restrictions for use in StreetUtils.makeEdgeBased.
+         * Store turn restrictions.
          * 
          * @param relation
          */
@@ -2536,7 +2548,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
             if (!vertices.containsKey(level)) {
                 Coordinate coordinate = getCoordinate(node);
-                String label = "osm node " + nodeId + " at level " + level.shortName;
+                String label = this.getLevelNodeLabel(node, level);
                 IntersectionVertex vertex = new IntersectionVertex(graph, label, coordinate.x,
                         coordinate.y, label);
                 vertices.put(level, vertex);
@@ -2569,7 +2581,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             iv = intersectionNodes.get(nid);
             if (iv == null) {
                 Coordinate coordinate = getCoordinate(node);
-                String label = "osm node " + nid;
+                String label = getNodeLabel(node);
                 String highway = node.getTag("highway");
                 if ("motorway_junction".equals(highway)) {
                     String ref = node.getTag("ref");

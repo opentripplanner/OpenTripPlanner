@@ -21,11 +21,13 @@ import java.util.Set;
 
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
+import org.opentripplanner.routing.edgetype.PartialPlainStreetEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
@@ -39,8 +41,6 @@ import org.slf4j.LoggerFactory;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.linearref.LinearLocation;
-import com.vividsolutions.jts.linearref.LocationIndexedLine;
 
 /**
  * Represents a location on a street, somewhere between the two corners. This is used when computing the first and last segments of a trip, for trips
@@ -116,6 +116,39 @@ public class StreetLocation extends StreetVertex {
         return location;
     }
 
+    /**
+     * Creates the StreetLocation along the given edges regardless of how close it is to the endpoints of the edge.
+     */
+    public static StreetLocation createStreetLocationOnEdges(Graph graph, String label, String name,
+            Iterable<StreetEdge> edges, Coordinate nearestPoint) {
+
+        boolean wheelchairAccessible = false;
+
+        StreetLocation location = new StreetLocation(graph, label, nearestPoint, name);
+        for (StreetEdge street : edges) {
+            Vertex fromv = street.getFromVertex();
+            Vertex tov = street.getToVertex();
+            wheelchairAccessible |= ((StreetEdge) street).isWheelchairAccessible();
+            /* forward edges and vertices */
+            Vertex edgeLocation;
+
+            // location is somewhere in the middle of the edge.
+            edgeLocation = location;
+            
+            // creates links from street head -> location -> street tail.
+            createHalfLocation(graph, location, label + " to " + tov.getLabel(), name,
+                    nearestPoint, street);
+            
+            double distanceToNearestTransitStop = Math.min(
+                    tov.getDistanceToNearestTransitStop(),
+                    fromv.getDistanceToNearestTransitStop());
+            edgeLocation.setDistanceToNearestTransitStop(distanceToNearestTransitStop);
+        }
+        location.setWheelchairAccessible(wheelchairAccessible);
+        return location;
+
+    }
+    
     public static StreetLocation createStreetLocation(Graph graph, String label, String name,
             Iterable<StreetEdge> edges, Coordinate nearestPoint) {
 
@@ -183,10 +216,10 @@ public class StreetLocation extends StreetVertex {
         double lengthIn = street.getLength() * lengthRatioIn;
         double lengthOut = street.getLength() * (1 - lengthRatioIn);
 
-        PlainStreetEdge newLeft = new PlainStreetEdge(fromv, base, geometries.getFirst(), name,
-                lengthIn, street.getPermission(), false);
-        PlainStreetEdge newRight = new PlainStreetEdge(base, tov, geometries.getSecond(), name,
-                lengthOut, street.getPermission(), false);
+        PlainStreetEdge newLeft = new PartialPlainStreetEdge(street, fromv, base,
+                geometries.getFirst(), name, lengthIn);
+        PlainStreetEdge newRight = new PartialPlainStreetEdge(street, base, tov,
+                geometries.getSecond(), name, lengthOut);
 
         newLeft.setElevationProfile(street.getElevationProfile(0, lengthIn), false);
         newLeft.setNoThruTraffic(street.isNoThruTraffic());
@@ -201,9 +234,8 @@ public class StreetLocation extends StreetVertex {
         newRight.setWheelchairNote(street.getWheelchairNotes());
         newRight.setNote(street.getNotes());
         
-        LOG.debug("Copying {} TurnRestrictions", street.getTurnRestrictions().size());
+        // Copy turn restrictions onto the outgoing half-edge.
         for (TurnRestriction turnRestriction : street.getTurnRestrictions()) {
-            LOG.debug("Adding TurnRestriction {}", turnRestriction);
             newRight.addTurnRestriction(turnRestriction);
         }
         base.extra.add(newLeft);
@@ -212,17 +244,7 @@ public class StreetLocation extends StreetVertex {
 
     private static P2<LineString> getGeometry(StreetEdge e, Coordinate nearestPoint) {
         Geometry geometry = e.getGeometry();
-        return splitGeometryAtPoint(geometry, nearestPoint);
-    }
-
-    public static P2<LineString> splitGeometryAtPoint(Geometry geometry, Coordinate nearestPoint) {
-        LocationIndexedLine line = new LocationIndexedLine(geometry);
-        LinearLocation l = line.indexOf(nearestPoint);
-
-        LineString beginning = (LineString) line.extractLine(line.getStartIndex(), l);
-        LineString ending = (LineString) line.extractLine(l, line.getEndIndex());
-
-        return new P2<LineString>(beginning, ending);
+        return GeometryUtils.splitGeometryAtPoint(geometry, nearestPoint);
     }
 
     // public void reify(Graph graph) {
@@ -269,11 +291,10 @@ public class StreetLocation extends StreetVertex {
     @Override
     public int removeTemporaryEdges() {
         int nRemoved = 0;
-        for (Edge e : getExtra()) {
+        for (Edge e : getExtra()) {            
             graph.removeTemporaryEdge(e);
             // edges might already be detached
-            if (e.detach() != 0)
-                nRemoved += 1;
+            if (e.detach() != 0) nRemoved += 1;
         }
         return nRemoved;
     }
