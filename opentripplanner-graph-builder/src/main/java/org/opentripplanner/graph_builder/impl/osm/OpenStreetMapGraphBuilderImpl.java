@@ -1826,7 +1826,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
 
             /* filter out ways that are not relevant for routing */
-            if (!isWayRouteable(way)) {
+            if (!isWayRoutable(way)) {
                 return;
             }
             if (way.isTag("area", "yes") && way.getNodeRefs().size() > 2) {
@@ -1850,21 +1850,25 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 _log.debug("ways=" + _ways.size());
         }
 
-        private boolean isWayRouteable(OSMWithTags way) {
+        /**
+         * Determine whether any mode can ever traverse the given way.
+         * If not, we can safely leave the way out of the OTP graph without affecting routing.
+         */
+        private boolean isWayRoutable(OSMWithTags way) {
             if (!isOsmEntityRoutable(way))
                 return false;
+            
             String highway = way.getTag("highway");
-            if (highway != null
-                    && (highway.equals("conveyer") || highway.equals("proposed") || highway
-                            .equals("raceway")))
+            if (highway != null && (highway.equals("conveyer") || highway.equals("proposed") || 
+                highway.equals("raceway")))
                 return false;
 
             if (way.isGeneralAccessDenied()) {
                 // There are exceptions.
-                return (way.isMotorcarExplicitlyAllowed() || way.isBicycleExplicitlyAllowed() || way
-                        .isPedestrianExplicitlyAllowed());
+                return (way.isMotorcarExplicitlyAllowed() || way.isBicycleExplicitlyAllowed() || 
+                        way.isPedestrianExplicitlyAllowed());
             }
-            
+
             return true;
         }
 
@@ -1877,7 +1881,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 // without reference to the ways that compose them. Accordingly, we will merely
                 // mark the ways for preservation here, and deal with the details once we have
                 // the ways loaded.
-                if (!isWayRouteable(relation)) {
+                if (!isWayRoutable(relation)) {
                     return;
                 }
                 for (OSMRelationMember member : relation.getMembers()) {
