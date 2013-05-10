@@ -1851,7 +1851,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         private boolean isWayRouteable(OSMWithTags way) {
-            if (!isOsmEntityHighway(way))
+            if (!isOsmEntityRoutable(way))
                 return false;
             String highway = way.getTag("highway");
             if (highway != null
@@ -1872,7 +1872,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             if (_relations.containsKey(relation.getId()))
                 return;
 
-            if (relation.isTag("type", "multipolygon") && isOsmEntityHighway(relation)) {
+            if (relation.isTag("type", "multipolygon") && isOsmEntityRoutable(relation)) {
                 // OSM MultiPolygons are ferociously complicated, and in fact cannot be processed
                 // without reference to the ways that compose them. Accordingly, we will merely
                 // mark the ways for preservation here, and deal with the details once we have
@@ -1886,7 +1886,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 getLevelsForWay(relation);
             } else if (!(relation.isTag("type", "restriction"))
                     && !(relation.isTag("type", "route") && relation.isTag("route", "road"))
-                    && !(relation.isTag("type", "multipolygon") && isOsmEntityHighway(relation))
+                    && !(relation.isTag("type", "multipolygon") && isOsmEntityRoutable(relation))
                     && !(relation.isTag("type", "level_map"))) {
                 return;
             }
@@ -1898,10 +1898,16 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
         }
 
-        /** Some OSM ways are treated as routeable even though they don't have highway= */
-        private boolean isOsmEntityHighway(OSMWithTags osmEntity) {
-            return osmEntity.hasTag("highway") || osmEntity.isTag("public_transport", "platform")
-                    || osmEntity.isTag("railway", "platform");
+        /** 
+         * Determines whether this OSM way is considered routable.
+         * The majority of routable ways are those with a highway= tag (which includes everything
+         * from motorways to hiking trails). Anything with a public_transport=platform or 
+         * railway=platform tag is also considered routable, even if it doesn't have a highway tag.
+         */
+        private boolean isOsmEntityRoutable(OSMWithTags osmEntity) {
+            return osmEntity.hasTag("highway") || 
+                   osmEntity.isTag("public_transport", "platform") || 
+                   osmEntity.isTag("railway", "platform");
         }
         
         private String getNodeLabel(OSMNode node) {
@@ -1979,7 +1985,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 if (_processedAreas.contains(relation)) {
                     continue;
                 }
-                if (!(relation.isTag("type", "multipolygon") && isOsmEntityHighway(relation))) {
+                if (!(relation.isTag("type", "multipolygon") && isOsmEntityRoutable(relation))) {
                     continue;
                 }
                 // Area multipolygons -- pedestrian plazas
