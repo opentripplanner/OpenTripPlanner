@@ -1937,7 +1937,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
          * After all relations, ways, and nodes are loaded, handle areas.
          */
         public void nodesLoaded() {
-            processMultipolygons();
+            processMultipolygonRelations();
             AREA: for (OSMWay way : _singleWayAreas) {
                 if (_processedAreas.contains(way)) {
                     continue;
@@ -1976,11 +1976,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         /**
-         * Copies useful metadata from multipolygon relations to the relevant ways, or to the area map
-         * 
-         * This is done at a different time than processRelations(), so that way purging doesn't remove the used ways.
+         * Copies useful metadata from multipolygon relations to the relevant ways, or to the area 
+         * map. This is done at a different time than processRelations(), so that way purging 
+         * doesn't remove the used ways.
          */
-        private void processMultipolygons() {
+        private void processMultipolygonRelations() {
             RELATION: for (OSMRelation relation : _relations.values()) {
                 if (_processedAreas.contains(relation)) {
                     continue;
@@ -2038,7 +2038,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     if (way == null) {
                         continue;
                     }
-
                     String[] relationCopyTags = { "highway", "name", "ref" };
                     for (String tag : relationCopyTags) {
                         if (relation.hasTag(tag) && !way.hasTag(tag)) {
