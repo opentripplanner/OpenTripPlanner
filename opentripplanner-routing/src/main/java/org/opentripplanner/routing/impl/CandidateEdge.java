@@ -22,6 +22,8 @@ public class CandidateEdge {
 
     private static final double SIDEWALK_PREFERENCE = 1.5;
 
+    // Massive preference for streets that allow cars, also applied to platforms for vehicles of
+    // the specified mode. 
     private static final double CAR_PREFERENCE = 100;
 
     private static final double MAX_DIRECTION_DIFFERENCE = 180.0;
@@ -281,7 +283,6 @@ public class CandidateEdge {
      */
     private double calcScore() {
         double myScore = 0;
-
         myScore = distance * SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_M / 360.0;
         myScore /= preference;
         if ((edge.getStreetClass() & platform) != 0) {
@@ -292,6 +293,7 @@ public class CandidateEdge {
             // this is a hack, but there's not really a better way to do it
             myScore /= SIDEWALK_PREFERENCE;
         }
+        // apply strong preference to car edges and to platforms for the specified modes 
         if (edge.getPermission().allows(StreetTraversalPermission.CAR)
                 || (edge.getStreetClass() & platform) != 0) {
             // we're subtracting here because no matter how close we are to a
@@ -310,7 +312,6 @@ public class CandidateEdge {
         // break ties by choosing shorter edges; this should cause split streets
         // to be preferred
         myScore += edge.getLength() / 1000000;
-
         return myScore;
     }
 }
