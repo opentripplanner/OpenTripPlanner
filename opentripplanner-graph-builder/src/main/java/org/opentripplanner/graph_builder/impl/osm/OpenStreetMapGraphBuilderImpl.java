@@ -1853,6 +1853,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         /**
          * Determine whether any mode can ever traverse the given way.
          * If not, we can safely leave the way out of the OTP graph without affecting routing.
+         * Potentially routable ways are those that have the tags :
+         * highway=* 
+         * public_transport=platform
+         * railway=platform
+         * But not conveyers, proposed highways/roads, and raceways (as well as ways where all 
+         * access is specifically forbidden to the public).
          */
         private boolean isWayRoutable(OSMWithTags way) {
             if (!isOsmEntityRoutable(way))
