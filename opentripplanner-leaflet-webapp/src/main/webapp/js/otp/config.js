@@ -7,7 +7,7 @@ if(typeof(otp.config) == "undefined" || otp.config == null) otp.config = {};
 otp.config = {
 
     hostname : "http://localhost:8080",
-    municoderHostname : "http://localhost:8080",
+    //municoderHostname : "http://localhost:8080",
     datastoreUrl : 'http://localhost:9000',
       
     baseLayers: [
