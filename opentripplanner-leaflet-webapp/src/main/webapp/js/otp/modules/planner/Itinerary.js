@@ -180,7 +180,6 @@ otp.modules.planner.Itinerary = otp.Class({
         return legs;
     },
     
-    
     /*getTripSegments : function() {
         var segments = [];
         for(var l=0; l<this.itinData.legs.length; l++) {

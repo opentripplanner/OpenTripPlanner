@@ -374,7 +374,11 @@ otp.widgets.ItinerariesWidget =
         .append('<div class="otp-itinTripSummaryLabel">Time</div><div class="otp-itinTripSummaryText">'+itin.getDurationStr()+'</div>');
         if(itin.hasTransit) {
             tripSummary.append('<div class="otp-itinTripSummaryLabel">Transfers</div><div class="otp-itinTripSummaryText">'+itin.itinData.transfers+'</div>')
-            .append('<div class="otp-itinTripSummaryLabel">Fare</div><div class="otp-itinTripSummaryText">'+itin.getFareStr()+'</div>');
+            if(itin.itinData.walkDistance > 0) {
+                tripSummary.append('<div class="otp-itinTripSummaryLabel">Total Walk</div><div class="otp-itinTripSummaryText">' + 
+                    otp.util.Itin.distanceString(itin.itinData.walkDistance) + '</div>')
+            }
+            tripSummary.append('<div class="otp-itinTripSummaryLabel">Fare</div><div class="otp-itinTripSummaryText">'+itin.getFareStr()+'</div>');
         }
         
         
