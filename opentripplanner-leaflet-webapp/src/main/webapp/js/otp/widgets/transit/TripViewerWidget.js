@@ -251,7 +251,7 @@ otp.widgets.transit.TripViewerWidget =
             
             // highlight the boarded stops
             if(this.activeLeg && i >= this.activeLeg.from.stopIndex && i <= this.activeLeg.to.stopIndex) {
-                stopIcon.css({ background : 'cyan' });
+                stopIcon.css({ background : '#bbb' });
             }
             
             // set up hover functionality (open popup over stop)
