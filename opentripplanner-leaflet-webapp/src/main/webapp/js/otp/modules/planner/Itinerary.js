@@ -253,12 +253,14 @@ otp.modules.planner.Itinerary = otp.Class({
             }
             html += '</h4>'
             
-            // content
-            if(otp.util.Itin.isTransit(leg.mode)) {
+            // main content
+            if(otp.util.Itin.isTransit(leg.mode)) { // transit
                 html += '<ul>';
-                html += '<li><b>Board</b>: '+leg.from.name+', '+otp.util.Time.formatItinTime(leg.startTime, "h:mma")+'</li>';
+                html += '<li><b>Board</b>: ' + leg.from.name + ' (' + leg.from.stopId.agencyId + ' stop ' + 
+                        leg.from.stopId.id + '), ' + otp.util.Time.formatItinTime(leg.startTime, "h:mma") + '</li>';
                 html += '<li><i>Time in transit: '+otp.util.Time.msToHrMin(leg.duration)+'</i></li>';
-                html += '<li><b>Alight</b>: '+leg.to.name+', '+otp.util.Time.formatItinTime(leg.endTime, "h:mma")+'</li>';
+                html += '<li><b>Alight</b>: ' + leg.to.name + ' (' + leg.to.stopId.agencyId + ' stop ' + 
+                        leg.to.stopId.id + '), ' + otp.util.Time.formatItinTime(leg.endTime, "h:mma") + '</li>';
                 
                 html += '</ul>';
             }
@@ -313,9 +315,11 @@ otp.modules.planner.Itinerary = otp.Class({
             
             // content
             if(otp.util.Itin.isTransit(leg.mode)) {
-                text += ' - Board: '+leg.from.name+', '+otp.util.Time.formatItinTime(leg.startTime, "h:mma") + '\n';
+                text += ' - Board: ' + leg.from.name + ' (' + leg.from.stopId.agencyId + ' stop ' + 
+                        leg.from.stopId.id + '), ' + otp.util.Time.formatItinTime(leg.startTime, "h:mma") + '\n';
                 text += ' - Time in transit: '+otp.util.Time.msToHrMin(leg.duration) + '\n';
-                text += ' - Alight: '+leg.to.name+', '+otp.util.Time.formatItinTime(leg.endTime, "h:mma")+ '\n';
+                text += ' - Alight: ' + leg.to.name + ' (' + leg.to.stopId.agencyId + ' stop ' + 
+                        leg.to.stopId.id + '), ' + otp.util.Time.formatItinTime(leg.endTime, "h:mma") + '\n';
             }
             else { // walk / bike / car
             
