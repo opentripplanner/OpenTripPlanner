@@ -410,42 +410,8 @@ otp.widgets.ItinerariesWidget =
         
         tripSummary.append(tripSummaryFooter)
         .appendTo(itinDiv);
-        //itinDiv.append(tripSummary);
 
-        
-        /*var html = '<div class="otp-itinTripSummary">';
-        html += '<div class="otp-itinTripSummaryHeader">Trip Summary</div>';
-        html += '<div class="otp-itinTripSummaryLabel">Travel</div><div class="otp-itinTripSummaryText">'+itin.getStartTimeStr()+'</div>';
-        html += '<div class="otp-itinTripSummaryLabel">Time</div><div class="otp-itinTripSummaryText">'+itin.getDurationStr()+'</div>';
-        if(itin.hasTransit) {
-            html += '<div class="otp-itinTripSummaryLabel">Transfers</div><div class="otp-itinTripSummaryText">'+itin.itinData.transfers+'</div>';
-            html += '<div class="otp-itinTripSummaryLabel">Fare</div><div class="otp-itinTripSummaryText">'+itin.getFareStr()+'</div>';
-        }
-        
-        
-        
-        html += '<div class="otp-itinTripSummaryFooter">Valid ' + moment().format('MMM Do YYYY, h:mma');
-        
-        if(this.showItineraryLink) {
-            var itinLink = this.constructLink(itin.tripPlan.queryParams, { itinIndex : index });
-            html += ' | <a href="'+itinLink+'">Link to Itinerary</a>';
-        }
-        
-        html += ' | <div id="'+divId+'-print">Print</div>';
-
-        var subject = "Your Trip";
-        var body = "Test\nfoo";
-        html += ' | <a href="mailto:?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body)+'" target="_blank">Email</a>';
-
-
-        html += '</div>';        
-        html += '</div>';
-        itinDiv.append(html);
-        
-        $('#'+divId+'-print').click(function() {
-            console.log("print");
-        });
-        console.log('#'+divId+'-print');*/
+       
         return itinDiv;
     },
 

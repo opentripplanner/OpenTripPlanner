@@ -285,9 +285,26 @@ otp.modules.planner.Itinerary = otp.Class({
                 }            
             }
             
+
         }
         
         html += '<h3>End: '+this.getEndLocationStr()+' at '+this.getEndTimeStr()+'</h3>';
+
+        // trip summary
+        html += '<div class="otp-itinTripSummary" style="font-size: .9em">';
+        html += '<div class="otp-itinTripSummaryHeader">Trip Summary</div>';
+        html += '<div class="otp-itinTripSummaryLabel">Travel</div><div class="otp-itinTripSummaryText">'+this.getStartTimeStr()+'</div>';
+        html += '<div class="otp-itinTripSummaryLabel">Time</div><div class="otp-itinTripSummaryText">'+this.getDurationStr()+'</div>';
+        if(this.hasTransit) {
+            html += '<div class="otp-itinTripSummaryLabel">Transfers</div><div class="otp-itinTripSummaryText">'+this.itinData.transfers+'</div>';
+            if(this.itinData.walkDistance > 0) {
+                html += '<div class="otp-itinTripSummaryLabel">Total Walk</div><div class="otp-itinTripSummaryText">' + 
+                    otp.util.Itin.distanceString(this.itinData.walkDistance) + '</div>';
+            }
+            html += '<div class="otp-itinTripSummaryLabel">Fare</div><div class="otp-itinTripSummaryText">'+this.getFareStr()+'</div>';
+        }
+        html += '</div>';
+
         html += '</div>';
         
         return html;

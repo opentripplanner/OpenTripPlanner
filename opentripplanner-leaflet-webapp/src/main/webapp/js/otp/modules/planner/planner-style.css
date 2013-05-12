@@ -153,11 +153,11 @@
 .otp-itinTripSummaryLabel {
     float: left;
     font-weight: bold;
-    width: 70px;
+    width: 6.5em;
 }
 
 .otp-itinTripSummaryText {
-    margin-left: 75px;    
+    margin-left: 7em;    
 }
 
 .otp-itinTripSummaryFooter {
