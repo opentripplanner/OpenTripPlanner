@@ -327,7 +327,7 @@ otp.widgets.ItinerariesWidget =
                 headerHtml += ": "+leg.agencyId+", ";
                 if(leg.route !== leg.routeLongName) headerHtml += "("+leg.route+") ";
                 headerHtml += leg.routeLongName;
-                if(leg.headsign) headerHtml +=  " toward " + leg.headsign;
+                if(leg.headsign) headerHtml +=  " to " + leg.headsign;
             }
             $("<h3>"+headerHtml+"</h3>").appendTo(itinAccord).hover(function(evt) {
                 var arr = evt.target.id.split('-');
