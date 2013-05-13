@@ -20,6 +20,8 @@ import java.util.List;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
 import org.opentripplanner.routing.graph.Graph;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link GraphBuilder} plugin that links up the stops of a transit network to a street network.
@@ -27,16 +29,19 @@ import org.opentripplanner.routing.graph.Graph;
  */
 public class TransitToStreetNetworkGraphBuilderImpl implements GraphBuilder {
 
+    private static final Logger LOG = LoggerFactory.getLogger(TransitToStreetNetworkGraphBuilderImpl.class);
+
     public List<String> provides() {
         return Arrays.asList("linking");
     }
 
     public List<String> getPrerequisites() {
-        return Arrays.asList("streets");
+        return Arrays.asList("streets"); // why not "transit" ?
     }
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
+        LOG.info("linking transit stops to streets...");
         NetworkLinker linker = new NetworkLinker(graph, extra);
         linker.createLinkage();
     }
