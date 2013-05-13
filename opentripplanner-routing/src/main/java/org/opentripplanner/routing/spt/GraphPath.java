@@ -86,6 +86,7 @@ public class GraphPath {
             if (cur.getBackEdge() != null)
                 edges.addFirst(cur.getBackEdge());
         }
+        //dump();
     }
 
     /**
@@ -125,19 +126,19 @@ public class GraphPath {
         return states.getLast().getVertex();
     }
 
-    /**
-     * Get a list containing one AgencyAndId (trip id) for each vehicle boarded in this path.
-     * 
-     * @return a list of the ids of trips used by this path
-     */
+    /** @return A list containing one AgencyAndId (trip_id) for each vehicle boarded in this path,
+     * in the chronological order they are boarded. */
     public List<AgencyAndId> getTrips() {
         List<AgencyAndId> ret = new LinkedList<AgencyAndId>();
+        Trip lastTrip = null;
         for (State s : states) {
-            Edge e = s.getBackEdge();
-            if (e == null) continue;
-            Trip trip = s.getBackTrip();
-            if (trip != null)
-                ret.add(trip.getId());
+            if (s.getBackEdge() != null) {
+                Trip trip = s.getBackTrip();
+                if (trip != null && trip != lastTrip) {
+                    ret.add(trip.getId());
+                    lastTrip = trip;
+                }
+            }
         }
         return ret;
     }
@@ -172,6 +173,8 @@ public class GraphPath {
         for (State s : states)
             System.out.println(s + " via " + s.getBackEdge());
         System.out.println(" --- END GRAPHPATH DUMP ---");
+        System.out.println("Total meters walked in this graphpath: " + 
+               states.getLast().getWalkDistance());
     }
 
     public void dumpPathParser() {

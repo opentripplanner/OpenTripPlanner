@@ -279,5 +279,29 @@ public class TestStreetMatcher {
         public List<TurnRestriction> getTurnRestrictions() {
             return Collections.emptyList();
         }
+
+        @Override
+        public float getCarSpeed() {
+            return 11.2f;
+        }
+
+        @Override
+        public int getInAngle() {
+            return 0;
+        }
+
+        @Override
+        public int getOutAngle() {
+            return 0;
+        }
+
+        @Override
+        public void setCarSpeed(float carSpeed) {}
+
+        @Override
+        public String getLabel() {
+            return "label";
+        }
+
     }
 }

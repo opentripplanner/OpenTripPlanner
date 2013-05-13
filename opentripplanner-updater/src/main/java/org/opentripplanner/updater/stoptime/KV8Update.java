@@ -77,7 +77,7 @@ public class KV8Update extends Update {
      * https://github.com/skywave/kv7tools/blob/master/kv7_gtfs.sql#L42
      */
     private static AgencyAndId kv8TripId (HashMap<String, String> row) {
-        String tripId = String.format("%s_%s_%s_%s_%s",
+        String tripId = String.format("%s|%s|%s|%s|%s",
                 row.get("DataOwnerCode"),
                 row.get("LinePlanningNumber"),
                 row.get("LocalServiceLevelCode"),

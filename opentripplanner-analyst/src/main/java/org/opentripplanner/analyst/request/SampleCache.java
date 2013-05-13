@@ -27,7 +27,6 @@ import org.springframework.stereotype.Component;
  * present in tiles at the next zoom level, this cache allows tiles to share Sample objects 
  * and spend less time recalculating them when a new zoom level is encountered.
  */
-@Component
 public class SampleCache implements SampleSource {
 
     private final Sample emptySample = new Sample(null, 0, null, 0);

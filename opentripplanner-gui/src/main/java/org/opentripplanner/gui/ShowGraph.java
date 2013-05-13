@@ -17,39 +17,39 @@ import java.awt.Point;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.awt.event.MouseMotionAdapter;
-
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 
 import org.opentripplanner.gbannotation.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.vertextype.TransitStop;
-import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.edgetype.TransitBoardAlight;
+import org.opentripplanner.routing.edgetype.PatternEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.PatternEdge;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.TransitStop;
+
+import processing.core.PApplet;
+import processing.core.PFont;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.index.strtree.STRtree;
-
-import processing.core.PApplet;
-import processing.core.PFont;
 
 /**
  * Processing applet to show a map of the graph. The user can: - Use mouse wheel to zoom (or right drag, or ctrl-drag) - Left drag to pan around the
@@ -285,12 +285,14 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     }
 
     /*
-     * Iterate through all vertices and their (outgoing) edges. If they are of 'interesting' types, add them to the corresponding spatial index.
+     * Iterate through all vertices and their (outgoing) edges. If they are of 'interesting' types, 
+     * add them to the corresponding spatial index.
      */
     public synchronized void buildSpatialIndex() {
         vertexIndex = new STRtree();
         edgeIndex = new STRtree();
         Envelope env;
+        
         // int xminx, xmax, ymin, ymax;
         for (Vertex v : graph.getVertices()) {
             Coordinate c = v.getCoordinate();
@@ -430,8 +432,11 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     }
 
     public synchronized void draw() {
-        final int BLOCK_SIZE = 1000;
-        final long DECIMATE = 100;
+        // how many edges to draw before checking whether we need to move on to the next frame
+        final int BLOCK_SIZE = 1000; 
+        // how many edges to skip over (to ensure a sampling of edges throughout the visible area)
+        final long DECIMATE = 40;
+        // 800 instead of 1000 msec, leaving 20% of the time for work other than drawing.
         final int FRAME_TIME = 800 / FRAME_RATE;
         int startMillis = millis();
         if (drawLevel == DRAW_PARTIAL) {
@@ -443,7 +448,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
             int drawIndex = 0;
             int drawStart = 0;
             int drawCount = 0;
-            while (drawStart < visibleStreetEdges.size()) {
+            while (drawStart < DECIMATE && drawStart < visibleStreetEdges.size()) {
                 if (drawFast)
                     drawEdgeFast(visibleStreetEdges.get(drawIndex));
                 else
@@ -451,10 +456,14 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
                 drawIndex += DECIMATE;
                 drawCount += 1;
                 if (drawCount % BLOCK_SIZE == 0 && millis() - startMillis > FRAME_TIME) {
-                    drawFast = drawCount < visibleStreetEdges.size() / 4;
+                    // ran out of time to draw this frame.
+                    // enable fast-drawing when too few edges were drawn:
+                    // drawFast = drawCount < visibleStreetEdges.size() / 10;
+                    // leave edge drawing loop to let other work happen.
                     break;
                 }
                 if (drawIndex >= visibleStreetEdges.size()) {
+                    // start over drawing every DECIMATEth edge, offset by 1
                     drawStart += 1;
                     drawIndex = drawStart;
                 }
@@ -506,6 +515,11 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
             for (Vertex v : visibleVertices) {
                 if (drawTransitStopVertices && v instanceof TransitStop) {
                     drawVertex(v, 5);
+                } else if (v instanceof IntersectionVertex) {
+                    IntersectionVertex iv = (IntersectionVertex) v;
+                    if (iv.isTrafficLight()) {
+                        drawVertex(v, 7);
+                    }
                 }
             }
             /* Draw highlighted edges in another color */

@@ -242,6 +242,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
         private static final double VISIBILITY_EPSILON = 0.000000001;
 
+        private static final String nodeLabelFormat = "osm:node:%d";
+        
+        private static final String levelnodeLabelFormat = nodeLabelFormat + ":level:%s";
+
         private Map<Long, OSMNode> _nodes = new HashMap<Long, OSMNode>();
 
         private Map<Long, OSMWay> _ways = new HashMap<Long, OSMWay>();
@@ -1822,7 +1826,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
 
             /* filter out ways that are not relevant for routing */
-            if (!isWayRouteable(way)) {
+            if (!isWayRoutable(way)) {
                 return;
             }
             if (way.isTag("area", "yes") && way.getNodeRefs().size() > 2) {
@@ -1846,21 +1850,31 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 _log.debug("ways=" + _ways.size());
         }
 
-        private boolean isWayRouteable(OSMWithTags way) {
-            if (!isOsmEntityHighway(way))
+        /**
+         * Determine whether any mode can ever traverse the given way.
+         * If not, we can safely leave the way out of the OTP graph without affecting routing.
+         * Potentially routable ways are those that have the tags :
+         * highway=* 
+         * public_transport=platform
+         * railway=platform
+         * But not conveyers, proposed highways/roads, and raceways (as well as ways where all 
+         * access is specifically forbidden to the public).
+         */
+        private boolean isWayRoutable(OSMWithTags way) {
+            if (!isOsmEntityRoutable(way))
                 return false;
+            
             String highway = way.getTag("highway");
-            if (highway != null
-                    && (highway.equals("conveyer") || highway.equals("proposed") || highway
-                            .equals("raceway")))
+            if (highway != null && (highway.equals("conveyer") || highway.equals("proposed") || 
+                highway.equals("raceway")))
                 return false;
 
             if (way.isGeneralAccessDenied()) {
                 // There are exceptions.
-                return (way.isMotorcarExplicitlyAllowed() || way.isBicycleExplicitlyAllowed() || way
-                        .isPedestrianExplicitlyAllowed());
+                return (way.isMotorcarExplicitlyAllowed() || way.isBicycleExplicitlyAllowed() || 
+                        way.isPedestrianExplicitlyAllowed());
             }
-            
+
             return true;
         }
 
@@ -1868,12 +1882,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             if (_relations.containsKey(relation.getId()))
                 return;
 
-            if (relation.isTag("type", "multipolygon") && isOsmEntityHighway(relation)) {
+            if (relation.isTag("type", "multipolygon") && isOsmEntityRoutable(relation)) {
                 // OSM MultiPolygons are ferociously complicated, and in fact cannot be processed
                 // without reference to the ways that compose them. Accordingly, we will merely
                 // mark the ways for preservation here, and deal with the details once we have
                 // the ways loaded.
-                if (!isWayRouteable(relation)) {
+                if (!isWayRoutable(relation)) {
                     return;
                 }
                 for (OSMRelationMember member : relation.getMembers()) {
@@ -1882,7 +1896,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 getLevelsForWay(relation);
             } else if (!(relation.isTag("type", "restriction"))
                     && !(relation.isTag("type", "route") && relation.isTag("route", "road"))
-                    && !(relation.isTag("type", "multipolygon") && isOsmEntityHighway(relation))
+                    && !(relation.isTag("type", "multipolygon") && isOsmEntityRoutable(relation))
                     && !(relation.isTag("type", "level_map"))) {
                 return;
             }
@@ -1894,10 +1908,24 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
         }
 
-        /** Some OSM ways are treated as routeable even though they don't have highway= */
-        private boolean isOsmEntityHighway(OSMWithTags osmEntity) {
-            return osmEntity.hasTag("highway") || osmEntity.isTag("public_transport", "platform")
-                    || osmEntity.isTag("railway", "platform");
+        /** 
+         * Determines whether this OSM way is considered routable.
+         * The majority of routable ways are those with a highway= tag (which includes everything
+         * from motorways to hiking trails). Anything with a public_transport=platform or 
+         * railway=platform tag is also considered routable, even if it doesn't have a highway tag.
+         */
+        private boolean isOsmEntityRoutable(OSMWithTags osmEntity) {
+            return osmEntity.hasTag("highway") || 
+                   osmEntity.isTag("public_transport", "platform") || 
+                   osmEntity.isTag("railway", "platform");
+        }
+        
+        private String getNodeLabel(OSMNode node) {
+            return String.format(nodeLabelFormat, node.getId());
+        }
+        
+        private String getLevelNodeLabel(OSMNode node, OSMLevel level) {
+            return String.format(levelnodeLabelFormat, node.getId(), level.shortName);
         }
 
         public void secondPhase() {
@@ -1919,7 +1947,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
          * After all relations, ways, and nodes are loaded, handle areas.
          */
         public void nodesLoaded() {
-            processMultipolygons();
+            processMultipolygonRelations();
             AREA: for (OSMWay way : _singleWayAreas) {
                 if (_processedAreas.contains(way)) {
                     continue;
@@ -1958,16 +1986,16 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         /**
-         * Copies useful metadata from multipolygon relations to the relevant ways, or to the area map
-         * 
-         * This is done at a different time than processRelations(), so that way purging doesn't remove the used ways.
+         * Copies useful metadata from multipolygon relations to the relevant ways, or to the area 
+         * map. This is done at a different time than processRelations(), so that way purging 
+         * doesn't remove the used ways.
          */
-        private void processMultipolygons() {
+        private void processMultipolygonRelations() {
             RELATION: for (OSMRelation relation : _relations.values()) {
                 if (_processedAreas.contains(relation)) {
                     continue;
                 }
-                if (!(relation.isTag("type", "multipolygon") && isOsmEntityHighway(relation))) {
+                if (!(relation.isTag("type", "multipolygon") && isOsmEntityRoutable(relation))) {
                     continue;
                 }
                 // Area multipolygons -- pedestrian plazas
@@ -2020,7 +2048,6 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     if (way == null) {
                         continue;
                     }
-
                     String[] relationCopyTags = { "highway", "name", "ref" };
                     for (String tag : relationCopyTags) {
                         if (relation.hasTag(tag) && !way.hasTag(tag)) {
@@ -2058,7 +2085,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         }
 
         /**
-         * Store turn restrictions for use in StreetUtils.makeEdgeBased.
+         * Store turn restrictions.
          * 
          * @param relation
          */
@@ -2536,7 +2563,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
             if (!vertices.containsKey(level)) {
                 Coordinate coordinate = getCoordinate(node);
-                String label = "osm node " + nodeId + " at level " + level.shortName;
+                String label = this.getLevelNodeLabel(node, level);
                 IntersectionVertex vertex = new IntersectionVertex(graph, label, coordinate.x,
                         coordinate.y, label);
                 vertices.put(level, vertex);
@@ -2569,7 +2596,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             iv = intersectionNodes.get(nid);
             if (iv == null) {
                 Coordinate coordinate = getCoordinate(node);
-                String label = "osm node " + nid;
+                String label = getNodeLabel(node);
                 String highway = node.getTag("highway");
                 if ("motorway_junction".equals(highway)) {
                     String ref = node.getTag("ref");

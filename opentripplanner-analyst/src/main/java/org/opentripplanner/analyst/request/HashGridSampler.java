@@ -33,7 +33,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-//@Component
 public class HashGridSampler implements SampleSource {
 
     private static final Logger LOG = LoggerFactory.getLogger(HashGridSampler.class);
