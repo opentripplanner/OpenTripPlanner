@@ -53,7 +53,7 @@ public class MapBuilder implements GraphBuilder {
 
         EdgesForRoute edgesForRoute = new EdgesForRoute();
         extra.put(EdgesForRoute.class, edgesForRoute);
-
+        log.info("matching route variants to street edges...");
         for (AgencyAndId route : transit.getAllRouteIds()) {
             for (RouteVariant variant : transit.getVariantsForRoute(route)) {
                 Geometry geometry = variant.getGeometry();
