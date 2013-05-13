@@ -86,6 +86,7 @@ public class GraphPath {
             if (cur.getBackEdge() != null)
                 edges.addFirst(cur.getBackEdge());
         }
+        //dump();
     }
 
     /**
@@ -172,6 +173,8 @@ public class GraphPath {
         for (State s : states)
             System.out.println(s + " via " + s.getBackEdge());
         System.out.println(" --- END GRAPHPATH DUMP ---");
+        System.out.println("Total meters walked in this graphpath: " + 
+               states.getLast().getWalkDistance());
     }
 
     public void dumpPathParser() {

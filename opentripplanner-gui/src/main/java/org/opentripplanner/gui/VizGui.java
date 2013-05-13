@@ -202,10 +202,10 @@ class VertexList extends AbstractListModel {
 };
 
 /**
- * A simple visualizer for graphs. It shows (using ShowGraph) a map of the graph, intersections and TransitStops only, and allows a user to select
- * stops, examine incoming and outgoing edges, and examine trip patterns. It's meant mainly for debugging, so it's totally OK if it develops (say) a
- * bunch of weird buttons designed to debug specific cases.
- * 
+ * A simple visualizer for graphs. It shows (using ShowGraph) a map of the graph, intersections and 
+ * TransitStops only, and allows a user to select stops, examine incoming and outgoing edges, and 
+ * examine trip patterns. It's meant mainly for debugging, so it's totally OK if it develops (say) 
+ * a bunch of weird buttons designed to debug specific cases.
  */
 public class VizGui extends JFrame implements VertexSelectionListener {
 

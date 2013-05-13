@@ -115,9 +115,6 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
             // If the passenger is onboard, the second term is zero.
             double mandatoryWalkDistance = target.getDistanceToNearestTransitStop()
                     + sv.getDistanceToNearestTransitStop();
-            if (mandatoryWalkDistance + s.getWalkDistance() > options.getMaxWalkDistance()) {
-                return -1; // impossible to reach target via transit? SEEMS INCORRECT since transit trip is hypothetical (abyrd)
-            }
             double transitCost = (euclideanDistance - mandatoryWalkDistance) / maxSpeed + boardCost; 
             double transitStreetCost = mandatoryWalkDistance * options.walkReluctance / streetSpeed; 
             // Compare transit use with the cost of just walking all the way to the destination, 
