@@ -35,6 +35,7 @@ import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -258,7 +259,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
         // then find closest walkable street
         StreetLocation closestStreet = null;
-        CandidateEdgeBundle bundle = getClosestEdges(location, options, extraEdges, null, false);
+        CandidateEdgeBundle bundle = getClosestEdges(location, options, extraEdges, null, null);
         CandidateEdge candidate = bundle.best;
         double closestStreetDistance = Double.POSITIVE_INFINITY;
         if (candidate != null) {
@@ -304,11 +305,20 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         return edgeTree.query(envelope);
     }
 
+//    @Override
+//    @SuppressWarnings("unchecked")
+//    public CandidateEdgeBundle getClosestEdges(GenericLocation location,
+//                                               TraversalRequirements reqs, List<Edge> extraEdges, Collection<Edge> preferredEdges,
+//                                               boolean possibleTransitLinksOnly) {
+//        if
+//
+//    }
+
     @Override
     @SuppressWarnings("unchecked")
     public CandidateEdgeBundle getClosestEdges(GenericLocation location,
             TraversalRequirements reqs, List<Edge> extraEdges, Collection<Edge> preferredEdges,
-            boolean possibleTransitLinksOnly) {
+            Collection<StreetTraversalPermission> traversalPermissions) {
         Coordinate coordinate = location.getCoordinate();
         Envelope envelope = new Envelope(coordinate);
 
@@ -375,8 +385,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         CandidateEdgeBundle best = null;
         for (CandidateEdgeBundle bundle : bundles) {
             if (best == null || bundle.best.score < best.best.score) {
-                if (possibleTransitLinksOnly) {
-                    if (!(bundle.allowsCars() || bundle.isPlatform() || bundle.allowsBicycle()))
+                if (traversalPermissions != null || traversalPermissions.isEmpty()) {
+                    if (!(bundle.allowsOnePermission(traversalPermissions) || bundle.isPlatform()))
                         continue;
                 }
                 best = bundle;
@@ -388,7 +398,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     @Override
     public CandidateEdgeBundle getClosestEdges(GenericLocation location, TraversalRequirements reqs) {
-        return getClosestEdges(location, reqs, null, null, false);
+        return getClosestEdges(location, reqs, null, null, null);
     }
 
     /**
@@ -400,16 +410,16 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
      * @param request RoutingRequest that must be able to traverse the edge (all edges if null)
      * @param extraEdges Any edges not in the graph that might be included (allows trips within one block)
      * @param preferredEdges Any edges to prefer in the search
-     * @param possibleTransitLinksOnly only return edges traversable by cars or are platforms
+     * @param traversalPermissions a collection of permissions that at list one of them is allowed, may be null
      * @return
      */
     protected CandidateEdgeBundle getClosestEdges(GenericLocation location, RoutingRequest request,
-            List<Edge> extraEdges, Collection<Edge> preferredEdges, boolean possibleTransitLinksOnly) {
+            List<Edge> extraEdges, Collection<Edge> preferredEdges, Collection<StreetTraversalPermission> traversalPermissions) {
         // NOTE(flamholz): if request is null, will initialize TraversalRequirements
         // that accept all modes of travel.
         TraversalRequirements reqs = new TraversalRequirements(request);
 
-        return getClosestEdges(location, reqs, extraEdges, preferredEdges, possibleTransitLinksOnly);
+        return getClosestEdges(location, reqs, extraEdges, preferredEdges, traversalPermissions);
     }
 
     /**
