@@ -1868,7 +1868,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             if (highway != null && (highway.equals("conveyer") || highway.equals("proposed") || 
                 highway.equals("raceway")))
                 return false;
-
+            
             if (way.isGeneralAccessDenied()) {
                 // There are exceptions.
                 return (way.isMotorcarExplicitlyAllowed() || way.isBicycleExplicitlyAllowed() || 
@@ -1912,12 +1912,19 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
          * Determines whether this OSM way is considered routable.
          * The majority of routable ways are those with a highway= tag (which includes everything
          * from motorways to hiking trails). Anything with a public_transport=platform or 
-         * railway=platform tag is also considered routable, even if it doesn't have a highway tag.
+         * railway=platform tag is also considered routable even if it doesn't have a highway tag.
+         * Platforms are however filtered out if they are marked usage=tourism. This prevents
+         * miniature tourist railways like the one in Portland's Zoo from receiving a better score
+         * and pulling search endpoints away from real transit stops.
          */
         private boolean isOsmEntityRoutable(OSMWithTags osmEntity) {
-            return osmEntity.hasTag("highway") || 
-                   osmEntity.isTag("public_transport", "platform") || 
-                   osmEntity.isTag("railway", "platform");
+            if (osmEntity.hasTag("highway"))
+                return true;
+            if (osmEntity.isTag("public_transport", "platform") || 
+                osmEntity.isTag("railway", "platform")) {
+                return ! ("tourism".equals(osmEntity.getTag("usage")));
+            }
+            return false;
         }
         
         private String getNodeLabel(OSMNode node) {
