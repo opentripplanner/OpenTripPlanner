@@ -30,94 +30,64 @@ public class CandidateEdge {
 
     private static final double MAX_ABS_DIRECTION_DIFFERENCE = 360.0;
 
-    /**
-     * The edge itself.
-     */
+    /** The edge being considered for linking. */
     @Getter
     protected final StreetEdge edge;
 
-    /**
-     * Pointer to the coordinates of the edge.
-     */
+    /** Pointer to the geometry (coordinate sequence) of the edge. */
     private final CoordinateSequence edgeCoords;
 
-    /**
-     * Number of coordinates on the edge.
-     */
+    /** Number of coordinates on the edge. */
     private final int numEdgeCoords;
 
-    /**
-     * Whether point is located at a platform.
-     */
+    /** Whether point is located at a platform. */
     private final int platform;
 
-    /**
-     * Preference value passed in.
-     */
+    /** Preference value passed in. */
     private final double preference;
 
-    /**
-     * Index of the closest segment along the edge.
-     */
+    /** Index of the closest segment along the edge. */
     private int nearestSegmentIndex;
 
-    /**
-     * Fractional distance along the closest segment.
-     */
+    /** Fractional distance along the closest segment. */
     private double nearestSegmentFraction;
 
     /**
-     * Set when to the closest endpoint of the edge when the input location is really sitting on that endpoint (within some tolerance).
+     * Set when to the closest endpoint of the edge when the input location is really sitting on 
+     * that endpoint (within some tolerance).
      */
     @Getter
     protected StreetVertex endwiseVertex;
 
-    /**
-     * The coordinate of the nearest point on the edge.
-     */
+    /** The coordinate of the nearest point on the edge to the linking location. */
     @Getter
     protected Coordinate nearestPointOnEdge;
 
-    /**
-     * Heading if given.
-     */
+    /** Heading if given. */
     @Getter
     protected Double heading;
 
-    /**
-     * Azimuth between input point and closest point on edge.
-     */
+    /** Azimuth between input point and closest point on edge. */
     @Getter
     protected double directionToEdge;
 
-    /**
-     * Azimuth of the subsegment of the edge to which the input point is closest.
-     */
+    /** Azimuth of the subsegment of the edge to which the input point is closest. */
     @Getter
     protected double directionOfEdge;
 
-    /**
-     * Difference in direction between heading and nearest subsegment of edge. Null if no heading given.
-     */
+    /** Difference in direction between heading and nearest subsegment of edge. Null if no heading given. */
     @Getter
     protected Double directionDifference;
 
-    /**
-     * Distance from edge and point.
-     */
+    /** Distance from edge to linking point. */
     @Getter
     protected double distance;
 
-    /**
-     * Score of the match. Lower is better.
-     */
+    /** Score of the match. Lower is better. */
     @Getter
     protected double score;
 
-    /**
-     * Sorts CandidateEdges by best score first (lower = better).
-     * @author avi
-     */
+    /** Sorts CandidateEdges by best score first (lower = better). */
     public static class CandidateEdgeScoreComparator implements Comparator<CandidateEdge> {
         @Override
         public int compare(CandidateEdge arg0, CandidateEdge arg1) {
@@ -132,13 +102,9 @@ public class CandidateEdge {
         }
     }
     
-    /**
-     * Construct from a LocationObservation.
-     * 
-     * @param e
-     * @param loc
-     * @param pref
-     * @param mode
+    /** 
+     * Construct CandidateEdge based on a GenericLocation. 
+     * The edge's score is calculated as the final step of construction. 
      */
     public CandidateEdge(StreetEdge e, GenericLocation loc, double pref, TraverseModeSet mode) {
         preference = pref;
@@ -174,14 +140,7 @@ public class CandidateEdge {
         score = calcScore();
     }
 
-    /**
-     * Construct from a Coordinate.
-     * 
-     * @param e
-     * @param p
-     * @param pref
-     * @param mode
-     */
+    /** Construct CandidateEdge based on a Coordinate. */
     public CandidateEdge(StreetEdge e, Coordinate p, double pref, TraverseModeSet mode) {
         this(e, new GenericLocation(p), pref, mode);
     }
@@ -196,15 +155,9 @@ public class CandidateEdge {
                         edge, score, heading, directionDifference, nearestPointOnEdge);
     }
 
-    /**
-     * Private methods
-     */
+    /* PRIVATE METHODS */
 
-    /**
-     * Initializes this.nearestPointOnEdge and other distance-related variables.
-     * 
-     * @param p
-     */
+    /** Initializes this.nearestPointOnEdge and other distance-related variables. */
     private double calcNearestPoint(Coordinate p) {
         LineString edgeGeom = edge.getGeometry();
         CoordinateSequence coordSeq = edgeGeom.getCoordinateSequence();
@@ -241,11 +194,7 @@ public class CandidateEdge {
         // nearestPointOnEdge);
     }
 
-    /**
-     * Calculates the endwiseVertex if appropriate.
-     * 
-     * @return
-     */
+    /** Calculates the endwiseVertex if appropriate. */
     private StreetVertex calcEndwiseVertex() {
         StreetVertex retV = null;
         if (nearestSegmentIndex == 0 && Math.abs(nearestSegmentFraction) < 0.000001) {
@@ -257,32 +206,26 @@ public class CandidateEdge {
         return retV;
     }
 
-    /**
-     * Calculate the platform int.
-     * 
-     * @param mode
-     * @return
+    /** 
+     * Get the platform mask for the given mode. 
+     * This is compatible with the bit flags from StreetEdge.getStreetClass(). 
      */
     private int calcPlatform(TraverseModeSet mode) {
         int out = 0;
         if (mode.getTrainish()) {
             out |= StreetEdge.CLASS_TRAIN_PLATFORM;
         }
-        if (mode.getBusish()) {
+        if (mode.getBusish() ) { 
+            // includes CABLE_CAR
             out |= StreetEdge.CLASS_OTHER_PLATFORM;
         }
         return out;
     }
 
-    /**
-     * Internal calculator for the score.
-     * 
-     * Assumes that edge, platform and distance are initialized.
-     * 
-     * @return
-     */
+    /** Internal calculator for the score. Assumes that edge, platform and distance are initialized. */
     private double calcScore() {
         double myScore = 0;
+        // why is this being scaled by 1/360th of the radius of the earth?
         myScore = distance * SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_M / 360.0;
         myScore /= preference;
         if ((edge.getStreetClass() & platform) != 0) {

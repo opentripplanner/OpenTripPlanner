@@ -543,7 +543,6 @@ public class GTFSPatternHopFactory {
 //        for (TableTripPattern tp : context.tripPatternIds.keySet()) {
 //            tp.finish();
 //        }
-        _log.info("end indexing large patterns");
         clearCachedData();
         graph.putService(FareService.class, fareServiceFactory.makeFareService());
         graph.putService(ServiceIdToNumberService.class, new ServiceIdToNumberService(context.serviceIds));

@@ -22,7 +22,7 @@ public class GraphConnectivity extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 1L;
 
-    public static final String FMT = "Removed/depedestrianized disconnected subgraph containing: %s at: (%f, %f), with %d";
+    public static final String FMT = "Removed/depedestrianized disconnected subgraph containing vertex '%s' at (%f, %f), with %d edges";
 
     final Vertex vertex;
     final int size;

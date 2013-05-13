@@ -345,10 +345,9 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                     continue;
                 }
 
-                // Ignore those edges we can't traverse
+                // Ignore those edges we can't traverse. canBeTraversed checks internally if 
+                // walking a bike is possible on this StreetEdge.
                 if (!reqs.canBeTraversed(e)) {
-                    // NOTE(flamholz): canBeTraversed checks internally if we
-                    // can walk our bike on this StreetEdge.
                     continue;
                 }
 
@@ -376,6 +375,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         for (CandidateEdgeBundle bundle : bundles) {
             if (best == null || bundle.best.score < best.best.score) {
                 if (possibleTransitLinksOnly) {
+                    // assuming all platforms are tagged when they are not car streets... #1077 
                     if (!(bundle.allowsCars() || bundle.isPlatform()))
                         continue;
                 }
