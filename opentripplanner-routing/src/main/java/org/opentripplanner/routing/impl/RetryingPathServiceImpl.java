@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Queue;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
-import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.pathparser.BasicPathParser;
 import org.opentripplanner.routing.pathparser.NoThruTrafficPathParser;
