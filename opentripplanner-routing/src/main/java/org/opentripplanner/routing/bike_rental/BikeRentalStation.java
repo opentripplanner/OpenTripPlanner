@@ -38,6 +38,14 @@ public class BikeRentalStation implements Serializable {
     @JsonSerialize
     public int spacesAvailable = Integer.MAX_VALUE;
     
+    /**
+     * Whether this station is static (usually coming from OSM data) or a real-time source. If no real-time data, users should take
+     * bikesAvailable/spacesAvailable with a pinch of salt, as they are always the total capacity divided by two. Only the total is meaningful.
+     */
+    @XmlAttribute
+    @JsonSerialize
+    public boolean realTimeData = true;
+    
     public boolean equals(Object o) {
         if (!(o instanceof BikeRentalStation)) {
             return false;

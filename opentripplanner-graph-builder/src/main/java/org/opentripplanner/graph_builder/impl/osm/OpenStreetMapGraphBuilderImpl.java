@@ -837,6 +837,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 station.y = node.getLat();
                 station.spacesAvailable = capacity / 2;
                 station.bikesAvailable = capacity / 2;
+                station.realTimeData = false;
                 bikeRentalService.addStation(station);
                 BikeRentalStationVertex stationVertex = new BikeRentalStationVertex(graph, station);
                 new RentABikeOnEdge(stationVertex, stationVertex, networkSet);
