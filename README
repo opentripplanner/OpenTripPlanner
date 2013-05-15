@@ -26,3 +26,4 @@ contributions from around the world.
 We welcome new contributions!  We prefer to format our code according to the
 GeoTools formatting guidelines; an Eclipse autoformatter can be found here:
 http://svn.osgeo.org/geotools/trunk/build/eclipse/formatter.xml
+

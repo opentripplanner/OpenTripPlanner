@@ -52,8 +52,7 @@ public class Planner extends RoutingResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(Planner.class);
     @Autowired public PlanGenerator planGenerator;
-    //@Context 
-    protected HttpServletRequest httpServletRequest;
+    @Context protected HttpServletRequest httpServletRequest;
 
     /** Java is immensely painful */
     interface OneArgFunc<T,U> {
