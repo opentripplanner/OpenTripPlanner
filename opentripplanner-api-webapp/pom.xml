@@ -84,10 +84,6 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-        </dependency>
-        <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>jsr311-api</artifactId>
             <version>1.1.1</version>
@@ -101,10 +97,7 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-        </dependency>
+        <!-- SPRING -->
         <dependency>
           <groupId>org.springframework</groupId>
           <artifactId>spring-aop</artifactId>
@@ -137,6 +130,28 @@
       	  <groupId>org.springframework.security</groupId>
       	  <artifactId>spring-security-web</artifactId>
         </dependency>
+        <!-- LOGGING -->
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-log4j12</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>log4j-over-slf4j</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>jcl-over-slf4j</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+        </dependency>
+        
         <dependency>
       	  <groupId>javax.servlet</groupId>
       	  <artifactId>servlet-api</artifactId>
@@ -162,6 +177,11 @@
         <dependency>
           <groupId>org.projectlombok</groupId>
           <artifactId>lombok</artifactId>
+        </dependency>
+        <!-- JERSEY/GRIZZLY INTEGRATION -->
+        <dependency>
+          <groupId>com.sun.jersey</groupId>
+          <artifactId>jersey-grizzly2</artifactId>
         </dependency>
     </dependencies>
 
