@@ -326,6 +326,37 @@
     margin: 0px 30px;
 }
 
+/* alert display style */
+
+.otp-itin-alert {
+    margin-top: 10px;
+    border: 1px solid red;
+    padding: 8px;
+}
+
+.otp-itin-alert-left {
+    background: url('../../../../images/alert.png');
+    background-position: 0px 3px;
+    background-repeat: no-repeat;
+    float: left;
+    width: 16px;
+    height: 16px;
+}
+
+.otp-itin-alert-main {
+    margin-left: 20px;
+}
+
+.otp-itin-alert-header {
+    font-weight: bold;
+    font-size: .9em;
+    margin-bottom: 2px;
+}
+
+.otp-itin-alert-description {
+    font-size: .9em;
+}
+
 /* print window style */
 
 .otp-itin-printWindow {

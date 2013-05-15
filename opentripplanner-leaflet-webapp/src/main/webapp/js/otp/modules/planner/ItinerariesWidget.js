@@ -328,6 +328,7 @@ otp.widgets.ItinerariesWidget =
                 if(leg.route !== leg.routeLongName) headerHtml += "("+leg.route+") ";
                 headerHtml += leg.routeLongName;
                 if(leg.headsign) headerHtml +=  " to " + leg.headsign;
+                if(leg.alerts) headerHtml += '&nbsp;&nbsp;<img src="images/alert.png" style="vertical-align: -20%;" />';
             }
             $("<h3>"+headerHtml+"</h3>").appendTo(itinAccord).hover(function(evt) {
                 var arr = evt.target.id.split('-');
@@ -442,41 +443,18 @@ otp.widgets.ItinerariesWidget =
                 this_.module.drawAllStartBubbles(this_.itineraries[this_.activeIndex]);
             });
             
-            /*$('<div class="otp-itin-leg-endpointDescSub">Stop #'+leg.from.stopId.id+' [<a href="#">Show other departures</a>]</div>')
-            .appendTo(legDiv)
-            .click(function(evt) {
-                var stopID = leg.from.stopId.id;
-                var times = this_.activeItin().stopTimesMap[stopID];
-                console.log(evt);
-                //var stopsWidget = new otp.widgets.StopTimesWidget(this_.id+"-stopWidget-"+stopID, this_.widgetManager);
-                if(!this_.module.stopsWidget) {
-                    this_.module.stopsWidget = new otp.widgets.StopTimesWidget("otp-"+this.moduleId+"-stopsWidget", this_.widgetManager);
-                    this_.module.stopsWidget.$().offset({top: evt.clientY, left: evt.clientX});
-                }
-                this_.module.stopsWidget.show();
-                this_.module.stopsWidget.update(stopID, (leg.routeShortName || leg.routeLongName), times, leg.startTime);
-                this_.module.stopsWidget.bringToFront();
-                //this_.widgetManager.addWidget(stopsWidget);
-            });*/
 
             $('<div class="otp-itin-leg-endpointDescSub">Stop #'+leg.from.stopId.id+' [<a href="#">Stop Viewer</a>]</div>')
             .appendTo(legDiv)
             .click(function(evt) {
-                //var stopId = leg.from.stopId.id;
-                //var times = this_.activeItin().stopTimesMap[stopId];
-                //console.log(evt);
-                //var stopsWidget = new otp.widgets.StopTimesWidget(this_.id+"-stopWidget-"+stopID, this_.widgetManager);
                 if(!this_.module.stopViewerWidget) {
-                    //this_.module.stopViewerWidget = new otp.modules.multimodal.StopViewerWidget("otp-"+this.moduleId+"-stopViewerWidget", this_.module);
                     this_.module.stopViewerWidget = new otp.widgets.transit.StopViewerWidget("otp-"+this_.module.id+"-stopViewerWidget", this_.module);
                     this_.module.stopViewerWidget.$().offset({top: evt.clientY, left: evt.clientX});
                 }
                 this_.module.stopViewerWidget.show();
-                //this_.module.stopViewerWidget.update(leg, times);
                 this_.module.stopViewerWidget.activeTime = leg.startTime;
                 this_.module.stopViewerWidget.setStop(leg.from.stopId.agencyId, leg.from.stopId.id, leg.from.name);
                 this_.module.stopViewerWidget.bringToFront();
-                //this_.widgetManager.addWidget(stopsWidget);
             });
 
 
@@ -564,14 +542,35 @@ otp.widgets.ItinerariesWidget =
                 this_.module.pathMarkerLayer.clearLayers();
                 this_.module.drawAllStartBubbles(this_.itineraries[this_.activeIndex]);
             });
-            
-            return legDiv;
 
-            /*if(previousLeg) {
-                html += '<div class="otp-itin-leg-leftcol">'+otp.util.Time.formatItinTime(previousLeg.endTime, "h:mma")+"</div>";
-                html += '<div class="otp-itin-leg-endpointDesc">Arrive at '+leg.from.name+'</div>';
-                html += '<div class="otp-itin-leg-elapsedDesc">Wait time: '+otp.util.Time.msToHrMin(leg.startTime-previousLeg.endTime)+'</div>';
-            }*/
+
+            // render any alerts
+            
+            if(leg.alerts) {
+                for(var i = 0; i < leg.alerts.length; i++) {
+                    var alert = leg.alerts[i];
+                    
+                    var alertHtml = '<div class="otp-itin-alert-header">';
+
+                    if(alert.alertUrl.someTranslation) alertHtml += '<a href="' + alert.alertUrl.someTranslation + '" target="_blank">';
+                    alertHtml += 'Alert for Route ' + leg.route;
+                    if(alert.alertUrl.someTranslation) alertHtml += '</a>';
+
+                    if(alert.alertHeaderText.someTranslation) {
+                        alertHtml += ': ' + alert.alertHeaderText.someTranslation;
+                    }
+                    alertHtml += '</div>';
+                    if(alert.alertDescriptionText.someTranslation) {
+                        alertHtml += '<div class="otp-itin-alert-description">' + alert.alertDescriptionText.someTranslation + '</div>';
+                    }
+                    
+                    $('<div class="otp-itin-alert" />').appendTo(legDiv)
+                    .append($('<div class="otp-itin-alert-left" />'))
+                    .append($('<div class="otp-itin-alert-main" />').html(alertHtml));                    
+                } 
+            }
+                        
+            return legDiv;
         }
         else { // walk / bike / car
             var legDiv = $('<div></div>');
