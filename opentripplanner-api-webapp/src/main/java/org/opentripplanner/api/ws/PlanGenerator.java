@@ -37,20 +37,7 @@ import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.AreaEdge;
-import org.opentripplanner.routing.edgetype.DwellEdge;
-import org.opentripplanner.routing.edgetype.EdgeWithElevation;
-import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
-import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
-import org.opentripplanner.routing.edgetype.ElevatorEdge;
-import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.edgetype.HopEdge;
-import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
-import org.opentripplanner.routing.edgetype.OnBoardForwardEdge;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
-import org.opentripplanner.routing.edgetype.PreAlightEdge;
-import org.opentripplanner.routing.edgetype.PreBoardEdge;
-import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
@@ -239,6 +226,11 @@ public class PlanGenerator {
                     // Add alighting alerts to the previous leg
                     addNotesToLeg(itinerary.legs.get(itinerary.legs.size() - 1), state.getBackAlerts());
                 }
+                continue;
+            }
+
+            //fix for the pathway edge, so they won't be show in the itinerary
+            if (backEdge instanceof PathwayEdge){
                 continue;
             }
 

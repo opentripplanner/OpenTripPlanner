@@ -13,11 +13,9 @@
 
 package org.opentripplanner.routing.edgetype.loader;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
+import java.util.*;
 
+import lombok.Setter;
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.gbannotation.BikeRentalStationUnlinked;
@@ -27,6 +25,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.factory.FindMaxWalkDistances;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -41,6 +40,9 @@ public class NetworkLinker {
     private static Logger _log = LoggerFactory.getLogger(NetworkLinker.class);
 
     private Graph graph;
+
+    @Setter
+    private Collection<StreetTraversalPermission> permissions = null;
 
     private NetworkLinkerLibrary networkLinkerLibrary;
 
@@ -83,7 +85,7 @@ public class NetworkLinker {
             // entrances
             if (ts.isEntrance() || !ts.hasEntrances()) {
                 boolean wheelchairAccessible = ts.hasWheelchairEntrance();
-                if (!networkLinkerLibrary.connectVertexToStreets(ts, wheelchairAccessible).getResult()) {
+                if (!networkLinkerLibrary.connectVertexToStreets(ts, wheelchairAccessible, permissions).getResult()) {
                     _log.warn(graph.addBuilderAnnotation(new StopUnlinked(ts)));
                 }
             }

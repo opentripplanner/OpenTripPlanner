@@ -50,7 +50,7 @@ import org.opentripplanner.api.thrift.definition.TripParameters;
 import org.opentripplanner.api.thrift.definition.TripPaths;
 import org.opentripplanner.api.thrift.definition.VertexQuery;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.graph_builder.impl.osm.DefaultWayPropertySetSource;
+import org.opentripplanner.graph_builder.impl.osm.wayProperties.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl;
 import org.opentripplanner.openstreetmap.impl.FileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.routing.algorithm.GenericAStar;

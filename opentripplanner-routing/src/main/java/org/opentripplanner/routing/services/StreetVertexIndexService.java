@@ -20,6 +20,7 @@ import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.CandidateEdgeBundle;
@@ -40,19 +41,34 @@ public interface StreetVertexIndexService {
 
     public Collection<StreetEdge> getEdgesForEnvelope(Envelope envelope);
 
+//    /**
+//     * Get the closest edges to this location are traversable given these preferences.
+//     *
+//     * @param location
+//     * @param prefs Must be able to traverse these edges given these preferences.
+//     * @param extraEdges Additional edges to consider, may be null
+//     * @param preferredEdges Edges which are preferred, may be null
+//     * @param possibleTransitLinksOnly Only include possible transit links.
+//     * @return
+//     */
+//    public CandidateEdgeBundle getClosestEdges(GenericLocation location,
+//            TraversalRequirements reqs, List<Edge> extraEdges, Collection<Edge> preferredEdges,
+//            boolean possibleTransitLinksOnly);
+
+
     /**
      * Get the closest edges to this location are traversable given these preferences.
-     * 
+     *
      * @param location
      * @param prefs Must be able to traverse these edges given these preferences.
      * @param extraEdges Additional edges to consider, may be null
      * @param preferredEdges Edges which are preferred, may be null
-     * @param possibleTransitLinksOnly Only include possible transit links.
+     * @param traversalPermissions a collection of permissions that at list one of them is allowed, may be null
      * @return
      */
     public CandidateEdgeBundle getClosestEdges(GenericLocation location,
-            TraversalRequirements reqs, List<Edge> extraEdges, Collection<Edge> preferredEdges,
-            boolean possibleTransitLinksOnly);
+                                               TraversalRequirements reqs, List<Edge> extraEdges, Collection<Edge> preferredEdges,
+                                               Collection<StreetTraversalPermission> traversalPermissions);
 
     /**
      * Get the closest edges to this location are traversable given these preferences.

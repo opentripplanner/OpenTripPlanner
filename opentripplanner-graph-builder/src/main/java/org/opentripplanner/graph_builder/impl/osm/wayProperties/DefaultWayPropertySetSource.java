@@ -11,13 +11,14 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.graph_builder.impl.osm;
+package org.opentripplanner.graph_builder.impl.osm.wayProperties;
 
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.graph_builder.impl.osm.*;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -545,20 +546,20 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         return props;
     }
 
-    private void createNames(WayPropertySet propset, String spec, String patternKey) {
+    protected void createNames(WayPropertySet propset, String spec, String patternKey) {
         String pattern = localize(patternKey);
         CreativeNamer namer = new CreativeNamer(pattern);
         propset.addCreativeNamer(new OSMSpecifier(spec), namer);
     }
 
-    private void createNotes(WayPropertySet propset, String spec, String patternKey) {
+    protected void createNotes(WayPropertySet propset, String spec, String patternKey) {
         NoteProperties properties = new NoteProperties();
         String pattern = localize(patternKey);
         properties.setNotePattern(pattern);
         propset.addNote(new OSMSpecifier(spec), properties);
     }
 
-    private void setProperties(WayPropertySet propset, String spec,
+    protected void setProperties(WayPropertySet propset, String spec,
             StreetTraversalPermission permission) {
         setProperties(propset, spec, permission, 1.0, 1.0);
     }
@@ -566,12 +567,12 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
     /**
      * Note that the safeties here will be adjusted such that the safest street has a safety value of 1, with all others scaled proportionately.
      */
-    private void setProperties(WayPropertySet propset, String spec,
+    protected void setProperties(WayPropertySet propset, String spec,
             StreetTraversalPermission permission, double safety, double safetyBack) {
         setProperties(propset, spec, permission, safety, safetyBack, false);
     }
 
-    private void setProperties(WayPropertySet propset, String spec,
+    protected void setProperties(WayPropertySet propset, String spec,
             StreetTraversalPermission permission, double safety, double safetyBack, boolean mixin) {
         WayProperties properties = new WayProperties();
         properties.setPermission(permission);
@@ -579,14 +580,14 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         propset.addProperties(new OSMSpecifier(spec), properties, mixin);
     }
 
-    private void setCarSpeed(WayPropertySet propset, String spec, float speed) {
+    protected void setCarSpeed(WayPropertySet propset, String spec, float speed) {
         SpeedPicker picker = new SpeedPicker();
         picker.setSpecifier(new OSMSpecifier(spec));
         picker.setSpeed(speed);
         propset.addSpeedPicker(picker);
     }
 
-    private String localize(String key) {
+    protected String localize(String key) {
         try {
             String retval = getResourceBundle().getString(key);
             _log.debug(String.format("Localized '%s' using '%s'", key, retval));
@@ -597,7 +598,7 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         }
     }
 
-    private ResourceBundle getResourceBundle() {
+    protected ResourceBundle getResourceBundle() {
         if (resources == null) {
             resources = ResourceBundle.getBundle("WayProperties", locale);
         }

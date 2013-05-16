@@ -13,11 +13,11 @@
 
 package org.opentripplanner.graph_builder.impl;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
+import lombok.Setter;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.loader.NetworkLinker;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
@@ -31,6 +31,11 @@ public class TransitToStreetNetworkGraphBuilderImpl implements GraphBuilder {
 
     private static final Logger LOG = LoggerFactory.getLogger(TransitToStreetNetworkGraphBuilderImpl.class);
 
+    @Setter
+    private Collection<StreetTraversalPermission> permissions = new ArrayList<StreetTraversalPermission>(){{
+        add(StreetTraversalPermission.CAR);
+    }};
+
     public List<String> provides() {
         return Arrays.asList("linking");
     }
@@ -43,6 +48,7 @@ public class TransitToStreetNetworkGraphBuilderImpl implements GraphBuilder {
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         LOG.info("linking transit stops to streets...");
         NetworkLinker linker = new NetworkLinker(graph, extra);
+        linker.setPermissions(permissions);
         linker.createLinkage();
     }
 

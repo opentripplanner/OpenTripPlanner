@@ -184,9 +184,14 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
                         break;
                     }
                 }
-            }            
+            }
+
+            s1.setEverBoarded(true);
 
             s1.setBackMode(getMode());
+
+            s1.setEverBoarded(true);
+
             return s1.makeState();
         } else { 
             /* We are going onto transit and must look for a suitable transit trip on this pattern. */            

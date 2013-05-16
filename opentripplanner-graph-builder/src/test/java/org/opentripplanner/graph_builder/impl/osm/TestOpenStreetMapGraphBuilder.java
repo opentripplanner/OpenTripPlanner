@@ -24,6 +24,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.graph_builder.impl.osm.wayProperties.DefaultWayPropertySetSource;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.impl.FileBasedOpenStreetMapProviderImpl;
