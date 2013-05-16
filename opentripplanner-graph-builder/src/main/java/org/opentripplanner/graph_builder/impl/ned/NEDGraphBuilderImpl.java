@@ -96,7 +96,7 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
         // interpolation internally)
         coverage = (gridCov instanceof GridCoverage2D) ? Interpolator2D.create(
                 (GridCoverage2D) gridCov, new InterpolationBilinear()) : gridCov;
-
+        log.info("setting street elevation profiles from NED data...");
         List<EdgeWithElevation> edgesWithElevation = new ArrayList<EdgeWithElevation>();
         int nProcessed = 0;
         int nTotal = graph.countEdges();

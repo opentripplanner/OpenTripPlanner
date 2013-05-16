@@ -543,7 +543,6 @@ public class GTFSPatternHopFactory {
 //        for (TableTripPattern tp : context.tripPatternIds.keySet()) {
 //            tp.finish();
 //        }
-        _log.info("end indexing large patterns");
         clearCachedData();
         graph.putService(FareService.class, fareServiceFactory.makeFareService());
         graph.putService(ServiceIdToNumberService.class, new ServiceIdToNumberService(context.serviceIds));
@@ -556,12 +555,14 @@ public class GTFSPatternHopFactory {
         cg += 1;
         AgencyAndId shapeId = trip.getShapeId();
         if (shapeId == null || shapeId.getId() == null || shapeId.getId().equals(""))
-            return;
-
-        //Treat shape_dist_traveled on a per-trip basis
+            return; // this trip has no associated shape_id, bail out
+        // TODO: is this right? don't we want to use the straight-line logic below?
+        
+        /* Detect presence or absence of shape_dist_traveled on a per-trip basis */
         StopTime st0 = stopTimes.get(0);
         boolean hasShapeDist = st0.isShapeDistTraveledSet();
-        if (hasShapeDist) {
+        if (hasShapeDist) { 
+            // this trip has shape_dist in stop_times
             for (int i = 0; i < hops.size(); ++i) {
                 Edge hop = hops.get(i);
                 st0 = stopTimes.get(i);
@@ -572,6 +573,8 @@ public class GTFSPatternHopFactory {
         }
         LineString shape = getLineStringForShapeId(shapeId);
         if (shape == null) {
+            // this trip has a shape_id, but no such shape exists, and no shape_dist in stop_times
+            // create straight line segments between stops for each hop
             for (int i = 0; i < stopTimes.size() - 1; ++i) {
                 st0 = stopTimes.get(i);
                 StopTime st1 = stopTimes.get(i + 1);
@@ -580,11 +583,12 @@ public class GTFSPatternHopFactory {
             }
             return;
         }
+        // This trip does not have shape_dist in stop_times, but does have an associated shape.
         ArrayList<IndexedLineSegment> segments = new ArrayList<IndexedLineSegment>();
         for (int i = 0 ; i < shape.getNumPoints() - 1; ++i) {
             segments.add(new IndexedLineSegment(i, shape.getCoordinateN(i), shape.getCoordinateN(i + 1)));
         }
-        //get possible segment matches for each stop
+        // Find possible segment matches for each stop.
         List<List<IndexedLineSegment>> possibleSegmentsForStop = new ArrayList<List<IndexedLineSegment>>();
         int minSegmentIndex = 0;
         for (int i = 0; i < stopTimes.size() ; ++i) {
@@ -1308,6 +1312,7 @@ public class GTFSPatternHopFactory {
                 && startIndex.getComponentIndex() == endIndex.getComponentIndex();
     }
 
+    /** create a 2-point linestring (a straight line segment) between the two stops */
     private LineString createSimpleGeometry(Stop s0, Stop s1) {
         
         Coordinate[] coordinates = new Coordinate[] {
@@ -1522,17 +1527,21 @@ public class GTFSPatternHopFactory {
                 new FreeEdge(parentStopVertex, stopVertex);
                 new FreeEdge(stopVertex, parentStopVertex);
 
+                // Stops with location_type=2 (entrances as defined in the pathways.txt 
+                // proposal) have no arrive/depart vertices, hence the null checks.
                 Vertex stopArriveVertex = context.stopArriveNodes.get(stop);
                 Vertex parentStopArriveVertex = context.stopArriveNodes.get(parentStop);
-
-                new FreeEdge(parentStopArriveVertex, stopArriveVertex);
-                new FreeEdge(stopArriveVertex, parentStopArriveVertex);
+                if (stopArriveVertex != null && parentStopArriveVertex != null) {
+                    new FreeEdge(parentStopArriveVertex, stopArriveVertex);
+                    new FreeEdge(stopArriveVertex, parentStopArriveVertex);
+                }
 
                 Vertex stopDepartVertex = context.stopDepartNodes.get(stop);
                 Vertex parentStopDepartVertex = context.stopDepartNodes.get(parentStop);
-
-                new FreeEdge(parentStopDepartVertex, stopDepartVertex);
-                new FreeEdge(stopDepartVertex, parentStopDepartVertex);
+                if (stopDepartVertex != null && parentStopDepartVertex != null) {
+                    new FreeEdge(parentStopDepartVertex, stopDepartVertex);
+                    new FreeEdge(stopDepartVertex, parentStopDepartVertex);
+                }
 
                 // TODO: provide a cost for these edges when stations and
                 // stops have different locations 

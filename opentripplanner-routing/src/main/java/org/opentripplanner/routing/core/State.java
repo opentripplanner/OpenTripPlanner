@@ -158,7 +158,7 @@ public class State implements Cloneable {
                 " w=" + this.getWeight() + 
                 " t=" + this.getElapsedTime() + 
                 " d=" + this.getWalkDistance() + 
-                " b=" + this.getNumBoardings();
+                " b=" + this.getNumBoardings() + ">";
     }
     
     /** Returns time in seconds since epoch */
@@ -262,8 +262,9 @@ public class State implements Cloneable {
         return stateData.lastNextArrivalDelta;
     }
 
-    /**
-     * Multicriteria comparison. Returns true if this state is better than the other one (or equal)
+   /**
+     * Multicriteria comparison of states. 
+     * @return True if this state is better than the other one (or equal) 
      * both in terms of time and weight.
      */
     public boolean dominates(State other) {
@@ -544,6 +545,7 @@ public class State implements Cloneable {
 		return sb.toString();
 	}
 
+    /** @return the last TripPattern used in this path (which is set when leaving the vehicle). */
     public TripPattern getLastPattern() {
         return stateData.lastPattern;
     }

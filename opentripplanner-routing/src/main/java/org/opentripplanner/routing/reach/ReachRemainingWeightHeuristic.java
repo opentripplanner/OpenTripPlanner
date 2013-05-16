@@ -68,7 +68,7 @@ public class ReachRemainingWeightHeuristic implements RemainingWeightHeuristic {
          *	    again considering any mandatory walking.
          */
         double remainingwalkDistance = options.getMaxWalkDistance()- s.getWalkDistance();
-        double speed = options.getSpeedUpperBound();
+        double speed = options.getStreetSpeedUpperBound();
         
         Edge backEdge = s.getBackEdge();
         EdgeWithReach edgeWithReach = null;
@@ -149,7 +149,7 @@ public class ReachRemainingWeightHeuristic implements RemainingWeightHeuristic {
         
         double euclidianDistance = distanceLibrary.fastDistance(sv.getCoordinate(), 
                 target.getCoordinate());
-        double speed = options.getSpeedUpperBound();
+        double speed = options.getStreetSpeedUpperBound();
 
         if (useTransit) {
             if (s.isAlightedLocal()) {
@@ -200,11 +200,11 @@ public class ReachRemainingWeightHeuristic implements RemainingWeightHeuristic {
             return 10;
         } else {
             if (options.optimize == OptimizeType.QUICK) {
-                return options.getSpeedUpperBound();
+                return options.getStreetSpeedUpperBound();
             } else {
                 // assume that the best route is no more than 10 times better than
                 // the as-the-crow-flies flat base route.
-                return options.getSpeedUpperBound() * 10;
+                return options.getStreetSpeedUpperBound() * 10;
             }
         }
     }

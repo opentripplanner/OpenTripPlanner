@@ -177,9 +177,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
      * @param options
      * @return
      */
-    private Vertex getClosestVertex(final GenericLocation location, String name,
-            RoutingRequest options) {
-        return getClosestVertex(location, name, options, null);
+    private Vertex getClosestVertex(final GenericLocation location, RoutingRequest options) {
+        return getClosestVertex(location, options, null);
     }
 
     /**
@@ -194,16 +193,18 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
      * @param extraEdges
      * @return
      */
-    protected Vertex getClosestVertex(final GenericLocation location, String name,
-            RoutingRequest options, List<Edge> extraEdges) {
+    protected Vertex getClosestVertex(final GenericLocation location, RoutingRequest options,
+            List<Edge> extraEdges) {
         _log.debug("Looking for/making a vertex near {}", location);
 
         // first, check for intersections very close by
         Coordinate coord = location.getCoordinate();
         StreetVertex intersection = getIntersectionAt(coord, MAX_CORNER_DISTANCE);
+        String calculatedName = location.getName();
+
         if (intersection != null) {
             // coordinate is at a street corner or endpoint
-            if (name == null) {
+            if (!location.hasName()) {
                 _log.debug("found intersection {}. not splitting.", intersection);
                 // generate names for corners when no name was given
                 Set<String> uniqueNameSet = new HashSet<String>();
@@ -222,15 +223,15 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 ResourceBundle resources = ResourceBundle.getBundle("internals", locale);
                 String fmt = resources.getString("corner");
                 if (uniqueNames.size() > 1) {
-                    name = String.format(fmt, uniqueNames.get(0), uniqueNames.get(1));
+                    calculatedName = String.format(fmt, uniqueNames.get(0), uniqueNames.get(1));
                 } else if (uniqueNames.size() == 1) {
-                    name = uniqueNames.get(0);
+                    calculatedName = uniqueNames.get(0);
                 } else {
-                    name = resources.getString("unnamedStreet");
+                    calculatedName = resources.getString("unnamedStreet");
                 }
             }
             StreetLocation closest = new StreetLocation(graph, "corner " + Math.random(), coord,
-                    name);
+                    calculatedName);
             FreeEdge e = new FreeEdge(closest, intersection);
             closest.getExtra().add(e);
             e = new FreeEdge(intersection, closest);
@@ -265,11 +266,11 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             Coordinate nearestPoint = candidate.nearestPointOnEdge;
             closestStreetDistance = distanceLibrary.distance(coord, nearestPoint);
             _log.debug("best street: {} dist: {}", bestStreet.toString(), closestStreetDistance);
-            if (name == null) {
-                name = bestStreet.getName();
+            if (calculatedName == null) {
+                calculatedName = bestStreet.getName();
             }
             String closestName = String.format("%s_%s", bestStreet.getName(), location.toString());
-            closestStreet = StreetLocation.createStreetLocation(graph, closestName, name,
+            closestStreet = StreetLocation.createStreetLocation(graph, closestName, calculatedName,
                     bundle.toEdgeList(), nearestPoint, coord);
         }
 
@@ -344,10 +345,9 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                     continue;
                 }
 
-                // Ignore those edges we can't traverse
+                // Ignore those edges we can't traverse. canBeTraversed checks internally if 
+                // walking a bike is possible on this StreetEdge.
                 if (!reqs.canBeTraversed(e)) {
-                    // NOTE(flamholz): canBeTraversed checks internally if we
-                    // can walk our bike on this StreetEdge.
                     continue;
                 }
 
@@ -375,6 +375,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         for (CandidateEdgeBundle bundle : bundles) {
             if (best == null || bundle.best.score < best.best.score) {
                 if (possibleTransitLinksOnly) {
+                    // assuming all platforms are tagged when they are not car streets... #1077 
                     if (!(bundle.allowsCars() || bundle.isPlatform()))
                         continue;
                 }
@@ -486,10 +487,9 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         Coordinate c = loc.getCoordinate();
         if (c != null) {
             if (other instanceof StreetLocation) {
-                return getClosestVertex(loc, loc.getName(), options,
-                        ((StreetLocation) other).getExtra());
+                return getClosestVertex(loc, options, ((StreetLocation) other).getExtra());
             } else {
-                return getClosestVertex(loc, loc.getName(), options);
+                return getClosestVertex(loc, options);
             }
         }
 

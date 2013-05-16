@@ -93,12 +93,7 @@ public class TraversalRequirements {
         return bikeWalkingRequirements != null;
     }
 
-    /**
-     * Returns true if this StreetEdge can be traversed.
-     * 
-     * @param e
-     * @return
-     */
+    /** Returns true if this StreetEdge can be traversed. */
     private boolean canBeTraversedInternal(StreetEdge e) {
         if (wheelchairAccessible) {
             if (!e.isWheelchairAccessible()) {
@@ -114,9 +109,7 @@ public class TraversalRequirements {
 
     /**
      * Returns true if this StreetEdge can be traversed.
-     * 
-     * @param e
-     * @return
+     * Also checks if we can walk our bike on this StreetEdge.
      */
     public boolean canBeTraversed(StreetEdge e) {
         if (canBeTraversedInternal(e)) {

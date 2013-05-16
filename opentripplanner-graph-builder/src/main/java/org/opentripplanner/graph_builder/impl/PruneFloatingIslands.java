@@ -76,16 +76,16 @@ public class PruneFloatingIslands implements GraphBuilder {
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
-        _log.warn("Pruning isolated islands ...");
+        _log.info("Pruning isolated islands in street network...");
         StreetUtils.pruneFloatingIslands(graph, islandWithoutStopsMaxSize, islandWithStopsMaxSize,
                 LoggerAppenderProvider.createCsvFile4LoggerCat(islandLogFile, "islands"));
-        if(transitToStreetNetwork == null){
-            _log.warn("Could not reconnect stop, TransitToStreetNetworkGraphBuilder was not provided");
-        }else{
+        if (transitToStreetNetwork == null) {
+            _log.info("TransitToStreetNetworkGraphBuilder was not provided to PruneFloatingIslands. Not attempting to reconnect stops.");
+        } else {
             //reconnect stops on small islands (that removed)
             transitToStreetNetwork.buildGraph(graph,extra);
         }
-        _log.warn("Done pruning isolated islands");
+        _log.debug("Done pruning isolated islands.");
     }
 
     @Override

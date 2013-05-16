@@ -32,7 +32,7 @@ public class PathExtension extends Path {
         setStart_time(path.getStartTime());
         setEnd_time(path.getEndTime());
 
-        // Optionall include path details
+        // Optionally include path details
         if (includePathDetails) {
             for (State state : path.states) {
                 addToStates(new TravelStateExtension(state));
@@ -46,9 +46,6 @@ public class PathExtension extends Path {
 
     /**
      * Convenience constructor to initialize from GraphPath and include all path information.
-     * 
-     * 
-     * @param path
      */
     public PathExtension(GraphPath path) {
         this(path, true);

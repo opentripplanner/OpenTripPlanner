@@ -21,6 +21,8 @@ otp.namespace("otp.planner");
   * RaphaelJS library.
   * 
   * TopoRenderer is created by Planner.
+  * 
+  * Adapted by Timothy Weyrer (04/15/2013)
   */
 
 otp.planner.TopoRendererStatic = {
@@ -36,7 +38,7 @@ otp.planner.TopoRendererStatic = {
     previewDiv :            null,
 
     terrainPct :        0.8,
-    axisWidth :         40,
+    axisWidth :         50, 
     nonBikeLegWidth:    150,
 
     terrainCursor :     null,
@@ -52,6 +54,9 @@ otp.planner.TopoRendererStatic = {
     minElev :           null,
     maxElev :           null,
     totalDistance :     null,
+    metricsSystem :   	null, 
+    unitRepresentation :	null, 
+    elevInterval	:	null, 
     THIS          :     null,
 
     /** */
@@ -60,6 +65,18 @@ otp.planner.TopoRendererStatic = {
         otp.configure(this, config);
         otp.planner.TopoRendererStatic.THIS = this;
         this.THIS = this;
+        
+        this.metricsSystem = otp.config.metricsSystem;
+
+        if(this.metricsSystem == 'international')
+        {
+        	this.unitRepresentation = ' m';
+        	this.elevInterval = 15; 
+        }else
+        {
+        	this.unitRepresentation = " '";
+        	this.elevInterval = 50;
+        }
     },
     
     processItinerary : function(itin) {
@@ -87,21 +104,27 @@ otp.planner.TopoRendererStatic = {
             var steps = leg.data.steps;
             var firstElev = 0, lastElev = 0;
             for (var si = 0; si < steps.length; si++) {
-                this.totalDistance += steps[si].distance;
+            	//sum up distance in case mode is either walk or bicycle
+            	if(leg.get('mode') == "BICYCLE" || leg.get('mode') == "WALK") 
+            		this.totalDistance += steps[si].distance; // total distance in meter
                 if (typeof steps[si].elevation == 'undefined') {
                     continue;
                 }
-                var elevArr = steps[si].elevation.split(",");
+                var elevArr = steps[si].elevation.split(","); 
                 for (var ei = 1; ei < elevArr.length; ei+=2) {
-                    var elevFt = elevArr[ei] * 3.2808399;
-                    if (elevFt < this.minElev) {
-                        this.minElev = elevFt;
+                    var elev;
+                    if(this.metricsSystem == 'international')
+                    	elev = elevArr[ei]; // international -- leave as meters 
+                    else 
+                    	elev = elevArr[ei] * 3.2808399; // english -- convert to feet
+                    if (elev < this.minElev) {
+                        this.minElev = elev;
                     }
-                    if (elevFt > this.maxElev) {
-                        this.maxElev = elevFt;
+                    if (elev > this.maxElev) {
+                        this.maxElev = elev;
                     }
-                    if(firstElev == 0 && elevFt > 0) firstElev = elevFt;
-                    if(elevFt > 0) lastElev = elevFt;
+                    if(firstElev == 0 && elev > 0) firstElev = elev;
+                    if(elev > 0) lastElev = elev;
                 }       
             }
             legInfo.firstElev = firstElev;
@@ -114,14 +137,13 @@ otp.planner.TopoRendererStatic = {
         
         this.processItinerary(itin);
         
-        //var width = this.panel.getWidth();
+        var width = this.panel.getWidth();
         var height = this.panel.getHeight();
-        //if(width == 0) width = this.map.map.size.w;
-        width = this.map.map.size.w;
+        
         if(height == 0) height = 180;
+        if(width == 0) width = 1074;
         
         this.render(width, height);
-        
         
         this.extWrapper = new Ext.Panel({
             contentEl : this.mainContainerDiv,
@@ -132,8 +154,13 @@ otp.planner.TopoRendererStatic = {
     
     redraw : function() {
         this.panel.remove(this.extWrapper);
+        
         var width = this.panel.getWidth();
         var height = this.panel.getHeight();
+        
+        if(height == 0) height = 180;
+        if(width == 0) width = 1074;
+        
         this.render(width, height);
         this.extWrapper = new Ext.Panel({
             contentEl : this.mainContainerDiv,
@@ -162,34 +189,35 @@ otp.planner.TopoRendererStatic = {
         this.locationPoint = null;
         this.locationMarker = null;
         
-        
-        // compute the resolution of the main terrain graph in ft per pixel
-        var res = Math.floor(this.totalDistance / 5000); 
-        if(res < 5) res = 5;
-        
         // compute the width of the main elevation graphic in pixels
-        var terrainWidth = (this.totalDistance*3.2808399)/res + this.nonBikeWalkLegCount*this.nonBikeLegWidth;
-        
+        // compute the resolution of the main terrain
+        var terrainWidth, res;
+        if(this.metricsSystem == 'international')
+        {
+        	res = this.totalDistance / (width - this.axisWidth - 10 - this.nonBikeLegWidth*this.nonBikeWalkLegCount);
+        	terrainWidth = (this.totalDistance)/res;
+        }	
+        else
+        {
+        	res = (this.totalDistance*3.2808399) / (width - this.axisWidth - 10 - this.nonBikeLegWidth*this.nonBikeWalkLegCount);
+        	terrainWidth = (this.totalDistance*3.2808399)/res;
+        }
+
         // if the graph is wider than what can be displayed without scrolling, 
         // split the panel between the main graph and a "preview" strip 
-        var showPreview = (terrainWidth > width);
+        var showPreview = (terrainWidth > (width - this.axisWidth));
         var terrainHeight = showPreview ? height * this.terrainPct : height;
         var previewHeight = height - terrainHeight;
         
-        // determine the interval at which to show 
-        
-        var elevSpan = this.maxElev - this.minElev;        
-        var elevInterval = Math.floor((elevSpan/terrainHeight)*.5)*100;
-        if(elevInterval < 100) elevInterval = 100;
-        
         // expand the min/max elevation range to align with interval multiples 
-        this.minElev = elevInterval*Math.floor(this.minElev/elevInterval);
-        this.maxElev = elevInterval*Math.ceil(this.maxElev/elevInterval);
+        this.minElev = this.elevInterval*Math.floor(this.minElev/this.elevInterval);
+        this.maxElev = this.elevInterval*Math.ceil(this.maxElev/this.elevInterval);
 
         // create the container div elements and associated Raphael canvases                     
-        this.createContainerDivs(width, height, terrainWidth, showPreview);  
+        this.createContainerDivs(width, height, width-this.axisWidth); 
+
         var axisCanvas = Raphael(this.axisDiv);
-        var terrainCanvas = Raphael(this.terrainDiv, terrainWidth, terrainHeight);
+        var terrainCanvas = Raphael(this.terrainDiv, width-this.axisWidth, terrainHeight, showPreview);
                
         // set up the terrain "cursor" w/ initial x = -10; not visible until
         // mouse first hovers over a terrain segment
@@ -200,7 +228,7 @@ otp.planner.TopoRendererStatic = {
         });
         
         // draw the "blue sky" background on both terrain and axis canvases
-        terrainCanvas.rect(0, 0, terrainWidth, terrainHeight).attr({
+        terrainCanvas.rect(0, 0, width-this.axisWidth, terrainHeight).attr({
             fill : '90-rgb(135,206,255)-rgb(204,245,255)', 
             stroke : 'none'
         });        
@@ -212,7 +240,11 @@ otp.planner.TopoRendererStatic = {
         var d, rect;
         
         // draw the axis elevation labels
-        var subDivisions = (this.maxElev-this.minElev)/elevInterval;
+        // in case the elevation difference btw this.maxElev and this.minElev is small (one interval), the visualization looks kind of bad ... depends on personal preference
+        if((this.maxElev - this.minElev) == this.elevInterval)
+            this.minElev -=this.elevInterval;
+
+        var subDivisions = (this.maxElev-this.minElev)/this.elevInterval;
         var subDivHeight = terrainHeight / subDivisions;
         for (d = 0; d <= subDivisions; d++) {
             var textY = subDivHeight*d;
@@ -220,14 +252,15 @@ otp.planner.TopoRendererStatic = {
                 fill: 'white',
                 stroke: 'none'
             });
-            terrainCanvas.rect(0, textY, terrainWidth, 1).attr({
+            terrainCanvas.rect(0, textY, width-this.axisWidth, 1).attr({ //CHANGE 04/12/13 terrainWidth to width ... so that the whole div has the blue background
                 fill: 'white',
                 stroke: 'none'
             });
-            
-            if(d == 0) textY += 6;
+            //Labels for y axis
+            if(d == 0) textY += 12; //CHANGE 04/12/13 ... before 6 ... a higher value in this position 
             if(d == subDivisions) textY -= 6;
-            axisCanvas.text(this.axisWidth-3, textY, (this.maxElev-d*elevInterval)+"'").attr({
+            
+            axisCanvas.text(this.axisWidth-3, textY, (this.maxElev-d*this.elevInterval)+this.unitRepresentation).attr({ 
                 fill: 'black',
                 'font-size' : '12px',
                 'font-weight' : 'bold',
@@ -289,11 +322,10 @@ otp.planner.TopoRendererStatic = {
                     'font-weight' : 'bold'
                 });
                 
-                previewXCoords.push(width*(legStartX)/terrainWidth);
+                previewXCoords.push(legStartX);
                 previewYCoords.push(previewHeight);
                 
-                previewXCoords.push(width*(legStartX+this.nonBikeLegWidth)/terrainWidth);
-                previewYCoords.push(previewHeight);
+                previewXCoords.push(legStartX+this.nonBikeLegWidth); //CHANGE 04/12/13 width instead of terrainWidth at last parameter within brackets                
 
                 currentX += this.nonBikeLegWidth;
                 continue;
@@ -304,10 +336,14 @@ otp.planner.TopoRendererStatic = {
             var legXCoords = new Array(), legYCoords = new Array();
             for (si = 0; si < steps.length; si++) {
                 var step = steps[si];
-                var segWidth = (step.distance*3.2808399)/res;
-                
-                leg.topoGraphSpan += segWidth;
 
+                var segWidth;
+                if(this.metricsSystem == 'international')
+                	segWidth = (step.distance)/res;
+                else
+                	segWidth = (step.distance*3.2808399)/res;
+               
+                leg.topoGraphSpan += segWidth;
                 var xCoords = new Array(), yCoords = new Array();
                 var terrainPoly = null;
 
@@ -317,16 +353,22 @@ otp.planner.TopoRendererStatic = {
                         var stepLenM = elevArr[elevArr.length-2]; 
                         for (var j = 0; j < elevArr.length-1; j+=2) {
                             var posM = elevArr[j];
-                            var elevFt = elevArr[j+1] * 3.2808399;
+                            
+                            var elev; //CHANGE 04/12/13
+                            if(this.metricsSystem == 'international')
+                            	elev = elevArr[j+1];
+                            else
+                            	elev = elevArr[j+1] * 3.2808399;
+                            
                             var x = currentX + (posM/stepLenM)*segWidth;
-                            var y = terrainHeight-terrainHeight*(elevFt-this.minElev)/(this.maxElev-this.minElev);
+                            var y = terrainHeight-terrainHeight*(elev-this.minElev)/(this.maxElev-this.minElev);
                             if(j >= elevArr.length-2) x += 1;
                             xCoords.push(x);
                             yCoords.push(y);
                             legXCoords.push(x);
                             legYCoords.push(y);
-                            previewXCoords.push(width*x/terrainWidth);
-                            previewYCoords.push(previewHeight * (0.8 - 0.6*(elevFt-this.minElev)/(this.maxElev-this.minElev)));
+                            previewXCoords.push((width - this.axisWidth)*x/(width - this.axisWidth));//CHANGE 04/12/13 change form terrainwidth to width
+                            previewYCoords.push(previewHeight * (0.8 - 0.6*(elev-this.minElev)/(this.maxElev-this.minElev)));
                         }
 
                         var pathStr = "M "+ xCoords[0] + " " + yCoords[0]+ " ";
@@ -463,85 +505,10 @@ otp.planner.TopoRendererStatic = {
         for(var m=0; m < mouseRects.length; m++) {
             mouseRects[m].toFront();
         }
-        
-        // draw preview panel (along bottom), if necessary
-
-        if(showPreview) {
-            var previewCanvas = Raphael(this.previewDiv, width, previewHeight);
-
-            var previewPathStr = "M 0 " + previewHeight + " ";
-            for(var p = 0; p < previewXCoords.length; p++) {
-                previewPathStr += "L "+ previewXCoords[p] + " " + previewYCoords[p]+ " ";
-            }
-            previewPathStr += "L " + width + " " + previewHeight + " z";
-
-            previewCanvas.path(previewPathStr).attr({
-                stroke : 'none', 
-                fill : 'gray'
-            });  
-
-            var pctVisible = (width - this.axisWidth) / terrainWidth;
-            var sliderWidth = pctVisible*width;
-            var slider = previewCanvas.rect(this.currentLeft, 3, sliderWidth, previewHeight-4).attr({
-                fill : '#bbb', 
-                'fill-opacity' : .5,
-                stroke : '#000',
-                'stroke-width' : 2
-            });
-            var rightArrow = previewCanvas.path([
-                     "M",this.currentLeft+sliderWidth+6,previewHeight*.25,
-                     "L",this.currentLeft+sliderWidth+18,previewHeight*.5,
-                     "L",this.currentLeft+sliderWidth+6,previewHeight*.75,"z"]).attr({
-                fill : '#000', 
-                stroke : 'none',
-                opacity : 0
-            });
-            var leftArrow = previewCanvas.path([
-                     "M",this.currentLeft-6,previewHeight*.25,
-                     "L",this.currentLeft-18,previewHeight*.5,
-                     "L",this.currentLeft-6,previewHeight*.75,"z"]).attr({
-                fill : '#000', 
-                stroke : 'none',
-                opacity : 0
-            });
-            
-            slider.mouseover(function(event) {
-                this.animate({fill: "#eee"}, 500);
-                rightArrow.animateWith(this, {opacity: 1}, 500);
-                leftArrow.animateWith(this, {opacity: 1}, 500);
-            });
-            slider.mouseout(function(event) {
-                this.animate({fill: "#bbb"}, 500);
-                rightArrow.animateWith(this, {opacity: 0}, 500);
-                leftArrow.animateWith(this, {opacity: 0}, 500);
-            });
-
-            var start = function () {
-                // storing original coordinates
-                this.ox = this.attr("x");
-            },
-            move = function (dx, dy) {
-                var nx = this.ox + dx;
-                if(nx < 0) nx = 0;
-                if(nx > width-sliderWidth) nx = width-sliderWidth;
-
-                this_.currentLeft = Math.round(-(nx/width)*terrainWidth);
-                this_.terrainDiv.style.left =  this_.currentLeft + 'px';
-
-                var ndx = nx - this.attr("x");
-                this.attr({x: nx});
-                rightArrow.translate(ndx,0);
-                leftArrow.translate(ndx,0);
-            },
-            up = function () {
-            };
-
-            slider.drag(move, start, up);
-        }
     },
     
     createContainerDivs : function(width, height, terrainWidth, showPreview) {
-        var upperHeight = showPreview ? height * this.terrainPct : height;;
+        var upperHeight = showPreview ? height * this.terrainPct : height;
         var lowerHeight = height - upperHeight;
                 
         this.axisDiv = document.createElement('div');
@@ -563,26 +530,15 @@ otp.planner.TopoRendererStatic = {
         this.terrainDiv.style.position = 'absolute';
         this.terrainDiv.style.top = '0px';
         this.terrainDiv.style.left = '0px';
+        this.terrainDiv.style.paddingBottom = '50px'; 
         this.terrainDiv.style.height = upperHeight + 'px';
         this.terrainDiv.style.width = terrainWidth + 'px';        
-
-        if(showPreview) {
-            this.previewDiv = document.createElement('div');
-            this.previewDiv.style.position = 'absolute';
-            this.previewDiv.style.top = upperHeight + 'px';
-            this.previewDiv.style.left = '0px';
-            this.previewDiv.style.height = lowerHeight + 'px';
-            this.previewDiv.style.width = width + 'px';
-        }
 
         this.mainContainerDiv = document.createElement('div');
         this.mainContainerDiv.appendChild(this.axisDiv);
         this.mainContainerDiv.appendChild(this.terrainContainerDiv);
         this.terrainContainerDiv.appendChild(this.terrainDiv);
-        if(showPreview) this.mainContainerDiv.appendChild(this.previewDiv);
-
     },
-
 
     pointAlongLineString : function(ls, d) {
         var points = ls.components;

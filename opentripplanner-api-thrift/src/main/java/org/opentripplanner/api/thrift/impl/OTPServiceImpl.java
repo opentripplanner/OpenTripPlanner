@@ -77,6 +77,8 @@ public class OTPServiceImpl implements OTPService.Iface {
     private GraphService graphService;
 
     private PathService pathService;
+    
+    private RoutingRequest prototypeRoutingRequest = new RoutingRequest();
 
     /**
      * Convenience getter for street index.
@@ -169,11 +171,11 @@ public class OTPServiceImpl implements OTPService.Iface {
         // perspective of the street indes, RoutingRequest is really just
         // a container for the TraversalModes, which is a weird design
         // but it's what we've got to work with.
-        RoutingRequestBuilder rrb = new RoutingRequestBuilder();
+        RoutingRequestBuilder builder = new RoutingRequestBuilder(prototypeRoutingRequest);
         if (q.isSetAllowed_modes()) {
-            rrb.setTravelModes(q.getAllowed_modes());
+            builder.setTravelModes(q.getAllowed_modes());
         }
-        RoutingRequest rr = rrb.build();
+        RoutingRequest rr = builder.build();
 
         // Get the nearest vertex
         StreetVertexIndexService streetVertexIndex = getStreetIndex();
@@ -287,14 +289,22 @@ public class OTPServiceImpl implements OTPService.Iface {
      */
     private TripPaths computePaths(TripParameters trip, PathOptions pathOptions) {
         // Build the RoutingRequest. For now, get only one itinerary.
-        RoutingRequest options = (new RoutingRequestBuilder(trip))
-                .setGraph(graphService.getGraph()).setNumItineraries(pathOptions.getNum_paths())
+        RoutingRequest options = (new RoutingRequestBuilder(prototypeRoutingRequest))
+                .addTripParameters(trip)
+                .setGraph(graphService.getGraph())
+                .setNumItineraries(pathOptions.getNum_paths())
                 .build();
 
         // For now, always use the default router.
         options.setRouterId("");
 
+        // TODO(flamholz): respect the return_detailed_path option.
         List<GraphPath> paths = pathService.getPaths(options);
+        if (paths == null || paths.size() == 0) {
+            LOG.warn("Found 0 paths for trip {}", trip);
+            LOG.warn("Origin {}", options.getFrom());
+            LOG.warn("Destination {}", options.getTo());
+        }
         TripPathsExtension tripPaths = new TripPathsExtension(trip, paths);
 
         // Need to call RoutingRequest.cleanup() to cleanup the temp edges.

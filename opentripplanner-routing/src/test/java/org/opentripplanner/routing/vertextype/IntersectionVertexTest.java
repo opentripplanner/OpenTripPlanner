@@ -5,8 +5,6 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
@@ -20,7 +18,6 @@ public class IntersectionVertexTest {
 
     private PlainStreetEdge fromEdge;
     private PlainStreetEdge straightAheadEdge;
-    private PlainStreetEdge turnEdge;
     
     @Before
     public void before() {
@@ -61,7 +58,6 @@ public class IntersectionVertexTest {
 
         this.fromEdge = maple1_2;
         this.straightAheadEdge = maple2_3;
-        this.turnEdge = maple_main2;
     }
 
     @Test
@@ -71,13 +67,6 @@ public class IntersectionVertexTest {
         
         iv.setFreeFlowing(true);
         assertTrue(iv.isFreeFlowing());
-
-        TraverseMode mode = TraverseMode.BICYCLE;
-        RoutingRequest options = new RoutingRequest();
-        float fromSpeed = 4.5f;
-        float toSpeed = 4.5f;
-        assertEquals(0.0,
-                iv.computeTraversalCost(fromEdge, straightAheadEdge, mode, options, fromSpeed, toSpeed), 0.0);
     }
     
     @Test
@@ -108,56 +97,9 @@ public class IntersectionVertexTest {
         
         // Set the freeFlowing bit to false.
         iv.setFreeFlowing(false);
-        assertFalse(iv.isFreeFlowing());
-       
-        // Should still infer free-flowingness and not penalize the traversal.
-        TraverseMode mode = TraverseMode.BICYCLE;
-        RoutingRequest options = new RoutingRequest();
-        float fromSpeed = 4.5f;
-        float toSpeed = 4.5f;
-        assertEquals(0.0,
-                iv.computeTraversalCost(fromEdge, straightAheadEdge, mode, options, fromSpeed, toSpeed), 0.0);
+        assertFalse(iv.isFreeFlowing());       
     }
 
-    @Test
-    public void testNotFreeFlowingBike() {
-        IntersectionVertex iv = new IntersectionVertex(_graph, "vertex", 1.0, 2.0);
-        assertFalse(iv.isFreeFlowing());
-        
-        TraverseMode mode = TraverseMode.BICYCLE;
-        RoutingRequest options = new RoutingRequest();
-        float fromSpeed = 4.5f;
-        float toSpeed = 4.5f;
-        
-        // Traversal cost is 0 because we're continuing straight ahead on a bike.
-        double straightAheadCost = iv.computeTraversalCost(fromEdge, straightAheadEdge, mode, options, fromSpeed, toSpeed);
-        assertEquals(0.0, straightAheadCost, 0.0);
-        
-        // If we are turning, then there is some cost due to the turn.
-        double turnCost = iv.computeTraversalCost(fromEdge, turnEdge, mode, options, fromSpeed, toSpeed);
-        assertTrue(turnCost > 0.0);
-    }
-
-    @Test
-    public void testNotFreeFlowingCar() {
-        IntersectionVertex iv = new IntersectionVertex(_graph, "vertex", 1.0, 2.0);
-        assertFalse(iv.isFreeFlowing());
-        
-        TraverseMode mode = TraverseMode.CAR;
-        RoutingRequest options = new RoutingRequest();
-        float fromSpeed = 4.5f;
-        float toSpeed = 4.5f;
-        
-        // Traversal cost is greater than 0 because we're driving.
-        double traversalCost = iv.computeTraversalCost(fromEdge, straightAheadEdge, mode, options, fromSpeed, toSpeed);
-        assertTrue(traversalCost > 0.0);
-    
-        // If there's a turn, the cost should be higher.
-        double turnCost = iv.computeTraversalCost(fromEdge, turnEdge, mode, options, fromSpeed, toSpeed);
-        assertTrue(turnCost > 0.0);
-        assertTrue(turnCost > traversalCost);
-    }
-    
     /****
      * Private Methods
      ****/

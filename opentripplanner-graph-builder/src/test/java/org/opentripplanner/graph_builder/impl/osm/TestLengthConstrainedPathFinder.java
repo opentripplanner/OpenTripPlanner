@@ -48,10 +48,10 @@ public class TestLengthConstrainedPathFinder extends TestCase {
         if (DEBUG_OUTPUT)
             gg.save(new File("/home/abyrd/constrain.graph"));
 
-        Vertex v1 = gg.getVertex("osm node 300879101");
-        Vertex v2 = gg.getVertex("osm node 300879072");
-        Vertex v3 = gg.getVertex("osm node 300879136");
-        Vertex v4 = gg.getVertex("osm node 300879035");
+        Vertex v1 = gg.getVertex("osm:node:300879101");
+        Vertex v2 = gg.getVertex("osm:node:300879072");
+        Vertex v3 = gg.getVertex("osm:node:300879136");
+        Vertex v4 = gg.getVertex("osm:node:300879035");
 
         Edge e1 = null, e2 = null;
         for (Edge e : v1.getOutgoing()) {

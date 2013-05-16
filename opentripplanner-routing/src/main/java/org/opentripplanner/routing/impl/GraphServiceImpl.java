@@ -51,6 +51,8 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphServiceImpl.class);
 
+    private static final String GRAPH_FILENAME = "Graph.obj";
+
     private String resourceBase = "file:/var/otp/graphs";
 
     private Map<String, Graph> graphs = new HashMap<String, Graph>();
@@ -76,6 +78,10 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
     /** If true, on startup register the graph in the location defaultRouterId. */
     @Setter
     private boolean attemptRegisterDefault = true;
+
+    /** If true, automatically try to load all graphs present in resourceBase. */
+    @Setter
+    private boolean autoDiscover = false;
 
     /** 
      * Router IDs may contain alphanumeric characters, underscores, and dashes only. 
@@ -118,7 +124,7 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
             LOG.info("attempting to automatically register routerIds {}", autoRegister);
             LOG.info("graph files will be sought in paths relative to {}", resourceBase);
             for (String routerId : autoRegister) {
-                this.registerGraph(routerId, true);
+                registerGraph(routerId, true);
             }
         } else {
             LOG.info("no list of routerIds was provided for automatic registration.");
@@ -126,6 +132,10 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
         if (attemptRegisterDefault && ! graphs.containsKey(defaultRouterId)) {
             LOG.info("Attempting to load graph for default routerId '{}'.", defaultRouterId);
             registerGraph(defaultRouterId, true);
+        }
+        if (autoDiscover) {
+            LOG.info("Auto discovering graphs under {}", resourceBase);
+            autoDiscoverGraphs();
         }
         if (this.getRouterIds().isEmpty()) {
             LOG.warn("No graphs have been loaded/registered. " +
@@ -196,7 +206,8 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
             ex.printStackTrace();
             return null;
         }
-        LOG.debug("graph input stream successfully opened. now loading.");
+        LOG.debug("graph input stream successfully opened.");
+        LOG.info("Loading graph...");
         try {
             return Graph.load(new ObjectInputStream(is), loadLevel, indexFactory);
         } catch (Exception ex) {
@@ -226,7 +237,7 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
     public boolean registerGraph(String routerId, boolean preEvict) {
         if (preEvict)
             evictGraph(routerId);
-        LOG.info("registering routerId {}", routerId);
+        LOG.info("registering routerId '{}'", routerId);
         Graph graph = this.loadGraph(routerId);
         if (graph != null) {
             synchronized (graphs) {
@@ -235,7 +246,7 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
             levels.put(routerId, loadLevel);
             return true;
         }
-        LOG.info("routerId {} was not registered (graph was null).", routerId);
+        LOG.info("routerId '{}' was not registered (graph was null).", routerId);
         return false;
     }
 
@@ -263,4 +274,46 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
         }
         return n;
     }
+    
+    private void autoDiscoverGraphs() {
+        synchronized (resourceBase) {
+            Resource base = resourceLoader.getResource(resourceBase);
+            try {
+                File baseFile = base.getFile();
+                // First check for a root graph
+                File rootGraphFile = new File(baseFile, GRAPH_FILENAME);
+                if (rootGraphFile.exists() && rootGraphFile.canRead() && !graphs.containsKey("")) {
+                    LOG.info("Auto-discovered (root) {}, trying to load.", rootGraphFile);
+                    registerGraph("", true);
+                }
+                // Then graph in sub-directories
+                for (String sub : baseFile.list()) {
+                    File subFile = new File(baseFile, sub);
+                    if (subFile.isDirectory()) {
+                        File graphFile = new File(subFile, GRAPH_FILENAME);
+                        if (graphFile.exists() && graphFile.canRead() && !graphs.containsKey(sub)) {
+                            LOG.info("Auto-discovered {}, trying to load.", graphFile);
+                            registerGraph(sub, true);
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                // Can happen if base is not a standard directory (resource)
+                LOG.error(
+                        "Graph auto-discovering has been set, but {} is not a file resource, so I'm bailing-out.",
+                        resourceBase);
+                // Just warn the user, no need to throw exception
+                return;
+            }
+            // If a defaultRouterId has not been set, and no root graph, take first loaded graph
+            if (defaultRouterId.isEmpty() && !getRouterIds().isEmpty() && !getRouterIds().contains("")) {
+                defaultRouterId = getRouterIds().iterator().next();
+                if (getRouterIds().size() > 1)
+                    LOG.warn("Default routerId not set, taking arbitrary one {}", defaultRouterId);
+                else
+                    LOG.info("Setting default routerId to {}", defaultRouterId);
+            }
+        }
+    }
+
 }
