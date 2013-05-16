@@ -14,6 +14,7 @@
 package org.opentripplanner.graph_builder.impl.osm;
 
 import org.junit.Test;
+import org.opentripplanner.graph_builder.impl.osm.wayProperties.DefaultWayPropertySetSource;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 import junit.framework.TestCase;

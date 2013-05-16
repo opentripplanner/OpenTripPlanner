@@ -26,6 +26,7 @@ import org.opentripplanner.extra_graph.EdgesForRoute;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.factory.LocalStopFinder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -81,9 +82,9 @@ public class NetworkLinkerLibrary {
      * @param wheelchairAccessible
      * @return true if the links were successfully added, otherwise false
      */
-    public LinkRequest connectVertexToStreets(TransitStop v, boolean wheelchairAccessible) {
+    public LinkRequest connectVertexToStreets(TransitStop v, boolean wheelchairAccessible, Collection<StreetTraversalPermission> permissions) {
         LinkRequest request = new LinkRequest(this);
-        request.connectVertexToStreets(v, wheelchairAccessible);
+        request.connectVertexToStreets(v, wheelchairAccessible, permissions);
         return request;
     }
 

@@ -31,11 +31,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.AreaEdge;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
-import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetTransitLink;
+import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.CandidateEdgeBundle;
@@ -78,7 +74,7 @@ public class LinkRequest {
      * Sets result to true if the links were successfully added, otherwise false
      */
     public void connectVertexToStreets(BikeRentalStationVertex v) {
-        Collection<StreetVertex> nearbyStreetVertices = getNearbyStreetVertices(v, null, null);
+        Collection<StreetVertex> nearbyStreetVertices = getNearbyStreetVertices(v, null, null, null);
         if (nearbyStreetVertices == null) {
             result = false;
         } else {
@@ -107,7 +103,7 @@ public class LinkRequest {
      * Used by both the network linker and for adding temporary "extra" edges at the origin 
      * and destination of a search.
      */
-    private Collection<StreetVertex> getNearbyStreetVertices(Vertex v, Collection<Edge> nearbyRouteEdges, RoutingRequest options) {
+    private Collection<StreetVertex> getNearbyStreetVertices(Vertex v, Collection<Edge> nearbyRouteEdges, RoutingRequest options, Collection<StreetTraversalPermission> permissions) {
         Collection<StreetVertex> existing = linker.splitVertices.get(v);
         if (existing != null)
             return existing;
@@ -122,7 +118,7 @@ public class LinkRequest {
         /* is there a bundle of edges nearby to use or split? */
         GenericLocation location = new GenericLocation(coordinate);
         TraversalRequirements reqs = new TraversalRequirements(options);
-        CandidateEdgeBundle edges = linker.index.getClosestEdges(location, reqs, null, nearbyRouteEdges, true);
+        CandidateEdgeBundle edges = linker.index.getClosestEdges(location, reqs, null, nearbyRouteEdges, permissions);
         if (edges == null || edges.size() < 1) {
             // no edges were found nearby, or a bidirectional/loop bundle of edges was not identified
             _log.debug("found too few edges: {} {}", v.getName(), v.getCoordinate());
@@ -343,7 +339,7 @@ public class LinkRequest {
         return edgesAdded;
     }
 
-    public void connectVertexToStreets(TransitStop v, boolean wheelchairAccessible) {
+    public void connectVertexToStreets(TransitStop v, boolean wheelchairAccessible, Collection<StreetTraversalPermission> permissions) {
         List<Edge> nearbyEdges = null;
         if (linker.edgesForRoute != null && linker.transitIndex != null) {
             nearbyEdges = new ArrayList<Edge>();
@@ -357,7 +353,7 @@ public class LinkRequest {
         TraverseModeSet modes = v.getModes().clone();
         modes.setMode(TraverseMode.WALK, true);
         RoutingRequest request = new RoutingRequest(modes);
-        Collection<StreetVertex> nearbyStreetVertices = getNearbyStreetVertices(v, nearbyEdges, request);
+        Collection<StreetVertex> nearbyStreetVertices = getNearbyStreetVertices(v, nearbyEdges, request, permissions);
         if (nearbyStreetVertices == null) {
             result = false;
         } else {

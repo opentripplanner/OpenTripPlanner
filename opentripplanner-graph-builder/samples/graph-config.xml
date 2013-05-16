@@ -29,7 +29,7 @@
             </bean>
         </property>
         <property name="defaultWayPropertySetSource">
-            <bean class="org.opentripplanner.graph_builder.impl.osm.DefaultWayPropertySetSource" />
+            <bean class="org.opentripplanner.graph_builder.impl.osm.wayProperties.DefaultWayPropertySetSource" />
         </property>
     </bean>
 

@@ -121,7 +121,7 @@ public class RetryingPathServiceImpl implements PathService {
             if (spt == null) // timeout or other fail
                 break;
             List<GraphPath> somePaths = spt.getPaths();
-            LOG.debug("END SUBSEARCH ({} msec of {} msec total)", 
+            LOG.debug("END SUBSEARCH ({} msec of {} msec total)",
                     System.currentTimeMillis() - subsearchBeginTime,
                     System.currentTimeMillis() - searchBeginTime);
             if (somePaths == null) {
@@ -170,6 +170,8 @@ public class RetryingPathServiceImpl implements PathService {
                     // now, create a list of options, one with each trip in this journey banned.
 
                     LOG.debug("New trips: {}", path.getTrips());
+
+                    //******ban trips ******
                     RoutingRequest newOptions = currOptions.clone();
                     for (AgencyAndId trip : path.getTrips()) {
                         newOptions.banTrip(trip);
@@ -177,6 +179,30 @@ public class RetryingPathServiceImpl implements PathService {
                     if (!optionQueue.contains(newOptions)) {
                         optionQueue.add(newOptions);
                     }
+
+
+                    //*****ban all routes
+//                    RoutingRequest newOptions = currOptions.clone();
+//                    for (RouteSpec route : path.getRouteSpecs()){
+//                        newOptions.banRoute(route);
+//                    }
+//                    if (!optionQueue.contains(newOptions)) {
+//                        optionQueue.add(newOptions);
+//                    }
+                    //*****ban few routes
+
+//                    RoutingRequest banAlloption = currOptions.clone();
+//                    for (RouteSpec route : path.getRouteSpecs()){
+//                        RoutingRequest newOptions = currOptions.clone();
+//                        newOptions.banRoute(route);
+//                        banAlloption.banRoute(route);
+//                        if (!optionQueue.contains(newOptions)) {
+//                            optionQueue.add(newOptions);
+//                        }
+//                    }
+//                    if (!optionQueue.contains(banAlloption)) {
+//                        optionQueue.add(banAlloption);
+//                    }
                 }
             }
             LOG.debug("{} / {} itineraries", paths.size(), currOptions.numItineraries);

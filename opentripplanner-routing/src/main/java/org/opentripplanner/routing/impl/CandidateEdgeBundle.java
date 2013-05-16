@@ -116,4 +116,16 @@ public class CandidateEdgeBundle extends ArrayList<CandidateEdge> {
         }
         return false;
     }
+
+    public boolean allowsOnePermission(Collection<StreetTraversalPermission> permissions){
+        for (CandidateEdge ce : CandidateEdgeBundle.this) {
+            StreetEdge e = ce.getEdge();
+            for(StreetTraversalPermission permission : permissions){
+                if (e.getPermission().allows(permission)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 }

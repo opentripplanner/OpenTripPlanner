@@ -35,7 +35,7 @@ public class StopsAlerts implements GraphBuilder {
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         Logger stopsLog = LoggerFactory.getLogger(LoggerAppenderProvider.createCsvFile4LoggerCat(logFile,"stops"));
-        stopsLog.info(String.format("%s,%s,%s,%s","stopId","lon","lat","types"));
+        stopsLog.info(String.format("%s,%s,%s,%s,%s,%s","stopGraphId","stopGtfsId","stopName","lon","lat","types"));
         for (TransitStop ts : IterableLibrary.filter(graph.getVertices(), TransitStop.class)) {
             StringBuilder types = new StringBuilder();
             for(IStopTester stopTester:stopTesters){
@@ -45,7 +45,8 @@ public class StopsAlerts implements GraphBuilder {
                 }
             }
             if(types.length() > 0) {
-                stopsLog.info(String.format("%s,%f,%f,%s",ts.getStopId(), ts.getCoordinate().x,ts.getCoordinate().y,types.toString()));
+                stopsLog.info(String.format("%s,%s,\"%s\",%f,%f,%s",ts.getIndex(), ts.getStopId() ,ts.getStop().getName() ,
+                        ts.getCoordinate().x,ts.getCoordinate().y,types.toString()));
             }
         }
     }
@@ -57,7 +58,8 @@ public class StopsAlerts implements GraphBuilder {
 
     @Override
     public List<String> getPrerequisites() {
-        return Arrays.asList("transit","streets");
+//        return Arrays.asList("transit","streets");
+        return Arrays.asList("transit");
     }
 
     @Override
