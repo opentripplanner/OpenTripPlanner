@@ -368,8 +368,9 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
                 realTurnCost = options.getIntersectionTraversalCostModel().computeTraversalCost(
                         traversedVertex, backPSE, this, traverseMode, options, (float) backSpeed,
                         (float) speed);                
-            } else { // in case this is a temporary edge not connected to an IntersectionVertex
-                LOG.info("Not computing turn cost for edge {}", this);
+            } else {
+                // In case this is a temporary edge not connected to an IntersectionVertex
+                LOG.debug("Not computing turn cost for edge {}", this);
                 realTurnCost = 0; 
             }
 
@@ -407,9 +408,6 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     /**
      * Calculate the average automobile traversal speed of this segment, given
      * the RoutingRequest, and return it in meters per second.
-     * 
-     * @param options
-     * @return
      */
     private double calculateCarSpeed(RoutingRequest options) {
         return carSpeed;
@@ -417,13 +415,9 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     
     /**
      * Calculate the speed appropriately given the RoutingRequest and traverseMode.
-     * 
-     * @param options
-     * @param traverseMode
-     * @return
      */
     private double calculateSpeed(RoutingRequest options, TraverseMode traverseMode) {
-        if (traverseMode == TraverseMode.CAR) {
+        if (traverseMode.isDriving()) {
             // NOTE: Automobiles have variable speeds depending on the edge type
             return calculateCarSpeed(options);
         }
@@ -484,7 +478,8 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     @Override
     public String toString() {
         return "PlainStreetEdge(" + getId() + ", " + name + ", " + fromv + " -> " + tov
-                + " length=" + this.getLength() + " carSpeed=" + this.getCarSpeed() + ")";
+                + " length=" + this.getLength() + " carSpeed=" + this.getCarSpeed()
+                + " permission=" + this.getPermission() + ")";
     }
 
     public boolean hasBogusName() {
