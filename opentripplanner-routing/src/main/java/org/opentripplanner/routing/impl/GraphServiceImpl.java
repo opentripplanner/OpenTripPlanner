@@ -13,17 +13,8 @@
 
 package org.opentripplanner.routing.impl;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
 
@@ -37,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.annotation.Scope;
-import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
 /**
@@ -45,32 +35,18 @@ import org.springframework.core.io.ResourceLoader;
  * It can handle multiple graphs, each with its own routerId. These graphs are loaded from 
  * serialized graph files in subdirectories immediately under the specified base 
  * resource/filesystem path.
+ * 
+ * Delegate the file loading implementation details to the GraphServiceFileImpl.
+ * 
+ * @see GraphServiceFileImpl
  */
 @Scope("singleton")
 public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphServiceImpl.class);
 
-    private static final String GRAPH_FILENAME = "Graph.obj";
-
-    private String resourceBase = "file:/var/otp/graphs";
-
-    private Map<String, Graph> graphs = new HashMap<String, Graph>();
-
-    private Map<String, LoadLevel> levels = new HashMap<String, LoadLevel>();
-
-    private LoadLevel loadLevel = LoadLevel.FULL;
+    private GraphServiceFileImpl decorated = new GraphServiceFileImpl();
     
-    @Setter
-    private StreetVertexIndexFactory indexFactory = new DefaultStreetVertexIndexFactory();
-
-    @Setter
-    private String defaultRouterId = "";
-
-    /** The resourceLoader setter is called by Spring via ResourceLoaderAware interface. */
-    @Setter
-    private ResourceLoader resourceLoader = null;
-
     /** A list of routerIds to automatically register and load at startup */
     @Setter
     private List<String> autoRegister;
@@ -79,17 +55,20 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
     @Setter
     private boolean attemptRegisterDefault = true;
 
-    /** If true, automatically try to load all graphs present in resourceBase. */
-    @Setter
-    private boolean autoDiscover = false;
-
-    /** 
-     * Router IDs may contain alphanumeric characters, underscores, and dashes only. 
-     * This prevents any confusion caused by the presence of special characters that might have a 
-     * meaning for the filesystem.
+    /**
+     * @param indexFactory
      */
-    private static Pattern routerIdPattern = Pattern.compile("[\\p{Alnum}_-]*");
-    
+    public void setIndexFactory(StreetVertexIndexFactory indexFactory) {
+        decorated.setIndexFactory(indexFactory);
+    }
+
+    /**
+     * @param defaultRouterId
+     */
+    public void setDefaultRouterId(String defaultRouterId) {
+        decorated.setDefaultRouterId(defaultRouterId);
+    }
+
     /** 
      * Sets a base path for graph loading from the filesystem. Serialized graph files will be 
      * retrieved from sub-directories immediately below this directory. The routerId of a graph is
@@ -97,7 +76,7 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
      * the parameter is interpreted as a file path.
      */
     public void setPath(String path) {
-        this.resourceBase = "file:" + path;
+        decorated.setResource("file:" + path);
     }
 
     /**
@@ -110,7 +89,7 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
      * should be prefixed with 'classpath:','file:', or 'url:'.
      */
     public void setResource(String resourceBaseName) {
-        this.resourceBase = resourceBaseName;
+        decorated.setResource(resourceBaseName);
     }
 
     /** 
@@ -122,20 +101,16 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
     private void startup() {
         if (autoRegister != null && ! autoRegister.isEmpty()) {
             LOG.info("attempting to automatically register routerIds {}", autoRegister);
-            LOG.info("graph files will be sought in paths relative to {}", resourceBase);
+            LOG.info("graph files will be sought in paths relative to {}", decorated.getResourceBase());
             for (String routerId : autoRegister) {
                 registerGraph(routerId, true);
             }
         } else {
             LOG.info("no list of routerIds was provided for automatic registration.");
         }
-        if (attemptRegisterDefault && ! graphs.containsKey(defaultRouterId)) {
-            LOG.info("Attempting to load graph for default routerId '{}'.", defaultRouterId);
-            registerGraph(defaultRouterId, true);
-        }
-        if (autoDiscover) {
-            LOG.info("Auto discovering graphs under {}", resourceBase);
-            autoDiscoverGraphs();
+        if (attemptRegisterDefault && ! decorated.getRouterIds().contains(decorated.getDefaultRouterId())) {
+            LOG.info("Attempting to load graph for default routerId '{}'.", decorated.getDefaultRouterId());
+            registerGraph(decorated.getDefaultRouterId(), true);
         }
         if (this.getRouterIds().isEmpty()) {
             LOG.warn("No graphs have been loaded/registered. " +
@@ -145,175 +120,53 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
 
     @Override
     public Graph getGraph() {
-        return getGraph(null);
+        return decorated.getGraph();
     }
 
     @Override
     public Graph getGraph(String routerId) {
-        if (routerId == null || routerId.isEmpty()) {
-            routerId = defaultRouterId;
-            LOG.debug("routerId not specified, set to default of '{}'", routerId);
-        }
-        synchronized (graphs) {
-            if ( ! graphs.containsKey(routerId)) {
-                LOG.error("no graph registered with the routerId '{}'", routerId);
-                return null;
-            } else {
-                return graphs.get(routerId);
-            }
-        }
+        return decorated.getGraph(routerId);
     }
 
     @Override
     public void setLoadLevel(LoadLevel level) {
-        if (level != loadLevel) {
-            loadLevel = level;
-            reloadGraphs(true);
-        }
+        decorated.setLoadLevel(level);
     }
 
-    private boolean routerIdLegal(String routerId) {
-        Matcher m = routerIdPattern.matcher(routerId);
-        return m.matches();
-    }
-
-    private Graph loadGraph(String routerId) {
-        if ( ! routerIdLegal(routerId)) {
-            LOG.error("routerId '{}' contains characters other than alphanumeric, underscore, and dash.", routerId);
-            return null;
-        }
-        LOG.debug("loading serialized graph for routerId {}", routerId);
-        StringBuilder sb = new StringBuilder(resourceBase);
-        // S3 is intolerant of extra slashes in the URL, so only add them as needed
-        if (! (resourceBase.endsWith("/") || resourceBase.endsWith(File.pathSeparator))) {
-            sb.append("/");
-        }
-        if (routerId.length() > 0) { 
-            sb.append(routerId);
-            sb.append("/");
-        }
-        sb.append("Graph.obj");
-        String resourceLocation = sb.toString();
-        LOG.debug("graph file for routerId '{}' is at {}", routerId, resourceLocation);
-        Resource graphResource;
-        InputStream is;
-        try {
-            graphResource = resourceLoader.getResource(resourceLocation);
-            //graphResource = resourceBase.createRelative(graphId);
-            is = graphResource.getInputStream();
-        } catch (IOException ex) {
-            LOG.warn("Graph file not found or not openable for routerId '{}' under {}", routerId, resourceBase);
-            ex.printStackTrace();
-            return null;
-        }
-        LOG.debug("graph input stream successfully opened.");
-        LOG.info("Loading graph...");
-        try {
-            return Graph.load(new ObjectInputStream(is), loadLevel, indexFactory);
-        } catch (Exception ex) {
-            LOG.error("Exception while loading graph from {}.", graphResource);
-            ex.printStackTrace();
-            return null;
-        }
-    }
-
+    // TODO Should we extract this interface in GraphService? 
+    // See the (strange) cast to GraphServiceImpl in Routers.reloadGraphs()
     public boolean reloadGraphs(boolean preEvict) {
-        boolean allSucceeded = true;
-        synchronized (graphs) {
-            for (String routerId : this.getRouterIds()) {
-                boolean success = registerGraph(routerId, preEvict);
-                allSucceeded &= success;
-            }
-        }
-        return allSucceeded;
+        return decorated.reloadGraphs(preEvict);
     }
     
     @Override
     public Collection<String> getRouterIds() {
-        return new ArrayList<String>(graphs.keySet());
+        return decorated.getRouterIds();
     }
 
     @Override
     public boolean registerGraph(String routerId, boolean preEvict) {
-        if (preEvict)
-            evictGraph(routerId);
-        LOG.info("registering routerId '{}'", routerId);
-        Graph graph = this.loadGraph(routerId);
-        if (graph != null) {
-            synchronized (graphs) {
-                graphs.put(routerId, graph);
-            }
-            levels.put(routerId, loadLevel);
-            return true;
-        }
-        LOG.info("routerId '{}' was not registered (graph was null).", routerId);
-        return false;
+        return decorated.registerGraph(routerId, preEvict);
     }
 
     @Override
     public boolean registerGraph(String routerId, Graph graph) {
-        Graph existing = graphs.put(routerId, graph);
-        return existing == null;
+        return decorated.registerGraph(routerId, graph);
     }
     
     @Override
     public boolean evictGraph(String routerId) {
-        LOG.debug("evicting graph {}", routerId);
-        synchronized (graphs) {
-            Graph existing = graphs.remove(routerId);
-            return existing != null;
-        }
+        return decorated.evictGraph(routerId);
     }
 
     @Override
     public int evictAll() {
-        int n;
-        synchronized(graphs) {
-            n = graphs.size(); 
-            graphs.clear();
-        }
-        return n;
-    }
-    
-    private void autoDiscoverGraphs() {
-        synchronized (resourceBase) {
-            Resource base = resourceLoader.getResource(resourceBase);
-            try {
-                File baseFile = base.getFile();
-                // First check for a root graph
-                File rootGraphFile = new File(baseFile, GRAPH_FILENAME);
-                if (rootGraphFile.exists() && rootGraphFile.canRead() && !graphs.containsKey("")) {
-                    LOG.info("Auto-discovered (root) {}, trying to load.", rootGraphFile);
-                    registerGraph("", true);
-                }
-                // Then graph in sub-directories
-                for (String sub : baseFile.list()) {
-                    File subFile = new File(baseFile, sub);
-                    if (subFile.isDirectory()) {
-                        File graphFile = new File(subFile, GRAPH_FILENAME);
-                        if (graphFile.exists() && graphFile.canRead() && !graphs.containsKey(sub)) {
-                            LOG.info("Auto-discovered {}, trying to load.", graphFile);
-                            registerGraph(sub, true);
-                        }
-                    }
-                }
-            } catch (IOException e) {
-                // Can happen if base is not a standard directory (resource)
-                LOG.error(
-                        "Graph auto-discovering has been set, but {} is not a file resource, so I'm bailing-out.",
-                        resourceBase);
-                // Just warn the user, no need to throw exception
-                return;
-            }
-            // If a defaultRouterId has not been set, and no root graph, take first loaded graph
-            if (defaultRouterId.isEmpty() && !getRouterIds().isEmpty() && !getRouterIds().contains("")) {
-                defaultRouterId = getRouterIds().iterator().next();
-                if (getRouterIds().size() > 1)
-                    LOG.warn("Default routerId not set, taking arbitrary one {}", defaultRouterId);
-                else
-                    LOG.info("Setting default routerId to {}", defaultRouterId);
-            }
-        }
+        return decorated.evictAll();
     }
 
+    /** The resourceLoader setter is called by Spring via ResourceLoaderAware interface. */
+    @Override
+    public void setResourceLoader(ResourceLoader resourceLoader) {
+        decorated.setResourceLoader(resourceLoader);
+    }
 }
