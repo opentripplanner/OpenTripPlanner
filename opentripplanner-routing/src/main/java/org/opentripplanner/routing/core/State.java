@@ -75,7 +75,7 @@ public class State implements Cloneable {
      * states must be created from a parent and associated with an edge.
      */
     public State(RoutingRequest opt) {
-        this (opt.rctx.origin, opt.getSecondsSinceEpoch(), opt);
+        this(opt.rctx.origin, opt.rctx.originBackEdge, opt.getSecondsSinceEpoch(), opt);
     }
 
     /**
@@ -83,6 +83,7 @@ public class State implements Cloneable {
      * RoutingContext in TransitIndex, tests, etc.
      */
     public State(Vertex vertex, RoutingRequest opt) {
+        // Since you explicitly specify, the vertex, we don't set the backEdge.
         this(vertex, opt.getSecondsSinceEpoch(), opt);
     }
 
@@ -91,10 +92,19 @@ public class State implements Cloneable {
      * a RoutingContext in TransitIndex, tests, etc.
      */
     public State(Vertex vertex, long time, RoutingRequest options) {
+        // Since you explicitly specify, the vertex, we don't set the backEdge.
+        this(vertex, null, time, options);
+    }
+    
+    /**
+     * Create an initial state, forcing vertex, back edge and time to the specified values. Useful for reusing 
+     * a RoutingContext in TransitIndex, tests, etc.
+     */
+    public State(Vertex vertex, Edge backEdge, long time, RoutingRequest options) {
         this.weight = 0;
         this.vertex = vertex;
+        this.backEdge = backEdge;
         this.backState = null;
-        this.backEdge = null;
         this.stateData = new StateData(options);
         // note that here we are breaking the circular reference between rctx and options
         // this should be harmless since reversed clones are only used when routing has finished
@@ -104,8 +114,8 @@ public class State implements Cloneable {
         this.walkDistance = 0;
         this.time = time;
         if (options.rctx != null) {
-        	this.pathParserStates = new int[options.rctx.pathParsers.length];
-        	Arrays.fill(this.pathParserStates, AutomatonState.START);
+            this.pathParserStates = new int[options.rctx.pathParsers.length];
+            Arrays.fill(this.pathParserStates, AutomatonState.START);
         }
         stateData.routeSequence = new AgencyAndId[0];
     }

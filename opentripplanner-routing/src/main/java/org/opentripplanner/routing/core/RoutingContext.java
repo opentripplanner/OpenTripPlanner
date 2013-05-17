@@ -16,7 +16,6 @@ package org.opentripplanner.routing.core;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,8 +26,6 @@ import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.GenericLocation;
-import org.opentripplanner.common.model.NamedPlace;
-import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.edgetype.PartialPlainStreetEdge;
@@ -80,6 +77,11 @@ public class RoutingContext implements Cloneable {
 
     // target means "where this search will terminate" not "the end of the trip from the user's perspective"
     public final Vertex target;
+    
+    // The back edge associated with the origin - i.e. continuing a previous search.
+    // NOTE: not final so that it can be modified post-construction for testing.
+    // TODO(flamholz): figure out a better way.
+    public Edge originBackEdge;
 
     public final ArrayList<Vertex> intermediateVertices = new ArrayList<Vertex>();
 
@@ -205,17 +207,25 @@ public class RoutingContext implements Cloneable {
         this.opt = routingRequest;
         this.graph = graph;
 
+        Edge fromBackEdge = null;
+        Edge toBackEdge = null;
         if (findPlaces) {
             // normal mode, search for vertices based RoutingRequest
             if (!opt.batch || opt.arriveBy) {
                 // non-batch mode, or arriveBy batch mode: we need a to vertex
                 toVertex = graph.streetIndex.getVertexForLocation(opt.getTo(), opt);
+                if (opt.getTo().hasEdgeId()) {
+                    toBackEdge = graph.getEdgeById(opt.getTo().getEdgeId());
+                }
             } else {
                 toVertex = null;
             }
             if (!opt.batch || !opt.arriveBy) {
                 // non-batch mode, or depart-after batch mode: we need a from vertex
                 fromVertex = graph.streetIndex.getVertexForLocation(opt.getFrom(), opt, toVertex);
+                if (opt.getFrom().hasEdgeId()) {
+                    fromBackEdge = graph.getEdgeById(opt.getFrom().getEdgeId());
+                }
             } else {
                 fromVertex = null;
             }
@@ -256,6 +266,7 @@ public class RoutingContext implements Cloneable {
             startingStop = tis.getPreBoardEdge(stopId).getToVertex();
         }
         origin = opt.arriveBy ? toVertex : fromVertex;
+        originBackEdge = opt.arriveBy ? toBackEdge : fromBackEdge;
         target = opt.arriveBy ? fromVertex : toVertex;
         calendarService = graph.getCalendarService();
         transferTable = graph.getTransferTable();

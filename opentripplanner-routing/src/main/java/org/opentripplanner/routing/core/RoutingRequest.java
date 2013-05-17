@@ -34,6 +34,7 @@ import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.request.BannedStopSet;
@@ -722,13 +723,18 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     /** For use in tests. Force RoutingContext to specific vertices rather than making temp edges. */
-    public void setRoutingContext(Graph graph, Vertex from, Vertex to) {
+    public void setRoutingContext(Graph graph, Edge fromBackEdge, Vertex from, Vertex to) {
         // normally you would want to tear down the routing context...
         // but this method is mostly used in tests, and teardown interferes with testHalfEdges
         // FIXME here, or in test, and/or in other places like TSP that use this method
         // if (rctx != null)
         // this.rctx.destroy();
         this.rctx = new RoutingContext(this, graph, from, to);
+        this.rctx.originBackEdge = fromBackEdge;
+    }
+    
+    public void setRoutingContext(Graph graph, Vertex from, Vertex to) {
+        setRoutingContext(graph, null, from, to);
     }
 
     /** For use in tests. Force RoutingContext to specific vertices rather than making temp edges. */
