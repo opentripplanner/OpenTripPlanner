@@ -83,8 +83,11 @@ public class GraphPath {
         this.edges = new LinkedList<Edge>();
         for (State cur = lastState; cur != null; cur = cur.getBackState()) {
             states.addFirst(cur);
-            if (cur.getBackEdge() != null)
+            
+            // Record the edge if it exists and this is not the first state in the path.
+            if (cur.getBackEdge() != null && cur.getBackState() != null) {
                 edges.addFirst(cur.getBackEdge());
+            }
         }
         //dump();
     }
