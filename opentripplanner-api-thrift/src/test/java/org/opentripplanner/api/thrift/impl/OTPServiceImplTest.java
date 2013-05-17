@@ -54,6 +54,7 @@ import org.opentripplanner.graph_builder.impl.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl;
 import org.opentripplanner.openstreetmap.impl.FileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.routing.algorithm.GenericAStar;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -72,7 +73,7 @@ public class OTPServiceImplTest {
     private Random rand;
 
     private OTPServiceImpl serviceImpl;
-
+    
     @BeforeClass
     public static void beforeClass() {
         extra = new HashMap<Class<?>, Object>();
@@ -101,9 +102,16 @@ public class OTPServiceImplTest {
         graphService.registerGraph("", graph);
         SimplifiedPathServiceImpl pathService = new SimplifiedPathServiceImpl();
         pathService.setGraphService(graphService);
+        
         pathService.setSptService(new GenericAStar());
 
+        RoutingRequest prototype = new RoutingRequest();
+        prototype.setTurnReluctance(1.0);
+        prototype.setWalkReluctance(1.0);
+        prototype.setStairsReluctance(1.0);
+        
         serviceImpl = new OTPServiceImpl();
+        serviceImpl.setPrototypeRoutingRequest(prototype);
         serviceImpl.setGraphService(graphService);
         serviceImpl.setPathService(pathService);
     }
@@ -236,7 +244,7 @@ public class OTPServiceImplTest {
         // the same edges as the original path.
         assertTrue(subPathDurations <= expectedTotalDuration); 
     }
-
+    
     @Test
     public void testBulkFindPaths() throws TException {
         PathOptions opts = new PathOptions();
@@ -261,9 +269,13 @@ public class OTPServiceImplTest {
         BulkPathsResponse res = serviceImpl.BulkFindPaths(req);
 
         for (TripPaths paths : res.getPaths()) {
-            assertEquals(1, paths.getPathsSize());
-            Path p = paths.getPaths().get(0);
-            checkPath(p);
+            int expectedPathsSize = paths.isNo_paths_found() ? 0 : 1;
+            assertEquals(expectedPathsSize, paths.getPathsSize());
+            
+            if (!paths.isSetNo_paths_found()) {
+                Path p = paths.getPaths().get(0);
+                checkPath(p);
+            }
         }
     }
     
