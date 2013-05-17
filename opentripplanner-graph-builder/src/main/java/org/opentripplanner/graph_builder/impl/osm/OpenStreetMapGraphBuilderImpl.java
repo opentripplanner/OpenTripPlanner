@@ -835,8 +835,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 station.name = creativeName;
                 station.x = node.getLon();
                 station.y = node.getLat();
+                // The following make sure that spaces+bikes=capacity, always.
+                // Also, for the degenerate case of capacity=1, we should have 1
+                // bike available, not 0.
                 station.spacesAvailable = capacity / 2;
-                station.bikesAvailable = capacity / 2;
+                station.bikesAvailable = capacity - station.spacesAvailable;
+                station.realTimeData = false;
                 bikeRentalService.addStation(station);
                 BikeRentalStationVertex stationVertex = new BikeRentalStationVertex(graph, station);
                 new RentABikeOnEdge(stationVertex, stationVertex, networkSet);
