@@ -209,6 +209,17 @@ public class OTPServiceImplTest {
 
         FindPathsResponse res = serviceImpl.FindPaths(req);
         TripPaths paths = res.getPaths();
+        
+        while (paths.getPaths().isEmpty()) {
+            // Pick another if we got no result.
+            pair = pickOriginAndDest();
+            trip.setOrigin(pair.getFirst());
+            trip.setDestination(pair.getSecond());
+            
+            res = serviceImpl.FindPaths(req);
+            paths = res.getPaths();
+        }
+        
         assertEquals(1, paths.getPathsSize());
         Path p = paths.getPaths().get(0);
         checkPath(p);
