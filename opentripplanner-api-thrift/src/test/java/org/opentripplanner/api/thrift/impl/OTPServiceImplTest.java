@@ -210,7 +210,7 @@ public class OTPServiceImplTest {
         FindPathsResponse res = serviceImpl.FindPaths(req);
         TripPaths paths = res.getPaths();
         
-        while (paths.getPaths().isEmpty()) {
+        while (paths == null || paths.getPaths().isEmpty()) {
             // Pick another if we got no result.
             pair = pickOriginAndDest();
             trip.setOrigin(pair.getFirst());
