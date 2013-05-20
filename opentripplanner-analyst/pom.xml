@@ -18,25 +18,15 @@
 			<artifactId>opentripplanner-routing</artifactId>
             <version>${project.version}</version>
 		</dependency>
-		<dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
-        </dependency>
+        <!-- Provides Jersey and JAX-RS annotations/classes -->
         <dependency>
     		<groupId>com.sun.jersey</groupId>
-    		<artifactId>jersey-servlet</artifactId>
+    		<artifactId>jersey-core</artifactId>
 		</dependency>
-        <dependency>
-    		<groupId>com.sun.jersey</groupId>
-    		<artifactId>jersey-grizzly2</artifactId>
-		</dependency>
+        <!-- Geotools for raster and projection operations -->
         <dependency>
           <groupId>org.geotools</groupId>
           <artifactId>gt-coverage</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>org.geotools</groupId>
-          <artifactId>gt-shapefile</artifactId>
         </dependency>
         <dependency>
           <groupId>org.geotools</groupId>
@@ -45,20 +35,6 @@
         <dependency>
           <groupId>org.geotools</groupId>
           <artifactId>gt-geotiff</artifactId>
-        </dependency>
-		<dependency>
-    		<groupId>com.sun.jersey.contribs</groupId>
-    		<artifactId>jersey-spring</artifactId>
-		</dependency>
-        <!-- prevent NotFoundErrors by including the correct versions
-        of these modules (which we exclude from jersey-spring) -->
-        <dependency>  
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-context</artifactId>
-        </dependency>
-        <dependency>  
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-web</artifactId>
         </dependency>
         <dependency>
           <groupId>org.projectlombok</groupId>
