@@ -78,7 +78,7 @@ public class PreBoardEdge extends FreeEdge {
             /*
              * look in the global transfer table for the rules from the previous stop to this stop.
              */
-            long t0 = s0.getTime();
+            long t0 = s0.getTimeSeconds();
 
             long slack;
             if (s0.isEverBoarded()) {

@@ -598,7 +598,7 @@ public class RaptorSearch {
                 }
                 state.weight = targetState.getWeight();
                 state.walkDistance = targetState.getWalkDistance();
-                state.arrivalTime = (int) targetState.getTime();
+                state.arrivalTime = (int) targetState.getTimeSeconds();
                 state.walkPath = targetState;
                 for (Iterator<RaptorState> it = getTargetStates().iterator(); it.hasNext();) {
                     RaptorState oldState = it.next();
@@ -675,7 +675,7 @@ public class RaptorSearch {
             newState.weight = state.getWeight();
             newState.nBoardings = nBoardings;
             newState.walkDistance = state.getWalkDistance();
-            newState.arrivalTime = (int) state.getTime();
+            newState.arrivalTime = (int) state.getTimeSeconds();
             newState.walkPath = state;
             newState.stop = stop;
             newState.rentingBike = state.isBikeRenting();

@@ -97,7 +97,7 @@ public class GraphPath {
      * @return
      */
     public long getStartTime() {
-        return states.getFirst().getTime();
+        return states.getFirst().getTimeSeconds();
     }
 
     /**
@@ -105,7 +105,7 @@ public class GraphPath {
      * @return
      */
     public long getEndTime() {
-        return states.getLast().getTime();
+        return states.getLast().getTimeSeconds();
     }
 
     /**

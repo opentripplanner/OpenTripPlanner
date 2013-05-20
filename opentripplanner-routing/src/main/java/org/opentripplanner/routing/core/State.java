@@ -172,7 +172,7 @@ public class State implements Cloneable {
     }
     
     /** Returns time in seconds since epoch */
-    public long getTime() {
+    public long getTimeSeconds() {
         return this.time;
     }
 
@@ -616,7 +616,7 @@ public class State implements Cloneable {
                          )
                     ) {
 
-                    ret = ((TransitBoardAlight) edge).traverse(ret, orig.getBackState().getTime());
+                    ret = ((TransitBoardAlight) edge).traverse(ret, orig.getBackState().getTimeSeconds());
                     newInitialWaitTime = ret.stateData.initialWaitTime;
                 }
                 else                   
@@ -702,7 +702,7 @@ public class State implements Cloneable {
                 LOG.warn("Weight has been reduced enough to make it run backwards, now:"
                         + reversed.getWeight() + " backState " + getBackState().getWeight() + ", "
                         + "number of boardings: " + getNumBoardings());
-            if (getTime() != reversed.getTime())
+            if (getTimeSeconds() != reversed.getTimeSeconds())
                 LOG.warn("Times do not match");
             if (Math.abs(getWeight() - reversed.getWeight()) > 1
                     && newInitialWaitTime == stateData.initialWaitTime)

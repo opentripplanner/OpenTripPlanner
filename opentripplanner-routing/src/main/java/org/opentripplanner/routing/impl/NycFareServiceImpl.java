@@ -139,7 +139,7 @@ public class NycFareServiceImpl implements FareService, Serializable {
 						newRide.classifier = EXPRESS_BUS; // Express bus
 					} 
 
-					newRide.startTime = state.getTime();
+					newRide.startTime = state.getTimeSeconds();
 				}
 				newRide.lastStop = ((HopEdge) backEdge).getStartStop();
 			}

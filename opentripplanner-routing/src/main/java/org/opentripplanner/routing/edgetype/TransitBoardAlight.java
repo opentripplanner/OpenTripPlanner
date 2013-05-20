@@ -147,13 +147,13 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
                 return null;
             }
             s1.setTripId(null);
-            s1.setLastAlightedTime(state0.getTime());
+            s1.setLastAlightedTime(state0.getTimeSeconds());
             s1.setPreviousStop(fromv);
             s1.setLastPattern(this.getPattern());
 
             // determine the wait
             if (arrivalTimeAtStop > 0) {
-                int wait = (int) Math.abs(state0.getTime() - arrivalTimeAtStop);
+                int wait = (int) Math.abs(state0.getTimeSeconds() - arrivalTimeAtStop);
                 
                 s1.incrementTimeInSeconds(wait);
                 // this should only occur at the beginning
@@ -215,7 +215,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
              * a trip on a pattern at 25:00 today and another trip on the same pattern at
              * 00:30 tommorrow. The 00:30 trip should be taken, but if we stopped the search
              * after finding today's 25:00 trip we would never find tomorrow's 00:30 trip. */
-            long current_time = state0.getTime();
+            long current_time = state0.getTimeSeconds();
             int bestWait = -1;
             TripTimes bestTripTimes = null;
             int serviceId = getPattern().getServiceId();

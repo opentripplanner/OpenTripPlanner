@@ -411,7 +411,7 @@ public class StateEditor {
     }
 
     public long getTime() {
-        return child.getTime();
+        return child.getTimeSeconds();
     }
 
     public long getElapsedTime() {
@@ -479,11 +479,11 @@ public class StateEditor {
             for (Patch patch : patches) {
                 active  = false;
                 display = patch.displayDuring(child.stateData.opt, child.getStartTime(),
-                                              child.getTime());
+                                              child.getTimeSeconds());
 
                 if(!display) {
                     active = patch.activeDuring(child.stateData.opt, child.getStartTime(),
-                                                child.getTime());
+                                                child.getTimeSeconds());
                 }
 
                 if(display || active) {

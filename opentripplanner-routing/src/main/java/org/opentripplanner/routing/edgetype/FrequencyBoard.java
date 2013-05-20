@@ -93,7 +93,7 @@ public class FrequencyBoard extends Edge implements OnBoardForwardEdge, PatternE
                 return null;
             }
             s1.setTripId(null);
-            s1.setLastAlightedTime(state0.getTime());
+            s1.setLastAlightedTime(state0.getTimeSeconds());
             s1.setBackMode(TraverseMode.BOARDING);
             s1.setPreviousStop(fromv);
             return s1.makeState();
@@ -108,7 +108,7 @@ public class FrequencyBoard extends Edge implements OnBoardForwardEdge, PatternE
              * initial state) if this pattern's serviceId is running look for the next boarding time
              * choose the soonest boarding time among trips starting yesterday, today, or tomorrow
              */
-            long currentTime = state0.getTime();
+            long currentTime = state0.getTimeSeconds();
             int bestWait = -1;
             TraverseMode mode = state0.getNonTransitMode();
             if (options.bannedTrips.containsKey(trip.getId())) {

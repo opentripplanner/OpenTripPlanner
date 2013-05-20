@@ -126,15 +126,15 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
 
             //exact dup
             if (old.getNumBoardings() == bounder.getNumBoardings()
-                && old.getTime() == bounder.getTime()
+                && old.getTimeSeconds() == bounder.getTimeSeconds()
                 && old.getWalkDistance() == bounder.getWalkDistance())
             return;
             if (bounder.dominates(old)) {
                 it.remove();
                 removedBoundingStates.add(old);
             } else if (bounder.getNumBoardings() <= old.getNumBoardings() && options.arriveBy ? (
-                        bounder.getTime() - WORST_TIME_DIFFERENCE > old.getTime())
-                        : (bounder.getTime() + WORST_TIME_DIFFERENCE < old.getTime())) {
+                        bounder.getTimeSeconds() - WORST_TIME_DIFFERENCE > old.getTimeSeconds())
+                        : (bounder.getTimeSeconds() + WORST_TIME_DIFFERENCE < old.getTimeSeconds())) {
                 it.remove();
                 removedBoundingStates.add(old);
             }
@@ -226,7 +226,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
                     && current.getNumBoardings() >= bounder.getNumBoardings()) {
                 if (current.getElapsedTime() + minTime >= bounder.getElapsedTime()) {
                     return true;
-                } else if (prevTime > 0 && (options.arriveBy ? (current.getTime() - minTime >= prevTime) : ((current.getTime() + minTime) <= prevTime))) {
+                } else if (prevTime > 0 && (options.arriveBy ? (current.getTimeSeconds() - minTime >= prevTime) : ((current.getTimeSeconds() + minTime) <= prevTime))) {
                     prevBounded = false;
                 }
             } else {
@@ -257,7 +257,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
                         State result = board.traverse(state);
                         if (result == null)
                             continue;
-                        int time = (int) result.getTime();
+                        int time = (int) result.getTimeSeconds();
                         if (time < bestArrivalTime) {
                             bestArrivalTime = time;
                         }
@@ -287,7 +287,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
                         State result = alight.traverse(state);
                         if (result == null)
                             continue;
-                        int time = (int) result.getTime();
+                        int time = (int) result.getTimeSeconds();
                         if (time > bestArrivalTime) {
                             bestArrivalTime = time;
                         }

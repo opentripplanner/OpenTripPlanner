@@ -229,7 +229,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                     } else if (isWorstTimeExceeded(v, options)) {
                         // too much time to get here
                     	if (_verbose)
-                            System.out.println("         too much time to reach, not enqueued. time = " + v.getTime());
+                            System.out.println("         too much time to reach, not enqueued. time = " + v.getTimeSeconds());
                     } else {
                         if (spt.add(v)) {
                             if (traverseVisitor != null)
@@ -266,9 +266,9 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 
     private boolean isWorstTimeExceeded(State v, RoutingRequest opt) {
         if (opt.isArriveBy())
-            return v.getTime() < opt.worstTime;
+            return v.getTimeSeconds() < opt.worstTime;
         else
-            return v.getTime() > opt.worstTime;
+            return v.getTimeSeconds() > opt.worstTime;
     }
 
     private ShortestPathTree createShortestPathTree(RoutingRequest opts) {

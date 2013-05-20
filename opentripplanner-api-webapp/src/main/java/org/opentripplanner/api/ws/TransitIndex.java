@@ -524,7 +524,7 @@ public class TransitIndex {
                 if (state.getBackTrip().getId().equals(trip)) {
                     start = segment;
                     StopTime st = new StopTime();
-                    st.time = state.getTime();
+                    st.time = state.getTimeSeconds();
                     for (org.onebusaway.gtfs.model.Stop stop : variant.getStops())
                         if (stop.getId().equals(segment.stop)) {
                             st.stop = new StopType(stop, extended);
@@ -540,10 +540,10 @@ public class TransitIndex {
 
         for (RouteSegment segment : variant.segmentsAfter(start)) {
             // TODO: verify options/state init correctness
-            State s0 = new State(segment.hopIn.getFromVertex(), state.getTime(), options);
+            State s0 = new State(segment.hopIn.getFromVertex(), state.getTimeSeconds(), options);
             state = segment.hopIn.traverse(s0);
             StopTime st = new StopTime();
-            st.time = state.getTime();
+            st.time = state.getTimeSeconds();
             for (org.onebusaway.gtfs.model.Stop stop : variant.getStops())
                 if (stop.getId().equals(segment.stop))
                     if (stop.getId().equals(segment.stop)) {
@@ -568,7 +568,7 @@ public class TransitIndex {
             result = e.traverse(s0);
             if (result == null)
                 break;
-            time = result.getTime();
+            time = result.getTimeSeconds();
             if (time > endTime)
                 break;
             StopTime stopTime = new StopTime();
@@ -593,7 +593,7 @@ public class TransitIndex {
             result = e.traverse(s0);
             if (result == null)
                 break;
-            time = result.getTime();
+            time = result.getTimeSeconds();
             if (time < startTime)
                 break;
             StopTime stopTime = new StopTime();

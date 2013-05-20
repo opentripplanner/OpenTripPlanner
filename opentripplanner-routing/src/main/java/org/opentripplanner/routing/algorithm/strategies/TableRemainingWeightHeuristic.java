@@ -88,7 +88,7 @@ public class TableRemainingWeightHeuristic implements RemainingWeightHeuristic {
         // heap does not really need to be this big, verify initialization time
         ShortestPathTree spt = new BasicShortestPathTree(options);
         BinHeap<State> heap = new BinHeap<State>(100);
-        State targetState = new State(target, s0.getTime(), s0.getOptions().reversedClone());
+        State targetState = new State(target, s0.getTimeSeconds(), s0.getOptions().reversedClone());
         spt.add(targetState);
         heap.insert(targetState, 0);
         while (!heap.empty()) {

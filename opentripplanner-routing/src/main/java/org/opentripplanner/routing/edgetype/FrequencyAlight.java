@@ -87,7 +87,7 @@ public class FrequencyAlight extends Edge  implements OnBoardReverseEdge {
              * initial state) if this pattern's serviceId is running look for the next boarding time
              * choose the soonest boarding time among trips starting yesterday, today, or tomorrow
              */
-            long currentTime = state0.getTime();
+            long currentTime = state0.getTimeSeconds();
             int bestWait = -1;
             TraverseMode mode = state0.getNonTransitMode();
             if (options.bannedTrips.containsKey(trip.getId())) {
@@ -169,7 +169,7 @@ public class FrequencyAlight extends Edge  implements OnBoardReverseEdge {
                 return null;
             }
             s1.setTripId(null);
-            s1.setLastAlightedTime(state0.getTime());
+            s1.setLastAlightedTime(state0.getTimeSeconds());
             s1.setPreviousStop(fromv);
             s1.setBackMode(TraverseMode.ALIGHTING);
             return s1.makeState();

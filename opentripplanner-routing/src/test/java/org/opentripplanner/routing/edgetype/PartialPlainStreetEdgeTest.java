@@ -107,7 +107,7 @@ public class PartialPlainStreetEdgeTest {
         State partialS1 = pEdge1.traverse(partialS0);
         
         // Traversal of original and partial edges should yield the same results.
-        assertEquals(s1.getTime(), partialS1.getTime());
+        assertEquals(s1.getTimeSeconds(), partialS1.getTimeSeconds());
         assertEquals(s1.getElapsedTime(), partialS1.getElapsedTime());
         assertEquals(s1.getWeight(), partialS1.getWeight(), 0.0);
         
@@ -116,7 +116,7 @@ public class PartialPlainStreetEdgeTest {
         State partialS2 = pEdge2.traverse(partialS1);
         
         // Same checks as above.
-        assertEquals(s2.getTime(), partialS2.getTime());
+        assertEquals(s2.getTimeSeconds(), partialS2.getTimeSeconds());
         assertEquals(s2.getElapsedTime(), partialS2.getElapsedTime());
         assertEquals(s2.getWeight(), partialS2.getWeight(), 0.0);
     }
@@ -154,10 +154,10 @@ public class PartialPlainStreetEdgeTest {
         State partialS3 = e3.traverse(partialS2B);
         
         // Should start at the same time.
-        assertEquals(s0.getTime(), partialS0.getTime());
+        assertEquals(s0.getTimeSeconds(), partialS0.getTimeSeconds());
         
         // Time and cost should be the same up to a rounding difference.
-        assertTrue(Math.abs(s3.getTime() - partialS3.getTime()) <= 1);
+        assertTrue(Math.abs(s3.getTimeSeconds() - partialS3.getTimeSeconds()) <= 1);
         assertTrue(Math.abs(s3.getElapsedTime() - partialS3.getElapsedTime()) <= 1);
         assertTrue(Math.abs(s3.getWeight() - partialS3.getWeight()) <= 1);
         
@@ -176,15 +176,15 @@ public class PartialPlainStreetEdgeTest {
         State partialS3NoCost = e3.traverse(partialS2BNoCost);
         
         // Time and cost should be the same up to a rounding difference.
-        assertTrue(Math.abs(s3NoCost.getTime() - partialS3NoCost.getTime()) <= 1);
+        assertTrue(Math.abs(s3NoCost.getTimeSeconds() - partialS3NoCost.getTimeSeconds()) <= 1);
         assertTrue(Math.abs(s3NoCost.getElapsedTime() - partialS3NoCost.getElapsedTime()) <= 1);
         assertTrue(Math.abs(s3NoCost.getWeight() - partialS3NoCost.getWeight()) <= 1);
         
         // Difference in duration and weight between now and before should be
         // entirely due to the crossing of 2 intersections at v2 and v3.
         double expectedDifference = 2 * 10 * 60.0;
-        double durationDiff = s3.getTime() - s3NoCost.getTime();
-        double partialDurationDiff = partialS3.getTime() - partialS3NoCost.getTime();
+        double durationDiff = s3.getTimeSeconds() - s3NoCost.getTimeSeconds();
+        double partialDurationDiff = partialS3.getTimeSeconds() - partialS3NoCost.getTimeSeconds();
         assertTrue(Math.abs(durationDiff - expectedDifference) <= 1);
         assertTrue(Math.abs(partialDurationDiff - expectedDifference) <= 1);
         

@@ -520,12 +520,12 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             // it might be a temporary edge that is equivalent to some graph edge.
             if (restriction.type == TurnRestrictionType.ONLY_TURN) {
                 if (!e.isEquivalentTo(restriction.to) && restriction.modes.contains(mode) &&
-                        restriction.active(state.getTime())) {
+                        restriction.active(state.getTimeSeconds())) {
                     return false;
                 }
             } else {
                 if (e.isEquivalentTo(restriction.to) && restriction.modes.contains(mode) &&
-                        restriction.active(state.getTime())) {
+                        restriction.active(state.getTimeSeconds())) {
                     return false;
                 }
             }

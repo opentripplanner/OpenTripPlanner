@@ -138,13 +138,13 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
                 ride.startZone = hEdge.getStartStop().getZoneId();
                 ride.zones.add(ride.startZone);
                 ride.route = state.getRoute();
-                ride.startTime = state.getBackState().getTime();
+                ride.startTime = state.getBackState().getTimeSeconds();
                 ride.firstStop = hEdge.getStartStop();
             }
             ride.lastStop = hEdge.getEndStop();
             ride.endZone  = ride.lastStop.getZoneId();
             ride.zones.add(ride.endZone);
-            ride.endTime  = state.getTime();
+            ride.endTime  = state.getTimeSeconds();
             // in default fare service, classify rides by mode 
             ride.classifier = state.getBackMode();
         }
