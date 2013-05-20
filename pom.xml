@@ -393,38 +393,21 @@
       <version>${jersey.version}</version>
       <scope>test</scope>
     </dependency>
+      <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-core</artifactId>
+      <version>${jersey.version}</version>
+    </dependency>
     <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-grizzly2</artifactId>
       <version>${jersey.version}</version>
     </dependency>
     <dependency>
+      <!-- jersey-spring (contrib) versioning does not match Spring itself -->
       <groupId>com.sun.jersey.contribs</groupId>
       <artifactId>jersey-spring</artifactId>
-      <version>${jersey.version}</version>
-      <!-- exclude these spring 2.5.6 jars -->
-      <exclusions>
-        <exclusion>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-core</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-context</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-web</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-beans</artifactId>
-        </exclusion>
-      </exclusions> 
+      <version>1.9.1</version>
     </dependency>
     <!-- LOGGING -->
     <dependency>

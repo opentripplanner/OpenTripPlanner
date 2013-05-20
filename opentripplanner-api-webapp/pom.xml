@@ -12,6 +12,7 @@
     </parent>
 
     <dependencies>
+        <!-- OTP Modules -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>opentripplanner-routing</artifactId>
@@ -42,24 +43,12 @@
             <artifactId>opentripplanner-web-utils</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
-        </dependency>
+        <!-- Provides a message body writer for application/json instead of just XML -->
         <dependency>
           <groupId>com.fasterxml.jackson.jaxrs</groupId>
           <artifactId>jackson-jaxrs-json-provider</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-client</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey.contribs</groupId>
-            <artifactId>jersey-spring</artifactId>
-        </dependency>
-        <dependency>
+        <dependency>  <!-- more JSON -->
             <groupId>net.sf.json-lib</groupId>
             <artifactId>json-lib</artifactId>
             <version>2.1</version>
@@ -83,19 +72,10 @@
                </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>jsr311-api</artifactId>
-            <version>1.1.1</version>
-        </dependency>
-        <dependency>
+        <dependency> <!-- more JSON -->
             <groupId>org.codehaus.jettison</groupId>
             <artifactId>jettison</artifactId>
             <version>1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
         </dependency>
         <!-- SPRING -->
         <dependency>
@@ -151,12 +131,11 @@
           <groupId>commons-logging</groupId>
           <artifactId>commons-logging</artifactId>
         </dependency>
-        
         <dependency>
       	  <groupId>javax.servlet</groupId>
       	  <artifactId>servlet-api</artifactId>
       	  <version>2.5</version>
-      	  <scope>provided</scope>
+      	  <scope>provided</scope> <!-- this dependency is provided by the servlet container -->
         </dependency>
         <dependency>
       	  <groupId>javax.annotation</groupId>
@@ -169,19 +148,37 @@
       	  <version>2.2.2</version>
         </dependency>
         <dependency>
-          <groupId>org.mockito</groupId>
-          <artifactId>mockito-all</artifactId>
-          <version>1.9.0</version>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
           <groupId>org.projectlombok</groupId>
           <artifactId>lombok</artifactId>
         </dependency>
         <!-- JERSEY/GRIZZLY INTEGRATION -->
         <dependency>
+          <groupId>com.sun.jersey.contribs</groupId>
+          <artifactId>jersey-spring</artifactId> <!-- provides SpringComponentProviderFactory -->
+        </dependency>
+        <dependency>
+          <groupId>com.sun.jersey</groupId>
+          <artifactId>jersey-servlet</artifactId> <!-- provides SpringServlet -->
+        </dependency>
+        <dependency>
           <groupId>com.sun.jersey</groupId>
           <artifactId>jersey-grizzly2</artifactId>
+        </dependency>
+        <!-- TESTING DEPENDENCIES -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>com.sun.jersey</groupId>
+          <artifactId>jersey-client</artifactId>
+          <scope>test</scope> <!-- what is this used for? -->
+        </dependency>
+        <dependency>
+          <groupId>org.mockito</groupId>
+          <artifactId>mockito-all</artifactId>
+          <version>1.9.0</version>
+          <scope>test</scope>
         </dependency>
     </dependencies>
 
