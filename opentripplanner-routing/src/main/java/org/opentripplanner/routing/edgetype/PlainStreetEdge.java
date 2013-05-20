@@ -310,7 +310,8 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
                 double costs = ElevationUtils.getWalkCostsForSlope(length, elevationProfileSegment.getMaxSlope());
                 // as the cost walkspeed is assumed to be for 4.8km/h (= 1.333 m/sec) we need to adjust
                 // for the walkspeed set by the user
-                weight = costs * ( 1.3333 / speed );
+                double elevationUtilsSpeed = 4.0 / 3.0;
+                weight = costs * (elevationUtilsSpeed / speed);
                 time = weight; //treat cost as time, as in the current model it actually is the same (this can be checked for maxSlope == 0)
                 /*
                 // debug code

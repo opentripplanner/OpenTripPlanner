@@ -20,6 +20,7 @@ public class PlainStreetEdgeTest {
 
     private Graph _graph;
     private StreetVertex v1, v2;
+    private RoutingRequest proto;
 
     @Before
     public void before() {
@@ -27,6 +28,14 @@ public class PlainStreetEdgeTest {
 
         v1 = vertex("maple_1st", 2.0, 2.0);
         v2 = vertex("maple_2nd", 1.0, 2.0);
+        
+        proto = new RoutingRequest();
+        proto.setCarSpeed(15.0f);
+        proto.setWalkSpeed(1.0);
+        proto.setBikeSpeed(5.0f);
+        proto.setWalkReluctance(1.0);
+        proto.setStairsReluctance(1.0);
+        proto.setTurnReluctance(1.0);
     }
     
     @Test
@@ -57,18 +66,18 @@ public class PlainStreetEdgeTest {
         PlainStreetEdge e1 = edge(v1, v2, 100.0, StreetTraversalPermission.ALL);
         e1.setCarSpeed(10.0f);
 
-        RoutingRequest options = new RoutingRequest();
+        RoutingRequest options = proto.clone();
         options.setMode(TraverseMode.WALK);
-        options.setCarSpeed(15.0f);
-        options.setWalkSpeed(1.0);
         options.setRoutingContext(_graph, v1, v2);
         
         State s0 = new State(options);
         State s1 = e1.traverse(s0);
         
         // Should use the speed on the edge.
-        long expectedDuration = (long) Math.ceil(e1.getLength() / options.getWalkSpeed());
+        double expectedWeight = e1.getLength() / options.getWalkSpeed();
+        long expectedDuration = (long) Math.ceil(expectedWeight);
         assertEquals(expectedDuration, s1.getElapsedTimeSeconds(), 0.0);
+        assertEquals(expectedWeight, s1.getWeight(), 0.0);
     }
     
     @Test
@@ -76,17 +85,18 @@ public class PlainStreetEdgeTest {
         PlainStreetEdge e1 = edge(v1, v2, 100.0, StreetTraversalPermission.ALL);
         e1.setCarSpeed(10.0f);
 
-        RoutingRequest options = new RoutingRequest();
+        RoutingRequest options = proto.clone();
         options.setMode(TraverseMode.CAR);
-        options.setCarSpeed(15.0f);
         options.setRoutingContext(_graph, v1, v2);
         
         State s0 = new State(options);
         State s1 = e1.traverse(s0);
         
         // Should use the speed on the edge.
-        long expectedDuration = (long) Math.ceil(e1.getLength() / e1.getCarSpeed());
+        double expectedWeight = e1.getLength() / e1.getCarSpeed();
+        long expectedDuration = (long) Math.ceil(expectedWeight);
         assertEquals(expectedDuration, s1.getElapsedTimeSeconds(), 0.0);
+        assertEquals(expectedWeight, s1.getWeight(), 0.0);
     }
     
     @Test
@@ -94,17 +104,18 @@ public class PlainStreetEdgeTest {
         PlainStreetEdge e1 = edge(v1, v2, 100.0, StreetTraversalPermission.ALL);
         e1.setCarSpeed(10.0f);
 
-        RoutingRequest options = new RoutingRequest();
+        RoutingRequest options = proto.clone();
         options.setMode(TraverseMode.CUSTOM_MOTOR_VEHICLE);
-        options.setCarSpeed(15.0f);
         options.setRoutingContext(_graph, v1, v2);
         
         State s0 = new State(options);
         State s1 = e1.traverse(s0);
         
         // Should use the speed on the edge.
-        long expectedDuration = (long) Math.ceil(e1.getLength() / e1.getCarSpeed());
+        double expectedWeight = e1.getLength() / e1.getCarSpeed();
+        long expectedDuration = (long) Math.ceil(expectedWeight);
         assertEquals(expectedDuration, s1.getElapsedTimeSeconds(), 0.0);
+        assertEquals(expectedWeight, s1.getWeight(), 0.0);
     }
     
     @Test
