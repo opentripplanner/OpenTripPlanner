@@ -149,10 +149,10 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
         //get previous alight at stop
         if (options.isArriveBy()) {
             final int nextDepartTime = getNextDepartTime(options, (state.arrivalTime - options.getBoardSlack()) - 2, stop.stopVertex);
-            previousArrivalTime.add((int) ((nextDepartTime - options.getAlightSlack()) - bounder.getElapsedTime()));
+            previousArrivalTime.add((int) ((nextDepartTime - options.getAlightSlack()) - bounder.getElapsedTimeSeconds()));
         } else {
             final int previousArriveTime = getPreviousArriveTime(options, state.arrivalTime - options.getAlightSlack() + 2, stop.stopVertex);
-            previousArrivalTime.add((int) (previousArriveTime + options.getAlightSlack() + bounder.getElapsedTime()));
+            previousArrivalTime.add((int) (previousArriveTime + options.getAlightSlack() + bounder.getElapsedTimeSeconds()));
         }
     }
 
@@ -208,7 +208,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
                 / speedUpperBound;
         minTime += (targetDistance - minWalk) / Raptor.MAX_TRANSIT_SPEED + walkTime;
         
-        double stateTime = current.getOptimizedElapsedTime() + minTime;
+        double stateTime = current.getOptimizedElapsedTimeSeconds() + minTime;
 
         double walkDistance = FastMath.max(optimisticDistance * Raptor.WALK_EPSILON, optimisticDistance + transferTimeInWalkDistance);
 
@@ -224,7 +224,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
 
             if (walkDistance > bounder.getWalkDistance()
                     && current.getNumBoardings() >= bounder.getNumBoardings()) {
-                if (current.getElapsedTime() + minTime >= bounder.getElapsedTime()) {
+                if (current.getElapsedTimeSeconds() + minTime >= bounder.getElapsedTimeSeconds()) {
                     return true;
                 } else if (prevTime > 0 && (options.arriveBy ? (current.getTimeSeconds() - minTime >= prevTime) : ((current.getTimeSeconds() + minTime) <= prevTime))) {
                     prevBounded = false;
@@ -234,7 +234,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
             }
 
             //check that the new path is not much longer in time than the bounding path
-            if (bounder.getOptimizedElapsedTime() * timeBoundFactor < stateTime) {
+            if (bounder.getOptimizedElapsedTimeSeconds() * timeBoundFactor < stateTime) {
                 return true;
             }
         }

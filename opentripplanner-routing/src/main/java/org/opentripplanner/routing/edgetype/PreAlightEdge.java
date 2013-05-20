@@ -82,7 +82,7 @@ public class PreAlightEdge extends FreeEdge {
             }
             long alight_before = t0 - slack;
             int transfer_penalty = 0;
-            if (s0.getLastAlightedTime() != 0) {
+            if (s0.getLastAlightedTimeSeconds() != 0) {
                 /* this is a transfer rather than an initial boarding */
                 TransferTable transferTable = rctx.transferTable;
                 if (transferTable.hasPreferredTransfers()) {
@@ -96,7 +96,7 @@ public class PreAlightEdge extends FreeEdge {
                 } else if (transfer_time >= 0) {
                     // handle minimum time transfers (>0) and timed transfers (0)
                     // relative to alight time at last stop
-                    long table_alight_before = s0.getLastAlightedTime() - transfer_time;
+                    long table_alight_before = s0.getLastAlightedTimeSeconds() - transfer_time;
                     // do not let time run the wrong way
                     // this could make timed transfers fail if there is walking involved
                     if (table_alight_before < alight_before)
@@ -127,7 +127,7 @@ public class PreAlightEdge extends FreeEdge {
             }
 
             StateEditor s1 = s0.edit(this);
-            s1.setTime(alight_before);
+            s1.setTimeSeconds(alight_before);
             s1.setEverBoarded(true);
             long wait_cost = t0 - alight_before;
             s1.incrementWeight(wait_cost + transfer_penalty);

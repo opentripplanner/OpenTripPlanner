@@ -114,7 +114,7 @@ public class GraphPath {
      */
     public int getDuration() {
         // test to see if it is the same as getStartTime - getEndTime;
-        return (int) states.getLast().getElapsedTime();
+        return (int) states.getLast().getElapsedTimeSeconds();
     }
 
     public double getWeight() {

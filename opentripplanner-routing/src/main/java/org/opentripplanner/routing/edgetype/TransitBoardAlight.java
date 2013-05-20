@@ -147,7 +147,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
                 return null;
             }
             s1.setTripId(null);
-            s1.setLastAlightedTime(state0.getTimeSeconds());
+            s1.setLastAlightedTimeSeconds(state0.getTimeSeconds());
             s1.setPreviousStop(fromv);
             s1.setLastPattern(this.getPattern());
 
@@ -159,7 +159,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
                 // this should only occur at the beginning
                 s1.incrementWeight(wait * options.waitAtBeginningFactor);
 
-                s1.setInitialWaitTime(wait);
+                s1.setInitialWaitTimeSeconds(wait);
 
                 //_log.debug("Initial wait time set to {} in PatternBoard", wait);
             }
@@ -284,7 +284,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
             if (state0.getNumBoardings() == 0 && !options.isReverseOptimizing()) {
                 wait_cost *= options.waitAtBeginningFactor;
                 // this is subtracted out in Analyst searches in lieu of reverse optimization
-                s1.setInitialWaitTime(bestWait);
+                s1.setInitialWaitTimeSeconds(bestWait);
             } else {
                 wait_cost *= options.waitReluctance;
             }

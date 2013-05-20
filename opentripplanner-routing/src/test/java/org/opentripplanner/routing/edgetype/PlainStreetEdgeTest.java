@@ -68,7 +68,7 @@ public class PlainStreetEdgeTest {
         
         // Should use the speed on the edge.
         long expectedDuration = (long) Math.ceil(e1.getLength() / options.getWalkSpeed());
-        assertEquals(expectedDuration, s1.getElapsedTime(), 0.0);
+        assertEquals(expectedDuration, s1.getElapsedTimeSeconds(), 0.0);
     }
     
     @Test
@@ -86,7 +86,7 @@ public class PlainStreetEdgeTest {
         
         // Should use the speed on the edge.
         long expectedDuration = (long) Math.ceil(e1.getLength() / e1.getCarSpeed());
-        assertEquals(expectedDuration, s1.getElapsedTime(), 0.0);
+        assertEquals(expectedDuration, s1.getElapsedTimeSeconds(), 0.0);
     }
     
     @Test
@@ -104,7 +104,7 @@ public class PlainStreetEdgeTest {
         
         // Should use the speed on the edge.
         long expectedDuration = (long) Math.ceil(e1.getLength() / e1.getCarSpeed());
-        assertEquals(expectedDuration, s1.getElapsedTime(), 0.0);
+        assertEquals(expectedDuration, s1.getElapsedTimeSeconds(), 0.0);
     }
     
     @Test

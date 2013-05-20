@@ -169,7 +169,7 @@ public class FrequencyAlight extends Edge  implements OnBoardReverseEdge {
                 return null;
             }
             s1.setTripId(null);
-            s1.setLastAlightedTime(state0.getTimeSeconds());
+            s1.setLastAlightedTimeSeconds(state0.getTimeSeconds());
             s1.setPreviousStop(fromv);
             s1.setBackMode(TraverseMode.ALIGHTING);
             return s1.makeState();

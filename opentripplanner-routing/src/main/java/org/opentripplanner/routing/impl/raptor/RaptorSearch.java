@@ -514,7 +514,7 @@ public class RaptorSearch {
                         continue;
                     }
 
-                    addStopNearTarget(stop, state.getWalkDistance(), (int) state.getElapsedTime());
+                    addStopNearTarget(stop, state.getWalkDistance(), (int) state.getElapsedTimeSeconds());
                 }
             }
         } else {
@@ -549,11 +549,11 @@ public class RaptorSearch {
 
                 StateEditor dijkstraState = new MaxWalkState.MaxWalkStateEditor(walkOptions,
                         stopVertex);
-                dijkstraState.setInitialWaitTime(state.initialWaitTime);
-                dijkstraState.setStartTime(options.dateTime);
+                dijkstraState.setInitialWaitTimeSeconds(state.initialWaitTime);
+                dijkstraState.setStartTimeSeconds(options.dateTime);
                 dijkstraState.setNumBoardings(state.nBoardings);
                 dijkstraState.setWalkDistance(state.walkDistance);
-                dijkstraState.setTime(state.arrivalTime);
+                dijkstraState.setTimeSeconds(state.arrivalTime);
                 dijkstraState.setExtension("raptorParent", state);
                 dijkstraState.setOptions(walkOptions);
                 dijkstraState.incrementWeight(state.weight);
@@ -639,7 +639,7 @@ public class RaptorSearch {
 
                     int maxTimeForVertex = 0;
                     int region = vertex.getGroupIndex();
-                    final int elapsedTime = (int) state.getElapsedTime();
+                    final int elapsedTime = (int) state.getElapsedTimeSeconds();
                     for (StopNearTarget stopNearTarget : stopsNearTarget.values()) {
                         int destinationRegion = stopNearTarget.stop.stopVertex.getGroupIndex();
                         final int maxTimeFromThisRegion = data.maxTransitRegions.maxTransit[maxTimeDayIndex][destinationRegion][region];

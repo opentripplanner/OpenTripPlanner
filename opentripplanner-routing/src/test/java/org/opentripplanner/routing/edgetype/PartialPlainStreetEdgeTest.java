@@ -108,7 +108,7 @@ public class PartialPlainStreetEdgeTest {
         
         // Traversal of original and partial edges should yield the same results.
         assertEquals(s1.getTimeSeconds(), partialS1.getTimeSeconds());
-        assertEquals(s1.getElapsedTime(), partialS1.getElapsedTime());
+        assertEquals(s1.getElapsedTimeSeconds(), partialS1.getElapsedTimeSeconds());
         assertEquals(s1.getWeight(), partialS1.getWeight(), 0.0);
         
         // Now traverse the second partial/parent edge pair.
@@ -117,7 +117,7 @@ public class PartialPlainStreetEdgeTest {
         
         // Same checks as above.
         assertEquals(s2.getTimeSeconds(), partialS2.getTimeSeconds());
-        assertEquals(s2.getElapsedTime(), partialS2.getElapsedTime());
+        assertEquals(s2.getElapsedTimeSeconds(), partialS2.getElapsedTimeSeconds());
         assertEquals(s2.getWeight(), partialS2.getWeight(), 0.0);
     }
     
@@ -158,7 +158,7 @@ public class PartialPlainStreetEdgeTest {
         
         // Time and cost should be the same up to a rounding difference.
         assertTrue(Math.abs(s3.getTimeSeconds() - partialS3.getTimeSeconds()) <= 1);
-        assertTrue(Math.abs(s3.getElapsedTime() - partialS3.getElapsedTime()) <= 1);
+        assertTrue(Math.abs(s3.getElapsedTimeSeconds() - partialS3.getElapsedTimeSeconds()) <= 1);
         assertTrue(Math.abs(s3.getWeight() - partialS3.getWeight()) <= 1);
         
         // All intersections take 0 seconds now.
@@ -177,7 +177,7 @@ public class PartialPlainStreetEdgeTest {
         
         // Time and cost should be the same up to a rounding difference.
         assertTrue(Math.abs(s3NoCost.getTimeSeconds() - partialS3NoCost.getTimeSeconds()) <= 1);
-        assertTrue(Math.abs(s3NoCost.getElapsedTime() - partialS3NoCost.getElapsedTime()) <= 1);
+        assertTrue(Math.abs(s3NoCost.getElapsedTimeSeconds() - partialS3NoCost.getElapsedTimeSeconds()) <= 1);
         assertTrue(Math.abs(s3NoCost.getWeight() - partialS3NoCost.getWeight()) <= 1);
         
         // Difference in duration and weight between now and before should be

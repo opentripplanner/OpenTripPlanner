@@ -337,7 +337,7 @@ public class TestPatternHopFactory extends TestCase {
                 num_alights += 1;
             }
             if (s.getBackEdge() instanceof PatternDwell) {
-                assertEquals(10 * 60, s.getTimeDeltaSec());
+                assertEquals(10 * 60, s.getTimeDeltaSeconds());
             }
         }
         assertEquals(1, num_alights);
@@ -354,7 +354,7 @@ public class TestPatternHopFactory extends TestCase {
                 num_alights += 1;
             }
             if (s.getBackEdge() instanceof PatternDwell) {
-                assertEquals(10 * 60, s.getTimeDeltaSec());
+                assertEquals(10 * 60, s.getTimeDeltaSeconds());
             }
         }
         assertEquals(1, num_alights);

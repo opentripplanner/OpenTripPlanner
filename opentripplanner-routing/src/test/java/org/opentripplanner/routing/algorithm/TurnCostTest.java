@@ -155,11 +155,11 @@ public class TurnCostTest {
         assertEquals("broad_2nd", states.get(3).getVertex().getLabel());
         assertEquals("broad_3rd", states.get(4).getVertex().getLabel());
         
-        assertEquals(0, states.get(0).getElapsedTime());
-        assertEquals(50, states.get(1).getElapsedTime());  // maple_main1 = 50
-        assertEquals(160, states.get(2).getElapsedTime()); // main1_2 = 100
-        assertEquals(220, states.get(3).getElapsedTime()); // main_broad2 = 50
-        assertEquals(330, states.get(4).getElapsedTime()); // broad2_3 = 100
+        assertEquals(0, states.get(0).getElapsedTimeSeconds());
+        assertEquals(50, states.get(1).getElapsedTimeSeconds());  // maple_main1 = 50
+        assertEquals(160, states.get(2).getElapsedTimeSeconds()); // main1_2 = 100
+        assertEquals(220, states.get(3).getElapsedTimeSeconds()); // main_broad2 = 50
+        assertEquals(330, states.get(4).getElapsedTimeSeconds()); // broad2_3 = 100
     }
         
     @Test
@@ -205,11 +205,11 @@ public class TurnCostTest {
         assertEquals("broad_2nd", states.get(3).getVertex().getLabel());
         assertEquals("broad_3rd", states.get(4).getVertex().getLabel());
         
-        assertEquals(0, states.get(0).getElapsedTime());
-        assertEquals(50, states.get(1).getElapsedTime());  // maple_main1 = 50
-        assertEquals(160, states.get(2).getElapsedTime()); // main1_2 = 100
-        assertEquals(270, states.get(3).getElapsedTime()); // broad1_2 = 100
-        assertEquals(380, states.get(4).getElapsedTime()); // broad2_3 = 100
+        assertEquals(0, states.get(0).getElapsedTimeSeconds());
+        assertEquals(50, states.get(1).getElapsedTimeSeconds());  // maple_main1 = 50
+        assertEquals(160, states.get(2).getElapsedTimeSeconds()); // main1_2 = 100
+        assertEquals(270, states.get(3).getElapsedTimeSeconds()); // broad1_2 = 100
+        assertEquals(380, states.get(4).getElapsedTimeSeconds()); // broad2_3 = 100
     }
 
     /****

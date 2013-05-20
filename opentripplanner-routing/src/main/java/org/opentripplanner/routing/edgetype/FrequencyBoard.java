@@ -93,7 +93,7 @@ public class FrequencyBoard extends Edge implements OnBoardForwardEdge, PatternE
                 return null;
             }
             s1.setTripId(null);
-            s1.setLastAlightedTime(state0.getTimeSeconds());
+            s1.setLastAlightedTimeSeconds(state0.getTimeSeconds());
             s1.setBackMode(TraverseMode.BOARDING);
             s1.setPreviousStop(fromv);
             return s1.makeState();

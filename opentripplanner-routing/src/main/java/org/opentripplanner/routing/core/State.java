@@ -37,7 +37,8 @@ import org.slf4j.LoggerFactory;
 
 public class State implements Cloneable {
     /* Data which is likely to change at most traversals */
-    // the current time at this state, in seconds
+    
+    // the current time at this state, in milliseconds
     protected long time;
 
     // accumulated weight up to this state
@@ -91,16 +92,16 @@ public class State implements Cloneable {
      * Create an initial state, forcing vertex and time to the specified values. Useful for reusing 
      * a RoutingContext in TransitIndex, tests, etc.
      */
-    public State(Vertex vertex, long time, RoutingRequest options) {
+    public State(Vertex vertex, long timeSeconds, RoutingRequest options) {
         // Since you explicitly specify, the vertex, we don't set the backEdge.
-        this(vertex, null, time, options);
+        this(vertex, null, timeSeconds, options);
     }
     
     /**
      * Create an initial state, forcing vertex, back edge and time to the specified values. Useful for reusing 
      * a RoutingContext in TransitIndex, tests, etc.
      */
-    public State(Vertex vertex, Edge backEdge, long time, RoutingRequest options) {
+    public State(Vertex vertex, Edge backEdge, long timeSeconds, RoutingRequest options) {
         this.weight = 0;
         this.vertex = vertex;
         this.backEdge = backEdge;
@@ -109,10 +110,10 @@ public class State implements Cloneable {
         // note that here we are breaking the circular reference between rctx and options
         // this should be harmless since reversed clones are only used when routing has finished
         this.stateData.opt = options;
-        this.stateData.startTime = time;
+        this.stateData.startTime = timeSeconds;
         this.stateData.usingRentedBike = false;
         this.walkDistance = 0;
-        this.time = time;
+        this.time = timeSeconds * 1000;
         if (options.rctx != null) {
             this.pathParserStates = new int[options.rctx.pathParsers.length];
             Arrays.fill(this.pathParserStates, AutomatonState.START);
@@ -166,19 +167,19 @@ public class State implements Cloneable {
     public String toStringVerbose() {
         return "<State " + new Date(getTimeInMillis()) + 
                 " w=" + this.getWeight() + 
-                " t=" + this.getElapsedTime() + 
+                " t=" + this.getElapsedTimeSeconds() + 
                 " d=" + this.getWalkDistance() + 
                 " b=" + this.getNumBoardings() + ">";
     }
     
     /** Returns time in seconds since epoch */
     public long getTimeSeconds() {
-        return this.time;
+        return time / 1000;
     }
 
     /** returns the length of the trip in seconds up to this state */
-    public long getElapsedTime() {
-        return Math.abs(this.time - stateData.startTime);
+    public long getElapsedTimeSeconds() {
+        return Math.abs(getTimeSeconds() - stateData.startTime);
     }
 
     public TripTimes getTripTimes() {
@@ -202,12 +203,12 @@ public class State implements Cloneable {
         if (clampInitialWait >= 0 && initialWait > clampInitialWait)
             initialWait = clampInitialWait;            
 
-        long activeTime = getElapsedTime() - initialWait;
+        long activeTime = getElapsedTimeSeconds() - initialWait;
 
         // TODO: what should be done here? (Does this ever happen?)
         if (activeTime < 0) {
             LOG.warn("initial wait was greater than elapsed time.");
-            activeTime = getElapsedTime();
+            activeTime = getElapsedTimeSeconds();
         }
 
         return activeTime;            
@@ -256,7 +257,7 @@ public class State implements Cloneable {
         return stateData.previousStop;
     }
 
-    public long getLastAlightedTime() {
+    public long getLastAlightedTimeSeconds() {
         return stateData.lastAlightedTime;
     }
 
@@ -296,7 +297,7 @@ public class State implements Cloneable {
         double weightDiff = this.weight / other.weight;
         return walkDistance <= other.getWalkDistance() * 1.05
                 && (weightDiff < 1.02 && this.weight - other.weight < 30)
-                && this.getElapsedTime() - other.getElapsedTime() <= 30;
+                && this.getElapsedTimeSeconds() - other.getElapsedTimeSeconds() <= 30;
     }
 
     /**
@@ -311,12 +312,12 @@ public class State implements Cloneable {
         return this.weight;
     }
 
-    public int getTimeDeltaSec() {
-        return (int) (this.time - backState.time);
+    public int getTimeDeltaSeconds() {
+        return (int) (getTimeSeconds() - backState.getTimeSeconds());
     }
 
-    public int getAbsTimeDeltaSec() {
-        return (int) Math.abs(this.time - backState.time);
+    public int getAbsTimeDeltaSeconds() {
+        return (int) Math.abs(getTimeSeconds() - backState.getTimeSeconds());
     }
 
     public double getWalkDistanceDelta () {
@@ -389,7 +390,7 @@ public class State implements Cloneable {
         return weight > maxWeight;
     }
 
-    public long getStartTime() {
+    public long getStartTimeSeconds() {
         return stateData.startTime;
     }
 
@@ -453,7 +454,7 @@ public class State implements Cloneable {
     public State reversedClone() {
         // We no longer compensate for schedule slack (minTransferTime) here.
         // It is distributed symmetrically over all preboard and prealight edges.
-        State newState = new State(this.vertex, this.time, stateData.opt.reversedClone());
+        State newState = new State(this.vertex, getTimeSeconds(), stateData.opt.reversedClone());
         newState.stateData.tripTimes = stateData.tripTimes;
         newState.stateData.initialWaitTime = stateData.initialWaitTime;
         return newState;
@@ -470,7 +471,7 @@ public class State implements Cloneable {
     }
 
     public long getTimeInMillis() {
-        return time * 1000;
+        return time;
     }
 
     public boolean similarRouteSequence(State that) {
@@ -643,7 +644,7 @@ public class State implements Cloneable {
                 // note the distinction between setFromState and setBackState
                 editor.setFromState(orig);
 
-                editor.incrementTimeInSeconds(orig.getAbsTimeDeltaSec());
+                editor.incrementTimeInSeconds(orig.getAbsTimeDeltaSeconds());
                 editor.incrementWeight(orig.getWeightDelta());
                 editor.incrementWalkDistance(orig.getWalkDistanceDelta());
                 
@@ -671,9 +672,9 @@ public class State implements Cloneable {
             if (getWeight() <= reversed.getWeight())
                 LOG.warn("Optimization did not decrease weight: before " + this.getWeight()
                         + " after " + reversed.getWeight());
-            if (getElapsedTime() != reversed.getElapsedTime())
-                LOG.warn("Optimization changed time: before " + this.getElapsedTime() + " after "
-                        + reversed.getElapsedTime());
+            if (getElapsedTimeSeconds() != reversed.getElapsedTimeSeconds())
+                LOG.warn("Optimization changed time: before " + this.getElapsedTimeSeconds() + " after "
+                        + reversed.getElapsedTimeSeconds());
             if (getActiveTime() <= reversed.getActiveTime())
                 // NOTE: this can happen and it isn't always bad (i.e. it doesn't always mean that
                 // reverse-opt got called when it shouldn't have). Imagine three lines A, B and C
@@ -728,14 +729,14 @@ public class State implements Cloneable {
     /**
      * Reverse-optimize a path after it is complete, by default
      */
-    public State optimize () {
+    public State optimize() {
         return optimizeOrReverse(true, false);
     }
 
     /**
      * Reverse a path
      */
-    public State reverse () {
+    public State reverse() {
         return optimizeOrReverse(false, false);
     }
     
@@ -757,7 +758,7 @@ public class State implements Cloneable {
         return stateData.opt.reverseOptimizing;
     }
 
-    public double getOptimizedElapsedTime() {
-        return getElapsedTime() - stateData.initialWaitTime;
+    public double getOptimizedElapsedTimeSeconds() {
+        return getElapsedTimeSeconds() - stateData.initialWaitTime;
     }
 }
