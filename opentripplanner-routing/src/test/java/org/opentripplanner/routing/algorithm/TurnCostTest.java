@@ -122,6 +122,13 @@ public class TurnCostTest {
         // Without turn costs, this path costs 2x100 + 2x50 = 300.
         assertEquals(expectedDuration, path.getDuration()); 
         
+        // Weight == duration when reluctances == 0.
+        assertEquals(expectedDuration, (int) path.getWeight());
+        
+        for (State s : path.states) {
+            assertEquals(s.getElapsedTimeSeconds(), (int) s.getWeight());
+        }
+        
         return path;
     }
     
@@ -159,7 +166,7 @@ public class TurnCostTest {
         assertEquals(50, states.get(1).getElapsedTimeSeconds());  // maple_main1 = 50
         assertEquals(160, states.get(2).getElapsedTimeSeconds()); // main1_2 = 100
         assertEquals(220, states.get(3).getElapsedTimeSeconds()); // main_broad2 = 50
-        assertEquals(330, states.get(4).getElapsedTimeSeconds()); // broad2_3 = 100
+        assertEquals(330, states.get(4).getElapsedTimeSeconds()); // broad2_3 = 100        
     }
         
     @Test
@@ -170,8 +177,6 @@ public class TurnCostTest {
         
         // Without turn costs, this path costs 3x100 + 1x50 = 300.
         GraphPath path = checkForwardRouteDuration(options, 350);
-        
-        path.dump();
         
         List<State> states = path.states;
         assertEquals(5, states.size());
@@ -193,8 +198,6 @@ public class TurnCostTest {
         // Without turn costs, this path costs 3x100 + 1x50 = 350.
         // Since there are 3 turns, the total cost should be 380.
         GraphPath path = checkForwardRouteDuration(options, 380);
-        
-        path.dump();
         
         List<State> states = path.states;
         assertEquals(5, states.size());
