@@ -18,6 +18,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jettison.json.JSONException;
@@ -45,16 +46,18 @@ import com.sun.jersey.api.spring.Autowire;
  * 
  * @throws JSONException
  */
-@Path("/plan") // NOTE - /ws/plan is the full path -- see web.xml
+@Path("/plan") // NOTE - /ws/plan is the full path. The prefix is added by the servlet's web.xml.
 @XmlRootElement
 @Autowire
 public class Planner extends RoutingResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(Planner.class);
     @Autowired public PlanGenerator planGenerator;
+    // We need to inject the incoming servletRequest so we can include the incoming query 
+    // parameters in the outgoing response. This was a TriMet requirement.
     @Context protected HttpServletRequest httpServletRequest;
-
-    /** Java is immensely painful */
+    
+    /** Java is immensely painful. TODO: Guava should cover this. */
     interface OneArgFunc<T,U> {
         public T call(U arg);
     }
