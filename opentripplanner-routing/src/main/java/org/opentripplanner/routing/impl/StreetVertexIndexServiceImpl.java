@@ -171,11 +171,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     /**
      * Convenience helper for when extraEdges is empty/null.
-     * 
-     * @param location
-     * @param name
-     * @param options
-     * @return
      */
     private Vertex getClosestVertex(final GenericLocation location, RoutingRequest options) {
         return getClosestVertex(location, options, null);
@@ -186,12 +181,6 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
      * 
      * This method is the heart of the logic that searches for the start and endpoints of RideRequests. As such, it is protected so that subclasses
      * can override the search behavior.
-     * 
-     * @param location
-     * @param name
-     * @param options
-     * @param extraEdges
-     * @return
      */
     protected Vertex getClosestVertex(final GenericLocation location, RoutingRequest options,
             List<Edge> extraEdges) {
@@ -266,7 +255,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
             Coordinate nearestPoint = candidate.nearestPointOnEdge;
             closestStreetDistance = distanceLibrary.distance(coord, nearestPoint);
             _log.debug("best street: {} dist: {}", bestStreet.toString(), closestStreetDistance);
-            if (calculatedName == null) {
+            if (calculatedName == null || "".equals(calculatedName)) {
                 calculatedName = bestStreet.getName();
             }
             String closestName = String.format("%s_%s", bestStreet.getName(), location.toString());
