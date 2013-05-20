@@ -10,16 +10,18 @@ import com.sun.jersey.spi.container.ContainerRequest;
 import com.sun.jersey.spi.container.ContainerRequestFilter;
 
 /** 
- * Adds basic authentication to the Grizzly + Jersey server.
- * http://simplapi.wordpress.com/2013/01/24/jersey-jax-rs-implements-a-http-basic-auth-decoder/ 
+ * This Jersey filter adds basic authentication to the Grizzly + Jersey server.
+ * A ContainerRequestFilter applies to the entire container rather than a single resource, and
+ * filters requests rather than responses.
+ * http://simplapi.wordpress.com/2013/01/24/jersey-jax-rs-implements-a-http-basic-auth-decoder/
  */
 public class GrizzlyAuthFilter implements ContainerRequestFilter {
 
     /* The exception thrown if a user is unauthorized. */
     private final static WebApplicationException unauthorized = 
         new WebApplicationException(Response.status(Status.UNAUTHORIZED)
-            .header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"realm\"")
-            .entity("Page requires login.").build());
+            .header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"OTP\"")
+            .entity("This OTP resource requires authentication.").build());
 
     public GrizzlyAuthFilter() {
         System.out.println("INSTANTIATING AUTH FILTER");
@@ -45,6 +47,7 @@ public class GrizzlyAuthFilter implements ContainerRequestFilter {
             if (!userColonPass.equals("admin:admin"))
                 throw unauthorized;
         } else {
+            // fail on unrecognized auth type
             throw unauthorized;
         }
         return containerRequest;
