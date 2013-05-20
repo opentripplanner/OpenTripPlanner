@@ -58,7 +58,7 @@ public class GrizzlyServer {
         XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader(gctx);
         String[] contexts = {
             "data-sources.xml",
-            "org/opentripplanner/api/security-application-context.xml"
+            // "org/opentripplanner/api/security-application-context.xml"
         };
         for (String contextFile : contexts) {
             xmlReader.loadBeanDefinitions(new ClassPathResource(contextFile));
@@ -70,7 +70,8 @@ public class GrizzlyServer {
         ResourceConfig rc = new PackagesResourceConfig("org.opentripplanner");
         rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, 
                  new String[] { GrizzlyAuthFilter.class.getName() });
-
+        // DelegatingFilterProxy.class.getName() does not seem to work out of the box.
+        
         IoCComponentProviderFactory ioc_factory = new SpringComponentProviderFactory(rc, gctx);
         HttpServer httpServer = GrizzlyServerFactory.createHttpServer(base_uri, rc, ioc_factory);
 
