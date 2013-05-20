@@ -53,9 +53,9 @@ public class Planner extends RoutingResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(Planner.class);
     @Autowired public PlanGenerator planGenerator;
-    // We need to inject the incoming servletRequest so we can include the incoming query 
-    // parameters in the outgoing response. This was a TriMet requirement.
-    @Context protected HttpServletRequest httpServletRequest;
+    // We inject info about the incoming request so we can include the incoming query 
+    // parameters in the outgoing response. This is a TriMet requirement.
+    @Context UriInfo uriInfo;
     
     /** Java is immensely painful. TODO: Guava should cover this. */
     interface OneArgFunc<T,U> {
@@ -72,7 +72,7 @@ public class Planner extends RoutingResource {
          */
         
         // create response object, containing a copy of all request parameters
-        Response response = new Response(httpServletRequest);
+        Response response = new Response(uriInfo);
         RoutingRequest request = null;
         try {
             // fill in request from query parameters via shared superclass method

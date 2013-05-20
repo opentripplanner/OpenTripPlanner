@@ -14,10 +14,10 @@
 package org.opentripplanner.api.ws;
 
 import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.Map.Entry;
 
-import javax.servlet.ServletRequest;
+import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -35,37 +35,29 @@ public class Response {
     public Response() {
     }
 
-    public Response(ServletRequest sr) {
+    /** Construct an new response initialized with all the incoming query paramters. */
+    public Response(UriInfo info) {
         this.requestParameters = new HashMap<String, String>();
-        if (sr == null) { 
-            // for tests where there is no http request
+        if (info == null) { 
+            // in tests where there is no HTTP request, just leave the map empty
             return;
         }
-        // include only the first instance of each query parameter
-        @SuppressWarnings("unchecked")
-        Map<String, String[]> params = sr.getParameterMap();
-        for (Entry<String, String[]> e : params.entrySet()) {
-            requestParameters.put(e.getKey(), e.getValue()[0]);
+        for (Entry<String, List<String>> e : info.getQueryParameters().entrySet()) {
+            // include only the first instance of each query parameter
+            requestParameters.put(e.getKey(), e.getValue().get(0));
         }
     }
 
-    // note order the getters below is semi-important, in that that's the order printed by jersey in the return
-    // e.g., from a human readable standpoint, it's tradition to have request params, followed by plan, followed by errors
+    // NOTE: the order the getter methods below is semi-important, in that Jersey will use the
+    // same order for the elements in the JS or XML serialized response. The traditional order
+    // is request params, followed by plan, followed by errors.
 
-    /**
-     * A dictionary of the parameters provided in the request that triggered this response.
-     */
+    /** A dictionary of the parameters provided in the request that triggered this response. */
     public HashMap<String, String> getRequestParameters() {
         return requestParameters;
     }
 
-    public void setRequestParameters(HashMap<String, String> requestParameters) {
-        this.requestParameters = requestParameters;
-    }
-
-    /**
-     * The actual trip plan.
-     */
+    /** The actual trip plan. */
     public TripPlan getPlan() {
         return plan;
     }
@@ -74,9 +66,7 @@ public class Response {
         this.plan = plan;
     }
 
-    /**
-     * The error (if any) that this response raised.
-     */
+    /** The error (if any) that this response raised. */
     @XmlElement(required=false)
     public PlannerError getError() {
         return error;
@@ -85,4 +75,5 @@ public class Response {
     public void setError(PlannerError error) {
         this.error = error;
     }
+    
 }
