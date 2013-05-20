@@ -94,7 +94,7 @@ public class TransitLocalStreetComputer implements GraphBuilder {
                     if (destStopVertex instanceof TransitStop) {
                         int pathIndex = 0;
                         if (req == walk && saveShortestPaths ) {
-                           cost.put(destStopVertex, new T2<Double, Integer>(s.getWalkDistance(), (int) s.getElapsedTime()));
+                           cost.put(destStopVertex, new T2<Double, Integer>(s.getWalkDistance(), (int) s.getElapsedTimeSeconds()));
                         }
                         while (s != null) {
                             transitShortestPathVertices.add(s.getVertex());

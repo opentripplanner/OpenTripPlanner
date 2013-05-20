@@ -361,7 +361,7 @@ public class RaptorDataBuilder implements GraphBuilder {
                         continue;
 
                     T2<Integer, Double> timeAndDistance = new T2<Integer, Double>(
-                            (int) state.getElapsedTime(), state.getWalkDistance());
+                            (int) state.getElapsedTimeSeconds(), state.getWalkDistance());
                     timesByDestination.put(vertex, timeAndDistance);
                 }
             }

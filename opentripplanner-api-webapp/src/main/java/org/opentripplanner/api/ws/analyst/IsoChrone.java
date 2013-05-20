@@ -282,7 +282,7 @@ public class IsoChrone extends RoutingResource {
             noRoadNearBy = false;
             Map<ReversibleLineStringWrapper, Edge> connectingEdgesMap = Maps.newHashMap();
             for (State state : sptA.getAllStates()) {
-                long et = state.getElapsedTime();
+                long et = state.getElapsedTimeSeconds();
                 if (et <= maxTime) {
                     // -- filter points, as the same coordinate may be passed several times due to the graph structure
                     // in a Calgary suburb family homes neighborhood with a 15min walkshed it filtered about
@@ -535,8 +535,8 @@ public class IsoChrone extends RoutingResource {
             State sFrom = spt.getState(edge.getFromVertex());
             State sTo = spt.getState(edge.getToVertex());
             if ((sFrom != null) && (sTo != null)) {
-                long fromTime = sFrom.getElapsedTime();
-                long toTime = sTo.getElapsedTime();
+                long fromTime = sFrom.getElapsedTimeSeconds();
+                long toTime = sTo.getElapsedTimeSeconds();
                 long dt = Math.abs(toTime - fromTime);
                 Geometry edgeGeom = edge.getGeometry();
                 if ((edgeGeom != null) && (edgeGeom instanceof LineString)) {

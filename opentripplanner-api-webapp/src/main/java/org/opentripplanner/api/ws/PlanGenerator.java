@@ -220,7 +220,7 @@ public class PlanGenerator {
 
             TraverseMode mode = state.getBackMode();
             if (mode != null) {
-                long dt = state.getAbsTimeDeltaSec();
+                long dt = state.getAbsTimeDeltaSeconds();
                 if (mode == TraverseMode.BOARDING || mode == TraverseMode.ALIGHTING
                         || mode == TraverseMode.STL) {
                     itinerary.waitingTime += dt;
