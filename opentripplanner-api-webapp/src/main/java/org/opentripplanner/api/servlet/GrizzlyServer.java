@@ -81,7 +81,7 @@ public class GrizzlyServer {
         httpServer.getServerConfiguration().addHttpHandler(new StaticHttpHandler("./"), "/cp/");
 
         try {
-            httpServer.start();
+            // httpServer.start(); unneeded, server is already started 
             System.out.println("Grizzly server running at " + base_uri);
             System.out.println("WADL at " + base_uri + "application.wadl");
             System.out.println("Test with " + base_uri + "metadata");
