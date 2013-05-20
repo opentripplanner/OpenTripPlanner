@@ -240,8 +240,10 @@ otp.core.Webapp = otp.Class({
         $('#otp_toptitle').html(module.moduleName);
         
         for(var i = 0; i < module.widgets.length; i++) {
-            console.log(" - showing widget: "+module.widgets[i].id);
-            module.widgets[i].show();
+            if(module.widgets[i].isOpen) {
+                console.log(" - showing widget: "+module.widgets[i].id);
+                module.widgets[i].show();
+            }
         }
         
         module.activate();

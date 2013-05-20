@@ -29,14 +29,14 @@ otp.modules.fieldtrip.FieldTripRequestsWidget =
         
         this.module = module;
 
-        otp.widgets.Widget.prototype.initialize.call(this, id, module.webapp.widgetManager);
-        this.$().addClass('otp-fieldTripRequestsWidget');
-        this.minimizable = true;
-        this.addHeader("Field Trip Requests");
+        otp.widgets.Widget.prototype.initialize.call(this, id, module, {
+            cssClass : 'otp-fieldTripRequestsWidget',
+            title : "Field Trip Requests"
+        });
         
-        this.requestsList = $('<div class="otp-fieldTripRequests-list notDraggable" />').appendTo(this.$());
+        this.requestsList = $('<div class="otp-fieldTripRequests-list notDraggable" />').appendTo(this.mainDiv);
         
-        var buttonRow = $('<div class="otp-fieldTripRequests-buttonRow" />').appendTo(this.$());
+        var buttonRow = $('<div class="otp-fieldTripRequests-buttonRow" />').appendTo(this.mainDiv);
         
         $('<button id="'+this.id+'-planOutboundButton">Plan Outbound</button>').button()
         .appendTo(buttonRow).click(function() {

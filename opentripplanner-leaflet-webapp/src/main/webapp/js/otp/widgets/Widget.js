@@ -16,44 +16,68 @@ otp.namespace("otp.widgets");
 
 otp.widgets.Widget = otp.Class({
     
-    widgetManager :   null,  
-    div :       null,
-    id :        null,
-    minimizable : false,
-    minimized   : false,
-    minimizedTab : null,
-    header      : null,
-    title       : null,
-    
-    initialize : function(id, manager) {
-        //otp.configure(this, config);
-        this.id = id;
-        //console.log('widget constructor: '+this.id);
-        this.widgetManager = manager;
-        
-        this.div = document.createElement('div');
-        this.div.setAttribute('id', this.id);
-        this.div.className = 'otp-widget';
-        document.body.appendChild(this.div);
-        var this_ = this;
-        $(this.div).draggable({ 
-            containment: "#map",
-            start: function(event, ui) {
-                console.log("dragging: "+$(this_.div).css('bottom'));
-                $(this_.div).css({'bottom' : 'auto', 'right' : 'auto'});
-            },
-            cancel: '.notDraggable'
-        });
-        
-        this.widgetManager.addWidget(this);
-        
-        
-    },
+    id              : null,
+    owner           : null,
+    mainDiv         : null,
+    header          : null,
+    minimizedTab    : null,
 
-    addHeader : function(title) {
+    // fields that can be set via the options parameter, and default values:
+    draggable       : true,
+    minimizable     : true,
+    closeable       : false,
+    resizable       : false,
+    showHeader      : true,
+    title           : '', // string
+    openInitially   : true,
+
+    isOpen          : true, // whether or not widget is displayed in applicable module view
+    isMinimized     : false,
+
+    
+    initialize : function(id, owner, options) {
+        //console.log('widget constructor: '+this.id);
+        
+        if(typeof options !== 'undefined') {
+            _.extend(this, options);
+        }
+
+        this.id = id;        
+        this.owner = owner;
+        this.owner.addWidget(this);
+
+        // set up the main widget DOM element:
+        this.mainDiv = $('<div />').attr('id', id).addClass('otp-widget').appendTo('body');
+
+        if(!this.openInitially) {
+            this.isOpen = false;
+            this.mainDiv.css('display','none');
+        }
+        
+        if(typeof this.cssClass !== 'undefined') {
+            this.mainDiv.addClass(this.cssClass);
+        }
+        
+        if(this.resizable) this.mainDiv.resizable();
+        
+        if(this.showHeader) this.addHeader();
+        
         var this_ = this;
-        this.title = title;
-        this.header = $('<div class="otp-widget-header">'+title+'</div>').appendTo(this.$());
+        if(this.draggable) {
+            this.mainDiv.draggable({ 
+                containment: "#map",
+                start: function(event, ui) {
+                    $(this_.mainDiv).css({'bottom' : 'auto', 'right' : 'auto'});
+                },
+                cancel: '.notDraggable'
+            });
+        }
+    },
+        
+    addHeader : function() {
+        var this_ = this;
+        //this.title = title;
+        this.header = $('<div class="otp-widget-header">'+this.title+'</div>').appendTo(this.$());
         var buttons = $('<div class="otp-widget-header-buttons"></div>').appendTo(this.$());
         if(this.minimizable) {
             $('<div class="otp-widget-header-minimize">&ndash;</div>').appendTo(buttons)
@@ -91,22 +115,22 @@ otp.widgets.Widget = otp.Class({
         .click(function () {
             this_.unminimize();
         });
-        this.minimized = true;
+        this.isMinimized = true;
     },
 
     unminimize : function(tab) {
-        this.minimized = false;
+        this.isMinimized = false;
         this.show();
         this.minimizedTab.hide();
     },
     
     bringToFront : function() {
-        var frontIndex = this.widgetManager.getFrontZIndex();
+        var frontIndex = this.owner.getWidgetManager().getFrontZIndex();
         this.$().css("zIndex", frontIndex+1);
     },
 
     sendToBack : function() {
-        var backIndex = this.widgetManager.getBackZIndex();
+        var backIndex = this.owner.getWidgetManager().getBackZIndex();
         this.$().css("zIndex", backIndex-1);
     },
     
@@ -119,28 +143,27 @@ otp.widgets.Widget = otp.Class({
     
     close : function() {
         console.log("close");
+        this.isOpen = false;
+        this.hide();
     },
             
     setContent : function(content) {
-        this.div.innerHTML = content;
+        this.mainDiv.innerHTML = content;
     },
     
     show : function() {
-        if(this.minimized) this.minimizedTab.show();
-        else $(this.div).fadeIn();//show();
+        this.isOpen = true;
+        if(this.isMinimized) this.minimizedTab.show();
+        else this.mainDiv.fadeIn(); //show();
     },
 
     hide : function() {
-        if(this.minimized) this.minimizedTab.hide();
-        else $(this.div).fadeOut();//hide();
+        if(this.isMinimized) this.minimizedTab.hide();
+        else this.mainDiv.fadeOut(); //hide();
     },
-    
-    isVisible : function() {
-        return $(this.div).is(":visible");
-    },
-    
+
     $ : function() {
-        return $(this.div);
+        return this.mainDiv;
     },
     
     CLASS_NAME : "otp.widgets.Widget"

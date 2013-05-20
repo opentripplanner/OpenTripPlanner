@@ -48,38 +48,32 @@ otp.modules.fieldtrip.FieldTripModule =
         console.log("activate "+this.id);
         otp.modules.planner.PlannerModule.prototype.activate.apply(this);
 
-        this.optionsWidget = new otp.widgets.TripWidget('otp-'+this.moduleId+'-optionsWidget', this);
-        this.optionsWidget.$().resizable();
-        this.addWidget(this.optionsWidget);
-        
-        this.optionsWidget.minimizable = true;
-        this.optionsWidget.addHeader("Trip Options");
+        this.optionsWidget = new otp.widgets.tripoptions.TripOptionsWidget('otp-'+this.moduleId+'-optionsWidget', this);
         
         if(this.webapp.geocoders && this.webapp.geocoders.length > 0) {
-            this.optionsWidget.addControl("locations", new otp.widgets.TW_LocationsSelector(this.optionsWidget, this.webapp.geocoders), true);
+            this.optionsWidget.addControl("locations", new otp.widgets.tripoptions.LocationsSelector(this.optionsWidget, this.webapp.geocoders), true);
             this.optionsWidget.addVerticalSpace(12, true);
         }
 
-        this.optionsWidget.addControl("time", new otp.widgets.TW_TimeSelector(this.optionsWidget), true);
+        this.optionsWidget.addControl("time", new otp.widgets.tripoptions.TimeSelector(this.optionsWidget), true);
         this.optionsWidget.addVerticalSpace(12, true);
         
         
-        var modeSelector = new otp.widgets.TW_ModeSelector(this.optionsWidget);
+        var modeSelector = new otp.widgets.tripoptions.ModeSelector(this.optionsWidget);
         this.optionsWidget.addControl("mode", modeSelector, true);
 
-        modeSelector.addModeControl(new otp.widgets.TW_MaxWalkSelector(this.optionsWidget));
-        modeSelector.addModeControl(new otp.widgets.TW_GroupTripOptions(this.optionsWidget, "Number of Students: "));
-        //modeSelector.addModeControl(new otp.widgets.TW_BikeTriangle(this.optionsWidget));
-        //modeSelector.addModeControl(new otp.widgets.TW_PreferredRoutes(this.optionsWidget));
+        modeSelector.addModeControl(new otp.widgets.tripoptions.MaxWalkSelector(this.optionsWidget));
+        modeSelector.addModeControl(new otp.widgets.tripoptions.GroupTripOptions(this.optionsWidget, "Number of Students: "));
+        //modeSelector.addModeControl(new otp.widgets.tripoptions.BikeTriangle(this.optionsWidget));
+        //modeSelector.addModeControl(new otp.widgets.tripoptions.PreferredRoutes(this.optionsWidget));
 
         modeSelector.refreshModeControls();
 
         this.optionsWidget.addSeparator();
-        //this.optionsWidget.addControl("submit", new otp.widgets.TW_GroupTripSubmit(this.optionsWidget));
-        this.optionsWidget.addControl("submit", new otp.widgets.TW_Submit(this.optionsWidget));
+        //this.optionsWidget.addControl("submit", new otp.widgets.tripoptions.GroupTripSubmit(this.optionsWidget));
+        this.optionsWidget.addControl("submit", new otp.widgets.tripoptions.Submit(this.optionsWidget));
 
         this.fieldTripManager = new otp.modules.fieldtrip.FieldTripManagerWidget('otp-'+this.moduleId+'-fieldTripWidget', this);
-        this.widgets.push(this.fieldTripManager);
 
 
         this.refreshTrips();
@@ -216,7 +210,6 @@ otp.modules.fieldtrip.FieldTripModule =
         this.itinWidget.showButtonRow = false;
         this.itinWidget.showItineraryLink = false;
         this.itinWidget.showSearchLink = true;
-        this.widgets.push(this.itinWidget);
     },
     
     setBannedTrips : function() {

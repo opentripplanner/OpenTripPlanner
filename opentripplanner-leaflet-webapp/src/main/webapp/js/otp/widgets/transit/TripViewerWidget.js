@@ -31,22 +31,18 @@ otp.widgets.transit.TripViewerWidget =
     
     initialize : function(id, module) {
     
-        otp.widgets.Widget.prototype.initialize.call(this, id, module.webapp.widgetManager);
-        module.addWidget(this);
+        otp.widgets.Widget.prototype.initialize.call(this, id, module, {
+            title : 'Trip Viewer',
+            cssClass : 'otp-tripViewer',
+            openInitially : false
+        });
         
         this.module = module;
-        
-        this.$().addClass('otp-tripViewer');
-        this.$().resizable();
-        this.$().css('display','none');
-        
-        this.minimizable = true;
-        this.addHeader("Trip Viewer");
         
         var this_ = this;
 
 
-        var routeSelectDiv = $('<div class="otp-tripViewer-select notDraggable" />').appendTo(this.$());
+        var routeSelectDiv = $('<div class="otp-tripViewer-select notDraggable" />').appendTo(this.mainDiv);
         $('<div style="float: left;">Route:</div>').appendTo(routeSelectDiv);
         this.routeSelect = $('<select id="'+this.id+'-routeSelect" style="width:100%;"></select>')
         .appendTo($('<div style="margin-left:60px;">').appendTo(routeSelectDiv))
@@ -64,7 +60,7 @@ otp.widgets.transit.TripViewerWidget =
         });
 
 
-        var variantSelectDiv = $('<div class="otp-tripViewer-select notDraggable" />').appendTo(this.$());
+        var variantSelectDiv = $('<div class="otp-tripViewer-select notDraggable" />').appendTo(this.mainDiv);
         $('<div style="float: left;">Variant:</div>').appendTo(variantSelectDiv);
         this.variantSelect = $('<select id="'+this.id+'-routeSelect" style="width:100%;"></select>')
         .appendTo($('<div style="margin-left:60px;">').appendTo(variantSelectDiv))
@@ -72,15 +68,15 @@ otp.widgets.transit.TripViewerWidget =
             this_.newVariantSelected();
         });
 
-        this.stopList = $('<div class="otp-tripViewer-stopList notDraggable" />').appendTo(this.$());
+        this.stopList = $('<div class="otp-tripViewer-stopList notDraggable" />').appendTo(this.mainDiv);
 
         $('<div class="otp-tripViewer-close">[<a href="#">CLOSE</a>]</div>')
-        .appendTo(this.$())
+        .appendTo(this.mainDiv)
         .click(function() {
-            this_.$().hide();
+            this_.mainDiv.hide();
         });
         
-        this.$().resizable({
+        this.mainDiv.resizable({
             minWidth: 200,
             alsoResize: this.stopList,
         });
@@ -241,7 +237,7 @@ otp.widgets.transit.TripViewerWidget =
                 var stop = $(this).data("stop");
                 if(!this_.module.stopViewerWidget) {
                     this_.module.stopViewerWidget = new otp.widgets.transit.StopViewerWidget("otp-"+this_.module.id+"-stopViewerWidget", this_.module);
-                    this_.module.stopViewerWidget.$().offset({top: evt.clientY, left: evt.clientX});
+                    this_.module.stopViewerWidget.mainDiv.offset({top: evt.clientY, left: evt.clientX});
                 }
                 this_.module.stopViewerWidget.show();
                 //this_.module.stopViewerWidget.activeTime = leg.startTime;

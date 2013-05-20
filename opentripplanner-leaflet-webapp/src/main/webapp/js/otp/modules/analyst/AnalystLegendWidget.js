@@ -21,17 +21,15 @@ otp.modules.analyst.AnalystLegendWidget =
     imgHeight : null,
     
     initialize : function(id, module, width, height) {
-        otp.widgets.Widget.prototype.initialize.call(this, id, module.webapp.widgetManager);
-        module.addWidget(this);
-        
-        this.$().addClass('otp-analyst-legendWidget');
-        this.minimizable = true;
-        this.addHeader("Legend");
+        otp.widgets.Widget.prototype.initialize.call(this, id, module, {
+            title : 'Legend',
+            cssClass : 'otp-analyst-legendWidget'
+        });
         
         this.imgWidth = width;
         this.imgHeight = height;
         
-        this.img = $('<img />').appendTo(this.$())
+        this.img = $('<img />').appendTo(this.mainDiv)
         .css({
             width: width,
             height: height,

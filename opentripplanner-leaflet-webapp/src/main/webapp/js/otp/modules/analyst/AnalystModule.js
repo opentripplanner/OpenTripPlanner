@@ -44,28 +44,23 @@ otp.modules.analyst.AnalystModule =
         otp.modules.planner.PlannerModule.prototype.activate.apply(this);
 
         // set up travel options widget
-        this.optionsWidget = new otp.widgets.TripWidget('otp-'+this.moduleId+'-optionsWidget', this);
-        this.optionsWidget.$().resizable();
-        this.addWidget(this.optionsWidget);
-        
-        this.optionsWidget.minimizable = true;
-        this.optionsWidget.addHeader("Travel Options");
-        
+        this.optionsWidget = new otp.widgets.tripoptions.TripOptionsWidget('otp-'+this.moduleId+'-optionsWidget', this);
+
         /*if(this.webapp.geocoders && this.webapp.geocoders.length > 0) {
-            this.optionsWidget.addControl("locations", new otp.widgets.TW_LocationsSelector(this.optionsWidget, this.webapp.geocoders), true);
+            this.optionsWidget.addControl("locations", new otp.widgets.tripoptions.LocationsSelector(this.optionsWidget, this.webapp.geocoders), true);
             this.optionsWidget.addVerticalSpace(12, true);
         }*/
                 
-        this.optionsWidget.addControl("time", new otp.widgets.TW_TimeSelector(this.optionsWidget), true);
+        this.optionsWidget.addControl("time", new otp.widgets.tripoptions.TimeSelector(this.optionsWidget), true);
         this.optionsWidget.addVerticalSpace(12, true);
         
         
-        var modeSelector = new otp.widgets.TW_ModeSelector(this.optionsWidget);
+        var modeSelector = new otp.widgets.tripoptions.ModeSelector(this.optionsWidget);
         this.optionsWidget.addControl("mode", modeSelector, true);
 
-        modeSelector.addModeControl(new otp.widgets.TW_MaxWalkSelector(this.optionsWidget));
-        modeSelector.addModeControl(new otp.widgets.TW_BikeTriangle(this.optionsWidget));
-        //modeSelector.addModeControl(new otp.widgets.TW_PreferredRoutes(this.optionsWidget));
+        modeSelector.addModeControl(new otp.widgets.tripoptions.MaxWalkSelector(this.optionsWidget));
+        modeSelector.addModeControl(new otp.widgets.tripoptions.BikeTriangle(this.optionsWidget));
+        //modeSelector.addModeControl(new otp.widgets.tripoptions.PreferredRoutes(this.optionsWidget));
 
         modeSelector.refreshModeControls();
 
@@ -78,6 +73,7 @@ otp.modules.analyst.AnalystModule =
 
         // set up legend widget 
         this.legendWidget = new otp.modules.analyst.AnalystLegendWidget(this.id + 'legend', this, 300, 40);
+
         // set up location marker
         this.startLatLng = this.webapp.map.lmap.getCenter();
         

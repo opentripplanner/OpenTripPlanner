@@ -27,24 +27,21 @@ otp.widgets.transit.StopViewerWidget =
         
     initialize : function(id, module) {
     
-        otp.widgets.Widget.prototype.initialize.call(this, id, module.webapp.widgetManager);
-        module.addWidget(this);
+        otp.widgets.Widget.prototype.initialize.call(this, id, module, {
+            title : 'Stop Viewer',
+            cssClass : 'otp-stopViewer',
+            openInitially : false
+        });
         
         this.module = module;
-        
-        this.$().addClass('otp-stopViewer');
-        this.$().css('display','none');
-        
-        this.minimizable = true;
-        this.addHeader("Stop Viewer");
         
         var this_ = this;
 
         this.activeTime = moment();
           
-        this.stopInfo = $('<div class="otp-stopViewer-infoRow" />').appendTo(this.$());
+        this.stopInfo = $('<div class="otp-stopViewer-infoRow" />').appendTo(this.mainDiv);
 
-        var dateRow = $('<div class="otp-stopViewer-dateRow notDraggable" />').appendTo(this.$()).append('<span>Date: </span>');
+        var dateRow = $('<div class="otp-stopViewer-dateRow notDraggable" />').appendTo(this.mainDiv).append('<span>Date: </span>');
         var currentDate = new Date();
         this.lastDate = currentDate;
         this.datePicker = $('<input type="text" style="width:100px;" />').datepicker({
@@ -61,7 +58,7 @@ otp.widgets.transit.StopViewerWidget =
 
 
         this.timesDiv = $("<div class='otp-stopViewer-stopTimes notDraggable'></div>");
-        this.timesDiv.appendTo(this.$());        
+        this.timesDiv.appendTo(this.mainDiv);        
 
         $('<div class="otp-stopViewer-stopTimes-advancer" style="left:0px;">&laquo;</div>')
         .appendTo(this.timesDiv)
@@ -77,9 +74,9 @@ otp.widgets.transit.StopViewerWidget =
 
 
         $('<div class="otp-stopTimes-close">[<a href="#">CLOSE</a>]</div>')
-        .appendTo(this.$())
+        .appendTo(this.mainDiv)
         .click(function() {
-            this_.$().hide();
+            this_.mainDiv.hide();
         });
         
     },

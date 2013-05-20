@@ -37,11 +37,15 @@ otp.widgets.ItinerariesWidget =
     initialize : function(id, module) {
         this.module = module;
 
-        otp.widgets.Widget.prototype.initialize.call(this, id, module.webapp.widgetManager);
-        this.$().addClass('otp-itinsWidget');
-        this.$().resizable();
-        this.minimizable = true;
-        this.addHeader("X Itineraries Returned");
+        otp.widgets.Widget.prototype.initialize.call(this, id, module, {
+            title : "Itineraries",
+            cssClass : 'otp-itinsWidget',
+            resizable : true
+        });
+        //this.$().addClass('otp-itinsWidget');
+        //this.$().resizable();
+        //this.minimizable = true;
+        //this.addHeader("X Itineraries Returned");
     },
     
     activeItin : function() {

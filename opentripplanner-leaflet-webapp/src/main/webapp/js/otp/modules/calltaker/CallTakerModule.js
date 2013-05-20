@@ -57,8 +57,7 @@ otp.modules.calltaker.CallTakerModule =
         console.log("activate ctm");        
         //this.tipWidget.$().css('display','none');
 
-        this.callHistoryWidget = new otp.widgets.CallHistoryWidget(this.moduleId+"-callHistoryWidget", this);
-        this.widgets.push(this.callHistoryWidget);
+        this.callHistoryWidget = new otp.modules.calltaker.CallHistoryWidget(this.moduleId+"-callHistoryWidget", this);
         this.callHistoryWidget.show();
     },
     

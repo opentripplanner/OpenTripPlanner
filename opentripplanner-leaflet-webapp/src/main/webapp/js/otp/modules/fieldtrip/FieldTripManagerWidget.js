@@ -29,13 +29,12 @@ otp.modules.fieldtrip.FieldTripManagerWidget =
         
         this.module = module;
 
-        otp.widgets.Widget.prototype.initialize.call(this, id, module.webapp.widgetManager);
-        this.$().addClass('otp-fieldTripManager');
-        //this.$().resizable();
-        this.minimizable = true;
-        this.addHeader("Field Trip Manager");
+        otp.widgets.Widget.prototype.initialize.call(this, id, module, {
+            cssClass : 'otp-fieldTripManager',
+            title : 'Field Trip Manager'
+        });
         
-        var tripListContainer = $('<div class="otp-fieldTripManager-callListContainer"></div>').appendTo(this.$());
+        var tripListContainer = $('<div class="otp-fieldTripManager-callListContainer"></div>').appendTo(this.mainDiv);
         
         var selectRow = $('<div class="notDraggable otp-fieldTripManager-callListHeader"></div>').appendTo(tripListContainer);
         $('<input type="radio" name="'+this.id+'+-selectGroup" checked />').appendTo(selectRow)
@@ -64,11 +63,11 @@ otp.modules.fieldtrip.FieldTripManagerWidget =
         
         this.tripList = $('<div class="otp-fieldTripManager-callList"></div>').appendTo(tripListContainer);
 
-        var tripInfoContainer = $('<div class="notDraggable" style="height:250px;"></div>').appendTo(this.$());
+        var tripInfoContainer = $('<div class="notDraggable" style="height:250px;"></div>').appendTo(this.mainDiv);
         this.tripInfo = $('<div class="otp-fieldTripManager-callInfo notDraggable"></div>').appendTo(tripInfoContainer);
         var tripButtonRow = $('<div style="margin-top: 4px; text-align: center;" />').appendTo(tripInfoContainer);
         
-        var mainButtonRow = $('<div class="otp-fieldTrip-buttonRow" />').appendTo(this.$());
+        var mainButtonRow = $('<div class="otp-fieldTrip-buttonRow" />').appendTo(this.mainDiv);
         
         
         $('<button id="'+this.id+'-saveButton">View Requests</button>').button()

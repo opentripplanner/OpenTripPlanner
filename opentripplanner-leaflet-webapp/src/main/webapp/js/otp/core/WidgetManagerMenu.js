@@ -33,13 +33,13 @@ otp.core.WidgetManagerMenu =
         this.addItem("Minimize all", function() {
             for(var i = 0; i < this_.webapp.activeModule.widgets.length; i++) {
                 var widget = this_.webapp.activeModule.widgets[i];
-                if(widget.isVisible() && widget.minimizable) widget.minimize();
+                if(widget.isOpen && widget.minimizable) widget.minimize();
             }
         });
         this.addItem("Unminimize all", function() {
              for(var i = 0; i < this_.webapp.activeModule.widgets.length; i++) {
                 var widget = this_.webapp.activeModule.widgets[i];
-                if(widget.minimized) widget.unminimize();
+                if(widget.isMinimized) widget.unminimize();
             }        
         });
         
@@ -59,7 +59,7 @@ otp.core.WidgetManagerMenu =
         this.clearWidgetItems();
         for(var i = 0; i < this.webapp.activeModule.widgets.length; i++) {
             var widget = this.webapp.activeModule.widgets[i];
-            if(widget.isVisible() || widget.minimized) this.addWidgetItem(widget);
+            if(widget.isOpen) this.addWidgetItem(widget);
         }          
     },
 
@@ -68,7 +68,7 @@ otp.core.WidgetManagerMenu =
         $('<div class="otp-popupMenu-item">'+widget.title+'</div>')
         .appendTo($(this.widgetItems))
         .click(function() {
-            if(widget.minimized) widget.unminimize();
+            if(widget.isMinimized) widget.unminimize();
             widget.bringToFront();
         });
         return this; // for chaining
