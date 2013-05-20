@@ -13,9 +13,7 @@
 
 package org.opentripplanner.graph_builder.impl.osm;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.util.HashMap;
@@ -126,7 +124,9 @@ public class TriangleInequalityTest {
         assertNotNull(path);
         
         double startEndWeight = path.getWeight();
-        assertTrue(startEndWeight > 0);            
+        int startEndDuration = path.getDuration();
+        assertTrue(startEndWeight > 0);
+        assertEquals(startEndWeight, (double) startEndDuration, 1.0 * path.edges.size());
         
         // Try every vertex in the graph as an intermediate.
         boolean violated = false;
@@ -146,10 +146,16 @@ public class TriangleInequalityTest {
                 continue;
             }
             
-            //startIntermediatePath.dump();
-            //intermediateEndPath.dump();
             double startIntermediateWeight = startIntermediatePath.getWeight();
+            int startIntermediateDuration = startIntermediatePath.getDuration();
             double intermediateEndWeight = intermediateEndPath.getWeight();
+            int intermediateEndDuration = intermediateEndPath.getDuration();
+            
+            // TODO(flamholz): fix traversal so that there's no rounding at the second resolution.
+            assertEquals(startIntermediateWeight, (double) startIntermediateDuration,
+                    1.0 * startIntermediatePath.edges.size());            
+            assertEquals(intermediateEndWeight, (double) intermediateEndDuration,
+                    1.0 * intermediateEndPath.edges.size());
             
             double diff = startIntermediateWeight + intermediateEndWeight - startEndWeight;
             if (diff < -0.01) {
