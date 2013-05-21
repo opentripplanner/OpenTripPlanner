@@ -100,7 +100,7 @@ otp.modules.planner.PlannerModule =
         this.addWidget(this.noTripWidget);*/
     },
     
-    applyParameters : function() {
+    restore : function() {
         // check URL params for restored trip
         if("fromPlace" in this.webapp.urlParams && "toPlace" in this.webapp.urlParams) {
             if("itinIndex" in this.webapp.urlParams) this.restoredItinIndex = this.webapp.urlParams["itinIndex"];

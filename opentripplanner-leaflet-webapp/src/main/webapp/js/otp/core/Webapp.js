@@ -230,7 +230,7 @@ otp.core.Webapp = otp.Class({
     setActiveModule : function(module) {
         console.log("set active module: "+module.moduleName);
         if(this.activeModule != null) {
-            this.activeModule.deactivate();
+            this.activeModule.deselected();
             
             for(var i = 0; i < this.activeModule.widgets.length; i++) {
                 this.activeModule.widgets[i].hide();
@@ -244,22 +244,19 @@ otp.core.Webapp = otp.Class({
                 console.log(" - showing widget: "+module.widgets[i].id);
                 module.widgets[i].show();
             }
+        }        
+        if(!module.activated) {
+            module.activate();
+            if(_.has(this.urlParams, 'module') && this.urlParams.module == module.id) module.restore();
         }
-        
-        module.activate();
-        module.applyParameters();
+        module.selected();
         
         this.map.activeModuleChanged(this.activeModule, module);
         
         this.activeModule = module;
     },   
     
-    restoreTrip : function(data) {
-    	
-    	this.activeModule.restorePlan(data);
-   
-    },
-           
+          
     hideSplash : function() {
     	$("#splash-text").hide();
     	for(widgetId in this.infoWidgets) {

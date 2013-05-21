@@ -30,9 +30,6 @@ otp.modules.Module = otp.Class({
         this.mapLayers = { };
     },
     
-    handleClick : function(event) {
-        //console.log('unhandled map click at ('+event.latlng.lat+", "+event.latlng.lng+ "), module="+this.moduleName);
-    },
 
     addLayer : function(name, layer) {
         this.mapLayers[name] = layer;
@@ -50,18 +47,60 @@ otp.modules.Module = otp.Class({
     createWidget : function(id, content) {
         var widget = new otp.widgets.Widget(id, this.webapp.widgetManager); 
         widget.setContent(content);
-        //this.widgets.push(widget);
         return widget;
     },
+
+
+    // functions to be overridden by subclasses
     
+    /**
+     * Called when the module is made active for the first time.
+     */
+         
     activate : function() {
     },
 
-    applyParameters : function() {
+
+    /**
+     * Called to restore module state based on url parameters. Called when the
+     * affected module is made active for the first time, following activate().
+     */
+
+    restore : function() {
+    },
+
+
+    /**
+     * Called when the module is selected as active by the user. When the module
+     * is selected for the first time, the call to selected() follows the calls
+     * to activate() and restore().
+     */
+
+    selected : function() {
     },
      
-    deactivate : function() {
+
+    /**
+     * Called when the module loses focus due to another being selected as
+     * active by the user.
+     */
+        
+    deselected : function() {
     },
+
+
+    /**
+     * Called by the Map object when the user clicks on the map.
+     */
+
+    handleClick : function(event) {
+    },
+
+
+    /**
+     * Called by the Map object to trigger the module to add any module-specific
+     * items to the map context menu.
+     */
 
     addMapContextMenuItems : function() {
     },

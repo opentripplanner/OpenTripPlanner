@@ -79,14 +79,14 @@ otp.modules.fieldtrip.FieldTripModule =
         this.refreshTrips();
     },
     
-    applyParameters : function() {
+    restore : function() {
         if(_.has(this.webapp.urlParams, 'groupSize')) {
             this.groupSize = parseInt(this.webapp.urlParams['groupSize']);
         }        
         if("fromPlace" in this.webapp.urlParams && "toPlace" in this.webapp.urlParams) {
             this.optionsWidget.restorePlan({queryParams : this.webapp.urlParams});
         }
-        otp.modules.planner.PlannerModule.prototype.applyParameters.apply(this);
+        otp.modules.planner.PlannerModule.prototype.restore.apply(this);
     },    
     
     getExtendedQueryParams : function() {
