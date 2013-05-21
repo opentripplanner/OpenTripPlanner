@@ -567,27 +567,32 @@ body {
     width: 50px;
 }
 
-.otp-widget-header-minimize {
+.otp-widget-header-button {
 	color: #666;
 	cursor: pointer;
 	font-size: 20px;
     font-weight: bold;
 	text-shadow: -1px 1px 0 #ffffff;
-    padding: 0 0.4em 0.23em;
+    padding: 0 10px 0px 2px;
+	position: static;
 	float: right;
-	position: absolute;
-	right: 0;
-	top: 0;
+	width: 8px;
 	z-index: 10000;
-    -webkit-border-radius: 4px;
+    /*-webkit-border-radius: 4px;
     -moz-border-radius: 4px;
-    border-radius: 4px;
+    border-radius: 4px;*/
 }
 
 .otp-widget-header-minimize:hover {
 	color: red;
 }
 
+.otp-defaultInfoWidget {
+    width: 40em;
+    height: 60%;
+  	overflow: auto;
+}
+  
 #otp-tripResultsWidget {
   width: 230px;
   height: auto;

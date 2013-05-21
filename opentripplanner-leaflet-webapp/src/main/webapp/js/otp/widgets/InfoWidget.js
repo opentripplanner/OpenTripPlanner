@@ -16,41 +16,22 @@ otp.namespace("otp.widgets");
 
 otp.widgets.InfoWidget = 
 	otp.Class(otp.widgets.Widget, {
-	
-	_div: null,
 	 
-	initialize : function(id, config) {
-	    otp.configure(this, id);
-	    otp.widgets.Widget.prototype.initialize.apply(this, arguments);
-	     
-	    this.addCloseButton();	
-	    //$(this.div).draggable();
+	initialize : function(id, owner, options, content) {
+	
+	    var defaultOptions = {
+	        cssClass : 'otp-defaultInfoWidget',
+            closeable : true,
+            minimizable : true,
+            openInitially : false,
+	    };
 	    
-	    this._div = this.div;
+	    options = (typeof options != 'undefined') ? 
+	        _.extend(defaultOptions, options) : defaultOptions;
+	        
+	    otp.widgets.Widget.prototype.initialize.call(this, id, owner, options);
+	     
+	    this.setContent(content);
+	    this.center(); 
 	},
-	
-	addCloseButton: function() {
-		var _this = this;
-		var close_div = $("<div class='close'><div>").html("&times;")
-			.click(function(e) {
-				e.preventDefault();
-				_this.hide();
-			});				
-		this.div = $(this.div).append(close_div);
-	},
-	 
-	setContent : function(content) {
-	    $(this._div).append("<div class='content'>" + content + "</div>");
-	},
-
-	show: function() {
-		$(this._div).show();
-	},
-	 
-	hide: function() {
-		$(this._div).hide();
-	},
-
-	CLASS_NAME : "otp.widgets.InfoWidget"
-	 
 });

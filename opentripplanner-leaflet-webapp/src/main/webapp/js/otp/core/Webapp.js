@@ -151,15 +151,20 @@ otp.core.Webapp = otp.Class({
             
                 if(otp.config.infoWidgets[i] == undefined) continue;
     
-                var id = "infoWidget-"+i;            
-    
-                this.infoWidgets[id] = new otp.widgets.InfoWidget(otp.config.infoWidgets[i].styleId, this.widgetManager);
-                this.infoWidgets[id].setContent(otp.config.infoWidgets[i].content);
-                this.infoWidgets[id].hide();
+                var id = "otp-infoWidget-"+i;            
+                
+                var options = {};
+                if(_.has(otp.config.infoWidgets[i], 'title')) options.title = otp.config.infoWidgets[i].title;
+                if(_.has(otp.config.infoWidgets[i], 'cssClass')) options.cssClass = otp.config.infoWidgets[i].cssClass;
+                
+                this.infoWidgets[id] = new otp.widgets.InfoWidget(otp.config.infoWidgets[i].styleId,
+                                                                  this, options, otp.config.infoWidgets[i].content);
                 
                 $("<li id='"+id+"'><a href='#'>"+otp.config.infoWidgets[i].title+"</a></li>").appendTo(ul).click(function(e) {
                     e.preventDefault();
-                    this_.infoWidgets[this.id].show();
+                    var widget = this_.infoWidgets[this.id];
+                    if(!widget.isOpen) widget.show();
+                    widget.bringToFront();
                 });
             
             }
@@ -276,11 +281,16 @@ otp.core.Webapp = otp.Class({
         this.activeModule.handleClick(event);
     },
     
-    /*showWidgetManagerMenu : function() {
-        this.widgetManagerMenu.refreshWidgets();
-        this.widgetManagerMenu.suppressHide = true;
-        this.widgetManagerMenu.menu.show().appendTo('body');
-    },*/
+    addWidget : function(widget) {
+        //this.widgets.push(widget);
+        this.widgetManager.addWidget(widget);
+    },
+    
+    getWidgetManager : function() {
+        return this.widgetManager;
+    },
+    
+    // TODO: move to Util library
     
     stringToFunction : function(str) {
         var arr = str.split(".");

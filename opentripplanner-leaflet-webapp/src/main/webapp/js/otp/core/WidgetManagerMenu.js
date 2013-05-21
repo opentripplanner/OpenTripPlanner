@@ -23,22 +23,27 @@ otp.core.WidgetManagerMenu =
     widgetItems : null,
     
     initialize : function(webapp) {
-        var this_ = this;
         
         otp.core.PopupMenu.prototype.initialize.call(this);
         this.webapp = webapp;
 
         this.menu.addClass('otp-widgetManagerMenu').hide();
 
+        
+        var this_ = this;
         this.addItem("Minimize all", function() {
-            for(var i = 0; i < this_.webapp.activeModule.widgets.length; i++) {
-                var widget = this_.webapp.activeModule.widgets[i];
+            var widgets = this_.webapp.activeModule.widgets;
+            for(infoWidgetId in this_.webapp.infoWidgets) widgets.push(this_.webapp.infoWidgets[infoWidgetId]);
+            for(var i = 0; i < widgets.length; i++) {
+                var widget = widgets[i];
                 if(widget.isOpen && widget.minimizable) widget.minimize();
             }
         });
         this.addItem("Unminimize all", function() {
-             for(var i = 0; i < this_.webapp.activeModule.widgets.length; i++) {
-                var widget = this_.webapp.activeModule.widgets[i];
+            var widgets = this_.webapp.activeModule.widgets;
+            for(infoWidgetId in this_.webapp.infoWidgets) widgets.push(this_.webapp.infoWidgets[infoWidgetId]);
+            for(var i = 0; i < widgets.length; i++) {
+                var widget = widgets[i];
                 if(widget.isMinimized) widget.unminimize();
             }        
         });

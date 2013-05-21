@@ -92,12 +92,11 @@ otp.config = {
     infoWidgets: [
         {
             title: 'About',
-            styleId: 'otp-aboutWidget',
             content: '<p>About this site</p>',
+            //cssClass: 'otp-contactWidget',
         },
         {
             title: 'Contact',
-            styleId: 'otp-contactWidget',
             content: '<p>Comments? Contact us at...</p>'
         },           
     ],

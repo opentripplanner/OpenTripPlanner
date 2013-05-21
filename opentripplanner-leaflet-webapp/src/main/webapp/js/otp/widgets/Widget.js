@@ -44,6 +44,7 @@ otp.widgets.Widget = otp.Class({
 
         this.id = id;        
         this.owner = owner;
+
         this.owner.addWidget(this);
 
         // set up the main widget DOM element:
@@ -77,16 +78,26 @@ otp.widgets.Widget = otp.Class({
     addHeader : function() {
         var this_ = this;
         //this.title = title;
-        this.header = $('<div class="otp-widget-header">'+this.title+'</div>').appendTo(this.$());
-        var buttons = $('<div class="otp-widget-header-buttons"></div>').appendTo(this.$());
+        this.header = $('<div class="otp-widget-header">'+this.title+'</div>').appendTo(this.mainDiv);
+        var buttons = $('<div class="otp-widget-header-buttons"></div>').appendTo(this.mainDiv);
+
+        if(this.closeable) {
+		    $("<div class='otp-widget-header-button'>&times;<div>").appendTo(buttons)
+		    .click(function(evt) {
+			    evt.preventDefault();
+			    this_.close();
+		    });				
+		}
         if(this.minimizable) {
-            $('<div class="otp-widget-header-minimize">&ndash;</div>').appendTo(buttons)
+            $('<div class="otp-widget-header-button">&ndash;</div>').appendTo(buttons)
             .click(function(evt) {
+			    evt.preventDefault();
                 this_.minimize();
             });
         }
+
         // set up context menu
-        this.contextMenu = new otp.core.ContextMenu(this.$(), function() {
+        this.contextMenu = new otp.core.ContextMenu(this.mainDiv, function() {
             //console.log("widget cm clicked");
         });
         this.contextMenu.addItem("Minimize", function() {
@@ -142,13 +153,12 @@ otp.widgets.Widget = otp.Class({
     },
     
     close : function() {
-        console.log("close");
         this.isOpen = false;
         this.hide();
     },
             
-    setContent : function(content) {
-        this.mainDiv.innerHTML = content;
+    setContent : function(htmlContent) {
+        $('<div />').html(htmlContent).appendTo(this.mainDiv);
     },
     
     show : function() {
