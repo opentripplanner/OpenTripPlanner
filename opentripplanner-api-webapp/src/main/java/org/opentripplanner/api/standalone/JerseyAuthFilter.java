@@ -1,4 +1,4 @@
-package org.opentripplanner.api.servlet;
+package org.opentripplanner.api.standalone;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
@@ -15,7 +15,7 @@ import com.sun.jersey.spi.container.ContainerRequestFilter;
  * filters requests rather than responses.
  * http://simplapi.wordpress.com/2013/01/24/jersey-jax-rs-implements-a-http-basic-auth-decoder/
  */
-public class GrizzlyAuthFilter implements ContainerRequestFilter {
+public class JerseyAuthFilter implements ContainerRequestFilter {
 
     /* The exception thrown if a user is unauthorized. */
     private final static WebApplicationException unauthorized = 
@@ -23,7 +23,7 @@ public class GrizzlyAuthFilter implements ContainerRequestFilter {
             .header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"OTP\"")
             .entity("This OTP resource requires authentication.").build());
 
-    public GrizzlyAuthFilter() {
+    public void GrizzlyAuthFilter() {
         System.out.println("INSTANTIATING AUTH FILTER");
     }
     
