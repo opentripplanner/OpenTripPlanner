@@ -34,7 +34,7 @@ public class GrizzlyAuthFilter implements ContainerRequestFilter {
         // Automatically allow certain requests.
         String method = containerRequest.getMethod();
         String path = containerRequest.getPath(true);
-        if (method.equals("GET") && path.endsWith("metadata"))
+        if (method.equals("GET")) // && path.endsWith("metadata")) // skip auth for now
             return containerRequest;
 
         // Get the authentication passed in HTTP headers parameters

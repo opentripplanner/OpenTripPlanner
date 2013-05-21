@@ -1,17 +1,17 @@
 package org.opentripplanner.api.servlet;
 
 import java.io.IOException;
-import java.net.URI;
 
-import javax.ws.rs.core.UriBuilder;
-
+import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.grizzly.http.server.NetworkListener;
 import org.glassfish.grizzly.http.server.StaticHttpHandler;
+import org.glassfish.grizzly.threadpool.ThreadPoolConfig;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 
-import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
+import com.sun.jersey.api.container.ContainerFactory;
 import com.sun.jersey.api.core.PackagesResourceConfig;
 import com.sun.jersey.api.core.ResourceConfig;
 import com.sun.jersey.core.spi.component.ioc.IoCComponentProviderFactory;
@@ -21,41 +21,12 @@ public class GrizzlyServer {
 
     private static final int PORT = 9090;
 
-    private static final String URI = "http://localhost/ws/";
-
     public static void main(String[] args) throws IOException {
 
-        // The /ws prefix in the OTP Servlet came from web.xml.
-        // Here, the URI context path (subpath) is provided in the first parameter.
-        final URI base_uri = UriBuilder.fromUri(URI).port(PORT).build();
-
-        // HttpServer httpServer = new HttpServer();
-        //
-        // NetworkListener networkListener = new NetworkListener("sample-listener", "127.0.0.1", 18888);
-        //
-        // // Configure NetworkListener thread pool to have just one thread,
-        // // so it would be easier to reproduce the problem
-        // ThreadPoolConfig threadPoolConfig = ThreadPoolConfig
-        // .defaultConfig()
-        // .setCorePoolSize(2)
-        // .setMaxPoolSize(4);
-        //
-        // networkListener.getTransport().setWorkerThreadPoolConfig(threadPoolConfig);
-        //
-        // httpServer.addListener(networkListener);
-        //
-        // httpServer.getServerConfiguration().addHttpHandler(new HttpHandler() {
-        // @Override
-        // public void service(Request request, Response response) throws Exception {
-        // response.setContentType("text/plain");
-        // response.getWriter().write("Simple task is done!");
-        // }
-        // }, "/simple");
-        //
-
+        /* LOAD THE SPRING CONTEXT */
         System.out.println("Loading Spring context...");
-        GenericApplicationContext gctx = new GenericApplicationContext();
-        XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader(gctx);
+        GenericApplicationContext actx = new GenericApplicationContext();
+        XmlBeanDefinitionReader xmlReader = new XmlBeanDefinitionReader(actx);
         String[] contexts = {
             "data-sources.xml",
             // "org/opentripplanner/api/security-application-context.xml"
@@ -63,32 +34,47 @@ public class GrizzlyServer {
         for (String contextFile : contexts) {
             xmlReader.loadBeanDefinitions(new ClassPathResource(contextFile));
         }
-        gctx.refresh();
-        gctx.registerShutdownHook();
+        actx.refresh();
+        actx.registerShutdownHook();
 
+        /* CONFIGURE GRIZZLY SERVER */
         System.out.println("Starting grizzly...");
+        // Rather than use Jersey's GrizzlyServerFactory we will construct it manually, so we can
+        // set the number of threads, etc.
+        HttpServer httpServer = new HttpServer();
+        NetworkListener networkListener = new NetworkListener("sample-listener", "localhost", PORT);
+        ThreadPoolConfig threadPoolConfig = ThreadPoolConfig.defaultConfig()
+                .setCorePoolSize(2).setMaxPoolSize(4);
+        networkListener.getTransport().setWorkerThreadPoolConfig(threadPoolConfig);
+        httpServer.addListener(networkListener);
         ResourceConfig rc = new PackagesResourceConfig("org.opentripplanner");
+        // DelegatingFilterProxy.class.getName() does not seem to work out of the box.
+        // Register a custom authentication filter.
         rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, 
                  new String[] { GrizzlyAuthFilter.class.getName() });
-        // DelegatingFilterProxy.class.getName() does not seem to work out of the box.
-        
-        IoCComponentProviderFactory ioc_factory = new SpringComponentProviderFactory(rc, gctx);
-        HttpServer httpServer = GrizzlyServerFactory.createHttpServer(base_uri, rc, ioc_factory);
+        // Provide Jersey a factory class that gets injected objects from the Spring context
+        IoCComponentProviderFactory ioc_factory = new SpringComponentProviderFactory(rc, actx);
 
-        /* add another handler (~= servlet) to serve up static content */
-        // This is a filesystem path, not classpath.
-        // Files are relative to the project dir, so
-        // from ./ we can reach e.g. target/classes/data-sources.xml
+        /* ADD A COUPLE OF HANDLERS (~SERVLETS) */
+        // 1. A Grizzly wrapper around the Jersey WebApplication. 
+        //    We cannot set the context path to /opentripplanner-api-webapp/ws
+        //    https://java.net/jira/browse/GRIZZLY-1481?focusedCommentId=360385&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#action_360385
+        HttpHandler handler = ContainerFactory.createContainer(HttpHandler.class, rc, ioc_factory);
+        httpServer.getServerConfiguration().addHttpHandler(handler, "/ws/");
+        // 2. A static content server for the client JS apps etc.
+        //    This is a filesystem path, not classpath.
+        //    Files are relative to the project dir, so
+        //    from ./ we can reach e.g. target/classes/data-sources.xml
         httpServer.getServerConfiguration().addHttpHandler(new StaticHttpHandler("./"), "/cp/");
-
+        
+        /* RELINQUISH CONTROL TO THE SERVER THREAD */
         try {
-            // httpServer.start(); unneeded, server is already started 
-            System.out.println("Grizzly server running at " + base_uri);
-            System.out.println("WADL at " + base_uri + "application.wadl");
-            System.out.println("Test with " + base_uri + "metadata");
+            httpServer.start(); 
+            System.out.println("Grizzly server running.");
             Thread.currentThread().join();
         } catch (InterruptedException ie) {
             httpServer.stop();
         }
+        
     }
 }
