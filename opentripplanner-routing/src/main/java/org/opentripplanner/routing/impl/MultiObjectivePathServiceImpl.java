@@ -154,7 +154,7 @@ public class MultiObjectivePathServiceImpl implements PathService {
             
             State origin = new State(options);
             // (used to) initialize heuristic outside loop so table can be reused
-            heuristic.computeInitialWeight(origin, targetVertex);
+            heuristic.initialize(origin, targetVertex);
             
             options.maxWeight = cutoff + 30 * 60 * options.waitReluctance;
             

@@ -46,7 +46,7 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
     private double targetY;
 
     @Override
-    public double computeInitialWeight(State s, Vertex target) {
+    public void initialize(State s, Vertex target) {
         this.options = s.getOptions();
         this.useTransit = options.getModes().isTransit();
         this.maxSpeed = getMaxSpeed(options);
@@ -56,9 +56,6 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
 
         targetX = target.getX();
         targetY = target.getY();
-
-        return distanceLibrary.fastDistance(s.getVertex().getY(), s.getVertex().getX(), targetY,
-                targetX) / maxSpeed;
     }
 
     /**
@@ -157,6 +154,8 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
     }
 
     @Override
-    public void reset() {
-    }
+    public void reset() {}
+
+    @Override
+    public void abort() {}
 }

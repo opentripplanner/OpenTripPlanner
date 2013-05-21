@@ -42,11 +42,10 @@ public class ReachRemainingWeightHeuristic implements RemainingWeightHeuristic {
     private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     @Override
-    public double computeInitialWeight(State s, Vertex target) {
+    public void initialize(State s, Vertex target) {
         this.options = s.getOptions();
         this.useTransit = options.getModes().isTransit();
         this.maxSpeed = getMaxSpeed(options);
-        return getDistanceLibrary() .fastDistance(s.getVertex().getCoordinate(), target.getCoordinate()) / maxSpeed;
     }
 
     @Override
@@ -219,5 +218,11 @@ public class ReachRemainingWeightHeuristic implements RemainingWeightHeuristic {
 
     public void setDistanceLibrary(DistanceLibrary distanceLibrary) {
         this.distanceLibrary = distanceLibrary;
+    }
+
+    @Override
+    public void abort() {
+        // TODO Auto-generated method stub
+        
     }
 }

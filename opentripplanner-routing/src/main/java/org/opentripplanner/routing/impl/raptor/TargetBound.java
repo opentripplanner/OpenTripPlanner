@@ -301,12 +301,6 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
 
     }
 
-    @Override
-    public double computeInitialWeight(State s, Vertex target) {
-        return computeForwardWeight(s, target);
-    }
-
-
     /**
      * This actually does have to be admissible, since when we find the target, it used to bound the rest of the search.
      */
@@ -320,10 +314,11 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
         return computeForwardWeight(s, target);
     }
 
-    /** Reset the heuristic */
     @Override
-    public void reset() {
-    }
+    public void reset() {}
+
+    @Override
+    public void initialize(State s, Vertex target) {}
 
     public double getTimeBoundFactor() {
         return timeBoundFactor;
@@ -387,4 +382,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
         this.speedWeight = options.getWalkReluctance() / speedUpperBound;
 
     }
+
+    @Override
+    public void abort() {}
 }

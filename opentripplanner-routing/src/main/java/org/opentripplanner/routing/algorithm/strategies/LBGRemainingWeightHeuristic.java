@@ -65,9 +65,8 @@ public class LBGRemainingWeightHeuristic implements RemainingWeightHeuristic {
     }
 
     @Override
-    public double computeInitialWeight(State s, Vertex target) {
+    public void initialize(State s, Vertex target) {
         recalculate(target);
-        return 0;
     }
 
     @Override
@@ -96,10 +95,6 @@ public class LBGRemainingWeightHeuristic implements RemainingWeightHeuristic {
         }
     }
 
-    @Override
-    public void reset() {
-    }
-
     private static class GraphAndDirection extends T2<Graph, Boolean> {
         private static final long serialVersionUID = 20110901L;
 
@@ -107,4 +102,10 @@ public class LBGRemainingWeightHeuristic implements RemainingWeightHeuristic {
             super(g, i);
         }
     }
+
+    @Override
+    public void reset() {}
+    
+    @Override
+    public void abort() {}
 }

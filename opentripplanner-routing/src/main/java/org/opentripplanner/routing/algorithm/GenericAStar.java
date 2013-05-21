@@ -100,7 +100,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 
         // heuristic calc could actually be done when states are constructed, inside state
         State initialState = new State(options);
-        double initialWeight = heuristic.computeInitialWeight(initialState, rctx.target);
+        heuristic.initialize(initialState, rctx.target);
         spt.add(initialState);
 
         // Priority Queue.
@@ -112,8 +112,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         int initialSize = rctx.graph.getVertices().size();
         initialSize = (int) Math.ceil(2 * (Math.sqrt((double) initialSize + 1)));
         OTPPriorityQueue<State> pq = qFactory.create(initialSize);
-        // this would allow continuing a search from an existing state
-        pq.insert(initialState, initialWeight);
+        pq.insert(initialState, 0);
 
 //        options = options.clone();
 //        /** max walk distance cannot be less than distances to nearest transit stops */

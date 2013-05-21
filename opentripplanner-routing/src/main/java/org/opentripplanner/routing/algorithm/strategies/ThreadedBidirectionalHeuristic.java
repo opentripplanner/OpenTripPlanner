@@ -63,7 +63,7 @@ public class ThreadedBidirectionalHeuristic implements RemainingWeightHeuristic 
     }
 
     @Override
-    public double computeInitialWeight(State s, Vertex target) {
+    public void initialize(State s, Vertex target) {
         if (target == this.target) {
             LOG.debug("reusing existing heuristic");
         } else {
@@ -72,13 +72,6 @@ public class ThreadedBidirectionalHeuristic implements RemainingWeightHeuristic 
             //singlethreaded debug
             //new Worker(s).run();
         }
-        // Maybe the computeInitialWeight interface method should just be replaced with heuristic 
-        // setup and teardown methods, since the initial weight is really not important (can be
-        // 0 with no problem). Perhaps directionality should also be defined during the setup,
-        // instead of having two separate methods for the two directions.
-        // We might not even need a setup method if the routing options are just passed into the
-        // constructor.
-        return 0;
     }
 
     @Override
