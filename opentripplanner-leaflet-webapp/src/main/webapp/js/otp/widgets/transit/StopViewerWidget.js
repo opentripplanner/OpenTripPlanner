@@ -30,6 +30,7 @@ otp.widgets.transit.StopViewerWidget =
         otp.widgets.Widget.prototype.initialize.call(this, id, module, {
             title : 'Stop Viewer',
             cssClass : 'otp-stopViewer',
+            closeable : true,
             openInitially : false
         });
         
@@ -70,13 +71,6 @@ otp.widgets.transit.StopViewerWidget =
         .appendTo(this.timesDiv)
         .click(function(evt) {
             this_.updateTimes(1);
-        });
-
-
-        $('<div class="otp-stopTimes-close">[<a href="#">CLOSE</a>]</div>')
-        .appendTo(this.mainDiv)
-        .click(function() {
-            this_.mainDiv.hide();
         });
         
     },

@@ -34,6 +34,7 @@ otp.widgets.transit.TripViewerWidget =
         otp.widgets.Widget.prototype.initialize.call(this, id, module, {
             title : 'Trip Viewer',
             cssClass : 'otp-tripViewer',
+            closeable : true,
             openInitially : false
         });
         
@@ -69,12 +70,6 @@ otp.widgets.transit.TripViewerWidget =
         });
 
         this.stopList = $('<div class="otp-tripViewer-stopList notDraggable" />').appendTo(this.mainDiv);
-
-        $('<div class="otp-tripViewer-close">[<a href="#">CLOSE</a>]</div>')
-        .appendTo(this.mainDiv)
-        .click(function() {
-            this_.mainDiv.hide();
-        });
         
         this.mainDiv.resizable({
             minWidth: 200,
