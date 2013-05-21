@@ -127,57 +127,13 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
         }
     }
 
-    /** 
-     * WARNING due to changes in progress, reverse method is different than forward method.
-     * This should probably be resolved by merging the two, rather than trying to keep the two
-     * in sync.
+    /**
+     * computeForwardWeight and computeReverseWeight were identical (except that 
+     * computeReverseWeight did not have the localStreetService clause). They have been merged.
      */
     @Override
     public double computeReverseWeight(State s, Vertex target) {
-        // from and to are interpreted in the direction of traversal
-        // so the edge actually leads from
-
-        Vertex sv = s.getVertex();
-
-        double euclidianDistance = distanceLibrary.fastDistance(sv.getCoordinate(),
-                target.getCoordinate());
-
-        if (useTransit) {
-            double speed = options.getStreetSpeedUpperBound();
-            if (s.isAlightedLocal()) {
-                if (euclidianDistance + s.getWalkDistance() > options.getMaxWalkDistance()) {
-                    return -1;
-                }
-                return options.walkReluctance * euclidianDistance / speed;
-            } else {
-                int boardCost;
-                if (s.isOnboard()) {
-                    boardCost = 0;
-                } else {
-                    boardCost = options.getBoardCostLowerBound();
-                }
-                if (s.isEverBoarded()) {
-                    boardCost += options.transferPenalty;
-                }
-                if (euclidianDistance < target.getDistanceToNearestTransitStop()) {
-                    if (euclidianDistance + s.getWalkDistance() > options.getMaxWalkDistance()) {
-                        return -1;
-                    }
-                    return options.walkReluctance * euclidianDistance / speed;
-                } else {
-                    double mandatoryWalkDistance = target.getDistanceToNearestTransitStop()
-                            + sv.getDistanceToNearestTransitStop();
-                    if (mandatoryWalkDistance + s.getWalkDistance() > options.getMaxWalkDistance()) {
-                        return -1;
-                    }
-                    double distance = (euclidianDistance - mandatoryWalkDistance) / maxSpeed
-                            + mandatoryWalkDistance * options.walkReluctance / speed + boardCost;
-                    return Math.min(distance, options.walkReluctance * euclidianDistance / speed);
-                }
-            }
-        } else {
-            return options.walkReluctance * euclidianDistance / maxSpeed;
-        }
+        return computeForwardWeight(s, target);
     }
 
     /** 
