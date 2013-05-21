@@ -325,7 +325,7 @@ otp.modules.planner.PlannerModule =
             var leg = itin.itinData.legs[i];
 
             // draw the polyline
-            var polyline = new L.Polyline(otp.util.Polyline.decode(leg.legGeometry.points));
+            var polyline = new L.Polyline(otp.util.Geo.decodePolyline(leg.legGeometry.points));
             var weight = 8;
             polyline.setStyle({ color : this.getModeColor(leg.mode), weight: weight});
             this.pathLayer.addLayer(polyline);
@@ -393,7 +393,7 @@ otp.modules.planner.PlannerModule =
     
     highlightLeg : function(leg) {
         if(!leg.legGeometry) return;
-        var polyline = new L.Polyline(otp.util.Polyline.decode(leg.legGeometry.points));
+        var polyline = new L.Polyline(otp.util.Geo.decodePolyline(leg.legGeometry.points));
         polyline.setStyle({ color : "yellow", weight: 16, opacity: 0.3 });
         this.highlightLayer.addLayer(polyline);
     },
