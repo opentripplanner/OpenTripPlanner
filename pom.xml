@@ -332,135 +332,143 @@
         <artifactId>gt-coverage</artifactId>
         <version>${geotools.version}</version>
       </dependency>
-    	<dependency>
-    	  <groupId>org.geotools</groupId>
-    	  <artifactId>gt-geojson</artifactId>
-    	  <version>${geotools.version}</version>
-    	</dependency>
-	<dependency>
-	  <groupId>org.geotools</groupId>
-	  <artifactId>gt-geotiff</artifactId>
-	  <version>${geotools.version}</version>
-	</dependency>
-	<dependency>
-	  <groupId>org.geotools</groupId>
-	  <artifactId>gt-referencing</artifactId>
-	  <version>${geotools.version}</version>
-	</dependency>
-	<dependency>
-	  <groupId>org.geotools</groupId>
-	  <artifactId>gt-shapefile</artifactId>
-	  <version>${geotools.version}</version>
-	</dependency>
-    <dependency>
-      <groupId>org.geotools</groupId>
-      <artifactId>gt-arcgrid</artifactId>
-      <version>${geotools.version}</version>
-    </dependency>
-	<dependency>
-      <!-- provides EPSG database -->
-	  <groupId>org.geotools</groupId>
-	  <artifactId>gt-epsg-hsql</artifactId>
-	  <version>${geotools.version}</version>
-	  <exclusions>
-	    <exclusion>
-	      <groupId>org.hsqlsdb</groupId>
-	      <artifactId>hsqldb</artifactId>
-	    </exclusion>
-	  </exclusions>
-  	</dependency>
-    <!-- 
-      JTS is a transitive dependency of Geotools, but some submodules only need JTS
-      so require the same version here.
-    -->
-    <dependency>
-      <groupId>com.vividsolutions</groupId>
-      <artifactId>jts</artifactId>
-      <version>1.12</version>
-    </dependency>    
-    <!-- Jersey -->
-    <dependency>
-      <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-server</artifactId>
-      <version>${jersey.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-servlet</artifactId>
-      <version>${jersey.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-client</artifactId>
-      <version>${jersey.version}</version>
-      <scope>test</scope>
-    </dependency>
       <dependency>
-      <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-core</artifactId>
-      <version>${jersey.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.jersey</groupId>
-      <artifactId>jersey-grizzly2</artifactId>
-      <version>${jersey.version}</version>
-    </dependency>
-    <dependency>
-      <!-- jersey-spring (contrib) versioning does not match Spring itself -->
-      <groupId>com.sun.jersey.contribs</groupId>
-      <artifactId>jersey-spring</artifactId>
-      <version>1.9.1</version>
-    </dependency>
-    <!-- LOGGING -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>${slf4j.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>${slf4j.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>log4j-over-slf4j</artifactId>
-      <version>${slf4j.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
-      <version>${slf4j.version}</version>
-    </dependency>
-	<!-- Other -->
-	<dependency>
-      <!-- do we actually use this? -->
-	  <groupId>org.hsqldb</groupId>
-	  <artifactId>hsqldb</artifactId>
-	  <version>2.0.0</version>
-	</dependency>
-	<dependency>
-	  <groupId>org.onebusaway</groupId>
-	  <artifactId>onebusaway-gtfs</artifactId>
-	  <version>1.3.0</version>
-	</dependency>
+        <groupId>org.geotools</groupId>
+        <artifactId>gt-geojson</artifactId>
+        <version>${geotools.version}</version>
+      </dependency>
       <dependency>
-        <groupId>commons-logging</groupId>
-        <artifactId>commons-logging</artifactId>
-        <version>1.1.1</version>
+        <groupId>org.geotools</groupId>
+        <artifactId>gt-geotiff</artifactId>
+        <version>${geotools.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotools</groupId>
+        <artifactId>gt-referencing</artifactId>
+        <version>${geotools.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.geotools</groupId>
+        <artifactId>gt-shapefile</artifactId>
+        <version>${geotools.version}</version>
+      </dependency>
+        <dependency>
+          <groupId>org.geotools</groupId>
+          <artifactId>gt-arcgrid</artifactId>
+          <version>${geotools.version}</version>
+        </dependency>
+      <dependency>
+        <!-- provides EPSG database -->
+        <groupId>org.geotools</groupId>
+        <artifactId>gt-epsg-hsql</artifactId>
+        <version>${geotools.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.hsqlsdb</groupId>
+            <artifactId>hsqldb</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <!-- why are we excluding then re-including a different version of hsql? -->
+        <groupId>org.hsqldb</groupId>
+        <artifactId>hsqldb</artifactId>
+        <version>2.0.0</version>
+      </dependency>
+      <!-- 
+        JTS is a transitive dependency of Geotools, but some submodules only need JTS
+        so require the same version here.
+      -->
+      <dependency>
+        <groupId>com.vividsolutions</groupId>
+        <artifactId>jts</artifactId>
+        <version>1.12</version>
+      </dependency>    
+      <!-- Jersey -->
+      <dependency>
+        <groupId>com.sun.jersey</groupId>
+        <artifactId>jersey-server</artifactId>
+        <version>${jersey.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.sun.jersey</groupId>
+        <artifactId>jersey-servlet</artifactId>
+        <version>${jersey.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.sun.jersey</groupId>
+        <artifactId>jersey-client</artifactId>
+        <version>${jersey.version}</version>
+        <scope>test</scope>
+      </dependency>
+        <dependency>
+        <groupId>com.sun.jersey</groupId>
+        <artifactId>jersey-core</artifactId>
+        <version>${jersey.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.sun.jersey</groupId>
+        <artifactId>jersey-grizzly2</artifactId>
+        <version>${jersey.version}</version>
+      </dependency>
+      <dependency>
+        <!-- jersey-spring (contrib) versioning does not match Spring itself -->
+        <groupId>com.sun.jersey.contribs</groupId>
+        <artifactId>jersey-spring</artifactId>
+        <version>1.9.1</version>
+      </dependency>
+      <!-- LOGGING -->
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+          <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-log4j12</artifactId>
+          <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>log4j-over-slf4j</artifactId>
+          <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>jcl-over-slf4j</artifactId>
+          <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>commons-logging</groupId>
+          <artifactId>commons-logging</artifactId>
+          <version>1.1.1</version>
+        </dependency>
+      <!-- Extensions to the Java standard library -->
+      <dependency>
+        <!-- Lombok provides annotation-driven field accessor methods -->
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>0.11.8</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <!-- Guava provides improved collections -->  
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>14.0.1</version>
+      </dependency>
+      <!-- Other -->
+      <dependency>
+        <groupId>org.onebusaway</groupId>
+        <artifactId>onebusaway-gtfs</artifactId>
+        <version>1.3.0</version>
       </dependency>
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
         <version>4.8.1</version>
         <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.projectlombok</groupId>
-        <artifactId>lombok</artifactId>
-        <version>0.11.2</version>
-        <scope>provided</scope>
-      </dependency>
+      </dependency>      
       <dependency>
         <groupId>net.sourceforge.javacsv</groupId>
         <artifactId>javacsv</artifactId>
