@@ -53,11 +53,13 @@ public class StreetUtils {
             int islandWithStopMaxSize, String islandLogName) {
         _log.debug("pruning");
         PrintWriter islandLog = null;
-        try {
-            islandLog = new PrintWriter(new File(islandLogName));
-        } catch (Exception e) {
-            _log.error("Failed to write islands log file due to {}", e);
-            e.printStackTrace();
+        if (islandLogName != null && !islandLogName.isEmpty()) {
+            try {
+                islandLog = new PrintWriter(new File(islandLogName));
+            } catch (Exception e) {
+                _log.error("Failed to write islands log file due to {}", e.toString());
+                e.printStackTrace();
+            }
         }
         if (islandLog != null) {
             islandLog.printf("%s\t%s\t%s\t%s\t%s\n","id","stopCount", "streetCount","wkt" ,"hadRemoved");
