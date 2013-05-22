@@ -18,37 +18,64 @@ otp.core.TransitIndex = otp.Class({
 
     webapp          : null,
 
-    routes  : { },
+    routes          : null,
+    routesLoaded    : false,
     
     initialize : function(webapp) {
-        var this_ = this;
         this.webapp = webapp;
-        
-        
-        // load route data from server
+    },
+    
+    loadRoutes : function(callbackTarget, callback) {
+        var this_ = this;
+        if(this.routesLoaded) {
+            if(callback) callback.call(callbackTarget);
+            return;
+        }
         
         var url = otp.config.hostname + '/opentripplanner-api-webapp/ws/transit/routes';
         $.ajax(url, {
             dataType:   'jsonp',
                 
             success: function(data) {
-                for(var i=0; i<data.routes.length; i++) {
-                    var routeData = data.routes[i];
-                    var agency_id = routeData.id.agencyId+"_"+routeData.id.id;
-                    this_.routes[agency_id] = {
+                if(!_.has(data, 'routes')) {
+                    console.log("Error: routes call returned no route data. OTP Message: "+data.message);
+                    return;
+                }
+                var sortedRoutes = data.routes;
+                sortedRoutes.sort(function(a,b) {
+                    a = a.routeShortName || a.routeLongName;
+                    b = b.routeShortName || b.routeLongName;
+                    if(otp.util.Text.isNumber(a) && otp.util.Text.isNumber(a)) {
+                        if(parseFloat(a) < parseFloat(b)) return -1;
+                        if(parseFloat(a) > parseFloat(b)) return 1;
+                        return 0;
+                    }
+                    if(a < b) return -1;
+                    if(a > b) return 1;
+                    return 0;
+                });
+                
+                var routes = { };
+                for(var i=0; i<sortedRoutes.length; i++) {
+                    var routeData = sortedRoutes[i];
+                    var agencyAndId = routeData.id.agencyId+"_"+routeData.id.id;
+                    routes[agencyAndId] = {
                         index : i,
                         routeData : routeData,
                         variants : null
                     };
                 }
-            }
+                this_.routes = routes;
+                this_.routesLoaded = true;
+                if(callback) callback.call(callbackTarget);
+            }            
         });        
     },
     
-    loadVariants : function(agency_id, callbackTarget, callback) {
+    loadVariants : function(agencyAndId, callbackTarget, callback) {
         var this_ = this;
-        //console.log("loadVariants: "+agency_id);
-        var route = this.routes[agency_id];
+        //console.log("loadVariants: "+agencyAndId);
+        var route = this.routes[agencyAndId];
 
         var url = otp.config.hostname + '/opentripplanner-api-webapp/ws/transit/routeData';
         $.ajax(url, {
@@ -91,11 +118,11 @@ otp.core.TransitIndex = otp.Class({
             }
         });        
 
-        /*var route = this.routes[agency_id];
-        console.log("looking for trip "+tripId+" in "+agency_id);
+        /*var route = this.routes[agencyAndId];
+        console.log("looking for trip "+tripId+" in "+agencyAndId);
         
         if(!route.variants) {
-            console.log("ERROR: transitIndex.routes.["+agency_id+"].variants null in TransitIndex.getVariantForTrip()");
+            console.log("ERROR: transitIndex.routes.["+agencyAndId+"].variants null in TransitIndex.getVariantForTrip()");
             return;
         }
         

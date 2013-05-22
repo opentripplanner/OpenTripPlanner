@@ -113,5 +113,11 @@ otp.util.Itin = {
             }
         }
         return text; // + ' and proceed <b>'+otp.util.Itin.distanceString(step.distance)+'</b>';
-    }     
+    },
+    
+    getRouteDisplayString : function(routeData) {
+        var str = routeData.routeShortName ? '('+routeData.routeShortName+') ' : '';
+        str += routeData.routeLongName;
+        return str;
+    },
 }

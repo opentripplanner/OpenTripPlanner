@@ -1,0 +1,23 @@
+.otp-alerts-entitiesWidget {
+    right: 20px;
+    bottom: 20px;
+}
+
+.otp-alerts-entitiesWidget-tabPanel {
+    width: 200px;
+    height: 250px;
+    background: white;
+    border: 1px solid black;
+    overflow: auto;
+}
+
+.otp-alerts-entitiesWidget-select {
+    height: 100%;
+    width: 100%;
+    background: #eee;
+}
+
+.otp-alerts-entitiesWidget-buttonRow {
+    text-align: center;
+    margin: 10px;
+}
