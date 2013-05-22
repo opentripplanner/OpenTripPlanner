@@ -12,6 +12,11 @@
     </parent>
 
     <dependencies>
+        <!-- LOGGING -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
         <dependency>
           <groupId>com.vividsolutions</groupId>
           <artifactId>jts</artifactId>

@@ -15,24 +15,24 @@ package org.opentripplanner.graph_builder;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.opentripplanner.gbannotation.GraphBuilderAnnotation;
 import org.opentripplanner.routing.graph.Graph;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AnnotationsToHTML {
 
+    private static Logger LOG = LoggerFactory.getLogger(AnnotationsToHTML .class); 
+
     public static void main(String[] args) throws IOException {
-        @SuppressWarnings("unchecked")
-        List<Logger> loggers = Collections.<Logger>list(LogManager.getCurrentLoggers());
-        loggers.add(LogManager.getRootLogger());
-        for ( Logger logger : loggers ) {
-            logger.setLevel(Level.OFF);
-        }
+        // FIXME turn off all logging to avoid mixing log entries and HTML
+//        @SuppressWarnings("unchecked")
+//        List<Logger> loggers = Collections.<Logger>list(LogManager.getCurrentLoggers());
+//        loggers.add(LogManager.getRootLogger());
+//        for ( Logger logger : loggers ) {
+//            logger.setLevel(Level.OFF);
+//        }
         if (args.length < 1) {
             System.out.println("Usage: AnnotationsToHTML /path/to/graph");
         }
