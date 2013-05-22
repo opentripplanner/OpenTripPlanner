@@ -194,4 +194,29 @@ otp.core.TransitIndex = otp.Class({
             }
         });
     },        
+    
+    loadStopsInRectangle : function(agencyId, bounds, callbackTarget, callback) {
+        var params = {
+            leftUpLat : bounds.getNorthWest().lat,
+            leftUpLon : bounds.getNorthWest().lng,
+            rightDownLat : bounds.getSouthEast().lat,
+            rightDownLon : bounds.getSouthEast().lng,
+        };
+        if(agencyId !== null) {
+            params.agency = agencyId;
+        }
+        if(typeof otp.config.routerId !== 'undefined') {
+            params.routerId = otp.config.routerId;
+        }
+        
+        var url = otp.config.hostname + '/opentripplanner-api-webapp/ws/transit/stopsInRectangle';
+        $.ajax(url, {
+            data:       params,
+            dataType:   'jsonp',
+                
+            success: function(data) {
+                callback.call(callbackTarget, data);                
+            }
+        });
+    },
 });

@@ -37,6 +37,7 @@ otp.modules.alerts.EntitiesWidget =
         this.routesSelect = $('<select size=10 />').addClass('otp-alerts-entitiesWidget-select').appendTo(this.routesDiv);
 
         this.stopsDiv = $('<div id="'+id+'-stopsTab" />').addClass('otp-alerts-entitiesWidget-tabPanel').appendTo(tabPanel);
+        this.stopsSelect = $('<select size=10 />').addClass('otp-alerts-entitiesWidget-select').appendTo(this.stopsDiv);
         
         tabPanel.tabs();
         
@@ -62,4 +63,12 @@ otp.modules.alerts.EntitiesWidget =
         });
     },
 
+    updateStops : function(stopArray) {
+        var this_ = this;
+        this.stopsSelect.empty();
+        for(var i = 0; i < stopArray.length; i++) {
+            var stop = stopArray[i];
+            this_.stopsSelect.append('<option>('+stop.id.agencyId+'_'+stop.id.id+') '+stop.stopName+'</option>');                       
+        }
+    }, 
 });

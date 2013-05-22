@@ -104,6 +104,14 @@ otp.core.Map = otp.Class({
         this.lmap.on('click', function(event) {
             webapp.mapClicked(event);        
         });
+
+        this.lmap.on('viewreset', function(event) {
+            webapp.mapBoundsChanged(event);        
+        });
+
+        this.lmap.on('dragend', function(event) {
+            webapp.mapBoundsChanged(event);        
+        });
         
         // setup context menu
         var this_ = this;

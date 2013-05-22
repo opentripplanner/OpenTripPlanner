@@ -33,6 +33,16 @@ otp.modules.alerts.AlertsModule =
         this.entitiesWidget = new otp.modules.alerts.EntitiesWidget('otp-'+this.moduleId+'-entitiesWidget', this);
         
     },
+    
+    mapBoundsChanged : function(event) {
+        if(this.webapp.map.lmap.getZoom() >= 16) {
+            this.webapp.transitIndex.loadStopsInRectangle("TriMet", this.webapp.map.lmap.getBounds(), this, function(data) {
+                this.entitiesWidget.updateStops(data.stops);
+            });
+        }
+
+    },
+    
 
 
 });
