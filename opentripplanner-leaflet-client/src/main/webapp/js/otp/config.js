@@ -6,10 +6,29 @@ if(typeof(otp.config) == "undefined" || otp.config == null) otp.config = {};
 
 otp.config = {
 
+    /**
+     * The OTP web service locations
+     */
+     
     hostname : "http://localhost:8080",
     //municoderHostname : "http://localhost:8080",
-    datastoreUrl : 'http://localhost:9000',
-      
+    //datastoreUrl : 'http://localhost:9000',
+
+
+    /**
+     * Base layers: the base map tile layers available for use by all modules.
+     * Expressed as an array of objects, where each object has the following 
+     * fields:
+     *   - name: <string> a unique name for this layer, used for both display
+     *       and internal reference purposes
+     *   - tileUrl: <string> the map tile service address (typically of the
+     *       format 'http://{s}.yourdomain.com/.../{z}/{x}/{y}.png')
+     *   - attribution: <string> the attribution text for the map tile data
+     *   - [subdomains]: <array of strings> a list of tileUrl subdomains, if
+     *       applicable
+     *       
+     */
+     
     baseLayers: [
         {
             name: 'MapQuest OSM',
@@ -23,32 +42,46 @@ otp.config = {
             subdomains : ['otile1','otile2','otile3','otile4'],
             attribution : 'Data, imagery and map information provided by <a href="http://open.mapquest.com" target="_blank">MapQuest</a>, <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors.'
         },           
-        {
-            name: 'MapBox Light',
-            tileUrl: 'http://{s}.tiles.mapbox.com/v3/demory.map-hmr94f0d/{z}/{x}/{y}.png',
-            //subdomains : ['otile1','otile2','otile3','otile4'],
-            attribution : 'Data, imagery and map information provided by <a href="http://www.mapbox.com" target="_blank">MapBox</a>, <a href="http://www.openstreetmap.org/" target="_blank">OpenStreetMap</a> and contributors.'
-        },           
-        
     ],
     
-    // map start location and zoom settings 
-    initLatLng : new L.LatLng(45.523307,-122.676086), // portland
-    initZoom : 14,
-    minZoom : 10,
-    maxZoom : 20,
 
-    showLogo:           true,
-    showTitle:          true,
-    showModuleSelector: true,
+    /**
+     * Map start location and zoom settings: by default, the client uses the
+     * OTP metadata API call to center and zoom the map. The following
+     * properties, when set, override that behavioir.
+     */
+     
+    // initLatLng : new L.LatLng(<lat>, <lng>),
+    // initZoom : 14,
+    // minZoom : 10,
+    // maxZoom : 20,
 
-    logoGraphic :       'images/otp_logo_darkbg_40px.png',
 
-    siteName    : "My OTP Instance",
-    siteDescription  : "An OpenTripPlanner deployment.",
-    
-    // bikeshareName : "",
+    /**
+     * Site name / description / branding display options
+     */
 
+    siteName            : "My OTP Instance",
+    siteDescription     : "An OpenTripPlanner deployment.",
+    logoGraphic         : 'images/otp_logo_darkbg_40px.png',
+    // bikeshareName    : "",
+
+    showLogo            : true,
+    showTitle           : true,
+    showModuleSelector  : true,
+
+
+    /**
+     * Modules: a list of the client modules to be loaded at startup. Expressed
+     * as an array of objects, where each object has the following fields:
+     *   - id: <string> a unique identifier for this module
+     *   - className: <string> the name of the main class for this module; class
+     *       must extend otp.modules.Module
+     *   - [defaultBaseLayer] : <string> the name of the map tile base layer to
+     *       used by default for this module
+     *   - [isDefault]: <boolean> whether this module is shown by default;
+     *       should only be 'true' for one module
+     */
     
     modules : [
         {
@@ -58,37 +91,38 @@ otp.config = {
             isDefault: true
         },
         {
-            id : 'ct',
-            className : 'otp.modules.calltaker.CallTakerModule',
-            defaultBaseLayer : 'MapQuest OSM'
-        },
-        {
-            id : 'ft',
-            className : 'otp.modules.fieldtrip.FieldTripModule',
-            defaultBaseLayer : 'MapQuest OSM',
-        },
-        {
             id : 'analyst',
             className : 'otp.modules.analyst.AnalystModule',
-            defaultBaseLayer : 'MapBox Light'
         }
     ],
     
+    
+    /**
+     * Geocoders: a list of supported geocoding services available for use in
+     * address resolution. Expressed as an array of objects, where each object
+     * has the following fields:
+     *   - name: <string> the name of the service to be displayed to the user
+     *   - className: <string> the name of the class that implements this service
+     *   - url: <string> the location of the service's API endpoint
+     *   - addressParam: <string> the name of the API parameter used to pass in
+     *       the user-specifed address string
+     */
+
     geocoders : [
-        {
-            name : 'TriMet Default',
-            className : 'otp.core.Geocoder',
-            url : 'http://maps5.trimet.org/geocoder/geocode',
-            addressParam : 'address'
-        },
-        {
-            name : 'SOLR',
-            className : 'otp.core.SOLRGeocoder',
-            url : 'http://maps5.trimet.org/solr/select',
-            addressParam : 'q'
-        }
     ],
-            
+
+    
+    /**
+     * Info Widgets: a list of the non-module-specific "information widgets"
+     * that can be accessed from the top bar of the client display. Expressed as
+     * an array of objects, where each object has the following fields:
+     *   - content: <string> the HTML content of the widget
+     *   - [title]: <string> the title of the widget
+     *   - [cssClass]: <string> the name of a CSS class to apply to the widget.
+     *        If not specified, the default styling is used.
+     */
+
+
     infoWidgets: [
         {
             title: 'About',
@@ -101,10 +135,20 @@ otp.config = {
         },           
     ],
     
+    
+    /**
+     * Support for the "AddThis" display for sharing to social media sites, etc.
+     */
+     
     showAddThis     : false,
     //addThisPubId    : 'your-addthis-id',
     //addThisTitle    : 'Your title for AddThis sharing messages',
-    
+
+
+    /**
+     * Formats to use for date and time displays, expressed as ISO-8601 strings.
+     */    
+     
     timeFormat  : "h:mma",
     dateFormat  : "MMM Do YYYY"
 };
