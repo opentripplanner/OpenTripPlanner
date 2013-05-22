@@ -1,0 +1,12 @@
+User(admin):
+    userName: admin
+    email: admin@example.com
+    password: secret
+    role: admin
+
+User(testct):
+    userName: testct
+    email: admin@example.com
+    password: secret
+    role: calltaker
+  

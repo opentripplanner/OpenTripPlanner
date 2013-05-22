@@ -32,6 +32,8 @@
     <module>opentripplanner-web-utils</module>
     <module>opentripplanner-analyst</module>
     <module>opentripplanner-analyst-client</module>
+    <module>opentripplanner-leaflet-webapp</module>
+    <module>opentripplanner-municoder</module>
   </modules>
 
   <build>

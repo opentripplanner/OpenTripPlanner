@@ -1,0 +1,78 @@
+<html>
+<head>
+<!-- jquery -->
+<script src="../../../../lib/jquery/jquery-1.9.1.js"></script>
+
+<!-- jquery-ui -->
+<script src="../../../../lib/jquery-ui/js/jquery-ui-1.9.1.custom.min.js"></script>
+<link rel="stylesheet" href="../../../../lib/jquery-ui/css/smoothness/jquery-ui-1.9.1.custom.css" />
+<script src="../../../../lib/jquery-ui/addons/jquery-ui-timepicker.js"></script>
+<link rel="stylesheet" href="../../../../lib/jquery-ui/addons/jquery-ui-timepicker.css" />
+
+
+<script src="request_form.js?v=1"></script>
+<link rel="stylesheet" href="request_form.css" />
+
+</head>
+
+<body style="font-family: sans-serif;">
+<center>
+<div style="width: 800px; margin-top: 20px; text-align: left;">
+<h2>Field Trip Request Form</h2>
+
+Complete and return this form to request a field trip if you wish to travel on TriMet with a group of 15 or more. 
+If you have any questions, please email us at fieldtrips@trimet.org or call 503-962-2424 option 4.
+
+<h3>Contact Information</h3>
+
+<div class="otp-fieldTripRequest-row">
+Teacher Name: <input id="teacherName"/>&nbsp;&nbsp;School Name: <input id="schoolName "/>
+</div>
+
+<div class="otp-fieldTripRequest-row">
+Address: <input id="address" />&nbsp;&nbsp;City: <input id="city" />&nbsp;&nbsp;State: <input id="state" style="width: 40px;" />&nbsp;&nbsp;Zip: <input id="zip" style="width: 60px;" />
+</div>
+
+
+<div class="otp-fieldTripRequest-row">
+Phone: <input id="emailAddress" />&nbsp;&nbsp;Fax: <input id="grade" />
+</div>
+
+<div class="otp-fieldTripRequest-row">
+Email Address: <input id="emailAddress" />&nbsp;&nbsp;Grade: <input id="grade" />
+</div>
+
+
+<h3>Field Trip Information</h3>
+
+
+<div class="otp-fieldTripRequest-row">
+# of Students: <input id="numStudents" style="width: 40px;" />&nbsp;&nbsp;&nbsp;Age Range: <input id="minAge" style="width: 30px;" /> to <input id="maxAge" style="width: 30px;" />&nbsp;&nbsp;&nbsp;# of Chaperones (including Teachers): <input id="numChaperones" style="width: 40px;" />
+</div>
+
+<div class="otp-fieldTripRequest-row">
+Starting Point (Address): <input id="startLocation" />&nbsp;&nbsp;Destination (Address): <input id="endLocation" />
+</div>
+
+<div class="otp-fieldTripRequest-row">
+Date of Trip: <input id="travelDate" />
+</div>
+
+<div class="otp-fieldTripRequest-row">
+Time your group needs to be at your destination: <input id="arriveDestTime" />
+</div>
+
+<div class="otp-fieldTripRequest-row">
+Time your group will be ready to leave your destination: <input id="leaveDestTime" />
+</div>
+
+<div class="otp-fieldTripRequest-row">
+Time your group needs to be back at school: <input id="arriveSchooleTime" /> 
+</div>
+
+<div id="submitBtn" style="margin-top: 20px;">Submit</div>
+
+</div>
+</center>
+</body>
+</html>
