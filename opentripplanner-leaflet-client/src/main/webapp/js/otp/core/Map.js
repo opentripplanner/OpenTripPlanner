@@ -71,14 +71,12 @@ otp.core.Map = otp.Class({
         
       
         if(!otp.config.initLatLng) {
-            console.log("no initLL, reading metadata");
             var url = otp.config.hostname + '/opentripplanner-api-webapp/ws/metadata';
             $.ajax(url, {
                 data: { routerId : otp.config.routerId },            
                 dataType:   'jsonp',
                 
                 success: function(data) {
-                    console.log(data);
                     this_.lmap.fitBounds([
                         [data.lowerLeftLatitude, data.lowerLeftLongitude],
                         [data.upperRightLatitude, data.upperRightLongitude]

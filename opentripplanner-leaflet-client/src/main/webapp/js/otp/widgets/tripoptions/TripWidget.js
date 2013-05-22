@@ -372,7 +372,6 @@ otp.widgets.tripoptions.ModeSelector =
         var container = $("#"+this.id+'-widgets');
         container.empty();
         var mode = _.keys(this.modes)[document.getElementById(this.id).selectedIndex];
-        console.log("refreshing widgets for mode: "+mode);
         for(var i = 0; i < this.modeControls.length; i++) {
             var control = this.modeControls[i];
             if(control.isApplicableForMode(mode)) {
