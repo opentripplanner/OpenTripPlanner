@@ -263,7 +263,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public Map<Object, Object> extensions = new HashMap<Object, Object>();
 
     /** Penalty for using a non-preferred transfer */
-    public int nonpreferredTransferPenalty = 120;
+    public int nonpreferredTransferPenalty = 180;
 
     /**
      * For the bike triangle, how important time is. triangleTimeFactor+triangleSlopeFactor+triangleSafetyFactor == 1
