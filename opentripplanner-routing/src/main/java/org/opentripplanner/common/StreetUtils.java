@@ -42,6 +42,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Polygon;
 
 public class StreetUtils {
 
@@ -59,7 +60,7 @@ public class StreetUtils {
             e.printStackTrace();
         }
         if (islandLog != null) {
-            islandLog.printf("%s\t%s\t%s\t%s\t%s","id","stopCount", "streetCount","wkt" ,"hadRemoved");
+            islandLog.printf("%s\t%s\t%s\t%s\t%s\n","id","stopCount", "streetCount","wkt" ,"hadRemoved");
         }
         Map<Vertex, Subgraph> subgraphs = new HashMap<Vertex, Subgraph>();
         Map<Vertex, ArrayList<Vertex>> neighborsForVertex = new HashMap<Vertex, ArrayList<Vertex>>();
@@ -209,10 +210,10 @@ public class StreetUtils {
 
     private static void WriteNodesInSubGraph(Subgraph subgraph, PrintWriter islandLog, boolean hadRemoved){
         Geometry convexHullGeom = subgraph.getConvexHull();
-        if(!convexHullGeom.getGeometryType().equalsIgnoreCase("POLYGON")){
+        if (convexHullGeom != null && !(convexHullGeom instanceof Polygon)) {
             convexHullGeom = convexHullGeom.buffer(0.0001,5);
         }
-        islandLog.printf("%d\t%d\t%d\t%s\t%b", islandCounter, subgraph.stopSize(), 
+        islandLog.printf("%d\t%d\t%d\t%s\t%b\n", islandCounter, subgraph.stopSize(), 
                 subgraph.streetSize(), convexHullGeom, hadRemoved);
         islandCounter++;
     }

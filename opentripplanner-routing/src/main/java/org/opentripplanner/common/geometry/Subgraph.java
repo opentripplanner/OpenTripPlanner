@@ -17,6 +17,8 @@ import com.vividsolutions.jts.algorithm.ConvexHull;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
+
 import lombok.Getter;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitVertex;
@@ -32,14 +34,14 @@ public class Subgraph {
     private Set<Vertex> streetVertexSet;
     private Set<Vertex> stopsVertexSet;
     private ConvexHull convexHull = null;
-    private ArrayList<Coordinate> vertexCoord;
+    private ArrayList<Coordinate> vertexCoords;
     private Geometry convexHullAsGeom = null;
     private boolean addNewVertex = true;
 
     public Subgraph(){
         streetVertexSet = new HashSet<Vertex>();
         stopsVertexSet = new HashSet<Vertex>();
-        vertexCoord = new ArrayList<Coordinate>();
+        vertexCoords = new ArrayList<Coordinate>();
     }
 
     public void addVertex(Vertex vertex){
@@ -49,7 +51,7 @@ public class Subgraph {
             streetVertexSet.add(vertex);
         }
         addNewVertex = true;
-        vertexCoord.add(vertex.getCoordinate());
+        vertexCoords.add(vertex.getCoordinate());
     }
 
     public boolean contains(Vertex vertex){
@@ -81,10 +83,16 @@ public class Subgraph {
         return stopsVertexSet.iterator();
     }
 
-    public Geometry getConvexHull(){
-        if(addNewVertex) {
-            convexHull = new ConvexHull(vertexCoord.toArray(new Coordinate[vertexCoord.size()]), new GeometryFactory());
-            convexHullAsGeom = convexHull.getConvexHull();
+    private static GeometryFactory gf = new GeometryFactory();
+    public Geometry getConvexHull() {
+        if (addNewVertex) {
+            convexHull = new ConvexHull(vertexCoords.toArray(new Coordinate[0]), gf);
+            // JTS explodes with more than 3 identical Coordinates
+            try {
+                convexHullAsGeom = convexHull.getConvexHull();
+            } catch (IllegalArgumentException iae) {
+                convexHullAsGeom = gf.createPoint(vertexCoords.get(0));
+            }
             addNewVertex = false;
         }
         return convexHullAsGeom;
