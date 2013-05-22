@@ -45,7 +45,7 @@ public class StopsAlerts implements GraphBuilder {
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         try {
             PrintWriter pw = new PrintWriter(new File(logFile));
-            pw.printf("%s,%s,%s,%s","stopId","lon","lat","types");
+            pw.printf("%s,%s,%s,%s\n","stopId","lon","lat","types");
             for (TransitStop ts : IterableLibrary.filter(graph.getVertices(), TransitStop.class)) {
                 StringBuilder types = new StringBuilder();
                 for(IStopTester stopTester:stopTesters){
@@ -55,7 +55,7 @@ public class StopsAlerts implements GraphBuilder {
                     }
                 }
                 if(types.length() > 0) {
-                    pw.printf("%s,%f,%f,%s",ts.getStopId(), ts.getCoordinate().x,
+                    pw.printf("%s,%f,%f,%s\n",ts.getStopId(), ts.getCoordinate().x,
                             ts.getCoordinate().y, types.toString());
                 }
             }
