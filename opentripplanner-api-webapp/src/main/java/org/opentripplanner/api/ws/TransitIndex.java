@@ -682,8 +682,8 @@ public class TransitIndex {
                 }
             }
         } else {
-            Coordinate cOne = new Coordinate(leftUpLat, leftUpLon);
-            Coordinate cTwo = new Coordinate(rightDownLat, rightDownLon);
+            Coordinate cOne = new Coordinate(leftUpLon, leftUpLat);
+            Coordinate cTwo = new Coordinate(rightDownLon, rightDownLat);
             List<TransitStop> stops = streetVertexIndexService.getNearbyTransitStops(cOne, cTwo);
             TransitIndexService transitIndexService = graph.getService(TransitIndexService.class);
             if (transitIndexService == null) {
