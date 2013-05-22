@@ -13,18 +13,27 @@
 
 package org.opentripplanner.graph_builder.impl;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
 import lombok.Setter;
+
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.graph_builder.impl.stopsAlerts.IStopTester;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.TransitStop;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
-
 public class StopsAlerts implements GraphBuilder {
+
+    private static org.slf4j.Logger LOG = LoggerFactory.getLogger(StopsAlerts.class);
 
     @Setter
     List<IStopTester> stopTesters = new ArrayList<IStopTester>();
@@ -34,19 +43,26 @@ public class StopsAlerts implements GraphBuilder {
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
-        Logger stopsLog = LoggerFactory.getLogger(LoggerAppenderProvider.createCsvFile4LoggerCat(logFile,"stops"));
-        stopsLog.info(String.format("%s,%s,%s,%s","stopId","lon","lat","types"));
-        for (TransitStop ts : IterableLibrary.filter(graph.getVertices(), TransitStop.class)) {
-            StringBuilder types = new StringBuilder();
-            for(IStopTester stopTester:stopTesters){
-                if(stopTester.fulfillDemands(ts,graph)){
-                    if(types.length() > 0) types.append(";");
-                    types.append(stopTester.getType());
+        try {
+            PrintWriter pw = new PrintWriter(new File(logFile));
+            pw.printf("%s,%s,%s,%s","stopId","lon","lat","types");
+            for (TransitStop ts : IterableLibrary.filter(graph.getVertices(), TransitStop.class)) {
+                StringBuilder types = new StringBuilder();
+                for(IStopTester stopTester:stopTesters){
+                    if(stopTester.fulfillDemands(ts,graph)){
+                        if(types.length() > 0) types.append(";");
+                        types.append(stopTester.getType());
+                    }
+                }
+                if(types.length() > 0) {
+                    pw.printf("%s,%f,%f,%s",ts.getStopId(), ts.getCoordinate().x,
+                            ts.getCoordinate().y, types.toString());
                 }
             }
-            if(types.length() > 0) {
-                stopsLog.info(String.format("%s,%f,%f,%s",ts.getStopId(), ts.getCoordinate().x,ts.getCoordinate().y,types.toString()));
-            }
+            pw.close();            
+        } catch (FileNotFoundException e) {
+            LOG.error("Failed to write StopsAlerts log file due to {}", e);
+            e.printStackTrace();
         }
     }
 
