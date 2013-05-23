@@ -20,6 +20,8 @@ otp.modules.alerts.AlertsModule =
     
     moduleName  : "Alerts Manager",
 
+    minimumZoomForStops : 15,
+    
     initialize : function(webapp) {
         otp.modules.Module.prototype.initialize.apply(this, arguments);
     },
@@ -30,19 +32,29 @@ otp.modules.alerts.AlertsModule =
         
         otp.modules.Module.prototype.activate.apply(this);
 
-        this.entitiesWidget = new otp.modules.alerts.EntitiesWidget('otp-'+this.moduleId+'-entitiesWidget', this);
+        this.entitiesWidget = new otp.modules.alerts.EntitiesWidget('otp-'+this.id+'-entitiesWidget', this);
         
     },
     
     mapBoundsChanged : function(event) {
-        if(this.webapp.map.lmap.getZoom() >= 16) {
-            this.webapp.transitIndex.loadStopsInRectangle("TriMet", this.webapp.map.lmap.getBounds(), this, function(data) {
+        if(this.webapp.map.lmap.getZoom() >= this.minimumZoomForStops) {
+            this.webapp.transitIndex.loadStopsInRectangle(null, this.webapp.map.lmap.getBounds(), this, function(data) {
                 this.entitiesWidget.updateStops(data.stops);
             });
+        }
+        else {
+            var diff = this.minimumZoomForStops - this.webapp.map.lmap.getZoom();
+            this.entitiesWidget.stopsText("<i>Please zoom an additional " + diff + " zoom level" + (diff > 1 ? "s" : "") + " to see stops.</i>");
         }
 
     },
     
-
+    alertWidgetCount : 0,
+    
+    newAlert : function(affectedRoutes, affectedStops) {
+        new otp.modules.alerts.EditAlertWidget('otp-'+this.id+'-editAlertWidget-'+this.alertWidgetCount, this, affectedRoutes, affectedStops);
+        this.alertWidgetCount++;
+    },
+    
 
 });

@@ -18,8 +18,12 @@ otp.modules.alerts.EntitiesWidget =
     otp.Class(otp.widgets.Widget, {
     
     module : null,
+    
+    routesLookup : null,
+    stopsLookup : null,
 
     initialize : function(id, module) {
+        var this_ = this;
         otp.widgets.Widget.prototype.initialize.call(this, id, module, {
             title : 'Transit Entities',
             cssClass : 'otp-alerts-entitiesWidget'
@@ -34,17 +38,17 @@ otp.modules.alerts.EntitiesWidget =
         .append('<li><a href="#'+id+'-stopsTab">Stops</a></li>');
         
         this.routesDiv = $('<div id="'+id+'-routesTab" />').addClass('otp-alerts-entitiesWidget-tabPanel').appendTo(tabPanel)
-        this.routesSelect = $('<select size=10 />').addClass('otp-alerts-entitiesWidget-select').appendTo(this.routesDiv);
+        this.routesSelect = $('<select multiple />').addClass('otp-alerts-entitiesWidget-select').appendTo(this.routesDiv);
 
         this.stopsDiv = $('<div id="'+id+'-stopsTab" />').addClass('otp-alerts-entitiesWidget-tabPanel').appendTo(tabPanel);
-        this.stopsSelect = $('<select size=10 />').addClass('otp-alerts-entitiesWidget-select').appendTo(this.stopsDiv);
+        this.stopsSelect = $('<select multiple />').addClass('otp-alerts-entitiesWidget-select').appendTo(this.stopsDiv);
         
         tabPanel.tabs();
         
         var buttonRow = $('<div>').addClass('otp-alerts-entitiesWidget-buttonRow').appendTo(this.mainDiv)
         
         $('<button>Create Alert</button>').button().appendTo(buttonRow).click(function() {
-            console.log("create alert");
+            this_.createAlert();
         });
         
         this.refreshRoutes();
@@ -54,21 +58,57 @@ otp.modules.alerts.EntitiesWidget =
     refreshRoutes : function() {
         var this_ = this;
         var ti = this.module.webapp.transitIndex
+        this.routesLookup = [];
         ti.loadRoutes(this, function() {
             this_.routesSelect.empty();
+            var i = 0;
             for(var routeId in ti.routes) {
                 var route = ti.routes[routeId];
-                this_.routesSelect.append('<option>'+otp.util.Itin.getRouteDisplayString(route.routeData)+'</option>');
+                this_.routesSelect.append('<option value="'+i+'">'+otp.util.Itin.getRouteDisplayString(route.routeData)+'</option>');
+                this.routesLookup[i] = route;
+                i++;
             }
         });
     },
 
     updateStops : function(stopArray) {
         var this_ = this;
+        if(!jQuery.contains(this.stopsDiv, this.stopsSelect)) {
+            this.stopsDiv.empty();
+            this.stopsDiv.append(this.stopsSelect);    
+        }
         this.stopsSelect.empty();
         for(var i = 0; i < stopArray.length; i++) {
             var stop = stopArray[i];
-            this_.stopsSelect.append('<option>('+stop.id.agencyId+'_'+stop.id.id+') '+stop.stopName+'</option>');                       
+            this_.stopsSelect.append('<option value="'+i+'">('+stop.id.agencyId+'_'+stop.id.id+') '+stop.stopName+'</option>');                       
         }
-    }, 
+        this.stopsLookup = stopArray;
+    },
+    
+    stopsText : function(text) {
+        this.stopsDiv.empty().html(text);
+    },
+    
+    createAlert : function() {
+
+        var routes = [];
+        var routeIndices = this.routesSelect.val();
+        if(routeIndices != null) {
+            for(var i = 0; i < routeIndices.length; i++) {
+                var index = parseInt(routeIndices[i]);
+                routes.push(this.routesLookup[index]);
+            }
+        }
+                
+        var stops = [];
+        var stopIndices = this.stopsSelect.val();
+        if(stopIndices != null) {
+            for(var i = 0; i < stopIndices.length; i++) {
+                var index = parseInt(stopIndices[i]);
+                stops.push(this.stopsLookup[index]);
+            }
+        }
+                
+        this.module.newAlert(routes, stops);
+    },
 });
