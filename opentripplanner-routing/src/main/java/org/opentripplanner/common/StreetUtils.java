@@ -16,6 +16,7 @@ package org.opentripplanner.common;
 import java.util.*;
 
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Polygon;
 import org.opentripplanner.common.geometry.Subgraph;
 import org.opentripplanner.gbannotation.GraphConnectivity;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -196,7 +197,7 @@ public class StreetUtils {
 
     private static void WriteNodesInSubGraph(Subgraph subgraph, Logger islandLog, boolean hadRemoved){
         Geometry convexHullGeom = subgraph.getConvexHull();
-        if(!convexHullGeom.getGeometryType().equalsIgnoreCase("POLYGON")){
+        if(!(convexHullGeom instanceof Polygon)){
             convexHullGeom = convexHullGeom.buffer(0.0001,5);
         }
         islandLog.info(String.format("%d\t%d\t%d\t%s\t%b",
