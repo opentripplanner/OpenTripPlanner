@@ -98,6 +98,14 @@ otp.modules.Module = otp.Class({
 
 
     /**
+     * Called by the Map object when the map is panned or zoomed
+     */
+
+    mapBoundsChanged : function(event) {
+    },
+
+
+    /**
      * Called by the Map object to trigger the module to add any module-specific
      * items to the map context menu.
      */

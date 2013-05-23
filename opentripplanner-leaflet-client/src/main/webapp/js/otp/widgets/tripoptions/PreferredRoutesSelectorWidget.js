@@ -134,7 +134,7 @@ otp.widgets.PreferredRoutesSelectorWidget =
                 
                 for(var i = 0; i < data.routes.length; i++) {
                     var route = data.routes[i];
-                    routesList.append('<option>'+this_.getDisplayString(route)+'</option>');
+                    routesList.append('<option>'+otp.util.Itin.getRouteDisplayString(route)+'</option>');
                     var combinedId = route.id.agencyId+"_"+route.id.id;
                     if(_.contains(restoredRouteIdArr, combinedId)) {
                         this_.selectRoute(i);
@@ -145,10 +145,6 @@ otp.widgets.PreferredRoutesSelectorWidget =
         });
     },
     
-    getDisplayString : function(routeData) {
-        var str = routeData.routeShortName ? '('+routeData.routeShortName+') ' : '';
-        str += routeData.routeLongName;
-        return str;
-    }
+
     
 });

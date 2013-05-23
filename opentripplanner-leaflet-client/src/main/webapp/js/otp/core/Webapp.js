@@ -280,6 +280,10 @@ otp.core.Webapp = otp.Class({
         this.activeModule.handleClick(event);
     },
     
+    mapBoundsChanged : function(event) {
+        if(this.activeModule) this.activeModule.mapBoundsChanged(event);
+    },
+    
     addWidget : function(widget) {
         //this.widgets.push(widget);
         this.widgetManager.addWidget(widget);

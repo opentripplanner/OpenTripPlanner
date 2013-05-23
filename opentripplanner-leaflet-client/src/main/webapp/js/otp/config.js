@@ -10,7 +10,8 @@ otp.config = {
      * The OTP web service locations
      */
      
-    hostname : "http://localhost:8080",
+    //hostname : "http://setravi.dev.conveyal.com:8080",
+    hostname: "http://localhost:8080",
     //municoderHostname : "http://localhost:8080",
     //datastoreUrl : 'http://localhost:9000',
 
@@ -85,10 +86,16 @@ otp.config = {
     
     modules : [
         {
+            id : 'alerts',
+            className : 'otp.modules.alerts.AlertsModule',
+            defaultBaseLayer : 'MapQuest OSM',
+            isDefault: true
+        },
+        {
             id : 'planner',
             className : 'otp.modules.multimodal.MultimodalPlannerModule',
             defaultBaseLayer : 'MapQuest OSM',
-            isDefault: true
+            isDefault: false
         },
         {
             id : 'analyst',
