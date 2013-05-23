@@ -24,6 +24,11 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
+/**
+ * It prints the stops that satisfy certain criteria.
+ * The output is a list of stops, some of the stops attributes (coordinates and etc.) and the criteria it satisfies.
+ */
+
 public class StopsAlerts implements GraphBuilder {
 
     @Setter

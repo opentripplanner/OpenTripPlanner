@@ -1,3 +1,16 @@
+/* This program is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
 package org.opentripplanner.graph_builder.impl.stopsAlerts;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -19,13 +32,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 
-/**
- * Created with IntelliJ IDEA.
- * User: Ben
- * Date: 06/01/13
- * Time: 14:01
- * To change this template use File | Settings | File Templates.
- */
+
+
 public class CountRoadInDis extends AbstractStopTester {
 
     Logger _log = LoggerFactory.getLogger(CountRoadInDis.class);
@@ -41,6 +49,12 @@ public class CountRoadInDis extends AbstractStopTester {
 
     GeometryFactory geometryFactory = new GeometryFactory();
 
+
+    /**
+     * @retrun return true if the number of streets around a stop is equal or higher then numberOfStreets,
+     * street consider to be around stop if the distance between then is less then distance.
+     * please note that the distance calculation is big approximation, but it still good enough for the alerts need.
+     */
     @Override
     public boolean fulfillDemands(TransitStop ts, Graph graph) {
         if(graph.streetIndex == null){
@@ -68,7 +82,6 @@ public class CountRoadInDis extends AbstractStopTester {
 
         int counter = 0;
         for(StreetEdge streetEdge: streetEdges){
-            //this is completely inaccurate!!! but may be good enough for now.
             double dis = DistanceOp.distance(streetEdge.getGeometry(),geometryFactory.createPoint(ts.getCoordinate()));
             double disMeters =  (dis*Math.PI/180) * rInMeters;
             if (disMeters <= distance && streetEdge.getPermission().allows(allowedPermission)){
