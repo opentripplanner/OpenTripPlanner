@@ -12,9 +12,9 @@
 
   <logger name="org.springframework" level="warn" />
   <logger name="org.opentripplanner" level="info" />
-  <logger name="org.opentripplanner.routing.impl.RetryingPathServiceImpl" level="debug" />
-  <logger name="org.opentripplanner.routing.algorithm.GenericAStar" level="debug" />
-    <!-- Avoid printing debug messages when walk limits are exceeded -->
+  <!-- Avoid printing debug messages about free-flowing vertices -->
+  <logger name="org.opentripplanner.routing.vertextype.IntersectionVertex" level="info" />
+  <!-- Avoid printing debug messages when walk limits are exceeded -->
   <logger name="org.opentripplanner.routing.edgetype.PlainStreetEdge" level="info" />
-  
+
 </configuration>
