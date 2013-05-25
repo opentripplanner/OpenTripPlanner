@@ -453,6 +453,7 @@ otp.widgets.tripoptions.PreferredRoutes =
     selectorWidget : null,
        
     initialize : function(tripWidget) {
+        var this_ = this;
         otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
         this.id = tripWidget.id+"-preferredRoutes";
         
@@ -462,6 +463,22 @@ otp.widgets.tripoptions.PreferredRoutes =
         html += '<div style="clear:both;"></div></div>';
         
         $(html).appendTo(this.$());
+        
+        var weightSliderDiv = $('<div class="otp-tripViewer-select notDraggable" style="margin-top: 8px;" >').appendTo(this.$());
+        $('<div style="float: left;">Weight:</div>').appendTo(weightSliderDiv);
+        this.weightSlider = $('<div id="'+this.id+'-weightSlider" style="width:90%" />')
+        .appendTo($('<div style="margin-left:60px;">').appendTo(weightSliderDiv))
+        .slider({
+            min : 0,
+            max : 28800,
+            value : 300,
+        });
+        
+        this.weightSlider.on('slidechange', function(evt) {
+            console.log(this_.weightSlider.slider('value'));
+            this_.tripWidget.module.otherThanPreferredRoutesPenalty = this_.weightSlider.slider('value');
+        });
+        
         
         this.selectorWidget = new otp.widgets.PreferredRoutesSelectorWidget(this.id+"-selectorWidget", this);
     },
@@ -511,6 +528,9 @@ otp.widgets.tripoptions.PreferredRoutes =
                     $('#'+this_.id+'-list').html(displayStr);
                 }
             });            
+        }
+        if(planData.queryParams.otherThanPreferredRoutesPenalty) {
+            this.weightSlider.slider('value', planData.queryParams.otherThanPreferredRoutesPenalty);
         }
     },
     

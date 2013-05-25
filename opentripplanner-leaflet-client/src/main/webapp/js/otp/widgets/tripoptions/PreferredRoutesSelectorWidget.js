@@ -102,7 +102,7 @@ otp.widgets.PreferredRoutesSelectorWidget =
     },
     
     selectRoute : function(index) {
-        $('#'+this.id+'-selectedList').append('<option>'+this.getDisplayString(this.routeData[index])+'</option>');                
+        $('#'+this.id+'-selectedList').append('<option>'+otp.util.Itin.getRouteDisplayString(this.routeData[index])+'</option>');                
         this.selectedRouteIndices.push(index);
     },
     

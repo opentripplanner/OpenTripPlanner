@@ -228,7 +228,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      * Penalty added for using every route that is not preferred if user set any route as preferred. We return number of seconds that we are willing
      * to wait for preferred route.
      */
-    public int useAnotherThanPreferredRoutesPenalty = 300;
+    public int otherThanPreferredRoutesPenalty = 300;
 
     /** Set of unpreferred routes for given user. */
     public RouteMatcher unpreferredRoutes = RouteMatcher.emptyMatcher();
@@ -478,6 +478,11 @@ public class RoutingRequest implements Cloneable, Serializable {
             preferredRoutes = RouteMatcher.parse(s);
         else
             preferredRoutes = RouteMatcher.emptyMatcher();
+    }
+    
+    public void setOtherThanPreferredRoutesPenalty(int penalty) {
+        if(penalty < 0) penalty = 0;
+        this.otherThanPreferredRoutesPenalty = penalty;
     }
     
     public void setUnpreferredAgencies(String s) {
@@ -803,7 +808,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && boardSlack == other.boardSlack
                 && alightSlack == other.alightSlack
                 && nonpreferredTransferPenalty == other.nonpreferredTransferPenalty
-                && useAnotherThanPreferredRoutesPenalty == other.useAnotherThanPreferredRoutesPenalty
+                && otherThanPreferredRoutesPenalty == other.otherThanPreferredRoutesPenalty
                 && useUnpreferredRoutesPenalty == other.useUnpreferredRoutesPenalty
                 && triangleSafetyFactor == other.triangleSafetyFactor
                 && triangleSlopeFactor == other.triangleSlopeFactor
@@ -1003,7 +1008,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     		boolean isPreferedRoute = preferredRoutes != null && preferredRoutes.matches(route);
     		boolean isPreferedAgency = preferredAgencies != null && preferredAgencies.contains(agencyID); 
     		if (!isPreferedRoute && !isPreferedAgency) {
-    			preferences_penalty += useAnotherThanPreferredRoutesPenalty;
+    			preferences_penalty += otherThanPreferredRoutesPenalty;
     		}
     		else {
     			preferences_penalty = 0;

@@ -114,6 +114,9 @@ public abstract class RoutingResource {
      * underscores, 42 is the route internal ID).
      */
     @DefaultValue("") @QueryParam("preferredRoutes") protected List<String> preferredRoutes;
+
+    /** The maximum number of possible itineraries to return. */
+    @DefaultValue("-1") @QueryParam("otherThanPreferredRoutesPenalty") protected List<Integer> otherThanPreferredRoutesPenalty;
     
     /** The comma-separated list of preferred agencies. */
     @DefaultValue("") @QueryParam("preferredAgencies") protected List<String> preferredAgencies;
@@ -296,6 +299,7 @@ public abstract class RoutingResource {
             intermediatePlacesOrdered = request.isIntermediatePlacesOrdered();
         request.setIntermediatePlacesOrdered(intermediatePlacesOrdered);
         request.setPreferredRoutes(get(preferredRoutes, n, request.getPreferredRouteStr()));
+        request.setOtherThanPreferredRoutesPenalty(get(otherThanPreferredRoutesPenalty, n, request.getOtherThanPreferredRoutesPenalty()));
         request.setPreferredAgencies(get(preferredAgencies, n, request.getPreferredAgenciesStr()));
         request.setUnpreferredRoutes(get(unpreferredRoutes, n, request.getUnpreferredRouteStr()));
         request.setUnpreferredAgencies(get(unpreferredAgencies, n, request.getUnpreferredAgenciesStr()));
