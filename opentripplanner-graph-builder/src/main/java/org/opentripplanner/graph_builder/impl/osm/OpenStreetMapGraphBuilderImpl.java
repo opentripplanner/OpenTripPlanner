@@ -137,6 +137,11 @@ class TurnRestrictionTag {
         this.type = type;
         this.direction = direction;
     }
+    
+    @Override
+    public String toString() {
+        return String.format("%s turn restriction via node %d", direction, via);
+    }
 }
 
 public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
@@ -223,10 +228,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         Handler handler = new Handler(graph);
         for (OpenStreetMapProvider provider : _providers) {
-            _log.debug("gathering osm from provider: " + provider);
+            _log.info("Gathering OSM from provider: " + provider);
             provider.readOSM(handler);
         }
-        _log.debug("building osm street graph");
+        _log.info("Building street graph from OSM");
         handler.buildGraph(extra);
     }
 
@@ -740,16 +745,16 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             for (List<TurnRestrictionTag> restrictions : turnRestrictionsByFromWay.values()) {
                 for (TurnRestrictionTag restrictionTag : restrictions) {
                     if (restrictionTag.possibleFrom.isEmpty()) {
-                        _log.warn("No from edge found for restriction " + restrictionTag);
+                        _log.warn("No from edge found for " + restrictionTag);
                         continue;
                     }
                     if (restrictionTag.possibleTo.isEmpty()) {
-                        _log.warn("No to edge found for restriction " + restrictionTag);
+                        _log.warn("No to edge found for " + restrictionTag);
                         continue;
                     }
                     for (PlainStreetEdge from : restrictionTag.possibleFrom) {
                         if (from == null) {
-                            _log.warn("from-edge is null in turn restriction " + restrictionTag);
+                            _log.warn("from-edge is null in turn " + restrictionTag);
                             continue;
                         }
                         for (PlainStreetEdge to : restrictionTag.possibleTo) {
@@ -802,7 +807,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         } // END buildGraph()
 
         private void processBikeRentalNodes() {
-            _log.debug("Processing bike rental nodes...");
+            _log.info("Processing bike rental nodes...");
             int n = 0;
             BikeRentalStationService bikeRentalService = new BikeRentalStationService();
             graph.putService(BikeRentalStationService.class, bikeRentalService);
@@ -846,13 +851,13 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 new RentABikeOnEdge(stationVertex, stationVertex, networkSet);
                 new RentABikeOffEdge(stationVertex, stationVertex, networkSet);
             }
-            _log.debug("Created " + n + " bike rental stations.");
+            _log.info("Created " + n + " bike rental stations.");
         }
 
         final int MAX_AREA_NODES = 500;
 
         private void buildAreas() {
-            _log.debug("building visibility graphs for areas");
+            _log.info("Building visibility graphs for areas");
 
             List<AreaGroup> areaGroups = groupAreas(_areas);
             for (AreaGroup group : areaGroups) {
@@ -2126,7 +2131,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         modes.setDriving(false);
                     } else if (m.equals("bicycle")) {
                         modes.setBicycle(false);
-                        _log.warn(graph
+                        _log.debug(graph
                                 .addBuilderAnnotation(new TurnRestrictionException(via, from)));
                     }
                 }
