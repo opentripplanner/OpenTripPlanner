@@ -263,19 +263,8 @@
     <repository>
       <id>opengeo</id>
       <name>OpenGeo Maven Repository</name>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
       <url>http://repo.opengeo.org/</url>
     </repository>
-<!--         <repository> -->
-<!--             <id>osgeo-snapshots</id> -->
-<!--             <name>OSGeo snapshots repository</name> -->
-<!--             <snapshots> -->
-<!--                 <enabled>true</enabled> -->
-<!--             </snapshots> -->
-<!--             <url>http://download.osgeo.org/</url> -->
-<!--         </repository> -->
   </repositories>
 
   <!-- define no dependencies in the top-level POM to minimize artifact size -->
