@@ -13,33 +13,32 @@
 
 package org.opentripplanner.common.geometry;
 
-import com.vividsolutions.jts.algorithm.ConvexHull;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import lombok.Getter;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.TransitVertex;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
+import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.TransitVertex;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.MultiPoint;
 
 
 public class Subgraph {
 
     private Set<Vertex> streetVertexSet;
     private Set<Vertex> stopsVertexSet;
-    private ConvexHull convexHull = null;
-    private ArrayList<Coordinate> vertexCoord;
+    private ArrayList<Coordinate> vertexCoords;
     private Geometry convexHullAsGeom = null;
-    private boolean addNewVertex = true;
+    private boolean newVertexAdded = true;
 
     public Subgraph(){
         streetVertexSet = new HashSet<Vertex>();
         stopsVertexSet = new HashSet<Vertex>();
-        vertexCoord = new ArrayList<Coordinate>();
+        vertexCoords = new ArrayList<Coordinate>();
     }
 
     public void addVertex(Vertex vertex){
@@ -48,8 +47,8 @@ public class Subgraph {
         }else{
             streetVertexSet.add(vertex);
         }
-        addNewVertex = true;
-        vertexCoord.add(vertex.getCoordinate());
+        newVertexAdded = true;
+        vertexCoords.add(vertex.getCoordinate());
     }
 
     public boolean contains(Vertex vertex){
@@ -81,11 +80,12 @@ public class Subgraph {
         return stopsVertexSet.iterator();
     }
 
-    public Geometry getConvexHull(){
-        if(addNewVertex) {
-            convexHull = new ConvexHull(vertexCoord.toArray(new Coordinate[vertexCoord.size()]), new GeometryFactory());
-            convexHullAsGeom = convexHull.getConvexHull();
-            addNewVertex = false;
+    private static GeometryFactory gf = new GeometryFactory();
+    public Geometry getConvexHull() {
+        if (newVertexAdded) {
+            MultiPoint mp = gf.createMultiPoint(vertexCoords.toArray(new Coordinate[0]));
+            newVertexAdded = false;
+            mp.convexHull();
         }
         return convexHullAsGeom;
     }
