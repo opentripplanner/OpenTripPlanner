@@ -116,12 +116,16 @@
             <artifactId>logback-classic</artifactId>
         </dependency>
         <dependency>
+          <!-- Jersey uses java.util logging, redirect it via slf4j API to Logback -->
+          <groupId>org.slf4j</groupId>
+          <artifactId>jul-to-slf4j</artifactId>
+        </dependency>
+        <dependency>
           <!-- Spring uses jakarta commons logging, redirect it via slf4j API to Logback -->
           <groupId>org.slf4j</groupId>
           <artifactId>jcl-over-slf4j</artifactId>
         </dependency>
         
-
         <dependency>
       	  <groupId>javax.servlet</groupId>
       	  <artifactId>servlet-api</artifactId>
