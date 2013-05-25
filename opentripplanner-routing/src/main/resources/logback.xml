@@ -7,18 +7,20 @@ depends on otp-routing.
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
-      <pattern>%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</pattern>
+      <!-- simple logging -->
+<!-- 	  <pattern>%d{HH:mm:ss} %level %msg%n</pattern> -->
+      <!-- debug logging: print out file and line number in parenthesis, which Eclipse will link -->
+      <pattern>%d{HH:mm:ss.SSS} %level \(%F:%L\) %msg%n</pattern>
     </encoder>
   </appender>
 
   <root level="info">
     <appender-ref ref="STDOUT" />
   </root>
-
-  <logger name="org.springframework" level="warn" />
+  
   <logger name="org.opentripplanner" level="info" />
   <logger name="org.opentripplanner.analyst" level="info" />
-  <logger name="org.opentripplanner.routing" level="error" />
+  <logger name="org.opentripplanner.routing" level="info" />
   <logger name="org.opentripplanner.routing.impl.RetryingPathServiceImpl" level="debug" />
   <logger name="org.opentripplanner.routing.algorithm.GenericAStar" level="debug" />
   <!-- Avoid printing debug messages about free-flowing vertices -->
@@ -26,5 +28,7 @@ depends on otp-routing.
   <!-- Avoid printing debug messages when walk limits are exceeded -->
   <logger name="org.opentripplanner.routing.edgetype.PlainStreetEdge" level="info" />
   
+  <logger name="org.springframework" level="warn" />
+  <logger name="com.sun.jersey" level="warn" />
   
 </configuration>
