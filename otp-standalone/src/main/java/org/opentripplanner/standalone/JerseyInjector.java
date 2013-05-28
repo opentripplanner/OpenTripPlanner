@@ -1,4 +1,4 @@
-package org.opentripplanner.api.standalone;
+package org.opentripplanner.standalone;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;

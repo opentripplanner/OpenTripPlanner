@@ -1,10 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     
-    <artifactId>opentripplanner-graph-builder</artifactId>
+    <artifactId>otp-standalone</artifactId>
     <packaging>jar</packaging>
-    <name>OpenTripPlanner Graph Builder</name>
-    <url>http:/www.opentripplanner.org</url>
+    <name>OpenTripPlanner Standalone</name>
 
     <parent>
         <groupId>org.opentripplanner</groupId>
@@ -13,107 +12,36 @@
     </parent>
 
     <dependencies>
+        <!-- OTP Modules -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>opentripplanner-routing</artifactId>
+            <artifactId>otp-rest-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <!-- Java standard library extensions -->
         <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>openstreetmap</artifactId>
-            <version>${project.version}</version>
+          <groupId>org.projectlombok</groupId>
+          <artifactId>lombok</artifactId>
         </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>opentripplanner-utils</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jdbc</artifactId>
-            <version>3.0.5.RELEASE</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-orm</artifactId>
-            <version>3.0.5.RELEASE</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.axis</groupId>
-            <artifactId>axis</artifactId>
-            <version>1.4</version>
-        </dependency>
-        <dependency>
-          <groupId>org.apache.axis</groupId>
-          <artifactId>axis-jaxrpc</artifactId>
-          <version>1.4</version>
-        </dependency>
-        <dependency>
-          <groupId>commons-discovery</groupId>
-          <artifactId>commons-discovery</artifactId>
-          <version>0.4</version>
-        </dependency>
-        <dependency>
-        	<groupId>postgresql</groupId>
-        	<artifactId>postgresql</artifactId>
-        	<version>8.3-603.jdbc4</version>
-        	<optional>false</optional>
-        </dependency>
-        <dependency>
-        	<groupId>mysql</groupId>
-        	<artifactId>mysql-connector-java</artifactId>
-        	<version>5.0.5</version>
-        	<optional>false</optional>
-        </dependency>
-  	    <dependency>
-  		    <groupId>org.geotools</groupId>
-  		    <artifactId>gt-arcgrid</artifactId>
-  	    </dependency>
-        <dependency>
-          <groupId>org.geotools</groupId>
-          <artifactId>gt-shapefile</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>org.geotools</groupId>
-          <artifactId>gt-geotiff</artifactId>
-        </dependency>
-        <dependency>
-          <!-- provides EPSG database for shapefile loading -->
-          <groupId>org.geotools</groupId>
-          <artifactId>gt-epsg-hsql</artifactId>
-        </dependency>
-	    <dependency>
-	        <groupId>org.apache.commons</groupId>
-	        <artifactId>commons-compress</artifactId>
-	        <version>1.0</version>
-	    </dependency>
-        <dependency>
-      		<groupId>net.java.dev.jets3t</groupId>
-      		<artifactId>jets3t</artifactId>
-      		<version>0.8.1</version>
-    	</dependency>
-        <dependency>
-          <groupId>com.beust</groupId>
-          <artifactId>jcommander</artifactId>
-          <version>1.27</version>
-        </dependency>
-        <dependency>
-          <groupId>net.sourceforge.javacsv</groupId>
-          <artifactId>javacsv</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
-        <!-- LOGGING -->
+        <!-- Logging  -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>javax.inject</groupId>
+          <artifactId>javax.inject</artifactId>
+          <version>1</version>
+        </dependency>
+        <!-- JERSEY/GRIZZLY INTEGRATION -->
+        <dependency>
+          <groupId>com.sun.jersey</groupId>
+          <artifactId>jersey-grizzly2</artifactId>
+        </dependency>
+        <!-- TESTING DEPENDENCIES -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
         </dependency>
     </dependencies>
 
@@ -153,11 +81,11 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <finalName>graph-builder</finalName>
+                            <finalName>otp</finalName>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
-                                        <Main-Class>org.opentripplanner.graph_builder.GraphBuilderMain</Main-Class>
+                                        <Main-Class>org.opentripplanner.standalone.OTPMain</Main-Class>
                                         <Specification-Title>Java Advanced Imaging Image I/O Tools</Specification-Title>
                                         <Specification-Version>1.1</Specification-Version>
                                         <Specification-Vendor>Sun Microsystems, Inc.</Specification-Vendor>
@@ -175,4 +103,5 @@
               </plugin>
         </plugins>
     </build>
+
 </project>

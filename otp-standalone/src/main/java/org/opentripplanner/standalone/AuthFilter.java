@@ -1,4 +1,7 @@
-package org.opentripplanner.api.standalone;
+package org.opentripplanner.standalone;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
@@ -15,28 +18,33 @@ import com.sun.jersey.spi.container.ContainerRequestFilter;
  * filters requests rather than responses.
  * http://simplapi.wordpress.com/2013/01/24/jersey-jax-rs-implements-a-http-basic-auth-decoder/
  */
-public class JerseyAuthFilter implements ContainerRequestFilter {
+public class AuthFilter implements ContainerRequestFilter {
 
     /* The exception thrown if a user is unauthorized. */
     private final static WebApplicationException unauthorized = 
         new WebApplicationException(Response.status(Status.UNAUTHORIZED)
             .header(HttpHeaders.WWW_AUTHENTICATE, "Basic realm=\"OTP\"")
             .entity("This OTP resource requires authentication.").build());
-
-    public void GrizzlyAuthFilter() {
-        System.out.println("INSTANTIATING AUTH FILTER");
-    }
     
     @Override
     public ContainerRequest filter(ContainerRequest containerRequest) 
             throws WebApplicationException {
 
+        // rewrite URIs to remove 
+        // calling these methods clears the cached method, path etc.
+        try {
+            containerRequest.setUris(containerRequest.getBaseUri(), 
+                    new URI(containerRequest.getRequestUri().toString().replace("/ws/", "/")));
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+
         // Automatically allow certain requests.
         String method = containerRequest.getMethod();
-        String path = containerRequest.getPath(true);
+        //String path = containerRequest.getPath(true);
         if (method.equals("GET")) // && path.endsWith("metadata")) // skip auth for now
             return containerRequest;
-
+        
         // Get the authentication passed in HTTP headers parameters
         String auth = containerRequest.getHeaderValue("authorization");
         if (auth == null)

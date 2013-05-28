@@ -1,4 +1,4 @@
-package org.opentripplanner.api.standalone;
+package org.opentripplanner.standalone;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -13,6 +13,7 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.sun.jersey.core.spi.component.ComponentContext;
 import com.sun.jersey.core.spi.component.ComponentScope;
@@ -92,7 +93,8 @@ public class OTPComponentProviderFactory implements IoCComponentProviderFactory 
             LOG.debug("Performing field injection on class {}", instance.getClass());
             for (Field field : instance.getClass().getDeclaredFields()) {
                 LOG.debug("Considering field {} for injection", field.getName());
-                if (field.isAnnotationPresent(Inject.class)) {
+                if (field.isAnnotationPresent(Inject.class) ||
+                    field.isAnnotationPresent(Autowired.class)) { // since we're still using Spring
                     Object obj = bindings.get(field.getType());
                     LOG.debug("Injecting field {} on instance of {}", 
                               field.getName(), instance.getClass());

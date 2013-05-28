@@ -1,4 +1,4 @@
-package org.opentripplanner.api.standalone;
+package org.opentripplanner.standalone;
 
 import org.opentripplanner.analyst.core.GeometryIndex;
 import org.opentripplanner.analyst.request.SPTCache;
@@ -6,10 +6,8 @@ import org.opentripplanner.analyst.request.SampleFactory;
 import org.opentripplanner.analyst.request.TileCache;
 import org.opentripplanner.api.ws.PlanGenerator;
 import org.opentripplanner.api.ws.services.MetadataService;
-import org.opentripplanner.jsonp.JsonpCallbackFilter;
 import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl;
 import org.opentripplanner.routing.impl.GraphServiceImpl;
 import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
@@ -35,7 +33,6 @@ public class OTPConfigurator {
         cpf.bind(RoutingRequest.class);
         cpf.bind(PlanGenerator.class);
         cpf.bind(MetadataService.class);
-        cpf.bind(JsonpCallbackFilter.class);
         cpf.bind(GraphService.class, makeGraphService(args));
         cpf.bind(SPTService.class, new GenericAStar());
         cpf.bind(PathService.class, pathService);

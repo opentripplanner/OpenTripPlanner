@@ -11,7 +11,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.api.standalone;
+package org.opentripplanner.standalone;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,9 +22,9 @@ import org.slf4j.LoggerFactory;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 
-public class OTPRunner {
+public class OTPMain {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OTPRunner.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OTPMain.class);
 
     @Parameter(names = { "-h", "--help"}, description = "Print this help message and exit", help = true)
     private boolean help;
@@ -35,26 +35,29 @@ public class OTPRunner {
     @Parameter(names = { "-p", "--port"}, description = "server port")
     private int port = 8080;
 
-    @Parameter(names = { "-g", "--graph"}, description = "path to graph directory")
+    @Parameter(names = { "-g", "--graphs"}, description = "path to graph directory")
     private String graphDirectory = "/var/otp/graphs";
     
     @Parameter(names = { "-r", "--router"}, description = "default router ID")
     private String defaultRouterId = "";
 
-    @Parameter(names = { "-s", "--server"}, description = "whether or not to start a server")
+    @Parameter(names = { "-b", "--buildonly"}, description = "build graph but do not start server")
     private boolean startServer = true;
 
-    @Parameter(description = "Files") // the rest of the parameters in one array
+    @Parameter(names = { "-s", "--static"}, description = "path to static content")
+    private boolean staticDirectory = true;
+
+    @Parameter(description = "files") // the rest of the parameters in one array
     private List<String> files = new ArrayList<String>();
 
     public static void main(String[] args) {
-        OTPRunner runner = new OTPRunner();
-        JCommander jc = new JCommander(runner, args);
-        if (runner.help) {
+        OTPMain main = new OTPMain();
+        JCommander jc = new JCommander(main, args);
+        if (main.help) {
             jc.usage();
             System.exit(0);
         }
-        runner.run();
+        main.run();
     }
     
     private void run() {

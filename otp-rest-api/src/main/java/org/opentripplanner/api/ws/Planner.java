@@ -20,6 +20,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import lombok.Setter;
+
 import org.codehaus.jettison.json.JSONException;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.api.model.TripPlan;
@@ -27,8 +29,8 @@ import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import com.sun.jersey.api.core.InjectParam;
 import com.sun.jersey.api.spring.Autowire;
 
 /**
@@ -52,9 +54,13 @@ import com.sun.jersey.api.spring.Autowire;
 public class Planner extends RoutingResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(Planner.class);
-    @Autowired public PlanGenerator planGenerator;
+    
+    @Setter @InjectParam 
+    public PlanGenerator planGenerator;
+    
     // We inject info about the incoming request so we can include the incoming query 
     // parameters in the outgoing response. This is a TriMet requirement.
+    // Jersey seems to use @Context to inject internal types and @InjectParam or @Resource for DI objects.
     @Context UriInfo uriInfo;
     
     /** Java is immensely painful. TODO: Guava should cover this. */

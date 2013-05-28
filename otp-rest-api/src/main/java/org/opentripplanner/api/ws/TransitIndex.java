@@ -28,6 +28,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import lombok.Setter;
+
 import org.codehaus.jettison.json.JSONException;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
@@ -64,8 +66,8 @@ import org.opentripplanner.routing.transit_index.adapters.TripType;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
+import com.sun.jersey.api.core.InjectParam;
 import com.sun.jersey.api.spring.Autowire;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -81,14 +83,10 @@ public class TransitIndex {
 
     private static final double STOP_SEARCH_RADIUS = 200;
 
+    @Setter @InjectParam 
     private GraphService graphService;
 
     private static final long MAX_STOP_TIME_QUERY_INTERVAL = 86400 * 2;
-
-    @Autowired
-    public void setGraphService(GraphService graphService) {
-        this.graphService = graphService;
-    }
 
     /**
      * Return a list of all agency ids in the graph

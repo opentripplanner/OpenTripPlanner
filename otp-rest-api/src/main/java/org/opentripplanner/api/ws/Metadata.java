@@ -25,6 +25,7 @@ import org.codehaus.jettison.json.JSONException;
 import org.opentripplanner.api.ws.services.MetadataService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.sun.jersey.api.core.InjectParam;
 import com.sun.jersey.api.spring.Autowire;
 
 @Path("/metadata")
@@ -32,7 +33,7 @@ import com.sun.jersey.api.spring.Autowire;
 @Autowire
 public class Metadata {
 
-    @Autowired 
+    @InjectParam
     private MetadataService metadataService;
     
     /**

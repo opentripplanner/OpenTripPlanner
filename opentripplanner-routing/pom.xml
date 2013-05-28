@@ -57,11 +57,13 @@
             <artifactId>javassist</artifactId>
             <version>3.8.0.GA</version>
         </dependency>
+        <!--  
         <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.6.16</version>
         </dependency>
+        -->
         <dependency>
             <groupId>org.onebusaway</groupId>
             <artifactId>onebusaway-gtfs</artifactId>
