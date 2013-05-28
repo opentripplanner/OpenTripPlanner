@@ -31,7 +31,7 @@ import com.vividsolutions.jts.geom.LineString;
 public class FrequencyAlight extends Edge  implements OnBoardReverseEdge {
     private static final long serialVersionUID = 3388162982920747289L;
 
-    private static final Logger _log = LoggerFactory.getLogger(FrequencyAlight.class);
+    private static final Logger LOG = LoggerFactory.getLogger(FrequencyAlight.class);
             
     private int stopIndex;
     private FrequencyBasedTripPattern pattern;
@@ -114,7 +114,7 @@ public class FrequencyAlight extends Edge  implements OnBoardReverseEdge {
                         
                         int wait = (int) (currentTime - sd.time(startTime));
                         if (wait < 0)
-                            _log.error("negative wait time on alight");
+                            LOG.error("negative wait time on alight");
                         if (bestWait < 0 || wait < bestWait) {
                             // track the soonest departure over all relevant schedules
                             bestWait = wait;

@@ -112,7 +112,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
 
     private static final long serialVersionUID = 20120229L;
 
-    private static final Logger _log = LoggerFactory.getLogger(DefaultFareServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultFareServiceImpl.class);
 
     protected HashMap<AgencyAndId, FareRuleSet> fareRules;
 
@@ -194,7 +194,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
             for (int j = 0; j < rides.size() - i; j++) {
                 float cost = calculateCost(rides.subList(j, j + i + 1));
                 if (cost < 0) {
-                    _log.error("negative cost for a ride sequence");
+                    LOG.error("negative cost for a ride sequence");
                     cost = Float.POSITIVE_INFINITY;
                 }
                 resultTable[j][j + i] = cost;
@@ -223,7 +223,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         long lastRideEndTime = firstRide.endTime;
         for (Ride ride : rides) {
             if ( ! ride.firstStop.getId().getAgencyId().equals(feedId)) {
-                _log.debug("skipped multi-feed ride sequence {}", rides);
+                LOG.debug("skipped multi-feed ride sequence {}", rides);
                 return Float.POSITIVE_INFINITY;
             }
             lastRideStartTime = ride.startTime;
@@ -266,10 +266,10 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
                 }
             }
         }
-        _log.debug("{} best for {}", bestAttribute, rides);
+        LOG.debug("{} best for {}", bestAttribute, rides);
 
         if (bestFare == Float.POSITIVE_INFINITY)
-            _log.warn("No fare for a ride sequence: {}", rides);
+            LOG.warn("No fare for a ride sequence: {}", rides);
 
         return bestFare;
 

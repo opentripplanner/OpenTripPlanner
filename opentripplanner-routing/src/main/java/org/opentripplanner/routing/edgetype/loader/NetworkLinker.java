@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 
 public class NetworkLinker {
 
-    private static Logger _log = LoggerFactory.getLogger(NetworkLinker.class);
+    private static Logger LOG = LoggerFactory.getLogger(NetworkLinker.class);
 
     private Graph graph;
 
@@ -63,7 +63,7 @@ public class NetworkLinker {
      */
     public void createLinkage() {
 
-        _log.debug("creating linkages...");
+        LOG.debug("creating linkages...");
         // iterate over a copy of vertex list because it will be modified
         ArrayList<Vertex> vertices = new ArrayList<Vertex>();
         vertices.addAll(graph.getVertices());
@@ -84,7 +84,7 @@ public class NetworkLinker {
             if (ts.isEntrance() || !ts.hasEntrances()) {
                 boolean wheelchairAccessible = ts.hasWheelchairEntrance();
                 if (!networkLinkerLibrary.connectVertexToStreets(ts, wheelchairAccessible).getResult()) {
-                    _log.warn(graph.addBuilderAnnotation(new StopUnlinked(ts)));
+                    LOG.warn(graph.addBuilderAnnotation(new StopUnlinked(ts)));
                 }
             }
         }
@@ -115,11 +115,11 @@ public class NetworkLinker {
         networkLinkerLibrary.markLocalStops();
         FindMaxWalkDistances.find(graph);
         
-        _log.debug("Linking bike rental stations...");
+        LOG.debug("Linking bike rental stations...");
         for (BikeRentalStationVertex brsv : IterableLibrary.filter(vertices,
                 BikeRentalStationVertex.class)) {
             if (!networkLinkerLibrary.connectVertexToStreets(brsv).getResult()) {
-                _log.warn(graph.addBuilderAnnotation(new BikeRentalStationUnlinked(brsv)));
+                LOG.warn(graph.addBuilderAnnotation(new BikeRentalStationUnlinked(brsv)));
             }
         }
     }

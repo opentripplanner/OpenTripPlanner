@@ -54,7 +54,7 @@ enum NycFareState {
  * (3) MNR, LIRR, and LI Bus are not supported -- only subways and buses   
  */
 public class NycFareServiceImpl implements FareService, Serializable {
-        private static final Logger _log = LoggerFactory.getLogger(NycFareServiceImpl.class);
+        private static final Logger LOG = LoggerFactory.getLogger(NycFareServiceImpl.class);
 
 	private static final long serialVersionUID = 1L;
 
@@ -285,7 +285,7 @@ public class NycFareServiceImpl implements FareService, Serializable {
 					state = NycFareState.SUBWAY_POST_TRANSFER;
 				} else if (ride.classifier.equals(SIR)) {
 					/* should not happen, and unhandled */
-					_log.warn("Should not transfer from SIR to SIR");
+					LOG.warn("Should not transfer from SIR to SIR");
 				} else if (ride.classifier.equals(LOCAL_BUS)) {
 					if (!SIR_BONUS_ROUTES.contains(ride.route)) {
 						totalFare += ORDINARY_FARE;
@@ -306,7 +306,7 @@ public class NycFareServiceImpl implements FareService, Serializable {
 					state = NycFareState.SUBWAY_PRE_TRANSFER;
 				} else if (ride.classifier.equals(SIR)) {
 					/* should not happen, and unhandled */
-					_log.warn("Should not transfer from SIR to SIR");
+					LOG.warn("Should not transfer from SIR to SIR");
 				} else if (ride.classifier.equals(LOCAL_BUS)) {
 					if (!ride.route.getId().startsWith("S")) {
 						totalFare += ORDINARY_FARE;

@@ -32,7 +32,7 @@ import lombok.Data;
 
 @Data
 public class WayPropertySet {
-    private static Logger _log = LoggerFactory.getLogger(WayPropertySet.class);
+    private static Logger LOG = LoggerFactory.getLogger(WayPropertySet.class);
 
     private List<WayPropertyPicker> wayProperties;
 
@@ -131,7 +131,7 @@ public class WayPropertySet {
         if ((bestLeftScore == 0 || bestRightScore == 0)
                 && (leftMixins.size() == 0 || rightMixins.size() == 0)) {
             String all_tags = dumpTags(way);
-            _log.debug("Used default permissions: " + all_tags);
+            LOG.debug("Used default permissions: " + all_tags);
         }
         return result;
     }
@@ -218,7 +218,7 @@ public class WayPropertySet {
         // this would be bad, as the segment could never be traversed by an automobile
         // The small epsilon is to account for possible rounding errors
         if (speed != null && speed < 0.0001)
-            _log.warn("Zero or negative automobile speed detected at {} based on OSM " +
+            LOG.warn("Zero or negative automobile speed detected at {} based on OSM " +
             		"maxspeed tags; ignoring these tags", this);
         
         // if there was a defined speed and it's not 0, we're done
@@ -326,7 +326,7 @@ public class WayPropertySet {
         try {
             originalUnits = (float) Double.parseDouble(m.group(1));
         } catch (NumberFormatException e) {
-            _log.warn("Could not parse max speed {}", m.group(1));
+            LOG.warn("Could not parse max speed {}", m.group(1));
             return null;
         }
         

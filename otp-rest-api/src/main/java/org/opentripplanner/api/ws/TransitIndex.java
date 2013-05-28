@@ -79,7 +79,7 @@ import com.vividsolutions.jts.geom.Envelope;
 @Autowire
 public class TransitIndex {
 
-    private static final Logger _log = LoggerFactory.getLogger(TransitIndex.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TransitIndex.class);
 
     private static final double STOP_SEARCH_RADIUS = 200;
 

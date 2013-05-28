@@ -42,39 +42,39 @@ public class GraphCoherencyChecker implements GraphBuilder {
         return Arrays.asList("streets");
     }
     
-    private static final Logger _log = LoggerFactory.getLogger(GraphCoherencyChecker.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GraphCoherencyChecker.class);
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         boolean coherent = true;
-        _log.info("checking graph coherency...");
+        LOG.info("checking graph coherency...");
         for (Vertex v : graph.getVertices()) {
             if (v.getOutgoing().isEmpty() && v.getIncoming().isEmpty()) {
-                _log.error("vertex {} has no edges", v);
+                LOG.error("vertex {} has no edges", v);
                 coherent = false;
             }
             for (Edge e : v.getOutgoing()) {
                 if (e.getFromVertex() != v) {
-                    _log.error("outgoing edge of {}: from vertex {} does not match", v, e);
+                    LOG.error("outgoing edge of {}: from vertex {} does not match", v, e);
                     coherent = false;
                 }
                 if (e.getToVertex() == null) {
-                    _log.error("outgoing edge has no to vertex {}", e);
+                    LOG.error("outgoing edge has no to vertex {}", e);
                     coherent = false;
                 }
             }
             for (Edge e : v.getIncoming()) {
                 if (e.getFromVertex() == null) {
-                    _log.error("incoming edge has no from vertex {}", e);
+                    LOG.error("incoming edge has no from vertex {}", e);
                     coherent = false;
                 }
                 if (e.getToVertex() != v) {
-                    _log.error("incoming edge of {}: to vertex {} does not match", v, e);
+                    LOG.error("incoming edge of {}: to vertex {} does not match", v, e);
                     coherent = false;
                 }
             }
         }
-        _log.info("edge lists and from/to members are {}coherent.", coherent ? "": "not ");
+        LOG.info("edge lists and from/to members are {}coherent.", coherent ? "": "not ");
     }
 
     @Override

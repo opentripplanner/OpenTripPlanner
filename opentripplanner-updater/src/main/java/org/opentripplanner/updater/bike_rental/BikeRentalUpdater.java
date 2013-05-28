@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class BikeRentalUpdater implements Runnable {
-    private static final Logger _log = LoggerFactory.getLogger(BikeRentalUpdater.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BikeRentalUpdater.class);
 
     Map<BikeRentalStation, BikeRentalStationVertex> verticesByStation = new HashMap<BikeRentalStation, BikeRentalStationVertex>();
 
@@ -80,14 +80,14 @@ public class BikeRentalUpdater implements Runnable {
         graph = graphService.getGraph(routerId); // Handle null routerId.
         if (graph == null && setup) {
             // We temporary disable the updater: no graph ready (yet).
-            _log.error("Can't get graph for router ID {}, disabling updater.", routerId);
+            LOG.error("Can't get graph for router ID {}, disabling updater.", routerId);
             networkLinkerLibrary = null;
             service = null;
             setup = false;
         }
         if (graph != null && !setup) {
             // A graph is available, setting up.
-            _log.info("Setting up updater for router ID {}.", routerId);
+            LOG.info("Setting up updater for router ID {}.", routerId);
             networkLinkerLibrary = new NetworkLinkerLibrary(graph,
                     Collections.<Class<?>, Object> emptyMap());
             service = graph.getService(BikeRentalStationService.class);
@@ -110,9 +110,9 @@ public class BikeRentalUpdater implements Runnable {
             // Updater has been disabled (no graph available).
             return;
         }
-        _log.debug("Updating bike rental stations from " + source);
+        LOG.debug("Updating bike rental stations from " + source);
         if (!source.update()) {
-            _log.debug("No updates");
+            LOG.debug("No updates");
             return;
         }
         List<BikeRentalStation> stations = source.getStations();

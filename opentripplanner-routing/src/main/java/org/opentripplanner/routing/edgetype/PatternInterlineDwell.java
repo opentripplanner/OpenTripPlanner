@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 import com.vividsolutions.jts.geom.LineString;
 
 public class PatternInterlineDwell extends Edge implements OnBoardForwardEdge, OnBoardReverseEdge {
-    private static final Logger _log = LoggerFactory.getLogger(PatternInterlineDwell.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PatternInterlineDwell.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -56,7 +56,7 @@ public class PatternInterlineDwell extends Edge implements OnBoardForwardEdge, O
             int oldPatternIndex, int newPatternIndex) {
         if (dwellTime < 0) {
 	    dwellTime = 0;
-            _log.warn ("Negative dwell time for trip " + trip.getAgencyId() + " " + trip.getId() + "(forcing to zero)");
+            LOG.warn ("Negative dwell time for trip " + trip.getAgencyId() + " " + trip.getId() + "(forcing to zero)");
         }
         tripIdToInterlineDwellData.put(trip, new InterlineDwellData(dwellTime, newPatternIndex, reverseTrip));
         reverseTripIdToInterlineDwellData.put(reverseTrip, new InterlineDwellData(dwellTime,

@@ -56,7 +56,7 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class LinkRequest {
 
-    private static Logger _log = LoggerFactory.getLogger(LinkRequest.class);
+    private static Logger LOG = LoggerFactory.getLogger(LinkRequest.class);
 
     NetworkLinkerLibrary linker;
     
@@ -125,7 +125,7 @@ public class LinkRequest {
         CandidateEdgeBundle edges = linker.index.getClosestEdges(location, reqs, null, nearbyRouteEdges, true);
         if (edges == null || edges.size() < 1) {
             // no edges were found nearby, or a bidirectional/loop bundle of edges was not identified
-            _log.debug("found too few edges: {} {}", v.getName(), v.getCoordinate());
+            LOG.debug("found too few edges: {} {}", v.getName(), v.getCoordinate());
             return null;
         }
         // if the bundle was caught endwise (T intersections and dead ends), 

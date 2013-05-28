@@ -31,7 +31,7 @@ import com.vividsolutions.jts.geom.LineString;
 public class FrequencyBoard extends Edge implements OnBoardForwardEdge, PatternEdge {
     private static final long serialVersionUID = 7919511656529752927L;
 
-    private static final Logger _log = LoggerFactory.getLogger(FrequencyBoard.class);
+    private static final Logger LOG = LoggerFactory.getLogger(FrequencyBoard.class);
             
     private int stopIndex;
     private FrequencyBasedTripPattern pattern;
@@ -129,7 +129,7 @@ public class FrequencyBoard extends Edge implements OnBoardForwardEdge, PatternE
                         
                         int wait = (int) (sd.time(startTime) - currentTime);
                         if (wait < 0)
-                            _log.error("negative wait time on board");
+                            LOG.error("negative wait time on board");
                         if (bestWait < 0 || wait < bestWait) {
                             // track the soonest departure over all relevant schedules
                             bestWait = wait;

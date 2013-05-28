@@ -50,7 +50,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
 
     private static final long serialVersionUID = 1042740795612978747L;
 
-    private static final Logger _log = LoggerFactory.getLogger(TransitBoardAlight.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TransitBoardAlight.class);
 
     private int stopIndex;
 
@@ -164,7 +164,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
 
                 s1.setInitialWaitTimeSeconds(wait);
 
-                //_log.debug("Initial wait time set to {} in PatternBoard", wait);
+                //LOG.debug("Initial wait time set to {} in PatternBoard", wait);
             }
             
             // during reverse optimization, board costs should be applied to PatternBoards
@@ -239,7 +239,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
                             (int)(current_time - sd.time(tripTimes.getArrivalTime(stopIndex)));
                         // a trip was found and the index is valid, so the wait should be non-negative
                         if (wait < 0)
-                            _log.error("negative wait time on board");
+                            LOG.error("negative wait time on board");
                         if (bestWait < 0 || wait < bestWait) {
                             // track the soonest departure over all relevant schedules
                             bestWait = wait;
@@ -312,7 +312,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
                 // it is re-reversed by optimize, so this still yields a forward tree
                 State optimized = s1.makeState().optimizeOrReverse(true, true);
                 if (optimized == null)
-                    _log.error("Null optimized state. This shouldn't happen");
+                    LOG.error("Null optimized state. This shouldn't happen");
                 return optimized;
             }
             

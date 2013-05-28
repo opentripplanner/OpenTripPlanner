@@ -48,7 +48,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 
 public class LocalStopFinder {
 
-    private final static Logger _log = LoggerFactory.getLogger(LocalStopFinder.class);
+    private final static Logger LOG = LoggerFactory.getLogger(LocalStopFinder.class);
 
     private static final double MAX_SUBOPTIMAL_DISTANCE = 100; /* allow a slop of ~10 seconds */
 
@@ -76,7 +76,7 @@ public class LocalStopFinder {
     }
 
     public void markLocalStops() {
-        _log.debug("Finding local stops");
+        LOG.debug("Finding local stops");
         patterns = new HashSet<TripPattern>();
         transitStops = new HashMap<AgencyAndId, TransitStop>();
         int total = 0;
@@ -186,7 +186,7 @@ public class LocalStopFinder {
             transitStop.setLocal(false);
 
         }
-        _log.debug("Local stops: " + (total - nonLocal) + " / " + total);
+        LOG.debug("Local stops: " + (total - nonLocal) + " / " + total);
     }
 
     private HashMap<TripPattern, P2<Double>> getNeighborhood(Stop stop) {
