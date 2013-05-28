@@ -45,7 +45,7 @@ public class OTPMain {
     private boolean startServer = true;
 
     @Parameter(names = { "-s", "--static"}, description = "path to static content")
-    private boolean staticDirectory = true;
+    private String staticDirectory = "/var/otp/static";
 
     @Parameter(description = "files") // the rest of the parameters in one array
     private List<String> files = new ArrayList<String>();
