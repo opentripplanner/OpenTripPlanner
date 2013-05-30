@@ -634,6 +634,82 @@ otp.widgets.tripoptions.PreferredRoutes =
         
 });
 
+
+//** BannedRoutes **//
+
+otp.widgets.tripoptions.BannedRoutes = 
+    otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
+    
+    id           :  null,
+    
+    selectorWidget : null,
+       
+    initialize : function(tripWidget) {
+        var this_ = this;
+        otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
+        this.id = tripWidget.id+"-bannedRoutes";
+        
+        var html = '<div class="notDraggable">';
+        var html = '<div style="float:right; font-size: 12px;"><button id="'+this.id+'-button">Edit..</button></div>';
+        html += 'Banned Routes: <span id="'+this.id+'-list">(None)</span>';
+        html += '<div style="clear:both;"></div></div>';
+        
+        $(html).appendTo(this.$());
+
+        this.selectorWidget = new otp.widgets.RoutesSelectorWidget(this.id+"-selectorWidget", this, "Banned Routes");
+    },
+
+    doAfterLayout : function() {
+        var this_ = this;
+        $('#'+this.id+'-button').button().click(function() {
+            this_.selectorWidget.updateRouteList();
+            this_.selectorWidget.show();
+            this_.selectorWidget.bringToFront();
+        });
+    },
+
+    setRoutes : function(paramStr, displayStr) {
+        this.tripWidget.module.bannedRoutes = paramStr;
+        $('#'+this.id+'-list').html(displayStr);
+    },
+    
+    restorePlan : function(planData) {
+        if(planData.queryParams.bannedRoutes) {
+            var this_ = this;
+            
+            var restoredIds = [];
+            var bannedRoutesArr = planData.queryParams.bannedRoutes.split(',');
+
+            // convert the API's agency_name_id format to standard agency_id
+            for(var i=0; i < bannedRoutesArr.length; i++) {
+                var apiIdArr = bannedRoutesArr[i].split("_");
+                var agencyAndId = apiIdArr[0] + "_" + apiIdArr.pop();
+                restoredIds.push(agencyAndId);
+            }
+            this.selectorWidget.restoredRouteIds = restoredIds;
+            this.tripWidget.module.bannedRoutes = planData.queryParams.bannedRoutes;
+            
+            // resolve the IDs to user-friendly names
+            var ti = this.tripWidget.module.webapp.transitIndex;
+            ti.loadRoutes(this, function() {
+                var routeNames = [];
+                for(var i = 0; i < restoredIds.length; i++) {
+                    var route = ti.routes[restoredIds[i]].routeData;
+                    routeNames.push(route.routeShortName || route.routeLongName);
+                }
+                $('#'+this_.id+'-list').html(routeNames.join(', '));
+            });
+            
+        }
+    },
+    
+    isApplicableForMode : function(mode) {
+        return otp.util.Itin.includesTransit(mode);
+    }      
+        
+});
+
+
 //** BikeTriangle **//
 
 otp.widgets.tripoptions.BikeTriangle = 
