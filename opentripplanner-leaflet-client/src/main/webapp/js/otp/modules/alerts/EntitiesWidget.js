@@ -38,18 +38,18 @@ otp.modules.alerts.EntitiesWidget =
         .append('<li><a href="#'+id+'-stopsTab">Stops</a></li>');
         
         this.routesDiv = $('<div id="'+id+'-routesTab" />').addClass('otp-alerts-entitiesWidget-tabPanel').appendTo(tabPanel)
-        this.routesSelect = $('<select multiple />').addClass('otp-alerts-entitiesWidget-select').appendTo(this.routesDiv);
+        //this.routesSelect = $('<select multiple />').addClass('otp-alerts-entitiesWidget-select').appendTo(this.routesDiv);
 
         this.stopsDiv = $('<div id="'+id+'-stopsTab" />').addClass('otp-alerts-entitiesWidget-tabPanel').appendTo(tabPanel);
-        this.stopsSelect = $('<select multiple />').addClass('otp-alerts-entitiesWidget-select').appendTo(this.stopsDiv);
+        //this.stopsSelect = $('<select multiple />').addClass('otp-alerts-entitiesWidget-select').appendTo(this.stopsDiv);
         
         tabPanel.tabs();
         
-        var buttonRow = $('<div>').addClass('otp-alerts-entitiesWidget-buttonRow').appendTo(this.mainDiv)
+        /*var buttonRow = $('<div>').addClass('otp-alerts-entitiesWidget-buttonRow').appendTo(this.mainDiv)
         
         $('<button>Create Alert</button>').button().appendTo(buttonRow).click(function() {
             this_.createAlert();
-        });
+        });*/
         
         this.refreshRoutes();
         
@@ -60,6 +60,33 @@ otp.modules.alerts.EntitiesWidget =
         var ti = this.module.webapp.transitIndex
         this.routesLookup = [];
         ti.loadRoutes(this, function() {
+            this_.routesDiv.empty();
+            var i = 0;
+            for(var routeId in ti.routes) {
+                var route = ti.routes[routeId];
+                //this_.routesSelect.append('<option value="'+i+'">'+otp.util.Itin.getRouteDisplayString(route.routeData)+'</option>');
+                ich['otp-alerts-routeRow'](route.routeData).appendTo(this_.routesDiv)
+                .data('routeId', route.routeData.id)
+                .draggable({
+                    helper: 'clone',
+                    revert: 'invalid',
+                    drag: function(event,ui){ 
+                        this_.bringToFront();
+                        $(ui.helper).css("border", '2px solid gray');
+                    }                    
+                })
+                .hover(function(evt) {
+                    var routeId = $(this).data('routeId');
+                    this_.module.highlightRoute(routeId.agencyId+"_"+routeId.id);
+                }, function(evt) {
+                    this_.module.clearHighlights();
+                });
+                this.routesLookup[i] = route;
+                i++;
+            }
+        });
+
+        /*ti.loadRoutes(this, function() {
             this_.routesSelect.empty();
             var i = 0;
             for(var routeId in ti.routes) {
@@ -68,19 +95,37 @@ otp.modules.alerts.EntitiesWidget =
                 this.routesLookup[i] = route;
                 i++;
             }
-        });
+        });*/
     },
 
     updateStops : function(stopArray) {
         var this_ = this;
-        if(!jQuery.contains(this.stopsDiv, this.stopsSelect)) {
+        /*if(!jQuery.contains(this.stopsDiv, this.stopsSelect)) {
             this.stopsDiv.empty();
             this.stopsDiv.append(this.stopsSelect);    
-        }
-        this.stopsSelect.empty();
+        }*/
+        //this.stopsSelect.empty();
+        this.stopsDiv.empty();
         for(var i = 0; i < stopArray.length; i++) {
             var stop = stopArray[i];
-            this_.stopsSelect.append('<option value="'+i+'">('+stop.id.agencyId+'_'+stop.id.id+') '+stop.stopName+'</option>');                       
+            ich['otp-alerts-stopRow'](stop).appendTo(this_.stopsDiv)
+            .data('stop', stop)
+            .data('stopId', stop.id)
+            .draggable({
+                helper: 'clone',
+                revert: 'invalid',
+                drag: function(event,ui){ 
+                    this_.bringToFront();
+                    $(ui.helper).css("border", '2px solid gray');
+                }                    
+            })
+            .hover(function(evt) {
+                this_.module.highlightStop($(this).data('stop'));
+            }, function(evt) {
+                this_.module.clearHighlights();
+            });
+
+            //this_.stopsSelect.append('<option value="'+i+'">('+stop.id.agencyId+'_'+stop.id.id+') '+stop.stopName+'</option>');                       
         }
         this.stopsLookup = stopArray;
     },
@@ -89,7 +134,7 @@ otp.modules.alerts.EntitiesWidget =
         this.stopsDiv.empty().html(text);
     },
     
-    createAlert : function() {
+    /*createAlert : function() {
 
         var routes = [];
         var routeIndices = this.routesSelect.val();
@@ -109,6 +154,6 @@ otp.modules.alerts.EntitiesWidget =
             }
         }
                 
-        this.module.newAlert(routes, stops);
-    },
+        this.module.newAlertWidget(routes, stops);
+    },*/
 });

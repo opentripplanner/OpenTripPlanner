@@ -282,7 +282,7 @@ otp.widgets.ItinerariesWidget =
                 width: widthPx,
                 left: leftPx,
                 //background: this.getModeColor(leg.mode)
-                background: this.getModeColor(leg.mode)+' url(images/mode/'+leg.mode.toLowerCase()+'.png) center no-repeat'
+                background: this.getModeColor(leg.mode)+' url('+otp.config.resourcePath+'images/mode/'+leg.mode.toLowerCase()+'.png) center no-repeat'
             })
             .appendTo(div);
             if(showRouteLabel) segment.append('<div style="margin-left:'+(widthPx/2+9)+'px;">'+leg.routeShortName+'</div>');
@@ -586,7 +586,7 @@ otp.widgets.ItinerariesWidget =
                 var html = '<div id="foo-'+i+'" class="otp-itin-step-row">';
                 html += '<div class="otp-itin-step-icon">';
                 if(step.relativeDirection)
-                    html += '<img src="images/directions/' +
+                    html += '<img src="'+otp.config.resourcePath+'images/directions/' +
                         step.relativeDirection.toLowerCase()+'.png">';
                 html += '</div>';                
                 var distArr= otp.util.Itin.distanceString(step.distance).split(" ");

@@ -14,10 +14,11 @@
 
 otp.namespace("otp.modules.planner");
 
+var resourcePath = otp.config.resourcePath || "";
 
 var StartFlagIcon = L.Icon.extend({
     options: {
-        iconUrl: 'images/marker-flag-start-shadowed.png',
+        iconUrl: resourcePath + 'images/marker-flag-start-shadowed.png',
         shadowUrl: null,
         iconSize: new L.Point(48, 49),
         iconAnchor: new L.Point(46, 42),
@@ -27,7 +28,7 @@ var StartFlagIcon = L.Icon.extend({
 
 var EndFlagIcon = L.Icon.extend({
     options: {
-        iconUrl: 'images/marker-flag-end-shadowed.png',
+        iconUrl: resourcePath + 'images/marker-flag-end-shadowed.png',
         shadowUrl: null,
         iconSize: new L.Point(48, 49),
         iconAnchor: new L.Point(46, 42),
@@ -38,7 +39,7 @@ var EndFlagIcon = L.Icon.extend({
 
 var StartBikeIcon = L.Icon.extend({
     options: {
-        iconUrl: 'images/marker-bike-green-shadowed.png',
+        iconUrl: resourcePath + 'images/marker-bike-green-shadowed.png',
         shadowUrl: null,
         iconSize: new L.Point(25, 39),
         iconAnchor: new L.Point(12, 36),
@@ -48,7 +49,7 @@ var StartBikeIcon = L.Icon.extend({
 
 var EndBikeIcon = L.Icon.extend({
     options: {
-        iconUrl: 'images/marker-bike-red-shadowed.png',
+        iconUrl: resourcePath + 'images/marker-bike-red-shadowed.png',
         shadowUrl: null,
         iconSize: new L.Point(25, 39),
         iconAnchor: new L.Point(12, 36),
@@ -59,7 +60,7 @@ var EndBikeIcon = L.Icon.extend({
 
 var SmallBlueIcon = L.Icon.extend({
     options: {
-        iconUrl: 'images/marker-blue-sm.png',
+        iconUrl: resourcePath + 'images/marker-blue-sm.png',
         shadowUrl: null,
         iconSize: new L.Point(9, 16),
         iconAnchor: new L.Point(5, 16),
@@ -69,7 +70,7 @@ var SmallBlueIcon = L.Icon.extend({
 
 var MediumBlueIcon = L.Icon.extend({
     options: {
-        iconUrl: 'images/marker-blue-med.png',
+        iconUrl: resourcePath + 'images/marker-blue-med.png',
         shadowUrl: null,
         iconSize: new L.Point(13, 23),
         iconAnchor: new L.Point(7, 23),
@@ -79,7 +80,7 @@ var MediumBlueIcon = L.Icon.extend({
 
 var BlueNubIcon = L.Icon.extend({
     options: {
-        iconUrl: 'images/marker-blue-nub.png',
+        iconUrl: resourcePath + 'images/marker-blue-nub.png',
         shadowUrl: null,
         iconSize: new L.Point(11, 8),
         iconAnchor: new L.Point(5, 8),
@@ -90,7 +91,7 @@ var BlueNubIcon = L.Icon.extend({
 
 var SmallIcon0Pct = L.Icon.extend({
     options: {
-        iconUrl: 'images/marker-sm-0pct.png',
+        iconUrl: resourcePath + 'images/marker-sm-0pct.png',
         shadowUrl: null,
         iconSize: new L.Point(11, 8),
         iconAnchor: new L.Point(5, 8),
@@ -100,7 +101,7 @@ var SmallIcon0Pct = L.Icon.extend({
 
 var SmallIcon25Pct = L.Icon.extend({
     options: {
-        iconUrl: 'images/marker-sm-25pct.png',
+        iconUrl: resourcePath + 'images/marker-sm-25pct.png',
         shadowUrl: null,
         iconSize: new L.Point(11, 8),
         iconAnchor: new L.Point(5, 8),
@@ -110,7 +111,7 @@ var SmallIcon25Pct = L.Icon.extend({
 
 var SmallIcon50Pct = L.Icon.extend({
     options: {
-        iconUrl: 'images/marker-sm-50pct.png',
+        iconUrl: resourcePath + 'images/marker-sm-50pct.png',
         shadowUrl: null,
         iconSize: new L.Point(11, 8),
         iconAnchor: new L.Point(5, 8),
@@ -120,7 +121,7 @@ var SmallIcon50Pct = L.Icon.extend({
 
 var SmallIcon75Pct = L.Icon.extend({
     options: {
-        iconUrl: 'images/marker-sm-75pct.png',
+        iconUrl: resourcePath + 'images/marker-sm-75pct.png',
         shadowUrl: null,
         iconSize: new L.Point(11, 8),
         iconAnchor: new L.Point(5, 8),
@@ -130,7 +131,7 @@ var SmallIcon75Pct = L.Icon.extend({
 
 var SmallIcon100Pct = L.Icon.extend({
     options: {
-        iconUrl: 'images/marker-sm-100pct.png',
+        iconUrl: resourcePath + 'images/marker-sm-100pct.png',
         shadowUrl: null,
         iconSize: new L.Point(11, 8),
         iconAnchor: new L.Point(5, 8),
@@ -141,7 +142,7 @@ var SmallIcon100Pct = L.Icon.extend({
 
 var MediumIcon0Pct = L.Icon.extend({
     options: {
-        iconUrl: 'images/marker-med-0pct.png',
+        iconUrl: resourcePath + 'images/marker-med-0pct.png',
         shadowUrl: null,
         iconSize: new L.Point(9, 16),
         iconAnchor: new L.Point(5, 16),
@@ -151,7 +152,7 @@ var MediumIcon0Pct = L.Icon.extend({
 
 var MediumIcon25Pct = L.Icon.extend({
     options: {
-        iconUrl: 'images/marker-med-25pct.png',
+        iconUrl: resourcePath + 'images/marker-med-25pct.png',
         shadowUrl: null,
         iconSize: new L.Point(9, 16),
         iconAnchor: new L.Point(5, 16),
@@ -161,7 +162,7 @@ var MediumIcon25Pct = L.Icon.extend({
 
 var MediumIcon50Pct = L.Icon.extend({
     options: {
-        iconUrl: 'images/marker-med-50pct.png',
+        iconUrl: resourcePath + 'images/marker-med-50pct.png',
         shadowUrl: null,
         iconSize: new L.Point(9, 16),
         iconAnchor: new L.Point(5, 16),
@@ -171,7 +172,7 @@ var MediumIcon50Pct = L.Icon.extend({
 
 var MediumIcon75Pct = L.Icon.extend({
     options: {
-        iconUrl: 'images/marker-med-75pct.png',
+        iconUrl: resourcePath + 'images/marker-med-75pct.png',
         shadowUrl: null,
         iconSize: new L.Point(9, 16),
         iconAnchor: new L.Point(5, 16),
@@ -181,7 +182,7 @@ var MediumIcon75Pct = L.Icon.extend({
 
 var MediumIcon100Pct = L.Icon.extend({
     options: {
-        iconUrl: 'images/marker-med-100pct.png',
+        iconUrl: resourcePath + 'images/marker-med-100pct.png',
         shadowUrl: null,
         iconSize: new L.Point(9, 16),
         iconAnchor: new L.Point(5, 16),
@@ -192,7 +193,7 @@ var MediumIcon100Pct = L.Icon.extend({
 
 var LargeIcon0Pct = L.Icon.extend({
     options: {
-        iconUrl: 'images/marker-0pct.png',
+        iconUrl: resourcePath + 'images/marker-0pct.png',
         shadowUrl: null,
         iconSize: new L.Point(13, 23),
         iconAnchor: new L.Point(7, 23),
@@ -202,7 +203,7 @@ var LargeIcon0Pct = L.Icon.extend({
 
 var LargeIcon25Pct = L.Icon.extend({
     options: {
-        iconUrl: 'images/marker-25pct.png',
+        iconUrl: resourcePath + 'images/marker-25pct.png',
         shadowUrl: null,
         iconSize: new L.Point(13, 23),
         iconAnchor: new L.Point(7, 23),
@@ -212,7 +213,7 @@ var LargeIcon25Pct = L.Icon.extend({
 
 var LargeIcon50Pct = L.Icon.extend({
     options: {
-        iconUrl: 'images/marker-50pct.png',
+        iconUrl: resourcePath + 'images/marker-50pct.png',
         shadowUrl: null,
         iconSize: new L.Point(13, 23),
         iconAnchor: new L.Point(7, 23),
@@ -222,7 +223,7 @@ var LargeIcon50Pct = L.Icon.extend({
 
 var LargeIcon75Pct = L.Icon.extend({
     options: {
-        iconUrl: 'images/marker-75pct.png',
+        iconUrl: resourcePath + 'images/marker-75pct.png',
         shadowUrl: null,
         iconSize: new L.Point(13, 23),
         iconAnchor: new L.Point(7, 23),
@@ -232,7 +233,7 @@ var LargeIcon75Pct = L.Icon.extend({
 
 var LargeIcon100Pct = L.Icon.extend({
     options: {
-        iconUrl: 'images/marker-100pct.png',
+        iconUrl: resourcePath + 'images/marker-100pct.png',
         shadowUrl: null,
         iconSize: new L.Point(13, 23),
         iconAnchor: new L.Point(7, 23),
@@ -312,9 +313,9 @@ otp.modules.planner.IconFactory = otp.Class({
         mode = mode.toLowerCase();
         highlight = highlight || false;
         var html = '<div class="otp-itin-div-icon-topRow-'+quadrant[0]+'">';
-        if(!isOrigin) html += '<img src="images/mode/arrow.png" style="margin-right:2px;">';
-        html += '<img src="images/mode/'+mode+'.png">';
-        if(isOrigin) html += '<img src="images/mode/arrow.png" style="margin-left:2px;">';
+        if(!isOrigin) html += '<img src="'+otp.config.resourcePath+'images/mode/arrow.png" style="margin-right:2px;">';
+        html += '<img src="'+otp.config.resourcePath+'images/mode/'+mode+'.png">';
+        if(isOrigin) html += '<img src="'+otp.config.resourcePath+'images/mode/arrow.png" style="margin-left:2px;">';
         html += '</div>';
         html +=  otp.util.Time.formatItinTime(time, "h:mm");
         

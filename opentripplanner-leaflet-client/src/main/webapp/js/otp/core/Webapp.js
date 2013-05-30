@@ -40,6 +40,8 @@ otp.core.Webapp = otp.Class({
         if(typeof console == 'undefined') console = { log: function(str) {} };
         $.support.cors = true;
         var this_ = this;
+        
+        otp.config.resourcePath = otp.config.resourcePath || "";
 
         // set the urlRoot variable, if needed
         /*if(!otp.config.urlRoot) {
@@ -72,7 +74,20 @@ otp.core.Webapp = otp.Class({
         // set the logo & title
         
         if(otp.config.showLogo) {
-          $('<div id="logo"><a href="'+otp.config.siteURL+'"><img src="'+otp.config.logoGraphic+'" style="height:100%"></a></div>').appendTo('#branding');
+          //$('<div id="logo"><a href="'+otp.config.siteURL+'"><img src="'+otp.config.logoGraphic+'" style="height:100%"></a></div>').appendTo('#branding');
+            $(Mustache.render(otp.templates.img, { 
+                src : otp.config.logoGraphic,
+                style : 'height:100%',
+                wrapLink : true,
+                linkHref : otp.config.siteURL,
+                wrapDiv : true,
+                divId : 'logo'
+            })).appendTo('#branding');
+            //console.log(img);
+            //$(img).appendTo('#branding');
+            /*$(Mustache.render(otp.templates.div, { id : 'logo' }))
+            .append(Mustache.render(otp.templates.img, { src : otp.config.logoGraphic }))
+            .appendTo('#branding');          */
 
         }
         
@@ -215,6 +230,14 @@ otp.core.Webapp = otp.Class({
             });
                        
         }
+        
+        // add the spinner
+        
+        $(Mustache.render(otp.templates.img, {
+            src: 'images/spinner.gif',
+            wrapDiv: true,
+            divId: 'otp-spinner'
+        }));
                 
         // retrieve a saved trip, if applicable
 		//if(window.location.hash !== "")

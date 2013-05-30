@@ -76,6 +76,10 @@ otp.core.TransitIndex = otp.Class({
         var this_ = this;
         //console.log("loadVariants: "+agencyAndId);
         var route = this.routes[agencyAndId];
+        if(route.variants) {
+            if(callback) callback.call(callbackTarget, route.variants);
+            return;
+        }
 
         var url = otp.config.hostname + '/opentripplanner-api-webapp/ws/transit/routeData';
         $.ajax(url, {
@@ -94,7 +98,7 @@ otp.core.TransitIndex = otp.Class({
                     data.routeData[0].variants[i].index = i;
                 }
                 if(callback && callbackTarget) {
-                    callback.call(callbackTarget);
+                    callback.call(callbackTarget, route.variants);
                 }
             }
         });

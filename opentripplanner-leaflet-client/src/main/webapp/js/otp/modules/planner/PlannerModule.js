@@ -248,10 +248,9 @@ otp.modules.planner.PlannerModule =
                 date : (this.date) ? this.date : moment().format("MM-DD-YYYY"),
                 mode: this.mode,
                 maxWalkDistance: this.maxWalkDistance
-            };            
+            };
             if(this.arriveBy !== null) _.extend(queryParams, { arriveBy : this.arriveBy } );
             if(this.preferredRoutes !== null) _.extend(queryParams, { preferredRoutes : this.preferredRoutes } );
-            if(this.otherThanPreferredRoutesPenalty !== null) queryParams.otherThanPreferredRoutesPenalty = this.otherThanPreferredRoutesPenalty;
             if(this.bannedTrips !== null) _.extend(queryParams, { bannedTrips : this.bannedTrips } );
             if(this.optimize !== null) _.extend(queryParams, { optimize : this.optimize } );
             if(this.optimize === 'TRIANGLE') {
