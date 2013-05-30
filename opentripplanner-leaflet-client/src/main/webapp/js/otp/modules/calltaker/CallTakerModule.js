@@ -124,7 +124,10 @@ otp.modules.calltaker.CallTakerModule =
             }
         });
         this.callHistoryWidget.callEnded();
-        this.activeCall = null;                 
+        this.activeCall = null;
+        
+        this.clearTrip();
+        this.optionsWidget.restoreDefaults();
     },
             
     saveModel : function(model, successCallback) {

@@ -87,6 +87,10 @@ otp.widgets.tripoptions.TripOptionsWidget =
             this.controls[id].restorePlan(data);
         }
     },
+
+    restoreDefaults : function () {
+        this.restorePlan({ queryParams : otp.modules.planner.defaultQueryParams });
+    },
     
     newItinerary : function(itin) {
         for(var id in this.controls) {
@@ -224,16 +228,28 @@ otp.widgets.tripoptions.LocationsSelector =
     },
     
     restorePlan : function(data) {
-        var fromName = otp.util.Itin.getLocationName(data.queryParams.fromPlace);
-        if(fromName) {
-            $("#"+this.id+"-start").val(fromName);
-            this.tripWidget.module.startName = fromName;
+        if(data.queryParams.fromPlace) {
+            var fromName = otp.util.Itin.getLocationName(data.queryParams.fromPlace);
+            if(fromName) {
+                $("#"+this.id+"-start").val(fromName);
+                this.tripWidget.module.startName = fromName;
+            }
         }
-
-        var toName = otp.util.Itin.getLocationName(data.queryParams.toPlace);
-        if(toName) {
-            $("#"+this.id+"-end").val(toName);
-            this.tripWidget.module.endName = toName;
+        else {
+            $("#"+this.id+"-start").val('');
+            this.tripWidget.module.startName = null;
+        }
+        
+        if(data.queryParams.toPlace) {
+            var toName = otp.util.Itin.getLocationName(data.queryParams.toPlace);
+            if(toName) {
+                $("#"+this.id+"-end").val(toName);
+                this.tripWidget.module.endName = toName;
+            }
+        }
+        else {
+            $("#"+this.id+"-end").val('');
+            this.tripWidget.module.endName = null;
         }
     }    
         
@@ -527,6 +543,11 @@ otp.widgets.tripoptions.PreferredRoutes =
             });
             
         }
+        else { // none specified
+            this.selectorWidget.restoredRouteIds = [];
+            $('#'+this.id+'-list').html('');
+            this.tripWidget.module.preferredRoutes = null;
+        }
         if(planData.queryParams.otherThanPreferredRoutesPenalty) {
             this.weightSlider.slider('value', planData.queryParams.otherThanPreferredRoutesPenalty);
         }
@@ -540,7 +561,7 @@ otp.widgets.tripoptions.PreferredRoutes =
 
 
 //** PreferredRoutes **//
-
+/*
 otp.widgets.tripoptions.PreferredRoutes = 
     otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
     
@@ -633,7 +654,7 @@ otp.widgets.tripoptions.PreferredRoutes =
     }      
         
 });
-
+*/
 
 //** BannedRoutes **//
 
@@ -700,6 +721,11 @@ otp.widgets.tripoptions.BannedRoutes =
                 $('#'+this_.id+'-list').html(routeNames.join(', '));
             });
             
+        }
+        else { // none specified
+            this.selectorWidget.restoredRouteIds = [];
+            $('#'+this.id+'-list').html('');
+            this.tripWidget.module.bannedRoutes = null;
         }
     },
     

@@ -78,18 +78,26 @@ otp.modules.multimodal.MultimodalPlannerModule =
             this.itinWidget = new otp.widgets.ItinerariesWidget(this.moduleId+"-itinWidget", this);
         }
         if(restoring && this.restoredItinIndex) {
+            this.itinWidget.show();
             this.itinWidget.updateItineraries(tripPlan.itineraries, tripPlan.queryParams, this.restoredItinIndex);
             this.restoredItinIndex = null;
         } else  {
+            this.itinWidget.show();
             this.itinWidget.updateItineraries(tripPlan.itineraries, tripPlan.queryParams);
         }
-        this.itinWidget.show();
         
         if(restoring) {
             this.optionsWidget.restorePlan(tripPlan);
         }
         this.drawItinerary(tripPlan.itineraries[0]);
     },
-    
+   
+    clearTrip : function() {
+        otp.modules.planner.PlannerModule.prototype.clearTrip.apply(this);
+        if(this.itinWidget !== null) {
+            this.itinWidget.close();
+        }
+ },
+        
     CLASS_NAME : "otp.modules.multimodal.MultimodalPlannerModule"
 });

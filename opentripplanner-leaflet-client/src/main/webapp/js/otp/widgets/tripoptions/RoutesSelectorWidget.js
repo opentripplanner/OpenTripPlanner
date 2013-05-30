@@ -92,6 +92,7 @@ otp.widgets.RoutesSelectorWidget =
     },
     
     selectRoute : function(agencyAndId) {
+        if(_.contains(this.selectedRouteIds, agencyAndId)) return;
         $('#'+this.id+'-selectedList').append('<option value="'+agencyAndId+'">'+otp.util.Itin.getRouteDisplayString(this.ti.routes[agencyAndId].routeData)+'</option>');                
         this.selectedRouteIds.push(agencyAndId);
     },
