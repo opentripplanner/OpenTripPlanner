@@ -33,16 +33,7 @@ otp.widgets.PreferredRoutesSelectorWidget =
             title : 'Preferred Routes Selector'
         });
 
-        // hidden by default
-        //this.$().css('display','none');            
-        //this.displayed = false;
-
         this.preferredRoutesControl = preferredRoutesControl;
-        //this.$().addClass('otp-preferredRoutesSelectorWidget');
-        
-        //this.$().resizable();
-        //this.minimizable = true;     
-        //this.addHeader("Preferred Routes Selector");
         
         var mainRowHtml = '<div>';
 
