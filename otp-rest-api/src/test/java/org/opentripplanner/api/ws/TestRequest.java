@@ -540,6 +540,21 @@ public class TestRequest extends TestCase {
         assertTrue(vertices.vertices.size() > 0);
 
     }
+    
+    public void testBannedTrips() throws JSONException {
+        // Plan short trip along NE GLISAN ST
+        TestPlanner planner = new TestPlanner("portland", "NE 57TH AVE at NE GLISAN ST #2", "NE 30TH AVE at NE GLISAN ST");
+        // Ban trips with ids 190W1280 and 190W1260 from agency with id TriMet
+        planner.setBannedTrips(Arrays.asList("TriMet_190W1280,TriMet_190W1260"));
+        // Do the planning
+        Response response = planner.getItineraries();
+        Itinerary itinerary = response.getPlan().itinerary.get(0);
+        Leg leg = itinerary.legs.get(1);
+        // Without bannedTrips this leg would contain a trip with id 190W1280
+        assertFalse(leg.tripId.equals("190W1280"));
+        // Instead a trip is now expected with id 190W1290
+        assertTrue(leg.tripId.equals("190W1290"));
+    }
 
     /**
      * Subclass of Planner for testing. Constructor sets fields that would usually be set by Jersey from HTTP Query string.
@@ -573,6 +588,10 @@ public class TestRequest extends TestCase {
             tsp.setChainedPathService(Context.getInstance().pathService);
             tsp.graphService = Context.getInstance().graphService;
             this.planGenerator.pathService = tsp;
+        }
+        
+        public void setBannedTrips(List<String> bannedTrips) {
+            this.bannedTrips = bannedTrips;
         }
 
         public List<GraphPath> getPaths() {
