@@ -14,56 +14,157 @@
 
 otp.namespace("otp.modules.alerts");
 
+
+otp.modules.alerts.EditAlertView = Backbone.View.extend({
+
+    events : {
+        'keyup textarea' : 'descriptionTextChanged',
+        'click #addRangeButton' : 'addRangeButtonClicked',
+        'click .otp-alerts-editAlert-deleteRangeButton' : 'deleteRangeButtonClicked',
+        'click .otp-alerts-editAlert-deleteEntityButton' : 'deleteEntityButtonClicked',
+    },    
+    
+    render : function() {
+        var this_ = this;
+
+        
+        var context = this.options.widget.module.prepareAlertTemplateContext(this.model); //_.clone(this.model.attributes);
+        var rangeIndex = entityIndex = 0;
+        context = _.extend(context, {
+            widgetId : this.options.widget.id,
+            renderDate : function() {
+                return function(date, render) { return moment(parseInt(render(date))).format(otp.config.dateFormat+' '+otp.config.timeFormat); }
+            },
+            rangeIndex: function() { return rangeIndex++; },
+            entityIndex: function() { return entityIndex++; },
+        });
+        
+
+        
+        this.$el.html(ich['otp-alerts-alertEditor'](context));
+
+        // set up the date/time pickers for the 'create new timerange' input
+        $("#"+this.options.widget.id+'-rangeStartInput').datetimepicker({
+            timeFormat: otp.config.timeFormat, 
+        }).datepicker("setDate", new Date());
+
+        $("#"+this.options.widget.id+'-rangeEndInput').datetimepicker({
+            timeFormat: otp.config.timeFormat, 
+        }).datepicker("setDate", new Date());
+
+        // allow the entities list to accept route/stop elements via drag & drop
+        $("#"+this.options.widget.id+'-entitiesList').droppable({
+            accept: '.otp-alerts-entitiesWidget-entityRow',
+            hoverClass: 'otp-alerts-editAlert-entitiesList-dropHover',
+            drop: function(event, ui) { this_.handleEntityDrop(event, ui); }
+        });
+
+    },
+
+    descriptionTextChanged : function(event) {
+        var text = $('#'+this.options.widget.id+'-descriptionText').val();
+        this.model.set('descriptionText', text);
+    },
+    
+    addRangeButtonClicked : function(event) {
+        var start = 1000*moment($("#"+this.options.widget.id+'-rangeStartInput').val(), "MM/DD/YYYY "+otp.config.timeFormat).unix();
+        var end = 1000*moment($("#"+this.options.widget.id+'-rangeEndInput').val(), "MM/DD/YYYY "+otp.config.timeFormat).unix();
+        console.log("new range: "+start+" to "+end);
+        
+        this.model.attributes.timeRanges.push({
+            startTime: start,
+            endTime: end
+        });
+        this.render();
+    },
+
+    deleteRangeButtonClicked : function(event) {
+        var index = parseInt(event.target.id.split('-').pop());
+        this.model.attributes.timeRanges.splice(index, 1);
+        this.render();
+    },
+
+    deleteEntityButtonClicked : function(event) {
+        var index = parseInt(event.target.id.split('-').pop());
+        this.model.attributes.informedEntities.splice(index, 1);
+        this.render();
+    },
+    
+    handleEntityDrop : function(event, ui) {
+        
+        var routeIdObj = $(ui.draggable.context).data('routeId');
+        if(typeof routeIdObj !== 'undefined' && routeIdObj !== null) {
+            this.model.attributes.informedEntities.push({
+                agencyId : routeIdObj.agencyId,
+                routeId : routeIdObj.id,
+            });
+        }
+
+        var stopIdObj = $(ui.draggable.context).data('stopId');
+        if(typeof stopIdObj !== 'undefined' && stopIdObj !== null) {
+            this.model.attributes.informedEntities.push({
+                agencyId : stopIdObj.agencyId,
+                stopId : stopIdObj.id,
+            });
+        }
+
+        this.render();
+    }
+    
+});
+
+
 otp.modules.alerts.EditAlertWidget = 
     otp.Class(otp.widgets.Widget, {
     
     module : null,
     
-    routesLookup : null,
-    stopsLookup : null,
+    alertObj : null,
     
     affectedRoutes : [],
     affectedStops : [],
 
-    initialize : function(id, module, routes, stops) {
+    initialize : function(id, module, alertObj) {
         var this_ = this;
         otp.widgets.Widget.prototype.initialize.call(this, id, module, {
-            title : 'Edit Alert',
+            title : (alertObj.get('id') == null) ? 'Create Alert' : 'Edit Alert #'+alertObj.get('id'),
             cssClass : 'otp-alerts-editAlertWidget',
             closeable: true
         });
         
         this.module = module;
-        this.affectedRoutes = routes;
-        this.affectedStops = stops;
-
-        $('<div>Alert Text</div>').appendTo(this.mainDiv);
-        $('<textarea />').addClass('otp-alerts-editAlert-text notDraggable').appendTo(this.mainDiv);
-
-        $('<div>Affected Entities:</div>').appendTo(this.mainDiv);
-        this.affectedEntitiesSelect = $('<select size=5 />').appendTo(this.mainDiv);
+        this.alertObj = alertObj;
         
-        var buttonRow = $('<div>').addClass('otp-alerts-entitiesWidget-buttonRow').appendTo(this.mainDiv)
-                        
-        $('<button>Save</button>').button().appendTo(buttonRow).click(function() {
-            //this.close();
+        // set up the view 
+        var view = new otp.modules.alerts.EditAlertView({
+            el: $('<div />').appendTo(this.mainDiv),
+            model: alertObj,
+            widget: this,
         });
         
-        this.refreshAffectedEntities();
+        
+        // create the save and delete buttons
+        var buttonRow = $('<div>').addClass('otp-alerts-entitiesWidget-buttonRow').appendTo(this.mainDiv)
+        
+        $(Mustache.render(otp.templates.button, { text : "Save"}))
+        .button().appendTo(buttonRow).click(function() {
+            this_.module.saveAlert(this_.alertObj);
+            this_.close();
+        });
+
+        $(Mustache.render(otp.templates.button, { text : "Delete"}))
+        .button().appendTo(buttonRow).click(function() {
+            this_.module.deleteAlert(this_.alertObj);
+            this_.close();
+        });
+        
+
+        view.render();
     },
     
-    refreshAffectedEntities : function() {
-        this.affectedEntitiesSelect.empty();
-        
-        for(var i = 0; i < this.affectedRoutes.length; i++) {
-            console.log(this.affectedRoutes[i]);
-            $('<option>Route '+this.affectedRoutes[i].routeData.routeShortName+'</option>').appendTo(this.affectedEntitiesSelect);
-        }
-
-        for(var i = 0; i < this.affectedStops.length; i++) {
-            console.log(this.affectedStops[i]);
-            $('<option>Stop '+this.affectedStops[i].id.id+'</option>').appendTo(this.affectedEntitiesSelect);
-        }
-    },
+    onClose : function() {
+        delete this.module.openEditAlertWidgets[this.alertObj.get('id')];
+    }
     
 });
+

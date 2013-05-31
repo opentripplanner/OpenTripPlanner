@@ -153,6 +153,7 @@ otp.widgets.Widget = otp.Class({
     },
     
     close : function() {
+        if(typeof this.onClose === 'function') this.onClose();
         this.isOpen = false;
         this.hide();
     },

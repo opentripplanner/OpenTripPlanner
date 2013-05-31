@@ -664,6 +664,10 @@ body {
 	font-size: 1em;
 }
 
+.otp-defaultLabel {
+    margin: 4px 0px 2px 0px;
+}
+
 .ui-dialog-titlebar {
   font-size: 14px;
   padding:2px;
