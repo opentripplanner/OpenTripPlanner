@@ -53,6 +53,7 @@ otp.modules.fieldtrip.FieldTripRequestsWidget =
         this.requestsList.empty();
         for(var i = 0; i < requests.length; i++) {
             var req = requests[i];
+            console.log(req);
             $('<div class="otp-fieldTripRequests-listRow">'+req.teacherName+", "+req.schoolName+'</div>').appendTo(this.requestsList);
         }
     }

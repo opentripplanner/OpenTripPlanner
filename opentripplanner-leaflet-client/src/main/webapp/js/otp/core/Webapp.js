@@ -195,8 +195,9 @@ otp.core.Webapp = otp.Class({
             for(var i=0; i<otp.config.modules.length; i++) {
                 var modConfig = otp.config.modules[i];
                 var modClass = this.stringToFunction(modConfig.className);
-                var module = new modClass(this);
-                if(modConfig.id) module.id = modConfig.id;
+                var id =  modConfig.id || 'module'+i;
+                var options = modConfig.options || {}; 
+                var module = new modClass(this, id, options);
                 if(modConfig.defaultBaseLayer) module.defaultBaseLayer = modConfig.defaultBaseLayer;
                 
                 var isDefault = false;

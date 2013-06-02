@@ -23,11 +23,15 @@ otp.modules.Module = otp.Class({
     mapLayers   : null,
     
     activated   : false,
+    
+    options     : null,
         
-    initialize : function(webapp) {
+    initialize : function(webapp, id, options) {
         this.webapp = webapp;
+        this.id = id;
+        this.options = options || {};
         this.widgets = [];
-        this.mapLayers = { };
+        this.mapLayers = {};
     },
     
 

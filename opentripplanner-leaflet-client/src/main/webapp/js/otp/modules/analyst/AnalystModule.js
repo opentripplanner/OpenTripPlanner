@@ -16,23 +16,16 @@ otp.namespace("otp.modules.analyst");
 
 
 otp.modules.analyst.AnalystModule = 
-    otp.Class(otp.modules.Module, {
+    otp.Class(otp.modules.planner.PlannerModule, {
     
     moduleName  : "Analyst",
 
     analystLayer : null,
-    
-    // current trip query parameters:
-    startLatLng             : null,
-    time                    : null,
-    date                    : null,
-    arriveBy                : false,
-    mode                    : "TRANSIT,WALK",
-    maxWalkDistance         : 804.672, // 1/2 mi.
+
              
-    initialize : function(webapp) {
+    initialize : function(webapp, id, options) {
         //otp.modules.planner.PlannerModule.prototype.initialize.apply(this, arguments);
-        otp.modules.Module.prototype.initialize.apply(this, arguments);
+        otp.modules.planner.PlannerModule.prototype.initialize.apply(this, arguments);
         
         this.analystUrl = otp.config.hostname + "/opentripplanner-api-webapp/ws/tile/{z}/{x}/{y}.png";
     },
@@ -71,6 +64,9 @@ otp.modules.analyst.AnalystModule =
             this_.runAnalystQuery();            
         }).appendTo(buttonRow);
 
+        this.optionsWidget.applyQueryParams(this.defaultQueryParams);
+
+
         // set up legend widget 
         this.legendWidget = new otp.modules.analyst.AnalystLegendWidget(this.id + 'legend', this, 300, 40);
 
@@ -100,7 +96,6 @@ otp.modules.analyst.AnalystModule =
     },    
     
     runAnalystQuery : function() {
-        console.log("mST");
 
 	    var params = { 
 		    batch : true,

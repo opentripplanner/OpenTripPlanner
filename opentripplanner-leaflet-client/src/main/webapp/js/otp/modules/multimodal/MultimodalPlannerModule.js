@@ -29,7 +29,7 @@ otp.modules.multimodal.MultimodalPlannerModule =
     
     routeData : null,
     
-    initialize : function(webapp) {
+    initialize : function(webapp, id, options) {
         otp.modules.planner.PlannerModule.prototype.initialize.apply(this, arguments);
     },
 
@@ -67,6 +67,7 @@ otp.modules.multimodal.MultimodalPlannerModule =
         this.optionsWidget.addSeparator();
         this.optionsWidget.addControl("submit", new otp.widgets.tripoptions.Submit(this.optionsWidget));
         
+        this.optionsWidget.applyQueryParams(this.defaultQueryParams);
     },
     
     getExtendedQueryParams : function() {

@@ -75,24 +75,31 @@ otp.modules.planner.PlannerModule =
     triangleSafetyFactor    : 0.334,
     */
     
-    startName                       : null,
-    endName                         : null,
-    startLatLng                     : null,
-    endLatLng                       : null,
+    startName       : null,
+    endName         : null,
+    startLatLng     : null,
+    endLatLng       : null,
 
+    // the defaults params, as modified in the module-specific config
+    defaultQueryParams  : null,
     
-    startTimePadding        : 0,
+    startTimePadding    : 0,
     
     // copy of query param set from last /plan request
     lastQueryParams : null,
     
     icons       : null,
 
-    initialize : function(webapp) {
+    initialize : function(webapp, id, options) {
         otp.modules.Module.prototype.initialize.apply(this, arguments);
         this.icons = new otp.modules.planner.IconFactory();
         
         this.planTripFunction = this.planTrip;
+        
+        this.defaultQueryParams = _.clone(otp.modules.planner.defaultQueryParams);
+        if(_.has(this.options, 'defaultQueryParams')) {
+            _.extend(this.defaultQueryParams, this.options.defaultQueryParams);
+        }
         
         _.extend(this, _.clone(otp.modules.planner.defaultQueryParams));    
         

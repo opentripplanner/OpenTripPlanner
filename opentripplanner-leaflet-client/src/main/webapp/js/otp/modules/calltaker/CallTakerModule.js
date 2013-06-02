@@ -42,7 +42,7 @@ otp.modules.calltaker.CallTakerModule =
     
     activeCall : null,
     
-    initialize : function(webapp) {
+    initialize : function(webapp, id, options) {
         otp.modules.multimodal.MultimodalPlannerModule.prototype.initialize.apply(this, arguments);
 
         this.callTaker = new otp.modules.calltaker.CallTaker('admin', 'secret');

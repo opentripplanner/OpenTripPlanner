@@ -88,8 +88,12 @@ otp.widgets.tripoptions.TripOptionsWidget =
         }
     },
 
-    restoreDefaults : function () {
-        this.restorePlan({ queryParams : otp.modules.planner.defaultQueryParams });
+    applyQueryParams : function(queryParams) {
+        this.restorePlan({ queryParams : queryParams });
+    },
+
+    restoreDefaults : function() {
+        this.applyQueryParams(this.module.defaultQueryParams);
     },
     
     newItinerary : function(itin) {
@@ -449,7 +453,7 @@ otp.widgets.tripoptions.MaxWalkSelector =
     },
 
     restorePlan : function(data) {
-        $('#'+this.id+'-value').val(data.queryParams.maxWalkDistance/1609.34);  
+        $('#'+this.id+'-value').val((data.queryParams.maxWalkDistance/1609.34).toFixed(2));  
         this.tripWidget.module.maxWalkDistance = data.queryParams.maxWalkDistance;
     },
  

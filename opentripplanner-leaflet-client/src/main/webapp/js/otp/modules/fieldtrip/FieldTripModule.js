@@ -37,7 +37,7 @@ otp.modules.fieldtrip.FieldTripModule =
     
     stopsWidget: false,
     
-    initialize : function(webapp) {
+    initialize : function(webapp, id, options) {
         otp.modules.planner.PlannerModule.prototype.initialize.apply(this, arguments);
         
         this.planTripFunction = this.ftPlanTrip;
