@@ -268,8 +268,12 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         }
         _log.debug("{} best for {}", bestAttribute, rides);
 
-        if (bestFare == Float.POSITIVE_INFINITY)
-            _log.warn("No fare for a ride sequence: {}", rides);
+        if (bestFare == Float.POSITIVE_INFINITY) {
+            if (fareAttributes.isEmpty())
+                _log.info("No fare for a ride sequence: {}", rides);
+            else
+                _log.warn("No fare for a ride sequence: {}", rides);
+        }
 
         return bestFare;
 
