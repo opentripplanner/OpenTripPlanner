@@ -15,6 +15,7 @@ package org.opentripplanner.api.common;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -145,11 +146,18 @@ public abstract class RoutingResource {
     /** The comma-separated list of banned agencies. */
     @DefaultValue("") @QueryParam("bannedAgencies") protected List<String> bannedAgencies;
     
-    /** The comma-separated list of banned trips.  The format is agency_route[:stop*], so:
+    /** The comma-separated list of banned trips.  The format is agency_trip[:stop*], so:
      * TriMet_24601 or TriMet_24601:0:1:2:17:18:19
      */
     @DefaultValue("") @QueryParam("bannedTrips") protected List<String> bannedTrips;
 
+    /** The comma-separated list of banned stops. A stop is banned by ignoring its 
+     * pre-board and pre-alight edges. This means the stop will be reachable via the
+     * street network, but can't be used to board or alight transit.  
+     * The format is agencyId_stopId, so: TriMet_2107
+     */
+    @DefaultValue("") @QueryParam("bannedStops") protected List<String> bannedStops;
+    
     /** An additional penalty added to boardings after the first.  The value is in OTP's
      *  internal weight units, which are roughly equivalent to seconds.  Set this to a high
      *  value to discourage transfers.  Of course, transfers that save significant
@@ -309,6 +317,10 @@ public abstract class RoutingResource {
         if (bannedTripMap != null) {
             request.setBannedTrips(bannedTripMap);
         }
+        HashSet<AgencyAndId> bannedStopSet = makeBannedStopSet(get(bannedStops, n, null));
+        if (bannedStopSet != null) {
+            request.setBannedStops(bannedStopSet);
+        }
         
         // "Least transfers" optimization is accomplished via an increased transfer penalty.
         // See comment on RoutingRequest.transferPentalty.
@@ -379,7 +391,7 @@ public abstract class RoutingResource {
         return request;
     }
 
-	private HashMap<AgencyAndId, BannedStopSet> makeBannedTripMap(String banned) {
+    private HashMap<AgencyAndId, BannedStopSet> makeBannedTripMap(String banned) {
         if (banned == null) {
             return null;
         }
@@ -402,6 +414,30 @@ public abstract class RoutingResource {
             bannedTripMap.put(tripId, bannedStops);
         }
         return bannedTripMap;
+    }
+
+    /**
+     * Parses banned stop string and returns a HashSet containing the banned stops.
+     * @param banned is the banned stop string
+     * @return a HashSet containing the banned stops
+     */
+    private HashSet<AgencyAndId> makeBannedStopSet(String banned) {
+        if (banned == null) {
+            return null;
+        }
+        
+        HashSet<AgencyAndId> bannedStopSet = new HashSet<AgencyAndId>();
+        String[] stopStrings = banned.split(",");
+        for (String stopString : stopStrings) {
+            try {
+                AgencyAndId stopId = AgencyAndId.convertFromString(stopString);
+                bannedStopSet.add(stopId);
+            } catch (IllegalArgumentException e) {
+                // Skip this stop
+            }
+        }
+        
+        return bannedStopSet;
     }
 
 /**
