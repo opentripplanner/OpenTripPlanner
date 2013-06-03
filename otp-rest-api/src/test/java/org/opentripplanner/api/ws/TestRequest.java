@@ -556,6 +556,22 @@ public class TestRequest extends TestCase {
         assertTrue(leg.tripId.equals("190W1290"));
     }
 
+    public void testBannedStops() throws JSONException {
+        // Plan short trip along NE GLISAN ST
+        TestPlanner planner = new TestPlanner("portland", "NE 57TH AVE at NE GLISAN ST #2", "NE 30TH AVE at NE GLISAN ST");
+        // Ban stops with ids 2106 and 2107 from agency with id TriMet
+        // These are the two stops near NE 30TH AVE at NE GLISAN ST
+        planner.setBannedStops(Arrays.asList("TriMet_2106,TriMet_2107"));
+        // Do the planning
+        Response response = planner.getItineraries();
+        Itinerary itinerary = response.getPlan().itinerary.get(0);
+        Leg leg = itinerary.legs.get(1);
+        // Without bannedStops this leg would stop at the stop with id 2107
+        assertFalse(leg.to.stopId.getId().equals("2107"));
+        // Instead a stop is now expected with id 2109
+        assertTrue(leg.to.stopId.getId().equals("2109"));
+    }
+    
     /**
      * Subclass of Planner for testing. Constructor sets fields that would usually be set by Jersey from HTTP Query string.
      */
@@ -594,6 +610,10 @@ public class TestRequest extends TestCase {
             this.bannedTrips = bannedTrips;
         }
 
+        public void setBannedStops(List<String> bannedStops) {
+            this.bannedStops = bannedStops;
+        }
+        
         public List<GraphPath> getPaths() {
             try {
                 RoutingRequest options = this.buildRequest();
