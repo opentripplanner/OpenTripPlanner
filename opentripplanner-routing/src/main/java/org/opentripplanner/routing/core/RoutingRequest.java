@@ -219,7 +219,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public HashMap<AgencyAndId, BannedStopSet> bannedTrips = new HashMap<AgencyAndId, BannedStopSet>();
 
     /** Do not use certain stops. See for more information the bannedStops property in the RoutingResource class. */
-    public HashSet<AgencyAndId> bannedStops = new HashSet<AgencyAndId>(); 
+    private HashSet<AgencyAndId> bannedStops = new HashSet<AgencyAndId>(); 
     
     /** Set of preferred routes by user. */
     public RouteMatcher preferredRoutes = RouteMatcher.emptyMatcher();
