@@ -43,6 +43,14 @@ public class PreBoardEdge extends FreeEdge {
     @Override
     public State traverse(State s0) {
         RoutingRequest options = s0.getOptions();
+        
+        // Ignore this edge if its stop is banned
+        if (!options.getBannedStops().isEmpty() && fromv instanceof TransitStop) {
+            if (options.getBannedStops().contains(((TransitStop) fromv).getStopId())) {
+                return null;
+            }
+        }
+        
         if (options.isArriveBy()) {
             /* Traverse backward: not much to do */
             StateEditor s1 = s0.edit(this);

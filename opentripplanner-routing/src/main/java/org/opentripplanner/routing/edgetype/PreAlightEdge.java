@@ -48,6 +48,14 @@ public class PreAlightEdge extends FreeEdge {
         // TODO: this could probably be fused with PreBoardEdge now (AMB)
         // they are currently only different because the StateEditor.incrementTime methods are not
         // used.
+
+        // Ignore this edge if its stop is banned
+        if (!options.getBannedStops().isEmpty() && tov instanceof TransitStop) {
+            if (options.getBannedStops().contains(((TransitStop) tov).getStopId())) {
+                return null;
+            }
+        }
+        
         if (options.isArriveBy()) {
             /* Backward traversal: apply stop(pair)-specific costs */
             // Do not pre-board if transit modes are not selected.
