@@ -579,15 +579,19 @@ otp.widgets.ItinerariesWidget =
                     
                     var alertHtml = '<div class="otp-itin-alert-header">';
 
-                    if(alert.alertUrl.someTranslation) alertHtml += '<a href="' + alert.alertUrl.someTranslation + '" target="_blank">';
+                    if(alert.alertUrl && alert.alertUrl.someTranslation) {
+                    	alertHtml += '<a href="' + alert.alertUrl.someTranslation + '" target="_blank">';
+                	}
                     alertHtml += 'Alert for Route ' + leg.route;
-                    if(alert.alertUrl.someTranslation) alertHtml += '</a>';
+                    if(alert.alertUrl && alert.alertUrl.someTranslation) {
+                    	alertHtml += '</a>';
+                	}
 
-                    if(alert.alertHeaderText.someTranslation) {
+                    if(alert.alertHeaderText && alert.alertHeaderText.someTranslation) {
                         alertHtml += ': ' + alert.alertHeaderText.someTranslation;
                     }
                     alertHtml += '</div>';
-                    if(alert.alertDescriptionText.someTranslation) {
+                    if(alert.alertDescriptionText && alert.alertDescriptionText.someTranslation) {
                         alertHtml += '<div class="otp-itin-alert-description">' + alert.alertDescriptionText.someTranslation + '</div>';
                     }
                     
