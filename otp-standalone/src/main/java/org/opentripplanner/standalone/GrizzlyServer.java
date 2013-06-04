@@ -64,7 +64,7 @@ public class GrizzlyServer {
         //    This is a filesystem path, not classpath.
         //    Files are relative to the project dir, so
         //    from ./ we can reach e.g. target/classes/data-sources.xml
-        final String clientPath = "../opentripplanner-webapp/target/opentripplanner-webapp/";
+        final String clientPath = "../opentripplanner-webapp/src/main/webapp/";
         httpServer.getServerConfiguration().addHttpHandler(new StaticHttpHandler(clientPath), "/");
         
         /* RELINQUISH CONTROL TO THE SERVER THREAD */
