@@ -556,14 +556,32 @@ public class TestRequest extends TestCase {
         assertTrue(leg.tripId.equals("190W1290"));
     }
 
-    public void testBannedStops() throws JSONException {
+    public void testBannedStops() throws JSONException, ParameterException {
         // Plan short trip along NE GLISAN ST
         TestPlanner planner = new TestPlanner("portland", "NE 57TH AVE at NE GLISAN ST #2", "NE 30TH AVE at NE GLISAN ST");
         // Ban stops with ids 2106 and 2107 from agency with id TriMet
         // These are the two stops near NE 30TH AVE at NE GLISAN ST
         planner.setBannedStops(Arrays.asList("TriMet_2106,TriMet_2107"));
+        // Create temporary request to check parsing
+        RoutingRequest options = null;
+        try {
+            // Create request
+            options = planner.buildRequest();
+            // Check for both stops
+            assertTrue(options.getBannedStops().contains(new AgencyAndId("TriMet", "2106")));
+            assertTrue(options.getBannedStops().contains(new AgencyAndId("TriMet", "2107")));
+            // Check number of banned stops
+            assertTrue(options.getBannedStops().size() == 2);
+        }
+        finally {
+            // Clean up request
+            if (options != null) {
+                options.cleanup();
+            }
+        }
         // Do the planning
         Response response = planner.getItineraries();
+        // First check the request
         Itinerary itinerary = response.getPlan().itinerary.get(0);
         Leg leg = itinerary.legs.get(1);
         // Without bannedStops this leg would stop at the stop with id 2107
@@ -612,6 +630,10 @@ public class TestRequest extends TestCase {
 
         public void setBannedStops(List<String> bannedStops) {
             this.bannedStops = bannedStops;
+        }
+        
+        public RoutingRequest buildRequest() throws ParameterException {
+            return super.buildRequest();
         }
         
         public List<GraphPath> getPaths() {
