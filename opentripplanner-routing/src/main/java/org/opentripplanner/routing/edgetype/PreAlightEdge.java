@@ -51,7 +51,7 @@ public class PreAlightEdge extends FreeEdge {
 
         // Ignore this edge if its stop is banned
         if (!options.getBannedStops().isEmpty() && tov instanceof TransitStop) {
-            if (options.getBannedStops().contains(((TransitStop) tov).getStopId())) {
+            if (options.getBannedStops().matches(((TransitStop) tov).getStop())) {
                 return null;
             }
         }

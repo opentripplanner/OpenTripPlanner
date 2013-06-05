@@ -15,7 +15,6 @@ package org.opentripplanner.api.common;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -317,10 +316,7 @@ public abstract class RoutingResource {
         if (bannedTripMap != null) {
             request.setBannedTrips(bannedTripMap);
         }
-        HashSet<AgencyAndId> bannedStopSet = makeBannedStopSet(get(bannedStops, n, null));
-        if (bannedStopSet != null) {
-            request.setBannedStops(bannedStopSet);
-        }
+        request.setBannedStops(get(bannedStops, n, request.getBannedStopsStr()));
         
         // "Least transfers" optimization is accomplished via an increased transfer penalty.
         // See comment on RoutingRequest.transferPentalty.
@@ -414,30 +410,6 @@ public abstract class RoutingResource {
             bannedTripMap.put(tripId, bannedStops);
         }
         return bannedTripMap;
-    }
-
-    /**
-     * Parses banned stop string and returns a HashSet containing the banned stops.
-     * @param banned is the banned stop string
-     * @return a HashSet containing the banned stops
-     */
-    private HashSet<AgencyAndId> makeBannedStopSet(String banned) {
-        if (banned == null) {
-            return null;
-        }
-        
-        HashSet<AgencyAndId> bannedStopSet = new HashSet<AgencyAndId>();
-        String[] stopStrings = banned.split(",");
-        for (String stopString : stopStrings) {
-            try {
-                AgencyAndId stopId = AgencyAndId.convertFromString(stopString);
-                bannedStopSet.add(stopId);
-            } catch (IllegalArgumentException e) {
-                // Skip this stop
-            }
-        }
-        
-        return bannedStopSet;
     }
 
 /**

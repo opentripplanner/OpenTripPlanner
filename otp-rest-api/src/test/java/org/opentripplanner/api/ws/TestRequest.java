@@ -562,23 +562,6 @@ public class TestRequest extends TestCase {
         // Ban stops with ids 2106 and 2107 from agency with id TriMet
         // These are the two stops near NE 30TH AVE at NE GLISAN ST
         planner.setBannedStops(Arrays.asList("TriMet_2106,TriMet_2107"));
-        // Create temporary request to check parsing
-        RoutingRequest options = null;
-        try {
-            // Create request
-            options = planner.buildRequest();
-            // Check for both stops
-            assertTrue(options.getBannedStops().contains(new AgencyAndId("TriMet", "2106")));
-            assertTrue(options.getBannedStops().contains(new AgencyAndId("TriMet", "2107")));
-            // Check number of banned stops
-            assertTrue(options.getBannedStops().size() == 2);
-        }
-        finally {
-            // Clean up request
-            if (options != null) {
-                options.cleanup();
-            }
-        }
         // Do the planning
         Response response = planner.getItineraries();
         // First check the request

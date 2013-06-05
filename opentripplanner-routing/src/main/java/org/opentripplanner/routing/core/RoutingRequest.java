@@ -33,7 +33,6 @@ import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.NamedPlace;
-import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -219,7 +218,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public HashMap<AgencyAndId, BannedStopSet> bannedTrips = new HashMap<AgencyAndId, BannedStopSet>();
 
     /** Do not use certain stops. See for more information the bannedStops property in the RoutingResource class. */
-    private HashSet<AgencyAndId> bannedStops = new HashSet<AgencyAndId>(); 
+    private StopMatcher bannedStops = StopMatcher.emptyMatcher(); 
     
     /** Set of preferred routes by user. */
     public RouteMatcher preferredRoutes = RouteMatcher.emptyMatcher();
@@ -507,6 +506,15 @@ public class RoutingRequest implements Cloneable, Serializable {
             bannedRoutes = RouteMatcher.emptyMatcher();
     }
 
+    public void setBannedStops(String s) {
+        if (s != null && !s.equals("")) {
+            bannedStops = StopMatcher.parse(s);
+        }
+        else {
+            bannedStops = StopMatcher.emptyMatcher();
+        }
+    }
+
     public void setBannedAgencies(String s) {
         if (s != null && !s.equals(""))
             bannedAgencies = new HashSet<String>(Arrays.asList(s.split(",")));
@@ -693,7 +701,7 @@ public class RoutingRequest implements Cloneable, Serializable {
             RoutingRequest clone = (RoutingRequest) super.clone();
             clone.bannedRoutes = bannedRoutes.clone();
             clone.bannedTrips = (HashMap<AgencyAndId, BannedStopSet>) bannedTrips.clone();
-            clone.bannedStops = (HashSet<AgencyAndId>) bannedStops.clone();
+            clone.bannedStops = bannedStops.clone();
             if (this.bikeWalkingOptions != this)
                 clone.bikeWalkingOptions = this.bikeWalkingOptions.clone();
             else
@@ -960,6 +968,10 @@ public class RoutingRequest implements Cloneable, Serializable {
         return bannedRoutes.asString();
     }
 
+    public String getBannedStopsStr() {
+        return bannedStops.asString();
+    }
+    
     public String getBannedAgenciesStr() {
     	return getRouteOrAgencyStr(bannedAgencies);
     }
