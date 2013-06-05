@@ -48,7 +48,7 @@ public class RouteMatcher implements Cloneable, Serializable {
      * Return an empty matcher (which match no routes).
      */
     public static RouteMatcher emptyMatcher() {
-        return EMPTY_MATCHER;
+        return new RouteMatcher();
     }
 
     /**
