@@ -67,7 +67,7 @@ public class GenericLocation implements Cloneable {
     // Pattern for parsing lat,lng strings.
     private static final String _doublePattern = "-{0,1}\\d+(\\.\\d+){0,1}";
 
-    private static final Pattern _latLonPattern = Pattern.compile("\\D*(" + _doublePattern
+    private static final Pattern _latLonPattern = Pattern.compile("[^[\\d&&[-|+|.]]]*(" + _doublePattern
             + ")(\\s*,\\s*|\\s+)(" + _doublePattern + ")\\D*");
     
     private static final Pattern _headingPattern = Pattern.compile("\\D*heading=("
