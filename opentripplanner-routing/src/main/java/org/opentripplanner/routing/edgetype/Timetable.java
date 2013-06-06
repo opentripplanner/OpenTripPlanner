@@ -353,19 +353,19 @@ public class Timetable implements Serializable {
             } else {
                 LOG.trace("tripId {} found at index {} (in scheduled timetable)", block.tripId, tripIndex);
             }
-            // 'stop' Index as in transit stop (not 'end', not 'hop')
-            int stopIndex = block.findUpdateStopIndex(pattern);
-            if (stopIndex == UpdateBlock.MATCH_FAILED) {
-                LOG.warn("Unable to match update block to stopIds.");
-                return false;
-            }
             TripTimes existingTimes = getTripTimes(tripIndex);
             ScheduledTripTimes scheduledTimes = existingTimes.getScheduledTripTimes();
             TripTimes newTimes;
             if (block.isCancellation()) {
                 newTimes = new CanceledTripTimes(scheduledTimes);
-            } 
+            }
             else {
+                // 'stop' Index as in transit stop (not 'end', not 'hop')
+                int stopIndex = block.findUpdateStopIndex(pattern);
+                if (stopIndex == UpdateBlock.MATCH_FAILED) {
+                    LOG.warn("Unable to match update block to stopIds.");
+                    return false;
+                }
                 newTimes = new UpdatedTripTimes(scheduledTimes, block, stopIndex);
                 if ( ! newTimes.timesIncreasing()) {
                     LOG.warn("Resulting UpdatedTripTimes has non-increasing times. " +
