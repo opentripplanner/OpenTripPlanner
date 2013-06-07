@@ -32,6 +32,7 @@ otp.planner.ParamTemplate = 'submit'
         + '&preferredRoutes={preferredRoutes}'
         + '&unpreferredRoutes={unpreferredRoutes}'
         + '&bannedRoutes={bannedRoutes}'
+        + '&bannedStops={bannedStops}'
 ;
 
 otp.planner.Templates = {
