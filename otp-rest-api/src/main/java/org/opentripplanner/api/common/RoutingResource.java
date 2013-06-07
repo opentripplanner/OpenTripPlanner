@@ -145,11 +145,18 @@ public abstract class RoutingResource {
     /** The comma-separated list of banned agencies. */
     @DefaultValue("") @QueryParam("bannedAgencies") protected List<String> bannedAgencies;
     
-    /** The comma-separated list of banned trips.  The format is agency_route[:stop*], so:
+    /** The comma-separated list of banned trips.  The format is agency_trip[:stop*], so:
      * TriMet_24601 or TriMet_24601:0:1:2:17:18:19
      */
     @DefaultValue("") @QueryParam("bannedTrips") protected List<String> bannedTrips;
 
+    /** The comma-separated list of banned stops. A stop is banned by ignoring its 
+     * pre-board and pre-alight edges. This means the stop will be reachable via the
+     * street network, but can't be used to board or alight transit.  
+     * The format is agencyId_stopId, so: TriMet_2107
+     */
+    @DefaultValue("") @QueryParam("bannedStops") protected List<String> bannedStops;
+    
     /** An additional penalty added to boardings after the first.  The value is in OTP's
      *  internal weight units, which are roughly equivalent to seconds.  Set this to a high
      *  value to discourage transfers.  Of course, transfers that save significant
@@ -309,6 +316,7 @@ public abstract class RoutingResource {
         if (bannedTripMap != null) {
             request.setBannedTrips(bannedTripMap);
         }
+        request.setBannedStops(get(bannedStops, n, request.getBannedStopsStr()));
         
         // "Least transfers" optimization is accomplished via an increased transfer penalty.
         // See comment on RoutingRequest.transferPentalty.
@@ -379,7 +387,7 @@ public abstract class RoutingResource {
         return request;
     }
 
-	private HashMap<AgencyAndId, BannedStopSet> makeBannedTripMap(String banned) {
+    private HashMap<AgencyAndId, BannedStopSet> makeBannedTripMap(String banned) {
         if (banned == null) {
             return null;
         }

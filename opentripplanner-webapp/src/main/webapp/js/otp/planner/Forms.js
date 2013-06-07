@@ -29,6 +29,7 @@ otp.planner.StaticForms = {
     preferredRoutes       : '',
     unpreferredRoutes     : '',
     bannedRoutes          : '',		
+    bannedStops           : '',		
     locale                : null,
     planner               : null,
     contextMenu           : null,
@@ -229,6 +230,9 @@ otp.planner.StaticForms = {
 
         if(this.bannedRoutes)
             added_params.bannedRoutes = this.bannedRoutes;
+        
+        if(this.bannedStops)
+        	added_params.bannedStops = this.bannedStops;
         
         // step 6: set data up, including the added params & submit...
         var data = {
@@ -651,6 +655,9 @@ otp.planner.StaticForms = {
             if(typeof(params.bannedRoutes)=='string') 
                 this.bannedRoutes = params.bannedRoutes;
 
+            if(typeof(params.bannedStops)=='string') 
+            	this.bannedStops = params.bannedStops;
+            
             if(params.routerId)
                 this.routerId = params.routerId;
 
@@ -757,6 +764,7 @@ otp.planner.StaticForms = {
         retVal.preferredRoutes = this.preferredRoutes;
         retVal.unpreferredRoutes = this.unpreferredRoutes;
         retVal.bannedRoutes = this.bannedRoutes;
+        retVal.bannedStops = this.bannedStops;
 
         // break up the from coordinate into lat & lon
         retVal.fromLat = otp.util.ObjUtils.getLat(this.m_fromForm.geocodeCoord);

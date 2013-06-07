@@ -172,6 +172,11 @@ public class RaptorSearch {
                 if (!data.raptorStopsForStopId.containsKey(stop.stopVertex.getStopId())) {
                     continue;
                 }
+                
+                // Skip banned stops
+                if (options.getBannedStops().matches(stop.stopVertex.getStop())) {
+                    continue;
+                }
 
                 List<RaptorState> states = statesByStop[stop.index];
                 List<RaptorState> newStates = new ArrayList<RaptorState>();
@@ -514,6 +519,11 @@ public class RaptorSearch {
                         continue;
                     }
 
+                    // Skip banned stops
+                    if (options.getBannedStops().matches(stop.stopVertex.getStop())) {
+                        continue;
+                    }
+
                     addStopNearTarget(stop, state.getWalkDistance(), (int) state.getElapsedTimeSeconds());
                 }
             }
@@ -625,6 +635,11 @@ public class RaptorSearch {
                 continue;
             }
 
+            // Skip banned stops
+            if (options.getBannedStops().matches(stop.stopVertex.getStop())) {
+                continue;
+            }
+            
             if (options.rctx.target != null) {
                 double minWalk = distanceToNearestTransitStop;
 
