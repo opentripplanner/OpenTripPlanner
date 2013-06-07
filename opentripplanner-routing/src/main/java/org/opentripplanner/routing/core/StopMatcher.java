@@ -84,16 +84,46 @@ public class StopMatcher implements Cloneable, Serializable {
 
     /**
      * Function to determine whether this StopMatcher matches a particular stop.
+     * When a stop has a parent stop, it is also matched when its parent stop is matched.
      * @param stop is the stop to match using its ID
      * @return true when the stop is matched
      */
     public boolean matches(Stop stop) {
-        if (stop != null && agencyAndStopIds.contains(stop.getId())) {
-            return true;
+        // Don't bother with an empty matcher 
+        if (this.isEmpty()) {
+            return false;
+        }
+        else if (stop != null) {
+            // Check whether stop is matched
+            if (matches(stop.getId())) {
+                return true;    
+            }
+            // Check whether parent stop is matched
+            else if (stop.getParentStation() != null 
+                    && !stop.getParentStation().isEmpty()) {
+                // This stop has a parent
+                AgencyAndId parentId = new AgencyAndId(stop.getId().getAgencyId(), stop.getParentStation());
+                if (matches(parentId)) {
+                    return true;    
+                }
+            }
         }
         return false;
     }
-
+    
+    /**
+     * Function to determine whether this StopMatcher matches a particular stop id.
+     * Warning: this function does not check for parent stops.
+     * @param stopId is the stop id
+     * @return true when stop id is matched 
+     */
+    private boolean matches(AgencyAndId stopId) {
+        if (agencyAndStopIds.contains(stopId)) {
+            return true;    
+        }
+        return false;
+    }
+    
     /**
      * Returns string representation of this matcher
      * @return string representation of this matcher

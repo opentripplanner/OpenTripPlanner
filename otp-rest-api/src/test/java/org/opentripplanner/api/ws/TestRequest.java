@@ -32,6 +32,7 @@ import junit.framework.TestCase;
 import org.codehaus.jettison.json.JSONException;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.model.AbsoluteDirection;
 import org.opentripplanner.api.model.Itinerary;
@@ -75,6 +76,7 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StopMatcher;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
@@ -86,11 +88,13 @@ import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.impl.TravelingSalesmanPathService;
 import org.opentripplanner.routing.patch.Patch;
+import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PatchService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.util.TestUtils;
 
 import com.vividsolutions.jts.geom.LineString;
@@ -571,6 +575,58 @@ public class TestRequest extends TestCase {
         assertFalse(leg.to.stopId.getId().equals("2107"));
         // Instead a stop is now expected with id 2109
         assertTrue(leg.to.stopId.getId().equals("2109"));
+    }
+    
+    public void testBannedStopGroup() throws JSONException, ParameterException {
+        // Create StopMatcher instance
+        StopMatcher stopMatcher = StopMatcher.parse("TriMet_2106,TriMet_65-tc");
+        // Find stops in graph
+        Stop stop65_tc = null;
+        Stop stop12921 = null;
+        Stop stop13132 = null;
+        Stop stop2106 = null;
+        Stop stop2107 = null;
+        {
+            Graph graph = Context.getInstance().graph;
+            for (Vertex v : graph.getVertices()) {
+               if (v instanceof TransitStop) {
+                   Stop stop = ((TransitStop)v).getStop();
+                   if (stop.getId().getAgencyId().equals("TriMet")) {
+                       if (stop.getId().getId().equals("65-tc")) {
+                           stop65_tc = stop;
+                       }
+                       else if (stop.getId().getId().equals("12921")) {
+                           stop12921 = stop;
+                       }
+                       else if (stop.getId().getId().equals("13132")) {
+                           stop13132 = stop;
+                       }
+                       else if (stop.getId().getId().equals("2106")) {
+                           stop2106 = stop;
+                       }
+                       else if (stop.getId().getId().equals("2107")) {
+                           stop2107 = stop;
+                       }
+                   }
+               }
+            }
+        }
+        // All stops should be found
+        assertNotNull(stop65_tc);
+        assertNotNull(stop12921);
+        assertNotNull(stop13132);
+        assertNotNull(stop2106);
+        assertNotNull(stop2107);
+        // Match stop with id 65-tc
+        assertTrue(stopMatcher.matches(stop65_tc));
+        // Match stop with id 12921 that has TriMet_65-tc as a parent
+        assertTrue(stopMatcher.matches(stop12921));
+        // Match stop with id 13132 that has TriMet_65-tc as a parent
+        assertTrue(stopMatcher.matches(stop13132));
+        // Match stop with id 2106
+        assertTrue(stopMatcher.matches(stop2106));
+        // Match stop with id 2107
+        assertFalse(stopMatcher.matches(stop2107));
     }
     
     /**
