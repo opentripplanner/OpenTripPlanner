@@ -157,7 +157,7 @@ public class Timetable implements Serializable {
     protected TripTimes getNextTrip(int stopIndex, int time, boolean haveBicycle,
             RoutingRequest options, boolean boarding) {
         TripTimes bestTrip = null;
-        int idxLo = -1, idxHi = Integer.MAX_VALUE;
+        int index;
         TripTimes[][] tableIndex = boarding ? departuresIndex : arrivalsIndex; 
         // sorted = tripTimes; ARGH, Array versus List APIs
         // for the purposes of adjacent trips, guess that unindexed tables are roughly FIFO
@@ -172,18 +172,18 @@ public class Timetable implements Serializable {
             // an alternative to conditional increment/decrement would be to sort the arrivals
             // index in decreasing order, but that would require changing the search algorithm
             if (boarding) {
-                idxLo = idxHi = TripTimes.binarySearchDepartures(sorted, stopIndex, time); 
-                for (; idxHi < sorted.length; idxHi++) {
-                    TripTimes tt = sorted[idxHi];
+                index = TripTimes.binarySearchDepartures(sorted, stopIndex, time);
+                while (index < sorted.length) {
+                    TripTimes tt = sorted[index++];
                     if (tt.tripAcceptable(options, haveBicycle, stopIndex)) {
                         bestTrip = tt;
                         break;
                     }
                 }
             } else {
-                idxLo = idxHi = TripTimes.binarySearchArrivals(sorted, stopIndex, time); 
-                for (; idxLo >= 0; idxLo--) {
-                    TripTimes tt = sorted[idxLo];
+                index = TripTimes.binarySearchArrivals(sorted, stopIndex, time);
+                while (index >= 0) {
+                    TripTimes tt = sorted[index--];
                     if (tt.tripAcceptable(options, haveBicycle, stopIndex)) {
                         bestTrip = tt;
                         break;
@@ -195,7 +195,6 @@ public class Timetable implements Serializable {
             // no index present on this timetable. use a linear search:
             // because trips may change with stoptime updates, we cannot count on them being sorted
             int bestTime = boarding ? Integer.MAX_VALUE : Integer.MIN_VALUE;
-            int idx = 0;
             for (TripTimes tt : tripTimes) { 
                 // hoping JVM JIT will distribute the loop over the if clauses as needed
                 if (boarding) {
@@ -203,17 +202,14 @@ public class Timetable implements Serializable {
                     if (depTime >= time && depTime < bestTime && tt.tripAcceptable(options, haveBicycle, stopIndex)) {
                         bestTrip = tt;
                         bestTime = depTime;
-                        idxLo = idxHi = idx;
                     }
                 } else {
                     int arvTime = tt.getArrivalTime(stopIndex);
                     if (arvTime <= time && arvTime > bestTime && tt.tripAcceptable(options, haveBicycle, stopIndex)) {
                         bestTrip = tt;
                         bestTime = arvTime;
-                        idxLo = idxHi = idx;
                     }
                 }
-                ++idx;
             }
         }
         return bestTrip;
