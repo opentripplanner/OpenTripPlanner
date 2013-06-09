@@ -301,6 +301,14 @@ public class StateEditor {
         child.stateData.backMode = mode;
     }
 
+    public void setBackWalkingBike (boolean walkingBike) {
+        if (walkingBike == child.stateData.backWalkingBike)
+            return;
+        
+        cloneStateDataAsNeeded();
+        child.stateData.backWalkingBike = walkingBike;
+    }
+
     /** 
      * The lastNextArrivalDelta is the amount of time between the arrival of the last trip
      * the planner used and the arrival of the trip after that.
