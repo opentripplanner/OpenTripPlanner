@@ -338,7 +338,8 @@ otp.widgets.tripoptions.ModeSelector =
                      "TRAINISH,WALK" : "Rail Only", 
                      "BICYCLE" : 'Bicycle Only',
                      "WALK" : 'Walk Only',
-                     "TRANSIT,BICYCLE" : "Bicycle &amp; Transit" 
+                     "TRANSIT,BICYCLE" : "Bicycle &amp; Transit",
+                     "CAR" : 'Drive Only',
                    },
     
     optionLookup : null,
