@@ -95,6 +95,8 @@ public class StateData implements Cloneable {
      */
     protected TraverseMode backMode;
 
+    protected boolean backWalkingBike;
+
     public Set<String> bikeRentalNetworks;
 
     public StateData(RoutingRequest options) {

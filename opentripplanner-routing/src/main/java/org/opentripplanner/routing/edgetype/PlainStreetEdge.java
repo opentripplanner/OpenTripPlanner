@@ -238,6 +238,9 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
     }
 
     private State doTraverse(State s0, RoutingRequest options, TraverseMode traverseMode) {
+        boolean walkingBike = options.isWalkingBike();
+        boolean backWalkingBike = s0.isBackWalkingBike();
+        TraverseMode backMode = s0.getBackMode();
         Edge backEdge = s0.getBackEdge();
         if (backEdge != null) {
             // No illegal U-turns.
@@ -249,6 +252,10 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
                 return null;
             }
         }
+
+        // Ensure we are actually walking, when walking a bike
+        backWalkingBike &= TraverseMode.WALK.equals(backMode);
+        walkingBike &= TraverseMode.WALK.equals(traverseMode);
 
         if (!canTraverse(options, traverseMode)) {
             if (traverseMode == TraverseMode.BICYCLE) {
@@ -300,7 +307,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
                 weight = length / speed;
             }
         } else {
-            if (options.isWalkingBike()) {
+            if (walkingBike) {
                 // take slopes into account when walking bikes
                 time = elevationProfileSegment.getSlopeSpeedEffectiveLength() / speed;
             }
@@ -330,6 +337,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         
         StateEditor s1 = s0.edit(this);
         s1.setBackMode(traverseMode);
+        s1.setBackWalkingBike(walkingBike);
 
         if (wheelchairNotes != null && options.wheelchairAccessible) {
             s1.addAlerts(wheelchairNotes);
@@ -338,7 +346,8 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         PlainStreetEdge backPSE;
         if (backEdge != null && backEdge instanceof PlainStreetEdge) {
             backPSE = (PlainStreetEdge) backEdge;
-            double backSpeed = backPSE.calculateSpeed(options, traverseMode);
+            RoutingRequest backOptions = backWalkingBike ? options.bikeWalkingOptions : options;
+            double backSpeed = backPSE.calculateSpeed(backOptions, backMode);
             final double realTurnCost;  // Units are seconds.
             
             /* Compute turn cost.
@@ -354,12 +363,12 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
              * the backEdge, rather than of the current edge.
              */
             if (options.arriveBy && tov instanceof IntersectionVertex) { // arrive-by search
-                if (!canTurnOnto(backPSE, s0, traverseMode)) {
+                if (!canTurnOnto(backPSE, s0, backMode)) {
                     return null;
                 }
                 IntersectionVertex traversedVertex = ((IntersectionVertex) tov);
-                realTurnCost = options.getIntersectionTraversalCostModel().computeTraversalCost(
-                        traversedVertex, this, backPSE, traverseMode, options, (float) speed,
+                realTurnCost = backOptions.getIntersectionTraversalCostModel().computeTraversalCost(
+                        traversedVertex, this, backPSE, backMode, backOptions, (float) speed,
                         (float) backSpeed);
             } else if (fromv instanceof IntersectionVertex) { // depart-after search
                 if (!backPSE.canTurnOnto(this, s0, traverseMode)) {
@@ -418,7 +427,9 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
      * Calculate the speed appropriately given the RoutingRequest and traverseMode.
      */
     private double calculateSpeed(RoutingRequest options, TraverseMode traverseMode) {
-        if (traverseMode.isDriving()) {
+        if (traverseMode == null) {
+            return Double.NaN;
+        } else if (traverseMode.isDriving()) {
             // NOTE: Automobiles have variable speeds depending on the edge type
             return calculateCarSpeed(options);
         }
