@@ -453,6 +453,7 @@ otp.widgets.tripoptions.MaxWalkSelector =
     },
 
     restorePlan : function(data) {
+        if(!data.queryParams.maxWalkDistance) return;
         $('#'+this.id+'-value').val((data.queryParams.maxWalkDistance/1609.34).toFixed(2));  
         this.tripWidget.module.maxWalkDistance = data.queryParams.maxWalkDistance;
     },
@@ -549,7 +550,7 @@ otp.widgets.tripoptions.PreferredRoutes =
         }
         else { // none specified
             this.selectorWidget.restoredRouteIds = [];
-            $('#'+this.id+'-list').html('');
+            $('#'+this.id+'-list').html('(None)');
             this.tripWidget.module.preferredRoutes = null;
         }
         if(planData.queryParams.otherThanPreferredRoutesPenalty) {
@@ -563,102 +564,6 @@ otp.widgets.tripoptions.PreferredRoutes =
         
 });
 
-
-//** PreferredRoutes **//
-/*
-otp.widgets.tripoptions.PreferredRoutes = 
-    otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
-    
-    id           :  null,
-    
-    selectorWidget : null,
-       
-    initialize : function(tripWidget) {
-        var this_ = this;
-        otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
-        this.id = tripWidget.id+"-preferredRoutes";
-        
-        var html = '<div class="notDraggable">';
-        var html = '<div style="float:right; font-size: 12px;"><button id="'+this.id+'-button">Edit..</button></div>';
-        html += 'Preferred Routes: <span id="'+this.id+'-list">(None)</span>';
-        html += '<div style="clear:both;"></div></div>';
-        
-        $(html).appendTo(this.$());
-        
-        var weightSliderDiv = $('<div class="otp-tripViewer-select notDraggable" style="margin-top: 8px;" >').appendTo(this.$());
-        $('<div style="float: left;">Weight:</div>').appendTo(weightSliderDiv);
-        this.weightSlider = $('<div id="'+this.id+'-weightSlider" style="width:90%" />')
-        .appendTo($('<div style="margin-left:60px;">').appendTo(weightSliderDiv))
-        .slider({
-            min : 0,
-            max : 28800,
-            value : 300,
-        });
-        
-        this.weightSlider.on('slidechange', function(evt) {
-            this_.tripWidget.module.otherThanPreferredRoutesPenalty = this_.weightSlider.slider('value');
-        });
-        
-        
-        this.selectorWidget = new otp.widgets.RoutesSelectorWidget(this.id+"-selectorWidget", this, "Preferred Routes");
-    },
-
-    doAfterLayout : function() {
-        var this_ = this;
-        $('#'+this.id+'-button').button().click(function() {
-            console.log("edit pref rtes");
-            this_.selectorWidget.updateRouteList();
-
-            this_.selectorWidget.show();
-            this_.selectorWidget.bringToFront();
-        });
-    },
-
-    setRoutes : function(paramStr, displayStr) {
-        this.tripWidget.module.preferredRoutes = paramStr;
-        $('#'+this.id+'-list').html(displayStr);
-    },
-    
-    restorePlan : function(planData) {
-        if(planData.queryParams.preferredRoutes) {
-            var this_ = this;
-            
-            var restoredIds = [];
-            var preferredRoutesArr = planData.queryParams.preferredRoutes.split(',');
-
-            // convert the API's agency_name_id format to standard agency_id
-            for(var i=0; i < preferredRoutesArr.length; i++) {
-                var apiIdArr = preferredRoutesArr[i].split("_");
-                var agencyAndId = apiIdArr[0] + "_" + apiIdArr.pop();
-                restoredIds.push(agencyAndId);
-            }
-            this.selectorWidget.restoredRouteIds = restoredIds; //planData.queryParams.preferredRoutes;
-            this.tripWidget.module.preferredRoutes = planData.queryParams.preferredRoutes;
-            //this.selectorWidget.updateRouteList();
-            
-            // resolve the IDs to user-friendly names
-            var ti = this.tripWidget.module.webapp.transitIndex;
-            ti.loadRoutes(this, function() {
-                var routeNames = [];
-                for(var i = 0; i < restoredIds.length; i++) {
-                    var route = ti.routes[restoredIds[i]].routeData;
-                    routeNames.push(route.routeShortName || route.routeLongName);
-                }
-                $('#'+this_.id+'-list').html(routeNames.join(', '));
-            });
-            
-        }
-        if(planData.queryParams.otherThanPreferredRoutesPenalty) {
-            this.weightSlider.slider('value', planData.queryParams.otherThanPreferredRoutesPenalty);
-        }
-    },
-    
-    isApplicableForMode : function(mode) {
-        return otp.util.Itin.includesTransit(mode);
-    }      
-        
-});
-*/
 
 //** BannedRoutes **//
 
@@ -728,7 +633,7 @@ otp.widgets.tripoptions.BannedRoutes =
         }
         else { // none specified
             this.selectorWidget.restoredRouteIds = [];
-            $('#'+this.id+'-list').html('');
+            $('#'+this.id+'-list').html('(None)');
             this.tripWidget.module.bannedRoutes = null;
         }
     },
