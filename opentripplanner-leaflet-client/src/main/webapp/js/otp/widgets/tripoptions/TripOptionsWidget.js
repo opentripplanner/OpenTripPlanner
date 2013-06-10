@@ -22,6 +22,8 @@ otp.widgets.tripoptions.TripOptionsWidget =
     module : null,
 
     scrollPanel : null,
+    
+    autoPlan : false,
             
     initialize : function(id, module, options) {
     
@@ -99,6 +101,13 @@ otp.widgets.tripoptions.TripOptionsWidget =
     newItinerary : function(itin) {
         for(var id in this.controls) {
             this.controls[id].newItinerary(itin);
+        }
+    },
+    
+    inputChanged : function(params) {
+        if(params) _.extend(this.module, params);
+        if(this.autoPlan) {
+            this.module.planTrip();
         }
     },
     
@@ -215,6 +224,7 @@ otp.widgets.tripoptions.LocationsSelector =
                 var latlng = new L.LatLng(result.lat, result.lng);
                 this_.tripWidget.module.webapp.map.lmap.panTo(latlng);
                 setterFunction.call(this_.tripWidget.module, latlng, true, result.description);
+                this_.tripWidget.inputChanged();
             }
         })
         .click(function() {
@@ -301,12 +311,10 @@ otp.widgets.tripoptions.TimeSelector =
             timeFormat: "hh:mmtt", 
             onSelect: function(dateTime) {
                 var dateTimeArr = dateTime.split(' ');
-                //vare date = 
-                this_.tripWidget.module.date = dateTimeArr[0];
-                this_.tripWidget.module.time = dateTimeArr[1];
-                console.log(dateTime);
-                this_.epoch = 1000*moment(dateTime, "MM/DD/YYYY hh:mma").unix();
-                console.log(this_.epoch);
+                this_.tripWidget.inputChanged({
+                    date : dateTimeArr[0],
+                    time : dateTimeArr[1],
+                });
             }
         });
         $('#'+this.id+'-picker').datepicker("setDate", new Date());
@@ -367,7 +375,9 @@ otp.widgets.tripoptions.ModeSelector =
     doAfterLayout : function() {
         var this_ = this;
         $("#"+this.id).change(function() {
-            this_.tripWidget.module.mode = _.keys(this_.modes)[this.selectedIndex];
+            this_.tripWidget.inputChanged({
+                mode : _.keys(this_.modes)[this.selectedIndex],
+            });
             this_.refreshModeControls();
         });
     },
@@ -447,7 +457,9 @@ otp.widgets.tripoptions.MaxWalkSelector =
             $('#'+this_.id+'-value').val(presetVal);    
 
             var m = presetVal*1609.34;
-            this_.tripWidget.module.maxWalkDistance = m;
+            this_.tripWidget.inputChanged({
+                maxWalkDistance : m,
+            });
 
             $('#'+this_.id+'-presets option:eq(0)').prop('selected', true);    
         });
@@ -497,7 +509,9 @@ otp.widgets.tripoptions.PreferredRoutes =
         });
         
         this.weightSlider.on('slidechange', function(evt) {
-            this_.tripWidget.module.otherThanPreferredRoutesPenalty = this_.weightSlider.slider('value');
+            this_.tripWidget.inputChanged({
+                otherThanPreferredRoutesPenalty : this_.weightSlider.slider('value'),
+            });
         });
         
         
@@ -516,7 +530,9 @@ otp.widgets.tripoptions.PreferredRoutes =
     },
 
     setRoutes : function(paramStr, displayStr) {
-        this.tripWidget.module.preferredRoutes = paramStr;
+        this.tripWidget.inputChanged({
+            preferredRoutes : paramStr,
+        });
         $('#'+this.id+'-list').html(displayStr);
     },
     
@@ -600,7 +616,9 @@ otp.widgets.tripoptions.BannedRoutes =
     },
 
     setRoutes : function(paramStr, displayStr) {
-        this.tripWidget.module.bannedRoutes = paramStr;
+        this.tripWidget.inputChanged({
+            bannedRoutes : paramStr,
+        });
         $('#'+this.id+'-list').html(displayStr);
     },
     
@@ -670,16 +688,21 @@ otp.widgets.tripoptions.BikeTriangle =
         var this_ = this;
         this.bikeTriangle.onChanged = function() {
             var formData = this_.bikeTriangle.getFormData();
-            this_.tripWidget.module.triangleTimeFactor = formData.triangleTimeFactor;
-            this_.tripWidget.module.triangleSlopeFactor = formData.triangleSlopeFactor;
-            this_.tripWidget.module.triangleSafetyFactor = formData.triangleSafetyFactor;
-            if(this_.tripWidget.module.planTrip) this_.tripWidget.module.planTrip();
+            this_.tripWidget.inputChanged({
+                optimize : "TRIANGLE",
+                triangleTimeFactor : formData.triangleTimeFactor,
+                triangleSlopeFactor : formData.triangleSlopeFactor,
+                triangleSafetyFactor : formData.triangleSafetyFactor,                
+            });
+            
         };
     },
 
-    restorePlan : function(data) {
-        if(data.optimize === 'TRIANGLE') {
-            this.bikeTriangle.setValues(data.triangleTimeFactor, data.triangleSlopeFactor, data.triangleSafetyFactor);
+    restorePlan : function(planData) {
+        if(planData.queryParams.optimize === 'TRIANGLE') {
+            this.bikeTriangle.setValues(planData.queryParams.triangleTimeFactor,
+                                        planData.queryParams.triangleSlopeFactor,
+                                        planData.queryParams.triangleSafetyFactor);
         }
     },
     
@@ -700,6 +723,7 @@ otp.widgets.tripoptions.BikeType =
     initialize : function(tripWidget) {
         otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
         this.id = tripWidget.id+"-bikeType";
+        this.$().addClass('notDraggable');
 
         var content = '';        
         content += 'Use: ';
@@ -710,22 +734,30 @@ otp.widgets.tripoptions.BikeType =
     },
 
     doAfterLayout : function() {
-        var module = this.tripWidget.module;
+        //var module = this.tripWidget.module;
+        var this_ = this;
         $('#'+this.id+'-myOwnBikeRBtn').click(function() {
-            module.mode = "BICYCLE";
-            module.planTrip();
+            //module.mode = "BICYCLE";
+            //module.planTrip();
+            this_.tripWidget.inputChanged({
+                mode : "BICYCLE",
+            });
+
         });
         $('#'+this.id+'-sharedBikeRBtn').click(function() {
-            module.mode = "WALK,BICYCLE";
-            module.planTrip();
+            //module.mode = "WALK,BICYCLE";
+            //module.planTrip();
+            this_.tripWidget.inputChanged({
+                mode : "WALK,BICYCLE",
+            });
         });
     },
     
-    restorePlan : function(data) {
-        if(data.mode === "BICYCLE") {
+    restorePlan : function(planData) {
+        if(planData.queryParams.mode === "BICYCLE") {
             $('#'+this.id+'-myOwnBikeRBtn').attr('checked', 'checked');
         }
-        if(data.mode === "WALK,BICYCLE") {
+        if(planData.queryParams.mode === "WALK,BICYCLE") {
             $('#'+this.id+'-sharedBikeRBtn').attr('checked', 'checked');
         }
     },
@@ -871,8 +903,12 @@ otp.widgets.tripoptions.GroupTripOptions =
     doAfterLayout : function() {
         var this_ = this;
         $('#'+this.id+'-value').change(function() {
-            console.log("new groupSize");
-            this_.tripWidget.module.groupSize = parseInt($('#'+this_.id+'-value').val());
+            //console.log("new groupSize");
+            //this_.tripWidget.module.groupSize = parseInt($('#'+this_.id+'-value').val());
+            this_.tripWidget.imputChanged({
+                groupSize : parseInt($('#'+this_.id+'-value').val()),
+            });
+
         });
     },
 
