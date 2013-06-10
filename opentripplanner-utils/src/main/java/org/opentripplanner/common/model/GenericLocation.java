@@ -64,9 +64,12 @@ public class GenericLocation implements Cloneable {
      */
     private Double heading;
 
-    // Pattern for parsing lat,lng strings.
+    // Pattern for matching lat,lng strings, i.e. an optional '-' character followed by 
+    // one or more digits, and an optional (decimal point followed by one or more digits).
     private static final String _doublePattern = "-{0,1}\\d+(\\.\\d+){0,1}";
 
+    // We want to ignore any number of non-digit characters at the beginning of the string, except
+    // that signs are also non-digits. So ignore any number of non-(digit or sign or decimal point). 
     private static final Pattern _latLonPattern = Pattern.compile("[^[\\d&&[-|+|.]]]*(" + _doublePattern
             + ")(\\s*,\\s*|\\s+)(" + _doublePattern + ")\\D*");
     
