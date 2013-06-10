@@ -350,6 +350,10 @@ public class State implements Cloneable {
         return stateData.backMode;
     }
     
+    public boolean isBackWalkingBike () {
+        return stateData.backWalkingBike;
+    }
+
     public Set<Alert> getBackAlerts () {
         return stateData.notes;
     }
