@@ -31,6 +31,11 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.LoggerFactory;
 
+/**
+ * It prints the stops that satisfy certain criteria.
+ * The output is a list of stops, some of the stops attributes (coordinates and etc.) and the criteria it satisfies.
+ */
+
 public class StopsAlerts implements GraphBuilder {
 
     private static org.slf4j.Logger LOG = LoggerFactory.getLogger(StopsAlerts.class);
