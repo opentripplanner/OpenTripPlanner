@@ -80,6 +80,17 @@ public class GenericLocationTest {
         assertNull(loc.getLng());
         assertNull(loc.getCoordinate());
     }
+
+    @Test
+    public void testFromStringWithEdgeAndHeading() {
+        String s = "40.75542978896869,-73.97618338000376 heading=29.028895183287617 edgeId=2767";
+        GenericLocation loc = GenericLocation.fromOldStyleString(s);
+        assertEquals(29.028895183287617, loc.getHeading(), 0.00001);
+        assertEquals(2767, loc.getEdgeId().intValue());
+        
+        assertEquals(40.75542978896869, loc.getLat(), 0.00001);
+        assertEquals(-73.97618338000376, loc.getLng(), 0.00001);
+    }
     
     @Test
     public void testFromOldStyleStringWithCoord() {

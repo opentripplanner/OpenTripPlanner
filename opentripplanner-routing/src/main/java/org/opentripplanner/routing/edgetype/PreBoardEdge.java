@@ -43,6 +43,14 @@ public class PreBoardEdge extends FreeEdge {
     @Override
     public State traverse(State s0) {
         RoutingRequest options = s0.getOptions();
+        
+        // Ignore this edge if its stop is banned
+        if (!options.getBannedStops().isEmpty() && fromv instanceof TransitStop) {
+            if (options.getBannedStops().matches(((TransitStop) fromv).getStop())) {
+                return null;
+            }
+        }
+        
         if (options.isArriveBy()) {
             /* Traverse backward: not much to do */
             StateEditor s1 = s0.edit(this);
@@ -78,7 +86,7 @@ public class PreBoardEdge extends FreeEdge {
             /*
              * look in the global transfer table for the rules from the previous stop to this stop.
              */
-            long t0 = s0.getTime();
+            long t0 = s0.getTimeSeconds();
 
             long slack;
             if (s0.isEverBoarded()) {
@@ -88,7 +96,7 @@ public class PreBoardEdge extends FreeEdge {
             }
             long board_after = t0 + slack;
             long transfer_penalty = 0;
-            if (s0.getLastAlightedTime() != 0) {
+            if (s0.getLastAlightedTimeSeconds() != 0) {
                 /* this is a transfer rather than an initial boarding */
                 TransferTable transferTable = s0.getContext().transferTable;
                 if (transferTable.hasPreferredTransfers()) {
@@ -102,7 +110,7 @@ public class PreBoardEdge extends FreeEdge {
                 } else if (transfer_time >= 0) {
                     // handle minimum time transfers (>0) and timed transfers (0)
                     // relative to alight time at last stop
-                    long table_board_after = s0.getLastAlightedTime() + transfer_time;
+                    long table_board_after = s0.getLastAlightedTimeSeconds() + transfer_time;
                     // do not let time run backward
                     // this could make timed transfers fail if there is walking involved
                     if (table_board_after > board_after)
@@ -133,7 +141,7 @@ public class PreBoardEdge extends FreeEdge {
             }
 
             StateEditor s1 = s0.edit(this);
-            s1.setTime(board_after);
+            s1.setTimeSeconds(board_after);
             s1.setEverBoarded(true);
             long wait_cost = board_after - t0;
             s1.incrementWeight(wait_cost + transfer_penalty);

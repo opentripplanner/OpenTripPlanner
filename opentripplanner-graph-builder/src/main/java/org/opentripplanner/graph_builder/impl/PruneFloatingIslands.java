@@ -25,17 +25,14 @@ import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.*;
 
 /**
- * this module is part of the  {@link GraphBuilder} process. it design to remove small isolated islands form the graph.
- * Island created when there is no connectivity in the map, island acts like trap since there
- * is no connectivity there is no way in or out the island.
- * the module distinguish between two island types one with transit stops and without stops.
- *
- *
- *
+ * this module is part of the  {@link GraphBuilder} process. it design to remove small isolated 
+ * islands form the graph. Islands are created when there is no connectivity in the map, island 
+ * acts like trap since there is no connectivity there is no way in or out the island.
+ * The module distinguish between two island types one with transit stops and one without stops.
  */
 public class PruneFloatingIslands implements GraphBuilder {
 
-    private static org.slf4j.Logger _log = LoggerFactory.getLogger(PruneFloatingIslands.class);
+    private static org.slf4j.Logger LOG = LoggerFactory.getLogger(PruneFloatingIslands.class);
 
     /**
      * this field indicate the maximum size for island without stops
@@ -52,11 +49,12 @@ public class PruneFloatingIslands implements GraphBuilder {
     private int islandWithStopsMaxSize = 5;
 
     /**
-     * The name for output file for this process, the file will store information about the islands were found and if they were pruned.
-     * If the value is an empty string there will be no output file.
+     * The name for output file for this process. The file will store information about the islands 
+     * that were found and whether they were pruned. If the value is an empty string or null there 
+     * will be no output file.
      */
     @Setter
-    private String islandLogFile = "";
+    private String islandLogFile;
 
     @Setter
     private TransitToStreetNetworkGraphBuilderImpl transitToStreetNetwork;
@@ -76,16 +74,17 @@ public class PruneFloatingIslands implements GraphBuilder {
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
-        _log.info("Pruning isolated islands in street network...");
-        StreetUtils.pruneFloatingIslands(graph, islandWithoutStopsMaxSize, islandWithStopsMaxSize,
-                LoggerAppenderProvider.createCsvFile4LoggerCat(islandLogFile, "islands"));
+        LOG.info("Pruning isolated islands in street network");
+        
+        StreetUtils.pruneFloatingIslands(graph, islandWithoutStopsMaxSize, 
+                islandWithStopsMaxSize, islandLogFile);
         if (transitToStreetNetwork == null) {
-            _log.info("TransitToStreetNetworkGraphBuilder was not provided to PruneFloatingIslands. Not attempting to reconnect stops.");
+            LOG.debug("TransitToStreetNetworkGraphBuilder was not provided to PruneFloatingIslands. Not attempting to reconnect stops.");
         } else {
             //reconnect stops on small islands (that removed)
             transitToStreetNetwork.buildGraph(graph,extra);
         }
-        _log.debug("Done pruning isolated islands.");
+        LOG.debug("Done pruning isolated islands");
     }
 
     @Override

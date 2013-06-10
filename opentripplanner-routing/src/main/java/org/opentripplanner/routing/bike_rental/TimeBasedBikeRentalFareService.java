@@ -95,9 +95,9 @@ public class TimeBasedBikeRentalFareService implements ChainedFareService, Seria
             if (state.getVertex() instanceof BikeRentalStationVertex
                     && state.getBackState().getVertex() instanceof BikeRentalStationVertex) {
                 if (start == -1) {
-                    start = state.getTime();
+                    start = state.getTimeSeconds();
                 } else {
-                    int time_on_bike = (int) (state.getTime() - start);
+                    int time_on_bike = (int) (state.getTimeSeconds() - start);
                     int ride_cost = -1;
                     for (P2<Integer> bracket : pricing_by_second) {
                         int time = bracket.getFirst();

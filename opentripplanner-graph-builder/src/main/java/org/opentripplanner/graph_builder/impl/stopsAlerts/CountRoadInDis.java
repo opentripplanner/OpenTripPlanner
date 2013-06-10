@@ -28,7 +28,7 @@ import java.util.Collection;
  */
 public class CountRoadInDis extends AbstractStopTester {
 
-    Logger _log = LoggerFactory.getLogger(CountRoadInDis.class);
+    Logger LOG = LoggerFactory.getLogger(CountRoadInDis.class);
 
     @Setter
     double distance; //distance in meters
@@ -45,7 +45,7 @@ public class CountRoadInDis extends AbstractStopTester {
     public boolean fulfillDemands(TransitStop ts, Graph graph) {
         if(graph.streetIndex == null){
             graph.streetIndex = new StreetVertexIndexServiceImpl(graph);
-            _log.debug("street index built.");
+            LOG.debug("street index built.");
         }
         StreetVertexIndexService streetIndexService = graph.streetIndex;
         DistanceLibrary distanceLibrary;

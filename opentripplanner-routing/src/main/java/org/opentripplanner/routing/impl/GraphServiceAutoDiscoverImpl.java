@@ -30,16 +30,11 @@ import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ResourceLoaderAware;
-import org.springframework.context.annotation.Scope;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 
 /**
  * An implementation of the file-based GraphServiceFileImpl which auto-configure itself by scanning the root resource directory.
  */
-@Scope("singleton")
-public class GraphServiceAutoDiscoverImpl implements GraphService, ResourceLoaderAware {
+public class GraphServiceAutoDiscoverImpl implements GraphService {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphServiceAutoDiscoverImpl.class);
 
@@ -143,12 +138,6 @@ public class GraphServiceAutoDiscoverImpl implements GraphService, ResourceLoade
         return 0;
     }
 
-    /** The resourceLoader setter is called by Spring via ResourceLoaderAware interface. */
-    @Override
-    public void setResourceLoader(ResourceLoader resourceLoader) {
-        decorated.setResourceLoader(resourceLoader);
-    }
-
     /**
      * Based on the autoRegister list, automatically register all routerIds for which we can find a graph file in a subdirectory of the resourceBase
      * path. Also register and load the graph for the defaultRouterId and warn if no routerIds are registered.
@@ -173,9 +162,16 @@ public class GraphServiceAutoDiscoverImpl implements GraphService, ResourceLoade
         Collection<String> graphToLoad = new HashSet<String>();
         // Only reload graph modified more than 1 mn ago.
         long validEndTime = System.currentTimeMillis() - loadDelaySec * 1000;
-        Resource base = decorated.getResource(decorated.getResourceBase());
         try {
-            File baseFile = base.getFile();
+            String resourceBase = decorated.getResourceBase();
+            File baseFile = null;
+            if (resourceBase.startsWith("file:")) {
+                baseFile = new File(resourceBase.substring(5));
+            } else if (resourceBase.startsWith("classpath:")) {
+                throw new UnsupportedOperationException();
+            } else {
+                baseFile = new File(resourceBase);
+            }
             // First check for a root graph
             File rootGraphFile = new File(baseFile, GraphServiceFileImpl.GRAPH_FILENAME);
             if (rootGraphFile.exists() && rootGraphFile.canRead()) {
@@ -186,6 +182,10 @@ public class GraphServiceAutoDiscoverImpl implements GraphService, ResourceLoade
                     LOG.debug("Graph to (re)load: {}, lastModified={}", rootGraphFile, lastModified);
                     graphToLoad.add("");
                 }
+            }
+            if (!baseFile.isDirectory()) {
+                throw new IOException("Resource base " + baseFile
+                        + " is not a directory, can't auto-discover.");
             }
             // Then graph in sub-directories
             for (String sub : baseFile.list()) {
@@ -204,11 +204,7 @@ public class GraphServiceAutoDiscoverImpl implements GraphService, ResourceLoade
                 }
             }
         } catch (IOException e) {
-            // Can happen if base is not a standard directory (resource)
-            LOG.error(
-                    "Graph auto-discovering has been set, but {} is not a file resource, so I'm bailing-out.",
-                    decorated.getResourceBase());
-            // Just warn the user, no need to throw exception
+            LOG.error("Can't scan " + decorated.getResourceBase(), e);
         } finally {
             lastAutoScan = validEndTime;
         }

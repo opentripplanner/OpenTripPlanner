@@ -50,7 +50,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
 
     private static final long serialVersionUID = 1042740795612978747L;
 
-    private static final Logger _log = LoggerFactory.getLogger(TransitBoardAlight.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TransitBoardAlight.class);
 
     private int stopIndex;
 
@@ -147,21 +147,24 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
                 return null;
             }
             s1.setTripId(null);
-            s1.setLastAlightedTime(state0.getTime());
-            s1.setPreviousStop(fromv);
+            s1.setLastAlightedTimeSeconds(state0.getTimeSeconds());
+            // For stop-to-stop transfer time, preference, and permission checking. 
+            // Vertices in transfer table are stop arrive/depart not pattern arrive/depart, 
+            // so previousStop is direction-dependent.
+            s1.setPreviousStop(boarding ? fromv : tov); 
             s1.setLastPattern(this.getPattern());
 
             // determine the wait
             if (arrivalTimeAtStop > 0) {
-                int wait = (int) Math.abs(state0.getTime() - arrivalTimeAtStop);
+                int wait = (int) Math.abs(state0.getTimeSeconds() - arrivalTimeAtStop);
                 
                 s1.incrementTimeInSeconds(wait);
                 // this should only occur at the beginning
                 s1.incrementWeight(wait * options.waitAtBeginningFactor);
 
-                s1.setInitialWaitTime(wait);
+                s1.setInitialWaitTimeSeconds(wait);
 
-                //_log.debug("Initial wait time set to {} in PatternBoard", wait);
+                //LOG.debug("Initial wait time set to {} in PatternBoard", wait);
             }
             
             // during reverse optimization, board costs should be applied to PatternBoards
@@ -215,7 +218,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
              * a trip on a pattern at 25:00 today and another trip on the same pattern at
              * 00:30 tommorrow. The 00:30 trip should be taken, but if we stopped the search
              * after finding today's 25:00 trip we would never find tomorrow's 00:30 trip. */
-            long current_time = state0.getTime();
+            long current_time = state0.getTimeSeconds();
             int bestWait = -1;
             TripTimes bestTripTimes = null;
             int serviceId = getPattern().getServiceId();
@@ -236,7 +239,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
                             (int)(current_time - sd.time(tripTimes.getArrivalTime(stopIndex)));
                         // a trip was found and the index is valid, so the wait should be non-negative
                         if (wait < 0)
-                            _log.error("negative wait time on board");
+                            LOG.error("negative wait time on board");
                         if (bestWait < 0 || wait < bestWait) {
                             // track the soonest departure over all relevant schedules
                             bestWait = wait;
@@ -284,7 +287,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
             if (state0.getNumBoardings() == 0 && !options.isReverseOptimizing()) {
                 wait_cost *= options.waitAtBeginningFactor;
                 // this is subtracted out in Analyst searches in lieu of reverse optimization
-                s1.setInitialWaitTime(bestWait);
+                s1.setInitialWaitTimeSeconds(bestWait);
             } else {
                 wait_cost *= options.waitReluctance;
             }
@@ -309,7 +312,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
                 // it is re-reversed by optimize, so this still yields a forward tree
                 State optimized = s1.makeState().optimizeOrReverse(true, true);
                 if (optimized == null)
-                    _log.error("Null optimized state. This shouldn't happen");
+                    LOG.error("Null optimized state. This shouldn't happen");
                 return optimized;
             }
             

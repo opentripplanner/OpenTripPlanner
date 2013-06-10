@@ -37,7 +37,14 @@ import org.opentripplanner.routing.graph.Vertex;
 public class BasicShortestPathTree extends AbstractShortestPathTree {
     
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
-
+    
+    public static final class FactoryImpl implements ShortestPathTreeFactory {
+        @Override
+        public ShortestPathTree create(RoutingRequest options) {
+            return new BasicShortestPathTree(options);
+        }
+    }
+    
     private static final int DEFAULT_CAPACITY = 500;
 
     Map<Vertex, State> states;

@@ -2,3 +2,4 @@
 
 require:
     - play
+    - com.lambdaworks -> scrypt 1.3.3

@@ -40,6 +40,11 @@ public class GenericLocation implements Cloneable {
      * The identifier of the place, if provided. May be a lat,lng string or a vertex ID.
      */
     private final String place;
+    
+    /**
+     * The ID of the edge this location is on if any.
+     */
+    private Integer edgeId;
 
     /**
      * Coordinates of the place, if provided.
@@ -62,9 +67,14 @@ public class GenericLocation implements Cloneable {
     // Pattern for parsing lat,lng strings.
     private static final String _doublePattern = "-{0,1}\\d+(\\.\\d+){0,1}";
 
-    private static final Pattern _latLonPattern = Pattern.compile("^\\s*(" + _doublePattern
-            + ")(\\s*,\\s*|\\s+)(" + _doublePattern + ")\\s*$");
+    private static final Pattern _latLonPattern = Pattern.compile("\\D*(" + _doublePattern
+            + ")(\\s*,\\s*|\\s+)(" + _doublePattern + ")\\D*");
+    
+    private static final Pattern _headingPattern = Pattern.compile("\\D*heading=("
+            + _doublePattern + ")\\D*");
 
+    private static final Pattern _edgeIdPattern = Pattern.compile("\\D*edgeId=(\\d+)\\D*");
+    
     /**
      * Constructs an empty GenericLocation.
      */
@@ -118,9 +128,19 @@ public class GenericLocation implements Cloneable {
         }
         
         Matcher matcher = _latLonPattern.matcher(place);
-        if (matcher.matches()) {
+        if (matcher.find()) {
             this.lat = Double.parseDouble(matcher.group(1));
             this.lng = Double.parseDouble(matcher.group(4));
+        }
+        
+        matcher = _headingPattern.matcher(place);
+        if (matcher.find()) {
+            this.heading = Double.parseDouble(matcher.group(1));
+        }
+        
+        matcher = _edgeIdPattern.matcher(place);
+        if (matcher.find()) {
+            this.edgeId = Integer.parseInt(matcher.group(1));
         }
     }
 
@@ -176,6 +196,14 @@ public class GenericLocation implements Cloneable {
         return this.lat != null && this.lng != null;
     }
     
+    /**
+     * Returns true if getEdgeId would not return null.
+     * @return
+     */
+    public boolean hasEdgeId() {
+        return this.edgeId != null;
+    }
+    
     public NamedPlace getNamedPlace() {
         return new NamedPlace(this.name, this.place);
     }
@@ -218,6 +246,9 @@ public class GenericLocation implements Cloneable {
         sb.append("<GenericLocation lat,lng=").append(this.lat).append(",").append(this.lng);
         if (this.hasHeading()) {
             sb.append(" heading=").append(this.heading);
+        }
+        if (this.hasEdgeId()) {
+            sb.append(" edgeId=").append(this.edgeId);
         }
         sb.append(">");
         return sb.toString();

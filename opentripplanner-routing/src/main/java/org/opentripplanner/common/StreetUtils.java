@@ -13,9 +13,16 @@
 
 package org.opentripplanner.common;
 
-import java.util.*;
+import java.io.File;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
 
-import com.vividsolutions.jts.geom.Geometry;
 import org.opentripplanner.common.geometry.Subgraph;
 import org.opentripplanner.gbannotation.GraphConnectivity;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -31,22 +38,31 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Polygon;
+
 public class StreetUtils {
 
-    private static Logger _log = LoggerFactory.getLogger(StreetUtils.class);
+    private static Logger LOG = LoggerFactory.getLogger(StreetUtils.class);
     private static int islandCounter = 0;
 
-    public static void pruneFloatingIslands(Graph graph, int maxIslandSize, int islandWithStopMaxSize, String islandLogName) {
-        _log.debug("pruning");
-
-        Logger islandLog = null;
-        if(islandLogName != null){
-            islandLog = LoggerFactory.getLogger(islandLogName);
-            islandLog.info(String.format("%s\t%s\t%s\t%s\t%s","id","stopCount", "streetCount","wkt" ,"hadRemoved"));
+    public static void pruneFloatingIslands(Graph graph, int maxIslandSize, 
+            int islandWithStopMaxSize, String islandLogName) {
+        LOG.debug("pruning");
+        PrintWriter islandLog = null;
+        if (islandLogName != null && !islandLogName.isEmpty()) {
+            try {
+                islandLog = new PrintWriter(new File(islandLogName));
+            } catch (Exception e) {
+                LOG.error("Failed to write islands log file due to {}", e.toString());
+                e.printStackTrace();
+            }
+        }
+        if (islandLog != null) {
+            islandLog.printf("%s\t%s\t%s\t%s\t%s\n","id","stopCount", "streetCount","wkt" ,"hadRemoved");
         }
         Map<Vertex, Subgraph> subgraphs = new HashMap<Vertex, Subgraph>();
         Map<Vertex, ArrayList<Vertex>> neighborsForVertex = new HashMap<Vertex, ArrayList<Vertex>>();
@@ -109,7 +125,7 @@ public class StreetUtils {
                 islands.add(subgraph);
             }
         }
-        _log.info(islands.size() + " sub graphs found");
+        LOG.info(islands.size() + " sub graphs found");
         /* remove all tiny subgraphs and large subgraphs without stops */
         for (Subgraph island : islands) {
             boolean hadRemoved = false;
@@ -131,7 +147,7 @@ public class StreetUtils {
             }
         }
         if (graph.removeEdgelessVertices() > 0) {
-            _log.warn("Removed edgeless vertices after pruning islands.");
+            LOG.warn("Removed edgeless vertices after pruning islands");
         }
     }
 
@@ -172,7 +188,7 @@ public class StreetUtils {
                 }
             }
         }
-        _log.warn(graph.addBuilderAnnotation(new GraphConnectivity(island.getRepresentativeVertex(), island.streetSize())));
+        LOG.debug(graph.addBuilderAnnotation(new GraphConnectivity(island.getRepresentativeVertex(), island.streetSize())));
     }
 
     private static Subgraph computeConnectedSubgraph(
@@ -194,13 +210,13 @@ public class StreetUtils {
 //        return null;
     }
 
-    private static void WriteNodesInSubGraph(Subgraph subgraph, Logger islandLog, boolean hadRemoved){
+    private static void WriteNodesInSubGraph(Subgraph subgraph, PrintWriter islandLog, boolean hadRemoved){
         Geometry convexHullGeom = subgraph.getConvexHull();
-        if(!convexHullGeom.getGeometryType().equalsIgnoreCase("POLYGON")){
+        if (convexHullGeom != null && !(convexHullGeom instanceof Polygon)) {
             convexHullGeom = convexHullGeom.buffer(0.0001,5);
         }
-        islandLog.info(String.format("%d\t%d\t%d\t%s\t%b",
-                islandCounter,subgraph.stopSize(), subgraph.streetSize(), convexHullGeom, hadRemoved));
+        islandLog.printf("%d\t%d\t%d\t%s\t%b\n", islandCounter, subgraph.stopSize(), 
+                subgraph.streetSize(), convexHullGeom, hadRemoved);
         islandCounter++;
     }
 }

@@ -97,9 +97,9 @@ public class EarliestArrivalSPTService implements SPTService {
     // Move this into State
     private boolean isWorstTimeExceeded(State v, RoutingRequest opt) {
         if (opt.isArriveBy())
-            return v.getTime() < opt.worstTime;
+            return v.getTimeSeconds() < opt.worstTime;
         else
-            return v.getTime() > opt.worstTime;
+            return v.getTimeSeconds() > opt.worstTime;
     }
 
 }

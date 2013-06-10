@@ -33,7 +33,7 @@ import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.NamedPlace;
-import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.request.BannedStopSet;
@@ -217,6 +217,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Do not use certain trips */
     public HashMap<AgencyAndId, BannedStopSet> bannedTrips = new HashMap<AgencyAndId, BannedStopSet>();
 
+    /** Do not use certain stops. See for more information the bannedStops property in the RoutingResource class. */
+    private StopMatcher bannedStops = StopMatcher.emptyMatcher(); 
+    
     /** Set of preferred routes by user. */
     public RouteMatcher preferredRoutes = RouteMatcher.emptyMatcher();
     
@@ -227,7 +230,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      * Penalty added for using every route that is not preferred if user set any route as preferred. We return number of seconds that we are willing
      * to wait for preferred route.
      */
-    public int useAnotherThanPreferredRoutesPenalty = 300;
+    public int otherThanPreferredRoutesPenalty = 300;
 
     /** Set of unpreferred routes for given user. */
     public RouteMatcher unpreferredRoutes = RouteMatcher.emptyMatcher();
@@ -262,7 +265,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public Map<Object, Object> extensions = new HashMap<Object, Object>();
 
     /** Penalty for using a non-preferred transfer */
-    public int nonpreferredTransferPenalty = 120;
+    public int nonpreferredTransferPenalty = 180;
 
     /**
      * For the bike triangle, how important time is. triangleTimeFactor+triangleSlopeFactor+triangleSafetyFactor == 1
@@ -479,6 +482,11 @@ public class RoutingRequest implements Cloneable, Serializable {
             preferredRoutes = RouteMatcher.emptyMatcher();
     }
     
+    public void setOtherThanPreferredRoutesPenalty(int penalty) {
+        if(penalty < 0) penalty = 0;
+        this.otherThanPreferredRoutesPenalty = penalty;
+    }
+    
     public void setUnpreferredAgencies(String s) {
         if (s != null && !s.equals(""))
             unpreferredAgencies = new HashSet<String>(Arrays.asList(s.split(",")));
@@ -496,6 +504,15 @@ public class RoutingRequest implements Cloneable, Serializable {
             bannedRoutes = RouteMatcher.parse(s);
         else
             bannedRoutes = RouteMatcher.emptyMatcher();
+    }
+
+    public void setBannedStops(String s) {
+        if (s != null && !s.equals("")) {
+            bannedStops = StopMatcher.parse(s);
+        }
+        else {
+            bannedStops = StopMatcher.emptyMatcher();
+        }
     }
 
     public void setBannedAgencies(String s) {
@@ -684,6 +701,7 @@ public class RoutingRequest implements Cloneable, Serializable {
             RoutingRequest clone = (RoutingRequest) super.clone();
             clone.bannedRoutes = bannedRoutes.clone();
             clone.bannedTrips = (HashMap<AgencyAndId, BannedStopSet>) bannedTrips.clone();
+            clone.bannedStops = bannedStops.clone();
             if (this.bikeWalkingOptions != this)
                 clone.bikeWalkingOptions = this.bikeWalkingOptions.clone();
             else
@@ -722,13 +740,18 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     /** For use in tests. Force RoutingContext to specific vertices rather than making temp edges. */
-    public void setRoutingContext(Graph graph, Vertex from, Vertex to) {
+    public void setRoutingContext(Graph graph, Edge fromBackEdge, Vertex from, Vertex to) {
         // normally you would want to tear down the routing context...
         // but this method is mostly used in tests, and teardown interferes with testHalfEdges
         // FIXME here, or in test, and/or in other places like TSP that use this method
         // if (rctx != null)
         // this.rctx.destroy();
         this.rctx = new RoutingContext(this, graph, from, to);
+        this.rctx.originBackEdge = fromBackEdge;
+    }
+    
+    public void setRoutingContext(Graph graph, Vertex from, Vertex to) {
+        setRoutingContext(graph, null, from, to);
     }
 
     /** For use in tests. Force RoutingContext to specific vertices rather than making temp edges. */
@@ -797,7 +820,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && boardSlack == other.boardSlack
                 && alightSlack == other.alightSlack
                 && nonpreferredTransferPenalty == other.nonpreferredTransferPenalty
-                && useAnotherThanPreferredRoutesPenalty == other.useAnotherThanPreferredRoutesPenalty
+                && otherThanPreferredRoutesPenalty == other.otherThanPreferredRoutesPenalty
                 && useUnpreferredRoutesPenalty == other.useUnpreferredRoutesPenalty
                 && triangleSafetyFactor == other.triangleSafetyFactor
                 && triangleSlopeFactor == other.triangleSlopeFactor
@@ -945,6 +968,10 @@ public class RoutingRequest implements Cloneable, Serializable {
         return bannedRoutes.asString();
     }
 
+    public String getBannedStopsStr() {
+        return bannedStops.asString();
+    }
+    
     public String getBannedAgenciesStr() {
     	return getRouteOrAgencyStr(bannedAgencies);
     }
@@ -997,7 +1024,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     		boolean isPreferedRoute = preferredRoutes != null && preferredRoutes.matches(route);
     		boolean isPreferedAgency = preferredAgencies != null && preferredAgencies.contains(agencyID); 
     		if (!isPreferedRoute && !isPreferedAgency) {
-    			preferences_penalty += useAnotherThanPreferredRoutesPenalty;
+    			preferences_penalty += otherThanPreferredRoutesPenalty;
     		}
     		else {
     			preferences_penalty = 0;

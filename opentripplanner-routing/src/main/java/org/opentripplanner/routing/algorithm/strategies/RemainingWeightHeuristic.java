@@ -24,19 +24,26 @@ import org.opentripplanner.routing.graph.Vertex;
  */
 public interface RemainingWeightHeuristic extends Serializable {
 	
-	/** 
-	 * It is important to evaluate the initial weight before computing additional weights, 
-	 * because this method also performs any one-time setup and precomputation that will be used
-	 * by the heuristic during the search. 
-	 */
-    public double computeInitialWeight(State s, Vertex target);
+    /** 
+     * Perform any one-time setup and pre-computation that will be needed by later calls to 
+     * computeForwardWeight/computeReverseWeight. 
+     */
+    public void initialize(State s, Vertex target);
 
     public double computeForwardWeight(State s, Vertex target);
 
     public double computeReverseWeight(State s, Vertex target);
     
-    /** 
-     * Reset any cached data in the heuristic 
-     */
+    /** Reset any cached data in the heuristic, e.g. between rounds of a retrying path service. */
     public void reset();
+    
+    /** Cancel computation. Useful for heuristics running in background threads. */
+    public void abort();
+    
 }
+
+
+// Perhaps directionality should also be defined during the setup,
+// instead of having two separate methods for the two directions.
+// We might not even need a setup method if the routing options are just passed into the
+// constructor.

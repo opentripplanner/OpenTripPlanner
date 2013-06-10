@@ -71,7 +71,7 @@ import com.vividsolutions.jts.geom.LineString;
  */
 @XmlRootElement(name = "RouteVariant")
 public class RouteVariant implements Serializable {
-    private static final Logger _log = LoggerFactory.getLogger(RouteVariant.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RouteVariant.class);
 
     private static final long serialVersionUID = -3110443015998033630L;
 
@@ -164,7 +164,7 @@ public class RouteVariant implements Serializable {
             segment = successors.get(segment.hopOut);
         }
         if (i != exemplarSegments.size()) {
-            _log.error("Failed to organize hops in route variant " + name);
+            LOG.error("Failed to organize hops in route variant " + name);
         }
     }
 

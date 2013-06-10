@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 
 public class GtfsBundle {
 
-    private static final Logger _log = LoggerFactory.getLogger(GtfsBundle.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GtfsBundle.class);
 
     private File path;
 
@@ -173,7 +173,7 @@ public class GtfsBundle {
     
     public void checkInputs() {
         if (csvInputSource != null) {
-            _log.warn("unknown CSV source type; cannot check inputs");
+            LOG.warn("unknown CSV source type; cannot check inputs");
             return;
         }
         if (path != null) {

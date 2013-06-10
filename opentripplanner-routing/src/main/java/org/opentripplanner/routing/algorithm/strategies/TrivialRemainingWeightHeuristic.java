@@ -26,10 +26,10 @@ import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
  */
 public class TrivialRemainingWeightHeuristic implements RemainingWeightHeuristic {
 
+    private static final long serialVersionUID = 1L;
+
     @Override
-    public double computeInitialWeight(State s, Vertex target) {
-        return 0;
-    }
+    public void initialize(State s, Vertex target) {}
 
     @Override
     public double computeForwardWeight(State s, Vertex target) {
@@ -41,9 +41,6 @@ public class TrivialRemainingWeightHeuristic implements RemainingWeightHeuristic
         return 0;
     }
 
-    @Override
-    public void reset() {}
-
     /** 
      * Factory that turns off goal-direction heuristics in OTP for comparison. 
      * results should be identical when heuristics are switched off.
@@ -54,4 +51,10 @@ public class TrivialRemainingWeightHeuristic implements RemainingWeightHeuristic
             return new TrivialRemainingWeightHeuristic();
         }
     }
+
+    @Override
+    public void reset() {}
+    
+    @Override
+    public void abort() {}
 }

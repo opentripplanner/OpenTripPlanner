@@ -79,7 +79,7 @@ public class RaptorRoute implements Serializable {
             State result = board.traverse(state);
             if (result == null)
                 continue;
-            int time = (int) result.getTime();
+            int time = (int) result.getTimeSeconds();
             if (time < spec.departureTime) {
                 spec.departureTime = time;
                 spec.tripTimes = result.getTripTimes();
@@ -110,7 +110,7 @@ public class RaptorRoute implements Serializable {
             State result = alight.traverse(state);
             if (result == null)
                 continue;
-            int time = (int) result.getTime();
+            int time = (int) result.getTimeSeconds();
             if (time > spec.departureTime) {
                 spec.departureTime = time;
                 spec.tripTimes = result.getTripTimes();

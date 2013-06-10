@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultWayPropertySetSource implements WayPropertySetSource {
 
-    private static Logger _log = LoggerFactory.getLogger(DefaultWayPropertySetSource.class);
+    private static Logger LOG = LoggerFactory.getLogger(DefaultWayPropertySetSource.class);
 
     private Locale locale = Locale.getDefault();
 
@@ -589,10 +589,10 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
     private String localize(String key) {
         try {
             String retval = getResourceBundle().getString(key);
-            _log.debug(String.format("Localized '%s' using '%s'", key, retval));
+            LOG.debug(String.format("Localized '%s' using '%s'", key, retval));
             return retval;
         } catch (MissingResourceException e) {
-            _log.warn("Missing translation for key: " + key);
+            LOG.warn("Missing translation for key: " + key);
             return key;
         }
     }

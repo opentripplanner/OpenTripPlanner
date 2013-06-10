@@ -51,7 +51,7 @@ public class GeometryIndex implements GeometryIndexService {
     private static final double SEARCH_RADIUS_M = 100; // meters
     private static final double SEARCH_RADIUS_DEG = SphericalDistanceLibrary.metersToDegrees(SEARCH_RADIUS_M);
     
-    @Autowired @Setter 
+    @Autowired @Setter
     GraphService graphService;
     
     private STRtree pedestrianIndex;

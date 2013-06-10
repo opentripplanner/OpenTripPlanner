@@ -412,7 +412,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         fill(240, 240, 240);
         Vertex v = s.getVertex();
         drawVertex(v, 8);
-        str += " " + shortDateFormat.format(new Date(s.getTime() * 1000));
+        str += " " + shortDateFormat.format(new Date(s.getTimeSeconds() * 1000));
         str += " [" + (int) s.getWeight() + "]";
         double x = toScreenX(v.getX()) + 10;
         double y = toScreenY(v.getY());

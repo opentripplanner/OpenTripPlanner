@@ -26,9 +26,6 @@ import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ResourceLoaderAware;
-import org.springframework.context.annotation.Scope;
-import org.springframework.core.io.ResourceLoader;
 
 /**
  * The primary implementation of the GraphService interface.
@@ -40,8 +37,7 @@ import org.springframework.core.io.ResourceLoader;
  * 
  * @see GraphServiceFileImpl
  */
-@Scope("singleton")
-public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
+public class GraphServiceImpl implements GraphService {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphServiceImpl.class);
 
@@ -162,11 +158,5 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
     @Override
     public int evictAll() {
         return decorated.evictAll();
-    }
-
-    /** The resourceLoader setter is called by Spring via ResourceLoaderAware interface. */
-    @Override
-    public void setResourceLoader(ResourceLoader resourceLoader) {
-        decorated.setResourceLoader(resourceLoader);
     }
 }

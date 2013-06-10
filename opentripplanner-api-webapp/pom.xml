@@ -1,6 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     
+    <!-- 
+    The opentripplanner-api-webapp module provides the OTP REST API as a WAR-packaged servlet.
+    The REST resources themselves are defined in the otp-rest-api module, which is a dependency.
+    This module should probably be renamed to otp-api-servlet.
+     -->
     <artifactId>opentripplanner-api-webapp</artifactId>
     <packaging>war</packaging>
     <name>OpenTripPlanner API Webapp</name>
@@ -12,99 +17,13 @@
     </parent>
 
     <dependencies>
+        <!-- OTP Modules -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>opentripplanner-routing</artifactId>
+            <artifactId>otp-rest-api</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>opentripplanner-analyst</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>opentripplanner-graph-builder</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>opentripplanner-updater</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>opentripplanner-utils</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>opentripplanner-web-utils</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>com.fasterxml.jackson.jaxrs</groupId>
-          <artifactId>jackson-jaxrs-json-provider</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-client</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.jersey.contribs</groupId>
-            <artifactId>jersey-spring</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>net.sf.json-lib</groupId>
-            <artifactId>json-lib</artifactId>
-            <version>2.1</version>
-            <classifier>jdk15</classifier>
-            <exclusions>
-               <exclusion>
-                  <groupId>commons-logging</groupId>
-                  <artifactId>commons-logging</artifactId>
-               </exclusion>
-               <exclusion>
-                  <groupId>commons-collections</groupId>
-                  <artifactId>commons-collections</artifactId>
-               </exclusion>
-               <exclusion>
-                  <groupId>commons-beanutils</groupId>
-                  <artifactId>commons-beanutils</artifactId>
-               </exclusion>
-               <exclusion>
-                  <groupId>commons-lang</groupId>
-                  <artifactId>commons-lang</artifactId>
-               </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>jsr311-api</artifactId>
-            <version>1.1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.codehaus.jettison</groupId>
-            <artifactId>jettison</artifactId>
-            <version>1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-logging</groupId>
-            <artifactId>commons-logging</artifactId>
-        </dependency>
+        <!-- SPRING -->
         <dependency>
           <groupId>org.springframework</groupId>
           <artifactId>spring-aop</artifactId>
@@ -137,11 +56,21 @@
       	  <groupId>org.springframework.security</groupId>
       	  <artifactId>spring-security-web</artifactId>
         </dependency>
+        <!-- LOGGING -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
+        <dependency>
+          <!-- Spring uses jakarta commons logging, redirect it via slf4j API to Logback -->
+          <groupId>org.slf4j</groupId>
+          <artifactId>jcl-over-slf4j</artifactId>
+        </dependency>        
         <dependency>
       	  <groupId>javax.servlet</groupId>
       	  <artifactId>servlet-api</artifactId>
       	  <version>2.5</version>
-      	  <scope>provided</scope>
+      	  <scope>provided</scope> <!-- this dependency is provided by the servlet container -->
         </dependency>
         <dependency>
       	  <groupId>javax.annotation</groupId>
@@ -154,14 +83,32 @@
       	  <version>2.2.2</version>
         </dependency>
         <dependency>
-          <groupId>org.mockito</groupId>
-          <artifactId>mockito-all</artifactId>
-          <version>1.9.0</version>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
           <groupId>org.projectlombok</groupId>
           <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>javax.inject</groupId>
+          <artifactId>javax.inject</artifactId>
+          <version>1</version>
+        </dependency>
+        <!-- JERSEY/SPRING SERVLET INTEGRATION -->
+        <dependency>
+          <groupId>com.sun.jersey.contribs</groupId>
+          <artifactId>jersey-spring</artifactId> <!-- provides SpringComponentProviderFactory -->
+        </dependency>
+        <dependency>
+          <groupId>com.sun.jersey</groupId>
+          <artifactId>jersey-servlet</artifactId> <!-- provides SpringServlet -->
+        </dependency>
+        <!-- TESTING DEPENDENCIES -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>com.sun.jersey</groupId>
+          <artifactId>jersey-client</artifactId>
+          <scope>test</scope> <!-- what is this used for? -->
         </dependency>
     </dependencies>
 
@@ -199,60 +146,8 @@
                     </execution>
                 </executions>
             </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.enunciate</groupId>
-                <artifactId>maven-enunciate-plugin</artifactId>
-                <version>1.25</version>
-                <executions>
-                  <execution>
-                    <!-- default binding for docs goal is process-sources phase -->
-                    <phase>site</phase>
-                    <goals>
-                      <goal>docs</goal>
-                    </goals>
-                  </execution>
-                </executions>
-                <configuration>
-                  <!-- change this to wherever you want the docs -->
-                  <docsDir>${project.build.directory}/site/enunciate</docsDir>
-                </configuration>
-            </plugin>
+        <!-- we now run enunciate on the REST API module not the servlet wrapper -->
         </plugins>
     </build>
-
-    <!-- If we are running in hudson -->
-    <profiles>
-        <profile>
-            <id>hudson</id>
-            <activation>
-                <property>
-                    <name>BUILD_NUMBER</name>
-                </property>
-            </activation>
-
-            <distributionManagement>
-                <site>
-                    <id>opentripplanner-docs</id> 
-                    <name>OpenTripPlanner Docs</name>
-                    <url>scp://opentripplanner.org/home/mavendeploy/otp-maven-site/webapi</url>
-                </site>
-            </distributionManagement>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                        <version>2.5</version>
-                        <configuration>
-                            <disableXmlReport>false</disableXmlReport>
-                            <argLine>-Xmx1000m</argLine>
-                        </configuration>
-                	</plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
 
 </project>

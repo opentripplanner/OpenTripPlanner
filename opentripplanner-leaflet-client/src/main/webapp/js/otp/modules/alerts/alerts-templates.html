@@ -1,0 +1,67 @@
+
+<script id="otp-alerts-alertRow" type="text/html">
+    <div class="otp-alerts-alertRow">
+        <div>{{descriptionText}}</div>
+        {{#routeIds}}
+            <div style="font-size: 11px; margin-top: 3px;"><b>Affects Routes</b>: {{routeIds}}</div>
+        {{/routeIds}}
+        {{#stopIds}}
+            <div style="font-size: 11px;"><b>Affects Stops</b>: {{stopIds}}</div>
+        {{/stopIds}}
+    </div>
+</script>
+
+<script id="otp-alerts-alertEditor" type="text/html">
+
+    <div>Description:</div>
+    <textarea id="{{widgetId}}-descriptionText" class="otp-alerts-editAlert-text notDraggable">{{descriptionText}}</textarea>
+
+    <div class="otp-defaultLabel">Affected Date/Time Ranges:</div>
+    <div style="border: 1px solid black" class="notDraggable">
+        <div style="background: white; height: 60px; overflow: auto;">
+            {{#timeRanges}}
+                <div class="otp-alerts-editAlert-entityRow">
+                    <button id='{{widgetId}}-deleteRangeButton-{{rangeIndex}}' class="otp-alerts-editAlert-deleteRangeButton">X</button>
+                    <div style="margin-right: 25px;">
+                        {{#renderDate}}{{startTime}}{{/renderDate}}
+                        &nbsp;to&nbsp;
+                        {{#renderDate}}{{endTime}}{{/renderDate}}
+                    </div>
+                </div>
+            {{/timeRanges}}
+        </div>
+        
+        <div style="background: #bbb; padding: 4px;">
+            <input type="text" id="{{widgetId}}-rangeStartInput" class="otp-alerts-editAlert-dateInput">
+            &nbsp;to&nbsp;
+            <input type="text" id="{{widgetId}}-rangeEndInput" class="otp-alerts-editAlert-dateInput">
+            <button id="addRangeButton">Add</button>
+        </div>
+        
+    </div>
+
+    <div class="otp-defaultLabel">Affected Entities:</div>
+    <div id="{{widgetId}}-entitiesList" class="otp-alerts-editAlert-entitiesList notDraggable" size="5">
+        {{#informedEntities}}
+            <div class="otp-alerts-editAlert-entityRow">
+                <button id='{{widgetId}}-deleteRangeButton-{{entityIndex}}' class="otp-alerts-editAlert-deleteEntityButton">X</button>
+                <div style="margin-right: 25px;">
+                    {{agencyId}} 
+                    {{#routeId}}Route {{routeReference}}{{/routeId}}
+                    {{#stopId}}Stop {{stopId}}{{/stopId}}
+                </div>
+            </div>
+        {{/informedEntities}}
+    </div>
+    <div style="font-style: italic;">Drag Routes/Stops from the &quot;Entities&quot; Widget to the above area to add to this alert </div>
+
+</script>
+
+
+<script id="otp-alerts-routeRow" type="text/html">
+    <div class="otp-alerts-entitiesWidget-entityRow">({{routeShortName}}) {{routeLongName}}</div>
+</script>
+
+<script id="otp-alerts-stopRow" type="text/html">
+    <div class="otp-alerts-entitiesWidget-entityRow">({{id.agencyId}}-{{id.id}}) {{stopName}}</div>
+</script>

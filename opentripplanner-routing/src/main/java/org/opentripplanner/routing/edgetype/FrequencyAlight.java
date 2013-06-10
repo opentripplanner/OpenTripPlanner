@@ -31,7 +31,7 @@ import com.vividsolutions.jts.geom.LineString;
 public class FrequencyAlight extends Edge  implements OnBoardReverseEdge {
     private static final long serialVersionUID = 3388162982920747289L;
 
-    private static final Logger _log = LoggerFactory.getLogger(FrequencyAlight.class);
+    private static final Logger LOG = LoggerFactory.getLogger(FrequencyAlight.class);
             
     private int stopIndex;
     private FrequencyBasedTripPattern pattern;
@@ -87,7 +87,7 @@ public class FrequencyAlight extends Edge  implements OnBoardReverseEdge {
              * initial state) if this pattern's serviceId is running look for the next boarding time
              * choose the soonest boarding time among trips starting yesterday, today, or tomorrow
              */
-            long currentTime = state0.getTime();
+            long currentTime = state0.getTimeSeconds();
             int bestWait = -1;
             TraverseMode mode = state0.getNonTransitMode();
             if (options.bannedTrips.containsKey(trip.getId())) {
@@ -114,7 +114,7 @@ public class FrequencyAlight extends Edge  implements OnBoardReverseEdge {
                         
                         int wait = (int) (currentTime - sd.time(startTime));
                         if (wait < 0)
-                            _log.error("negative wait time on alight");
+                            LOG.error("negative wait time on alight");
                         if (bestWait < 0 || wait < bestWait) {
                             // track the soonest departure over all relevant schedules
                             bestWait = wait;
@@ -169,7 +169,7 @@ public class FrequencyAlight extends Edge  implements OnBoardReverseEdge {
                 return null;
             }
             s1.setTripId(null);
-            s1.setLastAlightedTime(state0.getTime());
+            s1.setLastAlightedTimeSeconds(state0.getTimeSeconds());
             s1.setPreviousStop(fromv);
             s1.setBackMode(TraverseMode.ALIGHTING);
             return s1.makeState();

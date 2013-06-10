@@ -48,8 +48,11 @@ public class TransferTable implements Serializable {
     public boolean hasPreferredTransfers() {
         return preferredTransfers;
     }    
-    /** Get the transfer time (in seconds) between the stops, or negative integer codes indicating
-     *  the transfer is forbidden/preferred/timed. */
+    /** 
+     * Get the transfer time (in seconds) between the stops, or negative integer codes indicating
+     * the transfer is forbidden/preferred/timed.
+     * Table entries are of the form ((Agency_stopidX_arrive, Agency_stopIdY_depart), code).
+     */
     public int getTransferTime(Vertex previousStop, Vertex vertex) {
         Integer result = table.get(new P2<Vertex>(previousStop, vertex));
         if (result == null) {

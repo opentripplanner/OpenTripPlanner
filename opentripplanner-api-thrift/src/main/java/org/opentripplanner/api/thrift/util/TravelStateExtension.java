@@ -24,7 +24,7 @@ public class TravelStateExtension extends TravelState {
     public TravelStateExtension(State state) {
         super();
 
-        setArrival_time(state.getTime());
+        setArrival_time(state.getTimeSeconds());
         setVertex(new GraphVertexExtension(state.getVertex()));
         
         if (state.getBackEdge() != null) { 

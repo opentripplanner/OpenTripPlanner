@@ -154,7 +154,7 @@ public class MultiObjectivePathServiceImpl implements PathService {
             
             State origin = new State(options);
             // (used to) initialize heuristic outside loop so table can be reused
-            heuristic.computeInitialWeight(origin, targetVertex);
+            heuristic.initialize(origin, targetVertex);
             
             options.maxWeight = cutoff + 30 * 60 * options.waitReluctance;
             
@@ -289,11 +289,11 @@ public class MultiObjectivePathServiceImpl implements PathService {
         final double EPSILON = 0.05;
         if (s0.similarRouteSequence(s1)) {
             return s0.getWeight() <= s1.getWeight() * (1 + EPSILON) &&
-                    s0.getElapsedTime() <= s1.getElapsedTime() * (1 + EPSILON) &&
+                    s0.getElapsedTimeSeconds() <= s1.getElapsedTimeSeconds() * (1 + EPSILON) &&
                     s0.getWalkDistance() <= s1.getWalkDistance() * (1 + EPSILON) && 
                     s0.getNumBoardings() <= s1.getNumBoardings() &&
                     (s0.getWeight() < s1.getWeight() ||
-                     s0.getElapsedTime() < s1.getElapsedTime() ||
+                     s0.getElapsedTimeSeconds() < s1.getElapsedTimeSeconds() ||
                      s0.getWalkDistance() < s1.getWalkDistance() ||
                      s0.getNumBoardings() < s1.getNumBoardings());
         } else {

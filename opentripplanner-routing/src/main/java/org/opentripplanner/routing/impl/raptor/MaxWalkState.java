@@ -43,7 +43,7 @@ public class MaxWalkState extends State {
                 && (!((PlainStreetEdge) backEdge).getTurnRestrictions().isEmpty())))
             return false;
         return walkDistance <= other.getWalkDistance() * Raptor.WALK_EPSILON
-                && this.getElapsedTime() <= other.getElapsedTime() + 30
+                && this.getElapsedTimeSeconds() <= other.getElapsedTimeSeconds() + 30
                 && getNumBoardings() <= other.getNumBoardings();
     }
     

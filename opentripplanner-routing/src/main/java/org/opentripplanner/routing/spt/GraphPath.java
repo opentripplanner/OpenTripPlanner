@@ -83,8 +83,11 @@ public class GraphPath {
         this.edges = new LinkedList<Edge>();
         for (State cur = lastState; cur != null; cur = cur.getBackState()) {
             states.addFirst(cur);
-            if (cur.getBackEdge() != null)
+            
+            // Record the edge if it exists and this is not the first state in the path.
+            if (cur.getBackEdge() != null && cur.getBackState() != null) {
                 edges.addFirst(cur.getBackEdge());
+            }
         }
         //dump();
     }
@@ -94,7 +97,7 @@ public class GraphPath {
      * @return
      */
     public long getStartTime() {
-        return states.getFirst().getTime();
+        return states.getFirst().getTimeSeconds();
     }
 
     /**
@@ -102,7 +105,7 @@ public class GraphPath {
      * @return
      */
     public long getEndTime() {
-        return states.getLast().getTime();
+        return states.getLast().getTimeSeconds();
     }
 
     /**
@@ -111,7 +114,7 @@ public class GraphPath {
      */
     public int getDuration() {
         // test to see if it is the same as getStartTime - getEndTime;
-        return (int) states.getLast().getElapsedTime();
+        return (int) states.getLast().getElapsedTimeSeconds();
     }
 
     public double getWeight() {

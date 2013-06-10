@@ -172,6 +172,11 @@ public class RaptorSearch {
                 if (!data.raptorStopsForStopId.containsKey(stop.stopVertex.getStopId())) {
                     continue;
                 }
+                
+                // Skip banned stops
+                if (options.getBannedStops().matches(stop.stopVertex.getStop())) {
+                    continue;
+                }
 
                 List<RaptorState> states = statesByStop[stop.index];
                 List<RaptorState> newStates = new ArrayList<RaptorState>();
@@ -514,7 +519,12 @@ public class RaptorSearch {
                         continue;
                     }
 
-                    addStopNearTarget(stop, state.getWalkDistance(), (int) state.getElapsedTime());
+                    // Skip banned stops
+                    if (options.getBannedStops().matches(stop.stopVertex.getStop())) {
+                        continue;
+                    }
+
+                    addStopNearTarget(stop, state.getWalkDistance(), (int) state.getElapsedTimeSeconds());
                 }
             }
         } else {
@@ -549,11 +559,11 @@ public class RaptorSearch {
 
                 StateEditor dijkstraState = new MaxWalkState.MaxWalkStateEditor(walkOptions,
                         stopVertex);
-                dijkstraState.setInitialWaitTime(state.initialWaitTime);
-                dijkstraState.setStartTime(options.dateTime);
+                dijkstraState.setInitialWaitTimeSeconds(state.initialWaitTime);
+                dijkstraState.setStartTimeSeconds(options.dateTime);
                 dijkstraState.setNumBoardings(state.nBoardings);
                 dijkstraState.setWalkDistance(state.walkDistance);
-                dijkstraState.setTime(state.arrivalTime);
+                dijkstraState.setTimeSeconds(state.arrivalTime);
                 dijkstraState.setExtension("raptorParent", state);
                 dijkstraState.setOptions(walkOptions);
                 dijkstraState.incrementWeight(state.weight);
@@ -598,7 +608,7 @@ public class RaptorSearch {
                 }
                 state.weight = targetState.getWeight();
                 state.walkDistance = targetState.getWalkDistance();
-                state.arrivalTime = (int) targetState.getTime();
+                state.arrivalTime = (int) targetState.getTimeSeconds();
                 state.walkPath = targetState;
                 for (Iterator<RaptorState> it = getTargetStates().iterator(); it.hasNext();) {
                     RaptorState oldState = it.next();
@@ -625,6 +635,11 @@ public class RaptorSearch {
                 continue;
             }
 
+            // Skip banned stops
+            if (options.getBannedStops().matches(stop.stopVertex.getStop())) {
+                continue;
+            }
+            
             if (options.rctx.target != null) {
                 double minWalk = distanceToNearestTransitStop;
 
@@ -639,7 +654,7 @@ public class RaptorSearch {
 
                     int maxTimeForVertex = 0;
                     int region = vertex.getGroupIndex();
-                    final int elapsedTime = (int) state.getElapsedTime();
+                    final int elapsedTime = (int) state.getElapsedTimeSeconds();
                     for (StopNearTarget stopNearTarget : stopsNearTarget.values()) {
                         int destinationRegion = stopNearTarget.stop.stopVertex.getGroupIndex();
                         final int maxTimeFromThisRegion = data.maxTransitRegions.maxTransit[maxTimeDayIndex][destinationRegion][region];
@@ -675,7 +690,7 @@ public class RaptorSearch {
             newState.weight = state.getWeight();
             newState.nBoardings = nBoardings;
             newState.walkDistance = state.getWalkDistance();
-            newState.arrivalTime = (int) state.getTime();
+            newState.arrivalTime = (int) state.getTimeSeconds();
             newState.walkPath = state;
             newState.stop = stop;
             newState.rentingBike = state.isBikeRenting();

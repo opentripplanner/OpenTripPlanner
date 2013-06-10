@@ -5,6 +5,8 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
@@ -18,14 +20,22 @@ public class PlainStreetEdgeTest {
 
     private Graph _graph;
     private StreetVertex v1, v2;
+    private RoutingRequest proto;
 
     @Before
     public void before() {
         _graph = new Graph();
 
-        // Graph for a fictional grid city with turn restrictions
         v1 = vertex("maple_1st", 2.0, 2.0);
         v2 = vertex("maple_2nd", 1.0, 2.0);
+        
+        proto = new RoutingRequest();
+        proto.setCarSpeed(15.0f);
+        proto.setWalkSpeed(1.0);
+        proto.setBikeSpeed(5.0f);
+        proto.setWalkReluctance(1.0);
+        proto.setStairsReluctance(1.0);
+        proto.setTurnReluctance(1.0);
     }
     
     @Test
@@ -49,6 +59,63 @@ public class PlainStreetEdgeTest {
         // Difference should be about 90.
         int diff = (e1.getOutAngle() - e2.getInAngle());
         assertEquals(-89, diff);
+    }
+
+    @Test
+    public void testTraverseAsPedestrian() {
+        PlainStreetEdge e1 = edge(v1, v2, 100.0, StreetTraversalPermission.ALL);
+        e1.setCarSpeed(10.0f);
+
+        RoutingRequest options = proto.clone();
+        options.setMode(TraverseMode.WALK);
+        options.setRoutingContext(_graph, v1, v2);
+        
+        State s0 = new State(options);
+        State s1 = e1.traverse(s0);
+        
+        // Should use the speed on the edge.
+        double expectedWeight = e1.getLength() / options.getWalkSpeed();
+        long expectedDuration = (long) Math.ceil(expectedWeight);
+        assertEquals(expectedDuration, s1.getElapsedTimeSeconds(), 0.0);
+        assertEquals(expectedWeight, s1.getWeight(), 0.0);
+    }
+    
+    @Test
+    public void testTraverseAsCar() {
+        PlainStreetEdge e1 = edge(v1, v2, 100.0, StreetTraversalPermission.ALL);
+        e1.setCarSpeed(10.0f);
+
+        RoutingRequest options = proto.clone();
+        options.setMode(TraverseMode.CAR);
+        options.setRoutingContext(_graph, v1, v2);
+        
+        State s0 = new State(options);
+        State s1 = e1.traverse(s0);
+        
+        // Should use the speed on the edge.
+        double expectedWeight = e1.getLength() / e1.getCarSpeed();
+        long expectedDuration = (long) Math.ceil(expectedWeight);
+        assertEquals(expectedDuration, s1.getElapsedTimeSeconds(), 0.0);
+        assertEquals(expectedWeight, s1.getWeight(), 0.0);
+    }
+    
+    @Test
+    public void testTraverseAsCustomMotorVehicle() {
+        PlainStreetEdge e1 = edge(v1, v2, 100.0, StreetTraversalPermission.ALL);
+        e1.setCarSpeed(10.0f);
+
+        RoutingRequest options = proto.clone();
+        options.setMode(TraverseMode.CUSTOM_MOTOR_VEHICLE);
+        options.setRoutingContext(_graph, v1, v2);
+        
+        State s0 = new State(options);
+        State s1 = e1.traverse(s0);
+        
+        // Should use the speed on the edge.
+        double expectedWeight = e1.getLength() / e1.getCarSpeed();
+        long expectedDuration = (long) Math.ceil(expectedWeight);
+        assertEquals(expectedDuration, s1.getElapsedTimeSeconds(), 0.0);
+        assertEquals(expectedWeight, s1.getWeight(), 0.0);
     }
     
     @Test

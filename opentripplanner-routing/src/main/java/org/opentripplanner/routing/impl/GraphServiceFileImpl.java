@@ -14,7 +14,8 @@
 package org.opentripplanner.routing.impl;
 
 import java.io.File;
-import java.io.IOException;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
@@ -33,8 +34,6 @@ import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 
 /**
  * A GraphService implementation implementing loading graph from files or resources, but which does not load anything by itself. It rely on decorators
@@ -68,10 +67,6 @@ public class GraphServiceFileImpl implements GraphService {
     @Setter
     @Getter
     private String defaultRouterId = "";
-
-    /** The resourceLoader setter is called by decorators. */
-    @Setter
-    private ResourceLoader resourceLoader = null;
 
     /** 
      * Router IDs may contain alphanumeric characters, underscores, and dashes only. 
@@ -143,15 +138,17 @@ public class GraphServiceFileImpl implements GraphService {
         sb.append("Graph.obj");
         String resourceLocation = sb.toString();
         LOG.debug("graph file for routerId '{}' is at {}", routerId, resourceLocation);
-        Resource graphResource;
         InputStream is;
         try {
-            graphResource = resourceLoader.getResource(resourceLocation);
-            //graphResource = resourceBase.createRelative(graphId);
-            is = graphResource.getInputStream();
-        } catch (IOException ex) {
-            LOG.warn("Graph file not found or not openable for routerId '{}' under {}", routerId, resourceBase);
-            ex.printStackTrace();
+            if (resourceLocation.startsWith("file:")) {
+                is = new FileInputStream(new File(resourceLocation.substring(5)));
+            } else if (resourceLocation.startsWith("classpath:")) {
+                throw new UnsupportedOperationException();
+            } else {
+                is = new FileInputStream(new File(resourceLocation));
+            }
+        } catch (FileNotFoundException e) {
+            LOG.error("File not found at {}.", resourceLocation);
             return null;
         }
         LOG.debug("graph input stream successfully opened.");
@@ -159,7 +156,7 @@ public class GraphServiceFileImpl implements GraphService {
         try {
             return Graph.load(new ObjectInputStream(is), loadLevel, indexFactory);
         } catch (Exception ex) {
-            LOG.error("Exception while loading graph from {}.", graphResource);
+            LOG.error("Exception while loading graph from {}.", resourceLocation);
             ex.printStackTrace();
             return null;
         }
@@ -222,9 +219,4 @@ public class GraphServiceFileImpl implements GraphService {
         }
         return n;
     }
-    
-    public Resource getResource(String location) {
-        return resourceLoader.getResource(location);
-    }
-
 }

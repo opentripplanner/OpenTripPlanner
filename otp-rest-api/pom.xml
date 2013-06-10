@@ -1,0 +1,218 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    
+    <!-- 
+    This module contains the JAX-RS-annotated REST resource classes for the OpenTripPlanner public
+    API, i.e. the Jersey REST endpoints. We provide the REST API as both a WAR-packaged servlet 
+    (module opentripplanner-api-webapp) and a standalone Grizzly-based command-line invoked server 
+    (module otp-standalone). This module is a dependency for both of those modules.  
+    -->
+    <artifactId>otp-rest-api</artifactId>
+    <packaging>jar</packaging>
+    <name>OpenTripPlanner REST API</name>
+
+    <parent>
+        <groupId>org.opentripplanner</groupId>
+        <artifactId>opentripplanner</artifactId>
+        <version>0.9.2-SNAPSHOT</version>
+    </parent>
+
+    <dependencies>
+        <!-- OTP Modules -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>opentripplanner-routing</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>opentripplanner-analyst</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>opentripplanner-graph-builder</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>opentripplanner-updater</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>opentripplanner-utils</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>opentripplanner-web-utils</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- Provides a message body writer for application/json instead of just XML -->
+        <dependency>
+          <groupId>com.fasterxml.jackson.jaxrs</groupId>
+          <artifactId>jackson-jaxrs-json-provider</artifactId>
+        </dependency>
+        <dependency>  <!-- more JSON -->
+            <groupId>net.sf.json-lib</groupId>
+            <artifactId>json-lib</artifactId>
+            <version>2.1</version>
+            <classifier>jdk15</classifier>
+            <exclusions>
+               <exclusion>
+                  <groupId>commons-logging</groupId>
+                  <artifactId>commons-logging</artifactId>
+               </exclusion>
+               <exclusion>
+                  <groupId>commons-collections</groupId>
+                  <artifactId>commons-collections</artifactId>
+               </exclusion>
+               <exclusion>
+                  <groupId>commons-beanutils</groupId>
+                  <artifactId>commons-beanutils</artifactId>
+               </exclusion>
+               <exclusion>
+                  <groupId>commons-lang</groupId>
+                  <artifactId>commons-lang</artifactId>
+               </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency> <!-- more JSON -->
+            <groupId>org.codehaus.jettison</groupId>
+            <artifactId>jettison</artifactId>
+            <version>1.1</version>
+        </dependency>
+        <!-- SPRING -->
+        <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-aop</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-beans</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-context</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-core</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-web</artifactId>
+        </dependency>
+        <dependency>
+      	  <groupId>org.springframework.security</groupId>
+      	  <artifactId>spring-security-core</artifactId>
+        </dependency>
+        <dependency>
+      	  <groupId>org.springframework.security</groupId>
+      	  <artifactId>spring-security-config</artifactId>
+        </dependency>
+        <dependency>
+      	  <groupId>org.springframework.security</groupId>
+      	  <artifactId>spring-security-web</artifactId>
+        </dependency>
+        <!-- LOGGING -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
+        <dependency>
+          <!-- Jersey uses java.util logging, redirect it via slf4j API to Logback -->
+          <groupId>org.slf4j</groupId>
+          <artifactId>jul-to-slf4j</artifactId>
+        </dependency>
+        <dependency>
+          <!-- Spring uses jakarta commons logging, redirect it via slf4j API to Logback -->
+          <groupId>org.slf4j</groupId>
+          <artifactId>jcl-over-slf4j</artifactId>
+        </dependency>
+        
+        <dependency>
+      	  <groupId>javax.servlet</groupId>
+      	  <artifactId>servlet-api</artifactId>
+      	  <version>2.5</version>
+      	  <scope>provided</scope> <!-- this dependency is provided by the servlet container -->
+        </dependency>
+        <dependency>
+      	  <groupId>javax.annotation</groupId>
+      	  <artifactId>jsr250-api</artifactId>
+      	  <version>1.0</version>
+        </dependency>
+        <dependency>
+      	  <groupId>cglib</groupId>
+      	  <artifactId>cglib</artifactId>
+      	  <version>2.2.2</version>
+        </dependency>
+        <dependency>
+          <groupId>org.projectlombok</groupId>
+          <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>javax.inject</groupId>
+          <artifactId>javax.inject</artifactId>
+          <version>1</version>
+        </dependency>
+        <!-- JERSEY/GRIZZLY INTEGRATION -->
+        <dependency>
+          <groupId>com.sun.jersey.contribs</groupId>
+          <artifactId>jersey-spring</artifactId> <!-- provides SpringComponentProviderFactory -->
+        </dependency>
+        <dependency>
+          <groupId>com.sun.jersey</groupId>
+          <artifactId>jersey-servlet</artifactId> <!-- provides SpringServlet -->
+        </dependency>
+        <dependency>
+          <groupId>com.sun.jersey</groupId>
+          <artifactId>jersey-grizzly2</artifactId>
+        </dependency>
+        <!-- TESTING DEPENDENCIES -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>com.sun.jersey</groupId>
+          <artifactId>jersey-client</artifactId>
+          <scope>test</scope> <!-- what is this used for? -->
+        </dependency>
+        <dependency>
+          <groupId>org.mockito</groupId>
+          <artifactId>mockito-all</artifactId>
+          <version>1.9.0</version>
+          <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>otp-rest-api</finalName>
+
+        <plugins>
+            <!-- We do not copy in default resources here - that is Spring config for the servlet. --> 
+            <!-- We do however run enunciate on the API rather than the servlet wrapper. -->
+            <plugin>
+                <groupId>org.codehaus.enunciate</groupId>
+                <artifactId>maven-enunciate-plugin</artifactId>
+                <version>1.25</version>
+                <executions>
+                  <execution>
+                    <!-- default binding for docs goal is process-sources phase -->
+                    <phase>site</phase>
+                    <goals>
+                      <goal>docs</goal>
+                    </goals>
+                  </execution>
+                </executions>
+                <configuration>
+                  <!-- change this to wherever you want the docs -->
+                  <docsDir>${project.build.directory}/site/enunciate</docsDir>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+    
+</project>

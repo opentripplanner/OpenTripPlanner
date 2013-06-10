@@ -12,29 +12,14 @@
     </parent>
 
     <dependencies>
+        <!-- OTHER OTP MODULES -->
         <dependency>
-          <groupId>com.vividsolutions</groupId>
-          <artifactId>jts</artifactId>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>opentripplanner-utils</artifactId>
+            <version>${project.version}</version>
+            <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-core</artifactId>
-            <version>3.3.2.GA</version>
-        </dependency>
-        <dependency>
-            <groupId>javassist</groupId>
-            <artifactId>javassist</artifactId>
-            <version>3.8.0.GA</version>
-        </dependency>
-        <dependency>
-            <groupId>org.xerial</groupId>
-            <artifactId>sqlite-jdbc</artifactId>
-            <version>3.6.16</version>
-        </dependency>
-        <dependency>
-            <groupId>org.onebusaway</groupId>
-            <artifactId>onebusaway-gtfs</artifactId>
-        </dependency>
+        <!-- SPRING -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
@@ -43,29 +28,45 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-aop</artifactId>
         </dependency>
+        <!-- LOGGING -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>opentripplanner-utils</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
+        <!-- JAVA STANDARD LIBRARY EXTENSIONS -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>11.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+        </dependency>
+        <!-- TESTING -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <!-- OTHER DEPENDENCIES -->
+        <dependency>
+          <groupId>com.vividsolutions</groupId>
+          <artifactId>jts</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>3.8.0.GA</version>
+        </dependency>
+        <!--  
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.6.16</version>
+        </dependency>
+        -->
+        <dependency>
+            <groupId>org.onebusaway</groupId>
+            <artifactId>onebusaway-gtfs</artifactId>
         </dependency>
         <dependency>
         	<groupId>com.fasterxml.jackson.module</groupId>
@@ -82,14 +83,6 @@
             <id>maven2-repository.dev.java.net</id>
             <name>Java.net repository</name>
             <url>http://download.java.net/maven/2</url>
-        </repository>
-        <repository>
-            <id>osgeo-snapshots</id>
-            <name>OSGeo snapshots repository</name>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <url>http://download.osgeo.org/</url>
         </repository>
     </repositories>
     <build>

@@ -106,7 +106,7 @@ public class OTPServiceImpl implements OTPService.Iface {
     
     @Override
     public GraphVerticesResponse GetVertices(GraphVerticesRequest req) throws TException {
-        LOG.info("GetVertices called");
+        LOG.debug("GetVertices called");
         long startTime = System.currentTimeMillis();
 
         GraphVerticesResponse res = new GraphVerticesResponse();
@@ -155,7 +155,7 @@ public class OTPServiceImpl implements OTPService.Iface {
     
     @Override
     public GraphEdgesResponse GetEdges(GraphEdgesRequest req) throws TException {
-        LOG.info("GetEdges called");
+        LOG.debug("GetEdges called");
         long startTime = System.currentTimeMillis();
 
         GraphEdgesResponse res = new GraphEdgesResponse();
@@ -193,7 +193,7 @@ public class OTPServiceImpl implements OTPService.Iface {
     @Override
     public FindNearestVertexResponse FindNearestVertex(FindNearestVertexRequest req)
             throws TException {
-        LOG.info("FindNearestVertex called");
+        LOG.debug("FindNearestVertex called");
         long startTime = System.currentTimeMillis();
         VertexQuery q = req.getQuery();
         VertexResult result = findNearbyVertex(q);
@@ -207,7 +207,7 @@ public class OTPServiceImpl implements OTPService.Iface {
     @Override
     public BulkFindNearestVertexResponse BulkFindNearestVertex(BulkFindNearestVertexRequest req)
             throws TException {
-        LOG.info("BulkFindNearestVertex called");
+        LOG.debug("BulkFindNearestVertex called");
         long startTime = System.currentTimeMillis();
         
         BulkFindNearestVertexResponse res = new BulkFindNearestVertexResponse();
@@ -253,7 +253,7 @@ public class OTPServiceImpl implements OTPService.Iface {
     
     @Override
     public FindNearestEdgesResponse FindNearestEdges(FindNearestEdgesRequest req) throws TException {
-        LOG.info("FindNearestEdges called");
+        LOG.debug("FindNearestEdges called");
         long startTime = System.currentTimeMillis();
 
         NearestEdgesQuery q = req.getQuery();
@@ -268,7 +268,7 @@ public class OTPServiceImpl implements OTPService.Iface {
     @Override
     public BulkFindNearestEdgesResponse BulkFindNearestEdges(BulkFindNearestEdgesRequest req)
             throws TException {
-        LOG.info("BulkFindNearestEdges called");
+        LOG.debug("BulkFindNearestEdges called");
         long startTime = System.currentTimeMillis();
 
         BulkFindNearestEdgesResponse res = new BulkFindNearestEdgesResponse();
@@ -304,7 +304,7 @@ public class OTPServiceImpl implements OTPService.Iface {
             LOG.warn("Found 0 paths for trip {}", trip);
             LOG.warn("Origin {}", options.getFrom());
             LOG.warn("Destination {}", options.getTo());
-        }
+        }        
         TripPathsExtension tripPaths = new TripPathsExtension(trip, paths);
 
         // Need to call RoutingRequest.cleanup() to cleanup the temp edges.
@@ -314,7 +314,7 @@ public class OTPServiceImpl implements OTPService.Iface {
 
     @Override
     public FindPathsResponse FindPaths(FindPathsRequest req) throws TException {
-        LOG.info("FindPaths called");
+        LOG.debug("FindPaths called");
         long startTime = System.currentTimeMillis();
 
         TripParameters trip = req.getTrip();
@@ -332,7 +332,7 @@ public class OTPServiceImpl implements OTPService.Iface {
 
     @Override
     public BulkPathsResponse BulkFindPaths(BulkPathsRequest req) throws TException {
-        LOG.info("BulkFindPaths called");
+        LOG.debug("BulkFindPaths called");
         long startTime = System.currentTimeMillis();
 
         PathOptions pathOptions = req.getOptions();

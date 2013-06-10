@@ -35,3 +35,4 @@ gen-java/
 gen-javabean/
 gen-py/
 .idea/
+.sonar
