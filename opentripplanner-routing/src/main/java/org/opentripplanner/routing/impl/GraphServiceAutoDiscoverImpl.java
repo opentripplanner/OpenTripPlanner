@@ -36,7 +36,8 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
 /**
- * An implementation of the file-based GraphServiceFileImpl which auto-configure itself by scanning the root resource directory.
+ * An implementation of the file-based GraphServiceFileImpl which auto-configure itself by scanning
+ * the root resource directory.
  */
 @Scope("singleton")
 public class GraphServiceAutoDiscoverImpl implements GraphService, ResourceLoaderAware {
@@ -53,8 +54,9 @@ public class GraphServiceAutoDiscoverImpl implements GraphService, ResourceLoade
     private int autoScanPeriodSec = 60;
 
     /**
-     * The delay before loading a new graph, in seconds. We load a graph if it has been modified at least this amount of time in the past. This in
-     * order to give some time for non-atomic graph copy.
+     * The delay before loading a new graph, in seconds. We load a graph if it has been modified at
+     * least this amount of time in the past. This in order to give some time for non-atomic graph
+     * copy.
      */
     @Setter
     private int loadDelaySec = 10;
@@ -74,20 +76,23 @@ public class GraphServiceAutoDiscoverImpl implements GraphService, ResourceLoade
     }
 
     /**
-     * Sets a base path for graph loading from the filesystem. Serialized graph files will be retrieved from sub-directories immediately below this
-     * directory. The routerId of a graph is the same as the name of its sub-directory. This does the same thing as setResource, except the parameter
-     * is interpreted as a file path.
+     * Sets a base path for graph loading from the filesystem. Serialized graph files will be
+     * retrieved from sub-directories immediately below this directory. The routerId of a graph is
+     * the same as the name of its sub-directory. This does the same thing as setResource, except
+     * the parameter is interpreted as a file path.
      */
     public void setPath(String path) {
         decorated.setResource("file:" + path);
     }
 
     /**
-     * Sets a base path in the classpath or relative to the webapp root. This can be useful in cloud computing environments where webapps must be
-     * entirely self-contained. When OTP is running as a webapp, the ResourceLoader provided by Spring will be a ServletContextResourceLoader, so
-     * paths will be interpreted relative to the webapp root and WARs should be handled transparently. If you want to point to a location outside the
-     * webapp or you just want to be clear about exactly where the graphs are to be found, this path should be prefixed with 'classpath:','file:', or
-     * 'url:'.
+     * Sets a base path in the classpath or relative to the webapp root. This can be useful in cloud
+     * computing environments where webapps must be entirely self-contained. When OTP is running as
+     * a webapp, the ResourceLoader provided by Spring will be a ServletContextResourceLoader, so
+     * paths will be interpreted relative to the webapp root and WARs should be handled
+     * transparently. If you want to point to a location outside the webapp or you just want to be
+     * clear about exactly where the graphs are to be found, this path should be prefixed with
+     * 'classpath:','file:', or 'url:'.
      */
     public void setResource(String resourceBaseName) {
         decorated.setResource(resourceBaseName);
@@ -150,15 +155,19 @@ public class GraphServiceAutoDiscoverImpl implements GraphService, ResourceLoade
     }
 
     /**
-     * Based on the autoRegister list, automatically register all routerIds for which we can find a graph file in a subdirectory of the resourceBase
-     * path. Also register and load the graph for the defaultRouterId and warn if no routerIds are registered.
+     * Based on the autoRegister list, automatically register all routerIds for which we can find a
+     * graph file in a subdirectory of the resourceBase path. Also register and load the graph for
+     * the defaultRouterId and warn if no routerIds are registered.
      */
     @PostConstruct
     // PostConstruct means run on startup after all injection has occurred
     private void startup() {
         /* Run the first one syncronously as other initialization methods may need a default router. */
         autoDiscoverGraphs();
-        /* Starting with JDK7 we should use a directory change listener callback on baseResource instead. */
+        /*
+         * Starting with JDK7 we should use a directory change listener callback on baseResource
+         * instead.
+         */
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -222,8 +231,9 @@ public class GraphServiceAutoDiscoverImpl implements GraphService, ResourceLoade
         LOG.debug("Found routers: {} - Must reload: {}", onDiskSb.toString(), toLoadSb.toString());
         for (String routerId : graphToLoad) {
             /*
-             * Do not set preEvict, because: 1) during loading of a new graph we want to keep one available; and 2) if the loading of a new graph
-             * fails we also want to keep the old one.
+             * Do not set preEvict, because: 1) during loading of a new graph we want to keep one
+             * available; and 2) if the loading of a new graph fails we also want to keep the old
+             * one.
              */
             decorated.registerGraph(routerId, false);
         }

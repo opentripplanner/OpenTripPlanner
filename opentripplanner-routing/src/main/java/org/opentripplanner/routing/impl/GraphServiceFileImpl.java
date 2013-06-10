@@ -37,11 +37,12 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 
 /**
- * A GraphService implementation implementing loading graph from files or resources, but which does not load anything by itself. It rely on decorators
- * instances to help it initialize/reload itself.
+ * A GraphService implementation implementing loading graph from files or resources, but which does
+ * not load anything by itself. It rely on decorators instances to help it initialize/reload itself.
  * 
- * Note: Instead of a decorator pattern we should have used a strategy pattern (letting the GraphServiceImpl delegate the file mapping to various
- * strategy/factory instances), but this would have broke down the spring API widely used. And also this could have been a bit more complex as
+ * Note: Instead of a decorator pattern we should have used a strategy pattern (letting the
+ * GraphServiceImpl delegate the file mapping to various strategy/factory instances), but this would
+ * have broke down the spring API widely used. And also this could have been a bit more complex as
  * auto-discover mode would have need callbacks.
  * 
  * @see GraphServiceImpl
@@ -61,7 +62,7 @@ public class GraphServiceFileImpl implements GraphService {
     private Map<String, LoadLevel> levels = new HashMap<String, LoadLevel>();
 
     private LoadLevel loadLevel = LoadLevel.FULL;
-    
+
     @Setter
     private StreetVertexIndexFactory indexFactory = new DefaultStreetVertexIndexFactory();
 
@@ -73,26 +74,26 @@ public class GraphServiceFileImpl implements GraphService {
     @Setter
     private ResourceLoader resourceLoader = null;
 
-    /** 
-     * Router IDs may contain alphanumeric characters, underscores, and dashes only. 
-     * This prevents any confusion caused by the presence of special characters that might have a 
-     * meaning for the filesystem.
+    /**
+     * Router IDs may contain alphanumeric characters, underscores, and dashes only. This prevents
+     * any confusion caused by the presence of special characters that might have a meaning for the
+     * filesystem.
      */
     private static Pattern routerIdPattern = Pattern.compile("[\\p{Alnum}_-]*");
-    
+
     /**
-     * Sets a base path in the classpath or relative to the webapp root. This can be useful in 
-     * cloud computing environments where webapps must be entirely self-contained. When OTP is
-     * running as a webapp, the ResourceLoader provided by Spring will be a 
-     * ServletContextResourceLoader, so paths will be interpreted relative to the webapp root and 
-     * WARs should be handled transparently. If you want to point to a location outside the webapp 
-     * or you just want to be clear about exactly where the graphs are to be found, this path 
-     * should be prefixed with 'classpath:','file:', or 'url:'.
+     * Sets a base path in the classpath or relative to the webapp root. This can be useful in cloud
+     * computing environments where webapps must be entirely self-contained. When OTP is running as
+     * a webapp, the ResourceLoader provided by Spring will be a ServletContextResourceLoader, so
+     * paths will be interpreted relative to the webapp root and WARs should be handled
+     * transparently. If you want to point to a location outside the webapp or you just want to be
+     * clear about exactly where the graphs are to be found, this path should be prefixed with
+     * 'classpath:','file:', or 'url:'.
      */
     public void setResource(String resourceBaseName) {
         this.resourceBase = resourceBaseName;
     }
-    
+
     public Graph getGraph() {
         return getGraph(null);
     }
@@ -126,17 +127,19 @@ public class GraphServiceFileImpl implements GraphService {
     }
 
     protected Graph loadGraph(String routerId) {
-        if ( ! routerIdLegal(routerId)) {
-            LOG.error("routerId '{}' contains characters other than alphanumeric, underscore, and dash.", routerId);
+        if (!routerIdLegal(routerId)) {
+            LOG.error(
+                "routerId '{}' contains characters other than alphanumeric, underscore, and dash.",
+                routerId);
             return null;
         }
         LOG.debug("loading serialized graph for routerId {}", routerId);
         StringBuilder sb = new StringBuilder(resourceBase);
         // S3 is intolerant of extra slashes in the URL, so only add them as needed
-        if (! (resourceBase.endsWith("/") || resourceBase.endsWith(File.pathSeparator))) {
+        if (!(resourceBase.endsWith("/") || resourceBase.endsWith(File.pathSeparator))) {
             sb.append("/");
         }
-        if (routerId.length() > 0) { 
+        if (routerId.length() > 0) {
             sb.append(routerId);
             sb.append("/");
         }
@@ -147,10 +150,11 @@ public class GraphServiceFileImpl implements GraphService {
         InputStream is;
         try {
             graphResource = resourceLoader.getResource(resourceLocation);
-            //graphResource = resourceBase.createRelative(graphId);
+            // graphResource = resourceBase.createRelative(graphId);
             is = graphResource.getInputStream();
         } catch (IOException ex) {
-            LOG.warn("Graph file not found or not openable for routerId '{}' under {}", routerId, resourceBase);
+            LOG.warn("Graph file not found or not openable for routerId '{}' under {}", routerId,
+                    resourceBase);
             ex.printStackTrace();
             return null;
         }
@@ -175,7 +179,7 @@ public class GraphServiceFileImpl implements GraphService {
         }
         return allSucceeded;
     }
-    
+
     @Override
     public Collection<String> getRouterIds() {
         return new ArrayList<String>(graphs.keySet());
@@ -203,7 +207,7 @@ public class GraphServiceFileImpl implements GraphService {
         Graph existing = graphs.put(routerId, graph);
         return existing == null;
     }
-    
+
     @Override
     public boolean evictGraph(String routerId) {
         LOG.debug("evicting graph {}", routerId);
@@ -216,13 +220,13 @@ public class GraphServiceFileImpl implements GraphService {
     @Override
     public int evictAll() {
         int n;
-        synchronized(graphs) {
-            n = graphs.size(); 
+        synchronized (graphs) {
+            n = graphs.size();
             graphs.clear();
         }
         return n;
     }
-    
+
     public Resource getResource(String location) {
         return resourceLoader.getResource(location);
     }
