@@ -45,21 +45,27 @@ public class GenericLocationTest {
 
     @Test
     public void testFromNamePlaceWithCoord() {
-        GenericLocation loc = new GenericLocation("name", "1.0,2.5");
+        GenericLocation loc = new GenericLocation("name", "-1.0,2.5");
         assertEquals("name", loc.getName());
-        assertEquals("1.0,2.5", loc.getPlace());
+        assertEquals("-1.0,2.5", loc.getPlace());
+
 
         NamedPlace np = loc.getNamedPlace();
         assertEquals("name", np.name);
-        assertEquals("1.0,2.5", np.place);
+        assertEquals("-1.0,2.5", np.place);
         assertTrue(loc.hasName());
         assertTrue(loc.hasPlace());
         
         assertTrue(loc.hasCoordinate());
         assertFalse(loc.hasHeading());
-        assertEquals(new Double(1.0), loc.getLat());
+        assertEquals(new Double(-1.0), loc.getLat());
         assertEquals(new Double(2.5), loc.getLng());
-        assertEquals(new Coordinate(2.5, 1.0), loc.getCoordinate());
+        assertEquals(new Coordinate(2.5, -1.0), loc.getCoordinate());
+
+        loc = new GenericLocation("name", "1.0,-2.5");
+        assertEquals(new Double(1.0), loc.getLat());
+        assertEquals(new Double(-2.5), loc.getLng());
+        assertEquals(new Coordinate(-2.5, 1.0), loc.getCoordinate());
     }
 
     @Test
