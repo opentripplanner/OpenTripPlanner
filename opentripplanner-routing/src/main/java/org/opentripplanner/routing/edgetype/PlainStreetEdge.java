@@ -169,9 +169,9 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
                     }
                 }
                 double angleR = DirectionUtils.getLastAngle(geometry);
-                outAngle = ((int) (180 * angleR / Math.PI) + 180 + 360) % 360;
+                outAngle = ((int) Math.toDegrees(angleR) + 180) % 360;
                 angleR = DirectionUtils.getFirstAngle(geometry);
-                inAngle = ((int) (180 * angleR / Math.PI) + 180 + 360) % 360;
+                inAngle = ((int) Math.toDegrees(angleR) + 180) % 360;
             } catch (IllegalArgumentException iae) {
                 LOG.error("exception while determining street edge angles. setting to zero. there is probably something wrong with this street segment's geometry.");
                 inAngle = 0;
