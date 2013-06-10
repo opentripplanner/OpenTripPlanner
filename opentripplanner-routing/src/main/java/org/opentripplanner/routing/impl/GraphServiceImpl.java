@@ -14,8 +14,6 @@
 package org.opentripplanner.routing.impl;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -37,6 +35,10 @@ import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ResourceLoaderAware;
+import org.springframework.context.annotation.Scope;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 
 /**
  * The primary implementation of the GraphService interface.
@@ -44,7 +46,8 @@ import org.slf4j.LoggerFactory;
  * serialized graph files in subdirectories immediately under the specified base 
  * resource/filesystem path.
  */
-public class GraphServiceImpl implements GraphService {  //ResourceLoaderAware {
+@Scope("singleton")
+public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphServiceImpl.class);
 
@@ -63,6 +66,10 @@ public class GraphServiceImpl implements GraphService {  //ResourceLoaderAware {
 
     @Setter
     private String defaultRouterId = "";
+
+    /** The resourceLoader setter is called by Spring via ResourceLoaderAware interface. */
+    @Setter
+    private ResourceLoader resourceLoader = null;
 
     /** A list of routerIds to automatically register and load at startup */
     @Setter
@@ -188,27 +195,15 @@ public class GraphServiceImpl implements GraphService {  //ResourceLoaderAware {
         sb.append("Graph.obj");
         String resourceLocation = sb.toString();
         LOG.debug("graph file for routerId '{}' is at {}", routerId, resourceLocation);
+        Resource graphResource;
         InputStream is;
-//        Resource graphResource;
-//        try {
-//            graphResource = resourceLoader.getResource(resourceLocation);
-//            //graphResource = resourceBase.createRelative(graphId);
-//            is = graphResource.getInputStream();
-//        } catch (IOException ex) {
-//            LOG.warn("Graph file not found or not openable for routerId '{}' under {}", routerId, resourceBase);
-//            ex.printStackTrace();
-//            return null;
-//        }
         try {
-            if (resourceLocation.startsWith("file:")) {
-                is = new FileInputStream(new File(resourceLocation.substring(5)));
-            } else if (resourceLocation.startsWith("classpath:")) {
-                throw new UnsupportedOperationException();
-            } else {
-                is = new FileInputStream(new File(resourceLocation));
-            }
-        } catch (FileNotFoundException e) {
-            LOG.error("File not found at {}.", resourceLocation);
+            graphResource = resourceLoader.getResource(resourceLocation);
+            //graphResource = resourceBase.createRelative(graphId);
+            is = graphResource.getInputStream();
+        } catch (IOException ex) {
+            LOG.warn("Graph file not found or not openable for routerId '{}' under {}", routerId, resourceBase);
+            ex.printStackTrace();
             return null;
         }
         LOG.debug("graph input stream successfully opened.");
@@ -216,7 +211,7 @@ public class GraphServiceImpl implements GraphService {  //ResourceLoaderAware {
         try {
             return Graph.load(new ObjectInputStream(is), loadLevel, indexFactory);
         } catch (Exception ex) {
-            LOG.error("Exception while loading graph from {}.", resourceLocation);
+            LOG.error("Exception while loading graph from {}.", graphResource);
             ex.printStackTrace();
             return null;
         }
@@ -282,9 +277,9 @@ public class GraphServiceImpl implements GraphService {  //ResourceLoaderAware {
     
     private void autoDiscoverGraphs() {
         synchronized (resourceBase) {
+            Resource base = resourceLoader.getResource(resourceBase);
             try {
-                File baseFile = new File(resourceBase); // FIXME
-                // File baseFile = base.getFile();
+                File baseFile = base.getFile();
                 // First check for a root graph
                 File rootGraphFile = new File(baseFile, GRAPH_FILENAME);
                 if (rootGraphFile.exists() && rootGraphFile.canRead() && !graphs.containsKey("")) {
@@ -302,7 +297,7 @@ public class GraphServiceImpl implements GraphService {  //ResourceLoaderAware {
                         }
                     }
                 }
-            } catch (Exception e) { // (IOException e) { FIXME
+            } catch (IOException e) {
                 // Can happen if base is not a standard directory (resource)
                 LOG.error(
                         "Graph auto-discovering has been set, but {} is not a file resource, so I'm bailing-out.",
