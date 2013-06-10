@@ -274,13 +274,14 @@ public abstract class TripTimes {
             // Check for minimum transfer time and forbidden transfers
             if (transferTime > 0) {
                 // There is a minimum transfer time to make this transfer
+                int hopIndex = stopIndex - (boarding ? 0 : 1);
                 if (boarding) {
-                    if (sd.secondsSinceMidnight(state0.getLastAlightedTimeSeconds()) + transferTime > getDepartureTime(stopIndex)) {
+                    if (sd.secondsSinceMidnight(state0.getLastAlightedTimeSeconds()) + transferTime > getDepartureTime(hopIndex)) {
                         return false;
                     }
                 }
                 else {
-                    if (sd.secondsSinceMidnight(state0.getLastAlightedTimeSeconds()) - transferTime < getArrivalTime(stopIndex)) {
+                    if (sd.secondsSinceMidnight(state0.getLastAlightedTimeSeconds()) - transferTime < getArrivalTime(hopIndex)) {
                         return false;
                     }
                 }

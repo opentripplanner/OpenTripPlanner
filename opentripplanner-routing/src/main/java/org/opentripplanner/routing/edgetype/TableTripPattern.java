@@ -238,12 +238,11 @@ public class TableTripPattern implements TripPattern, Serializable {
         // check that we can even board/alight the given stop on this pattern with these options
         int mask = boarding ? MASK_PICKUP : MASK_DROPOFF;
         int shift = boarding ? SHIFT_PICKUP : SHIFT_DROPOFF;
-        int stopOffset = boarding ? 0 : 1;
-        if ((perStopFlags[stopIndex + stopOffset] & mask) >> shift == NO_PICKUP) {
+        if ((perStopFlags[stopIndex] & mask) >> shift == NO_PICKUP) {
             return null;
         }
         if (options.wheelchairAccessible && 
-           (perStopFlags[stopIndex + stopOffset] & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
+           (perStopFlags[stopIndex] & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
             return null;
         }
         // so far so good, delegate to the timetable

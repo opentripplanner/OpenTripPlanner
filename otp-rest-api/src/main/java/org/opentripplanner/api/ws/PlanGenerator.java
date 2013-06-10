@@ -676,7 +676,7 @@ public class PlanGenerator {
             TransitVertex transitVertex = (TransitVertex) v;
             Edge backEdge = state.getBackEdge();
             if (backEdge instanceof OnBoardForwardEdge) {
-                place.stopIndex = ((OnBoardForwardEdge)backEdge).getStopIndex() + 1;
+                place.stopIndex = ((OnBoardForwardEdge)backEdge).getStopIndex();
             }
             place.stopId = transitVertex.getStopId();
             place.stopCode = transitVertex.getStopCode();

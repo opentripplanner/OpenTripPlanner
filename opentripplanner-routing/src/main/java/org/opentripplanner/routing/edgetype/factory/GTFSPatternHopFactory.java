@@ -1164,7 +1164,7 @@ public class GTFSPatternHopFactory {
             }
             stopArrive.getStopVertex().addMode(mode);
             new TransitBoardAlight(stopDepart, psv0depart, hopIndex, mode);
-            new TransitBoardAlight(psv1arrive, stopArrive, hopIndex, mode);
+            new TransitBoardAlight(psv1arrive, stopArrive, hopIndex + 1, mode);
         }        
         
         return new T2<TableTripPattern, List<PatternHop>>(tripPattern, hops);

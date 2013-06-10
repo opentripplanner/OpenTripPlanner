@@ -161,8 +161,7 @@ public class Timetable implements Serializable {
         TripTimes bestTrip = null;
         int index;
         TripTimes[][] tableIndex = boarding ? departuresIndex : arrivalsIndex;
-        int stopOffset = boarding ? 0 : 1;
-        Stop currentStop = pattern.getStop(stopIndex + stopOffset);
+        Stop currentStop = pattern.getStop(stopIndex);
         if (tableIndex != null) {
             TripTimes[] sorted;
             // this timetable has been indexed, use binary search
@@ -182,7 +181,7 @@ public class Timetable implements Serializable {
                     }
                 }
             } else {
-                index = TripTimes.binarySearchArrivals(sorted, stopIndex, time);
+                index = TripTimes.binarySearchArrivals(sorted, stopIndex - 1, time);
                 while (index >= 0) {
                     TripTimes tt = sorted[index--];
                     if (tt.tripAcceptable(state0, currentStop, sd, haveBicycle, stopIndex, boarding)) {
@@ -204,7 +203,7 @@ public class Timetable implements Serializable {
                         bestTime = depTime;
                     }
                 } else {
-                    int arvTime = tt.getArrivalTime(stopIndex);
+                    int arvTime = tt.getArrivalTime(stopIndex - 1);
                     if (arvTime <= time && arvTime > bestTime && tt.tripAcceptable(state0, currentStop, sd, haveBicycle, stopIndex, boarding)) {
                         bestTrip = tt;
                         bestTime = arvTime;
