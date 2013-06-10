@@ -403,8 +403,8 @@ public class RoutingRequest implements Cloneable, Serializable {
             bikeWalkingOptions = new RoutingRequest();
             bikeWalkingOptions.setArriveBy(this.isArriveBy());
             bikeWalkingOptions.maxWalkDistance = maxWalkDistance;
-            bikeWalkingOptions.walkSpeed *= 0.8; // walking bikes is slow
-            bikeWalkingOptions.walkReluctance *= 2.7; // and painful
+            bikeWalkingOptions.walkSpeed = walkSpeed * 0.8; // walking bikes is slow
+            bikeWalkingOptions.walkReluctance = walkReluctance * 2.7; // and painful
             bikeWalkingOptions.optimize = optimize;
             bikeWalkingOptions.modes = modes.clone();
             bikeWalkingOptions.modes.setBicycle(false);
