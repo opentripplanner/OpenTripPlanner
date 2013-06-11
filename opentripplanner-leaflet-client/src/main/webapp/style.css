@@ -514,6 +514,9 @@ body {
 .otp-widget {
   position : absolute;
   z-index: 1000;
+}
+
+.otp-widget-nonTransparent {
   padding: 5px 10px;
   background: #eee;
   border: 1px solid #acacac;

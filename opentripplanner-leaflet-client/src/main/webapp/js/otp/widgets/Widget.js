@@ -30,6 +30,7 @@ otp.widgets.Widget = otp.Class({
     showHeader      : true,
     title           : '', // string
     openInitially   : true,
+    transparent     : false,
 
     isOpen          : true, // whether or not widget is displayed in applicable module view
     isMinimized     : false,
@@ -49,6 +50,7 @@ otp.widgets.Widget = otp.Class({
 
         // set up the main widget DOM element:
         this.mainDiv = $('<div />').attr('id', id).addClass('otp-widget').appendTo('body');
+        if(!this.transparent) this.mainDiv.addClass('otp-widget-nonTransparent');
 
         if(!this.openInitially) {
             this.isOpen = false;
