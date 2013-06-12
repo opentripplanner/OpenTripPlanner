@@ -14,9 +14,11 @@
 package org.opentripplanner.routing.impl;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -33,8 +35,6 @@ import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 
 /**
  * A GraphService implementation implementing loading graph from files or resources, but which does
@@ -54,8 +54,9 @@ public class GraphServiceFileImpl implements GraphService {
 
     public static final String GRAPH_FILENAME = "Graph.obj";
 
-    @Getter
-    private String resourceBase = "file:/var/otp/graphs";
+    @Getter 
+    @Setter
+    private String basePath = "/var/otp/graphs";
 
     private Map<String, Graph> graphs = new HashMap<String, Graph>();
 
@@ -70,29 +71,12 @@ public class GraphServiceFileImpl implements GraphService {
     @Getter
     private String defaultRouterId = "";
 
-    /** The resourceLoader setter is called by decorators. */
-    @Setter
-    private ResourceLoader resourceLoader = null;
-
     /**
      * Router IDs may contain alphanumeric characters, underscores, and dashes only. This prevents
      * any confusion caused by the presence of special characters that might have a meaning for the
      * filesystem.
      */
     private static Pattern routerIdPattern = Pattern.compile("[\\p{Alnum}_-]*");
-
-    /**
-     * Sets a base path in the classpath or relative to the webapp root. This can be useful in cloud
-     * computing environments where webapps must be entirely self-contained. When OTP is running as
-     * a webapp, the ResourceLoader provided by Spring will be a ServletContextResourceLoader, so
-     * paths will be interpreted relative to the webapp root and WARs should be handled
-     * transparently. If you want to point to a location outside the webapp or you just want to be
-     * clear about exactly where the graphs are to be found, this path should be prefixed with
-     * 'classpath:','file:', or 'url:'.
-     */
-    public void setResource(String resourceBaseName) {
-        this.resourceBase = resourceBaseName;
-    }
 
     public Graph getGraph() {
         return getGraph(null);
@@ -134,27 +118,25 @@ public class GraphServiceFileImpl implements GraphService {
             return null;
         }
         LOG.debug("loading serialized graph for routerId {}", routerId);
-        StringBuilder sb = new StringBuilder(resourceBase);
-        // S3 is intolerant of extra slashes in the URL, so only add them as needed
-        if (!(resourceBase.endsWith("/") || resourceBase.endsWith(File.pathSeparator))) {
-            sb.append("/");
+        StringBuilder sb = new StringBuilder(basePath);
+        if (!(basePath.endsWith(File.separator))) {
+            sb.append(File.separator);
         }
         if (routerId.length() > 0) {
+            // there clearly must be a more elegant way to extend paths
             sb.append(routerId);
-            sb.append("/");
+            sb.append(File.separator);
         }
         sb.append("Graph.obj");
-        String resourceLocation = sb.toString();
-        LOG.debug("graph file for routerId '{}' is at {}", routerId, resourceLocation);
-        Resource graphResource;
+        String graphFileName = sb.toString();
+        LOG.debug("graph file for routerId '{}' is at {}", routerId, graphFileName);
         InputStream is;
         try {
-            graphResource = resourceLoader.getResource(resourceLocation);
-            // graphResource = resourceBase.createRelative(graphId);
-            is = graphResource.getInputStream();
+            File graphFile = new File(graphFileName);
+            is = new FileInputStream(graphFile);
         } catch (IOException ex) {
             LOG.warn("Graph file not found or not openable for routerId '{}' under {}", routerId,
-                    resourceBase);
+                    graphFileName);
             ex.printStackTrace();
             return null;
         }
@@ -163,7 +145,7 @@ public class GraphServiceFileImpl implements GraphService {
         try {
             return Graph.load(new ObjectInputStream(is), loadLevel, indexFactory);
         } catch (Exception ex) {
-            LOG.error("Exception while loading graph from {}.", graphResource);
+            LOG.error("Exception while loading graph from {}.", graphFileName);
             ex.printStackTrace();
             return null;
         }
@@ -225,10 +207,6 @@ public class GraphServiceFileImpl implements GraphService {
             graphs.clear();
         }
         return n;
-    }
-
-    public Resource getResource(String location) {
-        return resourceLoader.getResource(location);
     }
 
 }

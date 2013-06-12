@@ -26,9 +26,7 @@ import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ResourceLoaderAware;
 import org.springframework.context.annotation.Scope;
-import org.springframework.core.io.ResourceLoader;
 
 /**
  * The primary implementation of the GraphService interface. It can handle multiple graphs, each
@@ -40,7 +38,7 @@ import org.springframework.core.io.ResourceLoader;
  * @see GraphServiceFileImpl
  */
 @Scope("singleton")
-public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
+public class GraphServiceImpl implements GraphService {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphServiceImpl.class);
 
@@ -75,20 +73,7 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
      * the parameter is interpreted as a file path.
      */
     public void setPath(String path) {
-        decorated.setResource("file:" + path);
-    }
-
-    /**
-     * Sets a base path in the classpath or relative to the webapp root. This can be useful in cloud
-     * computing environments where webapps must be entirely self-contained. When OTP is running as
-     * a webapp, the ResourceLoader provided by Spring will be a ServletContextResourceLoader, so
-     * paths will be interpreted relative to the webapp root and WARs should be handled
-     * transparently. If you want to point to a location outside the webapp or you just want to be
-     * clear about exactly where the graphs are to be found, this path should be prefixed with
-     * 'classpath:','file:', or 'url:'.
-     */
-    public void setResource(String resourceBaseName) {
-        decorated.setResource(resourceBaseName);
+        decorated.setBasePath(path);
     }
 
     /**
@@ -102,7 +87,7 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
         if (autoRegister != null && !autoRegister.isEmpty()) {
             LOG.info("attempting to automatically register routerIds {}", autoRegister);
             LOG.info("graph files will be sought in paths relative to {}",
-                    decorated.getResourceBase());
+                    decorated.getBasePath());
             for (String routerId : autoRegister) {
                 registerGraph(routerId, true);
             }
@@ -167,9 +152,4 @@ public class GraphServiceImpl implements GraphService, ResourceLoaderAware {
         return decorated.evictAll();
     }
 
-    /** The resourceLoader setter is called by Spring via ResourceLoaderAware interface. */
-    @Override
-    public void setResourceLoader(ResourceLoader resourceLoader) {
-        decorated.setResourceLoader(resourceLoader);
-    }
 }
