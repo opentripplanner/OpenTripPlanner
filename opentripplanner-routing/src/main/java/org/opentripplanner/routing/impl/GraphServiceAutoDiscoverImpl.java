@@ -96,8 +96,7 @@ public class GraphServiceAutoDiscoverImpl implements GraphService {
         decorated.setLoadLevel(level);
     }
 
-    // TODO Should we extract this interface in GraphService?
-    // See the (strange) cast to GraphServiceImpl in Routers.reloadGraphs()
+    @Override
     public boolean reloadGraphs(boolean preEvict) {
         return decorated.reloadGraphs(preEvict);
     }

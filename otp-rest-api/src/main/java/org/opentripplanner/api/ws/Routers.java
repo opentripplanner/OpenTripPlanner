@@ -153,8 +153,7 @@ public class Routers {
     @PUT @Produces({ MediaType.APPLICATION_JSON })
     public Response reloadGraphs(@QueryParam("path") String path, 
             @QueryParam("preEvict") @DefaultValue("true") boolean preEvict) {
-        GraphServiceImpl gsi = (GraphServiceImpl) graphService;
-        gsi.reloadGraphs(preEvict);
+        graphService.reloadGraphs(preEvict);
         return Response.status(Status.OK).build();
     }
 
