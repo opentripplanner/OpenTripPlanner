@@ -21,8 +21,12 @@ import static org.apache.commons.math3.util.FastMath.sqrt;
 import static org.apache.commons.math3.util.FastMath.toDegrees;
 import static org.apache.commons.math3.util.FastMath.toRadians;
 
+import org.apache.commons.math3.util.FastMath;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Point;
 
 public class SphericalDistanceLibrary implements DistanceLibrary {
 
@@ -52,6 +56,24 @@ public class SphericalDistanceLibrary implements DistanceLibrary {
     @Override
     public final double fastDistance(Coordinate from, Coordinate to) {
         return fastDistance(from.y, from.x, to.y, to.x);
+    }
+
+    @Override
+    public final double fastDistance(Coordinate point, LineString lineString) {
+        // Transform in equirectangular projection on sphere of radius 1,
+        // centered at point
+        double lat = Math.toRadians(point.y);
+        double cosLat = FastMath.cos(lat);
+        double lon = Math.toRadians(point.x) * cosLat;
+        Point point2 = GeometryUtils.getGeometryFactory().createPoint(new Coordinate(lon, lat));
+        Coordinate[] coords = lineString.getCoordinates();
+        Coordinate[] coords2 = new Coordinate[coords.length];
+        for (int i = 0; i < coords.length; i++) {
+            coords2[i] = new Coordinate(Math.toRadians(coords[i].x) * cosLat,
+                    Math.toRadians(coords[i].y));
+        }
+        LineString lineString2 = GeometryUtils.getGeometryFactory().createLineString(coords2);
+        return lineString2.distance(point2) * RADIUS_OF_EARTH_IN_M;
     }
 
     /* (non-Javadoc)
