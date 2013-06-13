@@ -19,6 +19,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -29,6 +30,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
+import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
@@ -43,8 +45,8 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.trippattern.TripUpdate;
 import org.opentripplanner.routing.trippattern.Update;
-import org.opentripplanner.routing.trippattern.UpdateBlock;
 import org.opentripplanner.routing.trippattern.Update.Status;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -164,13 +166,14 @@ public class TestTransfers extends TestCase {
 
     /**
      * Apply an update to a table trip pattern and check whether the update was applied correctly
+     * @param serviceDate is a string of format YYYYMMDD indicating the date of the update
      */
     private void applyUpdateToTripPattern(TableTripPattern pattern, String tripId, String stopId,
-            int stopSeq, int arrive, int depart, Status prediction, int timestamp) {
-        Update update = new Update(new AgencyAndId("agency",tripId), stopId, stopSeq, arrive, depart, prediction, timestamp);
+            int stopSeq, int arrive, int depart, Status prediction, int timestamp, String serviceDate) throws ParseException {
+        Update update = new Update(new AgencyAndId("agency",tripId), stopId, stopSeq, arrive, depart, prediction, timestamp, ServiceDate.parseString(serviceDate));
         ArrayList<Update> updates = new ArrayList<Update>(Arrays.asList(update));
-        UpdateBlock block = UpdateBlock.splitByTrip(updates).get(0);
-        boolean success = pattern.update(block);
+        TripUpdate tripUpdate = TripUpdate.splitByTrip(updates).get(0);
+        boolean success = pattern.update(tripUpdate);
         assertTrue(success);
     }
     
@@ -525,7 +528,7 @@ public class TestTransfers extends TestCase {
         // Now apply a real-time update: let the to-trip be early by 27600 seconds, resulting in a transfer time of 0 seconds
         @SuppressWarnings("deprecation")
         TableTripPattern pattern = ((PatternStopVertex) graph.getVertex("agency_F_agency_4.3_1_D")).getTripPattern();
-        applyUpdateToTripPattern(pattern, "4.2", "F", 0, 55200, 55200, Update.Status.PREDICTION, 0);
+        applyUpdateToTripPattern(pattern, "4.2", "F", 0, 55200, 55200, Update.Status.PREDICTION, 0, "20090711");
         
         // Plan journey
         path = planJourney(options);
@@ -535,7 +538,7 @@ public class TestTransfers extends TestCase {
         assertEquals("4.2", trips.get(1).getId().getId());
         
         // Now apply a real-time update: let the to-trip be early by 27601 seconds, resulting in a transfer time of -1 seconds
-        applyUpdateToTripPattern(pattern, "4.2", "F", 0, 55199, 55199, Update.Status.PREDICTION, 0);
+        applyUpdateToTripPattern(pattern, "4.2", "F", 0, 55199, 55199, Update.Status.PREDICTION, 0, "20090711");
         
         // Plan journey
         path = planJourney(options);
@@ -545,7 +548,7 @@ public class TestTransfers extends TestCase {
         assertEquals("4.3", trips.get(1).getId().getId());
         
         // "Revert" the real-time update
-        applyUpdateToTripPattern(pattern, "4.2", "F", 0, 82800, 82800, Update.Status.PREDICTION, 0);
+        applyUpdateToTripPattern(pattern, "4.2", "F", 0, 82800, 82800, Update.Status.PREDICTION, 0, "20090711");
         // Remove the timed transfer from the graph
         timedTransferEdge.detach();
         // Revert the graph, thus using the original transfer table again

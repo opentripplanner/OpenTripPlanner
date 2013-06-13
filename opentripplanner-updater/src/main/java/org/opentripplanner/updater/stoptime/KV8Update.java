@@ -21,14 +21,15 @@ import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.common.CTX;
 import org.opentripplanner.routing.trippattern.Update;
 
 public class KV8Update extends Update {
 
     public KV8Update(AgencyAndId tripId, String stopId, int stopSeq, int arrive, int depart,
-            Status status, long timestamp) {
-        super(tripId, stopId, stopSeq, arrive, depart, status, timestamp);
+            Status status, long timestamp, ServiceDate serviceDate) {
+        super(tripId, stopId, stopSeq, arrive, depart, status, timestamp, serviceDate);
     }
 
     public static List<Update> fromCTX(String ctxString) {
@@ -53,7 +54,8 @@ public class KV8Update extends Update {
                     Integer.parseInt(row.get("UserStopOrderNumber")), 
                     arrival, departure,
                     kv8Status(row),
-                    kv8Timestamp(row)) ;
+                    kv8Timestamp(row),
+                    new ServiceDate());
             ret.add(u);
         }
         return ret;

@@ -13,34 +13,41 @@
 
 package org.opentripplanner.routing.trippattern;
 
+import lombok.Getter;
+
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.calendar.ServiceDate;
 
-public class Update implements Comparable<Update> {
+public class Update extends AbstractUpdate implements Comparable<Update> {
 
-    // these fields can eventually be protected if trippattern is in the same package as update
-    public final AgencyAndId tripId;
+    @Getter
     public final String stopId;
+
+    @Getter
     public final int stopSeq;
+
+    @Getter
     public int arrive; // sec since midnight
+
+    @Getter
     public final int depart; // sec since midnight
+
+    @Getter
     public final Status status;
-    /** The official timestamp for the update, if one was provided, or the time it was received. */
-    public final long timestamp;
-    
+
     public Update (AgencyAndId tripId, String stopId, int stopSeq, int arrive, int depart, 
-            Status status, long timestamp) {
-        this.tripId = tripId;
+            Status status, long timestamp, ServiceDate serviceDate) {
+        super(tripId, timestamp, serviceDate);
         this.stopId = stopId;
         this.stopSeq = stopSeq;
         this.arrive = arrive;
         this.depart = depart;
         this.status = status;
-        this.timestamp = timestamp;
     }
 
     /**
      * This ordering is useful for breaking lists of mixed-trip updates into single-trip blocks.
-     * We sort on (tripId, timestamp, stopSequence, depart) because there may be duplicate stops in 
+     * We sort on (tripId, timestamp, serviceDate, stopSequence, depart) because there may be duplicate stops in 
      * an update list, and we want them to be in a predictable order for filtering. Usually 
      * duplicate stops are due to multiple updates for the same trip in the same message. In this 
      * case the two updates will have different timestamps, and we want to apply them in order.
@@ -53,6 +60,9 @@ public class Update implements Comparable<Update> {
             return result;
         result = (int) (this.timestamp - other.timestamp);
         if (result != 0)
+            return result;
+        result = serviceDate.compareTo(other.serviceDate);
+        if(result != 0)
             return result;
         result = this.stopSeq - other.stopSeq;
         if (result != 0)

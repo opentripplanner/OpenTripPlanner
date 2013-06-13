@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.opentripplanner.routing.trippattern.UpdateBlock;
+import org.opentripplanner.routing.trippattern.TripUpdate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,9 +62,9 @@ public class TimetableResolver {
     /**
      * @return whether or not the update was actually applied
      */
-    public boolean update(TableTripPattern pattern, UpdateBlock block) {
+    public boolean update(TableTripPattern pattern, TripUpdate tripUpdate) {
         // synchronization prevents commits/snapshots while update is in progress
-        synchronized(this) {  
+        synchronized(this) {
             if (dirty == null)
                 throw new ConcurrentModificationException("This TimetableResolver is read-only.");
             Timetable tt = resolve(pattern);
@@ -74,11 +74,11 @@ public class TimetableResolver {
                 tt = tt.copy();
                 timetables.put(pattern, tt);
                 dirty.add(tt);
-            }        
-            return tt.update(block);
+            }
+            return tt.update(tripUpdate);
         }
     }
-    
+
     /**
      * This produces a small delay of typically around 50ms, which is almost entirely due to
      * the indexing step. Cloning the map is much faster (2ms). 

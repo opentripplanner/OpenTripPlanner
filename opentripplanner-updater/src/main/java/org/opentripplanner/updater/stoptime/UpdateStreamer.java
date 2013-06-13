@@ -15,7 +15,7 @@ package org.opentripplanner.updater.stoptime;
 
 import java.util.List;
 
-import org.opentripplanner.routing.trippattern.Update;
+import org.opentripplanner.routing.trippattern.TripUpdate;
 
 public interface UpdateStreamer {
 
@@ -24,6 +24,6 @@ public interface UpdateStreamer {
      * @return an UpdateList potentially containing updates for several different trips,
      *         or null if an exception occurred while processing the message
      */
-    public List<Update> getUpdates();
-    
+    public List<TripUpdate> getUpdates();
+
 }

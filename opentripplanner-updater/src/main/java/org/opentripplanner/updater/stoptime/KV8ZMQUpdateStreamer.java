@@ -16,6 +16,7 @@ import javax.annotation.PostConstruct;
 
 import lombok.Setter;
 
+import org.opentripplanner.routing.trippattern.TripUpdate;
 import org.opentripplanner.routing.trippattern.Update;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,7 +64,7 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer {
         }
     }
 
-    public List<Update> getUpdates() {
+    public List<TripUpdate> getUpdates() {
         /* recvMsg blocks -- unless you call Socket.setReceiveTimeout() */
         // so when timeout occurs, it does not return null, but a reference to some
         // static ZMsg object?
@@ -95,7 +96,7 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer {
         } finally {
             msg.destroy(); // is this necessary? does ZMQ lib automatically free mem?
         }
-        return ret;
+        return TripUpdate.splitByTrip(ret);
     }
     
     private static String gunzipMultifameZMsg(ZMsg msg) throws IOException {

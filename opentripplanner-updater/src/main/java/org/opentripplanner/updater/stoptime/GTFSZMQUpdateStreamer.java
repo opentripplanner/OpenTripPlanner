@@ -24,23 +24,23 @@ import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 
 public class GTFSZMQUpdateStreamer extends GtfsRealtimeAbstractUpdateStreamer {
-	private static final Logger LOG = LoggerFactory.getLogger(GtfsRealtimeHttpUpdateStreamer.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GTFSZMQUpdateStreamer.class);
 
     private static final File file = new File("/var/otp/data/nl/gtfs-rt.protobuf");
 
-	@Override
-	protected FeedMessage getFeedMessage() {
+    @Override
+    protected FeedMessage getFeedMessage() {
         FeedMessage feed = null;
-		try {
-			InputStream is = new FileInputStream(file);
-			feed = GtfsRealtime.FeedMessage.parseFrom(is);
-		} catch (IOException e) {
-			LOG.warn("Failed to parse gtfs-rt feed at " + file + ":", e);
-		}
+        try {
+            InputStream is = new FileInputStream(file);
+            feed = GtfsRealtime.FeedMessage.parseFrom(is);
+        } catch (IOException e) {
+            LOG.warn("Failed to parse gtfs-rt feed at " + file + ":", e);
+        }
         return feed;
-	}
-	
+    }
+
     public String toString() {
-    	return "GTFSZMQUpdateStreamer(" + file + ")";
+        return "GTFSZMQUpdateStreamer(" + file + ")";
     }
 }

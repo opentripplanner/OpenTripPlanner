@@ -24,20 +24,14 @@ import java.util.TimeZone;
 import lombok.Setter;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.routing.services.GraphService;
-import org.opentripplanner.routing.services.TransitIndexService;
-import org.opentripplanner.routing.transit_index.RouteVariant;
+import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.routing.trippattern.TripUpdate;
 import org.opentripplanner.routing.trippattern.Update;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
-import com.google.transit.realtime.GtfsRealtime.FeedEntity;
-import com.google.transit.realtime.GtfsRealtime.FeedHeader;
-import com.google.transit.realtime.GtfsRealtime.FeedMessage;
-import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
-import com.google.transit.realtime.GtfsRealtime.TripUpdate;
+import com.google.transit.realtime.GtfsRealtime;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 
 public abstract class GtfsRealtimeAbstractUpdateStreamer implements UpdateStreamer {
 
@@ -49,58 +43,53 @@ public abstract class GtfsRealtimeAbstractUpdateStreamer implements UpdateStream
         ymdParser.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
 
-    @Autowired
-    private GraphService graphService;
-
     @Setter
     private String defaultAgencyId;
 
-    protected abstract FeedMessage getFeedMessage();
+    protected abstract GtfsRealtime.FeedMessage getFeedMessage();
 
     @Override
-    public List<Update> getUpdates() {
-        FeedMessage feed = getFeedMessage();
+    public List<org.opentripplanner.routing.trippattern.TripUpdate> getUpdates() {
+        GtfsRealtime.FeedMessage feed = getFeedMessage();
         if (feed == null)
             return null;
 
-        FeedHeader header = feed.getHeader();
+        GtfsRealtime.FeedHeader header = feed.getHeader();
         long timestamp = header.getTimestamp();
-        List<Update> updates = new ArrayList<Update>();
-        for (FeedEntity entity : feed.getEntityList()) {
+        List<org.opentripplanner.routing.trippattern.TripUpdate> updates = new ArrayList<org.opentripplanner.routing.trippattern.TripUpdate>();
+        for (GtfsRealtime.FeedEntity entity : feed.getEntityList()) {
             if (!entity.hasTripUpdate()) {
                 continue;
             }
 
-            TripUpdate tripUpdate = entity.getTripUpdate();
-            TripDescriptor descriptor = tripUpdate.getTrip();
+            GtfsRealtime.TripUpdate tripUpdate = entity.getTripUpdate();
+            GtfsRealtime.TripDescriptor descriptor = tripUpdate.getTrip();
             String trip = descriptor.getTripId();
             AgencyAndId tripId = new AgencyAndId(defaultAgencyId, trip);
 
-            long midnight = (new Date().getTime() / 1000) - (new Date().getTime() / 1000)
-                    % (24 * 60 * 60); // TODO: use real midnight
+            ServiceDate serviceDate = new ServiceDate();
             if (descriptor.hasStartDate()) {
                 try {
                     Date date = ymdParser.parse(descriptor.getStartDate());
-                    midnight = date.getTime() / 1000;
+                    serviceDate = new ServiceDate(date);
                 } catch (ParseException e) {
                     LOG.warn("Failed to parse startDate in gtfs-rt feed: ", e);
                 }
             }
 
-            TripDescriptor.ScheduleRelationship sr;
+            GtfsRealtime.TripDescriptor.ScheduleRelationship sr;
             if (tripUpdate.getTrip().hasScheduleRelationship()) {
                 sr = tripUpdate.getTrip().getScheduleRelationship();
             } else {
-                sr = TripDescriptor.ScheduleRelationship.SCHEDULED;
+                sr = GtfsRealtime.TripDescriptor.ScheduleRelationship.SCHEDULED;
             }
 
             switch (sr) {
             case SCHEDULED:
-                updates.addAll(GtfsRealtimeUpdate.getUpdatesForScheduledTrip(tripId, tripUpdate,
-                        timestamp, midnight));
+                updates.add(getUpdateForScheduledTrip(tripId, tripUpdate, timestamp, serviceDate));
                 break;
             case CANCELED:
-                updates.addAll(getUpdateForCanceledTrip(tripId, timestamp));
+                updates.add(getUpdateForCanceledTrip(tripId, timestamp, serviceDate));
                 break;
             case ADDED:
                 LOG.warn("ScheduleRelationship.ADDED trips are currently not handled.");
@@ -116,20 +105,60 @@ public abstract class GtfsRealtimeAbstractUpdateStreamer implements UpdateStream
         return updates;
     }
 
-    private List<GtfsRealtimeUpdate> getUpdateForCanceledTrip(AgencyAndId tripId, long timestamp) {
+    protected TripUpdate getUpdateForCanceledTrip(AgencyAndId tripId, long timestamp, ServiceDate serviceDate) {
+        return TripUpdate.forCanceledTrip(tripId, timestamp, serviceDate);
+    }
 
-        List<GtfsRealtimeUpdate> updates = new LinkedList<GtfsRealtimeUpdate>();
+    protected TripUpdate getUpdateForScheduledTrip(AgencyAndId tripId,
+            GtfsRealtime.TripUpdate tripUpdate, long timestamp, ServiceDate serviceDate) {
+        List<Update> updates = new LinkedList<Update>();
 
-        RouteVariant variant = graphService.getGraph().getService(TransitIndexService.class)
-                .getVariantForTrip(tripId);
+        for (StopTimeUpdate stopTimeUpdate : tripUpdate.getStopTimeUpdateList()) {
+            Update u = getStopTimeUpdateForTrip(tripId, timestamp, serviceDate, updates,
+                    stopTimeUpdate);
 
-        int stopSequence = 0;
-        for (Stop stop : variant.getStops()) {
-            updates.add(GtfsRealtimeUpdate.getUpdateForCanceledTrip(tripId, stop, stopSequence,
-                    timestamp));
-            stopSequence++;
+            updates.add(u);
         }
 
-        return updates;
+        return TripUpdate.forUpdatedTrip(tripId, timestamp, serviceDate, updates);
+    }
+
+    private Update getStopTimeUpdateForTrip(AgencyAndId tripId, long timestamp,
+            ServiceDate serviceDate, List<Update> updates, StopTimeUpdate stopTimeUpdate) {
+        
+        AgencyAndId stopId = new AgencyAndId(defaultAgencyId, stopTimeUpdate.getStopId());
+        
+        if (stopTimeUpdate.hasScheduleRelationship()
+                && StopTimeUpdate.ScheduleRelationship.NO_DATA == stopTimeUpdate
+                        .getScheduleRelationship()) {
+            Update u = new Update(tripId, stopTimeUpdate.getStopId(), stopTimeUpdate.getStopSequence(),
+                    0, 0, Update.Status.PLANNED, timestamp, serviceDate);
+            updates.add(u);
+        }
+
+        // TODO: handle cases where only the delay is provided
+        long today = serviceDate.getAsDate(TimeZone.getTimeZone("GMT")).getTime() / 1000;
+        long arrivalTime = stopTimeUpdate.getArrival().getTime();
+        long departureTime = stopTimeUpdate.getDeparture().getTime();
+
+        Update.Status status = Update.Status.PREDICTION;
+        if (stopTimeUpdate.hasScheduleRelationship()
+                && StopTimeUpdate.ScheduleRelationship.SKIPPED == stopTimeUpdate
+                        .getScheduleRelationship()) {
+            status = Update.Status.CANCEL;
+            /*
+             * } else if(arrivalTime <= now){ if( departureTime <= now) { //status =
+             * Update.Status.PASSED; arrivalTime = arrivalTime - today;; departureTime =
+             * departureTime - today; } else { status = Update.Status.ARRIVED; arrivalTime =
+             * arrivalTime - today;; departureTime = departureTime - today; }
+             */
+        } else {
+            arrivalTime = arrivalTime - today;
+            departureTime = departureTime - today;
+        }
+
+        Update u = new Update(tripId, stopTimeUpdate.getStopId(), stopTimeUpdate.getStopSequence(),
+                (int) arrivalTime, (int) departureTime, status, timestamp, serviceDate);
+        return u;
     }
 }
