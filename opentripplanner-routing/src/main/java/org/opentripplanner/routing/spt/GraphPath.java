@@ -18,7 +18,6 @@ import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
@@ -62,6 +61,12 @@ public class GraphPath {
     public GraphPath(State s, boolean optimize) {
         this.rctx = s.getContext();
         this.back = s.getOptions().isArriveBy();
+        
+        if (s.getOptions().getStartingTransitTripId() != null) {
+            // TODO Check this.
+            LOG.debug("Disable reverse-optimize for on-board depart");
+            optimize = false;
+        }
         
         /* Put path in chronological order, and optimize as necessary */
         State lastState;
