@@ -40,6 +40,7 @@ import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.ObjectUtils;
 
 /**
  * A trip planning request. Some parameters may not be honored by the trip planner for some or all itineraries. For example, maxWalkDistance may be
@@ -337,6 +338,9 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /** A transit stop that this trip must start from */
     private AgencyAndId startingTransitStopId;
+    
+    /** A trip where this trip must start from (depart-onboard routing) */
+    private AgencyAndId startingTransitTripId;
 
     private boolean walkingBike;
 
@@ -837,7 +841,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && useBikeRentalAvailabilityInformation == other.useBikeRentalAvailabilityInformation
                 && extensions.equals(other.extensions)
                 && clampInitialWait == other.clampInitialWait
-                && reverseOptimizeOnTheFly == other.reverseOptimizeOnTheFly;
+                && reverseOptimizeOnTheFly == other.reverseOptimizeOnTheFly
+                && ObjectUtils.nullSafeEquals(startingTransitTripId, other.startingTransitTripId);
     }
 
     /** Equality and hashCode should not consider the routing context, to allow SPT caching. */

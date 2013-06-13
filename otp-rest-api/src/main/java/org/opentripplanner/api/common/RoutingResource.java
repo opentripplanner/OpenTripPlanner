@@ -175,6 +175,9 @@ public abstract class RoutingResource {
     /** A transit stop required to be the first stop in the search (AgencyId_StopId) */
     @DefaultValue("") @QueryParam("startTransitStopId") protected List<String> startTransitStopId;
 
+    /** A transit trip acting as a starting "state" for depart-onboard routing (AgencyId_TripId) */
+    @DefaultValue("") @QueryParam("startTransitTripId") protected List<String> startTransitTripId;
+
     /**
      * When subtracting initial wait time, do not subtract more than this value, to prevent overly
      * optimistic trips. Reasoning is that it is reasonable to delay a trip start 15 minutes to 
@@ -358,6 +361,11 @@ public abstract class RoutingResource {
                 AgencyAndId.convertToString(request.getStartingTransitStopId()));
         if (startTransitStopId != null && !"".equals(startTransitStopId)) {
             request.setStartingTransitStopId(AgencyAndId.convertFromString(startTransitStopId));
+        }
+        String startTransitTripId = get(this.startTransitTripId, n,
+                AgencyAndId.convertToString(request.getStartingTransitTripId()));
+        if (startTransitTripId != null && !"".equals(startTransitTripId)) {
+            request.setStartingTransitTripId(AgencyAndId.convertFromString(startTransitTripId));
         }
         
         request.setClampInitialWait(get(clampInitialWait, n, request.getClampInitialWait()));
