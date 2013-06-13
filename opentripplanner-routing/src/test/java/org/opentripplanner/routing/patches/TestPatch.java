@@ -185,6 +185,11 @@ public class TestPatch extends TestCase {
             public Collection<Stop> getStopsForRoute(AgencyAndId route) {
                 return Collections.emptyList();
             }
+
+            @Override
+            public List<PatternHop> getPatternHopsForTrip(AgencyAndId tripId) {
+                return null;
+            }
         };
         graph.putService(TransitIndexService.class, index);
     }
