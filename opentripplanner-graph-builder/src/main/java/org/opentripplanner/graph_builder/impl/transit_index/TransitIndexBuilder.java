@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -37,19 +38,20 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.services.GraphBuilderWithGtfsDao;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
-import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
+import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.transit_index.RouteSegment;
 import org.opentripplanner.routing.transit_index.RouteVariant;
 import org.opentripplanner.routing.transit_index.TransitIndexServiceImpl;
+import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.util.MapUtils;
@@ -76,6 +78,8 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
     private HashMap<String, List<RouteVariant>> variantsByAgency = new HashMap<String, List<RouteVariant>>();
 
     private HashMap<AgencyAndId, PreAlightEdge> preAlightEdges = new HashMap<AgencyAndId, PreAlightEdge>();
+    
+    private HashMap<AgencyAndId, List<PatternHop>> patternHopsByTrip = new HashMap<AgencyAndId, List<PatternHop>>();
 
     private HashMap<AgencyAndId, PreBoardEdge> preBoardEdges = new HashMap<AgencyAndId, PreBoardEdge>();
 
@@ -99,6 +103,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
         LOG.debug("Building transit index");
 
         createRouteVariants(graph);
+        indexHopsByTrip(graph);
 
         nameVariants(variantsByRoute);
         int totalVariants = 0;
@@ -118,11 +123,11 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                 .getService(TransitIndexService.class);
         if (service == null) {
             service = new TransitIndexServiceImpl(variantsByAgency, variantsByRoute,
-                    variantsByTrip, preBoardEdges, preAlightEdges, directionsByRoute, stopsByRoute,
-                    modes);
+                    variantsByTrip, preBoardEdges, preAlightEdges, patternHopsByTrip,
+                    directionsByRoute, stopsByRoute, modes);
         } else {
             service.merge(variantsByAgency, variantsByRoute, variantsByTrip, preBoardEdges,
-                    preAlightEdges, directionsByRoute, stopsByRoute, modes);
+                    preAlightEdges, patternHopsByTrip, directionsByRoute, stopsByRoute, modes);
         }
 
         insertCalendarData(service);
@@ -427,6 +432,30 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                     variant.addSegment(segment);
                 }
             }
+        }
+    }
+    
+    private void indexHopsByTrip(Graph graph) {
+        for (PatternHop hop : IterableLibrary.filter(graph.getEdges(), PatternHop.class)) {
+            PatternStopVertex from = (PatternStopVertex)hop.getFromVertex();
+            TableTripPattern tripPattern = from.getTripPattern();
+            for (Trip trip : tripPattern.getTrips()) {
+                List<PatternHop> hops = patternHopsByTrip.get(trip.getId());
+                if (hops == null) {
+                    hops = new ArrayList<PatternHop>(tripPattern.getStops().size());
+                    patternHopsByTrip.put(trip.getId(), hops);
+                }
+                // We can't have duplicated PatternHop here
+                hops.add(hop);
+            }
+        }
+        for (List<PatternHop> hops : patternHopsByTrip.values()) {
+            Collections.sort(hops, new Comparator<PatternHop>() {
+                @Override
+                public int compare(PatternHop hop1, PatternHop hop2) {
+                    return hop1.stopIndex - hop2.stopIndex;
+                }
+            });
         }
     }
 

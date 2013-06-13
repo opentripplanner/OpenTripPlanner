@@ -22,6 +22,7 @@ import org.onebusaway.gtfs.model.ServiceCalendar;
 import org.onebusaway.gtfs.model.ServiceCalendarDate;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.transit_index.RouteVariant;
@@ -38,6 +39,11 @@ public interface TransitIndexService {
     public PreBoardEdge getPreBoardEdge(AgencyAndId stop);
 
     public PreAlightEdge getPreAlightEdge(AgencyAndId stop);
+
+    /**
+     * @return The list of PatternHop edges for a given trip.
+     */
+    public List<PatternHop> getPatternHopsForTrip(AgencyAndId tripId);
 
     public List<AgencyAndId> getRoutesForStop(AgencyAndId stop);
 

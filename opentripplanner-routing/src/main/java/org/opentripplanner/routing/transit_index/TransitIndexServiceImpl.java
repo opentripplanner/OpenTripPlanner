@@ -28,9 +28,10 @@ import org.onebusaway.gtfs.model.ServiceCalendarDate;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.TransitBoardAlight;
+import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.util.MapUtils;
@@ -49,6 +50,8 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
     private HashMap<AgencyAndId, PreAlightEdge> preAlightEdges;
 
     private HashMap<AgencyAndId, PreBoardEdge> preBoardEdges;
+    
+    private HashMap<AgencyAndId, List<PatternHop>> patternHopsByTrip;
 
     private HashMap<AgencyAndId, HashSet<String>> directionsForRoute;
 
@@ -71,6 +74,7 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
             HashMap<AgencyAndId, RouteVariant> variantsByTrip,
             HashMap<AgencyAndId, PreBoardEdge> preBoardEdges,
             HashMap<AgencyAndId, PreAlightEdge> preAlightEdges,
+            HashMap<AgencyAndId, List<PatternHop>> patternHopsByTrip,
             HashMap<AgencyAndId, HashSet<String>> directionsByRoute,
             HashMap<AgencyAndId, HashSet<Stop>> stopsByRoute, List<TraverseMode> modes) {
         this.variantsByAgency = variantsByAgency;
@@ -78,6 +82,7 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
         this.variantsByTrip = variantsByTrip;
         this.preBoardEdges = preBoardEdges;
         this.preAlightEdges = preAlightEdges;
+        this.patternHopsByTrip = patternHopsByTrip;
         this.directionsForRoute = directionsByRoute;
         this.stopsForRoute = stopsByRoute;
         this.modes = modes;
@@ -88,6 +93,7 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
             HashMap<AgencyAndId, RouteVariant> variantsByTrip,
             HashMap<AgencyAndId, PreBoardEdge> preBoardEdges,
             HashMap<AgencyAndId, PreAlightEdge> preAlightEdges,
+            HashMap<AgencyAndId, List<PatternHop>> patternHopsByTrip,
             HashMap<AgencyAndId, HashSet<String>> directionsByRoute,
             HashMap<AgencyAndId, HashSet<Stop>> stopsByRoute, List<TraverseMode> modes) {
 
@@ -96,6 +102,7 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
         this.variantsByTrip.putAll(variantsByTrip);
         this.preBoardEdges.putAll(preBoardEdges);
         this.preAlightEdges.putAll(preAlightEdges);
+        this.patternHopsByTrip.putAll(patternHopsByTrip);
         MapUtils.mergeInUnique(this.directionsForRoute, directionsByRoute);
         MapUtils.mergeInUnique(this.stopsForRoute, stopsByRoute);
         for (TraverseMode mode : modes) {
@@ -131,6 +138,11 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
     @Override
     public PreAlightEdge getPreAlightEdge(AgencyAndId stop) {
         return preAlightEdges.get(stop);
+    }
+    
+    @Override
+    public List<PatternHop> getPatternHopsForTrip(AgencyAndId tripId) {
+        return patternHopsByTrip.get(tripId);
     }
 
     @Override
