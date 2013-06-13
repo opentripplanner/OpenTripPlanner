@@ -79,8 +79,10 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
+import org.opentripplanner.routing.impl.OnBoardDepartServiceImpl;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.FareServiceFactory;
+import org.opentripplanner.routing.services.OnBoardDepartService;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.routing.vertextype.PatternDepartVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -546,6 +548,7 @@ public class GTFSPatternHopFactory {
         clearCachedData();
         graph.putService(FareService.class, fareServiceFactory.makeFareService());
         graph.putService(ServiceIdToNumberService.class, new ServiceIdToNumberService(context.serviceIds));
+        graph.putService(OnBoardDepartService.class, new OnBoardDepartServiceImpl());
     }
 
     static int cg = 0;
