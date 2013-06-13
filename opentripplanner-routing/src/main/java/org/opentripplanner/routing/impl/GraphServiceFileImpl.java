@@ -18,7 +18,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -130,14 +129,26 @@ public class GraphServiceFileImpl implements GraphService {
         sb.append("Graph.obj");
         String graphFileName = sb.toString();
         LOG.debug("graph file for routerId '{}' is at {}", routerId, graphFileName);
-        InputStream is;
-        try {
-            File graphFile = new File(graphFileName);
-            is = new FileInputStream(graphFile);
-        } catch (IOException ex) {
-            LOG.warn("Graph file not found or not openable for routerId '{}' under {}", routerId,
-                    graphFileName);
-            ex.printStackTrace();
+        InputStream is = null;
+        final String CLASSPATH_PREFIX = "classpath:/";
+        if (graphFileName.startsWith(CLASSPATH_PREFIX)) {
+            // look for graph on classpath
+            String resourceName = graphFileName.substring(CLASSPATH_PREFIX.length());
+            LOG.debug("loading graph on classpath at {}", resourceName);
+            is = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName);
+        } else {
+            // look for graph in filesystem
+            try {
+                File graphFile = new File(graphFileName);
+                is = new FileInputStream(graphFile);
+            } catch (IOException ex) {
+                is = null;
+                ex.printStackTrace();
+            }
+        }
+        if (is == null) {
+            LOG.warn("Graph file not found or not openable for routerId '{}' under {}", 
+                    routerId, graphFileName);
             return null;
         }
         LOG.debug("graph input stream successfully opened.");
