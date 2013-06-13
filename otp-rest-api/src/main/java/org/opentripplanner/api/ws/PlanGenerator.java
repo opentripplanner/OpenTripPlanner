@@ -236,8 +236,10 @@ public class PlanGenerator {
                     // Add boarding alerts to the next leg
                     postponedAlerts = state.getBackAlerts();
                 } else if (backEdge instanceof PreAlightEdge) {
-                    // Add alighting alerts to the previous leg
-                    addNotesToLeg(itinerary.legs.get(itinerary.legs.size() - 1), state.getBackAlerts());
+                    // Add alighting alerts to the previous leg, if any
+                    if (itinerary.legs.size() > 0)
+                        addNotesToLeg(itinerary.legs.get(itinerary.legs.size() - 1),
+                                state.getBackAlerts());
                 }
                 continue;
             }
@@ -282,6 +284,14 @@ public class PlanGenerator {
                     coordinates.add(state.getVertex().getCoordinate());
                     finalizeLeg(leg, state, path.states, i, i, coordinates, itinerary);
                     coordinates.clear();
+                } else if (mode.isTransit()) {
+                    pgstate = PlanGenState.TRANSIT;
+                    leg = makeLeg(itinerary, state);
+                    leg.stop = new ArrayList<Place>();
+                    leg.from.name = null; // TODO What name? "k.StopA + (1-k).StopB" ? :)
+                    itinerary.transfers++;
+                    startWalk = -1;
+                    fixupTransitLeg(leg, state, transitIndex);
                 } else {
                     LOG.error("Unexpected state (in START): " + mode);
                 }

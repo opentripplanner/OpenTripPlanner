@@ -59,7 +59,12 @@ public class BasicPathParser extends PathParser {
                 seq(star(StreetEdge.CLASS_STREET), bikeNonStreet));
 
         Nonterminal transitLeg = seq(plus(STATION), plus(TRANSIT), plus(STATION));
-        Nonterminal itinerary = seq(optionalNontransitLeg, star(transitLeg, optionalNontransitLeg));
+        Nonterminal departOnStreetItinerary = seq(optionalNontransitLeg,
+                star(transitLeg, optionalNontransitLeg));
+        Nonterminal onBoardDepartTransitLeg = seq(plus(TRANSIT), plus(STATION));
+        Nonterminal departOnBoardItinerary = seq(onBoardDepartTransitLeg, optionalNontransitLeg,
+                star(transitLeg, optionalNontransitLeg));
+        Nonterminal itinerary = choice(departOnStreetItinerary, departOnBoardItinerary);
         DFA = itinerary.toDFA().minimize();
         System.out.println(DFA.toGraphViz());
         System.out.println(DFA.dumpTable());

@@ -39,6 +39,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.pathparser.PathParser;
+import org.opentripplanner.routing.services.OnBoardDepartService;
 import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -207,6 +208,15 @@ public class RoutingContext implements Cloneable {
         this.opt = routingRequest;
         this.graph = graph;
 
+        // the graph's snapshot may be frequently updated.
+        // Grab a reference to ensure a coherent view of the timetables throughout this search.
+        if (graph.timetableSnapshotSource != null)
+            timetableSnapshot = graph.timetableSnapshotSource.getSnapshot();
+        else
+            timetableSnapshot = null;
+        calendarService = graph.getCalendarService();
+        setServiceDays();
+
         Edge fromBackEdge = null;
         Edge toBackEdge = null;
         if (findPlaces) {
@@ -220,7 +230,13 @@ public class RoutingContext implements Cloneable {
             } else {
                 toVertex = null;
             }
-            if (!opt.batch || !opt.arriveBy) {
+            if (opt.getStartingTransitTripId() != null && !opt.arriveBy) {
+                // Depart on-board mode: set the from vertex to "on-board" state
+                OnBoardDepartService onBoardDepartService = graph.getService(OnBoardDepartService.class);
+                if (onBoardDepartService == null)
+                    throw new UnsupportedOperationException("Missing OnBoardDepartService");
+                fromVertex = onBoardDepartService.setupDepartOnBoard(this);
+            } else if (!opt.batch || !opt.arriveBy) {
                 // non-batch mode, or depart-after batch mode: we need a from vertex
                 fromVertex = graph.streetIndex.getVertexForLocation(opt.getFrom(), opt, toVertex);
                 if (opt.getFrom().hasEdgeId()) {
@@ -268,15 +284,7 @@ public class RoutingContext implements Cloneable {
         origin = opt.arriveBy ? toVertex : fromVertex;
         originBackEdge = opt.arriveBy ? toBackEdge : fromBackEdge;
         target = opt.arriveBy ? fromVertex : toVertex;
-        calendarService = graph.getCalendarService();
         transferTable = graph.getTransferTable();
-        // the graph's snapshot may be frequently updated.
-        // Grab a reference to ensure a coherent view of the timetables throughout this search.
-        if (graph.timetableSnapshotSource != null)
-            timetableSnapshot = graph.timetableSnapshotSource.getSnapshot();
-        else
-            timetableSnapshot = null;
-        setServiceDays();
         if (opt.batch)
             remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
         else
@@ -329,7 +337,7 @@ public class RoutingContext implements Cloneable {
      * is very heavily used (at every transit boarding) and Date operations were identified as a performance bottleneck. Must be called after the
      * TraverseOptions already has a CalendarService set.
      */
-    public void setServiceDays() {
+    private void setServiceDays() {
         final long SEC_IN_DAY = 60 * 60 * 24;
         final long time = opt.getSecondsSinceEpoch();
         this.serviceDays = new ArrayList<ServiceDay>(3);
