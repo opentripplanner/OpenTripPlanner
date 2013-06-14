@@ -42,6 +42,8 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
     @Autowired private GraphService graphService;
     @Setter    private UpdateStreamer updateStreamer;
     @Setter    private int logFrequency = 2000;
+    
+    private int appliedBlockCount = 0;
 
     /** 
      * If a timetable snapshot is requested less than this number of milliseconds after the previous 
@@ -112,59 +114,56 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
      */
     @Override
     public void run() {
-        int appliedBlockCount = 0;
-        while (true) {
-            List<TripUpdate> tripUpdates = updateStreamer.getUpdates(); 
-            if (tripUpdates == null) {
-                LOG.debug("tripUpdates is null");
-                continue;
-            }
+        
+        List<TripUpdate> tripUpdates = updateStreamer.getUpdates(); 
+        if (tripUpdates == null) {
+            LOG.debug("updates is null");
+            return;
+        }
 
-            LOG.debug("message contains {} trip update blocks", tripUpdates.size());
-            int uIndex = 0;
-            for (TripUpdate tripUpdate : tripUpdates) {
-                uIndex += 1;
-                LOG.debug("trip update block #{} ({} updates) :", uIndex, tripUpdate.getUpdates().size());
-                LOG.trace("{}", tripUpdate.toString());
-                
-                boolean applied = false;
-                switch(tripUpdate.getStatus()) {
-                case ADDED:
-                    applied = handleAddedTrip(tripUpdate);
-                    break;
-                case CANCELED:
-                    applied = handleCanceledTrip(tripUpdate);
-                    break;
-                case MODIFIED:
-                    applied = handleModifiedTrip(tripUpdate);
-                    break;
-                case REMOVED:
-                    applied = handleRemovedTrip(tripUpdate);
-                    break;
-                }
-                
-                if(applied) {
-                   appliedBlockCount++;
-                } else {
-                    LOG.warn("Failed to apply Tripupdate: " + tripUpdate);
-                }
-
-                if (appliedBlockCount % logFrequency == 0) {
-                    LOG.info("Applied {} stoptime update blocks.", appliedBlockCount);
-                }
+        LOG.debug("message contains {} trip update blocks", tripUpdates.size());
+        int uIndex = 0;
+        for (TripUpdate tripUpdate : tripUpdates) {
+            uIndex += 1;
+            LOG.debug("trip update block #{} ({} updates) :", uIndex, tripUpdate.getUpdates().size());
+            LOG.trace("{}", tripUpdate.toString());
+            
+            boolean applied = false;
+            switch(tripUpdate.getStatus()) {
+            case ADDED:
+                applied = handleAddedTrip(tripUpdate);
+                break;
+            case CANCELED:
+                applied = handleCanceledTrip(tripUpdate);
+                break;
+            case MODIFIED:
+                applied = handleModifiedTrip(tripUpdate);
+                break;
+            case REMOVED:
+                applied = handleRemovedTrip(tripUpdate);
+                break;
             }
+            
+            if(applied) {
+                appliedBlockCount++;
+             } else {
+                 LOG.warn("Failed to apply Tripupdate: " + tripUpdate);
+             }
 
-            LOG.debug("end of update message");
-
-            // Make a snapshot after each message in anticipation of incoming requests
-            // Purge data if necessary (and force new snapshot if anything was purged)
-            if(purgeExpiredData) {
-                boolean modified = purgeExpiredData(); 
-                getSnapshot(modified);
-            }
-            else {
-                getSnapshot(); 
-            }
+             if (appliedBlockCount % logFrequency == 0) {
+                 LOG.info("Applied {} stoptime update blocks.", appliedBlockCount);
+             }
+        }
+        LOG.debug("end of update message");
+        
+        // Make a snapshot after each message in anticipation of incoming requests
+        // Purge data if necessary (and force new snapshot if anything was purged)
+        if(purgeExpiredData) {
+            boolean modified = purgeExpiredData(); 
+            getSnapshot(modified);
+        }
+        else {
+            getSnapshot(); 
         }
     }
 
