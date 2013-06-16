@@ -289,8 +289,10 @@ public abstract class GtfsRealtimeAbstractUpdateStreamer implements UpdateStream
                     arrivalTime = event.getTime();
                     arrivalTime = arrivalTime - today;
                 } else if(event.hasDelay()) {
-                    LOG.warn("Providing only a delay is not supported yet: \n{}", stopTimeUpdate);
-                    return null;
+
+                    Update u = new Update(tripId, stopId, stopSequence,
+                            event.getDelay(), Update.Status.PREDICTION, timestamp, serviceDate);
+                    return u;
                 }
             }
             if(stopTimeUpdate.hasDeparture()) {
@@ -299,8 +301,10 @@ public abstract class GtfsRealtimeAbstractUpdateStreamer implements UpdateStream
                     departureTime = event.getTime();
                     departureTime = departureTime - today;
                 } else if(event.hasDelay()) {
-                    LOG.warn("Providing only a delay is not supported yet: \n{}", stopTimeUpdate);
-                    return null;
+
+                    Update u = new Update(tripId, stopId, stopSequence,
+                            event.getDelay(), Update.Status.PREDICTION, timestamp, serviceDate);
+                    return u;
                 }
             }
             

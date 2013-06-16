@@ -24,7 +24,10 @@ public class Update extends AbstractUpdate implements Comparable<Update> {
     public final AgencyAndId stopId;
 
     @Getter
-    public final int stopSeq;
+    public final Integer stopSeq;
+    
+    @Getter
+    public final Integer delay;
 
     @Getter
     public int arrive; // sec since midnight
@@ -35,7 +38,7 @@ public class Update extends AbstractUpdate implements Comparable<Update> {
     @Getter
     public final Status status;
 
-    public Update (AgencyAndId tripId, AgencyAndId stopId, int stopSeq, int arrive, int depart, 
+    public Update (AgencyAndId tripId, AgencyAndId stopId, Integer stopSeq, int arrive, int depart, 
             Status status, long timestamp, ServiceDate serviceDate) {
         super(tripId, timestamp, serviceDate);
         this.stopId = stopId;
@@ -43,6 +46,27 @@ public class Update extends AbstractUpdate implements Comparable<Update> {
         this.arrive = arrive;
         this.depart = depart;
         this.status = status;
+        this.delay = null;
+    }
+
+
+    public Update (AgencyAndId tripId, AgencyAndId stopId, Integer stopSeq, int delay, 
+            Status status, long timestamp, ServiceDate serviceDate) {
+        super(tripId, timestamp, serviceDate);
+        this.stopId = stopId;
+        this.stopSeq = stopSeq;
+        this.arrive = 0;
+        this.depart = 0;
+        this.delay = delay;
+        this.status = status;
+    }
+    
+    public boolean hasStopSequence() {
+        return stopSeq != null;
+    }
+    
+    public boolean hasDelay() {
+        return delay != null;
     }
 
     /**
@@ -73,6 +97,10 @@ public class Update extends AbstractUpdate implements Comparable<Update> {
 
     @Override
     public String toString() {
+        if(hasDelay())
+            return String.format("Update trip %s Stop #%d:%s (%s) delay %s", 
+                    tripId, stopSeq, stopId, status, delay);
+        
         return String.format("Update trip %s Stop #%d:%s (%s) A%s D%s", 
                 tripId, stopSeq, stopId, status, arrive, depart);
     }

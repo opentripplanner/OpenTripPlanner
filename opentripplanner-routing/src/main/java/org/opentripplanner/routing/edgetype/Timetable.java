@@ -369,6 +369,16 @@ public class Timetable implements Serializable {
             if (tripUpdate.isCancellation()) {
                 newTimes = new CanceledTripTimes(scheduledTimes);
             }
+            else if(tripUpdate.hasDelay()) {
+                // 'stop' Index as in transit stop (not 'end', not 'hop')
+                int stopIndex = tripUpdate.findUpdateStopIndex(pattern);
+                if (stopIndex == TripUpdate.MATCH_FAILED) {
+                    LOG.warn("Unable to match update block to stopIds.");
+                    return false;
+                }
+                int delay = tripUpdate.getUpdates().get(0).getDelay();
+                newTimes = new DecayingDelayTripTimes(scheduledTimes, stopIndex, delay);
+            }
             else {
                 // 'stop' Index as in transit stop (not 'end', not 'hop')
                 int stopIndex = tripUpdate.findUpdateStopIndex(pattern);

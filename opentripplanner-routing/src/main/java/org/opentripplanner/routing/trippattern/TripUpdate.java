@@ -64,6 +64,10 @@ public class TripUpdate extends AbstractUpdate {
         return getStatus() == Status.CANCELED;
     }
 
+    public boolean hasDelay() {
+        return !updates.isEmpty() && updates.get(0).hasDelay();
+    }
+
     public enum Status {
         /** This trip should be added to the graph, valid on the given serviceDate. */
         ADDED,
