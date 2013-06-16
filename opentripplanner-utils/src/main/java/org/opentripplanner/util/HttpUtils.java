@@ -32,6 +32,9 @@ public class HttpUtils {
         HttpGet httpget = new HttpGet(url);
         HttpClient httpclient = new DefaultHttpClient();
         HttpResponse response = httpclient.execute(httpget);
+        if(response.getStatusLine().getStatusCode() != 200)
+            return null;
+
         HttpEntity entity = response.getEntity();
         if (entity == null) {
             return null;
