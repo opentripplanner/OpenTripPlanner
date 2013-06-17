@@ -1,0 +1,186 @@
+#{script 'jquery-1.8.2.js' /}
+#{script 'jquery-ui-1.9.1.custom.js' /}
+#{stylesheet 'jquery-ui/jquery-ui-1.9.1.custom.css' /}
+
+#{form @FieldTrip.newRequest(), id:'requestForm'}
+
+
+<center>
+<div style="width: 800px; margin-top: 20px; text-align: left;">
+<h2>Field Trip Request Form</h2>
+
+Complete and return this form to request a field trip if you wish to travel on TriMet with a group of 15 or more. 
+If you have any questions, please email us at fieldtrips@trimet.org or call 503-962-2424 option 4.
+
+<h3>Contact Information</h3>
+
+<div class="otp-fieldTripRequest-row">
+  Teacher Name: <input id="teacherName" name="request.teacherName"/>&nbsp;&nbsp;
+  School Name: <input id="schoolName"  name="request.schoolName"/>
+</div>
+
+<div class="otp-fieldTripRequest-row">
+  Address: <input name="request.address" />&nbsp;&nbsp;
+  City: <input name="request.city" />&nbsp;&nbsp;
+  State: <input name="request.state" style="width: 40px;" />&nbsp;&nbsp;
+  Zip: <input name="request.zip" style="width: 60px;" />
+</div>
+
+
+<div class="otp-fieldTripRequest-row">
+  Phone: <input name="request.phoneNumber" />&nbsp;&nbsp;
+  Fax: <input name="request.faxNumber" />
+</div>
+
+<div class="otp-fieldTripRequest-row">
+  Email Address: <input id="emailAddress" name="request.emailAddress" />&nbsp;&nbsp;
+  Grade: <input name="request.grade" style="width: 40px;" />
+</div>
+
+
+<h3>Field Trip Information</h3>
+
+
+<div class="otp-fieldTripRequest-row">
+  # of Students: <input name="request.numStudents" style="width: 40px;" />&nbsp;&nbsp;&nbsp;
+  Age Range: <input name="request.minimumAge" style="width: 30px;" /> to <input name="request.maximumAge" style="width: 30px;" />&nbsp;&nbsp;&nbsp;# of Chaperones (including Teachers): <input name="request.numChaperones" style="width: 40px;" />
+</div>
+
+<div class="otp-fieldTripRequest-row">
+  Starting Point (Address): <input name="request.startLocation" />&nbsp;&nbsp;Destination (Address): <input name="request.endLocation" />
+</div>
+
+<div class="otp-fieldTripRequest-row">
+  Date of Trip: <input id="travelDate" name="request.travelDate" />
+</div>
+
+<div class="otp-fieldTripRequest-row">
+  Time your group needs to be at your destination: 
+    <input id="arriveDestinationTime-hour" style="width: 20px; "/> : <input id="arriveDestinationTime-minute" style="width: 20px; "/> 
+    <select id="arriveDestinationTime-ampm">
+        <option value="AM">AM</option>
+        <option value="PM">PM</option>
+    </select>
+</div>
+<input type="hidden" id="arriveDestinationTime" name="request.arriveDestinationTime" />
+
+
+<div class="otp-fieldTripRequest-row">
+  Time your group will be ready to leave your destination:
+    <input id="leaveDestinationTime-hour" style="width: 20px; "/> : <input id="leaveDestinationTime-minute" style="width: 20px; "/> 
+    <select id="leaveDestinationTime-ampm">
+        <option value="AM">AM</option>
+        <option value="PM">PM</option>
+    </select>
+</div>
+<input type="hidden" id="leaveDestinationTime" name="request.leaveDestinationTime" />
+
+
+<div class="otp-fieldTripRequest-row">
+  Time your group needs to be back at school:
+    <input id="arriveSchoolTime-hour" style="width: 20px; "/> : <input id="arriveSchoolTime-minute" style="width: 20px; "/> 
+    <select id="arriveSchoolTime-ampm">
+        <option value="AM">AM</option>
+        <option value="PM">PM</option>
+    </select>
+</div>
+<input type="hidden" id="arriveSchoolTime" name="request.arriveSchoolTime" />
+
+
+<h3>Payment Information</h3>
+
+<div class="otp-fieldTripRequest-row">
+  Payment preference:
+</div>
+<input name="paymentPreference" type="radio" value="request_call" checked /> Please call me at above phone number<br>
+<input name="paymentPreference" type="radio" value="fax_cc" /> I will fax credit card information to TriMet<br>
+<input name="paymentPreference" type="radio" value="mail_check" /> I will mail a check to TriMet
+
+
+</div>
+</center>
+
+
+#{/form}
+
+
+<div style="margin-top: 20px; text-align: center;">
+    <!--<input type="submit" value="Submit your Request" style="font-size: 20px;" />-->
+    <button id="submitButton">Submit Request</button>
+</div>
+
+
+<!-- initialization of interactive fields -->
+<script type="text/javascript" language="javascript">
+$(document).ready(function() {
+    console.log("startup");
+    $("#travelDate").datepicker();
+    $("#submitButton").click(function() {
+        submitClicked();
+    });
+});
+
+function submitClicked() {
+    console.log("click");
+    
+    if(!checkRequired('teacherName', 'Teacher Name')) return;
+    
+    var arriveDestinationTime = constructTime("arriveDestinationTime");
+    if(arriveDestinationTime == null) {
+        alert("Arrive at destination time is not valid");
+        return;
+    }
+    $("#arriveDestinationTime").val(arriveDestinationTime);
+
+    var leaveDestinationTime = constructTime("leaveDestinationTime");
+    if(leaveDestinationTime == null) {
+        alert("Leave destination time is not valid");
+        return;
+    }
+    $("#leaveDestinationTime").val(leaveDestinationTime);
+
+    
+    var arriveSchoolTime = constructTime("arriveSchoolTime");
+    if(arriveSchoolTime == null) {
+        alert("Arrive back at school time is not valid");
+        return;
+    }
+    $("#arriveSchoolTime").val(arriveSchoolTime);
+
+
+    document.forms["requestForm"].submit();
+}
+
+function checkRequired(id, name) {
+    if($('#'+id).val().length > 0) return true;
+    alert(name + " is a required field");
+    return false;
+}
+
+function constructTime(prefix) {
+    var hourStr = $("#" + prefix + "-hour").val();
+    if($.isNumeric(hourStr)) {
+        var hour = parseInt(hourStr);
+        if(hour <= 0 || hour > 12) return null;
+    }
+    else {
+        return null;
+    }
+    
+    var minuteStr = $("#" + prefix + "-minute").val();
+    if($.isNumeric(minuteStr)) {
+        var minute = parseInt(minuteStr);
+        if(minute < 0 || minute > 59) return null;
+    }
+    else {
+        return null;
+    }
+
+    var ampmStr = $("#" + prefix + "-ampm").val();
+    
+    return (hour < 10 ? "0" : "") + hour + ":" + (minute < 10 ? "0" : "") + minute + ampmStr;
+}
+
+
+
+</script>

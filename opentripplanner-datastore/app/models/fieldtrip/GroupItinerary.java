@@ -1,4 +1,4 @@
-package models;
+package models.fieldtrip;
  
 import java.util.List;
 import javax.persistence.*;

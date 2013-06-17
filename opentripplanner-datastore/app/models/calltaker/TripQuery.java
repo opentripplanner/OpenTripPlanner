@@ -19,7 +19,7 @@ import play.db.jpa.*;
 @Entity
 public class TripQuery extends Model {
  
-    public String userName;
+    //public String userName;
     
     @Column(length=1000)
     public String queryParams;
@@ -33,8 +33,7 @@ public class TripQuery extends Model {
     @ManyToOne
     public Call call;
     
-    public TripQuery(String userName, String queryParams, String fromPlace, String toPlace) {
-        this.userName = userName;
+    public TripQuery(String queryParams, String fromPlace, String toPlace) {
         this.queryParams = queryParams;
         this.fromPlace = fromPlace;
         this.toPlace = toPlace;
@@ -43,7 +42,7 @@ public class TripQuery extends Model {
     
     @Override
     public String toString() {
-        return "["+id+"] query from "+fromPlace+" to "+toPlace+", submitted by "+userName+" at "+timeStamp+", call="+call;
+        return "["+id+"] query from "+fromPlace+" to "+toPlace+", submitted by "+call.user.username+" at "+timeStamp+", call="+call;
     }
  
 }

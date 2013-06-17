@@ -1,4 +1,4 @@
-package models;
+package models.fieldtrip;
  
 import java.util.Date;
 import javax.persistence.*;

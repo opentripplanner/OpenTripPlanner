@@ -1,8 +1,7 @@
 package controllers;
 
-import com.google.gson.Gson;
-import play.*;
-import play.cache.*;
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import play.mvc.*;
 
 import java.util.*;
@@ -11,6 +10,8 @@ import models.*;
 
 public class Application extends Controller {
 
+    private static SecureRandom random = new SecureRandom();
+  
     @Before
     public static void setCORS()  {
         Http.Header origin = new Http.Header();
@@ -32,6 +33,39 @@ public class Application extends Controller {
 
     }
     
+    public static void initLogin() {
+        String username = "test";
+        TrinetUser user = TrinetUser.find("byUsername", username).first();
+        String sessionId = null;
+        if(user != null) {
+            sessionId = nextSessionId();
+            Session trinetSession = new Session(sessionId, user);
+            trinetSession.save();
+            System.out.println("saved session" + sessionId + " for user "+user);
+        }
+        
+        Map<String, String> resp = new HashMap<String, String>();
+        resp.put("sessionId", sessionId);
+        resp.put("username", user.username);
+        renderJSON(resp);
+    }
+    
+    public static TrinetUser checkLogin() {
+        String sessionId = params.get("sessionId");
+        
+        Session session = Session.find("bySessionId", sessionId).first();
+        if(session == null) {
+            forbidden();
+        }
+        System.out.println("retrieved session for user: "+session.user);
+        return session.user;
+    }
+    
+        
+    public static String nextSessionId() {
+        return new BigInteger(130, random).toString(32);
+    }
+    
     /*@Util
     public static void renderJSON(Object obj) {
         if (request.params._contains("callback")) {
@@ -44,12 +78,14 @@ public class Application extends Controller {
         }      
     }*/
     
-    @Before(priority=0)
+    
+    /*@Before(priority=0)
     public static void checkPassword() {
         request.user = null;
 
         String username = params.get("userName");
         String password = params.get("password");
+        System.out.println("checkPassword "+username);
         User user = getUser(username);
         if (user == null) {
             Logger.debug("no user by this username: %s (count = %s)", username, User.count());
@@ -62,19 +98,11 @@ public class Application extends Controller {
             Logger.debug("bad password");
             forbidden();
         }
-    }
+    }*/
+    
 
-    static User getUser(String username) {
-        User user = Cache.get(username, User.class);
-        if (user == null) {
-            Logger.debug("no user in cache");
-            user = User.find("byUsername", username).first();
-            Cache.set(username, user);
-        }
-        return user;
-    }
-
-    static User getUser() {
+    /*static User getUser() {
+        System.out.println("getUser(): "+request.user);
         return getUser(request.user);
-    }
+    }*/
 }
