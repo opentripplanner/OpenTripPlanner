@@ -14,38 +14,19 @@
 
 otp.namespace("otp.modules.calltaker");
 
-/*otp.modules.calltaker.PastQueryModel = 
-    Backbone.Model.extend({});
-    
-otp.modules.calltaker.PastQueryCollection = 
-    Backbone.Collection.extend({
-    
-    url: otp.config.datastoreUrl+'/getQueries',
-    model: otp.modules.calltaker.PastQueryModel,
-   
-    sync: function(method, model, options) {
-        //options.dataType = 'jsonp';
-        options.data = options.data || {};
-        return Backbone.sync(method, model, options);
-    },
-    
-});*/    
-
 
 otp.modules.calltaker.CallTakerModule = 
     otp.Class(otp.modules.multimodal.MultimodalPlannerModule, {
 
     moduleName  : "Call Taker Interface",
-    moduleId    : "calltaker",
-
-    callTaker : null,
     
     activeCall : null,
     
+    sessionId : null,
+    username: null,
+    
     initialize : function(webapp, id, options) {
         otp.modules.multimodal.MultimodalPlannerModule.prototype.initialize.apply(this, arguments);
-
-        this.callTaker = new otp.modules.calltaker.CallTaker('admin', 'secret');
         
         this.showIntermediateStops = true;
         
@@ -55,10 +36,8 @@ otp.modules.calltaker.CallTakerModule =
         if(this.activated) return;
         otp.modules.multimodal.MultimodalPlannerModule.prototype.activate.apply(this);
         console.log("activate ctm");        
-        //this.tipWidget.$().css('display','none');
-
-        this.callHistoryWidget = new otp.modules.calltaker.CallHistoryWidget(this.moduleId+"-callHistoryWidget", this);
-        this.callHistoryWidget.show();
+        
+        this.initSession();
     },
     
     getExtendedQueryParams : function() {
@@ -66,6 +45,32 @@ otp.modules.calltaker.CallTakerModule =
             showIntermediateStops : this.showIntermediateStops,
             minTransferTime : 300 
         };
+    },
+    
+    initSession : function() {
+        var this_ = this;
+        var url = otp.config.datastoreUrl+'/auth/initLogin';
+        $.ajax(url, {
+            type: 'GET',
+            dataType: 'json',
+            
+            success: function(data) {
+                this_.sessionId = data.sessionId;
+                this_.username = data.username;
+                this_.showHistoryWidget();
+            },
+            
+            error: function(data) {
+                console.log("auth error");
+                console.log(data);
+            }
+        });
+                
+    },
+    
+    showHistoryWidget : function() {
+        this.callHistoryWidget = new otp.modules.calltaker.CallHistoryWidget(this.id+"-callHistoryWidget", this);
+        this.callHistoryWidget.show();
     },
         
     processPlan : function(tripPlan, restoring) {
@@ -85,17 +90,8 @@ otp.modules.calltaker.CallTakerModule =
             
             this.callHistoryWidget.queryListView.addQuery(query);
             this.activeCall.queries.push(query);
-            //this.queryLogger.logQuery(tripPlan.queryParams, this.userName, this.password);    
         }
     },
-
-    /*queryLogged : function() {
-        this.fetchQueries();
-    },
-    
-    fetchQueries : function() {
-        this.pastQueries.fetch({ data: { userName: this.userName, password: this.password, limit: 10 }});
-    },*/
 
     startCall : function() {
         this.activeCall = new otp.modules.calltaker.Call();
@@ -135,8 +131,7 @@ otp.modules.calltaker.CallTakerModule =
         console.log(model);
         
         var data = {
-            userName : this.callTaker.userName,
-            password : this.callTaker.password
+            sessionId : this.sessionId,
         };
         
         
@@ -169,54 +164,4 @@ otp.modules.calltaker.CallTakerModule =
     CLASS_NAME : "otp.modules.calltaker.CallTakerModule"
 });
 
-otp.modules.calltaker.CallTaker = otp.Class({
-    
-    userName : null,    
-    password : null,
-   
-    initialize : function(userName, password) {
-        this.userName = userName;
-        this.password = password;
-    }
-});
-
-
-otp.modules.calltaker.Call = Backbone.Model.extend({
-    
-    url : otp.config.datastoreUrl+'/call',
-    playName : 'call',
-    queries : null,   
-    
-    initialize : function() {
-        this.queries = [ ];
-    },
-    
-    defaults: {
-        startTime: null,
-        endTime: null
-    },
-
-});
-
-otp.modules.calltaker.CallList = Backbone.Collection.extend({
-    model: otp.modules.calltaker.Call,
-    url: otp.config.datastoreUrl+'/call',
-});
-
-
-otp.modules.calltaker.Query = Backbone.Model.extend({
-    
-    url : otp.config.datastoreUrl+'/callQuery',
-    playName : 'query'
-   
-});
- 
-otp.modules.calltaker.QueryList = Backbone.Collection.extend({
-
-    model: otp.modules.calltaker.Query,
-    url: otp.config.datastoreUrl+'/callQuery',
-       
-});
-
-  
 
