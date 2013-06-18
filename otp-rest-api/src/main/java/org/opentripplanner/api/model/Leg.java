@@ -47,6 +47,19 @@ public class Leg {
     public Calendar endTime = null;
     
     /**
+     * The delay of this leg in seconds, in the case there is real-time data about it;
+     */
+    public int departureDelay = 0;
+    /**
+     * The delay of this leg in seconds, in the case there is real-time data about it;
+     */
+    public int arrivalDelay = 0;
+    /**
+     * Whether there is real-time data about this Leg
+     */
+    public Boolean realTime = false;
+    
+    /**
      * The distance traveled while traversing the leg in meters.
      */
     public Double distance = null;
