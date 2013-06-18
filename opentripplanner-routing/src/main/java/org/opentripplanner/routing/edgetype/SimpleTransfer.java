@@ -3,6 +3,7 @@ package org.opentripplanner.routing.edgetype;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
@@ -31,6 +32,8 @@ public class SimpleTransfer extends Edge {
         RoutingRequest rr = s0.getOptions();
         double walkspeed = rr.getWalkSpeed();
         StateEditor se = s0.edit(this);
+        //se.setBackMode(TraverseMode.TRANSFER);
+        se.setBackMode(s0.getNonTransitMode());
         int time = (int) (distance / walkspeed); 
         se.incrementTimeInSeconds(time);
         se.incrementWeight(time * rr.walkReluctance);
