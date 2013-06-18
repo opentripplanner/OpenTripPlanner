@@ -204,7 +204,8 @@ public class PlanGenerator {
                 int hop = ((PatternHop)backEdge).stopIndex;
                 if ( ! tt.isScheduled()) {
                 	leg.realTime = true;
-                	leg.delay = tt.getDepartureDelay(hop);
+                	leg.departureDelay = tt.getDepartureDelay(hop);
+                	leg.arrivalDelay = tt.getArrivalDelay(hop);
                 } 
                 else {
                 	leg.realTime = false;
