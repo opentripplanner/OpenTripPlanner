@@ -16,7 +16,6 @@ package org.opentripplanner.routing.impl;
 import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
-import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
@@ -59,8 +58,6 @@ import com.vividsolutions.jts.geom.LineString;
 public class OnBoardDepartServiceImpl implements OnBoardDepartService {
     private static final long serialVersionUID = -3729628250159575313L;
 
-    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
-
     private static final Logger LOG = LoggerFactory.getLogger(OnBoardDepartServiceImpl.class);
 
     @Override
@@ -95,7 +92,7 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
         double minDist = Double.MAX_VALUE;
         for (PatternHop hop : hops) {
             LineString line = hop.getGeometry();
-            double dist = distanceLibrary.fastDistance(point, line);
+            double dist = SphericalDistanceLibrary.getInstance().fastDistance(point, line);
             if (dist < minDist) {
                 minDist = dist;
                 bestHop = hop;

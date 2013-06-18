@@ -150,7 +150,9 @@ public class SimplifiedPathServiceImpl implements PathService {
                     nontransitLeg, 
                     LINK, transitLeg, star(XFER, transitLeg), LINK, 
                     nontransitLeg);
-            Nonterminal itinerary = choice(nontransitLeg, transitItinerary);
+            Nonterminal onboardItinerary = seq(plus(RIDE), plus(STATION), star(XFER, transitLeg),
+                    LINK, nontransitLeg);
+            Nonterminal itinerary = choice(nontransitLeg, transitItinerary, onboardItinerary);
             DFA = itinerary.toDFA().minimize();
             System.out.println(DFA.toGraphViz());
             System.out.println(DFA.dumpTable());

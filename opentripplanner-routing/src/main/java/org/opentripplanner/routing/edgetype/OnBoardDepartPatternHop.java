@@ -101,6 +101,10 @@ public class OnBoardDepartPatternHop extends Edge implements OnBoardForwardEdge 
             throw new UnsupportedOperationException(
                     "Cannot (yet) reverse-optimize depart-on-board mode.");
         }
+        
+        /* Can't be traversed backwards. */
+        if (options.isArriveBy())
+            return null;
 
         StateEditor s1 = state0.edit(this);
         // s1.setBackMode(TraverseMode.BOARDING); TODO Do we need this?
