@@ -264,7 +264,7 @@ otp.modules.planner.Itinerary = otp.Class({
                 
                 html += '</ul>';
             }
-            else { // walk / bike / car
+            else if (leg.steps) { // walk / bike / car
             
                 for(var i=0; i<leg.steps.length; i++) {
                     var step = leg.steps[i];
@@ -338,7 +338,7 @@ otp.modules.planner.Itinerary = otp.Class({
                 text += ' - Alight: ' + leg.to.name + ' (' + leg.to.stopId.agencyId + ' stop ' + 
                         leg.to.stopId.id + '), ' + otp.util.Time.formatItinTime(leg.endTime, "h:mma") + '\n';
             }
-            else { // walk / bike / car
+            else if (leg.steps) { // walk / bike / car
             
                 for(var i=0; i<leg.steps.length; i++) {
                     var step = leg.steps[i];
