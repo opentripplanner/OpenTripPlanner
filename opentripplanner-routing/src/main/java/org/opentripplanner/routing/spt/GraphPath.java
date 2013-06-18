@@ -63,7 +63,6 @@ public class GraphPath {
         this.back = s.getOptions().isArriveBy();
         
         if (s.getOptions().getStartingTransitTripId() != null) {
-            // TODO Check this.
             LOG.debug("Disable reverse-optimize for on-board depart");
             optimize = false;
         }
