@@ -485,35 +485,15 @@ otp.widgets.tripoptions.PreferredRoutes =
     id           :  null,
     
     selectorWidget : null,
+    
+    lastSliderValue : null,
        
     initialize : function(tripWidget) {
         var this_ = this;
         otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
         this.id = tripWidget.id+"-preferredRoutes";
         
-        var html = '<div class="notDraggable">';
-        var html = '<div style="float:right; font-size: 12px;"><button id="'+this.id+'-button">Edit..</button></div>';
-        html += 'Preferred Routes: <span id="'+this.id+'-list">(None)</span>';
-        html += '<div style="clear:both;"></div></div>';
-        
-        $(html).appendTo(this.$());
-        
-        var weightSliderDiv = $('<div class="otp-tripViewer-select notDraggable" style="margin-top: 8px;" >').appendTo(this.$());
-        $('<div style="float: left;">Weight:</div>').appendTo(weightSliderDiv);
-        this.weightSlider = $('<div id="'+this.id+'-weightSlider" style="width:90%" />')
-        .appendTo($('<div style="margin-left:60px;">').appendTo(weightSliderDiv))
-        .slider({
-            min : 0,
-            max : 28800,
-            value : 300,
-        });
-        
-        this.weightSlider.on('slidechange', function(evt) {
-            this_.tripWidget.inputChanged({
-                otherThanPreferredRoutesPenalty : this_.weightSlider.slider('value'),
-            });
-        });
-        
+        ich['otp-tripOptions-preferredRoutes']({ widgetId : this.id }).appendTo(this.$());
         
         this.selectorWidget = new otp.widgets.RoutesSelectorWidget(this.id+"-selectorWidget", this, "Preferred Routes");
     },
@@ -527,6 +507,19 @@ otp.widgets.tripoptions.PreferredRoutes =
             this_.selectorWidget.show();
             this_.selectorWidget.bringToFront();
         });
+        
+        $('#'+this.id+'-weightSlider').slider({
+            min : 0,
+            max : 28800,
+            value : this_.lastSliderValue || 300,
+        })
+        .on('slidechange', function(evt) {
+            this_.lastSliderValue = $(this).slider('value');
+            this_.tripWidget.inputChanged({
+                otherThanPreferredRoutesPenalty : this_.lastSliderValue,
+            });
+        });
+
     },
 
     setRoutes : function(paramStr, displayStr) {
@@ -571,7 +564,8 @@ otp.widgets.tripoptions.PreferredRoutes =
             this.tripWidget.module.preferredRoutes = null;
         }
         if(planData.queryParams.otherThanPreferredRoutesPenalty) {
-            this.weightSlider.slider('value', planData.queryParams.otherThanPreferredRoutesPenalty);
+            this.lastSliderValue = planData.queryParams.otherThanPreferredRoutesPenalty;
+            $('#'+this.id+'-weightSlider').slider('value', this.lastSliderValue);
         }
     },
     

@@ -138,11 +138,33 @@
 <![endif]-->
 
 
-<!-- create the webapp at startups -->
+<!-- load ICH templates and create the webapp at startup -->
 <script type="text/javascript" language="javascript">
+
+
 $(document).ready(function() {
-    new otp.core.Webapp();
+    var templateUrls = new Array(
+        'js/otp/widgets/tripoptions/tripoptions-templates.html'
+    );
+
+    var loadedTemplates = 0;
+
+    for(var i = 0; i < templateUrls.length; i++) {
+        $.get(templateUrls[i])
+        .success(function(html) {
+            $('<div style="display:none;"></div>').appendTo($("body")).html(html);
+            loadedTemplates++;
+            if(loadedTemplates == templateUrls.length) {
+                ich.grabTemplates();                   
+                new otp.core.Webapp();
+            }
+        });
+    }
+        
 });
+
+
+
 </script>
 
 </head>
