@@ -23,7 +23,7 @@ OpenTripPlanner has been primarily developed by OpenPlans with funding
 from TriMet, and many code, translation, and documentation
 contributions from around the world.  
 
-We welcome new contributions!  We prefer to format our code according to the
-GeoTools formatting guidelines; an Eclipse autoformatter can be found here:
-http://svn.osgeo.org/geotools/trunk/build/eclipse/formatter.xml
-
+We welcome new contributions!  We prefer to format our code according to a
+GeoTools-based formatting guidelines; an Eclipse autoformatter can be found
+at the root of this project:
+https://raw.github.com/openplans/OpenTripPlanner/master/formatter.xml
