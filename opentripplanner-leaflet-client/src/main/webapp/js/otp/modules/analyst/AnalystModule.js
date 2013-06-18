@@ -37,7 +37,7 @@ otp.modules.analyst.AnalystModule =
         otp.modules.planner.PlannerModule.prototype.activate.apply(this);
 
         // set up travel options widget
-        this.optionsWidget = new otp.widgets.tripoptions.TripOptionsWidget('otp-'+this.moduleId+'-optionsWidget', this);
+        this.optionsWidget = new otp.widgets.tripoptions.TripOptionsWidget('otp-' + this.id + '-optionsWidget', this);
 
         /*if(this.webapp.geocoders && this.webapp.geocoders.length > 0) {
             this.optionsWidget.addControl("locations", new otp.widgets.tripoptions.LocationsSelector(this.optionsWidget, this.webapp.geocoders), true);

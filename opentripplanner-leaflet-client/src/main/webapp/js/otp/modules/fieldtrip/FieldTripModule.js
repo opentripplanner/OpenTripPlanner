@@ -19,7 +19,6 @@ otp.modules.fieldtrip.FieldTripModule =
     otp.Class(otp.modules.planner.PlannerModule, {
 
     moduleName  : "Field Trip Planner",
-    moduleId    : "fieldtrip",
     
     itinWidget  : null,
     
@@ -48,7 +47,7 @@ otp.modules.fieldtrip.FieldTripModule =
         console.log("activate "+this.id);
         otp.modules.planner.PlannerModule.prototype.activate.apply(this);
 
-        this.optionsWidget = new otp.widgets.tripoptions.TripOptionsWidget('otp-'+this.moduleId+'-optionsWidget', this);
+        this.optionsWidget = new otp.widgets.tripoptions.TripOptionsWidget('otp-'+this.id+'-optionsWidget', this);
         
         if(this.webapp.geocoders && this.webapp.geocoders.length > 0) {
             this.optionsWidget.addControl("locations", new otp.widgets.tripoptions.LocationsSelector(this.optionsWidget, this.webapp.geocoders), true);
@@ -74,7 +73,7 @@ otp.modules.fieldtrip.FieldTripModule =
         //this.optionsWidget.addControl("submit", new otp.widgets.tripoptions.GroupTripSubmit(this.optionsWidget));
         this.optionsWidget.addControl("submit", new otp.widgets.tripoptions.Submit(this.optionsWidget));
 
-        this.fieldTripManager = new otp.modules.fieldtrip.FieldTripManagerWidget('otp-'+this.moduleId+'-fieldTripWidget', this);
+        this.fieldTripManager = new otp.modules.fieldtrip.FieldTripManagerWidget('otp-'+this.id+'-fieldTripWidget', this);
 
 
         this.refreshTrips();
@@ -207,7 +206,7 @@ otp.modules.fieldtrip.FieldTripModule =
     
         
     createItinerariesWidget : function() {
-        this.itinWidget = new otp.widgets.ItinerariesWidget(this.moduleId+"-itinWidget", this);
+        this.itinWidget = new otp.widgets.ItinerariesWidget(this.id+"-itinWidget", this);
         this.itinWidget.showButtonRow = false;
         this.itinWidget.showItineraryLink = false;
         this.itinWidget.showSearchLink = true;
@@ -246,7 +245,7 @@ otp.modules.fieldtrip.FieldTripModule =
     },
     
     showSaveWidget : function() {
-        new otp.modules.fieldtrip.SaveFieldTripWidget('otp-'+this.moduleId+'-saveFieldTripWidget', this);
+        new otp.modules.fieldtrip.SaveFieldTripWidget('otp-'+this.id+'-saveFieldTripWidget', this);
     },
         
     saveTrip : function(desc) {
@@ -397,7 +396,7 @@ otp.modules.fieldtrip.FieldTripModule =
 
     showRequests : function() {
         if(!this.requestsWidget) {
-            this.requestsWidget = new otp.modules.fieldtrip.FieldTripRequestsWidget('otp-'+this.moduleId+'-requestsWidget', this);
+            this.requestsWidget = new otp.modules.fieldtrip.FieldTripRequestsWidget('otp-'+this.id+'-requestsWidget', this);
         }
         if(this.requestsWidget.minimized) this.requestsWidget.unminimize();
         this.requestsWidget.bringToFront();

@@ -35,7 +35,6 @@ otp.modules.planner.PlannerModule =
     otp.Class(otp.modules.Module, {
 
     moduleName  : "Trip Planner",
-    moduleId    : "planner",
     
     markerLayer     : null,
     pathLayer       : null,

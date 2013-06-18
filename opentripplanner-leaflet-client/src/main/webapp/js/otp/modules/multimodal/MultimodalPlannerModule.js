@@ -19,7 +19,6 @@ otp.modules.multimodal.MultimodalPlannerModule =
     otp.Class(otp.modules.planner.PlannerModule, {
 
     moduleName  : "Multimodal Trip Planner",
-    moduleId    : "multimodal",
     
     itinWidget  : null,
     
@@ -40,7 +39,7 @@ otp.modules.multimodal.MultimodalPlannerModule =
         // setup options widget
         
         this.optionsWidget = new otp.widgets.tripoptions.TripOptionsWidget(
-            'otp-'+this.moduleId+'-optionsWidget', this, {
+            'otp-'+this.id+'-optionsWidget', this, {
                 title : 'Trip Options'
             }
         );
@@ -77,7 +76,7 @@ otp.modules.multimodal.MultimodalPlannerModule =
             
     processPlan : function(tripPlan, restoring) {
         if(this.itinWidget == null) {
-            this.itinWidget = new otp.widgets.ItinerariesWidget(this.moduleId+"-itinWidget", this);
+            this.itinWidget = new otp.widgets.ItinerariesWidget(this.id+"-itinWidget", this);
         }
         if(restoring && this.restoredItinIndex) {
             this.itinWidget.show();

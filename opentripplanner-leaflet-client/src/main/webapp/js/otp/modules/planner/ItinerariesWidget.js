@@ -497,7 +497,7 @@ otp.widgets.ItinerariesWidget =
             .appendTo(inTransitDiv)
             .click(function(evt) {
                 if(!this_.module.tripViewerWidget) {
-                    this_.module.tripViewerWidget = new otp.widgets.transit.TripViewerWidget("otp-"+this.moduleId+"-tripViewerWidget", this_.module);
+                    this_.module.tripViewerWidget = new otp.widgets.transit.TripViewerWidget("otp-"+this_.module.id+"-tripViewerWidget", this_.module);
                     this_.module.tripViewerWidget.$().offset({top: evt.clientY, left: evt.clientX});
                 }
                 this_.module.tripViewerWidget.show();
