@@ -80,6 +80,10 @@ public abstract class RoutingResource {
     /** The maximum distance (in meters) the user is willing to walk. Defaults to unlimited. */
     @QueryParam("maxWalkDistance") protected List<Double> maxWalkDistance;
 
+    /** How much worse walking is than waiting for an equivalent length of time, as a multiplier.
+     *  Defaults to 2. */
+    @QueryParam("walkReluctance") protected List<Double> walkReluctance;
+
     /** The user's walking speed in meters/second. Defaults to approximately 3 MPH. */
     @QueryParam("walkSpeed") protected List<Double> walkSpeed;
 
@@ -268,6 +272,7 @@ public abstract class RoutingResource {
         request.setWheelchairAccessible(get(wheelchair, n, request.isWheelchairAccessible()));
         request.setNumItineraries(get(numItineraries, n, request.getNumItineraries()));
         request.setMaxWalkDistance(get(maxWalkDistance, n, request.getMaxWalkDistance()));
+        request.setWalkReluctance(get(walkReluctance, n, request.getWalkReluctance()));
         request.setWalkSpeed(get(walkSpeed, n, request.getWalkSpeed()));
         double bikeSpeedParam = get(bikeSpeed, n, request.getBikeSpeed());
         request.setBikeSpeed(bikeSpeedParam);

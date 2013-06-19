@@ -984,6 +984,13 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
     }
 
+    public void setWalkReluctance(double walkReluctance) {
+        if (walkReluctance > 0) {
+            this.walkReluctance = walkReluctance;
+            // Do not set bikeWalkingOptions.walkReluctance here, because that needs a higher value.
+        }
+    }
+
     public void banTrip(AgencyAndId trip) {
         bannedTrips.put(trip, BannedStopSet.ALL);
     }
