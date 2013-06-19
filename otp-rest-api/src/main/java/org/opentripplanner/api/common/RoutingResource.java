@@ -77,8 +77,8 @@ public abstract class RoutingResource {
     /** Whether the trip must be wheelchair accessible. */
     @DefaultValue("false") @QueryParam("wheelchair") protected List<Boolean> wheelchair;
 
-    /** The maximum distance (in meters) the user is willing to walk. Defaults to approximately 1/2 mile. */
-    @DefaultValue("-1") @QueryParam("maxWalkDistance") protected List<Double> maxWalkDistance;
+    /** The maximum distance (in meters) the user is willing to walk. Defaults to unlimited. */
+    @QueryParam("maxWalkDistance") protected List<Double> maxWalkDistance;
 
     /** The user's walking speed in meters/second. Defaults to approximately 3 MPH. */
     @QueryParam("walkSpeed") protected List<Double> walkSpeed;

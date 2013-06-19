@@ -90,8 +90,8 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public boolean intermediatePlacesOrdered;
 
-    /** The maximum distance (in meters) the user is willing to walk. Defaults to 1/2 mile. */
-    public double maxWalkDistance = 800;
+    /** The maximum distance (in meters) the user is willing to walk. Defaults to unlimited. */
+    public double maxWalkDistance = Double.MAX_VALUE;
 
     /** The worst possible time (latest for depart-by and earliest for arrive-by) to accept */
     public long worstTime = Long.MAX_VALUE;
@@ -148,7 +148,8 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     public int transferPenalty = 0;
 
-    /** How much worse walking is than waiting for an equivalent length of time, as a multiplier */
+    /** How much worse walking is than waiting for an equivalent length of time, as a multiplier.
+     *  Defaults to 2. */
     public double walkReluctance = 2.0;
 
     /** Used instead of walk reluctance for stairs */
@@ -977,11 +978,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     public void setMaxWalkDistance(double maxWalkDistance) {
-        if (maxWalkDistance == 0)
-            return;
-        this.maxWalkDistance = maxWalkDistance;
-        if (bikeWalkingOptions != null && bikeWalkingOptions != this) {
-            this.bikeWalkingOptions.setMaxWalkDistance(maxWalkDistance);
+        if (maxWalkDistance > 0) {
+            this.maxWalkDistance = maxWalkDistance;
+            bikeWalkingOptions.maxWalkDistance = maxWalkDistance;
         }
     }
 
