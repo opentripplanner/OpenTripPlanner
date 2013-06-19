@@ -11,8 +11,8 @@ import org.onebusaway.gtfs.model.Trip;
 
 /**
  * SpecificTransfer class used by Transfer. Represents a specific transfer between two stops.
- * See https://support.google.com/transitpartners/answer/2450962 for more details
- * (heading Route-to-route and trip-to-trip transfers).
+ * See the links described at TransferTable for more details about the specifications.
+ * @see TransferTable
  */
 public class SpecificTransfer implements Serializable {
     

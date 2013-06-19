@@ -33,6 +33,7 @@ import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StopTransfer;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.FrequencyBasedTripPattern;
@@ -52,6 +53,8 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.TransitStopArrive;
+import org.opentripplanner.routing.vertextype.TransitStopDepart;
 import org.opentripplanner.util.TestUtils;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -294,8 +297,10 @@ public class TestPatternHopFactory extends TestCase {
     public void testTransfers() throws Exception {
         TransferTable transferTable = graph.getTransferTable();
         assertTrue(transferTable.hasPreferredTransfers());
-        assertTrue(transferTable.getTransferTime(graph.getVertex("agency_K_arrive"), 
-                graph.getVertex("agency_N_depart")) == TransferTable.PREFERRED_TRANSFER);
+        assertTrue(transferTable.getUnspecificTransferTime(
+                ((TransitStopArrive)graph.getVertex("agency_K_arrive")).getStop(), 
+                ((TransitStopDepart)graph.getVertex("agency_N_depart")).getStop()
+                ) == StopTransfer.PREFERRED_TRANSFER);
         
         Vertex e_arrive = graph.getVertex("agency_E_arrive");
         Vertex f_depart = graph.getVertex("agency_F_depart");

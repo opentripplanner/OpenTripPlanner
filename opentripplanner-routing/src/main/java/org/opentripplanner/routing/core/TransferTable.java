@@ -13,77 +13,172 @@
 
 package org.opentripplanner.routing.core;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Route;
+import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.routing.graph.Vertex;
 
+/**
+ * This class represents all transfer information in the graph. Transfers are grouped
+ * by stop-to-stop pairs. Each transfer may consist of multiple specific transfers. 
+ * See https://developers.google.com/transit/gtfs/reference#transfers_fields
+ * and https://support.google.com/transitpartners/answer/2450962 (heading Route-to-route
+ * and trip-to-trip transfers) for more details about the specifications.
+ * @see StopTransfer, SpecificTransfer
+ */
 public class TransferTable implements Serializable {
 
-    private static final long serialVersionUID = 1L;
-
-    public static final int UNKNOWN_TRANSFER = -999;
-
-    public static final int PREFERRED_TRANSFER = -2;
+    private static final long serialVersionUID = 9160765220742241406L;
     
-    public static final int FORBIDDEN_TRANSFER = -1;
-
-    public static final int TIMED_TRANSFER = 0; /*
-                                                 * In a timed transfer, the departing vehicle will
-                                                 * wait for passengers from the arriving vehicle, so
-                                                 * the minimum transfer time is effectively zero
-                                                 */
-
-
-    protected HashMap<P2<Vertex>, Integer> table = new HashMap<P2<Vertex>, Integer>();
+    /**
+     * Table which contains transfers between two stops
+     */
+    protected HashMap<P2<Stop>, StopTransfer> table = new HashMap<P2<Stop>, StopTransfer>();
+    
+    /**
+     * Indicates that preferred transfers are present if true
+     */
     protected boolean preferredTransfers = false;
-    
-    public void setPreferredTransfers(boolean preferredTransfers) {
-        this.preferredTransfers = preferredTransfers;
-    }
     
     public boolean hasPreferredTransfers() {
         return preferredTransfers;
-    }    
-    /** 
-     * Get the transfer time (in seconds) between the stops, or negative integer codes indicating
-     * the transfer is forbidden/preferred/timed.
-     * Table entries are of the form ((Agency_stopidX_arrive, Agency_stopIdY_depart), code).
+    }
+    
+    /**
+     * Get the transfer time that should be used when transferring from a trip to another trip.
+     * Note that this function does not check whether another specific transfer exists with the
+     * same specificity, what is forbidden by the specifications.    
+     * @param fromStop is the arriving stop
+     * @param toStop is the departing stop
+     * @param fromTrip is the arriving trip
+     * @param toTrip is the departing trip
+     * @return the transfer time in seconds. May contain special (negative) values which meaning
+     *   can be found in the StopTransfer.*_TRANSFER constants.
      */
-    public int getTransferTime(Vertex previousStop, Vertex vertex) {
-        Integer result = table.get(new P2<Vertex>(previousStop, vertex));
-        if (result == null) {
-            return UNKNOWN_TRANSFER;
+    public int getTransferTime(Stop fromStop, Stop toStop, Trip fromTrip, Trip toTrip) {
+        // Define transfer time to return
+        int transferTime = StopTransfer.UNKNOWN_TRANSFER; 
+        // Lookup transfer between two stops
+        StopTransfer stopTransfer = table.get(new P2<Stop>(fromStop, toStop));
+        if (stopTransfer != null) {
+            // Lookup correct transfer time between two stops and two trips
+            transferTime = stopTransfer.getTransferTime(fromTrip, toTrip);
         }
-        return result;
+        return transferTime;
     }
     
-    public void setTransferTime(Vertex fromStop, Vertex toStop, int transferTime) {
-        table.put(new P2<Vertex>(fromStop, toStop), transferTime);
-        if (transferTime == PREFERRED_TRANSFER) {
-            setPreferredTransfers(true);
+    /**
+     * Add a transfer time to the transfer table.
+     * @param fromStop is the arriving stop
+     * @param toStop is the departing stop
+     * @param fromRoute is the arriving route; is allowed to be null
+     * @param toRoute is the departing route; is allowed to be null
+     * @param fromTrip is the arriving trip; is allowed to be null
+     * @param toTrip is the departing trip; is allowed to be null
+     * @param transferTime is the transfer time in seconds. May contain special (negative) values
+     *   which meaning can be found in the StopTransfer.*_TRANSFER constants.
+     */
+    public void addTransferTime(Stop fromStop, Stop toStop, Route fromRoute, Route toRoute, Trip fromTrip, Trip toTrip, int transferTime) {
+        checkNotNull(fromStop);
+        checkNotNull(toStop);
+
+        if (transferTime == StopTransfer.PREFERRED_TRANSFER) {
+            preferredTransfers = true;
         }
+        
+        // Lookup whether a transfer between the two stops already exists
+        P2<Stop> stopPair = new P2<Stop>(fromStop, toStop);
+        StopTransfer stopTransfer = table.get(stopPair);
+        if (stopTransfer == null) {
+            // If not, create one and add to table
+            stopTransfer = new StopTransfer();
+            table.put(stopPair, stopTransfer);
+        }
+        assert(stopTransfer != null);
+        
+        // Create a specific transfer to add to the stop transfer
+        SpecificTransfer specificTransfer;
+        // Prepare the fields
+        AgencyAndId fromRouteId = null;
+        if (fromRoute != null) {
+            fromRouteId = fromRoute.getId();
+        }
+        AgencyAndId toRouteId = null;
+        if (toRoute != null) {
+            toRouteId = toRoute.getId();
+        }
+        AgencyAndId fromTripId = null;
+        if (fromTrip != null) {
+            fromTripId = fromTrip.getId();
+        }
+        AgencyAndId toTripId = null;
+        if (toTrip != null) {
+            toTripId = toTrip.getId();
+        }
+        
+        // Create and add the specific transfer to the stop transfer
+        specificTransfer = new SpecificTransfer(fromRouteId, toRouteId, fromTripId, toTripId, transferTime);
+        stopTransfer.addSpecificTransfer(specificTransfer);
     }
     
+    /**
+     * Internal class for testing purposes only.
+     * @see TransferGraphLinker
+     */
     public static class Transfer {
-        public Vertex from, to;
+        public Stop from, to;
         public int seconds;
-        public Transfer(Vertex from, Vertex to, int seconds) {
+        public Transfer(Stop from, Stop to, int seconds) {
             this.from = from;
             this.to = to;
             this.seconds = seconds;
-        }        
+        }
     }
     
+    /**
+     * Public function for testing purposes only.
+     * Returns only the transfers that contain a specific transfer with no fromRoute, toRoute,
+     * fromTrip or toTrip defined.
+     * @see TransferGraphLinker
+     */
     public Iterable<Transfer> getAllTransfers() {
         ArrayList<Transfer> transfers = new ArrayList<Transfer>(table.size());
-        for (Entry<P2<Vertex>, Integer> entry : table.entrySet()) {
-            P2<Vertex> p2 = entry.getKey();
-            transfers.add(new Transfer(p2.getFirst(), p2.getSecond(), entry.getValue()));
+        for (Entry<P2<Stop>, StopTransfer> entry : table.entrySet()) {
+            P2<Stop> p2 = entry.getKey();
+            int transferTime = entry.getValue().getUnspecificTransferTime();
+            if (transferTime != StopTransfer.UNKNOWN_TRANSFER) {
+                transfers.add(new Transfer(p2.getFirst(), p2.getSecond(), transferTime));
+            }
         }
         return transfers;
+    }
+
+    /**
+     * Public function for testing purposes only.
+     * Get the transfer time between two stops. Only works when a specific transfer with no fromRoute,
+     * toRoute, fromTrip or toTrip defined exists.    
+     * @param fromStop is the arriving stop
+     * @param toStop is the departing stop
+     * @return the transfer time in seconds. May contain special (negative) values which meaning
+     *   can be found in the StopTransfer.*_TRANSFER constants.
+     */
+    public int getUnspecificTransferTime(Stop fromStop, Stop toStop) {
+        // Define transfer time to return
+        int transferTime = StopTransfer.UNKNOWN_TRANSFER; 
+        // Lookup transfer between two stops
+        StopTransfer stopTransfer = table.get(new P2<Stop>(fromStop, toStop));
+        if (stopTransfer != null) {
+            // Lookup correct transfer time between two stops and two trips
+            transferTime = stopTransfer.getUnspecificTransferTime();
+        }
+        return transferTime;
     }
 }

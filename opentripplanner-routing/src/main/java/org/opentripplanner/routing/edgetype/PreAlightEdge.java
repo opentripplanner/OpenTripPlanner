@@ -90,42 +90,43 @@ public class PreAlightEdge extends FreeEdge {
             }
             long alight_before = t0 - slack;
             int transfer_penalty = 0;
-            if (s0.getLastAlightedTimeSeconds() != 0) {
-                /* this is a transfer rather than an initial boarding */
-                TransferTable transferTable = rctx.transferTable;
-                if (transferTable.hasPreferredTransfers()) {
-                    // only penalize transfers if there are some that will be depenalized
-                    transfer_penalty = options.nonpreferredTransferPenalty;
-                }
-                int transfer_time = transferTable.getTransferTime(getFromVertex(),
-                        s0.getPreviousStop());
-                if (transfer_time == TransferTable.UNKNOWN_TRANSFER) {
-                    // use min transfer time relative to arrival time at this stop
-                } else if (transfer_time >= 0) {
-                    // handle minimum time transfers (>0) and timed transfers (0)
-                    // relative to alight time at last stop
-                    long table_alight_before = s0.getLastAlightedTimeSeconds() - transfer_time;
-                    // do not let time run the wrong way
-                    // this could make timed transfers fail if there is walking involved
-                    if (table_alight_before < alight_before)
-                        alight_before = table_alight_before;
-                } else if (transfer_time == TransferTable.FORBIDDEN_TRANSFER) {
-                    return null;
-                } else if (transfer_time == TransferTable.PREFERRED_TRANSFER) {
-                    // depenalize preferred transfers
-                    // TODO: verify correctness of this method (AMB)
-                    transfer_penalty = 0;
-                    // use min transfer time relative to arrival time at this stop
-                } else {
-                    throw new IllegalStateException("Undefined value in transfer table.");
-                }
-                if (transfer_time == 0) {
-                    // timed transfers are assumed to be preferred
-                    transfer_penalty = 0;
-                }
-            } else {
-                /* this is a first boarding, not a transfer - divide minTransferTime in half */
-            }
+            //TODO: delete comments below
+//            if (s0.getLastAlightedTimeSeconds() != 0) {
+//                /* this is a transfer rather than an initial boarding */
+//                TransferTable transferTable = rctx.transferTable;
+//                if (transferTable.hasPreferredTransfers()) {
+//                    // only penalize transfers if there are some that will be depenalized
+//                    transfer_penalty = options.nonpreferredTransferPenalty;
+//                }
+//                int transfer_time = transferTable.getTransferTime(getFromVertex(),
+//                        s0.getPreviousStop());
+//                if (transfer_time == TransferTable.UNKNOWN_TRANSFER) {
+//                    // use min transfer time relative to arrival time at this stop
+//                } else if (transfer_time >= 0) {
+//                    // handle minimum time transfers (>0) and timed transfers (0)
+//                    // relative to alight time at last stop
+//                    long table_alight_before = s0.getLastAlightedTimeSeconds() - transfer_time;
+//                    // do not let time run the wrong way
+//                    // this could make timed transfers fail if there is walking involved
+//                    if (table_alight_before < alight_before)
+//                        alight_before = table_alight_before;
+//                } else if (transfer_time == TransferTable.FORBIDDEN_TRANSFER) {
+//                    return null;
+//                } else if (transfer_time == TransferTable.PREFERRED_TRANSFER) {
+//                    // depenalize preferred transfers
+//                    // TODO: verify correctness of this method (AMB)
+//                    transfer_penalty = 0;
+//                    // use min transfer time relative to arrival time at this stop
+//                } else {
+//                    throw new IllegalStateException("Undefined value in transfer table.");
+//                }
+//                if (transfer_time == 0) {
+//                    // timed transfers are assumed to be preferred
+//                    transfer_penalty = 0;
+//                }
+//            } else {
+//                /* this is a first boarding, not a transfer - divide minTransferTime in half */
+//            }
 
             // penalize transfers more heavily if requested by the user
             if (s0.isEverBoarded()) {

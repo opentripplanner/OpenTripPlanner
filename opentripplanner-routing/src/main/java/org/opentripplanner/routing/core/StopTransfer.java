@@ -12,8 +12,8 @@ import org.onebusaway.gtfs.model.Trip;
  * StopTransfer class used by TransferTable. Represents a transfer between two stops.
  * Contains more specific transfer information depending on the routes and trips
  * that are involved.
- * See https://support.google.com/transitpartners/answer/2450962 for more details
- * (heading Route-to-route and trip-to-trip transfers).
+ * See the links described at TransferTable for more details about the specifications.
+ * @see TransferTable
  */
 public class StopTransfer implements Serializable {
 
@@ -63,10 +63,12 @@ public class StopTransfer implements Serializable {
     }
     
     /**
-     * Get the transfer time that should be used when transferring from a trip to another trip   
+     * Get the transfer time that should be used when transferring from a trip to another trip.
+     * Note that this function does not check whether another specific transfer exists with the
+     * same specificity, what is forbidden by the specifications.    
      * @param fromTrip is the arriving trip
      * @param toTrip is the departing trip
-     * @return the transfer time. May contain special (negative) values which meaning
+     * @return the transfer time in seconds. May contain special (negative) values which meaning
      *   can be found in the *_TRANSFER constants.
      */
     public int getTransferTime(Trip fromTrip, Trip toTrip) {
@@ -88,6 +90,30 @@ public class StopTransfer implements Serializable {
                         break;
                     }
                 }
+            }
+        }
+        
+        // Return transfer time
+        return transferTime;
+    }
+    
+    /**
+     * Public function for testing purposes only.
+     * @return the transfer time with specificity 0 (i.e. no fromRoute, toRoute, fromTrip or toTrip
+     *   are defined) 
+     * @see TransferTable
+     */
+    public int getUnspecificTransferTime() {
+        // By default the transfer is unknown
+        int transferTime = UNKNOWN_TRANSFER;
+        
+        // Pick the specific transfer with specificity 0
+        for (SpecificTransfer specificTransfer : specificTransfers) {
+            int specificity = specificTransfer.getSpecificity(); 
+            if (specificity == 0) {
+                // Set the found transfer time
+                transferTime = specificTransfer.getTransferTime();
+                break;
             }
         }
         
