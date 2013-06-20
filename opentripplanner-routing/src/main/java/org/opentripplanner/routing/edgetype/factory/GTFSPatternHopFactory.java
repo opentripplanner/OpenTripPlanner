@@ -1257,8 +1257,22 @@ public class GTFSPatternHopFactory {
                 // timed (synchronized) transfer 
                 // Handle with edges that bypass the street network.
                 // from and to vertex here are stop_arrive and stop_depart vertices
-                // TODO: handle specificity
-                new TimedTransferEdge(fromVertex, toVertex);
+                
+                // only add edge when it doesn't exist already
+                boolean hasTimedTransferEdge = false;
+                for (Edge outgoingEdge : fromVertex.getOutgoing()) {
+                    if (outgoingEdge instanceof TimedTransferEdge) {
+                        if (outgoingEdge.getToVertex() == toVertex) {
+                            hasTimedTransferEdge = true;
+                            break;
+                        }
+                    }
+                }
+                if (!hasTimedTransferEdge) {
+                    new TimedTransferEdge(fromVertex, toVertex);
+                }
+                // add to transfer table to handle specificity
+                transferTable.addTransferTime(fromStop, toStop, fromRoute, toRoute, fromTrip, toTrip, StopTransfer.TIMED_TRANSFER);
                 break;
             case 2:
                 // min transfer time
