@@ -7,9 +7,16 @@
         <div>End:</div>
     </div>
         
-    <div class="notDraggable" style="margin-left: 2.5em; text-align:right;">
-        <div style="height: 2em;"><input id="{{widgetId}}-start" style="width:95%;"></div>
-        <div><input id="{{widgetId}}-end" style="width:95%;"></div>
+    <div class="notDraggable" style="position: relative; margin-left: 3em; height: 3.6em;">
+        <div style="position: absolute; left:0px; right: 30px;">
+            <input id="{{widgetId}}-start" style="width:100%">
+        </div>
+        <div style="position: absolute; top: 1.8em; left:0px; right: 30px;">
+            <input id="{{widgetId}}-end" style="width:100%">
+        </div>
+        <div style="position: absolute; top: 10px; right:0px; width: 20px; height: 20px; background: red;">
+            <button id="{{widgetId}}-reverseButton" style="width:20px; height: 22px; padding:2px;"><img src="images/reverse.png" /></button>
+        </div>
     </div>
 
     <div style="clear:both;"></div>

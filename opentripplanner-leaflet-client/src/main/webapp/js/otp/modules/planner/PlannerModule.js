@@ -182,7 +182,7 @@ otp.modules.planner.PlannerModule =
             this.startMarker.setLatLng(latlng);
         }
         
-        this.invokeHandlers("startChanged", [latlng]);
+        this.invokeHandlers("startChanged", [latlng, name]);
         
         if(update) {
             this.updateTipStep(2);
@@ -212,7 +212,7 @@ otp.modules.planner.PlannerModule =
             this.endMarker.setLatLng(latlng);
         }
                  
-        this.invokeHandlers("endChanged", [latlng]);
+        this.invokeHandlers("endChanged", [latlng, name]);
 
         if(update) {
             if(this.startLatLng) {

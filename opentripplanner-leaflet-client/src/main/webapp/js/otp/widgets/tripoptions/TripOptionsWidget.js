@@ -175,12 +175,12 @@ otp.widgets.tripoptions.LocationsSelector =
             geocoders : this.geocoders,
         }).appendTo(this.$());
         
-        this.tripWidget.module.on("startChanged", $.proxy(function(latlng) {
-            $("#"+this.id+"-start").val('(' + latlng.lat.toFixed(5) + ', ' + latlng.lng.toFixed(5) + ')');
+        this.tripWidget.module.on("startChanged", $.proxy(function(latlng, name) {
+            $("#"+this.id+"-start").val(name || '(' + latlng.lat.toFixed(5) + ', ' + latlng.lng.toFixed(5) + ')');
         }, this));
 
-        this.tripWidget.module.on("endChanged", $.proxy(function(latlng) {
-            $("#"+this.id+"-end").val('(' + latlng.lat.toFixed(5) + ', ' + latlng.lng.toFixed(5) + ')');
+        this.tripWidget.module.on("endChanged", $.proxy(function(latlng, name) {
+            $("#"+this.id+"-end").val(name || '(' + latlng.lat.toFixed(5) + ', ' + latlng.lng.toFixed(5) + ')');
         }, this));
 
     },
@@ -193,6 +193,16 @@ otp.widgets.tripoptions.LocationsSelector =
         this.initInput(startInput, this.tripWidget.module.setStartPoint);
         this.initInput($("#"+this.id+"-end"), this.tripWidget.module.setEndPoint);
 
+        $("#"+this.id+"-reverseButton").click($.proxy(function() {
+            var module = this.tripWidget.module;
+            var startLatLng = module.startLatLng, startName = module.startName;
+            var endLatLng = module.endLatLng, endName = module.endName;
+            module.clearTrip();
+            module.setStartPoint(endLatLng, false, endName);
+            module.setEndPoint(startLatLng, false, startName);
+            this_.tripWidget.inputChanged();
+        }, this));
+        
         if(this.geocoders.length > 1) {
             var selector = $("#"+this.id+"-selector");
             selector.change(function() {
@@ -215,7 +225,7 @@ otp.widgets.tripoptions.LocationsSelector =
                 var result = this_.resultLookup[ui.item.value];
                 var latlng = new L.LatLng(result.lat, result.lng);
                 this_.tripWidget.module.webapp.map.lmap.panTo(latlng);
-                setterFunction.call(this_.tripWidget.module, latlng, true, result.description);
+                setterFunction.call(this_.tripWidget.module, latlng, false, result.description);
                 this_.tripWidget.inputChanged();
             }
         })
