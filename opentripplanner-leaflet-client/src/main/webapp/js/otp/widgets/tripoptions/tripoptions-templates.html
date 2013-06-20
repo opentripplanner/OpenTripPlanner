@@ -1,4 +1,34 @@
+<!-- LocationsSelector -->
+
+<script id="otp-tripOptions-locations" type="text/html">
+
+    <div style="width: 2.5em; float:left;">
+        <div style="height: 2em;">Start:</div>
+        <div>End:</div>
+    </div>
+        
+    <div class="notDraggable" style="margin-left: 2.5em; text-align:right;">
+        <div style="height: 2em;"><input id="{{widgetId}}-start" style="width:95%;"></div>
+        <div><input id="{{widgetId}}-end" style="width:95%;"></div>
+    </div>
+
+    <div style="clear:both;"></div>
+
+    {{#showGeocoders}}
+        <div style="margin-top:5px;">
+            Geocoder:
+            <select id="{{widgetId}}-selector">
+                {{#geocoders}}
+                     <option>{{name}}</option>
+                {{/geocoders}}
+            </select>
+        </div>            
+    {{/showGeocoders}}
+    
 </script>
+
+
+<!-- MaxDistanceSelector -->
 
 <script id="otp-tripOptions-maxDistance" type="text/html">
 
@@ -12,6 +42,9 @@
     </div>
         
 </script>
+
+
+<!-- PreferredRoutesSelector -->
 
 <script id="otp-tripOptions-preferredRoutes" type="text/html">
 

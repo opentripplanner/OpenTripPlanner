@@ -169,28 +169,11 @@ otp.widgets.tripoptions.LocationsSelector =
         otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
         this.id = tripWidget.id+"-locSelector";
         
-        var html = '<div style="width: 2.5em; float:left;">';
-        html += '<div style="height: 2em;">Start:</div>';
-        html += '<div>End:</div>';
-        html += "</div>";
-        
-        html += '<div class="notDraggable" style="margin-left: 2.5em; text-align:right;">';
-        html += '<div style="height: 2em;"><input id="'+this.id+'-start" style="width:95%;"></div>';
-        html += '<div><input id="'+this.id+'-end" style="width:95%;"></div>';
-        html += "</div>";
-
-        html += '<div style="clear:both;"></div>';
-
-        if(geocoders.length > 1) {
-            html += '<div style="margin-top:5px;">Geocoder: <select id="'+this.id+'-selector">';
-            for(var i=0; i<geocoders.length; i++) {
-                html += '<option>'+geocoders[i].name+'</option>';
-            
-            }
-            html += '</select></div>';
-        }
-         
-        $(html).appendTo(this.$());
+        ich['otp-tripOptions-locations']({
+            widgetId : this.id,
+            showGeocoders : (this.geocoders && this.geocoders.length > 1),
+            geocoders : this.geocoders,
+        }).appendTo(this.$());        
     },
 
     doAfterLayout : function() {
