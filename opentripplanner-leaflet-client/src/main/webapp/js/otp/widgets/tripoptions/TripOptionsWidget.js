@@ -173,7 +173,16 @@ otp.widgets.tripoptions.LocationsSelector =
             widgetId : this.id,
             showGeocoders : (this.geocoders && this.geocoders.length > 1),
             geocoders : this.geocoders,
-        }).appendTo(this.$());        
+        }).appendTo(this.$());
+        
+        this.tripWidget.module.on("startChanged", $.proxy(function(latlng) {
+            $("#"+this.id+"-start").val('(' + latlng.lat.toFixed(5) + ', ' + latlng.lng.toFixed(5) + ')');
+        }, this));
+
+        this.tripWidget.module.on("endChanged", $.proxy(function(latlng) {
+            $("#"+this.id+"-end").val('(' + latlng.lat.toFixed(5) + ', ' + latlng.lng.toFixed(5) + ')');
+        }, this));
+
     },
 
     doAfterLayout : function() {
