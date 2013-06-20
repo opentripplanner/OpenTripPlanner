@@ -99,23 +99,19 @@ public class StopTransfer implements Serializable {
     
     /**
      * Public function for testing purposes only.
-     * @return the transfer time with specificity 0 (i.e. no fromRoute, toRoute, fromTrip or toTrip
-     *   are defined) 
+     * @return the first specific transfer time
      * @see TransferTable
      */
     @Deprecated
-    public int getUnspecificTransferTime() {
+    public int getFirstSpecificTransferTime() {
         // By default the transfer is unknown
         int transferTime = UNKNOWN_TRANSFER;
         
-        // Pick the specific transfer with specificity 0
+        // Pick the first specific transfer
         for (SpecificTransfer specificTransfer : specificTransfers) {
-            int specificity = specificTransfer.getSpecificity(); 
-            if (specificity == 0) {
-                // Set the found transfer time
-                transferTime = specificTransfer.getTransferTime();
-                break;
-            }
+            // Set the found transfer time
+            transferTime = specificTransfer.getTransferTime();
+            break;
         }
         
         // Return transfer time

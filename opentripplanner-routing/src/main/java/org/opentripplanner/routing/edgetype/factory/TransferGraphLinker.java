@@ -61,7 +61,7 @@ public class TransferGraphLinker {
         } 
         
         // Create edges
-        for (TransferTable.Transfer transfer : graph.getTransferTable().getAllUnspecificTransfers()) {
+        for (TransferTable.Transfer transfer : graph.getTransferTable().getAllFirstSpecificTransfers()) {
             Vertex fromVertex = stopArriveNodes.get(transfer.fromStopId);
             Vertex toVertex = stopDepartNodes.get(transfer.toStopId);
 

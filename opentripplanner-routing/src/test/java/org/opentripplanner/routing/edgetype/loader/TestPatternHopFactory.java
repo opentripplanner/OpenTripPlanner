@@ -297,7 +297,7 @@ public class TestPatternHopFactory extends TestCase {
     public void testTransfers() throws Exception {
         TransferTable transferTable = graph.getTransferTable();
         assertTrue(transferTable.hasPreferredTransfers());
-        assertTrue(transferTable.getUnspecificTransferTime(
+        assertTrue(transferTable.getFirstSpecificTransferTime(
                 ((TransitStopArrive)graph.getVertex("agency_K_arrive")).getStop(), 
                 ((TransitStopDepart)graph.getVertex("agency_N_depart")).getStop()
                 ) == StopTransfer.PREFERRED_TRANSFER);
