@@ -16,6 +16,7 @@ package org.opentripplanner.routing.edgetype.factory;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -32,6 +33,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 
 /** Link graph based on transfers.txt.  Intended for testing */
+@Deprecated
 public class TransferGraphLinker {
 
     private Graph graph;
@@ -42,26 +44,26 @@ public class TransferGraphLinker {
     }
     
     public void run() {
-        // Create a mapping from Stop to StopVertices
-        Map<Stop, TransitStopArrive> stopArriveNodes = new HashMap<Stop, TransitStopArrive>();
-        Map<Stop, TransitStopDepart> stopDepartNodes = new HashMap<Stop, TransitStopDepart>();
+        // Create a mapping from StopId to StopVertices
+        Map<AgencyAndId, TransitStopArrive> stopArriveNodes = new HashMap<AgencyAndId, TransitStopArrive>();
+        Map<AgencyAndId, TransitStopDepart> stopDepartNodes = new HashMap<AgencyAndId, TransitStopDepart>();
         for (Vertex v : graph.getVertices()) {
             if (v instanceof TransitStopArrive) {
                 TransitStopArrive transitStop = (TransitStopArrive)v; 
                 Stop stop = transitStop.getStop();
-                stopArriveNodes.put(stop, transitStop);
+                stopArriveNodes.put(stop.getId(), transitStop);
             }
             else if (v instanceof TransitStopDepart) {
                 TransitStopDepart transitStop = (TransitStopDepart)v; 
                 Stop stop = transitStop.getStop();
-                stopDepartNodes.put(stop, transitStop);
+                stopDepartNodes.put(stop.getId(), transitStop);
             }
         } 
         
         // Create edges
-        for (TransferTable.Transfer transfer : graph.getTransferTable().getAllTransfers()) {
-            Vertex fromVertex = stopArriveNodes.get(transfer.from);
-            Vertex toVertex = stopDepartNodes.get(transfer.to);
+        for (TransferTable.Transfer transfer : graph.getTransferTable().getAllUnspecificTransfers()) {
+            Vertex fromVertex = stopArriveNodes.get(transfer.fromStopId);
+            Vertex toVertex = stopDepartNodes.get(transfer.toStopId);
 
             double distance = distanceLibrary.distance(fromVertex.getCoordinate(), 
                     toVertex.getCoordinate());

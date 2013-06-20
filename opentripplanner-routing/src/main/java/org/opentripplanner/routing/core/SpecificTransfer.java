@@ -7,6 +7,7 @@ import lombok.Getter;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
 
 /**
@@ -67,6 +68,38 @@ public class SpecificTransfer implements Serializable {
         this.transferTime = transferTime;
     }
 
+    public SpecificTransfer(Route fromRoute, Route toRoute, Trip fromTrip, Trip toTrip, int transferTime) {
+        if (fromRoute != null) {
+            this.fromRouteId = fromRoute.getId();
+        }
+        else {
+            this.fromRouteId = null;
+        }
+        
+        if (toRoute != null) {
+            this.toRouteId = toRoute.getId();
+        }
+        else {
+            this.toRouteId = null;
+        }
+        
+        if (fromTrip != null) {
+            this.fromTripId = fromTrip.getId();
+        }
+        else {
+            this.fromTripId = null;
+        }
+        
+        if (toTrip != null) {
+            this.toTripId = toTrip.getId();
+        }
+        else {
+            this.toTripId = null;
+        }
+
+        this.transferTime = transferTime;
+    }
+    
     /**
      * @return specificity as defined in the specifications
      */
