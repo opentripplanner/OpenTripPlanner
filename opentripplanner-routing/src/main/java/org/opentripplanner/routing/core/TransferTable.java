@@ -133,6 +133,7 @@ public class TransferTable implements Serializable {
      * Internal class for testing purposes only.
      * @see TransferGraphLinker
      */
+    @Deprecated
     public static class Transfer {
         public Stop from, to;
         public int seconds;
@@ -149,6 +150,7 @@ public class TransferTable implements Serializable {
      * fromTrip or toTrip defined.
      * @see TransferGraphLinker
      */
+    @Deprecated
     public Iterable<Transfer> getAllTransfers() {
         ArrayList<Transfer> transfers = new ArrayList<Transfer>(table.size());
         for (Entry<P2<Stop>, StopTransfer> entry : table.entrySet()) {
@@ -170,6 +172,7 @@ public class TransferTable implements Serializable {
      * @return the transfer time in seconds. May contain special (negative) values which meaning
      *   can be found in the StopTransfer.*_TRANSFER constants.
      */
+    @Deprecated
     public int getUnspecificTransferTime(Stop fromStop, Stop toStop) {
         // Define transfer time to return
         int transferTime = StopTransfer.UNKNOWN_TRANSFER; 

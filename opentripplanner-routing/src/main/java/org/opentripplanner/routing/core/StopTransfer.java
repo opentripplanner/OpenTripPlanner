@@ -103,6 +103,7 @@ public class StopTransfer implements Serializable {
      *   are defined) 
      * @see TransferTable
      */
+    @Deprecated
     public int getUnspecificTransferTime() {
         // By default the transfer is unknown
         int transferTime = UNKNOWN_TRANSFER;
