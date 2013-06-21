@@ -169,28 +169,20 @@ otp.widgets.tripoptions.LocationsSelector =
         otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
         this.id = tripWidget.id+"-locSelector";
         
-        var html = '<div style="width: 2.5em; float:left;">';
-        html += '<div style="height: 2em;">Start:</div>';
-        html += '<div>End:</div>';
-        html += "</div>";
+        ich['otp-tripOptions-locations']({
+            widgetId : this.id,
+            showGeocoders : (this.geocoders && this.geocoders.length > 1),
+            geocoders : this.geocoders,
+        }).appendTo(this.$());
         
-        html += '<div class="notDraggable" style="margin-left: 2.5em; text-align:right;">';
-        html += '<div style="height: 2em;"><input id="'+this.id+'-start" style="width:95%;"></div>';
-        html += '<div><input id="'+this.id+'-end" style="width:95%;"></div>';
-        html += "</div>";
+        this.tripWidget.module.on("startChanged", $.proxy(function(latlng, name) {
+            $("#"+this.id+"-start").val(name || '(' + latlng.lat.toFixed(5) + ', ' + latlng.lng.toFixed(5) + ')');
+        }, this));
 
-        html += '<div style="clear:both;"></div>';
+        this.tripWidget.module.on("endChanged", $.proxy(function(latlng, name) {
+            $("#"+this.id+"-end").val(name || '(' + latlng.lat.toFixed(5) + ', ' + latlng.lng.toFixed(5) + ')');
+        }, this));
 
-        if(geocoders.length > 1) {
-            html += '<div style="margin-top:5px;">Geocoder: <select id="'+this.id+'-selector">';
-            for(var i=0; i<geocoders.length; i++) {
-                html += '<option>'+geocoders[i].name+'</option>';
-            
-            }
-            html += '</select></div>';
-        }
-         
-        $(html).appendTo(this.$());
     },
 
     doAfterLayout : function() {
@@ -201,6 +193,16 @@ otp.widgets.tripoptions.LocationsSelector =
         this.initInput(startInput, this.tripWidget.module.setStartPoint);
         this.initInput($("#"+this.id+"-end"), this.tripWidget.module.setEndPoint);
 
+        $("#"+this.id+"-reverseButton").click($.proxy(function() {
+            var module = this.tripWidget.module;
+            var startLatLng = module.startLatLng, startName = module.startName;
+            var endLatLng = module.endLatLng, endName = module.endName;
+            module.clearTrip();
+            module.setStartPoint(endLatLng, false, endName);
+            module.setEndPoint(startLatLng, false, startName);
+            this_.tripWidget.inputChanged();
+        }, this));
+        
         if(this.geocoders.length > 1) {
             var selector = $("#"+this.id+"-selector");
             selector.change(function() {
@@ -223,7 +225,7 @@ otp.widgets.tripoptions.LocationsSelector =
                 var result = this_.resultLookup[ui.item.value];
                 var latlng = new L.LatLng(result.lat, result.lng);
                 this_.tripWidget.module.webapp.map.lmap.panTo(latlng);
-                setterFunction.call(this_.tripWidget.module, latlng, true, result.description);
+                setterFunction.call(this_.tripWidget.module, latlng, false, result.description);
                 this_.tripWidget.inputChanged();
             }
         })
@@ -422,34 +424,26 @@ otp.widgets.tripoptions.ModeSelector =
 
 //** MaxWalkSelector **//
 
-otp.widgets.tripoptions.MaxWalkSelector = 
+otp.widgets.tripoptions.MaxDistanceSelector = 
     otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
     
     id           :  null,
 
-    presets      : [0.1, 0.2, 0.25, 0.3, 0.4, 0.5, 0.75, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5],
-       
     initialize : function(tripWidget) {
         otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
-        this.id = tripWidget.id+"-maxWalkSelector";
         
-        var html = '<div class="notDraggable">Maximum walk: <input id="'+this.id+'-value" type="text" style="width:30px;" value="0.5" /> mi.&nbsp;';
-        html += '<select id="'+this.id+'-presets"><option>Presets:</option>';
-        for(var i=0; i<this.presets.length; i++) {
-            //html += '<option'+(this.values[i] == .5 ? ' selected' : '')+'>'+this.values[i]+'</option>';            
-            html += '<option>'+this.presets[i]+' mi.</option>';            
-        }
-        html += '</select>';
-        html += "</div>";
-              
-        $(html).appendTo(this.$());
-        //this.setContent(content);
+        ich['otp-tripOptions-maxDistance']({
+            widgetId : this.id,
+            presets : this.presets,
+            label : this.label,
+        }).appendTo(this.$());
+
     },
 
     doAfterLayout : function() {
         var this_ = this;
         $('#'+this.id+'-value').change(function() {
-            this_.tripWidget.module.maxWalkDistance = parseFloat($('#'+this_.id+'-value').val())*1609.34;
+            this_.setDistance(parseFloat($('#'+this_.id+'-value').val())*1609.34);
         });
         
         $('#'+this.id+'-presets').change(function() {
@@ -457,9 +451,7 @@ otp.widgets.tripoptions.MaxWalkSelector =
             $('#'+this_.id+'-value').val(presetVal);    
 
             var m = presetVal*1609.34;
-            this_.tripWidget.inputChanged({
-                maxWalkDistance : m,
-            });
+            this_.setDistance(m);
 
             $('#'+this_.id+'-presets option:eq(0)').prop('selected', true);    
         });
@@ -470,12 +462,50 @@ otp.widgets.tripoptions.MaxWalkSelector =
         $('#'+this.id+'-value').val((data.queryParams.maxWalkDistance/1609.34).toFixed(2));  
         this.tripWidget.module.maxWalkDistance = data.queryParams.maxWalkDistance;
     },
- 
-    isApplicableForMode : function(mode) {
-        return otp.util.Itin.includesTransit(mode) && otp.util.Itin.includesWalk(mode);
-    }       
+
+    setDistance : function(distance) {
+        this.tripWidget.inputChanged({
+            maxWalkDistance : distance,
+        });
+    },
+
 });
 
+otp.widgets.tripoptions.MaxWalkSelector = 
+    otp.Class(otp.widgets.tripoptions.MaxDistanceSelector, {
+
+    presets     : [0.1, 0.2, 0.25, 0.3, 0.4, 0.5, 0.75, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5],
+
+    label       : "Maximum walk:",
+
+    initialize : function(tripWidget) {
+        this.id = tripWidget.id+"-maxWalkSelector";
+        otp.widgets.tripoptions.MaxDistanceSelector.prototype.initialize.apply(this, arguments);
+    },
+    
+    isApplicableForMode : function(mode) {
+        return otp.util.Itin.includesTransit(mode) && otp.util.Itin.includesWalk(mode);
+    },
+
+});
+
+otp.widgets.tripoptions.MaxBikeSelector = 
+    otp.Class(otp.widgets.tripoptions.MaxDistanceSelector, {
+
+    presets     : [0.1, 0.25, 0.5, 0.75, 1, 2, 3, 4, 5, 10, 15, 20, 30, 40, 100],
+
+    label       : "Maximum bike:",
+
+    initialize : function(tripWidget) {
+        this.id = tripWidget.id+"-maxBikeSelector";
+        otp.widgets.tripoptions.MaxDistanceSelector.prototype.initialize.apply(this, arguments);
+    },
+    
+    isApplicableForMode : function(mode) {
+        return otp.util.Itin.includesTransit(mode) && otp.util.Itin.includesBicycle(mode);
+    },
+
+});
 
 //** PreferredRoutes **//
 

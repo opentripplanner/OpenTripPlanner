@@ -65,7 +65,6 @@ otp.modules.bikeshare.BikeShareModule =
     otp.Class(otp.modules.planner.PlannerModule, {
     
     moduleName  : "Bike Share Planner",
-    moduleId    : "bikeshare",
 
     resultsWidget   : null,
     
@@ -105,7 +104,7 @@ otp.modules.bikeshare.BikeShareModule =
     
     initOptionsWidget : function() {
         this.optionsWidget = new otp.widgets.tripoptions.TripOptionsWidget(
-            'otp-'+this.moduleId+'-optionsWidget', this, {
+            'otp-'+this.id+'-optionsWidget', this, {
                 title : 'Trip Options'
             }
         );
@@ -143,7 +142,7 @@ otp.modules.bikeshare.BikeShareModule =
         
 	    /*if(this.resultsWidget == null) {
 
-            this.resultsWidget = new otp.widgets.TripWidget('otp-'+this.moduleId+'-tripWidget', this);
+            this.resultsWidget = new otp.widgets.TripWidget('otp-'+this.id+'-tripWidget', this);
             this.widgets.push(this.resultsWidget);
             
             this.resultsWidget.addPanel("summary", new otp.widgets.TW_TripSummary(this.resultsWidget));

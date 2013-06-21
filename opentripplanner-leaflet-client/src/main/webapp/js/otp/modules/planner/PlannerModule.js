@@ -35,7 +35,6 @@ otp.modules.planner.PlannerModule =
     otp.Class(otp.modules.Module, {
 
     moduleName  : "Trip Planner",
-    moduleId    : "planner",
     
     markerLayer     : null,
     pathLayer       : null,
@@ -165,56 +164,60 @@ otp.modules.planner.PlannerModule =
     },
     
     setStartPoint : function(latlng, update, name) {
-        var this_ = this;
         this.startName = (typeof name !== 'undefined') ? name : null;
         this.startLatLng = latlng;
         if(this.startMarker == null) {
             this.startMarker = new L.Marker(this.startLatLng, {icon: this.icons.startFlag, draggable: true});
             this.startMarker.bindPopup('<strong>Start</strong>');
-            this.startMarker.on('dragend', function() {
-                this_.webapp.hideSplash();
-                this_.startLatLng = this_.startMarker.getLatLng();
-                if(typeof this_.userPlanTripStart == 'function') this_.userPlanTripStart();
-                this_.planTripFunction.apply(this_);//planTrip();
-            });
+            this.startMarker.on('dragend', $.proxy(function() {
+                this.webapp.hideSplash();
+                this.startLatLng = this.startMarker.getLatLng();
+                this.invokeHandlers("startChanged", [this.startLatLng]);
+                if(typeof this.userPlanTripStart == 'function') this.userPlanTripStart();
+                this.planTripFunction.apply(this);//planTrip();
+            }, this));
             this.markerLayer.addLayer(this.startMarker);
         }
         else { // marker already exists
             this.startMarker.setLatLng(latlng);
         }
         
+        this.invokeHandlers("startChanged", [latlng, name]);
+        
         if(update) {
             this.updateTipStep(2);
             if(this.endLatLng) {
                 if(typeof this.userPlanTripStart == 'function') this.userPlanTripStart();
-                this_.planTripFunction.apply(this);//this.planTrip(); 
+                this.planTripFunction.apply(this);//this.planTrip(); 
             }
         }
     },
     
     setEndPoint : function(latlng, update, name) {
-        var this_ = this;
         this.endName = (typeof name !== 'undefined') ? name : null;
         this.endLatLng = latlng;    	 
         if(this.endMarker == null) {
             this.endMarker = new L.Marker(this.endLatLng, {icon: this.icons.endFlag, draggable: true}); 
             this.endMarker.bindPopup('<strong>Destination</strong>');
-            this.endMarker.on('dragend', function() {
-                this_.webapp.hideSplash();
-                this_.endLatLng = this_.endMarker.getLatLng();
-                if(typeof this_.userPlanTripStart == 'function') this_.userPlanTripStart();
-                this_.planTripFunction.apply(this_);//this_.planTrip();
-            });
+            this.endMarker.on('dragend', $.proxy(function() {
+                this.webapp.hideSplash();
+                this.endLatLng = this.endMarker.getLatLng();
+                this.invokeHandlers("endChanged", [this.endLatLng]);
+                if(typeof this.userPlanTripStart == 'function') this.userPlanTripStart();
+                this.planTripFunction.apply(this);//this_.planTrip();
+            }, this));
             this.markerLayer.addLayer(this.endMarker);
         }
         else { // marker already exists
             this.endMarker.setLatLng(latlng);
         }
                  
+        this.invokeHandlers("endChanged", [latlng, name]);
+
         if(update) {
             if(this.startLatLng) {
                 if(typeof this.userPlanTripStart == 'function') this.userPlanTripStart();
-                this_.planTripFunction.apply(this);//this.planTrip();
+                this.planTripFunction.apply(this);//this.planTrip();
             }
         }
     },
