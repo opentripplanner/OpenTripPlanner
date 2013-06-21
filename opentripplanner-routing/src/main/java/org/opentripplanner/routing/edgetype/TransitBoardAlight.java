@@ -151,7 +151,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
             // For stop-to-stop transfer time, preference, and permission checking. 
             // Vertices in transfer table are stop arrive/depart not pattern arrive/depart, 
             // so previousStop is direction-dependent.
-            s1.setPreviousStop(boarding ? fromv : tov); 
+            s1.setPreviousStop(boarding ? ((PatternStopVertex) tov).getStop() : ((PatternStopVertex) fromv).getStop()); 
             s1.setLastPattern(this.getPattern());
 
             // determine the wait

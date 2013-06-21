@@ -95,7 +95,7 @@ public class FrequencyBoard extends Edge implements OnBoardForwardEdge, PatternE
             s1.setTripId(null);
             s1.setLastAlightedTimeSeconds(state0.getTimeSeconds());
             s1.setBackMode(TraverseMode.BOARDING);
-            s1.setPreviousStop(fromv);
+            s1.setPreviousStop(((TransitVertex) fromv).getStop());
             return s1.makeState();
         } else {
             /* forward traversal: look for a transit trip on this pattern */

@@ -17,8 +17,8 @@ import java.util.HashMap;
 import java.util.Set;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.routing.edgetype.TripPattern;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.patch.Alert;
 
@@ -51,7 +51,7 @@ public class StateData implements Cloneable {
 
     protected boolean usingRentedBike;
 
-    protected Vertex previousStop;
+    protected Stop previousStop;
 
     protected long lastAlightedTime;
 

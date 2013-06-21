@@ -20,6 +20,8 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.automata.AutomatonState;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
@@ -374,7 +376,7 @@ public class StateEditor {
         }
     }
 
-    public void setPreviousStop(Vertex previousStop) {
+    public void setPreviousStop(Stop previousStop) {
         cloneStateDataAsNeeded();
         child.stateData.previousStop = previousStop;
     }
@@ -404,6 +406,7 @@ public class StateEditor {
         child.stateData.route = state.stateData.route;
         child.stateData.tripTimes = state.stateData.tripTimes;
         child.stateData.tripId = state.stateData.tripId;
+        child.stateData.previousStop = state.stateData.previousStop;
         child.stateData.zone = state.stateData.zone;
         child.stateData.extensions = state.stateData.extensions;
         child.stateData.usingRentedBike = state.stateData.usingRentedBike;
@@ -456,7 +459,7 @@ public class StateEditor {
         return child.isBikeRenting();
     }
 
-    public Vertex getPreviousStop() {
+    public Stop getPreviousStop() {
         return child.getPreviousStop();
     }
 
