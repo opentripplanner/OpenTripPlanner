@@ -334,7 +334,25 @@ otp.widgets.ItinerariesWidget =
                 if(leg.headsign) headerHtml +=  " to " + leg.headsign;
                 if(leg.alerts) headerHtml += '&nbsp;&nbsp;<img src="images/alert.png" style="vertical-align: -20%;" />';
             }
-            $("<h3>"+headerHtml+"</h3>").appendTo(itinAccord).hover(function(evt) {
+            
+            if (otp.config.debug) {
+                var jsonLink = $("<a href='#json' style='float:right;'>json</a>").data('json', JSON.stringify(leg, null, 4)).on('click', function () {
+                    var w = window.open('', '', 'width=900,height=900,resizeable,scrollbars');
+                    w.document.write('<pre>' + $(this).data('json') + '</pre>');
+                    w.document.close(); // needed for chrome and safari
+
+                    console.warn('LEG:', JSON.parse($(this).data('json')));
+                });
+                headerHtml += '&nbsp;';
+            }
+
+            var headerEl = $('<h3></h3>').html(headerHtml);
+
+            if (otp.config.debug) {
+                headerEl.append(jsonLink);
+            }
+            
+            headerEl.appendTo(itinAccord).hover(function(evt) {
                 var arr = evt.target.id.split('-');
                 var index = parseInt(arr[arr.length-1]);
                 this_.module.highlightLeg(itin.itinData.legs[index]);

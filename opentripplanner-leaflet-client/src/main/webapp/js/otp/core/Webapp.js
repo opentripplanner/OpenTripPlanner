@@ -69,6 +69,18 @@ otp.core.Webapp = otp.Class({
             otp.config.siteUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
         }
             
+        // Set Debug options
+        if (this.urlParams.debug === 'false') {
+            delete window.localStorage['otpDebug']; // Reset the debug value
+        } else if (otp.config.debug || this.urlParams.debug === 'true' || window.localStorage['otpDebug'] === 'true') {
+            console.info('Debug mode enabled (persistent).');
+            console.info('    To disable put debug=false in the url parameters');
+            window.localStorage['otpDebug'] = 'true'; // Save in localstorage to make it persistant!
+            otp.config.debug = true;
+        } else if (this.urlParams.debug === 'false') {
+            delete window.localStorage['otpDebug']; // Reset the debug value
+        }
+
         // set the logo & title
         
         if(otp.config.showLogo) {
