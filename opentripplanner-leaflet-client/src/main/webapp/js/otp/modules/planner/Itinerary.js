@@ -179,7 +179,19 @@ otp.modules.planner.Itinerary = otp.Class({
         }
         return legs;
     },
+
+    getModeDistance : function(mode) {
+        var distance = 0;
+        for(var l=0; l<this.itinData.legs.length; l++) {
+            var leg = this.itinData.legs[l];
+            if(leg.mode === mode) {
+                distance += leg.distance;
+            } 
+        }
+        return distance;
+    },
     
+        
     /*getTripSegments : function() {
         var segments = [];
         for(var l=0; l<this.itinData.legs.length; l++) {
