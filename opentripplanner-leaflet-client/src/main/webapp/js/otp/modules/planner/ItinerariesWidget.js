@@ -40,7 +40,9 @@ otp.widgets.ItinerariesWidget =
         otp.widgets.Widget.prototype.initialize.call(this, id, module, {
             title : "Itineraries",
             cssClass : 'otp-itinsWidget',
-            resizable : true
+            resizable : true,
+            closeable : true,
+            persistOnClose : true,
         });
         //this.$().addClass('otp-itinsWidget');
         //this.$().resizable();
@@ -89,12 +91,10 @@ otp.widgets.ItinerariesWidget =
         }            
         
         this.itineraries = itineraries;
-        //this.header.html(this.itineraries.length+" Itineraries Returned:");
-        this.setTitle(this.itineraries.length+" Itineraries Returned:");
-        
-        if(this.itinsAccord !== null) this.itinsAccord.remove();
-        if(this.footer !== null) this.footer.remove();
 
+        this.clear();
+        this.setTitle(this.itineraries.length+" Itineraries Returned");
+        
         var html = "<div id='"+divId+"' class='otp-itinsAccord'></div>";
         this.itinsAccord = $(html).appendTo(this.$());
 
@@ -152,6 +152,11 @@ otp.widgets.ItinerariesWidget =
 
         this.$().draggable({ cancel: "#"+divId });
         
+    },
+    
+    clear : function() {
+        if(this.itinsAccord !== null) this.itinsAccord.remove();
+        if(this.footer !== null) this.footer.remove();
     },
     
     renderButtonRow : function() {

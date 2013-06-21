@@ -37,7 +37,9 @@ otp.modules.calltaker.CallHistoryWidget =
 
         otp.widgets.Widget.prototype.initialize.call(this, id, module, {
             cssClass : 'otp-callHistoryWidget',
-            title : "Call History for user " + module.username
+            title : "Call History for user " + module.username,
+            closeable : true,
+            persistOnClose : true,
         });
 
         var buttonRow = $('<div class="otp-callHistory-buttonRow"></div>').appendTo(this.$());

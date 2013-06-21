@@ -29,8 +29,9 @@ otp.widgets.Widget = otp.Class({
     resizable       : false,
     showHeader      : true,
     title           : '', // string
-    openInitially   : true,
-    transparent     : false,
+    openInitially   : true, 
+    persistOnClose  : false, // whether widget can be opened via 'toolbar' dropdown when closed
+    transparent     : false, // whether to hide the default gray background / frame
 
     isOpen          : true, // whether or not widget is displayed in applicable module view
     isMinimized     : false,

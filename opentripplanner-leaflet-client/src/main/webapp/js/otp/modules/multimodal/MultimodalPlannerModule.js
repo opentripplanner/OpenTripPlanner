@@ -40,7 +40,9 @@ otp.modules.multimodal.MultimodalPlannerModule =
         
         this.optionsWidget = new otp.widgets.tripoptions.TripOptionsWidget(
             'otp-'+this.id+'-optionsWidget', this, {
-                title : 'Trip Options'
+                title : 'Trip Options',
+                closeable : true,
+                persistOnClose: true,
             }
         );
 
@@ -97,6 +99,8 @@ otp.modules.multimodal.MultimodalPlannerModule =
         otp.modules.planner.PlannerModule.prototype.clearTrip.apply(this);
         if(this.itinWidget !== null) {
             this.itinWidget.close();
+            this.itinWidget.clear();
+            this.itinWidget.setTitle("Itineraries");
         }
  },
         
