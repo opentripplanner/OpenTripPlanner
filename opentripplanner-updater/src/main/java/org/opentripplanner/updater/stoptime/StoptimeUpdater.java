@@ -41,7 +41,7 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
 
     @Autowired private GraphService graphService;
     @Setter    private UpdateStreamer updateStreamer;
-    @Setter    private static int logFrequency = 2000;
+    @Setter    private int logFrequency = 2000;
 
     /** 
      * If a timetable snapshot is requested less than this number of milliseconds after the previous 
@@ -150,7 +150,7 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
                 }
 
                 if (appliedBlockCount % logFrequency == 0) {
-                    LOG.info("applied {} stoptime update blocks.", appliedBlockCount);
+                    LOG.info("Applied {} stoptime update blocks.", appliedBlockCount);
                 }
             }
 
