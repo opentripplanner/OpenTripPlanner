@@ -49,9 +49,13 @@ public class GrizzlyServer {
         httpServer.addListener(networkListener);
         ResourceConfig rc = new PackagesResourceConfig("org.opentripplanner");
         // DelegatingFilterProxy.class.getName() does not seem to work out of the box.
-        // Register a custom authentication filter.
+        // Register a custom authentication filter, a filter that removes the /ws/ from OTP
+        // REST API calls, and a filter that wraps JSON in method calls as needed.
         rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, 
-                 new String[] { AuthFilter.class.getName(), RewriteFilter.class.getName() });
+                new String[] { AuthFilter.class.getName(), RewriteFilter.class.getName() });
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS, 
+                new String[] { JsonpFilter.class.getName() });
+
         // Make a factory that hands Jersey OTP modules to inject
         IoCComponentProviderFactory ioc_factory = OTPConfigurator.fromCommandLineArguments(args);
 
@@ -67,6 +71,7 @@ public class GrizzlyServer {
         //    from ./ we can reach e.g. target/classes/data-sources.xml
         staticContentDirectory = "../opentripplanner-leaflet-client/src/main/webapp/";
         httpServer.getServerConfiguration().addHttpHandler(new StaticHttpHandler(staticContentDirectory), "/");
+        
         /* RELINQUISH CONTROL TO THE SERVER THREAD */
         try {
             httpServer.start(); 
