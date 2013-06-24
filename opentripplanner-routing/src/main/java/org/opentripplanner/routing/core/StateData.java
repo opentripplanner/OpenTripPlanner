@@ -56,6 +56,8 @@ public class StateData implements Cloneable {
 
     protected Stop previousStop;
 
+    protected Stop currentStop;
+    
     protected long lastAlightedTime;
 
     protected AgencyAndId[] routeSequence;

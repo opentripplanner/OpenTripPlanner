@@ -386,6 +386,11 @@ public class StateEditor {
         child.stateData.previousStop = previousStop;
     }
 
+    public void setCurrentStop(Stop currentStop) {
+        cloneStateDataAsNeeded();
+        child.stateData.currentStop = currentStop;
+    }
+    
     public void setLastAlightedTimeSeconds(long lastAlightedTimeSeconds) {
         cloneStateDataAsNeeded();
         child.stateData.lastAlightedTime = lastAlightedTimeSeconds;
@@ -413,6 +418,7 @@ public class StateEditor {
         child.stateData.tripId = state.stateData.tripId;
         child.stateData.previousTrip = state.stateData.previousTrip;
         child.stateData.previousStop = state.stateData.previousStop;
+        child.stateData.currentStop = state.stateData.currentStop;
         child.stateData.zone = state.stateData.zone;
         child.stateData.extensions = state.stateData.extensions;
         child.stateData.usingRentedBike = state.stateData.usingRentedBike;
@@ -467,10 +473,6 @@ public class StateEditor {
 
     public boolean isRentingBike() {
         return child.isBikeRenting();
-    }
-
-    public Stop getPreviousStop() {
-        return child.getPreviousStop();
     }
 
     public long getLastAlightedTimeSeconds() {
