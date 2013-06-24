@@ -203,26 +203,4 @@ public class TransferTable implements Serializable {
         }
         return transfers;
     }
-
-    /**
-     * Public function for testing purposes only.
-     * Get the transfer time between two stops. Only checks first specific transfer time.
-     * @param fromStop is the arriving stop
-     * @param toStop is the departing stop
-     * @return the transfer time in seconds. May contain special (negative) values which meaning
-     *   can be found in the StopTransfer.*_TRANSFER constants. If no transfer is found,
-     *   StopTransfer.UNKNOWN_TRANSFER is returned.
-     */
-    @Deprecated
-    public int getFirstSpecificTransferTime(Stop fromStop, Stop toStop) {
-        // Define transfer time to return
-        int transferTime = StopTransfer.UNKNOWN_TRANSFER; 
-        // Lookup transfer between two stops
-        StopTransfer stopTransfer = table.get(new P2<AgencyAndId>(fromStop.getId(), toStop.getId()));
-        if (stopTransfer != null) {
-            // Lookup first specific transfer time between two stops
-            transferTime = stopTransfer.getFirstSpecificTransferTime();
-        }
-        return transferTime;
-    }
 }

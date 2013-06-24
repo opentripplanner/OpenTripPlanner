@@ -22,6 +22,10 @@ import java.util.TimeZone;
 
 import junit.framework.TestCase;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Route;
+import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -296,11 +300,33 @@ public class TestPatternHopFactory extends TestCase {
 
     public void testTransfers() throws Exception {
         TransferTable transferTable = graph.getTransferTable();
+        
+        // create dummy routes and trips
+        Route fromRoute = new Route();
+        fromRoute.setId(new AgencyAndId("agency", "1"));
+        Trip fromTrip = new Trip();
+        fromTrip.setId(new AgencyAndId("agency", "1.1"));
+        fromTrip.setRoute(fromRoute);
+        Route toRoute = new Route();
+        toRoute.setId(new AgencyAndId("agency", "2"));
+        Trip toTrip = new Trip();
+        toTrip.setId(new AgencyAndId("agency", "2.1"));
+        toTrip.setRoute(toRoute);
+        Trip toTrip2 = new Trip();
+        toTrip2.setId(new AgencyAndId("agency", "2.2"));
+        toTrip2.setRoute(toRoute);
+        
+        // find stops
+        Stop stopK = ((TransitStopArrive)graph.getVertex("agency_K_arrive")).getStop();
+        Stop stopN = ((TransitStopDepart)graph.getVertex("agency_N_depart")).getStop();
+        Stop stopM = ((TransitStopDepart)graph.getVertex("agency_M_depart")).getStop();
+        
         assertTrue(transferTable.hasPreferredTransfers());
-        assertTrue(transferTable.getFirstSpecificTransferTime(
-                ((TransitStopArrive)graph.getVertex("agency_K_arrive")).getStop(), 
-                ((TransitStopDepart)graph.getVertex("agency_N_depart")).getStop()
-                ) == StopTransfer.PREFERRED_TRANSFER);
+        assertEquals(StopTransfer.UNKNOWN_TRANSFER, transferTable.getTransferTime(stopN, stopM, fromTrip, toTrip));
+        assertEquals(StopTransfer.FORBIDDEN_TRANSFER, transferTable.getTransferTime(stopK, stopM, fromTrip, toTrip));
+        assertEquals(StopTransfer.PREFERRED_TRANSFER, transferTable.getTransferTime(stopN, stopK, toTrip, toTrip2));
+        assertEquals(StopTransfer.TIMED_TRANSFER, transferTable.getTransferTime(stopN, stopK, fromTrip, toTrip));
+        assertEquals(15, transferTable.getTransferTime(stopN, stopK, fromTrip, toTrip2));
         
         Vertex e_arrive = graph.getVertex("agency_E_arrive");
         Vertex f_depart = graph.getVertex("agency_F_depart");
