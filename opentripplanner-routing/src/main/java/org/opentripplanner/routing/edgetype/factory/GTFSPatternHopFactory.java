@@ -532,7 +532,7 @@ public class GTFSPatternHopFactory {
                     interlineDwells.put(dwellKey, dwell);
                 }
                 int dwellTime = st1.getDepartureTime() - st0.getArrivalTime();
-                dwell.addTrip(fromTrip.getId(), toTrip.getId(), dwellTime,
+                dwell.addTrip(fromTrip, toTrip, dwellTime,
                         fromInterlineTrip.getPatternIndex(), toInterlineTrip.getPatternIndex());
             }
         } // END loop over interlining blocks 

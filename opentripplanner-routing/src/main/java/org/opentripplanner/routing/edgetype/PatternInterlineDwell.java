@@ -52,14 +52,14 @@ public class PatternInterlineDwell extends Edge implements OnBoardForwardEdge, O
         this.targetTrip = targetTrip;
     }
 
-    public void addTrip(AgencyAndId trip, AgencyAndId reverseTrip, int dwellTime,
+    public void addTrip(Trip trip, Trip reverseTrip, int dwellTime,
             int oldPatternIndex, int newPatternIndex) {
         if (dwellTime < 0) {
 	    dwellTime = 0;
-            LOG.warn ("Negative dwell time for trip " + trip.getAgencyId() + " " + trip.getId() + "(forcing to zero)");
+            LOG.warn ("Negative dwell time for trip " + trip.getId().getAgencyId() + " " + trip.getId().getId() + "(forcing to zero)");
         }
-        tripIdToInterlineDwellData.put(trip, new InterlineDwellData(dwellTime, newPatternIndex, reverseTrip));
-        reverseTripIdToInterlineDwellData.put(reverseTrip, new InterlineDwellData(dwellTime,
+        tripIdToInterlineDwellData.put(trip.getId(), new InterlineDwellData(dwellTime, newPatternIndex, reverseTrip));
+        reverseTripIdToInterlineDwellData.put(reverseTrip.getId(), new InterlineDwellData(dwellTime,
                 oldPatternIndex, trip));
         if (dwellTime < bestDwellTime) {
             bestDwellTime = dwellTime;
@@ -113,7 +113,7 @@ public class PatternInterlineDwell extends Edge implements OnBoardForwardEdge, O
         if (dwellData == null) {
             return null;
         }
-        BannedStopSet banned = options.bannedTrips.get(dwellData.trip);
+        BannedStopSet banned = options.bannedTrips.get(dwellData.trip.getId());
         if (banned != null) {
             if (banned.contains(0)) 
                 return null;
@@ -123,8 +123,8 @@ public class PatternInterlineDwell extends Edge implements OnBoardForwardEdge, O
         // FIXME: ugly!
         TableTripPattern pattern = ((OnboardVertex)s1.getVertex()).getTripPattern();
         s1.incrementTimeInSeconds(dwellData.dwellTime);
-        s1.setTripId(dwellData.trip);
-        // TODO: set previous trip?
+        s1.setTripId(dwellData.trip.getId());
+        s1.setPreviousTrip(dwellData.trip);
         // FIXME: this is interlining to the SCHEDULED timetable, not the updated timetable. use resolver.
         s1.setTripTimes(pattern.getTripTimes(dwellData.patternIndex));
         s1.incrementWeight(dwellData.dwellTime);
