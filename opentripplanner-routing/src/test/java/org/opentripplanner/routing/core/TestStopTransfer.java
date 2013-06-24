@@ -28,21 +28,21 @@ public class TestStopTransfer extends TestCase {
         // Setup from trip with route
         Route fromRoute = new Route();
         fromRoute.setId(new AgencyAndId("A1", "R1"));
-        Trip fromTrip = new Trip(); 
+        Trip fromTrip = new Trip();
         fromTrip.setId(new AgencyAndId("A1", "T1"));
         fromTrip.setRoute(fromRoute);
         
         // Setup to trip with route
         Route toRoute = new Route();
         toRoute.setId(new AgencyAndId("A1", "R2"));
-        Trip toTrip = new Trip(); 
+        Trip toTrip = new Trip();
         toTrip.setId(new AgencyAndId("A1", "T2"));
         toTrip.setRoute(toRoute);
         
         // Setup second to trip with route
         Route toRoute2 = new Route();
         toRoute2.setId(new AgencyAndId("A1", "R3"));
-        Trip toTrip2 = new Trip(); 
+        Trip toTrip2 = new Trip();
         toTrip2.setId(new AgencyAndId("A1", "T3"));
         toTrip2.setRoute(toRoute2);
         
