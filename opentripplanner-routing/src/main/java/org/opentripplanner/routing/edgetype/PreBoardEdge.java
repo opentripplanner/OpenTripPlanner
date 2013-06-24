@@ -15,7 +15,6 @@ package org.opentripplanner.routing.edgetype;
 
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -96,43 +95,6 @@ public class PreBoardEdge extends FreeEdge {
             }
             long board_after = t0 + slack;
             long transfer_penalty = 0;
-            //TODO: delete comments below
-//            if (s0.getLastAlightedTimeSeconds() != 0) {
-//                /* this is a transfer rather than an initial boarding */
-//                TransferTable transferTable = s0.getContext().transferTable;
-//                if (transferTable.hasPreferredTransfers()) {
-//                    // only penalize transfers if there are some that will be depenalized
-//                    transfer_penalty = options.nonpreferredTransferPenalty;
-//                }
-//                int transfer_time = transferTable.getTransferTime(s0.getPreviousStop(),
-//                        getToVertex());
-//                if (transfer_time == TransferTable.UNKNOWN_TRANSFER) {
-//                    // use min transfer time relative to arrival time at this stop
-//                } else if (transfer_time >= 0) {
-//                    // handle minimum time transfers (>0) and timed transfers (0)
-//                    // relative to alight time at last stop
-//                    long table_board_after = s0.getLastAlightedTimeSeconds() + transfer_time;
-//                    // do not let time run backward
-//                    // this could make timed transfers fail if there is walking involved
-//                    if (table_board_after > board_after)
-//                        board_after = table_board_after;
-//                } else if (transfer_time == TransferTable.FORBIDDEN_TRANSFER) {
-//                    return null;
-//                } else if (transfer_time == TransferTable.PREFERRED_TRANSFER) {
-//                    // depenalize preferred transfers
-//                    // TODO: verify correctness of this method (AMB)
-//                    transfer_penalty = 0;
-//                    // use min transfer time relative to arrival time at this stop
-//                } else {
-//                    throw new IllegalStateException("Undefined value in transfer table.");
-//                }
-//                if (transfer_time == 0) {
-//                    // timed transfers are assumed to be preferred
-//                    transfer_penalty = 0;
-//                }
-//            } else {
-//                /* this is a first boarding, not a transfer - divide minTransferTime in half */
-//            }
 
             // penalize transfers more heavily if requested by the user
             if (s0.isEverBoarded()) {
