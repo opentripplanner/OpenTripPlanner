@@ -22,6 +22,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StopTransfer;
 import org.opentripplanner.routing.core.TransferTable;
+import org.opentripplanner.routing.edgetype.TimedTransferEdge;
 import org.opentripplanner.routing.request.BannedStopSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -261,14 +262,14 @@ public abstract class TripTimes {
                 || trip.getTripBikesAllowed() == 1))    // trip explicitly forbids bikes
                 return false;
         
-        // Check time table rules
+        // Check transfer table rules
         if (state0.getNumBoardings() > 0) {
             // This is not the first boarding, thus a transfer
             TransferTable transferTable = options.getRoutingContext().transferTable;
             // Get the transfer time
             int transferTime = transferTable.getTransferTime(state0.getPreviousStop(),
                     state0.getCurrentStop(), state0.getPreviousTrip(), trip);
-            // Only check for minimum transfer time and forbidden transfers
+            // Check for minimum transfer time and forbidden transfers
             if (transferTime > 0) {
                 // There is a minimum transfer time to make this transfer
                 if (state0.getLastAlightedTimeSeconds() + transferTime > getDepartureTime(stopIndex)) {
@@ -277,6 +278,14 @@ public abstract class TripTimes {
             } else if (transferTime == StopTransfer.FORBIDDEN_TRANSFER) {
                 // This transfer is forbidden
                 return false;
+            }
+            
+            // Check whether back edge is TimedTransferEdge
+            if (state0.getBackEdge() instanceof TimedTransferEdge) {
+                // Transfer must be of type TIMED_TRANSFER
+                if (transferTime != StopTransfer.TIMED_TRANSFER) {
+                    return false;
+                }
             }
         }
         

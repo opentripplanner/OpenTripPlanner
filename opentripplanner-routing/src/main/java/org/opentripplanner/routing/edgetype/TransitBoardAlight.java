@@ -18,6 +18,8 @@ import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
+import org.opentripplanner.routing.core.StopTransfer;
+import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -260,6 +262,26 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
 
             /* check if route is preferred for this plan */
             long preferences_penalty = options.preferencesPenaltyForTrip(trip);
+            
+            /* check whether this is a preferred transfer */
+            int transferPenalty = 0;
+            if (state0.getNumBoardings() > 0) {
+                // This is not the first boarding, thus a transfer
+                TransferTable transferTable = options.getRoutingContext().transferTable;
+                if (transferTable.hasPreferredTransfers()) {
+                    // Only penalize transfers if there are some that will be depenalized
+                    transferPenalty = options.nonpreferredTransferPenalty;
+                }
+                // Get the transfer time
+                int transferTime = transferTable.getTransferTime(state0.getPreviousStop(),
+                        state0.getCurrentStop(), state0.getPreviousTrip(), trip);
+                
+                if (transferTime == StopTransfer.PREFERRED_TRANSFER) {
+                    // Depenalize preferred transfers
+                    // TODO: verify correctness of this method (AMB)
+                    transferPenalty = 0;
+                }
+            }            
 
             StateEditor s1 = state0.edit(this);
             s1.setBackMode(getMode());
@@ -294,6 +316,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
             }
             
             s1.incrementWeight(preferences_penalty);
+            s1.incrementWeight(transferPenalty);
 
             // when reverse optimizing, the board cost needs to be applied on
             // alight to prevent state domination due to free alights
