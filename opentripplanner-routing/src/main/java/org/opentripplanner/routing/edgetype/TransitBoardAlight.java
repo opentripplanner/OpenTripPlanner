@@ -232,7 +232,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
                 if (sd.serviceIdRunning(serviceId)) {
                     // getNextTrip will find next or prev departure depending on final boolean parameter
                     tripTimes = getPattern().getNextTrip(stopIndex, secondsSinceMidnight, 
-                            mode == TraverseMode.BICYCLE, options, boarding);
+                            mode == TraverseMode.BICYCLE, state0, boarding);
                     if (tripTimes != null) {
                         wait = boarding ? // we care about departures on board and arrivals on alight
                             (int)(sd.time(tripTimes.getDepartureTime(stopIndex)) - current_time):

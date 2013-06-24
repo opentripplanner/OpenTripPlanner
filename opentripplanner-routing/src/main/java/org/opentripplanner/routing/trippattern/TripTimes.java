@@ -19,6 +19,9 @@ import lombok.AllArgsConstructor;
 
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StopTransfer;
+import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.request.BannedStopSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -229,7 +232,8 @@ public abstract class TripTimes {
 
     /**
      * Once a trip has been found departing or arriving at an appropriate time, check whether that 
-     * trip fits other restrictive search criteria such as bicycle and wheelchair accessibility.
+     * trip fits other restrictive search criteria such as bicycle and wheelchair accessibility
+     * and transfers with minimum time or forbidden transfers.
      * 
      * GTFS bike extensions based on mailing list message at: 
      * https://groups.google.com/d/msg/gtfs-changes/QqaGOuNmG7o/xyqORy-T4y0J
@@ -240,7 +244,8 @@ public abstract class TripTimes {
      * If route OR trip explicitly allows bikes, bikes are allowed.
      * @param stopIndex 
      */
-    public boolean tripAcceptable(RoutingRequest options, boolean bicycle, int stopIndex) {
+    public boolean tripAcceptable(State state0, boolean bicycle, int stopIndex) {
+        RoutingRequest options = state0.getOptions();
         Trip trip = this.getTrip();
         BannedStopSet banned = options.bannedTrips.get(trip.getId());
         if (banned != null) {
@@ -254,7 +259,27 @@ public abstract class TripTimes {
             if ((trip.getTripBikesAllowed() != 2) &&    // trip does not explicitly allow bikes and
                 (trip.getRoute().getBikesAllowed() != 2 // route does not explicitly allow bikes or  
                 || trip.getTripBikesAllowed() == 1))    // trip explicitly forbids bikes
-                return false; 
+                return false;
+        
+        // Check time table rules
+        if (state0.getNumBoardings() > 0) {
+            // This is not the first boarding, thus a transfer
+            TransferTable transferTable = options.getRoutingContext().transferTable;
+            // Get the transfer time
+            int transferTime = transferTable.getTransferTime(state0.getPreviousStop(),
+                    state0.getCurrentStop(), state0.getPreviousTrip(), trip);
+            // Only check for minimum transfer time and forbidden transfers
+            if (transferTime > 0) {
+                // There is a minimum transfer time to make this transfer
+                if (state0.getLastAlightedTimeSeconds() + transferTime > getDepartureTime(stopIndex)) {
+                    return false;
+                }
+            } else if (transferTime == StopTransfer.FORBIDDEN_TRANSFER) {
+                // This transfer is forbidden
+                return false;
+            }
+        }
+        
         return true;
     }
 

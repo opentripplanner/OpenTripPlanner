@@ -41,9 +41,9 @@ import org.opentripplanner.routing.edgetype.FrequencyBoard;
 import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
-import org.opentripplanner.routing.edgetype.SimpleEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.graph.Edge;
@@ -304,7 +304,7 @@ public class TestPatternHopFactory extends TestCase {
         
         Vertex e_arrive = graph.getVertex("agency_E_arrive");
         Vertex f_depart = graph.getVertex("agency_F_depart");
-        Edge edge = new SimpleEdge(e_arrive, f_depart, 10000, 10000);
+        Edge edge = new TransferEdge(e_arrive, f_depart, 10000, 10000);
         
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 18, 0, 50, 0);
         Vertex stop_b = graph.getVertex("agency_B_depart");
