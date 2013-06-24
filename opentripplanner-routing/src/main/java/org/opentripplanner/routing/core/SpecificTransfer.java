@@ -170,7 +170,7 @@ public class SpecificTransfer implements Serializable {
         checkNotNull(trip);
 
         boolean match = false;
-        int specificity = getFromSpecificity();
+        int specificity = getToSpecificity();
         if (specificity == 0) {
             match = true;
         }
