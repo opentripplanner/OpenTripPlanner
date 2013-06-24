@@ -219,6 +219,10 @@ public class State implements Cloneable {
         return stateData.tripId;
     }
 
+    public Trip getPreviousTrip() {
+        return stateData.previousTrip;
+    }
+    
     public String getZone() {
         return stateData.zone;
     }

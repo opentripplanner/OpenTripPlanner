@@ -279,6 +279,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
             s1.incrementTimeInSeconds(bestWait);
             s1.incrementNumBoardings();
             s1.setTripId(trip.getId());
+            s1.setPreviousTrip(trip);
             s1.setZone(getPattern().getZone(stopIndex));
             s1.setRoute(trip.getRoute().getId());
 

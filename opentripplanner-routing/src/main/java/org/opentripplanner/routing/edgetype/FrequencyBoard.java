@@ -157,6 +157,7 @@ public class FrequencyBoard extends Edge implements OnBoardForwardEdge, PatternE
             s1.incrementTimeInSeconds(bestWait);
             s1.incrementNumBoardings();
             s1.setTripId(trip.getId());
+            s1.setPreviousTrip(trip);
             s1.setZone(pattern.getZone(stopIndex));
             s1.setRoute(trip.getRoute().getId());
             s1.setBackMode(TraverseMode.BOARDING);

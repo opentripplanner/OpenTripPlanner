@@ -290,6 +290,11 @@ public class StateEditor {
         child.stateData.tripId = tripId;
     }
 
+    public void setPreviousTrip(Trip previousTrip) {
+        cloneStateDataAsNeeded();
+        child.stateData.previousTrip = previousTrip;
+    }
+    
     public void setInitialWaitTimeSeconds(long initialWaitTimeSeconds) {
         cloneStateDataAsNeeded();
         child.stateData.initialWaitTime = initialWaitTimeSeconds;
@@ -406,6 +411,7 @@ public class StateEditor {
         child.stateData.route = state.stateData.route;
         child.stateData.tripTimes = state.stateData.tripTimes;
         child.stateData.tripId = state.stateData.tripId;
+        child.stateData.previousTrip = state.stateData.previousTrip;
         child.stateData.previousStop = state.stateData.previousStop;
         child.stateData.zone = state.stateData.zone;
         child.stateData.extensions = state.stateData.extensions;
@@ -435,6 +441,10 @@ public class StateEditor {
         return child.getTripId();
     }
 
+    public Trip getPreviousTrip() {
+        return child.getPreviousTrip();
+    }
+    
     public String getZone() {
         return child.getZone();
     }

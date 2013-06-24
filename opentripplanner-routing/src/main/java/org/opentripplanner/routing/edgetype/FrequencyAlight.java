@@ -143,6 +143,7 @@ public class FrequencyAlight extends Edge  implements OnBoardReverseEdge {
             s1.incrementTimeInSeconds(bestWait);
             s1.incrementNumBoardings();
             s1.setTripId(trip.getId());
+            s1.setPreviousTrip(trip);
             s1.setZone(pattern.getZone(stopIndex));
             s1.setRoute(trip.getRoute().getId());
 

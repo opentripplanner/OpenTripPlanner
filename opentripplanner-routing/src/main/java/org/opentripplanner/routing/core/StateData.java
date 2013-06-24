@@ -18,6 +18,7 @@ import java.util.Set;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.patch.Alert;
@@ -36,6 +37,8 @@ public class StateData implements Cloneable {
     protected TripTimes tripTimes;
 
     protected AgencyAndId tripId;
+    
+    protected Trip previousTrip;
 
     protected double lastTransitWalk = 0;
 
