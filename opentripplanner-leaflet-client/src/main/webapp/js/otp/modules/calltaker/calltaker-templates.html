@@ -1,0 +1,25 @@
+<script id="otp-calltaker-mailablesWidget" type="text/html">
+    <div class="notDraggable" style="line-height: 2em;">
+        Salutation: <select>
+            <option>Mr.</option>
+            <option>Ms.</option>
+            <option>Mrs.</option>
+            <option>Dr.</option>
+        </select><br>
+        First Name: <input type="text" id="{{widgetId}}-firstname" /><br>
+        Last Name: <input type="text" id="{{widgetId}}-lastname" /><br>
+        
+        Address 1: <input type="text" id="{{widgetId}}-address1" /><br>
+        Address 2: <input type="text" id="{{widgetId}}-address2" /><br>
+        City: <input type="text" id="{{widgetId}}-address2" style="width: 100px;"/>
+        State: <input type="text" id="{{widgetId}}-address2" style="width: 20px;"/>
+        ZIP: <input type="text" id="{{widgetId}}-address2" style="width: 40px;"/>               
+    </div>
+
+    <div class="notDraggable otp-calltaker-mailablesSelect">
+        {{#mailables}}
+            <input type="checkbox"/>{{name}}
+        {{/mailables}}
+    </div>
+
+</script>

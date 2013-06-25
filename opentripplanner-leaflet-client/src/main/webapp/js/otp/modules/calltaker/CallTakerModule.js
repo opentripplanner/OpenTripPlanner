@@ -25,6 +25,8 @@ otp.modules.calltaker.CallTakerModule =
     sessionId : null,
     username: null,
     
+    templateFile : 'otp/modules/calltaker/calltaker-templates.html',
+    
     initialize : function(webapp, id, options) {
         otp.modules.multimodal.MultimodalPlannerModule.prototype.initialize.apply(this, arguments);
         
@@ -38,6 +40,8 @@ otp.modules.calltaker.CallTakerModule =
         console.log("activate ctm");        
         
         this.initSession();
+        
+        this.mailablesWidget = new otp.modules.calltaker.MailablesWidget(this.id+'-mailablesWidget', this);
     },
     
     getExtendedQueryParams : function() {
