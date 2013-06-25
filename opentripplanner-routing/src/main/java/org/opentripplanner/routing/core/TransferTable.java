@@ -172,10 +172,10 @@ public class TransferTable implements Serializable {
     }
     
     /**
-     * Determines the transfer penalty given a transfer time and a penalty value for non-preferred
+     * Determines the transfer penalty given a transfer time and a penalty for non-preferred
      * transfers. 
      * @param transferTime is the transfer time
-     * @param nonpreferredTransferPenalty is the penalty value for non-preferred transfers
+     * @param nonpreferredTransferPenalty is the penalty for non-preferred transfers
      * @return the transfer penalty
      */
     public int determineTransferPenalty(int transferTime, int nonpreferredTransferPenalty) {
@@ -184,14 +184,14 @@ public class TransferTable implements Serializable {
         if (hasPreferredTransfers()) {
             // Only penalize transfers if there are some that will be depenalized
             transferPenalty = nonpreferredTransferPenalty;
-        }
-        
-        if (transferTime == StopTransfer.PREFERRED_TRANSFER
-                || transferTime == StopTransfer.TIMED_TRANSFER) {
-            // Depenalize preferred transfers
-            // Timed transfers are assumed to be preferred as well
-            // TODO: verify correctness of this method (AMB)
-            transferPenalty = 0;
+
+            if (transferTime == StopTransfer.PREFERRED_TRANSFER
+                    || transferTime == StopTransfer.TIMED_TRANSFER) {
+                // Depenalize preferred transfers
+                // Timed transfers are assumed to be preferred as well
+                // TODO: verify correctness of this method (AMB)
+                transferPenalty = 0;
+            }
         }
         
         return transferPenalty;
