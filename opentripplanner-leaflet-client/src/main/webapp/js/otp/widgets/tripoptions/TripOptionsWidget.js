@@ -428,39 +428,85 @@ otp.widgets.tripoptions.MaxDistanceSelector =
     otp.Class(otp.widgets.tripoptions.TripOptionsWidgetControl, {
     
     id           :  null,
+    presets      : null,
+    distSuffix   : null,
+
+    /**
+    * As we want nice presets in both metric and imperial scale, we can't just do a transformation here, we just declare both
+    */
+
+    imperialDistanceSuffix: 'mi.',
+    metricDistanceSuffix: 'm.',
 
     initialize : function(tripWidget) {
+        var presets;
+
         otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
         
+        // Set it up the system correctly ones, so we don't need to later on
+        if (otp.config.metric) {
+            this.presets = presets = this.metricPresets;
+            this.distSuffix = this.metricDistanceSuffix;
+        } else {
+            this.presets = this.imperialPresets;
+            this.distSuffix = this.imperialDistanceSuffix;
+            presets = [];
+            // Transform the presets to miles/meters depending on the metric setting
+            for (var i = 0; i < this.presets.length; i++) {
+                presets.push((otp.util.Imperial.metersToMiles(this.presets[i])).toFixed(2));
+            }
+        }
+        this.id = tripWidget.id+"-maxWalkSelector";
+
+        // currentMaxDistance is used to compare against the title string of the option element, to select the correct one
+        var currentMaxDistance = otp.util.Geo.distanceString(this.tripWidget.module.maxWalkDistance);
+
         ich['otp-tripOptions-maxDistance']({
             widgetId : this.id,
-            presets : this.presets,
+            presets : presets,
             label : this.label,
+            distSuffix: this.distSuffix,
+            currentMaxDistance: parseFloat(currentMaxDistance)
         }).appendTo(this.$());
 
     },
 
     doAfterLayout : function() {
         var this_ = this;
+
         $('#'+this.id+'-value').change(function() {
-            this_.setDistance(parseFloat($('#'+this_.id+'-value').val())*1609.34);
+            var meters = parseFloat($(this).val());
+
+            // If inputed in miles transform to meters to change the value
+            if (!otp.config.metric) { meters = otp.util.Imperial.milesToMeters(meters); } // input field was in miles
+
+            this_.setDistance(meters);
         });
         
         $('#'+this.id+'-presets').change(function() {
             var presetVal = this_.presets[this.selectedIndex-1];
-            $('#'+this_.id+'-value').val(presetVal);    
 
-            var m = presetVal*1609.34;
-            this_.setDistance(m);
+            // Save the distance in meters
+            this_.setDistance(presetVal);
 
+            if (!otp.config.metric) { presetVal = otp.util.Imperial.metersToMiles(presetVal); } // Output in miles
+
+            // Show the value in miles/meters
+            $('#'+this_.id+'-value').val(presetVal.toFixed(2));    
             $('#'+this_.id+'-presets option:eq(0)').prop('selected', true);    
         });
     },
 
     restorePlan : function(data) {
         if(!data.queryParams.maxWalkDistance) return;
-        $('#'+this.id+'-value').val((data.queryParams.maxWalkDistance/1609.34).toFixed(2));  
-        this.tripWidget.module.maxWalkDistance = data.queryParams.maxWalkDistance;
+
+        var meters = parseFloat(data.queryParams.maxWalkDistance);
+        if (isNaN(meters)) { return; }
+
+        if (!otp.config.metric) { meters = otp.util.Imperial.metersToMiles(meters); }
+
+        $('#'+this.id+'-value').val(meters.toFixed(2));  
+        this.tripWidget.module.maxWalkDistance = parseFloat(data.queryParams.maxWalkDistance);
     },
 
     setDistance : function(distance) {
@@ -474,7 +520,11 @@ otp.widgets.tripoptions.MaxDistanceSelector =
 otp.widgets.tripoptions.MaxWalkSelector = 
     otp.Class(otp.widgets.tripoptions.MaxDistanceSelector, {
 
-    presets     : [0.1, 0.2, 0.25, 0.3, 0.4, 0.5, 0.75, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5],
+    // miles (0.1, 0.2, 0.25, 0.3, 0.4, 0.5, 0.75, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5)
+    imperialPresets: [160.9344, 321.8688, 402.336, 482.8032, 643.7376, 804.672, 1207.008, 1609.344, 2414.016, 3218.688, 4023.36, 4828.032, 5632.704, 6437.376, 7242.048000000001, 8046.72],
+
+    // meters
+    metricPresets      : [100, 200, 300, 400, 500, 750, 1000, 1500, 2000, 2500, 5000, 7500, 10000],
 
     label       : "Maximum walk:",
 
@@ -492,7 +542,11 @@ otp.widgets.tripoptions.MaxWalkSelector =
 otp.widgets.tripoptions.MaxBikeSelector = 
     otp.Class(otp.widgets.tripoptions.MaxDistanceSelector, {
 
-    presets     : [0.1, 0.25, 0.5, 0.75, 1, 2, 3, 4, 5, 10, 15, 20, 30, 40, 100],
+    // miles (0.1, 0.25, 0.5, 0.75, 1, 2, 3, 4, 5, 10, 15, 20, 30, 40, 100)
+    imperialPresets: [160.934, 402.335, 804.67, 1207.0049999999999, 1609.34, 3218.68, 4828.0199999999995, 6437.36, 8046.7, 16093.4, 24140.1, 32186.8, 48280.2, 64373.6, 160934],
+
+    // meters
+    metricPresets      : [100, 300, 750, 1000, 1500, 2500, 5000, 7500, 10000],
 
     label       : "Maximum bike:",
 
@@ -819,7 +873,7 @@ otp.widgets.tripoptions.TripSummary =
     		dist += itin.legs[i].distance;
         }
     	
-        $("#"+this.id+"-distance").html(Math.round(100*(dist/1609.344))/100+" mi.");
+        $("#"+this.id+"-distance").html(otp.util.Geo.distanceString(dist));
         $("#"+this.id+"-duration").html(otp.util.Time.msToHrMin(itin.duration));	
         
         var timeByMode = { };
