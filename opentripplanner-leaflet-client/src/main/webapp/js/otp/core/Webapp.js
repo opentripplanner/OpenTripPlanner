@@ -213,7 +213,11 @@ otp.core.Webapp = otp.Class({
             }
             if(_.has(this.urlParams, 'module') && !setDefault) {
                 console.log("OTP module with id="+this.urlParams['module']+" not found");
-                if(defaultModule) this.setActiveModule(defaultModule);
+                if(defaultModule) {
+                    //this_.activeModule = defaultModule;
+                    //console.log("init active module: "+ defaultModule);
+                    this.setActiveModule(defaultModule);
+                }
             }
         }                
 
@@ -306,6 +310,8 @@ otp.core.Webapp = otp.Class({
         module.selected();
         this.map.activeModuleChanged(this.activeModule, module);    
         this.activeModule = module;
+        var moduleIndex = this.modules.indexOf(this.activeModule);
+        $('#otp_moduleSelector option:eq('+moduleIndex+')').prop('selected', true);
     },
           
           
