@@ -18,11 +18,6 @@ otp.modules.fieldtrip.FieldTripManagerWidget =
     otp.Class(otp.widgets.Widget, {
 
     module : null,
-
-    trips : null,
-    selectedTrip : null,
-    
-    selectedDate : null,
     
     initialize : function(id, module) {
         var this_ = this;  
@@ -33,8 +28,52 @@ otp.modules.fieldtrip.FieldTripManagerWidget =
             cssClass : 'otp-fieldTripManager',
             title : 'Field Trip Manager'
         });
+    
+        ich['otp-fieldtrip-manager']({ widgetId : this.id }).appendTo(this.mainDiv);
+        $('#'+this.id+'-tabs').tabs({
+            heightStyle : "fill",
+        });
+
+        this.buildRequestsViewer($('#'+this.id+'-requestsTab'));        
+        this.buildTripManager($('#'+this.id+'-tripsTab'));
+    },
+
+    /** requests viewer **/
+     
+    buildRequestsViewer : function(container) {
+        this.requestsList = $('<div class="otp-fieldTripRequests-list notDraggable" />').appendTo(container);
         
-        var tripListContainer = $('<div class="otp-fieldTripManager-callListContainer"></div>').appendTo(this.mainDiv);
+        this.module.loadRequests();
+    },
+    
+    updateRequests : function(requests) {
+        var this_ = this;
+        this.requestsList.empty();
+        for(var i = 0; i < requests.length; i++) {
+            var req = requests[i];
+            console.log(req);
+            //$('<div class="otp-fieldTripRequests-listRow">'+req.teacherName+", "+req.schoolName+'</div>').appendTo(this.requestsList);
+            
+            var context = _.clone(req);
+            req.formattedDate = moment(req.travelDate).format("MMM Do YYYY");
+            ich['otp-fieldtrip-requestRow'](req).appendTo(this.requestsList)
+            .click(function() {
+                this_.module.showRequest(req);
+            });
+        }
+    },
+
+     
+    /** trip manager **/
+
+    trips : null,
+    selectedTrip : null,
+    
+    selectedDate : null,
+    
+    buildTripManager : function(container) {    
+        // TODO : refactor
+        var tripListContainer = $('<div class="otp-fieldTripManager-callListContainer"></div>').appendTo(container);
         
         var selectRow = $('<div class="notDraggable otp-fieldTripManager-callListHeader"></div>').appendTo(tripListContainer);
         $('<input type="radio" name="'+this.id+'+-selectGroup" checked />').appendTo(selectRow)
@@ -63,11 +102,11 @@ otp.modules.fieldtrip.FieldTripManagerWidget =
         
         this.tripList = $('<div class="otp-fieldTripManager-callList"></div>').appendTo(tripListContainer);
 
-        var tripInfoContainer = $('<div class="notDraggable" style="height:250px;"></div>').appendTo(this.mainDiv);
+        var tripInfoContainer = $('<div class="notDraggable" style="height:210px;"></div>').appendTo(container);
         this.tripInfo = $('<div class="otp-fieldTripManager-callInfo notDraggable"></div>').appendTo(tripInfoContainer);
         var tripButtonRow = $('<div style="margin-top: 4px; text-align: center;" />').appendTo(tripInfoContainer);
         
-        var mainButtonRow = $('<div class="otp-fieldTrip-buttonRow" />').appendTo(this.mainDiv);
+        var mainButtonRow = $('<div class="otp-fieldTrip-buttonRow" />').appendTo(container);
         
         
         $('<button id="'+this.id+'-saveButton">View Requests</button>').button()

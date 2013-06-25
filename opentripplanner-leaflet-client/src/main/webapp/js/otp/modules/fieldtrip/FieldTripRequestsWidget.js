@@ -23,7 +23,7 @@ otp.modules.fieldtrip.FieldTripRequestsWidget =
     selectedTrip : null,
     
     selectedDate : null,
-    
+        
     initialize : function(id, module) {
         var this_ = this;  
         
@@ -36,7 +36,7 @@ otp.modules.fieldtrip.FieldTripRequestsWidget =
         
         this.requestsList = $('<div class="otp-fieldTripRequests-list notDraggable" />').appendTo(this.mainDiv);
         
-        var buttonRow = $('<div class="otp-fieldTripRequests-buttonRow" />').appendTo(this.mainDiv);
+        /*var buttonRow = $('<div class="otp-fieldTripRequests-buttonRow" />').appendTo(this.mainDiv);
         
         $('<button id="'+this.id+'-planOutboundButton">Plan Outbound</button>').button()
         .appendTo(buttonRow).click(function() {
@@ -44,17 +44,25 @@ otp.modules.fieldtrip.FieldTripRequestsWidget =
 
         $('<button id="'+this.id+'-planInboundButton">Plan Inbound</button>').button()
         .appendTo(buttonRow).click(function() {
-        });
+        });*/
         
         module.loadRequests();
     },
     
     updateRequests : function(requests) {
+        var this_ = this;
         this.requestsList.empty();
         for(var i = 0; i < requests.length; i++) {
             var req = requests[i];
             console.log(req);
-            $('<div class="otp-fieldTripRequests-listRow">'+req.teacherName+", "+req.schoolName+'</div>').appendTo(this.requestsList);
+            //$('<div class="otp-fieldTripRequests-listRow">'+req.teacherName+", "+req.schoolName+'</div>').appendTo(this.requestsList);
+            
+            var context = _.clone(req);
+            req.formattedDate = moment(req.travelDate).format("MMM Do YYYY");
+            ich['otp-fieldtrip-requestRow'](req).appendTo(this.requestsList)
+            .click(function() {
+                this_.module.showRequest(req);
+            });
         }
     }
     

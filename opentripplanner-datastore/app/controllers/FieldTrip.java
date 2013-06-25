@@ -166,11 +166,14 @@ public class FieldTrip extends Application {
     }
 
     public static void newRequest(FieldTripRequest request) {
-        request.id = null;
-        request.save();
-        Long id = request.id;
-        render();
-        //renderJSON(id);
+        String msg = "bad request";
+        if(request.teacherName != null) {
+            request.id = null;
+            request.save();
+            Long id = request.id;
+            msg = "Your request has been submitted.";
+        }
+        render(msg);
     }
     
     public static void getRequests(Integer limit) {

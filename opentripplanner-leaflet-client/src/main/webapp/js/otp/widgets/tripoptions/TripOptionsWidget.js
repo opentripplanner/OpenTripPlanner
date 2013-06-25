@@ -245,6 +245,7 @@ otp.widgets.tripoptions.LocationsSelector =
     
     restorePlan : function(data) {
         if(data.queryParams.fromPlace) {
+            console.log("rP: "+data.queryParams.fromPlace);
             var fromName = otp.util.Itin.getLocationName(data.queryParams.fromPlace);
             if(fromName) {
                 $("#"+this.id+"-start").val(fromName);
@@ -330,6 +331,10 @@ otp.widgets.tripoptions.TimeSelector =
         if(data.queryParams.arriveBy === true || data.queryParams.arriveBy === "true") {
             this.tripWidget.module.arriveBy = true;
             $('#'+this.id+'-depArr option:eq(1)').prop('selected', true);  
+        }
+        else {
+            this.tripWidget.module.arriveBy = false;
+            $('#'+this.id+'-depArr option:eq(0)').prop('selected', true);  
         }
     }
         
@@ -927,9 +932,8 @@ otp.widgets.tripoptions.GroupTripOptions =
     doAfterLayout : function() {
         var this_ = this;
         $('#'+this.id+'-value').change(function() {
-            //console.log("new groupSize");
             //this_.tripWidget.module.groupSize = parseInt($('#'+this_.id+'-value').val());
-            this_.tripWidget.imputChanged({
+            this_.tripWidget.inputChanged({
                 groupSize : parseInt($('#'+this_.id+'-value').val()),
             });
 
@@ -939,6 +943,7 @@ otp.widgets.tripoptions.GroupTripOptions =
     restorePlan : function(data) {
         if(_.has(data.queryParams, 'groupSize')) {
             $('#'+this.id+'-value').val(data.queryParams['groupSize']);
+            this.tripWidget.module.groupSize = parseInt(data.queryParams['groupSize']);
         }
     },
  

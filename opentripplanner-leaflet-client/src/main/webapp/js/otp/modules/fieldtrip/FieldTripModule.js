@@ -22,6 +22,8 @@ otp.modules.fieldtrip.FieldTripModule =
     
     itinWidget  : null,
     
+    requestWidgets : null, // object, maps request ids to widget instances
+    
     groupSize   : 100,
     bannedSegments : null,
     //itineraries : null,
@@ -34,12 +36,15 @@ otp.modules.fieldtrip.FieldTripModule =
     
     showIntermediateStops : true,
     
-    stopsWidget: false,
+    
+    templateFile : 'otp/modules/fieldtrip/fieldtrip-templates.html',
+
     
     initialize : function(webapp, id, options) {
         otp.modules.planner.PlannerModule.prototype.initialize.apply(this, arguments);
         
         this.planTripFunction = this.ftPlanTrip;
+        this.requestWidgets = {};
     },
 
     activate : function() {
@@ -75,8 +80,10 @@ otp.modules.fieldtrip.FieldTripModule =
 
         this.fieldTripManager = new otp.modules.fieldtrip.FieldTripManagerWidget('otp-'+this.id+'-fieldTripWidget', this);
 
+        //this.requestsWidget = new otp.modules.fieldtrip.FieldTripRequestsWidget('otp-'+this.moduleId+'-requestsWidget', this);
 
-        this.refreshTrips();
+
+        //this.refreshTrips();
     },
     
     restore : function() {
@@ -228,13 +235,13 @@ otp.modules.fieldtrip.FieldTripModule =
             data: {
                 userName : this.userName,
                 password : this.password,                
-                date : this.fieldTripManager.selectedDate,
+                //date : this.fieldTripManager.selectedDate,
                 limit : 100,
             },
                 
             success: function(data) {
                 if((typeof data) == "string") data = jQuery.parseJSON(data);
-                this_.fieldTripManager.updateTrips(data);
+                //this_.fieldTripManager.updateTrips(data);
             },
             
             error: function(data) {
@@ -248,9 +255,9 @@ otp.modules.fieldtrip.FieldTripModule =
         new otp.modules.fieldtrip.SaveFieldTripWidget('otp-'+this.id+'-saveFieldTripWidget', this);
     },
         
-    saveTrip : function(desc) {
+    saveTrip : function(successCallback) {
         var this_ = this;
-        console.log("saving trip: "+desc);
+        //console.log("saving trip: "+desc);
         console.log(moment(this.optionsWidget.controls['time'].epoch).format("YYYY-MM-DDTHH:mm:ss"));
         
         var data = {
@@ -258,7 +265,7 @@ otp.modules.fieldtrip.FieldTripModule =
             password : this.password,
             'trip.origin' : this.getStartOTPString(),
             'trip.destination' : this.getEndOTPString(),
-            'trip.description' : desc,
+            //'trip.description' : desc,
             'trip.createdBy' : this.userName,
             'trip.passengers' : this.groupSize,            
             'trip.departure' : moment(this.optionsWidget.controls['time'].epoch).format("YYYY-MM-DDTHH:mm:ss"),
@@ -273,7 +280,7 @@ otp.modules.fieldtrip.FieldTripModule =
                 
             success: function(data) {
                 if((typeof data) == "string") data = jQuery.parseJSON(data);
-                this_.saveItineraries(data);
+                this_.saveItineraries(data, successCallback);
             },
             
             error: function(data) {
@@ -284,7 +291,7 @@ otp.modules.fieldtrip.FieldTripModule =
     },
     
     
-    saveItineraries : function(tripId) {
+    saveItineraries : function(tripId, successCallback) {
         var this_ = this;
         this.itinsSaved = 0;
         for(var i = 0; i < this.groupPlan.itineraries.length; i++) {
@@ -322,7 +329,8 @@ otp.modules.fieldtrip.FieldTripModule =
                     this_.itinsSaved++;
                     if(this_.itinsSaved == this_.groupPlan.itineraries.length) {
                         //console.log("all itins saved");
-                        this_.refreshTrips();
+                        //this_.refreshTrips();
+                        this.successCallback.call(this_, tripId);
                     }
                                  
                 },
@@ -394,6 +402,9 @@ otp.modules.fieldtrip.FieldTripModule =
 
     },
 
+
+    //** requests functions **//
+    
     showRequests : function() {
         if(!this.requestsWidget) {
             this.requestsWidget = new otp.modules.fieldtrip.FieldTripRequestsWidget('otp-'+this.id+'-requestsWidget', this);
@@ -413,7 +424,8 @@ otp.modules.fieldtrip.FieldTripModule =
                 
             success: function(data) {
                 if((typeof data) == "string") data = jQuery.parseJSON(data);
-                this_.requestsWidget.updateRequests(data);
+                //this_.requestsWidget.updateRequests(data);
+                this_.fieldTripManager.updateRequests(data);
             },
             
             error: function(data) {
@@ -423,4 +435,66 @@ otp.modules.fieldtrip.FieldTripModule =
         });
     },
         
+    showRequest : function(request) {
+        if(_.has(this.requestWidgets, request.id)) {
+            var widget = this.requestWidgets[request.id];
+            if(widget.minimized) widget.unminimize();
+        }
+        else {
+            var widget = new otp.modules.fieldtrip.FieldTripRequestWidget('otp-'+this.id+'-requestWidget-'+request.id, this, request);
+            this.requestWidgets[request.id] = widget;
+        }
+        widget.bringToFront();
+    },
+    
+    planOutbound : function(request) {
+        var queryParams = {
+            fromPlace : request.startLocation,
+            toPlace : request.endLocation,
+            time : moment(request.arriveDestinationTime).format("h:mma"),
+            date : moment(request.travelDate).format("MM-DD-YYYY"),            
+            arriveBy : true,
+            groupSize : request.numStudents,
+        };
+        
+        this.optionsWidget.applyQueryParams(queryParams);
+    },
+
+    planInbound : function(request) {
+        var queryParams = {
+            time : moment(request.leaveDestinationTime).format("h:mma"),
+            date : moment(request.travelDate).format("MM-DD-YYYY"),            
+            arriveBy : false,
+            groupSize : request.numStudents,
+        };
+        
+        this.optionsWidget.applyQueryParams(queryParams);
+    },
+       
+    saveRequestTrip : function(request, type) {
+        var this_ = this;
+        this.saveTrip(function(tripId) {
+            if(type === "outbound") var url = this.datastoreUrl+'/fieldTrip/setOutboundTrip';
+            if(type === "inbound") var url = this.datastoreUrl+'/fieldTrip/setInboundTrip';
+            $.ajax(url, {
+                type: 'POST',
+                
+                data: {
+                    requestId : request.id,
+                    tripId : tripId,
+                },
+                      
+                success: function(data) {
+                    console.log("set " + type + "trip!");
+                },
+                
+                error: function(data) {
+                    console.log("error setting " + type + "trip");
+                    console.log(data);
+                }
+            });          
+        });     
+    }
+    
+    
 });

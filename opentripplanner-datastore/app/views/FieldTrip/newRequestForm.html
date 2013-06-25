@@ -42,12 +42,12 @@ If you have any questions, please email us at fieldtrips@trimet.org or call 503-
 
 
 <div class="otp-fieldTripRequest-row">
-  # of Students: <input name="request.numStudents" style="width: 40px;" />&nbsp;&nbsp;&nbsp;
+  # of Students: <input id="numStudents" name="request.numStudents" style="width: 40px;" />&nbsp;&nbsp;&nbsp;
   Age Range: <input name="request.minimumAge" style="width: 30px;" /> to <input name="request.maximumAge" style="width: 30px;" />&nbsp;&nbsp;&nbsp;# of Chaperones (including Teachers): <input name="request.numChaperones" style="width: 40px;" />
 </div>
 
 <div class="otp-fieldTripRequest-row">
-  Starting Point (Address): <input name="request.startLocation" />&nbsp;&nbsp;Destination (Address): <input name="request.endLocation" />
+  Starting Point (Address): <input id="startLocation" name="request.startLocation" />&nbsp;&nbsp;Destination (Address): <input id="endLocation" name="request.endLocation" />
 </div>
 
 <div class="otp-fieldTripRequest-row">
@@ -121,9 +121,13 @@ $(document).ready(function() {
 });
 
 function submitClicked() {
-    console.log("click");
     
     if(!checkRequired('teacherName', 'Teacher Name')) return;
+    if(!checkRequired('schoolName', 'School Name')) return;
+    if(!checkRequired('numStudents', 'Number of Students')) return;
+    if(!checkRequired('startLocation', 'Start Location Address')) return;
+    if(!checkRequired('endLocation', 'End Location Address')) return;
+    if(!checkRequired('travelDate', 'Date of Travel')) return;
     
     var arriveDestinationTime = constructTime("arriveDestinationTime");
     if(arriveDestinationTime == null) {
