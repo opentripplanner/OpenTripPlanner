@@ -268,19 +268,11 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
             if (state0.getNumBoardings() > 0) {
                 // This is not the first boarding, thus a transfer
                 TransferTable transferTable = options.getRoutingContext().transferTable;
-                if (transferTable.hasPreferredTransfers()) {
-                    // Only penalize transfers if there are some that will be depenalized
-                    transferPenalty = options.nonpreferredTransferPenalty;
-                }
                 // Get the transfer time
                 int transferTime = transferTable.getTransferTime(state0.getPreviousStop(),
                         state0.getCurrentStop(), state0.getPreviousTrip(), trip);
-                
-                if (transferTime == StopTransfer.PREFERRED_TRANSFER) {
-                    // Depenalize preferred transfers
-                    // TODO: verify correctness of this method (AMB)
-                    transferPenalty = 0;
-                }
+                // Determine transfer penalty
+                transferPenalty = transferTable.determineTransferPenalty(transferTime, options.nonpreferredTransferPenalty);
             }            
 
             StateEditor s1 = state0.edit(this);

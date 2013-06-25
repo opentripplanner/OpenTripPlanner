@@ -117,17 +117,10 @@ public class FrequencyBoard extends Edge implements OnBoardForwardEdge, PatternE
             if (state0.getNumBoardings() > 0) {
                 // This is not the first boarding, thus a transfer
                 TransferTable transferTable = options.getRoutingContext().transferTable;
-                if (transferTable.hasPreferredTransfers()) {
-                    // Only penalize transfers if there are some that will be depenalized
-                    transferPenalty = options.nonpreferredTransferPenalty;
-                }
                 // Get the transfer time
                 int transferTime = transferTable.getTransferTime(state0.getPreviousStop(),
                         state0.getCurrentStop(), state0.getPreviousTrip(), trip);
-                if (transferTime == StopTransfer.UNKNOWN_TRANSFER) {
-                    // Unknown transfer
-                    // Do nothing
-                } else if (transferTime > 0) {
+                if (transferTime > 0) {
                     // There is a minimum transfer time to make this transfer
                     // Increase current time if necessary
                     long tableBoardAfter = state0.getLastAlightedTimeSeconds() + transferTime;
@@ -137,11 +130,10 @@ public class FrequencyBoard extends Edge implements OnBoardForwardEdge, PatternE
                 } else if (transferTime == StopTransfer.FORBIDDEN_TRANSFER) {
                     // This transfer is not allowed
                     return null;
-                } else if (transferTime == StopTransfer.PREFERRED_TRANSFER) {
-                    // Depenalize preferred transfers
-                    // TODO: verify correctness of this method (AMB)
-                    transferPenalty = 0;
                 }
+                
+                // Determine transfer penalty
+                transferPenalty = transferTable.determineTransferPenalty(transferTime, options.nonpreferredTransferPenalty);
                 
                 // Check whether back edge is TimedTransferEdge
                 if (state0.getBackEdge() instanceof TimedTransferEdge) {
