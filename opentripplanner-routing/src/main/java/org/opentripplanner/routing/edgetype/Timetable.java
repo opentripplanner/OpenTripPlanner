@@ -178,7 +178,7 @@ public class Timetable implements Serializable {
             if (boarding) {
                 index = TripTimes.binarySearchDepartures(sorted, stopIndex, time);
                 while (index < ordered.size()) {
-                    TripTimes tt = ordered.get(index++);// [index++];
+                    TripTimes tt = ordered.get(index++);
                     if (tt.tripAcceptable(options, haveBicycle, stopIndex)) {
                         bestTrip = tt;
                         break;
