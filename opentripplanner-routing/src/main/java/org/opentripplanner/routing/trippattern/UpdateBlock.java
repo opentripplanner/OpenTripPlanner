@@ -133,23 +133,20 @@ public class UpdateBlock {
             if (u == null || ! u.tripId.equals(this.tripId))
                return false;
 
-        // check that sequence numbers are sequential and increasing
-        boolean increasing = true;
-        boolean sequential = true;
-        boolean timesCoherent = true;
+        // check that sequence numbers increasing
         Update prev_u = null;
         for (Update u : updates) {
             if (prev_u != null) {
-                if (u.stopSeq <= prev_u.stopSeq)
-                    increasing = false;
-                if (u.stopSeq - prev_u.stopSeq != 1)
-                    sequential = false;
-                if (u.arrive < prev_u.depart)
-                    timesCoherent = false;
+                if (u.stopSeq <= prev_u.stopSeq){
+                    return false;
+                }
+                if (u.arrive < prev_u.depart){
+                    return false;
+                }
             }
             prev_u = u;
         }
-        return increasing && timesCoherent; // || !sequential)
+        return true;
     }
 
     /**        
@@ -272,5 +269,5 @@ public class UpdateBlock {
         /* full-block match succeeded */
         return bestStop;
     }
-    
+        
 }

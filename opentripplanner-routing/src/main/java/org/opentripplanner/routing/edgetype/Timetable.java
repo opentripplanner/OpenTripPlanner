@@ -169,12 +169,16 @@ public class Timetable implements Serializable {
                 sorted = tableIndex[0]; 
             else
                 sorted = tableIndex[stopIndex];
-            // an alternative to conditional increment/decrement would be to sort the arrivals
-            // index in decreasing order, but that would require changing the search algorithm
+            // An alternative to conditional increment/decrement would be to sort the arrivals
+            // index in decreasing order, but that would require changing the search algorithm.
+            //
+            // Although we look for the right index in the sorted TripTimes, we then get the
+            // right TripTime from the ordered version, because that is the one that can
+            // contain TripTimes altered by real time updates (e.g. CanceledTripTimes)
             if (boarding) {
                 index = TripTimes.binarySearchDepartures(sorted, stopIndex, time);
-                while (index < sorted.length) {
-                    TripTimes tt = sorted[index++];
+                while (index < ordered.size()) {
+                    TripTimes tt = ordered.get(index++);// [index++];
                     if (tt.tripAcceptable(options, haveBicycle, stopIndex)) {
                         bestTrip = tt;
                         break;
@@ -183,7 +187,7 @@ public class Timetable implements Serializable {
             } else {
                 index = TripTimes.binarySearchArrivals(sorted, stopIndex, time);
                 while (index >= 0) {
-                    TripTimes tt = sorted[index--];
+                    TripTimes tt = ordered.get(index--);
                     if (tt.tripAcceptable(options, haveBicycle, stopIndex)) {
                         bestTrip = tt;
                         break;
@@ -194,7 +198,7 @@ public class Timetable implements Serializable {
         } else { 
             // no index present on this timetable. use a linear search:
             // because trips may change with stoptime updates, we cannot count on them being sorted
-            int bestTime = boarding ? Integer.MAX_VALUE : Integer.MIN_VALUE;
+            int bestTime = boarding ? Integer.MAX_VALUE : 0; // The zero is to exclude the negative times in the backward search (canceled and passed)
             for (TripTimes tt : tripTimes) { 
                 // hoping JVM JIT will distribute the loop over the if clauses as needed
                 if (boarding) {
@@ -205,7 +209,7 @@ public class Timetable implements Serializable {
                     }
                 } else {
                     int arvTime = tt.getArrivalTime(stopIndex);
-                    if (arvTime <= time && arvTime > bestTime && tt.tripAcceptable(options, haveBicycle, stopIndex)) {
+                    if (arvTime <= time && arvTime >= bestTime && tt.tripAcceptable(options, haveBicycle, stopIndex)) {
                         bestTrip = tt;
                         bestTime = arvTime;
                     }
@@ -383,7 +387,8 @@ public class Timetable implements Serializable {
                     }
                 }
             }
-            // Update succeeded, save the new TripTimes back into this Timetable.
+
+            // Update succeeded, save the new TripTimes back into this Timetable. 
             this.tripTimes.set(tripIndex, newTimes);
             return true;
         } catch (Exception e) { // prevent server from dying while debugging
