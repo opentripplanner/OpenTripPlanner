@@ -98,7 +98,8 @@ public class TestTransferTable extends TestCase {
         assertEquals(StopTransfer.TIMED_TRANSFER, table.getTransferTime(fromStop, toStopParent, fromTrip, toTrip2));
         
         // Add transfer to parent stop and unknown to child stop, specificity 3
-        table.addTransferTime(fromStop, toStop, fromRoute, null, null, toTrip, StopTransfer.UNKNOWN_TRANSFER); // don't add this one in real code
+        // WARNING: don't add transfers with StopTransfer.UNKNOWN_TRANSFER in non-testing code
+        table.addTransferTime(fromStop, toStop, fromRoute, null, null, toTrip, StopTransfer.UNKNOWN_TRANSFER);
         table.addTransferTime(fromStop, toStopParent, fromRoute, null, null, toTrip, 5);
         assertEquals(5, table.getTransferTime(fromStop, toStop, fromTrip, toTrip));
         assertEquals(4, table.getTransferTime(fromStop, toStop, fromTrip, toTrip2));
