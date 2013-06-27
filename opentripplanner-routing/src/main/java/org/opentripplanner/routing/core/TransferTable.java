@@ -44,7 +44,7 @@ public class TransferTable implements Serializable {
     protected HashMap<P2<AgencyAndId>, StopTransfer> table = new HashMap<P2<AgencyAndId>, StopTransfer>();
     
     /**
-     * Indicates that preferred transfers are present if true
+     * Preferred transfers (or timed transfers, which are preferred as well) are present if true
      */
     protected boolean preferredTransfers = false;
     
@@ -152,7 +152,9 @@ public class TransferTable implements Serializable {
         checkNotNull(fromStop);
         checkNotNull(toStop);
 
-        if (transferTime == StopTransfer.PREFERRED_TRANSFER) {
+        // Check whether this transfer is preferred (or timed)
+        if (transferTime == StopTransfer.PREFERRED_TRANSFER
+                || transferTime == StopTransfer.TIMED_TRANSFER) {
             preferredTransfers = true;
         }
         
