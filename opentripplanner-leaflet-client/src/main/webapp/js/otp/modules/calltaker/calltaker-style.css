@@ -1,8 +1,55 @@
-.otp-calltaker-mailablesSelect {
+.otp-calltaker-mailablesWidget {
+    width: 500px;
+    height: 400px;
+}
+
+.otp-calltaker-mailables-listHeader {
+    font-size: 15px;
+    font-weight: bold;
+    padding: 3px;
+}
+
+.otp-calltaker-mailables-list {
+    position: absolute;
+    top: 22px;
+    bottom: 0px;
+    width: 100%;
     border: 1px solid black;
-    width: 300px;
-    height: 100px;
+    background: white;
     overflow: auto;
-    margin-top: 10px;
-    padding: 5px;
+    
+    -moz-box-sizing:    border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing:         border-box;
+}
+
+.otp-calltaker-mailables-fullListItem {
+    padding: 3px;
+    margin: 4px;
+    background: #eee;
+    cursor: move;
+}
+
+.otp-calltaker-mailables-selectedListHover {
+    background: #cff;
+    border: 2px solid black;
+}
+
+.otp-calltaker-mailables-selectedListItem {
+    padding: 3px;
+    margin: 4px;
+    background: #eee;
+}
+
+.otp-calltaker-mailables-selectedListItem-name {
+    font-weight: bold;
+}
+
+.otp-calltaker-mailables-selectedListItem-closeButton {
+    font-size: 10px;
+}
+
+.otp-calltaker-mailables-selectedListItem-quantity {
+    width: 20px;
+    font-size: 10px;
 }
