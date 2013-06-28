@@ -592,46 +592,28 @@ public class TestRequest extends TestCase {
         assertTrue(leg.to.stopId.getId().equals("2109"));
     }
     
+    @SuppressWarnings("deprecation")
     public void testBannedStopGroup() throws JSONException, ParameterException {
         // Create StopMatcher instance
         StopMatcher stopMatcher = StopMatcher.parse("TriMet_2106,TriMet_65-tc");
         // Find stops in graph
-        Stop stop65_tc = null;
-        Stop stop12921 = null;
-        Stop stop13132 = null;
-        Stop stop2106 = null;
-        Stop stop2107 = null;
-        {
-            Graph graph = Context.getInstance().graph;
-            for (Vertex v : graph.getVertices()) {
-               if (v instanceof TransitStop) {
-                   Stop stop = ((TransitStop)v).getStop();
-                   if (stop.getId().getAgencyId().equals("TriMet")) {
-                       if (stop.getId().getId().equals("65-tc")) {
-                           stop65_tc = stop;
-                       }
-                       else if (stop.getId().getId().equals("12921")) {
-                           stop12921 = stop;
-                       }
-                       else if (stop.getId().getId().equals("13132")) {
-                           stop13132 = stop;
-                       }
-                       else if (stop.getId().getId().equals("2106")) {
-                           stop2106 = stop;
-                       }
-                       else if (stop.getId().getId().equals("2107")) {
-                           stop2107 = stop;
-                       }
-                   }
-               }
-            }
-        }
-        // All stops should be found
+        Graph graph = Context.getInstance().graph;
+        
+        Stop stop65_tc = ((TransitStop) graph.getVertex("TriMet_65-tc")).getStop();
         assertNotNull(stop65_tc);
+        
+        Stop stop12921 = ((TransitStop) graph.getVertex("TriMet_12921")).getStop();
         assertNotNull(stop12921);
+        
+        Stop stop13132 = ((TransitStop) graph.getVertex("TriMet_13132")).getStop();
         assertNotNull(stop13132);
+        
+        Stop stop2106 = ((TransitStop) graph.getVertex("TriMet_2106")).getStop();
         assertNotNull(stop2106);
+        
+        Stop stop2107 = ((TransitStop) graph.getVertex("TriMet_2107")).getStop();
         assertNotNull(stop2107);
+        
         // Match stop with id 65-tc
         assertTrue(stopMatcher.matches(stop65_tc));
         // Match stop with id 12921 that has TriMet_65-tc as a parent
