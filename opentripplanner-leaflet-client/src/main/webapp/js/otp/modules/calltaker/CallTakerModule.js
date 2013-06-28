@@ -87,8 +87,8 @@ otp.modules.calltaker.CallTakerModule =
             var query = new otp.modules.calltaker.Query();
             query.set({
                 queryParams : JSON.stringify(tripPlan.queryParams),
-                fromPlace: this.fromPlaceName || otp.util.Geo.truncatedLatLng(otp.util.Itin.getLocationPlace(tripPlan.queryParams.fromPlace)),
-                toPlace: this.toPlaceName || otp.util.Geo.truncatedLatLng(otp.util.Itin.getLocationPlace(tripPlan.queryParams.toPlace)),
+                fromPlace: this.startName || otp.util.Geo.truncatedLatLng(otp.util.Itin.getLocationPlace(tripPlan.queryParams.fromPlace)),
+                toPlace: this.endName || otp.util.Geo.truncatedLatLng(otp.util.Itin.getLocationPlace(tripPlan.queryParams.toPlace)),
                 timeStamp : moment().format("YYYY-MM-DDTHH:mm:ss"),
             });
             
