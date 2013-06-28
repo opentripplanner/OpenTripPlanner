@@ -161,11 +161,23 @@ public abstract class RoutingResource {
      */
     @DefaultValue("") @QueryParam("bannedStops") protected List<String> bannedStops;
     
-    /** An additional penalty added to boardings after the first.  The value is in OTP's
-     *  internal weight units, which are roughly equivalent to seconds.  Set this to a high
-     *  value to discourage transfers.  Of course, transfers that save significant
-     *  time or walking will still be taken.*/
+    /**
+     * An additional penalty added to boardings after the first.  The value is in OTP's
+     * internal weight units, which are roughly equivalent to seconds.  Set this to a high
+     * value to discourage transfers.  Of course, transfers that save significant
+     * time or walking will still be taken.
+     */
     @DefaultValue("-1") @QueryParam("transferPenalty") protected List<Integer> transferPenalty;
+    
+    /**
+     * An additional penalty added to boardings after the first when the transfer is not
+     * preferred. Preferred transfers also include timed transfers. The value is in OTP's
+     * internal weight units, which are roughly equivalent to seconds. Set this to a high
+     * value to discourage transfers that are not preferred. Of course, transfers that save
+     * significant time or walking will still be taken.
+     * When no preferred or timed transfer is defined, this value is ignored.
+     */
+    @DefaultValue("-1") @QueryParam("nonpreferredTransferPenalty") protected List<Integer> nonpreferredTransferPenalty;
     
     /** The maximum number of transfers (that is, one plus the maximum number of boardings)
      *  that a trip will be allowed.  Larger values will slow performance, but could give
@@ -345,6 +357,7 @@ public abstract class RoutingResource {
         request.setBoardSlack(get(boardSlack, n, request.getBoardSlack()));
         request.setAlightSlack(get(alightSlack, n, request.getAlightSlack()));
         request.setTransferSlack(get(minTransferTime, n, request.getTransferSlack()));
+        request.setNonpreferredTransferPenalty(get(nonpreferredTransferPenalty, n, request.getNonpreferredTransferPenalty()));
 
         if (request.getBoardSlack() + request.getAlightSlack() > request.getTransferSlack()) {
             throw new RuntimeException("Invalid parameters: transfer slack must "
