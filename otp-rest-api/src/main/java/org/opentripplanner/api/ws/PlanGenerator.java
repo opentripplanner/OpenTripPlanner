@@ -198,20 +198,6 @@ public class PlanGenerator {
                 continue;
             }
 
-            // debug: push vehicle late status out to UI
-            if (backEdge instanceof PatternHop) {
-                TripTimes tt = state.getTripTimes();
-                int hop = ((PatternHop)backEdge).stopIndex;
-                if ( ! tt.isScheduled()) {
-                	leg.realTime = true;
-                	leg.departureDelay = tt.getDepartureDelay(hop);
-                	leg.arrivalDelay = tt.getArrivalDelay(hop);
-                } 
-                else {
-                	leg.realTime = false;
-                }
-            }
-
             TraverseMode mode = state.getBackMode();
             if (mode != null) {
                 long dt = state.getAbsTimeDeltaSeconds();
@@ -387,6 +373,11 @@ public class PlanGenerator {
                     } else {
                         leg = makeLeg(itinerary, state);
                         leg.from.stopIndex = ((OnBoardForwardEdge)backEdge).getStopIndex();
+                        TripTimes tt = state.getTripTimes();
+                        if ( ! tt.isScheduled()) {
+                            leg.realTime = true;
+                            leg.departureDelay = tt.getDepartureDelay(leg.from.stopIndex);
+                        }
                         leg.stop = new ArrayList<Place>();
                         itinerary.transfers++;
                         leg.boardRule = (String) state.getExtension("boardAlightRule");
@@ -541,6 +532,11 @@ public class PlanGenerator {
             name = backEdge.getName();
         } else {
             name = state.getVertex().getName();
+        }
+        if (backEdge instanceof PatternHop) {
+            TripTimes tt = state.getTripTimes();
+            int hop = ((PatternHop)backEdge).stopIndex;
+            leg.arrivalDelay = tt.getArrivalDelay(hop);
         }
         leg.to = makePlace(state, name, true);
         coordinates.clear();
