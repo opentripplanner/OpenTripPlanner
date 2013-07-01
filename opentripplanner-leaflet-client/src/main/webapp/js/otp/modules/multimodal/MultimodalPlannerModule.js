@@ -38,13 +38,19 @@ otp.modules.multimodal.MultimodalPlannerModule =
 
         // setup options widget
         
-        this.optionsWidget = new otp.widgets.tripoptions.TripOptionsWidget(
-            'otp-'+this.id+'-optionsWidget', this, {
+        var optionsWidgetConfig = {
                 title : 'Trip Options',
                 closeable : true,
                 persistOnClose: true,
-            }
-        );
+        };
+        
+        if(typeof this.tripOptionsWidgetCssClass !== 'undefined') {
+            console.log("set tripOptionsWidgetCssClass: " + this.tripOptionsWidgetCssClass); 
+            optionsWidgetConfig['cssClass'] = this.tripOptionsWidgetCssClass;
+        }
+        
+        this.optionsWidget = new otp.widgets.tripoptions.TripOptionsWidget(
+            'otp-'+this.id+'-optionsWidget', this, optionsWidgetConfig);
 
         if(this.webapp.geocoders && this.webapp.geocoders.length > 0) {
             this.optionsWidget.addControl("locations", new otp.widgets.tripoptions.LocationsSelector(this.optionsWidget, this.webapp.geocoders), true);

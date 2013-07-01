@@ -27,6 +27,9 @@ otp.modules.calltaker.CallTakerModule =
     
     templateFile : 'otp/modules/calltaker/calltaker-templates.html',
     
+    tripOptionsWidgetCssClass : 'otp-calltaker-tripOptionsWidget',
+    itinerariesWidgetCssClass : 'otp-calltaker-itinerariesWidget',
+    
     initialize : function(webapp, id, options) {
         otp.modules.multimodal.MultimodalPlannerModule.prototype.initialize.apply(this, arguments);
         
@@ -36,8 +39,8 @@ otp.modules.calltaker.CallTakerModule =
     
     activate : function() {    
         if(this.activated) return;
+        console.log("activate ctm: " + this.tripOptionsWidgetCssClass);
         otp.modules.multimodal.MultimodalPlannerModule.prototype.activate.apply(this);
-        console.log("activate ctm");        
         
         this.initSession();
         

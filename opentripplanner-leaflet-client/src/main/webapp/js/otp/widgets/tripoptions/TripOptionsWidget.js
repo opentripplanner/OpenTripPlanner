@@ -28,9 +28,11 @@ otp.widgets.tripoptions.TripOptionsWidget =
     initialize : function(id, module, options) {
     
         options = options || {};
-        if(!_.has(options, 'title')) _.extend(options, { title : 'Travel Options' });
-        _.extend(options, { cssClass : 'otp-defaultTripWidget' });
+        if(!_.has(options, 'title')) options['title'] = 'Travel Options';
+        if(!_.has(options, 'cssClass')) options['cssClass'] = 'otp-defaultTripWidget';
         otp.widgets.Widget.prototype.initialize.call(this, id, module, options);
+
+        this.mainDiv.addClass('otp-tripOptionsWidget');
         
         //this.planTripCallback = planTripCallback;
         this.module = module;

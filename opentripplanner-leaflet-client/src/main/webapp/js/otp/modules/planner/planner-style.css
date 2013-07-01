@@ -2,7 +2,7 @@
 
 /* Itineraries Widget */
 
-.otp-itinsWidget {
+.otp-defaultItinsWidget {
   top: 60px;
   left: 10px;
   width: 300px;
@@ -10,13 +10,13 @@
 }
 
 @media only screen and (min-width: 1024px) {
-  .otp-itinsWidget {
+  .otp-defaultItinsWidget {
     width: 450px;
   }
 }
 
 @media only screen and (min-height: 768px) {
-  .otp-itinsWidget {
+  .otp-defaultItinsWidget {
     hieght: 350px;
   }
 }

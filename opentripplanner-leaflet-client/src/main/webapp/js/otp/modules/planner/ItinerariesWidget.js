@@ -39,7 +39,7 @@ otp.widgets.ItinerariesWidget =
 
         otp.widgets.Widget.prototype.initialize.call(this, id, module, {
             title : "Itineraries",
-            cssClass : 'otp-itinsWidget',
+            cssClass : module.itinerariesWidgetCssClass || 'otp-defaultItinsWidget',
             resizable : true,
             closeable : true,
             persistOnClose : true,
