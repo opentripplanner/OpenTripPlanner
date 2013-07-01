@@ -56,14 +56,19 @@ public abstract class TripTimes {
         
     /** 
      * @return the time in seconds after midnight at which the vehicle begins traversing each 
-     * inter-stop segment ("hop"). 
+     * inter-stop segment ("hop"), or special negative values for PASSED or CANCELED if real time
+     * updates are being used. Both getArrivalTime and getDepartureTime should return the same
+     * special value for the same stop (not hop).
      */
     public abstract int getDepartureTime(int hop);
     
     /** 
      * @return the time in seconds after midnight at which the vehicle arrives at the end of each 
-     * inter-stop segment ("hop"). A null value indicates that all dwells are 0-length, and arrival 
-     * times are to be derived from the departure times array. 
+     * inter-stop segment ("hop"), or special negative values for PASSED or CANCELED if real time
+     * updates are being used. Both getArrivalTime and getDepartureTime should return the same
+     * special value for the same stop (not hop).
+     *  If all dwells are 0-length the implementation does not store an arrival times array 
+     * (it is null) and this function will read through to the departure times array.
      */
     public abstract int getArrivalTime(int hop);
 
@@ -208,6 +213,11 @@ public abstract class TripTimes {
      * from Arrays.binarysearch: this is a mirror-image of the departure search algorithm.
      * 
      * TODO: I have worked through corner cases but should reverify with some critical distance.
+     * 
+     * If there are canceled or passed trips from real time updates, all those trips will be sorted
+     * at the beginning of the array. If there are no arrivals before the specified time then we
+     * may return an index to one of these canceled or passed trips. The caller is required to 
+     * catch this situation.
      */
     public static int binarySearchArrivals(TripTimes[] a, int hop, int key) {
         int low = 0;
@@ -250,11 +260,19 @@ public abstract class TripTimes {
         }
         if (options.wheelchairAccessible && trip.getWheelchairAccessible() != 1)
             return false;
-        if (bicycle)
+        if (bicycle){
             if ((trip.getTripBikesAllowed() != 2) &&    // trip does not explicitly allow bikes and
                 (trip.getRoute().getBikesAllowed() != 2 // route does not explicitly allow bikes or  
-                || trip.getTripBikesAllowed() == 1))    // trip explicitly forbids bikes
-                return false; 
+                || trip.getTripBikesAllowed() == 1)){    // trip explicitly forbids bikes
+                return false;
+            }
+        }
+        // Canceled trips or passed stops return special negative values
+        // Arrival time is undefined for the 0th stop, but we only need to check the departure time
+        // because for stops with special values both arrival and departure should return the same value
+        if (this.getDepartureTime(stopIndex) < 0){
+        	return false;
+        }
         return true;
     }
 
