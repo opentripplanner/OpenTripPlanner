@@ -33,76 +33,54 @@ public class Application extends Controller {
 
     }
     
-    public static void initLogin() {
-        String username = "test";
-        TrinetUser user = TrinetUser.find("byUsername", username).first();
-        String sessionId = null;
-        if(user != null) {
-            sessionId = nextSessionId();
-            Session trinetSession = new Session(sessionId, user);
-            trinetSession.save();
-            System.out.println("saved session" + sessionId + " for user "+user);
-        }
-        
-        Map<String, String> resp = new HashMap<String, String>();
-        resp.put("sessionId", sessionId);
-        resp.put("username", user.username);
-        renderJSON(resp);
-    }
     
+    // called internally by CallTaker/FieldTrip controller
     public static TrinetUser checkLogin() {
         String sessionId = params.get("sessionId");
         
-        Session session = Session.find("bySessionId", sessionId).first();
-        if(session == null) {
+        Session userSession = Session.find("bySessionId", sessionId).first();
+        if(userSession == null) {
             forbidden();
         }
-        System.out.println("retrieved session for user: "+session.user);
-        return session.user;
+        System.out.println("retrieved session for user: "+userSession.user);
+        return userSession.user;
     }
     
+    public static void newSession() {
+        Map<String, String> resp = new HashMap<String, String>();
+        resp.put("sessionId", nextSessionId());
+        renderJSON(resp);
+    }
+
+    public static void checkSession(String sessionId) {
+        Session userSession = Session.find("bySessionId", sessionId).first();
+
+        Map<String, String> resp = new HashMap<String, String>();
+        resp.put("sessionId", sessionId);
+        if(session != null) {
+            resp.put("username", userSession.user.username);            
+        }
+        renderJSON(resp);
+    }
+    
+    public static void verifyLogin(String session, String redirect) {
+
+        System.out.println("\n** verifyLogin ** " + redirect +  " \n");
+        System.out.println("headers: "+ request.headers);
+        
+        String username = request.headers.get("x-remote-user").value();
+        TrinetUser user = TrinetUser.find("byUsername", username).first();
+        Session userSession = new Session(session, user);
+        userSession.save();
+        System.out.println("initialized session " + session + " for user "+username);
+        
+        String redirectUrl = redirect + "?sessionId=" + session;
+        System.out.println("redirecting to: " + redirectUrl);
+        redirect(redirectUrl);
+    }
         
     public static String nextSessionId() {
         return new BigInteger(130, random).toString(32);
     }
     
-    /*@Util
-    public static void renderJSON(Object obj) {
-        if (request.params._contains("callback")) {
-            Gson gson = new Gson();
-            String json = gson.toJson(obj);
-            //System.out.println("returning as jsonp (u): "+json);
-            renderText(request.params.get("callback") + "(" + json + ")");            
-        } else {
-            renderJSON(obj);
-        }      
-    }*/
-    
-    
-    /*@Before(priority=0)
-    public static void checkPassword() {
-        request.user = null;
-
-        String username = params.get("userName");
-        String password = params.get("password");
-        System.out.println("checkPassword "+username);
-        User user = getUser(username);
-        if (user == null) {
-            Logger.debug("no user by this username: %s (count = %s)", username, User.count());
-            forbidden();
-        }
-        if (user.checkPassword(password)) {
-            request.user = username;
-            Logger.debug("Logged in %s", user.userName);
-        } else {
-            Logger.debug("bad password");
-            forbidden();
-        }
-    }*/
-    
-
-    /*static User getUser() {
-        System.out.println("getUser(): "+request.user);
-        return getUser(request.user);
-    }*/
 }

@@ -42,7 +42,15 @@ otp.modules.calltaker.CallTakerModule =
         console.log("activate ctm: " + this.tripOptionsWidgetCssClass);
         otp.modules.multimodal.MultimodalPlannerModule.prototype.activate.apply(this);
         
-        this.initSession();
+        // initialize the session
+        if(_.has(this.webapp.urlParams, 'sessionId')) {
+            console.log("received session id: " + this.webapp.urlParams['sessionId']);
+            this.checkSession(this.webapp.urlParams['sessionId']);
+        }
+        else { // no sessionId passed in; must request one from server
+            console.log("creating new session..");
+            this.newSession();
+        }
         
         this.mailablesWidget = new otp.modules.calltaker.MailablesWidget(this.id+'-mailablesWidget', this);
     },
@@ -54,7 +62,8 @@ otp.modules.calltaker.CallTakerModule =
         };
     },
     
-    initSession : function() {
+    /*initSession : function() {
+        
         var this_ = this;
         var url = otp.config.datastoreUrl+'/auth/initLogin';
         $.ajax(url, {
@@ -73,6 +82,55 @@ otp.modules.calltaker.CallTakerModule =
             }
         });
                 
+    },*/
+    
+    newSession : function() {
+        var this_ = this;
+        var url = otp.config.datastoreUrl+'/auth/newSession';
+        $.ajax(url, {
+            type: 'GET',
+            dataType: 'json',
+            
+            success: function(data) {
+                console.log("newSession success: "+data.sessionId);
+                var redirectUrl = this_.options.trinet_verify_login_url + "?session=" + data.sessionId + "&redirect=" + this_.options.module_redirect_url;
+                console.log("redirect url: "+redirectUrl);
+                window.location = redirectUrl;
+            },
+            
+            error: function(data) {
+                console.log("newSession error");
+                console.log(data);
+            }
+        });
+    },
+    
+    checkSession : function(sessionId) {
+        var this_ = this;
+        var url = otp.config.datastoreUrl+'/auth/checkSession';
+        $.ajax(url, {
+            type: 'GET',
+            data: {
+                sessionId : sessionId,
+            },
+            dataType: 'json',
+            
+            success: function(data) {
+                if(data.username) {
+                    this_.sessionId = sessionId;
+                    this_.username = data.username;
+                    this_.showHistoryWidget();
+                }
+                else {
+                    console.log("bad session id: " + sessionId);
+                }
+            },
+            
+            error: function(data) {
+                console.log("checkSession error");
+                console.log(data);
+            }
+        });
     },
     
     showHistoryWidget : function() {
@@ -114,15 +172,11 @@ otp.modules.calltaker.CallTakerModule =
         });
         var this_ = this;
         this.saveModel(this.activeCall, function(model) {
-            console.log("saveModel call:");
-            console.log(model.queries);
             for(var i=0; i < model.queries.length; i++) {
                 var query = model.queries[i];
                 query.set({
                     "call.id" : model.id
                 });
-                console.log("updated query:");
-                console.log(query);
                 this_.saveModel(query);
             }
         });
@@ -134,8 +188,8 @@ otp.modules.calltaker.CallTakerModule =
     },
             
     saveModel : function(model, successCallback) {
-        console.log("saveModel");
-        console.log(model);
+        //console.log("saveModel");
+        //console.log(model);
         
         var data = {
             sessionId : this.sessionId,

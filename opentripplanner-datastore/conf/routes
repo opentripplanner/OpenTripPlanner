@@ -37,6 +37,10 @@ POST     /admin/addUser                         Admin.addUser
 # Trinet Authentication
 GET      /auth/initLogin                        Application.initLogin
 
+GET      /auth/checkSession                     Application.checkSession
+GET      /auth/newSession                       Application.newSession
+GET      /auth/verifyLogin                      Application.verifyLogin
+
 # Ignore favicon requests
 GET     /favicon.ico                            404
 
