@@ -47,11 +47,11 @@ public class Leg {
     public Calendar endTime = null;
     
     /**
-     * The delay of this leg in seconds, in the case there is real-time data about it;
+     * For transit leg, the offset from the scheduled departure-time of the boarding stop in this leg.
      */
     public int departureDelay = 0;
     /**
-     * The delay of this leg in seconds, in the case there is real-time data about it;
+     * For transit leg, the offset from the scheduled arrival-time of the alighting stop in this leg.
      */
     public int arrivalDelay = 0;
     /**
