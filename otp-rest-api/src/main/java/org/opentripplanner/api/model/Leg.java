@@ -48,10 +48,12 @@ public class Leg {
     
     /**
      * For transit leg, the offset from the scheduled departure-time of the boarding stop in this leg.
+     * "scheduled time of departure at boarding stop" = startTime - departureDelay
      */
     public int departureDelay = 0;
     /**
      * For transit leg, the offset from the scheduled arrival-time of the alighting stop in this leg.
+     * "scheduled time of arrival at alighting stop" = endTime - arrivalDelay
      */
     public int arrivalDelay = 0;
     /**
