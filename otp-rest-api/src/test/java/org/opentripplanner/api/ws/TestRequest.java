@@ -89,7 +89,6 @@ import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.impl.TravelingSalesmanPathService;
 import org.opentripplanner.routing.patch.Patch;
-import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PatchService;
 import org.opentripplanner.routing.spt.GraphPath;
