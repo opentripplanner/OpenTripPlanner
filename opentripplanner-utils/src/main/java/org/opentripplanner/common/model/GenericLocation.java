@@ -116,11 +116,12 @@ public class GenericLocation implements Cloneable {
     
     /**
      * Construct from a name, place pair.
-     * 
-     * Parses latitude, longitude data from the place string.
-     * 
-     * @param name
-     * @param place
+     * Parses latitude, longitude data, heading and numeric edge ID out of the place string.
+     * Note that if the place string does not appear to contain a lat/lon pair, heading, or edge ID
+     * the GenericLocation will be missing that information but will still retain the place string,
+     * which will be interpreted during routing context construction as a vertex label within the 
+     * graph for the appropriate routerId (by StreetVertexIndexServiceImpl.getVertexForLocation()).
+     * TODO: Perhaps the interpretation as a vertex label should be done here for clarity.
      */
     public GenericLocation(String name, String place) {
         this.name = name;
