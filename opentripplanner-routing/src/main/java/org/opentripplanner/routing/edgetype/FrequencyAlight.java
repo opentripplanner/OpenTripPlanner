@@ -19,6 +19,8 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
+import org.opentripplanner.routing.core.StopTransfer;
+import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Edge;
@@ -81,13 +83,53 @@ public class FrequencyAlight extends Edge  implements OnBoardReverseEdge {
             if (!options.getModes().get(modeMask)) {
                 return null;
             }
+            
+            /*
+             * Check transfer rules. This is possible here because the pattern always returns the
+             * same trip. 
+             */
+            
+            // Current time is used to find the next trip
+            long currentTime = state0.getTimeSeconds();
+            
+            int transferPenalty = 0;
+            if (state0.getNumBoardings() > 0) {
+                // This is not the first boarding, thus a transfer
+                TransferTable transferTable = options.getRoutingContext().transferTable;
+                // Get the transfer time
+                int transferTime = transferTable.getTransferTime(state0.getPreviousStop(),
+                        state0.getCurrentStop(), state0.getPreviousTrip(), trip);
+                if (transferTime > 0) {
+                    // There is a minimum transfer time to make this transfer
+                    // Decrease current time if necessary
+                    long tableAlightBefore = state0.getLastAlightedTimeSeconds() - transferTime;
+                    if (tableAlightBefore < currentTime) {
+                        currentTime = tableAlightBefore;
+                    }
+                } else if (transferTime == StopTransfer.FORBIDDEN_TRANSFER) {
+                    // This transfer is not allowed
+                    return null;
+                }
+                
+                // Determine transfer penalty
+                transferPenalty = transferTable.determineTransferPenalty(transferTime, options.nonpreferredTransferPenalty);
+                
+                // Check whether back edge is TimedTransferEdge
+                if (state0.getBackEdge() instanceof TimedTransferEdge) {
+                    // Transfer must be of type TIMED_TRANSFER
+                    if (transferTime != StopTransfer.TIMED_TRANSFER) {
+                        return null;
+                    }
+                }
+            }
+            
+            
             /* find next boarding time */
             /*
              * check lists of transit serviceIds running yesterday, today, and tomorrow (relative to
              * initial state) if this pattern's serviceId is running look for the next boarding time
              * choose the soonest boarding time among trips starting yesterday, today, or tomorrow
              */
-            long currentTime = state0.getTimeSeconds();
             int bestWait = -1;
             TraverseMode mode = state0.getNonTransitMode();
             if (options.bannedTrips.containsKey(trip.getId())) {
@@ -143,6 +185,7 @@ public class FrequencyAlight extends Edge  implements OnBoardReverseEdge {
             s1.incrementTimeInSeconds(bestWait);
             s1.incrementNumBoardings();
             s1.setTripId(trip.getId());
+            s1.setPreviousTrip(trip);
             s1.setZone(pattern.getZone(stopIndex));
             s1.setRoute(trip.getRoute().getId());
 
@@ -153,6 +196,7 @@ public class FrequencyAlight extends Edge  implements OnBoardReverseEdge {
                 wait_cost *= options.waitReluctance;
             }
             s1.incrementWeight(preferences_penalty);
+            s1.incrementWeight(transferPenalty);
             s1.incrementWeight(wait_cost + options.getBoardCost(mode));
             s1.setBackMode(TraverseMode.ALIGHTING);
             return s1.makeState();
@@ -170,7 +214,7 @@ public class FrequencyAlight extends Edge  implements OnBoardReverseEdge {
             }
             s1.setTripId(null);
             s1.setLastAlightedTimeSeconds(state0.getTimeSeconds());
-            s1.setPreviousStop(fromv);
+            s1.setPreviousStop(((TransitVertex) fromv).getStop());
             s1.setBackMode(TraverseMode.ALIGHTING);
             return s1.makeState();
         }

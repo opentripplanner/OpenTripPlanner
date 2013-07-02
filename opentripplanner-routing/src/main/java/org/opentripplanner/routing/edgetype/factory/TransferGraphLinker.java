@@ -13,17 +13,27 @@
 
 package org.opentripplanner.routing.edgetype.factory;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.routing.core.StopTransfer;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.TransitStopArrive;
+import org.opentripplanner.routing.vertextype.TransitStopDepart;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 
 /** Link graph based on transfers.txt.  Intended for testing */
+@Deprecated
 public class TransferGraphLinker {
 
     private Graph graph;
@@ -34,28 +44,48 @@ public class TransferGraphLinker {
     }
     
     public void run() {
-        for (TransferTable.Transfer transfer : graph.getTransferTable().getAllTransfers()) {
- 
-            double distance = distanceLibrary.distance(transfer.from.getCoordinate(), 
-                    transfer.to.getCoordinate());
+        // Create a mapping from StopId to StopVertices
+        Map<AgencyAndId, TransitStopArrive> stopArriveNodes = new HashMap<AgencyAndId, TransitStopArrive>();
+        Map<AgencyAndId, TransitStopDepart> stopDepartNodes = new HashMap<AgencyAndId, TransitStopDepart>();
+        for (Vertex v : graph.getVertices()) {
+            if (v instanceof TransitStopArrive) {
+                TransitStopArrive transitStop = (TransitStopArrive)v; 
+                Stop stop = transitStop.getStop();
+                stopArriveNodes.put(stop.getId(), transitStop);
+            }
+            else if (v instanceof TransitStopDepart) {
+                TransitStopDepart transitStop = (TransitStopDepart)v; 
+                Stop stop = transitStop.getStop();
+                stopDepartNodes.put(stop.getId(), transitStop);
+            }
+        } 
+        
+        // Create edges
+        for (TransferTable.Transfer transfer : graph.getTransferTable().getAllFirstSpecificTransfers()) {
+            Vertex fromVertex = stopArriveNodes.get(transfer.fromStopId);
+            Vertex toVertex = stopDepartNodes.get(transfer.toStopId);
+
+            double distance = distanceLibrary.distance(fromVertex.getCoordinate(), 
+                    toVertex.getCoordinate());
             TransferEdge edge = null;
             switch (transfer.seconds) {
-                case TransferTable.FORBIDDEN_TRANSFER:
+                case StopTransfer.FORBIDDEN_TRANSFER:
+                case StopTransfer.UNKNOWN_TRANSFER:
                     break;
-                case TransferTable.PREFERRED_TRANSFER:
-                case TransferTable.TIMED_TRANSFER:
-                    edge = new TransferEdge(transfer.from,
-                            transfer.to, distance);
+                case StopTransfer.PREFERRED_TRANSFER:
+                case StopTransfer.TIMED_TRANSFER:
+                    edge = new TransferEdge(fromVertex,
+                            toVertex, distance);
                     break;
                 default:
-                    edge = new TransferEdge(transfer.from,
-                            transfer.to, distance, transfer.seconds);
+                    edge = new TransferEdge(fromVertex,
+                            toVertex, distance, transfer.seconds);
             }
             
             if (edge != null) {
                 LineString geometry = GeometryUtils.getGeometryFactory().createLineString(new Coordinate[] {
-                        transfer.from.getCoordinate(),
-                        transfer.to.getCoordinate() });
+                        fromVertex.getCoordinate(),
+                        toVertex.getCoordinate() });
                 edge.setGeometry(geometry);
             }
         }

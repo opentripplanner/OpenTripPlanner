@@ -18,6 +18,7 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.TransitStopDepart;
 
 import com.vividsolutions.jts.geom.LineString;
 
@@ -86,6 +87,8 @@ public class TransferEdge extends Edge {
             return null;
         }
         StateEditor s1 = s0.edit(this);
+        s1.setEverBoarded(true);
+        s1.setCurrentStop(((TransitStopDepart) tov).getStop());
         s1.incrementTimeInSeconds(time);
         s1.incrementWeight(time);
         s1.setBackMode(TraverseMode.TRANSFER);
