@@ -626,6 +626,50 @@ public class TestRequest extends TestCase {
         assertFalse(stopMatcher.matches(stop2107));
     }
     
+    public void testTransferPenalty() throws JSONException {
+        // Plan short trip
+        TestPlanner planner = new TestPlanner("portland", "45.5264892578125,-122.60479259490967", "45.511622,-122.645564");
+        // Don't use non-preferred transfer penalty
+        planner.setNonpreferredTransferPenalty(Arrays.asList(0));
+        // Check number of legs when using different transfer penalties
+        checkLegsWithTransferPenalty(planner, 0, 7, false);
+        checkLegsWithTransferPenalty(planner, 1800, 7, true);
+    }
+
+    public void testTransferPenalty2() throws JSONException {
+        // Plan short trip
+        TestPlanner planner = new TestPlanner("portland", "45.514861,-122.612035", "45.483096,-122.540624");
+        // Don't use non-preferred transfer penalty
+        planner.setNonpreferredTransferPenalty(Arrays.asList(0));
+        // Check number of legs when using different transfer penalties
+        checkLegsWithTransferPenalty(planner, 0, 5, false);
+        checkLegsWithTransferPenalty(planner, 1800, 5, true);
+    }
+    
+    /**
+     * Checks the number of legs when using a specific transfer penalty while planning.
+     * @param planner is the test planner to use
+     * @param transferPenalty is the value for the transfer penalty
+     * @param expectedLegs is the number of expected legs
+     * @param smaller if true, number of legs should be smaller; if false, number of legs should be exact
+     * @throws JSONException
+     */
+    private void checkLegsWithTransferPenalty(TestPlanner planner, int transferPenalty,
+            int expectedLegs, boolean smaller) throws JSONException {
+        // Set transfer penalty
+        planner.setTransferPenalty(Arrays.asList(transferPenalty));
+        // Do the planning
+        Response response = planner.getItineraries();
+        Itinerary itinerary = response.getPlan().itinerary.get(0);
+        // Check the number of legs
+        if (smaller) {
+            assertTrue(itinerary.legs.size() < expectedLegs);
+        }
+        else {
+            assertEquals(expectedLegs, itinerary.legs.size());
+        }
+    }
+    
     /**
      * Subclass of Planner for testing. Constructor sets fields that would usually be set by Jersey from HTTP Query string.
      */
@@ -667,6 +711,14 @@ public class TestRequest extends TestCase {
 
         public void setBannedStops(List<String> bannedStops) {
             this.bannedStops = bannedStops;
+        }
+        
+        public void setTransferPenalty(List<Integer> transferPenalty) {
+            this.transferPenalty = transferPenalty;
+        }
+        
+        public void setNonpreferredTransferPenalty(List<Integer> nonpreferredTransferPenalty) {
+            this.nonpreferredTransferPenalty = nonpreferredTransferPenalty;
         }
         
         public RoutingRequest buildRequest() throws ParameterException {
