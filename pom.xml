@@ -193,7 +193,7 @@
         <artifactId>maven-javadoc-plugin</artifactId>
         <configuration>
           <links>
-            <link>http://developer.onebusaway.org/apidocs/modules/onebusaway-gtfs/1.3.0/</link>
+            <link>http://developer.onebusaway.org/apidocs/modules/onebusaway-gtfs/1.3.1/</link>
           </links>
         </configuration>
         <reportSets>
@@ -445,7 +445,7 @@
       <dependency>
         <groupId>org.onebusaway</groupId>
         <artifactId>onebusaway-gtfs</artifactId>
-        <version>1.3.0</version>
+        <version>1.3.1</version>
       </dependency>
       <dependency>
         <groupId>junit</groupId>

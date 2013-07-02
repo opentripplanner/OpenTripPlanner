@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.Set;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.automata.AutomatonState;
@@ -218,6 +219,10 @@ public class State implements Cloneable {
         return stateData.tripId;
     }
 
+    public Trip getPreviousTrip() {
+        return stateData.previousTrip;
+    }
+    
     public String getZone() {
         return stateData.zone;
     }
@@ -253,10 +258,14 @@ public class State implements Cloneable {
         return !isBikeRenting();
     }
 
-    public Vertex getPreviousStop() {
+    public Stop getPreviousStop() {
         return stateData.previousStop;
     }
 
+    public Stop getCurrentStop() {
+        return stateData.currentStop;
+    }
+    
     public long getLastAlightedTimeSeconds() {
         return stateData.lastAlightedTime;
     }

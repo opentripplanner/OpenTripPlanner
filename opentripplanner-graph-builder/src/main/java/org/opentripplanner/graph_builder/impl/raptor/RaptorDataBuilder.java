@@ -179,7 +179,7 @@ public class RaptorDataBuilder implements GraphBuilder {
                     .getTripIdToInterlineDwellData().entrySet()) {
                 InterlineDwellData dwellData = entry.getValue();
                 AgencyAndId fromTripId = entry.getKey();
-                AgencyAndId toTripId = dwellData.trip;
+                AgencyAndId toTripId = dwellData.trip.getId();
                 RaptorInterlineData interlineData = new RaptorInterlineData();
                 interlineData.fromTripId = fromTripId;
                 interlineData.toTripId = toTripId;
