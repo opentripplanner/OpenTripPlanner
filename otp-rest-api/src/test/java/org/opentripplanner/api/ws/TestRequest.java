@@ -155,6 +155,12 @@ class SimpleGraphServiceImpl implements GraphService {
 
 /* This is a hack to hold context and graph data between test runs, since loading it is slow. */
 class Context {
+    
+    /**
+     * Save a temporary graph object when this is true
+     */
+    private static final boolean DEBUG_OUTPUT = false;
+
     public Graph graph = new Graph();
 
     public SimpleGraphServiceImpl graphService = new SimpleGraphServiceImpl();
@@ -204,10 +210,12 @@ class Context {
         initBikeRental();
         graph.streetIndex = new StreetVertexIndexServiceImpl(graph);
 
-        try {
-            graph.save(File.createTempFile("graph", ".obj"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (DEBUG_OUTPUT) {
+            try {
+                graph.save(File.createTempFile("graph", ".obj"));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         pathService.setSptService(new GenericAStar());
