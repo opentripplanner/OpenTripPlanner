@@ -325,6 +325,10 @@ otp.modules.planner.PlannerModule =
             success: function(data) {
                 $('#otp-spinner').hide();
                 
+                if (otp.config.debug) {
+                    otp.debug.processRequest(data)
+                }
+
                 if(data.plan) {
                     // compare returned plan.date to sent date/time to determine timezone offset (unless set explicitly in config.js)
                     otp.config.timeOffset = (otp.config.timeOffset) ||

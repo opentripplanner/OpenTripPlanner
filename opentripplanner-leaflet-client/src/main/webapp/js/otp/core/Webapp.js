@@ -71,6 +71,15 @@ otp.core.Webapp = otp.Class({
             otp.config.siteUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
         }
             
+        // Set Debug options
+        if (this.urlParams.debug === 'false') {
+            otp.debug.disable();
+        } else if (otp.config.debug || this.urlParams.debug === 'true' || window.localStorage['otpDebug'] === 'true') {
+            otp.debug.enable();
+        } else if (this.urlParams.debug === 'false') {
+            otp.debug.disable();
+        }
+
         // set the logo & title
         
         if(otp.config.showLogo) {
@@ -184,6 +193,7 @@ otp.core.Webapp = otp.Class({
             
             }
         }
+
 
 
         // initialize the modules 

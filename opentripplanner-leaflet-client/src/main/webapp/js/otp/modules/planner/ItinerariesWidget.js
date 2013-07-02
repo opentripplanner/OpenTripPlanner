@@ -362,6 +362,7 @@ otp.widgets.ItinerariesWidget =
                     headerHtml += '&nbsp;&nbsp;<img src="images/alert.png" style="vertical-align: -20%;" />';
                 }
             }
+            
             $("<h3>"+headerHtml+"</h3>").appendTo(itinAccord).hover(function(evt) {
                 var arr = evt.target.id.split('-');
                 var index = parseInt(arr[arr.length-1]);
