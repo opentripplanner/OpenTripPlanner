@@ -26,23 +26,24 @@ import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
 
 /**
- * The primary implementation of the GraphService interface.
- * It can handle multiple graphs, each with its own routerId. These graphs are loaded from 
- * serialized graph files in subdirectories immediately under the specified base 
- * resource/filesystem path.
+ * The primary implementation of the GraphService interface. It can handle multiple graphs, each
+ * with its own routerId. These graphs are loaded from serialized graph files in subdirectories
+ * immediately under the specified base resource/filesystem path.
  * 
  * Delegate the file loading implementation details to the GraphServiceFileImpl.
  * 
  * @see GraphServiceFileImpl
  */
+@Scope("singleton")
 public class GraphServiceImpl implements GraphService {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphServiceImpl.class);
 
     private GraphServiceFileImpl decorated = new GraphServiceFileImpl();
-    
+
     /** A list of routerIds to automatically register and load at startup */
     @Setter
     private List<String> autoRegister;
@@ -65,52 +66,43 @@ public class GraphServiceImpl implements GraphService {
         decorated.setDefaultRouterId(defaultRouterId);
     }
 
-    /** 
-     * Sets a base path for graph loading from the filesystem. Serialized graph files will be 
+    /**
+     * Sets a base path for graph loading from the filesystem. Serialized graph files will be
      * retrieved from sub-directories immediately below this directory. The routerId of a graph is
-     * the same as the name of its sub-directory. This does the same thing as setResource, except 
+     * the same as the name of its sub-directory. This does the same thing as setResource, except
      * the parameter is interpreted as a file path.
      */
     public void setPath(String path) {
-        decorated.setResource("file:" + path);
+        decorated.setBasePath(path);
     }
 
     /**
-     * Sets a base path in the classpath or relative to the webapp root. This can be useful in 
-     * cloud computing environments where webapps must be entirely self-contained. When OTP is
-     * running as a webapp, the ResourceLoader provided by Spring will be a 
-     * ServletContextResourceLoader, so paths will be interpreted relative to the webapp root and 
-     * WARs should be handled transparently. If you want to point to a location outside the webapp 
-     * or you just want to be clear about exactly where the graphs are to be found, this path 
-     * should be prefixed with 'classpath:','file:', or 'url:'.
+     * Based on the autoRegister list, automatically register all routerIds for which we can find a
+     * graph file in a subdirectory of the resourceBase path. Also register and load the graph for
+     * the defaultRouterId and warn if no routerIds are registered.
      */
-    public void setResource(String resourceBaseName) {
-        decorated.setResource(resourceBaseName);
-    }
-
-    /** 
-     * Based on the autoRegister list, automatically register all routerIds for which we can find 
-     * a graph file in a subdirectory of the resourceBase path. Also register and load the graph
-     * for the defaultRouterId and warn if no routerIds are registered.
-     */
-    @PostConstruct // PostConstruct means run on startup after all injection has occurred 
+    @PostConstruct
+    // PostConstruct means run on startup after all injection has occurred
     private void startup() {
-        if (autoRegister != null && ! autoRegister.isEmpty()) {
+        if (autoRegister != null && !autoRegister.isEmpty()) {
             LOG.info("attempting to automatically register routerIds {}", autoRegister);
-            LOG.info("graph files will be sought in paths relative to {}", decorated.getResourceBase());
+            LOG.info("graph files will be sought in paths relative to {}",
+                    decorated.getBasePath());
             for (String routerId : autoRegister) {
                 registerGraph(routerId, true);
             }
         } else {
             LOG.info("no list of routerIds was provided for automatic registration.");
         }
-        if (attemptRegisterDefault && ! decorated.getRouterIds().contains(decorated.getDefaultRouterId())) {
-            LOG.info("Attempting to load graph for default routerId '{}'.", decorated.getDefaultRouterId());
+        if (attemptRegisterDefault
+                && !decorated.getRouterIds().contains(decorated.getDefaultRouterId())) {
+            LOG.info("Attempting to load graph for default routerId '{}'.",
+                    decorated.getDefaultRouterId());
             registerGraph(decorated.getDefaultRouterId(), true);
         }
         if (this.getRouterIds().isEmpty()) {
-            LOG.warn("No graphs have been loaded/registered. " +
-                    "You must use the routers API to register one or more graphs before routing.");
+            LOG.warn("No graphs have been loaded/registered. "
+                    + "You must use the routers API to register one or more graphs before routing.");
         }
     }
 
@@ -129,12 +121,11 @@ public class GraphServiceImpl implements GraphService {
         decorated.setLoadLevel(level);
     }
 
-    // TODO Should we extract this interface in GraphService? 
-    // See the (strange) cast to GraphServiceImpl in Routers.reloadGraphs()
+    @Override
     public boolean reloadGraphs(boolean preEvict) {
         return decorated.reloadGraphs(preEvict);
     }
-    
+
     @Override
     public Collection<String> getRouterIds() {
         return decorated.getRouterIds();
@@ -149,7 +140,7 @@ public class GraphServiceImpl implements GraphService {
     public boolean registerGraph(String routerId, Graph graph) {
         return decorated.registerGraph(routerId, graph);
     }
-    
+
     @Override
     public boolean evictGraph(String routerId) {
         return decorated.evictGraph(routerId);
@@ -159,4 +150,5 @@ public class GraphServiceImpl implements GraphService {
     public int evictAll() {
         return decorated.evictAll();
     }
+
 }

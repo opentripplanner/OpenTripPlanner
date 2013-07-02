@@ -25,6 +25,7 @@ public class GrizzlyServer {
 
     @Setter private int port = 8080;
     @Setter private String graphDirectory = "/var/otp/graphs/";
+    @Setter private String staticContentDirectory = "./opentripplanner-leaflet-client/src/main/webapp/";
     @Setter private String defaultRouterId = "";
 
     public void start(String[] args) {
@@ -48,10 +49,14 @@ public class GrizzlyServer {
         httpServer.addListener(networkListener);
         ResourceConfig rc = new PackagesResourceConfig("org.opentripplanner");
         // DelegatingFilterProxy.class.getName() does not seem to work out of the box.
-        // Register a custom authentication filter.
+        // Register a custom authentication filter, a filter that removes the /ws/ from OTP
+        // REST API calls, and a filter that wraps JSON in method calls as needed.
         rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_REQUEST_FILTERS, 
-                 new String[] { AuthFilter.class.getName(), RewriteFilter.class.getName() });
-        // Provide Jersey a factory class that gets injected objects from the Spring context
+                new String[] { AuthFilter.class.getName(), RewriteFilter.class.getName() });
+        rc.getProperties().put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS, 
+                new String[] { JsonpFilter.class.getName() });
+
+        // Make a factory that hands Jersey OTP modules to inject
         IoCComponentProviderFactory ioc_factory = OTPConfigurator.fromCommandLineArguments(args);
 
         /* ADD A COUPLE OF HANDLERS (~SERVLETS) */
@@ -64,8 +69,8 @@ public class GrizzlyServer {
         //    This is a filesystem path, not classpath.
         //    Files are relative to the project dir, so
         //    from ./ we can reach e.g. target/classes/data-sources.xml
-        final String clientPath = "../opentripplanner-webapp/src/main/webapp/";
-        httpServer.getServerConfiguration().addHttpHandler(new StaticHttpHandler(clientPath), "/");
+        staticContentDirectory = "../opentripplanner-leaflet-client/src/main/webapp/";
+        httpServer.getServerConfiguration().addHttpHandler(new StaticHttpHandler(staticContentDirectory), "/");
         
         /* RELINQUISH CONTROL TO THE SERVER THREAD */
         try {

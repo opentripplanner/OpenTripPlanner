@@ -1,0 +1,35 @@
+<a href="@{Secure.logout()}">Log out</a>
+
+<p><b>All users:</b>
+<ul>
+#{list users, as:'user'}
+    <li>
+        ${user.username} (${user.role}) [<a href="/admin/deleteUser?id=${user.id}">Delete</a>]
+        
+    </li>
+#{/list}
+</ul>
+
+#{form @Admin.addUser(), id:'addUserForm'}
+
+<input type="hidden" name="username" value="${admin_username}" />
+<input type="hidden" name="password" value="${admin_password}" />
+       
+<p><b>Add new:</b>
+<br> 
+
+Username: <input name="user.username" />&nbsp;
+
+Role: <select name="user.role">
+    <option value="calltaker">Calltaker</option>
+    <option value="fieldtrip">Field trip scheduler</option>
+    <option value="all">All Roles</option>
+</select>
+
+    
+<input type="submit" value="Add" style="font-size: 14px;" />
+
+#{/form}
+
+
+<div style="margin-top: 20px; text-align: center;">

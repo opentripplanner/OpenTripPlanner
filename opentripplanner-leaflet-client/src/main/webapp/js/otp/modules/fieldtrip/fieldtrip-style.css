@@ -4,8 +4,15 @@
   bottom: 20px;
   right: 10px;
   background: blue;
-  height: 325px;
-  width: 425px;
+  height: 350px;
+  width: 480px;
+}
+
+.otp-fieldTripManager-tabbedArea {
+    padding: 0px;
+    margin: 0px;
+    border: 2px solid blue;
+    background: red;
 }
 
 .otp-fieldTripManager-callListContainer {
@@ -25,13 +32,13 @@
 
 .otp-fieldTripManager-callList {
     overflow: auto;
-    height: 200px;
+    height: 150px;
 }
 
 .otp-fieldTripManager-callInfo {
     padding: 4px;
-    height: 200px;
-    background: #fff;
+    height: 160px;
+    background: #eee;
     overflow: auto;
     width: 200px;
 }
@@ -55,6 +62,8 @@
     margin-bottom: 4px;
 }
 
+/** FieldTripRequests widget **/
+
 .otp-fieldTripRequestsWidget {
   width: 300px;
   bottom: 20px;
@@ -75,5 +84,70 @@
 }
 
 .otp-fieldTripRequests-listRow {
+    margin: 4px;
     padding: 4px;
+    background: #eee;
+    cursor: pointer;
+}
+
+
+/** FieldTripRequest widget **/
+
+.otp-fieldTrip-requestWidget {
+    width: 400px;
+    height: 300px;
+}
+
+.otp-fieldTrip-requestWidget-content {
+    position: absolute;
+    top: 30px;
+    bottom: 12px;
+    left:10px;
+    right: 10px;
+}
+
+.otp-fieldTrip-requestWidget-summary {
+    position: absolute;
+    overflow: auto;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 130px;
+    border: 1px solid gray;
+    padding: 10px;
+    background: white;
+}
+
+.otp-fieldTrip-requestWidget-tripBoxContainer {
+    position: absolute;
+    width: 50%;
+    height: 120px;
+    padding: 0px;
+    bottom: 0px;
+    
+}
+
+.otp-fieldTrip-requestWidget-tripBox {
+    position: relative;
+    height: 100px;
+    padding: 8px;
+    border: 2px solid gray;
+    text-align: center;
+}
+
+.otp-fieldTrip-requestWidget-planInfo {
+    text-align: left;
+    background: white;
+    padding: 4px;
+    font-style: italic;
+    margin-top: 2px;
+    height: 24px;
+    border: 1px solid #ccc;
+}
+
+.otp-fieldTrip-requestWidget-button {
+    width:95%;
+    margin-top: 5px;
+    overflow: hidden;
+    height: 20px;
 }

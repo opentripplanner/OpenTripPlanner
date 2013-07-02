@@ -1,5 +1,10 @@
 package controllers;
 
+import models.fieldtrip.ScheduledFieldTrip;
+import models.fieldtrip.FieldTripFeedback;
+import models.fieldtrip.FieldTripRequest;
+import models.fieldtrip.GroupItinerary;
+import models.fieldtrip.GTFSTrip;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import play.*;
@@ -15,13 +20,19 @@ import play.data.binding.As;
 
 public class FieldTrip extends Application {
 
-    @Before(unless={"newTrip","addTripFeedback"}, priority=1)
+    /*@Before(unless={"newTrip","addTripFeedback","getCalendar","newRequest","newRequestForm"}, priority=1)
     public static void checkLogin () {
-        User user = getUser();
-        if (!user.canScheduleFieldTrips()) {
+        String username = params.get("userName");
+        String password = params.get("password");
+        
+        System.out.println("checkLogin "+username);
+        User user = checkUser(username, password);
+        //User user = getUser();
+        if (user == null || !user.canScheduleFieldTrips()) {
             forbidden();
         }
-    }
+        System.out.println("checkLogin success");
+    }*/
 
     public static void index() {
         //index at present does nothing
@@ -115,11 +126,11 @@ public class FieldTrip extends Application {
         //existing trip is not overwritten?
         trip.id = null;
         trip.serviceDay = trip.departure;
-        User user = getUser();
+        /*User user = getUser();
         if (!user.canScheduleFieldTrips()) {
             //TODO: is this safe if those itineraries exist?
             trip.groupItineraries.clear();
-        }
+        }*/
         trip.save();
         Long id = trip.id;
         renderJSON(id);
@@ -155,10 +166,14 @@ public class FieldTrip extends Application {
     }
 
     public static void newRequest(FieldTripRequest request) {
-        request.id = null;
-        request.save();
-        Long id = request.id;
-        renderJSON(id);
+        String msg = "bad request";
+        if(request.teacherName != null) {
+            request.id = null;
+            request.save();
+            Long id = request.id;
+            msg = "Your request has been submitted.";
+        }
+        render(msg);
     }
     
     public static void getRequests(Integer limit) {
@@ -172,7 +187,33 @@ public class FieldTrip extends Application {
 
         Gson gson = new GsonBuilder()
           .excludeFieldsWithoutExposeAnnotation()  
+          .serializeNulls()
           .create();
         renderJSON(gson.toJson(requests));
     }
+    
+    public static void newRequestForm() {
+        render();
+    }
+    
+    public static void setInboundTrip(long requestId, long tripId) {
+        FieldTripRequest ftRequest = FieldTripRequest.findById(requestId);
+        ScheduledFieldTrip trip = ScheduledFieldTrip.findById(tripId);
+        ftRequest.inboundTrip = trip;
+        trip.request = ftRequest;
+        trip.save();
+        ftRequest.save();
+        render();
+    }
+
+    public static void setOutboundTrip(long requestId, long tripId) {
+        FieldTripRequest ftRequest = FieldTripRequest.findById(requestId);
+        ScheduledFieldTrip trip = ScheduledFieldTrip.findById(tripId);
+        ftRequest.outboundTrip = trip;
+        trip.request = ftRequest;
+        trip.save();
+        ftRequest.save();
+        render();
+    }
+
 }

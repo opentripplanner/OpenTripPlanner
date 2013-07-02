@@ -64,10 +64,13 @@ public class GenericLocation implements Cloneable {
      */
     private Double heading;
 
-    // Pattern for parsing lat,lng strings.
+    // Pattern for matching lat,lng strings, i.e. an optional '-' character followed by 
+    // one or more digits, and an optional (decimal point followed by one or more digits).
     private static final String _doublePattern = "-{0,1}\\d+(\\.\\d+){0,1}";
 
-    private static final Pattern _latLonPattern = Pattern.compile("\\D*(" + _doublePattern
+    // We want to ignore any number of non-digit characters at the beginning of the string, except
+    // that signs are also non-digits. So ignore any number of non-(digit or sign or decimal point). 
+    private static final Pattern _latLonPattern = Pattern.compile("[^[\\d&&[-|+|.]]]*(" + _doublePattern
             + ")(\\s*,\\s*|\\s+)(" + _doublePattern + ")\\D*");
     
     private static final Pattern _headingPattern = Pattern.compile("\\D*heading=("
@@ -113,11 +116,12 @@ public class GenericLocation implements Cloneable {
     
     /**
      * Construct from a name, place pair.
-     * 
-     * Parses latitude, longitude data from the place string.
-     * 
-     * @param name
-     * @param place
+     * Parses latitude, longitude data, heading and numeric edge ID out of the place string.
+     * Note that if the place string does not appear to contain a lat/lon pair, heading, or edge ID
+     * the GenericLocation will be missing that information but will still retain the place string,
+     * which will be interpreted during routing context construction as a vertex label within the 
+     * graph for the appropriate routerId (by StreetVertexIndexServiceImpl.getVertexForLocation()).
+     * TODO: Perhaps the interpretation as a vertex label should be done here for clarity.
      */
     public GenericLocation(String name, String place) {
         this.name = name;

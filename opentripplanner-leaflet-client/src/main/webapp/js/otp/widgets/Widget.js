@@ -29,7 +29,9 @@ otp.widgets.Widget = otp.Class({
     resizable       : false,
     showHeader      : true,
     title           : '', // string
-    openInitially   : true,
+    openInitially   : true, 
+    persistOnClose  : false, // whether widget can be opened via 'toolbar' dropdown when closed
+    transparent     : false, // whether to hide the default gray background / frame
 
     isOpen          : true, // whether or not widget is displayed in applicable module view
     isMinimized     : false,
@@ -49,6 +51,7 @@ otp.widgets.Widget = otp.Class({
 
         // set up the main widget DOM element:
         this.mainDiv = $('<div />').attr('id', id).addClass('otp-widget').appendTo('body');
+        if(!this.transparent) this.mainDiv.addClass('otp-widget-nonTransparent');
 
         if(!this.openInitially) {
             this.isOpen = false;

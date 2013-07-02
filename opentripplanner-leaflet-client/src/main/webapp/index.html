@@ -10,6 +10,7 @@
 
 <!--  Mobile Viewport Fix -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   
 <!-- Google WebFonts -->
 <link href='http://fonts.googleapis.com/css?family=Dancing+Script:700' rel='stylesheet' type='text/css'>
@@ -25,8 +26,8 @@
 <link rel="stylesheet" href="js/lib/jquery-ui/addons/jquery-ui-timepicker.css" />
 
 <!-- backbone -->
-<script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.2/underscore-min.js"></script>
-<script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/0.9.2/backbone-min.js"></script>
+<script src="js/lib/underscore.js"></script>
+<script src="js/lib/backbone.js"></script>
 
 <!-- leaflet -->
 <script src="js/lib/leaflet/leaflet.js"></script>
@@ -49,9 +50,14 @@
 <script src="js/lib/mustache.js"></script>
 <script src="js/lib/ICanHaz.js"></script>
 
+<!-- jsPDF -->
+<script src="js/lib/jspdf.min.js"></script>
+
+
 <!-- otp-specific imports -->
 <script src="js/otp/otp.js?v=1"></script>
 <script src="js/otp/config.js?v=1"></script>
+<script src="js/otp/debug.js?v=1"></script>
 <script src="js/otp/templates.js?v=1"></script>
 
 <script src="js/otp/util/DataStorage.js?v=1"></script>
@@ -60,6 +66,7 @@
 <script src="js/otp/util/Logger.js?v=1"></script>
 <script src="js/otp/util/Text.js?v=1"></script>
 <script src="js/otp/util/Time.js?v=1"></script>
+<script src="js/otp/util/Imperial.js?v=1"></script>
 
 <script src="js/otp/core/Webapp.js?v=1"></script>
 <script src="js/otp/core/Map.js?v=1"></script>
@@ -86,6 +93,7 @@
 
 <script src="js/otp/modules/bikeshare/BikeShareModule.js?v=1"></script>
 <script src="js/otp/modules/bikeshare/BikeStationsWidget.js?v=1"></script>
+<link rel="stylesheet" href="js/otp/modules/bikeshare/bikeshare-style.css?v=1" />
 
 <script src="js/otp/modules/multimodal/MultimodalPlannerModule.js?v=1"></script>
 <script src="js/otp/modules/multimodal/StopViewerWidget.js?v=1"></script>
@@ -93,6 +101,10 @@
 
 <script src="js/otp/modules/calltaker/CallTakerModule.js?v=1"></script>
 <script src="js/otp/modules/calltaker/CallHistoryWidget.js?v=1"></script>
+<script src="js/otp/modules/calltaker/MailablesWidget.js?v=1"></script>
+<script src="js/otp/modules/calltaker/calltaker-models.js?v=1"></script>
+<link rel="stylesheet" href="js/otp/modules/calltaker/calltaker-style.css?v=1" />
+
 <script src="js/otp/modules/annotations/AnnotationsModule.js?v=1"></script>
 
 <script src="js/otp/modules/analyst/AnalystModule.js?v=1"></script>
@@ -119,7 +131,7 @@
 <link rel="stylesheet" href="js/otp/modules/fieldtrip/fieldtrip-style.css?v=1" />
 
 <script src="js/otp/widgets/InfoWidget.js?v=1"></script>
-<script src="js/otp/widgets/tripoptions/PreferredRoutesSelectorWidget.js?v=1"></script>
+<script src="js/otp/widgets/tripoptions/RoutesSelectorWidget.js?v=1"></script>
 <script src="js/otp/widgets/tripoptions/TripOptionsWidget.js?v=1"></script>
 <script src="js/otp/widgets/tripoptions/BikeTrianglePanel.js?v=1"></script>
 
@@ -136,12 +148,34 @@
   <script src="js/lib/respond.min.js"></script>
 <![endif]-->
 
-<!-- create the webapp at startups -->
-<script type="text/javascript" language="javascript">
-$(document).ready(function() {
-    new otp.core.Webapp();
 
+<!-- load ICH templates and create the webapp at startup -->
+<script type="text/javascript" language="javascript">
+
+
+$(document).ready(function() {
+    var templateUrls = new Array(
+        'js/otp/widgets/tripoptions/tripoptions-templates.html'
+    );
+
+    var loadedTemplates = 0;
+
+    for(var i = 0; i < templateUrls.length; i++) {
+        $.get(templateUrls[i])
+        .success(function(html) {
+            $('<div style="display:none;"></div>').appendTo($("body")).html(html);
+            loadedTemplates++;
+            if(loadedTemplates == templateUrls.length) {
+                ich.grabTemplates();                   
+                new otp.core.Webapp();
+            }
+        });
+    }
+        
 });
+
+
+
 </script>
 
 </head>

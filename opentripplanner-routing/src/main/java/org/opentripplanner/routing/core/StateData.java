@@ -17,8 +17,9 @@ import java.util.HashMap;
 import java.util.Set;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.edgetype.TripPattern;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.patch.Alert;
 
@@ -36,6 +37,8 @@ public class StateData implements Cloneable {
     protected TripTimes tripTimes;
 
     protected AgencyAndId tripId;
+    
+    protected Trip previousTrip;
 
     protected double lastTransitWalk = 0;
 
@@ -51,8 +54,10 @@ public class StateData implements Cloneable {
 
     protected boolean usingRentedBike;
 
-    protected Vertex previousStop;
+    protected Stop previousStop;
 
+    protected Stop currentStop;
+    
     protected long lastAlightedTime;
 
     protected AgencyAndId[] routeSequence;
@@ -94,6 +99,8 @@ public class StateData implements Cloneable {
      * The mode that was used to traverse the backEdge
      */
     protected TraverseMode backMode;
+
+    protected boolean backWalkingBike;
 
     public Set<String> bikeRentalNetworks;
 

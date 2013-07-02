@@ -14,7 +14,6 @@
 package org.opentripplanner.routing.impl;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Timer;
@@ -30,10 +29,13 @@ import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
 
 /**
- * An implementation of the file-based GraphServiceFileImpl which auto-configure itself by scanning the root resource directory.
+ * An implementation of the file-based GraphServiceFileImpl which auto-configure itself by scanning
+ * the root resource directory.
  */
+@Scope("singleton")
 public class GraphServiceAutoDiscoverImpl implements GraphService {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphServiceAutoDiscoverImpl.class);
@@ -48,8 +50,9 @@ public class GraphServiceAutoDiscoverImpl implements GraphService {
     private int autoScanPeriodSec = 60;
 
     /**
-     * The delay before loading a new graph, in seconds. We load a graph if it has been modified at least this amount of time in the past. This in
-     * order to give some time for non-atomic graph copy.
+     * The delay before loading a new graph, in seconds. We load a graph if it has been modified at
+     * least this amount of time in the past. This in order to give some time for non-atomic graph
+     * copy.
      */
     @Setter
     private int loadDelaySec = 10;
@@ -69,23 +72,13 @@ public class GraphServiceAutoDiscoverImpl implements GraphService {
     }
 
     /**
-     * Sets a base path for graph loading from the filesystem. Serialized graph files will be retrieved from sub-directories immediately below this
-     * directory. The routerId of a graph is the same as the name of its sub-directory. This does the same thing as setResource, except the parameter
-     * is interpreted as a file path.
+     * Sets a base path for graph loading from the filesystem. Serialized graph files will be
+     * retrieved from sub-directories immediately below this directory. The routerId of a graph is
+     * the same as the name of its sub-directory. This does the same thing as setResource, except
+     * the parameter is interpreted as a file path.
      */
     public void setPath(String path) {
-        decorated.setResource("file:" + path);
-    }
-
-    /**
-     * Sets a base path in the classpath or relative to the webapp root. This can be useful in cloud computing environments where webapps must be
-     * entirely self-contained. When OTP is running as a webapp, the ResourceLoader provided by Spring will be a ServletContextResourceLoader, so
-     * paths will be interpreted relative to the webapp root and WARs should be handled transparently. If you want to point to a location outside the
-     * webapp or you just want to be clear about exactly where the graphs are to be found, this path should be prefixed with 'classpath:','file:', or
-     * 'url:'.
-     */
-    public void setResource(String resourceBaseName) {
-        decorated.setResource(resourceBaseName);
+        decorated.setBasePath(path);
     }
 
     @Override
@@ -103,8 +96,7 @@ public class GraphServiceAutoDiscoverImpl implements GraphService {
         decorated.setLoadLevel(level);
     }
 
-    // TODO Should we extract this interface in GraphService?
-    // See the (strange) cast to GraphServiceImpl in Routers.reloadGraphs()
+    @Override
     public boolean reloadGraphs(boolean preEvict) {
         return decorated.reloadGraphs(preEvict);
     }
@@ -139,15 +131,19 @@ public class GraphServiceAutoDiscoverImpl implements GraphService {
     }
 
     /**
-     * Based on the autoRegister list, automatically register all routerIds for which we can find a graph file in a subdirectory of the resourceBase
-     * path. Also register and load the graph for the defaultRouterId and warn if no routerIds are registered.
+     * Based on the autoRegister list, automatically register all routerIds for which we can find a
+     * graph file in a subdirectory of the resourceBase path. Also register and load the graph for
+     * the defaultRouterId and warn if no routerIds are registered.
      */
     @PostConstruct
     // PostConstruct means run on startup after all injection has occurred
     private void startup() {
         /* Run the first one syncronously as other initialization methods may need a default router. */
         autoDiscoverGraphs();
-        /* Starting with JDK7 we should use a directory change listener callback on baseResource instead. */
+        /*
+         * Starting with JDK7 we should use a directory change listener callback on baseResource
+         * instead.
+         */
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -157,57 +153,40 @@ public class GraphServiceAutoDiscoverImpl implements GraphService {
     }
 
     private synchronized void autoDiscoverGraphs() {
-        LOG.debug("Auto discovering graphs under {}", decorated.getResourceBase());
+        LOG.debug("Auto discovering graphs under {}", decorated.getBasePath());
         Collection<String> graphOnDisk = new HashSet<String>();
         Collection<String> graphToLoad = new HashSet<String>();
         // Only reload graph modified more than 1 mn ago.
         long validEndTime = System.currentTimeMillis() - loadDelaySec * 1000;
-        try {
-            String resourceBase = decorated.getResourceBase();
-            File baseFile = null;
-            if (resourceBase.startsWith("file:")) {
-                baseFile = new File(resourceBase.substring(5));
-            } else if (resourceBase.startsWith("classpath:")) {
-                throw new UnsupportedOperationException();
-            } else {
-                baseFile = new File(resourceBase);
+        File baseFile = new File(decorated.getBasePath());
+        // First check for a root graph
+        File rootGraphFile = new File(baseFile, GraphServiceFileImpl.GRAPH_FILENAME);
+        if (rootGraphFile.exists() && rootGraphFile.canRead()) {
+            graphOnDisk.add("");
+            // lastModified can change, so test must be atomic here.
+            long lastModified = rootGraphFile.lastModified();
+            if (lastModified > lastAutoScan && lastModified <= validEndTime) {
+                LOG.debug("Graph to (re)load: {}, lastModified={}", rootGraphFile, lastModified);
+                graphToLoad.add("");
             }
-            // First check for a root graph
-            File rootGraphFile = new File(baseFile, GraphServiceFileImpl.GRAPH_FILENAME);
-            if (rootGraphFile.exists() && rootGraphFile.canRead()) {
-                graphOnDisk.add("");
-                // lastModified can change, so test must be atomic here.
-                long lastModified = rootGraphFile.lastModified();
-                if (lastModified > lastAutoScan && lastModified <= validEndTime) {
-                    LOG.debug("Graph to (re)load: {}, lastModified={}", rootGraphFile, lastModified);
-                    graphToLoad.add("");
-                }
-            }
-            if (!baseFile.isDirectory()) {
-                throw new IOException("Resource base " + baseFile
-                        + " is not a directory, can't auto-discover.");
-            }
-            // Then graph in sub-directories
-            for (String sub : baseFile.list()) {
-                File subFile = new File(baseFile, sub);
-                if (subFile.isDirectory()) {
-                    File graphFile = new File(subFile, GraphServiceFileImpl.GRAPH_FILENAME);
-                    if (graphFile.exists() && graphFile.canRead()) {
-                        graphOnDisk.add(sub);
-                        long lastModified = graphFile.lastModified();
-                        if (lastModified > lastAutoScan && lastModified <= validEndTime) {
-                            LOG.debug("Graph to (re)load: {}, lastModified={}", graphFile,
-                                    lastModified);
-                            graphToLoad.add(sub);
-                        }
+        }
+        // Then graph in sub-directories
+        for (String sub : baseFile.list()) {
+            File subFile = new File(baseFile, sub);
+            if (subFile.isDirectory()) {
+                File graphFile = new File(subFile, GraphServiceFileImpl.GRAPH_FILENAME);
+                if (graphFile.exists() && graphFile.canRead()) {
+                    graphOnDisk.add(sub);
+                    long lastModified = graphFile.lastModified();
+                    if (lastModified > lastAutoScan && lastModified <= validEndTime) {
+                        LOG.debug("Graph to (re)load: {}, lastModified={}", graphFile,
+                                lastModified);
+                        graphToLoad.add(sub);
                     }
                 }
             }
-        } catch (IOException e) {
-            LOG.error("Can't scan " + decorated.getResourceBase(), e);
-        } finally {
-            lastAutoScan = validEndTime;
         }
+        lastAutoScan = validEndTime;
 
         StringBuffer onDiskSb = new StringBuffer();
         for (String routerId : graphOnDisk)
@@ -218,8 +197,9 @@ public class GraphServiceAutoDiscoverImpl implements GraphService {
         LOG.debug("Found routers: {} - Must reload: {}", onDiskSb.toString(), toLoadSb.toString());
         for (String routerId : graphToLoad) {
             /*
-             * Do not set preEvict, because: 1) during loading of a new graph we want to keep one available; and 2) if the loading of a new graph
-             * fails we also want to keep the old one.
+             * Do not set preEvict, because: 1) during loading of a new graph we want to keep one
+             * available; and 2) if the loading of a new graph fails we also want to keep the old
+             * one.
              */
             decorated.registerGraph(routerId, false);
         }

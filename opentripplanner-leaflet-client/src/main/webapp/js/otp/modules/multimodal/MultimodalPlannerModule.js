@@ -19,7 +19,6 @@ otp.modules.multimodal.MultimodalPlannerModule =
     otp.Class(otp.modules.planner.PlannerModule, {
 
     moduleName  : "Multimodal Trip Planner",
-    moduleId    : "multimodal",
     
     itinWidget  : null,
     
@@ -29,7 +28,7 @@ otp.modules.multimodal.MultimodalPlannerModule =
     
     routeData : null,
     
-    initialize : function(webapp) {
+    initialize : function(webapp, id, options) {
         otp.modules.planner.PlannerModule.prototype.initialize.apply(this, arguments);
     },
 
@@ -39,11 +38,19 @@ otp.modules.multimodal.MultimodalPlannerModule =
 
         // setup options widget
         
+        var optionsWidgetConfig = {
+                title : 'Trip Options',
+                closeable : true,
+                persistOnClose: true,
+        };
+        
+        if(typeof this.tripOptionsWidgetCssClass !== 'undefined') {
+            console.log("set tripOptionsWidgetCssClass: " + this.tripOptionsWidgetCssClass); 
+            optionsWidgetConfig['cssClass'] = this.tripOptionsWidgetCssClass;
+        }
+        
         this.optionsWidget = new otp.widgets.tripoptions.TripOptionsWidget(
-            'otp-'+this.moduleId+'-optionsWidget', this, {
-                title : 'Trip Options'
-            }
-        );
+            'otp-'+this.id+'-optionsWidget', this, optionsWidgetConfig);
 
         if(this.webapp.geocoders && this.webapp.geocoders.length > 0) {
             this.optionsWidget.addControl("locations", new otp.widgets.tripoptions.LocationsSelector(this.optionsWidget, this.webapp.geocoders), true);
@@ -58,14 +65,17 @@ otp.modules.multimodal.MultimodalPlannerModule =
         this.optionsWidget.addControl("mode", modeSelector, true);
 
         modeSelector.addModeControl(new otp.widgets.tripoptions.MaxWalkSelector(this.optionsWidget));
+        modeSelector.addModeControl(new otp.widgets.tripoptions.MaxBikeSelector(this.optionsWidget));
         modeSelector.addModeControl(new otp.widgets.tripoptions.BikeTriangle(this.optionsWidget));
         modeSelector.addModeControl(new otp.widgets.tripoptions.PreferredRoutes(this.optionsWidget));
+        modeSelector.addModeControl(new otp.widgets.tripoptions.BannedRoutes(this.optionsWidget));
 
         modeSelector.refreshModeControls();
 
         this.optionsWidget.addSeparator();
         this.optionsWidget.addControl("submit", new otp.widgets.tripoptions.Submit(this.optionsWidget));
         
+        this.optionsWidget.applyQueryParams(this.defaultQueryParams);
     },
     
     getExtendedQueryParams : function() {
@@ -74,21 +84,31 @@ otp.modules.multimodal.MultimodalPlannerModule =
             
     processPlan : function(tripPlan, restoring) {
         if(this.itinWidget == null) {
-            this.itinWidget = new otp.widgets.ItinerariesWidget(this.moduleId+"-itinWidget", this);
+            this.itinWidget = new otp.widgets.ItinerariesWidget(this.id+"-itinWidget", this);
         }
         if(restoring && this.restoredItinIndex) {
+            this.itinWidget.show();
             this.itinWidget.updateItineraries(tripPlan.itineraries, tripPlan.queryParams, this.restoredItinIndex);
             this.restoredItinIndex = null;
         } else  {
+            this.itinWidget.show();
             this.itinWidget.updateItineraries(tripPlan.itineraries, tripPlan.queryParams);
         }
-        this.itinWidget.show();
         
         if(restoring) {
             this.optionsWidget.restorePlan(tripPlan);
         }
         this.drawItinerary(tripPlan.itineraries[0]);
     },
-    
+   
+    clearTrip : function() {
+        otp.modules.planner.PlannerModule.prototype.clearTrip.apply(this);
+        if(this.itinWidget !== null) {
+            this.itinWidget.close();
+            this.itinWidget.clear();
+            this.itinWidget.setTitle("Itineraries");
+        }
+ },
+        
     CLASS_NAME : "otp.modules.multimodal.MultimodalPlannerModule"
 });

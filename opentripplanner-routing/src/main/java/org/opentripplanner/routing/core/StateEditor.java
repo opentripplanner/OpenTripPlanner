@@ -20,6 +20,8 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.automata.AutomatonState;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
@@ -288,6 +290,11 @@ public class StateEditor {
         child.stateData.tripId = tripId;
     }
 
+    public void setPreviousTrip(Trip previousTrip) {
+        cloneStateDataAsNeeded();
+        child.stateData.previousTrip = previousTrip;
+    }
+    
     public void setInitialWaitTimeSeconds(long initialWaitTimeSeconds) {
         cloneStateDataAsNeeded();
         child.stateData.initialWaitTime = initialWaitTimeSeconds;
@@ -299,6 +306,14 @@ public class StateEditor {
         
         cloneStateDataAsNeeded();
         child.stateData.backMode = mode;
+    }
+
+    public void setBackWalkingBike (boolean walkingBike) {
+        if (walkingBike == child.stateData.backWalkingBike)
+            return;
+        
+        cloneStateDataAsNeeded();
+        child.stateData.backWalkingBike = walkingBike;
     }
 
     /** 
@@ -366,11 +381,16 @@ public class StateEditor {
         }
     }
 
-    public void setPreviousStop(Vertex previousStop) {
+    public void setPreviousStop(Stop previousStop) {
         cloneStateDataAsNeeded();
         child.stateData.previousStop = previousStop;
     }
 
+    public void setCurrentStop(Stop currentStop) {
+        cloneStateDataAsNeeded();
+        child.stateData.currentStop = currentStop;
+    }
+    
     public void setLastAlightedTimeSeconds(long lastAlightedTimeSeconds) {
         cloneStateDataAsNeeded();
         child.stateData.lastAlightedTime = lastAlightedTimeSeconds;
@@ -396,6 +416,9 @@ public class StateEditor {
         child.stateData.route = state.stateData.route;
         child.stateData.tripTimes = state.stateData.tripTimes;
         child.stateData.tripId = state.stateData.tripId;
+        child.stateData.previousTrip = state.stateData.previousTrip;
+        child.stateData.previousStop = state.stateData.previousStop;
+        child.stateData.currentStop = state.stateData.currentStop;
         child.stateData.zone = state.stateData.zone;
         child.stateData.extensions = state.stateData.extensions;
         child.stateData.usingRentedBike = state.stateData.usingRentedBike;
@@ -424,6 +447,10 @@ public class StateEditor {
         return child.getTripId();
     }
 
+    public Trip getPreviousTrip() {
+        return child.getPreviousTrip();
+    }
+    
     public String getZone() {
         return child.getZone();
     }
@@ -446,10 +473,6 @@ public class StateEditor {
 
     public boolean isRentingBike() {
         return child.isBikeRenting();
-    }
-
-    public Vertex getPreviousStop() {
-        return child.getPreviousStop();
     }
 
     public long getLastAlightedTimeSeconds() {

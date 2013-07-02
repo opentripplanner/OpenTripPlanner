@@ -1,0 +1,74 @@
+<!-- LocationsSelector -->
+
+<script id="otp-tripOptions-locations" type="text/html">
+
+    <div style="width: 2.5em; float:left;">
+        <div style="height: 2em;">Start:</div>
+        <div>End:</div>
+    </div>
+        
+    <div class="notDraggable" style="position: relative; margin-left: 3em; height: 3.6em;">
+        <div style="position: absolute; left:0px; right: 30px;">
+            <input id="{{widgetId}}-start" style="width:100%">
+        </div>
+        <div style="position: absolute; top: 1.8em; left:0px; right: 30px;">
+            <input id="{{widgetId}}-end" style="width:100%">
+        </div>
+        <div style="position: absolute; top: 10px; right:0px; width: 20px; height: 20px; background: red;">
+            <button id="{{widgetId}}-reverseButton" style="width:20px; height: 22px; padding:2px;"><img src="images/reverse.png" /></button>
+        </div>
+    </div>
+
+    <div style="clear:both;"></div>
+
+    {{#showGeocoders}}
+        <div style="margin-top:5px;">
+            Geocoder:
+            <select id="{{widgetId}}-selector">
+                {{#geocoders}}
+                     <option>{{name}}</option>
+                {{/geocoders}}
+            </select>
+        </div>            
+    {{/showGeocoders}}
+    
+</script>
+
+
+<!-- MaxDistanceSelector -->
+
+<script id="otp-tripOptions-maxDistance" type="text/html">
+
+    <div class="notDraggable">
+        {{label}} <input id="{{widgetId}}-value" type="text" style="width:40px;" value="{{currentMaxDistance}}" /> {{distSuffix}}&nbsp;
+        <select id="{{widgetId}}-presets"><option>Presets:</option>
+            {{#presets}}
+                <option>{{.}} {{distSuffix}}</option>
+            {{/presets}}
+        </select>
+    </div>
+        
+</script>
+
+
+<!-- PreferredRoutesSelector -->
+
+<script id="otp-tripOptions-preferredRoutes" type="text/html">
+
+    <div class="notDraggable">
+        <div style="float:right; font-size: 12px;">
+            <button id="{{widgetId}}-button">Edit..</button>
+        </div>
+        Preferred Routes: <span id="{{widgetId}}-list">(None)</span>
+        <div style="clear:both;"></div>
+    </div>
+    
+    <div class="otp-tripViewer-select notDraggable" style="margin-top: 8px;" >
+        <div style="float: left;">Weight:</div>
+        <div style="margin-left:60px;">
+            <div id="{{widgetId}}-weightSlider" style="width:90%" />
+        </div>
+    </div>
+    
+</script>
+

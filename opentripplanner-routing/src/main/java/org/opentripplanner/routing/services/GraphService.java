@@ -70,6 +70,14 @@ public interface GraphService {
     public boolean registerGraph(String routerId, Graph graph);
 
     /** 
+     * Reload all registered graphs from wherever they came from.
+     * @param preEvict When true, release the existing graph (if any) before loading. This will
+     * halve the amount of memory needed for the operation, but routing will be unavailable for 
+     * that graph during the load process
+     */
+    public boolean reloadGraphs(boolean preEvict);
+
+    /** 
      * Dissociate a router ID from the corresponding graph object, and disable that router ID
      * for use in routing.
      * 

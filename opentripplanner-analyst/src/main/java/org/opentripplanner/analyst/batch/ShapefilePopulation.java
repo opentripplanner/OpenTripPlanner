@@ -49,6 +49,8 @@ public class ShapefilePopulation extends BasicPopulation {
         LOG.debug("Feature attributes: input data in {}, labeled with {}", inputAttribute, labelAttribute);
         try {
             File file = new File(filename);
+            if ( ! file.exists())
+                throw new RuntimeException("Shapefile does not exist.");
             FileDataStore store = FileDataStoreFinder.getDataStore(file);
             SimpleFeatureSource featureSource = store.getFeatureSource();
 

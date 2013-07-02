@@ -30,6 +30,7 @@ import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -198,7 +199,8 @@ public class TableTripPattern implements TripPattern, Serializable {
      * @return a TripTimes object providing all the arrival and departure times on the best trip.
      */
     public TripTimes getNextTrip(int stopIndex, int time, boolean haveBicycle,
-            RoutingRequest options, boolean boarding) {
+            State state0, boolean boarding) {
+        RoutingRequest options = state0.getOptions();
         Timetable timetable = scheduledTimetable;
         TimetableResolver snapshot = options.rctx.timetableSnapshot;
         if (snapshot != null)
@@ -215,7 +217,7 @@ public class TableTripPattern implements TripPattern, Serializable {
             return null;
         }
         // so far so good, delegate to the timetable
-        return timetable.getNextTrip(stopIndex, time, haveBicycle, options, boarding);
+        return timetable.getNextTrip(stopIndex, time, haveBicycle, state0, boarding);
     }
     
     public Iterator<Integer> getScheduledDepartureTimes(int stopIndex) {

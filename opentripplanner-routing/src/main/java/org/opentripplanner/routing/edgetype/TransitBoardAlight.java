@@ -18,6 +18,8 @@ import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
+import org.opentripplanner.routing.core.StopTransfer;
+import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -151,7 +153,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
             // For stop-to-stop transfer time, preference, and permission checking. 
             // Vertices in transfer table are stop arrive/depart not pattern arrive/depart, 
             // so previousStop is direction-dependent.
-            s1.setPreviousStop(boarding ? fromv : tov); 
+            s1.setPreviousStop(boarding ? ((PatternStopVertex) tov).getStop() : ((PatternStopVertex) fromv).getStop()); 
             s1.setLastPattern(this.getPattern());
 
             // determine the wait
@@ -232,7 +234,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
                 if (sd.serviceIdRunning(serviceId)) {
                     // getNextTrip will find next or prev departure depending on final boolean parameter
                     tripTimes = getPattern().getNextTrip(stopIndex, secondsSinceMidnight, 
-                            mode == TraverseMode.BICYCLE, options, boarding);
+                            mode == TraverseMode.BICYCLE, state0, boarding);
                     if (tripTimes != null) {
                         wait = boarding ? // we care about departures on board and arrivals on alight
                             (int)(sd.time(tripTimes.getDepartureTime(stopIndex)) - current_time):
@@ -260,6 +262,18 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
 
             /* check if route is preferred for this plan */
             long preferences_penalty = options.preferencesPenaltyForTrip(trip);
+            
+            /* check whether this is a preferred transfer */
+            int transferPenalty = 0;
+            if (state0.getNumBoardings() > 0) {
+                // This is not the first boarding, thus a transfer
+                TransferTable transferTable = options.getRoutingContext().transferTable;
+                // Get the transfer time
+                int transferTime = transferTable.getTransferTime(state0.getPreviousStop(),
+                        state0.getCurrentStop(), state0.getPreviousTrip(), trip);
+                // Determine transfer penalty
+                transferPenalty = transferTable.determineTransferPenalty(transferTime, options.nonpreferredTransferPenalty);
+            }            
 
             StateEditor s1 = state0.edit(this);
             s1.setBackMode(getMode());
@@ -279,6 +293,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
             s1.incrementTimeInSeconds(bestWait);
             s1.incrementNumBoardings();
             s1.setTripId(trip.getId());
+            s1.setPreviousTrip(trip);
             s1.setZone(getPattern().getZone(stopIndex));
             s1.setRoute(trip.getRoute().getId());
 
@@ -293,6 +308,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
             }
             
             s1.incrementWeight(preferences_penalty);
+            s1.incrementWeight(transferPenalty);
 
             // when reverse optimizing, the board cost needs to be applied on
             // alight to prevent state domination due to free alights

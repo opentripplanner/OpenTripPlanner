@@ -25,12 +25,15 @@ otp.widgets.BikeStationsWidget =
 		 
 	initialize : function(id, module) {
 	    otp.configure(this, id);
-	    otp.widgets.Widget.prototype.initialize.apply(this, arguments);
+	    otp.widgets.Widget.prototype.initialize.call(this, id, module, {
+	        cssClass : 'otp-bikeshare-stationsWidget',
+	        showHeader : false,
+	        draggable : false,
+	        transparent : true,
+	        openInitially : false,
+	    });
 	     
-	    //$(this.div).draggable();
-	    
-	    this._div = this.div;
-	    this.hide();
+	    //this.hide();
 	},
 	
 	setContentAndShow: function(startStation, endStation, module) {
@@ -52,7 +55,8 @@ otp.widgets.BikeStationsWidget =
 			this.start_button = $("<div id='pickup_btn'><strong>Recommended Pick Up:</strong><br /> " + start.name + "<br /><strong>Bikes:</strong> " + start.bikesAvailable + "</div>");
 			this.end_button = $("<div id='dropoff_btn'><strong>Recommended Drop Off:</strong><br /> " + end.name + "<br /><strong>Spaces:</strong> " + end.spacesAvailable + "</div>");
 			
-			($(this.div).append($("<div class='button left'></div>").append(this.start_button))).append($("<div class='button right'></div>").append(this.end_button));  
+			this.$().append($("<div class='otp-bikeshare-stationsWidget-left'></div>").append(this.start_button))
+        			.append($("<div class='otp-bikeshare-stationsWidget-right'></div>").append(this.end_button));  
 		    this.show();
 		}
 		

@@ -1,8 +1,7 @@
 package controllers;
 
-import com.google.gson.Gson;
-import play.*;
-import play.cache.*;
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import play.mvc.*;
 
 import java.util.*;
@@ -11,6 +10,8 @@ import models.*;
 
 public class Application extends Controller {
 
+    private static SecureRandom random = new SecureRandom();
+  
     @Before
     public static void setCORS()  {
         Http.Header origin = new Http.Header();
@@ -32,49 +33,54 @@ public class Application extends Controller {
 
     }
     
-    /*@Util
-    public static void renderJSON(Object obj) {
-        if (request.params._contains("callback")) {
-            Gson gson = new Gson();
-            String json = gson.toJson(obj);
-            //System.out.println("returning as jsonp (u): "+json);
-            renderText(request.params.get("callback") + "(" + json + ")");            
-        } else {
-            renderJSON(obj);
-        }      
-    }*/
     
-    @Before(priority=0)
-    public static void checkPassword() {
-        request.user = null;
-
-        String username = params.get("userName");
-        String password = params.get("password");
-        User user = getUser(username);
-        if (user == null) {
-            Logger.debug("no user by this username: %s (count = %s)", username, User.count());
+    // called internally by CallTaker/FieldTrip controller
+    public static TrinetUser checkLogin() {
+        String sessionId = params.get("sessionId");
+        
+        Session userSession = Session.find("bySessionId", sessionId).first();
+        if(userSession == null) {
             forbidden();
         }
-        if (user.checkPassword(password)) {
-            request.user = username;
-            Logger.debug("Logged in %s", user.userName);
-        } else {
-            Logger.debug("bad password");
-            forbidden();
-        }
+        System.out.println("retrieved session for user: "+userSession.user);
+        return userSession.user;
+    }
+    
+    public static void newSession() {
+        Map<String, String> resp = new HashMap<String, String>();
+        resp.put("sessionId", nextSessionId());
+        renderJSON(resp);
     }
 
-    static User getUser(String username) {
-        User user = Cache.get(username, User.class);
-        if (user == null) {
-            Logger.debug("no user in cache");
-            user = User.find("byUsername", username).first();
-            Cache.set(username, user);
-        }
-        return user;
-    }
+    public static void checkSession(String sessionId) {
+        Session userSession = Session.find("bySessionId", sessionId).first();
 
-    static User getUser() {
-        return getUser(request.user);
+        Map<String, String> resp = new HashMap<String, String>();
+        resp.put("sessionId", sessionId);
+        if(session != null) {
+            resp.put("username", userSession.user.username);            
+        }
+        renderJSON(resp);
     }
+    
+    public static void verifyLogin(String session, String redirect) {
+
+        System.out.println("\n** verifyLogin ** " + redirect +  " \n");
+        System.out.println("headers: "+ request.headers);
+        
+        String username = request.headers.get("x-remote-user").value();
+        TrinetUser user = TrinetUser.find("byUsername", username).first();
+        Session userSession = new Session(session, user);
+        userSession.save();
+        System.out.println("initialized session " + session + " for user "+username);
+        
+        String redirectUrl = redirect + "?sessionId=" + session;
+        System.out.println("redirecting to: " + redirectUrl);
+        redirect(redirectUrl);
+    }
+        
+    public static String nextSessionId() {
+        return new BigInteger(130, random).toString(32);
+    }
+    
 }

@@ -47,6 +47,7 @@ import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.HopEdge;
 import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
 import org.opentripplanner.routing.edgetype.OnBoardForwardEdge;
+import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
@@ -63,6 +64,7 @@ import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.util.PolylineEncoder;
@@ -195,28 +197,6 @@ public class PlanGenerator {
             if (backEdge == null) {
                 continue;
             }
-
-// debug: push vehicle late status out to UI
-//            if (backEdge instanceof PatternHop) {
-//                TripTimes tt = state.getTripTimes();
-//                int hop = ((PatternHop)backEdge).stopIndex;
-//                LOG.info("{} {}", tt.getTrip().toString(), hop);
-//                if ( ! tt.isScheduled()) {
-//                    int delay = tt.getDepartureDelay(hop);
-//                    String d = "on time";
-//                    if (Math.abs(delay) > 10) {
-//                        d = String.format("%2.1f min %s", delay / 60.0, 
-//                                (delay < 0) ? "early" : "late");
-//                    }
-//                    d = "Using real-time delay information: ".concat(d);
-//                    leg.addAlert(Alert.createSimpleAlerts(d));
-//                    LOG.info(d);
-//                } 
-//                else {
-//                    leg.addAlert(Alert.createSimpleAlerts("Using published timetables."));
-//                    LOG.info("sched");
-//                }
-//            }
 
             TraverseMode mode = state.getBackMode();
             if (mode != null) {
@@ -403,6 +383,11 @@ public class PlanGenerator {
                     } else {
                         leg = makeLeg(itinerary, state);
                         leg.from.stopIndex = ((OnBoardForwardEdge)backEdge).getStopIndex();
+                        TripTimes tt = state.getTripTimes();
+                        if ( ! tt.isScheduled()) {
+                            leg.realTime = true;
+                            leg.departureDelay = tt.getDepartureDelay(leg.from.stopIndex);
+                        }
                         leg.stop = new ArrayList<Place>();
                         itinerary.transfers++;
                         leg.boardRule = (String) state.getExtension("boardAlightRule");
@@ -557,6 +542,11 @@ public class PlanGenerator {
             name = backEdge.getName();
         } else {
             name = state.getVertex().getName();
+        }
+        if (backEdge instanceof PatternHop) {
+            TripTimes tt = state.getTripTimes();
+            int hop = ((PatternHop)backEdge).stopIndex;
+            leg.arrivalDelay = tt.getArrivalDelay(hop);
         }
         leg.to = makePlace(state, name, true);
         coordinates.clear();

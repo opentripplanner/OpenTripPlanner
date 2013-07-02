@@ -37,7 +37,9 @@ otp.modules.calltaker.CallHistoryWidget =
 
         otp.widgets.Widget.prototype.initialize.call(this, id, module, {
             cssClass : 'otp-callHistoryWidget',
-            title : "Call History for user "+module.callTaker.userName
+            title : "Call History for user " + module.username,
+            closeable : true,
+            persistOnClose : true,
         });
 
         var buttonRow = $('<div class="otp-callHistory-buttonRow"></div>').appendTo(this.$());
@@ -145,7 +147,10 @@ otp.widgets.CallListView = Backbone.View.extend({
         this.collection = new otp.modules.calltaker.CallList();
         this.collection.bind('add', this.appendCall); // collection event binder
         this.collection.bind('reset', this.render);
-        this.collection.fetch({ data: { userName: 'admin', password: 'secret', limit: 10 }});
+        this.collection.fetch({ data: {
+            sessionId: module.sessionId,
+            limit: 10,
+        }});
         this.counter = 0;
         this.render();
     },
@@ -244,7 +249,10 @@ otp.widgets.QueryListView = Backbone.View.extend({
     
     fetchByCallId: function(callId) {
         this.el.empty();
-        this.collection.fetch({ data: { userName: this.module.callTaker.userName, password: this.module.callTaker.password, "call.id": callId }});
+        this.collection.fetch({ data: {
+            sessionId : this.module.sessionId, 
+            "call.id": callId
+        }});
     }
 });
     

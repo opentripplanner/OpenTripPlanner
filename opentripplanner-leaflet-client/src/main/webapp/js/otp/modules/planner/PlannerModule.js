@@ -14,12 +14,29 @@
 
 otp.namespace("otp.modules.planner");
 
+otp.modules.planner.defaultQueryParams = {
+    startPlace                      : null,
+    endPlace                        : null,
+    time                            : moment().format("h:mma"),
+    date                            : moment().format("MM-DD-YYYY"),
+    arriveBy                        : false,
+    mode                            : "TRANSIT,WALK",
+    maxWalkDistance                 : 804.672, // 1/2 mi.
+    metricDefaultMaxWalkDistance    : 750, // meters
+    imperialDefaultMaxWalkDistance  : 804.672, // 0.5 mile
+    preferredRoutes                 : null,
+    otherThanPreferredRoutesPenalty : 300,
+    bannedTrips                     : null,
+    optimize                        : null,
+    triangleTimeFactor              : 0.333,
+    triangleSlopeFactor             : 0.333,
+    triangleSafetyFactor            : 0.334,
+}
 
 otp.modules.planner.PlannerModule = 
     otp.Class(otp.modules.Module, {
 
     moduleName  : "Trip Planner",
-    moduleId    : "planner",
     
     markerLayer     : null,
     pathLayer       : null,
@@ -40,7 +57,8 @@ otp.modules.planner.PlannerModule =
 
     planTripFunction : null,
 
-    // current trip query parameters:
+    // current trip query parameters: 
+    /*
     startName               : null,
     endName                 : null,
     startLatLng             : null,
@@ -49,26 +67,49 @@ otp.modules.planner.PlannerModule =
     date                    : null,
     arriveBy                : false,
     mode                    : "TRANSIT,WALK",
-    maxWalkDistance         : 804.672, // 1/2 mi.
+    maxWalkDistance         : null,
     preferredRoutes         : null,
     bannedTrips             : null,
     optimize                : null,
     triangleTimeFactor      : 0.333,
     triangleSlopeFactor     : 0.333,
     triangleSafetyFactor    : 0.334,
+    */
     
-    startTimePadding        : 0,
+    startName       : null,
+    endName         : null,
+    startLatLng     : null,
+    endLatLng       : null,
+
+    // the defaults params, as modified in the module-specific config
+    defaultQueryParams  : null,
+    
+    startTimePadding    : 0,
     
     // copy of query param set from last /plan request
     lastQueryParams : null,
     
     icons       : null,
 
-    initialize : function(webapp) {
+    initialize : function(webapp, id, options) {
         otp.modules.Module.prototype.initialize.apply(this, arguments);
         this.icons = new otp.modules.planner.IconFactory();
         
-        this.planTripFunction = this.planTrip;    
+        this.planTripFunction = this.planTrip;
+        
+        this.defaultQueryParams = _.clone(otp.modules.planner.defaultQueryParams);
+
+        if (otp.config.metric) {
+            this.defaultQueryParams.maxWalkDistance = this.defaultQueryParams.metricDefaultMaxWalkDistance;
+        } else {
+            this.defaultQueryParams.maxWalkDistance = this.defaultQueryParams.imperialDefaultMaxWalkDistance;
+        }
+
+        if(_.has(this.options, 'defaultQueryParams')) {
+            _.extend(this.defaultQueryParams, this.options.defaultQueryParams);
+        }
+        
+        _.extend(this, _.clone(otp.modules.planner.defaultQueryParams));    
     },
     
     activate : function() {
@@ -131,56 +172,60 @@ otp.modules.planner.PlannerModule =
     },
     
     setStartPoint : function(latlng, update, name) {
-        var this_ = this;
         this.startName = (typeof name !== 'undefined') ? name : null;
         this.startLatLng = latlng;
         if(this.startMarker == null) {
             this.startMarker = new L.Marker(this.startLatLng, {icon: this.icons.startFlag, draggable: true});
             this.startMarker.bindPopup('<strong>Start</strong>');
-            this.startMarker.on('dragend', function() {
-                this_.webapp.hideSplash();
-                this_.startLatLng = this_.startMarker.getLatLng();
-                if(typeof this_.userPlanTripStart == 'function') this_.userPlanTripStart();
-                this_.planTripFunction.apply(this_);//planTrip();
-            });
+            this.startMarker.on('dragend', $.proxy(function() {
+                this.webapp.hideSplash();
+                this.startLatLng = this.startMarker.getLatLng();
+                this.invokeHandlers("startChanged", [this.startLatLng]);
+                if(typeof this.userPlanTripStart == 'function') this.userPlanTripStart();
+                this.planTripFunction.apply(this);//planTrip();
+            }, this));
             this.markerLayer.addLayer(this.startMarker);
         }
         else { // marker already exists
             this.startMarker.setLatLng(latlng);
         }
         
+        this.invokeHandlers("startChanged", [latlng, name]);
+        
         if(update) {
             this.updateTipStep(2);
             if(this.endLatLng) {
                 if(typeof this.userPlanTripStart == 'function') this.userPlanTripStart();
-                this_.planTripFunction.apply(this);//this.planTrip(); 
+                this.planTripFunction.apply(this);//this.planTrip(); 
             }
         }
     },
     
     setEndPoint : function(latlng, update, name) {
-        var this_ = this;
         this.endName = (typeof name !== 'undefined') ? name : null;
         this.endLatLng = latlng;    	 
         if(this.endMarker == null) {
             this.endMarker = new L.Marker(this.endLatLng, {icon: this.icons.endFlag, draggable: true}); 
             this.endMarker.bindPopup('<strong>Destination</strong>');
-            this.endMarker.on('dragend', function() {
-                this_.webapp.hideSplash();
-                this_.endLatLng = this_.endMarker.getLatLng();
-                if(typeof this_.userPlanTripStart == 'function') this_.userPlanTripStart();
-                this_.planTripFunction.apply(this_);//this_.planTrip();
-            });
+            this.endMarker.on('dragend', $.proxy(function() {
+                this.webapp.hideSplash();
+                this.endLatLng = this.endMarker.getLatLng();
+                this.invokeHandlers("endChanged", [this.endLatLng]);
+                if(typeof this.userPlanTripStart == 'function') this.userPlanTripStart();
+                this.planTripFunction.apply(this);//this_.planTrip();
+            }, this));
             this.markerLayer.addLayer(this.endMarker);
         }
         else { // marker already exists
             this.endMarker.setLatLng(latlng);
         }
                  
+        this.invokeHandlers("endChanged", [latlng, name]);
+
         if(update) {
             if(this.startLatLng) {
                 if(typeof this.userPlanTripStart == 'function') this.userPlanTripStart();
-                this_.planTripFunction.apply(this);//this.planTrip();
+                this.planTripFunction.apply(this);//this.planTrip();
             }
         }
     },
@@ -250,7 +295,12 @@ otp.modules.planner.PlannerModule =
                 maxWalkDistance: this.maxWalkDistance
             };
             if(this.arriveBy !== null) _.extend(queryParams, { arriveBy : this.arriveBy } );
-            if(this.preferredRoutes !== null) _.extend(queryParams, { preferredRoutes : this.preferredRoutes } );
+            if(this.preferredRoutes !== null) {
+                queryParams.preferredRoutes = this.preferredRoutes;
+                if(this.otherThanPreferredRoutesPenalty !== null) 
+                    queryParams.otherThanPreferredRoutesPenalty = this.otherThanPreferredRoutesPenalty;             
+            }    
+            if(this.bannedRoutes !== null) _.extend(queryParams, { bannedRoutes : this.bannedRoutes } );
             if(this.bannedTrips !== null) _.extend(queryParams, { bannedTrips : this.bannedTrips } );
             if(this.optimize !== null) _.extend(queryParams, { optimize : this.optimize } );
             if(this.optimize === 'TRIANGLE') {
@@ -275,6 +325,10 @@ otp.modules.planner.PlannerModule =
             success: function(data) {
                 $('#otp-spinner').hide();
                 
+                if (otp.config.debug) {
+                    otp.debug.processRequest(data)
+                }
+
                 if(data.plan) {
                     // compare returned plan.date to sent date/time to determine timezone offset (unless set explicitly in config.js)
                     otp.config.timeOffset = (otp.config.timeOffset) ||
@@ -434,7 +488,20 @@ otp.modules.planner.PlannerModule =
         if(mode === "SUBWAY") return '#f00';
         if(mode === "BUS") return '#080';
         if(mode === "TRAM") return '#800';
+        if(mode === "CAR") return '#444';
         return '#aaa';
+    },
+    
+    clearTrip : function() {
+    
+        this.markerLayer.removeLayer(this.startMarker);
+        this.startName = this.startLatLng = this.startMarker = null;
+        
+        this.markerLayer.removeLayer(this.endMarker);
+        this.endName = this.endLatLng = this.endMarker = null;
+
+        this.pathLayer.clearLayers();
+        this.pathMarkerLayer.clearLayers();    
     },
         
     savePlan : function(data) {

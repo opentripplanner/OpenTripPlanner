@@ -15,7 +15,7 @@ package org.opentripplanner.routing.edgetype;
 
 import java.io.Serializable;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Trip;
 
 /** 
  * A vehicle's wait between the end of one run and the beginning of another run on the same block 
@@ -28,9 +28,9 @@ public class InterlineDwellData implements Serializable {
 
     public int patternIndex;
 
-    public AgencyAndId trip;
+    public Trip trip;
     
-    public InterlineDwellData(int dwellTime, int patternIndex, AgencyAndId trip) {
+    public InterlineDwellData(int dwellTime, int patternIndex, Trip trip) {
         this.dwellTime = dwellTime;
         this.patternIndex = patternIndex;
         this.trip = trip;

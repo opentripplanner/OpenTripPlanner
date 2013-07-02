@@ -15,7 +15,7 @@ package org.opentripplanner.routing.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
@@ -36,11 +36,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A GraphService implementation implementing loading graph from files or resources, but which does not load anything by itself. It rely on decorators
- * instances to help it initialize/reload itself.
+ * A GraphService implementation implementing loading graph from files or resources, but which does
+ * not load anything by itself. It rely on decorators instances to help it initialize/reload itself.
  * 
- * Note: Instead of a decorator pattern we should have used a strategy pattern (letting the GraphServiceImpl delegate the file mapping to various
- * strategy/factory instances), but this would have broke down the spring API widely used. And also this could have been a bit more complex as
+ * Note: Instead of a decorator pattern we should have used a strategy pattern (letting the
+ * GraphServiceImpl delegate the file mapping to various strategy/factory instances), but this would
+ * have broke down the spring API widely used. And also this could have been a bit more complex as
  * auto-discover mode would have need callbacks.
  * 
  * @see GraphServiceImpl
@@ -52,15 +53,16 @@ public class GraphServiceFileImpl implements GraphService {
 
     public static final String GRAPH_FILENAME = "Graph.obj";
 
-    @Getter
-    private String resourceBase = "file:/var/otp/graphs";
+    @Getter 
+    @Setter
+    private String basePath = "/var/otp/graphs";
 
     private Map<String, Graph> graphs = new HashMap<String, Graph>();
 
     private Map<String, LoadLevel> levels = new HashMap<String, LoadLevel>();
 
     private LoadLevel loadLevel = LoadLevel.FULL;
-    
+
     @Setter
     private StreetVertexIndexFactory indexFactory = new DefaultStreetVertexIndexFactory();
 
@@ -68,26 +70,13 @@ public class GraphServiceFileImpl implements GraphService {
     @Getter
     private String defaultRouterId = "";
 
-    /** 
-     * Router IDs may contain alphanumeric characters, underscores, and dashes only. 
-     * This prevents any confusion caused by the presence of special characters that might have a 
-     * meaning for the filesystem.
+    /**
+     * Router IDs may contain alphanumeric characters, underscores, and dashes only. This prevents
+     * any confusion caused by the presence of special characters that might have a meaning for the
+     * filesystem.
      */
     private static Pattern routerIdPattern = Pattern.compile("[\\p{Alnum}_-]*");
-    
-    /**
-     * Sets a base path in the classpath or relative to the webapp root. This can be useful in 
-     * cloud computing environments where webapps must be entirely self-contained. When OTP is
-     * running as a webapp, the ResourceLoader provided by Spring will be a 
-     * ServletContextResourceLoader, so paths will be interpreted relative to the webapp root and 
-     * WARs should be handled transparently. If you want to point to a location outside the webapp 
-     * or you just want to be clear about exactly where the graphs are to be found, this path 
-     * should be prefixed with 'classpath:','file:', or 'url:'.
-     */
-    public void setResource(String resourceBaseName) {
-        this.resourceBase = resourceBaseName;
-    }
-    
+
     public Graph getGraph() {
         return getGraph(null);
     }
@@ -121,34 +110,45 @@ public class GraphServiceFileImpl implements GraphService {
     }
 
     protected Graph loadGraph(String routerId) {
-        if ( ! routerIdLegal(routerId)) {
-            LOG.error("routerId '{}' contains characters other than alphanumeric, underscore, and dash.", routerId);
+        if (!routerIdLegal(routerId)) {
+            LOG.error(
+                "routerId '{}' contains characters other than alphanumeric, underscore, and dash.",
+                routerId);
             return null;
         }
         LOG.debug("loading serialized graph for routerId {}", routerId);
-        StringBuilder sb = new StringBuilder(resourceBase);
-        // S3 is intolerant of extra slashes in the URL, so only add them as needed
-        if (! (resourceBase.endsWith("/") || resourceBase.endsWith(File.pathSeparator))) {
-            sb.append("/");
+        StringBuilder sb = new StringBuilder(basePath);
+        if (!(basePath.endsWith(File.separator))) {
+            sb.append(File.separator);
         }
-        if (routerId.length() > 0) { 
+        if (routerId.length() > 0) {
+            // there clearly must be a more elegant way to extend paths
             sb.append(routerId);
-            sb.append("/");
+            sb.append(File.separator);
         }
         sb.append("Graph.obj");
-        String resourceLocation = sb.toString();
-        LOG.debug("graph file for routerId '{}' is at {}", routerId, resourceLocation);
-        InputStream is;
-        try {
-            if (resourceLocation.startsWith("file:")) {
-                is = new FileInputStream(new File(resourceLocation.substring(5)));
-            } else if (resourceLocation.startsWith("classpath:")) {
-                throw new UnsupportedOperationException();
-            } else {
-                is = new FileInputStream(new File(resourceLocation));
+        String graphFileName = sb.toString();
+        LOG.debug("graph file for routerId '{}' is at {}", routerId, graphFileName);
+        InputStream is = null;
+        final String CLASSPATH_PREFIX = "classpath:/";
+        if (graphFileName.startsWith(CLASSPATH_PREFIX)) {
+            // look for graph on classpath
+            String resourceName = graphFileName.substring(CLASSPATH_PREFIX.length());
+            LOG.debug("loading graph on classpath at {}", resourceName);
+            is = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName);
+        } else {
+            // look for graph in filesystem
+            try {
+                File graphFile = new File(graphFileName);
+                is = new FileInputStream(graphFile);
+            } catch (IOException ex) {
+                is = null;
+                ex.printStackTrace();
             }
-        } catch (FileNotFoundException e) {
-            LOG.error("File not found at {}.", resourceLocation);
+        }
+        if (is == null) {
+            LOG.warn("Graph file not found or not openable for routerId '{}' under {}", 
+                    routerId, graphFileName);
             return null;
         }
         LOG.debug("graph input stream successfully opened.");
@@ -156,12 +156,13 @@ public class GraphServiceFileImpl implements GraphService {
         try {
             return Graph.load(new ObjectInputStream(is), loadLevel, indexFactory);
         } catch (Exception ex) {
-            LOG.error("Exception while loading graph from {}.", resourceLocation);
+            LOG.error("Exception while loading graph from {}.", graphFileName);
             ex.printStackTrace();
             return null;
         }
     }
 
+    @Override
     public boolean reloadGraphs(boolean preEvict) {
         boolean allSucceeded = true;
         synchronized (graphs) {
@@ -172,7 +173,7 @@ public class GraphServiceFileImpl implements GraphService {
         }
         return allSucceeded;
     }
-    
+
     @Override
     public Collection<String> getRouterIds() {
         return new ArrayList<String>(graphs.keySet());
@@ -200,7 +201,7 @@ public class GraphServiceFileImpl implements GraphService {
         Graph existing = graphs.put(routerId, graph);
         return existing == null;
     }
-    
+
     @Override
     public boolean evictGraph(String routerId) {
         LOG.debug("evicting graph {}", routerId);
@@ -213,10 +214,11 @@ public class GraphServiceFileImpl implements GraphService {
     @Override
     public int evictAll() {
         int n;
-        synchronized(graphs) {
-            n = graphs.size(); 
+        synchronized (graphs) {
+            n = graphs.size();
             graphs.clear();
         }
         return n;
     }
+
 }

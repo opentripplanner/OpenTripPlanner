@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -144,6 +145,11 @@ class SimpleGraphServiceImpl implements GraphService {
     @Override
     public int evictAll() {
         return 0;
+    }
+
+    @Override
+    public boolean reloadGraphs(boolean preEvict) {
+        throw new UnsupportedOperationException();
     }
 
 }
@@ -295,6 +301,16 @@ public class TestRequest extends TestCase {
         assertFalse(request.getModes().getCar());
         assertTrue(request.getModes().getBicycle());
         assertTrue(request.getModes().getWalk());
+    }
+
+    public void testBuildRequest() throws Exception {
+        TestPlanner planner = new TestPlanner("portland", "45.58,-122.68", "45.48,-122.6");
+        RoutingRequest options = planner.buildRequest();
+
+        assertEquals(new Date(1254420671000L), options.getDateTime());
+        assertEquals(1600.0, options.getMaxWalkDistance());
+        assertEquals(8.0, options.getWalkReluctance());
+        assertEquals(1, options.getNumItineraries());
     }
 
     public void testPlanner() throws Exception {
@@ -640,6 +656,7 @@ public class TestRequest extends TestCase {
             this.date = Arrays.asList("2009-10-01");
             this.time = Arrays.asList("11:11:11");
             this.maxWalkDistance = Arrays.asList(1600.0);
+            this.walkReluctance = Arrays.asList(8.0);
             this.walkSpeed = Arrays.asList(1.33);
             this.optimize = Arrays.asList(OptimizeType.QUICK);
             this.modes = Arrays.asList(new TraverseModeSet("WALK,TRANSIT"));

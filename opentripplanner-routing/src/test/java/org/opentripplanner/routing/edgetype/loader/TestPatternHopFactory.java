@@ -22,6 +22,10 @@ import java.util.TimeZone;
 
 import junit.framework.TestCase;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Route;
+import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -33,6 +37,7 @@ import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StopTransfer;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.FrequencyBasedTripPattern;
@@ -40,9 +45,9 @@ import org.opentripplanner.routing.edgetype.FrequencyBoard;
 import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
-import org.opentripplanner.routing.edgetype.SimpleEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.graph.Edge;
@@ -52,6 +57,8 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.TransitStopArrive;
+import org.opentripplanner.routing.vertextype.TransitStopDepart;
 import org.opentripplanner.util.TestUtils;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -293,13 +300,37 @@ public class TestPatternHopFactory extends TestCase {
 
     public void testTransfers() throws Exception {
         TransferTable transferTable = graph.getTransferTable();
+        
+        // create dummy routes and trips
+        Route fromRoute = new Route();
+        fromRoute.setId(new AgencyAndId("agency", "1"));
+        Trip fromTrip = new Trip();
+        fromTrip.setId(new AgencyAndId("agency", "1.1"));
+        fromTrip.setRoute(fromRoute);
+        Route toRoute = new Route();
+        toRoute.setId(new AgencyAndId("agency", "2"));
+        Trip toTrip = new Trip();
+        toTrip.setId(new AgencyAndId("agency", "2.1"));
+        toTrip.setRoute(toRoute);
+        Trip toTrip2 = new Trip();
+        toTrip2.setId(new AgencyAndId("agency", "2.2"));
+        toTrip2.setRoute(toRoute);
+        
+        // find stops
+        Stop stopK = ((TransitStopArrive)graph.getVertex("agency_K_arrive")).getStop();
+        Stop stopN = ((TransitStopDepart)graph.getVertex("agency_N_depart")).getStop();
+        Stop stopM = ((TransitStopDepart)graph.getVertex("agency_M_depart")).getStop();
+        
         assertTrue(transferTable.hasPreferredTransfers());
-        assertTrue(transferTable.getTransferTime(graph.getVertex("agency_K_arrive"), 
-                graph.getVertex("agency_N_depart")) == TransferTable.PREFERRED_TRANSFER);
+        assertEquals(StopTransfer.UNKNOWN_TRANSFER, transferTable.getTransferTime(stopN, stopM, fromTrip, toTrip));
+        assertEquals(StopTransfer.FORBIDDEN_TRANSFER, transferTable.getTransferTime(stopK, stopM, fromTrip, toTrip));
+        assertEquals(StopTransfer.PREFERRED_TRANSFER, transferTable.getTransferTime(stopN, stopK, toTrip, toTrip2));
+        assertEquals(StopTransfer.TIMED_TRANSFER, transferTable.getTransferTime(stopN, stopK, fromTrip, toTrip));
+        assertEquals(15, transferTable.getTransferTime(stopN, stopK, fromTrip, toTrip2));
         
         Vertex e_arrive = graph.getVertex("agency_E_arrive");
         Vertex f_depart = graph.getVertex("agency_F_depart");
-        Edge edge = new SimpleEdge(e_arrive, f_depart, 10000, 10000);
+        Edge edge = new TransferEdge(e_arrive, f_depart, 10000, 10000);
         
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 18, 0, 50, 0);
         Vertex stop_b = graph.getVertex("agency_B_depart");

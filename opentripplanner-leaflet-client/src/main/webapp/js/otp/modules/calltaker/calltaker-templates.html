@@ -1,0 +1,70 @@
+<script id="otp-calltaker-mailablesWidget" type="text/html">
+    <div class="notDraggable" style="position: absolute; top: 25px; left: 10px; right: 10px; bottom: 10px;">
+        <div style="position: absolute; top: 0px; width: 100%; height: 110px; overflow: auto; line-height: 2em;">
+            Salutation: <select id="{{widgetId}}-salutation">
+                <option>Mr.</option>
+                <option>Ms.</option>
+                <option>Mrs.</option>
+                <option>Dr.</option>
+            </select>&nbsp;&nbsp;
+            First: <input type="text" id="{{widgetId}}-firstname" style="width:120px;" />&nbsp;&nbsp;
+            Last: <input type="text" id="{{widgetId}}-lastname" style="width:120px;" /><br>
+            
+            Address 1: <input type="text" id="{{widgetId}}-address1" style="width:300px;" /><br>
+            Address 2: <input type="text" id="{{widgetId}}-address2" style="width:300px;" /><br>
+            City: <input type="text" id="{{widgetId}}-city" style="width: 200px;"/>
+            State: <input type="text" id="{{widgetId}}-state" style="width: 20px;"/>
+            ZIP: <input type="text" id="{{widgetId}}-zip" style="width: 80px;"/>
+        </div>
+
+        <div style="position: absolute; top: 120px; bottom: 40px; width: 100%;">
+            <div style="position: absolute; width: 50%; height: 100%; left: 0px;">
+                <div style="position: absolute; right: 5px; left: 0px; height: 100%;">
+                    <div class="otp-calltaker-mailables-listHeader">
+                        All Mailables:
+                    </div>
+                    <div class="otp-calltaker-mailables-list">
+                        {{#mailables}}
+                            <div id="{{widgetId}}-listItem-{{index}}" class="otp-calltaker-mailables-fullListItem">
+                                {{name}}
+                            </div>
+                        {{/mailables}}
+                    </div>
+                </div>
+            </div>
+            <div style="position: absolute; width: 50%; height: 100%; right: 0px;">
+                <div style="position: absolute; right: 0px; left: 5px; height: 100%;">
+                    <div class="otp-calltaker-mailables-listHeader">
+                        Selected Mailables:
+                    </div>
+                    <div id="{{widgetId}}-selectedList" class="otp-calltaker-mailables-list">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="position: absolute; bottom: 0px; width: 100%; text-align: center;">
+            <button id="{{widgetId}}-createLetterButton">Create Letter</button>
+        </div>
+    </div>
+
+</script>
+
+<script id="otp-calltaker-selectedMailable" type="text/html">
+    <div class="otp-calltaker-mailables-selectedListItem">
+        <div style="float: right; width: 25px;">
+            <button class="otp-calltaker-mailables-selectedListItem-closeButton">X</button>
+        </div>
+        <div style="margin-right: 30px;">
+            <div class="otp-calltaker-mailables-selectedListItem-name">{{name}}</div>
+            <div style="font-size: 11px; margin-top: 4px;">
+                Quantity: <input type="text" class="otp-calltaker-mailables-selectedListItem-quantity" value="1" />
+                {{#largePrint}}
+                    &nbsp;&nbsp;<input class="otp-calltaker-mailables-selectedListItem-largePrint" type="checkbox" style="vertical-align: -25%;" /> Large Print
+                {{/largePrint}}
+            </div>
+        </div>
+        
+    <div>
+</script>
+

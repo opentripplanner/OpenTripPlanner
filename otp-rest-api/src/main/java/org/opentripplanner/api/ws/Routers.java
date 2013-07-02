@@ -48,6 +48,7 @@ import org.springframework.security.access.annotation.Secured;
 
 import com.sun.jersey.api.NotFoundException;
 import com.sun.jersey.api.Responses;
+import com.sun.jersey.api.core.InjectParam;
 import com.sun.jersey.api.spring.Autowire;
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -97,7 +98,7 @@ public class Routers {
 
     private static final Logger LOG = LoggerFactory.getLogger(Routers.class);
 
-    @Autowired GraphService graphService;
+    @InjectParam GraphService graphService;
     
     /** 
      * Returns a list of routers and their bounds. 
@@ -153,8 +154,7 @@ public class Routers {
     @PUT @Produces({ MediaType.APPLICATION_JSON })
     public Response reloadGraphs(@QueryParam("path") String path, 
             @QueryParam("preEvict") @DefaultValue("true") boolean preEvict) {
-        GraphServiceImpl gsi = (GraphServiceImpl) graphService;
-        gsi.reloadGraphs(preEvict);
+        graphService.reloadGraphs(preEvict);
         return Response.status(Status.OK).build();
     }
 

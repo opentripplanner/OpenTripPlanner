@@ -82,4 +82,9 @@ public class GraphServiceBeanImpl implements GraphService {
         return 0;
     }
 
+    @Override
+    public boolean reloadGraphs(boolean preEvict) {
+        throw new UnsupportedOperationException();
+    }
+
 }

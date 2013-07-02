@@ -24,13 +24,22 @@ POST    /fieldTrip/addItinerary                 FieldTrip.addItinerary
 POST    /fieldTrip/addTripFeedback              FieldTrip.addTripFeedback
 POST    /fieldTrip/deleteTrip                   FieldTrip.deleteTrip
 POST    /fieldTrip/newRequest                   FieldTrip.newRequest
+POST    /fieldTrip/newRequestForm               FieldTrip.newRequestForm
 GET     /fieldTrip/getRequests                  FieldTrip.getRequests
+POST    /fieldTrip/setInboundTrip               FieldTrip.setInboundTrip
+POST    /fieldTrip/setOutboundTrip              FieldTrip.setOutboundTrip
 
-#Users
-GET      /users                                 UserManagement.getUsers
-POST     /users/delete                          UserManagement.deleteUser
-POST     /users/add                             UserManagement.addUser
+#Admin
+GET      /admin/users                           Admin.getUsers
+POST     /admin/deleteUser                      Admin.deleteUser
+POST     /admin/addUser                         Admin.addUser
 
+# Trinet Authentication
+GET      /auth/initLogin                        Application.initLogin
+
+GET      /auth/checkSession                     Application.checkSession
+GET      /auth/newSession                       Application.newSession
+GET      /auth/verifyLogin                      Application.verifyLogin
 
 # Ignore favicon requests
 GET     /favicon.ico                            404
