@@ -16,7 +16,9 @@ package org.opentripplanner.api.ws;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.reset;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +35,9 @@ import junit.framework.TestCase;
 import org.codehaus.jettison.json.JSONException;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.model.AbsoluteDirection;
 import org.opentripplanner.api.model.Itinerary;
@@ -78,6 +82,8 @@ import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StopMatcher;
+import org.opentripplanner.routing.core.StopTransfer;
+import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
@@ -161,7 +167,7 @@ class Context {
      */
     private static final boolean DEBUG_OUTPUT = false;
 
-    public Graph graph = new Graph();
+    public Graph graph = spy(new Graph());
 
     public SimpleGraphServiceImpl graphService = new SimpleGraphServiceImpl();
 
@@ -678,6 +684,52 @@ public class TestRequest extends TestCase {
         }
     }
     
+    public void testForbiddenTripToTripTransfer() throws JSONException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
+        // Plan short trip
+        TestPlanner planner = new TestPlanner("portland", "45.5264892578125,-122.60479259490967", "45.511622,-122.645564");
+        // Replace the transfer table with an empty table
+        TransferTable table = new TransferTable();
+        Graph graph = Context.getInstance().graph;
+        when(graph.getTransferTable()).thenReturn(table);
+        
+        // Do the planning
+        Response response = planner.getItineraries();
+        Itinerary itinerary = response.getPlan().itinerary.get(0);
+        // Check the ids of the first two busses
+        assertEquals("190W1280", itinerary.legs.get(1).tripId);
+        assertEquals("751W1330", itinerary.legs.get(3).tripId);
+        
+        // Now add a forbidden transfer between the two busses
+        Stop fromStop = new Stop();
+        fromStop.setId(new AgencyAndId("TriMet", "2111"));
+        Stop toStop = new Stop();
+        toStop.setId(new AgencyAndId("TriMet", "7452"));
+        Route fromRoute = new Route();
+        fromRoute.setId(new AgencyAndId("TriMet", "19"));
+        Route toRoute = new Route();
+        toRoute.setId(new AgencyAndId("TriMet", "75"));
+        Trip fromTrip = new Trip();
+        fromTrip.setId(new AgencyAndId("TriMet", "190W1280"));
+        fromTrip.setRoute(fromRoute);
+        Trip toTrip = new Trip();
+        toTrip.setId(new AgencyAndId("TriMet", "751W1330"));
+        toTrip.setRoute(toRoute);
+        assertEquals(StopTransfer.UNKNOWN_TRANSFER, table.getTransferTime(fromStop, toStop, fromTrip, toTrip));
+        table.addTransferTime(fromStop, toStop, null, null, fromTrip, toTrip, StopTransfer.FORBIDDEN_TRANSFER);
+        assertEquals(StopTransfer.FORBIDDEN_TRANSFER, table.getTransferTime(fromStop, toStop, fromTrip, toTrip));
+        
+        // Do the planning again
+        response = planner.getItineraries();
+        itinerary = response.getPlan().itinerary.get(0);
+        // The ids of the first two busses should be different
+        assertFalse("190W1280".equals(itinerary.legs.get(1).tripId)
+                && "751W1330".equals(itinerary.legs.get(3).tripId));
+        
+        // Revert the graph, thus using the original transfer table again
+        reset(graph);
+        assertEquals(StopTransfer.PREFERRED_TRANSFER, graph.getTransferTable().getTransferTime(fromStop, toStop, fromTrip, toTrip));
+    }
+
     /**
      * Subclass of Planner for testing. Constructor sets fields that would usually be set by Jersey from HTTP Query string.
      */
