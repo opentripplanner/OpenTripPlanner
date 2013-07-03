@@ -155,6 +155,12 @@ class SimpleGraphServiceImpl implements GraphService {
 
 /* This is a hack to hold context and graph data between test runs, since loading it is slow. */
 class Context {
+    
+    /**
+     * Save a temporary graph object when this is true
+     */
+    private static final boolean DEBUG_OUTPUT = false;
+
     public Graph graph = new Graph();
 
     public SimpleGraphServiceImpl graphService = new SimpleGraphServiceImpl();
@@ -204,10 +210,12 @@ class Context {
         initBikeRental();
         graph.streetIndex = new StreetVertexIndexServiceImpl(graph);
 
-        try {
-            graph.save(File.createTempFile("graph", ".obj"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (DEBUG_OUTPUT) {
+            try {
+                graph.save(File.createTempFile("graph", ".obj"));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         pathService.setSptService(new GenericAStar());
@@ -592,46 +600,28 @@ public class TestRequest extends TestCase {
         assertTrue(leg.to.stopId.getId().equals("2109"));
     }
     
+    @SuppressWarnings("deprecation")
     public void testBannedStopGroup() throws JSONException, ParameterException {
         // Create StopMatcher instance
         StopMatcher stopMatcher = StopMatcher.parse("TriMet_2106,TriMet_65-tc");
         // Find stops in graph
-        Stop stop65_tc = null;
-        Stop stop12921 = null;
-        Stop stop13132 = null;
-        Stop stop2106 = null;
-        Stop stop2107 = null;
-        {
-            Graph graph = Context.getInstance().graph;
-            for (Vertex v : graph.getVertices()) {
-               if (v instanceof TransitStop) {
-                   Stop stop = ((TransitStop)v).getStop();
-                   if (stop.getId().getAgencyId().equals("TriMet")) {
-                       if (stop.getId().getId().equals("65-tc")) {
-                           stop65_tc = stop;
-                       }
-                       else if (stop.getId().getId().equals("12921")) {
-                           stop12921 = stop;
-                       }
-                       else if (stop.getId().getId().equals("13132")) {
-                           stop13132 = stop;
-                       }
-                       else if (stop.getId().getId().equals("2106")) {
-                           stop2106 = stop;
-                       }
-                       else if (stop.getId().getId().equals("2107")) {
-                           stop2107 = stop;
-                       }
-                   }
-               }
-            }
-        }
-        // All stops should be found
+        Graph graph = Context.getInstance().graph;
+        
+        Stop stop65_tc = ((TransitStop) graph.getVertex("TriMet_65-tc")).getStop();
         assertNotNull(stop65_tc);
+        
+        Stop stop12921 = ((TransitStop) graph.getVertex("TriMet_12921")).getStop();
         assertNotNull(stop12921);
+        
+        Stop stop13132 = ((TransitStop) graph.getVertex("TriMet_13132")).getStop();
         assertNotNull(stop13132);
+        
+        Stop stop2106 = ((TransitStop) graph.getVertex("TriMet_2106")).getStop();
         assertNotNull(stop2106);
+        
+        Stop stop2107 = ((TransitStop) graph.getVertex("TriMet_2107")).getStop();
         assertNotNull(stop2107);
+        
         // Match stop with id 65-tc
         assertTrue(stopMatcher.matches(stop65_tc));
         // Match stop with id 12921 that has TriMet_65-tc as a parent
@@ -642,6 +632,50 @@ public class TestRequest extends TestCase {
         assertTrue(stopMatcher.matches(stop2106));
         // Match stop with id 2107
         assertFalse(stopMatcher.matches(stop2107));
+    }
+    
+    public void testTransferPenalty() throws JSONException {
+        // Plan short trip
+        TestPlanner planner = new TestPlanner("portland", "45.5264892578125,-122.60479259490967", "45.511622,-122.645564");
+        // Don't use non-preferred transfer penalty
+        planner.setNonpreferredTransferPenalty(Arrays.asList(0));
+        // Check number of legs when using different transfer penalties
+        checkLegsWithTransferPenalty(planner, 0, 7, false);
+        checkLegsWithTransferPenalty(planner, 1800, 7, true);
+    }
+
+    public void testTransferPenalty2() throws JSONException {
+        // Plan short trip
+        TestPlanner planner = new TestPlanner("portland", "45.514861,-122.612035", "45.483096,-122.540624");
+        // Don't use non-preferred transfer penalty
+        planner.setNonpreferredTransferPenalty(Arrays.asList(0));
+        // Check number of legs when using different transfer penalties
+        checkLegsWithTransferPenalty(planner, 0, 5, false);
+        checkLegsWithTransferPenalty(planner, 1800, 5, true);
+    }
+    
+    /**
+     * Checks the number of legs when using a specific transfer penalty while planning.
+     * @param planner is the test planner to use
+     * @param transferPenalty is the value for the transfer penalty
+     * @param expectedLegs is the number of expected legs
+     * @param smaller if true, number of legs should be smaller; if false, number of legs should be exact
+     * @throws JSONException
+     */
+    private void checkLegsWithTransferPenalty(TestPlanner planner, int transferPenalty,
+            int expectedLegs, boolean smaller) throws JSONException {
+        // Set transfer penalty
+        planner.setTransferPenalty(Arrays.asList(transferPenalty));
+        // Do the planning
+        Response response = planner.getItineraries();
+        Itinerary itinerary = response.getPlan().itinerary.get(0);
+        // Check the number of legs
+        if (smaller) {
+            assertTrue(itinerary.legs.size() < expectedLegs);
+        }
+        else {
+            assertEquals(expectedLegs, itinerary.legs.size());
+        }
     }
     
     /**
@@ -685,6 +719,14 @@ public class TestRequest extends TestCase {
 
         public void setBannedStops(List<String> bannedStops) {
             this.bannedStops = bannedStops;
+        }
+        
+        public void setTransferPenalty(List<Integer> transferPenalty) {
+            this.transferPenalty = transferPenalty;
+        }
+        
+        public void setNonpreferredTransferPenalty(List<Integer> nonpreferredTransferPenalty) {
+            this.nonpreferredTransferPenalty = nonpreferredTransferPenalty;
         }
         
         public RoutingRequest buildRequest() throws ParameterException {
