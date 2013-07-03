@@ -160,9 +160,6 @@ public class Timetable implements Serializable {
         TripTimes bestTrip = null;
         int index;
         TripTimes[][] tableIndex = boarding ? departuresIndex : arrivalsIndex; 
-        // sorted = tripTimes; ARGH, Array versus List APIs
-        // for the purposes of adjacent trips, guess that unindexed tables are roughly FIFO
-        List<TripTimes> ordered = tripTimes;
         if (tableIndex != null) {
             TripTimes[] sorted;
             // this timetable has been indexed, use binary search
@@ -191,7 +188,6 @@ public class Timetable implements Serializable {
                     }
                 }
             }
-            ordered = Arrays.asList(sorted); // find adjacent entries in the sorted list
         } else { 
             // no index present on this timetable. use a linear search:
             // because trips may change with stoptime updates, we cannot count on them being sorted

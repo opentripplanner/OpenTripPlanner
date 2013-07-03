@@ -261,8 +261,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     public int maxTransfers = 2;
 
     /**
-     * Extensions to the trip planner will require additional traversal options beyond the default set. We provide an extension point for adding
-     * arbitrary parameters with an extension-specific key.
+     * Extensions to the trip planner will require additional traversal options beyond the default 
+     * set. We provide an extension point for adding arbitrary parameters with an 
+     * extension-specific key.
      */
     public Map<Object, Object> extensions = new HashMap<Object, Object>();
 
@@ -270,7 +271,8 @@ public class RoutingRequest implements Cloneable, Serializable {
     public int nonpreferredTransferPenalty = 180;
 
     /**
-     * For the bike triangle, how important time is. triangleTimeFactor+triangleSlopeFactor+triangleSafetyFactor == 1
+     * For the bike triangle, how important time is. 
+     * triangleTimeFactor+triangleSlopeFactor+triangleSafetyFactor == 1
      */
     public double triangleTimeFactor;
 
@@ -280,9 +282,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** For the bike triangle, how important safety is */
     public double triangleSafetyFactor;
 
-    /**
-     * Options specifically for the case that you are walking a bicycle.
-     */
+    /** Options specifically for the case that you are walking a bicycle. */
     public RoutingRequest bikeWalkingOptions;
 
     /** This is true when a GraphPath is being traversed in reverse for optimization purposes. */
