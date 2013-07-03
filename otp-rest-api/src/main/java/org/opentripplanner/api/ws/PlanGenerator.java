@@ -384,7 +384,7 @@ public class PlanGenerator {
                         leg = makeLeg(itinerary, state);
                         leg.from.stopIndex = ((OnBoardForwardEdge)backEdge).getStopIndex();
                         TripTimes tt = state.getTripTimes();
-                        if ( ! tt.isScheduled()) {
+                        if (tt != null && !tt.isScheduled()) {
                             leg.realTime = true;
                             leg.departureDelay = tt.getDepartureDelay(leg.from.stopIndex);
                         }
