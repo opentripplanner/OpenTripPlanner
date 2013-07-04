@@ -108,7 +108,7 @@ otp.modules.calltaker.MailablesWidget =
 
 
         // current date
-        doc.text(x_offset, y_offset, moment().format("MMMM DD, YYYY"));
+        doc.text(x_offset, y_offset, moment().format("MMMM D, YYYY"));
 
 
         // recipient address
@@ -150,7 +150,7 @@ otp.modules.calltaker.MailablesWidget =
 
         y_offset += line_height * 2;
         doc.setFontType("bold");
-        doc.text(x_offset, y_offset, "SUMMARY BY ITEM");
+        doc.text(x_offset+135, y_offset, "SUMMARY BY ITEM");
 
         y_offset += line_height * 2;
         doc.text(x_offset, y_offset, "Item");
