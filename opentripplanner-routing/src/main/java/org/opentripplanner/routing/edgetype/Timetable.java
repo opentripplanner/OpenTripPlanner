@@ -22,7 +22,7 @@ import java.util.List;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.trippattern.CanceledTripTimes;
 import org.opentripplanner.routing.trippattern.DecayingDelayTripTimes;
@@ -155,7 +155,7 @@ public class Timetable implements Serializable {
      * @return the TripTimes object representing the (possibly updated) best trip, or null if no
      * trip matches both the time and other criteria. 
      */
-    protected TripTimes getNextTrip(int stopIndex, int time, boolean haveBicycle,
+    protected TripTimes getNextTrip(int stopIndex, int time, boolean haveBicycle, ServiceDay sd,
             State state0, boolean boarding) {
         TripTimes bestTrip = null;
         int index;
@@ -173,7 +173,7 @@ public class Timetable implements Serializable {
                 index = TripTimes.binarySearchDepartures(sorted, stopIndex, time);
                 while (index < sorted.length) {
                     TripTimes tt = sorted[index++];
-                    if (tt.tripAcceptable(state0, haveBicycle, stopIndex)) {
+                    if (tt.tripAcceptable(state0, haveBicycle, sd, stopIndex)) {
                         bestTrip = tt;
                         break;
                     }
@@ -182,7 +182,7 @@ public class Timetable implements Serializable {
                 index = TripTimes.binarySearchArrivals(sorted, stopIndex, time);
                 while (index >= 0) {
                     TripTimes tt = sorted[index--];
-                    if (tt.tripAcceptable(state0, haveBicycle, stopIndex)) {
+                    if (tt.tripAcceptable(state0, haveBicycle, sd, stopIndex)) {
                         bestTrip = tt;
                         break;
                     }
@@ -196,13 +196,13 @@ public class Timetable implements Serializable {
                 // hoping JVM JIT will distribute the loop over the if clauses as needed
                 if (boarding) {
                     int depTime = tt.getDepartureTime(stopIndex);
-                    if (depTime >= time && depTime < bestTime && tt.tripAcceptable(state0, haveBicycle, stopIndex)) {
+                    if (depTime >= time && depTime < bestTime && tt.tripAcceptable(state0, haveBicycle, sd, stopIndex)) {
                         bestTrip = tt;
                         bestTime = depTime;
                     }
                 } else {
                     int arvTime = tt.getArrivalTime(stopIndex);
-                    if (arvTime <= time && arvTime > bestTime && tt.tripAcceptable(state0, haveBicycle, stopIndex)) {
+                    if (arvTime <= time && arvTime > bestTime && tt.tripAcceptable(state0, haveBicycle, sd, stopIndex)) {
                         bestTrip = tt;
                         bestTime = arvTime;
                     }
