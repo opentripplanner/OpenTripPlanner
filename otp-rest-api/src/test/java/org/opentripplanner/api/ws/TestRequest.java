@@ -87,6 +87,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.graph.Vertex;
@@ -97,7 +98,11 @@ import org.opentripplanner.routing.patch.Patch;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PatchService;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.trippattern.Update;
+import org.opentripplanner.routing.trippattern.Update.Status;
+import org.opentripplanner.routing.trippattern.UpdateBlock;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.util.TestUtils;
@@ -709,10 +714,24 @@ public class TestRequest extends TestCase {
         assertFalse("190W1280".equals(itinerary.legs.get(1).tripId)
                 && "751W1330".equals(itinerary.legs.get(3).tripId));
         
+        // Now apply a real-time update: let the to-trip have a delay of 3 seconds
+        @SuppressWarnings("deprecation")
+        TableTripPattern pattern = ((PatternStopVertex) graph.getVertex("TriMet_7452_TriMet_751W1090_79_A")).getTripPattern();
+        applyUpdateToTripPattern(pattern, "751W1330", "7452", 78, 41227, 41228, Update.Status.PREDICTION, 0);
+        
+        // Do the planning again
+        response = planner.getItineraries();
+        itinerary = response.getPlan().itinerary.get(0);
+        // Check the ids of the first two busses, they should be the original again
+        assertEquals("190W1280", itinerary.legs.get(1).tripId);
+        assertEquals("751W1330", itinerary.legs.get(3).tripId);
+        
+        // "Revert" the real-time update
+        applyUpdateToTripPattern(pattern, "751W1330", "7452", 78, 41224, 41225, Update.Status.PREDICTION, 0);
         // Revert the graph, thus using the original transfer table again
         reset(graph);
     }
-    
+
     public void testForbiddenTripToTripTransfer() throws JSONException, SecurityException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException {
         // Plan short trip
         TestPlanner planner = new TestPlanner("portland", "45.5264892578125,-122.60479259490967", "45.511622,-122.645564");
@@ -828,6 +847,18 @@ public class TestRequest extends TestCase {
         toTrip.setRoute(toRoute);
         table.addTransferTime(fromStop, toStop, null, null, fromTrip, toTrip, transferTime);
         assertEquals(transferTime, table.getTransferTime(fromStop, toStop, fromTrip, toTrip));
+    }
+    
+    /**
+     * Apply an update to a table trip pattern and check whether the update was applied correctly
+     */
+    private void applyUpdateToTripPattern(TableTripPattern pattern, String tripId, String stopId,
+            int stopSeq, int arrive, int depart, Status prediction, int timestamp) {
+        Update update = new Update(new AgencyAndId("TriMet",tripId), stopId, stopSeq, arrive, depart, prediction, timestamp);
+        ArrayList<Update> updates = new ArrayList<Update>(Arrays.asList(update));
+        UpdateBlock block = UpdateBlock.splitByTrip(updates).get(0);
+        boolean success = pattern.update(block);
+        assertTrue(success);
     }
     
     /**
