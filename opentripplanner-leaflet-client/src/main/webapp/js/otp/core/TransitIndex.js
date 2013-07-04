@@ -205,6 +205,7 @@ otp.core.TransitIndex = otp.Class({
             leftUpLon : bounds.getNorthWest().lng,
             rightDownLat : bounds.getSouthEast().lat,
             rightDownLon : bounds.getSouthEast().lng,
+            extended : true
         };
         if(agencyId !== null) {
             params.agency = agencyId;
