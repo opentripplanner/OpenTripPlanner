@@ -326,7 +326,8 @@ otp.widgets.ItinerariesWidget =
             var legDiv = $('<div />').appendTo(itinAccord);
 
             var leg = itin.itinData.legs[l];
-            var headerHtml = "<b>"+otp.util.Itin.modeString(leg.mode).toUpperCase()+"</b>";
+            var headerModeText = leg.interlineWithPreviousLeg ? "CONTINUES AS" : otp.util.Itin.modeString(leg.mode).toUpperCase()
+            var headerHtml = "<b>" + headerModeText + "</b>";
 
             // Add info about realtimeness of the leg
             if (leg.realTime && typeof(leg.arrivalDelay) === 'number') {
@@ -378,7 +379,10 @@ otp.widgets.ItinerariesWidget =
                 this_.module.pathMarkerLayer.clearLayers();
                 this_.module.drawAllStartBubbles(itin);
             });
-            this_.renderLeg(leg, (l>0 ? itin.itinData.legs[l-1] : null)).appendTo(legDiv);
+            this_.renderLeg(leg, 
+                            l>0 ? itin.itinData.legs[l-1] : null, // previous
+                            l+1 < itin.itinData.legs.length ? itin.itinData.legs[l+1] : null // next
+            ).appendTo(legDiv);
             
             $(legDiv).accordion({
                 header : 'h3',
@@ -476,7 +480,7 @@ otp.widgets.ItinerariesWidget =
         return itinDiv;
     },
 
-    renderLeg : function(leg, previousLeg) {
+    renderLeg : function(leg, previousLeg, nextLeg) {
         var this_ = this;
         if(otp.util.Itin.isTransit(leg.mode)) {
             var legDiv = $('<div></div>');
@@ -485,7 +489,7 @@ otp.widgets.ItinerariesWidget =
 
             $('<div class="otp-itin-leg-leftcol">'+otp.util.Time.formatItinTime(leg.startTime, "h:mma")+"</div>").appendTo(legDiv);
 
-            var startHtml = '<div class="otp-itin-leg-endpointDesc"><b>Board</b> at '+leg.from.name;
+            var startHtml = '<div class="otp-itin-leg-endpointDesc">' + (leg.interlineWithPreviousLeg ? "<b>Depart</b> " : "<b>Board</b> at ") +leg.from.name;
             if(otp.config.municoderHostname) {
                 var spanId = this.newMunicoderRequest(leg.from.lat, leg.from.lon);
                 startHtml += '<span id="'+spanId+'"></span>';
@@ -585,7 +589,8 @@ otp.widgets.ItinerariesWidget =
 
             $('<div class="otp-itin-leg-leftcol">'+otp.util.Time.formatItinTime(leg.endTime, "h:mma")+"</div>").appendTo(legDiv);           
 
-            var endHtml = '<div class="otp-itin-leg-endpointDesc"><b>Alight</b> at '+leg.to.name;
+            var endAction = (nextLeg && nextLeg.interlineWithPreviousLeg) ? "Stay on board" : "Alight";
+            var endHtml = '<div class="otp-itin-leg-endpointDesc"><b>' + endAction + '</b> at '+leg.to.name;
             if(otp.config.municoderHostname) {
                 spanId = this.newMunicoderRequest(leg.to.lat, leg.to.lon);
                 endHtml += '<span id="'+spanId+'"></span>';
