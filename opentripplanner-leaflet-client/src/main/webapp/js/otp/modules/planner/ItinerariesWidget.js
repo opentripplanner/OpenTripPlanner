@@ -316,12 +316,15 @@ otp.widgets.ItinerariesWidget =
     // returns jQuery object
     renderItinerary : function(itin, index, alerts) {
         var this_ = this;
-
+        
         // render legs
         var divId = this.module.id+"-itinAccord-"+index;
         var accordHtml = "<div id='"+divId+"' class='otp-itinAccord'></div>";
         var itinAccord = $(accordHtml);
         for(var l=0; l<itin.itinData.legs.length; l++) {
+
+            var legDiv = $('<div />').appendTo(itinAccord);
+
             var leg = itin.itinData.legs[l];
             var headerHtml = "<b>"+otp.util.Itin.modeString(leg.mode).toUpperCase()+"</b>";
 
@@ -363,7 +366,7 @@ otp.widgets.ItinerariesWidget =
                 }
             }
             
-            $("<h3>"+headerHtml+"</h3>").appendTo(itinAccord).hover(function(evt) {
+            $("<h3>"+headerHtml+"</h3>").appendTo(legDiv).hover(function(evt) {
                 var arr = evt.target.id.split('-');
                 var index = parseInt(arr[arr.length-1]);
                 this_.module.highlightLeg(itin.itinData.legs[index]);
@@ -375,13 +378,24 @@ otp.widgets.ItinerariesWidget =
                 this_.module.pathMarkerLayer.clearLayers();
                 this_.module.drawAllStartBubbles(itin);
             });
-            this_.renderLeg(leg, (l>0 ? itin.itinData.legs[l-1] : null)).appendTo(itinAccord);
+            this_.renderLeg(leg, (l>0 ? itin.itinData.legs[l-1] : null)).appendTo(legDiv);
+            
+            $(legDiv).accordion({
+                header : 'h3',
+                active: otp.util.Itin.isTransit(leg.mode) ? 0 : false,
+                heightStyle: "content",
+                collapsible: true
+            });
         }
-        itinAccord.accordion({
+        
+        //itinAccord.accordion({
+        /*console.log('#' + divId + ' > div')
+        $('#' + divId + ' > div').accordion({
+            header : 'h3',
             active: false,
             heightStyle: "content",
             collapsible: true
-        });
+        });*/
 
         var itinDiv = $("<div></div>");
 
