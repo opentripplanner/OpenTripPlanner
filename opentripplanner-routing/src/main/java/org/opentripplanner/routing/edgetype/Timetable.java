@@ -109,7 +109,7 @@ public class Timetable implements Serializable {
      * is before optimizing it.
      */
     private void index() {
-        int nHops = pattern.stops.length - 1;
+        int nHops = pattern.getHopCount();
         arrivalsIndex = new TripTimes[nHops][];
         departuresIndex = new TripTimes[nHops][];
         boolean departuresFifo = true;
@@ -239,7 +239,7 @@ public class Timetable implements Serializable {
      * actions to compact the data structure such as trimming and deduplicating arrays.
      */
     public void finish() {
-        int nHops = pattern.stops.length - 1;
+        int nHops = pattern.getHopCount();
         int nTrips = tripTimes.size();
         bestRunningTimes = new int[nHops];
         boolean nullArrivals = false; // TODO: should scan through triptimes?

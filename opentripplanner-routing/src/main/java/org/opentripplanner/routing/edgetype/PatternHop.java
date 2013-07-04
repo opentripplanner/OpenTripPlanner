@@ -47,6 +47,7 @@ public class PatternHop extends TablePatternEdge implements OnBoardForwardEdge, 
         this.start = start;
         this.end = end;
         this.stopIndex = stopIndex;
+        getPattern().setPatternHop(stopIndex, this);
     }
 
     public double getDistance() {

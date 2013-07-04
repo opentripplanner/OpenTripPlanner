@@ -23,4 +23,6 @@ import org.onebusaway.gtfs.model.Stop;
 public interface TripPattern {
     @XmlTransient
     List<Stop> getStops();
+    
+    int getHopCount(); 
 }

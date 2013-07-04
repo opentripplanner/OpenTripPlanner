@@ -298,6 +298,11 @@ public class FrequencyBasedTripPattern implements Serializable, TripPattern {
         return stops;
     }
 
+    @Override
+    public int getHopCount() {
+        return stops.size() - 1;
+    }
+
     public void setStops(List<Stop> stops) {
         this.stops = stops;
     }
