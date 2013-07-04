@@ -184,7 +184,7 @@ otp.modules.calltaker.CallTakerModule =
         this.activeCall = null;
         
         this.clearTrip();
-        this.optionsWidget.restoreDefaults();
+        this.optionsWidget.restoreDefaults(true);
     },
             
     saveModel : function(model, successCallback) {

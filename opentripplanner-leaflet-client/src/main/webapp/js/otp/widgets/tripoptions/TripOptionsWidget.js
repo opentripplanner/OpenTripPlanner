@@ -96,8 +96,13 @@ otp.widgets.tripoptions.TripOptionsWidget =
         this.restorePlan({ queryParams : queryParams });
     },
 
-    restoreDefaults : function() {
-        this.applyQueryParams(this.module.defaultQueryParams);
+    restoreDefaults : function(useCurrentTime) {
+        var params = _.clone(this.module.defaultQueryParams);
+        if(useCurrentTime) {
+            params['date'] = moment().format("MM-DD-YYYY");
+            params['time'] = moment().format("h:mma");
+        }
+        this.applyQueryParams(params);
     },
     
     newItinerary : function(itin) {
