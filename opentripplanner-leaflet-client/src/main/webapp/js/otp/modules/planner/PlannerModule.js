@@ -127,7 +127,9 @@ otp.modules.planner.PlannerModule =
         this.addLayer("Paths", this.pathLayer);
         this.addLayer("Path Markers", this.pathMarkerLayer);
         
-        this.webapp.transitIndex.loadRoutes();
+        this.webapp.transitIndex.loadRoutes(this, function() {
+            this.routesLoaded();
+        });
         
         this.activated = true;
         
@@ -547,6 +549,9 @@ otp.modules.planner.PlannerModule =
         if(step == 3) this.tipWidget.setContent("Tip: Drag the Start or End Flags to Modify Your Trip.");
         
         this.tipStep = step;*/
+    },
+    
+    routesLoaded : function() {
     },
     
     CLASS_NAME : "otp.modules.planner.PlannerModule"

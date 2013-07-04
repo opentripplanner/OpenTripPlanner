@@ -21,7 +21,6 @@ otp.widgets.transit.StopViewerWidget =
 
     agency_id : null,
     
-    activeLeg : null,
     timeIndex : null,
     
         
@@ -31,7 +30,7 @@ otp.widgets.transit.StopViewerWidget =
             title : 'Stop Viewer',
             cssClass : 'otp-stopViewer',
             closeable : true,
-            openInitially : false
+            openInitially : false,
         });
         
         this.module = module;
@@ -75,7 +74,13 @@ otp.widgets.transit.StopViewerWidget =
         
     },
     
+    /*clear : function() {
+        this.clearTimes();
+    },
     
+    variantSelected : function(variantData) {
+    },*/
+        
     clearTimes : function() {
         this.times = null;
         this.timeIndex = null;
