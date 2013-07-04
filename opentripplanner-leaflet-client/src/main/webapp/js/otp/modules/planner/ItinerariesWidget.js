@@ -160,6 +160,8 @@ otp.widgets.ItinerariesWidget =
     },
     
     renderButtonRow : function() {
+    
+        var serviceBreakTime = "03:00am";
         var this_ = this;
         var buttonRow = $("<div class='otp-itinsButtonRow'></div>").appendTo(this.footer);
         $('<button>First</button>').button().appendTo(buttonRow).click(function() {
@@ -168,7 +170,7 @@ otp.widgets.ItinerariesWidget =
             var stopId = itin.getFirstStopID();
             _.extend(params, {
                 startTransitStopId :  stopId,
-                time : "04:00am",
+                time : serviceBreakTime,
                 arriveBy : false
             });
             this_.refreshActiveOnly = true;
@@ -209,7 +211,7 @@ otp.widgets.ItinerariesWidget =
             _.extend(params, {
                 startTransitStopId :  stopId,
                 date : moment().add('days', 1).format("MM-DD-YYYY"),
-                time : "04:00am",
+                time : serviceBreakTime,
                 arriveBy : true
             });
             this_.refreshActiveOnly = true;
