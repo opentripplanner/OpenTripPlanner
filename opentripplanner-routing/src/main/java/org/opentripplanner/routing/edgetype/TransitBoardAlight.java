@@ -18,7 +18,6 @@ import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.StopTransfer;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -234,7 +233,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
                 if (sd.serviceIdRunning(serviceId)) {
                     // getNextTrip will find next or prev departure depending on final boolean parameter
                     tripTimes = getPattern().getNextTrip(stopIndex, secondsSinceMidnight, 
-                            mode == TraverseMode.BICYCLE, state0, boarding);
+                            mode == TraverseMode.BICYCLE, sd, state0, boarding);
                     if (tripTimes != null) {
                         wait = boarding ? // we care about departures on board and arrivals on alight
                             (int)(sd.time(tripTimes.getDepartureTime(stopIndex)) - current_time):

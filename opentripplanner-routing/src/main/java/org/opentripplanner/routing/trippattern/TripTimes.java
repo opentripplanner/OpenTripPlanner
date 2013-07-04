@@ -19,6 +19,7 @@ import lombok.AllArgsConstructor;
 
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StopTransfer;
 import org.opentripplanner.routing.core.TransferTable;
@@ -245,7 +246,7 @@ public abstract class TripTimes {
      * If route OR trip explicitly allows bikes, bikes are allowed.
      * @param stopIndex 
      */
-    public boolean tripAcceptable(State state0, boolean bicycle, int stopIndex) {
+    public boolean tripAcceptable(State state0, boolean bicycle, ServiceDay sd, int stopIndex) {
         RoutingRequest options = state0.getOptions();
         Trip trip = this.getTrip();
         BannedStopSet banned = options.bannedTrips.get(trip.getId());
@@ -272,7 +273,7 @@ public abstract class TripTimes {
             // Check for minimum transfer time and forbidden transfers
             if (transferTime > 0) {
                 // There is a minimum transfer time to make this transfer
-                if (state0.getLastAlightedTimeSeconds() + transferTime > getDepartureTime(stopIndex)) {
+                if (sd.secondsSinceMidnight(state0.getLastAlightedTimeSeconds()) + transferTime > getDepartureTime(stopIndex)) {
                     return false;
                 }
             } else if (transferTime == StopTransfer.FORBIDDEN_TRANSFER) {
