@@ -305,6 +305,7 @@ otp.widgets.ItinerariesWidget =
         if(mode === "WALK") return '#bbb';
         if(mode === "BICYCLE") return '#44f';
         if(mode === "SUBWAY") return '#f00';
+        if(mode === "RAIL") return '#b00';
         if(mode === "BUS") return '#0f0';
         if(mode === "TRAM") return '#f00';
         return '#aaa';
