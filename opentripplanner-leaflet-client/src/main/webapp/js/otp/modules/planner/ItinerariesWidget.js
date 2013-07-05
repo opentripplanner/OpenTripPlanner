@@ -519,7 +519,7 @@ otp.widgets.ItinerariesWidget =
                     this_.module.stopViewerWidget.$().offset({top: evt.clientY, left: evt.clientX});
                 }
                 this_.module.stopViewerWidget.show();
-                this_.module.stopViewerWidget.activeTime = leg.startTime;
+                this_.module.stopViewerWidget.setActiveTime(leg.startTime);
                 this_.module.stopViewerWidget.setStop(leg.from.stopId.agencyId, leg.from.stopId.id, leg.from.name);
                 this_.module.stopViewerWidget.bringToFront();
             });

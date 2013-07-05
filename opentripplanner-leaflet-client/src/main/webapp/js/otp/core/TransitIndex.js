@@ -182,7 +182,8 @@ otp.core.TransitIndex = otp.Class({
             agency: agencyId,
             id: stopId,
             startTime : startTime,
-            endTime : endTime
+            endTime : endTime,
+            extended : true,
         };
         if(otp.config.routerId !== undefined) {
             params.routerId = otp.config.routerId;

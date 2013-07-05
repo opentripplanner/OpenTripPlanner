@@ -30,7 +30,9 @@ otp.widgets.transit.StopViewerWidget =
             title : 'Stop Viewer',
             cssClass : 'otp-stopViewer',
             closeable : true,
+            resizable : true,
             openInitially : false,
+            persistOnClose : true,
         });
         
         this.module = module;
@@ -39,54 +41,29 @@ otp.widgets.transit.StopViewerWidget =
 
         this.activeTime = moment();
           
-        this.stopInfo = $('<div class="otp-stopViewer-infoRow" />').appendTo(this.mainDiv);
-
-        var dateRow = $('<div class="otp-stopViewer-dateRow notDraggable" />').appendTo(this.mainDiv).append('<span>Date: </span>');
+        ich['otp-stopViewer']({}).appendTo(this.mainDiv);
+        
+        this.timeList = this.mainDiv.find(".otp-stopViewer-timeList");
+        this.stopInfo = this.mainDiv.find(".otp-stopViewer-stopInfo");
+        
         var currentDate = new Date();
-        this.lastDate = currentDate;
-        this.datePicker = $('<input type="text" style="width:100px;" />').datepicker({
+        this.datePicker = this.mainDiv.find(".otp-stopViewer-dateInput");
+        this.datePicker.datepicker({
             onSelect: function(date) {
-                console.log(date);
-                console.log(moment(date)-moment(this_.lastDate));
-                
+                this_.activeTime = moment(date).unix()*1000 + moment(this_.activeTime).hours()*3600000 + moment(this_.activeTime).minutes()*60000;
                 this_.clearTimes();
                 this_.runTimesQuery();
             }
-        }).appendTo(dateRow);
+        });
         this.datePicker.datepicker("setDate", currentDate);
-
-
-
-        this.timesDiv = $("<div class='otp-stopViewer-stopTimes notDraggable'></div>");
-        this.timesDiv.appendTo(this.mainDiv);        
-
-        $('<div class="otp-stopViewer-stopTimes-advancer" style="left:0px;">&laquo;</div>')
-        .appendTo(this.timesDiv)
-        .click(function(evt) {
-            this_.updateTimes(-1);
-        });
-
-        $('<div class="otp-stopViewer-stopTimes-advancer" style="right:0px;">&raquo;</div>')
-        .appendTo(this.timesDiv)
-        .click(function(evt) {
-            this_.updateTimes(1);
-        });
+        
         
     },
-    
-    /*clear : function() {
-        this.clearTimes();
-    },
-    
-    variantSelected : function(variantData) {
-    },*/
-        
+
     clearTimes : function() {
         this.times = null;
         this.timeIndex = null;
-        if(this.rightTime) this.rightTime.remove();
-        if(this.centerTime) this.centerTime.remove();
-        if(this.leftTime) this.leftTime.remove();    
+        this.timeList.empty();
     },
             
     setStop : function(agencyId, stopId, stopName) {
@@ -100,126 +77,37 @@ otp.widgets.transit.StopViewerWidget =
     runTimesQuery : function() {
         var this_ = this;
         var startTime = moment(this.datePicker.val()).add("hours", -otp.config.timeOffset).unix()*1000;
-        this.module.webapp.transitIndex.runStopTimesQuery2(this.agencyId, this.stopId, startTime, startTime+86400000, this, function(data) {
+        this.module.webapp.transitIndex.runStopTimesQuery2(this.agencyId, this.stopId, startTime+10800000, startTime+97200000, this, function(data) {
             this_.times = [];
             for(var i=0; i < data.stopTimes.length; i++) {
                 var time = data.stopTimes[i];
                 if(time.phase == "departure") {
-                    this_.times.push(time.time*1000);
+                    this_.times.push(time);
                 }
             }
             this_.updateTimes();
         });        
     },
-            
-    updateTimes : function(delta) {
-        //console.log("uT delta="+delta);
-        if(!this.timeIndex) {
-            var bestTimeDiff = 1000000000;
-            for(var i=0; i<this.times.length; i++) {
-                var timeDiff = Math.abs(this.activeTime - this.times[i]);
-                if(timeDiff < bestTimeDiff) {
-                    this.timeIndex = i;
-                    bestTimeDiff = timeDiff;
-                }
+      
+    updateTimes : function() {
+        var minDiff = 1000000000;
+        var bestIndex = 0;
+        for(var i = 0; i < this.times.length; i++) {
+            var time = this.times[i];
+            time.formattedTime = otp.util.Time.formatItinTime(time.time * 1000, "h:mma");
+            ich['otp-stopViewer-timeListItem'](time).appendTo(this.timeList);
+            var diff = Math.abs(this.activeTime - time.time*1000);
+            if(diff < minDiff) {
+                minDiff = diff;
+                bestIndex = i;
             }
         }
-         
-        if(delta && delta == 1) {
-            this.timeIndex++;
-            this.leftTime.remove();
-            this.centerTime.animate({
-                left: 40,
-                width: 60,
-                'font-size': 14,
-                'padding-top': 13
-            });
-            this.leftTime = this.centerTime;
-            
-            this.rightTime.animate({
-                left: 110,
-                width: 80,
-                'font-size': 20,
-                'padding-top': 10
-            });
-            this.centerTime = this.rightTime;
-
-            this.rightTime = $('<div class="otp-stopViewer-stopTimes-timeBox">' + this.getTime(this.timeIndex+1) + '<div>')
-            .css({
-                left: 300,
-                width: 60,
-                'font-size': 14,
-                'padding-top': 13
-            })
-            .appendTo(this.timesDiv)
-            .animate({
-                left: 200
-            });
-        }
-        else if(delta && delta == -1) {
-            this.timeIndex--;
-            this.rightTime.remove();
-            this.centerTime.animate({
-                left: 200,
-                width: 60,
-                'font-size': 14,
-                'padding-top': 13
-            });
-            this.rightTime = this.centerTime;
-            
-            this.leftTime.animate({
-                left: 110,
-                width: 80,
-                'font-size': 20,
-                'padding-top': 10
-            });
-            this.centerTime = this.leftTime;
-
-            this.leftTime = $('<div class="otp-stopViewer-stopTimes-timeBox">' + this.getTime(this.timeIndex-1) + '<div>')
-            .css({
-                left: -60,
-                width: 60,
-                'font-size': 14,
-                'padding-top': 13
-            })
-            .appendTo(this.timesDiv)
-            .animate({
-                left: 40
-            });
-        }
-        else {
-            this.leftTime = $('<div class="otp-stopViewer-stopTimes-timeBox">' + this.getTime(this.timeIndex-1) + '<div>')
-            .css({            
-                left: 40,
-                width: 60,
-                'font-size': 14,
-                'padding-top': 13
-            })
-            .appendTo(this.timesDiv);
-           
-            this.centerTime = $('<div class="otp-stopViewer-stopTimes-timeBox">' + this.getTime(this.timeIndex) + '<div>')
-            .css({            
-                left: 110,
-                width: 80,
-                'font-size': 20,
-                'padding-top': 10
-            })
-            .appendTo(this.timesDiv);
-     
-            this.rightTime = $('<div class="otp-stopViewer-stopTimes-timeBox">' + this.getTime(this.timeIndex+1) + '<div>')
-            .css({
-                left: 200,
-                width: 60,
-                'font-size': 14,
-                'padding-top': 13
-            })
-            .appendTo(this.timesDiv);
-        }
+        this.timeList.scrollTop(((bestIndex/this.times.length) * this.timeList[0].scrollHeight) - this.timeList.height()/2 + $(this.timeList.find(".otp-stopViewer-timeListItem")[0]).height()/2);
     },
     
-    getTime : function(index) {
-        if(index < 0 || index >= this.times.length) return "";
-        return otp.util.Time.formatItinTime(this.times[index], "h:mma");
-    }
+    setActiveTime : function(activeTime) {
+        this.activeTime = activeTime;
+        this.datePicker.datepicker("setDate", new Date(activeTime));
+    },
     
 });

@@ -72,6 +72,14 @@ otp.layers.StopsLayer =
             
             var popupContent = ich['otp-stopsLayer-popup'](stop);
 
+            popupContent.find('.stopViewerLink').data('stop', stop).click(function() {
+                var thisStop = $(this).data('stop');
+                this_.module.stopViewerWidget.show();
+                this_.module.stopViewerWidget.setActiveTime(moment().add("hours", -otp.config.timeOffset).unix()*1000);
+                this_.module.stopViewerWidget.setStop(thisStop.id.agencyId, thisStop.id.id, thisStop.stopName);
+                this_.module.stopViewerWidget.bringToFront();
+            });
+            
             popupContent.find('.planFromLink').data('stop', stop).click(function() {
                 var thisStop = $(this).data('stop');
                 this_.module.setStartPoint(new L.LatLng(thisStop.lat, thisStop.lon), false, thisStop.stopName);
