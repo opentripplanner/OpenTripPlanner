@@ -370,13 +370,14 @@ otp.widgets.ItinerariesWidget =
                 }
             }
             
-            $("<h3>"+headerHtml+"</h3>").appendTo(legDiv).hover(function(evt) {
-                var arr = evt.target.id.split('-');
-                var index = parseInt(arr[arr.length-1]);
-                this_.module.highlightLeg(itin.itinData.legs[index]);
+            $("<h3>"+headerHtml+"</h3>").appendTo(legDiv).data('leg', leg).hover(function(evt) {
+                //var arr = evt.target.id.split('-');
+                //var index = parseInt(arr[arr.length-1]);
+                var thisLeg = $(this).data('leg');
+                this_.module.highlightLeg(thisLeg);
                 this_.module.pathMarkerLayer.clearLayers();
-                this_.module.drawStartBubble(itin.itinData.legs[index], true);
-                this_.module.drawEndBubble(itin.itinData.legs[index], true);
+                this_.module.drawStartBubble(thisLeg, true);
+                this_.module.drawEndBubble(thisLeg, true);
             }, function(evt) {
                 this_.module.clearHighlights();
                 this_.module.pathMarkerLayer.clearLayers();
