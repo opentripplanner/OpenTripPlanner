@@ -90,8 +90,6 @@ otp.modules.multimodal.MultimodalPlannerModule =
         this.stopViewerWidget = new otp.widgets.transit.StopViewerWidget("otp-"+this.id+"-stopViewerWidget", this);
         this.stopViewerWidget.center();
 
-        
-        this.optionsWidget.applyQueryParams(this.defaultQueryParams);
     },
     
     getExtendedQueryParams : function() {
