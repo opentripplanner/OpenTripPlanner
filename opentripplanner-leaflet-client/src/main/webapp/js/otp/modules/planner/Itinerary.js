@@ -133,7 +133,7 @@ otp.modules.planner.Itinerary = otp.Class({
     },
     
     differentServiceDayFrom : function(itin, offsetHrs) {
-        offsetHrs = offsetHrs || 4; // default to 4 hrs; i.e. use 4am as breakpoint between days
+        offsetHrs = offsetHrs || 3; // default to 3 hrs; i.e. use 3am as breakpoint between days
         var time1 = moment(this.itinData.startTime).add("hours", otp.config.timeOffset-offsetHrs).format('D');
         var time2 = moment(itin.itinData.startTime).add("hours", otp.config.timeOffset-offsetHrs).format('D');
         return time1 !== time2;

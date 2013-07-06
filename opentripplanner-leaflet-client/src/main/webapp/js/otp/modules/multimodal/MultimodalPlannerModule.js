@@ -109,12 +109,17 @@ otp.modules.multimodal.MultimodalPlannerModule =
             this.itinWidget.updateItineraries(tripPlan.itineraries, tripPlan.queryParams);
         }
         
-        if(restoring) {
+        /*if(restoring) {
             this.optionsWidget.restorePlan(tripPlan);
-        }
+        }*/
         this.drawItinerary(tripPlan.itineraries[0]);
     },
-   
+    
+    restoreTrip : function(queryParams) {    
+        this.optionsWidget.applyQueryParams(queryParams);
+        otp.modules.planner.PlannerModule.prototype.restoreTrip.apply(this, arguments);
+    },
+       
     clearTrip : function() {
         otp.modules.planner.PlannerModule.prototype.clearTrip.apply(this);
         if(this.itinWidget !== null) {

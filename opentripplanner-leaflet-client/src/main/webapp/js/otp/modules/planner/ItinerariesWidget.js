@@ -75,6 +75,8 @@ otp.widgets.ItinerariesWidget =
 
             // create an alert if we moved to another day
             var alerts = null;
+            console.log("old itin: ")
+            console.log(oldItin)
             if(newItin.differentServiceDayFrom(oldItin)) {
                 alerts = [ "This itinerary departs on a different day from the previous one"];
             }
@@ -170,6 +172,7 @@ otp.widgets.ItinerariesWidget =
             var stopId = itin.getFirstStopID();
             _.extend(params, {
                 startTransitStopId :  stopId,
+                date : this_.module.date,
                 time : serviceBreakTime,
                 arriveBy : false
             });
@@ -210,7 +213,7 @@ otp.widgets.ItinerariesWidget =
             var stopId = itin.getFirstStopID();
             _.extend(params, {
                 startTransitStopId :  stopId,
-                date : moment().add('days', 1).format("MM-DD-YYYY"),
+                date : moment(this_.module.date, "MM-DD-YYYY").add('days', 1).format("MM-DD-YYYY"),
                 time : serviceBreakTime,
                 arriveBy : true
             });
