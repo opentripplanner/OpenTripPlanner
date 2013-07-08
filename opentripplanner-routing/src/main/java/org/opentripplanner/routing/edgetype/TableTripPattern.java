@@ -199,8 +199,8 @@ public class TableTripPattern implements TripPattern, Serializable {
      * @param boarding true means find next departure, false means find previous arrival 
      * @return a TripTimes object providing all the arrival and departure times on the best trip.
      */
-    public TripTimes getNextTrip(int stopIndex, int time, boolean haveBicycle, ServiceDay sd,
-            State state0, boolean boarding) {
+    public TripTimes getNextTrip(int stopIndex, int time, State state0, ServiceDay sd,
+            boolean haveBicycle, boolean boarding) {
         RoutingRequest options = state0.getOptions();
         Timetable timetable = scheduledTimetable;
         TimetableResolver snapshot = options.rctx.timetableSnapshot;
@@ -218,7 +218,7 @@ public class TableTripPattern implements TripPattern, Serializable {
             return null;
         }
         // so far so good, delegate to the timetable
-        return timetable.getNextTrip(stopIndex, time, haveBicycle, sd, state0, boarding);
+        return timetable.getNextTrip(stopIndex, time, state0, sd, haveBicycle, boarding);
     }
     
     public Iterator<Integer> getScheduledDepartureTimes(int stopIndex) {
