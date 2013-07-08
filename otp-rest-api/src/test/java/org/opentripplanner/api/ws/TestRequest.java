@@ -832,8 +832,6 @@ public class TestRequest extends TestCase {
         @SuppressWarnings("deprecation")
         TableTripPattern pattern = ((PatternStopVertex) graph.getVertex("TriMet_9756_TriMet_120W1320_22_A")).getTripPattern();
         applyUpdateToTripPattern(pattern, "120W1320", "9756", 21, 41580, 41580, Update.Status.PREDICTION, 0);
-//        TableTripPattern pattern = ((PatternStopVertex) graph.getVertex("TriMet_7528_TriMet_750W1030_58_A")).getTripPattern();
-//        applyUpdateToTripPattern(pattern, "750W1300", "7528", 57, 41580, 41580, Update.Status.PREDICTION, 0);
         
         // Do the planning again
         response = planner.getItineraries();
@@ -844,7 +842,6 @@ public class TestRequest extends TestCase {
         
         // "Revert" the real-time update
         applyUpdateToTripPattern(pattern, "120W1320", "9756", 21, 41820, 41820, Update.Status.PREDICTION, 0);
-//        applyUpdateToTripPattern(pattern, "750W1300", "7528", 57, 41580, 41580, Update.Status.PREDICTION, 0);
         // Revert the graph, thus using the original transfer table again
         reset(graph);
     }
