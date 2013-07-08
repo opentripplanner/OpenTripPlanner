@@ -76,6 +76,12 @@ public class TestTransferTable extends TestCase {
         assertEquals(StopTransfer.PREFERRED_TRANSFER, table.getTransferTime(fromStop, toStopParent, fromTrip, toTrip, true));
         assertEquals(StopTransfer.PREFERRED_TRANSFER, table.getTransferTime(fromStop, toStopParent, fromTrip, toTrip2, true));
         
+        // Check going forward and backwards in time
+        assertEquals(StopTransfer.PREFERRED_TRANSFER, table.getTransferTime(fromStop, toStop, fromTrip, toTrip, true));
+        assertEquals(StopTransfer.UNKNOWN_TRANSFER, table.getTransferTime(fromStop, toStop, fromTrip, toTrip, false));
+        assertEquals(StopTransfer.UNKNOWN_TRANSFER, table.getTransferTime(toStop, fromStop, toTrip, fromTrip, true));
+        assertEquals(StopTransfer.PREFERRED_TRANSFER, table.getTransferTime(toStop, fromStop, toTrip, fromTrip, false));
+        
         // Add transfer to child stop, specificity 1
         table.addTransferTime(fromStop, toStop, null, toRoute, null, null, StopTransfer.FORBIDDEN_TRANSFER);
         assertEquals(StopTransfer.FORBIDDEN_TRANSFER, table.getTransferTime(fromStop, toStop, fromTrip, toTrip, true));
