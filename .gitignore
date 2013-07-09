@@ -36,3 +36,4 @@ gen-javabean/
 gen-py/
 .idea/
 .sonar
+_site/
