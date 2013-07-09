@@ -639,6 +639,25 @@ public class TestRequest extends TestCase {
         assertFalse(stopMatcher.matches(stop2107));
     }
     
+    public void testWalkLimitExceeded() throws JSONException, ParameterException {
+        // Plan short trip
+        TestPlanner planner = new TestPlanner("portland", "45.501115,-122.738214", "45.469487,-122.500343");
+        // Do the planning
+        Response response = planner.getItineraries();
+        // Check itinerary for walkLimitExceeded
+        Itinerary itinerary = response.getPlan().itinerary.get(0);
+        assertTrue(itinerary.walkDistance > planner.getMaxWalkDistance().get(0));
+        assertTrue(itinerary.walkLimitExceeded);
+
+        planner = new TestPlanner("portland", "45.445631,-122.845388", "45.459961,-122.752347");
+        // Do the planning with high walk reluctance
+        response = planner.getItineraries();
+        // Check itinerary for walkLimitExceeded
+        itinerary = response.getPlan().itinerary.get(0);
+        assertTrue(itinerary.walkDistance <= planner.getMaxWalkDistance().get(0));
+        assertFalse(itinerary.walkLimitExceeded);
+    }
+    
     public void testTransferPenalty() throws JSONException {
         // Plan short trip
         TestPlanner planner = new TestPlanner("portland", "45.5264892578125,-122.60479259490967", "45.511622,-122.645564");
@@ -880,6 +899,14 @@ public class TestRequest extends TestCase {
         
         public void setNonpreferredTransferPenalty(List<Integer> nonpreferredTransferPenalty) {
             this.nonpreferredTransferPenalty = nonpreferredTransferPenalty;
+        }
+        
+        public List<Double> getMaxWalkDistance() {
+            return this.maxWalkDistance;
+        }
+        
+        public void setMaxWalkDistance(List<Double> maxWalkDistance) {
+            this.maxWalkDistance = maxWalkDistance;
         }
         
         public RoutingRequest buildRequest() throws ParameterException {

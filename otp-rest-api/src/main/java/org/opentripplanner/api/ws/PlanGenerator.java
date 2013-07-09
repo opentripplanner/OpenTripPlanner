@@ -93,6 +93,9 @@ public class PlanGenerator {
         // TODO: this seems to only check the endpoints, which are usually auto-generated
         //if ( ! options.isAccessible())
         //    throw new LocationNotAccessible();
+        
+        // Copy options to keep originals
+        RoutingRequest originalOptions = options.clone();
 
         /* try to plan the trip */
         List<GraphPath> paths = null;
@@ -116,7 +119,7 @@ public class PlanGenerator {
             throw new PathNotFoundException();
         }
 
-        TripPlan plan = generatePlan(paths, options);
+        TripPlan plan = generatePlan(paths, originalOptions);
         if (plan != null) {
             for (Itinerary i : plan.itinerary) {
                 i.tooSloped = tooSloped;
@@ -160,9 +163,25 @@ public class PlanGenerator {
 
         for (GraphPath path : paths) {
             Itinerary itinerary = generateItinerary(path, request.isShowIntermediateStops());
+            itinerary = adjustItinerary(request, itinerary);
             plan.addItinerary(itinerary);
         }
         return plan;
+    }
+
+    /**
+     * Check whether itinerary needs adjustments based on the request.
+     * @param itinerary is the itinerary
+     * @param request is the request containing the original trip planning options
+     * @return the (adjusted) itinerary
+     */
+    private Itinerary adjustItinerary(RoutingRequest request, Itinerary itinerary) {
+        // Check walk limit distance
+        if (itinerary.walkDistance > request.maxWalkDistance) {
+            itinerary.walkLimitExceeded = true;
+        }
+        // Return itinerary
+        return itinerary;
     }
 
     /**
