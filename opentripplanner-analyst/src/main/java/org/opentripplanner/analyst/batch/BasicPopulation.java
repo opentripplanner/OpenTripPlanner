@@ -1,3 +1,16 @@
+/* This program is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
 package org.opentripplanner.analyst.batch;
 
 import java.nio.charset.Charset;
@@ -72,14 +85,16 @@ public class BasicPopulation implements Population {
             CsvWriter writer = new CsvWriter(outFileName, ',', Charset.forName("UTF8"));
             writer.writeRecord( new String[] {"label", "lat", "lon", "input", "output"} );
             int i = 0;
+            int j = 0;
             // using internal list rather than filtered iterator
             for (Individual indiv : this.individuals) {
                 if ( ! this.skip[i]) {
                     String[] entries = new String[] { 
                             indiv.label, Double.toString(indiv.lat), Double.toString(indiv.lon), 
-                            Double.toString(indiv.input), Double.toString(results.results[i]) 
+                            Double.toString(indiv.input), Double.toString(results.results[j]) 
                     };
                     writer.writeRecord(entries);
+                    j++;
                 }
                 i++;
             }
@@ -97,6 +112,7 @@ public class BasicPopulation implements Population {
         this.writeCsv(outFileName, results);
     }
 
+    // TODO maybe store skip values in the samples themselves?
     /** 
      * If a filter chain is specified, apply it to the individuals. Must be called after loading 
      * or generating the individuals. Filtering does not actually remove individuals from the 
@@ -109,7 +125,7 @@ public class BasicPopulation implements Population {
         if (filterChain == null) // no filter chain, do not reject any individuals
             return;
         for (IndividualFilter filter : filterChain) {
-            LOG.debug("applying filter {}", filter);
+            LOG.info("applying filter {}", filter);
             int rejected = 0;
             int i = 0;
             for (Individual individual : this.individuals) {
@@ -118,13 +134,13 @@ public class BasicPopulation implements Population {
                     rejected += 1;
                 skip[i++] |= skipThis;
             }
-            LOG.debug("accepted {} rejected {}", skip.length - rejected, rejected);
+            LOG.info("accepted {} rejected {}", skip.length - rejected, rejected);
         }
         int rejected = 0;
         for (boolean s : skip)
             if (s)
                 rejected += 1;
-        LOG.debug("TOTALS: accepted {} rejected {}", skip.length - rejected, rejected);
+        LOG.info("TOTALS: accepted {} rejected {}", skip.length - rejected, rejected);
         
     }
 

@@ -13,8 +13,10 @@
 
 package org.opentripplanner.routing.algorithm.strategies;
 
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
 
 /**
  * A trivial heuristic that always returns 0, which is always admissible. 
@@ -24,23 +26,35 @@ import org.opentripplanner.routing.graph.Vertex;
  */
 public class TrivialRemainingWeightHeuristic implements RemainingWeightHeuristic {
 
+    private static final long serialVersionUID = 1L;
+
     @Override
-    public double computeInitialWeight(State s, Vertex target) {
+    public void initialize(State s, Vertex target) {}
+
+    @Override
+    public double computeForwardWeight(State s, Vertex target) {
         return 0;
     }
 
     @Override
-    public double computeForwardWeight(State s, Vertex target) {
-    	return 0;
+    public double computeReverseWeight(State s, Vertex target) {
+        return 0;
+    }
+
+    /** 
+     * Factory that turns off goal-direction heuristics in OTP for comparison. 
+     * results should be identical when heuristics are switched off.
+     */
+    public static class Factory implements RemainingWeightHeuristicFactory {
+        @Override
+        public RemainingWeightHeuristic getInstanceForSearch(RoutingRequest opt) {
+            return new TrivialRemainingWeightHeuristic();
+        }
     }
 
     @Override
-    public double computeReverseWeight(State s, Vertex target) {
-    	return 0;
-    }
-
-	@Override
-	public void reset() {		
-	}
-
+    public void reset() {}
+    
+    @Override
+    public void abort() {}
 }

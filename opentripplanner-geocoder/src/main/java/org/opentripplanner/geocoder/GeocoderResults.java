@@ -20,6 +20,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 
 @XmlRootElement
 public class GeocoderResults {
@@ -50,6 +52,7 @@ public class GeocoderResults {
     
     @XmlElementWrapper(name="results")
     @XmlElement(name="result")
+    @JsonProperty(value="results")
     public Collection<GeocoderResult> getResults() {
         return results;
     }

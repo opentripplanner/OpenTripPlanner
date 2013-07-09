@@ -65,7 +65,7 @@ import com.vividsolutions.jts.geom.Coordinate;
  * 
  */
 public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
-    private static final Logger _log = LoggerFactory.getLogger(TransitIndexBuilder.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TransitIndexBuilder.class);
 
     private GtfsRelationalDao dao;
 
@@ -96,7 +96,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 
     @Override
     public void buildGraph(Graph graph) {
-        _log.debug("Building transit index");
+        LOG.debug("Building transit index");
 
         createRouteVariants(graph);
 
@@ -110,7 +110,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                 totalTrips += variant.getTrips().size();
             }
         }
-        _log.debug("Built transit index: " + variantsByAgency.size() + " agencies, "
+        LOG.debug("Built transit index: " + variantsByAgency.size() + " agencies, "
                 + variantsByRoute.size() + " routes, " + totalTrips + " trips, " + totalVariants
                 + " variants ");
 
@@ -207,7 +207,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
      * Find the "transit center" of the graph using a weighted k-means technique
      */
     private Coordinate findTransitCenter() {
-        _log.debug("Finding transit center via k-means");
+        LOG.debug("Finding transit center via k-means");
         final int N = 30;// number of clusters
         final int ITERATIONS = 50;
         Map<Stop, Integer> stopWeight = new HashMap<Stop, Integer>();
@@ -306,7 +306,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
             }
 
         }
-        _log.debug("found transit center");
+        LOG.debug("found transit center");
 
         // the highest-weighted cluster
         return Collections.max(Arrays.asList(centers)).coord;
@@ -366,6 +366,9 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                             addModeFromTrip(trip2);
                             variantsByTrip.put(trip2.getId(), variant);
                         }
+                      variant.addTrip(trip, pattern.getTrips().size());
+                    } else {
+                      variant.addTrip(trip, 1);
                     }
                 } else {
                     continue;
@@ -597,7 +600,6 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
         // have we seen this trip before?
         RouteVariant variant = variantsByTrip.get(trip.getId());
         if (variant != null) {
-            variant.addTrip(trip);
             return variant;
         }
 
@@ -654,7 +656,6 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
             agencyVariants.add(variant);
         }
         variantsByTrip.put(trip.getId(), variant);
-        variant.addTrip(trip);
         return variant;
     }
 

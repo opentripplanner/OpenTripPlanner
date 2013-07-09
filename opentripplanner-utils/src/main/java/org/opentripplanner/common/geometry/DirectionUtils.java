@@ -28,6 +28,8 @@ public class DirectionUtils {
     private GeodeticCalculator geodeticCalculator;
 
     private DirectionUtils() {
+        // TODO(flamholz): Is constructing GeodeticCalculator really so
+        // heavyweight that we need this synchronization?
         geodeticCalculator = new GeodeticCalculator();
     }
 
@@ -38,6 +40,21 @@ public class DirectionUtils {
         return instance;
     }
 
+    /**
+     * Returns the azimuth in decimal degrees from (-180° to +180°) between
+     * Coordinates A and B.
+     * 
+     * @param a
+     * @param b
+     * @return
+     */
+    public static synchronized double getAzimuth(Coordinate a, Coordinate b) {
+    	DirectionUtils utils = getInstance();
+        utils.geodeticCalculator.setStartingGeographicPoint(a.x, a.y);
+        utils.geodeticCalculator.setDestinationGeographicPoint(b.x, b.y);
+    	return utils.geodeticCalculator.getAzimuth();
+    }
+    
     /**
      * Computes the angle of the last segment of a LineString or MultiLineString
      *
@@ -57,14 +74,16 @@ public class DirectionUtils {
         Coordinate coord0 = line.getCoordinateN(numPoints - 2);
         Coordinate coord1 = line.getCoordinateN(numPoints - 1);
         int i = numPoints - 3;
-        while (distanceLibrary.fastDistance(coord0, coord1) < 10 && i >= 0) {
+        int minDistance = 10;  // Meters        
+        while (distanceLibrary.fastDistance(coord0, coord1) < minDistance && i >= 0) {
             coord0 = line.getCoordinateN(i--);
         }
 
         DirectionUtils utils = getInstance();
         utils.geodeticCalculator.setStartingGeographicPoint(coord0.x, coord0.y);
         utils.geodeticCalculator.setDestinationGeographicPoint(coord1.x, coord1.y);
-        return utils.geodeticCalculator.getAzimuth() * Math.PI / 180;
+        double az = utils.geodeticCalculator.getAzimuth();
+        return az * Math.PI / 180;
     }
 
     /**
@@ -86,13 +105,16 @@ public class DirectionUtils {
         Coordinate coord0 = line.getCoordinateN(0);
         Coordinate coord1 = line.getCoordinateN(1);
         int i = 2;
-        while (distanceLibrary.fastDistance(coord0, coord1) < 10 && i < line.getNumPoints()) {
+        int minDistance = 10;  // Meters 
+        while (distanceLibrary.fastDistance(coord0, coord1) < minDistance
+                && i < line.getNumPoints()) {
             coord1 = line.getCoordinateN(i++);
         }
 
         DirectionUtils utils = getInstance();
         utils.geodeticCalculator.setStartingGeographicPoint(coord0.x, coord0.y);
         utils.geodeticCalculator.setDestinationGeographicPoint(coord1.x, coord1.y);
-        return utils.geodeticCalculator.getAzimuth() * Math.PI / 180;
+        double az = utils.geodeticCalculator.getAzimuth();
+        return az * Math.PI / 180;
     }
 }

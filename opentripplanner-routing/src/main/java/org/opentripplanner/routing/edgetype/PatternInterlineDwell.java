@@ -25,6 +25,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.routing.vertextype.OnboardVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,7 @@ import org.slf4j.LoggerFactory;
 import com.vividsolutions.jts.geom.LineString;
 
 public class PatternInterlineDwell extends Edge implements OnBoardForwardEdge, OnBoardReverseEdge {
-    private static final Logger _log = LoggerFactory.getLogger(PatternInterlineDwell.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PatternInterlineDwell.class);
 
     private static final long serialVersionUID = 1L;
 
@@ -55,7 +56,7 @@ public class PatternInterlineDwell extends Edge implements OnBoardForwardEdge, O
             int oldPatternIndex, int newPatternIndex) {
         if (dwellTime < 0) {
 	    dwellTime = 0;
-            _log.warn ("Negative dwell time for trip " + trip.getAgencyId() + " " + trip.getId() + "(forcing to zero)");
+            LOG.warn ("Negative dwell time for trip " + trip.getAgencyId() + " " + trip.getId() + "(forcing to zero)");
         }
         tripIdToInterlineDwellData.put(trip, new InterlineDwellData(dwellTime, newPatternIndex, reverseTrip));
         reverseTripIdToInterlineDwellData.put(reverseTrip, new InterlineDwellData(dwellTime,
@@ -112,8 +113,10 @@ public class PatternInterlineDwell extends Edge implements OnBoardForwardEdge, O
         if (dwellData == null) {
             return null;
         }
-        if (options.bannedTrips.contains(dwellData.trip)) {
-            return null;
+        BannedStopSet banned = options.bannedTrips.get(dwellData.trip);
+        if (banned != null) {
+            if (banned.contains(0)) 
+                return null;
         }
 
         StateEditor s1 = state0.edit(this);
@@ -147,6 +150,11 @@ public class PatternInterlineDwell extends Edge implements OnBoardForwardEdge, O
     }
     public Map<AgencyAndId, InterlineDwellData> getTripIdToInterlineDwellData() {
         return tripIdToInterlineDwellData;
+    }
+
+    @Override
+    public int getStopIndex() {
+        return -1; //special case.
     }
 
 }

@@ -1,0 +1,38 @@
+.otp-alerts-entitiesWidget {
+    right: 20px;
+    bottom: 20px;
+}
+
+.otp-alerts-entitiesWidget-tabPanel {
+    width: 200px;
+    height: 250px;
+    background: white;
+    border: 1px solid black;
+    overflow: auto;
+}
+
+.otp-alerts-entitiesWidget-select {
+    height: 100%;
+    width: 100%;
+    background: #eee;
+}
+
+.otp-alerts-entitiesWidget-buttonRow {
+    text-align: center;
+    margin: 10px;
+}
+
+
+.otp-alerts-editAlertWidget {
+    left: 20px;
+    bottom: 20px;
+    width: 300px;
+    height: 300px;
+}
+
+
+.otp-alerts-editAlert-text {
+    width: 100%;
+    height: 40px;
+}
+

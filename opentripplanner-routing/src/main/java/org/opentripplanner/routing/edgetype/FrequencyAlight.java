@@ -13,10 +13,7 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.core.RouteSpec;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
@@ -34,7 +31,7 @@ import com.vividsolutions.jts.geom.LineString;
 public class FrequencyAlight extends Edge  implements OnBoardReverseEdge {
     private static final long serialVersionUID = 3388162982920747289L;
 
-    private static final Logger _log = LoggerFactory.getLogger(FrequencyAlight.class);
+    private static final Logger LOG = LoggerFactory.getLogger(FrequencyAlight.class);
             
     private int stopIndex;
     private FrequencyBasedTripPattern pattern;
@@ -90,14 +87,16 @@ public class FrequencyAlight extends Edge  implements OnBoardReverseEdge {
              * initial state) if this pattern's serviceId is running look for the next boarding time
              * choose the soonest boarding time among trips starting yesterday, today, or tomorrow
              */
-            long currentTime = state0.getTime();
+            long currentTime = state0.getTimeSeconds();
             int bestWait = -1;
             TraverseMode mode = state0.getNonTransitMode();
-            if (options.bannedTrips.contains(trip.getId())) {
+            if (options.bannedTrips.containsKey(trip.getId())) {
                 //This behaves a little differently than with ordinary trip patterns,
                 //because trips don't really have strong identities in frequency-based
                 //plans.  I expect that reasonable plans will still be produced, since
-                //we used to use route banning and that was not so bad.
+                //we used to use route banning and that was not so bad.  Also, 
+                //partial trip banning is unsupported (the whole trip will be treated
+                //as banned)
                 return null;
             }
 
@@ -115,7 +114,7 @@ public class FrequencyAlight extends Edge  implements OnBoardReverseEdge {
                         
                         int wait = (int) (currentTime - sd.time(startTime));
                         if (wait < 0)
-                            _log.error("negative wait time on alight");
+                            LOG.error("negative wait time on alight");
                         if (bestWait < 0 || wait < bestWait) {
                             // track the soonest departure over all relevant schedules
                             bestWait = wait;
@@ -127,37 +126,13 @@ public class FrequencyAlight extends Edge  implements OnBoardReverseEdge {
             if (bestWait < 0) {
                 return null;
             }
-
-            /* check if route banned for this plan */
-            if (options.bannedRoutes != null) {
-                Route route = trip.getRoute();
-                RouteSpec spec = new RouteSpec(route.getId().getAgencyId(),
-                        GtfsLibrary.getRouteName(route));
-                if (options.bannedRoutes.contains(spec)) {
-                    return null;
-                }
-            }
+            
+            /* check if trip is banned for this plan */
+            if (options.tripIsBanned(trip))
+            	return null;
 
             /* check if route is preferred for this plan */
-            long preferences_penalty = 0;
-            if (options.preferredRoutes != null && options.preferredRoutes.size() > 0) {
-                Route route = trip.getRoute();
-                RouteSpec spec = new RouteSpec(route.getId().getAgencyId(),
-                        GtfsLibrary.getRouteName(route));
-                if (!options.preferredRoutes.contains(spec)) {
-                    preferences_penalty += options.useAnotherThanPreferredRoutesPenalty;
-                }
-            }
-
-            /* check if route is unpreferred for this plan */
-            if (options.unpreferredRoutes != null && options.unpreferredRoutes.size() > 0) {
-                Route route = trip.getRoute();
-                RouteSpec spec = new RouteSpec(route.getId().getAgencyId(),
-                        GtfsLibrary.getRouteName(route));
-                if (options.unpreferredRoutes.contains(spec)) {
-                    preferences_penalty += options.useUnpreferredRoutesPenalty;
-                }
-            }
+            long preferences_penalty = options.preferencesPenaltyForTrip(trip);
 
             StateEditor s1 = state0.edit(this);
             int type = pattern.getBoardType(stopIndex);
@@ -194,7 +169,7 @@ public class FrequencyAlight extends Edge  implements OnBoardReverseEdge {
                 return null;
             }
             s1.setTripId(null);
-            s1.setLastAlightedTime(state0.getTime());
+            s1.setLastAlightedTimeSeconds(state0.getTimeSeconds());
             s1.setPreviousStop(fromv);
             s1.setBackMode(TraverseMode.ALIGHTING);
             return s1.makeState();

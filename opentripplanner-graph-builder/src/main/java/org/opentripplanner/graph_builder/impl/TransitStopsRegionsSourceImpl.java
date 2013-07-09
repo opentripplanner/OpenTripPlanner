@@ -32,7 +32,7 @@ import com.vividsolutions.jts.geom.Envelope;
  *
  */
 public class TransitStopsRegionsSourceImpl implements RegionsSource {
-    private static Logger _log = LoggerFactory.getLogger(TransitStopsRegionsSourceImpl.class);
+    private static Logger LOG = LoggerFactory.getLogger(TransitStopsRegionsSourceImpl.class);
 
     private static final double METERS_PER_DEGREE_LAT = 111111;
     private double distance = 2000;
@@ -60,7 +60,7 @@ public class TransitStopsRegionsSourceImpl implements RegionsSource {
             }
         }
 
-        _log.debug("Total regions: " + regions.size());
+        LOG.debug("Total regions: " + regions.size());
         
         return regions;
     }

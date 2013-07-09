@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
 import com.vividsolutions.jts.geom.Envelope;
 
 public class OSMDownloader {
-    private static final Logger _log = LoggerFactory.getLogger(OSMDownloader.class);
+    private static final Logger LOG = LoggerFactory.getLogger(OSMDownloader.class);
 
     private double _latYStep = 0.04;
 
@@ -75,7 +75,7 @@ public class OSMDownloader {
                 try {
                     listener.handleMapTile(key, y, x, path);
                 } catch (IllegalStateException e) {
-                    _log.debug("trying to re-download");
+                    LOG.debug("trying to re-download");
                     path.delete();
                     path = getPathToUpToDateMapTile(y, x, key);
                     listener.handleMapTile(key, y, x, path);
@@ -109,11 +109,11 @@ public class OSMDownloader {
             Envelope r = new Envelope(lon - _overlap, lon + _lonXStep + _overlap, lat - _overlap,
                     lat + _latYStep + _overlap);
 
-            _log.debug("downloading osm tile: " + key + " from path " + path + " e " + path.exists());
+            LOG.debug("downloading osm tile: " + key + " from path " + path + " e " + path.exists());
             
 
             URL url = constructUrl(r);
-            _log.warn("downloading from " + url.toString());
+            LOG.warn("downloading from " + url.toString());
 
             InputStream in = url.openStream();
             FileOutputStream out = new FileOutputStream(path);
@@ -130,7 +130,7 @@ public class OSMDownloader {
                 out.close();
             } catch (RuntimeException e) {
                 out.close();
-                _log.info("Removing half-written file " + path);
+                LOG.info("Removing half-written file " + path);
                 path.delete(); //clean up any half-written files
                 throw e;
             }

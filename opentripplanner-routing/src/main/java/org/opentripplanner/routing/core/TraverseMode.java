@@ -22,7 +22,14 @@ import java.util.Set;
 
 @XmlType(name="TraverseMode")  
 public enum TraverseMode {
-    WALK, BICYCLE, CAR, TRAM, SUBWAY, RAIL, BUS, FERRY, CABLE_CAR, GONDOLA, FUNICULAR, TRANSIT, TRAINISH, BUSISH, BOARDING, ALIGHTING, TRANSFER, STL;
+    WALK, BICYCLE, CAR,
+    TRAM, SUBWAY, RAIL, BUS, FERRY,
+    CABLE_CAR, GONDOLA, FUNICULAR,
+    TRANSIT, TRAINISH, BUSISH, BOARDING,
+    ALIGHTING, TRANSFER, STL,
+    // A motor vehicle that requires custom configuration
+    // e.g. a truck, motor bike, airport shuttle service.
+    CUSTOM_MOTOR_VEHICLE;
 
     private static HashMap <Set<TraverseMode>, Set<TraverseMode>> setMap = 
             new HashMap <Set<TraverseMode>, Set<TraverseMode>>();
@@ -48,7 +55,11 @@ public enum TraverseMode {
     }
 
     public boolean isOnStreetNonTransit() {
-        return this == WALK || this == BICYCLE || this == CAR;
+        return this == WALK || this == BICYCLE || this == CAR || this == CUSTOM_MOTOR_VEHICLE;
+    }
+    
+    public boolean isDriving() {
+        return this == CAR || this == CUSTOM_MOTOR_VEHICLE;
     }
 
 }

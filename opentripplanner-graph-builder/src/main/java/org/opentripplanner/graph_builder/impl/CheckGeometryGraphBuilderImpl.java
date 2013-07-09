@@ -55,15 +55,15 @@ public class CheckGeometryGraphBuilderImpl implements GraphBuilder {
         return Arrays.asList("streets");
     }
     
-    private static final Logger _log = LoggerFactory.getLogger(CheckGeometryGraphBuilderImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CheckGeometryGraphBuilderImpl.class);
     private static final double MAX_VERTEX_SHAPE_ERROR = 150;
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         for (Vertex gv : graph.getVertices()) {
             if (Double.isNaN(gv.getCoordinate().x) || Double.isNaN(gv.getCoordinate().y)) {
-                _log.warn("Vertex " + gv + " has NaN location; this will cause doom.");
-                _log.warn(graph.addBuilderAnnotation(new BogusVertexGeometry(gv)));
+                LOG.warn("Vertex " + gv + " has NaN location; this will cause doom.");
+                LOG.warn(graph.addBuilderAnnotation(new BogusVertexGeometry(gv)));
             }
             
             // TODO: This was filtered to EdgeNarratives before EdgeNarrative removal
@@ -74,7 +74,7 @@ public class CheckGeometryGraphBuilderImpl implements GraphBuilder {
                 }
                 for (Coordinate c : g.getCoordinates()) {
                     if (Double.isNaN(c.x) || Double.isNaN(c.y)) {
-                        _log.warn(graph.addBuilderAnnotation(new BogusEdgeGeometry(e)));
+                        LOG.warn(graph.addBuilderAnnotation(new BogusEdgeGeometry(e)));
                     }
                 }
                 if (e instanceof HopEdge) {
@@ -82,15 +82,15 @@ public class CheckGeometryGraphBuilderImpl implements GraphBuilder {
                     Coordinate edgeEndCoord = e.getToVertex().getCoordinate();
                     Coordinate[] geometryCoordinates = g.getCoordinates();
                     if (geometryCoordinates.length < 2) {
-                        _log.warn(graph.addBuilderAnnotation(new BogusEdgeGeometry(e)));
+                        LOG.warn(graph.addBuilderAnnotation(new BogusEdgeGeometry(e)));
                         continue;
                     }
                     Coordinate geometryStartCoord = geometryCoordinates[0];
                     Coordinate geometryEndCoord = geometryCoordinates[geometryCoordinates.length - 1];
                     if (getDistanceLibrary().distance(edgeStartCoord, geometryStartCoord) > MAX_VERTEX_SHAPE_ERROR) {
-                        _log.warn(graph.addBuilderAnnotation(new VertexShapeError(e)));
+                        LOG.warn(graph.addBuilderAnnotation(new VertexShapeError(e)));
                     } else if (getDistanceLibrary().distance(edgeEndCoord, geometryEndCoord) > MAX_VERTEX_SHAPE_ERROR) {
-                        _log.warn(graph.addBuilderAnnotation(new VertexShapeError(e)));
+                        LOG.warn(graph.addBuilderAnnotation(new VertexShapeError(e)));
                     }
                 }
             }

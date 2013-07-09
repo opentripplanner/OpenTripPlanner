@@ -1,6 +1,20 @@
+/* This program is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
 package org.opentripplanner.routing.vertextype;
 
 import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.graph.AbstractVertex;
 import org.opentripplanner.routing.graph.Graph;
 
@@ -19,21 +33,12 @@ public class BikeRentalStationVertex extends AbstractVertex {
     private int spacesAvailable;
 
     private String id;
-
-    public BikeRentalStationVertex(Graph g, String id, String label, double x, double y, String name,
-            int capacity) {
-        super(g, label, x, y, name);
-        this.setId(id);
-        this.bikesAvailable = capacity / 2;
-        this.spacesAvailable = capacity / 2;
-    }
-
-    public BikeRentalStationVertex(Graph g, String id, String label, double x, double y, String name,
-            int bikes, int spaces) {
-        super(g, label, x, y, name);
-        this.setId(id);
-        this.bikesAvailable = bikes;
-        this.spacesAvailable = spaces;
+    
+    public BikeRentalStationVertex(Graph g, BikeRentalStation station) {
+        super(g, "bike rental station " + station.id, station.x, station.y, station.name);
+        this.setId(station.id);
+        this.setBikesAvailable(station.bikesAvailable);
+        this.setSpacesAvailable(station.spacesAvailable);
     }
 
     public int getBikesAvailable() {

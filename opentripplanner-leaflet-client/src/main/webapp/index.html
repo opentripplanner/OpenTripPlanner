@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<!--[if lt IE 7 ]> <html dir="ltr" lang="en-US" class="ie6"> <![endif]-->
+<!--[if IE 7 ]>    <html dir="ltr" lang="en-US" class="ie7"> <![endif]-->
+<!--[if IE 8 ]>    <html dir="ltr" lang="en-US" class="ie8"> <![endif]-->
+<!--[if IE 9 ]>    <html dir="ltr" lang="en-US" class="ie9"> <![endif]-->
+<!--[if (gt IE 9)|!(IE)]><!--> <html dir="ltr" lang="en-US"> <!--<![endif]-->
+
+<head>
+<title>OpenTripPlanner</title>
+
+<!--  Mobile Viewport Fix -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  
+<!-- Google WebFonts -->
+<link href='http://fonts.googleapis.com/css?family=Dancing+Script:700' rel='stylesheet' type='text/css'>
+
+
+<!-- jquery -->
+<script src="js/lib/jquery/jquery-1.9.1.js"></script>
+
+<!-- jquery-ui -->
+<script src="js/lib/jquery-ui/js/jquery-ui-1.9.1.custom.min.js"></script>
+<link rel="stylesheet" href="js/lib/jquery-ui/css/smoothness/jquery-ui-1.9.1.custom.css" />
+<script src="js/lib/jquery-ui/addons/jquery-ui-timepicker.js"></script>
+<link rel="stylesheet" href="js/lib/jquery-ui/addons/jquery-ui-timepicker.css" />
+
+<!-- backbone -->
+<script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.2/underscore-min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/0.9.2/backbone-min.js"></script>
+
+<!-- leaflet -->
+<script src="js/lib/leaflet/leaflet.js"></script>
+<link rel="stylesheet" href="js/lib/leaflet/leaflet.css" />
+<!--[if lte IE 8]>
+    <link rel="stylesheet" href="js/lib/leaflet/leaflet.ie.css" />
+<![endif]-->
+
+<!-- json support -->
+<script src="js/lib/json2.js"></script>
+
+
+<!-- moment.js -->
+<script src="js/lib/moment.min.js"></script>
+
+<!-- raphael -->
+<script src="js/lib/raphael/raphael-min.js"></script>
+
+
+<!-- otp-specific imports -->
+<script src="js/otp/otp.js?v=1"></script>
+<script src="js/otp/config.js?v=1"></script>
+
+<script src="js/otp/util/DataStorage.js?v=1"></script>
+<script src="js/otp/util/Geo.js?v=1"></script>
+<script src="js/otp/util/Itin.js?v=1"></script>
+<script src="js/otp/util/Logger.js?v=1"></script>
+<script src="js/otp/util/Text.js?v=1"></script>
+<script src="js/otp/util/Time.js?v=1"></script>
+
+<script src="js/otp/core/Webapp.js?v=1"></script>
+<script src="js/otp/core/Map.js?v=1"></script>
+<script src="js/otp/core/QueryLogger.js?v=1"></script>
+<script src="js/otp/core/PopupMenu.js?v=1"></script>
+<script src="js/otp/core/ContextMenu.js?v=1"></script>
+<script src="js/otp/core/MapContextMenu.js?v=1"></script>
+<script src="js/otp/core/WidgetManagerMenu.js?v=1"></script>
+<script src="js/otp/core/Geocoder.js?v=1"></script>
+<script src="js/otp/core/SOLRGeocoder.js?v=1"></script>
+<script src="js/otp/core/TransitIndex.js?v=1"></script>
+
+<script src="js/otp/widgets/Widget.js?v=1"></script>
+<script src="js/otp/widgets/WidgetManager.js?v=1"></script>
+
+<script src="js/otp/modules/Module.js?v=1"></script>
+
+<script src="js/otp/modules/planner/PlannerModule.js?v=1"></script>
+<script src="js/otp/modules/planner/IconFactory.js?v=1"></script>
+<script src="js/otp/modules/planner/TripPlan.js?v=1"></script>
+<script src="js/otp/modules/planner/Itinerary.js?v=1"></script>
+<script src="js/otp/modules/planner/ItinerariesWidget.js?v=1"></script>
+<link rel="stylesheet" href="js/otp/modules/planner/planner-style.css?v=1" />
+
+<script src="js/otp/modules/bikeshare/BikeShareModule.js?v=1"></script>
+<script src="js/otp/modules/bikeshare/BikeStationsWidget.js?v=1"></script>
+
+<script src="js/otp/modules/multimodal/MultimodalPlannerModule.js?v=1"></script>
+<script src="js/otp/modules/multimodal/StopViewerWidget.js?v=1"></script>
+<link rel="stylesheet" href="js/otp/modules/multimodal/multimodal-style.css?v=1" />
+
+<script src="js/otp/modules/calltaker/CallTakerModule.js?v=1"></script>
+<script src="js/otp/modules/calltaker/CallHistoryWidget.js?v=1"></script>
+<script src="js/otp/modules/annotations/AnnotationsModule.js?v=1"></script>
+
+<script src="js/otp/modules/analyst/AnalystModule.js?v=1"></script>
+<script src="js/otp/modules/analyst/AnalystLegendWidget.js?v=1"></script>
+<link rel="stylesheet" href="js/otp/modules/analyst/analyst-style.css?v=1" />
+
+<script src="js/otp/modules/alerts/AlertsModule.js?v=1"></script>
+<script src="js/otp/modules/alerts/EntitiesWidget.js?v=1"></script>
+<script src="js/otp/modules/alerts/EditAlertWidget.js?v=1"></script>
+<link rel="stylesheet" href="js/otp/modules/alerts/alerts-style.css?v=1" />
+
+
+<script src="js/otp/modules/fieldtrip/FieldTripModule.js?v=1"></script>
+<script src="js/otp/modules/fieldtrip/FieldTripManagerWidget.js?v=1"></script>
+<script src="js/otp/modules/fieldtrip/FieldTripRequestsWidget.js?v=1"></script>
+<script src="js/otp/modules/fieldtrip/SaveFieldTripWidget.js?v=1"></script>
+<link rel="stylesheet" href="js/otp/modules/fieldtrip/fieldtrip-style.css?v=1" />
+
+<script src="js/otp/widgets/InfoWidget.js?v=1"></script>
+<script src="js/otp/widgets/tripoptions/PreferredRoutesSelectorWidget.js?v=1"></script>
+<script src="js/otp/widgets/tripoptions/TripOptionsWidget.js?v=1"></script>
+<script src="js/otp/widgets/tripoptions/BikeTrianglePanel.js?v=1"></script>
+
+<script src="js/otp/widgets/transit/StopViewerWidget.js?v=1"></script>
+<script src="js/otp/widgets/transit/TripViewerWidget.js?v=1"></script>
+<link rel="stylesheet" href="js/otp/widgets/transit/widgets-transit-style.css?v=1" />
+
+
+<link rel="stylesheet" href="style.css?v=1" />
+
+<!-- make legacy Internet Explorer play nice(r) -->
+<!--[if lt IE 9]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <script src="js/lib/respond.min.js"></script>
+<![endif]-->
+
+<!-- create the webapp at startups -->
+<script type="text/javascript" language="javascript">
+$(document).ready(function() {
+    new otp.core.Webapp();
+
+});
+</script>
+
+</head>
+<body>
+
+<header id="branding" role="banner" class="clearfix">
+  
+  <!--<hgroup id="logo">
+    <div class="ribbon">
+      <h1 id="site-title"><span><a href="/" title="cibi.me" rel="home">cibi.me</a></span></h1>
+      <h2 id="site-description">Where can you bike to?</h2>
+    </div>
+  </hgroup>-->
+
+  <!--<p id="splash-text"><span>Bike share is coming to NYC this summer!</span> <span>How will you use it to get around?</span></p>-->
+
+ <!--
+  <div class="search">
+    
+    <input type="text" name="location_search" placeholder="Search for a location&hellip;" />
+  </div>
+ -->
+</header><!-- #branding -->
+
+<div id="map"></div>
+<div id="otp-minimize-tray"></div>
+
+<div id="otp-spinner"><img src="images/spinner.gif"></div>
+
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-8102379-22']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+
+</body>
+</html>

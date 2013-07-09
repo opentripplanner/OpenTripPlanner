@@ -1,0 +1,87 @@
+/* Multimodal Module Widget Styles */
+
+.otp-stopViewer {
+    /*height: 150px;*/
+    width: 300px;
+}
+
+.otp-stopViewer-select {
+    margin-bottom: 4px;
+}
+
+.otp-stopViewer-stopTimes {
+    position: relative;
+    height: 42px;
+    border: 1px solid black;
+    background: white;
+    overflow: hidden;
+}
+
+.otp-stopViewer-stopTimes-advancer {
+    height: 40px;
+    width: 30px;
+    position: absolute;
+    top: 0px;
+    background: #fff;
+    font-size: 30px;
+    cursor: pointer;
+    z-index: 10;
+    text-align:center;
+}
+
+.otp-stopViewer-stopTimes-timeBox {
+    position: absolute;
+    background: #fff;
+    text-align:center;
+    font-weight: bold;
+    color: gray; 
+    z-index: 5;
+}
+/*
+.otp-fieldTripManager-callListContainer {
+    background: white;
+    border: 1px solid black;
+    width: 200px;
+    float: left;
+    margin-right: 10px;
+}
+
+.otp-fieldTripManager-callListHeader {
+    padding: 4px;
+    line-height: 18px;
+    height: 42px;
+    background: #ddd;
+}
+
+.otp-fieldTripManager-callList {
+    overflow: auto;
+    height: 200px;
+}
+
+.otp-fieldTripManager-callInfo {
+    padding: 4px;
+    height: 244px;
+    background: #fff;
+    overflow: auto;
+    width: 200px;
+}
+
+.otp-fieldTrip-buttonRow {
+    padding: 10px 0px 5px 0px;
+    text-align: center;
+}
+
+.otp-saveFieldTripWidget {
+}
+
+.otp-fieldTripManager-tripRow {
+    background: #eee;
+    margin: 4px;
+    padding: 4px;
+    cursor: pointer;
+}
+
+.otp-fieldTripManager-tripDetail {
+    margin-bottom: 4px;
+}*/
+

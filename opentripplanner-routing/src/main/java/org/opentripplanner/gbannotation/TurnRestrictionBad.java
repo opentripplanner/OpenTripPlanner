@@ -20,7 +20,7 @@ public class TurnRestrictionBad extends GraphBuilderAnnotation {
 
     private static final long serialVersionUID = 1L;
 
-    public static final String FMT = "Bad turn restriction at %s";
+    public static final String FMT = "Bad turn restriction at relation %s";
     
     final long id;
     

@@ -33,25 +33,25 @@ import java.util.List;
  */
 public class Environment {
 
-    Polygon outer_boundary;
+    VLPolygon outer_boundary;
 
-    ArrayList<Polygon> holes = new ArrayList<Polygon>();
+    ArrayList<VLPolygon> holes = new ArrayList<VLPolygon>();
 
     ArrayList<pair<Integer, Integer>> flattened_index_key = new ArrayList<pair<Integer, Integer>>();
 
-    public Environment(List<Polygon> polygons) {
+    public Environment(List<VLPolygon> polygons) {
         outer_boundary = polygons.get(0);
         for (int i = 1; i < polygons.size(); i++)
             holes.add(polygons.get(i));
         update_flattened_index_key();
     }
 
-    public Environment(Polygon polygon_temp) {
+    public Environment(VLPolygon polygon_temp) {
         outer_boundary = polygon_temp;
         update_flattened_index_key();
     }
 
-    Point kth_point(int k) {
+    VLPoint kth_point(int k) {
         pair<Integer, Integer> ij = flattened_index_key.get(k);
         return get(ij.first()).get(ij.second());
     }
@@ -68,7 +68,7 @@ public class Environment {
         int r_count = 0;
         r_count = outer_boundary.r();
         for (int i = 0; i < h(); i++) {
-            Polygon polygon_temp = holes.get(i);
+            VLPolygon polygon_temp = holes.get(i);
             r_count += polygon_temp.n() - polygon_temp.r();
         }
         return r_count;
@@ -190,12 +190,12 @@ public class Environment {
         return area_temp;
     }
 
-    ArrayList<Point> random_points(int count, double epsilon) {
+    ArrayList<VLPoint> random_points(int count, double epsilon) {
         assert (area() > 0);
 
         BoundingBox bounding_box = bbox();
-        ArrayList<Point> pts_in_environment = new ArrayList<Point>(count);
-        Point pt_temp = new Point(
+        ArrayList<VLPoint> pts_in_environment = new ArrayList<VLPoint>(count);
+        VLPoint pt_temp = new VLPoint(
                 Util.uniform_random_sample(bounding_box.x_min, bounding_box.x_max),
                 Util.uniform_random_sample(bounding_box.y_min, bounding_box.y_max));
         while (pts_in_environment.size() < count) {
@@ -215,7 +215,7 @@ public class Environment {
         return outer_boundary.bbox();
     }
 
-    public Polygon get(int i) {
+    public VLPolygon get(int i) {
         if (i == 0) {
             return outer_boundary;
         } else {
@@ -287,7 +287,7 @@ public class Environment {
         return outs;
     }
 
-    double boundary_distance(Point point_temp) {
+    double boundary_distance(VLPoint point_temp) {
         return point_temp.boundary_distance(this);
     }
 

@@ -32,10 +32,12 @@ public class TestDisjointSet  extends TestCase{
         assertEquals(set.find("cats"), set.find("dogs"));
         assertTrue(set.find("cats") != set.find("sparrows"));
         assertEquals(set.size(set.find("sparrows")), 1);
-        
+
         set.union("sparrows", "robins");
         assertEquals(set.size(set.find("robins")), 2);
 
+        assertTrue(set.sets().size() == 2);
+        
         assertTrue(set.find("dogs") != set.find("robins"));
         assertEquals(set.find("sparrows"), set.find("robins"));
         
@@ -43,6 +45,7 @@ public class TestDisjointSet  extends TestCase{
         assertEquals(set.find("dogs"), set.find("robins"));
         assertEquals(set.size(set.find("cats")), 4);
 
+        assertTrue(set.sets().size() == 1);
     }
     
     public void testRandom() {

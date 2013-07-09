@@ -50,18 +50,27 @@ public class TraverseModeSet implements Cloneable, Serializable {
     private static final int MODE_GONDOLA = 1024;
 
     private static final int MODE_FUNICULAR = 2048;
+    
+    private static final int MODE_CUSTOM_MOTOR_VEHICLE = 4096;
 
     private static final int MODE_TRAINISH = MODE_TRAM | MODE_RAIL | MODE_SUBWAY | MODE_FUNICULAR | MODE_GONDOLA;
 
     private static final int MODE_BUSISH = MODE_CABLE_CAR | MODE_BUS;
 
     private static final int MODE_TRANSIT = MODE_TRAINISH | MODE_BUSISH | MODE_FERRY;
+    
+    private static final int MODE_DRIVING = MODE_CAR | MODE_CUSTOM_MOTOR_VEHICLE;
+    
+    private static final int MODE_ALL = MODE_TRANSIT | MODE_DRIVING | MODE_WALK | MODE_BICYCLE;
 
     private int modes = 0;
 
     public TraverseModeSet(String modelist) {
         modes = 0;
         for (String modeStr : modelist.split(",")) {
+            if (modeStr.length() == 0) {
+                continue;
+            }
             setMode(TraverseMode.valueOf(modeStr), true);
         }
 
@@ -72,6 +81,17 @@ public class TraverseModeSet implements Cloneable, Serializable {
             this.modes |= getMaskForMode(mode);
         }
     }
+    
+    /**
+     * Returns a mode set containing all modes.
+     * 
+     * @return
+     */
+    public static TraverseModeSet allModes() {
+    	TraverseModeSet modes = new TraverseModeSet();
+    	modes.modes = MODE_ALL;
+    	return modes;
+    }
 
     private final int getMaskForMode(TraverseMode mode) {
         switch (mode) {
@@ -81,6 +101,8 @@ public class TraverseModeSet implements Cloneable, Serializable {
             return MODE_WALK;
         case CAR:
             return MODE_CAR;
+        case CUSTOM_MOTOR_VEHICLE:
+            return MODE_CUSTOM_MOTOR_VEHICLE;
         case BUS:
             return MODE_BUS;
         case TRAM:
@@ -134,6 +156,14 @@ public class TraverseModeSet implements Cloneable, Serializable {
 
     public boolean getCar() {
         return (modes & MODE_CAR) != 0;
+    }
+    
+    public boolean getCustomMotorVehicle() {
+        return (modes & MODE_CUSTOM_MOTOR_VEHICLE) != 0;
+    }
+    
+    public boolean getDriving() {
+        return (modes & MODE_DRIVING) != 0;
     }
 
     public boolean getTram() {
@@ -197,6 +227,22 @@ public class TraverseModeSet implements Cloneable, Serializable {
             modes |= MODE_CAR;
         } else {
             modes &= ~MODE_CAR;
+        }
+    }
+    
+    public void setCustomMotorVehicle(boolean cmv) {
+        if (cmv) {
+            modes |= MODE_CUSTOM_MOTOR_VEHICLE;
+        } else {
+            modes &= ~MODE_CUSTOM_MOTOR_VEHICLE;
+        }
+    }
+    
+    public void setDriving(boolean driving) {
+        if (driving) {
+            modes |= MODE_DRIVING;
+        } else {
+            modes &= ~MODE_DRIVING;
         }
     }
 
@@ -332,7 +378,8 @@ public class TraverseModeSet implements Cloneable, Serializable {
     public String toString() {
         StringBuilder out = new StringBuilder();
         for (TraverseMode mode : TraverseMode.values()) {
-            if ((modes & getMaskForMode(mode)) != 0) {
+            int mask = getMaskForMode(mode);
+            if (mask != 0 && (modes & mask) == mask) {
                 if (out.length() != 0) {
                     out.append(", ");
                 }
@@ -363,6 +410,13 @@ public class TraverseModeSet implements Cloneable, Serializable {
             throw new RuntimeException(e);
         }
     }
+    
+    /**
+     * Clear the mode set so that no modes are included.
+     */
+    public void clear() {
+    	modes = 0;
+    }
 
     /**
      * @param restrictedModes A set of restricted modes
@@ -376,6 +430,8 @@ public class TraverseModeSet implements Cloneable, Serializable {
         if (getBicycle() && !restrictedModes.contains(TraverseMode.BICYCLE))
             return false;
         if (getCar() && !restrictedModes.contains(TraverseMode.CAR))
+            return false;
+        if (getCustomMotorVehicle() && !restrictedModes.contains(TraverseMode.CUSTOM_MOTOR_VEHICLE))
             return false;
         return true;
     }

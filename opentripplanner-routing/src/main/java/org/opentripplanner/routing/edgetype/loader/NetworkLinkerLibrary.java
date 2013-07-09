@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
 
 public class NetworkLinkerLibrary {
 
-    private static Logger _log = LoggerFactory.getLogger(NetworkLinkerLibrary.class);
+    private static Logger LOG = LoggerFactory.getLogger(NetworkLinkerLibrary.class);
 
     /* for each original bundle of (turn)edges making up a street, a list of 
        edge pairs that will replace it */
@@ -69,7 +69,7 @@ public class NetworkLinkerLibrary {
         this.transitIndex = graph.getService(TransitIndexService.class);
         EdgesForRoute edgesForRoute = (EdgesForRoute) extra.get(EdgesForRoute.class);
         this.edgesForRoute = edgesForRoute;
-        _log.debug("constructing index...");
+        LOG.debug("constructing index...");
         this.index = new StreetVertexIndexServiceImpl(graph);
         this.index.setup();
     }

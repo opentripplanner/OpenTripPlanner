@@ -43,8 +43,8 @@ public class TransitLocalStreetComputer implements GraphBuilder {
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         HashSet<Vertex> transitShortestPathVertices = new HashSet<Vertex>();
         
-        //this is necessary for storing walk distances by vertex index
-        graph.renumberVerticesAndEdges();
+        // This is necessary for storing walk distances by vertex index
+        graph.rebuildVertexAndEdgeIndices();
 
         RoutingRequest walk = new RoutingRequest(TraverseMode.WALK);
         RoutingRequest wheelchair = new RoutingRequest(TraverseMode.WALK);
@@ -94,7 +94,7 @@ public class TransitLocalStreetComputer implements GraphBuilder {
                     if (destStopVertex instanceof TransitStop) {
                         int pathIndex = 0;
                         if (req == walk && saveShortestPaths ) {
-                           cost.put(destStopVertex, new T2<Double, Integer>(s.getWalkDistance(), (int) s.getElapsedTime()));
+                           cost.put(destStopVertex, new T2<Double, Integer>(s.getWalkDistance(), (int) s.getElapsedTimeSeconds()));
                         }
                         while (s != null) {
                             transitShortestPathVertices.add(s.getVertex());
@@ -121,7 +121,7 @@ public class TransitLocalStreetComputer implements GraphBuilder {
 
     @Override
     public List<String> getPrerequisites() {
-        return Arrays.asList("streets", "transit");
+        return Arrays.asList("streets", "transit", "linking");
     }
 
     @Override

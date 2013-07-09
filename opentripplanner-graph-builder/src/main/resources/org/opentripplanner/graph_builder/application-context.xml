@@ -18,7 +18,6 @@
     </bean>
     
     <bean id="graphBuilderTask" class="org.opentripplanner.graph_builder.GraphBuilderTask">
-        <property name="graphBundle" ref="graphBundle" />
         <property name="graphBuilders" ref="graphBuilders" />
     </bean>
 

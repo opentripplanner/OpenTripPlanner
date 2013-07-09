@@ -1,0 +1,63 @@
+.otp-tripViewer {
+    /*height: 150px;*/
+    width: 300px;
+}
+
+.otp-tripViewer-select {
+    margin-bottom: 6px;
+}
+
+.otp-tripViewer-close {
+    text-align: center;
+    margin-top: 4px;
+    font-size: 11px;
+}
+
+.otp-tripViewer-stopList {
+    height: 200px;
+    background: white;
+    border: 1px solid black;
+    overflow: auto;
+    padding: 4px 8px;
+}
+
+.otp-tripViewer-stopRow {
+    height: 32px;
+}
+
+.otp-tripViewer-stopRow-name {
+    color: black;
+    white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+    font-size: 11px;
+    margin-bottom: 1px;
+    padding-top: 3px;
+}
+
+.otp-tripViewer-stopRow-idLine {
+    font-size: 10px;
+    color: gray;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.otp-tripViewer-stopRow-idLine a {
+    text-decoration: none;
+}
+
+.otp-tripViewer-stopRow-idLine a:hover {
+    text-decoration: underline;
+}
+
+.otp-stopViewer-infoRow {
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+
+.otp-stopViewer-dateRow {
+    font-size: 14px;
+    margin-bottom: 8px;
+    text-align: center;
+}
+

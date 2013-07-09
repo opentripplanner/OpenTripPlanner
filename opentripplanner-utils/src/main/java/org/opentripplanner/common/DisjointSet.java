@@ -15,6 +15,11 @@ package org.opentripplanner.common;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.opentripplanner.util.MapUtils;
 
 /** basic union-find data structure with path compression */
 public class DisjointSet<T> {
@@ -61,6 +66,14 @@ public class DisjointSet<T> {
     public boolean exists(T element) {
         return setMapping.containsKey(element);
     }
+    
+    public List<Set<T>> sets() {
+        HashMap<Integer, Set<T>> out = new HashMap<Integer, Set<T>>();
+        for (Map.Entry<T, Integer> entry : setMapping.entrySet()) {
+            MapUtils.addToMapSet(out, compact(entry.getValue()), entry.getKey());
+        }
+        return new ArrayList<Set<T>>(out.values());
+    }
 
     private int compact(int i) {
         int key = sets.get(i);
@@ -71,7 +84,7 @@ public class DisjointSet<T> {
         sets.set(i, j);
         return j;
     }
-    
+
     public int size(int component) {
         return -sets.get(component);
     }

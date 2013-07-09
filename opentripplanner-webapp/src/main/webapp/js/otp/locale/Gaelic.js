@@ -272,7 +272,10 @@ otp.locale.Gaelic = {
             intermediate  : "Intermediate Place",          // TODO
             minimize      : "Teaspáin dom an",
             maxWalkDistance: "Súil is faide",
+            walkSpeed     : "Siúl luas",
             maxBikeDistance: "Súil is bike",              // TODO
+            bikeSpeed     : "luas rothar",                // TODO
+
             arriveDepart  : "Sroic roimh/Imigh ag",
             mode          : "Iompair ar",
             wheelchair    : "Turas oiriúnach do chathaoireacha rothaí", 
@@ -357,7 +360,22 @@ otp.locale.Gaelic = {
             ['5000',  '5 chiliméadar'],
             ['10000', '10 chiliméadar']
         ],
-    
+            
+
+        walkSpeed :
+        [
+            ['0.278',  '1 km/u'],
+            ['0.556',  '2 km/u'],
+            ['0.833',  '3 km/u'],
+            ['1.111',  '4 km/u'],
+            ['1.389',  '5 km/u'],
+            ['1.667',  '6 km/u'],
+            ['1.944',  '7 km/u'],
+            ['2.222',  '8 km/u'],
+            ['2.500',  '9 km/u'],
+            ['2.778',  '10 km/u']
+        ],
+
         mode : 
         [
             ['TRANSIT,WALK', 'Idirthurais'],

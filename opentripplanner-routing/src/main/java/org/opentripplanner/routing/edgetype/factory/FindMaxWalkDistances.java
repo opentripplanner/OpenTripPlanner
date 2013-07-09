@@ -32,10 +32,10 @@ import org.slf4j.LoggerFactory;
 
 public class FindMaxWalkDistances {
     
-    private final static Logger _log = LoggerFactory.getLogger(FindMaxWalkDistances.class);
+    private final static Logger LOG = LoggerFactory.getLogger(FindMaxWalkDistances.class);
 
     public static void find(Graph graph) {
-        _log.debug("finding max walk distances");
+        LOG.debug("finding max walk distances");
         for (Vertex gv : graph.getVertices()) {
             gv.setDistanceToNearestTransitStop(Double.MAX_VALUE);
         }

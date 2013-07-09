@@ -19,6 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ApplicationContext;
@@ -28,17 +30,21 @@ import org.springframework.core.io.FileSystemResource;
 
 public class GraphBuilderMain {
 
+    private static final Logger LOG = LoggerFactory.getLogger(GraphBuilderMain.class);
+
     private static final String CLASSPATH_PREFIX = "classpath:";
 
     private static final String FILE_PREFIX = "file:";
 
     public static void main(String[] args) throws IOException {
 
-        if( args.length == 0) {
+        if (args.length == 0) {
             System.err.println("usage: config.xml");
             System.exit(-1);
         }
-        
+
+        long startTime = System.currentTimeMillis();
+
         List<String> paths = new ArrayList<String>();
         paths.add("classpath:org/opentripplanner/graph_builder/application-context.xml");
         for (String arg : args)
@@ -47,6 +53,10 @@ public class GraphBuilderMain {
         ApplicationContext context = createContext(paths, new HashMap<String, BeanDefinition>());
         GraphBuilderTask task = (GraphBuilderTask) context.getBean("graphBuilderTask");
         task.run();
+
+        long totalTime = System.currentTimeMillis() - startTime;
+        double totalTimeSeconds = ((double) totalTime) / 1000.0;
+        LOG.info("Total graph build time: {} seconds", totalTimeSeconds);
     }
 
     public static ApplicationContext createContext(Iterable<String> paths,

@@ -29,7 +29,7 @@ import com.vividsolutions.jts.geom.Envelope;
 
 public class RegionBasedOpenStreetMapProviderImpl implements OpenStreetMapProvider {
 
-    private static Logger _log = LoggerFactory.getLogger(RegionBasedOpenStreetMapProviderImpl.class);
+    private static Logger LOG = LoggerFactory.getLogger(RegionBasedOpenStreetMapProviderImpl.class);
 
     private RegionsSource _regionsSource;
 
@@ -63,7 +63,7 @@ public class RegionBasedOpenStreetMapProviderImpl implements OpenStreetMapProvid
             for (Envelope region : _regionsSource.getRegions()) {
                 getDownloader().visitRegion(region, downloadHandler);
                 if (regionIndex % 1000 == 0) {
-                    _log.debug("regions=" + regionIndex);
+                    LOG.debug("regions=" + regionIndex);
                 }
                 regionIndex++;
             }

@@ -1,0 +1,539 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="1041"
+   height="781"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.2 r9819"
+   sodipodi:docname="icons_planner_2.svg">
+  <defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient3892">
+      <stop
+         style="stop-color:#aaaaaa;stop-opacity:1;"
+         offset="0"
+         id="stop3894" />
+      <stop
+         style="stop-color:#aaaaaa;stop-opacity:0;"
+         offset="1"
+         id="stop3896" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient5289">
+      <stop
+         style="stop-color:#808080;stop-opacity:1;"
+         offset="0"
+         id="stop5291" />
+      <stop
+         style="stop-color:#c09797;stop-opacity:0;"
+         offset="1"
+         id="stop5293" />
+    </linearGradient>
+    <marker
+       inkscape:stockid="Arrow1Lend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Lend"
+       style="overflow:visible">
+      <path
+         id="path3761"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="matrix(-0.8,0,0,-0.8,-10,0)"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:stockid="TriangleOutM"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="TriangleOutM"
+       style="overflow:visible">
+      <path
+         id="path3904"
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="scale(0.4,0.4)"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Send"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Send"
+       style="overflow:visible">
+      <path
+         id="path3773"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="matrix(-0.2,0,0,-0.2,-1.2,0)"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Mend"
+       style="overflow:visible">
+      <path
+         id="path3767"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow2Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow2Mend"
+       style="overflow:visible">
+      <path
+         id="path3785"
+         style="font-size:12px;fill-rule:evenodd;stroke-width:0.625;stroke-linejoin:round"
+         d="M 8.7185878,4.0337352 -2.2072895,0.01601326 8.7185884,-4.0017078 c -1.7454984,2.3720609 -1.7354408,5.6174519 -6e-7,8.035443 z"
+         transform="scale(-0.6,-0.6)"
+         inkscape:connector-curvature="0" />
+    </marker>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient5289"
+       id="linearGradient5295"
+       x1="950"
+       y1="204.09448"
+       x2="950"
+       y2="-15.905518"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient5289-6"
+       id="linearGradient5295-7"
+       x1="950"
+       y1="204.09448"
+       x2="950"
+       y2="-15.905518"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       id="linearGradient5289-6">
+      <stop
+         style="stop-color:#808080;stop-opacity:1;"
+         offset="0"
+         id="stop5291-4" />
+      <stop
+         style="stop-color:#c09797;stop-opacity:0;"
+         offset="1"
+         id="stop5293-1" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3892"
+       id="linearGradient5354"
+       x1="450"
+       y1="292.36218"
+       x2="470"
+       y2="232.36218"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3892"
+       id="linearGradient5354-3"
+       x1="450"
+       y1="312.36218"
+       x2="450"
+       y2="232.36218"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       id="linearGradient5348-8">
+      <stop
+         style="stop-color:#aaaaaa;stop-opacity:1;"
+         offset="0"
+         id="stop5350-1" />
+      <stop
+         style="stop-color:#aaaaaa;stop-opacity:0;"
+         offset="1"
+         id="stop5352-0" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient5348-7"
+       id="linearGradient5354-0"
+       x1="450"
+       y1="292.36218"
+       x2="470"
+       y2="232.36218"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       id="linearGradient5348-7">
+      <stop
+         style="stop-color:#aaaaaa;stop-opacity:1;"
+         offset="0"
+         id="stop5350-8" />
+      <stop
+         style="stop-color:#aaaaaa;stop-opacity:0;"
+         offset="1"
+         id="stop5352-8" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3892"
+       id="linearGradient3898"
+       x1="160"
+       y1="142.36218"
+       x2="220"
+       y2="202.36218"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient3892-3"
+       id="linearGradient3898-1"
+       x1="160"
+       y1="142.36218"
+       x2="220"
+       y2="202.36218"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       id="linearGradient3892-3">
+      <stop
+         style="stop-color:#aaaaaa;stop-opacity:1;"
+         offset="0"
+         id="stop3894-1" />
+      <stop
+         style="stop-color:#aaaaaa;stop-opacity:0;"
+         offset="1"
+         id="stop3896-0" />
+    </linearGradient>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.35"
+     inkscape:cx="404.38141"
+     inkscape:cy="319.53231"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     showguides="false"
+     inkscape:window-width="1440"
+     inkscape:window-height="851"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:snap-global="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0">
+    <inkscape:grid
+       type="xygrid"
+       id="grid5145"
+       empspacing="5"
+       visible="true"
+       enabled="true"
+       snapvisiblegridlinesonly="true" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Calque 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-9.5,-321.86218)">
+    <g
+       id="g5170"
+       transform="translate(-50,270)"
+       inkscape:export-filename="/home/laurent/workspace/mecatran/urbiplan-client-webapp/art/continue_200.png"
+       inkscape:export-xdpi="68.970001"
+       inkscape:export-ydpi="68.970001">
+      <path
+         sodipodi:nodetypes="cccccccc"
+         inkscape:connector-curvature="0"
+         id="path5143"
+         d="m 160,162.36218 0,150 60,0 0,-150 40,0 L 190,52.362186 120,162.36218 z"
+         style="fill:#808080;fill-opacity:1;stroke:none" />
+      <rect
+         ry="0"
+         rx="0"
+         y="52.362183"
+         x="60"
+         height="260"
+         width="260"
+         id="rect5147"
+         style="opacity:0;fill:none;stroke:#9e5757;stroke-opacity:1" />
+    </g>
+    <g
+       id="g5182"
+       transform="translate(10,90.000002)"
+       inkscape:export-filename="/home/laurent/workspace/mecatran/urbiplan-client-webapp/art/left.png"
+       inkscape:export-xdpi="6.9000001"
+       inkscape:export-ydpi="6.9000001">
+      <path
+         sodipodi:nodetypes="ccccccccccc"
+         inkscape:connector-curvature="0"
+         id="path5143-1"
+         d="m 360,332.36218 60,0 0,160 60,0 0,-170 c 0,-30 -20,-50 -50,-50 l -70,0 0,-40 -100,69.13729 100,70.86271 z"
+         style="fill:#808080;fill-opacity:1;stroke:none" />
+      <g
+         id="g5174">
+        <rect
+           style="opacity:0;fill:none;stroke:#000000;stroke-opacity:1"
+           id="rect5147-8"
+           width="260"
+           height="260"
+           x="260"
+           y="232.36218"
+           rx="0"
+           ry="0" />
+      </g>
+    </g>
+    <g
+       id="g5182-1"
+       transform="translate(270,90.000002)"
+       inkscape:export-filename="/home/laurent/workspace/mecatran/urbiplan-client-webapp/art/uturn_left.png"
+       inkscape:export-xdpi="6.9000001"
+       inkscape:export-ydpi="6.9000001">
+      <path
+         sodipodi:nodetypes="cczcccczcccccc"
+         inkscape:connector-curvature="0"
+         id="path5143-1-0"
+         d="m 360,352.36218 0,-20 c 0,-34.81459 3.93422,-40.30841 35.36063,-40 31.42641,0.30841 34.63937,4.45744 34.63937,40 l 0,160 60,0 0,-160 C 490,258.2405 467.14844,235.11071 395.35961,234.8628 323.57078,234.61489 300,256.84101 300,332.36218 l 0,20 -40,0 70,100 70,-100 z"
+         style="fill:#808080;fill-opacity:1;stroke:none" />
+      <g
+         id="g5174-7">
+        <rect
+           style="opacity:0;fill:none;stroke:#000000;stroke-opacity:1"
+           id="rect5147-8-6"
+           width="260"
+           height="260"
+           x="260"
+           y="232.36218"
+           rx="0"
+           ry="0" />
+      </g>
+    </g>
+    <g
+       id="g5182-7"
+       transform="translate(530,90.000002)"
+       inkscape:export-filename="/home/laurent/workspace/mecatran/urbiplan-client-webapp/art/exit_left.png"
+       inkscape:export-xdpi="6.9000001"
+       inkscape:export-ydpi="6.9000001">
+      <path
+         style="fill:url(#linearGradient5354);fill-opacity:1;stroke:none"
+         d="m 390,492.36218 60,0 c 0,-180 60,-260 60,-260 l -70,0 c 0,0 -50,60 -50,260 z"
+         id="path5287"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ccccc" />
+      <path
+         sodipodi:nodetypes="cccccccccc"
+         inkscape:connector-curvature="0"
+         id="path5143-1-9"
+         d="m 340,322.36218 c 20,20 50,60 50,130 l 0,40 60,0 0,-40 c 0,-70 -30,-130 -70,-170 l 30,-30 -120,-20 20,120 z"
+         style="fill:#808080;fill-opacity:1;stroke:none" />
+      <g
+         id="g5174-0">
+        <rect
+           style="opacity:0;fill:none;stroke:#000000;stroke-opacity:1"
+           id="rect5147-8-3"
+           width="260"
+           height="260"
+           x="260"
+           y="232.36218"
+           rx="0"
+           ry="0" />
+      </g>
+    </g>
+    <g
+       id="g5182-7-9"
+       transform="translate(530,350)"
+       inkscape:export-filename="/home/laurent/workspace/mecatran/urbiplan-client-webapp/art/turn_left.png"
+       inkscape:export-xdpi="6.9000001"
+       inkscape:export-ydpi="6.9000001">
+      <path
+         style="fill:url(#linearGradient5354-3);fill-opacity:1;stroke:none"
+         d="m 420,492.36218 60,0 c 0,-180 0,-260 0,-260 l -60,0 c 0,0 0,60 0,260 z"
+         id="path5287-8"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ccccc" />
+      <path
+         sodipodi:nodetypes="cccccccccc"
+         inkscape:connector-curvature="0"
+         id="path5143-1-9-8"
+         d="m 350,352.36218 c 50,0 70,10 70,100 l 0,40 60,0 0,-40 c 0,-120 -40,-160 -130,-160 l 0,-40 -90,70 90,70 z"
+         style="fill:#808080;fill-opacity:1;stroke:none" />
+      <g
+         id="g5174-0-5">
+        <rect
+           style="opacity:0;fill:none;stroke:#000000;stroke-opacity:1"
+           id="rect5147-8-3-5"
+           width="260"
+           height="260"
+           x="260"
+           y="232.36218"
+           rx="0"
+           ry="0" />
+      </g>
+    </g>
+    <g
+       id="g5182-7-3"
+       transform="translate(10,350)"
+       inkscape:export-filename="/home/laurent/workspace/mecatran/urbiplan-client-webapp/art/slightly_left.png"
+       inkscape:export-xdpi="6.9000001"
+       inkscape:export-ydpi="6.9000001">
+      <path
+         sodipodi:nodetypes="csccccsccccc"
+         inkscape:connector-curvature="0"
+         id="path5143-1-9-5"
+         d="m 340,322.36218 40,40 c 10,10 20,20 20,40 l 0,90 60,0 0,-90 c 0,-40 -20,-60 -40,-80 l -40,-40 30,-30 -120,-20 20,120 z"
+         style="fill:#808080;fill-opacity:1;stroke:none" />
+      <g
+         id="g5174-0-0">
+        <rect
+           style="opacity:0;fill:none;stroke:#000000;stroke-opacity:1"
+           id="rect5147-8-3-9"
+           width="260"
+           height="260"
+           x="260"
+           y="232.36218"
+           rx="0"
+           ry="0" />
+      </g>
+    </g>
+    <g
+       id="g5182-7-3-0"
+       transform="translate(270,350)"
+       inkscape:export-filename="/home/laurent/workspace/mecatran/urbiplan-client-webapp/art/hard_left.png"
+       inkscape:export-xdpi="6.9000001"
+       inkscape:export-ydpi="6.9000001">
+      <path
+         sodipodi:nodetypes="csccccsccccc"
+         inkscape:connector-curvature="0"
+         id="path5143-1-9-5-8"
+         d="m 320,332.36218 50,-50 c 40,-40 110,-20 110,50 l 0,160 -60,0 0,-160 c 0,-10 0,-20 -10,-10 l -50,50 30,30 -120,20 20,-120 z"
+         style="fill:#808080;fill-opacity:1;stroke:none" />
+      <g
+         id="g5174-0-0-6">
+        <rect
+           style="opacity:0;fill:none;stroke:#000000;stroke-opacity:1"
+           id="rect5147-8-3-9-8"
+           width="260"
+           height="260"
+           x="260"
+           y="232.36218"
+           rx="0"
+           ry="0" />
+      </g>
+    </g>
+    <g
+       id="g5170-1"
+       transform="translate(-50,530)"
+       inkscape:export-filename="/home/laurent/workspace/mecatran/urbiplan-client-webapp/art/merge.png"
+       inkscape:export-xdpi="6.9000001"
+       inkscape:export-ydpi="6.9000001">
+      <path
+         sodipodi:nodetypes="cccccccccccccccc"
+         inkscape:connector-curvature="0"
+         id="path5143-6"
+         d="m 160,162.36218 0,21.42857 c 0,38.57143 -50,28.57143 -50,88.57143 l 0,41.42857 60,-1.42857 0,-40 c 0,-30 40,-30 40,0 l 0,40 60,0 0,-40 c 0,-60 -50,-50 -50,-90 l 0,-20 40,0 L 190,52.362186 120,162.36218 z"
+         style="fill:#808080;fill-opacity:1;stroke:none" />
+      <rect
+         ry="0"
+         rx="0"
+         y="52.362183"
+         x="60"
+         height="260"
+         width="260"
+         id="rect5147-2"
+         style="opacity:0;fill:none;stroke:#000000;stroke-opacity:1" />
+    </g>
+    <g
+       id="g5170-1-2"
+       transform="translate(-50,790)"
+       inkscape:export-filename="/home/laurent/workspace/mecatran/urbiplan-client-webapp/art/circle_counterclockwise.png"
+       inkscape:export-xdpi="6.9000001"
+       inkscape:export-ydpi="6.9000001">
+      <path
+         style="fill:url(#linearGradient3898);fill-opacity:1;fill-rule:nonzero;stroke:none"
+         d="m 190,72.362182 c -55.22847,0 -100,44.771528 -100,99.999998 0,42.48815 27.62873,75.51531 65,90 0,-30 10,-45 25,-50 -19.48793,-2.68095 -30,-19.77523 -30,-40 0,-22.09139 17.90861,-40 40,-40 22.09139,0 40,17.90861 40,40 l 60,0 C 290,117.13371 245.22847,72.362182 190,72.362182 z"
+         id="path3113-8"
+         inkscape:connector-curvature="0"
+         sodipodi:nodetypes="ssccssccs" />
+      <rect
+         ry="0"
+         rx="0"
+         y="52.362183"
+         x="60"
+         height="260"
+         width="260"
+         id="rect5147-2-4"
+         style="opacity:0;fill:none;stroke:#000000;stroke-opacity:1" />
+      <path
+         style="fill:#808080;fill-opacity:1;fill-rule:nonzero;stroke:none"
+         d="m 210,614.09375 -60,60 25.625,0 c -5.53796,11.95372 -15.57328,20 -25.625,20 -25,0 -40,20 -40,40 l 0,60 60,0 0,-44.59375 c 34.36321,-10.79065 60.70183,-39.63122 67.96875,-75.40625 l 32.03125,0 -60,-60 z"
+         transform="translate(50,-481.7323)"
+         id="path3113"
+         inkscape:connector-curvature="0" />
+    </g>
+    <path
+       style="fill:#aaaaaa;fill-opacity:0;fill-rule:nonzero;stroke:none"
+       d="m 140,862.36218 c -55.22847,0 -100,44.77153 -100,100 0,42.48812 27.62873,75.51532 65,90.00002 0,-30 10,-45 25,-50 -19.48793,-2.68097 -30,-19.77525 -30,-40.00002 0,-22.09139 17.90861,-40 40,-40 22.09139,0 40,17.90861 40,40 l 60,0 c 0,-55.22847 -44.77153,-100 -100,-100 z"
+       id="path3113-8-7"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ssccssccs" />
+    <g
+       id="g5170-4"
+       transform="translate(210,790)"
+       inkscape:export-filename="/home/laurent/workspace/mecatran/urbiplan-client-webapp/art/elevator.png"
+       inkscape:export-xdpi="6.9000001"
+       inkscape:export-ydpi="6.9000001">
+      <rect
+         ry="0"
+         rx="0"
+         y="52.362183"
+         x="60"
+         height="260"
+         width="260"
+         id="rect5147-4"
+         style="opacity:0;fill:none;stroke:#000000;stroke-opacity:1" />
+      <g
+         id="g4053"
+         transform="translate(-5.0507625,20.000002)">
+        <path
+           style="fill:#808080;fill-opacity:1;stroke:none"
+           d="m 386.42857,534.09375 0,43.28125 -36.52232,0 c -20.22031,0 -36.71875,16.49844 -36.71875,36.71875 l 0,140 c 0,20.22031 16.49844,36.6875 36.71875,36.6875 l 100,0 c 20.22031,0 36.6875,-16.46719 36.6875,-36.6875 l 0,-140 c 0,-20.22031 -16.46719,-36.71875 -36.6875,-36.71875 l -35.62054,0 0,-43.28125 z m -32.52232,60.6875 92,0 c 13.01969,0 23.28125,10.29281 23.28125,23.3125 l 0,132 c 0,13.01969 -10.26156,23.28125 -23.28125,23.28125 l -92,0 c -13.01969,0 -23.3125,-10.26156 -23.3125,-23.28125 l 0,-132 c 0,-13.01969 10.29281,-23.3125 23.3125,-23.3125 z m 1.03125,24.3125 0,75 -20,0 35.0625,60.00073 34.9375,-60.00073 -20,0 0,-75 z M 430,614.09448 l -35.0625,59.99927 20,0 0,75 30,0 0,-75 20,0 z"
+           transform="translate(-204.94924,-501.7323)"
+           id="path5143-61"
+           inkscape:connector-curvature="0"
+           sodipodi:nodetypes="ccsssssssscccssssssssscccccccccccccccc" />
+      </g>
+    </g>
+  </g>
+</svg>

@@ -36,6 +36,7 @@ public class RasterPopulation extends BasicPopulation {
     @Setter int rows = 200, cols = 200; // these are the raster (gridEnvelope) dimensions
     @Setter double left, right, top, bottom; // bounding box values in CRS
     @Setter int band = 0; // raster band to read
+    @Setter double unitySeconds = 0; // scale output values so unity=1. 0 to turn off. 
     
     /* derived fields */
     protected CoordinateReferenceSystem coverageCRS; // from input raster or config string
@@ -50,13 +51,19 @@ public class RasterPopulation extends BasicPopulation {
         this.writeGeotiff(outFileName, results);
     }
 
+    public void setUnityMinutes(double minutes) {
+        this.unitySeconds = minutes * 60;
+    }
+    
     public void writeGeotiff(String fileName, ResultSet results) {
         LOG.info("writing geotiff.");
         float[][] imagePixelData = new float[rows][cols]; 
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
                 int index = row * cols + col;
-                float pixel = (float) results.results[index];
+                float pixel = (float) (results.results[index]);
+                if (unitySeconds > 0)
+                    pixel /= unitySeconds;
                 imagePixelData[row][col] = pixel;
             }
         }

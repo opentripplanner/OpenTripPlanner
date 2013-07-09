@@ -29,6 +29,7 @@ public class SphericalDistanceLibrary implements DistanceLibrary {
     private static final DistanceLibrary instance = new SphericalDistanceLibrary();
     
     public static final double RADIUS_OF_EARTH_IN_KM = 6371.01;
+    public static final double RADIUS_OF_EARTH_IN_M = RADIUS_OF_EARTH_IN_KM * 1000;
     
     // Max admissible lat/lon delta for approximated distance computation
     public static final double MAX_LAT_DELTA_DEG = 4.0;
@@ -58,7 +59,7 @@ public class SphericalDistanceLibrary implements DistanceLibrary {
      */
     @Override
     public final double distance(double lat1, double lon1, double lat2, double lon2) {
-        return distance(lat1, lon1, lat2, lon2, RADIUS_OF_EARTH_IN_KM * 1000);
+        return distance(lat1, lon1, lat2, lon2, RADIUS_OF_EARTH_IN_M);
     }
     
     /* (non-Javadoc)
@@ -66,7 +67,7 @@ public class SphericalDistanceLibrary implements DistanceLibrary {
      */
     @Override
     public final double fastDistance(double lat1, double lon1, double lat2, double lon2) {
-        return fastDistance(lat1, lon1, lat2, lon2, RADIUS_OF_EARTH_IN_KM * 1000);
+        return fastDistance(lat1, lon1, lat2, lon2, RADIUS_OF_EARTH_IN_M);
     }
     
     /* (non-Javadoc)
@@ -113,13 +114,13 @@ public class SphericalDistanceLibrary implements DistanceLibrary {
 
     /** this is an overestimate */
     public static double metersToDegrees(double distance) {
-        return 360 * distance / (2 * Math.PI * RADIUS_OF_EARTH_IN_KM * 1000);
+        return 360 * distance / (2 * Math.PI * RADIUS_OF_EARTH_IN_M);
     }
 
     public final Envelope bounds(double lat, double lon, double latDistance,
             double lonDistance) {
 
-        double radiusOfEarth = RADIUS_OF_EARTH_IN_KM * 1000;
+        double radiusOfEarth = RADIUS_OF_EARTH_IN_M;
 
         double latRadians = toRadians(lat);
         double lonRadians = toRadians(lon);

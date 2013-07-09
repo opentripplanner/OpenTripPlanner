@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 public class GraphBuilderIntegrationMain {
 
-  private static Logger _log = LoggerFactory.getLogger(GraphBuilderIntegrationMain.class);
+  private static Logger LOG = LoggerFactory.getLogger(GraphBuilderIntegrationMain.class);
 
   private static final String GRAPH_BUILDER_CONFIG_PATH = "graph_builder.config.path";
 
@@ -31,11 +31,11 @@ public class GraphBuilderIntegrationMain {
 
     String fromProperty = System.getProperty(GRAPH_BUILDER_CONFIG_PATH);
     if (fromProperty != null) {
-      _log.info("reading graph builder config path from property "
+      LOG.info("reading graph builder config path from property "
           + GRAPH_BUILDER_CONFIG_PATH);
       configPath = fromProperty;
     }
-    _log.info("graph builder config path: " + configPath);
+    LOG.info("graph builder config path: " + configPath);
 
     GraphBuilderMain.main(new String[] {configPath});
   }

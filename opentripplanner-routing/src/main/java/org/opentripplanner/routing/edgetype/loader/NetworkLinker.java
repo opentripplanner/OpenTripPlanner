@@ -16,14 +16,19 @@ package org.opentripplanner.routing.edgetype.loader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 
 import org.opentripplanner.common.IterableLibrary;
+import org.opentripplanner.common.model.P2;
 import org.opentripplanner.gbannotation.BikeRentalStationUnlinked;
 import org.opentripplanner.gbannotation.StopUnlinked;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.factory.FindMaxWalkDistances;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
@@ -33,7 +38,7 @@ import org.slf4j.LoggerFactory;
 
 public class NetworkLinker {
 
-    private static Logger _log = LoggerFactory.getLogger(NetworkLinker.class);
+    private static Logger LOG = LoggerFactory.getLogger(NetworkLinker.class);
 
     private Graph graph;
 
@@ -58,19 +63,28 @@ public class NetworkLinker {
      */
     public void createLinkage() {
 
-        _log.debug("creating linkages...");
+        LOG.debug("creating linkages...");
         // iterate over a copy of vertex list because it will be modified
         ArrayList<Vertex> vertices = new ArrayList<Vertex>();
         vertices.addAll(graph.getVertices());
 
         for (TransitStop ts : IterableLibrary.filter(vertices, TransitStop.class)) {
+            // if the street is already linked there is no need to linked it again,
+            // could happened if using the prune isolated island
+            boolean alreadyLinked = false;
+            for(Edge e:ts.getOutgoing()){
+                if(e instanceof StreetTransitLink) {
+                    alreadyLinked = true;
+                    break;
+                }
+            }
+            if(alreadyLinked) continue;
             // only connect transit stops that (a) are entrances, or (b) have no associated
             // entrances
             if (ts.isEntrance() || !ts.hasEntrances()) {
                 boolean wheelchairAccessible = ts.hasWheelchairEntrance();
                 if (!networkLinkerLibrary.connectVertexToStreets(ts, wheelchairAccessible).getResult()) {
-                    _log.warn(graph.addBuilderAnnotation(new StopUnlinked(ts)));
-                    networkLinkerLibrary.connectVertexToStreets(ts, wheelchairAccessible);
+                    LOG.warn(graph.addBuilderAnnotation(new StopUnlinked(ts)));
                 }
             }
         }
@@ -81,16 +95,31 @@ public class NetworkLinker {
                 edge.getToVertex().removeIncoming(edge);
             }
         }
-        
+        //and add back in replacements
+        for (LinkedList<P2<PlainStreetEdge>> toAdd : networkLinkerLibrary.replacements.values()) {
+            for (P2<PlainStreetEdge> edges : toAdd) {
+                PlainStreetEdge edge1 = edges.getFirst();
+                if (edge1.getToVertex().getLabel().startsWith("split ") || edge1.getFromVertex().getLabel().startsWith("split ")) {
+                    continue;
+                }
+                edge1.getFromVertex().addOutgoing(edge1);
+                edge1.getToVertex().addIncoming(edge1);
+                PlainStreetEdge edge2 = edges.getSecond();
+                if (edge2 != null) {
+                    edge2.getFromVertex().addOutgoing(edge2);
+                    edge2.getToVertex().addIncoming(edge2);
+                }
+            }
+        }
         // Do we really need this? Commenting out does seem to cause some slowdown. (AMB)
         networkLinkerLibrary.markLocalStops();
         FindMaxWalkDistances.find(graph);
         
-        _log.debug("Linking bike rental stations...");
+        LOG.debug("Linking bike rental stations...");
         for (BikeRentalStationVertex brsv : IterableLibrary.filter(vertices,
                 BikeRentalStationVertex.class)) {
             if (!networkLinkerLibrary.connectVertexToStreets(brsv).getResult()) {
-                _log.warn(graph.addBuilderAnnotation(new BikeRentalStationUnlinked(brsv)));
+                LOG.warn(graph.addBuilderAnnotation(new BikeRentalStationUnlinked(brsv)));
             }
         }
     }

@@ -153,11 +153,12 @@ public class RetryingPathServiceImpl implements PathService {
             }
             if (somePaths.isEmpty()) {
                 //try again doubling maxwalk
+                LOG.debug("No paths were found.");
                 if (maxWalk > initialMaxWalk * MAX_WALK_MULTIPLE || maxWalk >= Double.MAX_VALUE)
                     break;
                 maxWalk *= 2;
+                LOG.debug("Doubled walk distance to {}", maxWalk);
                 optionQueue.add(currOptions);
-                LOG.debug("No paths were found.");
                 continue;
             }
             for (GraphPath path : somePaths) {
@@ -171,7 +172,7 @@ public class RetryingPathServiceImpl implements PathService {
                     LOG.debug("New trips: {}", path.getTrips());
                     RoutingRequest newOptions = currOptions.clone();
                     for (AgencyAndId trip : path.getTrips()) {
-                        newOptions.bannedTrips.add(trip);
+                        newOptions.banTrip(trip);
                     }
                     if (!optionQueue.contains(newOptions)) {
                         optionQueue.add(newOptions);

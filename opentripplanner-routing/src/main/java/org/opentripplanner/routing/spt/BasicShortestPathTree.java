@@ -37,7 +37,14 @@ import org.opentripplanner.routing.graph.Vertex;
 public class BasicShortestPathTree extends AbstractShortestPathTree {
     
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
-
+    
+    public static final class FactoryImpl implements ShortestPathTreeFactory {
+        @Override
+        public ShortestPathTree create(RoutingRequest options) {
+            return new BasicShortestPathTree(options);
+        }
+    }
+    
     private static final int DEFAULT_CAPACITY = 500;
 
     Map<Vertex, State> states;
@@ -80,10 +87,14 @@ public class BasicShortestPathTree extends AbstractShortestPathTree {
             return true;
         } else {
             final Edge backEdge = existing.getBackEdge();
-            if (backEdge != state.getBackEdge()
-                    && ((backEdge instanceof PlainStreetEdge) && (!((PlainStreetEdge) backEdge)
-                            .getTurnRestrictions().isEmpty())))
-                return true;
+            if (backEdge instanceof PlainStreetEdge) {
+                PlainStreetEdge pseBack = (PlainStreetEdge) backEdge;
+                if (pseBack.hasExplicitTurnRestrictions()) {
+                    // If the previous back edge had turn restrictions, we need to continue
+                    // the search because the previous path may be prevented by from reaching the end by turn restrictions.
+                    return true;
+                }
+            }
 
             return false;
         }
@@ -107,9 +118,14 @@ public class BasicShortestPathTree extends AbstractShortestPathTree {
     public boolean visit(State s) {
         final State existing = states.get(s.getVertex());
         final Edge backEdge = existing.getBackEdge();
-        if ((backEdge instanceof PlainStreetEdge) && (!((PlainStreetEdge) backEdge)
-                        .getTurnRestrictions().isEmpty()))
-            return true;
+        if (backEdge instanceof PlainStreetEdge) {
+            PlainStreetEdge pseBack = (PlainStreetEdge) backEdge;
+            if (pseBack.hasExplicitTurnRestrictions()) {
+                // If the previous back edge had turn restrictions, we need to continue
+                // the search because the previous path may be prevented by from reaching the end by turn restrictions.
+                return true;
+            }
+        }
         return (s == existing);
     }
 

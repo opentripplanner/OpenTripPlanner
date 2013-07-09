@@ -16,6 +16,8 @@ package org.opentripplanner.routing.transit_index.adapters;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 @XmlRootElement(name = "AgencyAndId")
 public class AgencyAndIdType {
     public AgencyAndIdType(String agency, String id) {
@@ -27,9 +29,11 @@ public class AgencyAndIdType {
     }
 
     @XmlAttribute
+    @JsonSerialize
     String agency;
 
     @XmlAttribute
+    @JsonSerialize
     String id;
 
 }

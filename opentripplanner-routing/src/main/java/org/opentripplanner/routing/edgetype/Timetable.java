@@ -1,3 +1,16 @@
+/* This program is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
 package org.opentripplanner.routing.edgetype;
 
 import java.io.Serializable;
@@ -162,7 +175,7 @@ public class Timetable implements Serializable {
                 idxLo = idxHi = TripTimes.binarySearchDepartures(sorted, stopIndex, time); 
                 for (; idxHi < sorted.length; idxHi++) {
                     TripTimes tt = sorted[idxHi];
-                    if (tt.tripAcceptable(options, haveBicycle)) {
+                    if (tt.tripAcceptable(options, haveBicycle, stopIndex)) {
                         bestTrip = tt;
                         break;
                     }
@@ -171,7 +184,7 @@ public class Timetable implements Serializable {
                 idxLo = idxHi = TripTimes.binarySearchArrivals(sorted, stopIndex, time); 
                 for (; idxLo >= 0; idxLo--) {
                     TripTimes tt = sorted[idxLo];
-                    if (tt.tripAcceptable(options, haveBicycle)) {
+                    if (tt.tripAcceptable(options, haveBicycle, stopIndex)) {
                         bestTrip = tt;
                         break;
                     }
@@ -187,14 +200,14 @@ public class Timetable implements Serializable {
                 // hoping JVM JIT will distribute the loop over the if clauses as needed
                 if (boarding) {
                     int depTime = tt.getDepartureTime(stopIndex);
-                    if (depTime >= time && depTime < bestTime && tt.tripAcceptable(options, haveBicycle)) {
+                    if (depTime >= time && depTime < bestTime && tt.tripAcceptable(options, haveBicycle, stopIndex)) {
                         bestTrip = tt;
                         bestTime = depTime;
                         idxLo = idxHi = idx;
                     }
                 } else {
                     int arvTime = tt.getArrivalTime(stopIndex);
-                    if (arvTime <= time && arvTime > bestTime && tt.tripAcceptable(options, haveBicycle)) {
+                    if (arvTime <= time && arvTime > bestTime && tt.tripAcceptable(options, haveBicycle, stopIndex)) {
                         bestTrip = tt;
                         bestTime = arvTime;
                         idxLo = idxHi = idx;

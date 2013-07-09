@@ -84,10 +84,10 @@ public class TransitStartPathService implements PathService {
 
             GraphPath toTransit = pathsToTransit.get(0);
             subOptions.setArriveBy(false);
-            options.rctx.pathParsers = new PathParser[] { new BasicPathParser(),
+            subOptions.rctx.pathParsers = new PathParser[] { new BasicPathParser(),
                     new NoThruTrafficPathParser() };
             State firstState = toTransit.states.getFirst();
-            State state = new State(firstState.getVertex(), firstState.getTime(), subOptions);
+            State state = new State(firstState.getVertex(), firstState.getTimeSeconds(), subOptions);
             LinkedList<Edge> edges = toTransit.edges;
             toTransit.edges = new LinkedList<Edge>();
             toTransit.states = new LinkedList<State>();

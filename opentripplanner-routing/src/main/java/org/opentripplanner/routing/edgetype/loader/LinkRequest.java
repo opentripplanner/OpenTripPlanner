@@ -1,29 +1,44 @@
+/* This program is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
 package org.opentripplanner.routing.edgetype.loader;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Set;
-import java.util.Map.Entry;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.TraversalRequirements;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl.CandidateEdgeBundle;
-import org.opentripplanner.routing.location.StreetLocation;
+import org.opentripplanner.routing.impl.CandidateEdgeBundle;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -41,7 +56,7 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class LinkRequest {
 
-    private static Logger _log = LoggerFactory.getLogger(LinkRequest.class);
+    private static Logger LOG = LoggerFactory.getLogger(LinkRequest.class);
 
     NetworkLinkerLibrary linker;
     
@@ -63,7 +78,7 @@ public class LinkRequest {
      * Sets result to true if the links were successfully added, otherwise false
      */
     public void connectVertexToStreets(BikeRentalStationVertex v) {
-        Collection<StreetVertex> nearbyStreetVertices = getNearbyStreetVertices(v, null);
+        Collection<StreetVertex> nearbyStreetVertices = getNearbyStreetVertices(v, null, null);
         if (nearbyStreetVertices == null) {
             result = false;
         } else {
@@ -92,7 +107,7 @@ public class LinkRequest {
      * Used by both the network linker and for adding temporary "extra" edges at the origin 
      * and destination of a search.
      */
-    private Collection<StreetVertex> getNearbyStreetVertices(Vertex v, Collection<Edge> nearbyRouteEdges) {
+    private Collection<StreetVertex> getNearbyStreetVertices(Vertex v, Collection<Edge> nearbyRouteEdges, RoutingRequest options) {
         Collection<StreetVertex> existing = linker.splitVertices.get(v);
         if (existing != null)
             return existing;
@@ -105,10 +120,12 @@ public class LinkRequest {
         Coordinate coordinate = v.getCoordinate();
 
         /* is there a bundle of edges nearby to use or split? */
-        CandidateEdgeBundle edges = linker.index.getClosestEdges(coordinate, linker.options, null, nearbyRouteEdges, true);
+        GenericLocation location = new GenericLocation(coordinate);
+        TraversalRequirements reqs = new TraversalRequirements(options);
+        CandidateEdgeBundle edges = linker.index.getClosestEdges(location, reqs, null, nearbyRouteEdges, true);
         if (edges == null || edges.size() < 1) {
             // no edges were found nearby, or a bidirectional/loop bundle of edges was not identified
-            _log.debug("found too few edges: {} {}", v.getName(), v.getCoordinate());
+            LOG.debug("found too few edges: {} {}", v.getName(), v.getCoordinate());
             return null;
         }
         // if the bundle was caught endwise (T intersections and dead ends), 
@@ -209,11 +226,11 @@ public class LinkRequest {
             e2v1 = (StreetVertex) e2.getFromVertex();
             e2v2 = (StreetVertex) e2.getToVertex();
             LineString backGeometry = e2.getGeometry();
-            backGeometryPair = StreetLocation.splitGeometryAtPoint(backGeometry,
+            backGeometryPair = GeometryUtils.splitGeometryAtPoint(backGeometry,
                     coordinate);
         }
         
-        P2<LineString> forwardGeometryPair = StreetLocation.splitGeometryAtPoint(forwardGeometry,
+        P2<LineString> forwardGeometryPair = GeometryUtils.splitGeometryAtPoint(forwardGeometry,
                 coordinate);
 
         LineString toMidpoint = forwardGeometryPair.getFirst();
@@ -247,12 +264,16 @@ public class LinkRequest {
 
         // Split each edge independently. If a only one splitter vertex is used, routing may take 
         // shortcuts thought the splitter vertex to avoid turn penalties.
-        StreetVertex e1midpoint = new IntersectionVertex(linker.graph, "split 1 at " + label, midCoord, name);
+        IntersectionVertex e1midpoint = new IntersectionVertex(linker.graph, "split 1 at " + label, midCoord.x, midCoord.y, name);
         // We are replacing two edges with four edges
         PlainStreetEdge forward1 = new PlainStreetEdge(e1v1, e1midpoint, toMidpoint, name, lengthIn,
                 e1.getPermission(), false);
         PlainStreetEdge forward2 = new PlainStreetEdge(e1midpoint, e1v2,
                 forwardGeometryPair.getSecond(), name, lengthOut, e1.getPermission(), true);
+
+        if (e1 instanceof AreaEdge) {
+            ((AreaEdge) e1).getArea().addVertex(e1midpoint, linker.graph);
+        }
 
         addEdges(forward1, forward2);
 
@@ -260,11 +281,14 @@ public class LinkRequest {
         PlainStreetEdge backward2 = null;
         IntersectionVertex e2midpoint = null;
         if (e2 != null) {
-            e2midpoint  = new IntersectionVertex(linker.graph, "split 2 at " + label, midCoord, name);
+            e2midpoint  = new IntersectionVertex(linker.graph, "split 2 at " + label, midCoord.x, midCoord.y, name);
             backward1 = new PlainStreetEdge(e2v1, e2midpoint, backGeometryPair.getFirst(),
                     name, lengthOut, e2.getPermission(), false);
             backward2 = new PlainStreetEdge(e2midpoint, e2v2, backGeometryPair.getSecond(),
                     name, lengthIn, e2.getPermission(), true);
+            if (e2 instanceof AreaEdge) {
+                ((AreaEdge) e2).getArea().addVertex(e2midpoint, linker.graph);
+            }
             double backwardBseLengthIn = e2.getBicycleSafetyEffectiveLength() * lengthRatioIn;
             double backwardBseLengthOut = e2.getBicycleSafetyEffectiveLength() * (1 - lengthRatioIn);
             backward1.setBicycleSafetyEffectiveLength(backwardBseLengthIn);
@@ -274,7 +298,6 @@ public class LinkRequest {
             addEdges(backward1, backward2);
         }
 
-        
         double forwardBseLengthIn = e1.getBicycleSafetyEffectiveLength() * lengthRatioIn;
         double forwardBseLengthOut = e1.getBicycleSafetyEffectiveLength() * (1 - lengthRatioIn);
         forward1.setBicycleSafetyEffectiveLength(forwardBseLengthIn);
@@ -297,64 +320,23 @@ public class LinkRequest {
         // disconnect the two old edges from the graph
         linker.graph.removeTemporaryEdge(e1);
         edgesAdded.remove(e1);
-        e1.detach();
+        //e1.detach();
         
         if (e2 != null) {
             linker.graph.removeTemporaryEdge(e2);
             edgesAdded.remove(e2);
-            e2.detach();
+            //e2.detach();
             // return the two new splitter vertices
-            return Arrays.asList(e1midpoint, e2midpoint);
+            return Arrays.asList((StreetVertex) e1midpoint, e2midpoint);
         } else {
             // return the one new splitter vertices
-            return Arrays.asList(e1midpoint);
+            return Arrays.asList((StreetVertex) e1midpoint);
         }
 
     }
 
     private void addEdges(Edge... newEdges) {
         edgesAdded.addAll(Arrays.asList(newEdges));
-    }
-
-    private P2<Entry<StreetVertex, Set<Edge>>> findEndVertices(Collection<StreetEdge> edges) {
-        // find the two most common edge start points, which will be the endpoints of this street
-        HashMap<StreetVertex, Set<Edge>> edgesStartingAt = new HashMap<StreetVertex, Set<Edge>>();
-        for (Edge edge : edges) {
-            Set<Edge> starting = edgesStartingAt.get(edge.getFromVertex());
-            if (starting == null) {
-                starting = new HashSet<Edge>();
-                if (edge.getFromVertex() instanceof StreetVertex) {
-                    edgesStartingAt.put((StreetVertex) edge.getFromVertex(), starting);
-                }
-            }
-            starting.add(edge);
-        }
-        
-        int maxStarting = 0;
-        Entry<StreetVertex, Set<Edge>> startingVertex = null;
-        for (Entry<StreetVertex, Set<Edge>> entry : edgesStartingAt.entrySet()) {
-            int numEdges = entry.getValue().size();
-            if (numEdges >= maxStarting) {
-                maxStarting = numEdges;
-                startingVertex = entry;
-            }
-        }
-        Coordinate startingCoordinate = startingVertex.getKey().getCoordinate();
-        int maxEnding = 0;
-        Entry<StreetVertex, Set<Edge>> endingVertex = null;
-        for (Entry<StreetVertex, Set<Edge>> entry : edgesStartingAt.entrySet()) {
-            Set<Edge> backEdges = entry.getValue();
-            for (Edge edge : backEdges) {
-                if (edge.getToVertex().getCoordinate().equals(startingCoordinate)) {
-                    int numEdges = backEdges.size();
-                    if (numEdges >= maxEnding) {
-                        maxEnding = numEdges;
-                        endingVertex = entry;
-                    }
-                }
-            }
-        }
-        return new P2<Entry<StreetVertex, Set<Edge>>>(startingVertex, endingVertex);
     }
 
     public List<Edge> getEdgesAdded() {
@@ -372,7 +354,10 @@ public class LinkRequest {
                 }
             }
         }
-        Collection<StreetVertex> nearbyStreetVertices = getNearbyStreetVertices(v, nearbyEdges);
+        TraverseModeSet modes = v.getModes().clone();
+        modes.setMode(TraverseMode.WALK, true);
+        RoutingRequest request = new RoutingRequest(modes);
+        Collection<StreetVertex> nearbyStreetVertices = getNearbyStreetVertices(v, nearbyEdges, request);
         if (nearbyStreetVertices == null) {
             result = false;
         } else {

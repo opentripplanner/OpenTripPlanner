@@ -27,9 +27,9 @@ class Ray {
 
     private Angle bearing;
 
-    private Point base_point;
+    private VLPoint base_point;
 
-  public double distance(Point point_temp)
+  public double distance(VLPoint point_temp)
   {
     return point_temp.distance(
                      point_temp.projection_onto(this) );
@@ -39,11 +39,11 @@ class Ray {
         return bearing;
     }
 
-    public Point base_point() {
+    public VLPoint base_point() {
         return base_point;
     }
 
-  public Ray(Point base_point_temp, Point bearing_point)
+  public Ray(VLPoint base_point_temp, VLPoint bearing_point)
   { 
       assert(  !( base_point_temp.equals(bearing_point) )  ); 
 
@@ -51,7 +51,7 @@ class Ray {
       bearing = new Angle( bearing_point.y-base_point_temp.y,
                             bearing_point.x-base_point_temp.x );
     }
-    public Ray(Point base_point_temp, Angle bearing_temp) {
+    public Ray(VLPoint base_point_temp, Angle bearing_temp) {
         base_point = base_point_temp; 
         bearing = bearing_temp; 
     }
@@ -81,7 +81,7 @@ class Ray {
                + line_segment_temp.length();
     LineSegment seg_approx =
         new LineSegment(  base_point, base_point.plus(
-                     new Point( R*Math.cos(bearing.get()),
+                     new VLPoint( R*Math.cos(bearing.get()),
                                 R*Math.sin(bearing.get()) ))  );
     LineSegment intersect_seg = line_segment_temp.intersection(
                                               seg_approx,

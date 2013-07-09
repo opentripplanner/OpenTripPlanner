@@ -134,4 +134,9 @@ public class FrequencyHop extends Edge implements OnBoardForwardEdge, OnBoardRev
         return "PatternHop(" + getFromVertex() + ", " + getToVertex() + ")";
     }
 
+    @Override
+    public int getStopIndex() {
+        return stopIndex;
+    }
+
 }

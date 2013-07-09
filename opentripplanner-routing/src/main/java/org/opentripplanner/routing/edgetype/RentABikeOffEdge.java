@@ -13,8 +13,10 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import org.opentripplanner.routing.core.State;
+import java.util.Set;
+
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Vertex;
 
 /**
@@ -29,8 +31,8 @@ public class RentABikeOffEdge extends RentABikeAbstractEdge {
 
     private static final long serialVersionUID = 1L;
 
-    public RentABikeOffEdge(Vertex from, Vertex to, String network) {
-        super(from, to, network);
+    public RentABikeOffEdge(Vertex from, Vertex to, Set<String> networks) {
+        super(from, to, networks);
     }
 
     @Override

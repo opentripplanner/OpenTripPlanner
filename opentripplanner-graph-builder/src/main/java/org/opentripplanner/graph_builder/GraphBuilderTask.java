@@ -37,8 +37,6 @@ public class GraphBuilderTask implements Runnable {
     private boolean _alwaysRebuild = true;
 
     private List<RoutingRequest> _modeList;
-
-    private double _contractionFactor = 1.0;
     
     private String _baseGraph = null;
     
@@ -71,10 +69,6 @@ public class GraphBuilderTask implements Runnable {
 
     public void setModes(List<RoutingRequest> modeList) {
         _modeList = modeList;
-    }
-
-    public void setContractionFactor(double contractionFactor) {
-        _contractionFactor = contractionFactor;
     }
     
     public void setPath (String path) {

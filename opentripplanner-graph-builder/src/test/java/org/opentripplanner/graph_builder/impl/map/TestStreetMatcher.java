@@ -28,6 +28,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
@@ -228,6 +229,11 @@ public class TestStreetMatcher {
         }
 
         @Override
+        public boolean canTraverse(TraverseModeSet modes) {
+            return true;
+        }
+        
+        @Override
         public double getLength() {
             return getDistance();
         }
@@ -273,5 +279,29 @@ public class TestStreetMatcher {
         public List<TurnRestriction> getTurnRestrictions() {
             return Collections.emptyList();
         }
+
+        @Override
+        public float getCarSpeed() {
+            return 11.2f;
+        }
+
+        @Override
+        public int getInAngle() {
+            return 0;
+        }
+
+        @Override
+        public int getOutAngle() {
+            return 0;
+        }
+
+        @Override
+        public void setCarSpeed(float carSpeed) {}
+
+        @Override
+        public String getLabel() {
+            return "label";
+        }
+
     }
 }

@@ -42,11 +42,10 @@ public class ReachRemainingWeightHeuristic implements RemainingWeightHeuristic {
     private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
     @Override
-    public double computeInitialWeight(State s, Vertex target) {
+    public void initialize(State s, Vertex target) {
         this.options = s.getOptions();
         this.useTransit = options.getModes().isTransit();
         this.maxSpeed = getMaxSpeed(options);
-        return getDistanceLibrary() .fastDistance(s.getVertex().getCoordinate(), target.getCoordinate()) / maxSpeed;
     }
 
     @Override
@@ -68,7 +67,7 @@ public class ReachRemainingWeightHeuristic implements RemainingWeightHeuristic {
          *	    again considering any mandatory walking.
          */
         double remainingwalkDistance = options.getMaxWalkDistance()- s.getWalkDistance();
-        double speed = options.getSpeedUpperBound();
+        double speed = options.getStreetSpeedUpperBound();
         
         Edge backEdge = s.getBackEdge();
         EdgeWithReach edgeWithReach = null;
@@ -149,7 +148,7 @@ public class ReachRemainingWeightHeuristic implements RemainingWeightHeuristic {
         
         double euclidianDistance = distanceLibrary.fastDistance(sv.getCoordinate(), 
                 target.getCoordinate());
-        double speed = options.getSpeedUpperBound();
+        double speed = options.getStreetSpeedUpperBound();
 
         if (useTransit) {
             if (s.isAlightedLocal()) {
@@ -200,11 +199,11 @@ public class ReachRemainingWeightHeuristic implements RemainingWeightHeuristic {
             return 10;
         } else {
             if (options.optimize == OptimizeType.QUICK) {
-                return options.getSpeedUpperBound();
+                return options.getStreetSpeedUpperBound();
             } else {
                 // assume that the best route is no more than 10 times better than
                 // the as-the-crow-flies flat base route.
-                return options.getSpeedUpperBound() * 10;
+                return options.getStreetSpeedUpperBound() * 10;
             }
         }
     }
@@ -219,5 +218,11 @@ public class ReachRemainingWeightHeuristic implements RemainingWeightHeuristic {
 
     public void setDistanceLibrary(DistanceLibrary distanceLibrary) {
         this.distanceLibrary = distanceLibrary;
+    }
+
+    @Override
+    public void abort() {
+        // TODO Auto-generated method stub
+        
     }
 }

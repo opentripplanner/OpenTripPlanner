@@ -20,6 +20,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipFile;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import org.apache.http.client.ClientProtocolException;
 import org.onebusaway.csv_entities.CsvInputSource;
 import org.onebusaway.csv_entities.ZipFileCsvInputSource;
@@ -30,7 +33,7 @@ import org.slf4j.LoggerFactory;
 
 public class GtfsBundle {
 
-    private static final Logger _log = LoggerFactory.getLogger(GtfsBundle.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GtfsBundle.class);
 
     private File path;
 
@@ -47,6 +50,14 @@ public class GtfsBundle {
     private Map<String, String> agencyIdMappings = new HashMap<String, String>();
 
     private int defaultStreetToStopTime;
+
+    private double maxStopToShapeSnapDistance = 150;
+
+    @Getter @Setter 
+    private Boolean useCached = null; // null means use global default from GtfsGB || true
+
+    @Getter @Setter 
+    private File cacheDirectory = null; // null means use default from GtfsGB || system temp dir 
 
     public void setPath(File path) {
         this.path = path;
@@ -71,6 +82,10 @@ public class GtfsBundle {
             } else if (url != null) {
             	DownloadableGtfsInputSource isrc = new DownloadableGtfsInputSource();
             	isrc.setUrl(url);
+            	if (cacheDirectory != null)
+            	    isrc.setCacheDirectory(cacheDirectory);
+                if (useCached != null)
+                    isrc.setUseCached(useCached);
                 csvInputSource = isrc;
             }
     	}
@@ -158,7 +173,7 @@ public class GtfsBundle {
     
     public void checkInputs() {
         if (csvInputSource != null) {
-            _log.warn("unknown CSV source type; cannot check inputs");
+            LOG.warn("unknown CSV source type; cannot check inputs");
             return;
         }
         if (path != null) {
@@ -172,11 +187,19 @@ public class GtfsBundle {
             try {
                 HttpUtils.testUrl(url.toExternalForm());
             } catch (ClientProtocolException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("Error connecting to " + url.toExternalForm() + "\n" + e);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("GTFS url " + url.toExternalForm() + " cannot be read.\n" + e);
             }
         }
 
+    }
+
+    public double getMaxStopToShapeSnapDistance() {
+        return maxStopToShapeSnapDistance;
+    }
+
+    public void setMaxStopToShapeSnapDistance(double maxStopToShapeSnapDistance) {
+        this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
     }
 }

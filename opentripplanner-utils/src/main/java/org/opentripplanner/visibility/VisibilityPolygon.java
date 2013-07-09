@@ -32,11 +32,11 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class VisibilityPolygon extends Polygon {
+public class VisibilityPolygon extends VLPolygon {
     private static Logger log = LoggerFactory.getLogger(VisibilityPolygon.class);
-    Point observer;
+    VLPoint observer;
 
-    public boolean is_spike(Point observer, Point point1, Point point2, Point point3, double epsilon) {
+    public boolean is_spike(VLPoint observer, VLPoint point1, VLPoint point2, VLPoint point3, double epsilon) {
 
         return (
         // Make sure observer not colocated with any of the points.
@@ -54,7 +54,7 @@ public class VisibilityPolygon extends Polygon {
         // Math.abs( Polygon(point1, point2, point3).area() ) < epsilon
     }
 
-    public void chop_spikes_at_back(Point observer, double epsilon) {
+    public void chop_spikes_at_back(VLPoint observer, double epsilon) {
         // Eliminate "special case" vertices of the visibility polygon.
         // While the top three vertices form a spike.
         while (vertices.size() >= 3
@@ -66,7 +66,7 @@ public class VisibilityPolygon extends Polygon {
         }
     }
 
-    void chop_spikes_at_wrap_around(Point observer, double epsilon) {
+    void chop_spikes_at_wrap_around(VLPoint observer, double epsilon) {
         // Eliminate "special case" vertices of the visibility polygon at
         // wrap-around. While the there's a spike at the wrap-around,
         while (vertices.size() >= 3
@@ -77,9 +77,9 @@ public class VisibilityPolygon extends Polygon {
         }
     }
 
-    void chop_spikes(Point observer, double epsilon) {
-        HashSet<Point> spike_tips = new HashSet<Point>();
-        ArrayList<Point> vertices_temp = new ArrayList<Point>();
+    void chop_spikes(VLPoint observer, double epsilon) {
+        HashSet<VLPoint> spike_tips = new HashSet<VLPoint>();
+        ArrayList<VLPoint> vertices_temp = new ArrayList<VLPoint>();
         // Middle point is potentially the tip of a spike
         for (int i = 0; i < vertices.size(); i++)
             if (get(i + 2).distance(new LineSegment(get(i), get(i + 1))) <= epsilon
@@ -92,7 +92,7 @@ public class VisibilityPolygon extends Polygon {
         vertices = vertices_temp;
     }
 
-    public VisibilityPolygon(Point observer, Environment environment_temp, double epsilon) {
+    public VisibilityPolygon(VLPoint observer, Environment environment_temp, double epsilon) {
         this.observer = observer;
         // Visibility polygon algorithm for environments with holes
         // Radial line (AKA angular plane) sweep technique.
@@ -163,7 +163,7 @@ public class VisibilityPolygon extends Polygon {
         Angle right_wall_bearing = new Angle(0.0);
         Angle left_wall_bearing = new Angle(0.0);
         for (int i = 0; i <= environment_temp.h(); i++) {
-            Polygon polygon = environment_temp.get(i);
+            VLPolygon polygon = environment_temp.get(i);
 
             for (int j = 0; j < polygon.n(); j++) {
                 ppoint1 = new PolarPoint(observer, polygon.get(j));
@@ -231,9 +231,9 @@ public class VisibilityPolygon extends Polygon {
                             continue;
                         // Otherwise split the edge, making sure angles are assigned
                         // correctly on each side of the split point.
-                        split_bottom = new PolarPoint(observer, new Point(t * ppoint1.x + (1 - t)
+                        split_bottom = new PolarPoint(observer, new VLPoint(t * ppoint1.x + (1 - t)
                                 * ppoint2.x, observer.y));
-                        split_top = new PolarPoint(observer, new Point(t * ppoint1.x + (1 - t)
+                        split_top = new PolarPoint(observer, new VLPoint(t * ppoint1.x + (1 - t)
                                 * ppoint2.x, observer.y));
                         split_top.set_bearing(ANGLE_ZERO);
                         split_bottom.set_bearing_to_2pi();
@@ -355,7 +355,7 @@ public class VisibilityPolygon extends Polygon {
             q2.add(active_edge);
         }
 
-        vertices.add(new Point(current_vertex));
+        vertices.add(new VLPoint(current_vertex));
         log.debug("adding: " + current_vertex + "\n--");
 
         // -------BEGIN MAIN LOOP-------//
@@ -383,7 +383,7 @@ public class VisibilityPolygon extends Polygon {
                 }
 
                 // Push current_vertex onto visibility polygon
-                vertices.add(new Point(current_vertex));
+                vertices.add(new VLPoint(current_vertex));
                 log.debug("adding: " + current_vertex);
 
                 chop_spikes_at_back(observer, epsilon);
@@ -417,7 +417,7 @@ public class VisibilityPolygon extends Polygon {
                         }
 
                         // Push k onto the visibility polygon.
-                        vertices.add(new Point(k));
+                        vertices.add(new VLPoint(k));
                         log.debug("adding k1: " + k);
                         chop_spikes_at_back(observer, epsilon);
                         active_edge = e;
@@ -479,13 +479,13 @@ public class VisibilityPolygon extends Polygon {
                             && active_edge.first.distance(observer) > epsilon) {
 
                         // Push k-point onto the visibility polygon.
-                        vertices.add(new Point(k));
+                        vertices.add(new VLPoint(k));
                         log.debug("adding k2: " + k);
                         chop_spikes_at_back(observer, epsilon);
                     }
 
                     // Push current_vertex onto the visibility polygon.
-                    vertices.add(new Point(current_vertex));
+                    vertices.add(new VLPoint(current_vertex));
                     log.debug("adding: " + current_vertex);
                     chop_spikes_at_back(observer, epsilon);
                     // Set active_edge to edge of current_vertex.
@@ -506,7 +506,7 @@ public class VisibilityPolygon extends Polygon {
 
     }
 
-    VisibilityPolygon(Point observer, Polygon polygon_temp, double epsilon) {
+    VisibilityPolygon(VLPoint observer, VLPolygon polygon_temp, double epsilon) {
         this(observer, new Environment(polygon_temp), epsilon);
     }
 

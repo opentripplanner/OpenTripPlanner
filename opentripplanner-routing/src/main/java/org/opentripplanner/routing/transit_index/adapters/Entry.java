@@ -16,12 +16,16 @@ package org.opentripplanner.routing.transit_index.adapters;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 @XmlType
 public class Entry {
     @XmlAttribute
+    @JsonSerialize
     public String key;
 
     @XmlAttribute
+    @JsonSerialize
     public String value;
 
     public Entry() {

@@ -260,7 +260,7 @@ public class WeightTable implements Serializable {
 						s0 = se.makeState();
 						spt.add(s0);
 						heap.insert(s0, s0.getWeight());
-						// _log.debug("    board " + tov);
+						// LOG.debug("    board " + tov);
 					} else if (e instanceof FreeEdge) { // handle preboard
 						Vertex v = ((FreeEdge) e).getToVertex();
 						// give onboard vertices same index as their

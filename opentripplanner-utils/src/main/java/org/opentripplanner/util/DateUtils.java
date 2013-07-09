@@ -47,107 +47,51 @@ public class DateUtils implements DateConstants {
         Date retVal = new Date();
         if (date != null) {
             Date d = parseDate(date, tz);
-            Integer s = null;
-            if (time != null)
-                s = secPastMid(time);
-            if (s == null || s < 0)
-                s = secPastMid();
-            if (d != null && s != null)
-                retVal = new Date(d.getTime() + s * 1000);
+            if (d == null) {
+                return null; //unparseable date
+            }
+            Calendar cal = new GregorianCalendar(tz);
+            cal.setTime(d);
+            boolean timed = false;
+            if (time != null) {
+                int[] hms = parseTime (time);
+                if (hms != null) {
+                    cal.set(Calendar.HOUR_OF_DAY, hms[0]);
+                    cal.set(Calendar.MINUTE, hms[1]);
+                    cal.set(Calendar.SECOND, hms[2]);
+                    timed = true;
+                }
+            }
+            if (!timed) {
+                //assume t = now
+                Calendar today = new GregorianCalendar();
+                cal.set(Calendar.HOUR_OF_DAY, today.get(Calendar.HOUR_OF_DAY));
+                cal.set(Calendar.MINUTE, today.get(Calendar.MINUTE));
+                cal.set(Calendar.SECOND, today.get(Calendar.SECOND));
+            }
+            retVal = cal.getTime();
         } else if (time != null) {
-            // we could just set the Calendar fields directly instead of using secPastMidnight
-            Integer s = secPastMid(time);
-            if (s != null && s > 0) {
-                // Maybe we should be using JodaTime... (AMB)
+            int[] hms = parseTime (time);
+            if (hms != null) {
                 Calendar cal = new GregorianCalendar(tz);
-                cal.set(Calendar.HOUR_OF_DAY, 0);
-                cal.set(Calendar.MINUTE, 0);
-                cal.set(Calendar.SECOND, 0);
-                cal.set(Calendar.MILLISECOND, 0);
-                retVal = new Date(cal.getTimeInMillis() + s * 1000);
+
+                cal.set(Calendar.HOUR_OF_DAY, hms[0]);
+                cal.set(Calendar.MINUTE, hms[1]);
+                cal.set(Calendar.SECOND, hms[2]);
+                retVal = cal.getTime();
             }
         }
         LOG.debug( "resulting date is {}", retVal);
         return retVal;
     }
 
-    // TODO: could be replaced with Apache's DateFormat.parseDate ???
-    static public Date parseDate(String input, TimeZone tz) {
-        Date retVal = null;
-        try {
-            String newString = input.trim().replace('_', '.').replace('-', '.').replace(':', '.').replace(
-                    '/', '.');
-            if (newString != null) {
-                List<String> dl = DF_LIST;
-
-                // if it looks like we have a small date format, ala 11.4.09, then use another set
-                // of compares
-                if (newString.length() <= 8 && !newString.matches(".*20\\d\\d.*")) {
-                    dl = SMALL_DF_LIST;
-                }
-
-                for (String df : dl) {
-                    SimpleDateFormat sdf = new SimpleDateFormat(df);
-                    sdf.setTimeZone(tz);
-                    retVal = DateUtils.parseDate(sdf, newString);
-                    // getYear() returns (year - 1900)
-                    if (retVal != null && retVal.getYear() + 1900 >= 2000)
-                        break;
-                }
-            }
-        } catch (Exception _) {
-            throw new RuntimeException("Could not parse " + input);
-        }
-
-        return retVal;
-    }
-
-    public static Integer getDurationInMinutes(String timeA, String timeB) {
-        return getDuration(timeA, timeB) / 60;
-    }
-
-    public static Integer getDuration(String timeA, String timeB) {
-        int a = secPastMid(timeA);
-        int b = secPastMid(timeB);
-
-        if (b < a) {
-            b = b + ONE_DAY_SECONDS;
-        }
-
-        return b - a;
-    }
-
-    // ///////// SECONDS PAST MIDNIGHT ////////////////////////
-
-    public static int secPastMid() {
-        return secPastMid(new Date());
-    }
-
-    synchronized public static int secPastMid(Date dateTime) {
-        String t = simpTimeSDF.format(dateTime);
-        return secPastMid(t);
-    }
-
-    public static int secPastMid(String time) {
-        int retVal = 0;
-
-        Integer tmp = secondsPastMidnight(time);
-        if (tmp != null)
-            retVal = tmp;
-
-        return retVal;
-    }
-
     /**
-     * Convert HH:MM or HH:MM:SS to seconds past midnight (note, spm format is chosen for
-     * comptability with other data feeds)
-     * 
-     * @param Time
-     *            in HH:MM / HH:MM:SS format
-     * @return integer seconds past midnight
+     * Returns H,M,S
+     * @param time
+     * @return
      */
-    public static Integer secondsPastMidnight(String time) {
-        Integer retVal = null;
+    private static int[] parseTime(String time) {
+        int[] retVal = null;
 
         boolean amPm = false;
         int addHours = 0;
@@ -157,8 +101,10 @@ public class DateUtils implements DateConstants {
 
             // if we don't have a colon sep string, assume string is int and represents seconds past
             // midnight
-            if (hms.length < 2)
-                return getIntegerFromString(time);
+            if (hms.length < 2) {
+                int secondsPastMidnight = getIntegerFromString(time);
+                retVal = new int[] { secondsPastMidnight / 3600, (secondsPastMidnight % 3600) / 60, secondsPastMidnight % 60 };
+            }
 
             if (hms[1].endsWith("PM") || hms[1].endsWith("AM")) {
                 amPm = true;
@@ -186,10 +132,45 @@ public class DateUtils implements DateConstants {
                 sec = Integer.parseInt(trim(hms[2]));
             }
 
-            retVal = (hour * 60 * 60) + (min * 60) + sec;
+            retVal = new int[] {hour, min, sec};
         } catch (Exception e) {
             LOG.info(time + " didn't parse", e);
             retVal = null;
+        }
+
+        return retVal;
+    }
+
+    // TODO: could be replaced with Apache's DateFormat.parseDate ???
+    static public Date parseDate(String input, TimeZone tz) {
+        Date retVal = null;
+        try {
+            String newString = input.trim().replace('_', '.').replace('-', '.').replace(':', '.').replace(
+                    '/', '.');
+            if (newString != null) {
+                List<String> dl = DF_LIST;
+
+                // if it looks like we have a small date format, ala 11.4.09, then use another set
+                // of compares
+                if (newString.length() <= 8 && !newString.matches(".*20\\d\\d.*")) {
+                    dl = SMALL_DF_LIST;
+                }
+
+                for (String df : dl) {
+                    SimpleDateFormat sdf = new SimpleDateFormat(df);
+                    sdf.setTimeZone(tz);
+                    retVal = DateUtils.parseDate(sdf, newString);
+                    if (retVal != null) {
+                        Calendar cal = new GregorianCalendar(tz);
+                        cal.setTime(retVal);
+                        int year = cal.get(Calendar.YEAR);
+                        if (year >= 2000)
+                            break;
+                    }
+                }
+            }
+        } catch (Exception _) {
+            throw new RuntimeException("Could not parse " + input);
         }
 
         return retVal;
@@ -201,32 +182,6 @@ public class DateUtils implements DateConstants {
         } catch (Exception e) {
             return 0;
         }
-    }
-
-    public static long getTimeInMillis(String time) {
-        Integer secs = DateUtils.secondsPastMidnight(time);
-        if (secs == null) {
-            secs = 0;
-            try {
-                int isPM = 0;
-
-                String[] t = time.split("[\\W]+");
-                if (t.length >= 3 && t[2].trim().equalsIgnoreCase("PM"))
-                    isPM = 12;
-
-                secs = (Integer.valueOf(t[0]) + isPM) * 60 * 60; // hours
-                secs += Integer.valueOf(t[1]) * 60; // minutes in seconds
-            } catch (Exception _) {
-            }
-        }
-
-        return secs * 1000; // milliseconds
-    }
-
-    /** gets a pretty time (eg: h:mm a) from seconds past midnight */
-    public static String getTime(int time) {
-        String retVal = secondsToString(time) + " " + getAmPm(time);
-        return retVal;
     }
 
     /**

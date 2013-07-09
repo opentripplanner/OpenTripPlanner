@@ -61,7 +61,7 @@ class PolarPointWithEdgeInfo extends PolarPoint implements Cloneable {
     // second point of its respective edge, then the vertex which is
     // the second point of its respective edge is considered
     // lexicographically smaller.
-    public int compareTo(Point point2) {
+    public int compareTo(VLPoint point2) {
         if (!(point2 instanceof PolarPointWithEdgeInfo)) {
             return super.compareTo(point2);
         }

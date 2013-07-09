@@ -14,6 +14,7 @@
 package org.opentripplanner.updater.bike_rental;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,8 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import javax.annotation.PostConstruct;
 
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
@@ -39,7 +38,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class BikeRentalUpdater implements Runnable {
-    private static final Logger _log = LoggerFactory.getLogger(BikeRentalUpdater.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BikeRentalUpdater.class);
 
     Map<BikeRentalStation, BikeRentalStationVertex> verticesByStation = new HashMap<BikeRentalStation, BikeRentalStationVertex>();
 
@@ -56,11 +55,13 @@ public class BikeRentalUpdater implements Runnable {
     private GraphService graphService;
 
     private String network = "default";
+    
+    private boolean setup = false;
 
     public void setRouterId(String routerId) {
         this.routerId = routerId;
     }
-    
+
     public void setNetwork(String network) {
         this.network = network;
     }
@@ -75,19 +76,28 @@ public class BikeRentalUpdater implements Runnable {
         this.graphService = graphService;
     }
 
-    @PostConstruct
-    public void setup() {
-        if (routerId != null) {
-            graph = graphService.getGraph(routerId);
-        } else {
-            graph = graphService.getGraph();
+    public boolean setup() {
+        graph = graphService.getGraph(routerId); // Handle null routerId.
+        if (graph == null && setup) {
+            // We temporary disable the updater: no graph ready (yet).
+            LOG.error("Can't get graph for router ID {}, disabling updater.", routerId);
+            networkLinkerLibrary = null;
+            service = null;
+            setup = false;
         }
-        networkLinkerLibrary = new NetworkLinkerLibrary(graph, Collections.<Class<?>, Object> emptyMap());
-        service = graph.getService(BikeRentalStationService.class);
-        if (service == null) {
-            service = new BikeRentalStationService();
-            graph.putService(BikeRentalStationService.class, service);
+        if (graph != null && !setup) {
+            // A graph is available, setting up.
+            LOG.info("Setting up updater for router ID {}.", routerId);
+            networkLinkerLibrary = new NetworkLinkerLibrary(graph,
+                    Collections.<Class<?>, Object> emptyMap());
+            service = graph.getService(BikeRentalStationService.class);
+            if (service == null) {
+                service = new BikeRentalStationService();
+                graph.putService(BikeRentalStationService.class, service);
+            }
+            setup = true;
         }
+        return setup;
     }
 
     public List<BikeRentalStation> getStations() {
@@ -96,47 +106,55 @@ public class BikeRentalUpdater implements Runnable {
 
     @Override
     public void run() {
-        _log.debug("Updating bike rental stations from " + source);
+        if (!setup()) {
+            // Updater has been disabled (no graph available).
+            return;
+        }
+        LOG.debug("Updating bike rental stations from " + source);
         if (!source.update()) {
-            _log.debug("No updates");
+            LOG.debug("No updates");
             return;
         }
         List<BikeRentalStation> stations = source.getStations();
         Set<BikeRentalStation> stationSet = new HashSet<BikeRentalStation>();
+        Set<String> networks = new HashSet<String>(Arrays.asList(network));
+        /* add any new stations and update bike counts for existing stations */
         for (BikeRentalStation station : stations) {
             service.addStation(station);
-            String id = station.id;
             stationSet.add(station);
             BikeRentalStationVertex vertex = verticesByStation.get(station);
             if (vertex == null) {
-                String name = "bike rental station " + id;
-                vertex = new BikeRentalStationVertex(graph, id, name, station.x,
-                        station.y, station.name, station.bikesAvailable, station.spacesAvailable);
+                vertex = new BikeRentalStationVertex(graph, station);
                 LinkRequest request = networkLinkerLibrary.connectVertexToStreets(vertex);
                 for (Edge e : request.getEdgesAdded()) {
                     graph.addTemporaryEdge(e);
                 }
                 verticesByStation.put(station, vertex);
-                new RentABikeOnEdge(vertex, vertex, network);
-                new RentABikeOffEdge(vertex, vertex, network);
+                new RentABikeOnEdge(vertex, vertex, networks);
+                new RentABikeOffEdge(vertex, vertex, networks);
             } else {
                 vertex.setBikesAvailable(station.bikesAvailable);
                 vertex.setSpacesAvailable(station.spacesAvailable);
             }
         }
-        List<BikeRentalStationVertex> toRemove = new ArrayList<BikeRentalStationVertex>();
+        /* remove existing stations that were not present in the update */
+        List<BikeRentalStation> toRemove = new ArrayList<BikeRentalStation>();
         for (Entry<BikeRentalStation, BikeRentalStationVertex> entry : verticesByStation.entrySet()) {
             BikeRentalStation station = entry.getKey();
             if (stationSet.contains(station))
                 continue;
             BikeRentalStationVertex vertex = entry.getValue();
-            graph.removeVertexAndEdges(vertex);
-            toRemove.add(vertex);
+            if (graph.containsVertex(vertex)) {
+                graph.removeVertexAndEdges(vertex);
+            }
+            toRemove.add(station);
             service.removeStation(station);
-            //TODO: need to unsplit any streets that were split
+            // TODO: need to unsplit any streets that were split
         }
-        verticesByStation.keySet().removeAll(toRemove);
+        for (BikeRentalStation station : toRemove) {
+            // post-iteration removal to avoid concurrent modification
+            verticesByStation.remove(station); 
+        }
 
     }
-
 }

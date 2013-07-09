@@ -31,7 +31,7 @@ import com.vividsolutions.jts.geom.LineString;
  * A transit vehicle's journey between departure at one stop and arrival at the next.
  * This version represents a set of such journeys specified by a TripPattern.
  */
-public class PatternHop extends PatternEdge implements OnBoardForwardEdge, OnBoardReverseEdge, 
+public class PatternHop extends TablePatternEdge implements OnBoardForwardEdge, OnBoardReverseEdge, 
         HopEdge {
 
     private static final long serialVersionUID = 1L;

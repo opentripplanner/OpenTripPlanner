@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 
 public class OSMLevel implements Comparable<OSMLevel> {
 
-    private static Logger _log = LoggerFactory.getLogger(OSMLevel.class);
+    private static Logger LOG = LoggerFactory.getLogger(OSMLevel.class);
 
     public static final Pattern RANGE_PATTERN = Pattern.compile("^[0-9]+\\-[0-9]+$");
     public static final double METERS_PER_FLOOR = 3;
@@ -122,7 +122,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
         /* fall back on altitude when necessary */
         if (floorNumber == null && altitude != null) {
             floorNumber = (int)(altitude / METERS_PER_FLOOR);
-            _log.warn("Could not determine floor number for layer {}. Guessed {} (0-based) from altitude.", spec, floorNumber);
+            LOG.warn("Could not determine floor number for layer {}. Guessed {} (0-based) from altitude.", spec, floorNumber);
             reliable = false;
         }
 
@@ -133,7 +133,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
         /* signal failure to extract any useful level information */
         if (floorNumber == null) {
             floorNumber = 0;
-            _log.warn("Could not determine floor number for layer {}, assumed to be ground-level.", 
+            LOG.warn("Could not determine floor number for layer {}, assumed to be ground-level.", 
                  spec, floorNumber);
             reliable = false;
         }

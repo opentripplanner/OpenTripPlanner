@@ -13,6 +13,7 @@
 
 package org.opentripplanner.graph_builder.impl;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -22,6 +23,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+
+import lombok.Setter;
 
 import org.onebusaway.csv_entities.EntityHandler;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
@@ -66,7 +69,7 @@ import org.slf4j.LoggerFactory;
  */
 public class GtfsGraphBuilderImpl implements GraphBuilder {
 
-    private static final Logger _log = LoggerFactory.getLogger(GtfsGraphBuilderImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GtfsGraphBuilderImpl.class);
 
     private GtfsBundles _gtfsBundles;
 
@@ -77,6 +80,12 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
     EntityHandler counter = new EntityCounter();
 
     private FareServiceFactory _fareServiceFactory;
+
+    /** will be applied to all bundles which do not have the cacheDirectory property set */
+    @Setter private File cacheDirectory; 
+    
+    /** will be applied to all bundles which do not have the useCached property set */
+    @Setter private Boolean useCached; 
 
     Map<Agency, GtfsBundle> agenciesSeen = new HashMap<Agency, GtfsBundle>();
 
@@ -128,11 +137,17 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
             int bundleIndex = 0;
             for (GtfsBundle gtfsBundle : _gtfsBundles.getBundles()) {
                 bundleIndex += 1;
+                // apply global defaults to individual GTFSBundles (if globals have been set) 
+                if (cacheDirectory != null && gtfsBundle.getCacheDirectory() == null)
+                    gtfsBundle.setCacheDirectory(cacheDirectory);
+                if (useCached != null && gtfsBundle.getUseCached() == null)
+                    gtfsBundle.setUseCached(useCached);
                 GtfsMutableRelationalDao dao = new GtfsRelationalDaoImpl();
                 GtfsContext context = GtfsLibrary.createContext(dao, service);
                 GTFSPatternHopFactory hf = new GTFSPatternHopFactory(context);
                 hf.setStopContext(stopContext);
                 hf.setFareServiceFactory(_fareServiceFactory);
+                hf.setMaxStopToShapeSnapDistance(gtfsBundle.getMaxStopToShapeSnapDistance());
 
                 if (generateFeedIds && gtfsBundle.getDefaultAgencyId() == null) {
                     gtfsBundle.setDefaultAgencyId("FEED#" + bundleIndex);
@@ -180,7 +195,7 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
         StoreImpl store = new StoreImpl(dao);
         store.open();
-        _log.info("reading {}", gtfsBundle.toString());
+        LOG.info("reading {}", gtfsBundle.toString());
 
         GtfsReader reader = new GtfsReader();
         reader.setInputSource(gtfsBundle.getCsvInputSource());
@@ -194,21 +209,21 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
         for (Map.Entry<String, String> entry : gtfsBundle.getAgencyIdMappings().entrySet())
             reader.addAgencyIdMapping(entry.getKey(), entry.getValue());
 
-        if (_log.isDebugEnabled())
+        if (LOG.isDebugEnabled())
             reader.addEntityHandler(counter);
 
         if (gtfsBundle.getDefaultBikesAllowed())
             reader.addEntityHandler(new EntityBikeability(true));
 
         for (Class<?> entityClass : reader.getEntityClasses()) {
-            _log.info("reading entities: " + entityClass.getName());
+            LOG.info("reading entities: " + entityClass.getName());
             reader.readEntities(entityClass);
             store.flush();
             if (entityClass == Agency.class) {
                 for (Agency agency : reader.getAgencies()) {
                     GtfsBundle existing = agenciesSeen.get(agency);
                     if (existing != null) {
-                        _log.warn(graph.addBuilderAnnotation(new AgencyNameCollision(agency, existing.toString())));
+                        LOG.warn(graph.addBuilderAnnotation(new AgencyNameCollision(agency, existing.toString())));
                     } else {
                         agenciesSeen.put(agency, gtfsBundle);
                     }
@@ -308,12 +323,12 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
         public void handleEntity(Object bean) {
             int count = incrementCount(bean.getClass());
             if (count % 1000000 == 0)
-                if (_log.isDebugEnabled()) {
+                if (LOG.isDebugEnabled()) {
                     String name = bean.getClass().getName();
                     int index = name.lastIndexOf('.');
                     if (index != -1)
                         name = name.substring(index + 1);
-                    _log.debug("loading " + name + ": " + count);
+                    LOG.debug("loading " + name + ": " + count);
                 }
         }
 

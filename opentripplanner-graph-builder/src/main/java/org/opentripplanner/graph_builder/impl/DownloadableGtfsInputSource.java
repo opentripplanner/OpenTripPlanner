@@ -23,6 +23,8 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.zip.ZipFile;
 
+import lombok.Setter;
+
 import org.onebusaway.csv_entities.CsvInputSource;
 import org.onebusaway.csv_entities.ZipFileCsvInputSource;
 import org.slf4j.Logger;
@@ -30,13 +32,15 @@ import org.slf4j.LoggerFactory;
 
 public class DownloadableGtfsInputSource implements CsvInputSource {
 
-    private static final Logger _log = LoggerFactory.getLogger(DownloadableGtfsInputSource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(DownloadableGtfsInputSource.class);
 
     private URL _url;
 
     private File _cacheDirectory;
 
     private String _defaultAgencyId;
+    
+    @Setter private boolean useCached = true;
 
     // Pattern: Decorator
     private ZipFileCsvInputSource _zip;
@@ -89,11 +93,14 @@ public class DownloadableGtfsInputSource implements CsvInputSource {
             File gtfsFile = new File(tmpDir, fileName);
 
             if (gtfsFile.exists()) {
-                _log.info("using already downloaded gtfs file: path=" + gtfsFile);
-                return gtfsFile;
+                if (useCached) {
+                    LOG.info("using already downloaded gtfs file: path=" + gtfsFile);
+                    return gtfsFile;
+                }
+                LOG.info("useCached=false; GTFS will be re-downloaded." + gtfsFile);
             }
 
-            _log.info("downloading gtfs: url=" + _url + " path=" + gtfsFile);
+            LOG.info("downloading gtfs: url=" + _url + " path=" + gtfsFile);
 
             BufferedInputStream in = new BufferedInputStream(_url.openStream());
             BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(gtfsFile));
@@ -102,7 +109,7 @@ public class DownloadableGtfsInputSource implements CsvInputSource {
             } catch (RuntimeException e) {
                 out.close();
                 if (!gtfsFile.delete()) {
-                    _log.error("Failed to delete incomplete file " + gtfsFile);
+                    LOG.error("Failed to delete incomplete file " + gtfsFile);
                 }
                 throw e;
             }

@@ -7,14 +7,19 @@
 		<param-name>contextConfigLocation</param-name>
 		<param-value>classpath:data-sources.xml classpath:/org/opentripplanner/api/security-application-context.xml</param-value>
 	</context-param>
+	
+    <listener>
+        <listener-class>org.opentripplanner.api.servlet.LoggingConfigurationListener</listener-class>
+    </listener>
 
 	<listener>
 		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
 	</listener>
+  
 	<listener>
 		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
 	</listener>
-	
+
 	<filter>
 		<filter-name>jsonpCallbackFilter</filter-name>
 		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>

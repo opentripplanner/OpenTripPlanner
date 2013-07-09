@@ -200,7 +200,7 @@ public class TableTripPattern implements TripPattern, Serializable {
     public TripTimes getNextTrip(int stopIndex, int time, boolean haveBicycle,
             RoutingRequest options, boolean boarding) {
         Timetable timetable = scheduledTimetable;
-        TimetableResolver snapshot = options.rctx.timetableSnapshot; 
+        TimetableResolver snapshot = options.rctx.timetableSnapshot;
         if (snapshot != null)
             timetable = snapshot.resolve(this);
         // check that we can even board/alight the given stop on this pattern with these options

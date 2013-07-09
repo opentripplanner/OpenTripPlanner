@@ -46,6 +46,7 @@ public interface Vertex extends Serializable, Cloneable {
     
     /** Get the distance from this vertex to the closest transit stop in meters. */
     public abstract double getDistanceToNearestTransitStop();
+    
     // TODO: this is a candidate for no-arg message-passing style
     public abstract void setDistanceToNearestTransitStop(double distance);
 
@@ -64,6 +65,22 @@ public interface Vertex extends Serializable, Cloneable {
     public void setStreetName(String streetName);
 
     public abstract Coordinate getCoordinate();
+
+    /**
+     * Get the bearing, in degrees, between this vertex and another coordinate.
+     * 
+     * @param other
+     * @return
+     */
+    public abstract double azimuthTo(Coordinate other);
+    
+    /**
+     * Get the bearing, in degrees, between this vertex and another.
+     * 
+     * @param other
+     * @return
+     */
+    public abstract double azimuthTo(Vertex other);
 
     /** Get this vertex's unique index, that can serve as a hashcode or an index into a table */
     public abstract int getIndex();
