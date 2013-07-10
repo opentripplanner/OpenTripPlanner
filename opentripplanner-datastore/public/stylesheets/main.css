@@ -1,0 +1,39 @@
+body {
+    font-family: sans-serif;
+}
+
+h2 {
+    font-size: 24px;
+    border-bottom: 4px solid #ccc;
+}
+
+h3 {
+    font-size: 18px;
+    background: #eee;
+    padding: 4px;
+}
+
+.mainContent {
+    width: 800px;
+    margin: 20px auto;
+    text-align: left;
+}
+
+.buttonRow {
+    text-align: center;
+    padding: 5px;
+    background: #f4f4f4;
+    margin-top: 1em;
+}
+
+.tripHeader {
+    padding: 3px 6px;
+    margin-top: 1em;
+    background: #ccc;
+    font-size: bold;
+}
+
+.tripBody {
+    padding: 6px;
+    background: #eee;
+}

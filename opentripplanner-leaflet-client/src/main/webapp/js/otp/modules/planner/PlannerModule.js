@@ -364,11 +364,16 @@ otp.modules.planner.PlannerModule =
     },
     
     noTripFound : function(error) {
-        $('<div>' + error.msg + ' (Error ' + error.id + ')</div>').dialog({
-            title : "No Trip Found",
+        this.showDialog(error.msg + ' (Error ' + error.id + ')', 'No Trup Found');
+    },
+    
+    showDialog : function(msg, title) {
+        $('<div style="z-index: 100000000;">' + msg + '</div>').dialog({
+            title : title,
+            appendTo: 'body',
             modal: true
         });
-    },
+    },    
     
     drawItinerary : function(itin) {
         var this_ = this;
@@ -497,10 +502,10 @@ otp.modules.planner.PlannerModule =
     
     clearTrip : function() {
     
-        this.markerLayer.removeLayer(this.startMarker);
+        if(this.startMarker) this.markerLayer.removeLayer(this.startMarker);
         this.startName = this.startLatLng = this.startMarker = null;
         
-        this.markerLayer.removeLayer(this.endMarker);
+        if(this.endMarker) this.markerLayer.removeLayer(this.endMarker);
         this.endName = this.endLatLng = this.endMarker = null;
 
         this.pathLayer.clearLayers();

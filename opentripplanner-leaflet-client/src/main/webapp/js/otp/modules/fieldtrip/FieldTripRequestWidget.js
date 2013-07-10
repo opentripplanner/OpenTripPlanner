@@ -31,7 +31,7 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
             closeable : true,
         });
         
-        this.contentDiv  = $('<div class="otp-fieldTrip-requestWidget-content notDraggable" />').appendTo(this.mainDiv);
+        //this.contentDiv  = $('<div class="otp-fieldTrip-requestWidget-content notDraggable" />').appendTo(this.mainDiv);
         this.render();
         this.center();
     },
@@ -40,27 +40,92 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
         var this_ = this;
         var context = _.clone(this.request);
         context.widgetId = this.id;
-        this.contentDiv.empty().append(ich['otp-fieldtrip-request'](context));
+        context.dsUrl = otp.config.datastoreUrl;
+        if(this.request.outboundTrip) context.outboundPlanInfo = this.module.constructPlanInfo(this.request.outboundTrip);
+        if(this.request.inboundTrip) context.inboundPlanInfo = this.module.constructPlanInfo(this.request.inboundTrip);
+        //this.contentDiv.empty().append(ich['otp-fieldtrip-request'](context));
+        if(this.content) this.content.remove();
+        this.content = ich['otp-fieldtrip-request'](context).appendTo(this.mainDiv);
         
-        $('#' + this.id + '-outboundPlanButton').click(function(evt) {
+        if(this.request.outboundTrip) {
+            this.content.find('.outboundPlanInfo').css('cursor', 'pointer').click(function() {
+                this_.module.renderTrip(this_.request.outboundTrip);
+            });
+        }
+        
+        if(this.request.inboundTrip) {
+            this.content.find('.inboundPlanInfo').css('cursor', 'pointer').click(function() {
+                this_.module.renderTrip(this_.request.inboundTrip);
+            });
+        }
+                 
+        //$('#' + this.id + '-outboundPlanButton').click(function(evt) {
+        this.content.find('.outboundPlanButton').click(function(evt) {
             this_.module.planOutbound(this_.request);
         });
-
-        $('#' + this.id + '-outboundSaveButton').click(function(evt) {
+        
+        this.content.find('.outboundSaveButton').click(function(evt) {
             this_.module.saveRequestTrip(this_.request, "outbound");
         });
         
-        $('#' + this.id + '-inboundPlanButton').click(function(evt) {
+        this.content.find('.inboundPlanButton').click(function(evt) {
+            
             this_.module.planInbound(this_.request);
         });
 
-        $('#' + this.id + '-inboundSaveButton').click(function(evt) {
-            this_.module.saveRequestTrip(this_.request, "outbound");
+        this.content.find('.inboundSaveButton').click(function(evt) {
+            this_.module.saveRequestTrip(this_.request, "inbound");
+        });
+        
+        this.content.find('.printablePlanLink').click(function(evt) {
+            evt.preventDefault();
+            var req = this_.request;
+            var printWindow = window.open('','Group Plan','toolbar=yes, scrollbars=yes, height=500, width=800');
+            var context = _.clone(req);
+            var outboundItinIndex = 0; inboundItinIndex = 0;
+            context["outboundItinIndex"] = function() {
+                return outboundItinIndex++;
+            };
+            context["inboundItinIndex"] = function() {
+                return inboundItinIndex++;
+            };
+            
+            var content = ich['otp-fieldtrip-printablePlan'](context);
+            
+            // populate itin details
+            if(req.outboundTrip) {
+                var itins = req.outboundTrip.groupItineraries;
+                for(var i = 0; i < itins.length; i++) {
+                    var itinData = JSON.parse(otp.util.Text.lzwDecode(itins[i].itinData));
+                    var itin = new otp.modules.planner.Itinerary(itinData, null);
+                    content.find('.outbound-itinBody-'+i).html(itin.getHtmlNarrative());
+                }
+            }
+            if(req.inboundTrip) {
+                var itins = req.inboundTrip.groupItineraries;
+                for(var i = 0; i < itins.length; i++) {
+                    var itinData = JSON.parse(otp.util.Text.lzwDecode(itins[i].itinData));
+                    var itin = new otp.modules.planner.Itinerary(itinData, null);
+                    content.find('.inbound-itinBody-'+i).html(itin.getHtmlNarrative());
+                }
+            }
+
+            var html = "";
+            html += '<link rel="stylesheet" href="js/otp/modules/planner/planner-style.css" />';
+            html += '<link rel="stylesheet" href="js/otp/modules/fieldtrip/fieldtrip-style.css" />';
+            
+            html += content.html();
+            printWindow.document.write(html);
         });
     },
     
     onClose : function() {
         delete this.module.requestWidgets[this.request.id];
+    },
+    
+    tripPlanned : function() {
+        $('#' + this.id + '-outboundSaveButton').removeAttr("disabled");
+        $('#' + this.id + '-inboundSaveButton').removeAttr("disabled");
     }
     
 });

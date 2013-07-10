@@ -31,6 +31,9 @@ public class GTFSTrip extends Model {
     public String agencyAndId;
 
     @Expose
+    public String routeName;
+
+    @Expose
     public Integer fromStopIndex;
 
     @Expose

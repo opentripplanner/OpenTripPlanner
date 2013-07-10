@@ -25,9 +25,13 @@ POST    /fieldTrip/addTripFeedback              FieldTrip.addTripFeedback
 POST    /fieldTrip/deleteTrip                   FieldTrip.deleteTrip
 POST    /fieldTrip/newRequest                   FieldTrip.newRequest
 POST    /fieldTrip/newRequestForm               FieldTrip.newRequestForm
+
 GET     /fieldTrip/getRequests                  FieldTrip.getRequests
 POST    /fieldTrip/setInboundTrip               FieldTrip.setInboundTrip
 POST    /fieldTrip/setOutboundTrip              FieldTrip.setOutboundTrip
+
+GET     /fieldTrip/feedbackForm                 FieldTrip.feedbackForm
+
 
 #Admin
 GET      /admin/users                           Admin.getUsers

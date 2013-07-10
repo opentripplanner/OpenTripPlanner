@@ -26,16 +26,17 @@ otp.modules.fieldtrip.FieldTripManagerWidget =
 
         otp.widgets.Widget.prototype.initialize.call(this, id, module, {
             cssClass : 'otp-fieldTripManager',
-            title : 'Field Trip Manager'
+            title : 'Field Trip Requests',
+            resizable: true,
         });
     
         ich['otp-fieldtrip-manager']({ widgetId : this.id }).appendTo(this.mainDiv);
-        $('#'+this.id+'-tabs').tabs({
+        /*$('#'+this.id+'-tabs').tabs({
             heightStyle : "fill",
-        });
+        });*/
 
         this.buildRequestsViewer($('#'+this.id+'-requestsTab'));        
-        this.buildTripManager($('#'+this.id+'-tripsTab'));
+        //this.buildTripManager($('#'+this.id+'-tripsTab'));
     },
 
     /** requests viewer **/
@@ -51,13 +52,16 @@ otp.modules.fieldtrip.FieldTripManagerWidget =
         this.requestsList.empty();
         for(var i = 0; i < requests.length; i++) {
             var req = requests[i];
-            console.log(req);
+            //console.log(req);
             //$('<div class="otp-fieldTripRequests-listRow">'+req.teacherName+", "+req.schoolName+'</div>').appendTo(this.requestsList);
             
             var context = _.clone(req);
             req.formattedDate = moment(req.travelDate).format("MMM Do YYYY");
-            ich['otp-fieldtrip-requestRow'](req).appendTo(this.requestsList)
+            if(req.outboundTrip) req.outboundDesc = this.module.constructPlanInfo(req.outboundTrip);
+            if(req.inboundTrip) req.inboundDesc = this.module.constructPlanInfo(req.inboundTrip);
+            ich['otp-fieldtrip-requestRow'](req).appendTo(this.requestsList).data('req', req)
             .click(function() {
+                var req = $(this).data('req');
                 this_.module.showRequest(req);
             });
         }
