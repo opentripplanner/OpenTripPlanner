@@ -660,6 +660,7 @@ public class PlanGenerator {
             }
             place.stopId = transitVertex.getStopId();
             place.stopCode = transitVertex.getStopCode();
+            place.platformCode = transitVertex.getPlatformCode();
             place.zoneId = state.getZone();
         }
         return place;
