@@ -22,6 +22,7 @@ public class ScheduledFieldTrip extends GenericModel {
     @Expose
     public Long id;
     
+    /*
     //@Column(nullable=false)
     @OneToOne
     public FieldTripRequest outboundRequest;
@@ -34,12 +35,18 @@ public class ScheduledFieldTrip extends GenericModel {
         if(outboundRequest != null) return outboundRequest;
         if(inboundRequest != null) return inboundRequest;
         return null;
-    }
+    }*/
     
-    /** The username of the user who created this trip */
+    @ManyToOne(optional=false)
+    public FieldTripRequest request;
+
     @Column(nullable=false)
     @Expose
     public String createdBy;
+    
+    /** The username of the user who created this trip */
+    @Expose
+    public Integer requestOrder;
 
     /** When the trip was created */
     @Column(nullable=false)

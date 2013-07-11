@@ -93,13 +93,18 @@ public class FieldTripRequest extends GenericModel  {
     @Expose
     public Boolean requireInvoice;
     
-    @Expose
+    /*@Expose
     @OneToOne(mappedBy="outboundRequest", cascade=CascadeType.ALL)
     public ScheduledFieldTrip outboundTrip;
 
     @Expose
     @OneToOne(mappedBy="inboundRequest", cascade=CascadeType.ALL)
-    public ScheduledFieldTrip inboundTrip;
+    public ScheduledFieldTrip inboundTrip;*/
+    
+    @OneToMany(mappedBy="request", cascade=CascadeType.ALL)
+    @Expose
+    public List<ScheduledFieldTrip> trips;
+    
     
     @OneToMany(mappedBy="request", cascade=CascadeType.ALL)
     @Expose

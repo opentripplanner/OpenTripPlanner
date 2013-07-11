@@ -23,7 +23,9 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
         var this_ = this;  
         
         this.module = module;
-        this.request = request;    
+        this.request = request;
+        //console.log("request "+request.id+":");
+        //console.log(request);
         otp.widgets.Widget.prototype.initialize.call(this, id, module, {
             cssClass : 'otp-fieldTrip-requestWidget',
             title : "Field Trip Request #"+request.id,
@@ -41,21 +43,24 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
         var context = _.clone(this.request);
         context.widgetId = this.id;
         context.dsUrl = otp.config.datastoreUrl;
-        if(this.request.outboundTrip) context.outboundPlanInfo = this.module.constructPlanInfo(this.request.outboundTrip);
-        if(this.request.inboundTrip) context.inboundPlanInfo = this.module.constructPlanInfo(this.request.inboundTrip);
+
+        var outboundTrip = otp.util.FieldTrip.getOutboundTrip(this.request);
+        if(outboundTrip) context.outboundPlanInfo = otp.util.FieldTrip.constructPlanInfo(outboundTrip);
+        var inboundTrip = otp.util.FieldTrip.getInboundTrip(this.request);
+        if(inboundTrip) context.inboundPlanInfo = otp.util.FieldTrip.constructPlanInfo(inboundTrip);
         //this.contentDiv.empty().append(ich['otp-fieldtrip-request'](context));
         if(this.content) this.content.remove();
         this.content = ich['otp-fieldtrip-request'](context).appendTo(this.mainDiv);
         
-        if(this.request.outboundTrip) {
+        if(outboundTrip) {
             this.content.find('.outboundPlanInfo').css('cursor', 'pointer').click(function() {
-                this_.module.renderTrip(this_.request.outboundTrip);
+                this_.module.renderTrip(outboundTrip);
             });
         }
         
-        if(this.request.inboundTrip) {
+        if(inboundTrip) {
             this.content.find('.inboundPlanInfo').css('cursor', 'pointer').click(function() {
-                this_.module.renderTrip(this_.request.inboundTrip);
+                this_.module.renderTrip(inboundTrip);
             });
         }
                  
@@ -89,22 +94,29 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
             context["inboundItinIndex"] = function() {
                 return inboundItinIndex++;
             };
+
+            var outboundTrip = otp.util.FieldTrip.getOutboundTrip(req);
+            var inboundTrip = otp.util.FieldTrip.getInboundTrip(req);
+            if(outboundTrip) context.outboundItineraries = outboundTrip.groupItineraries;
+            if(inboundTrip) context.inboundItineraries = inboundTrip.groupItineraries;
             
             var content = ich['otp-fieldtrip-printablePlan'](context);
             
             // populate itin details
-            if(req.outboundTrip) {
-                var itins = req.outboundTrip.groupItineraries;
+            console.log(outboundTrip);
+            if(outboundTrip) {
+                var itins = outboundTrip.groupItineraries;
                 for(var i = 0; i < itins.length; i++) {
-                    var itinData = JSON.parse(otp.util.Text.lzwDecode(itins[i].itinData));
+                    var itinData = otp.util.FieldTrip.readItinData(itins[i]);
                     var itin = new otp.modules.planner.Itinerary(itinData, null);
                     content.find('.outbound-itinBody-'+i).html(itin.getHtmlNarrative());
                 }
             }
-            if(req.inboundTrip) {
-                var itins = req.inboundTrip.groupItineraries;
+            
+            if(inboundTrip) {
+                var itins = inboundTrip.groupItineraries;
                 for(var i = 0; i < itins.length; i++) {
-                    var itinData = JSON.parse(otp.util.Text.lzwDecode(itins[i].itinData));
+                    var itinData = otp.util.FieldTrip.readItinData(itins[i]);
                     var itin = new otp.modules.planner.Itinerary(itinData, null);
                     content.find('.inbound-itinBody-'+i).html(itin.getHtmlNarrative());
                 }

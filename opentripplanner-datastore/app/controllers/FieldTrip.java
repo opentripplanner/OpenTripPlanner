@@ -126,10 +126,13 @@ public class FieldTrip extends Application {
     }
 
     
-    public static void newTrip(ScheduledFieldTrip trip) {
+    public static void newTrip(long requestId, ScheduledFieldTrip trip) {
+        FieldTripRequest ftRequest = FieldTripRequest.findById(requestId);
+
         //TODO: is setting id to null the right way to ensure that an
         //existing trip is not overwritten?
         trip.id = null;
+        trip.request = ftRequest;
         trip.serviceDay = trip.departure;
         //trip.timeStamp = new Date();
         /*User user = getUser();
@@ -138,6 +141,10 @@ public class FieldTrip extends Application {
             trip.groupItineraries.clear();
         }*/
         trip.save();
+        
+        ftRequest.trips.add(trip);
+        ftRequest.save();
+        
         System.out.println("saved ScheduledFieldTrip, id="+trip.id);
         Long id = trip.id;
         renderJSON(id);
@@ -205,11 +212,12 @@ public class FieldTrip extends Application {
     }
     
     
-    public static void setInboundTrip(long requestId, long tripId) {
+    /*public static void setInboundTrip(long requestId, long tripId) {
         FieldTripRequest ftRequest = FieldTripRequest.findById(requestId);
         ScheduledFieldTrip trip = ScheduledFieldTrip.findById(tripId);
-        ftRequest.inboundTrip = trip;
-        trip.inboundRequest = ftRequest;
+        ftRequest.trips.add(trip);
+        trip.request = ftRequest;
+        trip.requestOrder = 1;
         trip.save();
         ftRequest.save();
         renderJSON(requestId);
@@ -218,12 +226,13 @@ public class FieldTrip extends Application {
     public static void setOutboundTrip(long requestId, long tripId) {
         FieldTripRequest ftRequest = FieldTripRequest.findById(requestId);
         ScheduledFieldTrip trip = ScheduledFieldTrip.findById(tripId);
-        ftRequest.outboundTrip = trip;
-        trip.outboundRequest = ftRequest;
+        ftRequest.trips.add(trip);
+        trip.request = ftRequest;
+        trip.requestOrder = 0;
         trip.save();
         ftRequest.save();
         renderJSON(requestId);
-    }
+    }*/
 
     /* FieldTripFeedback */
     

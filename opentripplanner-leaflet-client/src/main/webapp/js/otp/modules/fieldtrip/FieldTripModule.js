@@ -274,14 +274,15 @@ otp.modules.fieldtrip.FieldTripModule =
         new otp.modules.fieldtrip.SaveFieldTripWidget('otp-'+this.id+'-saveFieldTripWidget', this);
     },
         
-    saveTrip : function(request, successCallback) {
+    saveTrip : function(request, requestOrder, successCallback) {
         var this_ = this;
         //console.log("saving trip: "+desc);
         
         var data = {
             userName : this.userName,
             password : this.password,
-            //'trip.request' : request.id,
+            requestId : request.id,
+            'trip.requestOrder' : requestOrder,
             'trip.origin' : this.getStartOTPString(),
             'trip.destination' : this.getEndOTPString(),
             //'trip.description' : desc,
@@ -316,14 +317,16 @@ otp.modules.fieldtrip.FieldTripModule =
         this.itinsSaved = 0;
         for(var i = 0; i < this.groupPlan.itineraries.length; i++) {
             var itin = this.groupPlan.itineraries[i];
-            //console.log("saving itin for trip "+tripId);
+            console.log("saving itin for trip "+tripId);
+            console.log(itin.itinData);
 
             var data = {
                 userName : this.userName,
                 password : this.password,
                 fieldTripId : tripId,
                 'itinerary.passengers' : itin.groupSize,
-                'itinerary.itinData' : otp.util.Text.lzwEncode(JSON.stringify(itin.itinData))
+                'itinerary.itinData' : otp.util.Text.lzwEncode(JSON.stringify(itin.itinData)),
+                'itinerary.timeOffset' : otp.config.timeOffset || 0, 
             };
             
             var legs = itin.getTransitLegs();
@@ -431,7 +434,7 @@ otp.modules.fieldtrip.FieldTripModule =
         var queryParams = JSON.parse(tripData.queryParams);
         this.groupPlan = new otp.modules.planner.TripPlan(null, queryParams);//_.extend(queryParams, { groupSize : this.groupSize }));
         for(var i = 0; i < tripData.groupItineraries.length; i++) {
-            var itinData = JSON.parse(otp.util.Text.lzwDecode(tripData.groupItineraries[i].itinData));
+            var itinData = otp.util.FieldTrip.readItinData(tripData.groupItineraries[i]);
             var itin = new otp.modules.planner.Itinerary(itinData, this.groupPlan);
             itin.groupSize = tripData.groupItineraries[i].passengers;
             this.groupPlan.addItinerary(itin);
@@ -557,7 +560,7 @@ otp.modules.fieldtrip.FieldTripModule =
     },
     
     showGeocoder : function(request, mode) {
-        console.log("showing geocoder for request "+request.id);
+        //console.log("showing geocoder for request "+request.id);
         
         if(_.has(this.geocoderWidgets, request.id)) {
             var widget = this.geocoderWidgets[request.id];
@@ -576,18 +579,27 @@ otp.modules.fieldtrip.FieldTripModule =
     saveRequestTrip : function(request, type) {
         if(!this.checkPlanValidity(request)) return;
         
-        if(type === 'outbound' && request.outboundTrip) {
-            this.deleteTrip(request.outboundTrip);
+        var outboundTrip = otp.util.FieldTrip.getOutboundTrip(request);
+        if(type === 'outbound' && outboundTrip) {
+            this.deleteTrip(outboundTrip);
             alert("Note: request already had planned outbound trip; previously planned trip overwritten.");
         }
 
-        if(type === 'inbound' && request.inboundTrip) {
-            this.deleteTrip(request.inboundTrip);
+        var inboundTrip = otp.util.FieldTrip.getInboundTrip(request);
+        if(type === 'inbound' && inboundTrip) {
+            this.deleteTrip(inboundTrip);
             alert("Note: request already had planned inbound trip; previously planned trip overwritten.");
         }
         
         var this_ = this;
-        this.saveTrip(request, function(tripId) {
+        if(type === "outbound") var requestOrder = 0;
+        if(type === "inbound") var requestOrder = 1;
+
+        this.saveTrip(request, requestOrder, function(tripId) {
+            console.log("saved "+type+" trip for req #"+request.id);
+            this_.loadRequests();
+        });
+        /*this.saveTrip(request, function(tripId) {
             if(type === "outbound") var url = this.datastoreUrl+'/fieldTrip/setOutboundTrip';
             if(type === "inbound") var url = this.datastoreUrl+'/fieldTrip/setInboundTrip';
             $.ajax(url, {
@@ -608,7 +620,8 @@ otp.modules.fieldtrip.FieldTripModule =
                     console.log(data);
                 }
             });          
-        });     
+        });*/
+             
     },
     
     checkPlanValidity : function(request) {
@@ -629,10 +642,40 @@ otp.modules.fieldtrip.FieldTripModule =
         
         return true;
     },
+});
+
+
+otp.util.FieldTrip = {
     
     constructPlanInfo : function(trip) {
         return trip.groupItineraries.length + " group itineraries, planned by " + trip.createdBy + " at " + trip.timeStamp;
     },
-
     
-});
+    getOutboundTrip : function(request) {
+        if(request.outboundTrip) return request.outboundTrip;
+        return otp.util.FieldTrip.tripAtIndex(request, 0);
+    },
+
+    getInboundTrip : function(request) {
+        if(request.inboundTrip) return request.inboundTrip;
+        return otp.util.FieldTrip.tripAtIndex(request, 1);
+    },
+    
+    tripAtIndex : function(request, index) {
+        if(request.trips) {
+            for(var i = 0; i < request.trips.length; i++) {
+                if(request.trips[i].requestOrder === index) return request.trips[i];
+            }
+        }
+        return null;
+    },
+    
+    readItinData : function(groupItin) {
+        if(groupItin.timeOffset) otp.config.timeOffset = groupItin.timeOffset;
+        return JSON.parse(otp.util.Text.lzwDecode(groupItin.itinData));
+    },
+    
+    
+    
+};
+

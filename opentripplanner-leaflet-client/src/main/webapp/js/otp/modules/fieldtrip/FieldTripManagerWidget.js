@@ -56,9 +56,11 @@ otp.modules.fieldtrip.FieldTripManagerWidget =
             //$('<div class="otp-fieldTripRequests-listRow">'+req.teacherName+", "+req.schoolName+'</div>').appendTo(this.requestsList);
             
             var context = _.clone(req);
-            req.formattedDate = moment(req.travelDate).format("MMM Do YYYY");
-            if(req.outboundTrip) req.outboundDesc = this.module.constructPlanInfo(req.outboundTrip);
-            if(req.inboundTrip) req.inboundDesc = this.module.constructPlanInfo(req.inboundTrip);
+            if(req.travelDate) req.formattedDate = moment(req.travelDate).format("MMM Do YYYY");
+            var outboundTrip = otp.util.FieldTrip.getOutboundTrip(req);
+            if(outboundTrip) req.outboundDesc = otp.util.FieldTrip.constructPlanInfo(outboundTrip);
+            var inboundTrip = otp.util.FieldTrip.getInboundTrip(req);
+            if(inboundTrip) req.inboundDesc = otp.util.FieldTrip.constructPlanInfo(inboundTrip);
             ich['otp-fieldtrip-requestRow'](req).appendTo(this.requestsList).data('req', req)
             .click(function() {
                 var req = $(this).data('req');

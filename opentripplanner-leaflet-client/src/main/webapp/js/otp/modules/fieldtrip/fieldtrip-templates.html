@@ -167,20 +167,18 @@
                     Outbound Trip (to Destination)
                 </div>
                 <div class="otp-fieldtrip-printablePlan-tripBody">
-                    {{#outboundTrip}}
-                        {{#groupItineraries}}
-                            <div class="otp-fieldtrip-printablePlan-itinContainer">
-                                <div class="otp-fieldtrip-printablePlan-itinHeader">
-                                    {{passengers}} passengers on following Itinerary:
-                                </div>
-                                <div class="otp-fieldtrip-printablePlan-itinBody outbound-itinBody-{{outboundItinIndex}}">
-                                </div>
+                    {{#outboundItineraries}}
+                        <div class="otp-fieldtrip-printablePlan-itinContainer">
+                            <div class="otp-fieldtrip-printablePlan-itinHeader">
+                                {{passengers}} passengers on following Itinerary:
                             </div>
-                        {{/groupItineraries}}
-                    {{/outboundTrip}}
-                    {{^outboundTrip}}
+                            <div class="otp-fieldtrip-printablePlan-itinBody outbound-itinBody-{{outboundItinIndex}}">
+                            </div>
+                        </div>
+                    {{/outboundItineraries}}
+                    {{^outboundItineraries}}
                         <i>No Outbound Trip Planned</i>
-                    {{/outboundTrip}}
+                    {{/outboundItineraries}}
                 </div>
             </div>
 
@@ -189,20 +187,18 @@
                     Inbound Trip (from Destination)
                 </div>
                 <div class="otp-fieldtrip-printablePlan-tripBody">
-                    {{#inboundTrip}}
-                        {{#groupItineraries}}
-                            <div class="otp-fieldtrip-printablePlan-itinContainer">
-                                <div class="otp-fieldtrip-printablePlan-itinHeader">
-                                    {{passengers}} passengers on following Itinerary:
-                                </div>
-                                <div class="otp-fieldtrip-printablePlan-itinBody inbound-itinBody-{{inboundItinIndex}}">
-                                </div>
+                    {{#inboundItineraries}}
+                        <div class="otp-fieldtrip-printablePlan-itinContainer">
+                            <div class="otp-fieldtrip-printablePlan-itinHeader">
+                                {{passengers}} passengers on following Itinerary:
                             </div>
-                        {{/groupItineraries}}
-                    {{/inboundTrip}}
-                    {{^inboundTrip}}
+                            <div class="otp-fieldtrip-printablePlan-itinBody inbound-itinBody-{{inboundItinIndex}}">
+                            </div>
+                        </div>
+                    {{/inboundItineraries}}
+                    {{^inboundItineraries}}
                         <i>No Inbound Trip Planned</i>
-                    {{/inboundTrip}}
+                    {{/inboundItineraries}}
                 </div>
             </div>
         </div>
