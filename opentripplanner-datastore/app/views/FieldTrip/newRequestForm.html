@@ -106,8 +106,7 @@ If you have any questions, please email us at fieldtrips@trimet.org or call 503-
 
 
 <div class="buttonRow">
-    <!--<input type="submit" value="Submit your Request" style="font-size: 20px;" />-->
-    <button id="submitButton">Submit Request</button>
+    <div id="submitLink" style="cursor:pointer; border: 2px solid gray; width: 250px; padding: 3px; margin: 4px auto; background: white;">Submit Request</div>
 </div>
 
 </div>
@@ -118,7 +117,7 @@ If you have any questions, please email us at fieldtrips@trimet.org or call 503-
 $(document).ready(function() {
     console.log("startup");
     $("#travelDate").datepicker();
-    $("#submitButton").click(function() {
+    $("#submitLink").click(function() {
         submitClicked();
     });
 });
@@ -153,7 +152,6 @@ function submitClicked() {
         return;
     }
     $("#arriveSchoolTime").val(arriveSchoolTime);
-
 
     document.forms["requestForm"].submit();
 }
