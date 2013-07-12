@@ -18,6 +18,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -48,33 +49,55 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.util.TestUtils;
 
 /**
+ * This is a singleton class to hold graph data between test runs, since loading it is slow.
+ */
+class Context {
+    
+    public Graph graph;
+
+    public GenericAStar aStar = new GenericAStar();
+
+    private static Context instance = null;
+
+    public static Context getInstance() throws IOException {
+        if (instance == null) {
+            instance = new Context();
+        }
+        return instance;
+    }
+
+    public Context() throws IOException {
+        // Create graph
+        GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
+        graph = spy(new Graph());
+        GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
+        factory.run(graph);
+        graph.putService(CalendarServiceData.class,
+                GtfsLibrary.createCalendarServiceData(context.getDao()));
+        
+        // Add simple transfer to make transfer possible between N-K and F-H
+        @SuppressWarnings("deprecation")
+        TransitStop from = ((TransitStop) graph.getVertex("agency_K"));
+        @SuppressWarnings("deprecation")
+        TransitStop to = ((TransitStop) graph.getVertex("agency_F"));
+        new SimpleTransfer(from, to, 100);
+        
+    }
+}
+
+/**
  * Test transfers, mostly stop-to-stop transfers.
  */
 public class TestTransfers extends TestCase {
     
     private Graph graph;
 
-    private GenericAStar aStar = new GenericAStar();
+    private GenericAStar aStar;
 
     public void setUp() throws Exception {
-        // Set up graph once to speed up test
-        if (graph == null) {
-            // Create graph
-            GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
-            graph = spy(new Graph());
-            GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
-            factory.run(graph);
-            graph.putService(CalendarServiceData.class,
-                    GtfsLibrary.createCalendarServiceData(context.getDao()));
-            
-            // Add simple transfer to make transfer possible between N-K and F-H
-            @SuppressWarnings("deprecation")
-            TransitStop from = ((TransitStop) graph.getVertex("agency_K"));
-            @SuppressWarnings("deprecation")
-            TransitStop to = ((TransitStop) graph.getVertex("agency_F"));
-            new SimpleTransfer(from, to, 100);
-            
-        }
+        // Get graph and a star from singleton class
+        graph = Context.getInstance().graph;
+        aStar = Context.getInstance().aStar;
     }
 
     /**
