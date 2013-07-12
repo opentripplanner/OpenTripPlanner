@@ -53,11 +53,13 @@ public class Application extends Controller {
     }
 
     public static void checkSession(String sessionId) {
+        System.out.println("checkSession: "+sessionId);
         Session userSession = Session.find("bySessionId", sessionId).first();
+        System.out.println("found session: "+userSession);
 
         Map<String, String> resp = new HashMap<String, String>();
         resp.put("sessionId", sessionId);
-        if(session != null) {
+        if(userSession != null) {
             resp.put("username", userSession.user.username);            
         }
         renderJSON(resp);

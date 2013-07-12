@@ -22,8 +22,10 @@ otp.modules.calltaker.CallTakerModule =
     
     activeCall : null,
     
-    sessionId : null,
-    username: null,
+    /*sessionId : null,
+    username: null,*/
+    
+    sessionManager : null,
     
     templateFile : 'otp/modules/calltaker/calltaker-templates.html',
     
@@ -42,15 +44,9 @@ otp.modules.calltaker.CallTakerModule =
         console.log("activate ctm: " + this.tripOptionsWidgetCssClass);
         otp.modules.multimodal.MultimodalPlannerModule.prototype.activate.apply(this);
         
-        // initialize the session
-        if(_.has(this.webapp.urlParams, 'sessionId')) {
-            console.log("received session id: " + this.webapp.urlParams['sessionId']);
-            this.checkSession(this.webapp.urlParams['sessionId']);
-        }
-        else { // no sessionId passed in; must request one from server
-            console.log("creating new session..");
-            this.newSession();
-        }
+        this.sessionManager = new otp.core.TrinetSessionManager(this, $.proxy(function() {
+            this.showHistoryWidget();
+        }, this));
         
         this.mailablesWidget = new otp.modules.calltaker.MailablesWidget(this.id+'-mailablesWidget', this);
     },
@@ -62,28 +58,7 @@ otp.modules.calltaker.CallTakerModule =
         };
     },
     
-    /*initSession : function() {
-        
-        var this_ = this;
-        var url = otp.config.datastoreUrl+'/auth/initLogin';
-        $.ajax(url, {
-            type: 'GET',
-            dataType: 'json',
-            
-            success: function(data) {
-                this_.sessionId = data.sessionId;
-                this_.username = data.username;
-                this_.showHistoryWidget();
-            },
-            
-            error: function(data) {
-                console.log("auth error");
-                console.log(data);
-            }
-        });
-                
-    },*/
-    
+    /*
     newSession : function() {
         var this_ = this;
         var url = otp.config.datastoreUrl+'/auth/newSession';
@@ -131,7 +106,7 @@ otp.modules.calltaker.CallTakerModule =
                 console.log(data);
             }
         });
-    },
+    },*/
     
     showHistoryWidget : function() {
         this.callHistoryWidget = new otp.modules.calltaker.CallHistoryWidget(this.id+"-callHistoryWidget", this);
@@ -192,7 +167,7 @@ otp.modules.calltaker.CallTakerModule =
         //console.log(model);
         
         var data = {
-            sessionId : this.sessionId,
+            sessionId : this.sessionManager.sessionId,
         };
         
         

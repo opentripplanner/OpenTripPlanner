@@ -39,15 +39,15 @@ public class ScheduledFieldTrip extends GenericModel {
     
     @ManyToOne(optional=false)
     public FieldTripRequest request;
+    
+    @Expose
+    public Integer requestOrder;
 
+    /** The username of the user who created this trip */
     @Column(nullable=false)
     @Expose
     public String createdBy;
     
-    /** The username of the user who created this trip */
-    @Expose
-    public Integer requestOrder;
-
     /** When the trip was created */
     @Column(nullable=false)
     @Expose

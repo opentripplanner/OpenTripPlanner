@@ -35,8 +35,7 @@ otp.modules.fieldtrip.FieldTripModule =
     geocodedOrigins : null, 
     geocodedDestinations : null, 
     
-    userName : "admin",
-    password : "secret",
+    sessionManager : null,
     
     showIntermediateStops : true,
     
@@ -88,7 +87,10 @@ otp.modules.fieldtrip.FieldTripModule =
         modeSelector.addModeControl(new otp.widgets.tripoptions.GroupTripOptions(this.optionsWidget, "Group Size: "));
         modeSelector.refreshModeControls();
         
-        this.fieldTripManager = new otp.modules.fieldtrip.FieldTripManagerWidget('otp-'+this.id+'-fieldTripWidget', this);
+        //this.fieldTripManager = new otp.modules.fieldtrip.FieldTripManagerWidget('otp-'+this.id+'-fieldTripWidget', this);
+        this.sessionManager = new otp.core.TrinetSessionManager(this, $.proxy(function() {
+            this.fieldTripManager = new otp.modules.fieldtrip.FieldTripManagerWidget('otp-'+this.id+'-fieldTripWidget', this);
+        }, this));
 
         //this.requestsWidget = new otp.modules.fieldtrip.FieldTripRequestsWidget('otp-'+this.moduleId+'-requestsWidget', this);
 
@@ -124,8 +126,7 @@ otp.modules.fieldtrip.FieldTripModule =
         var this_ = this;
         $.ajax(this.datastoreUrl+'/fieldTrip/getTrips', {
             data: {
-                userName : this.userName,
-                password : this.password,                
+                sessionId : this.sessionManager.sessionId,
                 date : planDate,
                 //limit : 100,
             },
@@ -252,8 +253,7 @@ otp.modules.fieldtrip.FieldTripModule =
         var this_ = this;
         $.ajax(this.datastoreUrl+'/fieldTrip/getTrips', {
             data: {
-                userName : this.userName,
-                password : this.password,                
+                sessionId : this.sessionManager.sessionId,
                 //date : this.fieldTripManager.selectedDate,
                 limit : 100,
             },
@@ -279,8 +279,7 @@ otp.modules.fieldtrip.FieldTripModule =
         //console.log("saving trip: "+desc);
         
         var data = {
-            userName : this.userName,
-            password : this.password,
+            sessionId : this.sessionManager.sessionId,
             requestId : request.id,
             'trip.requestOrder' : requestOrder,
             'trip.origin' : this.getStartOTPString(),
@@ -321,8 +320,7 @@ otp.modules.fieldtrip.FieldTripModule =
             console.log(itin.itinData);
 
             var data = {
-                userName : this.userName,
-                password : this.password,
+                sessionId : this.sessionManager.sessionId,
                 fieldTripId : tripId,
                 'itinerary.passengers' : itin.groupSize,
                 'itinerary.itinData' : otp.util.Text.lzwEncode(JSON.stringify(itin.itinData)),
@@ -351,8 +349,6 @@ otp.modules.fieldtrip.FieldTripModule =
                     
                 success: function(data) {
                     if((typeof data) == "string") data = jQuery.parseJSON(data);
-                    //console.log("success saving itinerary");
-                    //console.log(data);       
                     this_.itinsSaved++;
                     if(this_.itinsSaved == this_.groupPlan.itineraries.length) {
                         //console.log("all itins saved");
@@ -375,8 +371,7 @@ otp.modules.fieldtrip.FieldTripModule =
         var this_ = this;
         
         var data = {
-                userName : this.userName,
-                password : this.password,
+                sessionId : this.sessionManager.sessionId,
                 id : trip.id
         };
         
@@ -402,8 +397,7 @@ otp.modules.fieldtrip.FieldTripModule =
         var this_ = this;
         $.ajax(this.datastoreUrl+'/fieldTrip', {
             data: {
-                userName : this.userName,
-                password : this.password,                
+                sessionId : this.sessionManager.sessionId,
                 id : trip.id
             },
                 
@@ -459,8 +453,7 @@ otp.modules.fieldtrip.FieldTripModule =
         var this_ = this;
         $.ajax(this.datastoreUrl+'/fieldTrip/getRequests', {
             data: {
-                userName : this.userName,
-                password : this.password,                
+                sessionId : this.sessionManager.sessionId,
                 limit : 100,
             },
                 
