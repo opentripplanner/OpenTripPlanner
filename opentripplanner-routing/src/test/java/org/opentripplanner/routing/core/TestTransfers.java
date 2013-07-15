@@ -55,7 +55,7 @@ class Context {
     
     public Graph graph;
 
-    public GenericAStar aStar = new GenericAStar();
+    public GenericAStar aStar;
 
     private static Context instance = null;
 
@@ -67,6 +67,9 @@ class Context {
     }
 
     public Context() throws IOException {
+        // Create a star search
+        aStar = new GenericAStar();
+        
         // Create graph
         GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
         graph = spy(new Graph());
@@ -106,9 +109,19 @@ public class TestTransfers extends TestCase {
      * @return ordered list of trips in the journey
      */
     private List<Trip> planJourney(RoutingRequest options) {
+        return planJourney(options, false);
+    }
+
+    /**
+     * Plan journey and return list with trips
+     * @param options are options to use for planning the journey
+     * @param optimize is true when optimization should be used
+     * @return ordered list of trips in the journey
+     */
+    private List<Trip> planJourney(RoutingRequest options, boolean optimize) {
         // Calculate route and convert to path
         ShortestPathTree spt = aStar.getShortestPathTree(options);
-        GraphPath path = spt.getPath(options.rctx.target, false);
+        GraphPath path = spt.getPath(options.rctx.target, optimize);
         
         // Get all trips in order
         List<Trip> trips = new ArrayList<Trip>();
@@ -179,6 +192,47 @@ public class TestTransfers extends TestCase {
         reset(graph);
     }
 
+    public void testStopToStopTransferInReverse() throws Exception {
+        // Replace the transfer table with an empty table
+        TransferTable table = new TransferTable();
+        when(graph.getTransferTable()).thenReturn(table);
+        
+        // Compute a normal path between two stops
+        @SuppressWarnings("deprecation")
+        Vertex origin = graph.getVertex("agency_N");
+        @SuppressWarnings("deprecation")
+        Vertex destination = graph.getVertex("agency_H");
+        
+        // Set options like time and routing context
+        RoutingRequest options = new RoutingRequest();
+        options.setArriveBy(true);
+        options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 7, 12, 1, 0, 0);
+        options.setRoutingContext(graph, origin, destination);
+        
+        // Plan journey
+        List<Trip> trips;
+        trips = planJourney(options, true);
+        // Validate result
+        assertEquals("8.1", trips.get(0).getId().getId());
+        assertEquals("4.2", trips.get(1).getId().getId());
+        
+        // Add transfer to table, transfer time was 27600 seconds
+        Stop stopK = new Stop();
+        stopK.setId(new AgencyAndId("agency", "K"));
+        Stop stopF = new Stop();
+        stopF.setId(new AgencyAndId("agency", "F"));
+        table.addTransferTime(stopK, stopF, null, null, null, null, 27601);
+        
+        // Plan journey
+        trips = planJourney(options, true);
+        // Check whether a later second trip was taken
+        assertEquals("8.1", trips.get(0).getId().getId());
+        assertEquals("4.3", trips.get(1).getId().getId());
+        
+        // Revert the graph, thus using the original transfer table again
+        reset(graph);
+    }
+    
     public void testForbiddenStopToStopTransfer() throws Exception {
         // Replace the transfer table with an empty table
         TransferTable table = new TransferTable();
