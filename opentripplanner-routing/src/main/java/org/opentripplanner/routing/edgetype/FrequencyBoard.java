@@ -171,7 +171,7 @@ public class FrequencyBoard extends Edge implements OnBoardForwardEdge, PatternE
                     if (startTime >= 0) {
                         // a trip was found, wait will be non-negative
                         
-                        int wait = (int) (sd.time(startTime) - currentTime);
+                        int wait = (int) (sd.time(startTime) - state0.getTimeSeconds());
                         if (wait < 0)
                             LOG.error("negative wait time on board");
                         if (bestWait < 0 || wait < bestWait) {
