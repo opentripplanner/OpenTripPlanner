@@ -35,6 +35,10 @@ otp.core.TransitIndex = otp.Class({
         var url = otp.config.hostname + '/opentripplanner-api-webapp/ws/transit/routes';
         $.ajax(url, {
             dataType:   'jsonp',
+            
+            data: {
+                extended: 'true',
+            },
                 
             success: function(data) {
                 if(!_.has(data, 'routes')) {

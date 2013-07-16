@@ -66,6 +66,10 @@ otp.layers.StopsLayer =
             stop.lat = stop.lat || stop.stopLat;
             stop.lon = stop.lon || stop.stopLon;
 
+            // temporary TriMet specific code
+            if(stop.stopUrl.indexOf("http://trimet.org") === 0) {
+                stop.titleLink = 'http://www.trimet.org/go/cgi-bin/cstops.pl?action=entry&resptype=U&lang=en&noCat=Landmark&Loc=' + stop.id.id;
+            }
             //console.log(stop);
             
             var icon = new StopIcon20();
