@@ -642,7 +642,7 @@ otp.widgets.tripoptions.PreferredRoutes =
         
         $('#'+this.id+'-weightSlider').slider({
             min : 0,
-            max : 28800,
+            max : 57600,
             value : this_.lastSliderValue || 300,
         })
         .on('slidechange', function(evt) {
