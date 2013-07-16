@@ -44,7 +44,10 @@ otp.widgets.transit.TripViewerWidget =
         var this_ = this;
 
         this.stopList = $('<div class="otp-tripViewer-stopList notDraggable" />').appendTo(this.mainDiv);
+
+        this.scheduleLink = $('<div class="otp-tripViewer-scheduleLink notDraggable" />').appendTo(this.mainDiv);
         
+        console.log("added sched link");
         this.mainDiv.resizable({
             minWidth: 200,
             alsoResize: this.stopList,
@@ -58,6 +61,8 @@ otp.widgets.transit.TripViewerWidget =
     },
     
     variantSelected : function(variantData) {
+        console.log("var sel");
+        console.log(variantData);
         var this_ = this;
     
         this.stopList.empty();
@@ -150,6 +155,27 @@ otp.widgets.transit.TripViewerWidget =
             var scrollY = this.stopList[0].scrollHeight * this.activeLeg.from.stopIndex / (this.activeVariant.stops.length - 1);
             this.stopList.scrollTop(scrollY);
         }
+        
+        // update the route link
+        
+        var url = variantData.route.url;
+        var html = "";
+        if(url) html += 'Link to: <a href="' + url + '" target="_blank">Route Info</a>';
+
+        // temporary TriMet-specific code
+        if(url.indexOf('http://trimet.org') === 0) {
+            var day = "w";
+            if(this.activeLeg) {
+                var dow = moment(this.activeLeg.startTime).add("h", -3).day();
+                if(dow === 0) day = "h";
+                if(dow === 6) day = "s";
+            }
+            var rte = url.substring(29, 32);
+            html += ' | <a href="http://trimet.org/schedules/' + day + '/t1' + rte + '_' + variantData.direction + '.htm" target="_blank">Timetable</a>';
+        }
+        
+        this.scheduleLink.html(html);
+        
     },
     
 });

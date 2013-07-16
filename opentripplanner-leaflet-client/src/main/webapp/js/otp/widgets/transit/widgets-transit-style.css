@@ -50,6 +50,11 @@
     text-decoration: underline;
 }
 
+.otp-tripViewer-scheduleLink {
+    text-align: center;
+    margin-top: 4px;    
+}
+
 /** Stop Viewer **/
 
 .otp-stopViewer {
