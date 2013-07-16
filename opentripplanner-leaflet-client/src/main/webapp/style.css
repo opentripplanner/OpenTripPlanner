@@ -688,11 +688,6 @@ body {
 
 /* TripSummaryWidget */
 
-.otp-tripOptionsWidget {
-  padding: 0.25em 0.5em;
-  z-index: 1100;
-}
-
 .otp-defaultTripWidget {
   width: auto;
   bottom: 10px;

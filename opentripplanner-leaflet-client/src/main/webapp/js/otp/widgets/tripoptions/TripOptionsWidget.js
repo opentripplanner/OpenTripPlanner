@@ -166,9 +166,8 @@ otp.widgets.tripoptions.LocationsSelector =
     id           :  null,
     geocoders    :  null,
     
-    resultLookup :  null,
     activeIndex  :  0,
-
+    
     initialize : function(tripWidget, geocoders) {
         console.log("init loc");
         this.geocoders = geocoders;
@@ -195,10 +194,18 @@ otp.widgets.tripoptions.LocationsSelector =
     doAfterLayout : function() {
         var this_ = this;
         
-        var startInput = $("#"+this.id+"-start");
-        console.log("startInput "+startInput);
-        this.initInput(startInput, this.tripWidget.module.setStartPoint);
-        this.initInput($("#"+this.id+"-end"), this.tripWidget.module.setEndPoint);
+        this.startInput = this.initInput($("#"+this.id+"-start"), this.tripWidget.module.setStartPoint);
+        this.endInput = this.initInput($("#"+this.id+"-end"), this.tripWidget.module.setEndPoint);
+
+        
+        $("#"+this.id+"-startDropdown").click($.proxy(function() {
+            $("#"+this.id+"-start").autocomplete("widget").show();
+        }, this));
+
+        $("#"+this.id+"-endDropdown").click($.proxy(function() {
+            $("#"+this.id+"-end").autocomplete("widget").show();
+        }, this));
+                
 
         $("#"+this.id+"-reverseButton").click($.proxy(function() {
             var module = this.tripWidget.module;
@@ -208,6 +215,7 @@ otp.widgets.tripoptions.LocationsSelector =
             module.setStartPoint(endLatLng, false, endName);
             module.setEndPoint(startLatLng, false, startName);
             this_.tripWidget.inputChanged();
+            
         }, this));
         
         if(this.geocoders.length > 1) {
@@ -225,29 +233,29 @@ otp.widgets.tripoptions.LocationsSelector =
                 this_.geocoders[this_.activeIndex].geocode(request.term, function(results) {
                     console.log("got results "+results.length);
                     response.call(this, _.pluck(results, 'description'));
-                    this_.updateResultLookup(results);
+                    input.data("results", this_.getResultLookup(results));
                 });
             },
             select: function(event, ui) {
-                var result = this_.resultLookup[ui.item.value];
+                var result = input.data("results")[ui.item.value];
                 var latlng = new L.LatLng(result.lat, result.lng);
                 this_.tripWidget.module.webapp.map.lmap.panTo(latlng);
                 setterFunction.call(this_.tripWidget.module, latlng, false, result.description);
                 this_.tripWidget.inputChanged();
-            }
+            },
         })
-        .click(function() {
+        .dblclick(function() {
             $(this).select();
-        })
-        .change(function() {
         });
+        return input;
     },
     
-    updateResultLookup : function(results) {
-        this.resultLookup = {};
+    getResultLookup : function(results) {
+        var resultLookup = {};
         for(var i=0; i<results.length; i++) {
-            this.resultLookup[results[i].description] = results[i];
-        }    
+            resultLookup[results[i].description] = results[i];
+        }
+        return resultLookup;
     },
     
     restorePlan : function(data) {
