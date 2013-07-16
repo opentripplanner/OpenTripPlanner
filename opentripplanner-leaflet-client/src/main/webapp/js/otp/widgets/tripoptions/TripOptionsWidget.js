@@ -300,8 +300,9 @@ otp.widgets.tripoptions.TimeSelector =
         html += '<option>Arrive</option>';
         html += '</select>';
         
-        var inputId = this.id+'-picker';
-        html += '&nbsp;<input type="text" name="'+inputId+'" id="'+inputId+'" class="otp-datepicker-input" />';
+        //var inputId = this.id+'-datepicker';
+        html += '&nbsp;<input type="text" id="'+this.id+'-date" class="otp-date-input" />';
+        html += '&nbsp;<input type="text" id="'+this.id+'-time" class="otp-time-input" />';
         
         html += '</div>';
         $(html).appendTo(this.$());
@@ -317,7 +318,7 @@ otp.widgets.tripoptions.TimeSelector =
         });
 
 
-        $('#'+this.id+'-picker').datetimepicker({
+        /*$('#'+this.id+'-picker').datetimepicker({
             timeFormat: "hh:mmtt", 
             onSelect: function(dateTime) {
                 var dateTimeArr = dateTime.split(' ');
@@ -327,14 +328,49 @@ otp.widgets.tripoptions.TimeSelector =
                 });
             }
         });
-        $('#'+this.id+'-picker').datepicker("setDate", new Date());
+        $('#'+this.id+'-picker').datepicker("setDate", new Date());*/
+
+        $('#'+this.id+'-date').datepicker({
+            timeFormat: "hh:mmtt", 
+            onSelect: function(date) {
+                this_.tripWidget.inputChanged({
+                    date : date,
+                });
+            }
+        });
+        $('#'+this.id+'-date').datepicker("setDate", new Date());
+        
+        $('#'+this.id+'-time').val(moment().format(otp.config.timeFormat))
+        .keyup(function() {
+            if(otp.config.timeFormat.toLowerCase().charAt(otp.config.timeFormat.length-1) === 'a') {
+                var val = $(this).val();
+                if(val.charAt(val.length-1) === 'a' || val.charAt(val.length-1) === 'p') {
+                    if(otp.util.Text.isNumber(val.substring(0, val.length-1))) {
+                        var hour = parseInt(val.substring(0, val.length-1));
+                        if(hour >= 1 && hour <= 12) $(this).val(hour + ":00" + val.charAt(val.length-1) + "m")
+                    }
+                }
+            }            
+            this_.tripWidget.inputChanged({
+                time : $(this).val(),
+            });
+            
+        });
+        
+
     },
 
     restorePlan : function(data) {
-        var m = moment(data.queryParams.date+" "+data.queryParams.time, "MM-DD-YYYY h:mma");
-        $('#'+this.id+'-picker').datepicker("setDate", new Date(m));
-        this.tripWidget.module.date = data.queryParams.date;
-        this.tripWidget.module.time = data.queryParams.time;
+        //var m = moment(data.queryParams.date+" "+data.queryParams.time, "MM-DD-YYYY h:mma");
+        //$('#'+this.id+'-picker').datepicker("setDate", new Date(m));
+        if(data.queryParams.date) {
+            $('#'+this.id+'-date').datepicker("setDate", new Date(moment(data.queryParams.date, "MM-DD-YYYY")));
+            this.tripWidget.module.date = data.queryParams.date;
+        }
+        if(data.queryParams.time) {
+            $('#'+this.id+'-time').val(data.queryParams.time);
+            this.tripWidget.module.time = data.queryParams.time;
+        }
         if(data.queryParams.arriveBy === true || data.queryParams.arriveBy === "true") {
             this.tripWidget.module.arriveBy = true;
             $('#'+this.id+'-depArr option:eq(1)').prop('selected', true);  

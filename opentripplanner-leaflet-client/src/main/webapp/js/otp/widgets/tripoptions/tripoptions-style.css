@@ -1,0 +1,12 @@
+/* Date/Time Picker */
+
+.otp-date-input {
+    text-align: center;
+    width: 80px;
+}
+
+.otp-time-input {
+    text-align: center;
+    width: 60px;
+}
+
