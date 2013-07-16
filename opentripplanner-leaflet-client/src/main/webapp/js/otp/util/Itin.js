@@ -103,7 +103,7 @@ otp.util.Itin = {
                 otp.util.Text.ordinal(step.exit)+' exit on '+step.streetName;
         }
         else {
-            if(!step.relativeDirection) text += "Start on" + (asHtml ? " <b>" : " ") + step.streetName + (asHtml ? "</b>" : "");
+            if(!step.relativeDirection) text += "Start on" + (asHtml ? " <b>" : " ") + step.streetName + (asHtml ? "</b>" : "") + " heading " + step.absoluteDirection.toLowerCase();
             else {
                 text += (asHtml ? "<b>" : "") + otp.util.Text.capitalizeFirstChar(this.directionString(step.relativeDirection)) +
                             (asHtml ? "</b>" : "") + ' ' + (step.stayOn ? "to continue on" : "on to")  + (asHtml ? " <b>" : " ") +
