@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -96,9 +97,11 @@ public class FrequencyAlight extends Edge  implements OnBoardReverseEdge {
             if (state0.getNumBoardings() > 0) {
                 // This is not the first boarding, thus a transfer
                 TransferTable transferTable = options.getRoutingContext().transferTable;
+                // Get the current stop
+                Stop currentStop = ((TransitVertex) tov).getStop(); 
                 // Get the transfer time
                 int transferTime = transferTable.getTransferTime(state0.getPreviousStop(),
-                        state0.getCurrentStop(), state0.getPreviousTrip(), trip);
+                        currentStop, state0.getPreviousTrip(), trip, false);
                 if (transferTime > 0) {
                     // There is a minimum transfer time to make this transfer
                     // Decrease current time if necessary
