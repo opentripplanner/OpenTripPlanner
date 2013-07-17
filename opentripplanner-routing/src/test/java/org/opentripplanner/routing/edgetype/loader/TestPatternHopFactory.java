@@ -588,8 +588,8 @@ public class TestPatternHopFactory extends TestCase {
             previousArrivalTime = pattern.getPreviousArrivalTime(0, 60*60*11, false, false, false);
             assertEquals(60*60*10, previousArrivalTime);
             
-            previousArrivalTime = pattern.getPreviousArrivalTime(0, 60*60*18, false, false, false);
-            assertEquals(60*60*16, previousArrivalTime);
+            previousArrivalTime = pattern.getPreviousArrivalTime(0, 60*60*19, false, false, false);
+            assertEquals(60*60*18, previousArrivalTime);
         }
         assertTrue(boarded);
         

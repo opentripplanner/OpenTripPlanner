@@ -119,7 +119,7 @@ public class FrequencyBoard extends Edge implements OnBoardForwardEdge, PatternE
                 // This is not the first boarding, thus a transfer
                 TransferTable transferTable = options.getRoutingContext().transferTable;
                 // Get the current stop
-                Stop currentStop = ((TransitVertex) fromv).getStop(); 
+                Stop currentStop = ((TransitVertex) fromv).getStop();
                 // Get the transfer time
                 int transferTime = transferTable.getTransferTime(state0.getPreviousStop(),
                         currentStop, state0.getPreviousTrip(), trip, true);
@@ -171,7 +171,7 @@ public class FrequencyBoard extends Edge implements OnBoardForwardEdge, PatternE
                     if (startTime >= 0) {
                         // a trip was found, wait will be non-negative
                         
-                        int wait = (int) (sd.time(startTime) - currentTime);
+                        int wait = (int) (sd.time(startTime) - state0.getTimeSeconds());
                         if (wait < 0)
                             LOG.error("negative wait time on board");
                         if (bestWait < 0 || wait < bestWait) {
