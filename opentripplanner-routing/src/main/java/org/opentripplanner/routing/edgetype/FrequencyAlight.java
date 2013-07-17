@@ -157,7 +157,7 @@ public class FrequencyAlight extends Edge  implements OnBoardReverseEdge {
                     if (startTime >= 0) {
                         // a trip was found, wait will be non-negative
                         
-                        int wait = (int) (currentTime - sd.time(startTime));
+                        int wait = (int) (state0.getTimeSeconds() - sd.time(startTime));
                         if (wait < 0)
                             LOG.error("negative wait time on alight");
                         if (bestWait < 0 || wait < bestWait) {
