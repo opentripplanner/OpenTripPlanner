@@ -13,27 +13,20 @@
 
 package org.opentripplanner.updater.stoptime;
 
-import static org.opentripplanner.common.IterableLibrary.filter;
-
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.PostConstruct;
 
 import lombok.Setter;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.edgetype.TimetableSnapshotSource;
-import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
+import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.trippattern.Update;
 import org.opentripplanner.routing.trippattern.UpdateBlock;
-import org.opentripplanner.routing.vertextype.TransitStopDepart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,32 +59,25 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
     /** The working copy of the timetable resolver. Should not be visible to routing threads. */
     private TimetableResolver buffer = new TimetableResolver();
     
-    /** A map from Trip AgencyAndIds to the TripPatterns that contain them */
-    private Map<AgencyAndId, TableTripPattern> patternIndex;
+    /** The TransitIndexService */
+    private TransitIndexService transitIndexService;
+    
     // nothing in the timetable snapshot binds it to one graph. we could use this updater for all
     // graphs at once
     private Graph graph;
     private long lastSnapshotTime = -1;
     
     /**
-     * Once the data sources and target graphs have been set, index all trip patterns on the 
-     * tripIds of Trips they contain.
+     * Set the data sources for the target graphs.
      */
     @PostConstruct
     public void setup () {
         graph = graphService.getGraph();
-        patternIndex = new HashMap<AgencyAndId, TableTripPattern>();
-        for (TransitStopDepart tsd : filter(graph.getVertices(), TransitStopDepart.class)) {
-            for (TransitBoardAlight tba : filter(tsd.getOutgoing(), TransitBoardAlight.class)) {
-                if (!tba.isBoarding())
-                    continue;
-                TableTripPattern pattern = tba.getPattern();
-                for (Trip trip : pattern.getTrips()) {
-                    patternIndex.put(trip.getId(), pattern);
-                }
-            }
-        }
         graph.timetableSnapshotSource = this;
+        transitIndexService = graph.getService(TransitIndexService.class);
+        if (transitIndexService == null)
+            throw new RuntimeException(
+                    "Real-time update need a TransitIndexService. Please setup one during graph building.");
     }
     
     public synchronized TimetableResolver getSnapshot() {
@@ -139,7 +125,7 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
                     LOG.debug("UpdateBlock contains no updates after filtering, skipping.");
                     continue; 
                 }
-                TableTripPattern pattern = patternIndex.get(block.tripId);
+                TableTripPattern pattern = transitIndexService.getTripPatternForTrip(block.tripId);
                 if (pattern == null) {
                     LOG.debug("No pattern found for tripId {}, skipping UpdateBlock.", block.tripId);
                     continue;

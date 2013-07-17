@@ -68,11 +68,12 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
         /* 1. Get the list of PatternHop for the given trip ID. */
         AgencyAndId tripId = opt.getStartingTransitTripId();
         TransitIndexService transitIndexService = ctx.graph.getService(TransitIndexService.class);
-        List<PatternHop> hops = transitIndexService.getPatternHopsForTrip(tripId);
-        if (hops == null) {
+        TableTripPattern tripPattern = transitIndexService.getTripPatternForTrip(tripId);
+        if (tripPattern == null) {
             // TODO Shouldn't we bailout on a normal trip plan here, returning null ?
             throw new IllegalArgumentException("Unknown/invalid trip ID: " + tripId);
         }
+        List<PatternHop> hops = tripPattern.getPatternHops();
 
         /*
          * 2. Get the best hop from the list, given the parameters. Currently look for nearest hop,
