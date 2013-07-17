@@ -57,7 +57,16 @@ public class OTPMain {
             jc.usage();
             System.exit(0);
         }
-        main.run();
+        while (true) {
+            try {
+                main.run();
+                return;
+            }
+            catch (Throwable throwable) {
+                LOG.error("An uncaught " + throwable.getClass().getSimpleName()
+                        + " occurred inside OTP. Restarting server.", throwable);
+            }
+        }
     }
     
     private void run() {
