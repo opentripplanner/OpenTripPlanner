@@ -1,12 +1,12 @@
 #{script 'jquery-1.8.2.js' /}
 #{script 'jquery-ui-1.9.1.custom.js' /}
 #{stylesheet 'jquery-ui/jquery-ui-1.9.1.custom.css' /}
+#{stylesheet 'main.css' /}
 
 #{form @FieldTrip.newRequest(), id:'requestForm'}
 
 
-<center>
-<div style="width: 800px; margin-top: 20px; text-align: left;">
+<div class="mainContent">
 <h2>Field Trip Request Form</h2>
 
 Complete and return this form to request a field trip if you wish to travel on TriMet with a group of 15 or more. 
@@ -15,26 +15,26 @@ If you have any questions, please email us at fieldtrips@trimet.org or call 503-
 <h3>Contact Information</h3>
 
 <div class="otp-fieldTripRequest-row">
-  Teacher Name: <input id="teacherName" name="request.teacherName"/>&nbsp;&nbsp;
-  School Name: <input id="schoolName"  name="request.schoolName"/>
+  Teacher Name: <input id="teacherName" name="req.teacherName"/>&nbsp;&nbsp;
+  School Name: <input id="schoolName"  name="req.schoolName"/>
 </div>
 
 <div class="otp-fieldTripRequest-row">
-  Address: <input name="request.address" />&nbsp;&nbsp;
-  City: <input name="request.city" />&nbsp;&nbsp;
-  State: <input name="request.state" style="width: 40px;" />&nbsp;&nbsp;
-  Zip: <input name="request.zip" style="width: 60px;" />
+  Address: <input name="req.address" />&nbsp;&nbsp;
+  City: <input name="req.city" />&nbsp;&nbsp;
+  State: <input name="req.state" style="width: 40px;" />&nbsp;&nbsp;
+  Zip: <input name="req.zip" style="width: 60px;" />
 </div>
 
 
 <div class="otp-fieldTripRequest-row">
-  Phone: <input name="request.phoneNumber" />&nbsp;&nbsp;
-  Fax: <input name="request.faxNumber" />
+  Phone: <input name="req.phoneNumber" />&nbsp;&nbsp;
+  Fax: <input name="req.faxNumber" />
 </div>
 
 <div class="otp-fieldTripRequest-row">
-  Email Address: <input id="emailAddress" name="request.emailAddress" />&nbsp;&nbsp;
-  Grade: <input name="request.grade" style="width: 40px;" />
+  Email Address: <input id="emailAddress" name="req.emailAddress" />&nbsp;&nbsp;
+  Grade: <input name="req.grade" style="width: 40px;" />
 </div>
 
 
@@ -42,16 +42,20 @@ If you have any questions, please email us at fieldtrips@trimet.org or call 503-
 
 
 <div class="otp-fieldTripRequest-row">
-  # of Students: <input id="numStudents" name="request.numStudents" style="width: 40px;" />&nbsp;&nbsp;&nbsp;
-  Age Range: <input name="request.minimumAge" style="width: 30px;" /> to <input name="request.maximumAge" style="width: 30px;" />&nbsp;&nbsp;&nbsp;# of Chaperones (including Teachers): <input name="request.numChaperones" style="width: 40px;" />
+  # of Students: <input id="numStudents" name="req.numStudents" style="width: 40px;" />&nbsp;&nbsp;&nbsp;
+  Age Range: <input name="req.minimumAge" style="width: 30px;" /> to <input name="req.maximumAge" style="width: 30px;" />&nbsp;&nbsp;&nbsp;# of Chaperones (including Teachers): <input name="req.numChaperones" style="width: 40px;" />
 </div>
 
 <div class="otp-fieldTripRequest-row">
-  Starting Point (Address): <input id="startLocation" name="request.startLocation" />&nbsp;&nbsp;Destination (Address): <input id="endLocation" name="request.endLocation" />
+  Starting Point (Address): <input id="startLocation" name="req.startLocation" />&nbsp;&nbsp;Destination (Address): <input id="endLocation" name="req.endLocation" />
 </div>
 
 <div class="otp-fieldTripRequest-row">
-  Date of Trip: <input id="travelDate" name="request.travelDate" />
+  Intermediate Point(s): <input id="startLocation" name="req.intermediateLocations" style="width: 600px;" />
+</div>
+
+<div class="otp-fieldTripRequest-row">
+  Date of Trip: <input id="travelDate" name="req.travelDate" />
 </div>
 
 <div class="otp-fieldTripRequest-row">
@@ -62,7 +66,7 @@ If you have any questions, please email us at fieldtrips@trimet.org or call 503-
         <option value="PM">PM</option>
     </select>
 </div>
-<input type="hidden" id="arriveDestinationTime" name="request.arriveDestinationTime" />
+<input type="hidden" id="arriveDestinationTime" name="req.arriveDestinationTime" />
 
 
 <div class="otp-fieldTripRequest-row">
@@ -73,7 +77,7 @@ If you have any questions, please email us at fieldtrips@trimet.org or call 503-
         <option value="PM">PM</option>
     </select>
 </div>
-<input type="hidden" id="leaveDestinationTime" name="request.leaveDestinationTime" />
+<input type="hidden" id="leaveDestinationTime" name="req.leaveDestinationTime" />
 
 
 <div class="otp-fieldTripRequest-row">
@@ -84,7 +88,7 @@ If you have any questions, please email us at fieldtrips@trimet.org or call 503-
         <option value="PM">PM</option>
     </select>
 </div>
-<input type="hidden" id="arriveSchoolTime" name="request.arriveSchoolTime" />
+<input type="hidden" id="arriveSchoolTime" name="req.arriveSchoolTime" />
 
 
 <h3>Payment Information</h3>
@@ -92,21 +96,19 @@ If you have any questions, please email us at fieldtrips@trimet.org or call 503-
 <div class="otp-fieldTripRequest-row">
   Payment preference:
 </div>
-<input name="paymentPreference" type="radio" value="request_call" checked /> Please call me at above phone number<br>
-<input name="paymentPreference" type="radio" value="fax_cc" /> I will fax credit card information to TriMet<br>
-<input name="paymentPreference" type="radio" value="mail_check" /> I will mail a check to TriMet
+<input name="req.paymentPreference" type="radio" value="request_call" checked /> Please call me at above phone number<br>
+<input name="req.paymentPreference" type="radio" value="fax_cc" /> I will fax credit card information to TriMet<br>
+<input name="req.paymentPreference" type="radio" value="mail_check" /> I will mail a check to TriMet
 
-
-</div>
-</center>
-
+<p><input type="checkbox" name="req.requireInvoice" /> I need an invoice before paying
 
 #{/form}
 
 
-<div style="margin-top: 20px; text-align: center;">
-    <!--<input type="submit" value="Submit your Request" style="font-size: 20px;" />-->
-    <button id="submitButton">Submit Request</button>
+<div class="buttonRow">
+    <div id="submitLink" style="cursor:pointer; border: 2px solid gray; width: 250px; padding: 3px; margin: 4px auto; background: white;">Submit Request</div>
+</div>
+
 </div>
 
 
@@ -115,7 +117,7 @@ If you have any questions, please email us at fieldtrips@trimet.org or call 503-
 $(document).ready(function() {
     console.log("startup");
     $("#travelDate").datepicker();
-    $("#submitButton").click(function() {
+    $("#submitLink").click(function() {
         submitClicked();
     });
 });
@@ -150,7 +152,6 @@ function submitClicked() {
         return;
     }
     $("#arriveSchoolTime").val(arriveSchoolTime);
-
 
     document.forms["requestForm"].submit();
 }

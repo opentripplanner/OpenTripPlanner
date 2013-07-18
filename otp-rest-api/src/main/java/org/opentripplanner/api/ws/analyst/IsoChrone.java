@@ -55,34 +55,6 @@ import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.linearref.LengthIndexedLine;
 
-/**
- * <p>
- * The method calculates walksheds for a given location, based on time given to walk and the walkspeed. For that two parameters "walkTime" and
- * "output" have been added to the request API. Depending on the value for the "output" parameter (i.e. "POINTS", "SHED" or "EDGES"), a different type
- * of GeoJSON geometry is returned. If a SHED is requested, then a ConcaveHull of the EDGES/roads is returned. If that fails, a ConvexHull will be
- * returned. <br>
- * The ConcaveHull parameter is set to 0.005 degrees. The offroad walkspeed is assumed to be 0.83333 m/sec (= 3km/h) until a road is hit.<br>
- * Note that the set of EDGES/roads returned as well as POINTS returned may contain duplicates. If POINTS are requested, then not the end-points are
- * returned at which the max time is reached, but instead all the graph nodes/crossings that are within the time limits.<br>
- * In case there is no road near by within the given time, then a circle for the walktime limit is created and returned for the SHED parameter.
- * Otherwise the edge with the direction towards the closest road. Note that the circle is calculated in Euclidian 2D coordinates, and distortions
- * towards an ellipse will appear if it is transformed/projected to the user location.
- * </p>
- * <p>
- * An example request may look like this:
- * localhost:8080/opentripplanner-api-webapp/ws/iso?layers=traveltime&styles=mask&batch=true&fromPlace=51.040193121307176
- * %2C-114.04471635818481&toPlace
- * =51.09098935%2C-113.95179705&time=2012-06-06T08%3A00%3A00&mode=WALK&maxWalkDistance=10000&walkSpeed=1.38&walkTime=10.7&output=EDGES Though the
- * first parameters (i) layer, (ii) styles and (iii) batch could be discarded.
- * </p>
- * 
- * @return Returns a JSON document containing geometries, either points, lineStrings or a polygon.
- * 
- * @throws JSONException
- * 
- * @author sstein---geo.uzh.ch
- * 
- */
 @Path("/iso")
 @XmlRootElement
 @Autowire
@@ -137,10 +109,44 @@ public class IsoChrone extends RoutingResource {
 
     private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
+    /**
+     * Calculates walksheds for a given location, based on time given to walk and the walk speed. 
+     *
+     * Depending on the value for the "output" parameter (i.e. "POINTS", "SHED" or "EDGES"), a 
+     * different type of GeoJSON geometry is returned. If a SHED is requested, then a ConcaveHull 
+     * of the EDGES/roads is returned. If that fails, a ConvexHull will be returned. 
+     * <p>
+     * The ConcaveHull parameter is set to 0.005 degrees. The offroad walkspeed is assumed to be 
+     * 0.83333 m/sec (= 3km/h) until a road is hit.
+     * <p>
+     * Note that the set of EDGES/roads returned as well as POINTS returned may contain duplicates. 
+     * If POINTS are requested, then not the end-points are returned at which the max time is 
+     * reached, but instead all the graph nodes/crossings that are within the time limits.
+     * <p>
+     * In case there is no road near by within the given time, then a circle for the walktime limit 
+     * is created and returned for the SHED parameter. Otherwise the edge with the direction 
+     * towards the closest road. Note that the circle is calculated in Euclidian 2D coordinates, 
+     * and distortions towards an ellipse will appear if it is transformed/projected to the user location.
+     * <p>
+     * An example request may look like this:
+     * localhost:8080/opentripplanner-api-webapp/ws/iso?layers=traveltime&styles=mask&batch=true&fromPlace=51.040193121307176
+     * %2C-114.04471635818481&toPlace
+     * =51.09098935%2C-113.95179705&time=2012-06-06T08%3A00%3A00&mode=WALK&maxWalkDistance=10000&walkSpeed=1.38&walkTime=10.7&output=EDGES 
+     * Though the first parameters (i) layer, (ii) styles and (iii) batch could be discarded.
+     * 
+     * @param walkmins Maximum number of minutes to walk.
+     * @param output Can be set to "POINTS", "SHED" or "EDGES" to return different types of GeoJSON 
+     *        geometry. SHED returns a ConcaveHull or ConvexHull of the edges/roads. POINTS returns
+     *        all graph nodes that are within the time limit. 
+     * @return a JSON document containing geometries (either points, lineStrings or a polygon).
+     * @throws Exception
+     * @author sstein---geo.uzh.ch
+     */
     @GET
     @Produces({ MediaType.APPLICATION_JSON })
-    public String getIsochrone(@QueryParam("walkTime") @DefaultValue("15") double walkmins,
-            @QueryParam("output") @DefaultValue("POINTS") String output) throws Exception {
+    public String getIsochrone(
+            @QueryParam("walkTime") @DefaultValue("15")     double walkmins,
+            @QueryParam("output")   @DefaultValue("POINTS") String output ) throws Exception {
 
         this.debugGeoms = new ArrayList();
         this.tooFastTraversedEdgeGeoms = new ArrayList();

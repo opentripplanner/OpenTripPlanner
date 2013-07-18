@@ -57,6 +57,9 @@ public class FieldTripRequest extends GenericModel  {
     public String endLocation;
 
     @Expose
+    public String intermediateLocations;
+    
+    @Expose
     public Integer numStudents;
 
     @Expose
@@ -88,11 +91,25 @@ public class FieldTripRequest extends GenericModel  {
     public String paymentPreference;
 
     @Expose
+    public Boolean requireInvoice;
+    
+    /*@Expose
+    @OneToOne(mappedBy="outboundRequest", cascade=CascadeType.ALL)
     public ScheduledFieldTrip outboundTrip;
 
     @Expose
-    public ScheduledFieldTrip inboundTrip;
+    @OneToOne(mappedBy="inboundRequest", cascade=CascadeType.ALL)
+    public ScheduledFieldTrip inboundTrip;*/
     
+    @OneToMany(mappedBy="request", cascade=CascadeType.ALL)
+    @Expose
+    public List<ScheduledFieldTrip> trips;
+    
+    
+    @OneToMany(mappedBy="request", cascade=CascadeType.ALL)
+    @Expose
+    public List<FieldTripFeedback> feedback;
+        
     @Expose
     @As("yyyy-MM-dd'T'HH:mm:ss")
     public Date timeStamp;

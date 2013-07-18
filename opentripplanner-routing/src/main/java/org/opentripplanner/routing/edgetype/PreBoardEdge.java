@@ -106,7 +106,6 @@ public class PreBoardEdge extends FreeEdge {
             StateEditor s1 = s0.edit(this);
             s1.setTimeSeconds(board_after);
             s1.setEverBoarded(true);
-            s1.setCurrentStop(fromVertex.getStop());
             long wait_cost = board_after - t0;
             s1.incrementWeight(wait_cost + transfer_penalty);
             s1.setBackMode(getMode());

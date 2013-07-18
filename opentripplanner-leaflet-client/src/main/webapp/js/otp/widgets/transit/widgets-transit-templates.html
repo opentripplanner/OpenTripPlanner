@@ -1,0 +1,33 @@
+<script id="otp-stopViewer" type="text/html">
+
+    <div class="otp-stopViewer-container notDraggable">
+        <div class="otp-stopViewer-stopInfo"> 
+            (No Stop Selected)
+        </div>
+        <!--<div style="margin-top: 4px;">
+            <b>ID</b>: <input type='text' class="otp-stopViewer-idInput" />
+            <button class="otp-stopViewwer-reloadButton">Reload</button>
+        </div>-->
+        <div style="margin-top: 4px; text-align: center;">
+            <b>Date</b>: <input type='text' class="otp-stopViewer-dateInput" />
+        </div>
+        <div class="otp-stopViewer-timeList"></div>
+    </div>
+</script>
+
+<script id="otp-stopViewer-timeListItem" type="text/html">
+    <div class="otp-stopViewer-timeListItem">
+        <div class="otp-stopViewer-timeRow">
+            {{formattedTime}}
+        </div>
+        <div class="otp-stopViewer-routeRow">
+            {{#trip.route.shortName}}
+                ({{trip.route.shortName}}) 
+            {{/trip.route.shortName}}
+            {{trip.route.longName}}
+        </div>
+        <div class="otp-stopViewer-tripRow">
+            Trip {{trip.id.agencyId}}_{{trip.id.id}}
+        </div>
+    </div>
+</script>

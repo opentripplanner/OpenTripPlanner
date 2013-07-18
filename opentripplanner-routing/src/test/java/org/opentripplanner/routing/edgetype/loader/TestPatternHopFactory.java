@@ -322,11 +322,11 @@ public class TestPatternHopFactory extends TestCase {
         Stop stopM = ((TransitStopDepart)graph.getVertex("agency_M_depart")).getStop();
         
         assertTrue(transferTable.hasPreferredTransfers());
-        assertEquals(StopTransfer.UNKNOWN_TRANSFER, transferTable.getTransferTime(stopN, stopM, fromTrip, toTrip));
-        assertEquals(StopTransfer.FORBIDDEN_TRANSFER, transferTable.getTransferTime(stopK, stopM, fromTrip, toTrip));
-        assertEquals(StopTransfer.PREFERRED_TRANSFER, transferTable.getTransferTime(stopN, stopK, toTrip, toTrip2));
-        assertEquals(StopTransfer.TIMED_TRANSFER, transferTable.getTransferTime(stopN, stopK, fromTrip, toTrip));
-        assertEquals(15, transferTable.getTransferTime(stopN, stopK, fromTrip, toTrip2));
+        assertEquals(StopTransfer.UNKNOWN_TRANSFER, transferTable.getTransferTime(stopN, stopM, fromTrip, toTrip, true));
+        assertEquals(StopTransfer.FORBIDDEN_TRANSFER, transferTable.getTransferTime(stopK, stopM, fromTrip, toTrip, true));
+        assertEquals(StopTransfer.PREFERRED_TRANSFER, transferTable.getTransferTime(stopN, stopK, toTrip, toTrip2, true));
+        assertEquals(StopTransfer.TIMED_TRANSFER, transferTable.getTransferTime(stopN, stopK, fromTrip, toTrip, true));
+        assertEquals(15, transferTable.getTransferTime(stopN, stopK, fromTrip, toTrip2, true));
         
         Vertex e_arrive = graph.getVertex("agency_E_arrive");
         Vertex f_depart = graph.getVertex("agency_F_depart");
@@ -588,8 +588,8 @@ public class TestPatternHopFactory extends TestCase {
             previousArrivalTime = pattern.getPreviousArrivalTime(0, 60*60*11, false, false, false);
             assertEquals(60*60*10, previousArrivalTime);
             
-            previousArrivalTime = pattern.getPreviousArrivalTime(0, 60*60*18, false, false, false);
-            assertEquals(60*60*16, previousArrivalTime);
+            previousArrivalTime = pattern.getPreviousArrivalTime(0, 60*60*19, false, false, false);
+            assertEquals(60*60*18, previousArrivalTime);
         }
         assertTrue(boarded);
         

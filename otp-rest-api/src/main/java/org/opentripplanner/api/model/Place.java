@@ -45,6 +45,12 @@ public class Place {
     public String stopCode = null;
 
     /**
+      * The code or name identifying the quay/platform the vehicle will arrive at or depart from
+      *
+    */
+    public String platformCode = null;
+
+    /**
      * The longitude of the place.
      */
     public Double lon = null;

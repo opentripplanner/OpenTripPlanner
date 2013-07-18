@@ -7,10 +7,22 @@ import java.util.*;
 import models.TrinetUser;
 
 import models.calltaker.TripQuery;
-import play.data.binding.As;
+import play.mvc.Util;
 
 public class Calltaker extends Application {
 
+    @Util
+    public static void checkAccess(TrinetUser user) {
+        if(user == null) {
+            System.out.println("null user in FieldTrip module");
+            forbidden("null user");
+        }
+        if(!user.hasCalltakerAccess()) {
+            System.out.println("User " + user.username + " has insufficient access for Calltaker module");
+            forbidden("insufficient access privileges");
+        }
+    }
+    
     public static void index() {
         //List<OTPQuery> queries = OTPQuery.all().fetch(10);
         //render(queries);
@@ -34,6 +46,7 @@ public class Calltaker extends Application {
     
     public static void newCall(Call call) {
         TrinetUser user = checkLogin();        
+        checkAccess(user);
         call.user = user;
         call.save();
         System.out.println("saved call for "+call.user);
@@ -43,6 +56,7 @@ public class Calltaker extends Application {
 
     public static void getCall(Integer limit) {
         TrinetUser user = checkLogin();        
+        checkAccess(user);
         System.out.println("getCall for "+user);
         List<Call> calls;
         if(limit == null)
@@ -57,7 +71,8 @@ public class Calltaker extends Application {
     }
 
     public static void getQuery(Call call, Integer limit) {
-        TrinetUser user = checkLogin();        
+        TrinetUser user = checkLogin();
+        checkAccess(user);
         List<TripQuery> queries;
         if(limit == null)
             queries = TripQuery.find("call.id = '"+call.id+"' order by timeStamp").fetch();
@@ -69,6 +84,7 @@ public class Calltaker extends Application {
     
     public static void newQuery(TripQuery query) {
         TrinetUser user = checkLogin();        
+        checkAccess(user);
         //System.out.println("nQ request params: " + request.params.allSimple());
         //query.user = user;
         query.save();
@@ -77,8 +93,9 @@ public class Calltaker extends Application {
 
     public static void deleteQuery(Long id) {
         TrinetUser user = checkLogin();        
+        checkAccess(user);
         TripQuery query = TripQuery.findById(id);  
         query.delete();
         render(id);
-    }  
+    }
 }

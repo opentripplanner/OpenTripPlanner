@@ -96,8 +96,13 @@ otp.widgets.tripoptions.TripOptionsWidget =
         this.restorePlan({ queryParams : queryParams });
     },
 
-    restoreDefaults : function() {
-        this.applyQueryParams(this.module.defaultQueryParams);
+    restoreDefaults : function(useCurrentTime) {
+        var params = _.clone(this.module.defaultQueryParams);
+        if(useCurrentTime) {
+            params['date'] = moment().format("MM-DD-YYYY");
+            params['time'] = moment().format("h:mma");
+        }
+        this.applyQueryParams(params);
     },
     
     newItinerary : function(itin) {
@@ -161,9 +166,8 @@ otp.widgets.tripoptions.LocationsSelector =
     id           :  null,
     geocoders    :  null,
     
-    resultLookup :  null,
     activeIndex  :  0,
-
+    
     initialize : function(tripWidget, geocoders) {
         console.log("init loc");
         this.geocoders = geocoders;
@@ -190,10 +194,18 @@ otp.widgets.tripoptions.LocationsSelector =
     doAfterLayout : function() {
         var this_ = this;
         
-        var startInput = $("#"+this.id+"-start");
-        console.log("startInput "+startInput);
-        this.initInput(startInput, this.tripWidget.module.setStartPoint);
-        this.initInput($("#"+this.id+"-end"), this.tripWidget.module.setEndPoint);
+        this.startInput = this.initInput($("#"+this.id+"-start"), this.tripWidget.module.setStartPoint);
+        this.endInput = this.initInput($("#"+this.id+"-end"), this.tripWidget.module.setEndPoint);
+
+        
+        $("#"+this.id+"-startDropdown").click($.proxy(function() {
+            $("#"+this.id+"-start").autocomplete("widget").show();
+        }, this));
+
+        $("#"+this.id+"-endDropdown").click($.proxy(function() {
+            $("#"+this.id+"-end").autocomplete("widget").show();
+        }, this));
+                
 
         $("#"+this.id+"-reverseButton").click($.proxy(function() {
             var module = this.tripWidget.module;
@@ -203,6 +215,7 @@ otp.widgets.tripoptions.LocationsSelector =
             module.setStartPoint(endLatLng, false, endName);
             module.setEndPoint(startLatLng, false, startName);
             this_.tripWidget.inputChanged();
+            
         }, this));
         
         if(this.geocoders.length > 1) {
@@ -220,29 +233,29 @@ otp.widgets.tripoptions.LocationsSelector =
                 this_.geocoders[this_.activeIndex].geocode(request.term, function(results) {
                     console.log("got results "+results.length);
                     response.call(this, _.pluck(results, 'description'));
-                    this_.updateResultLookup(results);
+                    input.data("results", this_.getResultLookup(results));
                 });
             },
             select: function(event, ui) {
-                var result = this_.resultLookup[ui.item.value];
+                var result = input.data("results")[ui.item.value];
                 var latlng = new L.LatLng(result.lat, result.lng);
                 this_.tripWidget.module.webapp.map.lmap.panTo(latlng);
                 setterFunction.call(this_.tripWidget.module, latlng, false, result.description);
                 this_.tripWidget.inputChanged();
-            }
+            },
         })
-        .click(function() {
+        .dblclick(function() {
             $(this).select();
-        })
-        .change(function() {
         });
+        return input;
     },
     
-    updateResultLookup : function(results) {
-        this.resultLookup = {};
+    getResultLookup : function(results) {
+        var resultLookup = {};
         for(var i=0; i<results.length; i++) {
-            this.resultLookup[results[i].description] = results[i];
-        }    
+            resultLookup[results[i].description] = results[i];
+        }
+        return resultLookup;
     },
     
     restorePlan : function(data) {
@@ -295,8 +308,9 @@ otp.widgets.tripoptions.TimeSelector =
         html += '<option>Arrive</option>';
         html += '</select>';
         
-        var inputId = this.id+'-picker';
-        html += '&nbsp;<input type="text" name="'+inputId+'" id="'+inputId+'" class="otp-datepicker-input" />';
+        //var inputId = this.id+'-datepicker';
+        html += '&nbsp;<input type="text" id="'+this.id+'-date" class="otp-date-input" />';
+        html += '&nbsp;<input type="text" id="'+this.id+'-time" class="otp-time-input" />';
         
         html += '</div>';
         $(html).appendTo(this.$());
@@ -312,7 +326,7 @@ otp.widgets.tripoptions.TimeSelector =
         });
 
 
-        $('#'+this.id+'-picker').datetimepicker({
+        /*$('#'+this.id+'-picker').datetimepicker({
             timeFormat: "hh:mmtt", 
             onSelect: function(dateTime) {
                 var dateTimeArr = dateTime.split(' ');
@@ -322,14 +336,49 @@ otp.widgets.tripoptions.TimeSelector =
                 });
             }
         });
-        $('#'+this.id+'-picker').datepicker("setDate", new Date());
+        $('#'+this.id+'-picker').datepicker("setDate", new Date());*/
+
+        $('#'+this.id+'-date').datepicker({
+            timeFormat: "hh:mmtt", 
+            onSelect: function(date) {
+                this_.tripWidget.inputChanged({
+                    date : date,
+                });
+            }
+        });
+        $('#'+this.id+'-date').datepicker("setDate", new Date());
+        
+        $('#'+this.id+'-time').val(moment().format(otp.config.timeFormat))
+        .keyup(function() {
+            if(otp.config.timeFormat.toLowerCase().charAt(otp.config.timeFormat.length-1) === 'a') {
+                var val = $(this).val();
+                if(val.charAt(val.length-1) === 'a' || val.charAt(val.length-1) === 'p') {
+                    if(otp.util.Text.isNumber(val.substring(0, val.length-1))) {
+                        var hour = parseInt(val.substring(0, val.length-1));
+                        if(hour >= 1 && hour <= 12) $(this).val(hour + ":00" + val.charAt(val.length-1) + "m")
+                    }
+                }
+            }            
+            this_.tripWidget.inputChanged({
+                time : $(this).val(),
+            });
+            
+        });
+        
+
     },
 
     restorePlan : function(data) {
-        var m = moment(data.queryParams.date+" "+data.queryParams.time, "MM-DD-YYYY h:mma");
-        $('#'+this.id+'-picker').datepicker("setDate", new Date(m));
-        this.tripWidget.module.date = data.queryParams.date;
-        this.tripWidget.module.time = data.queryParams.time;
+        //var m = moment(data.queryParams.date+" "+data.queryParams.time, "MM-DD-YYYY h:mma");
+        //$('#'+this.id+'-picker').datepicker("setDate", new Date(m));
+        if(data.queryParams.date) {
+            $('#'+this.id+'-date').datepicker("setDate", new Date(moment(data.queryParams.date, "MM-DD-YYYY")));
+            this.tripWidget.module.date = data.queryParams.date;
+        }
+        if(data.queryParams.time) {
+            $('#'+this.id+'-time').val(data.queryParams.time);
+            this.tripWidget.module.time = data.queryParams.time;
+        }
         if(data.queryParams.arriveBy === true || data.queryParams.arriveBy === "true") {
             this.tripWidget.module.arriveBy = true;
             $('#'+this.id+'-depArr option:eq(1)').prop('selected', true);  
@@ -601,7 +650,7 @@ otp.widgets.tripoptions.PreferredRoutes =
         
         $('#'+this.id+'-weightSlider').slider({
             min : 0,
-            max : 28800,
+            max : 57600,
             value : this_.lastSliderValue || 300,
         })
         .on('slidechange', function(evt) {

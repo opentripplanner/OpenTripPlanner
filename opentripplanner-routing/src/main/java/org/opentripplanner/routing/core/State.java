@@ -262,10 +262,6 @@ public class State implements Cloneable {
         return stateData.previousStop;
     }
 
-    public Stop getCurrentStop() {
-        return stateData.currentStop;
-    }
-    
     public long getLastAlightedTimeSeconds() {
         return stateData.lastAlightedTime;
     }

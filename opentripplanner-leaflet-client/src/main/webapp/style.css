@@ -143,6 +143,12 @@ button {width: auto; overflow: visible;}
 /* Fix clearfix: blueprintcss.lighthouseapp.com/projects/15318/tickets/5-extra-margin-padding-bottom-of-page */
 .clearfix { zoom: 1; }
 
+.borderBox {
+     box-sizing: border-box;
+     -webkit-box-sizing:border-box;
+     -moz-box-sizing: border-box;
+}
+
 
 /* Structure
 -------------------------------------------------------------- */
@@ -682,11 +688,6 @@ body {
 
 /* TripSummaryWidget */
 
-.otp-tripOptionsWidget {
-  padding: 0.25em 0.5em;
-  z-index: 1100;
-}
-
 .otp-defaultTripWidget {
   width: auto;
   bottom: 10px;
@@ -728,16 +729,6 @@ h6.drag-to-change {
     left: 10px;
 }*/
 
-/* Date/Time Picker */
-
-.ui-datepicker {
-    font-size: 11px;
-}
-
-.otp-datepicker-input {
-    text-align: center;
-    width: 150px;
-}
 
 /* Bike Triangle */
 
