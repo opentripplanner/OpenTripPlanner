@@ -132,7 +132,7 @@ public class TableTripPattern implements TripPattern, Serializable {
         }
     }
     
-    private Stop getStop(int stopIndex) {
+    public Stop getStop(int stopIndex) {
     	if (stopIndex == patternHops.length)
     		return patternHops[stopIndex - 1].getEndStop();
     	else
