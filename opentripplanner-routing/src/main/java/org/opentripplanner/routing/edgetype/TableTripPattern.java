@@ -132,7 +132,7 @@ public class TableTripPattern implements TripPattern, Serializable {
         }
     }
     
-    private Stop getStop(int stopIndex) {
+    public Stop getStop(int stopIndex) {
     	if (stopIndex == patternHops.length)
     		return patternHops[stopIndex - 1].getEndStop();
     	else
@@ -145,7 +145,7 @@ public class TableTripPattern implements TripPattern, Serializable {
          * is not called very often.
          */
         List<Stop> retval = new ArrayList<Stop>(patternHops.length + 1);
-        for (int i = 0; i < patternHops.length; i++)
+        for (int i = 0; i <= patternHops.length; i++)
             retval.add(getStop(i));
         return retval;
     }

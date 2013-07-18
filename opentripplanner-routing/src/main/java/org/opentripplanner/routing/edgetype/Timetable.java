@@ -162,7 +162,7 @@ public class Timetable implements Serializable {
         int index;
         TripTimes[][] tableIndex = boarding ? departuresIndex : arrivalsIndex;
         int stopOffset = boarding ? 0 : 1;
-        Stop currentStop = pattern.getStops().get(stopIndex + stopOffset);
+        Stop currentStop = pattern.getStop(stopIndex + stopOffset);
         if (tableIndex != null) {
             TripTimes[] sorted;
             // this timetable has been indexed, use binary search
