@@ -364,7 +364,7 @@ otp.modules.planner.PlannerModule =
     },
     
     noTripFound : function(error) {
-        this.showDialog(error.msg + ' (Error ' + error.id + ')', 'No Trup Found');
+        this.showDialog(error.msg + ' (Error ' + error.id + ')', 'No Trip Found');
     },
     
     showDialog : function(msg, title) {
