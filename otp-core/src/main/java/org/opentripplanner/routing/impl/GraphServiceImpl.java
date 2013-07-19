@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.impl;
 
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 
@@ -151,4 +152,9 @@ public class GraphServiceImpl implements GraphService {
         return decorated.evictAll();
     }
 
+    @Override
+    public boolean save(String routerId, InputStream is) {
+    	return decorated.save(routerId, is);
+    }
+    
 }

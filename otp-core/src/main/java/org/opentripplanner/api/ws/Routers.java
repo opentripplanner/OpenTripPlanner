@@ -13,6 +13,7 @@
 
 package org.opentripplanner.api.ws;
 
+import java.io.File;
 import java.io.InputStream;
 
 import javax.ws.rs.Consumes;
@@ -37,6 +38,7 @@ import org.opentripplanner.api.model.RouterList;
 import org.opentripplanner.api.ws.impl.StoredHullService;
 import org.opentripplanner.api.ws.services.HullService;
 import org.opentripplanner.common.geometry.GraphUtils;
+import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.impl.GraphServiceImpl;
@@ -204,6 +206,29 @@ public class Routers {
             graph = Graph.load(is, level);
             graphService.registerGraph(routerId, graph);
             return Response.status(Status.CREATED).entity(graph.toString()).build();
+        } catch (Exception e) {
+            return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
+        }
+    }
+    
+    /** 
+     * Save the graph data, but don't load it in memory. The file location is based on routerId.
+     * If the graph already exists, the graph will be overwritten.
+     */
+    @Secured({ "ROLE_ROUTERS" })
+    @POST @Path("/save") @Produces({ MediaType.TEXT_PLAIN })
+    @Consumes(MediaType.APPLICATION_OCTET_STREAM)
+    public Response saveGraphOverWire (
+            @QueryParam("routerId") String routerId,
+            InputStream is) {
+        LOG.debug("save graph from POST data stream...");
+        try {
+        	boolean success = graphService.save(routerId, is);
+        	if (success) {
+        		return Response.status(201).entity("graph saved.").build();
+        	} else {
+        		return Response.status(404).entity("graph not saved or other error.").build();
+        	}
         } catch (Exception e) {
             return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
         }
