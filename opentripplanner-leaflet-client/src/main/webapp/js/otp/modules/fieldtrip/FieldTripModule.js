@@ -504,7 +504,7 @@ otp.modules.fieldtrip.FieldTripModule =
             time : moment(request.arriveDestinationTime).format("h:mma"),
             date : moment(request.travelDate).format("MM-DD-YYYY"),            
             arriveBy : true,
-            groupSize : request.numStudents,
+            groupSize : otp.util.FieldTrip.getGroupSize(request),
         };
         
         this.optionsWidget.applyQueryParams(queryParams);
@@ -531,7 +531,7 @@ otp.modules.fieldtrip.FieldTripModule =
             time : moment(request.leaveDestinationTime).format("h:mma"),
             date : moment(request.travelDate).format("MM-DD-YYYY"),            
             arriveBy : false,
-            groupSize : request.numStudents,
+            groupSize : otp.util.FieldTrip.getGroupSize(request),
         };
         
         this.optionsWidget.applyQueryParams(queryParams);
@@ -662,6 +662,13 @@ otp.util.FieldTrip = {
         }
         return null;
     },
+
+    getGroupSize : function(request) {
+        var groupSize = 0;
+        if(request.numStudents) groupSize += request.numStudents;
+        if(request.numChaperones) groupSize += request.numChaperones;
+        return groupSize;
+    },    
     
     readItinData : function(groupItin) {
         if(groupItin.timeOffset) otp.config.timeOffset = groupItin.timeOffset;
