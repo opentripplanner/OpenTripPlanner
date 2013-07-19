@@ -258,7 +258,7 @@ otp.modules.planner.Itinerary = otp.Class({
                 html += ': ';
                 if(leg.route !== leg.routeLongName) html += "("+leg.route+") ";
                 html += leg.routeLongName;
-                if(leg.headsign) html +=  " toward " + leg.headsign;
+                if(leg.headsign) html +=  " to " + leg.headsign;
             }
             else { // walk / bike / car
                 html += " "+otp.util.Itin.distanceString(leg.distance)+ " to "+leg.to.name;
@@ -268,10 +268,10 @@ otp.modules.planner.Itinerary = otp.Class({
             // main content
             if(otp.util.Itin.isTransit(leg.mode)) { // transit
                 html += '<ul>';
-                html += '<li><b>Board</b>: ' + leg.from.name + ' (' + leg.from.stopId.agencyId + ' stop ' + 
+                html += '<li><b>Board</b>: ' + leg.from.name + ' (' + leg.from.stopId.agencyId + ' Stop ID #' + 
                         leg.from.stopId.id + '), ' + otp.util.Time.formatItinTime(leg.startTime, "h:mma") + '</li>';
                 html += '<li><i>Time in transit: '+otp.util.Time.msToHrMin(leg.duration)+'</i></li>';
-                html += '<li><b>Alight</b>: ' + leg.to.name + ' (' + leg.to.stopId.agencyId + ' stop ' + 
+                html += '<li><b>Alight</b>: ' + leg.to.name + ' (' + leg.to.stopId.agencyId + ' Stop ID #' + 
                         leg.to.stopId.id + '), ' + otp.util.Time.formatItinTime(leg.endTime, "h:mma") + '</li>';
                 
                 html += '</ul>';
@@ -335,7 +335,7 @@ otp.modules.planner.Itinerary = otp.Class({
                 text += ': ';
                 if(leg.route !== leg.routeLongName) text += "("+leg.route+") ";
                 text += leg.routeLongName;
-                if(leg.headsign) text +=  " toward " + leg.headsign;
+                if(leg.headsign) text +=  " to " + leg.headsign;
             }
             else { // walk / bike / car
                 text += ' '+ otp.util.Itin.distanceString(leg.distance)+ " to "+leg.to.name;
@@ -344,10 +344,10 @@ otp.modules.planner.Itinerary = otp.Class({
             
             // content
             if(otp.util.Itin.isTransit(leg.mode)) {
-                text += ' - Board: ' + leg.from.name + ' (' + leg.from.stopId.agencyId + ' stop ' + 
+                text += ' - Board: ' + leg.from.name + ' (' + leg.from.stopId.agencyId + ' Stop ID #' + 
                         leg.from.stopId.id + '), ' + otp.util.Time.formatItinTime(leg.startTime, "h:mma") + '\n';
                 text += ' - Time in transit: '+otp.util.Time.msToHrMin(leg.duration) + '\n';
-                text += ' - Alight: ' + leg.to.name + ' (' + leg.to.stopId.agencyId + ' stop ' + 
+                text += ' - Alight: ' + leg.to.name + ' (' + leg.to.stopId.agencyId + ' Stop ID #' + 
                         leg.to.stopId.id + '), ' + otp.util.Time.formatItinTime(leg.endTime, "h:mma") + '\n';
             }
             else if (leg.steps) { // walk / bike / car
