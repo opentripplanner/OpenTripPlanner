@@ -243,6 +243,19 @@ public class RouteVariant implements Serializable {
         }
         return geometry;
     }
+    
+    /**
+     * @param index The index of the segment in the list
+     * @return The partial geometry between this segment's stop and the next one.
+     */
+    public LineString getGeometrySegment(int index) {
+        RouteSegment segment = exemplarSegments.get(index);
+        if (segment.hopOut != null) {
+            return GeometryUtils.getGeometryFactory().createLineString(
+                    segment.getGeometry().getCoordinates());
+        }
+        return null;
+    }
 
     @JsonIgnore
     public TraverseMode getTraverseMode() {
