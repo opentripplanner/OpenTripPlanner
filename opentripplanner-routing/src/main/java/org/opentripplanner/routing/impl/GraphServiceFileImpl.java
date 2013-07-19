@@ -15,9 +15,11 @@ package org.opentripplanner.routing.impl;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -109,14 +111,7 @@ public class GraphServiceFileImpl implements GraphService {
         return m.matches();
     }
 
-    protected Graph loadGraph(String routerId) {
-        if (!routerIdLegal(routerId)) {
-            LOG.error(
-                "routerId '{}' contains characters other than alphanumeric, underscore, and dash.",
-                routerId);
-            return null;
-        }
-        LOG.debug("loading serialized graph for routerId {}", routerId);
+    private String createGraphFileName(String routerId) {
         StringBuilder sb = new StringBuilder(basePath);
         if (!(basePath.endsWith(File.separator))) {
             sb.append(File.separator);
@@ -128,6 +123,32 @@ public class GraphServiceFileImpl implements GraphService {
         }
         sb.append("Graph.obj");
         String graphFileName = sb.toString();
+        return graphFileName;
+    }
+    
+    private void copyStreams(InputStream in, OutputStream out) throws IOException {
+        byte[] buffer = new byte[1024];
+        while (true) {
+            int rc = in.read(buffer);
+            if (rc == -1)
+                break;
+            out.write(buffer, 0, rc);
+        }
+        in.close();
+        out.close();
+    }     
+    
+    protected Graph loadGraph(String routerId) {
+        if (!routerIdLegal(routerId)) {
+            LOG.error(
+                "routerId '{}' contains characters other than alphanumeric, underscore, and dash.",
+                routerId);
+            return null;
+        }
+        LOG.debug("loading serialized graph for routerId {}", routerId);
+
+        String graphFileName = createGraphFileName(routerId);
+        
         LOG.debug("graph file for routerId '{}' is at {}", routerId, graphFileName);
         InputStream is = null;
         final String CLASSPATH_PREFIX = "classpath:/";
@@ -221,4 +242,48 @@ public class GraphServiceFileImpl implements GraphService {
         return n;
     }
 
+    @Override
+    public boolean save(String routerId, InputStream is) {
+    	String graphFileName = createGraphFileName(routerId);
+    	try {
+
+    		// Create directory if necessary
+    		File sourceFile = new File(graphFileName);
+    		File directory = new File(sourceFile.getParentFile().getPath());
+    		if (!directory.exists()) {
+    			directory.mkdir();
+    		}
+    		
+    		// Store the stream to disk, to be sure no data will be lost make a temporary backup
+    		// file of the original file.
+    		
+    		// Make backup file
+    		sourceFile = new File(graphFileName);
+    		File destFile = null;
+    		if (sourceFile.exists()) {
+    			destFile = new File(graphFileName + ".bak");
+    			if (destFile.exists()) {
+    				destFile.delete();
+    			}
+    			sourceFile.renameTo(destFile);
+    		}
+
+    		// Store the stream
+    		FileOutputStream os = new FileOutputStream(graphFileName);
+    		copyStreams(is, os);
+    		
+    		// And delete the backup file
+    		sourceFile = new File(graphFileName + ".bak");
+    		if (sourceFile.exists()) {
+    			sourceFile.delete();
+    		}
+        
+    	} catch (Exception ex) {
+            LOG.error("Exception while storing graph to {}.", graphFileName);
+            ex.printStackTrace();
+            return false;
+        }
+    	
+    	return true;
+    } 
 }

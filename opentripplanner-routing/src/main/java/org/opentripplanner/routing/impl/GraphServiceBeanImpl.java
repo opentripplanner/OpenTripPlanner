@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.impl;
 
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,7 +34,7 @@ public class GraphServiceBeanImpl implements GraphService {
     // 0-arg bean constructor
     public GraphServiceBeanImpl() {
     }
-    
+
     public GraphServiceBeanImpl(Graph graph) {
         this.graph = graph;
     }
@@ -85,6 +86,11 @@ public class GraphServiceBeanImpl implements GraphService {
     @Override
     public boolean reloadGraphs(boolean preEvict) {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean save(String routerId, InputStream is) {
+        return false;
     }
 
 }
