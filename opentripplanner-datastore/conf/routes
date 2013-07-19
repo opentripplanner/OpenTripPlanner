@@ -6,31 +6,31 @@
 GET     /                                       Calltaker.index
 
 
-GET     /call                                   Calltaker.getCall
-POST    /call                                   Calltaker.newCall
-OPTIONS /call                                   Calltaker.options
+GET     /calltaker/call                         Calltaker.getCall
+POST    /calltaker/call                         Calltaker.newCall
+OPTIONS /calltaker/call                         Calltaker.options
 
-GET     /callQuery                              Calltaker.getQuery
-POST    /callQuery                              Calltaker.newQuery
-DELETE  /callQuery                              Calltaker.deleteQuery
+GET     /calltaker/callQuery                    Calltaker.getQuery
+POST    /calltaker/callQuery                    Calltaker.newQuery
+DELETE  /calltaker/callQuery                    Calltaker.deleteQuery
 
 #Field trip
-GET     /fieldTrip                              FieldTrip.getFieldTrip
-GET     /fieldTrip/getTrips                     FieldTrip.getFieldTrips
-GET     /fieldTrip/getGTFSTripsInUse            FieldTrip.getGTFSTripsInUse
-GET     /fieldTrip/calendar                     FieldTrip.getCalendar
-POST    /fieldTrip/newTrip                      FieldTrip.newTrip
-POST    /fieldTrip/addItinerary                 FieldTrip.addItinerary
-POST    /fieldTrip/addTripFeedback              FieldTrip.addTripFeedback
-POST    /fieldTrip/deleteTrip                   FieldTrip.deleteTrip
-POST    /fieldTrip/newRequest                   FieldTrip.newRequest
-POST    /fieldTrip/newRequestForm               FieldTrip.newRequestForm
+GET     /fieldtrip                              FieldTrip.getFieldTrip
+GET     /fieldtrip/getTrips                     FieldTrip.getFieldTrips
+GET     /fieldtrip/getGTFSTripsInUse            FieldTrip.getGTFSTripsInUse
+GET     /fieldtrip/calendar                     FieldTrip.getCalendar
+POST    /fieldtrip/newTrip                      FieldTrip.newTrip
+POST    /fieldtrip/addItinerary                 FieldTrip.addItinerary
+POST    /fieldtrip/deleteTrip                   FieldTrip.deleteTrip
 
-GET     /fieldTrip/getRequests                  FieldTrip.getRequests
-POST    /fieldTrip/setInboundTrip               FieldTrip.setInboundTrip
-POST    /fieldTrip/setOutboundTrip              FieldTrip.setOutboundTrip
+GET     /fieldtrip/getRequests                  FieldTrip.getRequests
+POST    /fieldtrip/setInboundTrip               FieldTrip.setInboundTrip
+POST    /fieldtrip/setOutboundTrip              FieldTrip.setOutboundTrip
 
-GET     /fieldTrip/feedbackForm                 FieldTrip.feedbackForm
+POST    /public/fieldtrip/newRequest            FieldTrip.newRequest
+GET     /public/fieldtrip/newRequestForm        FieldTrip.newRequestForm
+GET     /public/fieldtrip/feedbackForm          FieldTrip.feedbackForm
+POST    /public/fieldtrip/addFeedback           FieldTrip.addFeedback
 
 
 #Admin

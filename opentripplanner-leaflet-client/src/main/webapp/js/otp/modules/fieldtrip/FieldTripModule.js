@@ -124,7 +124,7 @@ otp.modules.fieldtrip.FieldTripModule =
         this.groupPlan = null;
 
         var this_ = this;
-        $.ajax(this.datastoreUrl+'/fieldTrip/getTrips', {
+        $.ajax(this.datastoreUrl+'/fieldtrip/getTrips', {
             data: {
                 sessionId : this.sessionManager.sessionId,
                 date : planDate,
@@ -251,7 +251,7 @@ otp.modules.fieldtrip.FieldTripModule =
 
     refreshTrips : function(date) {
         var this_ = this;
-        $.ajax(this.datastoreUrl+'/fieldTrip/getTrips', {
+        $.ajax(this.datastoreUrl+'/fieldtrip/getTrips', {
             data: {
                 sessionId : this.sessionManager.sessionId,
                 //date : this.fieldTripManager.selectedDate,
@@ -292,7 +292,7 @@ otp.modules.fieldtrip.FieldTripModule =
         };
         
         //console.log(data);
-        $.ajax(this.datastoreUrl+'/fieldTrip/newTrip', {
+        $.ajax(this.datastoreUrl+'/fieldtrip/newTrip', {
             type: 'POST',
             
             data: data,
@@ -342,7 +342,7 @@ otp.modules.fieldtrip.FieldTripModule =
             }
             //console.log(data);
             
-            $.ajax(this.datastoreUrl+'/fieldTrip/addItinerary', {
+            $.ajax(this.datastoreUrl+'/fieldtrip/addItinerary', {
                 type: 'POST',
                 
                 data: data,
@@ -377,7 +377,7 @@ otp.modules.fieldtrip.FieldTripModule =
         
         console.log("delete");
         console.log(data);
-        $.ajax(this.datastoreUrl+'/fieldTrip/deleteTrip', {
+        $.ajax(this.datastoreUrl+'/fieldtrip/deleteTrip', {
             type: 'POST',
             
             data: data,
@@ -451,7 +451,7 @@ otp.modules.fieldtrip.FieldTripModule =
     
     loadRequests : function() {
         var this_ = this;
-        $.ajax(this.datastoreUrl+'/fieldTrip/getRequests', {
+        $.ajax(this.datastoreUrl+'/fieldtrip/getRequests', {
             data: {
                 sessionId : this.sessionManager.sessionId,
                 limit : 100,
@@ -593,8 +593,8 @@ otp.modules.fieldtrip.FieldTripModule =
             this_.loadRequests();
         });
         /*this.saveTrip(request, function(tripId) {
-            if(type === "outbound") var url = this.datastoreUrl+'/fieldTrip/setOutboundTrip';
-            if(type === "inbound") var url = this.datastoreUrl+'/fieldTrip/setInboundTrip';
+            if(type === "outbound") var url = this.datastoreUrl+'/fieldtrip/setOutboundTrip';
+            if(type === "inbound") var url = this.datastoreUrl+'/fieldtrip/setInboundTrip';
             $.ajax(url, {
                 type: 'POST',
                 
