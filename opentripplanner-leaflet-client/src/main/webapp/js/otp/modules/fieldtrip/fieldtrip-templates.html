@@ -39,7 +39,9 @@
 <script id="otp-fieldtrip-request" type="text/html">
     <div class="otp-fieldTrip-requestWidget-content notDraggable">
         <div class="otp-fieldTrip-requestWidget-summary">
-            <b>Teacher</b>: {{teacherName}} ({{schoolName}}, Grade {{#grade}}{{grade}}{{/grade}}{{^grade}}N/A{{/grade}})<br>
+            <b>Destination</b>: {{endLocation}}<br>
+            <b>Day of Travel</b>: {{travelDate}}<br>
+            <b>Teacher/School</b>: {{teacherName}} ({{schoolName}}, Grade {{#grade}}{{grade}}{{/grade}}{{^grade}}N/A{{/grade}})<br>
             <b>Teacher Address</b>: {{address}}, {{city}} {{state}} {{zip}}<br>
             <b>Phone</b>: {{#phoneNumber}}{{phoneNumber}}{{/phoneNumber}}{{^phoneNumber}}N/A{{/phoneNumber}}&nbsp;/&nbsp;
             <b>Fax</b>: {{#faxNumber}}{{faxNumber}}{{/faxNumber}}{{^faxNumber}}N/A{{/faxNumber}}<br>
@@ -47,6 +49,16 @@
             <b>Students</b>: {{numStudents}} (Ages {{#minimumAge}}{{minimumAge}}{{/minimumAge}}{{^minimumAge}}N/A{{/minimumAge}}&nbsp;to&nbsp;
                 {{#maximumAge}}{{maximumAge}}{{/maximumAge}}{{^maximumAge}}N/A{{/maximumAge}}) / 
                 <b>Chaperones</b>: {{#numChaperones}}{{numChaperones}}{{/numChaperones}}{{^numChaperones}}N/A{{/numChaperones}}<br>
+            <b>Start Address</b>: {{startLocation}}<br>
+            <b>Time Arriving at Destination</b>: {{arriveDestinationTime}}<br>
+            <b>Time Leaving at Destination</b>: {{leaveDestinationTime}}<br>
+            <b>Time Due Back at School</b>: {{arriveSchoolTime}}<br>
+            <b>Intermediate Locations</b>:
+                {{#intermediateLocations}}{{intermediateLocations}}{{/intermediateLocations}}{{^intermediateLocations}}N/A{{/intermediateLocations}}<br>
+            <b>Payment Preference</b>: {{paymentPreference}}<br>
+            <b>Invoice Required?</b>: 
+                {{#requireInvoice}}Yes{{/requireInvoice}}{{^requireInvoice}}No{{/requireInvoice}}<br>
+
             <i>Request submitted: {{timeStamp}}</i>
             
             <div style="margin-top: 1em; border-bottom: 2px solid gray; font-weight: bold;">User Feedback</div>
