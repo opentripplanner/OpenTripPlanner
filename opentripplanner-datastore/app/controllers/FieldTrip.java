@@ -242,6 +242,22 @@ public class FieldTrip extends Application {
         renderJSON(gson.toJson(requests));
     }
     
+    public static void setRequestStatus(long requestId, String status) {
+        FieldTripRequest req = FieldTripRequest.findById(requestId);
+        if(req != null) {
+            req.status = status;
+            req.save();
+            if(status.equals("cancelled")) {
+                for(ScheduledFieldTrip trip : req.trips) {
+                    trip.delete();
+                }
+            }
+            renderJSON(requestId);
+        }
+        else {
+            badRequest();
+        }        
+    }
 
     /* FieldTripFeedback */
     

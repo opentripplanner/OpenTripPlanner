@@ -26,6 +26,7 @@ POST    /fieldtrip/deleteTrip                   FieldTrip.deleteTrip
 GET     /fieldtrip/getRequests                  FieldTrip.getRequests
 POST    /fieldtrip/setInboundTrip               FieldTrip.setInboundTrip
 POST    /fieldtrip/setOutboundTrip              FieldTrip.setOutboundTrip
+POST    /fieldtrip/setRequestStatus             FieldTrip.setRequestStatus
 
 POST    /public/fieldtrip/newRequest            FieldTrip.newRequest
 GET     /public/fieldtrip/newRequestForm        FieldTrip.newRequestForm

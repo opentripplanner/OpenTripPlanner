@@ -485,6 +485,35 @@ otp.modules.fieldtrip.FieldTripModule =
             }
         });
     },
+
+    setRequestStatus : function(request, status) {
+        var this_ = this;
+        
+        var data = {
+            sessionId : this.sessionManager.sessionId,
+            requestId : request.id,
+            status : status
+        };
+        
+        $.ajax(this.datastoreUrl+'/fieldtrip/setRequestStatus', {
+            type: 'POST',
+            
+            data: data,
+                  
+            success: function(data) {
+                this_.loadRequests();
+            },
+            
+            error: function(data) {
+                console.log("error setting trip status:");
+                console.log(data);
+            }
+        });
+    },
+    
+    cancelRequest : function(request) {
+        this.setRequestStatus(request, "cancelled"); 
+    },
         
     showRequest : function(request) {
         if(_.has(this.requestWidgets, request.id)) {

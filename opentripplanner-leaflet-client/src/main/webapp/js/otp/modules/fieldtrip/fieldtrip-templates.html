@@ -1,12 +1,27 @@
 <script id="otp-fieldtrip-manager" type="text/html">
-    <!--<div id="{{widgetId}}-tabs" style="position: absolute; top: 30px; bottom: 10px; left: 10px; right: 10px;">
+    <div id="{{widgetId}}-tabs" class="otp-fieldTripManager-tabs notDraggable" style="position: absolute; top: 30px; bottom: 50px; left: 10px; right: 10px;">
         <ul>
-            <li><a href="#{{widgetId}}-requestsTab">Requests</a></li>
-            <li><a href="#{{widgetId}}-tripsTab">Planned Trips</a></li>
-        </ul>-->
-        <div id="{{widgetId}}-requestsTab" class="notDraggable" style="position: absolute; top: 30px; bottom: 10px; left: 10px; right: 10px;"></div>
-        <!--<div id="{{widgetId}}-tripsTab" class="otp-fieldTripManager-tabbedArea notDraggable"></div>
-    </div>-->
+            <li><a href="#{{widgetId}}-requestsTab">Active Requests</a></li>
+            <li><a href="#{{widgetId}}-cancelledRequestsTab">Cancelled</a></li>
+            <li><a href="#{{widgetId}}-pastTripsTab">Past Trips</a></li>
+        </ul>
+        <div id="{{widgetId}}-requestsTab">
+            <div class="otp-fieldTripManager-requestsList activeRequestsList">
+            </div>
+        </div>
+        <div id="{{widgetId}}-cancelledRequestsTab">
+            <div class="otp-fieldTripManager-requestsList cancelledRequestsList">
+            </div>
+        </div>
+        <div id="{{widgetId}}-pastTripsTab">
+            <div class="otp-fieldTripManager-requestsList pastTripsList">
+            </div>
+        </div>
+    </div>
+    <div class="notDraggable" style="position: absolute; height: 30px; bottom: 10px; width:100%; text-align: center;">
+        <button class="refreshButton">Refresh Requests</button>
+    </div>
+
 </script>
 
 
@@ -82,7 +97,15 @@
                 <button class="otp-fieldTrip-requestWidget-button inboundSaveButton">Save Active Plan</button>
             </div>
         </div>
-        <div class="otp-fieldTrip-requestWidget-bottomRow"><a href="{{dsUrl}}/public/fieldtrip/feedbackForm?requestId={{id}}" target="blank_">Feedback Link</a> | <a href="#" class="printablePlanLink">Printable Trip Plan</a></div>
+        <div class="otp-fieldTrip-requestWidget-bottomRow">
+            <div style="float: right; text-align:right;">
+                <a href="{{dsUrl}}/public/fieldtrip/feedbackForm?requestId={{id}}" target="blank_">Feedback Link</a> | 
+                <a href="#" class="printablePlanLink">Printable Trip Plan</a>
+            </div>            
+            <div style="text-align:left;">
+                <button class="cancelRequestButton">Cancel Request</button>
+            </div>            
+        </div>
     </div>
 </script>
 

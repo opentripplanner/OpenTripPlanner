@@ -113,6 +113,9 @@ public class FieldTripRequest extends GenericModel  {
     @Expose
     @As("yyyy-MM-dd'T'HH:mm:ss")
     public Date timeStamp;
+    
+    @Expose
+    public String status = "active";
 
 
   public FieldTripRequest() {

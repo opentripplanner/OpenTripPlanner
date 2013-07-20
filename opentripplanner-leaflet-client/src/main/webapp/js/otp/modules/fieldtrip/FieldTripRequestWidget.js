@@ -129,6 +129,13 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
             html += content.html();
             printWindow.document.write(html);
         });
+        
+        this.content.find('.cancelRequestButton').click(function(evt) {
+            if(confirm("Are you sure you want to cancel this request? Any associated trips will be deleted.")) {
+                this_.module.cancelRequest(this_.request);
+                this_.hide();
+            }
+        });
     },
     
     onClose : function() {
