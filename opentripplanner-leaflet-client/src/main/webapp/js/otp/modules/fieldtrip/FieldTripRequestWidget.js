@@ -50,7 +50,7 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
 
         if(this.request.paymentPreference === "request_call") context.paymentPreference = "Call requested at provided phone number";
         else if(this.request.paymentPreference === "fax_cc") context.paymentPreference = "Will fax credit card info to TriMet";
-        else if(this.request.paymentPreference === "main_check") context.paymentPreference = "will mail check to TriMet";
+        else if(this.request.paymentPreference === "mail_check") context.paymentPreference = "Will mail check to TriMet";
         
         var outboundTrip = otp.util.FieldTrip.getOutboundTrip(this.request);
         if(outboundTrip) context.outboundPlanInfo = otp.util.FieldTrip.constructPlanInfo(outboundTrip);
