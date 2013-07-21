@@ -214,7 +214,20 @@ otp.modules.planner.Itinerary = otp.Class({
         }
         return segments;
     },*/
+
+    getTripIds : function() {
+        var tripIds = [];
+        for(var l=0; l<this.itinData.legs.length; l++) {
+            var leg = this.itinData.legs[l];
+            if(otp.util.Itin.isTransit(leg.mode)) {
+                var tripId = leg.agencyId + "_"+leg.tripId;
+                tripIds.push(tripId);
+            } 
+        }
+        return tripIds;
+    },
         
+                
     getGroupTripCapacity : function() {
         var capacity = 100000;
         for(var l=0; l<this.itinData.legs.length; l++) {

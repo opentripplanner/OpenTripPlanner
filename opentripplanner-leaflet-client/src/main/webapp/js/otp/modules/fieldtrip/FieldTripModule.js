@@ -109,14 +109,31 @@ otp.modules.fieldtrip.FieldTripModule =
     },    
     
     getExtendedQueryParams : function() {
-        return { showIntermediateStops : this.showIntermediateStops };
+        return { 
+            numItineraries : 1,
+        };
     },
 
     getAdditionalUrlParams : function() {
         return { groupSize : this.groupSize };
     },
         
-    ftPlanTrip : function() {
+    ftPlanTrip : function(queryParams) {
+
+        if(this.updateActiveOnly) { // single itin modified by first/last/previous/next
+
+            if(this.groupPlan) {
+                var bannedTripArr = [];
+                for(var i = 0; i < this.groupPlan.itineraries.length; i++) {
+                    bannedTripArr = bannedTripArr.concat(this.groupPlan.itineraries[i].getTripIds());
+                }
+                queryParams.bannedTrips = bannedTripArr.join(',');
+            }
+            
+            this.planTrip(queryParams);
+            return;
+        }
+        
         var planDate = moment(this.optionsWidget.controls['time'].epoch).format("YYYY-MM-DD");
         this.currentGroupSize = this.groupSize;
         this.bannedSegments = [];
@@ -160,6 +177,14 @@ otp.modules.fieldtrip.FieldTripModule =
     },
     
     processPlan : function(tripPlan, restoring) {
+        if(this.updateActiveOnly) {
+            var itinIndex = this.itinWidget.activeIndex;
+            tripPlan.itineraries[0].groupSize = this.groupPlan.itineraries[itinIndex].groupSize;
+            this.itinWidget.updateItineraries(tripPlan.itineraries);
+            this.updateActiveOnly = false;            
+            return;
+        }
+    
         if(this.groupPlan == null)
             this.groupPlan = new otp.modules.planner.TripPlan(null, _.extend(tripPlan.queryParams, { groupSize : this.groupSize }));
 
@@ -234,9 +259,9 @@ otp.modules.fieldtrip.FieldTripModule =
         
     createItinerariesWidget : function() {
         this.itinWidget = new otp.widgets.ItinerariesWidget(this.id+"-itinWidget", this);
-        this.itinWidget.showButtonRow = false;
+        //this.itinWidget.showButtonRow = false;
         this.itinWidget.showItineraryLink = false;
-        this.itinWidget.showSearchLink = true;
+        //this.itinWidget.showSearchLink = true;
     },
     
     setBannedTrips : function() {
@@ -309,7 +334,6 @@ otp.modules.fieldtrip.FieldTripModule =
             }
         });
     },
-    
     
     saveItineraries : function(tripId, successCallback) {
         var this_ = this;
