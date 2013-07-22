@@ -259,6 +259,19 @@ public class FieldTrip extends Application {
         }        
     }
 
+    public static void setRequestClasspassId(long requestId, String classpassId) {
+        FieldTripRequest req = FieldTripRequest.findById(requestId);
+        if(req != null) {
+            if(classpassId != null && classpassId.length() == 0) classpassId = null;
+            req.classpassId = classpassId;
+            req.save();
+            renderJSON(requestId);
+        }
+        else {
+            badRequest();
+        }        
+    }
+    
     /* FieldTripFeedback */
     
     public static void feedbackForm(long requestId) {

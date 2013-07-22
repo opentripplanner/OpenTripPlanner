@@ -144,6 +144,12 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
                 this_.hide();
             }
         });
+        this.content.find('.setClasspassButton').click(function(evt) {
+            var classpassId = prompt("Specify the Class Pass ID (to clear a previously set Class Pass, leave the field blank):");
+            if(classpassId !== null) {
+                this_.module.setClasspassId(this_.request, classpassId);
+            }
+        });
     },
     
     onClose : function() {

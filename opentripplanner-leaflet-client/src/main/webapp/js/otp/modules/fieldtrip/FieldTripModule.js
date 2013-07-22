@@ -567,7 +567,30 @@ otp.modules.fieldtrip.FieldTripModule =
     cancelRequest : function(request) {
         this.setRequestStatus(request, "cancelled"); 
     },
-        
+
+    setClasspassId : function(request, classpassId) {
+        var this_ = this;
+
+        $.ajax(this.datastoreUrl+'/fieldtrip/setRequestClasspassId', {
+            type: 'POST',
+            
+            data: {
+                sessionId : this.sessionManager.sessionId,
+                requestId : request.id,
+                classpassId : classpassId
+            },
+            
+            success: function(data) {
+                this_.loadRequests();
+            },
+            
+            error: function(data) {
+                console.log("error setting classpass id:");
+                console.log(data);
+            }
+        });
+    },
+                
     showRequest : function(request) {
         if(_.has(this.requestWidgets, request.id)) {
             var widget = this.requestWidgets[request.id];

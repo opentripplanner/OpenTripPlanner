@@ -126,7 +126,7 @@
 
 .otp-fieldTrip-requestWidget {
     width: 400px;
-    height: 300px;
+    height: 350px;
 }
 
 .otp-fieldTrip-requestWidget-content {
@@ -143,7 +143,7 @@
     top: 0px;
     left: 0px;
     right: 0px;
-    bottom: 160px;
+    bottom: 180px;
     border: 1px solid gray;
     padding: 10px;
     background: white;
@@ -154,14 +154,14 @@
     width: 50%;
     height: 120px;
     padding: 0px;
-    bottom: 30px;
+    bottom: 50px;
     
 }
 
 .otp-fieldTrip-requestWidget-bottomRow {
     position: absolute;
     width: 100%;
-    height: 20px;
+    height: 40px;
     padding: 0px;
     bottom: 0px;
 }
