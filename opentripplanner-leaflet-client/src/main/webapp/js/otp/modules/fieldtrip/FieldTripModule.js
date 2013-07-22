@@ -187,7 +187,8 @@ otp.modules.fieldtrip.FieldTripModule =
             var itinIndex = this.itinWidget.activeIndex;
             tripPlan.itineraries[0].groupSize = this.groupPlan.itineraries[itinIndex].groupSize;
             this.itinWidget.updateItineraries(tripPlan.itineraries);
-            this.updateActiveOnly = false;            
+            this.updateActiveOnly = false;    
+            this.drawItinerary(tripPlan.itineraries[0]);        
             return;
         }
     
