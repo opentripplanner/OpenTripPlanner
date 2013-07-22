@@ -66,17 +66,39 @@ public class SphericalDistanceLibrary implements DistanceLibrary {
         double cosLat = FastMath.cos(lat);
         double lon = Math.toRadians(point.x) * cosLat;
         Point point2 = GeometryUtils.getGeometryFactory().createPoint(new Coordinate(lon, lat));
+        LineString lineString2 = equirectangularProject(point, lineString);
+        return lineString2.distance(point2) * RADIUS_OF_EARTH_IN_M;
+    }
+
+    @Override
+    public final double fastLength(LineString lineString) {
+        // Warn: do not use LineString.getCentroid() as it is broken
+        // for degenerated geometry (same first/last point). 
+        Coordinate[] coordinates = lineString.getCoordinates();
+        Coordinate middle = new Coordinate((coordinates[0].x + coordinates[coordinates.length - 1].x) / 2.0,
+                (coordinates[0].y + coordinates[coordinates.length - 1].y) / 2.0);
+        return equirectangularProject(middle, lineString).getLength()
+                * RADIUS_OF_EARTH_IN_M;
+    }
+
+    /**
+     * Equirectangular project a polyline.
+     * @param projectionCenter Center of the equirectangular projection.
+     * @param lineString
+     * @return The projected polyline. Coordinates in radians.
+     */
+    private LineString equirectangularProject(Coordinate projectionCenter, LineString lineString) {
+        double cosLat = FastMath.cos(Math.toRadians(projectionCenter.y));
         Coordinate[] coords = lineString.getCoordinates();
         Coordinate[] coords2 = new Coordinate[coords.length];
         for (int i = 0; i < coords.length; i++) {
             coords2[i] = new Coordinate(Math.toRadians(coords[i].x) * cosLat,
                     Math.toRadians(coords[i].y));
         }
-        LineString lineString2 = GeometryUtils.getGeometryFactory().createLineString(coords2);
-        return lineString2.distance(point2) * RADIUS_OF_EARTH_IN_M;
+        return GeometryUtils.getGeometryFactory().createLineString(coords2);
     }
-
-    /* (non-Javadoc)
+    
+    /**
      * @see org.opentripplanner.common.geometry.DistanceLibrary#distance(double, double, double, double)
      */
     @Override
@@ -84,7 +106,7 @@ public class SphericalDistanceLibrary implements DistanceLibrary {
         return distance(lat1, lon1, lat2, lon2, RADIUS_OF_EARTH_IN_M);
     }
     
-    /* (non-Javadoc)
+    /**
      * @see org.opentripplanner.common.geometry.DistanceLibrary#fastDistance(double, double, double, double)
      */
     @Override
@@ -92,7 +114,7 @@ public class SphericalDistanceLibrary implements DistanceLibrary {
         return fastDistance(lat1, lon1, lat2, lon2, RADIUS_OF_EARTH_IN_M);
     }
     
-    /* (non-Javadoc)
+    /**
      * @see org.opentripplanner.common.geometry.DistanceLibrary#distance(double, double, double, double, double)
      */
     @Override

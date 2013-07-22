@@ -30,6 +30,13 @@ public interface DistanceLibrary {
      * @return The (approximated) distance, in meters, between the point and the linestring.
      */
     public abstract double fastDistance(Coordinate point, LineString lineString);
+    
+    /**
+     * Compute the (approximated) length of a polyline
+     * @param lineString The polyline in (longitude, latitude degrees).
+     * @return The (approximated) length, in meters, of the linestring.
+     */
+    public abstract double fastLength(LineString lineString);
 
     public abstract double distance(double lat1, double lon1, double lat2, double lon2);
 
