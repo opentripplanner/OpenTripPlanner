@@ -781,32 +781,23 @@ public class TransitIndex {
     
     /**
      * Return a list of all trips for a given route nearby a certain point (used for on-board depart
-     * when client does not know trip ID)
-     * 
-     * @param maxDistanceMeter The maximum distance in meters from the given point to the trip
-     *        geometry. If a trip has no geometry (straight line), use a large distance.
-     * @param maxDeltaTimeSec The maximum delta in seconds from the estimated trip position to
-     *        the given position. If no real-time data and unreliable network, use a large value.
+     * when client does not know trip ID), sorted by a matching (=relevance) factor.
      */
     @GET
     @Path("/tripsAtPosition")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public Object tripsAtPosition(@QueryParam("routeId") String routeIdStr,
             @QueryParam("latitude") Double latitude, @QueryParam("longitude") Double longitude,
-            @QueryParam("maxDistanceMeter") Double maxDistanceMeter,
-            @QueryParam("maxDeltaTimeSec") Integer maxDeltaTimeSec,
-            @QueryParam("timeSec") Long timeSec,
-            @QueryParam("extended") Boolean extended, @QueryParam("routerId") String routerId)
-            throws JSONException {
-        
+            @QueryParam("maxReturnedValues") Integer maxReturnedValues,
+            @QueryParam("timeSec") Long timeSec, @QueryParam("extended") Boolean extended,
+            @QueryParam("routerId") String routerId) throws JSONException {
+
         // Specify sensible default values if not present
         if (timeSec == null)
             timeSec = System.currentTimeMillis() / 1000;
-        if (maxDistanceMeter == null)
-            maxDistanceMeter = 500.0;
-        if (maxDeltaTimeSec == null)
-            maxDeltaTimeSec = 60 * 60;
-        
+        if (maxReturnedValues == null)
+            maxReturnedValues = 10;
+
         Graph graph = getGraph(routerId);
         TransitIndexService transitIndexService = graph.getService(TransitIndexService.class);
         if (transitIndexService == null) {
@@ -823,7 +814,7 @@ public class TransitIndex {
         TripList response = new TripList();
         for (RouteVariant variant : variants) {
             response.tripMatches.addAll(matchTripsForVariant(variant, position, timeSec,
-                    serviceDays, maxDistanceMeter, maxDeltaTimeSec));
+                    serviceDays));
         }
         Collections.sort(response.tripMatches, new Comparator<TripMatch>() {
             @Override
@@ -831,28 +822,31 @@ public class TransitIndex {
                 return o1.matchFactor - o2.matchFactor < 0 ? -1 : +1;
             }
         });
+        if (response.tripMatches.size() > maxReturnedValues)
+            response.tripMatches = response.tripMatches.subList(0, maxReturnedValues);
         return response;
     }
-    
+
     private List<TripMatch> matchTripsForVariant(RouteVariant variant, Coordinate position,
-            long timeSec, List<ServiceDay> serviceDays, double maxDistanceMeter,
-            double maxDeltaTimeSec) {
-        final int T0 = 60; // seconds
-        final int L0 = 100; // meters
-        
+            long timeSec, List<ServiceDay> serviceDays) {
         List<TripMatch> matches = new ArrayList<TripMatch>();
         DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
-        
-        // Compute for each segment (distance, % inside segment) from the position
-        List<P2<Double>> distancesFraction = new ArrayList<P2<Double>>();
+
+        // Compute for each segment (distance, % inside segment, segment length) from the position
+        List<Double> distToShape = new ArrayList<Double>();
+        List<Double> fracOfShape = new ArrayList<Double>();
+        List<Double> shapeLength = new ArrayList<Double>();
         int nHops = variant.getStops().size() - 1;
         for (int hop = 0; hop < nHops; hop++) {
             LineString geometry = variant.getGeometrySegment(hop);
             double distanceMeter = distanceLibrary.fastDistance(position, geometry);
             P2<LineString> geomPair = GeometryUtils.splitGeometryAtPoint(geometry, position);
-            double total = geometry.getLength();
-            double fraction = total > 0.01 ? geomPair.getSecond().getLength() / total : 0.0;
-            distancesFraction.add(new P2<Double>(distanceMeter, fraction));
+            double shapeLen = distanceLibrary.fastLength(geometry);
+            double coverLen = distanceLibrary.fastLength(geomPair.getFirst());
+            double fraction = shapeLen > 0.01 ? coverLen / shapeLen : 0.0;
+            distToShape.add(distanceMeter);
+            fracOfShape.add(fraction);
+            shapeLength.add(shapeLen);
         }
 
         Set<AgencyAndId> processedTrips = new HashSet<AgencyAndId>();
@@ -868,45 +862,64 @@ public class TransitIndex {
                         TripTimes tripTimes = tripPattern.getTripTimes(tripPattern
                                 .getTripIndex(trip.getId()));
                         assert tripTimes.getNumHops() == nHops;
-                        double dXmin = Double.MAX_VALUE;
-                        double dTmin = Double.MAX_VALUE;
-                        double dLmin = Double.MAX_VALUE;
-                        // For each hop (= variant segment), compute
-                        // the best one in term of distance AND time delta.
-                        for (int hop = 0; hop < nHops - 1; hop++) {
-                            for (ServiceDay sd : serviceDays) {
-                                if (!sd.serviceIdRunning(serviceId))
-                                    continue;
-                                double dL = distancesFraction.get(hop).getFirst();
-                                double fraction = distancesFraction.get(hop).getSecond();
-                                int depTime = tripTimes.getDepartureTime(hop);
-                                int hopTime = tripTimes
-                                        .getArrivalTime(hop) - depTime;
-                                double dT = Math.abs(sd.time(depTime
-                                        + (int)Math.round(hopTime * fraction))
-                                        - timeSec);
-                                // Here is magic: dX = (dT + T0) . (dL + L0)
-                                double dX = (dT + hopTime / 10 + T0) * (dL + (int) dL / 10 + L0);
-                                if (dX < dXmin) {
-                                    dXmin = dX;
-                                    dTmin = dT;
-                                    dLmin = dL;
-                                }
-                            }
-                        }
-                        if (dLmin < maxDistanceMeter && dTmin < maxDeltaTimeSec) {
-                            TripMatch tripMatch = new TripMatch();
-                            tripMatch.trip = new TripType(trip);
-                            tripMatch.matchDistanceMeter = dLmin;
-                            tripMatch.matchTimeSeconds = dTmin;
-                            tripMatch.matchFactor = dXmin;
+                        TripMatch tripMatch = matchTrip(timeSec, trip, tripTimes, serviceId,
+                                distToShape, fracOfShape, shapeLength, serviceDays);
+                        if (tripMatch != null)
                             matches.add(tripMatch);
-                        }
                     }
                 }
             }
         }
         return matches;
+    }
+
+    /**
+     * Match a trip and compute it's matching factor.
+     * @return The TripMatch if the trip matches or null if not.
+     */
+    private TripMatch matchTrip(long timeSec, Trip trip, TripTimes tripTimes, int serviceId,
+            List<Double> distToShape, List<Double> fracOfShape, List<Double> shapeLength,
+            List<ServiceDay> serviceDays) {
+        final int ONE_DAY = 24 * 60 * 60;
+        double dXmin = Double.MAX_VALUE;
+        double dTmin = Double.MAX_VALUE;
+        double dLmin = Double.MAX_VALUE;
+        int nHops = tripTimes.getNumHops();
+        // For each hop (= variant segment), compute
+        // the best one in term of distance AND time delta.
+        for (ServiceDay sd : serviceDays) {
+            if (!sd.serviceIdRunning(serviceId))
+                continue;
+            for (int hop = 0; hop < nHops - 1; hop++) {
+                double dL = distToShape.get(hop);
+                double fraction = fracOfShape.get(hop);
+                double shapeLen = shapeLength.get(hop);
+                int depTime = tripTimes.getDepartureTime(hop);
+                int hopTime = tripTimes.getArrivalTime(hop) - depTime;
+                // hopTime=0 usually means rounded time to the minute,
+                // so let's assume a minimum value of 30 seconds/hop.
+                double speedMs = hopTime < 30 ? shapeLen / 30 : shapeLen / hopTime;
+                double dT = Math.abs(sd.time(depTime + (int) Math.round(hopTime * fraction))
+                        - timeSec);
+                // Here is magic: dX = dT . S + dL
+                double dX = dT * speedMs + dL;
+                if (dX < dXmin) {
+                    dXmin = dX;
+                    dTmin = dT;
+                    dLmin = dL;
+                }
+            }
+        }
+        if (dXmin < Double.MAX_VALUE && dTmin < ONE_DAY) {
+            TripMatch tripMatch = new TripMatch();
+            tripMatch.trip = new TripType(trip);
+            tripMatch.matchDistanceMeter = dLmin;
+            tripMatch.matchTimeSeconds = dTmin;
+            tripMatch.matchFactor = dXmin;
+            return tripMatch;
+        } else {
+            return null;
+        }
     }
 
     /**
