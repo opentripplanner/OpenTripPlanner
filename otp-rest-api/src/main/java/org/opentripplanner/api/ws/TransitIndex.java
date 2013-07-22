@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -36,6 +37,7 @@ import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.ServiceCalendar;
 import org.onebusaway.gtfs.model.ServiceCalendarDate;
 import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.api.model.error.TransitError;
 import org.opentripplanner.api.model.transit.AgencyList;
 import org.opentripplanner.api.model.transit.CalendarData;
@@ -47,9 +49,19 @@ import org.opentripplanner.api.model.transit.ServiceCalendarData;
 import org.opentripplanner.api.model.transit.StopList;
 import org.opentripplanner.api.model.transit.StopTime;
 import org.opentripplanner.api.model.transit.StopTimeList;
+import org.opentripplanner.api.model.transit.TripList;
+import org.opentripplanner.api.model.transit.TripMatch;
+import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.PatternHop;
+import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -63,6 +75,7 @@ import org.opentripplanner.routing.transit_index.adapters.ServiceCalendarDateTyp
 import org.opentripplanner.routing.transit_index.adapters.ServiceCalendarType;
 import org.opentripplanner.routing.transit_index.adapters.StopType;
 import org.opentripplanner.routing.transit_index.adapters.TripType;
+import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,6 +84,7 @@ import com.sun.jersey.api.core.InjectParam;
 import com.sun.jersey.api.spring.Autowire;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.LineString;
 
 // NOTE - /ws/transit is the full path -- see web.xml
 
@@ -79,6 +93,7 @@ import com.vividsolutions.jts.geom.Envelope;
 @Autowire
 public class TransitIndex {
 
+    @SuppressWarnings("unused")
     private static final Logger LOG = LoggerFactory.getLogger(TransitIndex.class);
 
     private static final double STOP_SEARCH_RADIUS = 200;
@@ -309,9 +324,6 @@ public class TransitIndex {
                     "No transit index found.  Add TransitIndexBuilder to your graph builder configuration and rebuild your graph.");
         }
 
-        // if no stopAgency is set try to search through all different agencies
-        Graph graph = getGraph(routerId);
-
         // add all departures
         HashSet<TripType> trips = new HashSet<TripType>();
         StopTimeList result = new StopTimeList();
@@ -331,8 +343,9 @@ public class TransitIndex {
 
             RoutingRequest options = makeTraverseOptions(startTime, routerId);
 
-            HashMap<Long, Edge> seen = new HashMap();
-            OUTER: for (Edge e : boarding.getOutgoing()) {
+            HashMap<Long, Edge> seen = new HashMap<Long, Edge>();
+            //OUTER:
+            for (Edge e : boarding.getOutgoing()) {
                 // each of these edges boards a separate set of trips
                 for (StopTime st : getStopTimesForBoardEdge(startTime, endTime, options, e,
                         extended)) {
@@ -538,17 +551,18 @@ public class TransitIndex {
 
         for (RouteSegment segment : variant.segmentsAfter(start)) {
             // TODO: verify options/state init correctness
-            State s0 = new State(segment.hopIn.getFromVertex(), state.getTimeSeconds(), options);
+            StateEditor se = state.edit(null);
+            State s0 = se.makeState();
             state = segment.hopIn.traverse(s0);
             StopTime st = new StopTime();
             st.time = state.getTimeSeconds();
-            for (org.onebusaway.gtfs.model.Stop stop : variant.getStops())
-                if (stop.getId().equals(segment.stop))
+            if (extended) {
+                for (org.onebusaway.gtfs.model.Stop stop : variant.getStops()) {
                     if (stop.getId().equals(segment.stop)) {
-                        if (extended != null && extended.equals(true)) {
-                            st.stop = new StopType(stop, extended);
-                        }
+                        st.stop = new StopType(stop, extended);
                     }
+                }
+            }
             result.stopTimes.add(st);
         }
 
@@ -764,4 +778,164 @@ public class TransitIndex {
         }
         return agencyList;
     }
+    
+    /**
+     * Return a list of all trips for a given route nearby a certain point (used for on-board depart
+     * when client does not know trip ID), sorted by a matching (=relevance) factor.
+     */
+    @GET
+    @Path("/tripsAtPosition")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    public Object tripsAtPosition(@QueryParam("routeId") String routeIdStr,
+            @QueryParam("latitude") Double latitude, @QueryParam("longitude") Double longitude,
+            @QueryParam("maxReturnedValues") Integer maxReturnedValues,
+            @QueryParam("timeSec") Long timeSec, @QueryParam("extended") Boolean extended,
+            @QueryParam("routerId") String routerId) throws JSONException {
+
+        // Specify sensible default values if not present
+        if (timeSec == null)
+            timeSec = System.currentTimeMillis() / 1000;
+        if (maxReturnedValues == null)
+            maxReturnedValues = 10;
+        if (extended == null)
+            extended = false;
+
+        Graph graph = getGraph(routerId);
+        TransitIndexService transitIndexService = graph.getService(TransitIndexService.class);
+        if (transitIndexService == null) {
+            return new TransitError(
+                    "No transit index found. Add TransitIndexBuilder to your graph builder configuration and rebuild your graph.");
+        }
+        AgencyAndId routeId = AgencyAndId.convertFromString(routeIdStr);
+        List<RouteVariant> variants = transitIndexService.getVariantsForRoute(routeId);
+        // variants can't be null here
+        Coordinate position = new Coordinate(longitude, latitude);
+        List<ServiceDay> serviceDays = getServiceDays(graph, timeSec, routeId.getAgencyId());
+
+        // Brute-force approach: number of variants for a route should be rather small
+        TripList response = new TripList();
+        for (RouteVariant variant : variants) {
+            response.tripMatches.addAll(matchTripsForVariant(variant, position, timeSec,
+                    serviceDays, extended));
+        }
+        Collections.sort(response.tripMatches, new Comparator<TripMatch>() {
+            @Override
+            public int compare(TripMatch o1, TripMatch o2) {
+                return o1.matchFactor - o2.matchFactor < 0 ? -1 : +1;
+            }
+        });
+        if (response.tripMatches.size() > maxReturnedValues)
+            response.tripMatches = response.tripMatches.subList(0, maxReturnedValues);
+        return response;
+    }
+
+    private List<TripMatch> matchTripsForVariant(RouteVariant variant, Coordinate position,
+            long timeSec, List<ServiceDay> serviceDays, boolean extended) {
+        List<TripMatch> matches = new ArrayList<TripMatch>();
+        DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
+
+        // Compute for each segment (distance, % inside segment, segment length) from the position
+        List<Double> distToShape = new ArrayList<Double>();
+        List<Double> fracOfShape = new ArrayList<Double>();
+        List<Double> shapeLength = new ArrayList<Double>();
+        int nHops = variant.getStops().size() - 1;
+        for (int hop = 0; hop < nHops; hop++) {
+            LineString geometry = variant.getGeometrySegment(hop);
+            double distanceMeter = distanceLibrary.fastDistance(position, geometry);
+            P2<LineString> geomPair = GeometryUtils.splitGeometryAtPoint(geometry, position);
+            double shapeLen = distanceLibrary.fastLength(geometry);
+            double coverLen = distanceLibrary.fastLength(geomPair.getFirst());
+            double fraction = shapeLen > 0.01 ? coverLen / shapeLen : 0.0;
+            distToShape.add(distanceMeter);
+            fracOfShape.add(fraction);
+            shapeLength.add(shapeLen);
+        }
+
+        Set<AgencyAndId> processedTrips = new HashSet<AgencyAndId>();
+        for (RouteSegment segment : variant.getSegments()) {
+            if (segment.hopOut != null && segment.hopOut instanceof PatternHop) {
+                PatternHop patternHop = (PatternHop) segment.hopOut;
+                TableTripPattern tripPattern = patternHop.getPattern();
+                int serviceId = tripPattern.getServiceId();
+                for (Trip trip : tripPattern.getTrips()) {
+                    if (!processedTrips.contains(trip.getId())) {
+                        processedTrips.add(trip.getId());
+                        // Compute trip times
+                        TripTimes tripTimes = tripPattern.getTripTimes(tripPattern
+                                .getTripIndex(trip.getId()));
+                        assert tripTimes.getNumHops() == nHops;
+                        TripMatch tripMatch = matchTrip(timeSec, trip, tripTimes, serviceId,
+                                distToShape, fracOfShape, shapeLength, serviceDays, extended);
+                        if (tripMatch != null)
+                            matches.add(tripMatch);
+                    }
+                }
+            }
+        }
+        return matches;
+    }
+
+    /**
+     * Match a trip and compute it's matching factor.
+     * @return The TripMatch if the trip matches or null if not.
+     */
+    private TripMatch matchTrip(long timeSec, Trip trip, TripTimes tripTimes, int serviceId,
+            List<Double> distToShape, List<Double> fracOfShape, List<Double> shapeLength,
+            List<ServiceDay> serviceDays, boolean extended) {
+        final int ONE_DAY = 24 * 60 * 60;
+        double dXmin = Double.MAX_VALUE;
+        double dTmin = Double.MAX_VALUE;
+        double dLmin = Double.MAX_VALUE;
+        int nHops = tripTimes.getNumHops();
+        // For each hop (= variant segment), compute
+        // the best one in term of distance AND time delta.
+        for (ServiceDay sd : serviceDays) {
+            if (!sd.serviceIdRunning(serviceId))
+                continue;
+            for (int hop = 0; hop < nHops - 1; hop++) {
+                double dL = distToShape.get(hop);
+                double fraction = fracOfShape.get(hop);
+                double shapeLen = shapeLength.get(hop);
+                int depTime = tripTimes.getDepartureTime(hop);
+                int hopTime = tripTimes.getArrivalTime(hop) - depTime;
+                // hopTime=0 usually means rounded time to the minute,
+                // so let's assume a minimum value of 30 seconds/hop.
+                double speedMs = hopTime < 30 ? shapeLen / 30 : shapeLen / hopTime;
+                double dT = Math.abs(sd.time(depTime + (int) Math.round(hopTime * fraction))
+                        - timeSec);
+                // Here is magic: dX = dT . S + dL
+                double dX = dT * speedMs + dL;
+                if (dX < dXmin) {
+                    dXmin = dX;
+                    dTmin = dT;
+                    dLmin = dL;
+                }
+            }
+        }
+        if (dXmin < Double.MAX_VALUE && dTmin < ONE_DAY) {
+            TripMatch tripMatch = new TripMatch();
+            tripMatch.trip = new TripType(trip, extended);
+            tripMatch.matchDistanceMeter = dLmin;
+            tripMatch.matchTimeSeconds = dTmin;
+            tripMatch.matchFactor = dXmin;
+            return tripMatch;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * @return 3 service days: yesterday, today and tomorrow for an agency.
+     */
+    private List<ServiceDay> getServiceDays(Graph graph, long epochSec, String agencyId) {
+        final long SEC_IN_DAY = 60 * 60 * 24;
+        List<ServiceDay> serviceDays = new ArrayList<ServiceDay>(3);
+        serviceDays.add(new ServiceDay(graph, epochSec - SEC_IN_DAY, graph.getCalendarService(),
+                agencyId));
+        serviceDays.add(new ServiceDay(graph, epochSec, graph.getCalendarService(), agencyId));
+        serviceDays.add(new ServiceDay(graph, epochSec + SEC_IN_DAY, graph.getCalendarService(),
+                agencyId));
+        return serviceDays;
+    }
+    
 }
