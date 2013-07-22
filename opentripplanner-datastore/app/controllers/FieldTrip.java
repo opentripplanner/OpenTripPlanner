@@ -303,5 +303,13 @@ public class FieldTrip extends Application {
         }
     }
 
+    /* Receipt Generation */
+    
+    public static void receipt(long requestId) {
+        FieldTripRequest req = FieldTripRequest.findById(requestId);
+        if(req != null) {
+            render(req);
+        }
+    }
     
 }
