@@ -502,6 +502,7 @@ public class PlanGenerator {
             leg.tripId = trip.getId().getId();
             leg.agencyId = trip.getId().getAgencyId();
             leg.tripShortName = trip.getTripShortName();
+            leg.tripBlockId = trip.getBlockId();
             leg.routeShortName = trip.getRoute().getShortName();
             leg.routeLongName = trip.getRoute().getLongName();
             leg.routeColor = trip.getRoute().getColor();
