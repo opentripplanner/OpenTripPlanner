@@ -38,7 +38,20 @@ public class GTFSTrip extends Model {
 
     @Expose
     public Integer toStopIndex;
+
+    @Expose
+    public Integer blockId;
+
+    @Expose
+    public String fromStopName;
     
+    @Expose
+    public String toStopName;
+    
+    @Expose
+    public String headsign;
+    
+        
     /*@ManyToOne
     @Expose
     private Trip trip;*/

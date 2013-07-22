@@ -392,6 +392,10 @@ otp.modules.fieldtrip.FieldTripModule =
                 data['trips['+l+'].routeName'] = routeName;
                 data['trips['+l+'].fromStopIndex'] = leg.from.stopIndex;
                 data['trips['+l+'].toStopIndex'] = leg.to.stopIndex;
+                data['trips['+l+'].fromStopName'] = leg.from.name;
+                data['trips['+l+'].toStopName'] = leg.to.name;
+                data['trips['+l+'].headsign'] = leg.headsign;
+                if(leg.tripBlockId) data['trips['+l+'].blockId'] = leg.tripBlockId;
             }
             //console.log(data);
             

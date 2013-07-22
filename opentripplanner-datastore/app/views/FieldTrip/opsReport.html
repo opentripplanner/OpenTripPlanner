@@ -1,0 +1,31 @@
+#{stylesheet 'main.css' /}
+
+<div class="mainContent">
+
+<h2>Field trips for ${monthName} ${day}, ${year}:</h2>
+  #{list items:gtfsTrips, as:'gtfsTrip'}
+  <div class="tripHeader">${gtfsTrip.groupItinerary.fieldTrip.request.schoolName} Trip to ${gtfsTrip.groupItinerary.fieldTrip.request.endLocation}</div>
+  <div class="tripBody">
+    <b>Date</b>: ${month}/${day}/${year}<br>
+    <b>Number of Passengers</b>: ${gtfsTrip.groupItinerary.passengers}<br>
+    <b>Ages</b>: ${gtfsTrip.groupItinerary.fieldTrip.request.minimumAge} to ${gtfsTrip.groupItinerary.fieldTrip.request.maximumAge}<br>
+    <b>Class Pass</b>: 
+      #{if gtfsTrip.groupItinerary.fieldTrip.request.classpassId}
+        ${gtfsTrip.groupItinerary.fieldTrip.request.classpassId}
+      #{/if}
+      #{else}
+        (None)
+      #{/else}<br>
+    <b>Organization</b>: ${gtfsTrip.groupItinerary.fieldTrip.request.schoolName}<br>
+    <b>Contact</b>: ${gtfsTrip.groupItinerary.fieldTrip.request.teacherName} (${gtfsTrip.groupItinerary.fieldTrip.request.phoneNumber})<br>
+    <b>Block ID</b>: ${gtfsTrip.blockId}<br>
+    <b>Departure Stop/Time</b>: ${gtfsTrip.fromStopName} at ${new Date(gtfsTrip.depart.getTime() + gtfsTrip.groupItinerary.timeOffset*3600000).format("h:mma")}<br>
+    <b>Arrival Stop/Time</b>: ${gtfsTrip.toStopName} at ${new Date(gtfsTrip.arrive.getTime() + gtfsTrip.groupItinerary.timeOffset*3600000).format("h:mma")}<br>
+    <b>Headsign</b>: ${gtfsTrip.headsign}<br>
+  </div>
+  #{/list}
+  #{else}
+    <i>No trips planned for this day.
+  #{/else}
+
+</div>
