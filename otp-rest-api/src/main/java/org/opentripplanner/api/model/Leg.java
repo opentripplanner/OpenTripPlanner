@@ -141,6 +141,13 @@ public class Leg {
     public String tripShortName = null;
 
     /**
+     * For transit leg, the trip's block ID (if one exists). For non-transit legs, null.
+     */
+    @XmlAttribute
+    @JsonSerialize
+    public String tripBlockId = null;
+    
+    /**
      * For transit legs, the headsign of the bus or train being used. For non-transit legs, null.
      */
     @XmlAttribute
