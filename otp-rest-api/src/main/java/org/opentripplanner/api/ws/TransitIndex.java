@@ -797,6 +797,8 @@ public class TransitIndex {
             timeSec = System.currentTimeMillis() / 1000;
         if (maxReturnedValues == null)
             maxReturnedValues = 10;
+        if (extended == null)
+            extended = false;
 
         Graph graph = getGraph(routerId);
         TransitIndexService transitIndexService = graph.getService(TransitIndexService.class);
@@ -814,7 +816,7 @@ public class TransitIndex {
         TripList response = new TripList();
         for (RouteVariant variant : variants) {
             response.tripMatches.addAll(matchTripsForVariant(variant, position, timeSec,
-                    serviceDays));
+                    serviceDays, extended));
         }
         Collections.sort(response.tripMatches, new Comparator<TripMatch>() {
             @Override
@@ -828,7 +830,7 @@ public class TransitIndex {
     }
 
     private List<TripMatch> matchTripsForVariant(RouteVariant variant, Coordinate position,
-            long timeSec, List<ServiceDay> serviceDays) {
+            long timeSec, List<ServiceDay> serviceDays, boolean extended) {
         List<TripMatch> matches = new ArrayList<TripMatch>();
         DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
@@ -863,7 +865,7 @@ public class TransitIndex {
                                 .getTripIndex(trip.getId()));
                         assert tripTimes.getNumHops() == nHops;
                         TripMatch tripMatch = matchTrip(timeSec, trip, tripTimes, serviceId,
-                                distToShape, fracOfShape, shapeLength, serviceDays);
+                                distToShape, fracOfShape, shapeLength, serviceDays, extended);
                         if (tripMatch != null)
                             matches.add(tripMatch);
                     }
@@ -879,7 +881,7 @@ public class TransitIndex {
      */
     private TripMatch matchTrip(long timeSec, Trip trip, TripTimes tripTimes, int serviceId,
             List<Double> distToShape, List<Double> fracOfShape, List<Double> shapeLength,
-            List<ServiceDay> serviceDays) {
+            List<ServiceDay> serviceDays, boolean extended) {
         final int ONE_DAY = 24 * 60 * 60;
         double dXmin = Double.MAX_VALUE;
         double dTmin = Double.MAX_VALUE;
@@ -912,7 +914,7 @@ public class TransitIndex {
         }
         if (dXmin < Double.MAX_VALUE && dTmin < ONE_DAY) {
             TripMatch tripMatch = new TripMatch();
-            tripMatch.trip = new TripType(trip);
+            tripMatch.trip = new TripType(trip, extended);
             tripMatch.matchDistanceMeter = dLmin;
             tripMatch.matchTimeSeconds = dTmin;
             tripMatch.matchFactor = dXmin;
