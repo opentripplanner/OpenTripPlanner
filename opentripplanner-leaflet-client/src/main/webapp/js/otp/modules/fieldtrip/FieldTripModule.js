@@ -134,13 +134,15 @@ otp.modules.fieldtrip.FieldTripModule =
             return;
         }
         
-        var planDate = moment(this.optionsWidget.controls['time'].epoch).format("YYYY-MM-DD");
+        var planDate = moment(this.optionsWidget.controls['time'].getDate()).format("MM/DD/YYYY");
         this.currentGroupSize = this.groupSize;
         this.bannedSegments = [];
         //console.log("RESET SEGMENTS");
         this.groupPlan = null;
 
         var this_ = this;
+        
+        // query for trips in use by other field trip itineraries in the DB
         $.ajax(this.datastoreUrl+'/fieldtrip/getTrips', {
             data: {
                 sessionId : this.sessionManager.sessionId,
@@ -150,21 +152,25 @@ otp.modules.fieldtrip.FieldTripModule =
                 
             success: function(data) {
                 if((typeof data) == "string") data = jQuery.parseJSON(data);
+                
+                // store the trips in use for reference by the checkTripValidity() method
+                this_.tripsInUse = [];
+                
                 for(var t = 0; t < data.length; t++) {
                     var fieldTrip = data[t];
                     for(var i = 0; i < fieldTrip.groupItineraries.length; i++) {
                         var grpItin = fieldTrip.groupItineraries[i];
                         for(var gt =0 ; gt < grpItin.trips.length; gt++) {
-                            //this_.bannedSegments.push(grpItin.trips[gt].tripString);
                             var gtfsTrip = grpItin.trips[gt];
-                            this_.bannedSegments.push({
-                                agencyAndId : gtfsTrip.agencyAndId,
-                                fromStopIndex : gtfsTrip.stopIndex,
-                                toStopIndex : gtfsTrip.stopIndex,
-                            });
+                            // (gtfsTrip already includes fields agencyAndId, fromStopIndex, and toStopIndex)
+                            gtfsTrip.passengers = grpItin.passengers; 
+                            this_.tripsInUse.push(gtfsTrip);
                         }
                     }
                 }
+                
+                // kick off the main planTrip request
+                this.itinCapacity = null;
                 this_.planTrip();
             },
             
@@ -206,6 +212,10 @@ otp.modules.fieldtrip.FieldTripModule =
         //var itin = new otp.modules.planner.Itinerary(tripPlan.itineraries[0], tripPlan);
         var itin = tripPlan.itineraries[0];
         var capacity = itin.getGroupTripCapacity();
+        
+        // if this itin shares a vehicle trip with another one already in use, only use the remainingCapacity (as set in checkTripValidity())
+        if(this.itinCapacity) capacity = Math.min(capacity, this.itinCapacity);
+
         //console.log("cur grp size:"+this.currentGroupSize+", cap="+capacity);
         
         //console.log("FT returned trip:");
@@ -230,6 +240,7 @@ otp.modules.fieldtrip.FieldTripModule =
             this.currentGroupSize -= capacity;
             itin.groupSize = capacity;
             //console.log("remaining: "+this.currentGroupSize);
+            this.itinCapacity = null;
             this.planTrip();
         }
         else { // we're done; show the results
@@ -334,7 +345,25 @@ otp.modules.fieldtrip.FieldTripModule =
             }
         });
     },
-    
+
+    checkTripValidity : function(tripId, fromStopIndex, toStopIndex, itin) {
+        for(var i = 0; i < this.tripsInUse.length; i++) {
+            var tripInUse  = this.tripsInUse[i];
+            
+            // first test: are these the same vehicle trip? if not, we're ok
+            if(tripId !== tripInUse.agencyAndId) continue;
+            
+            // second test: do the stop ranges overlap? if not, we're ok
+            if(fromStopIndex > tripInUse.toStopIndex || toStopIndex < tripInUse.fromStopIndex) continue;
+            
+            // if ranges overlap, calculate remaining capacity
+            var remainingCapacity = itin.getGroupTripCapacity() - tripInUse.passengers;
+            if(remainingCapacity < 10) return false; // consider trip 'full' if < 10 spots remain
+            this.itinCapacity = this.itinCapacity ? Math.min(this.itinCapacity, remainingCapacity) : remainingCapacity;
+        }
+        return true;
+    },
+        
     saveItineraries : function(tripId, successCallback) {
         var this_ = this;
         this.itinsSaved = 0;

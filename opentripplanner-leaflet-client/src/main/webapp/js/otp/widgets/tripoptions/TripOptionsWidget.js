@@ -367,6 +367,14 @@ otp.widgets.tripoptions.TimeSelector =
         
 
     },
+    
+    getDate : function() {
+        return $('#'+this.id+'-date').val();
+    },
+
+    getTime : function() {
+        return $('#'+this.id+'-time').val();
+    },
 
     restorePlan : function(data) {
         //var m = moment(data.queryParams.date+" "+data.queryParams.time, "MM-DD-YYYY h:mma");
