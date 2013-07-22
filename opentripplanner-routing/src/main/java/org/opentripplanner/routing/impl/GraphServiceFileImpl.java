@@ -30,24 +30,21 @@ import lombok.Setter;
 
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
-import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A GraphService implementation implementing loading graph from files or resources, but which does
- * not load anything by itself. It rely on decorators instances to help it initialize/reload itself.
+ * A class implementing loading graph from files or resources, but which does not load anything by
+ * itself. It rely on owner instances to help it initialize/reload itself.
  * 
- * Note: Instead of a decorator pattern we should have used a strategy pattern (letting the
- * GraphServiceImpl delegate the file mapping to various strategy/factory instances), but this would
- * have broke down the spring API widely used. And also this could have been a bit more complex as
- * auto-discover mode would have need callbacks.
+ * Note: Naming is not ideal, but this would have broke down the spring API widely used (namely, the
+ * GraphServiceImpl class).
  * 
  * @see GraphServiceImpl
  * @see GraphServiceAutoDiscoverImpl
  */
-public class GraphServiceFileImpl implements GraphService {
+public class GraphServiceFileImpl {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphServiceFileImpl.class);
 
@@ -96,7 +93,6 @@ public class GraphServiceFileImpl implements GraphService {
         }
     }
 
-    @Override
     public void setLoadLevel(LoadLevel level) {
         if (level != loadLevel) {
             loadLevel = level;
@@ -162,7 +158,6 @@ public class GraphServiceFileImpl implements GraphService {
         }
     }
 
-    @Override
     public boolean reloadGraphs(boolean preEvict) {
         boolean allSucceeded = true;
         synchronized (graphs) {
@@ -174,12 +169,10 @@ public class GraphServiceFileImpl implements GraphService {
         return allSucceeded;
     }
 
-    @Override
     public Collection<String> getRouterIds() {
         return new ArrayList<String>(graphs.keySet());
     }
 
-    @Override
     public boolean registerGraph(String routerId, boolean preEvict) {
         if (preEvict)
             evictGraph(routerId);
@@ -196,13 +189,11 @@ public class GraphServiceFileImpl implements GraphService {
         return false;
     }
 
-    @Override
     public boolean registerGraph(String routerId, Graph graph) {
         Graph existing = graphs.put(routerId, graph);
         return existing == null;
-    }
+     }
 
-    @Override
     public boolean evictGraph(String routerId) {
         LOG.debug("evicting graph {}", routerId);
         synchronized (graphs) {
@@ -211,7 +202,6 @@ public class GraphServiceFileImpl implements GraphService {
         }
     }
 
-    @Override
     public int evictAll() {
         int n;
         synchronized (graphs) {
