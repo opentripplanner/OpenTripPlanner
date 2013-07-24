@@ -44,7 +44,7 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
 
     /** 
      * If a timetable snapshot is requested less than this number of milliseconds after the previous 
-     * snapshot, just return the same one. Thottles the potentially resource-consuming task of 
+     * snapshot, just return the same one. Throttles the potentially resource-consuming task of 
      * duplicating a TripPattern -> Timetable map and indexing the new Timetables.
      */
     @Setter private int maxSnapshotFrequency = 1000; // msec    
@@ -106,7 +106,7 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
         while (true) {
             List<TripUpdate> tripUpdates = updateStreamer.getUpdates(); 
             if (tripUpdates == null) {
-                LOG.debug("updates is null");
+                LOG.debug("tripUpdates is null");
                 continue;
             }
 
@@ -114,20 +114,20 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
             int uIndex = 0;
             for (TripUpdate tripUpdate : tripUpdates) {
                 uIndex += 1;
-                LOG.debug("update block #{} ({} updates) :", uIndex, tripUpdate.getUpdates().size());
+                LOG.debug("trip update block #{} ({} updates) :", uIndex, tripUpdate.getUpdates().size());
                 LOG.trace("{}", tripUpdate.toString());
                 tripUpdate.filter(true, true, true);
                 if (! tripUpdate.isCoherent()) {
-                    LOG.warn("Incoherent UpdateBlock, skipping.");
+                    LOG.warn("Incoherent TripUpdate, skipping.");
                     continue;
                 }
                 if (tripUpdate.getUpdates().size() < 1) {
-                    LOG.debug("UpdateBlock contains no updates after filtering, skipping.");
+                    LOG.debug("trip update contains no updates after filtering, skipping.");
                     continue;
                 }
                 TableTripPattern pattern = transitIndexService.getTripPatternForTrip(tripUpdate.getTripId());
                 if (pattern == null) {
-                    LOG.debug("No pattern found for tripId {}, skipping UpdateBlock.", tripUpdate.getTripId());
+                    LOG.debug("No pattern found for tripId {}, skipping trip update.", tripUpdate.getTripId());
                     continue;
                 }
 
