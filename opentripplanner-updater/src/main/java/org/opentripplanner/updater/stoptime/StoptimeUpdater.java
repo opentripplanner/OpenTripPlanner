@@ -143,6 +143,9 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
                     LOG.info("applied {} stoptime update blocks.", appliedBlockCount);
                 }
             }
+            // Make a snapshot after each message in anticipation of incoming requests 
+            getSnapshot(); 
+
             LOG.debug("end of update message");
         }
     }
@@ -162,10 +165,6 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
         }
 
         boolean applied = buffer.update(pattern, tripUpdate);
-        if (applied) {
-            // consider making a snapshot immediately in anticipation of incoming requests 
-            getSnapshot(); 
-        }
         
         return applied;
     }
@@ -189,10 +188,6 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
 
         // we have a message we actually want to apply
         boolean applied = buffer.update(pattern, tripUpdate);
-        if (applied) {
-            // consider making a snapshot immediately in anticipation of incoming requests 
-            getSnapshot(); 
-        }
         
         return applied;
     }
