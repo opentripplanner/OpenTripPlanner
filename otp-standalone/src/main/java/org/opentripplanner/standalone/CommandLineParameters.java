@@ -51,31 +51,35 @@ public class CommandLineParameters {
     description = "build graphs at specified paths", variableArity = true)
     public List<File> build;
     
+    @Parameter(names = { "-e", "--elevation"},
+            description = "whether to download elevation data for the graph")
+    boolean elevation;
+    
     @Parameter(names = { "-m", "--inMemory"},
     description = "whether to pass the graph to the server in-memory after building it")
     boolean inMemory;
     
     /* Options for the server sub-task. */
 
+    @Parameter( names = { "-g", "--graphs"}, validateWith = ReadableDirectory.class, 
+            description = "path to graph directory")
+    String graphDirectory;
+    
     @Parameter( names = { "-p", "--port"}, validateWith = AvailablePort.class, 
     description = "server port")
     Integer port;
 
-    @Parameter( names = { "-g", "--graphs"}, validateWith = ReadableDirectory.class, 
-    description = "path to graph directory")
-    String graphDirectory;
-    
     @Parameter( names = { "-r", "--router"}, validateWith = RouterId.class,
     description = "default router ID")
     String defaultRouterId;
 
+    @Parameter( names = { "-s", "--server"}, 
+            description = "run a server")
+    boolean server = false;
+    
     @Parameter( names = { "-t", "--static"}, 
     description = "path to static content")
     String staticDirectory;
-
-    @Parameter( names = { "-s", "--server"}, 
-    description = "run a server")
-    boolean server = false;
 
     @Parameter( validateWith = ReadableFile.class, // the remaining parameters in one array
     description = "files") 
