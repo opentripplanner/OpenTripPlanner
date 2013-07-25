@@ -33,6 +33,7 @@ public class CommandLineParameters {
     private static final int DEFAULT_PORT = 8080;
     private static final String DEFAULT_STATIC_DIRECTORY = "/var/otp/static";
     private static final String DEFAULT_GRAPH_DIRECTORY  = "/var/otp/graphs";
+    private static final String DEFAULT_CACHE_DIRECTORY  = "/var/otp/cache";
     private static final String DEFAULT_ROUTER_ID = "";
 
     /* Options for the command itself, rather than build or server sub-tasks. */
@@ -51,6 +52,10 @@ public class CommandLineParameters {
     description = "build graphs at specified paths", variableArity = true)
     public List<File> build;
     
+    @Parameter(names = { "-c", "--cache"}, validateWith = ReadWriteDirectory.class,
+            description = "the directory under which to cache OSM and NED tiles")
+    String cacheDirectory;
+
     @Parameter(names = { "-e", "--elevation"},
             description = "whether to download elevation data for the graph")
     boolean elevation;
@@ -92,6 +97,7 @@ public class CommandLineParameters {
         if (graphDirectory  == null) graphDirectory  = DEFAULT_GRAPH_DIRECTORY;
         if (defaultRouterId == null) defaultRouterId = DEFAULT_ROUTER_ID;
         if (staticDirectory == null) staticDirectory = DEFAULT_STATIC_DIRECTORY;        
+        if (cacheDirectory == null)  cacheDirectory  = DEFAULT_CACHE_DIRECTORY;        
         if (port == null) port = DEFAULT_PORT;
         new AvailablePort().validate(port);
     }
@@ -126,6 +132,18 @@ public class CommandLineParameters {
         }
     }
     
+    public static class ReadWriteDirectory implements IParameterValidator {
+        @Override
+        public void validate(String name, String value) throws ParameterException {
+            new ReadableDirectory().validate(name, value);
+            File file = new File(value);
+            if ( ! file.canWrite()) {
+                String msg = String.format("%s: directory '%s' is not writable.", name, value);
+                throw new ParameterException(msg);
+            }
+        }
+    }
+
     public static class PositiveInteger implements IParameterValidator {
         @Override
         public void validate(String name, String value) throws ParameterException {
