@@ -139,8 +139,8 @@ public class OTPConfigurator {
                 }
             }
         }
-        boolean hasOSM  = ! osmFiles.isEmpty();
-        boolean hasGTFS = ! gtfsFiles.isEmpty();
+        boolean hasOSM  = ! (osmFiles.isEmpty()  || params.noStreets);
+        boolean hasGTFS = ! (gtfsFiles.isEmpty() || params.noTransit);
         if ( ! (hasOSM || hasGTFS )) {
             LOG.error("Found no input files from which to build a graph in {}", params.build.toString());
             return null;

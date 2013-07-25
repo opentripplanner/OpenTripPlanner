@@ -57,12 +57,20 @@ public class CommandLineParameters {
     String cacheDirectory;
 
     @Parameter(names = { "-e", "--elevation"},
-            description = "whether to download elevation data for the graph")
+            description = "download and use elevation data for the graph")
     boolean elevation;
     
     @Parameter(names = { "-m", "--inMemory"},
-    description = "whether to pass the graph to the server in-memory after building it")
+    description = "pass the graph to the server in-memory after building it, without saving to disk")
     boolean inMemory;
+    
+    @Parameter(names = {"--noTransit"},
+    description = "skip all input files that define transit service (GTFS feeds)")
+    boolean noTransit;
+    
+    @Parameter(names = { "-m", "--noStreets"},
+    description = "skip all input files that define transit service (GTFS feeds)")
+    boolean noStreets;
     
     /* Options for the server sub-task. */
 
