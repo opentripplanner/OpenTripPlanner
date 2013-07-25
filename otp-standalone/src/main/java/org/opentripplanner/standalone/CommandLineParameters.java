@@ -40,9 +40,9 @@ public class CommandLineParameters {
    
     /* Options for the graph builder sub-task. */
 
-    @Parameter(names = {"-b", "--build"}, variableArity = true, validateWith = ReadableDirectory.class, 
-    description = "build graphs at specified paths")
-    public List<File> foo = new ArrayList<File>();
+    @Parameter(names = {"-b", "--build"}, validateWith = ReadableDirectory.class, 
+    description = "build graphs at specified paths", variableArity = true)
+    public List<File> build = new ArrayList<File>();
     
     @Parameter(names = { "-s", "--serialize"}, 
     description = "whether to serialize the graph after building it")
