@@ -43,6 +43,7 @@ public class OTPMain {
         try {
             JCommander jc = new JCommander(params, args);
             if (params.help) {
+                jc.setProgramName("java -Xmx[several]G -jar otp.jar");
                 jc.usage();
                 System.exit(0);
             }
