@@ -18,10 +18,14 @@
             <artifactId>otp-rest-api</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!-- Java standard library extensions -->
+        <!-- JAVA STANDARD LIBRARY EXTENSIONS -->
         <dependency>
-          <groupId>org.projectlombok</groupId>
-          <artifactId>lombok</artifactId>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
         </dependency>
         <!-- Logging  -->
         <dependency>
