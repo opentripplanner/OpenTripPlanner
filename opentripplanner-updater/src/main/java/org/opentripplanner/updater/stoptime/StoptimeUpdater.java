@@ -19,6 +19,7 @@ import javax.annotation.PostConstruct;
 import lombok.Setter;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.edgetype.TimetableSnapshotSource;
@@ -58,9 +59,14 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
     /** The working copy of the timetable resolver. Should not be visible to routing threads. */
     private TimetableResolver buffer = new TimetableResolver();
     
+    /** Should expired realtime data be purged from the graph. */
+    @Setter private boolean purgeExpiredData = true;
+    
     /** The TransitIndexService */
     private TransitIndexService transitIndexService;
     
+    
+    private ServiceDate lastPurgeDate = new ServiceDate();
     
     // nothing in the timetable snapshot binds it to one graph. we could use this updater for all
     // graphs at once
@@ -80,10 +86,14 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
                     "Real-time update need a TransitIndexService. Please setup one during graph building.");
     }
     
-    public synchronized TimetableResolver getSnapshot() {
+    public TimetableResolver getSnapshot() {
+        return getSnapshot(false);
+    }
+    
+    private synchronized TimetableResolver getSnapshot(boolean force) {
         long now = System.currentTimeMillis();
-        if (now - lastSnapshotTime > maxSnapshotFrequency) {
-            if (buffer.isDirty()) {
+        if (force || now - lastSnapshotTime > maxSnapshotFrequency) {
+            if (force || buffer.isDirty()) {
                 LOG.debug("Committing {}", buffer.toString());
                 snapshot = buffer.commit();
             } else {
@@ -143,10 +153,18 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
                     LOG.info("applied {} stoptime update blocks.", appliedBlockCount);
                 }
             }
-            // Make a snapshot after each message in anticipation of incoming requests 
-            getSnapshot(); 
 
             LOG.debug("end of update message");
+
+            // Make a snapshot after each message in anticipation of incoming requests
+            // Purge data if necessary (and force new snapshot if anything was purged)
+            if(purgeExpiredData) {
+                boolean modified = purgeExpiredData(); 
+                getSnapshot(modified);
+            }
+            else {
+                getSnapshot(); 
+            }
         }
     }
 
@@ -207,5 +225,20 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
         String s = (updateStreamer == null) ? "NONE" : updateStreamer.toString();
         return "Streaming stoptime updater with update streamer = " + s;
     }
-    
+
+    private boolean purgeExpiredData() {
+        ServiceDate today = new ServiceDate();
+        ServiceDate previously = today.previous().previous(); // Just to be safe... 
+        
+        if(lastPurgeDate.compareTo(previously) > 0) {
+            return false;
+        }
+        
+        LOG.debug("purging expired realtime data");
+        // TODO: purge expired realtime data
+        
+        lastPurgeDate = previously;
+        
+        return buffer.purgeExpiredData(previously);
+    }
 }

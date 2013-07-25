@@ -36,6 +36,7 @@ public class ServiceDay implements Serializable {
     private static final long serialVersionUID = -1206371243806996680L;
 
     protected long midnight;
+    protected ServiceDate serviceDate;
     protected BitSet serviceIdsRunning;
     
     /* 
@@ -47,13 +48,13 @@ public class ServiceDay implements Serializable {
         GregorianCalendar calendar = new GregorianCalendar(timeZone);
         calendar.setTime(new Date(time * 1000));
 
-        ServiceDate sd = new ServiceDate(calendar);
-        Date d = sd.getAsDate(timeZone);
+        serviceDate = new ServiceDate(calendar);
+        Date d = serviceDate.getAsDate(timeZone);
         this.midnight = d.getTime() / 1000;
         serviceIdsRunning = new BitSet(cs.getServiceIds().size());
         
         ServiceIdToNumberService service = graph.getService(ServiceIdToNumberService.class);
-        for (AgencyAndId serviceId : cs.getServiceIdsOnDate(sd)) {
+        for (AgencyAndId serviceId : cs.getServiceIdsOnDate(serviceDate)) {
             int n = service.getNumber(serviceId);
             if (n < 0)
                 continue;
@@ -67,7 +68,14 @@ public class ServiceDay implements Serializable {
     public boolean serviceIdRunning(int serviceId) {
         return this.serviceIdsRunning.get(serviceId);
     }
-
+    
+    /**
+     * Return the ServiceDate for this ServiceDay.
+     */
+    public ServiceDate getServiceDate() {
+        return serviceDate;
+    }
+    
     /* 
      * Return number of seconds after midnight on this ServiceDay
      * for the given time.

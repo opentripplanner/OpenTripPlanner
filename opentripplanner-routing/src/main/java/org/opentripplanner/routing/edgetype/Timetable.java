@@ -19,10 +19,13 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import lombok.Getter;
+
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.trippattern.CanceledTripTimes;
@@ -62,6 +65,12 @@ public class Timetable implements Serializable {
      * additional TripTimes objects for unscheduled trips.
      */
     private final ArrayList<TripTimes> tripTimes;
+    
+    /**
+     * The ServiceDate for which this (updated) timetables is valid. If null, then it is valid for all dates.
+     */
+    @Getter
+    private final ServiceDate serviceDate;
 
     /** 
      * If the departures index is null, this timetable has not been indexed: use a linear search. 
@@ -82,14 +91,16 @@ public class Timetable implements Serializable {
     public Timetable(TableTripPattern pattern) {
         tripTimes = new ArrayList<TripTimes>();
         this.pattern = pattern;
+        this.serviceDate = null;
     }
     
     /** 
      * Copy constructor: create an un-indexed Timetable with the same TripTimes as the 
      * specified timetable. 
      */
-    private Timetable (Timetable tt) {
+    private Timetable (Timetable tt, ServiceDate serviceDate) {
         tripTimes = new ArrayList<TripTimes>(tt.tripTimes);
+        this.serviceDate = serviceDate;
         this.pattern = tt.pattern;
     }
     
@@ -98,8 +109,8 @@ public class Timetable implements Serializable {
      * constructor does not. The only publicly visible way to make a timetable, and it should
      * probably be protected.
      */
-    public Timetable copy() {
-        return new Timetable(this);
+    public Timetable copy(ServiceDate serviceDate) {
+        return new Timetable(this, serviceDate);
     }
     
     /**
@@ -390,7 +401,7 @@ public class Timetable implements Serializable {
             return false;
         }
     }
-    
+
     /**
      * Add a trip to this Timetable. The Timetable must be analyzed, compacted, and indexed
      * any time trips are added, but this is not done automatically because it is time consuming
@@ -433,5 +444,8 @@ public class Timetable implements Serializable {
         return bestDwellTimes[stopIndex];
     }
 
+    public boolean isValidFor(ServiceDate serviceDate) {
+        return this.serviceDate == null || this.serviceDate.equals(serviceDate);
+    }
 } 
 

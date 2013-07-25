@@ -234,7 +234,7 @@ public class TableTripPattern implements TripPattern, Serializable {
         Timetable timetable = scheduledTimetable;
         TimetableResolver snapshot = options.rctx.timetableSnapshot;
         if (snapshot != null)
-            timetable = snapshot.resolve(this);
+            timetable = snapshot.resolve(this, sd.getServiceDate());
         // check that we can even board/alight the given stop on this pattern with these options
         int mask = boarding ? MASK_PICKUP : MASK_DROPOFF;
         int shift = boarding ? SHIFT_PICKUP : SHIFT_DROPOFF;
