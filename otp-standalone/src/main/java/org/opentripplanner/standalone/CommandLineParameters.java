@@ -24,9 +24,16 @@ import com.beust.jcommander.ParameterException;
  * This module also contains classes for validating parameters. 
  * See: http://jcommander.org/#Parameter_validation
  * 
+ * Parameter fields are not initialized so we can check for null and see whether they were specified.
+ * 
  * @author abyrd
  */
 public class CommandLineParameters {
+
+    private static final int DEFAULT_PORT = 8080;
+    private static final String DEFAULT_STATIC_DIRECTORY = "/var/otp/static";
+    private static final String DEFAULT_GRAPH_DIRECTORY  = "/var/otp/graphs";
+    private static final String DEFAULT_ROUTER_ID = "";
 
     /* Options for the command itself, rather than build or server sub-tasks. */
     
@@ -36,92 +43,114 @@ public class CommandLineParameters {
     
     @Parameter(names = { "-v", "--verbose" }, 
     description = "Verbose output")
-    boolean verbose = false;
+    boolean verbose;
    
     /* Options for the graph builder sub-task. */
 
     @Parameter(names = {"-b", "--build"}, validateWith = ReadableDirectory.class, 
     description = "build graphs at specified paths", variableArity = true)
-    public List<File> build = new ArrayList<File>();
+    public List<File> build;
     
-    @Parameter(names = { "-s", "--serialize"}, 
-    description = "whether to serialize the graph after building it")
-    boolean serialize = true;
+    @Parameter(names = { "-m", "--inMemory"},
+    description = "whether to pass the graph to the server in-memory after building it")
+    boolean inMemory;
     
     /* Options for the server sub-task. */
 
     @Parameter( names = { "-p", "--port"}, validateWith = AvailablePort.class, 
     description = "server port")
-    int port = 8080;
+    Integer port;
 
     @Parameter( names = { "-g", "--graphs"}, validateWith = ReadableDirectory.class, 
     description = "path to graph directory")
-    String graphDirectory = "/var/otp/graphs";
+    String graphDirectory;
     
     @Parameter( names = { "-r", "--router"}, validateWith = RouterId.class,
     description = "default router ID")
-    String defaultRouterId = "";
+    String defaultRouterId;
 
     @Parameter( names = { "-t", "--static"}, 
     description = "path to static content")
-    String staticDirectory = "/var/otp/static";
+    String staticDirectory;
+
+    @Parameter( names = { "-s", "--server"}, 
+    description = "run a server")
+    boolean server = false;
 
     @Parameter( validateWith = ReadableFile.class, // the remaining parameters in one array
     description = "files") 
     List<File> files = new ArrayList<File>();
 
-    private static class ReadableFile implements IParameterValidator {
+    /** Set some convenience parameters based on other parameters' values. */
+    public void infer () {
+        server |= ( inMemory || port != null );
+        server |= ( defaultRouterId != null || graphDirectory != null || staticDirectory != null );
+        if (graphDirectory  == null) graphDirectory  = DEFAULT_GRAPH_DIRECTORY;
+        if (defaultRouterId == null) defaultRouterId = DEFAULT_ROUTER_ID;
+        if (staticDirectory == null) staticDirectory = DEFAULT_STATIC_DIRECTORY;        
+        if (port == null) port = DEFAULT_PORT;
+        new AvailablePort().validate(port);
+    }
+    
+    public static class ReadableFile implements IParameterValidator {
         @Override
         public void validate(String name, String value) throws ParameterException {
             File file = new File(value);
             if ( ! file.isFile()) {
-                String msg = String.format("Parameter '%s': '%s' is not a file.", name, value);
+                String msg = String.format("%s: '%s' is not a file.", name, value);
                 throw new ParameterException(msg);
             }
             if ( ! file.canRead()) {
-                String msg = String.format("Parameter '%s': file '%s' is not readable.", name, value);
+                String msg = String.format("%s: file '%s' is not readable.", name, value);
                 throw new ParameterException(msg);
             }
         }
     }
     
-    private static class ReadableDirectory implements IParameterValidator {
+    public static class ReadableDirectory implements IParameterValidator {
         @Override
         public void validate(String name, String value) throws ParameterException {
             File file = new File(value);
             if ( ! file.isDirectory()) {
-                String msg = String.format("Parameter '%s': '%s' is not a directory.", name, value);
+                String msg = String.format("%s: '%s' is not a directory.", name, value);
                 throw new ParameterException(msg);
             }
             if ( ! file.canRead()) {
-                String msg = String.format("Parameter '%s': directory '%s' is not readable.", name, value);
+                String msg = String.format("%s: directory '%s' is not readable.", name, value);
                 throw new ParameterException(msg);
             }
         }
     }
     
-    private static class PositiveInteger implements IParameterValidator {
+    public static class PositiveInteger implements IParameterValidator {
         @Override
         public void validate(String name, String value) throws ParameterException {
             Integer i = Integer.parseInt(value);
             if ( i <= 0 ) {
-                String msg = String.format("Parameter '%s' must be a positive integer.", name);
+                String msg = String.format("%s must be a positive integer.", name);
                 throw new ParameterException(msg);
             }
         }
     }
 
-    private static class AvailablePort implements IParameterValidator {
+    public static class AvailablePort implements IParameterValidator {
+
         @Override
         public void validate(String name, String value) throws ParameterException {
             new PositiveInteger().validate(name, value);
-            Integer port = Integer.parseInt(value);
+            int port = Integer.parseInt(value);
+            this.validate(port);
+        }
+        
+        public void validate(int port) throws ParameterException {
             ServerSocket socket = null;
             boolean portUnavailable = false;
+            String reason = null;
             try {
                 socket = new ServerSocket(port);
             } catch (IOException e) {
                 portUnavailable = true;
+                reason = e.getMessage();
             } finally {
                 if (socket != null) {
                     try {
@@ -132,19 +161,19 @@ public class CommandLineParameters {
                 }
             }
             if ( portUnavailable ) {
-                String msg = String.format("Port %d is not available.", port);
+                String msg = String.format(": port %d is not available. %s.", port, reason);
                 throw new ParameterException(msg);
             }
         }
     }
     
-    private static class RouterId implements IParameterValidator {
+    public static class RouterId implements IParameterValidator {
         @Override
         public void validate(String name, String value) throws ParameterException {
             Pattern routerIdPattern = GraphServiceFileImpl.routerIdPattern;
             Matcher m = routerIdPattern.matcher(value);
             if ( ! m.matches()) {
-                String msg = String.format("Parameter '%s': '%s' is not a valid router ID.", name, value);
+                String msg = String.format("%s: '%s' is not a valid router ID.", name, value);
                 throw new ParameterException(msg);
             }
         }
