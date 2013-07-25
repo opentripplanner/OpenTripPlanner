@@ -54,6 +54,11 @@ public class NEDGridCoverageFactoryImpl implements NEDGridCoverageFactory {
             throw new RuntimeException(e);
         }
     }
+    
+    public NEDGridCoverageFactoryImpl(File cacheDirectory) {
+        this();
+        this.setCacheDirectory(cacheDirectory);
+    }
 
     /**
      * Set the directory where NED will be cached.
@@ -92,6 +97,7 @@ public class NEDGridCoverageFactoryImpl implements NEDGridCoverageFactory {
 
     @Override
     public void checkInputs() {
+        /* This is actually checking before we call tileSource.setCacheDirectory, which creates the dirs */
         if (!cacheDirectory.canWrite()) {
             throw new RuntimeException("Can't write to NED cache: " + cacheDirectory);
         }

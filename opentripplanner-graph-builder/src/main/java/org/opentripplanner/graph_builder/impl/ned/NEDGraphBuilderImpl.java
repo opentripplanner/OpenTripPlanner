@@ -70,6 +70,12 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
 
     private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
+    public NEDGraphBuilderImpl() { /* This makes me a "bean" */ };
+    
+    public NEDGraphBuilderImpl(NEDGridCoverageFactory factory) {
+        this.setGridCoverageFactory(factory);
+    }
+
     public List<String> provides() {
         return Arrays.asList("elevation");
     }
