@@ -19,10 +19,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import lombok.Setter;
+
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
+import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,6 +44,10 @@ public class GraphBuilderTask implements Runnable {
     private String _baseGraph = null;
     
     private Graph graph = new Graph();
+
+    /** Should the graph be serialized to disk after being created or not? */
+    @Setter
+    private boolean serializeGraph = true;
 
     public void addGraphBuilder(GraphBuilder loader) {
         _graphBuilders.add(loader);
@@ -75,6 +82,10 @@ public class GraphBuilderTask implements Runnable {
         graphFile = new File(path.concat("/Graph.obj"));
     }
     
+    public void setPath (File path) {
+        graphFile = new File(path, "Graph.obj");
+    }
+
     public Graph getGraph() {
         return this.graph;
     }
@@ -127,10 +138,20 @@ public class GraphBuilderTask implements Runnable {
             load.buildGraph(graph, extra);
 
         graph.summarizeBuilderAnnotations();
-        try {
-            graph.save(graphFile);
-        } catch (Exception ex) {
-            throw new IllegalStateException(ex);
+        if (serializeGraph) {
+            try {
+                graph.save(graphFile);
+            } catch (Exception ex) {
+                throw new IllegalStateException(ex);
+            }
+        } else {
+            LOG.info("Not saving graph to disk, as requested.");
+            /* TODO make this indexing into a method on Graph, so it can be triggered outside graph loading. */
+            LOG.info("Building street index.");
+            graph.streetIndex = new StreetVertexIndexServiceImpl(graph);
+            LOG.info("Building edge and vertex indices.");
+            graph.rebuildVertexAndEdgeIndices();
         }
+        
     }
 }
