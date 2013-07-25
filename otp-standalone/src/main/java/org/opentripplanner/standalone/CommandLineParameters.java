@@ -21,58 +21,53 @@ import com.beust.jcommander.ParameterException;
  * daemon, parameters are loaded from such a file, located by default in '/etc/opentripplanner.cfg'.
  * 
  * Note that JCommander-annotated parameters can be any type that can be constructed from a string.
- * This module also contains classes for validating parameters (see 
- * http://jcommander.org/#Parameter_validation).
- * 
- * http://jcommander.org/#Arities
+ * This module also contains classes for validating parameters. 
+ * See: http://jcommander.org/#Parameter_validation
  * 
  * @author abyrd
  */
 public class CommandLineParameters {
 
-    /* Options that influence the command itself, rather than build or server sub-tasks. */
+    /* Options for the command itself, rather than build or server sub-tasks. */
     
-    @Parameter(names = { "-h", "--help"}, description = "Print this help message and exit", help = true)
+    @Parameter(names = { "-h", "--help"}, help = true,
+    description = "Print this help message and exit")
     boolean help;
     
-    @Parameter(names = { "-v", "--verbose" }, description = "Verbose output")
+    @Parameter(names = { "-v", "--verbose" }, 
+    description = "Verbose output")
     boolean verbose = false;
    
-    @Parameter(names = { "-B", "--buildonly"}, description = "build graph but do not start server")
-    boolean startServer = true;
-    
-    @Parameter(names = { "-p", "--props"}, description = "path to global server properties")
-    String propsPath = "/etc";
-    
     /* Options for the graph builder sub-task. */
 
     @Parameter(names = {"-b", "--build"}, variableArity = true, validateWith = ReadableDirectory.class, 
-               description = "build graphs at specified paths")
+    description = "build graphs at specified paths")
     public List<File> foo = new ArrayList<File>();
     
     @Parameter(names = { "-s", "--serialize"}, 
-               description = "whether to serialize the graph after building it")
+    description = "whether to serialize the graph after building it")
     boolean serialize = true;
     
-
     /* Options for the server sub-task. */
 
-    @Parameter(names = { "-p", "--port"}, validateWith = AvailablePort.class, 
+    @Parameter( names = { "-p", "--port"}, validateWith = AvailablePort.class, 
     description = "server port")
     int port = 8080;
 
-    @Parameter(names = { "-g", "--graphs"}, validateWith = ReadableDirectory.class, 
-               description = "path to graph directory")
+    @Parameter( names = { "-g", "--graphs"}, validateWith = ReadableDirectory.class, 
+    description = "path to graph directory")
     String graphDirectory = "/var/otp/graphs";
     
-    @Parameter(names = { "-r", "--router"}, validateWith = RouterId.class,
-               description = "default router ID")
+    @Parameter( names = { "-r", "--router"}, validateWith = RouterId.class,
+    description = "default router ID")
     String defaultRouterId = "";
 
-    @Parameter(names = { "-t", "--static"}, description = "path to static content")
+    @Parameter( names = { "-t", "--static"}, 
+    description = "path to static content")
     String staticDirectory = "/var/otp/static";
 
-    @Parameter(description = "files", validateWith = ReadableFile.class) // the rest of the parameters in one array
+    @Parameter( validateWith = ReadableFile.class, // the remaining parameters in one array
+    description = "files") 
     List<File> files = new ArrayList<File>();
 
     private static class ReadableFile implements IParameterValidator {
