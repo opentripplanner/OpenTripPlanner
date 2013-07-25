@@ -72,7 +72,7 @@ public class GraphServiceFileImpl {
      * any confusion caused by the presence of special characters that might have a meaning for the
      * filesystem.
      */
-    private static Pattern routerIdPattern = Pattern.compile("[\\p{Alnum}_-]*");
+    public static final Pattern routerIdPattern = Pattern.compile("[\\p{Alnum}_-]*");
 
     public Graph getGraph() {
         return getGraph(null);
