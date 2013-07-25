@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.geotools.coverage.grid.GridCoverageFactory;
 import org.opentripplanner.analyst.core.GeometryIndex;
 import org.opentripplanner.analyst.request.Renderer;
 import org.opentripplanner.analyst.request.SPTCache;
@@ -16,9 +17,12 @@ import org.opentripplanner.graph_builder.GraphBuilderTask;
 import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.StreetlessStopLinker;
 import org.opentripplanner.graph_builder.impl.TransitToStreetNetworkGraphBuilderImpl;
+import org.opentripplanner.graph_builder.impl.ned.NEDGraphBuilderImpl;
+import org.opentripplanner.graph_builder.impl.ned.NEDGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
+import org.opentripplanner.graph_builder.services.ned.NEDGridCoverageFactory;
 import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 import org.opentripplanner.routing.algorithm.GenericAStar;
@@ -44,8 +48,6 @@ import com.google.common.collect.Lists;
 public class OTPConfigurator {
 
     private static final Logger LOG = LoggerFactory.getLogger(OTPConfigurator.class);
-
-    private static final String DEFAULT_GRAPH_LOCATION = "/var/otp/graphs";
     
     /**
      * @param graph if non-null, the in-memry graph to use (rather than loading from disk)
@@ -91,8 +93,6 @@ public class OTPConfigurator {
         GraphServiceImpl graphService = new GraphServiceImpl();
         if (params.graphDirectory != null) {
             graphService.setPath(params.graphDirectory);
-        } else {
-            graphService.setPath(DEFAULT_GRAPH_LOCATION);
         }
         if (params.defaultRouterId != null) {
             graphService.setDefaultRouterId(params.defaultRouterId);
@@ -159,6 +159,12 @@ public class OTPConfigurator {
             } else {
                 graphBuilder.addGraphBuilder(new StreetlessStopLinker());
             }
+        }
+        if (params.elevation) {
+            File cacheDirectory = new File(params.cacheDirectory, "ned");
+            NEDGridCoverageFactory ngcf = new NEDGridCoverageFactoryImpl(cacheDirectory);
+            GraphBuilder nedBuilder = new NEDGraphBuilderImpl(ngcf);
+            graphBuilder.addGraphBuilder(nedBuilder);
         }
         graphBuilder.setSerializeGraph( ! params.inMemory);
         return graphBuilder;
