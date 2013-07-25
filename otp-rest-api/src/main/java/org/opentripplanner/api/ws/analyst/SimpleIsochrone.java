@@ -64,7 +64,6 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
-import org.opentripplanner.util.GeoJSONBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,6 +92,8 @@ import com.vividsolutions.jts.geom.Point;
  * stations within (maxIsochroneTime * speed) meters, and apply a travel time to reach them.
  *  
  * The GET methods both use makeContours which in turn uses makePoints (where range checking occurs).
+ * 
+ * Putting "@Setter" on all the parameters would allow resource classes to be used outside Jersey.
  * 
  * @author abyrd
  */
