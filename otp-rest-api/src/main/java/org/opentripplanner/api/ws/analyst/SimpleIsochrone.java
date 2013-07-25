@@ -157,22 +157,6 @@ public class SimpleIsochrone extends RoutingResource {
         
     }
     
-    /**
-     * A hashmap with an additional method to put a value only if it is 
-     * a) new or b) less than the existing value.
-     */
-    class MinMap<K, V extends Comparable<V>> extends HashMap<K, V> {
-        private static final long serialVersionUID = -23L;
-        public boolean putMin(K key, V value) {
-            V oldValue = this.get(key);
-            if (oldValue == null || value.compareTo(oldValue) < 0) {
-                this.put(key, value);
-                return true;
-            }
-            return false;
-        }
-    }
-
     /** @return a map from each vertex to minimum travel time over the course of the day. */
     private Map<Vertex, Double> makePoints () throws Exception {
         rangeCheckParameters();
@@ -350,5 +334,39 @@ public class SimpleIsochrone extends RoutingResource {
             zip.close();
         }
     }
-    
+
+    /** A HashMap that has been extended to track the greatest or smallest value for each key. */
+    public static class MinMap<K, V extends Comparable<V>> extends HashMap<K, V> {
+        private static final long serialVersionUID = -23L;
+
+        /** 
+         * Put the given key-value pair in the map if the map does not yet contain the key, or if
+         * the value is less than the existing value for the same key. 
+         * @return whether the key-value pair was inserted in the map.
+         */
+        public boolean putMin(K key, V value) {
+            V oldValue = this.get(key);
+            if (oldValue == null || value.compareTo(oldValue) < 0) {
+                this.put(key, value);
+                return true;
+            }
+            return false;
+        }
+        
+        /** 
+         * Put the given key-value pair in the map if the map does not yet contain the key, or if
+         * the value is greater than the existing value for the same key. 
+         * @return whether the key-value pair was inserted in the map.
+         */
+        public boolean putMax(K key, V value) {
+            V oldValue = this.get(key);
+            if (oldValue == null || value.compareTo(oldValue) > 0) {
+                this.put(key, value);
+                return true;
+            }
+            return false;
+        }
+        
+    }
+
 }
