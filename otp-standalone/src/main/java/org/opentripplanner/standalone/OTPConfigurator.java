@@ -5,7 +5,8 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.geotools.coverage.grid.GridCoverageFactory;
+import lombok.Setter;
+
 import org.opentripplanner.analyst.core.GeometryIndex;
 import org.opentripplanner.analyst.request.Renderer;
 import org.opentripplanner.analyst.request.SPTCache;
@@ -41,18 +42,24 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
 
-/*
- * TODO Make the methods non-static, construct this class with a ComandLineParameters, 
- * and add an "infer" step that sets some extra boolean variables based on the command line parameters.
- */
 public class OTPConfigurator {
 
     private static final Logger LOG = LoggerFactory.getLogger(OTPConfigurator.class);
     
-    /**
-     * @param graph if non-null, the in-memry graph to use (rather than loading from disk)
+    private final CommandLineParameters params;
+    
+    /* If non-null, the in-memory graph to use (rather than loading from disk) */
+    @Setter private Graph graph;
+
+    public OTPConfigurator (CommandLineParameters params) {
+        this.params = params;
+    }
+
+    /** 
+     * Create an adapter to make Jersey see OTP as a dependency injection framework. 
+     * This will associate our specific OTP component instances with their interface classes.
      */
-    public static OTPComponentProviderFactory providerFromParameters(CommandLineParameters params, Graph graph) {
+    public OTPComponentProviderFactory providerFromParameters() {
         
         LOG.info("Wiring up and configuring server task.");
         
@@ -61,10 +68,9 @@ public class OTPConfigurator {
         pathService.setFirstPathTimeout(10.0);
         pathService.setMultiPathTimeout(1.0);
         
-        // An adapter to make Jersey see OTP as a dependency injection framework.
-        // Associate our specific instances with their interface classes.
+        // Core OTP modules
         OTPComponentProviderFactory cpf = new OTPComponentProviderFactory(); 
-        cpf.bind(GraphService.class, makeGraphService(params, graph));
+        cpf.bind(GraphService.class, makeGraphService());
         cpf.bind(RoutingRequest.class);
         cpf.bind(PlanGenerator.class);
         cpf.bind(MetadataService.class);
@@ -86,10 +92,12 @@ public class OTPConfigurator {
         
     }
 
-    private static GraphService makeGraphService(CommandLineParameters params, Graph graph) {
-        if (graph != null) {
+    private GraphService makeGraphService() {
+        /* Hand off graph in memory to server in a single-graph in-memory GraphServiceImpl. */
+        if (graph != null && params.inMemory) {
             return new GraphServiceBeanImpl(graph);
         }
+        /* Create a conventional GraphService that loads graphs from disk. */
         GraphServiceImpl graphService = new GraphServiceImpl();
         if (params.graphDirectory != null) {
             graphService.setPath(params.graphDirectory);
@@ -100,7 +108,7 @@ public class OTPConfigurator {
         return graphService;
     }
 
-    public static GraphBuilderTask builderFromParameters(CommandLineParameters params) {
+    public GraphBuilderTask builderFromParameters() {
         LOG.info("Wiring up and configuring graph builder task.");
         if (params.build == null || params.build.isEmpty()) {
             return null;
@@ -170,8 +178,8 @@ public class OTPConfigurator {
         return graphBuilder;
     }
 
-    public static GrizzlyServer serverFromParameters(CommandLineParameters params, Graph graph) {
-        OTPComponentProviderFactory cpf = providerFromParameters(params, graph);
+    public GrizzlyServer serverFromParameters() {
+        OTPComponentProviderFactory cpf = providerFromParameters();
         GrizzlyServer server = new GrizzlyServer(cpf, params);
         return server;
     }
