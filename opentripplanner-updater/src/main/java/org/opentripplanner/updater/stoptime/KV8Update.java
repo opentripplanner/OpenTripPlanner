@@ -27,7 +27,7 @@ import org.opentripplanner.routing.trippattern.Update;
 
 public class KV8Update extends Update {
 
-    public KV8Update(AgencyAndId tripId, String stopId, int stopSeq, int arrive, int depart,
+    public KV8Update(AgencyAndId tripId, AgencyAndId stopId, int stopSeq, int arrive, int depart,
             Status status, long timestamp, ServiceDate serviceDate) {
         super(tripId, stopId, stopSeq, arrive, depart, status, timestamp, serviceDate);
     }
@@ -93,8 +93,8 @@ public class KV8Update extends Update {
      * internal identifiers for a stop, so should not be used. TimingPointCode is a unique 
      * nationwide (feed-wide) identifier which includes those UserStopCodes.
      */
-    private static String kv8StopId (HashMap<String, String> row) {
-        return row.get("TimingPointCode");
+    private static AgencyAndId kv8StopId (HashMap<String, String> row) {
+        return new AgencyAndId(null, row.get("TimingPointCode"));
     }
     
     private static long kv8Timestamp (HashMap<String, String> row) {

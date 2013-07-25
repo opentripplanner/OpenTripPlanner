@@ -21,7 +21,7 @@ import org.onebusaway.gtfs.model.calendar.ServiceDate;
 public class Update extends AbstractUpdate implements Comparable<Update> {
 
     @Getter
-    public final String stopId;
+    public final AgencyAndId stopId;
 
     @Getter
     public final int stopSeq;
@@ -35,7 +35,7 @@ public class Update extends AbstractUpdate implements Comparable<Update> {
     @Getter
     public final Status status;
 
-    public Update (AgencyAndId tripId, String stopId, int stopSeq, int arrive, int depart, 
+    public Update (AgencyAndId tripId, AgencyAndId stopId, int stopSeq, int arrive, int depart, 
             Status status, long timestamp, ServiceDate serviceDate) {
         super(tripId, timestamp, serviceDate);
         this.stopId = stopId;

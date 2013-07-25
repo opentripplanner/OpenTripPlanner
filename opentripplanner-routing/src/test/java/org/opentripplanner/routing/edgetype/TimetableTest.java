@@ -90,6 +90,9 @@ public class TimetableTest {
         TripUpdate tripUpdate;
         AgencyAndId trip_1_1_id = new AgencyAndId("agency", "1.1");
         int trip_1_1_index = timetable.getTripIndex(trip_1_1_id);
+        AgencyAndId stop_a_id = new AgencyAndId("agency", "A");
+        AgencyAndId stop_b_id = new AgencyAndId("agency", "B");
+        AgencyAndId stop_c_id = new AgencyAndId("agency", "C");
         
         @SuppressWarnings("deprecation")
         Vertex stop_a = graph.getVertex("agency_A");
@@ -105,9 +108,8 @@ public class TimetableTest {
         assertFalse(timetable.update(tripUpdate));
         
         // update trip with bad data
-        tripUpdate = TripUpdate.forUpdatedTrip(trip_1_1_id, 0, new ServiceDate(),
-                Collections.<Update> singletonList(new Update(trip_1_1_id, "A", 0,
-                        1200, 1200, Status.PREDICTION, 0, new ServiceDate())));
+        tripUpdate = TripUpdate.forUpdatedTrip(trip_1_1_id, 0, new ServiceDate(), Collections.<Update> singletonList(
+                        new Update(trip_1_1_id, stop_a_id, 0, 1200, 1200, Status.PREDICTION, 0, new ServiceDate())));
         assertFalse(timetable.update(tripUpdate));
         
         //---
@@ -125,9 +127,9 @@ public class TimetableTest {
         
         // update trip
         List<Update> updates = new LinkedList<Update>();
-        updates.add(new Update(trip_1_1_id, "A", 0,  0*60 + 120,  0*60 + 120, Status.PREDICTION, 0, new ServiceDate()));
-        updates.add(new Update(trip_1_1_id, "B", 1, 10*60 + 120, 10*60 + 120, Status.PREDICTION, 0, new ServiceDate()));
-        updates.add(new Update(trip_1_1_id, "C", 2, 20*60 + 120, 20*60 + 120, Status.PREDICTION, 0, new ServiceDate()));
+        updates.add(new Update(trip_1_1_id, stop_a_id, 0,  0*60 + 120,  0*60 + 120, Status.PREDICTION, 0, new ServiceDate()));
+        updates.add(new Update(trip_1_1_id, stop_b_id, 1, 10*60 + 120, 10*60 + 120, Status.PREDICTION, 0, new ServiceDate()));
+        updates.add(new Update(trip_1_1_id, stop_c_id, 2, 20*60 + 120, 20*60 + 120, Status.PREDICTION, 0, new ServiceDate()));
         tripUpdate = TripUpdate.forUpdatedTrip(trip_1_1_id, 0, new ServiceDate(), updates);
         assertEquals(timetable.getArrivalTime(1, trip_1_1_index), 20*60);
         assertTrue(timetable.update(tripUpdate));
