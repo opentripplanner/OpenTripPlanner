@@ -66,11 +66,11 @@ public class CommandLineParameters {
     boolean inMemory;
     
     @Parameter(names = {"--noTransit"},
-    description = "skip all input files that define transit service (GTFS feeds)")
+    description = "skip all transit input files (GTFS)")
     boolean noTransit;
     
     @Parameter(names = {"--noStreets"},
-    description = "skip all input files that define transit service (GTFS feeds)")
+    description = "skip all street input files (OSM)")
     boolean noStreets;
     
     /* Options for the server sub-task. */
