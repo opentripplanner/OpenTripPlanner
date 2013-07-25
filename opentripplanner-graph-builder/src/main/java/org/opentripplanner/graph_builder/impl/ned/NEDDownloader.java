@@ -327,13 +327,16 @@ public class NEDDownloader implements NEDTileSource {
         List<URL> urls = getDownloadURLsCached();
         List<File> files = new ArrayList<File>();
         Iterator<URL> it = urls.iterator();
+        /* TODO couldn't this just be (for URL url : urls) ? */
         URL url = it.next();
+        int tileCount = 0;
         do {
+            String tileProgress = String.format("Tile %d/%d", ++tileCount, urls.size());
             String key = getKey(url);
             File tile = getPathToNEDTile(key);
             if (tile.exists()) {
                 files.add(tile);
-                log.info("File found in NED cache, not downloading: {}", tile);
+                log.info("{} found in NED cache, not downloading: {}", tileProgress, tile);
                 if (it.hasNext()) {
                     url = it.next();
                     continue;
@@ -341,7 +344,7 @@ public class NEDDownloader implements NEDTileSource {
                     break;
                 }
             }
-            log.info("File not in NED cache, requesting download: {}", tile);
+            log.info("{} not in NED cache, requesting download: {}", tileProgress, tile);
             try {
                 while (true) {
                     sleep(3000);
