@@ -14,13 +14,9 @@
 package org.opentripplanner.api.ws.analyst;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,22 +33,22 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
 import lombok.AllArgsConstructor;
 
-import org.geotools.data.FeatureWriter;
-import org.geotools.data.Transaction;
 import org.geotools.data.shapefile.ShapefileDataStore;
+import org.geotools.data.simple.SimpleFeatureCollection;
+import org.geotools.data.simple.SimpleFeatureStore;
+import org.geotools.feature.DefaultFeatureCollection;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geojson.feature.FeatureJSON;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.geotools.referencing.CRS;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
@@ -81,6 +77,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * Vector isochrone generator for places without good OSM street connectivity, or graphs that
@@ -129,6 +126,32 @@ public class SimpleIsochrone extends RoutingResource {
     @QueryParam("shpName") String shpName; // what to name the output file
 
     private RoutingRequest request;
+
+    
+    /* Static feature schemas */
+    
+    private static final SimpleFeatureType pointSchema = makePointSchema();
+    
+    private static final SimpleFeatureType contourSchema = makeContourSchema();
+    
+    static SimpleFeatureType makePointSchema() {
+        SimpleFeatureTypeBuilder tbuilder = new SimpleFeatureTypeBuilder();
+        tbuilder.setName("points");
+        tbuilder.setCRS(DefaultGeographicCRS.WGS84);
+        tbuilder.add("Geometry", Point.class);
+        tbuilder.add("Time", Integer.class); 
+        return tbuilder.buildFeatureType();
+    }
+
+    static SimpleFeatureType makeContourSchema() {
+        /* Create the output feature schema. */
+        SimpleFeatureTypeBuilder tbuilder = new SimpleFeatureTypeBuilder();
+        tbuilder.setName("contours");
+        tbuilder.setCRS(DefaultGeographicCRS.WGS84);
+        tbuilder.add("Geometry", MultiPolygon.class);
+        tbuilder.add("Time", Integer.class); 
+        return tbuilder.buildFeatureType();
+    }
 
     private void rangeCheckParameters () {
         
@@ -236,78 +259,70 @@ public class SimpleIsochrone extends RoutingResource {
         return contours;
     }
 
-    /** @return Evenly spaced travel time contours (isochrones) as GeoJSON. */
-    @GET @Produces("application/json")
-    public String geoJsonGet() throws Exception { 
+    private SimpleFeatureCollection makePointFeatures() throws Exception {
+        Map<Vertex, Double> points = makePoints();
+        /* Stage the point features in memory */
+        DefaultFeatureCollection featureCollection = new DefaultFeatureCollection(null, pointSchema);
+        SimpleFeatureBuilder fbuilder = new SimpleFeatureBuilder(pointSchema);
+        GeometryFactory gf = new GeometryFactory();
+        for (Map.Entry<Vertex, Double> entry : points.entrySet()) {
+            Vertex vertex = entry.getKey();
+            Double travelTime = entry.getValue();
+            fbuilder.add(gf.createPoint(vertex.getCoordinate()));
+            fbuilder.add(travelTime);
+            featureCollection.add(fbuilder.buildFeature(null));
+        }
+        return featureCollection;
+    }
+
+    private SimpleFeatureCollection makeContourFeatures() throws Exception {
         Map<Integer, Geometry> contours = makeContours();
-        
-        /* 
-         we could also get the contours into a featureCollection and make use of GeoTools GeoJSON.
-         FeatureJSON fj = new FeatureJSON();
-         fj.writeFeature(feature, Writer wr));
-         Then there could be separate methods for generating point and contour feature collections.
-        */
-        
-        StringWriter stringWriter = new StringWriter();
-        /* QGIS seems to want multi-features rather than multi-geometries. */
-        /* TODO GeoJSON output of multi-geometries calls array before key and fails. */
-        stringWriter.write("{\"type\": \"FeatureCollection\", \"features\": [\n");
-        /* Output the features in order from bottom to top, biggest to smallest */
+        /* Stage the features in memory, in order from bottom to top, biggest to smallest */
+        DefaultFeatureCollection featureCollection = 
+                new DefaultFeatureCollection(null, contourSchema);
+        SimpleFeatureBuilder fbuilder = new SimpleFeatureBuilder(contourSchema);
         List<Integer> thresholds = new ArrayList<Integer>(contours.keySet());
         Collections.sort(thresholds);
-        Collections.reverse(thresholds);
+        //Collections.reverse(thresholds);
         for (Integer threshold : thresholds) {
             Geometry contour = contours.get(threshold);
-            stringWriter.write("{\"type\":\"Feature\",\"geometry\":");
-            GeoJSONBuilder json = new GeoJSONBuilder(stringWriter);
-            json.writeGeom(contour);
-            stringWriter.write(",\n\"properties\":{\"minutes\":\"" + threshold + "\"}\n");
-            stringWriter.write("},\n");
+            fbuilder.add(contour);
+            fbuilder.add(threshold);
+            featureCollection.add(fbuilder.buildFeature(null));
         }
-        stringWriter.write("]}\n");
-        return stringWriter.toString();
+        return featureCollection;
+    }
+
+    /** @return Evenly spaced travel time contours (isochrones) as GeoJSON. */
+    @GET @Produces("application/json")
+    public Response geoJsonGet() throws Exception { 
+        /* QGIS seems to want multi-features rather than multi-geometries. */
+        SimpleFeatureCollection contourFeatures = makeContourFeatures();
+        /* Output the staged features to JSON */
+        StringWriter writer = new StringWriter();
+        FeatureJSON fj = new FeatureJSON();
+        fj.writeFeatureCollection(contourFeatures, writer);
+        return Response.ok().entity(writer.toString()).build();
     }
         
     /** @return Evenly spaced travel time contours (isochrones) as a zipped shapefile. */
     @GET @Produces("application/x-zip-compressed")
     public Response zippedShapefileGet(
-            @QueryParam("stream") @DefaultValue("true") boolean stream) throws Exception {
-
-        Map<Integer, Geometry> contours = makeContours();
-        
-        /* Create the output shapefile schema. */
-        SimpleFeatureTypeBuilder tbuilder = new SimpleFeatureTypeBuilder();
-        tbuilder.setName("Contour");
-        tbuilder.add("Geometry", MultiPolygon.class);
-        tbuilder.add("Time", Integer.class); 
-        if (resultsProjected) tbuilder.setCRS(crs);
-        else tbuilder.setCRS(DefaultGeographicCRS.WGS84);
-        SimpleFeatureType schema = tbuilder.buildFeatureType();
-        // SimpleFeatureBuilder fbuilder = new SimpleFeatureBuilder(schema);
-        
-        /* Open a shapefile with this schema. */
+        @QueryParam("stream") @DefaultValue("true") boolean stream) throws Exception {
+        SimpleFeatureCollection contourFeatures = makeContourFeatures(); 
+        /* Output the staged features to Shapefile */
         final File shapeDir = Files.createTempDir();
         shapeDir.deleteOnExit();
         File shapeFile = new File(shapeDir, shpName + ".shp");
         LOG.debug("writing out shapefile {}", shapeFile);
         ShapefileDataStore outStore = new ShapefileDataStore(shapeFile.toURI().toURL());
-        outStore.createSchema(schema);
-        FeatureWriter<SimpleFeatureType, SimpleFeature> fw = 
-                outStore.getFeatureWriter("Contour", Transaction.AUTO_COMMIT);
-
-        /* Output the features in order from bottom to top, biggest to smallest */
-        List<Integer> thresholds = new ArrayList<Integer>(contours.keySet());
-        Collections.sort(thresholds);
-        Collections.reverse(thresholds);
-        for (Integer threshold : thresholds) {
-            Geometry contour = contours.get(threshold);
-            SimpleFeature feature = fw.next();
-            feature.setAttributes(new Object[] { contour, threshold});
-            fw.write();
-        }
-        fw.close();
-        LOG.info("Wrote {}", shapeFile);
-        
+        outStore.createSchema(contourSchema);
+        /* "FeatureSource is used to read features, the subclass FeatureStore is used for 
+         * read/write access. The way to tell if a File can be written to in GeoTools is to use an 
+         * instanceof check. */
+        SimpleFeatureStore featureStore = (SimpleFeatureStore) outStore.getFeatureSource();
+        featureStore.addFeatures(contourFeatures);
+        // close?
         /* Zip up the shapefile components */  
         StreamingOutput output = new DirectoryZipper(shapeDir);
         if (stream) {
