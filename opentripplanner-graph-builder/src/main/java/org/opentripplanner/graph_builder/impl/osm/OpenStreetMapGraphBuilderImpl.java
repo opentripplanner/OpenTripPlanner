@@ -224,6 +224,13 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
         wayPropertySet = source.getWayPropertySet();
     }
 
+    /** Construct and set providers all at once. */
+    public OpenStreetMapGraphBuilderImpl (List<OpenStreetMapProvider> providers) {
+        this.setProviders(providers);
+    }
+
+    public OpenStreetMapGraphBuilderImpl() { }
+
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         Handler handler = new Handler(graph);

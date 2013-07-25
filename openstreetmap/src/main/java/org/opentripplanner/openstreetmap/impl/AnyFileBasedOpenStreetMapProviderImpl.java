@@ -26,6 +26,12 @@ public class AnyFileBasedOpenStreetMapProviderImpl implements OpenStreetMapProvi
         _path = path;
     }
 
+    public AnyFileBasedOpenStreetMapProviderImpl (File file) {
+        this.setPath(file);
+    }
+    
+    public AnyFileBasedOpenStreetMapProviderImpl() { };
+
     @Override
     public void readOSM(OpenStreetMapContentHandler handler) {
         try {
