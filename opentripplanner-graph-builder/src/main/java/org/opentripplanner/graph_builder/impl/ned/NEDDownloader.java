@@ -163,7 +163,7 @@ public class NEDDownloader implements NEDTileSource {
     private List<URL> getDownloadURLs() {
         List<URL> urls = new ArrayList<URL>();
         List<String> payloads = getValidateElements();
-        log.debug("Getting urls from request validation service");
+        log.info("Getting urls from request validation service");
         String RTendpointURL = "http://extract.cr.usgs.gov/requestValidationService/services/RequestValidationService";
 
         try {
@@ -323,7 +323,7 @@ public class NEDDownloader implements NEDTileSource {
 
     @Override
     public List<File> getNEDTiles() {
-        log.debug("Downloading NED");
+        log.info("Downloading NED elevation data.");
         List<URL> urls = getDownloadURLsCached();
         List<File> files = new ArrayList<File>();
         Iterator<URL> it = urls.iterator();
@@ -333,7 +333,7 @@ public class NEDDownloader implements NEDTileSource {
             File tile = getPathToNEDTile(key);
             if (tile.exists()) {
                 files.add(tile);
-                log.debug(url + " already exists; not downloading");
+                log.info("File found in NED cache, not downloading: {}", tile);
                 if (it.hasNext()) {
                     url = it.next();
                     continue;
@@ -341,6 +341,7 @@ public class NEDDownloader implements NEDTileSource {
                     break;
                 }
             }
+            log.info("File not in NED cache, requesting download: {}", tile);
             try {
                 while (true) {
                     sleep(3000);
@@ -349,7 +350,7 @@ public class NEDDownloader implements NEDTileSource {
                         token = initiateDownload(url);
                         int i = 0;
                         do {
-                            log.debug("Waiting to query");
+                            log.info("Waiting 30 seconds to check if tile is ready for download...");
                             sleep(30000);
                         } while (!downloadReady(token) && i++ < 20);
                         sleep(3000);
@@ -357,7 +358,7 @@ public class NEDDownloader implements NEDTileSource {
                             break;
                         }
                         //we've waited ten minutes.  Let's just give up on this download and try again.
-                        log.debug("Giving up on slow download and retrying");
+                        log.info("Giving up on slow download and retrying.");
                     }
 
                     downloadFile(url, token);
@@ -485,7 +486,7 @@ public class NEDDownloader implements NEDTileSource {
     private void downloadFile(URL url, String token) {
         try {
             String key = getKey(url);
-            log.debug("Starting download " + key);
+            log.info("Starting download " + key);
             File path = getPathToNEDArchive(key);
             URL downloadUrl = new URL(
                     "http://extract.cr.usgs.gov/axis2/services/DownloadService/getData?downloadID="
@@ -506,7 +507,7 @@ public class NEDDownloader implements NEDTileSource {
             ostream.close();
             istream.close();
             httpconnection.disconnect();
-            log.debug("Done download " + key);
+            log.info("Finished download " + key);
             NEDDownloader.sleep(3000);
         } catch (Exception e) {
             throw new RuntimeException(
