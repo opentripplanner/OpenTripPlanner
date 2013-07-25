@@ -80,11 +80,13 @@ public class OTPConfigurator {
                 new DefaultRemainingWeightHeuristicFactoryImpl()); 
 
         // Optional Analyst Modules
-        cpf.bind(Renderer.class);
-        cpf.bind(SPTCache.class);
-        cpf.bind(TileCache.class);
-        cpf.bind(GeometryIndex.class);
-        cpf.bind(SampleFactory.class);
+        if (params.analyst) {
+            cpf.bind(Renderer.class);
+            cpf.bind(SPTCache.class);
+            cpf.bind(TileCache.class);
+            cpf.bind(GeometryIndex.class);
+            cpf.bind(SampleFactory.class);
+        }
         
         // Perform field injection on bound instances and call post-construct methods
         cpf.doneBinding();        

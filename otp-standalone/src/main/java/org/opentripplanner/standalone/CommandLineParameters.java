@@ -24,7 +24,8 @@ import com.beust.jcommander.ParameterException;
  * This module also contains classes for validating parameters. 
  * See: http://jcommander.org/#Parameter_validation
  * 
- * Parameter fields are not initialized so we can check for null and see whether they were specified.
+ * Some parameter fields are not initialized so when inferring other parameters, we can check for 
+ * null and see whether they were specified on the command line.
  * 
  * @author abyrd
  */
@@ -68,12 +69,16 @@ public class CommandLineParameters {
     description = "skip all input files that define transit service (GTFS feeds)")
     boolean noTransit;
     
-    @Parameter(names = { "-m", "--noStreets"},
+    @Parameter(names = {"--noStreets"},
     description = "skip all input files that define transit service (GTFS feeds)")
     boolean noStreets;
     
     /* Options for the server sub-task. */
 
+    @Parameter( names = { "-a", "--analyst"}, 
+            description = "enable OTP Analyst extensions")
+    boolean analyst;
+    
     @Parameter( names = { "-g", "--graphs"}, validateWith = ReadableDirectory.class, 
             description = "path to graph directory")
     String graphDirectory;

@@ -48,7 +48,7 @@ public class OTPMain {
             }
             params.infer();
         } catch (ParameterException pex) {
-            LOG.error("Invalid parameter {}", pex.getMessage());
+            LOG.error("Parameter error: {}", pex.getMessage());
             System.exit(1);
         }
         /* Wire up and configure graph builder and server based on command line parameters. */
