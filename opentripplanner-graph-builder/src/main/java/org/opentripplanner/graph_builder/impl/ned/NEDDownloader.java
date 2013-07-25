@@ -336,7 +336,7 @@ public class NEDDownloader implements NEDTileSource {
             File tile = getPathToNEDTile(key);
             if (tile.exists()) {
                 files.add(tile);
-                log.info("{} found in NED cache, not downloading: {}", tileProgress, tile);
+                log.debug("{} found in NED cache, not downloading: {}", tileProgress, tile);
                 if (it.hasNext()) {
                     url = it.next();
                     continue;
