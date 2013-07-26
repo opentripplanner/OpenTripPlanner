@@ -59,6 +59,13 @@ public class GtfsBundle {
     @Getter @Setter 
     private File cacheDirectory = null; // null means use default from GtfsGB || system temp dir 
 
+    public GtfsBundle() {
+    }
+    
+    public GtfsBundle(File gtfsFile) {
+        this.setPath(gtfsFile);
+    }
+
     public void setPath(File path) {
         this.path = path;
     }

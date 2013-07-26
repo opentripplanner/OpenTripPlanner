@@ -75,8 +75,6 @@ otp.widgets.ItinerariesWidget =
 
             // create an alert if we moved to another day
             var alerts = null;
-            console.log("old itin: ")
-            console.log(oldItin)
             if(newItin.differentServiceDayFrom(oldItin)) {
                 alerts = [ "This itinerary departs on a different day from the previous one"];
             }
@@ -177,7 +175,8 @@ otp.widgets.ItinerariesWidget =
                 arriveBy : false
             });
             this_.refreshActiveOnly = true;
-            this_.module.planTrip(params);
+            this_.module.updateActiveOnly = true;
+            this_.module.planTripFunction.call(this_.module, params);
         });
         $('<button>Previous</button>').button().appendTo(buttonRow).click(function() {
             var itin = this_.itineraries[this_.activeIndex];
@@ -191,7 +190,8 @@ otp.widgets.ItinerariesWidget =
                 arriveBy : true
             });
             this_.refreshActiveOnly = true;
-            this_.module.planTrip(params);            
+            this_.module.updateActiveOnly = true;
+            this_.module.planTripFunction.call(this_.module, params);
         });
         $('<button>Next</button>').button().appendTo(buttonRow).click(function() {
             var itin = this_.itineraries[this_.activeIndex];
@@ -205,7 +205,8 @@ otp.widgets.ItinerariesWidget =
                 arriveBy : false
             });
             this_.refreshActiveOnly = true;
-            this_.module.planTrip(params);      
+            this_.module.updateActiveOnly = true;
+            this_.module.planTripFunction.call(this_.module, params);
         });
         $('<button>Last</button>').button().appendTo(buttonRow).click(function() {
             var itin = this_.itineraries[this_.activeIndex];
@@ -218,7 +219,8 @@ otp.widgets.ItinerariesWidget =
                 arriveBy : true
             });
             this_.refreshActiveOnly = true;
-            this_.module.planTrip(params);
+            this_.module.updateActiveOnly = true;
+            this_.module.planTripFunction.call(this_.module, params);
         });
     },
     

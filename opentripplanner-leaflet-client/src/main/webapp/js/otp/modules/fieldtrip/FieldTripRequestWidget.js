@@ -43,7 +43,15 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
         var context = _.clone(this.request);
         context.widgetId = this.id;
         context.dsUrl = otp.config.datastoreUrl;
+        if(this.request.travelDate) context.travelDate = moment(this.request.travelDate).format("dddd, MMMM D, YYYY");
+        if(this.request.arriveDestinationTime) context.arriveDestinationTime = moment(this.request.arriveDestinationTime).format(otp.config.timeFormat);
+        if(this.request.leaveDestinationTime) context.leaveDestinationTime = moment(this.request.leaveDestinationTime).format(otp.config.timeFormat);
+        if(this.request.arriveSchoolTime) context.arriveSchoolTime = moment(this.request.arriveSchoolTime).format(otp.config.timeFormat);
 
+        if(this.request.paymentPreference === "request_call") context.paymentPreference = "Call requested at provided phone number";
+        else if(this.request.paymentPreference === "fax_cc") context.paymentPreference = "Will fax credit card info to TriMet";
+        else if(this.request.paymentPreference === "mail_check") context.paymentPreference = "Will mail check to TriMet";
+        
         var outboundTrip = otp.util.FieldTrip.getOutboundTrip(this.request);
         if(outboundTrip) context.outboundPlanInfo = otp.util.FieldTrip.constructPlanInfo(outboundTrip);
         var inboundTrip = otp.util.FieldTrip.getInboundTrip(this.request);
@@ -128,6 +136,19 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
             
             html += content.html();
             printWindow.document.write(html);
+        });
+        
+        this.content.find('.cancelRequestButton').click(function(evt) {
+            if(confirm("Are you sure you want to cancel this request? Any associated trips will be deleted.")) {
+                this_.module.cancelRequest(this_.request);
+                this_.hide();
+            }
+        });
+        this.content.find('.setClasspassButton').click(function(evt) {
+            var classpassId = prompt("Specify the Class Pass ID (to clear a previously set Class Pass, leave the field blank):");
+            if(classpassId !== null) {
+                this_.module.setClasspassId(this_.request, classpassId);
+            }
         });
     },
     

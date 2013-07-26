@@ -74,6 +74,23 @@ public class FieldTrip extends Application {
         render(fieldTrips, year, month, monthName, day);
     }
 
+    public static void opsReport(int year, int month, int day) {
+        Calendar cal = Calendar.getInstance();
+        if(year == 0) year = cal.get(Calendar.YEAR);
+        if(month == 0) month = cal.get(Calendar.MONTH)+1;
+        if(day == 0) day = cal.get(Calendar.DAY_OF_MONTH);
+
+        List<GTFSTrip> gtfsTrips = GTFSTrip.find("year(groupItinerary.fieldTrip.serviceDay) = ? and month(groupItinerary.fieldTrip.serviceDay) = ? and day(groupItinerary.fieldTrip.serviceDay) = ? " +
+                                              "order by depart", 
+                                              year, month, day).fetch();
+
+        DateFormatSymbols dfs = new DateFormatSymbols();
+        String[] months = dfs.getMonths();
+        String monthName = months[month - 1];
+        render(gtfsTrips, year, month, monthName, day);
+    }
+    
+    
     public static void getFieldTrip(long id) {
         TrinetUser user = checkLogin();        
         checkAccess(user);
@@ -242,7 +259,36 @@ public class FieldTrip extends Application {
         renderJSON(gson.toJson(requests));
     }
     
+    public static void setRequestStatus(long requestId, String status) {
+        FieldTripRequest req = FieldTripRequest.findById(requestId);
+        if(req != null) {
+            req.status = status;
+            req.save();
+            if(status.equals("cancelled")) {
+                for(ScheduledFieldTrip trip : req.trips) {
+                    trip.delete();
+                }
+            }
+            renderJSON(requestId);
+        }
+        else {
+            badRequest();
+        }        
+    }
 
+    public static void setRequestClasspassId(long requestId, String classpassId) {
+        FieldTripRequest req = FieldTripRequest.findById(requestId);
+        if(req != null) {
+            if(classpassId != null && classpassId.length() == 0) classpassId = null;
+            req.classpassId = classpassId;
+            req.save();
+            renderJSON(requestId);
+        }
+        else {
+            badRequest();
+        }        
+    }
+    
     /* FieldTripFeedback */
     
     public static void feedbackForm(long requestId) {
@@ -274,5 +320,13 @@ public class FieldTrip extends Application {
         }
     }
 
+    /* Receipt Generation */
+    
+    public static void receipt(long requestId) {
+        FieldTripRequest req = FieldTripRequest.findById(requestId);
+        if(req != null) {
+            render(req);
+        }
+    }
     
 }

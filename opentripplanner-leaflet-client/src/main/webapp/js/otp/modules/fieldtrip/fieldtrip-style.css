@@ -8,12 +8,43 @@
   width: 480px;
 }
 
+
+.otp-fieldTripManager-tabs { 
+    padding: 0px; 
+} 
+
+.otp-fieldTripManager-tabs .ui-tabs-nav { 
+    background: transparent; 
+    border-width: 0px 0px 1px 0px; 
+    -moz-border-radius: 0px; 
+    -webkit-border-radius: 0px; 
+    border-radius: 0px; 
+} 
+
+.otp-fieldTripManager-tabs .ui-tabs-panel { 
+    margin: 0em 0.2em 0.2em 0.2em; 
+}
+
 .otp-fieldTripManager-tabbedArea {
     padding: 0px;
     margin: 0px;
-    border: 2px solid blue;
+    border: 2px solid blue;    
     background: red;
 }
+
+
+.otp-fieldTripManager-requestsList {
+    position: absolute;
+    background: white;
+    overflow: auto;
+    border: 1px solid black;
+    top: 48px;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+}
+
+
 
 .otp-fieldTripManager-callListContainer {
     background: white;
@@ -95,7 +126,7 @@
 
 .otp-fieldTrip-requestWidget {
     width: 400px;
-    height: 300px;
+    height: 350px;
 }
 
 .otp-fieldTrip-requestWidget-content {
@@ -112,7 +143,7 @@
     top: 0px;
     left: 0px;
     right: 0px;
-    bottom: 160px;
+    bottom: 180px;
     border: 1px solid gray;
     padding: 10px;
     background: white;
@@ -123,17 +154,16 @@
     width: 50%;
     height: 120px;
     padding: 0px;
-    bottom: 30px;
+    bottom: 50px;
     
 }
 
 .otp-fieldTrip-requestWidget-bottomRow {
     position: absolute;
     width: 100%;
-    height: 20px;
+    height: 40px;
     padding: 0px;
     bottom: 0px;
-    text-align: center;
 }
 
 .otp-fieldTrip-requestWidget-tripBox {

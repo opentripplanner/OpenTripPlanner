@@ -14,7 +14,7 @@
 
 otp.modules.calltaker.Call = Backbone.Model.extend({
     
-    url : otp.config.datastoreUrl+'/call',
+    url : otp.config.datastoreUrl+'/calltaker/call',
     playName : 'call',
     queries : null,   
     
@@ -31,13 +31,13 @@ otp.modules.calltaker.Call = Backbone.Model.extend({
 
 otp.modules.calltaker.CallList = Backbone.Collection.extend({
     model: otp.modules.calltaker.Call,
-    url: otp.config.datastoreUrl+'/call',
+    url: otp.config.datastoreUrl+'/calltaker/call',
 });
 
 
 otp.modules.calltaker.Query = Backbone.Model.extend({
     
-    url : otp.config.datastoreUrl+'/callQuery',
+    url : otp.config.datastoreUrl+'/calltaker/callQuery',
     playName : 'query'
    
 });
@@ -45,7 +45,7 @@ otp.modules.calltaker.Query = Backbone.Model.extend({
 otp.modules.calltaker.QueryList = Backbone.Collection.extend({
 
     model: otp.modules.calltaker.Query,
-    url: otp.config.datastoreUrl+'/callQuery',
+    url: otp.config.datastoreUrl+'/calltaker/callQuery',
        
 });
 

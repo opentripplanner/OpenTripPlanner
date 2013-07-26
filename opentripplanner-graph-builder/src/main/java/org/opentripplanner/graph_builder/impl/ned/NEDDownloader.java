@@ -163,7 +163,7 @@ public class NEDDownloader implements NEDTileSource {
     private List<URL> getDownloadURLs() {
         List<URL> urls = new ArrayList<URL>();
         List<String> payloads = getValidateElements();
-        log.debug("Getting urls from request validation service");
+        log.info("Getting urls from request validation service");
         String RTendpointURL = "http://extract.cr.usgs.gov/requestValidationService/services/RequestValidationService";
 
         try {
@@ -323,66 +323,48 @@ public class NEDDownloader implements NEDTileSource {
 
     @Override
     public List<File> getNEDTiles() {
-        log.debug("Downloading NED");
+        log.info("Downloading NED elevation data.");
         List<URL> urls = getDownloadURLsCached();
         List<File> files = new ArrayList<File>();
-        Iterator<URL> it = urls.iterator();
-        URL url = it.next();
-        do {
+        int tileCount = 0;
+        TILE: for (URL url : urls) {
+            String tileProgress = String.format("Tile %d/%d", ++tileCount, urls.size());
             String key = getKey(url);
             File tile = getPathToNEDTile(key);
             if (tile.exists()) {
                 files.add(tile);
-                log.debug(url + " already exists; not downloading");
-                if (it.hasNext()) {
-                    url = it.next();
-                    continue;
-                } else {
-                    break;
-                }
-            }
-            try {
-                while (true) {
-                    sleep(3000);
-                    String token;
-                    while (true) {
-                        token = initiateDownload(url);
-                        int i = 0;
-                        do {
-                            log.debug("Waiting to query");
-                            sleep(30000);
-                        } while (!downloadReady(token) && i++ < 20);
-                        sleep(3000);
-                        if (i != 20) {
-                            break;
-                        }
-                        //we've waited ten minutes.  Let's just give up on this download and try again.
-                        log.debug("Giving up on slow download and retrying");
-                    }
-
-                    downloadFile(url, token);
-                    try {
-                        files.add(unzipFile(url));
-                    } catch (NotAZipFileException e) {
-                        // try again (my kingdom for goto)
-                        continue;
-                    }
-                    break;
-                }
-            } catch (NoDownloadIDException e) {
-                log.debug("Failed to download, retrying");
-                // have to retry
+                log.debug("{} found in NED cache, not downloading: {}", tileProgress, tile);
                 continue;
-            } catch (Exception e) {
-                throw new RuntimeException(
-                        "Error getting data from USGS Download Server while downloading", e);
             }
-            if (it.hasNext()) {
-                url = it.next();
-            } else {
-                break;
+            REQUEST: for (int req_attempt = 0; req_attempt < 5; ++req_attempt) {
+                log.info("{} not in NED cache, requesting download: {}", tileProgress, tile);
+                try {
+                    sleep(3000);
+                    String token = initiateDownload(url);
+                    DOWNLOAD: for (int dl_attempt = 0; dl_attempt < 20; ++dl_attempt) {
+                        log.info("Waiting to check if tile is ready for download (try {}).", dl_attempt + 1);
+                        sleep(30000);
+                        if (downloadReady(token)) {
+                            downloadFile(url, token);
+                            try {
+                                files.add(unzipFile(url));
+                                continue TILE;
+                            } catch (NotAZipFileException e) {
+                                log.error("Received corrupted zip file. Retrying with same token.");
+                                continue DOWNLOAD;
+                            }
+                        }
+                    }
+                    log.info("Giving up on slow download attempt {} and retrying.", req_attempt);
+                } catch (NoDownloadIDException e) {
+                    log.debug("Download ID unrecognized by server, retrying.");
+                    continue REQUEST;
+                } catch (Exception e) {
+                    throw new RuntimeException("Error getting data from USGS Download Server while downloading", e);
+                }
             }
-        } while (true);
+            log.error("Unable to download a NED tile after 5 requests.");
+        }
         return files;
     }
 
@@ -477,7 +459,6 @@ public class NEDDownloader implements NEDTileSource {
         } catch (Exception e) {
             throw new RuntimeException("Error extracting geotiff from zip " + path, e);
         }
-
         throw new RuntimeException("Error extracting geotiff from zip: nothing ends in .tif "
                 + path);
     }
@@ -485,7 +466,7 @@ public class NEDDownloader implements NEDTileSource {
     private void downloadFile(URL url, String token) {
         try {
             String key = getKey(url);
-            log.debug("Starting download " + key);
+            log.info("Starting download " + key);
             File path = getPathToNEDArchive(key);
             URL downloadUrl = new URL(
                     "http://extract.cr.usgs.gov/axis2/services/DownloadService/getData?downloadID="
@@ -506,7 +487,7 @@ public class NEDDownloader implements NEDTileSource {
             ostream.close();
             istream.close();
             httpconnection.disconnect();
-            log.debug("Done download " + key);
+            log.info("Finished download " + key);
             NEDDownloader.sleep(3000);
         } catch (Exception e) {
             throw new RuntimeException(

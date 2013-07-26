@@ -109,22 +109,41 @@ otp.modules.fieldtrip.FieldTripModule =
     },    
     
     getExtendedQueryParams : function() {
-        return { showIntermediateStops : this.showIntermediateStops };
+        return { 
+            numItineraries : 1,
+        };
     },
 
     getAdditionalUrlParams : function() {
         return { groupSize : this.groupSize };
     },
         
-    ftPlanTrip : function() {
-        var planDate = moment(this.optionsWidget.controls['time'].epoch).format("YYYY-MM-DD");
+    ftPlanTrip : function(queryParams) {
+
+        if(this.updateActiveOnly) { // single itin modified by first/last/previous/next
+
+            if(this.groupPlan) {
+                var bannedTripArr = [];
+                for(var i = 0; i < this.groupPlan.itineraries.length; i++) {
+                    bannedTripArr = bannedTripArr.concat(this.groupPlan.itineraries[i].getTripIds());
+                }
+                queryParams.bannedTrips = bannedTripArr.join(',');
+            }
+            
+            this.planTrip(queryParams);
+            return;
+        }
+        
+        var planDate = moment(this.optionsWidget.controls['time'].getDate()).format("MM/DD/YYYY");
         this.currentGroupSize = this.groupSize;
         this.bannedSegments = [];
         //console.log("RESET SEGMENTS");
         this.groupPlan = null;
 
         var this_ = this;
-        $.ajax(this.datastoreUrl+'/fieldTrip/getTrips', {
+        
+        // query for trips in use by other field trip itineraries in the DB
+        $.ajax(this.datastoreUrl+'/fieldtrip/getTrips', {
             data: {
                 sessionId : this.sessionManager.sessionId,
                 date : planDate,
@@ -133,21 +152,25 @@ otp.modules.fieldtrip.FieldTripModule =
                 
             success: function(data) {
                 if((typeof data) == "string") data = jQuery.parseJSON(data);
+                
+                // store the trips in use for reference by the checkTripValidity() method
+                this_.tripsInUse = [];
+                
                 for(var t = 0; t < data.length; t++) {
                     var fieldTrip = data[t];
                     for(var i = 0; i < fieldTrip.groupItineraries.length; i++) {
                         var grpItin = fieldTrip.groupItineraries[i];
                         for(var gt =0 ; gt < grpItin.trips.length; gt++) {
-                            //this_.bannedSegments.push(grpItin.trips[gt].tripString);
                             var gtfsTrip = grpItin.trips[gt];
-                            this_.bannedSegments.push({
-                                agencyAndId : gtfsTrip.agencyAndId,
-                                fromStopIndex : gtfsTrip.stopIndex,
-                                toStopIndex : gtfsTrip.stopIndex,
-                            });
+                            // (gtfsTrip already includes fields agencyAndId, fromStopIndex, and toStopIndex)
+                            gtfsTrip.passengers = grpItin.passengers; 
+                            this_.tripsInUse.push(gtfsTrip);
                         }
                     }
                 }
+                
+                // kick off the main planTrip request
+                this.itinCapacity = null;
                 this_.planTrip();
             },
             
@@ -160,6 +183,15 @@ otp.modules.fieldtrip.FieldTripModule =
     },
     
     processPlan : function(tripPlan, restoring) {
+        if(this.updateActiveOnly) {
+            var itinIndex = this.itinWidget.activeIndex;
+            tripPlan.itineraries[0].groupSize = this.groupPlan.itineraries[itinIndex].groupSize;
+            this.itinWidget.updateItineraries(tripPlan.itineraries);
+            this.updateActiveOnly = false;    
+            this.drawItinerary(tripPlan.itineraries[0]);        
+            return;
+        }
+    
         if(this.groupPlan == null)
             this.groupPlan = new otp.modules.planner.TripPlan(null, _.extend(tripPlan.queryParams, { groupSize : this.groupSize }));
 
@@ -181,6 +213,10 @@ otp.modules.fieldtrip.FieldTripModule =
         //var itin = new otp.modules.planner.Itinerary(tripPlan.itineraries[0], tripPlan);
         var itin = tripPlan.itineraries[0];
         var capacity = itin.getGroupTripCapacity();
+        
+        // if this itin shares a vehicle trip with another one already in use, only use the remainingCapacity (as set in checkTripValidity())
+        if(this.itinCapacity) capacity = Math.min(capacity, this.itinCapacity);
+
         //console.log("cur grp size:"+this.currentGroupSize+", cap="+capacity);
         
         //console.log("FT returned trip:");
@@ -205,6 +241,7 @@ otp.modules.fieldtrip.FieldTripModule =
             this.currentGroupSize -= capacity;
             itin.groupSize = capacity;
             //console.log("remaining: "+this.currentGroupSize);
+            this.itinCapacity = null;
             this.planTrip();
         }
         else { // we're done; show the results
@@ -234,9 +271,9 @@ otp.modules.fieldtrip.FieldTripModule =
         
     createItinerariesWidget : function() {
         this.itinWidget = new otp.widgets.ItinerariesWidget(this.id+"-itinWidget", this);
-        this.itinWidget.showButtonRow = false;
+        //this.itinWidget.showButtonRow = false;
         this.itinWidget.showItineraryLink = false;
-        this.itinWidget.showSearchLink = true;
+        //this.itinWidget.showSearchLink = true;
     },
     
     setBannedTrips : function() {
@@ -251,7 +288,7 @@ otp.modules.fieldtrip.FieldTripModule =
 
     refreshTrips : function(date) {
         var this_ = this;
-        $.ajax(this.datastoreUrl+'/fieldTrip/getTrips', {
+        $.ajax(this.datastoreUrl+'/fieldtrip/getTrips', {
             data: {
                 sessionId : this.sessionManager.sessionId,
                 //date : this.fieldTripManager.selectedDate,
@@ -292,7 +329,7 @@ otp.modules.fieldtrip.FieldTripModule =
         };
         
         //console.log(data);
-        $.ajax(this.datastoreUrl+'/fieldTrip/newTrip', {
+        $.ajax(this.datastoreUrl+'/fieldtrip/newTrip', {
             type: 'POST',
             
             data: data,
@@ -309,8 +346,25 @@ otp.modules.fieldtrip.FieldTripModule =
             }
         });
     },
-    
-    
+
+    checkTripValidity : function(tripId, fromStopIndex, toStopIndex, itin) {
+        for(var i = 0; i < this.tripsInUse.length; i++) {
+            var tripInUse  = this.tripsInUse[i];
+            
+            // first test: are these the same vehicle trip? if not, we're ok
+            if(tripId !== tripInUse.agencyAndId) continue;
+            
+            // second test: do the stop ranges overlap? if not, we're ok
+            if(fromStopIndex > tripInUse.toStopIndex || toStopIndex < tripInUse.fromStopIndex) continue;
+            
+            // if ranges overlap, calculate remaining capacity
+            var remainingCapacity = itin.getGroupTripCapacity() - tripInUse.passengers;
+            if(remainingCapacity < 10) return false; // consider trip 'full' if < 10 spots remain
+            this.itinCapacity = this.itinCapacity ? Math.min(this.itinCapacity, remainingCapacity) : remainingCapacity;
+        }
+        return true;
+    },
+        
     saveItineraries : function(tripId, successCallback) {
         var this_ = this;
         this.itinsSaved = 0;
@@ -339,10 +393,14 @@ otp.modules.fieldtrip.FieldTripModule =
                 data['trips['+l+'].routeName'] = routeName;
                 data['trips['+l+'].fromStopIndex'] = leg.from.stopIndex;
                 data['trips['+l+'].toStopIndex'] = leg.to.stopIndex;
+                data['trips['+l+'].fromStopName'] = leg.from.name;
+                data['trips['+l+'].toStopName'] = leg.to.name;
+                data['trips['+l+'].headsign'] = leg.headsign;
+                if(leg.tripBlockId) data['trips['+l+'].blockId'] = leg.tripBlockId;
             }
             //console.log(data);
             
-            $.ajax(this.datastoreUrl+'/fieldTrip/addItinerary', {
+            $.ajax(this.datastoreUrl+'/fieldtrip/addItinerary', {
                 type: 'POST',
                 
                 data: data,
@@ -377,7 +435,7 @@ otp.modules.fieldtrip.FieldTripModule =
         
         console.log("delete");
         console.log(data);
-        $.ajax(this.datastoreUrl+'/fieldTrip/deleteTrip', {
+        $.ajax(this.datastoreUrl+'/fieldtrip/deleteTrip', {
             type: 'POST',
             
             data: data,
@@ -451,7 +509,7 @@ otp.modules.fieldtrip.FieldTripModule =
     
     loadRequests : function() {
         var this_ = this;
-        $.ajax(this.datastoreUrl+'/fieldTrip/getRequests', {
+        $.ajax(this.datastoreUrl+'/fieldtrip/getRequests', {
             data: {
                 sessionId : this.sessionManager.sessionId,
                 limit : 100,
@@ -485,7 +543,59 @@ otp.modules.fieldtrip.FieldTripModule =
             }
         });
     },
+
+    setRequestStatus : function(request, status) {
+        var this_ = this;
         
+        var data = {
+            sessionId : this.sessionManager.sessionId,
+            requestId : request.id,
+            status : status
+        };
+        
+        $.ajax(this.datastoreUrl+'/fieldtrip/setRequestStatus', {
+            type: 'POST',
+            
+            data: data,
+                  
+            success: function(data) {
+                this_.loadRequests();
+            },
+            
+            error: function(data) {
+                console.log("error setting trip status:");
+                console.log(data);
+            }
+        });
+    },
+    
+    cancelRequest : function(request) {
+        this.setRequestStatus(request, "cancelled"); 
+    },
+
+    setClasspassId : function(request, classpassId) {
+        var this_ = this;
+
+        $.ajax(this.datastoreUrl+'/fieldtrip/setRequestClasspassId', {
+            type: 'POST',
+            
+            data: {
+                sessionId : this.sessionManager.sessionId,
+                requestId : request.id,
+                classpassId : classpassId
+            },
+            
+            success: function(data) {
+                this_.loadRequests();
+            },
+            
+            error: function(data) {
+                console.log("error setting classpass id:");
+                console.log(data);
+            }
+        });
+    },
+                
     showRequest : function(request) {
         if(_.has(this.requestWidgets, request.id)) {
             var widget = this.requestWidgets[request.id];
@@ -504,7 +614,7 @@ otp.modules.fieldtrip.FieldTripModule =
             time : moment(request.arriveDestinationTime).format("h:mma"),
             date : moment(request.travelDate).format("MM-DD-YYYY"),            
             arriveBy : true,
-            groupSize : request.numStudents,
+            groupSize : otp.util.FieldTrip.getGroupSize(request),
         };
         
         this.optionsWidget.applyQueryParams(queryParams);
@@ -531,7 +641,7 @@ otp.modules.fieldtrip.FieldTripModule =
             time : moment(request.leaveDestinationTime).format("h:mma"),
             date : moment(request.travelDate).format("MM-DD-YYYY"),            
             arriveBy : false,
-            groupSize : request.numStudents,
+            groupSize : otp.util.FieldTrip.getGroupSize(request),
         };
         
         this.optionsWidget.applyQueryParams(queryParams);
@@ -593,8 +703,8 @@ otp.modules.fieldtrip.FieldTripModule =
             this_.loadRequests();
         });
         /*this.saveTrip(request, function(tripId) {
-            if(type === "outbound") var url = this.datastoreUrl+'/fieldTrip/setOutboundTrip';
-            if(type === "inbound") var url = this.datastoreUrl+'/fieldTrip/setInboundTrip';
+            if(type === "outbound") var url = this.datastoreUrl+'/fieldtrip/setOutboundTrip';
+            if(type === "inbound") var url = this.datastoreUrl+'/fieldtrip/setInboundTrip';
             $.ajax(url, {
                 type: 'POST',
                 
@@ -662,6 +772,13 @@ otp.util.FieldTrip = {
         }
         return null;
     },
+
+    getGroupSize : function(request) {
+        var groupSize = 0;
+        if(request.numStudents) groupSize += request.numStudents;
+        if(request.numChaperones) groupSize += request.numChaperones;
+        return groupSize;
+    },    
     
     readItinData : function(groupItin) {
         if(groupItin.timeOffset) otp.config.timeOffset = groupItin.timeOffset;

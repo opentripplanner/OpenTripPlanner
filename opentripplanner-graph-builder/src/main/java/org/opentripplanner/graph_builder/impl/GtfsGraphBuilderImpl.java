@@ -91,6 +91,19 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
     private boolean generateFeedIds = false;
 
+    /** 
+     * Construct and set bundles all at once. 
+     * TODO why is there a wrapper class around a list of GTFS files?
+     * TODO why is there a wrapper around GTFS files at all?
+     */
+    public GtfsGraphBuilderImpl (List<GtfsBundle> gtfsBundles) {
+        GtfsBundles gtfsb = new GtfsBundles();
+        gtfsb.setBundles(gtfsBundles);
+        this.setGtfsBundles(gtfsb);
+    }
+    
+    public GtfsGraphBuilderImpl() { };
+
     public List<String> provides() {
         List<String> result = new ArrayList<String>();
         result.add("transit");
