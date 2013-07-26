@@ -210,10 +210,13 @@ public class RoutingContext implements Cloneable {
 
         // the graph's snapshot may be frequently updated.
         // Grab a reference to ensure a coherent view of the timetables throughout this search.
-        if (graph.timetableSnapshotSource != null)
+        if (routingRequest.isIgnoreRealtimeUpdates() == false
+                && graph.timetableSnapshotSource != null) {
             timetableSnapshot = graph.timetableSnapshotSource.getSnapshot();
-        else
+        }
+        else {
             timetableSnapshot = null;
+        }
         calendarService = graph.getCalendarService();
         setServiceDays();
 
