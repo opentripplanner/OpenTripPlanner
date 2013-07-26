@@ -14,27 +14,18 @@
 package org.opentripplanner.updater.stoptime;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.TimeZone;
-
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
-import org.onebusaway.gtfs.model.calendar.LocalizedServiceId;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.impl.transit_index.TransitIndexBuilder;
@@ -48,13 +39,10 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.TransitIndexService;
-import org.opentripplanner.routing.transit_index.RouteVariant;
 import org.opentripplanner.routing.trippattern.CanceledTripTimes;
 import org.opentripplanner.routing.trippattern.DecayingDelayTripTimes;
 import org.opentripplanner.routing.trippattern.TripUpdate;
 import org.opentripplanner.routing.trippattern.Update;
-import org.opentripplanner.routing.trippattern.UpdatedTripTimes;
-import org.opentripplanner.routing.trippattern.Update.Status;
 
 public class StoptimeUpdaterTest {
 
@@ -126,50 +114,6 @@ public class StoptimeUpdaterTest {
         assertNotSame(resolver, newResolver);
     }
     
-    // TODO: run
-
-    @Test
-    public void testHandleAddedAndRemovedTrip() { 
-        AgencyAndId routeId = new AgencyAndId("agency", "1");
-        AgencyAndId tripId = new AgencyAndId("agency", "1.A");
-        AgencyAndId stop_a_id = new AgencyAndId("agency", "A");
-        AgencyAndId stop_b_id = new AgencyAndId("agency", "B");
-        AgencyAndId stop_c_id = new AgencyAndId("agency", "C");
-        
-        ServiceDate today = new ServiceDate();
-        
-        Trip trip = new Trip();
-        trip.setId(tripId);
-        trip.setRoute(transitIndexService.getAllRoutes().get(routeId));
-        
-        List<Update> updates = new LinkedList<Update>();
-        updates.add(new Update(tripId, stop_a_id, 0,  0*60 + 120,  0*60 + 120, Status.PREDICTION, 0, new ServiceDate()));
-        updates.add(new Update(tripId, stop_b_id, 1, 10*60 + 120, 10*60 + 120, Status.PREDICTION, 0, new ServiceDate()));
-        updates.add(new Update(tripId, stop_c_id, 2, 20*60 + 120, 20*60 + 120, Status.PREDICTION, 0, new ServiceDate()));
-        tripUpdate = TripUpdate.forAddedTrip(trip, 0, new ServiceDate(), updates);
-        updater.run();
-        
-        TimetableResolver resolver = updater.getSnapshot(true);
-
-        TableTripPattern pattern = transitIndexService.getTripPatternForTrip(tripId);
-        RouteVariant variant = transitIndexService.getVariantForTrip(tripId);
-        assertNotNull(pattern);
-        assertNotNull(variant);
-        
-        Timetable forToday = resolver.resolve(pattern, today);
-        Timetable schedule = resolver.resolve(pattern, null);
-        assertSame(forToday, schedule);
-        assertEquals(3, variant.getStops().size());
-        
-        tripUpdate = TripUpdate.forRemovedTrip(tripId, 0, new ServiceDate());
-        updater.run();
-        
-        pattern = transitIndexService.getTripPatternForTrip(tripId);
-        variant = transitIndexService.getVariantForTrip(tripId);
-        assertNull(pattern);
-        assertNull(variant);
-    }
-
     @Test
     public void testHandleCanceledTrip() { 
         AgencyAndId tripId = new AgencyAndId("agency", "1.1");
@@ -214,49 +158,6 @@ public class StoptimeUpdaterTest {
         assertSame(forToday.getTripTimes(tripIndex2), schedule.getTripTimes(tripIndex2));
     }
 
-    @Test
-    public void testAddService_new() {
-        CalendarServiceData data = graph.getService(CalendarServiceData.class);
-        AgencyAndId serviceId = new AgencyAndId("A", "test");
-        TimeZone timezone = data.getTimeZoneForAgencyId("agency");
-        LocalizedServiceId lServiceId = new LocalizedServiceId(serviceId, timezone);
-        ServiceDate date = new ServiceDate();
-        
-        updater.addService(serviceId, timezone, Collections.singletonList(date));
-        
-        assertTrue(data.getLocalizedServiceIds().contains(lServiceId));
-        data.getServiceIdsForDate(date).contains(serviceId);
-        
-        assertEquals(1, data.getServiceDatesForServiceId(serviceId).size());
-        assertEquals(date, data.getServiceDatesForServiceId(serviceId).get(0));
-    }
-    
-    @Test
-    public void testAddService_existing() {
-        CalendarServiceData data = graph.getService(CalendarServiceData.class);
-        AgencyAndId serviceId = new AgencyAndId("A", "test2");
-        TimeZone timezone = data.getTimeZoneForAgencyId("agency");
-        LocalizedServiceId lServiceId = new LocalizedServiceId(serviceId, timezone);
-        ServiceDate date = new ServiceDate();
-        ServiceDate other = date.next();
-        
-        assertTrue(updater.addService(serviceId, timezone, Collections.singletonList(date)));
-        
-        assertTrue(data.getLocalizedServiceIds().contains(lServiceId));
-        assertTrue(data.getServiceIdsForDate(date).contains(serviceId));
-        
-        assertEquals(1, data.getServiceDatesForServiceId(serviceId).size());
-        assertEquals(date, data.getServiceDatesForServiceId(serviceId).get(0));
-        
-        assertFalse(updater.addService(serviceId, timezone, Collections.singletonList(other)));
-        
-        assertTrue(data.getLocalizedServiceIds().contains(lServiceId));
-        assertTrue(data.getServiceIdsForDate(date).contains(serviceId));
-
-        assertEquals(1, data.getServiceDatesForServiceId(serviceId).size());
-        assertEquals(date, data.getServiceDatesForServiceId(serviceId).get(0));
-    }
-    
     @Test
     public void testPurgeExpiredData() {
         AgencyAndId tripId = new AgencyAndId("agency", "1.1");
