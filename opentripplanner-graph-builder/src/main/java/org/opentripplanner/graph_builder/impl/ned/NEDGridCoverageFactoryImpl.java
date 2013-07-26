@@ -14,6 +14,7 @@
 package org.opentripplanner.graph_builder.impl.ned;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,30 +42,15 @@ public class NEDGridCoverageFactoryImpl implements NEDGridCoverageFactory {
 
     private NEDTileSource tileSource = new NEDDownloader();
 
-    private List<VerticalDatum> datums = new ArrayList<VerticalDatum>();
+    private List<VerticalDatum> datums;
 
-    public NEDGridCoverageFactoryImpl () {
-        String[] filenames = {"g2012a00.gtx","g2012g00.gtx","g2012h00.gtx","g2012p00.gtx","g2012s00.gtx","g2012u00.gtx"};
-        GtxVDatumReader reader = new GtxVDatumReader();
-        try {
-            for (String filename : filenames) {
-                datums.add(reader.read(getClass().getResourceAsStream("g12/" + filename)));
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    public NEDGridCoverageFactoryImpl () { }
     
     public NEDGridCoverageFactoryImpl(File cacheDirectory) {
-        this();
         this.setCacheDirectory(cacheDirectory);
     }
 
-    /**
-     * Set the directory where NED will be cached.
-     *
-     * @param cacheDirectory
-     */
+    /** Set the directory where NED data will be cached. */
     public void setCacheDirectory(File cacheDirectory) {
         this.cacheDirectory = cacheDirectory;
     }
@@ -74,8 +60,26 @@ public class NEDGridCoverageFactoryImpl implements NEDGridCoverageFactory {
         this.tileSource = source;
     }
 
+    private void loadVerticalDatum () {
+        if (datums == null) {
+            datums = new ArrayList<VerticalDatum>();
+            String[] datumFilenames = {"g2012a00.gtx","g2012g00.gtx","g2012h00.gtx","g2012p00.gtx","g2012s00.gtx","g2012u00.gtx"};
+            GtxVDatumReader reader = new GtxVDatumReader();
+            try {
+                for (String filename : datumFilenames) {
+                    File datumFile = new File(cacheDirectory, filename);
+                    VerticalDatum datum = VerticalDatum.fromGTX(new FileInputStream(datumFile)); 
+                    datums.add(datum);
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }            
+        }
+    }
+    
     public Coverage getGridCoverage() {
         if (coverage == null) {
+            loadVerticalDatum();
             tileSource.setGraph(graph);
             tileSource.setCacheDirectory(cacheDirectory);
             List<File> paths = tileSource.getNEDTiles();
@@ -84,7 +88,6 @@ public class NEDGridCoverageFactoryImpl implements NEDGridCoverageFactory {
                 factory.setPath(path);
                 GridCoverage2D regionCoverage = Interpolator2D.create(factory.getGridCoverage(),
                         new InterpolationBilinear());
-
                 if (coverage == null) {
                     coverage = new UnifiedGridCoverage("unified", regionCoverage, datums);
                 } else {
@@ -103,13 +106,7 @@ public class NEDGridCoverageFactoryImpl implements NEDGridCoverageFactory {
         }
     }
 
-
-    /**
-     * Set the graph that will be used to determine the extent of the NED.
-     *
-     * @param graph
-     */
-
+    /** Set the graph that will be used to determine the extent of the NED. */
     @Override
     public void setGraph(Graph graph) {
         this.graph = graph;
