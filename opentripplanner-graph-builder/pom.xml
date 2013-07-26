@@ -58,18 +58,6 @@
           <artifactId>commons-discovery</artifactId>
           <version>0.4</version>
         </dependency>
-        <dependency>
-        	<groupId>postgresql</groupId>
-        	<artifactId>postgresql</artifactId>
-        	<version>8.3-603.jdbc4</version>
-        	<optional>false</optional>
-        </dependency>
-        <dependency>
-        	<groupId>mysql</groupId>
-        	<artifactId>mysql-connector-java</artifactId>
-        	<version>5.0.5</version>
-        	<optional>false</optional>
-        </dependency>
   	    <dependency>
   		    <groupId>org.geotools</groupId>
   		    <artifactId>gt-arcgrid</artifactId>
