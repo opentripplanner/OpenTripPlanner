@@ -13,59 +13,64 @@
 
 package org.opentripplanner.standalone;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.opentripplanner.graph_builder.GraphBuilderTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.beust.jcommander.JCommander;
-import com.beust.jcommander.Parameter;
+import com.beust.jcommander.ParameterException;
 
+/**
+ * I originally considered configuring OTP server through Java properties, with one global
+ * properties file at /etc/otp.properties for the whole server and one optional properties file per
+ * graph, then allowing overriding or entirely replacing these settings with command line options.
+ * 
+ * However, there are not that many build/server settings. Rather than duplicating everything in
+ * properties, a command line options class, and an internal configuration class, I am tentatively
+ * just using command line parameters for everything. JCommander lets you use "@filename" notation
+ * to load command line parameters from a file, which we can keep in /etc or wherever.
+ * 
+ * Graphs are sought by default in /var/otp/graphs.
+ */
 public class OTPMain {
 
     private static final Logger LOG = LoggerFactory.getLogger(OTPMain.class);
 
-    @Parameter(names = { "-h", "--help"}, description = "Print this help message and exit", help = true)
-    private boolean help;
-    
-    @Parameter(names = { "-v", "--verbose" }, description = "Verbose output")
-    private boolean verbose = false;
-   
-    @Parameter(names = { "-p", "--port"}, description = "server port")
-    private int port = 8080;
-
-    @Parameter(names = { "-g", "--graphs"}, description = "path to graph directory")
-    private String graphDirectory = "/var/otp/graphs";
-    
-    @Parameter(names = { "-r", "--router"}, description = "default router ID")
-    private String defaultRouterId = "";
-
-    @Parameter(names = { "-b", "--buildonly"}, description = "build graph but do not start server")
-    private boolean startServer = true;
-
-    @Parameter(names = { "-s", "--static"}, description = "path to static content")
-    private String staticDirectory = "/var/otp/static";
-
-    @Parameter(description = "files") // the rest of the parameters in one array
-    private List<String> files = new ArrayList<String>();
-
     public static void main(String[] args) {
-        OTPMain main = new OTPMain();
-        JCommander jc = new JCommander(main, args);
-        if (main.help) {
-            jc.usage();
-            System.exit(0);
+        /* Parse and validate command line parameters */
+        CommandLineParameters params = new CommandLineParameters();
+        try {
+            JCommander jc = new JCommander(params, args);
+            if (params.help) {
+                jc.setProgramName("java -Xmx[several]G -jar otp.jar");
+                jc.usage();
+                System.exit(0);
+            }
+            params.infer();
+        } catch (ParameterException pex) {
+            LOG.error("Parameter error: {}", pex.getMessage());
+            System.exit(1);
         }
-        main.run();
+        /* Wire up and configure graph builder and server based on command line parameters. */
+        OTPConfigurator configurator = new OTPConfigurator(params);
+        GraphBuilderTask graphBuilder = configurator.builderFromParameters();
+        if (graphBuilder != null) {
+            graphBuilder.run();
+            // Inform configurator which graph is to be used for potential in-memory handoff.
+            configurator.setGraph(graphBuilder.getGraph());
+        }
+        GrizzlyServer grizzlyServer = configurator.serverFromParameters();
+        if (grizzlyServer != null) {
+            while (true) { // Loop to restart server on uncaught fatal exceptions.
+                try {
+                    grizzlyServer.run();
+                    return;
+                } catch (Throwable throwable) {
+                    throwable.printStackTrace();
+                    LOG.error("An uncaught {} occurred inside OTP. Restarting server.", 
+                              throwable.getClass().getSimpleName());
+                }
+            }
+        }
     }
-    
-    private void run() {
-        LOG.info("Starting OTP server on port {} using graphs at {}", port, graphDirectory);
-        GrizzlyServer server = new GrizzlyServer();
-        server.start(new String[] { graphDirectory, defaultRouterId, String.valueOf(port) });
-    }
-    
 }
-
-

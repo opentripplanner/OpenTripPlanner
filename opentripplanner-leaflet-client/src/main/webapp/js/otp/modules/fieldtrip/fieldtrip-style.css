@@ -4,16 +4,47 @@
   bottom: 20px;
   right: 10px;
   background: blue;
-  height: 350px;
+  height: 300px;
   width: 480px;
+}
+
+
+.otp-fieldTripManager-tabs { 
+    padding: 0px; 
+} 
+
+.otp-fieldTripManager-tabs .ui-tabs-nav { 
+    background: transparent; 
+    border-width: 0px 0px 1px 0px; 
+    -moz-border-radius: 0px; 
+    -webkit-border-radius: 0px; 
+    border-radius: 0px; 
+} 
+
+.otp-fieldTripManager-tabs .ui-tabs-panel { 
+    margin: 0em 0.2em 0.2em 0.2em; 
 }
 
 .otp-fieldTripManager-tabbedArea {
     padding: 0px;
     margin: 0px;
-    border: 2px solid blue;
+    border: 2px solid blue;    
     background: red;
 }
+
+
+.otp-fieldTripManager-requestsList {
+    position: absolute;
+    background: white;
+    overflow: auto;
+    border: 1px solid black;
+    top: 48px;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+}
+
+
 
 .otp-fieldTripManager-callListContainer {
     background: white;
@@ -72,7 +103,7 @@
 }
 
 .otp-fieldTripRequests-list {
-    height: 250px;
+    height: 100%;
     background: white;
     border: 1px solid black;
     overflow: auto;
@@ -95,7 +126,7 @@
 
 .otp-fieldTrip-requestWidget {
     width: 400px;
-    height: 300px;
+    height: 350px;
 }
 
 .otp-fieldTrip-requestWidget-content {
@@ -112,7 +143,7 @@
     top: 0px;
     left: 0px;
     right: 0px;
-    bottom: 130px;
+    bottom: 180px;
     border: 1px solid gray;
     padding: 10px;
     background: white;
@@ -123,8 +154,16 @@
     width: 50%;
     height: 120px;
     padding: 0px;
-    bottom: 0px;
+    bottom: 50px;
     
+}
+
+.otp-fieldTrip-requestWidget-bottomRow {
+    position: absolute;
+    width: 100%;
+    height: 40px;
+    padding: 0px;
+    bottom: 0px;
 }
 
 .otp-fieldTrip-requestWidget-tripBox {
@@ -140,9 +179,11 @@
     background: white;
     padding: 4px;
     font-style: italic;
+    font-size: 11px;
     margin-top: 2px;
-    height: 24px;
+    height: 26px;
     border: 1px solid #ccc;
+    overflow: auto;
 }
 
 .otp-fieldTrip-requestWidget-button {
@@ -151,3 +192,88 @@
     overflow: hidden;
     height: 20px;
 }
+
+/** Geocoder widget **/
+
+.otp-fieldTrip-geocoder {
+    width: 500px;
+    height: 250px;
+}
+
+.otp-fieldTrip-geocoder-endpointContainer {
+    position: absolute;
+    width: 50%;
+    top: 0px;
+    padding: 0px;
+    bottom: 35px;   
+}
+
+.otp-fieldTrip-geocoder-endpointBox {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
+    right: 0px;
+    padding: 8px;
+    border: 2px solid gray;
+}
+
+.otp-fieldTrip-geocoder-endpointBox h6 {
+    font-size: 14px;
+    margin-bottom: 4px;
+    text-align: center;   
+}
+
+
+.otp-fieldTrip-geocoder-listContainer {
+    position: absolute;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+    top: 70px; 
+}
+
+.otp-fieldTrip-geocoder-buttonRow {
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
+    height: 30px;
+    text-align: center;   
+}
+
+
+/** printable plan **/
+
+.otp-fieldtrip-printablePlan-tripContainer {
+    margin-top: 1em;
+    background: #ddd;
+}
+
+.otp-fieldtrip-printablePlan-tripHeader {
+    padding: 4px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.otp-fieldtrip-printablePlan-tripBody {
+    padding: 8px;
+}
+
+.otp-fieldtrip-printablePlan-itinContainer {
+    border: 3px solid #444;
+    margin-top: .5em;
+}
+
+.otp-fieldtrip-printablePlan-itinHeader {
+    padding: 4px;
+    background: #444;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+}
+
+.otp-fieldtrip-printablePlan-itinBody {
+    padding: 12px;
+    background: white;
+}
+

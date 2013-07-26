@@ -60,6 +60,11 @@ public class Itinerary {
      * How far the user has to walk, in meters.
      */
     public Double walkDistance = 0.0;
+    
+    /**
+     * Indicates that the walk limit distance has been exceeded for this itinerary when true.
+     */
+    public boolean walkLimitExceeded = false;
 
     /**
      * How much elevation is lost, in total, over the course of the trip, in meters. As an example,

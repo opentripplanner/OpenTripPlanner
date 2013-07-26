@@ -60,13 +60,25 @@ public class TransferTable implements Serializable {
      * @param toStop is the departing stop
      * @param fromTrip is the arriving trip
      * @param toTrip is the departing trip
+     * @param forwardInTime is true when moving forward in time; false when moving
+     *   backwards in time (usually this will be the variable "boarding")
      * @return the transfer time in seconds. May contain special (negative) values which meaning
      *   can be found in the StopTransfer.*_TRANSFER constants. If no transfer is found,
      *   StopTransfer.UNKNOWN_TRANSFER is returned.
      */
-    public int getTransferTime(Stop fromStop, Stop toStop, Trip fromTrip, Trip toTrip) {
+    public int getTransferTime(Stop fromStop, Stop toStop, Trip fromTrip, Trip toTrip, boolean forwardInTime) {
         checkNotNull(fromStop);
         checkNotNull(toStop);
+        
+        // Reverse from and to if we are moving backwards in time
+        if (!forwardInTime) {
+            Stop tempStop = fromStop;
+            fromStop = toStop;
+            toStop = tempStop;
+            Trip tempTrip = fromTrip;
+            fromTrip = toTrip;
+            toTrip = tempTrip;
+        }
         
         // Get transfer time between the two stops
         int transferTime = getTransferTime(fromStop.getId(), toStop.getId(), fromTrip, toTrip);

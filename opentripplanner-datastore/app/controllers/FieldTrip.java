@@ -7,6 +7,8 @@ import models.fieldtrip.GroupItinerary;
 import models.fieldtrip.GTFSTrip;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import static controllers.Application.checkLogin;
+import static controllers.Calltaker.checkAccess;
 import play.*;
 import play.mvc.*;
 
@@ -19,7 +21,19 @@ import play.data.binding.As;
 
 
 public class FieldTrip extends Application {
-
+    
+    @Util
+    public static void checkAccess(TrinetUser user) {
+        if(user == null) {
+            System.out.println("null user in FieldTrip module");
+            forbidden("null user");
+        }
+        if(!user.hasFieldTripAccess()) {
+            System.out.println("User " + user.username + " has insufficient access for FieldTrip module");
+            forbidden("insufficient access privileges");
+        }
+    }
+    
     /*@Before(unless={"newTrip","addTripFeedback","getCalendar","newRequest","newRequestForm"}, priority=1)
     public static void checkLogin () {
         String username = params.get("userName");
@@ -43,6 +57,11 @@ public class FieldTrip extends Application {
      * y/m/d are the day for which we would like a calendar.
      */
     public static void getCalendar(int year, int month, int day) {
+        Calendar cal = Calendar.getInstance();
+        if(year == 0) year = cal.get(Calendar.YEAR);
+        if(month == 0) month = cal.get(Calendar.MONTH)+1;
+        if(day == 0) day = cal.get(Calendar.DAY_OF_MONTH);
+
         List<ScheduledFieldTrip> fieldTrips;
 
         fieldTrips = ScheduledFieldTrip.find("year(serviceDay) = ? and month(serviceDay) = ? and day(serviceDay) = ? " +
@@ -55,7 +74,27 @@ public class FieldTrip extends Application {
         render(fieldTrips, year, month, monthName, day);
     }
 
+    public static void opsReport(int year, int month, int day) {
+        Calendar cal = Calendar.getInstance();
+        if(year == 0) year = cal.get(Calendar.YEAR);
+        if(month == 0) month = cal.get(Calendar.MONTH)+1;
+        if(day == 0) day = cal.get(Calendar.DAY_OF_MONTH);
+
+        List<GTFSTrip> gtfsTrips = GTFSTrip.find("year(groupItinerary.fieldTrip.serviceDay) = ? and month(groupItinerary.fieldTrip.serviceDay) = ? and day(groupItinerary.fieldTrip.serviceDay) = ? " +
+                                              "order by depart", 
+                                              year, month, day).fetch();
+
+        DateFormatSymbols dfs = new DateFormatSymbols();
+        String[] months = dfs.getMonths();
+        String monthName = months[month - 1];
+        render(gtfsTrips, year, month, monthName, day);
+    }
+    
+    
     public static void getFieldTrip(long id) {
+        TrinetUser user = checkLogin();        
+        checkAccess(user);
+      
         ScheduledFieldTrip fieldTrip = ScheduledFieldTrip.findById(id);
         Gson gson = new GsonBuilder()
           .excludeFieldsWithoutExposeAnnotation()  
@@ -64,6 +103,9 @@ public class FieldTrip extends Application {
     }
     
     public static void getFieldTrips(@As("MM/dd/yyyy") Date date, Integer limit) {
+        TrinetUser user = checkLogin();        
+        checkAccess(user);
+      
         System.out.println("getFTs, date="+date);
         List<ScheduledFieldTrip> trips;
         String sql = "";
@@ -89,6 +131,9 @@ public class FieldTrip extends Application {
     }
     
     public static void getGTFSTripsInUse(@As("MM/dd/yyyy") Date date, Integer limit) {
+        TrinetUser user = checkLogin();        
+        checkAccess(user);
+      
         System.out.println("getFTs, date="+date);
         List<ScheduledFieldTrip> trips;
         String sql = "";
@@ -121,29 +166,36 @@ public class FieldTrip extends Application {
     }
 
     
-    public static void newTrip(ScheduledFieldTrip trip) {
+    public static void newTrip(long requestId, ScheduledFieldTrip trip) {
+        TrinetUser user = checkLogin();        
+        checkAccess(user);
+      
+        FieldTripRequest ftRequest = FieldTripRequest.findById(requestId);
+
         //TODO: is setting id to null the right way to ensure that an
         //existing trip is not overwritten?
         trip.id = null;
+        trip.request = ftRequest;
         trip.serviceDay = trip.departure;
-        /*User user = getUser();
-        if (!user.canScheduleFieldTrips()) {
-            //TODO: is this safe if those itineraries exist?
-            trip.groupItineraries.clear();
-        }*/
+        trip.createdBy = user.username;
+        
         trip.save();
+        
+        ftRequest.trips.add(trip);
+        ftRequest.save();
+        
+        System.out.println("saved ScheduledFieldTrip, id="+trip.id);
         Long id = trip.id;
         renderJSON(id);
     }
     
-    public static void addTripFeedback(FieldTripFeedback feedback) {
-        feedback.id = null;
-        feedback.save();
-        render();
-    }
-
     public static void addItinerary(long fieldTripId, GroupItinerary itinerary, GTFSTrip[] trips) {
+        TrinetUser user = checkLogin();        
+        checkAccess(user);
+      
+        System.out.println("aI / fieldTripId="+fieldTripId);
         ScheduledFieldTrip fieldTrip = ScheduledFieldTrip.findById(fieldTripId);
+        //System.out.println("aI / fieldTrip="+fieldTrip);
         itinerary.fieldTrip = fieldTrip;
         fieldTrip.groupItineraries.add(itinerary);
         itinerary.save();
@@ -160,25 +212,40 @@ public class FieldTrip extends Application {
     }
 
     public static void deleteTrip(Long id) {
+        TrinetUser user = checkLogin();        
+        checkAccess(user);
+      
         ScheduledFieldTrip trip = ScheduledFieldTrip.findById(id);
         trip.delete();
         renderJSON(id);
     }
-
-    public static void newRequest(FieldTripRequest request) {
-        String msg = "bad request";
-        if(request.teacherName != null) {
-            request.id = null;
-            request.save();
-            Long id = request.id;
-            msg = "Your request has been submitted.";
+    
+    /* FieldTripRequest methods */
+    
+    public static void newRequestForm() {
+        render();
+    }
+    
+    public static void newRequest(FieldTripRequest req) {
+        System.out.println("newRequest tn="+req.teacherName);
+        if(req.teacherName != null) {
+            req.id = null;
+            req.save();
+            Long id = req.id;
+            System.out.println("about to render");
+            render(req);
         }
-        render(msg);
+        else {
+            badRequest();
+        }
     }
     
     public static void getRequests(Integer limit) {
+        TrinetUser user = checkLogin();        
+        checkAccess(user);
+      
         List<FieldTripRequest> requests;
-        String sql = "";
+        String sql = "order by timeStamp desc";
         if(limit == null)
             requests = FieldTripRequest.find(sql).fetch();
         else {
@@ -192,28 +259,74 @@ public class FieldTrip extends Application {
         renderJSON(gson.toJson(requests));
     }
     
-    public static void newRequestForm() {
-        render();
+    public static void setRequestStatus(long requestId, String status) {
+        FieldTripRequest req = FieldTripRequest.findById(requestId);
+        if(req != null) {
+            req.status = status;
+            req.save();
+            if(status.equals("cancelled")) {
+                for(ScheduledFieldTrip trip : req.trips) {
+                    trip.delete();
+                }
+            }
+            renderJSON(requestId);
+        }
+        else {
+            badRequest();
+        }        
+    }
+
+    public static void setRequestClasspassId(long requestId, String classpassId) {
+        FieldTripRequest req = FieldTripRequest.findById(requestId);
+        if(req != null) {
+            if(classpassId != null && classpassId.length() == 0) classpassId = null;
+            req.classpassId = classpassId;
+            req.save();
+            renderJSON(requestId);
+        }
+        else {
+            badRequest();
+        }        
     }
     
-    public static void setInboundTrip(long requestId, long tripId) {
-        FieldTripRequest ftRequest = FieldTripRequest.findById(requestId);
-        ScheduledFieldTrip trip = ScheduledFieldTrip.findById(tripId);
-        ftRequest.inboundTrip = trip;
-        trip.request = ftRequest;
-        trip.save();
-        ftRequest.save();
-        render();
+    /* FieldTripFeedback */
+    
+    public static void feedbackForm(long requestId) {
+        System.out.println("ff req="+requestId);
+        FieldTripRequest req = FieldTripRequest.findById(requestId);
+        if(req != null) {
+            render(req);
+        }
+        else {
+            badRequest();
+        }
+    }
+    
+    public static void addFeedback(FieldTripFeedback feedback, long requestId) {
+        System.out.println("addFeedback reqId="+requestId);
+        FieldTripRequest req = FieldTripRequest.findById(requestId);
+        if(req != null) {
+            feedback.id = null;
+            feedback.request = req;
+            feedback.save();
+            
+            req.feedback.add(feedback);
+            req.save();
+            
+            render(feedback);
+        }
+        else {
+            badRequest();
+        }
     }
 
-    public static void setOutboundTrip(long requestId, long tripId) {
-        FieldTripRequest ftRequest = FieldTripRequest.findById(requestId);
-        ScheduledFieldTrip trip = ScheduledFieldTrip.findById(tripId);
-        ftRequest.outboundTrip = trip;
-        trip.request = ftRequest;
-        trip.save();
-        ftRequest.save();
-        render();
+    /* Receipt Generation */
+    
+    public static void receipt(long requestId) {
+        FieldTripRequest req = FieldTripRequest.findById(requestId);
+        if(req != null) {
+            render(req);
+        }
     }
-
+    
 }

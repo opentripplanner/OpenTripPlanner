@@ -13,12 +13,12 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.StopTransfer;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -153,7 +153,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
             // For stop-to-stop transfer time, preference, and permission checking. 
             // Vertices in transfer table are stop arrive/depart not pattern arrive/depart, 
             // so previousStop is direction-dependent.
-            s1.setPreviousStop(boarding ? ((PatternStopVertex) tov).getStop() : ((PatternStopVertex) fromv).getStop()); 
+            s1.setPreviousStop(getStop()); 
             s1.setLastPattern(this.getPattern());
 
             // determine the wait
@@ -234,7 +234,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
                 if (sd.serviceIdRunning(serviceId)) {
                     // getNextTrip will find next or prev departure depending on final boolean parameter
                     tripTimes = getPattern().getNextTrip(stopIndex, secondsSinceMidnight, 
-                            mode == TraverseMode.BICYCLE, state0, boarding);
+                            state0, sd, mode == TraverseMode.BICYCLE, boarding);
                     if (tripTimes != null) {
                         wait = boarding ? // we care about departures on board and arrivals on alight
                             (int)(sd.time(tripTimes.getDepartureTime(stopIndex)) - current_time):
@@ -270,7 +270,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
                 TransferTable transferTable = options.getRoutingContext().transferTable;
                 // Get the transfer time
                 int transferTime = transferTable.getTransferTime(state0.getPreviousStop(),
-                        state0.getCurrentStop(), state0.getPreviousTrip(), trip);
+                        getStop(), state0.getPreviousTrip(), trip, boarding);
                 // Determine transfer penalty
                 transferPenalty = transferTable.determineTransferPenalty(transferTime, options.nonpreferredTransferPenalty);
             }            
@@ -335,6 +335,21 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
             // if we didn't return an optimized path, return an unoptimized one
             return s1.makeState();
         }
+    }
+
+    /**
+     * Return the stop associated with this edge.
+     * @return the stop associated with this edge
+     */
+    private Stop getStop() {
+        PatternStopVertex stopVertex;
+        if (boarding) {
+            stopVertex = (PatternStopVertex) tov;
+        }
+        else {
+            stopVertex = (PatternStopVertex) fromv;
+        }
+        return stopVertex.getStop();
     }
 
     public State optimisticTraverse(State state0) {

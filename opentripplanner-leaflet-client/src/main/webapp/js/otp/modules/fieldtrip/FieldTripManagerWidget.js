@@ -26,7 +26,8 @@ otp.modules.fieldtrip.FieldTripManagerWidget =
 
         otp.widgets.Widget.prototype.initialize.call(this, id, module, {
             cssClass : 'otp-fieldTripManager',
-            title : 'Field Trip Manager'
+            title : 'Field Trip Requests',
+            resizable: true,
         });
     
         ich['otp-fieldtrip-manager']({ widgetId : this.id }).appendTo(this.mainDiv);
@@ -34,8 +35,23 @@ otp.modules.fieldtrip.FieldTripManagerWidget =
             heightStyle : "fill",
         });
 
-        this.buildRequestsViewer($('#'+this.id+'-requestsTab'));        
-        this.buildTripManager($('#'+this.id+'-tripsTab'));
+        this.activeRequestsList = this.mainDiv.find('.activeRequestsList');
+        this.cancelledRequestsList = this.mainDiv.find('.cancelledRequestsList');
+        this.pastTripsList = this.mainDiv.find('.pastTripsList');
+        
+        this.mainDiv.find('.refreshButton').button().click(function() {
+            this_.module.loadRequests();
+        });
+        
+        this.mainDiv.resizable({
+            alsoResize: '#' + this.id + ' .ui-tabs-panel',
+            minWidth: 400,
+            minHeight: 200,
+        });
+
+        this.module.loadRequests();
+
+        //this.buildTripManager($('#'+this.id+'-tripsTab'));
     },
 
     /** requests viewer **/
@@ -48,18 +64,46 @@ otp.modules.fieldtrip.FieldTripManagerWidget =
     
     updateRequests : function(requests) {
         var this_ = this;
-        this.requestsList.empty();
+        
+        this.activeRequestsList.empty();
+        this.cancelledRequestsList.empty();
+        this.pastTripsList.empty();
+        
         for(var i = 0; i < requests.length; i++) {
             var req = requests[i];
-            console.log(req);
+            //console.log(req);
             //$('<div class="otp-fieldTripRequests-listRow">'+req.teacherName+", "+req.schoolName+'</div>').appendTo(this.requestsList);
             
             var context = _.clone(req);
-            req.formattedDate = moment(req.travelDate).format("MMM Do YYYY");
-            ich['otp-fieldtrip-requestRow'](req).appendTo(this.requestsList)
-            .click(function() {
-                this_.module.showRequest(req);
-            });
+            if(req.travelDate) req.formattedDate = moment(req.travelDate).format("MMM Do YYYY");
+            var outboundTrip = otp.util.FieldTrip.getOutboundTrip(req);
+            if(outboundTrip) req.outboundDesc = otp.util.FieldTrip.constructPlanInfo(outboundTrip);
+            var inboundTrip = otp.util.FieldTrip.getInboundTrip(req);
+            if(inboundTrip) req.inboundDesc = otp.util.FieldTrip.constructPlanInfo(inboundTrip);
+
+            var row = ich['otp-fieldtrip-requestRow'](req);
+            if(req.status === "cancelled") {
+                row.appendTo(this.cancelledRequestsList);
+            }
+            
+            else {
+                if(req.travelDate) {
+                    var diffDays = moment(req.travelDate).diff(moment(), 'days');
+                    if(diffDays < 0) {
+                        row.appendTo(this.pastTripsList);                        
+                    }
+                    else {
+                        row.appendTo(this.activeRequestsList);
+                    }
+                }
+                else {
+                    row.appendTo(this.activeRequestsList);
+                }
+                row.data('req', req).click(function() {
+                    var req = $(this).data('req');
+                    this_.module.showRequest(req);
+                });
+            }            
         }
     },
 

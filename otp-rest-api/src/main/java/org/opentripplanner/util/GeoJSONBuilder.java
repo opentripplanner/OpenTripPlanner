@@ -123,13 +123,11 @@ public class GeoJSONBuilder extends JSONBuilder {
     }
 
     private JSONBuilder writeGeomCollection(GeometryCollection collection) throws JSONException {
-        this.array();
         this.key("geometries");
-
+        this.array();
         for (int i = 0, n = collection.getNumGeometries(); i < n; i++) {
             writeGeom(collection.getGeometryN(i));
         }
-
         return this.endArray();
     }
 

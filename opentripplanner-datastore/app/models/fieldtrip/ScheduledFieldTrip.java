@@ -22,16 +22,32 @@ public class ScheduledFieldTrip extends GenericModel {
     @Expose
     public Long id;
     
-    @Column(nullable=false)
-    @Expose
-    public FieldTripRequest request;
+    /*
+    //@Column(nullable=false)
+    @OneToOne
+    public FieldTripRequest outboundRequest;
 
+    //@Column(nullable=false)
+    @OneToOne
+    public FieldTripRequest inboundRequest;
     
+    public FieldTripRequest getRequest() {
+        if(outboundRequest != null) return outboundRequest;
+        if(inboundRequest != null) return inboundRequest;
+        return null;
+    }*/
+    
+    @ManyToOne(optional=false)
+    public FieldTripRequest request;
+    
+    @Expose
+    public Integer requestOrder;
+
     /** The username of the user who created this trip */
     @Column(nullable=false)
     @Expose
     public String createdBy;
-
+    
     /** When the trip was created */
     @Column(nullable=false)
     @Expose
@@ -126,7 +142,7 @@ public class ScheduledFieldTrip extends GenericModel {
         this.passengers = passengers;*/
     }
 
-    public String toString() {
+    /*public String toString() {
         GregorianCalendar calendar = new GregorianCalendar();
         calendar.setTime(departure);
         String timeString = String.format("%d:%02d %s", calendar.get(Calendar.HOUR),
@@ -134,5 +150,5 @@ public class ScheduledFieldTrip extends GenericModel {
                                           (calendar.get(Calendar.AM_PM) == 0 ? "AM" : "PM"));
         String scheduled = isScheduled() ? "scheduled" : "unscheduled";
         return timeString + " (" + passengers + " passengers) " + scheduled;
-    }
+    }*/
 }

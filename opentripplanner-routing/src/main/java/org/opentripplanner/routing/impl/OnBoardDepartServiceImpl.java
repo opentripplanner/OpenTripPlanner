@@ -16,6 +16,7 @@ package org.opentripplanner.routing.impl;
 import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
@@ -63,16 +64,18 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
     @Override
     public Vertex setupDepartOnBoard(RoutingContext ctx) {
 
+        DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
         RoutingRequest opt = ctx.opt;
 
         /* 1. Get the list of PatternHop for the given trip ID. */
         AgencyAndId tripId = opt.getStartingTransitTripId();
         TransitIndexService transitIndexService = ctx.graph.getService(TransitIndexService.class);
-        List<PatternHop> hops = transitIndexService.getPatternHopsForTrip(tripId);
-        if (hops == null) {
+        TableTripPattern tripPattern = transitIndexService.getTripPatternForTrip(tripId);
+        if (tripPattern == null) {
             // TODO Shouldn't we bailout on a normal trip plan here, returning null ?
             throw new IllegalArgumentException("Unknown/invalid trip ID: " + tripId);
         }
+        List<PatternHop> hops = tripPattern.getPatternHops();
 
         /*
          * 2. Get the best hop from the list, given the parameters. Currently look for nearest hop,
@@ -92,7 +95,7 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
         double minDist = Double.MAX_VALUE;
         for (PatternHop hop : hops) {
             LineString line = hop.getGeometry();
-            double dist = SphericalDistanceLibrary.getInstance().fastDistance(point, line);
+            double dist = distanceLibrary.fastDistance(point, line);
             if (dist < minDist) {
                 minDist = dist;
                 bestHop = hop;
@@ -113,9 +116,9 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
          */
         P2<LineString> geomPair = GeometryUtils.splitGeometryAtPoint(bestHop.getGeometry(), point);
         LineString geomRemaining = geomPair.getSecond();
-        double total = bestHop.getGeometry().getLength();
-        double remaining = geomRemaining.getLength();
-        float fractionCovered = total > 0.0 ? (float) (remaining / total) : 0.0f;
+        double total = distanceLibrary.fastLength(bestHop.getGeometry());
+        double remaining = distanceLibrary.fastLength(geomRemaining);
+        float fractionCovered = total > 0.0 ? (float) (1.0f - remaining / total) : 0.0f;
 
         PatternStopVertex nextStop = (PatternStopVertex) bestHop.getToVertex();
         int stopIndex = bestHop.getStopIndex();

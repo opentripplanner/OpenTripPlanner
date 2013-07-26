@@ -40,6 +40,11 @@ public abstract class TransitVertex extends AbstractVertex {
         return stop.getCode();
     }
 
+    /** The passenger-facing code/name indentifying the platform/quay */
+    public String getPlatformCode() {
+        return stop.getPlatformCode();
+    }
+
     /** Stop information need by API */
     public Stop getStop() {
         return stop;

@@ -98,7 +98,6 @@ public class PreAlightEdge extends FreeEdge {
             StateEditor s1 = s0.edit(this);
             s1.setTimeSeconds(alight_before);
             s1.setEverBoarded(true);
-            s1.setCurrentStop(toVertex.getStop());
             long wait_cost = t0 - alight_before;
             s1.incrementWeight(wait_cost + transfer_penalty);
             s1.setBackMode(getMode());

@@ -27,6 +27,8 @@ depends on otp-routing.
   <logger name="org.opentripplanner.routing.vertextype.IntersectionVertex" level="info" />
   <!-- Avoid printing debug messages when walk limits are exceeded -->
   <logger name="org.opentripplanner.routing.edgetype.PlainStreetEdge" level="info" />
+  <!-- Avoid printing info messages about calendars when building graph -->
+  <logger name="org.onebusaway.gtfs.impl.calendar.CalendarServiceDataFactoryImpl" level="warn" />
   
   <logger name="org.springframework" level="warn" />
   <logger name="com.sun.jersey" level="warn" />

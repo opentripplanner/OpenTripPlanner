@@ -17,8 +17,10 @@ import java.util.Comparator;
 
 import lombok.AllArgsConstructor;
 
+import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StopTransfer;
 import org.opentripplanner.routing.core.TransferTable;
@@ -245,7 +247,7 @@ public abstract class TripTimes {
      * If route OR trip explicitly allows bikes, bikes are allowed.
      * @param stopIndex 
      */
-    public boolean tripAcceptable(State state0, boolean bicycle, int stopIndex) {
+    public boolean tripAcceptable(State state0, Stop currentStop, ServiceDay sd, boolean bicycle, int stopIndex, boolean boarding) {
         RoutingRequest options = state0.getOptions();
         Trip trip = this.getTrip();
         BannedStopSet banned = options.bannedTrips.get(trip.getId());
@@ -268,12 +270,19 @@ public abstract class TripTimes {
             TransferTable transferTable = options.getRoutingContext().transferTable;
             // Get the transfer time
             int transferTime = transferTable.getTransferTime(state0.getPreviousStop(),
-                    state0.getCurrentStop(), state0.getPreviousTrip(), trip);
+                    currentStop, state0.getPreviousTrip(), trip, boarding);
             // Check for minimum transfer time and forbidden transfers
             if (transferTime > 0) {
                 // There is a minimum transfer time to make this transfer
-                if (state0.getLastAlightedTimeSeconds() + transferTime > getDepartureTime(stopIndex)) {
-                    return false;
+                if (boarding) {
+                    if (sd.secondsSinceMidnight(state0.getLastAlightedTimeSeconds()) + transferTime > getDepartureTime(stopIndex)) {
+                        return false;
+                    }
+                }
+                else {
+                    if (sd.secondsSinceMidnight(state0.getLastAlightedTimeSeconds()) - transferTime < getArrivalTime(stopIndex)) {
+                        return false;
+                    }
                 }
             } else if (transferTime == StopTransfer.FORBIDDEN_TRANSFER) {
                 // This transfer is forbidden

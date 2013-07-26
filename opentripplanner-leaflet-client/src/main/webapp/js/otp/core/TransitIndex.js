@@ -35,6 +35,10 @@ otp.core.TransitIndex = otp.Class({
         var url = otp.config.hostname + '/opentripplanner-api-webapp/ws/transit/routes';
         $.ajax(url, {
             dataType:   'jsonp',
+            
+            data: {
+                extended: 'true',
+            },
                 
             success: function(data) {
                 if(!_.has(data, 'routes')) {
@@ -182,7 +186,8 @@ otp.core.TransitIndex = otp.Class({
             agency: agencyId,
             id: stopId,
             startTime : startTime,
-            endTime : endTime
+            endTime : endTime,
+            extended : true,
         };
         if(otp.config.routerId !== undefined) {
             params.routerId = otp.config.routerId;
@@ -205,6 +210,7 @@ otp.core.TransitIndex = otp.Class({
             leftUpLon : bounds.getNorthWest().lng,
             rightDownLat : bounds.getSouthEast().lat,
             rightDownLon : bounds.getSouthEast().lng,
+            extended : true
         };
         if(agencyId !== null) {
             params.agency = agencyId;

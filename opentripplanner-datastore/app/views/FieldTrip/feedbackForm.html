@@ -1,0 +1,18 @@
+#{stylesheet 'main.css' /}
+
+<div class="mainContent">
+
+<h2>Field Trip Feedback</h2>
+
+Feedback for Field Trip request ${req.id} (${req.schoolName} trip on ${(req.travelDate).format("MMMM dd, yyyy")}):
+
+#{form @FieldTrip.addFeedback()}
+
+<textarea cols="50" rows="8" name="feedback.feedback" style="width: 100%"></textarea>
+<input type="hidden" name="requestId" value="${req.id}" />
+
+<div class="buttonRow"><input type="submit" value="Submit Feedback"></div>
+
+#{/form}
+
+</div>

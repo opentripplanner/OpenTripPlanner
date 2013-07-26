@@ -133,7 +133,7 @@ otp.modules.planner.Itinerary = otp.Class({
     },
     
     differentServiceDayFrom : function(itin, offsetHrs) {
-        offsetHrs = offsetHrs || 4; // default to 4 hrs; i.e. use 4am as breakpoint between days
+        offsetHrs = offsetHrs || 3; // default to 3 hrs; i.e. use 3am as breakpoint between days
         var time1 = moment(this.itinData.startTime).add("hours", otp.config.timeOffset-offsetHrs).format('D');
         var time2 = moment(itin.itinData.startTime).add("hours", otp.config.timeOffset-offsetHrs).format('D');
         return time1 !== time2;
@@ -214,7 +214,20 @@ otp.modules.planner.Itinerary = otp.Class({
         }
         return segments;
     },*/
+
+    getTripIds : function() {
+        var tripIds = [];
+        for(var l=0; l<this.itinData.legs.length; l++) {
+            var leg = this.itinData.legs[l];
+            if(otp.util.Itin.isTransit(leg.mode)) {
+                var tripId = leg.agencyId + "_"+leg.tripId;
+                tripIds.push(tripId);
+            } 
+        }
+        return tripIds;
+    },
         
+                
     getGroupTripCapacity : function() {
         var capacity = 100000;
         for(var l=0; l<this.itinData.legs.length; l++) {
@@ -258,7 +271,7 @@ otp.modules.planner.Itinerary = otp.Class({
                 html += ': ';
                 if(leg.route !== leg.routeLongName) html += "("+leg.route+") ";
                 html += leg.routeLongName;
-                if(leg.headsign) html +=  " toward " + leg.headsign;
+                if(leg.headsign) html +=  " to " + leg.headsign;
             }
             else { // walk / bike / car
                 html += " "+otp.util.Itin.distanceString(leg.distance)+ " to "+leg.to.name;
@@ -268,10 +281,10 @@ otp.modules.planner.Itinerary = otp.Class({
             // main content
             if(otp.util.Itin.isTransit(leg.mode)) { // transit
                 html += '<ul>';
-                html += '<li><b>Board</b>: ' + leg.from.name + ' (' + leg.from.stopId.agencyId + ' stop ' + 
+                html += '<li><b>Board</b>: ' + leg.from.name + ' (' + leg.from.stopId.agencyId + ' Stop ID #' + 
                         leg.from.stopId.id + '), ' + otp.util.Time.formatItinTime(leg.startTime, "h:mma") + '</li>';
                 html += '<li><i>Time in transit: '+otp.util.Time.msToHrMin(leg.duration)+'</i></li>';
-                html += '<li><b>Alight</b>: ' + leg.to.name + ' (' + leg.to.stopId.agencyId + ' stop ' + 
+                html += '<li><b>Alight</b>: ' + leg.to.name + ' (' + leg.to.stopId.agencyId + ' Stop ID #' + 
                         leg.to.stopId.id + '), ' + otp.util.Time.formatItinTime(leg.endTime, "h:mma") + '</li>';
                 
                 html += '</ul>';
@@ -335,7 +348,7 @@ otp.modules.planner.Itinerary = otp.Class({
                 text += ': ';
                 if(leg.route !== leg.routeLongName) text += "("+leg.route+") ";
                 text += leg.routeLongName;
-                if(leg.headsign) text +=  " toward " + leg.headsign;
+                if(leg.headsign) text +=  " to " + leg.headsign;
             }
             else { // walk / bike / car
                 text += ' '+ otp.util.Itin.distanceString(leg.distance)+ " to "+leg.to.name;
@@ -344,10 +357,10 @@ otp.modules.planner.Itinerary = otp.Class({
             
             // content
             if(otp.util.Itin.isTransit(leg.mode)) {
-                text += ' - Board: ' + leg.from.name + ' (' + leg.from.stopId.agencyId + ' stop ' + 
+                text += ' - Board: ' + leg.from.name + ' (' + leg.from.stopId.agencyId + ' Stop ID #' + 
                         leg.from.stopId.id + '), ' + otp.util.Time.formatItinTime(leg.startTime, "h:mma") + '\n';
                 text += ' - Time in transit: '+otp.util.Time.msToHrMin(leg.duration) + '\n';
-                text += ' - Alight: ' + leg.to.name + ' (' + leg.to.stopId.agencyId + ' stop ' + 
+                text += ' - Alight: ' + leg.to.name + ' (' + leg.to.stopId.agencyId + ' Stop ID #' + 
                         leg.to.stopId.id + '), ' + otp.util.Time.formatItinTime(leg.endTime, "h:mma") + '\n';
             }
             else if (leg.steps) { // walk / bike / car

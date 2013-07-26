@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -117,9 +118,11 @@ public class FrequencyBoard extends Edge implements OnBoardForwardEdge, PatternE
             if (state0.getNumBoardings() > 0) {
                 // This is not the first boarding, thus a transfer
                 TransferTable transferTable = options.getRoutingContext().transferTable;
+                // Get the current stop
+                Stop currentStop = ((TransitVertex) fromv).getStop();
                 // Get the transfer time
                 int transferTime = transferTable.getTransferTime(state0.getPreviousStop(),
-                        state0.getCurrentStop(), state0.getPreviousTrip(), trip);
+                        currentStop, state0.getPreviousTrip(), trip, true);
                 if (transferTime > 0) {
                     // There is a minimum transfer time to make this transfer
                     // Increase current time if necessary
@@ -168,7 +171,7 @@ public class FrequencyBoard extends Edge implements OnBoardForwardEdge, PatternE
                     if (startTime >= 0) {
                         // a trip was found, wait will be non-negative
                         
-                        int wait = (int) (sd.time(startTime) - currentTime);
+                        int wait = (int) (sd.time(startTime) - state0.getTimeSeconds());
                         if (wait < 0)
                             LOG.error("negative wait time on board");
                         if (bestWait < 0 || wait < bestWait) {

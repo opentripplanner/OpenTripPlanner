@@ -127,7 +127,9 @@ otp.modules.planner.PlannerModule =
         this.addLayer("Paths", this.pathLayer);
         this.addLayer("Path Markers", this.pathMarkerLayer);
         
-        this.webapp.transitIndex.loadRoutes();
+        this.webapp.transitIndex.loadRoutes(this, function() {
+            this.routesLoaded();
+        });
         
         this.activated = true;
         
@@ -318,6 +320,19 @@ otp.modules.planner.PlannerModule =
         $('#otp-spinner').show();
         
         this.lastQueryParams = queryParams;
+
+        this.planTripRequestCount = 0;
+        
+        this.planTripRequest(url, queryParams, function(tripPlan) {
+            var restoring = (existingQueryParams !== undefined)
+            this_.processPlan(tripPlan, restoring);
+            
+            this_.updateTipStep(3);
+        });
+    },
+    
+    planTripRequest : function(url, queryParams, successCallback) {
+        var this_ = this;
         this.currentRequest = $.ajax(url, {
             data:       queryParams,
             dataType:   'jsonp',
@@ -335,14 +350,44 @@ otp.modules.planner.PlannerModule =
                         (moment(queryParams.date+" "+queryParams.time, "MM-DD-YYYY h:mma") - moment(data.plan.date))/3600000;
 
                     var tripPlan = new otp.modules.planner.TripPlan(data.plan, queryParams);
-
-                    this_.processPlan(tripPlan, (existingQueryParams !== undefined));
-
-                    this_.updateTipStep(3);
                     
-                    /*if(!skipSave)
-                    	this_.savePlan(queryParams);*/
+                    var invalidTrips = [];
                     
+                    // check trip validity
+                    if(typeof this_.checkTripValidity == 'function') {
+                        for(var i = 0; i < tripPlan.itineraries.length; i++) {
+                            var itin = tripPlan.itineraries[i];
+                            for(var l = 0; l < itin.itinData.legs.length; l++) {
+                                var leg = itin.itinData.legs[l];
+                                if(otp.util.Itin.isTransit(leg.mode)) {
+                                    var tripId = leg.agencyId + "_"+leg.tripId;
+                                    if(!this_.checkTripValidity(tripId, leg.from.stopIndex, leg.to.stopIndex, itin)) {
+                                        //console.log("INVALID TRIP");
+                                        invalidTrips.push(tripId);
+                                    }
+                                } 
+                            }
+                        }
+                    }
+
+                    if(invalidTrips.length == 0) { // all trips are valid; proceed with this tripPlan
+                        successCallback.call(this_, tripPlan);
+                    }
+                    else { // run planTrip again w/ invalid trips banned
+                        this_.planTripRequestCount++;
+                        if(this_.planTripRequestCount > 10) {
+                            this_.noTripFound({ 'msg' : 'Number of trip requests exceeded without valid results'});
+                        }
+                        else {
+                            if(queryParams.bannedTrips && queryParams.bannedTrips.length > 0) {
+                                queryParams.bannedTrips += ',' + invalidTrips.join(',');
+                            }
+                            else {
+                                queryParams.bannedTrips = invalidTrips.join(',');
+                            }
+                            this_.planTripRequest(url, queryParams, successCallback);
+                        }
+                    }                    
                 }
                 else {
                     this_.noTripFound(data.error);
@@ -362,11 +407,18 @@ otp.modules.planner.PlannerModule =
     },
     
     noTripFound : function(error) {
-        $('<div>' + error.msg + ' (Error ' + error.id + ')</div>').dialog({
-            title : "No Trip Found",
+        var msg = error.msg;
+        if(error.id) msg += ' (Error ' + error.id + ')';
+        this.showDialog(msg, 'No Trip Found');
+    },
+    
+    showDialog : function(msg, title) {
+        $('<div style="z-index: 100000000;">' + msg + '</div>').dialog({
+            title : title,
+            appendTo: 'body',
             modal: true
         });
-    },
+    },    
     
     drawItinerary : function(itin) {
         var this_ = this;
@@ -486,6 +538,7 @@ otp.modules.planner.PlannerModule =
         if(mode === "WALK") return '#444';
         if(mode === "BICYCLE") return '#0073e5';
         if(mode === "SUBWAY") return '#f00';
+        if(mode === "RAIL") return '#b00';
         if(mode === "BUS") return '#080';
         if(mode === "TRAM") return '#800';
         if(mode === "CAR") return '#444';
@@ -494,10 +547,10 @@ otp.modules.planner.PlannerModule =
     
     clearTrip : function() {
     
-        this.markerLayer.removeLayer(this.startMarker);
+        if(this.startMarker) this.markerLayer.removeLayer(this.startMarker);
         this.startName = this.startLatLng = this.startMarker = null;
         
-        this.markerLayer.removeLayer(this.endMarker);
+        if(this.endMarker) this.markerLayer.removeLayer(this.endMarker);
         this.endName = this.endLatLng = this.endMarker = null;
 
         this.pathLayer.clearLayers();
@@ -546,6 +599,9 @@ otp.modules.planner.PlannerModule =
         if(step == 3) this.tipWidget.setContent("Tip: Drag the Start or End Flags to Modify Your Trip.");
         
         this.tipStep = step;*/
+    },
+    
+    routesLoaded : function() {
     },
     
     CLASS_NAME : "otp.modules.planner.PlannerModule"

@@ -1,5 +1,6 @@
 package models.fieldtrip;
  
+import com.google.gson.annotations.Expose;
 import java.util.Date;
 import javax.persistence.*;
  
@@ -13,15 +14,26 @@ public class FieldTripFeedback extends Model {
 
     /** The trip that this belongs to */
     @ManyToOne
-    public ScheduledFieldTrip fieldTrip;
+    public FieldTripRequest request;
 
-    @Column(nullable=false)
+    @Column
+    @Expose
     public String userName;
 
     @Column(nullable=false)
+    @Expose
     @Lob
     public String feedback;
 
     @Column(nullable=false)
-    public Date timestamp;
+    @Expose
+    public Date timeStamp;
+
+    @PrePersist
+    public void prePersist() {
+        if (timeStamp == null) {
+            timeStamp = new Date();
+        }
+    }
+
 }

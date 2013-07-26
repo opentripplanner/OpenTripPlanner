@@ -20,9 +20,10 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.trippattern.CanceledTripTimes;
 import org.opentripplanner.routing.trippattern.DecayingDelayTripTimes;
@@ -109,7 +110,7 @@ public class Timetable implements Serializable {
      * is before optimizing it.
      */
     private void index() {
-        int nHops = pattern.stops.length - 1;
+        int nHops = pattern.getHopCount();
         arrivalsIndex = new TripTimes[nHops][];
         departuresIndex = new TripTimes[nHops][];
         boolean departuresFifo = true;
@@ -155,14 +156,13 @@ public class Timetable implements Serializable {
      * @return the TripTimes object representing the (possibly updated) best trip, or null if no
      * trip matches both the time and other criteria. 
      */
-    protected TripTimes getNextTrip(int stopIndex, int time, boolean haveBicycle,
-            State state0, boolean boarding) {
+    protected TripTimes getNextTrip(int stopIndex, int time, State state0, ServiceDay sd,
+            boolean haveBicycle, boolean boarding) {
         TripTimes bestTrip = null;
         int index;
-        TripTimes[][] tableIndex = boarding ? departuresIndex : arrivalsIndex; 
-        // sorted = tripTimes; ARGH, Array versus List APIs
-        // for the purposes of adjacent trips, guess that unindexed tables are roughly FIFO
-        List<TripTimes> ordered = tripTimes;
+        TripTimes[][] tableIndex = boarding ? departuresIndex : arrivalsIndex;
+        int stopOffset = boarding ? 0 : 1;
+        Stop currentStop = pattern.getStop(stopIndex + stopOffset);
         if (tableIndex != null) {
             TripTimes[] sorted;
             // this timetable has been indexed, use binary search
@@ -176,7 +176,7 @@ public class Timetable implements Serializable {
                 index = TripTimes.binarySearchDepartures(sorted, stopIndex, time);
                 while (index < sorted.length) {
                     TripTimes tt = sorted[index++];
-                    if (tt.tripAcceptable(state0, haveBicycle, stopIndex)) {
+                    if (tt.tripAcceptable(state0, currentStop, sd, haveBicycle, stopIndex, boarding)) {
                         bestTrip = tt;
                         break;
                     }
@@ -185,13 +185,12 @@ public class Timetable implements Serializable {
                 index = TripTimes.binarySearchArrivals(sorted, stopIndex, time);
                 while (index >= 0) {
                     TripTimes tt = sorted[index--];
-                    if (tt.tripAcceptable(state0, haveBicycle, stopIndex)) {
+                    if (tt.tripAcceptable(state0, currentStop, sd, haveBicycle, stopIndex, boarding)) {
                         bestTrip = tt;
                         break;
                     }
                 }
             }
-            ordered = Arrays.asList(sorted); // find adjacent entries in the sorted list
         } else { 
             // no index present on this timetable. use a linear search:
             // because trips may change with stoptime updates, we cannot count on them being sorted
@@ -200,13 +199,13 @@ public class Timetable implements Serializable {
                 // hoping JVM JIT will distribute the loop over the if clauses as needed
                 if (boarding) {
                     int depTime = tt.getDepartureTime(stopIndex);
-                    if (depTime >= time && depTime < bestTime && tt.tripAcceptable(state0, haveBicycle, stopIndex)) {
+                    if (depTime >= time && depTime < bestTime && tt.tripAcceptable(state0, currentStop, sd, haveBicycle, stopIndex, boarding)) {
                         bestTrip = tt;
                         bestTime = depTime;
                     }
                 } else {
                     int arvTime = tt.getArrivalTime(stopIndex);
-                    if (arvTime <= time && arvTime > bestTime && tt.tripAcceptable(state0, haveBicycle, stopIndex)) {
+                    if (arvTime <= time && arvTime > bestTime && tt.tripAcceptable(state0, currentStop, sd, haveBicycle, stopIndex, boarding)) {
                         bestTrip = tt;
                         bestTime = arvTime;
                     }
@@ -243,7 +242,7 @@ public class Timetable implements Serializable {
      * actions to compact the data structure such as trimming and deduplicating arrays.
      */
     public void finish() {
-        int nHops = pattern.stops.length - 1;
+        int nHops = pattern.getHopCount();
         int nTrips = tripTimes.size();
         bestRunningTimes = new int[nHops];
         boolean nullArrivals = false; // TODO: should scan through triptimes?
