@@ -64,7 +64,6 @@ public class NEDGridCoverageFactoryImpl implements NEDGridCoverageFactory {
         if (datums == null) {
             datums = new ArrayList<VerticalDatum>();
             String[] datumFilenames = {"g2012a00.gtx","g2012g00.gtx","g2012h00.gtx","g2012p00.gtx","g2012s00.gtx","g2012u00.gtx"};
-            GtxVDatumReader reader = new GtxVDatumReader();
             try {
                 for (String filename : datumFilenames) {
                     File datumFile = new File(cacheDirectory, filename);
