@@ -39,6 +39,7 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
 
     private static final Logger LOG = LoggerFactory.getLogger(StoptimeUpdater.class);
 
+    @Setter
     @Autowired private GraphService graphService;
     @Setter    private UpdateStreamer updateStreamer;
     @Setter    private int logFrequency = 2000;
@@ -68,12 +69,12 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
     private TransitIndexService transitIndexService;
     
     
-    private ServiceDate lastPurgeDate = new ServiceDate();
+    protected ServiceDate lastPurgeDate = null;
     
     // nothing in the timetable snapshot binds it to one graph. we could use this updater for all
     // graphs at once
-    private Graph graph;
-    private long lastSnapshotTime = -1;
+    protected Graph graph;
+    protected long lastSnapshotTime = -1;
     
     /**
      * Set the data sources for the target graphs.
@@ -92,12 +93,12 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
         return getSnapshot(false);
     }
     
-    private synchronized TimetableResolver getSnapshot(boolean force) {
+    protected synchronized TimetableResolver getSnapshot(boolean force) {
         long now = System.currentTimeMillis();
         if (force || now - lastSnapshotTime > maxSnapshotFrequency) {
             if (force || buffer.isDirty()) {
                 LOG.debug("Committing {}", buffer.toString());
-                snapshot = buffer.commit();
+                snapshot = buffer.commit(force);
             } else {
                 LOG.debug("Buffer was unchanged, keeping old snapshot.");
             }
@@ -110,10 +111,12 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
     
     /**
      * Repeatedly makes blocking calls to an UpdateStreamer to retrieve new stop time updates,
-     * and applies those updates to scheduled trips.
+     * and applies those updates to the graph.
      */
     @Override
     public void run() {
+        graph = graphService.getGraph();
+        transitIndexService = graph.getService(TransitIndexService.class);
         
         List<TripUpdate> tripUpdates = updateStreamer.getUpdates(); 
         if (tripUpdates == null) {
@@ -225,11 +228,11 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
         return "Streaming stoptime updater with update streamer = " + s;
     }
 
-    private boolean purgeExpiredData() {
+    protected boolean purgeExpiredData() {
         ServiceDate today = new ServiceDate();
         ServiceDate previously = today.previous().previous(); // Just to be safe... 
         
-        if(lastPurgeDate.compareTo(previously) > 0) {
+        if(lastPurgeDate != null && lastPurgeDate.compareTo(previously) > 0) {
             return false;
         }
         
