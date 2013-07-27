@@ -13,6 +13,7 @@
 
 package org.opentripplanner.updater.stoptime;
 
+import java.util.Collection;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -32,7 +33,7 @@ public class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
     /**
      * The list with updates to apply to the graph
      */
-    private List<TripUpdateList> updates;
+    private Collection<TripUpdateList> updates;
 
     @Override
     public void run(Graph graph) {
