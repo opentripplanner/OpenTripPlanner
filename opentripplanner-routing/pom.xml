@@ -62,7 +62,7 @@
             <artifactId>lombok</artifactId>
         </dependency>
 
-        <!-- JTS Topology Suite and Geotools Geospatial (raster and projection) -->
+        <!-- GEOTOOLS AND JTS TOPOLOGY (rasters and projection) -->
         <dependency>
           <groupId>com.vividsolutions</groupId>
           <artifactId>jts</artifactId>
@@ -70,6 +70,10 @@
         <dependency>
           <groupId>org.geotools</groupId>
           <artifactId>gt-geojson</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.geotools</groupId>
+          <artifactId>gt-referencing</artifactId>
         </dependency>
         <dependency>
           <groupId>org.geotools</groupId>
@@ -227,6 +231,16 @@
         <dependency>
           <groupId>net.sourceforge.javacsv</groupId>
           <artifactId>javacsv</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.httpcomponents</groupId>
+          <artifactId>httpclient</artifactId>
+          <version>4.1.2</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-math3</artifactId>
+          <version>3.0</version>
         </dependency>
 
     </dependencies>

@@ -18,11 +18,10 @@
   <modules>
     <module>openstreetmap</module>
     <module>opentripplanner-admin-webapp</module>
-    <module>opentripplanner-api-thrift</module>
+    <module>opentripplanner-api-thrift</module>    
     <module>opentripplanner-api-webapp</module>
     <module>opentripplanner-geocoder</module>
     <module>opentripplanner-routing</module>
-    <module>opentripplanner-utils</module>
     <module>opentripplanner-webapp</module>
     <module>opentripplanner-web-utils</module>
     <module>opentripplanner-analyst-client</module>
@@ -225,19 +224,15 @@
       <url>http://repo1.maven.org/maven2</url>
     </repository>    
     <repository>
-        <id>download.java.net</id>
-        <name>Java.net Repository for Maven</name>
-        <url>http://download.java.net/maven/2/</url>
+      <id>download.java.net</id>
+      <name>Java.net Repository for Maven</name>
+      <url>http://download.java.net/maven/2/</url>
     </repository>
     <repository>
       <id>releases.developer.onebusaway.org</id>
       <url>http://developer.onebusaway.org/maven/repository/</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
+      <releases><enabled>true</enabled></releases>
+      <snapshots><enabled>false</enabled></snapshots>
     </repository>
     <repository>
       <id>osgeo</id>
@@ -253,6 +248,9 @@
       <id>opengeo</id>
       <name>OpenGeo Maven Repository</name>
       <url>http://repo.opengeo.org/</url>
+      <!-- Avoid downloading OTP snapshots from repo -->
+      <releases><enabled>true</enabled></releases>
+      <snapshots><enabled>false</enabled></snapshots>
     </repository>
   </repositories>
 
