@@ -16,12 +16,6 @@
         <!-- OTHER OTP MODULES -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>opentripplanner-utils</artifactId>
-            <version>${project.version}</version>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
             <artifactId>openstreetmap</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -45,7 +39,15 @@
             <artifactId>spring-orm</artifactId>
             <version>${spring.version}</version>
         </dependency>
-
+        <dependency>
+          <groupId>org.springframework.security</groupId>
+          <artifactId>spring-security-core</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.springframework.security</groupId>
+          <artifactId>spring-security-web</artifactId>
+        </dependency>
+                
         <!-- LOGGING -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -110,36 +112,42 @@
         </dependency>
 
         <!-- OTHER DEPENDENCIES -->
-        <!-- Jersey JAX-RS annontation-driven REST -->
         <dependency>
+          <groupId>javax.servlet</groupId>
+          <artifactId>servlet-api</artifactId>
+          <version>2.5</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <!-- Jersey JAX-RS annontation-driven REST -->
           <groupId>com.sun.jersey</groupId>
           <artifactId>jersey-core</artifactId>
         </dependency>
-        <!-- Bytecode manipulator -->
         <dependency>
-            <groupId>javassist</groupId>
-            <artifactId>javassist</artifactId>
-            <version>3.8.0.GA</version>
+          <!-- Bytecode manipulator -->
+          <groupId>javassist</groupId>
+          <artifactId>javassist</artifactId>
+          <version>3.8.0.GA</version>
         </dependency>
-        <!-- Java ZeroMQ -->
         <dependency>
-            <groupId>org.jeromq</groupId>
-            <artifactId>jeromq</artifactId>
-            <version>0.2.0</version>
+          <!-- Java ZeroMQ -->
+          <groupId>org.jeromq</groupId>
+          <artifactId>jeromq</artifactId>
+          <version>0.2.0</version>
         </dependency>
-        <!-- OBA GTFS loader -->
         <dependency>
-            <groupId>org.onebusaway</groupId>
-            <artifactId>onebusaway-gtfs</artifactId>
+          <!-- OBA GTFS loader -->
+          <groupId>org.onebusaway</groupId>
+          <artifactId>onebusaway-gtfs</artifactId>
         </dependency>
-        <!-- Processing is used for the debug GUI (though we could probably use just Java2D) -->
         <dependency>
+          <!-- Processing is used for the debug GUI (though we could probably use just Java2D) -->
           <groupId>org.processing</groupId>
           <artifactId>core</artifactId>
           <version>1.0.7</version>
         </dependency>
-        <!-- Google Protocol Buffers -->
         <dependency>
+          <!-- Google Protocol Buffers -->
           <groupId>com.google.protobuf</groupId>
           <artifactId>protobuf-java</artifactId>
           <version>2.5.0</version>
@@ -152,9 +160,9 @@
           <version>2.6</version>
         </dependency>
         <dependency>
-            <groupId>joda-time</groupId>
-            <artifactId>joda-time</artifactId>
-            <version>2.1</version>
+          <groupId>joda-time</groupId>
+          <artifactId>joda-time</artifactId>
+          <version>2.1</version>
         </dependency>
         <dependency>
             <groupId>net.sf.json-lib</groupId>
@@ -221,14 +229,14 @@
             <artifactId>jets3t</artifactId>
             <version>0.8.1</version>
         </dependency>
-        <!-- Command line parameter parsing -->
         <dependency>
+          <!-- Command line parameter parsing -->
           <groupId>com.beust</groupId>
           <artifactId>jcommander</artifactId>
           <version>1.27</version>
         </dependency>
-        <!-- CSV parser -->
         <dependency>
+          <!-- CSV parser -->
           <groupId>net.sourceforge.javacsv</groupId>
           <artifactId>javacsv</artifactId>
         </dependency>

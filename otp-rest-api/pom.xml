@@ -24,16 +24,6 @@
             <artifactId>opentripplanner-routing</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>opentripplanner-utils</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>opentripplanner-web-utils</artifactId>
-            <version>${project.version}</version>
-        </dependency>
         <!-- Provides a message body writer for application/json instead of just XML -->
         <dependency>
           <groupId>com.fasterxml.jackson.jaxrs</groupId>
