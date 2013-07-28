@@ -26,7 +26,6 @@
     <module>opentripplanner-leaflet-client</module>
     <module>opentripplanner-municoder</module>
     <module>otp-standalone</module>
-    <module>otp-rest-api</module>
   </modules>
 
   <build>

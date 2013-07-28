@@ -15,26 +15,42 @@
     
         <!-- SPRING -->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-aop</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-aop</artifactId>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-beans</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jdbc</artifactId>
-            <version>${spring.version}</version>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-context</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-orm</artifactId>
-            <version>${spring.version}</version>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-core</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-web</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-jdbc</artifactId>
+          <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-orm</artifactId>
+          <version>${spring.version}</version>
         </dependency>
         <dependency>
           <groupId>org.springframework.security</groupId>
           <artifactId>spring-security-core</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.springframework.security</groupId>
+          <artifactId>spring-security-config</artifactId>
         </dependency>
         <dependency>
           <groupId>org.springframework.security</groupId>
@@ -45,6 +61,16 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
+        </dependency>
+        <dependency>
+          <!-- Jersey uses java.util logging, redirect it via slf4j API to Logback -->
+          <groupId>org.slf4j</groupId>
+          <artifactId>jul-to-slf4j</artifactId>
+        </dependency>
+        <dependency>
+          <!-- Spring uses jakarta commons logging, redirect it via slf4j API to Logback -->
+          <groupId>org.slf4j</groupId>
+          <artifactId>jcl-over-slf4j</artifactId>
         </dependency>
 
         <!-- JAVA STANDARD LIBRARY EXTENSIONS -->
@@ -98,10 +124,35 @@
           <artifactId>junit</artifactId>
         </dependency>
         <dependency>
+          <!-- what is this used for? -->
+          <groupId>com.sun.jersey</groupId>
+          <artifactId>jersey-client</artifactId>
+          <scope>test</scope> 
+        </dependency>
+        <dependency>
           <groupId>org.mockito</groupId>
           <artifactId>mockito-all</artifactId>
           <version>1.9.0</version>
           <scope>test</scope>
+        </dependency>
+
+        <!-- JERSEY JAX-RS annontation-driven REST -->
+        <dependency>
+          <groupId>com.sun.jersey</groupId>
+          <artifactId>jersey-core</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>com.sun.jersey.contribs</groupId>
+          <artifactId>jersey-spring</artifactId> <!-- provides SpringComponentProviderFactory -->
+        </dependency>
+        <dependency>
+          <groupId>com.sun.jersey</groupId>
+          <artifactId>jersey-servlet</artifactId> <!-- provides SpringServlet -->
+        </dependency>
+        <dependency>
+          <!-- Jersey-Grizzly integration -->
+          <groupId>com.sun.jersey</groupId>
+          <artifactId>jersey-grizzly2</artifactId>
         </dependency>
 
         <!-- OTHER DEPENDENCIES -->
@@ -109,12 +160,22 @@
           <groupId>javax.servlet</groupId>
           <artifactId>servlet-api</artifactId>
           <version>2.5</version>
-          <scope>provided</scope>
+          <scope>provided</scope> <!-- this dependency is provided by the servlet container -->
         </dependency>
         <dependency>
-          <!-- Jersey JAX-RS annontation-driven REST -->
-          <groupId>com.sun.jersey</groupId>
-          <artifactId>jersey-core</artifactId>
+          <groupId>javax.annotation</groupId>
+          <artifactId>jsr250-api</artifactId>
+          <version>1.0</version>
+        </dependency>
+        <dependency>
+          <groupId>cglib</groupId>
+          <artifactId>cglib</artifactId>
+          <version>2.2.2</version>
+        </dependency>
+        <dependency>
+          <groupId>javax.inject</groupId>
+          <artifactId>javax.inject</artifactId>
+          <version>1</version>
         </dependency>
         <dependency>
           <!-- Bytecode manipulator -->
@@ -157,6 +218,13 @@
           <artifactId>joda-time</artifactId>
           <version>2.1</version>
         </dependency>
+
+        <!-- JSON -->
+        <dependency>
+          <!-- Provides a message body writer for application/json instead of just XML -->
+          <groupId>com.fasterxml.jackson.jaxrs</groupId>
+          <artifactId>jackson-jaxrs-json-provider</artifactId>
+        </dependency>
         <dependency>
             <groupId>net.sf.json-lib</groupId>
             <artifactId>json-lib</artifactId>
@@ -181,6 +249,12 @@
                   <artifactId>commons-lang</artifactId>
                </exclusion>
             </exclusions>
+        </dependency>
+        <dependency> 
+          <!-- more JSON -->
+          <groupId>org.codehaus.jettison</groupId>
+          <artifactId>jettison</artifactId>
+          <version>1.1</version>
         </dependency>
         <dependency>
           <groupId>org.codehaus.jackson</groupId>
@@ -260,6 +334,24 @@
         </resource>
       </resources>
       <plugins>
+        <plugin>
+          <groupId>org.codehaus.enunciate</groupId>
+          <artifactId>maven-enunciate-plugin</artifactId>
+          <version>1.25</version>
+          <executions>
+            <execution>
+              <!-- default binding for docs goal is process-sources phase -->
+              <phase>site</phase>
+              <goals>
+                <goal>docs</goal>
+              </goals>
+            </execution>
+          </executions>
+          <configuration>
+            <!-- change this to wherever you want the docs -->
+            <docsDir>${project.build.directory}/site/enunciate</docsDir>
+          </configuration>
+        </plugin>
         <!-- Get current Git commit information for use in MavenVersion class -->
         <plugin>
           <groupId>pl.project13.maven</groupId>
