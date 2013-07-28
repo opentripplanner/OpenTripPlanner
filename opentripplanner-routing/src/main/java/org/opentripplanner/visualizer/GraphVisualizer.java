@@ -11,7 +11,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.gui;
+package org.opentripplanner.visualizer;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -207,7 +207,7 @@ class VertexList extends AbstractListModel {
  * examine trip patterns. It's meant mainly for debugging, so it's totally OK if it develops (say) 
  * a bunch of weird buttons designed to debug specific cases.
  */
-public class VizGui extends JFrame implements VertexSelectionListener {
+public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
     private static final long serialVersionUID = 1L;
 
@@ -283,7 +283,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
 
     private JList metadataList;
 
-    public VizGui(String graphName) {
+    public GraphVisualizer(String graphName) {
         super();
         File path = new File(graphName);
         if (path.getName().equals("Graph.obj")) {
@@ -301,7 +301,7 @@ public class VizGui extends JFrame implements VertexSelectionListener {
         pathservice.setGraphService(graphservice);
         pathservice.setSptService(sptService);
         
-        setTitle("VizGui: " + graphName);
+        setTitle("GraphVisualizer: " + graphName);
         init();
     }
 
@@ -967,12 +967,12 @@ public class VizGui extends JFrame implements VertexSelectionListener {
     }
 
     public static void main(String args[]) {
-        VizGui gui = null;
+        GraphVisualizer gui = null;
         if (args.length != 1) {
-            System.out.println("Usage: VizGui /path/to/Graph.obj");
+            System.out.println("Usage: GraphVisualizer /path/to/Graph.obj");
             System.exit(1);
         } else {
-            gui = new VizGui(args[0]);
+            gui = new GraphVisualizer(args[0]);
         }
         gui.setVisible(true);
 
