@@ -21,9 +21,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
 import java.lang.reflect.Field;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -79,13 +76,13 @@ import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
-import org.opentripplanner.routing.impl.GraphServiceImpl;
 import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
-import org.opentripplanner.routing.services.StreetVertexIndexFactory;
+import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.spt.DefaultShortestPathTreeFactory;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Sets;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -211,6 +208,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
     private static final long serialVersionUID = 1L;
 
+    private static final Logger LOG = LoggerFactory.getLogger(GraphVisualizer.class);
+
     private JPanel leftPanel;
 
     private ShowGraph showGraph;
@@ -257,18 +256,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
     private RetryingPathServiceImpl pathservice = new RetryingPathServiceImpl();
     
-    private StreetVertexIndexFactory indexFactory = new DefaultStreetVertexIndexFactory();
-
     private ShortestPathTreeFactory sptFactory = new DefaultShortestPathTreeFactory();
     
-    private Graph graph;
-
-    private GraphServiceImpl graphservice = new GraphServiceImpl() {
-        public Graph getGraph(String routerId) {
-            return graph;
-        }
-    };
-
     private GenericAStar sptService = new GenericAStar();
 
     private DefaultListModel metadataModel;
@@ -283,28 +272,26 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
     private JList metadataList;
 
-    public GraphVisualizer(String graphName) {
+    private final GraphService graphService;
+    
+    private final Graph graph;
+
+    public GraphVisualizer(GraphService graphService) {
         super();
-        File path = new File(graphName);
-        if (path.getName().equals("Graph.obj")) {
-            path = path.getParentFile();
-        }
-        try {
-            ObjectInputStream oiStream = new ObjectInputStream(
-                    new FileInputStream(new File(graphName)));
-            graph = Graph.load(oiStream, Graph.LoadLevel.DEBUG,
-                    this.indexFactory);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        LOG.info("Starting up graph visualizer...");
+        this.graphService = graphService;
+        this.graph = graphService.getGraph();
         sptService.setShortestPathTreeFactory(sptFactory);
-        pathservice.setGraphService(graphservice);
+        pathservice.setGraphService(graphService);
         pathservice.setSptService(sptService);
-        
-        setTitle("GraphVisualizer: " + graphName);
+        setTitle("GraphVisualizer");
         init();
     }
 
+    public void run () {
+        this.setVisible(true);
+    }
+    
     public void init() {
         BorderLayout layout = new BorderLayout();
         setLayout(layout);
@@ -963,18 +950,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
         System.out.println("Found " + annotationMatchesModel.getSize() + " annotations of type "
                 + variety);
-
-    }
-
-    public static void main(String args[]) {
-        GraphVisualizer gui = null;
-        if (args.length != 1) {
-            System.out.println("Usage: GraphVisualizer /path/to/Graph.obj");
-            System.exit(1);
-        } else {
-            gui = new GraphVisualizer(args[0]);
-        }
-        gui.setVisible(true);
 
     }
 

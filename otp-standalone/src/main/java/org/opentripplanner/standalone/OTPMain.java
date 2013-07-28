@@ -14,6 +14,7 @@
 package org.opentripplanner.standalone;
 
 import org.opentripplanner.graph_builder.GraphBuilderTask;
+import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +58,11 @@ public class OTPMain {
         if (graphBuilder != null) {
             graphBuilder.run();
             // Inform configurator which graph is to be used for potential in-memory handoff.
-            configurator.setGraph(graphBuilder.getGraph());
+            configurator.makeGraphService(graphBuilder.getGraph());
+        }
+        GraphVisualizer graphVisualizer = configurator.visualizerFromParameters();
+        if (graphVisualizer != null) {
+            graphVisualizer.run();
         }
         GrizzlyServer grizzlyServer = configurator.serverFromParameters();
         if (grizzlyServer != null) {

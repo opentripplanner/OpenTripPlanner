@@ -64,8 +64,10 @@ public class GrizzlyServer {
      * Grizzly does include a static file server but it does not work on resources within a JAR, 
      * only files. Solution: copy the ZIP outside the JAR and expand it in a temp directory.
      * JVM does cache classpath resource streams, but let's just do it manually.
-     * Interestingly this even works in Eclipse. 
-     * The WAR artifact copying and expansion is still working.    
+     * 
+     * Interestingly this even works in Eclipse, but apparently only if you previously ran a
+     * command-line Maven build that left a WAR in /target/classes. We might want to check for the
+     * existence of ../opentipplanner-leaflet-client/src/... and serve that as a fallback.
      */
     public HttpHandler makeClientStaticHandler () {
         File tempDir = Files.createTempDir();
@@ -75,9 +77,9 @@ public class GrizzlyServer {
             ZipFile zip = new ZipFile(clientWar);
             zip.extractAll(tempDir.toString());
         } catch (ZipException e) {
-            LOG.error("Error expanding client WAR, client will not be available.");
+            LOG.error("Error expanding client WAR, client will not be available: {}", e.getMessage());
         } catch (IOException e) {
-            LOG.error("Error copying client WAR, client will not be available.");
+            LOG.error("Error copying client WAR, client will not be available: {}", e.getMessage());
         }
         return new StaticHttpHandler(tempDir.toString());
     }

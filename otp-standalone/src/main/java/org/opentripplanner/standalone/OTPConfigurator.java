@@ -37,6 +37,7 @@ import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
 import org.opentripplanner.routing.services.SPTService;
+import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,18 +49,26 @@ public class OTPConfigurator {
     
     private final CommandLineParameters params;
     
-    /* If non-null, the in-memory graph to use (rather than loading from disk) */
-    @Setter private Graph graph;
-
+    private GraphService graphService = null;
+    
+    private OTPComponentProviderFactory componentProviderFactory = null;
+    
     public OTPConfigurator (CommandLineParameters params) {
         this.params = params;
     }
 
     /** 
-     * Create an adapter to make Jersey see OTP as a dependency injection framework. 
+     * Return an adapter that makes Jersey see OTP as a dependency injection framework. 
      * This will associate our specific OTP component instances with their interface classes.
+     * 
+     * We could even do this at Configurator construct time (rather than lazy initializing), using 
+     * the inMemory param to create the right kind of graphservice ahead of time. However that 
+     * would create indexes even when only a build was going to happen. 
      */
-    public OTPComponentProviderFactory providerFromParameters() {
+    public OTPComponentProviderFactory getComponentProviderFactory() {
+        
+        if (componentProviderFactory != null)
+            return componentProviderFactory;
         
         LOG.info("Wiring up and configuring server task.");
         
@@ -70,7 +79,7 @@ public class OTPConfigurator {
         
         // Core OTP modules
         OTPComponentProviderFactory cpf = new OTPComponentProviderFactory(); 
-        cpf.bind(GraphService.class, makeGraphService());
+        cpf.bind(GraphService.class, getGraphService());
         cpf.bind(RoutingRequest.class);
         cpf.bind(PlanGenerator.class);
         cpf.bind(MetadataService.class);
@@ -89,27 +98,38 @@ public class OTPConfigurator {
         }
         
         // Perform field injection on bound instances and call post-construct methods
-        cpf.doneBinding();        
+        cpf.doneBinding();   
+        
+        this.componentProviderFactory = cpf;
         return cpf;         
         
     }
 
-    private GraphService makeGraphService() {
+    /** Create a cached GraphService that will be shared between all OTP components. */
+    public void makeGraphService(Graph graph) {
         /* Hand off graph in memory to server in a single-graph in-memory GraphServiceImpl. */
         if (graph != null && params.inMemory) {
-            return new GraphServiceBeanImpl(graph);
+            this.graphService = new GraphServiceBeanImpl(graph);
+        } else {
+            /* Create a conventional GraphService that loads graphs from disk. */
+            GraphServiceImpl graphService = new GraphServiceImpl();
+            if (params.graphDirectory != null) {
+                graphService.setPath(params.graphDirectory);
+            }
+            if (params.defaultRouterId != null) {
+                graphService.setDefaultRouterId(params.defaultRouterId);
+            }
+            this.graphService = graphService;
         }
-        /* Create a conventional GraphService that loads graphs from disk. */
-        GraphServiceImpl graphService = new GraphServiceImpl();
-        if (params.graphDirectory != null) {
-            graphService.setPath(params.graphDirectory);
-        }
-        if (params.defaultRouterId != null) {
-            graphService.setDefaultRouterId(params.defaultRouterId);
-        }
-        return graphService;
     }
 
+    /** Return the cached, shared GraphService, making one as needed. */
+    public GraphService getGraphService () {
+        if (graphService == null)
+            makeGraphService(null);
+        return graphService;
+    }
+    
     public GraphBuilderTask builderFromParameters() {
         LOG.info("Wiring up and configuring graph builder task.");
         if (params.build == null || params.build.isEmpty()) {
@@ -181,11 +201,22 @@ public class OTPConfigurator {
     }
 
     public GrizzlyServer serverFromParameters() {
-        OTPComponentProviderFactory cpf = providerFromParameters();
-        GrizzlyServer server = new GrizzlyServer(cpf, params);
-        return server;
+        if (params.server) {
+            OTPComponentProviderFactory cpf = getComponentProviderFactory();
+            GrizzlyServer server = new GrizzlyServer(cpf, params);
+            return server;
+        } else return null;
     }
     
+    public GraphVisualizer visualizerFromParameters() {
+        if (params.visualize) {
+            // get a component provider factory to force injection/post-construct
+            OTPComponentProviderFactory cpf = getComponentProviderFactory();
+            GraphVisualizer visualizer = new GraphVisualizer(getGraphService());
+            return visualizer;
+        } else return null;
+    }
+
     private static enum InputFileType {
         GTFS, OSM, OTHER;
         public static InputFileType forFile(File file) {
