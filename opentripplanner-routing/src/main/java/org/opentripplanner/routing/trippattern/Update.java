@@ -13,34 +13,65 @@
 
 package org.opentripplanner.routing.trippattern;
 
+import lombok.Getter;
+
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.calendar.ServiceDate;
 
-public class Update implements Comparable<Update> {
+public class Update extends AbstractUpdate implements Comparable<Update> {
 
-    // these fields can eventually be protected if trippattern is in the same package as update
-    public final AgencyAndId tripId;
-    public final String stopId;
-    public final int stopSeq;
-    public int arrive; // sec since midnight
-    public final int depart; // sec since midnight
-    public final Status status;
-    /** The official timestamp for the update, if one was provided, or the time it was received. */
-    public final long timestamp;
+    @Getter
+    public final AgencyAndId stopId;
+
+    @Getter
+    public final Integer stopSeq;
     
-    public Update (AgencyAndId tripId, String stopId, int stopSeq, int arrive, int depart, 
-            Status status, long timestamp) {
-        this.tripId = tripId;
+    @Getter
+    public final Integer delay;
+
+    @Getter
+    public int arrive; // sec since midnight
+
+    @Getter
+    public final int depart; // sec since midnight
+
+    @Getter
+    public final Status status;
+
+    public Update (AgencyAndId tripId, AgencyAndId stopId, Integer stopSeq, int arrive, int depart, 
+            Status status, long timestamp, ServiceDate serviceDate) {
+        super(tripId, timestamp, serviceDate);
         this.stopId = stopId;
         this.stopSeq = stopSeq;
         this.arrive = arrive;
         this.depart = depart;
         this.status = status;
-        this.timestamp = timestamp;
+        this.delay = null;
+    }
+
+
+    public Update (AgencyAndId tripId, AgencyAndId stopId, Integer stopSeq, int delay, 
+            Status status, long timestamp, ServiceDate serviceDate) {
+        super(tripId, timestamp, serviceDate);
+        this.stopId = stopId;
+        this.stopSeq = stopSeq;
+        this.arrive = 0;
+        this.depart = 0;
+        this.delay = delay;
+        this.status = status;
+    }
+    
+    public boolean hasStopSequence() {
+        return stopSeq != null;
+    }
+    
+    public boolean hasDelay() {
+        return delay != null;
     }
 
     /**
      * This ordering is useful for breaking lists of mixed-trip updates into single-trip blocks.
-     * We sort on (tripId, timestamp, stopSequence, depart) because there may be duplicate stops in 
+     * We sort on (tripId, timestamp, serviceDate, stopSequence, depart) because there may be duplicate stops in 
      * an update list, and we want them to be in a predictable order for filtering. Usually 
      * duplicate stops are due to multiple updates for the same trip in the same message. In this 
      * case the two updates will have different timestamps, and we want to apply them in order.
@@ -54,6 +85,9 @@ public class Update implements Comparable<Update> {
         result = (int) (this.timestamp - other.timestamp);
         if (result != 0)
             return result;
+        result = serviceDate.compareTo(other.serviceDate);
+        if(result != 0)
+            return result;
         result = this.stopSeq - other.stopSeq;
         if (result != 0)
             return result;
@@ -63,6 +97,10 @@ public class Update implements Comparable<Update> {
 
     @Override
     public String toString() {
+        if(hasDelay())
+            return String.format("Update trip %s Stop #%d:%s (%s) delay %s", 
+                    tripId, stopSeq, stopId, status, delay);
+        
         return String.format("Update trip %s Stop #%d:%s (%s) A%s D%s", 
                 tripId, stopSeq, stopId, status, arrive, depart);
     }

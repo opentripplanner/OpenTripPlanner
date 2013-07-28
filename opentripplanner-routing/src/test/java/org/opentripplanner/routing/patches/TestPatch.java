@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import junit.framework.TestCase;
 
@@ -189,6 +190,17 @@ public class TestPatch extends TestCase {
 
             @Override
             public TableTripPattern getTripPatternForTrip(AgencyAndId tripId) {
+                return null;
+            }
+
+
+            @Override
+            public Map<AgencyAndId, Stop> getAllStops() {
+                return null;
+            }
+
+            @Override
+            public Map<AgencyAndId, Route> getAllRoutes() {
                 return null;
             }
         };

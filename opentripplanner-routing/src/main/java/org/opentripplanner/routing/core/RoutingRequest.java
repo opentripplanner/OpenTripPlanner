@@ -323,6 +323,11 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     // 2.9 m/s/s: 0 mph to 65 mph in 10 seconds
     public double carAccelerationSpeed = 2.9;
+    
+    /**
+     * When true, realtime updates are ignored during this search.
+     */
+    public boolean ignoreRealtimeUpdates = false;
 
     /**
      * The routing context used to actually carry out this search. It is important to build States from TraverseOptions rather than RoutingContexts,
@@ -843,6 +848,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && extensions.equals(other.extensions)
                 && clampInitialWait == other.clampInitialWait
                 && reverseOptimizeOnTheFly == other.reverseOptimizeOnTheFly
+                && ignoreRealtimeUpdates == other.ignoreRealtimeUpdates
                 && ObjectUtils.nullSafeEquals(startingTransitTripId, other.startingTransitTripId);
     }
 
@@ -864,7 +870,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + new Double(triangleTimeFactor).hashCode() * 790052899
                 + new Double(stairsReluctance).hashCode() * 315595321
                 + new Long(clampInitialWait).hashCode() * 209477
-                + new Boolean(reverseOptimizeOnTheFly).hashCode() * 95112799;
+                + new Boolean(reverseOptimizeOnTheFly).hashCode() * 95112799
+                + new Boolean(ignoreRealtimeUpdates).hashCode() * 154329;
         if (batch) {
             hashCode *= -1;
             // batch mode, only one of two endpoints matters

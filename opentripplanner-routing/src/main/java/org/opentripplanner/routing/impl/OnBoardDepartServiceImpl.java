@@ -125,25 +125,26 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
 
         /* 3. Get the tripTimes */
         TableTripPattern pattern = nextStop.getTripPattern();
-        TripTimes tripTimes = null;
-        if (ctx.timetableSnapshot == null) {
-            tripTimes = pattern.getTripTimes(pattern.getTripIndex(tripId));
-        } else {
-            Timetable timeTable = ctx.timetableSnapshot.resolve(pattern);
-            tripTimes = timeTable.getTripTimes(timeTable.getTripIndex(tripId));
-        }
-
+        TripTimes tripTimes = pattern.getTripTimes(pattern.getTripIndex(tripId));
+        
         /*
          * 4. Compute service day based on given departure day/time relative to scheduled/real-time
          * trip time for hop. This is needed as for some trips any service day can apply.
          */
-        int depTime = tripTimes.getDepartureTime(stopIndex);
-        int arrTime = tripTimes.getArrivalTime(stopIndex);
-        int estTime = Math.round(depTime * fractionCovered + arrTime * (1 - fractionCovered));
         ServiceDay bestServiceDay = null;
         int minDelta = Integer.MAX_VALUE;
         int actDelta = 0;
         for (ServiceDay serviceDay : ctx.serviceDays) {
+            // Get the tripTimes including real-time updates for the serviceDay
+            if (ctx.timetableSnapshot != null) {
+                Timetable timeTable = ctx.timetableSnapshot.resolve(pattern, serviceDay.getServiceDate());
+                tripTimes = timeTable.getTripTimes(timeTable.getTripIndex(tripId));
+            }
+            
+            int depTime = tripTimes.getDepartureTime(stopIndex);
+            int arrTime = tripTimes.getArrivalTime(stopIndex);
+            int estTime = Math.round(depTime * fractionCovered + arrTime * (1 - fractionCovered));
+
             int time = serviceDay.secondsSinceMidnight(opt.dateTime);
             /*
              * TODO Weight differently early vs late time, as the probability of any transit being

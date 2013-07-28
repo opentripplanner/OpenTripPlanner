@@ -20,9 +20,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.ServiceCalendar;
 import org.onebusaway.gtfs.model.ServiceCalendarDate;
 import org.onebusaway.gtfs.model.Stop;
@@ -65,6 +67,10 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
 
     private HashMap<String, Agency> agencies = new HashMap<String, Agency>();
 
+    private HashMap<AgencyAndId, Stop> stops = new HashMap<AgencyAndId, Stop>();
+
+    private HashMap<AgencyAndId, Route> routes = new HashMap<AgencyAndId, Route>();
+    
     private Coordinate center;
 
     private int overnightBreak;
@@ -76,7 +82,10 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
             HashMap<AgencyAndId, PreAlightEdge> preAlightEdges,
             HashMap<AgencyAndId, TableTripPattern> tableTripPatternsByTrip,
             HashMap<AgencyAndId, HashSet<String>> directionsByRoute,
-            HashMap<AgencyAndId, HashSet<Stop>> stopsByRoute, List<TraverseMode> modes) {
+            HashMap<AgencyAndId, HashSet<Stop>> stopsByRoute,
+            HashMap<AgencyAndId, Route> routes,
+            HashMap<AgencyAndId, Stop> stops,
+            List<TraverseMode> modes) {
         this.variantsByAgency = variantsByAgency;
         this.variantsByRoute = variantsByRoute;
         this.variantsByTrip = variantsByTrip;
@@ -85,6 +94,8 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
         this.tableTripPatternsByTrip = tableTripPatternsByTrip;
         this.directionsForRoute = directionsByRoute;
         this.stopsForRoute = stopsByRoute;
+        this.routes = routes;
+        this.stops = stops;
         this.modes = modes;
     }
 
@@ -95,7 +106,10 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
             HashMap<AgencyAndId, PreAlightEdge> preAlightEdges,
             HashMap<AgencyAndId, TableTripPattern> tableTripPatternsByTrip,
             HashMap<AgencyAndId, HashSet<String>> directionsByRoute,
-            HashMap<AgencyAndId, HashSet<Stop>> stopsByRoute, List<TraverseMode> modes) {
+            HashMap<AgencyAndId, HashSet<Stop>> stopsByRoute,
+            HashMap<AgencyAndId, Route> routes,
+            HashMap<AgencyAndId, Stop> stops,
+            List<TraverseMode> modes) {
 
         MapUtils.mergeInUnique(this.variantsByAgency, variantsByAgency);
         MapUtils.mergeInUnique(this.variantsByRoute, variantsByRoute);
@@ -105,6 +119,8 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
         this.tableTripPatternsByTrip.putAll(tableTripPatternsByTrip);
         MapUtils.mergeInUnique(this.directionsForRoute, directionsByRoute);
         MapUtils.mergeInUnique(this.stopsForRoute, stopsByRoute);
+        this.routes.putAll(routes);
+        this.stops.putAll(stops);
         for (TraverseMode mode : modes) {
             if (!this.modes.contains(mode)) {
                 this.modes.add(mode);
@@ -168,6 +184,16 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
     @Override
     public Collection<AgencyAndId> getAllRouteIds() {
         return variantsByRoute.keySet();
+    }
+
+    @Override
+    public Map<AgencyAndId, Route> getAllRoutes() {
+        return Collections.unmodifiableMap(routes);
+    }
+
+    @Override
+    public Map<AgencyAndId, Stop> getAllStops() {
+        return Collections.unmodifiableMap(stops);
     }
 
     @Override

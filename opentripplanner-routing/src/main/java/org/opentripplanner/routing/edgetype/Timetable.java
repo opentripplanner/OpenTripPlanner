@@ -19,17 +19,20 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import lombok.Getter;
+
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.trippattern.CanceledTripTimes;
 import org.opentripplanner.routing.trippattern.DecayingDelayTripTimes;
 import org.opentripplanner.routing.trippattern.ScheduledTripTimes;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.routing.trippattern.UpdateBlock;
+import org.opentripplanner.routing.trippattern.TripUpdate;
 import org.opentripplanner.routing.trippattern.UpdatedTripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +65,12 @@ public class Timetable implements Serializable {
      * additional TripTimes objects for unscheduled trips.
      */
     private final ArrayList<TripTimes> tripTimes;
+    
+    /**
+     * The ServiceDate for which this (updated) timetables is valid. If null, then it is valid for all dates.
+     */
+    @Getter
+    private final ServiceDate serviceDate;
 
     /** 
      * If the departures index is null, this timetable has not been indexed: use a linear search. 
@@ -82,14 +91,16 @@ public class Timetable implements Serializable {
     public Timetable(TableTripPattern pattern) {
         tripTimes = new ArrayList<TripTimes>();
         this.pattern = pattern;
+        this.serviceDate = null;
     }
     
     /** 
      * Copy constructor: create an un-indexed Timetable with the same TripTimes as the 
      * specified timetable. 
      */
-    private Timetable (Timetable tt) {
+    private Timetable (Timetable tt, ServiceDate serviceDate) {
         tripTimes = new ArrayList<TripTimes>(tt.tripTimes);
+        this.serviceDate = serviceDate;
         this.pattern = tt.pattern;
     }
     
@@ -98,8 +109,8 @@ public class Timetable implements Serializable {
      * constructor does not. The only publicly visible way to make a timetable, and it should
      * probably be protected.
      */
-    public Timetable copy() {
-        return new Timetable(this);
+    public Timetable copy(ServiceDate serviceDate) {
+        return new Timetable(this, serviceDate);
     }
     
     /**
@@ -161,8 +172,7 @@ public class Timetable implements Serializable {
         TripTimes bestTrip = null;
         int index;
         TripTimes[][] tableIndex = boarding ? departuresIndex : arrivalsIndex;
-        int stopOffset = boarding ? 0 : 1;
-        Stop currentStop = pattern.getStop(stopIndex + stopOffset);
+        Stop currentStop = pattern.getStop(stopIndex);
         if (tableIndex != null) {
             TripTimes[] sorted;
             // this timetable has been indexed, use binary search
@@ -182,7 +192,7 @@ public class Timetable implements Serializable {
                     }
                 }
             } else {
-                index = TripTimes.binarySearchArrivals(sorted, stopIndex, time);
+                index = TripTimes.binarySearchArrivals(sorted, stopIndex - 1, time);
                 while (index >= 0) {
                     TripTimes tt = sorted[index--];
                     if (tt.tripAcceptable(state0, currentStop, sd, haveBicycle, stopIndex, boarding)) {
@@ -204,7 +214,7 @@ public class Timetable implements Serializable {
                         bestTime = depTime;
                     }
                 } else {
-                    int arvTime = tt.getArrivalTime(stopIndex);
+                    int arvTime = tt.getArrivalTime(stopIndex - 1);
                     if (arvTime <= time && arvTime > bestTime && tt.tripAcceptable(state0, currentStop, sd, haveBicycle, stopIndex, boarding)) {
                         bestTrip = tt;
                         bestTime = arvTime;
@@ -341,36 +351,46 @@ public class Timetable implements Serializable {
      * @return whether or not the timetable actually changed as a result of this operation
      * (maybe it should do the cloning and return the new timetable to enforce copy-on-write?) 
      */
-    public boolean update(UpdateBlock block) {
+    public boolean update(TripUpdate tripUpdate) {
         try {
              // Though all timetables have the same trip ordering, some may have extra trips due to 
              // the dynamic addition of unscheduled trips.
              // However, we want to apply trip update blocks on top of *scheduled* times 
-            int tripIndex = getTripIndex(block.tripId);
+            int tripIndex = getTripIndex(tripUpdate.getTripId());
             if (tripIndex == -1) {
-                LOG.info("tripId {} not found in pattern.", block.tripId);
+                LOG.info("tripId {} not found in pattern.", tripUpdate.getTripId());
                 return false;
             } else {
-                LOG.trace("tripId {} found at index {} (in scheduled timetable)", block.tripId, tripIndex);
-            }
-            // 'stop' Index as in transit stop (not 'end', not 'hop')
-            int stopIndex = block.findUpdateStopIndex(pattern);
-            if (stopIndex == UpdateBlock.MATCH_FAILED) {
-                LOG.warn("Unable to match update block to stopIds.");
-                return false;
+                LOG.trace("tripId {} found at index {} (in scheduled timetable)", tripUpdate.getTripId(), tripIndex);
             }
             TripTimes existingTimes = getTripTimes(tripIndex);
             ScheduledTripTimes scheduledTimes = existingTimes.getScheduledTripTimes();
             TripTimes newTimes;
-            if (block.isCancellation()) {
+            if (tripUpdate.isCancellation()) {
                 newTimes = new CanceledTripTimes(scheduledTimes);
-            } 
+            }
+            else if(tripUpdate.hasDelay()) {
+                // 'stop' Index as in transit stop (not 'end', not 'hop')
+                int stopIndex = tripUpdate.findUpdateStopIndex(pattern);
+                if (stopIndex == TripUpdate.MATCH_FAILED) {
+                    LOG.warn("Unable to match update block to stopIds.");
+                    return false;
+                }
+                int delay = tripUpdate.getUpdates().get(0).getDelay();
+                newTimes = new DecayingDelayTripTimes(scheduledTimes, stopIndex, delay);
+            }
             else {
-                newTimes = new UpdatedTripTimes(scheduledTimes, block, stopIndex);
+                // 'stop' Index as in transit stop (not 'end', not 'hop')
+                int stopIndex = tripUpdate.findUpdateStopIndex(pattern);
+                if (stopIndex == TripUpdate.MATCH_FAILED) {
+                    LOG.warn("Unable to match update block to stopIds.");
+                    return false;
+                }
+                newTimes = new UpdatedTripTimes(scheduledTimes, tripUpdate, stopIndex);
                 if ( ! newTimes.timesIncreasing()) {
                     LOG.warn("Resulting UpdatedTripTimes has non-increasing times. " +
                              "Falling back on DecayingDelayTripTimes.");
-                    LOG.warn(block.toString());
+                    LOG.warn(tripUpdate.toString());
                     LOG.warn(newTimes.toString());
                     int delay = newTimes.getDepartureDelay(stopIndex);
                     // maybe decay should be applied on top of the update (wrap Updated in Decaying), 
@@ -391,7 +411,7 @@ public class Timetable implements Serializable {
             return false;
         }
     }
-    
+
     /**
      * Add a trip to this Timetable. The Timetable must be analyzed, compacted, and indexed
      * any time trips are added, but this is not done automatically because it is time consuming
@@ -434,5 +454,8 @@ public class Timetable implements Serializable {
         return bestDwellTimes[stopIndex];
     }
 
+    public boolean isValidFor(ServiceDate serviceDate) {
+        return this.serviceDate == null || this.serviceDate.equals(serviceDate);
+    }
 } 
 

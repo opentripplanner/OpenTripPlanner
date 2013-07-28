@@ -88,6 +88,10 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 
     private HashMap<AgencyAndId, HashSet<Stop>> stopsByRoute = new HashMap<AgencyAndId, HashSet<Stop>>();
 
+    private HashMap<AgencyAndId, Stop> stops = new HashMap<AgencyAndId, Stop>();
+
+    private HashMap<AgencyAndId, Route> routes = new HashMap<AgencyAndId, Route>();
+
     List<TraverseMode> modes = new ArrayList<TraverseMode>();
 
     private HashSet<Edge> handledEdges = new HashSet<Edge>();
@@ -116,6 +120,15 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                 totalTrips += variant.getTrips().size();
             }
         }
+        
+        for(Stop stop : dao.getAllStops()) {
+            stops.put(stop.getId(), stop);
+        }
+        
+        for(Route route : dao.getAllRoutes()) {
+            routes.put(route.getId(), route);
+        }
+        
         LOG.debug("Built transit index: " + variantsByAgency.size() + " agencies, "
                 + variantsByRoute.size() + " routes, " + totalTrips + " trips, " + totalVariants
                 + " variants ");
@@ -124,11 +137,11 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                 .getService(TransitIndexService.class);
         if (service == null) {
             service = new TransitIndexServiceImpl(variantsByAgency, variantsByRoute,
-                    variantsByTrip, preBoardEdges, preAlightEdges, tableTripPatternsByTrip,
-                    directionsByRoute, stopsByRoute, modes);
+                    variantsByTrip, preBoardEdges, preAlightEdges, tableTripPatternsByTrip, directionsByRoute, stopsByRoute,
+                    routes, stops, modes);
         } else {
             service.merge(variantsByAgency, variantsByRoute, variantsByTrip, preBoardEdges,
-                    preAlightEdges, tableTripPatternsByTrip, directionsByRoute, stopsByRoute, modes);
+                    preAlightEdges, tableTripPatternsByTrip, directionsByRoute, stopsByRoute, routes, stops, modes);
         }
 
         insertCalendarData(service);

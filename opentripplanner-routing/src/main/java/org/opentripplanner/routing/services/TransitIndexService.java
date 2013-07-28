@@ -15,9 +15,11 @@ package org.opentripplanner.routing.services;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.ServiceCalendar;
 import org.onebusaway.gtfs.model.ServiceCalendarDate;
 import org.onebusaway.gtfs.model.Stop;
@@ -54,6 +56,10 @@ public interface TransitIndexService {
     public List<TraverseMode> getAllModes();
 
     public Collection<AgencyAndId> getAllRouteIds();
+    
+    public Map<AgencyAndId, Route> getAllRoutes();
+    
+    public Map<AgencyAndId, Stop> getAllStops();
 
     public void addCalendars(Collection<ServiceCalendar> allCalendars);
 
