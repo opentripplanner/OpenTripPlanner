@@ -16,7 +16,7 @@
     <!-- OTP Modules -->
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>opentripplanner-routing</artifactId>
+      <artifactId>otp-core</artifactId>
       <version>${project.version}</version>
     </dependency>
     <!-- JAVA STANDARD LIBRARY EXTENSIONS -->

@@ -39,7 +39,7 @@ public class TransitIndexBuilderTest extends TestCase {
 	public void testTransitIndexBuilder() throws IOException {
 		Graph graph = new Graph();
 
-		File testGtfs = new File("../opentripplanner-routing/src/test/resources/testagency.zip");
+		File testGtfs = new File("../otp-core/src/test/resources/testagency.zip");
 		GtfsBundle bundle = new GtfsBundle();
 		bundle.setPath(testGtfs);
 		

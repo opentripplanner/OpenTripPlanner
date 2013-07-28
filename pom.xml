@@ -20,7 +20,7 @@
     <module>opentripplanner-api-thrift</module>    
     <module>opentripplanner-api-webapp</module>
     <module>opentripplanner-geocoder</module>
-    <module>opentripplanner-routing</module>
+    <module>otp-core</module>
     <module>opentripplanner-webapp</module>
     <module>opentripplanner-analyst-client</module>
     <module>opentripplanner-leaflet-client</module>

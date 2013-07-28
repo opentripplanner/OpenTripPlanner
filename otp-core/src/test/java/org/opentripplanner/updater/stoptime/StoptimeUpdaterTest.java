@@ -67,7 +67,7 @@ public class StoptimeUpdaterTest {
     
     @BeforeClass
     public static void setUpClass() throws Exception {
-        context = GtfsLibrary.readGtfs(new File("../opentripplanner-routing/" + ConstantsForTests.FAKE_GTFS));
+        context = GtfsLibrary.readGtfs(new File("../otp-core/" + ConstantsForTests.FAKE_GTFS));
 
         GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
         factory.run(graph);
