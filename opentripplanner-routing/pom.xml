@@ -62,7 +62,7 @@
             <artifactId>lombok</artifactId>
         </dependency>
 
-        <!-- JTS Topology Suite and Geotools Geospatial -->
+        <!-- JTS Topology Suite and Geotools Geospatial (raster and projection) -->
         <dependency>
           <groupId>com.vividsolutions</groupId>
           <artifactId>jts</artifactId>
@@ -70,6 +70,10 @@
         <dependency>
           <groupId>org.geotools</groupId>
           <artifactId>gt-geojson</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.geotools</groupId>
+          <artifactId>gt-coverage</artifactId>
         </dependency>
         <dependency>
           <groupId>org.geotools</groupId>
@@ -100,8 +104,13 @@
           <version>1.9.0</version>
           <scope>test</scope>
         </dependency>
-        
+
         <!-- OTHER DEPENDENCIES -->
+        <!-- Jersey JAX-RS annontation-driven REST -->
+        <dependency>
+          <groupId>com.sun.jersey</groupId>
+          <artifactId>jersey-core</artifactId>
+        </dependency>
         <!-- Bytecode manipulator -->
         <dependency>
             <groupId>javassist</groupId>
