@@ -83,6 +83,12 @@
           <groupId>org.geotools</groupId>
           <artifactId>gt-geojson</artifactId>
         </dependency>
+        <!-- Processing is used for the debug GUI (though we could probably use just Java2D) -->
+        <dependency>
+          <groupId>org.processing</groupId>
+          <artifactId>core</artifactId>
+          <version>1.0.7</version>
+        </dependency>
     </dependencies>
     <repositories>
         <repository>
