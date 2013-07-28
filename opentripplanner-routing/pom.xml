@@ -12,6 +12,7 @@
     </parent>
 
     <dependencies>
+    
         <!-- OTHER OTP MODULES -->
         <dependency>
             <groupId>${project.groupId}</groupId>
@@ -19,6 +20,12 @@
             <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>openstreetmap</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        
         <!-- SPRING -->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -28,11 +35,23 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-aop</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-orm</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+
         <!-- LOGGING -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
         </dependency>
+
         <!-- JAVA STANDARD LIBRARY EXTENSIONS -->
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -42,10 +61,38 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>
+
+        <!-- JTS Topology Suite and Geotools Geospatial -->
+        <dependency>
+          <groupId>com.vividsolutions</groupId>
+          <artifactId>jts</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.geotools</groupId>
+          <artifactId>gt-geojson</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.geotools</groupId>
+          <artifactId>gt-arcgrid</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.geotools</groupId>
+          <artifactId>gt-shapefile</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.geotools</groupId>
+          <artifactId>gt-geotiff</artifactId>
+        </dependency>
+        <!-- provides EPSG database for projections (shapefile loading) -->
+        <dependency>
+          <groupId>org.geotools</groupId>
+          <artifactId>gt-epsg-hsql</artifactId>
+        </dependency>
+        
         <!-- TESTING -->
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
         </dependency>
         <dependency>
           <groupId>org.mockito</groupId>
@@ -53,11 +100,9 @@
           <version>1.9.0</version>
           <scope>test</scope>
         </dependency>
+        
         <!-- OTHER DEPENDENCIES -->
-        <dependency>
-          <groupId>com.vividsolutions</groupId>
-          <artifactId>jts</artifactId>
-        </dependency>
+        <!-- Bytecode manipulator -->
         <dependency>
             <groupId>javassist</groupId>
             <artifactId>javassist</artifactId>
@@ -69,25 +114,10 @@
             <artifactId>jeromq</artifactId>
             <version>0.2.0</version>
         </dependency>
-        <!--  
-        <dependency>
-            <groupId>org.xerial</groupId>
-            <artifactId>sqlite-jdbc</artifactId>
-            <version>3.6.16</version>
-        </dependency>
-        -->
+        <!-- OBA GTFS loader -->
         <dependency>
             <groupId>org.onebusaway</groupId>
             <artifactId>onebusaway-gtfs</artifactId>
-        </dependency>
-        <dependency>
-        	<groupId>com.fasterxml.jackson.module</groupId>
-        	<artifactId>jackson-module-jaxb-annotations</artifactId>
-        	<version>2.0.5</version>
-        </dependency>
-        <dependency>
-          <groupId>org.geotools</groupId>
-          <artifactId>gt-geojson</artifactId>
         </dependency>
         <!-- Processing is used for the debug GUI (though we could probably use just Java2D) -->
         <dependency>
@@ -95,6 +125,7 @@
           <artifactId>core</artifactId>
           <version>1.0.7</version>
         </dependency>
+        <!-- Google Protocol Buffers -->
         <dependency>
           <groupId>com.google.protobuf</groupId>
           <artifactId>protobuf-java</artifactId>
@@ -117,6 +148,7 @@
             <artifactId>json-lib</artifactId>
             <version>2.1</version>
             <classifier>jdk15</classifier>
+            <!-- Why exactly are these being excluded? -->
             <exclusions>
                <exclusion>
                   <groupId>commons-logging</groupId>
@@ -146,14 +178,50 @@
           <artifactId>jackson-mapper-asl</artifactId>
           <version>1.9.11</version>
         </dependency>
+        <dependency>
+          <groupId>com.fasterxml.jackson.module</groupId>
+          <artifactId>jackson-module-jaxb-annotations</artifactId>
+          <version>2.0.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.axis</groupId>
+            <artifactId>axis</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.axis</groupId>
+          <artifactId>axis-jaxrpc</artifactId>
+          <version>1.4</version>
+        </dependency>
+        <dependency>
+          <groupId>commons-discovery</groupId>
+          <artifactId>commons-discovery</artifactId>
+          <version>0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-compress</artifactId>
+            <version>1.0</version>
+        </dependency>
+          <dependency>
+            <groupId>net.java.dev.jets3t</groupId>
+            <artifactId>jets3t</artifactId>
+            <version>0.8.1</version>
+        </dependency>
+        <!-- Command line parameter parsing -->
+        <dependency>
+          <groupId>com.beust</groupId>
+          <artifactId>jcommander</artifactId>
+          <version>1.27</version>
+        </dependency>
+        <!-- CSV parser -->
+        <dependency>
+          <groupId>net.sourceforge.javacsv</groupId>
+          <artifactId>javacsv</artifactId>
+        </dependency>
+
     </dependencies>
-    <repositories>
-        <repository>
-            <id>maven2-repository.dev.java.net</id>
-            <name>Java.net repository</name>
-            <url>http://download.java.net/maven/2</url>
-        </repository>
-    </repositories>
+    
     <build>
       <resources>
         <resource>
@@ -162,6 +230,7 @@
         </resource>
       </resources>
       <plugins>
+        <!-- Get current Git commit information for use in MavenVersion class -->
         <plugin>
           <groupId>pl.project13.maven</groupId>
           <artifactId>git-commit-id-plugin</artifactId>
