@@ -22,9 +22,7 @@
     <module>opentripplanner-api-webapp</module>
     <module>opentripplanner-geocoder</module>
     <module>opentripplanner-graph-builder</module>
-    <module>opentripplanner-integration</module>
     <module>opentripplanner-routing</module>
-    <module>opentripplanner-updater</module>
     <module>opentripplanner-utils</module>
     <module>opentripplanner-webapp</module>
     <module>opentripplanner-web-utils</module>
