@@ -113,17 +113,27 @@
             </goals>
             <configuration>
               <finalName>otp</finalName>
-              <!-- MinimizeJar removes unused classes, i.e. all classes not imported explicitly
-                by name, unless the classes have been force-included with filters. -->
+              <!-- MinimizeJar removes unused classes, (classes not imported explicitly by name).
+              Jersey auto-scans for REST resources in OTP, so use include filters to force-include 
+              classes that are dynamically loaded by name/auto-scanned. -->
+              <!-- It is removing things like org/codehaus/jettison/json/JSONException even though
+              they are explicitly imported in the source.
               <minimizeJar>true</minimizeJar> 
               <filters> 
                 <filter>
                    <artifact>com.sun.jersey:*</artifact>
                    <includes>
-                       <include>**/impl/**</include>
+                       <include>**</include>
+                   </includes>
+                </filter>
+                <filter>
+                   <artifact>org.opentripplanner:*</artifact>
+                   <includes>
+                       <include>**</include>
                    </includes>
                 </filter> 
               </filters>
+              -->
               <transformers>
                 <transformer
                   implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
