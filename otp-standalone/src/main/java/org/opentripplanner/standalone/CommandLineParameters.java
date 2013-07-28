@@ -99,6 +99,10 @@ public class CommandLineParameters {
     description = "path to static content")
     String staticDirectory;
 
+    @Parameter( names = { "-z", "--visualize"}, 
+    description = "open a debugging graph visualizer")
+    boolean visualize;
+
     @Parameter( validateWith = ReadableFile.class, // the remaining parameters in one array
     description = "files") 
     List<File> files = new ArrayList<File>();
