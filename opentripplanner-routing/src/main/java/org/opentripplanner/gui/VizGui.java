@@ -87,7 +87,7 @@ import org.opentripplanner.routing.spt.DefaultShortestPathTreeFactory;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTreeFactory;
 
-import com.beust.jcommander.internal.Sets;
+import com.google.common.collect.Sets;
 import com.vividsolutions.jts.geom.Coordinate;
 
 /**
