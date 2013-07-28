@@ -44,6 +44,7 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>2.3.2</version>
         <configuration>
+          <!-- Target Java versions -->
           <source>1.6</source>
           <target>1.6</target>
         </configuration>
@@ -60,11 +61,13 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <argLine>-Xmx2G</argLine>
-          <disableXmlReport>false</disableXmlReport>
+          <!-- Jenkins needs XML test reports to determine whether the build is stable. -->
+          <disableXmlReport>false</disableXmlReport> 
         </configuration>
       </plugin>
     </plugins>
     
+    <!-- Necessary for uploading/deploying artifacts to Maven repos via WebDAV. -->
     <extensions>
       <extension>
         <groupId>org.apache.maven.wagon</groupId>
@@ -96,10 +99,9 @@
           <artifactId>maven-release-plugin</artifactId>
           <version>2.2.2</version>
           <configuration>
-            <!-- by default, release:prepare runs goals 'clean' and 'verify'.
-            Javadoc generation in release:perform requires the new release
-            versions of our artifacts to already be installed in the local 
-            repository. -->
+            <!-- by default, release:prepare runs goals 'clean' and 'verify'. Javadoc generation 
+            in release:perform requires the new release versions of our artifacts to already be 
+            installed in the local repository. -->
             <preparationGoals>clean install</preparationGoals>
             <!-- The site generation step can fail. Run it in release:prepare to make sure it
             works before tagging the release. Enunciate model validation is currently failing,
@@ -113,9 +115,12 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <version>2.12</version>
         </plugin>
+        <!-- m2eclipse lifecycle mapping configuration. This controls which Maven build goals should
+        be performed during incremental builds within the Eclipse IDE. There are sensible defaults
+        for most plugins, but some others require manual configuration with <action><ignore /> or 
+        <action><execute /> filters. This section only affects incremental builds within Eclipse,
+        not command-line Maven builds. -->
         <plugin>
-          <!-- m2eclipse lifecycle mapping configuration -->
-          <!-- should not affect builds outside IDE -->
           <groupId>org.eclipse.m2e</groupId>
           <artifactId>lifecycle-mapping</artifactId>
           <version>1.0.0</version>
@@ -213,24 +218,6 @@
       </plugin>
     </plugins>
   </reporting>
-
-  <!-- 
-    CI Server profile
-    Hudson by default defines a property BUILD_NUMBER which is used to enable this profile. 
-  -->
-  <profiles>
-    <profile>
-      <id>hudson</id>
-      <activation>
-        <property>
-          <name>BUILD_NUMBER</name>
-        </property>
-      </activation>
-      <!-- CI Server profile currently unused -->
-      <distributionManagement>
-      </distributionManagement>
-    </profile>
-  </profiles>
 
   <repositories>
     <!-- Hack to force maven to check central first. Maven central is inherited from the superpom,
