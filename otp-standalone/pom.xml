@@ -113,7 +113,17 @@
             </goals>
             <configuration>
               <finalName>otp</finalName>
-              <!-- <minimizeJar>true</minimizeJar> remove unused class files (this seems to remove too much for now) -->
+              <!-- MinimizeJar removes unused classes, i.e. all classes not imported explicitly
+                by name, unless the classes have been force-included with filters. -->
+              <minimizeJar>true</minimizeJar> 
+              <filters> 
+                <filter>
+                   <artifact>com.sun.jersey:*</artifact>
+                   <includes>
+                       <include>**/impl/**</include>
+                   </includes>
+                </filter> 
+              </filters>
               <transformers>
                 <transformer
                   implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
