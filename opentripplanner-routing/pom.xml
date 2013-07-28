@@ -13,13 +13,6 @@
 
     <dependencies>
     
-        <!-- OTHER OTP MODULES -->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>openstreetmap</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        
         <!-- SPRING -->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -64,7 +57,7 @@
             <artifactId>lombok</artifactId>
         </dependency>
 
-        <!-- GEOTOOLS AND JTS TOPOLOGY (rasters and projection) -->
+        <!-- GEOTOOLS AND JTS TOPOLOGY (geometry, rasters and projection) -->
         <dependency>
           <groupId>com.vividsolutions</groupId>
           <artifactId>jts</artifactId>
@@ -93,8 +86,8 @@
           <groupId>org.geotools</groupId>
           <artifactId>gt-geotiff</artifactId>
         </dependency>
-        <!-- provides EPSG database for projections (shapefile loading) -->
         <dependency>
+          <!-- provides EPSG database for projections (shapefile loading) -->
           <groupId>org.geotools</groupId>
           <artifactId>gt-epsg-hsql</artifactId>
         </dependency>
@@ -205,9 +198,9 @@
           <version>2.0.5</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.axis</groupId>
-            <artifactId>axis</artifactId>
-            <version>1.4</version>
+          <groupId>org.apache.axis</groupId>
+          <artifactId>axis</artifactId>
+          <version>1.4</version>
         </dependency>
         <dependency>
           <groupId>org.apache.axis</groupId>
@@ -220,14 +213,20 @@
           <version>0.4</version>
         </dependency>
         <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-compress</artifactId>
-            <version>1.0</version>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-compress</artifactId>
+          <version>1.0</version>
         </dependency>
-          <dependency>
-            <groupId>net.java.dev.jets3t</groupId>
-            <artifactId>jets3t</artifactId>
-            <version>0.8.1</version>
+        <dependency>
+          <groupId>net.java.dev.jets3t</groupId>
+          <artifactId>jets3t</artifactId>
+          <version>0.8.1</version>
+        </dependency>
+        <dependency>
+          <!-- OpenStreetMap protobuf (PBF) definitions -->
+          <groupId>crosby.binary</groupId>
+          <artifactId>osmpbf</artifactId>
+          <version>1.2.1</version>
         </dependency>
         <dependency>
           <!-- Command line parameter parsing -->
