@@ -52,7 +52,7 @@ public class GrizzlyServer {
     private static class ClientWarSupplier implements InputSupplier<InputStream> {
         @Override public InputStream getInput() throws IOException {
             InputStream istream =  ClassLoader.getSystemResourceAsStream(CLIENT_WAR_FILENAME);
-            if (istream == null) throw new IOException("Cannot find client WAR.");
+            if (istream == null) throw new IOException("Cannot find client WAR on classpath.");
             return istream;
         }
     }
@@ -62,8 +62,9 @@ public class GrizzlyServer {
      * Zip files have the file index at the /end/, so they cannot be properly decoded as a stream.
      * Zip streams do not offer random access, and ZipFiles are considered preferable in all cases.
      * Grizzly does include a static file server but it does not work on resources within a JAR, 
-     * only files. Solution: copy the ZIP outside the JAR and expand it in a temp directory.
-     * JVM does cache classpath resource streams, but let's just do it manually.
+     * only files. JVM does cache classpath resource streams, but modifying the entire static HTTP 
+     * server would be a major undertaking. Solution: copy the ZIP outside the JAR and expand it 
+     * in a temp directory, manually.
      * 
      * Interestingly this even works in Eclipse, but apparently only if you previously ran a
      * command-line Maven build that left a WAR in /target/classes. We might want to check for the
