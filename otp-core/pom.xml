@@ -17,7 +17,7 @@
       <dependency>
         <!-- We include the client WAR artifact in the core JAR so it must be built first -->
         <groupId>org.opentripplanner</groupId>
-        <artifactId>opentripplanner-leaflet-client</artifactId>
+        <artifactId>otp-leaflet-client</artifactId>
         <version>${project.version}</version>
         <type>war</type> <!-- defaults to JAR, must specify if it's WAR -->
       </dependency>
@@ -403,7 +403,7 @@
                 <artifactItems>
                   <artifactItem>
                     <groupId>${project.groupId}</groupId>
-                    <artifactId>opentripplanner-leaflet-client</artifactId>
+                    <artifactId>otp-leaflet-client</artifactId>
                     <version>${project.version}</version>
                     <type>war</type>
                     <!-- Per-artifact directory / filename setting (also possible globally). -->

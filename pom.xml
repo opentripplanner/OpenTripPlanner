@@ -22,8 +22,8 @@
     <module>opentripplanner-geocoder</module>
     <module>otp-core</module>
     <module>otp-openlayers-client</module>
-    <module>opentripplanner-analyst-client</module>
-    <module>opentripplanner-leaflet-client</module>
+    <module>otp-analyst-client</module>
+    <module>otp-leaflet-client</module>
     <module>opentripplanner-municoder</module>
   </modules>
 
