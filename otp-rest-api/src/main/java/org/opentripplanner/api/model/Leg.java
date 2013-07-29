@@ -207,11 +207,11 @@ public class Leg {
      */
     @XmlElement
     @JsonSerialize
-    private List<Note> notes;
+    public List<Note> notes;
 
     @XmlElement
     @JsonSerialize
-    private List<Alert> alerts;
+    public List<Alert> alerts;
 
     @XmlAttribute
     @JsonSerialize
@@ -234,21 +234,16 @@ public class Leg {
     public Boolean rentedBike;
 
     /**
-     * bogus walk/bike/car legs are those that have 0.0 distance, 
-     * and just one instruction
-     * 
-     * @return boolean true if the leg is bogus 
+     * Whether this leg is a transit leg or not.
+     * @return Boolean true if the leg is a transit leg
      */
-    public boolean isBogusNonTransitLeg() {
-        boolean retVal = false;
-        if( (TraverseMode.WALK.toString().equals(this.mode) ||
-             TraverseMode.CAR.toString().equals(this.mode) ||
-             TraverseMode.BICYCLE.toString().equals(this.mode)) &&
-            (this.walkSteps == null || this.walkSteps.size() <= 1) && 
-            this.distance == 0) {
-            retVal = true;
-        }
-        return retVal;
+    public Boolean isTransitLeg() {
+        if (mode == null) return null;
+        else if (mode.equals(TraverseMode.WALK.toString())) return false;
+        else if (mode.equals(TraverseMode.CAR.toString())) return false;
+        else if (mode.equals(TraverseMode.BICYCLE.toString())) return false;
+        else if (mode.equals(TraverseMode.CUSTOM_MOTOR_VEHICLE.toString())) return false;
+        else return true;
     }
     
     /** 

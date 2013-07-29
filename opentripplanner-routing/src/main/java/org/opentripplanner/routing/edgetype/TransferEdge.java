@@ -74,7 +74,7 @@ public class TransferEdge extends Edge {
     }
 
     public TraverseMode getMode() {
-        return TraverseMode.TRANSFER;
+        return TraverseMode.LEG_SWITCH;
     }
 
     public String getName() {
@@ -90,7 +90,7 @@ public class TransferEdge extends Edge {
         s1.setEverBoarded(true);
         s1.incrementTimeInSeconds(time);
         s1.incrementWeight(time);
-        s1.setBackMode(TraverseMode.TRANSFER);
+        s1.setBackMode(TraverseMode.LEG_SWITCH);
         return s1.makeState();
     }
 

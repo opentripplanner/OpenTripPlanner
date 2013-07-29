@@ -122,16 +122,6 @@ public class Itinerary {
         }
     }
     
-    public void removeBogusLegs() {
-        Iterator<Leg> it = legs.iterator();
-        while (it.hasNext()) {
-            Leg leg = it.next();
-            if (leg.isBogusNonTransitLeg()) {
-                it.remove();
-            }
-        }
-    }
-
     public void fixupDates(CalendarServiceData service) {
         TimeZone startTimeZone = null;
         TimeZone timeZone = null;
