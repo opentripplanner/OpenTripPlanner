@@ -22,10 +22,18 @@
     <b>Departure Stop/Time</b>: ${gtfsTrip.fromStopName} at ${new Date(gtfsTrip.depart.getTime() + gtfsTrip.groupItinerary.timeOffset*3600000).format("h:mma")}<br>
     <b>Arrival Stop/Time</b>: ${gtfsTrip.toStopName} at ${new Date(gtfsTrip.arrive.getTime() + gtfsTrip.groupItinerary.timeOffset*3600000).format("h:mma")}<br>
     <b>Headsign</b>: ${gtfsTrip.headsign}<br>
+    <b>Notes</b>:
+        #{list items:gtfsTrip.groupItinerary.fieldTrip.request.notes, as:'note'}
+            <br>
+            &nbsp;&bull; ${note.note} <i>(${note.userName}, ${(note.timeStamp).format("M-d-yyyy h:mma")})</i>
+        #{/list}
+        #{else}
+            (None)
+        #{/else}
   </div>
   #{/list}
   #{else}
-    <i>No trips planned for this day.
+    <i>No trips planned for this day.</i>
   #{/else}
 
 </div>

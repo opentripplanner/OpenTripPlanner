@@ -409,16 +409,8 @@ otp.modules.planner.PlannerModule =
     noTripFound : function(error) {
         var msg = error.msg;
         if(error.id) msg += ' (Error ' + error.id + ')';
-        this.showDialog(msg, 'No Trip Found');
+        otp.widgets.Dialogs.showOkDialog(msg, 'No Trip Found');
     },
-    
-    showDialog : function(msg, title) {
-        $('<div style="z-index: 100000000;">' + msg + '</div>').dialog({
-            title : title,
-            appendTo: 'body',
-            modal: true
-        });
-    },    
     
     drawItinerary : function(itin) {
         var this_ = this;

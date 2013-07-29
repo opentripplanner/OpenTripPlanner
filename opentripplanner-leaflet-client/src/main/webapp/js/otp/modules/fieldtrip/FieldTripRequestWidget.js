@@ -24,8 +24,8 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
         
         this.module = module;
         this.request = request;
-        //console.log("request "+request.id+":");
-        //console.log(request);
+        console.log("request "+request.id+":");
+        console.log(request);
         otp.widgets.Widget.prototype.initialize.call(this, id, module, {
             cssClass : 'otp-fieldTrip-requestWidget',
             title : "Field Trip Request #"+request.id,
@@ -150,6 +150,25 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
                 this_.module.setClasspassId(this_.request, classpassId);
             }
         });
+        this.content.find('.addNoteButton').click(function(evt) {
+            otp.widgets.Dialogs.showInputDialog("Note to be attached to this request:", "Add Note", function(input) {
+                console.log(input);
+                this_.module.addNote(this_.request, input);
+            });
+        });
+        
+        for(var i = 0; i < this.request.notes.length; i++) {
+            //console.log("note "+this.request.notes[i].id);
+            var note = this.request.notes[i];
+            this.content.find(".deleteNoteButton-" + note.id).data("note", note).click(function() {
+                var note = $(this).data("note");
+                var msg = 'Are you sure you want to delete the note "' + note.note + '" from Field Trip Request #' + this_.request.id + '?';
+                otp.widgets.Dialogs.showYesNoDialog(msg, 'Confirm Note Delete', function() {
+                    this_.module.deleteNote(note);                  
+                });                
+            });
+        }
+        
     },
     
     onClose : function() {

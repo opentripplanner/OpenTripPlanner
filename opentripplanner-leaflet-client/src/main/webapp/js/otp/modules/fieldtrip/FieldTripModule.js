@@ -745,6 +745,54 @@ otp.modules.fieldtrip.FieldTripModule =
         
         return true;
     },
+    
+    addNote: function(request, note) {
+        var this_ = this;
+
+        $.ajax(this.datastoreUrl+'/fieldtrip/addNote', {
+            type: 'POST',
+            
+            data: {
+                sessionId : this.sessionManager.sessionId,
+                requestId : request.id,
+                'note.note' : note,
+                'note.userName' : this.sessionManager.username,
+            },
+            
+            success: function(data) {
+                this_.loadRequests();
+            },
+            
+            error: function(data) {
+                console.log("error adding note:");
+                console.log(data);
+            }
+        });
+    },
+
+    deleteNote: function(note) {
+        var this_ = this;
+
+        $.ajax(this.datastoreUrl+'/fieldtrip/deleteNote', {
+            type: 'POST',
+            
+            data: {
+                sessionId : this.sessionManager.sessionId,
+                noteId : note.id,
+            },
+            
+            success: function(data) {
+                this_.loadRequests();
+            },
+            
+            error: function(data) {
+                console.log("error deleting note:");
+                console.log(data);
+            }
+        });
+    },
+        
+    
 });
 
 

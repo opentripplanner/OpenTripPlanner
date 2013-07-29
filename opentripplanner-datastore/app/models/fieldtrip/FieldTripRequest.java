@@ -113,6 +113,10 @@ public class FieldTripRequest extends GenericModel  {
     @Expose
     public List<FieldTripFeedback> feedback;
         
+    @OneToMany(mappedBy="request", cascade=CascadeType.ALL)
+    @Expose
+    public List<FieldTripNote> notes;
+
     @Expose
     @As("yyyy-MM-dd'T'HH:mm:ss")
     public Date timeStamp;
