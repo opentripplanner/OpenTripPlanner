@@ -3,16 +3,16 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>opentripplanner-webapp</artifactId>
     <packaging>war</packaging>
-    <name>OpenTripPlanner Main Client</name>
+    <name>OpenTripPlanner OpenLayers Client</name>
 
     <parent>
-        <artifactId>opentripplanner</artifactId>
         <groupId>org.opentripplanner</groupId>
+        <artifactId>opentripplanner</artifactId>
         <version>0.9.2-SNAPSHOT</version>
     </parent>
 
     <build>
-        <finalName>opentripplanner-webapp</finalName>
+        <finalName>otp-openlayers-client</finalName>
         <plugins>
             <plugin>
                 <groupId>ro.isdc.wro4j</groupId>
