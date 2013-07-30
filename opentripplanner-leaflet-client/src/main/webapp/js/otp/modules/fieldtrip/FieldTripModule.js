@@ -682,26 +682,40 @@ otp.modules.fieldtrip.FieldTripModule =
     saveRequestTrip : function(request, type) {
         if(!this.checkPlanValidity(request)) return;
         
+        var this_ = this;
+
         var outboundTrip = otp.util.FieldTrip.getOutboundTrip(request);
         if(type === 'outbound' && outboundTrip) {
-            this.deleteTrip(outboundTrip);
-            alert("Note: request already had planned outbound trip; previously planned trip overwritten.");
+            var msg = "This action will overwrite a previously planned outbound itinerary for this request. Do you wish to continue?";
+            otp.widgets.Dialogs.showYesNoDialog(msg, "Overwrite Outbound Itinerary?", function() {
+                this_.deleteTrip(outboundTrip);
+                this_.saveTrip(request, 0, function(tripId) {
+                    console.log("saved "+type+" trip for req #"+request.id);
+                    this_.loadRequests();
+                });
+            });
         }
 
         var inboundTrip = otp.util.FieldTrip.getInboundTrip(request);
         if(type === 'inbound' && inboundTrip) {
-            this.deleteTrip(inboundTrip);
-            alert("Note: request already had planned inbound trip; previously planned trip overwritten.");
+            var msg = "This action will overwrite a previously planned inbound itinerary for this request. Do you wish to continue?";
+            otp.widgets.Dialogs.showYesNoDialog(msg, "Overwrite Inbound Itinerary?", function() {
+                this_.deleteTrip(outboundTrip);
+                this_.saveTrip(request, 1, function(tripId) {
+                    console.log("saved "+type+" trip for req #"+request.id);
+                    this_.loadRequests();
+                });
+            });
         }
         
-        var this_ = this;
-        if(type === "outbound") var requestOrder = 0;
+        /*if(type === "outbound") var requestOrder = 0;
         if(type === "inbound") var requestOrder = 1;
 
         this.saveTrip(request, requestOrder, function(tripId) {
             console.log("saved "+type+" trip for req #"+request.id);
             this_.loadRequests();
-        });
+        });*/
+        
         /*this.saveTrip(request, function(tripId) {
             if(type === "outbound") var url = this.datastoreUrl+'/fieldtrip/setOutboundTrip';
             if(type === "inbound") var url = this.datastoreUrl+'/fieldtrip/setInboundTrip';
@@ -729,7 +743,7 @@ otp.modules.fieldtrip.FieldTripModule =
     
     checkPlanValidity : function(request) {
         if(this.groupPlan == null) {
-            alert("No active plan to save");
+            otp.widgets.Dialogs.showOkDialog("No active plan to save", "Cannot Save Plan");
             return false;
         }
         
@@ -739,7 +753,8 @@ otp.modules.fieldtrip.FieldTripModule =
         if(planDeparture.date() != requestDate.date() ||
                 planDeparture.month() != requestDate.month() ||
                 planDeparture.year() != requestDate.year()) {
-            alert("Planned trip date (" + planDeparture.format("MM/DD/YYYY") + ") is not the requested day of travel (" + requestDate.format("MM/DD/YYYY") + ")");
+            var msg = "Planned trip date (" + planDeparture.format("MM/DD/YYYY") + ") is not the requested day of travel (" + requestDate.format("MM/DD/YYYY") + ")";
+            otp.widgets.Dialogs.showOkDialog(msg, "Cannot Save Plan");
             return false;
         }
         
