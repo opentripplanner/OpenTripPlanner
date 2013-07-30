@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.prefs.Preferences;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -29,7 +30,9 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.opentripplanner.decoration.Configurable;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +42,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public abstract class GenericXmlBikeRentalDataSource implements BikeRentalDataSource {
+public abstract class GenericXmlBikeRentalDataSource implements BikeRentalDataSource, Configurable {
 
     private static final Logger log = LoggerFactory.getLogger(BixiBikeRentalDataSource.class);
 
@@ -137,7 +140,17 @@ public abstract class GenericXmlBikeRentalDataSource implements BikeRentalDataSo
 
     public abstract BikeRentalStation makeStation(Map<String, String> attributes);
 
+    @Override
     public String toString() {
         return getClass().getName() + "(" + url + ")";
+    }
+    
+    @Override
+    public void configure(Graph graph, Preferences preferences) {
+        String url = preferences.get("url", null);
+        if (url == null)
+            throw new IllegalArgumentException("Missing mandatory 'url' configuration.");
+        setUrl(url);
+        return true;
     }
 }

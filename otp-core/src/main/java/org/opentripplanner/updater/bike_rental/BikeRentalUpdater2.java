@@ -31,15 +31,16 @@ import org.opentripplanner.routing.edgetype.loader.LinkRequest;
 import org.opentripplanner.routing.edgetype.loader.NetworkLinkerLibrary;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
-@Deprecated // TODO Remove
-public class BikeRentalUpdater implements Runnable {
-    private static final Logger LOG = LoggerFactory.getLogger(BikeRentalUpdater.class);
+/**
+ * Dynamic bike-rental station updater which encapsulate one BikeRentalDataSource. 
+ *
+ */
+public class BikeRentalUpdater2 implements Runnable {
+    private static final Logger LOG = LoggerFactory.getLogger(BikeRentalUpdater2.class);
 
     Map<BikeRentalStation, BikeRentalStationVertex> verticesByStation = new HashMap<BikeRentalStation, BikeRentalStationVertex>();
 
@@ -51,66 +52,27 @@ public class BikeRentalUpdater implements Runnable {
 
     private BikeRentalStationService service;
 
-    private String routerId;
-
-    private GraphService graphService;
-
     private String network = "default";
-    
-    private boolean setup = false;
-
-    public void setRouterId(String routerId) {
-        this.routerId = routerId;
-    }
 
     public void setNetwork(String network) {
         this.network = network;
     }
 
-    @Autowired
-    public void setBikeRentalDataSource(BikeRentalDataSource source) {
+    public BikeRentalUpdater2(Graph graph, BikeRentalDataSource source) {
+        LOG.info("Setting up bike rental updater.");
+        this.graph = graph;
         this.source = source;
-    }
-
-    @Autowired
-    public void setGraphService(GraphService graphService) {
-        this.graphService = graphService;
-    }
-
-    public boolean setup() {
-        graph = graphService.getGraph(routerId); // Handle null routerId.
-        if (graph == null && setup) {
-            // We temporary disable the updater: no graph ready (yet).
-            LOG.error("Can't get graph for router ID {}, disabling updater.", routerId);
-            networkLinkerLibrary = null;
-            service = null;
-            setup = false;
+        networkLinkerLibrary = new NetworkLinkerLibrary(graph,
+                Collections.<Class<?>, Object> emptyMap());
+        service = graph.getService(BikeRentalStationService.class);
+        if (service == null) {
+            service = new BikeRentalStationService();
+            graph.putService(BikeRentalStationService.class, service);
         }
-        if (graph != null && !setup) {
-            // A graph is available, setting up.
-            LOG.info("Setting up updater for router ID {}.", routerId);
-            networkLinkerLibrary = new NetworkLinkerLibrary(graph,
-                    Collections.<Class<?>, Object> emptyMap());
-            service = graph.getService(BikeRentalStationService.class);
-            if (service == null) {
-                service = new BikeRentalStationService();
-                graph.putService(BikeRentalStationService.class, service);
-            }
-            setup = true;
-        }
-        return setup;
-    }
-
-    public List<BikeRentalStation> getStations() {
-        return source.getStations();
     }
 
     @Override
     public void run() {
-        if (!setup()) {
-            // Updater has been disabled (no graph available).
-            return;
-        }
         LOG.debug("Updating bike rental stations from " + source);
         if (!source.update()) {
             LOG.debug("No updates");
@@ -154,7 +116,7 @@ public class BikeRentalUpdater implements Runnable {
         }
         for (BikeRentalStation station : toRemove) {
             // post-iteration removal to avoid concurrent modification
-            verticesByStation.remove(station); 
+            verticesByStation.remove(station);
         }
 
     }

@@ -22,12 +22,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import lombok.Getter;
 import lombok.Setter;
 
+import org.opentripplanner.decoration.GraphDecorator;
+import org.opentripplanner.decoration.PropertiesPreferences;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
@@ -49,6 +52,7 @@ public class GraphServiceFileImpl {
     private static final Logger LOG = LoggerFactory.getLogger(GraphServiceFileImpl.class);
 
     public static final String GRAPH_FILENAME = "Graph.obj";
+    public static final String CONFIG_FILENAME = "Graph.properties";
 
     @Getter 
     @Setter
@@ -59,6 +63,8 @@ public class GraphServiceFileImpl {
     private Map<String, LoadLevel> levels = new HashMap<String, LoadLevel>();
 
     private LoadLevel loadLevel = LoadLevel.FULL;
+
+    private GraphDecorator decorator = new GraphDecorator();
 
     @Setter
     private StreetVertexIndexFactory indexFactory = new DefaultStreetVertexIndexFactory();
@@ -122,8 +128,8 @@ public class GraphServiceFileImpl {
             sb.append(routerId);
             sb.append(File.separator);
         }
-        sb.append("Graph.obj");
-        String graphFileName = sb.toString();
+        String graphFileName = sb.toString() + GRAPH_FILENAME;
+        String configFileName = sb.toString() + CONFIG_FILENAME;
         LOG.debug("graph file for routerId '{}' is at {}", routerId, graphFileName);
         InputStream is = null;
         final String CLASSPATH_PREFIX = "classpath:/";
@@ -139,7 +145,7 @@ public class GraphServiceFileImpl {
                 is = new FileInputStream(graphFile);
             } catch (IOException ex) {
                 is = null;
-                ex.printStackTrace();
+                LOG.warn("Error creating graph input stream", ex);
             }
         }
         if (is == null) {
@@ -149,13 +155,25 @@ public class GraphServiceFileImpl {
         }
         LOG.debug("graph input stream successfully opened.");
         LOG.info("Loading graph...");
+        Graph graph = null;
         try {
-            return Graph.load(new ObjectInputStream(is), loadLevel, indexFactory);
+            graph = Graph.load(new ObjectInputStream(is), loadLevel, indexFactory);
         } catch (Exception ex) {
             LOG.error("Exception while loading graph from {}.", graphFileName);
             ex.printStackTrace();
             return null;
         }
+        File configFile = new File(configFileName);
+        if (configFile.canRead()) {
+            try {
+                LOG.info("Loading config from file {}", configFileName);
+                Preferences config = new PropertiesPreferences(configFile);
+                decorator.setupGraph(graph, config);
+            } catch (IOException e) {
+                LOG.error("Can't read config file", e);
+            }
+        }
+        return graph;
     }
 
     public boolean reloadGraphs(boolean preEvict) {
@@ -180,6 +198,8 @@ public class GraphServiceFileImpl {
         Graph graph = this.loadGraph(routerId);
         if (graph != null) {
             synchronized (graphs) {
+                if (!preEvict)
+                    evictGraph(routerId);
                 graphs.put(routerId, graph);
             }
             levels.put(routerId, loadLevel);
@@ -198,7 +218,12 @@ public class GraphServiceFileImpl {
         LOG.debug("evicting graph {}", routerId);
         synchronized (graphs) {
             Graph existing = graphs.remove(routerId);
-            return existing != null;
+            if (existing != null) {
+                decorator.shutdownGraph(existing);
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 
@@ -206,7 +231,9 @@ public class GraphServiceFileImpl {
         int n;
         synchronized (graphs) {
             n = graphs.size();
-            graphs.clear();
+            for (String routerId : graphs.keySet()) {
+                evictGraph(routerId);
+            }
         }
         return n;
     }
