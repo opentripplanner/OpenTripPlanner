@@ -42,6 +42,14 @@ otp.modules.fieldtrip.FieldTripManagerWidget =
         this.mainDiv.find('.refreshButton').button().click(function() {
             this_.module.loadRequests();
         });
+
+        this.mainDiv.find('.reportDateInput').datepicker().datepicker("setDate", new Date());/*.click(function() {
+        });*/
+
+        this.mainDiv.find('.viewReportButton').button().click(function() {
+            var m = moment(this_.mainDiv.find('.reportDateInput').val());
+            window.open(otp.config.datastoreUrl + "/fieldtrip/opsReport?month=" + (m.month()+1) + "&day=" + m.date() + "&year=" + m.year());
+        });
         
         this.mainDiv.resizable({
             alsoResize: '#' + this.id + ' .ui-tabs-panel',

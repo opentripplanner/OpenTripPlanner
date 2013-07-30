@@ -24,8 +24,8 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
         
         this.module = module;
         this.request = request;
-        console.log("request "+request.id+":");
-        console.log(request);
+        //console.log("request "+request.id+":");
+        //console.log(request);
         otp.widgets.Widget.prototype.initialize.call(this, id, module, {
             cssClass : 'otp-fieldTrip-requestWidget',
             title : "Field Trip Request #"+request.id,
@@ -43,7 +43,13 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
         var context = _.clone(this.request);
         context.widgetId = this.id;
         context.dsUrl = otp.config.datastoreUrl;
-        if(this.request.travelDate) context.travelDate = moment(this.request.travelDate).format("dddd, MMMM D, YYYY");
+        if(this.request.travelDate) {
+            var m = moment(this.request.travelDate);
+            context.travelDate = m.format("dddd, MMMM D, YYYY");
+            context.travelDay = m.date();
+            context.travelMonth = m.month()+1;
+            context.travelYear = m.year();
+        }
         if(this.request.arriveDestinationTime) context.arriveDestinationTime = moment(this.request.arriveDestinationTime).format(otp.config.timeFormat);
         if(this.request.leaveDestinationTime) context.leaveDestinationTime = moment(this.request.leaveDestinationTime).format(otp.config.timeFormat);
         if(this.request.arriveSchoolTime) context.arriveSchoolTime = moment(this.request.arriveSchoolTime).format(otp.config.timeFormat);
