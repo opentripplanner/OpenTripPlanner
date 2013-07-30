@@ -160,6 +160,7 @@ public class OTPConfigurator {
             List<GtfsBundle> gtfsBundles = Lists.newArrayList();
             for (File gtfsFile : gtfsFiles) {
                 GtfsBundle gtfsBundle = new GtfsBundle(gtfsFile);
+                gtfsBundle.setTransfersTxtDefinesStationPaths(params.useTransfersTxt);
                 gtfsBundles.add(gtfsBundle);
             }
             GraphBuilder gtfsBuilder = new GtfsGraphBuilderImpl(gtfsBundles);
