@@ -235,6 +235,22 @@ public class Graph implements Serializable {
         return (T) _services.get(serviceType);
     }
 
+    public <T> T getService(Class<T> serviceType, boolean autoCreate) {
+        @SuppressWarnings("unchecked")
+        T t = (T) _services.get(serviceType);
+        if (t == null) {
+            try {
+                t = (T)serviceType.newInstance();
+            } catch (InstantiationException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+            _services.put(serviceType, t);
+        }
+        return t;
+    }
+
     public void remove(Vertex vertex) {
         vertices.remove(vertex.getLabel());
     }
