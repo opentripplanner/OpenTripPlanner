@@ -68,6 +68,10 @@ public class CommandLineParameters {
     @Parameter(names = {"--noTransit"},
     description = "skip all transit input files (GTFS)")
     boolean noTransit;
+
+    @Parameter(names = {"--useTransfersTxt"},
+    description = "use transfers.txt file for the gtfsBundle (GTFS)")
+    boolean useTransfersTxt;
     
     @Parameter(names = {"--noStreets"},
     description = "skip all street input files (OSM)")
