@@ -151,6 +151,5 @@ public abstract class GenericXmlBikeRentalDataSource implements BikeRentalDataSo
         if (url == null)
             throw new IllegalArgumentException("Missing mandatory 'url' configuration.");
         setUrl(url);
-        return true;
     }
 }
