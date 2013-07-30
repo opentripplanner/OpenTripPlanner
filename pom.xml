@@ -21,11 +21,10 @@
     <module>opentripplanner-api-webapp</module>
     <module>opentripplanner-geocoder</module>
     <module>otp-core</module>
-    <module>opentripplanner-webapp</module>
-    <module>opentripplanner-analyst-client</module>
-    <module>opentripplanner-leaflet-client</module>
+    <module>otp-openlayers-client</module>
+    <module>otp-analyst-client</module>
+    <module>otp-leaflet-client</module>
     <module>opentripplanner-municoder</module>
-    <module>otp-standalone</module>
   </modules>
 
   <build>
