@@ -34,12 +34,20 @@ import org.springframework.stereotype.Component;
 @Component
 public class PatchServiceImpl implements PatchService {
 
+    private Graph graph;
     private GraphService graphService;
 
     private HashMap<String, Patch> patches = new HashMap<String, Patch>();
     private HashMap<AgencyAndId,List<Patch>> patchesByRoute = new HashMap<AgencyAndId, List<Patch>>();
     private HashMap<AgencyAndId, List<Patch>> patchesByStop = new HashMap<AgencyAndId, List<Patch>>();
 
+    protected PatchServiceImpl() {
+    }
+    
+    public PatchServiceImpl(Graph graph) {
+        this.graph = graph;
+    }
+    
     @Autowired
     public void setGraphService(GraphService graphService) {
         this.graphService = graphService;
@@ -56,9 +64,10 @@ public class PatchServiceImpl implements PatchService {
 
     @Override
     public synchronized void apply(Patch patch) {
-        Graph graph = graphService.getGraph();
+        if (graph == null)
+            graph = graphService.getGraph();
 
-        if(patches.containsKey(patch.getId())) {
+        if (patches.containsKey(patch.getId())) {
             expire(patches.get(patch.getId()));
         }
 
@@ -122,20 +131,21 @@ public class PatchServiceImpl implements PatchService {
     }
 
     private void expire(Patch patch) {
-        Graph graph = graphService.getGraph();
+        if (graph == null)
+            graph = graphService.getGraph();
 
-                if (patch instanceof AlertPatch) {
-                    AlertPatch alertPatch = (AlertPatch) patch;
-                    AgencyAndId stop = alertPatch.getStop();
-                    if (stop != null) {
-                        MapUtils.removeFromMapList(patchesByStop, stop, patch);
-                    }
-                    AgencyAndId route = alertPatch.getRoute();
-                    if (route != null) {
-                        MapUtils.removeFromMapList(patchesByRoute, stop, patch);
-                    }
-                }
-
-                patch.remove(graph);
+        if (patch instanceof AlertPatch) {
+            AlertPatch alertPatch = (AlertPatch) patch;
+            AgencyAndId stop = alertPatch.getStop();
+            if (stop != null) {
+                MapUtils.removeFromMapList(patchesByStop, stop, patch);
             }
+            AgencyAndId route = alertPatch.getRoute();
+            if (route != null) {
+                MapUtils.removeFromMapList(patchesByRoute, stop, patch);
+            }
+        }
+
+        patch.remove(graph);
+    }
 }

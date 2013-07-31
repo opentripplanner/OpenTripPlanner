@@ -53,18 +53,6 @@ public class StoptimeUpdaterTest {
     private StoptimeUpdater updater;
     private TripUpdate tripUpdate;
     
-    private static GraphService graphService = new GraphService() {
-        @Override public void setLoadLevel(LoadLevel level) {}
-        @Override public boolean reloadGraphs(boolean preEvict) { return false; }
-        @Override public boolean registerGraph(String routerId, Graph graph) { return false; }
-        @Override public boolean registerGraph(String routerId, boolean preEvict) { return false; }
-        @Override public Collection<String> getRouterIds() { return null; }
-        @Override public Graph getGraph(String routerId) { return graph; }
-        @Override public Graph getGraph() { return graph; }
-        @Override public boolean evictGraph(String routerId) { return false; }
-        @Override public int evictAll() { return 0; }
-    };
-    
     @BeforeClass
     public static void setUpClass() throws Exception {
         context = GtfsLibrary.readGtfs(new File("../otp-core/" + ConstantsForTests.FAKE_GTFS));
@@ -81,8 +69,7 @@ public class StoptimeUpdaterTest {
     
     @Before
     public void setUp() {
-        updater = new StoptimeUpdater();
-        updater.setGraphService(graphService);
+        updater = new StoptimeUpdater(graph);
         updater.setUpdateStreamer(new UpdateStreamer() {
             @Override
             public List<TripUpdate> getUpdates() {

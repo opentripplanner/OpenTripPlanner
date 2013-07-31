@@ -16,6 +16,8 @@ package org.opentripplanner.updater;
 import java.io.IOException;
 import java.io.InputStream;
 
+import lombok.Setter;
+
 import org.opentripplanner.routing.services.PatchService;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
@@ -28,27 +30,18 @@ import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 public class GtfsRealtimeUpdater implements Runnable {
     private static final Logger log = LoggerFactory.getLogger(GtfsRealtimeUpdater.class);
 
+    @Setter
     private String url;
 
+    @Setter
     private String defaultAgencyId;
 
     private PatchService patchService;
 
+    @Setter
     private long earlyStart;
 
     private UpdateHandler updateHandler = null;
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setDefaultAgencyId(String defaultAgencyId) {
-        this.defaultAgencyId = defaultAgencyId;
-    }
 
     public void run() {
         try {
@@ -56,12 +49,12 @@ public class GtfsRealtimeUpdater implements Runnable {
             if (data == null) {
                 throw new RuntimeException("Failed to get data from url " + url);
             }
-            if(updateHandler == null) {
+            if (updateHandler == null) {
                 updateHandler = new UpdateHandler();
             }
             updateHandler.setEarlyStart(earlyStart);
             updateHandler.setDefaultAgencyId(defaultAgencyId);
-            updateHandler.setPatchService(getPatchService());
+            updateHandler.setPatchService(patchService);
 
             FeedMessage feed = GtfsRealtime.FeedMessage.parseFrom(data);
             updateHandler.update(feed);
@@ -75,17 +68,6 @@ public class GtfsRealtimeUpdater implements Runnable {
         this.patchService = patchService;
     }
 
-    public PatchService getPatchService() {
-        return patchService;
-    }
-
-    public long getEarlyStart() {
-        return earlyStart;
-    }
-
-    public void setEarlyStart(long earlyStart) {
-        this.earlyStart = earlyStart;
-    }
     public String toString() {
         return "GtfsRealtimeUpdater(" + url + ")";
     }

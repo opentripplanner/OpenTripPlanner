@@ -30,15 +30,15 @@ import org.slf4j.LoggerFactory;
 /**
  * Decorate by creating stop time updater.
  * 
- * Usage example:
+ * Usage example ('rt' bean name is an example):
  * 
- * <code>
+ * <pre>
  * rt.type = stop-time-updater
  * rt.frequencySec = 60
  * rt.source.type = gtfs-http
  * rt.source.url = http://host.tld/path
  * rt.source.defaultAgencyId = TA
- * </code>
+ * </pre>
  * 
  */
 public class StopTimeUpdateDecorator implements Configurable {
@@ -82,6 +82,8 @@ public class StopTimeUpdateDecorator implements Configurable {
             updater.setMaxSnapshotFrequency(maxSnapshotFrequency);
         updater.setPurgeExpiredData(preferences.getBoolean("purgeExpiredData", true));
         long frequencySec = preferences.getLong("frequencySec", DEFAULT_UPDATE_FREQ_SEC);
+        LOG.info("Creating stop time updater running every {} seconds : {}", frequencySec,
+                updateStreamer);
         PeriodicTimerGraphUpdater periodicGraphUpdater = graph
                 .getService(PeriodicTimerGraphUpdater.class);
         periodicGraphUpdater.addUpdater(updater, frequencySec * 1000);

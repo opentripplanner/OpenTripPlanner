@@ -47,6 +47,7 @@ public class GraphDecorator {
         configurables = new HashMap<String, Class<? extends Configurable>>();
         configurables.put("bike-rental", BikeRentalDecorator.class);
         configurables.put("stop-time-updater", StopTimeUpdateDecorator.class);
+        configurables.put("real-time-alerts", RealTimeAlertDecorator.class);
     }
 
     public void setupGraph(Graph graph, Preferences config) {
@@ -61,7 +62,7 @@ public class GraphDecorator {
                 Class<? extends Configurable> clazz = configurables.get(beanType);
                 if (clazz != null) {
                     try {
-                        LOG.info("Configuring bean {} of type {} ({})", beanName, beanType,
+                        LOG.info("Configuring bean '{}' of type '{}' ({})", beanName, beanType,
                                 clazz.getName());
                         Configurable bean = clazz.newInstance();
                         bean.configure(graph, beanConfig);

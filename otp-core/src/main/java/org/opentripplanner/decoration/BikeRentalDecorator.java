@@ -33,15 +33,15 @@ import org.slf4j.LoggerFactory;
 /**
  * Decorate by creating dynamic bike rental station based on a source type.
  * 
- * Usage example:
+ * Usage example ('bike1' bean name is an example):
  * 
- * <code>
+ * <pre>
  * bike1.type = bike-rental
  * bike1.frequencySec = 60
  * bike1.networks = V3,V3N
  * bike1.source.type = jcdecaux
  * bike1.source.url = https://api.jcdecaux.com/vls/v1/stations?contract=Xxx?apiKey=Zzz
- * </code>
+ * </pre>
  * 
  */
 public class BikeRentalDecorator implements Configurable {
@@ -82,6 +82,8 @@ public class BikeRentalDecorator implements Configurable {
         BikeRentalUpdater2 updater = new BikeRentalUpdater2(graph, source);
         updater.setNetwork(preferences.get("networks", DEFAULT_NETWORK_LIST));
         long frequencySec = preferences.getLong("frequencySec", DEFAULT_UPDATE_FREQ_SEC);
+        LOG.info("Creating bike-rental updater running every {} seconds : {}", frequencySec,
+                source);
         PeriodicTimerGraphUpdater periodicGraphUpdater = graph
                 .getService(PeriodicTimerGraphUpdater.class);
         periodicGraphUpdater.addUpdater(updater, frequencySec * 1000);
