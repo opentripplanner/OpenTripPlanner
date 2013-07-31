@@ -129,6 +129,7 @@ public class PlanGeneratorTest {
 
     /**
      * Test that a LEG_SWITCH mode at the end of a graph path does not generate an extra leg.
+     * Also test that such a LEG_SWITCH mode does not show up as part of the itinerary.
      */
     @Test
     public void testEndWithLegSwitch() {
@@ -138,6 +139,7 @@ public class PlanGeneratorTest {
         Itinerary itinerary = new PlanGenerator().generateItinerary(graphPath, false);
 
         assertEquals(1, itinerary.legs.size());
+        assertEquals("WALK", itinerary.legs.get(0).mode);
     }
 
     /**
