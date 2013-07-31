@@ -13,8 +13,12 @@
 
 package org.opentripplanner.decoration;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
@@ -37,6 +41,11 @@ import org.slf4j.LoggerFactory;
  * This class then create "beans" (usually real-time connector, etc...) depending on the given
  * configuration, and configure them using the corresponding children Preferences node.
  * 
+ * If an embedded configuration is present in the graph, we also try to use it. In case of conflicts
+ * between two child nodes in both configs (two childs node with the same name) the dynamic (ie
+ * provided) configuration takes complete precedence over the embedded one: childrens properties are
+ * *not* merged.
+ * 
  */
 public class GraphDecorator {
 
@@ -51,26 +60,20 @@ public class GraphDecorator {
         configurables.put("real-time-alerts", RealTimeAlertDecorator.class);
     }
 
-    public void setupGraph(Graph graph, Preferences config) {
+    public void setupGraph(Graph graph, Preferences mainConfig) {
         // Create a periodic updater per graph
         PeriodicTimerGraphUpdater periodicUpdater = graph.getService(
                 PeriodicTimerGraphUpdater.class, true);
 
-        // TODO Merge both bundled and provided config ?
-        if (config != null) {
-            // Apply provided configuration
-            applyConfigurationToGraph(graph, config);
-        } else {
-            // Look for embedded config if it exists
-            EmbeddedConfigService embeddedConfigService = graph
-                    .getService(EmbeddedConfigService.class);
-            if (embeddedConfigService != null) {
-                LOG.info("Decorating graph using embedded config");
-                Preferences embeddedConfig = new PropertiesPreferences(
-                        embeddedConfigService.getProperties());
-                applyConfigurationToGraph(graph, embeddedConfig);
-            }
+        // Look for embedded config if it exists
+        EmbeddedConfigService embeddedConfigService = graph.getService(EmbeddedConfigService.class);
+        Preferences embeddedConfig = null;
+        if (embeddedConfigService != null) {
+            embeddedConfig = new PropertiesPreferences(embeddedConfigService.getProperties());
         }
+        LOG.info("Using configurations: " + (mainConfig == null ? "" : "[main]") + " "
+                + (embeddedConfig == null ? "" : "[embedded]"));
+        applyConfigurationToGraph(graph, Arrays.asList(mainConfig, embeddedConfig));
 
         // Delete the periodic updater if it contains nothing
         if (periodicUpdater.size() == 0) {
@@ -78,21 +81,33 @@ public class GraphDecorator {
         }
     }
 
-    private void applyConfigurationToGraph(Graph graph, Preferences config) {
+    /**
+     * Apply a list of configs to a graph. Please note that the order of the config in the list *is
+     * important* as a child node already seen will not be overriden.
+     */
+    private void applyConfigurationToGraph(Graph graph, List<Preferences> configs) {
         try {
-            for (String beanName : config.childrenNames()) {
-                Preferences beanConfig = config.node(beanName);
-                String beanType = beanConfig.get("type", null);
-                Class<? extends Configurable> clazz = configurables.get(beanType);
-                if (clazz != null) {
-                    try {
-                        LOG.info("Configuring bean '{}' of type '{}' ({})", beanName, beanType,
-                                clazz.getName());
-                        Configurable bean = clazz.newInstance();
-                        bean.configure(graph, beanConfig);
-                    } catch (Exception e) {
-                        LOG.error("Can't configure bean: " + beanName, e);
-                        // Continue on next bean
+            Set<String> beanNames = new HashSet<String>();
+            for (Preferences config : configs) {
+                if (config == null)
+                    continue;
+                for (String beanName : config.childrenNames()) {
+                    if (beanNames.contains(beanName))
+                        continue; // Already processed
+                    beanNames.add(beanName);
+                    Preferences beanConfig = config.node(beanName);
+                    String beanType = beanConfig.get("type", null);
+                    Class<? extends Configurable> clazz = configurables.get(beanType);
+                    if (clazz != null) {
+                        try {
+                            LOG.info("Configuring bean '{}' of type '{}' ({})", beanName, beanType,
+                                    clazz.getName());
+                            Configurable bean = clazz.newInstance();
+                            bean.configure(graph, beanConfig);
+                        } catch (Exception e) {
+                            LOG.error("Can't configure bean: " + beanName, e);
+                            // Continue on next bean
+                        }
                     }
                 }
             }
