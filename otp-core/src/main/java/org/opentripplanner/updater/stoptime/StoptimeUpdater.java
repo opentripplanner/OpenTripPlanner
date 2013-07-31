@@ -71,17 +71,36 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
     
     protected ServiceDate lastPurgeDate = null;
     
-    // nothing in the timetable snapshot binds it to one graph. we could use this updater for all
-    // graphs at once
     protected Graph graph;
     protected long lastSnapshotTime = -1;
     
     /**
-     * Set the data sources for the target graphs.
+     * No-arg constructor is needed for DI.
+     */
+    protected StoptimeUpdater() {
+    }
+
+    /**
+     * Build a StoptimeUpdater binded to a single graph.
+     * @param graph
+     */
+    public StoptimeUpdater(Graph graph) {
+        setup(graph);
+    }
+    
+    /**
+     * Called when used in DI-context: graph is default one.
      */
     @PostConstruct
     public void setup () {
-        graph = graphService.getGraph();
+        setup(graphService.getGraph());
+    }
+    
+    /**
+     * Initialise for a given graph. Set the data sources for the target graphs.
+     */
+    private void setup(Graph graph) {
+        this.graph = graph;
         graph.timetableSnapshotSource = this;
         transitIndexService = graph.getService(TransitIndexService.class);
         if (transitIndexService == null)
@@ -115,8 +134,6 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
      */
     @Override
     public void run() {
-        graph = graphService.getGraph();
-        transitIndexService = graph.getService(TransitIndexService.class);
         
         List<TripUpdate> tripUpdates = updateStreamer.getUpdates(); 
         if (tripUpdates == null) {

@@ -45,8 +45,8 @@ public class GraphDecorator {
 
     static {
         configurables = new HashMap<String, Class<? extends Configurable>>();
-        // TODO Add new configurables: real-time
         configurables.put("bike-rental", BikeRentalDecorator.class);
+        configurables.put("stop-time-updater", StopTimeUpdateDecorator.class);
     }
 
     public void setupGraph(Graph graph, Preferences config) {
