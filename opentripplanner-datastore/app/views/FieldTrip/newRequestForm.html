@@ -3,24 +3,25 @@
 #{stylesheet 'jquery-ui/jquery-ui-1.9.1.custom.css' /}
 #{stylesheet 'main.css' /}
 
-#{form @FieldTrip.newRequest(), id:'requestForm'}
-
+<form action="newRequest" id="requestForm" method="post">
 
 <div class="mainContent">
 <h2>Field Trip Request Form</h2>
 
-Complete and return this form to request a field trip if you wish to travel on TriMet with a group of 15 or more. 
-If you have any questions, please email us at fieldtrips@trimet.org or call 503-962-2424 option 4.
+Complete and return this form to request a field trip if you wish to travel on 
+TriMet with a group of 15 or more.  <u>Trips must be scheduled and paid for (if 
+applicable) at least two weeks in advance</u>.  If you have any questions, please 
+email us at fieldtrips@trimet.org or call 503-962-2424, option 4.
 
 <h3>Contact Information</h3>
 
 <div class="otp-fieldTripRequest-row">
-  Teacher Name: <input id="teacherName" name="req.teacherName"/>&nbsp;&nbsp;
-  School Name: <input id="schoolName"  name="req.schoolName"/>
+  Teacher Name: <input id="teacherName" name="req.teacherName" style="width: 250px;" />&nbsp;&nbsp;
+  School Name: <input id="schoolName"  name="req.schoolName" style="width: 250px;"/>
 </div>
 
 <div class="otp-fieldTripRequest-row">
-  Address: <input name="req.address" />&nbsp;&nbsp;
+  Address: <input name="req.address" style="width: 250px;" />&nbsp;&nbsp;
   City: <input name="req.city" />&nbsp;&nbsp;
   State: <input name="req.state" style="width: 40px;" />&nbsp;&nbsp;
   Zip: <input name="req.zip" style="width: 60px;" />
@@ -47,12 +48,20 @@ If you have any questions, please email us at fieldtrips@trimet.org or call 503-
 </div>
 
 <div class="otp-fieldTripRequest-row">
-  Starting Point (Address): <input id="startLocation" name="req.startLocation" />&nbsp;&nbsp;Destination (Address): <input id="endLocation" name="req.endLocation" />
+  Starting Point (Address): <input id="startLocation" name="req.startLocation" style="width: 500px" />&nbsp;&nbsp;
 </div>
 
 <div class="otp-fieldTripRequest-row">
+  Destination (Address): <input id="endLocation" name="req.endLocation" style="width: 500px" />
+</div>
+
+<!--
+<div class="otp-fieldTripRequest-row">
   Intermediate Point(s): <input id="startLocation" name="req.intermediateLocations" style="width: 600px;" />
 </div>
+-->
+
+
 
 <div class="otp-fieldTripRequest-row">
   Date of Trip: <input id="travelDate" name="req.travelDate" />
@@ -90,21 +99,33 @@ If you have any questions, please email us at fieldtrips@trimet.org or call 503-
 </div>
 <input type="hidden" id="arriveSchoolTime" name="req.arriveSchoolTime" />
 
+<div class="otp-fieldTripRequest-row" style="margin-top: 1em">
+  Notes:<br>
+  <textarea name="req.submitterNotes" style="width: 100%; height: 5em;"></textarea>
+</div>
 
 <h3>Payment Information</h3>
 
-<div class="otp-fieldTripRequest-row">
-  Payment preference:
-</div>
-<input name="req.paymentPreference" type="radio" value="request_call" checked /> Please call me at above phone number<br>
+Your group can use regular TriMet tickets/passes, or you can purchase a Class 
+Pass – our discounted group fare.  The Class Pass is only $1 per person (ages 
+7 and up, including adults) round trip plus a <b>$2.50 processing fee</b>.
+
+<p>
+<input name="req.paymentPreference" type="radio" value="own_tickets" checked /> I will use my own tickets<br>
+
+<div style="font-weight: bold;">- OR -</div>
+
+<p>Class Pass payment preference:</p>
+<input name="req.paymentPreference" type="radio" value="request_call" /> Please call me at above phone number<br>
 <input name="req.paymentPreference" type="radio" value="fax_cc" /> I will fax credit card information to TriMet<br>
 <input name="req.paymentPreference" type="radio" value="mail_check" /> I will mail a check to TriMet
 
 <p><input type="checkbox" name="req.requireInvoice" /> I need an invoice before paying
 
-#{/form}
+</form>
 
 
+<div style="text-align: center; font-weight: bold; margin-top: 2em;">Please verify that all information is correctly entered prior to submitting.</div>
 <div class="buttonRow">
     <div id="submitLink" style="cursor:pointer; border: 2px solid gray; width: 250px; padding: 3px; margin: 4px auto; background: white;">Submit Request</div>
 </div>
@@ -153,6 +174,8 @@ function submitClicked() {
     }
     $("#arriveSchoolTime").val(arriveSchoolTime);
 
+    console.log("submitting..");
+  
     document.forms["requestForm"].submit();
 }
 

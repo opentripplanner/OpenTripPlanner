@@ -118,6 +118,9 @@ public class FieldTripRequest extends GenericModel  {
     public List<FieldTripNote> notes;
 
     @Expose
+    public String submitterNotes;
+    
+    @Expose
     @As("yyyy-MM-dd'T'HH:mm:ss")
     public Date timeStamp;
     

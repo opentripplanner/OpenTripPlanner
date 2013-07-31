@@ -54,7 +54,8 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
         if(this.request.leaveDestinationTime) context.leaveDestinationTime = moment(this.request.leaveDestinationTime).format(otp.config.timeFormat);
         if(this.request.arriveSchoolTime) context.arriveSchoolTime = moment(this.request.arriveSchoolTime).format(otp.config.timeFormat);
 
-        if(this.request.paymentPreference === "request_call") context.paymentPreference = "Call requested at provided phone number";
+        if(this.request.paymentPreference === "own_tickets") context.paymentPreference = "Will use own tickets";
+        else if(this.request.paymentPreference === "request_call") context.paymentPreference = "Call requested at provided phone number";
         else if(this.request.paymentPreference === "fax_cc") context.paymentPreference = "Will fax credit card info to TriMet";
         else if(this.request.paymentPreference === "mail_check") context.paymentPreference = "Will mail check to TriMet";
         
