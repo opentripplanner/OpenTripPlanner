@@ -128,6 +128,19 @@ public class PlanGeneratorTest {
     }
 
     /**
+     * Test that a LEG_SWITCH mode at the end of a graph path does not generate an extra leg.
+     */
+    @Test
+    public void testEndWithLegSwitch() {
+        // Reuse testGenerateItinerary()'s graph path, but shorten it
+        GraphPath graphPath = new GraphPath(buildPath().states.get(3), false);
+
+        Itinerary itinerary = new PlanGenerator().generateItinerary(graphPath, false);
+
+        assertEquals(1, itinerary.legs.size());
+    }
+
+    /**
      * Build a GraphPath that can be used for testing. This method doesn't rely on any routing code.
      * Leg 0: Walking towards the train station
      * Leg 1: First train leg, interlined with leg 2
