@@ -163,15 +163,18 @@ public class GraphServiceFileImpl {
             ex.printStackTrace();
             return null;
         }
-        File configFile = new File(configFileName);
-        if (configFile.canRead()) {
-            try {
+        // Decorate the graph. Even if a config file is not present
+        // one could be bundled inside.
+        try {
+            File configFile = new File(configFileName);
+            Preferences config = null;
+            if (configFile.canRead()) {
                 LOG.info("Loading config from file {}", configFileName);
-                Preferences config = new PropertiesPreferences(configFile);
-                decorator.setupGraph(graph, config);
-            } catch (IOException e) {
-                LOG.error("Can't read config file", e);
+                config = new PropertiesPreferences(configFile);
             }
+            decorator.setupGraph(graph, config);
+        } catch (IOException e) {
+            LOG.error("Can't read config file", e);
         }
         return graph;
     }

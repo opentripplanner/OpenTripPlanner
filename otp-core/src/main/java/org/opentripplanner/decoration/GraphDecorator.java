@@ -19,6 +19,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.services.EmbeddedConfigService;
 import org.opentripplanner.updater.PeriodicTimerGraphUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,11 +52,34 @@ public class GraphDecorator {
     }
 
     public void setupGraph(Graph graph, Preferences config) {
-        try {
-            // Create a periodic updater per graph
-            PeriodicTimerGraphUpdater periodicUpdater = graph.getService(
-                    PeriodicTimerGraphUpdater.class, true);
+        // Create a periodic updater per graph
+        PeriodicTimerGraphUpdater periodicUpdater = graph.getService(
+                PeriodicTimerGraphUpdater.class, true);
 
+        // TODO Merge both bundled and provided config ?
+        if (config != null) {
+            // Apply provided configuration
+            applyConfigurationToGraph(graph, config);
+        } else {
+            // Look for embedded config if it exists
+            EmbeddedConfigService embeddedConfigService = graph
+                    .getService(EmbeddedConfigService.class);
+            if (embeddedConfigService != null) {
+                LOG.info("Decorating graph using embedded config");
+                Preferences embeddedConfig = new PropertiesPreferences(
+                        embeddedConfigService.getProperties());
+                applyConfigurationToGraph(graph, embeddedConfig);
+            }
+        }
+
+        // Delete the periodic updater if it contains nothing
+        if (periodicUpdater.size() == 0) {
+            graph.putService(PeriodicTimerGraphUpdater.class, null);
+        }
+    }
+
+    private void applyConfigurationToGraph(Graph graph, Preferences config) {
+        try {
             for (String beanName : config.childrenNames()) {
                 Preferences beanConfig = config.node(beanName);
                 String beanType = beanConfig.get("type", null);
@@ -72,11 +96,6 @@ public class GraphDecorator {
                     }
                 }
             }
-            // Delete the periodic updater if it contains nothing
-            if (periodicUpdater.size() == 0) {
-                graph.putService(PeriodicTimerGraphUpdater.class, null);
-            }
-
         } catch (BackingStoreException e) {
             LOG.error("Can't read configuration", e); // Should not happen
         }

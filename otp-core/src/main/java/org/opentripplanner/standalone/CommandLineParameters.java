@@ -73,6 +73,10 @@ public class CommandLineParameters {
     description = "skip all street input files (OSM)")
     boolean noStreets;
 
+    @Parameter(names = {"--noEmbedConfig"},
+    description = "Skip embedding config in graph (Embed.properties)")
+    boolean noEmbedConfig = false;
+
     @Parameter(names = {"--transitIndex"},
     description = "build a transit index for GTFS data")
     boolean transitIndex;

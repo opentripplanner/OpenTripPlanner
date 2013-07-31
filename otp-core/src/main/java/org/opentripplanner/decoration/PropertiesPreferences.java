@@ -48,24 +48,28 @@ public class PropertiesPreferences extends AbstractPreferences {
         super(null, "");
         root = new TreeMap<String, String>();
         children = new TreeMap<String, PropertiesPreferences>();
-        load(inputStream);
+        Properties properties = new Properties();
+        properties.load(inputStream);
+        initFromProperties(properties);
+    }
+
+    public PropertiesPreferences(Properties properties) {
+        super(null, "");
+        root = new TreeMap<String, String>();
+        children = new TreeMap<String, PropertiesPreferences>();
+        initFromProperties(properties);
     }
 
     private PropertiesPreferences(AbstractPreferences parent, String name, Properties properties) {
         super(parent, name);
         root = new TreeMap<String, String>();
         children = new TreeMap<String, PropertiesPreferences>();
-        if (properties != null)
-            initFromProperties(properties);
-    }
-
-    private void load(InputStream in) throws IOException {
-        Properties properties = new Properties();
-        properties.load(in);
         initFromProperties(properties);
     }
 
     private void initFromProperties(Properties properties) {
+        if (properties == null)
+            return;
         String path = getDottedPath();
         final Enumeration<?> pnen = properties.propertyNames();
         Set<String> childrenNodes = new HashSet<String>();
