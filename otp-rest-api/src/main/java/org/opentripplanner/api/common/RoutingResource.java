@@ -227,6 +227,12 @@ public abstract class RoutingResource {
     @DefaultValue("en_US") @QueryParam("locale")
     private List<String> locale;
     
+    /**
+     * If true, realtime updates are ignored during this search.
+     */
+    @QueryParam("ignoreRealtimeUpdates")
+    protected List<Boolean> ignoreRealtimeUpdates;
+    
     /* 
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
      * this should ideally be done when setting the routing context, but at present departure/
@@ -391,6 +397,9 @@ public abstract class RoutingResource {
         request.setReverseOptimizeOnTheFly(get(reverseOptimizeOnTheFly, n, 
                                                request.isReverseOptimizeOnTheFly()));
 
+        request.setIgnoreRealtimeUpdates(get(ignoreRealtimeUpdates, n, 
+                request.isIgnoreRealtimeUpdates()));
+        
         String localeSpec = get(locale, n, "en");
         String[] localeSpecParts = localeSpec.split("_");
         Locale locale;

@@ -96,7 +96,23 @@ public abstract class TripTimes {
      * inter-stop segment ("hop"). 
      */
     public int getRunningTime(int hop) {
-        return getArrivalTime(hop) - getDepartureTime(hop);
+        int arrivalTime   = getArrivalTime(hop);
+        int departureTime = getDepartureTime(hop);
+
+        if(arrivalTime == TripTimes.CANCELED) {
+            return 0;
+        }
+
+        while(hop >= 0 && departureTime == TripTimes.CANCELED) {
+            hop--;
+            departureTime = getDepartureTime(hop);
+        }
+
+        if(departureTime == TripTimes.CANCELED) {
+            return 0;
+        }
+
+        return arrivalTime - departureTime;
     }
 
     /** @return the difference between the scheduled and actual departure times for this hop. */
@@ -162,6 +178,10 @@ public abstract class TripTimes {
         for (int hop = 0; hop < nHops; hop++) {
             int dep = getDepartureTime(hop);
             int arr = getArrivalTime(hop);
+            if(arr == CANCELED || dep == CANCELED) {
+                continue;
+            }
+
             if (arr < dep) { // negative hop time
                 LOG.error("Negative hop time in TripTimes at index {}.", hop);
                 increasing = false;
@@ -274,13 +294,14 @@ public abstract class TripTimes {
             // Check for minimum transfer time and forbidden transfers
             if (transferTime > 0) {
                 // There is a minimum transfer time to make this transfer
+                int hopIndex = stopIndex - (boarding ? 0 : 1);
                 if (boarding) {
-                    if (sd.secondsSinceMidnight(state0.getLastAlightedTimeSeconds()) + transferTime > getDepartureTime(stopIndex)) {
+                    if (sd.secondsSinceMidnight(state0.getLastAlightedTimeSeconds()) + transferTime > getDepartureTime(hopIndex)) {
                         return false;
                     }
                 }
                 else {
-                    if (sd.secondsSinceMidnight(state0.getLastAlightedTimeSeconds()) - transferTime < getArrivalTime(stopIndex)) {
+                    if (sd.secondsSinceMidnight(state0.getLastAlightedTimeSeconds()) - transferTime < getArrivalTime(hopIndex)) {
                         return false;
                     }
                 }

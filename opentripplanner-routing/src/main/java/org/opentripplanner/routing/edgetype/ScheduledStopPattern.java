@@ -60,9 +60,9 @@ public class ScheduledStopPattern {
     }
     
     public static ScheduledStopPattern fromTrip(Trip trip, List<StopTime> stopTimes) {
-        ArrayList<Stop> stops = new ArrayList<Stop>();
-        ArrayList<Integer> pickups = new ArrayList<Integer>();
-        ArrayList<Integer> dropoffs = new ArrayList<Integer>();
+        ArrayList<Stop> stops = new ArrayList<Stop>(stopTimes.size());
+        ArrayList<Integer> pickups = new ArrayList<Integer>(stopTimes.size());
+        ArrayList<Integer> dropoffs = new ArrayList<Integer>(stopTimes.size());
         for (StopTime stoptime : stopTimes) {
             stops.add(stoptime.getStop());
             pickups.add(stoptime.getPickupType());

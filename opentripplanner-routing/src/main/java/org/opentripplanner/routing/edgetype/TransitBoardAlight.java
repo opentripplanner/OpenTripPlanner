@@ -143,7 +143,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
             if (boarding)
                 type = getPattern().getBoardType(stopIndex);
             else
-                type = getPattern().getAlightType(stopIndex + 1);
+                type = getPattern().getAlightType(stopIndex);
                 
             if (TransitUtils.handleBoardAlightType(s1, type)) {
                 return null;
@@ -238,7 +238,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
                     if (tripTimes != null) {
                         wait = boarding ? // we care about departures on board and arrivals on alight
                             (int)(sd.time(tripTimes.getDepartureTime(stopIndex)) - current_time):
-                            (int)(current_time - sd.time(tripTimes.getArrivalTime(stopIndex)));
+                            (int)(current_time - sd.time(tripTimes.getArrivalTime(stopIndex - 1)));
                         // a trip was found and the index is valid, so the wait should be non-negative
                         if (wait < 0)
                             LOG.error("negative wait time on board");
@@ -281,7 +281,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnBoardForwa
             if (boarding)
                 type = getPattern().getBoardType(stopIndex);
             else
-                type = getPattern().getAlightType(stopIndex + 1);
+                type = getPattern().getAlightType(stopIndex);
             // check: isn't this now handled inside the trip search? (AMB)
             if (TransitUtils.handleBoardAlightType(s1, type)) {
                 return null;

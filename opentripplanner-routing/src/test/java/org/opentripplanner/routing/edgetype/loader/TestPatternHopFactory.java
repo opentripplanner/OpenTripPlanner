@@ -18,6 +18,8 @@ import static org.opentripplanner.common.IterableLibrary.filter;
 import java.io.File;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.TimeZone;
 
 import junit.framework.TestCase;
@@ -47,6 +49,7 @@ import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
@@ -128,6 +131,24 @@ public class TestPatternHopFactory extends TestCase {
             } else {
                 assertEquals(PatternHop.class, e.getClass());
             }
+        }
+        
+    }
+    
+    public void testBoardAlightStopIndex() {
+        Vertex stop_b_arrive = graph.getVertex("agency_C_arrive");
+        Vertex stop_b_depart = graph.getVertex("agency_C_depart");
+        
+        Map<TableTripPattern, Integer> stopIndex = new HashMap<TableTripPattern, Integer>();
+        for(Edge edge : stop_b_depart.getOutgoing()) {
+            TransitBoardAlight tba = (TransitBoardAlight) edge;
+            stopIndex.put(tba.getPattern(), tba.getStopIndex());
+        }
+        
+        for(Edge edge : stop_b_arrive.getIncoming()) {
+            TransitBoardAlight tba = (TransitBoardAlight) edge;
+            if(stopIndex.containsKey(tba.getPattern()))
+                assertEquals((Integer) stopIndex.get(tba.getPattern()), new Integer(tba.getStopIndex()));
         }
     }
 

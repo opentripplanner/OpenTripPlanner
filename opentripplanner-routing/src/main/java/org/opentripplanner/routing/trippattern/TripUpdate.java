@@ -16,67 +16,153 @@ package org.opentripplanner.routing.trippattern;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+
+import lombok.Getter;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An UpdateBlock is an ordered list of Updates which all refer to the same trip on the same day.
+ * An TripUpdate is an ordered list of Updates which all refer to the same trip on the same day.
  * This class also provides methods for building, filtering, and sanity-checking such lists. 
  * @author abyrd
  */
-public class UpdateBlock {
-    
-    private static final Logger LOG = LoggerFactory.getLogger(UpdateBlock.class);
+public class TripUpdate extends AbstractUpdate {
+
+    private static final Logger LOG = LoggerFactory.getLogger(TripUpdate.class);
 
     public static final int MATCH_FAILED = -1;
 
-    public final AgencyAndId tripId;
+    /** The trip to add, for ADDED updates. */
+    @Getter
+    private final Trip trip;
 
-    public final long timestamp; 
-    
-    public final List<Update> updates;
-    
-    private UpdateBlock(AgencyAndId tripId, long timestamp) {
-        this.tripId = tripId;
-        this.timestamp = timestamp;
-        updates = new ArrayList<Update>();
+    private final List<Update> updates;
+
+    @Getter
+    private final Status status;
+
+    protected TripUpdate(AgencyAndId tripId, long timestamp, ServiceDate serviceDate, Status status, List<Update> updates, Trip trip) {
+        super(tripId, timestamp, serviceDate);
+        this.status = status;
+        this.updates = updates;
+        this.trip = trip;
+    }
+
+    public List<Update> getUpdates() {
+        return Collections.unmodifiableList(updates);
+    }
+
+    public boolean isCancellation() {
+        return getStatus() == Status.CANCELED;
+    }
+
+    public boolean hasDelay() {
+        return !updates.isEmpty() && updates.get(0).hasDelay();
+    }
+
+    public enum Status {
+        /** This trip should be added to the graph, valid on the given serviceDate. */
+        ADDED,
+        /** This trip isn't running on the given serviceDate. */
+        CANCELED,
+        /** This trip should be removed from the graph. Only valid for ADDED trips. */
+        REMOVED,
+        /** This trip should be modified for the given serviceDate. */
+        MODIFIED
     }
     
+    public static TripUpdate forCanceledTrip(AgencyAndId tripId, long timestamp, ServiceDate serviceDate) {
+        return new TripUpdate(tripId, timestamp, serviceDate, Status.CANCELED, Collections.<Update> emptyList(), null);
+    }
+    
+    public static TripUpdate forRemovedTrip(AgencyAndId tripId, long timestamp, ServiceDate serviceDate) {
+        return new TripUpdate(tripId, timestamp, serviceDate, Status.REMOVED, Collections.<Update> emptyList(), null);
+    }
+    
+    public static TripUpdate forAddedTrip(Trip trip, long timestamp, ServiceDate serviceDate,  List<Update> stopTimes) {
+        if(trip == null || trip.getId() == null || trip.getRoute() == null)
+            throw new IllegalArgumentException("A trip with a valid tripId and route must be supplied.");
+        if(stopTimes == null || stopTimes.size() < 2)
+            throw new IllegalArgumentException("At least two stop times need to be supplied.");
+
+        return new TripUpdate(trip.getId(), timestamp, serviceDate, Status.ADDED, stopTimes, trip);
+    }
+    
+    public static TripUpdate forUpdatedTrip(AgencyAndId tripId, long timestamp, ServiceDate serviceDate, List<Update> updates) {
+        if(updates == null || updates.isEmpty())
+            throw new IllegalArgumentException("At least one update needs to be supplied.");
+
+        return new TripUpdate(tripId, timestamp, serviceDate, Status.MODIFIED, updates, null);
+    }
+
     /**
      * This method takes a list of updates that may have mixed TripIds, dates, etc. and splits it 
-     * into a list of UpdateBlocks, with each UpdateBlock referencing a single trip on a single day.
+     * into a list of TripUpdatess, with each TripUpdate referencing a single trip on a single day.
      * TODO: implement date support for updates
      */
-    public static List<UpdateBlock> splitByTrip(List<Update> mixedUpdates) {
-        List<UpdateBlock> ret = new ArrayList<UpdateBlock>();
+    public static List<TripUpdate> splitByTrip(List<Update> mixedUpdates) {
+        List<TripUpdate> ret = new ArrayList<TripUpdate>();
         // Update comparator sorts on (tripId, timestamp, stopSequence, depart)
         Collections.sort(mixedUpdates);
-        UpdateBlock block = null;
-        for (Update u : mixedUpdates) { // create a new block when the trip or timestamp changes 
-            if (block == null || ! block.tripId.equals(u.tripId) || block.timestamp != u.timestamp) {
-                block = new UpdateBlock(u.tripId, u.timestamp);
-                ret.add(block);
+        List<Update> blockUpdates = new LinkedList<Update>();
+        blockUpdates.add(mixedUpdates.remove(0));
+
+        for (Update u : mixedUpdates) { // create a new block when the trip or timestamp changes
+            Update l = blockUpdates.get(0);
+            if (!l.tripId.equals(u.tripId) || l.timestamp != u.timestamp || l.serviceDate != u.serviceDate) {
+                TripUpdate tripUpdate = TripUpdate.forUpdatedTrip(l.tripId, l.timestamp, l.serviceDate, blockUpdates);
+                ret.add(tripUpdate);
+                blockUpdates = new LinkedList<Update>();
             }
-            block.updates.add(u);
+            blockUpdates.add(u);
         }
+
+        Update l = blockUpdates.get(0);
+        TripUpdate tripUpdate = TripUpdate.forUpdatedTrip(l.tripId, l.timestamp, l.serviceDate, blockUpdates);
+        ret.add(tripUpdate);
+
         return ret;
     }
+    
+    /** 
+     * Check that this TripUpdate is internally coherent, meaning that:
+     * 1. all Updates' trip_ids are the same, and match the UpdateBlock's trip_id
+     * 2. stop sequence numbers are sequential and increasing
+     * 3. all dwell times and run times are positive
+     */
+    public boolean isCoherent() {
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("tripId: ");
-        sb.append(this.tripId);
+        //LOG.debug("{}", this.toString());
+        for (Update u : updates)
+            if (u == null || ! u.tripId.equals(this.tripId))
+               return false;
+
+        // check that sequence numbers are sequential and increasing
+        boolean increasing = true;
+        boolean sequential = true;
+        boolean timesCoherent = true;
+        Update prev_u = null;
         for (Update u : updates) {
-            sb.append('\n');
-            sb.append(u.toString());
+            if (prev_u != null) {
+                if (u.stopSeq <= prev_u.stopSeq)
+                    increasing = false;
+                if (u.stopSeq - prev_u.stopSeq != 1)
+                    sequential = false;
+                if (prev_u.status != Update.Status.CANCEL && u.status != Update.Status.CANCEL
+                                && u.arrive < prev_u.depart)
+                    timesCoherent = false;
+            }
+            prev_u = u;
         }
-        return sb.toString();
+        return increasing && timesCoherent; // || !sequential)
     }
     
     public boolean filter(boolean passed, boolean negativeDwells, boolean duplicateStops) {
@@ -109,47 +195,6 @@ public class UpdateBlock {
             }
         }
         return modified;
-    }
-    
-    /** @return true if any of the updates in this block is a cancellation */
-    public boolean isCancellation() {
-        for (Update u : updates) {
-            if (u.status == Update.Status.CANCEL) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /** 
-     * Check that this UpdateBlock is internally coherent, meaning that:
-     * 1. all Updates' trip_ids are the same, and match the UpdateBlock's trip_id
-     * 2. stop sequence numbers are sequential and increasing
-     * 3. all dwell times and run times are positive
-     */
-    public boolean isCoherent() {
-        //LOG.debug("{}", this.toString());
-        for (Update u : updates)
-            if (u == null || ! u.tripId.equals(this.tripId))
-               return false;
-
-        // check that sequence numbers are sequential and increasing
-        boolean increasing = true;
-        boolean sequential = true;
-        boolean timesCoherent = true;
-        Update prev_u = null;
-        for (Update u : updates) {
-            if (prev_u != null) {
-                if (u.stopSeq <= prev_u.stopSeq)
-                    increasing = false;
-                if (u.stopSeq - prev_u.stopSeq != 1)
-                    sequential = false;
-                if (u.arrive < prev_u.depart)
-                    timesCoherent = false;
-            }
-            prev_u = u;
-        }
-        return increasing && timesCoherent; // || !sequential)
     }
 
     /**        
@@ -219,8 +264,8 @@ public class UpdateBlock {
             for (int ui = 0; ui < updates.size(); ui++) { // index in update
                 Stop ps = patternStops.get(pi + ui);
                 Update u = updates.get(ui);
-                LOG.trace("{} == {}", ps.getId().getId(), u.stopId);
-                if ( ! ps.getId().getId().equals(u.stopId)) {
+                LOG.trace("{} == {}", ps.getId(), u.stopId);
+                if ( ! ps.getId().equals(u.stopId)) {
                     continue PATTERN; // full-block match failed, try incrementing offset
                 }
             }
@@ -246,7 +291,7 @@ public class UpdateBlock {
                 }
                 Stop ps = patternStops.get(si);
                 Update u = updates.get(ui);
-                LOG.trace("{} == {}", ps.getId().getId(), u.stopId);
+                LOG.trace("{} == {}", ps.getId(), u.stopId);
                 if ( ! ps.getId().getId().equals(u.stopId)) {
                     continue; // skip one update, do not raise score, do not increment stop
                 }
@@ -272,5 +317,16 @@ public class UpdateBlock {
         /* full-block match succeeded */
         return bestStop;
     }
-    
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("tripId: ");
+        sb.append(this.tripId);
+        for (Update u : updates) {
+            sb.append('\n');
+            sb.append(u.toString());
+        }
+        return sb.toString();
+    }
 }
