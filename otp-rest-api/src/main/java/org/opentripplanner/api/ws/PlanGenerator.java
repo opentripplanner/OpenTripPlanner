@@ -190,6 +190,10 @@ public class PlanGenerator {
      * @return The generated itinerary
      */
     Itinerary generateItinerary(GraphPath path, boolean showIntermediateStops) {
+        if (path.states.size() < 2) {
+            throw new TrivialPathException();
+        }
+
         Itinerary itinerary = new Itinerary();
 
         State[] states = new State[path.states.size()];
@@ -229,10 +233,6 @@ public class PlanGenerator {
         itinerary.walkDistance = lastState.getWalkDistance();
 
         if (lastState.getNumBoardings() > 1) itinerary.transfers = lastState.getNumBoardings() - 1;
-
-        if (itinerary.legs.size() == 0) {
-            throw new TrivialPathException();
-        }
 
         return itinerary;
     }
@@ -293,8 +293,9 @@ public class PlanGenerator {
             if (backMode == TraverseMode.LEG_SWITCH || forwardMode == TraverseMode.LEG_SWITCH) {
                 if (backMode != TraverseMode.LEG_SWITCH) {              // Start of leg switch
                     legIndexPairs[1] = i;
-                    legsIndexes.add(legIndexPairs);
                 } else if (forwardMode != TraverseMode.LEG_SWITCH) {    // End of leg switch
+                    if (legIndexPairs[1] == states.length - 1) continue;
+                    legsIndexes.add(legIndexPairs);
                     legIndexPairs = new int[] {i, states.length - 1};
                 }
             } else if (backMode != forwardMode) {                       // Mode change => leg switch
@@ -309,7 +310,9 @@ public class PlanGenerator {
         }
 
         // Final leg
+        legIndexPairs[1] = states.length - 1;
         legsIndexes.add(legIndexPairs);
+
         State[][] legsStates = new State[legsIndexes.size()][];
 
         // Fill the two-dimensional array with states
