@@ -166,12 +166,22 @@ public class GraphServiceFileImpl {
         // Decorate the graph. Even if a config file is not present
         // one could be bundled inside.
         try {
-            File configFile = new File(configFileName);
-            Preferences config = null;
-            if (configFile.canRead()) {
-                LOG.info("Loading config from file {}", configFileName);
-                config = new PropertiesPreferences(configFile);
+            is = null;
+            if (configFileName.startsWith(CLASSPATH_PREFIX)) {
+                // look for config on classpath
+                String resourceName = configFileName.substring(CLASSPATH_PREFIX.length());
+                LOG.debug("Trying to load config on classpath at {}", resourceName);
+                is = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName);
+            } else {
+                // look for config in filesystem
+                LOG.debug("Trying to load config on file at {}", configFileName);
+                File configFile = new File(configFileName);
+                if (configFile.canRead()) {
+                    LOG.info("Loading config from file {}", configFileName);
+                    is = new FileInputStream(configFile);
+                }
             }
+            Preferences config = is == null ? null : new PropertiesPreferences(is);
             decorator.setupGraph(graph, config);
         } catch (IOException e) {
             LOG.error("Can't read config file", e);
