@@ -1,6 +1,8 @@
 package org.opentripplanner.standalone;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -21,8 +23,10 @@ import org.opentripplanner.graph_builder.impl.TransitToStreetNetworkGraphBuilder
 import org.opentripplanner.graph_builder.impl.ned.NEDGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.ned.NEDGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl;
+import org.opentripplanner.graph_builder.impl.transit_index.TransitIndexBuilder;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
+import org.opentripplanner.graph_builder.services.GraphBuilderWithGtfsDao;
 import org.opentripplanner.graph_builder.services.ned.NEDGridCoverageFactory;
 import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
@@ -182,13 +186,18 @@ public class OTPConfigurator {
                 GtfsBundle gtfsBundle = new GtfsBundle(gtfsFile);
                 gtfsBundles.add(gtfsBundle);
             }
-            GraphBuilder gtfsBuilder = new GtfsGraphBuilderImpl(gtfsBundles);
+            GtfsGraphBuilderImpl gtfsBuilder = new GtfsGraphBuilderImpl(gtfsBundles);
             graphBuilder.addGraphBuilder(gtfsBuilder);
             if ( hasOSM ) {
                 graphBuilder.addGraphBuilder(new TransitToStreetNetworkGraphBuilderImpl());
             } else {
                 graphBuilder.addGraphBuilder(new StreetlessStopLinker());
             }
+            List<GraphBuilderWithGtfsDao> gtfsBuilders = new ArrayList<GraphBuilderWithGtfsDao>();
+            if (params.transitIndex) {
+                gtfsBuilders.add(new TransitIndexBuilder());
+            }
+            gtfsBuilder.setGtfsGraphBuilders(gtfsBuilders);
         }
         if (params.elevation) {
             File cacheDirectory = new File(params.cacheDirectory, "ned");
