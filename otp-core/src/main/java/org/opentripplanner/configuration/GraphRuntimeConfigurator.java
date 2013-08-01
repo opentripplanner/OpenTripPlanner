@@ -29,17 +29,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Configure/decorate a graph upon loading through Preferences (Preference is the new Java API replacing
- * "Properties"). Usually preferences are loaded from a .properties files, but could also come from
- * the graph itself or any other sources.
+ * Configure/decorate a graph upon loading through Preferences (Preference is the new Java API
+ * replacing "Properties"). Usually preferences are loaded from a .properties files, but could also
+ * come from the graph itself or any other sources.
  * 
  * When a graph is loaded, client should call setupGraph() with the Preferences setup.
  * 
  * When a graph is unloaded, one must ensure the shutdownGraph() method is called to cleanup all
  * resources that could have been created.
  * 
- * This class then create "configurables" (usually real-time connector, etc...) depending on the given
- * configuration, and configure them using the corresponding children Preferences node.
+ * This class then create "configurables" (usually real-time connector, etc...) depending on the
+ * given configuration, and configure them using the corresponding children Preferences node.
  * 
  * If an embedded configuration is present in the graph, we also try to use it. In case of conflicts
  * between two child nodes in both configs (two childs node with the same name) the dynamic (ie
@@ -98,11 +98,12 @@ public class GraphRuntimeConfigurator {
                     configurableNames.add(configurableName);
                     Preferences prefs = config.node(configurableName);
                     String configurableType = prefs.get("type", null);
-                    Class<? extends PreferencesConfigurable> clazz = configurables.get(configurableType);
+                    Class<? extends PreferencesConfigurable> clazz = configurables
+                            .get(configurableType);
                     if (clazz != null) {
                         try {
-                            LOG.info("Configuring '{}' of type '{}' ({})", configurableName, configurableType,
-                                    clazz.getName());
+                            LOG.info("Configuring '{}' of type '{}' ({})", configurableName,
+                                    configurableType, clazz.getName());
                             PreferencesConfigurable configurable = clazz.newInstance();
                             configurable.configure(graph, prefs);
                         } catch (Exception e) {
@@ -118,10 +119,6 @@ public class GraphRuntimeConfigurator {
     }
 
     public void shutdownGraph(Graph graph) {
-        ShutdownGraphService shutdownGraphService = graph.getService(ShutdownGraphService.class);
-        if (shutdownGraphService != null) {
-            shutdownGraphService.shutdown(graph);
-        }
         PeriodicTimerGraphUpdater periodicUpdater = graph
                 .getService(PeriodicTimerGraphUpdater.class);
         if (periodicUpdater != null) {
