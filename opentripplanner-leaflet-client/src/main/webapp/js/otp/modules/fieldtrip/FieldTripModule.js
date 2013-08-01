@@ -685,27 +685,39 @@ otp.modules.fieldtrip.FieldTripModule =
         var this_ = this;
 
         var outboundTrip = otp.util.FieldTrip.getOutboundTrip(request);
-        if(type === 'outbound' && outboundTrip) {
-            var msg = "This action will overwrite a previously planned outbound itinerary for this request. Do you wish to continue?";
-            otp.widgets.Dialogs.showYesNoDialog(msg, "Overwrite Outbound Itinerary?", function() {
-                this_.deleteTrip(outboundTrip);
+        if(type === 'outbound') {
+            if(outboundTrip) {
+                var msg = "This action will overwrite a previously planned outbound itinerary for this request. Do you wish to continue?";
+                otp.widgets.Dialogs.showYesNoDialog(msg, "Overwrite Outbound Itinerary?", function() {
+                    this_.deleteTrip(outboundTrip);
+                    this_.saveTrip(request, 0, function(tripId) {
+                        this_.loadRequests();
+                    });
+                });
+            }
+            else {
                 this_.saveTrip(request, 0, function(tripId) {
-                    console.log("saved "+type+" trip for req #"+request.id);
                     this_.loadRequests();
                 });
-            });
+            }            
         }
 
         var inboundTrip = otp.util.FieldTrip.getInboundTrip(request);
-        if(type === 'inbound' && inboundTrip) {
-            var msg = "This action will overwrite a previously planned inbound itinerary for this request. Do you wish to continue?";
-            otp.widgets.Dialogs.showYesNoDialog(msg, "Overwrite Inbound Itinerary?", function() {
-                this_.deleteTrip(outboundTrip);
+        if(type === 'inbound') {
+            if(inboundTrip) {
+                var msg = "This action will overwrite a previously planned inbound itinerary for this request. Do you wish to continue?";
+                otp.widgets.Dialogs.showYesNoDialog(msg, "Overwrite Inbound Itinerary?", function() {
+                    this_.deleteTrip(outboundTrip);
+                    this_.saveTrip(request, 1, function(tripId) {
+                        this_.loadRequests();
+                    });
+                });
+            }
+            else {
                 this_.saveTrip(request, 1, function(tripId) {
-                    console.log("saved "+type+" trip for req #"+request.id);
                     this_.loadRequests();
                 });
-            });
+            }
         }
         
         /*if(type === "outbound") var requestOrder = 0;
