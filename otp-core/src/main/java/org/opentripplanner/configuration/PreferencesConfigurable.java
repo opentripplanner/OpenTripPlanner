@@ -11,18 +11,18 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.decoration;
+package org.opentripplanner.configuration;
 
 import java.util.prefs.Preferences;
 
 import org.opentripplanner.routing.graph.Graph;
 
 /**
- * A configurable is a class than can be configured through Preferences (the new API which kind of
+ * Interface for a class than can be configured through Preferences (the new API which kind of
  * replaces Properties).
  * 
  */
-public interface Configurable {
+public interface PreferencesConfigurable {
 
     public abstract void configure(Graph graph, Preferences preferences) throws Exception;
 }

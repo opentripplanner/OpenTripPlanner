@@ -11,7 +11,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.decoration;
+package org.opentripplanner.configuration;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Decorate by creating dynamic bike rental station based on a source type.
  * 
- * Usage example ('bike1' bean name is an example):
+ * Usage example ('bike1' name is an example):
  * 
  * <pre>
  * bike1.type = bike-rental
@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
  * </pre>
  * 
  */
-public class BikeRentalDecorator implements Configurable {
+public class BikeRentalDecorator implements PreferencesConfigurable {
 
     private static final String DEFAULT_NETWORK_LIST = "default";
 
@@ -75,9 +75,9 @@ public class BikeRentalDecorator implements Configurable {
             return;
         }
         BikeRentalDataSource source = clazz.newInstance();
-        if (source instanceof Configurable) {
+        if (source instanceof PreferencesConfigurable) {
             // If the source itself is a configurable, let's configure it.
-            ((Configurable) source).configure(graph, sourcesPreferences);
+            ((PreferencesConfigurable) source).configure(graph, sourcesPreferences);
         }
         BikeRentalUpdater2 updater = new BikeRentalUpdater2(graph, source);
         updater.setNetwork(preferences.get("networks", DEFAULT_NETWORK_LIST));

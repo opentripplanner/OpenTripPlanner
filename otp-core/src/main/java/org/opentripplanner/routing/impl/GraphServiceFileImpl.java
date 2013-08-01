@@ -29,8 +29,8 @@ import java.util.regex.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 
-import org.opentripplanner.decoration.GraphDecorator;
-import org.opentripplanner.decoration.PropertiesPreferences;
+import org.opentripplanner.configuration.GraphRuntimeConfigurator;
+import org.opentripplanner.configuration.PropertiesPreferences;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
@@ -64,7 +64,7 @@ public class GraphServiceFileImpl {
 
     private LoadLevel loadLevel = LoadLevel.FULL;
 
-    private GraphDecorator decorator = new GraphDecorator();
+    private GraphRuntimeConfigurator decorator = new GraphRuntimeConfigurator();
 
     @Setter
     private StreetVertexIndexFactory indexFactory = new DefaultStreetVertexIndexFactory();

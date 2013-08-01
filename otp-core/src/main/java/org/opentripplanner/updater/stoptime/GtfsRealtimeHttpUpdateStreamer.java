@@ -19,7 +19,7 @@ import java.util.prefs.Preferences;
 
 import lombok.Setter;
 
-import org.opentripplanner.decoration.Configurable;
+import org.opentripplanner.configuration.PreferencesConfigurable;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
@@ -29,7 +29,7 @@ import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 
 public class GtfsRealtimeHttpUpdateStreamer extends GtfsRealtimeAbstractUpdateStreamer implements
-        Configurable {
+        PreferencesConfigurable {
     private static final Logger LOG = LoggerFactory.getLogger(GtfsRealtimeHttpUpdateStreamer.class);
 	
     @Setter

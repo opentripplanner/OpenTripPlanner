@@ -11,7 +11,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.decoration;
+package org.opentripplanner.configuration;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -29,7 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Decorate a graph upon loading through Preferences (Preference is the new Java API replacing
+ * Configure/decorate a graph upon loading through Preferences (Preference is the new Java API replacing
  * "Properties"). Usually preferences are loaded from a .properties files, but could also come from
  * the graph itself or any other sources.
  * 
@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * When a graph is unloaded, one must ensure the shutdownGraph() method is called to cleanup all
  * resources that could have been created.
  * 
- * This class then create "beans" (usually real-time connector, etc...) depending on the given
+ * This class then create "configurables" (usually real-time connector, etc...) depending on the given
  * configuration, and configure them using the corresponding children Preferences node.
  * 
  * If an embedded configuration is present in the graph, we also try to use it. In case of conflicts
@@ -47,14 +47,14 @@ import org.slf4j.LoggerFactory;
  * *not* merged.
  * 
  */
-public class GraphDecorator {
+public class GraphRuntimeConfigurator {
 
-    private static Logger LOG = LoggerFactory.getLogger(GraphDecorator.class);
+    private static Logger LOG = LoggerFactory.getLogger(GraphRuntimeConfigurator.class);
 
-    private static Map<String, Class<? extends Configurable>> configurables;
+    private static Map<String, Class<? extends PreferencesConfigurable>> configurables;
 
     static {
-        configurables = new HashMap<String, Class<? extends Configurable>>();
+        configurables = new HashMap<String, Class<? extends PreferencesConfigurable>>();
         configurables.put("bike-rental", BikeRentalDecorator.class);
         configurables.put("stop-time-updater", StopTimeUpdateDecorator.class);
         configurables.put("real-time-alerts", RealTimeAlertDecorator.class);
@@ -87,26 +87,26 @@ public class GraphDecorator {
      */
     private void applyConfigurationToGraph(Graph graph, List<Preferences> configs) {
         try {
-            Set<String> beanNames = new HashSet<String>();
+            Set<String> configurableNames = new HashSet<String>();
             for (Preferences config : configs) {
                 if (config == null)
                     continue;
-                for (String beanName : config.childrenNames()) {
-                    if (beanNames.contains(beanName))
+                for (String configurableName : config.childrenNames()) {
+                    if (configurableNames.contains(configurableName))
                         continue; // Already processed
-                    beanNames.add(beanName);
-                    Preferences beanConfig = config.node(beanName);
-                    String beanType = beanConfig.get("type", null);
-                    Class<? extends Configurable> clazz = configurables.get(beanType);
+                    configurableNames.add(configurableName);
+                    Preferences prefs = config.node(configurableName);
+                    String configurableType = prefs.get("type", null);
+                    Class<? extends PreferencesConfigurable> clazz = configurables.get(configurableType);
                     if (clazz != null) {
                         try {
-                            LOG.info("Configuring bean '{}' of type '{}' ({})", beanName, beanType,
+                            LOG.info("Configuring '{}' of type '{}' ({})", configurableName, configurableType,
                                     clazz.getName());
-                            Configurable bean = clazz.newInstance();
-                            bean.configure(graph, beanConfig);
+                            PreferencesConfigurable configurable = clazz.newInstance();
+                            configurable.configure(graph, prefs);
                         } catch (Exception e) {
-                            LOG.error("Can't configure bean: " + beanName, e);
-                            // Continue on next bean
+                            LOG.error("Can't configure: " + configurableName, e);
+                            // Continue on next configurable
                         }
                     }
                 }

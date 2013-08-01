@@ -28,7 +28,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
-import org.opentripplanner.decoration.Configurable;
+import org.opentripplanner.configuration.PreferencesConfigurable;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.HttpUtils;
@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 // TODO This class could probably inherit from GenericJSONBikeRentalDataSource
-public class CityBikesBikeRentalDataSource implements BikeRentalDataSource, Configurable {
+public class CityBikesBikeRentalDataSource implements BikeRentalDataSource, PreferencesConfigurable {
 
     private static final Logger log = LoggerFactory.getLogger(BixiBikeRentalDataSource.class);
 

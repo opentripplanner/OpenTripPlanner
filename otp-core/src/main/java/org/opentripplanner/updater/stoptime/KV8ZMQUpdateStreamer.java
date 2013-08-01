@@ -17,7 +17,7 @@ import javax.annotation.PostConstruct;
 
 import lombok.Setter;
 
-import org.opentripplanner.decoration.Configurable;
+import org.opentripplanner.configuration.PreferencesConfigurable;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.TripUpdate;
 import org.opentripplanner.routing.trippattern.Update;
@@ -28,7 +28,7 @@ import org.jeromq.ZMQ;
 import org.jeromq.ZMsg;
 
 /** StoptimeUpdateStreamer for CTX-encoded Dutch KV8 realtime updates over ZeroMQ */
-public class KV8ZMQUpdateStreamer implements UpdateStreamer, Configurable {
+public class KV8ZMQUpdateStreamer implements UpdateStreamer, PreferencesConfigurable {
 
     private static Logger LOG = LoggerFactory.getLogger(KV8ZMQUpdateStreamer.class); 
     

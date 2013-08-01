@@ -11,7 +11,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.decoration;
+package org.opentripplanner.configuration;
 
 import java.util.prefs.Preferences;
 
@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Decorate a graph by creating a GTFS real-time alert connector.
  * 
- * Usage example ('myalert' bean name is an example):
+ * Usage example ('myalert' name is an example):
  * 
  * <pre>
  * myalert.type = stop-time-updater
@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  * </pre>
  * 
  */
-public class RealTimeAlertDecorator implements Configurable {
+public class RealTimeAlertDecorator implements PreferencesConfigurable {
 
     private static final long DEFAULT_UPDATE_FREQ_SEC = 60;
 

@@ -19,6 +19,8 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.prefs.Preferences;
 
+import org.opentripplanner.configuration.PropertiesPreferences;
+
 import junit.framework.TestCase;
 
 /*

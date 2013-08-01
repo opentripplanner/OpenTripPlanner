@@ -30,7 +30,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.opentripplanner.decoration.Configurable;
+import org.opentripplanner.configuration.PreferencesConfigurable;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.HttpUtils;
@@ -42,7 +42,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public abstract class GenericXmlBikeRentalDataSource implements BikeRentalDataSource, Configurable {
+public abstract class GenericXmlBikeRentalDataSource implements BikeRentalDataSource, PreferencesConfigurable {
 
     private static final Logger log = LoggerFactory.getLogger(BixiBikeRentalDataSource.class);
 

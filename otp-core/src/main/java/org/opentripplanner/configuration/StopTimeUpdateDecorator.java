@@ -11,7 +11,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.decoration;
+package org.opentripplanner.configuration;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Decorate by creating stop time updater.
  * 
- * Usage example ('rt' bean name is an example):
+ * Usage example ('rt' name is an example):
  * 
  * <pre>
  * rt.type = stop-time-updater
@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  * </pre>
  * 
  */
-public class StopTimeUpdateDecorator implements Configurable {
+public class StopTimeUpdateDecorator implements PreferencesConfigurable {
 
     private static final long DEFAULT_UPDATE_FREQ_SEC = 60;
 
@@ -67,9 +67,9 @@ public class StopTimeUpdateDecorator implements Configurable {
             return;
         }
         UpdateStreamer updateStreamer = clazz.newInstance();
-        if (updateStreamer instanceof Configurable) {
+        if (updateStreamer instanceof PreferencesConfigurable) {
             // If the source itself is a configurable, let's configure it.
-            ((Configurable) updateStreamer).configure(graph, sourcesPreferences);
+            ((PreferencesConfigurable) updateStreamer).configure(graph, sourcesPreferences);
         }
         StoptimeUpdater updater = new StoptimeUpdater(graph);
         updater.setUpdateStreamer(updateStreamer);
