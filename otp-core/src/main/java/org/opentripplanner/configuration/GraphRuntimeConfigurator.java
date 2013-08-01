@@ -77,6 +77,7 @@ public class GraphRuntimeConfigurator {
 
         // Delete the periodic updater if it contains nothing
         if (periodicUpdater.size() == 0) {
+            periodicUpdater.stop();
             graph.putService(PeriodicTimerGraphUpdater.class, null);
         }
     }
