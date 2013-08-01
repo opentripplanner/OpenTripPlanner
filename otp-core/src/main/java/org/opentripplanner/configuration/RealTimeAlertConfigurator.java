@@ -24,39 +24,36 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Decorate a graph by creating a GTFS real-time alert connector.
+ * Configure a graph by creating a GTFS real-time alert connector.
  * 
  * Usage example ('myalert' name is an example):
  * 
  * <pre>
  * myalert.type = stop-time-updater
  * myalert.frequencySec = 60
- * myalert.source.url = http://host.tld/path
- * myalert.source.earlyStartSec = 3600
- * myalert.source.defaultAgencyId = TA
+ * myalert.url = http://host.tld/path
+ * myalert.earlyStartSec = 3600
+ * myalert.defaultAgencyId = TA
  * </pre>
  * 
  */
-public class RealTimeAlertDecorator implements PreferencesConfigurable {
+public class RealTimeAlertConfigurator implements PreferencesConfigurable {
 
     private static final long DEFAULT_UPDATE_FREQ_SEC = 60;
 
-    private static Logger LOG = LoggerFactory.getLogger(RealTimeAlertDecorator.class);
+    private static Logger LOG = LoggerFactory.getLogger(RealTimeAlertConfigurator.class);
 
     @Override
     public void configure(Graph graph, Preferences preferences) throws Exception {
         GtfsRealtimeUpdater realTimeUpdater = new GtfsRealtimeUpdater();
         PatchService patchService = new PatchServiceImpl(graph);
         realTimeUpdater.setPatchService(patchService);
-        // Use a "source" node to align with other configs
-        // And ease later migration if source can change
-        Preferences sourcesPreferences = preferences.node("source");
-        String url = sourcesPreferences.get("url", null);
+        String url = preferences.get("url", null);
         if (url == null)
             throw new IllegalArgumentException("Missing mandatory 'url' parameter");
         realTimeUpdater.setUrl(url);
-        realTimeUpdater.setEarlyStart(sourcesPreferences.getInt("earlyStartSec", 0));
-        realTimeUpdater.setDefaultAgencyId(sourcesPreferences.get("defaultAgencyId", null));
+        realTimeUpdater.setEarlyStart(preferences.getInt("earlyStartSec", 0));
+        realTimeUpdater.setDefaultAgencyId(preferences.get("defaultAgencyId", null));
         long frequencySec = preferences.getLong("frequencySec", DEFAULT_UPDATE_FREQ_SEC);
         LOG.info("Creating real-time alert updater running every {} seconds : {}", frequencySec,
                 url);

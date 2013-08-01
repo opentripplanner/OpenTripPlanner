@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Decorate by creating dynamic bike rental station based on a source type.
+ * Configure a graph by creating dynamic bike rental station based on a source type.
  * 
  * Usage example ('bike1' name is an example):
  * 
@@ -39,18 +39,18 @@ import org.slf4j.LoggerFactory;
  * bike1.type = bike-rental
  * bike1.frequencySec = 60
  * bike1.networks = V3,V3N
- * bike1.source.type = jcdecaux
- * bike1.source.url = https://api.jcdecaux.com/vls/v1/stations?contract=Xxx?apiKey=Zzz
+ * bike1.sourceType = jcdecaux
+ * bike1.url = https://api.jcdecaux.com/vls/v1/stations?contract=Xxx?apiKey=Zzz
  * </pre>
  * 
  */
-public class BikeRentalDecorator implements PreferencesConfigurable {
+public class BikeRentalConfigurator implements PreferencesConfigurable {
 
     private static final String DEFAULT_NETWORK_LIST = "default";
 
     private static final long DEFAULT_UPDATE_FREQ_SEC = 60;
 
-    private static Logger LOG = LoggerFactory.getLogger(BikeRentalDecorator.class);
+    private static Logger LOG = LoggerFactory.getLogger(BikeRentalConfigurator.class);
 
     private static Map<String, Class<? extends BikeRentalDataSource>> bikeRentalSources;
 
@@ -67,8 +67,7 @@ public class BikeRentalDecorator implements PreferencesConfigurable {
 
     @Override
     public void configure(Graph graph, Preferences preferences) throws Exception {
-        Preferences sourcesPreferences = preferences.node("source");
-        String sourceType = sourcesPreferences.get("type", null);
+        String sourceType = preferences.get("sourceType", null);
         Class<? extends BikeRentalDataSource> clazz = bikeRentalSources.get(sourceType);
         if (clazz == null) {
             LOG.error("Unknown bike rental source type: " + sourceType);
@@ -77,7 +76,7 @@ public class BikeRentalDecorator implements PreferencesConfigurable {
         BikeRentalDataSource source = clazz.newInstance();
         if (source instanceof PreferencesConfigurable) {
             // If the source itself is a configurable, let's configure it.
-            ((PreferencesConfigurable) source).configure(graph, sourcesPreferences);
+            ((PreferencesConfigurable) source).configure(graph, preferences);
         }
         BikeRentalUpdater2 updater = new BikeRentalUpdater2(graph, source);
         updater.setNetwork(preferences.get("networks", DEFAULT_NETWORK_LIST));

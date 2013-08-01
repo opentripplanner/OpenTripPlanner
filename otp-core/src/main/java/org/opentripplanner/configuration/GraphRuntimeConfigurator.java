@@ -55,9 +55,9 @@ public class GraphRuntimeConfigurator {
 
     static {
         configurables = new HashMap<String, Class<? extends PreferencesConfigurable>>();
-        configurables.put("bike-rental", BikeRentalDecorator.class);
-        configurables.put("stop-time-updater", StopTimeUpdateDecorator.class);
-        configurables.put("real-time-alerts", RealTimeAlertDecorator.class);
+        configurables.put("bike-rental", BikeRentalConfigurator.class);
+        configurables.put("stop-time-updater", StopTimeUpdateConfigurator.class);
+        configurables.put("real-time-alerts", RealTimeAlertConfigurator.class);
     }
 
     public void setupGraph(Graph graph, Preferences mainConfig) {

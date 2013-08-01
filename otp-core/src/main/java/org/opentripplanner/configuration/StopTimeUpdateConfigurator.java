@@ -28,24 +28,24 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Decorate by creating stop time updater.
+ * Configure a graph by creating stop time updater.
  * 
  * Usage example ('rt' name is an example):
  * 
  * <pre>
  * rt.type = stop-time-updater
  * rt.frequencySec = 60
- * rt.source.type = gtfs-http
- * rt.source.url = http://host.tld/path
- * rt.source.defaultAgencyId = TA
+ * rt.sourceType = gtfs-http
+ * rt.url = http://host.tld/path
+ * rt.defaultAgencyId = TA
  * </pre>
  * 
  */
-public class StopTimeUpdateDecorator implements PreferencesConfigurable {
+public class StopTimeUpdateConfigurator implements PreferencesConfigurable {
 
     private static final long DEFAULT_UPDATE_FREQ_SEC = 60;
 
-    private static Logger LOG = LoggerFactory.getLogger(StopTimeUpdateDecorator.class);
+    private static Logger LOG = LoggerFactory.getLogger(StopTimeUpdateConfigurator.class);
 
     private static Map<String, Class<? extends UpdateStreamer>> updateStreamers;
 
@@ -59,8 +59,7 @@ public class StopTimeUpdateDecorator implements PreferencesConfigurable {
 
     @Override
     public void configure(Graph graph, Preferences preferences) throws Exception {
-        Preferences sourcesPreferences = preferences.node("source");
-        String sourceType = sourcesPreferences.get("type", null);
+        String sourceType = preferences.get("sourceType", null);
         Class<? extends UpdateStreamer> clazz = updateStreamers.get(sourceType);
         if (clazz == null) {
             LOG.error("Unknown update streamer source type: " + sourceType);
@@ -69,7 +68,7 @@ public class StopTimeUpdateDecorator implements PreferencesConfigurable {
         UpdateStreamer updateStreamer = clazz.newInstance();
         if (updateStreamer instanceof PreferencesConfigurable) {
             // If the source itself is a configurable, let's configure it.
-            ((PreferencesConfigurable) updateStreamer).configure(graph, sourcesPreferences);
+            ((PreferencesConfigurable) updateStreamer).configure(graph, preferences);
         }
         StoptimeUpdater updater = new StoptimeUpdater(graph);
         updater.setUpdateStreamer(updateStreamer);
