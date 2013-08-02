@@ -25,8 +25,7 @@ public enum TraverseMode {
     WALK, BICYCLE, CAR,
     TRAM, SUBWAY, RAIL, BUS, FERRY,
     CABLE_CAR, GONDOLA, FUNICULAR,
-    TRANSIT, TRAINISH, BUSISH, BOARDING,
-    ALIGHTING, TRANSFER, STL,
+    TRANSIT, TRAINISH, BUSISH, LEG_SWITCH,
     // A motor vehicle that requires custom configuration
     // e.g. a truck, motor bike, airport shuttle service.
     CUSTOM_MOTOR_VEHICLE;
