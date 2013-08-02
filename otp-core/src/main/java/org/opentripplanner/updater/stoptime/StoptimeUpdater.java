@@ -27,6 +27,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.trippattern.TripUpdate;
+import org.opentripplanner.updater.GraphUpdaterRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Update OTP stop time tables from some (realtime) source
  * @author abyrd
  */
-public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
+public class StoptimeUpdater implements GraphUpdaterRunnable, TimetableSnapshotSource {
 
     private static final Logger LOG = LoggerFactory.getLogger(StoptimeUpdater.class);
 
@@ -71,17 +72,36 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
     
     protected ServiceDate lastPurgeDate = null;
     
-    // nothing in the timetable snapshot binds it to one graph. we could use this updater for all
-    // graphs at once
     protected Graph graph;
     protected long lastSnapshotTime = -1;
     
     /**
-     * Set the data sources for the target graphs.
+     * No-arg constructor is needed for DI.
+     */
+    protected StoptimeUpdater() {
+    }
+
+    /**
+     * Build a StoptimeUpdater binded to a single graph.
+     * @param graph
+     */
+    public StoptimeUpdater(Graph graph) {
+        init(graph);
+    }
+    
+    /**
+     * Called when used in DI-context: graph is default one.
      */
     @PostConstruct
-    public void setup () {
-        graph = graphService.getGraph();
+    public void init() {
+        init(graphService.getGraph());
+    }
+    
+    /**
+     * Initialise for a given graph. Set the data sources for the target graphs.
+     */
+    private void init(Graph graph) {
+        this.graph = graph;
         graph.timetableSnapshotSource = this;
         transitIndexService = graph.getService(TransitIndexService.class);
         if (transitIndexService == null)
@@ -109,14 +129,16 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
         return snapshot;
     }
     
+    @Override
+    public void setup() {
+    }
+    
     /**
      * Repeatedly makes blocking calls to an UpdateStreamer to retrieve new stop time updates,
      * and applies those updates to the graph.
      */
     @Override
     public void run() {
-        graph = graphService.getGraph();
-        transitIndexService = graph.getService(TransitIndexService.class);
         
         List<TripUpdate> tripUpdates = updateStreamer.getUpdates(); 
         if (tripUpdates == null) {
@@ -168,6 +190,10 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
         else {
             getSnapshot(); 
         }
+    }
+
+    @Override
+    public void teardown() {
     }
 
     protected boolean handleAddedTrip(TripUpdate tripUpdate) {

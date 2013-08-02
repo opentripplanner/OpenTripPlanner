@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -72,7 +73,15 @@ public class CommandLineParameters {
     @Parameter(names = {"--noStreets"},
     description = "skip all street input files (OSM)")
     boolean noStreets;
-    
+
+    @Parameter(names = {"--noEmbedConfig"},
+    description = "Skip embedding config in graph (Embed.properties)")
+    boolean noEmbedConfig = false;
+
+    @Parameter(names = {"--transitIndex"},
+    description = "build a transit index for GTFS data")
+    boolean transitIndex;
+
     /* Options for the server sub-task. */
 
     @Parameter( names = { "-a", "--analyst"}, 
@@ -88,8 +97,8 @@ public class CommandLineParameters {
     Integer port;
 
     @Parameter( names = { "-r", "--router"}, validateWith = RouterId.class,
-    description = "default router ID")
-    String defaultRouterId;
+    description = "Router ID, first one being the default")
+    List<String> routerIds;
 
     @Parameter( names = { "-s", "--server"}, 
             description = "run a server")
@@ -110,9 +119,9 @@ public class CommandLineParameters {
     /** Set some convenience parameters based on other parameters' values. */
     public void infer () {
         server |= ( inMemory || port != null );
-        server |= ( defaultRouterId != null || graphDirectory != null || staticDirectory != null );
+        server |= ( routerIds != null || graphDirectory != null || staticDirectory != null );
         if (graphDirectory  == null) graphDirectory  = DEFAULT_GRAPH_DIRECTORY;
-        if (defaultRouterId == null) defaultRouterId = DEFAULT_ROUTER_ID;
+        if (routerIds == null) routerIds = Arrays.asList(DEFAULT_ROUTER_ID);
         if (staticDirectory == null) staticDirectory = DEFAULT_STATIC_DIRECTORY;        
         if (cacheDirectory == null)  cacheDirectory  = DEFAULT_CACHE_DIRECTORY;        
         if (port == null) port = DEFAULT_PORT;
@@ -217,6 +226,5 @@ public class CommandLineParameters {
             }
         }
     }
-
 }
 

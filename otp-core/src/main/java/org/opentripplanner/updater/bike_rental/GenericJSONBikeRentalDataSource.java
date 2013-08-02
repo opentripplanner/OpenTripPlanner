@@ -4,15 +4,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.util.HttpUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.prefs.Preferences;
 
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.opentripplanner.configuration.PreferencesConfigurable;
+import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.util.HttpUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -20,7 +22,7 @@ import org.codehaus.jackson.map.ObjectMapper;
  *
  * @see BikeRentalDataSource
  */
-public abstract class GenericJSONBikeRentalDataSource implements BikeRentalDataSource {
+public abstract class GenericJSONBikeRentalDataSource implements BikeRentalDataSource, PreferencesConfigurable {
 
     private static final Logger log = LoggerFactory.getLogger(GenericJSONBikeRentalDataSource.class);
     private String url;
@@ -128,8 +130,16 @@ public abstract class GenericJSONBikeRentalDataSource implements BikeRentalDataS
 
     public abstract BikeRentalStation makeStation(JsonNode rentalStationNode);
 
+    @Override
     public String toString() {
         return getClass().getName() + "(" + url + ")";
     }
 
+    @Override
+    public void configure(Graph graph, Preferences preferences) {
+        String url = preferences.get("url", null);
+        if (url == null)
+            throw new IllegalArgumentException("Missing mandatory 'url' configuration.");
+        setUrl(url);
+    }
 }

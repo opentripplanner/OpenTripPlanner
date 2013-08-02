@@ -16,6 +16,17 @@ package org.opentripplanner.api.servlet;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.opentripplanner.updater.GraphUpdaterRunnable;
+import org.opentripplanner.updater.PeriodicTimerGraphUpdater;
+
+/**
+ * TODO Remove. This class is kept as is for now only for spring-backward-compatiliby purposes. This
+ * class has been replaced by the PeriodicTimerGraphUpdater, with one instance per graph (this class
+ * is unique for all graphs and need it's updater to take care of graph eviction).
+ * 
+ * @see PeriodicTimerGraphUpdater
+ */
+@Deprecated
 public class PeriodicGraphUpdater {
     private UpdateTask updater;
 
@@ -23,7 +34,7 @@ public class PeriodicGraphUpdater {
 
     private Thread thread;
 
-    private List<Runnable> updaters = new LinkedList<Runnable>();
+    private List<GraphUpdaterRunnable> updaters = new LinkedList<GraphUpdaterRunnable>();
 
     public void start() {
         updater = new UpdateTask();
@@ -32,6 +43,10 @@ public class PeriodicGraphUpdater {
         thread.setDaemon(false);
         // useful to name threads for debugging / profiling
         thread.setName("Graph Updater Thread");
+        // we assume updaters are set here
+        for (GraphUpdaterRunnable updater : updaters) {
+            updater.setup();
+        }
         thread.start();
     }
 
@@ -48,11 +63,9 @@ public class PeriodicGraphUpdater {
         return updateFrequency;
     }
 
-    public List<Runnable> getUpdaters() {
-        return updaters;
-    }
-
-    public void setUpdaters(List<Runnable> updaters) {
+    public void setUpdaters(List<GraphUpdaterRunnable> updaters) {
+        if (updaters != null)
+            throw new IllegalArgumentException("Can't set updaters twice.");
         this.updaters = updaters;
     }
 
@@ -74,13 +87,13 @@ public class PeriodicGraphUpdater {
                         Thread.sleep(getUpdateFrequency() - (now - lastUpdate));
                     } catch (InterruptedException e) {
                         if (finished) {
-                            return;
+                            break;
                         }
                     }
 
                     now = System.currentTimeMillis();
                 }
-                for (Runnable updater : getUpdaters()) {
+                for (GraphUpdaterRunnable updater : updaters) {
                     System.out.println("running updater " + updater);
                     updater.run();
                 }
@@ -88,6 +101,9 @@ public class PeriodicGraphUpdater {
                 lastUpdate = now;
 
                 Thread.yield();
+            }
+            for (GraphUpdaterRunnable updater : updaters) {
+                updater.teardown();
             }
         }
 

@@ -31,28 +31,17 @@ import org.opentripplanner.routing.edgetype.loader.LinkRequest;
 import org.opentripplanner.routing.edgetype.loader.NetworkLinkerLibrary;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.updater.GraphUpdaterRunnable;
-import org.opentripplanner.updater.PeriodicTimerGraphUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * TODO Remove. This class is kept for spring-backward compatibility purposes. Initially there was a
- * single PeriodicGraphUpdater for all graphs, thus the need for the updater itself to have to be
- * configured with the router ID he need to access, and have a GraphService at hand. It also need
- * to take care of graph eviction himself which is a bit brittle.
- * 
- * @see BikeRentalUpdater2
- * @see PeriodicTimerGraphUpdater
- * @see PeriodicGraphUpdater
- * 
+ * Dynamic bike-rental station updater which encapsulate one BikeRentalDataSource. 
+ *
  */
-@Deprecated
-public class BikeRentalUpdater implements GraphUpdaterRunnable {
-    private static final Logger LOG = LoggerFactory.getLogger(BikeRentalUpdater.class);
+public class BikeRentalUpdater2 implements GraphUpdaterRunnable {
+    private static final Logger LOG = LoggerFactory.getLogger(BikeRentalUpdater2.class);
 
     Map<BikeRentalStation, BikeRentalStationVertex> verticesByStation = new HashMap<BikeRentalStation, BikeRentalStationVertex>();
 
@@ -64,58 +53,23 @@ public class BikeRentalUpdater implements GraphUpdaterRunnable {
 
     private BikeRentalStationService service;
 
-    private String routerId;
-
-    private GraphService graphService;
-
     private String network = "default";
-    
-    private boolean setup = false;
-
-    public void setRouterId(String routerId) {
-        this.routerId = routerId;
-    }
 
     public void setNetwork(String network) {
         this.network = network;
     }
 
-    @Autowired
-    public void setBikeRentalDataSource(BikeRentalDataSource source) {
+    public BikeRentalUpdater2(Graph graph, BikeRentalDataSource source) {
+        LOG.info("Setting up bike rental updater.");
+        this.graph = graph;
         this.source = source;
-    }
-
-    @Autowired
-    public void setGraphService(GraphService graphService) {
-        this.graphService = graphService;
-    }
-
-    public boolean init() {
-        graph = graphService.getGraph(routerId); // Handle null routerId.
-        if (graph == null && setup) {
-            // We temporary disable the updater: no graph ready (yet).
-            LOG.error("Can't get graph for router ID {}, disabling updater.", routerId);
-            networkLinkerLibrary = null;
-            service = null;
-            setup = false;
+        networkLinkerLibrary = new NetworkLinkerLibrary(graph,
+                Collections.<Class<?>, Object> emptyMap());
+        service = graph.getService(BikeRentalStationService.class);
+        if (service == null) {
+            service = new BikeRentalStationService();
+            graph.putService(BikeRentalStationService.class, service);
         }
-        if (graph != null && !setup) {
-            // A graph is available, setting up.
-            LOG.info("Setting up updater for router ID {}.", routerId);
-            networkLinkerLibrary = new NetworkLinkerLibrary(graph,
-                    Collections.<Class<?>, Object> emptyMap());
-            service = graph.getService(BikeRentalStationService.class);
-            if (service == null) {
-                service = new BikeRentalStationService();
-                graph.putService(BikeRentalStationService.class, service);
-            }
-            setup = true;
-        }
-        return setup;
-    }
-
-    public List<BikeRentalStation> getStations() {
-        return source.getStations();
     }
 
     @Override
@@ -124,10 +78,6 @@ public class BikeRentalUpdater implements GraphUpdaterRunnable {
 
     @Override
     public void run() {
-        if (!init()) {
-            // Updater has been disabled (no graph available).
-            return;
-        }
         LOG.debug("Updating bike rental stations from " + source);
         if (!source.update()) {
             LOG.debug("No updates");
