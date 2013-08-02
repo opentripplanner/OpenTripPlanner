@@ -114,7 +114,7 @@ public class PreBoardEdge extends FreeEdge {
     }
 
     public TraverseMode getMode() {
-        return TraverseMode.BOARDING;
+        return TraverseMode.LEG_SWITCH;
     }
 
     public State optimisticTraverse(State s0) {

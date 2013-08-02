@@ -117,7 +117,7 @@ public class PreAlightEdge extends FreeEdge {
     }
 
     public TraverseMode getMode() {
-        return TraverseMode.ALIGHTING;
+        return TraverseMode.LEG_SWITCH;
     }
 
     public State optimisticTraverse(State s0) {

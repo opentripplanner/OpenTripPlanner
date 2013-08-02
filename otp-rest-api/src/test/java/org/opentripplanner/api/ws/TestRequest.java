@@ -845,7 +845,7 @@ public class TestRequest extends TestCase {
         itinerary = response.getPlan().itinerary.get(0);
         // Check the ids of the first two busses, the timed transfer should be used
         assertEquals("750W1300", itinerary.legs.get(1).tripId);
-        assertEquals("120W1320", itinerary.legs.get(2).tripId);
+        assertEquals("120W1320", itinerary.legs.get(3).tripId);
         
         // Now apply a real-time update: let the to-trip be early by 240 seconds, resulting in a transfer time of 0 seconds
         @SuppressWarnings("deprecation")
@@ -857,7 +857,7 @@ public class TestRequest extends TestCase {
         itinerary = response.getPlan().itinerary.get(0);
         // Check the ids of the first two busses, the timed transfer should still be used
         assertEquals("750W1300", itinerary.legs.get(1).tripId);
-        assertEquals("120W1320", itinerary.legs.get(2).tripId);
+        assertEquals("120W1320", itinerary.legs.get(3).tripId);
         
         // "Revert" the real-time update
         applyUpdateToTripPattern(pattern, "120W1320", "9756", 21, 41820, 41820, Update.Status.PREDICTION, 0);
@@ -897,7 +897,7 @@ public class TestRequest extends TestCase {
         itinerary = response.getPlan().itinerary.get(0);
         // Check the ids of the first two busses, the timed transfer should be used
         assertEquals("750W1300", itinerary.legs.get(1).tripId);
-        assertEquals("120W1320", itinerary.legs.get(2).tripId);
+        assertEquals("120W1320", itinerary.legs.get(3).tripId);
         
         // Now apply a real-time update: let the to-trip be early by 240 seconds, resulting in a transfer time of 0 seconds
         @SuppressWarnings("deprecation")
@@ -909,7 +909,7 @@ public class TestRequest extends TestCase {
         itinerary = response.getPlan().itinerary.get(0);
         // Check the ids of the first two busses, the timed transfer should still be used
         assertEquals("750W1300", itinerary.legs.get(1).tripId);
-        assertEquals("120W1320", itinerary.legs.get(2).tripId);
+        assertEquals("120W1320", itinerary.legs.get(3).tripId);
         
         // Now apply a real-time update: let the to-trip be early by 241 seconds, resulting in a transfer time of -1 seconds
         applyUpdateToTripPattern(pattern, "120W1320", "9756", 21, 41579, 41579, Update.Status.PREDICTION, 0);
@@ -918,12 +918,8 @@ public class TestRequest extends TestCase {
         response = planner.getItineraries();
         itinerary = response.getPlan().itinerary.get(0);
         // The ids of the first two busses should be different
-        int secondBusLeg = 2;
-        if (itinerary.legs.get(2).mode == "WALK") {
-            secondBusLeg = 3;
-        }
         assertFalse("190W1280".equals(itinerary.legs.get(1).tripId)
-                && "751W1330".equals(itinerary.legs.get(secondBusLeg).tripId));
+                && "751W1330".equals(itinerary.legs.get(3).tripId));
         
         // "Revert" the real-time update
         applyUpdateToTripPattern(pattern, "120W1320", "9756", 21, 41820, 41820, Update.Status.PREDICTION, 0);

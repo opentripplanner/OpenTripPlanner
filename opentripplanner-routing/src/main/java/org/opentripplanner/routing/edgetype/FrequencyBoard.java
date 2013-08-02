@@ -70,7 +70,7 @@ public class FrequencyBoard extends Edge implements OnBoardForwardEdge, PatternE
     }
 
     public TraverseMode getMode() {
-        return TraverseMode.BOARDING;
+        return TraverseMode.LEG_SWITCH;
     }
 
     public String getName() {
@@ -97,7 +97,7 @@ public class FrequencyBoard extends Edge implements OnBoardForwardEdge, PatternE
             }
             s1.setTripId(null);
             s1.setLastAlightedTimeSeconds(state0.getTimeSeconds());
-            s1.setBackMode(TraverseMode.BOARDING);
+            s1.setBackMode(TraverseMode.LEG_SWITCH);
             s1.setPreviousStop(((TransitVertex) fromv).getStop());
             return s1.makeState();
         } else {
@@ -204,7 +204,7 @@ public class FrequencyBoard extends Edge implements OnBoardForwardEdge, PatternE
             s1.setPreviousTrip(trip);
             s1.setZone(pattern.getZone(stopIndex));
             s1.setRoute(trip.getRoute().getId());
-            s1.setBackMode(TraverseMode.BOARDING);
+            s1.setBackMode(TraverseMode.LEG_SWITCH);
             
             long wait_cost = bestWait;
             if (state0.getNumBoardings() == 0) {
@@ -222,7 +222,7 @@ public class FrequencyBoard extends Edge implements OnBoardForwardEdge, PatternE
     public State optimisticTraverse(State state0) {
         StateEditor s1 = state0.edit(this);
         // no cost (see patternalight)
-        s1.setBackMode(TraverseMode.BOARDING);
+        s1.setBackMode(TraverseMode.LEG_SWITCH);
         return s1.makeState();
     }
 

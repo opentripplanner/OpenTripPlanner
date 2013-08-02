@@ -15,6 +15,7 @@ package org.opentripplanner.routing.edgetype;
 
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 
@@ -33,7 +34,7 @@ public class LegSwitchingEdge extends Edge {
 	@Override
 	public State traverse(State s0) {
 		StateEditor editor = s0.edit(this);
-		editor.setBackMode(null);
+		editor.setBackMode(TraverseMode.LEG_SWITCH);
 		return editor.makeState();
 	}
 
