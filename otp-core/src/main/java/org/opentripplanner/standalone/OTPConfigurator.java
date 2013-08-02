@@ -2,6 +2,7 @@ package org.opentripplanner.standalone;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -118,8 +119,9 @@ public class OTPConfigurator {
             if (params.graphDirectory != null) {
                 graphService.setPath(params.graphDirectory);
             }
-            if (params.defaultRouterId != null) {
-                graphService.setDefaultRouterId(params.defaultRouterId);
+            if (params.routerIds.size() > 0) {
+                graphService.setDefaultRouterId(params.routerIds.get(0));
+                graphService.setAutoRegister(params.routerIds);
             }
             this.graphService = graphService;
         }
