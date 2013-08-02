@@ -1,11 +1,11 @@
 package org.opentripplanner.standalone;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-
-import lombok.Setter;
 
 import org.opentripplanner.analyst.core.GeometryIndex;
 import org.opentripplanner.analyst.request.Renderer;
@@ -15,14 +15,17 @@ import org.opentripplanner.analyst.request.TileCache;
 import org.opentripplanner.api.ws.PlanGenerator;
 import org.opentripplanner.api.ws.services.MetadataService;
 import org.opentripplanner.graph_builder.GraphBuilderTask;
+import org.opentripplanner.graph_builder.impl.EmbeddedConfigGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.StreetlessStopLinker;
 import org.opentripplanner.graph_builder.impl.TransitToStreetNetworkGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.ned.NEDGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.ned.NEDGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl;
+import org.opentripplanner.graph_builder.impl.transit_index.TransitIndexBuilder;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
+import org.opentripplanner.graph_builder.services.GraphBuilderWithGtfsDao;
 import org.opentripplanner.graph_builder.services.ned.NEDGridCoverageFactory;
 import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
@@ -116,8 +119,9 @@ public class OTPConfigurator {
             if (params.graphDirectory != null) {
                 graphService.setPath(params.graphDirectory);
             }
-            if (params.defaultRouterId != null) {
-                graphService.setDefaultRouterId(params.defaultRouterId);
+            if (params.routerIds.size() > 0) {
+                graphService.setDefaultRouterId(params.routerIds.get(0));
+                graphService.setAutoRegister(params.routerIds);
             }
             this.graphService = graphService;
         }
@@ -138,6 +142,7 @@ public class OTPConfigurator {
         GraphBuilderTask graphBuilder = new GraphBuilderTask();
         List<File> gtfsFiles = Lists.newArrayList();
         List<File> osmFiles =  Lists.newArrayList();
+        File configFile = null;
         /* For now this is adding files from all directories listed, rather than building multiple graphs. */
         for (File dir : params.build) {
             LOG.info("Searching for graph builder input files in {}", dir);
@@ -155,6 +160,12 @@ public class OTPConfigurator {
                 case OSM:
                     LOG.info("Found OSM file {}", file);
                     osmFiles.add(file);
+                    break;
+                case CONFIG:
+                    if (!params.noEmbedConfig) {
+                        LOG.info("Found CONFIG file {}", file);
+                        configFile = file;
+                    }
                     break;
                 case OTHER:
                     LOG.debug("Skipping file '{}'", file);
@@ -182,13 +193,23 @@ public class OTPConfigurator {
                 GtfsBundle gtfsBundle = new GtfsBundle(gtfsFile);
                 gtfsBundles.add(gtfsBundle);
             }
-            GraphBuilder gtfsBuilder = new GtfsGraphBuilderImpl(gtfsBundles);
+            GtfsGraphBuilderImpl gtfsBuilder = new GtfsGraphBuilderImpl(gtfsBundles);
             graphBuilder.addGraphBuilder(gtfsBuilder);
             if ( hasOSM ) {
                 graphBuilder.addGraphBuilder(new TransitToStreetNetworkGraphBuilderImpl());
             } else {
                 graphBuilder.addGraphBuilder(new StreetlessStopLinker());
             }
+            List<GraphBuilderWithGtfsDao> gtfsBuilders = new ArrayList<GraphBuilderWithGtfsDao>();
+            if (params.transitIndex) {
+                gtfsBuilders.add(new TransitIndexBuilder());
+            }
+            gtfsBuilder.setGtfsGraphBuilders(gtfsBuilders);
+        }
+        if (configFile != null) {
+            EmbeddedConfigGraphBuilderImpl embeddedConfigBuilder = new EmbeddedConfigGraphBuilderImpl();
+            embeddedConfigBuilder.setPropertiesFile(configFile);
+            graphBuilder.addGraphBuilder(embeddedConfigBuilder);
         }
         if (params.elevation) {
             File cacheDirectory = new File(params.cacheDirectory, "ned");
@@ -218,7 +239,7 @@ public class OTPConfigurator {
     }
 
     private static enum InputFileType {
-        GTFS, OSM, OTHER;
+        GTFS, OSM, CONFIG, OTHER;
         public static InputFileType forFile(File file) {
             String name = file.getName();
             if (name.endsWith(".zip")) {
@@ -232,6 +253,7 @@ public class OTPConfigurator {
             if (name.endsWith(".pbf")) return OSM;
             if (name.endsWith(".osm")) return OSM;
             if (name.endsWith(".osm.xml")) return OSM;
+            if (name.equals("Embed.properties")) return CONFIG;
             return OTHER;
         }
     }

@@ -16,6 +16,8 @@ package org.opentripplanner.updater;
 import java.io.IOException;
 import java.io.InputStream;
 
+import lombok.Setter;
+
 import org.opentripplanner.routing.services.PatchService;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
@@ -25,44 +27,39 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 
-public class GtfsRealtimeUpdater implements Runnable {
+public class GtfsRealtimeUpdater implements GraphUpdaterRunnable {
     private static final Logger log = LoggerFactory.getLogger(GtfsRealtimeUpdater.class);
 
+    @Setter
     private String url;
 
+    @Setter
     private String defaultAgencyId;
 
     private PatchService patchService;
 
+    @Setter
     private long earlyStart;
 
     private UpdateHandler updateHandler = null;
 
-    public void setUrl(String url) {
-        this.url = url;
+    @Override
+    public void setup() {
+        if (updateHandler == null) {
+            updateHandler = new UpdateHandler();
+        }
+        updateHandler.setEarlyStart(earlyStart);
+        updateHandler.setDefaultAgencyId(defaultAgencyId);
+        updateHandler.setPatchService(patchService);
     }
 
-    public String getUrl() {
-        return url;
-    }
-
-    public void setDefaultAgencyId(String defaultAgencyId) {
-        this.defaultAgencyId = defaultAgencyId;
-    }
-
+    @Override
     public void run() {
         try {
             InputStream data = HttpUtils.getData(url);
             if (data == null) {
                 throw new RuntimeException("Failed to get data from url " + url);
             }
-            if(updateHandler == null) {
-                updateHandler = new UpdateHandler();
-            }
-            updateHandler.setEarlyStart(earlyStart);
-            updateHandler.setDefaultAgencyId(defaultAgencyId);
-            updateHandler.setPatchService(getPatchService());
-
             FeedMessage feed = GtfsRealtime.FeedMessage.parseFrom(data);
             updateHandler.update(feed);
         } catch (IOException e) {
@@ -70,22 +67,15 @@ public class GtfsRealtimeUpdater implements Runnable {
         }
     }
 
+    @Override
+    public void teardown() {
+    }
+
     @Autowired
     public void setPatchService(PatchService patchService) {
         this.patchService = patchService;
     }
 
-    public PatchService getPatchService() {
-        return patchService;
-    }
-
-    public long getEarlyStart() {
-        return earlyStart;
-    }
-
-    public void setEarlyStart(long earlyStart) {
-        this.earlyStart = earlyStart;
-    }
     public String toString() {
         return "GtfsRealtimeUpdater(" + url + ")";
     }

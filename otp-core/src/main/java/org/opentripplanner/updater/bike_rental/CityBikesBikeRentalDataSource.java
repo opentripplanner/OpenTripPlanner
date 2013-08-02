@@ -21,19 +21,23 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.prefs.Preferences;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
+import org.opentripplanner.configuration.PreferencesConfigurable;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
-public class CityBikesBikeRentalDataSource implements BikeRentalDataSource {
+// TODO This class could probably inherit from GenericJSONBikeRentalDataSource
+public class CityBikesBikeRentalDataSource implements BikeRentalDataSource, PreferencesConfigurable {
 
     private static final Logger log = LoggerFactory.getLogger(BixiBikeRentalDataSource.class);
 
@@ -114,7 +118,17 @@ public class CityBikesBikeRentalDataSource implements BikeRentalDataSource {
         this.url = url;
     }
 
+    @Override
     public String toString() {
         return getClass().getName() + "(" + url + ")";
     }
+    
+    @Override
+    public void configure(Graph graph, Preferences preferences) {
+        String url = preferences.get("url", null);
+        if (url == null)
+            throw new IllegalArgumentException("Missing mandatory 'url' configuration.");
+        setUrl(url);
+    }
+
 }
