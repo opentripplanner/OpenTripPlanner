@@ -18,7 +18,6 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement; 
 
 import org.onebusaway.gtfs.model.AgencyAndId;
-import org.opentripplanner.model.json_serialization.GeoJSONSerializer;
 import org.opentripplanner.util.Constants; 
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -103,8 +102,9 @@ public class Place {
         this.name = name;
     }
 
-    public Place(Double lon, Double lat, String name, Calendar timeAtState) {
+    public Place(Double lon, Double lat, String name, Calendar arrival, Calendar departure) {
         this(lon, lat, name);
-        this.arrival = departure = timeAtState;
+        this.arrival = arrival;
+        this.departure = departure;
     }
 }

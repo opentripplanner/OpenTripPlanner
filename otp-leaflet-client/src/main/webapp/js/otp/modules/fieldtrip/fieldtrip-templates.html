@@ -18,9 +18,17 @@
             </div>
         </div>
     </div>
-    <div class="notDraggable" style="position: absolute; height: 30px; bottom: 10px; width:100%; text-align: center;">
+    <div class="notDraggable" style="position: absolute; height: 30px; bottom: 10px; left:10px; right:10px;">
+        
+        <div style="position: absolute; right: 0px; text-align: right;">
+            Daily Report for:
+            <input type="text" class="reportDateInput" style="width: 75px; text-align: center;"></input>&nbsp;
+            <button class="viewReportButton">View</button>
+        </div>
+
         <button class="refreshButton">Refresh Requests</button>
     </div>
+    
 
 </script>
 
@@ -61,6 +69,8 @@
             <b>Class Pass ID</b>: 
                 {{#classpassId}}{{classpassId}}{{/classpassId}}{{^classpassId}}(None){{/classpassId}}<br>
 
+            <b>Teacher Notes:</b>
+                {{#submitterNotes}}{{submitterNotes}}{{/submitterNotes}}{{^submitterNotes}}N/A{{/submitterNotes}}<br>
             <i>Request submitted: {{timeStamp}}</i>
             
             <div style="margin-top: 1em; border-bottom: 2px solid gray; font-weight: bold;">User Feedback</div>
@@ -78,7 +88,22 @@
                 </div>
             {{/feedback}}
             
-            
+            <div style="margin-top: 1em; border-bottom: 2px solid gray; font-weight: bold;">Agent Notes</div>
+            {{#notes}}
+                <div style="margin-top: 10px; background: #f0f0f0; font-size: 12px; padding: 6px;">
+                    <div style="float:right; font-size: 8px;"><button class="deleteNoteButton-{{id}}">X</button></div>
+                    {{note}}
+                    <div style="margin-top: 6px; font-size: 11px; font-style: italic; text-align: right;">
+                        Submitted by {{userName}} on {{timeStamp}} / {{id}}
+                    </div>                    
+                </div>
+            {{/notes}}
+            {{^notes}}
+                <div style="margin-top: 10px; font-size: 12px; font-style: italic;">
+                    No notes.
+                </div>
+            {{/notes}}
+                        
         </div>
         <!--<div style="position: absolute; bottom: 0px; height: 120px; left:0px; right: 0px;">-->
         <div class="otp-fieldTrip-requestWidget-tripBoxContainer" style="left:0px;">
@@ -115,11 +140,13 @@
             <div style="text-align:center;">
                 <button class="cancelRequestButton">Cancel Request</button>
                 <button class="setClasspassButton">Set Classpass ID</button>
+                <button class="addNoteButton">Add Note</button>
             </div>            
             <div style="text-align:center; margin-top: 6px;">
                 <a href="{{dsUrl}}/public/fieldtrip/feedbackForm?requestId={{id}}" target="blank_">Feedback Link</a> | 
                 <a href="{{dsUrl}}/fieldtrip/receipt?requestId={{id}}" target="blank_">Receipt Link</a> | 
-                <a href="#" class="printablePlanLink">Printable Trip Plan</a>
+                <a href="#" class="printablePlanLink">Printable Trip Plan</a> | 
+                <a href="{{dsUrl}}/fieldtrip/opsReport?month={{travelMonth}}&day={{travelDay}}&year={{travelYear}}" target="blank_">Daily Report</a>
             </div>            
         </div>
     </div>

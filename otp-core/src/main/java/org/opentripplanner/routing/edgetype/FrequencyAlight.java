@@ -201,7 +201,7 @@ public class FrequencyAlight extends Edge  implements OnBoardReverseEdge {
             s1.incrementWeight(preferences_penalty);
             s1.incrementWeight(transferPenalty);
             s1.incrementWeight(wait_cost + options.getBoardCost(mode));
-            s1.setBackMode(TraverseMode.ALIGHTING);
+            s1.setBackMode(TraverseMode.LEG_SWITCH);
             return s1.makeState();
         } else {
             /* forward traversal: not so much to do */
@@ -218,7 +218,7 @@ public class FrequencyAlight extends Edge  implements OnBoardReverseEdge {
             s1.setTripId(null);
             s1.setLastAlightedTimeSeconds(state0.getTimeSeconds());
             s1.setPreviousStop(((TransitVertex) fromv).getStop());
-            s1.setBackMode(TraverseMode.ALIGHTING);
+            s1.setBackMode(TraverseMode.LEG_SWITCH);
             return s1.makeState();
         }
     }
@@ -226,7 +226,7 @@ public class FrequencyAlight extends Edge  implements OnBoardReverseEdge {
     public State optimisticTraverse(State state0) {
         StateEditor s1 = state0.edit(this);
         // no cost (see patternalight)
-        s1.setBackMode(TraverseMode.ALIGHTING);
+        s1.setBackMode(TraverseMode.LEG_SWITCH);
         return s1.makeState();
     }
 

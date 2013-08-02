@@ -67,7 +67,7 @@ public class StreetTransitLink extends Edge {
     }
 
     public TraverseMode getMode() {
-        return TraverseMode.STL;
+        return TraverseMode.LEG_SWITCH;
     }
 
     public String getName() {
@@ -84,14 +84,14 @@ public class StreetTransitLink extends Edge {
         StateEditor s1 = s0.edit(this);
         s1.incrementTimeInSeconds(transitStop.getStreetToStopTime() + 1);
         s1.incrementWeight(STL_TRAVERSE_COST + transitStop.getStreetToStopTime());
-        s1.setBackMode(TraverseMode.STL);
+        s1.setBackMode(TraverseMode.LEG_SWITCH);
         return s1.makeState();
     }
 
     public State optimisticTraverse(State s0) {
         StateEditor s1 = s0.edit(this);
         s1.incrementWeight(STL_TRAVERSE_COST);
-        s1.setBackMode(TraverseMode.STL);
+        s1.setBackMode(TraverseMode.LEG_SWITCH);
         return s1.makeState();
     }
     

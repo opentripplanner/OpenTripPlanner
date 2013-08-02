@@ -1,0 +1,33 @@
+<script id="otp-okDialog" type="text/html">
+    <div style="position: relative;">
+        <div class="otp-dialogContent">{{message}}</div>
+        <div class="otp-dialogButtonRow">
+            <button class="okButton">OK</button>
+        </div>
+    </div>
+</script>
+
+<script id="otp-yesNoDialog" type="text/html">
+    <div style="position: relative;">
+        <div class="otp-dialogContent">{{message}}</div>
+        <div class="otp-dialogButtonRow">
+            <button class="yesButton">Yes</button>
+            <button class="noButton">No</button>
+        </div>
+    </div>
+</script>
+
+<script id="otp-inputDialog" type="text/html">
+    <div style="position: relative;">
+        <div class="otp-dialogContent">
+            {{message}}
+            <div style="margin-top: 6px;">
+                <textarea class="borderBox textarea" style="width: 100%; height: 100%;" />
+            </div>
+        </div>
+        <div class="otp-dialogButtonRow">
+            <button class="okButton">OK</button>
+            <button class="cancelButton">Cancel</button>
+        </div>
+    </div>
+</script>

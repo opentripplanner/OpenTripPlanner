@@ -16,6 +16,7 @@ import java.text.DateFormatSymbols;
 import java.util.*;
 
 import models.*;
+import models.fieldtrip.FieldTripNote;
 import play.data.binding.As;
 
 
@@ -320,6 +321,35 @@ public class FieldTrip extends Application {
         }
     }
 
+    public static void addNote(FieldTripNote note, long requestId) {
+        TrinetUser user = checkLogin();        
+        checkAccess(user);
+
+        FieldTripRequest req = FieldTripRequest.findById(requestId);
+        if(req != null) {
+            note.id = null;
+            note.request = req;
+            note.save();
+            
+            req.notes.add(note);
+            req.save();
+            
+            renderJSON(requestId);
+        }
+        else {
+            badRequest();
+        }
+    }
+    
+    public static void deleteNote(Long noteId) {
+        TrinetUser user = checkLogin();        
+        checkAccess(user);
+      
+        FieldTripNote note = FieldTripNote.findById(noteId);
+        note.delete();
+        renderJSON(noteId);
+    }
+        
     /* Receipt Generation */
     
     public static void receipt(long requestId) {

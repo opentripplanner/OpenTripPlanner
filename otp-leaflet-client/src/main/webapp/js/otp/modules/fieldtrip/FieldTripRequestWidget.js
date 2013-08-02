@@ -43,12 +43,19 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
         var context = _.clone(this.request);
         context.widgetId = this.id;
         context.dsUrl = otp.config.datastoreUrl;
-        if(this.request.travelDate) context.travelDate = moment(this.request.travelDate).format("dddd, MMMM D, YYYY");
+        if(this.request.travelDate) {
+            var m = moment(this.request.travelDate);
+            context.travelDate = m.format("dddd, MMMM D, YYYY");
+            context.travelDay = m.date();
+            context.travelMonth = m.month()+1;
+            context.travelYear = m.year();
+        }
         if(this.request.arriveDestinationTime) context.arriveDestinationTime = moment(this.request.arriveDestinationTime).format(otp.config.timeFormat);
         if(this.request.leaveDestinationTime) context.leaveDestinationTime = moment(this.request.leaveDestinationTime).format(otp.config.timeFormat);
         if(this.request.arriveSchoolTime) context.arriveSchoolTime = moment(this.request.arriveSchoolTime).format(otp.config.timeFormat);
 
-        if(this.request.paymentPreference === "request_call") context.paymentPreference = "Call requested at provided phone number";
+        if(this.request.paymentPreference === "own_tickets") context.paymentPreference = "Will use own tickets";
+        else if(this.request.paymentPreference === "request_call") context.paymentPreference = "Call requested at provided phone number";
         else if(this.request.paymentPreference === "fax_cc") context.paymentPreference = "Will fax credit card info to TriMet";
         else if(this.request.paymentPreference === "mail_check") context.paymentPreference = "Will mail check to TriMet";
         
@@ -150,6 +157,25 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
                 this_.module.setClasspassId(this_.request, classpassId);
             }
         });
+        this.content.find('.addNoteButton').click(function(evt) {
+            otp.widgets.Dialogs.showInputDialog("Note to be attached to this request:", "Add Note", function(input) {
+                console.log(input);
+                this_.module.addNote(this_.request, input);
+            });
+        });
+        
+        for(var i = 0; i < this.request.notes.length; i++) {
+            //console.log("note "+this.request.notes[i].id);
+            var note = this.request.notes[i];
+            this.content.find(".deleteNoteButton-" + note.id).data("note", note).click(function() {
+                var note = $(this).data("note");
+                var msg = 'Are you sure you want to delete the note "' + note.note + '" from Field Trip Request #' + this_.request.id + '?';
+                otp.widgets.Dialogs.showYesNoDialog(msg, 'Confirm Note Delete', function() {
+                    this_.module.deleteNote(note);                  
+                });                
+            });
+        }
+        
     },
     
     onClose : function() {
