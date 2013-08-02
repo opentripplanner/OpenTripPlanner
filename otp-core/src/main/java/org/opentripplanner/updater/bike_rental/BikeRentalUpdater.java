@@ -33,12 +33,25 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.updater.GraphUpdaterRunnable;
+import org.opentripplanner.updater.PeriodicTimerGraphUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Deprecated // TODO Remove
-public class BikeRentalUpdater implements Runnable {
+/**
+ * TODO Remove. This class is kept for spring-backward compatibility purposes. Initially there was a
+ * single PeriodicGraphUpdater for all graphs, thus the need for the updater itself to have to be
+ * configured with the router ID he need to access, and have a GraphService at hand. It also need
+ * to take care of graph eviction himself which is a bit brittle.
+ * 
+ * @see BikeRentalUpdater2
+ * @see PeriodicTimerGraphUpdater
+ * @see PeriodicGraphUpdater
+ * 
+ */
+@Deprecated
+public class BikeRentalUpdater implements GraphUpdaterRunnable {
     private static final Logger LOG = LoggerFactory.getLogger(BikeRentalUpdater.class);
 
     Map<BikeRentalStation, BikeRentalStationVertex> verticesByStation = new HashMap<BikeRentalStation, BikeRentalStationVertex>();
@@ -77,7 +90,7 @@ public class BikeRentalUpdater implements Runnable {
         this.graphService = graphService;
     }
 
-    public boolean setup() {
+    public boolean init() {
         graph = graphService.getGraph(routerId); // Handle null routerId.
         if (graph == null && setup) {
             // We temporary disable the updater: no graph ready (yet).
@@ -106,8 +119,12 @@ public class BikeRentalUpdater implements Runnable {
     }
 
     @Override
+    public void setup() {
+    }
+
+    @Override
     public void run() {
-        if (!setup()) {
+        if (!init()) {
             // Updater has been disabled (no graph available).
             return;
         }
@@ -154,8 +171,12 @@ public class BikeRentalUpdater implements Runnable {
         }
         for (BikeRentalStation station : toRemove) {
             // post-iteration removal to avoid concurrent modification
-            verticesByStation.remove(station); 
+            verticesByStation.remove(station);
         }
 
+    }
+
+    @Override
+    public void teardown() {
     }
 }

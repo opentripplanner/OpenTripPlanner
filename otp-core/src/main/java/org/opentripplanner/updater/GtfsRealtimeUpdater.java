@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 
-public class GtfsRealtimeUpdater implements Runnable {
+public class GtfsRealtimeUpdater implements GraphUpdaterRunnable {
     private static final Logger log = LoggerFactory.getLogger(GtfsRealtimeUpdater.class);
 
     @Setter
@@ -43,24 +43,32 @@ public class GtfsRealtimeUpdater implements Runnable {
 
     private UpdateHandler updateHandler = null;
 
+    @Override
+    public void setup() {
+        if (updateHandler == null) {
+            updateHandler = new UpdateHandler();
+        }
+        updateHandler.setEarlyStart(earlyStart);
+        updateHandler.setDefaultAgencyId(defaultAgencyId);
+        updateHandler.setPatchService(patchService);
+    }
+
+    @Override
     public void run() {
         try {
             InputStream data = HttpUtils.getData(url);
             if (data == null) {
                 throw new RuntimeException("Failed to get data from url " + url);
             }
-            if (updateHandler == null) {
-                updateHandler = new UpdateHandler();
-            }
-            updateHandler.setEarlyStart(earlyStart);
-            updateHandler.setDefaultAgencyId(defaultAgencyId);
-            updateHandler.setPatchService(patchService);
-
             FeedMessage feed = GtfsRealtime.FeedMessage.parseFrom(data);
             updateHandler.update(feed);
         } catch (IOException e) {
             log.error("Eror reading gtfs-realtime feed from " + url, e);
         }
+    }
+
+    @Override
+    public void teardown() {
     }
 
     @Autowired

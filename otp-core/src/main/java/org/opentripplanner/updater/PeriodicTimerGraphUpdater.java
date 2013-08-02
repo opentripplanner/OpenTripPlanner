@@ -13,42 +13,57 @@
 
 package org.opentripplanner.updater;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Graph updater running a list of Runnable periodically. This class is attached to the graph as a
- * service:
+ * Graph updater running a list of GraphUpdaterRunnable periodically. This class is attached to the
+ * graph as a service:
  * 
  * <pre>
- *         PeriodicTimerGraphUpdater periodicGraphUpdater = graph
- *             .getService(PeriodicTimerGraphUpdater.class);
+ * PeriodicTimerGraphUpdater periodicGraphUpdater = graph.getService(PeriodicTimerGraphUpdater.class);
  * </pre>
  * 
- * 
- * Each Runnable can have it's own frequency. We rely on standard Java Timer for implementation.
+ * Each GraphUpdaterRunnable can have it's own frequency. We rely on standard Java
+ * ScheduledExecutorService for implementation.
  * 
  */
 public class PeriodicTimerGraphUpdater {
 
     private static Logger LOG = LoggerFactory.getLogger(PeriodicTimerGraphUpdater.class);
 
-    private Timer timer = new Timer(true);
+    private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
-    private int size = 0;
+    List<GraphUpdaterRunnable> updaters = new ArrayList<GraphUpdaterRunnable>();
 
     public PeriodicTimerGraphUpdater() {
     }
 
     public void stop() {
-        timer.cancel();
+        scheduler.shutdownNow();
+        try {
+            boolean ok = scheduler.awaitTermination(30, TimeUnit.SECONDS);
+            if (!ok) {
+                LOG.warn("Timeout waiting for scheduled task to finish.");
+            }
+        } catch (InterruptedException e) {
+            // This should not happen
+            LOG.warn("Interrupted while waiting for scheduled task to finish.");
+        }
+        for (GraphUpdaterRunnable updater : updaters) {
+            updater.teardown();
+        }
     }
 
-    public void addUpdater(final Runnable updater, long frequencyMs) {
-        timer.scheduleAtFixedRate(new TimerTask() {
+    public void addUpdater(final GraphUpdaterRunnable updater, long frequencyMs) {
+        updater.setup();
+        scheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -59,12 +74,12 @@ public class PeriodicTimerGraphUpdater {
                     // cancel();
                 }
             }
-        }, 0, frequencyMs);
-        size++;
+        }, 0, frequencyMs, TimeUnit.MILLISECONDS);
+        updaters.add(updater);
     }
 
     public int size() {
-        return size;
+        return updaters.size();
     }
 
 }

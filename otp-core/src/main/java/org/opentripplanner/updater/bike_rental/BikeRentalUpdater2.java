@@ -32,6 +32,7 @@ import org.opentripplanner.routing.edgetype.loader.NetworkLinkerLibrary;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.updater.GraphUpdaterRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * Dynamic bike-rental station updater which encapsulate one BikeRentalDataSource. 
  *
  */
-public class BikeRentalUpdater2 implements Runnable {
+public class BikeRentalUpdater2 implements GraphUpdaterRunnable {
     private static final Logger LOG = LoggerFactory.getLogger(BikeRentalUpdater2.class);
 
     Map<BikeRentalStation, BikeRentalStationVertex> verticesByStation = new HashMap<BikeRentalStation, BikeRentalStationVertex>();
@@ -69,6 +70,10 @@ public class BikeRentalUpdater2 implements Runnable {
             service = new BikeRentalStationService();
             graph.putService(BikeRentalStationService.class, service);
         }
+    }
+
+    @Override
+    public void setup() {
     }
 
     @Override
@@ -119,5 +124,9 @@ public class BikeRentalUpdater2 implements Runnable {
             verticesByStation.remove(station);
         }
 
+    }
+
+    @Override
+    public void teardown() {
     }
 }

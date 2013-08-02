@@ -27,6 +27,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.trippattern.TripUpdate;
+import org.opentripplanner.updater.GraphUpdaterRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Update OTP stop time tables from some (realtime) source
  * @author abyrd
  */
-public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
+public class StoptimeUpdater implements GraphUpdaterRunnable, TimetableSnapshotSource {
 
     private static final Logger LOG = LoggerFactory.getLogger(StoptimeUpdater.class);
 
@@ -85,21 +86,21 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
      * @param graph
      */
     public StoptimeUpdater(Graph graph) {
-        setup(graph);
+        init(graph);
     }
     
     /**
      * Called when used in DI-context: graph is default one.
      */
     @PostConstruct
-    public void setup () {
-        setup(graphService.getGraph());
+    public void init() {
+        init(graphService.getGraph());
     }
     
     /**
      * Initialise for a given graph. Set the data sources for the target graphs.
      */
-    private void setup(Graph graph) {
+    private void init(Graph graph) {
         this.graph = graph;
         graph.timetableSnapshotSource = this;
         transitIndexService = graph.getService(TransitIndexService.class);
@@ -126,6 +127,10 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
             LOG.debug("Snapshot frequency exceeded. Reusing snapshot {}", snapshot);
         }
         return snapshot;
+    }
+    
+    @Override
+    public void setup() {
     }
     
     /**
@@ -185,6 +190,10 @@ public class StoptimeUpdater implements Runnable, TimetableSnapshotSource {
         else {
             getSnapshot(); 
         }
+    }
+
+    @Override
+    public void teardown() {
     }
 
     protected boolean handleAddedTrip(TripUpdate tripUpdate) {
