@@ -25,4 +25,7 @@ public interface TripPattern {
     List<Stop> getStops();
     
     int getHopCount(); 
+
+    int getAlightType(int stopIndex);
+    int getBoardType(int stopIndex);
 }
