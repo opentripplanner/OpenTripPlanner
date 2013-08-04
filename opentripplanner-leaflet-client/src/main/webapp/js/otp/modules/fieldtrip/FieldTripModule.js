@@ -707,7 +707,7 @@ otp.modules.fieldtrip.FieldTripModule =
             if(inboundTrip) {
                 var msg = "This action will overwrite a previously planned inbound itinerary for this request. Do you wish to continue?";
                 otp.widgets.Dialogs.showYesNoDialog(msg, "Overwrite Inbound Itinerary?", function() {
-                    this_.deleteTrip(outboundTrip);
+                    this_.deleteTrip(inboundTrip);
                     this_.saveTrip(request, 1, function(tripId) {
                         this_.loadRequests();
                     });
