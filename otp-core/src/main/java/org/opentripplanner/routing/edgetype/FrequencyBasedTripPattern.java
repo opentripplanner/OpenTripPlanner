@@ -249,10 +249,12 @@ public class FrequencyBasedTripPattern implements Serializable, TripPattern {
         return headsigns[stopIndex];
     }
 
+    @Override
     public int getAlightType(int stopIndex) {
         return (perStopFlags[stopIndex] & TableTripPattern.MASK_DROPOFF) >> TableTripPattern.SHIFT_DROPOFF;
     }
 
+    @Override
     public int getBoardType(int stopIndex) {
         return (perStopFlags[stopIndex] & TableTripPattern.MASK_PICKUP) >> TableTripPattern.SHIFT_PICKUP;
     }

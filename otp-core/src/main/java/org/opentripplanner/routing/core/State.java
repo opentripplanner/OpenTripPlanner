@@ -663,6 +663,9 @@ public class State implements Cloneable {
 
                 if (orig.isBikeRenting() != orig.getBackState().isBikeRenting())
                     editor.setBikeRenting(!orig.isBikeRenting());
+
+                editor.setNumBoardings(getNumBoardings() - orig.getNumBoardings());
+
                 ret = editor.makeState();
 
                 //EdgeNarrative origNarrative = orig.getBackEdgeNarrative();
