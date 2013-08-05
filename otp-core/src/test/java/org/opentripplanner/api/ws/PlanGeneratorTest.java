@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
@@ -88,7 +89,7 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.transit_index.RouteVariant;
 import org.opentripplanner.routing.trippattern.Update;
 import org.opentripplanner.routing.trippattern.Update.Status;
-import org.opentripplanner.routing.trippattern.UpdateBlock;
+import org.opentripplanner.routing.trippattern.TripUpdate;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
@@ -509,7 +510,7 @@ public class PlanGeneratorTest {
         PatternHop e19 = new PatternHop(
                 v18, v20, trainStopInterline, trainStopArrive, 0);
         TransitBoardAlight e21 = new TransitBoardAlight(
-                v20, v22, 0, TraverseMode.RAIL);
+                v20, v22, 1, TraverseMode.RAIL);
         PreAlightEdge e23 = new PreAlightEdge(
                 v22, v24);
 
@@ -523,7 +524,7 @@ public class PlanGeneratorTest {
         PatternHop e31 = new PatternHop(
                 v30, v32, ferryStopDepart, ferryStopArrive, 0);
         TransitBoardAlight e33 = new TransitBoardAlight(
-                v32, v34, 0, TraverseMode.FERRY);
+                v32, v34, 1, TraverseMode.FERRY);
         PreAlightEdge e35 = new PreAlightEdge(
                 v34, v36);
         StreetTransitLink e37 = new StreetTransitLink(
@@ -604,22 +605,24 @@ public class PlanGeneratorTest {
 
         FareServiceStub fareServiceStub = new FareServiceStub();
 
+        ServiceDate serviceDate = new ServiceDate(1970, 1, 1);
+
         // Updates for leg 4, the ferry leg
         Update ferryStopDepartUpdate = new Update(thirdTrip.getId(),
-                ferryStopDepart.getId().getId(), 0, 40, 40, Status.PREDICTION, 0L);
+                ferryStopDepart.getId(), 0, 40, 40, Status.PREDICTION, 0L, serviceDate);
         Update ferryStopArriveUpdate = new Update(thirdTrip.getId(),
-                ferryStopArrive.getId().getId(), 1, 43, 43, Status.PREDICTION, 0L);
+                ferryStopArrive.getId(), 1, 43, 43, Status.PREDICTION, 0L, serviceDate);
 
         ArrayList<Update> updates = new ArrayList<Update>();
 
         updates.add(ferryStopDepartUpdate);
         updates.add(ferryStopArriveUpdate);
 
-        UpdateBlock updateBlock = UpdateBlock.splitByTrip(updates).get(0);
+        TripUpdate tripUpdate = TripUpdate.splitByTrip(updates).get(0);
 
         TimetableSnapshotSource timetableSnapshotSource = new TimetableSnapshotSourceStub();
 
-        timetableSnapshotSource.getSnapshot().update(thirdTripPattern, updateBlock);
+        timetableSnapshotSource.getSnapshot().update(thirdTripPattern, tripUpdate);
 
         // Further graph initialization
         graph.putService(ServiceIdToNumberService.class, serviceIdToNumberService);
@@ -1776,6 +1779,16 @@ public class PlanGeneratorTest {
         @Override
         public int getOvernightBreak() {
             return 0;
+        }
+
+        @Override
+        public Map<AgencyAndId, Route> getAllRoutes() {
+            return null;
+        }
+
+        @Override
+        public Map<AgencyAndId, Stop> getAllStops() {
+            return null;
         }
     }
 
