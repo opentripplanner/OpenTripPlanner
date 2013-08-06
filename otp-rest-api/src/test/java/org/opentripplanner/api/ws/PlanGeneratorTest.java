@@ -117,6 +117,8 @@ public class PlanGeneratorTest {
     private static final String alertsExample =
             "Mine is the last voice that you will ever hear. Do not be alarmed.";
 
+    private static final PlanGenerator planGenerator = new PlanGenerator();
+
     /**
      * Test the generateItinerary() method. This test is intended to be comprehensive but fast.
      * Any future changes to the generateItinerary() method should be accompanied by changes in this
@@ -124,7 +126,10 @@ public class PlanGeneratorTest {
      */
     @Test
     public void testGenerateItinerary() {
-        compare(new PlanGenerator().generateItinerary(buildPath(), true));
+        GraphPath[] graphPaths = buildPaths();
+
+        compare(planGenerator.generateItinerary(graphPaths[0], true), false);
+        compare(planGenerator.generateItinerary(graphPaths[1], true), true);
     }
 
     /**
@@ -134,9 +139,9 @@ public class PlanGeneratorTest {
     @Test
     public void testEndWithLegSwitch() {
         // Reuse testGenerateItinerary()'s graph path, but shorten it
-        GraphPath graphPath = new GraphPath(buildPath().states.get(3), false);
+        GraphPath graphPath = new GraphPath(buildPaths()[0].states.get(3), false);
 
-        Itinerary itinerary = new PlanGenerator().generateItinerary(graphPath, false);
+        Itinerary itinerary = planGenerator.generateItinerary(graphPath, false);
 
         assertEquals(1, itinerary.legs.size());
         assertEquals("WALK", itinerary.legs.get(0).mode);
@@ -155,7 +160,7 @@ public class PlanGeneratorTest {
      * Leg 8: Leaving the bike rental station on foot
      * @return The generated GraphPath
      */
-    private GraphPath buildPath() {
+    private GraphPath[] buildPaths() {
         // This set of requested traverse modes implies that bike rental is a possibility.
         RoutingRequest options = new RoutingRequest(new TraverseModeSet(
                 TraverseMode.WALK, TraverseMode.BICYCLE, TraverseMode.TRANSIT));
@@ -628,63 +633,111 @@ public class PlanGeneratorTest {
         // Routing context creation and initialization
         ServiceDay serviceDay = new ServiceDay(graph, 0, calendarServiceImpl, null);
 
-        RoutingContext routingContext = new RoutingContext(options, graph, v0, v60);
+        // Traverse the path forward first
+        RoutingRequest forwardOptions = options.clone();
+        RoutingContext forwardContext = new RoutingContext(forwardOptions, graph, v0, v60);
 
-        routingContext.serviceDays = new ArrayList<ServiceDay>(1);
-        routingContext.serviceDays.add(serviceDay);
+        forwardContext.serviceDays = new ArrayList<ServiceDay>(1);
+        forwardContext.serviceDays.add(serviceDay);
 
-        options.rctx = routingContext;
-        options.dateTime = 0;
-        options.bikeRentalPickupTime = 4;
-        options.bikeRentalDropoffTime = 2;
+        forwardOptions.rctx = forwardContext;
+        forwardOptions.dateTime = 0;
+        forwardOptions.bikeRentalPickupTime = 4;
+        forwardOptions.bikeRentalDropoffTime = 2;
 
-        // Traversal of all edges
-        State s0 = new State(options);
-        State s2 = e1.traverse(s0);
-        State s4 = e3.traverse(s2);
-        State s6 = e5.traverse(s4);
-        State s8 = e7.traverse(s6);
-        State s10 = e9.traverse(s8);
-        State s12 = e11.traverse(s10);
-        State s14 = e13.traverse(s12);
-        State s16 = e15.traverse(s14);
-        State s18 = e17.traverse(s16);
-        State s20 = e19.traverse(s18);
-        State s22 = e21.traverse(s20);
-        State s24 = e23.traverse(s22);
-        State s26 = e25.traverse(s24);
-        State s28 = e27.traverse(s26);
-        State s30 = e29.traverse(s28);
-        State s32 = e31.traverse(s30);
-        State s34 = e33.traverse(s32);
-        State s36 = e35.traverse(s34);
-        State s38 = e37.traverse(s36);
-        State s40 = e39.traverse(s38);
-        State s42 = e41.traverse(s40);
-        State s44 = e43.traverse(s42);
-        State s46 = e45.traverse(s44);
-        State s48 = e47.traverse(s46);
-        State s50 = e49.traverse(s48);
-        State s52 = e51.traverse(s50);
-        State s54 = e53.traverse(s52);
-        State s56 = e55.traverse(s54);
-        State s58 = e57.traverse(s56);
-        State s60 = e59.traverse(s58);
+        // Forward traversal of all edges
+        State s0Forward = new State(forwardOptions);
+        State s2Forward = e1.traverse(s0Forward);
+        State s4Forward = e3.traverse(s2Forward);
+        State s6Forward = e5.traverse(s4Forward);
+        State s8Forward = e7.traverse(s6Forward);
+        State s10Forward = e9.traverse(s8Forward);
+        State s12Forward = e11.traverse(s10Forward);
+        State s14Forward = e13.traverse(s12Forward);
+        State s16Forward = e15.traverse(s14Forward);
+        State s18Forward = e17.traverse(s16Forward);
+        State s20Forward = e19.traverse(s18Forward);
+        State s22Forward = e21.traverse(s20Forward);
+        State s24Forward = e23.traverse(s22Forward);
+        State s26Forward = e25.traverse(s24Forward);
+        State s28Forward = e27.traverse(s26Forward);
+        State s30Forward = e29.traverse(s28Forward);
+        State s32Forward = e31.traverse(s30Forward);
+        State s34Forward = e33.traverse(s32Forward);
+        State s36Forward = e35.traverse(s34Forward);
+        State s38Forward = e37.traverse(s36Forward);
+        State s40Forward = e39.traverse(s38Forward);
+        State s42Forward = e41.traverse(s40Forward);
+        State s44Forward = e43.traverse(s42Forward);
+        State s46Forward = e45.traverse(s44Forward);
+        State s48Forward = e47.traverse(s46Forward);
+        State s50Forward = e49.traverse(s48Forward);
+        State s52Forward = e51.traverse(s50Forward);
+        State s54Forward = e53.traverse(s52Forward);
+        State s56Forward = e55.traverse(s54Forward);
+        State s58Forward = e57.traverse(s56Forward);
+        State s60Forward = e59.traverse(s58Forward);
 
-        return new GraphPath(s60, false);
+        // Also traverse the path backward
+        RoutingRequest backwardOptions = options.clone();
+        RoutingContext backwardContext = new RoutingContext(backwardOptions, graph, v60, v0);
+
+        backwardContext.serviceDays = new ArrayList<ServiceDay>(1);
+        backwardContext.serviceDays.add(serviceDay);
+
+        backwardOptions.rctx = backwardContext;
+        backwardOptions.dateTime = 60L;
+        backwardOptions.bikeRentalPickupTime = 4;
+        backwardOptions.bikeRentalDropoffTime = 2;
+        backwardOptions.setArriveBy(true);
+
+        // Backward traversal of all edges
+        State s60Backward = new State(backwardOptions);
+        State s58Backward = e59.traverse(s60Backward);
+        State s56Backward = e57.traverse(s58Backward);
+        State s54Backward = e55.traverse(s56Backward);
+        State s52Backward = e53.traverse(s54Backward);
+        State s50Backward = e51.traverse(s52Backward);
+        State s48Backward = e49.traverse(s50Backward);
+        State s46Backward = e47.traverse(s48Backward);
+        State s44Backward = e45.traverse(s46Backward);
+        State s42Backward = e43.traverse(s44Backward);
+        State s40Backward = e41.traverse(s42Backward);
+        State s38Backward = e39.traverse(s40Backward);
+        State s36Backward = e37.traverse(s38Backward);
+        State s34Backward = e35.traverse(s36Backward);
+        State s32Backward = e33.traverse(s34Backward);
+        State s30Backward = e31.traverse(s32Backward);
+        State s28Backward = e29.traverse(s30Backward);
+        State s26Backward = e27.traverse(s28Backward);
+        State s24Backward = e25.traverse(s26Backward);
+        State s22Backward = e23.traverse(s24Backward);
+        State s20Backward = e21.traverse(s22Backward);
+        State s18Backward = e19.traverse(s20Backward);
+        State s16Backward = e17.traverse(s18Backward);
+        State s14Backward = e15.traverse(s16Backward);
+        State s12Backward = e13.traverse(s14Backward);
+        State s10Backward = e11.traverse(s12Backward);
+        State s8Backward = e9.traverse(s10Backward);
+        State s6Backward = e7.traverse(s8Backward);
+        State s4Backward = e5.traverse(s6Backward);
+        State s2Backward = e3.traverse(s4Backward);
+        State s0Backward = e1.traverse(s2Backward);
+
+        return new GraphPath[] {new GraphPath(s60Forward, false), new GraphPath(s0Backward, false)};
     }
 
     /**
      * This method compares the itinerary's fields to their expected values. The actual work is
      * delegated to other methods. This method just calls them with the right arguments.
      */
-    private void compare(Itinerary itinerary) {
+    private void compare(Itinerary itinerary, boolean backward) {
         compareItinerary(itinerary);
 
         compareFare(itinerary.fare);
 
         Leg[] legs = itinerary.legs.toArray(new Leg[9]);
-        compareLegs(legs);
+        compareLegs(legs, backward);
 
         WalkStep[][] steps = new WalkStep[9][0];
         for (int i = 0; i < steps.length; i++) {
@@ -712,7 +765,7 @@ public class PlanGeneratorTest {
                 places[i] = allStops.toArray(places[i]);
             }
         }
-        comparePlaces(places);
+        comparePlaces(places, backward);
 
         AgencyAndId[][] stopIds = new AgencyAndId[9][2];
         for (int i = 0; i < stopIds.length; i++) {
@@ -781,7 +834,7 @@ public class PlanGeneratorTest {
     }
 
     /** Compare all simple leg fields to their expected values, leg by leg. */
-    private void compareLegs(Leg[] legs) {
+    private void compareLegs(Leg[] legs, boolean backward) {
         assertEquals(9, legs.length);
 
         assertNull(legs[0].agencyId);
@@ -900,8 +953,13 @@ public class PlanGeneratorTest {
         assertNull(legs[3].boardRule);
         assertNull(legs[3].alightRule);
         assertEquals("WALK", legs[3].mode);
-        assertEquals(24000L, legs[3].startTime.getTimeInMillis());
-        assertEquals(32000L, legs[3].endTime.getTimeInMillis());
+        if (backward) {
+            assertEquals(32000L, legs[3].startTime.getTimeInMillis());
+            assertEquals(40000L, legs[3].endTime.getTimeInMillis());
+        } else {
+            assertEquals(24000L, legs[3].startTime.getTimeInMillis());
+            assertEquals(32000L, legs[3].endTime.getTimeInMillis());
+        }
         assertEquals(8000L, legs[3].getDuration());
         assertEquals(0, legs[3].departureDelay);
         assertEquals(0, legs[3].arrivalDelay);
@@ -1195,7 +1253,7 @@ public class PlanGeneratorTest {
     }
 
     /** Compare all simple place fields to their expected values, place by place. */
-    private void comparePlaces(Place[][] places) {
+    private void comparePlaces(Place[][] places, boolean backward) {
         assertEquals(2, places[0].length);
         assertEquals(3, places[1].length);
         assertEquals(2, places[2].length);
@@ -1281,7 +1339,11 @@ public class PlanGeneratorTest {
         assertEquals("Train arrive zone", places[2][1].zoneId);
         assertNull(places[2][1].orig);
         assertEquals(24000L, places[2][1].arrival.getTimeInMillis());
-        assertEquals(24000L, places[2][1].departure.getTimeInMillis());
+        if (backward) {
+            assertEquals(32000L, places[2][1].departure.getTimeInMillis());
+        } else {
+            assertEquals(24000L, places[2][1].departure.getTimeInMillis());
+        }
 
         assertEquals("Train stop arrive", places[3][0].name);
         assertEquals(133, places[3][0].lon, 0.0);
@@ -1292,7 +1354,11 @@ public class PlanGeneratorTest {
         assertNull(places[3][0].zoneId);
         assertNull(places[3][0].orig);
         assertEquals(24000L, places[3][0].arrival.getTimeInMillis());
-        assertEquals(24000L, places[3][0].departure.getTimeInMillis());
+        if (backward) {
+            assertEquals(32000L, places[3][0].departure.getTimeInMillis());
+        } else {
+            assertEquals(24000L, places[3][0].departure.getTimeInMillis());
+        }
 
         assertEquals("Ferry stop depart", places[3][1].name);
         assertEquals(135, places[3][1].lon, 0.0);
@@ -1302,7 +1368,11 @@ public class PlanGeneratorTest {
         assertNull(places[3][1].platformCode);
         assertNull(places[3][1].zoneId);
         assertNull(places[3][1].orig);
-        assertEquals(32000L, places[3][1].arrival.getTimeInMillis());
+        if (backward) {
+            assertEquals(40000L, places[3][1].arrival.getTimeInMillis());
+        } else {
+            assertEquals(32000L, places[3][1].arrival.getTimeInMillis());
+        }
         assertEquals(40000L, places[3][1].departure.getTimeInMillis());
 
         assertEquals("Ferry stop depart", places[4][0].name);
@@ -1313,7 +1383,11 @@ public class PlanGeneratorTest {
         assertEquals("Ferry depart platform", places[4][0].platformCode);
         assertEquals("Ferry depart zone", places[4][0].zoneId);
         assertNull(places[4][0].orig);
-        assertEquals(32000L, places[4][0].arrival.getTimeInMillis());
+        if (backward) {
+            assertEquals(40000L, places[4][0].arrival.getTimeInMillis());
+        } else {
+            assertEquals(32000L, places[4][0].arrival.getTimeInMillis());
+        }
         assertEquals(40000L, places[4][0].departure.getTimeInMillis());
 
         assertEquals("Ferry stop arrive", places[4][1].name);

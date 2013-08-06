@@ -197,10 +197,12 @@ public class TableTripPattern implements TripPattern, Serializable {
         return exemplar;
     }
 
+    @Override
     public int getAlightType(int stopIndex) {
         return (perStopFlags[stopIndex] & MASK_DROPOFF) >> SHIFT_DROPOFF;
     }
 
+    @Override
     public int getBoardType(int stopIndex) {
         return (perStopFlags[stopIndex] & MASK_PICKUP) >> SHIFT_PICKUP;
     }
