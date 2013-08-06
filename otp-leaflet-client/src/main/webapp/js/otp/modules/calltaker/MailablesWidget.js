@@ -84,35 +84,61 @@ otp.modules.calltaker.MailablesWidget =
     
     createLetter : function() {
 
-        var salutation = $('#' + this.id + '-salutation option:selected').text();
-        var firstname = $('#' + this.id + '-firstname').val();
-        var lastname = $('#' + this.id + '-lastname').val();
-        var address1 = $('#' + this.id + '-address1').val();
-        var address2 = $('#' + this.id + '-address2').val();
-        var city = $('#' + this.id + '-city').val();
-        var state = $('#' + this.id + '-state').val();
-        var zip = $('#' + this.id + '-zip').val();
+        var img = new Image();
+        var this_ = this;
+        img.onload = function() {
+            var canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+
+            var ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0);
+
+            var data = canvas.toDataURL("image/jpeg");
+            this_.headerImageData = data;
+            this_.headerImageWidth = img.width;
+            this_.headerImageHeight = img.height;
+            
+            this_.writePDF();
+
+        }
+        img.src = this.module.options.mailables_header_graphic;
+    
+    },
+    
+    writePDF : function() {
+
+        var firstname = $('#' + this.id + '-firstname').val().toUpperCase();
+        var lastname = $('#' + this.id + '-lastname').val().toUpperCase();
+        var address1 = $('#' + this.id + '-address1').val().toUpperCase();
+        var address2 = $('#' + this.id + '-address2').val().toUpperCase();
+        var city = $('#' + this.id + '-city').val().toUpperCase();
+        var state = $('#' + this.id + '-state').val().toUpperCase();
+        var zip = $('#' + this.id + '-zip').val().toUpperCase();
     
 
-        var doc = new jsPDF("p", "pt");
-        doc.setFont("times");
-        doc.setFontSize(12);
+        var doc = new jsPDF("p", "pt", "letter");
         var line_height = 14;
 
 
         var horizontal_margin = this.module.options.mailables_horizontal_margin || 108;
-        var vertical_margin = this.module.options.mailables_vertical_margin || 72;
+        var top_margin = this.module.options.mailables_top_margin || 108;
+        var bottom_margin = this.module.options.mailables_bottom_margin || 72;
 
-        var x_offset = horizontal_margin, y_offset = vertical_margin;
-        var max_y = 792 - vertical_margin;
+        var x_offset = horizontal_margin, y_offset = top_margin;
+        var max_y = 792 - bottom_margin;
 
 
+        this.preparePage(doc);
+        
+        
         // current date
+        y_offset += line_height;
         doc.text(x_offset, y_offset, moment().format("MMMM D, YYYY"));
 
 
         // recipient address
-        y_offset += 4 * line_height;
+        y_offset += 3 * line_height;
         doc.text(x_offset, y_offset, firstname + " " + lastname);
         y_offset += line_height;
         doc.text(x_offset, y_offset, address1);
@@ -124,19 +150,15 @@ otp.modules.calltaker.MailablesWidget =
         doc.text(x_offset, y_offset, city + ", " + state + " " + zip);
 
 
-        // recipient salutation
-        y_offset += line_height*2;
-        doc.text(x_offset, y_offset, "Dear " + salutation + " " + lastname + ":");
-
-
         // introduction block        
-        y_offset += line_height;
+        y_offset += 2 * line_height;
         var lines = doc.splitTextToSize(this.module.options.mailables_introduction, 612 - 2 * horizontal_margin);
         for(var l = 0; l < lines.length; l++) {
             y_offset += line_height;
             if(y_offset > max_y) {
                 doc.addPage();
-                y_offset = vertical_margin;
+                this.preparePage(doc);
+                y_offset = top_margin;
             }
             doc.text(x_offset, y_offset, lines[l]);
         }
@@ -145,12 +167,16 @@ otp.modules.calltaker.MailablesWidget =
         // table header 
         if(y_offset + line_height * 7 > max_y) {
             doc.addPage();
-            y_offset = vertical_margin;
+            this.preparePage(doc);
+            y_offset = top_margin;
         } 
 
         y_offset += line_height * 2;
         doc.setFontType("bold");
-        doc.text(x_offset+135, y_offset, "SUMMARY BY ITEM");
+        var summaryText = "SUMMARY BY ITEM"
+        var w = doc.getStringUnitWidth(summaryText, {fontType : 'bold'}) * 12;
+        doc.text(306 - w/2, y_offset, summaryText);
+
 
         y_offset += line_height * 2;
         doc.text(x_offset, y_offset, "Item");
@@ -174,7 +200,8 @@ otp.modules.calltaker.MailablesWidget =
 
             if(y_offset + lines.length * line_height + 4 > max_y) {
                 doc.addPage();
-                y_offset = vertical_margin;
+                this.preparePage(doc);                
+                y_offset = top_margin;
             }
             doc.text(x_offset, y_offset, lines);
             doc.text(612 - horizontal_margin - 72, y_offset, quantity);
@@ -187,33 +214,32 @@ otp.modules.calltaker.MailablesWidget =
             y_offset += line_height;
             if(y_offset > max_y) {
                 doc.addPage();
-                y_offset = vertical_margin;
+                this.preparePage(doc);
+                y_offset = top_margin;
             }
             doc.text(x_offset, y_offset, lines[l]);
         }
         
 
-        // "Sincerely.." block        
-        if(y_offset + line_height * 4.5 + this.module.options.mailables_signature_graphic_height > max_y) {
-            doc.addPage();
-            y_offset = vertical_margin;
-        } 
-
-        y_offset += line_height * 2;
-        doc.text(x_offset, y_offset, "Sincerely,");
-        y_offset += line_height  / 2;
-        doc.addImage(this.module.options.mailables_signature_graphic_data,
-                     "JPEG", x_offset, y_offset,
-                     this.module.options.mailables_signature_graphic_width,
-                     this.module.options.mailables_signature_graphic_height);
-
-        y_offset += this.module.options.mailables_signature_graphic_height + line_height;
-        doc.text(x_offset, y_offset, this.module.options.mailables_signature_name);
-        y_offset += line_height;
-        doc.text(x_offset, y_offset, this.module.options.mailables_signature_title);
-
-
         doc.save('mailables_letter.pdf');
 
+    },
+    
+    preparePage : function(doc) {
+
+        if(this.headerImageData) {
+            var imgWidth = this.module.options.mailables_header_graphic_width || 72 * this.headerImageWidth/300;
+            var imgHeight =  this.module.options.mailables_header_graphic_height || 72 * this.headerImageHeight/300;
+            doc.addImage(this.headerImageData, "JPEG", 306 - imgWidth/2, 54, imgWidth, imgHeight);
+        }
+                
+        if(this.module.options.mailables_footer) {
+            var fontSize = 9;
+            doc.setFontSize(fontSize);
+            var width = doc.getStringUnitWidth(this.module.options.mailables_footer) * fontSize;
+            doc.text(306 - width/2, 750, this.module.options.mailables_footer);
+        }
+
+        doc.setFontSize(12);     
     },
 });
