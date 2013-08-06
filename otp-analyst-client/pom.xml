@@ -17,7 +17,7 @@
     </dependencies>
 
     <build>
-      <finalName>otp-analyst-client</finalName>
+        <finalName>${artifactId}</finalName>
     </build>
 
 </project>

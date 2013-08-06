@@ -2,11 +2,10 @@
     <modelVersion>4.0.0</modelVersion>
     
     <!-- 
-    The opentripplanner-api-webapp module provides the OTP REST API as a WAR-packaged servlet.
-    The REST resources themselves are defined in the otp-rest-api module, which is a dependency.
-    This module should probably be renamed to otp-api-servlet.
+    The otp-rest-servlet module provides the OTP REST API as a WAR-packaged servlet.
+    The REST resources themselves are defined in the otp-core module, which is a dependency.
      -->
-    <artifactId>opentripplanner-api-webapp</artifactId>
+    <artifactId>otp-rest-servlet</artifactId>
     <packaging>war</packaging>
     <name>OpenTripPlanner API Webapp</name>
 
@@ -80,8 +79,7 @@
     </dependencies>
 
     <build>
-        <finalName>opentripplanner-api-webapp</finalName>
-
+        <finalName>${artifactId}</finalName>
         <plugins>
             <!-- Copy in a couple of default resources if they are not already present -->
             <plugin>
