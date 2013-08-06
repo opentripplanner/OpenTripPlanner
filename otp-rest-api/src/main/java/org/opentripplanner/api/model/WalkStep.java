@@ -190,8 +190,9 @@ public class WalkStep {
 
     public String streetNameNoParens() {
         int idx = streetName.indexOf('(');
-        if (idx < 0)
+        if (idx <= 0) {
             return streetName;
+        }
         return streetName.substring(0, idx - 1);
     }
 
