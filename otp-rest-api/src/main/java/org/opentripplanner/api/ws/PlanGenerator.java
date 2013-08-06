@@ -43,9 +43,12 @@ import org.opentripplanner.routing.edgetype.EdgeWithElevation;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.OnBoardForwardEdge;
+import org.opentripplanner.routing.edgetype.PatternEdge;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.TransitUtils;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
@@ -408,22 +411,35 @@ public class PlanGenerator {
      * @param legsStates The states that go with the legs
      */
     private void fixupLegs(List<Leg> legs, State[][] legsStates) {
-        State lastLegStates[] = legsStates[legsStates.length - 1];
-        State lastState = lastLegStates[lastLegStates.length - 1];
+        Object alightRules[] = new Object[legsStates.length];
+        Object boardRules[] = new Object[legsStates.length];
+
+        // Extract the per-leg trip board and alight rules from the state array
+        for (int i = 0; i < legsStates.length; i++) {
+            for (int j = 1; j < legsStates[i].length; j++) {
+                if (legsStates[i][j].getBackEdge() instanceof PatternEdge) {
+                    PatternEdge patternEdge = (PatternEdge) legsStates[i][j].getBackEdge();
+                    TripPattern tripPattern = patternEdge.getPattern();
+
+                    int boardType = tripPattern.getBoardType(legs.get(i).from.stopIndex);
+                    int alightType = tripPattern.getAlightType(legs.get(i).to.stopIndex);
+
+                    boardRules[i] = TransitUtils.determineBoardAlightType(boardType);
+                    alightRules[i] = TransitUtils.determineBoardAlightType(alightType);
+                }
+            }
+        }
 
         for (int i = 0; i < legsStates.length - 1; i++) {
             legs.get(i + 1).from.arrival = legs.get(i).to.arrival;
             legs.get(i).to.departure = legs.get(i + 1).from.departure;
 
-            Object boardRule = legsStates[i][0].getExtension("boardAlightRule");
-            Object alightRule = legsStates[i + 1][0].getExtension("boardAlightRule");
-
             if (legs.get(i).isTransitLeg()) {
-                if (!legs.get(i).interlineWithPreviousLeg) {
-                    legs.get(i).boardRule = (String) boardRule;
+                if (boardRules[i] instanceof String && !legs.get(i).interlineWithPreviousLeg) {
+                    legs.get(i).boardRule = (String) boardRules[i];
                 }
-                if (!legs.get(i + 1).interlineWithPreviousLeg) {
-                    legs.get(i).alightRule = (String) alightRule;
+                if (alightRules[i] instanceof String && !legs.get(i + 1).interlineWithPreviousLeg) {
+                    legs.get(i).alightRule = (String) alightRules[i];
                 }
             }
 
@@ -436,15 +452,16 @@ public class PlanGenerator {
         }
 
         Leg lastLeg = legs.get(legs.size() - 1);
+        Object lastBoardRule = boardRules[boardRules.length - 1];
+        Object lastAlightRule = alightRules[alightRules.length - 1];
+
         if (lastLeg.isTransitLeg()) {
-            Object boardRule = legsStates[legsStates.length - 1][0].getExtension("boardAlightRule");
-            Object alightRule = lastState.getExtension("boardAlightRule");
-
-            if (!lastLeg.interlineWithPreviousLeg) {
-                lastLeg.boardRule = (String) boardRule;
+            if (lastBoardRule instanceof String && !lastLeg.interlineWithPreviousLeg) {
+                lastLeg.boardRule = (String) lastBoardRule;
             }
-
-            lastLeg.alightRule = (String) alightRule;
+            if (lastAlightRule instanceof String) {
+                lastLeg.alightRule = (String) lastAlightRule;
+            }
         }
     }
 
