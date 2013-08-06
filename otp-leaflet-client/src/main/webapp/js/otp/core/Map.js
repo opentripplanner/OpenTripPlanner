@@ -71,7 +71,7 @@ otp.core.Map = otp.Class({
         
       
         if(!otp.config.initLatLng) {
-            var url = otp.config.hostname + '/opentripplanner-api-webapp/ws/metadata';
+            var url = otp.config.hostname + '/otp-rest-servlet/ws/metadata';
             $.ajax(url, {
                 data: { routerId : otp.config.routerId },            
                 dataType:   'jsonp',

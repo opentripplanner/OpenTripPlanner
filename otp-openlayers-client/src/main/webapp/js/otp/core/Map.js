@@ -28,7 +28,7 @@ otp.core.MapStatic = {
     map               : null,
     baseLayer         : null,
     mapDiv            : "map",
-    metadataUrl       : '/opentripplanner-api-webapp/ws/metadata',
+    metadataUrl       : '/otp-rest-servlet/ws/metadata',
 
     // list of functions that will be called before/after all features on the map are removed
     beforeAllFeaturesRemoved: [],

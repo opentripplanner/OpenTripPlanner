@@ -68,7 +68,7 @@ var buildQuery = function(params) {
 	return "?" + ret.join('&');
 };
 
-var analystUrl = "/opentripplanner-api-webapp/ws/tile/{z}/{x}/{y}.png"; 
+var analystUrl = "/otp-rest-servlet/ws/tile/{z}/{x}/{y}.png"; 
 var analystLayer = new L.TileLayer(analystUrl, {attribution: osmAttrib});
 
 // create geoJSON layers for DC Purple Line
@@ -156,7 +156,7 @@ var initLocation = INIT_LOCATION;
 if (AUTO_CENTER_MAP) {
 	// attempt to get map metadata (bounds) from server
 	var request = new XMLHttpRequest();
-	request.open("GET", "/opentripplanner-api-webapp/ws/metadata", false); // synchronous request
+	request.open("GET", "/otp-rest-servlet/ws/metadata", false); // synchronous request
 	request.setRequestHeader("Accept", "application/xml");
 	request.send(null);
 	if (request.status == 200 && request.responseXML != null) {
@@ -285,7 +285,7 @@ function mapSetupTool() {
 		map.removeLayer(analystLayer);
 	analystLayer._url = URL;
     map.addLayer(analystLayer);
-	legend.src = "/opentripplanner-api-webapp/ws/legend.png?width=300&height=40&styles=" 
+	legend.src = "/otp-rest-servlet/ws/legend.png?width=300&height=40&styles=" 
 		+ params.styles;
 
 	return false;
@@ -329,7 +329,7 @@ var downloadTool = function () {
         // left, bot, right, top
         bbox = [sw.x, sw.y, ne.x, ne.y].join(',');
 
-        var url = '/opentripplanner-api-webapp/ws/wms' +
+        var url = '/otp-rest-servlet/ws/wms' +
             buildQuery(params) +
             '&format=' + dlParams.format + 
             '&srs=' + dlParams.srs +

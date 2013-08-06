@@ -34,7 +34,7 @@ otp.planner.StaticForms = {
     planner               : null,
     contextMenu           : null,
     poi                   : null,
-    url                   : '/opentripplanner-api-webapp/ws/plan',
+    url                   : '/otp-rest-servlet/ws/plan',
 
     // things overridden by config.js
     fromToOverride        : null,  // over-ride me to get rid of From / To from with something else

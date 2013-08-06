@@ -102,7 +102,7 @@ otp.widgets.PreferredRoutesSelectorWidget =
         var routesList = $('#'+this.id+'-routeList'), selectedList = $('#'+this.id+'-selectedList');
         var this_ = this;
         
-        var url = otp.config.hostname + '/opentripplanner-api-webapp/ws/transit/routes';
+        var url = otp.config.hostname + '/otp-rest-servlet/ws/transit/routes';
         this.currentRequest = $.ajax(url, {
             dataType:   'jsonp',
                 
