@@ -1882,7 +1882,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             
             String highway = way.getTag("highway");
             if (highway != null && (highway.equals("conveyer") || highway.equals("proposed") || 
-                highway.equals("raceway")))
+                highway.equals("raceway") || highway.equals("unbuilt")))
                 return false;
             
             if (way.isGeneralAccessDenied()) {
