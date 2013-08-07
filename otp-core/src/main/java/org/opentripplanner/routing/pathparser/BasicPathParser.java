@@ -48,9 +48,15 @@ public class BasicPathParser extends PathParser {
     static {
 
         Nonterminal bikeNonStreet = star(choice(StreetEdge.CLASS_CROSSING,
-                StreetEdge.CLASS_OTHERPATH));
+                StreetEdge.CLASS_OTHERPATH));        
+        /*
+         * OTP has been observed to avoid turn restrictions in bike routes by dismounting and using
+         * a crosswalk. This code attempts to solve that problem. See issue #726. 
+         * TODO: imlement a complement operator. create tests for this specific situation and
+         * reimplement more cleanly.
+         */
 
-        // (C|O)*(S+O(C|O)*)*(S*(C|O)*) -- the inverse of S+C+S+
+        // (C|O)*(S+O(C|O)*)*(S*(C|O)*) -- the inverse of S+C+S+ (S=class_street C=class_crossing)
         Nonterminal optionalNontransitLeg = seq(bikeNonStreet,
                 star(plus(StreetEdge.CLASS_STREET),
                      star(StreetEdge.CLASS_CROSSING),
