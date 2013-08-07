@@ -69,23 +69,23 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * For example:
  * 
- * GET http://localhost/opentripplanner-api-webapp/ws/routers
+ * GET http://localhost/otp-rest-servlet/ws/routers
  * will retrieve a list of all registered routerId -> Graph mappings and their geographic bounds.
  * 
- * GET http://localhost/opentripplanner-api-webapp/ws/routers/london
+ * GET http://localhost/otp-rest-servlet/ws/routers/london
  * will return status code 200 and a brief description of the 'london' graph including geographic 
  * bounds, or 404 if the 'london' routerId is not registered.
  * 
- * PUT http://localhost/opentripplanner-api-webapp/ws/routers
+ * PUT http://localhost/otp-rest-servlet/ws/routers
  * will reload the graphs for all currently registered routerIds from disk.
  * 
- * PUT http://localhost/opentripplanner-api-webapp/ws/routers/paris
+ * PUT http://localhost/otp-rest-servlet/ws/routers/paris
  * will load a Graph from a sub-directory called 'paris' and associate it with the routerId 'paris'.
  * 
- * DELETE http://localhost/opentripplanner-api-webapp/ws/routers/paris
+ * DELETE http://localhost/otp-rest-servlet/ws/routers/paris
  * will release the Paris Graph and de-register the 'paris' routerId.
  * 
- * DELETE http://localhost/opentripplanner-api-webapp/ws/routers
+ * DELETE http://localhost/otp-rest-servlet/ws/routers
  * will de-register all currently registered routerIds.
  * 
  * The GET methods are not secured, but all other methods are secured under ROLE_ROUTERS.

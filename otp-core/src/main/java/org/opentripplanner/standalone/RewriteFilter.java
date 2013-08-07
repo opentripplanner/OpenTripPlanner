@@ -9,7 +9,7 @@ import com.sun.jersey.spi.container.ContainerRequestFilter;
 /** 
  * Jersey filter that rewrites URIs to remove /ws/ if present.
  * Grizzly HTTPServer does not like multi-level context paths like 
- * /opentripplanner-api-webapp/ws/ so we have to register the handler only one level deep and 
+ * /otp-rest-servlet/ws/ so we have to register the handler only one level deep and 
  * ignore the second level. 
  */
 public class RewriteFilter implements ContainerRequestFilter {

@@ -108,10 +108,10 @@ public class GrizzlyServer {
 
         /* ADD A COUPLE OF HANDLERS (~= SERVLETS) */
         /* 1. A Grizzly wrapper around the Jersey WebApplication. 
-              We cannot set the context path to /opentripplanner-api-webapp/ws
+              We cannot set the context path to /otp-rest-servlet/ws
               https://java.net/jira/browse/GRIZZLY-1481?focusedCommentId=360385&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#action_360385 */
         HttpHandler handler = ContainerFactory.createContainer(HttpHandler.class, rc, iocFactory);
-        httpServer.getServerConfiguration().addHttpHandler(handler, "/opentripplanner-api-webapp/");
+        httpServer.getServerConfiguration().addHttpHandler(handler, "/otp-rest-servlet/");
         /* 2. A static content server for the client JS apps etc.
               This is a filesystem path, not classpath. Files are relative to the project dir, so
               from ./ we can reach e.g. target/classes/data-sources.xml */
