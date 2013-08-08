@@ -30,10 +30,13 @@ import org.opentripplanner.routing.automata.DFA;
 import org.opentripplanner.routing.automata.Nonterminal;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.edgetype.OnboardEdge;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
+import org.opentripplanner.routing.edgetype.StationEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.TimedTransferEdge;
+import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.pathparser.PathParser;
@@ -140,22 +143,21 @@ public class SimplifiedPathServiceImpl implements PathService {
         private static final int STREET = 1;
         private static final int LINK = 2;
         private static final int STATION = 3;
-        private static final int RIDE = 4;
-        private static final int XFER = 5;
+        private static final int ONBOARD = 4;
+        private static final int TRANSFER = 5;
 
         private static final DFA DFA;
 
         static {
-            Nonterminal nontransitLeg = plus(STREET);
-            Nonterminal transitLeg = seq(plus(STATION), plus(RIDE), plus(STATION));
-            Nonterminal stopToStop = seq(transitLeg, star(optional(XFER), transitLeg));
-            Nonterminal transitItinerary = seq(nontransitLeg, 
-                    LINK, stopToStop, LINK, nontransitLeg);
-            // Following nonterminal is probably not be working because RIDE is only onboard vertices, 
-            // and OnboardDepartVertex is not a subclass of onboardVertex (though it probably should be)
-            Nonterminal onboardItinerary = seq(plus(RIDE), plus(STATION), star(XFER, transitLeg),
-                    LINK, nontransitLeg);
-            Nonterminal itinerary = choice(nontransitLeg, transitItinerary, onboardItinerary, stopToStop);
+            Nonterminal streetLeg  = plus(STREET);
+            Nonterminal transitLeg = seq(plus(STATION), plus(ONBOARD), plus(STATION));
+            Nonterminal stopToStop = seq(transitLeg, star(optional(TRANSFER), transitLeg));
+            Nonterminal streetAndTransitItinerary = seq(streetLeg, LINK, stopToStop, LINK, streetLeg);
+            // FIXME
+            Nonterminal onboardItinerary = seq( plus(ONBOARD), plus(STATION), star(TRANSFER, transitLeg),
+                    LINK, streetLeg);
+            Nonterminal itinerary = 
+                    choice(streetLeg, streetAndTransitItinerary, onboardItinerary, stopToStop);
             DFA = itinerary.toDFA().minimize();
             System.out.println(DFA.toGraphViz());
             System.out.println(DFA.dumpTable());
@@ -172,19 +174,21 @@ public class SimplifiedPathServiceImpl implements PathService {
             Edge e = state.getBackEdge();
             if (e == null) {
                 throw new RuntimeException ("terminalFor should never be called on States without back edges!");
-            }            
-            if (e instanceof StreetEdge) return STREET;
-            if (e instanceof StreetTransitLink) return LINK;
-            // There should perhaps be a shared superclass of all transfer edges to simplify this. 
-            if (e instanceof TimedTransferEdge) return XFER;
-            if (e instanceof SimpleTransfer) return XFER;
-            if (v instanceof OnboardVertex) return RIDE;
-            if (v instanceof OffboardVertex) return STATION;
-            if (v instanceof StreetVertex) return STREET;
-            else {
-                LOG.debug("failed to tokenize path. vertex {} edge {}", v, e);
-                throw new RuntimeException("failed to tokenize path");
             }
+            /* OnboardEdge currently includes BoardAlight edges. */
+            if (e instanceof OnboardEdge) return ONBOARD;
+            if (e instanceof StationEdge) return STATION;
+            // There should perhaps be a shared superclass of all transfer edges to simplify this. 
+            if (e instanceof TimedTransferEdge) return TRANSFER;
+            if (e instanceof SimpleTransfer)    return TRANSFER;
+            if (e instanceof TransferEdge)      return TRANSFER;
+            if (e instanceof StreetTransitLink) return LINK;
+            // Is it really correct to clasify all other edges as STREET?
+            return STREET;
+//            else {
+//                LOG.debug("failed to tokenize path. vertex {} edge {}", v, e);
+//                throw new RuntimeException("failed to tokenize path");
+//            }
         }
 
     }
