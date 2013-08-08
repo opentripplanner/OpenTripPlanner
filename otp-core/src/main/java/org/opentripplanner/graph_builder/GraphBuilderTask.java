@@ -101,13 +101,15 @@ public class GraphBuilderTask implements Runnable {
             return;
         }
 
-        try {
-            if (!graphFile.getParentFile().exists())
-                if (!graphFile.getParentFile().mkdirs())
-                    LOG.error("Failed to create directories for graph bundle at " + graphFile);
-            graphFile.createNewFile();
-        } catch (IOException e) {
-            throw new RuntimeException("Cannot create or overwrite graph at path " + graphFile);
+        if (serializeGraph) {
+            try {
+                if (!graphFile.getParentFile().exists())
+                    if (!graphFile.getParentFile().mkdirs())
+                        LOG.error("Failed to create directories for graph bundle at " + graphFile);
+                graphFile.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException("Cannot create or overwrite graph at path " + graphFile);
+            }
         }
 
         //check prerequisites
