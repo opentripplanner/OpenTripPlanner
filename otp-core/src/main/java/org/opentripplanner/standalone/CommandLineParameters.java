@@ -96,6 +96,10 @@ public class CommandLineParameters {
             description = "path to graph directory")
     String graphDirectory;
     
+    @Parameter( names = { "-l", "--longDistance"}, 
+            description = "use an algorithm tailored for long-distance routing")
+    boolean longDistance = false;
+
     @Parameter( names = { "-p", "--port"}, validateWith = AvailablePort.class, 
     description = "server port")
     Integer port;
