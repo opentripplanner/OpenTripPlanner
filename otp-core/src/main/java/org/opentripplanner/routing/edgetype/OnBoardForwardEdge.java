@@ -14,11 +14,17 @@
 
 package org.opentripplanner.routing.edgetype;
 
-/** Marker interface for edges which are on board a transit vehicle
- * when traversing forward
+/** 
+ * Marker interface for edges which are on board a transit vehicle
+ * when traversing forward.
+ * 
  */
 public interface OnBoardForwardEdge {
 
+    /** 
+     * The stop index (within the trip) of the stop this edge comes from. This is equivalent
+     * to a hop index. 
+     */
     int getStopIndex();
 
 }
