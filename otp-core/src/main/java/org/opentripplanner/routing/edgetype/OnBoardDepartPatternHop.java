@@ -37,7 +37,7 @@ import com.vividsolutions.jts.geom.LineString;
  * 
  * @author laurent
  */
-public class OnBoardDepartPatternHop extends Edge implements OnBoardForwardEdge {
+public class OnBoardDepartPatternHop extends Edge implements OnboardEdge {
     private static final long serialVersionUID = 1L;
 
     private TripTimes tripTimes;

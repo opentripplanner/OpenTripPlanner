@@ -22,7 +22,7 @@ import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.automata.AutomatonState;
-import org.opentripplanner.routing.edgetype.OnBoardForwardEdge;
+import org.opentripplanner.routing.edgetype.OnboardEdge;
 import org.opentripplanner.routing.edgetype.TablePatternEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -344,7 +344,7 @@ public class State implements Cloneable {
     }
 
     public boolean isOnboard() {
-        return this.backEdge instanceof OnBoardForwardEdge;
+        return this.backEdge instanceof OnboardEdge;
     }
 
     public State getBackState() {

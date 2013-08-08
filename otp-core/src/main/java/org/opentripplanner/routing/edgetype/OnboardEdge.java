@@ -19,7 +19,7 @@ package org.opentripplanner.routing.edgetype;
  * when traversing forward.
  * 
  */
-public interface OnBoardForwardEdge {
+public interface OnboardEdge {
 
     /** 
      * The stop index (within the trip) of the stop this edge comes from. This is equivalent

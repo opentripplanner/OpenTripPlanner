@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.LineString;
 
-public class FrequencyBoard extends Edge implements OnBoardForwardEdge, PatternEdge {
+public class FrequencyBoard extends Edge implements OnboardEdge, PatternEdge {
     private static final long serialVersionUID = 7919511656529752927L;
 
     private static final Logger LOG = LoggerFactory.getLogger(FrequencyBoard.class);

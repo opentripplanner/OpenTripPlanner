@@ -42,7 +42,7 @@ import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.edgetype.OnBoardForwardEdge;
+import org.opentripplanner.routing.edgetype.OnboardEdge;
 import org.opentripplanner.routing.edgetype.PatternEdge;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
@@ -615,24 +615,24 @@ public class PlanGenerator {
         if (firstVertex instanceof TransitVertex) {
             firstStop = ((TransitVertex) firstVertex).getStop();
 
-            if (firstEdge instanceof OnBoardForwardEdge) {
+            if (firstEdge instanceof OnboardEdge) {
                 leg.from.stopId = firstStop.getId();
                 leg.from.stopCode = firstStop.getCode();
                 leg.from.platformCode = firstStop.getPlatformCode();
                 leg.from.zoneId = firstStop.getZoneId();
-                leg.from.stopIndex = ((OnBoardForwardEdge) firstEdge).getStopIndex();
+                leg.from.stopIndex = ((OnboardEdge) firstEdge).getStopIndex();
             }
         }
 
         if (lastVertex instanceof TransitVertex) {
             lastStop = ((TransitVertex) lastVertex).getStop();
 
-            if (lastEdge instanceof OnBoardForwardEdge) {
+            if (lastEdge instanceof OnboardEdge) {
                 leg.to.stopId = lastStop.getId();
                 leg.to.stopCode = lastStop.getCode();
                 leg.to.platformCode = lastStop.getPlatformCode();
                 leg.to.zoneId = lastStop.getZoneId();
-                leg.to.stopIndex = ((OnBoardForwardEdge) lastEdge).getStopIndex() + 1;
+                leg.to.stopIndex = ((OnboardEdge) lastEdge).getStopIndex() + 1;
             }
         }
 
@@ -661,12 +661,12 @@ public class PlanGenerator {
                 Place place = new Place(vertex.getX(), vertex.getY(), currentStop.getName(),
                         makeCalendar(states[i]), makeCalendar(states[i]));
 
-                if (edges[i] instanceof OnBoardForwardEdge) {
+                if (edges[i] instanceof OnboardEdge) {
                     place.stopId = currentStop.getId();
                     place.stopCode = currentStop.getCode();
                     place.platformCode = currentStop.getPlatformCode();
                     place.zoneId = currentStop.getZoneId();
-                    place.stopIndex = ((OnBoardForwardEdge) edges[i]).getStopIndex();
+                    place.stopIndex = ((OnboardEdge) edges[i]).getStopIndex();
                 }
 
                 leg.stop.add(place);
