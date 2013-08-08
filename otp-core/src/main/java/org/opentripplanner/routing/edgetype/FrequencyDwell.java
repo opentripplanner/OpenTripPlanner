@@ -26,7 +26,7 @@ import com.vividsolutions.jts.geom.LineString;
 /**
  *  Models waiting in a station on a vehicle, for frequency-based trips
  */
-public class FrequencyDwell extends Edge implements OnBoardForwardEdge, OnBoardReverseEdge, DwellEdge {
+public class FrequencyDwell extends Edge implements OnBoardForwardEdge, DwellEdge {
     
     private static final long serialVersionUID = 1L;
 

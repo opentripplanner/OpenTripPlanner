@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.LineString;
 
-public class PatternInterlineDwell extends Edge implements OnBoardForwardEdge, OnBoardReverseEdge {
+public class PatternInterlineDwell extends Edge implements OnBoardForwardEdge {
     private static final Logger LOG = LoggerFactory.getLogger(PatternInterlineDwell.class);
 
     private static final long serialVersionUID = 1L;

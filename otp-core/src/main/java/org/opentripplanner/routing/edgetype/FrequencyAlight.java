@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.LineString;
 
-public class FrequencyAlight extends Edge  implements OnBoardReverseEdge {
+public class FrequencyAlight extends Edge {
     private static final long serialVersionUID = 3388162982920747289L;
 
     private static final Logger LOG = LoggerFactory.getLogger(FrequencyAlight.class);

@@ -28,7 +28,7 @@ import org.opentripplanner.routing.vertextype.TransitVertex;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 
-public class FrequencyHop extends Edge implements OnBoardForwardEdge, OnBoardReverseEdge, HopEdge {
+public class FrequencyHop extends Edge implements OnBoardForwardEdge, HopEdge {
 
     private static final long serialVersionUID = 2389378459266920841L;
 
