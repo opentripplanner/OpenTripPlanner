@@ -17,6 +17,7 @@ import static org.opentripplanner.routing.automata.Nonterminal.choice;
 import static org.opentripplanner.routing.automata.Nonterminal.plus;
 import static org.opentripplanner.routing.automata.Nonterminal.seq;
 import static org.opentripplanner.routing.automata.Nonterminal.star;
+import static org.opentripplanner.routing.automata.Nonterminal.optional;
 
 import java.util.List;
 
@@ -147,7 +148,7 @@ public class SimplifiedPathServiceImpl implements PathService {
         static {
             Nonterminal nontransitLeg = plus(STREET);
             Nonterminal transitLeg = seq(plus(STATION), plus(RIDE), plus(STATION));
-            Nonterminal stopToStop = seq(transitLeg, star(choice(transitLeg, seq(XFER, transitLeg))));
+            Nonterminal stopToStop = seq(transitLeg, star(optional(XFER), transitLeg));
             Nonterminal transitItinerary = seq(nontransitLeg, 
                     LINK, stopToStop, LINK, nontransitLeg);
             // Following nonterminal is probably not be working because RIDE is only onboard vertices, 
@@ -169,6 +170,9 @@ public class SimplifiedPathServiceImpl implements PathService {
         public int terminalFor(State state) {
             Vertex v = state.getVertex();
             Edge e = state.getBackEdge();
+            if (e == null) {
+                throw new RuntimeException ("terminalFor should never be called on States without back edges!");
+            }            
             if (e instanceof StreetEdge) return STREET;
             if (e instanceof StreetTransitLink) return LINK;
             // There should perhaps be a shared superclass of all transfer edges to simplify this. 
