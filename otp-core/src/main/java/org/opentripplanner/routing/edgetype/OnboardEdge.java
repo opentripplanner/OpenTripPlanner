@@ -15,9 +15,7 @@
 package org.opentripplanner.routing.edgetype;
 
 /** 
- * Marker interface for edges which are on board a transit vehicle
- * when traversing forward.
- * 
+ * Interface for edges which are on board a transit vehicle.
  */
 public interface OnboardEdge {
 

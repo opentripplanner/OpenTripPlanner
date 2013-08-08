@@ -29,7 +29,7 @@ import org.opentripplanner.routing.vertextype.TransitStopArrive;
  * applying these costs/rules repeatedly in (Pattern)Board edges. These are single station or
  * station-to-station specific costs, rather than trip-pattern specific costs.
  */
-public class PreAlightEdge extends FreeEdge {
+public class PreAlightEdge extends FreeEdge implements StationEdge {
 
     private static final long serialVersionUID = -8046937388471651897L;
 
