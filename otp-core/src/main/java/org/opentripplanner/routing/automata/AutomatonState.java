@@ -34,6 +34,7 @@ public class AutomatonState {
 
     public final List<Transition> transitions = new ArrayList<Transition>();
 
+    /** A list of the states that can be reached from this state without consuming a terminal. */
     public final List<AutomatonState> epsilonTransitions = new ArrayList<AutomatonState>();
 
     public AutomatonState() {

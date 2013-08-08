@@ -27,10 +27,11 @@ public class NTKleenePlus extends Nonterminal {
         AutomatonState in2 = new AutomatonState();
         in.epsilonTransitions.add(in2);
         AutomatonState out = nt.build(in2);
+        // General rule for nonterminals: 
+        // Never add an epsilon edge leading to a state you did not create.
         out.epsilonTransitions.add(in2);
         return out;
     }
 
-    // general rule for nonterminals: never add an epsilon edge to a state you did not create
 
 }
