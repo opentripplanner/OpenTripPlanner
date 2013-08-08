@@ -36,6 +36,7 @@ import org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryIm
 import org.opentripplanner.routing.impl.GraphServiceBeanImpl;
 import org.opentripplanner.routing.impl.GraphServiceImpl;
 import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
+import org.opentripplanner.routing.impl.SimplifiedPathServiceImpl;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
@@ -75,10 +76,6 @@ public class OTPConfigurator {
         
         LOG.info("Wiring up and configuring server task.");
         
-        // The PathService which wraps the SPTService
-        RetryingPathServiceImpl pathService = new RetryingPathServiceImpl();
-        pathService.setFirstPathTimeout(10.0);
-        pathService.setMultiPathTimeout(1.0);
         
         // Core OTP modules
         OTPComponentProviderFactory cpf = new OTPComponentProviderFactory(); 
@@ -87,10 +84,21 @@ public class OTPConfigurator {
         cpf.bind(PlanGenerator.class);
         cpf.bind(MetadataService.class);
         cpf.bind(SPTService.class, new GenericAStar());
-        cpf.bind(PathService.class, pathService);
-        cpf.bind(RemainingWeightHeuristicFactory.class, 
-                new DefaultRemainingWeightHeuristicFactoryImpl()); 
-
+        
+        // Choose a PathService to wrap the SPTService, depending on expected maximum path lengths
+        if (params.longDistance) {
+            SimplifiedPathServiceImpl pathService = new SimplifiedPathServiceImpl();
+            pathService.setTimeout(10);
+            cpf.bind(PathService.class, pathService);
+        } else {
+            RetryingPathServiceImpl pathService = new RetryingPathServiceImpl();
+            pathService.setFirstPathTimeout(10.0);
+            pathService.setMultiPathTimeout(1.0);
+            cpf.bind(PathService.class, pathService);
+            cpf.bind(RemainingWeightHeuristicFactory.class, 
+                    new DefaultRemainingWeightHeuristicFactoryImpl()); 
+        }
+        
         // Optional Analyst Modules
         if (params.analyst) {
             cpf.bind(Renderer.class);
@@ -196,10 +204,12 @@ public class OTPConfigurator {
             }
             GtfsGraphBuilderImpl gtfsBuilder = new GtfsGraphBuilderImpl(gtfsBundles);
             graphBuilder.addGraphBuilder(gtfsBuilder);
+            
+            if ( ( ! hasOSM ) || params.longDistance ) {
+                graphBuilder.addGraphBuilder(new StreetlessStopLinker());
+            } 
             if ( hasOSM ) {
                 graphBuilder.addGraphBuilder(new TransitToStreetNetworkGraphBuilderImpl());
-            } else {
-                graphBuilder.addGraphBuilder(new StreetlessStopLinker());
             }
             List<GraphBuilderWithGtfsDao> gtfsBuilders = new ArrayList<GraphBuilderWithGtfsDao>();
             if (params.transitIndex) {
