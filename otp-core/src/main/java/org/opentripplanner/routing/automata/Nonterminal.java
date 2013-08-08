@@ -54,6 +54,10 @@ public abstract class Nonterminal {
         return new NTKleenePlus(this);
     }
 
+    public Nonterminal optional() {
+        return new NTOptional(this);
+    }
+    
     public Nonterminal or(Object that) {
         return new NTChoice(this, wrap0(that));
     }
@@ -76,6 +80,10 @@ public abstract class Nonterminal {
 
     public static Nonterminal plus(Object... objs) {
         return new NTKleenePlus(seq(objs));
+    }
+
+    public static Nonterminal optional(Object... objs) {
+        return new NTOptional(seq(objs));
     }
 
     public static Nonterminal choice(Object... objs) {
