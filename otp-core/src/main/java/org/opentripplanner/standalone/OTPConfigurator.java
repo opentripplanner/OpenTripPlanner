@@ -204,9 +204,13 @@ public class OTPConfigurator {
             }
             GtfsGraphBuilderImpl gtfsBuilder = new GtfsGraphBuilderImpl(gtfsBundles);
             graphBuilder.addGraphBuilder(gtfsBuilder);
-            
+            // When using the simplified path service, or when there is no street data,
+            // link stops to each other based on distance only, unless user has requested linking
+            // based on transfers.txt.
             if ( ( ! hasOSM ) || params.longDistance ) {
-                graphBuilder.addGraphBuilder(new StreetlessStopLinker());
+                if ( ! params.useTransfersTxt) {
+                    graphBuilder.addGraphBuilder(new StreetlessStopLinker());
+                }
             } 
             if ( hasOSM ) {
                 graphBuilder.addGraphBuilder(new TransitToStreetNetworkGraphBuilderImpl());
