@@ -17,6 +17,7 @@ import org.opentripplanner.api.ws.services.MetadataService;
 import org.opentripplanner.graph_builder.GraphBuilderTask;
 import org.opentripplanner.graph_builder.impl.EmbeddedConfigGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
+import org.opentripplanner.graph_builder.impl.PruneFloatingIslands;
 import org.opentripplanner.graph_builder.impl.StreetlessStopLinker;
 import org.opentripplanner.graph_builder.impl.TransitToStreetNetworkGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.ned.NEDGraphBuilderImpl;
@@ -194,6 +195,7 @@ public class OTPConfigurator {
             }
             GraphBuilder osmBuilder = new OpenStreetMapGraphBuilderImpl(osmProviders); 
             graphBuilder.addGraphBuilder(osmBuilder);
+            graphBuilder.addGraphBuilder(new PruneFloatingIslands());
         }
         if ( hasGTFS ) {
             List<GtfsBundle> gtfsBundles = Lists.newArrayList();
