@@ -40,7 +40,7 @@ import com.vividsolutions.jts.geom.Coordinate;
  */
 public class StreetlessStopLinker implements GraphBuilder {
 
-    @Setter private double radius = 250; 
+    @Setter private double radius = 500; 
 
     private static Logger LOG = LoggerFactory.getLogger(StreetlessStopLinker.class); 
 
