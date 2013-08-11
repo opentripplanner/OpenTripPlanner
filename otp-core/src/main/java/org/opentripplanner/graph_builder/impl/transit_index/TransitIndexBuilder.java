@@ -235,7 +235,11 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
             Stop stop = stopTime.getStop();
             String parent = stop.getParentStation();
             if (parent != null) {
-                stop = dao.getStopForId(new AgencyAndId(stop.getId().getAgencyId(), parent));
+                Stop parentStop = dao.getStopForId(new AgencyAndId(stop.getId().getAgencyId(), parent));
+                if(parentStop == null) {
+                    LOG.warn("Missing parent station for " + stop.getId());
+                }
+                stop = parentStop;
             }
 
             Integer weight = stopWeight.get(stop);
