@@ -180,6 +180,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
      */
     @Setter
     private CustomNamer customNamer;
+    
+    /**
+     * Ignore wheelchair accessibility information.
+     */
+    @Setter
+    private boolean ignoreWheelchairAccessibility = false;
 
     /**
      * Allows for alternate PlainStreetEdge implementations; this is intended for users who want to provide more info in PSE than OTP normally keeps
@@ -2547,7 +2553,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 street.setToll(false);
 
             /* TODO: This should probably generalized somehow? */
-            if (way.isTagFalse("wheelchair") || (steps && !way.isTagTrue("wheelchair"))) {
+            if (!ignoreWheelchairAccessibility
+                    && (way.isTagFalse("wheelchair") || (steps && !way.isTagTrue("wheelchair")))) {
                 street.setWheelchairAccessible(false);
             }
 
