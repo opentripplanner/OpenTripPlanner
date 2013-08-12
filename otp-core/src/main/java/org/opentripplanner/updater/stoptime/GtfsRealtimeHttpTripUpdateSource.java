@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.transit.realtime.GtfsRealtime;
-import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 
 public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, PreferencesConfigurable {
     
@@ -38,25 +37,28 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, Prefe
     private String agencyId;
 
     private String url;
+    
+    private Graph graph;
 
     @Override
     public void configure(Graph graph, Preferences preferences) throws Exception {
         String url = preferences.get("url", null);
         if (url == null)
             throw new IllegalArgumentException("Missing mandatory 'url' parameter");
+        this.graph = graph;
         this.url = url;
         this.agencyId = preferences.get("defaultAgencyId", null);
     }
 
     @Override
     public List<TripUpdateList> getUpdates() {
-        FeedMessage feed = null;
+        GtfsRealtime.FeedMessage feed = null;
         List<TripUpdateList> updates = null;
         try {
             InputStream is = HttpUtils.getData(url);
             if (is != null) {
                 feed = GtfsRealtime.FeedMessage.PARSER.parseFrom(is);
-                updates = TripUpdateList.decodeFromGtfsRealtime(feed, agencyId);
+                updates = TripUpdateList.decodeFromGtfsRealtime(feed, agencyId, graph.getTimeZone());
             }
         } catch (IOException e) {
             LOG.warn("Failed to parse gtfs-rt feed from " + url + ":", e);
