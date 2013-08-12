@@ -60,7 +60,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.GraphServiceImpl;
-import org.opentripplanner.routing.impl.SimplifiedPathServiceImpl;
+import org.opentripplanner.routing.impl.LongDistancePathService;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -100,7 +100,7 @@ public class OTPServiceImplTest {
 
         GraphServiceImpl graphService = new GraphServiceImpl();
         graphService.registerGraph("", graph);
-        SimplifiedPathServiceImpl pathService = new SimplifiedPathServiceImpl();
+        LongDistancePathService pathService = new LongDistancePathService();
         pathService.setGraphService(graphService);
         
         pathService.setSptService(new GenericAStar());

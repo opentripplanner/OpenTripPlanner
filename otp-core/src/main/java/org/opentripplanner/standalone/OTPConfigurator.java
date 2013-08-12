@@ -39,7 +39,7 @@ import org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryIm
 import org.opentripplanner.routing.impl.GraphServiceBeanImpl;
 import org.opentripplanner.routing.impl.GraphServiceImpl;
 import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
-import org.opentripplanner.routing.impl.SimplifiedPathServiceImpl;
+import org.opentripplanner.routing.impl.LongDistancePathService;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
@@ -90,7 +90,7 @@ public class OTPConfigurator {
         
         // Choose a PathService to wrap the SPTService, depending on expected maximum path lengths
         if (params.longDistance) {
-            SimplifiedPathServiceImpl pathService = new SimplifiedPathServiceImpl();
+            LongDistancePathService pathService = new LongDistancePathService();
             pathService.setTimeout(10);
             cpf.bind(PathService.class, pathService);
         } else {
