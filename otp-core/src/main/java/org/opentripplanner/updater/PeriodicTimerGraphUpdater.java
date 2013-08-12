@@ -38,6 +38,12 @@ public class PeriodicTimerGraphUpdater {
 
     private static Logger LOG = LoggerFactory.getLogger(PeriodicTimerGraphUpdater.class);
 
+    /** 
+     * OTP's multi-version concurrency control model for graph updating allows simultaneous reads,
+     * but never simultaneous writes. We ensure this policy is respected by having a single writer 
+     * thread, which sequentially executes all graph updater tasks. Each task is a runnable that is
+     * scheduled with the ExecutorService to run at regular intervals.
+     */
     private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     List<GraphUpdaterRunnable> updaters = new ArrayList<GraphUpdaterRunnable>();
