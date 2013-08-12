@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  * Usage example ('myalert' name is an example):
  * 
  * <pre>
- * myalert.type = stop-time-updater
+ * myalert.type = real-time-alerts
  * myalert.frequencySec = 60
  * myalert.url = http://host.tld/path
  * myalert.earlyStartSec = 3600
