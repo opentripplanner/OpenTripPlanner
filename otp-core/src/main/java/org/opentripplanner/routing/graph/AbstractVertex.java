@@ -268,14 +268,6 @@ public abstract class AbstractVertex implements Vertex {
         index = maxIndex++;
     }
 
-    @Override
-    public void compact() {
-// copy-on-write array list never has extra empty slots
-//        this.outgoing.trimToSize();
-//        this.incoming.trimToSize();
-    }
-    
-
     /* UTILITY METHODS FOR SEARCHING, GRAPH BUILDING, AND GENERATING WALKSTEPS */
     
     @Override

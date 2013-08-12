@@ -25,6 +25,7 @@ import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
+import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -148,11 +149,7 @@ public class GraphBuilderTask implements Runnable {
             }
         } else {
             LOG.info("Not saving graph to disk, as requested.");
-            /* TODO make this indexing into a method on Graph, so it can be triggered outside graph loading. */
-            LOG.info("Building street index.");
-            graph.streetIndex = new StreetVertexIndexServiceImpl(graph);
-            LOG.info("Building edge and vertex indices.");
-            graph.rebuildVertexAndEdgeIndices();
+            graph.index(new DefaultStreetVertexIndexFactory());
         }
         
     }

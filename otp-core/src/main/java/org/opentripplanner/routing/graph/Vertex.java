@@ -113,10 +113,6 @@ public interface Vertex extends Serializable, Cloneable {
      */
     public abstract int removeTemporaryEdges();
 
-    /** Trim edge lists */
-    public abstract void compact();
-
-
     /* GRAPH COHERENCY AND TYPE CHECKING */
 
     public abstract ValidEdgeTypes getValidOutgoingEdgeTypes();

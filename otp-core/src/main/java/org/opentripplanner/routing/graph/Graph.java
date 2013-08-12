@@ -46,6 +46,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
+import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.gbannotation.GraphBuilderAnnotation;
 import org.opentripplanner.gbannotation.NoFutureDates;
@@ -53,13 +54,16 @@ import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.edgetype.TimetableSnapshotSource;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
+import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.beust.jcommander.internal.Sets;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
@@ -382,8 +386,6 @@ public class Graph implements Serializable {
     private void readObject(ObjectInputStream inputStream) throws ClassNotFoundException,
             IOException {
         inputStream.defaultReadObject();
-
-        temporaryEdges = Collections.newSetFromMap(new ConcurrentHashMap<Edge, Boolean>());
     }
 
     /**
@@ -444,6 +446,28 @@ public class Graph implements Serializable {
         return load(in, level, new DefaultStreetVertexIndexFactory());
     }
     
+    /** 
+     * Perform indexing on vertices, edges, and timetables, and create transient data structures.
+     * This used to be done in readObject methods upon deserialization, but stand-alone mode now
+     * allows passing graphs from graphbuilder to server in memory, without a round trip through
+     * serialization. 
+     * TODO: do we really need a factory for different street vertex indexes?
+     */
+    public void index(StreetVertexIndexFactory indexFactory) {
+        temporaryEdges = Collections.newSetFromMap(new ConcurrentHashMap<Edge, Boolean>());
+        streetIndex = indexFactory.newIndex(this);
+        LOG.debug("street index built.");
+        LOG.debug("Rebuilding edge and vertex indices.");
+        rebuildVertexAndEdgeIndices();
+        Set<TableTripPattern> tableTripPatterns = Sets.newHashSet();
+        for (PatternArriveVertex pav : IterableLibrary.filter(this.getVertices(), PatternArriveVertex.class)) {
+            tableTripPatterns.add(pav.getTripPattern());
+        }
+        for (TableTripPattern ttp : tableTripPatterns) {
+            ttp.finish();
+        }
+    }
+    
     /**
      * Loading which allows you to specify StreetVertexIndexFactory and inject other implementation.
      * @param in
@@ -473,17 +497,10 @@ public class Graph implements Serializable {
                 graph.vertices.put(e.getFromVertex().getLabel(), e.getFromVertex());
                 graph.vertices.put(e.getToVertex().getLabel(), e.getToVertex());
             }
-            // trim edge lists to length
-            for (Vertex v : graph.getVertices())
-                v.compact();
+
             LOG.info("Main graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
-            
-            graph.streetIndex = indexFactory.newIndex(graph);
-            LOG.debug("street index built.");
-            
-            LOG.debug("Rebuilding edge and vertex indices");
-            graph.rebuildVertexAndEdgeIndices();
-            
+            graph.index(indexFactory);
+
             if (level == LoadLevel.FULL) {
                 return graph;
             }
