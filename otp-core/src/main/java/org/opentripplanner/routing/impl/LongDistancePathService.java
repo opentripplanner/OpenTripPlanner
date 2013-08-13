@@ -26,6 +26,7 @@ import lombok.Setter;
 import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.ThreadedBidirectionalHeuristic;
+import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.automata.DFA;
 import org.opentripplanner.routing.automata.Nonterminal;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -33,7 +34,6 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.OnboardEdge;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.StationEdge;
-import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.TimedTransferEdge;
 import org.opentripplanner.routing.edgetype.TransferEdge;
@@ -45,9 +45,6 @@ import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.vertextype.OffboardVertex;
-import org.opentripplanner.routing.vertextype.OnboardVertex;
-import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,9 +88,11 @@ public class LongDistancePathService implements PathService {
         
         // only use the threaded bidi heuristic for transit
         RemainingWeightHeuristic heuristic;
-        if (options.modes.isTransit())
+        if (options.isDisableRemainingWeightHeuristic()) {
+            heuristic = new TrivialRemainingWeightHeuristic();
+        } else if (options.modes.isTransit()) {
             heuristic = new ThreadedBidirectionalHeuristic(options.rctx.graph);
-        else {
+        } else {
             heuristic = new DefaultRemainingWeightHeuristic();
         }
         options.rctx.remainingWeightHeuristic = heuristic;

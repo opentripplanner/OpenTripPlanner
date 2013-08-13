@@ -330,6 +330,12 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean ignoreRealtimeUpdates = false;
 
     /**
+     * If true, the remaining weight heuristic is disabled. Currently only implemented for the long
+     * distance path service.
+     */
+    public boolean disableRemainingWeightHeuristic = false;
+
+    /**
      * The routing context used to actually carry out this search. It is important to build States from TraverseOptions rather than RoutingContexts,
      * and just keep a reference to the context in the TraverseOptions, rather than using RoutingContexts for everything because in some testing and
      * graph building situations we need to build a bunch of initial states with different times and vertices from a single TraverseOptions, without
@@ -849,10 +855,14 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && clampInitialWait == other.clampInitialWait
                 && reverseOptimizeOnTheFly == other.reverseOptimizeOnTheFly
                 && ignoreRealtimeUpdates == other.ignoreRealtimeUpdates
+                && disableRemainingWeightHeuristic == other.disableRemainingWeightHeuristic
                 && ObjectUtils.nullSafeEquals(startingTransitTripId, other.startingTransitTripId);
     }
 
-    /** Equality and hashCode should not consider the routing context, to allow SPT caching. */
+    /**
+     * Equality and hashCode should not consider the routing context, to allow SPT caching.
+     * When adding fields to the hash code, pick a random large prime number that's not yet in use.
+     */
     @Override
     public int hashCode() {
         int hashCode = new Double(walkSpeed).hashCode() + new Double(bikeSpeed).hashCode()
@@ -871,7 +881,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + new Double(stairsReluctance).hashCode() * 315595321
                 + new Long(clampInitialWait).hashCode() * 209477
                 + new Boolean(reverseOptimizeOnTheFly).hashCode() * 95112799
-                + new Boolean(ignoreRealtimeUpdates).hashCode() * 154329;
+                + new Boolean(ignoreRealtimeUpdates).hashCode() * 154329
+                + new Boolean(disableRemainingWeightHeuristic).hashCode() * 193939;
         if (batch) {
             hashCode *= -1;
             // batch mode, only one of two endpoints matters

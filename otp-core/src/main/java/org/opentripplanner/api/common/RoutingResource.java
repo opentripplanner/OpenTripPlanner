@@ -232,6 +232,13 @@ public abstract class RoutingResource {
      */
     @QueryParam("ignoreRealtimeUpdates")
     protected List<Boolean> ignoreRealtimeUpdates;
+
+    /**
+     * If true, the remaining weight heuristic is disabled. Currently only implemented for the long
+     * distance path service.
+     */
+    @QueryParam("disableRemainingWeightHeuristic")
+    protected List<Boolean> disableRemainingWeightHeuristic;
     
     /* 
      * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
@@ -399,6 +406,9 @@ public abstract class RoutingResource {
 
         request.setIgnoreRealtimeUpdates(get(ignoreRealtimeUpdates, n, 
                 request.isIgnoreRealtimeUpdates()));
+
+        request.setDisableRemainingWeightHeuristic(get(disableRemainingWeightHeuristic, n,
+                request.isDisableRemainingWeightHeuristic()));
         
         String localeSpec = get(locale, n, "en");
         String[] localeSpecParts = localeSpec.split("_");
