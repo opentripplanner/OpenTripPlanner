@@ -97,6 +97,12 @@ public class LongDistancePathService implements PathService {
             heuristic = new DefaultRemainingWeightHeuristic();
         }
         options.rctx.remainingWeightHeuristic = heuristic;
+        /* In RoutingRequest, maxTransfers defaults to 2. Over long distances, we may see 
+         * itineraries with far more transfers. We do not expect transfer limiting to improve
+         * search times on the LongDistancePathService, so we set it to the maximum we ever expect
+         * to see. Because people may use either the traditional path services or the 
+         * LongDistancePathService, we do not change the global default but override it here. */
+        options.setMaxTransfers(10);
         long searchBeginTime = System.currentTimeMillis();
         LOG.debug("BEGIN SEARCH");
         ShortestPathTree spt = sptService.getShortestPathTree(options, timeout);
