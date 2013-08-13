@@ -57,7 +57,7 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, Prefe
         GtfsRealtime.FeedMessage feed = null;
         List<TripUpdateList> updates = null;
         try {
-            InputStream is = HttpUtils.getData(url);
+            InputStream is = HttpUtils.getData(url, lastTimestamp);
             if (is != null) {
                 feed = GtfsRealtime.FeedMessage.PARSER.parseFrom(is);
                 updates = TripUpdateList.decodeFromGtfsRealtime(feed, agencyId, graph.getTimeZone());
@@ -70,7 +70,7 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, Prefe
                     lastTimestamp = feedTimestamp;
                 }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             LOG.warn("Failed to parse gtfs-rt feed from " + url + ":", e);
         }
         return updates;
