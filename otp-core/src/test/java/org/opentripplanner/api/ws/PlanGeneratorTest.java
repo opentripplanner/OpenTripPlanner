@@ -1648,7 +1648,7 @@ public class PlanGeneratorTest {
      * This class extends the {@link CalendarServiceData} class to allow for easier testing.
      * It includes methods to return both the set of service ids and the time zone used for testing.
      */
-    class CalendarServiceDataStub extends CalendarServiceData {
+    private static final class CalendarServiceDataStub extends CalendarServiceData {
         private static final long serialVersionUID = 1L;
 
         final Set<AgencyAndId> serviceIds;
@@ -1677,7 +1677,7 @@ public class PlanGeneratorTest {
      * This class implements the {@link TransitIndexService} interface to allow for testing.
      * It only really implements the getAgency method. Everything else returns meaningless results.
      */
-    class TransitIndexServiceStub implements TransitIndexService {
+    private static final class TransitIndexServiceStub implements TransitIndexService {
         final Agency train;
         final Agency ferry;
 
@@ -1796,7 +1796,7 @@ public class PlanGeneratorTest {
      * This class implements the {@link FareService} interface to allow for testing.
      * It will return the same fare at every invocation.
      */
-    class FareServiceStub implements FareService {
+    private static final class FareServiceStub implements FareService {
         @Override
         public Fare getCost(GraphPath path) {
             Fare fare = new Fare();
@@ -1813,7 +1813,7 @@ public class PlanGeneratorTest {
      * This class implements the {@link TimetableSnapshotSource} interface to allow for testing.
      * It will return the exact same {@link TimetableResolver} object at every invocation.
      */
-    class TimetableSnapshotSourceStub implements TimetableSnapshotSource {
+    private static final class TimetableSnapshotSourceStub implements TimetableSnapshotSource {
         final TimetableResolver timetableResolver = new TimetableResolver();
 
         @Override
