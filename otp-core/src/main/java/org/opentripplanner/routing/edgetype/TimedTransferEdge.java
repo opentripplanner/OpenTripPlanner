@@ -15,6 +15,7 @@ package org.opentripplanner.routing.edgetype;
 
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 
@@ -47,7 +48,7 @@ public class TimedTransferEdge extends Edge {
     public State traverse(State s0) {
         StateEditor s1 = s0.edit(this);
         s1.incrementWeight(1);
-        s1.setBackMode(s0.getNonTransitMode());
+        s1.setBackMode(TraverseMode.WALK);
         return s1.makeState();
     }
 

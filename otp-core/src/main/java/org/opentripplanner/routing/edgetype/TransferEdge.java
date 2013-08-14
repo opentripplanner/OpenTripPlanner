@@ -90,7 +90,7 @@ public class TransferEdge extends Edge {
         s1.setEverBoarded(true);
         s1.incrementTimeInSeconds(time);
         s1.incrementWeight(time);
-        s1.setBackMode(TraverseMode.LEG_SWITCH);
+        s1.setBackMode(TraverseMode.WALK);
         return s1.makeState();
     }
 
