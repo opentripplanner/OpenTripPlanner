@@ -74,7 +74,7 @@ public class TransferEdge extends Edge {
     }
 
     public TraverseMode getMode() {
-        return TraverseMode.LEG_SWITCH;
+        return TraverseMode.WALK;
     }
 
     public String getName() {
