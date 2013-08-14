@@ -164,7 +164,7 @@ public class LongDistancePathService implements PathService {
 
         static {
             Nonterminal streetLeg  = plus(STREET);
-            Nonterminal transitLeg = seq(plus(STATION), plus(ONBOARD), plus(STATION));
+            Nonterminal transitLeg = seq(star(STATION), plus(ONBOARD), star(STATION));
             Nonterminal stopToStop = seq(transitLeg, star(optional(TRANSFER), transitLeg));
             Nonterminal streetAndTransitItinerary = seq(streetLeg, LINK, stopToStop, LINK, streetLeg);
             // FIXME
