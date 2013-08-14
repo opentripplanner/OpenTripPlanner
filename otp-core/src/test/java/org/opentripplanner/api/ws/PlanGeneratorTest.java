@@ -1507,7 +1507,8 @@ public class PlanGeneratorTest {
 
         assertNull(stopIds[0][0]);
 
-        assertNull(stopIds[0][1]);
+        assertEquals("Train", stopIds[0][1].getAgencyId());
+        assertEquals("Depart", stopIds[0][1].getId());
 
         assertEquals("Train", stopIds[1][0].getAgencyId());
         assertEquals("Depart", stopIds[1][0].getId());
@@ -1524,9 +1525,11 @@ public class PlanGeneratorTest {
         assertEquals("Train", stopIds[2][1].getAgencyId());
         assertEquals("Arrive", stopIds[2][1].getId());
 
-        assertNull(stopIds[3][0]);
+        assertEquals("Train", stopIds[3][0].getAgencyId());
+        assertEquals("Arrive", stopIds[3][0].getId());
 
-        assertNull(stopIds[3][1]);
+        assertEquals("Ferry", stopIds[3][1].getAgencyId());
+        assertEquals("Depart", stopIds[3][1].getId());
 
         assertEquals("Ferry", stopIds[4][0].getAgencyId());
         assertEquals("Depart", stopIds[4][0].getId());
@@ -1534,7 +1537,8 @@ public class PlanGeneratorTest {
         assertEquals("Ferry", stopIds[4][1].getAgencyId());
         assertEquals("Arrive", stopIds[4][1].getId());
 
-        assertNull(stopIds[5][0]);
+        assertEquals("Ferry", stopIds[5][0].getAgencyId());
+        assertEquals("Arrive", stopIds[5][0].getId());
 
         assertNull(stopIds[5][1]);
 
