@@ -73,7 +73,7 @@ public class GraphPath {
         if (back) {
             lastState = optimize ? s.optimize() : s.reverse();
         } else {
-            lastState = optimize ? s.optimize().reverse() : s;
+            lastState = optimize ? s.optimize().optimize() : s;
         }
         // DEBUG
         // lastState = s;
