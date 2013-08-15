@@ -187,11 +187,9 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                     rctx.origin, rctx.target, u, spt, options))
                     break;
             // TODO AMB: Replace isFinal with bicycle conditions in BasicPathParser
-            } else if (!options.batch && u_vertex == rctx.target) {
-                if (u.isFinal() && u.allPathParsersAccept()) {
-                    targetAcceptedStates.add(u);
-                    options.rctx.debug.foundPath();
-                }
+            }  else if (!options.batch && u_vertex == rctx.target && u.isFinal() && u.allPathParsersAccept()) {
+                targetAcceptedStates.add(u);
+                options.rctx.debug.foundPath();
                 if (targetAcceptedStates.size() >= nPaths) {
                     LOG.debug("total vertices visited {}", nVisited);
                     storeMemory();
