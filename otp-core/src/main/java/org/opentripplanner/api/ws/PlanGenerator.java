@@ -112,6 +112,7 @@ public class PlanGenerator {
             LOG.info("Vertex not found: " + options.getFrom() + " : " + options.getTo(), e);
             throw e;
         }
+        options.rctx.debug.finishedCalculating();
 
         if (paths == null || paths.size() == 0) {
             LOG.info("Path not found: " + options.getFrom() + " : " + options.getTo());
@@ -133,7 +134,7 @@ public class PlanGenerator {
                 lastLeg.to.orig = options.getTo().getName();
             }
         }
-
+        options.rctx.debug.finishedRendering();
         return plan;
     }
 

@@ -32,10 +32,13 @@ public class Response {
     private TripPlan plan;
     private PlannerError error = null;
 
-    public Response() {
-    }
+    /** Debugging and profiling information */
+    public Debug debug = null;
 
-    /** Construct an new response initialized with all the incoming query paramters. */
+    /** This no-arg constructor exists to make JAX-RS happy. */ 
+    private Response() {};
+
+    /** Construct an new response initialized with all the incoming query parameters. */
     public Response(UriInfo info) {
         this.requestParameters = new HashMap<String, String>();
         if (info == null) { 
