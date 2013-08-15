@@ -165,18 +165,23 @@
           <artifactId>jersey-servlet</artifactId> <!-- provides SpringServlet -->
         </dependency>
         <dependency>
-          <!-- Jersey-Grizzly integration -->
+          <!-- Jersey-Grizzly integration. -->
+          <!-- Grizzly is a NIO framework we use in the embedded (standalone) server. -->
+          <!-- Jersey integrates with Grizzly 2.2.16 by default -->
+          <!-- But seems to work properly with 2.3.5 via artifact excludes. -->
           <groupId>com.sun.jersey</groupId>
           <artifactId>jersey-grizzly2</artifactId>
         </dependency>
-
-        <!-- OTHER DEPENDENCIES -->
+        
+        <!-- Asynchronous Websockets-capable client, for message-driven incremental GTFS-RT -->
+        <!-- AsyncHttpClient Websockets needs a newer version of Grizzly than Jersey does. -->
         <dependency>
-          <!-- websockets-capable HTTP client -->
           <groupId>com.ning</groupId>
           <artifactId>async-http-client</artifactId>
           <version>1.7.19</version>
         </dependency>
+
+        <!-- OTHER DEPENDENCIES -->
         <dependency>
           <groupId>javax.servlet</groupId>
           <artifactId>servlet-api</artifactId>
