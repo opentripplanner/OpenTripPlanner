@@ -39,12 +39,13 @@ import com.google.common.collect.Lists;
 
 public class ThreadedBidirectionalHeuristic implements RemainingWeightHeuristic {
 
-    private static final long serialVersionUID = 20111002L;
+    private static final long serialVersionUID = 20130813L;
 
-    private static Logger LOG = LoggerFactory.getLogger(LBGRemainingWeightHeuristic.class);
+    private static Logger LOG = LoggerFactory.getLogger(ThreadedBidirectionalHeuristic.class);
 
     private boolean aborted = false;
     
+    /** The vertex that the main search is working towards. */
     Vertex target;
 
     // it is important that whenever a thread sees a higher maxFound, the preceding writes to the 
@@ -89,25 +90,22 @@ public class ThreadedBidirectionalHeuristic implements RemainingWeightHeuristic 
     @Override
     public double computeReverseWeight(State s, Vertex target) {
         final Vertex v = s.getVertex();
-        // temp locations might not be found in walk search
+        // Temporary vertices (StreetLocations) might not be found in walk search
         if (v instanceof StreetLocation)
             return 0;
-//        if (s.getWeight() < 10 * 60)
-//            return 0;
         int index = v.getIndex();
+        double upperBoundCost = maxFound; // pre-read volatile to force cache flush
         if (index < weights.length) {
             double h = weights[index];
-            if (v instanceof StreetVertex)
-                return h;
+            if (v instanceof StreetVertex) return h;
             // all valid street vertices should be explored before the main search starts
             // but many transit vertices may not yet be explored when the search starts
-            if (closed.get(index)) {
-                return h;
-            } else {
-                return maxFound;
-            }
-        } else // this vertex was created after this heuristic was calculated
-            return 0;
+            if (closed.get(index)) return h;
+            else return upperBoundCost;
+        } else {
+            // this vertex was created after this heuristic was calculated
+            return upperBoundCost;
+        }
     }
 
     @Override
@@ -175,10 +173,6 @@ public class ThreadedBidirectionalHeuristic implements RemainingWeightHeuristic 
                     // check for case where the edge's to vertex has been created after this worker
                     if (vi < weights.length) {
                         double ew = e.weightLowerBound(options);
-//                        if (ew < 0) {
-//                            LOG.error("negative edge weight {} qt {}", ew, e);
-//                            continue;
-//                        }
                         double vw = uw + ew;
                         if (weights[vi] > vw) {
                             weights[vi] = vw;
@@ -305,5 +299,5 @@ public class ThreadedBidirectionalHeuristic implements RemainingWeightHeuristic 
             }
         }
     }
-    
+
 }
