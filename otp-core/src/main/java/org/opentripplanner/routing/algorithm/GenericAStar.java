@@ -139,6 +139,8 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                 double w = pq.peek_min_key();
                 System.out.println("pq min key = " + w);
             }
+            // interleave some heuristic-improving work (single threaded)
+            heuristic.doSomeWork();
             /**
              * Terminate the search prematurely if we've hit our computation wall.
              */

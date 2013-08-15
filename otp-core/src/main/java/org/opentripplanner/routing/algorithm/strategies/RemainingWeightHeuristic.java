@@ -37,8 +37,11 @@ public interface RemainingWeightHeuristic extends Serializable {
     /** Reset any cached data in the heuristic, e.g. between rounds of a retrying path service. */
     public void reset();
     
-    /** Cancel computation. Useful for heuristics running in background threads. */
-    public void abort();
+    /** 
+     * Call to cause the heuristic to perform some predetermined amount of work improving its 
+     * estimate. Avoids thread synchronization evil by interleaving forward and backward searches. 
+     */
+    public void doSomeWork();
     
 }
 
