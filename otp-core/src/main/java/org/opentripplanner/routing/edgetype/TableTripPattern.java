@@ -123,7 +123,8 @@ public class TableTripPattern implements TripPattern, Serializable {
         perStopFlags = new int[stopPattern.stops.size()];
         int i = 0;
         for (Stop stop : stopPattern.stops) {
-            if (stop.getWheelchairBoarding() == 1) {
+            // Assume that stops can be boarded with wheelchairs by default (defer to per-trip data)
+            if (stop.getWheelchairBoarding() != 2) {
                 perStopFlags[i] |= FLAG_WHEELCHAIR_ACCESSIBLE;
             }
             perStopFlags[i] |= stopPattern.pickups.get(i) << SHIFT_PICKUP;
