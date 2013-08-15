@@ -49,7 +49,8 @@ public class GraphPath {
      * access etc.) from the predecessor information left in states by the search algorithm.
      * 
      * Optionally re-traverses all edges backward in order to remove excess waiting time from the
-     * final itinerary presented to the user.
+     * final itinerary presented to the user. When planning with departure time, the edges will then
+     * be re-traversed once more in order to move the waiting time forward in time, towards the end.
      * 
      * @param s
      *            - the state for which a path is requested
