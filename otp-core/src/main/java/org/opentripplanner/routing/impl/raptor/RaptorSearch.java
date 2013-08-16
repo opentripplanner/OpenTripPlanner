@@ -177,7 +177,10 @@ public class RaptorSearch {
                 if (options.getBannedStops().matches(stop.stopVertex.getStop())) {
                     continue;
                 }
-
+                if (options.getBannedStopsHard().matches(stop.stopVertex.getStop())) {
+                    continue;
+                }
+                
                 List<RaptorState> states = statesByStop[stop.index];
                 List<RaptorState> newStates = new ArrayList<RaptorState>();
 
@@ -523,6 +526,9 @@ public class RaptorSearch {
                     if (options.getBannedStops().matches(stop.stopVertex.getStop())) {
                         continue;
                     }
+                    if (options.getBannedStopsHard().matches(stop.stopVertex.getStop())) {
+                        continue;
+                    }
 
                     addStopNearTarget(stop, state.getWalkDistance(), (int) state.getElapsedTimeSeconds());
                 }
@@ -637,6 +643,9 @@ public class RaptorSearch {
 
             // Skip banned stops
             if (options.getBannedStops().matches(stop.stopVertex.getStop())) {
+                continue;
+            }
+            if (options.getBannedStopsHard().matches(stop.stopVertex.getStop())) {
                 continue;
             }
             

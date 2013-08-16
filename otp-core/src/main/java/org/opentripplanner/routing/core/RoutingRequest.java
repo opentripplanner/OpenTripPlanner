@@ -222,6 +222,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Do not use certain stops. See for more information the bannedStops property in the RoutingResource class. */
     private StopMatcher bannedStops = StopMatcher.emptyMatcher(); 
     
+    /** Do not use certain stops. See for more information the bannedStopsHard property in the RoutingResource class. */
+    private StopMatcher bannedStopsHard = StopMatcher.emptyMatcher(); 
+    
     /** Set of preferred routes by user. */
     public RouteMatcher preferredRoutes = RouteMatcher.emptyMatcher();
     
@@ -531,6 +534,15 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
     }
 
+    public void setBannedStopsHard(String s) {
+        if (s != null && !s.equals("")) {
+            bannedStopsHard = StopMatcher.parse(s);
+        }
+        else {
+            bannedStopsHard = StopMatcher.emptyMatcher();
+        }
+    }
+    
     public void setBannedAgencies(String s) {
         if (s != null && !s.equals(""))
             bannedAgencies = new HashSet<String>(Arrays.asList(s.split(",")));
@@ -718,6 +730,7 @@ public class RoutingRequest implements Cloneable, Serializable {
             clone.bannedRoutes = bannedRoutes.clone();
             clone.bannedTrips = (HashMap<AgencyAndId, BannedStopSet>) bannedTrips.clone();
             clone.bannedStops = bannedStops.clone();
+            clone.bannedStopsHard = bannedStopsHard.clone();
             if (this.bikeWalkingOptions != this)
                 clone.bikeWalkingOptions = this.bikeWalkingOptions.clone();
             else
@@ -994,6 +1007,10 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public String getBannedStopsStr() {
         return bannedStops.asString();
+    }
+    
+    public String getBannedStopsHardStr() {
+        return bannedStopsHard.asString();
     }
     
     public String getBannedAgenciesStr() {

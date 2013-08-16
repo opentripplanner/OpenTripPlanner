@@ -47,8 +47,13 @@ public class PreAlightEdge extends FreeEdge implements StationEdge {
         // used.
 
         // Ignore this edge if its stop is banned
-        if (!options.getBannedStops().isEmpty() && tov instanceof TransitStop) {
+        if (!options.getBannedStops().isEmpty()) {
             if (options.getBannedStops().matches(((TransitStop) tov).getStop())) {
+                return null;
+            }
+        }
+        if (!options.getBannedStopsHard().isEmpty()) {
+            if (options.getBannedStopsHard().matches(((TransitStop) tov).getStop())) {
                 return null;
             }
         }
