@@ -130,11 +130,12 @@ public class LongDistancePathService implements PathService {
             Nonterminal transitLeg = seq(star(STATION), plus(ONBOARD), star(STATION));
             Nonterminal stopToStop = seq(transitLeg, star(optional(TRANSFER), transitLeg));
             Nonterminal streetAndTransitItinerary = seq(streetLeg, LINK, stopToStop, LINK, streetLeg);
+            Nonterminal transitItinerary = seq(optional(TRANSFER), stopToStop, optional(TRANSFER));
             // FIXME
             Nonterminal onboardItinerary = seq( plus(ONBOARD), plus(STATION), star(TRANSFER, transitLeg),
                     LINK, streetLeg);
             Nonterminal itinerary = 
-                    choice(streetLeg, streetAndTransitItinerary, onboardItinerary, stopToStop);
+                    choice(streetLeg, streetAndTransitItinerary, onboardItinerary, transitItinerary);
             DFA = itinerary.toDFA().minimize();
             System.out.println(DFA.toGraphViz());
             System.out.println(DFA.dumpTable());
