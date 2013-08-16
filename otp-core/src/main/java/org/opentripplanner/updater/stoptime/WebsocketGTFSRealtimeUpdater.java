@@ -98,7 +98,7 @@ public class WebsocketGTFSRealtimeUpdater implements PreferencesConfigurable {
             FeedMessage feed = null;
             try {
                 System.out.println("Parsing protocol buffers from message: " + bytes);
-                feed = GtfsRealtime.FeedMessage.parseFrom(bytes);
+                feed = GtfsRealtime.FeedMessage.PARSER.parseFrom(bytes);
                 // System.out.println("Feed: " + feed);
                 return feed;
             } catch (InvalidProtocolBufferException e) {

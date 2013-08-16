@@ -62,7 +62,7 @@ public class GtfsRealtimeUpdater implements GraphUpdaterRunnable {
                 throw new RuntimeException("Failed to get data from url " + url);
             }
             
-            GtfsRealtime.FeedMessage feed = GtfsRealtime.FeedMessage.parseFrom(data);
+            GtfsRealtime.FeedMessage feed = GtfsRealtime.FeedMessage.PARSER.parseFrom(data);
             
             long feedTimestamp = feed.getHeader().getTimestamp();
             if(feedTimestamp <= lastTimestamp) {
