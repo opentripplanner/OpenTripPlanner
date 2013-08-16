@@ -31,7 +31,7 @@ public class GtfsStopContext {
 
     public HashSet<AgencyAndId> stops = new HashSet<AgencyAndId>();
 
-    public Map<Stop, Vertex> stopNodes = new HashMap<Stop, Vertex>();
+    public Map<Stop, TransitStop> stopNodes = new HashMap<Stop, TransitStop>();
 
     public Map<Stop, TransitStopArrive> stopArriveNodes = new HashMap<Stop, TransitStopArrive>();
 
