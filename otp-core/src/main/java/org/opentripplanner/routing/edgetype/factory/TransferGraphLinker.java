@@ -26,9 +26,7 @@ import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.TransitStopArrive;
-import org.opentripplanner.routing.vertextype.TransitStopDepart;
-
+import org.opentripplanner.routing.vertextype.TransitStop;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 
@@ -45,25 +43,19 @@ public class TransferGraphLinker {
     
     public void run() {
         // Create a mapping from StopId to StopVertices
-        Map<AgencyAndId, TransitStopArrive> stopArriveNodes = new HashMap<AgencyAndId, TransitStopArrive>();
-        Map<AgencyAndId, TransitStopDepart> stopDepartNodes = new HashMap<AgencyAndId, TransitStopDepart>();
+        Map<AgencyAndId, TransitStop> stopNodes = new HashMap<AgencyAndId, TransitStop>();
         for (Vertex v : graph.getVertices()) {
-            if (v instanceof TransitStopArrive) {
-                TransitStopArrive transitStop = (TransitStopArrive)v; 
+            if (v instanceof TransitStop) {
+                TransitStop transitStop = (TransitStop)v; 
                 Stop stop = transitStop.getStop();
-                stopArriveNodes.put(stop.getId(), transitStop);
-            }
-            else if (v instanceof TransitStopDepart) {
-                TransitStopDepart transitStop = (TransitStopDepart)v; 
-                Stop stop = transitStop.getStop();
-                stopDepartNodes.put(stop.getId(), transitStop);
+                stopNodes.put(stop.getId(), transitStop);
             }
         } 
         
         // Create edges
         for (TransferTable.Transfer transfer : graph.getTransferTable().getAllFirstSpecificTransfers()) {
-            Vertex fromVertex = stopArriveNodes.get(transfer.fromStopId);
-            Vertex toVertex = stopDepartNodes.get(transfer.toStopId);
+            TransitStop fromVertex = stopNodes.get(transfer.fromStopId);
+            TransitStop toVertex = stopNodes.get(transfer.toStopId);
 
             double distance = distanceLibrary.distance(fromVertex.getCoordinate(), 
                     toVertex.getCoordinate());

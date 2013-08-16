@@ -349,8 +349,8 @@ public class TestPatternHopFactory extends TestCase {
         assertEquals(StopTransfer.TIMED_TRANSFER, transferTable.getTransferTime(stopN, stopK, fromTrip, toTrip, true));
         assertEquals(15, transferTable.getTransferTime(stopN, stopK, fromTrip, toTrip2, true));
         
-        Vertex e_arrive = graph.getVertex("agency_E_arrive");
-        Vertex f_depart = graph.getVertex("agency_F_depart");
+        TransitStop e_arrive = (TransitStop) graph.getVertex("agency_E");
+        TransitStop f_depart = (TransitStop) graph.getVertex("agency_F");
         Edge edge = new TransferEdge(e_arrive, f_depart, 10000, 10000);
         
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 18, 0, 50, 0);
