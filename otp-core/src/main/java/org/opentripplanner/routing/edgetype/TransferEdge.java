@@ -17,9 +17,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.TransitStopDepart;
-
+import org.opentripplanner.routing.vertextype.TransitStop;
 import com.vividsolutions.jts.geom.LineString;
 
 /**
@@ -41,10 +39,8 @@ public class TransferEdge extends Edge {
     /**
      * @see Transfer(Vertex, Vertex, double, int)
      */
-    public TransferEdge(Vertex fromv, Vertex tov, double distance) {
-        super(fromv, tov);
-        this.distance = distance;
-        this.time = (int) distance; //(int) distance * 3;
+    public TransferEdge(TransitStop fromv, TransitStop tov, double distance) {
+        this(fromv, tov, distance, (int) distance);
     }
     
     /**
@@ -54,14 +50,13 @@ public class TransferEdge extends Edge {
      * @param distance  the distance in meters from the origin Vertex to the destination
      * @param time      the minimum time in seconds it takes to complete this transfer
      */
-    public TransferEdge(Vertex fromv, Vertex tov, double distance, int time) {
+    public TransferEdge(TransitStop fromv, TransitStop tov, double distance, int time) {
         super(fromv, tov);
         this.distance = distance;
         this.time = time; 
     }
 
     public String getDirection() {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -78,8 +73,7 @@ public class TransferEdge extends Edge {
     }
 
     public String getName() {
-        // TODO Auto-generated method stub
-        return "transfer";
+        return "Transfer";
     }
 
     public State traverse(State s0) {
