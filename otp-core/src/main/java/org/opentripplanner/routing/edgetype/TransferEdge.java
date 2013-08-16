@@ -77,9 +77,8 @@ public class TransferEdge extends Edge {
     }
 
     public State traverse(State s0) {
-        if (s0.getOptions().wheelchairAccessible && !wheelchairAccessible) {
-            return null;
-        }
+        if (s0.getBackEdge() instanceof TransferEdge) return null; // Disallow chaining of transfers
+        if (s0.getOptions().wheelchairAccessible && !wheelchairAccessible) return null;
         StateEditor s1 = s0.edit(this);
         s1.setEverBoarded(true);
         s1.incrementTimeInSeconds(time);
