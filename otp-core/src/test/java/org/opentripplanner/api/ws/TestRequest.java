@@ -647,6 +647,31 @@ public class TestRequest extends TestCase {
         assertFalse(stopMatcher.matches(stop2107));
     }
     
+    public void testBannedStopsHard() throws JSONException, ParameterException {
+        // Plan short trip along NE GLISAN ST
+        TestPlanner planner = new TestPlanner("portland", "NE 57TH AVE at NE GLISAN ST #2", "NE 30TH AVE at NE GLISAN ST");
+
+        // Do the planning
+        Response response = planner.getItineraries();
+        // First check the request
+        Itinerary itinerary = response.getPlan().itinerary.get(0);
+        Leg leg = itinerary.legs.get(1);
+        // Validate that this leg uses trip 190W1280
+        assertTrue(leg.tripId.equals("190W1280"));
+        
+        // Ban stop hard with id 2009 from agency with id TriMet
+        // This is a stop that will be passed when using trip 190W1280
+        planner.setBannedStopsHard(Arrays.asList("TriMet_2009"));
+        
+        // Do the planning again
+        response = planner.getItineraries();
+        // First check the request
+        itinerary = response.getPlan().itinerary.get(0);
+        leg = itinerary.legs.get(1);
+        // Validate that this leg doesn't use trip 190W1280
+        assertFalse(leg.tripId.equals("190W1280"));
+    }
+    
     public void testWalkLimitExceeded() throws JSONException, ParameterException {
         // Plan short trip
         TestPlanner planner = new TestPlanner("portland", "45.501115,-122.738214", "45.469487,-122.500343");
@@ -1033,6 +1058,10 @@ public class TestRequest extends TestCase {
 
         public void setBannedStops(List<String> bannedStops) {
             this.bannedStops = bannedStops;
+        }
+        
+        public void setBannedStopsHard(List<String> bannedStopsHard) {
+            this.bannedStopsHard = bannedStopsHard;
         }
         
         public void setTransferPenalty(List<Integer> transferPenalty) {
