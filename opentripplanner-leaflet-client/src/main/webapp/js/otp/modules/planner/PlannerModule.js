@@ -487,8 +487,7 @@ otp.modules.planner.PlannerModule =
                 }
             }
         }
-        
-        this.webapp.map.lmap.fitBounds(itin.getBoundsArray());
+        if (otp.config.zoomToFitResults) this.webapp.map.lmap.fitBounds(itin.getBoundsArray());
     },
     
     highlightLeg : function(leg) {
