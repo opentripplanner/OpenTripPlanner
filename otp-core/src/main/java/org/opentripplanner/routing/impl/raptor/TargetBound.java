@@ -384,5 +384,6 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
     }
 
     @Override
-    public void abort() {}
+    public void doSomeWork() {}
+
 }

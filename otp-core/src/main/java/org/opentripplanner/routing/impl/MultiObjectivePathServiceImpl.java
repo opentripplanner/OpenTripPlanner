@@ -22,8 +22,8 @@ import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
-import org.opentripplanner.routing.algorithm.strategies.BidirectionalRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -116,7 +116,7 @@ public class MultiObjectivePathServiceImpl implements PathService {
         if (options.getModes().isTransit()) {
             LOG.debug("Transit itinerary requested.");
             // always use the bidirectional heuristic because the others are not precise enough
-            heuristic = new BidirectionalRemainingWeightHeuristic(options.rctx.graph);
+            heuristic = new InterleavedBidirectionalHeuristic(options.rctx.graph);
         } else {
             LOG.debug("Non-transit itinerary requested.");
             heuristic = new DefaultRemainingWeightHeuristic();

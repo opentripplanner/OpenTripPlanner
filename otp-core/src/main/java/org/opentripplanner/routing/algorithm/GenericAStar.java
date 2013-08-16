@@ -14,6 +14,9 @@
 package org.opentripplanner.routing.algorithm;
 
 import java.util.Collection;
+import java.util.List;
+
+import lombok.Setter;
 
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.common.pqueue.OTPPriorityQueue;
@@ -37,6 +40,9 @@ import org.opentripplanner.util.monitoring.MonitoringStoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.beust.jcommander.internal.Lists;
+import com.vividsolutions.jts.geom.Coordinate;
+
 /**
  * Find the shortest path between graph vertices using A*.
  */
@@ -54,6 +60,9 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     private SearchTerminationStrategy _searchTerminationStrategy;
 
     private TraverseVisitor traverseVisitor;
+    
+    /** The number of paths to attempt to find */
+    @Setter private int nPaths = 1;
 
     public void setShortestPathTreeFactory(ShortestPathTreeFactory shortestPathTreeFactory) {
         _shortestPathTreeFactory = shortestPathTreeFactory;
@@ -101,6 +110,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         // heuristic calc could actually be done when states are constructed, inside state
         State initialState = new State(options);
         heuristic.initialize(initialState, rctx.target);
+        options.rctx.debug.finishedPrecalculating();
         spt.add(initialState);
 
         // Priority Queue.
@@ -123,12 +133,14 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         int nVisited = 0;
 
         /* the core of the A* algorithm */
+        List<State> targetAcceptedStates = Lists.newArrayList();
         while (!pq.empty()) { // Until the priority queue is empty:
             if (_verbose) {
                 double w = pq.peek_min_key();
                 System.out.println("pq min key = " + w);
             }
-
+            // interleave some heuristic-improving work (single threaded)
+            heuristic.doSomeWork();
             /**
              * Terminate the search prematurely if we've hit our computation wall.
              */
@@ -137,6 +149,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                 // Returning null indicates something went wrong and search should be aborted.
                 // This is distinct from the empty list of paths which implies that a result may still
                 // be found by retrying with altered options (e.g. max walk distance)
+                options.rctx.debug.timedOut = true;
                 storeMemory();
                 return null; // throw timeout exception
             }
@@ -174,10 +187,14 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                     rctx.origin, rctx.target, u, spt, options))
                     break;
             // TODO AMB: Replace isFinal with bicycle conditions in BasicPathParser
-            } else if (!options.batch && u_vertex == rctx.target && u.isFinal() && u.allPathParsersAccept()) {
-                LOG.debug("total vertices visited {}", nVisited);
-                storeMemory();
-                return spt;
+            }  else if (!options.batch && u_vertex == rctx.target && u.isFinal() && u.allPathParsersAccept()) {
+                targetAcceptedStates.add(u);
+                options.rctx.debug.foundPath();
+                if (targetAcceptedStates.size() >= nPaths) {
+                    LOG.debug("total vertices visited {}", nVisited);
+                    storeMemory();
+                    return spt;
+                } else continue;
             }
 
             Collection<Edge> edges = options.isArriveBy() ? u_vertex.getIncoming() : u_vertex.getOutgoing();
@@ -187,7 +204,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
             for (Edge edge : edges) {
 
                 // Iterate over traversal results. When an edge leads nowhere (as indicated by
-                // returning NULL), the iteration is over.
+                // returning NULL), the iteration is over. TODO Use this to board multiple trips.
                 for (State v = edge.traverse(u); v != null; v = v.getNextResult()) {
                     // Could be: for (State v : traverseEdge...)
 
@@ -209,6 +226,11 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                     }
 
                     double remaining_w = computeRemainingWeight(heuristic, v, rctx.target, options);
+                    Coordinate vc = v.getVertex().getCoordinate();
+
+//                    System.out.printf("M, %3.5f, %3.5f, %2.1f\n", vc.y, vc.x, 
+//                            Double.isInfinite(remaining_w) ? -1.0 : remaining_w);
+
                     if (remaining_w < 0 || Double.isInfinite(remaining_w) ) {
                         continue;
                     }

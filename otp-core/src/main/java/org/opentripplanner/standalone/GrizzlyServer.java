@@ -48,6 +48,12 @@ public class GrizzlyServer {
     }
 
     public static final String CLIENT_WAR_FILENAME = "client.war";
+    final String[] FALLBACK_CLIENT_DIRS = new String[] {
+            "otp-leaflet-client/src/main/webapp/",
+            "../otp-leaflet-client/src/main/webapp/",
+            "otp-openlayers-client/src/main/webapp/",
+            "../otp-openlayers-client/src/main/webapp/"
+    };
     
     private static class ClientWarSupplier implements InputSupplier<InputStream> {
         @Override public InputStream getInput() throws IOException {
@@ -66,23 +72,32 @@ public class GrizzlyServer {
      * server would be a major undertaking. Solution: copy the ZIP outside the JAR and expand it 
      * in a temp directory, manually.
      * 
-     * Interestingly this even works in Eclipse, but apparently only if you previously ran a
-     * command-line Maven build that left a WAR in /target/classes. We might want to check for the
-     * existence of ../opentipplanner-leaflet-client/src/... and serve that as a fallback.
+     * Interestingly this even works in Eclipse, but only if you previously ran a
+     * command-line Maven build that left a WAR in /target/classes. Therefore we check for the
+     * existence of source directories that would be seen from Eclipse, and serve those as fallbacks.
      */
     public HttpHandler makeClientStaticHandler () {
-        File tempDir = Files.createTempDir();
-        File clientWar = new File(tempDir, CLIENT_WAR_FILENAME);
+        File clientDir = Files.createTempDir();
+        /* Eclipse does not seem to be copying this file. Maven is. */
+        File clientWar = new File(clientDir, CLIENT_WAR_FILENAME);
+        boolean fallback = false;
         try {
             Files.copy(new ClientWarSupplier(), clientWar);
             ZipFile zip = new ZipFile(clientWar);
-            zip.extractAll(tempDir.toString());
-        } catch (ZipException e) {
-            LOG.error("Error expanding client WAR, client will not be available: {}", e.getMessage());
-        } catch (IOException e) {
-            LOG.error("Error copying client WAR, client will not be available: {}", e.getMessage());
+            zip.extractAll(clientDir.toString());
+        } catch (Exception e) {
+            LOG.error("Error copying or expanding client WAR: {}", e.getMessage());
+            for (String fallbackClientDir : FALLBACK_CLIENT_DIRS) {
+                File f = new File(fallbackClientDir);
+                if (f.isDirectory() && f.canRead()) {
+                    clientDir = f;
+                    LOG.info("Found fallback client files at {}", f);
+                    break;
+                }
+            }
         }
-        return new StaticHttpHandler(tempDir.toString());
+        LOG.info("Serving static client files from {}", clientDir);
+        return new StaticHttpHandler(clientDir.toString());
     }
     
     public void run() {

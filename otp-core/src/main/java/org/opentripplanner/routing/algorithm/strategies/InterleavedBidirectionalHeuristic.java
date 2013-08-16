@@ -13,16 +13,14 @@
 
 package org.opentripplanner.routing.algorithm.strategies;
 
-import java.util.Arrays;
-import java.util.BitSet;
 import java.util.List;
+import java.util.Map;
 
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.common.pqueue.OTPPriorityQueue;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
-import org.opentripplanner.routing.graph.AbstractVertex;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -36,44 +34,122 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
-public class ThreadedBidirectionalHeuristic implements RemainingWeightHeuristic {
+public class InterleavedBidirectionalHeuristic implements RemainingWeightHeuristic {
 
-    private static final long serialVersionUID = 20111002L;
+    private static final long serialVersionUID = 20130813L;
 
-    private static Logger LOG = LoggerFactory.getLogger(LBGRemainingWeightHeuristic.class);
-
-    private boolean aborted = false;
+    private static final int HEURISTIC_STEPS_PER_MAIN_STEP = 2;
     
+    private static Logger LOG = LoggerFactory.getLogger(InterleavedBidirectionalHeuristic.class);
+
+    /** The vertex that the main search is working towards. */
     Vertex target;
 
-    // it is important that whenever a thread sees a higher maxFound, the preceding writes to the 
-    // node table are also visible. Since Java 1.5 (JSR133) the memory model specifies that 
-    // accessing a volatile will flush caches. Word tearing is also avoided by volatile.
-    volatile double maxFound = 0; 
+    double maxFound = 0; 
 
-    double[] weights;
+    Map <Vertex, Double> weights;
 
-    BitSet closed;
+    Graph graph;
     
-    Graph g;
+    Vertex origin;
+    
+    RoutingRequest options;
+    
+    BinHeap<Vertex> q;
 
-    public ThreadedBidirectionalHeuristic(Graph graph) {
-        this.g = graph;
+    boolean finished = false;
+    
+    public InterleavedBidirectionalHeuristic(Graph graph) {
+        this.graph = graph;
     }
 
+    
+    /* Implementation observations:
+     * 1. filling weights array with inf is expensive (~70 msec in PDX)
+     * 2. keeping a separate closed bitset is ugly (and was not threadsafe)
+     * 3. street movement is "almost Euclidean" in cost
+     * 4. precomputing 20km origin/destination circles takes ~30 msec each
+     *    1 or 2km takes only about 5msec each.
+     *    20km using hashmap weights takes ~150 msec each AND search gets really slow due to unlimited walking
+     *    
+     * 5. we could get the and calculate origin circle on the fly using distance
+     * 6. we could use a HashMap for weights
+     * 0. Raising walk distance severely affects bidi heuristic performance
+     * TODO: verify that everything works both arriveBy and departAfter
+     * 
+     * We could even create shortcut edges from the destination stops to the destination.
+     */
+    
     @Override
     public void initialize(State s, Vertex target) {
         if (target == this.target) {
             LOG.debug("reusing existing heuristic");
-        } else {
-            this.target = target;
-            new Thread(new Worker(s)).start();
-            //singlethreaded debug
-            //new Worker(s).run();
+            return;
         }
+        LOG.info("begin init heuristic        {}", System.currentTimeMillis());
+        this.target = target;
+        // int nVertices = AbstractVertex.getMaxIndex(); // will be ever increasing?
+        int nVertices = graph.countVertices();
+        weights = Maps.newHashMapWithExpectedSize(((int)Math.log(nVertices)) + 1);
+        this.options = s.getOptions();
+        this.origin = s.getVertex();
+        // make sure distance table is initialized before starting thread
+        LOG.debug("initializing heuristic computation thread");
+        // forward street search first, sets values around origin to 0
+        streetSearch(options, false); // ~30 msec
+        LOG.info("end foreward street search {}", System.currentTimeMillis());
+        // create a new priority queue
+        q = new BinHeap<Vertex>();
+        // enqueue states for each stop within walking distance of the destination
+        for (State stopState : streetSearch(options, true)) { // backward street search
+            q.insert(stopState.getVertex(), stopState.getWeight());
+        }
+        LOG.info("end backward street search {}", System.currentTimeMillis());
+        // once street searches are done, raise the walk limit to max
+        // because hard walk limiting is incorrect and is observed to cause problems 
+        // for trips near the cutoff
+        options.setMaxWalkDistance(Double.MAX_VALUE);
+        LOG.debug("initialized SSSP");        
     }
 
+    /** Do up to N iterations as long as the queue is not empty */
+    @Override
+    public void doSomeWork() {
+        if (finished) return;
+        for (int i = 0; i < HEURISTIC_STEPS_PER_MAIN_STEP; ++i) {
+            if (q.empty()) {
+                LOG.info("Emptied SSSP queue.");
+                finished = true;
+                break;
+            }
+            double uw = q.peek_min_key();
+            Vertex u = q.extract_min();
+//            // Ignore vertices that could be rekeyed (but are not rekeyed in this implementation).
+//            if (uw > weights.get(u)) continue;
+            // The weight of the queue head is uniformly increasing. This is the highest ever seen.
+            maxFound = uw;
+            
+//            System.out.printf("H, %3.5f, %3.5f, %2.1f\n", u.getY(), u.getX(), 
+//                    Double.isInfinite(uw) ? -1.0 : uw);
+
+            // OUTgoing for heuristic search when main search is arriveBy 
+            for (Edge e : options.isArriveBy() ? u.getOutgoing() : u.getIncoming()) {
+                // Do not enter streets in this phase.
+                if (e instanceof StreetTransitLink) continue;
+                Vertex v = options.isArriveBy() ? e.getToVertex() : e.getFromVertex();
+                double ew = e.weightLowerBound(options);
+                double vw = uw + ew;
+                Double old_vw = weights.get(v);
+                if (old_vw == null || vw < old_vw) {
+                    weights.put(v, vw);
+                    q.insert(v, vw); 
+                }
+            }
+        }
+    }
+    
     @Override
     public double computeForwardWeight(State s, Vertex target) {
         return computeReverseWeight(s, target);
@@ -89,116 +165,21 @@ public class ThreadedBidirectionalHeuristic implements RemainingWeightHeuristic 
     @Override
     public double computeReverseWeight(State s, Vertex target) {
         final Vertex v = s.getVertex();
-        // temp locations might not be found in walk search
-        if (v instanceof StreetLocation)
-            return 0;
-//        if (s.getWeight() < 10 * 60)
-//            return 0;
-        int index = v.getIndex();
-        if (index < weights.length) {
-            double h = weights[index];
-            if (v instanceof StreetVertex)
-                return h;
-            // all valid street vertices should be explored before the main search starts
-            // but many transit vertices may not yet be explored when the search starts
-            if (closed.get(index)) {
-                return h;
-            } else {
-                return maxFound;
-            }
-        } else // this vertex was created after this heuristic was calculated
-            return 0;
+        // Temporary vertices (StreetLocations) might not be found in walk search.
+        if (v instanceof StreetLocation) return 0;
+        Double weight = weights.get(v);
+        // All valid street vertices should be explored before the main search starts,
+        // but many transit vertices may not yet be explored when the search starts.
+        // TODO: verify that StreetVertex includes all vertices of interest.
+        if (v instanceof StreetVertex) return weight == null ? Double.POSITIVE_INFINITY : weight;
+        else if (weight == null) return maxFound;
+        else return weight;
     }
 
     @Override
     public void reset() {
     }
-
-    private /* inner */ class Worker implements Runnable {
-
-        Vertex origin;
         
-        RoutingRequest options;
-
-        BinHeap<Vertex> q;
-
-        // constructor runs in main thread so sequential semantics are guaranteed
-        Worker (State s) {
-            this.options = s.getOptions();
-            this.origin = s.getVertex();
-            // make sure distance table is initialized before starting thread
-            LOG.debug("initializing heuristic computation thread");
-            int nVertices = AbstractVertex.getMaxIndex();
-            weights = new double[nVertices];
-            Arrays.fill(weights, Double.POSITIVE_INFINITY);
-            // closed nodes must be tracked separately from (possibly tentative) weight values
-            closed = new BitSet(nVertices);
-            // make sure street distances are known before starting thread
-            LOG.debug("street searches");
-            // forward street search first, sets values around origin to 0
-            streetSearch(options, false); 
-            // create a new priority queue
-            q = new BinHeap<Vertex>();
-            // enqueue states for each stop within walking distance of the destination
-            for (State stopState : streetSearch(options, true)) { // backward street search
-                q.insert(stopState.getVertex(), stopState.getWeight());
-            }
-            // once street searches are done, raise the walk limit to max
-            // because hard walk limiting is incorrect and is observed to cause problems 
-            // for trips near the cutoff
-            options.setMaxWalkDistance(Double.MAX_VALUE);
-        }
-        
-        @Override
-        public void run() {
-            LOG.debug("start SSSP");
-            long t0 = System.currentTimeMillis();
-            while (!q.empty()) {
-                if (aborted) {
-                    LOG.debug("aborted threaded heuristic calculation.");
-                    break;
-                }
-                double uw = q.peek_min_key();
-                Vertex u = q.extract_min();
-                int ui = u.getIndex();
-                closed.set(ui);
-                // ignore vertices that could have been rekeyed but are not in this implementation
-                if (uw > weights[ui])
-                    continue;
-                maxFound = uw;
-                // OUTgoing for heuristic search when main search is arriveBy 
-                for (Edge e : options.isArriveBy() ? u.getOutgoing() : u.getIncoming()) {
-                    if (e instanceof StreetTransitLink) // no streets in this phase
-                        continue;
-                    Vertex v = options.isArriveBy() ? e.getToVertex() : e.getFromVertex();
-                    int vi = v.getIndex();
-                    // check for case where the edge's to vertex has been created after this worker
-                    if (vi < weights.length) {
-                        double ew = e.weightLowerBound(options);
-//                        if (ew < 0) {
-//                            LOG.error("negative edge weight {} qt {}", ew, e);
-//                            continue;
-//                        }
-                        double vw = uw + ew;
-                        if (weights[vi] > vw) {
-                            weights[vi] = vw;
-                            // selectively rekeying did not seem to offer any speed advantage
-                            q.insert(v, vw);
-                            // System.out.println("Insert " + v + " weight " + vw);
-                        }
-                    } // if the vertex is beyond the index... it is not enqueued.
-                    // BTw... the index is constantly increasing...
-                }
-            }            
-            LOG.info("End SSSP ({} msec)", System.currentTimeMillis() - t0);
-            
-        }
-        
-    }
-
-    public synchronized void abort () {
-        this.aborted = true;
-    }
 
     /*
     
@@ -239,7 +220,6 @@ public class ThreadedBidirectionalHeuristic implements RemainingWeightHeuristic 
     */
 
     private List<State> streetSearch (RoutingRequest rr, boolean fromTarget) {
-//        final double RADIUS = 5000;
         rr = rr.clone();
         if (fromTarget)
             rr.setArriveBy( ! rr.isArriveBy());
@@ -251,35 +231,29 @@ public class ThreadedBidirectionalHeuristic implements RemainingWeightHeuristic 
         pq.insert(initState, 0);
         while ( ! pq.empty()) {
             State s = pq.extract_min();
-            double w = s.getWeight();
+            Double w = s.getWeight();
             Vertex v = s.getVertex();
-            int vi = v.getIndex();
-            
             if (v instanceof TransitStop) {
                 stopStates.add(s);
-                // do not save weights at transit stops since they may be reached by simpletransfer
-                // their weights will be recorded during the main heuristic search
+                // Prune street search upon reaching TransitStops.
+                // Do not save weights at transit stops. Since they may be reached by 
+                // SimpleTransfer their weights will be recorded during the main heuristic search.
                 continue;
             }
-            
             // at this point the vertex is closed (pulled off heap).
             // on reverse search save measured weights.
             // on forward search set heuristic to 0 -- we have no idea how far to the destination, 
             // the optimal path may use transit etc.
-            if (!fromTarget)  
-                w = 0;
+            if (!fromTarget) weights.put(v, 0.0);
+            else {
+                Double old_weight = weights.get(v);
+                if (old_weight == null || old_weight > w) {
+                    weights.put(v, w);
+                }
+            }
 
-            if (vi < weights.length)
-                if (weights[vi] > w)
-                    weights[vi] = w;
-            
-            //LOG.debug("{} at v={}", w, v);
-            
-//            if (vi < weights.length)
-//                weights[vi] = 0;
-            
-            // here, arriveBy has been set to match actual directional behavior in this subsearch
             for (Edge e : rr.arriveBy ? v.getIncoming() : v.getOutgoing()) {
+                // arriveBy has been set to match actual directional behavior in this subsearch
                 State s1 = e.traverse(s);
                 if (s1 == null)
                     continue;
@@ -298,12 +272,12 @@ public class ThreadedBidirectionalHeuristic implements RemainingWeightHeuristic 
         public RemainingWeightHeuristic getInstanceForSearch(RoutingRequest opt) {
             if (opt.getModes().isTransit()) {
                 LOG.debug("Transit itinerary requested.");
-                return new ThreadedBidirectionalHeuristic (opt.rctx.graph);
+                return new InterleavedBidirectionalHeuristic (opt.rctx.graph);
             } else {
                 LOG.debug("Non-transit itinerary requested.");
                 return new DefaultRemainingWeightHeuristic();
             }
         }
     }
-    
+
 }

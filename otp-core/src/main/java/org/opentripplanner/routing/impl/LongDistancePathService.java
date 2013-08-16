@@ -14,18 +14,18 @@
 package org.opentripplanner.routing.impl;
 
 import static org.opentripplanner.routing.automata.Nonterminal.choice;
+import static org.opentripplanner.routing.automata.Nonterminal.optional;
 import static org.opentripplanner.routing.automata.Nonterminal.plus;
 import static org.opentripplanner.routing.automata.Nonterminal.seq;
 import static org.opentripplanner.routing.automata.Nonterminal.star;
-import static org.opentripplanner.routing.automata.Nonterminal.optional;
 
 import java.util.List;
 
 import lombok.Setter;
 
 import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
-import org.opentripplanner.routing.algorithm.strategies.ThreadedBidirectionalHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.automata.DFA;
 import org.opentripplanner.routing.automata.Nonterminal;
@@ -86,12 +86,12 @@ public class LongDistancePathService implements PathService {
 
         LOG.debug("rreq={}", options);
         
-        // only use the threaded bidi heuristic for transit
         RemainingWeightHeuristic heuristic;
         if (options.isDisableRemainingWeightHeuristic()) {
             heuristic = new TrivialRemainingWeightHeuristic();
         } else if (options.modes.isTransit()) {
-            heuristic = new ThreadedBidirectionalHeuristic(options.rctx.graph);
+            // Only use the BiDi heuristic for transit.
+            heuristic = new InterleavedBidirectionalHeuristic(options.rctx.graph);
         } else {
             heuristic = new DefaultRemainingWeightHeuristic();
         }
@@ -106,8 +106,6 @@ public class LongDistancePathService implements PathService {
         LOG.debug("BEGIN SEARCH");
         ShortestPathTree spt = sptService.getShortestPathTree(options, timeout);
         LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
-        if (heuristic instanceof ThreadedBidirectionalHeuristic)
-            ((ThreadedBidirectionalHeuristic)heuristic).abort();
         
         if (spt == null) { // timeout or other fail
             LOG.warn("SPT was null.");
@@ -115,41 +113,6 @@ public class LongDistancePathService implements PathService {
         }
         //spt.getPaths().get(0).dump();
         return spt.getPaths();
-        
-        /*
-        List<? extends State> states = spt.getStates(options.rctx.target);
-        if (states == null) {
-            LOG.warn("no states.");
-            return null;
-        }
-        if (states.size() == 0) {
-            LOG.warn("0-length state list.");
-            return null;
-        }
-        State s = states.get(0);
-        options = options.clone();
-        options.setArriveBy( ! options.isArriveBy());
-        options.dateTime = s.getTime();
-        options.rctx = new RoutingContext(options, options.rctx.graph, 
-                options.rctx.fromVertex, options.rctx.toVertex, false);
-        
-        // existing heuristic has been aborted
-        heuristic = new ThreadedBidirectionalHeuristic(options.rctx.graph);
-        options.rctx.remainingWeightHeuristic = heuristic;
-        
-        searchBeginTime = System.currentTimeMillis();
-        LOG.debug("BEGIN REVERSE SEARCH");
-        spt = sptService.getShortestPathTree(options, timeout);
-        LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
-        heuristic.abort();
-        
-        // We order the list of returned paths by the time of arrival or departure (not path duration)
-        //Collections.sort(paths, new PathComparator(options.isArriveBy()));
-        //return Arrays.asList(path);
-        List<GraphPath> paths = spt.getPaths(options.rctx.target, false); 
-        paths.get(0).dump();
-        return paths;
-        */
     }
 
     public static class Parser extends PathParser {

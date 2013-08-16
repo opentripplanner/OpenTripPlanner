@@ -56,5 +56,5 @@ public class TrivialRemainingWeightHeuristic implements RemainingWeightHeuristic
     public void reset() {}
     
     @Override
-    public void abort() {}
+    public void doSomeWork() {}
 }
