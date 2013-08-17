@@ -191,19 +191,23 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         StreetVertex intersection = getIntersectionAt(coord, MAX_CORNER_DISTANCE);
         String calculatedName = location.getName();
         if (intersection != null) {
-            // check that this vertex has edges we can actually traverse
+            // We have an intersection vertex. Check that this vertex has edges we can traverse.
             boolean canEscape = false; 
-            TraversalRequirements reqs = new TraversalRequirements(options);
-            for (StreetEdge e : IterableLibrary.filter ( options.arriveBy ? 
-                    intersection.getIncoming() : intersection.getOutgoing(),
-                    StreetEdge.class)) {
-                if (reqs.canBeTraversed(e)) {
-                    canEscape = true;
-                    break;
+            if (options == null) {
+                canEscape = true; // Some tests do not supply options.
+            } else {
+                TraversalRequirements reqs = new TraversalRequirements(options);
+                for (StreetEdge e : IterableLibrary.filter ( options.arriveBy ? 
+                        intersection.getIncoming() : intersection.getOutgoing(),
+                        StreetEdge.class)) {
+                    if (reqs.canBeTraversed(e)) {
+                        canEscape = true;
+                        break;
+                    }
                 }
-            }
+            }       
             if (canEscape) { 
-                // coordinate is at a street corner or endpoint, and has traversible edges
+                // Coordinate is at an intersection or street endpoint, and has traversible edges.
                 if (!location.hasName()) {
                     LOG.debug("found intersection {}. not splitting.", intersection);
                     // generate names for corners when no name was given
