@@ -38,6 +38,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultRemainingWeightHeuristicFactoryImpl;
 import org.opentripplanner.routing.impl.GraphServiceBeanImpl;
 import org.opentripplanner.routing.impl.GraphServiceImpl;
+import org.opentripplanner.routing.impl.PatchServiceImpl;
 import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
 import org.opentripplanner.routing.impl.LongDistancePathService;
 import org.opentripplanner.routing.services.GraphService;
@@ -85,6 +86,7 @@ public class OTPConfigurator {
         cpf.bind(GraphService.class, getGraphService());
         cpf.bind(RoutingRequest.class);
         cpf.bind(PlanGenerator.class);
+        cpf.bind(PatchServiceImpl.class);
         cpf.bind(MetadataService.class);
         cpf.bind(SPTService.class, new GenericAStar());
         
