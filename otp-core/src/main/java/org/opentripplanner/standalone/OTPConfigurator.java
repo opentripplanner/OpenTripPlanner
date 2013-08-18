@@ -206,6 +206,9 @@ public class OTPConfigurator {
             for (File gtfsFile : gtfsFiles) {
                 GtfsBundle gtfsBundle = new GtfsBundle(gtfsFile);
                 gtfsBundle.setTransfersTxtDefinesStationPaths(params.useTransfersTxt);
+                if (params.useTransfersTxt && !params.noParentStopLinking) {
+                    gtfsBundle.setLinkStopsToParentStops(true);
+                }
                 gtfsBundles.add(gtfsBundle);
             }
             GtfsGraphBuilderImpl gtfsBuilder = new GtfsGraphBuilderImpl(gtfsBundles);

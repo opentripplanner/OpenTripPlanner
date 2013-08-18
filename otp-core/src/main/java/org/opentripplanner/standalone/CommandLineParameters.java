@@ -74,6 +74,10 @@ public class CommandLineParameters {
     description = "use transfers.txt file for the gtfsBundle (GTFS)")
     boolean useTransfersTxt;
     
+    @Parameter(names = {"--noParentStopLinking"},
+    description = "skip linking of stops to parent stops (GTFS)")
+    boolean noParentStopLinking;
+
     @Parameter(names = {"--noStreets"},
     description = "skip all street input files (OSM)")
     boolean noStreets;

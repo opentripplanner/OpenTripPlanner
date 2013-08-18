@@ -47,6 +47,8 @@ public class GtfsBundle {
 
     private boolean transfersTxtDefinesStationPaths = false;
 
+    private boolean linkStopsToParentStops = false;
+
     private Map<String, String> agencyIdMappings = new HashMap<String, String>();
 
     private int defaultStreetToStopTime;
@@ -87,15 +89,15 @@ public class GtfsBundle {
             if (path != null) {
                 csvInputSource = new ZipFileCsvInputSource(new ZipFile(path));
             } else if (url != null) {
-            	DownloadableGtfsInputSource isrc = new DownloadableGtfsInputSource();
-            	isrc.setUrl(url);
-            	if (cacheDirectory != null)
-            	    isrc.setCacheDirectory(cacheDirectory);
+                DownloadableGtfsInputSource isrc = new DownloadableGtfsInputSource();
+                isrc.setUrl(url);
+                if (cacheDirectory != null)
+                    isrc.setCacheDirectory(cacheDirectory);
                 if (useCached != null)
                     isrc.setUseCached(useCached);
                 csvInputSource = isrc;
             }
-    	}
+        }
         return csvInputSource;
     }
 
@@ -168,6 +170,14 @@ public class GtfsBundle {
 
     public void setTransfersTxtDefinesStationPaths(boolean transfersTxtDefinesStationPaths) {
         this.transfersTxtDefinesStationPaths = transfersTxtDefinesStationPaths;
+    }
+
+    public boolean isLinkStopsToParentStops() {
+        return linkStopsToParentStops;
+    }
+
+    public void setLinkStopsToParentStops(boolean linkStopsToParentStops) {
+        this.linkStopsToParentStops = linkStopsToParentStops;
     }
 
     public int getDefaultStreetToStopTime() {

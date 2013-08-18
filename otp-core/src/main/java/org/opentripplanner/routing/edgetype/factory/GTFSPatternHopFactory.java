@@ -1544,41 +1544,43 @@ public class GTFSPatternHopFactory {
      * NOTE: this method is only called when transfersTxtDefinesStationPaths is set to
      * True for a given GFTS feed. 
      */
-    public void createStationTransfers(Graph graph) {
+    public void createStationTransfers(Graph graph, boolean linkStopsToParentStops) {
 
-        /*  1. Connect stops to their parent stations. */
-        for (Stop stop : _dao.getAllStops()) {
-            String parentStation = stop.getParentStation();
-            if (parentStation != null) {
-                Vertex stopVertex = context.stopNodes.get(stop);
+        /*  1. Optionally connect stops to their parent stations. */
+        if (linkStopsToParentStops) {
+            for (Stop stop : _dao.getAllStops()) {
+                String parentStation = stop.getParentStation();
+                if (parentStation != null) {
+                    Vertex stopVertex = context.stopNodes.get(stop);
 
-                String agencyId = stop.getId().getAgencyId();
-                AgencyAndId parentStationId = new AgencyAndId(agencyId, parentStation);
+                    String agencyId = stop.getId().getAgencyId();
+                    AgencyAndId parentStationId = new AgencyAndId(agencyId, parentStation);
 
-                Stop parentStop = _dao.getStopForId(parentStationId);
-                Vertex parentStopVertex = context.stopNodes.get(parentStop);
+                    Stop parentStop = _dao.getStopForId(parentStationId);
+                    Vertex parentStopVertex = context.stopNodes.get(parentStop);
 
-                new FreeEdge(parentStopVertex, stopVertex);
-                new FreeEdge(stopVertex, parentStopVertex);
+                    new FreeEdge(parentStopVertex, stopVertex);
+                    new FreeEdge(stopVertex, parentStopVertex);
 
-                // Stops with location_type=2 (entrances as defined in the pathways.txt 
-                // proposal) have no arrive/depart vertices, hence the null checks.
-                Vertex stopArriveVertex = context.stopArriveNodes.get(stop);
-                Vertex parentStopArriveVertex = context.stopArriveNodes.get(parentStop);
-                if (stopArriveVertex != null && parentStopArriveVertex != null) {
-                    new FreeEdge(parentStopArriveVertex, stopArriveVertex);
-                    new FreeEdge(stopArriveVertex, parentStopArriveVertex);
+                    // Stops with location_type=2 (entrances as defined in the pathways.txt
+                    // proposal) have no arrive/depart vertices, hence the null checks.
+                    Vertex stopArriveVertex = context.stopArriveNodes.get(stop);
+                    Vertex parentStopArriveVertex = context.stopArriveNodes.get(parentStop);
+                    if (stopArriveVertex != null && parentStopArriveVertex != null) {
+                        new FreeEdge(parentStopArriveVertex, stopArriveVertex);
+                        new FreeEdge(stopArriveVertex, parentStopArriveVertex);
+                    }
+
+                    Vertex stopDepartVertex = context.stopDepartNodes.get(stop);
+                    Vertex parentStopDepartVertex = context.stopDepartNodes.get(parentStop);
+                    if (stopDepartVertex != null && parentStopDepartVertex != null) {
+                        new FreeEdge(parentStopDepartVertex, stopDepartVertex);
+                        new FreeEdge(stopDepartVertex, parentStopDepartVertex);
+                    }
+
+                    // TODO: provide a cost for these edges when stations and
+                    // stops have different locations
                 }
-
-                Vertex stopDepartVertex = context.stopDepartNodes.get(stop);
-                Vertex parentStopDepartVertex = context.stopDepartNodes.get(parentStop);
-                if (stopDepartVertex != null && parentStopDepartVertex != null) {
-                    new FreeEdge(parentStopDepartVertex, stopDepartVertex);
-                    new FreeEdge(stopDepartVertex, parentStopDepartVertex);
-                }
-
-                // TODO: provide a cost for these edges when stations and
-                // stops have different locations 
             }
         }
         /* 2. Create transfer edges based on transfers.txt. */
