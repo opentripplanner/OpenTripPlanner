@@ -37,6 +37,9 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
+
+import com.google.common.io.ByteStreams;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -126,18 +129,6 @@ public class GraphServiceFileImpl implements GraphService {
         }
         return sb.toString();
     }
-    
-    private void copyStreams(InputStream in, OutputStream out) throws IOException {
-        byte[] buffer = new byte[1024];
-        while (true) {
-            int rc = in.read(buffer);
-            if (rc == -1)
-                break;
-            out.write(buffer, 0, rc);
-        }
-        in.close();
-        out.close();
-    }     
     
     protected Graph loadGraph(String routerId) {
         if (!routerIdLegal(routerId)) {
@@ -309,7 +300,7 @@ public class GraphServiceFileImpl implements GraphService {
 
     		// Store the stream
     		FileOutputStream os = new FileOutputStream(graphFileName);
-    		copyStreams(is, os);
+    		ByteStreams.copy(is, os);
     		
     		// And delete the backup file
     		sourceFile = new File(graphFileName + ".bak");
