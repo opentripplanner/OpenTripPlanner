@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.services;
 
+import java.io.InputStream;
 import java.util.Collection;
 
 import org.onebusaway.gtfs.services.calendar.CalendarService;
@@ -92,5 +93,15 @@ public interface GraphService {
      * This is equivalent to calling evictGraph on every registered router ID.
      */
     public int evictAll();
-
+    
+    /**
+     * Save the graph data, but don't load it in memory. The file location is based on the router id.
+     * If the graph already exists, the graph will be overwritten. The relationship between router IDs
+     * and paths in the filesystem is determined by the graphService implementation.
+     * 
+     * @param routerId the routerId of the graph
+     * @param is graph data as input stream
+     * @return
+     */
+    public boolean save(String routerId, InputStream is);
 }
