@@ -141,6 +141,18 @@ public abstract class RoutingResource {
     @DefaultValue("false") @QueryParam("showIntermediateStops") protected List<Boolean> showIntermediateStops;
 
     /**
+     * Prevents unnecessary transfers by adding a cost for boarding a vehicle. This is the cost that
+     * is used when boarding while walking.
+     */
+    @DefaultValue("-1") @QueryParam("walkBoardCost") protected List<Integer> walkBoardCost;
+    
+    /**
+     * Prevents unnecessary transfers by adding a cost for boarding a vehicle. This is the cost that
+     * is used when boarding while cycling. This is usually higher that walkBoardCost.
+     */
+    @DefaultValue("-1") @QueryParam("bikeBoardCost") protected List<Integer> bikeBoardCost;
+    
+    /**
      * The comma-separated list of banned routes. The format is agency_[routename][_routeid], so TriMet_100 (100 is route short name) or Trimet__42
      * (two underscores, 42 is the route internal ID).
      */
@@ -154,12 +166,22 @@ public abstract class RoutingResource {
      */
     @DefaultValue("") @QueryParam("bannedTrips") protected List<String> bannedTrips;
 
-    /** The comma-separated list of banned stops. A stop is banned by ignoring its 
+    /** A comma-separated list of banned stops. A stop is banned by ignoring its 
      * pre-board and pre-alight edges. This means the stop will be reachable via the
-     * street network, but can't be used to board or alight transit.  
+     * street network. Also, it is still possible to travel through the stop. Just
+     * boarding and alighting is prohibited.
      * The format is agencyId_stopId, so: TriMet_2107
      */
     @DefaultValue("") @QueryParam("bannedStops") protected List<String> bannedStops;
+    
+    /** A comma-separated list of banned stops. A stop is banned by ignoring its 
+     * pre-board and pre-alight edges. This means the stop will be reachable via the
+     * street network. It is not possible to travel through the stop.
+     * For example, this parameter can be used when a train station is destroyed, such
+     * that no trains can drive through the station anymore.
+     * The format is agencyId_stopId, so: TriMet_2107
+     */
+    @DefaultValue("") @QueryParam("bannedStopsHard") protected List<String> bannedStopsHard;
     
     /**
      * An additional penalty added to boardings after the first.  The value is in OTP's
@@ -343,6 +365,8 @@ public abstract class RoutingResource {
         request.setPreferredAgencies(get(preferredAgencies, n, request.getPreferredAgenciesStr()));
         request.setUnpreferredRoutes(get(unpreferredRoutes, n, request.getUnpreferredRouteStr()));
         request.setUnpreferredAgencies(get(unpreferredAgencies, n, request.getUnpreferredAgenciesStr()));
+        request.setWalkBoardCost(get(walkBoardCost, n, request.getWalkBoardCost()));
+        request.setBikeBoardCost(get(bikeBoardCost, n, request.getBikeBoardCost()));
         request.setBannedRoutes(get(bannedRoutes, n, request.getBannedRouteStr()));
         request.setBannedAgencies(get(bannedAgencies, n, request.getBannedAgenciesStr()));
         HashMap<AgencyAndId, BannedStopSet> bannedTripMap = makeBannedTripMap(get(bannedTrips, n, null));
@@ -350,6 +374,7 @@ public abstract class RoutingResource {
             request.setBannedTrips(bannedTripMap);
         }
         request.setBannedStops(get(bannedStops, n, request.getBannedStopsStr()));
+        request.setBannedStopsHard(get(bannedStopsHard, n, request.getBannedStopsHardStr()));
         
         // "Least transfers" optimization is accomplished via an increased transfer penalty.
         // See comment on RoutingRequest.transferPentalty.

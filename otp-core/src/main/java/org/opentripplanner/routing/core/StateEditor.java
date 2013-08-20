@@ -411,6 +411,7 @@ public class StateEditor {
         child.stateData.route = state.stateData.route;
         child.stateData.tripTimes = state.stateData.tripTimes;
         child.stateData.tripId = state.stateData.tripId;
+        child.stateData.serviceDay = state.stateData.serviceDay;
         child.stateData.previousTrip = state.stateData.previousTrip;
         child.stateData.previousStop = state.stateData.previousStop;
         child.stateData.zone = state.stateData.zone;

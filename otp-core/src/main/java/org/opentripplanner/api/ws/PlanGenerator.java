@@ -577,6 +577,7 @@ public class PlanGenerator {
             leg.tripId = trip.getId().getId();
             leg.tripShortName = trip.getTripShortName();
             leg.tripBlockId = trip.getBlockId();
+            leg.serviceDate = states[states.length - 1].getServiceDay().getServiceDate().getAsString();
 
             if (transitIndexService != null) {
                 Agency agency = transitIndexService.getAgency(id);

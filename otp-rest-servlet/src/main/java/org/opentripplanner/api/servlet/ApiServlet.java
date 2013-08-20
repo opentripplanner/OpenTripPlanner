@@ -23,10 +23,13 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
+import org.opentripplanner.routing.services.GraphService;
 
 public class ApiServlet extends SpringServlet {
     private static final long serialVersionUID = -9081567116972786015L;
 
+    @Autowired private GraphService graphService;
+    
     @Autowired(required=false) private PeriodicGraphUpdater updater;
 
 //    @Autowired(required=false) private PeriodicGraphUpdater updater;
@@ -51,10 +54,12 @@ public class ApiServlet extends SpringServlet {
     @Override
     public void destroy() {
     	if (updater != null) {
-    		// updater is a user (not daemon) thread
-    		// shut it down properly so container shutdown does not stall
-    		updater.stop();
+            // updater is a user (not daemon) thread
+            // shut it down properly so container shutdown does not stall
+            updater.stop();
     	}
+        
+        graphService.evictAll();
     }
     
     public ApiServlet() {

@@ -17,6 +17,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.opentripplanner.routing.patch.Alert;
+import org.opentripplanner.routing.patch.AlertPatch;
 
 public class EdgeTest {
 
@@ -58,4 +60,39 @@ public class EdgeTest {
 		Edge e = makeSimpleEdge();
 		assertTrue(e.getId() >= 0);
 	}
+        
+        @Test
+        public void testPatches() {
+            Edge edge = makeSimpleEdge();
+            AlertPatch[] alerts = new AlertPatch[]{ new AlertPatch(), new AlertPatch(), new AlertPatch() };
+
+            alerts[0].setAlert(new Alert());
+            alerts[1].setAlert(new Alert());
+            alerts[2].setAlert(new Alert());
+
+            alerts[0].setId("0");
+            alerts[1].setId("1");
+            alerts[2].setId("2");
+            
+            edge.addPatch(alerts[0]);
+            edge.addPatch(alerts[1]);
+            
+            assertEquals(2, edge.getPatches().size());
+            assertTrue(edge.getPatches().contains(alerts[0]));
+            assertTrue(edge.getPatches().contains(alerts[1]));
+            
+            edge.removePatch(alerts[0]);
+            
+            assertEquals(1, edge.getPatches().size());
+            assertFalse(edge.getPatches().contains(alerts[0]));
+            assertTrue(edge.getPatches().contains(alerts[1]));
+            
+            edge.removePatch(alerts[0]);
+            assertEquals(1, edge.getPatches().size());
+            assertFalse(edge.getPatches().contains(alerts[0]));
+            assertTrue(edge.getPatches().contains(alerts[1]));
+            
+            edge.removePatch(alerts[1]);
+            assertTrue(edge.getPatches().isEmpty());
+        }
 }

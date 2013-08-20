@@ -856,6 +856,7 @@ public class PlanGeneratorTest {
         assertNull(legs[0].tripId);
         assertNull(legs[0].tripShortName);
         assertNull(legs[0].tripBlockId);
+        assertNull(legs[0].serviceDate);
         assertNull(legs[0].headsign);
         assertFalse(legs[0].rentedBike);
         assertFalse(legs[0].isTransitLeg());
@@ -888,6 +889,7 @@ public class PlanGeneratorTest {
         assertEquals("A", legs[1].tripShortName);
         assertEquals("Alock", legs[1].tripBlockId);
         assertEquals("Street Fighting Man", legs[1].headsign);
+        assertEquals("19700101", legs[1].serviceDate);
         assertFalse(legs[1].rentedBike);
         assertTrue(legs[1].isTransitLeg());
         assertFalse(legs[1].interlineWithPreviousLeg);
@@ -919,6 +921,7 @@ public class PlanGeneratorTest {
         assertEquals("B", legs[2].tripShortName);
         assertEquals("Block", legs[2].tripBlockId);
         assertEquals("No Expectations", legs[2].headsign);
+        assertEquals("19700101", legs[2].serviceDate);
         assertFalse(legs[2].rentedBike);
         assertTrue(legs[2].isTransitLeg());
         assertTrue(legs[2].interlineWithPreviousLeg);
@@ -950,6 +953,7 @@ public class PlanGeneratorTest {
         assertNull(legs[3].tripShortName);
         assertNull(legs[3].tripBlockId);
         assertNull(legs[3].headsign);
+        assertNull(legs[3].serviceDate);
         assertFalse(legs[3].rentedBike);
         assertFalse(legs[3].isTransitLeg());
         assertFalse(legs[3].interlineWithPreviousLeg);
@@ -986,6 +990,7 @@ public class PlanGeneratorTest {
         assertEquals("C", legs[4].tripShortName);
         assertEquals("Clock", legs[4].tripBlockId);
         assertEquals("Handsome Molly", legs[4].headsign);
+        assertEquals("19700101", legs[4].serviceDate);
         assertFalse(legs[4].rentedBike);
         assertTrue(legs[4].isTransitLeg());
         assertFalse(legs[4].interlineWithPreviousLeg);
@@ -1017,6 +1022,7 @@ public class PlanGeneratorTest {
         assertNull(legs[5].tripShortName);
         assertNull(legs[5].tripBlockId);
         assertNull(legs[5].headsign);
+        assertNull(legs[5].serviceDate);
         assertFalse(legs[5].rentedBike);
         assertFalse(legs[5].isTransitLeg());
         assertFalse(legs[5].interlineWithPreviousLeg);
@@ -1048,6 +1054,7 @@ public class PlanGeneratorTest {
         assertNull(legs[6].tripShortName);
         assertNull(legs[6].tripBlockId);
         assertNull(legs[6].headsign);
+        assertNull(legs[6].serviceDate);
         assertTrue(legs[6].rentedBike);
         assertFalse(legs[6].isTransitLeg());
         assertFalse(legs[6].interlineWithPreviousLeg);
@@ -1081,6 +1088,7 @@ public class PlanGeneratorTest {
         assertNull(legs[7].tripShortName);
         assertNull(legs[7].tripBlockId);
         assertNull(legs[7].headsign);
+        assertNull(legs[7].serviceDate);
         assertTrue(legs[7].rentedBike);
         assertFalse(legs[7].isTransitLeg());
         assertFalse(legs[7].interlineWithPreviousLeg);
@@ -1112,6 +1120,7 @@ public class PlanGeneratorTest {
         assertNull(legs[8].tripShortName);
         assertNull(legs[8].tripBlockId);
         assertNull(legs[8].headsign);
+        assertNull(legs[8].serviceDate);
         assertFalse(legs[8].rentedBike);
         assertFalse(legs[8].isTransitLeg());
         assertFalse(legs[8].interlineWithPreviousLeg);

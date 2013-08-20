@@ -250,10 +250,11 @@ public abstract class Edge implements Serializable {
     }
 
     public void removePatch(Patch patch) {
-        if (patches == null || patches.size() == 1) {
-            patches = null;
-        } else {
+        if (patches != null) {
             patches.remove(patch);
+            if (patches.isEmpty()) {
+                patches = null;
+            }
         }
     }
 

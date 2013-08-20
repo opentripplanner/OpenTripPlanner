@@ -41,7 +41,7 @@ public class GtfsRealtimeHttpUpdateStreamer extends GtfsRealtimeAbstractUpdateSt
         try {
             InputStream is = HttpUtils.getData(url);
             if (is != null) {
-                feed = GtfsRealtime.FeedMessage.parseFrom(is);
+                feed = GtfsRealtime.FeedMessage.PARSER.parseFrom(is);
             }
         } catch (IOException e) {
             LOG.warn("Failed to parse gtfs-rt feed from " + url + ":", e);
