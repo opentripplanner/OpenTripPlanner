@@ -141,6 +141,18 @@ public abstract class RoutingResource {
     @DefaultValue("false") @QueryParam("showIntermediateStops") protected List<Boolean> showIntermediateStops;
 
     /**
+     * Prevents unnecessary transfers by adding a cost for boarding a vehicle. This is the cost that
+     * is used when boarding while walking.
+     */
+    @DefaultValue("-1") @QueryParam("walkBoardCost") protected List<Integer> walkBoardCost;
+    
+    /**
+     * Prevents unnecessary transfers by adding a cost for boarding a vehicle. This is the cost that
+     * is used when boarding while cycling. This is usually higher that walkBoardCost.
+     */
+    @DefaultValue("-1") @QueryParam("bikeBoardCost") protected List<Integer> bikeBoardCost;
+    
+    /**
      * The comma-separated list of banned routes. The format is agency_[routename][_routeid], so TriMet_100 (100 is route short name) or Trimet__42
      * (two underscores, 42 is the route internal ID).
      */
@@ -343,6 +355,8 @@ public abstract class RoutingResource {
         request.setPreferredAgencies(get(preferredAgencies, n, request.getPreferredAgenciesStr()));
         request.setUnpreferredRoutes(get(unpreferredRoutes, n, request.getUnpreferredRouteStr()));
         request.setUnpreferredAgencies(get(unpreferredAgencies, n, request.getUnpreferredAgenciesStr()));
+        request.setWalkBoardCost(get(walkBoardCost, n, request.getWalkBoardCost()));
+        request.setBikeBoardCost(get(bikeBoardCost, n, request.getBikeBoardCost()));
         request.setBannedRoutes(get(bannedRoutes, n, request.getBannedRouteStr()));
         request.setBannedAgencies(get(bannedAgencies, n, request.getBannedAgenciesStr()));
         HashMap<AgencyAndId, BannedStopSet> bannedTripMap = makeBannedTripMap(get(bannedTrips, n, null));
