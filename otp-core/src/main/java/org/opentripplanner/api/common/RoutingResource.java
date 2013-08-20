@@ -166,12 +166,22 @@ public abstract class RoutingResource {
      */
     @DefaultValue("") @QueryParam("bannedTrips") protected List<String> bannedTrips;
 
-    /** The comma-separated list of banned stops. A stop is banned by ignoring its 
+    /** A comma-separated list of banned stops. A stop is banned by ignoring its 
      * pre-board and pre-alight edges. This means the stop will be reachable via the
-     * street network, but can't be used to board or alight transit.  
+     * street network. Also, it is still possible to travel through the stop. Just
+     * boarding and alighting is prohibited.
      * The format is agencyId_stopId, so: TriMet_2107
      */
     @DefaultValue("") @QueryParam("bannedStops") protected List<String> bannedStops;
+    
+    /** A comma-separated list of banned stops. A stop is banned by ignoring its 
+     * pre-board and pre-alight edges. This means the stop will be reachable via the
+     * street network. It is not possible to travel through the stop.
+     * For example, this parameter can be used when a train station is destroyed, such
+     * that no trains can drive through the station anymore.
+     * The format is agencyId_stopId, so: TriMet_2107
+     */
+    @DefaultValue("") @QueryParam("bannedStopsHard") protected List<String> bannedStopsHard;
     
     /**
      * An additional penalty added to boardings after the first.  The value is in OTP's
@@ -364,6 +374,7 @@ public abstract class RoutingResource {
             request.setBannedTrips(bannedTripMap);
         }
         request.setBannedStops(get(bannedStops, n, request.getBannedStopsStr()));
+        request.setBannedStopsHard(get(bannedStopsHard, n, request.getBannedStopsHardStr()));
         
         // "Least transfers" optimization is accomplished via an increased transfer penalty.
         // See comment on RoutingRequest.transferPentalty.

@@ -23,7 +23,6 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 
@@ -63,6 +62,16 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
     }
     
     public State optimisticTraverse(State state0) {
+        RoutingRequest options = state0.getOptions();
+        
+        // Ignore this edge if either of its stop is banned hard
+        if (!options.getBannedStopsHard().isEmpty()) {
+            if (options.getBannedStopsHard().matches(((PatternStopVertex) fromv).getStop())
+                    || options.getBannedStopsHard().matches(((PatternStopVertex) tov).getStop())) {
+                return null;
+            }
+        }
+        
     	int runningTime = getPattern().getBestRunningTime(stopIndex);
     	StateEditor s1 = state0.edit(this);
     	s1.incrementTimeInSeconds(runningTime);
@@ -82,6 +91,16 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
     }
     
     public State traverse(State s0) {
+        RoutingRequest options = s0.getOptions();
+        
+        // Ignore this edge if either of its stop is banned hard
+        if (!options.getBannedStopsHard().isEmpty()) {
+            if (options.getBannedStopsHard().matches(((PatternStopVertex) fromv).getStop())
+                    || options.getBannedStopsHard().matches(((PatternStopVertex) tov).getStop())) {
+                return null;
+            }
+        }
+        
         TripTimes tripTimes = s0.getTripTimes();
         int runningTime = tripTimes.getRunningTime(stopIndex);
         StateEditor s1 = s0.edit(this);
