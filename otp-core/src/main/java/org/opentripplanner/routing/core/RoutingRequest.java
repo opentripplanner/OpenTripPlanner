@@ -486,6 +486,24 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
     }
     
+    public void setWalkBoardCost(int walkBoardCost) {
+        if (walkBoardCost < 0) {
+            this.walkBoardCost = 0;
+        }
+        else {
+            this.walkBoardCost = walkBoardCost;
+        }
+    }
+    
+    public void setBikeBoardCost(int bikeBoardCost) {
+        if (bikeBoardCost < 0) {
+            this.bikeBoardCost = 0;
+        }
+        else {
+            this.bikeBoardCost = bikeBoardCost;
+        }
+    }
+    
     public void setPreferredAgencies(String s) {
         if (s != null && !s.equals(""))
             preferredAgencies = new HashSet<String>(Arrays.asList(s.split(",")));
