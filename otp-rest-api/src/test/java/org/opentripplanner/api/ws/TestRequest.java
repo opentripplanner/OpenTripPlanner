@@ -22,6 +22,7 @@ import static org.mockito.Mockito.reset;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -162,6 +163,10 @@ class SimpleGraphServiceImpl implements GraphService {
         throw new UnsupportedOperationException();
     }
 
+    @Override
+    public boolean save(String routerId, InputStream is) {
+    	return false;
+    }
 }
 
 /* This is a hack to hold context and graph data between test runs, since loading it is slow. */
