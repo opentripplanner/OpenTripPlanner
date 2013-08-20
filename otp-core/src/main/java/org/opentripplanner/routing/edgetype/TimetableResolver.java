@@ -17,6 +17,7 @@ import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -149,7 +150,8 @@ public class TimetableResolver {
                 throw new ConcurrentModificationException("This TimetableResolver is read-only.");
             
             boolean modified = false;
-            for(TableTripPattern pattern : timetables.keySet()) {
+            for (Iterator<TableTripPattern> it = timetables.keySet().iterator(); it.hasNext();){
+                TableTripPattern pattern = it.next();
                 SortedSet<Timetable> sortedTimetables = timetables.get(pattern);
                 SortedSet<Timetable> toKeepTimetables = new TreeSet<Timetable>(new SortedTimetableComparator());
                 for(Timetable timetable : sortedTimetables) {
@@ -161,7 +163,7 @@ public class TimetableResolver {
                 }
                 
                 if(toKeepTimetables.isEmpty()) {
-                    timetables.remove(pattern);
+                    it.remove();
                 } else {
                     timetables.put(pattern, toKeepTimetables);
                 }
