@@ -185,4 +185,22 @@ public class GenericLocationTest {
         assertEquals(loc.getHeading(), cloned.getHeading());
         assertEquals(loc.getNamedPlace(), cloned.getNamedPlace());
     }
+
+    @Test
+    public void testFromOldStyleStringIncomplete() {
+        String input = "0::";
+        GenericLocation loc = GenericLocation.fromOldStyleString(input);
+        assertEquals("0", loc.getName());
+        assertEquals("", loc.getPlace());
+
+        input = "::1";
+        loc = GenericLocation.fromOldStyleString(input);
+        assertEquals("", loc.getName());
+        assertEquals("1", loc.getPlace());
+
+        input = "::";
+        loc = GenericLocation.fromOldStyleString(input);
+        assertEquals("", loc.getName());
+        assertEquals("", loc.getPlace());
+    }
 }
