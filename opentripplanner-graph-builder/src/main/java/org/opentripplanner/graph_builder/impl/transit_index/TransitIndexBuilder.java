@@ -39,6 +39,9 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.services.GraphBuilderWithGtfsDao;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.FrequencyAlight;
+import org.opentripplanner.routing.edgetype.FrequencyBasedTripPattern;
+import org.opentripplanner.routing.edgetype.FrequencyBoard;
 import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
@@ -326,11 +329,13 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 
     private void createRouteVariants(Graph graph) {
         TransitBoardAlight tba;
-        
+        FrequencyBoard fb;
+
         for (TransitVertex gv : IterableLibrary.filter(graph.getVertices(), TransitVertex.class)) {
             boolean start = false;
             boolean noStart = false;
             TableTripPattern pattern = null;
+            FrequencyBasedTripPattern fpattern = null;
             Trip trip = null;
             for (Edge e : gv.getIncoming()) {
                 if (handledEdges.contains(e)) {
@@ -342,6 +347,12 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                 }
                 if (e instanceof PatternHop || e instanceof PatternDwell) {
                     noStart = true;
+                }
+                if (e instanceof FrequencyBoard) {
+                    fb = (FrequencyBoard) e;
+                    fpattern = fb.getPattern();
+                    trip = fpattern.getTrip();
+                    start = true;
                 }
                 if (e instanceof TransitBoardAlight) {
                     tba = (TransitBoardAlight) e;
@@ -391,6 +402,9 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                                         ((TransitBoardAlight) e).isBoarding()) {
                             segment.board = e;
                         }
+                        if (e instanceof FrequencyBoard) {
+                            segment.board = e;
+                        }
                     }
                     Collection<Edge> outgoing = gv.getOutgoing();
                     gv = null;
@@ -406,6 +420,9 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                                          ((TransitBoardAlight) e2).isBoarding()) {
                                     segment.board = e2;
                                 }
+                                if (e2 instanceof FrequencyBoard) {
+                                    segment.board = e2;
+                                }
                             }
                             for (Edge e2 : e.getToVertex().getOutgoing()) {
                                 if (e2 instanceof PatternHop) {
@@ -416,6 +433,9 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                                         !((TransitBoardAlight) e2).isBoarding()) {
                                     segment.alight = e2;
                                 }
+                                if (e2 instanceof FrequencyAlight) {
+                                    segment.alight = e2;
+                                }
                             }
                         }
                         if (e instanceof PatternInterlineDwell) {
@@ -423,6 +443,9 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
                         }
                         if (e instanceof TransitBoardAlight &&
                                 !((TransitBoardAlight) e).isBoarding()) {
+                            segment.alight = e;
+                        }
+                        if (e instanceof FrequencyAlight) {
                             segment.alight = e;
                         }
                     }
