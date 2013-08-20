@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
+import lombok.Setter;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.graph.Graph;
@@ -35,6 +36,8 @@ import org.springframework.stereotype.Component;
 public class PatchServiceImpl implements PatchService {
 
     private Graph graph;
+    
+    @Autowired @Setter
     private GraphService graphService;
 
     private HashMap<String, Patch> patches = new HashMap<String, Patch>();
@@ -47,12 +50,12 @@ public class PatchServiceImpl implements PatchService {
     public PatchServiceImpl(Graph graph) {
         this.graph = graph;
     }
-    
-    @Autowired
-    public void setGraphService(GraphService graphService) {
-        this.graphService = graphService;
-    }
 
+    @Override
+    public Collection<Patch> getAllPatches() {
+        return patches.values();
+    }
+    
     @Override
     public Collection<Patch> getStopPatches(AgencyAndId stop) {
         List<Patch> result = patchesByStop.get(stop);
@@ -60,6 +63,16 @@ public class PatchServiceImpl implements PatchService {
             result = Collections.emptyList();
         }
         return result;
+    }
+
+    @Override
+    public Collection<Patch> getRoutePatches(AgencyAndId route) {
+        List<Patch> result = patchesByRoute.get(route);
+        if (result == null) {
+            result = Collections.emptyList();
+        }
+        return result;
+
     }
 
     @Override
@@ -84,16 +97,6 @@ public class PatchServiceImpl implements PatchService {
                 MapUtils.addToMapList(patchesByRoute, route, patch);
             }
         }
-
-    }
-
-    @Override
-    public Collection<Patch> getRoutePatches(AgencyAndId route) {
-        List<Patch> result = patchesByRoute.get(route);
-        if (result == null) {
-            result = Collections.emptyList();
-        }
-        return result;
 
     }
 
@@ -142,7 +145,7 @@ public class PatchServiceImpl implements PatchService {
             }
             AgencyAndId route = alertPatch.getRoute();
             if (route != null) {
-                MapUtils.removeFromMapList(patchesByRoute, stop, patch);
+                MapUtils.removeFromMapList(patchesByRoute, route, patch);
             }
         }
 

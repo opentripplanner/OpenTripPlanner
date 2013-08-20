@@ -219,16 +219,16 @@ public class StoptimeUpdater implements GraphUpdaterRunnable, TimetableSnapshotS
 
         tripUpdate.filter(true, true, true);
         if (! tripUpdate.isCoherent()) {
-            LOG.warn("Incoherent UpdateBlock, skipping.");
+            LOG.warn("Incoherent TripUpdate, skipping.");
             return false;
         }
         if (tripUpdate.getUpdates().size() < 1) {
-            LOG.debug("UpdateBlock contains no updates after filtering, skipping.");
+            LOG.warn("TripUpdate contains no updates after filtering, skipping.");
             return false;
         }
         TableTripPattern pattern = getPatternForTrip(tripUpdate.getTripId());
         if (pattern == null) {
-            LOG.debug("No pattern found for tripId {}, skipping UpdateBlock.", tripUpdate.getTripId());
+            LOG.warn("No pattern found for tripId {}, skipping TripUpdate.", tripUpdate.getTripId());
             return false;
         }
 

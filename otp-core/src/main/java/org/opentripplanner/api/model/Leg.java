@@ -171,6 +171,14 @@ public class Leg {
     public String tripId = null;
     
     /**
+     * For transit legs, the service date of the trip.
+     * For non-transit legs, null.
+     */
+    @XmlAttribute
+    @JsonSerialize
+    public String serviceDate = null;
+    
+    /**
      * The Place where the leg originates.
      */
     public Place from = null;

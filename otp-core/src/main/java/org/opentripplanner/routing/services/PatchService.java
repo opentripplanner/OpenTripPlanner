@@ -20,7 +20,9 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.patch.Patch;
 
 public interface PatchService {
-
+    
+        Collection<Patch> getAllPatches();
+    
 	Collection<Patch> getStopPatches(AgencyAndId stop);
 
 	Collection<Patch> getRoutePatches(AgencyAndId route);
