@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.impl;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Timer;
@@ -130,6 +131,11 @@ public class GraphServiceAutoDiscoverImpl implements GraphService {
         return 0;
     }
 
+    @Override
+    public boolean save(String routerId, InputStream is) {
+    	return decorated.save(routerId, is);
+    }
+    
     /**
      * Based on the autoRegister list, automatically register all routerIds for which we can find a
      * graph file in a subdirectory of the resourceBase path. Also register and load the graph for
@@ -239,4 +245,5 @@ public class GraphServiceAutoDiscoverImpl implements GraphService {
                     + "You must place one or more graphs before routing.");
         }
     }
+
 }
