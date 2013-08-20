@@ -179,7 +179,7 @@ public class Timetable implements Serializable {
             if (tableIndex.length == 1) // for optimized FIFO patterns
                 sorted = tableIndex[0]; 
             else
-                sorted = tableIndex[stopIndex];
+                sorted = tableIndex[boarding ? stopIndex : stopIndex - 1];
             // an alternative to conditional increment/decrement would be to sort the arrivals
             // index in decreasing order, but that would require changing the search algorithm
             if (boarding) {

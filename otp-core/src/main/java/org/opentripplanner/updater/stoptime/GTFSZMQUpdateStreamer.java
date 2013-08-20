@@ -33,7 +33,7 @@ public class GTFSZMQUpdateStreamer extends GtfsRealtimeAbstractUpdateStreamer {
         FeedMessage feed = null;
         try {
             InputStream is = new FileInputStream(file);
-            feed = GtfsRealtime.FeedMessage.parseFrom(is);
+            feed = GtfsRealtime.FeedMessage.PARSER.parseFrom(is);
         } catch (IOException e) {
             LOG.warn("Failed to parse gtfs-rt feed at " + file + ":", e);
         }

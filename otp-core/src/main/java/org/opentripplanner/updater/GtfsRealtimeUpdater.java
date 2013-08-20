@@ -25,10 +25,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.transit.realtime.GtfsRealtime;
-import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 
 public class GtfsRealtimeUpdater implements GraphUpdaterRunnable {
     private static final Logger log = LoggerFactory.getLogger(GtfsRealtimeUpdater.class);
+
+    private Long lastTimestamp = Long.MIN_VALUE;
 
     @Setter
     private String url;
@@ -60,8 +61,18 @@ public class GtfsRealtimeUpdater implements GraphUpdaterRunnable {
             if (data == null) {
                 throw new RuntimeException("Failed to get data from url " + url);
             }
-            FeedMessage feed = GtfsRealtime.FeedMessage.parseFrom(data);
+            
+            GtfsRealtime.FeedMessage feed = GtfsRealtime.FeedMessage.PARSER.parseFrom(data);
+            
+            long feedTimestamp = feed.getHeader().getTimestamp();
+            if(feedTimestamp <= lastTimestamp) {
+                log.info("Ignoring feed with an old timestamp.");
+                return;
+            }
+        
             updateHandler.update(feed);
+        
+            lastTimestamp = feedTimestamp;
         } catch (IOException e) {
             log.error("Eror reading gtfs-realtime feed from " + url, e);
         }
@@ -79,5 +90,4 @@ public class GtfsRealtimeUpdater implements GraphUpdaterRunnable {
     public String toString() {
         return "GtfsRealtimeUpdater(" + url + ")";
     }
-
 }
