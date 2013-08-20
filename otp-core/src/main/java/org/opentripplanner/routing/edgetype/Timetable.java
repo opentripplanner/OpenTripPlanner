@@ -32,7 +32,7 @@ import org.opentripplanner.routing.trippattern.CanceledTripTimes;
 import org.opentripplanner.routing.trippattern.DecayingDelayTripTimes;
 import org.opentripplanner.routing.trippattern.ScheduledTripTimes;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.routing.trippattern.TripUpdate;
+import org.opentripplanner.routing.trippattern.TripUpdateList;
 import org.opentripplanner.routing.trippattern.UpdatedTripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -351,7 +351,7 @@ public class Timetable implements Serializable {
      * @return whether or not the timetable actually changed as a result of this operation
      * (maybe it should do the cloning and return the new timetable to enforce copy-on-write?) 
      */
-    public boolean update(TripUpdate tripUpdate) {
+    public boolean update(TripUpdateList tripUpdate) {
         try {
              // Though all timetables have the same trip ordering, some may have extra trips due to 
              // the dynamic addition of unscheduled trips.
@@ -372,7 +372,7 @@ public class Timetable implements Serializable {
             else if(tripUpdate.hasDelay()) {
                 // 'stop' Index as in transit stop (not 'end', not 'hop')
                 int stopIndex = tripUpdate.findUpdateStopIndex(pattern);
-                if (stopIndex == TripUpdate.MATCH_FAILED) {
+                if (stopIndex == TripUpdateList.MATCH_FAILED) {
                     LOG.warn("Unable to match update block to stopIds.");
                     return false;
                 }
@@ -382,7 +382,7 @@ public class Timetable implements Serializable {
             else {
                 // 'stop' Index as in transit stop (not 'end', not 'hop')
                 int stopIndex = tripUpdate.findUpdateStopIndex(pattern);
-                if (stopIndex == TripUpdate.MATCH_FAILED) {
+                if (stopIndex == TripUpdateList.MATCH_FAILED) {
                     LOG.warn("Unable to match update block to stopIds.");
                     return false;
                 }

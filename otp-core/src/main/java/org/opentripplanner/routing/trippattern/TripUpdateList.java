@@ -30,13 +30,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * An TripUpdate is an ordered list of Updates which all refer to the same trip on the same day.
+ * A TripUpdateList is an ordered list of Updates which all refer to the same trip on the same day.
  * This class also provides methods for building, filtering, and sanity-checking such lists. 
  * @author abyrd
  */
-public class TripUpdate extends AbstractUpdate {
+public class TripUpdateList extends AbstractUpdate {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TripUpdate.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TripUpdateList.class);
 
     public static final int MATCH_FAILED = -1;
 
@@ -49,7 +49,7 @@ public class TripUpdate extends AbstractUpdate {
     @Getter
     private final Status status;
 
-    protected TripUpdate(AgencyAndId tripId, long timestamp, ServiceDate serviceDate, Status status, List<Update> updates, Trip trip) {
+    protected TripUpdateList(AgencyAndId tripId, long timestamp, ServiceDate serviceDate, Status status, List<Update> updates, Trip trip) {
         super(tripId, timestamp, serviceDate);
         this.status = status;
         this.updates = updates;
@@ -79,37 +79,37 @@ public class TripUpdate extends AbstractUpdate {
         MODIFIED
     }
     
-    public static TripUpdate forCanceledTrip(AgencyAndId tripId, long timestamp, ServiceDate serviceDate) {
-        return new TripUpdate(tripId, timestamp, serviceDate, Status.CANCELED, Collections.<Update> emptyList(), null);
+    public static TripUpdateList forCanceledTrip(AgencyAndId tripId, long timestamp, ServiceDate serviceDate) {
+        return new TripUpdateList(tripId, timestamp, serviceDate, Status.CANCELED, Collections.<Update> emptyList(), null);
     }
     
-    public static TripUpdate forRemovedTrip(AgencyAndId tripId, long timestamp, ServiceDate serviceDate) {
-        return new TripUpdate(tripId, timestamp, serviceDate, Status.REMOVED, Collections.<Update> emptyList(), null);
+    public static TripUpdateList forRemovedTrip(AgencyAndId tripId, long timestamp, ServiceDate serviceDate) {
+        return new TripUpdateList(tripId, timestamp, serviceDate, Status.REMOVED, Collections.<Update> emptyList(), null);
     }
     
-    public static TripUpdate forAddedTrip(Trip trip, long timestamp, ServiceDate serviceDate,  List<Update> stopTimes) {
+    public static TripUpdateList forAddedTrip(Trip trip, long timestamp, ServiceDate serviceDate,  List<Update> stopTimes) {
         if(trip == null || trip.getId() == null || trip.getRoute() == null)
             throw new IllegalArgumentException("A trip with a valid tripId and route must be supplied.");
         if(stopTimes == null || stopTimes.size() < 2)
             throw new IllegalArgumentException("At least two stop times need to be supplied.");
 
-        return new TripUpdate(trip.getId(), timestamp, serviceDate, Status.ADDED, stopTimes, trip);
+        return new TripUpdateList(trip.getId(), timestamp, serviceDate, Status.ADDED, stopTimes, trip);
     }
     
-    public static TripUpdate forUpdatedTrip(AgencyAndId tripId, long timestamp, ServiceDate serviceDate, List<Update> updates) {
+    public static TripUpdateList forUpdatedTrip(AgencyAndId tripId, long timestamp, ServiceDate serviceDate, List<Update> updates) {
         if(updates == null || updates.isEmpty())
             throw new IllegalArgumentException("At least one update needs to be supplied.");
 
-        return new TripUpdate(tripId, timestamp, serviceDate, Status.MODIFIED, updates, null);
+        return new TripUpdateList(tripId, timestamp, serviceDate, Status.MODIFIED, updates, null);
     }
 
     /**
      * This method takes a list of updates that may have mixed TripIds, dates, etc. and splits it 
-     * into a list of TripUpdatess, with each TripUpdate referencing a single trip on a single day.
+     * into a list of TripUpdateLists, with each TripUpdateList referencing a single trip on a single day.
      * TODO: implement date support for updates
      */
-    public static List<TripUpdate> splitByTrip(List<Update> mixedUpdates) {
-        List<TripUpdate> ret = new ArrayList<TripUpdate>();
+    public static List<TripUpdateList> splitByTrip(List<Update> mixedUpdates) {
+        List<TripUpdateList> ret = new ArrayList<TripUpdateList>();
         // Update comparator sorts on (tripId, timestamp, stopSequence, depart)
         Collections.sort(mixedUpdates);
         List<Update> blockUpdates = new LinkedList<Update>();
@@ -118,22 +118,22 @@ public class TripUpdate extends AbstractUpdate {
         for (Update u : mixedUpdates) { // create a new block when the trip or timestamp changes
             Update l = blockUpdates.get(0);
             if (!l.tripId.equals(u.tripId) || l.timestamp != u.timestamp || l.serviceDate != u.serviceDate) {
-                TripUpdate tripUpdate = TripUpdate.forUpdatedTrip(l.tripId, l.timestamp, l.serviceDate, blockUpdates);
-                ret.add(tripUpdate);
+                TripUpdateList tripUpdateList = TripUpdateList.forUpdatedTrip(l.tripId, l.timestamp, l.serviceDate, blockUpdates);
+                ret.add(tripUpdateList);
                 blockUpdates = new LinkedList<Update>();
             }
             blockUpdates.add(u);
         }
 
         Update l = blockUpdates.get(0);
-        TripUpdate tripUpdate = TripUpdate.forUpdatedTrip(l.tripId, l.timestamp, l.serviceDate, blockUpdates);
-        ret.add(tripUpdate);
+        TripUpdateList tripUpdateList = TripUpdateList.forUpdatedTrip(l.tripId, l.timestamp, l.serviceDate, blockUpdates);
+        ret.add(tripUpdateList);
 
         return ret;
     }
     
     /** 
-     * Check that this TripUpdate is internally coherent, meaning that:
+     * Check that this TripUpdateList is internally coherent, meaning that:
      * 1. all Updates' trip_ids are the same, and match the UpdateBlock's trip_id
      * 2. stop sequence numbers are sequential and increasing
      * 3. all dwell times and run times are positive

@@ -102,7 +102,7 @@ import org.opentripplanner.routing.patch.Patch;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PatchService;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.trippattern.TripUpdate;
+import org.opentripplanner.routing.trippattern.TripUpdateList;
 import org.opentripplanner.routing.trippattern.Update;
 import org.opentripplanner.routing.trippattern.Update.Status;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
@@ -1016,8 +1016,8 @@ public class TestRequest extends TestCase {
             int stopSeq, int arrive, int depart, Status prediction, int timestamp, String serviceDate) throws ParseException {
         Update update = new Update(new AgencyAndId("TriMet", tripId), new AgencyAndId("TriMet", stopId), stopSeq, arrive, depart, prediction, timestamp, ServiceDate.parseString(serviceDate));
         ArrayList<Update> updates = new ArrayList<Update>(Arrays.asList(update));
-        TripUpdate tripUpdate = TripUpdate.splitByTrip(updates).get(0);
-        boolean success = pattern.update(tripUpdate);
+        TripUpdateList tripUpdateList = TripUpdateList.splitByTrip(updates).get(0);
+        boolean success = pattern.update(tripUpdateList);
         assertTrue(success);
     }
 

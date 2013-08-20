@@ -30,7 +30,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
-import org.opentripplanner.routing.trippattern.TripUpdate;
+import org.opentripplanner.routing.trippattern.TripUpdateList;
 import org.opentripplanner.routing.trippattern.Update;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,10 +59,10 @@ public abstract class GtfsRealtimeAbstractUpdateStreamer implements UpdateStream
     private long lastTimestamp = Long.MIN_VALUE;
     
     /**
-     * Entities seen in the feed, along with the TripUpdate it was converted to. 
+     * Entities seen in the feed, along with the TripUpdateList it was converted to. 
      * Used to avoid reusing updates already processed.
      */
-    private Map<String, TripUpdate> seenEntities = new HashMap<String, TripUpdate>();
+    private Map<String, TripUpdateList> seenEntities = new HashMap<String, TripUpdateList>();
     
     /**
      * Retrieves a GTFS-rt feed message.
@@ -70,12 +70,12 @@ public abstract class GtfsRealtimeAbstractUpdateStreamer implements UpdateStream
     protected abstract GtfsRealtime.FeedMessage getFeedMessage();
 
     /**
-     * Converts a GTFS-rt feed into TripUpdates for updating the graph.
+     * Converts a GTFS-rt feed into TripUpdateLists for updating the graph.
      * 
      * If a feed doesn't have a timestamp newer than the last processed feed, than it is discarded. 
      */
     @Override
-    public List<org.opentripplanner.routing.trippattern.TripUpdate> getUpdates() {
+    public List<TripUpdateList> getUpdates() {
         GtfsRealtime.FeedMessage feed = getFeedMessage();
         if (feed == null)
             return null;
@@ -88,7 +88,7 @@ public abstract class GtfsRealtimeAbstractUpdateStreamer implements UpdateStream
         }
         lastTimestamp = feedTimestamp;
         
-        List<org.opentripplanner.routing.trippattern.TripUpdate> updates = new ArrayList<org.opentripplanner.routing.trippattern.TripUpdate>();
+        List<TripUpdateList> updates = new ArrayList<TripUpdateList>();
         for (GtfsRealtime.FeedEntity entity : feed.getEntityList()) {
             if (!entity.hasTripUpdate()) {
                 continue;
@@ -100,7 +100,7 @@ public abstract class GtfsRealtimeAbstractUpdateStreamer implements UpdateStream
             long timestamp = rtTripUpdate.hasTimestamp() ? rtTripUpdate.getTimestamp() : feedTimestamp;
 
             if(seenEntities.containsKey(entity.getId())) {
-                TripUpdate processed = seenEntities.get(entity.getId());
+                TripUpdateList processed = seenEntities.get(entity.getId());
                 if(timestamp <= processed.getTimestamp())
                     continue;
             }
@@ -126,28 +126,28 @@ public abstract class GtfsRealtimeAbstractUpdateStreamer implements UpdateStream
                 sr = GtfsRealtime.TripDescriptor.ScheduleRelationship.SCHEDULED;
             }
 
-            TripUpdate tripUpdate = null;
+            TripUpdateList tripUpdateList = null;
             switch (sr) {
             case SCHEDULED:
-                tripUpdate = getUpdateForScheduledTrip(tripId, rtTripUpdate, timestamp, serviceDate);
+                tripUpdateList = getUpdateForScheduledTrip(tripId, rtTripUpdate, timestamp, serviceDate);
                 break;
             case CANCELED:
-                tripUpdate = getUpdateForCanceledTrip(tripId, rtTripUpdate, timestamp, serviceDate);
+                tripUpdateList = getUpdateForCanceledTrip(tripId, rtTripUpdate, timestamp, serviceDate);
                 break;
             case ADDED:
-                tripUpdate = getUpdateForAddedTrip(tripId, rtTripUpdate, timestamp, serviceDate);
+                tripUpdateList = getUpdateForAddedTrip(tripId, rtTripUpdate, timestamp, serviceDate);
                 break;
             case UNSCHEDULED:
-                tripUpdate = getUpdateForUnscheduledTrip(tripId, rtTripUpdate, timestamp, serviceDate);
+                tripUpdateList = getUpdateForUnscheduledTrip(tripId, rtTripUpdate, timestamp, serviceDate);
                 break;
             case REPLACEMENT:
-                tripUpdate = getUpdateForReplacementTrip(tripId, rtTripUpdate, timestamp, serviceDate);
+                tripUpdateList = getUpdateForReplacementTrip(tripId, rtTripUpdate, timestamp, serviceDate);
                 break;
             }
             
-            if(tripUpdate != null) {
-                seenEntities.put(entity.getId(), tripUpdate);
-                updates.add(tripUpdate);
+            if(tripUpdateList != null) {
+                seenEntities.put(entity.getId(), tripUpdateList);
+                updates.add(tripUpdateList);
             } else {
                 LOG.warn("Failed to parse tripUpdate: \n{}", entity);
             }
@@ -155,31 +155,31 @@ public abstract class GtfsRealtimeAbstractUpdateStreamer implements UpdateStream
         return updates;
     }
 
-    private TripUpdate getUpdateForReplacementTrip(AgencyAndId tripId,
+    private TripUpdateList getUpdateForReplacementTrip(AgencyAndId tripId,
             GtfsRealtime.TripUpdate rtTripUpdate, long timestamp, ServiceDate serviceDate) {
         
         LOG.warn("ScheduleRelationship.REPLACEMENT trips are currently not handled.");
         return null;
     }
 
-    private TripUpdate getUpdateForUnscheduledTrip(AgencyAndId tripId,
+    private TripUpdateList getUpdateForUnscheduledTrip(AgencyAndId tripId,
             GtfsRealtime.TripUpdate rtTripUpdate, long timestamp, ServiceDate serviceDate) {
         
         LOG.warn("ScheduleRelationship.UNSCHEDULED trips are currently not handled.");
         return null;
     }
 
-    protected TripUpdate getUpdateForCanceledTrip(AgencyAndId tripId,
+    protected TripUpdateList getUpdateForCanceledTrip(AgencyAndId tripId,
             GtfsRealtime.TripUpdate tripUpdate, long timestamp, ServiceDate serviceDate) {
         
         if(!validateTripDescriptor(tripUpdate.getTrip())) {
             return null;
         }
 
-        return TripUpdate.forCanceledTrip(tripId, timestamp, serviceDate);
+        return TripUpdateList.forCanceledTrip(tripId, timestamp, serviceDate);
     }
 
-    protected TripUpdate getUpdateForAddedTrip(AgencyAndId tripId,
+    protected TripUpdateList getUpdateForAddedTrip(AgencyAndId tripId,
             GtfsRealtime.TripUpdate tripUpdate, long timestamp, ServiceDate serviceDate) {
         
         if(!validateTripDescriptor(tripUpdate.getTrip())) {
@@ -215,10 +215,10 @@ public abstract class GtfsRealtimeAbstractUpdateStreamer implements UpdateStream
             return null;
         }
         
-        return TripUpdate.forAddedTrip(trip, timestamp, serviceDate, updates);
+        return TripUpdateList.forAddedTrip(trip, timestamp, serviceDate, updates);
     }
 
-    protected TripUpdate getUpdateForScheduledTrip(AgencyAndId tripId,
+    protected TripUpdateList getUpdateForScheduledTrip(AgencyAndId tripId,
             GtfsRealtime.TripUpdate tripUpdate, long timestamp, ServiceDate serviceDate) {
 
         if(!validateTripDescriptor(tripUpdate.getTrip())) {
@@ -241,7 +241,7 @@ public abstract class GtfsRealtimeAbstractUpdateStreamer implements UpdateStream
             return null;
         }
 
-        return TripUpdate.forUpdatedTrip(tripId, timestamp, serviceDate, updates);
+        return TripUpdateList.forUpdatedTrip(tripId, timestamp, serviceDate, updates);
     }
 
     protected Update getStopTimeUpdateForTrip(AgencyAndId tripId, long timestamp,

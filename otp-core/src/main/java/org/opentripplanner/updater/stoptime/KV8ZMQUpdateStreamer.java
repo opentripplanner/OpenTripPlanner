@@ -19,7 +19,7 @@ import lombok.Setter;
 
 import org.opentripplanner.configuration.PreferencesConfigurable;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.trippattern.TripUpdate;
+import org.opentripplanner.routing.trippattern.TripUpdateList;
 import org.opentripplanner.routing.trippattern.Update;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,7 +67,7 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer, PreferencesConfigur
         }
     }
 
-    public List<TripUpdate> getUpdates() {
+    public List<TripUpdateList> getUpdates() {
         /* recvMsg blocks -- unless you call Socket.setReceiveTimeout() */
         // so when timeout occurs, it does not return null, but a reference to some
         // static ZMsg object?
@@ -99,7 +99,7 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer, PreferencesConfigur
         } finally {
             msg.destroy(); // is this necessary? does ZMQ lib automatically free mem?
         }
-        return TripUpdate.splitByTrip(ret);
+        return TripUpdateList.splitByTrip(ret);
     }
     
     private static String gunzipMultifameZMsg(ZMsg msg) throws IOException {

@@ -89,7 +89,7 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.transit_index.RouteVariant;
 import org.opentripplanner.routing.trippattern.Update;
 import org.opentripplanner.routing.trippattern.Update.Status;
-import org.opentripplanner.routing.trippattern.TripUpdate;
+import org.opentripplanner.routing.trippattern.TripUpdateList;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
@@ -618,11 +618,11 @@ public class PlanGeneratorTest {
         updates.add(ferryStopDepartUpdate);
         updates.add(ferryStopArriveUpdate);
 
-        TripUpdate tripUpdate = TripUpdate.splitByTrip(updates).get(0);
+        TripUpdateList tripUpdateList = TripUpdateList.splitByTrip(updates).get(0);
 
         TimetableSnapshotSource timetableSnapshotSource = new TimetableSnapshotSourceStub();
 
-        timetableSnapshotSource.getSnapshot().update(thirdTripPattern, tripUpdate);
+        timetableSnapshotSource.getSnapshot().update(thirdTripPattern, tripUpdateList);
 
         // Further graph initialization
         graph.putService(ServiceIdToNumberService.class, serviceIdToNumberService);

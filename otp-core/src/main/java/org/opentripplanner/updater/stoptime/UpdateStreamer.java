@@ -15,15 +15,15 @@ package org.opentripplanner.updater.stoptime;
 
 import java.util.List;
 
-import org.opentripplanner.routing.trippattern.TripUpdate;
+import org.opentripplanner.routing.trippattern.TripUpdateList;
 
 public interface UpdateStreamer {
 
     /**
-     * Wait for one message to arrive, and decode it into an UpdateList. Blocking call. 
-     * @return an UpdateList potentially containing updates for several different trips,
+     * Wait for one message to arrive, and decode it into an TripUpdateList. Blocking call. 
+     * @return a TripUpdateList potentially containing updates for several different trips,
      *         or null if an exception occurred while processing the message
      */
-    public List<TripUpdate> getUpdates();
+    public List<TripUpdateList> getUpdates();
 
 }

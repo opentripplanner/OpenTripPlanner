@@ -26,7 +26,7 @@ import org.opentripplanner.routing.edgetype.TimetableSnapshotSource;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.TransitIndexService;
-import org.opentripplanner.routing.trippattern.TripUpdate;
+import org.opentripplanner.routing.trippattern.TripUpdateList;
 import org.opentripplanner.updater.GraphUpdaterRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -140,39 +140,39 @@ public class StoptimeUpdater implements GraphUpdaterRunnable, TimetableSnapshotS
     @Override
     public void run() {
         
-        List<TripUpdate> tripUpdates = updateStreamer.getUpdates(); 
-        if (tripUpdates == null) {
+        List<TripUpdateList> tripUpdateLists = updateStreamer.getUpdates(); 
+        if (tripUpdateLists == null) {
             LOG.debug("updates is null");
             return;
         }
 
-        LOG.debug("message contains {} trip update blocks", tripUpdates.size());
+        LOG.debug("message contains {} trip update blocks", tripUpdateLists.size());
         int uIndex = 0;
-        for (TripUpdate tripUpdate : tripUpdates) {
+        for (TripUpdateList tripUpdateList : tripUpdateLists) {
             uIndex += 1;
-            LOG.debug("trip update block #{} ({} updates) :", uIndex, tripUpdate.getUpdates().size());
-            LOG.trace("{}", tripUpdate.toString());
+            LOG.debug("trip update block #{} ({} updates) :", uIndex, tripUpdateList.getUpdates().size());
+            LOG.trace("{}", tripUpdateList.toString());
             
             boolean applied = false;
-            switch(tripUpdate.getStatus()) {
+            switch(tripUpdateList.getStatus()) {
             case ADDED:
-                applied = handleAddedTrip(tripUpdate);
+                applied = handleAddedTrip(tripUpdateList);
                 break;
             case CANCELED:
-                applied = handleCanceledTrip(tripUpdate);
+                applied = handleCanceledTrip(tripUpdateList);
                 break;
             case MODIFIED:
-                applied = handleModifiedTrip(tripUpdate);
+                applied = handleModifiedTrip(tripUpdateList);
                 break;
             case REMOVED:
-                applied = handleRemovedTrip(tripUpdate);
+                applied = handleRemovedTrip(tripUpdateList);
                 break;
             }
             
             if(applied) {
                 appliedBlockCount++;
              } else {
-                 LOG.warn("Failed to apply Tripupdate: " + tripUpdate);
+                 LOG.warn("Failed to apply TripUpdateList: " + tripUpdateList);
              }
 
              if (appliedBlockCount % logFrequency == 0) {
@@ -196,49 +196,49 @@ public class StoptimeUpdater implements GraphUpdaterRunnable, TimetableSnapshotS
     public void teardown() {
     }
 
-    protected boolean handleAddedTrip(TripUpdate tripUpdate) {
+    protected boolean handleAddedTrip(TripUpdateList tripUpdateList) {
         // TODO: Handle added trip
         
         return false;
     }
 
-    protected boolean handleCanceledTrip(TripUpdate tripUpdate) {
+    protected boolean handleCanceledTrip(TripUpdateList tripUpdateList) {
 
-        TableTripPattern pattern = getPatternForTrip(tripUpdate.getTripId());
+        TableTripPattern pattern = getPatternForTrip(tripUpdateList.getTripId());
         if (pattern == null) {
-            LOG.debug("No pattern found for tripId {}, skipping UpdateBlock.", tripUpdate.getTripId());
+            LOG.debug("No pattern found for tripId {}, skipping UpdateBlock.", tripUpdateList.getTripId());
             return false;
         }
 
-        boolean applied = buffer.update(pattern, tripUpdate);
+        boolean applied = buffer.update(pattern, tripUpdateList);
         
         return applied;
     }
 
-    protected boolean handleModifiedTrip(TripUpdate tripUpdate) {
+    protected boolean handleModifiedTrip(TripUpdateList tripUpdateList) {
 
-        tripUpdate.filter(true, true, true);
-        if (! tripUpdate.isCoherent()) {
+        tripUpdateList.filter(true, true, true);
+        if (! tripUpdateList.isCoherent()) {
             LOG.warn("Incoherent TripUpdate, skipping.");
             return false;
         }
-        if (tripUpdate.getUpdates().size() < 1) {
+        if (tripUpdateList.getUpdates().size() < 1) {
             LOG.warn("TripUpdate contains no updates after filtering, skipping.");
             return false;
         }
-        TableTripPattern pattern = getPatternForTrip(tripUpdate.getTripId());
+        TableTripPattern pattern = getPatternForTrip(tripUpdateList.getTripId());
         if (pattern == null) {
-            LOG.warn("No pattern found for tripId {}, skipping TripUpdate.", tripUpdate.getTripId());
+            LOG.warn("No pattern found for tripId {}, skipping TripUpdate.", tripUpdateList.getTripId());
             return false;
         }
 
         // we have a message we actually want to apply
-        boolean applied = buffer.update(pattern, tripUpdate);
+        boolean applied = buffer.update(pattern, tripUpdateList);
         
         return applied;
     }
 
-    protected boolean handleRemovedTrip(TripUpdate tripUpdate) {
+    protected boolean handleRemovedTrip(TripUpdateList tripUpdateList) {
         // TODO: Handle removed trip
         
         return false;
