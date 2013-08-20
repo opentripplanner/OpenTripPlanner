@@ -174,7 +174,8 @@ public class GenericLocationTest {
         assertTrue(loc.hasCoordinate());
         assertFalse(loc.hasHeading());
     }
-    
+
+    @Test
     public void testClone() {
         Coordinate expectedCoord = new Coordinate(2.0, 1.0);
         GenericLocation loc = new GenericLocation(expectedCoord);
@@ -183,7 +184,8 @@ public class GenericLocationTest {
         
         assertEquals(expectedCoord, cloned.getCoordinate());
         assertEquals(loc.getHeading(), cloned.getHeading());
-        assertEquals(loc.getNamedPlace(), cloned.getNamedPlace());
+        assertEquals(loc.getNamedPlace().name, cloned.getNamedPlace().name);
+        assertEquals(loc.getNamedPlace().place, cloned.getNamedPlace().place);
     }
 
     @Test
