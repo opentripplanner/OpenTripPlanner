@@ -44,8 +44,13 @@ public class PreBoardEdge extends FreeEdge implements StationEdge {
         RoutingRequest options = s0.getOptions();
         
         // Ignore this edge if its stop is banned
-        if (!options.getBannedStops().isEmpty() && fromv instanceof TransitStop) {
+        if (!options.getBannedStops().isEmpty()) {
             if (options.getBannedStops().matches(((TransitStop) fromv).getStop())) {
+                return null;
+            }
+        }
+        if (!options.getBannedStopsHard().isEmpty()) {
+            if (options.getBannedStopsHard().matches(((TransitStop) fromv).getStop())) {
                 return null;
             }
         }

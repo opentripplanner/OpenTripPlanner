@@ -72,6 +72,16 @@ public class FrequencyHop extends Edge implements OnboardEdge, HopEdge {
     }
     
     public State optimisticTraverse(State state0) {
+        RoutingRequest options = state0.getOptions();
+        
+        // Ignore this edge if either of its stop is banned hard
+        if (!options.getBannedStopsHard().isEmpty()) {
+            if (options.getBannedStopsHard().matches(((TransitVertex) fromv).getStop())
+                    || options.getBannedStopsHard().matches(((TransitVertex) tov).getStop())) {
+                return null;
+            }
+        }
+
         int runningTime = pattern.getRunningTime(stopIndex);
         StateEditor s1 = state0.edit(this);
         s1.setBackMode(getMode());
@@ -91,6 +101,16 @@ public class FrequencyHop extends Edge implements OnboardEdge, HopEdge {
     }
     
     public State traverse(State s0) {
+        RoutingRequest options = s0.getOptions();
+        
+        // Ignore this edge if either of its stop is banned hard
+        if (!options.getBannedStopsHard().isEmpty()) {
+            if (options.getBannedStopsHard().matches(((TransitVertex) fromv).getStop())
+                    || options.getBannedStopsHard().matches(((TransitVertex) tov).getStop())) {
+                return null;
+            }
+        }
+
         int runningTime = pattern.getRunningTime(stopIndex);
         // TODO: Stop headsigns
         StateEditor s1 = s0.edit(this);
