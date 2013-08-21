@@ -23,7 +23,6 @@ import java.util.List;
 
 import lombok.Setter;
 
-import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.algorithm.strategies.DefaultRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.InterleavedBidirectionalHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
@@ -66,17 +65,11 @@ public class LongDistancePathService implements PathService {
     @Autowired @Setter
     private GraphService graphService;
     
+    @Autowired @Setter
     private SPTService sptService;
 
     @Setter 
     private double timeout = 0; // seconds
-    
-    public LongDistancePathService () {
-        // Use an instance of GenericAStar that finds 3 paths instead of 1
-        GenericAStar astar = new GenericAStar();
-        astar.setNPaths(3);
-        sptService = astar;
-    }
     
     @Override
     public List<GraphPath> getPaths(RoutingRequest options) {

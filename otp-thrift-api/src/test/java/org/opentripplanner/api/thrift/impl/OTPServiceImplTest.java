@@ -103,6 +103,8 @@ public class OTPServiceImplTest {
         LongDistancePathService pathService = new LongDistancePathService();
         pathService.setGraphService(graphService);
         
+        pathService.setSptService(new GenericAStar());
+
         RoutingRequest prototype = new RoutingRequest();
         prototype.setTurnReluctance(1.0);
         prototype.setWalkReluctance(1.0);
