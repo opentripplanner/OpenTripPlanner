@@ -195,6 +195,8 @@ otp.modules.calltaker.MailablesWidget =
             if(largePrint && largePrint.is(':checked')) {
                 name += " (LARGE PRINT)";
             }
+
+            name = jQuery('<div>' + name + '</div>').text();
             
             var lines = doc.splitTextToSize(name, 612 - 2 * horizontal_margin - 108);
 

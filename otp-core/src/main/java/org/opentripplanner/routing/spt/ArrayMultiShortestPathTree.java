@@ -27,6 +27,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.AbstractVertex;
 import org.opentripplanner.routing.graph.Vertex;
 
+/** Seems to only be used by Raptor. */
 public class ArrayMultiShortestPathTree extends AbstractShortestPathTree {
 
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
