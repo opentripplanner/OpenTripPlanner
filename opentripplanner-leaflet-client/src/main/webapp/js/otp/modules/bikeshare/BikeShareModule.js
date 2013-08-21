@@ -49,8 +49,7 @@ otp.modules.bikeshare.StationCollection =
     },
     
     parse: function(rawData, options) {
-        var stationsData = _.pluck(rawData.stations, 'BikeRentalStation');
-        return Backbone.Collection.prototype.parse.call(this, stationsData, options);
+        return Backbone.Collection.prototype.parse.call(this, rawData.stations, options);
     }
 });
 
@@ -66,7 +65,6 @@ otp.modules.bikeshare.BikeShareModule =
     otp.Class(otp.modules.planner.PlannerModule, {
     
     moduleName  : "Bike Share Planner",
-    moduleId    : "bikeshare",
 
     resultsWidget   : null,
     
@@ -81,10 +79,12 @@ otp.modules.bikeshare.BikeShareModule =
     activate : function() {
         if(this.activated) return;
         otp.modules.planner.PlannerModule.prototype.activate.apply(this);
-        this.mode = "BICYCLE";
+        this.mode = "WALK,BICYCLE";
         
         this.stationsLayer = new L.LayerGroup();
         this.addLayer("Bike Stations", this.stationsLayer);
+        
+        this.bikestationsWidget = new otp.widgets.BikeStationsWidget(this.id+"-stationsWidget", this);
 
         this.initStations();
 
@@ -92,24 +92,57 @@ otp.modules.bikeshare.BikeShareModule =
         setInterval(function() {
             this_.reloadStations();
         }, 30000);
+        
+        
+        this.initOptionsWidget();
+        
+        this.defaultQueryParams.mode = "WALK,BICYCLE";
+        this.optionsWidget.applyQueryParams(this.defaultQueryParams);
+                
        
     },
+    
+    initOptionsWidget : function() {
+        this.optionsWidget = new otp.widgets.tripoptions.TripOptionsWidget(
+            'otp-'+this.id+'-optionsWidget', this, {
+                title : 'Trip Options'
+            }
+        );
+
+        if(this.webapp.geocoders && this.webapp.geocoders.length > 0) {
+            this.optionsWidget.addControl("locations", new otp.widgets.tripoptions.LocationsSelector(this.optionsWidget, this.webapp.geocoders), true);
+            this.optionsWidget.addVerticalSpace(12, true);
+        }
+                
+        //this.optionsWidget.addControl("time", new otp.widgets.tripoptions.TimeSelector(this.optionsWidget), true);
+        //this.optionsWidget.addVerticalSpace(12, true);
+        
+        
+        //var modeSelector = new otp.widgets.tripoptions.ModeSelector(this.optionsWidget);
+        //this.optionsWidget.addControl("mode", modeSelector, true);
+
+        this.optionsWidget.addControl("triangle", new otp.widgets.tripoptions.BikeTriangle(this.optionsWidget));
+
+        this.optionsWidget.addControl("biketype", new otp.widgets.tripoptions.BikeType(this.optionsWidget));
+
+        this.optionsWidget.autoPlan = true;
+
+        /*this.optionsWidget.addSeparator();
+        this.optionsWidget.addControl("submit", new otp.widgets.tripoptions.Submit(this.optionsWidget));*/
+    },
+    
 
     planTripStart : function() {
-        console.log("rsm");
         this.resetStationMarkers();
     },
     
-    processPlan : function(tripPlan, queryParams, restoring) {
+    processPlan : function(tripPlan, restoring) {
         var itin = tripPlan.itineraries[0];
         var this_ = this;
         
-	    if(this.resultsWidget == null) {
+	    /*if(this.resultsWidget == null) {
 
-            this.resultsWidget = new otp.widgets.TripWidget('otp-'+this.moduleId+'-tripWidget', this);
-            /*this.resultsWidget = new otp.widgets.TripWidget('otp-'+this.moduleId+'-tripWidget', function() {
-                this_.trianglePlanTrip();
-            });*/
+            this.resultsWidget = new otp.widgets.TripWidget('otp-'+this.id+'-tripWidget', this);
             this.widgets.push(this.resultsWidget);
             
             this.resultsWidget.addPanel("summary", new otp.widgets.TW_TripSummary(this.resultsWidget));
@@ -123,22 +156,22 @@ otp.modules.bikeshare.BikeShareModule =
                 this.resultsWidget.restorePlan(queryParams);
             }
             this.resultsWidget.show();
-        }
+        }*/
                         
         this.drawItinerary(itin);
         
-        if(queryParams.mode === 'WALK,BICYCLE') { // bikeshare trip
-            var polyline = new L.Polyline(otp.util.Geo.decodePolyline(itin.legs[1].legGeometry.points));
+        if(tripPlan.queryParams.mode === 'WALK,BICYCLE') { // bikeshare trip
+            var polyline = new L.Polyline(otp.util.Geo.decodePolyline(itin.itinData.legs[1].legGeometry.points));
             var start_and_end_stations = this.processStations(polyline.getLatLngs()[0], polyline.getLatLngs()[polyline.getLatLngs().length-1]);
         }
         else { // "my own bike" trip
            	this.resetStationMarkers();
         }	
 
-        this.resultsWidget.show();
-        this.resultsWidget.newItinerary(itin);
+        //this.resultsWidget.show();
+        //this.resultsWidget.newItinerary(itin);
                     
-        if(start_and_end_stations !== undefined && queryParams.mode === 'WALK,BICYCLE') {
+        if(start_and_end_stations !== undefined && tripPlan.queryParams.mode === 'WALK,BICYCLE') {
             if(start_and_end_stations['start'] && start_and_end_stations['end']) {
            	    this.bikestationsWidget.setContentAndShow(
            	        start_and_end_stations['start'], 
@@ -204,12 +237,14 @@ otp.modules.bikeshare.BikeShareModule =
     
     resetStationMarkers : function() {
         this.stations.each(function(station) {
-            this.setStationMarker(station); }, this);
+            this.setStationMarker(station);
+        }, this);
     },
 
     clearStationMarkers : function() {
         _.each(_.keys(this.markers), function(stationId) {
-            this.removeStationMarker(stationId); }, this);
+            this.removeStationMarker(stationId);
+        s}, this);
     },
     
     getStationMarker : function(station) {
@@ -230,6 +265,7 @@ otp.modules.bikeshare.BikeShareModule =
             marker;
         icon = icon || this.icons.getSmall(stationData);
         
+        //console.log(station);
         marker = new L.Marker(new L.LatLng(stationData.y, stationData.x), {icon: icon});
         this.markers[station.id] = marker;
         this.stationsLayer.addLayer(marker);
@@ -248,12 +284,12 @@ otp.modules.bikeshare.BikeShareModule =
     updateStationMarker : function(marker, station, title, icon) {
         var stationData = station.toJSON();
         
-        if (icon) marker.setIcon(icon);
+        marker.setIcon(icon || this.icons.getSmall(stationData));
+
         marker.bindPopup(this.constructStationInfo(title, stationData));
     },
     
     initStations : function() {
-        //console.log('init stations');
         this.markers = {};
         this.stations = new otp.modules.bikeshare.StationCollection();
         this.stations.on('reset', this.onResetStations, this);
@@ -262,7 +298,6 @@ otp.modules.bikeshare.BikeShareModule =
     },
 
     reloadStations : function(stations) {
-        //console.log('update stations');
         this.stations.fetch();
     },
             

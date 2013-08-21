@@ -1,0 +1,23 @@
+.otp-bikeshare-stationsWidget {
+    right: 20px;
+    bottom: 20px;
+}
+
+.otp-bikeshare-stationsWidget-left {
+  	background-color: #3fc100;
+  	background-color: rgba(153,204,153, 0.85);
+  	border: 1px solid #51be1b;
+    border-top: 1px solid #7fca5b;
+    border-bottom: 1px solid #70995c;
+    padding: 6px;
+}
+  
+.otp-bikeshare-stationsWidget-right {
+    padding: 6px;
+    margin-top: 8px;
+ 	background-color: #fd7474;
+    background-color: rgba(255,159,159, 0.85);
+    border: 1px solid #ff9191;
+    border-top: 1px solid #fea6a6;
+    border-bottom: 1px solid #e68b8b;
+}

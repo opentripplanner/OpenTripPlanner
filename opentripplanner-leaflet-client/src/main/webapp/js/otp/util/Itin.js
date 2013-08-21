@@ -47,7 +47,7 @@ otp.util.Itin = {
     },
     
     isTransit : function(mode) {
-        return mode === "TRANSIT" || mode === "SUBWAY" || mode === "BUS" || mode === "TRAM" || mode === "GONDOLA" || mode === "TRAINISH" || mode === "BUSISH";
+        return mode === "TRANSIT" || mode === "SUBWAY" || mode === "RAIL" || mode === "BUS" || mode === "TRAM" || mode === "GONDOLA" || mode === "TRAINISH" || mode === "BUSISH";
     },
     
     includesTransit : function(mode) {
@@ -79,9 +79,7 @@ otp.util.Itin = {
     },
     
     distanceString : function(m) {
-        var ft = m*3.28084;
-        if(ft < 528) return Math.round(ft) + ' feet';
-        return Math.round(ft/528)/10+" miles";
+        return otp.util.Geo.distanceString(m);
     },
     
     modeStrings : {
@@ -105,14 +103,14 @@ otp.util.Itin = {
                 otp.util.Text.ordinal(step.exit)+' exit on '+step.streetName;
         }
         else {
-            if(!step.relativeDirection) text += "Start on" + (asHtml ? " <b>" : " ") + step.streetName + (asHtml ? "</b>" : "");
+            if(!step.relativeDirection) text += "Start on" + (asHtml ? " <b>" : " ") + step.streetName + (asHtml ? "</b>" : "") + " heading " + step.absoluteDirection.toLowerCase();
             else {
                 text += (asHtml ? "<b>" : "") + otp.util.Text.capitalizeFirstChar(this.directionString(step.relativeDirection)) +
                             (asHtml ? "</b>" : "") + ' ' + (step.stayOn ? "to continue on" : "on to")  + (asHtml ? " <b>" : " ") +
                             step.streetName + (asHtml ? "</b>" : "");
             }
         }
-        return text; // + ' and proceed <b>'+otp.util.Itin.distanceString(step.distance)+'</b>';
+        return text;
     },
     
     getRouteDisplayString : function(routeData) {
@@ -120,4 +118,8 @@ otp.util.Itin = {
         str += routeData.routeLongName;
         return str;
     },
+    
+    getRouteShortReference : function(routeData) {
+        return routeData.routeShortName || routeData.id.id;
+    },    
 }

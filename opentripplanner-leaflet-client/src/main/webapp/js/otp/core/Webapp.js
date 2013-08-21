@@ -40,6 +40,8 @@ otp.core.Webapp = otp.Class({
         if(typeof console == 'undefined') console = { log: function(str) {} };
         $.support.cors = true;
         var this_ = this;
+        
+        otp.config.resourcePath = otp.config.resourcePath || "";
 
         // set the urlRoot variable, if needed
         /*if(!otp.config.urlRoot) {
@@ -69,10 +71,32 @@ otp.core.Webapp = otp.Class({
             otp.config.siteUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
         }
             
+        // Set Debug options
+        if (this.urlParams.debug === 'false') {
+            otp.debug.disable();
+        } else if (otp.config.debug || this.urlParams.debug === 'true' || window.localStorage['otpDebug'] === 'true') {
+            otp.debug.enable();
+        } else if (this.urlParams.debug === 'false') {
+            otp.debug.disable();
+        }
+
         // set the logo & title
         
         if(otp.config.showLogo) {
-          $('<div id="logo"><a href="'+otp.config.siteURL+'"><img src="'+otp.config.logoGraphic+'" style="height:100%"></a></div>').appendTo('#branding');
+          //$('<div id="logo"><a href="'+otp.config.siteURL+'"><img src="'+otp.config.logoGraphic+'" style="height:100%"></a></div>').appendTo('#branding');
+            $(Mustache.render(otp.templates.img, { 
+                src : otp.config.logoGraphic,
+                style : 'height:100%',
+                wrapLink : true,
+                linkHref : otp.config.siteURL,
+                wrapDiv : true,
+                divId : 'logo'
+            })).appendTo('#branding');
+            //console.log(img);
+            //$(img).appendTo('#branding');
+            /*$(Mustache.render(otp.templates.div, { id : 'logo' }))
+            .append(Mustache.render(otp.templates.img, { src : otp.config.logoGraphic }))
+            .appendTo('#branding');          */
 
         }
         
@@ -171,6 +195,7 @@ otp.core.Webapp = otp.Class({
         }
 
 
+
         // initialize the modules 
         
         if(this.urlParams['module'])
@@ -180,8 +205,9 @@ otp.core.Webapp = otp.Class({
             for(var i=0; i<otp.config.modules.length; i++) {
                 var modConfig = otp.config.modules[i];
                 var modClass = this.stringToFunction(modConfig.className);
-                var module = new modClass(this);
-                if(modConfig.id) module.id = modConfig.id;
+                var id =  modConfig.id || 'module'+i;
+                var options = modConfig.options || {}; 
+                var module = new modClass(this, id, options);
                 if(modConfig.defaultBaseLayer) module.defaultBaseLayer = modConfig.defaultBaseLayer;
                 
                 var isDefault = false;
@@ -197,7 +223,11 @@ otp.core.Webapp = otp.Class({
             }
             if(_.has(this.urlParams, 'module') && !setDefault) {
                 console.log("OTP module with id="+this.urlParams['module']+" not found");
-                if(defaultModule) this.setActiveModule(defaultModule);
+                if(defaultModule) {
+                    //this_.activeModule = defaultModule;
+                    //console.log("init active module: "+ defaultModule);
+                    this.setActiveModule(defaultModule);
+                }
             }
         }                
 
@@ -215,6 +245,15 @@ otp.core.Webapp = otp.Class({
             });
                        
         }
+        
+        
+        // add the spinner
+        
+        $(Mustache.render(otp.templates.img, {
+            src: 'images/spinner.gif',
+            wrapDiv: true,
+            divId: 'otp-spinner'
+        }));
                 
         // retrieve a saved trip, if applicable
 		//if(window.location.hash !== "")
@@ -232,6 +271,7 @@ otp.core.Webapp = otp.Class({
     },
     
     setActiveModule : function(module) {
+        var this_ = this;
         //console.log("set active module: "+module.moduleName);
         if(this.activeModule != null) {
             this.activeModule.deselected();
@@ -249,17 +289,41 @@ otp.core.Webapp = otp.Class({
                 module.widgets[i].show();
             }
         }        
-        if(!module.activated) {
-            module.activate();
-            if(_.has(this.urlParams, 'module') && this.urlParams.module == module.id) module.restore();
+        
+        if(!module.activated) {        
+            if(module.templateFile) {
+                $.get(otp.config.resourcePath + 'js/' + module.templateFile)
+                .success(function(data) {
+                    $('<div style="display:none;"></div>').appendTo($("body")).html(data);
+                    ich.grabTemplates();                   
+                    this_.activateModule(module);
+                });
+            }        
+            else {
+                this.activateModule(module);
+            }         
         }
-        module.selected();
-        
-        this.map.activeModuleChanged(this.activeModule, module);
-        
-        this.activeModule = module;
-    },   
+        else {
+            this.moduleSelected(module);
+        }
+
+    },
     
+    activateModule : function(module) {
+        module.activate();
+        if(_.has(this.urlParams, 'module') && this.urlParams.module == module.id) module.restore();
+        this.moduleSelected(module);
+        module.activated = true;
+    },
+    
+    moduleSelected : function(module) {
+        module.selected();
+        this.map.activeModuleChanged(this.activeModule, module);    
+        this.activeModule = module;
+        var moduleIndex = this.modules.indexOf(this.activeModule);
+        $('#otp_moduleSelector option:eq('+moduleIndex+')').prop('selected', true);
+    },
+          
           
     hideSplash : function() {
     	$("#splash-text").hide();

@@ -41,12 +41,11 @@ otp.core.SOLRGeocoder = otp.Class({
             
             success: function(data) {
                 if(!data.response) data = jQuery.parseJSON(data);
-                
                 var results = [];
                 var resultData = data.response.docs;
                 for(var i=0; i<resultData.length; i++) {
                     var resultObj = {
-                        description : resultData[i].name,
+                        description : resultData[i].name + (resultData[i].city ? ', ' + resultData[i].city : ''),
                         lat : resultData[i].lat,
                         lng : resultData[i].lon
                     };

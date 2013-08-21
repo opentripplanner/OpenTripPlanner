@@ -23,11 +23,18 @@ otp.modules.Module = otp.Class({
     mapLayers   : null,
     
     activated   : false,
+    
+    options     : null,
+    
+    handlers    : null,
         
-    initialize : function(webapp) {
+    initialize : function(webapp, id, options) {
         this.webapp = webapp;
+        this.id = id;
+        this.options = options || {};
         this.widgets = [];
-        this.mapLayers = { };
+        this.mapLayers = {};
+        this.handlers = {};
     },
     
 
@@ -49,7 +56,22 @@ otp.modules.Module = otp.Class({
         widget.setContent(content);
         return widget;
     },
+    
+    on : function(eventName, handler) {    
+        if(!_.has(this.handlers, eventName)) {
+            this.handlers[eventName] = [];
+        }
+        this.handlers[eventName].push(handler);
+    },
 
+    invokeHandlers : function(eventName, args) {
+        if(_.has(this.handlers, eventName)) {
+            var handlerArr = this.handlers[eventName];
+            for(var i = 0; i < handlerArr.length; i++) {
+                handlerArr[i].apply(this, args);
+            }
+        }
+    },
 
     // functions to be overridden by subclasses
     

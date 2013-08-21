@@ -5,11 +5,11 @@ if(typeof(otp.config) == "undefined" || otp.config == null) otp.config = {};
 
 
 otp.config = {
+    debug: false,
 
     /**
      * The OTP web service locations
      */
-     
     hostname : "http://localhost:8080",
     //municoderHostname : "http://localhost:8080",
     //datastoreUrl : 'http://localhost:9000',
@@ -55,7 +55,9 @@ otp.config = {
     // initZoom : 14,
     // minZoom : 10,
     // maxZoom : 20,
-
+    
+    /* Whether the map should be moved to contain the full itinerary when a result is received. */
+    zoomToFitResults    : true,
 
     /**
      * Site name / description / branding display options
@@ -69,6 +71,7 @@ otp.config = {
     showLogo            : true,
     showTitle           : true,
     showModuleSelector  : true,
+    metric              : true,
 
 
     /**

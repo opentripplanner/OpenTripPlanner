@@ -15,7 +15,7 @@
 otp.namespace("otp.widgets.transit");
 
 otp.widgets.transit.TripViewerWidget = 
-    otp.Class(otp.widgets.Widget, {
+    otp.Class(otp.widgets.transit.RouteBasedWidget, {
 
     module : null,
 
@@ -31,46 +31,23 @@ otp.widgets.transit.TripViewerWidget =
     
     initialize : function(id, module) {
     
-        otp.widgets.Widget.prototype.initialize.call(this, id, module, {
+        otp.widgets.transit.RouteBasedWidget.prototype.initialize.call(this, id, module, {
             title : 'Trip Viewer',
             cssClass : 'otp-tripViewer',
             closeable : true,
-            openInitially : false
+            openInitially : false,
+            persistOnClose : true, 
         });
         
         this.module = module;
         
         var this_ = this;
 
-
-        var routeSelectDiv = $('<div class="otp-tripViewer-select notDraggable" />').appendTo(this.mainDiv);
-        $('<div style="float: left;">Route:</div>').appendTo(routeSelectDiv);
-        this.routeSelect = $('<select id="'+this.id+'-routeSelect" style="width:100%;"></select>')
-        .appendTo($('<div style="margin-left:60px;">').appendTo(routeSelectDiv))
-        .change(function() {
-            this_.newRouteSelected();
-        });
-
-        _.each(module.webapp.transitIndex.routes, function(route, key) {
-            var optionHtml = '<option>';
-            if(route.routeData.routeShortName) optionHtml += '('+route.routeData.routeShortName+') ';
-            if(route.routeData.routeLongName) optionHtml += route.routeData.routeLongName;
-            optionHtml += '</option>';
-            this_.routeSelect.append($(optionHtml));
-            this_.routeLookup.push(route);
-        });
-
-
-        var variantSelectDiv = $('<div class="otp-tripViewer-select notDraggable" />').appendTo(this.mainDiv);
-        $('<div style="float: left;">Variant:</div>').appendTo(variantSelectDiv);
-        this.variantSelect = $('<select id="'+this.id+'-routeSelect" style="width:100%;"></select>')
-        .appendTo($('<div style="margin-left:60px;">').appendTo(variantSelectDiv))
-        .change(function() {
-            this_.newVariantSelected();
-        });
-
         this.stopList = $('<div class="otp-tripViewer-stopList notDraggable" />').appendTo(this.mainDiv);
+
+        this.scheduleLink = $('<div class="otp-tripViewer-scheduleLink notDraggable" />').appendTo(this.mainDiv);
         
+        console.log("added sched link");
         this.mainDiv.resizable({
             minWidth: 200,
             alsoResize: this.stopList,
@@ -78,103 +55,16 @@ otp.widgets.transit.TripViewerWidget =
         
     },
     
-    newRouteSelected : function() {
-        this.agency_id = null;
-        this.activeLeg = null;
-        var route = this.routeLookup[this.routeSelect.prop("selectedIndex")]
-        this.agency_id = route.routeData.id.agencyId + "_" + route.routeData.id.id;
-        this.variantSelect.empty();
+        
+    clear : function() {
         this.stopList.empty();
-        this.checkAndLoadVariants();     
     },
     
-    newVariantSelected : function() {
-        this.activeLeg = null;
-        var variantName = this.variantSelect.val();
-        //console.log("new variant selected: "+variantName);
-        this.stopList.empty();
-        this.setActiveVariant(this.module.webapp.transitIndex.routes[this.agency_id].variants[variantName]);
-    },
+    variantSelected : function(variantData) {
+        console.log("var sel");
+        console.log(variantData);
+        var this_ = this;
     
-    /*newStopSelected : function() {
-        this.clearTimes();
-        var stop = this.activeVariant.stops[this.stopSelect.prop("selectedIndex")];
-        
-        var this_ = this;
-        this.module.webapp.transitIndex.runStopTimesQuery(stop.id, null, this.activeTime, this, function(data) {
-            var stopTimes = [];
-            for(var i=0; i<data.stopTimes.length; i++) {
-                var st = data.stopTimes[i].StopTime || data.stopTimes[i];
-                if(st.phase == 'departure')
-                    stopTimes.push(st.time*1000);
-            }
-            this_.times = stopTimes;
-            this_.updateTimes();
-        });
-    },*/
-        
-    /*clearTimes : function() {
-        this.times = null;
-        this.timeIndex = null;
-        if(this.rightTime) this.rightTime.remove();
-        if(this.centerTime) this.centerTime.remove();
-        if(this.leftTime) this.leftTime.remove();    
-    },*/
-        
-    update : function(leg) {
-        //this.clearTimes();
-        this.activeLeg = leg;
-        this.activeTime = leg.startTime;
-        //this.times = times;
-
-        this.agency_id = leg.agencyId + "_" + leg.routeId;
-        
-        var tiRouteInfo = this.module.webapp.transitIndex.routes[this.agency_id];
-        $('#'+this.id+'-routeSelect option:eq('+tiRouteInfo.index+')').prop('selected', true);
-        
-        this.checkAndLoadVariants();      
-    },
-        
-    checkAndLoadVariants : function() {
-        var tiRouteInfo = this.module.webapp.transitIndex.routes[this.agency_id];
-        if(tiRouteInfo.variants != null) {
-            //console.log("variants exist");
-            this.updateVariants();
-        }
-        else {
-            this.module.webapp.transitIndex.loadVariants(this.agency_id, this, this.updateVariants);
-        }
-    },
-
-    updateVariants : function() {
-        var this_ = this;
-        var route = this.module.webapp.transitIndex.routes[this.agency_id];
-
-        if(!route.variants) {
-            console.log("ERROR: transitIndex.routes.["+this.agency_id+"].variants null in StopViewerWidget.updateVariants()");
-            return;
-        }
-        
-        if(this.activeLeg) {
-            this.module.webapp.transitIndex.readVariantForTrip(this.activeLeg.agencyId, this.activeLeg.tripId, this, this.setActiveVariant);
-        }
-
-        this.variantSelect.empty();
-        _.each(route.variants, function(variant) {
-            $('<option>'+variant.name+'</option>').appendTo(this_.variantSelect);
-        });
-        
-        if(!this.activeLeg) {
-            this.newVariantSelected();
-        }
-    },
-    
-    setActiveVariant : function(variantData) {
-        var this_ = this;
-        var route = this.module.webapp.transitIndex.routes[this.agency_id];
-        this.activeVariant = route.variants[variantData.name];
-        $('#'+this.id+'-variantSelect option:eq('+(this.activeVariant.index)+')').prop('selected', true);
-          
         this.stopList.empty();
         var selectedStopIndex = 0;
         for(var i=0; i<this.activeVariant.stops.length; i++) {
@@ -265,6 +155,27 @@ otp.widgets.transit.TripViewerWidget =
             var scrollY = this.stopList[0].scrollHeight * this.activeLeg.from.stopIndex / (this.activeVariant.stops.length - 1);
             this.stopList.scrollTop(scrollY);
         }
+        
+        // update the route link
+        
+        var url = variantData.route.url;
+        var html = "";
+        if(url) html += 'Link to: <a href="' + url + '" target="_blank">Route Info</a>';
+
+        // temporary TriMet-specific code
+        if(url.indexOf('http://trimet.org') === 0) {
+            var day = "w";
+            if(this.activeLeg) {
+                var dow = moment(this.activeLeg.startTime).add("h", -3).day();
+                if(dow === 0) day = "h";
+                if(dow === 6) day = "s";
+            }
+            var rte = url.substring(29, 32);
+            html += ' | <a href="http://trimet.org/schedules/' + day + '/t1' + rte + '_' + variantData.direction + '.htm" target="_blank">Timetable</a>';
+        }
+        
+        this.scheduleLink.html(html);
+        
     },
     
 });

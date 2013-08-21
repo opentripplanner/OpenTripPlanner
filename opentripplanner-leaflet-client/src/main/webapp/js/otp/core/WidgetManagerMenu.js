@@ -64,7 +64,7 @@ otp.core.WidgetManagerMenu =
         this.clearWidgetItems();
         for(var i = 0; i < this.webapp.activeModule.widgets.length; i++) {
             var widget = this.webapp.activeModule.widgets[i];
-            if(widget.isOpen) this.addWidgetItem(widget);
+            if(widget.isOpen || widget.persistOnClose) this.addWidgetItem(widget);
         }          
     },
 
@@ -73,6 +73,7 @@ otp.core.WidgetManagerMenu =
         $('<div class="otp-popupMenu-item">'+widget.title+'</div>')
         .appendTo($(this.widgetItems))
         .click(function() {
+            if(!widget.isOpen) widget.show();
             if(widget.isMinimized) widget.unminimize();
             widget.bringToFront();
         });

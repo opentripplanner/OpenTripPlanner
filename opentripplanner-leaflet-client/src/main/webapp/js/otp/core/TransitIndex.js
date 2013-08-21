@@ -35,6 +35,10 @@ otp.core.TransitIndex = otp.Class({
         var url = otp.config.hostname + '/opentripplanner-api-webapp/ws/transit/routes';
         $.ajax(url, {
             dataType:   'jsonp',
+            
+            data: {
+                extended: 'true',
+            },
                 
             success: function(data) {
                 if(!_.has(data, 'routes')) {
@@ -76,6 +80,10 @@ otp.core.TransitIndex = otp.Class({
         var this_ = this;
         //console.log("loadVariants: "+agencyAndId);
         var route = this.routes[agencyAndId];
+        if(route.variants) {
+            if(callback) callback.call(callbackTarget, route.variants);
+            return;
+        }
 
         var url = otp.config.hostname + '/opentripplanner-api-webapp/ws/transit/routeData';
         $.ajax(url, {
@@ -94,7 +102,7 @@ otp.core.TransitIndex = otp.Class({
                     data.routeData[0].variants[i].index = i;
                 }
                 if(callback && callbackTarget) {
-                    callback.call(callbackTarget);
+                    callback.call(callbackTarget, route.variants);
                 }
             }
         });
@@ -178,7 +186,8 @@ otp.core.TransitIndex = otp.Class({
             agency: agencyId,
             id: stopId,
             startTime : startTime,
-            endTime : endTime
+            endTime : endTime,
+            extended : true,
         };
         if(otp.config.routerId !== undefined) {
             params.routerId = otp.config.routerId;
@@ -201,6 +210,7 @@ otp.core.TransitIndex = otp.Class({
             leftUpLon : bounds.getNorthWest().lng,
             rightDownLat : bounds.getSouthEast().lat,
             rightDownLon : bounds.getSouthEast().lng,
+            extended : true
         };
         if(agencyId !== null) {
             params.agency = agencyId;

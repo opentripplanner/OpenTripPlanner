@@ -50,14 +50,85 @@
     text-decoration: underline;
 }
 
-.otp-stopViewer-infoRow {
-    font-size: 14px;
-    margin-bottom: 8px;
+.otp-tripViewer-scheduleLink {
+    text-align: center;
+    margin-top: 4px;    
 }
 
-.otp-stopViewer-dateRow {
-    font-size: 14px;
-    margin-bottom: 8px;
+/** Stop Viewer **/
+
+.otp-stopViewer {
+    width: 150px;
+    height: 250px;
+}
+
+.otp-stopViewer-container {
+    position: absolute;
+    top: 30px;
+    bottom: 10px;    
+    left: 10px;
+    right: 10px; 
+}
+
+.otp-stopViewer-stopInfo {
+    height: 48px;
+    border: 1px solid #bbb;
+    padding: 3px;
+    overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.otp-stopViewer-reloadButton {
+    font-size: 11px;
+}
+
+.otp-stopViewer-idInput {
+    font-size: 11px;
+    width: 50px;
+}
+
+.otp-stopViewer-dateInput {
+    font-size: 12px;
+    width: 80px;
+}
+
+
+.otp-stopViewer-timeList {
+    position: absolute;
+    top: 85px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    background: white;
+    border: 1px solid black;
+    overflow: auto;
+}
+
+.otp-stopViewer-timeListItem {
+    margin: 6px 5px;
     text-align: center;
+}
+
+.otp-stopViewer-timeRow {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.otp-stopViewer-routeRow {
+    font-size: 11px;
+    font-weight: bold;
+    color: gray;
+    white-space: nowrap;
+    overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.otp-stopViewer-tripRow {
+    font-size: 10px;
+    font-style: italic;
+    color: gray;
+    white-space: nowrap;
+    overflow: hidden;
+	text-overflow: ellipsis;
 }
 
