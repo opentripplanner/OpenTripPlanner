@@ -77,7 +77,10 @@ public class TransferEdge extends Edge {
     }
 
     public State traverse(State s0) {
-        if (s0.getBackEdge() instanceof TransferEdge) return null; // Disallow chaining of transfers
+        /* Disallow chaining of transfer edges. TODO: This should really be guaranteed by the PathParser
+           but the default Pathparser is currently very hard to read because
+           we need a complement operator. */
+        if (s0.getBackEdge() instanceof TransferEdge) return null;
         if (s0.getOptions().wheelchairAccessible && !wheelchairAccessible) return null;
         StateEditor s1 = s0.edit(this);
         s1.incrementTimeInSeconds(time);
