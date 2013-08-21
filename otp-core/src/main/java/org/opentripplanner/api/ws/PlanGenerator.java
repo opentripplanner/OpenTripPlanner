@@ -36,6 +36,7 @@ import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.AreaEdge;
@@ -564,6 +565,7 @@ public class PlanGenerator {
         if (trip != null) {
             String id = trip.getId().getAgencyId();
             Route route = trip.getRoute();
+            ServiceDay serviceDay = states[states.length - 1].getServiceDay();
 
             leg.agencyId = id;
             leg.headsign = states[states.length - 1].getBackDirection();
@@ -577,7 +579,10 @@ public class PlanGenerator {
             leg.tripId = trip.getId().getId();
             leg.tripShortName = trip.getTripShortName();
             leg.tripBlockId = trip.getBlockId();
-            leg.serviceDate = states[states.length - 1].getServiceDay().getServiceDate().getAsString();
+
+            if (serviceDay != null) {
+                leg.serviceDate = serviceDay.getServiceDate().getAsString();
+            }
 
             if (transitIndexService != null) {
                 Agency agency = transitIndexService.getAgency(id);
