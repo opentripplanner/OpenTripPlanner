@@ -64,6 +64,8 @@ import org.opentripplanner.routing.transit_index.adapters.ServiceCalendarType;
 import org.opentripplanner.routing.transit_index.adapters.StopType;
 import org.opentripplanner.routing.transit_index.adapters.TripType;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.TransitStopArrive;
+import org.opentripplanner.routing.vertextype.TransitStopDepart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -204,6 +206,39 @@ public class TransitIndex {
                 response.routes.add(routeType);
                 break;
             }
+        }
+        return response;
+    }
+
+    /**
+     * Returns data for a single stop given an id
+     */
+
+    @GET
+    @Path("/stopData")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    public Object getStopData(@QueryParam("agency") String agency, @QueryParam("id") String id,
+            @QueryParam("extended") Boolean extended, @QueryParam("routerId") String routerId)
+            throws JSONException {
+    	
+        Graph graph = getGraph(routerId);
+    	TransitIndexService transitIndexService = graph.getService(TransitIndexService.class);
+
+    	StopList response = new StopList();
+    	
+    	AgencyAndId stopId = new AgencyAndId(agency, id);
+        
+    	Edge preBoardEdge = transitIndexService.getPreBoardEdge(stopId);
+        if(preBoardEdge != null) {
+        	TransitStopDepart transitStop = (TransitStopDepart) preBoardEdge.getToVertex();
+        	response.stops.add(new StopType(transitStop.getStop(), extended));
+        }
+        else { // check if stop is alight-only        	
+	    	Edge preAlightEdge = transitIndexService.getPreAlightEdge(stopId);
+	        if(preAlightEdge != null) {
+	        	TransitStopArrive transitStop = (TransitStopArrive) preAlightEdge.getFromVertex();
+	        	response.stops.add(new StopType(transitStop.getStop(), extended));
+	        }
         }
         return response;
     }
