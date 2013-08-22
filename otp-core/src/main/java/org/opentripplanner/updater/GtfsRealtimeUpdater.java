@@ -125,4 +125,10 @@ public class GtfsRealtimeUpdater implements GraphUpdaterRunnable, GraphUpdater {
         LOG.info("Creating real-time alert updater running every {} seconds : {}", frequencySec,
                 url);
     }
+
+    @Override
+    public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
+        // TODO Auto-generated method stub
+        
+    }
 }

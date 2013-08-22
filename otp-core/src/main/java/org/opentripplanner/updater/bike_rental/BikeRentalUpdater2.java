@@ -35,6 +35,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.updater.GraphUpdater;
+import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphUpdaterRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -186,5 +187,11 @@ public class BikeRentalUpdater2 implements GraphUpdaterRunnable, GraphUpdater {
         long frequencySec = preferences.getLong("frequencySec", DEFAULT_UPDATE_FREQ_SEC);
         LOG.info("Creating bike-rental updater running every {} seconds : {}", frequencySec,
                 source);
+    }
+
+    @Override
+    public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
+        // TODO Auto-generated method stub
+        
     }
 }

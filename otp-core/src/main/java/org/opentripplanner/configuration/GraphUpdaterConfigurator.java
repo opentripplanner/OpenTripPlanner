@@ -14,10 +14,8 @@
 package org.opentripplanner.configuration;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
@@ -56,9 +54,8 @@ public class GraphUpdaterConfigurator {
     private static Logger LOG = LoggerFactory.getLogger(GraphUpdaterConfigurator.class);
 
     public void setupGraph(Graph graph, Preferences mainConfig) {
-        // Create a periodic updater per graph
-        GraphUpdaterManager updaterManager = new GraphUpdaterManager();
-        graph.setUpdaterManager(updaterManager);
+        // Create a updater manager for this graph
+        GraphUpdaterManager updaterManager = new GraphUpdaterManager(graph);
 
         // Look for embedded config if it exists
         Properties embeddedGraphPreferences = graph.getEmbeddedPreferences();
@@ -72,10 +69,13 @@ public class GraphUpdaterConfigurator {
         // Apply configuration 
         updaterManager = applyConfigurationToGraph(graph, updaterManager, Arrays.asList(mainConfig, embeddedConfig));
 
-        // Delete the updater manager if it contains nothing
+        // Stop the updater manager if it contains nothing
         if (updaterManager.size() == 0) {
             updaterManager.stop();
-            graph.setUpdaterManager(null);
+        }
+        // Otherwise add it to the graph
+        else {
+            graph.setUpdaterManager(updaterManager);
         }
     }
 
@@ -91,13 +91,18 @@ public class GraphUpdaterConfigurator {
         try {
             Set<String> configurableNames = new HashSet<String>();
             for (Preferences config : configs) {
-                if (config == null)
+                if (config == null) {
+                    // This config is not used; skip it
                     continue;
+                }
                 for (String configurableName : config.childrenNames()) {
-                    if (configurableNames.contains(configurableName))
-                        continue; // Already processed
+                    if (configurableNames.contains(configurableName)) {
+                        // Already processed this configurable; skip it
+                        continue;
+                    }
                     configurableNames.add(configurableName);
                     
+                    // Determine the updater
                     Preferences prefs = config.node(configurableName);
                     String type = prefs.get("type", null);
                     GraphUpdater updater = null;
@@ -113,6 +118,7 @@ public class GraphUpdaterConfigurator {
                         }
                     }
                     
+                    // Configure and activate the updaters
                     try {
                         // Check whether no updater type was found 
                         if (updater == null) {
@@ -123,7 +129,11 @@ public class GraphUpdaterConfigurator {
                             ((PreferencesConfigurable) updater).configure(graph, prefs);
                         }
                         
-                        // TODO add to manager
+                        // Add manager as parent
+                        updater.setGraphUpdaterManager(updaterManager);
+                        
+                        // Add graph updater to manager
+                        updaterManager.addUpdater(updater);
                     
                     } catch (Exception e) {
                         LOG.error("Can't configure: " + configurableName, e);

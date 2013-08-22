@@ -31,6 +31,7 @@ import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.trippattern.TripUpdateList;
 import org.opentripplanner.updater.GraphUpdater;
+import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphUpdaterRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -326,5 +327,11 @@ public class StoptimeUpdater implements GraphUpdaterRunnable, TimetableSnapshotS
         long frequencySec = preferences.getLong("frequencySec", DEFAULT_UPDATE_FREQ_SEC);
         LOG.info("Creating stop time updater running every {} seconds : {}", frequencySec,
                 streamer);
+    }
+
+    @Override
+    public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
+        // TODO Auto-generated method stub
+        
     }
 }

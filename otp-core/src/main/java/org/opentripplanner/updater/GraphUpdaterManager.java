@@ -20,6 +20,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,8 +31,9 @@ import org.slf4j.LoggerFactory;
  * GraphUpdaterManager updaterManager = graph.getUpdaterManager();
  * </pre>
  * 
- * Each updater will run in its own thread. When changes to the graph have to be made, this should 
- * be done via the scheduler to prevent race conditions between multiple updaters. 
+ * Each updater will run in its own thread. When changes to the graph have to be made by these
+ * updaters, this should be done via the execute method of this manager to prevent race conditions
+ * between graph write operations.
  * 
  */
 public class GraphUpdaterManager {
@@ -46,19 +48,34 @@ public class GraphUpdaterManager {
      */
     private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     
+    /**
+     * Pool with updaters
+     */
     private ExecutorService updaterPool = Executors.newCachedThreadPool(); 
     
-    List<GraphUpdaterRunnable> updaterList = new ArrayList<GraphUpdaterRunnable>();
+    /**
+     * List with updaters to be able to free resources
+     * TODO: is this list necessary?
+     */
+    List<GraphUpdater> updaterList = new ArrayList<GraphUpdater>();
+    
+    /**
+     * Parent graph of this manager
+     */
+    Graph graph;
 
-    public GraphUpdaterManager() {
+    /**
+     * Constructor
+     * @param graph is parent graph of manager
+     */
+    public GraphUpdaterManager(Graph graph) {
+        this.graph = graph;
     }
 
     public void stop() {
+        // TODO: find a better way to stop these threads
+        
         // Shutdown updaters
-        for (GraphUpdaterRunnable updater : updaterList) {
-            updater.teardown();
-        }
-
         updaterPool.shutdownNow();
         try {
             boolean ok = updaterPool.awaitTermination(30, TimeUnit.SECONDS);
@@ -70,6 +87,11 @@ public class GraphUpdaterManager {
             LOG.warn("Interrupted while waiting for updaters to finish.");
         }
         
+        // Clean up updaters
+        for (GraphUpdater updater : updaterList) {
+            updater.teardown();
+        }
+
         
         // Shutdown scheduler
         scheduler.shutdownNow();
@@ -84,24 +106,32 @@ public class GraphUpdaterManager {
         }
     }
 
-    public void addUpdater(final GraphUpdaterRunnable updater, long frequencyMs) {
+    public void addUpdater(GraphUpdater updater) {
         updater.setup();
-        scheduler.scheduleAtFixedRate(new Runnable() {
+        updaterPool.execute(updater);
+        updaterList.add(updater);
+    }
+    
+    /**
+     * This is the method to use to modify the graph. The runnables will be scheduled after each
+     * other, guaranteeing that only one of these runnables will be active at a time.
+     * 
+     * @param runnable is a graph writer runnable
+     */
+    public void execute(final GraphWriterRunnable runnable) {
+        scheduler.schedule(new Runnable() {
             @Override
             public void run() {
                 try {
-                    updater.run();
+                    runnable.run(graph);
                 } catch (Exception e) {
-                    LOG.error("Error while running updater " + updater.getClass().getName(), e);
+                    LOG.error("Error while running graph writer " + runnable.getClass().getName(), e);
                     // TODO Should we cancel the task? Or after n consecutive failures?
                     // cancel();
                 }
             }
-        }, 0, frequencyMs, TimeUnit.MILLISECONDS);
-        updaterList.add(updater);
+        }, 0, TimeUnit.MILLISECONDS);
     }
-    
-//    public void 
 
     public int size() {
         return updaterList.size();
