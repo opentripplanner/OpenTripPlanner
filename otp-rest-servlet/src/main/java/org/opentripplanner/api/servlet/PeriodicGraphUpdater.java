@@ -17,14 +17,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.opentripplanner.updater.GraphUpdaterRunnable;
-import org.opentripplanner.updater.PeriodicTimerGraphUpdater;
+import org.opentripplanner.updater.GraphUpdaterManager;
 
 /**
  * TODO Remove. This class is kept as is for now only for spring-backward-compatiliby purposes. This
  * class has been replaced by the PeriodicTimerGraphUpdater, with one instance per graph (this class
  * is unique for all graphs and need it's updater to take care of graph eviction).
  * 
- * @see PeriodicTimerGraphUpdater
+ * @see GraphUpdaterManager
  */
 @Deprecated
 public class PeriodicGraphUpdater {

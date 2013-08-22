@@ -24,7 +24,7 @@ import java.util.prefs.Preferences;
 
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.EmbeddedConfigService;
-import org.opentripplanner.updater.PeriodicTimerGraphUpdater;
+import org.opentripplanner.updater.GraphUpdaterManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,8 +62,8 @@ public class GraphRuntimeConfigurator {
 
     public void setupGraph(Graph graph, Preferences mainConfig) {
         // Create a periodic updater per graph
-        PeriodicTimerGraphUpdater periodicUpdater = graph.getService(
-                PeriodicTimerGraphUpdater.class, true);
+        GraphUpdaterManager periodicUpdater = graph.getService(
+                GraphUpdaterManager.class, true);
 
         // Look for embedded config if it exists
         EmbeddedConfigService embeddedConfigService = graph.getService(EmbeddedConfigService.class);
@@ -78,7 +78,7 @@ public class GraphRuntimeConfigurator {
         // Delete the periodic updater if it contains nothing
         if (periodicUpdater.size() == 0) {
             periodicUpdater.stop();
-            graph.putService(PeriodicTimerGraphUpdater.class, null);
+            graph.putService(GraphUpdaterManager.class, null);
         }
     }
 
@@ -119,8 +119,8 @@ public class GraphRuntimeConfigurator {
     }
 
     public void shutdownGraph(Graph graph) {
-        PeriodicTimerGraphUpdater periodicUpdater = graph
-                .getService(PeriodicTimerGraphUpdater.class);
+        GraphUpdaterManager periodicUpdater = graph
+                .getService(GraphUpdaterManager.class);
         if (periodicUpdater != null) {
             LOG.info("Stopping periodic updater with " + periodicUpdater.size() + " updaters.");
             periodicUpdater.stop();

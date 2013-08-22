@@ -84,9 +84,9 @@ public class WebsocketGTFSRealtimeUpdater implements PreferencesConfigurable {
     public static class DecoderTask implements Runnable { //, GraphUpdaterRunnable 
         private byte[] bytes;
         @Override public void run() {
-            // System.out.println("Decoding message: " + bytes);
+            System.out.println("Decoding message: " + bytes);
             UpdateStreamer us = new UpdateStreamer(bytes);
-            // System.out.println("Updates: " + us.getUpdates());
+            System.out.println("Updates: " + us.getUpdates());
         }
     }
 
@@ -111,7 +111,7 @@ public class WebsocketGTFSRealtimeUpdater implements PreferencesConfigurable {
     
     public static void main (String[] argv) {
         WebsocketGTFSRealtimeUpdater wu = new WebsocketGTFSRealtimeUpdater();
-        wu.setUrl("ws://ovapi.nl:8088/tripUpdates");
+        wu.setUrl("ws://localhost:8088/tripUpdates");
         wu.setExecutor(Executors.newSingleThreadExecutor());
         wu.start();
     }

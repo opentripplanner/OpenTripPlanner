@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.prefs.Preferences;
 
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.updater.PeriodicTimerGraphUpdater;
+import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.stoptime.GTFSZMQUpdateStreamer;
 import org.opentripplanner.updater.stoptime.GtfsRealtimeHttpUpdateStreamer;
 import org.opentripplanner.updater.stoptime.KV8ZMQUpdateStreamer;
@@ -83,8 +83,8 @@ public class StopTimeUpdateConfigurator implements PreferencesConfigurable {
         long frequencySec = preferences.getLong("frequencySec", DEFAULT_UPDATE_FREQ_SEC);
         LOG.info("Creating stop time updater running every {} seconds : {}", frequencySec,
                 updateStreamer);
-        PeriodicTimerGraphUpdater periodicGraphUpdater = graph
-                .getService(PeriodicTimerGraphUpdater.class);
+        GraphUpdaterManager periodicGraphUpdater = graph
+                .getService(GraphUpdaterManager.class);
         periodicGraphUpdater.addUpdater(updater, frequencySec * 1000);
     }
 }

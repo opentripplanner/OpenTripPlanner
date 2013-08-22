@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.prefs.Preferences;
 
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.updater.PeriodicTimerGraphUpdater;
+import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.bike_rental.BCycleBikeRentalDataSource;
 import org.opentripplanner.updater.bike_rental.BikeRentalDataSource;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater2;
@@ -83,8 +83,8 @@ public class BikeRentalConfigurator implements PreferencesConfigurable {
         long frequencySec = preferences.getLong("frequencySec", DEFAULT_UPDATE_FREQ_SEC);
         LOG.info("Creating bike-rental updater running every {} seconds : {}", frequencySec,
                 source);
-        PeriodicTimerGraphUpdater periodicGraphUpdater = graph
-                .getService(PeriodicTimerGraphUpdater.class);
+        GraphUpdaterManager periodicGraphUpdater = graph
+                .getService(GraphUpdaterManager.class);
         periodicGraphUpdater.addUpdater(updater, frequencySec * 1000);
     }
 }

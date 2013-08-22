@@ -34,9 +34,9 @@ import org.slf4j.LoggerFactory;
  * ScheduledExecutorService for implementation.
  * 
  */
-public class PeriodicTimerGraphUpdater {
+public class GraphUpdaterManager {
 
-    private static Logger LOG = LoggerFactory.getLogger(PeriodicTimerGraphUpdater.class);
+    private static Logger LOG = LoggerFactory.getLogger(GraphUpdaterManager.class);
 
     /** 
      * OTP's multi-version concurrency control model for graph updating allows simultaneous reads,
@@ -48,7 +48,7 @@ public class PeriodicTimerGraphUpdater {
 
     List<GraphUpdaterRunnable> updaters = new ArrayList<GraphUpdaterRunnable>();
 
-    public PeriodicTimerGraphUpdater() {
+    public GraphUpdaterManager() {
     }
 
     public void stop() {

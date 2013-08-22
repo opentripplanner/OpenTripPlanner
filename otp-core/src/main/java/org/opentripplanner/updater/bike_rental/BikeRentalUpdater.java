@@ -34,7 +34,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.updater.GraphUpdaterRunnable;
-import org.opentripplanner.updater.PeriodicTimerGraphUpdater;
+import org.opentripplanner.updater.GraphUpdaterManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +46,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * to take care of graph eviction himself which is a bit brittle.
  * 
  * @see BikeRentalUpdater2
- * @see PeriodicTimerGraphUpdater
+ * @see GraphUpdaterManager
  * @see PeriodicGraphUpdater
  * 
  */

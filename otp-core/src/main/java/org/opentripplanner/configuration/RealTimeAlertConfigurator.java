@@ -19,7 +19,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.PatchServiceImpl;
 import org.opentripplanner.routing.services.PatchService;
 import org.opentripplanner.updater.GtfsRealtimeUpdater;
-import org.opentripplanner.updater.PeriodicTimerGraphUpdater;
+import org.opentripplanner.updater.GraphUpdaterManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,8 +57,8 @@ public class RealTimeAlertConfigurator implements PreferencesConfigurable {
         long frequencySec = preferences.getLong("frequencySec", DEFAULT_UPDATE_FREQ_SEC);
         LOG.info("Creating real-time alert updater running every {} seconds : {}", frequencySec,
                 url);
-        PeriodicTimerGraphUpdater periodicGraphUpdater = graph
-                .getService(PeriodicTimerGraphUpdater.class);
+        GraphUpdaterManager periodicGraphUpdater = graph
+                .getService(GraphUpdaterManager.class);
         periodicGraphUpdater.addUpdater(realTimeUpdater, frequencySec * 1000);
     }
 }
