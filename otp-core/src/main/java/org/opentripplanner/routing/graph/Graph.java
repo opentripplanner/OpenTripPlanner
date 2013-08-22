@@ -52,6 +52,7 @@ import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.configuration.GraphUpdaterConfigurator;
 import org.opentripplanner.gbannotation.GraphBuilderAnnotation;
 import org.opentripplanner.gbannotation.NoFutureDates;
 import org.opentripplanner.model.GraphBundle;
@@ -64,6 +65,7 @@ import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
+import org.opentripplanner.updater.GraphUpdaterManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,10 +126,22 @@ public class Graph implements Serializable {
     
     /**
      * Makes it possible to embed a default configuration inside a graph.
+     * 
      * @see EmbeddedConfigGraphBuilderImpl
      */
-    @Getter @Setter
+    @Getter
+    @Setter
     private Properties embeddedPreferences = null;
+
+    /**
+     * Manages all updaters of this graph. Is created by the GraphUpdaterConfigurator when there are
+     * graph updaters defined in the configuration.
+     * 
+     * @see GraphUpdaterConfigurator
+     */
+    @Getter
+    @Setter
+    private transient GraphUpdaterManager updaterManager = null;
 
     public Graph(Graph basedOn) {
         this();

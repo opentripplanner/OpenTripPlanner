@@ -83,8 +83,7 @@ public class BikeRentalConfigurator implements PreferencesConfigurable {
         long frequencySec = preferences.getLong("frequencySec", DEFAULT_UPDATE_FREQ_SEC);
         LOG.info("Creating bike-rental updater running every {} seconds : {}", frequencySec,
                 source);
-        GraphUpdaterManager periodicGraphUpdater = graph
-                .getService(GraphUpdaterManager.class);
-        periodicGraphUpdater.addUpdater(updater, frequencySec * 1000);
+        GraphUpdaterManager updaterManager = graph.getUpdaterManager();
+        updaterManager.addUpdater(updater, frequencySec * 1000);
     }
 }

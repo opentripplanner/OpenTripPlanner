@@ -57,8 +57,7 @@ public class RealTimeAlertConfigurator implements PreferencesConfigurable {
         long frequencySec = preferences.getLong("frequencySec", DEFAULT_UPDATE_FREQ_SEC);
         LOG.info("Creating real-time alert updater running every {} seconds : {}", frequencySec,
                 url);
-        GraphUpdaterManager periodicGraphUpdater = graph
-                .getService(GraphUpdaterManager.class);
-        periodicGraphUpdater.addUpdater(realTimeUpdater, frequencySec * 1000);
+        GraphUpdaterManager updaterManager = graph.getUpdaterManager();
+        updaterManager.addUpdater(realTimeUpdater, frequencySec * 1000);
     }
 }

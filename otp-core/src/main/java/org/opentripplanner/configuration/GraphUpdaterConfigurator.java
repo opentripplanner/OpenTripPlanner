@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * When a graph is unloaded, one must ensure the shutdownGraph() method is called to cleanup all
  * resources that could have been created.
  * 
- * This class then create "configurables" (usually real-time connector, etc...) depending on the
+ * This class then creates "graph updaters" (usually real-time connector, etc...) depending on the
  * given configuration, and configure them using the corresponding children Preferences node.
  * 
  * If an embedded configuration is present in the graph, we also try to use it. In case of conflicts
@@ -62,8 +62,8 @@ public class GraphUpdaterConfigurator {
 
     public void setupGraph(Graph graph, Preferences mainConfig) {
         // Create a periodic updater per graph
-        GraphUpdaterManager periodicUpdater = graph.getService(
-                GraphUpdaterManager.class, true);
+        GraphUpdaterManager updaterManager = new GraphUpdaterManager();
+        graph.setUpdaterManager(updaterManager);
 
         // Look for embedded config if it exists
         Properties embeddedGraphPreferences = graph.getEmbeddedPreferences();
@@ -75,10 +75,10 @@ public class GraphUpdaterConfigurator {
                 + (embeddedConfig == null ? "" : "[embedded]"));
         applyConfigurationToGraph(graph, Arrays.asList(mainConfig, embeddedConfig));
 
-        // Delete the periodic updater if it contains nothing
-        if (periodicUpdater.size() == 0) {
-            periodicUpdater.stop();
-            graph.putService(GraphUpdaterManager.class, null);
+        // Delete the updater manager if it contains nothing
+        if (updaterManager.size() == 0) {
+            updaterManager.stop();
+            graph.setUpdaterManager(null);
         }
     }
 
@@ -119,11 +119,10 @@ public class GraphUpdaterConfigurator {
     }
 
     public void shutdownGraph(Graph graph) {
-        GraphUpdaterManager periodicUpdater = graph
-                .getService(GraphUpdaterManager.class);
-        if (periodicUpdater != null) {
-            LOG.info("Stopping periodic updater with " + periodicUpdater.size() + " updaters.");
-            periodicUpdater.stop();
+        GraphUpdaterManager updaterManager = graph.getUpdaterManager();
+        if (updaterManager != null) {
+            LOG.info("Stopping periodic updater with " + updaterManager.size() + " updaters.");
+            updaterManager.stop();
         }
     }
 }

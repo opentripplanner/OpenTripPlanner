@@ -83,8 +83,7 @@ public class StopTimeUpdateConfigurator implements PreferencesConfigurable {
         long frequencySec = preferences.getLong("frequencySec", DEFAULT_UPDATE_FREQ_SEC);
         LOG.info("Creating stop time updater running every {} seconds : {}", frequencySec,
                 updateStreamer);
-        GraphUpdaterManager periodicGraphUpdater = graph
-                .getService(GraphUpdaterManager.class);
-        periodicGraphUpdater.addUpdater(updater, frequencySec * 1000);
+        GraphUpdaterManager updaterManager = graph.getUpdaterManager();
+        updaterManager.addUpdater(updater, frequencySec * 1000);
     }
 }
