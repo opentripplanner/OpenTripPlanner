@@ -23,7 +23,7 @@ otp.widgets.Dialogs = {
             title : title,
             appendTo: 'body',
             modal: true,
-            zIndex: 1000000,
+            zIndex: 100000,
         });
         
         dialog.find(".okButton").button().click(function() {
@@ -38,7 +38,7 @@ otp.widgets.Dialogs = {
             title : title,
             appendTo: 'body',
             modal: true,
-            zIndex: 1000000,
+            zIndex: 100000,
         });
         
         dialog.find(".yesButton").button().click(function() {
@@ -60,7 +60,7 @@ otp.widgets.Dialogs = {
             title : title,
             appendTo: 'body',
             modal: true,
-            zIndex: 1000000,
+            zIndex: 100000,
         });
         
         //dialog.resizable({ alsoResize: dialog.find('.textarea') });
