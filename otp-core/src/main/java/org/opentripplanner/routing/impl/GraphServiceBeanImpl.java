@@ -17,7 +17,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
-import org.opentripplanner.configuration.GraphRuntimeConfigurator;
+import org.opentripplanner.configuration.GraphUpdaterConfigurator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.services.GraphService;
@@ -38,7 +38,7 @@ public class GraphServiceBeanImpl implements GraphService {
 
     public GraphServiceBeanImpl(Graph graph) {
         this.graph = graph;
-        GraphRuntimeConfigurator decorator = new GraphRuntimeConfigurator();
+        GraphUpdaterConfigurator decorator = new GraphUpdaterConfigurator();
         decorator.setupGraph(graph, null);
     }
 

@@ -47,9 +47,9 @@ import org.slf4j.LoggerFactory;
  * *not* merged.
  * 
  */
-public class GraphRuntimeConfigurator {
+public class GraphUpdaterConfigurator {
 
-    private static Logger LOG = LoggerFactory.getLogger(GraphRuntimeConfigurator.class);
+    private static Logger LOG = LoggerFactory.getLogger(GraphUpdaterConfigurator.class);
 
     private static Map<String, Class<? extends PreferencesConfigurable>> configurables;
 
