@@ -18,16 +18,47 @@ otp.core.TransitIndex = otp.Class({
 
     webapp          : null,
 
+    agencies        : null,
     routes          : null,
-    routesLoaded    : false,
     
     initialize : function(webapp) {
         this.webapp = webapp;
     },
-    
+
+    loadAgencies : function(callbackTarget, callback) {
+        var this_ = this;
+        if(this.agencies) {
+            if(callback) callback.call(callbackTarget);
+            return;
+        }
+        
+        var url = otp.config.hostname + '/opentripplanner-api-webapp/ws/transit/agencyIds';
+        $.ajax(url, {
+            dataType:   'jsonp',
+            
+            data: {
+                extended: 'true',
+            },
+                
+            success: function(data) {
+                this_.agencies = {};
+
+                for(var i=0; i<data.agencies.length; i++) {
+                    var agencyData = data.agencies[i];
+                    this_.agencies[agencyData.id] = {
+                        index : i,
+                        agencyData : agencyData,
+                    };
+                }
+
+                if(callback) callback.call(callbackTarget);
+            }            
+        });
+    },
+
     loadRoutes : function(callbackTarget, callback) {
         var this_ = this;
-        if(this.routesLoaded) {
+        if(this.routes) {
             if(callback) callback.call(callbackTarget);
             return;
         }
@@ -70,7 +101,6 @@ otp.core.TransitIndex = otp.Class({
                     };
                 }
                 this_.routes = routes;
-                this_.routesLoaded = true;
                 if(callback) callback.call(callbackTarget);
             }            
         });        

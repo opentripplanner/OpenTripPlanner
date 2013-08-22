@@ -126,7 +126,8 @@ otp.modules.planner.PlannerModule =
         this.addLayer("Start/End Markers", this.markerLayer);
         this.addLayer("Paths", this.pathLayer);
         this.addLayer("Path Markers", this.pathMarkerLayer);
-        
+
+        this.webapp.transitIndex.loadAgencies(this);
         this.webapp.transitIndex.loadRoutes(this, function() {
             this.routesLoaded();
         });
