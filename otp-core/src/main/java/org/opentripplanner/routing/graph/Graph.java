@@ -36,9 +36,13 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
+
+import lombok.Getter;
+import lombok.Setter;
 
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.Agency;
@@ -117,6 +121,13 @@ public class Graph implements Serializable {
     private VertexComparatorFactory vertexComparatorFactory = new MortonVertexComparatorFactory();
 
     private transient TimeZone timeZone = null;
+    
+    /**
+     * Makes it possible to embed a default configuration inside a graph.
+     * @see EmbeddedConfigGraphBuilderImpl
+     */
+    @Getter @Setter
+    private Properties embeddedPreferences = null;
 
     public Graph(Graph basedOn) {
         this();

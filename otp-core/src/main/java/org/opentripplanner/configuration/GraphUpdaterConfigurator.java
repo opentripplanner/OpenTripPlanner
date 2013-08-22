@@ -18,12 +18,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.services.EmbeddedConfigService;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,10 +66,10 @@ public class GraphUpdaterConfigurator {
                 GraphUpdaterManager.class, true);
 
         // Look for embedded config if it exists
-        EmbeddedConfigService embeddedConfigService = graph.getService(EmbeddedConfigService.class);
+        Properties embeddedGraphPreferences = graph.getEmbeddedPreferences();
         Preferences embeddedConfig = null;
-        if (embeddedConfigService != null) {
-            embeddedConfig = new PropertiesPreferences(embeddedConfigService.getProperties());
+        if (embeddedGraphPreferences != null) {
+            embeddedConfig = new PropertiesPreferences(embeddedGraphPreferences);
         }
         LOG.info("Using configurations: " + (mainConfig == null ? "" : "[main]") + " "
                 + (embeddedConfig == null ? "" : "[embedded]"));

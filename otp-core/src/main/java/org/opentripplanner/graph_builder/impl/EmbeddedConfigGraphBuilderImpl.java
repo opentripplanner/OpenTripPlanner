@@ -25,7 +25,6 @@ import lombok.Setter;
 
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.services.EmbeddedConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,11 +60,9 @@ public class EmbeddedConfigGraphBuilderImpl implements GraphBuilder {
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         try {
             LOG.info("Bundling config '" + propertiesFile.getPath() + "' into graph.");
-            EmbeddedConfigService embeddedConfig = graph.getService(EmbeddedConfigService.class,
-                    true);
             Properties props = new Properties();
             props.load(new FileInputStream(propertiesFile));
-            embeddedConfig.setProperties(props);
+            graph.setEmbeddedPreferences(props);
         } catch (IOException e) {
             LOG.error("Can't load properties from '" + propertiesFile.getAbsolutePath() + "'", e);
         }
