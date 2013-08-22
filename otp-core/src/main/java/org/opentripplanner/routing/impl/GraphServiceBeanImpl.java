@@ -17,7 +17,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 
-import org.opentripplanner.configuration.GraphUpdaterConfigurator;
+import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.services.GraphService;

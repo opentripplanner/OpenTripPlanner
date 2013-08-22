@@ -9,7 +9,7 @@ import java.util.prefs.Preferences;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonProcessingException;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.opentripplanner.configuration.PreferencesConfigurable;
+import org.opentripplanner.updater.PreferencesConfigurable;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.HttpUtils;

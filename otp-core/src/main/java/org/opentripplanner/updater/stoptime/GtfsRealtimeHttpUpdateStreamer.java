@@ -19,7 +19,7 @@ import java.util.prefs.Preferences;
 
 import lombok.Setter;
 
-import org.opentripplanner.configuration.PreferencesConfigurable;
+import org.opentripplanner.updater.PreferencesConfigurable;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;

@@ -13,8 +13,6 @@
 
 package org.opentripplanner.updater;
 
-import org.opentripplanner.configuration.PreferencesConfigurable;
-
 /**
  * Interface for graph updaters. Objects that implement this interface should always be configured
  * via PreferencesConfigurable.configure after creating the object. GraphUpdaterConfigurator should
@@ -22,7 +20,7 @@ import org.opentripplanner.configuration.PreferencesConfigurable;
  * 
  * @see GraphUpdaterConfigurator
  */
-public interface GraphUpdater extends Runnable, PreferencesConfigurable {
+public interface GraphUpdater extends PreferencesConfigurable {
 
     /**
      * Graph updaters must be aware of their manager to be able to push GraphWriterRunnables on the
@@ -33,6 +31,8 @@ public interface GraphUpdater extends Runnable, PreferencesConfigurable {
      * @see GraphUpdaterManager.execute
      */
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager);
+    
+    public void run();
 
     public void setup();
 

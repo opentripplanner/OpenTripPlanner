@@ -106,15 +106,26 @@ public class GraphUpdaterManager {
         }
     }
 
-    public void addUpdater(GraphUpdater updater) {
+    public void addUpdater(final GraphUpdater updater) {
         updater.setup();
-        updaterPool.execute(updater);
+        updaterPool.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    updater.run();
+                } catch (Exception e) {
+                    LOG.error("Error while running updater " + updater.getClass().getName(), e);
+                    // TODO Should we cancel the task? Or after n consecutive failures?
+                    // cancel();
+                }
+            }
+        });
         updaterList.add(updater);
     }
     
     /**
      * This is the method to use to modify the graph. The runnables will be scheduled after each
-     * other, guaranteeing that only one of these runnables will be active at a time.
+     * other, guaranteeing that only one of these runnables will be active at any time.
      * 
      * @param runnable is a graph writer runnable
      */

@@ -17,7 +17,7 @@ import javax.annotation.PostConstruct;
 
 import lombok.Setter;
 
-import org.opentripplanner.configuration.PreferencesConfigurable;
+import org.opentripplanner.updater.PreferencesConfigurable;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.TripUpdateList;
 import org.opentripplanner.routing.trippattern.Update;

@@ -7,7 +7,7 @@ import java.util.prefs.Preferences;
 import lombok.AllArgsConstructor;
 import lombok.Setter;
 
-import org.opentripplanner.configuration.PreferencesConfigurable;
+import org.opentripplanner.updater.PreferencesConfigurable;
 import org.opentripplanner.routing.graph.Graph;
 
 import com.google.protobuf.InvalidProtocolBufferException;

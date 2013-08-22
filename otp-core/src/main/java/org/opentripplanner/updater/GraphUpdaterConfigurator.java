@@ -11,7 +11,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.configuration;
+package org.opentripplanner.updater;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -26,6 +26,7 @@ import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GtfsRealtimeUpdater;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater2;
+import org.opentripplanner.updater.example.ExampleGraphUpdater;
 import org.opentripplanner.updater.stoptime.StoptimeUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,6 +116,9 @@ public class GraphUpdaterConfigurator {
                         }
                         else if (type.equals("real-time-alerts")) {
                             updater = new GtfsRealtimeUpdater();
+                        }
+                        else if (type.equals("example-updater")) {
+                            updater = new ExampleGraphUpdater();
                         }
                     }
                     
