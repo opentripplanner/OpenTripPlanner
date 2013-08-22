@@ -15,6 +15,7 @@ package org.opentripplanner.updater;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -23,15 +24,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Graph updater running a list of GraphUpdaterRunnable periodically. This class is attached to the
- * graph as a service:
+ * This class is attached to the graph:
  * 
  * <pre>
- * PeriodicTimerGraphUpdater periodicGraphUpdater = graph.getService(PeriodicTimerGraphUpdater.class);
+ * GraphUpdaterManager updaterManager = graph.getUpdaterManager();
  * </pre>
  * 
- * Each GraphUpdaterRunnable can have it's own frequency. We rely on standard Java
- * ScheduledExecutorService for implementation.
+ * Each updater will run in its own thread. When changes to the graph have to be made, this should 
+ * be done via the scheduler to prevent race conditions between multiple updaters. 
  * 
  */
 public class GraphUpdaterManager {
@@ -45,13 +45,33 @@ public class GraphUpdaterManager {
      * scheduled with the ExecutorService to run at regular intervals.
      */
     private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-
-    List<GraphUpdaterRunnable> updaters = new ArrayList<GraphUpdaterRunnable>();
+    
+    private ExecutorService updaterPool = Executors.newCachedThreadPool(); 
+    
+    List<GraphUpdaterRunnable> updaterList = new ArrayList<GraphUpdaterRunnable>();
 
     public GraphUpdaterManager() {
     }
 
     public void stop() {
+        // Shutdown updaters
+        for (GraphUpdaterRunnable updater : updaterList) {
+            updater.teardown();
+        }
+
+        updaterPool.shutdownNow();
+        try {
+            boolean ok = updaterPool.awaitTermination(30, TimeUnit.SECONDS);
+            if (!ok) {
+                LOG.warn("Timeout waiting for updaters to finish.");
+            }
+        } catch (InterruptedException e) {
+            // This should not happen
+            LOG.warn("Interrupted while waiting for updaters to finish.");
+        }
+        
+        
+        // Shutdown scheduler
         scheduler.shutdownNow();
         try {
             boolean ok = scheduler.awaitTermination(30, TimeUnit.SECONDS);
@@ -61,9 +81,6 @@ public class GraphUpdaterManager {
         } catch (InterruptedException e) {
             // This should not happen
             LOG.warn("Interrupted while waiting for scheduled task to finish.");
-        }
-        for (GraphUpdaterRunnable updater : updaters) {
-            updater.teardown();
         }
     }
 
@@ -81,11 +98,13 @@ public class GraphUpdaterManager {
                 }
             }
         }, 0, frequencyMs, TimeUnit.MILLISECONDS);
-        updaters.add(updater);
+        updaterList.add(updater);
     }
+    
+//    public void 
 
     public int size() {
-        return updaters.size();
+        return updaterList.size();
     }
 
 }

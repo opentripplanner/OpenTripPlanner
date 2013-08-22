@@ -15,9 +15,12 @@ package org.opentripplanner.updater;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.prefs.Preferences;
 
 import lombok.Setter;
 
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.impl.PatchServiceImpl;
 import org.opentripplanner.routing.services.PatchService;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
@@ -26,8 +29,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.transit.realtime.GtfsRealtime;
 
-public class GtfsRealtimeUpdater implements GraphUpdaterRunnable {
-    private static final Logger log = LoggerFactory.getLogger(GtfsRealtimeUpdater.class);
+public class GtfsRealtimeUpdater implements GraphUpdaterRunnable, GraphUpdater {
+    private static final Logger LOG = LoggerFactory.getLogger(GtfsRealtimeUpdater.class);
+
+    private static final long DEFAULT_UPDATE_FREQ_SEC = 60;
 
     private Long lastTimestamp = Long.MIN_VALUE;
 
@@ -66,7 +71,7 @@ public class GtfsRealtimeUpdater implements GraphUpdaterRunnable {
             
             long feedTimestamp = feed.getHeader().getTimestamp();
             if(feedTimestamp <= lastTimestamp) {
-                log.info("Ignoring feed with an old timestamp.");
+                LOG.info("Ignoring feed with an old timestamp.");
                 return;
             }
         
@@ -74,7 +79,7 @@ public class GtfsRealtimeUpdater implements GraphUpdaterRunnable {
         
             lastTimestamp = feedTimestamp;
         } catch (IOException e) {
-            log.error("Eror reading gtfs-realtime feed from " + url, e);
+            LOG.error("Eror reading gtfs-realtime feed from " + url, e);
         }
     }
 
@@ -89,5 +94,35 @@ public class GtfsRealtimeUpdater implements GraphUpdaterRunnable {
 
     public String toString() {
         return "GtfsRealtimeUpdater(" + url + ")";
+    }
+
+    /**
+     * Configure GTFS real-time alert updater
+     * 
+     * Usage example ('myalert' name is an example):
+     * 
+     * <pre>
+     * myalert.type = real-time-alerts
+     * myalert.frequencySec = 60
+     * myalert.url = http://host.tld/path
+     * myalert.earlyStartSec = 3600
+     * myalert.defaultAgencyId = TA
+     * </pre>
+     * 
+     */
+    @Override
+    public void configure(Graph graph, Preferences preferences) throws Exception {
+        GtfsRealtimeUpdater realTimeUpdater = new GtfsRealtimeUpdater();
+        PatchService patchService = new PatchServiceImpl(graph);
+        realTimeUpdater.setPatchService(patchService);
+        String url = preferences.get("url", null);
+        if (url == null)
+            throw new IllegalArgumentException("Missing mandatory 'url' parameter");
+        realTimeUpdater.setUrl(url);
+        realTimeUpdater.setEarlyStart(preferences.getInt("earlyStartSec", 0));
+        realTimeUpdater.setDefaultAgencyId(preferences.get("defaultAgencyId", null));
+        long frequencySec = preferences.getLong("frequencySec", DEFAULT_UPDATE_FREQ_SEC);
+        LOG.info("Creating real-time alert updater running every {} seconds : {}", frequencySec,
+                url);
     }
 }

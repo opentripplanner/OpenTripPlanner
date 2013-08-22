@@ -24,7 +24,11 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
+import org.opentripplanner.updater.GtfsRealtimeUpdater;
+import org.opentripplanner.updater.bike_rental.BikeRentalUpdater2;
+import org.opentripplanner.updater.stoptime.StoptimeUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,15 +55,6 @@ public class GraphUpdaterConfigurator {
 
     private static Logger LOG = LoggerFactory.getLogger(GraphUpdaterConfigurator.class);
 
-    private static Map<String, Class<? extends PreferencesConfigurable>> configurables;
-
-    static {
-        configurables = new HashMap<String, Class<? extends PreferencesConfigurable>>();
-        configurables.put("bike-rental", BikeRentalConfigurator.class);
-        configurables.put("stop-time-updater", StopTimeUpdateConfigurator.class);
-        configurables.put("real-time-alerts", RealTimeAlertConfigurator.class);
-    }
-
     public void setupGraph(Graph graph, Preferences mainConfig) {
         // Create a periodic updater per graph
         GraphUpdaterManager updaterManager = new GraphUpdaterManager();
@@ -73,7 +68,9 @@ public class GraphUpdaterConfigurator {
         }
         LOG.info("Using configurations: " + (mainConfig == null ? "" : "[main]") + " "
                 + (embeddedConfig == null ? "" : "[embedded]"));
-        applyConfigurationToGraph(graph, Arrays.asList(mainConfig, embeddedConfig));
+        
+        // Apply configuration 
+        updaterManager = applyConfigurationToGraph(graph, updaterManager, Arrays.asList(mainConfig, embeddedConfig));
 
         // Delete the updater manager if it contains nothing
         if (updaterManager.size() == 0) {
@@ -85,8 +82,12 @@ public class GraphUpdaterConfigurator {
     /**
      * Apply a list of configs to a graph. Please note that the order of the config in the list *is
      * important* as a child node already seen will not be overriden.
+     * @param graph
+     * @param updaterManager is the graph updater manager to which all updaters should be added
+     * @param configs is the list of configs.
+     * @return reference to the same updaterManager as was given as input   
      */
-    private void applyConfigurationToGraph(Graph graph, List<Preferences> configs) {
+    private GraphUpdaterManager applyConfigurationToGraph(Graph graph, GraphUpdaterManager updaterManager, List<Preferences> configs) {
         try {
             Set<String> configurableNames = new HashSet<String>();
             for (Preferences config : configs) {
@@ -96,32 +97,50 @@ public class GraphUpdaterConfigurator {
                     if (configurableNames.contains(configurableName))
                         continue; // Already processed
                     configurableNames.add(configurableName);
+                    
                     Preferences prefs = config.node(configurableName);
-                    String configurableType = prefs.get("type", null);
-                    Class<? extends PreferencesConfigurable> clazz = configurables
-                            .get(configurableType);
-                    if (clazz != null) {
-                        try {
-                            LOG.info("Configuring '{}' of type '{}' ({})", configurableName,
-                                    configurableType, clazz.getName());
-                            PreferencesConfigurable configurable = clazz.newInstance();
-                            configurable.configure(graph, prefs);
-                        } catch (Exception e) {
-                            LOG.error("Can't configure: " + configurableName, e);
-                            // Continue on next configurable
+                    String type = prefs.get("type", null);
+                    GraphUpdater updater = null;
+                    if (type != null) {
+                        if (type.equals("bike-rental")) {
+                            updater = new BikeRentalUpdater2();
                         }
+                        else if (type.equals("stop-time-updater")) {
+                            updater = new StoptimeUpdater();
+                        }
+                        else if (type.equals("real-time-alerts")) {
+                            updater = new GtfsRealtimeUpdater();
+                        }
+                    }
+                    
+                    try {
+                        // Check whether no updater type was found 
+                        if (updater == null) {
+                            LOG.error("Unknown updater type: " + type);
+                        }
+                        // Configure updater if found and necessary
+                        else if (updater instanceof PreferencesConfigurable) {
+                            ((PreferencesConfigurable) updater).configure(graph, prefs);
+                        }
+                        
+                        // TODO add to manager
+                    
+                    } catch (Exception e) {
+                        LOG.error("Can't configure: " + configurableName, e);
+                        // Continue on next configurable
                     }
                 }
             }
         } catch (BackingStoreException e) {
             LOG.error("Can't read configuration", e); // Should not happen
         }
+        return updaterManager;
     }
 
     public void shutdownGraph(Graph graph) {
         GraphUpdaterManager updaterManager = graph.getUpdaterManager();
         if (updaterManager != null) {
-            LOG.info("Stopping periodic updater with " + updaterManager.size() + " updaters.");
+            LOG.info("Stopping updater manager with " + updaterManager.size() + " updaters.");
             updaterManager.stop();
         }
     }

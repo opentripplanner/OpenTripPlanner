@@ -14,12 +14,15 @@
 package org.opentripplanner.updater.stoptime;
 
 import java.util.List;
+import java.util.prefs.Preferences;
+
 import javax.annotation.PostConstruct;
 
 import lombok.Setter;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.configuration.PreferencesConfigurable;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.edgetype.TimetableSnapshotSource;
@@ -27,6 +30,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.trippattern.TripUpdateList;
+import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,9 +40,11 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Update OTP stop time tables from some (realtime) source
  * @author abyrd
  */
-public class StoptimeUpdater implements GraphUpdaterRunnable, TimetableSnapshotSource {
+public class StoptimeUpdater implements GraphUpdaterRunnable, TimetableSnapshotSource, GraphUpdater {
 
     private static final Logger LOG = LoggerFactory.getLogger(StoptimeUpdater.class);
+
+    private static final long DEFAULT_UPDATE_FREQ_SEC = 60;
 
     @Setter
     @Autowired private GraphService graphService;
@@ -75,16 +81,14 @@ public class StoptimeUpdater implements GraphUpdaterRunnable, TimetableSnapshotS
     protected Graph graph;
     protected long lastSnapshotTime = -1;
     
-    /**
-     * No-arg constructor is needed for DI.
-     */
-    protected StoptimeUpdater() {
+    public StoptimeUpdater() {
     }
 
     /**
-     * Build a StoptimeUpdater binded to a single graph.
+     * Build a StoptimeUpdater binded to a single graph. Only used for tests.
      * @param graph
      */
+    @Deprecated
     public StoptimeUpdater(Graph graph) {
         init(graph);
     }
@@ -268,5 +272,59 @@ public class StoptimeUpdater implements GraphUpdaterRunnable, TimetableSnapshotS
         lastPurgeDate = previously;
         
         return buffer.purgeExpiredData(previously);
+    }
+
+    /**
+     * Configure stop time updater
+     * 
+     * Usage example ('rt' name is an example):
+     * 
+     * <pre>
+     * rt.type = stop-time-updater
+     * rt.frequencySec = 60
+     * rt.sourceType = gtfs-http
+     * rt.url = http://host.tld/path
+     * rt.defaultAgencyId = TA
+     * </pre>
+     * 
+     */
+    @Override
+    public void configure(Graph graph, Preferences preferences) throws Exception {
+        // Create update streamer from preferences
+        String sourceType = preferences.get("sourceType", null);
+        UpdateStreamer streamer = null;
+        if (sourceType != null) {
+            if (sourceType.equals("gtfs-http")) {
+                streamer = new GtfsRealtimeHttpUpdateStreamer();
+            }
+            else if (sourceType.equals("gtfs-zmq")) {
+                streamer = new GTFSZMQUpdateStreamer();
+            }
+            else if (sourceType.equals("kv8-zmq")) {
+                streamer = new KV8ZMQUpdateStreamer();
+            }
+        }
+        
+        if (streamer == null) {
+            throw new IllegalArgumentException("Unknown update streamer source type: " + sourceType);
+        }
+        else if (streamer instanceof PreferencesConfigurable) {
+            ((PreferencesConfigurable) streamer).configure(graph, preferences);
+        }
+        
+        // Configure updater
+        init(graph);
+        setUpdateStreamer(streamer);
+        // Configure the updater itself
+        int logFrequency = preferences.getInt("logFrequency", -1);
+        if (logFrequency >= 0)
+            setLogFrequency(logFrequency);
+        int maxSnapshotFrequency = preferences.getInt("maxSnapshotFrequencyMs", -1);
+        if (maxSnapshotFrequency >= 0)
+            setMaxSnapshotFrequency(maxSnapshotFrequency);
+        setPurgeExpiredData(preferences.getBoolean("purgeExpiredData", true));
+        long frequencySec = preferences.getLong("frequencySec", DEFAULT_UPDATE_FREQ_SEC);
+        LOG.info("Creating stop time updater running every {} seconds : {}", frequencySec,
+                streamer);
     }
 }
