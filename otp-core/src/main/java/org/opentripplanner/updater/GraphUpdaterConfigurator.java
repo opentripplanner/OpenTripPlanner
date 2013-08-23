@@ -29,6 +29,7 @@ import org.opentripplanner.updater.bike_rental.BikeRentalUpdater2;
 import org.opentripplanner.updater.example.ExampleGraphUpdater;
 import org.opentripplanner.updater.example.ExamplePollingGraphUpdater;
 import org.opentripplanner.updater.stoptime.StoptimeUpdater;
+import org.opentripplanner.updater.stoptime.WebsocketStoptimeUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,6 +116,9 @@ public class GraphUpdaterConfigurator {
                         else if (type.equals("stop-time-updater")) {
                             updater = new StoptimeUpdater();
                         }
+                        else if (type.equals("websocket-stop-time-updater")) {
+                            updater = new WebsocketStoptimeUpdater();
+                        }
                         else if (type.equals("real-time-alerts")) {
                             updater = new GtfsRealtimeUpdater();
                         }
@@ -132,17 +136,18 @@ public class GraphUpdaterConfigurator {
                         if (updater == null) {
                             LOG.error("Unknown updater type: " + type);
                         }
-                        // Configure updater if found and necessary
-                        else if (updater instanceof PreferencesConfigurable) {
-                            ((PreferencesConfigurable) updater).configure(graph, prefs);
+                        else {
+                            // Configure updater if found and necessary
+                            if (updater instanceof PreferencesConfigurable) {
+                                ((PreferencesConfigurable) updater).configure(graph, prefs);
+                            }
+                            
+                            // Add manager as parent
+                            updater.setGraphUpdaterManager(updaterManager);
+                            
+                            // Add graph updater to manager
+                            updaterManager.addUpdater(updater);
                         }
-                        
-                        // Add manager as parent
-                        updater.setGraphUpdaterManager(updaterManager);
-                        
-                        // Add graph updater to manager
-                        updaterManager.addUpdater(updater);
-                    
                     } catch (Exception e) {
                         LOG.error("Can't configure: " + configurableName, e);
                         // Continue on next configurable

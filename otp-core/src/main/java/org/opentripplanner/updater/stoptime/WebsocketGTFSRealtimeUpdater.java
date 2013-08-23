@@ -29,6 +29,7 @@ import com.ning.http.client.websocket.WebSocketUpgradeHandler;
  * 
  * @author abyrd
  */
+@Deprecated
 public class WebsocketGTFSRealtimeUpdater implements PreferencesConfigurable {
     
     /** The URL at which the websocket stream of GTFS-RT messages will be found. */

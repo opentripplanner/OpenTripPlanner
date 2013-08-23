@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.transit.realtime.GtfsRealtime;
 
+@Deprecated
 public abstract class GtfsRealtimeAbstractUpdateStreamer implements UpdateStreamer {
 
     private static final Logger LOG = LoggerFactory
