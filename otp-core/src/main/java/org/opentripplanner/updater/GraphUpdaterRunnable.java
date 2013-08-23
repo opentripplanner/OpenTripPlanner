@@ -21,6 +21,7 @@ package org.opentripplanner.updater;
  * locking is needed between any two different concurrent GraphUpdaterRunnable instances.
  * 
  */
+@Deprecated
 public interface GraphUpdaterRunnable {
 
     public void setup();

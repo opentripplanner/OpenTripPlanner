@@ -115,8 +115,6 @@ public class GraphUpdaterManager {
                     updater.run();
                 } catch (Exception e) {
                     LOG.error("Error while running updater " + updater.getClass().getName(), e);
-                    // TODO Should we cancel the task? Or after n consecutive failures?
-                    // cancel();
                 }
             }
         });
@@ -137,8 +135,6 @@ public class GraphUpdaterManager {
                     runnable.run(graph);
                 } catch (Exception e) {
                     LOG.error("Error while running graph writer " + runnable.getClass().getName(), e);
-                    // TODO Should we cancel the task? Or after n consecutive failures?
-                    // cancel();
                 }
             }
         }, 0, TimeUnit.MILLISECONDS);
