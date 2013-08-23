@@ -16,26 +16,33 @@ package org.opentripplanner.updater;
 /**
  * Interface for graph updaters. Objects that implement this interface should always be configured
  * via PreferencesConfigurable.configure after creating the object. GraphUpdaterConfigurator should
- * take care of that.
+ * take care of that. Beware that updaters run in separate threads at the same time.
  * 
+ * The only allowed way to make changes to the graph in an updater is by pushing (anonymous)
+ * GraphWriterRunnable objects on a queue via GraphUpdaterManager.execute.
+ * 
+ * An example implementation can be found in ExampleGraphUpdater.
+ * 
+ * @see ExampleGraphUpdater
+ * @see GraphUpdaterManager.execute
  * @see GraphUpdaterConfigurator
  */
 public interface GraphUpdater extends PreferencesConfigurable {
 
     /**
-     * Graph updaters must be aware of their manager to be able to push GraphWriterRunnables on the
-     * queue. GraphUpdaterConfigurator should take care of calling this function.
+     * Graph updaters must be aware of their manager to be able to execute GraphWriterRunnables.
+     * GraphUpdaterConfigurator should take care of calling this function.
      * 
      * @param updaterManager is the parent updater manager
      * @see GraphWriterRunnable
      * @see GraphUpdaterManager.execute
      */
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager);
-    
+
     public void run();
 
     public void setup();
 
     public void teardown();
-    
+
 }

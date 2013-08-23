@@ -17,6 +17,7 @@ import java.util.prefs.Preferences;
 
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdaterManager;
+import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,8 +28,16 @@ import org.slf4j.LoggerFactory;
  * function GraphUpdaterConfigurator.applyConfigurationToGraph.
  * 
  * This example is suited for polling updaters. For streaming updaters (aka push updaters) it is
- * better to use GraphUpdater interface directly for this purpose. The class ExampleGraphUpdater
+ * better to use the GraphUpdater interface directly for this purpose. The class ExampleGraphUpdater
  * shows an example of how to implement this.
+ * 
+ * Usage example ('polling-example' name is an example) in file 'Graph.properties':
+ * 
+ * <pre>
+ * polling-example.type = example-polling-updater
+ * polling-example.frequencySec = 60
+ * polling-example.url = https://api.updater.com/example-polling-updater
+ * </pre>
  * 
  * @see ExampleGraphUpdater
  * @see GraphUpdaterConfigurator.applyConfigurationToGraph
@@ -41,28 +50,8 @@ public class ExamplePollingGraphUpdater extends PollingGraphUpdater {
 
     private String url;
 
-    @Override
-    protected void runPolling() {
-        LOG.info("Run example polling updater with hashcode: {}", this.hashCode());
-        // Create example writer to "write to graph"
-        ExampleGraphWriter exampleWriter = new ExampleGraphWriter();
-        // Execute example writer
-        updaterManager.execute(exampleWriter);
-    }
-
-    /**
-     * Configure polling updater for example usage.
-     * 
-     * Usage example ('polling-example' name is an example):
-     * 
-     * <pre>
-     * polling-example.type = example-polling-updater
-     * polling-example.frequencySec = 60
-     * polling-example.url = https://api.updater.com/example-polling-updater
-     * </pre>
-     * 
-     * The property frequencySec is read and used by the abstract base class. 
-     */
+    // Here the updater can be configured using the properties in the file 'Graph.properties'.
+    // The property frequencySec is already read and used by the abstract base class.
     @Override
     protected void configurePolling(Graph graph, Preferences preferences) throws Exception {
         url = preferences.get("url", null);
@@ -70,20 +59,41 @@ public class ExamplePollingGraphUpdater extends PollingGraphUpdater {
                 getFrequencySec(), url);
     }
 
+    // Here the updater gets to know its parent manager to execute GraphWriterRunnables.
     @Override
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
         LOG.info("Example polling updater: updater manager is set");
         this.updaterManager = updaterManager;
     }
 
+    // Here the updater can be initialized.
     @Override
     public void setup() {
         LOG.info("Setup example polling updater");
     }
 
+    // This is where the updater thread receives updates and applies them to the graph.
+    // This method will be called every frequencySec seconds.
+    @Override
+    protected void runPolling() {
+        LOG.info("Run example polling updater with hashcode: {}", this.hashCode());
+        // Execute example graph writer
+        updaterManager.execute(new ExampleGraphWriter());
+    }
+
+    // Here the updater can cleanup after itself.
     @Override
     public void teardown() {
         LOG.info("Teardown example polling updater");
     }
-
+    
+    // This is a private GraphWriterRunnable that can be executed to modify the graph
+    private class ExampleGraphWriter implements GraphWriterRunnable {
+        @Override
+        public void run(Graph graph) {
+            LOG.info("ExampleGraphWriter {} runnable is run on the "
+                            + "graph writer scheduler.", this.hashCode());
+            // Do some writing to the graph here
+        }
+    }
 }

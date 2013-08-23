@@ -13,11 +13,13 @@
 
 package org.opentripplanner.updater.example;
 
+import java.util.concurrent.ExecutionException;
 import java.util.prefs.Preferences;
 
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
+import org.opentripplanner.updater.GraphWriterRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,9 +28,17 @@ import org.slf4j.LoggerFactory;
  * of the interface GraphUpdater, the updater also needs to be registered in the function
  * GraphUpdaterConfigurator.applyConfigurationToGraph.
  * 
- * While this example runs in a loop, it is better to use the abstract base class
- * PollingGraphUpdater for this purpose. The class ExamplePollingGraphUpdater shows an example of
+ * This example is suited for streaming updaters. For polling updaters it is better to use the
+ * abstract base class PollingGraphUpdater. The class ExamplePollingGraphUpdater shows an example of
  * this.
+ * 
+ * Usage example ('example' name is an example) in the file 'Graph.properties':
+ * 
+ * <pre>
+ * example.type = example-updater
+ * example.frequencySec = 60
+ * example.url = https://api.updater.com/example-updater
+ * </pre>
  * 
  * @see ExamplePollingGraphUpdater
  * @see GraphUpdaterConfigurator.applyConfigurationToGraph
@@ -43,36 +53,7 @@ public class ExampleGraphUpdater implements GraphUpdater {
 
     private String url;
 
-    @Override
-    public void run() {
-        try {
-            while (true) {
-                // Sleep a given number of seconds
-                Thread.sleep(frequencySec * 1000);
-                LOG.info("Run example updater with hashcode: {}", this.hashCode());
-                // Create example writer to "write to graph"
-                ExampleGraphWriter exampleWriter = new ExampleGraphWriter();
-                // Execute example writer
-                updaterManager.execute(exampleWriter);
-            }
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Configure updater for example usage.
-     * 
-     * Usage example ('example' name is an example):
-     * 
-     * <pre>
-     * example.type = example-updater
-     * example.frequencySec = 60
-     * example.url = https://api.updater.com/example-updater
-     * </pre>
-     * 
-     */
+    // Here the updater can be configured using the properties in the file 'Graph.properties'.
     @Override
     public void configure(Graph graph, Preferences preferences) throws Exception {
         frequencySec = preferences.getInt("frequencySec", 5);
@@ -80,17 +61,43 @@ public class ExampleGraphUpdater implements GraphUpdater {
         LOG.info("Configured example updater: frequencySec={} and url={}", frequencySec, url);
     }
 
+    // Here the updater gets to know its parent manager to execute GraphWriterRunnables.
     @Override
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
         LOG.info("Example updater: updater manager is set");
         this.updaterManager = updaterManager;
     }
 
+    // Here the updater can be initialized.
     @Override
     public void setup() {
         LOG.info("Setup example updater");
+        
+        // Execute anonymous graph writer runnable and wait for its termination
+        try {
+            updaterManager.executeBlocking(new GraphWriterRunnable() {
+                @Override
+                public void run(Graph graph) {
+                    LOG.info("Anonymous graph writer {} runnable is run on the "
+                            + "graph writer scheduler.", this.hashCode());
+                    // Do some writing to the graph here
+                }
+            });
+        } catch (InterruptedException e) {
+        } catch (ExecutionException e) {
+        }
     }
 
+    // This is where the updater thread receives updates and applies them to the graph.
+    // This method only runs once.
+    @Override
+    public void run() {
+        LOG.info("Run example updater with hashcode: {}", this.hashCode());
+        // Here the updater can connect to a server and register a callback function
+        // to handle updates to the graph
+    }
+
+    // Here the updater can cleanup after itself.
     @Override
     public void teardown() {
         LOG.info("Teardown example updater");
