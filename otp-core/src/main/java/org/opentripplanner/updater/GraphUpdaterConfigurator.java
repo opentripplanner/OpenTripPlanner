@@ -27,6 +27,7 @@ import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GtfsRealtimeUpdater;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater2;
 import org.opentripplanner.updater.example.ExampleGraphUpdater;
+import org.opentripplanner.updater.example.ExamplePollingGraphUpdater;
 import org.opentripplanner.updater.stoptime.StoptimeUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -119,6 +120,9 @@ public class GraphUpdaterConfigurator {
                         }
                         else if (type.equals("example-updater")) {
                             updater = new ExampleGraphUpdater();
+                        }
+                        else if (type.equals("example-polling-updater")) {
+                            updater = new ExamplePollingGraphUpdater();
                         }
                     }
                     

@@ -73,7 +73,8 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
             }
         } catch (InterruptedException e) {
             // When Thread.sleep is interrupted
-            e.printStackTrace();
+            LOG.error("Error while running polling updater of type {}: sleep interrupted, "
+                    + "updater stops.", type, e);
         }
     }
 

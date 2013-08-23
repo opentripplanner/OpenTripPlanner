@@ -18,10 +18,21 @@ import java.util.prefs.Preferences;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
-import org.opentripplanner.updater.GraphWriterRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This class shows an example of how to implement a graph updater. Besides implementing the methods
+ * of the interface GraphUpdater, the updater also needs to be registered in the function
+ * GraphUpdaterConfigurator.applyConfigurationToGraph.
+ * 
+ * While this example runs in a loop, it is better to use the abstract base class
+ * PollingGraphUpdater for this purpose. The class ExamplePollingGraphUpdater shows an example of
+ * this.
+ * 
+ * @see ExamplePollingGraphUpdater
+ * @see GraphUpdaterConfigurator.applyConfigurationToGraph
+ */
 public class ExampleGraphUpdater implements GraphUpdater {
 
     private static Logger LOG = LoggerFactory.getLogger(ExampleGraphUpdater.class);
@@ -38,7 +49,7 @@ public class ExampleGraphUpdater implements GraphUpdater {
             while (true) {
                 // Sleep a given number of seconds
                 Thread.sleep(frequencySec * 1000);
-                LOG.info("Example updater with hashcode: {}", this.hashCode());
+                LOG.info("Run example updater with hashcode: {}", this.hashCode());
                 // Create example writer to "write to graph"
                 ExampleGraphWriter exampleWriter = new ExampleGraphWriter();
                 // Execute example writer
@@ -58,7 +69,7 @@ public class ExampleGraphUpdater implements GraphUpdater {
      * <pre>
      * example.type = example-updater
      * example.frequencySec = 60
-     * example.url = https://api.jcdecaux.com/vls/v1/stations?contract=Xxx?apiKey=Zzz
+     * example.url = https://api.updater.com/example-updater
      * </pre>
      * 
      */
@@ -85,18 +96,4 @@ public class ExampleGraphUpdater implements GraphUpdater {
         LOG.info("Teardown example updater");
     }
 
-    private class ExampleGraphWriter implements GraphWriterRunnable {
-
-        @Override
-        public void run(Graph graph) {
-            LOG.info("Start running {} on writer scheduler. Wait 2 seconds...", this.hashCode());
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            LOG.info("End running {} on writer scheduler.", this.hashCode());
-        }
-    }
 }

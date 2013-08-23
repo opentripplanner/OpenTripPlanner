@@ -107,11 +107,11 @@ public class GraphUpdaterManager {
     }
 
     public void addUpdater(final GraphUpdater updater) {
-        updater.setup();
         updaterPool.execute(new Runnable() {
             @Override
             public void run() {
                 try {
+                    updater.setup();
                     updater.run();
                 } catch (Exception e) {
                     LOG.error("Error while running updater " + updater.getClass().getName(), e);
@@ -122,12 +122,14 @@ public class GraphUpdaterManager {
     }
     
     /**
-     * This is the method to use to modify the graph. The runnables will be scheduled after each
-     * other, guaranteeing that only one of these runnables will be active at any time.
+     * This is the method to use to modify the graph from the updaters. The runnables will be
+     * scheduled after each other, guaranteeing that only one of these runnables will be active at
+     * any time.
      * 
      * @param runnable is a graph writer runnable
      */
     public void execute(final GraphWriterRunnable runnable) {
+        // TODO: check for high water mark?
         scheduler.schedule(new Runnable() {
             @Override
             public void run() {
