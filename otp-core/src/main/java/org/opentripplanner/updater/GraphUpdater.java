@@ -18,12 +18,13 @@ package org.opentripplanner.updater;
  * via PreferencesConfigurable.configure after creating the object. GraphUpdaterConfigurator should
  * take care of that. Beware that updaters run in separate threads at the same time.
  * 
- * The only allowed way to make changes to the graph in an updater is by pushing (anonymous)
- * GraphWriterRunnable objects on a queue via GraphUpdaterManager.execute.
+ * The only allowed way to make changes to the graph in an updater is by executing (anonymous)
+ * GraphWriterRunnable objects via GraphUpdaterManager.execute.
  * 
- * An example implementation can be found in ExampleGraphUpdater.
+ * Example implementations can be found in ExampleGraphUpdater and ExamplePollingGraphUpdater.
  * 
  * @see ExampleGraphUpdater
+ * @see ExamplePollingGraphUpdater
  * @see GraphUpdaterManager.execute
  * @see GraphUpdaterConfigurator
  */
@@ -39,10 +40,20 @@ public interface GraphUpdater extends PreferencesConfigurable {
      */
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager);
 
-    public void run();
-
+    /**
+     * Here the updater can be initialized.
+     */
     public void setup();
 
+    /**
+     * This is where the updater thread receives updates and applies them to the graph. This method
+     * only runs once.
+     */
+    public void run();
+
+    /**
+     * Here the updater can cleanup after itself.
+     */
     public void teardown();
 
 }
