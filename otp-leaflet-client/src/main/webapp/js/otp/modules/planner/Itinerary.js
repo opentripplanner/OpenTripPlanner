@@ -58,7 +58,7 @@ otp.modules.planner.Itinerary = otp.Class({
             params.routerId = otp.config.routerId;
         }
         
-        var url = otp.config.hostname + '/otp-rest-servlet/ws/transit/stopTimesForStop';
+        var url = otp.config.hostname + '/' + otp.config.restService + '/ws/transit/stopTimesForStop';
         $.ajax(url, {
             data:       params,
             dataType:   'jsonp',
