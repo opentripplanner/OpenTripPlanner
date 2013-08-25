@@ -88,22 +88,38 @@
                 </div>
             {{/feedback}}
             
-            <div style="margin-top: 1em; border-bottom: 2px solid gray; font-weight: bold;">Agent Notes</div>
-            {{#notes}}
+            <div style="margin-top: 1em; border-bottom: 2px solid gray; font-weight: bold;">Internal Agent Notes</div>
+            {{#internalNotes}}
                 <div style="margin-top: 10px; background: #f0f0f0; font-size: 12px; padding: 6px;">
                     <div style="float:right; font-size: 8px;"><button class="deleteNoteButton-{{id}}">X</button></div>
                     {{note}}
                     <div style="margin-top: 6px; font-size: 11px; font-style: italic; text-align: right;">
-                        Submitted by {{userName}} on {{timeStamp}} / {{id}}
+                        Submitted by {{userName}} on {{timeStamp}}
                     </div>                    
                 </div>
-            {{/notes}}
-            {{^notes}}
+            {{/internalNotes}}
+            {{^internalNotes}}
                 <div style="margin-top: 10px; font-size: 12px; font-style: italic;">
-                    No notes.
+                    No internal notes.
                 </div>
-            {{/notes}}
-                        
+            {{/internalNotes}}
+
+            <div style="margin-top: 1em; border-bottom: 2px solid gray; font-weight: bold;">Operational Notes</div>
+            {{#operationalNotes}}
+                <div style="margin-top: 10px; background: #f0f0f0; font-size: 12px; padding: 6px;">
+                    <div style="float:right; font-size: 8px;"><button class="deleteNoteButton-{{id}}">X</button></div>
+                    {{note}}
+                    <div style="margin-top: 6px; font-size: 11px; font-style: italic; text-align: right;">
+                        Submitted by {{userName}} on {{timeStamp}}
+                    </div>                    
+                </div>
+            {{/operationalNotes}}
+            {{^operationalNotes}}
+                <div style="margin-top: 10px; font-size: 12px; font-style: italic;">
+                    No operational notes.
+                </div>
+            {{/operationalNotes}}
+
         </div>
         <!--<div style="position: absolute; bottom: 0px; height: 120px; left:0px; right: 0px;">-->
         <div class="otp-fieldTrip-requestWidget-tripBoxContainer" style="left:0px;">
@@ -271,3 +287,22 @@
     </div>
 </script>
 
+
+<script id="otp-fieldtrip-noteDialog" type="text/html">
+    <div style="position: relative;">
+        <div class="otp-dialogContent">
+            {{message}}
+            <div style="margin-top: 6px;">
+                <textarea class="borderBox textarea" style="z-index: 1000000; width: 100%; height: 3em;" />
+            </div>
+            <div style="margin-top: 5px;">Type:&nbsp;
+                <input type="radio" name="type" value="internal" checked> Internal&nbsp;&nbsp;
+                <input type="radio" name="type" value="operational"> Operational
+            </div>
+        </div>
+        <div class="otp-dialogButtonRow">
+            <button class="okButton">OK</button>
+            <button class="cancelButton">Cancel</button>
+        </div>
+    </div>
+</script>

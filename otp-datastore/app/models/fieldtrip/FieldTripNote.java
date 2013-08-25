@@ -47,6 +47,10 @@ public class FieldTripNote extends GenericModel {
     @Expose
     public Date timeStamp;
 
+    @Column
+    @Expose
+    public String type; // "internal" or "operational"
+        
     @PrePersist
     public void prePersist() {
         if (timeStamp == null) {

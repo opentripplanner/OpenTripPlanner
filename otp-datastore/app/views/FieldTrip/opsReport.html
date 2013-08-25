@@ -40,8 +40,10 @@
     <b>Headsign</b>: ${gtfsTrip.headsign}<br>
     <b>Notes</b>:
         #{list items:gtfsTrip.groupItinerary.fieldTrip.request.notes, as:'note'}
-            <br>
-            &nbsp;&bull; ${note.note} <i>(${note.userName}, ${(note.timeStamp).format("M-d-yyyy h:mma")})</i>
+            #{if note.type == "operational"}
+                <br>
+                &nbsp;&bull; ${note.note} <i>(${note.userName}, ${(note.timeStamp).format("M-d-yyyy h:mma")})</i>
+            #{/if}
         #{/list}
         #{else}
             (None)

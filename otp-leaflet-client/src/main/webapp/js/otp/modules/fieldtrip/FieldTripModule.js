@@ -773,7 +773,7 @@ otp.modules.fieldtrip.FieldTripModule =
         return true;
     },
     
-    addNote: function(request, note) {
+    addNote: function(request, note, type) {
         var this_ = this;
 
         $.ajax(this.datastoreUrl+'/fieldtrip/addNote', {
@@ -783,6 +783,7 @@ otp.modules.fieldtrip.FieldTripModule =
                 sessionId : this.sessionManager.sessionId,
                 requestId : request.id,
                 'note.note' : note,
+                'note.type' : type,
                 'note.userName' : this.sessionManager.username,
             },
             
