@@ -118,6 +118,7 @@ public class FieldTripRequest extends GenericModel  {
     public List<FieldTripNote> notes;
 
     @Expose
+    @Lob
     public String submitterNotes;
     
     @Expose
