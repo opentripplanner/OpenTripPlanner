@@ -180,4 +180,25 @@ public class GeometryUtils {
 
         return low + (differenceRequestedLow / differenceHighLow);
     }
+
+    /**
+     * Compute the length of part of a LineString object, built from an array of Coordinate objects.
+     *
+     * @return the length of a LineString, as built from the coordinates array, from start to index.
+     */
+    public static double computePartialLength(Coordinate[] coordinates, int index) {
+        if (index < 1) return 0;    // A line string consisting of a single point has a length of 0.
+        if (index >= coordinates.length) index = coordinates.length - 1;    // Check upper bound.
+
+        Coordinate[] array = new Coordinate[index + 1];
+
+        for (int i = 0; i <= index; i++) {
+            array[i] = coordinates[i];
+        }
+
+        CoordinateSequence sequence = gf.getCoordinateSequenceFactory().create(array);
+        LineString lineString = new LineString(sequence, gf);
+
+        return lineString.getLength();
+    }
 }
