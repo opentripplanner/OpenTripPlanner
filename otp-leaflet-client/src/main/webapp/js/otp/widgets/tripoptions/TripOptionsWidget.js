@@ -351,11 +351,20 @@ otp.widgets.tripoptions.TimeSelector =
         $('#'+this.id+'-time').val(moment().format(otp.config.timeFormat))
         .keyup(function() {
             if(otp.config.timeFormat.toLowerCase().charAt(otp.config.timeFormat.length-1) === 'a') {
-                var val = $(this).val();
+                var val = $(this).val().toLowerCase();
+                if(val.charAt(val.length-1) === 'm') {
+                    val = val.substring(0, val.length-1);
+                }
                 if(val.charAt(val.length-1) === 'a' || val.charAt(val.length-1) === 'p') {
                     if(otp.util.Text.isNumber(val.substring(0, val.length-1))) {
-                        var hour = parseInt(val.substring(0, val.length-1));
-                        if(hour >= 1 && hour <= 12) $(this).val(hour + ":00" + val.charAt(val.length-1) + "m")
+                        var num = parseInt(val.substring(0, val.length-1));
+                        if(num >= 1 && num <= 12) $(this).val(num + ":00" + val.charAt(val.length-1) + "m");
+                        else if(num >= 100) {
+                            var hour = Math.floor(num/100), min = num % 100;
+                            if(hour >= 1 && hour <= 12 && min >= 0 && min < 60) {
+                                $(this).val(hour + ":" + (min < 10 ? "0" : "") + min + val.charAt(val.length-1) + "m");
+                            }
+                        }
                     }
                 }
             }            
