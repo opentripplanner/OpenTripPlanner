@@ -30,7 +30,7 @@ public class DecayingDelayTripTimes extends DelegatingTripTimes {
     private final double lambda;
 
     public DecayingDelayTripTimes(ScheduledTripTimes sched, int currentStop, int delay) {
-        this(sched, currentStop, delay, 500, false, false);
+        this(sched, currentStop, delay, 500, true, false);
     }
     
     public DecayingDelayTripTimes(ScheduledTripTimes sched, int currentStop, int delay, 
