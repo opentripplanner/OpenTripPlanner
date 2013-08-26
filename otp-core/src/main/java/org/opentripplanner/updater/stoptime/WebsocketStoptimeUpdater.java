@@ -14,6 +14,7 @@
 package org.opentripplanner.updater.stoptime;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.prefs.Preferences;
 
 import org.opentripplanner.routing.graph.Graph;
@@ -38,6 +39,15 @@ import com.ning.http.client.websocket.WebSocketUpgradeHandler;
  * This class starts an HTTP client which opens a websocket connection to a GTFS-RT data source. A
  * callback is registered which handles incoming GTFS-RT messages as they stream in by placing a
  * GTFS-RT decoder Runnable task in the single-threaded executor for handling.
+ *
+ * Usage example ('example' name is an example) in the file 'Graph.properties':
+ * 
+ * <pre>
+ * websocket.type = websocket-stop-time-updater
+ * websocket.agencyId = agency
+ * websocket.url = ws://localhost:8088/tripUpdates
+ * </pre>
+ *  
  */
 public class WebsocketStoptimeUpdater implements GraphUpdater {
 
@@ -99,8 +109,10 @@ public class WebsocketStoptimeUpdater implements GraphUpdater {
         try {
             socket = client.prepareGet(url).execute(handler).get();
             // socket.sendMessage("I CAN HAZ GTFS-RT?".getBytes("UTF-8"));
+        } catch (ExecutionException e) {
+            LOG.error("Could not connect to {}: {}", url, e.getCause().getMessage());
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("Unknown exception when trying to connect to {}.", url, e);
         }
         // client.closeAsynchronously();
     }

@@ -18,25 +18,32 @@ import java.util.List;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.TripUpdateList;
 import org.opentripplanner.updater.GraphWriterRunnable;
+import org.opentripplanner.updater.RealtimeDataSnapshotSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TripUpdateListGraphWriterRunnable implements GraphWriterRunnable {
-    
+
     private static Logger LOG = LoggerFactory.getLogger(TripUpdateListGraphWriterRunnable.class);
-    
+
     /**
      * The list with updates to apply to the graph
      */
     private List<TripUpdateList> updates;
-    
+
     public TripUpdateListGraphWriterRunnable(List<TripUpdateList> updates) {
         this.updates = updates;
     }
-    
+
     @Override
     public void run(Graph graph) {
-        // TODO: Apply updates to graph
-        LOG.info("Updates: {}", updates);
+        // Apply updates to graph using realtime snapshot source
+        RealtimeDataSnapshotSource snapshotSource = graph.getRealtimeDataSnapshotSource();
+        if (snapshotSource != null) {
+            snapshotSource.applyTripUpdateLists(updates);
+        } else {
+            LOG.error("Could not find realtime data snapshot source in graph."
+                    + " The following updates are not applied: {}", updates);
+        }
     }
 }
