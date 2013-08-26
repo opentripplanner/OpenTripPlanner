@@ -80,7 +80,7 @@ otp.core.TransitIndex = otp.Class({
                 sortedRoutes.sort(function(a,b) {
                     a = a.routeShortName || a.routeLongName;
                     b = b.routeShortName || b.routeLongName;
-                    if(otp.util.Text.isNumber(a) && otp.util.Text.isNumber(a)) {
+                    if(otp.util.Text.isNumber(a) && otp.util.Text.isNumber(b)) {
                         if(parseFloat(a) < parseFloat(b)) return -1;
                         if(parseFloat(a) > parseFloat(b)) return 1;
                         return 0;

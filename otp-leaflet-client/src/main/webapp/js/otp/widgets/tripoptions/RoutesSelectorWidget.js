@@ -106,13 +106,7 @@ otp.widgets.RoutesSelectorWidget =
         selectedList.empty();
 
         this.ti.loadRoutes(this, function() {
-            console.log("routes:");
-            console.log(this.ti.routes);
-            //var restoredRouteIdArr = (this_.restoredRouteIds != null) ? this_.restoredRouteIds.split(',') : []; 
-            
             var i = 0;
-            //console.log('restoredRouteIdArr');
-            //console.log(restoredRouteIdArr);
             for(agencyAndId in this.ti.routes) {
                 var route = this.ti.routes[agencyAndId].routeData;
                 routesList.append('<option value="'+agencyAndId+'">'+otp.util.Itin.getRouteDisplayString(route)+'</option>');
