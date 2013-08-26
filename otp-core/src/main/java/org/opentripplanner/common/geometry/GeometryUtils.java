@@ -140,4 +140,44 @@ public class GeometryUtils {
             return 1.0;
         return r;
       }
+
+    /**
+     * Binary search method adapted from GNU Classpath Arrays.java (GPL).
+     * Search across an array of Coordinate objects, computing the length of the geometry described.
+     *
+     * @return the index at which the distance is as requested, or a value in between two indices if
+     * the match is not exact. In that case, the fractional part of the result will be proportional
+     * to the distance between the two coordinates and the desired distance.
+     */
+    public static double binarySearchCoordinates(
+            Coordinate[] coordinates, double requestedDistance) {
+        if (coordinates.length < 2) return 0;
+
+        int low = 0;
+        int high = coordinates.length - 1;
+        int middle;
+
+        if (requestedDistance <= computePartialLength(coordinates, low)) return low;
+        if (requestedDistance >= computePartialLength(coordinates, high)) return high;
+
+        while (low < high - 1) {
+            middle = (low + high) >>> 1;    // Shift right logical so the full range of int is used.
+            double middleDistance = computePartialLength(coordinates, middle);
+
+            if (requestedDistance > middleDistance) {
+                low = middle;
+            } else if (requestedDistance < middleDistance) {
+                high = middle;
+            } else {
+                return middle;
+            }
+        }
+
+        double lowDistance = computePartialLength(coordinates, low);
+        double highDistance = computePartialLength(coordinates, high);
+        double differenceHighLow = highDistance - lowDistance;
+        double differenceRequestedLow = requestedDistance - lowDistance;
+
+        return low + (differenceRequestedLow / differenceHighLow);
+    }
 }
