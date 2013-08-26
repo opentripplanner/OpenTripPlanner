@@ -59,13 +59,13 @@ import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
-import org.opentripplanner.routing.edgetype.TimetableSnapshotSource;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
+import org.opentripplanner.updater.RealtimeDataSnapshotSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,7 +110,9 @@ public class Graph implements Serializable {
 
     public transient StreetVertexIndexService streetIndex;
 
-    public transient TimetableSnapshotSource timetableSnapshotSource = null;
+    @Getter
+    @Setter
+    private transient RealtimeDataSnapshotSource realtimeDataSnapshotSource = null;
 
     private transient List<GraphBuilderAnnotation> graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>(); // initialize for tests
 

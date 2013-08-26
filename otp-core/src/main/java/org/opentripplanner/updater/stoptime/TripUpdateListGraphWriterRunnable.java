@@ -21,21 +21,22 @@ import org.opentripplanner.updater.GraphWriterRunnable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TripUpdateListGraphWriter implements GraphWriterRunnable {
+public class TripUpdateListGraphWriterRunnable implements GraphWriterRunnable {
     
-    private static Logger LOG = LoggerFactory.getLogger(TripUpdateListGraphWriter.class);
+    private static Logger LOG = LoggerFactory.getLogger(TripUpdateListGraphWriterRunnable.class);
     
     /**
      * The list with updates to apply to the graph
      */
     private List<TripUpdateList> updates;
     
-    public TripUpdateListGraphWriter(List<TripUpdateList> updates) {
+    public TripUpdateListGraphWriterRunnable(List<TripUpdateList> updates) {
         this.updates = updates;
     }
     
     @Override
     public void run(Graph graph) {
-        // Apply updates to graph
+        // TODO: Apply updates to graph
+        LOG.info("Updates: {}", updates);
     }
 }

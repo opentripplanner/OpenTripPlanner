@@ -20,6 +20,8 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.TripUpdateList;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
+import org.opentripplanner.updater.GraphWriterRunnable;
+import org.opentripplanner.updater.RealtimeDataSnapshotSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,6 +62,22 @@ public class WebsocketStoptimeUpdater implements GraphUpdater {
 
     @Override
     public void setup() {
+        // Create a realtime data snapshot source and wait for runnable to be executed
+        try {
+            updaterManager.executeBlocking(new GraphWriterRunnable() {
+                @Override
+                public void run(Graph graph) {
+                    // Only create a realtime data snapshot source if none exists already
+                    if (graph.getRealtimeDataSnapshotSource() == null) {
+                        RealtimeDataSnapshotSource snapshotSource = new RealtimeDataSnapshotSource(graph);
+                        // Add snapshot source to graph
+                        graph.setRealtimeDataSnapshotSource(snapshotSource);
+                    }
+                }
+            });
+        } catch (Exception e) {
+            LOG.error("Error while setting up {}:", getClass().getName(), e);
+        }
     }
 
     @Override
@@ -114,9 +132,9 @@ public class WebsocketStoptimeUpdater implements GraphUpdater {
                 FeedMessage feed = GtfsRealtime.FeedMessage.PARSER.parseFrom(message);
                 List<TripUpdateList> updates = TripUpdateList.decodeFromGtfsRealtime(feed, agencyId);
                 
-                LOG.info("Updates: {}", updates);
-                
-                // TODO handle trip updates via graph writer
+                // Handle trip updates via graph writer
+                TripUpdateListGraphWriterRunnable runnable = new TripUpdateListGraphWriterRunnable(updates);
+                updaterManager.execute(runnable);
             } catch (InvalidProtocolBufferException e) {
                 LOG.error("Could not decode gtfs-rt message.", e);
             }

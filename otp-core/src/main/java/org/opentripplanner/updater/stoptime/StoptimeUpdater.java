@@ -25,7 +25,6 @@ import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.updater.PreferencesConfigurable;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.edgetype.TimetableResolver;
-import org.opentripplanner.routing.edgetype.TimetableSnapshotSource;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.TransitIndexService;
@@ -33,6 +32,7 @@ import org.opentripplanner.routing.trippattern.TripUpdateList;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphUpdaterRunnable;
+import org.opentripplanner.updater.RealtimeDataSnapshotSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * Update OTP stop time tables from some (realtime) source
  * @author abyrd
  */
-public class StoptimeUpdater implements GraphUpdaterRunnable, TimetableSnapshotSource, GraphUpdater {
+public class StoptimeUpdater implements GraphUpdaterRunnable, GraphUpdater {
 
     private static final Logger LOG = LoggerFactory.getLogger(StoptimeUpdater.class);
 
@@ -107,31 +107,11 @@ public class StoptimeUpdater implements GraphUpdaterRunnable, TimetableSnapshotS
      */
     private void init(Graph graph) {
         this.graph = graph;
-        graph.timetableSnapshotSource = this;
+//        graph.timetableSnapshotSource = this;
         transitIndexService = graph.getService(TransitIndexService.class);
         if (transitIndexService == null)
             throw new RuntimeException(
                     "Real-time update need a TransitIndexService. Please setup one during graph building.");
-    }
-    
-    public TimetableResolver getSnapshot() {
-        return getSnapshot(false);
-    }
-    
-    protected synchronized TimetableResolver getSnapshot(boolean force) {
-        long now = System.currentTimeMillis();
-        if (force || now - lastSnapshotTime > maxSnapshotFrequency) {
-            if (force || buffer.isDirty()) {
-                LOG.debug("Committing {}", buffer.toString());
-                snapshot = buffer.commit(force);
-            } else {
-                LOG.debug("Buffer was unchanged, keeping old snapshot.");
-            }
-            lastSnapshotTime = System.currentTimeMillis();
-        } else {
-            LOG.debug("Snapshot frequency exceeded. Reusing snapshot {}", snapshot);
-        }
-        return snapshot;
     }
     
     @Override
@@ -144,111 +124,15 @@ public class StoptimeUpdater implements GraphUpdaterRunnable, TimetableSnapshotS
      */
     @Override
     public void run() {
+        List<TripUpdateList> tripUpdateLists = updateStreamer.getUpdates();
         
-        List<TripUpdateList> tripUpdateLists = updateStreamer.getUpdates(); 
-        if (tripUpdateLists == null) {
-            LOG.debug("updates is null");
-            return;
-        }
-
-        LOG.debug("message contains {} trip update blocks", tripUpdateLists.size());
-        int uIndex = 0;
-        for (TripUpdateList tripUpdateList : tripUpdateLists) {
-            uIndex += 1;
-            LOG.debug("trip update block #{} ({} updates) :", uIndex, tripUpdateList.getUpdates().size());
-            LOG.trace("{}", tripUpdateList.toString());
-            
-            boolean applied = false;
-            switch(tripUpdateList.getStatus()) {
-            case ADDED:
-                applied = handleAddedTrip(tripUpdateList);
-                break;
-            case CANCELED:
-                applied = handleCanceledTrip(tripUpdateList);
-                break;
-            case MODIFIED:
-                applied = handleModifiedTrip(tripUpdateList);
-                break;
-            case REMOVED:
-                applied = handleRemovedTrip(tripUpdateList);
-                break;
-            }
-            
-            if(applied) {
-                appliedBlockCount++;
-             } else {
-                 LOG.warn("Failed to apply TripUpdateList: " + tripUpdateList);
-             }
-
-             if (appliedBlockCount % logFrequency == 0) {
-                 LOG.info("Applied {} stoptime update blocks.", appliedBlockCount);
-             }
-        }
-        LOG.debug("end of update message");
-        
-        // Make a snapshot after each message in anticipation of incoming requests
-        // Purge data if necessary (and force new snapshot if anything was purged)
-        if(purgeExpiredData) {
-            boolean modified = purgeExpiredData(); 
-            getSnapshot(modified);
-        }
-        else {
-            getSnapshot(); 
-        }
+        // Handle tripupdatelist
     }
 
     @Override
     public void teardown() {
     }
 
-    protected boolean handleAddedTrip(TripUpdateList tripUpdateList) {
-        // TODO: Handle added trip
-        
-        return false;
-    }
-
-    protected boolean handleCanceledTrip(TripUpdateList tripUpdateList) {
-
-        TableTripPattern pattern = getPatternForTrip(tripUpdateList.getTripId());
-        if (pattern == null) {
-            LOG.debug("No pattern found for tripId {}, skipping UpdateBlock.", tripUpdateList.getTripId());
-            return false;
-        }
-
-        boolean applied = buffer.update(pattern, tripUpdateList);
-        
-        return applied;
-    }
-
-    protected boolean handleModifiedTrip(TripUpdateList tripUpdateList) {
-
-        tripUpdateList.filter(true, true, true);
-        if (! tripUpdateList.isCoherent()) {
-            LOG.warn("Incoherent TripUpdate, skipping.");
-            return false;
-        }
-        if (tripUpdateList.getUpdates().size() < 1) {
-            LOG.warn("TripUpdate contains no updates after filtering, skipping.");
-            return false;
-        }
-        TableTripPattern pattern = getPatternForTrip(tripUpdateList.getTripId());
-        if (pattern == null) {
-            LOG.warn("No pattern found for tripId {}, skipping TripUpdate.", tripUpdateList.getTripId());
-            return false;
-        }
-
-        // we have a message we actually want to apply
-        boolean applied = buffer.update(pattern, tripUpdateList);
-        
-        return applied;
-    }
-
-    protected boolean handleRemovedTrip(TripUpdateList tripUpdateList) {
-        // TODO: Handle removed trip
-        
-        return false;
-    }
-    
     protected TableTripPattern getPatternForTrip(AgencyAndId tripId) {
         TableTripPattern pattern = transitIndexService.getTripPatternForTrip(tripId);
         return pattern;

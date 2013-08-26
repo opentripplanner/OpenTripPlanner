@@ -137,13 +137,13 @@ public class GraphUpdaterConfigurator {
                             LOG.error("Unknown updater type: " + type);
                         }
                         else {
+                            // Add manager as parent
+                            updater.setGraphUpdaterManager(updaterManager);
+                            
                             // Configure updater if found and necessary
                             if (updater instanceof PreferencesConfigurable) {
                                 ((PreferencesConfigurable) updater).configure(graph, prefs);
                             }
-                            
-                            // Add manager as parent
-                            updater.setGraphUpdaterManager(updaterManager);
                             
                             // Add graph updater to manager
                             updaterManager.addUpdater(updater);

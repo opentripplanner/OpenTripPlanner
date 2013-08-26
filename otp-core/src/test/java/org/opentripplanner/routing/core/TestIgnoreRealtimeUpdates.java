@@ -16,10 +16,10 @@ package org.opentripplanner.routing.core;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.routing.edgetype.TimetableResolver;
-import org.opentripplanner.routing.edgetype.TimetableSnapshotSource;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.updater.RealtimeDataSnapshotSource;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -53,9 +53,9 @@ public class TestIgnoreRealtimeUpdates extends TestCase {
         TimetableResolver resolver = new TimetableResolver();
         
         // Mock TimetableSnapshotSource to return dummy TimetableResolver
-        TimetableSnapshotSource source = mock(TimetableSnapshotSource.class);
-        when(source.getSnapshot()).thenReturn(resolver);
-        graph.timetableSnapshotSource = source;
+        RealtimeDataSnapshotSource source = mock(RealtimeDataSnapshotSource.class);
+        when(source.getTimetableSnapshot()).thenReturn(resolver);
+        graph.setRealtimeDataSnapshotSource(source);
         
         // Create routing context
         RoutingContext rctx = new RoutingContext(options, graph, from, to);

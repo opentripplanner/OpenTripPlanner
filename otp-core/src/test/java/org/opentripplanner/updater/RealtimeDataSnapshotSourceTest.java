@@ -11,13 +11,14 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.updater.stoptime;
+package org.opentripplanner.updater;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import java.io.File;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -44,14 +45,13 @@ import org.opentripplanner.routing.trippattern.DecayingDelayTripTimes;
 import org.opentripplanner.routing.trippattern.TripUpdateList;
 import org.opentripplanner.routing.trippattern.Update;
 
-public class StoptimeUpdaterTest {
+public class RealtimeDataSnapshotSourceTest {
 
     private static Graph graph = new Graph();
     private static GtfsContext context;
     private static TransitIndexService transitIndexService;
     
-    private StoptimeUpdater updater;
-    private TripUpdateList tripUpdateList;
+    private RealtimeDataSnapshotSource updater;
     
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -69,13 +69,7 @@ public class StoptimeUpdaterTest {
     
     @Before
     public void setUp() {
-        updater = new StoptimeUpdater(graph);
-        updater.setUpdateStreamer(new UpdateStreamer() {
-            @Override
-            public List<TripUpdateList> getUpdates() {
-                return Collections.singletonList(tripUpdateList);
-            }
-        });
+        updater = new RealtimeDataSnapshotSource(graph);
         graph.putService(CalendarServiceData.class, GtfsLibrary.createCalendarServiceData(context.getDao()));
     }
     
@@ -84,19 +78,19 @@ public class StoptimeUpdaterTest {
         AgencyAndId tripId = new AgencyAndId("agency", "1.1");
         ServiceDate serviceDate = new ServiceDate();
         
-        tripUpdateList = TripUpdateList.forCanceledTrip(tripId, 0, serviceDate);
-        updater.run();
+        TripUpdateList tripUpdateList = TripUpdateList.forCanceledTrip(tripId, 0, serviceDate);
+        updater.applyTripUpdateLists(Arrays.asList(tripUpdateList));
         
-        TimetableResolver resolver = updater.getSnapshot();
+        TimetableResolver resolver = updater.getTimetableSnapshot();
         assertNotNull(resolver);
-        assertSame(resolver, updater.getSnapshot());
+        assertSame(resolver, updater.getTimetableSnapshot());
         
         tripUpdateList = TripUpdateList.forCanceledTrip(tripId, 0, serviceDate);
-        updater.run();
-        assertSame(resolver, updater.getSnapshot());
+        updater.applyTripUpdateLists(Arrays.asList(tripUpdateList));
+        assertSame(resolver, updater.getTimetableSnapshot());
 
         updater.setMaxSnapshotFrequency(-1);
-        TimetableResolver newResolver = updater.getSnapshot();
+        TimetableResolver newResolver = updater.getTimetableSnapshot();
         assertNotNull(newResolver);
         assertNotSame(resolver, newResolver);
     }
@@ -110,10 +104,10 @@ public class StoptimeUpdaterTest {
         int tripIndex = pattern.getTripIndex(tripId);
         int tripIndex2 = pattern.getTripIndex(tripId2);
         
-        tripUpdateList = TripUpdateList.forCanceledTrip(tripId, 0, today);
-        updater.run();
+        TripUpdateList tripUpdateList = TripUpdateList.forCanceledTrip(tripId, 0, today);
+        updater.applyTripUpdateLists(Arrays.asList(tripUpdateList));
         
-        TimetableResolver resolver = updater.getSnapshot();
+        TimetableResolver resolver = updater.getTimetableSnapshot();
         Timetable forToday = resolver.resolve(pattern, today);
         Timetable schedule = resolver.resolve(pattern, null);
         assertNotSame(forToday, schedule);
@@ -133,10 +127,10 @@ public class StoptimeUpdaterTest {
         int tripIndex2 = pattern.getTripIndex(tripId2);
         
         Update u = new Update(tripId, stopId, 0, 0, Update.Status.PREDICTION, 0, today);
-        tripUpdateList = TripUpdateList.forUpdatedTrip(tripId, 0, today, Collections.singletonList(u));
-        updater.run();
+        TripUpdateList tripUpdateList = TripUpdateList.forUpdatedTrip(tripId, 0, today, Collections.singletonList(u));
+        updater.applyTripUpdateLists(Arrays.asList(tripUpdateList));
         
-        TimetableResolver resolver = updater.getSnapshot();
+        TimetableResolver resolver = updater.getTimetableSnapshot();
         Timetable forToday = resolver.resolve(pattern, today);
         Timetable schedule = resolver.resolve(pattern, null);
         assertNotSame(forToday, schedule);
@@ -155,15 +149,15 @@ public class StoptimeUpdaterTest {
         updater.setMaxSnapshotFrequency(0);
         updater.setPurgeExpiredData(false);
         
-        tripUpdateList = TripUpdateList.forCanceledTrip(tripId, 0, today);
-        updater.run();
-        TimetableResolver resolverA = updater.getSnapshot();
+        TripUpdateList tripUpdateList = TripUpdateList.forCanceledTrip(tripId, 0, today);
+        updater.applyTripUpdateLists(Arrays.asList(tripUpdateList));
+        TimetableResolver resolverA = updater.getTimetableSnapshot();
         
         updater.setPurgeExpiredData(true);
         
         tripUpdateList = TripUpdateList.forCanceledTrip(tripId, 0, previously);
-        updater.run();
-        TimetableResolver resolverB = updater.getSnapshot();
+        updater.applyTripUpdateLists(Arrays.asList(tripUpdateList));
+        TimetableResolver resolverB = updater.getTimetableSnapshot();
         
         assertNotSame(resolverA, resolverB);
         
