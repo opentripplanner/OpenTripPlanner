@@ -73,5 +73,29 @@ otp.widgets.Dialogs = {
         dialog.find(".cancelButton").button().click(function() {
             dialog.dialog("close");
         });
-    },     
+    },
+
+    showDateDialog : function(message, title, callback) {
+        var dialog = ich['otp-dateDialog']({
+            message : message
+        }).dialog({
+            title : title,
+            appendTo: 'body',
+            modal: true,
+            zIndex: 100000,
+            height: 300,
+            width: 250,
+        });
+        
+        dialog.find(".datepicker").datepicker();
+
+        dialog.find(".okButton").button().click(function() {
+            callback.call(this, dialog.find(".datepicker").datepicker('getDate'));
+            dialog.dialog("close");
+        });
+
+        dialog.find(".cancelButton").button().click(function() {
+            dialog.dialog("close");
+        });
+    },
 };

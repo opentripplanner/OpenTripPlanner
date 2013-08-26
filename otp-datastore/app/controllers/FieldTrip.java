@@ -261,6 +261,9 @@ public class FieldTrip extends Application {
     }
     
     public static void setRequestStatus(long requestId, String status) {
+        TrinetUser user = checkLogin();        
+        checkAccess(user);
+
         FieldTripRequest req = FieldTripRequest.findById(requestId);
         if(req != null) {
             req.status = status;
@@ -278,11 +281,32 @@ public class FieldTrip extends Application {
     }
 
     public static void setRequestClasspassId(long requestId, String classpassId) {
+        TrinetUser user = checkLogin();        
+        checkAccess(user);
+
         FieldTripRequest req = FieldTripRequest.findById(requestId);
         if(req != null) {
             if(classpassId != null && classpassId.length() == 0) classpassId = null;
             req.classpassId = classpassId;
             req.save();
+            renderJSON(requestId);
+        }
+        else {
+            badRequest();
+        }        
+    }
+    
+    public static void setRequestDate(long requestId, @As("MM/dd/yyyy") Date date) {
+        TrinetUser user = checkLogin();        
+        checkAccess(user);
+
+        FieldTripRequest req = FieldTripRequest.findById(requestId);
+        if(req != null) {
+            req.travelDate = date;
+            req.save();
+            for(ScheduledFieldTrip trip : req.trips) {
+                trip.delete();
+            }
             renderJSON(requestId);
         }
         else {

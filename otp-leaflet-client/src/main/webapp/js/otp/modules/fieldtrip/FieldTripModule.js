@@ -820,6 +820,28 @@ otp.modules.fieldtrip.FieldTripModule =
         });
     },
         
+    setRequestDate: function(request, date) {
+        var this_ = this;
+
+        $.ajax(this.datastoreUrl+'/fieldtrip/setRequestDate', {
+            type: 'POST',
+            
+            data: {
+                sessionId : this.sessionManager.sessionId,
+                requestId : request.id,
+                date: moment(date).format("MM/DD/YYYY")
+            },
+            
+            success: function(data) {
+                this_.loadRequests();
+            },
+            
+            error: function(data) {
+                console.log("error updating request date");
+                console.log(data);
+            }
+        });
+    },    
     
 });
 

@@ -48,7 +48,8 @@
     <div class="otp-fieldTrip-requestWidget-content notDraggable">
         <div class="otp-fieldTrip-requestWidget-summary">
             <b>Destination</b>: {{endLocation}}<br>
-            <b>Day of Travel</b>: {{travelDate}}<br>
+            <b>Day of Travel</b>: {{travelDate}}
+                <span style="font-size: .8em">[<a href="#" class="changeDateLink">Change</a>]</span><br>
             <b>Teacher/School</b>: {{teacherName}} ({{schoolName}}, Grade {{#grade}}{{grade}}{{/grade}}{{^grade}}N/A{{/grade}})<br>
             <b>Teacher Address</b>: {{address}}, {{city}} {{state}} {{zip}}<br>
             <b>Phone</b>: {{#phoneNumber}}{{phoneNumber}}{{/phoneNumber}}{{^phoneNumber}}N/A{{/phoneNumber}}&nbsp;/&nbsp;

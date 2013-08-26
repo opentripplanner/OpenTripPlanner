@@ -96,13 +96,26 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
             this_.module.saveRequestTrip(this_.request, "outbound");
         });
         
-        this.content.find('.inboundPlanButton').click(function(evt) {
-            
+        this.content.find('.inboundPlanButton').click(function(evt) {            
             this_.module.planInbound(this_.request);
         });
 
         this.content.find('.inboundSaveButton').click(function(evt) {
             this_.module.saveRequestTrip(this_.request, "inbound");
+        });
+
+        this.content.find('.changeDateLink').click(function(evt) {
+            otp.widgets.Dialogs.showDateDialog("Select the new travel date:", "Select Date", function(date) {
+                if(otp.util.FieldTrip.getOutboundTrip(this_.request) || otp.util.FieldTrip.getInboundTrip(this_.request)) {
+                    var msg = "This action will delete any itineraries previously planned for this request on the original date. Do you wish to continue?";
+                    otp.widgets.Dialogs.showYesNoDialog(msg, "Continue?", function() {
+                        this_.module.setRequestDate(this_.request, date);
+                    });
+                }
+                else {
+                    this_.module.setRequestDate(this_.request, date);
+                }
+            });
         });
         
         this.content.find('.printablePlanLink').click(function(evt) {
