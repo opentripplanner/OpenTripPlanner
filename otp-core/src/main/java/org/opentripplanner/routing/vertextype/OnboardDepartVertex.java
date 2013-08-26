@@ -27,7 +27,7 @@ public class OnboardDepartVertex extends AbstractVertex {
 
     public OnboardDepartVertex(String label, double lon, double lat) {
         // This vertex is *alway* temporary, so graph is always null.
-        super(null, label, lon, lat);
+        super(null, label, lon, lat, label);
     }
 
     @Override
