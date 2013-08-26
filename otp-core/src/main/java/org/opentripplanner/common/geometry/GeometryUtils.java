@@ -16,6 +16,7 @@ package org.opentripplanner.common.geometry;
 import org.opentripplanner.common.model.P2;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -25,7 +26,8 @@ import com.vividsolutions.jts.linearref.LocationIndexedLine;
 
 public class GeometryUtils {
 
-    private static CoordinateSequenceFactory csf = new Serializable2DPackedCoordinateSequenceFactory();
+    private static CoordinateSequenceFactory csf =
+            new Serializable2DPackedCoordinateSequenceFactory();
     private static GeometryFactory gf = new GeometryFactory(csf);
 
     public static LineString makeLineString(double... coords) {
@@ -54,6 +56,58 @@ public class GeometryUtils {
         return new P2<LineString>(beginning, ending);
     }
     
+    /**
+     * Splits the input geometry into two LineStrings at a fraction of the distance covered.
+     */
+    public static P2<LineString> splitGeometryAtFraction(Geometry geometry, double fraction) {
+        LineString empty = new LineString(null, gf);
+        Coordinate[] coordinates = geometry.getCoordinates();
+        CoordinateSequence sequence = gf.getCoordinateSequenceFactory().create(coordinates);
+        LineString total = new LineString(sequence, gf);
+
+        if (coordinates.length < 2) return new P2<LineString>(empty, empty);
+        if (fraction <= 0) return new P2<LineString>(empty, total);
+        if (fraction >= 1) return new P2<LineString>(total, empty);
+
+        double totalDistance = total.getLength();
+        double requestedDistance = totalDistance * fraction;
+
+        double fractionalIndex = binarySearchCoordinates(coordinates, requestedDistance);
+        int lowIndex = (int) Math.floor(fractionalIndex);
+        int highIndex = (int) Math.ceil(fractionalIndex);
+
+        if (lowIndex == highIndex) {
+            return splitGeometryAtPoint(geometry, coordinates[lowIndex]);
+        } else {
+            double lowFactor = highIndex - fractionalIndex;
+            double highFactor = fractionalIndex - lowIndex;
+            double x = coordinates[lowIndex].x * lowFactor + coordinates[highIndex].x * highFactor;
+            double y = coordinates[lowIndex].y * lowFactor + coordinates[highIndex].y * highFactor;
+
+            Coordinate splitCoordinate = new Coordinate(x, y);
+            Coordinate[] beginning = new Coordinate[lowIndex + 2];
+            Coordinate[] ending = new Coordinate[coordinates.length - lowIndex];
+
+            for (int i = 0; i <= lowIndex; i++) {
+                beginning[i] = coordinates[i];
+            }
+            beginning[lowIndex + 1] = splitCoordinate;
+
+            CoordinateSequence firstSequence = gf.getCoordinateSequenceFactory().create(beginning);
+            LineString firstLineString = new LineString(firstSequence, gf);
+
+            for (int i = coordinates.length - 1; i >= highIndex; i--) {
+                ending[i - lowIndex] = coordinates[i];
+            }
+            ending[0] = splitCoordinate;
+
+            CoordinateSequence secondSequence = gf.getCoordinateSequenceFactory().create(ending);
+            LineString secondLineString = new LineString(secondSequence, gf);
+
+            return new P2<LineString>(firstLineString, secondLineString);
+        }
+    }
+
     /**
      * Returns the chunk of the given geometry between the two given coordinates.
      * 
