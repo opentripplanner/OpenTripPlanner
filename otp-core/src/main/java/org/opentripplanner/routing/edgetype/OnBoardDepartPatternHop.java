@@ -67,6 +67,7 @@ public class OnBoardDepartPatternHop extends Edge implements OnboardEdge {
             TripTimes tripTimes, ServiceDay serviceDay, int stopIndex, double positionInHop) {
         super(from, to);
         this.stopIndex = stopIndex;
+        this.serviceDay = serviceDay;
         this.tripTimes = tripTimes;
         this.positionInHop = positionInHop;
         this.trip = tripTimes.getTrip();
