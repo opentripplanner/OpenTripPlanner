@@ -115,7 +115,7 @@ public class RealtimeDataSnapshotSource {
         for (TripUpdateList tripUpdateList : updates) {
             uIndex += 1;
             LOG.debug("trip update block #{} ({} updates) :", uIndex, tripUpdateList.getUpdates().size());
-            LOG.trace("{}", tripUpdateList.toString());
+            LOG.trace("{}", tripUpdateList);
             
             boolean applied = false;
             switch(tripUpdateList.getStatus()) {
@@ -136,7 +136,7 @@ public class RealtimeDataSnapshotSource {
             if(applied) {
                 appliedBlockCount++;
              } else {
-                 LOG.warn("Failed to apply TripUpdateList: " + tripUpdateList);
+                 LOG.warn("Failed to apply TripUpdateList: {}", tripUpdateList);
              }
 
              if (appliedBlockCount % logFrequency == 0) {
