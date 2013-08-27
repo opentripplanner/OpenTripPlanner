@@ -212,7 +212,6 @@ public class PlanGenerator {
         Graph graph = path.getRoutingContext().graph;
 
         FareService fareService = graph.getService(FareService.class);
-        TransitIndexService transitIndexService = graph.getService(TransitIndexService.class);
 
         State[][] legsStates = sliceStates(states);
 
@@ -221,7 +220,7 @@ public class PlanGenerator {
         }
 
         for (State[] legStates : legsStates) {
-            itinerary.addLeg(generateLeg(legStates, transitIndexService, showIntermediateStops));
+            itinerary.addLeg(generateLeg(legStates, showIntermediateStops));
         }
 
         addWalkSteps(itinerary.legs, legsStates);
@@ -337,12 +336,10 @@ public class PlanGenerator {
      * Generate one leg of an itinerary from a {@link State} array.
      *
      * @param states The array of states to base the leg on
-     * @param transitIndexService The service to use for transit agency lookups
      * @param showIntermediateStops Whether to include intermediate stops in the leg or not
      * @return The generated leg
      */
-    private Leg generateLeg(State[] states, TransitIndexService transitIndexService,
-            boolean showIntermediateStops) {
+    private Leg generateLeg(State[] states, boolean showIntermediateStops) {
         Leg leg = new Leg();
 
         Edge[] edges = new Edge[states.length - 1];
@@ -362,7 +359,7 @@ public class PlanGenerator {
         TimeZone timeZone = leg.startTime.getTimeZone();
         leg.agencyTimeZoneOffset = timeZone.getOffset(leg.startTime.getTimeInMillis());
 
-        addTripFields(leg, states, transitIndexService);
+        addTripFields(leg, states);
 
         addPlaces(leg, states, edges, showIntermediateStops);
 
@@ -565,17 +562,18 @@ public class PlanGenerator {
      *
      * @param leg The leg to add the trip-related fields to
      * @param states The states that go with the leg
-     * @param transitIndexService The service to use for transit agency lookups
      */
-    private void addTripFields(Leg leg, State[] states, TransitIndexService transitIndexService) {
+    private void addTripFields(Leg leg, State[] states) {
         Trip trip = states[states.length - 1].getBackTrip();
 
         if (trip != null) {
-            String id = trip.getId().getAgencyId();
             Route route = trip.getRoute();
+            Agency agency = route.getAgency();
             ServiceDay serviceDay = states[states.length - 1].getServiceDay();
 
-            leg.agencyId = id;
+            leg.agencyId = agency.getId();
+            leg.agencyName = agency.getName();
+            leg.agencyUrl = agency.getUrl();
             leg.headsign = states[states.length - 1].getBackDirection();
             leg.route = states[states.length - 1].getBackEdge().getName();
             leg.routeColor = route.getColor();
@@ -590,12 +588,6 @@ public class PlanGenerator {
 
             if (serviceDay != null) {
                 leg.serviceDate = serviceDay.getServiceDate().getAsString();
-            }
-
-            if (transitIndexService != null) {
-                Agency agency = transitIndexService.getAgency(id);
-                leg.agencyName = agency.getName();
-                leg.agencyUrl = agency.getUrl();
             }
 
             if (leg.headsign == null) {
