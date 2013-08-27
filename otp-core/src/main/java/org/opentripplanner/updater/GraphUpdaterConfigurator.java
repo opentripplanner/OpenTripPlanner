@@ -28,8 +28,8 @@ import org.opentripplanner.updater.GtfsRealtimeUpdater;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater2;
 import org.opentripplanner.updater.example.ExampleGraphUpdater;
 import org.opentripplanner.updater.example.ExamplePollingGraphUpdater;
-import org.opentripplanner.updater.stoptime.StoptimeUpdater;
-import org.opentripplanner.updater.stoptime.WebsocketStoptimeUpdater;
+import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
+import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,10 +114,10 @@ public class GraphUpdaterConfigurator {
                             updater = new BikeRentalUpdater2();
                         }
                         else if (type.equals("stop-time-updater")) {
-                            updater = new StoptimeUpdater();
+                            updater = new PollingStoptimeUpdater();
                         }
-                        else if (type.equals("websocket-stop-time-updater")) {
-                            updater = new WebsocketStoptimeUpdater();
+                        else if (type.equals("websocket-gtfs-rt-updater")) {
+                            updater = new WebsocketGtfsRealtimeUpdater();
                         }
                         else if (type.equals("real-time-alerts")) {
                             updater = new GtfsRealtimeUpdater();

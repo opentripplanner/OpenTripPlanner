@@ -25,9 +25,9 @@ import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.common.CTX;
 import org.opentripplanner.routing.trippattern.Update;
 
-public class KV8Update extends Update {
+public class Kv8Update extends Update {
 
-    public KV8Update(AgencyAndId tripId, AgencyAndId stopId, int stopSeq, int arrive, int depart,
+    public Kv8Update(AgencyAndId tripId, AgencyAndId stopId, int stopSeq, int arrive, int depart,
             Status status, long timestamp, ServiceDate serviceDate) {
         super(tripId, stopId, stopSeq, arrive, depart, status, timestamp, serviceDate);
     }
@@ -48,7 +48,7 @@ public class KV8Update extends Update {
                 continue;
             int arrival = secondsSinceMidnight(row.get("ExpectedArrivalTime"));
             int departure = secondsSinceMidnight(row.get("ExpectedDepartureTime"));
-            KV8Update u = new KV8Update(
+            Kv8Update u = new Kv8Update(
                     kv8TripId(row),   
                     kv8StopId(row), 
                     Integer.parseInt(row.get("UserStopOrderNumber")), 

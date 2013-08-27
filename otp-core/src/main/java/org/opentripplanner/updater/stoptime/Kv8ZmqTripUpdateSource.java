@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.prefs.Preferences;
 import java.util.zip.GZIPInputStream;
 
-import javax.annotation.PostConstruct;
-
 import lombok.Setter;
 
 import org.opentripplanner.updater.PreferencesConfigurable;
@@ -27,15 +25,16 @@ import org.jeromq.ZFrame;
 import org.jeromq.ZMQ;
 import org.jeromq.ZMsg;
 
-/** StoptimeUpdateStreamer for CTX-encoded Dutch KV8 realtime updates over ZeroMQ */
-public class KV8ZMQUpdateStreamer implements UpdateStreamer, PreferencesConfigurable {
+/**
+ * TripUpdateSource for CTX-encoded Dutch KV8 realtime updates over ZeroMQ
+ */
+public class Kv8ZmqTripUpdateSource implements TripUpdateSource, PreferencesConfigurable {
 
-    private static Logger LOG = LoggerFactory.getLogger(KV8ZMQUpdateStreamer.class); 
+    private static Logger LOG = LoggerFactory.getLogger(Kv8ZmqTripUpdateSource.class); 
     
     private ZMQ.Context context = ZMQ.context(1);
     private ZMQ.Socket subscriber = context.socket(ZMQ.SUB);
     private long count = 0;
-    @Setter private String defaultAgencyId = "";
     @Setter private String address = "tcp://node01.post.openov.nl:7817";
     @Setter private static String feed = "/GOVI/KV8"; 
     @Setter private static String messageLogFile;
@@ -45,7 +44,6 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer, PreferencesConfigur
     Writer logWriter;
     Reader fakeInputReader;
     
-    @PostConstruct
     public void connectToFeed() {
         subscriber.connect(address);
         subscriber.subscribe(feed.getBytes());
@@ -67,6 +65,22 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer, PreferencesConfigur
         }
     }
 
+    @Override
+    public void configure(Graph graph, Preferences preferences) throws Exception {
+        String address = preferences.get("address", null);
+        if (address == null)
+            throw new IllegalArgumentException("Missing mandatory 'address' parameter");
+        setAddress(address);
+        String feed = preferences.get("feed", null);
+        if (feed == null)
+            throw new IllegalArgumentException("Missing mandatory 'feed' parameter");
+        setFeed(feed);
+        setLogFrequency(preferences.getInt("logFrequency", 2000));
+        setFakeInput(preferences.get("fakeInput", null));
+        // Connect to feed
+        connectToFeed();
+    }
+    
     public List<TripUpdateList> getUpdates() {
         /* recvMsg blocks -- unless you call Socket.setReceiveTimeout() */
         // so when timeout occurs, it does not return null, but a reference to some
@@ -87,7 +101,7 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer, PreferencesConfigur
             if (logWriter != null) {
                 logWriter.write(kv8ctx);
             }
-            ret = KV8Update.fromCTX(kv8ctx);
+            ret = Kv8Update.fromCTX(kv8ctx);
             count += 1; // if we got here there must not have been an exception
             LOG.debug("decoded gzipped CTX message #{}: {}", count, msg);
             if (count % logFrequency == 0) {
@@ -127,20 +141,4 @@ public class KV8ZMQUpdateStreamer implements UpdateStreamer, PreferencesConfigur
         }   
         return buffer.toString();
     }
-
-    @Override
-    public void configure(Graph graph, Preferences preferences) throws Exception {
-        setDefaultAgencyId(preferences.get("defaultAgencyId", ""));
-        String address = preferences.get("address", null);
-        if (address == null)
-            throw new IllegalArgumentException("Missing mandatory 'address' parameter");
-        setAddress(address);
-        String feed = preferences.get("feed", null);
-        if (feed == null)
-            throw new IllegalArgumentException("Missing mandatory 'feed' parameter");
-        setFeed(feed);
-        setLogFrequency(preferences.getInt("logFrequency", 2000));
-        setFakeInput(preferences.get("fakeInput", null));
-    }
-    
 }

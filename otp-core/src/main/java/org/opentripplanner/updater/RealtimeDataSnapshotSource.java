@@ -24,7 +24,7 @@ import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.trippattern.TripUpdateList;
-import org.opentripplanner.updater.stoptime.StoptimeUpdater;
+import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  */
 public class RealtimeDataSnapshotSource {
 
-    private static final Logger LOG = LoggerFactory.getLogger(StoptimeUpdater.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RealtimeDataSnapshotSource.class);
 
     @Setter    private int logFrequency = 2000;
     

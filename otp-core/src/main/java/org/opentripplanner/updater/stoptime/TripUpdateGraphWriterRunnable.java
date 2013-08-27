@@ -22,16 +22,16 @@ import org.opentripplanner.updater.RealtimeDataSnapshotSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TripUpdateListGraphWriterRunnable implements GraphWriterRunnable {
+public class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
 
-    private static Logger LOG = LoggerFactory.getLogger(TripUpdateListGraphWriterRunnable.class);
+    private static Logger LOG = LoggerFactory.getLogger(TripUpdateGraphWriterRunnable.class);
 
     /**
      * The list with updates to apply to the graph
      */
     private List<TripUpdateList> updates;
 
-    public TripUpdateListGraphWriterRunnable(List<TripUpdateList> updates) {
+    public TripUpdateGraphWriterRunnable(List<TripUpdateList> updates) {
         this.updates = updates;
     }
 

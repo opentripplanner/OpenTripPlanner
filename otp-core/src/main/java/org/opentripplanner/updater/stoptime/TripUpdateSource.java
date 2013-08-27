@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.opentripplanner.routing.trippattern.TripUpdateList;
 
-public interface UpdateStreamer {
+public interface TripUpdateSource {
 
     /**
      * Wait for one message to arrive, and decode it into an TripUpdateList. Blocking call. 

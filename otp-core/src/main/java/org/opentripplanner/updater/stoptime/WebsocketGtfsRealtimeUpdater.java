@@ -49,9 +49,9 @@ import com.ning.http.client.websocket.WebSocketUpgradeHandler;
  * </pre>
  * 
  */
-public class WebsocketStoptimeUpdater implements GraphUpdater {
+public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
 
-    private static Logger LOG = LoggerFactory.getLogger(WebsocketStoptimeUpdater.class);
+    private static Logger LOG = LoggerFactory.getLogger(WebsocketGtfsRealtimeUpdater.class);
 
     /**
      * Parent update manager. Is used to execute graph writer runnables. 
@@ -59,7 +59,7 @@ public class WebsocketStoptimeUpdater implements GraphUpdater {
     private GraphUpdaterManager updaterManager;
 
     /**
-     * Url with the websocket server
+     * Url of the websocket server
      */
     private String url;
 
@@ -69,15 +69,15 @@ public class WebsocketStoptimeUpdater implements GraphUpdater {
     private String agencyId;
 
     @Override
-    public void configure(Graph graph, Preferences preferences) throws Exception {
-        // Read configuration
-        url = preferences.get("url", null);
-        agencyId = preferences.get("agencyId", "");
+    public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
+        this.updaterManager = updaterManager;
     }
 
     @Override
-    public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
-        this.updaterManager = updaterManager;
+    public void configure(Graph graph, Preferences preferences) throws Exception {
+        // Read configuration
+        url = preferences.get("url", null);
+        agencyId = preferences.get("defaultAgencyId", "");
     }
 
     @Override
@@ -140,7 +140,7 @@ public class WebsocketStoptimeUpdater implements GraphUpdater {
                 List<TripUpdateList> updates = TripUpdateList.decodeFromGtfsRealtime(feed, agencyId);
 
                 // Handle trip updates via graph writer runnable
-                TripUpdateListGraphWriterRunnable runnable = new TripUpdateListGraphWriterRunnable(updates);
+                TripUpdateGraphWriterRunnable runnable = new TripUpdateGraphWriterRunnable(updates);
                 updaterManager.execute(runnable);
             } catch (InvalidProtocolBufferException e) {
                 LOG.error("Could not decode gtfs-rt message:", e);
