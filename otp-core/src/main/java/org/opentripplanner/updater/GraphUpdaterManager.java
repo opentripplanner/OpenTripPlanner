@@ -93,6 +93,7 @@ public class GraphUpdaterManager {
         for (GraphUpdater updater : updaterList) {
             updater.teardown();
         }
+        updaterList.clear();
 
         // Shutdown scheduler
         scheduler.shutdownNow();
@@ -119,9 +120,13 @@ public class GraphUpdaterManager {
             public void run() {
                 try {
                     updater.setup();
-                    updater.run();
+                    try {
+                        updater.run();
+                    } catch (Exception e) {
+                        LOG.error("Error while running updater {}:", updater.getClass().getName(), e);
+                    }
                 } catch (Exception e) {
-                    LOG.error("Error while running updater " + updater.getClass().getName(), e);
+                    LOG.error("Error while setting up updater {}:", updater.getClass().getName(), e);
                 }
             }
         });
@@ -164,7 +169,7 @@ public class GraphUpdaterManager {
                 try {
                     runnable.run(graph);
                 } catch (Exception e) {
-                    LOG.error("Error while running graph writer " + runnable.getClass().getName(),
+                    LOG.error("Error while running graph writer {}:", runnable.getClass().getName(),
                             e);
                 }
             }

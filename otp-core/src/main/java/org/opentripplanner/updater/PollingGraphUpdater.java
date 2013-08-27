@@ -25,6 +25,14 @@ import org.slf4j.LoggerFactory;
 /**
  * This abstract class implements logic that is shared between all polling updaters.
  * 
+ * Usage example ('polling' name is an example and 'polling-updater' should be the type of a
+ * concrete class derived from this abstract class):
+ * 
+ * <pre>
+ * polling.type = polling-updater
+ * polling.frequencySec = 60
+ * </pre>
+ * 
  * @see GraphUpdater
  */
 public abstract class PollingGraphUpdater implements GraphUpdater {
@@ -36,7 +44,7 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
      * times with pauses in between. The length of the pause is defined in the preference
      * frequencySec.
      */
-    abstract protected void runPolling();
+    abstract protected void runPolling() throws Exception;
 
     /**
      * Mirrors GraphUpdater.configure method.
@@ -62,6 +70,9 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
                 try {
                     // Run concrete class' method
                     runPolling();
+                } catch (InterruptedException e) {
+                    // Throw further up the stack
+                    throw e;
                 } catch (Exception e) {
                     LOG.error("Error while running polling updater of type {}", type, e);
                     // TODO Should we cancel the task? Or after n consecutive failures?
@@ -72,24 +83,12 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
                 Thread.sleep(frequencySec * 1000);
             }
         } catch (InterruptedException e) {
-            // When Thread.sleep is interrupted
-            LOG.error("Error while running polling updater of type {}: sleep interrupted, "
-                    + "updater stops.", type, e);
+            // When updater is interrupted
+            LOG.error("Polling updater {} is interrupted, updater stops.", this.getClass()
+                    .getName());
         }
     }
 
-    /**
-     * Configure polling updater.
-     * 
-     * Usage example ('polling' name is an example and 'polling-updater' should be the type of a
-     * concrete class derived from this abstract class):
-     * 
-     * <pre>
-     * polling.type = polling-updater
-     * polling.frequencySec = 60
-     * </pre>
-     * 
-     */
     @Override
     final public void configure(Graph graph, Preferences preferences) throws Exception {
         // Configure polling system

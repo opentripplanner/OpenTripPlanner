@@ -39,7 +39,7 @@ import com.ning.http.client.websocket.WebSocketUpgradeHandler;
  * This class starts an HTTP client which opens a websocket connection to a GTFS-RT data source. A
  * callback is registered which handles incoming GTFS-RT messages as they stream in by placing a
  * GTFS-RT decoder Runnable task in the single-threaded executor for handling.
- *
+ * 
  * Usage example ('example' name is an example) in the file 'Graph.properties':
  * 
  * <pre>
@@ -47,20 +47,30 @@ import com.ning.http.client.websocket.WebSocketUpgradeHandler;
  * websocket.agencyId = agency
  * websocket.url = ws://localhost:8088/tripUpdates
  * </pre>
- *  
+ * 
  */
 public class WebsocketStoptimeUpdater implements GraphUpdater {
 
     private static Logger LOG = LoggerFactory.getLogger(WebsocketStoptimeUpdater.class);
 
+    /**
+     * Parent update manager. Is used to execute graph writer runnables. 
+     */
     private GraphUpdaterManager updaterManager;
 
+    /**
+     * Url with the websocket server
+     */
     private String url;
-    
+
+    /**
+     * Default agency id that is used for the trip id's in the TripUpdateLists
+     */
     private String agencyId;
 
     @Override
     public void configure(Graph graph, Preferences preferences) throws Exception {
+        // Read configuration
         url = preferences.get("url", null);
         agencyId = preferences.get("agencyId", "");
     }
@@ -71,23 +81,19 @@ public class WebsocketStoptimeUpdater implements GraphUpdater {
     }
 
     @Override
-    public void setup() {
+    public void setup() throws InterruptedException, ExecutionException {
         // Create a realtime data snapshot source and wait for runnable to be executed
-        try {
-            updaterManager.executeBlocking(new GraphWriterRunnable() {
-                @Override
-                public void run(Graph graph) {
-                    // Only create a realtime data snapshot source if none exists already
-                    if (graph.getRealtimeDataSnapshotSource() == null) {
-                        RealtimeDataSnapshotSource snapshotSource = new RealtimeDataSnapshotSource(graph);
-                        // Add snapshot source to graph
-                        graph.setRealtimeDataSnapshotSource(snapshotSource);
-                    }
+        updaterManager.executeBlocking(new GraphWriterRunnable() {
+            @Override
+            public void run(Graph graph) {
+                // Only create a realtime data snapshot source if none exists already
+                if (graph.getRealtimeDataSnapshotSource() == null) {
+                    RealtimeDataSnapshotSource snapshotSource = new RealtimeDataSnapshotSource(graph);
+                    // Add snapshot source to graph
+                    graph.setRealtimeDataSnapshotSource(snapshotSource);
                 }
-            });
-        } catch (Exception e) {
-            LOG.error("Error while setting up {}:", getClass().getName(), e);
-        }
+            }
+        });
     }
 
     @Override
@@ -104,51 +110,40 @@ public class WebsocketStoptimeUpdater implements GraphUpdater {
         WebSocketListener listener = new Listener();
         WebSocketUpgradeHandler handler = new WebSocketUpgradeHandler.Builder()
                 .addWebSocketListener(listener).build();
+
+        // TODO: add logic to reconnect after losing the connection
+
         @SuppressWarnings("unused")
         WebSocket socket;
         try {
             socket = client.prepareGet(url).execute(handler).get();
-            // socket.sendMessage("I CAN HAZ GTFS-RT?".getBytes("UTF-8"));
         } catch (ExecutionException e) {
             LOG.error("Could not connect to {}: {}", url, e.getCause().getMessage());
         } catch (Exception e) {
-            LOG.error("Unknown exception when trying to connect to {}.", url, e);
+            LOG.error("Unknown exception when trying to connect to {}:", url, e);
         }
-        // client.closeAsynchronously();
     }
 
     @Override
     public void teardown() {
     }
 
+    /**
+     * Auxiliary class to handle incoming messages via the websocket connection
+     */
     private class Listener extends DefaultWebSocketListener {
-        private int n_received = 0;
-
-        private long last_log_time = System.currentTimeMillis();
-
         @Override
         public void onMessage(byte[] message) {
-            // Log number of messages received
-            n_received += 1;
-            if (n_received % 100 == 0) {
-                long this_log_time = System.currentTimeMillis();
-                long elapsed_time = this_log_time - last_log_time;
-                LOG.info("Received {} messages in {} msec, {} msgs/sec", n_received, elapsed_time,
-                        n_received / (elapsed_time / 1000d));
-                n_received = 0;
-                last_log_time = System.currentTimeMillis();
-            }
-
             try {
                 // Decode message into TripUpdateList
                 FeedMessage feed = GtfsRealtime.FeedMessage.PARSER.parseFrom(message);
                 List<TripUpdateList> updates = TripUpdateList.decodeFromGtfsRealtime(feed, agencyId);
-                
-                // Handle trip updates via graph writer
+
+                // Handle trip updates via graph writer runnable
                 TripUpdateListGraphWriterRunnable runnable = new TripUpdateListGraphWriterRunnable(updates);
                 updaterManager.execute(runnable);
             } catch (InvalidProtocolBufferException e) {
-                LOG.error("Could not decode gtfs-rt message.", e);
+                LOG.error("Could not decode gtfs-rt message:", e);
             }
         }
     }

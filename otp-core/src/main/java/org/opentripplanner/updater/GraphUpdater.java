@@ -41,15 +41,16 @@ public interface GraphUpdater extends PreferencesConfigurable {
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager);
 
     /**
-     * Here the updater can be initialized.
+     * Here the updater can be initialized. If it throws, the updater won't be started (i.e. the run
+     * method won't be called).
      */
-    public void setup();
+    public void setup() throws Exception;
 
     /**
      * This is where the updater thread receives updates and applies them to the graph. This method
      * only runs once.
      */
-    public void run();
+    public void run() throws Exception;
 
     /**
      * Here the updater can cleanup after itself.
