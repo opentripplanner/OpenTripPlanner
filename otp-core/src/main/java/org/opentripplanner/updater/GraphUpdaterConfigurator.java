@@ -24,7 +24,7 @@ import java.util.prefs.Preferences;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
-import org.opentripplanner.updater.GtfsRealtimeUpdater;
+import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater2;
 import org.opentripplanner.updater.example.ExampleGraphUpdater;
 import org.opentripplanner.updater.example.ExamplePollingGraphUpdater;
@@ -120,7 +120,7 @@ public class GraphUpdaterConfigurator {
                             updater = new WebsocketGtfsRealtimeUpdater();
                         }
                         else if (type.equals("real-time-alerts")) {
-                            updater = new GtfsRealtimeUpdater();
+                            updater = new GtfsRealtimeAlertsUpdater();
                         }
                         else if (type.equals("example-updater")) {
                             updater = new ExampleGraphUpdater();

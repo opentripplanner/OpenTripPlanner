@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Update OTP stop time tables from some (realtime) source
  * 
- * Usage example ('rt' name is an example):
+ * Usage example ('rt' name is an example) in file 'Graph.properties':
  * 
  * <pre>
  * rt.type = stop-time-updater

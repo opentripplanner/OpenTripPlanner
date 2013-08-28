@@ -11,7 +11,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.updater;
+package org.opentripplanner.updater.alerts;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -40,8 +40,8 @@ import com.google.transit.realtime.GtfsRealtime.TranslatedString.Translation;
  * @author novalis
  *
  */
-public class UpdateHandler {
-    private static final Logger log = LoggerFactory.getLogger(UpdateHandler.class);
+public class AlertsUpdateHandler {
+    private static final Logger log = LoggerFactory.getLogger(AlertsUpdateHandler.class);
 
     private String defaultAgencyId;
 
@@ -52,7 +52,7 @@ public class UpdateHandler {
     /** How long before the posted start of an event it should be displayed to users */
     private long earlyStart;
 
-    public UpdateHandler() {
+    public AlertsUpdateHandler() {
     }
 
     public void update(FeedMessage message) {
