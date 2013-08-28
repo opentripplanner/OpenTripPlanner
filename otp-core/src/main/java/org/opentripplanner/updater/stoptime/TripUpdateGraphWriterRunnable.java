@@ -20,7 +20,7 @@ import lombok.AllArgsConstructor;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.TripUpdateList;
 import org.opentripplanner.updater.GraphWriterRunnable;
-import org.opentripplanner.updater.TimetableSnapshotSource;
+import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

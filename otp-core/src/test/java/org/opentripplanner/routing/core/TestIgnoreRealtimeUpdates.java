@@ -19,7 +19,7 @@ import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
-import org.opentripplanner.updater.TimetableSnapshotSource;
+import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

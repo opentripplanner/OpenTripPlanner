@@ -99,7 +99,7 @@ import org.opentripplanner.routing.vertextype.PatternDepartVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.routing.vertextype.TransitStopArrive;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
-import org.opentripplanner.updater.TimetableSnapshotSource;
+import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
 import com.vividsolutions.jts.geom.Coordinate;
