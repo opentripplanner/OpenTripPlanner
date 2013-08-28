@@ -51,6 +51,13 @@ import com.ning.http.client.websocket.WebSocketUpgradeHandler;
  */
 public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
 
+    /**
+     * Number of seconds to wait before checking again whether we are still connected
+     */
+    private static final int CHECK_CONNECTION_PERIOD_SEC = 1;
+    
+    private static final int DEFAULT_RECONNECT_PERIOD_SEC = 300; // Five minutes
+
     private static Logger LOG = LoggerFactory.getLogger(WebsocketGtfsRealtimeUpdater.class);
 
     /**
@@ -67,6 +74,11 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
      * Default agency id that is used for the trip id's in the TripUpdateLists
      */
     private String agencyId;
+    
+    /**
+     * The number of seconds to wait before reconnecting after a failed connection.
+     */
+    private int reconnectPeriodSec;
 
     @Override
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
@@ -78,6 +90,7 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
         // Read configuration
         url = preferences.get("url", null);
         agencyId = preferences.get("defaultAgencyId", "");
+        reconnectPeriodSec = preferences.getInt("reconnectPeriodSec", DEFAULT_RECONNECT_PERIOD_SEC);
     }
 
     @Override
@@ -97,7 +110,7 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
     }
 
     @Override
-    public void run() {
+    public void run() throws InterruptedException {
         // The AsyncHttpClient library uses Netty by default (it has a dependency on Netty).
         // It can also make use of Grizzly for the HTTP layer, but the Jersey-Grizzly integration
         // forces us to use a version of Grizzly that is too old to be compatible with the current
@@ -111,16 +124,37 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
         WebSocketUpgradeHandler handler = new WebSocketUpgradeHandler.Builder()
                 .addWebSocketListener(listener).build();
 
-        // TODO: add logic to reconnect after losing the connection
-
-        @SuppressWarnings("unused")
-        WebSocket socket;
-        try {
-            socket = client.prepareGet(url).execute(handler).get();
-        } catch (ExecutionException e) {
-            LOG.error("Could not connect to {}: {}", url, e.getCause().getMessage());
-        } catch (Exception e) {
-            LOG.error("Unknown exception when trying to connect to {}:", url, e);
+        while (true) {
+            WebSocket socket = null;
+            boolean connectionSuccessful = true;
+            // Try to create a websocket connection
+            try {
+                socket = client.prepareGet(url).execute(handler).get();
+                LOG.info("Successfully connected to {}.", url);
+            } catch (ExecutionException e) {
+                LOG.error("Could not connect to {}: {}", url, e.getCause().getMessage());
+                connectionSuccessful = false;
+            } catch (Exception e) {
+                LOG.error("Unknown exception when trying to connect to {}:", url, e);
+                connectionSuccessful = false;
+            }
+            
+            // If connection was unsuccessful, wait some time before trying again
+            if (!connectionSuccessful) {
+                Thread.sleep(reconnectPeriodSec * 1000);
+            }
+            
+            // Keep checking whether connection is still open
+            while (true) {
+                if (socket == null || !socket.isOpen()) {
+                    // The connection is closed somehow, try to reconnect
+                    if (connectionSuccessful) {
+                        LOG.warn("Connection to {} was lost. Trying to reconnect...", url);
+                    }
+                    break;
+                }
+                Thread.sleep(CHECK_CONNECTION_PERIOD_SEC * 1000);
+            }
         }
     }
 
