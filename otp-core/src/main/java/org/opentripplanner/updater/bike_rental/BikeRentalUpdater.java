@@ -44,8 +44,8 @@ import org.slf4j.LoggerFactory;
  * Dynamic bike-rental station updater which encapsulate one BikeRentalDataSource. 
  *
  */
-public class BikeRentalUpdater2 implements GraphUpdaterRunnable, GraphUpdater {
-    private static final Logger LOG = LoggerFactory.getLogger(BikeRentalUpdater2.class);
+public class BikeRentalUpdater implements GraphUpdaterRunnable, GraphUpdater {
+    private static final Logger LOG = LoggerFactory.getLogger(BikeRentalUpdater.class);
 
     private static final String DEFAULT_NETWORK_LIST = "default";
 

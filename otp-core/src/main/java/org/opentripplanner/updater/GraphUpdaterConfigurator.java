@@ -25,7 +25,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
-import org.opentripplanner.updater.bike_rental.BikeRentalUpdater2;
+import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
 import org.opentripplanner.updater.example.ExampleGraphUpdater;
 import org.opentripplanner.updater.example.ExamplePollingGraphUpdater;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
@@ -111,7 +111,7 @@ public class GraphUpdaterConfigurator {
                     GraphUpdater updater = null;
                     if (type != null) {
                         if (type.equals("bike-rental")) {
-                            updater = new BikeRentalUpdater2();
+                            updater = new BikeRentalUpdater();
                         }
                         else if (type.equals("stop-time-updater")) {
                             updater = new PollingStoptimeUpdater();
