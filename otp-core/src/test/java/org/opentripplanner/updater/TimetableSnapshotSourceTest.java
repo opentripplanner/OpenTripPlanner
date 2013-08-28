@@ -19,9 +19,7 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -37,21 +35,19 @@ import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Graph.LoadLevel;
-import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.trippattern.CanceledTripTimes;
 import org.opentripplanner.routing.trippattern.DecayingDelayTripTimes;
 import org.opentripplanner.routing.trippattern.TripUpdateList;
 import org.opentripplanner.routing.trippattern.Update;
 
-public class RealtimeDataSnapshotSourceTest {
+public class TimetableSnapshotSourceTest {
 
     private static Graph graph = new Graph();
     private static GtfsContext context;
     private static TransitIndexService transitIndexService;
     
-    private RealtimeDataSnapshotSource updater;
+    private TimetableSnapshotSource updater;
     
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -69,7 +65,7 @@ public class RealtimeDataSnapshotSourceTest {
     
     @Before
     public void setUp() {
-        updater = new RealtimeDataSnapshotSource(graph);
+        updater = new TimetableSnapshotSource(graph);
         graph.putService(CalendarServiceData.class, GtfsLibrary.createCalendarServiceData(context.getDao()));
     }
     

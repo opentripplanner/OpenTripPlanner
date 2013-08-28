@@ -23,7 +23,7 @@ import org.opentripplanner.routing.trippattern.TripUpdateList;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.PollingGraphUpdater;
-import org.opentripplanner.updater.RealtimeDataSnapshotSource;
+import org.opentripplanner.updater.TimetableSnapshotSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,11 +118,11 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
             @Override
             public void run(Graph graph) {
                 // Only create a realtime data snapshot source if none exists already
-                RealtimeDataSnapshotSource snapshotSource = graph.getRealtimeDataSnapshotSource(); 
+                TimetableSnapshotSource snapshotSource = graph.getTimetableSnapshotSource(); 
                 if (snapshotSource == null) {
-                    snapshotSource = new RealtimeDataSnapshotSource(graph);
+                    snapshotSource = new TimetableSnapshotSource(graph);
                     // Add snapshot source to graph
-                    graph.setRealtimeDataSnapshotSource(snapshotSource);
+                    graph.setTimetableSnapshotSource(snapshotSource);
                 }
                 
                 // Set properties of realtime data snapshot source

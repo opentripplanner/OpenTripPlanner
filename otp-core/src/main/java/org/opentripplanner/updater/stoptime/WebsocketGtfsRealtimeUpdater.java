@@ -22,7 +22,7 @@ import org.opentripplanner.routing.trippattern.TripUpdateList;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
-import org.opentripplanner.updater.RealtimeDataSnapshotSource;
+import org.opentripplanner.updater.TimetableSnapshotSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,10 +87,10 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
             @Override
             public void run(Graph graph) {
                 // Only create a realtime data snapshot source if none exists already
-                if (graph.getRealtimeDataSnapshotSource() == null) {
-                    RealtimeDataSnapshotSource snapshotSource = new RealtimeDataSnapshotSource(graph);
+                if (graph.getTimetableSnapshotSource() == null) {
+                    TimetableSnapshotSource snapshotSource = new TimetableSnapshotSource(graph);
                     // Add snapshot source to graph
-                    graph.setRealtimeDataSnapshotSource(snapshotSource);
+                    graph.setTimetableSnapshotSource(snapshotSource);
                 }
             }
         });

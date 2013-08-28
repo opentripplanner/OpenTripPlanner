@@ -217,8 +217,8 @@ public class RoutingContext implements Cloneable {
         // the graph's snapshot may be frequently updated.
         // Grab a reference to ensure a coherent view of the timetables throughout this search.
         if (routingRequest.isIgnoreRealtimeUpdates() == false
-                && graph.getRealtimeDataSnapshotSource() != null) {
-            timetableSnapshot = graph.getRealtimeDataSnapshotSource().getTimetableSnapshot();
+                && graph.getTimetableSnapshotSource() != null) {
+            timetableSnapshot = graph.getTimetableSnapshotSource().getTimetableSnapshot();
         }
         else {
             timetableSnapshot = null;

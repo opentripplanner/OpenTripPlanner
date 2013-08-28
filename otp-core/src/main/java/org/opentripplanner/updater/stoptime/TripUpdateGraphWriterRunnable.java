@@ -18,7 +18,7 @@ import java.util.List;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.TripUpdateList;
 import org.opentripplanner.updater.GraphWriterRunnable;
-import org.opentripplanner.updater.RealtimeDataSnapshotSource;
+import org.opentripplanner.updater.TimetableSnapshotSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +38,7 @@ public class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
     @Override
     public void run(Graph graph) {
         // Apply updates to graph using realtime snapshot source
-        RealtimeDataSnapshotSource snapshotSource = graph.getRealtimeDataSnapshotSource();
+        TimetableSnapshotSource snapshotSource = graph.getTimetableSnapshotSource();
         if (snapshotSource != null) {
             snapshotSource.applyTripUpdateLists(updates);
         } else {

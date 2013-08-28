@@ -19,7 +19,7 @@ import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
-import org.opentripplanner.updater.RealtimeDataSnapshotSource;
+import org.opentripplanner.updater.TimetableSnapshotSource;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -53,9 +53,9 @@ public class TestIgnoreRealtimeUpdates extends TestCase {
         TimetableResolver resolver = new TimetableResolver();
         
         // Mock TimetableSnapshotSource to return dummy TimetableResolver
-        RealtimeDataSnapshotSource source = mock(RealtimeDataSnapshotSource.class);
+        TimetableSnapshotSource source = mock(TimetableSnapshotSource.class);
         when(source.getTimetableSnapshot()).thenReturn(resolver);
-        graph.setRealtimeDataSnapshotSource(source);
+        graph.setTimetableSnapshotSource(source);
         
         // Create routing context
         RoutingContext rctx = new RoutingContext(options, graph, from, to);

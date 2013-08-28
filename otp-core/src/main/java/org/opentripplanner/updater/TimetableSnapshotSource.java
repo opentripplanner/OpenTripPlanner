@@ -24,7 +24,6 @@ import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.trippattern.TripUpdateList;
-import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,9 +32,9 @@ import org.slf4j.LoggerFactory;
  * necessary to provide planning threads a consistent constant view of a graph with realtime data at
  * a specific point in time.
  */
-public class RealtimeDataSnapshotSource {
+public class TimetableSnapshotSource {
 
-    private static final Logger LOG = LoggerFactory.getLogger(RealtimeDataSnapshotSource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TimetableSnapshotSource.class);
 
     @Setter    private int logFrequency = 2000;
     
@@ -67,7 +66,7 @@ public class RealtimeDataSnapshotSource {
     
     protected long lastSnapshotTime = -1;
     
-    public RealtimeDataSnapshotSource(Graph graph) {
+    public TimetableSnapshotSource(Graph graph) {
         transitIndexService = graph.getService(TransitIndexService.class);
         if (transitIndexService == null)
             throw new RuntimeException(

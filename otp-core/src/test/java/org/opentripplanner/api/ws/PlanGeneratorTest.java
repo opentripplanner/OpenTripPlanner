@@ -99,7 +99,7 @@ import org.opentripplanner.routing.vertextype.PatternDepartVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.routing.vertextype.TransitStopArrive;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
-import org.opentripplanner.updater.RealtimeDataSnapshotSource;
+import org.opentripplanner.updater.TimetableSnapshotSource;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -626,7 +626,7 @@ public class PlanGeneratorTest {
         TimetableResolver resolver = new TimetableResolver();
         
         // Mock TimetableSnapshotSource to return dummy TimetableResolver
-        RealtimeDataSnapshotSource timetableSnapshotSource = mock(RealtimeDataSnapshotSource.class);
+        TimetableSnapshotSource timetableSnapshotSource = mock(TimetableSnapshotSource.class);
         when(timetableSnapshotSource.getTimetableSnapshot()).thenReturn(resolver);
 
         timetableSnapshotSource.getTimetableSnapshot().update(thirdTripPattern, tripUpdateList);
@@ -638,7 +638,7 @@ public class PlanGeneratorTest {
         graph.putService(FareService.class, fareServiceStub);
         graph.addAgency(trainAgency);
         graph.addAgency(ferryAgency);
-        graph.setRealtimeDataSnapshotSource(timetableSnapshotSource);
+        graph.setTimetableSnapshotSource(timetableSnapshotSource);
 
         // Routing context creation and initialization
         ServiceDay serviceDay = new ServiceDay(graph, 0, calendarServiceImpl, null);
