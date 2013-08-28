@@ -100,6 +100,10 @@ public class CommandLineParameters {
             description = "enable OTP Analyst extensions")
     boolean analyst;
     
+    @Parameter( names = { "-f", "--graphConfigFile"}, validateWith = ReadableFile.class,
+            description = "path to graph configuration file")
+    String graphConfigFile;
+
     @Parameter( names = { "-g", "--graphs"}, validateWith = ReadableDirectory.class, 
             description = "path to graph directory")
     String graphDirectory;
