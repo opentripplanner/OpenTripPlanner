@@ -44,7 +44,7 @@ import com.ning.http.client.websocket.WebSocketUpgradeHandler;
  * 
  * <pre>
  * websocket.type = websocket-stop-time-updater
- * websocket.agencyId = agency
+ * websocket.defaultAgencyId = agency
  * websocket.url = ws://localhost:8088/tripUpdates
  * </pre>
  * 
