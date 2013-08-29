@@ -50,7 +50,9 @@ public class GTFSTrip extends Model {
     
     @Expose
     public String headsign;
-    
+
+    @Expose
+    public Integer capacity;
         
     /*@ManyToOne
     @Expose

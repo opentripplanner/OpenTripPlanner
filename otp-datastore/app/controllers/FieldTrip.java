@@ -167,25 +167,83 @@ public class FieldTrip extends Application {
     }
 
     
-    public static void newTrip(long requestId, ScheduledFieldTrip trip) {
+    public static void newTrip(long requestId, ScheduledFieldTrip trip, GroupItinerary[] itins, GTFSTrip[][] gtfsTrips) {
         TrinetUser user = checkLogin();        
         checkAccess(user);
-      
+        
         FieldTripRequest ftRequest = FieldTripRequest.findById(requestId);
 
+        // first, check that trip is possible
+        for(int i = 0; i < itins.length; i++) {
+            GroupItinerary itin = itins[i];
+            for(GTFSTrip gtrip : gtfsTrips[i]) {
+                List<GTFSTrip> tripsInUse = GTFSTrip.find("agencyAndId = ?", gtrip.agencyAndId).fetch();
+                
+                if(!tripsInUse.isEmpty()) {
+                    int capacityInUse = 0;
+                    for(GTFSTrip tripInUse : tripsInUse) {
+                        
+                        // are dates the same?
+                        if(!tripInUse.groupItinerary.fieldTrip.request.travelDate.equals(ftRequest.travelDate)) continue;
+                            
+                        // do the stop ranges overlap?
+                        if(gtrip.fromStopIndex > tripInUse.toStopIndex || gtrip.toStopIndex < tripInUse.fromStopIndex) continue;
+                        
+                        capacityInUse += tripInUse.groupItinerary.passengers;
+                    }
+                    int remainingCapacity = gtrip.capacity - capacityInUse;
+                    if(itin.passengers > remainingCapacity) {
+                        renderJSON(-1);
+                    }
+                }
+            }
+        }
+
+        
+        // delete any existing ScheduledFieldTrip(s) at this requestOrder index 
+        
+        Set<ScheduledFieldTrip> tripsToDelete = new HashSet<ScheduledFieldTrip>();
+        for(ScheduledFieldTrip reqTrip : ftRequest.trips) {
+            if(reqTrip.requestOrder == trip.requestOrder) tripsToDelete.add(reqTrip);
+        }            
+        for(ScheduledFieldTrip delTrip : tripsToDelete) {
+            delTrip.delete();
+        }
+
+
+        // save the new ScheduledFieldTrip
+        
         //TODO: is setting id to null the right way to ensure that an
         //existing trip is not overwritten?
         trip.id = null;
         trip.request = ftRequest;
         trip.serviceDay = trip.departure;
         trip.createdBy = user.username;
-        
         trip.save();
         
+        // add the ScheduledFieldTrip to the request
+    
         ftRequest.trips.add(trip);
-        ftRequest.save();
-        
+                
         System.out.println("saved ScheduledFieldTrip, id="+trip.id);
+        
+        // create the GroupItineraries and GTFSTrips
+        trip.groupItineraries = new ArrayList<GroupItinerary>();
+        for(int i = 0; i < itins.length; i++) {
+            GroupItinerary itinerary = itins[i];
+            itinerary.fieldTrip = trip;
+            trip.groupItineraries.add(itinerary);
+            itinerary.save();
+            
+            itinerary.trips = new ArrayList<GTFSTrip>();
+            for(GTFSTrip gtrip : gtfsTrips[i]) {
+                gtrip.groupItinerary = itinerary;
+                itinerary.trips.add(gtrip);
+                gtrip.save();
+            }
+        }
+        
+        
         Long id = trip.id;
         renderJSON(id);
     }

@@ -313,7 +313,6 @@ otp.modules.fieldtrip.FieldTripModule =
         
     saveTrip : function(request, requestOrder, successCallback) {
         var this_ = this;
-        //console.log("saving trip: "+desc);
         
         var data = {
             sessionId : this.sessionManager.sessionId,
@@ -321,12 +320,40 @@ otp.modules.fieldtrip.FieldTripModule =
             'trip.requestOrder' : requestOrder,
             'trip.origin' : this.getStartOTPString(),
             'trip.destination' : this.getEndOTPString(),
-            //'trip.description' : desc,
             'trip.createdBy' : this.userName,
             'trip.passengers' : this.groupSize,            
             'trip.departure' : moment(this.groupPlan.earliestStartTime).add("hours", otp.config.timeOffset).format("YYYY-MM-DDTHH:mm:ss"),
             'trip.queryParams' : JSON.stringify(this.groupPlan.queryParams),
         };
+
+        for(var i = 0; i < this.groupPlan.itineraries.length; i++) {
+            var itin = this.groupPlan.itineraries[i];
+            //console.log("saving itin for trip "+tripId);
+            //console.log(itin.itinData);
+
+            data['itins['+i+'].passengers'] = itin.groupSize;
+            data['itins['+i+'].itinData'] = otp.util.Text.lzwEncode(JSON.stringify(itin.itinData));
+            data['itins['+i+'].timeOffset'] = otp.config.timeOffset || 0;
+
+            var legs = itin.getTransitLegs();
+            
+            for(var l = 0; l < legs.length; l++) {
+                var leg = legs[l];
+                var routeName = (leg.routeShortName !== null ? ('(' + leg.routeShortName + ') ') : '') + (leg.routeLongName || ""); 
+
+                data['gtfsTrips['+i+']['+l+'].depart'] = moment(leg.startTime).format("HH:mm:ss"); 
+                data['gtfsTrips['+i+']['+l+'].arrive'] = moment(leg.endTime).format("HH:mm:ss"); 
+                data['gtfsTrips['+i+']['+l+'].agencyAndId'] = leg.agencyId + "_" + leg.tripId;
+                data['gtfsTrips['+i+']['+l+'].routeName'] = routeName;
+                data['gtfsTrips['+i+']['+l+'].fromStopIndex'] = leg.from.stopIndex;
+                data['gtfsTrips['+i+']['+l+'].toStopIndex'] = leg.to.stopIndex;
+                data['gtfsTrips['+i+']['+l+'].fromStopName'] = leg.from.name;
+                data['gtfsTrips['+i+']['+l+'].toStopName'] = leg.to.name;
+                data['gtfsTrips['+i+']['+l+'].headsign'] = leg.headsign;
+                data['gtfsTrips['+i+']['+l+'].capacity'] = itin.getModeCapacity(leg.mode);
+                if(leg.tripBlockId) data['gtfsTrips['+i+']['+l+'].blockId'] = leg.tripBlockId;
+            }
+        }
         
         //console.log(data);
         $.ajax(this.datastoreUrl+'/fieldtrip/newTrip', {
@@ -336,8 +363,10 @@ otp.modules.fieldtrip.FieldTripModule =
                 
             success: function(data) {
                 if((typeof data) == "string") data = jQuery.parseJSON(data);
-                //console.log("successfully saved trip, now doing itins");
-                this_.saveItineraries(data, successCallback);
+                if(data === -1) {
+                    otp.widgets.Dialogs.showOkDialog("This plan could not be saved due to a lack of capacity on one or more vehicles. Please re-plan your trip.", "Cannot Save Plan");
+                }
+                else successCallback.call(this_, data);
             },
             
             error: function(data) {
@@ -347,7 +376,8 @@ otp.modules.fieldtrip.FieldTripModule =
         });
     },
 
-    checkTripValidity : function(tripId, fromStopIndex, toStopIndex, itin) {
+    checkTripValidity : function(tripId, leg, itin) {
+        var capacityInUse = 0;
         for(var i = 0; i < this.tripsInUse.length; i++) {
             var tripInUse  = this.tripsInUse[i];
             
@@ -355,76 +385,20 @@ otp.modules.fieldtrip.FieldTripModule =
             if(tripId !== tripInUse.agencyAndId) continue;
             
             // second test: do the stop ranges overlap? if not, we're ok
-            if(fromStopIndex > tripInUse.toStopIndex || toStopIndex < tripInUse.fromStopIndex) continue;
+            if(leg.from.stopIndex > tripInUse.toStopIndex || leg.to.stopIndex < tripInUse.fromStopIndex) continue;
             
             // if ranges overlap, calculate remaining capacity
-            var remainingCapacity = itin.getGroupTripCapacity() - tripInUse.passengers;
-            if(remainingCapacity < 10) return false; // consider trip 'full' if < 10 spots remain
-            this.itinCapacity = this.itinCapacity ? Math.min(this.itinCapacity, remainingCapacity) : remainingCapacity;
+            capacityInUse += tripInUse.passengers;
         }
+
+        var remainingCapacity = itin.getModeCapacity(leg.mode) - capacityInUse;
+        if(remainingCapacity < 10) return false; // consider trip 'full' if < 10 spots remain
+        this.itinCapacity = this.itinCapacity ? Math.min(this.itinCapacity, remainingCapacity) : remainingCapacity;
+
         return true;
     },
         
-    saveItineraries : function(tripId, successCallback) {
-        var this_ = this;
-        this.itinsSaved = 0;
-        for(var i = 0; i < this.groupPlan.itineraries.length; i++) {
-            var itin = this.groupPlan.itineraries[i];
-            console.log("saving itin for trip "+tripId);
-            console.log(itin.itinData);
 
-            var data = {
-                sessionId : this.sessionManager.sessionId,
-                fieldTripId : tripId,
-                'itinerary.passengers' : itin.groupSize,
-                'itinerary.itinData' : otp.util.Text.lzwEncode(JSON.stringify(itin.itinData)),
-                'itinerary.timeOffset' : otp.config.timeOffset || 0, 
-            };
-            
-            var legs = itin.getTransitLegs();
-            
-            for(var l = 0; l < legs.length; l++) {
-                var leg = legs[l];
-                var routeName = (leg.routeShortName !== null ? ('(' + leg.routeShortName + ') ') : '') + (leg.routeLongName || ""); 
-                //console.log('routeName='+routeName); 
-                data['trips['+l+'].depart'] = moment(leg.startTime).format("HH:mm:ss"); 
-                data['trips['+l+'].arrive'] = moment(leg.endTime).format("HH:mm:ss"); 
-                data['trips['+l+'].agencyAndId'] = leg.agencyId + "_" + leg.tripId;
-                data['trips['+l+'].routeName'] = routeName;
-                data['trips['+l+'].fromStopIndex'] = leg.from.stopIndex;
-                data['trips['+l+'].toStopIndex'] = leg.to.stopIndex;
-                data['trips['+l+'].fromStopName'] = leg.from.name;
-                data['trips['+l+'].toStopName'] = leg.to.name;
-                data['trips['+l+'].headsign'] = leg.headsign;
-                if(leg.tripBlockId) data['trips['+l+'].blockId'] = leg.tripBlockId;
-            }
-            //console.log(data);
-            
-            $.ajax(this.datastoreUrl+'/fieldtrip/addItinerary', {
-                type: 'POST',
-                
-                data: data,
-                    
-                success: function(data) {
-                    if((typeof data) == "string") data = jQuery.parseJSON(data);
-                    this_.itinsSaved++;
-                    if(this_.itinsSaved == this_.groupPlan.itineraries.length) {
-                        //console.log("all itins saved");
-                        //this_.refreshTrips();
-                        successCallback.call(this_, tripId);
-                    }
-                                 
-                },
-                
-                error: function(data) {
-                    console.log("error saving itinerary");
-                    console.log(data);
-                }
-            });
-                    
-        }
-    },
-    
     deleteTrip : function(trip) {
         var this_ = this;
         
@@ -689,8 +663,8 @@ otp.modules.fieldtrip.FieldTripModule =
             if(outboundTrip) {
                 var msg = "This action will overwrite a previously planned outbound itinerary for this request. Do you wish to continue?";
                 otp.widgets.Dialogs.showYesNoDialog(msg, "Overwrite Outbound Itinerary?", function() {
-                    this_.deleteTrip(outboundTrip);
                     this_.saveTrip(request, 0, function(tripId) {
+                        //this_.deleteTrip(outboundTrip);
                         this_.loadRequests();
                     });
                 });
@@ -707,8 +681,8 @@ otp.modules.fieldtrip.FieldTripModule =
             if(inboundTrip) {
                 var msg = "This action will overwrite a previously planned inbound itinerary for this request. Do you wish to continue?";
                 otp.widgets.Dialogs.showYesNoDialog(msg, "Overwrite Inbound Itinerary?", function() {
-                    this_.deleteTrip(inboundTrip);
                     this_.saveTrip(request, 1, function(tripId) {
+                        //this_.deleteTrip(inboundTrip);
                         this_.loadRequests();
                     });
                 });

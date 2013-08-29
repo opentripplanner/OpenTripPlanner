@@ -362,7 +362,7 @@ otp.modules.planner.PlannerModule =
                                 var leg = itin.itinData.legs[l];
                                 if(otp.util.Itin.isTransit(leg.mode)) {
                                     var tripId = leg.agencyId + "_"+leg.tripId;
-                                    if(!this_.checkTripValidity(tripId, leg.from.stopIndex, leg.to.stopIndex, itin)) {
+                                    if(!this_.checkTripValidity(tripId, leg, itin)) {
                                         //console.log("INVALID TRIP");
                                         invalidTrips.push(tripId);
                                     }
