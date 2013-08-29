@@ -24,6 +24,7 @@ public enum Message {
     // id field is loosely based on HTTP error codes http://en.wikipedia.org/wiki/List_of_HTTP_status_codes
     PLAN_OK(200),
     SYSTEM_ERROR(500),
+    GRAPH_UNAVAILABLE(503),
 
     OUTSIDE_BOUNDS(400),
     PATH_NOT_FOUND(404),

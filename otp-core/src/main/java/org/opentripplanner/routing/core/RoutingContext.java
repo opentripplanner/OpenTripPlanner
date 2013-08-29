@@ -32,6 +32,7 @@ import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHe
 import org.opentripplanner.routing.edgetype.PartialPlainStreetEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.TimetableResolver;
+import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.error.TransitTimesException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Edge;
@@ -210,6 +211,9 @@ public class RoutingContext implements Cloneable {
      */
     private RoutingContext(RoutingRequest routingRequest, Graph graph, Vertex from, Vertex to,
             boolean findPlaces) {
+        if (graph == null) {
+            throw new GraphNotFoundException();
+        }
         this.opt = routingRequest;
         this.graph = graph;
         this.debug.startedCalculating();
