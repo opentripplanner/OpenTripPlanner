@@ -23,7 +23,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
-import org.opentripplanner.routing.trippattern.TripUpdate;
+import org.opentripplanner.routing.trippattern.TripUpdateList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,17 +80,17 @@ public class TimetableResolver {
     /**
      * @return whether or not the update was actually applied
      */
-    public boolean update(TableTripPattern pattern, TripUpdate tripUpdate) {
+    public boolean update(TableTripPattern pattern, TripUpdateList tripUpdateList) {
         // synchronization prevents commits/snapshots while update is in progress
         synchronized(this) {
             if (dirty == null)
                 throw new ConcurrentModificationException("This TimetableResolver is read-only.");
-            Timetable tt = resolve(pattern, tripUpdate.getServiceDate());
+            Timetable tt = resolve(pattern, tripUpdateList.getServiceDate());
             // we need to perform the copy of Timetable here rather than in Timetable.update()
             // to avoid repeatedly copying in case several updates are applied to the same timetable
             if ( ! dirty.contains(tt)) {
                 Timetable old = tt;
-                tt = tt.copy(tripUpdate.getServiceDate());
+                tt = tt.copy(tripUpdateList.getServiceDate());
                 SortedSet<Timetable> sortedTimetables = timetables.get(pattern);
                 if(sortedTimetables == null) {
                     sortedTimetables = new TreeSet<Timetable>(new SortedTimetableComparator());
@@ -105,7 +105,7 @@ public class TimetableResolver {
                 timetables.put(pattern, sortedTimetables);
                 dirty.add(tt);
             }
-            return tt.update(tripUpdate);
+            return tt.update(tripUpdateList);
         }
     }
 

@@ -11,21 +11,19 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.updater;
+package org.opentripplanner.updater.stoptime;
 
-/**
- * A cyclic process that periodically update a graph.
- * 
- * Instance of this interface will be added to a round-robin scheduler system which ensure that no
- * two GraphUpdaterRunnable will run at the same time ever. So client can safely assume that no
- * locking is needed between any two different concurrent GraphUpdaterRunnable instances.
- * 
- */
-public interface GraphUpdaterRunnable {
+import java.util.List;
 
-    public void setup();
+import org.opentripplanner.routing.trippattern.TripUpdateList;
 
-    public void run();
+public interface TripUpdateSource {
 
-    public void teardown();
+    /**
+     * Wait for one message to arrive, and decode it into an TripUpdateList. Blocking call. 
+     * @return a TripUpdateList potentially containing updates for several different trips,
+     *         or null if an exception occurred while processing the message
+     */
+    public List<TripUpdateList> getUpdates();
+
 }

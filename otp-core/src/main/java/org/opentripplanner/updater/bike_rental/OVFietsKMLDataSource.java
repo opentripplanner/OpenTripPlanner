@@ -14,11 +14,6 @@
 package org.opentripplanner.updater.bike_rental;
 
 import java.util.Map;
-import java.util.List;
-import java.util.ArrayList;
-
-import java.util.Collections;
-
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 
 public class OVFietsKMLDataSource extends GenericXmlBikeRentalDataSource {

@@ -17,6 +17,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -78,7 +80,6 @@ import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.edgetype.TimetableResolver;
-import org.opentripplanner.routing.edgetype.TimetableSnapshotSource;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.location.StreetLocation;
@@ -89,7 +90,7 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.transit_index.RouteVariant;
 import org.opentripplanner.routing.trippattern.Update;
 import org.opentripplanner.routing.trippattern.Update.Status;
-import org.opentripplanner.routing.trippattern.TripUpdate;
+import org.opentripplanner.routing.trippattern.TripUpdateList;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
@@ -98,6 +99,7 @@ import org.opentripplanner.routing.vertextype.PatternDepartVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.routing.vertextype.TransitStopArrive;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
+import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -618,11 +620,16 @@ public class PlanGeneratorTest {
         updates.add(ferryStopDepartUpdate);
         updates.add(ferryStopArriveUpdate);
 
-        TripUpdate tripUpdate = TripUpdate.splitByTrip(updates).get(0);
+        TripUpdateList tripUpdateList = TripUpdateList.splitByTrip(updates).get(0);
 
-        TimetableSnapshotSource timetableSnapshotSource = new TimetableSnapshotSourceStub();
+        // Create dummy TimetableResolver
+        TimetableResolver resolver = new TimetableResolver();
+        
+        // Mock TimetableSnapshotSource to return dummy TimetableResolver
+        TimetableSnapshotSource timetableSnapshotSource = mock(TimetableSnapshotSource.class);
+        when(timetableSnapshotSource.getTimetableSnapshot()).thenReturn(resolver);
 
-        timetableSnapshotSource.getSnapshot().update(thirdTripPattern, tripUpdate);
+        timetableSnapshotSource.getTimetableSnapshot().update(thirdTripPattern, tripUpdateList);
 
         // Further graph initialization
         graph.putService(ServiceIdToNumberService.class, serviceIdToNumberService);
@@ -631,7 +638,7 @@ public class PlanGeneratorTest {
         graph.putService(FareService.class, fareServiceStub);
         graph.addAgency(trainAgency);
         graph.addAgency(ferryAgency);
-        graph.timetableSnapshotSource = timetableSnapshotSource;
+        graph.setTimetableSnapshotSource(timetableSnapshotSource);
 
         // Routing context creation and initialization
         ServiceDay serviceDay = new ServiceDay(graph, 0, calendarServiceImpl, null);
@@ -1819,19 +1826,6 @@ public class PlanGeneratorTest {
             fare.addFare(FareType.tram, new WrappedCurrency(), 4);
             fare.addFare(FareType.special, new WrappedCurrency(), 8);
             return fare;
-        }
-    }
-
-    /**
-     * This class implements the {@link TimetableSnapshotSource} interface to allow for testing.
-     * It will return the exact same {@link TimetableResolver} object at every invocation.
-     */
-    private static final class TimetableSnapshotSourceStub implements TimetableSnapshotSource {
-        final TimetableResolver timetableResolver = new TimetableResolver();
-
-        @Override
-        public TimetableResolver getSnapshot() {
-            return timetableResolver;
         }
     }
 }

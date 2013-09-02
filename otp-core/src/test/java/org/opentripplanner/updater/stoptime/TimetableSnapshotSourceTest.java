@@ -18,9 +18,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import java.io.File;
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -36,22 +35,19 @@ import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Graph.LoadLevel;
-import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.trippattern.CanceledTripTimes;
 import org.opentripplanner.routing.trippattern.DecayingDelayTripTimes;
-import org.opentripplanner.routing.trippattern.TripUpdate;
+import org.opentripplanner.routing.trippattern.TripUpdateList;
 import org.opentripplanner.routing.trippattern.Update;
 
-public class StoptimeUpdaterTest {
+public class TimetableSnapshotSourceTest {
 
     private static Graph graph = new Graph();
     private static GtfsContext context;
     private static TransitIndexService transitIndexService;
     
-    private StoptimeUpdater updater;
-    private TripUpdate tripUpdate;
+    private TimetableSnapshotSource updater;
     
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -69,13 +65,7 @@ public class StoptimeUpdaterTest {
     
     @Before
     public void setUp() {
-        updater = new StoptimeUpdater(graph);
-        updater.setUpdateStreamer(new UpdateStreamer() {
-            @Override
-            public List<TripUpdate> getUpdates() {
-                return Collections.singletonList(tripUpdate);
-            }
-        });
+        updater = new TimetableSnapshotSource(graph);
         graph.putService(CalendarServiceData.class, GtfsLibrary.createCalendarServiceData(context.getDao()));
     }
     
@@ -84,19 +74,19 @@ public class StoptimeUpdaterTest {
         AgencyAndId tripId = new AgencyAndId("agency", "1.1");
         ServiceDate serviceDate = new ServiceDate();
         
-        tripUpdate = TripUpdate.forCanceledTrip(tripId, 0, serviceDate);
-        updater.run();
+        TripUpdateList tripUpdateList = TripUpdateList.forCanceledTrip(tripId, 0, serviceDate);
+        updater.applyTripUpdateLists(Arrays.asList(tripUpdateList));
         
-        TimetableResolver resolver = updater.getSnapshot();
+        TimetableResolver resolver = updater.getTimetableSnapshot();
         assertNotNull(resolver);
-        assertSame(resolver, updater.getSnapshot());
+        assertSame(resolver, updater.getTimetableSnapshot());
         
-        tripUpdate = TripUpdate.forCanceledTrip(tripId, 0, serviceDate);
-        updater.run();
-        assertSame(resolver, updater.getSnapshot());
+        tripUpdateList = TripUpdateList.forCanceledTrip(tripId, 0, serviceDate);
+        updater.applyTripUpdateLists(Arrays.asList(tripUpdateList));
+        assertSame(resolver, updater.getTimetableSnapshot());
 
         updater.setMaxSnapshotFrequency(-1);
-        TimetableResolver newResolver = updater.getSnapshot();
+        TimetableResolver newResolver = updater.getTimetableSnapshot();
         assertNotNull(newResolver);
         assertNotSame(resolver, newResolver);
     }
@@ -110,10 +100,10 @@ public class StoptimeUpdaterTest {
         int tripIndex = pattern.getTripIndex(tripId);
         int tripIndex2 = pattern.getTripIndex(tripId2);
         
-        tripUpdate = TripUpdate.forCanceledTrip(tripId, 0, today);
-        updater.run();
+        TripUpdateList tripUpdateList = TripUpdateList.forCanceledTrip(tripId, 0, today);
+        updater.applyTripUpdateLists(Arrays.asList(tripUpdateList));
         
-        TimetableResolver resolver = updater.getSnapshot();
+        TimetableResolver resolver = updater.getTimetableSnapshot();
         Timetable forToday = resolver.resolve(pattern, today);
         Timetable schedule = resolver.resolve(pattern, null);
         assertNotSame(forToday, schedule);
@@ -133,10 +123,10 @@ public class StoptimeUpdaterTest {
         int tripIndex2 = pattern.getTripIndex(tripId2);
         
         Update u = new Update(tripId, stopId, 0, 0, Update.Status.PREDICTION, 0, today);
-        tripUpdate = TripUpdate.forUpdatedTrip(tripId, 0, today, Collections.singletonList(u));
-        updater.run();
+        TripUpdateList tripUpdateList = TripUpdateList.forUpdatedTrip(tripId, 0, today, Collections.singletonList(u));
+        updater.applyTripUpdateLists(Arrays.asList(tripUpdateList));
         
-        TimetableResolver resolver = updater.getSnapshot();
+        TimetableResolver resolver = updater.getTimetableSnapshot();
         Timetable forToday = resolver.resolve(pattern, today);
         Timetable schedule = resolver.resolve(pattern, null);
         assertNotSame(forToday, schedule);
@@ -155,15 +145,15 @@ public class StoptimeUpdaterTest {
         updater.setMaxSnapshotFrequency(0);
         updater.setPurgeExpiredData(false);
         
-        tripUpdate = TripUpdate.forCanceledTrip(tripId, 0, today);
-        updater.run();
-        TimetableResolver resolverA = updater.getSnapshot();
+        TripUpdateList tripUpdateList = TripUpdateList.forCanceledTrip(tripId, 0, today);
+        updater.applyTripUpdateLists(Arrays.asList(tripUpdateList));
+        TimetableResolver resolverA = updater.getTimetableSnapshot();
         
         updater.setPurgeExpiredData(true);
         
-        tripUpdate = TripUpdate.forCanceledTrip(tripId, 0, previously);
-        updater.run();
-        TimetableResolver resolverB = updater.getSnapshot();
+        tripUpdateList = TripUpdateList.forCanceledTrip(tripId, 0, previously);
+        updater.applyTripUpdateLists(Arrays.asList(tripUpdateList));
+        TimetableResolver resolverB = updater.getTimetableSnapshot();
         
         assertNotSame(resolverA, resolverB);
         

@@ -30,14 +30,6 @@ public class ApiServlet extends SpringServlet {
 
     @Autowired private GraphService graphService;
     
-    @Autowired(required=false) private PeriodicGraphUpdater updater;
-
-//    @Autowired(required=false) private PeriodicGraphUpdater updater;
-
-//    public PeriodicGraphUpdater getPeriodicGraphUpdater() {
-//        return updater;
-//    }
-
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
@@ -45,20 +37,10 @@ public class ApiServlet extends SpringServlet {
         WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
         AutowireCapableBeanFactory autowireCapableBeanFactory = webApplicationContext.getAutowireCapableBeanFactory();
         autowireCapableBeanFactory.autowireBean(this);
-        // do not use a postconstruct method to start threads - 
-        // in this class it would be called before the XML context is prepared
-        if (updater != null)
-            updater.start();
     }
     
     @Override
     public void destroy() {
-    	if (updater != null) {
-            // updater is a user (not daemon) thread
-            // shut it down properly so container shutdown does not stall
-            updater.stop();
-    	}
-        
         graphService.evictAll();
     }
     

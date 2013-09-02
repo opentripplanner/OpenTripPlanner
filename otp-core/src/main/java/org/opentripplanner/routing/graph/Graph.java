@@ -36,9 +36,13 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
+
+import lombok.Getter;
+import lombok.Setter;
 
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.Agency;
@@ -55,11 +59,13 @@ import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
-import org.opentripplanner.routing.edgetype.TimetableSnapshotSource;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
+import org.opentripplanner.updater.GraphUpdaterConfigurator;
+import org.opentripplanner.updater.GraphUpdaterManager;
+import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,7 +110,9 @@ public class Graph implements Serializable {
 
     public transient StreetVertexIndexService streetIndex;
 
-    public transient TimetableSnapshotSource timetableSnapshotSource = null;
+    @Getter
+    @Setter
+    private transient TimetableSnapshotSource timetableSnapshotSource = null;
 
     private transient List<GraphBuilderAnnotation> graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>(); // initialize for tests
 
@@ -117,6 +125,25 @@ public class Graph implements Serializable {
     private VertexComparatorFactory vertexComparatorFactory = new MortonVertexComparatorFactory();
 
     private transient TimeZone timeZone = null;
+    
+    /**
+     * Makes it possible to embed a default configuration inside a graph.
+     * 
+     * @see EmbeddedConfigGraphBuilderImpl
+     */
+    @Getter
+    @Setter
+    private Properties embeddedPreferences = null;
+
+    /**
+     * Manages all updaters of this graph. Is created by the GraphUpdaterConfigurator when there are
+     * graph updaters defined in the configuration.
+     * 
+     * @see GraphUpdaterConfigurator
+     */
+    @Getter
+    @Setter
+    private transient GraphUpdaterManager updaterManager = null;
 
     public Graph(Graph basedOn) {
         this();
