@@ -58,7 +58,9 @@ public class ScheduledTripTimes extends TripTimes implements Serializable {
      * times are to be derived from the departure times array. Field is non-final to support 
      * compaction.
      */ //@XmlElement
-    private int[] arrivalTimes; 
+    private int[] arrivalTimes;
+
+    protected int[] stopSequences;
 
     /** The provided stopTimes are assumed to be pre-filtered, valid, and monotonically increasing. */ 
     public ScheduledTripTimes(Trip trip, List<StopTime> stopTimes) {
@@ -67,10 +69,15 @@ public class ScheduledTripTimes extends TripTimes implements Serializable {
         int nHops = nStops - 1;
         departureTimes = new int[nHops];
         arrivalTimes = new int[nHops];
+        stopSequences = new int[nStops];
         // this might be clearer if time array indexes were stops instead of hops
         for (int hop = 0; hop < nHops; hop++) {
             departureTimes[hop] = stopTimes.get(hop).getDepartureTime();
             arrivalTimes[hop] = stopTimes.get(hop + 1).getArrivalTime();
+        }
+        for (int stop = 0; stop < nStops; stop++) {
+            StopTime stopTime = stopTimes.get(stop);
+            stopSequences[stop] = stopTime.getStopSequence();
         }
         this.headsigns = makeHeadsignsArray(stopTimes);
         // If all dwell times are 0, arrival times array is not needed. Attempt to save some memory.
@@ -139,10 +146,25 @@ public class ScheduledTripTimes extends TripTimes implements Serializable {
             return departureTimes[hop + 1];
         return arrivalTimes[hop];
     }
-    
+
+    @Override
+    public int getStopSequence(int stopIndex) {
+        if(stopSequences != null) {
+            return stopSequences[stopIndex];
+        }
+
+        return stopIndex + 1;
+    }
+
     /** {@inheritDoc} Replaces the arrivals array with null if all dwell times are zero. */
     @Override
     public boolean compact() {
+        boolean ret = compactArrivalsAndDepartures();
+        ret = compactStopSequence() || ret;
+        return ret;
+    }
+
+    private boolean compactArrivalsAndDepartures() {
         if (arrivalTimes == null)
             return false;
         // use arrivalTimes to determine number of hops because departureTimes may have grown by 1
@@ -161,7 +183,20 @@ public class ScheduledTripTimes extends TripTimes implements Serializable {
         arrivalTimes = null;
         return true;
     }
-    
+
+    private boolean compactStopSequence() {
+        // TODO
+        return false;
+    }
+
+    public void compactStopSequence(ScheduledTripTimes firstTripTime) {
+        if(firstTripTime.stopSequences == null || stopSequences == null) {
+            return;
+        } else if(firstTripTime.stopSequences.equals(stopSequences)) {
+            stopSequences = firstTripTime.stopSequences;
+        }
+    }
+
     @SuppressWarnings("unused")
     private boolean decompact() {
         if (arrivalTimes != null)
