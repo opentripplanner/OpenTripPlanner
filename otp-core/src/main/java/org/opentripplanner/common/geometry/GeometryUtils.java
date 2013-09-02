@@ -16,16 +16,19 @@ package org.opentripplanner.common.geometry;
 import org.opentripplanner.common.model.P2;
 
 import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.linearref.LengthLocationMap;
 import com.vividsolutions.jts.linearref.LinearLocation;
 import com.vividsolutions.jts.linearref.LocationIndexedLine;
 
 public class GeometryUtils {
 
-    private static CoordinateSequenceFactory csf = new Serializable2DPackedCoordinateSequenceFactory();
+    private static CoordinateSequenceFactory csf =
+            new Serializable2DPackedCoordinateSequenceFactory();
     private static GeometryFactory gf = new GeometryFactory(csf);
 
     public static LineString makeLineString(double... coords) {
@@ -45,6 +48,7 @@ public class GeometryUtils {
      * Splits the input geometry into two LineStrings at the given point.
      */
     public static P2<LineString> splitGeometryAtPoint(Geometry geometry, Coordinate nearestPoint) {
+        // An index in JTS can actually refer to any point along the line. It is NOT an array index.
         LocationIndexedLine line = new LocationIndexedLine(geometry);
         LinearLocation l = line.indexOf(nearestPoint);
 
@@ -54,6 +58,32 @@ public class GeometryUtils {
         return new P2<LineString>(beginning, ending);
     }
     
+    /**
+     * Splits the input geometry into two LineStrings at a fraction of the distance covered.
+     */
+    public static P2<LineString> splitGeometryAtFraction(Geometry geometry, double fraction) {
+        LineString empty = new LineString(null, gf);
+        Coordinate[] coordinates = geometry.getCoordinates();
+        CoordinateSequence sequence = gf.getCoordinateSequenceFactory().create(coordinates);
+        LineString total = new LineString(sequence, gf);
+
+        if (coordinates.length < 2) return new P2<LineString>(empty, empty);
+        if (fraction <= 0) return new P2<LineString>(empty, total);
+        if (fraction >= 1) return new P2<LineString>(total, empty);
+
+        double totalDistance = total.getLength();
+        double requestedDistance = totalDistance * fraction;
+
+        // An index in JTS can actually refer to any point along the line. It is NOT an array index.
+        LocationIndexedLine line = new LocationIndexedLine(geometry);
+        LinearLocation l = LengthLocationMap.getLocation(geometry, requestedDistance);
+
+        LineString beginning = (LineString) line.extractLine(line.getStartIndex(), l);
+        LineString ending = (LineString) line.extractLine(l, line.getEndIndex());
+
+        return new P2<LineString>(beginning, ending);
+    }
+
     /**
      * Returns the chunk of the given geometry between the two given coordinates.
      * 

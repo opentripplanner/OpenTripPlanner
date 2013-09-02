@@ -46,7 +46,7 @@ public class OnBoardDepartPatternHop extends Edge implements OnboardEdge {
 
     private int stopIndex;
 
-    private float positionInHop;
+    private double positionInHop;
 
     private Trip trip;
 
@@ -64,9 +64,10 @@ public class OnBoardDepartPatternHop extends Edge implements OnboardEdge {
      *        far.
      */
     public OnBoardDepartPatternHop(OnboardDepartVertex from, PatternStopVertex to,
-            TripTimes tripTimes, ServiceDay serviceDay, int stopIndex, float positionInHop) {
+            TripTimes tripTimes, ServiceDay serviceDay, int stopIndex, double positionInHop) {
         super(from, to);
         this.stopIndex = stopIndex;
+        this.serviceDay = serviceDay;
         this.tripTimes = tripTimes;
         this.positionInHop = positionInHop;
         this.trip = tripTimes.getTrip();
@@ -116,8 +117,8 @@ public class OnBoardDepartPatternHop extends Edge implements OnboardEdge {
         s1.setZone(endStop.getZoneId());
         s1.setRoute(trip.getRoute().getId());
 
-        int remainingTime = Math
-                .round((1.0f - positionInHop) * tripTimes.getRunningTime(stopIndex));
+        int remainingTime = (int) Math.round(
+                (1.0 - positionInHop) * tripTimes.getRunningTime(stopIndex));
 
         s1.incrementTimeInSeconds(remainingTime);
         s1.incrementWeight(remainingTime);
