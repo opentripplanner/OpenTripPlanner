@@ -47,6 +47,7 @@ public class GeometryUtils {
      * Splits the input geometry into two LineStrings at the given point.
      */
     public static P2<LineString> splitGeometryAtPoint(Geometry geometry, Coordinate nearestPoint) {
+        // An index in JTS can actually refer to any point along the line. It is NOT an array index.
         LocationIndexedLine line = new LocationIndexedLine(geometry);
         LinearLocation l = line.indexOf(nearestPoint);
 
@@ -76,36 +77,17 @@ public class GeometryUtils {
         int lowIndex = (int) Math.floor(fractionalIndex);
         int highIndex = (int) Math.ceil(fractionalIndex);
 
-        if (lowIndex == highIndex) {
-            return splitGeometryAtPoint(geometry, coordinates[lowIndex]);
-        } else {
+        Coordinate coordinate = coordinates[lowIndex];
+
+        if (lowIndex != highIndex) {
             double lowFactor = highIndex - fractionalIndex;
             double highFactor = fractionalIndex - lowIndex;
             double x = coordinates[lowIndex].x * lowFactor + coordinates[highIndex].x * highFactor;
             double y = coordinates[lowIndex].y * lowFactor + coordinates[highIndex].y * highFactor;
 
-            Coordinate splitCoordinate = new Coordinate(x, y);
-            Coordinate[] beginning = new Coordinate[lowIndex + 2];
-            Coordinate[] ending = new Coordinate[coordinates.length - lowIndex];
-
-            for (int i = 0; i <= lowIndex; i++) {
-                beginning[i] = coordinates[i];
-            }
-            beginning[lowIndex + 1] = splitCoordinate;
-
-            CoordinateSequence firstSequence = gf.getCoordinateSequenceFactory().create(beginning);
-            LineString firstLineString = new LineString(firstSequence, gf);
-
-            for (int i = coordinates.length - 1; i >= highIndex; i--) {
-                ending[i - lowIndex] = coordinates[i];
-            }
-            ending[0] = splitCoordinate;
-
-            CoordinateSequence secondSequence = gf.getCoordinateSequenceFactory().create(ending);
-            LineString secondLineString = new LineString(secondSequence, gf);
-
-            return new P2<LineString>(firstLineString, secondLineString);
+            coordinate = new Coordinate(x, y);
         }
+        return splitGeometryAtPoint(geometry, coordinate);
     }
 
     /**
