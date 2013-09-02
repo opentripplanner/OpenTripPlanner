@@ -16,6 +16,7 @@ package org.opentripplanner.routing.impl;
 import java.util.List;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -52,8 +53,6 @@ import com.vividsolutions.jts.geom.LineString;
  * TODO The method is not optimal for looping trips, as several origin point can map to distinct
  * location on trip shape.
  * 
- * TODO Add mode with heuristics based on departure time only (may be too brittle?)
- * 
  * @author laurent
  */
 public class OnBoardDepartServiceImpl implements OnBoardDepartService {
@@ -77,96 +76,172 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
         }
         List<PatternHop> hops = tripPattern.getPatternHops();
 
-        /*
-         * 2. Get the best hop from the list, given the parameters. Currently look for nearest hop,
-         * taking into account shape if available. If no shape are present, the computed hop and
-         * fraction may be a bit away from what it should be.
-         */
         Double lon = opt.getFrom().getLng(); // Origin point, optional
         Double lat = opt.getFrom().getLat();
+        PatternStopVertex nextStop;
+        TripTimes tripTimes;
+        ServiceDay bestServiceDay = null;
+        int stopIndex;
+        double fractionCovered;
+        LineString geomRemaining;
+
         Coordinate point = lon == null || lat == null ? null : new Coordinate(lon, lat);
-        if (point == null) {
-            // If you want to support this, you have to give in the request the hop index and hop
-            // fraction percentage.
-            throw new UnsupportedOperationException(
-                    "Unsupported on-board depart without initial location.");
-        }
-        PatternHop bestHop = null;
-        double minDist = Double.MAX_VALUE;
-        for (PatternHop hop : hops) {
-            LineString line = hop.getGeometry();
-            double dist = distanceLibrary.fastDistance(point, line);
-            if (dist < minDist) {
-                minDist = dist;
-                bestHop = hop;
+        if (point != null) {
+            /*
+             * 2. Get the best hop from the list, given the parameters. Currently look for nearest hop,
+             * taking into account shape if available. If no shape are present, the computed hop and
+             * fraction may be a bit away from what it should be.
+             */
+            PatternHop bestHop = null;
+            double minDist = Double.MAX_VALUE;
+            for (PatternHop hop : hops) {
+                LineString line = hop.getGeometry();
+                double dist = distanceLibrary.fastDistance(point, line);
+                if (dist < minDist) {
+                    minDist = dist;
+                    bestHop = hop;
+                }
             }
-        }
-        if (minDist > 1000)
-            LOG.warn(
+            if (minDist > 1000) LOG.warn(
                     "On-board depart: origin point suspiciously away from nearest trip shape ({} meters)",
                     minDist);
-        else
-            LOG.info("On-board depart: origin point {} meters away from hop shape", minDist);
+            else LOG.info("On-board depart: origin point {} meters away from hop shape", minDist);
 
-        /*
-         * 3. Compute the fraction covered percentage of the current hop. This assume a constant
-         * trip speed alongside the whole hop: this should be quite precise for small hops (buses),
-         * a bit less for longer ones (long distance train). Shape linear distance is of no help
-         * here, as the unit is arbitrary (and probably usually a distance).
-         */
-        P2<LineString> geomPair = GeometryUtils.splitGeometryAtPoint(bestHop.getGeometry(), point);
-        LineString geomRemaining = geomPair.getSecond();
-        double total = distanceLibrary.fastLength(bestHop.getGeometry());
-        double remaining = distanceLibrary.fastLength(geomRemaining);
-        float fractionCovered = total > 0.0 ? (float) (1.0f - remaining / total) : 0.0f;
-
-        PatternStopVertex nextStop = (PatternStopVertex) bestHop.getToVertex();
-        int stopIndex = bestHop.getStopIndex();
-
-        /* 3. Get the tripTimes */
-        TableTripPattern pattern = nextStop.getTripPattern();
-        TripTimes tripTimes = pattern.getTripTimes(pattern.getTripIndex(tripId));
-        
-        /*
-         * 4. Compute service day based on given departure day/time relative to scheduled/real-time
-         * trip time for hop. This is needed as for some trips any service day can apply.
-         */
-        ServiceDay bestServiceDay = null;
-        int minDelta = Integer.MAX_VALUE;
-        int actDelta = 0;
-        for (ServiceDay serviceDay : ctx.serviceDays) {
-            // Get the tripTimes including real-time updates for the serviceDay
-            if (ctx.timetableSnapshot != null) {
-                Timetable timeTable = ctx.timetableSnapshot.resolve(pattern, serviceDay.getServiceDate());
-                tripTimes = timeTable.getTripTimes(timeTable.getTripIndex(tripId));
-            }
-            
-            int depTime = tripTimes.getDepartureTime(stopIndex);
-            int arrTime = tripTimes.getArrivalTime(stopIndex);
-            int estTime = Math.round(depTime * fractionCovered + arrTime * (1 - fractionCovered));
-
-            int time = serviceDay.secondsSinceMidnight(opt.dateTime);
             /*
-             * TODO Weight differently early vs late time, as the probability of any transit being
-             * late is higher than being early. However, this has impact if your bus is more than
-             * 12h late, I don't think this would happen really often.
+             * 3. Compute the fraction covered percentage of the current hop. This assume a constant
+             * trip speed alongside the whole hop: this should be quite precise for small hops
+             * (buses), a bit less for longer ones (long distance train). Shape linear distance is
+             * of no help here, as the unit is arbitrary (and probably usually a distance).
              */
-            int deltaTime = Math.abs(time - estTime);
-            if (deltaTime < minDelta) {
-                minDelta = deltaTime;
-                actDelta = time - estTime;
-                bestServiceDay = serviceDay;
+            LineString geometry = bestHop.getGeometry();
+            P2<LineString> geomPair = GeometryUtils.splitGeometryAtPoint(geometry, point);
+            geomRemaining = geomPair.getSecond();
+            double total = distanceLibrary.fastLength(geometry);
+            double remaining = distanceLibrary.fastLength(geomRemaining);
+            fractionCovered = total > 0.0 ? (double) (1.0 - remaining / total) : 0.0;
+
+            nextStop = (PatternStopVertex) bestHop.getToVertex();
+            stopIndex = bestHop.getStopIndex();
+
+            /* 4. Get the tripTimes */
+            TableTripPattern pattern = nextStop.getTripPattern();
+            tripTimes = pattern.getTripTimes(pattern.getTripIndex(tripId));
+
+            /*
+             * 5. Compute service day based on given departure day/time relative to
+             * scheduled/real-time trip time for hop. This is needed as for some trips any service
+             * day can apply.
+             */
+            int minDelta = Integer.MAX_VALUE;
+            int actDelta = 0;
+            for (ServiceDay serviceDay : ctx.serviceDays) {
+                ServiceDate serviceDate = serviceDay.getServiceDate();
+                // Get the tripTimes including real-time updates for the serviceDay
+                if (ctx.timetableSnapshot != null) {
+                    Timetable timeTable = ctx.timetableSnapshot.resolve(pattern, serviceDate);
+                    tripTimes = timeTable.getTripTimes(timeTable.getTripIndex(tripId));
+                }
+
+                int depTime = tripTimes.getDepartureTime(stopIndex);
+                int arrTime = tripTimes.getArrivalTime(stopIndex);
+                int estTime = (int) Math.round(
+                        depTime * fractionCovered + arrTime * (1 - fractionCovered));
+
+                int time = serviceDay.secondsSinceMidnight(opt.dateTime);
+                /*
+                 * TODO Weight differently early vs late time, as the probability of any transit
+                 * being late is higher than being early. However, this has impact if your bus is
+                 * more than 12h late, I don't think this would happen really often.
+                 */
+                int deltaTime = Math.abs(time - estTime);
+                if (deltaTime < minDelta) {
+                    minDelta = deltaTime;
+                    actDelta = time - estTime;
+                    bestServiceDay = serviceDay;
+                }
             }
-        }
-        if (minDelta > 60000)
-            // Being more than 1h late should not happen often
-            LOG.warn(
+            if (minDelta > 60000) LOG.warn(       // Being more than 1h late should not happen often
                     "On-board depart: delta between scheduled/real-time and actual time suspiciously large: {} seconds.",
                     actDelta);
-        else
-            LOG.info(
+            else LOG.info(
                     "On-board depart: delta between scheduled/real-time and actual time is {} seconds.",
                     actDelta);
+        } else {
+            /* 2. Get the tripTimes */
+            tripTimes = tripPattern.getTripTimes(tripPattern.getTripIndex(tripId));
+            PatternHop firstHop = hops.get(0);
+            PatternHop lastHop = hops.get(hops.size() - 1);
+
+            /* 3. Compute service day */
+            for (ServiceDay serviceDay : ctx.serviceDays) {
+                ServiceDate serviceDate = serviceDay.getServiceDate();
+                // Get the tripTimes including real-time updates for the serviceDay
+                if (ctx.timetableSnapshot != null) {
+                    Timetable timeTable = ctx.timetableSnapshot.resolve(tripPattern, serviceDate);
+                    tripTimes = timeTable.getTripTimes(timeTable.getTripIndex(tripId));
+                }
+
+                int depTime = tripTimes.getDepartureTime(firstHop.getStopIndex());
+                int arrTime = tripTimes.getArrivalTime(lastHop.getStopIndex());
+
+                int time = serviceDay.secondsSinceMidnight(opt.dateTime);
+
+                if (depTime <= time && time <= arrTime) {
+                    bestServiceDay = serviceDay;
+                }
+            }
+
+            if (bestServiceDay == null) {
+                throw new RuntimeException("Unable to determine on-board depart service day.");
+            }
+
+            int time = bestServiceDay.secondsSinceMidnight(opt.dateTime);
+
+            /*
+             * 4. Get the best hop from the list, given the parameters. This is done by finding the
+             * last hop that has not yet departed.
+             */
+
+            PatternHop bestHop = null;
+
+            for (PatternHop hop : hops) {
+                int depTime = tripTimes.getDepartureTime(hop.getStopIndex());
+
+                if (depTime > time) {
+                    break;
+                } else {
+                   bestHop = hop;
+                }
+            }
+
+            nextStop = (PatternStopVertex) bestHop.getToVertex();
+            stopIndex = bestHop.getStopIndex();
+
+            LineString geometry = bestHop.getGeometry();
+
+            /*
+             * 5. Compute the fraction covered percentage of the current hop. Once again a constant
+             * trip speed is assumed. The linear distance of the shape is used, so the results are
+             * not 100% accurate. On the flip side, they are easy to compute and very well testable.
+             */
+            int depTime = tripTimes.getDepartureTime(stopIndex);
+            int arrTime = tripTimes.getArrivalTime(stopIndex);
+            fractionCovered =  ((double) (time - depTime)) / ((double) (arrTime - depTime));
+
+            P2<LineString> geomPair =
+                    GeometryUtils.splitGeometryAtFraction(geometry, fractionCovered);
+            geomRemaining = geomPair.getSecond();
+
+            if (geomRemaining.isEmpty()) {
+                lon = Double.NaN;
+                lat = Double.NaN;
+            } else {
+                Coordinate start = geomRemaining.getCoordinateN(0);
+                lon = start.x;
+                lat = start.y;
+            }
+        }
+
         OnboardDepartVertex onboardDepart = new OnboardDepartVertex("on_board_depart", lon, lat);
         OnBoardDepartPatternHop startHop = new OnBoardDepartPatternHop(onboardDepart, nextStop,
                 tripTimes, bestServiceDay, stopIndex, fractionCovered);
