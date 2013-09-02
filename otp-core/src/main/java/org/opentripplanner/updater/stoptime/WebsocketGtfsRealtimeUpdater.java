@@ -40,7 +40,7 @@ import com.ning.http.client.websocket.WebSocketUpgradeHandler;
  * callback is registered which handles incoming GTFS-RT messages as they stream in by placing a
  * GTFS-RT decoder Runnable task in the single-threaded executor for handling.
  * 
- * Usage example ('example' name is an example) in the file 'Graph.properties':
+ * Usage example ('websocket' name is an example) in the file 'Graph.properties':
  * 
  * <pre>
  * websocket.type = websocket-stop-time-updater
