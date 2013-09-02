@@ -27,14 +27,14 @@ public class UpdatedTripTimes extends DelegatingTripTimes {
     private int[] departures;
     
     // maybe push pattern and offset into block
-    public UpdatedTripTimes(ScheduledTripTimes sched, TripUpdate tripUpdate, int offset) {
+    public UpdatedTripTimes(ScheduledTripTimes sched, TripUpdateList tripUpdateList, int offset) {
         super(sched);
         this.offset = offset;
-        int nUpdates = tripUpdate.getUpdates().size();
+        int nUpdates = tripUpdateList.getUpdates().size();
         this.arrivals = new int[nUpdates];
         this.departures = new int[nUpdates];
         int ui = 0;
-        for (Update update : tripUpdate.getUpdates()) {
+        for (Update update : tripUpdateList.getUpdates()) {
             switch (update.status) {
             case PASSED:
                 arrivals[ui] = TripTimes.PASSED;

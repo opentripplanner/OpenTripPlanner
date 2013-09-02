@@ -45,7 +45,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.trippattern.TripUpdate;
+import org.opentripplanner.routing.trippattern.TripUpdateList;
 import org.opentripplanner.routing.trippattern.Update;
 import org.opentripplanner.routing.trippattern.Update.Status;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
@@ -172,8 +172,8 @@ public class TestTransfers extends TestCase {
             int stopSeq, int arrive, int depart, Status prediction, int timestamp, String serviceDate) throws ParseException {
         Update update = new Update(new AgencyAndId("agency", tripId), new AgencyAndId("agency", stopId), stopSeq, arrive, depart, prediction, timestamp, ServiceDate.parseString(serviceDate));
         ArrayList<Update> updates = new ArrayList<Update>(Arrays.asList(update));
-        TripUpdate tripUpdate = TripUpdate.splitByTrip(updates).get(0);
-        boolean success = pattern.update(tripUpdate);
+        TripUpdateList tripUpdateList = TripUpdateList.splitByTrip(updates).get(0);
+        boolean success = pattern.update(tripUpdateList);
         assertTrue(success);
     }
     
