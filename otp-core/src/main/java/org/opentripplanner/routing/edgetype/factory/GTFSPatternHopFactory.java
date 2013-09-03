@@ -66,6 +66,7 @@ import org.opentripplanner.routing.edgetype.FrequencyBoard;
 import org.opentripplanner.routing.edgetype.FrequencyDwell;
 import org.opentripplanner.routing.edgetype.FrequencyHop;
 import org.opentripplanner.routing.edgetype.HopEdge;
+import org.opentripplanner.routing.edgetype.ParentChildStopEdge;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
@@ -1534,6 +1535,77 @@ public class GTFSPatternHopFactory {
         this.fareServiceFactory = fareServiceFactory;
     }
 
+    /** 
+     * Create bidirectional, "free" edges (zero-time, low-cost edges) between stops and their 
+     * parent stations. This is used to produce implicit transfers between all stops that are
+     * part of the same parent station. It was introduced as a workaround to allow in-station 
+     * transfers for underground/grade-separated transportation systems like the NYC subway.
+     * 
+     * This step used to be automatically applied whenever transfers.txt was used to create 
+     * transfers (rathen than or in addition to transfers through the street netowrk), 
+     * but has been separated out since it is really a separate process.
+     */
+    public void linkStopsWithinParentStops () {
+        for (Stop stop : _dao.getAllStops()) {
+            String parentStation = stop.getParentStation();
+            if (parentStation != null) {
+                Vertex stopVertex = context.stopNodes.get(stop);
+
+                String agencyId = stop.getId().getAgencyId();
+                AgencyAndId parentStationId = new AgencyAndId(agencyId, parentStation);
+
+                Stop parentStop = _dao.getStopForId(parentStationId);
+                Vertex parentStopVertex = context.stopNodes.get(parentStop);
+
+                new FreeEdge(parentStopVertex, stopVertex);
+                new FreeEdge(stopVertex, parentStopVertex);
+
+                // Stops with location_type=2 (entrances as defined in the pathways.txt
+                // proposal) have no arrive/depart vertices, hence the null checks.
+                Vertex stopArriveVertex = context.stopArriveNodes.get(stop);
+                Vertex parentStopArriveVertex = context.stopArriveNodes.get(parentStop);
+                if (stopArriveVertex != null && parentStopArriveVertex != null) {
+                    new FreeEdge(parentStopArriveVertex, stopArriveVertex);
+                    new FreeEdge(stopArriveVertex, parentStopArriveVertex);
+                }
+
+                Vertex stopDepartVertex = context.stopDepartNodes.get(stop);
+                Vertex parentStopDepartVertex = context.stopDepartNodes.get(parentStop);
+                if (stopDepartVertex != null && parentStopDepartVertex != null) {
+                    new FreeEdge(parentStopDepartVertex, stopDepartVertex);
+                    new FreeEdge(stopDepartVertex, parentStopDepartVertex);
+                }
+
+                // TODO: provide a cost for these edges when stations and
+                // stops have different locations
+            }
+        }
+    }
+    
+    /**
+     * Links the vertices representing parent stops to their child stops bidirectionally. This is
+     * not intended to provide implicit transfers (i.e. child stop to parent station to another
+     * child stop) but instead to allow beginning or ending a path (itinerary) at a parent station.
+     * 
+     * Currently this linking is only intended for use in the long distance path service. The
+     * pathparsers should ensure that it is effectively ignored in other path services, and even in
+     * the long distance path service anywhere but the beginning or end of a path.
+     */
+    public void linkStopsToParentStops () {
+        for (Stop stop : _dao.getAllStops()) {
+            String parentStation = stop.getParentStation();
+            if (parentStation != null) {
+                TransitStop stopVertex = context.stopNodes.get(stop);
+                String agencyId = stop.getId().getAgencyId();
+                AgencyAndId parentStationId = new AgencyAndId(agencyId, parentStation);
+                Stop parentStop = _dao.getStopForId(parentStationId);
+                TransitStop parentStopVertex = context.stopNodes.get(parentStop);
+                new ParentChildStopEdge(parentStopVertex, stopVertex);
+                new ParentChildStopEdge(stopVertex, parentStopVertex);
+            }
+        }        
+    }
+    
     /**
      * 1. Create edges between stops and their parent stations.
      * 2. Create transfer edges between stops which are listed in transfers.txt.
@@ -1544,44 +1616,11 @@ public class GTFSPatternHopFactory {
      * NOTE: this method is only called when transfersTxtDefinesStationPaths is set to
      * True for a given GFTS feed. 
      */
-    public void createStationTransfers(Graph graph, boolean linkStopsToParentStops) {
+    public void createStationTransfers(Graph graph, boolean linkStopsWithinParentStops) {
 
         /*  1. Optionally connect stops to their parent stations. */
-        if (linkStopsToParentStops) {
-            for (Stop stop : _dao.getAllStops()) {
-                String parentStation = stop.getParentStation();
-                if (parentStation != null) {
-                    Vertex stopVertex = context.stopNodes.get(stop);
-
-                    String agencyId = stop.getId().getAgencyId();
-                    AgencyAndId parentStationId = new AgencyAndId(agencyId, parentStation);
-
-                    Stop parentStop = _dao.getStopForId(parentStationId);
-                    Vertex parentStopVertex = context.stopNodes.get(parentStop);
-
-                    new FreeEdge(parentStopVertex, stopVertex);
-                    new FreeEdge(stopVertex, parentStopVertex);
-
-                    // Stops with location_type=2 (entrances as defined in the pathways.txt
-                    // proposal) have no arrive/depart vertices, hence the null checks.
-                    Vertex stopArriveVertex = context.stopArriveNodes.get(stop);
-                    Vertex parentStopArriveVertex = context.stopArriveNodes.get(parentStop);
-                    if (stopArriveVertex != null && parentStopArriveVertex != null) {
-                        new FreeEdge(parentStopArriveVertex, stopArriveVertex);
-                        new FreeEdge(stopArriveVertex, parentStopArriveVertex);
-                    }
-
-                    Vertex stopDepartVertex = context.stopDepartNodes.get(stop);
-                    Vertex parentStopDepartVertex = context.stopDepartNodes.get(parentStop);
-                    if (stopDepartVertex != null && parentStopDepartVertex != null) {
-                        new FreeEdge(parentStopDepartVertex, stopDepartVertex);
-                        new FreeEdge(stopDepartVertex, parentStopDepartVertex);
-                    }
-
-                    // TODO: provide a cost for these edges when stations and
-                    // stops have different locations
-                }
-            }
+        if (linkStopsWithinParentStops) {
+            linkStopsWithinParentStops();
         }
         /* 2. Create transfer edges based on transfers.txt. */
         for (Transfer transfer : _dao.getAllTransfers()) {
