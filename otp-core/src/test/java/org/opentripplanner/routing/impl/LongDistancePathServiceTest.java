@@ -205,22 +205,18 @@ public class LongDistancePathServiceTest {
         // Assumes only the backedge is used for the terminal
         boolean accept = false;
 
-        final int invalidState = -1;
-        int currentState = invalidState;
+        // Start in state 0
+        int currentState = 0;
         for (Class<? extends Edge> edgeClass : path) {
             // Create dummy state with edge as back edge
             State state = mock(State.class);
-            Edge edge = mock(edgeClass); 
+            Edge edge = mock(edgeClass);
             when(state.getBackEdge()).thenReturn(edge);
 
             // Get terminal of state
             int terminal = parser.terminalFor(state);
             // First state?
-            if (currentState == invalidState) {
-                currentState = terminal;
-            } else {
-                currentState = parser.transition(currentState, terminal);
-            }
+            currentState = parser.transition(currentState, terminal);
             if (currentState == AutomatonState.REJECT) {
                 return false;
             }
