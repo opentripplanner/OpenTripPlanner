@@ -57,6 +57,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.patch.Alert;
+import org.opentripplanner.routing.patch.Patch;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
@@ -539,6 +540,7 @@ public class PlanGenerator {
         for (State state : states) {
             TraverseMode mode = state.getBackMode();
             Set<Alert> alerts = state.getBackAlerts();
+            Edge edge = state.getBackEdge();
 
             if (mode != null) {
                 leg.mode = mode.toString();
@@ -547,6 +549,12 @@ public class PlanGenerator {
             if (alerts != null) {
                 for (Alert alert : alerts) {
                     leg.addAlert(alert);
+                }
+            }
+
+            if (edge != null) {
+                for (Patch patch : edge.getPatches()) {
+                    leg.addAlert(patch.getAlert());
                 }
             }
         }
