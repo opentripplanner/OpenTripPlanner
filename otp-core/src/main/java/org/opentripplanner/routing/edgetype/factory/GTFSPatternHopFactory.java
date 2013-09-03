@@ -66,7 +66,7 @@ import org.opentripplanner.routing.edgetype.FrequencyBoard;
 import org.opentripplanner.routing.edgetype.FrequencyDwell;
 import org.opentripplanner.routing.edgetype.FrequencyHop;
 import org.opentripplanner.routing.edgetype.HopEdge;
-import org.opentripplanner.routing.edgetype.ParentChildStopEdge;
+import org.opentripplanner.routing.edgetype.StationStopEdge;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
@@ -1601,8 +1601,8 @@ public class GTFSPatternHopFactory {
                 AgencyAndId parentStationId = new AgencyAndId(agencyId, parentStation);
                 Stop parentStop = _dao.getStopForId(parentStationId);
                 TransitStop parentStopVertex = context.stopNodes.get(parentStop);
-                new ParentChildStopEdge(parentStopVertex, stopVertex);
-                new ParentChildStopEdge(stopVertex, parentStopVertex);
+                new StationStopEdge(parentStopVertex, stopVertex);
+                new StationStopEdge(stopVertex, parentStopVertex);
             }
         }        
     }
