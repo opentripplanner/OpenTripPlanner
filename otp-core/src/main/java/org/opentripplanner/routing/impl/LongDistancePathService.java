@@ -133,7 +133,10 @@ public class LongDistancePathService implements PathService {
             Nonterminal streetLeg = star(STREET);
 
             /* A TransitLeg is a ride on transit, including preboard and prealight edges at its 
-             * ends. It begins and ends at a TransitStop vertex. */
+             * ends. It begins and ends at a TransitStop vertex. 
+             * Note that these are STATION* rather than STATION+ because some transfer edges
+             * (timed transfer edges) connect arrival and depart vertices. Requiring a STATION
+             * edge would prevent them from being traversed. */
             Nonterminal transitLeg = seq(star(STATION), plus(ONBOARD), star(STATION));
             
             /* A beginning gets us from the path's initial vertex to the first transit stop it 
@@ -198,9 +201,7 @@ public class LongDistancePathService implements PathService {
             // There should perhaps be a shared superclass of all transfer edges to simplify this. 
             if (e instanceof SimpleTransfer)    return TRANSFER;
             if (e instanceof TransferEdge)      return TRANSFER;
-            // WARNING HACK Timed transfers connect arrive/depart vertices
-            // if they were not considered onboard, they would be disallowed by plus(STATION)
-            if (e instanceof TimedTransferEdge) return ONBOARD;
+            if (e instanceof TimedTransferEdge) return TRANSFER;
             if (e instanceof StreetTransitLink) return LINK;
             // Is it really correct to clasify all other edges as STREET?
             return STREET;
