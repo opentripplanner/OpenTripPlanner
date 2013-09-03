@@ -34,6 +34,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.OnboardEdge;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.StationEdge;
+import org.opentripplanner.routing.edgetype.StationStopEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.TimedTransferEdge;
 import org.opentripplanner.routing.edgetype.TransferEdge;
@@ -122,6 +123,7 @@ public class LongDistancePathService implements PathService {
         private static final int STATION = 3;
         private static final int ONBOARD = 4;
         private static final int TRANSFER = 5;
+        private static final int STATION_STOP = 6;
 
         private static final DFA DFA;
 
@@ -132,7 +134,7 @@ public class LongDistancePathService implements PathService {
             Nonterminal streetAndTransitItinerary = seq(streetLeg, LINK, stopToStop, LINK, streetLeg);
             Nonterminal transitItinerary = seq(optional(TRANSFER), stopToStop, optional(TRANSFER));
             // FIXME
-            Nonterminal onboardItinerary = seq( plus(ONBOARD), plus(STATION), star(TRANSFER, transitLeg),
+            Nonterminal onboardItinerary = seq( plus(ONBOARD), plus(STATION), star(optional(TRANSFER), transitLeg),
                     LINK, streetLeg);
             Nonterminal itinerary = 
                     choice(streetLeg, streetAndTransitItinerary, onboardItinerary, transitItinerary);
@@ -146,16 +148,20 @@ public class LongDistancePathService implements PathService {
             return DFA;
         }
 
+        /**
+         * The terminal is based exclusively on the backEdge, i.e. each terminal represents 
+         * exactly one edge in the path.
+         */
         @Override
         public int terminalFor(State state) {
-            Vertex v = state.getVertex();
             Edge e = state.getBackEdge();
             if (e == null) {
                 throw new RuntimeException ("terminalFor should never be called on States without back edges!");
             }
             /* OnboardEdge currently includes BoardAlight edges. */
-            if (e instanceof OnboardEdge) return ONBOARD;
-            if (e instanceof StationEdge) return STATION;
+            if (e instanceof OnboardEdge)       return ONBOARD;
+            if (e instanceof StationEdge)       return STATION;
+            if (e instanceof StationStopEdge)   return STATION_STOP;
             // There should perhaps be a shared superclass of all transfer edges to simplify this. 
             if (e instanceof TimedTransferEdge) return TRANSFER;
             if (e instanceof SimpleTransfer)    return TRANSFER;
