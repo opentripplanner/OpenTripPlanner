@@ -1539,13 +1539,14 @@ public class GTFSPatternHopFactory {
      * Create bidirectional, "free" edges (zero-time, low-cost edges) between stops and their 
      * parent stations. This is used to produce implicit transfers between all stops that are
      * part of the same parent station. It was introduced as a workaround to allow in-station 
-     * transfers for underground/grade-separated transportation systems like the NYC subway.
+     * transfers for underground/grade-separated transportation systems like the NYC subway (where
+     * it's important to provide in-station transfers for fare computation).
      * 
      * This step used to be automatically applied whenever transfers.txt was used to create 
      * transfers (rathen than or in addition to transfers through the street netowrk), 
      * but has been separated out since it is really a separate process.
      */
-    public void linkStopsWithinParentStops () {
+    public void createParentStationTransfers () {
         for (Stop stop : _dao.getAllStops()) {
             String parentStation = stop.getParentStation();
             if (parentStation != null) {
@@ -1591,7 +1592,7 @@ public class GTFSPatternHopFactory {
      * pathparsers should ensure that it is effectively ignored in other path services, and even in
      * the long distance path service anywhere but the beginning or end of a path.
      */
-    public void linkStopsToParentStops () {
+    public void linkStopsToParentStations () {
         for (Stop stop : _dao.getAllStops()) {
             String parentStation = stop.getParentStation();
             if (parentStation != null) {
@@ -1607,22 +1608,14 @@ public class GTFSPatternHopFactory {
     }
     
     /**
-     * 1. Create edges between stops and their parent stations.
-     * 2. Create transfer edges between stops which are listed in transfers.txt.
-     * 
-     * This is not usually useful, but it's nice for the NYC subway system, where
-     * it's important to provide in-station transfers for fare computation.
+     * Create transfer edges between stops which are listed in transfers.txt.
      * 
      * NOTE: this method is only called when transfersTxtDefinesStationPaths is set to
      * True for a given GFTS feed. 
      */
-    public void createStationTransfers(Graph graph, boolean linkStopsWithinParentStops) {
+    public void createTransfersTxtTransfers() {
 
-        /*  1. Optionally connect stops to their parent stations. */
-        if (linkStopsWithinParentStops) {
-            linkStopsWithinParentStops();
-        }
-        /* 2. Create transfer edges based on transfers.txt. */
+        /* Create transfer edges based on transfers.txt. */
         for (Transfer transfer : _dao.getAllTransfers()) {
 
             int type = transfer.getTransferType();

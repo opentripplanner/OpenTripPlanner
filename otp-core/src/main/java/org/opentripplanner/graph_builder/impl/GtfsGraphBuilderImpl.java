@@ -177,7 +177,13 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
                 hf.run(graph);
 
                 if (gtfsBundle.doesTransfersTxtDefineStationPaths()) {
-                    hf.createStationTransfers(graph, gtfsBundle.isLinkStopsToParentStops());
+                    hf.createTransfersTxtTransfers();
+                }
+                if (gtfsBundle.isLinkStopsToParentStations()) {
+                    hf.linkStopsToParentStations();
+                } 
+                if (gtfsBundle.isParentStationTransfers()) {
+                    hf.createParentStationTransfers();
                 }
                 // run any additional graph builders that require the DAO
                 if (gtfsGraphBuilders != null) {

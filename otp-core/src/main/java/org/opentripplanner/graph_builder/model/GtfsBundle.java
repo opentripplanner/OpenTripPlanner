@@ -47,7 +47,19 @@ public class GtfsBundle {
 
     private boolean transfersTxtDefinesStationPaths = false;
 
-    private boolean linkStopsToParentStops = false;
+    /** 
+     * Create direct transfers between the constituent stops of each parent station.
+     * This is different from "linking stops to parent stations" below.
+     */
+    @Getter @Setter
+    private boolean parentStationTransfers = false;
+
+    /** 
+     * Connect parent station vertices to their constituent stops to allow beginning and 
+     * ending paths (itineraries) at them. 
+     */
+    @Getter @Setter
+    private boolean linkStopsToParentStations = true;
 
     private Map<String, String> agencyIdMappings = new HashMap<String, String>();
 
@@ -170,14 +182,6 @@ public class GtfsBundle {
 
     public void setTransfersTxtDefinesStationPaths(boolean transfersTxtDefinesStationPaths) {
         this.transfersTxtDefinesStationPaths = transfersTxtDefinesStationPaths;
-    }
-
-    public boolean isLinkStopsToParentStops() {
-        return linkStopsToParentStops;
-    }
-
-    public void setLinkStopsToParentStops(boolean linkStopsToParentStops) {
-        this.linkStopsToParentStops = linkStopsToParentStops;
     }
 
     public int getDefaultStreetToStopTime() {
