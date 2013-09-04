@@ -59,7 +59,7 @@ public class GtfsBundle {
      * ending paths (itineraries) at them. 
      */
     @Getter @Setter
-    private boolean linkStopsToParentStations = true;
+    private boolean linkStopsToParentStations = false;
 
     private Map<String, String> agencyIdMappings = new HashMap<String, String>();
 
