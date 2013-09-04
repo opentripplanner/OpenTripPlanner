@@ -84,6 +84,7 @@ import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.patch.Alert;
+import org.opentripplanner.routing.patch.AlertPatch;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -560,9 +561,15 @@ public class PlanGeneratorTest {
         StreetBikeRentalLink e59 = new StreetBikeRentalLink(
                 v58, v60);
 
+        // Alert for testing GTFS-RT
+        AlertPatch patch = new AlertPatch();
+
+        patch.setAlert(Alert.createSimpleAlerts(alertsExample));
+
         // Edge initialization that can't be done using the constructor
         e3.setElevationProfile(elevation3, false);
         e17.addTrip(firstTrip, secondTrip, 4, 0, 0);
+        e29.addPatch(patch);
         e39.setElevationProfile(elevation39, false);
         e41.setElevationProfile(elevation41, false);
         e41.setHasBogusName(true);
@@ -984,8 +991,10 @@ public class PlanGeneratorTest {
         assertEquals("Brian Ferry", legs[4].agencyName);
         assertEquals("http://www.ferry.org/", legs[4].agencyUrl);
         assertEquals(2, legs[4].agencyTimeZoneOffset);
-        assertNull(legs[4].notes);
-        assertNull(legs[4].alerts);
+        assertEquals(1, legs[4].notes.size());
+        assertEquals(alertsExample, legs[4].notes.get(0).text);
+        assertEquals(1, legs[4].alerts.size());
+        assertEquals(Alert.createSimpleAlerts(alertsExample), legs[4].alerts.get(0));
         assertEquals("C", legs[4].route);
         assertEquals("C", legs[4].routeId);
         assertEquals("C", legs[4].routeShortName);
