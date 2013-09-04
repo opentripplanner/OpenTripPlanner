@@ -40,6 +40,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.impl.LongDistancePathService.Parser;
 
 public class LongDistancePathServiceTest {
+
     @Test
     public final void testPathParser() {
         // Create a long distance path parser
@@ -334,7 +335,7 @@ public class LongDistancePathServiceTest {
             path.add(StreetTransitLink.class);
             assertTrue(parsePath(parser, path));
         }
-        
+
         { // Test street link (4 times) (not allowed)
             List<Class<? extends Edge>> path = new ArrayList<Class<? extends Edge>>();
             path.add(StreetTransitLink.class);
@@ -343,15 +344,24 @@ public class LongDistancePathServiceTest {
             path.add(StreetTransitLink.class);
             assertFalse(parsePath(parser, path));
         }
-        
+
     }
 
+    /**
+     * Check whether a "path" is accepted by the long distance path parser.
+     * 
+     * Assumes that only the back edge is used to determine the terminal.
+     * 
+     * @param parser is the long distance path parser
+     * @param path is a list of edge classes that represent a path
+     * @return true when path is accepted
+     */
     private boolean parsePath(Parser parser, List<Class<? extends Edge>> path) {
-        // Assumes only the backedge is used for the terminal
-        boolean accept = false;
+        // Assume a path that is not accepted
+        boolean accepted = false;
 
-        // Start in state 0
-        int currentState = 0;
+        // Start in start state and "walk" through state machine
+        int currentState = AutomatonState.START;
         for (Class<? extends Edge> edgeClass : path) {
             // Create dummy state with edge as back edge
             State state = mock(State.class);
@@ -360,18 +370,20 @@ public class LongDistancePathServiceTest {
 
             // Get terminal of state
             int terminal = parser.terminalFor(state);
-            // First state?
+            // Make a transition
             currentState = parser.transition(currentState, terminal);
+            // Check whether we still are in a valid state
             if (currentState == AutomatonState.REJECT) {
                 return false;
             }
         }
 
+        // Check whether this final state is accepted
         if (parser.accepts(currentState)) {
-            accept = true;
+            accepted = true;
         }
 
-        return accept;
+        return accepted;
     }
 
 }
