@@ -79,7 +79,7 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
         Double lon = opt.getFrom().getLng(); // Origin point, optional
         Double lat = opt.getFrom().getLat();
         PatternStopVertex nextStop;
-        TripTimes tripTimes;
+        TripTimes bestTripTimes = null;
         ServiceDay bestServiceDay = null;
         int stopIndex;
         double fractionCovered;
@@ -123,12 +123,8 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
             nextStop = (PatternStopVertex) bestHop.getToVertex();
             stopIndex = bestHop.getStopIndex();
 
-            /* 4. Get the tripTimes */
-            TableTripPattern pattern = nextStop.getTripPattern();
-            tripTimes = pattern.getTripTimes(pattern.getTripIndex(tripId));
-
             /*
-             * 5. Compute service day based on given departure day/time relative to
+             * 4. Compute service day based on given departure day/time relative to
              * scheduled/real-time trip time for hop. This is needed as for some trips any service
              * day can apply.
              */
@@ -136,6 +132,8 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
             int actDelta = 0;
             for (ServiceDay serviceDay : ctx.serviceDays) {
                 ServiceDate serviceDate = serviceDay.getServiceDate();
+                TableTripPattern pattern = nextStop.getTripPattern();
+                TripTimes tripTimes = pattern.getTripTimes(pattern.getTripIndex(tripId));
                 // Get the tripTimes including real-time updates for the serviceDay
                 if (ctx.timetableSnapshot != null) {
                     Timetable timeTable = ctx.timetableSnapshot.resolve(pattern, serviceDate);
@@ -157,6 +155,7 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
                 if (deltaTime < minDelta) {
                     minDelta = deltaTime;
                     actDelta = time - estTime;
+                    bestTripTimes = tripTimes;
                     bestServiceDay = serviceDay;
                 }
             }
@@ -167,14 +166,13 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
                     "On-board depart: delta between scheduled/real-time and actual time is {} seconds.",
                     actDelta);
         } else {
-            /* 2. Get the tripTimes */
-            tripTimes = tripPattern.getTripTimes(tripPattern.getTripIndex(tripId));
+            /* 2. Compute service day */
             PatternHop firstHop = hops.get(0);
             PatternHop lastHop = hops.get(hops.size() - 1);
 
-            /* 3. Compute service day */
             for (ServiceDay serviceDay : ctx.serviceDays) {
                 ServiceDate serviceDate = serviceDay.getServiceDate();
+                TripTimes tripTimes = tripPattern.getTripTimes(tripPattern.getTripIndex(tripId));
                 // Get the tripTimes including real-time updates for the serviceDay
                 if (ctx.timetableSnapshot != null) {
                     Timetable timeTable = ctx.timetableSnapshot.resolve(tripPattern, serviceDate);
@@ -187,6 +185,7 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
                 int time = serviceDay.secondsSinceMidnight(opt.dateTime);
 
                 if (depTime <= time && time <= arrTime) {
+                    bestTripTimes = tripTimes;
                     bestServiceDay = serviceDay;
                 }
             }
@@ -198,14 +197,14 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
             int time = bestServiceDay.secondsSinceMidnight(opt.dateTime);
 
             /*
-             * 4. Get the best hop from the list, given the parameters. This is done by finding the
+             * 3. Get the best hop from the list, given the parameters. This is done by finding the
              * last hop that has not yet departed.
              */
 
             PatternHop bestHop = null;
 
             for (PatternHop hop : hops) {
-                int depTime = tripTimes.getDepartureTime(hop.getStopIndex());
+                int depTime = bestTripTimes.getDepartureTime(hop.getStopIndex());
 
                 if (depTime > time) {
                     break;
@@ -220,12 +219,12 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
             LineString geometry = bestHop.getGeometry();
 
             /*
-             * 5. Compute the fraction covered percentage of the current hop. Once again a constant
+             * 4. Compute the fraction covered percentage of the current hop. Once again a constant
              * trip speed is assumed. The linear distance of the shape is used, so the results are
              * not 100% accurate. On the flip side, they are easy to compute and very well testable.
              */
-            int depTime = tripTimes.getDepartureTime(stopIndex);
-            int arrTime = tripTimes.getArrivalTime(stopIndex);
+            int depTime = bestTripTimes.getDepartureTime(stopIndex);
+            int arrTime = bestTripTimes.getArrivalTime(stopIndex);
             fractionCovered =  ((double) (time - depTime)) / ((double) (arrTime - depTime));
 
             P2<LineString> geomPair =
@@ -244,7 +243,7 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
 
         OnboardDepartVertex onboardDepart = new OnboardDepartVertex("on_board_depart", lon, lat);
         OnBoardDepartPatternHop startHop = new OnBoardDepartPatternHop(onboardDepart, nextStop,
-                tripTimes, bestServiceDay, stopIndex, fractionCovered);
+                bestTripTimes, bestServiceDay, stopIndex, fractionCovered);
         startHop.setGeometry(geomRemaining);
         return onboardDepart;
     }
