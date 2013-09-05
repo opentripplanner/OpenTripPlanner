@@ -88,6 +88,9 @@ public class Graph implements Serializable {
     private final MavenVersion mavenVersion = MavenVersion.VERSION;
 
     private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
+    
+    @Setter @Getter
+    private String routerId;
 
     private final Map<Edge, Set<AlertPatch>> alertPatches = new HashMap<Edge, Set<AlertPatch>>(0);
 
