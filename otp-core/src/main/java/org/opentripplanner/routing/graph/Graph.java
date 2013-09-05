@@ -491,7 +491,7 @@ public class Graph implements Serializable {
             tableTripPatterns.add(pav.getTripPattern());
         }
         for (TableTripPattern ttp : tableTripPatterns) {
-            ttp.finish();
+            if (ttp != null) ttp.finish(); // skip frequency-based patterns with no table (null)
         }
     }
     
