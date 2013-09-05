@@ -703,7 +703,9 @@ public class PlanGenerator {
 
         if (tripTimes != null && !tripTimes.isScheduled()) {
             leg.realTime = true;
-            leg.departureDelay = tripTimes.getDepartureDelay(leg.from.stopIndex);
+            if (leg.from.stopIndex != null) {
+                leg.departureDelay = tripTimes.getDepartureDelay(leg.from.stopIndex);
+            }
             leg.arrivalDelay = tripTimes.getArrivalDelay(leg.to.stopIndex - 1);
         }
     }
