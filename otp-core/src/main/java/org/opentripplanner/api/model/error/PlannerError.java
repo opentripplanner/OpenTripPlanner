@@ -20,6 +20,7 @@ import java.util.Map;
 
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.ws.LocationNotAccessible;
+import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.TransitTimesException;
 import org.opentripplanner.routing.error.TrivialPathException;
@@ -39,6 +40,7 @@ public class PlannerError {
         messages.put(LocationNotAccessible.class,   Message.LOCATION_NOT_ACCESSIBLE);
         messages.put(TransitTimesException.class,   Message.NO_TRANSIT_TIMES);
         messages.put(TrivialPathException.class,    Message.TOO_CLOSE);
+        messages.put(GraphNotFoundException.class,    Message.GRAPH_UNAVAILABLE);
     }
     
     private int    id;
