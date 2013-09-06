@@ -174,7 +174,7 @@ public abstract class TripTimes {
         // iterate over the new tripTimes, checking that dwells and hops are positive
         boolean increasing = true;
         int nHops = getNumHops();
-        int prevArr = -1;
+        int prevDep = -1;
         for (int hop = 0; hop < nHops; hop++) {
             int dep = getDepartureTime(hop);
             int arr = getArrivalTime(hop);
@@ -182,15 +182,15 @@ public abstract class TripTimes {
                 continue;
             }
 
-            if (arr < dep) { // negative hop time
+            if (arr < prevDep) { // negative hop time before this hop
                 LOG.error("Negative hop time in TripTimes at index {}.", hop);
                 increasing = false;
             }
-            if (prevArr > dep) { // negative dwell time before this hop
+            if (arr > dep) { // negative dwell time on this hop
                 LOG.error("Negative dwell time in TripTimes at index {}.", hop);
                 increasing = false;
             }
-            prevArr = arr;
+            prevDep = dep;
         }
         return increasing;
     }
