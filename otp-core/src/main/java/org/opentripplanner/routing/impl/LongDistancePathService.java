@@ -129,8 +129,8 @@ public class LongDistancePathService implements PathService {
 
         static {
 
-            /* A StreetLeg is zero or more street edges. */
-            Nonterminal streetLeg = star(STREET);
+            /* A StreetLeg is one or more street edges. */
+            Nonterminal streetLeg = plus(STREET);
 
             /* A TransitLeg is a ride on transit, including preboard and prealight edges at its 
              * ends. It begins and ends at a TransitStop vertex. 
@@ -142,7 +142,7 @@ public class LongDistancePathService implements PathService {
             /* A beginning gets us from the path's initial vertex to the first transit stop it 
              * passes through (its first board location). We may want to transfer at the beginning 
              * of an itinerary that begins at a station or stop, and does not use streets. */
-            Nonterminal beginning = choice(seq(streetLeg, LINK), seq(optional(STATION_STOP), optional(TRANSFER)));
+            Nonterminal beginning = choice(seq(optional(streetLeg), LINK), seq(optional(STATION_STOP), optional(TRANSFER)));
             
             /* Begin on board transit, ending up at another stop where the "middle" can take over. */
             Nonterminal onboardBeginning = seq(plus(ONBOARD), plus(STATION), optional(TRANSFER));
@@ -157,7 +157,7 @@ public class LongDistancePathService implements PathService {
              * 3. stay at the stop where we are but go to its parent station, 
              * 4. transfer and stay at the target stop, 
              * 5. transfer and move to the target stop's parent station. */
-            Nonterminal end = choice(seq(LINK, streetLeg), seq(optional(TRANSFER), optional(STATION_STOP)));
+            Nonterminal end = choice(seq(LINK, optional(streetLeg)), seq(optional(TRANSFER), optional(STATION_STOP)));
 
             /* An itinerary that includes a ride on public transit. It might begin on- or offboard. 
              * if it begins onboard, it doesn't necessarily have subsequent transit legs. */
