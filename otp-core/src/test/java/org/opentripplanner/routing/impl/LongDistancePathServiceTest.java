@@ -329,19 +329,17 @@ public class LongDistancePathServiceTest {
             assertFalse(parsePath(parser, path));
         }
 
-        { // Test street link-street link (allowed, but do we want that?)
+        { // Test street link-street link (not allowed; not necessary in long distance mode)
             List<Class<? extends Edge>> path = new ArrayList<Class<? extends Edge>>();
             path.add(StreetTransitLink.class);
             path.add(StreetTransitLink.class);
-            assertTrue(parsePath(parser, path));
+            assertFalse(parsePath(parser, path));
         }
 
-        { // Test street link (4 times) (not allowed)
+        { // Test station stop-station stop (not allowed)
             List<Class<? extends Edge>> path = new ArrayList<Class<? extends Edge>>();
-            path.add(StreetTransitLink.class);
-            path.add(StreetTransitLink.class);
-            path.add(StreetTransitLink.class);
-            path.add(StreetTransitLink.class);
+            path.add(StationStopEdge.class);
+            path.add(StationStopEdge.class);
             assertFalse(parsePath(parser, path));
         }
 
