@@ -66,6 +66,7 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.util.ElevationProfileSegment;
 import org.opentripplanner.routing.vertextype.ExitVertex;
+import org.opentripplanner.routing.vertextype.OnboardDepartVertex;
 import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
@@ -238,7 +239,10 @@ public class PlanGenerator {
 
         itinerary.walkDistance = lastState.getWalkDistance();
 
-        if (lastState.getNumBoardings() > 1) itinerary.transfers = lastState.getNumBoardings() - 1;
+        itinerary.transfers = lastState.getNumBoardings();
+        if (itinerary.transfers > 1 && !(states[0].getVertex() instanceof OnboardDepartVertex)) {
+            itinerary.transfers--;
+        }
 
         return itinerary;
     }
@@ -424,8 +428,11 @@ public class PlanGenerator {
                     PatternEdge patternEdge = (PatternEdge) legsStates[i][j].getBackEdge();
                     TripPattern tripPattern = patternEdge.getPattern();
 
-                    int boardType = tripPattern.getBoardType(legs.get(i).from.stopIndex);
-                    int alightType = tripPattern.getAlightType(legs.get(i).to.stopIndex);
+                    Integer fromIndex = legs.get(i).from.stopIndex;
+                    Integer toIndex = legs.get(i).to.stopIndex;
+
+                    int boardType = (fromIndex != null) ? (tripPattern.getBoardType(fromIndex)) : 0;
+                    int alightType = (toIndex != null) ? (tripPattern.getAlightType(toIndex)) : 0;
 
                     boardRules[i] = TransitUtils.determineBoardAlightType(boardType);
                     alightRules[i] = TransitUtils.determineBoardAlightType(alightType);
