@@ -19,6 +19,8 @@ import java.util.prefs.Preferences;
 
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.TripUpdateList;
+import org.opentripplanner.routing.trippattern.strategy.DecayingOrStatusUpdater;
+import org.opentripplanner.routing.trippattern.strategy.ITripTimesUpdater;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
@@ -49,7 +51,7 @@ import com.ning.http.client.websocket.WebSocketUpgradeHandler;
  * </pre>
  * 
  */
-public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
+public class WebsocketGtfsRealtimeUpdater implements StoptimeGraphUpdater {
 
     /**
      * Number of seconds to wait before checking again whether we are still connected
@@ -80,6 +82,11 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
      */
     private int reconnectPeriodSec;
 
+    /**
+     * The strategy to update the trip time, allows to change the strategy from the configuration
+     */
+    private ITripTimesUpdater tripTimesUpdater = new DecayingOrStatusUpdater();
+
     @Override
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
         this.updaterManager = updaterManager;
@@ -91,6 +98,7 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
         url = preferences.get("url", null);
         agencyId = preferences.get("defaultAgencyId", "");
         reconnectPeriodSec = preferences.getInt("reconnectPeriodSec", DEFAULT_RECONNECT_PERIOD_SEC);
+        //TODO: add triptime updater by strategy
     }
 
     @Override
@@ -162,6 +170,11 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
     public void teardown() {
     }
 
+    @Override
+    public ITripTimesUpdater getTripTimesUpdater() {
+        return tripTimesUpdater;
+    }
+
     /**
      * Auxiliary class to handle incoming messages via the websocket connection
      */
@@ -174,7 +187,7 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
                 List<TripUpdateList> updates = TripUpdateList.decodeFromGtfsRealtime(feed, agencyId);
 
                 // Handle trip updates via graph writer runnable
-                TripUpdateGraphWriterRunnable runnable = new TripUpdateGraphWriterRunnable(updates);
+                TripUpdateGraphWriterRunnable runnable = new TripUpdateGraphWriterRunnable(updates, tripTimesUpdater);
                 updaterManager.execute(runnable);
             } catch (InvalidProtocolBufferException e) {
                 LOG.error("Could not decode gtfs-rt message:", e);

@@ -93,6 +93,8 @@ import org.opentripplanner.routing.transit_index.RouteVariant;
 import org.opentripplanner.routing.trippattern.Update;
 import org.opentripplanner.routing.trippattern.Update.Status;
 import org.opentripplanner.routing.trippattern.TripUpdateList;
+import org.opentripplanner.routing.trippattern.strategy.DecayingOrStatusUpdater;
+import org.opentripplanner.routing.trippattern.strategy.ITripTimesUpdater;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
@@ -120,6 +122,9 @@ public class PlanGeneratorTest {
     private static final double EPSILON = 1e-1;
 
     private static final SimpleTimeZone timeZone = new SimpleTimeZone(2, "CEST");
+
+    private ITripTimesUpdater tripTimesUpdater = new DecayingOrStatusUpdater();
+
 
     private static final String alertsExample =
             "Mine is the last voice that you will ever hear. Do not be alarmed.";
@@ -641,7 +646,7 @@ public class PlanGeneratorTest {
         TimetableSnapshotSource timetableSnapshotSource = mock(TimetableSnapshotSource.class);
         when(timetableSnapshotSource.getTimetableSnapshot()).thenReturn(resolver);
 
-        timetableSnapshotSource.getTimetableSnapshot().update(thirdTripPattern, tripUpdateList);
+        timetableSnapshotSource.getTimetableSnapshot().update(thirdTripPattern, tripUpdateList, tripTimesUpdater);
 
         // Further graph initialization
         graph.putService(ServiceIdToNumberService.class, serviceIdToNumberService);

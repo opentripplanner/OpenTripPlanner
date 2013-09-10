@@ -48,6 +48,8 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.trippattern.TripUpdateList;
 import org.opentripplanner.routing.trippattern.Update;
 import org.opentripplanner.routing.trippattern.Update.Status;
+import org.opentripplanner.routing.trippattern.strategy.DecayingOrStatusUpdater;
+import org.opentripplanner.routing.trippattern.strategy.ITripTimesUpdater;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.util.TestUtils;
@@ -116,6 +118,9 @@ public class TestTransfers extends TestCase {
 
     private GenericAStar aStar;
 
+    private ITripTimesUpdater tripTimesUpdater = new DecayingOrStatusUpdater();
+
+
     public void setUp() throws Exception {
         // Get graph and a star from singleton class
         graph = Context.getInstance().graph;
@@ -173,7 +178,7 @@ public class TestTransfers extends TestCase {
         Update update = new Update(new AgencyAndId("agency", tripId), new AgencyAndId("agency", stopId), stopSeq, arrive, depart, prediction, timestamp, ServiceDate.parseString(serviceDate));
         ArrayList<Update> updates = new ArrayList<Update>(Arrays.asList(update));
         TripUpdateList tripUpdateList = TripUpdateList.splitByTrip(updates).get(0);
-        boolean success = pattern.update(tripUpdateList);
+        boolean success = pattern.update(tripUpdateList, tripTimesUpdater);
         assertTrue(success);
     }
     

@@ -16,9 +16,12 @@ package org.opentripplanner.updater.example;
 import java.util.prefs.Preferences;
 
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.trippattern.strategy.DecayingOrStatusUpdater;
+import org.opentripplanner.routing.trippattern.strategy.ITripTimesUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.PollingGraphUpdater;
+import org.opentripplanner.updater.stoptime.PollingStoptimeGraphUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,13 +45,18 @@ import org.slf4j.LoggerFactory;
  * @see ExampleGraphUpdater
  * @see GraphUpdaterConfigurator.applyConfigurationToGraph
  */
-public class ExamplePollingGraphUpdater extends PollingGraphUpdater {
+public class ExamplePollingGraphUpdater extends PollingStoptimeGraphUpdater {
 
     private static Logger LOG = LoggerFactory.getLogger(ExamplePollingGraphUpdater.class);
 
     private GraphUpdaterManager updaterManager;
 
     private String url;
+
+    /**
+     * The strategy to update the trip time, allows to change the strategy from the configuration
+     */
+    private ITripTimesUpdater tripTimesUpdater = new DecayingOrStatusUpdater();
 
     // Here the updater can be configured using the properties in the file 'Graph.properties'.
     // The property frequencySec is already read and used by the abstract base class.
@@ -86,7 +94,12 @@ public class ExamplePollingGraphUpdater extends PollingGraphUpdater {
     public void teardown() {
         LOG.info("Teardown example polling updater");
     }
-    
+
+    @Override
+    public ITripTimesUpdater getTripTimesUpdater() {
+        return tripTimesUpdater;
+    }
+
     // This is a private GraphWriterRunnable that can be executed to modify the graph
     private class ExampleGraphWriter implements GraphWriterRunnable {
         @Override

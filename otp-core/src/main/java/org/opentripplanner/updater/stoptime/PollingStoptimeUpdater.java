@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.prefs.Preferences;
 
+import org.opentripplanner.routing.trippattern.strategy.DecayingOrStatusUpdater;
+import org.opentripplanner.routing.trippattern.strategy.ITripTimesUpdater;
 import org.opentripplanner.updater.PreferencesConfigurable;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.TripUpdateList;
@@ -41,7 +43,7 @@ import org.slf4j.LoggerFactory;
  * </pre>
  * 
  */
-public class PollingStoptimeUpdater extends PollingGraphUpdater {
+public class PollingStoptimeUpdater extends PollingStoptimeGraphUpdater{
 
     private static final Logger LOG = LoggerFactory.getLogger(PollingStoptimeUpdater.class);
     
@@ -69,6 +71,11 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
      * Property to set on the RealtimeDataSnapshotSource
      */
     private Boolean purgeExpiredData;
+
+    /**
+     * The strategy to update the trip time, allows to change the strategy from the configuration
+     */
+    private ITripTimesUpdater tripTimesUpdater = new DecayingOrStatusUpdater();
 
     @Override
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
@@ -107,6 +114,8 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
         if (!purgeExpiredData.isEmpty()) {
             this.purgeExpiredData = preferences.getBoolean("purgeExpiredData", true);
         }
+
+        //TODO: add triptime updater by strategy
 
         LOG.info("Creating stop time updater running every {} seconds : {}", getFrequencySec(), updateSource);
     }
@@ -149,8 +158,13 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
         List<TripUpdateList> updates = updateSource.getUpdates();
 
         // Handle trip updates via graph writer runnable
-        TripUpdateGraphWriterRunnable runnable = new TripUpdateGraphWriterRunnable(updates);
+        TripUpdateGraphWriterRunnable runnable = new TripUpdateGraphWriterRunnable(updates, tripTimesUpdater);
         updaterManager.execute(runnable);
+    }
+
+    @Override
+    public ITripTimesUpdater getTripTimesUpdater() {
+        return tripTimesUpdater;
     }
 
     @Override

@@ -24,6 +24,7 @@ import java.util.TreeSet;
 
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.routing.trippattern.TripUpdateList;
+import org.opentripplanner.routing.trippattern.strategy.ITripTimesUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,7 +81,7 @@ public class TimetableResolver {
     /**
      * @return whether or not the update was actually applied
      */
-    public boolean update(TableTripPattern pattern, TripUpdateList tripUpdateList) {
+    public boolean update(TableTripPattern pattern, TripUpdateList tripUpdateList, ITripTimesUpdater timesUpdater) {
         // synchronization prevents commits/snapshots while update is in progress
         synchronized(this) {
             if (dirty == null)
@@ -105,7 +106,7 @@ public class TimetableResolver {
                 timetables.put(pattern, sortedTimetables);
                 dirty.add(tt);
             }
-            return tt.update(tripUpdateList);
+            return tt.update(tripUpdateList, timesUpdater);
         }
     }
 

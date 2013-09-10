@@ -38,13 +38,18 @@ import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.TripUpdateList;
+import org.opentripplanner.routing.trippattern.strategy.DecayingOrStatusUpdater;
+import org.opentripplanner.routing.trippattern.strategy.ITripTimesUpdater;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
 
 public class TimetableResolverTest {
     private static Graph graph;
     private static GtfsContext context;
     private static Map<AgencyAndId, TableTripPattern> patternIndex;
-    
+
+    private ITripTimesUpdater tripTimesUpdater = new DecayingOrStatusUpdater();
+
+
     @BeforeClass
     public static void setUp() throws Exception {
 
@@ -86,7 +91,7 @@ public class TimetableResolverTest {
         
         Timetable scheduled = resolver.resolve(pattern, today);
         assertEquals(scheduled, resolver.resolve(pattern, null));
-        resolver.update(pattern, TripUpdateList.forCanceledTrip(pattern.getTrip(0).getId(), 0, today));
+        resolver.update(pattern, TripUpdateList.forCanceledTrip(pattern.getTrip(0).getId(), 0, today), tripTimesUpdater);
         
         // add a new timetable for today
         Timetable forNow = resolver.resolve(pattern, today);
@@ -96,7 +101,7 @@ public class TimetableResolverTest {
         assertEquals(scheduled, resolver.resolve(pattern, null));
         
         // add a new timetable for yesterday
-        resolver.update(pattern, TripUpdateList.forCanceledTrip(pattern.getTrip(0).getId(), 0, yesterday));
+        resolver.update(pattern, TripUpdateList.forCanceledTrip(pattern.getTrip(0).getId(), 0, yesterday), tripTimesUpdater);
         Timetable forYesterday = resolver.resolve(pattern, yesterday);
         assertNotSame(scheduled, forYesterday);
         assertNotSame(scheduled, forNow);
@@ -114,22 +119,22 @@ public class TimetableResolverTest {
         Timetable origNow = resolver.resolve(pattern, today);
         
         // new timetable for today
-        resolver.update(pattern, TripUpdateList.forCanceledTrip(pattern.getTrip(0).getId(), 0, today));
+        resolver.update(pattern, TripUpdateList.forCanceledTrip(pattern.getTrip(0).getId(), 0, today), tripTimesUpdater);
         Timetable updatedNow = resolver.resolve(pattern, today);
         assertNotSame(origNow, updatedNow);
 
         // reuse timetable for today
-        resolver.update(pattern, TripUpdateList.forCanceledTrip(pattern.getTrip(0).getId(), 0, today));
+        resolver.update(pattern, TripUpdateList.forCanceledTrip(pattern.getTrip(0).getId(), 0, today), tripTimesUpdater);
         assertEquals(updatedNow, resolver.resolve(pattern, today));
         
         // create new timetable for tomorrow
-        resolver.update(pattern, TripUpdateList.forCanceledTrip(pattern.getTrip(0).getId(), 0, yesterday));
+        resolver.update(pattern, TripUpdateList.forCanceledTrip(pattern.getTrip(0).getId(), 0, yesterday), tripTimesUpdater);
         assertNotSame(origNow, resolver.resolve(pattern, yesterday));
         assertNotSame(updatedNow, resolver.resolve(pattern, yesterday));
         
         // exception if we try to modify a snapshot
         TimetableResolver snapshot = resolver.commit();
-        snapshot.update(pattern, TripUpdateList.forCanceledTrip(pattern.getTrip(0).getId(), 0, yesterday));
+        snapshot.update(pattern, TripUpdateList.forCanceledTrip(pattern.getTrip(0).getId(), 0, yesterday), tripTimesUpdater);
     }
     
     public void testCommit() {
@@ -144,18 +149,18 @@ public class TimetableResolverTest {
         assertNull(snapshot);
                 
         // add a new timetable for today, commit, and everything should match
-        assertTrue(resolver.update(pattern, TripUpdateList.forCanceledTrip(pattern.getTrip(0).getId(), 0, today)));
+        assertTrue(resolver.update(pattern, TripUpdateList.forCanceledTrip(pattern.getTrip(0).getId(), 0, today), tripTimesUpdater));
         snapshot = resolver.commit();
         assertEquals(snapshot.resolve(pattern, today), resolver.resolve(pattern, today));
         assertEquals(snapshot.resolve(pattern, yesterday), resolver.resolve(pattern, yesterday));
         
         // add a new timetable for today, don't commit, and everything should not match
-        assertTrue(resolver.update(pattern, TripUpdateList.forCanceledTrip(pattern.getTrip(0).getId(), 0, today)));
+        assertTrue(resolver.update(pattern, TripUpdateList.forCanceledTrip(pattern.getTrip(0).getId(), 0, today), tripTimesUpdater));
         assertNotSame(snapshot.resolve(pattern, today), resolver.resolve(pattern, today));
         assertEquals(snapshot.resolve(pattern, yesterday), resolver.resolve(pattern, yesterday));
         
         // add a new timetable for today, on another day, and things should still not match
-        assertTrue(resolver.update(pattern, TripUpdateList.forCanceledTrip(pattern.getTrip(0).getId(), 0, yesterday)));
+        assertTrue(resolver.update(pattern, TripUpdateList.forCanceledTrip(pattern.getTrip(0).getId(), 0, yesterday), tripTimesUpdater));
         assertNotSame(snapshot.resolve(pattern, yesterday), resolver.resolve(pattern, yesterday));
 
         // commit, and things should match
@@ -173,8 +178,8 @@ public class TimetableResolverTest {
         TableTripPattern pattern = patternIndex.get(new AgencyAndId("agency", "1.1"));
 
         TimetableResolver resolver = new TimetableResolver();
-        assertTrue(resolver.update(pattern, TripUpdateList.forCanceledTrip(pattern.getTrip(0).getId(), 0, today)));
-        assertTrue(resolver.update(pattern, TripUpdateList.forCanceledTrip(pattern.getTrip(0).getId(), 0, yesterday)));
+        assertTrue(resolver.update(pattern, TripUpdateList.forCanceledTrip(pattern.getTrip(0).getId(), 0, today), tripTimesUpdater));
+        assertTrue(resolver.update(pattern, TripUpdateList.forCanceledTrip(pattern.getTrip(0).getId(), 0, yesterday), tripTimesUpdater));
         
         assertNotSame(resolver.resolve(pattern, yesterday), resolver.resolve(pattern, null));
         assertNotSame(resolver.resolve(pattern, today), resolver.resolve(pattern, null));
