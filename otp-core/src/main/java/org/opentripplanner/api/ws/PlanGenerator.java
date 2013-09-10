@@ -240,7 +240,7 @@ public class PlanGenerator {
         itinerary.walkDistance = lastState.getWalkDistance();
 
         itinerary.transfers = lastState.getNumBoardings();
-        if (itinerary.transfers > 1 && !(states[0].getVertex() instanceof OnboardDepartVertex)) {
+        if (itinerary.transfers > 0 && !(states[0].getVertex() instanceof OnboardDepartVertex)) {
             itinerary.transfers--;
         }
 
