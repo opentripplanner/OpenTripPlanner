@@ -135,13 +135,14 @@ public class CommandLineParameters {
     /** Set some convenience parameters based on other parameters' values. */
     public void infer () {
         server |= ( inMemory || port != null );
-        server |= ( routerIds != null || graphDirectory != null || staticDirectory != null );
         if (graphDirectory  == null) graphDirectory  = DEFAULT_GRAPH_DIRECTORY;
         if (routerIds == null) routerIds = Arrays.asList(DEFAULT_ROUTER_ID);
         if (staticDirectory == null) staticDirectory = DEFAULT_STATIC_DIRECTORY;        
         if (cacheDirectory == null)  cacheDirectory  = DEFAULT_CACHE_DIRECTORY;        
-        if (port == null) port = DEFAULT_PORT;
-        new AvailablePort().validate(port);
+        if (server && port == null) {
+            port = DEFAULT_PORT;
+            new AvailablePort().validate(port);
+        }
     }
     
     public static class ReadableFile implements IParameterValidator {
