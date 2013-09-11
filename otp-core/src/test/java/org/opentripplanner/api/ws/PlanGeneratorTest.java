@@ -106,6 +106,7 @@ import org.opentripplanner.util.model.EncodedPolylineBean;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
+import org.opentripplanner.routing.patch.TimePeriod;
 
 public class PlanGeneratorTest {
     private static final double[] DISTANCES = {3, 9996806.8, 3539050.5, 11, 2478638.8, 4, 2, 1, 0};
@@ -563,7 +564,7 @@ public class PlanGeneratorTest {
 
         // Alert for testing GTFS-RT
         AlertPatch patch = new AlertPatch();
-
+        patch.setTimePeriods(Collections.singletonList(new TimePeriod(0, Long.MAX_VALUE)));
         patch.setAlert(Alert.createSimpleAlerts(alertsExample));
 
         // Edge initialization that can't be done using the constructor

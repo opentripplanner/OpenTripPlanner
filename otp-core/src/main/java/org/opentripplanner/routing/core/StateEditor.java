@@ -497,20 +497,20 @@ public class StateEditor {
 
         if (patches != null) {
             for (Patch patch : patches) {
-                active  = false;
-                display = patch.displayDuring(child.stateData.opt, child.getStartTimeSeconds(),
-                                              child.getTimeSeconds());
+                display = false;
+                active = patch.activeDuring(child.stateData.opt, child.getStartTimeSeconds(),
+                                            child.getTimeSeconds());
 
-                if(!display) {
-                    active = patch.activeDuring(child.stateData.opt, child.getStartTimeSeconds(),
-                                                child.getTimeSeconds());
+                if(!active) {
+                    display = patch.displayDuring(child.stateData.opt, child.getStartTimeSeconds(),
+                                                  child.getTimeSeconds());
                 }
 
                 if(display || active) {
                     if(!patch.filterTraverseResult(this, display))
                         return false;
+                }
             }
-        }
         }
 
         return true;
