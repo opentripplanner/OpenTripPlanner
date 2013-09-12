@@ -609,6 +609,7 @@ public class PlanGenerator {
 
         Edge firstEdge = edges[0];
         Edge lastEdge = edges[edges.length - 1];
+        TripTimes tripTimes = states[states.length - 1].getTripTimes();
 
         leg.from = new Place(firstVertex.getX(), firstVertex.getY(), firstVertex.getName(),
                 null, makeCalendar(states[0]));
@@ -627,6 +628,7 @@ public class PlanGenerator {
                 leg.from.platformCode = firstStop.getPlatformCode();
                 leg.from.zoneId = firstStop.getZoneId();
                 leg.from.stopIndex = ((OnboardEdge) firstEdge).getStopIndex();
+                leg.from.stopSequence = tripTimes.getStopSequence(leg.from.stopIndex);
             }
         }
 
@@ -639,6 +641,7 @@ public class PlanGenerator {
                 leg.to.platformCode = lastStop.getPlatformCode();
                 leg.to.zoneId = lastStop.getZoneId();
                 leg.to.stopIndex = ((OnboardEdge) lastEdge).getStopIndex() + 1;
+                leg.to.stopSequence = tripTimes.getStopSequence(leg.to.stopIndex);
             }
         }
 
@@ -674,6 +677,7 @@ public class PlanGenerator {
                     place.platformCode = currentStop.getPlatformCode();
                     place.zoneId = currentStop.getZoneId();
                     place.stopIndex = ((OnboardEdge) edges[i]).getStopIndex();
+                    place.stopSequence = tripTimes.getStopSequence(place.stopIndex);
                 }
 
                 leg.stop.add(place);
