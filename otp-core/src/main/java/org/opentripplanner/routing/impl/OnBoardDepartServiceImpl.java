@@ -81,7 +81,7 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
         PatternStopVertex nextStop;
         TripTimes bestTripTimes = null;
         ServiceDay bestServiceDay = null;
-        int stopIndex;
+        int bestStopIndex = 0;
         double fractionCovered;
         LineString geomRemaining;
 
@@ -121,7 +121,7 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
             fractionCovered = total > 0.0 ? (double) (1.0 - remaining / total) : 0.0;
 
             nextStop = (PatternStopVertex) bestHop.getToVertex();
-            stopIndex = bestHop.getStopIndex();
+            bestStopIndex = bestHop.getStopIndex();
 
             /*
              * 4. Compute service day based on given departure day/time relative to
@@ -140,8 +140,8 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
                     tripTimes = timeTable.getTripTimes(timeTable.getTripIndex(tripId));
                 }
 
-                int depTime = tripTimes.getDepartureTime(stopIndex);
-                int arrTime = tripTimes.getArrivalTime(stopIndex);
+                int depTime = tripTimes.getDepartureTime(bestStopIndex);
+                int arrTime = tripTimes.getArrivalTime(bestStopIndex);
                 int estTime = (int) Math.round(
                         depTime * fractionCovered + arrTime * (1 - fractionCovered));
 
@@ -204,17 +204,23 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
             PatternHop bestHop = null;
 
             for (PatternHop hop : hops) {
-                int depTime = bestTripTimes.getDepartureTime(hop.getStopIndex());
+                int stopIndex = hop.getStopIndex();
+                int depTime = bestTripTimes.getDepartureTime(stopIndex);
+                int arrTime = bestTripTimes.getArrivalTime(stopIndex);
 
-                if (depTime > time) {
-                    break;
+                if (time == arrTime) {
+                    return ctx.graph.getVertex(hop.getEndStop().getId().toString());
+                } else if (depTime < time) {
+                    bestHop = hop;
+                    bestStopIndex = stopIndex;
+                } else if (time == depTime || bestTripTimes.getArrivalTime(bestStopIndex) < time) {
+                    return ctx.graph.getVertex(hop.getBeginStop().getId().toString());
                 } else {
-                   bestHop = hop;
+                    break;
                 }
             }
 
             nextStop = (PatternStopVertex) bestHop.getToVertex();
-            stopIndex = bestHop.getStopIndex();
 
             LineString geometry = bestHop.getGeometry();
 
@@ -223,8 +229,8 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
              * trip speed is assumed. The linear distance of the shape is used, so the results are
              * not 100% accurate. On the flip side, they are easy to compute and very well testable.
              */
-            int depTime = bestTripTimes.getDepartureTime(stopIndex);
-            int arrTime = bestTripTimes.getArrivalTime(stopIndex);
+            int depTime = bestTripTimes.getDepartureTime(bestStopIndex);
+            int arrTime = bestTripTimes.getArrivalTime(bestStopIndex);
             fractionCovered =  ((double) (time - depTime)) / ((double) (arrTime - depTime));
 
             P2<LineString> geomPair =
@@ -248,7 +254,7 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
 
         OnboardDepartVertex onboardDepart = new OnboardDepartVertex("on_board_depart", lon, lat);
         OnBoardDepartPatternHop startHop = new OnBoardDepartPatternHop(onboardDepart, nextStop,
-                bestTripTimes, bestServiceDay, stopIndex, fractionCovered);
+                bestTripTimes, bestServiceDay, bestStopIndex, fractionCovered);
         startHop.setGeometry(geomRemaining);
         return onboardDepart;
     }
