@@ -21,11 +21,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
@@ -35,8 +33,6 @@ import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
-import org.onebusaway.gtfs.model.ServiceCalendar;
-import org.onebusaway.gtfs.model.ServiceCalendarDate;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
@@ -87,9 +83,7 @@ import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.AlertPatch;
 import org.opentripplanner.routing.services.FareService;
-import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.transit_index.RouteVariant;
 import org.opentripplanner.routing.trippattern.Update;
 import org.opentripplanner.routing.trippattern.Update.Status;
 import org.opentripplanner.routing.trippattern.TripUpdateList;
@@ -108,6 +102,7 @@ import org.opentripplanner.util.model.EncodedPolylineBean;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
+import org.opentripplanner.routing.patch.TimePeriod;
 
 public class PlanGeneratorTest {
     private static final double[] F_DISTANCE = {3, 9996806.8, 3539050.5, 11, 2478638.8, 4, 2, 1, 0};
@@ -247,24 +242,38 @@ public class PlanGeneratorTest {
         thirdStops.add(ferryStopDepart);
         thirdStops.add(ferryStopArrive);
 
+        // Agencies for legs 1, 2 and 4, plus initialization
+        Agency trainAgency = new Agency();
+        Agency ferryAgency = new Agency();
+
+        trainAgency.setId("Train");
+        trainAgency.setName("John Train");
+        trainAgency.setUrl("http://www.train.org/");
+        ferryAgency.setId("Ferry");
+        ferryAgency.setName("Brian Ferry");
+        ferryAgency.setUrl("http://www.ferry.org/");
+
         // Routes for legs 1, 2 and 4, plus initialization
         Route firstRoute = new Route();
         Route secondRoute = new Route();
         Route thirdRoute = new Route();
 
         firstRoute.setId(new AgencyAndId("Train", "A"));
+        firstRoute.setAgency(trainAgency);
         firstRoute.setShortName("A");
         firstRoute.setLongName("'A' Train");
         firstRoute.setType(2);
         firstRoute.setColor("White");
         firstRoute.setTextColor("Black");
         secondRoute.setId(new AgencyAndId("Train", "B"));
+        secondRoute.setAgency(trainAgency);
         secondRoute.setShortName("B");
         secondRoute.setLongName("Another Train");
         secondRoute.setType(2);
         secondRoute.setColor("Cyan");
         secondRoute.setTextColor("Yellow");
         thirdRoute.setId(new AgencyAndId("Ferry", "C"));
+        thirdRoute.setAgency(ferryAgency);
         thirdRoute.setShortName("C");
         thirdRoute.setLongName("Ferry Cross the Mersey");
         thirdRoute.setType(4);
@@ -568,7 +577,7 @@ public class PlanGeneratorTest {
 
         // Alert for testing GTFS-RT
         AlertPatch patch = new AlertPatch();
-
+        patch.setTimePeriods(Collections.singletonList(new TimePeriod(0, Long.MAX_VALUE)));
         patch.setAlert(Alert.createSimpleAlerts(alertsExample));
 
         // Edge initialization that can't be done using the constructor
@@ -604,19 +613,6 @@ public class PlanGeneratorTest {
         calendarServiceData.putTimeZoneForAgencyId("Train", timeZone);
         calendarServiceData.putTimeZoneForAgencyId("Ferry", timeZone);
 
-        Agency trainAgency = new Agency();
-        Agency ferryAgency = new Agency();
-
-        trainAgency.setId("Train");
-        trainAgency.setName("John Train");
-        trainAgency.setUrl("http://www.train.org/");
-        ferryAgency.setId("Ferry");
-        ferryAgency.setName("Brian Ferry");
-        ferryAgency.setUrl("http://www.ferry.org/");
-
-        TransitIndexServiceStub transitIndexServiceStub = new TransitIndexServiceStub(
-                trainAgency, ferryAgency);
-
         FareServiceStub fareServiceStub = new FareServiceStub();
 
         ServiceDate serviceDate = new ServiceDate(1970, 1, 1);
@@ -646,7 +642,6 @@ public class PlanGeneratorTest {
         // Further graph initialization
         graph.putService(ServiceIdToNumberService.class, serviceIdToNumberService);
         graph.putService(CalendarServiceData.class, calendarServiceData);
-        graph.putService(TransitIndexService.class, transitIndexServiceStub);
         graph.putService(FareService.class, fareServiceStub);
         graph.addAgency(trainAgency);
         graph.addAgency(ferryAgency);
@@ -1848,125 +1843,6 @@ public class PlanGeneratorTest {
         @Override
         public TimeZone getTimeZoneForAgencyId(String agencyId) {
             return timeZone;
-        }
-    }
-
-    /**
-     * This class implements the {@link TransitIndexService} interface to allow for testing.
-     * It only really implements the getAgency method. Everything else returns meaningless results.
-     */
-    private static final class TransitIndexServiceStub implements TransitIndexService {
-        final Agency train;
-        final Agency ferry;
-
-        public TransitIndexServiceStub(Agency train, Agency ferry) {
-            this.train = train;
-            this.ferry = ferry;
-        }
-
-        @Override
-        public List<RouteVariant> getVariantsForAgency(String agency) {
-            return null;
-        }
-
-        @Override
-        public List<RouteVariant> getVariantsForRoute(AgencyAndId route) {
-            return null;
-        }
-
-        @Override
-        public RouteVariant getVariantForTrip(AgencyAndId trip) {
-            return null;
-        }
-
-        @Override
-        public PreBoardEdge getPreBoardEdge(AgencyAndId stop) {
-            return null;
-        }
-
-        @Override
-        public PreAlightEdge getPreAlightEdge(AgencyAndId stop) {
-            return null;
-        }
-
-        @Override
-        public TableTripPattern getTripPatternForTrip(AgencyAndId tripId) {
-            return null;
-        }
-
-        @Override
-        public List<AgencyAndId> getRoutesForStop(AgencyAndId stop) {
-            return null;
-        }
-
-        @Override
-        public Collection<String> getDirectionsForRoute(AgencyAndId route) {
-            return null;
-        }
-
-        @Override
-        public Collection<Stop> getStopsForRoute(AgencyAndId route) {
-            return null;
-        }
-
-        @Override
-        public List<TraverseMode> getAllModes() {
-            return null;
-        }
-
-        @Override
-        public Collection<AgencyAndId> getAllRouteIds() {
-            return null;
-        }
-
-        @Override
-        public void addCalendars(Collection<ServiceCalendar> allCalendars) {
-        }
-
-        @Override
-        public void addCalendarDates(Collection<ServiceCalendarDate> allDates) {
-        }
-
-        @Override
-        public List<String> getAllAgencies() {
-            return null;
-        }
-
-        @Override
-        public List<ServiceCalendarDate> getCalendarDatesByAgency(String agency) {
-            return null;
-        }
-
-        @Override
-        public List<ServiceCalendar> getCalendarsByAgency(String agency) {
-            return null;
-        }
-
-        @Override
-        public Agency getAgency(String id) {
-            if (train.getId().equals(id)) return train;
-            if (ferry.getId().equals(id)) return ferry;
-            return null;
-        }
-
-        @Override
-        public Coordinate getCenter() {
-            return null;
-        }
-
-        @Override
-        public int getOvernightBreak() {
-            return 0;
-        }
-
-        @Override
-        public Map<AgencyAndId, Route> getAllRoutes() {
-            return null;
-        }
-
-        @Override
-        public Map<AgencyAndId, Stop> getAllStops() {
-            return null;
         }
     }
 
