@@ -57,7 +57,6 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.patch.Alert;
-import org.opentripplanner.routing.patch.Patch;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
@@ -451,12 +450,10 @@ public class PlanGenerator {
             }
 
             if (legs.get(i).isTransitLeg() && !legs.get(i + 1).isTransitLeg()) {
-                legs.get(i + 1).from.name = legs.get(i).to.name;
-                legs.get(i + 1).from.stopId = legs.get(i).to.stopId;
+                legs.get(i + 1).from = legs.get(i).to;
             }
             if (!legs.get(i).isTransitLeg() && legs.get(i + 1).isTransitLeg()) {
-                legs.get(i).to.name = legs.get(i + 1).from.name;
-                legs.get(i).to.stopId = legs.get(i + 1).from.stopId;
+                legs.get(i).to = legs.get(i + 1).from;
             }
         }
 
@@ -544,7 +541,6 @@ public class PlanGenerator {
         for (State state : states) {
             TraverseMode mode = state.getBackMode();
             Set<Alert> alerts = state.getBackAlerts();
-            Edge edge = state.getBackEdge();
 
             if (mode != null) {
                 leg.mode = mode.toString();
