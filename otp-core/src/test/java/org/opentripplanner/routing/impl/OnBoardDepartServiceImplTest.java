@@ -94,4 +94,48 @@ public class OnBoardDepartServiceImplTest {
         assertEquals(coordinates[0].x, vertex.getX(), 0.0);
         assertEquals(coordinates[0].y, vertex.getY(), 0.0);
     }
+
+    @Test
+    public final void testOnBoardDepartureAtArrivalTime() {
+        Coordinate[] coordinates = new Coordinate[2];
+        coordinates[0] = new Coordinate(0.0, 0.0);
+        coordinates[1] = new Coordinate(0.0, 1.0);
+
+        PatternDepartVertex depart = mock(PatternDepartVertex.class);
+        PatternArriveVertex arrive = mock(PatternArriveVertex.class);
+        PatternHop patternHop = mock(PatternHop.class);
+        TripTimes tripTimes = mock(TripTimes.class);
+        TableTripPattern tableTripPattern = mock(TableTripPattern.class);
+        TransitIndexService transitIndexService = mock(TransitIndexService.class);
+        Graph graph = mock(Graph.class);
+        RoutingRequest routingRequest = mock(RoutingRequest.class);
+        ServiceDay serviceDay = mock(ServiceDay.class);
+
+        GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
+        CoordinateSequenceFactory coordinateSequenceFactory =
+                geometryFactory.getCoordinateSequenceFactory();
+        CoordinateSequence coordinateSequence = coordinateSequenceFactory.create(coordinates);
+        LineString geometry = new LineString(coordinateSequence, geometryFactory);
+        RoutingContext routingContext = new RoutingContext(routingRequest, graph, depart, arrive);
+
+        routingContext.serviceDays =
+                new ArrayList<ServiceDay>(Collections.singletonList(serviceDay));
+
+        when(graph.getService(TransitIndexService.class)).thenReturn(transitIndexService);
+        when(transitIndexService.getTripPatternForTrip(any(AgencyAndId.class)))
+                .thenReturn(tableTripPattern);
+        when(tableTripPattern.getPatternHops()).thenReturn(Collections.singletonList(patternHop));
+        when(routingRequest.getFrom()).thenReturn(new GenericLocation());
+        when(tableTripPattern.getTripTimes(anyInt())).thenReturn(tripTimes);
+        when(tripTimes.getDepartureTime(anyInt())).thenReturn(0);
+        when(tripTimes.getArrivalTime(anyInt())).thenReturn(10);
+        when(serviceDay.secondsSinceMidnight(anyInt())).thenReturn(10);
+        when(patternHop.getToVertex()).thenReturn(arrive);
+        when(patternHop.getGeometry()).thenReturn(geometry);
+
+        Vertex vertex = new OnBoardDepartServiceImpl().setupDepartOnBoard(routingContext);
+
+        assertEquals(coordinates[1].x, vertex.getX(), 0.0);
+        assertEquals(coordinates[1].y, vertex.getY(), 0.0);
+    }
 }

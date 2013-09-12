@@ -231,11 +231,16 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
                     GeometryUtils.splitGeometryAtFraction(geometry, fractionCovered);
             geomRemaining = geomPair.getSecond();
 
-            if (geomRemaining.isEmpty()) {
+            if (geometry.isEmpty()) {
                 lon = Double.NaN;
                 lat = Double.NaN;
             } else {
-                Coordinate start = geomRemaining.getCoordinateN(0);
+                Coordinate start;
+                if (geomRemaining.isEmpty()) {
+                    start = geometry.getCoordinateN(geometry.getNumPoints() - 1);
+                } else {
+                    start = geomRemaining.getCoordinateN(0);
+                }
                 lon = start.x;
                 lat = start.y;
             }
