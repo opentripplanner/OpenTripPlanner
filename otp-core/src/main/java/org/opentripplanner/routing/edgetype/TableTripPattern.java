@@ -134,10 +134,11 @@ public class TableTripPattern implements TripPattern, Serializable {
     }
     
     public Stop getStop(int stopIndex) {
-    	if (stopIndex == patternHops.length)
-    		return patternHops[stopIndex - 1].getEndStop();
-    	else
-    		return patternHops[stopIndex].getStartStop();
+        if (stopIndex == patternHops.length) {
+            return patternHops[stopIndex - 1].getEndStop();
+        } else {
+            return patternHops[stopIndex].getBeginStop();
+        }
     }
 
     public List<Stop> getStops() {
@@ -152,7 +153,7 @@ public class TableTripPattern implements TripPattern, Serializable {
     }
     
     public List<PatternHop> getPatternHops() {
-    	return Arrays.asList(patternHops);
+        return Arrays.asList(patternHops);
     }
 
     /* package private */
@@ -171,7 +172,7 @@ public class TableTripPattern implements TripPattern, Serializable {
     
     @XmlTransient
     public List<Trip> getTrips() {
-    	return trips;
+        return trips;
     }
 
     public int getTripIndex(Trip trip) {

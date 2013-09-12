@@ -109,7 +109,7 @@ public class TestPatch extends TestCase {
                 PatternHop somePatternHop = (PatternHop) somePatternBoard.getToVertex()
                         .getOutgoing().iterator().next();
 
-                Stop stopA = somePatternHop.getStartStop();
+                Stop stopA = somePatternHop.getBeginStop();
                 ArrayList<Stop> stops = new ArrayList<Stop>();
                 stops.add(stopA);
 
