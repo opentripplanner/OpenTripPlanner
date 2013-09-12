@@ -315,28 +315,35 @@ public class PlanGeneratorTest {
 
         trainStopDepartTime.setTrip(firstTrip);
         trainStopDepartTime.setStop(trainStopDepart);
+        trainStopDepartTime.setStopSequence(Integer.MIN_VALUE);
         trainStopDepartTime.setDepartureTime(4);
         trainStopDepartTime.setPickupType(3);
         trainStopDwellTime.setTrip(firstTrip);
         trainStopDwellTime.setStop(trainStopDwell);
+        trainStopDwellTime.setStopSequence(0);
         trainStopDwellTime.setArrivalTime(8);
         trainStopDwellTime.setDepartureTime(12);
         trainStopInterlineFirstTime.setTrip(firstTrip);
         trainStopInterlineFirstTime.setStop(trainStopInterline);
+        trainStopInterlineFirstTime.setStopSequence(Integer.MAX_VALUE);
         trainStopInterlineFirstTime.setArrivalTime(16);
         trainStopInterlineSecondTime.setTrip(secondTrip);
         trainStopInterlineSecondTime.setStop(trainStopInterline);
+        trainStopInterlineSecondTime.setStopSequence(0);
         trainStopInterlineSecondTime.setDepartureTime(20);
         trainStopArriveTime.setTrip(secondTrip);
         trainStopArriveTime.setStop(trainStopArrive);
+        trainStopArriveTime.setStopSequence(1);
         trainStopArriveTime.setArrivalTime(24);
         trainStopArriveTime.setDropOffType(2);
         ferryStopDepartTime.setTrip(thirdTrip);
         ferryStopDepartTime.setStop(ferryStopDepart);
+        ferryStopDepartTime.setStopSequence(-1);
         ferryStopDepartTime.setDepartureTime(32);
         ferryStopDepartTime.setPickupType(2);
         ferryStopArriveTime.setTrip(thirdTrip);
         ferryStopArriveTime.setStop(ferryStopArrive);
+        ferryStopArriveTime.setStopSequence(0);
         ferryStopArriveTime.setArrivalTime(36);
         ferryStopArriveTime.setDropOffType(3);
 
@@ -1410,6 +1417,7 @@ public class PlanGeneratorTest {
             assertEquals(0, places[0][0].lon, 0.0);
             assertEquals(0, places[0][0].lat, 0.0);
             assertNull(places[0][0].stopIndex);
+            assertNull(places[0][0].stopSequence);
             assertNull(places[0][0].stopCode);
             assertNull(places[0][0].platformCode);
             assertNull(places[0][0].zoneId);
@@ -1421,6 +1429,7 @@ public class PlanGeneratorTest {
             assertEquals(1, places[0][1].lon, 0.0);
             assertEquals(1, places[0][1].lat, 0.0);
             assertEquals(0, places[0][1].stopIndex.intValue());
+            assertEquals(Integer.MIN_VALUE, places[0][1].stopSequence.intValue());
             assertEquals("Train depart code", places[0][1].stopCode);
             assertEquals("Train depart platform", places[0][1].platformCode);
             assertEquals("Train depart zone", places[0][1].zoneId);
@@ -1432,6 +1441,7 @@ public class PlanGeneratorTest {
             assertEquals(1, places[1][0].lon, 0.0);
             assertEquals(1, places[1][0].lat, 0.0);
             assertEquals(0, places[1][0].stopIndex.intValue());
+            assertEquals(Integer.MIN_VALUE, places[1][0].stopSequence.intValue());
             assertEquals("Train depart code", places[1][0].stopCode);
             assertEquals("Train depart platform", places[1][0].platformCode);
             assertEquals("Train depart zone", places[1][0].zoneId);
@@ -1447,6 +1457,7 @@ public class PlanGeneratorTest {
             assertEquals(23, places[1][0].lon, 0.0);
             assertEquals(12, places[1][0].lat, 0.0);
             assertNull(places[1][0].stopIndex);
+            assertNull(places[1][0].stopSequence);
             assertNull(places[1][0].stopCode);
             assertNull(places[1][0].platformCode);
             assertNull(places[1][0].zoneId);
@@ -1459,6 +1470,7 @@ public class PlanGeneratorTest {
         assertEquals(45, places[1][1].lon, 0.0);
         assertEquals(23, places[1][1].lat, 0.0);
         assertEquals(1, places[1][1].stopIndex.intValue());
+        assertEquals(0, places[1][1].stopSequence.intValue());
         assertEquals("Train dwell code", places[1][1].stopCode);
         assertEquals("Train dwell platform", places[1][1].platformCode);
         assertEquals("Train dwell zone", places[1][1].zoneId);
@@ -1470,6 +1482,7 @@ public class PlanGeneratorTest {
         assertEquals(89, places[1][2].lon, 0.0);
         assertEquals(45, places[1][2].lat, 0.0);
         assertEquals(2, places[1][2].stopIndex.intValue());
+        assertEquals(Integer.MAX_VALUE, places[1][2].stopSequence.intValue());
         assertEquals("Train interline code", places[1][2].stopCode);
         assertEquals("Train interline platform", places[1][2].platformCode);
         assertEquals("Train interline zone", places[1][2].zoneId);
@@ -1481,6 +1494,7 @@ public class PlanGeneratorTest {
         assertEquals(89, places[2][0].lon, 0.0);
         assertEquals(45, places[2][0].lat, 0.0);
         assertEquals(0, places[2][0].stopIndex.intValue());
+        assertEquals(0, places[2][0].stopSequence.intValue());
         assertEquals("Train interline code", places[2][0].stopCode);
         assertEquals("Train interline platform", places[2][0].platformCode);
         assertEquals("Train interline zone", places[2][0].zoneId);
@@ -1492,6 +1506,7 @@ public class PlanGeneratorTest {
         assertEquals(133, places[2][1].lon, 0.0);
         assertEquals(67, places[2][1].lat, 0.0);
         assertEquals(1, places[2][1].stopIndex.intValue());
+        assertEquals(1, places[2][1].stopSequence.intValue());
         assertEquals("Train arrive code", places[2][1].stopCode);
         assertEquals("Train arrive platform", places[2][1].platformCode);
         assertEquals("Train arrive zone", places[2][1].zoneId);
@@ -1507,6 +1522,7 @@ public class PlanGeneratorTest {
         assertEquals(133, places[3][0].lon, 0.0);
         assertEquals(67, places[3][0].lat, 0.0);
         assertEquals(1, places[3][0].stopIndex.intValue());
+        assertEquals(1, places[3][0].stopSequence.intValue());
         assertEquals("Train arrive code", places[3][0].stopCode);
         assertEquals("Train arrive platform", places[3][0].platformCode);
         assertEquals("Train arrive zone", places[3][0].zoneId);
@@ -1522,6 +1538,7 @@ public class PlanGeneratorTest {
         assertEquals(135, places[3][1].lon, 0.0);
         assertEquals(67, places[3][1].lat, 0.0);
         assertEquals(0, places[3][1].stopIndex.intValue());
+        assertEquals(-1, places[3][1].stopSequence.intValue());
         assertEquals("Ferry depart code", places[3][1].stopCode);
         assertEquals("Ferry depart platform", places[3][1].platformCode);
         assertEquals("Ferry depart zone", places[3][1].zoneId);
@@ -1537,6 +1554,7 @@ public class PlanGeneratorTest {
         assertEquals(135, places[4][0].lon, 0.0);
         assertEquals(67, places[4][0].lat, 0.0);
         assertEquals(0, places[4][0].stopIndex.intValue());
+        assertEquals(-1, places[4][0].stopSequence.intValue());
         assertEquals("Ferry depart code", places[4][0].stopCode);
         assertEquals("Ferry depart platform", places[4][0].platformCode);
         assertEquals("Ferry depart zone", places[4][0].zoneId);
@@ -1552,6 +1570,7 @@ public class PlanGeneratorTest {
         assertEquals(179, places[4][1].lon, 0.0);
         assertEquals(89, places[4][1].lat, 0.0);
         assertEquals(1, places[4][1].stopIndex.intValue());
+        assertEquals(0, places[4][1].stopSequence.intValue());
         assertEquals("Ferry arrive code", places[4][1].stopCode);
         assertEquals("Ferry arrive platform", places[4][1].platformCode);
         assertEquals("Ferry arrive zone", places[4][1].zoneId);
@@ -1563,6 +1582,7 @@ public class PlanGeneratorTest {
         assertEquals(179, places[5][0].lon, 0.0);
         assertEquals(89, places[5][0].lat, 0.0);
         assertEquals(1, places[5][0].stopIndex.intValue());
+        assertEquals(0, places[5][0].stopSequence.intValue());
         assertEquals("Ferry arrive code", places[5][0].stopCode);
         assertEquals("Ferry arrive platform", places[5][0].platformCode);
         assertEquals("Ferry arrive zone", places[5][0].zoneId);
@@ -1574,6 +1594,7 @@ public class PlanGeneratorTest {
         assertEquals(180, places[5][1].lon, 0.0);
         assertEquals(90, places[5][1].lat, 0.0);
         assertNull(places[5][1].stopIndex);
+        assertNull(places[5][1].stopSequence);
         assertNull(places[5][1].stopCode);
         assertNull(places[5][1].platformCode);
         assertNull(places[5][1].zoneId);
@@ -1585,6 +1606,7 @@ public class PlanGeneratorTest {
         assertEquals(180, places[6][0].lon, 0.0);
         assertEquals(90, places[6][0].lat, 0.0);
         assertNull(places[6][0].stopIndex);
+        assertNull(places[6][0].stopSequence);
         assertNull(places[6][0].stopCode);
         assertNull(places[6][0].platformCode);
         assertNull(places[6][0].zoneId);
@@ -1596,6 +1618,7 @@ public class PlanGeneratorTest {
         assertEquals(90, places[6][1].lon, 0.0);
         assertEquals(90, places[6][1].lat, 0.0);
         assertNull(places[6][1].stopIndex);
+        assertNull(places[6][1].stopSequence);
         assertNull(places[6][1].stopCode);
         assertNull(places[6][1].platformCode);
         assertNull(places[6][1].zoneId);
@@ -1607,6 +1630,7 @@ public class PlanGeneratorTest {
         assertEquals(90, places[7][0].lon, 0.0);
         assertEquals(90, places[7][0].lat, 0.0);
         assertNull(places[7][0].stopIndex);
+        assertNull(places[7][0].stopSequence);
         assertNull(places[7][0].stopCode);
         assertNull(places[7][0].platformCode);
         assertNull(places[7][0].zoneId);
@@ -1618,6 +1642,7 @@ public class PlanGeneratorTest {
         assertEquals(0, places[7][1].lon, 0.0);
         assertEquals(90, places[7][1].lat, 0.0);
         assertNull(places[7][1].stopIndex);
+        assertNull(places[7][1].stopSequence);
         assertNull(places[7][1].stopCode);
         assertNull(places[7][1].platformCode);
         assertNull(places[7][1].zoneId);
@@ -1629,6 +1654,7 @@ public class PlanGeneratorTest {
         assertEquals(0, places[8][0].lon, 0.0);
         assertEquals(90, places[8][0].lat, 0.0);
         assertNull(places[8][0].stopIndex);
+        assertNull(places[8][0].stopSequence);
         assertNull(places[8][0].stopCode);
         assertNull(places[8][0].platformCode);
         assertNull(places[8][0].zoneId);
@@ -1640,6 +1666,7 @@ public class PlanGeneratorTest {
         assertEquals(0, places[8][1].lon, 0.0);
         assertEquals(90, places[8][1].lat, 0.0);
         assertNull(places[8][1].stopIndex);
+        assertNull(places[8][1].stopSequence);
         assertNull(places[8][1].stopCode);
         assertNull(places[8][1].platformCode);
         assertNull(places[8][1].zoneId);
