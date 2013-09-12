@@ -577,6 +577,7 @@ public class PlanGeneratorTest {
 
         // Alert for testing GTFS-RT
         AlertPatch patch = new AlertPatch();
+
         patch.setTimePeriods(Collections.singletonList(new TimePeriod(0, Long.MAX_VALUE)));
         patch.setAlert(Alert.createSimpleAlerts(alertsExample));
 
@@ -1419,10 +1420,10 @@ public class PlanGeneratorTest {
             assertEquals("Train stop depart", places[0][1].name);
             assertEquals(1, places[0][1].lon, 0.0);
             assertEquals(1, places[0][1].lat, 0.0);
-            assertNull(places[0][1].stopIndex);
-            assertNull(places[0][1].stopCode);
-            assertNull(places[0][1].platformCode);
-            assertNull(places[0][1].zoneId);
+            assertEquals(0, places[0][1].stopIndex.intValue());
+            assertEquals("Train depart code", places[0][1].stopCode);
+            assertEquals("Train depart platform", places[0][1].platformCode);
+            assertEquals("Train depart zone", places[0][1].zoneId);
             assertNull(places[0][1].orig);
             assertEquals(3000L, places[0][1].arrival.getTimeInMillis());
             assertEquals(4000L, places[0][1].departure.getTimeInMillis());
@@ -1505,10 +1506,10 @@ public class PlanGeneratorTest {
         assertEquals("Train stop arrive", places[3][0].name);
         assertEquals(133, places[3][0].lon, 0.0);
         assertEquals(67, places[3][0].lat, 0.0);
-        assertNull(places[3][0].stopIndex);
-        assertNull(places[3][0].stopCode);
-        assertNull(places[3][0].platformCode);
-        assertNull(places[3][0].zoneId);
+        assertEquals(1, places[3][0].stopIndex.intValue());
+        assertEquals("Train arrive code", places[3][0].stopCode);
+        assertEquals("Train arrive platform", places[3][0].platformCode);
+        assertEquals("Train arrive zone", places[3][0].zoneId);
         assertNull(places[3][0].orig);
         assertEquals(24000L, places[3][0].arrival.getTimeInMillis());
         if (type == Type.FORWARD || type == Type.ONBOARD) {
@@ -1520,10 +1521,10 @@ public class PlanGeneratorTest {
         assertEquals("Ferry stop depart", places[3][1].name);
         assertEquals(135, places[3][1].lon, 0.0);
         assertEquals(67, places[3][1].lat, 0.0);
-        assertNull(places[3][1].stopIndex);
-        assertNull(places[3][1].stopCode);
-        assertNull(places[3][1].platformCode);
-        assertNull(places[3][1].zoneId);
+        assertEquals(0, places[3][1].stopIndex.intValue());
+        assertEquals("Ferry depart code", places[3][1].stopCode);
+        assertEquals("Ferry depart platform", places[3][1].platformCode);
+        assertEquals("Ferry depart zone", places[3][1].zoneId);
         assertNull(places[3][1].orig);
         if (type == Type.FORWARD || type == Type.ONBOARD) {
             assertEquals(32000L, places[3][1].arrival.getTimeInMillis());
@@ -1561,10 +1562,10 @@ public class PlanGeneratorTest {
         assertEquals("Ferry stop arrive", places[5][0].name);
         assertEquals(179, places[5][0].lon, 0.0);
         assertEquals(89, places[5][0].lat, 0.0);
-        assertNull(places[5][0].stopIndex);
-        assertNull(places[5][0].stopCode);
-        assertNull(places[5][0].platformCode);
-        assertNull(places[5][0].zoneId);
+        assertEquals(1, places[5][0].stopIndex.intValue());
+        assertEquals("Ferry arrive code", places[5][0].stopCode);
+        assertEquals("Ferry arrive platform", places[5][0].platformCode);
+        assertEquals("Ferry arrive zone", places[5][0].zoneId);
         assertNull(places[5][0].orig);
         assertEquals(43000L, places[5][0].arrival.getTimeInMillis());
         assertEquals(44000L, places[5][0].departure.getTimeInMillis());
