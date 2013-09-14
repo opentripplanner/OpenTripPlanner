@@ -28,11 +28,12 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
-
 import org.opentripplanner.gbannotation.GraphBuilderAnnotation;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.PatternEdge;
+import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -84,6 +85,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     private List<Vertex> visibleVertices;
 
     private List<Edge> visibleStreetEdges = new ArrayList<Edge>(1000);
+
+    private List<Edge> visibleLinkEdges = new ArrayList<Edge>(1000);
 
     private List<Edge> visibleTransitEdges = new ArrayList<Edge>(1000);
 
@@ -139,9 +142,11 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
 
     static final int DRAW_TRANSIT = 2;
 
-    static final int DRAW_STREETS = 3;
+    static final int DRAW_LINKS = 3;
 
-    static final int DRAW_ALL = 4;
+    static final int DRAW_STREETS = 4;
+
+    static final int DRAW_ALL = 5;
 
     static final int DRAW_PARTIAL = 6;
 
@@ -302,7 +307,8 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
                 if (e.getGeometry() == null)
                     continue;
                 if (e instanceof PatternEdge || e instanceof StreetTransitLink
-                        || e instanceof StreetEdge) {
+                        || e instanceof StreetEdge || e instanceof PathwayEdge
+                        || e instanceof SimpleTransfer) {
                     env = e.getGeometry().getEnvelopeInternal();
                     edgeIndex.insert(env, e);
                 }
@@ -316,11 +322,16 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     private synchronized void findVisibleElements() {
         visibleVertices = (List<Vertex>) vertexIndex.query(modelBounds);
         visibleStreetEdges.clear();
+        visibleLinkEdges.clear();
         visibleTransitEdges.clear();
         for (Edge de : (Iterable<Edge>) edgeIndex.query(modelBounds)) {
-            if (de instanceof PatternEdge || de instanceof StreetTransitLink) {
+            if (de instanceof PatternEdge) {
                 visibleTransitEdges.add(de);
-            } else if (de instanceof StreetEdge) {
+            }
+            else if (de instanceof PathwayEdge || de instanceof StreetTransitLink || de instanceof SimpleTransfer) {
+                visibleLinkEdges.add(de);
+            }
+            else if (de instanceof StreetEdge) {
                 visibleStreetEdges.add(de);
             }
         }
@@ -484,6 +495,22 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
                     drawEdge(visibleStreetEdges.get(drawOffset));
                     drawOffset += 1;
                     // if (drawOffset % FRAME_SIZE == 0) return;
+                    if (drawOffset % BLOCK_SIZE == 0) {
+                        if (millis() - startMillis > FRAME_TIME)
+                            return;
+                    }
+                }
+            }
+        } else if (drawLevel == DRAW_LINKS) {
+            if (drawLinkEdges) {
+                stroke(256, 165, 0, 30); // transparent blue
+                strokeWeight(3);
+                noFill();
+                // for (Edge e : visibleTransitEdges) {
+                while (drawOffset < visibleLinkEdges.size()) {
+                    Edge e = visibleLinkEdges.get(drawOffset);
+                    drawEdge(e);
+                    drawOffset += 1;
                     if (drawOffset % BLOCK_SIZE == 0) {
                         if (millis() - startMillis > FRAME_TIME)
                             return;
