@@ -50,7 +50,7 @@ public class TripUpdateList extends AbstractUpdate {
     {
         ymdParser.setTimeZone(TimeZone.getTimeZone("GMT"));
     }
-    
+
     /** The trip to add, for ADDED updates. */
     @Getter
     private final Trip trip;
@@ -89,15 +89,15 @@ public class TripUpdateList extends AbstractUpdate {
         /** This trip should be modified for the given serviceDate. */
         MODIFIED
     }
-    
+
     public static TripUpdateList forCanceledTrip(AgencyAndId tripId, long timestamp, ServiceDate serviceDate) {
         return new TripUpdateList(tripId, timestamp, serviceDate, Status.CANCELED, Collections.<Update> emptyList(), null);
     }
-    
+
     public static TripUpdateList forRemovedTrip(AgencyAndId tripId, long timestamp, ServiceDate serviceDate) {
         return new TripUpdateList(tripId, timestamp, serviceDate, Status.REMOVED, Collections.<Update> emptyList(), null);
     }
-    
+
     public static TripUpdateList forAddedTrip(Trip trip, long timestamp, ServiceDate serviceDate,  List<Update> stopTimes) {
         if(trip == null || trip.getId() == null || trip.getRoute() == null)
             throw new IllegalArgumentException("A trip with a valid tripId and route must be supplied.");
@@ -106,7 +106,7 @@ public class TripUpdateList extends AbstractUpdate {
 
         return new TripUpdateList(trip.getId(), timestamp, serviceDate, Status.ADDED, stopTimes, trip);
     }
-    
+
     public static TripUpdateList forUpdatedTrip(AgencyAndId tripId, long timestamp, ServiceDate serviceDate, List<Update> updates) {
         if(updates == null || updates.isEmpty())
             throw new IllegalArgumentException("At least one update needs to be supplied.");
@@ -142,8 +142,8 @@ public class TripUpdateList extends AbstractUpdate {
 
         return ret;
     }
-    
-    /** 
+
+    /**
      * Check that this TripUpdateList is internally coherent, meaning that:
      * 1. all Updates' trip_ids are the same, and match the UpdateBlock's trip_id
      * 2. stop sequence numbers are sequential and increasing
@@ -158,18 +158,19 @@ public class TripUpdateList extends AbstractUpdate {
 
         // check that sequence numbers are sequential and increasing
         boolean increasing = true;
-        boolean statusCoherent = true;
+        boolean timesCoherent = true;
         Update prev_u = null;
         for (Update u : updates) {
             if (prev_u != null) {
                 if (u.stopSeq <= prev_u.stopSeq)
                     increasing = false;
-                if (prev_u.status != Update.Status.CANCEL && u.status != Update.Status.CANCEL)
-                    statusCoherent = false;
+                if (prev_u.status != Update.Status.CANCEL && u.status != Update.Status.CANCEL
+                        && u.arrive < prev_u.depart)
+                    timesCoherent = false;
             }
             prev_u = u;
         }
-        return increasing && statusCoherent;
+        return increasing && timesCoherent; // || !sequential)
     }
 
     public boolean filter(boolean passed, boolean negativeDwells, boolean duplicateStops) {
@@ -324,257 +325,6 @@ public class TripUpdateList extends AbstractUpdate {
         /* full-block match succeeded */
         return bestStop;
     }
-    
-    /**
-     * Converts a GTFS-RT feed into TripUpdateLists.
-     */
-    public static List<TripUpdateList> decodeFromGtfsRealtime(GtfsRealtime.FeedMessage feed, String agencyId) {
-        if (feed == null)
-            return null;
-
-        GtfsRealtime.FeedHeader header = feed.getHeader();
-        long feedTimestamp = header.getTimestamp();
-        
-        List<TripUpdateList> updates = new ArrayList<TripUpdateList>();
-        for (GtfsRealtime.FeedEntity entity : feed.getEntityList()) {
-            if (!entity.hasTripUpdate()) {
-                continue;
-            }
-
-            GtfsRealtime.TripUpdate rtTripUpdate = entity.getTripUpdate();
-            GtfsRealtime.TripDescriptor descriptor = rtTripUpdate.getTrip();
-            
-            long timestamp = rtTripUpdate.hasTimestamp() ? rtTripUpdate.getTimestamp() : feedTimestamp;
-
-            String trip = descriptor.getTripId();
-            AgencyAndId tripId = new AgencyAndId(agencyId, trip);
-            
-            ServiceDate serviceDate = new ServiceDate();
-            if (descriptor.hasStartDate()) {
-                try {
-                    Date date = ymdParser.parse(descriptor.getStartDate());
-                    serviceDate = new ServiceDate(date);
-                } catch (ParseException e) {
-                    LOG.warn("Failed to parse startDate in gtfs-rt feed: \n{}", entity);
-                    continue;
-                }
-            }
-
-            GtfsRealtime.TripDescriptor.ScheduleRelationship sr;
-            if (rtTripUpdate.getTrip().hasScheduleRelationship()) {
-                sr = rtTripUpdate.getTrip().getScheduleRelationship();
-            } else {
-                sr = GtfsRealtime.TripDescriptor.ScheduleRelationship.SCHEDULED;
-            }
-
-            TripUpdateList tripUpdateList = null;
-            switch (sr) {
-            case SCHEDULED:
-                tripUpdateList = getUpdateForScheduledTrip(tripId, rtTripUpdate, timestamp, serviceDate);
-                break;
-            case CANCELED:
-                tripUpdateList = getUpdateForCanceledTrip(tripId, rtTripUpdate, timestamp, serviceDate);
-                break;
-            case ADDED:
-                tripUpdateList = getUpdateForAddedTrip(tripId, rtTripUpdate, timestamp, serviceDate);
-                break;
-            case UNSCHEDULED:
-                tripUpdateList = getUpdateForUnscheduledTrip(tripId, rtTripUpdate, timestamp, serviceDate);
-                break;
-            case REPLACEMENT:
-                tripUpdateList = getUpdateForReplacementTrip(tripId, rtTripUpdate, timestamp, serviceDate);
-                break;
-            }
-            
-            if(tripUpdateList != null) {
-                updates.add(tripUpdateList);
-            } else {
-                LOG.warn("Failed to parse tripUpdate: \n{}", entity);
-            }
-        }
-        return updates;
-    }
-
-    private static TripUpdateList getUpdateForReplacementTrip(AgencyAndId tripId,
-            GtfsRealtime.TripUpdate rtTripUpdate, long timestamp, ServiceDate serviceDate) {
-        
-        LOG.warn("ScheduleRelationship.REPLACEMENT trips are currently not handled.");
-        return null;
-    }
-
-    private static TripUpdateList getUpdateForUnscheduledTrip(AgencyAndId tripId,
-            GtfsRealtime.TripUpdate rtTripUpdate, long timestamp, ServiceDate serviceDate) {
-        
-        LOG.warn("ScheduleRelationship.UNSCHEDULED trips are currently not handled.");
-        return null;
-    }
-
-    protected static TripUpdateList getUpdateForCanceledTrip(AgencyAndId tripId,
-            GtfsRealtime.TripUpdate tripUpdate, long timestamp, ServiceDate serviceDate) {
-        
-        if(!validateTripDescriptor(tripUpdate.getTrip())) {
-            return null;
-        }
-
-        return TripUpdateList.forCanceledTrip(tripId, timestamp, serviceDate);
-    }
-
-    protected static TripUpdateList getUpdateForAddedTrip(AgencyAndId tripId,
-            GtfsRealtime.TripUpdate tripUpdate, long timestamp, ServiceDate serviceDate) {
-        
-        if(!validateTripDescriptor(tripUpdate.getTrip())) {
-            return null;
-        }
-        
-        if(!tripUpdate.getTrip().hasRouteId()) {
-            LOG.warn("A routeId must be provided for added/unscheduled trips.");
-            return null;
-        }
-
-        Trip trip = new Trip();
-        trip.setId(tripId);
-        
-        Route route = new Route();
-        AgencyAndId routeId = new AgencyAndId(tripId.getAgencyId(), tripUpdate.getTrip().getRouteId());
-        route.setId(routeId);
-        trip.setRoute(route);
-
-        List<Update> updates = new LinkedList<Update>();
-        for(GtfsRealtime.TripUpdate.StopTimeUpdate stopTimeUpdate
-                : tripUpdate.getStopTimeUpdateList()) {
-            
-            Update u = getStopTimeUpdateForTrip(tripId, timestamp, serviceDate, stopTimeUpdate);
-            if(u == null) {
-                return null;
-            }
-            updates.add(u);
-        }
-        
-        if(updates.size() < 2) {
-            LOG.warn("At least two stop times must be provided for an added trip.");
-            return null;
-        }
-        
-        return TripUpdateList.forAddedTrip(trip, timestamp, serviceDate, updates);
-    }
-
-    protected static TripUpdateList getUpdateForScheduledTrip(AgencyAndId tripId,
-            GtfsRealtime.TripUpdate tripUpdate, long timestamp, ServiceDate serviceDate) {
-
-        if(!validateTripDescriptor(tripUpdate.getTrip())) {
-            return null;
-        }
-        
-        List<Update> updates = new LinkedList<Update>();
-
-        for (GtfsRealtime.TripUpdate.StopTimeUpdate stopTimeUpdate
-                : tripUpdate.getStopTimeUpdateList()) {
-            
-            Update u = getStopTimeUpdateForTrip(tripId, timestamp, serviceDate, stopTimeUpdate);
-            if(u == null) {
-                return null;
-            }
-            updates.add(u);
-        }
-
-        if(updates.isEmpty()) {
-            return null;
-        }
-
-        return TripUpdateList.forUpdatedTrip(tripId, timestamp, serviceDate, updates);
-    }
-
-    protected static Update getStopTimeUpdateForTrip(AgencyAndId tripId, long timestamp,
-            ServiceDate serviceDate, GtfsRealtime.TripUpdate.StopTimeUpdate stopTimeUpdate) {
-        
-        if(!(stopTimeUpdate.hasStopId() || stopTimeUpdate.hasStopSequence())) {
-            LOG.warn("A stopId or stopSequence must be provided: \n{}", stopTimeUpdate);
-            return null;
-        }
-        
-        AgencyAndId stopId = null;
-        if(stopTimeUpdate.hasStopId())
-            stopId = new AgencyAndId(tripId.getAgencyId(), stopTimeUpdate.getStopId());
-        
-        Integer stopSequence = null;
-        if(stopTimeUpdate.hasStopSequence())
-            stopSequence = stopTimeUpdate.getStopSequence();
-        
-        if (stopTimeUpdate.hasScheduleRelationship()
-                && GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.NO_DATA == stopTimeUpdate
-                        .getScheduleRelationship()) {
-            Update u = new Update(tripId, stopId, stopSequence,
-                    0, 0, Update.Status.PLANNED, timestamp, serviceDate);
-            return u;
-        }
-
-        if (stopTimeUpdate.hasScheduleRelationship()
-                && GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.SKIPPED == stopTimeUpdate
-                        .getScheduleRelationship()) {
-            Update u = new Update(tripId, stopId, stopSequence,
-                    0, 0, Update.Status.CANCEL, timestamp, serviceDate);
-            return u;
-        } else {
-            if(!(stopTimeUpdate.hasArrival() || stopTimeUpdate.hasDeparture())) {
-                LOG.warn("Neither an arrival or departure was provided for: \n{}", stopTimeUpdate);
-                return null;
-            }
-            
-            long today = serviceDate.getAsDate(TimeZone.getTimeZone("GMT")).getTime() / 1000;
-            long arrivalTime = -1, departureTime = -1;
-            
-            if(stopTimeUpdate.hasArrival()) {
-                GtfsRealtime.TripUpdate.StopTimeEvent event = stopTimeUpdate.getArrival();
-                if(event.hasTime()) {
-                    arrivalTime = event.getTime();
-                    arrivalTime = arrivalTime - today;
-                } else if(event.hasDelay()) {
-
-                    Update u = new Update(tripId, stopId, stopSequence,
-                            event.getDelay(), Update.Status.PREDICTION, timestamp, serviceDate);
-                    return u;
-                }
-            }
-            if(stopTimeUpdate.hasDeparture()) {
-                GtfsRealtime.TripUpdate.StopTimeEvent event = stopTimeUpdate.getDeparture();
-                if(event.hasTime()) {
-                    departureTime = event.getTime();
-                    departureTime = departureTime - today;
-                } else if(event.hasDelay()) {
-
-                    Update u = new Update(tripId, stopId, stopSequence,
-                            event.getDelay(), Update.Status.PREDICTION, timestamp, serviceDate);
-                    return u;
-                }
-            }
-            
-            if(arrivalTime < 0 && departureTime < 0) {
-                LOG.warn("Neither an arrival or departure time was provided for: \n{}", stopTimeUpdate);
-                return null;
-            }
-            
-            if(arrivalTime == -1) {
-                arrivalTime = departureTime;
-            }
-            if(departureTime == -1) {
-                departureTime = arrivalTime;
-            }
-
-            Update u = new Update(tripId, stopId, stopSequence,
-                    (int) arrivalTime, (int) departureTime, Update.Status.PREDICTION,
-                    timestamp, serviceDate);
-            return u;
-        }
-    }
-    
-    protected static boolean validateTripDescriptor(GtfsRealtime.TripDescriptor tripDescriptor) {
-        if(tripDescriptor.hasStartTime()) {
-            LOG.warn("Frequency-expanded trips are not supported...");
-            return false;
-        }
-        
-        return tripDescriptor.hasTripId();
-    }
 
     /**
      * Converts a GTFS-RT feed into TripUpdateLists.
@@ -620,21 +370,21 @@ public class TripUpdateList extends AbstractUpdate {
 
             TripUpdateList tripUpdateList = null;
             switch (sr) {
-            case SCHEDULED:
-                tripUpdateList = getUpdateForScheduledTrip(tripId, rtTripUpdate, timestamp, serviceDate);
-                break;
-            case CANCELED:
-                tripUpdateList = getUpdateForCanceledTrip(tripId, rtTripUpdate, timestamp, serviceDate);
-                break;
-            case ADDED:
-                tripUpdateList = getUpdateForAddedTrip(tripId, rtTripUpdate, timestamp, serviceDate);
-                break;
-            case UNSCHEDULED:
-                tripUpdateList = getUpdateForUnscheduledTrip(tripId, rtTripUpdate, timestamp, serviceDate);
-                break;
-            case REPLACEMENT:
-                tripUpdateList = getUpdateForReplacementTrip(tripId, rtTripUpdate, timestamp, serviceDate);
-                break;
+                case SCHEDULED:
+                    tripUpdateList = getUpdateForScheduledTrip(tripId, rtTripUpdate, timestamp, serviceDate);
+                    break;
+                case CANCELED:
+                    tripUpdateList = getUpdateForCanceledTrip(tripId, rtTripUpdate, timestamp, serviceDate);
+                    break;
+                case ADDED:
+                    tripUpdateList = getUpdateForAddedTrip(tripId, rtTripUpdate, timestamp, serviceDate);
+                    break;
+                case UNSCHEDULED:
+                    tripUpdateList = getUpdateForUnscheduledTrip(tripId, rtTripUpdate, timestamp, serviceDate);
+                    break;
+                case REPLACEMENT:
+                    tripUpdateList = getUpdateForReplacementTrip(tripId, rtTripUpdate, timestamp, serviceDate);
+                    break;
             }
 
             if(tripUpdateList != null) {
@@ -647,21 +397,21 @@ public class TripUpdateList extends AbstractUpdate {
     }
 
     private static TripUpdateList getUpdateForReplacementTrip(AgencyAndId tripId,
-            GtfsRealtime.TripUpdate rtTripUpdate, long timestamp, ServiceDate serviceDate) {
+                                                              GtfsRealtime.TripUpdate rtTripUpdate, long timestamp, ServiceDate serviceDate) {
 
         LOG.warn("ScheduleRelationship.REPLACEMENT trips are currently not handled.");
         return null;
     }
 
     private static TripUpdateList getUpdateForUnscheduledTrip(AgencyAndId tripId,
-            GtfsRealtime.TripUpdate rtTripUpdate, long timestamp, ServiceDate serviceDate) {
+                                                              GtfsRealtime.TripUpdate rtTripUpdate, long timestamp, ServiceDate serviceDate) {
 
         LOG.warn("ScheduleRelationship.UNSCHEDULED trips are currently not handled.");
         return null;
     }
 
     protected static TripUpdateList getUpdateForCanceledTrip(AgencyAndId tripId,
-            GtfsRealtime.TripUpdate tripUpdate, long timestamp, ServiceDate serviceDate) {
+                                                             GtfsRealtime.TripUpdate tripUpdate, long timestamp, ServiceDate serviceDate) {
 
         if(!validateTripDescriptor(tripUpdate.getTrip())) {
             return null;
@@ -671,7 +421,7 @@ public class TripUpdateList extends AbstractUpdate {
     }
 
     protected static TripUpdateList getUpdateForAddedTrip(AgencyAndId tripId,
-            GtfsRealtime.TripUpdate tripUpdate, long timestamp, ServiceDate serviceDate) {
+                                                          GtfsRealtime.TripUpdate tripUpdate, long timestamp, ServiceDate serviceDate) {
 
         if(!validateTripDescriptor(tripUpdate.getTrip())) {
             return null;
@@ -710,7 +460,7 @@ public class TripUpdateList extends AbstractUpdate {
     }
 
     protected static TripUpdateList getUpdateForScheduledTrip(AgencyAndId tripId,
-            GtfsRealtime.TripUpdate tripUpdate, long timestamp, ServiceDate serviceDate) {
+                                                              GtfsRealtime.TripUpdate tripUpdate, long timestamp, ServiceDate serviceDate) {
 
         if(!validateTripDescriptor(tripUpdate.getTrip())) {
             return null;
@@ -736,7 +486,7 @@ public class TripUpdateList extends AbstractUpdate {
     }
 
     protected static Update getStopTimeUpdateForTrip(AgencyAndId tripId, long timestamp,
-            ServiceDate serviceDate, GtfsRealtime.TripUpdate.StopTimeUpdate stopTimeUpdate) {
+                                                     ServiceDate serviceDate, GtfsRealtime.TripUpdate.StopTimeUpdate stopTimeUpdate) {
 
         if(!(stopTimeUpdate.hasStopId() || stopTimeUpdate.hasStopSequence())) {
             LOG.warn("A stopId or stopSequence must be provided: \n{}", stopTimeUpdate);
@@ -753,7 +503,7 @@ public class TripUpdateList extends AbstractUpdate {
 
         if (stopTimeUpdate.hasScheduleRelationship()
                 && GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.NO_DATA == stopTimeUpdate
-                        .getScheduleRelationship()) {
+                .getScheduleRelationship()) {
             Update u = new Update(tripId, stopId, stopSequence,
                     0, 0, false,Update.Status.PLANNED, timestamp, serviceDate);
             return u;
@@ -761,7 +511,7 @@ public class TripUpdateList extends AbstractUpdate {
 
         if (stopTimeUpdate.hasScheduleRelationship()
                 && GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship.SKIPPED == stopTimeUpdate
-                        .getScheduleRelationship()) {
+                .getScheduleRelationship()) {
             Update u = new Update(tripId, stopId, stopSequence,
                     0, 0, false,Update.Status.CANCEL, timestamp, serviceDate);
             return u;
@@ -817,13 +567,13 @@ public class TripUpdateList extends AbstractUpdate {
             return u;
         }
     }
-    
+
     protected static boolean validateTripDescriptor(GtfsRealtime.TripDescriptor tripDescriptor) {
         if(tripDescriptor.hasStartTime()) {
             LOG.warn("Frequency-expanded trips are not supported...");
             return false;
         }
-        
+
         return tripDescriptor.hasTripId();
     }
 
