@@ -29,7 +29,7 @@ public class Kv8Update extends Update {
 
     public Kv8Update(AgencyAndId tripId, AgencyAndId stopId, int stopSeq, int arrive, int depart,
             Status status, long timestamp, ServiceDate serviceDate) {
-        super(tripId, stopId, stopSeq, arrive, depart, status, timestamp, serviceDate);
+        super(tripId, stopId, stopSeq, arrive, depart, false, status, timestamp, serviceDate);
     }
 
     public static List<Update> fromCTX(String ctxString) {

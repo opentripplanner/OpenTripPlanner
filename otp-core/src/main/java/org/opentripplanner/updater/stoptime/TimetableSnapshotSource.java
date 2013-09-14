@@ -104,7 +104,7 @@ public class TimetableSnapshotSource {
     /**
      * Method to apply a trip update list to the most recent version of the timetable snapshot.
      */
-    public void applyTripUpdateLists(List<TripUpdateList> updates, ITripTimesUpdater tripTimesUpdater) {
+    public void applyTripUpdateLists(List<TripUpdateList> updates, ITripTimesUpdater ITripTimesUpdater) {
         if (updates == null) {
             LOG.debug("updates is null");
             return;
@@ -123,10 +123,10 @@ public class TimetableSnapshotSource {
                 applied = handleAddedTrip(tripUpdateList);
                 break;
             case CANCELED:
-                applied = handleCanceledTrip(tripUpdateList, tripTimesUpdater);
+                applied = handleCanceledTrip(tripUpdateList, ITripTimesUpdater);
                 break;
             case MODIFIED:
-                applied = handleModifiedTrip(tripUpdateList, tripTimesUpdater);
+                applied = handleModifiedTrip(tripUpdateList, ITripTimesUpdater);
                 break;
             case REMOVED:
                 applied = handleRemovedTrip(tripUpdateList);
@@ -163,7 +163,7 @@ public class TimetableSnapshotSource {
         return false;
     }
 
-    protected boolean handleCanceledTrip(TripUpdateList tripUpdateList, ITripTimesUpdater tripTimesUpdater) {
+    protected boolean handleCanceledTrip(TripUpdateList tripUpdateList, ITripTimesUpdater ITripTimesUpdater) {
 
         TableTripPattern pattern = getPatternForTrip(tripUpdateList.getTripId());
         if (pattern == null) {
@@ -171,12 +171,12 @@ public class TimetableSnapshotSource {
             return false;
         }
 
-        boolean applied = buffer.update(pattern, tripUpdateList, tripTimesUpdater);
+        boolean applied = buffer.update(pattern, tripUpdateList, ITripTimesUpdater);
         
         return applied;
     }
 
-    protected boolean handleModifiedTrip(TripUpdateList tripUpdateList, ITripTimesUpdater tripTimesUpdater) {
+    protected boolean handleModifiedTrip(TripUpdateList tripUpdateList, ITripTimesUpdater ITripTimesUpdater) {
 
         tripUpdateList.filter(true, true, true);
         if (! tripUpdateList.isCoherent()) {
@@ -194,7 +194,7 @@ public class TimetableSnapshotSource {
         }
 
         // we have a message we actually want to apply
-        boolean applied = buffer.update(pattern, tripUpdateList, tripTimesUpdater);
+        boolean applied = buffer.update(pattern, tripUpdateList, ITripTimesUpdater);
         
         return applied;
     }

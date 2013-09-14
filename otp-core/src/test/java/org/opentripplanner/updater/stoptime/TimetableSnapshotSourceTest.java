@@ -51,7 +51,7 @@ public class TimetableSnapshotSourceTest {
     
     private TimetableSnapshotSource updater;
 
-    private ITripTimesUpdater tripTimesUpdater = new DecayingOrStatusUpdater();
+    private ITripTimesUpdater ITripTimesUpdater = new DecayingOrStatusUpdater();
 
 
     @BeforeClass
@@ -80,14 +80,14 @@ public class TimetableSnapshotSourceTest {
         ServiceDate serviceDate = new ServiceDate();
         
         TripUpdateList tripUpdateList = TripUpdateList.forCanceledTrip(tripId, 0, serviceDate);
-        updater.applyTripUpdateLists(Arrays.asList(tripUpdateList), tripTimesUpdater);
+        updater.applyTripUpdateLists(Arrays.asList(tripUpdateList), ITripTimesUpdater);
         
         TimetableResolver resolver = updater.getTimetableSnapshot();
         assertNotNull(resolver);
         assertSame(resolver, updater.getTimetableSnapshot());
         
         tripUpdateList = TripUpdateList.forCanceledTrip(tripId, 0, serviceDate);
-        updater.applyTripUpdateLists(Arrays.asList(tripUpdateList), tripTimesUpdater);
+        updater.applyTripUpdateLists(Arrays.asList(tripUpdateList), ITripTimesUpdater);
         assertSame(resolver, updater.getTimetableSnapshot());
 
         updater.setMaxSnapshotFrequency(-1);
@@ -106,7 +106,7 @@ public class TimetableSnapshotSourceTest {
         int tripIndex2 = pattern.getTripIndex(tripId2);
         
         TripUpdateList tripUpdateList = TripUpdateList.forCanceledTrip(tripId, 0, today);
-        updater.applyTripUpdateLists(Arrays.asList(tripUpdateList), tripTimesUpdater);
+        updater.applyTripUpdateLists(Arrays.asList(tripUpdateList), ITripTimesUpdater);
         
         TimetableResolver resolver = updater.getTimetableSnapshot();
         Timetable forToday = resolver.resolve(pattern, today);
@@ -127,9 +127,9 @@ public class TimetableSnapshotSourceTest {
         int tripIndex = pattern.getTripIndex(tripId);
         int tripIndex2 = pattern.getTripIndex(tripId2);
         
-        Update u = new Update(tripId, stopId, 0, 0, Update.Status.PREDICTION, 0, today);
+        Update u = new Update(tripId, stopId, 0, 0, 0, true, Update.Status.PREDICTION, 0, today);
         TripUpdateList tripUpdateList = TripUpdateList.forUpdatedTrip(tripId, 0, today, Collections.singletonList(u));
-        updater.applyTripUpdateLists(Arrays.asList(tripUpdateList), tripTimesUpdater);
+        updater.applyTripUpdateLists(Arrays.asList(tripUpdateList), ITripTimesUpdater);
         
         TimetableResolver resolver = updater.getTimetableSnapshot();
         Timetable forToday = resolver.resolve(pattern, today);
@@ -151,13 +151,13 @@ public class TimetableSnapshotSourceTest {
         updater.setPurgeExpiredData(false);
         
         TripUpdateList tripUpdateList = TripUpdateList.forCanceledTrip(tripId, 0, today);
-        updater.applyTripUpdateLists(Arrays.asList(tripUpdateList), tripTimesUpdater);
+        updater.applyTripUpdateLists(Arrays.asList(tripUpdateList), ITripTimesUpdater);
         TimetableResolver resolverA = updater.getTimetableSnapshot();
         
         updater.setPurgeExpiredData(true);
         
         tripUpdateList = TripUpdateList.forCanceledTrip(tripId, 0, previously);
-        updater.applyTripUpdateLists(Arrays.asList(tripUpdateList), tripTimesUpdater);
+        updater.applyTripUpdateLists(Arrays.asList(tripUpdateList), ITripTimesUpdater);
         TimetableResolver resolverB = updater.getTimetableSnapshot();
         
         assertNotSame(resolverA, resolverB);

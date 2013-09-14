@@ -19,10 +19,10 @@ import java.util.prefs.Preferences;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.strategy.DecayingOrStatusUpdater;
 import org.opentripplanner.routing.trippattern.strategy.ITripTimesUpdater;
-import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.stoptime.StoptimeGraphUpdater;
+import org.opentripplanner.updater.stoptime.TimesUpdaterConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +59,7 @@ public class ExampleGraphUpdater implements StoptimeGraphUpdater {
     /**
      * The strategy to update the trip time, allows to change the strategy from the configuration
      */
-    private ITripTimesUpdater tripTimesUpdater = new DecayingOrStatusUpdater();
+    private ITripTimesUpdater tripTimesUpdater;
 
     // Here the updater can be configured using the properties in the file 'Graph.properties'.
     @Override
@@ -67,6 +67,7 @@ public class ExampleGraphUpdater implements StoptimeGraphUpdater {
         frequencySec = preferences.getInt("frequencySec", 5);
         url = preferences.get("url", null);
         LOG.info("Configured example updater: frequencySec={} and url={}", frequencySec, url);
+        tripTimesUpdater = TimesUpdaterConfigurator.getConfigurator(preferences);
     }
 
     // Here the updater gets to know its parent manager to execute GraphWriterRunnables.
@@ -106,7 +107,7 @@ public class ExampleGraphUpdater implements StoptimeGraphUpdater {
     }
 
     @Override
-    public ITripTimesUpdater getTripTimesUpdater() {
+    public ITripTimesUpdater getITripTimesUpdater() {
         return tripTimesUpdater;
     }
 

@@ -5,13 +5,7 @@ import org.opentripplanner.routing.trippattern.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Created with IntelliJ IDEA.
- * User: Ben
- * Date: 10/09/13
- * Time: 06:56
- * To change this template use File | Settings | File Templates.
- */
+
 public class DecayingOrStatusUpdater implements ITripTimesUpdater {
 
     private static final Logger LOG = LoggerFactory.getLogger(DecayingOrStatusUpdater.class);
@@ -29,8 +23,12 @@ public class DecayingOrStatusUpdater implements ITripTimesUpdater {
                 LOG.warn("Unable to match update block to stopIds.");
                 return null;
             }
-            int delay = updateList.getUpdates().get(0).getDelay();
+            int delay = updateList.getUpdates().get(0).getArriveDelay();
             newTimes = new DecayingDelayTripTimes(scheduledTimes, stopIndex, delay);
+            if(newTimes.timesIncreasing()){
+                return newTimes;
+            }
+            return null;
         }
         else {
             // 'stop' Index as in transit stop (not 'end', not 'hop')
@@ -56,6 +54,7 @@ public class DecayingOrStatusUpdater implements ITripTimesUpdater {
                 }
             }
         }
+
         return newTimes;
     }
 

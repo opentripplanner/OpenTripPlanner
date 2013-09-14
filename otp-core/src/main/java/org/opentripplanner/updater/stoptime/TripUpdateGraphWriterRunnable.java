@@ -21,7 +21,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.TripUpdateList;
 import org.opentripplanner.routing.trippattern.strategy.ITripTimesUpdater;
 import org.opentripplanner.updater.GraphWriterRunnable;
-import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,14 +34,14 @@ public class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
      */
     private List<TripUpdateList> updates;
 
-    private ITripTimesUpdater tripTimesUpdater;
+    private ITripTimesUpdater ITripTimesUpdater;
 
     @Override
     public void run(Graph graph) {
         // Apply updates to graph using realtime snapshot source
         TimetableSnapshotSource snapshotSource = graph.getTimetableSnapshotSource();
         if (snapshotSource != null) {
-            snapshotSource.applyTripUpdateLists(updates, tripTimesUpdater);
+            snapshotSource.applyTripUpdateLists(updates, ITripTimesUpdater);
         } else {
             LOG.error("Could not find realtime data snapshot source in graph."
                     + " The following updates are not applied: {}", updates);

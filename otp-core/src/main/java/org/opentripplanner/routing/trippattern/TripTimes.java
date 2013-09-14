@@ -133,7 +133,7 @@ public abstract class TripTimes {
         return this.getScheduledTripTimes() == this;
     }
     
-    private String formatSeconds(int s) {
+    protected String formatSeconds(int s) {
         int m = s / 60;
         s = s % 60;
         int h = m / 60;
@@ -170,12 +170,12 @@ public abstract class TripTimes {
      * This method check that all times are increasing, and issues warnings if this is not the case.
      * @return whether the times were found to be increasing.
      */
-    public boolean timesIncreasing() {
+    public boolean timesIncreasing(int startAt) {
         // iterate over the new tripTimes, checking that dwells and hops are positive
         boolean increasing = true;
         int nHops = getNumHops();
         int prevArr = -1;
-        for (int hop = 0; hop < nHops; hop++) {
+        for (int hop = startAt; hop < nHops; hop++) {
             int dep = getDepartureTime(hop);
             int arr = getArrivalTime(hop);
             if(arr == CANCELED || dep == CANCELED) {
@@ -193,6 +193,10 @@ public abstract class TripTimes {
             prevArr = arr;
         }
         return increasing;
+    }
+
+    public boolean timesIncreasing() {
+        return timesIncreasing(0);
     }
     
     /* STATIC METHODS TAKING TRIPTIMES AS ARGUMENTS */

@@ -118,7 +118,7 @@ public class TestTransfers extends TestCase {
 
     private GenericAStar aStar;
 
-    private ITripTimesUpdater tripTimesUpdater = new DecayingOrStatusUpdater();
+    private ITripTimesUpdater ITripTimesUpdater = new DecayingOrStatusUpdater();
 
 
     public void setUp() throws Exception {
@@ -175,10 +175,10 @@ public class TestTransfers extends TestCase {
      */
     private void applyUpdateToTripPattern(TableTripPattern pattern, String tripId, String stopId,
             int stopSeq, int arrive, int depart, Status prediction, int timestamp, String serviceDate) throws ParseException {
-        Update update = new Update(new AgencyAndId("agency", tripId), new AgencyAndId("agency", stopId), stopSeq, arrive, depart, prediction, timestamp, ServiceDate.parseString(serviceDate));
+        Update update = new Update(new AgencyAndId("agency", tripId), new AgencyAndId("agency", stopId), stopSeq, arrive, depart,false, prediction, timestamp, ServiceDate.parseString(serviceDate));
         ArrayList<Update> updates = new ArrayList<Update>(Arrays.asList(update));
         TripUpdateList tripUpdateList = TripUpdateList.splitByTrip(updates).get(0);
-        boolean success = pattern.update(tripUpdateList, tripTimesUpdater);
+        boolean success = pattern.update(tripUpdateList, ITripTimesUpdater);
         assertTrue(success);
     }
     

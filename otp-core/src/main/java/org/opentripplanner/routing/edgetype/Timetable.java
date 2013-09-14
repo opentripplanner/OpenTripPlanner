@@ -349,7 +349,7 @@ public class Timetable implements Serializable {
      * @return whether or not the timetable actually changed as a result of this operation
      * (maybe it should do the cloning and return the new timetable to enforce copy-on-write?) 
      */
-    public boolean update(TripUpdateList tripUpdate, ITripTimesUpdater tripTimesUpdater) {
+    public boolean update(TripUpdateList tripUpdate, ITripTimesUpdater ITripTimesUpdater) {
         try {
              // Though all timetables have the same trip ordering, some may have extra trips due to 
              // the dynamic addition of unscheduled trips.
@@ -363,7 +363,7 @@ public class Timetable implements Serializable {
             }
             TripTimes existingTimes = getTripTimes(tripIndex);
             ScheduledTripTimes scheduledTimes = existingTimes.getScheduledTripTimes();
-            TripTimes newTimes = tripTimesUpdater.updateTimes(scheduledTimes, pattern, tripUpdate);
+            TripTimes newTimes = ITripTimesUpdater.updateTimes(scheduledTimes, pattern, tripUpdate);
             if(newTimes != null){
                 // Update succeeded, save the new TripTimes back into this Timetable.
                 this.tripTimes.set(tripIndex, newTimes);

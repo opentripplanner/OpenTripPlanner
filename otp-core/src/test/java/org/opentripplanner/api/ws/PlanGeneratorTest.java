@@ -123,7 +123,7 @@ public class PlanGeneratorTest {
 
     private static final SimpleTimeZone timeZone = new SimpleTimeZone(2, "CEST");
 
-    private ITripTimesUpdater tripTimesUpdater = new DecayingOrStatusUpdater();
+    private ITripTimesUpdater ITripTimesUpdater = new DecayingOrStatusUpdater();
 
 
     private static final String alertsExample =
@@ -628,9 +628,9 @@ public class PlanGeneratorTest {
 
         // Updates for leg 4, the ferry leg
         Update ferryStopDepartUpdate = new Update(thirdTrip.getId(),
-                ferryStopDepart.getId(), 0, 40, 40, Status.PREDICTION, 0L, serviceDate);
+                ferryStopDepart.getId(), 0, 40, 40, false, Status.PREDICTION, 0L, serviceDate);
         Update ferryStopArriveUpdate = new Update(thirdTrip.getId(),
-                ferryStopArrive.getId(), 1, 43, 43, Status.PREDICTION, 0L, serviceDate);
+                ferryStopArrive.getId(), 1, 43, 43, false, Status.PREDICTION, 0L, serviceDate);
 
         ArrayList<Update> updates = new ArrayList<Update>();
 
@@ -646,7 +646,7 @@ public class PlanGeneratorTest {
         TimetableSnapshotSource timetableSnapshotSource = mock(TimetableSnapshotSource.class);
         when(timetableSnapshotSource.getTimetableSnapshot()).thenReturn(resolver);
 
-        timetableSnapshotSource.getTimetableSnapshot().update(thirdTripPattern, tripUpdateList, tripTimesUpdater);
+        timetableSnapshotSource.getTimetableSnapshot().update(thirdTripPattern, tripUpdateList, ITripTimesUpdater);
 
         // Further graph initialization
         graph.putService(ServiceIdToNumberService.class, serviceIdToNumberService);

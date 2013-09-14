@@ -80,10 +80,10 @@ public class UpdatedTripTimesTest {
         TripUpdateList tripUpdateList;
         
         List<Update> updates = new LinkedList<Update>();
-        updates.add(new Update(tripId, stop_a, 0, 0, 0, Update.Status.PLANNED, 0, new ServiceDate()));
-        updates.add(new Update(tripId, stop_b, 1, 0, 0, Update.Status.PLANNED, 0, new ServiceDate()));
-        updates.add(new Update(tripId, stop_c, 2, 0, 0, Update.Status.CANCEL , 0, new ServiceDate()));
-        updates.add(new Update(tripId, stop_d, 3, 0, 0, Update.Status.CANCEL , 0, new ServiceDate()));
+        updates.add(new Update(tripId, stop_a, 0, 0, 0, false, Update.Status.PLANNED, 0, new ServiceDate()));
+        updates.add(new Update(tripId, stop_b, 1, 0, 0, false, Update.Status.PLANNED, 0, new ServiceDate()));
+        updates.add(new Update(tripId, stop_c, 2, 0, 0, false, Update.Status.CANCEL , 0, new ServiceDate()));
+        updates.add(new Update(tripId, stop_d, 3, 0, 0, false, Update.Status.CANCEL , 0, new ServiceDate()));
         
         tripUpdateList = TripUpdateList.forUpdatedTrip(tripId, 0, new ServiceDate(), updates);
         
@@ -113,7 +113,7 @@ public class UpdatedTripTimesTest {
         TripUpdateList tripUpdateList;
         
         List<Update> updates = new LinkedList<Update>();
-        updates.add(new Update(tripId, stop_d, 3, 190, 190, Update.Status.PREDICTION , 0, new ServiceDate()));
+        updates.add(new Update(tripId, stop_d, 3, 190, 190, false, Update.Status.PREDICTION , 0, new ServiceDate()));
         
         tripUpdateList = TripUpdateList.forUpdatedTrip(tripId, 0, new ServiceDate(), updates);
         
@@ -133,7 +133,7 @@ public class UpdatedTripTimesTest {
         TripUpdateList tripUpdateList;
         
         List<Update> updates = new LinkedList<Update>();
-        updates.add(new Update(tripId, stop_a, 0, 0, 0, Update.Status.PASSED, 0, new ServiceDate()));
+        updates.add(new Update(tripId, stop_a, 0, 0, 0, false, Update.Status.PASSED, 0, new ServiceDate()));
         
         tripUpdateList = TripUpdateList.forUpdatedTrip(tripId, 0, new ServiceDate(), updates);
         

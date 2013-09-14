@@ -27,7 +27,10 @@ public class Update extends AbstractUpdate implements Comparable<Update> {
     public final Integer stopSeq;
     
     @Getter
-    public final Integer delay;
+    public final Integer arriveDelay;
+
+    @Getter
+    public final Integer departDelay;
 
     @Getter
     public int arrive; // sec since midnight
@@ -38,27 +41,24 @@ public class Update extends AbstractUpdate implements Comparable<Update> {
     @Getter
     public final Status status;
 
-    public Update (AgencyAndId tripId, AgencyAndId stopId, Integer stopSeq, int arrive, int depart, 
-            Status status, long timestamp, ServiceDate serviceDate) {
+    public Update (AgencyAndId tripId, AgencyAndId stopId, Integer stopSeq, Integer arrive, Integer depart,
+            boolean isDelays, Status status, long timestamp, ServiceDate serviceDate) {
         super(tripId, timestamp, serviceDate);
         this.stopId = stopId;
         this.stopSeq = stopSeq;
         this.arrive = arrive;
-        this.depart = depart;
         this.status = status;
-        this.delay = null;
-    }
-
-
-    public Update (AgencyAndId tripId, AgencyAndId stopId, Integer stopSeq, int delay, 
-            Status status, long timestamp, ServiceDate serviceDate) {
-        super(tripId, timestamp, serviceDate);
-        this.stopId = stopId;
-        this.stopSeq = stopSeq;
-        this.arrive = 0;
-        this.depart = 0;
-        this.delay = delay;
-        this.status = status;
+        if(isDelays){
+            this.arriveDelay = arrive;
+            this.departDelay = depart;
+            this.arrive = 0;
+            this.depart = 0;
+        }else{
+            this.arrive = arrive;
+            this.depart = depart;
+            this.arriveDelay = null;
+            this.departDelay = null;
+        }
     }
     
     public boolean hasStopSequence() {
@@ -66,7 +66,7 @@ public class Update extends AbstractUpdate implements Comparable<Update> {
     }
     
     public boolean hasDelay() {
-        return delay != null;
+        return (arriveDelay != null || departDelay != null);
     }
 
     /**
@@ -98,8 +98,8 @@ public class Update extends AbstractUpdate implements Comparable<Update> {
     @Override
     public String toString() {
         if(hasDelay())
-            return String.format("Update trip %s Stop #%d:%s (%s) delay %s", 
-                    tripId, stopSeq, stopId, status, delay);
+            return String.format("Update trip %s Stop #%d:%s (%s) arrival delay %s departure delay %s",
+                    tripId, stopSeq, stopId, status, arriveDelay, departDelay);
         
         return String.format("Update trip %s Stop #%d:%s (%s) A%s D%s", 
                 tripId, stopSeq, stopId, status, arrive, depart);

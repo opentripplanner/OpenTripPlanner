@@ -1016,11 +1016,11 @@ public class TestRequest extends TestCase {
      */
     private void applyUpdateToTripPattern(TableTripPattern pattern, String tripId, String stopId,
             int stopSeq, int arrive, int depart, Status prediction, int timestamp, String serviceDate) throws ParseException {
-        Update update = new Update(new AgencyAndId("TriMet", tripId), new AgencyAndId("TriMet", stopId), stopSeq, arrive, depart, prediction, timestamp, ServiceDate.parseString(serviceDate));
+        Update update = new Update(new AgencyAndId("TriMet", tripId), new AgencyAndId("TriMet", stopId), stopSeq, arrive, depart, false, prediction, timestamp, ServiceDate.parseString(serviceDate));
         ArrayList<Update> updates = new ArrayList<Update>(Arrays.asList(update));
         TripUpdateList tripUpdateList = TripUpdateList.splitByTrip(updates).get(0);
-        ITripTimesUpdater tripTimesUpdater = new DecayingOrStatusUpdater();
-        boolean success = pattern.update(tripUpdateList, tripTimesUpdater);
+        ITripTimesUpdater ITripTimesUpdater = new DecayingOrStatusUpdater();
+        boolean success = pattern.update(tripUpdateList, ITripTimesUpdater);
         assertTrue(success);
     }
 
