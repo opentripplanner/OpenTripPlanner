@@ -57,7 +57,6 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.patch.Alert;
-import org.opentripplanner.routing.patch.Patch;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
@@ -213,7 +212,6 @@ public class PlanGenerator {
         Graph graph = path.getRoutingContext().graph;
 
         FareService fareService = graph.getService(FareService.class);
-        TransitIndexService transitIndexService = graph.getService(TransitIndexService.class);
 
         State[][] legsStates = sliceStates(states);
 
@@ -222,7 +220,7 @@ public class PlanGenerator {
         }
 
         for (State[] legStates : legsStates) {
-            itinerary.addLeg(generateLeg(legStates, transitIndexService, showIntermediateStops));
+            itinerary.addLeg(generateLeg(legStates, showIntermediateStops));
         }
 
         addWalkSteps(itinerary.legs, legsStates);
@@ -341,12 +339,10 @@ public class PlanGenerator {
      * Generate one leg of an itinerary from a {@link State} array.
      *
      * @param states The array of states to base the leg on
-     * @param transitIndexService The service to use for transit agency lookups
      * @param showIntermediateStops Whether to include intermediate stops in the leg or not
      * @return The generated leg
      */
-    private Leg generateLeg(State[] states, TransitIndexService transitIndexService,
-            boolean showIntermediateStops) {
+    private Leg generateLeg(State[] states, boolean showIntermediateStops) {
         Leg leg = new Leg();
 
         Edge[] edges = new Edge[states.length - 1];
@@ -366,7 +362,7 @@ public class PlanGenerator {
         TimeZone timeZone = leg.startTime.getTimeZone();
         leg.agencyTimeZoneOffset = timeZone.getOffset(leg.startTime.getTimeInMillis());
 
-        addTripFields(leg, states, transitIndexService);
+        addTripFields(leg, states);
 
         addPlaces(leg, states, edges, showIntermediateStops);
 
@@ -454,12 +450,10 @@ public class PlanGenerator {
             }
 
             if (legs.get(i).isTransitLeg() && !legs.get(i + 1).isTransitLeg()) {
-                legs.get(i + 1).from.name = legs.get(i).to.name;
-                legs.get(i + 1).from.stopId = legs.get(i).to.stopId;
+                legs.get(i + 1).from = legs.get(i).to;
             }
             if (!legs.get(i).isTransitLeg() && legs.get(i + 1).isTransitLeg()) {
-                legs.get(i).to.name = legs.get(i + 1).from.name;
-                legs.get(i).to.stopId = legs.get(i + 1).from.stopId;
+                legs.get(i).to = legs.get(i + 1).from;
             }
         }
 
@@ -547,7 +541,6 @@ public class PlanGenerator {
         for (State state : states) {
             TraverseMode mode = state.getBackMode();
             Set<Alert> alerts = state.getBackAlerts();
-            Edge edge = state.getBackEdge();
 
             if (mode != null) {
                 leg.mode = mode.toString();
@@ -558,12 +551,6 @@ public class PlanGenerator {
                     leg.addAlert(alert);
                 }
             }
-
-            if (edge != null) {
-                for (Patch patch : edge.getPatches()) {
-                    leg.addAlert(patch.getAlert());
-                }
-            }
         }
     }
 
@@ -572,17 +559,18 @@ public class PlanGenerator {
      *
      * @param leg The leg to add the trip-related fields to
      * @param states The states that go with the leg
-     * @param transitIndexService The service to use for transit agency lookups
      */
-    private void addTripFields(Leg leg, State[] states, TransitIndexService transitIndexService) {
+    private void addTripFields(Leg leg, State[] states) {
         Trip trip = states[states.length - 1].getBackTrip();
 
         if (trip != null) {
-            String id = trip.getId().getAgencyId();
             Route route = trip.getRoute();
+            Agency agency = route.getAgency();
             ServiceDay serviceDay = states[states.length - 1].getServiceDay();
 
-            leg.agencyId = id;
+            leg.agencyId = agency.getId();
+            leg.agencyName = agency.getName();
+            leg.agencyUrl = agency.getUrl();
             leg.headsign = states[states.length - 1].getBackDirection();
             leg.route = states[states.length - 1].getBackEdge().getName();
             leg.routeColor = route.getColor();
@@ -597,12 +585,6 @@ public class PlanGenerator {
 
             if (serviceDay != null) {
                 leg.serviceDate = serviceDay.getServiceDate().getAsString();
-            }
-
-            if (transitIndexService != null) {
-                Agency agency = transitIndexService.getAgency(id);
-                leg.agencyName = agency.getName();
-                leg.agencyUrl = agency.getUrl();
             }
 
             if (leg.headsign == null) {
@@ -627,6 +609,7 @@ public class PlanGenerator {
 
         Edge firstEdge = edges[0];
         Edge lastEdge = edges[edges.length - 1];
+        TripTimes tripTimes = states[states.length - 1].getTripTimes();
 
         leg.from = new Place(firstVertex.getX(), firstVertex.getY(), firstVertex.getName(),
                 null, makeCalendar(states[0]));
@@ -645,6 +628,7 @@ public class PlanGenerator {
                 leg.from.platformCode = firstStop.getPlatformCode();
                 leg.from.zoneId = firstStop.getZoneId();
                 leg.from.stopIndex = ((OnboardEdge) firstEdge).getStopIndex();
+                leg.from.stopSequence = tripTimes.getStopSequence(leg.from.stopIndex);
             }
         }
 
@@ -657,6 +641,7 @@ public class PlanGenerator {
                 leg.to.platformCode = lastStop.getPlatformCode();
                 leg.to.zoneId = lastStop.getZoneId();
                 leg.to.stopIndex = ((OnboardEdge) lastEdge).getStopIndex() + 1;
+                leg.to.stopSequence = tripTimes.getStopSequence(leg.to.stopIndex);
             }
         }
 
@@ -692,6 +677,7 @@ public class PlanGenerator {
                     place.platformCode = currentStop.getPlatformCode();
                     place.zoneId = currentStop.getZoneId();
                     place.stopIndex = ((OnboardEdge) edges[i]).getStopIndex();
+                    place.stopSequence = tripTimes.getStopSequence(place.stopIndex);
                 }
 
                 leg.stop.add(place);

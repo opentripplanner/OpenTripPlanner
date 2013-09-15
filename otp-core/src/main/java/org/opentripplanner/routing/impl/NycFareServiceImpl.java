@@ -120,7 +120,7 @@ public class NycFareServiceImpl implements FareService, Serializable {
 					newRide = new Ride();
 					rides.add(newRide);
 
-					newRide.firstStop = ((HopEdge) backEdge).getStartStop();
+					newRide.firstStop = ((HopEdge) backEdge).getBeginStop();
 
 					newRide.route = routeId;
 					Trip trip = state.getBackTrip();
@@ -141,7 +141,7 @@ public class NycFareServiceImpl implements FareService, Serializable {
 
 					newRide.startTime = state.getTimeSeconds();
 				}
-				newRide.lastStop = ((HopEdge) backEdge).getStartStop();
+				newRide.lastStop = ((HopEdge) backEdge).getBeginStop();
 			}
 		}
 

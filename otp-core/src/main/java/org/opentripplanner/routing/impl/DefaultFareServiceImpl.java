@@ -135,11 +135,11 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
             if (ride == null || ! state.getRoute().equals(ride.route)) {
                 ride = new Ride();
                 rides.add(ride);
-                ride.startZone = hEdge.getStartStop().getZoneId();
+                ride.startZone = hEdge.getBeginStop().getZoneId();
                 ride.zones.add(ride.startZone);
                 ride.route = state.getRoute();
                 ride.startTime = state.getBackState().getTimeSeconds();
-                ride.firstStop = hEdge.getStartStop();
+                ride.firstStop = hEdge.getBeginStop();
             }
             ride.lastStop = hEdge.getEndStop();
             ride.endZone  = ride.lastStop.getZoneId();

@@ -16,6 +16,7 @@ package org.opentripplanner.routing.impl;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.prefs.Preferences;
 
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.routing.graph.Graph;
@@ -36,10 +37,10 @@ public class GraphServiceBeanImpl implements GraphService {
     public GraphServiceBeanImpl() {
     }
 
-    public GraphServiceBeanImpl(Graph graph) {
+    public GraphServiceBeanImpl(Graph graph, Preferences config) {
         this.graph = graph;
         GraphUpdaterConfigurator decorator = new GraphUpdaterConfigurator();
-        decorator.setupGraph(graph, null);
+        decorator.setupGraph(graph, config);
     }
 
     public void setGraph(Graph graph) {

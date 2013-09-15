@@ -26,7 +26,7 @@ public interface HopEdge {
 
     Stop getEndStop();
 
-    Stop getStartStop();
+    Stop getBeginStop();
 
     void setGeometry(LineString geometry);
 

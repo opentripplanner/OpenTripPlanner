@@ -36,7 +36,7 @@ import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 public class GtfsRealtimeZmqTripUpdateSource implements TripUpdateSource, PreferencesConfigurable {
     private static final Logger LOG = LoggerFactory.getLogger(GtfsRealtimeZmqTripUpdateSource.class);
 
-    private static final File file = new File("/var/otp/data/nl/gtfs-rt.protobuf");
+    private File file;
 
     /**
      * Default agency id that is used for the trip id's in the TripUpdateLists
@@ -46,6 +46,7 @@ public class GtfsRealtimeZmqTripUpdateSource implements TripUpdateSource, Prefer
     @Override
     public void configure(Graph graph, Preferences preferences) throws Exception {
         this.agencyId = preferences.get("defaultAgencyId", null);
+        this.file = new File(preferences.get("file", ""));
     }
 
     @Override

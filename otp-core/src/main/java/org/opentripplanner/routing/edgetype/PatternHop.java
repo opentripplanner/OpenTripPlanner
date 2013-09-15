@@ -34,22 +34,22 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
 
     private static final long serialVersionUID = 1L;
 
-    private Stop start, end;
+    private Stop begin, end;
 
     public int stopIndex;
 
     private LineString geometry = null;
 
-    public PatternHop(PatternStopVertex from, PatternStopVertex to, Stop start, Stop end, int stopIndex) {
+    public PatternHop(PatternStopVertex from, PatternStopVertex to, Stop begin, Stop end, int stopIndex) {
         super(from, to);
-        this.start = start;
+        this.begin = begin;
         this.end = end;
         this.stopIndex = stopIndex;
         getPattern().setPatternHop(stopIndex, this);
     }
 
     public double getDistance() {
-        return SphericalDistanceLibrary.getInstance().distance(start.getLat(), start.getLon(), end.getLat(),
+        return SphericalDistanceLibrary.getInstance().distance(begin.getLat(), begin.getLon(), end.getLat(),
                 end.getLon());
     }
 
@@ -106,7 +106,7 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
         StateEditor s1 = s0.edit(this);
         s1.incrementTimeInSeconds(runningTime);
         if (s0.getOptions().isArriveBy())
-            s1.setZone(getStartStop().getZoneId());
+            s1.setZone(getBeginStop().getZoneId());
         else
             s1.setZone(getEndStop().getZoneId());
         //s1.setRoute(pattern.getExemplar().getRoute().getId());
@@ -122,7 +122,7 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
     public LineString getGeometry() {
         if (geometry == null) {
 
-            Coordinate c1 = new Coordinate(start.getLon(), start.getLat());
+            Coordinate c1 = new Coordinate(begin.getLon(), begin.getLat());
             Coordinate c2 = new Coordinate(end.getLon(), end.getLat());
 
             geometry = GeometryUtils.getGeometryFactory().createLineString(new Coordinate[] { c1, c2 });
@@ -136,8 +136,8 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
     }
 
     @Override
-    public Stop getStartStop() {
-        return start;
+    public Stop getBeginStop() {
+        return begin;
     }
 
     public String toString() {
