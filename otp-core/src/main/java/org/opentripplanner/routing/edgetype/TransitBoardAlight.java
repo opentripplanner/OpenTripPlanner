@@ -360,13 +360,13 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
     }
 
     /* See weightLowerBound comment. */
-    public double timeLowerBound(RoutingContext rctx) {
-        if ((rctx.opt.isArriveBy() && boarding) || (!rctx.opt.isArriveBy() && !boarding)) {
-            if (!rctx.opt.getModes().get(modeMask)) {
+    public double timeLowerBound(RoutingRequest options) {
+        if ((options.isArriveBy() && boarding) || (!options.isArriveBy() && !boarding)) {
+            if (!options.getModes().get(modeMask)) {
                 return Double.POSITIVE_INFINITY;
             }
             int serviceId = getPattern().getServiceId();
-            for (ServiceDay sd : rctx.serviceDays)
+            for (ServiceDay sd : options.rctx.serviceDays)
                 if (sd.serviceIdRunning(serviceId))
                     return 0;
             return Double.POSITIVE_INFINITY;
