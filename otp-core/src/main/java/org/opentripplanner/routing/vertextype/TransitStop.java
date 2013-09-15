@@ -73,4 +73,8 @@ public class TransitStop extends TransitStationStop {
     public void addMode(TraverseMode mode) {
         modes.setMode(mode, true);
     }
+    
+    public boolean isStreetLinkable() {
+        return isEntrance() || !hasEntrances();
+    }
 }
