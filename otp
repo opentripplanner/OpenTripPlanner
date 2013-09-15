@@ -1,0 +1,2 @@
+#!/bin/bash
+java -Xmx6G -jar otp-core/target/otp.jar "$@"
