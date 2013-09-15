@@ -80,6 +80,7 @@ import org.springframework.stereotype.Service;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
+import org.opentripplanner.routing.edgetype.PathwayEdge;
 
 @Service @Scope("singleton")
 public class PlanGenerator {
@@ -468,6 +469,9 @@ public class PlanGenerator {
 
                     boardRule = TransitUtils.determineBoardAlightType(boardType);
                     alightRule = TransitUtils.determineBoardAlightType(alightType);
+                }
+                if (legsStates[i][j].getBackEdge() instanceof PathwayEdge) {
+                    legs.get(i).pathway = true;
                 }
             }
 

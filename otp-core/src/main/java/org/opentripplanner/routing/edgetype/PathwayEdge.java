@@ -8,6 +8,7 @@ import org.opentripplanner.routing.graph.Vertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
+import org.opentripplanner.routing.core.TraverseMode;
 
 /* This program is free software: you can redistribute it and/or
 modify it under the terms of the GNU Lesser General Public License
@@ -51,6 +52,10 @@ public class PathwayEdge extends Edge {
     public double getDistance() {
         return 0;
     }
+    
+    public TraverseMode getMode() {
+       return TraverseMode.WALK;
+    }
 
     public LineString getGeometry() {
         Coordinate[] coordinates = new Coordinate[] { getFromVertex().getCoordinate(),
@@ -73,8 +78,7 @@ public class PathwayEdge extends Edge {
         StateEditor s1 = s0.edit(this);
         s1.incrementTimeInSeconds(time);
         s1.incrementWeight(time);
-        // TODO: leaving mode as previous
+        s1.setBackMode(getMode());
         return s1.makeState();
     }
-
 }

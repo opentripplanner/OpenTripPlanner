@@ -77,6 +77,11 @@ public class Leg {
      * The distance traveled while traversing the leg in meters.
      */
     public Double distance = null;
+    
+    /**
+     * Is this leg a traversing pathways?
+     */
+    public Boolean pathway = false;
 
     /**
      * The mode (e.g., <code>Walk</code>) used when traversing this leg.

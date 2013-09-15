@@ -990,6 +990,7 @@ public class PlanGeneratorTest {
             assertFalse(legs[0].interlineWithPreviousLeg);
             assertNull(legs[0].boardRule);
             assertNull(legs[0].alightRule);
+            assertFalse(legs[0].pathway);
             assertEquals("WALK", legs[0].mode);
             assertEquals(0L, legs[0].startTime.getTimeInMillis());
             assertEquals(3000L, legs[0].endTime.getTimeInMillis());
@@ -1031,6 +1032,7 @@ public class PlanGeneratorTest {
             assertNull(legs[1].boardRule);
         }
         assertNull(legs[1].alightRule);
+        assertFalse(legs[1].pathway);
         assertEquals("RAIL", legs[1].mode);
         if (type == Type.FORWARD || type == Type.BACKWARD) {
             assertEquals(4000L, legs[1].startTime.getTimeInMillis());
@@ -1074,6 +1076,7 @@ public class PlanGeneratorTest {
         assertTrue(legs[2].interlineWithPreviousLeg);
         assertNull(legs[2].boardRule);
         assertEquals("mustPhone", legs[2].alightRule);
+        assertFalse(legs[2].pathway);
         assertEquals("RAIL", legs[2].mode);
         assertEquals(20000L, legs[2].startTime.getTimeInMillis());
         assertEquals(24000L, legs[2].endTime.getTimeInMillis());
@@ -1108,6 +1111,7 @@ public class PlanGeneratorTest {
         assertFalse(legs[3].interlineWithPreviousLeg);
         assertNull(legs[3].boardRule);
         assertNull(legs[3].alightRule);
+        assertFalse(legs[3].pathway);
         assertEquals("WALK", legs[3].mode);
         if (type == Type.FORWARD || type == Type.ONBOARD) {
             assertEquals(24000L, legs[3].startTime.getTimeInMillis());
@@ -1149,6 +1153,7 @@ public class PlanGeneratorTest {
         assertFalse(legs[4].interlineWithPreviousLeg);
         assertEquals("mustPhone", legs[4].boardRule);
         assertEquals("coordinateWithDriver", legs[4].alightRule);
+        assertFalse(legs[4].pathway);
         assertEquals("FERRY", legs[4].mode);
         assertEquals(40000L, legs[4].startTime.getTimeInMillis());
         assertEquals(43000L, legs[4].endTime.getTimeInMillis());
@@ -1183,6 +1188,7 @@ public class PlanGeneratorTest {
         assertFalse(legs[5].interlineWithPreviousLeg);
         assertNull(legs[5].boardRule);
         assertNull(legs[5].alightRule);
+        assertFalse(legs[5].pathway);
         assertEquals("WALK", legs[5].mode);
         assertEquals(44000L, legs[5].startTime.getTimeInMillis());
         assertEquals(53000L, legs[5].endTime.getTimeInMillis());
@@ -1217,6 +1223,7 @@ public class PlanGeneratorTest {
         assertFalse(legs[6].interlineWithPreviousLeg);
         assertNull(legs[6].boardRule);
         assertNull(legs[6].alightRule);
+        assertFalse(legs[6].pathway);
         assertEquals("BICYCLE", legs[6].mode);
         assertEquals(53000L, legs[6].startTime.getTimeInMillis());
         assertEquals(55000L, legs[6].endTime.getTimeInMillis());
@@ -1253,6 +1260,7 @@ public class PlanGeneratorTest {
         assertFalse(legs[7].interlineWithPreviousLeg);
         assertNull(legs[7].boardRule);
         assertNull(legs[7].alightRule);
+        assertFalse(legs[7].pathway);
         assertEquals("BICYCLE", legs[7].mode);
         assertEquals(55000L, legs[7].startTime.getTimeInMillis());
         assertEquals(57000L, legs[7].endTime.getTimeInMillis());
@@ -1287,6 +1295,7 @@ public class PlanGeneratorTest {
         assertFalse(legs[8].interlineWithPreviousLeg);
         assertNull(legs[8].boardRule);
         assertNull(legs[8].alightRule);
+        assertFalse(legs[8].pathway);
         assertEquals("WALK", legs[8].mode);
         assertEquals(57000L, legs[8].startTime.getTimeInMillis());
         assertEquals(60000L, legs[8].endTime.getTimeInMillis());
