@@ -16,6 +16,8 @@ package org.opentripplanner.routing.algorithm.strategies;
 import java.util.List;
 import java.util.Map;
 
+import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.common.pqueue.OTPPriorityQueue;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -40,14 +42,24 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
 
     private static final long serialVersionUID = 20130813L;
 
-    private static final int HEURISTIC_STEPS_PER_MAIN_STEP = 2;
+    private static final int HEURISTIC_STEPS_PER_MAIN_STEP = 4;
     
     private static Logger LOG = LoggerFactory.getLogger(InterleavedBidirectionalHeuristic.class);
 
+    private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
+
+    /* 
+     * http://en.wikipedia.org/wiki/Train_routes_in_the_Netherlands
+     * http://en.wikipedia.org/wiki/File:Baanvaksnelheden.png 
+     */
+    private final static double MAX_TRANSIT_SPEED = 45.0;
+    
     /** The vertex that the main search is working towards. */
     Vertex target;
 
-    double maxFound = 0; 
+    double maxFound = 0;
+    
+    double minEgressWalk = 0;
 
     Map <Vertex, Double> weights;
 
@@ -110,8 +122,8 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         // once street searches are done, raise the walk limit to max
         // because hard walk limiting is incorrect and is observed to cause problems 
         // for trips near the cutoff
-        options.setMaxWalkDistance(Double.MAX_VALUE);
-        LOG.debug("initialized SSSP");        
+        options.setMaxWalkDistance(Double.POSITIVE_INFINITY);
+        LOG.debug("initialized SSSP");
     }
 
     /** Do up to N iterations as long as the queue is not empty */
@@ -172,7 +184,11 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         // but many transit vertices may not yet be explored when the search starts.
         // TODO: verify that StreetVertex includes all vertices of interest.
         if (v instanceof StreetVertex) return weight == null ? Double.POSITIVE_INFINITY : weight;
-        else if (weight == null) return maxFound;
+        else if (weight == null) {
+            double dist = distanceLibrary.fastDistance(v.getY(), v.getX(), target.getY(), target.getX());
+            double time = dist / MAX_TRANSIT_SPEED;
+            return Math.max(maxFound, time);
+        }
         else return weight;
     }
 
