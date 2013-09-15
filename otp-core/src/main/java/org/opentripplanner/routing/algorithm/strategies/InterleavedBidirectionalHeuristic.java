@@ -52,7 +52,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
      * http://en.wikipedia.org/wiki/Train_routes_in_the_Netherlands
      * http://en.wikipedia.org/wiki/File:Baanvaksnelheden.png 
      */
-    private final static double MAX_TRANSIT_SPEED = 45.0;
+    private final static double MAX_TRANSIT_SPEED = 45.0; // in meters/second
     
     /** The vertex that the main search is working towards. */
     Vertex target;
