@@ -163,7 +163,8 @@ public class LongDistancePathService implements PathService {
              * if it begins onboard, it doesn't necessarily have subsequent transit legs. */
             Nonterminal transitItinerary = choice( 
                     seq(beginning, middle, end),
-                    seq(onboardBeginning, optional(middle), end));
+                    seq(onboardBeginning, optional(middle), end),
+                    TRANSFER);
             
             /* A streets-only itinerary, which might begin or end at a stop or its station, 
              * but does not actually ride transit. */
