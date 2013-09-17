@@ -558,12 +558,6 @@ public class PlanGenerator {
                     leg.addAlert(alert);
                 }
             }
-
-            if (edge != null) {
-                for (Patch patch : edge.getPatches()) {
-                    leg.addAlert(patch.getAlert());
-                }
-            }
         }
     }
 
