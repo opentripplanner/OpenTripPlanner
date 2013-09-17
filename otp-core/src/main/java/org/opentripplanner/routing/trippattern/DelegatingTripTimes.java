@@ -35,6 +35,8 @@ public abstract class DelegatingTripTimes extends TripTimes {
     @Override public int getDepartureTime(int hop) { return base.getDepartureTime(hop); }
 
     @Override public int getArrivalTime(int hop) { return base.getArrivalTime(hop); }
+
+    @Override public int getStopSequence(int stopIndex) { return base.getStopSequence(stopIndex); }
     
     @Override public String getHeadsign(int hop) { return base.getHeadsign(hop); }
  

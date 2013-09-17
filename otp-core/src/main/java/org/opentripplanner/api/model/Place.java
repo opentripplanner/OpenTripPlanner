@@ -85,6 +85,13 @@ public class Place {
     public Integer stopIndex;
 
     /**
+     * For transit trips, the sequence number of the stop. Per GTFS, these numbers are increasing.
+     */
+    @XmlAttribute
+    @JsonSerialize
+    public Integer stopSequence;
+
+    /**
      * Returns the geometry in GeoJSON format
      * @return
      */
