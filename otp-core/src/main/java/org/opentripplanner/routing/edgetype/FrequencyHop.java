@@ -116,7 +116,7 @@ public class FrequencyHop extends Edge implements OnboardEdge, HopEdge {
         StateEditor s1 = s0.edit(this);
         s1.incrementTimeInSeconds(runningTime);
         if (s0.getOptions().isArriveBy())
-            s1.setZone(getStartStop().getZoneId());
+            s1.setZone(getBeginStop().getZoneId());
         else
             s1.setZone(getEndStop().getZoneId());
         s1.setRoute(pattern.getTrip().getRoute().getId());
@@ -146,7 +146,7 @@ public class FrequencyHop extends Edge implements OnboardEdge, HopEdge {
     }
 
     @Override
-    public Stop getStartStop() {
+    public Stop getBeginStop() {
         return start;
     }
 

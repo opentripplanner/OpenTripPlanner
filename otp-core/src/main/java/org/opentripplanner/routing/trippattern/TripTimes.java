@@ -77,7 +77,10 @@ public abstract class TripTimes {
      * It all depends whether we store pointers to the enclosing Timetable in ScheduledTripTimes...
      */
     public abstract String getHeadsign(int hop);
-        
+
+    /** Return the stopSequence for the given stop. */
+    public abstract int getStopSequence(int stopIndex);
+
     /* IMPLEMENTED INSTANCE METHODS */
     
     /** 
