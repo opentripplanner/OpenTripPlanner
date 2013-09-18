@@ -39,7 +39,6 @@ import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.TimedTransferEdge;
 import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
@@ -118,12 +117,13 @@ public class LongDistancePathService implements PathService {
 
     public static class Parser extends PathParser {
 
-        private static final int STREET       = 1;
-        private static final int LINK         = 2;
-        private static final int STATION      = 3;
-        private static final int ONBOARD      = 4;
-        private static final int TRANSFER     = 5;
-        private static final int STATION_STOP = 6;
+        static final int STREET       = 1;
+        static final int LINK         = 2;
+        static final int STATION      = 3;
+        static final int ONBOARD      = 4;
+        static final int TRANSFER     = 5;
+        static final int STATION_STOP = 6;
+        static final int STOP_STATION = 7;
 
         private static final DFA DFA;
 
@@ -205,13 +205,8 @@ public class LongDistancePathService implements PathService {
             if (e instanceof StreetTransitLink) return LINK;
             // Is it really correct to clasify all other edges as STREET?
             return STREET;
-//            else {
-//                LOG.debug("failed to tokenize path. vertex {} edge {}", v, e);
-//                throw new RuntimeException("failed to tokenize path");
-//            }
         }
 
     }
     
 }
-
