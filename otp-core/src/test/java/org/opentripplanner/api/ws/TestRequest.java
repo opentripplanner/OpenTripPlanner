@@ -108,7 +108,7 @@ import org.opentripplanner.routing.trippattern.Update.Status;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.TransitStationStop;
 import org.opentripplanner.util.TestUtils;
 
 import com.vividsolutions.jts.geom.LineString;
@@ -625,19 +625,19 @@ public class TestRequest extends TestCase {
         // Find stops in graph
         Graph graph = Context.getInstance().graph;
         
-        Stop stop65_tc = ((TransitStop) graph.getVertex("TriMet_65-tc")).getStop();
+        Stop stop65_tc = ((TransitStationStop) graph.getVertex("TriMet_65-tc")).getStop();
         assertNotNull(stop65_tc);
         
-        Stop stop12921 = ((TransitStop) graph.getVertex("TriMet_12921")).getStop();
+        Stop stop12921 = ((TransitStationStop) graph.getVertex("TriMet_12921")).getStop();
         assertNotNull(stop12921);
         
-        Stop stop13132 = ((TransitStop) graph.getVertex("TriMet_13132")).getStop();
+        Stop stop13132 = ((TransitStationStop) graph.getVertex("TriMet_13132")).getStop();
         assertNotNull(stop13132);
         
-        Stop stop2106 = ((TransitStop) graph.getVertex("TriMet_2106")).getStop();
+        Stop stop2106 = ((TransitStationStop) graph.getVertex("TriMet_2106")).getStop();
         assertNotNull(stop2106);
         
-        Stop stop2107 = ((TransitStop) graph.getVertex("TriMet_2107")).getStop();
+        Stop stop2107 = ((TransitStationStop) graph.getVertex("TriMet_2107")).getStop();
         assertNotNull(stop2107);
         
         // Match stop with id 65-tc

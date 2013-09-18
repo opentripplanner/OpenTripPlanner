@@ -16,7 +16,7 @@ package org.opentripplanner.routing.edgetype;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.TransitStation;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
 import com.vividsolutions.jts.geom.LineString;
@@ -26,7 +26,7 @@ import com.vividsolutions.jts.geom.LineString;
  * implicit transfers (i.e. child stop to parent station to another child stop) but instead to allow
  * beginning or ending a path (itinerary) at a parent station.
  * 
- * Currently this edge is only intended for use in the long distance path service. The pathparsers
+ * Currently this edge is only intended for use in the long distance path service. The path parsers
  * should ensure that it is effectively ignored in other path services, and even in the long distance
  * path service anywhere but the beginning or end of a path.
  * 
@@ -36,12 +36,13 @@ import com.vividsolutions.jts.geom.LineString;
  * create endless search loops) but the edges can have zero time while having positive cost.
  */
 public class StationStopEdge extends Edge {
+    private static final long serialVersionUID = 20130918L;
 
-    private static final long serialVersionUID = 20130903L;
+    public StationStopEdge(TransitStation from, TransitStop to) {
+        super(from, to);
+    }
 
-    /* For now both parent stations and stops are the same vertex type. 
-     * TODO Should this really be the case? */
-    public StationStopEdge(TransitStop from, TransitStop to) {
+    public StationStopEdge(TransitStop from, TransitStation to) {
         super(from, to);
     }
 
