@@ -23,7 +23,7 @@ import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.TransitStationStop;
 import org.opentripplanner.routing.vertextype.TransitStopArrive;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
 
@@ -32,7 +32,7 @@ public class GtfsStopContext {
 
     public HashSet<AgencyAndId> stops = new HashSet<AgencyAndId>();
 
-    public Map<Stop, TransitStop> stopNodes = new HashMap<Stop, TransitStop>();
+    public Map<Stop, TransitStationStop> stationStopNodes = new HashMap<Stop, TransitStationStop>();
 
     public Map<Stop, TransitStopArrive> stopArriveNodes = new HashMap<Stop, TransitStopArrive>();
 

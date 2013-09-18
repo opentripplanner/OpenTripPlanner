@@ -42,7 +42,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.TransitStationStop;
 
 import processing.core.PApplet;
 import processing.core.PFont;
@@ -513,7 +513,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
             /* Draw selected visible vertices */
             fill(60, 60, 200);
             for (Vertex v : visibleVertices) {
-                if (drawTransitStopVertices && v instanceof TransitStop) {
+                if (drawTransitStopVertices && v instanceof TransitStationStop) {
                     drawVertex(v, 5);
                 } else if (v instanceof IntersectionVertex) {
                     IntersectionVertex iv = (IntersectionVertex) v;

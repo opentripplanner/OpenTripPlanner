@@ -26,7 +26,7 @@ import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.TransitStationStop;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.LineString;
 
@@ -43,19 +43,19 @@ public class TransferGraphLinker {
     
     public void run() {
         // Create a mapping from StopId to StopVertices
-        Map<AgencyAndId, TransitStop> stopNodes = new HashMap<AgencyAndId, TransitStop>();
+        Map<AgencyAndId, TransitStationStop> stopNodes = new HashMap<AgencyAndId, TransitStationStop>();
         for (Vertex v : graph.getVertices()) {
-            if (v instanceof TransitStop) {
-                TransitStop transitStop = (TransitStop)v; 
-                Stop stop = transitStop.getStop();
-                stopNodes.put(stop.getId(), transitStop);
+            if (v instanceof TransitStationStop) {
+                TransitStationStop transitStationStop = (TransitStationStop) v;
+                Stop stop = transitStationStop.getStop();
+                stopNodes.put(stop.getId(), transitStationStop);
             }
         } 
         
         // Create edges
         for (TransferTable.Transfer transfer : graph.getTransferTable().getAllFirstSpecificTransfers()) {
-            TransitStop fromVertex = stopNodes.get(transfer.fromStopId);
-            TransitStop toVertex = stopNodes.get(transfer.toStopId);
+            TransitStationStop fromVertex = stopNodes.get(transfer.fromStopId);
+            TransitStationStop toVertex = stopNodes.get(transfer.toStopId);
 
             double distance = distanceLibrary.distance(fromVertex.getCoordinate(), 
                     toVertex.getCoordinate());
