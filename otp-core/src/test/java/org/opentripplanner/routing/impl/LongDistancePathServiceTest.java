@@ -343,6 +343,12 @@ public class LongDistancePathServiceTest {
             assertFalse(parsePath(parser, path));
         }
 
+        { // Test transfer (allowed)
+            List<Class<? extends Edge>> path = new ArrayList<Class<? extends Edge>>();
+            path.add(TransferEdge.class);
+            assertTrue(parsePath(parser, path));
+        }
+
     }
 
     /**
