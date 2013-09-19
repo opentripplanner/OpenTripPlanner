@@ -64,6 +64,9 @@ otp.modules.fieldtrip.FieldTripModule =
         this.sessionManager = new otp.core.TrinetSessionManager(this, $.proxy(function() {
             this.fieldTripManager = new otp.modules.fieldtrip.FieldTripManagerWidget('otp-'+this.id+'-fieldTripWidget', this);
         }, this));
+
+        this.searchWidget = new otp.modules.fieldtrip.SearchWidget(this.id+'-searchWidget', this);
+
     },
     
     restore : function() {
@@ -739,6 +742,16 @@ otp.util.FieldTrip = {
         if(groupItin.timeOffset) otp.config.timeOffset = groupItin.timeOffset;
         return JSON.parse(otp.util.Text.lzwDecode(groupItin.itinData));
     },
+
+    getRequestContext : function(req) {
+        var context = _.clone(req);
+        if(req.travelDate) context.formattedDate = moment(req.travelDate).format("MMM Do YYYY");
+        var outboundTrip = otp.util.FieldTrip.getOutboundTrip(req);
+        if(outboundTrip) context.outboundDesc = otp.util.FieldTrip.constructPlanInfo(outboundTrip);
+        var inboundTrip = otp.util.FieldTrip.getInboundTrip(req);
+        if(inboundTrip) context.inboundDesc = otp.util.FieldTrip.constructPlanInfo(inboundTrip);
+        return context;
+    }
     
     
     

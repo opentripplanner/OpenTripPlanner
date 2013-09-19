@@ -82,14 +82,7 @@ otp.modules.fieldtrip.FieldTripManagerWidget =
             //console.log(req);
             //$('<div class="otp-fieldTripRequests-listRow">'+req.teacherName+", "+req.schoolName+'</div>').appendTo(this.requestsList);
             
-            var context = _.clone(req);
-            if(req.travelDate) req.formattedDate = moment(req.travelDate).format("MMM Do YYYY");
-            var outboundTrip = otp.util.FieldTrip.getOutboundTrip(req);
-            if(outboundTrip) req.outboundDesc = otp.util.FieldTrip.constructPlanInfo(outboundTrip);
-            var inboundTrip = otp.util.FieldTrip.getInboundTrip(req);
-            if(inboundTrip) req.inboundDesc = otp.util.FieldTrip.constructPlanInfo(inboundTrip);
-
-            var row = ich['otp-fieldtrip-requestRow'](req);
+            var row = ich['otp-fieldtrip-requestRow'](otp.util.FieldTrip.getRequestContext(req));
             if(req.status === "cancelled") {
                 row.appendTo(this.cancelledRequestsList);
             }
