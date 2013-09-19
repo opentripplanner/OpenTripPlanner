@@ -39,13 +39,13 @@ import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.TimedTransferEdge;
 import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -118,12 +118,13 @@ public class LongDistancePathService implements PathService {
 
     public static class Parser extends PathParser {
 
-        private static final int STREET       = 1;
-        private static final int LINK         = 2;
-        private static final int STATION      = 3;
-        private static final int ONBOARD      = 4;
-        private static final int TRANSFER     = 5;
-        private static final int STATION_STOP = 6;
+        static final int STREET       = 1;
+        static final int LINK         = 2;
+        static final int STATION      = 3;
+        static final int ONBOARD      = 4;
+        static final int TRANSFER     = 5;
+        static final int STATION_STOP = 6;
+        static final int STOP_STATION = 7;
 
         private static final DFA DFA;
 
@@ -157,7 +158,7 @@ public class LongDistancePathService implements PathService {
              * 3. stay at the stop where we are but go to its parent station, 
              * 4. transfer and stay at the target stop, 
              * 5. transfer and move to the target stop's parent station. */
-            Nonterminal end = choice(seq(LINK, optional(streetLeg)), seq(optional(TRANSFER), optional(STATION_STOP)));
+            Nonterminal end = choice(seq(LINK, optional(streetLeg)), seq(optional(TRANSFER), optional(STOP_STATION)));
 
             /* An itinerary that includes a ride on public transit. It might begin on- or offboard. 
              * if it begins onboard, it doesn't necessarily have subsequent transit legs. */
@@ -167,10 +168,10 @@ public class LongDistancePathService implements PathService {
             
             /* A streets-only itinerary, which might begin or end at a stop or its station, 
              * but does not actually ride transit. */
-            Nonterminal streetItinerary = seq( 
+            Nonterminal streetItinerary = choice(TRANSFER, seq(
                     optional(STATION_STOP), optional(LINK), 
                     streetLeg,
-                    optional(LINK), optional(STATION_STOP)); 
+                    optional(LINK), optional(STOP_STATION)));
             
             Nonterminal itinerary = choice(streetItinerary, transitItinerary);
             
@@ -185,8 +186,9 @@ public class LongDistancePathService implements PathService {
         }
 
         /**
-         * The terminal is based exclusively on the backEdge, i.e. each terminal represents 
-         * exactly one edge in the path.
+         * The terminal is normally based exclusively on the backEdge, i.e. each terminal represents
+         * exactly one edge in the path. In case of @link{StationStopEdge}, however, the type of the
+         * current vertex also determines what kind of terminal this is.
          */
         @Override
         public int terminalFor(State state) {
@@ -197,7 +199,9 @@ public class LongDistancePathService implements PathService {
             /* OnboardEdge currently includes BoardAlight edges. */
             if (e instanceof OnboardEdge)       return ONBOARD;
             if (e instanceof StationEdge)       return STATION;
-            if (e instanceof StationStopEdge)   return STATION_STOP;
+            if (e instanceof StationStopEdge) {
+                return state.getVertex() instanceof TransitStop ? STATION_STOP : STOP_STATION;
+            }
             // There should perhaps be a shared superclass of all transfer edges to simplify this. 
             if (e instanceof SimpleTransfer)    return TRANSFER;
             if (e instanceof TransferEdge)      return TRANSFER;
@@ -205,13 +209,8 @@ public class LongDistancePathService implements PathService {
             if (e instanceof StreetTransitLink) return LINK;
             // Is it really correct to clasify all other edges as STREET?
             return STREET;
-//            else {
-//                LOG.debug("failed to tokenize path. vertex {} edge {}", v, e);
-//                throw new RuntimeException("failed to tokenize path");
-//            }
         }
 
     }
     
 }
-

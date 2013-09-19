@@ -13,8 +13,10 @@
 
 package org.opentripplanner.routing.impl;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,8 +40,55 @@ import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.impl.LongDistancePathService.Parser;
+import org.opentripplanner.routing.vertextype.TransitStation;
+import org.opentripplanner.routing.vertextype.TransitStop;
 
 public class LongDistancePathServiceTest {
+    @Test
+    public final void testTerminalFor() {
+        // Create a long distance path parser
+        Parser parser = new Parser();
+
+        State emptyState = mock(State.class);
+
+        State streetState = mock(State.class);
+        when(streetState.getBackEdge()).thenReturn(mock(PlainStreetEdge.class));
+
+        State linkState = mock(State.class);
+        when(linkState.getBackEdge()).thenReturn(mock(StreetTransitLink.class));
+
+        State stationState = mock(State.class);
+        when(stationState.getBackEdge()).thenReturn(mock(PreAlightEdge.class));
+
+        State onboardState = mock(State.class);
+        when(onboardState.getBackEdge()).thenReturn(mock(PatternHop.class));
+
+        State transferState = mock(State.class);
+        when(transferState.getBackEdge()).thenReturn(mock(TransferEdge.class));
+
+        State stationStopState = mock(State.class);
+        when(stationStopState.getBackEdge()).thenReturn(mock(StationStopEdge.class));
+        when(stationStopState.getVertex()).thenReturn(mock(TransitStop.class));
+
+        State stopStationState = mock(State.class);
+        when(stopStationState.getBackEdge()).thenReturn(mock(StationStopEdge.class));
+        when(stopStationState.getVertex()).thenReturn(mock(TransitStation.class));
+
+        try {
+            parser.terminalFor(emptyState);
+            fail();
+        } catch (Throwable throwable) {
+            assertEquals(RuntimeException.class, throwable.getClass()); // A back edge must be given
+        }
+
+        assertEquals(Parser.STREET, parser.terminalFor(streetState));
+        assertEquals(Parser.LINK, parser.terminalFor(linkState));
+        assertEquals(Parser.STATION, parser.terminalFor(stationState));
+        assertEquals(Parser.ONBOARD, parser.terminalFor(onboardState));
+        assertEquals(Parser.TRANSFER, parser.terminalFor(transferState));
+        assertEquals(Parser.STATION_STOP, parser.terminalFor(stationStopState));
+        assertEquals(Parser.STOP_STATION, parser.terminalFor(stopStationState));
+    }
 
     @Test
     public final void testPathParser() {
@@ -343,12 +392,20 @@ public class LongDistancePathServiceTest {
             assertFalse(parsePath(parser, path));
         }
 
+        { // Test transfer (allowed)
+            List<Class<? extends Edge>> path = new ArrayList<Class<? extends Edge>>();
+            path.add(TransferEdge.class);
+            assertTrue(parsePath(parser, path));
+        }
+
     }
 
     /**
      * Check whether a "path" is accepted by the long distance path parser.
      * 
-     * Assumes that only the back edge is used to determine the terminal.
+     * Assumes that only the back edge is used to determine the terminal, except in the case of
+     * @link{StationStopEdge}. For that special case, the vertex of the first state is specified as
+     * @link{TransitStop} while the vertex of the final state is specified as @link{TransitStation}.
      * 
      * @param parser is the long distance path parser
      * @param path is a list of edge classes that represent a path
@@ -360,11 +417,17 @@ public class LongDistancePathServiceTest {
 
         // Start in start state and "walk" through state machine
         int currentState = AutomatonState.START;
-        for (Class<? extends Edge> edgeClass : path) {
+        for (int i = 0; i < path.size(); i++) {
+            Class<? extends Edge> edgeClass = path.get(i);
             // Create dummy state with edge as back edge
             State state = mock(State.class);
             Edge edge = mock(edgeClass);
             when(state.getBackEdge()).thenReturn(edge);
+            if (i == 0) {                                                           // First state
+                when(state.getVertex()).thenReturn(mock(TransitStop.class));
+            } else if (i == path.size() - 1) {                                      // Final state
+                when(state.getVertex()).thenReturn(mock(TransitStation.class));
+            }
 
             // Get terminal of state
             int terminal = parser.terminalFor(state);
@@ -383,5 +446,4 @@ public class LongDistancePathServiceTest {
 
         return accepted;
     }
-
 }
