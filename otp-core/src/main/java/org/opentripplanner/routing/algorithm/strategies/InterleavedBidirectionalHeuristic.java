@@ -138,6 +138,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
             }
             double uw = q.peek_min_key();
             Vertex u = q.extract_min();
+            //LOG.info("dequeued weight {} at {}", uw, u);
 //            // Ignore vertices that could be rekeyed (but are not rekeyed in this implementation).
 //            if (uw > weights.get(u)) continue;
             // The weight of the queue head is uniformly increasing. This is the highest ever seen.
@@ -152,6 +153,11 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                 if (e instanceof StreetTransitLink) continue;
                 Vertex v = options.isArriveBy() ? e.getToVertex() : e.getFromVertex();
                 double ew = e.weightLowerBound(options);
+                // INF heuristic value indicates unreachable (e.g. non-running transit service)
+                // this saves time by not reverse-exploring those routes and avoids maxFound of INF.
+                if (Double.isInfinite(ew)) {
+                    continue;  
+                }
                 double vw = uw + ew;
                 Double old_vw = weights.get(v);
                 if (old_vw == null || vw < old_vw) {
