@@ -334,6 +334,10 @@ public abstract class RoutingResource {
         request.setWalkSpeed(get(walkSpeed, n, request.getWalkSpeed()));
         double bikeSpeedParam = get(bikeSpeed, n, request.getBikeSpeed());
         request.setBikeSpeed(bikeSpeedParam);
+        int bikeSwitchTimeParam = get(bikeSwitchTime, n, request.getBikeSwitchTime());
+        request.setBikeSwitchTime(bikeSwitchTimeParam);
+        int bikeSwitchCostParam = get(bikeSwitchCost, n, request.getBikeSwitchCost());
+        request.setBikeSwitchCost(bikeSwitchCostParam);
         OptimizeType opt = get(optimize, n, request.getOptimize());
         {
             Double tsafe =  get(triangleSafetyFactor, n, null);
