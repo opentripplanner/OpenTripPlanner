@@ -29,7 +29,6 @@ public class PlainStreetEdgeTest {
         v0 = vertex("maple_0th", 0.0, 0.0);
         v1 = vertex("maple_1st", 2.0, 2.0);
         v2 = vertex("maple_2nd", 1.0, 2.0);
-        v1.setTrafficLight(true);
         
         proto = new RoutingRequest();
         proto.setCarSpeed(15.0f);
@@ -150,6 +149,8 @@ public class PlainStreetEdgeTest {
         PlainStreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
         PlainStreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.PEDESTRIAN);
 
+        v1.setTrafficLight(true);
+
         RoutingRequest forward = proto.clone();
         forward.setMode(TraverseMode.BICYCLE);
         forward.setRoutingContext(_graph, v0, v2);
@@ -169,6 +170,56 @@ public class PlainStreetEdgeTest {
 
         assertEquals(42, s2.getElapsedTimeSeconds());
         assertEquals(42, s5.getElapsedTimeSeconds());
+    }
+
+    /**
+     * Test the bike switching penalty feature, both its cost penalty and its separate time penalty.
+     */
+    @Test
+    public void testBikeSwitch() {
+        PlainStreetEdge e0 = edge(v0, v1, 0.0, StreetTraversalPermission.PEDESTRIAN);
+        PlainStreetEdge e1 = edge(v1, v2, 0.0, StreetTraversalPermission.BICYCLE);
+        PlainStreetEdge e2 = edge(v2, v0, 0.0, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+
+        RoutingRequest noPenalty = proto.clone();
+        noPenalty.setMode(TraverseMode.BICYCLE);
+        noPenalty.setRoutingContext(_graph, v0, v0);
+
+        State s0 = new State(noPenalty);
+        State s1 = e0.traverse(s0);
+        State s2 = e1.traverse(s1);
+        State s3 = e2.traverse(s2);
+
+        RoutingRequest withPenalty = proto.clone();
+        withPenalty.setBikeSwitchTime(42);
+        withPenalty.setBikeSwitchCost(23);
+        withPenalty.setMode(TraverseMode.BICYCLE);
+        withPenalty.setRoutingContext(_graph, v0, v0);
+
+        State s4 = new State(withPenalty);
+        State s5 = e0.traverse(s4);
+        State s6 = e1.traverse(s5);
+        State s7 = e2.traverse(s6);
+
+        assertEquals(0, s0.getElapsedTimeSeconds());
+        assertEquals(0, s1.getElapsedTimeSeconds());
+        assertEquals(0, s2.getElapsedTimeSeconds());
+        assertEquals(0, s3.getElapsedTimeSeconds());
+
+        assertEquals(0.0, s0.getWeight(), 0.0);
+        assertEquals(0.0, s1.getWeight(), 0.0);
+        assertEquals(0.0, s2.getWeight(), 0.0);
+        assertEquals(0.0, s3.getWeight(), 0.0);
+
+        assertEquals(0.0, s4.getWeight(), 0.0);
+        assertEquals(23.0, s5.getWeight(), 0.0);
+        assertEquals(23.0, s6.getWeight(), 0.0);
+        assertEquals(23.0, s7.getWeight(), 0.0);
+
+        assertEquals(0, s4.getElapsedTimeSeconds());
+        assertEquals(42, s5.getElapsedTimeSeconds());
+        assertEquals(42, s6.getElapsedTimeSeconds());
+        assertEquals(42, s7.getElapsedTimeSeconds());
     }
 
     /****
