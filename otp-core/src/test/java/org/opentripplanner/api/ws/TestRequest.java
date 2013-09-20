@@ -167,7 +167,7 @@ class SimpleGraphServiceImpl implements GraphService {
 
     @Override
     public boolean save(String routerId, InputStream is) {
-    	return false;
+        return false;
     }
 }
 
@@ -695,7 +695,34 @@ public class TestRequest extends TestCase {
         assertTrue(itinerary.walkDistance <= planner.getMaxWalkDistance().get(0));
         assertFalse(itinerary.walkLimitExceeded);
     }
-    
+
+    /**
+     * Test the influence of increasing the walk reluctance.
+     */
+    public void testWalkReluctance() throws JSONException {
+        // Test planning a trip with a walk reluctance of 1
+        TestPlanner planner = new TestPlanner("portland", "45.440947,-122.837645", "45.463966,-122.755822");
+        planner.setMaxWalkDistance(Arrays.asList(Double.POSITIVE_INFINITY));
+        planner.setWalkReluctance(Arrays.asList(1.0));
+
+        Response response = planner.getItineraries();
+        Itinerary itinerary = response.getPlan().itinerary.get(0);
+        Long duration = itinerary.duration;
+
+        // Some walking is expected here, because it's slightly faster than staying onboard the bus.
+        assertTrue(itinerary.walkDistance > 0);
+
+        // Replan with a walk reluctance of 16
+        planner.setWalkReluctance(Arrays.asList(16.0));
+
+        response = planner.getItineraries();
+        itinerary = response.getPlan().itinerary.get(0);
+
+        // Now the walking should be eliminated, but this alternative itinerary does take more time.
+        assertTrue(itinerary.walkDistance == 0);
+        assertTrue(duration < itinerary.duration);
+    }
+
     public void testTransferPenalty() throws JSONException {
         // Plan short trip
         TestPlanner planner = new TestPlanner("portland", "45.5264892578125,-122.60479259490967", "45.511622,-122.645564");
@@ -1084,7 +1111,11 @@ public class TestRequest extends TestCase {
         public void setMaxWalkDistance(List<Double> maxWalkDistance) {
             this.maxWalkDistance = maxWalkDistance;
         }
-        
+
+        public void setWalkReluctance(List<Double> walkReluctance) {
+            this.walkReluctance = walkReluctance;
+        }
+
         public RoutingRequest buildRequest() throws ParameterException {
             return super.buildRequest();
         }
