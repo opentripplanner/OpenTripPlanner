@@ -987,7 +987,41 @@ public class TestRequest extends TestCase {
         // Revert the graph, thus using the original transfer table again
         reset(graph);
     }
-    
+
+    /**
+     * Test the bike switching penalty feature, both its cost penalty and its separate time penalty.
+     */
+    public void testBikeSwitch() throws JSONException {
+        // Test planning a trip with bike and transit without any added penalties
+        TestPlanner planner = new TestPlanner("portland", "45.440947,-122.837645", "45.463966,-122.755822");
+        planner.setMaxWalkDistance(Arrays.asList(Double.POSITIVE_INFINITY));
+        planner.setWalkReluctance(Arrays.asList(1.0));
+        planner.setModes(Arrays.asList(new TraverseModeSet("BICYCLE,TRANSIT")));
+
+        Response response = planner.getItineraries();
+        Itinerary itinerary = response.getPlan().itinerary.get(0);
+        Long duration = itinerary.duration;
+
+        // Add a time penalty without changing the cost
+        planner.setBikeSwitchTime(Arrays.asList(30));
+
+        response = planner.getItineraries();
+        itinerary = response.getPlan().itinerary.get(0);
+
+        // Now the itinerary should be 30 seconds longer
+        assertTrue(duration + 30000L == itinerary.duration);
+
+        // Change the cost as well, so the routing result changes
+        planner.setBikeSwitchCost(Arrays.asList(99));
+
+        response = planner.getItineraries();
+        itinerary = response.getPlan().itinerary.get(0);
+
+        // Now the length of the itinerary should be in between the lengths of the other itineraries
+        assertTrue(duration < itinerary.duration);
+        assertTrue(duration + 30000L > itinerary.duration);
+    }
+
     /**
      * Add a trip-to-trip transfer time to a transfer table and check the result
      */
@@ -1067,6 +1101,8 @@ public class TestRequest extends TestCase {
             this.transferPenalty = Arrays.asList(0);
             this.nonpreferredTransferPenalty = Arrays.asList(180);
             this.maxTransfers = Arrays.asList(2);
+            this.bikeSwitchTime = Arrays.asList(0);
+            this.bikeSwitchCost = Arrays.asList(0);
             this.routerId = Arrays.asList(routerId);
             this.planGenerator = Context.getInstance().planGenerator;
             this.graphService = Context.getInstance().graphService;
@@ -1114,6 +1150,18 @@ public class TestRequest extends TestCase {
 
         public void setWalkReluctance(List<Double> walkReluctance) {
             this.walkReluctance = walkReluctance;
+        }
+
+        public void setModes(List<TraverseModeSet> modes) {
+            this.modes = modes;
+        }
+
+        public void setBikeSwitchTime(List<Integer> bikeSwitchTime) {
+            this.bikeSwitchTime = bikeSwitchTime;
+        }
+
+        public void setBikeSwitchCost(List<Integer> bikeSwitchCost) {
+            this.bikeSwitchCost = bikeSwitchCost;
         }
 
         public RoutingRequest buildRequest() throws ParameterException {

@@ -90,6 +90,14 @@ public abstract class RoutingResource {
     /** The user's biking speed in meters/second. Defaults to approximately 11 MPH, or 9.5 for bikeshare. */
     @QueryParam("bikeSpeed") protected List<Double> bikeSpeed;
 
+    /** The time it takes the user to fetch their bike and park it again in seconds.
+     *  Defaults to 0. */
+    @QueryParam("bikeSwitchTime") protected List<Integer> bikeSwitchTime;
+
+    /** The cost of the user fetching their bike and parking it again.
+     *  Defaults to 0. */
+    @QueryParam("bikeSwitchCost") protected List<Integer> bikeSwitchCost;
+
     /** For bike triangle routing, how much safety matters (range 0-1). */
     @QueryParam("triangleSafetyFactor") protected List<Double> triangleSafetyFactor;
     
