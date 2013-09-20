@@ -128,7 +128,7 @@ public class Routers {
         RouterInfo routerInfo = getRouterInfo(routerId);
         if (routerInfo == null)
             throw new WebApplicationException(Responses.notFound()
-                    .entity("Graph id '" + routerId + "' not registered.").type("text/plain")
+                    .entity("Graph id '" + routerId + "' not registered.\n").type("text/plain")
                     .build());
         return routerInfo;
     }
@@ -176,12 +176,12 @@ public class Routers {
             LOG.debug("pre-evicting graph");
             graphService.evictGraph(routerId);
         }
-        LOG.debug("attempting to load graph from server's local filsystem.");
+        LOG.debug("attempting to load graph from server's local filsystem.\n");
         boolean success = graphService.registerGraph(routerId, preEvict);
         if (success)
-            return Response.status(201).entity("graph registered.").build();
+            return Response.status(201).entity("graph registered.\n").build();
         else
-            return Response.status(404).entity("graph not found or other error.").build();
+            return Response.status(404).entity("graph not found or other error.\n").build();
     }
 
     /** 
@@ -205,9 +205,9 @@ public class Routers {
         try {
             graph = Graph.load(is, level);
             graphService.registerGraph(routerId, graph);
-            return Response.status(Status.CREATED).entity(graph.toString()).build();
+            return Response.status(Status.CREATED).entity(graph.toString() + "\n").build();
         } catch (Exception e) {
-            return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
+            return Response.status(Status.BAD_REQUEST).entity(e.toString() + "\n").build();
         }
     }
     
@@ -225,9 +225,9 @@ public class Routers {
         try {
         	boolean success = graphService.save(routerId, is);
         	if (success) {
-        		return Response.status(201).entity("graph saved.").build();
+        		return Response.status(201).entity("graph saved.\n").build();
         	} else {
-        		return Response.status(404).entity("graph not saved or other error.").build();
+        		return Response.status(404).entity("graph not saved or other error.\n").build();
         	}
         } catch (Exception e) {
             return Response.status(Status.BAD_REQUEST).entity(e.toString()).build();
@@ -239,7 +239,7 @@ public class Routers {
     @DELETE @Produces({ MediaType.TEXT_PLAIN })
     public Response deleteAll() {
         int nEvicted = graphService.evictAll();
-        String message = String.format("%d graphs evicted.", nEvicted);
+        String message = String.format("%d graphs evicted.\n", nEvicted);
         return Response.status(200).entity(message).build();
     }
 
@@ -253,9 +253,9 @@ public class Routers {
     public Response deleteGraphId(@PathParam("routerId") String routerId) {
         boolean existed = graphService.evictGraph(routerId);
         if (existed)
-            return Response.status(200).entity("graph evicted.").build();
+            return Response.status(200).entity("graph evicted.\n").build();
         else
-            return Response.status(404).entity("graph did not exist.").build();
+            return Response.status(404).entity("graph did not exist.\n").build();
     }
 
 }
