@@ -36,7 +36,7 @@ public class Update extends AbstractUpdate implements Comparable<Update> {
     public int arrive; // sec since midnight
 
     @Getter
-    public final int depart; // sec since midnight
+    public int depart; // sec since midnight
 
     @Getter
     public final Status status;
@@ -46,7 +46,6 @@ public class Update extends AbstractUpdate implements Comparable<Update> {
         super(tripId, timestamp, serviceDate);
         this.stopId = stopId;
         this.stopSeq = stopSeq;
-        this.arrive = arrive;
         this.status = status;
         if(isDelays){
             this.arriveDelay = arrive;

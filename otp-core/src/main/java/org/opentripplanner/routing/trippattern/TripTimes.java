@@ -117,12 +117,14 @@ public abstract class TripTimes {
 
     /** @return the difference between the scheduled and actual departure times for this hop. */
     public int getDepartureDelay(int hop) {
-        return getDepartureTime(hop) - getScheduledTripTimes().getDepartureTime(hop); 
+        //TODO (Ben): find a solution for a case that getDepartureTime(hop) return CANCELED or PASSED
+        return getDepartureTime(hop) - getScheduledTripTimes().getDepartureTime(hop);
     }
 
     /** @return the difference between the scheduled and actual arrival times for this hop. */
     public int getArrivalDelay(int hop) {
-        return getArrivalTime(hop) - getScheduledTripTimes().getArrivalTime(hop); 
+        //TODO (Ben): find a solution for a case that getArrivalTime(hop) return CANCELED or PASSED
+        return getArrivalTime(hop) - getScheduledTripTimes().getArrivalTime(hop);
     }
     
     /** 

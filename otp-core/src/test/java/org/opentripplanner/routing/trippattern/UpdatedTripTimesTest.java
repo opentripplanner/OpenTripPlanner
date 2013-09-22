@@ -16,63 +16,21 @@ package org.opentripplanner.routing.trippattern;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import static org.opentripplanner.routing.trippattern.TripTimesMocker.*;
+
 import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.StopTime;
-import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 
 public class UpdatedTripTimesTest {
     private static ScheduledTripTimes originalTripTimesA;
-    private static AgencyAndId tripId = new AgencyAndId("agency", "testtrip");
-    
-    private static AgencyAndId stop_a = new AgencyAndId("agency", "A"); // 0
-    private static AgencyAndId stop_b = new AgencyAndId("agency", "B"); // 1
-    private static AgencyAndId stop_c = new AgencyAndId("agency", "C"); // 2
-    private static AgencyAndId stop_d = new AgencyAndId("agency", "D"); // 3
-    private static AgencyAndId stop_e = new AgencyAndId("agency", "E"); // 4
-    private static AgencyAndId stop_f = new AgencyAndId("agency", "F"); // 5
-    private static AgencyAndId stop_g = new AgencyAndId("agency", "G"); // 6
-    private static AgencyAndId stop_h = new AgencyAndId("agency", "H"); // 7
-    private static AgencyAndId[] stops = {stop_a, stop_b, stop_c, stop_d, stop_e, stop_f, stop_g, stop_h};
     
     @BeforeClass
     public static void setUp() throws Exception {
-        Trip trip = new Trip();
-        trip.setId(tripId);
-        
-        List<StopTime> stopTimes = new LinkedList<StopTime>();
-        
-        for(int i =  0; i < stops.length; ++i) {
-            StopTime stopTime = new StopTime();
-            
-            Stop stop = new Stop();
-            stop.setId(stops[i]);
-            stopTime.setStop(stop);
-            stopTime.setArrivalTime(i * 60);
-            stopTime.setDepartureTime(i * 60);
-            stopTimes.add(stopTime);
-        }
-        originalTripTimesA = new ScheduledTripTimes(trip, stopTimes);
-        
-        stopTimes = new LinkedList<StopTime>();
-        for(int i =  0; i < stops.length; ++i) {
-            StopTime stopTime = new StopTime();
-            
-            Stop stop = new Stop();
-            stop.setId(stops[i]);
-            stopTime.setStop(stop);
-            stopTime.setStopSequence(i);
-            stopTime.setArrivalTime(i * 60); 
-            stopTime.setDepartureTime(i * 60 + (i > 3 && i < 6 ? i * 10 : 0));
-            stopTimes.add(stopTime);
-        }
-        new ScheduledTripTimes(trip, stopTimes);
+        originalTripTimesA = TripTimesMocker.mockSimpleTrip();
     }
 
     @Test

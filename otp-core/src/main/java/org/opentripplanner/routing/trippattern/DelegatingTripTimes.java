@@ -24,7 +24,7 @@ import lombok.NonNull;
 @AllArgsConstructor
 public abstract class DelegatingTripTimes extends TripTimes {
 
-    @NonNull private final ScheduledTripTimes base;
+    @NonNull protected final ScheduledTripTimes base;
 
     @Override public Trip getTrip() { return base.getTrip(); }
 

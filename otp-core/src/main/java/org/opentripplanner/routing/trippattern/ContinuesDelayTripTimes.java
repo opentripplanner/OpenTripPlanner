@@ -43,16 +43,16 @@ public class ContinuesDelayTripTimes extends DelegatingTripTimes {
         if (lastDelay == null){
             return TripTimes.PASSED;
         }
-        if(lastDelay.getValue() < 0){
-            return lastDelay.getValue();
-        }
+//        if(lastDelay.getValue() < 0){
+//            return lastDelay.getValue();
+//        }
         return lastDelay.getValue();
     }
 
     private int findDelayIndex(int hop, boolean isArrival){
-        int departureIndex = (hop + 1) * 2;
+        int departureIndex = hop * 2;
         if(isArrival){
-            return departureIndex - 1;
+            return departureIndex + 1;
         }
         return departureIndex;
     }
@@ -76,19 +76,28 @@ public class ContinuesDelayTripTimes extends DelegatingTripTimes {
                 break;
             case ARRIVED:
             case PREDICTION:
+                Integer arriveDelay = update.getArriveDelay();
+                Integer departDelay = update.getDepartDelay();
                 if(!update.hasDelay()){
-                    //TODO: maybe to throw an exception here
-                    LOG.warn("Update mark as prediction but have no delays, consider changing the update strategy. " +
-                            "ContinuesDelayTripTimes support only in delays.");
-                }else{
-                    if(update.getArriveDelay() != null){
-                        delayMap.put(delayIndex, update.getArriveDelay());
-                    }
-                    if(update.getDepartDelay() != null){
-                        delayMap.put(delayIndex + 1, update.getDepartDelay());
-                    }
+                    arriveDelay = findDelay(update.getArrive(), hop, true);
+                    departDelay = findDelay(update.getDepart(), hop, false);
                 }
+                if(arriveDelay != null){
+                    delayMap.put(delayIndex, arriveDelay);
+                }
+                if(departDelay != null){
+                    delayMap.put(delayIndex + 1, departDelay);
+                }
+
                 break;
+        }
+    }
+
+    private Integer findDelay(int time, int hop, boolean isArrival){
+        if(isArrival){
+            return time - base.getArrivalTime(hop);
+        }else {
+            return time - base.getDepartureTime(hop + 1);
         }
     }
 
