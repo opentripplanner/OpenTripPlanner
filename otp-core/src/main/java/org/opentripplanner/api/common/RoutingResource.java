@@ -80,8 +80,10 @@ public abstract class RoutingResource {
     /** The maximum distance (in meters) the user is willing to walk. Defaults to unlimited. */
     @QueryParam("maxWalkDistance") protected List<Double> maxWalkDistance;
 
-    /** How much worse walking is than waiting for an equivalent length of time, as a multiplier.
-     *  Defaults to 2. */
+    /** A multiplier for how bad walking is, compared to being in transit for equal lengths of time.
+     *  Defaults to 2. Empirically, values between 10 and 20 seem to correspond well to the concept
+     *  of not wanting to walk too much without asking for totally ridiculous itineraries, but this
+     *  observation should in no way be taken as scientific or definitive. Your mileage may vary.*/
     @QueryParam("walkReluctance") protected List<Double> walkReluctance;
 
     /** The user's walking speed in meters/second. Defaults to approximately 3 MPH. */
