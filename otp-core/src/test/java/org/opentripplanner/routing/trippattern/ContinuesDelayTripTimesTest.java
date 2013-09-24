@@ -26,8 +26,6 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.routing.trippattern.TripTimesMocker.*;
-import static org.opentripplanner.routing.trippattern.TripTimesMocker.stop_d;
-import static org.opentripplanner.routing.trippattern.TripTimesMocker.tripId;
 
 public class ContinuesDelayTripTimesTest{
 
@@ -57,23 +55,7 @@ public class ContinuesDelayTripTimesTest{
 
         TripTimes continuesUpdateA = cUpdater.updateTimes(scheduledTripTimesA,patternA,tripUpdateList);
 
-        //stop a
-        assertEquals(TripTimes.PASSED, continuesUpdateA.getDepartureTime(0));
-        //stop b
-        assertEquals(TripTimes.PASSED, continuesUpdateA.getArrivalTime(0));
-        assertEquals(TripTimes.PASSED, continuesUpdateA.getDepartureTime(1));
-        //stop c
-        assertEquals(scheduledTripTimesA.getArrivalTime(1) + 30, continuesUpdateA.getArrivalTime(1));
-        assertEquals(scheduledTripTimesA.getDepartureTime(2) + 30, continuesUpdateA.getDepartureTime(2));
-        //stop d
-        assertEquals(scheduledTripTimesA.getArrivalTime(2) + 60, continuesUpdateA.getArrivalTime(2));
-        assertEquals(scheduledTripTimesA.getDepartureTime(3) + 60, continuesUpdateA.getDepartureTime(3));
-        //stop e
-        assertEquals(scheduledTripTimesA.getArrivalTime(3) + 60, continuesUpdateA.getArrivalTime(3));
-        assertEquals(scheduledTripTimesA.getDepartureTime(4) + 60, continuesUpdateA.getDepartureTime(4));
-        //stop f
-        assertEquals(scheduledTripTimesA.getArrivalTime(4), continuesUpdateA.getArrivalTime(4));
-        assertEquals(scheduledTripTimesA.getDepartureTime(5), continuesUpdateA.getDepartureTime(5));
+        testTrip(scheduledTripTimesA, continuesUpdateA);
     }
 
     @Test
@@ -89,24 +71,31 @@ public class ContinuesDelayTripTimesTest{
 
         TripTimes continuesUpdateA = cUpdater.updateTimes(scheduledTripTimesA,patternA,tripUpdateList);
 
-        //stop a
-        assertEquals(TripTimes.PASSED, continuesUpdateA.getDepartureTime(0));
-        //stop b
-        assertEquals(TripTimes.PASSED, continuesUpdateA.getArrivalTime(0));
-        assertEquals(TripTimes.PASSED, continuesUpdateA.getDepartureTime(1));
-        //stop c
-        assertEquals(scheduledTripTimesA.getArrivalTime(1) + 30, continuesUpdateA.getArrivalTime(1));
-        assertEquals(scheduledTripTimesA.getDepartureTime(2) + 30, continuesUpdateA.getDepartureTime(2));
-        //stop d
-        assertEquals(scheduledTripTimesA.getArrivalTime(2) + 60, continuesUpdateA.getArrivalTime(2));
-        assertEquals(scheduledTripTimesA.getDepartureTime(3) + 60, continuesUpdateA.getDepartureTime(3));
-        //stop e
-        assertEquals(scheduledTripTimesA.getArrivalTime(3) + 60, continuesUpdateA.getArrivalTime(3));
-        assertEquals(scheduledTripTimesA.getDepartureTime(4) + 60, continuesUpdateA.getDepartureTime(4));
-        //stop f
-        assertEquals(scheduledTripTimesA.getArrivalTime(4), continuesUpdateA.getArrivalTime(4));
-        assertEquals(scheduledTripTimesA.getDepartureTime(5), continuesUpdateA.getDepartureTime(5));
+        testTrip(scheduledTripTimesA, continuesUpdateA);
     }
+
+
+    private void testTrip(TripTimes scheduledTT, TripTimes modifiedTT){
+        //stop a
+        assertEquals(TripTimes.PASSED, modifiedTT.getDepartureTime(0));
+        //stop b
+        assertEquals(TripTimes.PASSED, modifiedTT.getArrivalTime(0));
+        assertEquals(TripTimes.PASSED, modifiedTT.getDepartureTime(1));
+        //stop c
+        assertEquals(scheduledTT.getArrivalTime(1) + 30, modifiedTT.getArrivalTime(1));
+        assertEquals(scheduledTT.getDepartureTime(2) + 30, modifiedTT.getDepartureTime(2));
+        //stop d
+        assertEquals(scheduledTT.getArrivalTime(2) + 60, modifiedTT.getArrivalTime(2));
+        assertEquals(scheduledTT.getDepartureTime(3) + 60, modifiedTT.getDepartureTime(3));
+        //stop e
+        assertEquals(scheduledTT.getArrivalTime(3) + 60, modifiedTT.getArrivalTime(3));
+        assertEquals(scheduledTT.getDepartureTime(4) + 60, modifiedTT.getDepartureTime(4));
+        //stop f
+        assertEquals(scheduledTT.getArrivalTime(4), modifiedTT.getArrivalTime(4));
+        assertEquals(scheduledTT.getDepartureTime(5), modifiedTT.getDepartureTime(5));
+    }
+
+
 
 
 }
