@@ -52,6 +52,7 @@ public class WebMapService extends RoutingResource {
     @InjectParam
     private Renderer renderer;
     
+    /** @param bbox order is minx,miny,maxx,maxy */
     // use of string array in annotation dodges bug in Enunciate, which will be fixed in v1.26
     @GET @Produces( {"image/*", "text/*"} )
     public Response wmsGet(
