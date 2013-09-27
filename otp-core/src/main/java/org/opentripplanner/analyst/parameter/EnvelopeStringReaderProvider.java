@@ -25,6 +25,7 @@ import org.geotools.geometry.Envelope2D;
 import com.sun.jersey.spi.StringReader;
 import com.sun.jersey.spi.StringReaderProvider;
 
+/** order is minx,miny,maxx,maxy */
 @SuppressWarnings("rawtypes")
 @Provider
 public class EnvelopeStringReaderProvider implements StringReaderProvider {
