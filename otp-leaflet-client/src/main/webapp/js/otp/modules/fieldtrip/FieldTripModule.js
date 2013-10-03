@@ -237,7 +237,7 @@ otp.modules.fieldtrip.FieldTripModule =
             data: {
                 sessionId : this.sessionManager.sessionId,
                 //date : this.fieldTripManager.selectedDate,
-                limit : 100,
+                //limit : 100,
             },
                 
             success: function(data) {
@@ -414,7 +414,7 @@ otp.modules.fieldtrip.FieldTripModule =
         $.ajax(this.datastoreUrl+'/fieldtrip/getRequests', {
             data: {
                 sessionId : this.sessionManager.sessionId,
-                limit : 100,
+                //limit : 100,
             },
                 
             success: function(data) {
