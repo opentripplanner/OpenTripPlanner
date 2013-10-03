@@ -1036,6 +1036,7 @@ public class GTFSPatternHopFactory {
         }
         LOG.debug("deleted {} dwell edges / {} candidates, merging arrival and departure vertices.", 
            nDeleted, nDwells);
+        if (nDeleted > 0) graph.setDwellsDeleted(true);
     }
 
     private void addTripToInterliningMap(Trip trip, List<StopTime> stopTimes, TableTripPattern tripPattern) {

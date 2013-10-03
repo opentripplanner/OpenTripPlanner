@@ -97,6 +97,12 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
 
     private boolean generateFeedIds = false;
 
+    /**
+     * Delete dwell edges for trip patterns that have all-zero dwell times.
+     * Do not use with real-time updates.
+     */
+    @Setter private boolean deleteUselessDwells;
+
     /** 
      * Construct and set bundles all at once. 
      * TODO why is there a wrapper class around a list of GTFS files?
@@ -167,6 +173,7 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
                 hf.setStopContext(stopContext);
                 hf.setFareServiceFactory(_fareServiceFactory);
                 hf.setMaxStopToShapeSnapDistance(gtfsBundle.getMaxStopToShapeSnapDistance());
+                hf.setDeleteUselessDwells(deleteUselessDwells);
 
                 if (generateFeedIds && gtfsBundle.getDefaultAgencyId() == null) {
                     gtfsBundle.setDefaultAgencyId("FEED#" + bundleIndex);

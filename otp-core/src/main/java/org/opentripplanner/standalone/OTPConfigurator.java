@@ -2,7 +2,6 @@ package org.opentripplanner.standalone;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
@@ -241,6 +240,7 @@ public class OTPConfigurator {
             }
             gtfsBuilder.setFareServiceFactory(new DefaultFareServiceFactory());
             gtfsBuilder.setGtfsGraphBuilders(gtfsBuilders);
+            gtfsBuilder.setDeleteUselessDwells(params.deleteUselessDwells);
         }
         if (configFile != null) {
             EmbeddedConfigGraphBuilderImpl embeddedConfigBuilder = new EmbeddedConfigGraphBuilderImpl();
