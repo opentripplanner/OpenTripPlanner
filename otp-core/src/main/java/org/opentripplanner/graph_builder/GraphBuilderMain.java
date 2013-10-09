@@ -46,6 +46,9 @@ public class GraphBuilderMain {
         long startTime = System.currentTimeMillis();
 
         List<String> paths = new ArrayList<String>();
+        // This bit of Spring XML is included in the context config of every graph builder run.
+        // It mostly just configures some "custom property editors" that tell Spring how to
+        // set properties from strings.
         paths.add("classpath:org/opentripplanner/graph_builder/application-context.xml");
         for (String arg : args)
             paths.add(arg);
