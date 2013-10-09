@@ -30,6 +30,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.ElevatorEdge;
+import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
@@ -78,7 +79,7 @@ public class StreetUtils {
             for (Edge e : gv.getOutgoing()) {
                 Vertex in = gv;
                 if (!(e instanceof StreetEdge || e instanceof StreetTransitLink || 
-                      e instanceof ElevatorEdge)) {
+                      e instanceof ElevatorEdge || e instanceof FreeEdge)) {
                     continue;
                 }
                 State s1 = e.traverse(s0);
