@@ -13,14 +13,15 @@
 
 package org.opentripplanner.common.geometry;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Queue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -145,6 +146,8 @@ public class AccSamplingGridIsolineBuilder implements IsolineBuilder {
 
         private GridSample up, down, right, left;
 
+        private boolean vProcessed, hProcessed;
+
         private GridSample(XYIndex index) {
             this.index = index;
         }
@@ -165,7 +168,7 @@ public class AccSamplingGridIsolineBuilder implements IsolineBuilder {
 
         @Override
         public final String toString() {
-            return "[Sample" + index + "," + zz + "]";
+            return "[Sample" + index + "," + Arrays.toString(zz) + "]";
         }
     }
 
@@ -315,23 +318,31 @@ public class AccSamplingGridIsolineBuilder implements IsolineBuilder {
             closed = true;
         }
 
-        // TODO Transform this with a "open Q"
-        // and two hProcessed,vProcessed boolean in GridSample
-        Set<GridSample> h = new HashSet<GridSample>(allSamples.size());
-        Set<GridSample> v = new HashSet<GridSample>(allSamples.size());
         for (GridSample A : allSamples.values()) {
-            h.add(A);
-            v.add(A);
+            A.hProcessed = false;
+            A.vProcessed = false;
         }
+        Queue<GridSample> processQ = new ArrayDeque<GridSample>(allSamples.size());
+        processQ.addAll(allSamples.values());
 
         if (debug)
             generateDebugGeometry(zz0);
 
-        List<Geometry> retval = new ArrayList<Geometry>();
         List<LinearRing> rings = new ArrayList<LinearRing>();
-        while (!(h.isEmpty() && v.isEmpty())) {
-            boolean horizontal = v.isEmpty();
-            GridSample A = horizontal ? h.iterator().next() : v.iterator().next();
+        while (!processQ.isEmpty()) {
+            GridSample A = processQ.remove();
+            if (A.hProcessed && A.vProcessed)
+                continue;
+            boolean horizontal = !A.hProcessed;
+            if (horizontal) {
+                A.hProcessed = true;
+            } else {
+                A.vProcessed = true;
+            }
+            if (!(A.vProcessed && A.hProcessed)) {
+                // Re-adding self to be processed again for perpendicular direction
+                processQ.add(A);
+            }
             GridSample B = horizontal ? A.right : A.up;
             boolean ok = B != null;
             int cut = 0;
@@ -340,10 +351,6 @@ public class AccSamplingGridIsolineBuilder implements IsolineBuilder {
                 ok = (cut != 0);
             }
             if (!ok) {
-                if (horizontal)
-                    h.remove(A);
-                else
-                    v.remove(A);
                 continue; // While
             }
             List<Coordinate> polyPoints = new ArrayList<Coordinate>();
@@ -358,10 +365,11 @@ public class AccSamplingGridIsolineBuilder implements IsolineBuilder {
                         * k);
                 polyPoints.add(cC);
                 horizontal = direction == Direction.UP || direction == Direction.DOWN;
-                if (horizontal)
-                    h.remove(A);
-                else
-                    v.remove(A);
+                if (horizontal) {
+                    A.hProcessed = true;
+                } else {
+                    A.vProcessed = true;
+                }
                 // Compute next samples from adjacent tile
                 // C same side of B, D same side of A.
                 GridSample C, D;
@@ -404,14 +412,14 @@ public class AccSamplingGridIsolineBuilder implements IsolineBuilder {
                 }
                 boolean ok1 = D != null
                         && zFunc.cut(A.zz, D.zz, zz0) != 0
-                        && (horizontal ? (invertAB ? v.contains(D) : v.contains(A)) : (invertAB ? h
-                                .contains(D) : h.contains(A)));
+                        && (horizontal ? (invertAB ? !D.vProcessed : !A.vProcessed)
+                                : (invertAB ? !D.hProcessed : !A.hProcessed));
                 boolean ok2 = C != null
                         && zFunc.cut(B.zz, C.zz, zz0) != 0
-                        && (horizontal ? (invertAB ? v.contains(C) : v.contains(B)) : (invertAB ? h
-                                .contains(C) : h.contains(B)));
+                        && (horizontal ? (invertAB ? !C.vProcessed : !B.vProcessed)
+                                : (invertAB ? !C.hProcessed : !B.hProcessed));
                 boolean ok3 = C != null && D != null && zFunc.cut(C.zz, D.zz, zz0) != 0
-                        && (horizontal ? h.contains(D) : v.contains(D));
+                        && (horizontal ? !D.hProcessed : !D.vProcessed);
                 if (ok1 && ok2) {
                     /*
                      * We can go either turn, pick the best one from e1 or e2 by looking if C lies
@@ -458,7 +466,7 @@ public class AccSamplingGridIsolineBuilder implements IsolineBuilder {
                     .toArray(new Coordinate[polyPoints.size()]));
             rings.add(ring);
         }
-        retval.addAll(punchHoles(rings));
+        List<Polygon> retval = punchHoles(rings);
         return geometryFactory
                 .createGeometryCollection(retval.toArray(new Geometry[retval.size()]));
     }
