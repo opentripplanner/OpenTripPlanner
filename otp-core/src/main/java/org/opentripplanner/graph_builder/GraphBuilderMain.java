@@ -39,7 +39,7 @@ public class GraphBuilderMain {
     public static void main(String[] args) throws IOException {
 
         if (args.length == 0) {
-            System.err.println("usage: config.xml");
+            System.err.println("usage:\njava [-Xmx<heapsize>] -classpath otp-core/target/otp.jar org.opentripplanner.graph_builder.GraphBuilderMain <config.xml>");
             System.exit(-1);
         }
 
