@@ -21,6 +21,6 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public interface IsolineBuilder {
 
-    public Geometry computeIsoline(long z0);
+    public Geometry computeIsoline(double[] zz0);
     
 }

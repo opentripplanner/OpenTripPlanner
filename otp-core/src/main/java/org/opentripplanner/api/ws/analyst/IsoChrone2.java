@@ -27,6 +27,7 @@ import javax.ws.rs.core.Response;
 import org.opentripplanner.analyst.core.IsochroneData;
 import org.opentripplanner.analyst.request.IsoChroneRequest;
 import org.opentripplanner.analyst.request.IsoChroneSPTRenderer;
+import org.opentripplanner.analyst.request.IsoChroneSPTRenderer2;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.util.GeoJSONBuilder;
@@ -34,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.sun.jersey.api.core.InjectParam;
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * Return isochrone geometry as a set of GeoJSON polygons.
@@ -53,12 +55,15 @@ public class IsoChrone2 extends RoutingResource {
     @InjectParam
     private IsoChroneSPTRenderer renderer;
 
+    @InjectParam
+    private IsoChroneSPTRenderer2 oldRenderer;
+
     @QueryParam("cutoffSec")
     List<Integer> cutoffSecList;
 
     @QueryParam("debug")
     Boolean debug;
-    
+
     @QueryParam("precisionMeters")
     private Integer precisionMeters;
 
@@ -70,13 +75,14 @@ public class IsoChrone2 extends RoutingResource {
             debug = false;
         if (precisionMeters == null)
             precisionMeters = 200;
-        
+
         IsoChroneRequest isoChroneRequest = new IsoChroneRequest(cutoffSecList);
         isoChroneRequest.setIncludeDebugGeometry(debug);
         isoChroneRequest.setPrecisionMeters(precisionMeters);
         RoutingRequest sptRequest = buildRequest(0);
 
         List<IsochroneData> isochrones = renderer.getIsochrones(isoChroneRequest, sptRequest);
+        //List<IsochroneData> isochrones = oldRenderer.getIsochrones(isoChroneRequest, sptRequest);
         StringWriter geoJsonWriter = new StringWriter();
         GeoJSONBuilder geoJsonBuilder = new GeoJSONBuilder(geoJsonWriter);
         geoJsonBuilder.array();
@@ -88,9 +94,10 @@ public class IsoChrone2 extends RoutingResource {
             geoJsonBuilder.endObject();
             geoJsonBuilder.key("geometry");
             geoJsonBuilder.writeGeom(isochrone.getGeometry());
-            if (debug) {
+            Geometry debugGeometry = isochrone.getDebugGeometry();
+            if (debug && debugGeometry != null) {
                 geoJsonBuilder.key("debugGeometry");
-                geoJsonBuilder.writeGeom(isochrone.getDebugGeometry());
+                geoJsonBuilder.writeGeom(debugGeometry);
             }
             geoJsonBuilder.endObject();
         }

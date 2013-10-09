@@ -37,6 +37,10 @@ public class IsoChroneRequest {
     @Setter
     private int precisionMeters = 200;
 
+    @Getter
+    private int minCutoffSec = Integer.MAX_VALUE;
+    
+    @Getter
     private int maxCutoffSec = 0;
 
     public IsoChroneRequest(List<Integer> cutoffSecList) {
@@ -44,11 +48,9 @@ public class IsoChroneRequest {
         for (Integer cutoffSec : cutoffSecList) {
             if (cutoffSec > maxCutoffSec)
                 maxCutoffSec = cutoffSec;
+            if (cutoffSec < minCutoffSec)
+                minCutoffSec = cutoffSec;
         }
-    }
-
-    public int getMaxCutoffSec() {
-        return maxCutoffSec;
     }
 
     @Override

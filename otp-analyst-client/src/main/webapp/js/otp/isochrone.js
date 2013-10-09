@@ -13,10 +13,11 @@
  */
 
 var INIT_LOCATION = new L.LatLng(44.840, -0.574); // Bordeaux
-// var INIT_LOCATION = new L.LatLng(47.059, -0.880); // Cholet
+//var INIT_LOCATION = new L.LatLng(47.059, -0.880); // Cholet
 var ROUTER_ID = ""; // Default router
 // var ISOCHRONE_TIMES = [ 1800 ]; // secs
-var ISOCHRONE_TIMES = [ 1800, 2700, 3600 ]; // secs
+var ISOCHRONE_TIMES = [ 900, 1800, 2700 ]; // secs
+// var ISOCHRONE_TIMES = [ 900, 1800, 2700, 3600, 4500, 5400 ]; // secs
 var DATE = '2013/10/01';
 var TIME = '12:00:00';
 var MODES = 'WALK,TRANSIT';
@@ -97,7 +98,7 @@ function updateIsochrones() {
 				var debug = L.geoJson(geoJsonData[i].debugGeometry, {
 					style : {
 						color : "#FF0000",
-						weight : 1,
+						weight : 2,
 						fillOpacity : 0.1,
 						fillColor : "#FF0000"
 					},

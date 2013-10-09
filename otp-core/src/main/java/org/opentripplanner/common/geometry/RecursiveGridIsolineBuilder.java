@@ -52,7 +52,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * 
  * @author laurent
  */
-public class RecursiveGridIsolineBuilder implements IsolineBuilder {
+public class RecursiveGridIsolineBuilder {
 
     public interface ZFunc {
         public long z(Coordinate c);
@@ -315,7 +315,6 @@ public class RecursiveGridIsolineBuilder implements IsolineBuilder {
         this.debugCrossingEdges = debugCrossingEdges;
     }
 
-    @Override
     public Geometry computeIsoline(long z0) {
         fzInterpolateCount = 0;
         GeometryFactory geomFactory = new GeometryFactory();
