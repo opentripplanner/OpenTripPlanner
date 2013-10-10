@@ -18,11 +18,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 
+import org.opentripplanner.common.geometry.SparseMatrix.Visitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,46 +100,8 @@ public class AccSamplingGridIsolineBuilder implements IsolineBuilder {
         UP, DOWN, LEFT, RIGHT;
     }
 
-    /**
-     * A fast XY-index for tiles, allowing to use maps.
-     */
-    private static class XYIndex {
-
-        private int xIndex;
-
-        private int yIndex;
-
-        private XYIndex(int xIndex, int yIndex) {
-            this.xIndex = xIndex;
-            this.yIndex = yIndex;
-        }
-
-        private final XYIndex translated(int dx, int dy) {
-            return new XYIndex(this.xIndex + dx, this.yIndex + dy);
-        }
-
-        @Override
-        public final int hashCode() {
-            return xIndex >> 16 | yIndex;
-        }
-
-        @Override
-        public final boolean equals(Object other) {
-            if (other instanceof XYIndex) {
-                XYIndex otherTileIndex = (XYIndex) other;
-                return otherTileIndex.xIndex == this.xIndex && otherTileIndex.yIndex == this.yIndex;
-            }
-            return false;
-        }
-
-        @Override
-        public final String toString() {
-            return "(" + xIndex + "," + yIndex + ")";
-        }
-    }
-
     private static class GridSample {
-        private XYIndex index;
+        private int x, y;
 
         private double[] zz;
 
@@ -148,27 +109,14 @@ public class AccSamplingGridIsolineBuilder implements IsolineBuilder {
 
         private boolean vProcessed, hProcessed;
 
-        private GridSample(XYIndex index) {
-            this.index = index;
-        }
-
-        @Override
-        public final int hashCode() {
-            return index.hashCode();
-        }
-
-        @Override
-        public final boolean equals(Object other) {
-            if (other instanceof GridSample) {
-                // Only compare position, not Z value which should be identical
-                return this.index.equals(((GridSample) other).index);
-            }
-            return false;
+        private GridSample(int x, int y) {
+            this.x = x;
+            this.y = y;
         }
 
         @Override
         public final String toString() {
-            return "[Sample" + index + "," + Arrays.toString(zz) + "]";
+            return "[Sample(" + x + "," + y + ")," + Arrays.toString(zz) + "]";
         }
     }
 
@@ -180,7 +128,7 @@ public class AccSamplingGridIsolineBuilder implements IsolineBuilder {
 
     private ZFunc zFunc;
 
-    private Map<XYIndex, GridSample> allSamples;
+    private SparseMatrix<GridSample> allSamples;
 
     private boolean closed = false;
 
@@ -209,7 +157,7 @@ public class AccSamplingGridIsolineBuilder implements IsolineBuilder {
          */
         this.center = center;
         this.zFunc = zFunc;
-        allSamples = new HashMap<XYIndex, GridSample>(size);
+        allSamples = new SparseMatrix<GridSample>(16, size);
         LOG.debug("Center={} dX={} dY={}", this.center, dX, dY);
     }
 
@@ -226,46 +174,48 @@ public class AccSamplingGridIsolineBuilder implements IsolineBuilder {
         // debugGeom.add(geometryFactory.createLineString(new Coordinate[] { C0,
         // new Coordinate(C0.x + z / 1000000, C0.y + z / 1000000) }));
         // }
-        XYIndex iA = getLowerLeftIndex(C0);
+        int x = (int) Math.round((C0.x - center.x - dX / 2) / dX);
+        int y = (int) Math.round((C0.y - center.y - dY / 2) / dY);
+
         GridSample[] ABCD = new GridSample[4];
-        ABCD[0] = getOrCreateSample(iA);
-        ABCD[1] = ABCD[0].right != null ? ABCD[0].right : getOrCreateSample(iA.translated(1, 0));
-        ABCD[2] = ABCD[0].up != null ? ABCD[0].up : getOrCreateSample(iA.translated(0, 1));
-        ABCD[3] = ABCD[1].up != null ? ABCD[1].up : getOrCreateSample(iA.translated(1, 1));
+        ABCD[0] = getOrCreateSample(x, y);
+        ABCD[1] = ABCD[0].right != null ? ABCD[0].right : getOrCreateSample(x + 1, y);
+        ABCD[2] = ABCD[0].up != null ? ABCD[0].up : getOrCreateSample(x, y + 1);
+        ABCD[3] = ABCD[1].up != null ? ABCD[1].up : getOrCreateSample(x + 1, y + 1);
         for (GridSample P : ABCD) {
-            Coordinate C = getCoordinate(P.index);
+            Coordinate C = getCoordinate(P.x, P.y);
             P.zz = zFunc.cumulateSample(C0, C, z, P.zz);
         }
     }
 
     // TODO Add default for up, down, right and left if available
-    private final GridSample getOrCreateSample(XYIndex index) {
-        GridSample A = allSamples.get(index);
+    private final GridSample getOrCreateSample(int x, int y) {
+        GridSample A = allSamples.get(x, y);
         if (A != null)
             return A;
-        A = new GridSample(index);
+        A = new GridSample(x, y);
         A.zz = null;
-        GridSample Aright = allSamples.get(index.translated(1, 0));
+        GridSample Aright = allSamples.get(x + 1, y);
         if (Aright != null) {
             Aright.left = A;
             A.right = Aright;
         }
-        GridSample Aleft = allSamples.get(index.translated(-1, 0));
+        GridSample Aleft = allSamples.get(x - 1, y);
         if (Aleft != null) {
             Aleft.right = A;
             A.left = Aleft;
         }
-        GridSample Aup = allSamples.get(index.translated(0, 1));
+        GridSample Aup = allSamples.get(x, y + 1);
         if (Aup != null) {
             Aup.down = A;
             A.up = Aup;
         }
-        GridSample Adown = allSamples.get(index.translated(0, -1));
+        GridSample Adown = allSamples.get(x, y - 1);
         if (Adown != null) {
             Adown.up = A;
             A.down = Adown;
         }
-        allSamples.put(index, A);
+        allSamples.put(x, y, A);
         return A;
     }
 
@@ -273,8 +223,12 @@ public class AccSamplingGridIsolineBuilder implements IsolineBuilder {
      * Surround all existing sample on the edge by 2 layers of closing samples.
      */
     private final void closeSamples() {
-        List<GridSample> processList = new ArrayList<GridSample>(allSamples.size());
-        processList.addAll(allSamples.values());
+        final List<GridSample> processList = new ArrayList<GridSample>(allSamples.size());
+        allSamples.iterate(new Visitor<GridSample>() {
+            public void visit(GridSample A) {
+                processList.add(A);
+            }
+        });
         int n = 0;
         final int N_STAGES = 1;
         for (int i = 0; i < N_STAGES; i++) {
@@ -282,30 +236,33 @@ public class AccSamplingGridIsolineBuilder implements IsolineBuilder {
                     i == 0 ? processList.size() / 10 : processList.size() * 5 / 4);
             for (GridSample A : processList) {
                 if (A.right == null) {
-                    newProcessList.add(closeSample(A.index.translated(1, 0)));
+                    newProcessList.add(closeSample(A.x + 1, A.y));
                     n++;
                 }
                 if (A.left == null) {
-                    newProcessList.add(closeSample(A.index.translated(-1, 0)));
+                    newProcessList.add(closeSample(A.x - 1, A.y));
                     n++;
                 }
                 if (A.up == null) {
-                    newProcessList.add(closeSample(A.index.translated(0, 1)));
+                    newProcessList.add(closeSample(A.x, A.y + 1));
                     n++;
                 }
                 if (A.down == null) {
-                    newProcessList.add(closeSample(A.index.translated(0, -1)));
+                    newProcessList.add(closeSample(A.x, A.y - 1));
                     n++;
                 }
             }
-            processList = newProcessList;
+            if (i < N_STAGES - 1) {
+                processList.clear();
+                processList.addAll(newProcessList);
+            }
         }
-        LOG.info("Added {} closing samples to {} samples in {} stages.", n, processList.size(),
-                N_STAGES);
+        LOG.info("Added {} closing samples to get a total of {}, in {} stages.", n,
+                allSamples.size(), N_STAGES);
     }
 
-    private final GridSample closeSample(XYIndex index) {
-        GridSample A = getOrCreateSample(index);
+    private final GridSample closeSample(int x, int y) {
+        GridSample A = getOrCreateSample(x, y);
         A.zz = zFunc.closeSample(A.up != null ? A.up.zz : null, A.down != null ? A.down.zz : null,
                 A.right != null ? A.right.zz : null, A.left != null ? A.left.zz : null);
         return A;
@@ -318,12 +275,15 @@ public class AccSamplingGridIsolineBuilder implements IsolineBuilder {
             closed = true;
         }
 
-        for (GridSample A : allSamples.values()) {
-            A.hProcessed = false;
-            A.vProcessed = false;
-        }
-        Queue<GridSample> processQ = new ArrayDeque<GridSample>(allSamples.size());
-        processQ.addAll(allSamples.values());
+        final Queue<GridSample> processQ = new ArrayDeque<GridSample>(allSamples.size());
+        allSamples.iterate(new Visitor<GridSample>() {
+            @Override
+            public void visit(GridSample A) {
+                A.hProcessed = false;
+                A.vProcessed = false;
+                processQ.add(A);
+            }
+        });
 
         if (debug)
             generateDebugGeometry(zz0);
@@ -358,8 +318,8 @@ public class AccSamplingGridIsolineBuilder implements IsolineBuilder {
                     : (cut > 0 ? Direction.LEFT : Direction.RIGHT);
             while (true) {
                 // Add a point to polyline
-                Coordinate cA = getCoordinate(A.index);
-                Coordinate cB = getCoordinate(B.index);
+                Coordinate cA = getCoordinate(A.x, A.y);
+                Coordinate cB = getCoordinate(B.x, B.y);
                 double k = zFunc.interpolate(A.zz, B.zz, zz0);
                 Coordinate cC = new Coordinate(cA.x * (1.0 - k) + cB.x * k, cA.y * (1.0 - k) + cB.y
                         * k);
@@ -473,33 +433,33 @@ public class AccSamplingGridIsolineBuilder implements IsolineBuilder {
 
     private final void generateDebugGeometry(double[] zz0) {
         debug = false;
-        GeometryFactory geomFactory = new GeometryFactory();
 
-        double[] zmax = null;
-        for (GridSample A : allSamples.values()) {
-            if (zmax == null) {
-                zmax = new double[A.zz.length];
-                for (int i = 0; i < zmax.length; i++)
-                    zmax[i] = 0.0;
-            }
-            for (int i = 1; i < A.zz.length; i++) {
-                double z = A.zz[i] / A.zz[0];
-                if (A.zz[i] < Double.MAX_VALUE && z > zmax[i])
-                    zmax[i] = z;
-            }
-        }
-        for (GridSample A : allSamples.values()) {
-            Coordinate C1 = getCoordinate(A.index);
-            double[] zz = A.zz;
-            for (int i = 1; i < zz.length - 1; i++) {
-                double z = zz[i] / zz[0]; // TODO Make this more generic
-                if (z != Double.POSITIVE_INFINITY) {
-                    Coordinate C2 = new Coordinate(C1.x + z * dX / zmax[i] * 1 / 4, C1.y + z * dY
-                            / zmax[i]);
-                    debugGeom.add(geomFactory.createLineString(new Coordinate[] { C1, C2 }));
+        final double[] zmax = new double[10]; // TODO size!
+        allSamples.iterate(new Visitor<GridSample>() {
+            @Override
+            public void visit(GridSample A) {
+                for (int i = 1; i < A.zz.length; i++) {
+                    double z = A.zz[i] / A.zz[0];
+                    if (A.zz[i] < Double.MAX_VALUE && z > zmax[i])
+                        zmax[i] = z;
                 }
             }
-        }
+        });
+        allSamples.iterate(new Visitor<GridSample>() {
+            @Override
+            public void visit(GridSample A) {
+                Coordinate C1 = getCoordinate(A.x, A.y);
+                double[] zz = A.zz;
+                for (int i = 1; i < zz.length - 1; i++) {
+                    double z = zz[i] / zz[0]; // TODO Make this more generic
+                    if (z != Double.POSITIVE_INFINITY) {
+                        Coordinate C2 = new Coordinate(C1.x + z * dX / zmax[i] * 1 / 4, C1.y + z
+                                * dY / zmax[i]);
+                        debugGeom.add(geometryFactory.createLineString(new Coordinate[] { C1, C2 }));
+                    }
+                }
+            }
+        });
     }
 
     public final Geometry getDebugGeometry() {
@@ -507,14 +467,8 @@ public class AccSamplingGridIsolineBuilder implements IsolineBuilder {
                 .size()]));
     }
 
-    private final XYIndex getLowerLeftIndex(Coordinate p) {
-        int xIndex = (int) Math.round((p.x - center.x - dX / 2) / dX);
-        int yIndex = (int) Math.round((p.y - center.y - dY / 2) / dY);
-        return new XYIndex(xIndex, yIndex);
-    }
-
-    private final Coordinate getCoordinate(XYIndex index) {
-        return new Coordinate(index.xIndex * dX + center.x, index.yIndex * dY + center.y);
+    private final Coordinate getCoordinate(int x, int y) {
+        return new Coordinate(x * dX + center.x, y * dY + center.y);
     }
 
     @SuppressWarnings("unchecked")
