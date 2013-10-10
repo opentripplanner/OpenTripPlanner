@@ -420,9 +420,13 @@ public class AccSamplingGridIsolineBuilder implements IsolineBuilder {
             }
             // Close the polyline
             polyPoints.add(polyPoints.get(0));
-            LinearRing ring = geometryFactory.createLinearRing(polyPoints
-                    .toArray(new Coordinate[polyPoints.size()]));
-            rings.add(ring);
+            if (polyPoints.size() > 5) {
+                // If the ring is smaller than 4 points do not add it,
+                // that will remove too small islands or holes.
+                LinearRing ring = geometryFactory.createLinearRing(polyPoints
+                        .toArray(new Coordinate[polyPoints.size()]));
+                rings.add(ring);
+            }
         }
         List<Polygon> retval = punchHoles(rings);
         return geometryFactory
