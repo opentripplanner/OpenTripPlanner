@@ -26,8 +26,8 @@ import javax.ws.rs.core.Response;
 
 import org.opentripplanner.analyst.core.IsochroneData;
 import org.opentripplanner.analyst.request.IsoChroneRequest;
-import org.opentripplanner.analyst.request.IsoChroneSPTRenderer;
-import org.opentripplanner.analyst.request.IsoChroneSPTRenderer2;
+import org.opentripplanner.analyst.request.IsoChroneSPTRendererAccSampling;
+import org.opentripplanner.analyst.request.IsoChroneSPTRendererRecursiveGrid;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.util.GeoJSONBuilder;
@@ -41,31 +41,38 @@ import com.vividsolutions.jts.geom.Geometry;
  * Return isochrone geometry as a set of GeoJSON polygons.
  * 
  * Example of request:
- * http://localhost:8080/otp-rest-servlet/ws/iso2?fromPlace=47.059,-0.880&date=2013/10/01
+ * http://localhost:8080/otp-rest-servlet/ws/isochrone?routerId=bordeaux&algorithm
+ * =accSampling&fromPlace=47.059,-0.880&date=2013/10/01
  * &time=12:00:00&maxWalkDistance=1000&mode=WALK,TRANSIT&cutoffSec=1800&cutoffSec=3600
  * 
  * @author laurent
  */
-@Path("/iso2")
+@Path("/isochrone")
 public class IsoChrone2 extends RoutingResource {
 
     @SuppressWarnings("unused")
     private static final Logger LOG = LoggerFactory.getLogger(IsoChrone2.class);
 
     @InjectParam
-    private IsoChroneSPTRenderer renderer;
+    private IsoChroneSPTRendererAccSampling accSamplingRenderer;
 
     @InjectParam
-    private IsoChroneSPTRenderer2 oldRenderer;
+    private IsoChroneSPTRendererRecursiveGrid recursiveGridRenderer;
 
     @QueryParam("cutoffSec")
-    List<Integer> cutoffSecList;
+    private List<Integer> cutoffSecList;
 
     @QueryParam("debug")
-    Boolean debug;
+    private Boolean debug;
+
+    @QueryParam("algorithm")
+    private String algorithm;
 
     @QueryParam("precisionMeters")
     private Integer precisionMeters;
+
+    @QueryParam("routerId")
+    private String routerId;
 
     @GET
     @Produces({ MediaType.APPLICATION_JSON })
@@ -81,8 +88,14 @@ public class IsoChrone2 extends RoutingResource {
         isoChroneRequest.setPrecisionMeters(precisionMeters);
         RoutingRequest sptRequest = buildRequest(0);
 
-        List<IsochroneData> isochrones = renderer.getIsochrones(isoChroneRequest, sptRequest);
-        //List<IsochroneData> isochrones = oldRenderer.getIsochrones(isoChroneRequest, sptRequest);
+        List<IsochroneData> isochrones;
+        if (algorithm == null || "accSampling".equals(algorithm)) {
+            isochrones = accSamplingRenderer.getIsochrones(isoChroneRequest, sptRequest);
+        } else if ("recursiveGrid".equals(algorithm)) {
+            isochrones = recursiveGridRenderer.getIsochrones(isoChroneRequest, sptRequest);
+        } else {
+            throw new IllegalArgumentException("Unknown algorithm: " + algorithm);
+        }
         StringWriter geoJsonWriter = new StringWriter();
         GeoJSONBuilder geoJsonBuilder = new GeoJSONBuilder(geoJsonWriter);
         geoJsonBuilder.array();

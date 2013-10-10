@@ -1,3 +1,16 @@
+/* This program is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
 package org.opentripplanner.analyst.request;
 
 import java.util.ArrayList;
@@ -29,9 +42,10 @@ import com.vividsolutions.jts.geom.Coordinate;
  * @author laurent
  */
 @Component
-public class IsoChroneSPTRenderer2 {
+public class IsoChroneSPTRendererRecursiveGrid implements IsoChroneSPTRenderer {
 
-    private static final Logger LOG = LoggerFactory.getLogger(IsoChroneSPTRenderer2.class);
+    private static final Logger LOG = LoggerFactory
+            .getLogger(IsoChroneSPTRendererRecursiveGrid.class);
 
     @Autowired
     private GraphService graphService;
@@ -46,10 +60,14 @@ public class IsoChroneSPTRenderer2 {
      * @param isoChroneRequest
      * @param sptRequest
      * @return
-     * @throws Exception
      */
+    @Override
     public List<IsochroneData> getIsochrones(IsoChroneRequest isoChroneRequest,
-            RoutingRequest sptRequest) throws Exception {
+            RoutingRequest sptRequest) {
+
+        if (sptRequest.getRouterId() != null && !sptRequest.getRouterId().isEmpty())
+            throw new IllegalArgumentException(
+                    "TODO: SampleSource is not multi-router compatible (yet).");
 
         // 1. Compute the Shortest Path Tree.
         long t0 = System.currentTimeMillis();

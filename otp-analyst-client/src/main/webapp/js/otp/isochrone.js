@@ -13,16 +13,17 @@
  */
 
 var INIT_LOCATION = new L.LatLng(44.840, -0.574); // Bordeaux
-//var INIT_LOCATION = new L.LatLng(47.059, -0.880); // Cholet
-var ROUTER_ID = ""; // Default router
+// var INIT_LOCATION = new L.LatLng(47.059, -0.880); // Cholet
+var ROUTER_ID = null; // Default router
+var ALGORITHM = "accSampling"; // accSampling or recursiveGrid
 // var ISOCHRONE_TIMES = [ 1800 ]; // secs
 var ISOCHRONE_TIMES = [ 900, 1800, 2700 ]; // secs
-// var ISOCHRONE_TIMES = [ 900, 1800, 2700, 3600, 4500, 5400 ]; // secs
+// var ISOCHRONE_TIMES = [ 900, 1800, 2700, 3600, 4500 ]; // secs
 var DATE = '2013/10/01';
 var TIME = '12:00:00';
 var MODES = 'WALK,TRANSIT';
 var DEBUG = false;
-var PRECISION = 200; // meters
+var PRECISION = 100; // meters
 var MAX_WALK_DISTANCE = 1000;
 
 // Initialize a map
@@ -69,11 +70,13 @@ map.on('click', mapClick);
 
 function updateIsochrones() {
 	var xhr = new XMLHttpRequest();
-	// http://localhost:8080/otp-rest-servlet/ws/iso2?batch=true&fromPlace=47.059,-0.880&date=2013/10/01&time=12:00:00&maxWalkDistance=1000&mode=WALK,TRANSIT&cutoffSec=3000
-	var req = '/otp-rest-servlet/ws/iso2?fromPlace='
+	// http://localhost:8080/otp-rest-servlet/ws/isochrone?batch=true&fromPlace=47.059,-0.880&date=2013/10/01&time=12:00:00&maxWalkDistance=1000&mode=WALK,TRANSIT&cutoffSec=3000
+	var req = '/otp-rest-servlet/ws/isochrone?algorithm=' + ALGORITHM
+			+ (ROUTER_ID ? '&routerId=' + ROUTER_ID : '') + '&fromPlace='
 			+ origMarker.getLatLng().lat + ',' + origMarker.getLatLng().lng
 			+ '&date=' + DATE + '&time=' + TIME + '&mode=' + MODES
-			+ '&maxWalkDistance=' + MAX_WALK_DISTANCE + '&precisionMeters=' + PRECISION;
+			+ '&maxWalkDistance=' + MAX_WALK_DISTANCE + '&precisionMeters='
+			+ PRECISION;
 	for ( var i = 0; i < ISOCHRONE_TIMES.length; i++) {
 		req = req + '&cutoffSec=' + ISOCHRONE_TIMES[i];
 	}

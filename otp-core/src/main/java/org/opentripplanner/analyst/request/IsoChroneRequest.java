@@ -39,7 +39,7 @@ public class IsoChroneRequest {
 
     @Getter
     private int minCutoffSec = Integer.MAX_VALUE;
-    
+
     @Getter
     private int maxCutoffSec = 0;
 
