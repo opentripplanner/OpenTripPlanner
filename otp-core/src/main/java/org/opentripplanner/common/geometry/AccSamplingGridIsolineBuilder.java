@@ -178,42 +178,49 @@ public class AccSamplingGridIsolineBuilder implements IsolineBuilder {
         int y = (int) Math.round((C0.y - center.y - dY / 2) / dY);
 
         GridSample[] ABCD = new GridSample[4];
-        ABCD[0] = getOrCreateSample(x, y);
-        ABCD[1] = ABCD[0].right != null ? ABCD[0].right : getOrCreateSample(x + 1, y);
-        ABCD[2] = ABCD[0].up != null ? ABCD[0].up : getOrCreateSample(x, y + 1);
-        ABCD[3] = ABCD[1].up != null ? ABCD[1].up : getOrCreateSample(x + 1, y + 1);
+        ABCD[0] = getOrCreateSample(x, y, null, null, null, null);
+        ABCD[1] = ABCD[0].right != null ? ABCD[0].right : getOrCreateSample(x + 1, y, null, null,
+                null, ABCD[0]);
+        ABCD[2] = ABCD[0].up != null ? ABCD[0].up : getOrCreateSample(x, y + 1, null, ABCD[0],
+                null, null);
+        ABCD[3] = ABCD[1].up != null ? ABCD[1].up : getOrCreateSample(x + 1, y + 1, null, ABCD[1],
+                null, ABCD[2]);
         for (GridSample P : ABCD) {
             Coordinate C = getCoordinate(P.x, P.y);
             P.zz = zFunc.cumulateSample(C0, C, z, P.zz);
         }
     }
 
-    // TODO Add default for up, down, right and left if available
-    private final GridSample getOrCreateSample(int x, int y) {
+    private final GridSample getOrCreateSample(int x, int y, GridSample Aup, GridSample Adown,
+            GridSample Aright, GridSample Aleft) {
         GridSample A = allSamples.get(x, y);
         if (A != null)
             return A;
         A = new GridSample(x, y);
         A.zz = null;
-        GridSample Aright = allSamples.get(x + 1, y);
-        if (Aright != null) {
-            Aright.left = A;
-            A.right = Aright;
-        }
-        GridSample Aleft = allSamples.get(x - 1, y);
-        if (Aleft != null) {
-            Aleft.right = A;
-            A.left = Aleft;
-        }
-        GridSample Aup = allSamples.get(x, y + 1);
+        if (Aup == null)
+            Aup = allSamples.get(x, y + 1);
         if (Aup != null) {
             Aup.down = A;
             A.up = Aup;
         }
-        GridSample Adown = allSamples.get(x, y - 1);
+        if (Adown == null)
+            Adown = allSamples.get(x, y - 1);
         if (Adown != null) {
             Adown.up = A;
             A.down = Adown;
+        }
+        if (Aright == null)
+            Aright = allSamples.get(x + 1, y);
+        if (Aright != null) {
+            Aright.left = A;
+            A.right = Aright;
+        }
+        if (Aleft == null)
+            Aleft = allSamples.get(x - 1, y);
+        if (Aleft != null) {
+            Aleft.right = A;
+            A.left = Aleft;
         }
         allSamples.put(x, y, A);
         return A;
@@ -232,27 +239,28 @@ public class AccSamplingGridIsolineBuilder implements IsolineBuilder {
         int n = 0;
         for (GridSample A : processList) {
             if (A.right == null) {
-                closeSample(A.x + 1, A.y);
+                closeSample(A.x + 1, A.y, null, null, null, A);
                 n++;
             }
             if (A.left == null) {
-                closeSample(A.x - 1, A.y);
+                closeSample(A.x - 1, A.y, null, null, A, null);
                 n++;
             }
             if (A.up == null) {
-                closeSample(A.x, A.y + 1);
+                closeSample(A.x, A.y + 1, null, A, null, null);
                 n++;
             }
             if (A.down == null) {
-                closeSample(A.x, A.y - 1);
+                closeSample(A.x, A.y - 1, A, null, null, null);
                 n++;
             }
         }
         LOG.info("Added {} closing samples to get a total of {}.", n, allSamples.size());
     }
 
-    private final GridSample closeSample(int x, int y) {
-        GridSample A = getOrCreateSample(x, y);
+    private final GridSample closeSample(int x, int y, GridSample up, GridSample down,
+            GridSample right, GridSample left) {
+        GridSample A = getOrCreateSample(x, y, up, down, right, left);
         A.zz = zFunc.closeSample(A.up != null ? A.up.zz : null, A.down != null ? A.down.zz : null,
                 A.right != null ? A.right.zz : null, A.left != null ? A.left.zz : null);
         return A;
