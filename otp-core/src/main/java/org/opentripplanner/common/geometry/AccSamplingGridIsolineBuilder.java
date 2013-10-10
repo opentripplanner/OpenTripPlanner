@@ -230,35 +230,25 @@ public class AccSamplingGridIsolineBuilder implements IsolineBuilder {
             }
         });
         int n = 0;
-        final int N_STAGES = 1;
-        for (int i = 0; i < N_STAGES; i++) {
-            List<GridSample> newProcessList = new ArrayList<GridSample>(
-                    i == 0 ? processList.size() / 10 : processList.size() * 5 / 4);
-            for (GridSample A : processList) {
-                if (A.right == null) {
-                    newProcessList.add(closeSample(A.x + 1, A.y));
-                    n++;
-                }
-                if (A.left == null) {
-                    newProcessList.add(closeSample(A.x - 1, A.y));
-                    n++;
-                }
-                if (A.up == null) {
-                    newProcessList.add(closeSample(A.x, A.y + 1));
-                    n++;
-                }
-                if (A.down == null) {
-                    newProcessList.add(closeSample(A.x, A.y - 1));
-                    n++;
-                }
+        for (GridSample A : processList) {
+            if (A.right == null) {
+                closeSample(A.x + 1, A.y);
+                n++;
             }
-            if (i < N_STAGES - 1) {
-                processList.clear();
-                processList.addAll(newProcessList);
+            if (A.left == null) {
+                closeSample(A.x - 1, A.y);
+                n++;
+            }
+            if (A.up == null) {
+                closeSample(A.x, A.y + 1);
+                n++;
+            }
+            if (A.down == null) {
+                closeSample(A.x, A.y - 1);
+                n++;
             }
         }
-        LOG.info("Added {} closing samples to get a total of {}, in {} stages.", n,
-                allSamples.size(), N_STAGES);
+        LOG.info("Added {} closing samples to get a total of {}.", n, allSamples.size());
     }
 
     private final GridSample closeSample(int x, int y) {
