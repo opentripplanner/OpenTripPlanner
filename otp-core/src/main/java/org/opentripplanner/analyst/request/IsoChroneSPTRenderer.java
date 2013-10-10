@@ -1,5 +1,7 @@
 package org.opentripplanner.analyst.request;
 
+import static org.apache.commons.math3.util.FastMath.toRadians;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -74,17 +76,16 @@ public class IsoChroneSPTRenderer {
         long t1 = System.currentTimeMillis();
         Coordinate center = sptRequest.getFrom().getCoordinate();
         final double gridSizeMeters = isoChroneRequest.getPrecisionMeters();
+        final double cosLat = FastMath.cos(toRadians(center.y));
         double dY = Math.toDegrees(gridSizeMeters / SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_M);
-        double dX = dY / FastMath.cos(Math.toRadians(center.y));
+        double dX = dY / cosLat;
 
         ZFunc zFunc = new ZFunc() {
-            // Note: zz[] = { w, t, d }.
+            // Note: zz[] = { w, t.w, d }.
             @Override
             public double[] cumulateSample(Coordinate C0, Coordinate Cs, double z, double[] zzS) {
-                // TODO Optimize this by factoring out cos(Y) constant
-                // and removing the exp()
                 double t = z;
-                double d = distanceLibrary.fastDistance(C0, Cs); // meters
+                double d = distanceLibrary.fastDistance(C0, Cs, cosLat);
                 // additionnal time
                 double dt = d / V0;
                 // t weight
@@ -120,8 +121,8 @@ public class IsoChroneSPTRenderer {
 
             @Override
             public int cut(double[] zzA, double[] zzB, double[] zz0) {
-                double dA = zzA[2] / zzA[0];
-                double dB = zzB[2] / zzB[0];
+                double dA = zzA[2];
+                double dB = zzB[2];
                 double t0 = zz0[0];
                 double d0 = zz0[1];
                 double tA = dA > d0 ? Double.POSITIVE_INFINITY : zzA[1] / zzA[0];
@@ -135,8 +136,8 @@ public class IsoChroneSPTRenderer {
 
             @Override
             public double interpolate(double[] zzA, double[] zzB, double[] zz0) {
-                double dA = zzA[2] / zzA[0];
-                double dB = zzB[2] / zzB[0];
+                double dA = zzA[2];
+                double dB = zzB[2];
                 double t0 = zz0[0];
                 double d0 = zz0[1];
                 if (dA > d0 || dB > d0) {
@@ -158,7 +159,7 @@ public class IsoChroneSPTRenderer {
                 center, zFunc, spt.getVertexCount());
         isolineBuilder.setDebug(isoChroneRequest.isIncludeDebugGeometry());
         computeInitialPoints(spt, isolineBuilder, gridSizeMeters * 0.7, V0,
-                isoChroneRequest.getMaxCutoffSec() + tOvershot);
+                isoChroneRequest.getMaxCutoffSec() + tOvershot, cosLat);
 
         long t2 = System.currentTimeMillis();
         List<IsochroneData> isochrones = new ArrayList<IsochroneData>();
@@ -184,7 +185,8 @@ public class IsoChroneSPTRenderer {
      * @return
      */
     private void computeInitialPoints(ShortestPathTree spt,
-            AccSamplingGridIsolineBuilder isolineBuilder, double d0, double v0, long tMax) {
+            AccSamplingGridIsolineBuilder isolineBuilder, double d0, double v0, long tMax,
+            double cosLat) {
         int n = 0;
         int nSkippedDupEdge = 0, nSkippedTimeOut = 0;
         Collection<? extends State> allStates = spt.getAllStates();
@@ -202,14 +204,14 @@ public class IsoChroneSPTRenderer {
                         nSkippedTimeOut++;
                         continue;
                     }
-                    if (e.getFromVertex() == null || e.getToVertex() == null) {
-                        continue;
+                    if (e.getFromVertex() != null && e.getToVertex() != null) {
+                        // Hack alert: e.hashCode() throw NPE
+                        if (processedEdges.contains(e)) {
+                            nSkippedDupEdge++;
+                            continue;
+                        }
+                        processedEdges.add(e);
                     }
-                    if (processedEdges.contains(e)) {
-                        nSkippedDupEdge++;
-                        continue;
-                    }
-                    processedEdges.add(e);
                     Vertex vx0 = s0.getVertex();
                     Vertex vx1 = s1.getVertex();
                     LineString lineString = e.getGeometry();
@@ -220,7 +222,7 @@ public class IsoChroneSPTRenderer {
                     Coordinate[] pList = lineString.getCoordinates();
                     boolean reverse = vx1.getCoordinate().equals(pList[0]);
                     // Length of linestring
-                    double lineStringLen = distanceLibrary.fastLength(lineString);
+                    double lineStringLen = distanceLibrary.fastLength(lineString, cosLat);
                     // Split the linestring in nSteps
                     if (lineStringLen > d0) {
                         int nSteps = (int) Math.floor(lineStringLen / d0) + 1; // Number of steps
@@ -251,8 +253,7 @@ public class IsoChroneSPTRenderer {
                 }
             }
         }
-        LOG.info(
-                "Created {} initial points ({} dup edges, {} out time) from {} states.",
-                n, nSkippedDupEdge, nSkippedTimeOut, allStates.size());
+        LOG.info("Created {} initial points ({} dup edges, {} out time) from {} states.", n,
+                nSkippedDupEdge, nSkippedTimeOut, allStates.size());
     }
 }
