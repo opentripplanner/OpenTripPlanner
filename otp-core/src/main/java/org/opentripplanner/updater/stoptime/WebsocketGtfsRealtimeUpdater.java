@@ -13,12 +13,12 @@
 
 package org.opentripplanner.updater.stoptime;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.prefs.Preferences;
 
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.trippattern.TripUpdateList;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
@@ -27,8 +27,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import com.google.transit.realtime.GtfsRealtime;
+import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.ning.http.client.AsyncHttpClient;
 import com.ning.http.client.websocket.DefaultWebSocketListener;
 import com.ning.http.client.websocket.WebSocket;
@@ -39,29 +40,28 @@ import com.ning.http.client.websocket.WebSocketUpgradeHandler;
  * This class starts an HTTP client which opens a websocket connection to a GTFS-RT data source. A
  * callback is registered which handles incoming GTFS-RT messages as they stream in by placing a
  * GTFS-RT decoder Runnable task in the single-threaded executor for handling.
- * 
+ *
  * Usage example ('websocket' name is an example) in the file 'Graph.properties':
- * 
+ *
  * <pre>
  * websocket.type = websocket-stop-time-updater
  * websocket.defaultAgencyId = agency
  * websocket.url = ws://localhost:8088/tripUpdates
  * </pre>
- * 
+ *
  */
 public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
-
     /**
      * Number of seconds to wait before checking again whether we are still connected
      */
     private static final int CHECK_CONNECTION_PERIOD_SEC = 1;
-    
+
     private static final int DEFAULT_RECONNECT_PERIOD_SEC = 300; // Five minutes
 
     private static Logger LOG = LoggerFactory.getLogger(WebsocketGtfsRealtimeUpdater.class);
 
     /**
-     * Parent update manager. Is used to execute graph writer runnables. 
+     * Parent update manager. Is used to execute graph writer runnables.
      */
     private GraphUpdaterManager updaterManager;
 
@@ -71,10 +71,10 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
     private String url;
 
     /**
-     * Default agency id that is used for the trip id's in the TripUpdateLists
+     * Default agency id that is used for the trip ids in the TripUpdates
      */
     private String agencyId;
-    
+
     /**
      * The number of seconds to wait before reconnecting after a failed connection.
      */
@@ -138,12 +138,12 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
                 LOG.error("Unknown exception when trying to connect to {}:", url, e);
                 connectionSuccessful = false;
             }
-            
+
             // If connection was unsuccessful, wait some time before trying again
             if (!connectionSuccessful) {
                 Thread.sleep(reconnectPeriodSec * 1000);
             }
-            
+
             // Keep checking whether connection is still open
             while (true) {
                 if (socket == null || !socket.isOpen()) {
@@ -155,6 +155,8 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
                 }
                 Thread.sleep(CHECK_CONNECTION_PERIOD_SEC * 1000);
             }
+
+            client.close();
         }
     }
 
@@ -168,13 +170,21 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
     private class Listener extends DefaultWebSocketListener {
         @Override
         public void onMessage(byte[] message) {
+            FeedMessage feedMessage = null;
+            List<FeedEntity> feedEntityList = null;
+            List<TripUpdate> updates = null;
             try {
-                // Decode message into TripUpdateList
-                FeedMessage feed = GtfsRealtime.FeedMessage.PARSER.parseFrom(message);
-                List<TripUpdateList> updates = TripUpdateList.decodeFromGtfsRealtime(feed, agencyId);
+                // Decode message into List of TripUpdates
+                feedMessage = FeedMessage.PARSER.parseFrom(message);
+                feedEntityList = feedMessage.getEntityList();
+                updates = new ArrayList<TripUpdate>(feedEntityList.size());
+                for (FeedEntity feedEntity : feedEntityList) {
+                    updates.add(feedEntity.getTripUpdate());
+                }
 
                 // Handle trip updates via graph writer runnable
-                TripUpdateGraphWriterRunnable runnable = new TripUpdateGraphWriterRunnable(updates);
+                TripUpdateGraphWriterRunnable runnable =
+                        new TripUpdateGraphWriterRunnable(updates, agencyId);
                 updaterManager.execute(runnable);
             } catch (InvalidProtocolBufferException e) {
                 LOG.error("Could not decode gtfs-rt message:", e);

@@ -32,11 +32,9 @@ import com.google.transit.realtime.GtfsRealtime.EntitySelector;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TimeRange;
-import com.google.transit.realtime.GtfsRealtime.TranslatedString.Translation;
 
-/**  
- * This presently only includes GTFS-Realtime Service Alert feeds; 
- * we hope to eventually include Trip Updates as well. 
+/**
+ * This updater only includes GTFS-Realtime Service Alert feeds.
  * @author novalis
  *
  */
@@ -51,9 +49,6 @@ public class AlertsUpdateHandler {
 
     /** How long before the posted start of an event it should be displayed to users */
     private long earlyStart;
-
-    public AlertsUpdateHandler() {
-    }
 
     public void update(FeedMessage message) {
         patchService.expire(patchIds);
@@ -79,8 +74,8 @@ public class AlertsUpdateHandler {
         if(alert.getActivePeriodCount() > 0) {
             long bestStartTime = Long.MAX_VALUE;
             for (TimeRange activePeriod : alert.getActivePeriodList()) {
-                final long start = activePeriod.hasStart() ? activePeriod.getStart() - earlyStart : 0;
                 final long realStart = activePeriod.hasStart() ? activePeriod.getStart() : 0;
+                final long start = activePeriod.hasStart() ? realStart - earlyStart : 0;
                 if (realStart > 0 && realStart < bestStartTime) {
                     bestStartTime = realStart;
                 }
@@ -161,12 +156,12 @@ public class AlertsUpdateHandler {
 
     /**
      * convert a protobuf TranslatedString to a OTP TranslatedString
-     * 
-     * @return
+     *
+     * @return A TranslatedString containing the same information as the input
      */
-    private TranslatedString deBuffer(GtfsRealtime.TranslatedString buffered) {
+    private TranslatedString deBuffer(GtfsRealtime.TranslatedString input) {
         TranslatedString result = new TranslatedString();
-        for (Translation translation : buffered.getTranslationList()) {
+        for (GtfsRealtime.TranslatedString.Translation translation : input.getTranslationList()) {
             String language = translation.getLanguage();
             String string = translation.getText();
             result.addTranslation(language, string);
@@ -190,5 +185,4 @@ public class AlertsUpdateHandler {
     public void setEarlyStart(long earlyStart) {
         this.earlyStart = earlyStart;
     }
-
 }

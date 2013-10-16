@@ -13,7 +13,6 @@
 
 package org.opentripplanner.updater.alerts;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.prefs.Preferences;
 
@@ -26,13 +25,14 @@ import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.google.transit.realtime.GtfsRealtime;
+
+import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 
 /**
  * GTFS-RT alerts updater
- * 
+ *
  * Usage example ('myalert' name is an example) in file 'Graph.properties':
- * 
+ *
  * <pre>
  * myalert.type = real-time-alerts
  * myalert.frequencySec = 60
@@ -42,7 +42,6 @@ import com.google.transit.realtime.GtfsRealtime;
  * </pre>
  */
 public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
-    
     private static final Logger LOG = LoggerFactory.getLogger(GtfsRealtimeAlertsUpdater.class);
 
     private GraphUpdaterManager updaterManager;
@@ -70,8 +69,9 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
         PatchService patchService = new PatchServiceImpl(graph);
         this.patchService = patchService;
         String url = preferences.get("url", null);
-        if (url == null)
+        if (url == null) {
             throw new IllegalArgumentException("Missing mandatory 'url' parameter");
+        }
         this.url = url;
         this.earlyStart = preferences.getInt("earlyStartSec", 0);
         this.defaultAgencyId = preferences.get("defaultAgencyId", null);
@@ -90,21 +90,21 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    protected void runPolling() throws Exception {
+    protected void runPolling() {
         try {
             InputStream data = HttpUtils.getData(url);
             if (data == null) {
                 throw new RuntimeException("Failed to get data from url " + url);
             }
 
-            final GtfsRealtime.FeedMessage feed = GtfsRealtime.FeedMessage.PARSER.parseFrom(data);
+            final FeedMessage feed = FeedMessage.PARSER.parseFrom(data);
 
             long feedTimestamp = feed.getHeader().getTimestamp();
             if (feedTimestamp <= lastTimestamp) {
                 LOG.info("Ignoring feed with an old timestamp.");
                 return;
             }
-            
+
             // Handle update in graph writer runnable
             updaterManager.execute(new GraphWriterRunnable() {
                 @Override
@@ -114,7 +114,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
             });
 
             lastTimestamp = feedTimestamp;
-        } catch (IOException e) {
+        } catch (Exception e) {
             LOG.error("Eror reading gtfs-realtime feed from " + url, e);
         }
     }
@@ -126,5 +126,4 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
     public String toString() {
         return "GtfsRealtimeUpdater(" + url + ")";
     }
-
 }
