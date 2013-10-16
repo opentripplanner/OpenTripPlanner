@@ -21,8 +21,9 @@ import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.SimpleTimeZone;
+import java.util.TimeZone;
 
 import junit.framework.TestCase;
 
@@ -45,18 +46,20 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.routing.trippattern.TripUpdateList;
-import org.opentripplanner.routing.trippattern.Update;
-import org.opentripplanner.routing.trippattern.Update.Status;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.util.TestUtils;
+
+import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship;
 
 /**
  * This is a singleton class to hold graph data between test runs, since loading it is slow.
  */
 class Context {
-    
     public Graph graph;
 
     public GenericAStar aStar;
@@ -73,7 +76,7 @@ class Context {
     public Context() throws IOException {
         // Create a star search
         aStar = new GenericAStar();
-        
+
         // Create graph
         GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
         graph = spy(new Graph());
@@ -81,23 +84,22 @@ class Context {
         factory.run(graph);
         graph.putService(CalendarServiceData.class,
                 GtfsLibrary.createCalendarServiceData(context.getDao()));
-        
+
         // Add simple transfer to make transfer possible between N-K and F-H
         createSimpleTransfer("agency_K", "agency_F", 100);
-        
+
         // Add simple transfer to make transfer possible between O-P and U-V
         createSimpleTransfer("agency_P", "agency_U", 100);
-        
+
         // Add simple transfer to make transfer possible between U-V and I-J
         createSimpleTransfer("agency_V", "agency_I", 100);
-        
     }
 
     /**
      * Create simple transfer edge between two vertices given their labels
      * @param from is label of from vertex
      * @param to is label of to vertex
-     * @param distance is distance of transfer 
+     * @param distance is distance of transfer
      */
     @SuppressWarnings("deprecation")
     private void createSimpleTransfer(String from, String to, int distance) {
@@ -111,7 +113,6 @@ class Context {
  * Test transfers, mostly stop-to-stop transfers.
  */
 public class TestTransfers extends TestCase {
-    
     private Graph graph;
 
     private GenericAStar aStar;
@@ -141,11 +142,11 @@ public class TestTransfers extends TestCase {
         // Calculate route and convert to path
         ShortestPathTree spt = aStar.getShortestPathTree(options);
         GraphPath path = spt.getPath(options.rctx.target, optimize);
-        
+
         // Return list of states and edges in the journey
         return path;
     }
-    
+
     private List<Trip> extractTrips(GraphPath path) {
         // Get all trips in order
         List<Trip> trips = new ArrayList<Trip>();
@@ -159,29 +160,51 @@ public class TestTransfers extends TestCase {
                 }
             }
         }
-        
+
         // Return trips
         return trips;
     }
 
     /**
      * Apply an update to a table trip pattern and check whether the update was applied correctly
-     * @param serviceDate is a string of format YYYYMMDD indicating the date of the update
      */
     private void applyUpdateToTripPattern(TableTripPattern pattern, String tripId, String stopId,
-            int stopSeq, int arrive, int depart, Status prediction, int timestamp, String serviceDate) throws ParseException {
-        Update update = new Update(new AgencyAndId("agency", tripId), new AgencyAndId("agency", stopId), stopSeq, arrive, depart, prediction, timestamp, ServiceDate.parseString(serviceDate));
-        ArrayList<Update> updates = new ArrayList<Update>(Arrays.asList(update));
-        TripUpdateList tripUpdateList = TripUpdateList.splitByTrip(updates).get(0);
-        boolean success = pattern.update(tripUpdateList);
-        assertTrue(success);
+            int stopSeq, int arrive, int depart, ScheduleRelationship scheduleRelationship,
+            int timestamp, ServiceDate serviceDate) throws ParseException {
+        TimeZone timeZone = new SimpleTimeZone(-7, "PST");
+        long today = serviceDate.getAsDate(timeZone).getTime() / 1000;
+        TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
+
+        tripDescriptorBuilder.setTripId(tripId);
+
+        StopTimeEvent.Builder departStopTimeEventBuilder = StopTimeEvent.newBuilder();
+        StopTimeEvent.Builder arriveStopTimeEventBuilder = StopTimeEvent.newBuilder();
+
+        departStopTimeEventBuilder.setTime(today + depart);
+        arriveStopTimeEventBuilder.setTime(today + arrive);
+
+        StopTimeUpdate.Builder stopTimeUpdateBuilder = StopTimeUpdate.newBuilder();
+
+        stopTimeUpdateBuilder.setStopSequence(stopSeq);
+        stopTimeUpdateBuilder.setDeparture(departStopTimeEventBuilder);
+        stopTimeUpdateBuilder.setArrival(arriveStopTimeEventBuilder);
+        stopTimeUpdateBuilder.setScheduleRelationship(scheduleRelationship);
+
+        TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
+
+        tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+        tripUpdateBuilder.addStopTimeUpdate(0, stopTimeUpdateBuilder);
+
+        TripUpdate tripUpdate = tripUpdateBuilder.build();
+
+        assertTrue(pattern.update(tripUpdate, "agency", timeZone, serviceDate));
     }
-    
+
     public void testStopToStopTransfer() throws Exception {
         // Replace the transfer table with an empty table
         TransferTable table = new TransferTable();
         when(graph.getTransferTable()).thenReturn(table);
-        
+
         // Compute a normal path between two stops
         @SuppressWarnings("deprecation")
         Vertex origin = graph.getVertex("agency_N");
@@ -201,21 +224,21 @@ public class TestTransfers extends TestCase {
         // Validate result
         assertEquals("8.1", trips.get(0).getId().getId());
         assertEquals("4.2", trips.get(1).getId().getId());
-        
+
         // Add transfer to table, transfer time was 27600 seconds
         Stop stopK = new Stop();
         stopK.setId(new AgencyAndId("agency", "K"));
         Stop stopF = new Stop();
         stopF.setId(new AgencyAndId("agency", "F"));
         table.addTransferTime(stopK, stopF, null, null, null, null, 27601);
-        
+
         // Plan journey
         path = planJourney(options);
         trips = extractTrips(path);
         // Check whether a later second trip was taken
         assertEquals("8.1", trips.get(0).getId().getId());
         assertEquals("4.3", trips.get(1).getId().getId());
-        
+
         // Revert the graph, thus using the original transfer table again
         reset(graph);
     }
@@ -224,19 +247,19 @@ public class TestTransfers extends TestCase {
         // Replace the transfer table with an empty table
         TransferTable table = new TransferTable();
         when(graph.getTransferTable()).thenReturn(table);
-        
+
         // Compute a normal path between two stops
         @SuppressWarnings("deprecation")
         Vertex origin = graph.getVertex("agency_N");
         @SuppressWarnings("deprecation")
         Vertex destination = graph.getVertex("agency_H");
-        
+
         // Set options like time and routing context
         RoutingRequest options = new RoutingRequest();
         options.setArriveBy(true);
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 7, 12, 1, 0, 0);
         options.setRoutingContext(graph, origin, destination);
-        
+
         // Plan journey
         GraphPath path;
         List<Trip> trips;
@@ -245,30 +268,30 @@ public class TestTransfers extends TestCase {
         // Validate result
         assertEquals("8.1", trips.get(0).getId().getId());
         assertEquals("4.2", trips.get(1).getId().getId());
-        
+
         // Add transfer to table, transfer time was 27600 seconds
         Stop stopK = new Stop();
         stopK.setId(new AgencyAndId("agency", "K"));
         Stop stopF = new Stop();
         stopF.setId(new AgencyAndId("agency", "F"));
         table.addTransferTime(stopK, stopF, null, null, null, null, 27601);
-        
+
         // Plan journey
         path = planJourney(options, true);
         trips = extractTrips(path);
         // Check whether a later second trip was taken
         assertEquals("8.1", trips.get(0).getId().getId());
         assertEquals("4.3", trips.get(1).getId().getId());
-        
+
         // Revert the graph, thus using the original transfer table again
         reset(graph);
     }
-    
+
     public void testStopToStopTransferWithFrequency() throws Exception {
         // Replace the transfer table with an empty table
         TransferTable table = new TransferTable();
         when(graph.getTransferTable()).thenReturn(table);
-        
+
         // Compute a normal path between two stops
         @SuppressWarnings("deprecation")
         Vertex origin = graph.getVertex("agency_O");
@@ -297,15 +320,15 @@ public class TestTransfers extends TestCase {
             }
         }
         assertTrue(time >= 0);
-        
-        // Add transfer to table such that the next trip will be chosen (there are 3600 seconds between trips),
-        // transfer time was 75 seconds
+
+        // Add transfer to table such that the next trip will be chosen
+        // (there are 3600 seconds between trips), transfer time was 75 seconds
         Stop stopP = new Stop();
         stopP.setId(new AgencyAndId("agency", "P"));
         Stop stopU = new Stop();
         stopU.setId(new AgencyAndId("agency", "U"));
         table.addTransferTime(stopP, stopU, null, null, null, null, 3675);
-        
+
         // Plan journey
         path = planJourney(options);
         trips = extractTrips(path);
@@ -323,28 +346,28 @@ public class TestTransfers extends TestCase {
         assertTrue(newTime >= 0);
         assertTrue(newTime > time);
         assertEquals(3600, newTime - time);
-        
+
         // Revert the graph, thus using the original transfer table again
         reset(graph);
     }
-    
+
     public void testStopToStopTransferWithFrequencyInReverse() throws Exception {
         // Replace the transfer table with an empty table
         TransferTable table = new TransferTable();
         when(graph.getTransferTable()).thenReturn(table);
-        
+
         // Compute a normal path between two stops
         @SuppressWarnings("deprecation")
         Vertex origin = graph.getVertex("agency_U");
         @SuppressWarnings("deprecation")
         Vertex destination = graph.getVertex("agency_J");
-        
+
         // Set options like time and routing context
         RoutingRequest options = new RoutingRequest();
         options.setArriveBy(true);
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 7, 11, 11, 11, 0);
         options.setRoutingContext(graph, origin, destination);
-        
+
         // Plan journey
         GraphPath path;
         List<Trip> trips;
@@ -363,15 +386,15 @@ public class TestTransfers extends TestCase {
             }
         }
         assertTrue(time >= 0);
-        
-        // Add transfer to table such that the next trip will be chosen (there are 3600 seconds between trips),
-        // transfer time was 75 seconds
+
+        // Add transfer to table such that the next trip will be chosen
+        // (there are 3600 seconds between trips), transfer time was 75 seconds
         Stop stopV = new Stop();
         stopV.setId(new AgencyAndId("agency", "V"));
         Stop stopI = new Stop();
         stopI.setId(new AgencyAndId("agency", "I"));
         table.addTransferTime(stopV, stopI, null, null, null, null, 3675);
-        
+
         // Plan journey
         path = planJourney(options);
         trips = extractTrips(path);
@@ -390,27 +413,27 @@ public class TestTransfers extends TestCase {
         assertTrue(newTime >= 0);
         assertTrue(newTime < time);
         assertEquals(3600, time - newTime);
-        
+
         // Revert the graph, thus using the original transfer table again
         reset(graph);
     }
-    
+
     public void testForbiddenStopToStopTransfer() throws Exception {
         // Replace the transfer table with an empty table
         TransferTable table = new TransferTable();
         when(graph.getTransferTable()).thenReturn(table);
-        
+
         // Compute a normal path between two stops
         @SuppressWarnings("deprecation")
         Vertex origin = graph.getVertex("agency_N");
         @SuppressWarnings("deprecation")
         Vertex destination = graph.getVertex("agency_H");
-        
+
         // Set options like time and routing context
         RoutingRequest options = new RoutingRequest();
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 7, 11, 11, 11, 0);
         options.setRoutingContext(graph, origin, destination);
-        
+
         // Plan journey
         GraphPath path;
         List<Trip> trips;
@@ -419,41 +442,42 @@ public class TestTransfers extends TestCase {
         // Validate result
         assertEquals("8.1", trips.get(0).getId().getId());
         assertEquals("4.2", trips.get(1).getId().getId());
-        
+
         // Add forbidden transfer to table
         Stop stopK = new Stop();
         stopK.setId(new AgencyAndId("agency", "K"));
         Stop stopF = new Stop();
         stopF.setId(new AgencyAndId("agency", "F"));
-        table.addTransferTime(stopK, stopF, null, null, null, null, StopTransfer.FORBIDDEN_TRANSFER);
-        
+        table.addTransferTime(stopK, stopF, null, null, null, null,
+                StopTransfer.FORBIDDEN_TRANSFER);
+
         // Plan journey
         path = planJourney(options);
         trips = extractTrips(path);
         // Check that no trip was returned
         assertEquals(0, trips.size());
-        
+
         // Revert the graph, thus using the original transfer table again
         reset(graph);
     }
-    
+
     public void testForbiddenStopToStopTransferWithFrequencyInReverse() throws Exception {
         // Replace the transfer table with an empty table
         TransferTable table = new TransferTable();
         when(graph.getTransferTable()).thenReturn(table);
-        
+
         // Compute a normal path between two stops
         @SuppressWarnings("deprecation")
         Vertex origin = graph.getVertex("agency_U");
         @SuppressWarnings("deprecation")
         Vertex destination = graph.getVertex("agency_J");
-        
+
         // Set options like time and routing context
         RoutingRequest options = new RoutingRequest();
         options.setArriveBy(true);
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 7, 11, 11, 11, 0);
         options.setRoutingContext(graph, origin, destination);
-        
+
         // Plan journey
         GraphPath path;
         List<Trip> trips;
@@ -462,40 +486,43 @@ public class TestTransfers extends TestCase {
         // Validate result
         assertEquals("15.1", trips.get(0).getId().getId());
         assertEquals("5.1", trips.get(1).getId().getId());
-        
+
         // Add forbidden transfer to table
         Stop stopV = new Stop();
         stopV.setId(new AgencyAndId("agency", "V"));
         Stop stopI = new Stop();
         stopI.setId(new AgencyAndId("agency", "I"));
-        table.addTransferTime(stopV, stopI, null, null, null, null, StopTransfer.FORBIDDEN_TRANSFER);
-        
+        table.addTransferTime(stopV, stopI, null, null, null, null,
+                StopTransfer.FORBIDDEN_TRANSFER);
+
         // Plan journey
         path = planJourney(options);
         trips = extractTrips(path);
         // Check that no trip was returned
         assertEquals(0, trips.size());
-        
+
         // Revert the graph, thus using the original transfer table again
         reset(graph);
     }
 
     public void testTimedStopToStopTransfer() throws Exception {
+        ServiceDate serviceDate = new ServiceDate(2009, 07, 11);
+
         // Replace the transfer table with an empty table
         TransferTable table = new TransferTable();
         when(graph.getTransferTable()).thenReturn(table);
-        
+
         // Compute a normal path between two stops
         @SuppressWarnings("deprecation")
         Vertex origin = graph.getVertex("agency_N");
         @SuppressWarnings("deprecation")
         Vertex destination = graph.getVertex("agency_H");
-        
+
         // Set options like time and routing context
         RoutingRequest options = new RoutingRequest();
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 7, 11, 11, 11, 0);
         options.setRoutingContext(graph, origin, destination);
-        
+
         // Plan journey
         GraphPath path;
         List<Trip> trips;
@@ -504,7 +531,7 @@ public class TestTransfers extends TestCase {
         // Validate result
         assertEquals("8.1", trips.get(0).getId().getId());
         assertEquals("4.2", trips.get(1).getId().getId());
-        
+
         // Add timed transfer to table
         Stop stopK = new Stop();
         stopK.setId(new AgencyAndId("agency", "K"));
@@ -517,42 +544,47 @@ public class TestTransfers extends TestCase {
         @SuppressWarnings("deprecation")
         Vertex toVertex = graph.getVertex("agency_F_depart");
         TimedTransferEdge timedTransferEdge = new TimedTransferEdge(fromVertex, toVertex);
-        
+
         // Plan journey
         path = planJourney(options);
         trips = extractTrips(path);
         // Check whether the trips are still the same
         assertEquals("8.1", trips.get(0).getId().getId());
         assertEquals("4.2", trips.get(1).getId().getId());
-        
-        // Now apply a real-time update: let the to-trip be early by 27600 seconds, resulting in a transfer time of 0 seconds
+
+        // Now apply a real-time update: let the to-trip be early by 27600 seconds,
+        // resulting in a transfer time of 0 seconds
         @SuppressWarnings("deprecation")
-        TableTripPattern pattern = ((PatternStopVertex) graph.getVertex("agency_F_agency_4.3_1_D")).getTripPattern();
-        applyUpdateToTripPattern(pattern, "4.2", "F", 0, 55200, 55200, Update.Status.PREDICTION, 0, "20090711");
-        
+        TableTripPattern pattern = ((PatternStopVertex) graph
+                .getVertex("agency_F_agency_4.3_1_D")).getTripPattern();
+        applyUpdateToTripPattern(pattern, "4.2", "F", 1, 55200, 55200,
+                ScheduleRelationship.SCHEDULED, 0, serviceDate);
+
         // Plan journey
         path = planJourney(options);
         trips = extractTrips(path);
         // Check whether the trips are still the same
         assertEquals("8.1", trips.get(0).getId().getId());
         assertEquals("4.2", trips.get(1).getId().getId());
-        
-        // Now apply a real-time update: let the to-trip be early by 27601 seconds, resulting in a transfer time of -1 seconds
-        applyUpdateToTripPattern(pattern, "4.2", "F", 0, 55199, 55199, Update.Status.PREDICTION, 0, "20090711");
-        
+
+        // Now apply a real-time update: let the to-trip be early by 27601 seconds,
+        // resulting in a transfer time of -1 seconds
+        applyUpdateToTripPattern(pattern, "4.2", "F", 1, 55199, 55199,
+                ScheduleRelationship.SCHEDULED, 0, serviceDate);
+
         // Plan journey
         path = planJourney(options);
         trips = extractTrips(path);
         // Check whether a later second trip was taken
         assertEquals("8.1", trips.get(0).getId().getId());
         assertEquals("4.3", trips.get(1).getId().getId());
-        
+
         // "Revert" the real-time update
-        applyUpdateToTripPattern(pattern, "4.2", "F", 0, 82800, 82800, Update.Status.PREDICTION, 0, "20090711");
+        applyUpdateToTripPattern(pattern, "4.2", "F", 1, 82800, 82800,
+                ScheduleRelationship.SCHEDULED, 0, serviceDate);
         // Remove the timed transfer from the graph
         timedTransferEdge.detach();
         // Revert the graph, thus using the original transfer table again
         reset(graph);
     }
-    
 }
