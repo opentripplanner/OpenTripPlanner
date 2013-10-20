@@ -113,8 +113,6 @@ otp.modules.analyst.AnalystModule =
 
         	
         var URL = this.analystUrl + this.buildQuery(params);
-        console.log(params);
-        console.log(URL);
         
         if(this.analystLayer != null) {
             this.analystLayer.setUrl(URL);
