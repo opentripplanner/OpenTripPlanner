@@ -21,7 +21,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Queue;
 
-import org.opentripplanner.common.geometry.SparseMatrix.Visitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -230,12 +229,10 @@ public class AccSamplingGridIsolineBuilder implements IsolineBuilder {
      * Surround all existing sample on the edge by 2 layers of closing samples.
      */
     private final void closeSamples() {
-        final List<GridSample> processList = new ArrayList<GridSample>(allSamples.size());
-        allSamples.iterate(new Visitor<GridSample>() {
-            public void visit(GridSample A) {
-                processList.add(A);
-            }
-        });
+        List<GridSample> processList = new ArrayList<GridSample>(allSamples.size());
+        for (GridSample A : allSamples) {
+            processList.add(A);
+        }
         int n = 0;
         for (GridSample A : processList) {
             if (A.right == null) {
@@ -273,15 +270,12 @@ public class AccSamplingGridIsolineBuilder implements IsolineBuilder {
             closed = true;
         }
 
-        final Queue<GridSample> processQ = new ArrayDeque<GridSample>(allSamples.size());
-        allSamples.iterate(new Visitor<GridSample>() {
-            @Override
-            public void visit(GridSample A) {
-                A.hProcessed = false;
-                A.vProcessed = false;
-                processQ.add(A);
-            }
-        });
+        Queue<GridSample> processQ = new ArrayDeque<GridSample>(allSamples.size());
+        for (GridSample A : allSamples) {
+            A.hProcessed = false;
+            A.vProcessed = false;
+            processQ.add(A);
+        }
 
         if (debug)
             generateDebugGeometry(zz0);
@@ -436,32 +430,26 @@ public class AccSamplingGridIsolineBuilder implements IsolineBuilder {
     private final void generateDebugGeometry(double[] zz0) {
         debug = false;
 
-        final double[] zmax = new double[10]; // TODO size!
-        allSamples.iterate(new Visitor<GridSample>() {
-            @Override
-            public void visit(GridSample A) {
-                for (int i = 1; i < A.zz.length; i++) {
-                    double z = A.zz[i] / A.zz[0];
-                    if (A.zz[i] < Double.MAX_VALUE && z > zmax[i])
-                        zmax[i] = z;
+        double[] zmax = new double[10]; // TODO size!
+        for (GridSample A : allSamples) {
+            for (int i = 1; i < A.zz.length; i++) {
+                double z = A.zz[i] / A.zz[0];
+                if (A.zz[i] < Double.MAX_VALUE && z > zmax[i])
+                    zmax[i] = z;
+            }
+        }
+        for (GridSample A : allSamples) {
+            Coordinate C1 = getCoordinate(A.x, A.y);
+            double[] zz = A.zz;
+            for (int i = 1; i < zz.length - 1; i++) {
+                double z = zz[i] / zz[0]; // TODO Make this more generic
+                if (z != Double.POSITIVE_INFINITY) {
+                    Coordinate C2 = new Coordinate(C1.x + z * dX / zmax[i] * 1 / 4, C1.y + z * dY
+                            / zmax[i]);
+                    debugGeom.add(geometryFactory.createLineString(new Coordinate[] { C1, C2 }));
                 }
             }
-        });
-        allSamples.iterate(new Visitor<GridSample>() {
-            @Override
-            public void visit(GridSample A) {
-                Coordinate C1 = getCoordinate(A.x, A.y);
-                double[] zz = A.zz;
-                for (int i = 1; i < zz.length - 1; i++) {
-                    double z = zz[i] / zz[0]; // TODO Make this more generic
-                    if (z != Double.POSITIVE_INFINITY) {
-                        Coordinate C2 = new Coordinate(C1.x + z * dX / zmax[i] * 1 / 4, C1.y + z
-                                * dY / zmax[i]);
-                        debugGeom.add(geometryFactory.createLineString(new Coordinate[] { C1, C2 }));
-                    }
-                }
-            }
-        });
+        }
     }
 
     public final Geometry getDebugGeometry() {

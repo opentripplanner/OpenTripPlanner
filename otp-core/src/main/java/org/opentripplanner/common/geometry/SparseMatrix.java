@@ -14,6 +14,7 @@
 package org.opentripplanner.common.geometry;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -26,14 +27,7 @@ import java.util.Map;
  * 
  * @author laurent
  */
-public class SparseMatrix<T> {
-
-    /*
-     * For lazyness and efficiency, we use an internal iterator. TODO Implement Iterable<T> ?
-     */
-    public interface Visitor<T> {
-        void visit(T t);
-    }
+public class SparseMatrix<T> implements Iterable<T> {
 
     private int shift;
 
@@ -41,7 +35,7 @@ public class SparseMatrix<T> {
 
     private Map<Long, T[]> chunks;
 
-    int size = 0;
+    int size = 0, matSize;
 
     /**
      * @param chunkSize Chunk size, must be a power of two. Keep it small (8, 16, 32...). Number of
@@ -57,8 +51,9 @@ public class SparseMatrix<T> {
             chunkSize /= 2;
             shift++;
         }
+        this.matSize = (mask + 1) * (mask + 1);
         // We assume here that each chunk will be filled at ~25% (thus the x4)
-        this.chunks = new HashMap<Long, T[]>(totalSize / ((mask + 1) * (mask + 1)) * 4);
+        this.chunks = new HashMap<Long, T[]>(totalSize / matSize * 4);
     }
 
     public final T get(int x, int y) {
@@ -85,7 +80,7 @@ public class SparseMatrix<T> {
         T[] ts = chunks.get(key);
         if (ts == null) {
             // Java do not allow us to create an array of generics...
-            ts = (T[]) (new Object[(mask + 1) * (mask + 1)]);
+            ts = (T[]) (new Object[matSize]);
             chunks.put(key, ts);
         }
         int index = ((x & mask) << shift) + (y & mask);
@@ -99,15 +94,63 @@ public class SparseMatrix<T> {
         return size;
     }
 
-    public void iterate(Visitor<T> visitor) {
-        for (T[] ts : chunks.values()) {
-            for (int i = 0; i < ts.length; i++) {
-                T t = ts[i];
-                if (t != null) {
-                    visitor.visit(t);
+    /*
+     * We rely on the map iterator for checking for concurrent modification exceptions.
+     */
+    private class SparseMatrixIterator implements Iterator<T> {
+
+        private Iterator<T[]> mapIterator;
+
+        private int chunkIndex = -1;
+
+        private T[] chunk = null;
+
+        private SparseMatrixIterator() {
+            mapIterator = chunks.values().iterator();
+            moveToNext();
+        }
+
+        @Override
+        public boolean hasNext() {
+            boolean hasNext = chunk != null;
+            return hasNext;
+        }
+
+        @Override
+        public T next() {
+            T t = chunk[chunkIndex];
+            moveToNext();
+            return t;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("remove");
+        }
+
+        private void moveToNext() {
+            if (chunk == null) {
+                chunk = mapIterator.hasNext() ? mapIterator.next() : null;
+                if (chunk == null)
+                    return; // End
+            }
+            while (true) {
+                chunkIndex++;
+                if (chunkIndex == matSize) {
+                    chunkIndex = 0;
+                    chunk = mapIterator.hasNext() ? mapIterator.next() : null;
+                    if (chunk == null)
+                        return; // End
                 }
+                if (chunk[chunkIndex] != null)
+                    return;
             }
         }
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return new SparseMatrixIterator();
     }
 
 }

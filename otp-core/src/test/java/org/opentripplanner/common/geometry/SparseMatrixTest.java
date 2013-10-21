@@ -14,16 +14,17 @@
 package org.opentripplanner.common.geometry;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import junit.framework.TestCase;
 
-import org.opentripplanner.common.geometry.SparseMatrix.Visitor;
-
 public class SparseMatrixTest extends TestCase {
 
     public void testSparseMatrix() {
-        
+
+        List<String> all = new ArrayList<String>();
+
         SparseMatrix<String> m = new SparseMatrix<String>(8, 300);
         assertNull(m.get(0, 0));
         assertNull(m.get(10, 10));
@@ -37,14 +38,18 @@ public class SparseMatrixTest extends TestCase {
         assertEquals(1, m.size());
 
         m.put(-1000, -8978, "B");
+        all.add("B");
         assertEquals("B", m.get(-1000, -8978));
         m.put(223980, -898978, "C");
+        all.add("C");
         assertEquals("C", m.get(223980, -898978));
         assertEquals(3, m.size());
 
         for (int i = -10; i < 10; i++) {
             for (int j = -10; j < 10; j++) {
-                m.put(i, j, i + ":" + j);
+                String s = i + ":" + j;
+                m.put(i, j, s);
+                all.add(s);
             }
         }
         for (int i = -10; i < 10; i++) {
@@ -54,13 +59,13 @@ public class SparseMatrixTest extends TestCase {
             }
         }
 
-        final List<String> elements = new ArrayList<String>();
-        m.iterate(new Visitor<String>() {
-            @Override
-            public void visit(String s) {
-                elements.add(s);
-            }
-        });
+        List<String> elements = new ArrayList<String>();
+        for (String s : m) {
+            elements.add(s);
+        }
+        Collections.sort(elements);
+        Collections.sort(all);
+        assertEquals(all, elements);
         assertEquals(402, elements.size());
     }
 }
