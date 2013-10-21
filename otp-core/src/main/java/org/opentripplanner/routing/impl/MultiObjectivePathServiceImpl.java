@@ -146,6 +146,9 @@ public class MultiObjectivePathServiceImpl implements PathService {
             options.setMaxWalkDistance(maxWalk);
             
             // cap search / heuristic weight
+            long startTime = System.currentTimeMillis();
+            long endTime = startTime + (int)(_timeouts[0] * 1000);
+            LOG.debug("starttime {} endtime {}", startTime, endTime);
             final double AVG_TRANSIT_SPEED = 25; // m/sec 
             double cutoff = (distanceLibrary.distance(originVertex.getCoordinate(),
                     targetVertex.getCoordinate()) * 1.5) / AVG_TRANSIT_SPEED; // wait time is irrelevant in the heuristic
@@ -154,7 +157,7 @@ public class MultiObjectivePathServiceImpl implements PathService {
             
             State origin = new State(options);
             // (used to) initialize heuristic outside loop so table can be reused
-            heuristic.initialize(origin, targetVertex);
+            heuristic.initialize(origin, targetVertex, endTime);
             
             options.maxWeight = cutoff + 30 * 60 * options.waitReluctance;
             
@@ -162,9 +165,6 @@ public class MultiObjectivePathServiceImpl implements PathService {
             HashMap<Vertex, List<State>> states = new HashMap<Vertex, List<State>>();
             pq.reset();
             pq.insert(origin, 0);
-            long startTime = System.currentTimeMillis();
-            long endTime = startTime + (int)(_timeouts[0] * 1000);
-            LOG.debug("starttime {} endtime {}", startTime, endTime); 
             QUEUE: while ( ! pq.empty()) {
                 
                 if (System.currentTimeMillis() > endTime) {
