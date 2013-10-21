@@ -58,6 +58,10 @@ public class CommandLineParameters {
             description = "the directory under which to cache OSM and NED tiles")
     String cacheDirectory;
 
+    @Parameter(names = { "-d", "--deleteUselessDwells"},
+            description = "delete useless dwell edges (do not use with real-time updates)")
+    boolean deleteUselessDwells;
+
     @Parameter(names = { "-e", "--elevation"},
             description = "download and use elevation data for the graph")
     boolean elevation;

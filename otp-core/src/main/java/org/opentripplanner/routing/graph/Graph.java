@@ -104,6 +104,14 @@ public class Graph implements Serializable {
 
     private boolean debugData = true;
 
+    /**
+      * Indicates that zero-time dwell edges have been removed from this graph. If we receive real-time updates containing
+      * nonzero dwell times, they can't be applied to the dwell edge, because it isn't there.
+      */
+    @Getter
+    @Setter
+    private boolean dwellsDeleted;
+
     private transient Map<Integer, Vertex> vertexById;
 
     private transient Map<Integer, Edge> edgeById;

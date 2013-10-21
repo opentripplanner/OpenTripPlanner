@@ -77,6 +77,12 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
 
     @Override
     public void configurePolling(Graph graph, Preferences preferences) throws Exception {
+        // If zero-time dwell edges have been deleted, stop time updates can't be applied to them anymore,
+        // so we don't want to run a stop time updater.
+        if (graph.isDwellsDeleted()) {
+            throw new IllegalStateException("Can't apply stop time updates to absent dwell edges.");
+        }
+
         // Create update streamer from preferences
         String sourceType = preferences.get("sourceType", null);
         if (sourceType != null) {
