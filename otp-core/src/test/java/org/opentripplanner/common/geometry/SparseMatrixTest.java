@@ -30,6 +30,10 @@ public class SparseMatrixTest extends TestCase {
         assertNull(m.get(10, 10));
         assertNull(m.get(-10, -10));
         assertEquals(0, m.size());
+        for (String e : m) {
+            throw new AssertionError("Should not iterate over empty matrix");
+        }
+        
         m.put(0, 0, "A");
         assertEquals(1, m.size());
         assertEquals("A", m.get(0, 0));
