@@ -167,7 +167,7 @@ class SimpleGraphServiceImpl implements GraphService {
 
     @Override
     public boolean save(String routerId, InputStream is) {
-    	return false;
+        return false;
     }
 }
 
@@ -339,8 +339,8 @@ public class TestRequest extends TestCase {
     }
 
     public void testPlanner() throws Exception {
-
-        Planner planner = new TestPlanner("portland", "NE 43RD AVE at NE GLISAN ST", "NE 43RD AVE at NE ROYAL CT");
+        Planner planner = new TestPlanner(
+                "portland", "From::NE 43RD AVE at NE GLISAN ST", "To::NE 43RD AVE at NE ROYAL CT");
 
         Response response = planner.getItineraries();
         Itinerary itinerary = response.getPlan().itinerary.get(0);
@@ -354,7 +354,11 @@ public class TestRequest extends TestCase {
         assertEquals("NE 43RD AVE", step2.streetName);
         assertEquals(RelativeDirection.LEFT, step2.relativeDirection);
         assertTrue(step2.stayOn);
-
+        assertEquals("From", response.getPlan().from.orig);
+        assertEquals("From", leg.from.orig);
+        leg = itinerary.legs.get(itinerary.legs.size() - 1);
+        assertEquals("To", leg.to.orig);
+        assertEquals("To", response.getPlan().to.orig);
     }
 
     public void testFirstTrip() throws Exception {
