@@ -16,10 +16,7 @@ package org.opentripplanner.analyst.request;
 import static org.apache.commons.math3.util.FastMath.toRadians;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.math3.util.FastMath;
 import org.opentripplanner.analyst.core.IsochroneData;
@@ -31,9 +28,10 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.SPTService;
+import org.opentripplanner.routing.spt.SPTWalker;
+import org.opentripplanner.routing.spt.SPTWalker.SPTVisitor;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +39,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
 
 /**
  * Compute isochrones out of a shortest path tree request (AccSampling isoline algorithm).
@@ -173,7 +170,7 @@ public class IsoChroneSPTRendererAccSampling implements IsoChroneSPTRenderer {
                 center, zFunc, spt.getVertexCount());
         isolineBuilder.setDebug(isoChroneRequest.isIncludeDebugGeometry());
         computeInitialPoints(spt, isolineBuilder, gridSizeMeters * 0.7, V0,
-                isoChroneRequest.getMaxCutoffSec() + tOvershot, cosLat);
+                sptRequest.getMaxWalkDistance());
 
         long t2 = System.currentTimeMillis();
         List<IsochroneData> isochrones = new ArrayList<IsochroneData>();
@@ -199,75 +196,27 @@ public class IsoChroneSPTRendererAccSampling implements IsoChroneSPTRenderer {
      * @return
      */
     private void computeInitialPoints(ShortestPathTree spt,
-            AccSamplingGridIsolineBuilder isolineBuilder, double d0, double v0, long tMax,
-            double cosLat) {
-        int n = 0;
-        int nSkippedDupEdge = 0, nSkippedTimeOut = 0;
-        Collection<? extends State> allStates = spt.getAllStates();
-        Set<Edge> processedEdges = new HashSet<Edge>(allStates.size());
-        for (State s0 : allStates) {
-            for (Edge e : s0.getVertex().getIncoming()) {
-                // Take only street
-                if (e != null && e instanceof StreetEdge) {
-                    State s1 = spt.getState(e.getFromVertex());
-                    if (s1 == null)
-                        continue;
-                    long t0 = s0.getActiveTime();
-                    long t1 = s1.getActiveTime();
-                    if (t0 > tMax && t1 > tMax) {
-                        nSkippedTimeOut++;
-                        continue;
-                    }
-                    if (e.getFromVertex() != null && e.getToVertex() != null) {
-                        // Hack alert: e.hashCode() throw NPE
-                        if (processedEdges.contains(e)) {
-                            nSkippedDupEdge++;
-                            continue;
-                        }
-                        processedEdges.add(e);
-                    }
-                    Vertex vx0 = s0.getVertex();
-                    Vertex vx1 = s1.getVertex();
-                    LineString lineString = e.getGeometry();
+            final AccSamplingGridIsolineBuilder isolineBuilder, double d0, final double v0,
+            final double maxWalkDistance) {
 
-                    isolineBuilder.addSample(vx0.getCoordinate(), t0);
-                    isolineBuilder.addSample(vx1.getCoordinate(), t1);
-                    n += 2;
-                    Coordinate[] pList = lineString.getCoordinates();
-                    boolean reverse = vx1.getCoordinate().equals(pList[0]);
-                    // Length of linestring
-                    double lineStringLen = distanceLibrary.fastLength(lineString, cosLat);
-                    // Split the linestring in nSteps
-                    if (lineStringLen > d0) {
-                        int nSteps = (int) Math.floor(lineStringLen / d0) + 1; // Number of steps
-                        double stepLen = lineStringLen / nSteps; // Length of step
-                        double startLen = 0; // Distance at start of current seg
-                        double curLen = stepLen; // Distance cursor
-                        int ns = 1;
-                        for (int i = 0; i < pList.length - 1; i++) {
-                            Coordinate p0 = pList[i];
-                            Coordinate p1 = pList[i + 1];
-                            double segLen = distanceLibrary.fastDistance(p0, p1);
-                            while (curLen - startLen < segLen) {
-                                double k = (curLen - startLen) / segLen;
-                                Coordinate p = new Coordinate(p0.x * (1 - k) + p1.x * k, p0.y
-                                        * (1 - k) + p1.y * k);
-                                double t0b = (reverse ? t1 : t0) + curLen / v0;
-                                double t1b = (reverse ? t0 : t1) + (lineStringLen - curLen) / v0;
-                                isolineBuilder.addSample(p, t0b < t1b ? t0b : t1b);
-                                n++;
-                                curLen += stepLen;
-                                ns++;
-                            }
-                            startLen += segLen;
-                            if (ns >= nSteps)
-                                break;
-                        }
-                    }
-                }
+        SPTWalker johnny = new SPTWalker(spt);
+        johnny.walk(new SPTVisitor() {
+            @Override
+            public final boolean accept(Edge e) {
+                return e instanceof StreetEdge;
             }
-        }
-        LOG.info("Created {} initial points ({} dup edges, {} out time) from {} states.", n,
-                nSkippedDupEdge, nSkippedTimeOut, allStates.size());
+
+            @Override
+            public final void visit(Coordinate c, State s0, State s1, double d0, double d1) {
+                double wd0 = s0.getWalkDistance() + d0;
+                double wd1 = s0.getWalkDistance() + d1;
+                double t0 = wd0 > maxWalkDistance ? Double.POSITIVE_INFINITY : s0.getActiveTime()
+                        + d0 / v0;
+                double t1 = wd1 > maxWalkDistance ? Double.POSITIVE_INFINITY : s1.getActiveTime()
+                        + d1 / v0;
+                if (!Double.isInfinite(t0) || !Double.isInfinite(t1))
+                    isolineBuilder.addSample(c, t0 < t1 ? t0 : t1);
+            }
+        }, d0);
     }
 }
