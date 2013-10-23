@@ -90,53 +90,48 @@ public class IsoChroneSPTRendererAccSampling implements IsoChroneSPTRenderer {
         double dY = Math.toDegrees(gridSizeMeters / SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_M);
         double dX = dY / cosLat;
 
-        ZFunc zFunc = new ZFunc() {
-            // Note: zz[] = { w, t.w, d }.
+        ZFunc<WTWD> zFunc = new ZFunc<WTWD>() {
             @Override
-            public double[] cumulateSample(Coordinate C0, Coordinate Cs, double z, double[] zzS) {
+            public WTWD cumulateSample(Coordinate C0, Coordinate Cs, double z, WTWD zS) {
                 double t = z;
                 double d = distanceLibrary.fastDistance(C0, Cs, cosLat);
                 // additionnal time
                 double dt = d / V0;
                 // t weight
                 double w = 1 / (d + D0) * (d + D0);
-                if (zzS == null) {
-                    zzS = new double[3];
-                    zzS[2] = Double.MAX_VALUE;
+                if (zS == null) {
+                    zS = new WTWD();
+                    zS.d = Double.MAX_VALUE;
                 }
-                zzS[0] = zzS[0] + w;
-                zzS[1] = zzS[1] + w * (t + dt);
-                if (d < zzS[2])
-                    zzS[2] = d;
-                return zzS;
+                zS.w = zS.w + w;
+                zS.tw = zS.tw + w * (t + dt);
+                if (d < zS.d)
+                    zS.d = d;
+                return zS;
             }
 
             @Override
-            public double[] closeSample(double[] zzUp, double[] zzDown, double[] zzRight,
-                    double[] zzLeft) {
+            public WTWD closeSample(WTWD zUp, WTWD zDown, WTWD zRight, WTWD zLeft) {
                 double dMin = Double.MAX_VALUE;
-                for (double[] zz : new double[][] { zzUp, zzDown, zzRight, zzLeft }) {
-                    if (zz == null)
+                for (WTWD z : new WTWD[] { zUp, zDown, zRight, zLeft }) {
+                    if (z == null)
                         continue;
-                    double d = zz[2] / zz[0];
+                    double d = z.d / z.w;
                     if (d < dMin)
                         dMin = d;
                 }
-                double[] zz = new double[3];
-                zz[0] = 1.0; // w
-                zz[1] = Double.POSITIVE_INFINITY; // t
-                zz[2] = dMin + gridSizeMeters; // d
-                return zz;
+                WTWD z = new WTWD();
+                z.w = 1.0; // w
+                z.tw = Double.POSITIVE_INFINITY; // t
+                z.d = dMin + gridSizeMeters; // d
+                return z;
             }
 
             @Override
-            public int cut(double[] zzA, double[] zzB, double[] zz0) {
-                double dA = zzA[2];
-                double dB = zzB[2];
-                double t0 = zz0[0];
-                double d0 = zz0[1];
-                double tA = dA > d0 ? Double.POSITIVE_INFINITY : zzA[1] / zzA[0];
-                double tB = dB > d0 ? Double.POSITIVE_INFINITY : zzB[1] / zzB[0];
+            public int cut(WTWD zA, WTWD zB, WTWD z0) {
+                double t0 = z0.tw / z0.w;
+                double tA = zA.d > z0.d ? Double.POSITIVE_INFINITY : zA.tw / zA.w;
+                double tB = zB.d > z0.d ? Double.POSITIVE_INFINITY : zB.tw / zB.w;
                 if (tA < t0 && t0 <= tB)
                     return 1;
                 if (tB < t0 && t0 <= tA)
@@ -145,28 +140,25 @@ public class IsoChroneSPTRendererAccSampling implements IsoChroneSPTRenderer {
             }
 
             @Override
-            public double interpolate(double[] zzA, double[] zzB, double[] zz0) {
-                double dA = zzA[2];
-                double dB = zzB[2];
-                double t0 = zz0[0];
-                double d0 = zz0[1];
-                if (dA > d0 || dB > d0) {
-                    if (dA > d0 && dB > d0)
+            public double interpolate(WTWD zA, WTWD zB, WTWD z0) {
+                if (zA.d > z0.d || zB.d > z0.d) {
+                    if (zA.d > z0.d && zB.d > z0.d)
                         throw new AssertionError("dA > d0 && dB > d0");
                     // Interpolate on d
-                    double k = dA == dB ? 0.5 : (d0 - dA) / (dB - dA);
+                    double k = zA.d == zB.d ? 0.5 : (z0.d - zA.d) / (zB.d - zA.d);
                     return k;
                 } else {
                     // Interpolate on t
-                    double tA = zzA[1] / zzA[0];
-                    double tB = zzB[1] / zzB[0];
+                    double tA = zA.tw / zA.w;
+                    double tB = zB.tw / zB.w;
+                    double t0 = z0.tw / z0.w;
                     double k = tA == tB ? 0.5 : (t0 - tA) / (tB - tA);
                     return k;
                 }
             }
         };
-        AccSamplingGridIsolineBuilder isolineBuilder = new AccSamplingGridIsolineBuilder(dX, dY,
-                center, zFunc, spt.getVertexCount());
+        AccSamplingGridIsolineBuilder<WTWD> isolineBuilder = new AccSamplingGridIsolineBuilder<WTWD>(
+                dX, dY, center, zFunc, spt.getVertexCount());
         isolineBuilder.setDebug(isoChroneRequest.isIncludeDebugGeometry());
         computeInitialPoints(spt, isolineBuilder, gridSizeMeters * 0.7, V0,
                 sptRequest.getMaxWalkDistance());
@@ -175,8 +167,12 @@ public class IsoChroneSPTRendererAccSampling implements IsoChroneSPTRenderer {
         long t2 = System.currentTimeMillis();
         List<IsochroneData> isochrones = new ArrayList<IsochroneData>();
         for (Integer cutoffSec : isoChroneRequest.getCutoffSecList()) {
+            WTWD z0 = new WTWD();
+            z0.w = 1.0;
+            z0.tw = cutoffSec;
+            z0.d = D0;
             IsochroneData isochrone = new IsochroneData(cutoffSec,
-                    isolineBuilder.computeIsoline(new double[] { cutoffSec, D0 }));
+                    isolineBuilder.computeIsoline(z0));
             if (isoChroneRequest.isIncludeDebugGeometry())
                 isochrone.setDebugGeometry(isolineBuilder.getDebugGeometry());
             isochrones.add(isochrone);
@@ -196,7 +192,7 @@ public class IsoChroneSPTRendererAccSampling implements IsoChroneSPTRenderer {
      * @return
      */
     private void computeInitialPoints(ShortestPathTree spt,
-            final AccSamplingGridIsolineBuilder isolineBuilder, double d0, final double v0,
+            final AccSamplingGridIsolineBuilder<WTWD> isolineBuilder, double d0, final double v0,
             final double maxWalkDistance) {
 
         SPTWalker johnny = new SPTWalker(spt);
@@ -218,5 +214,13 @@ public class IsoChroneSPTRendererAccSampling implements IsoChroneSPTRenderer {
                     isolineBuilder.addSample(c, t0 < t1 ? t0 : t1);
             }
         }, d0);
+    }
+
+    private static class WTWD {
+        double w;
+
+        double tw;
+
+        double d;
     }
 }

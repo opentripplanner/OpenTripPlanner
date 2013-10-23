@@ -19,8 +19,8 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @author laurent
  */
-public interface IsolineBuilder {
+public interface IsolineBuilder<TZ> {
 
-    public Geometry computeIsoline(double[] zz0);
+    public Geometry computeIsoline(TZ z0);
     
 }
