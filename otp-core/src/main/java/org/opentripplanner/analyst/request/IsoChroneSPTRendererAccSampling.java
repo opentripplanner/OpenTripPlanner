@@ -81,7 +81,6 @@ public class IsoChroneSPTRendererAccSampling implements IsoChroneSPTRenderer {
         sptRequest.setBatch(true);
         sptRequest.setRoutingContext(graphService.getGraph(sptRequest.getRouterId()));
         final ShortestPathTree spt = sptService.getShortestPathTree(sptRequest);
-        sptRequest.cleanup();
 
         // 3. Compute the isochrone based on the SPT.
         long t1 = System.currentTimeMillis();
@@ -171,6 +170,7 @@ public class IsoChroneSPTRendererAccSampling implements IsoChroneSPTRenderer {
         isolineBuilder.setDebug(isoChroneRequest.isIncludeDebugGeometry());
         computeInitialPoints(spt, isolineBuilder, gridSizeMeters * 0.7, V0,
                 sptRequest.getMaxWalkDistance());
+        sptRequest.cleanup();
 
         long t2 = System.currentTimeMillis();
         List<IsochroneData> isochrones = new ArrayList<IsochroneData>();
