@@ -139,7 +139,7 @@ public class AccSamplingGridIsolineBuilder implements IsolineBuilder {
 
     /**
      * Create an object to compute isochrones. One may call several time isochronify on the same
-     * IsoChronificator object.
+     * object.
      * 
      * @param dX, dY Grid size
      * @param center Center point (eg origin)
