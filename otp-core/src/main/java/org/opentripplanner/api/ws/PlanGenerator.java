@@ -131,9 +131,9 @@ public class PlanGenerator {
                     continue;
                 }
                 Leg firstLeg = i.legs.get(0);
-                firstLeg.from.orig = options.getFrom().getName();
+                firstLeg.from.orig = plan.from.orig;
                 Leg lastLeg = i.legs.get(i.legs.size() - 1);
-                lastLeg.to.orig = options.getTo().getName();
+                lastLeg.to.orig = plan.to.orig;
             }
         }
         options.rctx.debug.finishedRendering();
@@ -160,6 +160,9 @@ public class PlanGenerator {
         }
         Place from = new Place(tripStartVertex.getX(), tripStartVertex.getY(), startName);
         Place to = new Place(tripEndVertex.getX(), tripEndVertex.getY(), endName);
+
+        from.orig = request.getFrom().getName();
+        to.orig = request.getTo().getName();
 
         TripPlan plan = new TripPlan(from, to, request.getDateTime());
 
