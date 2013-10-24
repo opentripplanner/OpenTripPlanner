@@ -42,11 +42,6 @@ public final class SparseMatrixZSampleGrid<TZ> implements ZSampleGrid<TZ>,
         @Setter
         private TZ z;
 
-        // TODO Remove
-        @Getter
-        @Setter
-        private Object userData;
-
         private SparseMatrixSamplePoint up, down, right, left;
 
         private GridDelaunayEdge eUp, eUpRight, eRight;

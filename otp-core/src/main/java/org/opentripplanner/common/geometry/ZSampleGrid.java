@@ -24,10 +24,6 @@ interface ZSamplePoint<TZ> {
     
     public void setZ(TZ z);
 
-    public Object getUserData();
-
-    public void setUserData(Object userData);
-
     public ZSamplePoint<TZ> up();
 
     public ZSamplePoint<TZ> down();
