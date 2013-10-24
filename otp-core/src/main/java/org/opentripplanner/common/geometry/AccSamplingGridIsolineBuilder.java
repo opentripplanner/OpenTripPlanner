@@ -103,10 +103,6 @@ public class AccSamplingGridIsolineBuilder<TZ> implements IsolineBuilder<TZ> {
 
     private static final Logger LOG = LoggerFactory.getLogger(AccSamplingGridIsolineBuilder.class);
 
-    private double dX, dY;
-
-    private Coordinate center;
-
     private ZFunc<TZ> zFunc;
 
     private ZSampleGrid<TZ, IsoLineUserData> sampleGrid;
@@ -130,16 +126,9 @@ public class AccSamplingGridIsolineBuilder<TZ> implements IsolineBuilder<TZ> {
      */
     public AccSamplingGridIsolineBuilder(double dX, double dY, Coordinate center, ZFunc<TZ> zFunc,
             int size) {
-        this.dX = dX;
-        this.dY = dY;
-        /*
-         * Center position only purpose is to serve as a reference value to the XY integer indexing,
-         * so it only needs to be not too far off to prevent int indexes from overflowing.
-         */
-        this.center = center;
         this.zFunc = zFunc;
-        sampleGrid = new SparseMatrixZSampleGrid<TZ, IsoLineUserData>(16, size);
-        LOG.debug("Center={} dX={} dY={}", this.center, dX, dY);
+        sampleGrid = new SparseMatrixZSampleGrid<TZ, IsoLineUserData>(16, size, dX, dY, center);
+        LOG.debug("Center={} dX={} dY={}", center, dX, dY);
     }
 
     public void setDebug(boolean debug) {
@@ -150,9 +139,9 @@ public class AccSamplingGridIsolineBuilder<TZ> implements IsolineBuilder<TZ> {
         if (closed) {
             throw new IllegalStateException("Cannot add sample once an isochrone is computed.");
         }
-        int x = (int) Math.round((C0.x - center.x - dX / 2) / dX);
-        int y = (int) Math.round((C0.y - center.y - dY / 2) / dY);
-
+        int[] xy = sampleGrid.getLowerLeftIndex(C0);
+        int x = xy[0];
+        int y = xy[1];
         @SuppressWarnings("unchecked")
         ZSamplePoint<TZ, IsoLineUserData>[] ABCD = new ZSamplePoint[4];
         ABCD[0] = sampleGrid.getOrCreate(x, y);
@@ -162,7 +151,7 @@ public class AccSamplingGridIsolineBuilder<TZ> implements IsolineBuilder<TZ> {
         for (ZSamplePoint<TZ, IsoLineUserData> P : ABCD) {
             if (P.getU() == null)
                 P.setU(new IsoLineUserData());
-            Coordinate C = getCoordinate(P.getX(), P.getY());
+            Coordinate C = sampleGrid.getCoordinates(P);
             P.setZ(zFunc.cumulateSample(C0, C, z, P.getZ()));
         }
     }
@@ -259,8 +248,8 @@ public class AccSamplingGridIsolineBuilder<TZ> implements IsolineBuilder<TZ> {
                     : (cut > 0 ? Direction.LEFT : Direction.RIGHT);
             while (true) {
                 // Add a point to polyline
-                Coordinate cA = getCoordinate(A.getX(), A.getY());
-                Coordinate cB = getCoordinate(B.getX(), B.getY());
+                Coordinate cA = sampleGrid.getCoordinates(A);
+                Coordinate cB = sampleGrid.getCoordinates(B);
                 double k = zFunc.interpolate(A.getZ(), B.getZ(), z0);
                 Coordinate cC = new Coordinate(cA.x * (1.0 - k) + cB.x * k, cA.y * (1.0 - k) + cB.y
                         * k);
@@ -406,10 +395,6 @@ public class AccSamplingGridIsolineBuilder<TZ> implements IsolineBuilder<TZ> {
     public final Geometry getDebugGeometry() {
         return geometryFactory.createGeometryCollection(debugGeom.toArray(new Geometry[debugGeom
                 .size()]));
-    }
-
-    private final Coordinate getCoordinate(int x, int y) {
-        return new Coordinate(x * dX + center.x, y * dY + center.y);
     }
 
     @SuppressWarnings("unchecked")

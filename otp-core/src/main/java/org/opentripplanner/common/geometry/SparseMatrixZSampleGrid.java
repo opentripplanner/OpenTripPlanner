@@ -18,6 +18,8 @@ import java.util.Iterator;
 import lombok.Getter;
 import lombok.Setter;
 
+import com.vividsolutions.jts.geom.Coordinate;
+
 /**
  * A generic indexed grid of Z samples.
  * 
@@ -64,9 +66,24 @@ public final class SparseMatrixZSampleGrid<TZ, U> implements ZSampleGrid<TZ, U> 
         }
     }
 
+    private double dX, dY;
+
+    private Coordinate center;
+
     private SparseMatrix<SparseMatrixSamplePoint<TZ, U>> allSamples;
 
-    public SparseMatrixZSampleGrid(int chunkSize, int totalSize) {
+    /**
+     * @param chunkSize SparseMatrix chunk side (eg 8 or 16). See SparseMatrix.
+     * @param totalSize Total estimated size for pre-allocating.
+     * @param dX X grid size, same units as center coordinates.
+     * @param dY Y grid size, same units as center coordinates.
+     * @param center Center position of the grid. Do not need to be precise.
+     */
+    public SparseMatrixZSampleGrid(int chunkSize, int totalSize, double dX, double dY,
+            Coordinate center) {
+        this.center = center;
+        this.dX = dX;
+        this.dY = dY;
         allSamples = new SparseMatrix<SparseMatrixSamplePoint<TZ, U>>(chunkSize, totalSize);
     }
 
@@ -123,6 +140,18 @@ public final class SparseMatrixZSampleGrid<TZ, U> implements ZSampleGrid<TZ, U> 
                 iterator.remove();
             }
         };
+    }
+
+    @Override
+    public Coordinate getCoordinates(ZSamplePoint<TZ, U> point) {
+        // TODO Cache the coordinates in the point?
+        return new Coordinate(point.getX() * dX + center.x, point.getY() * dY + center.y);
+    }
+
+    @Override
+    public int[] getLowerLeftIndex(Coordinate C) {
+        return new int[] { (int) Math.round((C.x - center.x - dX / 2) / dX),
+                (int) Math.round((C.y - center.y - dY / 2) / dY) };
     }
 
     @Override
