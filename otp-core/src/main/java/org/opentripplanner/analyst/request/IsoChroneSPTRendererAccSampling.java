@@ -22,9 +22,9 @@ import org.apache.commons.math3.util.FastMath;
 import org.opentripplanner.analyst.core.IsochroneData;
 import org.opentripplanner.common.geometry.AccumulativeGridSampler;
 import org.opentripplanner.common.geometry.AccumulativeGridSampler.AccumulativeMetric;
+import org.opentripplanner.common.geometry.DelaunayIsolineBuilder;
 import org.opentripplanner.common.geometry.DistanceLibrary;
-import org.opentripplanner.common.geometry.SampleGridIsolineBuilder;
-import org.opentripplanner.common.geometry.SampleGridIsolineBuilder.ZMetric;
+import org.opentripplanner.common.geometry.IsolineBuilder.ZMetric;
 import org.opentripplanner.common.geometry.SparseMatrixZSampleGrid;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.geometry.ZSampleGrid;
@@ -94,8 +94,8 @@ public class IsoChroneSPTRendererAccSampling implements IsoChroneSPTRenderer {
         double dY = Math.toDegrees(gridSizeMeters / SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_M);
         double dX = dY / cosLat;
 
-        ZSampleGrid<WTWD> sampleGrid = new SparseMatrixZSampleGrid<WTWD>(
-                16, spt.getVertexCount(), dX, dY, center);
+        SparseMatrixZSampleGrid<WTWD> sampleGrid = new SparseMatrixZSampleGrid<WTWD>(16,
+                spt.getVertexCount(), dX, dY, center);
         sampleSPT(spt, sampleGrid, gridSizeMeters * 0.7, gridSizeMeters, V0,
                 sptRequest.getMaxWalkDistance(), cosLat);
         sptRequest.cleanup();
@@ -132,7 +132,8 @@ public class IsoChroneSPTRendererAccSampling implements IsoChroneSPTRenderer {
                 }
             }
         };
-        SampleGridIsolineBuilder<WTWD> isolineBuilder = new SampleGridIsolineBuilder<WTWD>(sampleGrid, zMetric);
+        DelaunayIsolineBuilder<WTWD> isolineBuilder = new DelaunayIsolineBuilder<WTWD>(sampleGrid,
+                zMetric);
         isolineBuilder.setDebug(isoChroneRequest.isIncludeDebugGeometry());
 
         long t2 = System.currentTimeMillis();
@@ -162,9 +163,9 @@ public class IsoChroneSPTRendererAccSampling implements IsoChroneSPTRenderer {
      * @param spt
      * @return
      */
-    private void sampleSPT(ShortestPathTree spt,
-            ZSampleGrid<WTWD> sampleGrid, final double d0, final double gridSizeMeters, final double v0,
-            final double maxWalkDistance, final double cosLat) {
+    private void sampleSPT(ShortestPathTree spt, ZSampleGrid<WTWD> sampleGrid, final double d0,
+            final double gridSizeMeters, final double v0, final double maxWalkDistance,
+            final double cosLat) {
 
         AccumulativeMetric<WTWD> accMetric = new AccumulativeMetric<WTWD>() {
             @Override
@@ -174,7 +175,7 @@ public class IsoChroneSPTRendererAccSampling implements IsoChroneSPTRenderer {
                 // additionnal time
                 double dt = d / v0;
                 // t weight
-                double w = 1 / (d + d0) * (d + d0);
+                double w = 1 / ((d + d0) * (d + d0));
                 if (zS == null) {
                     zS = new WTWD();
                     zS.d = Double.MAX_VALUE;
@@ -192,9 +193,8 @@ public class IsoChroneSPTRendererAccSampling implements IsoChroneSPTRenderer {
                 for (WTWD z : new WTWD[] { zUp, zDown, zRight, zLeft }) {
                     if (z == null)
                         continue;
-                    double d = z.d / z.w;
-                    if (d < dMin)
-                        dMin = d;
+                    if (z.d < dMin)
+                        dMin = z.d;
                 }
                 WTWD z = new WTWD();
                 z.w = 1.0;
@@ -203,8 +203,8 @@ public class IsoChroneSPTRendererAccSampling implements IsoChroneSPTRenderer {
                 return z;
             }
         };
-        final AccumulativeGridSampler<WTWD> gridSampler = new AccumulativeGridSampler<WTWD>(sampleGrid,
-                accMetric);
+        final AccumulativeGridSampler<WTWD> gridSampler = new AccumulativeGridSampler<WTWD>(
+                sampleGrid, accMetric);
 
         SPTWalker johnny = new SPTWalker(spt);
         johnny.walk(new SPTVisitor() {
@@ -229,10 +229,15 @@ public class IsoChroneSPTRendererAccSampling implements IsoChroneSPTRenderer {
     }
 
     private static class WTWD {
-        double w;
+        private double w;
 
-        double tw;
+        private double tw;
 
-        double d;
+        private double d;
+        
+        @Override
+        public String toString() {
+            return String.format("[t/w=%f,w=%f,d=%f]", tw/w, w, d);
+        }
     }
 }

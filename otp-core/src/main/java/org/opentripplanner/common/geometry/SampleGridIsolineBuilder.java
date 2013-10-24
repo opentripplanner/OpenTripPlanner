@@ -46,29 +46,6 @@ import com.vividsolutions.jts.geom.Polygon;
  */
 public class SampleGridIsolineBuilder<TZ> implements IsolineBuilder<TZ> {
 
-    public interface ZMetric<TZ> {
-        /**
-         * Check if the edge [AB] between two samples A and B "intersect" the zz0 plane.
-         * 
-         * @param zA z value for the A sample
-         * @param zB z value for the B sample
-         * @param z0 z value for the intersecting plane
-         * @return 0 if no intersection, -1 or +1 if intersection (depending on which is lower, A or
-         *         B).
-         */
-        public int cut(TZ zA, TZ zB, TZ z0);
-
-        /**
-         * Interpolate a crossing point on an edge [AB].
-         * 
-         * @param zA z value for the A sample
-         * @param zB z value for the B sample
-         * @param z0 z value for the intersecting plane
-         * @return k value between 0 and 1, where the crossing occurs. 0=A, 1=B.
-         */
-        public double interpolate(TZ zA, TZ zB, TZ z0);
-    }
-
     public enum Direction {
         UP, DOWN, LEFT, RIGHT;
     }

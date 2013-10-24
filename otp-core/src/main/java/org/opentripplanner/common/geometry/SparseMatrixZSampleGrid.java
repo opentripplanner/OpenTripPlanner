@@ -13,7 +13,9 @@
 
 package org.opentripplanner.common.geometry;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -25,9 +27,10 @@ import com.vividsolutions.jts.geom.Coordinate;
  * 
  * @author laurent
  */
-public final class SparseMatrixZSampleGrid<TZ> implements ZSampleGrid<TZ> {
+public final class SparseMatrixZSampleGrid<TZ> implements ZSampleGrid<TZ>,
+        DelaunayTriangulation<TZ> {
 
-    private final static class SparseMatrixSamplePoint<TZ> implements ZSamplePoint<TZ> {
+    private final class SparseMatrixSamplePoint implements ZSamplePoint<TZ>, DelaunayPoint<TZ> {
 
         @Getter
         private int x;
@@ -39,11 +42,14 @@ public final class SparseMatrixZSampleGrid<TZ> implements ZSampleGrid<TZ> {
         @Setter
         private TZ z;
 
+        // TODO Remove
         @Getter
         @Setter
         private Object userData;
 
-        private SparseMatrixSamplePoint<TZ> up, down, right, left;
+        private SparseMatrixSamplePoint up, down, right, left;
+
+        private GridDelaunayEdge eUp, eUpRight, eRight;
 
         @Override
         public ZSamplePoint<TZ> up() {
@@ -64,13 +70,90 @@ public final class SparseMatrixZSampleGrid<TZ> implements ZSampleGrid<TZ> {
         public ZSamplePoint<TZ> left() {
             return left;
         }
+
+        @Override
+        public Coordinate getCoordinates() {
+            return SparseMatrixZSampleGrid.this.getCoordinates(this);
+        }
+    }
+
+    private final class GridDelaunayEdge implements DelaunayEdge<TZ> {
+
+        private static final int TYPE_VERTICAL = 0;
+
+        private static final int TYPE_HORIZONTAL = 1;
+
+        private static final int TYPE_DIAGONAL = 2;
+
+        private boolean processed;
+
+        private SparseMatrixSamplePoint A, B;
+
+        private GridDelaunayEdge ccw1, ccw2, cw1, cw2;
+
+        private int type;
+
+        private GridDelaunayEdge(SparseMatrixSamplePoint A, SparseMatrixSamplePoint B, int type) {
+            this.A = A;
+            this.B = B;
+            switch (type) {
+            case TYPE_HORIZONTAL:
+                A.eRight = this;
+                break;
+            case TYPE_VERTICAL:
+                A.eUp = this;
+                break;
+            case TYPE_DIAGONAL:
+                A.eUpRight = this;
+                break;
+            }
+            this.type = type;
+        }
+
+        @Override
+        public DelaunayPoint<TZ> getA() {
+            return A;
+        }
+
+        @Override
+        public DelaunayPoint<TZ> getB() {
+            return B;
+        }
+
+        @Override
+        public DelaunayEdge<TZ> getEdge1(boolean ccw) {
+            return ccw ? ccw1 : cw1;
+        }
+
+        @Override
+        public DelaunayEdge<TZ> getEdge2(boolean ccw) {
+            return ccw ? ccw2 : cw2;
+        }
+
+        @Override
+        public boolean isProcessed() {
+            return processed;
+        }
+
+        @Override
+        public void setProcessed(boolean processed) {
+            this.processed = processed;
+        }
+        
+        @Override
+        public String toString() {
+            return "<GridDelaunayEdge " + A.getCoordinates() + "->" + B.getCoordinates() + ">";
+        }
+
     }
 
     private double dX, dY;
 
     private Coordinate center;
 
-    private SparseMatrix<SparseMatrixSamplePoint<TZ>> allSamples;
+    private SparseMatrix<SparseMatrixSamplePoint> allSamples;
+
+    private List<GridDelaunayEdge> triangulation = null;
 
     /**
      * @param chunkSize SparseMatrix chunk side (eg 8 or 16). See SparseMatrix.
@@ -84,33 +167,33 @@ public final class SparseMatrixZSampleGrid<TZ> implements ZSampleGrid<TZ> {
         this.center = center;
         this.dX = dX;
         this.dY = dY;
-        allSamples = new SparseMatrix<SparseMatrixSamplePoint<TZ>>(chunkSize, totalSize);
+        allSamples = new SparseMatrix<SparseMatrixSamplePoint>(chunkSize, totalSize);
     }
 
     public ZSamplePoint<TZ> getOrCreate(int x, int y) {
-        SparseMatrixSamplePoint<TZ> A = allSamples.get(x, y);
+        SparseMatrixSamplePoint A = allSamples.get(x, y);
         if (A != null)
             return A;
-        A = new SparseMatrixSamplePoint<TZ>();
+        A = new SparseMatrixSamplePoint();
         A.x = x;
         A.y = y;
         A.z = null;
-        SparseMatrixSamplePoint<TZ> Aup = allSamples.get(x, y + 1);
+        SparseMatrixSamplePoint Aup = allSamples.get(x, y + 1);
         if (Aup != null) {
             Aup.down = A;
             A.up = Aup;
         }
-        SparseMatrixSamplePoint<TZ> Adown = allSamples.get(x, y - 1);
+        SparseMatrixSamplePoint Adown = allSamples.get(x, y - 1);
         if (Adown != null) {
             Adown.up = A;
             A.down = Adown;
         }
-        SparseMatrixSamplePoint<TZ> Aright = allSamples.get(x + 1, y);
+        SparseMatrixSamplePoint Aright = allSamples.get(x + 1, y);
         if (Aright != null) {
             Aright.left = A;
             A.right = Aright;
         }
-        SparseMatrixSamplePoint<TZ> Aleft = allSamples.get(x - 1, y);
+        SparseMatrixSamplePoint Aleft = allSamples.get(x - 1, y);
         if (Aleft != null) {
             Aleft.right = A;
             A.left = Aleft;
@@ -123,7 +206,7 @@ public final class SparseMatrixZSampleGrid<TZ> implements ZSampleGrid<TZ> {
     public Iterator<ZSamplePoint<TZ>> iterator() {
         return new Iterator<ZSamplePoint<TZ>>() {
 
-            private Iterator<SparseMatrixSamplePoint<TZ>> iterator = allSamples.iterator();
+            private Iterator<SparseMatrixSamplePoint> iterator = allSamples.iterator();
 
             @Override
             public boolean hasNext() {
@@ -157,5 +240,64 @@ public final class SparseMatrixZSampleGrid<TZ> implements ZSampleGrid<TZ> {
     @Override
     public int size() {
         return allSamples.size();
+    }
+
+    @Override
+    public int edgesCount() {
+        if (triangulation == null) {
+            delaunify();
+        }
+        return triangulation.size();
+    }
+
+    @Override
+    public Iterable<? extends DelaunayEdge<TZ>> edges() {
+        if (triangulation == null) {
+            delaunify();
+        }
+        return triangulation;
+    }
+
+    /**
+     * 
+     */
+    private void delaunify() {
+        triangulation = new ArrayList<GridDelaunayEdge>(allSamples.size() * 3);
+        // 1. Create unlinked edges
+        for (SparseMatrixSamplePoint A : allSamples) {
+            SparseMatrixSamplePoint B = (SparseMatrixSamplePoint) A.right();
+            SparseMatrixSamplePoint D = (SparseMatrixSamplePoint) A.up();
+            SparseMatrixSamplePoint C = (SparseMatrixSamplePoint) (B != null ? B.up()
+                    : D != null ? D.right() : null);
+            if (B != null)
+                triangulation.add(new GridDelaunayEdge(A, B, GridDelaunayEdge.TYPE_HORIZONTAL));
+            if (D != null)
+                triangulation.add(new GridDelaunayEdge(A, D, GridDelaunayEdge.TYPE_VERTICAL));
+            if (C != null)
+                triangulation.add(new GridDelaunayEdge(A, C, GridDelaunayEdge.TYPE_DIAGONAL));
+        }
+        // 2. Link edges
+        for (GridDelaunayEdge e : triangulation) {
+            switch (e.type) {
+            case GridDelaunayEdge.TYPE_HORIZONTAL:
+                e.ccw1 = e.B.eUp;
+                e.ccw2 = e.A.eUpRight;
+                e.cw1 = e.A.down == null ? null : e.A.down.eUpRight;
+                e.cw2 = e.A.down == null ? null : e.A.down.eUp;
+                break;
+            case GridDelaunayEdge.TYPE_VERTICAL:
+                e.ccw1 = e.A.left == null ? null : e.A.left.eUpRight;
+                e.ccw2 = e.A.left == null ? null : e.A.left.eRight;
+                e.cw1 = e.B.eRight;
+                e.cw2 = e.A.eUpRight;
+                break;
+            case GridDelaunayEdge.TYPE_DIAGONAL:
+                e.ccw1 = e.A.up == null ? null : e.A.up.eRight;
+                e.ccw2 = e.A.eUp;
+                e.cw1 = e.A.right == null ? null : e.A.right.eUp;
+                e.cw2 = e.A.eRight;
+                break;
+            }
+        }
     }
 }

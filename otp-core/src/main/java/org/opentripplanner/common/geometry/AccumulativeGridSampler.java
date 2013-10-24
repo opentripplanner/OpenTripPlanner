@@ -104,23 +104,27 @@ public class AccumulativeGridSampler<TZ> {
             processList.add(A);
         }
         int n = 0;
-        for (ZSamplePoint<TZ> A : processList) {
-            if (A.right() == null) {
-                closeSample(A.getX() + 1, A.getY());
-                n++;
+        for (int i = 0; i < 2; i++) {
+            List<ZSamplePoint<TZ>> newProcessList = new ArrayList<ZSamplePoint<TZ>>(processList.size());
+            for (ZSamplePoint<TZ> A : processList) {
+                if (A.right() == null) {
+                    newProcessList.add(closeSample(A.getX() + 1, A.getY()));
+                    n++;
+                }
+                if (A.left() == null) {
+                    newProcessList.add(closeSample(A.getX() - 1, A.getY()));
+                    n++;
+                }
+                if (A.up() == null) {
+                    newProcessList.add(closeSample(A.getX(), A.getY() + 1));
+                    n++;
+                }
+                if (A.down() == null) {
+                    newProcessList.add(closeSample(A.getX(), A.getY() - 1));
+                    n++;
+                }
             }
-            if (A.left() == null) {
-                closeSample(A.getX() - 1, A.getY());
-                n++;
-            }
-            if (A.up() == null) {
-                closeSample(A.getX(), A.getY() + 1);
-                n++;
-            }
-            if (A.down() == null) {
-                closeSample(A.getX(), A.getY() - 1);
-                n++;
-            }
+            processList = newProcessList;
         }
         LOG.info("Added {} closing samples to get a total of {}.", n, sampleGrid.size());
     }
