@@ -25,9 +25,9 @@ import com.vividsolutions.jts.geom.Coordinate;
  * 
  * @author laurent
  */
-public final class SparseMatrixZSampleGrid<TZ, U> implements ZSampleGrid<TZ, U> {
+public final class SparseMatrixZSampleGrid<TZ> implements ZSampleGrid<TZ> {
 
-    private final static class SparseMatrixSamplePoint<TZ, U> implements ZSamplePoint<TZ, U> {
+    private final static class SparseMatrixSamplePoint<TZ> implements ZSamplePoint<TZ> {
 
         @Getter
         private int x;
@@ -41,27 +41,27 @@ public final class SparseMatrixZSampleGrid<TZ, U> implements ZSampleGrid<TZ, U> 
 
         @Getter
         @Setter
-        private U u;
+        private Object userData;
 
-        private SparseMatrixSamplePoint<TZ, U> up, down, right, left;
+        private SparseMatrixSamplePoint<TZ> up, down, right, left;
 
         @Override
-        public ZSamplePoint<TZ, U> up() {
+        public ZSamplePoint<TZ> up() {
             return up;
         }
 
         @Override
-        public ZSamplePoint<TZ, U> down() {
+        public ZSamplePoint<TZ> down() {
             return down;
         }
 
         @Override
-        public ZSamplePoint<TZ, U> right() {
+        public ZSamplePoint<TZ> right() {
             return right;
         }
 
         @Override
-        public ZSamplePoint<TZ, U> left() {
+        public ZSamplePoint<TZ> left() {
             return left;
         }
     }
@@ -70,7 +70,7 @@ public final class SparseMatrixZSampleGrid<TZ, U> implements ZSampleGrid<TZ, U> 
 
     private Coordinate center;
 
-    private SparseMatrix<SparseMatrixSamplePoint<TZ, U>> allSamples;
+    private SparseMatrix<SparseMatrixSamplePoint<TZ>> allSamples;
 
     /**
      * @param chunkSize SparseMatrix chunk side (eg 8 or 16). See SparseMatrix.
@@ -84,33 +84,33 @@ public final class SparseMatrixZSampleGrid<TZ, U> implements ZSampleGrid<TZ, U> 
         this.center = center;
         this.dX = dX;
         this.dY = dY;
-        allSamples = new SparseMatrix<SparseMatrixSamplePoint<TZ, U>>(chunkSize, totalSize);
+        allSamples = new SparseMatrix<SparseMatrixSamplePoint<TZ>>(chunkSize, totalSize);
     }
 
-    public ZSamplePoint<TZ, U> getOrCreate(int x, int y) {
-        SparseMatrixSamplePoint<TZ, U> A = allSamples.get(x, y);
+    public ZSamplePoint<TZ> getOrCreate(int x, int y) {
+        SparseMatrixSamplePoint<TZ> A = allSamples.get(x, y);
         if (A != null)
             return A;
-        A = new SparseMatrixSamplePoint<TZ, U>();
+        A = new SparseMatrixSamplePoint<TZ>();
         A.x = x;
         A.y = y;
         A.z = null;
-        SparseMatrixSamplePoint<TZ, U> Aup = allSamples.get(x, y + 1);
+        SparseMatrixSamplePoint<TZ> Aup = allSamples.get(x, y + 1);
         if (Aup != null) {
             Aup.down = A;
             A.up = Aup;
         }
-        SparseMatrixSamplePoint<TZ, U> Adown = allSamples.get(x, y - 1);
+        SparseMatrixSamplePoint<TZ> Adown = allSamples.get(x, y - 1);
         if (Adown != null) {
             Adown.up = A;
             A.down = Adown;
         }
-        SparseMatrixSamplePoint<TZ, U> Aright = allSamples.get(x + 1, y);
+        SparseMatrixSamplePoint<TZ> Aright = allSamples.get(x + 1, y);
         if (Aright != null) {
             Aright.left = A;
             A.right = Aright;
         }
-        SparseMatrixSamplePoint<TZ, U> Aleft = allSamples.get(x - 1, y);
+        SparseMatrixSamplePoint<TZ> Aleft = allSamples.get(x - 1, y);
         if (Aleft != null) {
             Aleft.right = A;
             A.left = Aleft;
@@ -120,10 +120,10 @@ public final class SparseMatrixZSampleGrid<TZ, U> implements ZSampleGrid<TZ, U> 
     }
 
     @Override
-    public Iterator<ZSamplePoint<TZ, U>> iterator() {
-        return new Iterator<ZSamplePoint<TZ, U>>() {
+    public Iterator<ZSamplePoint<TZ>> iterator() {
+        return new Iterator<ZSamplePoint<TZ>>() {
 
-            private Iterator<SparseMatrixSamplePoint<TZ, U>> iterator = allSamples.iterator();
+            private Iterator<SparseMatrixSamplePoint<TZ>> iterator = allSamples.iterator();
 
             @Override
             public boolean hasNext() {
@@ -131,7 +131,7 @@ public final class SparseMatrixZSampleGrid<TZ, U> implements ZSampleGrid<TZ, U> 
             }
 
             @Override
-            public ZSamplePoint<TZ, U> next() {
+            public ZSamplePoint<TZ> next() {
                 return iterator.next();
             }
 
@@ -143,7 +143,7 @@ public final class SparseMatrixZSampleGrid<TZ, U> implements ZSampleGrid<TZ, U> 
     }
 
     @Override
-    public Coordinate getCoordinates(ZSamplePoint<TZ, U> point) {
+    public Coordinate getCoordinates(ZSamplePoint<TZ> point) {
         // TODO Cache the coordinates in the point?
         return new Coordinate(point.getX() * dX + center.x, point.getY() * dY + center.y);
     }

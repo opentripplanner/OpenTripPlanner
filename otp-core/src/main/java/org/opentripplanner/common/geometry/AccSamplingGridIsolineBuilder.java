@@ -105,7 +105,7 @@ public class AccSamplingGridIsolineBuilder<TZ> implements IsolineBuilder<TZ> {
 
     private ZFunc<TZ> zFunc;
 
-    private ZSampleGrid<TZ, IsoLineUserData> sampleGrid;
+    private ZSampleGrid<TZ> sampleGrid;
 
     private boolean closed = false;
 
@@ -127,7 +127,7 @@ public class AccSamplingGridIsolineBuilder<TZ> implements IsolineBuilder<TZ> {
     public AccSamplingGridIsolineBuilder(double dX, double dY, Coordinate center, ZFunc<TZ> zFunc,
             int size) {
         this.zFunc = zFunc;
-        sampleGrid = new SparseMatrixZSampleGrid<TZ, IsoLineUserData>(16, size, dX, dY, center);
+        sampleGrid = new SparseMatrixZSampleGrid<TZ>(16, size, dX, dY, center);
         LOG.debug("Center={} dX={} dY={}", center, dX, dY);
     }
 
@@ -143,14 +143,14 @@ public class AccSamplingGridIsolineBuilder<TZ> implements IsolineBuilder<TZ> {
         int x = xy[0];
         int y = xy[1];
         @SuppressWarnings("unchecked")
-        ZSamplePoint<TZ, IsoLineUserData>[] ABCD = new ZSamplePoint[4];
+        ZSamplePoint<TZ>[] ABCD = new ZSamplePoint[4];
         ABCD[0] = sampleGrid.getOrCreate(x, y);
         ABCD[1] = sampleGrid.getOrCreate(x + 1, y);
         ABCD[2] = sampleGrid.getOrCreate(x, y + 1);
         ABCD[3] = sampleGrid.getOrCreate(x + 1, y + 1);
-        for (ZSamplePoint<TZ, IsoLineUserData> P : ABCD) {
-            if (P.getU() == null)
-                P.setU(new IsoLineUserData());
+        for (ZSamplePoint<TZ> P : ABCD) {
+            if (P.getUserData() == null)
+                P.setUserData(new IsoLineUserData());
             Coordinate C = sampleGrid.getCoordinates(P);
             P.setZ(zFunc.cumulateSample(C0, C, z, P.getZ()));
         }
@@ -160,13 +160,12 @@ public class AccSamplingGridIsolineBuilder<TZ> implements IsolineBuilder<TZ> {
      * Surround all existing sample on the edge by 2 layers of closing samples.
      */
     private final void closeSamples() {
-        List<ZSamplePoint<TZ, IsoLineUserData>> processList = new ArrayList<ZSamplePoint<TZ, IsoLineUserData>>(
-                sampleGrid.size());
-        for (ZSamplePoint<TZ, IsoLineUserData> A : sampleGrid) {
+        List<ZSamplePoint<TZ>> processList = new ArrayList<ZSamplePoint<TZ>>(sampleGrid.size());
+        for (ZSamplePoint<TZ> A : sampleGrid) {
             processList.add(A);
         }
         int n = 0;
-        for (ZSamplePoint<TZ, IsoLineUserData> A : processList) {
+        for (ZSamplePoint<TZ> A : processList) {
             if (A.right() == null) {
                 closeSample(A.getX() + 1, A.getY(), null, null, null, A);
                 n++;
@@ -187,12 +186,11 @@ public class AccSamplingGridIsolineBuilder<TZ> implements IsolineBuilder<TZ> {
         LOG.info("Added {} closing samples to get a total of {}.", n, sampleGrid.size());
     }
 
-    private final ZSamplePoint<TZ, IsoLineUserData> closeSample(int x, int y,
-            ZSamplePoint<TZ, IsoLineUserData> up, ZSamplePoint<TZ, IsoLineUserData> down,
-            ZSamplePoint<TZ, IsoLineUserData> right, ZSamplePoint<TZ, IsoLineUserData> left) {
-        ZSamplePoint<TZ, IsoLineUserData> A = sampleGrid.getOrCreate(x, y);
-        if (A.getU() == null)
-            A.setU(new IsoLineUserData());
+    private final ZSamplePoint<TZ> closeSample(int x, int y, ZSamplePoint<TZ> up,
+            ZSamplePoint<TZ> down, ZSamplePoint<TZ> right, ZSamplePoint<TZ> left) {
+        ZSamplePoint<TZ> A = sampleGrid.getOrCreate(x, y);
+        if (A.getUserData() == null)
+            A.setUserData(new IsoLineUserData());
         A.setZ(zFunc.closeSample(A.up() != null ? A.up().getZ() : null, A.down() != null ? A.down()
                 .getZ() : null, A.right() != null ? A.right().getZ() : null, A.left() != null ? A
                 .left().getZ() : null));
@@ -206,11 +204,11 @@ public class AccSamplingGridIsolineBuilder<TZ> implements IsolineBuilder<TZ> {
             closed = true;
         }
 
-        Queue<ZSamplePoint<TZ, IsoLineUserData>> processQ = new ArrayDeque<ZSamplePoint<TZ, IsoLineUserData>>(
-                sampleGrid.size());
-        for (ZSamplePoint<TZ, IsoLineUserData> A : sampleGrid) {
-            A.getU().hProcessed = false;
-            A.getU().vProcessed = false;
+        Queue<ZSamplePoint<TZ>> processQ = new ArrayDeque<ZSamplePoint<TZ>>(sampleGrid.size());
+        for (ZSamplePoint<TZ> A : sampleGrid) {
+            IsoLineUserData iud = (IsoLineUserData) A.getUserData();
+            iud.hProcessed = false;
+            iud.vProcessed = false;
             processQ.add(A);
         }
 
@@ -219,8 +217,8 @@ public class AccSamplingGridIsolineBuilder<TZ> implements IsolineBuilder<TZ> {
 
         List<LinearRing> rings = new ArrayList<LinearRing>();
         while (!processQ.isEmpty()) {
-            ZSamplePoint<TZ, IsoLineUserData> A = processQ.remove();
-            IsoLineUserData uA = A.getU();
+            ZSamplePoint<TZ> A = processQ.remove();
+            IsoLineUserData uA = (IsoLineUserData) A.getUserData();
             if (uA.hProcessed && uA.vProcessed)
                 continue;
             boolean horizontal = !uA.hProcessed;
@@ -233,7 +231,7 @@ public class AccSamplingGridIsolineBuilder<TZ> implements IsolineBuilder<TZ> {
                 // Re-adding self to be processed again for perpendicular direction
                 processQ.add(A);
             }
-            ZSamplePoint<TZ, IsoLineUserData> B = horizontal ? A.right() : A.up();
+            ZSamplePoint<TZ> B = horizontal ? A.right() : A.up();
             boolean ok = B != null;
             int cut = 0;
             if (ok) {
@@ -256,13 +254,13 @@ public class AccSamplingGridIsolineBuilder<TZ> implements IsolineBuilder<TZ> {
                 polyPoints.add(cC);
                 horizontal = direction == Direction.UP || direction == Direction.DOWN;
                 if (horizontal) {
-                    A.getU().hProcessed = true;
+                    ((IsoLineUserData) A.getUserData()).hProcessed = true;
                 } else {
-                    A.getU().vProcessed = true;
+                    ((IsoLineUserData) A.getUserData()).vProcessed = true;
                 }
                 // Compute next samples from adjacent tile
                 // C same side of B, D same side of A.
-                ZSamplePoint<TZ, IsoLineUserData> C, D;
+                ZSamplePoint<TZ> C, D;
                 Direction d1, d2; // d3: same direction.
                 boolean invertAB;
                 switch (direction) {
@@ -302,14 +300,21 @@ public class AccSamplingGridIsolineBuilder<TZ> implements IsolineBuilder<TZ> {
                 }
                 boolean ok1 = D != null
                         && zFunc.cut(A.getZ(), D.getZ(), z0) != 0
-                        && (horizontal ? (invertAB ? !D.getU().vProcessed : !A.getU().vProcessed)
-                                : (invertAB ? !D.getU().hProcessed : !A.getU().hProcessed));
+                        && (horizontal ? (invertAB ? !((IsoLineUserData) D.getUserData()).vProcessed
+                                : !((IsoLineUserData)A.getUserData()).vProcessed)
+                                : (invertAB ? !((IsoLineUserData) D.getUserData()).hProcessed
+                                        : !((IsoLineUserData) A.getUserData()).hProcessed));
                 boolean ok2 = C != null
                         && zFunc.cut(B.getZ(), C.getZ(), z0) != 0
-                        && (horizontal ? (invertAB ? !C.getU().vProcessed : !B.getU().vProcessed)
-                                : (invertAB ? !C.getU().hProcessed : !B.getU().hProcessed));
-                boolean ok3 = C != null && D != null && zFunc.cut(C.getZ(), D.getZ(), z0) != 0
-                        && (horizontal ? !D.getU().hProcessed : !D.getU().vProcessed);
+                        && (horizontal ? (invertAB ? !((IsoLineUserData) C.getUserData()).vProcessed
+                                : !((IsoLineUserData) B.getUserData()).vProcessed)
+                                : (invertAB ? !((IsoLineUserData) C.getUserData()).hProcessed
+                                        : !((IsoLineUserData) B.getUserData()).hProcessed));
+                boolean ok3 = C != null
+                        && D != null
+                        && zFunc.cut(C.getZ(), D.getZ(), z0) != 0
+                        && (horizontal ? !((IsoLineUserData) D.getUserData()).hProcessed
+                                : !((IsoLineUserData) D.getUserData()).vProcessed);
                 if (ok1 && ok2) {
                     /*
                      * We can go either turn, pick the best one from e1 or e2 by looking if C lies
@@ -322,7 +327,7 @@ public class AccSamplingGridIsolineBuilder<TZ> implements IsolineBuilder<TZ> {
                     double dB = Math.max(Math.abs(cB.x - cC.x), Math.abs(cB.y - cC.y));
                     if (dA <= dB) {
                         // C closer to A
-                        ZSamplePoint<TZ, IsoLineUserData> oA = A;
+                        ZSamplePoint<TZ> oA = A;
                         A = invertAB ? D : A;
                         B = invertAB ? oA : D;
                         direction = d1;
@@ -333,7 +338,7 @@ public class AccSamplingGridIsolineBuilder<TZ> implements IsolineBuilder<TZ> {
                         direction = d2;
                     }
                 } else if (ok1) {
-                    ZSamplePoint<TZ, IsoLineUserData> oA = A;
+                    ZSamplePoint<TZ> oA = A;
                     A = invertAB ? D : A;
                     B = invertAB ? oA : D;
                     direction = d1;
@@ -367,29 +372,7 @@ public class AccSamplingGridIsolineBuilder<TZ> implements IsolineBuilder<TZ> {
 
     private final void generateDebugGeometry(TZ z0) {
         debug = false;
-
         // TODO Map TZ to some debug geometry.
-
-        // double[] zmax = new double[10]; // TODO size!
-        // for (GridSample A : allSamples) {
-        // for (int i = 1; i < A.zz.length; i++) {
-        // double z = A.zz[i] / A.zz[0];
-        // if (A.zz[i] < Double.MAX_VALUE && z > zmax[i])
-        // zmax[i] = z;
-        // }
-        // }
-        // for (GridSample A : allSamples) {
-        // Coordinate C1 = getCoordinate(A.x, A.y);
-        // double[] zz = A.zz;
-        // for (int i = 1; i < zz.length - 1; i++) {
-        // double z = zz[i] / zz[0]; // TODO Make this more generic
-        // if (z != Double.POSITIVE_INFINITY) {
-        // Coordinate C2 = new Coordinate(C1.x + z * dX / zmax[i] * 1 / 4, C1.y + z * dY
-        // / zmax[i]);
-        // debugGeom.add(geometryFactory.createLineString(new Coordinate[] { C1, C2 }));
-        // }
-        // }
-        // }
     }
 
     public final Geometry getDebugGeometry() {

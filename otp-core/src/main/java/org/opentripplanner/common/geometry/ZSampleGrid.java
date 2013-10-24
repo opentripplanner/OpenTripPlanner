@@ -15,7 +15,7 @@ package org.opentripplanner.common.geometry;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-interface ZSamplePoint<TZ, U> {
+interface ZSamplePoint<TZ> {
     public int getX();
 
     public int getY();
@@ -24,17 +24,17 @@ interface ZSamplePoint<TZ, U> {
     
     public void setZ(TZ z);
 
-    public U getU();
+    public Object getUserData();
 
-    public void setU(U u);
+    public void setUserData(Object userData);
 
-    public ZSamplePoint<TZ, U> up();
+    public ZSamplePoint<TZ> up();
 
-    public ZSamplePoint<TZ, U> down();
+    public ZSamplePoint<TZ> down();
 
-    public ZSamplePoint<TZ, U> right();
+    public ZSamplePoint<TZ> right();
 
-    public ZSamplePoint<TZ, U> left();
+    public ZSamplePoint<TZ> left();
 
 }
 
@@ -43,11 +43,11 @@ interface ZSamplePoint<TZ, U> {
  * 
  * @author laurent
  */
-public interface ZSampleGrid<TZ, U> extends Iterable<ZSamplePoint<TZ, U>> {
+public interface ZSampleGrid<TZ> extends Iterable<ZSamplePoint<TZ>> {
 
-    public ZSamplePoint<TZ, U> getOrCreate(int x, int y);
+    public ZSamplePoint<TZ> getOrCreate(int x, int y);
 
-    public Coordinate getCoordinates(ZSamplePoint<TZ,U> point);
+    public Coordinate getCoordinates(ZSamplePoint<TZ> point);
     
     public int[] getLowerLeftIndex(Coordinate C);
 
