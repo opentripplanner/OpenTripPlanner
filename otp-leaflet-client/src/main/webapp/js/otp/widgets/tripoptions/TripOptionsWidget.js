@@ -699,9 +699,11 @@ otp.widgets.tripoptions.PreferredRoutes =
                 var agencyAndId = apiIdArr[0] + "_" + apiIdArr.pop();
                 restoredIds.push(agencyAndId);
             }
-            this.selectorWidget.restoredRouteIds = restoredIds; //planData.queryParams.preferredRoutes;
+
+            this.selectorWidget.restoredRouteIds = restoredIds;
+            if(this.selectorWidget.initializedRoutes) this.selectorWidget.restoreSelected();
+
             this.tripWidget.module.preferredRoutes = planData.queryParams.preferredRoutes;
-            //this.selectorWidget.updateRouteList();
             
             // resolve the IDs to user-friendly names
             var ti = this.tripWidget.module.webapp.transitIndex;
@@ -716,6 +718,7 @@ otp.widgets.tripoptions.PreferredRoutes =
             
         }
         else { // none specified
+            this.selectorWidget.clearSelected();
             this.selectorWidget.restoredRouteIds = [];
             $('#'+this.id+'-list').html('(None)');
             this.tripWidget.module.preferredRoutes = null;
@@ -786,7 +789,10 @@ otp.widgets.tripoptions.BannedRoutes =
                 var agencyAndId = apiIdArr[0] + "_" + apiIdArr.pop();
                 restoredIds.push(agencyAndId);
             }
+
             this.selectorWidget.restoredRouteIds = restoredIds;
+            if(this.selectorWidget.initializedRoutes) this.selectorWidget.restoreSelected();
+
             this.tripWidget.module.bannedRoutes = planData.queryParams.bannedRoutes;
             
             // resolve the IDs to user-friendly names
@@ -802,6 +808,7 @@ otp.widgets.tripoptions.BannedRoutes =
             
         }
         else { // none specified
+            this.selectorWidget.clearSelected();
             this.selectorWidget.restoredRouteIds = [];
             $('#'+this.id+'-list').html('(None)');
             this.tripWidget.module.bannedRoutes = null;

@@ -82,3 +82,34 @@
     
 </script>
 
+
+<!-- RoutesSelector Widget-->
+
+<script id="otp-tripOptions-routesSelector" type="text/html">
+
+    <div>
+        <div style="float:left">
+            All Routes:<br>
+            <select id="{{widgetId}}-routeList" size=6 class="otp-preferredRoutesSelectorWidget-list notDraggable">
+            </select>
+        </div>
+        
+        <div style="float:right">{{name}}<br>
+            <select id="{{widgetId}}-selectedList" size=6 class="otp-preferredRoutesSelectorWidget-list notDraggable">
+            </select>
+        </div>
+
+        <div class="otp-preferredRoutesSelectorWidget-middle">
+            <button id="{{widgetId}}-addButton" style="margin-bottom: 5px;">&gt;</button><br>
+            <button id="{{widgetId}}-removeButton">&lt;</button><br>
+        </div>
+        
+        <div style="clear:both;" /></div>
+    </div>
+
+    <div class="otp-preferredRoutesSelectorWidget-buttonRow">
+        <button id="{{widgetId}}-saveButton">Save</button>&nbsp;
+        <button id="{{widgetId}}-closeButton">Close</button>
+    </div>
+
+</script>
