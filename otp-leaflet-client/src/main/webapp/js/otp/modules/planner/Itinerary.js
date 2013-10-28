@@ -122,8 +122,8 @@ otp.modules.planner.Itinerary = otp.Class({
         return otp.util.Time.msToHrMin(this.getEndTime() - this.getStartTime());
     },
     
-    getFareStr : function() {
-    
+    getFareStr : function() {    
+        if(otp.config.fareDisplayOverride) return otp.config.fareDisplayOverride;
         if(this.itinData.fare && this.itinData.fare.fare.regular) {
             var decimalPlaces = this.itinData.fare.fare.regular.currency.defaultFractionDigits;
             return this.itinData.fare.fare.regular.currency.symbol +
