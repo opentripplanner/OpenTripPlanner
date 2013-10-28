@@ -41,8 +41,8 @@ otp.modules.fieldtrip.SearchWidget =
         
         $('#' + this.id + '-searchButton').button().click($.proxy(this.runSearch, this));        
 
-        this.mainDiv.find(".dateInput1").datepicker().datepicker("setDate", new Date());
-        this.mainDiv.find(".dateInput2").datepicker().datepicker("setDate", new Date());
+        this.mainDiv.find(".dateInput1").datepicker();//.datepicker("setDate", new Date());
+        this.mainDiv.find(".dateInput2").datepicker();//.datepicker("setDate", new Date());
         this.mainDiv.find(".extendedDateInput").hide();
 
         this.mainDiv.find(".dateOperatorSelect").change(_.bind(function() {
@@ -60,24 +60,32 @@ otp.modules.fieldtrip.SearchWidget =
         
         var queryStr = "";
 
-        queryStr += "teacherName " + this.mainDiv.find(".teacherOperatorSelect").val() + " ?";
+        queryStr += "LOWER(teacherName) " + this.mainDiv.find(".teacherOperatorSelect").val() + " ?";
         queryStr += " " + this.mainDiv.find('input:radio[name=andor1]:checked').val() + " ";
-        queryStr += "schoolName " + this.mainDiv.find(".schoolOperatorSelect").val() + " ?";
+        queryStr += "LOWER(schoolName) " + this.mainDiv.find(".schoolOperatorSelect").val() + " ?";
         queryStr += " " + this.mainDiv.find('input:radio[name=andor2]:checked').val() + " ";
         queryStr += "travelDate " + this.mainDiv.find(".dateOperatorSelect").val() + " ?";
         if(this.mainDiv.find(".dateOperatorSelect").val() === 'between') {
             queryStr += " and ?";
         }
 
+        var date1 = this.mainDiv.find(".dateInput1").val();
+        if(!date1 || date1.length == 0) {
+            date1 = moment().format("MM/DD/YYYY");
+        }
         var params = {
             sessionId : this.module.sessionManager.sessionId,
             query : queryStr,
-            teacherValue : this.mainDiv.find(".teacherInput").val(),
-            schoolValue : this.mainDiv.find(".schoolInput").val(),
-            date1 : this.mainDiv.find(".dateInput1").val()
+            teacherValue : this.mainDiv.find(".teacherInput").val().toLowerCase(),
+            schoolValue : this.mainDiv.find(".schoolInput").val().toLowerCase(),
+            date1 : date1
         };
         if(this.mainDiv.find(".dateOperatorSelect").val() === 'between') {
-            params.date2 = this.mainDiv.find(".dateInput2").val();
+            var date2 = this.mainDiv.find(".dateInput2").val();
+            if(!date2 || date2.length == 0) {
+                date2 = moment().format("MM/DD/YYYY");
+            }
+            params.date2 = date2;
         }
 
         this.mainDiv.find(".searchTabs").tabs("select", 1);
