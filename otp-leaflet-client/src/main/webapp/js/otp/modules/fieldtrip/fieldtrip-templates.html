@@ -65,8 +65,10 @@
             <b>Intermediate Locations</b>:
                 {{#intermediateLocations}}{{intermediateLocations}}{{/intermediateLocations}}{{^intermediateLocations}}N/A{{/intermediateLocations}}<br>
             <b>Payment Preference</b>: {{paymentPreference}}<br>
+            {{#requireInvoice}}<span style="color: white; background: #800;">&nbsp;{{/requireInvoice}}
             <b>Invoice Required?</b>: 
-                {{#requireInvoice}}Yes{{/requireInvoice}}{{^requireInvoice}}No{{/requireInvoice}}<br>
+                {{#requireInvoice}}Yes{{/requireInvoice}}{{^requireInvoice}}No{{/requireInvoice}}
+            {{#requireInvoice}}&nbsp;</span>{{/requireInvoice}}<br>
             <b>Class Pass ID</b>: 
                 {{#classpassId}}{{classpassId}}{{/classpassId}}{{^classpassId}}(None){{/classpassId}}<br>
 
