@@ -35,7 +35,7 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
         
         //this.contentDiv  = $('<div class="otp-fieldTrip-requestWidget-content notDraggable" />').appendTo(this.mainDiv);
         this.render();
-        this.center();
+        this.centerX();
     },
     
     render : function() {

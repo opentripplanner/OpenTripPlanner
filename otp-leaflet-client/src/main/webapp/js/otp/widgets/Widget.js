@@ -154,7 +154,12 @@ otp.widgets.Widget = otp.Class({
         
         this.$().offset({ top : top, left: left });
     },
-    
+
+    centerX : function() {
+        var left = $(window).width()/2 - this.$().width()/2;  
+        this.$().offset({ left: left });
+    },
+
     close : function() {
         if(typeof this.onClose === 'function') this.onClose();
         this.isOpen = false;
