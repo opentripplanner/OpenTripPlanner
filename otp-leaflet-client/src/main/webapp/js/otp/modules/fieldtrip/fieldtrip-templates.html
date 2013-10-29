@@ -249,6 +249,10 @@
                 <b>Students</b>: {{numStudents}} (Ages {{#minimumAge}}{{minimumAge}}{{/minimumAge}}{{^minimumAge}}N/A{{/minimumAge}}&nbsp;to&nbsp;
                     {{#maximumAge}}{{maximumAge}}{{/maximumAge}}{{^maximumAge}}N/A{{/maximumAge}}) / 
                     <b>Chaperones</b>: {{#numChaperones}}{{numChaperones}}{{/numChaperones}}{{^numChaperones}}N/A{{/numChaperones}}<br>
+                {{#classpassId}}
+                    <b>Classpass ID</b>: {{classpassId}}<br>
+                {{/classpassId}}
+
                 <i>Request submitted: {{timeStamp}}</i>            
             </div>
             

@@ -136,15 +136,16 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
             if(outboundTrip) context.outboundItineraries = outboundTrip.groupItineraries;
             if(inboundTrip) context.inboundItineraries = inboundTrip.groupItineraries;
             
+            console.log(context);
             var content = ich['otp-fieldtrip-printablePlan'](context);
             
             // populate itin details
-            console.log(outboundTrip);
             if(outboundTrip) {
                 var itins = outboundTrip.groupItineraries;
                 for(var i = 0; i < itins.length; i++) {
                     var itinData = otp.util.FieldTrip.readItinData(itins[i]);
                     var itin = new otp.modules.planner.Itinerary(itinData, null);
+                    if(req.classpassId) itin.fareDisplayOverride = '(Classpass: #' + req.classpassId + ')';
                     content.find('.outbound-itinBody-'+i).html(itin.getHtmlNarrative());
                 }
             }
@@ -154,6 +155,7 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
                 for(var i = 0; i < itins.length; i++) {
                     var itinData = otp.util.FieldTrip.readItinData(itins[i]);
                     var itin = new otp.modules.planner.Itinerary(itinData, null);
+                    if(req.classpassId) itin.fareDisplayOverride = '(Classpass: #' + req.classpassId + ')';
                     content.find('.inbound-itinBody-'+i).html(itin.getHtmlNarrative());
                 }
             }
