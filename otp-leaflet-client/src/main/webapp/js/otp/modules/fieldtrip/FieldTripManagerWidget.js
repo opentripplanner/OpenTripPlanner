@@ -43,8 +43,9 @@ otp.modules.fieldtrip.FieldTripManagerWidget =
             this_.module.loadRequests();
         });
 
-        this.mainDiv.find('.reportDateInput').datepicker().datepicker("setDate", new Date());/*.click(function() {
-        });*/
+        var date = new Date();
+        date.setDate(date.getDate() + 1);
+        this.mainDiv.find('.reportDateInput').datepicker().datepicker("setDate", date);
 
         this.mainDiv.find('.viewReportButton').button().click(function() {
             var m = moment(this_.mainDiv.find('.reportDateInput').val());

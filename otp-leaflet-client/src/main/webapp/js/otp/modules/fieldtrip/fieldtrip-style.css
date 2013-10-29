@@ -115,10 +115,11 @@
 }
 
 .otp-fieldTripRequests-listRow {
-    margin: 4px;
+    margin: 6px;
     padding: 4px;
     background: #eee;
     cursor: pointer;
+    border: 1px solid gray;
 }
 
 
