@@ -430,7 +430,14 @@ public class Timetable implements Serializable {
                         } else {
                             long today = updateServiceDate.getAsDate(timeZone).getTime() / 1000;
 
-                            if (i > 0) {
+                            if (i == 0) {
+                                if (update.hasArrival()) {
+                                    StopTimeEvent arrival = update.getArrival();
+                                    if (arrival.hasDelay()) {
+                                        delay = arrival.getDelay();
+                                    }   // Arrival times aren't stored for the first stop - no else.
+                                }
+                            } else {
                                 if (update.hasArrival()) {
                                     StopTimeEvent arrival = update.getArrival();
                                     if (arrival.hasDelay()) {
