@@ -26,6 +26,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.request.BannedStopSet;
+import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.OnboardVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +56,7 @@ public class PatternInterlineDwell extends Edge implements OnboardEdge {
     public void addTrip(Trip trip, Trip reverseTrip, int dwellTime,
             int oldPatternIndex, int newPatternIndex) {
         if (dwellTime < 0) {
-	    dwellTime = 0;
+            dwellTime = 0;
             LOG.warn ("Negative dwell time for trip " + trip.getId().getAgencyId() + " " + trip.getId().getId() + "(forcing to zero)");
         }
         tripIdToInterlineDwellData.put(trip.getId(), new InterlineDwellData(dwellTime, newPatternIndex, reverseTrip));
@@ -83,8 +84,8 @@ public class PatternInterlineDwell extends Edge implements OnboardEdge {
     }
 
     public State optimisticTraverse(State s0) {
-    	StateEditor s1 = s0.edit(this);
-    	s1.incrementTimeInSeconds(bestDwellTime);
+        StateEditor s1 = s0.edit(this);
+        s1.incrementTimeInSeconds(bestDwellTime);
         return s1.makeState();
     }
     
@@ -99,35 +100,53 @@ public class PatternInterlineDwell extends Edge implements OnboardEdge {
     }
 
     public State traverse(State state0) {
+        int arrivalTime;
+        int departureTime;
+        TableTripPattern pattern;
+        TripTimes newTripTimes;
+        TripTimes oldTripTimes = state0.getTripTimes();
         RoutingRequest options = state0.getOptions();
 
         AgencyAndId tripId = state0.getTripId();
         InterlineDwellData dwellData;
+
         if (options.isArriveBy()) {
-        	// traversing backward
-        	dwellData = reverseTripIdToInterlineDwellData.get(tripId);
+            // traversing backward
+            dwellData = reverseTripIdToInterlineDwellData.get(tripId);
+            if (dwellData == null) return null;
+
+            pattern = ((OnboardVertex) fromv).getTripPattern();
+            newTripTimes = pattern.getResolvedTripTimes(dwellData.patternIndex, state0);
+            arrivalTime = newTripTimes.getArrivalTime(newTripTimes.getNumHops() - 1);
+            departureTime = oldTripTimes.getDepartureTime(0);
         } else {
-        	// traversing forward
-        	dwellData = tripIdToInterlineDwellData.get(tripId);
+            // traversing forward
+            dwellData = tripIdToInterlineDwellData.get(tripId);
+            if (dwellData == null) return null;
+
+            pattern = ((OnboardVertex) tov).getTripPattern();
+            newTripTimes = pattern.getResolvedTripTimes(dwellData.patternIndex, state0);
+            arrivalTime = oldTripTimes.getArrivalTime(oldTripTimes.getNumHops() - 1);
+            departureTime = newTripTimes.getDepartureTime(0);
         }
-        if (dwellData == null) {
-            return null;
-        }
+
         BannedStopSet banned = options.bannedTrips.get(dwellData.trip.getId());
         if (banned != null) {
             if (banned.contains(0)) 
                 return null;
         }
 
+        int dwellTime = departureTime - arrivalTime;
+        if (dwellTime < 0) return null;
+
         StateEditor s1 = state0.edit(this);
-        // FIXME: ugly!
-        TableTripPattern pattern = ((OnboardVertex)s1.getVertex()).getTripPattern();
-        s1.incrementTimeInSeconds(dwellData.dwellTime);
+
+        s1.incrementTimeInSeconds(dwellTime);
         s1.setTripId(dwellData.trip.getId());
         s1.setPreviousTrip(dwellData.trip);
-        // FIXME: this is interlining to the SCHEDULED timetable, not the updated timetable. use resolver.
-        s1.setTripTimes(pattern.getTripTimes(dwellData.patternIndex));
-        s1.incrementWeight(dwellData.dwellTime);
+
+        s1.setTripTimes(newTripTimes);
+        s1.incrementWeight(dwellTime);
         
         // This shouldn't be changing - MWC
         s1.setBackMode(getMode());
@@ -143,7 +162,7 @@ public class PatternInterlineDwell extends Edge implements OnboardEdge {
     }
     
     public Trip getTrip() {
-    	return targetTrip;
+        return targetTrip;
     }
 
     public Map<AgencyAndId, InterlineDwellData> getReverseTripIdToInterlineDwellData() {

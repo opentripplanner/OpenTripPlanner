@@ -151,7 +151,7 @@ class TripPatternListModel extends AbstractListModel {
     ArrayList<String> departureTimes = new ArrayList<String>();
 
     public TripPatternListModel(TableTripPattern pattern, int stopIndex) {
-        Iterator<Integer> departureTimeIterator = pattern.getScheduledDepartureTimes(stopIndex);
+        Iterator<Integer> departureTimeIterator = pattern.getDepartureTimes(stopIndex);
         while (departureTimeIterator.hasNext()) {
             int dt = departureTimeIterator.next();
 
