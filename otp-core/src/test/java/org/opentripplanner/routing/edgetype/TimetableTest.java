@@ -277,5 +277,27 @@ public class TimetableTest {
         stopTimeEventBuilder.setDelay(-1);
         tripUpdate = tripUpdateBuilder.build();
         assertTrue(timetable.update(tripUpdate, "agency", timeZone, serviceDate));
+
+        // update trip arrival time at first stop and make departure time incoherent at second stop
+        tripDescriptorBuilder = TripDescriptor.newBuilder();
+        tripDescriptorBuilder.setTripId("1.1");
+        tripDescriptorBuilder.setScheduleRelationship(
+                TripDescriptor.ScheduleRelationship.SCHEDULED);
+        tripUpdateBuilder = TripUpdate.newBuilder();
+        tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+        stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(0);
+        stopTimeUpdateBuilder.setStopSequence(1);
+        stopTimeUpdateBuilder.setScheduleRelationship(
+                StopTimeUpdate.ScheduleRelationship.SCHEDULED);
+        stopTimeEventBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
+        stopTimeEventBuilder.setDelay(0);
+        stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder(1);
+        stopTimeUpdateBuilder.setStopSequence(2);
+        stopTimeUpdateBuilder.setScheduleRelationship(
+                StopTimeUpdate.ScheduleRelationship.SCHEDULED);
+        stopTimeEventBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
+        stopTimeEventBuilder.setDelay(-1);
+        tripUpdate = tripUpdateBuilder.build();
+        assertFalse(timetable.update(tripUpdate, "agency", timeZone, serviceDate));
     }
 }
