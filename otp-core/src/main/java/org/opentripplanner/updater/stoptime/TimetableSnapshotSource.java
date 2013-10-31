@@ -111,7 +111,7 @@ public class TimetableSnapshotSource {
      */
     public void applyTripUpdates(List<TripUpdate> updates, String agencyId) {
         if (updates == null) {
-            LOG.debug("updates is null");
+            LOG.warn("updates is null");
             return;
         }
 
@@ -193,7 +193,7 @@ public class TimetableSnapshotSource {
         TableTripPattern pattern = getPatternForTrip(tripId);
 
         if (pattern == null) {
-            LOG.debug("No pattern found for tripId {}, skipping TripUpdate.", tripId);
+            LOG.warn("No pattern found for tripId {}, skipping TripUpdate.", tripId);
             return false;
         }
 
@@ -209,14 +209,14 @@ public class TimetableSnapshotSource {
     protected boolean handleAddedTrip(TripUpdate tripUpdate, String agencyId,
             ServiceDate serviceDate) {
         // TODO: Handle added trip
-
+        LOG.warn("Added trips are currently unsupported. Skipping TripUpdate.");
         return false;
     }
 
     protected boolean handleUnscheduledTrip(TripUpdate tripUpdate, String agencyId,
             ServiceDate serviceDate) {
         // TODO: Handle unscheduled trip
-
+        LOG.warn("Unscheduled trips are currently unsupported. Skipping TripUpdate.");
         return false;
     }
 
@@ -227,7 +227,7 @@ public class TimetableSnapshotSource {
         TableTripPattern pattern = getPatternForTrip(tripId);
 
         if (pattern == null) {
-            LOG.debug("No pattern found for tripId {}, skipping TripUpdate.", tripId);
+            LOG.warn("No pattern found for tripId {}, skipping TripUpdate.", tripId);
             return false;
         }
 
@@ -237,7 +237,7 @@ public class TimetableSnapshotSource {
     protected boolean handleReplacementTrip(TripUpdate tripUpdate, String agencyId,
             ServiceDate serviceDate) {
         // TODO: Handle replacement trip
-
+        LOG.warn("Replacement trips are currently unsupported. Skipping TripUpdate.");
         return false;
     }
 
