@@ -19,7 +19,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -31,18 +30,19 @@ import java.util.regex.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 
-import org.opentripplanner.updater.GraphUpdaterConfigurator;
-import org.opentripplanner.updater.PropertiesPreferences;
+import org.geotools.referencing.factory.DeferredAuthorityFactory;
+import org.geotools.util.WeakCollectionCleaner;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
-
-import com.google.common.io.ByteStreams;
-
+import org.opentripplanner.updater.GraphUpdaterConfigurator;
+import org.opentripplanner.updater.PropertiesPreferences;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.io.ByteStreams;
 
 /**
  * A class implementing loading graph from files or resources, but which does not load anything by
@@ -59,9 +59,10 @@ public class GraphServiceFileImpl implements GraphService {
     private static final Logger LOG = LoggerFactory.getLogger(GraphServiceFileImpl.class);
 
     public static final String GRAPH_FILENAME = "Graph.obj";
+
     public static final String CONFIG_FILENAME = "Graph.properties";
 
-    @Getter 
+    @Getter
     @Setter
     private String basePath = "/var/otp/graphs";
 
@@ -130,12 +131,12 @@ public class GraphServiceFileImpl implements GraphService {
         }
         return sb.toString();
     }
-    
+
     protected Graph loadGraph(String routerId) {
         if (!routerIdLegal(routerId)) {
             LOG.error(
-                "routerId '{}' contains characters other than alphanumeric, underscore, and dash.",
-                routerId);
+                    "routerId '{}' contains characters other than alphanumeric, underscore, and dash.",
+                    routerId);
             return null;
         }
         LOG.debug("loading serialized graph for routerId {}", routerId);
@@ -143,7 +144,7 @@ public class GraphServiceFileImpl implements GraphService {
         String baseFileName = createBaseFileName(routerId);
         String graphFileName = baseFileName + GRAPH_FILENAME;
         String configFileName = baseFileName + CONFIG_FILENAME;
-        
+
         LOG.debug("graph file for routerId '{}' is at {}", routerId, graphFileName);
         InputStream is = null;
         final String CLASSPATH_PREFIX = "classpath:/";
@@ -163,8 +164,8 @@ public class GraphServiceFileImpl implements GraphService {
             }
         }
         if (is == null) {
-            LOG.warn("Graph file not found or not openable for routerId '{}' under {}", 
-                    routerId, graphFileName);
+            LOG.warn("Graph file not found or not openable for routerId '{}' under {}", routerId,
+                    graphFileName);
             return null;
         }
         LOG.debug("graph input stream successfully opened.");
@@ -185,7 +186,8 @@ public class GraphServiceFileImpl implements GraphService {
                 // look for config on classpath
                 String resourceName = configFileName.substring(CLASSPATH_PREFIX.length());
                 LOG.debug("Trying to load config on classpath at {}", resourceName);
-                is = Thread.currentThread().getContextClassLoader().getResourceAsStream(resourceName);
+                is = Thread.currentThread().getContextClassLoader()
+                        .getResourceAsStream(resourceName);
             } else {
                 // look for config in filesystem
                 LOG.debug("Trying to load config on file at {}", configFileName);
@@ -243,7 +245,7 @@ public class GraphServiceFileImpl implements GraphService {
     public boolean registerGraph(String routerId, Graph graph) {
         Graph existing = graphs.put(routerId, graph);
         return existing == null;
-     }
+    }
 
     @Override
     public boolean evictGraph(String routerId) {
@@ -278,43 +280,53 @@ public class GraphServiceFileImpl implements GraphService {
 
         try {
 
-    		// Create directory if necessary
-    		File sourceFile = new File(graphFileName);
-    		File directory = new File(sourceFile.getParentFile().getPath());
-    		if (!directory.exists()) {
-    			directory.mkdir();
-    		}
-    		
-    		// Store the stream to disk, to be sure no data will be lost make a temporary backup
-    		// file of the original file.
-    		
-    		// Make backup file
-    		sourceFile = new File(graphFileName);
-    		File destFile = null;
-    		if (sourceFile.exists()) {
-    			destFile = new File(graphFileName + ".bak");
-    			if (destFile.exists()) {
-    				destFile.delete();
-    			}
-    			sourceFile.renameTo(destFile);
-    		}
+            // Create directory if necessary
+            File sourceFile = new File(graphFileName);
+            File directory = new File(sourceFile.getParentFile().getPath());
+            if (!directory.exists()) {
+                directory.mkdir();
+            }
 
-    		// Store the stream
-    		FileOutputStream os = new FileOutputStream(graphFileName);
-    		ByteStreams.copy(is, os);
-    		
-    		// And delete the backup file
-    		sourceFile = new File(graphFileName + ".bak");
-    		if (sourceFile.exists()) {
-    			sourceFile.delete();
-    		}
-        
-    	} catch (Exception ex) {
+            // Store the stream to disk, to be sure no data will be lost make a temporary backup
+            // file of the original file.
+
+            // Make backup file
+            sourceFile = new File(graphFileName);
+            File destFile = null;
+            if (sourceFile.exists()) {
+                destFile = new File(graphFileName + ".bak");
+                if (destFile.exists()) {
+                    destFile.delete();
+                }
+                sourceFile.renameTo(destFile);
+            }
+
+            // Store the stream
+            FileOutputStream os = new FileOutputStream(graphFileName);
+            ByteStreams.copy(is, os);
+
+            // And delete the backup file
+            sourceFile = new File(graphFileName + ".bak");
+            if (sourceFile.exists()) {
+                sourceFile.delete();
+            }
+
+        } catch (Exception ex) {
             LOG.error("Exception while storing graph to {}.", graphFileName);
             ex.printStackTrace();
             return false;
         }
-    	
-    	return true;
-    } 
+
+        return true;
+    }
+
+    /**
+     * Hook to cleanup various stuff of some used libraries (org.geotools), which depend on the
+     * external client to call them for cleaning-up.
+     */
+    public void cleanupWebapp() {
+        LOG.info("Web application shutdown: cleaning various stuff");
+        WeakCollectionCleaner.DEFAULT.exit();
+        DeferredAuthorityFactory.exit();
+    }
 }
