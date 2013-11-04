@@ -38,6 +38,10 @@ public class IsoChroneRequest {
     private int precisionMeters = 200;
 
     @Getter
+    @Setter
+    private int maxTimeSec = 0;
+
+    @Getter
     private int minCutoffSec = Integer.MAX_VALUE;
 
     @Getter

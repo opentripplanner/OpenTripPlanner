@@ -62,6 +62,9 @@ public class IsoChrone2 extends RoutingResource {
     @QueryParam("cutoffSec")
     private List<Integer> cutoffSecList;
 
+    @QueryParam("maxTimeSec")
+    private Integer maxTimeSec;
+
     @QueryParam("debug")
     private Boolean debug;
 
@@ -87,6 +90,12 @@ public class IsoChrone2 extends RoutingResource {
         isoChroneRequest.setIncludeDebugGeometry(debug);
         isoChroneRequest.setPrecisionMeters(precisionMeters);
         RoutingRequest sptRequest = buildRequest(0);
+
+        if (maxTimeSec != null) {
+            isoChroneRequest.setMaxTimeSec(maxTimeSec);
+        } else {
+            isoChroneRequest.setMaxTimeSec(isoChroneRequest.getMaxCutoffSec());
+        }
 
         List<IsochroneData> isochrones;
         if (algorithm == null || "accSampling".equals(algorithm)) {

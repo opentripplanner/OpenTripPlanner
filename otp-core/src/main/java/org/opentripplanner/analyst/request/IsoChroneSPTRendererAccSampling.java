@@ -80,8 +80,8 @@ public class IsoChroneSPTRendererAccSampling implements IsoChroneSPTRenderer {
         long t0 = System.currentTimeMillis();
         long tOvershot = (long) (2 * D0 / V0);
         sptRequest.setWorstTime(sptRequest.dateTime
-                + (sptRequest.arriveBy ? -isoChroneRequest.getMaxCutoffSec() - tOvershot
-                        : isoChroneRequest.getMaxCutoffSec() + tOvershot));
+                + (sptRequest.arriveBy ? -isoChroneRequest.getMaxTimeSec() - tOvershot
+                        : isoChroneRequest.getMaxTimeSec() + tOvershot));
         sptRequest.setBatch(true);
         sptRequest.setRoutingContext(graphService.getGraph(sptRequest.getRouterId()));
         final ShortestPathTree spt = sptService.getShortestPathTree(sptRequest);
@@ -234,10 +234,10 @@ public class IsoChroneSPTRendererAccSampling implements IsoChroneSPTRenderer {
         private double tw;
 
         private double d;
-        
+
         @Override
         public String toString() {
-            return String.format("[t/w=%f,w=%f,d=%f]", tw/w, w, d);
+            return String.format("[t/w=%f,w=%f,d=%f]", tw / w, w, d);
         }
     }
 }
