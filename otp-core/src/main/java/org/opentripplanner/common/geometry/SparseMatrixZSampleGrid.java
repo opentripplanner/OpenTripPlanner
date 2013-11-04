@@ -134,7 +134,7 @@ public final class SparseMatrixZSampleGrid<TZ> implements ZSampleGrid<TZ>,
         public void setProcessed(boolean processed) {
             this.processed = processed;
         }
-        
+
         @Override
         public String toString() {
             return "<GridDelaunayEdge " + A.getCoordinates() + "->" + B.getCoordinates() + ">";
@@ -254,7 +254,9 @@ public final class SparseMatrixZSampleGrid<TZ> implements ZSampleGrid<TZ>,
     }
 
     /**
-     * 
+     * The conversion from a grid of points to a Delaunay triangulation is trivial. Each square from
+     * the grid is cut through one diagonal in two triangles, the resulting output is a Delaunay
+     * triangulation.
      */
     private void delaunify() {
         triangulation = new ArrayList<GridDelaunayEdge>(allSamples.size() * 3);
@@ -294,5 +296,11 @@ public final class SparseMatrixZSampleGrid<TZ> implements ZSampleGrid<TZ>,
                 break;
             }
         }
+    }
+
+    @Override
+    public DelaunayTriangulation<TZ> delaunayTriangulate() {
+        // We ourselves are a DelaunayTriangulation
+        return this;
     }
 }

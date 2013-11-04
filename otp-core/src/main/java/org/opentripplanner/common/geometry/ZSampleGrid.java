@@ -13,26 +13,9 @@
 
 package org.opentripplanner.common.geometry;
 
+import org.opentripplanner.common.geometry.ZSampleGrid.ZSamplePoint;
+
 import com.vividsolutions.jts.geom.Coordinate;
-
-interface ZSamplePoint<TZ> {
-    public int getX();
-
-    public int getY();
-
-    public TZ getZ();
-    
-    public void setZ(TZ z);
-
-    public ZSamplePoint<TZ> up();
-
-    public ZSamplePoint<TZ> down();
-
-    public ZSamplePoint<TZ> right();
-
-    public ZSamplePoint<TZ> left();
-
-}
 
 /**
  * A generic indexed grid of Z samples.
@@ -41,12 +24,33 @@ interface ZSamplePoint<TZ> {
  */
 public interface ZSampleGrid<TZ> extends Iterable<ZSamplePoint<TZ>> {
 
+    public interface ZSamplePoint<TZ> {
+        public int getX();
+
+        public int getY();
+
+        public TZ getZ();
+
+        public void setZ(TZ z);
+
+        public ZSamplePoint<TZ> up();
+
+        public ZSamplePoint<TZ> down();
+
+        public ZSamplePoint<TZ> right();
+
+        public ZSamplePoint<TZ> left();
+
+    }
+
     public ZSamplePoint<TZ> getOrCreate(int x, int y);
 
     public Coordinate getCoordinates(ZSamplePoint<TZ> point);
-    
+
     public int[] getLowerLeftIndex(Coordinate C);
 
     public int size();
+
+    public DelaunayTriangulation<TZ> delaunayTriangulate();
 
 }
