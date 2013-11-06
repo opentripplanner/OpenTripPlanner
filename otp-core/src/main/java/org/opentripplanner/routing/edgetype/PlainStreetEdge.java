@@ -346,7 +346,8 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         PlainStreetEdge backPSE;
         if (backEdge != null && backEdge instanceof PlainStreetEdge) {
             backPSE = (PlainStreetEdge) backEdge;
-            RoutingRequest backOptions = backWalkingBike ? options.bikeWalkingOptions : options;
+            RoutingRequest backOptions = backWalkingBike ?
+                    s0.getOptions().bikeWalkingOptions : s0.getOptions();
             double backSpeed = backPSE.calculateSpeed(backOptions, backMode);
             final double realTurnCost;  // Units are seconds.
             

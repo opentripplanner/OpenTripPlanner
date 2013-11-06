@@ -139,14 +139,51 @@ public class PlainStreetEdgeTest {
     }
     
     /**
-     * Test the traversal of two edges with different traverse modes.
+     * Test the traversal of two edges with different traverse modes, with a focus on cycling.
+     * This test will fail unless the following three conditions are met:
+     * 1. Turn costs are computed based on the back edge's traverse mode during reverse traversal.
+     * 2. Turn costs are computed such that bike walking is taken into account correctly.
+     * 3. User-specified bike speeds are applied correctly during turn cost computation.
+     */
+    @Test
+    public void testTraverseModeSwitchBike() {
+        PlainStreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.PEDESTRIAN);
+        PlainStreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+
+        v1.setTrafficLight(true);
+
+        RoutingRequest forward = proto.clone();
+        forward.setMode(TraverseMode.BICYCLE);
+        forward.setBikeSpeed(3.0f);
+        forward.setRoutingContext(_graph, v0, v2);
+
+        State s0 = new State(forward);
+        State s1 = e0.traverse(s0);
+        State s2 = e1.traverse(s1);
+
+        RoutingRequest reverse = proto.clone();
+        reverse.setMode(TraverseMode.BICYCLE);
+        reverse.setArriveBy(true);
+        reverse.setBikeSpeed(3.0f);
+        reverse.setRoutingContext(_graph, v0, v2);
+
+        State s3 = new State(reverse);
+        State s4 = e1.traverse(s3);
+        State s5 = e0.traverse(s4);
+
+        assertEquals(73, s2.getElapsedTimeSeconds());
+        assertEquals(73, s5.getElapsedTimeSeconds());
+    }
+
+    /**
+     * Test the traversal of two edges with different traverse modes, with a focus on walking.
      * This test will fail unless the following three conditions are met:
      * 1. Turn costs are computed based on the back edge's traverse mode during reverse traversal.
      * 2. Turn costs are computed such that bike walking is taken into account correctly.
      * 3. Enabling bike mode on a routing request bases the bike walking speed on the walking speed.
      */
     @Test
-    public void testTraverseModeSwitch() {
+    public void testTraverseModeSwitchWalk() {
         PlainStreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
         PlainStreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.PEDESTRIAN);
 
