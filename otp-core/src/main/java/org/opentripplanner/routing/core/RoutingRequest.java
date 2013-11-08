@@ -149,8 +149,10 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     public int transferPenalty = 0;
 
-    /** How much worse walking is than waiting for an equivalent length of time, as a multiplier.
-     *  Defaults to 2. */
+    /** A multiplier for how bad walking is, compared to being in transit for equal lengths of time.
+     *  Defaults to 2. Empirically, values between 10 and 20 seem to correspond well to the concept
+     *  of not wanting to walk too much without asking for totally ridiculous itineraries, but this
+     *  observation should in no way be taken as scientific or definitive. Your mileage may vary.*/
     public double walkReluctance = 2.0;
 
     /** Used instead of walk reluctance for stairs */
@@ -177,6 +179,12 @@ public class RoutingRequest implements Cloneable, Serializable {
     public int elevatorHopCost = 20;
 
     // it is assumed that getting off an elevator is completely free
+
+    /** Time to get on and off your own bike */
+    public int bikeSwitchTime;
+
+    /** Cost of getting on and off your own bike */
+    public int bikeSwitchCost;
 
     /** Time to rent a bike */
     public int bikeRentalPickupTime = 60;
@@ -429,6 +437,8 @@ public class RoutingRequest implements Cloneable, Serializable {
             bikeWalkingOptions.modes.setBicycle(false);
             bikeWalkingOptions.modes.setWalk(true);
             bikeWalkingOptions.walkingBike = true;
+            bikeWalkingOptions.bikeSwitchTime = bikeSwitchTime;
+            bikeWalkingOptions.bikeSwitchCost = bikeSwitchCost;
         } else if (modes.getDriving()) {
             bikeWalkingOptions = new RoutingRequest();
             bikeWalkingOptions.setArriveBy(this.isArriveBy());
@@ -877,6 +887,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && elevatorBoardCost == other.elevatorBoardCost
                 && elevatorHopTime == other.elevatorHopTime
                 && elevatorHopCost == other.elevatorHopCost
+                && bikeSwitchTime == other.bikeSwitchTime
+                && bikeSwitchCost == other.bikeSwitchCost
                 && bikeRentalPickupTime == other.bikeRentalPickupTime
                 && bikeRentalPickupCost == other.bikeRentalPickupCost
                 && bikeRentalDropoffTime == other.bikeRentalDropoffTime

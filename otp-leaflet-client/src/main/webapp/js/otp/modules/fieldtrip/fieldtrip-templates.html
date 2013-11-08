@@ -307,3 +307,82 @@
         </div>
     </div>
 </script>
+
+
+<script id="otp-fieldtrip-searchWidget" type="text/html">
+    <div class="searchTabs notDraggable" style="position: absolute; top: 30px; bottom: 10px; left: 10px; right: 10px;">
+        <ul>
+            <li><a href="#{{widgetId}}-optionsTab">Search Options</a></li>
+            <li><a href="#{{widgetId}}-resultsTab">Results</a></li>
+        </ul>
+        <div id="{{widgetId}}-optionsTab">
+            <div class="otp-fieldtrip-searchWidget-tabArea">
+                Find Field Trips Where:
+
+                <div style="margin: 12px 0px; text-align: center;">
+                    Teacher&nbsp;&nbsp;
+                    <select class="teacherOperatorSelect" style="margin-right: 20px;">
+                        <option value="=">Equals</option>
+                        <option value="like">Like</option>
+                        <option value="!=">Not Equal</option>
+                    </select>
+                    <input class="teacherInput" type="text"></input>
+                </div>
+
+                <div style="margin: 12px 0px; text-align: center;">
+                    <input type="radio" name="andor1" value="and" checked> and&nbsp;&nbsp;
+                    <input type="radio" name="andor1" value="or"> or
+                </div>
+
+                <div style="margin: 12px 0px; text-align: center;">
+                    School&nbsp;&nbsp;
+                    <select class="schoolOperatorSelect" style="margin-right: 20px;">
+                        <option value="=">Equals</option>
+                        <option value="like">Like</option>
+                        <option value="!=">Not Equal</option>
+                    </select>
+                    <input class="schoolInput" type="text"></input>
+                </div>
+
+                <div style="margin: 12px 0px; text-align: center;">
+                    <input type="radio" name="andor2" value="and" checked> and&nbsp;&nbsp;
+                    <input type="radio" name="andor2" value="or"> or
+                </div>
+
+                <div style="margin: 12px 0px; text-align: center;">
+                    Date&nbsp;&nbsp;
+                    <select class="dateOperatorSelect" style="margin-right: 20px;">
+                        <option value="=">Equals</option>
+                        <option value="<">Is Before</option>
+                        <option value=">">Is After</option>
+                        <option value="between">Is Between</option>
+                    </select>
+                    <input class="dateInput1" type="text" style="width: 80px;"></input>
+                    <span class="extendedDateInput">
+                        and <input class="dateInput2" type="text" style="width: 80px;"></input>
+                    </span>
+                </div>
+
+                <div style="margin: 24px 0px; text-align: center;">
+                    Show:
+                    <input type="radio" name="plannedOnly" value="true" checked> Planned Trips Only &nbsp;&nbsp;
+                    <input type="radio" name="plannedOnly" value="false"> All Trips
+                </div>
+
+
+                <div style="text-align: center; margin-top: 25px;">
+                    <button id="{{widgetId}}-searchButton">Search</button>
+                </div>
+
+                <div style="text-align: center; margin-top: 25px; font-style: italic; font-size: .9em;">
+                    Note: for &quot;like&quot; queries, use % for wildcard matches<br>(e.g. &quot% High School&quot)
+                </div>
+
+            </div>
+        </div>
+        <div id="{{widgetId}}-resultsTab">
+            <div class="resultsArea otp-fieldtrip-searchWidget-tabArea">
+            </div>
+        </div>
+    </div>
+</script>

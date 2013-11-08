@@ -31,6 +31,9 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.SimpleTimeZone;
+import java.util.TimeZone;
+
 import junit.framework.TestCase;
 
 import org.codehaus.jettison.json.JSONException;
@@ -102,19 +105,20 @@ import org.opentripplanner.routing.patch.Patch;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PatchService;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.trippattern.TripUpdateList;
-import org.opentripplanner.routing.trippattern.Update;
-import org.opentripplanner.routing.trippattern.Update.Status;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStationStop;
 import org.opentripplanner.util.TestUtils;
 
+import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship;
 import com.vividsolutions.jts.geom.LineString;
 
 class SimpleGraphServiceImpl implements GraphService {
-
     private HashMap<String, Graph> graphs = new HashMap<String, Graph>();
 
     @Override
@@ -167,13 +171,12 @@ class SimpleGraphServiceImpl implements GraphService {
 
     @Override
     public boolean save(String routerId, InputStream is) {
-    	return false;
+        return false;
     }
 }
 
 /* This is a hack to hold context and graph data between test runs, since loading it is slow. */
 class Context {
-    
     /**
      * Save a temporary graph object when this is true
      */
@@ -258,7 +261,8 @@ class Context {
         HashMap<Class<?>, Object> extra = new HashMap<Class<?>, Object>();
         gtfsBuilder.buildGraph(graph, extra);
 
-        TransitToStreetNetworkGraphBuilderImpl linker = new TransitToStreetNetworkGraphBuilderImpl();
+        TransitToStreetNetworkGraphBuilderImpl linker =
+                new TransitToStreetNetworkGraphBuilderImpl();
         linker.buildGraph(graph, extra);
 
     }
@@ -306,7 +310,6 @@ class Context {
 }
 
 public class TestRequest extends TestCase {
-
     public void testRequest() {
         RoutingRequest request = new RoutingRequest();
 
@@ -314,7 +317,7 @@ public class TestRequest extends TestCase {
         assertTrue(request.getModes().getCar());
         request.removeMode(TraverseMode.CAR);
         assertFalse(request.getModes().getCar());
-        
+
         request.addMode(TraverseMode.CUSTOM_MOTOR_VEHICLE);
         assertFalse(request.getModes().getCar());
         assertTrue(request.getModes().getDriving());
@@ -339,8 +342,8 @@ public class TestRequest extends TestCase {
     }
 
     public void testPlanner() throws Exception {
-
-        Planner planner = new TestPlanner("portland", "NE 43RD AVE at NE GLISAN ST", "NE 43RD AVE at NE ROYAL CT");
+        Planner planner = new TestPlanner(
+                "portland", "From::NE 43RD AVE at NE GLISAN ST", "To::NE 43RD AVE at NE ROYAL CT");
 
         Response response = planner.getItineraries();
         Itinerary itinerary = response.getPlan().itinerary.get(0);
@@ -354,11 +357,14 @@ public class TestRequest extends TestCase {
         assertEquals("NE 43RD AVE", step2.streetName);
         assertEquals(RelativeDirection.LEFT, step2.relativeDirection);
         assertTrue(step2.stayOn);
-
+        assertEquals("From", response.getPlan().from.orig);
+        assertEquals("From", leg.from.orig);
+        leg = itinerary.legs.get(itinerary.legs.size() - 1);
+        assertEquals("To", leg.to.orig);
+        assertEquals("To", response.getPlan().to.orig);
     }
 
     public void testFirstTrip() throws Exception {
-
         Planner planner = new TestPlanner("portland", "45.58,-122.68", "45.48,-122.6");
 
         Response response = planner.getFirstTrip();
@@ -366,7 +372,6 @@ public class TestRequest extends TestCase {
         Leg leg = itinerary.legs.get(1);
         assertTrue(leg.startTime.get(Calendar.HOUR) >= 4);
         assertTrue(leg.startTime.get(Calendar.HOUR) <= 7);
-
     }
 
     public void testFirstAndLastLeg() throws Exception {
@@ -386,9 +391,9 @@ public class TestRequest extends TestCase {
     }
 
     public void testAlerts() throws Exception {
-
         // SE 47th and Ash, NE 47th and Davis (note that we cross Burnside, this goes from SE to NE)
-        Planner planner = new TestPlanner("portland", "SE 47TH AVE at SE ASH ST", "NE 47TH AVE at NE COUCH ST");
+        Planner planner = new TestPlanner(
+                "portland", "SE 47TH AVE at SE ASH ST", "NE 47TH AVE at NE COUCH ST");
         Response response = planner.getItineraries();
 
         Itinerary itinerary = response.getPlan().itinerary.get(0);
@@ -407,7 +412,6 @@ public class TestRequest extends TestCase {
     }
 
     public void testIntermediate() throws Exception {
-
         Vertex v1 = getVertexByCrossStreets("NW 10TH AVE", "W BURNSIDE ST");
         Vertex v2 = getVertexByCrossStreets("SE 82ND AVE", "SE ASH ST").getOutgoing().iterator()
                 .next().getToVertex();
@@ -472,7 +476,6 @@ public class TestRequest extends TestCase {
         assertTrue(Math.abs(-122 - data2.getCenterLongitude()) < 1);
         assertTrue(Math.abs(-122 - data2.getLowerLeftLongitude()) < 2);
         assertTrue(Math.abs(-122 - data2.getUpperRightLongitude()) < 2);
-
     }
 
     /** Smoke test for patcher */
@@ -487,7 +490,6 @@ public class TestRequest extends TestCase {
         assertNull(stopPatches.patches);
         PatchResponse routePatches = p.getRoutePatches("TriMet", "100");
         assertNull(routePatches.patches);
-
     }
 
     public void testRouters() throws JSONException {
@@ -519,9 +521,10 @@ public class TestRequest extends TestCase {
         assertEquals(agencyIds.agencies.toArray(new Agency[0])[0].getId(), ("TriMet"));
         assertEquals(1, agencyIds.agencies.size());
 
-        RouteDataList routeDataList = (RouteDataList) index.getRouteData("TriMet", "100", false, false,
-                routerId);
-        assertEquals(new AgencyAndId("TriMet", "100"), routeDataList.routeData.toArray(new RouteData[0])[0].id);
+        RouteDataList routeDataList = (RouteDataList) index.getRouteData(
+                "TriMet", "100", false, false, routerId);
+        assertEquals(new AgencyAndId("TriMet", "100"),
+                routeDataList.routeData.toArray(new RouteData[0])[0].id);
         assertTrue(routeDataList.routeData.toArray(new RouteData[0])[0].variants.size() >= 2);
 
         RouteList routes = (RouteList) index.getRoutes("TriMet", false, routerId);
@@ -552,7 +555,8 @@ public class TestRequest extends TestCase {
                 -122.578918, false, routerId, null);
         assertTrue(stopsNearPoint.stops.size() > 0);
 
-        long startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 9, 1, 7, 50, 0) * 1000;
+        long startTime =
+                TestUtils.dateInSeconds("America/Los_Angeles", 2009, 9, 1, 7, 50, 0) * 1000L;
         long endTime = startTime + 60 * 60 * 1000;
         StopTimeList stopTimesForStop = (StopTimeList) index.getStopTimesForStop("TriMet", "10579",
                 startTime, endTime, false, false, null, routerId);
@@ -570,8 +574,8 @@ public class TestRequest extends TestCase {
                 startTime, endTime, false, false, null, routerId);
         assertTrue(stopTimesForStop.stopTimes.size() > 0);
 
-        // StopTimeList stopTimesForTrip = (StopTimeList) index.getStopTimesForTrip("TriMet", "1254",
-        // "TriMet", "10W1040", startTime, routerId);
+        // StopTimeList stopTimesForTrip = (StopTimeList) index.getStopTimesForTrip(
+        // "TriMet", "1254", "TriMet", "10W1040", startTime, routerId);
         // assertTrue(stopTimesForTrip.stopTimes.size() > 0);
     }
 
@@ -599,12 +603,12 @@ public class TestRequest extends TestCase {
                 false, "portland");
         VertexSet vertices = (VertexSet) obj.getObject();
         assertTrue(vertices.vertices.size() > 0);
-
     }
-    
+
     public void testBannedTrips() throws JSONException {
         // Plan short trip along NE GLISAN ST
-        TestPlanner planner = new TestPlanner("portland", "NE 57TH AVE at NE GLISAN ST #2", "NE 30TH AVE at NE GLISAN ST");
+        TestPlanner planner = new TestPlanner(
+                "portland", "NE 57TH AVE at NE GLISAN ST #2", "NE 30TH AVE at NE GLISAN ST");
         // Ban trips with ids 190W1280 and 190W1260 from agency with id TriMet
         planner.setBannedTrips(Arrays.asList("TriMet_190W1280,TriMet_190W1260"));
         // Do the planning
@@ -619,7 +623,8 @@ public class TestRequest extends TestCase {
 
     public void testBannedStops() throws JSONException, ParameterException {
         // Plan short trip along NE GLISAN ST
-        TestPlanner planner = new TestPlanner("portland", "NE 57TH AVE at NE GLISAN ST #2", "NE 30TH AVE at NE GLISAN ST");
+        TestPlanner planner = new TestPlanner(
+                "portland", "NE 57TH AVE at NE GLISAN ST #2", "NE 30TH AVE at NE GLISAN ST");
         // Ban stops with ids 2106 and 2107 from agency with id TriMet
         // These are the two stops near NE 30TH AVE at NE GLISAN ST
         planner.setBannedStops(Arrays.asList("TriMet_2106,TriMet_2107"));
@@ -633,29 +638,29 @@ public class TestRequest extends TestCase {
         // Instead a stop is now expected with id 2109
         assertTrue(leg.to.stopId.getId().equals("2109"));
     }
-    
+
     @SuppressWarnings("deprecation")
     public void testBannedStopGroup() throws JSONException, ParameterException {
         // Create StopMatcher instance
         StopMatcher stopMatcher = StopMatcher.parse("TriMet_2106,TriMet_65-tc");
         // Find stops in graph
         Graph graph = Context.getInstance().graph;
-        
+
         Stop stop65_tc = ((TransitStationStop) graph.getVertex("TriMet_65-tc")).getStop();
         assertNotNull(stop65_tc);
-        
+
         Stop stop12921 = ((TransitStationStop) graph.getVertex("TriMet_12921")).getStop();
         assertNotNull(stop12921);
-        
+
         Stop stop13132 = ((TransitStationStop) graph.getVertex("TriMet_13132")).getStop();
         assertNotNull(stop13132);
-        
+
         Stop stop2106 = ((TransitStationStop) graph.getVertex("TriMet_2106")).getStop();
         assertNotNull(stop2106);
-        
+
         Stop stop2107 = ((TransitStationStop) graph.getVertex("TriMet_2107")).getStop();
         assertNotNull(stop2107);
-        
+
         // Match stop with id 65-tc
         assertTrue(stopMatcher.matches(stop65_tc));
         // Match stop with id 12921 that has TriMet_65-tc as a parent
@@ -667,10 +672,11 @@ public class TestRequest extends TestCase {
         // Match stop with id 2107
         assertFalse(stopMatcher.matches(stop2107));
     }
-    
+
     public void testBannedStopsHard() throws JSONException, ParameterException {
         // Plan short trip along NE GLISAN ST
-        TestPlanner planner = new TestPlanner("portland", "NE 57TH AVE at NE GLISAN ST #2", "NE 30TH AVE at NE GLISAN ST");
+        TestPlanner planner = new TestPlanner(
+                "portland", "NE 57TH AVE at NE GLISAN ST #2", "NE 30TH AVE at NE GLISAN ST");
 
         // Do the planning
         Response response = planner.getItineraries();
@@ -679,11 +685,11 @@ public class TestRequest extends TestCase {
         Leg leg = itinerary.legs.get(1);
         // Validate that this leg uses trip 190W1280
         assertTrue(leg.tripId.equals("190W1280"));
-        
+
         // Ban stop hard with id 2009 from agency with id TriMet
         // This is a stop that will be passed when using trip 190W1280
         planner.setBannedStopsHard(Arrays.asList("TriMet_2009"));
-        
+
         // Do the planning again
         response = planner.getItineraries();
         // First check the request
@@ -692,10 +698,11 @@ public class TestRequest extends TestCase {
         // Validate that this leg doesn't use trip 190W1280
         assertFalse(leg.tripId.equals("190W1280"));
     }
-    
+
     public void testWalkLimitExceeded() throws JSONException, ParameterException {
         // Plan short trip
-        TestPlanner planner = new TestPlanner("portland", "45.501115,-122.738214", "45.469487,-122.500343");
+        TestPlanner planner = new TestPlanner(
+                "portland", "45.501115,-122.738214", "45.469487,-122.500343");
         // Do the planning
         Response response = planner.getItineraries();
         // Check itinerary for walkLimitExceeded
@@ -711,10 +718,38 @@ public class TestRequest extends TestCase {
         assertTrue(itinerary.walkDistance <= planner.getMaxWalkDistance().get(0));
         assertFalse(itinerary.walkLimitExceeded);
     }
-    
+
+    /**
+     * Test the influence of increasing the walk reluctance.
+     */
+    public void testWalkReluctance() throws JSONException {
+        // Test planning a trip with a walk reluctance of 1
+        TestPlanner planner = new TestPlanner("portland", "45.440947,-122.837645", "45.463966,-122.755822");
+        planner.setMaxWalkDistance(Arrays.asList(Double.POSITIVE_INFINITY));
+        planner.setWalkReluctance(Arrays.asList(1.0));
+
+        Response response = planner.getItineraries();
+        Itinerary itinerary = response.getPlan().itinerary.get(0);
+        Long duration = itinerary.duration;
+
+        // Some walking is expected here, because it's slightly faster than staying onboard the bus.
+        assertTrue(itinerary.walkDistance > 0);
+
+        // Replan with a walk reluctance of 16
+        planner.setWalkReluctance(Arrays.asList(16.0));
+
+        response = planner.getItineraries();
+        itinerary = response.getPlan().itinerary.get(0);
+
+        // Now the walking should be eliminated, but this alternative itinerary does take more time.
+        assertTrue(itinerary.walkDistance == 0);
+        assertTrue(duration < itinerary.duration);
+    }
+
     public void testTransferPenalty() throws JSONException {
         // Plan short trip
-        TestPlanner planner = new TestPlanner("portland", "45.5264892578125,-122.60479259490967", "45.511622,-122.645564");
+        TestPlanner planner = new TestPlanner(
+                "portland", "45.5264892578125,-122.60479259490967", "45.511622,-122.645564");
         // Don't use non-preferred transfer penalty
         planner.setNonpreferredTransferPenalty(Arrays.asList(0));
         // Check number of legs when using different transfer penalties
@@ -724,20 +759,22 @@ public class TestRequest extends TestCase {
 
     public void testTransferPenalty2() throws JSONException {
         // Plan short trip
-        TestPlanner planner = new TestPlanner("portland", "45.514861,-122.612035", "45.483096,-122.540624");
+        TestPlanner planner = new TestPlanner(
+                "portland", "45.514861,-122.612035", "45.483096,-122.540624");
         // Don't use non-preferred transfer penalty
         planner.setNonpreferredTransferPenalty(Arrays.asList(0));
         // Check number of legs when using different transfer penalties
         checkLegsWithTransferPenalty(planner, 0, 5, false);
         checkLegsWithTransferPenalty(planner, 1800, 5, true);
     }
-    
+
     /**
      * Checks the number of legs when using a specific transfer penalty while planning.
      * @param planner is the test planner to use
      * @param transferPenalty is the value for the transfer penalty
      * @param expectedLegs is the number of expected legs
-     * @param smaller if true, number of legs should be smaller; if false, number of legs should be exact
+     * @param smaller if true, number of legs should be smaller;
+     *                if false, number of legs should be exact
      * @throws JSONException
      */
     private void checkLegsWithTransferPenalty(TestPlanner planner, int transferPenalty,
@@ -750,91 +787,100 @@ public class TestRequest extends TestCase {
         // Check the number of legs
         if (smaller) {
             assertTrue(itinerary.legs.size() < expectedLegs);
-        }
-        else {
+        } else {
             assertEquals(expectedLegs, itinerary.legs.size());
         }
     }
-    
+
     public void testTripToTripTransfer() throws JSONException, ParseException {
+        ServiceDate serviceDate = new ServiceDate(2009, 10, 01);
+
         // Plan short trip
-        TestPlanner planner = new TestPlanner("portland", "45.5264892578125,-122.60479259490967", "45.511622,-122.645564");
-        
+        TestPlanner planner = new TestPlanner(
+                "portland", "45.5264892578125,-122.60479259490967", "45.511622,-122.645564");
+
         // Replace the transfer table with an empty table
         TransferTable table = new TransferTable();
         Graph graph = Context.getInstance().graph;
         when(graph.getTransferTable()).thenReturn(table);
-        
+
         // Do the planning
         Response response = planner.getItineraries();
         Itinerary itinerary = response.getPlan().itinerary.get(0);
         // Check the ids of the first two busses
         assertEquals("190W1280", itinerary.legs.get(1).tripId);
         assertEquals("751W1330", itinerary.legs.get(3).tripId);
-        
-        // Now add a transfer between the two busses of minimal 126 seconds (transfer was 125 seconds)
-        addTripToTripTransferTimeToTable(table, "2111", "7452", "19", "75", "190W1280", "751W1330", 126);
-        
+
+        // Now add a transfer between the two busses of minimal 126 seconds
+        //(transfer was 125 seconds)
+        addTripToTripTransferTimeToTable(
+                table, "2111", "7452", "19", "75", "190W1280", "751W1330", 126);
+
         // Do the planning again
         response = planner.getItineraries();
         itinerary = response.getPlan().itinerary.get(0);
-        // The ids of the first two busses should be different
-        assertFalse("190W1280".equals(itinerary.legs.get(1).tripId)
-                && "751W1330".equals(itinerary.legs.get(3).tripId));
-        
+        // The id of the second bus should be different
+        assertEquals("190W1280", itinerary.legs.get(1).tripId);
+        assertFalse("751W1330".equals(itinerary.legs.get(3).tripId));
+
         // Now apply a real-time update: let the to-trip have a delay of 3 seconds
         @SuppressWarnings("deprecation")
-        TableTripPattern pattern = ((PatternStopVertex) graph.getVertex("TriMet_7452_TriMet_751W1090_79_A")).getTripPattern();
-        applyUpdateToTripPattern(pattern, "751W1330", "7452", 78, 41228, 41228, Update.Status.PREDICTION, 0, "20091001");
-        
+        TableTripPattern pattern = ((PatternStopVertex) graph
+                .getVertex("TriMet_7452_TriMet_751W1090_79_A")).getTripPattern();
+        applyUpdateToTripPattern(pattern, "751W1330", "7452", 79, 41228, 41228,
+                ScheduleRelationship.SCHEDULED, 0, serviceDate);
+
         // Do the planning again
         response = planner.getItineraries();
         itinerary = response.getPlan().itinerary.get(0);
         // Check the ids of the first two busses, they should be the original again
         assertEquals("190W1280", itinerary.legs.get(1).tripId);
         assertEquals("751W1330", itinerary.legs.get(3).tripId);
-        
+
         // "Revert" the real-time update
-        applyUpdateToTripPattern(pattern, "751W1330", "7452", 78, 41225, 41225, Update.Status.PREDICTION, 0, "20091001");
+        applyUpdateToTripPattern(pattern, "751W1330", "7452", 79, 41225, 41225,
+                ScheduleRelationship.SCHEDULED, 0, serviceDate);
         // Revert the graph, thus using the original transfer table again
         reset(graph);
     }
 
     public void testForbiddenTripToTripTransfer() throws JSONException {
         // Plan short trip
-        TestPlanner planner = new TestPlanner("portland", "45.5264892578125,-122.60479259490967", "45.511622,-122.645564");
-        
+        TestPlanner planner = new TestPlanner(
+                "portland", "45.5264892578125,-122.60479259490967", "45.511622,-122.645564");
+
         // Replace the transfer table with an empty table
         TransferTable table = new TransferTable();
         Graph graph = Context.getInstance().graph;
         when(graph.getTransferTable()).thenReturn(table);
-        
+
         // Do the planning
         Response response = planner.getItineraries();
         Itinerary itinerary = response.getPlan().itinerary.get(0);
         // Check the ids of the first two busses
         assertEquals("190W1280", itinerary.legs.get(1).tripId);
         assertEquals("751W1330", itinerary.legs.get(3).tripId);
-        
+
         // Now add a forbidden transfer between the two busses
-        addTripToTripTransferTimeToTable(table, "2111", "7452", "19", "75", "190W1280", "751W1330"
-                , StopTransfer.FORBIDDEN_TRANSFER);
-        
+        addTripToTripTransferTimeToTable(table, "2111", "7452", "19", "75", "190W1280", "751W1330",
+                StopTransfer.FORBIDDEN_TRANSFER);
+
         // Do the planning again
         response = planner.getItineraries();
         itinerary = response.getPlan().itinerary.get(0);
         // The ids of the first two busses should be different
         assertFalse("190W1280".equals(itinerary.legs.get(1).tripId)
                 && "751W1330".equals(itinerary.legs.get(3).tripId));
-        
+
         // Revert the graph, thus using the original transfer table again
         reset(graph);
     }
 
     public void testPreferredTripToTripTransfer() throws JSONException {
         // Plan short trip
-        TestPlanner planner = new TestPlanner("portland", "45.506077,-122.621139", "45.464637,-122.706061");
-        
+        TestPlanner planner = new TestPlanner(
+                "portland", "45.506077,-122.621139", "45.464637,-122.706061");
+
         // Replace the transfer table with an empty table
         TransferTable table = new TransferTable();
         Graph graph = Context.getInstance().graph;
@@ -846,38 +892,41 @@ public class TestRequest extends TestCase {
         // Check the ids of the first two busses
         assertEquals("751W1320", itinerary.legs.get(1).tripId);
         assertEquals("91W1350", itinerary.legs.get(3).tripId);
-                
+
         // Now add a preferred transfer between two other busses
         addTripToTripTransferTimeToTable(table, "7528", "9756", "75", "12", "750W1300", "120W1320"
                 , StopTransfer.PREFERRED_TRANSFER);
-        
+
         // Do the planning again
         response = planner.getItineraries();
         itinerary = response.getPlan().itinerary.get(0);
         // Check the ids of the first two busses, the preferred transfer should be used
         assertEquals("750W1300", itinerary.legs.get(1).tripId);
         assertEquals("120W1320", itinerary.legs.get(3).tripId);
-        
+
         // Revert the graph, thus using the original transfer table again
         reset(graph);
     }
 
     public void testTimedTripToTripTransfer() throws JSONException, ParseException {
+        ServiceDate serviceDate = new ServiceDate(2009, 10, 01);
+
         // Plan short trip
-        TestPlanner planner = new TestPlanner("portland", "45.506077,-122.621139", "45.464637,-122.706061");
-        
+        TestPlanner planner = new TestPlanner(
+                "portland", "45.506077,-122.621139", "45.464637,-122.706061");
+
         // Replace the transfer table with an empty table
         TransferTable table = new TransferTable();
         Graph graph = Context.getInstance().graph;
         when(graph.getTransferTable()).thenReturn(table);
-        
+
         // Do the planning
         Response response = planner.getItineraries();
         Itinerary itinerary = response.getPlan().itinerary.get(0);
         // Check the ids of the first two busses
         assertEquals("751W1320", itinerary.legs.get(1).tripId);
         assertEquals("91W1350", itinerary.legs.get(3).tripId);
-        
+
         // Now add a timed transfer between two other busses
         addTripToTripTransferTimeToTable(table, "7528", "9756", "75", "12", "750W1300", "120W1320"
                 , StopTransfer.TIMED_TRANSFER);
@@ -887,50 +936,57 @@ public class TestRequest extends TestCase {
         @SuppressWarnings("deprecation")
         Vertex toVertex = graph.getVertex("TriMet_9756_depart");
         TimedTransferEdge timedTransferEdge = new TimedTransferEdge(fromVertex, toVertex);
-        
+
         // Do the planning again
         response = planner.getItineraries();
         itinerary = response.getPlan().itinerary.get(0);
         // Check the ids of the first two busses, the timed transfer should be used
         assertEquals("750W1300", itinerary.legs.get(1).tripId);
         assertEquals("120W1320", itinerary.legs.get(3).tripId);
-        
-        // Now apply a real-time update: let the to-trip be early by 240 seconds, resulting in a transfer time of 0 seconds
+
+        // Now apply a real-time update: let the to-trip be early by 240 seconds,
+        // resulting in a transfer time of 0 seconds
         @SuppressWarnings("deprecation")
-        TableTripPattern pattern = ((PatternStopVertex) graph.getVertex("TriMet_9756_TriMet_120W1320_22_A")).getTripPattern();
-        applyUpdateToTripPattern(pattern, "120W1320", "9756", 21, 41580, 41580, Update.Status.PREDICTION, 0, "20091001");
-        
+        TableTripPattern pattern = ((PatternStopVertex) graph
+                .getVertex("TriMet_9756_TriMet_120W1320_22_A")).getTripPattern();
+        applyUpdateToTripPattern(pattern, "120W1320", "9756", 22, 41580, 41580,
+                ScheduleRelationship.SCHEDULED, 0, serviceDate);
+
         // Do the planning again
         response = planner.getItineraries();
         itinerary = response.getPlan().itinerary.get(0);
         // Check the ids of the first two busses, the timed transfer should still be used
         assertEquals("750W1300", itinerary.legs.get(1).tripId);
         assertEquals("120W1320", itinerary.legs.get(3).tripId);
-        
+
         // "Revert" the real-time update
-        applyUpdateToTripPattern(pattern, "120W1320", "9756", 21, 41820, 41820, Update.Status.PREDICTION, 0, "20091001");
+        applyUpdateToTripPattern(pattern, "120W1320", "9756", 22, 41820, 41820,
+                ScheduleRelationship.SCHEDULED, 0, serviceDate);
         // Remove the timed transfer from the graph
         timedTransferEdge.detach();
         // Revert the graph, thus using the original transfer table again
         reset(graph);
     }
-    
+
     public void testTimedStopToStopTransfer() throws JSONException, ParseException {
+        ServiceDate serviceDate = new ServiceDate(2009, 10, 01);
+
         // Plan short trip
-        TestPlanner planner = new TestPlanner("portland", "45.506077,-122.621139", "45.464637,-122.706061");
-        
+        TestPlanner planner = new TestPlanner(
+                "portland", "45.506077,-122.621139", "45.464637,-122.706061");
+
         // Replace the transfer table with an empty table
         TransferTable table = new TransferTable();
         Graph graph = Context.getInstance().graph;
         when(graph.getTransferTable()).thenReturn(table);
-        
+
         // Do the planning
         Response response = planner.getItineraries();
         Itinerary itinerary = response.getPlan().itinerary.get(0);
         // Check the ids of the first two busses
         assertEquals("751W1320", itinerary.legs.get(1).tripId);
         assertEquals("91W1350", itinerary.legs.get(3).tripId);
-        
+
         // Now add a timed transfer between two other busses
         addStopToStopTransferTimeToTable(table, "7528", "9756", StopTransfer.TIMED_TRANSFER);
         // Don't forget to also add a TimedTransferEdge
@@ -939,50 +995,90 @@ public class TestRequest extends TestCase {
         @SuppressWarnings("deprecation")
         Vertex toVertex = graph.getVertex("TriMet_9756_depart");
         TimedTransferEdge timedTransferEdge = new TimedTransferEdge(fromVertex, toVertex);
-        
+
         // Do the planning again
         response = planner.getItineraries();
         itinerary = response.getPlan().itinerary.get(0);
         // Check the ids of the first two busses, the timed transfer should be used
         assertEquals("750W1300", itinerary.legs.get(1).tripId);
         assertEquals("120W1320", itinerary.legs.get(3).tripId);
-        
-        // Now apply a real-time update: let the to-trip be early by 240 seconds, resulting in a transfer time of 0 seconds
+
+        // Now apply a real-time update: let the to-trip be early by 240 seconds,
+        // resulting in a transfer time of 0 seconds
         @SuppressWarnings("deprecation")
-        TableTripPattern pattern = ((PatternStopVertex) graph.getVertex("TriMet_9756_TriMet_120W1320_22_A")).getTripPattern();
-        applyUpdateToTripPattern(pattern, "120W1320", "9756", 21, 41580, 41580, Update.Status.PREDICTION, 0, "20091001");
-        
+        TableTripPattern pattern = ((PatternStopVertex) graph
+                .getVertex("TriMet_9756_TriMet_120W1320_22_A")).getTripPattern();
+        applyUpdateToTripPattern(pattern, "120W1320", "9756", 22, 41580, 41580,
+                ScheduleRelationship.SCHEDULED, 0, serviceDate);
+
         // Do the planning again
         response = planner.getItineraries();
         itinerary = response.getPlan().itinerary.get(0);
         // Check the ids of the first two busses, the timed transfer should still be used
         assertEquals("750W1300", itinerary.legs.get(1).tripId);
         assertEquals("120W1320", itinerary.legs.get(3).tripId);
-        
-        // Now apply a real-time update: let the to-trip be early by 241 seconds, resulting in a transfer time of -1 seconds
-        applyUpdateToTripPattern(pattern, "120W1320", "9756", 21, 41579, 41579, Update.Status.PREDICTION, 0, "20091001");
-        
+
+        // Now apply a real-time update: let the to-trip be early by 241 seconds,
+        // resulting in a transfer time of -1 seconds
+        applyUpdateToTripPattern(pattern, "120W1320", "9756", 22, 41579, 41579,
+                ScheduleRelationship.SCHEDULED, 0, serviceDate);
+
         // Do the planning again
         response = planner.getItineraries();
         itinerary = response.getPlan().itinerary.get(0);
         // The ids of the first two busses should be different
         assertFalse("190W1280".equals(itinerary.legs.get(1).tripId)
                 && "751W1330".equals(itinerary.legs.get(3).tripId));
-        
+
         // "Revert" the real-time update
-        applyUpdateToTripPattern(pattern, "120W1320", "9756", 21, 41820, 41820, Update.Status.PREDICTION, 0, "20091001");
+        applyUpdateToTripPattern(pattern, "120W1320", "9756", 22, 41820, 41820,
+                ScheduleRelationship.SCHEDULED, 0, serviceDate);
         // Remove the timed transfer from the graph
         timedTransferEdge.detach();
         // Revert the graph, thus using the original transfer table again
         reset(graph);
     }
-    
+
+    /**
+     * Test the bike switching penalty feature, both its cost penalty and its separate time penalty.
+     */
+    public void testBikeSwitch() throws JSONException {
+        // Test planning a trip with bike and transit without any added penalties
+        TestPlanner planner = new TestPlanner("portland", "45.440947,-122.837645", "45.463966,-122.755822");
+        planner.setMaxWalkDistance(Arrays.asList(Double.POSITIVE_INFINITY));
+        planner.setWalkReluctance(Arrays.asList(1.0));
+        planner.setModes(Arrays.asList(new TraverseModeSet("BICYCLE,TRANSIT")));
+
+        Response response = planner.getItineraries();
+        Itinerary itinerary = response.getPlan().itinerary.get(0);
+        Long duration = itinerary.duration;
+
+        // Add a time penalty without changing the cost
+        planner.setBikeSwitchTime(Arrays.asList(30));
+
+        response = planner.getItineraries();
+        itinerary = response.getPlan().itinerary.get(0);
+
+        // Now the itinerary should be 30 seconds longer
+        assertTrue(duration + 30000L == itinerary.duration);
+
+        // Change the cost as well, so the routing result changes
+        planner.setBikeSwitchCost(Arrays.asList(99));
+
+        response = planner.getItineraries();
+        itinerary = response.getPlan().itinerary.get(0);
+
+        // Now the length of the itinerary should be in between the lengths of the other itineraries
+        assertTrue(duration < itinerary.duration);
+        assertTrue(duration + 30000L > itinerary.duration);
+    }
+
     /**
      * Add a trip-to-trip transfer time to a transfer table and check the result
      */
-    private void addTripToTripTransferTimeToTable(TransferTable table, String fromStopId, String toStopId,
-            String fromRouteId, String toRouteId, String fromTripId, String toTripId,
-            int transferTime) {
+    private void addTripToTripTransferTimeToTable(TransferTable table, String fromStopId,
+            String toStopId, String fromRouteId, String toRouteId, String fromTripId,
+            String toTripId, int transferTime) {
         Stop fromStop = new Stop();
         fromStop.setId(new AgencyAndId("TriMet", fromStopId));
         Stop toStop = new Stop();
@@ -1000,12 +1096,12 @@ public class TestRequest extends TestCase {
         table.addTransferTime(fromStop, toStop, null, null, fromTrip, toTrip, transferTime);
         assertEquals(transferTime, table.getTransferTime(fromStop, toStop, fromTrip, toTrip, true));
     }
-    
+
     /**
      * Add a stop-to-stop transfer time to a transfer table and check the result
      */
-    private void addStopToStopTransferTimeToTable(TransferTable table, String fromStopId, String toStopId,
-            int transferTime) {
+    private void addStopToStopTransferTimeToTable(TransferTable table, String fromStopId,
+            String toStopId, int transferTime) {
         Stop fromStop = new Stop();
         fromStop.setId(new AgencyAndId("TriMet", fromStopId));
         Stop toStop = new Stop();
@@ -1023,22 +1119,45 @@ public class TestRequest extends TestCase {
         table.addTransferTime(fromStop, toStop, null, null, null, null, transferTime);
         assertEquals(transferTime, table.getTransferTime(fromStop, toStop, fromTrip, toTrip, true));
     }
-    
+
     /**
      * Apply an update to a table trip pattern and check whether the update was applied correctly
-     * @param serviceDate is a string of format YYYYMMDD indicating the date of the update
      */
     private void applyUpdateToTripPattern(TableTripPattern pattern, String tripId, String stopId,
-            int stopSeq, int arrive, int depart, Status prediction, int timestamp, String serviceDate) throws ParseException {
-        Update update = new Update(new AgencyAndId("TriMet", tripId), new AgencyAndId("TriMet", stopId), stopSeq, arrive, depart, prediction, timestamp, ServiceDate.parseString(serviceDate));
-        ArrayList<Update> updates = new ArrayList<Update>(Arrays.asList(update));
-        TripUpdateList tripUpdateList = TripUpdateList.splitByTrip(updates).get(0);
-        boolean success = pattern.update(tripUpdateList);
-        assertTrue(success);
+            int stopSeq, int arrive, int depart, ScheduleRelationship scheduleRelationship,
+            int timestamp, ServiceDate serviceDate) throws ParseException {
+        TimeZone timeZone = new SimpleTimeZone(-7, "PST");
+        long today = serviceDate.getAsDate(timeZone).getTime() / 1000;
+        TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
+
+        tripDescriptorBuilder.setTripId(tripId);
+
+        StopTimeEvent.Builder departStopTimeEventBuilder = StopTimeEvent.newBuilder();
+        StopTimeEvent.Builder arriveStopTimeEventBuilder = StopTimeEvent.newBuilder();
+
+        departStopTimeEventBuilder.setTime(today + depart);
+        arriveStopTimeEventBuilder.setTime(today + arrive);
+
+        StopTimeUpdate.Builder stopTimeUpdateBuilder = StopTimeUpdate.newBuilder();
+
+        stopTimeUpdateBuilder.setStopSequence(stopSeq);
+        stopTimeUpdateBuilder.setDeparture(departStopTimeEventBuilder);
+        stopTimeUpdateBuilder.setArrival(arriveStopTimeEventBuilder);
+        stopTimeUpdateBuilder.setScheduleRelationship(scheduleRelationship);
+
+        TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
+
+        tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+        tripUpdateBuilder.addStopTimeUpdate(0, stopTimeUpdateBuilder);
+
+        TripUpdate tripUpdate = tripUpdateBuilder.build();
+
+        assertTrue(pattern.update(tripUpdate, "TriMet", timeZone, serviceDate));
     }
 
     /**
-     * Subclass of Planner for testing. Constructor sets fields that would usually be set by Jersey from HTTP Query string.
+     * Subclass of Planner for testing. Constructor sets fields that would usually be set by Jersey
+     * from HTTP Query string.
      */
     private static class TestPlanner extends Planner {
         public TestPlanner(String routerId, String v1, String v2) {
@@ -1056,6 +1175,8 @@ public class TestRequest extends TestCase {
             this.transferPenalty = Arrays.asList(0);
             this.nonpreferredTransferPenalty = Arrays.asList(180);
             this.maxTransfers = Arrays.asList(2);
+            this.bikeSwitchTime = Arrays.asList(0);
+            this.bikeSwitchCost = Arrays.asList(0);
             this.routerId = Arrays.asList(routerId);
             this.planGenerator = Context.getInstance().planGenerator;
             this.graphService = Context.getInstance().graphService;
@@ -1072,7 +1193,7 @@ public class TestRequest extends TestCase {
             tsp.graphService = Context.getInstance().graphService;
             this.planGenerator.pathService = tsp;
         }
-        
+
         public void setBannedTrips(List<String> bannedTrips) {
             this.bannedTrips = bannedTrips;
         }
@@ -1080,31 +1201,47 @@ public class TestRequest extends TestCase {
         public void setBannedStops(List<String> bannedStops) {
             this.bannedStops = bannedStops;
         }
-        
+
         public void setBannedStopsHard(List<String> bannedStopsHard) {
             this.bannedStopsHard = bannedStopsHard;
         }
-        
+
         public void setTransferPenalty(List<Integer> transferPenalty) {
             this.transferPenalty = transferPenalty;
         }
-        
+
         public void setNonpreferredTransferPenalty(List<Integer> nonpreferredTransferPenalty) {
             this.nonpreferredTransferPenalty = nonpreferredTransferPenalty;
         }
-        
+
         public List<Double> getMaxWalkDistance() {
             return this.maxWalkDistance;
         }
-        
+
         public void setMaxWalkDistance(List<Double> maxWalkDistance) {
             this.maxWalkDistance = maxWalkDistance;
         }
-        
+
+        public void setWalkReluctance(List<Double> walkReluctance) {
+            this.walkReluctance = walkReluctance;
+        }
+
+        public void setModes(List<TraverseModeSet> modes) {
+            this.modes = modes;
+        }
+
+        public void setBikeSwitchTime(List<Integer> bikeSwitchTime) {
+            this.bikeSwitchTime = bikeSwitchTime;
+        }
+
+        public void setBikeSwitchCost(List<Integer> bikeSwitchCost) {
+            this.bikeSwitchCost = bikeSwitchCost;
+        }
+
         public RoutingRequest buildRequest() throws ParameterException {
             return super.buildRequest();
         }
-        
+
         public List<GraphPath> getPaths() {
             try {
                 RoutingRequest options = this.buildRequest();
@@ -1115,7 +1252,5 @@ public class TestRequest extends TestCase {
                 return null;
             }
         }
-
     }
-
 }

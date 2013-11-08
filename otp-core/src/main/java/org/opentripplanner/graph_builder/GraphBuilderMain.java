@@ -39,13 +39,16 @@ public class GraphBuilderMain {
     public static void main(String[] args) throws IOException {
 
         if (args.length == 0) {
-            System.err.println("usage: config.xml");
+            System.err.println("usage:\njava [-Xmx<heapsize>] -classpath otp-core/target/otp.jar org.opentripplanner.graph_builder.GraphBuilderMain <config.xml>");
             System.exit(-1);
         }
 
         long startTime = System.currentTimeMillis();
 
         List<String> paths = new ArrayList<String>();
+        // This bit of Spring XML is included in the context config of every graph builder run.
+        // It mostly just configures some "custom property editors" that tell Spring how to
+        // set properties from strings.
         paths.add("classpath:org/opentripplanner/graph_builder/application-context.xml");
         for (String arg : args)
             paths.add(arg);

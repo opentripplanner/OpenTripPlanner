@@ -80,8 +80,10 @@ public abstract class RoutingResource {
     /** The maximum distance (in meters) the user is willing to walk. Defaults to unlimited. */
     @QueryParam("maxWalkDistance") protected List<Double> maxWalkDistance;
 
-    /** How much worse walking is than waiting for an equivalent length of time, as a multiplier.
-     *  Defaults to 2. */
+    /** A multiplier for how bad walking is, compared to being in transit for equal lengths of time.
+     *  Defaults to 2. Empirically, values between 10 and 20 seem to correspond well to the concept
+     *  of not wanting to walk too much without asking for totally ridiculous itineraries, but this
+     *  observation should in no way be taken as scientific or definitive. Your mileage may vary.*/
     @QueryParam("walkReluctance") protected List<Double> walkReluctance;
 
     /** The user's walking speed in meters/second. Defaults to approximately 3 MPH. */
@@ -89,6 +91,14 @@ public abstract class RoutingResource {
 
     /** The user's biking speed in meters/second. Defaults to approximately 11 MPH, or 9.5 for bikeshare. */
     @QueryParam("bikeSpeed") protected List<Double> bikeSpeed;
+
+    /** The time it takes the user to fetch their bike and park it again in seconds.
+     *  Defaults to 0. */
+    @QueryParam("bikeSwitchTime") protected List<Integer> bikeSwitchTime;
+
+    /** The cost of the user fetching their bike and parking it again.
+     *  Defaults to 0. */
+    @QueryParam("bikeSwitchCost") protected List<Integer> bikeSwitchCost;
 
     /** For bike triangle routing, how much safety matters (range 0-1). */
     @QueryParam("triangleSafetyFactor") protected List<Double> triangleSafetyFactor;
@@ -326,6 +336,10 @@ public abstract class RoutingResource {
         request.setWalkSpeed(get(walkSpeed, n, request.getWalkSpeed()));
         double bikeSpeedParam = get(bikeSpeed, n, request.getBikeSpeed());
         request.setBikeSpeed(bikeSpeedParam);
+        int bikeSwitchTimeParam = get(bikeSwitchTime, n, request.getBikeSwitchTime());
+        request.setBikeSwitchTime(bikeSwitchTimeParam);
+        int bikeSwitchCostParam = get(bikeSwitchCost, n, request.getBikeSwitchCost());
+        request.setBikeSwitchCost(bikeSwitchCostParam);
         OptimizeType opt = get(optimize, n, request.getOptimize());
         {
             Double tsafe =  get(triangleSafetyFactor, n, null);

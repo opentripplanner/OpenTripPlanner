@@ -277,3 +277,18 @@
     background: white;
 }
 
+
+.otp-fieldtrip-searchWidget {
+    width: 400px;
+    height: 450px;
+}
+
+.otp-fieldtrip-searchWidget-tabArea {
+    position: absolute;
+    background: white;
+    overflow: auto;
+    top: 48px;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+}

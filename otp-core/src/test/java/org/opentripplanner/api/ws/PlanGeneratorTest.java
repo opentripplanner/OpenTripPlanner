@@ -84,9 +84,6 @@ import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.patch.AlertPatch;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.trippattern.Update;
-import org.opentripplanner.routing.trippattern.Update.Status;
-import org.opentripplanner.routing.trippattern.TripUpdateList;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
@@ -99,6 +96,11 @@ import org.opentripplanner.routing.vertextype.TransitStopDepart;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
+import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
@@ -626,26 +628,46 @@ public class PlanGeneratorTest {
         ServiceDate serviceDate = new ServiceDate(1970, 1, 1);
 
         // Updates for leg 4, the ferry leg
-        Update ferryStopDepartUpdate = new Update(thirdTrip.getId(),
-                ferryStopDepart.getId(), 0, 40, 40, Status.PREDICTION, 0L, serviceDate);
-        Update ferryStopArriveUpdate = new Update(thirdTrip.getId(),
-                ferryStopArrive.getId(), 1, 43, 43, Status.PREDICTION, 0L, serviceDate);
+        TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 
-        ArrayList<Update> updates = new ArrayList<Update>();
+        tripDescriptorBuilder.setTripId("C");
 
-        updates.add(ferryStopDepartUpdate);
-        updates.add(ferryStopArriveUpdate);
+        StopTimeEvent.Builder ferryStopDepartTimeEventBuilder = StopTimeEvent.newBuilder();
+        StopTimeEvent.Builder ferryStopArriveTimeEventBuilder = StopTimeEvent.newBuilder();
 
-        TripUpdateList tripUpdateList = TripUpdateList.splitByTrip(updates).get(0);
+        ferryStopDepartTimeEventBuilder.setTime(40L);
+        ferryStopArriveTimeEventBuilder.setTime(43L);
+
+        StopTimeUpdate.Builder ferryStopDepartUpdateBuilder = StopTimeUpdate.newBuilder();
+        StopTimeUpdate.Builder ferryStopArriveUpdateBuilder = StopTimeUpdate.newBuilder();
+
+        ferryStopDepartUpdateBuilder.setStopSequence(-1);
+        ferryStopDepartUpdateBuilder.setDeparture(ferryStopDepartTimeEventBuilder);
+        ferryStopDepartUpdateBuilder.setArrival(ferryStopDepartTimeEventBuilder);
+        ferryStopDepartUpdateBuilder.setScheduleRelationship(ScheduleRelationship.SCHEDULED);
+        ferryStopArriveUpdateBuilder.setStopSequence(0);
+        ferryStopArriveUpdateBuilder.setDeparture(ferryStopArriveTimeEventBuilder);
+        ferryStopArriveUpdateBuilder.setArrival(ferryStopArriveTimeEventBuilder);
+        ferryStopArriveUpdateBuilder.setScheduleRelationship(ScheduleRelationship.SCHEDULED);
+
+        TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
+
+        tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+        tripUpdateBuilder.addStopTimeUpdate(0, ferryStopDepartUpdateBuilder);
+        tripUpdateBuilder.addStopTimeUpdate(1, ferryStopArriveUpdateBuilder);
+
+        TripUpdate tripUpdate = tripUpdateBuilder.build();
 
         // Create dummy TimetableResolver
         TimetableResolver resolver = new TimetableResolver();
         
         // Mock TimetableSnapshotSource to return dummy TimetableResolver
         TimetableSnapshotSource timetableSnapshotSource = mock(TimetableSnapshotSource.class);
+
         when(timetableSnapshotSource.getTimetableSnapshot()).thenReturn(resolver);
 
-        timetableSnapshotSource.getTimetableSnapshot().update(thirdTripPattern, tripUpdateList);
+        timetableSnapshotSource.getTimetableSnapshot().update(
+                thirdTripPattern, tripUpdate, "Ferry", timeZone, serviceDate);
 
         // Further graph initialization
         graph.putService(ServiceIdToNumberService.class, serviceIdToNumberService);

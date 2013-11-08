@@ -95,7 +95,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
      */
     
     @Override
-    public void initialize(State s, Vertex target) {
+    public void initialize(State s, Vertex target, long abortTime) {
         if (target == this.target) {
             LOG.debug("reusing existing heuristic");
             return;
@@ -110,12 +110,15 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         // make sure distance table is initialized before starting thread
         LOG.debug("initializing heuristic computation thread");
         // forward street search first, sets values around origin to 0
-        streetSearch(options, false); // ~30 msec
+        List<State> search = streetSearch(options, false, abortTime); // ~30 msec
+        if (search == null) return; // Search timed out
         LOG.info("end foreward street search {}", System.currentTimeMillis());
         // create a new priority queue
         q = new BinHeap<Vertex>();
         // enqueue states for each stop within walking distance of the destination
-        for (State stopState : streetSearch(options, true)) { // backward street search
+        search = streetSearch(options, true, abortTime);
+        if (search == null) return; // Search timed out
+        for (State stopState : search) { // backward street search
             q.insert(stopState.getVertex(), stopState.getWeight());
         }
         LOG.info("end backward street search {}", System.currentTimeMillis());
@@ -241,7 +244,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
     
     */
 
-    private List<State> streetSearch (RoutingRequest rr, boolean fromTarget) {
+    private List<State> streetSearch (RoutingRequest rr, boolean fromTarget, long abortTime) {
         rr = rr.clone();
         if (fromTarget)
             rr.setArriveBy( ! rr.isArriveBy());
@@ -252,6 +255,13 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         State initState = new State(initVertex, rr);
         pq.insert(initState, 0);
         while ( ! pq.empty()) {
+            /**
+             * Terminate the search prematurely if we've hit our computation wall.
+             */
+            if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
+                return null;
+            }
+
             State s = pq.extract_min();
             Double w = s.getWeight();
             Vertex v = s.getVertex();

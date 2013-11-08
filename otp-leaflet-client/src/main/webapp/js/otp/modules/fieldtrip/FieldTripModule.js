@@ -57,45 +57,16 @@ otp.modules.fieldtrip.FieldTripModule =
         console.log("activate "+this.id);
         otp.modules.multimodal.MultimodalPlannerModule.prototype.activate.apply(this);
 
-        /*this.optionsWidget = new otp.widgets.tripoptions.TripOptionsWidget('otp-'+this.id+'-optionsWidget', this);
-        
-        if(this.webapp.geocoders && this.webapp.geocoders.length > 0) {
-            this.optionsWidget.addControl("locations", new otp.widgets.tripoptions.LocationsSelector(this.optionsWidget, this.webapp.geocoders), true);
-            this.optionsWidget.addVerticalSpace(12, true);
-        }
-
-        this.optionsWidget.addControl("time", new otp.widgets.tripoptions.TimeSelector(this.optionsWidget), true);
-        this.optionsWidget.addVerticalSpace(12, true);
-        
-        
-        var modeSelector = new otp.widgets.tripoptions.ModeSelector(this.optionsWidget);
-        this.optionsWidget.addControl("mode", modeSelector, true);
-
-        modeSelector.addModeControl(new otp.widgets.tripoptions.MaxWalkSelector(this.optionsWidget));
-        modeSelector.addModeControl(new otp.widgets.tripoptions.GroupTripOptions(this.optionsWidget, "Group Size: "));
-        //modeSelector.addModeControl(new otp.widgets.tripoptions.BikeTriangle(this.optionsWidget));
-        modeSelector.addModeControl(new otp.widgets.tripoptions.PreferredRoutes(this.optionsWidget));
-        modeSelector.addModeControl(new otp.widgets.tripoptions.BannedRoutes(this.optionsWidget));
-
-        modeSelector.refreshModeControls();
-
-        this.optionsWidget.addSeparator();
-        //this.optionsWidget.addControl("submit", new otp.widgets.tripoptions.GroupTripSubmit(this.optionsWidget));
-        this.optionsWidget.addControl("submit", new otp.widgets.tripoptions.Submit(this.optionsWidget));*/
-
         var modeSelector = this.optionsWidget.controls['mode'];
         modeSelector.addModeControl(new otp.widgets.tripoptions.GroupTripOptions(this.optionsWidget, "Group Size: "));
         modeSelector.refreshModeControls();
         
-        //this.fieldTripManager = new otp.modules.fieldtrip.FieldTripManagerWidget('otp-'+this.id+'-fieldTripWidget', this);
         this.sessionManager = new otp.core.TrinetSessionManager(this, $.proxy(function() {
             this.fieldTripManager = new otp.modules.fieldtrip.FieldTripManagerWidget('otp-'+this.id+'-fieldTripWidget', this);
         }, this));
 
-        //this.requestsWidget = new otp.modules.fieldtrip.FieldTripRequestsWidget('otp-'+this.moduleId+'-requestsWidget', this);
+        this.searchWidget = new otp.modules.fieldtrip.SearchWidget(this.id+'-searchWidget', this);
 
-
-        //this.refreshTrips();
     },
     
     restore : function() {
@@ -137,7 +108,6 @@ otp.modules.fieldtrip.FieldTripModule =
         var planDate = moment(this.optionsWidget.controls['time'].getDate()).format("MM/DD/YYYY");
         this.currentGroupSize = this.groupSize;
         this.bannedSegments = [];
-        //console.log("RESET SEGMENTS");
         this.groupPlan = null;
 
         var this_ = this;
@@ -196,32 +166,13 @@ otp.modules.fieldtrip.FieldTripModule =
             this.groupPlan = new otp.modules.planner.TripPlan(null, _.extend(tripPlan.queryParams, { groupSize : this.groupSize }));
 
         if(this.itinWidget == null) this.createItinerariesWidget();
-        /*if(restoring && this.restoredItinIndex) {
-            this.itinWidget.updateItineraries(tripPlan, this.restoredItinIndex);
-            this.restoredItinIndex = null;
-        } else  {
-            this.itinWidget.updateItineraries(tripPlan);
-        }*/
-        //this.itinWidget.updateItineraries(tripPlan);
-        //this.itinWidget.show();
-        
-        /*if(restoring) {
-            this.optionsWidget.restorePlan(tripPlan);
-        }*/
-        //this.drawItinerary(tripPlan.itineraries[0]);
-        
-        //var itin = new otp.modules.planner.Itinerary(tripPlan.itineraries[0], tripPlan);
+
         var itin = tripPlan.itineraries[0];
         var capacity = itin.getGroupTripCapacity();
         
         // if this itin shares a vehicle trip with another one already in use, only use the remainingCapacity (as set in checkTripValidity())
         if(this.itinCapacity) capacity = Math.min(capacity, this.itinCapacity);
 
-        //console.log("cur grp size:"+this.currentGroupSize+", cap="+capacity);
-        
-        //console.log("FT returned trip:");
-        //console.log(itin);        
-        //this.itineraries.push(itin);
         this.groupPlan.addItinerary(itin);
         
         var transitLegs = itin.getTransitLegs();
@@ -234,9 +185,8 @@ otp.modules.fieldtrip.FieldTripModule =
             });
         }
 
-        this.setBannedTrips();// = this.bannedSegments.join(',');     
-        //console.log("added "+transitLegs.length+" banned segments, total="+this.bannedSegments.length);
-        
+        this.setBannedTrips();
+
         if(this.currentGroupSize > capacity) { // group members remain; plan another trip
             this.currentGroupSize -= capacity;
             itin.groupSize = capacity;
@@ -252,17 +202,14 @@ otp.modules.fieldtrip.FieldTripModule =
     },
 
     showResults : function() {
-        //this.itinWidget.updateItineraries(this.itineraries, tripPlan.queryParams);
         this.itinWidget.show();
         this.itinWidget.bringToFront();
         this.itinWidget.updatePlan(this.groupPlan);
         this.drawItinerary(this.groupPlan.itineraries[0]);
         
         var requestWidgets = _.values(this.requestWidgets);
-        //console.log("rWidgets:")
         for(var i = 0; i <= requestWidgets.length; i++) {
             if(requestWidgets[i]) {
-                //console.log(requestWidgets[i])
                 requestWidgets[i].tripPlanned();
             }
         }
@@ -271,9 +218,7 @@ otp.modules.fieldtrip.FieldTripModule =
         
     createItinerariesWidget : function() {
         this.itinWidget = new otp.widgets.ItinerariesWidget(this.id+"-itinWidget", this);
-        //this.itinWidget.showButtonRow = false;
         this.itinWidget.showItineraryLink = false;
-        //this.itinWidget.showSearchLink = true;
     },
     
     setBannedTrips : function() {
@@ -292,7 +237,7 @@ otp.modules.fieldtrip.FieldTripModule =
             data: {
                 sessionId : this.sessionManager.sessionId,
                 //date : this.fieldTripManager.selectedDate,
-                limit : 100,
+                //limit : 100,
             },
                 
             success: function(data) {
@@ -436,16 +381,6 @@ otp.modules.fieldtrip.FieldTripModule =
             success: function(data) {
                 if((typeof data) == "string") data = jQuery.parseJSON(data);
                 this_.renderTrip(data);
-                /*this_.groupPlan = new otp.modules.planner.TripPlan(null, JSON.parse(data.queryParams));
-                for(var i = 0; i < data.groupItineraries.length; i++) {
-                    var itinData = JSON.parse(otp.util.Text.lzwDecode(data.groupItineraries[i].itinData));
-                    this_.groupPlan.addItinerary(new otp.modules.planner.Itinerary(itinData, this_.groupPlan));
-                }
-                if(this_.itinWidget == null) this_.createItinerariesWidget();
-                this_.showResults();
-                var queryParams = JSON.parse(data.queryParams);
-                this_.restoreMarkers(queryParams);
-                this_.optionsWidget.restorePlan({ queryParams : queryParams });*/
             },
             
             error: function(data) {
@@ -470,28 +405,20 @@ otp.modules.fieldtrip.FieldTripModule =
         this.restoreMarkers(queryParams);
         this.optionsWidget.restorePlan({ queryParams : queryParams });
     },
+
     
     //** requests functions **//
-    
-    showRequests : function() {
-        if(!this.requestsWidget) {
-            this.requestsWidget = new otp.modules.fieldtrip.FieldTripRequestsWidget('otp-'+this.id+'-requestsWidget', this);
-        }
-        if(this.requestsWidget.minimized) this.requestsWidget.unminimize();
-        this.requestsWidget.bringToFront();
-    },
     
     loadRequests : function() {
         var this_ = this;
         $.ajax(this.datastoreUrl+'/fieldtrip/getRequests', {
             data: {
                 sessionId : this.sessionManager.sessionId,
-                limit : 100,
+                //limit : 100,
             },
                 
             success: function(data) {
                 if((typeof data) == "string") data = jQuery.parseJSON(data);
-                //this_.requestsWidget.updateRequests(data);
                 this_.fieldTripManager.updateRequests(data);
                 
                 for(var i = 0; i < data.length; i++) {
@@ -502,13 +429,6 @@ otp.modules.fieldtrip.FieldTripModule =
                         widget.render();
                     }
                 }
-                /*var widgets = _.values(this_.requestWidgets);
-                for(var i =0; i < widgets.length; i++) {
-                    console.log("re-rendering:")
-                    console.log(widgets[i])
-                    widgets[i].render();
-                }*/
-                
             },
             
             error: function(data) {
@@ -637,8 +557,6 @@ otp.modules.fieldtrip.FieldTripModule =
     },
     
     showGeocoder : function(request, mode) {
-        //console.log("showing geocoder for request "+request.id);
-        
         if(_.has(this.geocoderWidgets, request.id)) {
             var widget = this.geocoderWidgets[request.id];
             widget.mode = mode;
@@ -693,38 +611,6 @@ otp.modules.fieldtrip.FieldTripModule =
                 });
             }
         }
-        
-        /*if(type === "outbound") var requestOrder = 0;
-        if(type === "inbound") var requestOrder = 1;
-
-        this.saveTrip(request, requestOrder, function(tripId) {
-            console.log("saved "+type+" trip for req #"+request.id);
-            this_.loadRequests();
-        });*/
-        
-        /*this.saveTrip(request, function(tripId) {
-            if(type === "outbound") var url = this.datastoreUrl+'/fieldtrip/setOutboundTrip';
-            if(type === "inbound") var url = this.datastoreUrl+'/fieldtrip/setInboundTrip';
-            $.ajax(url, {
-                type: 'POST',
-                
-                data: {
-                    requestId : request.id,
-                    tripId : tripId,
-                },
-                      
-                success: function(data) {
-                    console.log("set " + type + "trip");
-                    this_.loadRequests();
-                },
-                
-                error: function(data) {
-                    console.log("error setting " + type + "trip");
-                    console.log(data);
-                }
-            });          
-        });*/
-             
     },
     
     checkPlanValidity : function(request) {
@@ -856,6 +742,16 @@ otp.util.FieldTrip = {
         if(groupItin.timeOffset) otp.config.timeOffset = groupItin.timeOffset;
         return JSON.parse(otp.util.Text.lzwDecode(groupItin.itinData));
     },
+
+    getRequestContext : function(req) {
+        var context = _.clone(req);
+        if(req.travelDate) context.formattedDate = moment(req.travelDate).format("MMM Do YYYY");
+        var outboundTrip = otp.util.FieldTrip.getOutboundTrip(req);
+        if(outboundTrip) context.outboundDesc = otp.util.FieldTrip.constructPlanInfo(outboundTrip);
+        var inboundTrip = otp.util.FieldTrip.getInboundTrip(req);
+        if(inboundTrip) context.inboundDesc = otp.util.FieldTrip.constructPlanInfo(inboundTrip);
+        return context;
+    }
     
     
     

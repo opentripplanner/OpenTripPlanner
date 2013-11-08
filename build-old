@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# run the older Spring-assembled graph builder
+java -Xmx4G -classpath otp-core/target/otp.jar org.opentripplanner.graph_builder.GraphBuilderMain $1
