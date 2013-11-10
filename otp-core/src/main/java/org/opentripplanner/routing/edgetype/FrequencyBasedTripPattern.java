@@ -225,7 +225,7 @@ public class FrequencyBasedTripPattern implements Serializable, TripPattern {
         return true;
     }
 
-    public boolean getBikesAllowed(int trip) {
+    public boolean getBikesAllowed() {
         return (tripFlags & TableTripPattern.FLAG_BIKES_ALLOWED) != 0;
     }
 

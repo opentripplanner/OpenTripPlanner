@@ -37,6 +37,7 @@ public class TripType {
         this.shapeId = obj.getShapeId();
         this.wheelchairAccessible = obj.getWheelchairAccessible();
         this.tripBikesAllowed = obj.getTripBikesAllowed();
+        this.bikesAllowed = obj.getBikesAllowed();
         this.route = obj.getRoute();
     }
 
@@ -53,6 +54,7 @@ public class TripType {
             this.shapeId = obj.getShapeId();
             this.wheelchairAccessible = obj.getWheelchairAccessible();
             this.tripBikesAllowed = obj.getTripBikesAllowed();
+            this.bikesAllowed = obj.getBikesAllowed();
         }
     }
 
@@ -98,6 +100,10 @@ public class TripType {
     @XmlAttribute
     @JsonSerialize
     Integer tripBikesAllowed;
+    
+    @XmlAttribute
+    @JsonSerialize
+    Integer bikesAllowed;
 
     Route route;
 
