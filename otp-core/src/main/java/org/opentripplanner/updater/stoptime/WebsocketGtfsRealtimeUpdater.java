@@ -119,12 +119,12 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
         // AsyncHttpClient client = new AsyncHttpClient(new GrizzlyAsyncHttpProvider(config),
         // config);
         // Using Netty by default:
-        AsyncHttpClient client = new AsyncHttpClient();
-        WebSocketListener listener = new Listener();
-        WebSocketUpgradeHandler handler = new WebSocketUpgradeHandler.Builder()
-                .addWebSocketListener(listener).build();
 
         while (true) {
+            AsyncHttpClient client = new AsyncHttpClient();
+            WebSocketListener listener = new Listener();
+            WebSocketUpgradeHandler handler = new WebSocketUpgradeHandler.Builder()
+                    .addWebSocketListener(listener).build();
             WebSocket socket = null;
             boolean connectionSuccessful = true;
             // Try to create a websocket connection
