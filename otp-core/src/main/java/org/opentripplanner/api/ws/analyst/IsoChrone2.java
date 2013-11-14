@@ -28,7 +28,9 @@ import org.opentripplanner.analyst.core.IsochroneData;
 import org.opentripplanner.analyst.request.IsoChroneRequest;
 import org.opentripplanner.analyst.request.IsoChroneSPTRendererAccSampling;
 import org.opentripplanner.analyst.request.IsoChroneSPTRendererRecursiveGrid;
+import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.RoutingResource;
+import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.util.GeoJSONBuilder;
 import org.slf4j.Logger;
@@ -79,56 +81,63 @@ public class IsoChrone2 extends RoutingResource {
 
     @GET
     @Produces({ MediaType.APPLICATION_JSON })
-    public Response getIsochrone() throws Exception {
+    public Response getIsochrone() {
 
-        if (debug == null)
-            debug = false;
-        if (precisionMeters == null)
-            precisionMeters = 200;
+        try {
+            if (debug == null)
+                debug = false;
+            if (precisionMeters == null)
+                precisionMeters = 200;
+            if (precisionMeters < 10)
+                throw new IllegalArgumentException("Too small precisionMeters: " + precisionMeters);
 
-        IsoChroneRequest isoChroneRequest = new IsoChroneRequest(cutoffSecList);
-        isoChroneRequest.setIncludeDebugGeometry(debug);
-        isoChroneRequest.setPrecisionMeters(precisionMeters);
-        RoutingRequest sptRequest = buildRequest(0);
+            IsoChroneRequest isoChroneRequest = new IsoChroneRequest(cutoffSecList);
+            isoChroneRequest.setIncludeDebugGeometry(debug);
+            isoChroneRequest.setPrecisionMeters(precisionMeters);
+            RoutingRequest sptRequest = buildRequest(0);
 
-        if (maxTimeSec != null) {
-            isoChroneRequest.setMaxTimeSec(maxTimeSec);
-        } else {
-            isoChroneRequest.setMaxTimeSec(isoChroneRequest.getMaxCutoffSec());
-        }
-
-        List<IsochroneData> isochrones;
-        if (algorithm == null || "accSampling".equals(algorithm)) {
-            isochrones = accSamplingRenderer.getIsochrones(isoChroneRequest, sptRequest);
-        } else if ("recursiveGrid".equals(algorithm)) {
-            isochrones = recursiveGridRenderer.getIsochrones(isoChroneRequest, sptRequest);
-        } else {
-            throw new IllegalArgumentException("Unknown algorithm: " + algorithm);
-        }
-        StringWriter geoJsonWriter = new StringWriter();
-        GeoJSONBuilder geoJsonBuilder = new GeoJSONBuilder(geoJsonWriter);
-        geoJsonBuilder.array();
-        for (IsochroneData isochrone : isochrones) {
-            geoJsonBuilder.object();
-            geoJsonBuilder.key("type").value("Feature");
-            geoJsonBuilder.key("properties").object();
-            geoJsonBuilder.key("name").value("Isochrone " + isochrone.getCutoffSec() + " sec");
-            geoJsonBuilder.endObject();
-            geoJsonBuilder.key("geometry");
-            geoJsonBuilder.writeGeom(isochrone.getGeometry());
-            Geometry debugGeometry = isochrone.getDebugGeometry();
-            if (debug && debugGeometry != null) {
-                geoJsonBuilder.key("debugGeometry");
-                geoJsonBuilder.writeGeom(debugGeometry);
+            if (maxTimeSec != null) {
+                isoChroneRequest.setMaxTimeSec(maxTimeSec);
+            } else {
+                isoChroneRequest.setMaxTimeSec(isoChroneRequest.getMaxCutoffSec());
             }
-            geoJsonBuilder.endObject();
-        }
-        geoJsonBuilder.endArray();
 
-        CacheControl cc = new CacheControl();
-        cc.setMaxAge(3600);
-        cc.setNoCache(false);
-        return Response.ok(geoJsonWriter.toString()).cacheControl(cc).build();
+            List<IsochroneData> isochrones;
+            if (algorithm == null || "accSampling".equals(algorithm)) {
+                isochrones = accSamplingRenderer.getIsochrones(isoChroneRequest, sptRequest);
+            } else if ("recursiveGrid".equals(algorithm)) {
+                isochrones = recursiveGridRenderer.getIsochrones(isoChroneRequest, sptRequest);
+            } else {
+                throw new IllegalArgumentException("Unknown algorithm: " + algorithm);
+            }
+            StringWriter geoJsonWriter = new StringWriter();
+            GeoJSONBuilder geoJsonBuilder = new GeoJSONBuilder(geoJsonWriter);
+            geoJsonBuilder.array();
+            for (IsochroneData isochrone : isochrones) {
+                geoJsonBuilder.object();
+                geoJsonBuilder.key("type").value("Feature");
+                geoJsonBuilder.key("properties").object();
+                geoJsonBuilder.key("name").value("Isochrone " + isochrone.getCutoffSec() + " sec");
+                geoJsonBuilder.endObject();
+                geoJsonBuilder.key("geometry");
+                geoJsonBuilder.writeGeom(isochrone.getGeometry());
+                Geometry debugGeometry = isochrone.getDebugGeometry();
+                if (debug && debugGeometry != null) {
+                    geoJsonBuilder.key("debugGeometry");
+                    geoJsonBuilder.writeGeom(debugGeometry);
+                }
+                geoJsonBuilder.endObject();
+            }
+            geoJsonBuilder.endArray();
+
+            CacheControl cc = new CacheControl();
+            cc.setMaxAge(3600);
+            cc.setNoCache(false);
+            return Response.ok(geoJsonWriter.toString()).cacheControl(cc).build();
+        
+        } catch (Exception e) {
+            return Response.ok(new PlannerError(e)).build();
+        }
     }
 
 }
