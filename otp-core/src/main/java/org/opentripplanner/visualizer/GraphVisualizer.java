@@ -239,6 +239,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     private JCheckBox carCheckBox;
 
     private JCheckBox cmvCheckBox;
+    
+    private JCheckBox arriveByCheckBox;
 
     private JTextField searchDate;
 
@@ -354,7 +356,9 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         searchDate.setText(dateFormat.format(new Date()));
         routingPanel.add(searchDate);
 
-        // 2 rows: transport mode options
+        // 2 rows: arrive by + transport mode options
+        arriveByCheckBox = new JCheckBox("arrive by");
+        routingPanel.add(arriveByCheckBox);
         walkCheckBox = new JCheckBox("walk");
         routingPanel.add(walkCheckBox);
         bikeCheckBox = new JCheckBox("bike");
@@ -894,6 +898,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         // there should be a ui element for walk distance and optimize type
         options.setOptimize(OptimizeType.QUICK);
         options.setMaxWalkDistance(Double.MAX_VALUE);
+        options.setArriveBy(arriveByCheckBox.isSelected());
         options.setDateTime(when);
         options.setFromString(from);
         options.setToString(to);

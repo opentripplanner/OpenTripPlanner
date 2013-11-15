@@ -78,6 +78,10 @@ public class StreetTransitLink extends Edge {
         if (s0.getOptions().wheelchairAccessible && !wheelchairAccessible) {
             return null;
         }
+        if (s0.getNonTransitMode() == TraverseMode.CAR) {
+            // Forbid enter station in CAR mode
+            return null;
+        }
         // Do not check here whether transit modes are selected. A check for the presence of 
         // transit modes will instead be done in the following PreBoard edge.
         // This allows finding transit stops with walk-only options.

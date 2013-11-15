@@ -412,6 +412,8 @@ otp.planner.Itinerary = {
                 markerType = 'fromWalkMarker';
             } else if (mode === 'BICYCLE') {
                 markerType = 'fromBicycleMarker';
+            } else if (mode === 'CAR') {
+                markerType = 'fromCarMarker';
             } else {
                 markerType = 'fromMarker';
             }
