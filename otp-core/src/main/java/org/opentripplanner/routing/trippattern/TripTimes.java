@@ -19,6 +19,7 @@ import lombok.AllArgsConstructor;
 
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.gtfs.BikeAccess;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
@@ -258,13 +259,6 @@ public abstract class TripTimes {
      * trip fits other restrictive search criteria such as bicycle and wheelchair accessibility
      * and transfers with minimum time or forbidden transfers.
      * 
-     * GTFS bike extensions based on mailing list message at: 
-     * https://groups.google.com/d/msg/gtfs-changes/QqaGOuNmG7o/xyqORy-T4y0J
-     * 2: bikes allowed
-     * 1: no bikes allowed
-     * 0: no information (same as field omitted)
-     * 
-     * If route OR trip explicitly allows bikes, bikes are allowed.
      * @param stopIndex 
      */
     public boolean tripAcceptable(State state0, Stop currentStop, ServiceDay sd, boolean bicycle, int stopIndex, boolean boarding) {
@@ -278,11 +272,9 @@ public abstract class TripTimes {
         }
         if (options.wheelchairAccessible && trip.getWheelchairAccessible() != 1)
             return false;
-        if (bicycle)
-            if ((trip.getTripBikesAllowed() != 2) &&    // trip does not explicitly allow bikes and
-                (trip.getRoute().getBikesAllowed() != 2 // route does not explicitly allow bikes or  
-                || trip.getTripBikesAllowed() == 1))    // trip explicitly forbids bikes
-                return false;
+        if (bicycle && BikeAccess.fromTrip(trip) != BikeAccess.ALLOWED) {
+            return false;
+        }
         
         // Check transfer table rules
         if (state0.getNumBoardings() > 0) {
