@@ -93,7 +93,14 @@ public class NEDGridCoverageFactoryImpl implements NEDGridCoverageFactory {
      * they double the size of the OTP distribution, but are only needed by people loading 
      * elevations in North America. 
      * 
-     * These rasters must be downloaded from the OTP website and placed in the NED cache directory. 
+     * In OTP we perform the conversion using a geoid defined relative to the NAD83 ellipsoid. 
+     * This is backed up by an NOAA publication at 
+     * http://www.ngs.noaa.gov/PUBS_LIB/FedRegister/FRdoc95-19408.pdf stating they are for all 
+     * practical purposes identical, especially when using handheld equipment. NAD 83 and WGS 84 
+     * ellipsoid equivalence is also explained in a post at 
+     * http://forums.groundspeak.com/GC/index.php?showtopic=97337.
+     * 
+     * The datum rasters must be downloaded from the OTP website and placed in the NED cache directory. 
      */
     private void loadVerticalDatum () {
         if (datums == null) {
