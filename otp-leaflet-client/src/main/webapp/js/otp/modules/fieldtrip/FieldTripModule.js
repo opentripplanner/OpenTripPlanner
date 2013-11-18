@@ -573,6 +573,8 @@ otp.modules.fieldtrip.FieldTripModule =
        
     saveRequestTrip : function(request, type) {
         if(!this.checkPlanValidity(request)) return;
+
+        this.itinWidget.close();
         
         var this_ = this;
 

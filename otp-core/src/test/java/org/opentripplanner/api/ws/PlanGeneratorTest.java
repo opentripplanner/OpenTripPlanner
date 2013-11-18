@@ -45,6 +45,7 @@ import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.model.RelativeDirection;
 import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
+import org.opentripplanner.gtfs.BikeAccess;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
@@ -291,19 +292,19 @@ public class PlanGeneratorTest {
         firstTrip.setTripShortName("A");
         firstTrip.setBlockId("Alock");
         firstTrip.setRoute(firstRoute);
-        firstTrip.setTripBikesAllowed(2);
+        BikeAccess.setForTrip(firstTrip, BikeAccess.ALLOWED);
         firstTrip.setTripHeadsign("Street Fighting Man");
         secondTrip.setId(new AgencyAndId("Train", "B"));
         secondTrip.setTripShortName("B");
         secondTrip.setBlockId("Block");
         secondTrip.setRoute(secondRoute);
-        secondTrip.setTripBikesAllowed(2);
+        BikeAccess.setForTrip(secondTrip, BikeAccess.ALLOWED);
         secondTrip.setTripHeadsign("No Expectations");
         thirdTrip.setId(new AgencyAndId("Ferry", "C"));
         thirdTrip.setTripShortName("C");
         thirdTrip.setBlockId("Clock");
         thirdTrip.setRoute(thirdRoute);
-        thirdTrip.setTripBikesAllowed(2);
+        BikeAccess.setForTrip(thirdTrip, BikeAccess.ALLOWED);
         thirdTrip.setTripHeadsign("Handsome Molly");
 
         // Scheduled stop times for legs 1, 2 and 4, plus initialization and storage in a list

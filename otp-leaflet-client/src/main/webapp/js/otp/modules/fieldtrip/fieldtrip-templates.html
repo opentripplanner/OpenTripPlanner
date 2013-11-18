@@ -1,12 +1,17 @@
 <script id="otp-fieldtrip-manager" type="text/html">
     <div id="{{widgetId}}-tabs" class="otp-fieldTripManager-tabs notDraggable" style="position: absolute; top: 30px; bottom: 50px; left: 10px; right: 10px;">
         <ul>
-            <li><a href="#{{widgetId}}-requestsTab">Active Requests</a></li>
+            <li><a href="#{{widgetId}}-newRequestsTab">New Requests</a></li>
+            <li><a href="#{{widgetId}}-plannedRequestsTab">Planned</a></li>
             <li><a href="#{{widgetId}}-cancelledRequestsTab">Cancelled</a></li>
             <li><a href="#{{widgetId}}-pastTripsTab">Past Trips</a></li>
         </ul>
-        <div id="{{widgetId}}-requestsTab">
-            <div class="otp-fieldTripManager-requestsList activeRequestsList">
+        <div id="{{widgetId}}-newRequestsTab">
+            <div class="otp-fieldTripManager-requestsList newRequestsList">
+            </div>
+        </div>
+        <div id="{{widgetId}}-plannedRequestsTab">
+            <div class="otp-fieldTripManager-requestsList plannedRequestsList">
             </div>
         </div>
         <div id="{{widgetId}}-cancelledRequestsTab">
@@ -35,7 +40,7 @@
 
 <script id="otp-fieldtrip-requestRow" type="text/html">
     <div class="otp-fieldTripRequests-listRow">
-        <h5>{{schoolName}} Trip on {{formattedDate}}</h5>
+        <h5>{{schoolName}} Trip on {{formattedDate}} (#{{id}})</h5>
         Submitted by {{teacherName}} on {{timeStamp}}<br>
         <b>Outbound Trip:</b> {{#outboundDesc}}{{outboundDesc}}{{/outboundDesc}}{{^outboundDesc}}Not Planned{{/outboundDesc}}<br>
         <b>Inbound Trip:</b> {{#inboundDesc}}{{inboundDesc}}{{/inboundDesc}}{{^inboundDesc}}Not Planned{{/inboundDesc}}
@@ -65,8 +70,10 @@
             <b>Intermediate Locations</b>:
                 {{#intermediateLocations}}{{intermediateLocations}}{{/intermediateLocations}}{{^intermediateLocations}}N/A{{/intermediateLocations}}<br>
             <b>Payment Preference</b>: {{paymentPreference}}<br>
+            {{#requireInvoice}}<span style="color: white; background: #800;">&nbsp;{{/requireInvoice}}
             <b>Invoice Required?</b>: 
-                {{#requireInvoice}}Yes{{/requireInvoice}}{{^requireInvoice}}No{{/requireInvoice}}<br>
+                {{#requireInvoice}}Yes{{/requireInvoice}}{{^requireInvoice}}No{{/requireInvoice}}
+            {{#requireInvoice}}&nbsp;</span>{{/requireInvoice}}<br>
             <b>Class Pass ID</b>: 
                 {{#classpassId}}{{classpassId}}{{/classpassId}}{{^classpassId}}(None){{/classpassId}}<br>
 
@@ -242,6 +249,10 @@
                 <b>Students</b>: {{numStudents}} (Ages {{#minimumAge}}{{minimumAge}}{{/minimumAge}}{{^minimumAge}}N/A{{/minimumAge}}&nbsp;to&nbsp;
                     {{#maximumAge}}{{maximumAge}}{{/maximumAge}}{{^maximumAge}}N/A{{/maximumAge}}) / 
                     <b>Chaperones</b>: {{#numChaperones}}{{numChaperones}}{{/numChaperones}}{{^numChaperones}}N/A{{/numChaperones}}<br>
+                {{#classpassId}}
+                    <b>Classpass ID</b>: {{classpassId}}<br>
+                {{/classpassId}}
+
                 <i>Request submitted: {{timeStamp}}</i>            
             </div>
             
@@ -330,8 +341,8 @@
                 </div>
 
                 <div style="margin: 12px 0px; text-align: center;">
-                    <input type="radio" name="andor1" value="and" checked> and&nbsp;&nbsp;
-                    <input type="radio" name="andor1" value="or"> or
+                    <input type="radio" name="andor1" value="and"> and&nbsp;&nbsp;
+                    <input type="radio" name="andor1" value="or" checked> or
                 </div>
 
                 <div style="margin: 12px 0px; text-align: center;">
@@ -345,8 +356,8 @@
                 </div>
 
                 <div style="margin: 12px 0px; text-align: center;">
-                    <input type="radio" name="andor2" value="and" checked> and&nbsp;&nbsp;
-                    <input type="radio" name="andor2" value="or"> or
+                    <input type="radio" name="andor2" value="and"> and&nbsp;&nbsp;
+                    <input type="radio" name="andor2" value="or" checked> or
                 </div>
 
                 <div style="margin: 12px 0px; text-align: center;">
@@ -357,9 +368,9 @@
                         <option value=">">Is After</option>
                         <option value="between">Is Between</option>
                     </select>
-                    <input class="dateInput1" type="text" style="width: 80px;"></input>
+                    <input class="dateInput1" type="text" style="width: 100px;"></input>
                     <span class="extendedDateInput">
-                        and <input class="dateInput2" type="text" style="width: 80px;"></input>
+                        and <input class="dateInput2" type="text" style="width: 100px;"></input>
                     </span>
                 </div>
 

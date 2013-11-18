@@ -291,7 +291,7 @@ otp.modules.planner.PlannerModule =
        	    queryParams = {             
                 fromPlace: this.getStartOTPString(),
                 toPlace: this.getEndOTPString(),
-                time : (this.time) ? this.time : moment().format("h:mma"),
+                time : (this.time) ? otp.util.Time.correctAmPmTimeString(this.time) : moment().format("h:mma"),
                 //time : (this.time) ? moment(this.time).add("s", addToStart).format("h:mma") : moment().add("s", addToStart).format("h:mma"),
                 date : (this.date) ? this.date : moment().format("MM-DD-YYYY"),
                 mode: this.mode,

@@ -35,7 +35,8 @@ otp.modules.fieldtrip.FieldTripManagerWidget =
             heightStyle : "fill",
         });
 
-        this.activeRequestsList = this.mainDiv.find('.activeRequestsList');
+        this.newRequestsList = this.mainDiv.find('.newRequestsList');
+        this.plannedRequestsList = this.mainDiv.find('.plannedRequestsList');
         this.cancelledRequestsList = this.mainDiv.find('.cancelledRequestsList');
         this.pastTripsList = this.mainDiv.find('.pastTripsList');
         
@@ -43,8 +44,9 @@ otp.modules.fieldtrip.FieldTripManagerWidget =
             this_.module.loadRequests();
         });
 
-        this.mainDiv.find('.reportDateInput').datepicker().datepicker("setDate", new Date());/*.click(function() {
-        });*/
+        var date = new Date();
+        date.setDate(date.getDate() + 1);
+        this.mainDiv.find('.reportDateInput').datepicker().datepicker("setDate", date);
 
         this.mainDiv.find('.viewReportButton').button().click(function() {
             var m = moment(this_.mainDiv.find('.reportDateInput').val());
@@ -73,7 +75,8 @@ otp.modules.fieldtrip.FieldTripManagerWidget =
     updateRequests : function(requests) {
         var this_ = this;
         
-        this.activeRequestsList.empty();
+        this.newRequestsList.empty();
+        this.plannedRequestsList.empty();
         this.cancelledRequestsList.empty();
         this.pastTripsList.empty();
         
@@ -83,23 +86,22 @@ otp.modules.fieldtrip.FieldTripManagerWidget =
             //$('<div class="otp-fieldTripRequests-listRow">'+req.teacherName+", "+req.schoolName+'</div>').appendTo(this.requestsList);
             
             var row = ich['otp-fieldtrip-requestRow'](otp.util.FieldTrip.getRequestContext(req));
+            
             if(req.status === "cancelled") {
                 row.appendTo(this.cancelledRequestsList);
             }
-            
-            else {
-                if(req.travelDate) {
-                    var diffDays = moment(req.travelDate).diff(moment(), 'days');
-                    if(diffDays < 0) {
-                        row.appendTo(this.pastTripsList);                        
-                    }
-                    else {
-                        row.appendTo(this.activeRequestsList);
-                    }
+
+            else { // not a cancelled request
+                if(req.travelDate && moment(req.travelDate).diff(moment(), 'days')  < 0) { // past trip
+                    row.appendTo(this.pastTripsList);                        
                 }
-                else {
-                    row.appendTo(this.activeRequestsList);
+                else { // 'new' or 'planned' active request
+                    if(otp.util.FieldTrip.getOutboundTrip(req) && 
+                       otp.util.FieldTrip.getInboundTrip(req)) row.appendTo(this.plannedRequestsList);
+                    else row.appendTo(this.newRequestsList);
                 }
+
+                // make the the request clickable
                 row.data('req', req).click(function() {
                     var req = $(this).data('req');
                     this_.module.showRequest(req);

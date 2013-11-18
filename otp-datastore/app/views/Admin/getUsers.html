@@ -1,3 +1,5 @@
+#{script 'jquery-1.8.2.js' /}
+
 <a href="@{Secure.logout()}">Log out</a>
 
 <p><b>All users:</b>
@@ -18,7 +20,7 @@
 <p><b>Add new:</b>
 <br> 
 
-Username: <input name="user.username" />&nbsp;
+Username: <input id="username" name="user.username" />&nbsp;
 
 Role: <select name="user.role">
     <option value="calltaker">Calltaker</option>
@@ -27,9 +29,33 @@ Role: <select name="user.role">
 </select>
 
     
-<input type="submit" value="Add" style="font-size: 14px;" />
+<!--<input type="submit" value="Add" style="font-size: 14px;" />-->
+<!--<span id="addUserButton" style="cursor:pointer; border: 2px solid gray; width: 60px; padding: 3px; margin: 4px auto; background: white;">Add User</span>-->
+<button id="addUserButton">Add User</button>
 
 #{/form}
 
 
-<div style="margin-top: 20px; text-align: center;">
+<div style="margin-top: 20px; text-align: center;"></div>
+
+<script type="text/javascript" language="javascript">
+$(document).ready(function() {
+    $("#addUserButton").click(function(evt) {
+        evt.preventDefault();
+        addUserClicked();
+    });
+});
+
+function addUserClicked() {
+    var username = $("#username").val();
+
+    var regularExpression = /^[a-z0-9]+$/i;
+    if(regularExpression.test(username)) {
+        document.forms["addUserForm"].submit();
+    }
+    else {
+        alert("Not a valid username (alphanumeric only, no spaces or special characters)");
+    }
+}
+
+</script>
