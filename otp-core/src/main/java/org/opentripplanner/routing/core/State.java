@@ -113,8 +113,12 @@ public class State implements Cloneable {
         this.stateData.opt = options;
         this.stateData.startTime = timeSeconds;
         this.stateData.usingRentedBike = false;
-        this.stateData.carParked = options.isArriveBy() && options.getModes().getCar()
-                && options.getModes().getWalk();
+        boolean parkAndRideEnabled = options.getModes().getCar() && options.getModes().getWalk();
+        this.stateData.carParked = options.isArriveBy() && parkAndRideEnabled;
+        if (parkAndRideEnabled) {
+            this.stateData.nonTransitMode = this.stateData.carParked ? TraverseMode.WALK
+                    : TraverseMode.CAR;
+        }
         this.walkDistance = 0;
         this.time = timeSeconds * 1000;
         if (options.rctx != null) {
