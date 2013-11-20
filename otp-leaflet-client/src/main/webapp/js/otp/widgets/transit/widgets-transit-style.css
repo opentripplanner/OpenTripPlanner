@@ -132,6 +132,23 @@
 	text-overflow: ellipsis;
 }
 
+.otp-stopViewer-headsignRow {
+    font-size: 10px;
+    color: gray;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.otp-stopViewer-blockRow {
+    font-size: 10px;
+    font-style: italic;
+    color: gray;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 .otp-stopViewer-findButtonRow {
     position: absolute;
     bottom: 0px;
