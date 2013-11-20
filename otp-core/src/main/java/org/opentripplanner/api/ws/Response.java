@@ -21,6 +21,8 @@ import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import lombok.Getter;
+
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.error.PlannerError;
 
@@ -28,6 +30,8 @@ import org.opentripplanner.api.model.error.PlannerError;
 @XmlRootElement
 public class Response {
 
+    /** A dictionary of the parameters provided in the request that triggered this response. */
+    @XmlElement
     private HashMap<String, String> requestParameters;
     private TripPlan plan;
     private PlannerError error = null;
@@ -54,11 +58,6 @@ public class Response {
     // NOTE: the order the getter methods below is semi-important, in that Jersey will use the
     // same order for the elements in the JS or XML serialized response. The traditional order
     // is request params, followed by plan, followed by errors.
-
-    /** A dictionary of the parameters provided in the request that triggered this response. */
-    public HashMap<String, String> getRequestParameters() {
-        return requestParameters;
-    }
 
     /** The actual trip plan. */
     public TripPlan getPlan() {
