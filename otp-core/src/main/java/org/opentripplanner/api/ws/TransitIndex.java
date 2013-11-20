@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.GET;
@@ -236,28 +237,60 @@ public class TransitIndex {
             @QueryParam("extended") Boolean extended, @QueryParam("routerId") String routerId)
             throws JSONException {
     	
-        Graph graph = getGraph(routerId);
-    	TransitIndexService transitIndexService = graph.getService(TransitIndexService.class);
+        TransitIndexService transitIndexService = getGraph(routerId).getService(
+                TransitIndexService.class);
+        if (transitIndexService == null) {
+            return new TransitError(
+                    "No transit index found.  Add TransitIndexBuilder to your graph builder configuration and rebuild your graph.");
+        }
 
-    	StopList response = new StopList();
+        StopList response = new StopList();
+
+        AgencyAndId stopId = new AgencyAndId(agency, id);
     	
-    	AgencyAndId stopId = new AgencyAndId(agency, id);
+        Map<AgencyAndId, Stop> allStops = transitIndexService.getAllStops();
+        for(Map.Entry<AgencyAndId, Stop> entry : allStops.entrySet()) {
+        	//Stop stop = entry.getValue();
+        	if(entry.getKey().equals(stopId)) {
+        		response.stops.add(new StopType(entry.getValue(), extended));
+        	}
+        }
         
-    	Edge preBoardEdge = transitIndexService.getPreBoardEdge(stopId);
-        if(preBoardEdge != null) {
-        	TransitStopDepart transitStop = (TransitStopDepart) preBoardEdge.getToVertex();
-        	response.stops.add(new StopType(transitStop.getStop(), extended));
-        }
-        else { // check if stop is alight-only        	
-	    	Edge preAlightEdge = transitIndexService.getPreAlightEdge(stopId);
-	        if(preAlightEdge != null) {
-	        	TransitStopArrive transitStop = (TransitStopArrive) preAlightEdge.getFromVertex();
-	        	response.stops.add(new StopType(transitStop.getStop(), extended));
-	        }
-        }
         return response;
     }
 
+    
+    /**
+     * Returns data for stops matching a fragment of a name
+     */
+
+    @GET
+    @Path("/stopsByName")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    public Object getStopsByName(@QueryParam("agency") String agency, @QueryParam("name") String name,
+            @QueryParam("extended") Boolean extended, @QueryParam("routerId") String routerId)
+            throws JSONException {
+    	
+        TransitIndexService transitIndexService = getGraph(routerId).getService(
+                TransitIndexService.class);
+        if (transitIndexService == null) {
+            return new TransitError(
+                    "No transit index found.  Add TransitIndexBuilder to your graph builder configuration and rebuild your graph.");
+        }
+
+        StopList response = new StopList();
+    	
+        Map<AgencyAndId, Stop> allStops = transitIndexService.getAllStops();
+        for(Map.Entry<AgencyAndId, Stop> entry : allStops.entrySet()) {
+        	Stop stop = entry.getValue();
+        	if(entry.getKey().getAgencyId().equals(agency) && stop.getName().toLowerCase().contains(name.toLowerCase())) {
+        		response.stops.add(new StopType(stop, extended));
+        	}
+        }
+
+        return response;
+    }
+    
     /**
      * Return stops near a point. The default search radius is 200m, but this can be changed with the radius parameter (in meters)
      */
