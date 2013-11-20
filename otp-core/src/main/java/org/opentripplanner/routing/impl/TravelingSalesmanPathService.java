@@ -20,6 +20,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
@@ -31,7 +34,6 @@ import org.opentripplanner.routing.pathparser.NoThruTrafficPathParser;
 import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
-import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +46,7 @@ public class TravelingSalesmanPathService implements PathService {
     @Autowired
     public GraphService graphService;
 
-    @Autowired
+    @Autowired @Getter @Setter
     private PathService chainedPathService;
 
     @Override
