@@ -4,16 +4,18 @@
         <div class="otp-stopViewer-stopInfo"> 
             (No Stop Selected)
         </div>
-        <!--<div style="margin-top: 4px;">
-            <b>ID</b>: <input type='text' class="otp-stopViewer-idInput" />
-            <button class="otp-stopViewwer-reloadButton">Reload</button>
-        </div>-->
+
         <div style="margin-top: 4px; text-align: center;">
             <b>Date</b>: <input type='text' class="otp-stopViewer-dateInput" />
         </div>
         <div class="otp-stopViewer-timeList"></div>
+        <div class="otp-stopViewer-findButtonRow">
+            <button class="otp-stopViewer-findButton">Find Stops</button>
+        </div>
+
     </div>
 </script>
+
 
 <script id="otp-stopViewer-timeListItem" type="text/html">
     <div class="otp-stopViewer-timeListItem">
@@ -29,5 +31,50 @@
         <div class="otp-stopViewer-tripRow">
             Trip {{trip.id.agencyId}}_{{trip.id.id}}
         </div>
+    </div>
+</script>
+
+
+<script id="otp-stopFinder" type="text/html">
+
+    <div class="otp-stopFinder-container notDraggable">
+
+
+        <div style="position: absolute; top: 0px; left: 0px; right: 0px;">
+            <div style="position:absolute; left: 0px; padding-top: 2px;">
+                Agency:
+            </div>
+            <div style="position:absolute; left: 65px; right: 0px;">
+                <select style="width: 100%" class="otp-stopFinder-agencySelect" />
+            </div>
+        </div>
+
+        <div style="position: absolute; top: 25px; left: 0px; right: 0px;">
+            <div style="position:absolute; left: 0px; padding-top: 2px;">
+                By ID:
+            </div>
+            <div style="position:absolute; left: 65px; right: 70px;">
+                <input type="text" style="width: 100%" class="otp-stopFinder-idField" />
+            </div>
+            <div style="position:absolute; width: 60px; right: 0px;">
+                <button class="otp-stopFinder-idButton">Search</button>
+            </div>
+        </div>
+
+        <div style="position: absolute; top: 50px; left: 0px; right: 0px;">
+            <div style="position:absolute; left: 0px; padding-top: 2px;">
+                By Name:
+            </div>
+            <div style="position:absolute; left: 65px; right: 70px;">
+                <input type="text" style="width: 100%" class="otp-stopFinder-nameField" />
+            </div>
+            <div style="position:absolute; width: 60px; right: 0px;">
+                <button class="otp-stopFinder-nameButton">Search</button>
+            </div>
+        </div>
+
+        <div class="otp-stopFinder-stopList">
+        </div>
+
     </div>
 </script>
