@@ -157,14 +157,16 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
      * applies those updates to the graph.
      */
     @Override
-    public void runPolling() throws Exception {
+    public void runPolling() {
         // Get update lists from update source
         List<TripUpdate> updates = updateSource.getUpdates();
 
-        // Handle trip updates via graph writer runnable
-        TripUpdateGraphWriterRunnable runnable =
-                new TripUpdateGraphWriterRunnable(updates, agencyId);
-        updaterManager.execute(runnable);
+        if (updates != null && updates.size() > 0) {
+            // Handle trip updates via graph writer runnable
+            TripUpdateGraphWriterRunnable runnable =
+                    new TripUpdateGraphWriterRunnable(updates, agencyId);
+            updaterManager.execute(runnable);
+        }
     }
 
     @Override
