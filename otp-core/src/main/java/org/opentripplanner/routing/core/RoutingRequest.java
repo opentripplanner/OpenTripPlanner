@@ -178,6 +178,12 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     // it is assumed that getting off an elevator is completely free
 
+    /** Time to get on and off your own bike */
+    public int bikeSwitchTime;
+
+    /** Cost of getting on and off your own bike */
+    public int bikeSwitchCost;
+
     /** Time to rent a bike */
     public int bikeRentalPickupTime = 60;
 
@@ -429,6 +435,8 @@ public class RoutingRequest implements Cloneable, Serializable {
             bikeWalkingOptions.modes.setBicycle(false);
             bikeWalkingOptions.modes.setWalk(true);
             bikeWalkingOptions.walkingBike = true;
+            bikeWalkingOptions.bikeSwitchTime = bikeSwitchTime;
+            bikeWalkingOptions.bikeSwitchCost = bikeSwitchCost;
         } else if (modes.getDriving()) {
             bikeWalkingOptions = new RoutingRequest();
             bikeWalkingOptions.setArriveBy(this.isArriveBy());
@@ -877,6 +885,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && elevatorBoardCost == other.elevatorBoardCost
                 && elevatorHopTime == other.elevatorHopTime
                 && elevatorHopCost == other.elevatorHopCost
+                && bikeSwitchTime == other.bikeSwitchTime
+                && bikeSwitchCost == other.bikeSwitchCost
                 && bikeRentalPickupTime == other.bikeRentalPickupTime
                 && bikeRentalPickupCost == other.bikeRentalPickupCost
                 && bikeRentalDropoffTime == other.bikeRentalDropoffTime
