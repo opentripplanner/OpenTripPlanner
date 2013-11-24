@@ -15,32 +15,33 @@ package org.opentripplanner.updater.stoptime;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
 
+import lombok.Getter;
+
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.trippattern.TripUpdateList;
 import org.opentripplanner.updater.PreferencesConfigurable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.transit.realtime.GtfsRealtime;
+import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 
-/**
- * Supposed to be GTFS-RT ZeroMQ trip update source. For now it just reads the GTFS-RT
- * from a local file. 
- */
-public class GtfsRealtimeZmqTripUpdateSource implements TripUpdateSource, PreferencesConfigurable {
-    private static final Logger LOG = LoggerFactory.getLogger(GtfsRealtimeZmqTripUpdateSource.class);
+/** Reads the GTFS-RT from a local file. */
+public class GtfsRealtimeFileTripUpdateSource implements TripUpdateSource, PreferencesConfigurable {
+    private static final Logger LOG =
+            LoggerFactory.getLogger(GtfsRealtimeFileTripUpdateSource.class);
 
     private File file;
 
     /**
-     * Default agency id that is used for the trip id's in the TripUpdateLists
+     * Default agency id that is used for the trip ids in the TripUpdates
      */
+    @Getter
     private String agencyId;
 
     @Override
@@ -50,23 +51,27 @@ public class GtfsRealtimeZmqTripUpdateSource implements TripUpdateSource, Prefer
     }
 
     @Override
-    public List<TripUpdateList> getUpdates() {
-        FeedMessage feed = null;
-        List<TripUpdateList> updates = null;
+    public List<TripUpdate> getUpdates() {
+        FeedMessage feedMessage = null;
+        List<FeedEntity> feedEntityList = null;
+        List<TripUpdate> updates = null;
         try {
             InputStream is = new FileInputStream(file);
             if (is != null) {
-                feed = GtfsRealtime.FeedMessage.PARSER.parseFrom(is);
-                updates = TripUpdateList.decodeFromGtfsRealtime(feed, agencyId);
+                feedMessage = FeedMessage.PARSER.parseFrom(is);
+                feedEntityList = feedMessage.getEntityList();
+                updates = new ArrayList<TripUpdate>(feedEntityList.size());
+                for (FeedEntity feedEntity : feedEntityList) {
+                    updates.add(feedEntity.getTripUpdate());
+                }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             LOG.warn("Failed to parse gtfs-rt feed at " + file + ":", e);
         }
         return updates;
     }
 
     public String toString() {
-        return "GTFSZMQUpdateStreamer(" + file + ")";
+        return "GtfsRealtimeFileTripUpdateSource(" + file + ")";
     }
-
 }

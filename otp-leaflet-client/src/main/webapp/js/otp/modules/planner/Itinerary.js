@@ -123,7 +123,8 @@ otp.modules.planner.Itinerary = otp.Class({
     },
     
     getFareStr : function() {
-    
+        if(this.fareDisplayOverride) return this.fareDisplayOverride;
+        if(otp.config.fareDisplayOverride) return otp.config.fareDisplayOverride;
         if(this.itinData.fare && this.itinData.fare.fare.regular) {
             var decimalPlaces = this.itinData.fare.fare.regular.currency.defaultFractionDigits;
             return this.itinData.fare.fare.regular.currency.symbol +

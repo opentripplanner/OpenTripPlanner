@@ -53,6 +53,7 @@ import org.opentripplanner.gbannotation.NegativeHopTime;
 import org.opentripplanner.gbannotation.StopAtEntrance;
 import org.opentripplanner.gbannotation.TripDegenerate;
 import org.opentripplanner.gbannotation.TripUndefinedService;
+import org.opentripplanner.gtfs.BikeAccess;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.ServiceIdToNumberService;
@@ -856,8 +857,7 @@ public class GTFSPatternHopFactory {
         }
 
         int bikes = 0;
-        if ((trip.getRoute().getBikesAllowed() == 2 && trip.getTripBikesAllowed() != 1)
-                || trip.getTripBikesAllowed() == 2) {
+        if (BikeAccess.fromTrip(trip) == BikeAccess.ALLOWED) {
             bikes = TableTripPattern.FLAG_BIKES_ALLOWED;
         }
 

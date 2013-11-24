@@ -115,18 +115,20 @@
 }
 
 .otp-fieldTripRequests-listRow {
-    margin: 4px;
+    margin: 6px;
     padding: 4px;
     background: #eee;
     cursor: pointer;
+    border: 1px solid gray;
 }
 
 
 /** FieldTripRequest widget **/
 
 .otp-fieldTrip-requestWidget {
-    width: 400px;
-    height: 350px;
+    width: 450px;
+    top: 50px;
+    height: 80%;
 }
 
 .otp-fieldTrip-requestWidget-content {
@@ -277,3 +279,18 @@
     background: white;
 }
 
+
+.otp-fieldtrip-searchWidget {
+    width: 480px;
+    height: 450px;
+}
+
+.otp-fieldtrip-searchWidget-tabArea {
+    position: absolute;
+    background: white;
+    overflow: auto;
+    top: 48px;
+    bottom: 10px;
+    left: 10px;
+    right: 10px;
+}

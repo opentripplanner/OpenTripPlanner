@@ -50,6 +50,7 @@ import org.opentripplanner.graph_builder.model.GtfsBundles;
 import org.opentripplanner.graph_builder.services.EntityReplacementStrategy;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.GraphBuilderWithGtfsDao;
+import org.opentripplanner.gtfs.BikeAccess;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
@@ -418,9 +419,8 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
             }
 
             Trip trip = (Trip) bean;
-            if (_defaultBikesAllowed && trip.getTripBikesAllowed() == 0
-                    && trip.getRoute().getBikesAllowed() == 0) {
-                trip.setTripBikesAllowed(2);
+            if (_defaultBikesAllowed && BikeAccess.fromTrip(trip) == BikeAccess.UNKNOWN) {
+                BikeAccess.setForTrip(trip, BikeAccess.ALLOWED);
             }
         }
     }

@@ -79,7 +79,7 @@
     </dependencies>
 
     <build>
-        <finalName>${artifactId}</finalName>
+        <finalName>${project.artifactId}</finalName>
         <plugins>
             <!-- Copy in a couple of default resources if they are not already present -->
             <plugin>

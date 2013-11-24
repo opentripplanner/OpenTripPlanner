@@ -300,20 +300,9 @@ otp.widgets.tripoptions.TimeSelector =
         otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
         this.id = tripWidget.id+"-timeSelector";
 
-        var html = '<div id="'+this.id+'" class="notDraggable">';
-
-        var depArrId = this.id+'-depArr';
-        html += '<select id="'+depArrId+'">';
-        html += '<option>Depart</option>';
-        html += '<option>Arrive</option>';
-        html += '</select>';
-        
-        //var inputId = this.id+'-datepicker';
-        html += '&nbsp;<input type="text" id="'+this.id+'-date" class="otp-date-input" />';
-        html += '&nbsp;<input type="text" id="'+this.id+'-time" class="otp-time-input" />';
-        
-        html += '</div>';
-        $(html).appendTo(this.$());
+        ich['otp-tripOptions-timeSelector']({
+            widgetId : this.id,
+        }).appendTo(this.$());
     
         this.epoch = moment().unix()*1000;    
     },
@@ -324,19 +313,6 @@ otp.widgets.tripoptions.TimeSelector =
         $("#"+this.id+'-depArr').change(function() {
             this_.tripWidget.module.arriveBy = (this.selectedIndex == 1);
         });
-
-
-        /*$('#'+this.id+'-picker').datetimepicker({
-            timeFormat: "hh:mmtt", 
-            onSelect: function(dateTime) {
-                var dateTimeArr = dateTime.split(' ');
-                this_.tripWidget.inputChanged({
-                    date : dateTimeArr[0],
-                    time : dateTimeArr[1],
-                });
-            }
-        });
-        $('#'+this.id+'-picker').datepicker("setDate", new Date());*/
 
         $('#'+this.id+'-date').datepicker({
             timeFormat: "hh:mmtt", 
@@ -374,6 +350,14 @@ otp.widgets.tripoptions.TimeSelector =
             
         });
         
+        $("#"+this.id+'-nowButton').click(function() {
+            $('#'+this_.id+'-date').datepicker("setDate", new Date());        
+            $('#'+this_.id+'-time').val(moment().format(otp.config.timeFormat))
+            this_.tripWidget.inputChanged({
+                time : $('#'+this_.id+'-time').val(),
+                date : $('#'+this_.id+'-date').val()
+            });
+        });
 
     },
     
@@ -699,9 +683,11 @@ otp.widgets.tripoptions.PreferredRoutes =
                 var agencyAndId = apiIdArr[0] + "_" + apiIdArr.pop();
                 restoredIds.push(agencyAndId);
             }
-            this.selectorWidget.restoredRouteIds = restoredIds; //planData.queryParams.preferredRoutes;
+
+            this.selectorWidget.restoredRouteIds = restoredIds;
+            if(this.selectorWidget.initializedRoutes) this.selectorWidget.restoreSelected();
+
             this.tripWidget.module.preferredRoutes = planData.queryParams.preferredRoutes;
-            //this.selectorWidget.updateRouteList();
             
             // resolve the IDs to user-friendly names
             var ti = this.tripWidget.module.webapp.transitIndex;
@@ -716,6 +702,7 @@ otp.widgets.tripoptions.PreferredRoutes =
             
         }
         else { // none specified
+            this.selectorWidget.clearSelected();
             this.selectorWidget.restoredRouteIds = [];
             $('#'+this.id+'-list').html('(None)');
             this.tripWidget.module.preferredRoutes = null;
@@ -786,7 +773,10 @@ otp.widgets.tripoptions.BannedRoutes =
                 var agencyAndId = apiIdArr[0] + "_" + apiIdArr.pop();
                 restoredIds.push(agencyAndId);
             }
+
             this.selectorWidget.restoredRouteIds = restoredIds;
+            if(this.selectorWidget.initializedRoutes) this.selectorWidget.restoreSelected();
+
             this.tripWidget.module.bannedRoutes = planData.queryParams.bannedRoutes;
             
             // resolve the IDs to user-friendly names
@@ -802,6 +792,7 @@ otp.widgets.tripoptions.BannedRoutes =
             
         }
         else { // none specified
+            this.selectorWidget.clearSelected();
             this.selectorWidget.restoredRouteIds = [];
             $('#'+this.id+'-list').html('(None)');
             this.tripWidget.module.bannedRoutes = null;

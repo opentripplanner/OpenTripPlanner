@@ -414,7 +414,7 @@ otp.widgets.ItinerariesWidget =
 
         // add alerts, if applicable
         alerts = alerts || [];
-        if(itin.totalWalk > itin.tripPlan.queryParams.maxWalkDistance && itin.tripPlan.queryParams.maxWalkDistance > 804) {
+        if(itin.totalWalk > itin.tripPlan.queryParams.maxWalkDistance) {
             alerts.push("Total walk distance for this trip exceeds specified maximum");
         }
         

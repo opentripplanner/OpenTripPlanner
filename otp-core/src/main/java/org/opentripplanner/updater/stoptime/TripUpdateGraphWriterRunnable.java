@@ -18,28 +18,30 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.trippattern.TripUpdateList;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.transit.realtime.GtfsRealtime.TripUpdate;
+
 @AllArgsConstructor
 public class TripUpdateGraphWriterRunnable implements GraphWriterRunnable {
-
     private static Logger LOG = LoggerFactory.getLogger(TripUpdateGraphWriterRunnable.class);
 
     /**
      * The list with updates to apply to the graph
      */
-    private List<TripUpdateList> updates;
+    private List<TripUpdate> updates;
+
+    private String agencyId;
 
     @Override
     public void run(Graph graph) {
         // Apply updates to graph using realtime snapshot source
         TimetableSnapshotSource snapshotSource = graph.getTimetableSnapshotSource();
         if (snapshotSource != null) {
-            snapshotSource.applyTripUpdateLists(updates);
+            snapshotSource.applyTripUpdates(updates, agencyId);
         } else {
             LOG.error("Could not find realtime data snapshot source in graph."
                     + " The following updates are not applied: {}", updates);

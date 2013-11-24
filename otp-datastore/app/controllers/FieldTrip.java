@@ -431,6 +431,22 @@ public class FieldTrip extends Application {
         note.delete();
         renderJSON(noteId);
     }
+    
+    public static void searchRequests(String query, String teacherValue, String schoolValue, @As("MM/dd/yyyy") Date date1, @As("MM/dd/yyyy") Date date2) {
+        TrinetUser user = checkLogin();        
+        checkAccess(user);
+      
+        System.out.println("search: "+query);
+        List<FieldTripRequest> requests;
+        if(date2 == null) requests = FieldTripRequest.find(query, teacherValue, schoolValue, date1).fetch();
+        else requests = FieldTripRequest.find(query, teacherValue, schoolValue, date1, date2).fetch();
+
+        Gson gson = new GsonBuilder()
+          .excludeFieldsWithoutExposeAnnotation()  
+          .serializeNulls()
+          .create();
+        renderJSON(gson.toJson(requests));
+    }
         
     /* Receipt Generation */
     
