@@ -173,8 +173,9 @@ public class FrequencyAlight extends Edge {
             }
             
             /* check if trip is banned for this plan */
-            if (options.tripIsBanned(trip))
-            	return null;
+            if (options.tripIsBanned(trip)) {
+                return null;
+            }
 
             /* check if route is preferred for this plan */
             long preferences_penalty = options.preferencesPenaltyForTrip(trip);
@@ -267,5 +268,9 @@ public class FrequencyAlight extends Edge {
 
     public String toString() {
         return "FrequencyAlight(" + getFromVertex() + ", " + getToVertex() + ")";
+    }
+
+    public TripPattern getPattern() {
+        return pattern;
     }
 }

@@ -27,6 +27,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.transit_index.RouteVariant;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -48,6 +49,8 @@ public interface TransitIndexService {
     public TableTripPattern getTripPatternForTrip(AgencyAndId tripId);
     
     public List<AgencyAndId> getRoutesForStop(AgencyAndId stop);
+
+    public List<TripPattern> getTripPatternsForStop(AgencyAndId stop);
 
     public Collection<String> getDirectionsForRoute(AgencyAndId route);
     

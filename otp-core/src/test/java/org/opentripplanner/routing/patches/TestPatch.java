@@ -42,6 +42,7 @@ import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -170,6 +171,11 @@ public class TestPatch extends TestCase {
 
             @Override
             public List<AgencyAndId> getRoutesForStop(AgencyAndId stop) {
+                return null;
+            }
+
+            @Override
+            public List<TripPattern> getTripPatternsForStop(AgencyAndId stop) {
                 return null;
             }
 
