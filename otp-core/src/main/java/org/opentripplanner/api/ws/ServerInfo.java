@@ -43,17 +43,19 @@ public class ServerInfo {
         return SERVER_INFO;
     }    
     
-    /* fields must be public or have a public getter to be auto-serialized to JSON;
-    they are annotated with @XmlElement to be serialized to XML */
+    /* Fields must be public or have a public getter to be auto-serialized to JSON;
+    they are annotated with @XmlElement to be serialized to XML.
+    Adding Lombok @Getter does not work because the name of the auto-generated getNCores getter 
+    function confuses JSON field capitalization. */
 
-    @XmlElement @Getter
-    private MavenVersion serverVersion = MavenVersion.VERSION; 
+    @XmlElement 
+    public MavenVersion serverVersion = MavenVersion.VERSION; 
     
-    @XmlElement @Getter
-    private String cpuName = "unknown";
+    @XmlElement 
+    public String cpuName = "unknown";
     
-    @XmlElement @Getter
-    private int nCores = 0;
+    @XmlElement 
+    public int nCores = 0;
 
     /**
      * Determine the OTP version and CPU type of the running server. This information should not
