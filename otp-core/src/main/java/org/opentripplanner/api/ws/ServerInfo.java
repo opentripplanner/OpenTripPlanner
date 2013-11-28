@@ -57,6 +57,8 @@ public class ServerInfo {
     @XmlElement 
     public int nCores = 0;
 
+    /* It would make sense to have one object containing maven, git, and hardware subobjects. */
+    
     /**
      * Determine the OTP version and CPU type of the running server. This information should not
      * change while the server is up, so it can safely be cached at startup.
