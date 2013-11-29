@@ -24,6 +24,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.model.GtfsBundles;
@@ -36,46 +37,53 @@ import org.opentripplanner.routing.transit_index.RouteVariant;
 
 public class TransitIndexBuilderTest extends TestCase {
 
-	public void testTransitIndexBuilder() throws IOException {
-		Graph graph = new Graph();
+    public void testTransitIndexBuilder() throws IOException {
+        Graph graph = new Graph();
 
-		File testGtfs = new File("../otp-core/src/test/resources/testagency.zip");
-		GtfsBundle bundle = new GtfsBundle();
-		bundle.setPath(testGtfs);
-		
-		GtfsBundles bundles = new GtfsBundles();
-		bundles.setBundles(Arrays.asList(bundle));
+        File testGtfs = new File("../otp-core/src/test/resources/testagency.zip");
+        GtfsBundle bundle = new GtfsBundle();
+        bundle.setPath(testGtfs);
 
-		GtfsGraphBuilderImpl gtfsBuilder = new GtfsGraphBuilderImpl();
-		gtfsBuilder.setGtfsBundles(bundles);
-		
-		TransitIndexBuilder builder = new TransitIndexBuilder();
-		List<GraphBuilderWithGtfsDao> builders = new ArrayList<GraphBuilderWithGtfsDao>();
-		builders.add(builder);
-		gtfsBuilder.setGtfsGraphBuilders(builders);
-		
-		gtfsBuilder.buildGraph(graph, new HashMap<Class<?>, Object>());
-		
-		TransitIndexService index = graph.getService(TransitIndexService.class); 
-	
-		assertNotNull(index);
-		
-		Edge prealightEdge = index.getPreAlightEdge(new AgencyAndId("agency", "A"));
-		assertTrue(prealightEdge instanceof PreAlightEdge);
-		
-		//route 18 is the only bidirectional route in the test data
-		List<RouteVariant> variantsForRoute = index.getVariantsForRoute(new AgencyAndId("agency", "18"));
-		assertEquals(2, variantsForRoute.size());
+        GtfsBundles bundles = new GtfsBundles();
+        bundles.setBundles(Arrays.asList(bundle));
 
-		Collection<String> directionsForRoute = index.getDirectionsForRoute(new AgencyAndId("agency", "18"));
-		assertEquals(2, directionsForRoute.size());
-		
-		variantsForRoute = index.getVariantsForRoute(new AgencyAndId("agency", "2"));
-		assertEquals(1, variantsForRoute.size());
-		
-		directionsForRoute = index.getDirectionsForRoute(new AgencyAndId("agency", "2"));
-		assertEquals(1, directionsForRoute.size());
-		assertEquals(null, directionsForRoute.iterator().next());
+        GtfsGraphBuilderImpl gtfsBuilder = new GtfsGraphBuilderImpl();
+        gtfsBuilder.setGtfsBundles(bundles);
 
-	}
+        TransitIndexBuilder builder = new TransitIndexBuilder();
+        List<GraphBuilderWithGtfsDao> builders = new ArrayList<GraphBuilderWithGtfsDao>();
+        builders.add(builder);
+        gtfsBuilder.setGtfsGraphBuilders(builders);
+
+        gtfsBuilder.buildGraph(graph, new HashMap<Class<?>, Object>());
+
+        TransitIndexService index = graph.getService(TransitIndexService.class); 
+
+        assertNotNull(index);
+
+        Edge prealightEdge = index.getPreAlightEdge(new AgencyAndId("agency", "A"));
+        assertTrue(prealightEdge instanceof PreAlightEdge);
+
+        //route 18 is the only bidirectional route in the test data
+        List<RouteVariant> variantsForRoute = index.getVariantsForRoute(new AgencyAndId("agency", "18"));
+        assertEquals(2, variantsForRoute.size());
+
+        Collection<String> directionsForRoute = index.getDirectionsForRoute(new AgencyAndId("agency", "18"));
+        assertEquals(2, directionsForRoute.size());
+
+        variantsForRoute = index.getVariantsForRoute(new AgencyAndId("agency", "2"));
+        assertEquals(1, variantsForRoute.size());
+
+        directionsForRoute = index.getDirectionsForRoute(new AgencyAndId("agency", "2"));
+        assertEquals(1, directionsForRoute.size());
+        assertEquals(null, directionsForRoute.iterator().next());
+
+        List<Stop> stops = index.getStopsForStation(new AgencyAndId("agency", "station"));
+        assertEquals(2, stops.size());
+        assertEquals(new AgencyAndId("agency", "A"), stops.get(0).getId());
+        assertEquals(new AgencyAndId("agency", "entrance_a"), stops.get(1).getId());
+
+        stops = index.getStopsForStation(new AgencyAndId("agency", "A"));
+        assertEquals(0, stops.size());
+    }
 }
