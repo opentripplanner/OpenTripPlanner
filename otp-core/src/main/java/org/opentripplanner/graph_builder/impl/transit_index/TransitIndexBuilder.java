@@ -112,6 +112,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
     public void buildGraph(Graph graph) {
         LOG.debug("Building transit index");
 
+        connectParentStations(stopsByStation);
         createRouteVariants(graph);
         indexTableTripPatternByTrip(graph);
 
@@ -133,10 +134,10 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
         for(Route route : dao.getAllRoutes()) {
             routes.put(route.getId(), route);
         }
-        
-        LOG.debug("Built transit index: " + variantsByAgency.size() + " agencies, "
-                + variantsByRoute.size() + " routes, " + totalTrips + " trips, " + totalVariants
-                + " variants ");
+
+        LOG.debug("Built transit index: " + stopsByStation.size() + " stations, "
+                + variantsByAgency.size() + " agencies, " + variantsByRoute.size() + " routes, "
+                + totalTrips + " trips, " + totalVariants + " variants ");
 
         TransitIndexServiceImpl service = (TransitIndexServiceImpl) graph
                 .getService(TransitIndexService.class);
@@ -344,6 +345,29 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
     private void addAgencies(TransitIndexServiceImpl service) {
         for (Agency agency : dao.getAllAgencies()) {
             service.addAgency(agency);
+        }
+    }
+
+    private void connectParentStations(HashMap<AgencyAndId, List<Stop>> stopsByStation) {
+        // Add stations as keys
+        for (Stop stop : dao.getAllStops()) {
+            if (stop.getLocationType() != 1) continue;
+
+            stopsByStation.put(stop.getId(), new ArrayList<Stop>());
+        }
+
+        // Add stops as values
+        for (Stop stop : dao.getAllStops()) {
+            if (stop.getLocationType() == 1) continue;
+
+            String stationName = stop.getParentStation();
+            if (stationName == null || stationName.equals("")) continue;
+
+            AgencyAndId stationId = new AgencyAndId(stop.getId().getAgencyId(), stationName);
+            List<Stop> list = stopsByStation.get(stationId);
+            if (list == null) continue;
+
+            list.add(stop);
         }
     }
 
