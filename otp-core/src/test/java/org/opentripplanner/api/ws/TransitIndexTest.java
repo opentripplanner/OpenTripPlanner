@@ -2,14 +2,17 @@ package org.opentripplanner.api.ws;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static org.opentripplanner.util.DateConstants.ONE_DAY_MILLI;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TimeZone;
 
+import org.codehaus.jettison.json.JSONException;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -18,6 +21,7 @@ import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.api.model.Place;
+import org.opentripplanner.api.model.transit.StopTimeList;
 import org.opentripplanner.api.model.transit.TripTimesPair;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.edgetype.Timetable;
@@ -141,5 +145,38 @@ public class TransitIndexTest {
             assertEquals(i, resolved.stopIndex.intValue());
             assertEquals(0, resolved.stopSequence.intValue());
         }
+    }
+
+    @Test
+    public final void testStopTimesForStation() throws JSONException {
+        AgencyAndId station = new AgencyAndId("Agency", "Station");
+        Stop stop0 = new Stop();
+        Stop stop1 = new Stop();
+        ArrayList<Stop> stops = new ArrayList<Stop>(2);
+        TransitIndex transitIndex = new TransitIndex();
+
+        GraphService graphService = mock(GraphService.class);
+        Graph graph = mock(Graph.class);
+        TransitIndexService transitIndexService = mock(TransitIndexService.class);
+
+        when(graphService.getGraph(Matchers.anyString())).thenReturn(graph);
+        when(graph.getService(TransitIndexService.class)).thenReturn(transitIndexService);
+        when(transitIndexService.getStopsForStation(station)).thenReturn(stops);
+
+        stop0.setId(new AgencyAndId("Agency", "Stop 0"));
+        stop1.setId(new AgencyAndId("Agency", "Stop 1"));
+        stops.add(stop0);
+        stops.add(stop1);
+        transitIndex.setGraphService(graphService);
+
+        Object object = transitIndex.getStopTimesForStation("Agency", "Station",
+                0, null, null, null, null, null);
+
+        if (object instanceof StopTimeList[]) {
+            StopTimeList[] array = (StopTimeList[]) object;
+            assertEquals(2, array.length);
+            assertEquals(stop0.getId(), array[0].stop);
+            assertEquals(stop1.getId(), array[1].stop);
+        } else fail("The getStopTimesForStation() method didn't return a StopTimeList[] instance.");
     }
 }
