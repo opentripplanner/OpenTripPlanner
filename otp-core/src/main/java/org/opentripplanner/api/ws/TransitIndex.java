@@ -10,6 +10,7 @@
 
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
 package org.opentripplanner.api.ws;
 
 import java.util.ArrayList;
@@ -373,6 +374,7 @@ public class TransitIndex {
         // add all departures
         HashSet<TripType> trips = new HashSet<TripType>();
         StopTimeList result = new StopTimeList();
+        result.stop = new AgencyAndId(stopAgency, stopId);
         result.stopTimes = new ArrayList<StopTime>();
 
         if (references != null && references.equals(true)) {
@@ -452,6 +454,45 @@ public class TransitIndex {
             }
 
         });
+
+        return result;
+    }
+
+    /**
+     * Return stop times for all stops comprising a station, in seconds since the epoch
+     * startTime and endTime are in milliseconds since epoch
+     */
+    @GET
+    @Path("/stopTimesForStation")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    public Object getStopTimesForStation(@QueryParam("agency") String stationAgency,
+            @QueryParam("id") String stationId, @QueryParam("startTime") long startTime,
+            @QueryParam("endTime") Long endTime, @QueryParam("extended") Boolean extended,
+            @QueryParam("references") Boolean references, @QueryParam("routeId") String routeId,
+            @QueryParam("routerId") String routerId) throws JSONException {
+        AgencyAndId station = new AgencyAndId(stationAgency, stationId);
+        TransitIndexService transitIndexService = getGraph(routerId).getService(
+                TransitIndexService.class);
+
+        if (transitIndexService == null) {
+            return new TransitError(
+                    "No transit index found. Add TransitIndexBuilder to your graph builder " +
+                    "configuration and rebuild your graph.");
+        }
+
+        List<Stop> stops = transitIndexService.getStopsForStation(station);
+        StopTimeList result[] = new StopTimeList[stops.size()];
+
+        for (int i = 0; i < result.length; i++) {
+            AgencyAndId stop = stops.get(i).getId();
+            Object object = getStopTimesForStop(stop.getAgencyId(), stop.getId(),
+                    startTime, endTime, extended, references, routeId, routerId);
+            if (object instanceof StopTimeList) {
+                result[i] = (StopTimeList) object;
+                continue;
+            }
+            return object;  // Propagate any TransitError results immediately
+        }
 
         return result;
     }

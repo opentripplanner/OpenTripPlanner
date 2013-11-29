@@ -132,6 +132,11 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
     }
 
     @Override
+    public List<Stop> getStopsForStation(AgencyAndId stop) {
+        return null;
+    }
+
+    @Override
     public List<RouteVariant> getVariantsForAgency(String agency) {
         List<RouteVariant> variants = variantsByAgency.get(agency);
         if (variants == null) {

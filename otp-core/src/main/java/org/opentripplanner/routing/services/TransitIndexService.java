@@ -33,6 +33,8 @@ import org.opentripplanner.routing.transit_index.RouteVariant;
 import com.vividsolutions.jts.geom.Coordinate;
 
 public interface TransitIndexService {
+    public List<Stop> getStopsForStation(AgencyAndId stop);
+
     public List<RouteVariant> getVariantsForAgency(String agency);
 
     public List<RouteVariant> getVariantsForRoute(AgencyAndId route);
