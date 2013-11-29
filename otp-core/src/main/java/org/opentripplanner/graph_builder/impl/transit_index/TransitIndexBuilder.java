@@ -75,6 +75,8 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 
     private GtfsRelationalDao dao;
 
+    private HashMap<AgencyAndId, List<Stop>> stopsByStation = new HashMap<AgencyAndId, List<Stop>>();
+
     private HashMap<AgencyAndId, RouteVariant> variantsByTrip = new HashMap<AgencyAndId, RouteVariant>();
 
     private HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute = new HashMap<AgencyAndId, List<RouteVariant>>();
@@ -139,12 +141,13 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
         TransitIndexServiceImpl service = (TransitIndexServiceImpl) graph
                 .getService(TransitIndexService.class);
         if (service == null) {
-            service = new TransitIndexServiceImpl(variantsByAgency, variantsByRoute,
-                    variantsByTrip, preBoardEdges, preAlightEdges, tableTripPatternsByTrip, directionsByRoute, stopsByRoute,
-                    routes, stops, modes);
+            service = new TransitIndexServiceImpl(stopsByStation, variantsByAgency, variantsByRoute,
+                    variantsByTrip, preBoardEdges, preAlightEdges, tableTripPatternsByTrip,
+                    directionsByRoute, stopsByRoute, routes, stops, modes);
         } else {
-            service.merge(variantsByAgency, variantsByRoute, variantsByTrip, preBoardEdges,
-                    preAlightEdges, tableTripPatternsByTrip, directionsByRoute, stopsByRoute, routes, stops, modes);
+            service.merge(stopsByStation, variantsByAgency, variantsByRoute, variantsByTrip,
+                    preBoardEdges, preAlightEdges, tableTripPatternsByTrip, directionsByRoute,
+                    stopsByRoute, routes, stops, modes);
         }
 
         insertCalendarData(service);
@@ -562,7 +565,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
              * 
              * <pre>
              *                    A      B
-             * 	                  |      |
+             *                    |      |
              *                    |------|
              *                    |      |
              *                    |      |
