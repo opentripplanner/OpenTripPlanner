@@ -37,9 +37,11 @@ public class Debug { // rename to DebugOutput
      * Record the time when we first began calculating a path for this request 
      * (before any heuristic pre-calculation). Note that timings will not 
      * include network and server request queue overhead, which is what we want.
+     * finishedPrecalculating is also set because some heuristics will not mark any precalculation 
+     * step, and path times are measured from when precalculation ends.
      */
     public void startedCalculating() {
-        startedCalculating = System.currentTimeMillis();
+        startedCalculating = finishedPrecalculating = System.currentTimeMillis();
     }
 
     /** Record the time when we finished heuristic pre-calculation. */
@@ -72,6 +74,7 @@ public class Debug { // rename to DebugOutput
             pathTimes.add(t - last_t);
             last_t = t;
         }
+        System.out.printf("%s\n", pathTimes);
         renderingTime = finishedRendering - finishedCalculating;
         totalTime = finishedRendering - startedCalculating;
     }

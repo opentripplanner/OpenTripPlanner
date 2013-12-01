@@ -124,6 +124,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
         // for trips near the cutoff
         options.setMaxWalkDistance(Double.POSITIVE_INFINITY);
         LOG.debug("initialized SSSP");
+        s.getOptions().rctx.debug.finishedPrecalculating();
     }
 
     /** Do up to N iterations as long as the queue is not empty */

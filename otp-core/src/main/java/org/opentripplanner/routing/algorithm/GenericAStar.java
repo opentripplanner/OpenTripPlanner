@@ -110,7 +110,6 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         // heuristic calc could actually be done when states are constructed, inside state
         State initialState = new State(options);
         heuristic.initialize(initialState, rctx.target);
-        options.rctx.debug.finishedPrecalculating();
         spt.add(initialState);
 
         // Priority Queue.
