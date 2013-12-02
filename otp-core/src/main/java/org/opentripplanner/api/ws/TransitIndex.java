@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -87,8 +88,6 @@ import org.opentripplanner.routing.transit_index.adapters.StopType;
 import org.opentripplanner.routing.transit_index.adapters.TripType;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStop;
-import org.opentripplanner.routing.vertextype.TransitStopArrive;
-import org.opentripplanner.routing.vertextype.TransitStopDepart;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.opentripplanner.util.DateUtils;
 import org.slf4j.Logger;
@@ -251,22 +250,56 @@ public class TransitIndex {
         Graph graph = getGraph(routerId);
         TransitIndexService transitIndexService = graph.getService(TransitIndexService.class);
 
+        if (transitIndexService == null) {
+            return new TransitError(
+                    "No transit index found. Add TransitIndexBuilder to your graph builder " +
+                    "configuration and rebuild your graph.");
+        }
+
         StopList response = new StopList();
 
         AgencyAndId stopId = new AgencyAndId(agency, id);
-        
-        Edge preBoardEdge = transitIndexService.getPreBoardEdge(stopId);
-        if(preBoardEdge != null) {
-            TransitStopDepart transitStop = (TransitStopDepart) preBoardEdge.getToVertex();
-            response.stops.add(new StopType(transitStop.getStop(), extended));
-        }
-        else { // check if stop is alight-only
-            Edge preAlightEdge = transitIndexService.getPreAlightEdge(stopId);
-            if(preAlightEdge != null) {
-                TransitStopArrive transitStop = (TransitStopArrive) preAlightEdge.getFromVertex();
-                response.stops.add(new StopType(transitStop.getStop(), extended));
+
+        Map<AgencyAndId, Stop> allStops = transitIndexService.getAllStops();
+        for(Map.Entry<AgencyAndId, Stop> entry : allStops.entrySet()) {
+            //Stop stop = entry.getValue();
+            if(entry.getKey().equals(stopId)) {
+                response.stops.add(new StopType(entry.getValue(), extended));
             }
         }
+
+        return response;
+    }
+
+    
+    /**
+     * Returns data for stops matching a fragment of a name
+     */
+
+    @GET
+    @Path("/stopsByName")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    public Object getStopsByName(@QueryParam("agency") String agency, @QueryParam("name") String name,
+            @QueryParam("extended") Boolean extended, @QueryParam("routerId") String routerId)
+            throws JSONException {
+
+        TransitIndexService transitIndexService = getGraph(routerId).getService(
+                TransitIndexService.class);
+        if (transitIndexService == null) {
+            return new TransitError(
+                    "No transit index found.  Add TransitIndexBuilder to your graph builder configuration and rebuild your graph.");
+        }
+
+        StopList response = new StopList();
+
+        Map<AgencyAndId, Stop> allStops = transitIndexService.getAllStops();
+        for(Map.Entry<AgencyAndId, Stop> entry : allStops.entrySet()) {
+            Stop stop = entry.getValue();
+            if(entry.getKey().getAgencyId().equals(agency) && stop.getName().toLowerCase().contains(name.toLowerCase())) {
+                response.stops.add(new StopType(stop, extended));
+            }
+        }
+
         return response;
     }
 

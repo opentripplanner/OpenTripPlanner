@@ -40,7 +40,9 @@ otp.widgets.transit.StopViewerWidget =
         var this_ = this;
 
         this.activeTime = moment();
-          
+        
+        this.stopFinder = new otp.widgets.transit.StopFinderWidget(this.module.id + "-stopFinder", this.module, this);
+
         ich['otp-stopViewer']({}).appendTo(this.mainDiv);
         
         this.timeList = this.mainDiv.find(".otp-stopViewer-timeList");
@@ -57,6 +59,10 @@ otp.widgets.transit.StopViewerWidget =
         });
         this.datePicker.datepicker("setDate", currentDate);
         
+        this.mainDiv.find(".otp-stopViewer-findButton").click(function() {
+            this_.stopFinder.show();
+            this_.stopFinder.bringToFront();
+        });
         
     },
 

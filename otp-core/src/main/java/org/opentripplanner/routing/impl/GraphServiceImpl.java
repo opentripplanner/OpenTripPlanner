@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import lombok.Setter;
 
@@ -106,6 +107,18 @@ public class GraphServiceImpl implements GraphService {
                     + "You must use the routers API to register one or more graphs before routing.");
         }
     }
+    
+    /**
+     * This is called when the bean gets deleted, that is mainly in case of webapp container
+     * application stop or reload. We teardown all loaded graph to stop their background real-time
+     * data updater thread.
+     */
+    @PreDestroy
+    private void teardown() {
+        LOG.info("Cleaning-up graphs...");
+        evictAll();
+        decorated.cleanupWebapp();
+    }
 
     @Override
     public Graph getGraph() {
@@ -156,5 +169,4 @@ public class GraphServiceImpl implements GraphService {
     public boolean save(String routerId, InputStream is) {
     	return decorated.save(routerId, is);
     }
-    
 }
