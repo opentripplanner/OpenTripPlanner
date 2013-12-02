@@ -23,10 +23,14 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 public class StopTime {
-    /**
-     * These are departure times, except where the stop is the last stop on a particular
-     * trip, in which case they are arrivals
-     */
+    @JsonSerialize
+    @XmlAttribute
+    public boolean realTime;
+
+    @JsonSerialize
+    @XmlAttribute
+    public long delay;
+
     @JsonSerialize
     @XmlAttribute
     public long time;

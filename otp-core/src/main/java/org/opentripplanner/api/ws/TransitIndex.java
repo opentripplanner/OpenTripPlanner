@@ -69,6 +69,7 @@ import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.OnboardEdge;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.edgetype.Timetable;
@@ -704,6 +705,15 @@ public class TransitIndex {
             if (time > endTime)
                 break;
             StopTime stopTime = new StopTime();
+            TripTimes tripTimes = result.getTripTimes();
+            Edge backEdge = result.getBackEdge();
+
+            if (tripTimes != null && !tripTimes.isScheduled() && backEdge instanceof OnboardEdge) {
+                OnboardEdge onboardEdge = (OnboardEdge) backEdge;
+                stopTime.realTime = true;
+                stopTime.delay = tripTimes.getDepartureDelay(onboardEdge.getStopIndex());
+            }
+
             stopTime.time = time;
             stopTime.trip = new TripType(result.getBackTrip(), extended);
             out.add(stopTime);
@@ -729,6 +739,15 @@ public class TransitIndex {
             if (time < startTime)
                 break;
             StopTime stopTime = new StopTime();
+            TripTimes tripTimes = result.getTripTimes();
+            Edge backEdge = result.getBackEdge();
+
+            if (tripTimes != null && !tripTimes.isScheduled() && backEdge instanceof OnboardEdge) {
+                OnboardEdge onboardEdge = (OnboardEdge) backEdge;
+                stopTime.realTime = true;
+                stopTime.delay = tripTimes.getArrivalDelay(onboardEdge.getStopIndex() - 1);
+            }
+
             stopTime.time = time;
             stopTime.trip = new TripType(result.getBackTrip(), extended);
             out.add(stopTime);
