@@ -37,6 +37,10 @@ public class StopTime {
 
     @JsonSerialize
     @XmlAttribute
+    public String serviceDate;
+
+    @JsonSerialize
+    @XmlAttribute
     public String phase;
 
     @JsonSerialize

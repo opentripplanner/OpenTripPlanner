@@ -704,6 +704,7 @@ public class TransitIndex {
             time = result.getTimeSeconds();
             if (time > endTime)
                 break;
+            ServiceDay serviceDay = result.getServiceDay();
             StopTime stopTime = new StopTime();
             TripTimes tripTimes = result.getTripTimes();
             Edge backEdge = result.getBackEdge();
@@ -712,6 +713,10 @@ public class TransitIndex {
                 OnboardEdge onboardEdge = (OnboardEdge) backEdge;
                 stopTime.realTime = true;
                 stopTime.delay = tripTimes.getDepartureDelay(onboardEdge.getStopIndex());
+            }
+
+            if (serviceDay != null) {
+                stopTime.serviceDate = serviceDay.getServiceDate().getAsString();
             }
 
             stopTime.time = time;
@@ -738,6 +743,7 @@ public class TransitIndex {
             time = result.getTimeSeconds();
             if (time < startTime)
                 break;
+            ServiceDay serviceDay = result.getServiceDay();
             StopTime stopTime = new StopTime();
             TripTimes tripTimes = result.getTripTimes();
             Edge backEdge = result.getBackEdge();
@@ -746,6 +752,10 @@ public class TransitIndex {
                 OnboardEdge onboardEdge = (OnboardEdge) backEdge;
                 stopTime.realTime = true;
                 stopTime.delay = tripTimes.getArrivalDelay(onboardEdge.getStopIndex() - 1);
+            }
+
+            if (serviceDay != null) {
+                stopTime.serviceDate = serviceDay.getServiceDate().getAsString();
             }
 
             stopTime.time = time;
