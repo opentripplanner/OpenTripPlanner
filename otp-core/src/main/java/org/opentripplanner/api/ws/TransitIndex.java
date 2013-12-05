@@ -1017,7 +1017,13 @@ public class TransitIndex {
         int tripIndex = pattern.getTripIndex(trip);
         TripTimes tripTimes = pattern.getTripTimes(tripIndex);
         TimetableSnapshotSource timetableSnapshotSource = graph.getTimetableSnapshotSource();
-        ServiceDate serviceDate = new ServiceDate(makeCalendar(timeZone, date, 0));
+        Calendar calendar = makeCalendar(timeZone, date, 0);
+
+        if (calendar == null) {
+            return new TransitError("Date format can't be parsed.");
+        }
+
+        ServiceDate serviceDate = new ServiceDate(calendar);
         AgencyAndId serviceId = pattern.getTrip(tripIndex).getServiceId();
         result.scheduled = new Place[tripTimes.getNumHops() + 1];
 
@@ -1197,6 +1203,7 @@ public class TransitIndex {
     private Calendar makeCalendar(TimeZone timeZone, String dateString, int seconds) {
         Calendar calendar = Calendar.getInstance(timeZone);
         Date date = DateUtils.toDate(dateString, "00:00", timeZone);
+        if (date == null) return null;
         long time = date.getTime() + seconds * 1000L;
         calendar.setTimeInMillis(time);
         return calendar;

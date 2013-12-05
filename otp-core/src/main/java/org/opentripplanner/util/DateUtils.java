@@ -155,10 +155,17 @@ public class DateUtils implements DateConstants {
             if (newString != null) {
                 List<String> dl = DF_LIST;
 
-                // if it looks like we have a small date format, ala 11.4.09, then use another set
-                // of compares
-                if (newString.length() <= 8 && !newString.matches(".*20\\d\\d.*")) {
-                    dl = SMALL_DF_LIST;
+                if (newString.length() <= 8) {
+                    if (newString.matches("\\d\\d\\d\\d\\d\\d\\d\\d")) {
+                        // Accept dates without punctuation if they consist of exactly eight digits.
+                        newString = newString.substring(0, 4)
+                                + '.' + newString.substring(4, 6)
+                                + '.' + newString.substring(6, 8);
+                    } else if (!(newString.matches(".*20\\d\\d.*"))) {
+                        // if it looks like we have a small date format, ala 11.4.09, then use
+                        // another set of compares
+                        dl = SMALL_DF_LIST;
+                    }
                 }
 
                 for (String df : dl) {
