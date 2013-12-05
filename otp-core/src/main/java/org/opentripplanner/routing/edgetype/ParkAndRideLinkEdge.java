@@ -53,6 +53,7 @@ public class ParkAndRideLinkEdge extends Edge {
 
     private boolean exit;
 
+    @SuppressWarnings("unused")
     private LineString geometry = null;
 
     /** The estimated distance between the center of the P+R envelope and the street access. */
@@ -112,7 +113,8 @@ public class ParkAndRideLinkEdge extends Edge {
             s1.incrementTimeInSeconds((int) Math.round(driveTime));
             s1.incrementWeight(driveTime);
         } else {
-            throw new IllegalStateException("Must walk OR drive here: " + mode);
+            // Can't cycle in/out a P+R.
+            return null;
         }
         return s1.makeState();
     }
