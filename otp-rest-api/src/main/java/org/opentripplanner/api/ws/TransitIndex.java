@@ -606,6 +606,7 @@ public class TransitIndex {
                 break;
             StopTime stopTime = new StopTime();
             stopTime.time = time;
+            stopTime.direction = result.getBackDirection();
             stopTime.trip = new TripType(result.getBackTrip(), extended);
             out.add(stopTime);
 
@@ -631,6 +632,7 @@ public class TransitIndex {
                 break;
             StopTime stopTime = new StopTime();
             stopTime.time = time;
+            stopTime.direction = result.getBackDirection();
             stopTime.trip = new TripType(result.getBackTrip(), extended);
             out.add(stopTime);
             time -= 1; // move to the previous alight time
