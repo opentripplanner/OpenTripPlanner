@@ -570,10 +570,6 @@ public class TransitIndex {
 
         time /= 1000;
 
-        AgencyAndId firstStop = null;
-        if (stopId != null) {
-            firstStop = new AgencyAndId(stopAgency, stopId);
-        }
         AgencyAndId trip = new AgencyAndId(tripAgency, tripId);
 
         TransitIndexService transitIndexService = getGraph(routerId).getService(
@@ -586,6 +582,13 @@ public class TransitIndex {
 
         RouteVariant variant = transitIndexService.getVariantForTrip(trip);
         RoutingRequest options = makeTraverseOptions(time, routerId);
+
+        AgencyAndId firstStop = null;
+        if (stopId != null) {
+            firstStop = new AgencyAndId(stopAgency, stopId);
+        } else {
+            firstStop = variant.getSegments().get(0).stop;
+        }
 
         StopTimeList result = new StopTimeList();
         result.stopTimes = new ArrayList<StopTime>();
