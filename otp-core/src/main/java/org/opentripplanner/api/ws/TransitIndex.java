@@ -565,7 +565,8 @@ public class TransitIndex {
     public Object getStopTimesForTrip(@QueryParam("stopAgency") String stopAgency,
             @QueryParam("stopId") String stopId, @QueryParam("tripAgency") String tripAgency,
             @QueryParam("tripId") String tripId, @QueryParam("time") long time,
-            @QueryParam("extended") Boolean extended, @QueryParam("routerId") String routerId)
+            @QueryParam("extended") Boolean extended, @QueryParam("references") Boolean references,
+            @QueryParam("routerId") String routerId)
             throws JSONException {
 
         time /= 1000;
@@ -589,6 +590,10 @@ public class TransitIndex {
 
         StopTimeList result = new StopTimeList();
         result.stopTimes = new ArrayList<StopTime>();
+        if (references != null && references.equals(true)) {
+            result.routes = new HashSet<Route>();
+            result.routes.add(variant.getRoute());
+        }
         State state = null;
         RouteSegment start = null;
         for (RouteSegment segment : variant.getSegments()) {
