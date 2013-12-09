@@ -15,13 +15,21 @@ public class Segment {
     @Getter String route;
     @Getter String from;
     @Getter String to;
+    @Getter String fromName;
+    @Getter String toName;
     @Getter String qualifier;
+    @Getter String routeShortName;
+    @Getter String routeLongName;
     @Getter Set<String> stops = Sets.newHashSet();
     
     public Segment (Ride ride) {
         route = ride.route.getId().getId();
+        routeShortName = ride.route.getShortName();
+        routeLongName = ride.route.getLongName();
         from = ride.from.getId().getId();
         to = ride.to.getId().getId();
+        fromName = ride.from.getName();
+        toName = ride.to.getName();
         for (Pattern pattern : ride.patterns) {
             boolean onboard = false;
             for (Stop stop : pattern.stops) {

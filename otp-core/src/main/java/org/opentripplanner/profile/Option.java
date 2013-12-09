@@ -6,7 +6,6 @@ import lombok.Getter;
 
 import org.opentripplanner.profile.ProfileRouter.Ride;
 
-import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 public class Option {
@@ -24,13 +23,14 @@ public class Option {
     public String getSummary() {
         StringBuilder sb = new StringBuilder();
         sb.append("routes ");
+        //Joiner.on(", ").join(X);
         for (Segment segment : segments) {
-            sb.append(segment.route);
+            sb.append(segment.routeShortName);
             sb.append(" ");
         }
         sb.append("via ");
         for (Segment segment : segments.subList(0, segments.size() - 1)) {
-            sb.append(segment.to);
+            sb.append(segment.toName);
             sb.append(" ");
         }
         return sb.toString();
