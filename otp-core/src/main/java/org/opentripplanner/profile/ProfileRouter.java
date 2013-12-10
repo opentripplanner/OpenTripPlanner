@@ -1,6 +1,5 @@
 package org.opentripplanner.profile;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -38,22 +37,43 @@ public class ProfileRouter {
     Map<Pattern, StopAtDistance> fromStops, toStops;
     Set<Ride> targetRides = Sets.newHashSet();
     
-    public static class Stats {
-        int min = 0;
-        int avg = 0;
-        int max = 0;
+    public static class Stats implements Cloneable {
+        @Getter int min = 0;
+        @Getter int avg = 0;
+        @Getter int max = 0;
+        public Stats () {
+        };
         public Stats (Stats other) {
-            this.min = other.min;
-            this.avg = other.avg;
-            this.max = other.max;
+            if (other != null) {
+                this.min = other.min;
+                this.avg = other.avg;
+                this.max = other.max;
+            }
         }
-    }
-    
-    @RequiredArgsConstructor
-    public static class State {
-        final Pattern ptp;
-        final Stop stop;
-        final State back;
+        public Stats (Pattern pattern, int hop0, int hop1) {
+            this.min = pattern.min[hop1] - pattern.min[hop0];
+            this.avg = pattern.avg[hop1] - pattern.avg[hop0];
+            this.max = pattern.max[hop1] - pattern.max[hop0];
+            this.dump();
+        }        
+        public Stats (Stats s0, Stats s1) {
+            this.min = s0.min + s1.min;
+            this.avg = s0.avg + s1.avg;
+            this.max = s0.max + s1.max;
+        }
+        public void add(Stats s) {
+            min += s.min;
+            avg += s.avg;
+            max += s.max;
+        }
+        public void sub(Stats s) {
+            min -= s.min;
+            avg -= s.avg;
+            max -= s.max;
+        }
+        public void dump() {
+            System.out.printf("min %d avg %d max %d\n", min, avg, max);
+        }
     }
     
     @AllArgsConstructor
@@ -61,12 +81,14 @@ public class ProfileRouter {
         Stop from;
         Pattern pattern;
         Ride previous;
+        Stats stats;
     }
     
     public static class Ride {
         @Getter Stop from;
         @Getter Stop to;
         @Getter Route route;
+        @Getter Stats stats;
         List<Pattern> patterns = Lists.newArrayList();
         Ride previous;
         public Ride (QRide qr, Stop to) {
@@ -75,6 +97,7 @@ public class ProfileRouter {
             this.previous = qr.previous;
             this.patterns.add(qr.pattern);
             this.to = to;
+            this.stats = new Stats(qr.stats);
         }
         public String toStringVerbose() {
             return String.format(
@@ -122,7 +145,7 @@ public class ProfileRouter {
     }
 
     /** @return the ride object (whether it was new or and existing one we merged into) */
-    private Ride addRide (QRide qr, Stop stop) {
+    private Ride addRide (QRide qr, Stop stop, Stats stats) {
         for (Ride ride : rides.get(stop)) {
             if (ride.previous == qr.previous && 
                 ride.route == qr.pattern.route &&
@@ -135,6 +158,7 @@ public class ProfileRouter {
         }
         /* The new ride does not merge into any existing one. */
         Ride ride = new Ride(qr, stop);
+        ride.stats = stats;
         rides.put(stop, ride);
         return ride;
     }
@@ -159,16 +183,20 @@ public class ProfileRouter {
             targetStop = toStops.get(qr.pattern).stop; // this pattern has a stop near the destination
         }
         boolean boarded = false;
+        int s0 = -1;
         for (int s = 0; s < stops.size(); ++s) {
             Stop stop = stops.get(s);
             if (!boarded) {
-                if (stop == qr.from) boarded = true;
+                if (stop == qr.from) {
+                    boarded = true;
+                    s0 = s;
+                }
                 continue;
             }
             if (targetStop != null && targetStop == stop) {
-                targetRides.add(addRide(qr, stop));
+                targetRides.add(addRide(qr, stop, new Stats(qr.pattern, s0, s)));
             } else if (hasTransfers(stop, qr.pattern)) {
-                if ( ! pathContainsStop(qr.previous, stop)) addRide(qr, stop);
+                if ( ! pathContainsStop(qr.previous, stop)) addRide(qr, stop, new Stats(qr.pattern, s0, s));
             }
         }
     }
@@ -183,7 +211,7 @@ public class ProfileRouter {
         LOG.info("to stops: {}", toStops);
         List<QRide> queue = Lists.newArrayList();
         for (Entry<Pattern, StopAtDistance> entry : fromStops.entrySet()) {
-            queue.add(new QRide(entry.getValue().stop, entry.getKey(), null));
+            queue.add(new QRide(entry.getValue().stop, entry.getKey(), null, null));
         }
         for (int round = 0; round < ROUNDS; ++round) {
             LOG.info("ROUND {}", round);
@@ -211,7 +239,8 @@ public class ProfileRouter {
                         if (ride.patterns.contains(tr.tp1)) {
                             if (pathContainsRoute(ride, tr.tp2.route)) continue;
                             if (tr.s1 != tr.s2 && pathContainsStop(ride, tr.s2)) continue;
-                            queue.add(new QRide(tr.s2, tr.tp2, ride));
+                            // enqueue transfer result state
+                            queue.add(new QRide(tr.s2, tr.tp2, ride, null));
                         }
                     }
                 }

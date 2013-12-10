@@ -72,6 +72,7 @@ public class ProfileData {
             route = first.exemplar.getRoute(); // only _table_ trip patterns have exemplars
             int nStops = stops.size();
             min = new int[nStops];
+            avg = new int[nStops];
             max = new int[nStops];
             for (int s = 0; s < nStops; ++s) min[s] = Integer.MAX_VALUE;
             for (TableTripPattern ttp : ttps) {
@@ -86,14 +87,18 @@ public class ProfileData {
                 int nTrips = ttp.getTrips().size();
                 for (int i = 0; i < nTrips; ++i) {
                     TripTimes tt = ttp.getTripTimes(i);
-                    //int t0 = tt.getDepartureTime(0); // storing relative times
+                    int t0 = tt.getDepartureTime(0); // storing relative times
                     for (int hop = 0; hop < nStops - 1; ++hop) { // hops stops
-                        int tn = tt.getRunningTime(hop); // note this is ignoring dwell times
+                        // TODO switch to running time rather than dwell time, effect on stats
+                        int tn = tt.getDepartureTime(hop); // note this is ignoring dwell times
+                        tn -= t0;
                         if (tn < min[hop]) min[hop] = tn;
                         if (tn > max[hop]) max[hop] = tn;
                     }
                 }                
             }
+            // FIXME: horrific hack
+            for (int s = 0; s < nStops; ++s) avg[s] = (min[s] + max[s]) / 2;                        
         }
         
         public String stopString() {

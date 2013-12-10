@@ -5,17 +5,20 @@ import java.util.List;
 import lombok.Getter;
 
 import org.opentripplanner.profile.ProfileRouter.Ride;
+import org.opentripplanner.profile.ProfileRouter.Stats;
 
 import com.google.common.collect.Lists;
 
 public class Option {
 
-    @Getter
-    List<Segment> segments = Lists.newLinkedList();
+    @Getter List<Segment> segments = Lists.newLinkedList();
+    @Getter Stats stats;
     
     public Option (Ride ride) {
+        stats = new Stats();
         while (ride != null) {
             segments.add(0, new Segment(ride));
+            stats.add(ride.stats);
             ride = ride.previous;
         }
     }
