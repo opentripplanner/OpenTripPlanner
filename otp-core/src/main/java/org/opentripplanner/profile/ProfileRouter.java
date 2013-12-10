@@ -54,7 +54,7 @@ public class ProfileRouter {
             this.min = pattern.min[hop1] - pattern.min[hop0];
             this.avg = pattern.avg[hop1] - pattern.avg[hop0];
             this.max = pattern.max[hop1] - pattern.max[hop0];
-            this.dump();
+            //this.dump();
         }        
         public Stats (Stats s0, Stats s1) {
             this.min = s0.min + s1.min;
