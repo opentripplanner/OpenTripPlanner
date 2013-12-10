@@ -88,12 +88,12 @@ public class ProfileData {
                 for (int i = 0; i < nTrips; ++i) {
                     TripTimes tt = ttp.getTripTimes(i);
                     int t0 = tt.getDepartureTime(0); // storing relative times
-                    for (int hop = 0; hop < nStops - 1; ++hop) { // hops stops
+                    for (int stop = 1; stop < nStops; ++stop) { // hops vs. stops
                         // TODO switch to running time rather than dwell time, effect on stats
-                        int tn = tt.getDepartureTime(hop); // note this is ignoring dwell times
+                        int tn = tt.getArrivalTime(stop - 1); // note this is ignoring dwell times
                         tn -= t0;
-                        if (tn < min[hop]) min[hop] = tn;
-                        if (tn > max[hop]) max[hop] = tn;
+                        if (tn < min[stop]) min[stop] = tn;
+                        if (tn > max[stop]) max[stop] = tn;
                     }
                 }                
             }
