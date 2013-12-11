@@ -35,12 +35,13 @@ public class PlannerError {
     private static Map<Class<? extends Exception>, Message> messages;
     static {
         messages = new HashMap<Class<? extends Exception>, Message> ();
-        messages.put(VertexNotFoundException.class, Message.OUTSIDE_BOUNDS);
-        messages.put(PathNotFoundException.class,   Message.PATH_NOT_FOUND);
-        messages.put(LocationNotAccessible.class,   Message.LOCATION_NOT_ACCESSIBLE);
-        messages.put(TransitTimesException.class,   Message.NO_TRANSIT_TIMES);
-        messages.put(TrivialPathException.class,    Message.TOO_CLOSE);
-        messages.put(GraphNotFoundException.class,    Message.GRAPH_UNAVAILABLE);
+        messages.put(VertexNotFoundException.class,  Message.OUTSIDE_BOUNDS);
+        messages.put(PathNotFoundException.class,    Message.PATH_NOT_FOUND);
+        messages.put(LocationNotAccessible.class,    Message.LOCATION_NOT_ACCESSIBLE);
+        messages.put(TransitTimesException.class,    Message.NO_TRANSIT_TIMES);
+        messages.put(TrivialPathException.class,     Message.TOO_CLOSE);
+        messages.put(GraphNotFoundException.class,   Message.GRAPH_UNAVAILABLE);
+        messages.put(IllegalArgumentException.class, Message.BOGUS_PARAMETER);
     }
     
     private int    id;
