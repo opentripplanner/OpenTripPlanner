@@ -28,15 +28,15 @@ import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.ServiceCalendar;
 import org.onebusaway.gtfs.model.ServiceCalendarDate;
 import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.Trip;
-import org.onebusaway.gtfs.model.calendar.ServiceDate;
-import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.FrequencyAlight;
+import org.opentripplanner.routing.edgetype.FrequencyBasedTripPattern;
 import org.opentripplanner.routing.edgetype.FrequencyBoard;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.util.MapUtils;
@@ -44,7 +44,9 @@ import org.opentripplanner.util.MapUtils;
 import com.vividsolutions.jts.geom.Coordinate;
 
 public class TransitIndexServiceImpl implements TransitIndexService, Serializable {
-    private static final long serialVersionUID = -8147894489513820239L;
+    private static final long serialVersionUID = 20131127L;
+
+    private HashMap<AgencyAndId, List<Stop>> stopsByStation;
 
     private HashMap<String, List<RouteVariant>> variantsByAgency;
 
@@ -78,7 +80,8 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
 
     private int overnightBreak;
 
-    public TransitIndexServiceImpl(HashMap<String, List<RouteVariant>> variantsByAgency,
+    public TransitIndexServiceImpl(HashMap<AgencyAndId, List<Stop>> stopsByStation,
+            HashMap<String, List<RouteVariant>> variantsByAgency,
             HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute,
             HashMap<AgencyAndId, RouteVariant> variantsByTrip,
             HashMap<AgencyAndId, PreBoardEdge> preBoardEdges,
@@ -89,6 +92,7 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
             HashMap<AgencyAndId, Route> routes,
             HashMap<AgencyAndId, Stop> stops,
             List<TraverseMode> modes) {
+        this.stopsByStation = stopsByStation;
         this.variantsByAgency = variantsByAgency;
         this.variantsByRoute = variantsByRoute;
         this.variantsByTrip = variantsByTrip;
@@ -102,7 +106,8 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
         this.modes = modes;
     }
 
-    public void merge(HashMap<String, List<RouteVariant>> variantsByAgency,
+    public void merge(HashMap<AgencyAndId, List<Stop>> stopsByStation,
+            HashMap<String, List<RouteVariant>> variantsByAgency,
             HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute,
             HashMap<AgencyAndId, RouteVariant> variantsByTrip,
             HashMap<AgencyAndId, PreBoardEdge> preBoardEdges,
@@ -113,7 +118,7 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
             HashMap<AgencyAndId, Route> routes,
             HashMap<AgencyAndId, Stop> stops,
             List<TraverseMode> modes) {
-
+        MapUtils.mergeInUnique(this.stopsByStation, stopsByStation);
         MapUtils.mergeInUnique(this.variantsByAgency, variantsByAgency);
         MapUtils.mergeInUnique(this.variantsByRoute, variantsByRoute);
         this.variantsByTrip.putAll(variantsByTrip);
@@ -129,6 +134,16 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
                 this.modes.add(mode);
             }
         }
+    }
+
+    @Override
+    public List<Stop> getStopsForStation(AgencyAndId stop) {
+        List<Stop> list = stopsByStation.get(stop);
+        if (list == null) {
+            return Collections.emptyList();
+        }
+
+        return list;
     }
 
     @Override
@@ -235,21 +250,42 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
 
     @Override
     public List<AgencyAndId> getRoutesForStop(AgencyAndId stop) {
-        HashSet<AgencyAndId> out = new HashSet<AgencyAndId>();
-        Edge edge = preBoardEdges.get(stop);
-        if (edge == null)
-            return new ArrayList<AgencyAndId>();
-        for (Edge e: edge.getToVertex().getOutgoing()) {
-            if (e instanceof TransitBoardAlight && ((TransitBoardAlight) e).isBoarding()) {
-                TransitBoardAlight board = (TransitBoardAlight) e;
-                out.add(board.getPattern().getExemplar().getRoute().getId());
-            }
-            if (e instanceof FrequencyBoard) {
-                FrequencyBoard board = (FrequencyBoard) e;
-                out.add(board.getPattern().getTrip().getRoute().getId());
+        HashSet<AgencyAndId> routes = new HashSet<AgencyAndId>();
+
+        for (TripPattern pattern : getTripPatternsForStop(stop)) {
+            if (pattern instanceof TableTripPattern) {
+                routes.add(((TableTripPattern) pattern).getExemplar().getRoute().getId());
+            } else if (pattern instanceof FrequencyBasedTripPattern) {
+                routes.add(((FrequencyBasedTripPattern) pattern).getTrip().getRoute().getId());
             }
         }
-        return new ArrayList<AgencyAndId>(out);
+
+        return new ArrayList<AgencyAndId>(routes);
+    }
+
+    @Override
+    public List<TripPattern> getTripPatternsForStop(AgencyAndId stop) {
+        Edge alight = preAlightEdges.get(stop);
+        Edge board = preBoardEdges.get(stop);
+        HashSet<TripPattern> patterns = new HashSet<TripPattern>();
+
+        if (alight != null) for (Edge edge : alight.getFromVertex().getIncoming()) {
+            if (edge instanceof TransitBoardAlight && !(((TransitBoardAlight) edge).isBoarding())) {
+                patterns.add(((TransitBoardAlight) edge).getPattern());
+            } else if (edge instanceof FrequencyAlight) {
+                patterns.add(((FrequencyAlight) edge).getPattern());
+            }
+        }
+
+        if (board != null) for (Edge edge : board.getToVertex().getOutgoing()) {
+            if (edge instanceof TransitBoardAlight && (((TransitBoardAlight) edge).isBoarding())) {
+                patterns.add(((TransitBoardAlight) edge).getPattern());
+            } else if (edge instanceof FrequencyBoard) {
+                patterns.add(((FrequencyBoard) edge).getPattern());
+            }
+        }
+
+        return new ArrayList<TripPattern>(patterns);
     }
 
     public void setCenter(Coordinate coord) {

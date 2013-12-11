@@ -46,7 +46,10 @@ public class FieldTripRequest extends GenericModel  {
 
     @Expose
     public String phoneNumber;
-    
+
+    @Expose
+    public String faxNumber;
+        
     @Expose
     public String emailAddress;
 

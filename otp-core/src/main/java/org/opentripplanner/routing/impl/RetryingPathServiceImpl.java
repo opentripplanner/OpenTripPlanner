@@ -162,21 +162,23 @@ public class RetryingPathServiceImpl implements PathService {
                 continue;
             }
             for (GraphPath path : somePaths) {
-                if (!paths.contains(path)) {
+                if ( ! paths.contains(path)) {
                     if (path.getWalkDistance() > maxWalk) {
                         maxWalk = path.getWalkDistance() * 1.25;
                     }
                     paths.add(path);
-                    // now, create a list of options, one with each trip in this journey banned.
-
                     LOG.debug("New trips: {}", path.getTrips());
-                    RoutingRequest newOptions = currOptions.clone();
-                    for (AgencyAndId trip : path.getTrips()) {
-                        newOptions.banTrip(trip);
-                    }
-                    if (!optionQueue.contains(newOptions)) {
-                        optionQueue.add(newOptions);
-                    }
+                    // ban the trips in this path
+                    // unless is is a non-transit trip (in which case this would cause a useless retry)
+                    if ( ! path.getTrips().isEmpty()) {
+                        RoutingRequest newOptions = currOptions.clone();
+                        for (AgencyAndId trip : path.getTrips()) {
+                            newOptions.banTrip(trip);
+                        }
+                        if (!optionQueue.contains(newOptions)) {
+                            optionQueue.add(newOptions);
+                        }
+                    }           
                 }
             }
             LOG.debug("{} / {} itineraries", paths.size(), currOptions.numItineraries);

@@ -26,12 +26,18 @@ public class MavenVersion implements Serializable {
     public static final MavenVersion VERSION = fromProperties();
     private static final long serialVersionUID = VERSION.getUID();
 
+    /* Info derived from version string */
     public final String version; 
     public final int major;
     public final int minor;
     public final int incremental;
     public final String qualifier;
+    
+    /* Other info from git-commit-id-plugin via maven-version.properties */
     public final String commit;
+    public final String describe;
+    public final String commit_time;
+    public final String build_time;
     
     private static MavenVersion fromProperties() {
         final String FILE = "maven-version.properties";
@@ -40,7 +46,10 @@ public class MavenVersion implements Serializable {
             InputStream in = MavenVersion.class.getClassLoader().getResourceAsStream(FILE);
             props.load(in);
             MavenVersion version = new MavenVersion(props.getProperty("project.version"), 
-                                                    props.getProperty("git.commit.id"));
+                                                    props.getProperty("git.commit.id"),
+                                                    props.getProperty("git.commit.id.describe"),
+                                                    props.getProperty("git.commit.time"),
+                                                    props.getProperty("git.build.time"));
             LOG.info("Parsed Maven artifact version: {}", version.toStringVerbose());
             return version;
         } catch (Exception e) {
@@ -60,12 +69,12 @@ public class MavenVersion implements Serializable {
         // situation, so I am providing a 0-arg constructor with a totally different role: 
         // generating a default version when OTP encounters a problem parsing the
         // maven-version.properties file.
-        this("0.0.0-ParseFailure", "0");
+        this("0.0.0-ParseFailure", "UNKNOWN", "UNKNOWN", "UNKNOWN", "UNKNOWN");
     }
     
-    public MavenVersion (String v, String c) {
-        version = v;
-        String [] fields = v.split("\\-");
+    public MavenVersion (String version, String commit, String describe, String commit_time, String build_time) {
+        this.version = version;
+        String [] fields = version.split("\\-");
         if (fields.length > 1)
             qualifier = fields[1];
         else
@@ -83,7 +92,10 @@ public class MavenVersion implements Serializable {
             incremental = Integer.parseInt(fields[2]);
         else
             incremental = 0;
-        commit = c;
+        this.commit = commit;
+        this.describe = describe;
+        this.commit_time = commit_time;
+        this.build_time = build_time;
     }
     
     public long getUID() {

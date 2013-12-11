@@ -115,7 +115,6 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
             options.rctx.debug.timedOut = true;
             return null; // Search timed out
         }
-        options.rctx.debug.finishedPrecalculating();
         spt.add(initialState);
 
         // Priority Queue.

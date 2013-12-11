@@ -187,8 +187,9 @@ public class FrequencyBoard extends Edge implements OnboardEdge, PatternEdge {
             }
             
             /* check if trip is banned for this plan */
-            if (options.tripIsBanned(trip))
-            	return null;
+            if (options.tripIsBanned(trip)) {
+                return null;
+            }
 
             /* check if route is preferred for this plan */
             long preferences_penalty = options.preferencesPenaltyForTrip(trip);

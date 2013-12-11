@@ -75,6 +75,8 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 
     private GtfsRelationalDao dao;
 
+    private HashMap<AgencyAndId, List<Stop>> stopsByStation = new HashMap<AgencyAndId, List<Stop>>();
+
     private HashMap<AgencyAndId, RouteVariant> variantsByTrip = new HashMap<AgencyAndId, RouteVariant>();
 
     private HashMap<AgencyAndId, List<RouteVariant>> variantsByRoute = new HashMap<AgencyAndId, List<RouteVariant>>();
@@ -110,6 +112,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
     public void buildGraph(Graph graph) {
         LOG.debug("Building transit index");
 
+        connectParentStations(stopsByStation);
         createRouteVariants(graph);
         indexTableTripPatternByTrip(graph);
 
@@ -131,20 +134,21 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
         for(Route route : dao.getAllRoutes()) {
             routes.put(route.getId(), route);
         }
-        
-        LOG.debug("Built transit index: " + variantsByAgency.size() + " agencies, "
-                + variantsByRoute.size() + " routes, " + totalTrips + " trips, " + totalVariants
-                + " variants ");
+
+        LOG.debug("Built transit index: " + stopsByStation.size() + " stations, "
+                + variantsByAgency.size() + " agencies, " + variantsByRoute.size() + " routes, "
+                + totalTrips + " trips, " + totalVariants + " variants ");
 
         TransitIndexServiceImpl service = (TransitIndexServiceImpl) graph
                 .getService(TransitIndexService.class);
         if (service == null) {
-            service = new TransitIndexServiceImpl(variantsByAgency, variantsByRoute,
-                    variantsByTrip, preBoardEdges, preAlightEdges, tableTripPatternsByTrip, directionsByRoute, stopsByRoute,
-                    routes, stops, modes);
+            service = new TransitIndexServiceImpl(stopsByStation, variantsByAgency, variantsByRoute,
+                    variantsByTrip, preBoardEdges, preAlightEdges, tableTripPatternsByTrip,
+                    directionsByRoute, stopsByRoute, routes, stops, modes);
         } else {
-            service.merge(variantsByAgency, variantsByRoute, variantsByTrip, preBoardEdges,
-                    preAlightEdges, tableTripPatternsByTrip, directionsByRoute, stopsByRoute, routes, stops, modes);
+            service.merge(stopsByStation, variantsByAgency, variantsByRoute, variantsByTrip,
+                    preBoardEdges, preAlightEdges, tableTripPatternsByTrip, directionsByRoute,
+                    stopsByRoute, routes, stops, modes);
         }
 
         insertCalendarData(service);
@@ -341,6 +345,29 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
     private void addAgencies(TransitIndexServiceImpl service) {
         for (Agency agency : dao.getAllAgencies()) {
             service.addAgency(agency);
+        }
+    }
+
+    private void connectParentStations(HashMap<AgencyAndId, List<Stop>> stopsByStation) {
+        // Add stations as keys
+        for (Stop stop : dao.getAllStops()) {
+            if (stop.getLocationType() != 1) continue;
+
+            stopsByStation.put(stop.getId(), new ArrayList<Stop>());
+        }
+
+        // Add stops as values
+        for (Stop stop : dao.getAllStops()) {
+            if (stop.getLocationType() == 1) continue;
+
+            String stationName = stop.getParentStation();
+            if (stationName == null || stationName.equals("")) continue;
+
+            AgencyAndId stationId = new AgencyAndId(stop.getId().getAgencyId(), stationName);
+            List<Stop> list = stopsByStation.get(stationId);
+            if (list == null) continue;
+
+            list.add(stop);
         }
     }
 
@@ -562,7 +589,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
              * 
              * <pre>
              *                    A      B
-             * 	                  |      |
+             *                    |      |
              *                    |------|
              *                    |      |
              *                    |      |

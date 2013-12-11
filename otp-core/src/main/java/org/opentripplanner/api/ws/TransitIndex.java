@@ -10,17 +10,22 @@
 
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
 package org.opentripplanner.api.ws;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -38,6 +43,9 @@ import org.onebusaway.gtfs.model.ServiceCalendar;
 import org.onebusaway.gtfs.model.ServiceCalendarDate;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.onebusaway.gtfs.services.calendar.CalendarService;
+import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.model.error.TransitError;
 import org.opentripplanner.api.model.transit.AgencyList;
 import org.opentripplanner.api.model.transit.CalendarData;
@@ -51,6 +59,7 @@ import org.opentripplanner.api.model.transit.StopTime;
 import org.opentripplanner.api.model.transit.StopTimeList;
 import org.opentripplanner.api.model.transit.TripList;
 import org.opentripplanner.api.model.transit.TripMatch;
+import org.opentripplanner.api.model.transit.TripTimesPair;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -60,8 +69,11 @@ import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.OnboardEdge;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.routing.edgetype.Timetable;
+import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -77,8 +89,8 @@ import org.opentripplanner.routing.transit_index.adapters.StopType;
 import org.opentripplanner.routing.transit_index.adapters.TripType;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStop;
-import org.opentripplanner.routing.vertextype.TransitStopArrive;
-import org.opentripplanner.routing.vertextype.TransitStopDepart;
+import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
+import org.opentripplanner.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -235,26 +247,60 @@ public class TransitIndex {
     public Object getStopData(@QueryParam("agency") String agency, @QueryParam("id") String id,
             @QueryParam("extended") Boolean extended, @QueryParam("routerId") String routerId)
             throws JSONException {
-    	
-        Graph graph = getGraph(routerId);
-    	TransitIndexService transitIndexService = graph.getService(TransitIndexService.class);
 
-    	StopList response = new StopList();
-    	
-    	AgencyAndId stopId = new AgencyAndId(agency, id);
-        
-    	Edge preBoardEdge = transitIndexService.getPreBoardEdge(stopId);
-        if(preBoardEdge != null) {
-        	TransitStopDepart transitStop = (TransitStopDepart) preBoardEdge.getToVertex();
-        	response.stops.add(new StopType(transitStop.getStop(), extended));
+        Graph graph = getGraph(routerId);
+        TransitIndexService transitIndexService = graph.getService(TransitIndexService.class);
+
+        if (transitIndexService == null) {
+            return new TransitError(
+                    "No transit index found. Add TransitIndexBuilder to your graph builder " +
+                    "configuration and rebuild your graph.");
         }
-        else { // check if stop is alight-only        	
-	    	Edge preAlightEdge = transitIndexService.getPreAlightEdge(stopId);
-	        if(preAlightEdge != null) {
-	        	TransitStopArrive transitStop = (TransitStopArrive) preAlightEdge.getFromVertex();
-	        	response.stops.add(new StopType(transitStop.getStop(), extended));
-	        }
+
+        StopList response = new StopList();
+
+        AgencyAndId stopId = new AgencyAndId(agency, id);
+
+        Map<AgencyAndId, Stop> allStops = transitIndexService.getAllStops();
+        for(Map.Entry<AgencyAndId, Stop> entry : allStops.entrySet()) {
+            //Stop stop = entry.getValue();
+            if(entry.getKey().equals(stopId)) {
+                response.stops.add(new StopType(entry.getValue(), extended));
+            }
         }
+
+        return response;
+    }
+
+    
+    /**
+     * Returns data for stops matching a fragment of a name
+     */
+
+    @GET
+    @Path("/stopsByName")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    public Object getStopsByName(@QueryParam("agency") String agency, @QueryParam("name") String name,
+            @QueryParam("extended") Boolean extended, @QueryParam("routerId") String routerId)
+            throws JSONException {
+
+        TransitIndexService transitIndexService = getGraph(routerId).getService(
+                TransitIndexService.class);
+        if (transitIndexService == null) {
+            return new TransitError(
+                    "No transit index found.  Add TransitIndexBuilder to your graph builder configuration and rebuild your graph.");
+        }
+
+        StopList response = new StopList();
+
+        Map<AgencyAndId, Stop> allStops = transitIndexService.getAllStops();
+        for(Map.Entry<AgencyAndId, Stop> entry : allStops.entrySet()) {
+            Stop stop = entry.getValue();
+            if(entry.getKey().getAgencyId().equals(agency) && stop.getName().toLowerCase().contains(name.toLowerCase())) {
+                response.stops.add(new StopType(stop, extended));
+            }
+        }
+
         return response;
     }
 
@@ -362,6 +408,7 @@ public class TransitIndex {
         // add all departures
         HashSet<TripType> trips = new HashSet<TripType>();
         StopTimeList result = new StopTimeList();
+        result.stop = new AgencyAndId(stopAgency, stopId);
         result.stopTimes = new ArrayList<StopTime>();
 
         if (references != null && references.equals(true)) {
@@ -441,6 +488,45 @@ public class TransitIndex {
             }
 
         });
+
+        return result;
+    }
+
+    /**
+     * Return stop times for all stops comprising a station, in seconds since the epoch
+     * startTime and endTime are in milliseconds since epoch
+     */
+    @GET
+    @Path("/stopTimesForStation")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    public Object getStopTimesForStation(@QueryParam("agency") String stationAgency,
+            @QueryParam("id") String stationId, @QueryParam("startTime") long startTime,
+            @QueryParam("endTime") Long endTime, @QueryParam("extended") Boolean extended,
+            @QueryParam("references") Boolean references, @QueryParam("routeId") String routeId,
+            @QueryParam("routerId") String routerId) throws JSONException {
+        AgencyAndId station = new AgencyAndId(stationAgency, stationId);
+        TransitIndexService transitIndexService = getGraph(routerId).getService(
+                TransitIndexService.class);
+
+        if (transitIndexService == null) {
+            return new TransitError(
+                    "No transit index found. Add TransitIndexBuilder to your graph builder " +
+                    "configuration and rebuild your graph.");
+        }
+
+        List<Stop> stops = transitIndexService.getStopsForStation(station);
+        StopTimeList result[] = new StopTimeList[stops.size()];
+
+        for (int i = 0; i < result.length; i++) {
+            AgencyAndId stop = stops.get(i).getId();
+            Object object = getStopTimesForStop(stop.getAgencyId(), stop.getId(),
+                    startTime, endTime, extended, references, routeId, routerId);
+            if (object instanceof StopTimeList) {
+                result[i] = (StopTimeList) object;
+                continue;
+            }
+            return object;  // Propagate any TransitError results immediately
+        }
 
         return result;
     }
@@ -618,7 +704,21 @@ public class TransitIndex {
             time = result.getTimeSeconds();
             if (time > endTime)
                 break;
+            ServiceDay serviceDay = result.getServiceDay();
             StopTime stopTime = new StopTime();
+            TripTimes tripTimes = result.getTripTimes();
+            Edge backEdge = result.getBackEdge();
+
+            if (tripTimes != null && !tripTimes.isScheduled() && backEdge instanceof OnboardEdge) {
+                OnboardEdge onboardEdge = (OnboardEdge) backEdge;
+                stopTime.realTime = true;
+                stopTime.delay = tripTimes.getDepartureDelay(onboardEdge.getStopIndex());
+            }
+
+            if (serviceDay != null) {
+                stopTime.serviceDate = serviceDay.getServiceDate().getAsString();
+            }
+
             stopTime.time = time;
             stopTime.trip = new TripType(result.getBackTrip(), extended);
             out.add(stopTime);
@@ -643,7 +743,21 @@ public class TransitIndex {
             time = result.getTimeSeconds();
             if (time < startTime)
                 break;
+            ServiceDay serviceDay = result.getServiceDay();
             StopTime stopTime = new StopTime();
+            TripTimes tripTimes = result.getTripTimes();
+            Edge backEdge = result.getBackEdge();
+
+            if (tripTimes != null && !tripTimes.isScheduled() && backEdge instanceof OnboardEdge) {
+                OnboardEdge onboardEdge = (OnboardEdge) backEdge;
+                stopTime.realTime = true;
+                stopTime.delay = tripTimes.getArrivalDelay(onboardEdge.getStopIndex() - 1);
+            }
+
+            if (serviceDay != null) {
+                stopTime.serviceDate = serviceDay.getServiceDate().getAsString();
+            }
+
             stopTime.time = time;
             stopTime.trip = new TripType(result.getBackTrip(), extended);
             out.add(stopTime);
@@ -864,6 +978,119 @@ public class TransitIndex {
         return response;
     }
 
+    /**
+     * Return all stop times for a trip on a given service date; time is in milliseconds since epoch
+     */
+    @GET
+    @Path("/tripTimes")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    public Object getTripTimes(@QueryParam("agency") String agency, @QueryParam("id") String id,
+            @QueryParam("date") String date, @QueryParam("routerId") String routerId) {
+        TripTimesPair result = new TripTimesPair();
+        if (agency == null || id == null) {
+            return new TransitError("Not all required parameters were specified.");
+        }
+
+        AgencyAndId trip = new AgencyAndId(agency, id);
+
+        Graph graph = getGraph(routerId);
+        TimeZone timeZone = graph.getTimeZone();
+        TransitIndexService transitIndexService = graph.getService(TransitIndexService.class);
+        CalendarService calendarService = graph.getCalendarService();
+
+        if (transitIndexService == null) {
+            return new TransitError(
+                    "No transit index found. Add TransitIndexBuilder to your graph builder " +
+                    "configuration and rebuild your graph.");
+        }
+
+        if (calendarService == null) {
+            return new TransitError("No calendar service found.");
+        }
+
+        TableTripPattern pattern = transitIndexService.getTripPatternForTrip(trip);
+
+        if (pattern == null) {
+            return new TransitError("Could not find trip pattern.");
+        }
+
+        int tripIndex = pattern.getTripIndex(trip);
+        TripTimes tripTimes = pattern.getTripTimes(tripIndex);
+        TimetableSnapshotSource timetableSnapshotSource = graph.getTimetableSnapshotSource();
+        Calendar calendar = makeCalendar(timeZone, date, 0);
+
+        if (calendar == null) {
+            return new TransitError("Date format can't be parsed.");
+        }
+
+        ServiceDate serviceDate = new ServiceDate(calendar);
+        AgencyAndId serviceId = pattern.getTrip(tripIndex).getServiceId();
+        result.scheduled = new Place[tripTimes.getNumHops() + 1];
+
+        if (!(calendarService.getServiceIdsOnDate(serviceDate).contains(serviceId))) {
+            return new TransitError("Trip does not run on the specified service date.");
+        }
+
+        if (timetableSnapshotSource != null) {
+            TimetableResolver timetableResolver = timetableSnapshotSource.getTimetableSnapshot();
+            if (timetableResolver != null) {
+                Timetable timetable = timetableResolver.resolve(pattern, serviceDate);
+                if (timetable != null) {
+                    TripTimes resolvedTripTimes = timetable.getTripTimes(tripIndex);
+                    if (resolvedTripTimes != null) {
+                        tripTimes = resolvedTripTimes;
+                        if (!tripTimes.isScheduled()) {
+                            result.resolved = new Place[tripTimes.getNumHops() + 1];
+                        }
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < result.scheduled.length; i++) {
+            boolean invalid = (result.resolved == null);
+            Calendar arrival = null, departure = null;
+            Calendar scheduledArrival = null, scheduledDeparture = null;
+            Stop stop = pattern.getStop(i);
+
+            if (i > 0) {
+                arrival = makeCalendar(timeZone, date, tripTimes.getArrivalTime(i - 1));
+                invalid |= tripTimes.getArrivalTime(i - 1) < 0;
+                scheduledArrival =
+                        makeCalendar(timeZone, date, tripTimes.getScheduledArrivalTime(i - 1));
+            }
+
+            if (i < tripTimes.getNumHops()) {
+                departure = makeCalendar(timeZone, date, tripTimes.getDepartureTime(i));
+                invalid |= tripTimes.getDepartureTime(i) < 0;
+                scheduledDeparture =
+                        makeCalendar(timeZone, date, tripTimes.getScheduledDepartureTime(i));
+            }
+
+            if (!invalid) {         // Fill out the resolved fields iff they are valid at this stop.
+                result.resolved[i] = new Place(stop.getLon(), stop.getLat(), stop.getName(),
+                        arrival, departure);
+                result.resolved[i].stopIndex = i;
+                result.resolved[i].stopId = stop.getId();
+                result.resolved[i].stopCode = stop.getCode();
+                result.resolved[i].platformCode = stop.getPlatformCode();
+                result.resolved[i].zoneId = stop.getZoneId();
+                result.resolved[i].stopSequence = tripTimes.getStopSequence(i);
+            }
+
+            result.scheduled[i] = new Place(stop.getLon(), stop.getLat(), stop.getName(),
+                    scheduledArrival, scheduledDeparture);
+            result.scheduled[i].stopIndex = i;
+            result.scheduled[i].stopId = stop.getId();
+            result.scheduled[i].stopCode = stop.getCode();
+            result.scheduled[i].platformCode = stop.getPlatformCode();
+            result.scheduled[i].zoneId = stop.getZoneId();
+            result.scheduled[i].stopSequence = tripTimes.getStopSequence(i);
+        }
+
+        return result;
+    }
+
     private List<TripMatch> matchTripsForVariant(RouteVariant variant, Coordinate position,
             long timeSec, List<ServiceDay> serviceDays, boolean extended) {
         List<TripMatch> matches = new ArrayList<TripMatch>();
@@ -972,5 +1199,13 @@ public class TransitIndex {
                 agencyId));
         return serviceDays;
     }
-    
+
+    private Calendar makeCalendar(TimeZone timeZone, String dateString, int seconds) {
+        Calendar calendar = Calendar.getInstance(timeZone);
+        Date date = DateUtils.toDate(dateString, "00:00", timeZone);
+        if (date == null) return null;
+        long time = date.getTime() + seconds * 1000L;
+        calendar.setTimeInMillis(time);
+        return calendar;
+    }
 }

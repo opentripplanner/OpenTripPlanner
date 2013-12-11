@@ -11,19 +11,21 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.api.common;
+package org.opentripplanner.api.model.transit;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlRootElement;
 
-/**
- * Signals a problem parsing or interpreting a query parameter.
- */
-public class ParameterException extends Exception {
-    private static final long serialVersionUID = 1L;
-    
-    public Message message;
-    
-    public ParameterException(Message message) {
-        this.message = message;
-    }
-    
+import org.opentripplanner.api.model.Place;
+
+@XmlRootElement(name = "TripTimesPair")
+public class TripTimesPair {
+    @XmlElementWrapper(name = "Resolved")
+    @XmlElement(name = "Stop")
+    public Place[] resolved;
+
+    @XmlElementWrapper(name = "Scheduled")
+    @XmlElement(name = "Stop")
+    public Place[] scheduled;
 }

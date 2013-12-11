@@ -259,4 +259,50 @@ otp.core.TransitIndex = otp.Class({
             }
         });
     },
+
+    loadStopsById : function(agencyId, id, callbackTarget, callback) {
+        var params = {
+            id : id,
+            extended : true
+        };
+        if(agencyId !== null) {
+            params.agency = agencyId;
+        }
+        if(typeof otp.config.routerId !== 'undefined') {
+            params.routerId = otp.config.routerId;
+        }
+        
+        var url = otp.config.hostname + '/' + otp.config.restService + '/ws/transit/stopData';
+        $.ajax(url, {
+            data:       params,
+            dataType:   'jsonp',
+                
+            success: function(data) {
+                callback.call(callbackTarget, data);                
+            }
+        });
+    },   
+
+    loadStopsByName : function(agencyId, name, callbackTarget, callback) {
+        var params = {
+            name: name,
+            extended : true
+        };
+        if(agencyId !== null) {
+            params.agency = agencyId;
+        }
+        if(typeof otp.config.routerId !== 'undefined') {
+            params.routerId = otp.config.routerId;
+        }
+        
+        var url = otp.config.hostname + '/' + otp.config.restService + '/ws/transit/stopsByName';
+        $.ajax(url, {
+            data:       params,
+            dataType:   'jsonp',
+                
+            success: function(data) {
+                callback.call(callbackTarget, data);                
+            }
+        });
+    },    
 });

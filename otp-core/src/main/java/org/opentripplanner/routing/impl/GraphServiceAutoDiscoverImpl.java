@@ -17,10 +17,12 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import lombok.Setter;
 
@@ -49,6 +51,8 @@ public class GraphServiceAutoDiscoverImpl implements GraphService {
     /** The autoscan period in seconds */
     @Setter
     private int autoScanPeriodSec = 60;
+
+    private ScheduledExecutorService scanExecutor = Executors.newSingleThreadScheduledExecutor();
 
     /**
      * The delay before loading a new graph, in seconds. We load a graph if it has been modified at
@@ -133,9 +137,9 @@ public class GraphServiceAutoDiscoverImpl implements GraphService {
 
     @Override
     public boolean save(String routerId, InputStream is) {
-    	return decorated.save(routerId, is);
+        return decorated.save(routerId, is);
     }
-    
+
     /**
      * Based on the autoRegister list, automatically register all routerIds for which we can find a
      * graph file in a subdirectory of the resourceBase path. Also register and load the graph for
@@ -150,12 +154,33 @@ public class GraphServiceAutoDiscoverImpl implements GraphService {
          * Starting with JDK7 we should use a directory change listener callback on baseResource
          * instead.
          */
-        new Timer().scheduleAtFixedRate(new TimerTask() {
+        scanExecutor.scheduleWithFixedDelay(new Runnable() {
             @Override
             public void run() {
                 autoDiscoverGraphs();
             }
-        }, autoScanPeriodSec * 1000L, autoScanPeriodSec * 1000L);
+        }, autoScanPeriodSec, autoScanPeriodSec, TimeUnit.SECONDS);
+    }
+
+    /**
+     * This is called when the bean gets deleted, that is mainly in case of webapp container
+     * application stop or reload. We teardown all loaded graph to stop their background real-time
+     * data updater thread, and also the background auto-discover scanner thread.
+     */
+    @PreDestroy
+    private void teardown() {
+        LOG.info("Cleaning-up auto-discover thread and graphs");
+        decorated.evictAll();
+        scanExecutor.shutdown();
+        try {
+            boolean noTimeout = scanExecutor.awaitTermination(10, TimeUnit.SECONDS);
+            if (!noTimeout)
+                LOG.warn("Timeout while waiting for scanner thread to finish");
+        } catch (InterruptedException e) {
+            // This is not really important
+            LOG.warn("Interrupted while waiting for scanner thread to finish", e);
+        }
+        decorated.cleanupWebapp();
     }
 
     private synchronized void autoDiscoverGraphs() {
@@ -185,8 +210,7 @@ public class GraphServiceAutoDiscoverImpl implements GraphService {
                     graphOnDisk.add(sub);
                     long lastModified = graphFile.lastModified();
                     if (lastModified > lastAutoScan && lastModified <= validEndTime) {
-                        LOG.debug("Graph to (re)load: {}, lastModified={}", graphFile,
-                                lastModified);
+                        LOG.debug("Graph to (re)load: {}, lastModified={}", graphFile, lastModified);
                         graphToLoad.add(sub);
                     }
                 }
