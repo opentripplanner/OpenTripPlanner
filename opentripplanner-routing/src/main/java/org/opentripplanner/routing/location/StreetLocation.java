@@ -258,6 +258,10 @@ public class StreetLocation extends StreetVertex {
     // }
     // }
 
+    /*
+     * "Extra edges" means temporary edges, used to link temporary origin and destination vertices
+     * into the graph. They are cleaned out when a routing context is destroyed.
+     */
     public List<Edge> getExtra() {
         return extra;
     }

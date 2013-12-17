@@ -188,21 +188,23 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
         // first, check for intersections very close by
         Coordinate coord = location.getCoordinate();
-        StreetVertex intersection = getIntersectionAt(coord, MAX_CORNER_DISTANCE);
+        List<StreetVertex> intersection = getIntersectionAt(coord, MAX_CORNER_DISTANCE);
         String calculatedName = location.getName();
-        if (intersection != null) {
+        if (intersection != null && ! intersection.isEmpty()) {
             // We have an intersection vertex. Check that this vertex has edges we can traverse.
             boolean canEscape = false; 
             if (options == null) {
                 canEscape = true; // Some tests do not supply options.
             } else {
                 TraversalRequirements reqs = new TraversalRequirements(options);
-                for (StreetEdge e : IterableLibrary.filter ( options.arriveBy ? 
-                        intersection.getIncoming() : intersection.getOutgoing(),
-                        StreetEdge.class)) {
-                    if (reqs.canBeTraversed(e)) {
-                        canEscape = true;
-                        break;
+                for (StreetVertex sv : intersection) {
+                    for (StreetEdge e : IterableLibrary.filter ( options.arriveBy ? 
+                            sv.getIncoming() : sv.getOutgoing(),
+                            StreetEdge.class)) {
+                        if (reqs.canBeTraversed(e)) {
+                            canEscape = true;
+                            break;
+                        }
                     }
                 }
             }       
@@ -212,9 +214,11 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                     LOG.debug("found intersection {}. not splitting.", intersection);
                     // generate names for corners when no name was given
                     Set<String> uniqueNameSet = new HashSet<String>();
-                    for (Edge e : intersection.getOutgoing()) {
-                        if (e instanceof StreetEdge) {
-                            uniqueNameSet.add(e.getName());
+                    for (StreetVertex sv : intersection) {
+                        for (Edge e : sv.getOutgoing()) {
+                            if (e instanceof StreetEdge) {
+                                uniqueNameSet.add(e.getName());
+                            }
                         }
                     }
                     List<String> uniqueNames = new ArrayList<String>(uniqueNameSet);
@@ -234,13 +238,16 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                         calculatedName = resources.getString("unnamedStreet");
                     }
                 }
-                StreetLocation closest = new StreetLocation(graph, "corner " + Math.random(), coord,
+                StreetLocation stloc = new StreetLocation(graph, "corner " + Math.random(), coord,
                         calculatedName);
-                FreeEdge e = new FreeEdge(closest, intersection);
-                closest.getExtra().add(e);
-                e = new FreeEdge(intersection, closest);
-                closest.getExtra().add(e);
-                return closest;
+                for (StreetVertex sv : intersection) {
+                    FreeEdge e;
+                    e = new FreeEdge(stloc, sv);
+                    stloc.getExtra().add(e);
+                    e = new FreeEdge(sv, stloc);
+                    stloc.getExtra().add(e);
+                }
+                return stloc;
             }
         }
 
@@ -417,33 +424,24 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         return getClosestEdges(location, reqs, extraEdges, preferredEdges, possibleTransitLinksOnly);
     }
 
-    /**
-     * Convenience wrapper that uses MAX_CORNER_DISTANCE.
-     * 
-     * @param coordinate
-     * @return
-     */
-    public StreetVertex getIntersectionAt(Coordinate coordinate) {
+    /** Convenience wrapper that uses MAX_CORNER_DISTANCE. */
+    public List<StreetVertex> getIntersectionAt(Coordinate coordinate) {
         return getIntersectionAt(coordinate, MAX_CORNER_DISTANCE);
     }
 
+    /**
+     * Find the street vertices (street intersection nodes) very close to the given point. Useful to
+     * avoid splitting a street when the split point is very close to an intersection. This function
+     * used to return a single StreetVertex, but this causes problems when the returned nodes are
+     * themselves split streets: at these locations there are two intersection vertices, one for
+     * each direction of the road. See issue #1302.
+     */
     @SuppressWarnings("unchecked")
-    public StreetVertex getIntersectionAt(Coordinate coordinate, double distanceError) {
+    public List<StreetVertex> getIntersectionAt(Coordinate coordinate, double distanceError) {
         Envelope envelope = new Envelope(coordinate);
         envelope.expandBy(distanceError * 2);
         List<StreetVertex> nearby = intersectionTree.query(envelope);
-        StreetVertex nearest = null;
-        double bestDistance = Double.POSITIVE_INFINITY;
-        for (StreetVertex v : nearby) {
-            double distance = coordinate.distance(v.getCoordinate());
-            if (distance < distanceError) {
-                if (distance < bestDistance) {
-                    bestDistance = distance;
-                    nearest = v;
-                }
-            }
-        }
-        return nearest;
+        return nearby;
     }
 
     @Override

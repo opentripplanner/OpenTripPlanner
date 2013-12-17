@@ -136,11 +136,13 @@ public class LinkRequest {
             return list;
         } else {
             /* is the stop right at an intersection? */
-            StreetVertex atIntersection = linker.index.getIntersectionAt(coordinate);
-            if (atIntersection != null) {
+            List<StreetVertex> atIntersection = linker.index.getIntersectionAt(coordinate);
+            if (atIntersection != null && ! atIntersection.isEmpty()) {
                 // if so, the stop can be linked directly to all vertices at the intersection
-                if (edges.getScore() > distanceLibrary.distance(atIntersection.getCoordinate(), coordinate))
-                    return Arrays.asList(atIntersection);
+                for (StreetVertex sv : atIntersection) {
+                    if (edges.getScore() > distanceLibrary.distance(sv.getCoordinate(), coordinate))
+                        return atIntersection;
+                }
             }
             return getSplitterVertices(vertexLabel, edges.toEdgeList(), coordinate);
         }
