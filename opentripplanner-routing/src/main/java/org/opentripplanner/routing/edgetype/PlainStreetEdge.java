@@ -326,7 +326,18 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         if (wheelchairNotes != null && options.wheelchairAccessible) {
             s1.addAlerts(wheelchairNotes);
         }
-
+        /* Compute turn cost.
+         * 
+         * This is a subtle piece of code. Turn costs are evaluated differently during
+         * forward and reverse traversal. During forward traversal of an edge, the turn
+         * *into* that edge is used, while during reverse traversal, the turn *out of*
+         * the edge is used.
+         *
+         * However, over a set of edges, the turn costs must add up the same (for
+         * general correctness and specifically for reverse optimization). This means
+         * that during reverse traversal, we must also use the speed for the mode of
+         * the backEdge, rather than of the current edge.
+         */
         PlainStreetEdge backPSE;
         if (backEdge != null && backEdge instanceof PlainStreetEdge) {
             backPSE = (PlainStreetEdge) backEdge;
@@ -334,18 +345,6 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             double backSpeed = backPSE.calculateSpeed(backOptions, backMode);
             final double realTurnCost;  // Units are seconds.
             
-            /* Compute turn cost.
-             * 
-             * This is a subtle piece of code. Turn costs are evaluated differently during
-             * forward and reverse traversal. During forward traversal of an edge, the turn
-             * *into* that edge is used, while during reverse traversal, the turn *out of*
-             * the edge is used.
-             *
-             * However, over a set of edges, the turn costs must add up the same (for
-             * general correctness and specifically for reverse optimization). This means
-             * that during reverse traversal, we must also use the speed for the mode of
-             * the backEdge, rather than of the current edge.
-             */
             if (options.arriveBy && tov instanceof IntersectionVertex) { // arrive-by search
                 if (!canTurnOnto(backPSE, s0, backMode)) {
                     return null;
@@ -371,7 +370,6 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             if (!traverseMode.isDriving()) {
                 s1.incrementWalkDistance(realTurnCost / 100);  // just a tie-breaker
             }
-
             long turnTime = (long) Math.ceil(realTurnCost);
             time += turnTime;
             weight += options.turnReluctance * realTurnCost;
