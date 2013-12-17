@@ -117,14 +117,18 @@ public class SimpleIsochrone extends RoutingResource {
     int nContours;
     @QueryParam("contourSpacingMinutes") @DefaultValue("30") 
     int contourSpacingMinutes;
+    
     /** Whether the results should be left in the indicated CRS or de-projected back to WGS84. */
     @QueryParam("resultsProjected") @DefaultValue("false") boolean resultsProjected;
 
     /** The coordinate reference system in which buffering should be performed. 
         Defaults to the Hong Kong 1980 Grid System. */
-    @QueryParam("crs") @DefaultValue("EPSG:2326") CoordinateReferenceSystem crs;
+    // We are not using CoordinateReferenceSystem StringReaderProvider here because 
+    // Enunciate chokes on it (see #1319).
+    @QueryParam("crs") @DefaultValue("EPSG:2326") String crsCode;
 
-    @QueryParam("shpName") String shpName; // what to name the output file
+    /** What to name the output file. */
+    @QueryParam("shpName") String shpName;
 
     private RoutingRequest request;
 
@@ -211,7 +215,7 @@ public class SimpleIsochrone extends RoutingResource {
         /* Set up transforms into projected coordinates (necessary for buffering in meters) */
         /* We could avoid projection by equirectangular approximation */
         CoordinateReferenceSystem wgs = DefaultGeographicCRS.WGS84;
-        // CoordinateReferenceSystem meters = CRS.decode(crs); 
+        CoordinateReferenceSystem crs = CRS.decode(crsCode);
         MathTransform toMeters   = CRS.findMathTransform(wgs, crs, false);
         MathTransform fromMeters = CRS.findMathTransform(crs, wgs, false); 
         GeometryFactory geomf = JTSFactoryFinder.getGeometryFactory();
@@ -293,7 +297,8 @@ public class SimpleIsochrone extends RoutingResource {
     /** @return Evenly spaced travel time contours (isochrones) as a zipped shapefile. */
     @GET @Produces("application/x-zip-compressed")
     public Response zippedShapefileGet(
-        @QueryParam("stream") @DefaultValue("true") boolean stream) throws Exception {
+            @QueryParam("stream") @DefaultValue("true") boolean stream) 
+            throws Exception {
         SimpleFeatureCollection contourFeatures = makeContourFeatures(); 
         /* Output the staged features to Shapefile */
         final File shapeDir = Files.createTempDir();
