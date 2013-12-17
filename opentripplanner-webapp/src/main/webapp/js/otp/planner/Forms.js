@@ -1337,7 +1337,7 @@ otp.planner.StaticForms = {
             name:           'wheelchair',
             hiddenName:     'wheelchair',
             fieldLabel:     this.locale.tripPlanner.labels.wheelchair,
-            inputValue:     'true',
+            inputValue:     'false',
             displayField:   'text',
             valueField:     'opt',
             anchor:         this.FIELD_ANCHOR,
