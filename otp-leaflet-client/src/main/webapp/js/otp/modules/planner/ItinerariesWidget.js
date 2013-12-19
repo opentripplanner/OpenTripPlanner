@@ -624,27 +624,22 @@ otp.widgets.ItinerariesWidget =
                 for(var i = 0; i < leg.alerts.length; i++) {
                     var alert = leg.alerts[i];
                     
-                    var alertHtml = '<div class="otp-itin-alert-header">';
-
-                    if(alert.alertUrl && alert.alertUrl.someTranslation) {
-                    	alertHtml += '<a href="' + alert.alertUrl.someTranslation + '" target="_blank">';
-                	}
-                    alertHtml += 'Alert for Route ' + leg.route;
-                    if(alert.alertUrl && alert.alertUrl.someTranslation) {
-                    	alertHtml += '</a>';
-                	}
-
-                    if(alert.alertHeaderText && alert.alertHeaderText.someTranslation) {
-                        alertHtml += ': ' + alert.alertHeaderText.someTranslation;
-                    }
-                    alertHtml += '</div>';
-                    if(alert.alertDescriptionText && alert.alertDescriptionText.someTranslation) {
-                        alertHtml += '<div class="otp-itin-alert-description">' + alert.alertDescriptionText.someTranslation + '</div>';
-                    }
+                    var alertDiv = ich['otp-planner-alert']({ alert: alert, leg: leg }).appendTo(legDiv);
+                    alertDiv.find('.otp-itin-alert-description').hide();
                     
-                    $('<div class="otp-itin-alert" />').appendTo(legDiv)
-                    .append($('<div class="otp-itin-alert-left" />'))
-                    .append($('<div class="otp-itin-alert-main" />').html(alertHtml));                    
+                    alertDiv.find('.otp-itin-alert-toggleButton').data('div', alertDiv).click(function() {
+                        var div = $(this).data('div');
+                        var desc = div.find('.otp-itin-alert-description');
+                        var toggle = div.find('.otp-itin-alert-toggleButton');
+                        if(desc.is(":visible")) {
+                            desc.slideUp();
+                            toggle.html("&#x25BC;");
+                        }
+                        else {
+                            desc.slideDown();
+                            toggle.html("&#x25B2;");
+                        }
+                    });
                 } 
             }
                         
