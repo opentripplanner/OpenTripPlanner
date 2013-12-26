@@ -4,6 +4,10 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.opentripplanner.routing.graph.Graph;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.google.common.collect.Lists;
 
 /** 
@@ -15,6 +19,8 @@ import com.google.common.collect.Lists;
  */
 @XmlRootElement
 public class Debug { // rename to DebugOutput
+
+    private static final Logger LOG = LoggerFactory.getLogger(Debug.class);
 
     /* Only public fields are serialized by JAX-RS, make interal ones private? */
     private long startedCalculating;
@@ -74,7 +80,7 @@ public class Debug { // rename to DebugOutput
             pathTimes.add(t - last_t);
             last_t = t;
         }
-        System.out.printf("%s\n", pathTimes);
+        LOG.debug("times to find each path: {}", pathTimes);
         renderingTime = finishedRendering - finishedCalculating;
         totalTime = finishedRendering - startedCalculating;
     }
