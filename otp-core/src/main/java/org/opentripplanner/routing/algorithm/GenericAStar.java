@@ -145,12 +145,13 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
              */
             if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
                 LOG.warn("Search timeout. origin={} target={}", rctx.origin, rctx.target);
-                // Returning null indicates something went wrong and search should be aborted.
-                // This is distinct from the empty list of paths which implies that a result may still
-                // be found by retrying with altered options (e.g. max walk distance)
-                options.rctx.debug.timedOut = true;
+                // Rather than returning null to indicate that the search was aborted/timed out,
+                // we instead set a flag in the routing context and return the SPT anyway. This
+                // allows returning a partial list results even when a timeout occurs.
+                options.rctx.aborted = true; // signal search cancellation up to higher stack frames
+                options.rctx.debug.timedOut = true; // signal timeout in debug object in the response
                 storeMemory();
-                return null; // throw timeout exception
+                return spt;
             }
 
             // get the lowest-weight state in the queue
