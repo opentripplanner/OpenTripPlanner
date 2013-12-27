@@ -96,6 +96,10 @@ import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Multimap;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
@@ -411,34 +415,31 @@ public class GTFSPatternHopFactory {
         loadStops(graph);
         loadPathways(graph);
         loadAgencies(graph);
-        clearCachedData();
+        // TODO: Why is there cached "data", and why are we clearing it? Due to a general lack of comments, I have no idea.
+        // Perhaps it is to allow name collisions with previously loaded feeds.
+        clearCachedData(); 
 
         LOG.debug("building hops from trips");
         Collection<Trip> trips = _dao.getAllTrips();
         int tripCount = 0;
 
         /* first, record which trips are used by one or more frequency entries */
-        HashMap<Trip, List<Frequency>> tripFrequencies = new HashMap<Trip, List<Frequency>>();
+        ListMultimap<Trip, Frequency> frequenciesForTrip = ArrayListMultimap.create();        
         for(Frequency freq : _dao.getAllFrequencies()) {
-            List<Frequency> freqs = tripFrequencies.get(freq.getTrip());
-            if(freqs == null) {
-                freqs = new ArrayList<Frequency>();
-                tripFrequencies.put(freq.getTrip(), freqs);
-            }
-            freqs.add(freq);
+            frequenciesForTrip.put(freq.getTrip(), freq);
         }
 
         /* then loop over all trips handling each one as a frequency-based or scheduled trip */
         TRIP : for (Trip trip : trips) {
 
             tripCount++;
-            if (tripCount % 100000 == 0)
+            if (tripCount % 100000 == 0) {
                 LOG.debug("trips=" + tripCount + "/" + trips.size());
+            }
             
             if ( ! _calendarService.getServiceIds().contains(trip.getServiceId())) {
                 LOG.warn(graph.addBuilderAnnotation(new TripUndefinedService(trip)));
             }
-
 
             /* GTFS stop times frequently contain duplicate, missing, or incorrect entries */
             List<StopTime> stopTimes = getNonduplicateStopTimesForTrip(trip); // duplicate stopIds
@@ -450,11 +451,10 @@ public class GTFSPatternHopFactory {
             }
             
             /* check to see if this trip is used by one or more frequency entries */
-            List<Frequency> frequencies = tripFrequencies.get(trip);
+            List<Frequency> frequencies = frequenciesForTrip.get(trip);
             if(frequencies != null) {
                 // before creating frequency-based trips, check for single-instance frequencies.
                 Collections.sort(frequencies, new Comparator<Frequency>() {
-
                     @Override
                     public int compare(Frequency o1, Frequency o2) {
                         return o1.getStartTime() - o2.getStartTime();
@@ -1512,23 +1512,24 @@ public class GTFSPatternHopFactory {
     /** Filter out (erroneous) series of stop times that refer to the same stop */
     private List<StopTime> getNonduplicateStopTimesForTrip(Trip trip) {
         List<StopTime> unfiltered = _dao.getStopTimesForTrip(trip);
-        ArrayList<StopTime> filtered = new ArrayList<StopTime>(unfiltered.size());
+        List<StopTime> filtered = Lists.newArrayList(unfiltered.size());
         for (StopTime st : unfiltered) {
-            if (filtered.size() > 0) {
+            if (filtered.isEmpty()) {
+                filtered.add(st);                
+            } else {
                 StopTime lastStopTime = filtered.get(filtered.size() - 1);
                 if (lastStopTime.getStop().equals(st.getStop())) {
                     lastStopTime.setDepartureTime(st.getDepartureTime());
                 } else {
                     filtered.add(st);
                 }
-            } else {
-                filtered.add(st);
             }
         }
         if (filtered.size() == unfiltered.size()) {
             return unfiltered;
-        }
-        return filtered;
+        } else {
+            return filtered;
+        }   
     }
 
     public void setFareServiceFactory(FareServiceFactory fareServiceFactory) {
