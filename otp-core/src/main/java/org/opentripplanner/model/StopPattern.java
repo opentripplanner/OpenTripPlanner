@@ -6,25 +6,24 @@ import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.StopTime;
 
 /**
- * This class represents what is called a JourneyPattern in Transmodel: the sequence of stops at 
- * which a trip (GTFS) or vehicle journey (Transmodel) calls. This accounts for 
+ * This class represents what is called a JourneyPattern in Transmodel: the sequence of stops at
+ * which a trip (GTFS) or vehicle journey (Transmodel) calls. This accounts for
  * 
- * An important detail: 
- * Routes in GTFS are not a structurally important element, they just serve as user-facing information.
- * It is possible for the same journey pattern to appear in more than one route. This is notmore than one route to contain 
+ * An important detail: Routes in GTFS are not a structurally important element, they just serve as
+ * user-facing information. It is possible for the same journey pattern to appear in more than one
+ * route. This is notmore than one route to contain
  * 
- * OTP already has several classes that represent this same thing:
- * A TripPattern in the context of routing. It represents all trips with the same stop pattern
- * A ScheduledStopPattern in the GTFS loading process.
- * A RouteVariant in the TransitIndex, which has a unique human-readable name and belongs to a particular route.
+ * OTP already has several classes that represent this same thing: A TripPattern in the context of
+ * routing. It represents all trips with the same stop pattern A ScheduledStopPattern in the GTFS
+ * loading process. A RouteVariant in the TransitIndex, which has a unique human-readable name and
+ * belongs to a particular route.
  * 
  * We would like to combine all these different classes into one.
- * A ScheduledStopPattern is an intermediate object used when processing GTFS files. It represents an ordered
- * list of stops and a service ID. Any two trips with the same stops in the same order, and that
- * operate on the same days, can be combined using a TripPattern to simplify the graph. This saves memory and 
- * reduces search complexity since we only consider the trip that departs soonest for each pattern.
  * 
- * (AgencyAndId calendarId has been removed)
+ * Any two trips with the same stops in the same order, and that operate on the same days, can be
+ * combined using a TripPattern to simplify the graph. This saves memory and reduces search
+ * complexity since we only consider the trip that departs soonest for each pattern. AgencyAndId
+ * calendarId has been removed. See issue #1320.
  */
 public class StopPattern { // rename to StopPattern
 
