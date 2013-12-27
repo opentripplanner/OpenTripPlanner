@@ -295,14 +295,18 @@ public class State implements Cloneable {
                 && (!((PlainStreetEdge) backEdge).getTurnRestrictions().isEmpty())))
             return false;
 
-        if (this.similarRouteSequence(other)) {
+        if (this.routeSequenceSubset(other)) {
             return this.weight <= other.weight;
         }
 
+        // If returning more than one result from GenericAStar, the search can be very slow
+        // unless you replace the following code with:
+        // return false;
         double weightDiff = this.weight / other.weight;
         return walkDistance <= other.getWalkDistance() * 1.05
                 && (weightDiff < 1.02 && this.weight - other.weight < 30)
                 && this.getElapsedTimeSeconds() - other.getElapsedTimeSeconds() <= 30;
+        
     }
 
     /**
@@ -483,7 +487,8 @@ public class State implements Cloneable {
         return time;
     }
 
-    public boolean similarRouteSequence(State that) {
+    // symmetric prefix check
+    public boolean routeSequencePrefix (State that) {
         AgencyAndId[] rs0 = this.stateData.routeSequence;
         AgencyAndId[] rs1 = that.stateData.routeSequence;
         if (rs0 == rs1)
@@ -493,6 +498,58 @@ public class State implements Cloneable {
             if (rs0[i] != rs1[i])
                 return false;
         return true;
+    }
+
+    // symmetric subset check
+    public boolean routeSequenceSubsetSymmetric (State that) {
+        AgencyAndId[] rs0 = this.stateData.routeSequence;
+        AgencyAndId[] rs1 = that.stateData.routeSequence;
+        if (rs0 == rs1)
+            return true;
+        AgencyAndId[] shorter, longer;
+        if (rs0.length < rs1.length) {
+            shorter = rs0;
+            longer  = rs1;
+        } else {
+            shorter = rs1;
+            longer  = rs0;
+        }
+        /* bad complexity, but these are tiny arrays */
+        for (AgencyAndId ais : shorter) {
+            boolean match = false;
+            for (AgencyAndId ail : longer) {
+                if (ais == ail) {
+                    match = true;
+                    break;
+                }
+            }
+            if (!match) return false;
+        }
+        return true;
+    }
+
+    // subset check: is this a subset of that?
+    public boolean routeSequenceSubset (State that) {
+        AgencyAndId[] rs0 = this.stateData.routeSequence;
+        AgencyAndId[] rs1 = that.stateData.routeSequence;
+        if (rs0 == rs1) return true;
+        if (rs0.length > rs1.length) return false;
+        /* bad complexity, but these are tiny arrays */
+        for (AgencyAndId r0 : rs0) {
+            boolean match = false;
+            for (AgencyAndId r1 : rs1) {
+                if (r0 == r1) {
+                    match = true;
+                    break;
+                }
+            }
+            if (!match) return false;
+        }
+        return true;
+    }
+
+    public boolean routeSequenceSuperset (State that) {
+        return that.routeSequenceSubset(this);
     }
 
     public double getWalkSinceLastTransit() {
