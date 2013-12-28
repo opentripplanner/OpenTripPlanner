@@ -594,14 +594,14 @@ public class Timetable implements Serializable {
      * and should only be done once after an entire batch of trips are added.
      */
     public void addTrip(Trip trip, List<StopTime> stopTimes) {
-        TripTimes tripTime = new TripTimes(trip, stopTimes);
+        TripTimes newTripTimes = new TripTimes(trip, stopTimes);
         if(!tripTimes.isEmpty()) {
-            TripTimes firstTripTime = tripTimes.get(0);
-            tripTime.compactStopSequence(firstTripTime);
+            TripTimes firstTripTimes = tripTimes.get(0);
+            newTripTimes.compactStopSequence(firstTripTimes); // TODO: explain with a comment
         }
-        tripTimes.add(tripTime);
-        // TODO eliminate delegation / encapsulation fail
-        pattern.trips.add(trip);
+        tripTimes.add(newTripTimes);
+        // Note that the trip is not added to the enclosing pattern here, but in the pattern's wrapper function.
+        // Here we don't know if it's a scheduled trip or an added trip. 
     }
 
     /**

@@ -33,6 +33,7 @@ import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
@@ -74,8 +75,15 @@ public class TableTripPattern implements TripPattern, Serializable {
      * but we make the assumption that all trips with the same pattern belong to the same Route.  
      */
     @Getter 
-    public Route route;
-
+    public final Route route;
+    
+    /**
+     * All trips in this pattern call at this sequence of stops. This includes information about GTFS
+     * pick-up and drop-off types.
+     */
+    @Getter
+    public final StopPattern stopPattern;
+    
     /** 
      * This timetable holds the 'official' stop times from GTFS. If realtime stoptime updates are 
      * applied, trips searches will be conducted using another timetable and this one will serve to 
@@ -111,8 +119,9 @@ public class TableTripPattern implements TripPattern, Serializable {
     /** Optimized serviceId code. All trips in a pattern are by definition on the same service. */
     int serviceId; 
     
-    public TableTripPattern(ScheduledStopPattern stopPattern, int serviceId) {
-        this.serviceId = serviceId;
+    public TableTripPattern(Route route, StopPattern stopPattern) {
+        this.route = route;
+        this.stopPattern = stopPattern;
         setStopsFromStopPattern(stopPattern);
     }
 
@@ -124,17 +133,19 @@ public class TableTripPattern implements TripPattern, Serializable {
         finish();
     }
             
-    private void setStopsFromStopPattern(ScheduledStopPattern stopPattern) {
-        patternHops = new PatternHop[stopPattern.stops.size() - 1];
-        perStopFlags = new int[stopPattern.stops.size()];
+    // TODO verify correctness after substitution of StopPattern for ScheduledStopPattern
+    // also, maybe get rid of the per stop flags and just use the values in StopPattern, or an Enum
+    private void setStopsFromStopPattern(StopPattern stopPattern) {
+        patternHops = new PatternHop[stopPattern.size - 1];
+        perStopFlags = new int[stopPattern.size];
         int i = 0;
         for (Stop stop : stopPattern.stops) {
             // Assume that stops can be boarded with wheelchairs by default (defer to per-trip data)
             if (stop.getWheelchairBoarding() != 2) {
                 perStopFlags[i] |= FLAG_WHEELCHAIR_ACCESSIBLE;
             }
-            perStopFlags[i] |= stopPattern.pickups.get(i) << SHIFT_PICKUP;
-            perStopFlags[i] |= stopPattern.dropoffs.get(i) << SHIFT_DROPOFF;
+            perStopFlags[i] |= stopPattern.pickups[i] << SHIFT_PICKUP;
+            perStopFlags[i] |= stopPattern.dropoffs[i] << SHIFT_DROPOFF;
             ++i;
         }
     }
@@ -313,7 +324,14 @@ public class TableTripPattern implements TripPattern, Serializable {
      * Add a trip to this TableTripPattern.
      */
     public void addTrip(Trip trip, List<StopTime> stopTimes) {
-        scheduledTimetable.addTrip(trip, stopTimes);
+        // Only scheduled trips (added via the pattern rather than directly to the timetable) are in the trips list.
+        this.trips.add(trip);
+        this.scheduledTimetable.addTrip(trip, stopTimes);
+        // Check that all trips added to this pattern are on the initially declared route.
+        if (this.route != trip.getRoute()){
+            // Identity equality is valid on GTFS entity objects
+            LOG.warn("The trip {} is on a different route than its stop pattern, which is on {}.", trip, route);
+        }
     }
 
     /**
