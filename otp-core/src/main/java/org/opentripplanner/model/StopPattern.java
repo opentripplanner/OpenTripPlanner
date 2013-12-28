@@ -7,7 +7,8 @@ import org.onebusaway.gtfs.model.StopTime;
 
 /**
  * This class represents what is called a JourneyPattern in Transmodel: the sequence of stops at
- * which a trip (GTFS) or vehicle journey (Transmodel) calls. This accounts for
+ * which a trip (GTFS) or vehicle journey (Transmodel) calls, irrespective of the day on which 
+ * service runs.
  * 
  * An important detail: Routes in GTFS are not a structurally important element, they just serve as
  * user-facing information. It is possible for the same journey pattern to appear in more than one
