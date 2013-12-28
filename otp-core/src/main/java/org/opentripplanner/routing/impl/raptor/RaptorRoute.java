@@ -127,7 +127,7 @@ public class RaptorRoute implements Serializable {
     }
 
     public String toString() {
-        return GtfsLibrary.getRouteName(boards[0][0].getPattern().getExemplar().getRoute())
+        return GtfsLibrary.getRouteName(boards[0][0].getPattern().getRoute())
                 + " from " + stops[0].stopVertex.getLabel();
     }
 

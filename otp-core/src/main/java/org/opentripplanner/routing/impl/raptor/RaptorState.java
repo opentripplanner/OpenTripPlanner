@@ -97,9 +97,9 @@ public class RaptorState implements Comparable<RaptorState>, Cloneable {
         while (state != null) {
             String routeStr = "()";
             if (state.route != null) {
-                Trip gtfsTrip = state.route.boards[0][0].getPattern().getExemplar();
-                Route gtfsRoute = gtfsTrip.getRoute();
-                routeStr = gtfsTrip.getTripHeadsign();
+                
+                Route gtfsRoute = state.route.boards[0][0].getPattern().getRoute();
+                //routeStr = gtfsTrip.getTripHeadsign();
                 if (routeStr == null) {
                     routeStr = gtfsRoute.getId().getId();
                 } else {

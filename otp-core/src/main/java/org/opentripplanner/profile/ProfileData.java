@@ -69,7 +69,7 @@ public class ProfileData {
         public Pattern (Collection<TableTripPattern> ttps) {
             TableTripPattern first = ttps.iterator().next();
             stops = first.getStops();
-            route = first.exemplar.getRoute(); // only _table_ trip patterns have exemplars
+            route = first.getRoute(); // only _table_ trip patterns have exemplars
             int nStops = stops.size();
             min = new int[nStops];
             avg = new int[nStops];
@@ -80,7 +80,7 @@ public class ProfileData {
                     LOG.error("mismatched stop pattern");
                     continue;
                 }
-                if ( ! ttp.exemplar.getRoute().equals(route)) {
+                if ( ! ttp.getRoute().equals(route)) {
                     LOG.error("mismatched route");
                     continue;
                 }

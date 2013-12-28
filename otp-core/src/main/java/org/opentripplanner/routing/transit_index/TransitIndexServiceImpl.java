@@ -255,7 +255,7 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
 
         for (TripPattern pattern : getTripPatternsForStop(stop)) {
             if (pattern instanceof TableTripPattern) {
-                routes.add(((TableTripPattern) pattern).getExemplar().getRoute().getId());
+                routes.add(((TableTripPattern) pattern).getRoute().getId());
             } else if (pattern instanceof FrequencyBasedTripPattern) {
                 routes.add(((FrequencyBasedTripPattern) pattern).getTrip().getRoute().getId());
             }
