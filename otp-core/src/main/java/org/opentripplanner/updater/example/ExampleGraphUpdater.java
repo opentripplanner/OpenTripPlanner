@@ -17,9 +17,12 @@ import java.util.concurrent.ExecutionException;
 import java.util.prefs.Preferences;
 
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.updater.GraphUpdater;
+import org.opentripplanner.routing.trippattern.strategy.DecayingOrStatusUpdater;
+import org.opentripplanner.routing.trippattern.strategy.ITripTimesUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
+import org.opentripplanner.updater.stoptime.StoptimeGraphUpdater;
+import org.opentripplanner.updater.stoptime.TimesUpdaterConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +46,7 @@ import org.slf4j.LoggerFactory;
  * @see ExamplePollingGraphUpdater
  * @see GraphUpdaterConfigurator.applyConfigurationToGraph
  */
-public class ExampleGraphUpdater implements GraphUpdater {
+public class ExampleGraphUpdater implements StoptimeGraphUpdater {
 
     private static Logger LOG = LoggerFactory.getLogger(ExampleGraphUpdater.class);
 
@@ -53,12 +56,18 @@ public class ExampleGraphUpdater implements GraphUpdater {
 
     private String url;
 
+    /**
+     * The strategy to update the trip time, allows to change the strategy from the configuration
+     */
+    private ITripTimesUpdater tripTimesUpdater;
+
     // Here the updater can be configured using the properties in the file 'Graph.properties'.
     @Override
     public void configure(Graph graph, Preferences preferences) throws Exception {
         frequencySec = preferences.getInt("frequencySec", 5);
         url = preferences.get("url", null);
         LOG.info("Configured example updater: frequencySec={} and url={}", frequencySec, url);
+        tripTimesUpdater = TimesUpdaterConfigurator.getConfigurator(preferences);
     }
 
     // Here the updater gets to know its parent manager to execute GraphWriterRunnables.
@@ -95,6 +104,11 @@ public class ExampleGraphUpdater implements GraphUpdater {
         LOG.info("Run example updater with hashcode: {}", this.hashCode());
         // Here the updater can connect to a server and register a callback function
         // to handle updates to the graph
+    }
+
+    @Override
+    public ITripTimesUpdater getITripTimesUpdater() {
+        return tripTimesUpdater;
     }
 
     // Here the updater can cleanup after itself.

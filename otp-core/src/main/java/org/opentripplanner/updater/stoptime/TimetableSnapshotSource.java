@@ -24,6 +24,7 @@ import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.trippattern.TripUpdateList;
+import org.opentripplanner.routing.trippattern.strategy.ITripTimesUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,7 +104,7 @@ public class TimetableSnapshotSource {
     /**
      * Method to apply a trip update list to the most recent version of the timetable snapshot.
      */
-    public void applyTripUpdateLists(List<TripUpdateList> updates) {
+    public void applyTripUpdateLists(List<TripUpdateList> updates, ITripTimesUpdater ITripTimesUpdater) {
         if (updates == null) {
             LOG.debug("updates is null");
             return;
@@ -122,10 +123,10 @@ public class TimetableSnapshotSource {
                 applied = handleAddedTrip(tripUpdateList);
                 break;
             case CANCELED:
-                applied = handleCanceledTrip(tripUpdateList);
+                applied = handleCanceledTrip(tripUpdateList, ITripTimesUpdater);
                 break;
             case MODIFIED:
-                applied = handleModifiedTrip(tripUpdateList);
+                applied = handleModifiedTrip(tripUpdateList, ITripTimesUpdater);
                 break;
             case REMOVED:
                 applied = handleRemovedTrip(tripUpdateList);
@@ -162,7 +163,7 @@ public class TimetableSnapshotSource {
         return false;
     }
 
-    protected boolean handleCanceledTrip(TripUpdateList tripUpdateList) {
+    protected boolean handleCanceledTrip(TripUpdateList tripUpdateList, ITripTimesUpdater ITripTimesUpdater) {
 
         TableTripPattern pattern = getPatternForTrip(tripUpdateList.getTripId());
         if (pattern == null) {
@@ -170,12 +171,12 @@ public class TimetableSnapshotSource {
             return false;
         }
 
-        boolean applied = buffer.update(pattern, tripUpdateList);
+        boolean applied = buffer.update(pattern, tripUpdateList, ITripTimesUpdater);
         
         return applied;
     }
 
-    protected boolean handleModifiedTrip(TripUpdateList tripUpdateList) {
+    protected boolean handleModifiedTrip(TripUpdateList tripUpdateList, ITripTimesUpdater ITripTimesUpdater) {
 
         tripUpdateList.filter(true, true, true);
         if (! tripUpdateList.isCoherent()) {
@@ -193,7 +194,7 @@ public class TimetableSnapshotSource {
         }
 
         // we have a message we actually want to apply
-        boolean applied = buffer.update(pattern, tripUpdateList);
+        boolean applied = buffer.update(pattern, tripUpdateList, ITripTimesUpdater);
         
         return applied;
     }

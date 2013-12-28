@@ -28,12 +28,10 @@ import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.trippattern.CanceledTripTimes;
-import org.opentripplanner.routing.trippattern.DecayingDelayTripTimes;
 import org.opentripplanner.routing.trippattern.ScheduledTripTimes;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.trippattern.TripUpdateList;
-import org.opentripplanner.routing.trippattern.UpdatedTripTimes;
+import org.opentripplanner.routing.trippattern.strategy.ITripTimesUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -351,7 +349,7 @@ public class Timetable implements Serializable {
      * @return whether or not the timetable actually changed as a result of this operation
      * (maybe it should do the cloning and return the new timetable to enforce copy-on-write?) 
      */
-    public boolean update(TripUpdateList tripUpdate) {
+    public boolean update(TripUpdateList tripUpdate, ITripTimesUpdater ITripTimesUpdater) {
         try {
              // Though all timetables have the same trip ordering, some may have extra trips due to 
              // the dynamic addition of unscheduled trips.
@@ -365,47 +363,13 @@ public class Timetable implements Serializable {
             }
             TripTimes existingTimes = getTripTimes(tripIndex);
             ScheduledTripTimes scheduledTimes = existingTimes.getScheduledTripTimes();
-            TripTimes newTimes;
-            if (tripUpdate.isCancellation()) {
-                newTimes = new CanceledTripTimes(scheduledTimes);
+            TripTimes newTimes = ITripTimesUpdater.updateTimes(scheduledTimes, pattern, tripUpdate);
+            if(newTimes != null){
+                // Update succeeded, save the new TripTimes back into this Timetable.
+                this.tripTimes.set(tripIndex, newTimes);
+                return true;
             }
-            else if(tripUpdate.hasDelay()) {
-                // 'stop' Index as in transit stop (not 'end', not 'hop')
-                int stopIndex = tripUpdate.findUpdateStopIndex(pattern);
-                if (stopIndex == TripUpdateList.MATCH_FAILED) {
-                    LOG.warn("Unable to match update block to stopIds.");
-                    return false;
-                }
-                int delay = tripUpdate.getUpdates().get(0).getDelay();
-                newTimes = new DecayingDelayTripTimes(scheduledTimes, stopIndex, delay);
-            }
-            else {
-                // 'stop' Index as in transit stop (not 'end', not 'hop')
-                int stopIndex = tripUpdate.findUpdateStopIndex(pattern);
-                if (stopIndex == TripUpdateList.MATCH_FAILED) {
-                    LOG.warn("Unable to match update block to stopIds.");
-                    return false;
-                }
-                newTimes = new UpdatedTripTimes(scheduledTimes, tripUpdate, stopIndex);
-                if ( ! newTimes.timesIncreasing()) {
-                    LOG.warn("Resulting UpdatedTripTimes has non-increasing times. " +
-                             "Falling back on DecayingDelayTripTimes.");
-                    LOG.warn(tripUpdate.toString());
-                    LOG.warn(newTimes.toString());
-                    int delay = newTimes.getDepartureDelay(stopIndex);
-                    // maybe decay should be applied on top of the update (wrap Updated in Decaying), 
-                    // starting at the end of the update block
-                    newTimes = new DecayingDelayTripTimes(scheduledTimes, stopIndex, delay);
-                    LOG.warn(newTimes.toString());
-                    if ( ! newTimes.timesIncreasing()) {
-                        LOG.error("Even these trip times are non-increasing. Underlying schedule problem?");
-                        return false;
-                    }
-                }
-            }
-            // Update succeeded, save the new TripTimes back into this Timetable.
-            this.tripTimes.set(tripIndex, newTimes);
-            return true;
+            return false;
         } catch (Exception e) { // prevent server from dying while debugging
             e.printStackTrace();
             return false;

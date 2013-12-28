@@ -40,13 +40,14 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.trippattern.CanceledTripTimes;
 import org.opentripplanner.routing.trippattern.TripUpdateList;
 import org.opentripplanner.routing.trippattern.Update;
 import org.opentripplanner.routing.trippattern.Update.Status;
+import org.opentripplanner.routing.trippattern.strategy.DecayingOrStatusUpdater;
+import org.opentripplanner.routing.trippattern.strategy.ITripTimesUpdater;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
 import org.opentripplanner.util.TestUtils;
 
@@ -58,7 +59,10 @@ public class TimetableTest {
     private static Map<AgencyAndId, TableTripPattern> patternIndex;
     private static TableTripPattern pattern;
     private static Timetable timetable;
-    
+
+    private ITripTimesUpdater ITripTimesUpdater = new DecayingOrStatusUpdater();
+
+
     @BeforeClass
     public static void setUp() throws Exception {
 
@@ -105,12 +109,12 @@ public class TimetableTest {
 
         // non-existing trip
         tripUpdateList = TripUpdateList.forCanceledTrip(new AgencyAndId("a", "b"), 0, new ServiceDate());
-        assertFalse(timetable.update(tripUpdateList));
+        assertFalse(timetable.update(tripUpdateList, ITripTimesUpdater));
         
         // update trip with bad data
         tripUpdateList = TripUpdateList.forUpdatedTrip(trip_1_1_id, 0, new ServiceDate(), Collections.<Update> singletonList(
-                        new Update(trip_1_1_id, stop_a_id, 0, 1200, 1200, Status.PREDICTION, 0, new ServiceDate())));
-        assertFalse(timetable.update(tripUpdateList));
+                        new Update(trip_1_1_id, stop_a_id, 0, 1200, 1200, false, Status.PREDICTION, 0, new ServiceDate())));
+        assertFalse(timetable.update(tripUpdateList, ITripTimesUpdater));
         
         //---
         long startTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0);
@@ -127,12 +131,12 @@ public class TimetableTest {
         
         // update trip
         List<Update> updates = new LinkedList<Update>();
-        updates.add(new Update(trip_1_1_id, stop_a_id, 0,  0*60 + 120,  0*60 + 120, Status.PREDICTION, 0, new ServiceDate()));
-        updates.add(new Update(trip_1_1_id, stop_b_id, 1, 10*60 + 120, 10*60 + 120, Status.PREDICTION, 0, new ServiceDate()));
-        updates.add(new Update(trip_1_1_id, stop_c_id, 2, 20*60 + 120, 20*60 + 120, Status.PREDICTION, 0, new ServiceDate()));
+        updates.add(new Update(trip_1_1_id, stop_a_id, 0,  0*60 + 120,  0*60 + 120, false, Status.PREDICTION, 0, new ServiceDate()));
+        updates.add(new Update(trip_1_1_id, stop_b_id, 1, 10*60 + 120, 10*60 + 120, false, Status.PREDICTION, 0, new ServiceDate()));
+        updates.add(new Update(trip_1_1_id, stop_c_id, 2, 20*60 + 120, 20*60 + 120, false, Status.PREDICTION, 0, new ServiceDate()));
         tripUpdateList = TripUpdateList.forUpdatedTrip(trip_1_1_id, 0, new ServiceDate(), updates);
         assertEquals(timetable.getArrivalTime(1, trip_1_1_index), 20*60);
-        assertTrue(timetable.update(tripUpdateList));
+        assertTrue(timetable.update(tripUpdateList, ITripTimesUpdater));
         assertEquals(timetable.getArrivalTime(1, trip_1_1_index), 20*60 + 120);
 
         //---
@@ -145,7 +149,7 @@ public class TimetableTest {
         
         // cancel trip
         tripUpdateList = TripUpdateList.forCanceledTrip(trip_1_1_id, 0, new ServiceDate());
-        assertTrue(timetable.update(tripUpdateList));
+        assertTrue(timetable.update(tripUpdateList, ITripTimesUpdater));
         assertEquals(CanceledTripTimes.class, timetable.getTripTimes(trip_1_1_index).getClass());
         
         //---

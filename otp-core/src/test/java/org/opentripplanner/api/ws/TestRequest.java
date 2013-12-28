@@ -105,6 +105,8 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.trippattern.TripUpdateList;
 import org.opentripplanner.routing.trippattern.Update;
 import org.opentripplanner.routing.trippattern.Update.Status;
+import org.opentripplanner.routing.trippattern.strategy.DecayingOrStatusUpdater;
+import org.opentripplanner.routing.trippattern.strategy.ITripTimesUpdater;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -1014,10 +1016,11 @@ public class TestRequest extends TestCase {
      */
     private void applyUpdateToTripPattern(TableTripPattern pattern, String tripId, String stopId,
             int stopSeq, int arrive, int depart, Status prediction, int timestamp, String serviceDate) throws ParseException {
-        Update update = new Update(new AgencyAndId("TriMet", tripId), new AgencyAndId("TriMet", stopId), stopSeq, arrive, depart, prediction, timestamp, ServiceDate.parseString(serviceDate));
+        Update update = new Update(new AgencyAndId("TriMet", tripId), new AgencyAndId("TriMet", stopId), stopSeq, arrive, depart, false, prediction, timestamp, ServiceDate.parseString(serviceDate));
         ArrayList<Update> updates = new ArrayList<Update>(Arrays.asList(update));
         TripUpdateList tripUpdateList = TripUpdateList.splitByTrip(updates).get(0);
-        boolean success = pattern.update(tripUpdateList);
+        ITripTimesUpdater ITripTimesUpdater = new DecayingOrStatusUpdater();
+        boolean success = pattern.update(tripUpdateList, ITripTimesUpdater);
         assertTrue(success);
     }
 
