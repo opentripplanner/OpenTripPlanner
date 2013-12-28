@@ -98,6 +98,15 @@ public class TripTimes implements Serializable {
      */
     private int[] arrivalTimes;
 
+    /**
+     * These are the GTFS stop sequence numbers, which show the order in which the vehicle visits
+     * the stops. Despite the face that the StopPattern or TripPattern enclosing this TripTimes
+     * provides an ordered list of Stops, the original stop sequence numbers may still be needed for
+     * matching with GTFS-RT update messages. Unfortunately, each individual trip can have totally
+     * different sequence numbers for the same stops, so we need to store them at the individual
+     * trip level. An effort is made to re-use the sequence number arrays when they are the same
+     * across different trips in the same pattern.
+     */
     private int[] stopSequences;
 
     /**
@@ -233,7 +242,10 @@ public class TripTimes implements Serializable {
     }
 
     /**
-     * It all depends whether we store pointers to the enclosing Timetable...
+     * Trips may also have null headsigns, in which case we should fall back on a Timetable or
+     * Pattern-level headsign. Such a string will be available when we give TripPatterns or
+     * StopPatterns unique human readable route variant names, but a TripTimes currently does not
+     * have a pointer to its enclosing timetable or pattern.
      */
     public String getHeadsign(int hop) {
         if (headsigns == null) {
@@ -243,7 +255,7 @@ public class TripTimes implements Serializable {
         }
     }
 
-    /** Return the stopSequence for the given stop. */
+    /** @return the stop sequence number specified in the GTFS feed for the given stop on this trip. */
     public int getStopSequence(int stopIndex) {
         return stopSequences[stopIndex];
     }
