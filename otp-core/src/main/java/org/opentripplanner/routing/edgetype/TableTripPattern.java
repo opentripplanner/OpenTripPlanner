@@ -276,6 +276,11 @@ public class TableTripPattern implements TripPattern, Serializable {
         return timetable.getTripTimes(tripIndex);
     }
 
+    /* METHODS THAT DELEGATE TO THE SCHEDULED TIMETABLE */
+
+    // These should probably be deprecated. That would require grabbing the scheduled timetable,
+    // and would avoid mistakes where real-time updates are accidentally not taken into account.
+    
     /** Gets the running time after a given stop (i.e. for the given hop) on a given trip */
     public int getRunningTime(int stopIndex, int trip) {
         return scheduledTimetable.getRunningTime(stopIndex, trip);
