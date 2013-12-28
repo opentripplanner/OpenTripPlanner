@@ -81,6 +81,7 @@ public class TableTripPattern implements TripPattern, Serializable {
     // however it's nice to have for order reference, since all timetables must have tripTimes
     // in this order, e.g. for interlining. 
     // potential optimization: trip fields can be removed from TripTimes?
+    // another potential optimization: this field can be removed, and interlining can be done differently?
     /**
      * This pattern may have multiple Timetable objects, but they should all contain TripTimes
      * for the same trips, in the same order (that of the scheduled Timetable). An exception to 

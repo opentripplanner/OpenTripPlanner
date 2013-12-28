@@ -12,7 +12,7 @@ import org.onebusaway.gtfs.model.StopTime;
  * 
  * An important detail: Routes in GTFS are not a structurally important element, they just serve as
  * user-facing information. It is possible for the same journey pattern to appear in more than one
- * route. This is notmore than one route to contain
+ * route. 
  * 
  * OTP already has several classes that represent this same thing: A TripPattern in the context of
  * routing. It represents all trips with the same stop pattern A ScheduledStopPattern in the GTFS
@@ -25,8 +25,11 @@ import org.onebusaway.gtfs.model.StopTime;
  * combined using a TripPattern to simplify the graph. This saves memory and reduces search
  * complexity since we only consider the trip that departs soonest for each pattern. AgencyAndId
  * calendarId has been removed. See issue #1320.
+ * 
+ * A StopPattern is very closely related to a TripPattern -- it essentially serves as the unique key for a TripPattern.
+ * Should the route be included in the StopPattern?
  */
-public class StopPattern { // rename to StopPattern
+public class StopPattern {
 
     /* Constants for the GTFS pick up / drop off type fields. */
     // It would be nice to have an enum for these, but the equivalence with integers is important.
