@@ -167,12 +167,7 @@ public class Timetable implements Serializable {
     /**
      * Get the next (previous) trip that departs (arrives) from the specified stop at or after
      * (before) the specified time. The haveBicycle parameter must be passed in because we cannot
-     * determine whether the user is in possession of a rented bicycle from the options alone. If a
-     * pre-allocated array is passed in via the optional adjacentTimes parameter, that array will be
-     * filled with the main result plus a suitable number of TripTimes roughly temporally adjacent
-     * to the main result. If the main result is null, the contents of the adjacentTimes array are
-     * undefined. Note that no guarantees of exhaustiveness, contiguity, etc. are made about the
-     * additional TripTimes objects.
+     * determine whether the user is in possession of a rented bicycle from the options alone.
      *
      * @return the TripTimes object representing the (possibly updated) best trip, or null if no
      * trip matches both the time and other criteria.
