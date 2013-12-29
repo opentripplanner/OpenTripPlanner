@@ -90,6 +90,7 @@ public class TableTripPattern implements TripPattern, Serializable {
      * find early/late offsets, or as a fallback if the other timetable becomes corrupted or
      * expires.
      */
+    @Getter
     protected final Timetable scheduledTimetable = new Timetable(this);
 
     // redundant since tripTimes have a trip
