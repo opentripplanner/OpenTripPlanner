@@ -326,6 +326,14 @@ public class TableTripPattern implements TripPattern, Serializable {
     }
 
     /**
+     * Rather than the scheduled timetable, get the one that has been updated with real-time updates.
+     * The view is consistent across a single request, and depends on the routing context in the request.
+     */
+    public Timetable getUpdatedTimetable (RoutingRequest req) {
+        return null;
+    }
+
+    /**
      * Add a trip to this TableTripPattern.
      */
     public void addTrip(Trip trip, List<StopTime> stopTimes) {
