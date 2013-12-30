@@ -452,7 +452,7 @@ public class GTFSPatternHopFactory {
             
             /* check to see if this trip is used by one or more frequency entries */
             List<Frequency> frequencies = frequenciesForTrip.get(trip);
-            if(frequencies != null) {
+            if(frequencies != null && ! frequencies.isEmpty()) {
                 // before creating frequency-based trips, check for single-instance frequencies.
                 Collections.sort(frequencies, new Comparator<Frequency>() {
                     @Override
