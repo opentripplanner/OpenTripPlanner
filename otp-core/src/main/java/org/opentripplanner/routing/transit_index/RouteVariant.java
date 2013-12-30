@@ -46,16 +46,22 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 
 /**
- * This represents a particular stop pattern on a particular route. For example, the N train has at
- * least four different variants: express (over the Manhattan bridge), and local (via lower
- * Manhattan and the tunnel) x to Astoria and to Coney Island. During construction, it sometimes has
- * a fifth variant: along the D line to Coney Island after 59th St (or from Coney Island to 59th).
  * 
- * This is needed because route names are intended for customer information, but scheduling
- * personnel need to know about where a particular trip actually goes.
+ * THIS CLASS IS BEING MERGED INTO STOPPATTERN / TRIPPATTERN. It is being kept around for reference
+ * and is expected to be removed eventually.
  * 
- * Variant names are guaranteed to be unique (among variants for a route) but not stable. They are
- * generated to be as useful as can be reasonably done by machine. For instance, if a variant is the
+ * A "route variant" represents a particular stop pattern on a particular route. For example, the N
+ * train has at least four different variants: express (over the Manhattan bridge), and local (via
+ * lower Manhattan and the tunnel) x to Astoria and to Coney Island. During construction, it
+ * sometimes has a fifth variant: along the D line to Coney Island after 59th St (or from Coney
+ * Island to 59th).
+ * 
+ * Route names are intended for very general customer information, but sometimes there is a need to
+ * know where a particular trip actually goes.
+ * 
+ * Route Variant names are guaranteed to be unique (among variants for a single route) but not stable
+ * across graph builds especially based on different GTFS inputs. They are
+ * machine-generated on a best-effort basis. For instance, if a variant is the
  * only variant of the N that ends at Coney Island, the name will be "N to Coney Island". But if
  * multiple variants end at Coney Island (but have different stops elsewhere), that name would not
  * be chosen. OTP also tries start and intermediate stations ("from Coney Island", or "via
