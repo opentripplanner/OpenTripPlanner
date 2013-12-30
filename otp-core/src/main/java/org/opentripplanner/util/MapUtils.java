@@ -25,6 +25,7 @@ public class MapUtils {
     /**
      * An extremely common pattern: add an item to a set in a hash value, creating that set if
      * necessary
+     * TODO: Replace with Guava
      */
     public static final <T, U> void addToMapSet(Map<T, Set<U>> mapList, T key, U value) {
         Set<U> list = mapList.get(key);
@@ -38,6 +39,7 @@ public class MapUtils {
     /**
      * An extremely common pattern: add an item to a list in a hash value, creating that list if
      * necessary
+     * TODO: Replace with Guava
      */
     public static final <T, U> void addToMapList(Map<T, List<U>> mapList, T key, U value) {
         List<U> list = mapList.get(key);
