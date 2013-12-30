@@ -63,14 +63,6 @@ public class TableTripPattern implements TripPattern, Serializable {
     public static final int FLAG_BIKES_ALLOWED = 32;
 
     /** 
-     * An integer index uniquely identifying this pattern among all in the graph.
-     * This additional level of indirection allows versioning of trip patterns, which is 
-     * necessary for real-time stop time updates. (Currently using a hashmap until that proves to
-     * be too inefficient.) 
-     */
-//    public final int patternIndex;
-    
-    /** 
      * The GTFS Route of all trips in this pattern. GTFS allows the same pattern to appear in more than one route, 
      * but we make the assumption that all trips with the same pattern belong to the same Route.  
      */
