@@ -46,26 +46,23 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 
 /**
- * This represents a particular stop pattern on a particular route. For example, the N train has at least four different variants: express (over the
- * Manhattan bridge), and local (via lower Manhattan and the tunnel) x to Astoria and to Coney Island. During construction, it sometimes has a fifth
- * variant: along the D line to Coney Island after 59th St (or from Coney Island to 59th).
+ * This represents a particular stop pattern on a particular route. For example, the N train has at
+ * least four different variants: express (over the Manhattan bridge), and local (via lower
+ * Manhattan and the tunnel) x to Astoria and to Coney Island. During construction, it sometimes has
+ * a fifth variant: along the D line to Coney Island after 59th St (or from Coney Island to 59th).
  * 
- * This is needed because route names are intended for customer information, but scheduling personnel need to know about where a particular trip
- * actually goes.
+ * This is needed because route names are intended for customer information, but scheduling
+ * personnel need to know about where a particular trip actually goes.
  * 
- * Variant names are guaranteed to be unique (among variants for a
- * route) but not stable.  They are generated to be as useful as can
- * be reasonably done by machine.  For instance, if a variant is the
- * only variant of the N that ends at Coney Island, the name will be
- * "N to Coney Island".  But if multiple variants end at Coney Island
- * (but have different stops elsewhere), that name would not be
- * chosen.  OTP also tries start and intermediate stations ("from
- * Coney Island", or "via Whitehall", or even combinations ("from
- * Coney Island via Whitehall").  But if there is no way to create a
- * unique name from start/end/intermediate stops, then the best we can
- * do is to create a "like [trip id]" name, which at least tells you
- * where in the GTFS you can find a related trip.
- *
+ * Variant names are guaranteed to be unique (among variants for a route) but not stable. They are
+ * generated to be as useful as can be reasonably done by machine. For instance, if a variant is the
+ * only variant of the N that ends at Coney Island, the name will be "N to Coney Island". But if
+ * multiple variants end at Coney Island (but have different stops elsewhere), that name would not
+ * be chosen. OTP also tries start and intermediate stations ("from Coney Island", or "via
+ * Whitehall", or even combinations ("from Coney Island via Whitehall"). But if there is no way to
+ * create a unique name from start/end/intermediate stops, then the best we can do is to create a
+ * "like [trip id]" name, which at least tells you where in the GTFS you can find a related trip.
+ * 
  * @author novalis
  * 
  */
