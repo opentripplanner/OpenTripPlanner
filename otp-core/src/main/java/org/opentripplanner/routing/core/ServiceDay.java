@@ -125,27 +125,5 @@ public class ServiceDay implements Serializable {
     public int hashCode() {
         return (int) midnight;
     }
-
-//    public static ServiceDay universalService(Graph graph) {
-//        //FIXME: assumes all service is in the same tz
-//        final String agencyId = graph.getAgencyIds().iterator().next();
-//        ServiceDay universal = new ServiceDay(graph, 0, graph.getCalendarService(), agencyId);
-//
-//        return universal;
-//    }
-    
-    /** Used in RAPTOR graph analysis to board everything. */
-    public static class UniversalService extends ServiceDay {
-        
-        private static final long serialVersionUID = 1L;
-
-        public UniversalService(Graph graph) {
-            super(graph, 0, graph.getCalendarService(), graph.getAgencyIds().iterator().next());
-        }
-
-        @Override
-        public boolean serviceIdRunning(int serviceId) { return true; }
-        
-    }
     
 }
