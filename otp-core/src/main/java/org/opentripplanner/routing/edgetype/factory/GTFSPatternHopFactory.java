@@ -115,6 +115,10 @@ import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.linearref.LinearLocation;
 import com.vividsolutions.jts.linearref.LocationIndexedLine;
 
+// Filtering out (removing) stoptimes from a trip forces us to either have two copies of that list,
+// or do all the steps within one loop over trips. It would be clearer if there were multiple loops over the trips.
+
+/** A wrapper class for Trips that allows them to be sorted. */
 class InterliningTrip  implements Comparable<InterliningTrip> {
     public Trip trip;
     public StopTime firstStopTime;
@@ -147,13 +151,16 @@ class InterliningTrip  implements Comparable<InterliningTrip> {
     
 }
 
+/** 
+ * This compound key object is used when grouping interlining trips together by (serviceId, blockId). 
+ */
 class BlockIdAndServiceId {
     public String blockId;
     public AgencyAndId serviceId;
 
-    BlockIdAndServiceId(String blockId, AgencyAndId serviceId) {
-        this.blockId = blockId;
-        this.serviceId = serviceId;
+    BlockIdAndServiceId(Trip trip) {
+        this.blockId = trip.getBlockId();
+        this.serviceId = trip.getServiceId();
     }
     
     public boolean equals(Object o) {
@@ -199,6 +206,7 @@ class InterlineSwitchoverKey {
     }
 }
 
+/* TODO Move this stuff into the geometry library */
 class IndexedLineSegment {
     private static final double RADIUS = SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_M;
     int index;
@@ -337,13 +345,13 @@ public class GTFSPatternHopFactory {
 
     private FareServiceFactory fareServiceFactory;
 
-    private HashMap<BlockIdAndServiceId, List<InterliningTrip>> tripsForBlock = new HashMap<BlockIdAndServiceId, List<InterliningTrip>>();
+    private Multimap<BlockIdAndServiceId, TripTimes> tripTimesForBlock = ArrayListMultimap.create();
 
-    private Map<InterlineSwitchoverKey, PatternInterlineDwell> interlineDwells = new HashMap<InterlineSwitchoverKey, PatternInterlineDwell>();
+//    private Map<InterlineSwitchoverKey, PatternInterlineDwell> interlineDwells = new HashMap<InterlineSwitchoverKey, PatternInterlineDwell>();
 
-    Map<StopPattern, TableTripPattern> tableTripPatterns = Maps.newHashMap();
+    private Map<StopPattern, TableTripPattern> tableTripPatterns = Maps.newHashMap();
 
-    Map<StopPattern, FrequencyBasedTripPattern> frequencyPatterns = Maps.newHashMap();
+    private Map<StopPattern, FrequencyBasedTripPattern> frequencyTripPatterns = Maps.newHashMap();
 
     private GtfsStopContext context = new GtfsStopContext();
 
@@ -438,10 +446,7 @@ public class GTFSPatternHopFactory {
         for(Frequency freq : _dao.getAllFrequencies()) {
             frequenciesForTrip.put(freq.getTrip(), freq);
         }
-        
-        /* As we loop over the trips, we will group them by the sequence of stops they call at. */
-        Multimap<StopPattern, TripTimes> tripTimesForStopPattern = ArrayListMultimap.create();
-        
+
         /* Then loop over all trips, handling each one as a frequency-based or scheduled trip. */
         TRIP : for (Trip trip : trips) {
 
@@ -492,29 +497,49 @@ public class GTFSPatternHopFactory {
                         frequencyPattern.createRanges(frequencies);
                     createGeometry(graph, trip, stopTimes, hops);
                     continue TRIP;
-                } // else fall through and treat this as a normal trip
+                } 
+                // Else fall through and treat this trip as a non-frequency (table-based) one
             }
 
-            /* this trip is not frequency-based, add it to the corresponding trip pattern */
+            /* This trip is not frequency-based */
             
             /* Convert this trip and associated filtered stoptimes into a TripTimes object */
             StopPattern stopPattern = new StopPattern(stopTimes);
             TripTimes tripTimes = new TripTimes(trip, stopTimes);
-            /* Group this TripTimes with all others sharing the same sequence of stops */
-            tripTimesForStopPattern.put(stopPattern, tripTimes);
 
+            /* Group this TripTimes with all others sharing the same block ID (for interlining later) */
+            tripTimesForBlock.put(new BlockIdAndServiceId(trip), trip);
+
+            /* Get the existing TableTripPattern for this StopPattern, or create one. */
+            TableTripPattern tableTripPattern = tableTripPatterns.get(stopPattern);
+            if (tableTripPattern == null) {
+                tableTripPattern = new TableTripPattern(trip.getRoute(), stopPattern);
+                tableTripPatterns.put(stopPattern, tableTripPattern);
+            }
+
+            /* Add the stoptimes for the current trip to the appropriate TableTripPattern. */
+            /* This effectively groups trips by the sequence of stops they call at. */
+            tableTripPattern.addTrip(trip, stopTimes);
             
-            // TODO split this into two actions: 
-            // create edges after all patterns are known
-            addPatternForTripToGraph(graph, trip, stopTimes);
+        } // END foreach (TRIP)
 
-            /* record which block trips belong to so they can be linked up later */
+        /* Loop over all new TableTripPatterns, creating the vertices and edges for each pattern. */
+        for (TableTripPattern tableTripPattern : tableTripPatterns.values()) {
+//            // TODO split this into two actions: 
+//            // create edges after all patterns are known
+//            addPatternForTripToGraph(graph, trip, stopTimes);
+//
+//            /* record which block trips belong to so they can be linked up later */
 //            String blockId = trip.getBlockId();
 //            if (blockId != null && !blockId.equals("")) {
 //                addTripToInterliningMap(trip, stopTimes, tripPattern);
-//            }
-        } // END for loop over trips
+//            }            
+            System.out.printf(" -- %s\n", tableTripPattern.getName());
+        }
 
+        /* Generate unique names for all the TableTripPatterns. */
+        TableTripPattern.generateUniqueNames(tableTripPatterns.values());
+        
         /* link up interlined trips (where a vehicle continues on to another logical trip) */
         for (List<InterliningTrip> blockTrips : tripsForBlock.values()) {
 
@@ -542,6 +567,8 @@ public class GTFSPatternHopFactory {
                     continue;
                 }
 
+                // TODO: we should be keying vertex/edge collections on StopPatterns or TripPatterns, 
+                // not on the exemplar trips they contain.
                 Trip fromExemplar = fromInterlineTrip.tripPattern.exemplar;
                 Trip toExemplar = toInterlineTrip.tripPattern.exemplar;
 
@@ -1556,6 +1583,9 @@ public class GTFSPatternHopFactory {
      * Filter out any series of stop times that refer to the same stop. This is very inefficient in
      * an array-backed list, but we are assuming that this is a rare occurrence. The alternative is
      * to copy every list of stop times during filtering.
+     * 
+     * TODO: OBA GFTS makes the stoptime lists unmodifiable, so this will not work.
+     * We need to copy any modified list. 
      * 
      * @return whether any repeated stops were filtered out.
      */
