@@ -19,12 +19,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -40,22 +37,19 @@ import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.common.model.P2;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.transit_index.RouteVariant;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.beust.jcommander.internal.Maps;
 import com.beust.jcommander.internal.Sets;
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 
 /**
@@ -180,14 +174,7 @@ public class TableTripPattern implements TripPattern, Serializable {
     }
 
     public List<Stop> getStops() {
-        /*
-         * Dynamically build the list from the PatternHop list. Not super efficient but this method
-         * is not called very often.
-         */
-        List<Stop> retval = new ArrayList<Stop>(patternHops.length + 1);
-        for (int i = 0; i <= patternHops.length; i++)
-            retval.add(getStop(i));
-        return retval;
+        return Arrays.asList(stopPattern.stops);
     }
     
     public List<PatternHop> getPatternHops() {
@@ -419,6 +406,7 @@ public class TableTripPattern implements TripPattern, Serializable {
      * fields. Express should really be determined from number of stops and/or run time of trips.
      */
     public static void generateUniqueNames (Collection<TableTripPattern> tableTripPatterns) {
+        LOG.info("Generating unique names for stop patterns on each route.");
         Set<String> usedRouteNames = Sets.newHashSet();
         Map<Route, String> uniqueRouteNames = Maps.newHashMap();
 
@@ -429,14 +417,14 @@ public class TableTripPattern implements TripPattern, Serializable {
         }
 
         /* Ensure we have a unique name for every Route */
-        for (Route route : patternsByRoute.keys()) {
+        for (Route route : patternsByRoute.keySet()) {
             String routeName = GtfsLibrary.getRouteName(route);
             if (usedRouteNames.contains(routeName)) {
-                LOG.warn("Route has non-unique name. Generating one to ensure uniqueness of TripPattern names.");
                 int i = 2;
                 String generatedRouteName;
-                do generatedRouteName = routeName + (i++);
+                do generatedRouteName = routeName + " " + (i++);
                 while (usedRouteNames.contains(generatedRouteName));
+                LOG.warn("Route had non-unique name. Generated one to ensure uniqueness of TripPattern names: {}", generatedRouteName);
                 routeName = generatedRouteName;
             }
             usedRouteNames.add(routeName);
@@ -444,127 +432,96 @@ public class TableTripPattern implements TripPattern, Serializable {
         }
         
         /* Iterate over all routes, giving the patterns within each route unique names. */
-        ROUTE : for (Route route : patternsByRoute.keys()) {
-            Collection<TableTripPattern> tripPatterns = patternsByRoute.get(route);             
+        ROUTE : for (Route route : patternsByRoute.keySet()) {
+            Collection<TableTripPattern> routeTripPatterns = patternsByRoute.get(route);             
             String routeName = uniqueRouteNames.get(route);
 
             /* Simplest case: there's only one route variant, so we'll just give it the route's name. */
-            if (tripPatterns.size() == 1) {
-                tripPatterns.iterator().next().setName(routeName);
+            if (routeTripPatterns.size() == 1) {
+                routeTripPatterns.iterator().next().setName(routeName);
                 continue;
             }
 
             /* Do the patterns within this Route have a unique start, end, or via Stop? */
-            Multimap<String, TableTripPattern> starts = ArrayListMultimap.create();
-            Multimap<String, TableTripPattern> ends   = ArrayListMultimap.create();
-            Multimap<String, TableTripPattern> vias   = ArrayListMultimap.create();
-            for (TableTripPattern pattern : tableTripPatterns) {
+            Multimap<String, TableTripPattern> signs   = ArrayListMultimap.create(); // prefer headsigns
+            Multimap<Stop,   TableTripPattern> starts  = ArrayListMultimap.create();
+            Multimap<Stop,   TableTripPattern> ends    = ArrayListMultimap.create();
+            Multimap<Stop,   TableTripPattern> vias    = ArrayListMultimap.create();
+            for (TableTripPattern pattern : routeTripPatterns) {
                 List<Stop> stops = pattern.getStops();
-                starts.put(stopNameAndId(stops.get(0)), pattern);
-                ends.put(stopNameAndId(stops.get(stops.size() - 1)), pattern);
-                for (Stop stop : stops) {
-                    vias.put(stopNameAndId(stop), pattern);
-                }
+                Stop start = stops.get(0);
+                Stop end   = stops.get(stops.size() - 1);
+                starts.put(start, pattern);
+                ends.put(end, pattern);
+                for (Stop stop : stops) vias.put(stop, pattern);
             }
-            PATTERN : for (TableTripPattern pattern : tableTripPatterns) {
+            PATTERN : for (TableTripPattern pattern : routeTripPatterns) {
                 List<Stop> stops = pattern.getStops();
-                String start = stopNameAndId(stops.get(0));
-                if (starts.get(start).size() == 1) {
-                    pattern.setName(routeName + " from " + start);
-                    continue PATTERN; // this is the only pattern with this first stop
-                }
-                String end = stopNameAndId(stops.get(stops.size() - 1));
-                if (ends.get(end).size() == 1) {
-                    pattern.setName(routeName + " to " + end);
-                    continue PATTERN; // this is the only pattern with this last stop
-                } 
-                // TODO favor stops with the most transfers when choosing "via"
-                for (Stop stop : stops) {
-                    String via = stopNameAndId(stop);
-                    if (vias.get(via).size() == 1) {
-                        pattern.setName(routeName + " via " + via);
-                        continue PATTERN; // this is the only pattern via this stop
-                    }
-                }
-                /**
-                 * now we have the case where no route has a unique start, stop, or via. This can happen
-                 * if you have a single route which serves trips on an H-shaped alignment, where trips
-                 * can start at A or B and end at either C or D, visiting the same sets of stops along
-                 * the shared segments.
-                 * 
-                 * <pre>
-                 *                    A      B
-                 *                    |      |
-                 *                    |------|
-                 *                    |      |
-                 *                    |      |
-                 *                    C      D
-                 * </pre>
-                 * 
-                 * First, we try unique start + end, then start + via + end, and if that doesn't work,
-                 * we check for expresses, and finally we use a random trip's id.
-                 * 
-                 * It can happen if there is an express and a local version of a given line where the
-                 * local starts and ends at the same place as the express but makes a strict superset of
-                 * stops; the local version will get a "via", but the express will be doomed.
-                 * 
-                 * We can first check for the local/express situation by saying that if there are a
-                 * subset of routes with the same start/end, and there is exactly one that can't be
-                 * named with start/end/via, call it "express".
-                 * 
-                 * Consider the following three trips (A, B, C) along a route with four stops. A is the
-                 * local, and gets "via stop 3"; B is a limited, and C is (logically) an express:
-                 * 
-                 * A,B,C -- A,B -- A -- A, B, C
-                 * 
-                 * Here, neither B nor C is nameable. If either were removed, the other would be called
-                 * "express".
-                 */
+                StringBuilder sb = new StringBuilder(routeName);
 
-                /* Find all patterns on this route with the same first and last stop as this one. */
+                /* First try to name with destination. */
+                Stop end = stops.get(stops.size() - 1);
+                sb.append(" to " + stopNameAndId(end));
+                if (ends.get(end).size() == 1) {
+                    pattern.setName(sb.toString());
+                    continue PATTERN; // only pattern with this last stop
+                }
+
+                /* Then try to name with origin. */
+                Stop start = stops.get(0);
+                sb.append(" from " + stopNameAndId(start));
+                if (starts.get(start).size() == 1) {
+                    pattern.setName(sb.toString());
+                    continue PATTERN; // only pattern with this first stop
+                }
+
+                /* Check whether (end, start) is unique. */
                 Set<TableTripPattern> remainingPatterns = Sets.newHashSet();
                 remainingPatterns.addAll(starts.get(start));
-                remainingPatterns.retainAll(ends.get(end));
+                remainingPatterns.retainAll(ends.get(end)); // set intersection
                 if (remainingPatterns.size() == 1) {
-                    pattern.setName(routeName + " from " + start + " to " + end);
+                    pattern.setName(sb.toString());
                     continue PATTERN;
                 }
-                /* Still not unique; try (start, via, end) for each via. */
-                for (Stop stop : stops) {
-                    String via = stopNameAndId(stop);
+
+                /* Still not unique; try (end, start, via) for each via. */
+                for (Stop via : stops) {
                     if (via.equals(start) || via.equals(end)) continue;
-                    boolean found = false;
-                    boolean bad = false;
-                    for (TableTripPattern viaPattern : vias.get(via)) {
-                        if (remainingPatterns.contains(viaPattern)) {
-                            if (found) {
-                                bad = true;
-                                break;
-                            } else {
-                                found = true;
-                            }
-                        }
-                    }
-                    if (found && !bad) {
-                        String name = routeName + " from " + start + " to " + end + " via " + via;
-                        pattern.setName(name);
+                    Set<TableTripPattern> intersection = Sets.newHashSet();
+                    intersection.addAll(remainingPatterns);
+                    intersection.retainAll(vias.get(via));
+                    if (intersection.size() == 1) {
+                        sb.append(" via " + stopNameAndId(via));
+                        pattern.setName(sb.toString());
                         continue PATTERN;
                     }
                 }
+                
                 /* Still not unique; check for express. */
                 if (remainingPatterns.size() == 2) {
                     // There are exactly two patterns sharing this start/end.
                     // The current one must be a subset of the other, because it has no unique via. 
                     // Therefore we call it the express.
-                    String name = routeName + " from " + start + " to " + end + " express";
-                    pattern.setName(name);
+                    sb.append(" express");
                 } else {
-                    /* The final fallback: reference a specific trip ID. */
-                    pattern.setName(routeName + " like trip " + pattern.getTrips().get(0).getId());
+                    // The final fallback: reference a specific trip ID.
+                    sb.append(" like trip " + pattern.getTrips().get(0).getId());
                 }
+                pattern.setName(sb.toString());
             } // END foreach PATTERN
         } // END foreach ROUTE
 
+        LOG.info("Done generating unique names for stop patterns on each route.");
+        if (LOG.isDebugEnabled()) {
+            for (Route route : patternsByRoute.keySet()) {
+                Collection<TableTripPattern> routeTripPatterns = patternsByRoute.get(route);             
+                LOG.debug("Named {} patterns in route {}", routeTripPatterns.size(), uniqueRouteNames.get(route));
+                for (TableTripPattern pattern : routeTripPatterns) {
+                    LOG.debug("    {} ({} stops)", pattern.getName(), pattern.stopPattern.size);
+                }
+            }
+        }
+        
     }
 
 }
