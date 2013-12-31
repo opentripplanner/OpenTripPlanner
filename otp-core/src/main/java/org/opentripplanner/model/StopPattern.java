@@ -69,7 +69,7 @@ public class StopPattern {
         StringBuilder sb = new StringBuilder();
         sb.append("StopPattern: ");
         for (int i = 0, j = stops.length; i < j; ++i) {
-            sb.append(String.format("%s [%d %d] ", stops[i].getCode(), pickups[i], dropoffs[i]));
+            sb.append(String.format("%s_%d%d ", stops[i].getCode(), pickups[i], dropoffs[i]));
         }
         return sb.toString();
     }
@@ -83,13 +83,21 @@ public class StopPattern {
     
     public StopPattern (List<StopTime> stopTimes) {
         this (stopTimes.size());
+        if (size == 0) return;
         for (int i = 0; i < size; ++i) {
             StopTime stopTime = stopTimes.get(i);
             stops[i] = stopTime.getStop();
             pickups[i] = stopTime.getPickupType();
             dropoffs[i] = stopTime.getDropOffType();
         }
+        /*
+         * TriMet GTFS has many trips that differ only in the pick/drop status of their initial and
+         * final stops. This may have something to do with interlining. Allowing dropoffs at the
+         * initial stop and pickups at the final merges similar patterns while having no effect on
+         * routing.
+         */
+        dropoffs[0] = 0;
+        pickups[size - 1] = 0;
     }
-
-    
+   
 }
