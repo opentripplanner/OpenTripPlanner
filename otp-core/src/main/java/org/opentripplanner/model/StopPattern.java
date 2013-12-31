@@ -1,5 +1,6 @@
 package org.opentripplanner.model;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.onebusaway.gtfs.model.Stop;
@@ -45,15 +46,23 @@ public class StopPattern {
 
     public boolean equals(Object other) {
         if (other instanceof StopPattern) {
-            StopPattern pattern = (StopPattern) other;
-            return pattern.stops.equals(stops) && pattern.pickups.equals(pickups) && pattern.dropoffs.equals(dropoffs);
+            StopPattern that = (StopPattern) other;
+            return Arrays.equals(this.stops,    that.stops) && 
+                   Arrays.equals(this.pickups,  that.pickups) && 
+                   Arrays.equals(this.dropoffs, that.dropoffs);
         } else {
             return false;
         }
     }
 
     public int hashCode() {
-        return this.stops.hashCode() + this.pickups.hashCode() + this.dropoffs.hashCode();
+        int hash = size;
+        hash += Arrays.hashCode(this.stops);
+        hash *= 31;
+        hash += Arrays.hashCode(this.pickups);
+        hash *= 31;
+        hash += Arrays.hashCode(this.dropoffs);
+        return hash;
     }
 
     public String toString() {
