@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
  * it saves two extra array elements in every stopTimes. It might be worth it to just use stop
  * indexes everywhere for simplicity.
  */
-public class TripTimes implements Serializable {
+public class TripTimes implements Serializable, Comparable<TripTimes> {
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
     private static final Logger LOG = LoggerFactory.getLogger(TripTimes.class);
 
@@ -598,5 +598,11 @@ public class TripTimes implements Serializable {
         @Override public int compare(TripTimes tt1, TripTimes tt2) {
             return tt1.getDepartureTime(hop) - tt2.getDepartureTime(hop);
         }
+    }
+
+    /* Allow sorting TripTimes based on first departure time. */
+    @Override
+    public int compareTo(TripTimes other) {
+        return this.getDepartureTime(0) - other.getDepartureTime(0);
     }
 }
