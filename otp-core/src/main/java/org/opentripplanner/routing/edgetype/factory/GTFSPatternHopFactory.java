@@ -345,7 +345,8 @@ public class GTFSPatternHopFactory {
 
     private FareServiceFactory fareServiceFactory;
 
-    private Multimap<BlockIdAndServiceId, TripTimes> tripTimesForBlock = ArrayListMultimap.create();
+    /* Need TripTimes rather than Trips, to allow sorting within blocks and linking up patterns. */
+    private ListMultimap<BlockIdAndServiceId, TripTimes> tripTimesForBlock = ArrayListMultimap.create();
 
 //    private Map<InterlineSwitchoverKey, PatternInterlineDwell> interlineDwells = new HashMap<InterlineSwitchoverKey, PatternInterlineDwell>();
 
@@ -423,7 +424,7 @@ public class GTFSPatternHopFactory {
 
     /** Generate the edges. Assumes that there are already vertices in the graph for the stops. */
     public void run(Graph graph) {
-        LOG.warn("BEGIN HOP GENERATION");
+        LOG.info("BEGIN HOP GENERATION");
         if (fareServiceFactory == null) {
             fareServiceFactory = new DefaultFareServiceFactory();
         }
@@ -446,7 +447,7 @@ public class GTFSPatternHopFactory {
         for(Frequency freq : _dao.getAllFrequencies()) {
             frequenciesForTrip.put(freq.getTrip(), freq);
         }
-
+        
         /* Then loop over all trips, handling each one as a frequency-based or scheduled trip. */
         TRIP : for (Trip trip : trips) {
 
@@ -501,14 +502,15 @@ public class GTFSPatternHopFactory {
                 // Else fall through and treat this trip as a non-frequency (table-based) one
             }
 
-            /* This trip is not frequency-based */
-            
+            /* This trip is not frequency-based, so it must be table-based. */
+
             /* Convert this trip and associated filtered stoptimes into a TripTimes object */
             StopPattern stopPattern = new StopPattern(stopTimes);
             TripTimes tripTimes = new TripTimes(trip, stopTimes);
-
-            /* Group this TripTimes with all others sharing the same block ID (for interlining later) */
-            tripTimesForBlock.put(new BlockIdAndServiceId(trip), trip);
+            /* Group TripTimes with all others sharing the same block ID (for interlining later) */
+            if (trip.getBlockId() != null) {
+                tripTimesForBlock.put(new BlockIdAndServiceId(tripTimes.getTrip()), tripTimes);
+            }
 
             /* Get the existing TableTripPattern for this StopPattern, or create one. */
             TableTripPattern tableTripPattern = tableTripPatterns.get(stopPattern);
@@ -523,8 +525,44 @@ public class GTFSPatternHopFactory {
             
         } // END foreach (TRIP)
 
+        /* Generate unique names for all the TableTripPatterns. */
+        TableTripPattern.generateUniqueNames(tableTripPatterns.values());
+        
+        /* Link up interlined trips (where a physical vehicle continues on to another logical trip). */
+        Map<TripTimes, TripTimes> interlinedTrips = Maps.newHashMap();
+        for (BlockIdAndServiceId block : tripTimesForBlock.keySet()) {
+            List<TripTimes> blockTripTimes = tripTimesForBlock.get(block);
+            /* Sort trips within the block by first departure time, then iterate over trips in this 
+             * block and schedule, linking them. Has no effect on single-trip blocks. 
+             * Storing TripTimes rather than trip, so we have both Pattern and Trip, 
+             * and can perform real time lookup. */
+            Collections.sort(blockTripTimes); 
+            TripTimes last = null;
+            for (TripTimes tripTimes : blockTripTimes) {
+                if (last != null) {
+                    interlinedTrips.put(last, tripTimes);
+                }
+                // TODO: Check for incoherence / trip times overlap.
+                last = tripTimes;
+            }
+        }
+
         /* Loop over all new TableTripPatterns, creating the vertices and edges for each pattern. */
         for (TableTripPattern tableTripPattern : tableTripPatterns.values()) {
+// TODO: ADD patterns
+//            ScheduledStopPattern stopPattern = ScheduledStopPattern.fromTrip(trip, stopTimes);
+//            TableTripPattern tripPattern = patterns.get(stopPattern);
+//            if (tripPattern == null) {
+//                // it's the first time we are encountering this stops+pickups+serviceId combination
+//                T2<TableTripPattern, List<PatternHop>> patternAndHops = makePatternVerticesAndEdges(graph, trip, stopPattern, stopTimes);
+//                List<PatternHop> hops = patternAndHops.getSecond();
+//                createGeometry(graph, trip, stopTimes, hops);
+//                tripPattern = patternAndHops.getFirst();
+//                patterns.put(stopPattern, tripPattern);
+//            } 
+//            tripPattern.addTrip(trip, stopTimes);
+//            return tripPattern;
+            
 //            // TODO split this into two actions: 
 //            // create edges after all patterns are known
 //            addPatternForTripToGraph(graph, trip, stopTimes);
@@ -534,94 +572,39 @@ public class GTFSPatternHopFactory {
 //            if (blockId != null && !blockId.equals("")) {
 //                addTripToInterliningMap(trip, stopTimes, tripPattern);
 //            }            
-            System.out.printf(" -- %s\n", tableTripPattern.getName());
+
+// MAKE DWELL edge per pattern as well
+// do we already have a PatternInterlineDwell edge for this dwell?
+//            PatternInterlineDwell dwell = getInterlineDwell(dwellKey);
+//            if (dwell == null) { 
+//                // create the dwell because it does not exist yet
+//                Vertex startJourney = context.patternArriveNodes.get(new T2<Stop, Trip>(s0, fromExemplar));
+//                Vertex endJourney = context.patternDepartNodes.get(new T2<Stop, Trip>(s1, toExemplar));
+//                // toTrip is just an exemplar; dwell edges can contain many trip connections
+//                dwell = new PatternInterlineDwell(startJourney, endJourney, toTrip);
+//                interlineDwells.put(dwellKey, dwell);
+//            }
+//            int dwellTime = st1.getDepartureTime() - st0.getArrivalTime();
+//            dwell.addTrip(fromTrip, toTrip, dwellTime,
+//                    fromInterlineTrip.getPatternIndex(), toInterlineTrip.getPatternIndex());
         }
-
-        /* Generate unique names for all the TableTripPatterns. */
-        TableTripPattern.generateUniqueNames(tableTripPatterns.values());
-        
-        /* link up interlined trips (where a vehicle continues on to another logical trip) */
-        for (List<InterliningTrip> blockTrips : tripsForBlock.values()) {
-
-            if (blockTrips.size() == 1) { 
-                continue; // skip blocks of only a single trip
-            }
-            Collections.sort(blockTrips); // sort trips within the block by first arrival time 
-            
-            /* iterate over trips in this block/schedule, linking them */
-            for (int i = 0; i < blockTrips.size() - 1; ++i) {
-                InterliningTrip fromInterlineTrip = blockTrips.get(i);
-                InterliningTrip toInterlineTrip = blockTrips.get(i + 1);
-
-                Trip fromTrip = fromInterlineTrip.trip;
-                Trip toTrip = toInterlineTrip.trip;
-                StopTime st0 = fromInterlineTrip.lastStopTime;
-                StopTime st1 = toInterlineTrip.firstStopTime;
-                Stop s0 = st0.getStop();
-                Stop s1 = st1.getStop();
-
-                if (st0.getPickupType() == 1) {
-                    /* do not create an interline dwell when the last stop on the arriving trip does
-                     * not allow pickups, since this probably means that, while two trips share a
-                     * block, riders cannot stay on the vehicle during the deadhead */
-                    continue;
-                }
-
-                // TODO: we should be keying vertex/edge collections on StopPatterns or TripPatterns, 
-                // not on the exemplar trips they contain.
-                Trip fromExemplar = fromInterlineTrip.tripPattern.exemplar;
-                Trip toExemplar = toInterlineTrip.tripPattern.exemplar;
-
-                // make a key representing all interline dwells between these same vertices
-                InterlineSwitchoverKey dwellKey = new InterlineSwitchoverKey(
-                        s0, s1, fromInterlineTrip.tripPattern, toInterlineTrip.tripPattern);
-                // do we already have a PatternInterlineDwell edge for this dwell?
-                PatternInterlineDwell dwell = getInterlineDwell(dwellKey);
-                if (dwell == null) { 
-                    // create the dwell because it does not exist yet
-                    Vertex startJourney = context.patternArriveNodes.get(new T2<Stop, Trip>(s0, fromExemplar));
-                    Vertex endJourney = context.patternDepartNodes.get(new T2<Stop, Trip>(s1, toExemplar));
-                    // toTrip is just an exemplar; dwell edges can contain many trip connections
-                    dwell = new PatternInterlineDwell(startJourney, endJourney, toTrip);
-                    interlineDwells.put(dwellKey, dwell);
-                }
-                int dwellTime = st1.getDepartureTime() - st0.getArrivalTime();
-                dwell.addTrip(fromTrip, toTrip, dwellTime,
-                        fromInterlineTrip.getPatternIndex(), toInterlineTrip.getPatternIndex());
-            }
-        } // END loop over interlining blocks 
         
         loadTransfers(graph);
-        if (_deleteUselessDwells) 
-            deleteUselessDwells(graph);
-//        /* this is the wrong place to do this: it should be done on all feeds at once, or at deserialization*/
-//        LOG.info("begin indexing large patterns");
-//        for (TableTripPattern tp : context.tripPatternIds.keySet()) {
-//            tp.finish();
-//        }
+        if (_deleteUselessDwells) deleteUselessDwells(graph);
+
+        /* Is this the wrong place to do this? it should be done on all feeds at once, or at deserialization*/
+        for (TableTripPattern tableTripPattern : tableTripPatterns.values()) {
+            tableTripPattern.getScheduledTimetable().finish();
+        }
+        
         clearCachedData(); // eh?
         graph.putService(FareService.class, fareServiceFactory.makeFareService());
         graph.putService(ServiceIdToNumberService.class, new ServiceIdToNumberService(context.serviceIds));
         graph.putService(OnBoardDepartService.class, new OnBoardDepartServiceImpl());
-        LOG.warn("END HOP GENERATION");
+        LOG.info("END HOP GENERATION");
 
     }
     
-    public TableTripPattern addPatternForTripToGraph(Graph graph, Trip trip, List<StopTime> stopTimes) {
-        ScheduledStopPattern stopPattern = ScheduledStopPattern.fromTrip(trip, stopTimes);
-        TableTripPattern tripPattern = patterns.get(stopPattern);
-        if (tripPattern == null) {
-            // it's the first time we are encountering this stops+pickups+serviceId combination
-            T2<TableTripPattern, List<PatternHop>> patternAndHops = makePatternVerticesAndEdges(graph, trip, stopPattern, stopTimes);
-            List<PatternHop> hops = patternAndHops.getSecond();
-            createGeometry(graph, trip, stopTimes, hops);
-            tripPattern = patternAndHops.getFirst();
-            patterns.put(stopPattern, tripPattern);
-        } 
-        tripPattern.addTrip(trip, stopTimes);
-        return tripPattern;
-    }
-
     static int cg = 0;
     private <T extends Edge & HopEdge> void createGeometry(Graph graph, Trip trip,
             List<StopTime> stopTimes, List<T> hops) {
@@ -1033,10 +1016,6 @@ public class GTFSPatternHopFactory {
         }
     }
 
-    private PatternInterlineDwell getInterlineDwell(InterlineSwitchoverKey key) {
-        return interlineDwells.get(key);
-    }
-
     private void loadPathways(Graph graph) {
         for (Pathway pathway : _dao.getAllPathways()) {
             Vertex fromVertex = context.stationStopNodes.get(pathway.getFromStop());
@@ -1097,17 +1076,6 @@ public class GTFSPatternHopFactory {
         LOG.debug("deleted {} dwell edges / {} candidates, merging arrival and departure vertices.", 
            nDeleted, nDwells);
         if (nDeleted > 0) graph.setDwellsDeleted(true);
-    }
-
-    private void addTripToInterliningMap(Trip trip, List<StopTime> stopTimes, TableTripPattern tripPattern) {
-        String blockId = trip.getBlockId();
-        BlockIdAndServiceId key = new BlockIdAndServiceId(blockId, trip.getServiceId()); 
-        List<InterliningTrip> trips = tripsForBlock.get(key);
-        if (trips == null) {
-            trips = new ArrayList<InterliningTrip>();
-            tripsForBlock.put(key, trips);
-        }
-        trips.add(new InterliningTrip(trip, stopTimes, tripPattern));
     }
 
     /**
@@ -1189,7 +1157,7 @@ public class GTFSPatternHopFactory {
     private T2<TableTripPattern, List<PatternHop>> makePatternVerticesAndEdges(Graph graph, Trip trip,
             ScheduledStopPattern stopPattern, List<StopTime> stopTimes) {
 
-        TableTripPattern tripPattern = new TableTripPattern(trip, stopPattern, getServiceId(trip));
+        TableTripPattern tripPattern = null; //new TableTripPattern(trip, stopPattern, getServiceId(trip));
         // These indexes may be used to make an array-based TimetableResolver if the current 
         // hashmap-based implementation turns out to be insufficient.
         // Otherwise, they can be replaced with a simple list of tripPatterns, so that their 
