@@ -257,7 +257,7 @@ public class Timetable implements Serializable {
     }
 
     /**
-     * Finish off a TripPattern once all TripTimes have been added to it. This involves caching
+     * Finish off a Timetable once all TripTimes have been added to it. This involves caching
      * lower bounds on the running times and dwell times at each stop, and may perform other
      * actions to compact the data structure such as trimming and deduplicating arrays.
      */
