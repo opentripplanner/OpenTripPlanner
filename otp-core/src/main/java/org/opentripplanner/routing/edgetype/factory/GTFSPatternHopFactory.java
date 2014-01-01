@@ -372,56 +372,6 @@ public class GTFSPatternHopFactory {
         this._calendarService = null;
     }
 
-    
-//  // There's already a departure at this time on this trip pattern. This means
-//  // that either (a) this will have all the same stop times as that one, and thus
-//  // will be a duplicate of it, or (b) it will have different stops, and thus
-//  // break the assumption that trips are non-overlapping.
-//  if (!tripPattern.stopTimesIdentical(stopTimes, insertionPoint)) {
-//      LOG.warn(GraphBuilderAnnotation.register(graph,
-//              Variety.TRIP_DUPLICATE_DEPARTURE, trip.getId(),
-//              tripPattern.getTrip(insertionPoint)));
-//      simple = true;
-//      createSimpleHops(graph, trip, stopTimes);
-//  } else {
-//      LOG.warn(GraphBuilderAnnotation.register(graph, Variety.TRIP_DUPLICATE,
-//              trip.getId(), tripPattern.getTrip(insertionPoint)));
-//      simple = true;
-//  }
-
-
-/* check stoptimes for negative hops and dwells (midnight crossings?) */
-//for (int i = 0; i < stopTimes.size() - 1; i++) {
-//StopTime st0 = stopTimes.get(i);
-//StopTime st1 = stopTimes.get(i + 1);
-//
-//int dwellTime = st0.getDepartureTime() - st0.getArrivalTime();
-//int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
-//
-//if (runningTime < 0) {
-//  LOG.warn(GraphBuilderAnnotation.register(graph, Variety.NEGATIVE_HOP_TIME, st0, st1));
-//  
-//  break;
-//}
-//if (dwellTime < 0) {
-//  LOG.warn(GraphBuilderAnnotation.register(graph,
-//          Variety.NEGATIVE_DWELL_TIME, st0));
-//  dwellTime = 0;
-//}
-//
-//try {
-//  tripPattern.addHop(i, insertionPoint, st0.getDepartureTime(),
-//          runningTime, st1.getArrivalTime(), dwellTime,
-//          st0.getStopHeadsign(), trip);
-//} catch (TripOvertakingException e) {
-//  LOG.warn(GraphBuilderAnnotation.register(graph,
-//          Variety.TRIP_OVERTAKING, e.overtaker, e.overtaken, e.stopIndex));
-//  createSimpleHops(graph, trip, stopTimes);
-//  simple = true;
-//  break;
-//}
-//}
-
     /** Generate the edges. Assumes that there are already vertices in the graph for the stops. */
     public void run(Graph graph) {
         LOG.info("BEGIN HOP GENERATION");
@@ -1219,49 +1169,6 @@ public class GTFSPatternHopFactory {
         return new T2<TableTripPattern, List<PatternHop>>(tripPattern, hops);
     }
     
-    
-    // originally in makeTripPattern method (duplicate trip adding code and flags code):
-//        tripPattern.setTripFlags(0, 
-//                ((trip.getWheelchairAccessible() == 1) ? TripPattern.FLAG_WHEELCHAIR_ACCESSIBLE : 0)
-//                
-//                | 
-//                
-//                (((trip.getRoute().getBikesAllowed() == 2 && trip.getTripBikesAllowed() != 1)
-//                    || trip.getTripBikesAllowed() == 2) ? TripPattern.FLAG_BIKES_ALLOWED : 0));
-//
-//        tripPattern.addHop(i, 0, departureTime, runningTime, arrivalTime, dwellTime,
-//                st0.getStopHeadsign(), trip);
-//        StopTime st1 = null;
-//        for (int i = 0; i < lastStop; i++) {           
-//            StopTime st0 = stopTimes.get(i);
-//            Stop s0 = st0.getStop();
-//            st1 = stopTimes.get(i + 1);
-//            Stop s1 = st1.getStop();
-//
-//            int arrivalTime = st1.getArrivalTime();
-//            int departureTime = st0.getDepartureTime();
-//
-//            int dwellTime = st0.getDepartureTime() - st0.getArrivalTime();
-//            int runningTime = arrivalTime - departureTime ;
-//
-//            if (runningTime < 0) {
-//                LOG.warn(GraphBuilderAnnotation.register(graph,
-//                        Variety.NEGATIVE_HOP_TIME, st0, st1));
-//                //back out hops and give up
-//                for (Edge e: createdEdges) {
-//                    e.getFromVertex().removeOutgoing(e);
-//                    e.getToVertex().removeIncoming(e);
-//                }
-//                for (Vertex v : createdVertices) {
-//                    graph.removeVertexAndEdges(v);
-//                }
-//                return null;
-//            }
-//
-//        }
-//
-//    }
-
     private int getServiceId(Trip trip) {
         AgencyAndId gtfsId = trip.getServiceId();
         Integer id = context.serviceIds.get(gtfsId);
