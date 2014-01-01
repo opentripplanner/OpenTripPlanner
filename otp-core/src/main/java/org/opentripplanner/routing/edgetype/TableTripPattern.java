@@ -37,13 +37,15 @@ import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.common.MavenVersion;
-import org.opentripplanner.common.model.P2;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.routing.vertextype.PatternArriveVertex;
+import org.opentripplanner.routing.vertextype.PatternDepartVertex;
+import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,6 +107,17 @@ public class TableTripPattern implements TripPattern, Serializable {
     @Getter @Setter
     private String code;
     
+    /* The vertices in the Graph that correspond to each Stop in this pattern. */
+    public final TransitStop[] stopVertices;
+    public final PatternDepartVertex[] departVertices;
+    public final PatternArriveVertex[] arriveVertices;
+    
+    /* The Edges in the graph that correspond to each Stop in this pattern. */
+    public final TransitBoardAlight[]  boardEdges;
+    public final TransitBoardAlight[]  alightEdges;
+    public final PatternHop[]          hopEdges;
+    public final PatternDwell[]        dwellEdges;
+
     // redundant since tripTimes have a trip
     // however it's nice to have for order reference, since all timetables must have tripTimes
     // in this order, e.g. for interlining. 
@@ -127,7 +140,7 @@ public class TableTripPattern implements TripPattern, Serializable {
      * This appears to only be used for on-board departure. TODO: stops can now be grabbed from
      * stopPattern.
      */
-    private PatternHop[] patternHops;
+    private PatternHop[] patternHops; // TODO rename/merge with hopEdges
 
     /** Holds stop-specific information such as wheelchair accessibility and pickup/dropoff roles. */
     // TODO: is this necessary? Can we just look at the Stop and StopPattern objects directly?
@@ -140,7 +153,17 @@ public class TableTripPattern implements TripPattern, Serializable {
     public TableTripPattern(Route route, StopPattern stopPattern) {
         this.route = route;
         this.stopPattern = stopPattern;
+        int size = stopPattern.size;
         setStopsFromStopPattern(stopPattern);
+        
+        /* Create properly dimensioned arrays for all the vertices/edges associated with this pattern. */
+        stopVertices   = new TransitStop[size];
+        departVertices = new PatternDepartVertex[size];
+        arriveVertices = new PatternArriveVertex[size];
+        boardEdges     = new TransitBoardAlight[size];
+        alightEdges    = new TransitBoardAlight[size];
+        hopEdges       = new PatternHop[size];
+        dwellEdges     = new PatternDwell[size];
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
