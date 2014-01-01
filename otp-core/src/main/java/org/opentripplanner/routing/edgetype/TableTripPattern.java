@@ -42,10 +42,15 @@ import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.factory.GtfsStopContext;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.routing.vertextype.PatternDepartVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.TransitStopArrive;
+import org.opentripplanner.routing.vertextype.TransitStopDepart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -548,6 +553,61 @@ public class TableTripPattern implements TripPattern, Serializable {
             }
         }
         
+    }
+    
+    /**
+     * Repetitive logic pulled out of makePatternVerticesAndEdges().
+     * No longer works because we don't have access to the DAO here.
+     * But moving the makePatternVerticesAndEdges into TableTripPattern seems cleaner (certainly looks cleaner). 
+     */
+    private <T> T getStopOrParent(Map<Stop, T> map, Stop stop, Graph graph) {
+        T vertex = map.get(stop);
+        if (vertex == null) {
+            Stop parent = null; //_dao.getStopForId(new AgencyAndId(stop.getId().getAgencyId(), stop.getParentStation()));
+            vertex = map.get(parent);
+            /* FIXME: this is adding an annotation for a specific problem, but all we know is that the stop vertex does not exist. */
+            if (vertex == null) {
+                //LOG.warn(graph.addBuilderAnnotation(new StopAtEntrance(stop, false)));
+            } else {
+                //LOG.warn(graph.addBuilderAnnotation(new StopAtEntrance(stop, true)));
+            }
+        }
+        return vertex;
+    }
+    
+    /**
+     * Create the PatternStop vertices and PatternBoard/Hop/Dwell/Alight edges corresponding to a
+     * StopPattern/TripPattern. StopTimes are passed in instead of Stops only because they are
+     * needed for shape distances (actually, stop sequence numbers?).
+     * 
+     * TODO move GtfsStopContext into Graph.
+     */
+    public void makePatternVerticesAndEdges(Graph graph, GtfsStopContext context) {
+
+        /* Create arrive/depart vertices and hop/dwell/board/alight edges for each hop in this pattern. */ 
+        PatternArriveVertex pav0, pav1 = null;
+        PatternDepartVertex pdv0;
+        for (int hop = 0; hop < this.getHopCount(); hop++) {
+            Stop s0 = stopPattern.stops[hop];
+            Stop s1 = stopPattern.stops[hop + 1];
+            pdv0 = new PatternDepartVertex(graph, this, s0);
+            departVertices[hop] = pdv0;
+            if (hop > 0) {
+                pav0 = pav1;
+                new PatternDwell(pav0, pdv0, hop, this);
+            }
+            pav1 = new PatternArriveVertex(graph, this, s1);
+            arriveVertices[hop + 1] = pav1;
+            new PatternHop(pdv0, pav1, s0, s1, hop);
+
+            /* Get the arrive and depart vertices for the current stop (not pattern stop). */
+            TransitStopDepart stopDepart = getStopOrParent(context.stopDepartNodes, s0, graph);
+            TransitStopArrive stopArrive = getStopOrParent(context.stopArriveNodes, s1, graph);
+            TraverseMode mode = null; // FIXME
+            stopArrive.getStopVertex().addMode(mode);
+            new TransitBoardAlight(stopDepart, pdv0, hop, mode);
+            new TransitBoardAlight(pav1, stopArrive, hop + 1, mode);
+        }        
     }
 
 }
