@@ -470,7 +470,7 @@ public class GTFSPatternHopFactory {
             }
 
             /* Add the stoptimes for the current trip to the appropriate TableTripPattern. */
-            /* This effectively groups trips by the sequence of stops they call at. */
+            /* This effectively groups trips by the sequence of stops they visit. */
             tableTripPattern.addTrip(trip, stopTimes);
             
         } // END foreach (TRIP)
@@ -542,7 +542,8 @@ public class GTFSPatternHopFactory {
         loadTransfers(graph);
         if (_deleteUselessDwells) deleteUselessDwells(graph);
 
-        /* Is this the wrong place to do this? it should be done on all feeds at once, or at deserialization*/
+        /* Is this the wrong place to do this? It should be done on all feeds at once, or at deserialization. */
+        // it is already done at deserialization, but standalone mode allows using graphs without serializing them.
         for (TableTripPattern tableTripPattern : tableTripPatterns.values()) {
             tableTripPattern.getScheduledTimetable().finish();
         }
