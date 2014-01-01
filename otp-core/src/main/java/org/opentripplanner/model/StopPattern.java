@@ -39,7 +39,7 @@ public class StopPattern {
     public static final int PICKDROP_CALL_AGENCY = 2;
     public static final int PICKDROP_COORDINATE_WITH_DRIVER = 3;
     
-    public final int size;
+    public final int size; // property could be derived from arrays
     public final Stop[] stops;
     public final int[]  pickups;
     public final int[]  dropoffs;

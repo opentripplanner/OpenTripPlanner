@@ -56,7 +56,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
 
     private int stopIndex;
 
-    private int modeMask;
+    private int modeMask; // TODO: via TablePatternEdge it should be possible to grab this from the pattern
    
     @Getter
     private boolean boarding;
