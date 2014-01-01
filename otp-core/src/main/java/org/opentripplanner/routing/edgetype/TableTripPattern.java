@@ -73,9 +73,10 @@ public class TableTripPattern implements TripPattern, Serializable {
     public static final int NO_PICKUP = 1;
     public static final int FLAG_BIKES_ALLOWED = 32;
 
-    /** 
-     * The GTFS Route of all trips in this pattern. GTFS allows the same pattern to appear in more than one route, 
-     * but we make the assumption that all trips with the same pattern belong to the same Route.  
+    /**
+     * The GTFS Route of all trips in this pattern. GTFS allows the same pattern to appear in more
+     * than one route, but we make the assumption that all trips with the same pattern belong to the
+     * same Route.
      */
     @Getter 
     public final Route route;
@@ -104,7 +105,6 @@ public class TableTripPattern implements TripPattern, Serializable {
     @Getter @Setter
     private String code;
     
-    
     // redundant since tripTimes have a trip
     // however it's nice to have for order reference, since all timetables must have tripTimes
     // in this order, e.g. for interlining. 
@@ -119,19 +119,22 @@ public class TableTripPattern implements TripPattern, Serializable {
     final ArrayList<Trip> trips = new ArrayList<Trip>();
 
     /**
-     * An ordered list of related PatternHop. All trips in a pattern have the same stops and a
-     * PatternHop apply to all those trips, so this array apply to every trip in every timetable in
-     * this pattern. Please note that the array size is the number of stops minus 1. This also allow
-     * to access the ordered list of stops.
+     * An ordered list of PatternHop edges associated with this pattern. All trips in a pattern have
+     * the same stops and a PatternHop apply to all those trips, so this array apply to every trip
+     * in every timetable in this pattern. Please note that the array size is the number of stops
+     * minus 1. This also allow to access the ordered list of stops.
      * 
-     * This appears to only be used for on-board departure. TODO: stops can now be grabbed from stopPattern.
+     * This appears to only be used for on-board departure. TODO: stops can now be grabbed from
+     * stopPattern.
      */
     private PatternHop[] patternHops;
 
     /** Holds stop-specific information such as wheelchair accessibility and pickup/dropoff roles. */
+    // TODO: is this necessary? Can we just look at the Stop and StopPattern objects directly?
     @XmlElement int[] perStopFlags;
     
     /** Optimized serviceId code. All trips in a pattern are by definition on the same service. */
+    // TODO REMOVE, MOVE INTO Timetable or trip
     int serviceId; 
     
     public TableTripPattern(Route route, StopPattern stopPattern) {
