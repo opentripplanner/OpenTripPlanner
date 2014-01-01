@@ -57,9 +57,9 @@ public class Timetable implements Serializable {
      */
     private static final int INDEX_THRESHOLD = 16;
 
-    /**
-     * This creates a circular reference between trippatterns and timetables.
-     * Be careful during serialization.
+    /** 
+     * This creates a circular reference between trippatterns and timetables. 
+     * Be careful during serialization. 
      */
     private final TableTripPattern pattern;
 
@@ -95,11 +95,11 @@ public class Timetable implements Serializable {
      */
     private transient int bestDwellTimes[];
 
-    /**
-     * Helps determine whether a particular pattern is worth searching for departures at a given time.
+    /** 
+     * Helps determine whether a particular pattern is worth searching for departures at a given time. 
      */
     private transient int minDepart, maxArrive;
-
+    
     /** Construct an empty Timetable. */
     public Timetable(TableTripPattern pattern) {
         tripTimes = new ArrayList<TripTimes>();
@@ -255,7 +255,7 @@ public class Timetable implements Serializable {
         // the dwell time of a hop is the dwell time *before* that hop.
         return tripTimes.get(trip).getDwellTime(hop);
     }
-
+    
     /**
      * Finish off a Timetable once all TripTimes have been added to it. This involves caching
      * lower bounds on the running times and dwell times at each stop, and may perform other
@@ -293,7 +293,7 @@ public class Timetable implements Serializable {
         /* In large timetables, index stoptimes to allow binary searches over trips. */
         if (nTrips > INDEX_THRESHOLD) {
             LOG.trace("indexing pattern with {} trips", nTrips);
-            index();
+            index(); 
         } else {
             arrivalsIndex = null;
             departuresIndex = null;
@@ -301,7 +301,7 @@ public class Timetable implements Serializable {
         /* Detect trip overlap modulo 24 hours. Allows departure search optimizations. */
         minDepart = Integer.MAX_VALUE;
         maxArrive = Integer.MIN_VALUE;
-        for (int t = 0; t < nTrips; ++t) {
+        for (int t = 0; t < nTrips; ++t) { 
             int depart = getDepartureTime(0, t);
             int arrive = getArrivalTime(nHops - 1, t);
             if (minDepart > depart) {
@@ -627,4 +627,18 @@ public class Timetable implements Serializable {
     public boolean isValidFor(ServiceDate serviceDate) {
         return this.serviceDate == null || this.serviceDate.equals(serviceDate);
     }
-}
+    
+    /** 
+     * @return true if any two trips in this timetable overlap, modulo 24 hours. Helps determine
+     * whether we need to look at more than one day when performing departure/arrival searches.
+     */
+    private boolean tripsOverlap() {
+        return maxArrive - minDepart > (24 * 60 * 60);
+    }
+    
+    /** @return true if any trip in this timetable contains a stoptime greater than 24 hours. */
+    private boolean crossesMidnight() {
+        return maxArrive > (24 * 60 * 60);
+    }
+    
+} 
