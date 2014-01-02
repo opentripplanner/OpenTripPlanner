@@ -61,8 +61,8 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
 
     private int modeMask; // TODO: via TablePatternEdge it should be possible to grab this from the pattern
    
-    @Getter
-    private boolean boarding;
+    /** True if this edge represents boarding a vehicle, false if it represents alighting. */
+    @Getter private boolean boarding;
 
     /** Boarding constructor (TransitStopDepart --> PatternStopVertex) */
     public TransitBoardAlight (TransitStopDepart fromStopVertex, PatternStopVertex toPatternVertex, 
@@ -153,21 +153,18 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
     public State traverse(State state0, long arrivalTimeAtStop) {
         RoutingContext rctx = state0.getContext();
         RoutingRequest options = state0.getOptions();
-        // this method is on State not RoutingRequest because we care whether the user is in
-        // possession of a rented bike.
-        TraverseMode mode = state0.getNonTransitMode();
+        TraverseMode streetMode = state0.getNonTransitMode();
 
-        // Determine whether we are going onto or off of transit.
-        // We are leaving transit iff the edge is a boarding and the search is arrive-by, 
-        // or the edge is not a boarding and the search is not arrive-by.
-        boolean offTransit = (boarding && options.isArriveBy()) || 
+        /* Determine whether we are going onto or off of transit. */
+        boolean leavingTransit = 
+                ( boarding &&  options.isArriveBy()) || 
                 (!boarding && !options.isArriveBy()); 
         
         // NOTE: We don't need to check the pickup/drop off type. 
         // Edges are simply not created for type 1 (no pick/drop).
         
         /* TODO pull on/off transit out into two functions. */
-        if (offTransit) { 
+        if (leavingTransit) { 
             /* We are leaving transit, not as much to do. */
             // When a dwell edge has been eliminated, do not alight immediately after boarding.
             // Perhaps this should be handled by PathParser.
@@ -175,8 +172,6 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                 return null;
             }
             StateEditor s1 = state0.edit(this);
-            int type = this.getBoardAlightType();
-                
             s1.setTripId(null);
             s1.setLastAlightedTimeSeconds(state0.getTimeSeconds());
             // Store the stop we are alighting at, for computing stop-to-stop transfer times,
@@ -202,7 +197,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             // during reverse optimization, board costs should be applied to PatternBoards
             // so that comparable trip plans result (comparable to non-optimized plans)
             if (options.isReverseOptimizing())
-                s1.incrementWeight(options.getBoardCost(mode));
+                s1.incrementWeight(options.getBoardCost(streetMode));
 
             if (options.isReverseOptimizeOnTheFly()) {
                 int thisDeparture = state0.getTripTimes().getDepartureTime(stopIndex);
@@ -270,7 +265,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                 int wait;
                 /* Find the next or prev departure depending on final boolean parameter. */
                 TripTimes tripTimes = getPattern().getNextTrip(stopIndex, secondsSinceMidnight, 
-                        state0, sd, mode == TraverseMode.BICYCLE, boarding);
+                        state0, sd, streetMode == TraverseMode.BICYCLE, boarding);
                 if (tripTimes != null) {
                     /* Wait is relative to departures on board and arrivals on alight. */
                     wait = boarding ? 
@@ -342,7 +337,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             if (options.isReverseOptimizing()) {
                 s1.incrementWeight(wait_cost);
             } else {
-                s1.incrementWeight(wait_cost + options.getBoardCost(mode));
+                s1.incrementWeight(wait_cost + options.getBoardCost(streetMode));
             }
             
             // On-the-fly reverse optimization

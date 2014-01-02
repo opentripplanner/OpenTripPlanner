@@ -476,8 +476,13 @@ public class State implements Cloneable {
         return stateData.opt;
     }
     
-    /* will return BICYCLE if routing with an owned bicycle, or if at this state the user is holding
-     * on to a rented bicycle */
+    /**
+     * This method is on State rather than RoutingRequest because we care whether the user is in
+     * possession of a rented bike.
+     * 
+     * @return BICYCLE if routing with an owned bicycle, or if at this state the user is holding on
+     *         to a rented bicycle.
+     */
     public TraverseMode getNonTransitMode() {
         return stateData.nonTransitMode;
     }
