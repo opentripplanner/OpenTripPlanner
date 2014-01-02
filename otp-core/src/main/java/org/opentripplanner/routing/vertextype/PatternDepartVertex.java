@@ -13,32 +13,24 @@
 
 package org.opentripplanner.routing.vertextype;
 
-import org.onebusaway.gtfs.model.StopTime;
-import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.routing.graph.Graph;
 
 public class PatternDepartVertex extends PatternStopVertex {
 
-    private static final long serialVersionUID = -1458696615022789418L;
+    private static final long serialVersionUID = 20140101;
 
-    // stop could be pulled from pattern?
+    /** constructor for table trip patterns */
+    public PatternDepartVertex(Graph g, StopPattern pattern, int stopIndex) {
+        super(g, makeLabel(pattern, stopIndex), null, pattern.stops[stopIndex]);
+    }
+
+    // constructor for single-trip hops with no trip pattern (frequency patterns) is now missing
+    // it is possible to have both a freq and non-freq pattern with the same stop pattern
+
+    private static String makeLabel(StopPattern pattern, int stop) {
+        return String.format("%d_%02d_D", System.identityHashCode(pattern), stop);
+    }
+
     
-    // constructor for multi-trip trip patterns
-    public PatternDepartVertex(Graph g, TableTripPattern tripPattern, StopTime stopTime) {
-        super(g, makeLabel(tripPattern.getExemplar(), stopTime), tripPattern, stopTime.getStop());
-    }
-
-    // constructor for single-trip hops with no trip pattern
-    public PatternDepartVertex(Graph g, Trip trip, StopTime stopTime) {
-        super(g, makeLabel(trip, stopTime), null, stopTime.getStop());
-    }
-
-    private static String makeLabel(Trip t, StopTime st) {
-        return GtfsLibrary.convertIdToString(st.getStop().getId()) + "_" + 
-                GtfsLibrary.convertIdToString(t.getId()) + "_" + 
-                st.getStopSequence() + "_D";
-    }
-
 }
