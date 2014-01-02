@@ -157,7 +157,6 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
     public State traverse(State s0, long arrivalTimeAtStop) {
         RoutingContext rctx = s0.getContext();
         RoutingRequest options = s0.getOptions();
-        TraverseMode streetMode = s0.getNonTransitMode();
 
         /*
          * Determine whether we are going onto or off of transit. Entering and leaving transit is
@@ -202,7 +201,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             // during reverse optimization, board costs should be applied to PatternBoards
             // so that comparable trip plans result (comparable to non-optimized plans)
             if (options.isReverseOptimizing())
-                s1.incrementWeight(options.getBoardCost(streetMode));
+                s1.incrementWeight(options.getBoardCost(s0.getNonTransitMode()));
 
             if (options.isReverseOptimizeOnTheFly()) {
                 int thisDeparture = s0.getTripTimes().getDepartureTime(stopIndex);
@@ -270,7 +269,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                 int wait;
                 /* Find the next or prev departure depending on final boolean parameter. */
                 TripTimes tripTimes = getPattern().getNextTrip(stopIndex, secondsSinceMidnight, 
-                        s0, sd, streetMode == TraverseMode.BICYCLE, boarding);
+                        s0, sd, s0.getNonTransitMode() == TraverseMode.BICYCLE, boarding);
                 if (tripTimes != null) {
                     /* Wait is relative to departures on board and arrivals on alight. */
                     wait = boarding ? 
@@ -342,7 +341,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             if (options.isReverseOptimizing()) {
                 s1.incrementWeight(wait_cost);
             } else {
-                s1.incrementWeight(wait_cost + options.getBoardCost(streetMode));
+                s1.incrementWeight(wait_cost + options.getBoardCost(s0.getNonTransitMode()));
             }
             
             // On-the-fly reverse optimization
