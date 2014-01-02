@@ -601,10 +601,18 @@ public class TableTripPattern implements TripPattern, Serializable {
             /* Get the arrive and depart vertices for the current stop (not pattern stop). */
             TransitStopDepart stopDepart = getStopOrParent(context.stopDepartNodes, s0, graph);
             TransitStopArrive stopArrive = getStopOrParent(context.stopArriveNodes, s1, graph);
+
+            /* Add this pattern's route's mode to the modes for this Stop. */
             TraverseMode mode = GtfsLibrary.getTraverseMode(this.route);
-            stopArrive.getStopVertex().addMode(mode);
-            boardEdges[hop] = new TransitBoardAlight(stopDepart, pdv0, hop, mode);
-            alightEdges[hop +1] = new TransitBoardAlight(pav1, stopArrive, hop + 1, mode);
+            stopArrive.getStopVertex().addMode(mode); // isn't this skipping the first stop in the pattern?
+
+            /* Create board/alight edges, but only if pickup/dropoff is enabled in GTFS. */
+            if (this.canBoard(hop)) {
+                boardEdges[hop] = new TransitBoardAlight(stopDepart, pdv0, hop, mode);
+            }
+            if (this.canAlight(hop + 1)) {
+                alightEdges[hop +1] = new TransitBoardAlight(pav1, stopArrive, hop + 1, mode);
+            }
         }        
     }
 
