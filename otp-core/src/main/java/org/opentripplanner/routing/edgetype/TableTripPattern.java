@@ -590,20 +590,20 @@ public class TableTripPattern implements TripPattern, Serializable {
         for (int hop = 0; hop < this.getHopCount(); hop++) {
             Stop s0 = stopPattern.stops[hop];
             Stop s1 = stopPattern.stops[hop + 1];
-            pdv0 = new PatternDepartVertex(graph, this, s0);
+            pdv0 = new PatternDepartVertex(graph, this, hop);
             departVertices[hop] = pdv0;
             if (hop > 0) {
                 pav0 = pav1;
                 new PatternDwell(pav0, pdv0, hop, this);
             }
-            pav1 = new PatternArriveVertex(graph, this, s1);
+            pav1 = new PatternArriveVertex(graph, this, hop + 1);
             arriveVertices[hop + 1] = pav1;
             new PatternHop(pdv0, pav1, s0, s1, hop);
 
             /* Get the arrive and depart vertices for the current stop (not pattern stop). */
             TransitStopDepart stopDepart = getStopOrParent(context.stopDepartNodes, s0, graph);
             TransitStopArrive stopArrive = getStopOrParent(context.stopArriveNodes, s1, graph);
-            TraverseMode mode = null; // FIXME
+            TraverseMode mode = GtfsLibrary.getTraverseMode(this.route);
             stopArrive.getStopVertex().addMode(mode);
             new TransitBoardAlight(stopDepart, pdv0, hop, mode);
             new TransitBoardAlight(pav1, stopArrive, hop + 1, mode);
