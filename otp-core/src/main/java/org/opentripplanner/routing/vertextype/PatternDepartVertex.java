@@ -29,7 +29,7 @@ public class PatternDepartVertex extends PatternStopVertex {
     // it is possible to have both a freq and non-freq pattern with the same stop pattern
 
     private static String makeLabel(TableTripPattern pattern, int stop) {
-        return String.format("%d_%02d_D", System.identityHashCode(pattern), stop);
+        return String.format("%s_%02d_D", pattern.getCode(), stop);
     }
 
     

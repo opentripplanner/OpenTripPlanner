@@ -55,7 +55,6 @@ import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
-import org.opentripplanner.routing.core.ServiceIdToNumberService;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -618,7 +617,7 @@ public class PlanGeneratorTest {
         serviceId.put(secondTrip.getId(), secondTripPattern.getServiceId());
         serviceId.put(thirdTrip.getId(), thirdTripPattern.getServiceId());
 
-        ServiceIdToNumberService serviceIdToNumberService = new ServiceIdToNumberService(serviceId);
+        graph.serviceIdIntegers = serviceId;
 
         CalendarServiceData calendarServiceData = new CalendarServiceDataStub(serviceId.keySet());
         CalendarServiceImpl calendarServiceImpl = new CalendarServiceImpl(calendarServiceData);
@@ -673,7 +672,7 @@ public class PlanGeneratorTest {
                 thirdTripPattern, tripUpdate, "Ferry", timeZone, serviceDate);
 
         // Further graph initialization
-        graph.putService(ServiceIdToNumberService.class, serviceIdToNumberService);
+        graph.serviceIdIntegers = serviceId;
         graph.putService(CalendarServiceData.class, calendarServiceData);
         graph.putService(FareService.class, fareServiceStub);
         graph.addAgency(trainAgency);

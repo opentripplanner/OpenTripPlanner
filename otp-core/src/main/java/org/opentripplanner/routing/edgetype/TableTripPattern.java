@@ -18,6 +18,7 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -110,7 +111,7 @@ public class TableTripPattern implements TripPattern, Serializable {
     
     /** The short unique identifier for this trip pattern. */
     @Getter @Setter
-    private String code;
+    private String code = Integer.toHexString(System.identityHashCode(this));
     
     /* The vertices in the Graph that correspond to each Stop in this pattern. */
     public final TransitStop[] stopVertices;
@@ -151,16 +152,17 @@ public class TableTripPattern implements TripPattern, Serializable {
     // TODO: is this necessary? Can we just look at the Stop and StopPattern objects directly?
     @XmlElement int[] perStopFlags;
     
-    /** Optimized serviceId code. All trips in a pattern are by definition on the same service. */
-    // TODO REMOVE, MOVE INTO Timetable or trip
-    int serviceId; 
-    
+    /** Optimized serviceId codes. Trips in a pattern are NO LONGER NECESSARILY on the same service. */
+    // this is a set of all the running services on this pattern.
+    // TODO MOVE single codes INTO Timetable or trip
+    BitSet services;
+
     public TableTripPattern(Route route, StopPattern stopPattern) {
         this.route = route;
         this.stopPattern = stopPattern;
         int size = stopPattern.size;
         setStopsFromStopPattern(stopPattern);
-        
+
         /* Create properly dimensioned arrays for all the vertices/edges associated with this pattern. */
         stopVertices   = new TransitStop[size];
         departVertices = new PatternDepartVertex[size];
@@ -268,11 +270,6 @@ public class TableTripPattern implements TripPattern, Serializable {
      */
     public int getNumScheduledTrips () {
         return trips.size();
-    }
-    
-    // TODO: Lombokize all boilerplate... but lombok does not generate javadoc :/ 
-    public int getServiceId() { 
-        return serviceId;
     }
     
     /** 
@@ -608,6 +605,27 @@ public class TableTripPattern implements TripPattern, Serializable {
             new TransitBoardAlight(stopDepart, pdv0, hop, mode);
             new TransitBoardAlight(pav1, stopArrive, hop + 1, mode);
         }        
+        //dumpServices();
+    }
+
+    public void dumpServices() {
+        Set<AgencyAndId> services = Sets.newHashSet();
+        for (Trip trip : this.trips) {
+            services.add(trip.getServiceId());
+        }
+        LOG.info("route {} : {}", route, services);
+    }
+
+    /**
+     * A bit strange place to set service codes all at once when TripTimes are already added,
+     * but we need a reference to the Graph or at least the codes map. This could also be 
+     * placed in the hop factory itself.
+     */
+    public void setServiceCodes (Map<AgencyAndId, Integer> serviceCodes) {
+        services = new BitSet();
+        for (Trip trip : trips) {
+            services.set(serviceCodes.get(trip.getServiceId()));
+        }
     }
 
 }

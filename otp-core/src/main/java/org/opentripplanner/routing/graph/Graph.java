@@ -71,10 +71,11 @@ import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.beust.jcommander.internal.Sets;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multiset;
+import com.google.common.collect.Sets;
 import com.vividsolutions.jts.geom.Envelope;
 import lombok.Getter;
 
@@ -128,6 +129,12 @@ public class Graph implements Serializable {
 
     public transient StreetVertexIndexService streetIndex;
 
+    /** 
+     * Map from GTFS ServiceIds to integers close to 0. Allows using BitSets instead of Set<Object>.
+     * An empty Map is created before the Graph is built to allow registering IDs from multiple feeds.   
+     */
+    public final Map<AgencyAndId,Integer> serviceCodes = Maps.newHashMap();
+    
     @Getter
     @Setter
     private transient TimetableSnapshotSource timetableSnapshotSource = null;

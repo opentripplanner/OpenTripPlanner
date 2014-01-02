@@ -13,6 +13,8 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import java.util.BitSet;
+
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -223,32 +225,31 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
              * after finding today's 25:00 trip we would never find tomorrow's 00:30 trip. */
             long current_time = state0.getTimeSeconds();
             int bestWait = -1;
-            TripTimes bestTripTimes = null;
-            int serviceId = getPattern().getServiceId();
-            TripTimes tripTimes;
-            // this method is on State not RoutingRequest because we care whether the user is in
-            // possession of a rented bike.
-            ServiceDay serviceDay = null;
+            TripTimes  bestTripTimes  = null;
+            ServiceDay bestServiceDay = null;
             for (ServiceDay sd : rctx.serviceDays) {
-                int wait;
+                if (!sd.anyServiceRunning(this.getPattern().services)) continue;
                 int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
-                if (sd.serviceIdRunning(serviceId)) {
-                    // getNextTrip will find next or prev departure depending on final boolean parameter
-                    tripTimes = getPattern().getNextTrip(stopIndex, secondsSinceMidnight, 
-                            state0, sd, mode == TraverseMode.BICYCLE, boarding);
-                    if (tripTimes != null) {
-                        wait = boarding ? // we care about departures on board and arrivals on alight
-                            (int)(sd.time(tripTimes.getDepartureTime(stopIndex)) - current_time):
-                            (int)(current_time - sd.time(tripTimes.getArrivalTime(stopIndex - 1)));
-                        // a trip was found and the index is valid, so the wait should be non-negative
-                        if (wait < 0)
-                            LOG.error("negative wait time on board");
-                        if (bestWait < 0 || wait < bestWait) {
-                            // track the soonest departure over all relevant schedules
-                            bestWait = wait;
-                            serviceDay = sd;
-                            bestTripTimes = tripTimes;
-                        }
+                // Skip useless days (with realtime updates):
+                // if (boarding) {
+                //    if (secondsSinceMidnight > this.getPattern().getScheduledTimetable().maxArrival) 
+                //        continue;
+                int wait;
+                // getNextTrip will find next or prev departure depending on final boolean parameter
+                TripTimes tripTimes = getPattern().getNextTrip(stopIndex, secondsSinceMidnight, 
+                        state0, sd, mode == TraverseMode.BICYCLE, boarding);
+                if (tripTimes != null) {
+                    wait = boarding ? // we care about departures on board and arrivals on alight
+                        (int)(sd.time(tripTimes.getDepartureTime(stopIndex)) - current_time):
+                        (int)(current_time - sd.time(tripTimes.getArrivalTime(stopIndex - 1)));
+                    // a trip was found and the index is valid, so the wait should be non-negative
+                    if (wait < 0)
+                        LOG.error("negative wait time on board");
+                    if (bestWait < 0 || wait < bestWait) {
+                        // track the soonest departure over all relevant schedules
+                        bestWait       = wait;
+                        bestServiceDay = sd;
+                        bestTripTimes  = tripTimes;
                     }
                 }
             }
@@ -286,7 +287,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             if (TransitUtils.handleBoardAlightType(s1, type)) {
                 return null;
             }
-            s1.setServiceDay(serviceDay);
+            s1.setServiceDay(bestServiceDay);
             // save the trip times to ensure that router has a consistent view 
             // and constant-time access to them 
             s1.setTripTimes(bestTripTimes);
@@ -365,10 +366,10 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             if (!options.getModes().get(modeMask)) {
                 return Double.POSITIVE_INFINITY;
             }
-            int serviceId = getPattern().getServiceId();
-            for (ServiceDay sd : options.rctx.serviceDays)
-                if (sd.serviceIdRunning(serviceId))
-                    return 0;
+            BitSet services = getPattern().services;
+            for (ServiceDay sd : options.rctx.serviceDays) {
+                if (sd.anyServiceRunning(services)) return 0;
+            }
             return Double.POSITIVE_INFINITY;
         } else {
             return 0;

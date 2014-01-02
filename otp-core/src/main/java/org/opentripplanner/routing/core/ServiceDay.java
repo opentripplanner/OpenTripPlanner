@@ -38,7 +38,7 @@ public class ServiceDay implements Serializable {
     protected long midnight;
     protected ServiceDate serviceDate;
     protected BitSet serviceIdsRunning;
-    
+
     /* 
      * make a ServiceDay including the given time's day's starting second and a set of 
      * serviceIds running on that day.
@@ -64,22 +64,24 @@ public class ServiceDay implements Serializable {
         this.midnight = d.getTime() / 1000;
         serviceIdsRunning = new BitSet(cs.getServiceIds().size());
         
-        ServiceIdToNumberService service = graph.getService(ServiceIdToNumberService.class);
         for (AgencyAndId serviceId : cs.getServiceIdsOnDate(serviceDate)) {
-            int n = service.getNumber(serviceId);
+            int n = graph.serviceCodes.get(serviceId);
             if (n < 0)
                 continue;
             serviceIdsRunning.set(n);
         }
     }
 
-    /* 
-     * Does the given serviceId run on this ServiceDay?
-     */
+    /** Does the given serviceId run on this ServiceDay? */
     public boolean serviceIdRunning(int serviceId) {
         return this.serviceIdsRunning.get(serviceId);
     }
-    
+
+    /** Do any of the services for this set of service codes run on this ServiceDay? */
+    public boolean anyServiceRunning(BitSet serviceIds) {
+        return this.serviceIdsRunning.intersects(serviceIds);
+    }
+
     /**
      * Return the ServiceDate for this ServiceDay.
      */

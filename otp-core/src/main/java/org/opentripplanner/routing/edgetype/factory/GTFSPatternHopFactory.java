@@ -59,7 +59,6 @@ import org.opentripplanner.gtfs.BikeAccess;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.model.StopPattern;
-import org.opentripplanner.routing.core.ServiceIdToNumberService;
 import org.opentripplanner.routing.core.StopTransfer;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -388,6 +387,11 @@ public class GTFSPatternHopFactory {
         // Perhaps it is to allow name collisions with previously loaded feeds.
         clearCachedData(); 
 
+        /* Assign 0-based numeric codes to all GTFS service IDs. */
+        for (AgencyAndId serviceId : _dao.getAllServiceIds()) {
+            graph.serviceCodes.put(serviceId, graph.serviceCodes.size());
+        }
+        
         LOG.debug("building hops from trips");
         Collection<Trip> trips = _dao.getAllTrips();
         int tripCount = 0;
@@ -482,6 +486,7 @@ public class GTFSPatternHopFactory {
         /* Loop over all new TableTripPatterns, creating the vertices and edges for each pattern. */
         for (TableTripPattern tableTripPattern : tableTripPatterns.values()) {
             tableTripPattern.makePatternVerticesAndEdges(graph, context);
+            tableTripPattern.setServiceCodes(graph.serviceCodes); // TODO this could be more elegant
         }
 
         /* Link up interlined trips (where a physical vehicle continues on to another logical trip). */
@@ -503,7 +508,7 @@ public class GTFSPatternHopFactory {
             }
         }
 
-     // MAKE PATTERN INTERLINE DWELL edges for patterns
+     // FIXME MAKE PATTERN INTERLINE DWELL edges for patterns
      // do we already have a PatternInterlineDwell edge for this dwell?
 //                 PatternInterlineDwell dwell = getInterlineDwell(dwellKey);
 //                 if (dwell == null) { 
@@ -529,7 +534,6 @@ public class GTFSPatternHopFactory {
         
         clearCachedData(); // eh?
         graph.putService(FareService.class, fareServiceFactory.makeFareService());
-        graph.putService(ServiceIdToNumberService.class, new ServiceIdToNumberService(context.serviceIds));
         graph.putService(OnBoardDepartService.class, new OnBoardDepartServiceImpl());
         LOG.info("END HOP GENERATION");
 
@@ -1075,16 +1079,6 @@ public class GTFSPatternHopFactory {
                 i = j - 1;
             }
         }
-    }
-
-    private int getServiceId(Trip trip) {
-        AgencyAndId gtfsId = trip.getServiceId();
-        Integer id = context.serviceIds.get(gtfsId);
-        if (id == null) {
-            id = context.serviceIds.size();
-            context.serviceIds.put(gtfsId, id);
-        }
-        return id;
     }
 
     private void clearCachedData() {
