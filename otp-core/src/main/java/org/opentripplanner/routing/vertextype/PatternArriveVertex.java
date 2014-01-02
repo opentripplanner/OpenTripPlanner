@@ -13,7 +13,7 @@
 
 package org.opentripplanner.routing.vertextype;
 
-import org.opentripplanner.model.StopPattern;
+import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.graph.Graph;
 
 public class PatternArriveVertex extends PatternStopVertex {
@@ -21,15 +21,15 @@ public class PatternArriveVertex extends PatternStopVertex {
     private static final long serialVersionUID = 20140101;
 
     /** constructor for table trip patterns */
-    public PatternArriveVertex(Graph g, StopPattern pattern, int stopIndex) {
-        super(g, makeLabel(pattern, stopIndex), null, pattern.stops[stopIndex]);
+    public PatternArriveVertex(Graph g, TableTripPattern pattern, int stopIndex) {
+        super(g, makeLabel(pattern, stopIndex), pattern, pattern.stopPattern.stops[stopIndex]);
     }
 
-    // constructor for single-trip hops with no trip pattern (frequency patterns) is now missing
+    // constructor for frequency patterns is now missing
     // it is possible to have both a freq and non-freq pattern with the same stop pattern
 
-    private static String makeLabel(StopPattern pattern, int stop) {
-        return String.format("%d_%02d_D", System.identityHashCode(pattern), stop);
+    private static String makeLabel(TableTripPattern pattern, int stop) {
+        return String.format("%d_%02d_A", System.identityHashCode(pattern), stop);
     }
 
 
