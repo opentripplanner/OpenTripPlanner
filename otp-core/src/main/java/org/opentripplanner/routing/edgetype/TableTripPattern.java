@@ -277,25 +277,7 @@ public class TableTripPattern implements TripPattern, Serializable {
     public int getNumScheduledTrips () {
         return trips.size();
     }
-    
-    /** 
-     * Find the next (or previous) departure on this pattern at or after (respectively before) the 
-     * specified time. This method will make use of any TimetableResolver present in the 
-     * RoutingContext to redirect departure lookups to the appropriate updated Timetable, and will 
-     * fall back on the scheduled timetable when no updates are available.
-     * @param boarding true means find next departure, false means find previous arrival 
-     * @return a TripTimes object providing all the arrival and departure times on the best trip.
-     */
-    public TripTimes getNextTrip(State s0, ServiceDay serviceDay, int stopIndex, boolean boarding) {
-        RoutingRequest options = s0.getOptions();
-        Timetable timetable = scheduledTimetable;
-        TimetableResolver snapshot = options.rctx.timetableSnapshot;
-        if (snapshot != null)
-            timetable = snapshot.resolve(this, serviceDay.getServiceDate());
-        // so far so good, delegate to the timetable
-        return timetable.getNextTrip(s0, serviceDay, stopIndex, boarding);
-    }
-
+        
     public TripTimes getResolvedTripTimes(int tripIndex, State state0) {
         ServiceDate serviceDate = state0.getServiceDay().getServiceDate();
         RoutingRequest options = state0.getOptions();

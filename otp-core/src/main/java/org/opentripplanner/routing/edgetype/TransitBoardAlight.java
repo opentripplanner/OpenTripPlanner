@@ -258,28 +258,31 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
              * 00:30 tommorrow. The 00:30 trip should be taken, but if we stopped the search after
              * finding today's 25:00 trip we would never find tomorrow's 00:30 trip.
              */
+            TableTripPattern tripPattern = this.getPattern();
             int bestWait = -1;
             TripTimes  bestTripTimes  = null;
             ServiceDay bestServiceDay = null;
+            /* 
+             * testing seems to indicate that skipping some service days based on whether
+             * patterns are running, or whether we are past the end of the day makes very little 
+             * difference in speed. Is cache locality helping? 
+             * if (!sd.anyServiceRunning(this.getPattern().services)) continue;
+             */
             for (ServiceDay sd : rctx.serviceDays) {
-                /* 
-                 * testing seems to indicate that skipping some service days based on whether
-                 * patterns are running, or whether we are past the end of the day makes very little 
-                 * difference in speed. Is cache locality helping? 
-                 * if (!sd.anyServiceRunning(this.getPattern().services)) continue;
-                 */
-                int wait;
+                /* Find the proper timetable (updated or original) if there is a realtime snapshot. */
+                Timetable timetable = tripPattern.scheduledTimetable;
+                if (rctx.timetableSnapshot != null) {
+                    timetable = rctx.timetableSnapshot.resolve(tripPattern, sd.getServiceDate());
+                } 
                 /* Find the next or prev departure depending on final boolean parameter. */
-                TripTimes tripTimes = getPattern().getNextTrip(s0, sd, stopIndex, boarding);
+                TripTimes tripTimes = timetable.getNextTrip(s0, sd, stopIndex, boarding);
                 if (tripTimes != null) {
                     /* Wait is relative to departures on board and arrivals on alight. */
-                    wait = boarding ? 
+                    int wait = boarding ? 
                         (int)(sd.time(tripTimes.getDepartureTime(stopIndex)) - s0.getTimeSeconds()):
                         (int)(s0.getTimeSeconds() - sd.time(tripTimes.getArrivalTime(stopIndex - 1)));
                     /* A trip was found. The wait should be non-negative. */
-                    if (wait < 0) {
-                        LOG.error("Negative wait time when boarding.");
-                    }
+                    if (wait < 0) LOG.error("Negative wait time when boarding.");
                     /* Track the soonest departure over all relevant schedules. */
                     if (bestWait < 0 || wait < bestWait) {
                         bestWait       = wait;
@@ -288,9 +291,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                     }
                 }
             }
-            if (bestWait < 0) { 
-                return null; // no appropriate trip was found
-            }
+            if (bestWait < 0) return null; // no appropriate trip was found
             Trip trip = bestTripTimes.getTrip();
             
             /* check if route and/or Agency are banned for this plan */
