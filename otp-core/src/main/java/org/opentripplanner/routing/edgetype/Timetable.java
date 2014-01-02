@@ -30,6 +30,7 @@ import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -173,8 +174,11 @@ public class Timetable implements Serializable {
      * @return the TripTimes object representing the (possibly updated) best trip, or null if no
      * trip matches both the time and other criteria.
      */
-    protected TripTimes getNextTrip(int stopIndex, int time, State state0, ServiceDay sd,
-            boolean haveBicycle, boolean boarding) {
+    protected TripTimes getNextTrip(State s0, ServiceDay serviceDay, int stopIndex, boolean boarding) {
+        /* Search at the state's time, but relative to midnight on the given service day. */
+        int time = serviceDay.secondsSinceMidnight(s0.getTimeSeconds());
+        /* Establish whether we have a rented _or_ owned bicycle. */
+        boolean haveBicycle = s0.getNonTransitMode() == TraverseMode.BICYCLE; 
         TripTimes bestTrip = null;
         int index;
         TripTimes[][] tableIndex = boarding ? departuresIndex : arrivalsIndex;
@@ -193,8 +197,8 @@ public class Timetable implements Serializable {
                 index = TripTimes.binarySearchDepartures(sorted, stopIndex, time);
                 while (index < sorted.length) {
                     TripTimes tt = sorted[index++];
-                    if (tt.tripAcceptable(state0,
-                            currentStop, sd, haveBicycle, stopIndex, boarding)) {
+                    if (tt.tripAcceptable(s0,
+                            currentStop, serviceDay, haveBicycle, stopIndex, boarding)) {
                         bestTrip = tt;
                         break;
                     }
@@ -203,8 +207,8 @@ public class Timetable implements Serializable {
                 index = TripTimes.binarySearchArrivals(sorted, stopIndex - 1, time);
                 while (index >= 0) {
                     TripTimes tt = sorted[index--];
-                    if (tt.tripAcceptable(state0,
-                            currentStop, sd, haveBicycle, stopIndex, boarding)) {
+                    if (tt.tripAcceptable(s0,
+                            currentStop, serviceDay, haveBicycle, stopIndex, boarding)) {
                         bestTrip = tt;
                         break;
                     }
@@ -215,19 +219,19 @@ public class Timetable implements Serializable {
             // because trips may change with stoptime updates, we cannot count on them being sorted
             int bestTime = boarding ? Integer.MAX_VALUE : Integer.MIN_VALUE;
             for (TripTimes tt : tripTimes) {
-                if ( ! sd.serviceRunning(tt.serviceCode)) continue;
+                if ( ! serviceDay.serviceRunning(tt.serviceCode)) continue;
                 // hoping JVM JIT will distribute the loop over the if clauses as needed
                 if (boarding) {
                     int depTime = tt.getDepartureTime(stopIndex);
-                    if (depTime >= time && depTime < bestTime && tt.tripAcceptable(state0,
-                            currentStop, sd, haveBicycle, stopIndex, boarding)) {
+                    if (depTime >= time && depTime < bestTime && tt.tripAcceptable(s0,
+                            currentStop, serviceDay, haveBicycle, stopIndex, boarding)) {
                         bestTrip = tt;
                         bestTime = depTime;
                     }
                 } else {
                     int arvTime = tt.getArrivalTime(stopIndex - 1);
-                    if (arvTime <= time && arvTime > bestTime && tt.tripAcceptable(state0,
-                            currentStop, sd, haveBicycle, stopIndex, boarding)) {
+                    if (arvTime <= time && arvTime > bestTime && tt.tripAcceptable(s0,
+                            currentStop, serviceDay, haveBicycle, stopIndex, boarding)) {
                         bestTrip = tt;
                         bestTime = arvTime;
                     }

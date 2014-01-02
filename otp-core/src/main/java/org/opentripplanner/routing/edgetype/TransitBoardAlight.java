@@ -57,7 +57,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
 
     private static final Logger LOG = LoggerFactory.getLogger(TransitBoardAlight.class);
 
-    private int stopIndex;
+    private final int stopIndex;
 
     private int modeMask; // TODO: via TablePatternEdge it should be possible to grab this from the pattern
    
@@ -254,7 +254,6 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
              * 00:30 tommorrow. The 00:30 trip should be taken, but if we stopped the search after
              * finding today's 25:00 trip we would never find tomorrow's 00:30 trip.
              */
-            long current_time = s0.getTimeSeconds();
             int bestWait = -1;
             TripTimes  bestTripTimes  = null;
             ServiceDay bestServiceDay = null;
@@ -265,16 +264,14 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                  * difference in speed. Is cache locality helping? 
                  * if (!sd.anyServiceRunning(this.getPattern().services)) continue;
                  */
-                int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
                 int wait;
                 /* Find the next or prev departure depending on final boolean parameter. */
-                TripTimes tripTimes = getPattern().getNextTrip(stopIndex, secondsSinceMidnight, 
-                        s0, sd, s0.getNonTransitMode() == TraverseMode.BICYCLE, boarding);
+                TripTimes tripTimes = getPattern().getNextTrip(s0, sd, stopIndex, boarding);
                 if (tripTimes != null) {
                     /* Wait is relative to departures on board and arrivals on alight. */
                     wait = boarding ? 
-                        (int)(sd.time(tripTimes.getDepartureTime(stopIndex)) - current_time):
-                        (int)(current_time - sd.time(tripTimes.getArrivalTime(stopIndex - 1)));
+                        (int)(sd.time(tripTimes.getDepartureTime(stopIndex)) - s0.getTimeSeconds()):
+                        (int)(s0.getTimeSeconds() - sd.time(tripTimes.getArrivalTime(stopIndex - 1)));
                     /* A trip was found. The wait should be non-negative. */
                     if (wait < 0) {
                         LOG.error("Negative wait time when boarding.");
