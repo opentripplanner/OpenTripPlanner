@@ -61,6 +61,9 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     /** The trips whose arrivals and departures are represented by this TripTimes */
     @Getter private final Trip trip;
 
+    /** The code for the service on which this trip runs. For departure search optimizations. */ 
+    public int serviceCode = -1;
+    
     /**
      * Both trip_headsign and stop_headsign (per stop on a particular trip) are optional GTFS
      * fields. If the headsigns array is null, we will report the trip_headsign (which may also

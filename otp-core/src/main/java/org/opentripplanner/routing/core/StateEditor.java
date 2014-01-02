@@ -290,6 +290,10 @@ public class StateEditor {
         child.stateData.previousTrip = previousTrip;
     }
     
+    /**
+     * Initial wait time is recorded so it can be subtracted out of paths in lieu of "reverse optimization".
+     * This happens in Analyst.
+     */
     public void setInitialWaitTimeSeconds(long initialWaitTimeSeconds) {
         cloneStateDataAsNeeded();
         child.stateData.initialWaitTime = initialWaitTimeSeconds;
