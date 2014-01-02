@@ -136,7 +136,6 @@ Pass – our discounted group fare.  The Class Pass is only $1 per person (ages
 <!-- initialization of interactive fields -->
 <script type="text/javascript" language="javascript">
 $(document).ready(function() {
-    console.log("startup");
     $("#travelDate").datepicker();
     $("#submitLink").click(function() {
         submitClicked();
@@ -174,8 +173,6 @@ function submitClicked() {
     }
     $("#arriveSchoolTime").val(arriveSchoolTime);
 
-    console.log("submitting..");
-  
     document.forms["requestForm"].submit();
 }
 
