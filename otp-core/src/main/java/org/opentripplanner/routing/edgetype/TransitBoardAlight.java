@@ -121,7 +121,9 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
     public State traverse(State state0) {
         return traverse(state0, 0);
     }
-
+    /**
+     * @param arrivalTimeAtStop TODO clarify what this is
+     */
     public State traverse(State state0, long arrivalTimeAtStop) {
         RoutingContext rctx = state0.getContext();
         RoutingRequest options = state0.getOptions();
@@ -138,14 +140,13 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
         /* TODO pull on/off transit out into two functions. */
         if (offTransit) { 
             /* We are leaving transit, not as much to do. */
-            // do not alight immediately when arrive-depart dwell has been eliminated
-            // this affects multi-itinerary searches (should be handled by PathParser)
+            // When a dwell edge has been eliminated, do not alight immediately after boarding.
+            // Perhaps this should be handled by PathParser.
             if (state0.getBackEdge() instanceof TransitBoardAlight) {
                 return null;
             }
             StateEditor s1 = state0.edit(this);
-            
-            int type;            
+            int type;
             if (boarding)
                 type = getPattern().getBoardType(stopIndex);
             else
@@ -156,14 +157,15 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             }
             s1.setTripId(null);
             s1.setLastAlightedTimeSeconds(state0.getTimeSeconds());
-            // For stop-to-stop transfer time, preference, and permission checking. 
-            // Vertices in transfer table are stop arrive/depart not pattern arrive/depart, 
-            // so previousStop is direction-dependent.
+            // Store the stop we are alighting at, for computing stop-to-stop transfer times,
+            // preferences, and permissions.
+            // The vertices in the transfer table are stop arrives/departs, not pattern
+            // arrives/departs, so previousStop is direction-dependent.
             s1.setPreviousStop(getStop()); 
             s1.setLastPattern(this.getPattern());
 
-            // determine the wait
-            if (arrivalTimeAtStop > 0) {
+            /* Determine the wait. */
+            if (arrivalTimeAtStop > 0) { // FIXME what is this arrivalTimeAtStop?
                 int wait = (int) Math.abs(state0.getTimeSeconds() - arrivalTimeAtStop);
                 
                 s1.incrementTimeInSeconds(wait);
@@ -349,15 +351,9 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
         }
     }
 
-    /** @return the stop associated with this edge. */
+    /** @return the stop where this board/alight edge is located. */
     private Stop getStop() {
-        PatternStopVertex stopVertex;
-        if (boarding) {
-            stopVertex = (PatternStopVertex) tov;
-        }
-        else {
-            stopVertex = (PatternStopVertex) fromv;
-        }
+        PatternStopVertex stopVertex = (PatternStopVertex) (boarding ? tov : fromv);
         return stopVertex.getStop();
     }
 
