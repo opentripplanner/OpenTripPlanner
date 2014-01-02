@@ -15,17 +15,18 @@ package org.opentripplanner.routing.edgetype;
 
 import java.util.BitSet;
 
-import org.onebusaway.gtfs.model.Route;
+import lombok.Getter;
+
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.TransitStopArrive;
@@ -34,8 +35,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.LineString;
-
-import lombok.Getter;
 
 
 /**
@@ -155,8 +154,13 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
      * @param arrivalTimeAtStop TODO: clarify what this is.
      */
     public State traverse(State s0, long arrivalTimeAtStop) {
-        RoutingContext rctx = s0.getContext();
+        RoutingContext rctx    = s0.getContext();
         RoutingRequest options = s0.getOptions();
+
+        /* If the user requested a wheelchair accessible trip, check whether and this stop is not accessible. */
+        if (options.wheelchairAccessible && ! getPattern().wheelchairAccessible(stopIndex)) {
+            return null;
+        };
 
         /*
          * Determine whether we are going onto or off of transit. Entering and leaving transit is

@@ -248,6 +248,11 @@ public class TableTripPattern implements TripPattern, Serializable {
         return getBoardType(stopIndex) != NO_PICKUP;
     }
 
+    /** Returns whether a given stop is wheelchair-accessible. */
+    public boolean wheelchairAccessible(int stopIndex) {
+        return (perStopFlags[stopIndex] & FLAG_WHEELCHAIR_ACCESSIBLE) != 0;
+    }
+    
     /** Returns the zone of a given stop */
     public String getZone(int stopIndex) {
         return getStop(stopIndex).getZoneId();
@@ -287,10 +292,6 @@ public class TableTripPattern implements TripPattern, Serializable {
         TimetableResolver snapshot = options.rctx.timetableSnapshot;
         if (snapshot != null)
             timetable = snapshot.resolve(this, serviceDay.getServiceDate());
-        if (options.wheelchairAccessible && 
-           (perStopFlags[stopIndex] & FLAG_WHEELCHAIR_ACCESSIBLE) == 0) {
-            return null;
-        }
         // so far so good, delegate to the timetable
         return timetable.getNextTrip(s0, serviceDay, stopIndex, boarding);
     }
