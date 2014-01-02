@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 import lombok.Getter;
@@ -214,6 +215,7 @@ public class Timetable implements Serializable {
             // because trips may change with stoptime updates, we cannot count on them being sorted
             int bestTime = boarding ? Integer.MAX_VALUE : Integer.MIN_VALUE;
             for (TripTimes tt : tripTimes) {
+                if ( ! sd.serviceRunning(tt.serviceCode)) continue;
                 // hoping JVM JIT will distribute the loop over the if clauses as needed
                 if (boarding) {
                     int depTime = tt.getDepartureTime(stopIndex);
@@ -291,13 +293,14 @@ public class Timetable implements Serializable {
             }
         }
         /* In large timetables, index stoptimes to allow binary searches over trips. */
-        if (nTrips > INDEX_THRESHOLD) {
-            LOG.trace("indexing pattern with {} trips", nTrips);
-            index(); 
-        } else {
+// disabled since we are now mixing serviceids
+//        if (nTrips > INDEX_THRESHOLD) {
+//            LOG.trace("indexing pattern with {} trips", nTrips);
+//            index(); 
+//        } else {
             arrivalsIndex = null;
             departuresIndex = null;
-        }
+//        }
         /* Detect trip overlap modulo 24 hours. Allows departure search optimizations. */
         minDepart = Integer.MAX_VALUE;
         maxArrive = Integer.MIN_VALUE;
@@ -639,6 +642,14 @@ public class Timetable implements Serializable {
     /** @return true if any trip in this timetable contains a stoptime greater than 24 hours. */
     private boolean crossesMidnight() {
         return maxArrive > (24 * 60 * 60);
+    }
+
+    /** Find and cache service codes. Duplicates information in trip.getServiceId for optimization. */
+    // TODO maybe put this is a more appropriate place
+    public void setServiceCodes (Map<AgencyAndId, Integer> serviceCodes) {
+        for (TripTimes tt : this.tripTimes) {
+            tt.serviceCode = serviceCodes.get(tt.getTrip().getServiceId());
+        }
     }
     
 } 
