@@ -603,8 +603,12 @@ public class TableTripPattern implements TripPattern, Serializable {
             TransitStopArrive stopArrive = getStopOrParent(context.stopArriveNodes, s1, graph);
 
             /* Add this pattern's route's mode to the modes for this Stop. */
+            // This is updating a TraverseModeSet (which is a bitmask). 
+            // Maybe we should just store that mask in the pattern when it is created.
+            // Isn't this skipping the first stop in the pattern?
+            // Do we actually need a set of modes for each stop? 
             TraverseMode mode = GtfsLibrary.getTraverseMode(this.route);
-            stopArrive.getStopVertex().addMode(mode); // isn't this skipping the first stop in the pattern?
+            stopArrive.getStopVertex().addMode(mode); 
 
             /* Create board/alight edges, but only if pickup/dropoff is enabled in GTFS. */
             if (this.canBoard(hop)) {
