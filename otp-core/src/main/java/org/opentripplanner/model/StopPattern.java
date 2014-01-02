@@ -1,5 +1,6 @@
 package org.opentripplanner.model;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,8 +31,10 @@ import org.onebusaway.gtfs.model.StopTime;
  * A StopPattern is very closely related to a TripPattern -- it essentially serves as the unique key for a TripPattern.
  * Should the route be included in the StopPattern?
  */
-public class StopPattern {
+public class StopPattern implements Serializable {
 
+    private static final long serialVersionUID = 20140101L;
+    
     /* Constants for the GTFS pick up / drop off type fields. */
     // It would be nice to have an enum for these, but the equivalence with integers is important.
     public static final int PICKDROP_SCHEDULED = 0;
