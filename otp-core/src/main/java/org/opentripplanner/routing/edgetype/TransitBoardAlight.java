@@ -117,10 +117,36 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             "leave transit network for street network";
     }
 
+    public int getBoardAlightType () {
+        return boarding ? getPattern().getBoardType(stopIndex):
+                          getPattern().getAlightType(stopIndex);
+    }
+
+    /**
+     * This was originally handled by TransitUtils.handleBoardAlightType.
+     * Edges that always block traversal (forbidden pickups/dropoffs) should simply not exist.
+     * I'm not sure why these strings were being saved as key-value pairs in the State's extensions map. 
+     * It seems that they can be derived directly from the edge. (abyrd)
+     */
+    public String getBoardAlightMessage () {
+        switch (getBoardAlightType()) {
+        case 0:
+            return ""; // or null?
+        case 2:
+            return "mustPhone";
+        case 3:
+            return "coordinateWithDriver";
+        default:
+            LOG.error("This edge should not exist at a no pick-up / drop off stop.");
+            return null;
+        }
+    }
+
     @Override
     public State traverse(State state0) {
         return traverse(state0, 0);
     }
+    
     /**
      * @param arrivalTimeAtStop TODO clarify what this is
      */
@@ -137,6 +163,9 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
         boolean offTransit = (boarding && options.isArriveBy()) || 
                 (!boarding && !options.isArriveBy()); 
         
+        // NOTE: We don't need to check the pickup/drop off type. 
+        // Edges are simply not created for type 1 (no pick/drop).
+        
         /* TODO pull on/off transit out into two functions. */
         if (offTransit) { 
             /* We are leaving transit, not as much to do. */
@@ -146,15 +175,8 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                 return null;
             }
             StateEditor s1 = state0.edit(this);
-            int type;
-            if (boarding)
-                type = getPattern().getBoardType(stopIndex);
-            else
-                type = getPattern().getAlightType(stopIndex);
+            int type = this.getBoardAlightType();
                 
-            if (TransitUtils.handleBoardAlightType(s1, type)) {
-                return null;
-            }
             s1.setTripId(null);
             s1.setLastAlightedTimeSeconds(state0.getTimeSeconds());
             // Store the stop we are alighting at, for computing stop-to-stop transfer times,
@@ -278,28 +300,20 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             /* Check if route is preferred by the user. */
             long preferences_penalty = options.preferencesPenaltyForRoute(getPattern().route);
             
-            /* Check whether this is a preferred transfer. */
+            /* Compute penalty for non-preferred transfers. */
             int transferPenalty = 0;
+            /* If this is not the first boarding, then we are transferring. */
             if (state0.isEverBoarded()) {
-                // This is not the first boarding, thus we are transferring.
                 TransferTable transferTable = options.getRoutingContext().transferTable;
-                int transferTime = transferTable.getTransferTime(state0.getPreviousStop(),
-                        getStop(), state0.getPreviousTrip(), trip, boarding);
-                transferPenalty = transferTable.determineTransferPenalty(transferTime, options.nonpreferredTransferPenalty);
+                int transferTime = transferTable.getTransferTime(state0.getPreviousStop(), 
+                                   getStop(), state0.getPreviousTrip(), trip, boarding);
+                transferPenalty  = transferTable.determineTransferPenalty(transferTime, 
+                                   options.nonpreferredTransferPenalty);
             }            
 
-            
+            /* Found a trip to board. Now make the child state. */
             StateEditor s1 = state0.edit(this);
             s1.setBackMode(getMode());
-            int type;
-            if (boarding)
-                type = getPattern().getBoardType(stopIndex);
-            else
-                type = getPattern().getAlightType(stopIndex);
-            // FIXME: isn't this now handled inside the trip search? (abyrd)
-            if (TransitUtils.handleBoardAlightType(s1, type)) {
-                return null;
-            }
             s1.setServiceDay(bestServiceDay);
             // Save the trip times in the State to ensure that router has a consistent view 
             // and constant-time access to them.
