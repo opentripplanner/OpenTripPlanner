@@ -1103,13 +1103,10 @@ public class RoutingRequest implements Cloneable, Serializable {
         return false;
     }
 
-    public long preferencesPenaltyForTrip(Trip trip) {
-    	/* check if route is preferred for this plan */
+    /** Check if route is preferred according to this request. */
+    public long preferencesPenaltyForRoute(Route route) {
     	long preferences_penalty = 0;
-
-    	Route route = trip.getRoute();
     	String agencyID = route.getId().getAgencyId();
-    	
         if ((preferredRoutes != null && !preferredRoutes.equals(RouteMatcher.emptyMatcher())) ||
                 (preferredAgencies != null && !preferredAgencies.isEmpty())) {
     		boolean isPreferedRoute = preferredRoutes != null && preferredRoutes.matches(route);
@@ -1121,13 +1118,11 @@ public class RoutingRequest implements Cloneable, Serializable {
     			preferences_penalty = 0;
     		}
     	}
-
-    	boolean isUnpreferedRoute = unpreferredRoutes != null && unpreferredRoutes.matches(route);
+    	boolean isUnpreferedRoute  = unpreferredRoutes   != null && unpreferredRoutes.matches(route);
     	boolean isUnpreferedAgency = unpreferredAgencies != null && unpreferredAgencies.contains(agencyID); 
     	if (isUnpreferedRoute || isUnpreferedAgency) {
     		preferences_penalty += useUnpreferredRoutesPenalty;
     	}
-
     	return preferences_penalty;
     }
 
