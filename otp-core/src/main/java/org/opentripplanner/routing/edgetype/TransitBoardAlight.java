@@ -15,6 +15,7 @@ package org.opentripplanner.routing.edgetype;
 
 import java.util.BitSet;
 
+import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -63,6 +64,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
     @Getter
     private boolean boarding;
 
+    /** Boarding constructor (TransitStopDepart --> PatternStopVertex) */
     public TransitBoardAlight (TransitStopDepart fromStopVertex, PatternStopVertex toPatternVertex, 
             int stopIndex, TraverseMode mode) {
         super(fromStopVertex, toPatternVertex);
@@ -71,6 +73,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
         this.boarding = true;
     }
     
+    /** Alighting constructor (PatternStopVertex --> TransitStopArrive) */
     public TransitBoardAlight (PatternStopVertex fromPatternStop, TransitStopArrive toStationVertex,
             int stopIndex, TraverseMode mode) {
         super(fromPatternStop, toStationVertex);
@@ -132,6 +135,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
         boolean offTransit = (boarding && options.isArriveBy()) || 
                 (!boarding && !options.isArriveBy()); 
         
+        /* TODO pull on/off transit out into two functions. */
         if (offTransit) { 
             /* We are leaving transit, not as much to do. */
             // do not alight immediately when arrive-depart dwell has been eliminated
@@ -197,56 +201,63 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             s1.setBackMode(getMode());
             return s1.makeState();
         } else { 
-            /* We are going onto transit and must look for a suitable transit trip on this pattern. */            
+            /* We are going onto transit and must look for a suitable transit trip on this pattern. */   
+            
+            /* Disallow ever re-boarding the same trip pattern. */
             if (state0.getLastPattern() == this.getPattern()) {
-                return null; // to disallow ever re-boarding the same trip pattern
+                return null; 
             }
+            
+            /* Check this pattern's mode against those allowed in the request. */
             if (!options.getModes().get(modeMask)) {
                 return null;
             }
-            // TODO: assuming all trips within a pattern have the same route and agency,
-            // we could check route and agency up front ("is pattern suitable") up front, rather than
-            // below after the trip search.
+
+            /* We assume all trips in a pattern are on the same route. Check if that route is banned. */
+            if (options.bannedRoutes != null && options.bannedRoutes.matches(getPattern().route)) {
+                // TODO: remove route checks in/after the trip search
+                return null;
+            }
             
-            /* Find the next boarding/alighting time relative to the current State.
-             * Check lists of transit serviceIds running yesterday, today, and tomorrow 
-             * (relative to the initial state). If this pattern's serviceId is running, look for 
-             * the closest boarding/alighting time. Choose the closest board/alight time 
-             * among trips starting yesterday, today, or tomorrow.
-             * Note that we cannot skip searching on service days that have not started yet:
-             * Imagine a state at 23:59 Sunday, that should take a bus departing at 00:01
+            /*
+             * Find the next boarding/alighting time relative to the current State. Check lists of
+             * transit serviceIds running yesterday, today, and tomorrow relative to the initial
+             * state. Choose the closest board/alight time among trips starting yesterday, today, or
+             * tomorrow. Note that we cannot skip searching on service days that have not started
+             * yet: Imagine a state at 23:59 Sunday, that should take a bus departing at 00:01
              * Monday (and coded on Monday in the GTFS); disallowing Monday's departures would
-             * produce a strange plan. This proved to be a problem when reverse-optimizing
-             * arrive-by trips; trips would get moved earlier for transfer purposes and then
-             * the future days would not be considered.
-             * We also can't break off the search after we find trips today. Imagine 
-             * a trip on a pattern at 25:00 today and another trip on the same pattern at
-             * 00:30 tommorrow. The 00:30 trip should be taken, but if we stopped the search
-             * after finding today's 25:00 trip we would never find tomorrow's 00:30 trip. */
+             * produce a strange plan. We also can't break off the search after we find trips today.
+             * Imagine a trip on a pattern at 25:00 today and another trip on the same pattern at
+             * 00:30 tommorrow. The 00:30 trip should be taken, but if we stopped the search after
+             * finding today's 25:00 trip we would never find tomorrow's 00:30 trip.
+             */
             long current_time = state0.getTimeSeconds();
             int bestWait = -1;
             TripTimes  bestTripTimes  = null;
             ServiceDay bestServiceDay = null;
             for (ServiceDay sd : rctx.serviceDays) {
-                if (!sd.anyServiceRunning(this.getPattern().services)) continue;
+                /* 
+                 * testing seems to indicate that skipping some service days based on whether
+                 * patterns are running, or whether we are past the end of the day makes very little 
+                 * difference. Is cache locality helping? 
+                 * if (!sd.anyServiceRunning(this.getPattern().services)) continue;
+                 */
                 int secondsSinceMidnight = sd.secondsSinceMidnight(current_time);
-                // Skip useless days (with realtime updates):
-                // if (boarding) {
-                //    if (secondsSinceMidnight > this.getPattern().getScheduledTimetable().maxArrival) 
-                //        continue;
                 int wait;
-                // getNextTrip will find next or prev departure depending on final boolean parameter
+                /* Find the next or prev departure depending on final boolean parameter. */
                 TripTimes tripTimes = getPattern().getNextTrip(stopIndex, secondsSinceMidnight, 
                         state0, sd, mode == TraverseMode.BICYCLE, boarding);
                 if (tripTimes != null) {
-                    wait = boarding ? // we care about departures on board and arrivals on alight
+                    /* Wait is relative to departures on board and arrivals on alight. */
+                    wait = boarding ? 
                         (int)(sd.time(tripTimes.getDepartureTime(stopIndex)) - current_time):
                         (int)(current_time - sd.time(tripTimes.getArrivalTime(stopIndex - 1)));
-                    // a trip was found and the index is valid, so the wait should be non-negative
-                    if (wait < 0)
-                        LOG.error("negative wait time on board");
+                    /* A trip was found. The wait should be non-negative. */
+                    if (wait < 0) {
+                        LOG.error("Negative wait time when boarding.");
+                    }
+                    /* Track the soonest departure over all relevant schedules. */
                     if (bestWait < 0 || wait < bestWait) {
-                        // track the soonest departure over all relevant schedules
                         bestWait       = wait;
                         bestServiceDay = sd;
                         bestTripTimes  = tripTimes;
@@ -259,23 +270,23 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             Trip trip = bestTripTimes.getTrip();
             
             /* check if route and/or Agency are banned for this plan */
+            // FIXME this should be done WHILE searching for a trip.
             if (options.tripIsBanned(trip)) return null;
 
-            /* check if route is preferred for this plan */
-            long preferences_penalty = options.preferencesPenaltyForTrip(trip);
+            /* Check if route is preferred by the user. */
+            long preferences_penalty = options.preferencesPenaltyForRoute(getPattern().route);
             
-            /* check whether this is a preferred transfer */
+            /* Check whether this is a preferred transfer. */
             int transferPenalty = 0;
             if (state0.isEverBoarded()) {
-                // This is not the first boarding, thus a transfer
+                // This is not the first boarding, thus we are transferring.
                 TransferTable transferTable = options.getRoutingContext().transferTable;
-                // Get the transfer time
                 int transferTime = transferTable.getTransferTime(state0.getPreviousStop(),
                         getStop(), state0.getPreviousTrip(), trip, boarding);
-                // Determine transfer penalty
                 transferPenalty = transferTable.determineTransferPenalty(transferTime, options.nonpreferredTransferPenalty);
             }            
 
+            
             StateEditor s1 = state0.edit(this);
             s1.setBackMode(getMode());
             int type;
@@ -283,13 +294,13 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                 type = getPattern().getBoardType(stopIndex);
             else
                 type = getPattern().getAlightType(stopIndex);
-            // check: isn't this now handled inside the trip search? (AMB)
+            // FIXME: isn't this now handled inside the trip search? (abyrd)
             if (TransitUtils.handleBoardAlightType(s1, type)) {
                 return null;
             }
             s1.setServiceDay(bestServiceDay);
-            // save the trip times to ensure that router has a consistent view 
-            // and constant-time access to them 
+            // Save the trip times in the State to ensure that router has a consistent view 
+            // and constant-time access to them.
             s1.setTripTimes(bestTripTimes);
             s1.incrementTimeInSeconds(bestWait);
             s1.incrementNumBoardings();
@@ -302,7 +313,6 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
 
             if (!state0.isEverBoarded() && !options.isReverseOptimizing()) {
                 wait_cost *= options.waitAtBeginningFactor;
-                // this is subtracted out in Analyst searches in lieu of reverse optimization
                 s1.setInitialWaitTimeSeconds(bestWait);
             } else {
                 wait_cost *= options.waitReluctance;
@@ -313,35 +323,33 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
 
             // when reverse optimizing, the board cost needs to be applied on
             // alight to prevent state domination due to free alights
-            if (options.isReverseOptimizing())
+            if (options.isReverseOptimizing()) {
                 s1.incrementWeight(wait_cost);
-            else
+            } else {
                 s1.incrementWeight(wait_cost + options.getBoardCost(mode));
-
+            }
+            
             // On-the-fly reverse optimization
             // determine if this needs to be reverse-optimized.
             // The last alight can be moved forward by bestWait (but no further) without
             // impacting the possibility of this trip
-            if (options.isReverseOptimizeOnTheFly() && !options.isReverseOptimizing() && 
-                    state0.isEverBoarded() && state0.getLastNextArrivalDelta() <= bestWait &&
-                    state0.getLastNextArrivalDelta() > -1) {
-
+            if (options.isReverseOptimizeOnTheFly() && 
+               !options.isReverseOptimizing() && 
+                state0.getisEverBoarded() && 
+                state0.getLastNextArrivalDelta() <= bestWait &&
+                state0.getLastNextArrivalDelta() > -1) {
                 // it is re-reversed by optimize, so this still yields a forward tree
                 State optimized = s1.makeState().optimizeOrReverse(true, true);
-                if (optimized == null)
-                    LOG.error("Null optimized state. This shouldn't happen");
+                if (optimized == null) LOG.error("Null optimized state. This shouldn't happen.");
                 return optimized;
             }
             
-            // if we didn't return an optimized path, return an unoptimized one
+            /* If we didn't return an optimized path, return an unoptimized one. */
             return s1.makeState();
         }
     }
 
-    /**
-     * Return the stop associated with this edge.
-     * @return the stop associated with this edge
-     */
+    /** @return the stop associated with this edge. */
     private Stop getStop() {
         PatternStopVertex stopVertex;
         if (boarding) {
