@@ -56,6 +56,7 @@ public class TimetableResolver {
     // Use HashMap not Map so we can clone.
     // if this turns out to be slow/spacious we can use an array with integer pattern indexes
     // The SortedSet members are copy-on-write
+    // FIXME: this could be made into a flat hashtable with compound keys.
     private HashMap<TableTripPattern, SortedSet<Timetable>> timetables =
             new HashMap<TableTripPattern, SortedSet<Timetable>>();
 
