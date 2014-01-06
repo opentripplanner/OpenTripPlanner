@@ -41,8 +41,8 @@ public class ProfileRouter {
         @Getter int min = 0;
         @Getter int avg = 0;
         @Getter int max = 0;
-        public Stats () {
-        };
+        
+        public Stats () { }
         public Stats (Stats other) {
             if (other != null) {
                 this.min = other.min;
@@ -81,7 +81,7 @@ public class ProfileRouter {
         Stop from;
         Pattern pattern;
         Ride previous;
-        Stats stats;
+        int dist; // xfer from previous ride
     }
     
     public static class Ride {
@@ -89,6 +89,7 @@ public class ProfileRouter {
         @Getter Stop to;
         @Getter Route route;
         @Getter Stats stats;
+        @Getter int dist; // xfer from previous ride
         List<Pattern> patterns = Lists.newArrayList();
         Ride previous;
         public Ride (QRide qr, Stop to) {
@@ -97,7 +98,8 @@ public class ProfileRouter {
             this.previous = qr.previous;
             this.patterns.add(qr.pattern);
             this.to = to;
-            this.stats = new Stats(qr.stats);
+            this.stats = new Stats();
+            this.dist = qr.dist;
         }
         public String toStringVerbose() {
             return String.format(
@@ -171,7 +173,7 @@ public class ProfileRouter {
         }
         return false;
     }
-
+    
     /* don't even try to accumulate numbers on the fly, just enumerate options. */
     /**
      * Scan through this pattern, creating rides to all downstream stops that have relevant transfers.
@@ -202,6 +204,7 @@ public class ProfileRouter {
     }
     
     public Iterable<Ride> route (double fromLat, double fromLon, double toLat, double toLon) {
+        /* Set to 2 until we have better pruning. There are a lot of 3-combinations. */
         final int ROUNDS = 2;
         int finalRound = ROUNDS - 1;
         int penultimateRound = ROUNDS - 2;
@@ -211,7 +214,7 @@ public class ProfileRouter {
         LOG.info("to stops: {}", toStops);
         List<QRide> queue = Lists.newArrayList();
         for (Entry<Pattern, StopAtDistance> entry : fromStops.entrySet()) {
-            queue.add(new QRide(entry.getValue().stop, entry.getKey(), null, null));
+            queue.add(new QRide(entry.getValue().stop, entry.getKey(), null, entry.getValue().distance));
         }
         for (int round = 0; round < ROUNDS; ++round) {
             LOG.info("ROUND {}", round);
@@ -240,7 +243,7 @@ public class ProfileRouter {
                             if (pathContainsRoute(ride, tr.tp2.route)) continue;
                             if (tr.s1 != tr.s2 && pathContainsStop(ride, tr.s2)) continue;
                             // enqueue transfer result state
-                            queue.add(new QRide(tr.s2, tr.tp2, ride, null));
+                            queue.add(new QRide(tr.s2, tr.tp2, ride, tr.distance));
                         }
                     }
                 }
