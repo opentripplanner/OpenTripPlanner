@@ -116,31 +116,6 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             "leave transit network for street network";
     }
 
-    public int getBoardAlightType () {
-        return boarding ? getPattern().getBoardType(stopIndex):
-                          getPattern().getAlightType(stopIndex);
-    }
-
-    /**
-     * This was originally handled by TransitUtils.handleBoardAlightType.
-     * Edges that always block traversal (forbidden pickups/dropoffs) should simply not exist.
-     * I'm not sure why these strings were being saved as key-value pairs in the State's extensions map. 
-     * It seems that they can be derived directly from the edge. (abyrd)
-     */
-    public String getBoardAlightMessage () {
-        switch (getBoardAlightType()) {
-        case 0:
-            return ""; // or null?
-        case 2:
-            return "mustPhone";
-        case 3:
-            return "coordinateWithDriver";
-        default:
-            LOG.error("This edge should not exist at a no pick-up / drop off stop.");
-            return null;
-        }
-    }
-
     @Override
     public State traverse(State state0) {
         return traverse(state0, 0);
@@ -269,6 +244,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
              * if (!sd.anyServiceRunning(this.getPattern().services)) continue;
              */
             for (ServiceDay sd : rctx.serviceDays) {
+//            ServiceDay sd = rctx.serviceDays.get(1);
                 /* Find the proper timetable (updated or original) if there is a realtime snapshot. */
                 Timetable timetable = tripPattern.scheduledTimetable;
                 if (rctx.timetableSnapshot != null) {

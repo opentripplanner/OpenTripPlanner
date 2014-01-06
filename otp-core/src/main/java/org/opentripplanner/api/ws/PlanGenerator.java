@@ -52,7 +52,6 @@ import org.opentripplanner.routing.edgetype.PatternEdge;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.TransitUtils;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.TrivialPathException;
@@ -441,6 +440,23 @@ public class PlanGenerator {
     }
 
     /**
+     * This was originally in TransitUtils.handleBoardAlightType.
+     * Edges that always block traversal (forbidden pickups/dropoffs) are simply not ever created.
+     */
+    public String getBoardAlightMessage (int boardAlightType) {
+        switch (boardAlightType) {
+        case 1:
+            return "impossible";
+        case 2:
+            return "mustPhone";
+        case 3:
+            return "coordinateWithDriver";
+        default:
+            return null;
+        }
+    }
+
+    /**
      * Fix up a {@link Leg} {@link List} using the information available at the leg boundaries.
      * This method will fill holes in the arrival and departure times associated with a
      * {@link Place} within a leg and add board and alight rules. It will also ensure that stop
@@ -453,8 +469,8 @@ public class PlanGenerator {
         for (int i = 0; i < legsStates.length; i++) {
             boolean toOther = i + 1 < legsStates.length && legs.get(i + 1).interlineWithPreviousLeg;
             boolean fromOther = legs.get(i).interlineWithPreviousLeg;
-            Object boardRule = null;
-            Object alightRule = null;
+            String boardRule = null;
+            String alightRule = null;
 
             for (int j = 1; j < legsStates[i].length; j++) {
                 if (legsStates[i][j].getBackEdge() instanceof PatternEdge) {
@@ -467,8 +483,8 @@ public class PlanGenerator {
                     int boardType = (fromIndex != null) ? (tripPattern.getBoardType(fromIndex)) : 0;
                     int alightType = (toIndex != null) ? (tripPattern.getAlightType(toIndex)) : 0;
 
-                    boardRule = TransitUtils.determineBoardAlightType(boardType);
-                    alightRule = TransitUtils.determineBoardAlightType(alightType);
+                    boardRule = getBoardAlightMessage(boardType);
+                    alightRule = getBoardAlightMessage(alightType);
                 }
                 if (legsStates[i][j].getBackEdge() instanceof PathwayEdge) {
                     legs.get(i).pathway = true;
@@ -488,11 +504,11 @@ public class PlanGenerator {
             }
 
             if (legs.get(i).isTransitLeg()) {
-                if (boardRule instanceof String && !fromOther) {    // If boarding in some other leg
-                    legs.get(i).boardRule = (String) boardRule;     // (interline), don't board now.
+                if (boardRule != null && !fromOther) {      // If boarding in some other leg
+                    legs.get(i).boardRule = boardRule;      // (interline), don't board now.
                 }
-                if (alightRule instanceof String && !toOther) {     // If alighting in some other
-                    legs.get(i).alightRule = (String) alightRule;   // leg, don't alight now.
+                if (alightRule != null && !toOther) {       // If alighting in some other
+                    legs.get(i).alightRule = alightRule;    // leg, don't alight now.
                 }
             }
         }
