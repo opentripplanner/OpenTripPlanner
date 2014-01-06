@@ -1,10 +1,9 @@
 package org.opentripplanner.profile;
 
+import java.util.Collection;
 import java.util.List;
 
 import lombok.Getter;
-
-import org.opentripplanner.profile.ProfileRouter.Ride;
 
 import com.google.common.collect.Lists;
 
@@ -14,12 +13,8 @@ public class Response {
     @Getter
     List<Option> options = Lists.newArrayList();
     
-    private void addOption (Ride ride) {
-        options.add(new Option(ride));
-    }
-    
-    public Response (Iterable<Ride> options) {
-        for (Ride option : options) addOption(option);
+    public Response (Collection<Option> options) {
+        this.options.addAll(options);
     }
     
 }

@@ -1,5 +1,6 @@
 package org.opentripplanner.profile;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -203,7 +204,7 @@ public class ProfileRouter {
         }
     }
     
-    public Iterable<Ride> route (double fromLat, double fromLon, double toLat, double toLon) {
+    public Collection<Option> route (double fromLat, double fromLon, double toLat, double toLon) {
         /* Set to 2 until we have better pruning. There are a lot of 3-combinations. */
         final int ROUNDS = 2;
         int finalRound = ROUNDS - 1;
@@ -251,7 +252,13 @@ public class ProfileRouter {
                 rides.clear();
             }
         }
-        return targetRides;
+        List<Option> options = Lists.newArrayList();
+        for (Ride ride : targetRides) {
+            // we alight from all patterns in a ride at the same stop
+            int dist = toStops.get(ride.patterns.get(0)).distance; 
+            options.add(new Option (ride, dist));
+        }
+        return options;
     }
     
 }

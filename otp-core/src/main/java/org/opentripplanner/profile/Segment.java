@@ -12,6 +12,9 @@ import com.beust.jcommander.internal.Lists;
 
 public class Segment {
 
+    @Getter int walkDist;
+    @Getter Stats waitStats;
+
     @Getter String route;
     @Getter String from;
     @Getter String to;
@@ -21,9 +24,6 @@ public class Segment {
     @Getter String routeLongName;
     @Getter Stats  stats;
     @Getter List<String> patterns = Lists.newArrayList();
-
-    @Getter int walkDist;
-    @Getter Stats waitStats;
 
     public Segment (Ride ride) {
         route = ride.route.getId().getId();

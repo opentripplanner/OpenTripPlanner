@@ -12,15 +12,18 @@ import com.google.common.collect.Lists;
 public class Option {
 
     @Getter List<Segment> segments = Lists.newLinkedList();
+    @Getter int finalWalkDist;
     @Getter Stats stats;
     
-    public Option (Ride ride) {
+    public Option (Ride ride, int finalWalkDist) {
         stats = new Stats();
         while (ride != null) {
             segments.add(0, new Segment(ride));
             stats.add(ride.stats);
+            // add in transfer stats
             ride = ride.previous;
         }
+        this.finalWalkDist = finalWalkDist;
     }
 
     public String getSummary() {
