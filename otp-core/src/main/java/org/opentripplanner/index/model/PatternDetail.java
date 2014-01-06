@@ -8,6 +8,7 @@ import com.beust.jcommander.internal.Lists;
 
 public class PatternDetail extends PatternShort {
 
+    /* Maybe these should just be lists of IDs only, since there are stops and trips subendpoints. */
     public String routeId;
     public Collection<StopShort> stops = Lists.newArrayList();
     public Collection<TripShort> trips = Lists.newArrayList();
