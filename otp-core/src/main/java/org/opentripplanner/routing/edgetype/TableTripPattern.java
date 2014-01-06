@@ -615,7 +615,7 @@ public class TableTripPattern implements TripPattern, Serializable {
     }
 
     /**
-     * A bit strange place to set service codes all at once when TripTimes are already added,
+     * A bit of a strange place to set service codes all at once when TripTimes are already added,
      * but we need a reference to the Graph or at least the codes map. This could also be 
      * placed in the hop factory itself.
      */

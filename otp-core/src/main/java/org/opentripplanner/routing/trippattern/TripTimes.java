@@ -143,6 +143,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
     }
 
     /** This copy constructor does not copy the actual times, only the scheduled times. */
+    // TODO might it be more maintainable to clone the triptimes then null out the scheduled times?
     public TripTimes(TripTimes object) {
         this.trip = object.trip;
         this.headsigns = object.headsigns;
