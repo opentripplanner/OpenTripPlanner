@@ -63,6 +63,7 @@ public class Timetable implements Serializable {
      * This creates a circular reference between trippatterns and timetables. 
      * Be careful during serialization. 
      */
+    @Getter
     private final TableTripPattern pattern;
 
     /**
@@ -197,6 +198,7 @@ public class Timetable implements Serializable {
                 index = TripTimes.binarySearchDepartures(sorted, stopIndex, time);
                 while (index < sorted.length) {
                     TripTimes tt = sorted[index++];
+                    if ( ! serviceDay.serviceRunning(tt.serviceCode)) continue;
                     if (tt.tripAcceptable(s0,
                             currentStop, serviceDay, haveBicycle, stopIndex, boarding)) {
                         bestTrip = tt;
@@ -207,6 +209,7 @@ public class Timetable implements Serializable {
                 index = TripTimes.binarySearchArrivals(sorted, stopIndex - 1, time);
                 while (index >= 0) {
                     TripTimes tt = sorted[index--];
+                    if ( ! serviceDay.serviceRunning(tt.serviceCode)) continue;
                     if (tt.tripAcceptable(s0,
                             currentStop, serviceDay, haveBicycle, stopIndex, boarding)) {
                         bestTrip = tt;
@@ -298,13 +301,13 @@ public class Timetable implements Serializable {
         }
         /* In large timetables, index stoptimes to allow binary searches over trips. */
 // disabled since we are now mixing serviceids
-//        if (nTrips > INDEX_THRESHOLD) {
-//            LOG.trace("indexing pattern with {} trips", nTrips);
-//            index(); 
-//        } else {
+        if (nTrips > INDEX_THRESHOLD) {
+            LOG.trace("indexing pattern with {} trips", nTrips);
+            index(); 
+        } else {
             arrivalsIndex = null;
             departuresIndex = null;
-//        }
+        }
         /* Detect trip overlap modulo 24 hours. Allows departure search optimizations. */
         minDepart = Integer.MAX_VALUE;
         maxArrive = Integer.MIN_VALUE;
