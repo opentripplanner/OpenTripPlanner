@@ -1,5 +1,6 @@
 package org.opentripplanner.profile;
 
+import java.util.List;
 import java.util.Set;
 
 import lombok.Getter;
@@ -9,6 +10,7 @@ import org.opentripplanner.profile.ProfileData.Pattern;
 import org.opentripplanner.profile.ProfileRouter.Ride;
 import org.opentripplanner.profile.ProfileRouter.Stats;
 
+import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Sets;
 
 public class Segment {
@@ -22,6 +24,7 @@ public class Segment {
     @Getter String routeShortName;
     @Getter String routeLongName;
     @Getter Stats  stats;
+    @Getter List<String> patterns = Lists.newArrayList();
     @Getter Set<String> stops = Sets.newHashSet();
     
     public Segment (Ride ride) {
@@ -35,6 +38,7 @@ public class Segment {
         stats  = ride.stats;
         for (Pattern pattern : ride.patterns) {
             boolean onboard = false;
+            patterns.add(pattern.patternId);
             for (Stop stop : pattern.stops) {
                 if (!onboard) {
                     if (stop == ride.from) onboard = true;

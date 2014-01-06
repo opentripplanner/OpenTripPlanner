@@ -65,11 +65,13 @@ public class ProfileData {
         int[] min, avg, max;
         List<Stop> stops;
         Route route;
+        String patternId;
         
         public Pattern (Collection<TableTripPattern> ttps) {
             TableTripPattern first = ttps.iterator().next();
             stops = first.getStops();
             route = first.getRoute(); // only _table_ trip patterns have exemplars
+            patternId = first.getCode();
             int nStops = stops.size();
             min = new int[nStops];
             avg = new int[nStops];
@@ -215,6 +217,11 @@ public class ProfileData {
         }
         /* make one profile trip pattern per bin of table trip patterns */
         for (Collection<TableTripPattern> tpBin : tpsBinned.asMap().values()) {
+            if (tpBin.size() > 1) {
+                // All trip patterns should now have unique stop patterns (service days were merged).
+                // TODO: Different pick/drop patterns could still cause problems.
+                LOG.warn("TripPattern bin has size greater than one: {}", tpBin.size());
+            }
             patterns.add(new Pattern(tpBin));
         }
         LOG.info("Number of patterns is {}", patterns.size());
