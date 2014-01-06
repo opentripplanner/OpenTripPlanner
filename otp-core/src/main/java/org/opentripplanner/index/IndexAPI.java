@@ -21,6 +21,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -32,6 +33,8 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.common.geometry.DistanceLibrary;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.index.model.PatternDetail;
 import org.opentripplanner.index.model.PatternShort;
 import org.opentripplanner.index.model.RouteShort;
@@ -41,8 +44,9 @@ import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.services.GraphService;
-import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +54,7 @@ import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Sets;
 import com.sun.jersey.api.core.InjectParam;
 import com.sun.jersey.api.spring.Autowire;
+import com.vividsolutions.jts.geom.Coordinate;
 
 /* NOTE that in a servlet, the full path is /ws/transit (see web.xml) */
 
@@ -59,7 +64,12 @@ public class IndexAPI {
 
    private static final Logger LOG = LoggerFactory.getLogger(IndexAPI.class);
 
-   private static final String MSG_404 = "FOUR ZERO FOUR"; //IMG
+   private static final double MAX_STOP_SEARCH_RADIUS = 5000;
+
+   private static final DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
+           
+   private static final String MSG_404 = "FOUR ZERO FOUR";
+   private static final String MSG_400 = "FOUR ZERO ZERO";
    
    @Setter @InjectParam 
    private GraphService graphService;
@@ -87,16 +97,6 @@ public class IndexAPI {
        return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
    }
    
-   /** Return a list of all stops in the graph. */
-   @GET
-   @Path("/stops")
-   @Produces({ MediaType.APPLICATION_JSON })
-   public Response getStops () {
-       Graph graph = graphService.getGraph();
-       Collection<Stop> stops = graph.getIndex().stopForId.values();
-       return Response.status(Status.OK).entity(StopShort.list(stops)).build();
-   }
-
    /** Return specific transit stop in the graph, by ID. */
    @GET
    @Path("/stops/{id}")
@@ -110,6 +110,38 @@ public class IndexAPI {
        } else { 
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }
+   }
+
+   /** Return a list of all stops within a circle around the given coordinate. */
+   @GET
+   @Path("/stops")
+   @Produces({ MediaType.APPLICATION_JSON })
+   public Response getStopsInRadius (
+               @QueryParam("lat")    Double lat,
+               @QueryParam("lon")    Double lon,
+               @QueryParam("radius") Double radius) {
+       GraphIndex index = graphService.getGraph().getIndex();
+       /* No parameters supplied. Return all stops. */
+       if (lat == null && lon == null && radius == null) {
+           Collection<Stop> stops = index.stopForId.values();
+           return Response.status(Status.OK).entity(StopShort.list(stops)).build();
+       }
+       /* If any parameter is missing, return an error status. */
+       if (lat == null || lon == null || radius == null || radius < 0) {
+           return Response.status(Status.BAD_REQUEST).entity(MSG_400).build();
+       }
+       if (radius > MAX_STOP_SEARCH_RADIUS){
+           radius = MAX_STOP_SEARCH_RADIUS;
+       }
+       List<StopShort> stops = Lists.newArrayList(); 
+       Coordinate coord = new Coordinate(lon, lat);
+       for (TransitStop stopVertex : index.stopSpatialIndex.query(lon, lat, radius)) {
+           double distance = distanceLibrary.fastDistance(stopVertex.getCoordinate(), coord);
+           if (distance < radius) {
+               stops.add(new StopShort(stopVertex.getStop(), (int) distance));
+           }
+       }
+       return Response.status(Status.OK).entity(stops).build();
    }
 
    @GET

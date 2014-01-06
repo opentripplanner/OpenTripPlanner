@@ -129,6 +129,9 @@ public class Graph implements Serializable {
 
     public transient StreetVertexIndexService streetIndex;
 
+    @Getter
+    private transient GraphIndex index;
+    
     /** 
      * Map from GTFS ServiceIds to integers close to 0. Allows using BitSets instead of Set<Object>.
      * An empty Map is created before the Graph is built to allow registering IDs from multiple feeds.   
@@ -577,6 +580,8 @@ public class Graph implements Serializable {
         for (TableTripPattern ttp : tableTripPatterns) {
             if (ttp != null) ttp.getScheduledTimetable().finish(); // skip frequency-based patterns with no table (null)
         }
+        // TODO: Move this ^ stuff into the graph index
+        this.index = new GraphIndex(this);
     }
     
     /**

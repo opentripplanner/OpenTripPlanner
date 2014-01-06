@@ -9,7 +9,7 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
-import org.opentripplanner.routing.edgetype.PatternEdge;
+import org.opentripplanner.common.geometry.HashGrid;
 import org.opentripplanner.routing.edgetype.TablePatternEdge;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -41,6 +41,8 @@ public class GraphIndex {
     public final ListMultimap<Route, TableTripPattern> patternsForRoute = ArrayListMultimap.create();
     public final ListMultimap<Stop, TableTripPattern>  patternsForStop  = ArrayListMultimap.create(); 
     
+    public final HashGrid<TransitStop> stopSpatialIndex = new HashGrid<TransitStop>();
+        
     public GraphIndex (Graph graph) {
         LOG.info("Indexing graph...");
         Collection<Edge> edges = graph.getEdges();
@@ -63,6 +65,10 @@ public class GraphIndex {
                 stopForId.put(transitStop.getStop().getId(), transitStop.getStop());
                 stopVertexForStop.put(transitStop.getStop(), transitStop);
             }
+        }
+        stopSpatialIndex.setProjectionMeridian(vertices.iterator().next().getCoordinate().x);
+        for (TransitStop stopVertex : stopVertexForStop.values()) {
+            stopSpatialIndex.put(stopVertex.getCoordinate(), stopVertex);
         }
         for (TableTripPattern pattern : patternForId.values()) {
             patternsForRoute.put(pattern.route, pattern);
