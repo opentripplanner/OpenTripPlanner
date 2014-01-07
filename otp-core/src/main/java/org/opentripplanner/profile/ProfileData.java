@@ -129,6 +129,11 @@ public class ProfileData {
     
     // move some of this functionality into the objects themselves
 
+    /**
+     * Here we are using stops rather than indices within a pattern, 
+     * because we want to consider stops that 
+     * appear more than once at every index where they occur.
+     */
     @AllArgsConstructor
     public static class StopAtDistance implements Comparable<StopAtDistance> {
         Stop stop;
@@ -143,6 +148,8 @@ public class ProfileData {
     }
 
     /**
+     * We want a single stop for each route, so this is not the right place to convert to stop indexes from
+     * stop objects.
      * @return transfers to all nearby patterns, with only one transfer per pattern (the closest one). 
      */
     public Map<Pattern, StopAtDistance> closestPatterns(double lon, double lat) {

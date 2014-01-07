@@ -4,7 +4,7 @@ import java.util.List;
 
 import lombok.Getter;
 
-import org.opentripplanner.profile.ProfileData.Pattern;
+import org.opentripplanner.profile.ProfileRouter.PatternRide;
 import org.opentripplanner.profile.ProfileRouter.Ride;
 import org.opentripplanner.profile.ProfileRouter.Stats;
 
@@ -12,7 +12,21 @@ import com.beust.jcommander.internal.Lists;
 
 public class Segment {
 
-    @Getter int walkDist;
+    public static class SegmentPattern {
+        public String patternId;
+        public int fromIndex;
+        public int toIndex;
+        public SegmentPattern (PatternRide patternRide) {
+            this.patternId = patternRide.pattern.patternId;
+            this.fromIndex = patternRide.fromIndex;
+            this.toIndex   = patternRide.toIndex;
+        }
+    }
+    
+    public static final double WALK_SPEED = 1.0; // m/sec
+    public static final int SLACK = 60; // seconds
+
+    @Getter int walkTime;
     @Getter Stats waitStats;
 
     @Getter String route;
@@ -22,8 +36,8 @@ public class Segment {
     @Getter String toName;
     @Getter String routeShortName;
     @Getter String routeLongName;
-    @Getter Stats  stats;
-    @Getter List<String> patterns = Lists.newArrayList();
+    @Getter Stats rideStats;
+    @Getter List<SegmentPattern> segmentPatterns = Lists.newArrayList();
 
     public Segment (Ride ride) {
         route = ride.route.getId().getId();
@@ -33,27 +47,54 @@ public class Segment {
         to = ride.to.getId().getId();
         fromName = ride.from.getName();
         toName = ride.to.getName();
-        stats  = ride.stats;
-        for (Pattern pattern : ride.patterns) {
-            patterns.add(pattern.patternId);
+        rideStats = ride.getStats();
+        for (PatternRide patternRide : ride.patternRides) {
+            segmentPatterns.add(new SegmentPattern(patternRide));
         }
-        walkDist = ride.dist;
         waitStats = characterizeTransfer(ride);
+    }
+
+    /* Maybe store transfer distances by stop pair, and look them up. */
+    
+    /** Side effect: sets walkTime as well. */
+    public Stats characterizeTransfer (Ride ride) {
+        Stats ret = new Stats();
+        ret.min=200;
+        ret.avg=400;
+        ret.max=600;
+        walkTime = (int) (ride.getTransferDistance() / WALK_SPEED);
+        return ret;
     }
     
     /** 
      * Distances can be stored in rides, including the first and last distance. 
      * But waits must be calculated from full sets of patterns, which are not known until a round is over.
      */
-    public Stats characterizeTransfer (Ride ride) {
-        Ride prev = ride.previous;
-        Stats stats = new Stats();
-        if (prev != null) {
-            stats.min = 500;
-            stats.avg = 700;
-            stats.max = 900;
-        }
-        return stats;
-    }
-
+//    public Stats characterizeTransferNew (Ride ride) {
+//        Ride prev = ride.previous;
+//        List<Integer> departures = ride.getSortedDepartures();
+//        List<Integer> arrivals;
+//        if (prev != null) { 
+//            /* We have no arrivals because there is no previous ride. Find max wait, min is 0. */
+//            arrivals = prev.getSortedArrivals(); // index is different in each pattern but stop is known.
+//        } else {
+//            arrivals = departures;
+//        }
+//        
+//        int walkTime = (int) (ride.xfer.distance / WALK_SPEED);
+//        List<Integer> waits = Lists.newArrayList();
+//        
+//        Iterator<Integer> departureIterator = departures.iterator(); 
+//        int departure = departureIterator.next();
+//        ARRIVAL : for (int arrival : arrivals) {
+//            int boardTime = arrival + walkTime + SLACK;
+//            while (departure <= boardTime) {
+//                if (!departureIterator.hasNext()) break ARRIVAL;
+//                departure = departureIterator.next();
+//            }
+//            waits.add(departure - boardTime);
+//        }
+//        return new Stats (waits);
+//    }
+//    
 }

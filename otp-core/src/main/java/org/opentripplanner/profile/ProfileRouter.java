@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -17,11 +16,13 @@ import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.profile.ProfileData.Pattern;
 import org.opentripplanner.profile.ProfileData.StopAtDistance;
 import org.opentripplanner.profile.ProfileData.Transfer;
+import org.opentripplanner.profile.ProfileRouter.Stats;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Sets;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
@@ -66,54 +67,114 @@ public class ProfileRouter {
             min += s.min;
             avg += s.avg;
             max += s.max;
+            // TODO divide average ?
         }
         public void sub(Stats s) {
             min -= s.min;
             avg -= s.avg;
             max -= s.max;
         }
+        public void add(int x) {
+            min += x;
+            avg += x;
+            max += x;
+        }
+        public void merge (Stats other) {
+            if (other.min < min) min = other.min;
+            if (other.max > max) max = other.max;
+            avg = (min + max) / 2; // FIXME hack because we don't have N
+        }
         public void dump() {
             System.out.printf("min %d avg %d max %d\n", min, avg, max);
         }
     }
     
-    @AllArgsConstructor
-    public static class QRide {
-        Stop from;
-        Pattern pattern;
+    /** 
+     * A ride on a single pattern, one or more of which are included in a Ride.
+     * The distinction is made because stop indexes may be different on every pattern of a route.
+     * 
+     * When a ride is unfinished (waiting in the queue) its toIndex is -1 and stats is null.
+     */
+    public static class PatternRide implements Cloneable {
+        @Getter Pattern pattern;
+        @Getter int fromIndex;
+        @Getter int toIndex = -1;
         Ride previous;
-        int dist; // xfer from previous ride
+        Transfer xfer; // how did we get here
+        Stats stats = null;
+        public PatternRide (Pattern pattern, int fromIndex, Ride previous, Transfer xfer) {
+            this.pattern   = pattern;
+            this.fromIndex = fromIndex;
+            this.previous  = previous;
+            this.xfer      = xfer;
+        }
+        /* Complete an unfinished ride as a new object. */
+        public PatternRide extendToIndex(int toIndex) {
+            /* Copy most fields from this unfinished ride. */
+            PatternRide ret = new PatternRide(pattern, fromIndex, previous, xfer);
+            /* Set the other fields to complete the ride. */
+            ret.toIndex = toIndex;
+            /* TODO: we do not need to save these stats, this can be a method. */
+            ret.stats = new Stats(ret.pattern, ret.fromIndex, ret.toIndex); 
+            return ret;
+        }
+        @JsonIgnore
+        public Stop getFromStop() {
+            return pattern.stops.get(fromIndex);
+        }
+        @JsonIgnore
+        public Stop getToStop() {
+            return pattern.stops.get(toIndex);            
+        }
+        @JsonIgnore
+        public boolean finished () {
+            return toIndex >= 0 && stats != null;
+        }
     }
     
+    /** 
+     * A ride from a specific stop to another, on one or more patterns that are all on the same route. 
+     * Multi-pattern rides are formed by merging subsequent rides into existing ones.
+     * 
+     * TODO this could just be a RouteRide key mapped to lists of patternRides with the same characteristics.
+     * its constructor would pull out the right fields.
+     * 
+     * TODO if patternRides can be added later, and stats and transfers are computed after the fact,
+     * then maybe we no longer need a round-based approach.
+     * We need to put _groups_ of patternRides into the queue, grouped by back ride and beginning stop.
+     */
     public static class Ride {
-        @Getter Stop from;
-        @Getter Stop to;
-        @Getter Route route;
-        @Getter Stats stats;
-        @Getter int dist; // xfer from previous ride
-        List<Pattern> patterns = Lists.newArrayList();
-        Ride previous;
-        public Ride (QRide qr, Stop to) {
-            this.from = qr.from;
-            this.route = qr.pattern.route;
-            this.previous = qr.previous;
-            this.patterns.add(qr.pattern);
-            this.to = to;
-            this.stats = new Stats();
-            this.dist = qr.dist;
+
+        /* Here we store stop objects rather than indexes. The start and end indexes in the Ride's 
+         * constituent PatternRides should correspond to these same stops. */
+        final Stop from;
+        final Stop to;
+        final Route route;
+        final Ride previous;
+        final List<PatternRide> patternRides = Lists.newArrayList();
+
+        public Ride (PatternRide pr) {
+            this.from     = pr.getFromStop();
+            this.to       = pr.getToStop();
+            this.route    = pr.pattern.route;
+            this.previous = pr.previous;
+            this.patternRides.add(pr);
         }
+        
         public String toStringVerbose() {
             return String.format(
                 "ride route %s from %s to %s (%d patterns)",
-                route.getLongName(), from.getName(), to.getName(), patterns.size()
+                route.getLongName(), from.getName(), to.getName(), patternRides.size()
             );
         }
+
         public String toString() {
             return String.format(
                 "route %3s from %4s to %4s (%d)",
-                route.getShortName(), from.getCode(), to.getCode(), patterns.size()
+                route.getShortName(), from.getCode(), to.getCode(), patternRides.size()
             );
         }
+        
         public void dump() {
             List<Ride> rides = Lists.newLinkedList();
             Ride ride = this;
@@ -124,10 +185,28 @@ public class ProfileRouter {
             LOG.info("Path from {} to {}", rides.get(0).from, rides.get(rides.size() - 1).to);
             for (Ride r : rides) LOG.info("  {}", r);                
         }
-    }
 
-    public static class Round {
-        
+        public boolean containsPattern(Pattern pattern) {
+            for (PatternRide patternRide : patternRides) {
+                if (patternRide.pattern == pattern) return true;
+            }
+            return false;
+        }
+
+        /** All transfers are between the same stops, so of the same length. */
+        public double getTransferDistance() {
+            return patternRides.get(0).xfer.distance;
+        }
+
+        /** Create Stats for all the constituent PatternRides of this Ride. */
+        public Stats getStats() {
+            Stats ret = new Stats();
+            ret.min = Integer.MAX_VALUE;
+            for (PatternRide patternRide : patternRides) {
+                ret.merge(patternRide.stats);
+            }
+            return ret;
+        }
     }
 
     private boolean pathContainsRoute(Ride ride, Route route) {
@@ -147,59 +226,58 @@ public class ProfileRouter {
         return false;
     }
 
-    /** @return the ride object (whether it was new or and existing one we merged into) */
-    private Ride addRide (QRide qr, Stop stop, Stats stats) {
-        for (Ride ride : rides.get(stop)) {
-            if (ride.previous == qr.previous && 
-                ride.route == qr.pattern.route &&
-                ride.to == stop) { 
-                // to-stops should always match in our rides collections
-                /* The new ride merges into an existing one. */
-                ride.patterns.add(qr.pattern);
+    /**
+     * Adds a new PatternRide to the PatternRide's destination stop. 
+     * If a Ride already exists there on the same route, and with the same previous Ride, 
+     * then the new PatternRide is grouped into that existing Ride. Otherwise a new Ride is created.
+     * @return the resulting Ride object, whether it was new or and existing one we merged into. 
+     */
+    private Ride addRide (PatternRide pr) {
+        /* Check if the new PatternRide merges into an existing Ride. */
+        for (Ride ride : rides.get(pr.getToStop())) {
+            if (ride.previous == pr.previous && 
+                ride.route    == pr.pattern.route &&
+                ride.to       == pr.getToStop()) { // FIXME: how could it not be equal? To-stops should always match in our rides collections
+                ride.patternRides.add(pr);
                 return ride;
             }
         }
         /* The new ride does not merge into any existing one. */
-        Ride ride = new Ride(qr, stop);
-        ride.stats = stats;
-        rides.put(stop, ride);
+        Ride ride = new Ride(pr);
+        rides.put(pr.getToStop(), ride);
         return ride;
     }
 
+    /**
+     * @return true if the given stop has at least one transfer from the given pattern.
+     */
     private boolean hasTransfers(Stop stop, Pattern pattern) {
         for (Transfer tr : data.transfersForStop.get(stop)) {
-            if (tr.tp1 == pattern) {
-                return true;
-            }
+            if (tr.tp1 == pattern) return true;
         }
         return false;
     }
     
-    /* don't even try to accumulate numbers on the fly, just enumerate options. */
+    /* Don't even try to accumulate stats and weights on the fly, just enumerate options. */
+    
     /**
      * Scan through this pattern, creating rides to all downstream stops that have relevant transfers.
      */
-    private void makeRides(QRide qr, Multimap<Stop, Ride> rides) {
-        List<Stop> stops = qr.pattern.stops;
+    private void makeRides(PatternRide pr, Multimap<Stop, Ride> rides) {
+        List<Stop> stops = pr.pattern.stops;
         Stop targetStop = null;
-        if (toStops.containsKey(qr.pattern)) {
-            targetStop = toStops.get(qr.pattern).stop; // this pattern has a stop near the destination
+        if (toStops.containsKey(pr.pattern)) {
+            /* This pattern has a stop near the destination. Retrieve it. */
+            targetStop = toStops.get(pr.pattern).stop; 
         }
-        boolean boarded = false;
-        int s0 = -1;
-        for (int s = 0; s < stops.size(); ++s) {
+        for (int s = pr.fromIndex; s < stops.size(); ++s) {
             Stop stop = stops.get(s);
-            if (!boarded) {
-                if (stop == qr.from) {
-                    boarded = true;
-                    s0 = s;
-                }
-                continue;
-            }
             if (targetStop != null && targetStop == stop) {
-                targetRides.add(addRide(qr, stop, new Stats(qr.pattern, s0, s)));
-            } else if (hasTransfers(stop, qr.pattern)) {
-                if ( ! pathContainsStop(qr.previous, stop)) addRide(qr, stop, new Stats(qr.pattern, s0, s));
+                targetRides.add(addRide(pr.extendToIndex(s)));
+            } else if (hasTransfers(stop, pr.pattern)) {
+                if ( ! pathContainsStop(pr.previous, stop)) {
+                    addRide(pr.extendToIndex(s));
+                }
             }
         }
     }
@@ -213,14 +291,25 @@ public class ProfileRouter {
         toStops =   data.closestPatterns(toLon, toLat);
         LOG.info("from stops: {}", fromStops);
         LOG.info("to stops: {}", toStops);
-        List<QRide> queue = Lists.newArrayList();
+        List<PatternRide> queue = Lists.newArrayList();
+        /* Enqueue one or more QRides for each pattern/stop near the origin. */
         for (Entry<Pattern, StopAtDistance> entry : fromStops.entrySet()) {
-            queue.add(new QRide(entry.getValue().stop, entry.getKey(), null, entry.getValue().distance));
+            Pattern pattern = entry.getKey();
+            StopAtDistance sd = entry.getValue();
+            for (int i = 0; i < pattern.stops.size(); ++i) {
+                if (pattern.stops.get(i) == sd.stop) {
+                    /* Pseudo-transfer from null indicates first leg. */
+                    Transfer xfer = new Transfer(null, pattern, null, sd.stop, sd.distance);
+                    queue.add(new PatternRide(pattern, i, null, xfer));
+                    /* Do not break in case stop appears more than once in the same pattern. */
+                }
+            }
         }
+        /* One round per ride, as in RAPTOR. */
         for (int round = 0; round < ROUNDS; ++round) {
             LOG.info("ROUND {}", round);
-            for (QRide qr : queue) {
-                makeRides(qr, rides);
+            for (PatternRide pr : queue) {
+                makeRides(pr, rides);
             }
             LOG.info("number of rides: {}", rides.size());
             /* Check rides reaching the targets */
@@ -233,18 +322,24 @@ public class ProfileRouter {
 //                    if (ride.patterns.contains(entry.getKey())) ride.dump();
 //                }
 //            }
-            /* build a new queue for the next round by transferring from patterns in rides */
+            /* Build a new queue for the next round by transferring from patterns in rides */
             if (round != finalRound) {
                 queue.clear();
+                /* Rides is cleared at the end of each round. */
                 for (Ride ride : rides.values()) {
                     //LOG.info("{}", ride);
                     for (Transfer tr : data.transfersForStop.get(ride.to)) {
                         if (round == penultimateRound && !toStops.containsKey(tr.tp2)) continue;
-                        if (ride.patterns.contains(tr.tp1)) {
+                        if (ride.containsPattern(tr.tp1)) {
                             if (pathContainsRoute(ride, tr.tp2.route)) continue;
                             if (tr.s1 != tr.s2 && pathContainsStop(ride, tr.s2)) continue;
                             // enqueue transfer result state
-                            queue.add(new QRide(tr.s2, tr.tp2, ride, tr.distance));
+                            for (int i = 0; i < tr.tp2.stops.size(); ++i) {
+                                if (tr.tp2.stops.get(i) == tr.s2) {
+                                    queue.add(new PatternRide(tr.tp2, i, ride, tr));
+                                    /* Do not break, stop can appear in pattern more than once. */
+                                }
+                            }
                         }
                     }
                 }
@@ -254,9 +349,9 @@ public class ProfileRouter {
         }
         List<Option> options = Lists.newArrayList();
         for (Ride ride : targetRides) {
-            // we alight from all patterns in a ride at the same stop
-            int dist = toStops.get(ride.patterns.get(0)).distance; 
-            options.add(new Option (ride, dist));
+            /* We alight from all patterns in a ride at the same stop. */
+            int dist = toStops.get(ride.patternRides.get(0).pattern).distance; 
+            options.add(new Option (ride, dist)); // TODO Convert distance to time.
         }
         return options;
     }
