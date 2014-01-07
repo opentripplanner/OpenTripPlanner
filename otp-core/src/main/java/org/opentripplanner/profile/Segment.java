@@ -1,5 +1,6 @@
 package org.opentripplanner.profile;
 
+import java.util.Collections;
 import java.util.List;
 
 import lombok.Getter;
@@ -12,14 +13,20 @@ import com.beust.jcommander.internal.Lists;
 
 public class Segment {
 
-    public static class SegmentPattern {
+    public static class SegmentPattern implements Comparable<SegmentPattern> {
         public String patternId;
         public int fromIndex;
         public int toIndex;
+        public int nTrips;
         public SegmentPattern (PatternRide patternRide) {
             this.patternId = patternRide.pattern.patternId;
             this.fromIndex = patternRide.fromIndex;
             this.toIndex   = patternRide.toIndex;
+            this.nTrips    = patternRide.pattern.nTrips;
+        }
+        @Override
+        public int compareTo (SegmentPattern other) {
+            return other.nTrips - this.nTrips;
         }
     }
     
@@ -51,6 +58,7 @@ public class Segment {
         for (PatternRide patternRide : ride.patternRides) {
             segmentPatterns.add(new SegmentPattern(patternRide));
         }
+        Collections.sort(segmentPatterns);
         waitStats = characterizeTransfer(ride);
     }
 

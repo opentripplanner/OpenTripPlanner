@@ -66,6 +66,7 @@ public class ProfileData {
         List<Stop> stops;
         Route route;
         String patternId;
+        int nTrips;
         
         public Pattern (Collection<TableTripPattern> ttps) {
             TableTripPattern first = ttps.iterator().next();
@@ -86,7 +87,7 @@ public class ProfileData {
                     LOG.error("mismatched route");
                     continue;
                 }
-                int nTrips = ttp.getTrips().size();
+                nTrips = ttp.getTrips().size(); // TODO note this is taking only one pattern's count
                 for (int i = 0; i < nTrips; ++i) {
                     TripTimes tt = ttp.getTripTimes(i);
                     int t0 = tt.getDepartureTime(0); // storing relative times
