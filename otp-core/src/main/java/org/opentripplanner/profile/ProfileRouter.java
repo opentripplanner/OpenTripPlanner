@@ -207,6 +207,7 @@ public class ProfileRouter {
             }
             return ret;
         }
+        
     }
 
     private boolean pathContainsRoute(Ride ride, Route route) {

@@ -7,6 +7,7 @@ import lombok.Getter;
 import org.opentripplanner.profile.ProfileRouter.Ride;
 import org.opentripplanner.profile.ProfileRouter.Stats;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 public class Option {
@@ -32,15 +33,17 @@ public class Option {
     public String getSummary() {
         StringBuilder sb = new StringBuilder();
         sb.append("routes ");
-        //Joiner.on(", ").join(X);
+        List<String> routeShortNames = Lists.newArrayList();
+        List<String> vias = Lists.newArrayList();
         for (Segment segment : segments) {
-            sb.append(segment.routeShortName);
-            sb.append(" ");
+            routeShortNames.add(segment.routeShortName);
+            vias.add(segment.toName);
         }
-        sb.append("via ");
-        for (Segment segment : segments.subList(0, segments.size() - 1)) {
-            sb.append(segment.toName);
-            sb.append(" ");
+        if (!vias.isEmpty()) vias.remove(vias.size() - 1);
+        sb.append(Joiner.on(", ").join(routeShortNames));
+        if (!vias.isEmpty()) {
+            sb.append(" via ");
+            sb.append(Joiner.on(", ").join(vias));
         }
         return sb.toString();
     }
