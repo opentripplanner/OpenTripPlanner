@@ -28,7 +28,6 @@ import org.opentripplanner.analyst.core.IsochroneData;
 import org.opentripplanner.analyst.request.IsoChroneRequest;
 import org.opentripplanner.analyst.request.IsoChroneSPTRendererAccSampling;
 import org.opentripplanner.analyst.request.IsoChroneSPTRendererRecursiveGrid;
-import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.routing.core.RoutingRequest;
