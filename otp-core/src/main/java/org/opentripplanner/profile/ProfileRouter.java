@@ -14,9 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.profile.ProfileData.Pattern;
 import org.opentripplanner.profile.ProfileData.StopAtDistance;
 import org.opentripplanner.profile.ProfileData.Transfer;
+import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +36,7 @@ public class ProfileRouter {
     }
     @NonNull ProfileData data;
     Multimap<Stop, Ride> rides = ArrayListMultimap.create();
-    Map<Pattern, StopAtDistance> fromStops, toStops;
+    Map<TableTripPattern, StopAtDistance> fromStops, toStops;
     Set<Ride> targetRides = Sets.newHashSet();
     
     public static class Stats implements Cloneable {
@@ -53,10 +53,10 @@ public class ProfileRouter {
                 this.max = other.max;
             }
         }
-        public Stats (Pattern pattern, int hop0, int hop1) {
+        public Stats (TableTripPattern pattern, int hop0, int hop1) {
             min = Integer.MAX_VALUE;
             num = 0;
-            for (TripTimes tripTimes : pattern.backingPattern.getScheduledTimetable().getTripTimes()) {
+            for (TripTimes tripTimes : pattern.getScheduledTimetable().getTripTimes()) {
                 int depart = tripTimes.getDepartureTime(hop0);
                 int arrive = tripTimes.getArrivalTime(hop1);
                 int t = arrive - depart;
@@ -106,16 +106,19 @@ public class ProfileRouter {
      * The distinction is made because stop indexes may be different on every pattern of a route.
      * 
      * When a ride is unfinished (waiting in the queue) its toIndex is -1 and stats is null.
+     * 
+     * Hash code and equals allow adding the same PatternRide to a set multiple times 
+     * coming from different transfers.
      */
     @EqualsAndHashCode(exclude="xfer")
     public static class PatternRide {
-        Pattern pattern;
+        TableTripPattern pattern; // uses identity hash code
         int fromIndex;
         int toIndex = -1;
         Ride previous;
         Transfer xfer; // how did we get here
         Stats stats = null;
-        public PatternRide (Pattern pattern, int fromIndex, Ride previous, Transfer xfer) {
+        public PatternRide (TableTripPattern pattern, int fromIndex, Ride previous, Transfer xfer) {
             this.pattern   = pattern;
             this.fromIndex = fromIndex;
             this.previous  = previous;
@@ -132,16 +135,16 @@ public class ProfileRouter {
             return ret;
         }
         public Stop getFromStop() {
-            return pattern.stops.get(fromIndex);
+            return pattern.getStops().get(fromIndex);
         }
         public Stop getToStop() {
-            return pattern.stops.get(toIndex);            
+            return pattern.getStops().get(toIndex);            
         }
         public boolean finished () {
             return toIndex >= 0 && stats != null;
         }
         public String toString () {
-            return String.format("%s from %d, prev is %s", pattern.patternId, fromIndex, previous);
+            return String.format("%s from %d, prev is %s", pattern.getCode(), fromIndex, previous);
         }
     }
     
@@ -199,7 +202,7 @@ public class ProfileRouter {
             for (Ride r : rides) LOG.info("  {}", r);                
         }
 
-        public boolean containsPattern(Pattern pattern) {
+        public boolean containsPattern(TableTripPattern pattern) {
             for (PatternRide patternRide : patternRides) {
                 if (patternRide.pattern == pattern) return true;
             }
@@ -265,7 +268,7 @@ public class ProfileRouter {
     /**
      * @return true if the given stop has at least one transfer from the given pattern.
      */
-    private boolean hasTransfers(Stop stop, Pattern pattern) {
+    private boolean hasTransfers(Stop stop, TableTripPattern pattern) {
         for (Transfer tr : data.transfersForStop.get(stop)) {
             if (tr.tp1 == pattern) return true;
         }
@@ -278,7 +281,7 @@ public class ProfileRouter {
      * Scan through this pattern, creating rides to all downstream stops that have relevant transfers.
      */
     private void makeRides(PatternRide pr, Multimap<Stop, Ride> rides) {
-        List<Stop> stops = pr.pattern.stops;
+        List<Stop> stops = pr.pattern.getStops();
         Stop targetStop = null;
         if (toStops.containsKey(pr.pattern)) {
             /* This pattern has a stop near the destination. Retrieve it. */
@@ -309,11 +312,11 @@ public class ProfileRouter {
          * can generate the same PatternRide many times. FIXME */
         Set<PatternRide> queue = Sets.newHashSet();
         /* Enqueue one or more QRides for each pattern/stop near the origin. */
-        for (Entry<Pattern, StopAtDistance> entry : fromStops.entrySet()) {
-            Pattern pattern = entry.getKey();
+        for (Entry<TableTripPattern, StopAtDistance> entry : fromStops.entrySet()) {
+            TableTripPattern pattern = entry.getKey();
             StopAtDistance sd = entry.getValue();
-            for (int i = 0; i < pattern.stops.size(); ++i) {
-                if (pattern.stops.get(i) == sd.stop) {
+            for (int i = 0; i < pattern.getStops().size(); ++i) {
+                if (pattern.getStops().get(i) == sd.stop) {
                     /* Pseudo-transfer from null indicates first leg. */
                     Transfer xfer = new Transfer(null, pattern, null, sd.stop, sd.distance);
                     queue.add(new PatternRide(pattern, i, null, xfer));
@@ -351,8 +354,8 @@ public class ProfileRouter {
                             if (pathContainsRoute(ride, tr.tp2.route)) continue;
                             if (tr.s1 != tr.s2 && pathContainsStop(ride, tr.s2)) continue;
                             // enqueue transfer result state
-                            for (int i = 0; i < tr.tp2.stops.size(); ++i) {
-                                if (tr.tp2.stops.get(i) == tr.s2) {
+                            for (int i = 0; i < tr.tp2.getStops().size(); ++i) {
+                                if (tr.tp2.getStops().get(i) == tr.s2) {
                                     queue.add(new PatternRide(tr.tp2, i, ride, tr));
                                     /* Do not break, stop can appear in pattern more than once. */
                                 }

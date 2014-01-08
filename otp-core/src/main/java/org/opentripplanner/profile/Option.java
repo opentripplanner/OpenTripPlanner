@@ -4,6 +4,7 @@ import java.util.List;
 
 import lombok.Getter;
 
+import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.profile.ProfileRouter.Ride;
 import org.opentripplanner.profile.ProfileRouter.Stats;
 
@@ -36,7 +37,9 @@ public class Option {
         List<String> routeShortNames = Lists.newArrayList();
         List<String> vias = Lists.newArrayList();
         for (Segment segment : segments) {
-            routeShortNames.add(segment.routeShortName);
+            String routeName = segment.routeShortName == null 
+                    ? segment.routeLongName : segment.routeShortName;
+            routeShortNames.add(routeName);
             vias.add(segment.toName);
         }
         if (!vias.isEmpty()) vias.remove(vias.size() - 1);
