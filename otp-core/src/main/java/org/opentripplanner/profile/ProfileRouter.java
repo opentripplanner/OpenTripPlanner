@@ -43,7 +43,7 @@ public class ProfileRouter {
         @Getter int min = 0;
         @Getter int avg = 0;
         @Getter int max = 0;
-        @Getter Integer num = null;
+        @Getter int num = 0;
         
         public Stats () { }
         public Stats (Stats other) {
@@ -71,13 +71,13 @@ public class ProfileRouter {
             min += s.min;
             max += s.max;
             avg += (avg + s.avg) / 2; // TODO rethink
-            num = null; // it's poorly defined here
+            num = 0; // it's poorly defined here
         }
         public void add(int x) {
             min += x;
             avg += x;
             max += x;
-            num = null; // it's poorly defined here
+            num = 0; // it's poorly defined here
         }
         public void merge (Stats other) {
             if (other.min < min) min = other.min;
@@ -209,7 +209,10 @@ public class ProfileRouter {
             return false;
         }
 
-        /** All transfers are between the same stops, so of the same length. */
+        /** 
+         * All transfers are between the same stops, so of the same length.
+         * @return the distance walked from the end of the previous ride to the beginning of this ride.
+         */
         public double getTransferDistance() {
             return patternRides.get(0).xfer.distance;
         }
