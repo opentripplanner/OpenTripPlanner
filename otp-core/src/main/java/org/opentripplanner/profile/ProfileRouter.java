@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -16,13 +17,12 @@ import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.profile.ProfileData.Pattern;
 import org.opentripplanner.profile.ProfileData.StopAtDistance;
 import org.opentripplanner.profile.ProfileData.Transfer;
-import org.opentripplanner.profile.ProfileRouter.Stats;
+import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Sets;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
@@ -43,6 +43,7 @@ public class ProfileRouter {
         @Getter int min = 0;
         @Getter int avg = 0;
         @Getter int max = 0;
+        @Getter Integer num = null;
         
         public Stats () { }
         public Stats (Stats other) {
@@ -53,36 +54,47 @@ public class ProfileRouter {
             }
         }
         public Stats (Pattern pattern, int hop0, int hop1) {
-            this.min = pattern.min[hop1] - pattern.min[hop0];
-            this.avg = pattern.avg[hop1] - pattern.avg[hop0];
-            this.max = pattern.max[hop1] - pattern.max[hop0];
-            //this.dump();
+            min = Integer.MAX_VALUE;
+            num = 0;
+            for (TripTimes tripTimes : pattern.backingPattern.getScheduledTimetable().getTripTimes()) {
+                int depart = tripTimes.getDepartureTime(hop0);
+                int arrive = tripTimes.getArrivalTime(hop1);
+                int t = arrive - depart;
+                if (t < min) min = t;
+                if (t > max) max = t;
+                avg += t;            
+                ++num;
+            }
+            avg /= num;
         }        
-        public Stats (Stats s0, Stats s1) {
-            this.min = s0.min + s1.min;
-            this.avg = s0.avg + s1.avg;
-            this.max = s0.max + s1.max;
-        }
         public void add(Stats s) {
             min += s.min;
-            avg += s.avg;
             max += s.max;
-            // TODO divide average ?
-        }
-        public void sub(Stats s) {
-            min -= s.min;
-            avg -= s.avg;
-            max -= s.max;
+            avg += (avg + s.avg) / 2; // TODO rethink
+            num = null; // it's poorly defined here
         }
         public void add(int x) {
             min += x;
             avg += x;
             max += x;
+            num = null; // it's poorly defined here
         }
         public void merge (Stats other) {
             if (other.min < min) min = other.min;
             if (other.max > max) max = other.max;
-            avg = (min + max) / 2; // FIXME hack because we don't have N
+            avg = (avg * num + other.avg * other.num) / (num + other.num); // TODO should be float math
+        }
+        /** Build a composite Stats out of a bunch of other Stats. */
+        public Stats (Collection<Stats> stats) {
+            min = Integer.MAX_VALUE;
+            num = 0;
+            for (Stats other : stats) {
+                if (other.min < min) min = other.min;
+                if (other.max > max) max = other.max;
+                avg += other.avg * other.num;
+                num += other.num;
+            }
+            avg /= num; // TODO should perhaps be float math
         }
         public void dump() {
             System.out.printf("min %d avg %d max %d\n", min, avg, max);
@@ -95,10 +107,11 @@ public class ProfileRouter {
      * 
      * When a ride is unfinished (waiting in the queue) its toIndex is -1 and stats is null.
      */
-    public static class PatternRide implements Cloneable {
-        @Getter Pattern pattern;
-        @Getter int fromIndex;
-        @Getter int toIndex = -1;
+    @EqualsAndHashCode(exclude="xfer")
+    public static class PatternRide {
+        Pattern pattern;
+        int fromIndex;
+        int toIndex = -1;
         Ride previous;
         Transfer xfer; // how did we get here
         Stats stats = null;
@@ -115,20 +128,20 @@ public class ProfileRouter {
             /* Set the other fields to complete the ride. */
             ret.toIndex = toIndex;
             /* TODO: we do not need to save these stats, this can be a method. */
-            ret.stats = new Stats(ret.pattern, ret.fromIndex, ret.toIndex); 
+            ret.stats = new Stats(ret.pattern, ret.fromIndex, ret.toIndex - 1); 
             return ret;
         }
-        @JsonIgnore
         public Stop getFromStop() {
             return pattern.stops.get(fromIndex);
         }
-        @JsonIgnore
         public Stop getToStop() {
             return pattern.stops.get(toIndex);            
         }
-        @JsonIgnore
         public boolean finished () {
             return toIndex >= 0 && stats != null;
+        }
+        public String toString () {
+            return String.format("%s from %d, prev is %s", pattern.patternId, fromIndex, previous);
         }
     }
     
@@ -200,12 +213,11 @@ public class ProfileRouter {
 
         /** Create Stats for all the constituent PatternRides of this Ride. */
         public Stats getStats() {
-            Stats ret = new Stats();
-            ret.min = Integer.MAX_VALUE;
+            List<Stats> stats = Lists.newArrayList();
             for (PatternRide patternRide : patternRides) {
-                ret.merge(patternRide.stats);
+                stats.add(patternRide.stats);
             }
-            return ret;
+            return new Stats(stats);
         }
         
     }
@@ -226,7 +238,7 @@ public class ProfileRouter {
         }
         return false;
     }
-
+    
     /**
      * Adds a new PatternRide to the PatternRide's destination stop. 
      * If a Ride already exists there on the same route, and with the same previous Ride, 
@@ -234,6 +246,7 @@ public class ProfileRouter {
      * @return the resulting Ride object, whether it was new or and existing one we merged into. 
      */
     private Ride addRide (PatternRide pr) {
+        //LOG.info("new patternride: {}", pr);
         /* Check if the new PatternRide merges into an existing Ride. */
         for (Ride ride : rides.get(pr.getToStop())) {
             if (ride.previous == pr.previous && 
@@ -292,7 +305,9 @@ public class ProfileRouter {
         toStops =   data.closestPatterns(toLon, toLat);
         LOG.info("from stops: {}", fromStops);
         LOG.info("to stops: {}", toStops);
-        List<PatternRide> queue = Lists.newArrayList();
+        /* Our work queue is actually a set, because transferring from a group of patterns
+         * can generate the same PatternRide many times. FIXME */
+        Set<PatternRide> queue = Sets.newHashSet();
         /* Enqueue one or more QRides for each pattern/stop near the origin. */
         for (Entry<Pattern, StopAtDistance> entry : fromStops.entrySet()) {
             Pattern pattern = entry.getKey();
@@ -328,8 +343,9 @@ public class ProfileRouter {
                 queue.clear();
                 /* Rides is cleared at the end of each round. */
                 for (Ride ride : rides.values()) {
-                    //LOG.info("{}", ride);
+                    // LOG.info("RIDE {}", ride);
                     for (Transfer tr : data.transfersForStop.get(ride.to)) {
+                        // LOG.info("  TRANSFER {}", tr);
                         if (round == penultimateRound && !toStops.containsKey(tr.tp2)) continue;
                         if (ride.containsPattern(tr.tp1)) {
                             if (pathContainsRoute(ride, tr.tp2.route)) continue;

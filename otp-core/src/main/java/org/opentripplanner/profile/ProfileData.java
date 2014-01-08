@@ -54,17 +54,20 @@ public class ProfileData {
         
         @Override
         public String toString() {
-            return String.format("Transfer %s %s %s %s %d", tp1.route, tp2.route, 
-                    s1.getCode(), s2.getCode(), distance);
+            return String.format("Transfer %s %s %s %s %d", 
+                    tp1.patternId, s1.getId(), 
+                    tp2.patternId, s2.getId(), 
+                    distance);
         }
     
     }
 
+    /* Can be merged into new trippattern class. */
     public static class Pattern {
         
-        int[] min, avg, max;
         List<Stop> stops;
         Route route;
+        TableTripPattern backingPattern;
         String patternId;
         int nTrips;
         
@@ -73,35 +76,8 @@ public class ProfileData {
             stops = first.getStops();
             route = first.getRoute(); // only _table_ trip patterns have exemplars
             patternId = first.getCode();
-            int nStops = stops.size();
-            min = new int[nStops];
-            avg = new int[nStops];
-            max = new int[nStops];
-            for (int s = 0; s < nStops; ++s) min[s] = Integer.MAX_VALUE;
-            for (TableTripPattern ttp : ttps) {
-                if ( ! ttp.getStops().equals(stops)) {
-                    LOG.error("mismatched stop pattern");
-                    continue;
-                }
-                if ( ! ttp.getRoute().equals(route)) {
-                    LOG.error("mismatched route");
-                    continue;
-                }
-                nTrips = ttp.getTrips().size(); // TODO note this is taking only one pattern's count
-                for (int i = 0; i < nTrips; ++i) {
-                    TripTimes tt = ttp.getTripTimes(i);
-                    int t0 = tt.getDepartureTime(0); // storing relative times
-                    for (int stop = 1; stop < nStops; ++stop) { // hops vs. stops
-                        // TODO switch to running time rather than dwell time, effect on stats
-                        int tn = tt.getArrivalTime(stop - 1); // note this is ignoring dwell times
-                        tn -= t0;
-                        if (tn < min[stop]) min[stop] = tn;
-                        if (tn > max[stop]) max[stop] = tn;
-                    }
-                }                
-            }
-            // FIXME: horrific hack
-            for (int s = 0; s < nStops; ++s) avg[s] = (min[s] + max[s]) / 2;                        
+            nTrips = first.getTrips().size();
+            backingPattern = first;
         }
         
         public String stopString() {
@@ -187,6 +163,14 @@ public class ProfileData {
         for (Transfer tr : bestTransfers.values()) {
             transfersForStop.put(tr.s1, tr);
         }
+        /*
+        for (Stop stop : transfersForStop.keys()) {
+            System.out.println("STOP " + stop);
+            for (Transfer transfer : transfersForStop.get(stop)) {
+                System.out.println("    " + transfer.toString());
+            }            
+        }
+        */
         LOG.info("Done finding transfers.");
     }
 

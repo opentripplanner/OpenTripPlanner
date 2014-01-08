@@ -70,6 +70,7 @@ public class Timetable implements Serializable {
      * Contains one TripTimes object for each scheduled trip (even cancelled ones) and possibly
      * additional TripTimes objects for unscheduled trips.
      */
+    @Getter
     private final ArrayList<TripTimes> tripTimes;
 
     /**
@@ -658,5 +659,5 @@ public class Timetable implements Serializable {
             tt.serviceCode = serviceCodes.get(tt.getTrip().getServiceId());
         }
     }
-    
+
 } 

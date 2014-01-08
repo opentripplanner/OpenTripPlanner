@@ -18,11 +18,13 @@ public class Segment {
         public int fromIndex;
         public int toIndex;
         public int nTrips;
+        public Stats stats;
         public SegmentPattern (PatternRide patternRide) {
             this.patternId = patternRide.pattern.patternId;
             this.fromIndex = patternRide.fromIndex;
             this.toIndex   = patternRide.toIndex;
             this.nTrips    = patternRide.pattern.nTrips;
+            this.stats     = patternRide.stats;
         }
         @Override
         public int compareTo (SegmentPattern other) {
@@ -67,9 +69,10 @@ public class Segment {
     /** Side effect: sets walkTime as well. */
     public Stats characterizeTransfer (Ride ride) {
         Stats ret = new Stats();
-        ret.min=200;
-        ret.avg=400;
-        ret.max=600;
+        ret.min = 200;
+        ret.avg = 400;
+        ret.max = 600;
+        ret.num = null;
         walkTime = (int) (ride.getTransferDistance() / WALK_SPEED);
         return ret;
     }
