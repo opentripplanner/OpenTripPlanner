@@ -12,14 +12,15 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>. 
  */
 
-var INIT_LOCATION = new L.LatLng(44.840, -0.574); // Bordeaux
+var INIT_LOCATION = new L.LatLng(43.297, 5.370); // Marseille
+// var INIT_LOCATION = new L.LatLng(44.840, -0.574); // Bordeaux
 // var INIT_LOCATION = new L.LatLng(47.059, -0.880); // Cholet
 var ROUTER_ID = null; // Default router
 var ALGORITHM = "accSampling"; // accSampling or recursiveGrid
 // var ISOCHRONE_TIMES = [ 1800 ]; // secs
 var ISOCHRONE_TIMES = [ 900, 1800, 2700 ]; // secs
 // var ISOCHRONE_TIMES = [ 900, 1800, 2700, 3600, 4500 ]; // secs
-var DATE = '2013/10/01';
+var DATE = '2013/12/01';
 var TIME = '12:00:00';
 var MODES = 'WALK,TRANSIT';
 var DEBUG = false;
@@ -77,7 +78,7 @@ function updateIsochrones() {
 			+ '&date=' + DATE + '&time=' + TIME + '&mode=' + MODES
 			+ '&maxWalkDistance=' + MAX_WALK_DISTANCE + '&precisionMeters='
 			+ PRECISION;
-	for ( var i = 0; i < ISOCHRONE_TIMES.length; i++) {
+	for (var i = 0; i < ISOCHRONE_TIMES.length; i++) {
 		req = req + '&cutoffSec=' + ISOCHRONE_TIMES[i];
 	}
 	if (DEBUG) {
@@ -86,8 +87,8 @@ function updateIsochrones() {
 	xhr.open('GET', req, true);
 	xhr.onload = function() {
 		var geoJsonData = JSON.parse(this.responseText);
-		for ( var i = geoJsonData.length - 1; i >= 0; i--) {
-			var isochrone = L.geoJson(geoJsonData[i], {
+		for (var i = geoJsonData.features.length - 1; i >= 0; i--) {
+			var isochrone = L.geoJson(geoJsonData.features[i], {
 				style : {
 					color : "#0000FF",
 					weight : 2,
@@ -97,27 +98,6 @@ function updateIsochrones() {
 				}
 			});
 			isochrones.addLayer(isochrone);
-			if (DEBUG) {
-				var debug = L.geoJson(geoJsonData[i].debugGeometry, {
-					style : {
-						color : "#FF0000",
-						weight : 2,
-						fillOpacity : 0.1,
-						fillColor : "#FF0000"
-					},
-					pointToLayer : function(feature, latlng) {
-						return L.circleMarker(latlng, {
-							radius : 2,
-							fillColor : "#000",
-							color : "#000",
-							weight : 1,
-							opacity : 1,
-							fillOpacity : 0
-						});
-					}
-				});
-				isochrones.addLayer(debug);
-			}
 		}
 	};
 	xhr.send();
