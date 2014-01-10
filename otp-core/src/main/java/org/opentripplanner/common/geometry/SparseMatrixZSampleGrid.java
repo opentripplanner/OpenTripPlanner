@@ -20,6 +20,8 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
+import org.opentripplanner.analyst.core.TimeGrid;
+
 import com.vividsolutions.jts.geom.Coordinate;
 
 /**
@@ -146,6 +148,8 @@ public final class SparseMatrixZSampleGrid<TZ> implements ZSampleGrid<TZ>,
 
     private Coordinate center;
 
+    private int chunkSize;
+
     private SparseMatrix<SparseMatrixSamplePoint> allSamples;
 
     private List<GridDelaunayEdge> triangulation = null;
@@ -162,6 +166,7 @@ public final class SparseMatrixZSampleGrid<TZ> implements ZSampleGrid<TZ>,
         this.center = center;
         this.dX = dX;
         this.dY = dY;
+        this.chunkSize = chunkSize;
         allSamples = new SparseMatrix<SparseMatrixSamplePoint>(chunkSize, totalSize);
     }
 
@@ -302,5 +307,113 @@ public final class SparseMatrixZSampleGrid<TZ> implements ZSampleGrid<TZ>,
     public DelaunayTriangulation<TZ> delaunayTriangulate() {
         // We ourselves are a DelaunayTriangulation
         return this;
+    }
+
+    /**
+     * Convert to a TimeGrid. Use the same block size as the underlying sparse matrix, to prevent
+     * from allocating a new whole collection.
+     * 
+     * @param mapper Mapper between TZ objects and TimeGrid double[] values.
+     * @param offRoadDistanceMeters TODO Remove this parameter
+     * @return
+     */
+    @Override
+    public TimeGrid asTimeGrid(final TimeGridMapper<TZ> mapper, final double offRoadDistanceMeters) {
+
+        return new TimeGrid() {
+
+            @Override
+            public double getLonCenter() {
+                return center.x;
+            }
+
+            @Override
+            public double getLatCenter() {
+                return center.y;
+            }
+
+            @Override
+            public double getLonDelta() {
+                return dX;
+            }
+
+            @Override
+            public double getLatDelta() {
+                return dY;
+            }
+
+            @Override
+            public int getBlockSizeX() {
+                return allSamples.getChunkSize();
+            }
+
+            @Override
+            public int getBlockSizeY() {
+                return allSamples.getChunkSize();
+            }
+
+            /**
+             * @return An iterable to make the conversion between a sparse matrix and a time grid on
+             *         the fly. This prevent us from having two big collections of objects in memory
+             *         at the same time.
+             */
+            @Override
+            public Iterable<TimeGridBlock> getBlocks() {
+                return new Iterable<TimeGridBlock>() {
+                    @Override
+                    public Iterator<TimeGridBlock> iterator() {
+                        final Iterator<SparseMatrix<SparseMatrixSamplePoint>.SparseMatrixChunk> chunkIterator = allSamples
+                                .getChunks().iterator();
+                        return new Iterator<TimeGridBlock>() {
+
+                            @Override
+                            public boolean hasNext() {
+                                return chunkIterator.hasNext();
+                            }
+
+                            @Override
+                            public TimeGridBlock next() {
+                                final SparseMatrix<SparseMatrixSamplePoint>.SparseMatrixChunk spChunk = chunkIterator
+                                        .next();
+                                return new TimeGridBlock() {
+                                    @Override
+                                    public int getX0() {
+                                        return spChunk.getX0();
+                                    }
+
+                                    @Override
+                                    public int getY0() {
+                                        return spChunk.getY0();
+                                    }
+
+                                    @Override
+                                    public int[][][] getTimePoints() {
+                                        int[][][] retval = new int[chunkSize][chunkSize][];
+                                        for (int x = 0; x < chunkSize; x++) {
+                                            for (int y = 0; y < chunkSize; y++) {
+                                                SparseMatrixSamplePoint p = spChunk.getT(x, y);
+                                                retval[x][y] = p == null ? null : mapper
+                                                        .mapValues(p.getZ());
+                                            }
+                                        }
+                                        return retval;
+                                    }
+                                };
+                            }
+
+                            @Override
+                            public void remove() {
+                                throw new UnsupportedOperationException("remove");
+                            }
+                        };
+                    }
+                };
+            }
+
+            @Override
+            public int getOffRoadDistanceMeters() {
+                return (int) Math.round(offRoadDistanceMeters);
+            }
+        };
     }
 }

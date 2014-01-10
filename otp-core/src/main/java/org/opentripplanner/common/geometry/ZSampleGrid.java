@@ -13,6 +13,7 @@
 
 package org.opentripplanner.common.geometry;
 
+import org.opentripplanner.analyst.core.TimeGrid;
 import org.opentripplanner.common.geometry.ZSampleGrid.ZSamplePoint;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -52,5 +53,16 @@ public interface ZSampleGrid<TZ> extends Iterable<ZSamplePoint<TZ>> {
     public int size();
 
     public DelaunayTriangulation<TZ> delaunayTriangulate();
+
+    /**
+     * Map values from a TZ object to a TimeGrid.
+     * 
+     * @param <TZ>
+     */
+    public interface TimeGridMapper<TZ> {
+        public int[] mapValues(TZ z);
+    }
+
+    public TimeGrid asTimeGrid(TimeGridMapper<TZ> mapper, double offRoadDistanceMeters);
 
 }
