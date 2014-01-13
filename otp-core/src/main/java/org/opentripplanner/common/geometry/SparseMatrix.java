@@ -32,7 +32,7 @@ import lombok.Getter;
 public class SparseMatrix<T> implements Iterable<T> {
 
     /* The biggest negative 32 bits value that is a multiple of 128 */
-    private static final int INDEX_OFFSET = 2147483520;
+    private static final long INDEX_OFFSET = 2147483520L;
     
     private int shift;
 
@@ -63,10 +63,8 @@ public class SparseMatrix<T> implements Iterable<T> {
     }
 
     public final T get(int x, int y) {
-        x += INDEX_OFFSET;
-        y += INDEX_OFFSET;
-        long x0 = x >> shift;
-        long y0 = y >> shift;
+        long x0 = ((long)x + INDEX_OFFSET) >> shift;
+        long y0 = ((long)y + INDEX_OFFSET) >> shift;
         Long key = x0 + (y0 << 32);
         T[] ts = chunks.get(key);
         if (ts == null) {
@@ -78,10 +76,8 @@ public class SparseMatrix<T> implements Iterable<T> {
 
     @SuppressWarnings("unchecked")
     public final T put(int x, int y, T t) {
-        x += INDEX_OFFSET;
-        y += INDEX_OFFSET;
-        long x0 = x >> shift;
-        long y0 = y >> shift;
+        long x0 = ((long)x + INDEX_OFFSET) >> shift;
+        long y0 = ((long)y + INDEX_OFFSET) >> shift;
         Long key = x0 + (y0 << 32);
         T[] ts = chunks.get(key);
         if (ts == null) {
