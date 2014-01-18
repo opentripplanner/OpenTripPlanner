@@ -13,16 +13,17 @@
 
 package org.opentripplanner.extra_graph;
 
-import java.util.HashMap;
-import java.util.List;
-
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.graph.Edge;
 
-public class EdgesForRoute {
-    public HashMap<AgencyAndId, List<Edge>> edgesForRoute = new HashMap<AgencyAndId, List<Edge>>();
+import java.util.Collection;
 
-    public List<Edge> get(AgencyAndId route) {
+public class EdgesForRoute {
+    public Multimap<AgencyAndId, Edge> edgesForRoute = ArrayListMultimap.create();
+
+    public Collection<Edge> get(AgencyAndId route) {
         return edgesForRoute.get(route);
     }
 }

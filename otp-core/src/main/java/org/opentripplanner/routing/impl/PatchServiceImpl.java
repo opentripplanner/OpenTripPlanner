@@ -13,40 +13,37 @@
 
 package org.opentripplanner.routing.impl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-import java.util.Map.Entry;
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.ListMultimap;
 import lombok.Setter;
-
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.patch.AlertPatch;
 import org.opentripplanner.routing.patch.Patch;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PatchService;
-import org.opentripplanner.util.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 @Component
 public class PatchServiceImpl implements PatchService {
 
     private Graph graph;
-    
-    @Autowired @Setter
+
+    @Autowired
+    @Setter
     private GraphService graphService;
 
-    private HashMap<String, Patch> patches = new HashMap<String, Patch>();
-    private HashMap<AgencyAndId,List<Patch>> patchesByRoute = new HashMap<AgencyAndId, List<Patch>>();
-    private HashMap<AgencyAndId, List<Patch>> patchesByStop = new HashMap<AgencyAndId, List<Patch>>();
+    private Map<String, Patch> patches = new HashMap<String, Patch>();
+    private ListMultimap<AgencyAndId, Patch> patchesByRoute = LinkedListMultimap.create();
+    private ListMultimap<AgencyAndId, Patch> patchesByStop = LinkedListMultimap.create();
 
     protected PatchServiceImpl() {
     }
-    
+
     public PatchServiceImpl(Graph graph) {
         this.graph = graph;
     }
@@ -55,7 +52,7 @@ public class PatchServiceImpl implements PatchService {
     public Collection<Patch> getAllPatches() {
         return patches.values();
     }
-    
+
     @Override
     public Collection<Patch> getStopPatches(AgencyAndId stop) {
         List<Patch> result = patchesByStop.get(stop);
@@ -90,11 +87,11 @@ public class PatchServiceImpl implements PatchService {
             AlertPatch alertPatch = (AlertPatch) patch;
             AgencyAndId stop = alertPatch.getStop();
             if (stop != null) {
-                MapUtils.addToMapList(patchesByStop, stop, patch);
+                patchesByStop.put(stop, patch);
             }
             AgencyAndId route = alertPatch.getRoute();
             if (route != null) {
-                MapUtils.addToMapList(patchesByRoute, route, patch);
+                patchesByRoute.put(route, patch);
             }
         }
 
@@ -141,11 +138,11 @@ public class PatchServiceImpl implements PatchService {
             AlertPatch alertPatch = (AlertPatch) patch;
             AgencyAndId stop = alertPatch.getStop();
             if (stop != null) {
-                MapUtils.removeFromMapList(patchesByStop, stop, patch);
+                patchesByStop.remove(stop, patch);
             }
             AgencyAndId route = alertPatch.getRoute();
             if (route != null) {
-                MapUtils.removeFromMapList(patchesByRoute, route, patch);
+                patchesByRoute.remove(route, patch);
             }
         }
 
