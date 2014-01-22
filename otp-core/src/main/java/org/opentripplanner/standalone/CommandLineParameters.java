@@ -111,7 +111,11 @@ public class CommandLineParameters {
     @Parameter( names = { "-g", "--graphs"}, validateWith = ReadableDirectory.class, 
             description = "path to graph directory")
     String graphDirectory;
-    
+
+    @Parameter( names = { "--raptor"},
+            description = "use the RAPTOR algorithm for routing")
+    boolean raptor = false;
+
     @Parameter( names = { "-l", "--longDistance"}, 
             description = "use an algorithm tailored for long-distance routing")
     boolean longDistance = false;

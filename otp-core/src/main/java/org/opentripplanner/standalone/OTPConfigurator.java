@@ -28,6 +28,7 @@ import org.opentripplanner.graph_builder.impl.ned.NEDGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.ned.NEDGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.impl.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl;
+import org.opentripplanner.graph_builder.impl.raptor.RaptorDataBuilder;
 import org.opentripplanner.graph_builder.impl.transit_index.TransitIndexBuilder;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
@@ -44,6 +45,7 @@ import org.opentripplanner.routing.impl.GraphServiceBeanImpl;
 import org.opentripplanner.routing.impl.GraphServiceImpl;
 import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
 import org.opentripplanner.routing.impl.LongDistancePathService;
+import org.opentripplanner.routing.impl.raptor.Raptor;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
@@ -92,9 +94,16 @@ public class OTPConfigurator {
         cpf.bind(PlanGenerator.class);
         cpf.bind(MetadataService.class);
         cpf.bind(SPTService.class, new GenericAStar());
-        
+
         // Choose a PathService to wrap the SPTService, depending on expected maximum path lengths
-        if (params.longDistance) {
+        if (params.raptor) {
+            Raptor raptor = new Raptor();
+            raptor.setMultiPathTimeout(1.0);
+            raptor.setShortPathCutoff(1000);
+            cpf.bind(PathService.class, raptor);
+            cpf.bind(RemainingWeightHeuristicFactory.class,
+                    new DefaultRemainingWeightHeuristicFactoryImpl());
+        } else if (params.longDistance) {
             LongDistancePathService pathService = new LongDistancePathService();
             pathService.setTimeout(10);
             cpf.bind(PathService.class, pathService);
@@ -241,12 +250,15 @@ public class OTPConfigurator {
                 graphBuilder.addGraphBuilder(new TransitToStreetNetworkGraphBuilderImpl());
             }
             List<GraphBuilderWithGtfsDao> gtfsBuilders = new ArrayList<GraphBuilderWithGtfsDao>();
-            if (params.transitIndex) {
+            if (params.transitIndex || params.raptor) {
                 gtfsBuilders.add(new TransitIndexBuilder());
             }
             gtfsBuilder.setFareServiceFactory(new DefaultFareServiceFactory());
             gtfsBuilder.setGtfsGraphBuilders(gtfsBuilders);
             gtfsBuilder.setDeleteUselessDwells(params.deleteUselessDwells);
+        }
+        if(params.raptor) {
+            graphBuilder.addGraphBuilder(new RaptorDataBuilder());
         }
         if (configFile != null) {
             EmbeddedConfigGraphBuilderImpl embeddedConfigBuilder = new EmbeddedConfigGraphBuilderImpl();
