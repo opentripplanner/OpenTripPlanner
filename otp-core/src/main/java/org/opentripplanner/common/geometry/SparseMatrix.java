@@ -33,7 +33,7 @@ public class SparseMatrix<T> implements Iterable<T> {
 
     /* The biggest negative 32 bits value that is a multiple of 128 */
     private static final long INDEX_OFFSET = 2147483520L;
-    
+
     private int shift;
 
     private int mask;
@@ -41,6 +41,9 @@ public class SparseMatrix<T> implements Iterable<T> {
     private Map<Long, T[]> chunks;
 
     int size = 0, matSize, chunkSize;
+
+    @Getter
+    int xMin, xMax, yMin, yMax;
 
     /**
      * @param chunkSize Chunk size, must be a power of two. Keep it small (8, 16, 32...). Number of
@@ -60,11 +63,15 @@ public class SparseMatrix<T> implements Iterable<T> {
         this.matSize = (mask + 1) * (mask + 1);
         // We assume here that each chunk will be filled at ~25% (thus the x4)
         this.chunks = new HashMap<Long, T[]>(totalSize / matSize * 4);
+        this.xMin = Integer.MAX_VALUE;
+        this.yMin = Integer.MAX_VALUE;
+        this.xMax = Integer.MIN_VALUE;
+        this.yMax = Integer.MIN_VALUE;
     }
 
     public final T get(int x, int y) {
-        long x0 = ((long)x + INDEX_OFFSET) >> shift;
-        long y0 = ((long)y + INDEX_OFFSET) >> shift;
+        long x0 = ((long) x + INDEX_OFFSET) >> shift;
+        long y0 = ((long) y + INDEX_OFFSET) >> shift;
         Long key = x0 + (y0 << 32);
         T[] ts = chunks.get(key);
         if (ts == null) {
@@ -76,8 +83,16 @@ public class SparseMatrix<T> implements Iterable<T> {
 
     @SuppressWarnings("unchecked")
     public final T put(int x, int y, T t) {
-        long x0 = ((long)x + INDEX_OFFSET) >> shift;
-        long y0 = ((long)y + INDEX_OFFSET) >> shift;
+        if (x < xMin)
+            xMin = x;
+        if (x > xMax)
+            xMax = x;
+        if (y < yMin)
+            yMin = y;
+        if (y > yMax)
+            yMax = y;
+        long x0 = ((long) x + INDEX_OFFSET) >> shift;
+        long y0 = ((long) y + INDEX_OFFSET) >> shift;
         Long key = x0 + (y0 << 32);
         T[] ts = chunks.get(key);
         if (ts == null) {

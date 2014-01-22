@@ -50,6 +50,18 @@ public interface ZSampleGrid<TZ> extends Iterable<ZSamplePoint<TZ>> {
 
     public int[] getLowerLeftIndex(Coordinate C);
 
+    public Coordinate getCenter();
+
+    public Coordinate getCellSize();
+    
+    public int getXMin();
+    
+    public int getXMax();
+    
+    public int getYMin();
+    
+    public int getYMax();
+    
     public int size();
 
     public DelaunayTriangulation<TZ> delaunayTriangulate();
