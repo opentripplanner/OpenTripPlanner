@@ -163,11 +163,11 @@ public class TimeGridWs extends RoutingResource {
         pHYS.setUnits(1); // Meters
         pw.getChunksList().queue(pHYS);
 
-        String gridCornerStr = String.format(Locale.US, "%f,%f", sampleGrid.getCenter().x
-                + sampleGrid.getXMin() * sampleGrid.getCellSize().x, sampleGrid.getCenter().y
-                + sampleGrid.getYMin() * sampleGrid.getCellSize().y);
-        String gridCellSzStr = String.format(Locale.US, "%f,%f", sampleGrid.getCellSize().x,
-                sampleGrid.getCellSize().y);
+        String gridCornerStr = String.format(Locale.US, "%f,%f", sampleGrid.getCenter().y
+                + sampleGrid.getYMin() * sampleGrid.getCellSize().y, sampleGrid.getCenter().x
+                + sampleGrid.getXMin() * sampleGrid.getCellSize().x);
+        String gridCellSzStr = String.format(Locale.US, "%f,%f", sampleGrid.getCellSize().y,
+                sampleGrid.getCellSize().x);
         String offRoadDistStr = String.format(Locale.US, "%f",
                 sampleGridRenderer.getOffRoadDistanceMeters(precisionMeters));
 
