@@ -122,9 +122,24 @@ Pass – our discounted group fare.  The Class Pass is only $1 per person (ages
 
 <p><input type="checkbox" name="req.requireInvoice" /> I need an invoice before paying
 
+<h3>User Verification</h3>
+
+Please enter the following text:
+<script type="text/javascript"
+     src="http://www.google.com/recaptcha/api/challenge?k=${play.configuration['recaptcha.public_key']} ">
+</script>
+<noscript>
+   <iframe src="http://www.google.com/recaptcha/api/noscript?k=${play.configuration['recaptcha.public_key']} "
+       height="300" width="500" frameborder="0"></iframe><br>
+   <textarea name="recaptcha_challenge_field" rows="3" cols="40">
+   </textarea>
+   <input type="hidden" name="recaptcha_response_field"
+       value="manual_challenge">
+</noscript>
+
 </form>
 
-
+  
 <div style="text-align: center; font-weight: bold; margin-top: 2em;">Please verify that all information is correctly entered prior to submitting.</div>
 <div class="buttonRow">
     <div id="submitLink" style="cursor:pointer; border: 2px solid gray; width: 250px; padding: 3px; margin: 4px auto; background: white;">Submit Request</div>
