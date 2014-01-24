@@ -22,7 +22,7 @@ otp.modules.analyst.AnalystLegendWidget =
     
     initialize : function(id, module, width, height) {
         otp.widgets.Widget.prototype.initialize.call(this, id, module, {
-            title : 'Legend',
+            title : otp.config.locale.widgets.AnalystLegend.title,
             cssClass : 'otp-analyst-legendWidget'
         });
         

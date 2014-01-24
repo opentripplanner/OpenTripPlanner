@@ -38,7 +38,7 @@ otp.widgets.ItinerariesWidget =
         this.module = module;
 
         otp.widgets.Widget.prototype.initialize.call(this, id, module, {
-            title : "Itineraries",
+            title : otp.config.locale.widgets.ItinerariesWidget.title,
             cssClass : module.itinerariesWidgetCssClass || 'otp-defaultItinsWidget',
             resizable : true,
             closeable : true,
@@ -93,7 +93,7 @@ otp.widgets.ItinerariesWidget =
         this.itineraries = itineraries;
 
         this.clear();
-        this.setTitle(this.itineraries.length+" Itineraries Returned");
+        this.setTitle(this.itineraries.length + " " + otp.config.locale.widgets.ItinerariesWidget.itinerariesLength);
         
         var html = "<div id='"+divId+"' class='otp-itinsAccord'></div>";
         this.itinsAccord = $(html).appendTo(this.$());
@@ -106,7 +106,7 @@ otp.widgets.ItinerariesWidget =
             var link = this.constructLink(queryParams, 
                                           jQuery.isFunction(this.module.getAdditionalUrlParams) ?
                                               this.module.getAdditionalUrlParams() : null);
-            $('<div class="otp-itinsWidget-searchLink">[<a href="'+link+'">Link to Search</a>]</div>').appendTo(this.footer);
+            $('<div class="otp-itinsWidget-searchLink">[<a href="'+link+'">'+otp.config.locale.widgets.ItinerariesWidget.linkToSearch+'</a>]</div>').appendTo(this.footer);
         }
         
         var header;
@@ -164,7 +164,7 @@ otp.widgets.ItinerariesWidget =
         var serviceBreakTime = "03:00am";
         var this_ = this;
         var buttonRow = $("<div class='otp-itinsButtonRow'></div>").appendTo(this.footer);
-        $('<button>First</button>').button().appendTo(buttonRow).click(function() {
+        $('<button>'+otp.config.locale.widgets.ItinerariesWidget.buttons.first+'</button>').button().appendTo(buttonRow).click(function() {
             var itin = this_.itineraries[this_.activeIndex];
             var params = itin.tripPlan.queryParams;
             var stopId = itin.getFirstStopID();
@@ -178,7 +178,7 @@ otp.widgets.ItinerariesWidget =
             this_.module.updateActiveOnly = true;
             this_.module.planTripFunction.call(this_.module, params);
         });
-        $('<button>Previous</button>').button().appendTo(buttonRow).click(function() {
+        $('<button>'+otp.config.locale.widgets.ItinerariesWidget.buttons.previous+'</button>').button().appendTo(buttonRow).click(function() {
             var itin = this_.itineraries[this_.activeIndex];
             var params = itin.tripPlan.queryParams;
             var newEndTime = itin.itinData.endTime - 90000;
@@ -193,7 +193,7 @@ otp.widgets.ItinerariesWidget =
             this_.module.updateActiveOnly = true;
             this_.module.planTripFunction.call(this_.module, params);
         });
-        $('<button>Next</button>').button().appendTo(buttonRow).click(function() {
+        $('<button>'+otp.config.locale.widgets.ItinerariesWidget.buttons.next+'</button>').button().appendTo(buttonRow).click(function() {
             var itin = this_.itineraries[this_.activeIndex];
             var params = itin.tripPlan.queryParams;
             var newStartTime = itin.itinData.startTime + 90000;
@@ -208,7 +208,7 @@ otp.widgets.ItinerariesWidget =
             this_.module.updateActiveOnly = true;
             this_.module.planTripFunction.call(this_.module, params);
         });
-        $('<button>Last</button>').button().appendTo(buttonRow).click(function() {
+        $('<button>'+otp.config.locale.widgets.ItinerariesWidget.buttons.last+'</button>').button().appendTo(buttonRow).click(function() {
             var itin = this_.itineraries[this_.activeIndex];
             var params = itin.tripPlan.queryParams;
             var stopId = itin.getFirstStopID();
@@ -341,11 +341,11 @@ otp.widgets.ItinerariesWidget =
             if (leg.realTime && typeof(leg.arrivalDelay) === 'number') {
                 var minDelay = Math.round(leg.arrivalDelay / 60)
                 if (minDelay > 0) {
-                    headerHtml += ' <span style="color:red;">(' + minDelay + 'min late)</span>';
+                    headerHtml += ' <span style="color:red;">(' + minDelay + otp.config.locale.widgets.ItinerariesWidget.realtimeDelay.late + ')</span>';
                 } else if (minDelay < 0) {
-                    headerHtml += ' <span style="color:green;">(' + (minDelay * -1) + 'min early)</span>';
+                    headerHtml += ' <span style="color:green;">(' + (minDelay * -1) + otp.config.locale.widgets.ItinerariesWidget.realtimeDelay.early + ')</span>';
                 } else {
-                    headerHtml += ' <span style="color:green;">(on time)</span>';
+                    headerHtml += ' <span style="color:green;">(' + otp.config.locale.widgets.ItinerariesWidget.realtimeDelay.onTime + ')</span>';
                 }
             }
 
@@ -367,7 +367,7 @@ otp.widgets.ItinerariesWidget =
                 }
 
                 if(leg.headsign) {
-                    headerHtml +=  " to " + leg.headsign;
+                    headerHtml +=  " " + otp.config.locale.directions.to + " " + leg.headsign;
                 }
                 
                 if(leg.alerts) {
