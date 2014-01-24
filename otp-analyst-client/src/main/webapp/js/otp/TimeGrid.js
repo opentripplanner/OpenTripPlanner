@@ -209,7 +209,7 @@ OTPA.TimeGrid.prototype._drawTile = function(tileCache, canvas, tile, colorMap) 
         var d = id.data;
         var dLat = tile.C1.lat - tile.C0.lat;
         var dLng = tile.C1.lng - tile.C0.lng;
-        var dxy = 8; // Should be a divisor of tile.size
+        var dxy = 4; // Should be a divisor of tile.size
         var paint = function(x, y) {
             var C = L.latLng(tile.C0.lat + y * dLat / tile.size, tile.C0.lng
                     + x * dLng / tile.size);
@@ -233,12 +233,9 @@ OTPA.TimeGrid.prototype._drawTile = function(tileCache, canvas, tile, colorMap) 
                 return -1;
             return (d[j] << 16) + (d[j + 1] << 8) + (d[j + 2]);
         }
-        paint(0, 0);
-        for (var x = dxy - 1; x < tile.size; x += dxy) {
-            paint(x, 0);
-        }
-        for (var y = dxy - 1; y < tile.size; y += dxy) {
-            paint(0, y);
+        for (var xy = 0; xy < tile.size; xy++) {
+            paint(xy, 0);
+            paint(0, xy);
         }
         for (var x = dxy - 1; x < tile.size; x += dxy) {
             for (var y = dxy - 1; y < tile.size; y += dxy) {
@@ -263,9 +260,9 @@ OTPA.TimeGrid.prototype._drawTile = function(tileCache, canvas, tile, colorMap) 
                         var r = (c1 & 0xFF0000) >> 16;
                         var g = (c1 & 0x00FF00) >> 8;
                         var b = (c1 & 0x0000FF);
-                        for (var y2 = ym; y2 <= y; y2++) {
-                            var j = (xm + y2 * tile.size) * 4;
-                            for (var x2 = xm; x2 <= x; x2++) {
+                        for (var y2 = ym + 1; y2 <= y; y2++) {
+                            var j = (xm + 1 + y2 * tile.size) * 4;
+                            for (var x2 = xm + 1; x2 <= x; x2++) {
                                 d[j++] = r;
                                 d[j++] = g;
                                 d[j++] = b;
@@ -274,8 +271,8 @@ OTPA.TimeGrid.prototype._drawTile = function(tileCache, canvas, tile, colorMap) 
                         }
                     }
                 } else {
-                    for (var x2 = xm; x2 <= x; x2++) {
-                        for (var y2 = ym; y2 <= y; y2++) {
+                    for (var x2 = xm + 1; x2 <= x; x2++) {
+                        for (var y2 = ym + 1; y2 <= y; y2++) {
                             paint(x2, y2);
                         }
                     }
