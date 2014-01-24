@@ -1,11 +1,7 @@
-// make sure we have otp.config and otp.config.locale defined
-if(typeof(otp) == "undefined" || otp == null) otp = {};
-if(typeof(otp.config) == "undefined" || otp.config == null) otp.config = {};
-//if(typeof(otp.config.locale) == "undefined" || otp.config.locale == null) otp.config.locale = otp.locale.English;
-
-
 otp.config = {
     debug: false,
+
+    locale: otp.locale.French,
 
     /**
      * The OTP web service locations
@@ -154,5 +150,5 @@ otp.config = {
      
     timeFormat  : "h:mma",
     dateFormat  : "MMM Do YYYY"
-};
 
+};
