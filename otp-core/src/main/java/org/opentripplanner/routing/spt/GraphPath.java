@@ -60,6 +60,8 @@ public class GraphPath {
      *            - the traverse options used to reach this state
      */
     public GraphPath(State s, boolean optimize) {
+        // Only optimize transit trips
+        optimize &= s.getOptions().getModes().isTransit();
         this.rctx = s.getContext();
         this.back = s.getOptions().isArriveBy();
         

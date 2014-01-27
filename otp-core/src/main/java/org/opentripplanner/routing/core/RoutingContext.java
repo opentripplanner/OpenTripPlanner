@@ -22,7 +22,7 @@ import java.util.Set;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
-import org.opentripplanner.api.ws.Debug;
+import org.opentripplanner.api.ws.DebugOutput;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -120,7 +120,7 @@ public class RoutingContext implements Cloneable {
     public Vertex startingStop;
 
     /** An object that accumulates profiling and debugging info for inclusion in the response. */
-    public Debug debug = new Debug();
+    public DebugOutput debugOutput = new DebugOutput();
 
 
     /* CONSTRUCTORS */
@@ -216,7 +216,7 @@ public class RoutingContext implements Cloneable {
         }
         this.opt = routingRequest;
         this.graph = graph;
-        this.debug.startedCalculating();
+        this.debugOutput.startedCalculating();
 
         // the graph's snapshot may be frequently updated.
         // Grab a reference to ensure a coherent view of the timetables throughout this search.
