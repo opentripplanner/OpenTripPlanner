@@ -23,7 +23,7 @@ var OTPA = OTPA || {}; // namespace
  */
 OTPA.timeGrid = function(requestParams, callback) {
     return new OTPA.TimeGrid(requestParams, callback);
-}
+};
 
 /**
  * Constructor.
@@ -31,12 +31,12 @@ OTPA.timeGrid = function(requestParams, callback) {
 OTPA.TimeGrid = function(requestParams, callback) {
     // We do the base64 encoding on the server as
     // doing it on the client is painful and not portable.
-    var url = '/otp-rest-servlet/ws/timegrid/timegrid.png?'
-            + $.param(requestParams) + "&base64=true";
+    var url = '/otp-rest-servlet/ws/timegrid?' + $.param(requestParams)
+            + "&base64=true";
     var thisTg = this;
     $.ajax({
         url : url,
-        async : false,
+        async : true,
         mimeType : "image/png",
         // dataFilter : function(data, type) {
         // return window.btoa(data); <-- JS is really dumb
@@ -49,7 +49,7 @@ OTPA.TimeGrid = function(requestParams, callback) {
             thisTg.offRoadDistanceMeters = jqXhr
                     .getResponseHeader("OTPA-OffRoad-Dist");
             var png = new Image();
-            var pngLoaded = function() {
+            png.onload = function() {
                 var canvas = document.createElement("canvas");
                 canvas.width = png.width;
                 canvas.height = png.height;
@@ -60,7 +60,6 @@ OTPA.TimeGrid = function(requestParams, callback) {
                 thisTg.channels = 4; // RGBA
                 callback(thisTg);
             }
-            png.onload = pngLoaded;
             png.src = "data:image/png;base64," + data;
         }
     });
@@ -146,13 +145,20 @@ OTPA.TimeGrid.prototype._getValues = function(xIndex, yIndex) {
 };
 
 /**
- * Create a leaflet canvas layer.
+ * Create a leaflet canvas layer for the given timeGrid.
+ * 
+ * @param timeGrid
+ *            Any object with a get(latLng) method which retreive a value for a
+ *            given lat/lon coordinate.
+ * @param colorMap
+ *            A mapper between value and color, with a defined value range.
+ * @return A canvas-tiled leaflet layer, with a additional refresh() method to
+ *         be called when the colorMap has been modified.
  */
-OTPA.TimeGrid.prototype.getLeafletLayer = function(colorMap) {
+OTPA.getLeafletLayer = function(timeGrid, colorMap) {
     var layer = new L.TileLayer.Canvas({
         async : true
     });
-    var thisTg = this;
     layer.tileCache = [];
     layer.drawTile = function(canvas, tile, zoom) {
         var map = this._map; // Hackish
@@ -172,10 +178,13 @@ OTPA.TimeGrid.prototype.getLeafletLayer = function(colorMap) {
             C0 : C0,
             C1 : C1
         };
-        thisTg._drawTile(this.tileCache, canvas, mtile, colorMap);
-        this.tileDrawn(canvas);
+        var thisLayer = this;
+        OTPA._drawTile(timeGrid, this.tileCache, canvas, mtile, colorMap,
+                function() {
+                    thisLayer.tileDrawn(canvas);
+                });
     };
-    // TODO Howto override in JS?
+    // Add a new method to the layer
     layer.refresh = function() {
         this.tileCache = [];
         this.redraw();
@@ -186,6 +195,8 @@ OTPA.TimeGrid.prototype.getLeafletLayer = function(colorMap) {
 /**
  * Generic tile drawing.
  * 
+ * @param timeGrid
+ *            The timeGrid to draw the tile for.
  * @param tileCache
  *            Tile cache array, containing cached PNG image of the tile.
  * @param canvas
@@ -194,15 +205,18 @@ OTPA.TimeGrid.prototype.getLeafletLayer = function(colorMap) {
  *            Tile, containing size, C0, C1 (corners), x, y, z (tile position)
  * @param colorMap
  *            A mapping between values and color. Contains the range.
+ * @param completionCallback
+ *            Tile drawn completion callback.
  */
-OTPA.TimeGrid.prototype._drawTile = function(tileCache, canvas, tile, colorMap) {
+OTPA._drawTile = function(timeGrid, tileCache, canvas, tile, colorMap,
+        completionCallback) {
     var context = canvas.getContext("2d");
     var cachedTile = tileCache[[ tile.x, tile.y, tile.z ]];
     if (cachedTile != null) {
         context.drawImage(cachedTile, 0, 0);
+        completionCallback();
         return;
     }
-    var thisTg = this;
     // Else start a timer function to paint
     var timer = setTimeout(function() {
         var id = context.createImageData(tile.size, tile.size);
@@ -213,7 +227,7 @@ OTPA.TimeGrid.prototype._drawTile = function(tileCache, canvas, tile, colorMap) 
         var paint = function(x, y) {
             var C = L.latLng(tile.C0.lat + y * dLat / tile.size, tile.C0.lng
                     + x * dLng / tile.size);
-            var v = thisTg.get(C);
+            var v = timeGrid.get(C);
             if (v != null) {
                 var color = colorMap.colorize(v.t);
                 if (color != null) {
@@ -283,6 +297,7 @@ OTPA.TimeGrid.prototype._drawTile = function(tileCache, canvas, tile, colorMap) 
         var img = new Image();
         img.src = canvas.toDataURL("image/png");
         tileCache[[ tile.x, tile.y, tile.z ]] = img;
+        completionCallback();
     }, Math.floor((Math.random() * 100) + 1));
 };
 
@@ -321,4 +336,48 @@ OTPA.TimeGrid.prototype._getDebugLayer = function() {
         }
     }
     return retval;
-}
+};
+
+/**
+ * TimeGridDiff class. Inherit TimeGrid.
+ */
+
+OTPA.timeGridDiff = function(timeGrid1, timeGrid2) {
+    return new OTPA.TimeGridDiff(timeGrid1, timeGrid2);
+};
+
+/**
+ * Constructor.
+ */
+OTPA.TimeGridDiff = function(timeGrid1, timeGrid2) {
+    this.timeGrid1 = timeGrid1;
+    this.timeGrid2 = timeGrid2;
+};
+
+/**
+ * Return the values for a given (x,y) index.
+ */
+OTPA.TimeGridDiff.prototype.get = function(latLng) {
+    var v1 = this.timeGrid1.get(latLng);
+    var v2 = this.timeGrid2.get(latLng);
+    if (v1 == null || v2 == null) {
+        if (v1 == null && v2 == null) {
+            return null;
+        }
+        if (v1 == null) {
+            return {
+                t : +1000000, // +inf
+                d : v2.d
+            };
+        }
+        return {
+            t : -1000000, // -inf
+            d : v1.d
+        };
+    }
+    return {
+        t : v1.t - v2.t,
+        // Is this correct?
+        d : Math.max(v1.d, v2.d)
+    };
+};
