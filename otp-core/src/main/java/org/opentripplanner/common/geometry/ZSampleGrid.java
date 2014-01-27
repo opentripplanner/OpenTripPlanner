@@ -13,7 +13,6 @@
 
 package org.opentripplanner.common.geometry;
 
-import org.opentripplanner.analyst.core.TimeGrid;
 import org.opentripplanner.common.geometry.ZSampleGrid.ZSamplePoint;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -74,7 +73,4 @@ public interface ZSampleGrid<TZ> extends Iterable<ZSamplePoint<TZ>> {
     public interface TimeGridMapper<TZ> {
         public int[] mapValues(TZ z);
     }
-
-    public TimeGrid asTimeGrid(TimeGridMapper<TZ> mapper, double offRoadDistanceMeters);
-
 }

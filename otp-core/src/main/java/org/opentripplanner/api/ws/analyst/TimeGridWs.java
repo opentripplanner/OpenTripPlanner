@@ -23,16 +23,13 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.CacheControl;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.opentripplanner.analyst.core.TimeGrid;
 import org.opentripplanner.analyst.request.SampleGridRenderer;
 import org.opentripplanner.analyst.request.SampleGridRenderer.WTWD;
 import org.opentripplanner.analyst.request.SampleGridRequest;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.common.geometry.ZSampleGrid;
-import org.opentripplanner.common.geometry.ZSampleGrid.TimeGridMapper;
 import org.opentripplanner.common.geometry.ZSampleGrid.ZSamplePoint;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.slf4j.Logger;
@@ -81,44 +78,8 @@ public class TimeGridWs extends RoutingResource {
 
     private static final String OTPA_OFFROAD_DIST = "OTPA-OffRoad-Dist";
 
-    /** 
-     * TODO Remove this method (unused).
-     */
-    @GET
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Path("/{filename}.json")
-    public Response getTimeGridJson() throws Exception {
-
-        if (precisionMeters < 10)
-            throw new IllegalArgumentException("Too small precisionMeters: " + precisionMeters);
-
-        RoutingRequest sptRequest = buildRequest(0);
-        SampleGridRequest tgRequest = new SampleGridRequest();
-        tgRequest.setMaxTimeSec(maxTimeSec);
-        tgRequest.setPrecisionMeters(precisionMeters);
-
-        // Get a sample grid
-        ZSampleGrid<WTWD> sampleGrid = sampleGridRenderer.getSampleGrid(tgRequest, sptRequest);
-
-        TimeGrid timeGrid = sampleGrid.asTimeGrid(new TimeGridMapper<WTWD>() {
-            @Override
-            public int[] mapValues(WTWD z) {
-                double t = z.tw / z.w;
-                int it;
-                if (Double.isInfinite(t))
-                    it = -1;
-                else
-                    it = (int) Math.round(t);
-                return new int[] { it, (int) Math.round(z.d) };
-            }
-        }, sampleGridRenderer.getOffRoadDistanceMeters(precisionMeters));
-
-        return Response.ok().entity(timeGrid).build();
-    }
-
     @GET
     @Produces({ "image/png" })
-    @Path("/{filename}.png")
     public Response getTimeGridPng(@QueryParam("base64") @DefaultValue("false") boolean base64)
             throws Exception {
 
