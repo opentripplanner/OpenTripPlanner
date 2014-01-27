@@ -121,16 +121,6 @@ public class TimeGridWs extends RoutingResource {
         pw.getMetadata().setText(PngChunkTextVar.KEY_Creation_Time, new Date().toString());
         pw.getMetadata().setText(PngChunkTextVar.KEY_Description, "Sample grid bitmap");
 
-        /*
-         * PNG specs: pHYSs are in pixel per unit, that is pixel per METERS, and are defined as
-         * integers. Here we are having 0.something pixel per meters...
-         */
-        PngChunkPHYS pHYS = new PngChunkPHYS(imgInfo);
-        pHYS.setPixelsxUnitX(0); // ???
-        pHYS.setPixelsxUnitY(0); // ???
-        pHYS.setUnits(1); // Meters
-        pw.getChunksList().queue(pHYS);
-
         String gridCornerStr = String.format(Locale.US, "%.8f,%.8f", sampleGrid.getCenter().y
                 + sampleGrid.getYMin() * sampleGrid.getCellSize().y, sampleGrid.getCenter().x
                 + sampleGrid.getXMin() * sampleGrid.getCellSize().x);
