@@ -34,6 +34,7 @@ OTPA.TimeGrid = function(requestParams, callback) {
     var url = '/otp-rest-servlet/ws/timegrid?' + $.param(requestParams)
             + "&base64=true";
     var thisTg = this;
+    this.precisionMeters = requestParams.precisionMeters;
     $.ajax({
         url : url,
         async : true,
@@ -136,7 +137,7 @@ OTPA.TimeGrid.prototype._getValues = function(xIndex, yIndex) {
     var lat = yIndex * this.cellSize.lat + this.gridBase.lat;
     return {
         t : r + (g << 8),
-        d : b * 2,
+        d : b / 100 * this.precisionMeters,
         c : {
             lng : lng,
             lat : lat

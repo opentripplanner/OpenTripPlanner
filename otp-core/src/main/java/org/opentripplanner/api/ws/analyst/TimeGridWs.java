@@ -152,7 +152,10 @@ public class TimeGridWs extends RoutingResource {
                 if (it == 65535)
                     it = 65534;
             }
-            int id = ImageLineHelper.clampTo_0_255((int) Math.round(z.d / 2));
+            // d is expressed as a percentage of grid size, max 255%.
+            // Sometimes d will be bigger than 2.5 x grid size,
+            // but this should not be too much important as we are off-bounds.
+            int id = ImageLineHelper.clampTo_0_255((int) Math.round(z.d / precisionMeters * 100));
             int offset = col * channels;
             rgba[row][offset + 0] = it & 0xFF; // t low 8 bits
             rgba[row][offset + 1] = it >> 8; // t high 8 bits
