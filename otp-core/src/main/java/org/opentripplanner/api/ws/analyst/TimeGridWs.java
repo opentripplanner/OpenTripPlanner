@@ -31,6 +31,7 @@ import org.opentripplanner.analyst.request.SampleGridRequest;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.common.geometry.ZSampleGrid;
 import org.opentripplanner.common.geometry.ZSampleGrid.ZSamplePoint;
+import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,6 +73,9 @@ public class TimeGridWs extends RoutingResource {
     @QueryParam("precisionMeters")
     private Integer precisionMeters = 200;
 
+    @QueryParam("coordinateOrigin")
+    private String coordinateOrigin = null;
+
     private static final String OTPA_GRID_CORNER = "OTPA-Grid-Corner";
 
     private static final String OTPA_GRID_CELL_SIZE = "OTPA-Grid-Cell-Size";
@@ -91,6 +95,9 @@ public class TimeGridWs extends RoutingResource {
         SampleGridRequest tgRequest = new SampleGridRequest();
         tgRequest.setMaxTimeSec(maxTimeSec);
         tgRequest.setPrecisionMeters(precisionMeters);
+        if (coordinateOrigin != null)
+            tgRequest.setCoordinateOrigin(new GenericLocation(null, coordinateOrigin)
+                    .getCoordinate());
 
         // Get a sample grid
         ZSampleGrid<WTWD> sampleGrid = sampleGridRenderer.getSampleGrid(tgRequest, sptRequest);
@@ -124,10 +131,10 @@ public class TimeGridWs extends RoutingResource {
         pHYS.setUnits(1); // Meters
         pw.getChunksList().queue(pHYS);
 
-        String gridCornerStr = String.format(Locale.US, "%f,%f", sampleGrid.getCenter().y
+        String gridCornerStr = String.format(Locale.US, "%.8f,%.8f", sampleGrid.getCenter().y
                 + sampleGrid.getYMin() * sampleGrid.getCellSize().y, sampleGrid.getCenter().x
                 + sampleGrid.getXMin() * sampleGrid.getCellSize().x);
-        String gridCellSzStr = String.format(Locale.US, "%f,%f", sampleGrid.getCellSize().y,
+        String gridCellSzStr = String.format(Locale.US, "%.12f,%.12f", sampleGrid.getCellSize().y,
                 sampleGrid.getCellSize().x);
         String offRoadDistStr = String.format(Locale.US, "%f",
                 sampleGridRenderer.getOffRoadDistanceMeters(precisionMeters));

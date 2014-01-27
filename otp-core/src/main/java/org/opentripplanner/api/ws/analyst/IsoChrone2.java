@@ -48,6 +48,7 @@ import org.opentripplanner.analyst.request.IsoChroneRequest;
 import org.opentripplanner.analyst.request.IsoChroneSPTRendererAccSampling;
 import org.opentripplanner.analyst.request.IsoChroneSPTRendererRecursiveGrid;
 import org.opentripplanner.api.common.RoutingResource;
+import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,6 +93,9 @@ public class IsoChrone2 extends RoutingResource {
 
     @QueryParam("precisionMeters")
     private Integer precisionMeters;
+
+    @QueryParam("coordinateOrigin")
+    private String coordinateOrigin = null;
 
     @QueryParam("routerId")
     private String routerId;
@@ -172,6 +176,9 @@ public class IsoChrone2 extends RoutingResource {
         IsoChroneRequest isoChroneRequest = new IsoChroneRequest(cutoffSecList);
         isoChroneRequest.setIncludeDebugGeometry(debug);
         isoChroneRequest.setPrecisionMeters(precisionMeters);
+        if (coordinateOrigin != null)
+            isoChroneRequest.setCoordinateOrigin(new GenericLocation(null, coordinateOrigin)
+                    .getCoordinate());
         RoutingRequest sptRequest = buildRequest(0);
 
         if (maxTimeSec != null) {

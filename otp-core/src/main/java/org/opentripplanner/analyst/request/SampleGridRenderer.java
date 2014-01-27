@@ -76,14 +76,16 @@ public class SampleGridRenderer {
 
         // 3. Create a sample grid based on the SPT.
         long t1 = System.currentTimeMillis();
-        Coordinate center = sptRequest.getFrom().getCoordinate();
+        Coordinate coordinateOrigin = spgRequest.getCoordinateOrigin();
+        if (coordinateOrigin == null)
+            coordinateOrigin = sptRequest.getFrom().getCoordinate();
         final double gridSizeMeters = spgRequest.getPrecisionMeters();
-        final double cosLat = FastMath.cos(toRadians(center.y));
+        final double cosLat = FastMath.cos(toRadians(coordinateOrigin.y));
         double dY = Math.toDegrees(gridSizeMeters / SphericalDistanceLibrary.RADIUS_OF_EARTH_IN_M);
         double dX = dY / cosLat;
 
         SparseMatrixZSampleGrid<WTWD> sampleGrid = new SparseMatrixZSampleGrid<WTWD>(16,
-                spt.getVertexCount(), dX, dY, center);
+                spt.getVertexCount(), dX, dY, coordinateOrigin);
         sampleSPT(spt, sampleGrid, gridSizeMeters * 0.7, gridSizeMeters, V0,
                 sptRequest.getMaxWalkDistance(), cosLat);
         sptRequest.cleanup();

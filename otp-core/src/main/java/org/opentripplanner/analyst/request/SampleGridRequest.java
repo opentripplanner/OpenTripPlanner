@@ -13,6 +13,8 @@
 
 package org.opentripplanner.analyst.request;
 
+import com.vividsolutions.jts.geom.Coordinate;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -31,10 +33,15 @@ public class SampleGridRequest {
     @Setter
     private int maxTimeSec = 0;
 
+    @Getter
+    @Setter
+    private Coordinate coordinateOrigin;
+
     public SampleGridRequest() {
     }
 
     public String toString() {
-        return String.format("<timegrid request, precision=%d meters>", precisionMeters);
+        return String.format("<timegrid request, coordBase=%s precision=%d meters>",
+                coordinateOrigin, precisionMeters);
     }
 }
