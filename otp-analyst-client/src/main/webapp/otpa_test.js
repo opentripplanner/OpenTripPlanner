@@ -107,7 +107,7 @@ function updateOrigin() {
     timeGrid1 = OTPA.timeGrid(reqParams, function() {
         timeGrid2 = OTPA.timeGrid(reqParams2, function() {
 
-            timeGridDiff = OTPA.timeGridDiff(timeGrid1, timeGrid2);
+            timeGridDiff = OTPA.timeGridComposite(timeGrid1, timeGrid2);
             // Add a gradient layer
             isochrones.clearLayers();
             colorMap = OTPA.colorMap({

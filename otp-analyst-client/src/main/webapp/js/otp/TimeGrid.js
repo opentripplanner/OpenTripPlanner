@@ -368,27 +368,26 @@ OTPA.TimeGrid.prototype._getDebugLayer = function() {
 };
 
 /**
- * TimeGridDiff class. Inherit TimeGrid.
+ * TimeGridComposite class.
+ * 
+ * @param timeGrid1
+ *            A timegrid (can be a composite too)
+ * @param timeGrid2
+ *            A timegrid (can be a composite too)
+ * @param composeFunction
+ *            A function to compose results from both time grids. Must accept a
+ *            v1 and v2 parameters, result of time grid get() methods, and
+ *            should return a value v. If undefined, take the diff (1 - 2).
  */
 
-OTPA.timeGridDiff = function(timeGrid1, timeGrid2) {
-    return new OTPA.TimeGridDiff(timeGrid1, timeGrid2);
+OTPA.timeGridComposite = function(timeGrid1, timeGrid2, composeFunction) {
+    return new OTPA.TimeGridComposite(timeGrid1, timeGrid2, composeFunction);
 };
 
 /**
- * Constructor.
+ * TimeGrid difference function: v = v1 - v2.
  */
-OTPA.TimeGridDiff = function(timeGrid1, timeGrid2) {
-    this.timeGrid1 = timeGrid1;
-    this.timeGrid2 = timeGrid2;
-};
-
-/**
- * Return the values for a given (x,y) index.
- */
-OTPA.TimeGridDiff.prototype.get = function(latLng) {
-    var v1 = this.timeGrid1.get(latLng);
-    var v2 = this.timeGrid2.get(latLng);
+OTPA.deltaComposeFunction = function(v1, v2) {
     if (v1 == null || v2 == null) {
         if (v1 == null && v2 == null) {
             return null;
@@ -409,4 +408,22 @@ OTPA.TimeGridDiff.prototype.get = function(latLng) {
         // Is this correct?
         d : Math.max(v1.d, v2.d)
     };
+};
+
+/**
+ * Constructor.
+ */
+OTPA.TimeGridComposite = function(timeGrid1, timeGrid2, composeFunction) {
+    this.composeFunction = composeFunction || OTPA.deltaComposeFunction;
+    this.timeGrid1 = timeGrid1;
+    this.timeGrid2 = timeGrid2;
+};
+
+/**
+ * Return the values for a given (x,y) index.
+ */
+OTPA.TimeGridComposite.prototype.get = function(latLng) {
+    var v1 = this.timeGrid1.get(latLng);
+    var v2 = this.timeGrid2.get(latLng);
+    return this.composeFunction(v1, v2);
 };
