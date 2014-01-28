@@ -166,18 +166,18 @@ OTPA.getLeafletLayer = function(timeGrid, colorMap) {
         var tileSize = this.options.tileSize;
         // Start coordinate in pixel
         var start = tile.multiplyBy(tileSize);
-        // We do the point projection ourselves based on a
-        // linear interpolation of tile corner projections.
-        // This is an approximation for large tiles, but is much faster.
-        var C0 = map.unproject([ start.x, start.y ]);
-        var C1 = map.unproject([ start.x + tileSize, start.y + tileSize ]);
         var mtile = {
-            size : tileSize,
+            width : tileSize,
+            height : tileSize,
             x : tile.x,
             y : tile.y,
             z : zoom,
-            C0 : C0,
-            C1 : C1
+            // We do the point projection ourselves based on a
+            // linear interpolation of tile corner projections.
+            // This is an approximation for large tiles, but is much faster.
+            northWest : map.unproject([ start.x, start.y ]),
+            southEast : map
+                    .unproject([ start.x + tileSize, start.y + tileSize ])
         };
         var thisLayer = this;
         OTPA._drawTile(timeGrid, this.tileCache, canvas, mtile, colorMap,
@@ -203,11 +203,12 @@ OTPA.getLeafletLayer = function(timeGrid, colorMap) {
  * @param canvas
  *            HTML5 canvas to draw into.
  * @param tile
- *            Tile, containing size, C0, C1 (corners), x, y, z (tile position)
+ *            Tile, containing width, height, northWest, southEast (corners), x,
+ *            y, z (tile position)
  * @param colorMap
  *            A mapping between values and color. Contains the range.
  * @param completionCallback
- *            Tile drawn completion callback.
+ *            Tile drawn completion callback, null if synchronous.
  */
 OTPA._drawTile = function(timeGrid, tileCache, canvas, tile, colorMap,
         completionCallback) {
@@ -215,45 +216,48 @@ OTPA._drawTile = function(timeGrid, tileCache, canvas, tile, colorMap,
     var cachedTile = tileCache[[ tile.x, tile.y, tile.z ]];
     if (cachedTile != null) {
         context.drawImage(cachedTile, 0, 0);
-        completionCallback();
-        return;
+        if (completionCallback)
+            completionCallback();
+        return cachedTile;
     }
     // Else start a timer function to paint
-    var timer = setTimeout(function() {
-        var id = context.createImageData(tile.size, tile.size);
+    var drawFunc = function() {
+        var id = context.createImageData(tile.width, tile.height);
         var d = id.data;
-        var dLat = tile.C1.lat - tile.C0.lat;
-        var dLng = tile.C1.lng - tile.C0.lng;
-        var dxy = 4; // Should be a divisor of tile.size
+        var dLat = tile.southEast.lat - tile.northWest.lat;
+        var dLng = tile.southEast.lng - tile.northWest.lng;
+        var dxy = 4; // Should be a divisor of tile.width & tile.height
         var paint = function(x, y) {
-            var C = L.latLng(tile.C0.lat + y * dLat / tile.size, tile.C0.lng
-                    + x * dLng / tile.size);
+            var C = L.latLng(tile.northWest.lat + y * dLat / tile.height,
+                    tile.northWest.lng + x * dLng / tile.width);
             var v = timeGrid.get(C);
             if (v != null) {
                 var color = colorMap.colorize(v.t);
                 if (color != null) {
-                    var j = (x + y * tile.size) * 4;
-                    d[j] = (color & 0xFF0000) >> 16;
-                    d[j + 1] = (color & 0x00FF00) >> 8;
-                    d[j + 2] = (color & 0x0000FF);
-                    d[j + 3] = 255; // Use leaflet transparency
+                    var j = (x + y * tile.width) * 4;
+                    d[j++] = (color & 0xFF0000) >> 16;
+                    d[j++] = (color & 0x00FF00) >> 8;
+                    d[j++] = (color & 0x0000FF);
+                    d[j++] = 255; // Use leaflet transparency
                     return color;
                 }
             }
             return -1;
         }
         var getColor = function(x, y) {
-            var j = (x + y * tile.size) * 4;
+            var j = (x + y * tile.width) * 4;
             if (d[j + 3] == 0)
                 return -1;
             return (d[j] << 16) + (d[j + 1] << 8) + (d[j + 2]);
         }
-        for (var xy = 0; xy < tile.size; xy++) {
-            paint(xy, 0);
-            paint(0, xy);
+        for (var x = 0; x < tile.width; x++) {
+            paint(x, 0);
         }
-        for (var x = dxy - 1; x < tile.size; x += dxy) {
-            for (var y = dxy - 1; y < tile.size; y += dxy) {
+        for (var y = 0; y < tile.height; y++) {
+            paint(0, y);
+        }
+        for (var x = dxy - 1; x < tile.width; x += dxy) {
+            for (var y = dxy - 1; y < tile.height; y += dxy) {
                 var xm = x - dxy;
                 var ym = y - dxy;
                 // First row/column is shorter
@@ -275,14 +279,15 @@ OTPA._drawTile = function(timeGrid, tileCache, canvas, tile, colorMap,
                         var r = (c1 & 0xFF0000) >> 16;
                         var g = (c1 & 0x00FF00) >> 8;
                         var b = (c1 & 0x0000FF);
+                        var j = (xm + 1 + (ym + 1) * tile.width) * 4;
                         for (var y2 = ym + 1; y2 <= y; y2++) {
-                            var j = (xm + 1 + y2 * tile.size) * 4;
                             for (var x2 = xm + 1; x2 <= x; x2++) {
                                 d[j++] = r;
                                 d[j++] = g;
                                 d[j++] = b;
                                 d[j++] = 255; // Use leaflet transparency
                             }
+                            j += (tile.width + xm - x) * 4;
                         }
                     }
                 } else {
@@ -298,8 +303,31 @@ OTPA._drawTile = function(timeGrid, tileCache, canvas, tile, colorMap,
         var img = new Image();
         img.src = canvas.toDataURL("image/png");
         tileCache[[ tile.x, tile.y, tile.z ]] = img;
-        completionCallback();
-    }, Math.floor((Math.random() * 100) + 1));
+        if (completionCallback)
+            completionCallback();
+    };
+    if (completionCallback) {
+        setTimeout(drawFunc, Math.floor((Math.random() * 100) + 1));
+    } else {
+        drawFunc();
+        return tileCache[[ tile.x, tile.y, tile.z ]];
+    }
+};
+
+/**
+ * Build an image out of a time grid.
+ */
+OTPA.getImage = function(timeGrid, colorMap, options) {
+    // Ensure divisible by 4
+    options.height = Math.round(options.height / 4) * 4;
+    options.width = Math.round(options.width / 4) * 4;
+    var canvas = $("<canvas/>").get(0);
+    canvas.width = options.width;
+    canvas.height = options.height;
+    options.x = 0;
+    options.y = 0;
+    options.z = 0;
+    return OTPA._drawTile(timeGrid, [], canvas, options, colorMap, null);
 };
 
 /**

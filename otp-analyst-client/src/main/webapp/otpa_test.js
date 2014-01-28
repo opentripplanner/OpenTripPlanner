@@ -4,6 +4,7 @@
 
 /* --- LEAFLET STUFF --- */
 
+var GRID_ORIGIN = "43.3,5.4"; // Grid reference point
 // Initialize a map
 var map = L.map('map', {
     minZoom : 10,
@@ -67,23 +68,25 @@ var reqParams = {
     mode : 'WALK,TRANSIT',
     maxWalkDistance : 1000,
     precisionMeters : 100,
-    maxTimeSec : 3600
+    maxTimeSec : 3600,
+    coordinateOrigin : GRID_ORIGIN
 };
 // Default 2dn request
 var reqParams2 = {
     routerId : '',
     fromPlace : null,
     date : '2014/01/15',
-    time : '12:00:00',
+    time : '20:00:00',
     // walkSpeed : 1.5,
     // maxTransfers : 3,
     // transferPenalty : 0,
     // walkReluctance : 3.0,
-    bannedRoutes : "TRRTM\\_1__T1\\_A,TRRTM\\_1__T2\\_A",
+    // bannedRoutes : "TRRTM\\_1__T1\\_A,TRRTM\\_1__T2\\_A",
     mode : 'WALK,TRANSIT',
     maxWalkDistance : 1000,
     precisionMeters : 100,
-    maxTimeSec : 3600
+    maxTimeSec : 3600,
+    coordinateOrigin : GRID_ORIGIN
 };
 // Isotimes to display
 var isotimes = [ 900, 1800, 2700, 3600 ];
@@ -91,6 +94,8 @@ var timeGridLayer1;
 var timeGridLayerDiff;
 var colorMap = null;
 var colorMapDiff = null;
+var timeGrid1 = null;
+var timeGridDiff = null;
 
 function updateOrigin() {
     // Update the origin location
@@ -99,10 +104,10 @@ function updateOrigin() {
     reqParams2.fromPlace = reqParams.fromPlace;
     // Get a TimeGrid
     var timeGrid2 = null;
-    var timeGrid1 = OTPA.timeGrid(reqParams, function(timeGrid) {
-        timeGrid2 = OTPA.timeGrid(reqParams2, function(timeGrid) {
+    timeGrid1 = OTPA.timeGrid(reqParams, function() {
+        timeGrid2 = OTPA.timeGrid(reqParams2, function() {
 
-            var timeGridDiff = OTPA.timeGridDiff(timeGrid1, timeGrid2);
+            timeGridDiff = OTPA.timeGridDiff(timeGrid1, timeGrid2);
             // Add a gradient layer
             isochrones.clearLayers();
             colorMap = OTPA.colorMap({
@@ -143,7 +148,7 @@ function updateOrigin() {
 
             // Compute and update hospital scoring
             var scorer = OTPA.scoring();
-            var wHealth = scorer.score(timeGrid, hospitals, OTPA.sigmoid(1800,
+            var wHealth = scorer.score(timeGrid1, hospitals, OTPA.sigmoid(1800,
                     900), 10);
             $('#hospitalScore').text(wHealth.toFixed(2));
         });
@@ -175,4 +180,23 @@ $(function() {
             timeGridLayer1.bringToFront();
         }
     });
+    $('#downloadIsoimage').click(
+            function() {
+                var dialog = $('#downloadDialog').dialog({
+                    width : 'auto'
+                });
+                var timeGrid = $('#diffLayer').is(':checked') ? timeGridDiff
+                        : timeGrid1;
+                var colorMp = $('#diffLayer').is(':checked') ? colorMapDiff
+                        : colorMap;
+                var image = OTPA.getImage(timeGrid, colorMp, {
+                    width : map.getSize().x * 2,
+                    height : map.getSize().y * 2,
+                    northWest : map.getBounds().getNorthWest(),
+                    southEast : map.getBounds().getSouthEast()
+                });
+                image.width = map.getSize().x / 2;
+                image.height = map.getSize().y / 2;
+                dialog.empty().append(image);
+            });
 });
