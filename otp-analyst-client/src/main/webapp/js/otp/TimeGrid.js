@@ -56,7 +56,7 @@ OTPA.TimeGrid = function(requestParams, callback) {
                 canvas.height = png.height;
                 var ctx = canvas.getContext("2d");
                 ctx.drawImage(png, 0, 0);
-                thisTg.timeGrid = ctx.getImageData(0, 0, canvas.width,
+                thisTg.bitmap = ctx.getImageData(0, 0, canvas.width,
                         canvas.height);
                 thisTg.channels = 4; // RGBA
                 callback(thisTg);
@@ -71,6 +71,17 @@ OTPA.TimeGrid = function(requestParams, callback) {
     this.cachedV01 = null;
     this.cachedV10 = null;
     this.cachedV11 = null;
+};
+
+/**
+ * Get the covered bounds.
+ */
+OTPA.TimeGrid.prototype.getBounds = function() {
+    var southwest = this.gridBase;
+    var northeast = L.latLng(this.gridBase.lat + this.cellSize.lat
+            * this.bitmap.height, this.gridBase.lng + this.cellSize.lng
+            * this.bitmap.width);
+    return L.latLngBounds(southwest, northeast);
 };
 
 /**
@@ -123,14 +134,14 @@ OTPA.TimeGrid.prototype.get = function(latLng) {
  * Return the values for a given (x,y) index.
  */
 OTPA.TimeGrid.prototype._getValues = function(xIndex, yIndex) {
-    if (xIndex < 0 || yIndex < 0 || xIndex >= this.timeGrid.width
-            || yIndex >= this.timeGrid.height)
+    if (xIndex < 0 || yIndex < 0 || xIndex >= this.bitmap.width
+            || yIndex >= this.bitmap.height)
         return null;
-    var offset = (xIndex + yIndex * this.timeGrid.width) * this.channels;
-    var r = this.timeGrid.data[offset];
-    var g = this.timeGrid.data[offset + 1];
-    var b = this.timeGrid.data[offset + 2];
-    var a = this.timeGrid.data[offset + 3];
+    var offset = (xIndex + yIndex * this.bitmap.width) * this.channels;
+    var r = this.bitmap.data[offset];
+    var g = this.bitmap.data[offset + 1];
+    var b = this.bitmap.data[offset + 2];
+    var a = this.bitmap.data[offset + 3];
     if (a == 0)
         return null;
     var lng = xIndex * this.cellSize.lng + this.gridBase.lng;
@@ -175,9 +186,8 @@ OTPA.getLeafletLayer = function(timeGrid, colorMap) {
             // We do the point projection ourselves based on a
             // linear interpolation of tile corner projections.
             // This is an approximation for large tiles, but is much faster.
-            northWest : map.unproject([ start.x, start.y ]),
-            southEast : map
-                    .unproject([ start.x + tileSize, start.y + tileSize ])
+            southwest : map.unproject([ start.x, start.y + tileSize ]),
+            northeast : map.unproject([ start.x + tileSize, start.y ])
         };
         var thisLayer = this;
         OTPA._drawTile(timeGrid, this.tileCache, canvas, mtile, colorMap,
@@ -203,7 +213,7 @@ OTPA.getLeafletLayer = function(timeGrid, colorMap) {
  * @param canvas
  *            HTML5 canvas to draw into.
  * @param tile
- *            Tile, containing width, height, northWest, southEast (corners), x,
+ *            Tile, containing width, height, southwest, northeast (corners), x,
  *            y, z (tile position)
  * @param colorMap
  *            A mapping between values and color. Contains the range.
@@ -224,12 +234,12 @@ OTPA._drawTile = function(timeGrid, tileCache, canvas, tile, colorMap,
     var drawFunc = function() {
         var id = context.createImageData(tile.width, tile.height);
         var d = id.data;
-        var dLat = tile.southEast.lat - tile.northWest.lat;
-        var dLng = tile.southEast.lng - tile.northWest.lng;
+        var dLat = tile.northeast.lat - tile.southwest.lat;
+        var dLng = tile.northeast.lng - tile.southwest.lng;
         var dxy = 4; // Should be a divisor of tile.width & tile.height
         var paint = function(x, y) {
-            var C = L.latLng(tile.northWest.lat + y * dLat / tile.height,
-                    tile.northWest.lng + x * dLng / tile.width);
+            var C = L.latLng(tile.northeast.lat - y * dLat / tile.height,
+                    tile.southwest.lng + x * dLng / tile.width);
             var v = timeGrid.get(C);
             if (v != null) {
                 var color = colorMap.colorize(v.t);
@@ -293,7 +303,8 @@ OTPA._drawTile = function(timeGrid, tileCache, canvas, tile, colorMap,
                 } else {
                     for (var x2 = xm + 1; x2 <= x; x2++) {
                         for (var y2 = ym + 1; y2 <= y; y2++) {
-                            paint(x2, y2);
+                            if (x2 != x || y2 != y)
+                                paint(x2, y2);
                         }
                     }
                 }
@@ -315,12 +326,34 @@ OTPA._drawTile = function(timeGrid, tileCache, canvas, tile, colorMap,
 };
 
 /**
- * Build an image out of a time grid.
+ * Build an image out of a time grid. Warning: We do not ensure an absolutely
+ * precise square pixel. Projection is equirectangular.
+ * 
+ * @param timeGrid
+ *            The date to which get image for.
+ * @param colorMap
+ *            Color map used to colorize the gradient.
+ * @param options
+ *            Contains image width, southwest and northeast corners (default to
+ *            all).
  */
 OTPA.getImage = function(timeGrid, colorMap, options) {
+    // Provide sensible defaults
+    options.width = options.width || 800;
+    options.southwest = options.southwest
+            || timeGrid.getBounds().getSouthWest();
+    options.northeast = options.northeast
+            || timeGrid.getBounds().getNorthEast();
     // Ensure divisible by 4
-    options.height = Math.round(options.height / 4) * 4;
     options.width = Math.round(options.width / 4) * 4;
+    // Compute approximative height
+    options.height = options.height
+            || options.width
+            / (options.northeast.lng - options.southwest.lng)
+            * (options.northeast.lat - options.southwest.lat)
+            / Math.cos((options.northeast.lat + options.southwest.lat) / 2
+                    / 180 * Math.PI);
+    options.height = Math.round(options.height / 4) * 4;
     var canvas = $("<canvas/>").get(0);
     canvas.width = options.width;
     canvas.height = options.height;
@@ -339,8 +372,8 @@ OTPA.TimeGrid.prototype._getDebugLayer = function() {
     var retval = [];
     var dx = this.cellSize.lng;
     var dy = this.cellSize.lat;
-    for (var x = 0; x < this.timeGrid.width; x++) {
-        for (var y = 0; y < this.timeGrid.height; y++) {
+    for (var x = 0; x < this.bitmap.width; x++) {
+        for (var y = 0; y < this.bitmap.height; y++) {
             var v = this._getValues(x, y);
             if (v == null)
                 continue;
@@ -417,6 +450,17 @@ OTPA.TimeGridComposite = function(timeGrid1, timeGrid2, composeFunction) {
     this.composeFunction = composeFunction || OTPA.deltaComposeFunction;
     this.timeGrid1 = timeGrid1;
     this.timeGrid2 = timeGrid2;
+};
+
+/**
+ * Return the bounds (rectangular union of two bounds).
+ */
+OTPA.TimeGridComposite.prototype.getBounds = function(latLng) {
+    // LatLngBounds does not seems to have a clone()
+    var bounds = L.latLngBounds(this.timeGrid1.getBounds().getSouthWest(),
+            this.timeGrid1.getBounds().getNorthEast());
+    bounds.extend(this.timeGrid2.getBounds());
+    return bounds;
 };
 
 /**

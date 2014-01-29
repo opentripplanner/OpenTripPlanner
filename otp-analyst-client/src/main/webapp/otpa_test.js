@@ -182,21 +182,16 @@ $(function() {
     });
     $('#downloadIsoimage').click(
             function() {
-                var dialog = $('#downloadDialog').dialog({
-                    width : 'auto'
-                });
                 var timeGrid = $('#diffLayer').is(':checked') ? timeGridDiff
                         : timeGrid1;
                 var colorMp = $('#diffLayer').is(':checked') ? colorMapDiff
                         : colorMap;
                 var image = OTPA.getImage(timeGrid, colorMp, {
-                    width : map.getSize().x * 2,
-                    height : map.getSize().y * 2,
-                    northWest : map.getBounds().getNorthWest(),
-                    southEast : map.getBounds().getSouthEast()
+                    width : 2000,
+                    // If not provided, default to grid extent
+                    southwest : map.getBounds().getSouthWest(),
+                    northeast : map.getBounds().getNorthEast()
                 });
-                image.width = map.getSize().x / 2;
-                image.height = map.getSize().y / 2;
-                dialog.empty().append(image);
+                window.open(image.src);
             });
 });
