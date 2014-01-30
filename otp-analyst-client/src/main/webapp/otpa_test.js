@@ -68,7 +68,7 @@ var reqParams = {
     mode : 'WALK,TRANSIT',
     maxWalkDistance : 1000,
     precisionMeters : 100,
-    maxTimeSec : 3600,
+    maxTimeSec : 5400,
     coordinateOrigin : GRID_ORIGIN
 };
 // Default 2dn request
@@ -85,7 +85,7 @@ var reqParams2 = {
     mode : 'WALK,TRANSIT',
     maxWalkDistance : 1000,
     precisionMeters : 100,
-    maxTimeSec : 3600,
+    maxTimeSec : 5400,
     coordinateOrigin : GRID_ORIGIN
 };
 // Isotimes to display
@@ -113,11 +113,13 @@ function updateOrigin() {
             colorMap = OTPA.colorMap({
                 max : reqParams.maxTimeSec
             });
+            colorMap.setLegendCanvas($("#legend").get(0));
             colorMapDiff = OTPA.colorMap({
                 min : -600,
                 max : +600,
                 delta : true
             });
+            colorMapDiff.setLegendCanvas($("#legendDiff").get(0));
             timeGridLayerDiff = OTPA
                     .getLeafletLayer(timeGridDiff, colorMapDiff);
             timeGridLayerDiff.setOpacity(0.5);
@@ -174,12 +176,19 @@ $(function() {
             isochrones.removeLayer(timeGridLayer1);
             isochrones.addLayer(timeGridLayerDiff);
             timeGridLayerDiff.bringToFront();
+            $('#legend').hide();
+            $('#cutoffSec').hide();
+            $('#legendDiff').show();
         } else {
             isochrones.removeLayer(timeGridLayerDiff);
             isochrones.addLayer(timeGridLayer1);
             timeGridLayer1.bringToFront();
+            $('#legendDiff').hide();
+            $('#legend').show();
+            $('#cutoffSec').show();
         }
     });
+    $('#legendDiff').hide();
     $('#downloadIsoimage').click(
             function() {
                 var timeGrid = $('#diffLayer').is(':checked') ? timeGridDiff

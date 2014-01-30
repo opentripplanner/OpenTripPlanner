@@ -19,11 +19,15 @@ var OTPA = OTPA || {}; // namespace
  */
 
 /**
- * Factory method
+ * Factory method.
+ * 
+ * @params options Contains: delta: true or false (impact color palette only) -
+ *         min, max: total value range - minCutoff, maxCutoff: displayed range
+ *         (default to min/max).
  */
 OTPA.colorMap = function(options) {
     return new OTPA.ColorMap(options);
-}
+};
 
 /**
  * Constructor.
@@ -33,6 +37,7 @@ OTPA.ColorMap = function(options) {
     this.delta = options.delta === undefined ? false : options.delta;
     this.max = options.max || (this.delta ? 600 : 3600);
     this.min = options.min || (this.delta ? -this.max : 0);
+    this.unit = options.unit || "s";
     this.range = this.max - this.min;
     this.minCutoff = this.min;
     this.maxCutoff = this.max;
@@ -40,8 +45,9 @@ OTPA.ColorMap = function(options) {
     if (this.delta) {
         // red - grey - green, symetrical
         this.palette = [ 0xFF0000, 0xEF0F0F, 0xDF1F1F, 0xCF2F2F, 0xBF3F3F,
-                0xAF4F4F, 0x9F5F5F, 0x8F6F6F, 0x7F7F7F, 0x6F8F6F, 0x5F9F5F,
-                0x4FAF4F, 0x3FBF3F, 0x2FCF2F, 0x1FDF1F, 0x0FEF0F, 0x00FF00 ];
+                0xAF4F4F, 0x9F5F5F, 0x8F6F6F, 0x7F7F7F, 0x7F7F7F, 0x6F8F6F,
+                0x5F9F5F, 0x4FAF4F, 0x3FBF3F, 0x2FCF2F, 0x1FDF1F, 0x0FEF0F,
+                0x00FF00 ];
         // red - white - green, symetrical
         // this.palette = [ 0xFF0000, 0xFF1F1F, 0xFF3F3F, 0xFF5F5F, 0xFF7F7F,
         // 0xFF9F9F, 0xFFBFBF, 0xFFDFDF, 0xFFFFFF, 0xDFFFDF, 0xBFFFBF,
@@ -64,12 +70,14 @@ OTPA.ColorMap.prototype.setMinCutoff = function(minCutoff) {
     this.minCutoff = minCutoff;
     if (this.minCutoff < this.min)
         this.minCutoff = this.min;
+    this._redrawLegend();
 };
 
 OTPA.ColorMap.prototype.setMaxCutoff = function(maxCutoff) {
     this.maxCutoff = maxCutoff;
     if (this.maxCutoff > this.max)
         this.maxCutoff = this.max;
+    this._redrawLegend();
 };
 
 /**
@@ -92,4 +100,72 @@ OTPA.ColorMap.prototype.colorize = function(v) {
     if (index >= this.palette.length)
         index = this.palette.length - 1;
     return this.palette[index];
+};
+
+/**
+ * Set the canvas where the legend is to be drawned. Keep it as a reference: the
+ * legend is updated when colormap range is updated. Only one legend is
+ * supported.
+ */
+OTPA.ColorMap.prototype.setLegendCanvas = function(canvas) {
+    this.legendCanvas = canvas;
+    this._redrawLegend();
+};
+
+/**
+ * Redraw the legend.
+ */
+OTPA.ColorMap.prototype._redrawLegend = function() {
+    var ctx = this.legendCanvas.getContext("2d");
+    var width = this.legendCanvas.width;
+    var height = this.legendCanvas.height;
+    for (var x = 0; x < width; x++) {
+        var v = x / width * this.range + this.min;
+        var color = this.colorize(v);
+        if (color != null) {
+            ctx.fillStyle = "#" + color.toString(16);
+        } else {
+            ctx.fillStyle = "#888";
+        }
+        ctx.fillRect(x, 0, 1, height);
+    }
+    var nLabels = width / 40; // Max 1 label / n pixels
+    var vDelta = this.range / nLabels;
+    if (this.unit == "s") {
+        var mod = vDelta > 1800 ? 600 : vDelta > 900 ? 300 : 60;
+        vDelta = Math.floor(vDelta / mod) * mod;
+        if (vDelta == 0)
+            vDelta = mod;
+    } else {
+        vDelta = Math.floor(vDelta);
+        if (vDelta == 0)
+            vDelta = 1;
+    }
+    nLabels = Math.round(this.range / vDelta);
+    ctx.strokeStyle = "#000";
+    ctx.fillStyle = "#000";
+    ctx.font = "8pt Sans-Serif";
+    for (var i = 0; i < nLabels; i++) {
+        var v = this.min + vDelta * i;
+        var txt;
+        if (this.unit == "s" && !this.delta) {
+            var h = Math.floor(v / 3600);
+            var mm = Math.floor(v / 60) % 60;
+            // Where is snprintf in JS?
+            txt = h + ":" + (mm < 10 ? "0" : "") + mm;
+        } else if (this.unit == "s") {
+            var mm = Math.floor(v / 60);
+            var ss = Math.floor(v % 60);
+            txt = mm + ":" + (ss < 10 ? "0" : "") + ss;
+        } else {
+            txt = v + this.unit;
+        }
+        // floor() + 0.5: Align to pixel boundary
+        var x = Math.floor((v - this.min) / this.range * width) + 0.5;
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+        ctx.fillText(txt, x, height - 2);
+    }
 };
