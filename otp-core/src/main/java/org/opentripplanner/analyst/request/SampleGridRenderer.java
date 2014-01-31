@@ -111,8 +111,10 @@ public class SampleGridRenderer {
 
         AccumulativeMetric<WTWD> accMetric = new AccumulativeMetric<WTWD>() {
             @Override
-            public WTWD cumulateSample(Coordinate C0, Coordinate Cs, double z, WTWD zS) {
-                double t = z;
+            public WTWD cumulateSample(Coordinate C0, Coordinate Cs, WTWD z, WTWD zS) {
+                double t = z.wTime / z.w;
+                double b = z.wBoardings / z.w;
+                double wd = z.wWalkDist / z.w;
                 double d = distanceLibrary.fastDistance(C0, Cs, cosLat);
                 // additionnal time
                 double dt = d / v0;
@@ -123,7 +125,9 @@ public class SampleGridRenderer {
                     zS.d = Double.MAX_VALUE;
                 }
                 zS.w = zS.w + w;
-                zS.tw = zS.tw + w * (t + dt);
+                zS.wTime = zS.wTime + w * (t + dt);
+                zS.wBoardings = zS.wBoardings + w * b;
+                zS.wWalkDist = zS.wWalkDist + w * (wd + d);
                 if (d < zS.d)
                     zS.d = d;
                 return zS;
@@ -133,22 +137,32 @@ public class SampleGridRenderer {
             public WTWD closeSample(WTWD zUp, WTWD zDown, WTWD zRight, WTWD zLeft) {
                 double dMin = Double.MAX_VALUE;
                 double tMin = Double.MAX_VALUE;
+                double bMin = Double.MAX_VALUE;
+                double wdMin = Double.MAX_VALUE;
                 for (WTWD z : new WTWD[] { zUp, zDown, zRight, zLeft }) {
                     if (z == null)
                         continue;
                     if (z.d < dMin)
                         dMin = z.d;
-                    double t = z.tw / z.w;
+                    double t = z.wTime / z.w;
                     if (t < tMin)
                         tMin = t;
+                    double b = z.wBoardings / z.w;
+                    if (b < bMin)
+                        bMin = b;
+                    double wd = z.wWalkDist / z.w;
+                    if (wd < wdMin)
+                        wdMin = wd;
                 }
                 WTWD z = new WTWD();
                 z.w = 1.0;
-                // Two method below are approximation,
-                // but we are on the edge anyway and
-                // the current sample does not correspond to any
-                // computed value.
-                z.tw = tMin + gridSizeMeters / v0;
+                /*
+                 * The computations below are approximation, but we are on the edge anyway and the
+                 * current sample does not correspond to any computed value.
+                 */
+                z.wTime = tMin + gridSizeMeters / v0;
+                z.wBoardings = bMin;
+                z.wWalkDist = wdMin + gridSizeMeters;
                 z.d = dMin + gridSizeMeters;
                 return z;
             }
@@ -171,8 +185,21 @@ public class SampleGridRenderer {
                         + d0 / v0;
                 double t1 = wd1 > maxWalkDistance ? Double.POSITIVE_INFINITY : s1.getActiveTime()
                         + d1 / v0;
-                if (!Double.isInfinite(t0) || !Double.isInfinite(t1))
-                    gridSampler.addSamplingPoint(c, t0 < t1 ? t0 : t1);
+                if (!Double.isInfinite(t0) || !Double.isInfinite(t1)) {
+                    WTWD z = new WTWD();
+                    z.w = 1.0;
+                    z.d = 0.0;
+                    if (t0 < t1) {
+                        z.wTime = t0;
+                        z.wBoardings = s0.getNumBoardings();
+                        z.wWalkDist = s0.getWalkDistance();
+                    } else {
+                        z.wTime = t1;
+                        z.wBoardings = s1.getNumBoardings();
+                        z.wWalkDist = s1.getWalkDistance();
+                    }
+                    gridSampler.addSamplingPoint(c, z);
+                }
             }
         }, d0);
         gridSampler.close();
@@ -186,15 +213,24 @@ public class SampleGridRenderer {
     }
 
     public static class WTWD {
+        /* Total weight */
         public double w;
 
-        public double tw;
+        /* Weighted sum of time in seconds */
+        public double wTime;
 
+        /* Weighted sum of number of boardings (no units) */
+        public double wBoardings;
+
+        /* Weighted sum of walk distance in meters */
+        public double wWalkDist;
+
+        /* Minimum off-road distance to any sample */
         public double d;
 
         @Override
         public String toString() {
-            return String.format("[t/w=%f,w=%f,d=%f]", tw / w, w, d);
+            return String.format("[t/w=%f,w=%f,d=%f]", wTime / w, w, d);
         }
     }
 }

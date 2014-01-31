@@ -73,9 +73,9 @@ public class IsoChroneSPTRendererAccSampling implements IsoChroneSPTRenderer {
         ZMetric<WTWD> zMetric = new ZMetric<WTWD>() {
             @Override
             public int cut(WTWD zA, WTWD zB, WTWD z0) {
-                double t0 = z0.tw / z0.w;
-                double tA = zA.d > z0.d ? Double.POSITIVE_INFINITY : zA.tw / zA.w;
-                double tB = zB.d > z0.d ? Double.POSITIVE_INFINITY : zB.tw / zB.w;
+                double t0 = z0.wTime / z0.w;
+                double tA = zA.d > z0.d ? Double.POSITIVE_INFINITY : zA.wTime / zA.w;
+                double tB = zB.d > z0.d ? Double.POSITIVE_INFINITY : zB.wTime / zB.w;
                 if (tA < t0 && t0 <= tB)
                     return 1;
                 if (tB < t0 && t0 <= tA)
@@ -93,9 +93,9 @@ public class IsoChroneSPTRendererAccSampling implements IsoChroneSPTRenderer {
                     return k;
                 } else {
                     // Interpolate on t
-                    double tA = zA.tw / zA.w;
-                    double tB = zB.tw / zB.w;
-                    double t0 = z0.tw / z0.w;
+                    double tA = zA.wTime / zA.w;
+                    double tB = zB.wTime / zB.w;
+                    double t0 = z0.wTime / z0.w;
                     double k = tA == tB ? 0.5 : (t0 - tA) / (tB - tA);
                     return k;
                 }
@@ -109,7 +109,7 @@ public class IsoChroneSPTRendererAccSampling implements IsoChroneSPTRenderer {
         for (Integer cutoffSec : isoChroneRequest.getCutoffSecList()) {
             WTWD z0 = new WTWD();
             z0.w = 1.0;
-            z0.tw = cutoffSec;
+            z0.wTime = cutoffSec;
             z0.d = D0;
             IsochroneData isochrone = new IsochroneData(cutoffSec,
                     isolineBuilder.computeIsoline(z0));

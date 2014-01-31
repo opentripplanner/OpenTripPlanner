@@ -60,6 +60,12 @@ import com.sun.jersey.core.util.Base64;
 @Path("/timegrid")
 public class TimeGridWs extends RoutingResource {
 
+    public enum DataChannel {
+        TIME, /* Clock time */
+        BOARDINGS, /* Number of boardings */
+        WALK_DISTANCE, /* Total walk distance */
+    }
+
     @SuppressWarnings("unused")
     private static final Logger LOG = LoggerFactory.getLogger(TimeGridWs.class);
 
@@ -67,13 +73,18 @@ public class TimeGridWs extends RoutingResource {
     private SampleGridRenderer sampleGridRenderer;
 
     @QueryParam("maxTimeSec")
-    private Integer maxTimeSec = null;
+    private Integer maxTimeSec;
 
     @QueryParam("precisionMeters")
-    private Integer precisionMeters = 200;
+    @DefaultValue("200")
+    private Integer precisionMeters;
 
     @QueryParam("coordinateOrigin")
-    private String coordinateOrigin = null;
+    private String coordinateOrigin;
+
+    @QueryParam("zDataType")
+    @DefaultValue("TIME")
+    private DataChannel zDataType;
 
     private static final String OTPA_GRID_CORNER = "OTPA-Grid-Corner";
 
@@ -138,28 +149,60 @@ public class TimeGridWs extends RoutingResource {
         offRoadDistChunk.setKeyVal(OTPA_OFFROAD_DIST, offRoadDistStr);
         pw.getChunksList().queue(offRoadDistChunk);
 
+        double unit;
+        switch (zDataType) {
+        case TIME:
+            unit = 1.0; // 1:1sec, max 18h
+            break;
+        case BOARDINGS:
+            unit = 1000.0; // 1:0.001 boarding, max 65.5
+            break;
+        case WALK_DISTANCE:
+            unit = 10.0; // 1:0.1m, max 6.55km
+            break;
+        default:
+            throw new IllegalArgumentException("Unsupported Z DataType.");
+        }
+
         for (ZSamplePoint<WTWD> p : sampleGrid) {
             WTWD z = p.getZ();
             int row = p.getY() - sampleGrid.getYMin();
             int col = p.getX() - sampleGrid.getXMin();
-            double t = z.tw / z.w;
-            int it;
-            if (Double.isInfinite(t)) {
-                it = 65535;
+            double zz;
+            switch (zDataType) {
+            case TIME:
+                zz = z.wTime / z.w;
+                break;
+            case BOARDINGS:
+                zz = z.wBoardings / z.w;
+                break;
+            case WALK_DISTANCE:
+                zz = z.wWalkDist / z.w;
+                break;
+            default:
+                throw new IllegalArgumentException("Unsupported Z DataType.");
+            }
+            int iz;
+            if (Double.isInfinite(zz)) {
+                iz = 65535;
             } else {
-                it = ImageLineHelper.clampTo_0_65535((int) Math.round(t));
-                if (it == 65535)
-                    it = 65534;
+                iz = ImageLineHelper.clampTo_0_65535((int) Math.round(zz * unit));
+                if (iz == 65535)
+                    iz = 65534; // Clamp
             }
             // d is expressed as a percentage of grid size, max 255%.
-            // Sometimes d will be bigger than 2.5 x grid size,
+            // Sometimes d will be bigger than 2.55 x grid size,
             // but this should not be too much important as we are off-bounds.
             int id = ImageLineHelper.clampTo_0_255((int) Math.round(z.d / precisionMeters * 100));
             int offset = col * channels;
-            rgba[row][offset + 0] = it & 0xFF; // t low 8 bits
-            rgba[row][offset + 1] = it >> 8; // t high 8 bits
+            rgba[row][offset + 0] = (iz & 0xFF); // z low 8 bits
+            rgba[row][offset + 1] = (iz >> 8); // z high 8 bits
             rgba[row][offset + 2] = id; // d
-            rgba[row][offset + 3] = 255; // TODO USE IT
+            /*
+             * Keep the alpha channel at 255, otherwise the RGB channel will be downsampled on some
+             * rendering clients (namely, JS canvas).
+             */
+            rgba[row][offset + 3] = 255;
         }
         for (int row = 0; row < rgba.length; row++) {
             ImageLineInt iline = new ImageLineInt(imgInfo, rgba[row]);

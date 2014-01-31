@@ -43,7 +43,7 @@ public class AccumulativeGridSampler<TZ> {
          *        up to the caller to initialize the z value.
          * @return The modified z value for the sample.
          */
-        public TZ cumulateSample(Coordinate C0, Coordinate Cs, double z, TZ zS);
+        public TZ cumulateSample(Coordinate C0, Coordinate Cs, TZ z, TZ zS);
 
         /**
          * Callback function to handle a "closing" sample (that is a sample post-created to surround
@@ -75,7 +75,7 @@ public class AccumulativeGridSampler<TZ> {
         this.sampleGrid = sampleGrid;
     }
 
-    public final void addSamplingPoint(Coordinate C0, double z) {
+    public final void addSamplingPoint(Coordinate C0, TZ z) {
         if (closed)
             throw new IllegalStateException("Can't add a sample after closing.");
         int[] xy = sampleGrid.getLowerLeftIndex(C0);
