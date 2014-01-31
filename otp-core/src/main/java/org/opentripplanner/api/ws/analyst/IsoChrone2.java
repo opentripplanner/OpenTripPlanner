@@ -92,6 +92,7 @@ public class IsoChrone2 extends RoutingResource {
     private String algorithm;
 
     @QueryParam("precisionMeters")
+    @DefaultValue("200")
     private Integer precisionMeters;
 
     @QueryParam("coordinateOrigin")
@@ -168,8 +169,6 @@ public class IsoChrone2 extends RoutingResource {
 
         if (debug == null)
             debug = false;
-        if (precisionMeters == null)
-            precisionMeters = 200;
         if (precisionMeters < 10)
             throw new IllegalArgumentException("Too small precisionMeters: " + precisionMeters);
 
