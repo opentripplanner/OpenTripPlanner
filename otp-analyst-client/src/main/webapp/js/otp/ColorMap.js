@@ -35,26 +35,24 @@ OTPA.colorMap = function(options) {
 OTPA.ColorMap = function(options) {
     var options = options || {};
     this.delta = options.delta === undefined ? false : options.delta;
-    this.max = options.max || (this.delta ? 600 : 3600);
+    this.discrete = options.discrete === undefined ? false : options.discrete;
+    this.max = options.max || (this.discrete ? 10 : this.delta ? 600 : 3600);
     this.min = options.min || (this.delta ? -this.max : 0);
-    this.unit = options.unit || "s";
+    this.unit = options.unit === undefined ? "s" : options.unit;
     this.range = this.max - this.min;
     this.minCutoff = this.min;
     this.maxCutoff = this.max;
     // TODO Make this parametrable
-    if (this.delta) {
+    if (this.discrete) {
+        this.palette = [ 0x7FCAFF, 0x7F97FF, 0xA77FFF, 0xE77FFF, 0xFF7FB0,
+                0xFF9C7E, 0xFFBD7E, 0xFFD77E, 0xFFF17E, 0xCAF562 ];
+    } else if (this.delta) {
         // red - grey - green, symetrical
         this.palette = [ 0xFF0000, 0xEF0F0F, 0xDF1F1F, 0xCF2F2F, 0xBF3F3F,
                 0xAF4F4F, 0x9F5F5F, 0x8F6F6F, 0x7F7F7F, 0x7F7F7F, 0x6F8F6F,
                 0x5F9F5F, 0x4FAF4F, 0x3FBF3F, 0x2FCF2F, 0x1FDF1F, 0x0FEF0F,
                 0x00FF00 ];
-        // red - white - green, symetrical
-        // this.palette = [ 0xFF0000, 0xFF1F1F, 0xFF3F3F, 0xFF5F5F, 0xFF7F7F,
-        // 0xFF9F9F, 0xFFBFBF, 0xFFDFDF, 0xFFFFFF, 0xDFFFDF, 0xBFFFBF,
-        // 0x9FFF9F, 0x7FFF7F, 0x5FFF5F, 0x3FFF3F, 0x1FFF1F, 0x00FF00 ];
-        // this.minusInf = 0xFF0000;
         this.minusInf = 0x7F0000;
-        // this.plusInf = 0x00FF00;
         this.plusInf = 0x007F00;
     } else {
         this.palette = [ 0x7F7FFF, 0x7F99FF, 0x7FB4FF, 0x7FCFFF, 0x7FEAFF,
@@ -84,21 +82,31 @@ OTPA.ColorMap.prototype.setMaxCutoff = function(maxCutoff) {
  * Get the color based on some value. Return null for no value (outside range).
  */
 OTPA.ColorMap.prototype.colorize = function(v) {
-    if (this.delta) {
+    if (this.delta && !this.discrete) {
+        // Delta mode, if outside bounds, return +/- inf color
         if (v < this.minCutoff)
             return this.minusInf;
         if (v > this.maxCutoff)
             return this.plusInf;
     } else {
+        // Other modes: if outside bounds, return NULL
         if (v < this.minCutoff || v > this.maxCutoff)
             return null;
     }
+    // Note: if we are in "discrete" mode,
+    // color frontier is at value + 0.5 to make smoother transition
     var index = Math.round((v - this.min) / this.range * this.palette.length
-            - 0.5);
-    if (index < 0)
-        index = 0;
-    if (index >= this.palette.length)
-        index = this.palette.length - 1;
+            - (this.discrete ? 0.0 : 0.5));
+    if (this.discrete) {
+        // Discrete mode: we loop the palette
+        index = index % this.palette.length;
+    } else {
+        // Other modes: we limit ourselves to the range
+        if (index < 0)
+            index = 0;
+        if (index >= this.palette.length)
+            index = this.palette.length - 1;
+    }
     return this.palette[index];
 };
 
@@ -131,16 +139,15 @@ OTPA.ColorMap.prototype._redrawLegend = function() {
     }
     var nLabels = width / 40; // Max 1 label / n pixels
     var vDelta = this.range / nLabels;
+    var mod = 1;
     if (this.unit == "s") {
-        var mod = vDelta > 1800 ? 600 : vDelta > 900 ? 300 : 60;
-        vDelta = Math.floor(vDelta / mod) * mod;
-        if (vDelta == 0)
-            vDelta = mod;
-    } else {
-        vDelta = Math.floor(vDelta);
-        if (vDelta == 0)
-            vDelta = 1;
+        mod = vDelta > 1800 ? 600 : vDelta > 900 ? 300 : 60;
+    } else if (this.unit == "m") {
+        var mod = vDelta > 1000 ? 200 : vDelta > 500 ? 100 : 50;
     }
+    vDelta = Math.floor(vDelta / mod) * mod;
+    if (vDelta == 0)
+        vDelta = mod;
     nLabels = Math.round(this.range / vDelta);
     ctx.strokeStyle = "#000";
     ctx.fillStyle = "#000";
