@@ -35,6 +35,9 @@ OTPA.TimeGrid = function(requestParams, callback) {
             + "&base64=true";
     var thisTg = this;
     this.precisionMeters = requestParams.precisionMeters;
+    this.zDataType = requestParams.zDataType || "TIME";
+    this.zUnit = this.zDataType == "BOARDINGS" ? 1000
+            : this.zDataType == "WALK_DISTANCE" ? 10.0 : 1.0;
     $.ajax({
         url : url,
         async : true,
@@ -121,12 +124,7 @@ OTPA.TimeGrid.prototype.get = function(latLng) {
     var t = t0 * (1 - kx) + t1 * kx;
     return {
         t : t,
-        d : d,
-        // TODO Remove this, debug only
-        a : this.cachedV00.c,
-        b : this.cachedV01.c,
-        c : this.cachedV10.c,
-        d : this.cachedV11.c
+        d : d
     };
 };
 
@@ -147,7 +145,7 @@ OTPA.TimeGrid.prototype._getValues = function(xIndex, yIndex) {
     var lng = xIndex * this.cellSize.lng + this.gridBase.lng;
     var lat = yIndex * this.cellSize.lat + this.gridBase.lat;
     return {
-        t : r + (g << 8),
+        t : (r + (g << 8)) / this.zUnit,
         d : b / 100 * this.precisionMeters,
         c : {
             lng : lng,
