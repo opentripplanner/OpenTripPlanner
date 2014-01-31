@@ -141,11 +141,12 @@ OTPA.ColorMap.prototype._redrawLegend = function() {
     var vDelta = this.range / nLabels;
     var mod = 1;
     if (this.unit == "s") {
-        mod = vDelta > 1800 ? 600 : vDelta > 900 ? 300 : 60;
+        mod = vDelta > 1800 ? 900 : vDelta > 900 ? 600 : vDelta > 600 ? 300
+                : 60;
     } else if (this.unit == "m") {
-        var mod = vDelta > 1000 ? 200 : vDelta > 500 ? 100 : 50;
+        mod = vDelta > 1000 ? 200 : vDelta > 500 ? 100 : 50;
     }
-    vDelta = Math.floor(vDelta / mod) * mod;
+    vDelta = Math.floor(vDelta / mod + 1) * mod;
     if (vDelta == 0)
         vDelta = mod;
     nLabels = Math.round(this.range / vDelta);
