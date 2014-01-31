@@ -244,4 +244,19 @@ otp.modules.calltaker.MailablesWidget =
 
         doc.setFontSize(12);     
     },
+
+    clearForm : function() {
+        $('#' + this.id + '-firstname').val('');
+        $('#' + this.id + '-lastname').val('');
+        $('#' + this.id + '-address1').val('');
+        $('#' + this.id + '-address2').val('');
+        $('#' + this.id + '-city').val('');
+        $('#' + this.id + '-state').val('');
+        $('#' + this.id + '-zip').val('');
+        $("#"+this.id+'-selectedList').empty();
+    },
+
+    onClose : function() {
+        this.clearForm();
+    }
 });
