@@ -27,6 +27,8 @@ otp.modules.Module = otp.Class({
     options     : null,
     
     handlers    : null,
+
+    templateFiles   : null,    
         
     initialize : function(webapp, id, options) {
         this.webapp = webapp;
@@ -35,6 +37,7 @@ otp.modules.Module = otp.Class({
         this.widgets = [];
         this.mapLayers = {};
         this.handlers = {};
+        this.templateFiles = [];
     },
     
 
