@@ -119,17 +119,17 @@ OTPA.TimeGrid.prototype.get = function(latLng) {
     var d = d0 * (1 - kx) + d1 * kx;
     if (d > this.offRoadDistanceMeters)
         return null;
-    var t0 = this.cachedV00.t * (1 - ky) + this.cachedV01.t * ky;
-    var t1 = this.cachedV10.t * (1 - ky) + this.cachedV11.t * ky;
-    var t = t0 * (1 - kx) + t1 * kx;
+    var z0 = this.cachedV00.z * (1 - ky) + this.cachedV01.z * ky;
+    var z1 = this.cachedV10.z * (1 - ky) + this.cachedV11.z * ky;
+    var z = z0 * (1 - kx) + z1 * kx;
     return {
-        t : t,
+        z : z,
         d : d
     };
 };
 
 /**
- * Return the values for a given (x,y) index.
+ * Return the (z,d) values for a given (x,y) index.
  */
 OTPA.TimeGrid.prototype._getValues = function(xIndex, yIndex) {
     if (xIndex < 0 || yIndex < 0 || xIndex >= this.bitmap.width
@@ -145,7 +145,7 @@ OTPA.TimeGrid.prototype._getValues = function(xIndex, yIndex) {
     var lng = xIndex * this.cellSize.lng + this.gridBase.lng;
     var lat = yIndex * this.cellSize.lat + this.gridBase.lat;
     return {
-        t : (r + (g << 8)) / this.zUnit,
+        z : (r + (g << 8)) / this.zUnit,
         d : b / 100 * this.precisionMeters,
         c : {
             lng : lng,
@@ -240,7 +240,7 @@ OTPA._drawTile = function(timeGrid, tileCache, canvas, tile, colorMap,
                     tile.southwest.lng + x * dLng / tile.width);
             var v = timeGrid.get(C);
             if (v != null) {
-                var color = colorMap.colorize(v.t);
+                var color = colorMap.colorize(v.z);
                 if (color != null) {
                     var j = (x + y * tile.width) * 4;
                     d[j++] = (color & 0xFF0000) >> 16;
@@ -376,7 +376,7 @@ OTPA.TimeGrid.prototype._getDebugLayer = function() {
             if (v == null)
                 continue;
             var color = "#00f";
-            var radius = v.t / 1000000;
+            var radius = v.z / 1000000;
             if (v.d > this.offRoadDistanceMeters) {
                 color = "#f00";
                 radius = 600 / 1000000;
@@ -425,17 +425,17 @@ OTPA.deltaComposeFunction = function(v1, v2) {
         }
         if (v1 == null) {
             return {
-                t : +1000000, // +inf
+                z : +1e10, // +inf
                 d : v2.d
             };
         }
         return {
-            t : -1000000, // -inf
+            z : -1e10, // -inf
             d : v1.d
         };
     }
     return {
-        t : v1.t - v2.t,
+        z : v1.z - v2.z,
         // Is this correct?
         d : Math.max(v1.d, v2.d)
     };

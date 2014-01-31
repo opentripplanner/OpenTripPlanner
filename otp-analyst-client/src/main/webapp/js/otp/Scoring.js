@@ -76,7 +76,7 @@ OTPA.Scoring.prototype.score = function(timeGrid, poiList, wtFunc, beta) {
         var poiW = poi.w || 1.0;
         var v = timeGrid.get(poi.location);
         if (v != null) {
-            w += Math.pow(poiW * wtFunc(v.t), beta);
+            w += Math.pow(poiW * wtFunc(v.z), beta);
         }
     }
     return Math.pow(w, 1 / beta);
