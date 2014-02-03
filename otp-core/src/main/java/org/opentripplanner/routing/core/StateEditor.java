@@ -276,6 +276,7 @@ public class StateEditor {
     public void incrementNumBoardings() {
         cloneStateDataAsNeeded();
         child.stateData.numBoardings++;
+        setEverBoarded();
     }
 
     /* Basic Setters */
@@ -366,9 +367,10 @@ public class StateEditor {
         child.stateData.alightedLocal = alightedLocal;
     }
 
-    public void setEverBoarded(boolean everBoarded) {
+    public void setEverBoarded() {
+        if (child.stateData.everBoarded) return;
         cloneStateDataAsNeeded();
-        child.stateData.everBoarded = everBoarded;
+        child.stateData.everBoarded = true;
     }
 
     public void setBikeRenting(boolean bikeRenting) {

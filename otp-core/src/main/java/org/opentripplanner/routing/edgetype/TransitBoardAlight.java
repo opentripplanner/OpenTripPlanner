@@ -257,15 +257,14 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             Trip trip = bestTripTimes.getTrip();
             
             /* check if route and/or Agency are banned for this plan */
-            if (options.tripIsBanned(trip))
-            	return null;
+            if (options.tripIsBanned(trip)) return null;
 
             /* check if route is preferred for this plan */
             long preferences_penalty = options.preferencesPenaltyForTrip(trip);
             
             /* check whether this is a preferred transfer */
             int transferPenalty = 0;
-            if (state0.getNumBoardings() > 0) {
+            if (state0.isEverBoarded()) {
                 // This is not the first boarding, thus a transfer
                 TransferTable transferTable = options.getRoutingContext().transferTable;
                 // Get the transfer time
@@ -299,7 +298,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
 
             double wait_cost = bestWait;
 
-            if (state0.getNumBoardings() == 0 && !options.isReverseOptimizing()) {
+            if (!state0.isEverBoarded() && !options.isReverseOptimizing()) {
                 wait_cost *= options.waitAtBeginningFactor;
                 // this is subtracted out in Analyst searches in lieu of reverse optimization
                 s1.setInitialWaitTimeSeconds(bestWait);
@@ -322,7 +321,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             // The last alight can be moved forward by bestWait (but no further) without
             // impacting the possibility of this trip
             if (options.isReverseOptimizeOnTheFly() && !options.isReverseOptimizing() && 
-                    state0.getNumBoardings() > 0 && state0.getLastNextArrivalDelta() <= bestWait &&
+                    state0.isEverBoarded() && state0.getLastNextArrivalDelta() <= bestWait &&
                     state0.getLastNextArrivalDelta() > -1) {
 
                 // it is re-reversed by optimize, so this still yields a forward tree
