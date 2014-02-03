@@ -19,6 +19,7 @@ import models.*;
 import models.fieldtrip.FieldTripNote;
 import play.data.binding.As;
 
+import net.tanesha.recaptcha.*;
 
 
 public class FieldTrip extends Application {
@@ -285,14 +286,29 @@ public class FieldTrip extends Application {
         render();
     }
     
-    public static void newRequest(FieldTripRequest req) {
-        System.out.println("newRequest tn="+req.teacherName);
-        if(req.teacherName != null) {
+    public static void newRequest(FieldTripRequest req, String recaptcha_challenge_field, String recaptcha_response_field) {
+        
+        // check captcha
+        String publicKey = (String) Play.configuration.get("recaptcha.public_key");
+        String privateKey = (String) Play.configuration.get("recaptcha.private_key");
+
+        ReCaptcha captcha = ReCaptchaFactory.newReCaptcha(publicKey, privateKey, false);
+        ReCaptchaResponse response = captcha.checkAnswer(request.remoteAddress, recaptcha_challenge_field, recaptcha_response_field);
+
+        boolean validRecaptcha = false;
+        
+        if (response.isValid()) {
+            validRecaptcha = true;
+        }
+        else {
+            render(req, validRecaptcha);
+        }
+        
+        if(req.teacherName != null && validRecaptcha) {
             req.id = null;
             req.save();
             Long id = req.id;
-            System.out.println("about to render");
-            render(req);
+            render(req, validRecaptcha);
         }
         else {
             badRequest();

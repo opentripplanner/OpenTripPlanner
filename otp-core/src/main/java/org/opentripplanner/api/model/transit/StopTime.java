@@ -44,6 +44,10 @@ public class StopTime {
     public String phase;
 
     @JsonSerialize
+    @XmlAttribute
+    public String direction;
+    
+    @JsonSerialize
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @XmlElement
     public TripType trip;

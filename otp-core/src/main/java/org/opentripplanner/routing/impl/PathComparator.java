@@ -27,7 +27,7 @@ public class PathComparator implements Comparator<GraphPath> {
     
     /**
      * For depart-after search results sort by arrival time ascending
-     * For arrive-before search resultes sort by departure time descending
+     * For arrive-before search results sort by departure time descending
      */
     @Override
     public int compare(GraphPath o1, GraphPath o2) {

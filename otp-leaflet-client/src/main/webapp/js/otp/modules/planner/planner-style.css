@@ -175,7 +175,7 @@
 
 .otp-itin-leg-leftcol {
     font-size: .9em;
-    color: gray;
+    color: black;
     width: 50px;
     float: left;
 }
@@ -355,6 +355,16 @@
 
 .otp-itin-alert-description {
     font-size: .9em;
+}
+
+.otp-itin-alert-toggleButton {
+    width: 15px;
+    height: 15px;
+    float: right;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+    margin-top: -1px;
 }
 
 /* print window style */

@@ -29,11 +29,11 @@
             {{trip.route.longName}}
         </div>
 
-        {{#trip.tripHeadsign}}
+        {{#direction}}
             <div class="otp-stopViewer-headsignRow">
-                {{trip.tripHeadsign}}
+                to {{direction}}
             </div>
-        {{/trip.tripHeadsign}}
+        {{/direction}}
         
         {{#trip.blockId}}
             <div class="otp-stopViewer-blockRow">

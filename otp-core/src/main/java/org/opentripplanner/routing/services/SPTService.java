@@ -17,6 +17,13 @@ import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrateg
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 
+/**
+ * The various getShortestPathTree methods may return a ShortestPathTree or null. Null indicates
+ * that something went horribly wrong and no useful information could be produced. If an SPT is
+ * returned but req.rctx.aborted is true, the SPT may contain some valid paths but any enclosing
+ * retrying mechanism should end the search. If req.rctx.aborted is false the retrying mechanism may
+ * attempt to get additional paths by altering parameters.
+ */
 public interface SPTService {
     
     /**

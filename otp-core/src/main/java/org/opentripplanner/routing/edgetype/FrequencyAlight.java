@@ -94,7 +94,7 @@ public class FrequencyAlight extends Edge {
             long currentTime = state0.getTimeSeconds();
             
             int transferPenalty = 0;
-            if (state0.getNumBoardings() > 0) {
+            if (state0.isEverBoarded()) {
                 // This is not the first boarding, thus a transfer
                 TransferTable transferTable = options.getRoutingContext().transferTable;
                 // Get the current stop
@@ -194,7 +194,7 @@ public class FrequencyAlight extends Edge {
             s1.setRoute(trip.getRoute().getId());
 
             long wait_cost = bestWait;
-            if (state0.getNumBoardings() == 0) {
+            if (!state0.isEverBoarded()) {
                 wait_cost *= options.waitAtBeginningFactor;
             } else {
                 wait_cost *= options.waitReluctance;

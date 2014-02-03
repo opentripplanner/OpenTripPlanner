@@ -228,9 +228,10 @@ public class ShapefileStreetGraphBuilderImpl implements GraphBuilder {
             }
 
             it2.close();
-
         } catch (Exception ex) {
             throw new IllegalStateException("error loading shapefile street data", ex);
+        } finally {
+            _featureSourceFactory.cleanup();
         }       
     }
 

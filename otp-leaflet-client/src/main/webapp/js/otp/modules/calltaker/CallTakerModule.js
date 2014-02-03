@@ -27,14 +27,15 @@ otp.modules.calltaker.CallTakerModule =
     
     sessionManager : null,
     
-    templateFile : 'otp/modules/calltaker/calltaker-templates.html',
+    //templateFile : 'otp/modules/calltaker/calltaker-templates.html',
     
     tripOptionsWidgetCssClass : 'otp-calltaker-tripOptionsWidget',
     itinerariesWidgetCssClass : 'otp-calltaker-itinerariesWidget',
     
     initialize : function(webapp, id, options) {
         otp.modules.multimodal.MultimodalPlannerModule.prototype.initialize.apply(this, arguments);
-        
+        this.templateFiles.push('otp/modules/calltaker/calltaker-templates.html');
+
         this.showIntermediateStops = true;
         
     },
