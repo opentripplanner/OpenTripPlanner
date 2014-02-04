@@ -1,0 +1,132 @@
+<html>
+
+<head>
+<meta charset="utf-8" />
+<title>OTPA Marseille</title>
+<link rel="stylesheet" href="http://leafletjs.com/dist/leaflet.css" />
+<script src="http://leafletjs.com/dist/leaflet.js"></script>
+
+<script
+	src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<link rel="stylesheet"
+	href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.css"
+	type="text/css" media="all" />
+<script
+	src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.js"></script>
+
+<link rel="stylesheet" type="text/css" href="client.css" />
+</head>
+
+<body>
+	<div id="toolbox">
+		<h1>Prototype OpenTripPlanner Analyst Marseille Métropole</h1>
+
+		<p>
+			<button id="about">A propos</button>
+			<button id="contact">Contacts</button>
+		</p>
+
+		<h2>Paramètres de calcul</h2>
+		<div id="widget1"></div>
+		<p>
+			<button id="refresh">Rafraîchir</button>
+		</p>
+
+		<h2>Légende</h2>
+		<canvas id="legend" width="300" height="16"></canvas>
+
+		<h2>Outils</h2>
+		<p>
+			<button id="downloadIsoimage">Télécharger image calque</button>
+		</p>
+		<p>
+			<label>Isochrones: <input id="cutoffSec" type="text" size="6"
+				value="30;60" />mns
+			</label> <label><input id="isoEnable" type="checkbox" /> Afficher</label>
+			<button id="downloadIsoVector">Télécharger isochrone GeoJSON</button>
+		</p>
+	</div>
+	<div id="map"></div>
+
+	<div id="aboutContent" title="À propos" style="display: none;">
+		<p>
+			Ce prototype a été mis en place à l'initiative de la <a
+				href="http://www.paca.developpement-durable.gouv.fr/les-transports-en-paca-r139.html">DREAL
+				PACA</a>), qui anime auprès de la mission Métropole attachée à la
+			Préfecture la réflexion sur l'organisation des déplacements dans la
+			métropole Marseille Provence. <a
+				href="http://mim.cete-aix.fr/article.php3?id_article=360">Pour
+				en savoir plus sur le projet.</a>
+		</p>
+
+		<p>Le prototype s'appuie sur le logiciel libre de recherche
+			d'itinéraires multimodaux Open Trip Planner (OTP), qui est doté d'un
+			module Analyst permettant de produire des cartes isochrones
+			interactives et de calculer des indicateurs d'accessibilité
+			transport. La prestation a été confiée à un groupement réunissant les
+			sociétés Mecatran, Modulaweb et Conveyal, qui contribuent activement
+			à OpenTripPlanner.</p>
+
+		<p>Des développements sont prévus concernant le calcul
+			d'indicateurs d'accessibilité, qui seront mis en ligne dans les
+			semaines qui viennent.</p>
+
+		<p>Le réseau multimodal utilisé pour les calculs comprend:</p>
+		<ul>
+			<li>l'offre de transport collectif (<a
+				href="http://www.lepilote.com/presentation/?rub_code=92">Pilote</a>
+				plus TER)
+			</li>
+			<li>le réseau routier disponible par la base de données
+				collaborative <a href="http://www.openstreetmap.org/about">Open
+					Street Map</a>.
+			</li>
+		</ul>
+
+		<h2>Pour utiliser ANALYST:</h2>
+		<p>Déplacez avec la souris le pointeur bleu dans la carte pour
+			définir le point d'origine: la carte se met à jour et affiche alors
+			les surfaces isochrones indiquant les zones que l'on peut atteindre
+			en moins de 1/2H, 1H, 1H30, 2H depuis l'origine choisie.</p>
+		<p>Les isochrones dépendent des options que l'on peut définir dans
+			la fenêtre à gauche:</p>
+		<ul>
+			<li>Départ à / Arriver à: indique l'heure et le jour pour le
+				calcul depuis le point Origine</li>
+			<li>Voyager par: choix des modes de transport (Voiture - les
+				données ne tiennent pas compte de la congestion, dans la version
+				actuelle)</li>
+			<li>pour les modes TC, un paramètre supplémentaire 'Marcher au
+				maximum' permet de définir la distance maximale de marche au total.</li>
+			<li>le bouton Rafraîchir réactualise la carte.</li>
+		</ul>
+
+		<p>
+			N'hésitez pas à <a
+				href="mailto:Frederique.Reffet@developpement-durable.gouv.fr,pat.gendre@cerema.fr?subject=OTP+Analyst+Métropole+Marseillaise">nous
+				contacter</a> si l'outil vous intéresse, merci.
+		</p>
+	</div>
+
+	<div id="contactContent" title="Contact" style="display: none;">
+		<p>
+			Contactez-nous pour vous faire part de vos remarques ou de vos
+			questions: <a
+				href="mailto:Frederique.Reffet@developpement-durable.gouv.fr,pat.gendre@cerema.fr?subject=OTP+Analyst+Métropole+Marseillaise">
+				Frederique.Reffet@developpement-durable.gouv.fr,
+				pat.gendre@cerema.fr</a>
+		</p>
+	</div>
+
+	<script type="text/javascript" src="../js/otp/otpa.js"></script>
+	<script type="text/javascript" src="../js/otp/French.js"></script>
+	<script type="text/javascript" src="../js/otp/Widgets.js"></script>
+	<script type="text/javascript" src="../js/otp/TimeGrid.js"></script>
+	<script type="text/javascript" src="../js/otp/ColorMap.js"></script>
+	<script type="text/javascript" src="../js/otp/Isochrone.js"></script>
+	<script type="text/javascript" src="../js/otp/Population.js"></script>
+	<script type="text/javascript" src="../js/otp/Scoring.js"></script>
+	<script type="text/javascript" src="client.js"></script>
+</body>
+
+</html>
