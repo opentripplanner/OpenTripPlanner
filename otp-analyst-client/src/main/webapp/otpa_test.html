@@ -18,26 +18,30 @@
 <body>
 	<div id="toolbox">
 		<h1>OTPA lib test</h1>
-		<p>
-			Hospitals score: <span id="hospitalScore"></span>
-		</p>
+
+		<div id="widget1"></div>
+		<label><input id="diffMode" type="checkbox"> Enable diff mode</label>
+		<div id="widget2"></div>
+		<div>
+			<button id="refresh">Refresh</button>
+		</div>
+
 		<div style="width: 300px" id="cutoffSec"></div>
 		<canvas id="legend" width="300" height="16"></canvas>
 		<canvas id="legendDiff" width="300" height="16"></canvas>
-		<p>
-			<label><input type="checkbox" id="diffLayer" /> Show diff.</label>
-		</p>
 		<!-- Download image -->
 		<p>
 			<a href="#" id="downloadIsoimage">Download isochrone image</a>
 		</p>
 	</div>
 	<div id="map"></div>
+	<script type="text/javascript" src="js/otp/otpa.js"></script>
+	<script type="text/javascript" src="js/otp/Widgets.js"></script>
 	<script type="text/javascript" src="js/otp/TimeGrid.js"></script>
 	<script type="text/javascript" src="js/otp/ColorMap.js"></script>
-	<script type="text/javascript" src="js/otp/Isochrone.js"></script>
-	<script type="text/javascript" src="js/otp/POI.js"></script>
-	<script type="text/javascript" src="js/otp/Scoring.js"></script>
+	<!-- 	<script type="text/javascript" src="js/otp/Isochrone.js"></script> -->
+	<!-- 	<script type="text/javascript" src="js/otp/Population.js"></script> -->
+	<!-- 	<script type="text/javascript" src="js/otp/Scoring.js"></script> -->
 	<script type="text/javascript" src="otpa_test.js"></script>
 </body>
 

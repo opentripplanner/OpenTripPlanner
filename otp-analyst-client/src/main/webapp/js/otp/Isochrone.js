@@ -12,52 +12,51 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>. 
  */
 
-var OTPA = OTPA || {}; // namespace
+otp.namespace("otp.analyst");
 
 /**
  * Isochrone class.
  */
+otp.Class({
+    /**
+     * Isochrone constructor.
+     * 
+     * @param parameters
+     *            Request parameters
+     * @param cutoffSec
+     *            Cutoff time in seconds (array of values or single value).
+     */
+    initialize : function(parameters, cutoffSec) {
+        if (!(cutoffSec instanceof Array)) {
+            cutoffSec = [ cutoffSec ];
+        }
+        this.isochrones = null;
+        var url = '/otp-rest-servlet/ws/isochrone?' + $.param(parameters, false);
+        for (var i = 0; i < cutoffSec.length; i++)
+            url += "&cutoffSec=" + cutoffSec[i];
+        this.isoMap = [];
+        var thisIso = this;
+        var ajaxParams = {
+            url : url,
+            success : function(result) {
+                // Index features on cutoff time
+                for (var i = 0; i < result.features.length; i++) {
+                    var time = result.features[i].properties.Time;
+                    thisIso.isoMap[time] = result.features[i];
+                }
+            },
+            async : false
+        };
+        jQuery.ajax(ajaxParams);
+    },
 
-/**
- * Factory method.
- */
-OTPA.isochrone = function(parameters, cutoffSec) {
-    return new OTPA.Isochrone(parameters, cutoffSec);
-}
-
-/**
- * Isochrone constructor.
- * 
- * @param parameters Request parameters
- * @param cutoffSec Cutoff time in seconds (array of values or single value).
- */
-OTPA.Isochrone = function(parameters, cutoffSec) {
-    if (!(cutoffSec instanceof Array)) {
-        cutoffSec = [ cutoffSec];
+    /**
+     * Get the GeoJson feature.
+     * 
+     * @param cutoffSec
+     *            The iso time to request the GeoJSON feature from.
+     */
+    getFeature : function(cutoffSec) {
+        return this.isoMap[cutoffSec];
     }
-    this.isochrones = null;
-    var url = '/otp-rest-servlet/ws/isochrone?' + $.param(parameters, false);
-    for (var i = 0; i < cutoffSec.length; i++)
-        url += "&cutoffSec=" + cutoffSec[i];
-    this.isoMap = [];
-    var thisIso = this;
-    $.ajax({
-        url : url,
-        success : function(result) {
-            // Index features on cutoff time
-            for (var i = 0; i < result.features.length; i++) {
-                thisIso.isoMap[result.features[i].properties.Time] = result.features[i];
-            }
-        },
-        async : false
-    });
-};
-
-/**
- * Get the GeoJson feature.
- * 
- * @param cutoffSec The iso time to request the GeoJSON feature from.
- */
-OTPA.Isochrone.prototype.getFeature = function(cutoffSec) {
-    return this.isoMap[cutoffSec];
-}
+});

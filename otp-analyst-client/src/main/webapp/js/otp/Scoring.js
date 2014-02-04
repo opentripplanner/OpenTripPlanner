@@ -12,16 +12,46 @@
    along with this program.  If not, see <http://www.gnu.org/licenses/>. 
  */
 
-var OTPA = OTPA || {}; // namespace
+otp.namespace("otp.analyst");
+
+/**
+ * Scoring class.
+ */
+otp.analyst.Scoring = otp.Class({
+
+    /**
+     * Scoring constructor.
+     */
+    initialize : function() {
+    },
+
+    /**
+     * Compute an accessibility score for a POI list.
+     */
+    score : function(timeGrid, population, wtFunc, beta) {
+        var beta = beta || 1;
+        var w = 0.0;
+        for (var i = 0; i < population.size(); i++) {
+            var poi = population.get(i);
+            // Default POI weight is 1
+            var poiW = poi.w || 1.0;
+            var v = timeGrid.get(poi.location);
+            if (v != null) {
+                w += Math.pow(poiW * wtFunc(v.z), beta);
+            }
+        }
+        return Math.pow(w, 1 / beta);
+    }
+});
 
 /**
  * Accessibility function: step edge. w = 1 if t < t0
  */
-OTPA.stepEdge = function(t0) {
+otp.analyst.Scoring.stepEdge = function(t0) {
     return function(t) {
         return t < t0 ? 1.0 : 0.0;
     };
-}
+};
 
 /**
  * Accessibility function: smooth edge (sigmoid). A smooth function with: TODO:
@@ -40,44 +70,9 @@ OTPA.stepEdge = function(t0) {
  * --------------------
  * </pre>
  */
-OTPA.sigmoid = function(t0, t1) {
+otp.analyst.Scoring.sigmoid = function(t0, t1) {
     var t1 = t1 || t0 / 4;
     return function(t) {
         return 1 / (1 + Math.exp((t - t0) / t1));
-    }
-}
-
-/**
- * Scoring class.
- */
-
-/**
- * Factory method
- */
-OTPA.scoring = function() {
-    return new OTPA.Scoring();
-}
-
-/**
- * Scoring constructor.
- */
-OTPA.Scoring = function() {
-};
-
-/**
- * Compute an accessibility score for a POI list.
- */
-OTPA.Scoring.prototype.score = function(timeGrid, poiList, wtFunc, beta) {
-    var beta = beta || 1;
-    var w = 0.0;
-    for (var i = 0; i < poiList.size(); i++) {
-        var poi = poiList.get(i);
-        // Default POI weight is 1
-        var poiW = poi.w || 1.0;
-        var v = timeGrid.get(poi.location);
-        if (v != null) {
-            w += Math.pow(poiW * wtFunc(v.z), beta);
-        }
-    }
-    return Math.pow(w, 1 / beta);
+    };
 };
