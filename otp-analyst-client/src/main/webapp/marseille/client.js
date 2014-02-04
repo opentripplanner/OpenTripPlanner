@@ -43,9 +43,10 @@ $(function() {
             });
     gui.map.addLayer(gui.otLayer);
 
-    /* Create 2 layer groups for easier display / management */
+    /* Create 3 layer groups for easier display / management */
     gui.gradientLayerGroup = new L.LayerGroup([]);
     gui.isochronesLayerGroup = new L.LayerGroup([]);
+    gui.populationLayerGroup = new L.LayerGroup([]);
     gui.map.addLayer(gui.gradientLayerGroup);
     gui.map.addLayer(gui.isochronesLayerGroup);
 
@@ -54,17 +55,33 @@ $(function() {
         "Transport" : gui.otLayer,
         "OSM" : gui.osmLayer
     }, {
+        "Populations" : gui.populationLayerGroup,
         "Gradient" : gui.gradientLayerGroup,
         "Isochrones" : gui.isochronesLayerGroup,
     }).addTo(gui.map);
 
-    /* Load populations */
+    /* Load populations and add markers */
+    function addPopulationMarkers(population, pathOptions) {
+        for (var i = 0; i < population.size(); i++) {
+            var item = population.get(i);
+            gui.populationLayerGroup.addLayer(L.circleMarker(item.location, pathOptions));
+        }
+    }
     gui.colleges = new otp.analyst.Population();
     gui.colleges.loadFromCsv("colleges.csv", {
         lonColName : "X",
         latColName : "Y",
         nameColName : "DESIGNATIO"
+    }).onLoad(function(population) {
+        addPopulationMarkers(population, {
+            radius : 4,
+            color : "#000",
+            opacity : 0.8,
+            fillOpacity : 0.8,
+            fillColor : "#C0C"
+        });
     });
+    // Reload colleges, this time weighting on # of places
     gui.collegesPlaces = new otp.analyst.Population();
     gui.collegesPlaces.loadFromCsv("colleges.csv", {
         lonColName : "X",
@@ -77,6 +94,14 @@ $(function() {
         lonColName : "X",
         latColName : "Y",
         nameColName : "DESIGNATIO"
+    }).onLoad(function(population) {
+        addPopulationMarkers(population, {
+            radius : 4,
+            color : "#000",
+            opacity : 0.8,
+            fillOpacity : 0.8,
+            fillColor : "#F00"
+        });
     });
 
     /* Select client-wide locale */
@@ -90,7 +115,7 @@ $(function() {
     });
 
     /* Called whenever some parameters have changed. */
-    gui.refresh = function() {
+    function refresh() {
         /* Disable the refresh button to prevent too many calls */
         $("#refresh").prop("disabled", true);
         /* Get the current parameter values */
@@ -144,7 +169,7 @@ $(function() {
                         style : {
                             color : "#0000FF",
                             weight : 1,
-                            dashArray : (i % 2) == 1 ? "5,5" : "",
+                            dashArray : (i % 2) == 1 ? "5,2" : "",
                             fillOpacity : 0.0,
                             fillColor : "#000000"
                         }
@@ -153,12 +178,12 @@ $(function() {
                 }
             });
         }
-    };
+    }
 
     /* Plug the refresh callback function. */
-    gui.widget1.onRefresh(gui.refresh);
-    $("#refresh").click(gui.refresh);
-    $("#isoEnable").click(gui.refresh);
+    gui.widget1.onRefresh(refresh);
+    $("#refresh").click(refresh);
+    $("#isoEnable").click(refresh);
     /* Refresh to force an initial load. */
     gui.widget1.refresh();
 
