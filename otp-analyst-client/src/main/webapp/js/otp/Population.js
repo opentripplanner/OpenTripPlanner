@@ -19,30 +19,91 @@ otp.namespace("otp.analyst");
  */
 
 otp.analyst.Population = otp.Class({
-    
+
     /**
      * Constructor. Create an empty population.
      */
     initialize : function() {
         this.data = [];
+        this.onLoadCallbacks = $.Callbacks();
     },
 
     /**
      * Load population from JSON data.
      */
-    loadFromJson : function(jsonUrl) {
+    loadFromJson : function(jsonUrl, options) {
+        var thisPl = this;
+        this._loadAjax(jsonUrl, options, function(payload) {
+            payload = $.parseJSON(payload);
+            for (var i = 0; i < payload.length; i++) {
+                thisPl.data.push(payload[i]);
+            }
+        });
+    },
+
+    /**
+     * Load population from CSV data.
+     */
+    loadFromCsv : function(csvUrl, options) {
+        var thisPl = this;
+        this._loadAjax(csvUrl, options, function(payload) {
+            payload = thisPl._parseCsv(payload);
+            if (payload.length < 1)
+                return;
+            // Find the various column indexes from CSV header
+            var latCol, lonCol, nameCol, weightCol;
+            for (var col = 0; col < payload[0].length; col++) {
+                var header = payload[0][col];
+                if (header == options.latColName) {
+                    latCol = col;
+                } else if (header == options.lonColName) {
+                    lonCol = col;
+                } else if (header == options.nameColName) {
+                    nameCol = col;
+                } else if (header == options.weightColName) {
+                    weightCol = col;
+                }
+            }
+            if (latCol == null || lonCol == null)
+                return; // Mandatory fields
+            for (var row = 1; row < payload.length; row++) {
+                var item = {
+                    location : {
+                        lat : payload[row][latCol],
+                        lng : payload[row][lonCol]
+                    },
+                    w : weightCol ? payload[row][weightCol] : 1.0
+                };
+                if (nameCol)
+                    item.name = payload[row][nameCol];
+                thisPl.data.push(item);
+            }
+        });
+    },
+
+    /**
+     * Generic ajax-loading.
+     */
+    _loadAjax : function(url, options, dataCallback) {
         var thisPl = this;
         $.ajax({
-            url : jsonUrl,
+            url : url,
             success : function(result) {
-                if (typeof result === 'string')
-                    result = $.parseJSON(result);
-                for (var i = 0; i < result.length; i++) {
-                    thisPl.data.push(result[i]);
+                if (typeof result === 'string') {
+                    dataCallback(result);
                 }
+                thisPl.onLoadCallbacks.fire(thisPl);
             },
-            async : false
+            async : options.async
         });
+        return this;
+    },
+
+    /**
+     * Add a callback when loaded.
+     */
+    onLoad : function(callback) {
+        this.onLoadCallbacks.add(callback);
         return this;
     },
 
@@ -68,5 +129,49 @@ otp.analyst.Population = otp.Class({
      */
     get : function(index) {
         return this.data[index];
-    }
+    },
+
+    /**
+     * Parse CSV data. See http://stackoverflow.com/questions/1293147
+     */
+    _parseCsv : function(csv, reviver) {
+        reviver = reviver || function(r, c, v) {
+            return v;
+        };
+        var chars = csv.split(''), c = 0, cc = chars.length, start, end, table = [], row;
+        while (c < cc) {
+            table.push(row = []);
+            while (c < cc && '\r' !== chars[c] && '\n' !== chars[c]) {
+                start = end = c;
+                if ('"' === chars[c]) {
+                    start = end = ++c;
+                    while (c < cc) {
+                        if ('"' === chars[c]) {
+                            if ('"' !== chars[c + 1]) {
+                                break;
+                            } else {
+                                chars[++c] = '';
+                            } // unescape ""
+                        }
+                        end = ++c;
+                    }
+                    if ('"' === chars[c])
+                        ++c;
+                    while (c < cc && '\r' !== chars[c] && '\n' !== chars[c] && ',' !== chars[c])
+                        ++c;
+                } else {
+                    while (c < cc && '\r' !== chars[c] && '\n' !== chars[c] && ',' !== chars[c])
+                        end = ++c;
+                }
+                row.push(reviver(table.length - 1, row.length, chars.slice(start, end).join('')));
+                if (',' === chars[c])
+                    ++c;
+            }
+            if ('\r' === chars[c])
+                ++c;
+            if ('\n' === chars[c])
+                ++c;
+        }
+        return table;
+    },
 });
