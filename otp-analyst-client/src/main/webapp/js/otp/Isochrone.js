@@ -17,7 +17,7 @@ otp.namespace("otp.analyst");
 /**
  * Isochrone class.
  */
-otp.Class({
+otp.analyst.Isochrone = otp.Class({
     /**
      * Isochrone constructor.
      * 
@@ -25,29 +25,39 @@ otp.Class({
      *            Request parameters
      * @param cutoffSec
      *            Cutoff time in seconds (array of values or single value).
+     * @param options
+     *            Optional parameters
      */
-    initialize : function(parameters, cutoffSec) {
+    initialize : function(parameters, cutoffSec, options) {
         if (!(cutoffSec instanceof Array)) {
             cutoffSec = [ cutoffSec ];
         }
+        this.options = $.extend({
+            load : true,
+            async : true
+        }, options);
         this.isochrones = null;
-        var url = '/otp-rest-servlet/ws/isochrone?' + $.param(parameters, false);
+        this.onLoadCallbacks = $.Callbacks();
+        this.url = '/otp-rest-servlet/ws/isochrone?' + $.param(parameters, false);
         for (var i = 0; i < cutoffSec.length; i++)
-            url += "&cutoffSec=" + cutoffSec[i];
+            this.url += "&cutoffSec=" + cutoffSec[i];
         this.isoMap = [];
         var thisIso = this;
-        var ajaxParams = {
-            url : url,
-            success : function(result) {
-                // Index features on cutoff time
-                for (var i = 0; i < result.features.length; i++) {
-                    var time = result.features[i].properties.Time;
-                    thisIso.isoMap[time] = result.features[i];
-                }
-            },
-            async : false
-        };
-        jQuery.ajax(ajaxParams);
+        if (this.options.load) {
+            var ajaxParams = {
+                url : this.url,
+                success : function(result) {
+                    // Index features on cutoff time
+                    for (var i = 0; i < result.features.length; i++) {
+                        var time = result.features[i].properties.Time;
+                        thisIso.isoMap[time] = result.features[i];
+                    }
+                    thisIso.onLoadCallbacks.fire(thisIso);
+                },
+                async : this.options.async
+            };
+            jQuery.ajax(ajaxParams);
+        }
     },
 
     /**
@@ -58,5 +68,21 @@ otp.Class({
      */
     getFeature : function(cutoffSec) {
         return this.isoMap[cutoffSec];
-    }
+    },
+
+    /**
+     * Get the request URL.
+     */
+    getUrl : function() {
+        return this.url;
+    },
+
+    /**
+     * Add a callback when loaded.
+     */
+    onLoad : function(callback) {
+        this.onLoadCallbacks.add(callback);
+        return this;
+    },
+
 });
