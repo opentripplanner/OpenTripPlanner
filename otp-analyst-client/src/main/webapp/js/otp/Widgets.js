@@ -26,7 +26,9 @@ otp.analyst.ParamsWidget = otp.Class({
      * 
      * @param node
      *            The DOM container to contain the widget.
-     * @options Object containing the
+     * @param options
+     *            Object containing the various options.
+     * 
      */
     initialize : function(node, options) {
         this.options = $.extend({
@@ -36,9 +38,10 @@ otp.analyst.ParamsWidget = otp.Class({
             defaultDateTime : new Date(),
             dateFormat : "yy/mm/dd",
             selectModes : true,
-            defaultModes : "WALK,TRANSIT",
-            selectMaxWalk : true,
+            defaultModes : "TRANSIT,WALK",
+            selectWalkParams : true,
             defaultMaxWalk : 1000,
+            defaultWalkSpeed : 1.389,
             coordinateOrigin : null,
             selectMaxTime : false,
             defaultMaxTime : 3600,
@@ -47,6 +50,7 @@ otp.analyst.ParamsWidget = otp.Class({
             defaultDataType : "TIME",
             refreshButton : false
         }, options);
+        this.locale = otp.locale.analyst;
         this.parentNode = node;
         var thisRw = this;
         // Refresh callbacks list
@@ -62,7 +66,7 @@ otp.analyst.ParamsWidget = otp.Class({
                 }).click(function() {
                     thisRw.enableLocationMarker(this.checked);
                 });
-                locationDiv.text("Different origin");
+                locationDiv.text(this.locale.differentOrigin);
                 locationDiv.append(this.locationCheckbox);
             } else {
                 thisRw.enableLocationMarker(true);
@@ -73,13 +77,8 @@ otp.analyst.ParamsWidget = otp.Class({
             var dateTimeDiv = $("<div/>");
             node.append(dateTimeDiv);
             // Arrive By
-            this.arriveByInput = $("<select/>");
-            if (this.options.extend)
-                this.arriveByInput.append($("<option />").text("(same)").val("inherit"));
-            this.arriveByInput.append($("<option />").text("Depart at").val(false), $("<option />").text("Arrive by")
-                    .val(true));
-            if (!this.options.extend)
-                this.arriveByInput.val(this.options.defaultArriveBy);
+            this.arriveByInput = this._createSelect(this.locale.arriveDepart, this.options.extend,
+                    this.options.defaultArriveBy);
             dateTimeDiv.append(this.arriveByInput);
             // Date
             if (!this.options.extend) {
@@ -106,68 +105,43 @@ otp.analyst.ParamsWidget = otp.Class({
         if (this.options.selectModes) {
             var modesDiv = $("<div/>");
             node.append(modesDiv);
-            modesDiv.text("Modes");
-            this.modesInput = $("<select/>");
-            if (this.options.extend)
-                this.modesInput.append($("<option />").text("(same)").val("inherit"));
-            // TODO Add other modes, depending on options
-            // WALK, BICYCLE, CAR, TRAM, SUBWAY, RAIL, BUS, FERRY,
-            // CABLE_CAR, GONDOLA, FUNICULAR, TRANSIT, TRAINISH, BUSISH
-            var modes = [ [ "Transit", "WALK,TRANSIT" ], [ "Tram only", "WALK,TRAM" ],
-                    [ "Subway only", "WALK,SUBWAY" ], [ "Subway+Tram only", "WALK,TRAM,SUBWAY" ],
-                    [ "Walk only", "WALK" ], [ "Bike only", "BICYCLE" ], [ "Car only", "CAR" ],
-                    [ "Bike + Subway", "BICYCLE,SUBWAY" ] ];
-            for (var i = 0; i < modes.length; i++) {
-                this.modesInput.append($("<option />").text(modes[i][0]).val(modes[i][1]));
-            }
-            if (!this.options.extend)
-                this.modesInput.val(this.options.defaultModes);
+            modesDiv.text(this.locale.modesLabel);
+            this.modesInput = this._createSelect(this.locale.modes, this.options.extend, this.options.defaultModes);
             modesDiv.append(this.modesInput);
         }
-        // Max walk distance
-        if (this.options.selectMaxWalk) {
+        // Max walk distance / speed
+        if (this.options.selectWalkParams) {
             var maxWalkDiv = $("<div/>");
             node.append(maxWalkDiv);
-            maxWalkDiv.text("Max walk");
-            this.maxWalkInput = $("<select/>");
-            if (this.options.extend)
-                this.maxWalkInput.append($("<option />").text("(same)").val("inherit"));
-            this.maxWalkInput.append($("<option />").text("500m").val("500"), $("<option />").text("750m").val("750"),
-                    $("<option />").text("1km").val("1000"), $("<option />").text("1,5km").val("1500"), $("<option />")
-                            .text("2km").val("2000"), $("<option />").text("5km").val("5000"));
-            if (!this.options.extend)
-                this.maxWalkInput.val(this.options.defaultMaxWalk);
+            maxWalkDiv.text(this.locale.walkLabel);
+            this.maxWalkInput = this._createSelect(this.locale.maxWalkDistance, this.options.extend,
+                    this.options.defaultMaxWalk);
             maxWalkDiv.append(this.maxWalkInput);
+            this.walkSpeedInput = this._createSelect(this.locale.walkSpeed, this.options.extend,
+                    this.options.defaultWalkSpeed);
+            maxWalkDiv.append(this.walkSpeedInput);
         }
         // Max time
         if (this.options.selectMaxTime) {
             var maxTimeDiv = $("<div/>");
             node.append(maxTimeDiv);
-            maxTimeDiv.text("Max time");
-            this.maxTimeInput = $("<select/>");
-            if (this.options.extend)
-                this.maxTimeInput.append($("<option />").text("(same)").val("inherit"));
-            this.maxTimeInput.append($("<option />").text("0:30").val("1800"),
-                    $("<option />").text("0:45").val("2700"), $("<option />").text("1:00").val("3600"), $("<option />")
-                            .text("1:30").val("5400"), $("<option />").text("2:00").val("7200"), $("<option />").text(
-                            "2:30").val("9000"), $("<option />").text("3:00").val("10800"));
-            if (!this.options.extend)
-                this.maxTimeInput.val(this.options.defaultMaxTime);
+            maxTimeDiv.text(this.locale.maxTimeLabel);
+            this.maxTimeInput = this._createSelect(this.locale.maxTime, this.options.extend,
+                    this.options.defaultMaxTime);
             maxTimeDiv.append(this.maxTimeInput);
         }
         // Data type (time, boardings, max walk)
         if (this.options.selectDataType && !this.options.extend) {
             var dataTypeDiv = $("<div/>");
             node.append(dataTypeDiv);
-            dataTypeDiv.text("Output data");
-            this.dataTypeInput = $("<select/>");
-            this.dataTypeInput.append($("<option />").text("Time").val("TIME"), $("<option />").text("Boardings").val(
-                    "BOARDINGS"), $("<option />").text("Walk distance").val("WALK_DISTANCE"));
+            dataTypeDiv.text(this.locale.dataTypeLabel);
+            this.dataTypeInput = this._createSelect(this.locale.dataType, this.options.extend,
+                    this.options.defaultDataType);
             dataTypeDiv.append(this.dataTypeInput);
         }
         // Refresh button
         if (this.options.refreshButton) {
-            this.refreshButton = $("<button/>").text("Refresh").click(function() {
+            this.refreshButton = $("<button/>").text(this.locale.refresh).click(function() {
                 thisRw.refreshCallbacks.fire(thisRw);
             });
             node.append(this.refreshButton);
@@ -284,11 +258,16 @@ otp.analyst.ParamsWidget = otp.Class({
             retval.mode = base.mode;
         }
         // Max walk
-        retval.maxWalkDistance = this.options.selectMaxWalk ? this.maxWalkInput.val() : this.options.defaultMaxWalk;
+        retval.maxWalkDistance = this.options.selectWalkParams ? this.maxWalkInput.val() : this.options.defaultMaxWalk;
         if (base && retval.maxWalkDistance == "inherit") {
             retval.maxWalkDistance = base.maxWalkDistance;
         }
         retval.maxWalkDistance = parseInt(retval.maxWalkDistance);
+        retval.walkSpeed = this.options.selectWalkParams ? this.walkSpeedInput.val() : this.options.defaultWalkSpeed;
+        if (base && retval.walkSpeed == "inherit") {
+            retval.walkSpeed = base.walkSpeed;
+        }
+        retval.walkSpeed = parseFloat(retval.walkSpeed);
         // Max time
         retval.maxTimeSec = this.options.selectMaxTime ? this.maxTimeInput.val() : this.options.defaultMaxTime;
         if (base && retval.maxTimeSec == "inherit") {
@@ -305,6 +284,21 @@ otp.analyst.ParamsWidget = otp.Class({
             retval.zDataType = this.options.selectDataType ? this.dataTypeInput.val() : this.options.defaultDataType;
             retval.coordinateOrigin = this.options.coordinateOrigin.lat + "," + this.options.coordinateOrigin.lng;
         }
+        return retval;
+    },
+
+    /**
+     * Create a new <select>, filling it with provided values.
+     */
+    _createSelect : function(optionsList, inherit, defaultValue) {
+        var retval = $("<select/>");
+        if (inherit)
+            retval.append($("<option />").text(this.locale.inheritValue).val("inherit"));
+        for (var i = 0; i < optionsList.length; i++) {
+            retval.append($("<option />").text(optionsList[i][1]).val([ optionsList[i][0] ]));
+        }
+        if (!inherit)
+            retval.val(defaultValue);
         return retval;
     }
 });

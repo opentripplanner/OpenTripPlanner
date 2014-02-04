@@ -21,6 +21,16 @@
 var otp = otp || {}; // namespace
 
 /**
+ * Set the global locale.
+ * 
+ * @param locale
+ *            The locale to use (eg. otp.locale.English).
+ */
+otp.setLocale = function(locale) {
+    otp.locale = locale;
+};
+
+/**
  * Function: namespace Create a namespace given a string, eg:
  * otp.namespace("otp.analyst");
  * 
@@ -76,8 +86,7 @@ otp.Class = function() {
     };
 
     if (len > 1) {
-        var newArgs = [ C, P ].concat(Array.prototype.slice.call(arguments)
-                .slice(1, len - 1), F);
+        var newArgs = [ C, P ].concat(Array.prototype.slice.call(arguments).slice(1, len - 1), F);
         otp.inherit.apply(null, newArgs);
     } else {
         C.prototype = F;
@@ -142,11 +151,9 @@ otp.Util.extend = function(destination, source) {
          * prototype object" when calling hawOwnProperty if the source object is
          * an instance of window.Event.
          */
-        var sourceIsEvt = typeof window.Event == "function"
-                && source instanceof window.Event;
+        var sourceIsEvt = typeof window.Event == "function" && source instanceof window.Event;
 
-        if (!sourceIsEvt && source.hasOwnProperty
-                && source.hasOwnProperty("toString")) {
+        if (!sourceIsEvt && source.hasOwnProperty && source.hasOwnProperty("toString")) {
             destination.toString = source.toString;
         }
     }

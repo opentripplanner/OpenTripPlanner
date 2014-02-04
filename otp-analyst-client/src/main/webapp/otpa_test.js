@@ -43,6 +43,7 @@ $(function() {
     }).addTo(gui.map);
 
     /* --- OTPA STUFF --- */
+    otp.setLocale(otp.locale.English);
     gui.widget1 = new otp.analyst.ParamsWidget($('#widget1'), {
         coordinateOrigin : gui.GRID_ORIGIN,
         selectMaxTime : true,
