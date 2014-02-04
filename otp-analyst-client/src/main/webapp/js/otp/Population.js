@@ -39,6 +39,7 @@ otp.analyst.Population = otp.Class({
                 thisPl.data.push(payload[i]);
             }
         });
+        return this;
     },
 
     /**
@@ -79,6 +80,7 @@ otp.analyst.Population = otp.Class({
                 thisPl.data.push(item);
             }
         });
+        return this;
     },
 
     /**
