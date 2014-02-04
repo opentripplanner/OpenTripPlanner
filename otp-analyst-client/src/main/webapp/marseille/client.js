@@ -58,6 +58,27 @@ $(function() {
         "Isochrones" : gui.isochronesLayerGroup,
     }).addTo(gui.map);
 
+    /* Load populations */
+    gui.colleges = new otp.analyst.Population();
+    gui.colleges.loadFromCsv("colleges.csv", {
+        lonColName : "X",
+        latColName : "Y",
+        nameColName : "DESIGNATIO"
+    });
+    gui.collegesPlaces = new otp.analyst.Population();
+    gui.collegesPlaces.loadFromCsv("colleges.csv", {
+        lonColName : "X",
+        latColName : "Y",
+        nameColName : "DESIGNATIO",
+        weightColName : "TOTAL"
+    });
+    gui.lycees = new otp.analyst.Population();
+    gui.lycees.loadFromCsv("lycees.csv", {
+        lonColName : "X",
+        latColName : "Y",
+        nameColName : "DESIGNATIO"
+    });
+
     /* Select client-wide locale */
     otp.setLocale(otp.locale.French);
 
@@ -92,6 +113,17 @@ $(function() {
             gui.layer.bringToFront(); // TODO Leaflet bug?
             /* Re-enable refresh button */
             $("#refresh").prop("disabled", false);
+
+            /* Update scores */
+            var scorer = new otp.analyst.Scoring();
+            var edge30 = otp.analyst.Scoring.stepEdge(1800);
+            var edge60 = otp.analyst.Scoring.stepEdge(3600);
+            $("#c30").text(scorer.score(timeGrid, gui.colleges, edge30, 1.0));
+            $("#c60").text(scorer.score(timeGrid, gui.colleges, edge60, 1.0));
+            $("#cp30").text(scorer.score(timeGrid, gui.collegesPlaces, edge30, 1.0));
+            $("#cp60").text(scorer.score(timeGrid, gui.collegesPlaces, edge60, 1.0));
+            $("#l30").text(scorer.score(timeGrid, gui.lycees, edge30, 1.0));
+            $("#l60").text(scorer.score(timeGrid, gui.lycees, edge60, 1.0));
         });
 
         /* Check if we should display vector isochrones. */
