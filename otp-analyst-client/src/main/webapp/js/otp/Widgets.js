@@ -231,27 +231,26 @@ otp.analyst.ParamsWidget = otp.Class({
             retval.fromPlace = place;
         }
         // Date/time
-        var dateTime;
         var hour = parseInt(this.timeInput.val().split(":")[0]);
         var min = parseInt(this.timeInput.val().split(":")[1]);
         if (base) {
-            dateTime = new Date(base.dateTime.getTime() + hour * 3600000 + min * 60000);
-            hour = dateTime.getHours();
-            min = dateTime.getMinutes();
+            this.dateTime = new Date(this.options.extend.dateTime.getTime() + hour * 3600000 + min * 60000);
+            hour = this.dateTime.getHours();
+            min = this.dateTime.getMinutes();
         } else {
-            dateTime = this.options.selectDateTime ? this.dateInput.datepicker("getDate")
+            this.dateTime = this.options.selectDateTime ? this.dateInput.datepicker("getDate")
                     : this.options.defaultDateTime;
             if (!this.options.selectDateTime) {
                 hour = this.options.defaultDateTime.getHour();
                 min = this.options.defaultDateTime.getMinute();
             }
-            dateTime = new Date(dateTime.getTime());
-            dateTime.setHours(hour);
-            dateTime.setMinutes(min);
+            this.dateTime = new Date(this.dateTime.getTime());
+            this.dateTime.setHours(hour);
+            this.dateTime.setMinutes(min);
         }
-        retval.date = dateTime.getFullYear() + "/" + (dateTime.getMonth() + 1) + "/" + dateTime.getDate();
+        retval.date = this.dateTime.getFullYear() + "/" + (this.dateTime.getMonth() + 1) + "/"
+                + this.dateTime.getDate();
         retval.time = hour + ":" + (min < 10 ? "0" : "") + min + ":00";
-        retval.dateTime = dateTime; // For extending
         // Modes
         retval.mode = this.options.selectModes ? this.modesInput.val() : this.options.defaultModes;
         if (base && retval.mode == "inherit") {
