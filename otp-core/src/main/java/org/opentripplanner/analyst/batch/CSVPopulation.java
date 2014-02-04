@@ -15,6 +15,10 @@ package org.opentripplanner.analyst.batch;
 
 import java.nio.charset.Charset;
 
+import org.geotools.geometry.DirectPosition2D;
+import org.geotools.referencing.CRS;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.MathTransform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,19 +28,30 @@ import lombok.Setter;
 
 public class CSVPopulation extends BasicPopulation {
 
-    private static final Logger LOG = LoggerFactory.getLogger(BasicPopulation.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CSVPopulation.class);
 
     @Setter
-    public int latCol = 0;
+    public int yCol = 0;
+    
+    public void setLatCol(int latCol) {
+    	yCol = latCol;
+    }
 
     @Setter
-    public int lonCol = 1;
+    public int xCol = 1;
 
+    public void setLonCol(int lonCol) {
+    	xCol = lonCol;
+    }
+    
     @Setter
     public int labelCol = 2;
 
     @Setter
     public int inputCol = 3;
+    
+    @Setter
+    public String inputCrs = "EPSG:4326";
 
     @Setter
     public boolean skipHeaders = true;
@@ -48,11 +63,63 @@ public class CSVPopulation extends BasicPopulation {
             if (skipHeaders) {
                 reader.readHeaders();
             }
+            
+            // deal with non-WGS84 data
+            
+            MathTransform mathTransform = null;
+            boolean transform = false;
+        	CoordinateReferenceSystem destCrs = CRS.decode("EPSG:4326");
+        	Boolean latLon = null;
+            if (inputCrs != null) {
+            	CoordinateReferenceSystem sourceCrs = CRS.decode(inputCrs);
+            	
+            	// make sure coordinates come out in the right order
+            	// lat,lon: geotools default
+            	if (CRS.getAxisOrder(destCrs) == CRS.AxisOrder.NORTH_EAST)
+            		latLon = true;
+            	else if (CRS.getAxisOrder(destCrs) == CRS.AxisOrder.EAST_NORTH)
+            		latLon = false;
+            	else
+            		throw new UnsupportedOperationException("Coordinate axis order for WGS 84 unknown.");
+            		
+            		
+            	if (!destCrs.equals(sourceCrs)) {
+            		transform = true;
+
+            		// find the transformation, being strict about datums &c.
+            		mathTransform = CRS.findMathTransform(sourceCrs, destCrs, false);
+            	}
+            }
+            
             while (reader.readRecord()) {
-                double lat = Double.parseDouble(reader.get(latCol));
-                double lon = Double.parseDouble(reader.get(lonCol));
+                double y = Double.parseDouble(reader.get(yCol));
+                double x = Double.parseDouble(reader.get(xCol));
+                
+                double lon, lat;
+                if (transform) {
+                	DirectPosition2D orig = new DirectPosition2D(x, y);
+                	DirectPosition2D transformed = new DirectPosition2D();
+                	mathTransform.transform(orig, transformed);
+                	
+                	// x: lat, y: lon. This seems backwards but is the way Geotools does it. 
+                	if (latLon) {
+                		lon = transformed.getY();
+                		lat = transformed.getX();	
+                	} 
+                	// x: lon, y: lat
+                	else {
+                		lon = transformed.getX();
+                		lat = transformed.getY();
+                	}
+                }                	
+                else {
+                	lon = x;
+                	lat = y;
+                }
+                
                 String label = reader.get(labelCol);
                 Double input = Double.parseDouble(reader.get(inputCol));
+                // at this point x and y are expressed in WGS84
                 Individual individual = new Individual(label, lon, lat, input);
                 this.addIndividual(individual);
             }
