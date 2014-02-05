@@ -293,111 +293,252 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     }
     
     public void init() {
+    	// scaffold the layout; get the root container
         BorderLayout layout = new BorderLayout();
         setLayout(layout);
         Container pane = getContentPane();
 
+        // init center graphical panel
         showGraph = new ShowGraph(this, getGraph());
         pane.add(showGraph, BorderLayout.CENTER);
         sptService.setTraverseVisitor(new VisualTraverseVisitor(showGraph));
 
-        /*
-         * left panel, top-to-bottom: list of nearby vertices, list of edges for selected vertex, buttons
-         */
+        // init left panel
         leftPanel = new JPanel();
         leftPanel.setLayout(new BorderLayout());
 
         pane.add(leftPanel, BorderLayout.LINE_START);
 
-        /* ROUTING SUBPANEL */
-        JPanel routingPanel = new JPanel();
-        routingPanel.setLayout(new GridLayout(0, 2));
-        leftPanel.add(routingPanel, BorderLayout.NORTH);
+        initRoutingSubpanel();
+        initVertexInfoSubpanel();
+        initControlButtons();
 
-        // row: source vertex
-        JButton setSourceVertexButton = new JButton("set source");
-        setSourceVertexButton.addActionListener(new ActionListener() {
+        // init right panel
+        initRightPanel(pane);
+
+        // startup the graphical pane; ensure closing works; draw the window
+        showGraph.init();
+        addWindowListener(new ExitListener());
+        pack();
+    }
+
+	private void initRightPanel(Container pane) {
+		/* right panel holds trip pattern and stop metadata */
+        JPanel rightPanel = new JPanel();
+        rightPanel.setLayout(new BorderLayout());
+        pane.add(rightPanel, BorderLayout.LINE_END);
+
+        JTabbedPane rightPanelTabs = new JTabbedPane();
+
+        rightPanel.add(rightPanelTabs, BorderLayout.LINE_END);
+        serviceIdLabel = new JLabel("[service id]");
+        rightPanel.add(serviceIdLabel, BorderLayout.PAGE_END);
+
+        departurePattern = new JList();
+        JScrollPane dpScrollPane = new JScrollPane(departurePattern);
+        rightPanelTabs.addTab("trip pattern", dpScrollPane);
+
+        metadataList = new JList();
+        metadataModel = new DefaultListModel();
+        metadataList.setModel(metadataModel);
+        JScrollPane mdScrollPane = new JScrollPane(metadataList);
+        mdScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        rightPanelTabs.addTab("metadata", mdScrollPane);
+
+        // This is where matched annotations from an annotation search go
+        annotationMatches = new JList();
+        annotationMatches.addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent e) {
+                JList theList = (JList) e.getSource();
+                GraphBuilderAnnotation anno = (GraphBuilderAnnotation) theList.getSelectedValue();
+                if (anno == null)
+                    return;
+                showGraph.drawAnotation(anno);
+            }
+        });
+
+        annotationMatchesModel = new DefaultListModel();
+        annotationMatches.setModel(annotationMatchesModel);
+        JScrollPane amScrollPane = new JScrollPane(annotationMatches);
+        amScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        rightPanelTabs.addTab("annotations", amScrollPane);
+
+        Dimension size = new Dimension(200, 1600);
+
+        amScrollPane.setMaximumSize(size);
+        amScrollPane.setPreferredSize(size);
+        mdScrollPane.setMaximumSize(size);
+        mdScrollPane.setPreferredSize(size);
+        rightPanelTabs.setMaximumSize(size);
+        rightPanel.setMaximumSize(size);
+	}
+
+	private void initControlButtons() {
+		/* buttons at bottom */
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new GridLayout(0, 3));
+        leftPanel.add(buttonPanel, BorderLayout.PAGE_END);
+
+        JButton zoomDefaultButton = new JButton("Zoom to default");
+        zoomDefaultButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Object selected = nearbyVertices.getSelectedValue();
-                if (selected != null) {
-                    sourceVertex.setText(selected.toString());
+                showGraph.zoomToDefault();
+            }
+        });
+        buttonPanel.add(zoomDefaultButton);
+
+        final JFrame frame = this;
+
+        JButton zoomToNodeButton = new JButton("Zoom to node");
+        zoomToNodeButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String nodeName = (String) JOptionPane.showInputDialog(frame, "Node id",
+                        JOptionPane.PLAIN_MESSAGE);
+                Vertex v = getGraph().getVertex(nodeName);
+                if (v == null) {
+                    System.out.println("no such node " + nodeName);
+                } else {
+                    showGraph.zoomToVertex(v);
                 }
             }
         });
-        routingPanel.add(setSourceVertexButton);
-        sourceVertex = new JTextField();
-        routingPanel.add(sourceVertex);
+        buttonPanel.add(zoomToNodeButton);
 
-        // row: sink vertex
-        JButton setSinkVertexButton = new JButton("set sink");
-        setSinkVertexButton.addActionListener(new ActionListener() {
+        JButton zoomToLocationButton = new JButton("Zoom to location");
+        zoomToLocationButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                Object selected = nearbyVertices.getSelectedValue();
-                if (selected != null) {
-                    sinkVertex.setText(selected.toString());
-                }
+                String result = JOptionPane.showInputDialog("Enter the location (lat lon)");
+                if (result == null || result.length() == 0)
+                    return;
+                String[] tokens = result.split("[\\s,]+");
+                double lat = Double.parseDouble(tokens[0]);
+                double lon = Double.parseDouble(tokens[1]);
+                Coordinate c = new Coordinate(lon, lat);
+                showGraph.zoomToLocation(c);
             }
         });
-        routingPanel.add(setSinkVertexButton);
-        sinkVertex = new JTextField();
-        routingPanel.add(sinkVertex);
+        buttonPanel.add(zoomToLocationButton);
 
-        // row: set date
-        JButton resetSearchDateButton = new JButton("now ->");
-        resetSearchDateButton.addActionListener(new ActionListener() {
+        JButton zoomOutButton = new JButton("Zoom out");
+        zoomOutButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                searchDate.setText(dateFormat.format(new Date()));
+                showGraph.zoomOut();
             }
         });
-        routingPanel.add(resetSearchDateButton);
-        searchDate = new JTextField();
-        searchDate.setText(dateFormat.format(new Date()));
-        routingPanel.add(searchDate);
+        buttonPanel.add(zoomOutButton);
 
-        // 2 rows: transport mode options
-        walkCheckBox = new JCheckBox("walk");
-        routingPanel.add(walkCheckBox);
-        bikeCheckBox = new JCheckBox("bike");
-        routingPanel.add(bikeCheckBox);
-        trainCheckBox = new JCheckBox("trainish");
-        routingPanel.add(trainCheckBox);
-        busCheckBox = new JCheckBox("busish");
-        routingPanel.add(busCheckBox);
-        ferryCheckBox = new JCheckBox("ferry");
-        routingPanel.add(ferryCheckBox);
-        transitCheckBox = new JCheckBox("transit");
-        routingPanel.add(transitCheckBox);
-        carCheckBox = new JCheckBox("car");
-        routingPanel.add(carCheckBox);
-        cmvCheckBox = new JCheckBox("custom vehicle");
-        routingPanel.add(cmvCheckBox);
-
-        // row: boarding penalty
-        JLabel boardPenaltyLabel = new JLabel("Boarding penalty (min):");
-        routingPanel.add(boardPenaltyLabel);
-        boardingPenaltyField = new JTextField("5");
-        routingPanel.add(boardingPenaltyField);
-
-        // row: launch and clear path search
-        JButton routeButton = new JButton("path search");
-        routeButton.addActionListener(new ActionListener() {
+        JButton routeButton2 = new JButton("Route");
+        routeButton2.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                // String initialFrom = "";
+                // Object selected = nearbyVertices.getSelectedValue();
+                // if (selected != null) {
+                // initialFrom = selected.toString();
+                // }
+                // RouteDialog dlg = new RouteDialog(frame, initialFrom); // modal
                 String from = sourceVertex.getText();
                 String to = sinkVertex.getText();
                 route(from, to);
             }
         });
-        routingPanel.add(routeButton);
-        JButton clearRouteButton = new JButton("clear path");
-        clearRouteButton.addActionListener(new ActionListener() {
+        buttonPanel.add(routeButton2);
+
+        JButton findButton = new JButton("Find node");
+        findButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                showGraph.highlightGraphPath(null);
-                showGraph.clearHighlights();
+                String nodeName = (String) JOptionPane.showInputDialog(frame, "Node id",
+                        JOptionPane.PLAIN_MESSAGE);
+                Vertex v = getGraph().getVertex(nodeName);
+                if (v == null) {
+                    System.out.println("no such node " + nodeName);
+                } else {
+                    showGraph.highlightVertex(v);
+                    ArrayList<Vertex> l = new ArrayList<Vertex>();
+                    l.add(v);
+                    verticesSelected(l);
+                }
             }
         });
-        routingPanel.add(clearRouteButton);
+        buttonPanel.add(findButton);
 
-        /* VERTEX INFO SUBPANEL */
+        JButton findEdgeButton = new JButton("Find edge");
+        findEdgeButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String edgeName = (String) JOptionPane.showInputDialog(frame, "Edge name like",
+                        JOptionPane.PLAIN_MESSAGE);
+                for (Vertex gv : getGraph().getVertices()) {
+                    for (Edge edge : gv.getOutgoing()) {
+                        if (edge.getName() != null && edge.getName().contains(edgeName)) {
+                            showGraph.highlightVertex(gv);
+                            ArrayList<Vertex> l = new ArrayList<Vertex>();
+                            l.add(gv);
+                            verticesSelected(l);
+                        }
+                    }
+                }
+            }
+        });
+        buttonPanel.add(findEdgeButton);
+
+        JButton checkButton = new JButton("Check graph");
+        checkButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                checkGraph();
+            }
+        });
+        buttonPanel.add(checkButton);
+
+        JButton traceButton = new JButton("Trace");
+        traceButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                trace();
+            }
+        });
+        buttonPanel.add(traceButton);
+
+        // annotation search button
+        JButton annotationButton = new JButton("Find annotations");
+        annotationButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                findAnnotation();
+            }
+        });
+        buttonPanel.add(annotationButton);
+
+        JButton findEdgeByIdButton = new JButton("Find edge ID");
+        findEdgeByIdButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String edgeIdStr = (String) JOptionPane.showInputDialog(frame, "Edge ID",
+                        JOptionPane.PLAIN_MESSAGE);
+                Integer edgeId = Integer.parseInt(edgeIdStr);
+                Edge edge = getGraph().getEdgeById(edgeId);
+                if (edge != null) {
+                    showGraph.highlightEdge(edge);
+                    showGraph.highlightVertex(edge.getFromVertex());
+                } else {
+                    System.out.println("Found no edge with ID " + edgeIdStr);
+                }
+            }
+        });
+        buttonPanel.add(findEdgeByIdButton);
+        
+        JButton snapButton = new JButton("Snap location");
+        snapButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String locString = (String) JOptionPane.showInputDialog(frame, "Location string",
+                        "");
+                GenericLocation loc = GenericLocation.fromOldStyleString(locString);
+                RoutingRequest rr = new RoutingRequest();
+                Vertex v = graph.streetIndex.getVertexForLocation(
+                        loc, rr);
+                showGraph.highlightVertex(v);
+            }
+        });
+        buttonPanel.add(snapButton);
+	}
+
+	private void initVertexInfoSubpanel() {
+		/* VERTEX INFO SUBPANEL */
         JPanel vertexDataPanel = new JPanel();
         vertexDataPanel.setLayout(new BoxLayout(vertexDataPanel, BoxLayout.PAGE_AXIS));
         vertexDataPanel.setPreferredSize(new Dimension(300, 600));
@@ -562,222 +703,97 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
                 }
             }
         });
+	}
 
-        /* buttons at bottom */
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(0, 3));
-        leftPanel.add(buttonPanel, BorderLayout.PAGE_END);
+	private void initRoutingSubpanel() {
+		/* ROUTING SUBPANEL */
+        JPanel routingPanel = new JPanel();
+        routingPanel.setLayout(new GridLayout(0, 2));
+        leftPanel.add(routingPanel, BorderLayout.NORTH);
 
-        JButton zoomDefaultButton = new JButton("Zoom to default");
-        zoomDefaultButton.addActionListener(new ActionListener() {
+        // row: source vertex
+        JButton setSourceVertexButton = new JButton("set source");
+        setSourceVertexButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                showGraph.zoomToDefault();
-            }
-        });
-        buttonPanel.add(zoomDefaultButton);
-
-        final JFrame frame = this;
-
-        JButton zoomToNodeButton = new JButton("Zoom to node");
-        zoomToNodeButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String nodeName = (String) JOptionPane.showInputDialog(frame, "Node id",
-                        JOptionPane.PLAIN_MESSAGE);
-                Vertex v = getGraph().getVertex(nodeName);
-                if (v == null) {
-                    System.out.println("no such node " + nodeName);
-                } else {
-                    showGraph.zoomToVertex(v);
+                Object selected = nearbyVertices.getSelectedValue();
+                if (selected != null) {
+                    sourceVertex.setText(selected.toString());
                 }
             }
         });
-        buttonPanel.add(zoomToNodeButton);
+        routingPanel.add(setSourceVertexButton);
+        sourceVertex = new JTextField();
+        routingPanel.add(sourceVertex);
 
-        JButton zoomToLocationButton = new JButton("Zoom to location");
-        zoomToLocationButton.addActionListener(new ActionListener() {
+        // row: sink vertex
+        JButton setSinkVertexButton = new JButton("set sink");
+        setSinkVertexButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String result = JOptionPane.showInputDialog("Enter the location (lat lon)");
-                if (result == null || result.length() == 0)
-                    return;
-                String[] tokens = result.split("[\\s,]+");
-                double lat = Double.parseDouble(tokens[0]);
-                double lon = Double.parseDouble(tokens[1]);
-                Coordinate c = new Coordinate(lon, lat);
-                showGraph.zoomToLocation(c);
+                Object selected = nearbyVertices.getSelectedValue();
+                if (selected != null) {
+                    sinkVertex.setText(selected.toString());
+                }
             }
         });
-        buttonPanel.add(zoomToLocationButton);
+        routingPanel.add(setSinkVertexButton);
+        sinkVertex = new JTextField();
+        routingPanel.add(sinkVertex);
 
-        JButton zoomOutButton = new JButton("Zoom out");
-        zoomOutButton.addActionListener(new ActionListener() {
+        // row: set date
+        JButton resetSearchDateButton = new JButton("now ->");
+        resetSearchDateButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                showGraph.zoomOut();
+                searchDate.setText(dateFormat.format(new Date()));
             }
         });
-        buttonPanel.add(zoomOutButton);
+        routingPanel.add(resetSearchDateButton);
+        searchDate = new JTextField();
+        searchDate.setText(dateFormat.format(new Date()));
+        routingPanel.add(searchDate);
 
-        JButton routeButton2 = new JButton("Route");
-        routeButton2.addActionListener(new ActionListener() {
+        // 2 rows: transport mode options
+        walkCheckBox = new JCheckBox("walk");
+        routingPanel.add(walkCheckBox);
+        bikeCheckBox = new JCheckBox("bike");
+        routingPanel.add(bikeCheckBox);
+        trainCheckBox = new JCheckBox("trainish");
+        routingPanel.add(trainCheckBox);
+        busCheckBox = new JCheckBox("busish");
+        routingPanel.add(busCheckBox);
+        ferryCheckBox = new JCheckBox("ferry");
+        routingPanel.add(ferryCheckBox);
+        transitCheckBox = new JCheckBox("transit");
+        routingPanel.add(transitCheckBox);
+        carCheckBox = new JCheckBox("car");
+        routingPanel.add(carCheckBox);
+        cmvCheckBox = new JCheckBox("custom vehicle");
+        routingPanel.add(cmvCheckBox);
+
+        // row: boarding penalty
+        JLabel boardPenaltyLabel = new JLabel("Boarding penalty (min):");
+        routingPanel.add(boardPenaltyLabel);
+        boardingPenaltyField = new JTextField("5");
+        routingPanel.add(boardingPenaltyField);
+
+        // row: launch and clear path search
+        JButton routeButton = new JButton("path search");
+        routeButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // String initialFrom = "";
-                // Object selected = nearbyVertices.getSelectedValue();
-                // if (selected != null) {
-                // initialFrom = selected.toString();
-                // }
-                // RouteDialog dlg = new RouteDialog(frame, initialFrom); // modal
                 String from = sourceVertex.getText();
                 String to = sinkVertex.getText();
                 route(from, to);
             }
         });
-        buttonPanel.add(routeButton2);
-
-        JButton findButton = new JButton("Find node");
-        findButton.addActionListener(new ActionListener() {
+        routingPanel.add(routeButton);
+        JButton clearRouteButton = new JButton("clear path");
+        clearRouteButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                String nodeName = (String) JOptionPane.showInputDialog(frame, "Node id",
-                        JOptionPane.PLAIN_MESSAGE);
-                Vertex v = getGraph().getVertex(nodeName);
-                if (v == null) {
-                    System.out.println("no such node " + nodeName);
-                } else {
-                    showGraph.highlightVertex(v);
-                    ArrayList<Vertex> l = new ArrayList<Vertex>();
-                    l.add(v);
-                    verticesSelected(l);
-                }
+                showGraph.highlightGraphPath(null);
+                showGraph.clearHighlights();
             }
         });
-        buttonPanel.add(findButton);
-
-        JButton findEdgeButton = new JButton("Find edge");
-        findEdgeButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String edgeName = (String) JOptionPane.showInputDialog(frame, "Edge name like",
-                        JOptionPane.PLAIN_MESSAGE);
-                for (Vertex gv : getGraph().getVertices()) {
-                    for (Edge edge : gv.getOutgoing()) {
-                        if (edge.getName() != null && edge.getName().contains(edgeName)) {
-                            showGraph.highlightVertex(gv);
-                            ArrayList<Vertex> l = new ArrayList<Vertex>();
-                            l.add(gv);
-                            verticesSelected(l);
-                        }
-                    }
-                }
-            }
-        });
-        buttonPanel.add(findEdgeButton);
-
-        JButton checkButton = new JButton("Check graph");
-        checkButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                checkGraph();
-            }
-        });
-        buttonPanel.add(checkButton);
-
-        JButton traceButton = new JButton("Trace");
-        traceButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                trace();
-            }
-        });
-        buttonPanel.add(traceButton);
-
-        // annotation search button
-        JButton annotationButton = new JButton("Find annotations");
-        annotationButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                findAnnotation();
-            }
-        });
-        buttonPanel.add(annotationButton);
-
-        JButton findEdgeByIdButton = new JButton("Find edge ID");
-        findEdgeByIdButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String edgeIdStr = (String) JOptionPane.showInputDialog(frame, "Edge ID",
-                        JOptionPane.PLAIN_MESSAGE);
-                Integer edgeId = Integer.parseInt(edgeIdStr);
-                Edge edge = getGraph().getEdgeById(edgeId);
-                if (edge != null) {
-                    showGraph.highlightEdge(edge);
-                    showGraph.highlightVertex(edge.getFromVertex());
-                } else {
-                    System.out.println("Found no edge with ID " + edgeIdStr);
-                }
-            }
-        });
-        buttonPanel.add(findEdgeByIdButton);
-        
-        JButton snapButton = new JButton("Snap location");
-        snapButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                String locString = (String) JOptionPane.showInputDialog(frame, "Location string",
-                        "");
-                GenericLocation loc = GenericLocation.fromOldStyleString(locString);
-                RoutingRequest rr = new RoutingRequest();
-                Vertex v = graph.streetIndex.getVertexForLocation(
-                        loc, rr);
-                showGraph.highlightVertex(v);
-            }
-        });
-        buttonPanel.add(snapButton);
-
-        /* right panel holds trip pattern and stop metadata */
-        JPanel rightPanel = new JPanel();
-        rightPanel.setLayout(new BorderLayout());
-        pane.add(rightPanel, BorderLayout.LINE_END);
-
-        JTabbedPane rightPanelTabs = new JTabbedPane();
-
-        rightPanel.add(rightPanelTabs, BorderLayout.LINE_END);
-        serviceIdLabel = new JLabel("[service id]");
-        rightPanel.add(serviceIdLabel, BorderLayout.PAGE_END);
-
-        departurePattern = new JList();
-        JScrollPane dpScrollPane = new JScrollPane(departurePattern);
-        rightPanelTabs.addTab("trip pattern", dpScrollPane);
-
-        metadataList = new JList();
-        metadataModel = new DefaultListModel();
-        metadataList.setModel(metadataModel);
-        JScrollPane mdScrollPane = new JScrollPane(metadataList);
-        mdScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-        rightPanelTabs.addTab("metadata", mdScrollPane);
-
-        // This is where matched annotations from an annotation search go
-        annotationMatches = new JList();
-        annotationMatches.addListSelectionListener(new ListSelectionListener() {
-            public void valueChanged(ListSelectionEvent e) {
-                JList theList = (JList) e.getSource();
-                GraphBuilderAnnotation anno = (GraphBuilderAnnotation) theList.getSelectedValue();
-                if (anno == null)
-                    return;
-                showGraph.drawAnotation(anno);
-            }
-        });
-
-        annotationMatchesModel = new DefaultListModel();
-        annotationMatches.setModel(annotationMatchesModel);
-        JScrollPane amScrollPane = new JScrollPane(annotationMatches);
-        amScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-        rightPanelTabs.addTab("annotations", amScrollPane);
-
-        Dimension size = new Dimension(200, 1600);
-
-        amScrollPane.setMaximumSize(size);
-        amScrollPane.setPreferredSize(size);
-        mdScrollPane.setMaximumSize(size);
-        mdScrollPane.setPreferredSize(size);
-        rightPanelTabs.setMaximumSize(size);
-        rightPanel.setMaximumSize(size);
-
-        showGraph.init();
-        addWindowListener(new ExitListener());
-        pack();
-    }
+        routingPanel.add(clearRouteButton);
+	}
 
     protected void trace() {
         DisplayVertex selected = (DisplayVertex) nearbyVertices.getSelectedValue();
