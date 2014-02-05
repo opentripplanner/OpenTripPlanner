@@ -10,20 +10,20 @@ Installation instructions are available on the website: http://opentripplanner.o
 
 OpenTripPlanner is a multi-module Maven project. It contains the following sub-modules:
 
-otp-core/              - Core routing algorithms, data structures, libraries, and stand-alone server.
-otp-analyst-client/    - A Javascript client focusing on OTP analyst web service visualizations.
-otp-geocoder/          - A servlet that converts addresses to geographic locations using web services.
-otp-leaflet-client/    - The newer Javascript client providing a map-based UI for trip planning.
-otp-municoder/         - A servlet that determines which administrative area a coordinate falls within. 
-otp-openlayers-client/ - The original Javascript client providing a map-based UI for trip planning.
-otp-rest-servlet/      - A servlet that provides the OTP REST API within a servlet container.
-otp-thrift-api/        - A Thrift API supporting lower-level queries than the REST API.
-otp-admin-client/      - A client for administration.
+* `otp-core/`              - Core routing algorithms, data structures, libraries, and stand-alone server.
+* `otp-analyst-client/`    - A Javascript client focusing on OTP analyst web service visualizations.
+* `otp-geocoder/`          - A servlet that converts addresses to geographic locations using web services.
+* `otp-leaflet-client/`    - The newer Javascript client providing a map-based UI for trip planning.
+* `otp-municoder/`         - A servlet that determines which administrative area a coordinate falls within. 
+* `otp-openlayers-client/` - The original Javascript client providing a map-based UI for trip planning.
+* `otp-rest-servlet/`      - A servlet that provides the OTP REST API within a servlet container.
+* `otp-thrift-api/`        - A Thrift API supporting lower-level queries than the REST API.
+* `otp-admin-client/`      - A client for administration.
 
 OTP also includes the following subprojects which must be built separately:
 
-otp-datastore/         - A Play-based backend for logging OTP queries.
-otp-gvsig/             - An OpenTripPlanner-based extension to GVSIG.
+* `otp-datastore/`         - A Play-based backend for logging OTP queries.
+* `otp-gvsig/`             - An OpenTripPlanner-based extension to GVSIG.
 
 ##### DEVELOPMENT
 
