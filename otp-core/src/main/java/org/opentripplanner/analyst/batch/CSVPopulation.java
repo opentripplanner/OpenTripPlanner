@@ -63,60 +63,60 @@ public class CSVPopulation extends BasicPopulation {
             if (skipHeaders) {
                 reader.readHeaders();
             }
-            
+
             // deal with non-WGS84 data
-            
+
             MathTransform mathTransform = null;
             boolean transform = false;
-        	CoordinateReferenceSystem destCrs = CRS.decode("EPSG:4326");
-        	Boolean latLon = null;
+            CoordinateReferenceSystem destCrs = CRS.decode("EPSG:4326");
+            Boolean latLon = null;
             if (inputCrs != null) {
-            	CoordinateReferenceSystem sourceCrs = CRS.decode(inputCrs);
-            	
-            	// make sure coordinates come out in the right order
-            	// lat,lon: geotools default
-            	if (CRS.getAxisOrder(destCrs) == CRS.AxisOrder.NORTH_EAST)
-            		latLon = true;
-            	else if (CRS.getAxisOrder(destCrs) == CRS.AxisOrder.EAST_NORTH)
-            		latLon = false;
-            	else
-            		throw new UnsupportedOperationException("Coordinate axis order for WGS 84 unknown.");
-            		
-            		
-            	if (!destCrs.equals(sourceCrs)) {
-            		transform = true;
+                CoordinateReferenceSystem sourceCrs = CRS.decode(inputCrs);
 
-            		// find the transformation, being strict about datums &c.
-            		mathTransform = CRS.findMathTransform(sourceCrs, destCrs, false);
-            	}
+                // make sure coordinates come out in the right order
+                // lat,lon: geotools default
+                if (CRS.getAxisOrder(destCrs) == CRS.AxisOrder.NORTH_EAST)
+                    latLon = true;
+                else if (CRS.getAxisOrder(destCrs) == CRS.AxisOrder.EAST_NORTH)
+                    latLon = false;
+                else
+                    throw new UnsupportedOperationException("Coordinate axis order for WGS 84 unknown.");
+
+
+                if (!destCrs.equals(sourceCrs)) {
+                    transform = true;
+
+                    // find the transformation, being strict about datums &c.
+                    mathTransform = CRS.findMathTransform(sourceCrs, destCrs, false);
+                }
             }
-            
+
             while (reader.readRecord()) {
                 double y = Double.parseDouble(reader.get(yCol));
                 double x = Double.parseDouble(reader.get(xCol));
-                
+
                 double lon, lat;
                 if (transform) {
-                	DirectPosition2D orig = new DirectPosition2D(x, y);
-                	DirectPosition2D transformed = new DirectPosition2D();
-                	mathTransform.transform(orig, transformed);
-                	
-                	// x: lat, y: lon. This seems backwards but is the way Geotools does it. 
-                	if (latLon) {
-                		lon = transformed.getY();
-                		lat = transformed.getX();	
-                	} 
-                	// x: lon, y: lat
-                	else {
-                		lon = transformed.getX();
-                		lat = transformed.getY();
-                	}
+                    DirectPosition2D orig = new DirectPosition2D(x, y);
+                    DirectPosition2D transformed = new DirectPosition2D();
+                    mathTransform.transform(orig, transformed);
+
+                    // x: lat, y: lon. This seems backwards but is the way Geotools does it. 
+                    if (latLon) {
+                        lon = transformed.getY();
+                        lat = transformed.getX();	
+                    } 
+                    // x: lon, y: lat
+                    else {
+                        lon = transformed.getX();
+                        lat = transformed.getY();
+                    }
                 }                	
                 else {
-                	lon = x;
-                	lat = y;
+                    lon = x;
+                    lat = y;
                 }
-                
+
                 String label = reader.get(labelCol);
                 Double input = Double.parseDouble(reader.get(inputCol));
                 // at this point x and y are expressed in WGS84

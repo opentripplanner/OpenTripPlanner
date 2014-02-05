@@ -25,71 +25,71 @@ import org.junit.rules.TemporaryFolder;
 import com.google.common.io.Files;
 
 public class CSVPopulationTest {
-	@Rule
-	public TemporaryFolder temporaryFolder = new TemporaryFolder();
-	
-	/**
-	 * Test that coordinate transforms are applied correctly
-	 */
-	@Test
-	public void testCoordinateTransform() throws Exception {
-		File csvFile = temporaryFolder.newFile("coordinateTransform.csv");
-		// coordinates via OpenStreetMap
-		Files.write("Santa Barbara Botanical Gardens,1,6046688.23,1992920.46\n",
-				csvFile, Charset.forName("utf-8"));
-		
-		CSVPopulation pop = new CSVPopulation();
-		pop.setSourceFilename(csvFile.getAbsolutePath());
-		pop.setSkipHeaders(false);
-		pop.setXCol(2);
-		pop.setYCol(3);
-		pop.setInputCol(1);
-		pop.setLabelCol(0);
-		pop.setInputCrs("EPSG:2229"); // State Plane CA Zone 5, US Survey Feet
-		
-		pop.createIndividuals();
-		
-		Individual sbbg = pop.getIndividuals().get(0);
-		assertEquals(sbbg.lat, 34.45659, 0.00001);
-		assertEquals(sbbg.lon, -119.70843, 0.00001);
-	}
-	
-	/** Test that untransformed coordinate systems work */
-	@Test
-	public void testNoCoordinateTransform() throws Exception {
-		File csvFile = temporaryFolder.newFile("noCoordinateTransform.csv");
-		// coordinates via OpenStreetMap
-		Files.write("Marine Science,1,-119.84330,34.40783\n",
-				csvFile, Charset.forName("utf-8"));
-		
-		CSVPopulation pop = new CSVPopulation();
-		pop.setSourceFilename(csvFile.getAbsolutePath());
-		pop.setSkipHeaders(false);
-		pop.setLonCol(2);
-		pop.setLatCol(3);
-		pop.setInputCol(1);
-		pop.setLabelCol(0);
-		
-		pop.createIndividuals();
-		
-		Individual marsci = pop.getIndividuals().get(0);
-		assertEquals(marsci.lat, 34.40783, 0.00001);
-		assertEquals(marsci.lon, -119.84330, 0.00001);
-		
-		pop = new CSVPopulation();
-		pop.setSourceFilename(csvFile.getAbsolutePath());
-		pop.setSkipHeaders(false);
-		pop.setLonCol(2);
-		pop.setLatCol(3);
-		pop.setInputCol(1);
-		pop.setLabelCol(0);
-		pop.setInputCrs("EPSG:4326");
-		
-		pop.createIndividuals();
-		
-		marsci = pop.getIndividuals().get(0);
-		assertEquals(marsci.lat, 34.40783, 0.00001);
-		assertEquals(marsci.lon, -119.84330, 0.00001);
-	}
-	
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+    /**
+     * Test that coordinate transforms are applied correctly
+     */
+    @Test
+    public void testCoordinateTransform() throws Exception {
+        File csvFile = temporaryFolder.newFile("coordinateTransform.csv");
+        // coordinates via OpenStreetMap
+        Files.write("Santa Barbara Botanical Gardens,1,6046688.23,1992920.46\n",
+                csvFile, Charset.forName("utf-8"));
+
+        CSVPopulation pop = new CSVPopulation();
+        pop.setSourceFilename(csvFile.getAbsolutePath());
+        pop.setSkipHeaders(false);
+        pop.setXCol(2);
+        pop.setYCol(3);
+        pop.setInputCol(1);
+        pop.setLabelCol(0);
+        pop.setInputCrs("EPSG:2229"); // State Plane CA Zone 5, US Survey Feet
+
+        pop.createIndividuals();
+
+        Individual sbbg = pop.getIndividuals().get(0);
+        assertEquals(sbbg.lat, 34.45659, 0.00001);
+        assertEquals(sbbg.lon, -119.70843, 0.00001);
+    }
+
+    /** Test that untransformed coordinate systems work */
+    @Test
+    public void testNoCoordinateTransform() throws Exception {
+        File csvFile = temporaryFolder.newFile("noCoordinateTransform.csv");
+        // coordinates via OpenStreetMap
+        Files.write("Marine Science,1,-119.84330,34.40783\n",
+                csvFile, Charset.forName("utf-8"));
+
+        CSVPopulation pop = new CSVPopulation();
+        pop.setSourceFilename(csvFile.getAbsolutePath());
+        pop.setSkipHeaders(false);
+        pop.setLonCol(2);
+        pop.setLatCol(3);
+        pop.setInputCol(1);
+        pop.setLabelCol(0);
+
+        pop.createIndividuals();
+
+        Individual marsci = pop.getIndividuals().get(0);
+        assertEquals(marsci.lat, 34.40783, 0.00001);
+        assertEquals(marsci.lon, -119.84330, 0.00001);
+
+        pop = new CSVPopulation();
+        pop.setSourceFilename(csvFile.getAbsolutePath());
+        pop.setSkipHeaders(false);
+        pop.setLonCol(2);
+        pop.setLatCol(3);
+        pop.setInputCol(1);
+        pop.setLabelCol(0);
+        pop.setInputCrs("EPSG:4326");
+
+        pop.createIndividuals();
+
+        marsci = pop.getIndividuals().get(0);
+        assertEquals(marsci.lat, 34.40783, 0.00001);
+        assertEquals(marsci.lon, -119.84330, 0.00001);
+    }
+
 }
