@@ -45,7 +45,7 @@ public class CSVPopulationTest {
         pop.setYCol(3);
         pop.setInputCol(1);
         pop.setLabelCol(0);
-        pop.setInputCrs("EPSG:2229"); // State Plane CA Zone 5, US Survey Feet
+        pop.setCrs("EPSG:2229"); // State Plane CA Zone 5, US Survey Feet
 
         pop.createIndividuals();
 
@@ -83,7 +83,7 @@ public class CSVPopulationTest {
         pop.setLatCol(3);
         pop.setInputCol(1);
         pop.setLabelCol(0);
-        pop.setInputCrs("EPSG:4326");
+        pop.setCrs("EPSG:4326");
 
         pop.createIndividuals();
 

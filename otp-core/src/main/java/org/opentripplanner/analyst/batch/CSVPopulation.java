@@ -51,7 +51,7 @@ public class CSVPopulation extends BasicPopulation {
     public int inputCol = 3;
     
     @Setter
-    public String inputCrs = "EPSG:4326";
+    public String crs = null;
 
     @Setter
     public boolean skipHeaders = true;
@@ -70,8 +70,8 @@ public class CSVPopulation extends BasicPopulation {
             boolean transform = false;
             CoordinateReferenceSystem destCrs = CRS.decode("EPSG:4326");
             Boolean latLon = null;
-            if (inputCrs != null) {
-                CoordinateReferenceSystem sourceCrs = CRS.decode(inputCrs);
+            if (crs != null) {
+                CoordinateReferenceSystem sourceCrs = CRS.decode(crs);
 
                 // make sure coordinates come out in the right order
                 // lat,lon: geotools default
