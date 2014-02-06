@@ -146,10 +146,10 @@ public class OTPConfigurator {
     }
     
     public GraphBuilderTask builderFromParameters() {
-        LOG.info("Wiring up and configuring graph builder task.");
         if (params.build == null || params.build.isEmpty()) {
             return null;
         }
+        LOG.info("Wiring up and configuring graph builder task.");
         GraphBuilderTask graphBuilder = new GraphBuilderTask();
         List<File> gtfsFiles = Lists.newArrayList();
         List<File> osmFiles =  Lists.newArrayList();
@@ -257,8 +257,8 @@ public class OTPConfigurator {
     
     public GraphVisualizer visualizerFromParameters() {
         if (params.visualize) {
-            // get a component provider factory to force injection/post-construct
-            OTPComponentProviderFactory cpf = getComponentProviderFactory();
+            @SuppressWarnings("unused") // get a component provider factory to force injection/post-construct
+			OTPComponentProviderFactory cpf = getComponentProviderFactory();
             GraphVisualizer visualizer = new GraphVisualizer(getGraphService());
             return visualizer;
         } else return null;
