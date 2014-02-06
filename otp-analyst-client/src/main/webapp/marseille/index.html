@@ -102,7 +102,7 @@
 		<p>Le réseau multimodal utilisé pour les calculs comprend:</p>
 		<ul>
 			<li>l'offre de transport collectif (<a
-				href="http://www.lepilote.com/presentation/?rub_code=92">Pilote</a>
+				href="http://www.lepilote.com/presentation/?rub_code=92">LePilote</a>
 				plus TER)
 			</li>
 			<li>le réseau routier disponible par la base de données
@@ -115,24 +115,66 @@
 		<p>Déplacez avec la souris le pointeur bleu dans la carte pour
 			définir le point d'origine: la carte se met à jour et affiche alors
 			les surfaces isochrones indiquant les zones que l'on peut atteindre
-			en moins de 1/2H, 1H, 1H30, 2H depuis l'origine choisie.</p>
+			en moins d'une heure (cette durée est paramétrable) depuis l'origine
+			choisie (cf. Légende pour les codes couleurs).</p>
+		<p>La carte comporte en haut à gauche des boutons +/- pour changer
+			l'échelle (on peut déplacer la carte en glissant/déplaçant la souris)
+			et en haut à droite un bouton pour choisir les couches affichées:
+			fond de plan OSM Transport ou OSM standard, affichages des surfaces
+			en dégradé (gradient) ou des contours (isochrones), et des points
+			d'intérêt collèges/lycées utilisés pour le calcul des indicateurs.
+			Les calculs peuvent prendre quelques secondes à s'afficher.</p>
 		<p>Les isochrones dépendent des options que l'on peut définir dans
 			la fenêtre à gauche:</p>
 		<ul>
-			<li>Départ à / Arriver à: indique l'heure et le jour pour le
-				calcul depuis le point Origine</li>
-			<li>Voyager par: choix des modes de transport (Voiture - les
-				données ne tiennent pas compte de la congestion, dans la version
+			<li><b>Départ à (par défaut) / Arriver à</b>: indique l'heure et
+				le jour pour le calcul depuis le point Origine (ou vers ce point);</li>
+			<li><b>Mode</b>: choix des modes de transport (pour Voiture -
+				les données ne tiennent pas compte de la congestion, dans la version
 				actuelle)</li>
-			<li>pour les modes TC, un paramètre supplémentaire 'Marcher au
-				maximum' permet de définir la distance maximale de marche au total.</li>
-			<li>le bouton Rafraîchir réactualise la carte.</li>
+			<li><b>Durée max.</b>: extension maximale des surfaces
+				isochrones calculées (par défaut 1H);</li>
+			<li>Pour les modes TC, les paramètres supplémentaires <b>Marche
+					max. / Vitesse</b> permettent de définir la distance maximale de marche
+				au total, et la vitesse de marche;
+			</li>
+			<li>Pour les modes TC également, il est possible de choisir
+				d'autres <b>«Données à afficher»</b> que le temps de parcours:
+				nombre d'embarquements TC, distance de marche.
+			</li>
+			<li>le bouton <b>Rafraîchir</b> réactualise la carte.
+			</li>
 		</ul>
 
 		<p>
+			Le bouton <b>«Télécharger Image Calque»</b> ouvre un onglet contenant
+			l'image des surfaces isochrones au format PNG, qui peut être ensuite
+			utilisée avec des logiciels de bureautique.
+		</p>
+		<p>
+			Le menu <b>Isochrones</b> permet de calculer les contours isochrones
+			à partir du point d'origine, pour des durées en minutes séparées par
+			un point-virgule (par défaut 30;60); cochez la cache 'Afficher' pour
+			fait apparaître ces contours (en trait bleu) sur la carte.
+		</p>
+		<p>
+			Le bouton <b>«Télécharger Isochrones GeoJSON»</b> ouvre un nouvel
+			onglet dans le navigateur avec le contenu des isochrones en GeoJSON,
+			un format texte utilisable dans tout SIG (faire «Enregistrer sous»
+			pour sauver ce fichier).
+		</p>
+		<p>La rubrique Exemples d'indicateurs d'accessibilité illustre les
+			possibilités de calcul d'indicateurs d'OTP Analyst, à partir de 2
+			fichiers fournis par l'Agence d'Urbanisme (AGAM) localisant les
+			collèges et les lycées sur le territoire métropolitain: Nombre de
+			collèges à moins de 30 et 60 minutes, nombre de places en collège,
+			nombre de lycées. Pour ceux qui veulent comprendre comment sont fait
+			les calculs, il est possible d'étudier le code (clic droit, 'Code
+			source de la page').</p>
+		<p>
 			N'hésitez pas à <a
 				href="mailto:Frederique.Reffet@developpement-durable.gouv.fr,pat.gendre@cerema.fr?subject=OTP+Analyst+Métropole+Marseillaise">nous
-				contacter</a> si l'outil vous intéresse, merci.
+				contacter</a> si l'outil vous intéresse, merci d'avance.
 		</p>
 	</div>
 
