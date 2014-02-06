@@ -17,8 +17,10 @@ import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.MenuItem;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.Field;
@@ -47,6 +49,7 @@ import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -253,7 +256,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     private JList annotationMatches;
 
     private JLabel serviceIdLabel;
-
+    
     private RetryingPathServiceImpl pathservice = new RetryingPathServiceImpl();
     
     private ShortestPathTreeFactory sptFactory = new DefaultShortestPathTreeFactory();
@@ -279,12 +282,14 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     public GraphVisualizer(GraphService graphService) {
         super();
         LOG.info("Starting up graph visualizer...");
+        
         this.graphService = graphService;
         this.graph = graphService.getGraph();
         sptService.setShortestPathTreeFactory(sptFactory);
         pathservice.setGraphService(graphService);
         pathservice.setSptService(sptService);
         setTitle("GraphVisualizer");
+        
         init();
     }
 
@@ -293,11 +298,33 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     }
     
     public void init() {
-    	// scaffold the layout; get the root container
-        BorderLayout layout = new BorderLayout();
-        setLayout(layout);
-        Container pane = getContentPane();
+        JTabbedPane tabbedPane = new JTabbedPane();
+         
+        Container pane = initMainTab();
+        tabbedPane.addTab("Main", null, pane,
+                "Pretty much everything");
+         
+        JComponent panel2 = makeTextPanel("routing preferences go here");
+        tabbedPane.addTab("Prefs", null, panel2,
+                "Routing preferences");
+        tabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
+         
+        //Add the tabbed pane to this panel.
+        add(tabbedPane);
+         
+        //The following line enables to use scrolling tabs.
+        tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+        
+        // startup the graphical pane; ensure closing works; draw the window
+        showGraph.init();
+        addWindowListener(new ExitListener());
+        pack();
+    }
 
+	private Container initMainTab() {
+		Container pane = new JPanel();
+    	pane.setLayout(new BorderLayout());
+    	
         // init center graphical panel
         showGraph = new ShowGraph(this, getGraph());
         pane.add(showGraph, BorderLayout.CENTER);
@@ -315,11 +342,16 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
         // init right panel
         initRightPanel(pane);
-
-        // startup the graphical pane; ensure closing works; draw the window
-        showGraph.init();
-        addWindowListener(new ExitListener());
-        pack();
+		return pane;
+	}
+    
+    protected JComponent makeTextPanel(String text) {
+        JPanel panel = new JPanel(false);
+        JLabel filler = new JLabel(text);
+        filler.setHorizontalAlignment(JLabel.CENTER);
+        panel.setLayout(new GridLayout(1, 1));
+        panel.add(filler);
+        return panel;
     }
 
 	private void initRightPanel(Container pane) {
