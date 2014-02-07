@@ -46,30 +46,30 @@
 			<button id="downloadIsoVector">Télécharger isochrone GeoJSON</button>
 		</p>
 
-		<h2>Indicateurs example</h2>
+		<h2>Exemple d'indicateurs d'accessibilité</h2>
 		<table>
 			<thead>
 				<tr>
 					<th>Catégorie</th>
-					<th>&lt;30mn</th>
-					<th>&lt;1h</th>
+					<th id="cutoff1"></th>
+					<th id="cutoff2"></th>
 				</tr>
 			</thead>
 			<tbody>
 				<tr>
 					<td>Collèges (Nombre)</td>
-					<td id="c30"></td>
-					<td id="c60"></td>
+					<td id="c1"></td>
+					<td id="c2"></td>
 				</tr>
 				<tr>
 					<td>Collèges (Places)</td>
-					<td id="cp30"></td>
-					<td id="cp60"></td>
+					<td id="cp1"></td>
+					<td id="cp2"></td>
 				</tr>
 				<tr>
 					<td>Lycées (Nombre)</td>
-					<td id="l30"></td>
-					<td id="l60"></td>
+					<td id="l1"></td>
+					<td id="l2"></td>
 				</tr>
 			</tbody>
 		</table>
@@ -163,14 +163,17 @@
 			un format texte utilisable dans tout SIG (faire «Enregistrer sous»
 			pour sauver ce fichier).
 		</p>
-		<p>La rubrique Exemples d'indicateurs d'accessibilité illustre les
-			possibilités de calcul d'indicateurs d'OTP Analyst, à partir de 2
+		<p>
+			La rubrique <b>Exemples d'indicateurs d'accessibilité</b> illustre
+			les possibilités de calcul d'indicateurs d'OTP Analyst, à partir de 2
 			fichiers fournis par l'Agence d'Urbanisme (AGAM) localisant les
 			collèges et les lycées sur le territoire métropolitain: Nombre de
-			collèges à moins de 30 et 60 minutes, nombre de places en collège,
-			nombre de lycées. Pour ceux qui veulent comprendre comment sont fait
-			les calculs, il est possible d'étudier le code (clic droit, 'Code
-			source de la page').</p>
+			collèges, nombre de places en collège, nombre de lycées, à moins de:
+			30 et 60 minutes, 0 et 1 correspondances, 400 et 800m de marche (en
+			fonction du type de donnée affichée). Pour ceux qui veulent
+			comprendre comment sont fait les calculs, il est possible d'étudier
+			le code (clic droit, 'Code source de la page').
+		</p>
 		<p>
 			N'hésitez pas à <a
 				href="mailto:Frederique.Reffet@developpement-durable.gouv.fr,pat.gendre@cerema.fr?subject=OTP+Analyst+Métropole+Marseillaise">nous

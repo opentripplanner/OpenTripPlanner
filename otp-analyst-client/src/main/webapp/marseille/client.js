@@ -120,7 +120,7 @@ $(function() {
         $("#refresh").prop("disabled", true);
         /* Get the current parameter values */
         var params1 = gui.widget1.getParameters();
-        var max = params1.zDataType == "BOARDINGS" ? 10
+        var max = params1.zDataType == "BOARDINGS" ? 5
                 : params1.zDataType == "WALK_DISTANCE" ? params1.maxWalkDistance * 1.2 : params1.maxTimeSec;
         /* Get a TimeGrid from the server. */
         gui.timeGrid = new otp.analyst.TimeGrid(params1).onLoad(function(timeGrid) {
@@ -139,16 +139,22 @@ $(function() {
             /* Re-enable refresh button */
             $("#refresh").prop("disabled", false);
 
-            /* Update scores */
+            /* Update scores, cutoff depends on data we have available. */
+            var cutoff1 = params1.zDataType == "BOARDINGS" ? 1.5 : params1.zDataType == "WALK_DISTANCE" ? 400 : 1800;
+            var cutoff2 = params1.zDataType == "BOARDINGS" ? 2.5 : params1.zDataType == "WALK_DISTANCE" ? 800 : 3600;
+            var labels = params1.zDataType == "BOARDINGS" ? [ "<1", "<2 corresp." ]
+                    : params1.zDataType == "WALK_DISTANCE" ? [ "<400m", "<800m" ] : [ "<30mn", "<1h" ];
             var scorer = new otp.analyst.Scoring();
-            var edge30 = otp.analyst.Scoring.stepEdge(1800);
-            var edge60 = otp.analyst.Scoring.stepEdge(3600);
-            $("#c30").text(scorer.score(timeGrid, gui.colleges, edge30, 1.0));
-            $("#c60").text(scorer.score(timeGrid, gui.colleges, edge60, 1.0));
-            $("#cp30").text(scorer.score(timeGrid, gui.collegesPlaces, edge30, 1.0));
-            $("#cp60").text(scorer.score(timeGrid, gui.collegesPlaces, edge60, 1.0));
-            $("#l30").text(scorer.score(timeGrid, gui.lycees, edge30, 1.0));
-            $("#l60").text(scorer.score(timeGrid, gui.lycees, edge60, 1.0));
+            var edge1 = otp.analyst.Scoring.stepEdge(cutoff1);
+            var edge2 = otp.analyst.Scoring.stepEdge(cutoff2);
+            $("#cutoff1").text(labels[0]);
+            $("#cutoff2").text(labels[1]);
+            $("#c1").text(scorer.score(timeGrid, gui.colleges, edge1, 1.0));
+            $("#c2").text(scorer.score(timeGrid, gui.colleges, edge2, 1.0));
+            $("#cp1").text(scorer.score(timeGrid, gui.collegesPlaces, edge1, 1.0));
+            $("#cp2").text(scorer.score(timeGrid, gui.collegesPlaces, edge2, 1.0));
+            $("#l1").text(scorer.score(timeGrid, gui.lycees, edge1, 1.0));
+            $("#l2").text(scorer.score(timeGrid, gui.lycees, edge2, 1.0));
         });
 
         /* Check if we should display vector isochrones. */
