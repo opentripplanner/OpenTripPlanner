@@ -46,6 +46,7 @@ import javassist.Modifier;
 
 import javax.swing.AbstractListModel;
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -55,6 +56,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
@@ -279,6 +281,22 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     
     private final Graph graph;
 
+	private JRadioButton opQuick;
+
+	private JRadioButton opSafe;
+
+	private JRadioButton opFlat;
+
+	private JRadioButton opGreenways;
+
+	private ButtonGroup optimizeTypeGrp;
+
+	private JTextField maxWalkField;
+
+	private JTextField walkSpeed;
+
+	private JTextField bikeSpeed;
+
     public GraphVisualizer(GraphService graphService) {
         super();
         LOG.info("Starting up graph visualizer...");
@@ -300,14 +318,11 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
     public void init() {
         JTabbedPane tabbedPane = new JTabbedPane();
          
-        Container pane = initMainTab();
-        tabbedPane.addTab("Main", null, pane,
+        tabbedPane.addTab("Main", null, initMainTab(),
                 "Pretty much everything");
          
-        JComponent panel2 = makeTextPanel("routing preferences go here");
-        tabbedPane.addTab("Prefs", null, panel2,
+        tabbedPane.addTab("Prefs", null, makePrefsPanel(),
                 "Routing preferences");
-        tabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
          
         //Add the tabbed pane to this panel.
         add(tabbedPane);
@@ -344,6 +359,99 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         initRightPanel(pane);
 		return pane;
 	}
+	
+	private JComponent makePrefsPanel(){
+		/* ROUTING SUBPANEL */
+        JPanel pane = new JPanel();
+        pane.setLayout(new GridLayout(0, 2));
+        
+        // 2 rows: transport mode options
+        walkCheckBox = new JCheckBox("walk");
+        walkCheckBox.setSelected(true);
+        pane.add(walkCheckBox);
+        bikeCheckBox = new JCheckBox("bike");
+        pane.add(bikeCheckBox);
+        trainCheckBox = new JCheckBox("trainish");
+        pane.add(trainCheckBox);
+        busCheckBox = new JCheckBox("busish");
+        pane.add(busCheckBox);
+        ferryCheckBox = new JCheckBox("ferry");
+        pane.add(ferryCheckBox);
+        transitCheckBox = new JCheckBox("transit");
+        transitCheckBox.setSelected(true);
+        pane.add(transitCheckBox);
+        carCheckBox = new JCheckBox("car");
+        pane.add(carCheckBox);
+        cmvCheckBox = new JCheckBox("custom vehicle");
+        pane.add(cmvCheckBox);
+
+        // row: boarding penalty
+        JLabel boardPenaltyLabel = new JLabel("Boarding penalty (min):");
+        pane.add(boardPenaltyLabel);
+        boardingPenaltyField = new JTextField("5");
+        pane.add(boardingPenaltyField);
+        
+        // row: max walk
+        JLabel maxWalkLabel = new JLabel("Maximum walk (meters):");
+        pane.add(maxWalkLabel);
+        maxWalkField = new JTextField("5000");
+        pane.add(maxWalkField);
+        
+        // row: walk speed
+        JLabel walkSpeedLabel = new JLabel("Walk speed (m/s):");
+        pane.add(walkSpeedLabel);
+        walkSpeed = new JTextField("1.33");
+        pane.add(walkSpeed);
+        
+        // row: bike speed
+        JLabel bikeSpeedLabel = new JLabel("Bike speed (m/s):");
+        pane.add(bikeSpeedLabel);
+        bikeSpeed = new JTextField("5.0");
+        pane.add(bikeSpeed);
+        
+        // radio buttons: optimize type
+        JLabel optimizeTypeLabel = new JLabel("Optimize type:");
+        pane.add(optimizeTypeLabel);
+        
+        opQuick = new JRadioButton("Quick");
+        opQuick.setSelected(true);
+        opSafe = new JRadioButton("Safe");
+        opFlat = new JRadioButton("Flat");
+        opGreenways = new  JRadioButton("Greenways");
+        
+        optimizeTypeGrp = new ButtonGroup();
+        optimizeTypeGrp.add(opQuick);
+        optimizeTypeGrp.add(opSafe);
+        optimizeTypeGrp.add(opFlat);
+        optimizeTypeGrp.add(opGreenways);
+        
+        JPanel optimizeTypePane = new JPanel();
+        optimizeTypePane.add(opQuick);
+        optimizeTypePane.add(opSafe);
+        optimizeTypePane.add(opFlat);
+        optimizeTypePane.add(opGreenways);
+        
+        pane.add(optimizeTypePane);
+        
+		return pane;
+	}
+	
+	OptimizeType getSelectedOptimizeType(){
+		if(opQuick.isSelected()){
+			return OptimizeType.QUICK;
+		}
+		if(opSafe.isSelected()){
+			return OptimizeType.SAFE;
+		}
+		if(opFlat.isSelected()){
+			return OptimizeType.FLAT;
+		}
+		if(opGreenways.isSelected()){
+			return OptimizeType.GREENWAYS;
+		}
+		return OptimizeType.QUICK;
+	}
+	
     
     protected JComponent makeTextPanel(String text) {
         JPanel panel = new JPanel(false);
@@ -783,29 +891,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         searchDate.setText(dateFormat.format(new Date()));
         routingPanel.add(searchDate);
 
-        // 2 rows: transport mode options
-        walkCheckBox = new JCheckBox("walk");
-        routingPanel.add(walkCheckBox);
-        bikeCheckBox = new JCheckBox("bike");
-        routingPanel.add(bikeCheckBox);
-        trainCheckBox = new JCheckBox("trainish");
-        routingPanel.add(trainCheckBox);
-        busCheckBox = new JCheckBox("busish");
-        routingPanel.add(busCheckBox);
-        ferryCheckBox = new JCheckBox("ferry");
-        routingPanel.add(ferryCheckBox);
-        transitCheckBox = new JCheckBox("transit");
-        routingPanel.add(transitCheckBox);
-        carCheckBox = new JCheckBox("car");
-        routingPanel.add(carCheckBox);
-        cmvCheckBox = new JCheckBox("custom vehicle");
-        routingPanel.add(cmvCheckBox);
 
-        // row: boarding penalty
-        JLabel boardPenaltyLabel = new JLabel("Boarding penalty (min):");
-        routingPanel.add(boardPenaltyLabel);
-        boardingPenaltyField = new JTextField("5");
-        routingPanel.add(boardingPenaltyField);
 
         // row: launch and clear path search
         JButton routeButton = new JButton("path search");
@@ -940,11 +1026,13 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         // TODO LG Add ui element for bike board cost (for now bike = 2 * walk)
         options.setBikeBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60 * 2);
         // there should be a ui element for walk distance and optimize type
-        options.setOptimize(OptimizeType.QUICK);
-        options.setMaxWalkDistance(Double.MAX_VALUE);
+        options.setOptimize( getSelectedOptimizeType() );
+        options.setMaxWalkDistance(Integer.parseInt(maxWalkField.getText()));
         options.setDateTime(when);
         options.setFromString(from);
         options.setToString(to);
+        options.setWalkSpeed(Float.parseFloat(walkSpeed.getText()));
+        options.setBikeSpeed(Float.parseFloat(bikeSpeed.getText()));
         options.numItineraries = 1;
         System.out.println("--------");
         System.out.println("Path from " + from + " to " + to + " at " + when);
