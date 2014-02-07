@@ -33,8 +33,8 @@ otp.analyst.ColorMap = otp.Class({
             zDataType : "TIME"
         }, options);
         this.options.discrete = this.options.discrete || this.options.zDataType == "BOARDINGS";
-        this.options.max = this.options.discrete ? (this.options.delta ? 4 : 9) : this.options.max
-                || (this.options.delta ? 600 : 3600);
+        this.options.max = this.options.max
+                || (this.options.discrete ? (this.options.delta ? 4 : 9) : (this.options.delta ? 600 : 3600));
         this.options.min = this.options.min || (this.options.delta ? -this.options.max : 0);
         this.range = this.options.max - this.options.min;
         this.minCutoff = this.options.min;
