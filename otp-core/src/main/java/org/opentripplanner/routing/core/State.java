@@ -235,9 +235,6 @@ public class State implements Cloneable {
         return stateData.numBoardings;
     }
 
-    public boolean isAlightedLocal() {
-        return stateData.alightedLocal;
-    }
 
     /**
      * Whether this path has ever previously boarded (or alighted from, in a reverse search) a

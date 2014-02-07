@@ -59,9 +59,6 @@ public class PreBoardEdge extends FreeEdge implements StationEdge {
             /* Traverse backward: not much to do */
             StateEditor s1 = s0.edit(this);
             TransitStop fromVertex = (TransitStop) getFromVertex();
-            if (fromVertex.isLocal()) {
-                s1.setAlightedLocal(true);
-            }
 
             //apply board slack
             s1.incrementTimeInSeconds(options.getBoardSlack());
@@ -77,11 +74,6 @@ public class PreBoardEdge extends FreeEdge implements StationEdge {
             if (!options.getModes().isTransit())
                 return null;
 
-            TransitStop fromVertex = (TransitStop) getFromVertex();
-            // Do not board once one has alighted from a local stop
-            if (fromVertex.isLocal() && s0.isEverBoarded()) {
-                return null;
-            }
             // If we've hit our transfer limit, don't go any further
             if (s0.getNumBoardings() > options.maxTransfers)
                 return null;

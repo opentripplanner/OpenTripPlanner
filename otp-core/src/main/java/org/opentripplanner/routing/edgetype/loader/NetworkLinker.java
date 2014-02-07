@@ -111,8 +111,7 @@ public class NetworkLinker {
                 }
             }
         }
-        // Do we really need this? Commenting out does seem to cause some slowdown. (AMB)
-        networkLinkerLibrary.markLocalStops();
+        
         FindMaxWalkDistances.find(graph);
         
         LOG.debug("Linking bike rental stations...");
