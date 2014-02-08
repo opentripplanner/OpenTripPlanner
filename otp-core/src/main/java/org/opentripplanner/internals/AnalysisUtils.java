@@ -13,12 +13,12 @@
 
 package org.opentripplanner.internals;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.collect.LinkedListMultimap;
+import com.vividsolutions.jts.algorithm.ConvexHull;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Point;
 import org.opentripplanner.common.DisjointSet;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -26,13 +26,10 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.util.MapUtils;
 
-import com.vividsolutions.jts.algorithm.ConvexHull;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.geom.Point;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class AnalysisUtils {
 
@@ -42,14 +39,14 @@ public class AnalysisUtils {
      * Get polygons covering the components of the graph. The largest component (in terms of number
      * of nodes) will not overlap any other components (it will have holes); the others may overlap
      * each other.
-     * 
+     *
      * @param dateTime
      */
     public static List<Geometry> getComponentPolygons(Graph graph, RoutingRequest options,
-            long time) {
+                                                      long time) {
         DisjointSet<Vertex> components = getConnectedComponents(graph);
 
-        Map<Integer, List<Coordinate>> componentCoordinates = new HashMap<Integer, List<Coordinate>>();
+        LinkedListMultimap<Integer, Coordinate> componentCoordinates = LinkedListMultimap.create();
         options.setDummyRoutingContext(graph);
         for (Vertex v : graph.getVertices()) {
             for (Edge e : v.getOutgoing()) {
@@ -66,7 +63,7 @@ public class AnalysisUtils {
                             coordinate.y = Math.round(coordinate.y * PRECISION) / PRECISION;
                             coordinates.set(i, coordinate);
                         }
-                        MapUtils.addToMapList(componentCoordinates, component, coordinates);
+                        componentCoordinates.putAll(component, coordinates);
                     }
                 }
             }
@@ -77,7 +74,8 @@ public class AnalysisUtils {
         int mainComponentSize = 0;
         int mainComponentIndex = -1;
         int component = 0;
-        for (List<Coordinate> coords : componentCoordinates.values()) {
+        for (Integer key : componentCoordinates.keySet()) {
+            List<Coordinate> coords = componentCoordinates.get(key);
             Coordinate[] coordArray = new Coordinate[coords.size()];
             ConvexHull hull = new ConvexHull(coords.toArray(coordArray), GeometryUtils.getGeometryFactory());
             Geometry geom = hull.getConvexHull();
