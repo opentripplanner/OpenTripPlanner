@@ -70,6 +70,7 @@ public class TestOnBoardRouting extends TestCase {
      * We assert that the two itineraries will arrive at the same time, at the same place, with at
      * least one less boarding, and take a less or equals amount of time.
      */
+    @SuppressWarnings("deprecation")
     public void testOnBoardRouting() throws Exception {
 
         // Seed the random generator to make consistent set of tests

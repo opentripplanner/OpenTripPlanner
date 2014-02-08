@@ -277,7 +277,7 @@ public abstract class TripTimes {
         }
         
         // Check transfer table rules
-        if (state0.getNumBoardings() > 0) {
+        if (state0.isEverBoarded()) {
             // This is not the first boarding, thus a transfer
             TransferTable transferTable = options.getRoutingContext().transferTable;
             // Get the transfer time
