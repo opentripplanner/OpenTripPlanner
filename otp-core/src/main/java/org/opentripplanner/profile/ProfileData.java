@@ -1,13 +1,17 @@
 package org.opentripplanner.profile;
 
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 import lombok.AllArgsConstructor;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.api.ws.analyst.SimpleIsochrone.MinMap;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
@@ -56,6 +60,18 @@ public class ProfileData {
     Multimap<Stop, Transfer> transfersForStop = HashMultimap.create();
     Multimap<Route, TableTripPattern> patternsForRoute = HashMultimap.create();
 
+    /** An OBA Service Date is a local date without timezone, only year month and day. */
+    public BitSet servicesRunning (ServiceDate date) {
+        CalendarService cs = graph.getCalendarService();
+        BitSet services = new BitSet(cs.getServiceIds().size());
+        for (AgencyAndId serviceId : cs.getServiceIdsOnDate(date)) {
+            int n = graph.serviceCodes.get(serviceId);
+            if (n < 0) continue;
+            services.set(n);
+        }
+        return services;
+    }        
+    
     /**
      * Here we are using stops rather than indices within a pattern, because we want to consider
      * stops that appear more than once at every index where they occur.
@@ -148,4 +164,5 @@ public class ProfileData {
         this.graph = graph;
         setup();
     }
+    
 }

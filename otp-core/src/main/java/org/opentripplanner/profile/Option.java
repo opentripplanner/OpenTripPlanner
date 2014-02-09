@@ -4,10 +4,6 @@ import java.util.List;
 
 import lombok.Getter;
 
-import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.profile.ProfileRouter.Ride;
-import org.opentripplanner.profile.ProfileRouter.Stats;
-
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
@@ -17,10 +13,10 @@ public class Option {
     @Getter int finalWalkTime;
     @Getter Stats stats;
     
-    public Option (Ride ride, int finalWalkTime) {
+    public Option (Ride ride, int finalWalkTime, TimeWindow window) {
         stats = new Stats();
         while (ride != null) {
-            Segment segment = new Segment(ride); 
+            Segment segment = new Segment (ride, window); 
             segments.add(0, segment);
             stats.add(segment.walkTime);
             stats.add(segment.waitStats);
