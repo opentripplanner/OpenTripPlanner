@@ -297,6 +297,14 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
 	private JTextField bikeSpeed;
 
+	private JTextField heuristicWeight;
+
+	private JCheckBox softWalkLimiting;
+
+	private JTextField softWalkPenalty;
+
+	private JTextField softWalkOverageRate;
+
     public GraphVisualizer(GraphService graphService) {
         super();
         LOG.info("Starting up graph visualizer...");
@@ -408,6 +416,30 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         pane.add(bikeSpeedLabel);
         bikeSpeed = new JTextField("5.0");
         pane.add(bikeSpeed);
+        
+        // row: heuristic weight
+        JLabel heuristicWeightLabel = new JLabel("Heuristic weight:");
+        pane.add(heuristicWeightLabel);
+        heuristicWeight = new JTextField("1.0");
+        pane.add(heuristicWeight);
+        
+        // row: soft walk?
+        JLabel softWalkLimitLabel = new JLabel("Soft walk-limit?:");
+        pane.add(softWalkLimitLabel);
+        softWalkLimiting = new JCheckBox("soft walk-limiting");
+        pane.add(softWalkLimiting);
+        
+        // row: soft walk-limit penalty
+        JLabel softWalkLimitPenaltyLabel = new JLabel("Soft walk-limiting penalty:");
+        pane.add(softWalkLimitPenaltyLabel);
+        softWalkPenalty = new JTextField("60.0");
+        pane.add(softWalkPenalty);
+        
+        // row: soft walk-limit overage
+        JLabel softWalkLimitOverageLabel = new JLabel("Soft walk-limiting overage:");
+        pane.add(softWalkLimitOverageLabel);
+        softWalkOverageRate = new JTextField("5.0");
+        pane.add(softWalkOverageRate);
         
         // radio buttons: optimize type
         JLabel optimizeTypeLabel = new JLabel("Optimize type:");
@@ -1033,6 +1065,10 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         options.setToString(to);
         options.setWalkSpeed(Float.parseFloat(walkSpeed.getText()));
         options.setBikeSpeed(Float.parseFloat(bikeSpeed.getText()));
+        options.setHeuristicWeight(Float.parseFloat(heuristicWeight.getText()));
+        options.setSoftWalkLimiting( softWalkLimiting.isSelected() );
+        options.setSoftWalkPenalty(Float.parseFloat(softWalkPenalty.getText()));
+        options.setSoftWalkOverageRate(Float.parseFloat(this.softWalkOverageRate.getText()));
         options.numItineraries = 1;
         System.out.println("--------");
         System.out.println("Path from " + from + " to " + to + " at " + when);
