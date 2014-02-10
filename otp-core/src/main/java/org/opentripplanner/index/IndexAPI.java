@@ -22,9 +22,11 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 import lombok.Setter;
 
@@ -69,10 +71,13 @@ public class IndexAPI {
    private static final DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
            
    private static final String MSG_404 = "FOUR ZERO FOUR";
-   private static final String MSG_400 = "FOUR ZERO ZERO";
+   private static final String MSG_400 = "FOUR HUNDRED";
    
    @Setter @InjectParam 
    private GraphService graphService;
+
+   /* Needed to check whether query parameter map is empty, rather than chaining " && x == null"s */
+   @Context UriInfo ui;
 
    /** Return a list of all agencies in the graph. */
    @GET
@@ -117,32 +122,57 @@ public class IndexAPI {
    @Path("/stops")
    @Produces({ MediaType.APPLICATION_JSON })
    public Response getStopsInRadius (
-               @QueryParam("lat")    Double lat,
-               @QueryParam("lon")    Double lon,
-               @QueryParam("radius") Double radius) {
+           @QueryParam("minLat") Double minLat,
+           @QueryParam("minLon") Double minLon,
+           @QueryParam("maxLat") Double maxLat,
+           @QueryParam("maxLon") Double maxLon,
+           @QueryParam("lat")    Double lat,
+           @QueryParam("lon")    Double lon,
+           @QueryParam("radius") Double radius) {
+
        GraphIndex index = graphService.getGraph().getIndex();
-       /* No parameters supplied. Return all stops. */
-       if (lat == null && lon == null && radius == null) {
+       /* When no parameters are supplied, return all stops. */
+       if (ui.getQueryParameters().isEmpty()) {
            Collection<Stop> stops = index.stopForId.values();
            return Response.status(Status.OK).entity(StopShort.list(stops)).build();
        }
-       /* If any parameter is missing, return an error status. */
-       if (lat == null || lon == null || radius == null || radius < 0) {
-           return Response.status(Status.BAD_REQUEST).entity(MSG_400).build();
-       }
-       if (radius > MAX_STOP_SEARCH_RADIUS){
-           radius = MAX_STOP_SEARCH_RADIUS;
-       }
-       List<StopShort> stops = Lists.newArrayList(); 
-       Coordinate coord = new Coordinate(lon, lat);
-       for (TransitStop stopVertex : index.stopSpatialIndex.query(lon, lat, radius)) {
-           double distance = distanceLibrary.fastDistance(stopVertex.getCoordinate(), coord);
-           if (distance < radius) {
-               stops.add(new StopShort(stopVertex.getStop(), (int) distance));
+       /* If any of the circle parameters are specified, expect a circle not a box. */
+       boolean expectCircle = (lat != null || lon != null || radius != null);
+       if (expectCircle) {
+           if (lat == null || lon == null || radius == null || radius < 0) {
+               return Response.status(Status.BAD_REQUEST).entity(MSG_400).build();
            }
+           if (radius > MAX_STOP_SEARCH_RADIUS){
+               radius = MAX_STOP_SEARCH_RADIUS;
+           }
+           List<StopShort> stops = Lists.newArrayList(); 
+           Coordinate coord = new Coordinate(lon, lat);
+           /* TODO Ack this should use the spatial index! */
+           for (TransitStop stopVertex : index.stopSpatialIndex.query(lon, lat, radius)) {
+               double distance = distanceLibrary.fastDistance(stopVertex.getCoordinate(), coord);
+               if (distance < radius) {
+                   stops.add(new StopShort(stopVertex.getStop(), (int) distance));
+               }
+           }
+           return Response.status(Status.OK).entity(stops).build();
+       } else {
+           /* We're not circle mode, we must be in box mode. */
+           if (minLat == null || minLon == null || maxLat == null || maxLon == null) {
+               return Response.status(Status.BAD_REQUEST).entity(MSG_400).build();
+           }
+           if (maxLat <= minLat || maxLon <= minLon) {
+               return Response.status(Status.BAD_REQUEST).entity(MSG_400).build();
+           }
+           List<StopShort> stops = Lists.newArrayList(); 
+           for (TransitStop stopVertex : index.stopSpatialIndex.query(lon, lat, radius)) {
+               /* TODO The spatial index needs a rectangle query function. */
+               index.stopSpatialIndex.query(lon, lat, radius);
+               stops.add(new StopShort(stopVertex.getStop()));
+           }
+           return Response.status(Status.OK).entity(stops).build();           
        }
-       return Response.status(Status.OK).entity(stops).build();
-   }
+}
+
 
    @GET
    @Path("/stops/{id}/routes")
