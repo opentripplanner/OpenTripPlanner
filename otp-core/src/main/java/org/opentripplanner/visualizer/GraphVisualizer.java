@@ -305,6 +305,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
 	private JTextField softWalkOverageRate;
 
+	private JCheckBox arriveByCheckBox;
+
     public GraphVisualizer(GraphService graphService) {
         super();
         LOG.info("Starting up graph visualizer...");
@@ -392,6 +394,12 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         pane.add(carCheckBox);
         cmvCheckBox = new JCheckBox("custom vehicle");
         pane.add(cmvCheckBox);
+        
+        // row: arrive by?
+        JLabel arriveByLabel = new JLabel("Arrive by?:");
+        pane.add(arriveByLabel);
+        arriveByCheckBox = new JCheckBox("arrive by");
+        pane.add(arriveByCheckBox);
 
         // row: boarding penalty
         JLabel boardPenaltyLabel = new JLabel("Boarding penalty (min):");
@@ -1054,6 +1062,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         if (transitCheckBox.isSelected())
             modeSet.setTransit(true);
         RoutingRequest options = new RoutingRequest(modeSet);
+        options.setArriveBy(arriveByCheckBox.isSelected());
         options.setWalkBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60); // override low 2-4 minute values
         // TODO LG Add ui element for bike board cost (for now bike = 2 * walk)
         options.setBikeBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60 * 2);
