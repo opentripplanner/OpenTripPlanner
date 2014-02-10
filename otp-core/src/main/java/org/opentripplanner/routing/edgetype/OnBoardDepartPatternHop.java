@@ -114,6 +114,7 @@ public class OnBoardDepartPatternHop extends Edge implements OnboardEdge {
 
         // s1.incrementNumBoardings(); TODO Needed?
         s1.setTripId(trip.getId());
+        s1.setPreviousTrip(trip);
         s1.setZone(endStop.getZoneId());
         s1.setRoute(trip.getRoute().getId());
 
