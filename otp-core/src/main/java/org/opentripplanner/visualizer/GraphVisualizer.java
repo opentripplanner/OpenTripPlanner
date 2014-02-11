@@ -307,6 +307,10 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
 	private JCheckBox arriveByCheckBox;
 
+	private JLabel searchTimeElapsedLabel;
+
+	private JCheckBox dontUseGraphicalCallbackCheckBox;
+
     public GraphVisualizer(GraphService graphService) {
         super();
         LOG.info("Starting up graph visualizer...");
@@ -951,6 +955,14 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
             }
         });
         routingPanel.add(clearRouteButton);
+        
+        //label: search time elapsed
+        searchTimeElapsedLabel = new JLabel("search time elapsed:");
+        routingPanel.add(searchTimeElapsedLabel);
+        
+        //option: don't use graphical callback. useful for doing a quick profile
+        dontUseGraphicalCallbackCheckBox = new JCheckBox("no graphics");
+        routingPanel.add(dontUseGraphicalCallbackCheckBox);
 	}
 
     protected void trace() {
@@ -1083,8 +1095,20 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         System.out.println("Path from " + from + " to " + to + " at " + when);
         System.out.println("\tModes: " + modeSet);
         System.out.println("\tOptions: " + options);
+        
+        // apply callback if the options call for it
+        if( dontUseGraphicalCallbackCheckBox.isSelected() ){
+        	sptService.setTraverseVisitor(null);
+        } else {
+        	sptService.setTraverseVisitor(new VisualTraverseVisitor(showGraph));
+        }
+        
+        long t0 = System.currentTimeMillis();
         // TODO: check options properly intialized (AMB)
         List<GraphPath> paths = pathservice.getPaths(options);
+        long dt = System.currentTimeMillis() - t0;
+        searchTimeElapsedLabel.setText( "search time elapsed: "+dt+"ms" );
+        
         if (paths == null) {
             System.out.println("no path");
             showGraph.highlightGraphPath(null);
