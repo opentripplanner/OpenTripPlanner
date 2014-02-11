@@ -31,15 +31,17 @@ import org.opentripplanner.api.model.error.PlannerError;
 public class Response {
 
     /** A dictionary of the parameters provided in the request that triggered this response. */
+    @Getter
     @XmlElement
     private HashMap<String, String> requestParameters;
     private TripPlan plan;
     private PlannerError error = null;
 
     /** Debugging and profiling information */
-    public Debug debug = null;
+    public DebugOutput debugOutput = null;
 
     /** This no-arg constructor exists to make JAX-RS happy. */ 
+    @SuppressWarnings("unused")
     private Response() {};
 
     /** Construct an new response initialized with all the incoming query parameters. */

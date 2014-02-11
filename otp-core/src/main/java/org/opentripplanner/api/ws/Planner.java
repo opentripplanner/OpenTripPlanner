@@ -91,7 +91,7 @@ public class Planner extends RoutingResource {
             response.setError(error);
         } finally {
             if (request != null) {
-                response.debug = request.rctx.debug;
+                response.debugOutput = request.rctx.debugOutput;
                 request.cleanup(); // TODO verify that this is being done on Analyst web services
             }       
         }

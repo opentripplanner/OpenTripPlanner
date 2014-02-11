@@ -59,6 +59,13 @@ public class SphericalDistanceLibrary implements DistanceLibrary {
     }
 
     @Override
+    public final double fastDistance(Coordinate from, Coordinate to, double cosLat) {
+        double dLat = toRadians(from.y - to.y);
+        double dLon = toRadians(from.x - to.x) * cosLat;
+        return RADIUS_OF_EARTH_IN_M * sqrt(dLat * dLat + dLon * dLon);
+    }
+
+    @Override
     public final double fastDistance(Coordinate point, LineString lineString) {
         // Transform in equirectangular projection on sphere of radius 1,
         // centered at point
@@ -66,29 +73,32 @@ public class SphericalDistanceLibrary implements DistanceLibrary {
         double cosLat = FastMath.cos(lat);
         double lon = Math.toRadians(point.x) * cosLat;
         Point point2 = GeometryUtils.getGeometryFactory().createPoint(new Coordinate(lon, lat));
-        LineString lineString2 = equirectangularProject(point, lineString);
+        LineString lineString2 = equirectangularProject(lineString, cosLat);
         return lineString2.distance(point2) * RADIUS_OF_EARTH_IN_M;
     }
 
     @Override
     public final double fastLength(LineString lineString) {
         // Warn: do not use LineString.getCentroid() as it is broken
-        // for degenerated geometry (same first/last point). 
+        // for degenerated geometry (same first/last point).
         Coordinate[] coordinates = lineString.getCoordinates();
-        Coordinate middle = new Coordinate((coordinates[0].x + coordinates[coordinates.length - 1].x) / 2.0,
-                (coordinates[0].y + coordinates[coordinates.length - 1].y) / 2.0);
-        return equirectangularProject(middle, lineString).getLength()
-                * RADIUS_OF_EARTH_IN_M;
+        double middleY = (coordinates[0].y + coordinates[coordinates.length - 1].y) / 2.0;
+        double cosLat = FastMath.cos(Math.toRadians(middleY));
+        return equirectangularProject(lineString, cosLat).getLength() * RADIUS_OF_EARTH_IN_M;
+    }
+    
+    @Override
+    public final double fastLength(LineString lineString, double cosLat) {
+        return equirectangularProject(lineString, cosLat).getLength() * RADIUS_OF_EARTH_IN_M;
     }
 
     /**
      * Equirectangular project a polyline.
-     * @param projectionCenter Center of the equirectangular projection.
      * @param lineString
+     * @param cosLat cos(lat) of the projection center point.
      * @return The projected polyline. Coordinates in radians.
      */
-    private LineString equirectangularProject(Coordinate projectionCenter, LineString lineString) {
-        double cosLat = FastMath.cos(Math.toRadians(projectionCenter.y));
+    private LineString equirectangularProject(LineString lineString, double cosLat) {
         Coordinate[] coords = lineString.getCoordinates();
         Coordinate[] coords2 = new Coordinate[coords.length];
         for (int i = 0; i < coords.length; i++) {

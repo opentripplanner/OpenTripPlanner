@@ -251,10 +251,10 @@ public class StateEditor {
      * backward when traversing backward.
      */
     public void incrementTimeInSeconds(int seconds) {
-        incrementTimeInMilliseconds(seconds * 1000);
+        incrementTimeInMilliseconds(seconds * 1000L);
     }
     
-    public void incrementTimeInMilliseconds(int milliseconds) {
+    public void incrementTimeInMilliseconds(long milliseconds) {
         if (milliseconds < 0) {
             LOG.warn("A state's time is being incremented by a negative amount while traversing edge "
                     + child.getBackEdge());
@@ -276,6 +276,7 @@ public class StateEditor {
     public void incrementNumBoardings() {
         cloneStateDataAsNeeded();
         child.stateData.numBoardings++;
+        setEverBoarded();
     }
 
     /* Basic Setters */
@@ -366,9 +367,10 @@ public class StateEditor {
         child.stateData.alightedLocal = alightedLocal;
     }
 
-    public void setEverBoarded(boolean everBoarded) {
+    public void setEverBoarded() {
+        if (child.stateData.everBoarded) return;
         cloneStateDataAsNeeded();
-        child.stateData.everBoarded = everBoarded;
+        child.stateData.everBoarded = true;
     }
 
     public void setBikeRenting(boolean bikeRenting) {

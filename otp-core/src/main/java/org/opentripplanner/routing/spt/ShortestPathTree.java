@@ -86,12 +86,10 @@ public interface ShortestPathTree {
     public State getState(Vertex dest);
 
     /**
-     * This should probably be somewhere else (static method on GraphPath?), but leaving it here for now for backward compat.
+     * This should probably be somewhere else (static method on GraphPath?), 
+     * but leaving it here for now for backward compat.
      * 
-     * @param dest
-     * @param optimize
-     * @param options
-     * @return
+     * @return a list of GraphPaths, sometimes empty but never null.
      */
     public List<GraphPath> getPaths(Vertex dest, boolean optimize);
 

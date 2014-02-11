@@ -39,12 +39,13 @@ otp.modules.fieldtrip.FieldTripModule =
     
     showIntermediateStops : true,
     
-    templateFile : 'otp/modules/fieldtrip/fieldtrip-templates.html',
+    //templateFile : 'otp/modules/fieldtrip/fieldtrip-templates.html',
 
     
     initialize : function(webapp, id, options) {
         otp.modules.multimodal.MultimodalPlannerModule.prototype.initialize.apply(this, arguments);
-        
+        this.templateFiles.push('otp/modules/fieldtrip/fieldtrip-templates.html');
+
         this.planTripFunction = this.ftPlanTrip;
         this.requestWidgets = {};
         this.geocoderWidgets = {};

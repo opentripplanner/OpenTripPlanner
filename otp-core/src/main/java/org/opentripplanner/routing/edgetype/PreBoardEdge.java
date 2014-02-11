@@ -110,7 +110,6 @@ public class PreBoardEdge extends FreeEdge implements StationEdge {
 
             StateEditor s1 = s0.edit(this);
             s1.setTimeSeconds(board_after);
-            s1.setEverBoarded(true);
             long wait_cost = board_after - t0;
             s1.incrementWeight(wait_cost + transfer_penalty);
             s1.setBackMode(getMode());

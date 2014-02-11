@@ -19,6 +19,7 @@ import static org.opentripplanner.routing.automata.Nonterminal.plus;
 import static org.opentripplanner.routing.automata.Nonterminal.seq;
 import static org.opentripplanner.routing.automata.Nonterminal.star;
 
+import java.util.Collections;
 import java.util.List;
 
 import lombok.Setter;
@@ -113,7 +114,9 @@ public class LongDistancePathService implements PathService {
             return null;
         }
         //spt.getPaths().get(0).dump();
-        return spt.getPaths();
+        List<GraphPath> paths = spt.getPaths();
+        Collections.sort(paths, new PathWeightComparator());
+        return paths;
     }
 
     public static class Parser extends PathParser {

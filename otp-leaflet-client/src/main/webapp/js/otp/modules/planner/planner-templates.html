@@ -1,0 +1,22 @@
+ <script id="otp-planner-alert" type="text/html">
+
+    <div class="otp-itin-alert">
+        <div class="otp-itin-alert-left"></div>
+        <div class="otp-itin-alert-main">
+            <div class="otp-itin-alert-header">
+                <div class="otp-itin-alert-toggleButton">&#x25BC;</div>
+
+                {{#alert.alertUrl.someTranslation}}<a href="{{alert.alertUrl.someTranslation}}" target="_blank">{{/alert.alertUrl.someTranslation}}
+                Alert for Route {{leg.route}}
+                {{#alert.alertUrl.someTranslation}}</a>{{/alert.alertUrl.someTranslation}}
+
+                {{#alert.alertHeaderText.someTranslation}}: {{alert.alertHeaderText.someTranslation}}{{/alert.alertHeaderText.someTranslation}}
+                
+            </div>
+            
+            {{#alert.alertDescriptionText.someTranslation}}
+                <div class="otp-itin-alert-description">{{alert.alertDescriptionText.someTranslation}}</div>
+            {{/alert.alertDescriptionText.someTranslation}}
+        </div>
+    </div>
+</script>

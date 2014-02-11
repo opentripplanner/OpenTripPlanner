@@ -118,19 +118,47 @@ public class RetryingPathServiceImpl implements PathService {
             
             LOG.debug("BEGIN SUBSEARCH");
             ShortestPathTree spt = sptService.getShortestPathTree(currOptions, timeout);
-            if (spt == null) // timeout or other fail
-                break;
-            List<GraphPath> somePaths = spt.getPaths();
-            LOG.debug("END SUBSEARCH ({} msec of {} msec total)", 
-                    System.currentTimeMillis() - subsearchBeginTime,
-                    System.currentTimeMillis() - searchBeginTime);
-            if (somePaths == null) {
-                // search failed, likely due to timeout
-                // this could be signaled with an exception
+            if (spt == null) {
+                // Serious failure, no paths provided. This could be signaled with an exception.
                 LOG.warn("Aborting search. {} paths found, elapsed time {} sec", 
                         paths.size(), (System.currentTimeMillis() - searchBeginTime) / 1000.0);
                 break;
             }
+            List<GraphPath> somePaths = spt.getPaths(); // somePaths may be empty, but is never null.
+            LOG.debug("END SUBSEARCH ({} msec of {} msec total)", 
+                    System.currentTimeMillis() - subsearchBeginTime,
+                    System.currentTimeMillis() - searchBeginTime);
+            LOG.debug("SPT provides {} paths to target.", somePaths.size());
+
+            /* First, accumulate any new paths found into the list of itineraries. */
+            for (GraphPath path : somePaths) {
+                if ( ! paths.contains(path)) {
+                    if (path.getWalkDistance() > maxWalk) {
+                        maxWalk = path.getWalkDistance() * 1.25;
+                    }
+                    paths.add(path);
+                    LOG.debug("New trips: {}", path.getTrips());
+                    // ban the trips in this path
+                    // unless is is a non-transit trip (in which case this would cause a useless retry)
+                    if ( ! path.getTrips().isEmpty()) {
+                        RoutingRequest newOptions = currOptions.clone();
+                        for (AgencyAndId trip : path.getTrips()) {
+                            newOptions.banTrip(trip);
+                        }
+                        if (!optionQueue.contains(newOptions)) {
+                            optionQueue.add(newOptions);
+                        }
+                    }           
+                }
+            }
+            LOG.debug("{} / {} itineraries", paths.size(), currOptions.numItineraries);
+            if (options.rctx.aborted) {
+                // search was cleanly aborted, probably due to a timeout. 
+                // There may be useful paths, but we should stop retrying.
+                break;
+            }
+
+            /* Vary weight, time, and walk constraints for next iteration. */
             if (maxWeight == Double.MAX_VALUE && maxWalk == Double.MAX_VALUE) {
                 /* the worst trip we are willing to accept is at most twice as bad or twice as long */
                 if (somePaths.isEmpty()) {
@@ -161,27 +189,7 @@ public class RetryingPathServiceImpl implements PathService {
                 optionQueue.add(currOptions);
                 continue;
             }
-            for (GraphPath path : somePaths) {
-                if ( ! paths.contains(path)) {
-                    if (path.getWalkDistance() > maxWalk) {
-                        maxWalk = path.getWalkDistance() * 1.25;
-                    }
-                    paths.add(path);
-                    LOG.debug("New trips: {}", path.getTrips());
-                    // ban the trips in this path
-                    // unless is is a non-transit trip (in which case this would cause a useless retry)
-                    if ( ! path.getTrips().isEmpty()) {
-                        RoutingRequest newOptions = currOptions.clone();
-                        for (AgencyAndId trip : path.getTrips()) {
-                            newOptions.banTrip(trip);
-                        }
-                        if (!optionQueue.contains(newOptions)) {
-                            optionQueue.add(newOptions);
-                        }
-                    }           
-                }
-            }
-            LOG.debug("{} / {} itineraries", paths.size(), currOptions.numItineraries);
+
         }
         if (paths.size() == 0) {
             return null;

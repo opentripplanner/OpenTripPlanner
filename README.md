@@ -1,12 +1,12 @@
---== OVERVIEW ==--
+##### OVERVIEW
 
 OpenTripPlanner (OTP) is an open source multi-modal trip planner. It depends on open data in open standard file formats (GTFS and OpenStreetMap), and includes a REST API for journey planning as well as several map-based Javascript clients. OpenTripPlanner can also create travel time contour visualizations and compute accessibility indicators for planning and research applications. For more information, see the project website: http://opentripplanner.org
 
---== INSTALL ==--
+##### INSTALL
 
 Installation instructions are available on the website: http://opentripplanner.org/wiki/
 
---== FILES ==--
+##### FILES
 
 OpenTripPlanner is a multi-module Maven project. It contains the following sub-modules:
 
@@ -25,7 +25,7 @@ OTP also includes the following subprojects which must be built separately:
 otp-datastore/         - A Play-based backend for logging OTP queries.
 otp-gvsig/             - An OpenTripPlanner-based extension to GVSIG.
 
---== DEVELOPMENT ==--
+##### DEVELOPMENT
 
 OpenTripPlanner is a collaborative project incorporating code, translation, and documentation from contributors around the world. We welcome new contributions and prefer to format our code according to GeoTools-based formatting guidelines; an Eclipse autoformatter can be found at the root of this project (https://raw.github.com/openplans/OpenTripPlanner/master/formatter.xml). Further development guidelines can be found on the project wiki (https://github.com/openplans/OpenTripPlanner/wiki/DevelopersGuide).
 
@@ -33,8 +33,6 @@ The OpenTripPlanner project was launched by Portland, Oregon's transport agency 
 
 As of Summer 2013, the OpenTripPlanner project has been accepted for membership in the Software Freedom Conservancy (SFC). SFC handles the legal and financial details common to many open source projects, providing a formal framework for OTP and allowing contributors to concentrate on the code. For more information, see the SFC website at http://sfconservancy.org/.
 
---== MAILING LISTS ==--
+##### MAILING LISTS
 
 The main forums through which the OpenTripPlanner community organizes development and provides mutual assistance are our two Google discussion groups. Changes and extensions to OTP are debated on the developers' list (opentripplanner-dev). More general questions and announcements of interest to non-developer OTP users should be directed to the opentripplanner-users list.
-
-

@@ -642,10 +642,10 @@ otp.widgets.tripoptions.PreferredRoutes =
     doAfterLayout : function() {
         var this_ = this;
         $('#'+this.id+'-button').button().click(function() {
-            console.log("edit pref rtes");
             this_.selectorWidget.updateRouteList();
 
             this_.selectorWidget.show();
+            if(this_.selectorWidget.isMinimized) this_.selectorWidget.unminimize();
             this_.selectorWidget.bringToFront();
         });
         
@@ -749,6 +749,7 @@ otp.widgets.tripoptions.BannedRoutes =
         $('#'+this.id+'-button').button().click(function() {
             this_.selectorWidget.updateRouteList();
             this_.selectorWidget.show();
+            if(this_.selectorWidget.isMinimized) this_.selectorWidget.unminimize();
             this_.selectorWidget.bringToFront();
         });
     },

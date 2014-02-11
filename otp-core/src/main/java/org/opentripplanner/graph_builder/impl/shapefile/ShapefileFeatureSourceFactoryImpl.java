@@ -24,6 +24,7 @@ import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory
 public class ShapefileFeatureSourceFactoryImpl implements FeatureSourceFactory {
 
     private File _path;
+    private ShapefileDataStore dataStore;
 
     public ShapefileFeatureSourceFactoryImpl() {
         
@@ -41,7 +42,7 @@ public class ShapefileFeatureSourceFactoryImpl implements FeatureSourceFactory {
     public FeatureSource<SimpleFeatureType, SimpleFeature> getFeatureSource() {
 
         try {
-            ShapefileDataStore dataStore = new ShapefileDataStore(_path.toURI().toURL());
+            dataStore = new ShapefileDataStore(_path.toURI().toURL());
 
             String typeNames[] = dataStore.getTypeNames();
             String typeName = typeNames[0];
@@ -51,6 +52,11 @@ public class ShapefileFeatureSourceFactoryImpl implements FeatureSourceFactory {
             throw new IllegalStateException("error creating feature source from shapefile: path="
                     + _path, ex);
         }
+    }
+    
+    @Override
+    public void cleanup() {
+        dataStore.dispose();
     }
 
     @Override

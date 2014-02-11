@@ -16,6 +16,9 @@ package org.opentripplanner.routing.core;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Route;
+import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.model.GenericLocation;
 
 public class RoutingRequestTest {
@@ -53,4 +56,15 @@ public class RoutingRequestTest {
         assertTrue(req.intermediatesEffectivelyOrdered());        
     }
 
+    @Test
+    public void testPreferencesPenaltyForTrip() {
+        AgencyAndId agencyAndId = new AgencyAndId();
+        Route route = new Route();
+        Trip trip = new Trip();
+        RoutingRequest routingRequest = new RoutingRequest();
+
+        trip.setRoute(route);
+        route.setId(agencyAndId);
+        assertEquals(0, routingRequest.preferencesPenaltyForTrip(trip));
+    }
 }

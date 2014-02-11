@@ -107,6 +107,7 @@ public class PlanGenerator {
                 // There are no paths that meet the user's slope restrictions.
                 // Try again without slope restrictions (and warn user).
                 options.maxSlope = Double.MAX_VALUE;
+                options.maxWalkDistance = originalOptions.maxWalkDistance;
                 paths = pathService.getPaths(options);
                 tooSloped = true;
             }
@@ -114,11 +115,23 @@ public class PlanGenerator {
             LOG.info("Vertex not found: " + options.getFrom() + " : " + options.getTo(), e);
             throw e;
         }
-        options.rctx.debug.finishedCalculating();
+        options.rctx.debugOutput.finishedCalculating();
 
         if (paths == null || paths.size() == 0) {
             LOG.info("Path not found: " + options.getFrom() + " : " + options.getTo());
             throw new PathNotFoundException();
+        }
+
+        for (GraphPath graphPath : paths) {
+            if (originalOptions.isArriveBy()) {
+                if (graphPath.states.getLast().getTimeSeconds() > originalOptions.dateTime) {
+                    LOG.error("A graph path arrives after the requested time. This implies a bug.");
+                }
+            } else {
+                if (graphPath.states.getFirst().getTimeSeconds() < originalOptions.dateTime) {
+                    LOG.error("A graph path leaves before the requested time. This implies a bug.");
+                }
+            }
         }
 
         TripPlan plan = generatePlan(paths, originalOptions);
@@ -136,7 +149,7 @@ public class PlanGenerator {
                 lastLeg.to.orig = plan.to.orig;
             }
         }
-        options.rctx.debug.finishedRendering();
+        options.rctx.debugOutput.finishedRendering();
         return plan;
     }
 

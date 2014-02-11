@@ -115,7 +115,7 @@ public class FrequencyBoard extends Edge implements OnboardEdge, PatternEdge {
             long currentTime = state0.getTimeSeconds();
             
             int transferPenalty = 0;
-            if (state0.getNumBoardings() > 0) {
+            if (state0.isEverBoarded()) {
                 // This is not the first boarding, thus a transfer
                 TransferTable transferTable = options.getRoutingContext().transferTable;
                 // Get the current stop
@@ -208,7 +208,7 @@ public class FrequencyBoard extends Edge implements OnboardEdge, PatternEdge {
             s1.setBackMode(TraverseMode.LEG_SWITCH);
             
             long wait_cost = bestWait;
-            if (state0.getNumBoardings() == 0) {
+            if (!state0.isEverBoarded()) {
                 wait_cost *= options.waitAtBeginningFactor;
             } else {
                 wait_cost *= options.waitReluctance;

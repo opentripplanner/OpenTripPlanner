@@ -102,7 +102,6 @@ public class PreAlightEdge extends FreeEdge implements StationEdge {
 
             StateEditor s1 = s0.edit(this);
             s1.setTimeSeconds(alight_before);
-            s1.setEverBoarded(true);
             long wait_cost = t0 - alight_before;
             s1.incrementWeight(wait_cost + transfer_penalty);
             s1.setBackMode(getMode());

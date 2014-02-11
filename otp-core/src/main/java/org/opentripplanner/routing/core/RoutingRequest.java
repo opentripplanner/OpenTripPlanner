@@ -1096,7 +1096,8 @@ public class RoutingRequest implements Cloneable, Serializable {
     	Route route = trip.getRoute();
     	String agencyID = route.getId().getAgencyId();
     	
-    	if (preferredRoutes != null || (preferredAgencies != null && !preferredAgencies.isEmpty())) {
+        if ((preferredRoutes != null && !preferredRoutes.equals(RouteMatcher.emptyMatcher())) ||
+                (preferredAgencies != null && !preferredAgencies.isEmpty())) {
     		boolean isPreferedRoute = preferredRoutes != null && preferredRoutes.matches(route);
     		boolean isPreferedAgency = preferredAgencies != null && preferredAgencies.contains(agencyID); 
     		if (!isPreferedRoute && !isPreferedAgency) {
