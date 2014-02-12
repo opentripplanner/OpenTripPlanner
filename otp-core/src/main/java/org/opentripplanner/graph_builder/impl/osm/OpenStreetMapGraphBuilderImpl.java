@@ -205,7 +205,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
      * Whether we should create P+R stations from OSM data. 
      */
     @Setter
-    private boolean staticParkAndRide = false;
+    private boolean staticParkAndRide = true;
 
     public List<String> provides() {
         return Arrays.asList("streets", "turns");
