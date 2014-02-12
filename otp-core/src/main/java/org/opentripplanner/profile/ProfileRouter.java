@@ -9,10 +9,12 @@ import java.util.Set;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.api.param.LatLon;
 import org.opentripplanner.profile.ProfileData.StopAtDistance;
 import org.opentripplanner.profile.ProfileData.Transfer;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
@@ -128,15 +130,14 @@ public class ProfileRouter {
     // why do we not have a latlon class? we don't need super detailed geodesy.
     // (latlon from, latlon to, timewindow window)
     // TimeWindow should actually be resolved and created in the caller, which does have access to the profiledata.
-    public Collection<Option> route (double fromLat, double fromLon, double toLat, double toLon, 
-                                     int fromTime, int toTime, ServiceDate date) {
+    public ProfileResponse route (LatLon from, LatLon to, int fromTime, int toTime, LocalDate date) {
 
         /* Set to 2 until we have better pruning. There are a lot of 3-combinations. */
         final int ROUNDS = 2;
         int finalRound = ROUNDS - 1;
         int penultimateRound = ROUNDS - 2;
-        fromStops = data.closestPatterns(fromLon, fromLat);
-        toStops   = data.closestPatterns(toLon, toLat);
+        fromStops = data.closestPatterns(from.lon, from.lat);
+        toStops   = data.closestPatterns(to.lon, to.lat);
         LOG.info("from stops: {}", fromStops);
         LOG.info("to stops: {}", toStops);
         this.window = new TimeWindow (fromTime, toTime, data.servicesRunning(date));
@@ -205,7 +206,7 @@ public class ProfileRouter {
             int dist = toStops.get(ride.patternRides.get(0).pattern).distance; 
             options.add(new Option (ride, dist, window)); // TODO Convert distance to time.
         }
-        return options;
+        return new ProfileResponse(options);
     }
     
 }

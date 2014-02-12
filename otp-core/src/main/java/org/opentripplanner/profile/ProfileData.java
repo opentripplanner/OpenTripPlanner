@@ -7,6 +7,7 @@ import java.util.Map;
 
 import lombok.AllArgsConstructor;
 
+import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
@@ -71,7 +72,12 @@ public class ProfileData {
         }
         return services;
     }        
-    
+
+    /** Wraps the other version that accepts OBA ServiceDates. Joda LocalDate is similar. */
+    public BitSet servicesRunning (LocalDate date) {
+        return servicesRunning(new ServiceDate(date.getYear(), date.getMonthOfYear(), date.getDayOfMonth()));
+    }
+
     /**
      * Here we are using stops rather than indices within a pattern, because we want to consider
      * stops that appear more than once at every index where they occur.
