@@ -13,9 +13,9 @@
 
 package org.opentripplanner.analyst.request;
 
-import org.opentripplanner.analyst.parameter.Layer;
-import org.opentripplanner.analyst.parameter.MIMEImageFormat;
-import org.opentripplanner.analyst.parameter.Style;
+import org.opentripplanner.api.parameter.Layer;
+import org.opentripplanner.api.parameter.MIMEImageFormat;
+import org.opentripplanner.api.parameter.Style;
 
 public class RenderRequest {
 

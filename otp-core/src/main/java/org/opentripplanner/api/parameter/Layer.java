@@ -11,12 +11,9 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.error;
-
-/**
- * Indicates that the call to org.opentripplanner.routing.services.PathService returned either null or ZERO paths.
- * @see org.opentripplanner.api.resource.Planner for where this is (locally) thrown.
- */
-public class PathNotFoundException extends RuntimeException {
-    private static final long serialVersionUID = 1L;
+package org.opentripplanner.api.parameter;
+public enum Layer {
+    TRAVELTIME,
+    DIFFERENCE,
+    HAGERSTRAND
 }

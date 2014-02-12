@@ -11,7 +11,7 @@ import lombok.AllArgsConstructor;
 
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.api.ws.analyst.SimpleIsochrone.MinMap;
+import org.opentripplanner.api.resource.analyst.SimpleIsochrone.MinMap;
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;

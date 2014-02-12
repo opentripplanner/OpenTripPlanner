@@ -11,12 +11,23 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.error;
+package org.opentripplanner.api.resource;
 
-/**
- * Indicates that the call to org.opentripplanner.routing.services.PathService returned either null or ZERO paths.
- * @see org.opentripplanner.api.resource.Planner for where this is (locally) thrown.
- */
-public class PathNotFoundException extends RuntimeException {
-    private static final long serialVersionUID = 1L;
+import org.opentripplanner.api.resource.services.HullService;
+
+import com.vividsolutions.jts.geom.Geometry;
+
+public class StoredHullService implements HullService {
+
+    private Geometry hull;
+
+    public StoredHullService(Geometry hull) {
+        this.hull = hull;
+    }
+    
+    @Override
+    public Geometry getHull() {
+        return hull;
+    }
+
 }

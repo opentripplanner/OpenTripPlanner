@@ -278,6 +278,14 @@
           <artifactId>jackson-module-jaxb-annotations</artifactId>
           <version>2.0.5</version>
         </dependency>
+	   <dependency>
+         <!-- More JSON used by Nominatim geocoder module -->
+	     <groupId>net.sf.flexjson</groupId>
+	     <artifactId>flexjson</artifactId>
+	     <version>2.0</version>
+	     <type>jar</type>
+	     <scope>compile</scope>
+	   </dependency>        
         <dependency>
           <groupId>org.apache.axis</groupId>
           <artifactId>axis</artifactId>

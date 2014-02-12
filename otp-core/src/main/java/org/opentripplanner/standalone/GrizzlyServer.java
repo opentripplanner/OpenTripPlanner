@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.net.BindException;
 
 import net.lingala.zip4j.core.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
 
 import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -112,7 +111,8 @@ public class GrizzlyServer {
                 .setCorePoolSize(1).setMaxPoolSize(Runtime.getRuntime().availableProcessors());
         networkListener.getTransport().setWorkerThreadPoolConfig(threadPoolConfig);
         httpServer.addListener(networkListener);
-        ResourceConfig rc = new PackagesResourceConfig("org.opentripplanner");
+        /* All resources and parameter reader classes should be under this package. */
+        ResourceConfig rc = new PackagesResourceConfig("org.opentripplanner.api");
         /* DelegatingFilterProxy.class.getName() does not seem to work out of the box.
            Register a custom authentication filter, a filter that removes the /ws/ from OTP
            REST API calls, and a filter that wraps JSON in method calls as needed. */
