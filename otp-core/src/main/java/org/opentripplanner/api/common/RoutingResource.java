@@ -20,6 +20,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import javax.ws.rs.DefaultValue;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.xml.datatype.DatatypeConfigurationException;
 
@@ -46,8 +47,17 @@ public abstract class RoutingResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(RoutingResource.class);
 
+    /**
+     * The routerId selects between several graphs on the same server. The routerId is pulled from
+     * the path, not the query parameters. However, the class RoutingResource is not annotated with
+     * a path because we don't want it to be instantiated as an endpoint. Instead, the {routerId}
+     * path parameter should be included in the path annotations of all its subclasses.
+     */
+    @PathParam("routerId") 
+    public String routerId;
+
     /* TODO do not specify @DefaultValues here, so all defaults are handled in one place */
-    
+
     /** The start location -- either latitude, longitude pair in degrees or a Vertex
      *  label. For example, <code>40.714476,-74.005966</code> or
      *  <code>mtanyctsubway_A27_S</code>.  */
@@ -67,9 +77,6 @@ public abstract class RoutingResource {
     
     /** The time that the trip should depart (or arrive, for requests where arriveBy is true). */
     @QueryParam("time") protected List<String> time;
-    
-    /** Router ID used when in multiple graph mode. Unused in singleton graph mode. */
-    @DefaultValue("") @QueryParam("routerId") protected List<String> routerId;
     
     /** Whether the trip should depart or arrive at the specified date and time. */
     @DefaultValue("false") @QueryParam("arriveBy") protected List<Boolean> arriveBy;
@@ -293,9 +300,9 @@ public abstract class RoutingResource {
      */
     protected RoutingRequest buildRequest(int n) throws ParameterException {
         RoutingRequest request = prototypeRoutingRequest.clone();
-        request.setRouterId(get(routerId, n, request.getRouterId()));
         request.setFromString(get(fromPlace, n, request.getFromPlace().getRepresentation()));
         request.setToString(get(toPlace, n, request.getToPlace().getRepresentation()));
+        request.setRouterId(routerId);
         {
             //FIXME: get defaults for these from request
             String d = get(date, n, null);

@@ -20,7 +20,6 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.aspectj.weaver.tools.ISupportsMessageContext;
 import org.geotools.referencing.GeodeticCalculator;
 import org.opensphere.geometry.algorithm.ConcaveHull;
 import org.opentripplanner.analyst.core.GeometryIndex;
@@ -55,12 +54,16 @@ import com.vividsolutions.jts.geom.MultiLineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.linearref.LengthIndexedLine;
 
-@Path("/iso")
+/**
+ * This is the original Isochrone class provided by Stefan Steineger.
+ * Another implementation has been provided by Laurent Grégoire (isochrone2).
+ */
+@Path("{routerId}/isochroneOld")
 @XmlRootElement
 @Autowire
-public class IsoChrone extends RoutingResource {
+public class SIsochrone extends RoutingResource {
 
-    private static final Logger LOG = LoggerFactory.getLogger(IsoChrone.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SIsochrone.class);
 
     public static final String RESULT_TYPE_POINTS = "POINTS";
 
@@ -345,7 +348,7 @@ public class IsoChrone extends RoutingResource {
         // -- create the different outputs ---
         //
         try {
-            if (output.equals(IsoChrone.RESULT_TYPE_POINTS)) {
+            if (output.equals(SIsochrone.RESULT_TYPE_POINTS)) {
                 // in case there was no road we create a circle and
                 // and return those points
                 if (noRoadNearBy) {
@@ -356,7 +359,7 @@ public class IsoChrone extends RoutingResource {
                 LOG.debug("write multipoint geom with {} points", coords.length);
                 json.writeGeom(gf.createMultiPoint(coords));
                 LOG.debug("done");
-            } else if (output.equals(IsoChrone.RESULT_TYPE_SHED)) {
+            } else if (output.equals(SIsochrone.RESULT_TYPE_SHED)) {
 
                 Geometry geomsArray[] = null;
                 // in case there was no road we create a circle
@@ -414,7 +417,7 @@ public class IsoChrone extends RoutingResource {
                     json.writeGeom(outputHull);
                     LOG.debug("done");
                 }
-            } else if (output.equals(IsoChrone.RESULT_TYPE_EDGES)) {
+            } else if (output.equals(SIsochrone.RESULT_TYPE_EDGES)) {
                 // in case there was no road we return only the suggested path to the street
                 if (noRoadNearBy) {
                     json.writeGeom(pathToStreet);
