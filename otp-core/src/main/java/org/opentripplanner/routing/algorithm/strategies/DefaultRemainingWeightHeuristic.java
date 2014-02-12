@@ -78,11 +78,6 @@ public class DefaultRemainingWeightHeuristic implements RemainingWeightHeuristic
         if (useTransit) {
             double streetSpeed = options.getStreetSpeedUpperBound();
             if (euclideanDistance < target.getDistanceToNearestTransitStop()) { 
-                // Search allows using transit, passenger is alighted local or within mandatory 
-                // walking distance of the target. We will not reach the target via transit.
-                if (euclideanDistance + s.getWalkDistance() > options.getMaxWalkDistance()) {
-                    return -1; // impossible to reach destination
-                }
                 return options.walkReluctance * euclideanDistance / streetSpeed;
             }
             // Search allows using transit, passenger is not alighted local and is not within 
