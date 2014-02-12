@@ -68,10 +68,10 @@ import com.vividsolutions.jts.geom.MultiPolygon;
  * 
  * @author laurent
  */
-@Path("/isochrone")
-public class IsoChrone2 extends RoutingResource {
+@Path("{routerId}/isochrone")
+public class LIsochrone extends RoutingResource {
 
-    private static final Logger LOG = LoggerFactory.getLogger(IsoChrone2.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LIsochrone.class);
 
     @InjectParam
     private IsoChroneSPTRendererAccSampling accSamplingRenderer;

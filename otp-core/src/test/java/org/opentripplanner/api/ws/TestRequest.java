@@ -1192,7 +1192,7 @@ public class TestRequest extends TestCase {
             this.maxTransfers = Arrays.asList(2);
             this.bikeSwitchTime = Arrays.asList(0);
             this.bikeSwitchCost = Arrays.asList(0);
-            this.routerId = Arrays.asList(routerId);
+            this.routerId = routerId; // not a list because this is a path parameter not a query parameter
             this.planGenerator = Context.getInstance().planGenerator;
             this.graphService = Context.getInstance().graphService;
             this.planGenerator.graphService = Context.getInstance().graphService;

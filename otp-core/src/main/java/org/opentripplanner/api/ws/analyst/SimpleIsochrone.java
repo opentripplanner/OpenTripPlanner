@@ -79,25 +79,21 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 
 /**
- * Vector isochrone generator for places without good OSM street connectivity, or graphs that
- * are too large-scale to bother with modeling streets (e.g. all of China).
- * 
- * It assumes constant speed through both streets and "free space" around vertices, yielding 
- * isochrones that are the union of many circles.
+ * This class provides a vector isochrone generator for places without good OSM street connectivity,
+ * or for graphs that are too large-scale to bother with modeling streets (e.g. all of China). It
+ * assumes constant speed through both streets and "free space" around vertices, yielding isochrones
+ * that are the union of many circles.
  * 
  * The origin snapping option used here (connect to all stations within M meters of a lat/lon)
- * should be made into a standard query option in OTP.
+ * should be made into a standard query option in OTP. Instead of specifying an origin station
+ * search radius, it could be more coherent to use all stations within (maxIsochroneTime * speed)
+ * meters, and apply a travel time to reach them.
  * 
- * Instead of specifying an origin station search radius, it could be more coherent to use all 
- * stations within (maxIsochroneTime * speed) meters, and apply a travel time to reach them.
- *  
- * The GET methods both use makeContours which in turn uses makePoints (where range checking occurs).
- * 
- * Putting "@Setter" on all the parameters would allow resource classes to be used outside Jersey.
- * 
- * @author abyrd
+ * The GET methods both use makeContours which in turn uses makePoints (where range checking
+ * occurs). Putting "@Setter" on all the parameters would allow resource classes to be used outside
+ * Jersey.
  */
-@Path("/siso")
+@Path("/{routerId}/simpleIsochrone")
 @Autowire
 public class SimpleIsochrone extends RoutingResource {
     

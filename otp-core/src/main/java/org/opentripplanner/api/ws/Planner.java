@@ -48,16 +48,16 @@ import com.sun.jersey.api.spring.Autowire;
  * 
  * @throws JSONException
  */
-@Path("/plan") // NOTE - /ws/plan is the full path. The prefix is added by the servlet's web.xml.
 @XmlRootElement
 @Autowire
+@Path("/{routerId}")
 public class Planner extends RoutingResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(Planner.class);
     
     @Setter @InjectParam 
     public PlanGenerator planGenerator;
-    
+
     // We inject info about the incoming request so we can include the incoming query 
     // parameters in the outgoing response. This is a TriMet requirement.
     // Jersey seems to use @Context to inject internal types and @InjectParam or @Resource for DI objects.
@@ -101,6 +101,7 @@ public class Planner extends RoutingResource {
 
     @GET
     @Produces( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @Path("/plan")
     public Response getItineraries() throws JSONException {
         return wrapGenerate(new OneArgFunc<TripPlan, RoutingRequest>() {
             public TripPlan call(RoutingRequest request) {

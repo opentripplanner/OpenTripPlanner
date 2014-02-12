@@ -33,6 +33,6 @@ depends on otp-routing.
   <logger name="com.ning.http.client.providers.netty.NettyAsyncHttpProvider" level="error" />
   
   <logger name="org.springframework" level="warn" />
-  <logger name="com.sun.jersey" level="warn" />
+  <logger name="com.sun.jersey" level="debug" />
   
 </configuration>

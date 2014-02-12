@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
 import com.sun.jersey.api.core.InjectParam;
 
 // removed component, mixing spring and jersey annotations is bad?
-@Path("/tile/{z}/{x}/{y}.png") 
+@Path("/{routerId}/analyst/tile/{z}/{x}/{y}.png") 
 public class TileService extends RoutingResource {
     
     private static final Logger LOG = LoggerFactory.getLogger(TileService.class);
