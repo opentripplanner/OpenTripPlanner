@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.core;
 
-import static org.junit.Assert.*;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.LineString;
 import org.junit.Before;
 import org.junit.Test;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -11,8 +11,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
+import static org.junit.Assert.*;
 
 /**
  * Tests for SimpleIntersectionTraversalCostModel.
@@ -173,8 +172,8 @@ public class SimpleTraversalCostModelTest {
         
         double traversalCost = costModel.computeTraversalCost(v, fromEdge, toEdge, mode, options, fromSpeed, toSpeed);
         
-        // Cost with default values = 12.375
-        assertEquals(12.375, traversalCost, 0.0);
+        // Cost with default values = 5.0
+        assertEquals(5, traversalCost, 0.0);
     }
     
     @Test
@@ -206,8 +205,8 @@ public class SimpleTraversalCostModelTest {
         
         double traversalCost = costModel.computeTraversalCost(v, fromEdge, toEdge, mode, options, fromSpeed, toSpeed);
         
-        // Cost with default values = 10.5
-        assertEquals(10.5, traversalCost, 0.0);
+        // Cost with default values = 8.0
+        assertEquals(8.0, traversalCost, 0.0);
     }
     
     @Test
@@ -239,8 +238,8 @@ public class SimpleTraversalCostModelTest {
         
         double traversalCost = costModel.computeTraversalCost(v, fromEdge, toEdge, mode, options, fromSpeed, toSpeed);
         
-        // Cost with default values = 15.5
-        assertEquals(15.5, traversalCost, 0.0);
+        // Cost with default values = 8.0
+        assertEquals(8.0, traversalCost, 0.0);
     }
 
     /****

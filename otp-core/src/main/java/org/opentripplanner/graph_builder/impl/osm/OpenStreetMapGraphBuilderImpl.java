@@ -13,11 +13,20 @@
 
 package org.opentripplanner.graph_builder.impl.osm;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.Multimap;
-import com.vividsolutions.jts.geom.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import lombok.Setter;
+
+import org.geotools.geometry.Envelope2D;
 import org.opentripplanner.common.DisjointSet;
 import org.opentripplanner.common.RepeatingTimePeriod;
 import org.opentripplanner.common.TurnRestriction;
@@ -26,12 +35,25 @@ import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.gbannotation.*;
+import org.opentripplanner.gbannotation.ConflictingBikeTags;
+import org.opentripplanner.gbannotation.Graphwide;
+import org.opentripplanner.gbannotation.LevelAmbiguous;
+import org.opentripplanner.gbannotation.ParkAndRideUnlinked;
+import org.opentripplanner.gbannotation.StreetCarSpeedZero;
+import org.opentripplanner.gbannotation.TurnRestrictionBad;
+import org.opentripplanner.gbannotation.TurnRestrictionException;
+import org.opentripplanner.gbannotation.TurnRestrictionUnknown;
 import org.opentripplanner.graph_builder.impl.extra_elevation_data.ElevationPoint;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
-import org.opentripplanner.openstreetmap.model.*;
+import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMLevel.Source;
+import org.opentripplanner.openstreetmap.model.OSMNode;
+import org.opentripplanner.openstreetmap.model.OSMRelation;
+import org.opentripplanner.openstreetmap.model.OSMRelationMember;
+import org.opentripplanner.openstreetmap.model.OSMTag;
+import org.opentripplanner.openstreetmap.model.OSMWay;
+import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapContentHandler;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 import org.opentripplanner.routing.algorithm.GenericDijkstra;
@@ -40,9 +62,23 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.*;
+import org.opentripplanner.routing.edgetype.AreaEdge;
+import org.opentripplanner.routing.edgetype.AreaEdgeList;
+import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
+import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
+import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
+import org.opentripplanner.routing.edgetype.FreeEdge;
+import org.opentripplanner.routing.edgetype.NamedArea;
+import org.opentripplanner.routing.edgetype.ParkAndRideEdge;
+import org.opentripplanner.routing.edgetype.ParkAndRideLinkEdge;
+import org.opentripplanner.routing.edgetype.PlainStreetEdge;
+import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
+import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -51,7 +87,12 @@ import org.opentripplanner.routing.patch.TranslatedString;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.util.ElevationUtils;
-import org.opentripplanner.routing.vertextype.*;
+import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
+import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
+import org.opentripplanner.routing.vertextype.ExitVertex;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
 import org.opentripplanner.util.MapUtils;
 import org.opentripplanner.visibility.Environment;
 import org.opentripplanner.visibility.VLPoint;
@@ -60,7 +101,19 @@ import org.opentripplanner.visibility.VisibilityPolygon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.Multimap;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.LinearRing;
+import com.vividsolutions.jts.geom.MultiLineString;
+import com.vividsolutions.jts.geom.MultiPolygon;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * Builds a street graph from OpenStreetMap data.
@@ -147,6 +200,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
      */
     @Setter
     private boolean staticBikeRental = false;
+    
+    /**
+     * Whether we should create P+R stations from OSM data. 
+     */
+    @Setter
+    private boolean staticParkAndRide = true;
 
     public List<String> provides() {
         return Arrays.asList("streets", "turns");
@@ -220,7 +279,9 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
         private Map<Long, OSMWay> _ways = new HashMap<Long, OSMWay>();
 
-        private List<Area> _areas = new ArrayList<Area>();
+        private List<Area> _walkableAreas = new ArrayList<Area>();
+        
+        private List<Area> _parkAndRideAreas = new ArrayList<Area>();
 
         private Set<Long> _areaWayIds = new HashSet<Long>();
 
@@ -708,7 +769,10 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             initIntersectionNodes();
 
             buildBasicGraph();
-            buildAreas();
+            buildWalkableAreas();
+            if (staticParkAndRide) {
+                buildParkAndRideAreas();
+            }
 
             buildElevatorEdges(graph);
 
@@ -827,12 +891,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
         final int MAX_AREA_NODES = 500;
 
-        private void buildAreas() {
-            LOG.info("Building visibility graphs for areas");
+        private void buildWalkableAreas() {
+            LOG.info("Building visibility graphs for walkable areas");
 
-            List<AreaGroup> areaGroups = groupAreas(_areas);
+            List<AreaGroup> areaGroups = groupAreas(_walkableAreas);
             for (AreaGroup group : areaGroups) {
-                buildAreasForGroup(group);
+                buildWalkableAreasForGroup(group);
             }
         }
 
@@ -849,7 +913,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
          *
          * @param group
          */
-        private void buildAreasForGroup(AreaGroup group) {
+        private void buildWalkableAreasForGroup(AreaGroup group) {
             Set<OSMNode> startingNodes = new HashSet<OSMNode>();
             Set<Vertex> startingVertices = new HashSet<Vertex>();
             Set<Edge> edges = new HashSet<Edge>();
@@ -969,6 +1033,95 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 }
             }
             pruneAreaEdges(startingVertices, edges);
+        }
+        
+        private void buildParkAndRideAreas() {
+            LOG.info("Building P+R areas");
+            List<AreaGroup> areaGroups = groupAreas(_parkAndRideAreas);
+            int n = 0;
+            for (AreaGroup group : areaGroups) {
+                if (buildParkAndRideAreasForGroup(group))
+                    n++;
+            }
+            LOG.info("Created {} P+R.", n);
+        }
+
+        private boolean buildParkAndRideAreasForGroup(AreaGroup group) {
+            Envelope2D envelope = null;
+            // Process all nodes from outer rings
+            List<IntersectionVertex> accessVertexes = new ArrayList<IntersectionVertex>();
+            String creativeName = null;
+            long osmId = 0L;
+            for (Area area : group.areas) {
+                osmId = area.parent.getId();
+                if (creativeName == null || area.parent.getTag("name") != null)
+                    creativeName = wayPropertySet.getCreativeNameForWay(area.parent);
+                for (Ring ring : area.outermostRings) {
+                    for (OSMNode node : ring.nodes) {
+                        // We need to lazy create the envelope as the default
+                        // constructor include (0,0) in the bounds...
+                        if (envelope == null)
+                            envelope = new Envelope2D(null, node.getLon(), node.getLat(), 0, 0);
+                        else
+                            envelope.add(node.getLon(), node.getLat());
+                        IntersectionVertex accessVertex = getVertexForOsmNode(node, area.parent);
+                        if (accessVertex.getIncoming().isEmpty()
+                                || accessVertex.getOutgoing().isEmpty())
+                            continue;
+                        accessVertexes.add(accessVertex);
+                    }
+                }
+            }
+            // Check P+R accessibility by walking and driving.
+            TraversalRequirements walkReq = new TraversalRequirements(new RoutingRequest(
+                    TraverseMode.WALK));
+            TraversalRequirements driveReq = new TraversalRequirements(new RoutingRequest(
+                    TraverseMode.CAR));
+            boolean walkAccessibleIn = false;
+            boolean carAccessibleIn = false;
+            boolean walkAccessibleOut = false;
+            boolean carAccessibleOut = false;
+            for (IntersectionVertex accessVertex : accessVertexes) {
+                for (Edge incoming : accessVertex.getIncoming()) {
+                    if (incoming instanceof StreetEdge) {
+                        if (walkReq.canBeTraversed((StreetEdge)incoming))
+                            walkAccessibleIn = true;
+                        if (driveReq.canBeTraversed((StreetEdge)incoming))
+                            carAccessibleIn = true;
+                    }
+                }
+                for (Edge outgoing : accessVertex.getOutgoing()) {
+                    if (outgoing instanceof StreetEdge) {
+                        if (walkReq.canBeTraversed((StreetEdge)outgoing))
+                            walkAccessibleOut = true;
+                        if (driveReq.canBeTraversed((StreetEdge)outgoing))
+                            carAccessibleOut = true;
+                    }
+                }
+            }
+            if (walkAccessibleIn != walkAccessibleOut) {
+                LOG.error("P+R walk IN/OUT accessibility mismatch! Please have a look as this should not happen.");
+            }
+            if (!walkAccessibleOut || !carAccessibleIn) {
+                // This will prevent the P+R to be useful.
+                LOG.warn(graph.addBuilderAnnotation(new ParkAndRideUnlinked(creativeName, osmId)));
+                return false;
+            }
+            if (!walkAccessibleIn || !carAccessibleOut) {
+                LOG.warn("P+R '{}' ({}) is not walk-accessible");
+                // This does not prevent routing as we only use P+R for car dropoff,
+                // but this is an issue with OSM data.
+            }
+            // Place the P+R at the center of the envelope
+            ParkAndRideVertex parkAndRideVertex = new ParkAndRideVertex(graph, "P+R" + osmId, "P+R_"
+                    + osmId, envelope.getCenterX(), envelope.getCenterY(), creativeName);
+            new ParkAndRideEdge(parkAndRideVertex);
+            for (IntersectionVertex accessVertex : accessVertexes) {
+                new ParkAndRideLinkEdge(parkAndRideVertex, accessVertex);
+                new ParkAndRideLinkEdge(accessVertex, parkAndRideVertex);
+            }
+            LOG.debug("Created P+R '{}' ({})", creativeName, osmId);
+            return true;
         }
 
         private void addtoVisibilityAndStartSets(Set<OSMNode> startingNodes,
@@ -1387,7 +1540,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
 
                 StreetTraversalPermission permissions = getPermissionsForWay(way,
                         wayData.getPermission());
-                if (permissions.allowsNothing())
+                if (!isWayRoutable(way) || permissions.allowsNothing())
                     continue;
 
                 // handle duplicate nodes in OSM ways
@@ -1702,6 +1855,19 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     }
                 }
             }
+            // Intersect ways at P+R area boundaries if needed.
+            for (Area area : _parkAndRideAreas) {
+                for (Ring outerRing : area.outermostRings) {
+                    for (OSMNode node : outerRing.nodes) {
+                        long nodeId = node.getId();
+                        if (possibleIntersectionNodes.contains(nodeId)) {
+                            intersectionNodes.put(nodeId, null);
+                        } else {
+                            possibleIntersectionNodes.add(nodeId);
+                        }
+                    }
+                }
+            }
         }
 
         private Set<Alert> getWheelchairNotes(OSMWithTags way) {
@@ -1807,10 +1973,12 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
             }
 
             /* filter out ways that are not relevant for routing */
-            if (!isWayRoutable(way)) {
+            if (!(isWayRoutable(way) || way.isParkAndRide())) {
                 return;
             }
-            if (way.isTag("area", "yes") && way.getNodeRefs().size() > 2) {
+            /* An area can be specified as such, or be one by default as an amenity */
+            if ((way.isTag("area", "yes") || way.isTag("amenity", "parking"))
+                    && way.getNodeRefs().size() > 2) {
                 // this is an area that's a simple polygon. So we can just add it straight
                 // to the areas, if it's not part of a relation.
                 if (!_areaWayIds.contains(wayId)) {
@@ -1868,7 +2036,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 // without reference to the ways that compose them. Accordingly, we will merely
                 // mark the ways for preservation here, and deal with the details once we have
                 // the ways loaded.
-                if (!isWayRoutable(relation)) {
+                if (!isWayRoutable(relation) && !relation.isParkAndRide()) {
                     return;
                 }
                 for (OSMRelationMember member : relation.getMembers()) {
@@ -1947,12 +2115,7 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     }
                 }
                 try {
-                    StreetTraversalPermission areaPermissions = getPermissionsForEntity(way,
-                            StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
-                    if (areaPermissions == StreetTraversalPermission.NONE)
-                        continue;
-
-                    _areas.add(new Area(way, Arrays.asList(way), Collections.<OSMWay>emptyList()));
+                    newArea(new Area(way, Arrays.asList(way), Collections.<OSMWay> emptyList()));
                 } catch (Area.AreaConstructionException e) {
                     // this area cannot be constructed, but we already have all the
                     // necessary nodes to construct it. So, something must be wrong with
@@ -1985,7 +2148,8 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                 if (_processedAreas.contains(relation)) {
                     continue;
                 }
-                if (!(relation.isTag("type", "multipolygon") && isOsmEntityRoutable(relation))) {
+                if (!(relation.isTag("type", "multipolygon") && (isOsmEntityRoutable(relation) || relation
+                        .isParkAndRide()))) {
                     continue;
                 }
                 // Area multipolygons -- pedestrian plazas
@@ -2015,18 +2179,11 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                     }
                 }
                 _processedAreas.add(relation);
-                Area area;
                 try {
-                    StreetTraversalPermission areaPermissions = getPermissionsForEntity(relation,
-                            StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
-                    if (areaPermissions == StreetTraversalPermission.NONE)
-                        continue;
-
-                    area = new Area(relation, outerWays, innerWays);
+                    newArea(new Area(relation, outerWays, innerWays));
                 } catch (Area.AreaConstructionException e) {
                     continue;
                 }
-                _areas.add(area);
 
                 for (OSMRelationMember member : relation.getMembers()) {
                     // multipolygons for attribute mapping
@@ -2052,6 +2209,21 @@ public class OpenStreetMapGraphBuilderImpl implements GraphBuilder {
                         way.addTag("public_transport", "platform");
                     }
                 }
+            }
+        }
+
+        /**
+         * Handler for a new Area (single way area or multipolygon relations)
+         * @param area
+         */
+        private void newArea(Area area) {
+            StreetTraversalPermission permissions = getPermissionsForEntity(area.parent,
+                    StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
+            if (isOsmEntityRoutable(area.parent) && permissions != StreetTraversalPermission.NONE) {
+                _walkableAreas.add(area);
+            }
+            if (area.parent.isParkAndRide()) {
+                _parkAndRideAreas.add(area);
             }
         }
 

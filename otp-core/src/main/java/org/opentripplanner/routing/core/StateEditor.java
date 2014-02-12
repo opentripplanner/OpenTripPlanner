@@ -376,6 +376,17 @@ public class StateEditor {
             child.stateData.nonTransitMode = TraverseMode.WALK;
         }
     }
+    
+    public void setCarParked(boolean carParked) {
+        cloneStateDataAsNeeded();
+        child.stateData.carParked = carParked;
+        if (carParked) {
+            // We do not handle mixed-mode P+BIKE...
+            child.stateData.nonTransitMode = TraverseMode.WALK;
+        } else {
+            child.stateData.nonTransitMode = TraverseMode.CAR;
+        }
+    }
 
     public void setPreviousStop(Stop previousStop) {
         cloneStateDataAsNeeded();
@@ -413,6 +424,7 @@ public class StateEditor {
         child.stateData.zone = state.stateData.zone;
         child.stateData.extensions = state.stateData.extensions;
         child.stateData.usingRentedBike = state.stateData.usingRentedBike;
+        child.stateData.carParked = state.stateData.carParked;
     }
 
     /* PUBLIC GETTER METHODS */
