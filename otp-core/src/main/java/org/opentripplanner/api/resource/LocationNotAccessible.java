@@ -11,12 +11,15 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.error;
+package org.opentripplanner.api.resource;
 
 /**
- * Indicates that the call to org.opentripplanner.routing.services.PathService returned either null or ZERO paths.
- * @see org.opentripplanner.api.resource.Planner for where this is (locally) thrown.
+ * The start or end location that the user requested is not accessible given their mobility
+ * constraints (wheelchair, etc)
+ * 
  */
-public class PathNotFoundException extends RuntimeException {
+public class LocationNotAccessible extends RuntimeException {
+
     private static final long serialVersionUID = 1L;
+
 }

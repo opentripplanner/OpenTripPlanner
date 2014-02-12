@@ -25,7 +25,7 @@ import org.geotools.gce.geotiff.GeoTiffWriter;
 import org.opengis.parameter.GeneralParameterValue;
 import org.opengis.parameter.ParameterValueGroup;
 import org.opentripplanner.analyst.core.Tile;
-import org.opentripplanner.analyst.parameter.MIMEImageFormat;
+import org.opentripplanner.api.parameter.MIMEImageFormat;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.slf4j.Logger;

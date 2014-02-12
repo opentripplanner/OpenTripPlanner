@@ -19,7 +19,7 @@ import com.vividsolutions.jts.geom.LineString;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
-import org.opentripplanner.api.ws.DebugOutput;
+import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;

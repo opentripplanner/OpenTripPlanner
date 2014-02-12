@@ -24,7 +24,7 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
-import org.opentripplanner.api.ws.CoordinateArrayListSequence;
+import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;

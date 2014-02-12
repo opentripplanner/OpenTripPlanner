@@ -13,7 +13,7 @@ import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
-import org.opentripplanner.api.ws.analyst.SimpleIsochrone.MinMap;
+import org.opentripplanner.api.resource.analyst.SimpleIsochrone.MinMap;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.edgetype.TableTripPattern;

@@ -328,7 +328,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             // impacting the possibility of this trip
             if (options.isReverseOptimizeOnTheFly() && 
                !options.isReverseOptimizing() && 
-                s0.getisEverBoarded() && 
+                s0.isEverBoarded() && 
                 s0.getLastNextArrivalDelta() <= bestWait &&
                 s0.getLastNextArrivalDelta() > -1) {
                 // it is re-reversed by optimize, so this still yields a forward tree

@@ -11,12 +11,19 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.error;
+package org.opentripplanner.api.resource;
 
-/**
- * Indicates that the call to org.opentripplanner.routing.services.PathService returned either null or ZERO paths.
- * @see org.opentripplanner.api.resource.Planner for where this is (locally) thrown.
- */
-public class PathNotFoundException extends RuntimeException {
-    private static final long serialVersionUID = 1L;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.XmlRootElement;
+
+import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+
+@XmlRootElement(name="BikeRentalStationList")
+public class BikeRentalStationList {
+    @XmlElements(value = { @XmlElement(name="station") })
+    public List<BikeRentalStation> stations = new ArrayList<BikeRentalStation>();
 }
