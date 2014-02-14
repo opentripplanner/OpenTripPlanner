@@ -98,9 +98,6 @@ public class LIsochrone extends RoutingResource {
     @QueryParam("coordinateOrigin")
     private String coordinateOrigin = null;
 
-    @QueryParam("routerId")
-    private String routerId;
-
     private static final SimpleFeatureType contourSchema = makeContourSchema();
 
     @GET
