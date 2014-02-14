@@ -398,7 +398,7 @@ public class PlanGenerator {
         	int boardTime = preBoardState.getServiceDay().secondsSinceMidnight( preBoardState.getTimeSeconds() );
         	int period = pt.getPeriod( fb.getStopIndex(), boardTime ); //TODO fix
         	
-        	leg.isNonExactFrequency = pt.isExact();
+        	leg.isNonExactFrequency = !pt.isExact();
         	leg.headway = period;
         	
         }
