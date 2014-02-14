@@ -75,9 +75,6 @@ public class LIsochrone extends RoutingResource {
     @QueryParam("precisionMeters")
     private Integer precisionMeters;
 
-    @QueryParam("routerId")
-    private String routerId;
-
     @GET
     @Produces({ MediaType.APPLICATION_JSON })
     public Response getIsochrone() {
