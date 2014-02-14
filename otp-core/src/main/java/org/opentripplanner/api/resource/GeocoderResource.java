@@ -20,15 +20,15 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import lombok.Setter;
 
+import org.opentripplanner.api.parameter.BoundingBox;
 import org.opentripplanner.geocoder.Geocoder;
 import org.opentripplanner.geocoder.GeocoderResults;
 
 import com.sun.jersey.api.core.InjectParam;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
 
 @Path("/geocode")
 public class GeocoderResource {
@@ -40,35 +40,15 @@ public class GeocoderResource {
     @Produces({MediaType.APPLICATION_JSON + "; charset=UTF-8"})
     public GeocoderResults geocode(
             @QueryParam("address") String address,
-            @QueryParam("bbox") String bbox) {
+            @QueryParam("bbox") BoundingBox bbox) {
         if (address == null) {
-            error("no address");
+            badRequest ("no address");
         }
-        if (bbox != null) {
-            // left,top,right,bottom
-            String[] elem = bbox.split(",");
-            if (elem.length == 4) {
-                try {
-                    double x1 = Double.parseDouble(elem[0]);
-                    double y1 = Double.parseDouble(elem[1]);
-                    double x2 = Double.parseDouble(elem[2]);
-                    double y2 = Double.parseDouble(elem[3]);
-                    Envelope envelope = new Envelope(new Coordinate(x1, y1), new Coordinate(x2, y2));
-                    return geocoder.geocode(address, envelope);
-                } catch (NumberFormatException e) {
-                    error("bad bounding box: use left,top,right,bottom");
-                }
-            } else {
-                error("bad bounding box: use left,top,right,bottom");
-            }
-        }
-        return geocoder.geocode(address, null);
+        return geocoder.geocode(address, bbox.envelope());
     }
 
-    private void error(String message) {
-        throw new WebApplicationException(Response.status(400)
-                .entity(message)
-                .type("text/plain")
-                .build());
+    private void badRequest (String message) {
+        throw new WebApplicationException(Response.status(Status.BAD_REQUEST)
+                .entity(message).type("text/plain").build());
     }
 }
