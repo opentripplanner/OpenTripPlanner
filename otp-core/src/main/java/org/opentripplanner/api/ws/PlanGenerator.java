@@ -382,7 +382,15 @@ public class PlanGenerator {
 
         leg.interlineWithPreviousLeg = states[0].getBackEdge() instanceof PatternInterlineDwell;
         
-        if( states[0].getBackEdge() instanceof FrequencyBoard ){
+        addFrequencyFields(states, leg);
+        
+        leg.rentedBike = states[0].isBikeRenting() && states[states.length - 1].isBikeRenting();
+
+        return leg;
+    }
+
+	private void addFrequencyFields(State[] states, Leg leg) {
+		if( states[0].getBackEdge() instanceof FrequencyBoard ){
         	State preBoardState= states[0].getBackState();
         	
         	FrequencyBoard fb = (FrequencyBoard)states[0].getBackEdge();
@@ -394,11 +402,7 @@ public class PlanGenerator {
         	leg.headway = period;
         	
         }
-        
-        leg.rentedBike = states[0].isBikeRenting() && states[states.length - 1].isBikeRenting();
-
-        return leg;
-    }
+	}
 
     /**
      * Add a {@link WalkStep} {@link List} to a {@link Leg} {@link List}.
