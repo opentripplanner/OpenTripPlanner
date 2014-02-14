@@ -21,23 +21,23 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import lombok.Setter;
+
 import org.opentripplanner.geocoder.Geocoder;
 import org.opentripplanner.geocoder.GeocoderResults;
 
+import com.sun.jersey.api.core.InjectParam;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 
 @Path("/geocode")
 public class GeocoderResource {
     
+    @InjectParam @Setter 
     private Geocoder geocoder;
     
-    public void setGeocoder(Geocoder geocoder) {
-        this.geocoder = geocoder;
-    }
-
     @GET
-    @Produces({MediaType.APPLICATION_XML + "; charset=UTF-8", MediaType.APPLICATION_JSON + "; charset=UTF-8"})
+    @Produces({MediaType.APPLICATION_JSON + "; charset=UTF-8"})
     public GeocoderResults geocode(
             @QueryParam("address") String address,
             @QueryParam("bbox") String bbox) {
