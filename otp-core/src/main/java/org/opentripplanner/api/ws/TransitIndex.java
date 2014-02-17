@@ -362,7 +362,7 @@ public class TransitIndex {
     }
 
     /**
-     * Return stop times for a stop, in seconds since the epoch startTime and endTime are in milliseconds since epoch
+     * Return stop times for a stop, in seconds since the epoch.
      */
     @GET
     @Path("/stopTimesForStop")
@@ -373,13 +373,10 @@ public class TransitIndex {
             @QueryParam("references") Boolean references, @QueryParam("routeId") String routeId,
             @QueryParam("routerId") String routerId) throws JSONException {
 
-        startTime /= 1000;
 
         if (endTime == null) {
             endTime = startTime + 86400;
-        } else {
-            endTime /= 1000;
-        }
+        } 
 
         if (endTime - startTime > MAX_STOP_TIME_QUERY_INTERVAL) {
             return new TransitError("Max stop time query interval is " + (endTime - startTime)
@@ -446,7 +443,7 @@ public class TransitIndex {
                 for (StopTime st : getStopTimesForAlightEdge(startTime, endTime, options, e,
                         extended)) {
                     if (!trips.contains(st.trip)) {
-                        // diffrent parameters
+                        // different parameters
                         st.phase = "arrival";
                         if (extended != null && extended.equals(true)) {
                             if (references != null && references.equals(true))
