@@ -232,7 +232,7 @@ public class PlanGenerator {
         /* this is an affront to software development */
         fixupLegs(itinerary.legs, legsStates);
 
-        itinerary.duration = 1000L * lastState.getElapsedTimeSeconds();
+        itinerary.duration = (double) lastState.getElapsedTimeSeconds();
         itinerary.startTime = makeCalendar(states[0]);
         itinerary.endTime = makeCalendar(lastState);
 

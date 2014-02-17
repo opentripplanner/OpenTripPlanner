@@ -267,12 +267,12 @@ public class Leg {
     }
     
     /** 
-     * The leg's duration in milliseconds
+     * The leg's duration in seconds
      */
     @XmlElement
     @JsonSerialize
-    public long getDuration() {
-        return endTime.getTimeInMillis() - startTime.getTimeInMillis();
+    public double getDuration() {
+        return endTime.getTimeInMillis()/1000.0 - startTime.getTimeInMillis()/1000.0;
     }
 
     public void addAlert(Alert alert) {
