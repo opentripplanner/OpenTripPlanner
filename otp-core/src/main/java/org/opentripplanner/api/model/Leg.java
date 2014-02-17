@@ -68,7 +68,7 @@ public class Leg {
     
     /**
      * The best estimate of the time between two arriving vehicles. This is particularly important 
-     * for non-strict frequency trips, but could become important for real-time trips, non-strict 
+     * for non-strict frequency trips, but could become important for real-time trips, strict 
      * frequency trips, and scheduled trips with empirical headways.
      */
     public Integer headway = null;
