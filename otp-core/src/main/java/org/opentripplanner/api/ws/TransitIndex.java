@@ -554,7 +554,7 @@ public class TransitIndex {
     }
 
     /**
-     * Return subsequent stop times for a trip; time is in milliseconds since epoch
+     * Return subsequent stop times for a trip; time is in seconds since epoch
      */
     @GET
     @Path("/stopTimesForTrip")
@@ -564,8 +564,6 @@ public class TransitIndex {
             @QueryParam("tripId") String tripId, @QueryParam("time") long time,
             @QueryParam("extended") Boolean extended, @QueryParam("routerId") String routerId)
             throws JSONException {
-
-        time /= 1000;
 
         AgencyAndId firstStop = null;
         if (stopId != null) {
