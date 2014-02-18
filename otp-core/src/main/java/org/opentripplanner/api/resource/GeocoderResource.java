@@ -28,7 +28,7 @@ import org.opentripplanner.api.parameter.BoundingBox;
 import org.opentripplanner.geocoder.Geocoder;
 import org.opentripplanner.geocoder.GeocoderResults;
 
-import com.sun.jersey.api.core.InjectParam;
+import com.vividsolutions.jts.geom.Envelope;
 
 @Path("/geocode")
 public class GeocoderResource {
@@ -46,7 +46,8 @@ public class GeocoderResource {
         if (address == null) {
             badRequest ("no address");
         }
-        return geocoder.geocode(address, bbox.envelope());
+        Envelope env = (bbox == null) ? null : bbox.envelope();
+        return geocoder.geocode(address, env);
     }
 
     private void badRequest (String message) {
