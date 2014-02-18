@@ -16,6 +16,7 @@ package org.opentripplanner.api.resource;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
@@ -28,7 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.sun.jersey.api.core.InjectParam;
 import com.sun.jersey.api.spring.Autowire;
 
-@Path("/metadata")
+@Path("{routerId}/metadata")
 @XmlRootElement
 @Autowire
 public class Metadata {
@@ -50,9 +51,8 @@ public class Metadata {
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public GraphMetadata getMetadata(
-            @DefaultValue("") @QueryParam("routerId") String routerId)
+            @DefaultValue("default") @PathParam("routerId") String routerId)
             throws JSONException {
-
         GraphMetadata data = getMetadataService().getMetadata(routerId);
         return data;
     }
