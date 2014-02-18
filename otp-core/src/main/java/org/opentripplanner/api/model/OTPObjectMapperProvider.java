@@ -21,7 +21,10 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
  * feed, and the same agency could appear in multiple feeds. We don't want the key "agencyId" to
  * appear in the final OTP API because it will eventually not represent an agency.
  * 
- * See this ticket: And this proposal to gtfs-changes:
+ * See this ticket: https://github.com/opentripplanner/OpenTripPlanner/issues/1352
+ * 
+ * And this proposal to gtfs-changes:
+ * https://groups.google.com/d/msg/gtfs-changes/zVjEoNIPr_Y/4ngWCajPoS0J
  * 
  * Our solution is to serialize the AgencyAndId as a single string with a separator character
  * between the agency and ID. In future versions this scoped identifier will actually represent a
@@ -63,10 +66,10 @@ public class OTPObjectMapperProvider implements ContextResolver<ObjectMapper> {
         mapper.setSerializationInclusion(Include.NON_NULL); // skip null fields
     }
 
-    /** 
-     * When serializing any kind of result, use the same ObjectMapper.
-     * The "type" parameter will be the type of the object being serialized,  
-     * so you could provide different ObjectMappers for different result types.
+    /**
+     * When serializing any kind of result, use the same ObjectMapper. The "type" parameter will be
+     * the type of the object being serialized, so you could provide different ObjectMappers for
+     * different result types.
      */
     @Override
     public ObjectMapper getContext(Class<?> type) {
