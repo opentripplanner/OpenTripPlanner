@@ -20,9 +20,9 @@ otp.namespace("otp.util");
  
 otp.util.Time = {
 
-    msToHrMin : function(ms) {
-        var hrs = Math.floor(ms / 3600000);
-        var mins = Math.floor(ms / 60000) % 60;
+    secsToHrMin : function(secs) {
+        var hrs = Math.floor(secs / 3600);
+        var mins = Math.floor(secs / 60) % 60;
         
         // TODO: localization
         var str = (hrs > 0 ? (hrs +" hr, ") : "") + mins + " min";
@@ -30,10 +30,10 @@ otp.util.Time = {
         return str;
     },
     
-    msToHrMinSec : function(ms) {
-        var hrs = Math.floor(ms / 3600000);
-        var mins = Math.floor(ms / 60000) % 60;
-        var secs = Math.floor(ms / 1000) % 60;
+    secsToHrMinSec : function(secs) {
+        var hrs = Math.floor(secs / 3600);
+        var mins = Math.floor(secs / 60) % 60;
+        var secs = secs % 60;
         
         // TODO: localization
         var str = (hrs > 0 ? (hrs +" hr, ") : "") + (mins > 0 ? (mins +" min, ") : "") + secs + " sec";

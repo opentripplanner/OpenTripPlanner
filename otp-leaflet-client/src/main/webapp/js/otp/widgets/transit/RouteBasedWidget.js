@@ -93,7 +93,7 @@ otp.widgets.transit.RouteBasedWidget =
             for(var i=0; i<data.stopTimes.length; i++) {
                 var st = data.stopTimes[i].StopTime || data.stopTimes[i];
                 if(st.phase == 'departure')
-                    stopTimes.push(st.time*1000);
+                    stopTimes.push(st.time);
             }
             this_.times = stopTimes;
             this_.updateTimes();

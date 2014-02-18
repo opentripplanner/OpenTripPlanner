@@ -542,7 +542,7 @@ otp.widgets.ItinerariesWidget =
 
             var inTransitDiv = $('<div class="otp-itin-leg-elapsedDesc" />').appendTo(legDiv);
 
-            $('<span><i>Time in transit: '+otp.util.Time.msToHrMin(leg.duration)+'</i></span>').appendTo(inTransitDiv);
+            $('<span><i>Time in transit: '+otp.util.Time.secsToHrMin(leg.duration)+'</i></span>').appendTo(inTransitDiv);
 
             $('<span>&nbsp;[<a href="#">Trip Viewer</a>]</span>')
             .appendTo(inTransitDiv)
