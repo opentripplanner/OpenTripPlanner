@@ -439,9 +439,12 @@
         <version>2.0</version>
       </dependency>
       <dependency>
+		<!-- Provides a message body writer for application/json. 
+		     This allows Jersey to write JSON instead of just XML. 
+             https://github.com/FasterXML/jackson-jaxrs-providers -->
         <groupId>com.fasterxml.jackson.jaxrs</groupId>
         <artifactId>jackson-jaxrs-json-provider</artifactId>
-        <version>2.0.4</version>
+		<version>2.3.0</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

@@ -32,8 +32,10 @@ import com.sun.jersey.api.core.InjectParam;
 
 @Path("/geocode")
 public class GeocoderResource {
-    
-    @InjectParam @Setter 
+  
+// uncommenting injectparam will require a specific Geocoder to be instantiated
+//    @InjectParam 
+    @Setter 
     private Geocoder geocoder;
     
     @GET
