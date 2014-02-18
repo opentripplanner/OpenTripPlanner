@@ -37,7 +37,7 @@ otp.modules.analyst.AnalystLegendWidget =
     },
     
     refresh : function(params) {
-	    this.img.attr('src', otp.config.hostname+'/otp-rest-servlet/ws/legend.png?width='+this.imgWidth+'&height='+this.imgHeight+'&styles='
+	    this.img.attr('src', otp.config.hostname+'/otp-rest-servlet/legend.png?width='+this.imgWidth+'&height='+this.imgHeight+'&styles='
 		    + params.styles);
     }
 });
