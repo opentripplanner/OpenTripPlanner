@@ -55,7 +55,8 @@ public class OTPObjectMapperProvider implements ContextResolver<ObjectMapper> {
         // Our module includes a single class-serializer relationship.
         // Constructors are available for both unnamed, unversioned throwaway modules
         // and named, versioned reusable modules.
-        SimpleModule module = new SimpleModule("OTP", Version.unknownVersion());
+        Version moduleVersion = new Version(1, 0, 0, null, null, null);
+        SimpleModule module = new SimpleModule("OTP", moduleVersion);
         module.addSerializer(AgencyAndId.class, new AgencyAndIdSerializer());
         mapper = new ObjectMapper();
         mapper.registerModule(module);
