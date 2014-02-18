@@ -373,7 +373,6 @@
           <!-- Generate REST API documentation from Jersey-annotated classes -->
           <groupId>org.codehaus.enunciate</groupId>
           <artifactId>maven-enunciate-plugin</artifactId>
-          <version>1.27</version>
           <executions>
             <execution>
               <phase>site</phase> <!-- default binding for docs goal is process-sources phase -->

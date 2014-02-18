@@ -146,6 +146,12 @@
             </lifecycleMappingMetadata>
           </configuration>
         </plugin>
+        <plugin>
+          <!-- Generates REST API docs -->
+          <groupId>org.codehaus.enunciate</groupId>
+          <artifactId>maven-enunciate-plugin</artifactId>
+          <version>1.28</version>
+     	</plugin>
       </plugins>
     </pluginManagement>
   </build>
