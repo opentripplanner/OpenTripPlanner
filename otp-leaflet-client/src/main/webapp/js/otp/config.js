@@ -4,12 +4,16 @@ otp.config = {
     locale: otp.locale.English,
 
     /**
-     * The OTP web service locations
+     * Used to construct OTP web service URLs
      */
-    hostname : "",
+    hostname : "", // including protocol part
     //municoderHostname : "http://localhost:8080",
     //datastoreUrl : 'http://localhost:9000',
-
+    
+    // root for client images and templates
+    resourcePath : "", 
+    // location of OTP API root on host
+    restService : "otp-rest-servlet/default/", 
 
     /**
      * Base layers: the base map tile layers available for use by all modules.

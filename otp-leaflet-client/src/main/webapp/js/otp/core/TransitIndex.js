@@ -32,7 +32,7 @@ otp.core.TransitIndex = otp.Class({
             return;
         }
         
-        var url = otp.config.hostname + '/' + otp.config.restService + '/ws/transit/agencyIds';
+        var url = otp.config.hostname + '/' + otp.config.restService + 'transit/agencyIds';
         $.ajax(url, {
             dataType:   'jsonp',
             
@@ -63,7 +63,7 @@ otp.core.TransitIndex = otp.Class({
             return;
         }
         
-        var url = otp.config.hostname + '/' + otp.config.restService + '/ws/transit/routes';
+        var url = otp.config.hostname + '/' + otp.config.restService + 'transit/routes';
         $.ajax(url, {
             dataType:   'jsonp',
             
@@ -115,7 +115,7 @@ otp.core.TransitIndex = otp.Class({
             return;
         }
 
-        var url = otp.config.hostname + '/' + otp.config.restService + '/ws/transit/routeData';
+        var url = otp.config.hostname + '/' + otp.config.restService + 'transit/routeData';
         $.ajax(url, {
             data: {
                 agency : route.routeData.id.agencyId,
@@ -141,7 +141,7 @@ otp.core.TransitIndex = otp.Class({
     
     readVariantForTrip : function(tripAgency, tripId, callbackTarget, callback) {
     
-        var url = otp.config.hostname + '/' + otp.config.restService + '/ws/transit/variantForTrip';
+        var url = otp.config.hostname + '/' + otp.config.restService + 'transit/variantForTrip';
         $.ajax(url, {
             data: {
                 tripAgency : tripAgency,
@@ -192,7 +192,7 @@ otp.core.TransitIndex = otp.Class({
             params.routerId = otp.config.routerId;
         }
         
-        var url = otp.config.hostname + '/' + otp.config.restService + '/ws/transit/stopTimesForStop';
+        var url = otp.config.hostname + '/' + otp.config.restService + 'transit/stopTimesForStop';
         $.ajax(url, {
             data:       params,
             dataType:   'jsonp',
@@ -218,7 +218,7 @@ otp.core.TransitIndex = otp.Class({
             params.routerId = otp.config.routerId;
         }
         
-        var url = otp.config.hostname + '/' + otp.config.restService + '/ws/transit/stopsInRectangle';
+        var url = otp.config.hostname + '/' + otp.config.restService + 'transit/stopsInRectangle';
         $.ajax(url, {
             data:       params,
             dataType:   'jsonp',
@@ -241,7 +241,7 @@ otp.core.TransitIndex = otp.Class({
             params.routerId = otp.config.routerId;
         }
         
-        var url = otp.config.hostname + '/' + otp.config.restService + '/ws/transit/stopData';
+        var url = otp.config.hostname + '/' + otp.config.restService + 'transit/stopData';
         $.ajax(url, {
             data:       params,
             dataType:   'jsonp',
@@ -264,7 +264,7 @@ otp.core.TransitIndex = otp.Class({
             params.routerId = otp.config.routerId;
         }
         
-        var url = otp.config.hostname + '/' + otp.config.restService + '/ws/transit/stopsByName';
+        var url = otp.config.hostname + '/' + otp.config.restService + 'transit/stopsByName';
         $.ajax(url, {
             data:       params,
             dataType:   'jsonp',

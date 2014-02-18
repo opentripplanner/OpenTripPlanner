@@ -147,9 +147,7 @@ public class GrizzlyServer {
                 new String[] { JsonpFilter.class.getName() });
 
         /* ADD A COUPLE OF HANDLERS (~= SERVLETS) */
-        /* 1. A Grizzly wrapper around the Jersey WebApplication. 
-              We cannot set the context path to /otp-rest-servlet/ws
-              https://java.net/jira/browse/GRIZZLY-1481?focusedCommentId=360385&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#action_360385 */
+        /* 1. A Grizzly wrapper around the Jersey WebApplication. */
         HttpHandler handler = ContainerFactory.createContainer(HttpHandler.class, rc, iocFactory);
         httpServer.getServerConfiguration().addHttpHandler(handler, "/otp-rest-servlet/");
         /* 2. A static content server for the client JS apps etc.
