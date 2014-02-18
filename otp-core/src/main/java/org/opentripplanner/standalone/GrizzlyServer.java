@@ -74,6 +74,10 @@ public class GrizzlyServer {
      * Interestingly this even works in Eclipse, but only if you previously ran a
      * command-line Maven build that left a WAR in /target/classes. Therefore we check for the
      * existence of source directories that would be seen from Eclipse, and serve those as fallbacks.
+     * 
+     * TODO: these source dirs should not be fallbacks, they should _override_ the WAR file
+     * because otherwise you have to remember to do a maven clean to be sure of seeing 
+     * live changes to your client code.
      */
     public HttpHandler makeClientStaticHandler () {
         File clientDir = Files.createTempDir();
