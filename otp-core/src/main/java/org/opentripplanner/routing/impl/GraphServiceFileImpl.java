@@ -93,7 +93,7 @@ public class GraphServiceFileImpl implements GraphService {
     }
 
     public Graph getGraph(String routerId) {
-        if (routerId == null || routerId.isEmpty()) {
+        if (routerId == null || routerId.isEmpty() || routerId.equalsIgnoreCase("default")) {
             routerId = defaultRouterId;
             LOG.debug("routerId not specified, set to default of '{}'", routerId);
         }
