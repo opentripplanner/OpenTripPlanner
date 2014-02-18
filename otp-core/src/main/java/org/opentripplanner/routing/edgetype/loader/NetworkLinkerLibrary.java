@@ -26,7 +26,6 @@ import org.opentripplanner.extra_graph.EdgesForRoute;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.factory.LocalStopFinder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
@@ -155,11 +154,6 @@ public class NetworkLinkerLibrary {
      * Private Methods
      ****/
 
-
-    public void markLocalStops() {
-        LocalStopFinder localStopFinder = new LocalStopFinder(index, graph);
-        localStopFinder.markLocalStops();
-    }
 
     public DistanceLibrary getDistanceLibrary() {
         return distanceLibrary ;

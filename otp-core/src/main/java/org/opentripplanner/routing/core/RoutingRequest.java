@@ -193,6 +193,12 @@ public class RoutingRequest implements Cloneable, Serializable {
     public int bikeRentalDropoffCost = 30;
 
     /**
+     * Time to park a car in a park and ride, w/o taking into account driving and walking cost
+     * (time to park, switch off, pick your stuff, lock the car, etc...)
+     */
+    public int carDropoffTime = 120;
+
+    /**
      * How much worse is waiting for a transit vehicle than being on a transit vehicle, as a multiplier. The default value treats wait and on-vehicle
      * time as the same.
      * 
@@ -358,6 +364,13 @@ public class RoutingRequest implements Cloneable, Serializable {
     private AgencyAndId startingTransitTripId;
 
     private boolean walkingBike;
+
+	private double heuristicWeight = 1.0;
+	
+	private boolean softWalkLimiting = false;
+	
+	private double softWalkPenalty = 60.0; // a jump in cost when stepping over the walking limit
+	private double softWalkOverageRate = 5.0; // a jump in cost for every meter over the walking limit
 
     /* CONSTRUCTORS */
 
@@ -1104,4 +1117,5 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     	return preferences_penalty;
     }
+
 }

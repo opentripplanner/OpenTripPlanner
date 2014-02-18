@@ -67,7 +67,7 @@ public class FrequencyBasedTripPattern implements Serializable, TripPattern {
 
     private transient List<Stop> stops;
     
-    boolean exact;
+    private boolean exact;
 
     private int serviceId;
 
@@ -86,6 +86,27 @@ public class FrequencyBasedTripPattern implements Serializable, TripPattern {
         perStopFlags = new int[size];
 
         this.serviceId = serviceId;
+    }
+    
+    /*
+     * Returns the amount of time between two departures of a frequency-based trip. The stopIndex is necessary to establish 
+     */
+    public int getPeriod(int stopIndex, int afterTime) {
+        int stopDepartureTimeOffset = departureTimes[stopIndex];
+        int afterTimeAtStart = afterTime - stopDepartureTimeOffset;
+
+        int timeRange = Arrays.binarySearch(timeRangeStart, afterTimeAtStart);
+
+        if (timeRange < 0) {
+            timeRange = -timeRange - 1;
+            if (timeRange > 0)
+                timeRange -= 1;
+        }
+
+        int frequency = timeRangeFrequency[timeRange];
+        
+        return frequency;
+
     }
 
     public int getNextDepartureTime(int stopIndex, int afterTime, boolean wheelchairAccessible,
@@ -123,7 +144,7 @@ public class FrequencyBasedTripPattern implements Serializable, TripPattern {
         int frequency = timeRangeFrequency[timeRange];
 
         int departureTime;
-        if (exact) {
+        if (isExact()) {
             if (afterTime < firstDepartureTimeInRange) {
                 departureTime = firstDepartureTimeInRange;
             } else {
@@ -188,7 +209,7 @@ public class FrequencyBasedTripPattern implements Serializable, TripPattern {
         
         int arrivalTime;
 
-        if (exact) {
+        if (isExact()) {
 
             if (beforeTime > lastArrivalTimeInRange) {
                 arrivalTime = lastArrivalTimeInRange;
@@ -268,7 +289,7 @@ public class FrequencyBasedTripPattern implements Serializable, TripPattern {
             timeRangeStart[i] = frequency.getStartTime();
             timeRangeEnd[i] = frequency.getEndTime();
             timeRangeFrequency[i] = frequency.getHeadwaySecs();
-            exact = frequency.getExactTimes() == 1; // FIXME: assumes all frequencies work the same
+            setExact(frequency.getExactTimes() == 1); // FIXME: assumes all frequencies work the same
                                                     // way
         }
     }
@@ -312,5 +333,13 @@ public class FrequencyBasedTripPattern implements Serializable, TripPattern {
     public int getServiceId() {
         return serviceId;
     }
+
+	public boolean isExact() {
+		return exact;
+	}
+
+	public void setExact(boolean exact) {
+		this.exact = exact;
+	}
 
 }

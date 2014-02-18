@@ -194,7 +194,7 @@ otp.planner.ItineraryDataFactoryStatic = {
                     verb = this.locale.instructions.bike_toward;
                     template = 'TP_BICYCLE_LEG';
                     containsBikeMode = true;
-                } else if (mode === 'drive') {
+                } else if (mode === 'car') {
                     verb = this.locale.instructions.drive_toward;
                     template = 'TP_CAR_LEG';
                     containsDriveMode = true;

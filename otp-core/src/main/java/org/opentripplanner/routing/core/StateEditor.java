@@ -276,7 +276,7 @@ public class StateEditor {
     public void incrementNumBoardings() {
         cloneStateDataAsNeeded();
         child.stateData.numBoardings++;
-        setEverBoarded();
+        setEverBoarded(true);
     }
 
     /* Basic Setters */
@@ -362,13 +362,7 @@ public class StateEditor {
         child.stateData.numBoardings = numBoardings;
     }
 
-    public void setAlightedLocal(boolean alightedLocal) {
-        cloneStateDataAsNeeded();
-        child.stateData.alightedLocal = alightedLocal;
-    }
-
-    public void setEverBoarded() {
-        if (child.stateData.everBoarded) return;
+    public void setEverBoarded(boolean everBoarded) {
         cloneStateDataAsNeeded();
         child.stateData.everBoarded = true;
     }
@@ -380,6 +374,17 @@ public class StateEditor {
             child.stateData.nonTransitMode = TraverseMode.BICYCLE;
         } else {
             child.stateData.nonTransitMode = TraverseMode.WALK;
+        }
+    }
+    
+    public void setCarParked(boolean carParked) {
+        cloneStateDataAsNeeded();
+        child.stateData.carParked = carParked;
+        if (carParked) {
+            // We do not handle mixed-mode P+BIKE...
+            child.stateData.nonTransitMode = TraverseMode.WALK;
+        } else {
+            child.stateData.nonTransitMode = TraverseMode.CAR;
         }
     }
 
@@ -419,6 +424,7 @@ public class StateEditor {
         child.stateData.zone = state.stateData.zone;
         child.stateData.extensions = state.stateData.extensions;
         child.stateData.usingRentedBike = state.stateData.usingRentedBike;
+        child.stateData.carParked = state.stateData.carParked;
     }
 
     /* PUBLIC GETTER METHODS */
@@ -458,10 +464,6 @@ public class StateEditor {
 
     public int getNumBoardings() {
         return child.getNumBoardings();
-    }
-
-    public boolean isAlightedLocal() {
-        return child.isAlightedLocal();
     }
 
     public boolean isEverBoarded() {

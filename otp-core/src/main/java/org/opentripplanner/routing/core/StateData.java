@@ -48,12 +48,12 @@ public class StateData implements Cloneable {
 
     protected int numBoardings;
 
-    protected boolean alightedLocal;
-
     protected boolean everBoarded;
 
     protected boolean usingRentedBike;
 
+    protected boolean carParked;
+    
     protected Stop previousStop;
 
     protected long lastAlightedTime;

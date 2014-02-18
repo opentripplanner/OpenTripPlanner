@@ -348,6 +348,7 @@ otp.util.OpenLayersUtils = {
         bicycleMarker: 'images/map/trip/mode/bicycle.png',
         fromWalkMarker: 'images/map/trip/start-walk.png',
         fromBicycleMarker: 'images/map/trip/start-bicycle.png',
+        fromCarMarker: 'images/map/trip/start-car.png',
         toMarker: 'images/map/trip/end.png',
         fromMarker: 'images/map/trip/start.png',
         diskMarker: 'images/map/trip/xferdisk.png',
@@ -401,6 +402,12 @@ otp.util.OpenLayersUtils = {
                 graphicYOffset: this.ST_END_OFFSET.y
             },
             fromBicycleMarker: {
+                graphicWidth: this.ST_END_SIZE.w,
+                graphicHeight: this.ST_END_SIZE.h,
+                graphicXOffset: this.ST_END_OFFSET.x,
+                graphicYOffset: this.ST_END_OFFSET.y
+            },
+            fromCarMarker: {
                 graphicWidth: this.ST_END_SIZE.w,
                 graphicHeight: this.ST_END_SIZE.h,
                 graphicXOffset: this.ST_END_OFFSET.x,
