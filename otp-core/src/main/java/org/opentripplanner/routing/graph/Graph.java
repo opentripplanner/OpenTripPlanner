@@ -391,7 +391,7 @@ public class Graph implements Serializable {
      * before the Vertex has any edges, so updating indices on addVertex is insufficient.
      */
     public void rebuildVertexAndEdgeIndices() {
-        this.vertexById = new HashMap<Integer, Vertex>(AbstractVertex.getMaxIndex());
+        this.vertexById = new HashMap<Integer, Vertex>(Vertex.getMaxIndex());
         Collection<Vertex> vertices = getVertices();
         for (Vertex v : vertices) {
             vertexById.put(v.getIndex(), v);

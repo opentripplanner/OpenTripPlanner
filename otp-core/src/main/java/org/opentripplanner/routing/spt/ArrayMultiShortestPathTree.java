@@ -24,7 +24,6 @@ import java.util.Set;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.graph.AbstractVertex;
 import org.opentripplanner.routing.graph.Vertex;
 
 /** Seems to only be used by Raptor. */
@@ -44,7 +43,7 @@ public class ArrayMultiShortestPathTree extends AbstractShortestPathTree {
     public ArrayMultiShortestPathTree(RoutingRequest options) {
         super(options);
         stateSets = new IdentityHashMap<Vertex, List<State>>();
-        maxIndex = AbstractVertex.getMaxIndex();
+        maxIndex = Vertex.getMaxIndex();
         stateSetArray = new List[maxIndex];
     }
 

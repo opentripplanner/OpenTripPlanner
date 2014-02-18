@@ -32,7 +32,6 @@ import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.*;
-import org.opentripplanner.routing.graph.AbstractVertex;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -309,7 +308,7 @@ public class RaptorDataBuilder implements GraphBuilder {
             ListMultimap<Vertex, RaptorRoute> routesForVertex) {
         log.debug("Finding stop-to-stop walk times");
         @SuppressWarnings("unchecked")
-        HashMap<Vertex, T2<Integer, Double>>[] times = new HashMap[AbstractVertex.getMaxIndex()];
+        HashMap<Vertex, T2<Integer, Double>>[] times = new HashMap[Vertex.getMaxIndex()];
         RoutingRequest walkOptions = new RoutingRequest(TraverseMode.WALK);
         walkOptions.setWalkSpeed(minSpeed);
         walkOptions.setArriveBy(true);
@@ -480,7 +479,7 @@ public class RaptorDataBuilder implements GraphBuilder {
         }
 
         ArrayList<ArrayList<Vertex>> verticesForRegion = new ArrayList<ArrayList<Vertex>>();
-        int[] regionsForVertex = new int[AbstractVertex.getMaxIndex()];
+        int[] regionsForVertex = new int[Vertex.getMaxIndex()];
         Arrays.fill(regionsForVertex, -1);
 
         int nRegions = split(verticesForRegion, regionsForVertex, vertices, 0, true, vertices.size() / N_REGIONS);

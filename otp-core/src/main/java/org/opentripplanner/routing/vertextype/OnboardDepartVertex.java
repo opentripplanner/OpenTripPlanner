@@ -13,15 +13,15 @@
 
 package org.opentripplanner.routing.vertextype;
 
-import org.opentripplanner.routing.graph.AbstractVertex;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Vertex;
 
 /**
  * A vertex acting as a starting point for planning a trip while onboard an existing trip.
  * 
  * @author laurent
  */
-public class OnboardDepartVertex extends AbstractVertex {
+public class OnboardDepartVertex extends Vertex {
 
     private static final long serialVersionUID = -6721280275560962711L;
 
