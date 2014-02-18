@@ -246,11 +246,12 @@
         </dependency>
 
         <!-- JSON -->
-        <dependency>
-          <!-- Provides a message body writer for application/json instead of just XML -->
-          <groupId>com.fasterxml.jackson.jaxrs</groupId>
-          <artifactId>jackson-jaxrs-json-provider</artifactId>
-        </dependency>
+		<dependency>
+		  <!-- Provides a message body writer for application/json instead of just XML -->
+		  <!-- https://github.com/FasterXML/jackson-jaxrs-providers -->
+		  <groupId>com.fasterxml.jackson.jaxrs</groupId>
+		  <artifactId>jackson-jaxrs-json-provider</artifactId>
+		</dependency>
         <dependency>
             <groupId>net.sf.json-lib</groupId>
             <artifactId>json-lib</artifactId>
