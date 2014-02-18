@@ -119,7 +119,9 @@ otp.modules.planner.Itinerary = otp.Class({
     },
     
     getDurationStr : function() {
-        return otp.util.Time.secsToHrMin(this.getEndTime() - this.getStartTime());
+    	// even though the API communicates in seconds and timestamps, the timestamps are converted to
+    	// epoch milliseconds for internal representation.
+        return otp.util.Time.secsToHrMin( (this.getEndTime() - this.getStartTime())/1000.0 );
     },
     
     getFareStr : function() {
