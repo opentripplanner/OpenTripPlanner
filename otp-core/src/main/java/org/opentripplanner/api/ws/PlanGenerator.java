@@ -451,7 +451,7 @@ public class PlanGenerator {
                 }
             }
 
-            if (i + 1 < legsStates.length ) {
+            if (i + 1 < legsStates.length) {
                 legs.get(i + 1).from.arrival = legs.get(i).to.arrival;
                 legs.get(i).to.departure = legs.get(i + 1).from.departure;
 
