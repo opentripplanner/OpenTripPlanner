@@ -423,18 +423,18 @@ public class PlanGenerator {
      * Fix up a {@link Leg} {@link List} using the information available at the leg boundaries.
      * This method will fill holes in the arrival and departure times associated with a
      * {@link Place} within a leg and add board and alight rules. It will also ensure that stop
-     * names propagate correctly to the non-transit legs that connect to them. The last {@link Leg}
-     * needs to be treated differently, which causes some code duplication.
+     * names propagate correctly to the non-transit legs that connect to them.
      *
      * @param legs The legs of the itinerary
      * @param legsStates The states that go with the legs
      */
     private void fixupLegs(List<Leg> legs, State[][] legsStates) {
-        Object alightRules[] = new Object[legsStates.length];
-        Object boardRules[] = new Object[legsStates.length];
-
-        // Extract the per-leg trip board and alight rules from the state array
         for (int i = 0; i < legsStates.length; i++) {
+            boolean toOther = i + 1 < legsStates.length && legs.get(i + 1).interlineWithPreviousLeg;
+            boolean fromOther = legs.get(i).interlineWithPreviousLeg;
+            Object boardRule = null;
+            Object alightRule = null;
+
             for (int j = 1; j < legsStates[i].length; j++) {
                 if (legsStates[i][j].getBackEdge() instanceof PatternEdge) {
                     PatternEdge patternEdge = (PatternEdge) legsStates[i][j].getBackEdge();
@@ -446,43 +446,30 @@ public class PlanGenerator {
                     int boardType = (fromIndex != null) ? (tripPattern.getBoardType(fromIndex)) : 0;
                     int alightType = (toIndex != null) ? (tripPattern.getAlightType(toIndex)) : 0;
 
-                    boardRules[i] = TransitUtils.determineBoardAlightType(boardType);
-                    alightRules[i] = TransitUtils.determineBoardAlightType(alightType);
+                    boardRule = TransitUtils.determineBoardAlightType(boardType);
+                    alightRule = TransitUtils.determineBoardAlightType(alightType);
                 }
             }
-        }
 
-        for (int i = 0; i < legsStates.length - 1; i++) {
-            legs.get(i + 1).from.arrival = legs.get(i).to.arrival;
-            legs.get(i).to.departure = legs.get(i + 1).from.departure;
+            if (i + 1 < legsStates.length ) {
+                legs.get(i + 1).from.arrival = legs.get(i).to.arrival;
+                legs.get(i).to.departure = legs.get(i + 1).from.departure;
+
+                if (legs.get(i).isTransitLeg() && !legs.get(i + 1).isTransitLeg()) {
+                    legs.get(i + 1).from = legs.get(i).to;
+                }
+                if (!legs.get(i).isTransitLeg() && legs.get(i + 1).isTransitLeg()) {
+                    legs.get(i).to = legs.get(i + 1).from;
+                }
+            }
 
             if (legs.get(i).isTransitLeg()) {
-                if (boardRules[i] instanceof String && !legs.get(i).interlineWithPreviousLeg) {
-                    legs.get(i).boardRule = (String) boardRules[i];
+                if (boardRule instanceof String && !fromOther) {    // If boarding in some other leg
+                    legs.get(i).boardRule = (String) boardRule;     // (interline), don't board now.
                 }
-                if (alightRules[i] instanceof String && !legs.get(i + 1).interlineWithPreviousLeg) {
-                    legs.get(i).alightRule = (String) alightRules[i];
+                if (alightRule instanceof String && !toOther) {     // If alighting in some other
+                    legs.get(i).alightRule = (String) alightRule;   // leg, don't alight now.
                 }
-            }
-
-            if (legs.get(i).isTransitLeg() && !legs.get(i + 1).isTransitLeg()) {
-                legs.get(i + 1).from = legs.get(i).to;
-            }
-            if (!legs.get(i).isTransitLeg() && legs.get(i + 1).isTransitLeg()) {
-                legs.get(i).to = legs.get(i + 1).from;
-            }
-        }
-
-        Leg lastLeg = legs.get(legs.size() - 1);
-        Object lastBoardRule = boardRules[boardRules.length - 1];
-        Object lastAlightRule = alightRules[alightRules.length - 1];
-
-        if (lastLeg.isTransitLeg()) {
-            if (lastBoardRule instanceof String && !lastLeg.interlineWithPreviousLeg) {
-                lastLeg.boardRule = (String) lastBoardRule;
-            }
-            if (lastAlightRule instanceof String) {
-                lastLeg.alightRule = (String) lastAlightRule;
             }
         }
     }
@@ -623,47 +610,16 @@ public class PlanGenerator {
         Vertex firstVertex = states[0].getVertex();
         Vertex lastVertex = states[states.length - 1].getVertex();
 
-        Edge firstEdge = edges[0];
-        Edge lastEdge = edges[edges.length - 1];
+        Stop firstStop = firstVertex instanceof TransitVertex ?
+                ((TransitVertex) firstVertex).getStop(): null;
+        Stop lastStop = lastVertex instanceof TransitVertex ?
+                ((TransitVertex) lastVertex).getStop(): null;
         TripTimes tripTimes = states[states.length - 1].getTripTimes();
 
-        leg.from = new Place(firstVertex.getX(), firstVertex.getY(), firstVertex.getName(),
-                null, makeCalendar(states[0]));
-        leg.to = new Place(lastVertex.getX(), lastVertex.getY(), lastVertex.getName(),
-                makeCalendar(states[states.length - 1]), null);
-
-        Stop firstStop = null;
-        Stop lastStop = null;
-
-        if (firstVertex instanceof TransitVertex) {
-            firstStop = ((TransitVertex) firstVertex).getStop();
-            leg.from.stopId = firstStop.getId();
-
-            if (firstEdge instanceof OnboardEdge) {
-                leg.from.stopCode = firstStop.getCode();
-                leg.from.platformCode = firstStop.getPlatformCode();
-                leg.from.zoneId = firstStop.getZoneId();
-                leg.from.stopIndex = ((OnboardEdge) firstEdge).getStopIndex();
-                if (tripTimes != null) {
-                    leg.from.stopSequence = tripTimes.getStopSequence(leg.from.stopIndex);
-                }
-            }
-        }
-
-        if (lastVertex instanceof TransitVertex) {
-            lastStop = ((TransitVertex) lastVertex).getStop();
-            leg.to.stopId = lastStop.getId();
-
-            if (lastEdge instanceof OnboardEdge) {
-                leg.to.stopCode = lastStop.getCode();
-                leg.to.platformCode = lastStop.getPlatformCode();
-                leg.to.zoneId = lastStop.getZoneId();
-                leg.to.stopIndex = ((OnboardEdge) lastEdge).getStopIndex() + 1;
-                if (tripTimes != null) {
-                    leg.to.stopSequence = tripTimes.getStopSequence(leg.to.stopIndex);
-                }
-            }
-        }
+        leg.from = makePlace(states[0], firstVertex, edges[0], firstStop, tripTimes);
+        leg.from.arrival = null;
+        leg.to = makePlace(states[states.length - 1], lastVertex, null, lastStop, tripTimes);
+        leg.to.departure = null;
 
         if (showIntermediateStops) {
             leg.stop = new ArrayList<Place>();
@@ -687,24 +643,42 @@ public class PlanGenerator {
                 previousStop = currentStop;
                 if (currentStop == lastStop) break;
 
-                Place place = new Place(vertex.getX(), vertex.getY(), currentStop.getName(),
-                        makeCalendar(states[i]), makeCalendar(states[i]));
-
-                place.stopId = currentStop.getId();
-
-                if (edges[i] instanceof OnboardEdge) {
-                    place.stopCode = currentStop.getCode();
-                    place.platformCode = currentStop.getPlatformCode();
-                    place.zoneId = currentStop.getZoneId();
-                    place.stopIndex = ((OnboardEdge) edges[i]).getStopIndex();
-                    if (tripTimes != null) {
-                        place.stopSequence = tripTimes.getStopSequence(place.stopIndex);
-                    }
-                }
-
-                leg.stop.add(place);
+                leg.stop.add(makePlace(states[i], vertex, edges[i], currentStop, tripTimes));
             }
         }
+    }
+
+    /**
+     * Make a {@link Place} to add to a {@link Leg}.
+     *
+     * @param state The {@link State} that the {@link Place} pertains to.
+     * @param vertex The {@link Vertex} at the {@link State}.
+     * @param edge The {@link Edge} leading out of the {@link Vertex}.
+     * @param stop The {@link Stop} associated with the {@link Vertex}.
+     * @param tripTimes The {@link TripTimes} associated with the {@link Leg}.
+     * @return The resulting {@link Place} object.
+     */
+    private Place makePlace(State state, Vertex vertex, Edge edge, Stop stop, TripTimes tripTimes) {
+        // If no edge was given, it means we're at the end of this leg and need to work around that.
+        boolean endOfLeg = (edge == null);
+        Place place = new Place(vertex.getX(), vertex.getY(), vertex.getName(),
+                makeCalendar(state), makeCalendar(state));
+
+        if (endOfLeg) edge = state.getBackEdge();
+
+        if (vertex instanceof TransitVertex && edge instanceof OnboardEdge) {
+            place.stopId = stop.getId();
+            place.stopCode = stop.getCode();
+            place.platformCode = stop.getPlatformCode();
+            place.zoneId = stop.getZoneId();
+            place.stopIndex = ((OnboardEdge) edge).getStopIndex();
+            if (endOfLeg) place.stopIndex++;
+            if (tripTimes != null) {
+                place.stopSequence = tripTimes.getStopSequence(place.stopIndex);
+            }
+        }
+
+        return place;
     }
 
     /**
