@@ -113,6 +113,12 @@ public class State implements Cloneable {
         this.stateData.opt = options;
         this.stateData.startTime = timeSeconds;
         this.stateData.usingRentedBike = false;
+        boolean parkAndRideEnabled = options.getModes().getCar() && options.getModes().getWalk();
+        this.stateData.carParked = options.isArriveBy() && parkAndRideEnabled;
+        if (parkAndRideEnabled) {
+            this.stateData.nonTransitMode = this.stateData.carParked ? TraverseMode.WALK
+                    : TraverseMode.CAR;
+        }
         this.walkDistance = 0;
         this.time = timeSeconds * 1000;
         if (options.rctx != null) {
@@ -162,7 +168,9 @@ public class State implements Cloneable {
     }
 
     public String toString() {
-        return "<State " + new Date(getTimeInMillis()) + " [" + weight + "] " + (isBikeRenting() ? "BIKE_RENT " : "") + vertex + ">";
+        return "<State " + new Date(getTimeInMillis()) + " [" + weight + "] "
+                + (isBikeRenting() ? "BIKE_RENT " : "") + (isCarParked() ? "CAR_PARKED " : "")
+                + vertex + ">";
     }
     
     public String toStringVerbose() {
@@ -170,7 +178,9 @@ public class State implements Cloneable {
                 " w=" + this.getWeight() + 
                 " t=" + this.getElapsedTimeSeconds() + 
                 " d=" + this.getWalkDistance() + 
-                " b=" + this.getNumBoardings() + ">";
+                " b=" + this.getNumBoardings() +
+                " br=" + this.isBikeRenting() +
+                " pr=" + this.isCarParked() + ">";
     }
     
     /** Returns time in seconds since epoch */
@@ -250,12 +260,21 @@ public class State implements Cloneable {
     public boolean isBikeRenting() {
         return stateData.usingRentedBike;
     }
+    
+    public boolean isCarParked() {
+        return stateData.carParked;
+    }
 
     /**
      * @return True if the state at vertex can be the end of path.
      */
     public boolean isFinal() {
-        return !isBikeRenting();
+        boolean parkAndRide = stateData.opt.getModes().getCar()
+                && stateData.opt.getModes().getWalk();
+        if (stateData.opt.isArriveBy())
+            return !isBikeRenting() && !(parkAndRide && isCarParked());
+        else
+            return !isBikeRenting() && !(parkAndRide && !isCarParked());
     }
 
     public Stop getPreviousStop() {
@@ -287,8 +306,10 @@ public class State implements Cloneable {
         if (other.weight == 0) {
             return false;
         }
-        // Multi-state (bike rental) - no domination for different states
+        // Multi-state (bike rental, P+R) - no domination for different states
         if (isBikeRenting() != other.isBikeRenting())
+            return false;
+        if (isCarParked() != other.isCarParked())
             return false;
 
         if (backEdge != other.getBackEdge() && ((backEdge instanceof PlainStreetEdge)
@@ -470,6 +491,9 @@ public class State implements Cloneable {
         State newState = new State(this.vertex, getTimeSeconds(), stateData.opt.reversedClone());
         newState.stateData.tripTimes = stateData.tripTimes;
         newState.stateData.initialWaitTime = stateData.initialWaitTime;
+        // TODO Check if those two lines are needed:
+        newState.stateData.usingRentedBike = stateData.usingRentedBike;
+        newState.stateData.carParked = stateData.carParked;
         return newState;
     }
 
@@ -717,6 +741,8 @@ public class State implements Cloneable {
 
                 if (orig.isBikeRenting() != orig.getBackState().isBikeRenting())
                     editor.setBikeRenting(!orig.isBikeRenting());
+                if (orig.isCarParked() != orig.getBackState().isCarParked())
+                    editor.setCarParked(!orig.isCarParked());
 
                 editor.setNumBoardings(getNumBoardings() - orig.getNumBoardings());
 

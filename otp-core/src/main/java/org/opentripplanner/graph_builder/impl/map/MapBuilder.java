@@ -13,11 +13,9 @@
 
 package org.opentripplanner.graph_builder.impl.map;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.extra_graph.EdgesForRoute;
@@ -27,13 +25,13 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.transit_index.RouteVariant;
-import org.opentripplanner.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 public class MapBuilder implements GraphBuilder {
     private static final Logger log = LoggerFactory.getLogger(MapBuilder.class);
@@ -70,11 +68,10 @@ public class MapBuilder implements GraphBuilder {
                     List<Coordinate> coordinates = new ArrayList<Coordinate>();
                     for (Edge e : edges) {
                         coordinates.addAll(Arrays.asList(e.getGeometry().getCoordinates()));
-                        MapUtils.addToMapList(edgesForRoute.edgesForRoute, route, e);
+                        edgesForRoute.edgesForRoute.put(route, e);
                     }
                     Coordinate[] coordinateArray = new Coordinate[coordinates.size()];
-                    LineString ls = GeometryUtils.getGeometryFactory().createLineString(coordinates.toArray(coordinateArray));
-                    variant.setGeometry(ls);
+                    LineString ls = GeometryUtils.getGeometryFactory().createLineString(coordinates.toArray(coordinateArray));                    variant.setGeometry(ls);
                 }
             }
         }

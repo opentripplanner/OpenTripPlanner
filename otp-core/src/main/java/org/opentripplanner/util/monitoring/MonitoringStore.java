@@ -13,11 +13,12 @@
 
 package org.opentripplanner.util.monitoring;
 
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.ListMultimap;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-
-import org.opentripplanner.util.MapUtils;
 
 /**
  * This supports the monitoring of various system properties, such as free memory.
@@ -37,16 +38,16 @@ public class MonitoringStore {
 
     private HashMap<String, Long> longs = new HashMap<String, Long>();
 
-    private HashMap<String, List<String>> notes = new HashMap<String, List<String>>();
+    private ListMultimap<String, String> notes = LinkedListMultimap.create();
 
     public void addNote(String k, String v) {
         if (!monitoring.contains(k))
             return;
-        MapUtils.addToMapList(notes, k, v);
+        notes.put(k, v);
     }
 
     public void clearNotes(String k) {
-        notes.remove(k);
+        notes.removeAll(k);
     }
 
     public Long getLong(String k) {

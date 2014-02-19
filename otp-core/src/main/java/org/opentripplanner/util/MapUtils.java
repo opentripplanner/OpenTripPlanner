@@ -47,34 +47,6 @@ public class MapUtils {
         }
         list.add(value);
     }
-    
-    /**
-     * A common pattern: add some items to a list in a hash value, creating that list if
-     * necessary
-     */
-    public static final <T, U> void addToMapList(Map<T, List<U>> mapList,
-            T key, List<U> values) {
-        List<U> list = mapList.get(key);
-        if (list == null) {
-            list = new ArrayList<U>(values.size());
-            mapList.put(key, list);
-        }
-        list.addAll(values);
-    }
-    
-    /**
-     * Remove an item from a list in a hash, destroying that hash value if the list is empty
-     */
-    public static final <T, U> void removeFromMapList(Map<T, List<U>> mapList, T key, U value) {
-        List<U> list = mapList.get(key);
-        if (list == null) {
-            return;
-        }
-        list.remove(value);
-        if (list.isEmpty()) {
-            mapList.remove(key);
-        }
-    }
 
     public static final <T> boolean addToMaxMap(Map<T, Double> map, T key, double value) {
         Double oldValue = map.get(key);
@@ -96,18 +68,6 @@ public class MapUtils {
             if (!list.contains(value)) {
                 list.add(value);
             }
-        }
-    }
-
-    public static <T, U> void addToMapListUnique(Map<T, List<U>> mapList,
-            T key, U value) {
-        List<U> list = mapList.get(key);
-        if (list == null) {
-            list = new ArrayList<U>();
-            mapList.put(key, list);
-        }
-        if (!list.contains(value)) {
-            list.add(value);
         }
     }
 

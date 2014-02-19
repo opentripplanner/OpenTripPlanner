@@ -11,19 +11,24 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.extra_graph;
+package org.opentripplanner.gbannotation;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.opentripplanner.routing.graph.Edge;
+import lombok.AllArgsConstructor;
 
-import java.util.Collection;
+@AllArgsConstructor
+public class ParkAndRideUnlinked extends GraphBuilderAnnotation {
 
-public class EdgesForRoute {
-    public Multimap<AgencyAndId, Edge> edgesForRoute = ArrayListMultimap.create();
+    private static final long serialVersionUID = 1L;
 
-    public Collection<Edge> get(AgencyAndId route) {
-        return edgesForRoute.get(route);
+    public static final String FMT = "Park and ride '%s' (%d) not linked to any streets; it will not be usable.";
+    
+    final String name;
+    
+    final long osmId;
+    
+    @Override
+    public String getMessage() {
+        return String.format(FMT, name, osmId);
     }
+
 }

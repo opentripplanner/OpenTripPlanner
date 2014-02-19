@@ -31,7 +31,6 @@ import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
-import org.opentripplanner.routing.graph.AbstractVertex;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.ArrayMultiShortestPathTree;
@@ -83,7 +82,7 @@ public class TargetBound implements SearchTerminationStrategy, SkipTraverseResul
 
     public ShortestPathTree spt = new ArrayMultiShortestPathTree(options);
 
-    double[] distance = new double[AbstractVertex.getMaxIndex()];
+    double[] distance = new double[Vertex.getMaxIndex()];
 
     public double bestTargetDistance = Double.POSITIVE_INFINITY;
 

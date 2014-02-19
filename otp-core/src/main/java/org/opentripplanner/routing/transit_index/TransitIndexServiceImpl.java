@@ -41,6 +41,8 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.util.MapUtils;
 
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.ListMultimap;
 import com.vividsolutions.jts.geom.Coordinate;
 
 public class TransitIndexServiceImpl implements TransitIndexService, Serializable {
@@ -57,7 +59,7 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
     private HashMap<AgencyAndId, PreAlightEdge> preAlightEdges;
 
     private HashMap<AgencyAndId, PreBoardEdge> preBoardEdges;
-    
+
     private HashMap<AgencyAndId, TableTripPattern> tableTripPatternsByTrip;
 
     private HashMap<AgencyAndId, HashSet<String>> directionsForRoute;
@@ -66,16 +68,16 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
 
     private List<TraverseMode> modes;
 
-    private HashMap<String, List<ServiceCalendar>> calendarsByAgency = new HashMap<String, List<ServiceCalendar>>();
+    private ListMultimap<String, ServiceCalendar> calendarsByAgency = LinkedListMultimap.create();
 
-    private HashMap<String, List<ServiceCalendarDate>> calendarDatesByAgency = new HashMap<String, List<ServiceCalendarDate>>();
+    private ListMultimap<String, ServiceCalendarDate> calendarDatesByAgency = LinkedListMultimap.create();
 
     private HashMap<String, Agency> agencies = new HashMap<String, Agency>();
 
     private HashMap<AgencyAndId, Stop> stops = new HashMap<AgencyAndId, Stop>();
 
     private HashMap<AgencyAndId, Route> routes = new HashMap<AgencyAndId, Route>();
-    
+
     private Coordinate center;
 
     private int overnightBreak;
@@ -173,7 +175,7 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
     public PreAlightEdge getPreAlightEdge(AgencyAndId stop) {
         return preAlightEdges.get(stop);
     }
-    
+
     @Override
     public TableTripPattern getTripPatternForTrip(AgencyAndId tripId) {
         return tableTripPatternsByTrip.get(tripId);
@@ -217,15 +219,14 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
     @Override
     public void addCalendars(Collection<ServiceCalendar> allCalendars) {
         for (ServiceCalendar calendar : allCalendars) {
-            MapUtils.addToMapList(calendarsByAgency, calendar.getServiceId().getAgencyId(),
-                    calendar);
+            calendarsByAgency.put(calendar.getServiceId().getAgencyId(), calendar);
         }
     }
 
     @Override
     public void addCalendarDates(Collection<ServiceCalendarDate> allDates) {
         for (ServiceCalendarDate date : allDates) {
-            MapUtils.addToMapList(calendarDatesByAgency, date.getServiceId().getAgencyId(), date);
+            calendarDatesByAgency.put(date.getServiceId().getAgencyId(), date);
         }
     }
 

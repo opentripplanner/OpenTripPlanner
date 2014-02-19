@@ -24,6 +24,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.LinkedListMultimap;
+import com.google.common.collect.ListMultimap;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
@@ -544,15 +547,15 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
             }
 
             /* next, do routes have a unique start, end, or via? */
-            HashMap<String, List<RouteVariant>> starts = new HashMap<String, List<RouteVariant>>();
-            HashMap<String, List<RouteVariant>> ends = new HashMap<String, List<RouteVariant>>();
-            HashMap<String, List<RouteVariant>> vias = new HashMap<String, List<RouteVariant>>();
+            ListMultimap<String, RouteVariant> starts = ArrayListMultimap.create();
+            ListMultimap<String, RouteVariant> ends = ArrayListMultimap.create();
+            ListMultimap<String, RouteVariant> vias = ArrayListMultimap.create();
             for (RouteVariant variant : variants) {
                 List<Stop> stops = variant.getStops();
-                MapUtils.addToMapList(starts, getName(stops.get(0)), variant);
-                MapUtils.addToMapList(ends, getName(stops.get(stops.size() - 1)), variant);
+                starts.put(getName(stops.get(0)), variant);
+                ends.put(getName(stops.get(stops.size() - 1)), variant);
                 for (Stop stop : stops) {
-                    MapUtils.addToMapList(vias, getName(stop), variant);
+                    vias.put(getName(stop), variant);
                 }
             }
 

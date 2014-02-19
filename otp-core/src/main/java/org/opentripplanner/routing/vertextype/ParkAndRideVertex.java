@@ -11,16 +11,31 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.graph;
+package org.opentripplanner.routing.vertextype;
+
+import lombok.Getter;
+import lombok.Setter;
+
+import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 
 /**
- * Seems to be used only in tests. As far as I know this is not used in normal routing (abyrd).
+ * A vertex for a park and ride area.
+ * 
+ * @author laurent
+ * 
  */
-public class SimpleConcreteVertex extends Vertex {
+public class ParkAndRideVertex extends Vertex {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
-    public SimpleConcreteVertex(Graph g, String label, double lat, double lon) {
-        super(g, label, lon, lat);
+    @Getter
+    @Setter
+    private String id;
+
+    public ParkAndRideVertex(Graph g, String label, String id, double x, double y, String name) {
+        super(g, label, x, y, name);
+        setId(id);
     }
 }

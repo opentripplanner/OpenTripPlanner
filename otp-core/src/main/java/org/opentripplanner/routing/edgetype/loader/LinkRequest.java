@@ -348,7 +348,7 @@ public class LinkRequest {
         if (linker.edgesForRoute != null && linker.transitIndex != null) {
             nearbyEdges = new ArrayList<Edge>();
             for (AgencyAndId route : linker.transitIndex.getRoutesForStop(v.getStopId())) {
-                List<Edge> edges = linker.edgesForRoute.get(route);
+                Collection<Edge> edges = linker.edgesForRoute.get(route);
                 if (edges != null) {
                     nearbyEdges.addAll(edges);
                 }

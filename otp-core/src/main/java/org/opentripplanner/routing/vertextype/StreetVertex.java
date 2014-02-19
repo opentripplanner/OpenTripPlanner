@@ -13,8 +13,8 @@
 
 package org.opentripplanner.routing.vertextype;
 
-import org.opentripplanner.routing.graph.AbstractVertex;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -23,7 +23,7 @@ import com.vividsolutions.jts.geom.Coordinate;
  * This includes both vertices representing intersections or points (IntersectionVertices) 
  * and Elevator*Vertices.
  */
-public abstract class StreetVertex extends AbstractVertex {
+public abstract class StreetVertex extends Vertex {
 
     private static final long serialVersionUID = 1L;
 
