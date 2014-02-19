@@ -644,7 +644,9 @@ public class PlanGenerator {
                 leg.from.platformCode = firstStop.getPlatformCode();
                 leg.from.zoneId = firstStop.getZoneId();
                 leg.from.stopIndex = ((OnboardEdge) firstEdge).getStopIndex();
-                leg.from.stopSequence = tripTimes.getStopSequence(leg.from.stopIndex);
+                if (tripTimes != null) {
+                    leg.from.stopSequence = tripTimes.getStopSequence(leg.from.stopIndex);
+                }
             }
         }
 
@@ -657,7 +659,9 @@ public class PlanGenerator {
                 leg.to.platformCode = lastStop.getPlatformCode();
                 leg.to.zoneId = lastStop.getZoneId();
                 leg.to.stopIndex = ((OnboardEdge) lastEdge).getStopIndex() + 1;
-                leg.to.stopSequence = tripTimes.getStopSequence(leg.to.stopIndex);
+                if (tripTimes != null) {
+                    leg.to.stopSequence = tripTimes.getStopSequence(leg.to.stopIndex);
+                }
             }
         }
 
@@ -693,7 +697,9 @@ public class PlanGenerator {
                     place.platformCode = currentStop.getPlatformCode();
                     place.zoneId = currentStop.getZoneId();
                     place.stopIndex = ((OnboardEdge) edges[i]).getStopIndex();
-                    place.stopSequence = tripTimes.getStopSequence(place.stopIndex);
+                    if (tripTimes != null) {
+                        place.stopSequence = tripTimes.getStopSequence(place.stopIndex);
+                    }
                 }
 
                 leg.stop.add(place);
