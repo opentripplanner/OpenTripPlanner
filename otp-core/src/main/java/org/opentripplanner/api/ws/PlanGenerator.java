@@ -43,6 +43,8 @@ import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.FreeEdge;
+import org.opentripplanner.routing.edgetype.FrequencyBasedTripPattern;
+import org.opentripplanner.routing.edgetype.FrequencyBoard;
 import org.opentripplanner.routing.edgetype.OnboardEdge;
 import org.opentripplanner.routing.edgetype.PatternEdge;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
@@ -227,9 +229,10 @@ public class PlanGenerator {
 
         addWalkSteps(itinerary.legs, legsStates);
 
+        /* this is an affront to software development */
         fixupLegs(itinerary.legs, legsStates);
 
-        itinerary.duration = 1000L * lastState.getElapsedTimeSeconds();
+        itinerary.duration = (double) lastState.getElapsedTimeSeconds();
         itinerary.startTime = makeCalendar(states[0]);
         itinerary.endTime = makeCalendar(lastState);
 
@@ -360,7 +363,7 @@ public class PlanGenerator {
             edges[i] = states[i + 1].getBackEdge();
             leg.distance += edges[i].getDistance();
         }
-
+        
         addModeAndAlerts(leg, states);
 
         TimeZone timeZone = leg.startTime.getTimeZone();
@@ -378,11 +381,28 @@ public class PlanGenerator {
         leg.legGeometry = PolylineEncoder.createEncodings(geometry);
 
         leg.interlineWithPreviousLeg = states[0].getBackEdge() instanceof PatternInterlineDwell;
-
+        
+        addFrequencyFields(states, leg);
+        
         leg.rentedBike = states[0].isBikeRenting() && states[states.length - 1].isBikeRenting();
 
         return leg;
     }
+
+	private void addFrequencyFields(State[] states, Leg leg) {
+		if( states[0].getBackEdge() instanceof FrequencyBoard ){
+        	State preBoardState= states[0].getBackState();
+        	
+        	FrequencyBoard fb = (FrequencyBoard)states[0].getBackEdge();
+        	FrequencyBasedTripPattern pt = fb.getPattern();
+        	int boardTime = preBoardState.getServiceDay().secondsSinceMidnight( preBoardState.getTimeSeconds() );
+        	int period = pt.getPeriod( fb.getStopIndex(), boardTime ); //TODO fix
+        	
+        	leg.isNonExactFrequency = !pt.isExact();
+        	leg.headway = period;
+        	
+        }
+	}
 
     /**
      * Add a {@link WalkStep} {@link List} to a {@link Leg} {@link List}.

@@ -496,7 +496,12 @@ otp.widgets.ItinerariesWidget =
             
             // show the start time and stop
 
-            $('<div class="otp-itin-leg-leftcol">'+otp.util.Time.formatItinTime(leg.startTime, "h:mma")+"</div>").appendTo(legDiv);
+            // prevaricate if this is a nonstruct frequency trip
+            if( leg.isNonExactFrequency === true ){
+            	$('<div class="otp-itin-leg-leftcol">every '+(leg.headway/60)+" mins</div>").appendTo(legDiv);
+            } else {
+                $('<div class="otp-itin-leg-leftcol">'+otp.util.Time.formatItinTime(leg.startTime, "h:mma")+"</div>").appendTo(legDiv);
+            }
 
             var startHtml = '<div class="otp-itin-leg-endpointDesc">' + (leg.interlineWithPreviousLeg ? "<b>Depart</b> " : "<b>Board</b> at ") +leg.from.name;
             if(otp.config.municoderHostname) {
@@ -537,7 +542,7 @@ otp.widgets.ItinerariesWidget =
 
             var inTransitDiv = $('<div class="otp-itin-leg-elapsedDesc" />').appendTo(legDiv);
 
-            $('<span><i>Time in transit: '+otp.util.Time.msToHrMin(leg.duration)+'</i></span>').appendTo(inTransitDiv);
+            $('<span><i>Time in transit: '+otp.util.Time.secsToHrMin(leg.duration)+'</i></span>').appendTo(inTransitDiv);
 
             $('<span>&nbsp;[<a href="#">Trip Viewer</a>]</span>')
             .appendTo(inTransitDiv)
@@ -596,7 +601,11 @@ otp.widgets.ItinerariesWidget =
 
             $('<div class="otp-itin-leg-buffer"></div>').appendTo(legDiv);            
 
-            $('<div class="otp-itin-leg-leftcol">'+otp.util.Time.formatItinTime(leg.endTime, "h:mma")+"</div>").appendTo(legDiv);           
+            if( leg.isNonExactFrequency === true ) {
+            	$('<div class="otp-itin-leg-leftcol">late as '+otp.util.Time.formatItinTime(leg.endTime, "h:mma")+"</div>").appendTo(legDiv);   
+            } else {
+            	$('<div class="otp-itin-leg-leftcol">'+otp.util.Time.formatItinTime(leg.endTime, "h:mma")+"</div>").appendTo(legDiv);   
+            }
 
             var endAction = (nextLeg && nextLeg.interlineWithPreviousLeg) ? "Stay on board" : "Alight";
             var endHtml = '<div class="otp-itin-leg-endpointDesc"><b>' + endAction + '</b> at '+leg.to.name;

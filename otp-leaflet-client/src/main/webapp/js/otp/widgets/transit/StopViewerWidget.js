@@ -52,7 +52,7 @@ otp.widgets.transit.StopViewerWidget =
         this.datePicker = this.mainDiv.find(".otp-stopViewer-dateInput");
         this.datePicker.datepicker({
             onSelect: function(date) {
-                this_.activeTime = moment(date).unix()*1000 + moment(this_.activeTime).hours()*3600000 + moment(this_.activeTime).minutes()*60000;
+                this_.activeTime = moment(date).unix() + moment(this_.activeTime).hours()*3600 + moment(this_.activeTime).minutes()*60;
                 this_.clearTimes();
                 this_.runTimesQuery();
             }
@@ -82,8 +82,8 @@ otp.widgets.transit.StopViewerWidget =
     
     runTimesQuery : function() {
         var this_ = this;
-        var startTime = moment(this.datePicker.val()).add("hours", -otp.config.timeOffset).unix()*1000;
-        this.module.webapp.transitIndex.runStopTimesQuery2(this.agencyId, this.stopId, startTime+10800000, startTime+97200000, this, function(data) {
+        var startTime = moment(this.datePicker.val()).add("hours", -otp.config.timeOffset).unix();
+        this.module.webapp.transitIndex.runStopTimesQuery2(this.agencyId, this.stopId, startTime+10800, startTime+97200, this, function(data) {
             this_.times = [];
             for(var i=0; i < data.stopTimes.length; i++) {
                 var time = data.stopTimes[i];
@@ -100,9 +100,9 @@ otp.widgets.transit.StopViewerWidget =
         var bestIndex = 0;
         for(var i = 0; i < this.times.length; i++) {
             var time = this.times[i];
-            time.formattedTime = otp.util.Time.formatItinTime(time.time * 1000, "h:mma");
+            time.formattedTime = otp.util.Time.formatItinTime(time.time, "h:mma");
             ich['otp-stopViewer-timeListItem'](time).appendTo(this.timeList);
-            var diff = Math.abs(this.activeTime - time.time*1000);
+            var diff = Math.abs(this.activeTime - time.time);
             if(diff < minDiff) {
                 minDiff = diff;
                 bestIndex = i;

@@ -365,6 +365,13 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     private boolean walkingBike;
 
+	private double heuristicWeight = 1.0;
+	
+	private boolean softWalkLimiting = false;
+	
+	private double softWalkPenalty = 60.0; // a jump in cost when stepping over the walking limit
+	private double softWalkOverageRate = 5.0; // a jump in cost for every meter over the walking limit
+
     /* CONSTRUCTORS */
 
     /** Constructor for options; modes defaults to walk and transit */
@@ -1110,4 +1117,5 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     	return preferences_penalty;
     }
+
 }

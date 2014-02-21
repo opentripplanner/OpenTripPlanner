@@ -185,8 +185,8 @@ otp.core.TransitIndex = otp.Class({
         var params = {
             agency: stopId.agencyId,
             id: stopId.id,
-            startTime : time-hrs*3600000,
-            endTime : time+hrs*3600000
+            startTime : time-hrs*3600,
+            endTime : time+hrs*3600
         };
         if(otp.config.routerId !== undefined) {
             params.routerId = otp.config.routerId;
@@ -202,7 +202,7 @@ otp.core.TransitIndex = otp.Class({
                 for(var i=0; i<data.stopTimes.length; i++) {
                     var st = data.stopTimes[i].StopTime || data.stopTimes[i];
                     if(st.phase == 'departure')
-                        stopTimes.push(st.time*1000);
+                        stopTimes.push(st.time);
                 }
                 this_.stopTimesMap[stopId.id] = stopTimes;*/
                 callback.call(callbackTarget, data);                
