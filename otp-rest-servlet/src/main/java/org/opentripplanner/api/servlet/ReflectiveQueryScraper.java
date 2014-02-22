@@ -17,15 +17,15 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.ServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.primitives.Primitives;
 
 /**
  * A Servlet filter that constructs new objects of a given class, using reflection to pull their 
@@ -58,25 +58,24 @@ public class ReflectiveQueryScraper {
         targets = new HashSet<Target>();
         for (Field field : targetClass.getFields()) {
             Target target = FieldTarget.instanceFor(field);
-            if (target != null)
-                targets.add(target);
+            if (target != null) targets.add(target);
         }
+        /* Scan methods after fields, so they will override fields with the same name. */
         for (Method method : targetClass.getMethods()) {
             Target target = MethodTarget.instanceFor(method);
-            if (target != null)
-                targets.add(target);
+            if (target != null) targets.add(target);
         }
         LOG.info("initialized query scraper for: {}", targetClass);
-        for (Target t : targets)
+        for (Target t : targets) {
             LOG.info("-- {}", t);
+        }
     }
 
     public Object scrape(ServletRequest request) {
         Object obj = null;
         try {
             obj = targetClass.newInstance();
-            for (Target t : targets)
-                t.apply(request, obj);
+            for (Target t : targets) t.apply(request, obj);
         } catch (Exception e) {
             LOG.warn("exception {} while scraping {}", e, targetClass);
         }
@@ -121,8 +120,7 @@ public class ReflectiveQueryScraper {
         }
         static Target instanceFor(Field f) {
             Constructor<?> c = stringConstructor(f.getType());
-            if (c == null)
-                return null;
+            if (c == null) return null;
             return new FieldTarget(f, c);
         }
         @Override
@@ -174,33 +172,13 @@ public class ReflectiveQueryScraper {
     }   
     
     public static Constructor<?> stringConstructor(Class<?> clazz) {
-        clazz = filterPrimitives(clazz);
+        clazz = Primitives.wrap(clazz);
         for (Constructor<?> constructor : clazz.getDeclaredConstructors()) {
             Class<?>[] params = constructor.getParameterTypes();
-            if (params.length != 1)
-                continue;
-            if (params[0].equals(String.class))
-                return constructor;
+            if (params.length != 1) continue;
+            if (params[0].equals(String.class)) return constructor;
         }
         return null;
     }
 
-    // Amazingly, there is really no better way of doing this. 
-    // Guava does provide wrap/unwrap implementations in Primitives.
-    public static Class<?> filterPrimitives(Class<?> clazz) {
-        if (WRAPPERS.containsKey(clazz))
-            return WRAPPERS.get(clazz);
-        return clazz;
-    }
-
-    public static Map<Class<?>, Class<?>> WRAPPERS = new HashMap<Class<?>, Class<?>>();
-    static {
-        WRAPPERS.put(boolean.class, Boolean.class);
-        WRAPPERS.put(byte.class,    Byte.class);
-        WRAPPERS.put(double.class,  Double.class);
-        WRAPPERS.put(float.class,   Float.class);
-        WRAPPERS.put(int.class,     Integer.class);
-        WRAPPERS.put(long.class,    Long.class);
-        WRAPPERS.put(short.class,   Short.class);
-    }
 }
