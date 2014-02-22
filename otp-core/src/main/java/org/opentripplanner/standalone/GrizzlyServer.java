@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.ws.rs.core.HttpHeaders;
+
 import net.lingala.zip4j.core.ZipFile;
 
 import org.glassfish.grizzly.http.server.HttpHandler;
@@ -15,6 +17,9 @@ import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.NetworkListener;
 import org.glassfish.grizzly.http.server.StaticHttpHandler;
 import org.glassfish.grizzly.threadpool.ThreadPoolConfig;
+import org.opentripplanner.api.OTPHttpHandler;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -155,6 +160,11 @@ public class GrizzlyServer {
               from ./ we can reach e.g. target/classes/data-sources.xml */
         HttpHandler staticHandler = makeClientStaticHandler();
         httpServer.getServerConfiguration().addHttpHandler(staticHandler, "/");
+        /* 3. Test alternate method. */
+        // like in servlets, * needed in base path to identify the "rest" of the path
+        GraphService gs = (GraphService) iocFactory.getComponentProvider(GraphService.class).getInstance();
+        Graph graph = gs.getGraph();
+        httpServer.getServerConfiguration().addHttpHandler(new OTPHttpHandler(graph), "/test/*"); 
 
         for (NetworkListener l : httpServer.getListeners()) { l.getFileCache().setEnabled(false); }
         
