@@ -5,12 +5,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 
 /**
  * AgencyAndId is a third-party class in One Bus Away which represents a GTFS element's ID,
@@ -58,11 +54,8 @@ public class OTPObjectMapperProvider implements ContextResolver<ObjectMapper> {
         // Our module includes a single class-serializer relationship.
         // Constructors are available for both unnamed, unversioned throwaway modules
         // and named, versioned reusable modules.
-        Version moduleVersion = new Version(1, 0, 0, null, null, null);
-        SimpleModule module = new SimpleModule("OTP", moduleVersion);
-        module.addSerializer(AgencyAndId.class, new AgencyAndIdSerializer());
         mapper = new ObjectMapper();
-        mapper.registerModule(module);
+        mapper.registerModule(AgencyAndIdSerializer.makeModule());
         mapper.setSerializationInclusion(Include.NON_NULL); // skip null fields
     }
 
