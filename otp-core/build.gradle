@@ -1,0 +1,145 @@
+// The 'buildscript' block specified dependencies for the execution of the Gradle build script itself
+buildscript {
+    // https://github.com/johnrengelman/shadow
+    // which will merge JAR files without ruining their META-INF
+    repositories { jcenter() }
+    dependencies { classpath 'com.github.jengelman.gradle.plugins:shadow:0.8' }
+}
+
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'shadow'
+
+version = '1.0'
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'org.opentripplanner.standalone.OTPMain'
+    }
+}
+
+repositories {
+    mavenLocal()
+    maven { url 'http://download.osgeo.org/webdav/geotools/' }
+    mavenCentral()
+    maven { url "http://nexus.onebusaway.org/content/repositories/releases/" }
+    maven { url "http://people.apache.org/repo/m1-ibiblio-rsync-repository/org.apache.axis2/" }
+    maven { url "http://repo.opengeo.org/" }
+    maven { url "http://download.java.net/maven/2/" }
+}
+
+dependencies {
+    compile group: 'net.sf.json-lib', name: 'json-lib', version: '2.1', classifier: 'jdk15'
+    compile 'aopalliance:aopalliance:1.0'
+    compile 'asm:asm:3.3.1'
+    compile 'cglib:cglib:2.2.2'
+    compile 'ch.qos.logback:logback-classic:1.0.13'
+    compile 'ch.qos.logback:logback-core:1.0.13'
+    compile 'com.beust:jcommander:1.27'
+    compile 'com.fasterxml.jackson.core:jackson-annotations:2.3.0'
+    compile 'com.fasterxml.jackson.core:jackson-core:2.3.0'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.3.0'
+    compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.3.0'
+    compile 'com.fasterxml.jackson.jaxrs:jackson-jaxrs-base:2.3.0'
+    compile 'com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:2.3.0'
+    compile 'com.fasterxml.jackson.module:jackson-module-jaxb-annotations:2.3.0'
+    compile 'com.google.guava:guava:14.0.1'
+    compile 'com.google.protobuf:protobuf-java:2.5.0'
+    compile 'com.googlecode.json-simple:json-simple:1.1'
+    compile 'com.jamesmurty.utils:java-xmlbuilder:0.4'
+    compile 'com.ning:async-http-client:1.7.19'
+    compile 'com.sun.jersey:jersey-core:1.17.1'
+    compile 'com.sun.jersey:jersey-grizzly2:1.17.1'
+    compile 'com.sun.jersey:jersey-server:1.17.1'
+    compile 'com.sun.jersey:jersey-servlet:1.17.1'
+    compile 'com.sun.jersey.contribs:jersey-spring:1.9.1'
+    compile 'com.vividsolutions:jts:1.13'
+    compile 'commons-beanutils:commons-beanutils:1.7.0'
+    compile 'commons-codec:commons-codec:1.3'
+    compile 'commons-collections:commons-collections:3.2'
+    compile 'commons-discovery:commons-discovery:0.4'
+    compile 'commons-httpclient:commons-httpclient:3.1'
+    compile 'commons-lang:commons-lang:2.6'
+    compile 'commons-logging:commons-logging:1.1.1'
+    compile 'commons-pool:commons-pool:1.5.4'
+    compile 'crosby.binary:osmpbf:1.2.1'
+    compile 'hsqldb:hsqldb:1.8.0.7'
+    compile 'io.netty:netty:3.6.6.Final'
+    compile 'it.geosolutions.imageio-ext:imageio-ext-arcgrid:1.1.7'
+    compile 'it.geosolutions.imageio-ext:imageio-ext-streams:1.1.7'
+    compile 'it.geosolutions.imageio-ext:imageio-ext-tiff:1.1.7'
+    compile 'it.geosolutions.imageio-ext:imageio-ext-utilities:1.1.7'
+    compile 'java3d:vecmath:1.3.2'
+    compile 'javassist:javassist:3.8.0.GA'
+    compile 'javax.annotation:jsr250-api:1.0'
+    compile 'javax.inject:javax.inject:1'
+    compile 'javax.media:jai_codec:1.1.3'
+    compile 'javax.media:jai_core:1.1.3'
+    compile 'javax.media:jai_imageio:1.1'
+    compile 'javax.servlet:servlet-api:2.5'
+    compile 'javax.xml.stream:stax-api:1.0-2'
+    compile 'jdom:jdom:1.0'
+    compile 'jgridshift:jgridshift:1.0'
+    compile 'joda-time:joda-time:2.1'
+    compile 'net.java.dev.jets3t:jets3t:0.8.1'
+    compile 'net.java.dev.jsr-275:jsr-275:1.0-beta-2'
+    compile 'net.lingala.zip4j:zip4j:1.3.1'
+    compile 'net.sf.ezmorph:ezmorph:1.0.3'
+    compile 'net.sf.flexjson:flexjson:2.0'
+    compile 'net.sourceforge.javacsv:javacsv:2.0'
+    compile 'org.apache.axis:axis:1.4'
+    compile 'org.apache.axis:axis-jaxrpc:1.4'
+    compile 'org.apache.commons:commons-compress:1.0'
+    compile 'org.apache.commons:commons-math3:3.0'
+    compile 'org.apache.httpcomponents:httpclient:4.1.2'
+    compile 'org.apache.httpcomponents:httpcore:4.1.2'
+    compile 'org.aspectj:aspectjrt:1.6.8'
+    compile 'org.aspectj:aspectjweaver:1.6.8'
+    compile 'org.codehaus.jettison:jettison:1.1'
+    compile 'org.codehaus.woodstox:stax2-api:3.1.1'
+    compile 'org.geotools:gt-api:9.2'
+    compile 'org.geotools:gt-arcgrid:9.2'
+    compile 'org.geotools:gt-coverage:9.2'
+    compile 'org.geotools:gt-data:9.2'
+    compile 'org.geotools:gt-epsg-hsql:9.2'
+    compile 'org.geotools:gt-geojson:9.2'
+    compile 'org.geotools:gt-geotiff:9.2'
+    compile 'org.geotools:gt-main:9.2'
+    compile 'org.geotools:gt-metadata:9.2'
+    compile 'org.geotools:gt-opengis:9.2'
+    compile 'org.geotools:gt-referencing:9.2'
+    compile 'org.geotools:gt-shapefile:9.2'
+    compile 'org.glassfish.grizzly:grizzly-framework:2.2.16'
+    compile 'org.glassfish.grizzly:grizzly-http:2.2.16'
+    compile 'org.glassfish.grizzly:grizzly-http-server:2.2.16'
+    compile 'org.glassfish.grizzly:grizzly-rcm:2.2.16'
+    compile 'org.jaitools:jt-utils:1.3.0'
+    compile 'org.jaitools:jt-zonalstats:1.3.0'
+    compile 'org.jeromq:jeromq:0.2.0'
+    compile 'org.onebusaway:onebusaway-csv-entities:1.1.2'
+    compile 'org.onebusaway:onebusaway-gtfs:1.3.3'
+    compile 'org.processing:core:1.0.7'
+    compile 'org.projectlombok:lombok:0.11.8'
+    compile 'org.slf4j:jcl-over-slf4j:1.7.5'
+    compile 'org.slf4j:jul-to-slf4j:1.7.5'
+    compile 'org.slf4j:slf4j-api:1.7.5'
+    compile 'org.springframework:spring-aop:3.0.5.RELEASE'
+    compile 'org.springframework:spring-asm:3.0.5.RELEASE'
+    compile 'org.springframework:spring-beans:3.0.5.RELEASE'
+    compile 'org.springframework:spring-context:3.0.5.RELEASE'
+    compile 'org.springframework:spring-core:3.0.5.RELEASE'
+    compile 'org.springframework:spring-expression:3.0.5.RELEASE'
+    compile 'org.springframework:spring-jdbc:3.0.5.RELEASE'
+    compile 'org.springframework:spring-orm:3.0.5.RELEASE'
+    compile 'org.springframework:spring-tx:3.0.5.RELEASE'
+    compile 'org.springframework:spring-web:3.0.5.RELEASE'
+    compile 'org.springframework.security:spring-security-config:3.0.5.RELEASE'
+    compile 'org.springframework.security:spring-security-core:3.0.5.RELEASE'
+    compile 'org.springframework.security:spring-security-web:3.0.5.RELEASE'
+    compile 'stax:stax-api:1.0.1'
+    testCompile 'junit:junit:4.8.1'
+    testCompile 'com.sun.jersey:jersey-client:1.17.1'
+    testCompile 'org.mockito:mockito-all:1.9.0'
+}
+
+
