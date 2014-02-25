@@ -13,6 +13,13 @@
 
     <dependencies>
 
+		<dependency>
+			<!-- MapDB, for GTFS loading experiments. -->
+		    <groupId>org.mapdb</groupId>
+		    <artifactId>mapdb</artifactId>
+		    <version>0.9.10</version>
+		</dependency>
+
       <!-- OTP MODULES -->
       
       <dependency>
