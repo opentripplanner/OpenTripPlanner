@@ -267,9 +267,10 @@ public class PlanGenerator {
                     startWalk = i;
                 } else if (mode == TraverseMode.BOARDING) {
                     // this itinerary starts with transit
-                    pgstate = PlanGenState.PRETRANSIT;
+                	pgstate = PlanGenState.PRETRANSIT;
                     leg = makeLeg(itinerary, state);
                     leg.from.orig = nextName;
+                    leg.from.stopIndex = ((OnBoardForwardEdge)backEdge).getStopIndex();
                     itinerary.transfers++;
                     startWalk = -1;
                 } else if (mode == TraverseMode.STL) {
