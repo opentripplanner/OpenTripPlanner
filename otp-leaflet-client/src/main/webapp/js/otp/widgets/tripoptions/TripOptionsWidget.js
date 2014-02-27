@@ -304,7 +304,7 @@ otp.widgets.tripoptions.TimeSelector =
             widgetId : this.id,
         }).appendTo(this.$());
     
-        this.epoch = moment().unix()*1000;    
+        this.epoch = moment().unix();    
     },
 
     doAfterLayout : function() {
@@ -939,7 +939,7 @@ otp.widgets.tripoptions.TripSummary =
         }
     	
         $("#"+this.id+"-distance").html(otp.util.Geo.distanceString(dist));
-        $("#"+this.id+"-duration").html(otp.util.Time.msToHrMin(itin.duration));	
+        $("#"+this.id+"-duration").html(otp.util.Time.secsToHrMin(itin.duration));	
         
         var timeByMode = { };
         for(var i=0; i < itin.legs.length; i++) {
@@ -953,7 +953,7 @@ otp.widgets.tripoptions.TripSummary =
         
         var summaryStr = "";
         for(mode in timeByMode) {
-            summaryStr += otp.util.Time.msToHrMin(timeByMode[mode]) + " " + this.getModeName(mode) + " / ";
+            summaryStr += otp.util.Time.secsToHrMin(timeByMode[mode]) + " " + this.getModeName(mode) + " / ";
         }
         summaryStr = summaryStr.slice(0, -3);
         $("#"+this.id+"-timeSummary").html(summaryStr);	

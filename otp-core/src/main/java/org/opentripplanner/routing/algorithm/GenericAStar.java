@@ -41,7 +41,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.beust.jcommander.internal.Lists;
-import com.vividsolutions.jts.geom.Coordinate;
 
 /**
  * Find the shortest path between graph vertices using A*.
@@ -62,7 +61,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     private TraverseVisitor traverseVisitor;
     
     /** The number of paths to attempt to find */
-    @Setter private int nPaths = 1;
+    @Setter private int nPaths = 3;
 
     public void setShortestPathTreeFactory(ShortestPathTreeFactory shortestPathTreeFactory) {
         _shortestPathTreeFactory = shortestPathTreeFactory;
@@ -226,10 +225,6 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                     }
 
                     double remaining_w = computeRemainingWeight(heuristic, v, rctx.target, options);
-                    Coordinate vc = v.getVertex().getCoordinate();
-
-//                    System.out.printf("M, %3.5f, %3.5f, %2.1f\n", vc.y, vc.x, 
-//                            Double.isInfinite(remaining_w) ? -1.0 : remaining_w);
 
                     if (remaining_w < 0 || Double.isInfinite(remaining_w) ) {
                         continue;

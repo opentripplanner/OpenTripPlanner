@@ -446,7 +446,7 @@ public class TestHalfEdges extends TestCase {
         ShortestPathTree spt = aStar.getShortestPathTree(walking);
         GraphPath path = spt.getPath(end, false);
         for (State s : path.states) {
-            assertFalse(s.getVertex() == top);
+            assertFalse(s.getBackEdge() == top);
         }
     }
 

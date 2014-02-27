@@ -891,10 +891,10 @@ public class PlanGeneratorTest {
     /** Compare all simple itinerary fields to their expected values. */
     private void compareItinerary(Itinerary itinerary, Type type) {
         if (type == Type.FORWARD || type == Type.BACKWARD) {
-            assertEquals(60000L, itinerary.duration);
+            assertEquals(60, itinerary.duration.intValue());
             assertEquals(0L, itinerary.startTime.getTimeInMillis());
         } else if (type == Type.ONBOARD) {
-            assertEquals(54000L, itinerary.duration);
+            assertEquals(54, itinerary.duration.intValue());
             assertEquals(6000L, itinerary.startTime.getTimeInMillis());
         }
         assertEquals(60000L, itinerary.endTime.getTimeInMillis());
@@ -969,7 +969,7 @@ public class PlanGeneratorTest {
             assertEquals("WALK", legs[0].mode);
             assertEquals(0L, legs[0].startTime.getTimeInMillis());
             assertEquals(3000L, legs[0].endTime.getTimeInMillis());
-            assertEquals(3000L, legs[0].getDuration());
+            assertEquals(3.0, legs[0].getDuration(), 0.01);
             assertEquals(0, legs[0].departureDelay);
             assertEquals(0, legs[0].arrivalDelay);
             assertFalse(legs[0].realTime);
@@ -1008,10 +1008,10 @@ public class PlanGeneratorTest {
         assertEquals("RAIL", legs[1].mode);
         if (type == Type.FORWARD || type == Type.BACKWARD) {
             assertEquals(4000L, legs[1].startTime.getTimeInMillis());
-            assertEquals(12000L, legs[1].getDuration());
+            assertEquals(12.0, legs[1].getDuration(), 0.01);
         } else if (type == Type.ONBOARD) {
             assertEquals(6000L, legs[1].startTime.getTimeInMillis());
-            assertEquals(10000L, legs[1].getDuration());
+            assertEquals(10.0, legs[1].getDuration(), 0.01);
         }
         assertEquals(16000L, legs[1].endTime.getTimeInMillis());
         assertEquals(0, legs[1].departureDelay);
@@ -1049,7 +1049,7 @@ public class PlanGeneratorTest {
         assertEquals("RAIL", legs[2].mode);
         assertEquals(20000L, legs[2].startTime.getTimeInMillis());
         assertEquals(24000L, legs[2].endTime.getTimeInMillis());
-        assertEquals(4000L, legs[2].getDuration());
+        assertEquals(4.0, legs[2].getDuration(), 0.01);
         assertEquals(0, legs[2].departureDelay);
         assertEquals(0, legs[2].arrivalDelay);
         assertFalse(legs[2].realTime);
@@ -1086,7 +1086,7 @@ public class PlanGeneratorTest {
             assertEquals(32000L, legs[3].startTime.getTimeInMillis());
             assertEquals(40000L, legs[3].endTime.getTimeInMillis());
         }
-        assertEquals(8000L, legs[3].getDuration());
+        assertEquals(8.0, legs[3].getDuration(), 0.01);
         assertEquals(0, legs[3].departureDelay);
         assertEquals(0, legs[3].arrivalDelay);
         assertFalse(legs[3].realTime);
@@ -1120,7 +1120,7 @@ public class PlanGeneratorTest {
         assertEquals("FERRY", legs[4].mode);
         assertEquals(40000L, legs[4].startTime.getTimeInMillis());
         assertEquals(43000L, legs[4].endTime.getTimeInMillis());
-        assertEquals(3000L, legs[4].getDuration());
+        assertEquals(3.0, legs[4].getDuration(), 0.01);
         assertEquals(8, legs[4].departureDelay);
         assertEquals(7, legs[4].arrivalDelay);
         assertTrue(legs[4].realTime);
@@ -1152,7 +1152,7 @@ public class PlanGeneratorTest {
         assertEquals("WALK", legs[5].mode);
         assertEquals(44000L, legs[5].startTime.getTimeInMillis());
         assertEquals(53000L, legs[5].endTime.getTimeInMillis());
-        assertEquals(9000L, legs[5].getDuration());
+        assertEquals(9.0, legs[5].getDuration(), 0.01);
         assertEquals(0, legs[5].departureDelay);
         assertEquals(0, legs[5].arrivalDelay);
         assertFalse(legs[5].realTime);
@@ -1184,7 +1184,7 @@ public class PlanGeneratorTest {
         assertEquals("BICYCLE", legs[6].mode);
         assertEquals(53000L, legs[6].startTime.getTimeInMillis());
         assertEquals(55000L, legs[6].endTime.getTimeInMillis());
-        assertEquals(2000L, legs[6].getDuration());
+        assertEquals(2.0, legs[6].getDuration(), 0.01);
         assertEquals(0, legs[6].departureDelay);
         assertEquals(0, legs[6].arrivalDelay);
         assertFalse(legs[6].realTime);
@@ -1218,7 +1218,7 @@ public class PlanGeneratorTest {
         assertEquals("BICYCLE", legs[7].mode);
         assertEquals(55000L, legs[7].startTime.getTimeInMillis());
         assertEquals(57000L, legs[7].endTime.getTimeInMillis());
-        assertEquals(2000L, legs[7].getDuration());
+        assertEquals(2.0, legs[7].getDuration(), 0.01);
         assertEquals(0, legs[7].departureDelay);
         assertEquals(0, legs[7].arrivalDelay);
         assertFalse(legs[7].realTime);
@@ -1250,7 +1250,7 @@ public class PlanGeneratorTest {
         assertEquals("WALK", legs[8].mode);
         assertEquals(57000L, legs[8].startTime.getTimeInMillis());
         assertEquals(60000L, legs[8].endTime.getTimeInMillis());
-        assertEquals(3000L, legs[8].getDuration());
+        assertEquals(3.0, legs[8].getDuration(), 0.01);
         assertEquals(0, legs[8].departureDelay);
         assertEquals(0, legs[8].arrivalDelay);
         assertFalse(legs[8].realTime);

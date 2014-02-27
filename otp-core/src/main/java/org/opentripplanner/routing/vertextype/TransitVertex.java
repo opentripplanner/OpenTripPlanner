@@ -15,11 +15,11 @@ package org.opentripplanner.routing.vertextype;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.routing.graph.AbstractVertex;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 
 /** Abstract base class for vertices in the GTFS layer of the graph. */
-public abstract class TransitVertex extends AbstractVertex {
+public abstract class TransitVertex extends Vertex {
 
     private static final long serialVersionUID = 53855622892837370L;
 
