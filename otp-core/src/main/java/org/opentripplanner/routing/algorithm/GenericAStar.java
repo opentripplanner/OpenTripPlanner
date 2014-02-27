@@ -56,7 +56,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     private TraverseVisitor traverseVisitor;
     
     /** The number of paths to attempt to find */
-    @Setter private int nPaths = 1;
+    @Setter private int nPaths = 3;
     
     enum RunStatus {
         RUNNING, STOPPED
