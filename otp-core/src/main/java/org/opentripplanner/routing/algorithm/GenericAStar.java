@@ -49,6 +49,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 
     private static final Logger LOG = LoggerFactory.getLogger(GenericAStar.class);
     private static final MonitoringStore store = MonitoringStoreFactory.getStore();
+	private static final double OVERSEARCH_MULTIPLIER = 4.0;
 
     private boolean _verbose = false;
 
@@ -130,6 +131,8 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 
         int nVisited = 0;
 
+        Double foundPathWeight = null;
+
         /* the core of the A* algorithm */
         List<State> targetAcceptedStates = Lists.newArrayList();
         while (!pq.empty()) { // Until the priority queue is empty:
@@ -181,6 +184,10 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
             /**
              * Should we terminate the search?
              */
+            // Don't search too far past the most recently found accepted path/state
+            if (foundPathWeight != null && u.getWeight() > foundPathWeight*OVERSEARCH_MULTIPLIER ){
+            	return spt;
+            }
             if (terminationStrategy != null) {
                 if (!terminationStrategy.shouldSearchContinue(
                     rctx.origin, rctx.target, u, spt, options))
@@ -188,6 +195,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
             // TODO AMB: Replace isFinal with bicycle conditions in BasicPathParser
             }  else if (!options.batch && u_vertex == rctx.target && u.isFinal() && u.allPathParsersAccept()) {
                 targetAcceptedStates.add(u);
+                foundPathWeight = u.getWeight();
                 options.rctx.debug.foundPath();
                 if (targetAcceptedStates.size() >= nPaths) {
                     LOG.debug("total vertices visited {}", nVisited);
