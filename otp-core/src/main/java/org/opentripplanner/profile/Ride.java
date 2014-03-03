@@ -165,7 +165,8 @@ public class Ride {
             }
             waits.add(departure - boardTime);
         }
-        return new Stats (waits);
+        /* Waits list may be empty if no transfers are possible. Stats constructor handles this. */
+        return new Stats (waits); 
     }
 
 }
