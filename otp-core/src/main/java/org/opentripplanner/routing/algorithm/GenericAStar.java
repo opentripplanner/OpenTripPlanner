@@ -23,7 +23,6 @@ import org.opentripplanner.common.pqueue.OTPPriorityQueue;
 import org.opentripplanner.common.pqueue.OTPPriorityQueueFactory;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
-import org.opentripplanner.routing.algorithm.strategies.SkipTraverseResultStrategy;
 import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -54,8 +53,6 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 
     private ShortestPathTreeFactory shortestPathTreeFactory = new DefaultShortestPathTreeFactory();
 
-    private SkipTraverseResultStrategy skipTraversalResultStrategy;
-
     private TraverseVisitor traverseVisitor;
     
     /** The number of paths to attempt to find */
@@ -71,10 +68,6 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 
     public void setShortestPathTreeFactory(ShortestPathTreeFactory shortestPathTreeFactory) {
         this.shortestPathTreeFactory = shortestPathTreeFactory;
-    }
-
-    public void setSkipTraverseResultStrategy(SkipTraverseResultStrategy skipTraversalResultStrategy) {
-        this.skipTraversalResultStrategy = skipTraversalResultStrategy;
     }
     
     /**
@@ -221,12 +214,6 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                     // System.out.printf("inadmissible lower bound %f vs %f on edge %s\n",
                     // lbs.getWeightDelta(), v.getWeightDelta(), edge);
                     // }
-
-                    if (skipTraversalResultStrategy != null
-                            && skipTraversalResultStrategy.shouldSkipTraversalResult(
-                                    rctx.origin, rctx.target, u, v, runState.spt, options)) {
-                        continue;
-                    }
 
                     double remaining_w = computeRemainingWeight(heuristic, v, rctx.target, options);
 
