@@ -50,13 +50,13 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     private static final Logger LOG = LoggerFactory.getLogger(GenericAStar.class);
     private static final MonitoringStore store = MonitoringStoreFactory.getStore();
 
-    private boolean _verbose = false;
+    private boolean verbose = false;
 
-    private ShortestPathTreeFactory _shortestPathTreeFactory = new DefaultShortestPathTreeFactory();
+    private ShortestPathTreeFactory shortestPathTreeFactory = new DefaultShortestPathTreeFactory();
 
-    private SkipTraverseResultStrategy _skipTraversalResultStrategy;
+    private SkipTraverseResultStrategy skipTraversalResultStrategy;
 
-    private SearchTerminationStrategy _searchTerminationStrategy;
+    private SearchTerminationStrategy searchTerminationStrategy;
 
     private TraverseVisitor traverseVisitor;
     
@@ -64,15 +64,15 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     @Setter private int nPaths = 1;
 
     public void setShortestPathTreeFactory(ShortestPathTreeFactory shortestPathTreeFactory) {
-        _shortestPathTreeFactory = shortestPathTreeFactory;
+        this.shortestPathTreeFactory = shortestPathTreeFactory;
     }
 
     public void setSkipTraverseResultStrategy(SkipTraverseResultStrategy skipTraversalResultStrategy) {
-        _skipTraversalResultStrategy = skipTraversalResultStrategy;
+        this.skipTraversalResultStrategy = skipTraversalResultStrategy;
     }
 
     public void setSearchTerminationStrategy(SearchTerminationStrategy searchTerminationStrategy) {
-        _searchTerminationStrategy = searchTerminationStrategy;
+        this.searchTerminationStrategy = searchTerminationStrategy;
     }
     
     /**
@@ -80,7 +80,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
      */
     @Override
     public ShortestPathTree getShortestPathTree(RoutingRequest req) {
-        return getShortestPathTree(req, -1, _searchTerminationStrategy); // negative timeout means no timeout
+        return getShortestPathTree(req, -1, searchTerminationStrategy); // negative timeout means no timeout
     }
     
     /**
@@ -88,7 +88,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
      */
     @Override
     public ShortestPathTree getShortestPathTree(RoutingRequest req, double timeoutSeconds) {
-        return this.getShortestPathTree(req, timeoutSeconds, _searchTerminationStrategy);
+        return this.getShortestPathTree(req, timeoutSeconds, searchTerminationStrategy);
     }
 
     /** @return the shortest path, or null if none is found */
@@ -133,7 +133,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         /* the core of the A* algorithm */
         List<State> targetAcceptedStates = Lists.newArrayList();
         while (!pq.empty()) { // Until the priority queue is empty:
-            if (_verbose) {
+            if (verbose) {
                 double w = pq.peek_min_key();
                 System.out.println("pq min key = " + w);
             }
@@ -175,7 +175,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
             // System.out.println(u_vertex + ";" + u_vertex.getX() + ";" + u_vertex.getY() + ";" +
             // u.getWeight());
 
-            if (_verbose)
+            if (verbose)
                 System.out.println("   vertex " + u_vertex);
 
             /**
@@ -218,8 +218,8 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                     // lbs.getWeightDelta(), v.getWeightDelta(), edge);
                     // }
 
-                    if (_skipTraversalResultStrategy != null
-                            && _skipTraversalResultStrategy.shouldSkipTraversalResult(
+                    if (skipTraversalResultStrategy != null
+                            && skipTraversalResultStrategy.shouldSkipTraversalResult(
                                     rctx.origin, rctx.target, u, v, spt, options)) {
                         continue;
                     }
@@ -231,7 +231,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                     }
                     double estimate = v.getWeight() + remaining_w*options.getHeuristicWeight();
 
-                    if (_verbose) {
+                    if (verbose) {
                         System.out.println("      edge " + edge);
                         System.out.println("      " + u.getWeight() + " -> " + v.getWeight()
                                 + "(w) + " + remaining_w + "(heur) = " + estimate + " vert = "
@@ -240,11 +240,11 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 
                     if (estimate > options.maxWeight) {
                         // too expensive to get here
-                        if (_verbose)
+                        if (verbose)
                             System.out.println("         too expensive to reach, not enqueued. estimated weight = " + estimate);
                     } else if (isWorstTimeExceeded(v, options)) {
                         // too much time to get here
-                    	if (_verbose)
+                    	if (verbose)
                             System.out.println("         too much time to reach, not enqueued. time = " + v.getTimeSeconds());
                     } else {
                         if (spt.add(v)) {
@@ -288,7 +288,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     }
 
     private ShortestPathTree createShortestPathTree(RoutingRequest opts) {
-        return _shortestPathTreeFactory.create(opts);
+        return shortestPathTreeFactory.create(opts);
     }
 
     public void setTraverseVisitor(TraverseVisitor traverseVisitor) {
