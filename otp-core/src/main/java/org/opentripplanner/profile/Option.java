@@ -1,5 +1,6 @@
 package org.opentripplanner.profile;
 
+import java.util.Comparator;
 import java.util.List;
 
 import lombok.Getter;
@@ -45,6 +46,43 @@ public class Option {
             sb.append(Joiner.on(", ").join(vias));
         }
         return sb.toString();
+    }
+
+    public static enum SortOrder {
+        MIN, AVG, MAX;
+    }
+
+    public static class MinComparator implements Comparator<Option> {
+        @Override
+        public int compare(Option one, Option two) {
+            return one.stats.min - two.stats.min;
+        }
+    }
+
+    public static class AvgComparator implements Comparator<Option> {
+        @Override
+        public int compare(Option one, Option two) {
+            return one.stats.avg - two.stats.avg;
+        }
+    }
+
+    public static class MaxComparator implements Comparator<Option> {
+        @Override
+        public int compare(Option one, Option two) {
+            return one.stats.max - two.stats.max;
+        }
+    }
+
+    /**
+     * Rides or transfers may contain no patterns after applying time window.
+     */
+    public boolean hasEmptyRides() {
+        for (Segment seg : segments) {
+            if (seg.rideStats.num == 0 || seg.waitStats.num == 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
