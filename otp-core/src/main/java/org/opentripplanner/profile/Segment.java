@@ -29,6 +29,7 @@ public class Segment {
     }
     
     @Getter int walkTime;
+    @Getter int walkDistance;
     @Getter Stats waitStats;
 
     @Getter String route;
@@ -54,6 +55,7 @@ public class Segment {
             segmentPatterns.add(new SegmentPattern(patternRide));
         }
         Collections.sort(segmentPatterns);
+        walkDistance = (int) ride.getTransferDistance();
         walkTime = (int) (ride.getTransferDistance() / ProfileRouter.WALK_SPEED);
         /* At this point we know all patterns on rides. Calculate transfer time information. */
         waitStats = ride.statsForTransfer (window);
