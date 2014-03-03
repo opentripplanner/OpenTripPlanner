@@ -62,6 +62,14 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     
     /** The number of paths to attempt to find */
     @Setter private int nPaths = 1;
+    
+    class RunState {
+
+		public ShortestPathTree spt;
+    	
+    }
+    
+    private RunState runState;
 
     public void setShortestPathTreeFactory(ShortestPathTreeFactory shortestPathTreeFactory) {
         this.shortestPathTreeFactory = shortestPathTreeFactory;
@@ -94,6 +102,8 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     /** @return the shortest path, or null if none is found */
     public ShortestPathTree getShortestPathTree(RoutingRequest options, double relTimeout,
             SearchTerminationStrategy terminationStrategy) {
+    	
+    	runState = new RunState();
 
         RoutingContext rctx = options.getRoutingContext();
         long abortTime = DateUtils.absoluteTimeout(relTimeout);
@@ -101,7 +111,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         // null checks on origin and destination vertices are already performed in setRoutingContext
         // options.rctx.check();
         
-        ShortestPathTree spt = createShortestPathTree(options);
+        runState.spt = createShortestPathTree(options);
 
         final RemainingWeightHeuristic heuristic = options.batch ? 
                 new TrivialRemainingWeightHeuristic() : rctx.remainingWeightHeuristic; 
@@ -109,7 +119,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         // heuristic calc could actually be done when states are constructed, inside state
         State initialState = new State(options);
         heuristic.initialize(initialState, rctx.target);
-        spt.add(initialState);
+        runState.spt.add(initialState);
 
         // Priority Queue.
         // NOTE(flamholz): the queue is self-resizing, so we initialize it to have 
@@ -150,7 +160,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                 options.rctx.aborted = true; // signal search cancellation up to higher stack frames
                 options.rctx.debug.timedOut = true; // signal timeout in debug object in the response
                 storeMemory();
-                return spt;
+                return runState.spt;
             }
 
             // get the lowest-weight state in the queue
@@ -158,7 +168,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
             
             // check that this state has not been dominated
             // and mark vertex as visited
-            if (!spt.visit(u)) {
+            if (!runState.spt.visit(u)) {
                 // state has been dominated since it was added to the priority queue, so it is
                 // not in any optimal path. drop it on the floor and try the next one.
                 continue;  
@@ -183,7 +193,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
              */
             if (terminationStrategy != null) {
                 if (!terminationStrategy.shouldSearchContinue(
-                    rctx.origin, rctx.target, u, spt, options))
+                    rctx.origin, rctx.target, u, runState.spt, options))
                     break;
             // TODO AMB: Replace isFinal with bicycle conditions in BasicPathParser
             }  else if (!options.batch && u_vertex == rctx.target && u.isFinal() && u.allPathParsersAccept()) {
@@ -192,7 +202,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                 if (targetAcceptedStates.size() >= nPaths) {
                     LOG.debug("total vertices visited {}", nVisited);
                     storeMemory();
-                    return spt;
+                    return runState.spt;
                 } else continue;
             }
 
@@ -220,7 +230,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 
                     if (skipTraversalResultStrategy != null
                             && skipTraversalResultStrategy.shouldSkipTraversalResult(
-                                    rctx.origin, rctx.target, u, v, spt, options)) {
+                                    rctx.origin, rctx.target, u, v, runState.spt, options)) {
                         continue;
                     }
 
@@ -247,7 +257,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                     	if (verbose)
                             System.out.println("         too much time to reach, not enqueued. time = " + v.getTimeSeconds());
                     } else {
-                        if (spt.add(v)) {
+                        if (runState.spt.add(v)) {
                             if (traverseVisitor != null)
                                 traverseVisitor.visitEnqueue(v);
                             pq.insert(v, estimate);
@@ -257,7 +267,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
             }
         }
         storeMemory();
-        return spt;
+        return runState.spt;
     }
 
     private void storeMemory() {
