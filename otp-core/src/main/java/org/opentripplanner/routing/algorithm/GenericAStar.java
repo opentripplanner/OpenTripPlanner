@@ -56,8 +56,6 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 
     private SkipTraverseResultStrategy skipTraversalResultStrategy;
 
-    private SearchTerminationStrategy searchTerminationStrategy;
-
     private TraverseVisitor traverseVisitor;
     
     /** The number of paths to attempt to find */
@@ -78,17 +76,13 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     public void setSkipTraverseResultStrategy(SkipTraverseResultStrategy skipTraversalResultStrategy) {
         this.skipTraversalResultStrategy = skipTraversalResultStrategy;
     }
-
-    public void setSearchTerminationStrategy(SearchTerminationStrategy searchTerminationStrategy) {
-        this.searchTerminationStrategy = searchTerminationStrategy;
-    }
     
     /**
      * Compute SPT using default timeout and termination strategy.
      */
     @Override
     public ShortestPathTree getShortestPathTree(RoutingRequest req) {
-        return getShortestPathTree(req, -1, searchTerminationStrategy); // negative timeout means no timeout
+        return getShortestPathTree(req, -1, null); // negative timeout means no timeout
     }
     
     /**
@@ -96,7 +90,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
      */
     @Override
     public ShortestPathTree getShortestPathTree(RoutingRequest req, double timeoutSeconds) {
-        return this.getShortestPathTree(req, timeoutSeconds, searchTerminationStrategy);
+        return this.getShortestPathTree(req, timeoutSeconds, null);
     }
 
     /** @return the shortest path, or null if none is found */
