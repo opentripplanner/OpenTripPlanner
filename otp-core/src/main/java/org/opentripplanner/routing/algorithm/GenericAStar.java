@@ -98,7 +98,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         // null checks on origin and destination vertices are already performed in setRoutingContext
         // options.rctx.check();
         
-        runState.spt = createShortestPathTree(options);
+        runState.spt = shortestPathTreeFactory.create(options);
 
         final RemainingWeightHeuristic heuristic = options.batch ? 
                 new TrivialRemainingWeightHeuristic() : rctx.remainingWeightHeuristic; 
@@ -276,10 +276,6 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
             return v.getTimeSeconds() < opt.worstTime;
         else
             return v.getTimeSeconds() > opt.worstTime;
-    }
-
-    private ShortestPathTree createShortestPathTree(RoutingRequest opts) {
-        return shortestPathTreeFactory.create(opts);
     }
 
     public void setTraverseVisitor(TraverseVisitor traverseVisitor) {
