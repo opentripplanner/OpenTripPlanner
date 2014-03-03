@@ -130,7 +130,7 @@ public class ProfileRouter {
     // why do we not have a latlon class? we don't need super detailed geodesy.
     // (latlon from, latlon to, timewindow window)
     // TimeWindow should actually be resolved and created in the caller, which does have access to the profiledata.
-    public ProfileResponse route (LatLon from, LatLon to, int fromTime, int toTime, LocalDate date) {
+    public List<Option> route (LatLon from, LatLon to, int fromTime, int toTime, LocalDate date) {
 
         /* Set to 2 until we have better pruning. There are a lot of 3-combinations. */
         final int ROUNDS = 2;
@@ -204,9 +204,10 @@ public class ProfileRouter {
         for (Ride ride : targetRides) {
             /* We alight from all patterns in a ride at the same stop. */
             int dist = toStops.get(ride.patternRides.get(0).pattern).distance; 
-            options.add(new Option (ride, dist, window)); // TODO Convert distance to time.
+            Option option = new Option (ride, dist, window); // TODO Convert distance to time.
+            if ( ! option.hasEmptyRides()) options.add(option); 
         }
-        return new ProfileResponse(options);
+        return options;
     }
     
 }

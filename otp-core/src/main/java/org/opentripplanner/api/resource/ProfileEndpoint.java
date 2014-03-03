@@ -1,5 +1,7 @@
 package org.opentripplanner.api.resource;
 
+import java.util.List;
+
 import javax.inject.Singleton;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -36,11 +38,16 @@ public class ProfileEndpoint {
             @QueryParam("to")   LatLon to,
             @QueryParam("date")      @DefaultValue("today") YearMonthDay date,
             @QueryParam("startTime") @DefaultValue("07:00") HourMinuteSecond fromTime, 
-            @QueryParam("endTime")   @DefaultValue("09:00") HourMinuteSecond toTime) {
+            @QueryParam("endTime")   @DefaultValue("09:00") HourMinuteSecond toTime,
+            @QueryParam("orderBy")   @DefaultValue("MIN")   Option.SortOrder orderBy,
+            @QueryParam("limit")     @DefaultValue("10")    Integer limit) {
+
         if (data == null) data = new ProfileData(graphService.getGraph());
         ProfileRouter router = new ProfileRouter (data);
-        ProfileResponse pr = router.route(from, to, fromTime.toSeconds(), toTime.toSeconds(), date.toJoda());
+        List<Option> options = router.route(from, to, fromTime.toSeconds(), toTime.toSeconds(), date.toJoda());
+        ProfileResponse pr = new ProfileResponse(options, orderBy, limit);
         return Response.status(Status.OK).entity(pr).build();
+    
     }
     
 }
