@@ -7,6 +7,10 @@ import lombok.Getter;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
+/**
+ * num may be 0 if there are no observations.
+ * num will become 1 when adding a scalar or another Stats.
+ */
 class Stats implements Cloneable {
     
     @Getter int min = 0;
@@ -28,14 +32,14 @@ class Stats implements Cloneable {
         min += s.min;
         max += s.max;
         avg += (avg + s.avg) / 2; // TODO rethink
-        num = 0; // it's poorly defined here
+        num = 1; // it's poorly defined here
     }
     
     public void add(int x) {
         min += x;
         avg += x;
         max += x;
-        num = 0; // it's poorly defined here
+        num = 1; // it's poorly defined here
     }
     
     public void merge (Stats other) {
@@ -58,6 +62,7 @@ class Stats implements Cloneable {
     }
 
     public Stats (Collection<Integer> ints) {
+        if (ints == null || ints.isEmpty()) return; // all zeros
         min = Integer.MAX_VALUE;
         double accumulated = 0;
         for (int i : ints) {
