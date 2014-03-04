@@ -60,7 +60,17 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     
     class RunState {
 
+		private RoutingRequest options;
 		public ShortestPathTree spt;
+		OTPPriorityQueue<State> pq;
+		RemainingWeightHeuristic heuristic;
+		public RoutingContext rctx;
+		public int nVisited;
+		public List<Object> targetAcceptedStates;
+
+		public RunState(RoutingRequest options) {
+			this.options = options;
+		}
     	
     }
     
@@ -85,27 +95,23 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     public ShortestPathTree getShortestPathTree(RoutingRequest req, double timeoutSeconds) {
         return this.getShortestPathTree(req, timeoutSeconds, null);
     }
-
-    /** @return the shortest path, or null if none is found */
-    public ShortestPathTree getShortestPathTree(RoutingRequest options, double relTimeout,
-            SearchTerminationStrategy terminationStrategy) {
+    
+    public void startSearch(RoutingRequest options) {
+    	runState = new RunState( options );
     	
-    	runState = new RunState();
-
-        RoutingContext rctx = options.getRoutingContext();
-        long abortTime = DateUtils.absoluteTimeout(relTimeout);
+        runState.rctx = options.getRoutingContext();
 
         // null checks on origin and destination vertices are already performed in setRoutingContext
         // options.rctx.check();
         
         runState.spt = shortestPathTreeFactory.create(options);
 
-        final RemainingWeightHeuristic heuristic = options.batch ? 
-                new TrivialRemainingWeightHeuristic() : rctx.remainingWeightHeuristic; 
+        runState.heuristic = options.batch ? 
+                new TrivialRemainingWeightHeuristic() : runState.rctx.remainingWeightHeuristic; 
 
         // heuristic calc could actually be done when states are constructed, inside state
         State initialState = new State(options);
-        heuristic.initialize(initialState, rctx.target);
+        runState.heuristic.initialize(initialState, runState.rctx.target);
         runState.spt.add(initialState);
 
         // Priority Queue.
@@ -114,10 +120,10 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         // on a uniform 2d grid will examine roughly sqrt(|V|) vertices before
         // reaching its target. 
         OTPPriorityQueueFactory qFactory = BinHeap.FACTORY;
-        int initialSize = rctx.graph.getVertices().size();
+        int initialSize = runState.rctx.graph.getVertices().size();
         initialSize = (int) Math.ceil(2 * (Math.sqrt((double) initialSize + 1)));
-        OTPPriorityQueue<State> pq = qFactory.create(initialSize);
-        pq.insert(initialState, 0);
+        runState.pq = qFactory.create(initialSize);
+        runState.pq.insert(initialState, 0);
 
 //        options = options.clone();
 //        /** max walk distance cannot be less than distances to nearest transit stops */
@@ -125,22 +131,26 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 //                + target.getDistanceToNearestTransitStop();
 //        options.setMaxWalkDistance(Math.max(options.getMaxWalkDistance(), rctx.getMinWalkDistance()));
 
-        int nVisited = 0;
+        runState.nVisited = 0;
+        
+        runState.targetAcceptedStates = Lists.newArrayList();
+    }
+
+    /** @return the shortest path, or null if none is found */
+    public ShortestPathTree getShortestPathTree(RoutingRequest options, double relTimeout,
+            SearchTerminationStrategy terminationStrategy) {
+    	
+    	long abortTime = DateUtils.absoluteTimeout(relTimeout);
+
+    	startSearch( options );
 
         /* the core of the A* algorithm */
-        List<State> targetAcceptedStates = Lists.newArrayList();
-        while (!pq.empty()) { // Until the priority queue is empty:
-            if (verbose) {
-                double w = pq.peek_min_key();
-                System.out.println("pq min key = " + w);
-            }
-            // interleave some heuristic-improving work (single threaded)
-            heuristic.doSomeWork();
+        while (!runState.pq.empty()) { // Until the priority queue is empty:
             /**
              * Terminate the search prematurely if we've hit our computation wall.
              */
             if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
-                LOG.warn("Search timeout. origin={} target={}", rctx.origin, rctx.target);
+                LOG.warn("Search timeout. origin={} target={}", runState.rctx.origin, runState.rctx.target);
                 // Rather than returning null to indicate that the search was aborted/timed out,
                 // we instead set a flag in the routing context and return the SPT anyway. This
                 // allows returning a partial list results even when a timeout occurs.
@@ -149,9 +159,18 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                 storeMemory();
                 return runState.spt;
             }
+        	
+            // print debug info
+            if (verbose) {
+                double w = runState.pq.peek_min_key();
+                System.out.println("pq min key = " + w);
+            }
+            
+            // interleave some heuristic-improving work (single threaded)
+            runState.heuristic.doSomeWork();
 
             // get the lowest-weight state in the queue
-            State u = pq.extract_min();
+            State u = runState.pq.extract_min();
             
             // check that this state has not been dominated
             // and mark vertex as visited
@@ -166,11 +185,6 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
             }
 
             Vertex u_vertex = u.getVertex();
-            // Uncomment the following statement
-            // to print out a CSV (actually semicolon-separated)
-            // list of visited nodes for display in a GIS
-            // System.out.println(u_vertex + ";" + u_vertex.getX() + ";" + u_vertex.getY() + ";" +
-            // u.getWeight());
 
             if (verbose)
                 System.out.println("   vertex " + u_vertex);
@@ -180,14 +194,14 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
              */
             if (terminationStrategy != null) {
                 if (!terminationStrategy.shouldSearchContinue(
-                    rctx.origin, rctx.target, u, runState.spt, options))
+                    runState.rctx.origin, runState.rctx.target, u, runState.spt, options))
                     break;
             // TODO AMB: Replace isFinal with bicycle conditions in BasicPathParser
-            }  else if (!options.batch && u_vertex == rctx.target && u.isFinal() && u.allPathParsersAccept()) {
-                targetAcceptedStates.add(u);
+            }  else if (!options.batch && u_vertex == runState.rctx.target && u.isFinal() && u.allPathParsersAccept()) {
+                runState.targetAcceptedStates.add(u);
                 options.rctx.debug.foundPath();
-                if (targetAcceptedStates.size() >= nPaths) {
-                    LOG.debug("total vertices visited {}", nVisited);
+                if (runState.targetAcceptedStates.size() >= nPaths) {
+                    LOG.debug("total vertices visited {}", runState.nVisited);
                     storeMemory();
                     return runState.spt;
                 } else continue;
@@ -195,7 +209,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 
             Collection<Edge> edges = options.isArriveBy() ? u_vertex.getIncoming() : u_vertex.getOutgoing();
 
-            nVisited += 1;
+            runState.nVisited += 1;
 
             for (Edge edge : edges) {
 
@@ -215,7 +229,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                     // lbs.getWeightDelta(), v.getWeightDelta(), edge);
                     // }
 
-                    double remaining_w = computeRemainingWeight(heuristic, v, rctx.target, options);
+                    double remaining_w = computeRemainingWeight(runState.heuristic, v, runState.rctx.target, options);
 
                     if (remaining_w < 0 || Double.isInfinite(remaining_w) ) {
                         continue;
@@ -241,7 +255,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                         if (runState.spt.add(v)) {
                             if (traverseVisitor != null)
                                 traverseVisitor.visitEnqueue(v);
-                            pq.insert(v, estimate);
+                            runState.pq.insert(v, estimate);
                         } 
                     }
                 }
