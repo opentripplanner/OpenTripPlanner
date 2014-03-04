@@ -58,6 +58,10 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     /** The number of paths to attempt to find */
     @Setter private int nPaths = 1;
     
+    enum RunStatus {
+		RUNNING, CONTINUE, BREAK, RETURN
+    	
+    }
     class RunState {
 
 		public State u;
@@ -67,8 +71,14 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 		public RoutingContext rctx;
 		public int nVisited;
 		public List<Object> targetAcceptedStates;
+		public RunStatus status;
+		private RoutingRequest options;
+		private SearchTerminationStrategy terminationStrategy;
+		public Vertex u_vertex;
 
-		public RunState() {
+		public RunState(RoutingRequest options, SearchTerminationStrategy terminationStrategy) {
+			this.options = options;
+			this.terminationStrategy = terminationStrategy;
 		}
     	
     }
@@ -95,8 +105,8 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         return this.getShortestPathTree(req, timeoutSeconds, null);
     }
     
-    public void startSearch(RoutingRequest options) {
-    	runState = new RunState( );
+    public void startSearch(RoutingRequest options, SearchTerminationStrategy terminationStrategy) {
+    	runState = new RunState( options, terminationStrategy );
     	
         runState.rctx = options.getRoutingContext();
 
@@ -135,13 +145,126 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         runState.targetAcceptedStates = Lists.newArrayList();
     }
 
+    RunStatus iterate(){
+        // print debug info
+        if (verbose) {
+            double w = runState.pq.peek_min_key();
+            System.out.println("pq min key = " + w);
+        }
+        
+        // interleave some heuristic-improving work (single threaded)
+        runState.heuristic.doSomeWork();
+
+        // get the lowest-weight state in the queue
+        runState.u = runState.pq.extract_min();
+        
+        // check that this state has not been dominated
+        // and mark vertex as visited
+        if (!runState.spt.visit(runState.u)) {
+            // state has been dominated since it was added to the priority queue, so it is
+            // not in any optimal path. drop it on the floor and try the next one.
+        	return RunStatus.CONTINUE;
+        }
+        
+        if (traverseVisitor != null) {
+            traverseVisitor.visitVertex(runState.u);
+        }
+        
+        runState.u_vertex = runState.u.getVertex();
+
+        if (verbose)
+            System.out.println("   vertex " + runState.u_vertex);
+        
+        /**
+         * Should we terminate the search?
+         */
+        if (runState.terminationStrategy != null) {
+            if (!runState.terminationStrategy.shouldSearchContinue(
+                runState.rctx.origin, runState.rctx.target, runState.u, runState.spt, runState.options))
+                return RunStatus.RETURN;
+        // TODO AMB: Replace isFinal with bicycle conditions in BasicPathParser
+        }  else if (!runState.options.batch && runState.u_vertex == runState.rctx.target && runState.u.isFinal() && runState.u.allPathParsersAccept()) {
+            runState.targetAcceptedStates.add(runState.u);
+            runState.options.rctx.debug.foundPath();
+            if (runState.targetAcceptedStates.size() >= nPaths) {
+                LOG.debug("total vertices visited {}", runState.nVisited);
+
+                return RunStatus.RETURN;
+            } else {
+            	return RunStatus.CONTINUE;
+            }
+        }
+
+        runState.nVisited += 1;
+        
+        Collection<Edge> edges = runState.options.isArriveBy() ? runState.u_vertex.getIncoming() : runState.u_vertex.getOutgoing();
+        for (Edge edge : edges) {
+
+            // Iterate over traversal results. When an edge leads nowhere (as indicated by
+            // returning NULL), the iteration is over. TODO Use this to board multiple trips.
+            for (State v = edge.traverse(runState.u); v != null; v = v.getNextResult()) {
+                // Could be: for (State v : traverseEdge...)
+
+                if (traverseVisitor != null) {
+                    traverseVisitor.visitEdge(edge, v);
+                }
+                // TEST: uncomment to verify that all optimisticTraverse functions are actually
+                // admissible
+                // State lbs = edge.optimisticTraverse(u);
+                // if ( ! (lbs.getWeight() <= v.getWeight())) {
+                // System.out.printf("inadmissible lower bound %f vs %f on edge %s\n",
+                // lbs.getWeightDelta(), v.getWeightDelta(), edge);
+                // }
+
+                double remaining_w = computeRemainingWeight(runState.heuristic, v, runState.rctx.target, runState.options);
+
+                if (remaining_w < 0 || Double.isInfinite(remaining_w) ) {
+                    continue;
+                }
+                double estimate = v.getWeight() + remaining_w*runState.options.getHeuristicWeight();
+
+                if (verbose) {
+                    System.out.println("      edge " + edge);
+                    System.out.println("      " + runState.u.getWeight() + " -> " + v.getWeight()
+                            + "(w) + " + remaining_w + "(heur) = " + estimate + " vert = "
+                            + v.getVertex());
+                }
+
+                // avoid enqueuing useless branches 
+                if (estimate > runState.options.maxWeight) {
+                    // too expensive to get here
+                    if (verbose)
+                        System.out.println("         too expensive to reach, not enqueued. estimated weight = " + estimate);
+                    continue;
+                }
+                if (isWorstTimeExceeded(v, runState.options)) {
+                    // too much time to get here
+                	if (verbose)
+                        System.out.println("         too much time to reach, not enqueued. time = " + v.getTimeSeconds());
+                	continue;
+                }
+                
+                // spt.add returns true if the state is hopeful; enqueue state if it's hopeful
+                if (runState.spt.add(v)) {
+                	// report to the visitor if there is one
+                    if (traverseVisitor != null)
+                        traverseVisitor.visitEnqueue(v);
+                    
+                    runState.pq.insert(v, estimate);
+                } 
+            }
+        }
+        
+        return RunStatus.RUNNING;
+    }
+    
     /** @return the shortest path, or null if none is found */
     public ShortestPathTree getShortestPathTree(RoutingRequest options, double relTimeout,
             SearchTerminationStrategy terminationStrategy) {
     	
     	long abortTime = DateUtils.absoluteTimeout(relTimeout);
 
-    	startSearch( options );
+    	startSearch( options, terminationStrategy );
 
         /* the core of the A* algorithm */
         while (!runState.pq.empty()) { // Until the priority queue is empty:
@@ -158,113 +281,17 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                 storeMemory();
                 return runState.spt;
             }
-        	
-            // print debug info
-            if (verbose) {
-                double w = runState.pq.peek_min_key();
-                System.out.println("pq min key = " + w);
-            }
             
-            // interleave some heuristic-improving work (single threaded)
-            runState.heuristic.doSomeWork();
-
-            // get the lowest-weight state in the queue
-            runState.u = runState.pq.extract_min();
-            
-            // check that this state has not been dominated
-            // and mark vertex as visited
-            if (!runState.spt.visit(runState.u)) {
-                // state has been dominated since it was added to the priority queue, so it is
-                // not in any optimal path. drop it on the floor and try the next one.
-                continue;  
+            RunStatus status = iterate();
+            if(status==RunStatus.CONTINUE){
+            	continue;	
+            } else if(status==RunStatus.BREAK){
+            	break;
+            } else if(status==RunStatus.RETURN){
+                storeMemory();
+                return runState.spt;
             }
 
-            if (traverseVisitor != null) {
-                traverseVisitor.visitVertex(runState.u);
-            }
-
-            Vertex u_vertex = runState.u.getVertex();
-
-            if (verbose)
-                System.out.println("   vertex " + u_vertex);
-
-            /**
-             * Should we terminate the search?
-             */
-            if (terminationStrategy != null) {
-                if (!terminationStrategy.shouldSearchContinue(
-                    runState.rctx.origin, runState.rctx.target, runState.u, runState.spt, options))
-                    break;
-            // TODO AMB: Replace isFinal with bicycle conditions in BasicPathParser
-            }  else if (!options.batch && u_vertex == runState.rctx.target && runState.u.isFinal() && runState.u.allPathParsersAccept()) {
-                runState.targetAcceptedStates.add(runState.u);
-                options.rctx.debug.foundPath();
-                if (runState.targetAcceptedStates.size() >= nPaths) {
-                    LOG.debug("total vertices visited {}", runState.nVisited);
-                    storeMemory();
-                    return runState.spt;
-                } else continue;
-            }
-
-            runState.nVisited += 1;
-
-            Collection<Edge> edges = options.isArriveBy() ? u_vertex.getIncoming() : u_vertex.getOutgoing();
-            for (Edge edge : edges) {
-
-                // Iterate over traversal results. When an edge leads nowhere (as indicated by
-                // returning NULL), the iteration is over. TODO Use this to board multiple trips.
-                for (State v = edge.traverse(runState.u); v != null; v = v.getNextResult()) {
-                    // Could be: for (State v : traverseEdge...)
-
-                    if (traverseVisitor != null) {
-                        traverseVisitor.visitEdge(edge, v);
-                    }
-                    // TEST: uncomment to verify that all optimisticTraverse functions are actually
-                    // admissible
-                    // State lbs = edge.optimisticTraverse(u);
-                    // if ( ! (lbs.getWeight() <= v.getWeight())) {
-                    // System.out.printf("inadmissible lower bound %f vs %f on edge %s\n",
-                    // lbs.getWeightDelta(), v.getWeightDelta(), edge);
-                    // }
-
-                    double remaining_w = computeRemainingWeight(runState.heuristic, v, runState.rctx.target, options);
-
-                    if (remaining_w < 0 || Double.isInfinite(remaining_w) ) {
-                        continue;
-                    }
-                    double estimate = v.getWeight() + remaining_w*options.getHeuristicWeight();
-
-                    if (verbose) {
-                        System.out.println("      edge " + edge);
-                        System.out.println("      " + runState.u.getWeight() + " -> " + v.getWeight()
-                                + "(w) + " + remaining_w + "(heur) = " + estimate + " vert = "
-                                + v.getVertex());
-                    }
-
-                    // avoid enqueuing useless branches 
-                    if (estimate > options.maxWeight) {
-                        // too expensive to get here
-                        if (verbose)
-                            System.out.println("         too expensive to reach, not enqueued. estimated weight = " + estimate);
-                        continue;
-                    }
-                    if (isWorstTimeExceeded(v, options)) {
-                        // too much time to get here
-                    	if (verbose)
-                            System.out.println("         too much time to reach, not enqueued. time = " + v.getTimeSeconds());
-                    	continue;
-                    }
-                    
-                    // spt.add returns true if the state is hopeful; enqueue state if it's hopeful
-                    if (runState.spt.add(v)) {
-                    	// report to the visitor if there is one
-                        if (traverseVisitor != null)
-                            traverseVisitor.visitEnqueue(v);
-                        
-                        runState.pq.insert(v, estimate);
-                    } 
-                }
-            }
         }
         storeMemory();
         return runState.spt;
