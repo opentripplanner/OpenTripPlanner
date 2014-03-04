@@ -60,7 +60,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     
     class RunState {
 
-		private RoutingRequest options;
+		public State u;
 		public ShortestPathTree spt;
 		OTPPriorityQueue<State> pq;
 		RemainingWeightHeuristic heuristic;
@@ -68,8 +68,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 		public int nVisited;
 		public List<Object> targetAcceptedStates;
 
-		public RunState(RoutingRequest options) {
-			this.options = options;
+		public RunState() {
 		}
     	
     }
@@ -97,7 +96,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     }
     
     public void startSearch(RoutingRequest options) {
-    	runState = new RunState( options );
+    	runState = new RunState( );
     	
         runState.rctx = options.getRoutingContext();
 
@@ -170,21 +169,21 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
             runState.heuristic.doSomeWork();
 
             // get the lowest-weight state in the queue
-            State u = runState.pq.extract_min();
+            runState.u = runState.pq.extract_min();
             
             // check that this state has not been dominated
             // and mark vertex as visited
-            if (!runState.spt.visit(u)) {
+            if (!runState.spt.visit(runState.u)) {
                 // state has been dominated since it was added to the priority queue, so it is
                 // not in any optimal path. drop it on the floor and try the next one.
                 continue;  
             }
 
             if (traverseVisitor != null) {
-                traverseVisitor.visitVertex(u);
+                traverseVisitor.visitVertex(runState.u);
             }
 
-            Vertex u_vertex = u.getVertex();
+            Vertex u_vertex = runState.u.getVertex();
 
             if (verbose)
                 System.out.println("   vertex " + u_vertex);
@@ -194,11 +193,11 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
              */
             if (terminationStrategy != null) {
                 if (!terminationStrategy.shouldSearchContinue(
-                    runState.rctx.origin, runState.rctx.target, u, runState.spt, options))
+                    runState.rctx.origin, runState.rctx.target, runState.u, runState.spt, options))
                     break;
             // TODO AMB: Replace isFinal with bicycle conditions in BasicPathParser
-            }  else if (!options.batch && u_vertex == runState.rctx.target && u.isFinal() && u.allPathParsersAccept()) {
-                runState.targetAcceptedStates.add(u);
+            }  else if (!options.batch && u_vertex == runState.rctx.target && runState.u.isFinal() && runState.u.allPathParsersAccept()) {
+                runState.targetAcceptedStates.add(runState.u);
                 options.rctx.debug.foundPath();
                 if (runState.targetAcceptedStates.size() >= nPaths) {
                     LOG.debug("total vertices visited {}", runState.nVisited);
@@ -207,15 +206,14 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                 } else continue;
             }
 
-            Collection<Edge> edges = options.isArriveBy() ? u_vertex.getIncoming() : u_vertex.getOutgoing();
-
             runState.nVisited += 1;
 
+            Collection<Edge> edges = options.isArriveBy() ? u_vertex.getIncoming() : u_vertex.getOutgoing();
             for (Edge edge : edges) {
 
                 // Iterate over traversal results. When an edge leads nowhere (as indicated by
                 // returning NULL), the iteration is over. TODO Use this to board multiple trips.
-                for (State v = edge.traverse(u); v != null; v = v.getNextResult()) {
+                for (State v = edge.traverse(runState.u); v != null; v = v.getNextResult()) {
                     // Could be: for (State v : traverseEdge...)
 
                     if (traverseVisitor != null) {
@@ -238,26 +236,33 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 
                     if (verbose) {
                         System.out.println("      edge " + edge);
-                        System.out.println("      " + u.getWeight() + " -> " + v.getWeight()
+                        System.out.println("      " + runState.u.getWeight() + " -> " + v.getWeight()
                                 + "(w) + " + remaining_w + "(heur) = " + estimate + " vert = "
                                 + v.getVertex());
                     }
 
+                    // avoid enqueuing useless branches 
                     if (estimate > options.maxWeight) {
                         // too expensive to get here
                         if (verbose)
                             System.out.println("         too expensive to reach, not enqueued. estimated weight = " + estimate);
-                    } else if (isWorstTimeExceeded(v, options)) {
+                        continue;
+                    }
+                    if (isWorstTimeExceeded(v, options)) {
                         // too much time to get here
                     	if (verbose)
                             System.out.println("         too much time to reach, not enqueued. time = " + v.getTimeSeconds());
-                    } else {
-                        if (runState.spt.add(v)) {
-                            if (traverseVisitor != null)
-                                traverseVisitor.visitEnqueue(v);
-                            runState.pq.insert(v, estimate);
-                        } 
+                    	continue;
                     }
+                    
+                    // spt.add returns true if the state is hopeful; enqueue state if it's hopeful
+                    if (runState.spt.add(v)) {
+                    	// report to the visitor if there is one
+                        if (traverseVisitor != null)
+                            traverseVisitor.visitEnqueue(v);
+                        
+                        runState.pq.insert(v, estimate);
+                    } 
                 }
             }
         }
