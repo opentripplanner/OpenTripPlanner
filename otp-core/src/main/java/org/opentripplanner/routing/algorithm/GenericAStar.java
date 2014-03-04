@@ -59,7 +59,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     @Setter private int nPaths = 1;
     
     enum RunStatus {
-		RUNNING, CONTINUE, BREAK, RETURN
+		RUNNING, DONE
     	
     }
     class RunState {
@@ -163,7 +163,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         if (!runState.spt.visit(runState.u)) {
             // state has been dominated since it was added to the priority queue, so it is
             // not in any optimal path. drop it on the floor and try the next one.
-        	return RunStatus.CONTINUE;
+        	return RunStatus.RUNNING;
         }
         
         if (traverseVisitor != null) {
@@ -181,7 +181,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         if (runState.terminationStrategy != null) {
             if (!runState.terminationStrategy.shouldSearchContinue(
                 runState.rctx.origin, runState.rctx.target, runState.u, runState.spt, runState.options))
-                return RunStatus.RETURN;
+                return RunStatus.DONE;
         // TODO AMB: Replace isFinal with bicycle conditions in BasicPathParser
         }  else if (!runState.options.batch && runState.u_vertex == runState.rctx.target && runState.u.isFinal() && runState.u.allPathParsersAccept()) {
             runState.targetAcceptedStates.add(runState.u);
@@ -189,9 +189,9 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
             if (runState.targetAcceptedStates.size() >= nPaths) {
                 LOG.debug("total vertices visited {}", runState.nVisited);
 
-                return RunStatus.RETURN;
+                return RunStatus.DONE;
             } else {
-            	return RunStatus.CONTINUE;
+            	return RunStatus.RUNNING;
             }
         }
 
@@ -283,13 +283,8 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
             }
             
             RunStatus status = iterate();
-            if(status==RunStatus.CONTINUE){
-            	continue;	
-            } else if(status==RunStatus.BREAK){
+            if(status==RunStatus.DONE){
             	break;
-            } else if(status==RunStatus.RETURN){
-                storeMemory();
-                return runState.spt;
             }
 
         }
