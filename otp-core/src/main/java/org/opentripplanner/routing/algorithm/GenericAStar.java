@@ -59,7 +59,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     @Setter private int nPaths = 1;
     
     enum RunStatus {
-		RUNNING, DONE
+		RUNNING, STOPPED
     	
     }
     class RunState {
@@ -181,7 +181,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         if (runState.terminationStrategy != null) {
             if (!runState.terminationStrategy.shouldSearchContinue(
                 runState.rctx.origin, runState.rctx.target, runState.u, runState.spt, runState.options))
-                return RunStatus.DONE;
+                return RunStatus.STOPPED;
         // TODO AMB: Replace isFinal with bicycle conditions in BasicPathParser
         }  else if (!runState.options.batch && runState.u_vertex == runState.rctx.target && runState.u.isFinal() && runState.u.allPathParsersAccept()) {
             runState.targetAcceptedStates.add(runState.u);
@@ -189,7 +189,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
             if (runState.targetAcceptedStates.size() >= nPaths) {
                 LOG.debug("total vertices visited {}", runState.nVisited);
 
-                return RunStatus.DONE;
+                return RunStatus.STOPPED;
             } else {
             	return RunStatus.RUNNING;
             }
@@ -283,7 +283,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
             }
             
             RunStatus status = iterate();
-            if(status==RunStatus.DONE){
+            if(status==RunStatus.STOPPED){
             	break;
             }
 
