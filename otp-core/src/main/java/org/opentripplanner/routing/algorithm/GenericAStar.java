@@ -238,14 +238,13 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         return true;
     }
     
-    /** @return the shortest path, or null if none is found */
-    public ShortestPathTree getShortestPathTree(RoutingRequest options, double relTimeout,
-            SearchTerminationStrategy terminationStrategy) {
-    	
+    /**
+     * 
+     * @param abortTime - negative means no abort time
+     */
+    void runSearch(double relTimeout){
     	long abortTime = DateUtils.absoluteTimeout(relTimeout);
-
-    	startSearch( options, terminationStrategy );
-
+    	
         /* the core of the A* algorithm */
         while (!runState.pq.empty()) { // Until the priority queue is empty:
             /*
@@ -256,15 +255,16 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                 // Rather than returning null to indicate that the search was aborted/timed out,
                 // we instead set a flag in the routing context and return the SPT anyway. This
                 // allows returning a partial list results even when a timeout occurs.
-                options.rctx.aborted = true; // signal search cancellation up to higher stack frames
-                options.rctx.debug.timedOut = true; // signal timeout in debug object in the response
-                storeMemory();
-                return runState.spt;
+                runState.options.rctx.aborted = true; // signal search cancellation up to higher stack frames
+                runState.options.rctx.debug.timedOut = true; // signal timeout in debug object in the response
+                
+                break;
             }
             
             /*
              * Get next best state and, if it hasn't already been dominated, add adjacent states to queue.
              * If it has been dominated, the iteration is over; don't bother checking for termination condition.
+             * 
              * Note that termination is checked after adjacent states are added. This presents the small inefficiency
              * that adjacent states are generated for a state which could be the last one you need to check. The advantage
              * of this is that the algorithm is always left in a restartable state, which is useful for debugging or
@@ -280,6 +280,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
             if (runState.terminationStrategy != null) {
                 if (!runState.terminationStrategy.shouldSearchContinue(
                     runState.rctx.origin, runState.rctx.target, runState.u, runState.spt, runState.options))
+                	
                     break;
             // TODO AMB: Replace isFinal with bicycle conditions in BasicPathParser
             }  else if (!runState.options.batch && runState.u_vertex == runState.rctx.target && runState.u.isFinal() && runState.u.allPathParsersAccept()) {
@@ -293,6 +294,16 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
             }
 
         }
+    }
+    
+    /** @return the shortest path, or null if none is found */
+    public ShortestPathTree getShortestPathTree(RoutingRequest options, double relTimeout,
+            SearchTerminationStrategy terminationStrategy) {
+
+    	startSearch( options, terminationStrategy );
+
+    	runSearch( relTimeout );
+        
         storeMemory();
         return runState.spt;
     }
