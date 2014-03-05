@@ -145,7 +145,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         runState.targetAcceptedStates = Lists.newArrayList();
     }
 
-    RunStatus iterate(){
+    boolean iterate(){
         // print debug info
         if (verbose) {
             double w = runState.pq.peek_min_key();
@@ -163,7 +163,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         if (!runState.spt.visit(runState.u)) {
             // state has been dominated since it was added to the priority queue, so it is
             // not in any optimal path. drop it on the floor and try the next one.
-        	return RunStatus.RUNNING;
+        	return false;
         }
         
         if (traverseVisitor != null) {
@@ -174,26 +174,6 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 
         if (verbose)
             System.out.println("   vertex " + runState.u_vertex);
-        
-        /**
-         * Should we terminate the search?
-         */
-        if (runState.terminationStrategy != null) {
-            if (!runState.terminationStrategy.shouldSearchContinue(
-                runState.rctx.origin, runState.rctx.target, runState.u, runState.spt, runState.options))
-                return RunStatus.STOPPED;
-        // TODO AMB: Replace isFinal with bicycle conditions in BasicPathParser
-        }  else if (!runState.options.batch && runState.u_vertex == runState.rctx.target && runState.u.isFinal() && runState.u.allPathParsersAccept()) {
-            runState.targetAcceptedStates.add(runState.u);
-            runState.options.rctx.debug.foundPath();
-            if (runState.targetAcceptedStates.size() >= nPaths) {
-                LOG.debug("total vertices visited {}", runState.nVisited);
-
-                return RunStatus.STOPPED;
-            } else {
-            	return RunStatus.RUNNING;
-            }
-        }
 
         runState.nVisited += 1;
         
@@ -255,7 +235,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
             }
         }
         
-        return RunStatus.RUNNING;
+        return true;
     }
     
     /** @return the shortest path, or null if none is found */
@@ -268,8 +248,8 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 
         /* the core of the A* algorithm */
         while (!runState.pq.empty()) { // Until the priority queue is empty:
-            /**
-             * Terminate the search prematurely if we've hit our computation wall.
+            /*
+             * Terminate based on timeout?
              */
             if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
                 LOG.warn("Search timeout. origin={} target={}", runState.rctx.origin, runState.rctx.target);
@@ -282,9 +262,34 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
                 return runState.spt;
             }
             
-            RunStatus status = iterate();
-            if(status==RunStatus.STOPPED){
-            	break;
+            /*
+             * Get next best state and, if it hasn't already been dominated, add adjacent states to queue.
+             * If it has been dominated, the iteration is over; don't bother checking for termination condition.
+             * Note that termination is checked after adjacent states are added. This presents the small inefficiency
+             * that adjacent states are generated for a state which could be the last one you need to check. The advantage
+             * of this is that the algorithm is always left in a restartable state, which is useful for debugging or
+             * potential future variations.
+             */
+            if(!iterate()){
+            	continue;
+            }
+            
+            /*
+             * Should we terminate the search?
+             */
+            if (runState.terminationStrategy != null) {
+                if (!runState.terminationStrategy.shouldSearchContinue(
+                    runState.rctx.origin, runState.rctx.target, runState.u, runState.spt, runState.options))
+                    break;
+            // TODO AMB: Replace isFinal with bicycle conditions in BasicPathParser
+            }  else if (!runState.options.batch && runState.u_vertex == runState.rctx.target && runState.u.isFinal() && runState.u.allPathParsersAccept()) {
+                runState.targetAcceptedStates.add(runState.u);
+                runState.options.rctx.debug.foundPath();
+                if (runState.targetAcceptedStates.size() >= nPaths) {
+                    LOG.debug("total vertices visited {}", runState.nVisited);
+
+                    break;
+                }
             }
 
         }
