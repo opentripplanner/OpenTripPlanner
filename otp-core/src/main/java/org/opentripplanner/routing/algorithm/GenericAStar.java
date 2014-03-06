@@ -60,7 +60,6 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     
     enum RunStatus {
 		RUNNING, STOPPED
-    	
     }
     class RunState {
 
@@ -82,8 +81,6 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 		}
     	
     }
-    
-    private RunState runState;
 
     public void setShortestPathTreeFactory(ShortestPathTreeFactory shortestPathTreeFactory) {
         this.shortestPathTreeFactory = shortestPathTreeFactory;
@@ -105,8 +102,8 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         return this.getShortestPathTree(req, timeoutSeconds, null);
     }
     
-    public void startSearch(RoutingRequest options, SearchTerminationStrategy terminationStrategy) {
-    	runState = new RunState( options, terminationStrategy );
+    public RunState startSearch(RoutingRequest options, SearchTerminationStrategy terminationStrategy) {
+    	RunState runState = new RunState( options, terminationStrategy );
     	
         runState.rctx = options.getRoutingContext();
 
@@ -143,9 +140,11 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         runState.nVisited = 0;
         
         runState.targetAcceptedStates = Lists.newArrayList();
+        
+        return runState;
     }
 
-    boolean iterate(){
+    boolean iterate(RunState runState){
         // print debug info
         if (verbose) {
             double w = runState.pq.peek_min_key();
@@ -242,7 +241,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
      * 
      * @param abortTime - negative means no abort time
      */
-    void runSearch(double relTimeout){
+    void runSearch(RunState runState, double relTimeout){
     	long abortTime = DateUtils.absoluteTimeout(relTimeout);
     	
         /* the core of the A* algorithm */
@@ -270,7 +269,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
              * of this is that the algorithm is always left in a restartable state, which is useful for debugging or
              * potential future variations.
              */
-            if(!iterate()){
+            if(!iterate(runState)){
             	continue;
             }
             
@@ -300,9 +299,9 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     public ShortestPathTree getShortestPathTree(RoutingRequest options, double relTimeout,
             SearchTerminationStrategy terminationStrategy) {
 
-    	startSearch( options, terminationStrategy );
+    	RunState runState = startSearch( options, terminationStrategy );
 
-    	runSearch( relTimeout );
+    	runSearch( runState, relTimeout );
         
         storeMemory();
         return runState.spt;
