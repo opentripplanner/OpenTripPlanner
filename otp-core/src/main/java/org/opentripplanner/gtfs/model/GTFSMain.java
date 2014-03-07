@@ -16,11 +16,16 @@ import lombok.RequiredArgsConstructor;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.Fun;
+import org.opentripplanner.osm.OSMMain;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.beust.jcommander.internal.Lists;
 import com.csvreader.CsvReader;
 
-public class MapDbMain {
+public class GTFSMain {
+
+    private static final Logger LOG = LoggerFactory.getLogger(GTFSMain.class);
 
     static final List<Class<? extends GtfsEntity>> gtfsTables;
     static {
@@ -54,7 +59,7 @@ public class MapDbMain {
                 GtfsTable table = new GtfsTable(
                         entity.getFilename(), false, 
                         entity.getGtfsFields(), entityClass);
-                System.out.printf("Reading GTFS table '%s' (%soptional)\n", 
+                LOG.info("Reading GTFS table '{}' ({}optional)", 
                     table.name, table.optional ? "" : "not ");
                 // check if DB already exists
                 table.entities = db.getTreeMap(table.name);
@@ -74,7 +79,7 @@ public class MapDbMain {
                 int rec = 0;
                 while (reader.readRecord()) {
                     if (++rec % 100000 == 0) {
-                        System.out.println(human(rec));
+                        LOG.info(human(rec));
                     }
                     String[] row = new String[table.fields.length];
                     int col = 0;
@@ -90,7 +95,7 @@ public class MapDbMain {
                     table.entities.put(e.getKey(), e);
                 }
             }
-            for (Error e : errors) System.out.println(e.message);
+            for (Error e : errors) LOG.warn(e.message);
             zipfile.close();
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -103,7 +108,7 @@ public class MapDbMain {
         int t = 0;
         for (String trip_id : trips.keySet()) {
             if (++t % 10000 == 0) {
-                System.out.printf("trip %s\n", human(t));
+                LOG.info("trip {}", human(t));
             }
             Map<Fun.Tuple2, StopTime> tripStopTimes = 
                 stopTimes.subMap(
@@ -117,7 +122,7 @@ public class MapDbMain {
             }
             patterns.add(stops);
         }
-        System.out.printf("Total patterns: %d\n", patterns.size());
+        LOG.info("Total patterns: {}", patterns.size());
         //db.compact();
         db.close();
     }
