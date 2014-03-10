@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 import org.mapdb.Fun;
-import org.opentripplanner.osm.OSMMain;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

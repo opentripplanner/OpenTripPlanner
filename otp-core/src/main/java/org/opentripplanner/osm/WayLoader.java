@@ -9,9 +9,9 @@ public class WayLoader extends Parser {
     public final OSM osm;
     NodeTracker nodesInGeom, nodesInWays;
     
-    public WayLoader(OSM osm, NodeTracker nodes) {
+    public WayLoader(OSM osm, NodeTracker nodesInGeom) {
         this.osm = osm;
-        this.nodesInGeom = nodes;
+        this.nodesInGeom = nodesInGeom;
         this.nodesInWays = new NodeTracker();
     }
     

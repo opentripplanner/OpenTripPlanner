@@ -27,18 +27,18 @@ import crosby.binary.file.BlockInputStream;
 
 /**
  * Parser for the OpenStreetMap PBF Format. Implements callbacks for the crosby.binary OSMPBF
- * library. It loads into the OTP OSM model classes, then defers to implementations of handleNode,
+ * library. It loads OSM into the OTP model classes, then defers to implementations of handleNode,
  * handleWay, and handleRelation. Each block of a PBF file can be of a different type, so if we want
  * to examine nodes, then ways we must parse the entire file several times. This is just the nature
  * of OSM PBF.
  */
 public abstract class Parser extends BinaryParser {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Parser.class);
+    protected static final Logger LOG = LoggerFactory.getLogger(Parser.class);
 
+    OSM osm;
     // no need to internalize strings. they will be serialized out to disk anyway.
-    // private Map<String, String> stringTable = new HashMap<String, String>();
-
+    // private Map<String, String> stringTable = new HashMap<String, String>();    
     int nodeCount = 0;
     int wayCount = 0;
     
@@ -238,20 +238,26 @@ public abstract class Parser extends BinaryParser {
     
     /** 
      * Override this method to tell the parser what to do to with each node,
-     * once it has been parsed into OTP's internal OSM model. By default, do nothing.
+     * once it has been parsed into OTP's internal OSM model.
      */
-    public void handleNode(long id, Node node) {};
+    public void handleNode(long id, Node node) {
+        osm.nodes.put(id, node);
+    };
 
     /** 
      * Override this method to tell the parser what to do to with each way,
-     * once it has been parsed into OTP's internal OSM model. By default, do nothing.
+     * once it has been parsed into OTP's internal OSM model.
      */
-    public void handleWay(long id, Way way) {};
+    public void handleWay(long id, Way way) {
+        osm.ways.put(id, way);
+    };
 
     /** 
      * Override this method to tell the parser what to do to with each relation,
-     * once it has been parsed into OTP's internal OSM model. By default, do nothing.
+     * once it has been parsed into OTP's internal OSM model.
      */
-    public void handleRelation(long id, Relation relation) {};
+    public void handleRelation(long id, Relation relation) {
+        osm.relations.put(id, relation);
+    };
     
 }
