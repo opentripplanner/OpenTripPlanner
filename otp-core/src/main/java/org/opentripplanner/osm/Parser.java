@@ -13,6 +13,8 @@ package org.opentripplanner.osm;
  * not, see <http://www.gnu.org/licenses/>.
  */
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.List;
 
 import org.opentripplanner.osm.Relation.Type;
@@ -21,25 +23,24 @@ import org.slf4j.LoggerFactory;
 
 import crosby.binary.BinaryParser;
 import crosby.binary.Osmformat;
+import crosby.binary.file.BlockInputStream;
 
 /**
  * Parser for the OpenStreetMap PBF Format. Implements callbacks for the crosby.binary OSMPBF
- * library.
+ * library. It loads into the OTP OSM model classes, then defers to implementations of handleNode,
+ * handleWay, and handleRelation. Each block of a PBF file can be of a different type, so if we want
+ * to examine nodes, then ways we must parse the entire file several times. This is just the nature
+ * of OSM PBF.
  */
-public class Parser extends BinaryParser {
+public abstract class Parser extends BinaryParser {
 
     private static final Logger LOG = LoggerFactory.getLogger(Parser.class);
 
     // no need to internalize strings. they will be serialized out to disk anyway.
     // private Map<String, String> stringTable = new HashMap<String, String>();
 
-    private OSM osm;
     int nodeCount = 0;
     int wayCount = 0;
-    
-    public Parser(OSM osm) {
-        this.osm = osm;
-    }
     
     private static final String[] retainKeys = new String[] {
         "highway", "parking", "bicycle"
@@ -51,28 +52,33 @@ public class Parser extends BinaryParser {
         }
         // Accepting all tags increases size by < 1/10
         // when storing all elements.
-        // not storing elements that lack interesting tags
+        // Not storing elements that lack interesting tags
         // reduces size by 80%.
-        //return false;
-        return true;
+        // return true;
+        return false;
     }
 
+    // Load ways first, then skip loading all nodes which are not tracked.
+    // Also include bounding box filter.
+
+    // move to Tagged
     private void addTag(StringBuilder sb, String key, String val) {
-//        if (retainTag(key)) {
+        if (retainTag(key)) {
             if (sb.length() > 0) sb.append(';');
             sb.append(key);
             if (val != null && ! val.isEmpty()) {
                 sb.append('=');
                 sb.append(val);
             }
-//        }
+        }
     }
 
+    /** Note that in many PBF files this never gets called because nodes are dense. */
     @Override
     protected void parseNodes(List<Osmformat.Node> nodes) {
         StringBuilder sb = new StringBuilder();
         for (Osmformat.Node n : nodes) {
-            if (nodeCount++ % 100000 == 0) {
+            if (nodeCount++ % 10000000 == 0) {
                 LOG.info("node {}", human(nodeCount));
             }
             Node node = new Node();
@@ -85,8 +91,7 @@ public class Parser extends BinaryParser {
                 addTag(sb, key, val);
             }
             node.tags = sb.toString();
-            // Store nodes regardless of whether they have tags
-            osm.nodes.put(n.getId(), node);
+            handleNode(n.getId(), node);
         }
     }
 
@@ -96,7 +101,7 @@ public class Parser extends BinaryParser {
         int kv = 0; // index into the keysvals array
         StringBuilder sb = new StringBuilder();
         for (int n = 0; n < nodes.getIdCount(); n++) {
-            if (nodeCount++ % 100000 == 0) {
+            if (nodeCount++ % 5000000 == 0) {
                 LOG.info("node {}", human(nodeCount));
             }
             Node node = new Node();
@@ -121,8 +126,7 @@ public class Parser extends BinaryParser {
                 kv++; // Skip over the '0' delimiter.
             }
             node.tags = sb.toString();
-            // Store nodes regardless of whether they have tags
-            osm.nodes.put(id, node);
+            handleNode(id, node);
         }
     }
 
@@ -130,7 +134,7 @@ public class Parser extends BinaryParser {
     protected void parseWays(List<Osmformat.Way> ways) {
         StringBuilder sb = new StringBuilder();
         for (Osmformat.Way w : ways) {
-            if (wayCount++ % 50000 == 0) {
+            if (wayCount++ % 1000000 == 0) {
                 LOG.info("way {}", human(wayCount));
             }
             Way way = new Way();
@@ -151,9 +155,7 @@ public class Parser extends BinaryParser {
                 nodes[n] = ref;
             }
             way.nodes = nodes;
-            if (!way.tagless()) {
-                osm.ways.put(w.getId(), way);
-            }
+            handleWay(w.getId(), way);
         }
     }
 
@@ -192,9 +194,7 @@ public class Parser extends BinaryParser {
                 }
                 rel.members.add(member);
             }
-            if (!rel.tagless()) {
-                osm.relations.put(r.getId(), rel);
-            }
+            handleRelation(r.getId(), rel);
         }
     }
 
@@ -213,7 +213,7 @@ public class Parser extends BinaryParser {
 
     @Override
     public void complete() {
-        LOG.info("Done loading PBF.");
+        LOG.info("Done parsing PBF.");
     }
 
     private static String human(int n) {
@@ -225,4 +225,33 @@ public class Parser extends BinaryParser {
             return String.format("%d", n);
     }
 
+    /** Open the given OSM PBF file and run this parser on it. */
+    public void parse(String filename) {
+        try {
+            FileInputStream input = new FileInputStream(filename);
+            new BlockInputStream(input, this).process();
+            input.close();
+        } catch (IOException e) {
+            throw new RuntimeException("Error parsing OSM PBF.", e);
+        }
+    }
+    
+    /** 
+     * Override this method to tell the parser what to do to with each node,
+     * once it has been parsed into OTP's internal OSM model. By default, do nothing.
+     */
+    public void handleNode(long id, Node node) {};
+
+    /** 
+     * Override this method to tell the parser what to do to with each way,
+     * once it has been parsed into OTP's internal OSM model. By default, do nothing.
+     */
+    public void handleWay(long id, Way way) {};
+
+    /** 
+     * Override this method to tell the parser what to do to with each relation,
+     * once it has been parsed into OTP's internal OSM model. By default, do nothing.
+     */
+    public void handleRelation(long id, Relation relation) {};
+    
 }

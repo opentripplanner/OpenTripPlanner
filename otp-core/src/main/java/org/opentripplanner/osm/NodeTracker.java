@@ -54,16 +54,25 @@ public class NodeTracker {
         return block;
     }
     
-    public void set(long x) {
+    public void add(long x) {
         LOG.debug("set node {}: index {} bit {}", x, index(x), bit(x));
         block(x, true)[index(x)] |= (1L << bit(x));
     }
 
-    public boolean get(long x) {
+    public boolean contains(long x) {
         LOG.debug("get node {}: index {} bit {}", x, index(x), bit(x));
         long[] block = block(x, false);
         if (block == null) return false; 
         return (block[index(x)] & (1L << bit(x))) != 0;
+    }
+
+    public static NodeTracker acceptEverything() {
+        return new NodeTracker() {
+            @Override 
+            public boolean contains(long x) {
+                return true;
+            }
+        };
     }
     
 }

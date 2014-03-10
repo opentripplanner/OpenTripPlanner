@@ -19,7 +19,7 @@ public class NodeTrackerTest extends TestCase {
             for (int i = 0; i < 3000; i++) {            
                 long n = i * i + lo;
                 numbers.add(n);
-                tracker.set(n);
+                tracker.add(n);
                 hi = n;
                 count++;
             }
@@ -27,15 +27,15 @@ public class NodeTrackerTest extends TestCase {
             System.out.printf("Testing node tracker on %d numbers in range [%d,%d]\n", count, lo, hi);
             /* Note that a Set<Long> containing 0L returns false for contains((int)0). */
             for (long i = lo; i < hi; i++) {
-                if (tracker.get(i)) {
+                if (tracker.contains(i)) {
                     assertTrue(numbers.contains(i));
                 } else {
                     assertFalse(numbers.contains(i));
                 }
                 if (numbers.contains(i)) {
-                    assertTrue(tracker.get(i));
+                    assertTrue(tracker.contains(i));
                 } else {
-                    assertFalse(tracker.get(i));
+                    assertFalse(tracker.contains(i));
                 }
             }
         }
