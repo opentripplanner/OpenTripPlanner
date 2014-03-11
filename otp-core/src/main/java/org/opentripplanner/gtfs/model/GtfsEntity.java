@@ -5,18 +5,23 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.beust.jcommander.internal.Lists;
 
+/** Annotation for fields that are required in the GTFS spec. */
 @interface Required {}
-
-@interface Key {}
 
 abstract class GtfsEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    private static final Logger LOG = LoggerFactory.getLogger(GtfsEntity.class);
 
     /**
      * This is not a static method because it must be overridden in one subclass.
+     * 
+     * Are we even using this?
      */
     public List<Error> checkRequiredFields(Collection<String> present) {
         List<Error> errors = Lists.newArrayList();
@@ -30,44 +35,25 @@ abstract class GtfsEntity implements Serializable {
         return errors;
     }
 
-    public List<Error> setFromStrings(String[] strings) {
-        List<Error> errors = Lists.newArrayList();
+    public void setFromStrings(String[] strings) {
         int i = 0;
         for (Field field : getClass().getFields()) {
             try {
                 if (strings[i] != null) {
+                    // TODO adapt for numeric fields
                     field.set(this, strings[i]);
                 }
             } catch (ArrayIndexOutOfBoundsException ex) {
-                errors.add(new Error("Missing fields in row."));
+                LOG.error("Missing fields in row: ");
                 break;
             } catch (Exception e) {
-                errors.add(new Error("Exception: " + e));
+                LOG.error("Exception: " + e);
+                throw new RuntimeException(e);
             }
             i++;
         }
-        return errors;
-    }
-
-    public GtfsField[] getGtfsFields() {
-        Field[] fields = getClass().getFields();
-        GtfsField[] gfields = new GtfsField[fields.length];
-        for (int i = 0; i < fields.length; i++) {
-            String name = fields[i].getName();
-            boolean required = fields[i].isAnnotationPresent(Required.class);
-            gfields[i] = new GtfsField(name, !required);
-        }
-        return gfields;
     }
 
     public abstract Object getKey();
-
-    public String getFilename() {
-        return this.getClass().getSimpleName().toLowerCase() + "s.txt";
-    }
-
-    public boolean fileIsRequired() {
-        return true;
-    }
     
 }

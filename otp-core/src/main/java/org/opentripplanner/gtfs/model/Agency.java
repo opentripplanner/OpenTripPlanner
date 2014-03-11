@@ -18,9 +18,4 @@ public class Agency extends GtfsEntity {
         return agency_id == null ? agency_name : agency_id;
     }
 
-    @Override
-    public String getFilename() {
-        return "agency.txt";
-    }
-    
 }

@@ -8,7 +8,7 @@ public class Route extends GtfsEntity {
     private static final long serialVersionUID = 1L;
     
     @Required public String route_id;
-    @Required public int route_type;
+    @Required public String route_type;
     public String agency_id;
     public String route_desc;
     public String route_url;

@@ -22,9 +22,4 @@ public class StopTime extends GtfsEntity {
         return Fun.t2(trip_id, stop_sequence);
     }
 
-    @Override
-    public String getFilename() {
-        return "stop_times.txt"; // not like the others
-    }
-
 }
