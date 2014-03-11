@@ -113,7 +113,7 @@ public class ProfileRouter {
             /* This pattern has a stop near the destination. Retrieve it. */
             targetStop = toStops.get(pr.pattern).stop; 
         }
-        for (int s = pr.fromIndex; s < stops.size(); ++s) {
+        for (int s = pr.fromIndex + 1; s < stops.size(); ++s) {
             Stop stop = stops.get(s);
             if (targetStop != null && targetStop == stop) {
                 Ride ride = addRide(pr.extendToIndex(s, window));
