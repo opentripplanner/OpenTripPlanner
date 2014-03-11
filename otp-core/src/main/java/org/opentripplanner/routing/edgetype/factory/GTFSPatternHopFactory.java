@@ -413,8 +413,8 @@ public class GTFSPatternHopFactory {
                 LOG.warn(graph.addBuilderAnnotation(new TripUndefinedService(trip)));
             }
 
-            /* Fetch the stop times for this trip */
-            List<StopTime> stopTimes = _dao.getStopTimesForTrip(trip);
+            /* Fetch the stop times for this trip. Copy the list since it's immutable. */
+            List<StopTime> stopTimes = new ArrayList<StopTime>(_dao.getStopTimesForTrip(trip));
 
             /* GTFS stop times frequently contain duplicate, missing, or incorrect entries. Repair them. */
             if (removeRepeatedStops(stopTimes)) {
@@ -1363,9 +1363,9 @@ public class GTFSPatternHopFactory {
             StopTime st = it.next();
             if (prev != null) {
                 if (prev.getStop().equals(st.getStop())) {
-// OBA is giving us unmodifiable lists. copying is necessary.
-//                    prev.setDepartureTime(st.getDepartureTime());
-//                    it.remove();
+                    // OBA gives us unmodifiable lists, but we have copied them.
+                    prev.setDepartureTime(st.getDepartureTime());
+                    it.remove();
                     filtered = true;
                 }
             }
