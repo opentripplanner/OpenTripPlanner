@@ -466,7 +466,12 @@ public class Timetable implements Serializable {
                                     StopTimeEvent arrival = update.getArrival();
                                     if (arrival.hasDelay()) {
                                         delay = arrival.getDelay();
-                                        newTimes.updateArrivalDelay(i - 1, delay);
+                                        if (arrival.hasTime()) {
+                                            newTimes.updateArrivalTime(i - 1,
+                                                    (int) (arrival.getTime() - today));
+                                        } else {
+                                            newTimes.updateArrivalDelay(i - 1, delay);
+                                        }
                                     } else if (arrival.hasTime()) {
                                         newTimes.updateArrivalTime(i - 1,
                                                 (int) (arrival.getTime() - today));
@@ -489,7 +494,12 @@ public class Timetable implements Serializable {
                                     StopTimeEvent departure = update.getDeparture();
                                     if (departure.hasDelay()) {
                                         delay = departure.getDelay();
-                                        newTimes.updateDepartureDelay(i, delay);
+                                        if (departure.hasTime()) {
+                                            newTimes.updateDepartureTime(i,
+                                                    (int) (departure.getTime() - today));
+                                        } else {
+                                            newTimes.updateDepartureDelay(i, delay);
+                                        }
                                     } else if (departure.hasTime()) {
                                         newTimes.updateDepartureTime(i,
                                                 (int) (departure.getTime() - today));
