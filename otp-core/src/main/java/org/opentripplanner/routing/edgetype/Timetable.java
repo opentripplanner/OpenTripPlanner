@@ -442,9 +442,10 @@ public class Timetable implements Serializable {
                                 update.hasScheduleRelationship() ? update.getScheduleRelationship()
                                 : StopTimeUpdate.ScheduleRelationship.SCHEDULED;
                         if (scheduleRelationship == StopTimeUpdate.ScheduleRelationship.SKIPPED) {
-                            // Not really supported right now
-                            if (i > 0) newTimes.updateArrivalTime(i - 1, TripTimes.CANCELED);
-                            if (i < numHops) newTimes.updateDepartureTime(i, TripTimes.CANCELED);
+                            // TODO: Handle partial trip cancellations
+                            LOG.warn("Partially canceled trips are currently unsupported." +
+                            		" Skipping TripUpdate.");
+                            return false;
                         } else if (scheduleRelationship ==
                                 StopTimeUpdate.ScheduleRelationship.NO_DATA) {
                             if (i > 0) newTimes.updateArrivalDelay(i - 1, 0);
@@ -476,7 +477,7 @@ public class Timetable implements Serializable {
                                     }
                                 } else {
                                     if (delay == null) {
-                                        newTimes.updateArrivalTime(i - 1, TripTimes.PASSED);
+                                        newTimes.updateArrivalTime(i - 1, TripTimes.UNAVAILABLE);
                                     } else {
                                         newTimes.updateArrivalDelay(i - 1, delay);
                                     }
@@ -499,7 +500,7 @@ public class Timetable implements Serializable {
                                     }
                                 } else {
                                     if (delay == null) {
-                                        newTimes.updateDepartureTime(i, TripTimes.PASSED);
+                                        newTimes.updateDepartureTime(i, TripTimes.UNAVAILABLE);
                                     } else {
                                         newTimes.updateDepartureDelay(i, delay);
                                     }
@@ -514,8 +515,8 @@ public class Timetable implements Serializable {
                         }
                     } else {
                         if (delay == null) {
-                            if (i > 0) newTimes.updateArrivalTime(i - 1, TripTimes.PASSED);
-                            if (i < numHops) newTimes.updateDepartureTime(i, TripTimes.PASSED);
+                            if (i > 0) newTimes.updateArrivalTime(i - 1, TripTimes.UNAVAILABLE);
+                            if (i < numHops) newTimes.updateDepartureTime(i, TripTimes.UNAVAILABLE);
                         } else {
                             if (i > 0) newTimes.updateArrivalDelay(i - 1, delay);
                             if (i < numHops) newTimes.updateDepartureDelay(i, delay);
@@ -588,18 +589,5 @@ public class Timetable implements Serializable {
 
     public boolean isValidFor(ServiceDate serviceDate) {
         return this.serviceDate == null || this.serviceDate.equals(serviceDate);
-    }
-
-    /**
-     * @return true if any two trips in this timetable overlap, modulo 24 hours. Helps determine
-     * whether we need to look at more than one day when performing departure/arrival searches.
-     */
-    private boolean tripsOverlap() {
-        return maxArrive - minDepart > (24 * 60 * 60);
-    }
-
-    /** @return true if any trip in this timetable contains a stoptime greater than 24 hours. */
-    private boolean crossesMidnight() {
-        return maxArrive > (24 * 60 * 60);
     }
 }

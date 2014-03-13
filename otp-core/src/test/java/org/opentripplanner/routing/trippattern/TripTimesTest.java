@@ -96,42 +96,6 @@ public class TripTimesTest {
     }
 
     @Test
-    public void testStopCancellingUpdate() {
-        TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
-
-        updatedTripTimesA.updateArrivalTime(1, TripTimes.CANCELED);
-        updatedTripTimesA.updateDepartureTime(2, TripTimes.CANCELED);
-        updatedTripTimesA.updateArrivalTime(2, TripTimes.CANCELED);
-        updatedTripTimesA.updateDepartureTime(3, TripTimes.CANCELED);
-
-        assertTrue(updatedTripTimesA.timesIncreasing());
-
-        assertEquals(0 * 60            , updatedTripTimesA.getDepartureTime(0));
-        assertEquals(1 * 60            , updatedTripTimesA.getDepartureTime(1));
-        assertEquals(TripTimes.CANCELED, updatedTripTimesA.getDepartureTime(2));
-        assertEquals(TripTimes.CANCELED, updatedTripTimesA.getDepartureTime(3));
-        assertEquals(4 * 60            , updatedTripTimesA.getDepartureTime(4));
-        assertEquals(5 * 60            , updatedTripTimesA.getDepartureTime(5));
-        assertEquals(6 * 60            , updatedTripTimesA.getDepartureTime(6));
-
-        assertEquals(1 * 60            , updatedTripTimesA.getArrivalTime(0));
-        assertEquals(TripTimes.CANCELED, updatedTripTimesA.getArrivalTime(1));
-        assertEquals(TripTimes.CANCELED, updatedTripTimesA.getArrivalTime(2));
-        assertEquals(4 * 60            , updatedTripTimesA.getArrivalTime(3));
-        assertEquals(5 * 60            , updatedTripTimesA.getArrivalTime(4));
-        assertEquals(6 * 60            , updatedTripTimesA.getArrivalTime(5));
-        assertEquals(7 * 60            , updatedTripTimesA.getArrivalTime(6));
-
-        assertEquals( 60, updatedTripTimesA.getRunningTime(0));
-        assertEquals(  0, updatedTripTimesA.getRunningTime(1));
-        assertEquals(  0, updatedTripTimesA.getRunningTime(2));
-        assertEquals(180, updatedTripTimesA.getRunningTime(3));
-        assertEquals( 60, updatedTripTimesA.getRunningTime(4));
-        assertEquals( 60, updatedTripTimesA.getRunningTime(5));
-        assertEquals( 60, updatedTripTimesA.getRunningTime(6));
-    }
-
-    @Test
     public void testStopUpdate() {
         TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
 
@@ -150,9 +114,9 @@ public class TripTimesTest {
     public void testPassedUpdate() {
         TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
 
-        updatedTripTimesA.updateDepartureTime(0, TripTimes.PASSED);
+        updatedTripTimesA.updateDepartureTime(0, TripTimes.UNAVAILABLE);
 
-        assertEquals(TripTimes.PASSED, updatedTripTimesA.getDepartureTime(0));
+        assertEquals(TripTimes.UNAVAILABLE, updatedTripTimesA.getDepartureTime(0));
         assertEquals(60, updatedTripTimesA.getArrivalTime(0));
     }
 
@@ -193,8 +157,8 @@ public class TripTimesTest {
                     updatedTripTimesA.getScheduledDepartureTime(i));
             assertEquals(originalTripTimes.getArrivalTime(i),
                     updatedTripTimesA.getScheduledArrivalTime(i));
-            assertEquals(TripTimes.CANCELED, updatedTripTimesA.getDepartureTime(i));
-            assertEquals(TripTimes.CANCELED, updatedTripTimesA.getArrivalTime(i));
+            assertEquals(TripTimes.UNAVAILABLE, updatedTripTimesA.getDepartureTime(i));
+            assertEquals(TripTimes.UNAVAILABLE, updatedTripTimesA.getArrivalTime(i));
         }
     }
 
@@ -248,9 +212,9 @@ public class TripTimesTest {
     public void testGetRunningTime() {
         TripTimes updatedTripTimesA = new TripTimes(originalTripTimes);
 
-        updatedTripTimesA.updateDepartureTime(0, TripTimes.CANCELED);
+        updatedTripTimesA.updateDepartureTime(0, TripTimes.UNAVAILABLE);
 
-        assertEquals(0, updatedTripTimesA.getRunningTime(0));
+        assertEquals(-1, updatedTripTimesA.getRunningTime(0));
     }
 
     @Test
