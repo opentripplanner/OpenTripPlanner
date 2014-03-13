@@ -20,11 +20,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import lombok.Delegate;
-
 public class StyleList {
-
-    @Delegate
     List<Style> styles = new ArrayList<Style>(); 
 
     public StyleList(String v) {
@@ -43,6 +39,8 @@ public class StyleList {
             }
         }
     }
-    
-}
 
+    public Style get(int index) {
+        return styles.get(index);
+    }
+}

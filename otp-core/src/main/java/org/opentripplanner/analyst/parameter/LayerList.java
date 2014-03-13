@@ -20,8 +20,6 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import lombok.Delegate;
-
 /**
  *  WMS allows several layers and styles to be specified. We parse these parameters as if they 
  *  might contain a comma-separated list, but only use the first one in the WMS resource.
@@ -30,8 +28,6 @@ import lombok.Delegate;
  *  Type erasure makes a genericized EnumList impractical, so StyleList contains duplicate code.
  */
 public class LayerList {
-
-    @Delegate()
     List<Layer> layers = new ArrayList<Layer>(); 
     
     public LayerList(String v) {
@@ -46,6 +42,9 @@ public class LayerList {
             }
         }
     }
-    
+
+    public Layer get(int index) {
+        return layers.get(index);
+    }
 }
 

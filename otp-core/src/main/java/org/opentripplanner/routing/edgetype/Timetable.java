@@ -350,6 +350,38 @@ public class Timetable implements Serializable {
         return new DeparturesIterator(stopIndex);
     }
 
+    public class ArrivalsIterator implements Iterator<Integer> {
+
+        int nextPosition = 0;
+
+        private int stopIndex;
+
+        public ArrivalsIterator(int stopIndex) {
+            this.stopIndex = stopIndex;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return nextPosition < tripTimes.size();
+        }
+
+        @Override
+        public Integer next() {
+            return tripTimes.get(nextPosition++).getArrivalTime(stopIndex - 1);
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException();
+        }
+
+    }
+
+    /** Gets all the arrival times at a given stop (not used in routing) */
+    public Iterator<Integer> getArrivalTimes(int stopIndex) {
+        return new ArrivalsIterator(stopIndex);
+    }
+
     /** @return the index of TripTimes for this Trip(Id) in this particular Timetable */
     public int getTripIndex(AgencyAndId tripId) {
         int ret = 0;
@@ -444,7 +476,7 @@ public class Timetable implements Serializable {
                         if (scheduleRelationship == StopTimeUpdate.ScheduleRelationship.SKIPPED) {
                             // TODO: Handle partial trip cancellations
                             LOG.warn("Partially canceled trips are currently unsupported." +
-                            		" Skipping TripUpdate.");
+                                    " Skipping TripUpdate.");
                             return false;
                         } else if (scheduleRelationship ==
                                 StopTimeUpdate.ScheduleRelationship.NO_DATA) {

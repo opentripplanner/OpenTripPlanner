@@ -95,6 +95,8 @@ import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.edgetype.TimedTransferEdge;
+import org.opentripplanner.routing.edgetype.Timetable;
+import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.graph.Vertex;
@@ -109,6 +111,7 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStationStop;
+import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.opentripplanner.util.TestUtils;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
@@ -242,6 +245,16 @@ class Context {
         pathService.setSptService(new GenericAStar());
         pathService.setGraphService(graphService);
         planGenerator.pathService = pathService;
+
+        // Create dummy TimetableResolver
+        TimetableResolver resolver = new TimetableResolver();
+
+        // Mock TimetableSnapshotSource to return dummy TimetableResolver
+        TimetableSnapshotSource timetableSnapshotSource = mock(TimetableSnapshotSource.class);
+
+        when(timetableSnapshotSource.getTimetableSnapshot()).thenReturn(resolver);
+
+        graph.setTimetableSnapshotSource(timetableSnapshotSource);
     }
 
     private void initTransit() {
@@ -1126,6 +1139,9 @@ public class TestRequest extends TestCase {
     private void applyUpdateToTripPattern(TableTripPattern pattern, String tripId, String stopId,
             int stopSeq, int arrive, int depart, ScheduleRelationship scheduleRelationship,
             int timestamp, ServiceDate serviceDate) throws ParseException {
+        Graph graph = Context.getInstance().graph;
+        TimetableResolver snapshot = graph.getTimetableSnapshotSource().getTimetableSnapshot();
+        Timetable timetable = snapshot.resolve(pattern, serviceDate);
         TimeZone timeZone = new SimpleTimeZone(-7, "PST");
         long today = serviceDate.getAsDate(timeZone).getTime() / 1000;
         TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
@@ -1152,7 +1168,7 @@ public class TestRequest extends TestCase {
 
         TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-        assertTrue(pattern.update(tripUpdate, "TriMet", timeZone, serviceDate));
+        assertTrue(timetable.update(tripUpdate, "TriMet", timeZone, serviceDate));
     }
 
     /**

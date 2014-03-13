@@ -13,6 +13,7 @@
 
 package org.opentripplanner.routing.core;
 
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -41,6 +42,8 @@ import org.opentripplanner.routing.edgetype.FrequencyBoard;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.edgetype.TimedTransferEdge;
+import org.opentripplanner.routing.edgetype.Timetable;
+import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -48,6 +51,7 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.opentripplanner.util.TestUtils;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
@@ -93,6 +97,16 @@ class Context {
 
         // Add simple transfer to make transfer possible between U-V and I-J
         createSimpleTransfer("agency_V", "agency_I", 100);
+
+        // Create dummy TimetableResolver
+        TimetableResolver resolver = new TimetableResolver();
+
+        // Mock TimetableSnapshotSource to return dummy TimetableResolver
+        TimetableSnapshotSource timetableSnapshotSource = mock(TimetableSnapshotSource.class);
+
+        when(timetableSnapshotSource.getTimetableSnapshot()).thenReturn(resolver);
+
+        graph.setTimetableSnapshotSource(timetableSnapshotSource);
     }
 
     /**
@@ -171,6 +185,8 @@ public class TestTransfers extends TestCase {
     private void applyUpdateToTripPattern(TableTripPattern pattern, String tripId, String stopId,
             int stopSeq, int arrive, int depart, ScheduleRelationship scheduleRelationship,
             int timestamp, ServiceDate serviceDate) throws ParseException {
+        TimetableResolver snapshot = graph.getTimetableSnapshotSource().getTimetableSnapshot();
+        Timetable timetable = snapshot.resolve(pattern, serviceDate);
         TimeZone timeZone = new SimpleTimeZone(-7, "PST");
         long today = serviceDate.getAsDate(timeZone).getTime() / 1000;
         TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
@@ -197,7 +213,7 @@ public class TestTransfers extends TestCase {
 
         TripUpdate tripUpdate = tripUpdateBuilder.build();
 
-        assertTrue(pattern.update(tripUpdate, "agency", timeZone, serviceDate));
+        assertTrue(timetable.update(tripUpdate, "agency", timeZone, serviceDate));
     }
 
     public void testStopToStopTransfer() throws Exception {
