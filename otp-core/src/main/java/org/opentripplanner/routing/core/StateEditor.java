@@ -143,9 +143,7 @@ public class StateEditor {
                 return null;
             }
 
-            if(!applyPatches()) {
-                return null;
-            }
+            applyPatches();
         }
         if (!parsePath(this.child)) {
             return null;
@@ -502,10 +500,8 @@ public class StateEditor {
      * Find any patches that have been applied to the edge being traversed (i.e. the new child
      * state's back edge) and allow these patches to manipulate the StateEditor before the child
      * state is put to use.
-     * 
-     * @return false if a patch blocked traversal
      */
-    private boolean applyPatches() {
+    private void applyPatches() {
         List<Patch> patches = child.backEdge.getPatches();
         boolean display = false, active = false;
 
@@ -521,13 +517,10 @@ public class StateEditor {
                 }
 
                 if(display || active) {
-                    if(!patch.filterTraverseResult(this, display))
-                        return false;
+                    patch.filterTraverseResult(this);
                 }
             }
         }
-
-        return true;
     }
 
     /**

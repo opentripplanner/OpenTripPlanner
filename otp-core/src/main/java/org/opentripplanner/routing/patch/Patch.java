@@ -41,5 +41,5 @@ public interface Patch extends Serializable {
 
     public void remove(Graph graph);
 
-    public boolean filterTraverseResult(StateEditor result, boolean displayOnly);
+    public void filterTraverseResult(StateEditor result);
 }

@@ -49,8 +49,6 @@ public class AlertPatch extends AbstractPatch {
 
     private String direction;
 
-    private boolean cancelled = false;
-
     public AlertPatch() {
     }
 
@@ -145,9 +143,8 @@ public class AlertPatch extends AbstractPatch {
     }
 
     @Override
-    public boolean filterTraverseResult(StateEditor result, boolean displayOnly) {
+    public void filterTraverseResult(StateEditor result) {
         result.addAlert(alert);
-        return displayOnly || !isCancelled();
     }
 
     public String getAgency() {
@@ -179,14 +176,6 @@ public class AlertPatch extends AbstractPatch {
 
     public void setTrip(AgencyAndId trip) {
         this.trip = trip;
-    }
-
-    public void setCancelled(boolean cancelled) {
-        this.cancelled = cancelled;
-    }
-
-    public boolean isCancelled() {
-        return cancelled;
     }
 
     public void setDirection(String direction) {
@@ -255,9 +244,6 @@ public class AlertPatch extends AbstractPatch {
                 return false;
             }
         }
-        if(cancelled != other.cancelled) {
-            return false;
-        }
         return other.alert.equals(alert) && super.equals(other);
     }
 
@@ -267,7 +253,6 @@ public class AlertPatch extends AbstractPatch {
                 (trip == null ? 0 : trip.hashCode()) +
                 (stop == null ? 0 : stop.hashCode()) +
                 (route == null ? 0 : route.hashCode()) +
-                (alert == null ? 0 : alert.hashCode())) *
-                (cancelled ? 5 : 7);
+                (alert == null ? 0 : alert.hashCode()));
     }
 }
