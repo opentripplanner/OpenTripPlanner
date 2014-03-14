@@ -113,19 +113,14 @@ otp.modules.analyst.AnalystModule =
 
         	
         var URL = this.analystUrl + this.buildQuery(params);
-        console.log(params);
-        console.log(URL);
         
-        // is there a better way to trigger a refresh than removing and re-adding?
-	    if(this.analystLayer != null)
-		    this.webapp.map.lmap.removeLayer(this.analystLayer);
+        if(this.analystLayer != null) {
+            this.analystLayer.setUrl(URL);
+        }
         else {
-            this.analystLayer = new L.TileLayer(this.analystUrl, {zIndex : 100});
+            this.analystLayer = new L.TileLayer(URL, {zIndex : 100});
             this.addLayer("Analyst Accessibility", this.analystLayer)
         }
-            
-	    this.analystLayer._url = URL;
-        this.webapp.map.lmap.addLayer(this.analystLayer);
 
         this.legendWidget.refresh(params);
     },     
