@@ -40,9 +40,11 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.google.common.collect.Iterables;
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
@@ -57,6 +59,7 @@ import org.opentripplanner.routing.edgetype.TimetableSnapshotSource;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
+import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -114,6 +117,8 @@ public class Graph implements Serializable {
 
     private transient TimeZone timeZone = null;
 
+    private List<Stop> stops;
+
     public Graph(Graph basedOn) {
         this();
         this.bundle = basedOn.getBundle();
@@ -125,11 +130,22 @@ public class Graph implements Serializable {
         this.edgeById = new ConcurrentHashMap<Integer, Edge>();
         this.vertexById = new ConcurrentHashMap<Integer, Vertex>();
     }
-    
+
+    public List<Stop> getAllStops() {
+        /* Lazy-initialize stops list. */
+        if (stops == null) {
+            stops = Lists.newArrayList();
+            for (TransitStop stopv : Iterables.filter(vertices.values(), TransitStop.class)) {
+                stops.add(stopv.getStop());
+            }
+        }
+        return stops;
+    }
+
     /**
      * Add the given vertex to the graph. Ideally, only vertices should add themselves to the graph, when they are constructed or deserialized.
      * 
-     * @param vv the vertex to add
+     * @param v the vertex to add
      */
     public void addVertex(Vertex v) {
         Vertex old = vertices.put(v.getLabel(), v);
