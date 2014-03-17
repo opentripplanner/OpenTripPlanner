@@ -11,7 +11,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.patches;
+package org.opentripplanner.routing.alertpatch;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -46,8 +46,6 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.patch.Alert;
-import org.opentripplanner.routing.patch.AlertPatch;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -57,13 +55,13 @@ import org.opentripplanner.util.TestUtils;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-public class TestPatch extends TestCase {
+public class AlertPatchTest extends TestCase {
     private Graph graph;
 
     private RoutingRequest options;
 
     private GenericAStar aStar = new GenericAStar();
-    
+
     public void setUp() throws Exception {
 
         GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
@@ -72,17 +70,19 @@ public class TestPatch extends TestCase {
         GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
         factory.run(graph);
         graph.putService(CalendarServiceData.class, GtfsLibrary.createCalendarServiceData(context.getDao()));
-        
+
         TransitIndexService index = new TransitIndexService() {
             /*
              * mock TransitIndexService always returns preboard/prealight edges for stop A and a
              * subset of variants for route 1
              */
+            @SuppressWarnings("deprecation")
             @Override
             public PreAlightEdge getPreAlightEdge(AgencyAndId stop) {
                 return (PreAlightEdge) graph.getVertex("agency_A_arrive").getOutgoing().iterator().next();
             }
 
+            @SuppressWarnings("deprecation")
             @Override
             public PreBoardEdge getPreBoardEdge(AgencyAndId stop) {
                 return (PreBoardEdge) graph.getVertex("agency_A_depart").getIncoming().iterator().next();
@@ -98,6 +98,7 @@ public class TestPatch extends TestCase {
                 return null;
             }
 
+            @SuppressWarnings("deprecation")
             @Override
             public List<RouteVariant> getVariantsForRoute(AgencyAndId routeId) {
                 Route route = new Route();
@@ -218,6 +219,7 @@ public class TestPatch extends TestCase {
         graph.putService(TransitIndexService.class, index);
     }
 
+    @SuppressWarnings("deprecation")
     public void testStopAlertPatch() {
         AlertPatch snp1 = new AlertPatch();
         snp1.addTimePeriod(0, 1000L * 60 * 60 * 24 * 365 * 40); // until ~1/1/2011
@@ -233,7 +235,7 @@ public class TestPatch extends TestCase {
         ShortestPathTree spt;
         GraphPath path, unoptimizedPath;
 
-        options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0); 
+        options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0);
         options.setRoutingContext(graph, stop_a, stop_e);
         spt = aStar.getShortestPathTree(options);
 
@@ -247,6 +249,7 @@ public class TestPatch extends TestCase {
 
     }
 
+    @SuppressWarnings("deprecation")
     public void testTimeRanges() {
         AlertPatch snp1 = new AlertPatch();
         long breakTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0);
@@ -287,6 +290,7 @@ public class TestPatch extends TestCase {
         assertEquals(expectedNotes, path.states.get(1).getBackAlerts());
     }
 
+    @SuppressWarnings("deprecation")
     public void testRouteNotePatch() {
         AlertPatch rnp1 = new AlertPatch();
 
@@ -303,8 +307,6 @@ public class TestPatch extends TestCase {
         ShortestPathTree spt;
         GraphPath path;
 
-        long startTime = 
-        options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 7, 0, 0);
         options.setRoutingContext(graph, stop_a, stop_e);
         spt = aStar.getShortestPathTree(options);
 

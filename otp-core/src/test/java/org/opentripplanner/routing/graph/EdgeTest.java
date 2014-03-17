@@ -17,8 +17,8 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.opentripplanner.routing.patch.Alert;
-import org.opentripplanner.routing.patch.AlertPatch;
+import org.opentripplanner.routing.alertpatch.Alert;
+import org.opentripplanner.routing.alertpatch.AlertPatch;
 
 public class EdgeTest {
 
@@ -62,9 +62,9 @@ public class EdgeTest {
 	}
         
         @Test
-        public void testPatches() {
+        public void testAlertPatches() {
             Edge edge = makeSimpleEdge();
-            AlertPatch[] alerts = new AlertPatch[]{ new AlertPatch(), new AlertPatch(), new AlertPatch() };
+            AlertPatch[] alerts = new AlertPatch[] {new AlertPatch(), new AlertPatch(), new AlertPatch()};
 
             alerts[0].setAlert(new Alert());
             alerts[1].setAlert(new Alert());
@@ -74,25 +74,25 @@ public class EdgeTest {
             alerts[1].setId("1");
             alerts[2].setId("2");
             
-            edge.addPatch(alerts[0]);
-            edge.addPatch(alerts[1]);
+            edge.addAlertPatch(alerts[0]);
+            edge.addAlertPatch(alerts[1]);
             
-            assertEquals(2, edge.getPatches().size());
-            assertTrue(edge.getPatches().contains(alerts[0]));
-            assertTrue(edge.getPatches().contains(alerts[1]));
+            assertEquals(2, edge.getAlertPatches().size());
+            assertTrue(edge.getAlertPatches().contains(alerts[0]));
+            assertTrue(edge.getAlertPatches().contains(alerts[1]));
             
-            edge.removePatch(alerts[0]);
+            edge.removeAlertPatch(alerts[0]);
             
-            assertEquals(1, edge.getPatches().size());
-            assertFalse(edge.getPatches().contains(alerts[0]));
-            assertTrue(edge.getPatches().contains(alerts[1]));
+            assertEquals(1, edge.getAlertPatches().size());
+            assertFalse(edge.getAlertPatches().contains(alerts[0]));
+            assertTrue(edge.getAlertPatches().contains(alerts[1]));
             
-            edge.removePatch(alerts[0]);
-            assertEquals(1, edge.getPatches().size());
-            assertFalse(edge.getPatches().contains(alerts[0]));
-            assertTrue(edge.getPatches().contains(alerts[1]));
+            edge.removeAlertPatch(alerts[0]);
+            assertEquals(1, edge.getAlertPatches().size());
+            assertFalse(edge.getAlertPatches().contains(alerts[0]));
+            assertTrue(edge.getAlertPatches().contains(alerts[1]));
             
-            edge.removePatch(alerts[1]);
-            assertTrue(edge.getPatches().isEmpty());
+            edge.removeAlertPatch(alerts[1]);
+            assertTrue(edge.getAlertPatches().isEmpty());
         }
 }

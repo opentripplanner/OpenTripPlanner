@@ -11,8 +11,12 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.patch;
+package org.opentripplanner.routing.alertpatch;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -21,6 +25,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -31,13 +36,20 @@ import org.opentripplanner.routing.transit_index.adapters.AgencyAndIdAdapter;
 
 /**
  * This adds a note to all boardings of a given route or stop (optionally, in a given direction)
- * 
+ *
  * @author novalis
- * 
+ *
  */
 @XmlRootElement(name = "AlertPatch")
-public class AlertPatch extends AbstractPatch {
-    private static final long serialVersionUID = -7947169269916558755L;
+public class AlertPatch implements Serializable {
+    private static final long serialVersionUID = 20140317L;
+
+    private String id;
+
+    private Alert alert;
+
+    private List<TimePeriod> timePeriods = new ArrayList<TimePeriod>();
+    private List<TimePeriod> displayTimePeriods = new ArrayList<TimePeriod>();
 
     private String agency;
 
@@ -49,10 +61,38 @@ public class AlertPatch extends AbstractPatch {
 
     private String direction;
 
-    public AlertPatch() {
+    @XmlElement
+    public Alert getAlert() {
+        return alert;
     }
 
-    @Override
+    public boolean activeDuring(RoutingRequest options, long start, long end) {
+        for (TimePeriod period : timePeriods) {
+            if (!(end <= period.startTime || start >= period.endTime)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean displayDuring(RoutingRequest options, long start, long end) {
+        for (TimePeriod period : displayTimePeriods) {
+            if (!(end <= period.startTime || start >= period.endTime)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @XmlElement
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public void apply(Graph graph) {
             TransitIndexService index = graph.getService(TransitIndexService.class);
 
@@ -78,10 +118,10 @@ public class AlertPatch extends AbstractPatch {
                 for (RouteSegment segment : variant.getSegments()) {
                     if (stop == null || segment.stop.equals(stop)) {
                         if (segment.board != null) {
-                            segment.board.addPatch(this);
+                            segment.board.addAlertPatch(this);
                         }
                         if(segment.alight != null) {
-                            segment.alight.addPatch(this);
+                            segment.alight.addAlertPatch(this);
                         }
                     }
                 }
@@ -89,15 +129,14 @@ public class AlertPatch extends AbstractPatch {
         } else if (stop != null) {
             Edge edge = index.getPreBoardEdge(stop);
             if(edge != null)
-                edge.addPatch(this);
+                edge.addAlertPatch(this);
 
             edge = index.getPreAlightEdge(stop);
             if(edge != null)
-                edge.addPatch(this);
+                edge.addAlertPatch(this);
         }
     }
 
-    @Override
     public void remove(Graph graph) {
             TransitIndexService index = graph.getService(TransitIndexService.class);
 
@@ -123,10 +162,10 @@ public class AlertPatch extends AbstractPatch {
                 for (RouteSegment segment : variant.getSegments()) {
                     if (stop == null || segment.stop.equals(stop)) {
                         if (segment.board != null) {
-                            segment.board.removePatch(this);
+                            segment.board.removeAlertPatch(this);
                         }
                         if(segment.alight != null) {
-                            segment.alight.removePatch(this);
+                            segment.alight.removeAlertPatch(this);
                         }
                     }
                 }
@@ -134,17 +173,43 @@ public class AlertPatch extends AbstractPatch {
         } else if (stop != null) {
             Edge edge = index.getPreBoardEdge(stop);
             if(edge != null)
-                edge.removePatch(this);
+                edge.removeAlertPatch(this);
 
             edge = index.getPreAlightEdge(stop);
             if(edge != null)
-                edge.removePatch(this);
+                edge.removeAlertPatch(this);
         }
     }
 
-    @Override
     public void filterTraverseResult(StateEditor result) {
         result.addAlert(alert);
+    }
+
+    public void setAlert(Alert alert) {
+        this.alert = alert;
+    }
+
+    private void writeObject(ObjectOutputStream os) throws IOException {
+        if (timePeriods instanceof ArrayList<?>) {
+            ((ArrayList<TimePeriod>) timePeriods).trimToSize();
+        }
+        os.defaultWriteObject();
+    }
+
+    public void addTimePeriod(long start, long end) {
+        timePeriods.add(new TimePeriod(start, end));
+    }
+
+    public void setTimePeriods(List<TimePeriod> periods) {
+        timePeriods = periods;
+    }
+
+    public void addDisplayTimePeriod(long start, long end) {
+        displayTimePeriods.add(new TimePeriod(start, end));
+    }
+
+    public void setDisplayTimePeriods(List<TimePeriod> periods) {
+        displayTimePeriods = periods;
     }
 
     public String getAgency() {
@@ -244,7 +309,43 @@ public class AlertPatch extends AbstractPatch {
                 return false;
             }
         }
-        return other.alert.equals(alert) && super.equals(other);
+        if (alert == null) {
+            if (other.alert != null) {
+                return false;
+            }
+        } else {
+            if (!alert.equals(other.alert)) {
+                return false;
+            }
+        }
+        if (id == null) {
+            if (other.id != null) {
+                return false;
+            }
+        } else {
+            if (!id.equals(other.id)) {
+                return false;
+            }
+        }
+        if (timePeriods == null) {
+            if (other.timePeriods != null) {
+                return false;
+            }
+        } else {
+            if (!timePeriods.equals(other.timePeriods)) {
+                return false;
+            }
+        }
+        if (displayTimePeriods == null) {
+            if (other.displayTimePeriods != null) {
+                return false;
+            }
+        } else {
+            if (!displayTimePeriods.equals(other.displayTimePeriods)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public int hashCode() {

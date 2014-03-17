@@ -17,11 +17,10 @@ import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.ListMultimap;
 import lombok.Setter;
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.patch.AlertPatch;
-import org.opentripplanner.routing.patch.Patch;
 import org.opentripplanner.routing.services.GraphService;
-import org.opentripplanner.routing.services.PatchService;
+import org.opentripplanner.routing.services.AlertPatchService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -29,7 +28,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 @Component
-public class PatchServiceImpl implements PatchService {
+public class AlertPatchServiceImpl implements AlertPatchService {
 
     private Graph graph;
 
@@ -37,25 +36,25 @@ public class PatchServiceImpl implements PatchService {
     @Setter
     private GraphService graphService;
 
-    private Map<String, Patch> patches = new HashMap<String, Patch>();
-    private ListMultimap<AgencyAndId, Patch> patchesByRoute = LinkedListMultimap.create();
-    private ListMultimap<AgencyAndId, Patch> patchesByStop = LinkedListMultimap.create();
+    private Map<String, AlertPatch> alertPatches = new HashMap<String, AlertPatch>();
+    private ListMultimap<AgencyAndId, AlertPatch> patchesByRoute = LinkedListMultimap.create();
+    private ListMultimap<AgencyAndId, AlertPatch> patchesByStop = LinkedListMultimap.create();
 
-    protected PatchServiceImpl() {
+    protected AlertPatchServiceImpl() {
     }
 
-    public PatchServiceImpl(Graph graph) {
+    public AlertPatchServiceImpl(Graph graph) {
         this.graph = graph;
     }
 
     @Override
-    public Collection<Patch> getAllPatches() {
-        return patches.values();
+    public Collection<AlertPatch> getAllAlertPatches() {
+        return alertPatches.values();
     }
 
     @Override
-    public Collection<Patch> getStopPatches(AgencyAndId stop) {
-        List<Patch> result = patchesByStop.get(stop);
+    public Collection<AlertPatch> getStopPatches(AgencyAndId stop) {
+        List<AlertPatch> result = patchesByStop.get(stop);
         if (result == null) {
             result = Collections.emptyList();
         }
@@ -63,8 +62,8 @@ public class PatchServiceImpl implements PatchService {
     }
 
     @Override
-    public Collection<Patch> getRoutePatches(AgencyAndId route) {
-        List<Patch> result = patchesByRoute.get(route);
+    public Collection<AlertPatch> getRoutePatches(AgencyAndId route) {
+        List<AlertPatch> result = patchesByRoute.get(route);
         if (result == null) {
             result = Collections.emptyList();
         }
@@ -73,79 +72,75 @@ public class PatchServiceImpl implements PatchService {
     }
 
     @Override
-    public synchronized void apply(Patch patch) {
-        if (graph == null)
+    public synchronized void apply(AlertPatch alertPatch) {
+        if (graph == null) {
             graph = graphService.getGraph();
-
-        if (patches.containsKey(patch.getId())) {
-            expire(patches.get(patch.getId()));
         }
 
-        patch.apply(graph);
-        patches.put(patch.getId(), patch);
-        if (patch instanceof AlertPatch) {
-            AlertPatch alertPatch = (AlertPatch) patch;
-            AgencyAndId stop = alertPatch.getStop();
-            if (stop != null) {
-                patchesByStop.put(stop, patch);
-            }
-            AgencyAndId route = alertPatch.getRoute();
-            if (route != null) {
-                patchesByRoute.put(route, patch);
-            }
+        if (alertPatches.containsKey(alertPatch.getId())) {
+            expire(alertPatches.get(alertPatch.getId()));
         }
 
+        alertPatch.apply(graph);
+        alertPatches.put(alertPatch.getId(), alertPatch);
+
+        AgencyAndId stop = alertPatch.getStop();
+        if (stop != null) {
+            patchesByStop.put(stop, alertPatch);
+        }
+        AgencyAndId route = alertPatch.getRoute();
+        if (route != null) {
+            patchesByRoute.put(route, alertPatch);
+        }
     }
 
     @Override
     public void expire(Set<String> purge) {
         for (String patchId : purge) {
-            if (patches.containsKey(patchId)) {
-                expire(patches.get(patchId));
+            if (alertPatches.containsKey(patchId)) {
+                expire(alertPatches.get(patchId));
             }
         }
 
-        patches.keySet().removeAll(purge);
+        alertPatches.keySet().removeAll(purge);
     }
 
     @Override
     public void expireAll() {
-        for (Patch patch : patches.values()) {
-            expire(patch);
+        for (AlertPatch alertPatch : alertPatches.values()) {
+            expire(alertPatch);
         }
-        patches.clear();
+        alertPatches.clear();
     }
 
     @Override
     public void expireAllExcept(Set<String> retain) {
         ArrayList<String> toRemove = new ArrayList<String>();
 
-        for (Entry<String, Patch> entry : patches.entrySet()) {
+        for (Entry<String, AlertPatch> entry : alertPatches.entrySet()) {
             final String key = entry.getKey();
             if (!retain.contains(key)) {
                 toRemove.add(key);
                 expire(entry.getValue());
             }
         }
-        patches.keySet().removeAll(toRemove);
+        alertPatches.keySet().removeAll(toRemove);
     }
 
-    private void expire(Patch patch) {
-        if (graph == null)
+    private void expire(AlertPatch alertPatch) {
+        if (graph == null) {
             graph = graphService.getGraph();
-
-        if (patch instanceof AlertPatch) {
-            AlertPatch alertPatch = (AlertPatch) patch;
-            AgencyAndId stop = alertPatch.getStop();
-            if (stop != null) {
-                patchesByStop.remove(stop, patch);
-            }
-            AgencyAndId route = alertPatch.getRoute();
-            if (route != null) {
-                patchesByRoute.remove(route, patch);
-            }
         }
 
-        patch.remove(graph);
+        AgencyAndId stop = alertPatch.getStop();
+        if (stop != null) {
+            patchesByStop.remove(stop, alertPatch);
+        }
+        AgencyAndId route = alertPatch.getRoute();
+        if (route != null) {
+            patchesByRoute.remove(route, alertPatch);
+        }
+
+        alertPatch.remove(graph);
     }
 }

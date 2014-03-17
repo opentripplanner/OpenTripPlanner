@@ -27,10 +27,10 @@ import lombok.Getter;
 
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
-import org.opentripplanner.routing.patch.Patch;
 import org.opentripplanner.routing.util.IncrementingIdGenerator;
 import org.opentripplanner.routing.util.UniqueIdGenerator;
 
@@ -58,7 +58,7 @@ public abstract class Edge implements Serializable {
 
     protected Vertex tov;
 
-    private List<Patch> patches;
+    private List<AlertPatch> alertPatches;
 
     protected Edge(Vertex v1, Vertex v2) {
         if (v1 == null || v2 == null) {
@@ -233,27 +233,27 @@ public abstract class Edge implements Serializable {
         return 0;
     }
 
-    public void addPatch(Patch patch) {
-        if (patches == null) {
-            patches = new ArrayList<Patch>();
+    public void addAlertPatch(AlertPatch alertPatch) {
+        if (alertPatches == null) {
+            alertPatches = new ArrayList<AlertPatch>();
         }
-        if (!patches.contains(patch)) {
-            patches.add(patch);
+        if (!alertPatches.contains(alertPatch)) {
+            alertPatches.add(alertPatch);
         }
     }
 
-    public List<Patch> getPatches() {
-        if (patches == null) {
+    public List<AlertPatch> getAlertPatches() {
+        if (alertPatches == null) {
             return Collections.emptyList();
         }
-        return patches;
+        return alertPatches;
     }
 
-    public void removePatch(Patch patch) {
-        if (patches != null) {
-            patches.remove(patch);
-            if (patches.isEmpty()) {
-                patches = null;
+    public void removeAlertPatch(AlertPatch alertPatch) {
+        if (alertPatches != null) {
+            alertPatches.remove(alertPatch);
+            if (alertPatches.isEmpty()) {
+                alertPatches = null;
             }
         }
     }

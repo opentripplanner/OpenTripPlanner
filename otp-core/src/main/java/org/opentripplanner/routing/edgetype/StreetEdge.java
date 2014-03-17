@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.opentripplanner.common.TurnRestriction;
+import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
 /**

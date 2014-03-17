@@ -19,11 +19,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
-import org.opentripplanner.routing.patch.Alert;
-import org.opentripplanner.routing.patch.AlertPatch;
-import org.opentripplanner.routing.patch.TimePeriod;
-import org.opentripplanner.routing.patch.TranslatedString;
-import org.opentripplanner.routing.services.PatchService;
+import org.opentripplanner.routing.alertpatch.Alert;
+import org.opentripplanner.routing.alertpatch.AlertPatch;
+import org.opentripplanner.routing.alertpatch.TimePeriod;
+import org.opentripplanner.routing.alertpatch.TranslatedString;
+import org.opentripplanner.routing.services.AlertPatchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,13 +45,13 @@ public class AlertsUpdateHandler {
 
     private Set<String> patchIds = new HashSet<String>();
 
-    private PatchService patchService;
+    private AlertPatchService alertPatchService;
 
     /** How long before the posted start of an event it should be displayed to users */
     private long earlyStart;
 
     public void update(FeedMessage message) {
-        patchService.expire(patchIds);
+        alertPatchService.expire(patchIds);
         patchIds.clear();
 
         for (FeedEntity entity : message.getEntityList()) {
@@ -140,7 +140,7 @@ public class AlertsUpdateHandler {
             patch.setId(patchId);
             patchIds.add(patchId);
 
-            patchService.apply(patch);
+            alertPatchService.apply(patch);
         }
     }
 
@@ -173,8 +173,8 @@ public class AlertsUpdateHandler {
             this.defaultAgencyId = defaultAgencyId.intern();
     }
 
-    public void setPatchService(PatchService patchService) {
-        this.patchService = patchService;
+    public void setAlertPatchService(AlertPatchService alertPatchService) {
+        this.alertPatchService = alertPatchService;
     }
 
     public long getEarlyStart() {

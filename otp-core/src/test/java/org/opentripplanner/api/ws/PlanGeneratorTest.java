@@ -46,6 +46,9 @@ import org.opentripplanner.api.model.RelativeDirection;
 import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.gtfs.BikeAccess;
+import org.opentripplanner.routing.alertpatch.Alert;
+import org.opentripplanner.routing.alertpatch.AlertPatch;
+import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
@@ -81,8 +84,6 @@ import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.location.StreetLocation;
-import org.opentripplanner.routing.patch.Alert;
-import org.opentripplanner.routing.patch.AlertPatch;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
@@ -105,7 +106,6 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.Schedu
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
-import org.opentripplanner.routing.patch.TimePeriod;
 
 public class PlanGeneratorTest {
     private static final double[] F_DISTANCE = {3, 9996806.8, 3539050.5, 11, 2478638.8, 4, 2, 1, 0};
@@ -586,15 +586,15 @@ public class PlanGeneratorTest {
                 v58, v60);
 
         // Alert for testing GTFS-RT
-        AlertPatch patch = new AlertPatch();
+        AlertPatch alertPatch = new AlertPatch();
 
-        patch.setTimePeriods(Collections.singletonList(new TimePeriod(0, Long.MAX_VALUE)));
-        patch.setAlert(Alert.createSimpleAlerts(alertsExample));
+        alertPatch.setTimePeriods(Collections.singletonList(new TimePeriod(0, Long.MAX_VALUE)));
+        alertPatch.setAlert(Alert.createSimpleAlerts(alertsExample));
 
         // Edge initialization that can't be done using the constructor
         e3.setElevationProfile(elevation3, false);
         e17.addTrip(firstTrip, secondTrip, 4, 0, 0);
-        e29.addPatch(patch);
+        e29.addAlertPatch(alertPatch);
         e39.setElevationProfile(elevation39, false);
         e41.setElevationProfile(elevation41, false);
         e41.setHasBogusName(true);

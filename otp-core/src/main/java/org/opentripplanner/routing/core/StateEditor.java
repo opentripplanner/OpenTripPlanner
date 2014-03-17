@@ -22,12 +22,12 @@ import java.util.List;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.routing.alertpatch.Alert;
+import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.automata.AutomatonState;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.patch.Alert;
-import org.opentripplanner.routing.patch.Patch;
 import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
@@ -502,22 +502,22 @@ public class StateEditor {
      * state is put to use.
      */
     private void applyPatches() {
-        List<Patch> patches = child.backEdge.getPatches();
+        List<AlertPatch> alertPatches = child.backEdge.getAlertPatches();
         boolean display = false, active = false;
 
-        if (patches != null) {
-            for (Patch patch : patches) {
+        if (alertPatches != null) {
+            for (AlertPatch alertPatch : alertPatches) {
                 display = false;
-                active = patch.activeDuring(child.stateData.opt, child.getStartTimeSeconds(),
+                active = alertPatch.activeDuring(child.stateData.opt, child.getStartTimeSeconds(),
                                             child.getTimeSeconds());
 
                 if(!active) {
-                    display = patch.displayDuring(child.stateData.opt, child.getStartTimeSeconds(),
+                    display = alertPatch.displayDuring(child.stateData.opt, child.getStartTimeSeconds(),
                                                   child.getTimeSeconds());
                 }
 
                 if(display || active) {
-                    patch.filterTraverseResult(this);
+                    alertPatch.filterTraverseResult(this);
                 }
             }
         }

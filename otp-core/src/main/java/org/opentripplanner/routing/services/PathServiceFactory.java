@@ -25,6 +25,6 @@ public interface PathServiceFactory {
      */
     public PathService getPathService(String routerID);
 
-    public PatchService getPatchService(String routerID);
+    public AlertPatchService getAlertPatchService(String routerID);
 
 }

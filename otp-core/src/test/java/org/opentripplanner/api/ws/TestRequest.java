@@ -51,10 +51,10 @@ import org.opentripplanner.api.model.RelativeDirection;
 import org.opentripplanner.api.model.RouterInfo;
 import org.opentripplanner.api.model.RouterList;
 import org.opentripplanner.api.model.WalkStep;
+import org.opentripplanner.api.model.alertpatch.AlertPatchResponse;
 import org.opentripplanner.api.model.internals.EdgeSet;
 import org.opentripplanner.api.model.internals.FeatureCount;
 import org.opentripplanner.api.model.internals.VertexSet;
-import org.opentripplanner.api.model.patch.PatchResponse;
 import org.opentripplanner.api.model.transit.AgencyList;
 import org.opentripplanner.api.model.transit.ModeList;
 import org.opentripplanner.api.model.transit.RouteData;
@@ -80,6 +80,7 @@ import org.opentripplanner.graph_builder.model.GtfsBundles;
 import org.opentripplanner.graph_builder.services.GraphBuilderWithGtfsDao;
 import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory;
 import org.opentripplanner.model.json_serialization.WithGraph;
+import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
@@ -103,9 +104,8 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
 import org.opentripplanner.routing.impl.TravelingSalesmanPathService;
-import org.opentripplanner.routing.patch.Patch;
 import org.opentripplanner.routing.services.GraphService;
-import org.opentripplanner.routing.services.PatchService;
+import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
@@ -493,16 +493,16 @@ public class TestRequest extends TestCase {
 
     /** Smoke test for patcher */
     public void testPatcher() throws JSONException {
-        Patcher p = new Patcher();
-        PatchService service = mock(PatchService.class);
-        when(service.getStopPatches(any(AgencyAndId.class))).thenReturn(new ArrayList<Patch>());
-        when(service.getRoutePatches(any(AgencyAndId.class))).thenReturn(new ArrayList<Patch>());
+        AlertPatcher p = new AlertPatcher();
+        AlertPatchService service = mock(AlertPatchService.class);
+        when(service.getStopPatches(any(AgencyAndId.class))).thenReturn(new ArrayList<AlertPatch>());
+        when(service.getRoutePatches(any(AgencyAndId.class))).thenReturn(new ArrayList<AlertPatch>());
 
-        p.setPatchService(service);
-        PatchResponse stopPatches = p.getStopPatches("TriMet", "5678");
-        assertNull(stopPatches.patches);
-        PatchResponse routePatches = p.getRoutePatches("TriMet", "100");
-        assertNull(routePatches.patches);
+        p.setAlertPatchService(service);
+        AlertPatchResponse stopPatches = p.getStopPatches("TriMet", "5678");
+        assertNull(stopPatches.alertPatches);
+        AlertPatchResponse routePatches = p.getRoutePatches("TriMet", "100");
+        assertNull(routePatches.alertPatches);
     }
 
     public void testRouters() throws JSONException {

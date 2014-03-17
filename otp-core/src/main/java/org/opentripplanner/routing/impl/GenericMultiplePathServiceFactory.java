@@ -17,7 +17,7 @@ import java.io.StreamCorruptedException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.opentripplanner.routing.services.PatchService;
+import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.services.PathService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +52,7 @@ public abstract class GenericMultiplePathServiceFactory {
 
         public PathService pathService;
 
-        public PatchService patchService;
+        public AlertPatchService alertPatchService;
 
         public boolean reloadInProgress;
     }
@@ -101,8 +101,8 @@ public abstract class GenericMultiplePathServiceFactory {
         return doGetSubServiceBundle(routerID).pathService;
     }
 
-    protected PatchService doGetPatchService(String routerID) {
-        return doGetSubServiceBundle(routerID).patchService;
+    protected AlertPatchService doGetAlertPatchService(String routerID) {
+        return doGetSubServiceBundle(routerID).alertPatchService;
     }
 
     private SubServicesBundle doGetSubServiceBundle(String routerID) {
@@ -127,7 +127,7 @@ public abstract class GenericMultiplePathServiceFactory {
             if (ssb.pathService == null) {
                 SubServicesBundle newSsb = loadSubServices(routerID);
                 ssb.pathService = newSsb.pathService;
-                ssb.patchService = newSsb.patchService;
+                ssb.alertPatchService = newSsb.alertPatchService;
                 ssb.context = newSsb.context;
                 ssb.timestampLoaded = System.currentTimeMillis();
                 return ssb;
@@ -142,12 +142,12 @@ public abstract class GenericMultiplePathServiceFactory {
                     // Sync reload: remove old version before loading new one, in synchronized
                     // block.
                     ssb.pathService = null;
-                    ssb.patchService = null;
+                    ssb.alertPatchService = null;
                     ssb.context.close();
                     ssb.context = null;
                     SubServicesBundle newSsb = loadSubServices(routerID);
                     ssb.pathService = newSsb.pathService;
-                    ssb.patchService = newSsb.patchService;
+                    ssb.alertPatchService = newSsb.alertPatchService;
                     ssb.context = newSsb.context;
                     ssb.timestampLoaded = System.currentTimeMillis();
                 } else {
@@ -163,7 +163,7 @@ public abstract class GenericMultiplePathServiceFactory {
             synchronized (ssb) {
                 LOG.info("Async reloading modified graph '" + routerID + "'");
                 ssb.pathService = newSsb.pathService;
-                ssb.patchService = newSsb.patchService;
+                ssb.alertPatchService = newSsb.alertPatchService;
                 ssb.context.close();
                 ssb.context = newSsb.context;
                 ssb.reloadInProgress = false;
@@ -204,10 +204,10 @@ public abstract class GenericMultiplePathServiceFactory {
                 retval.pathService = (PathService) factory
                         .getBean("pathService", PathService.class);
                 try {
-                    retval.patchService = (PatchService) factory.getBean("patchService",
-                            PatchService.class);
+                    retval.alertPatchService = (AlertPatchService) factory.getBean("alertPatchService",
+                            AlertPatchService.class);
                 } catch (NoSuchBeanDefinitionException e) {
-                    LOG.warn("No bean 'patchService' defined in application-context.xml, skipping it.");
+                    LOG.warn("No bean 'alertPatchService' defined in application-context.xml, skipping it.");
                 }
                 break;
 

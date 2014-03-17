@@ -17,22 +17,20 @@ import java.util.Collection;
 import java.util.Set;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
-import org.opentripplanner.routing.patch.Patch;
+import org.opentripplanner.routing.alertpatch.AlertPatch;
 
-public interface PatchService {
-    
-        Collection<Patch> getAllPatches();
-    
-	Collection<Patch> getStopPatches(AgencyAndId stop);
+public interface AlertPatchService {
+    Collection<AlertPatch> getAllAlertPatches();
 
-	Collection<Patch> getRoutePatches(AgencyAndId route);
-	
-	void apply(Patch patch);
-	
-	void expire(Set<String> ids);
+    Collection<AlertPatch> getStopPatches(AgencyAndId stop);
 
-	void expireAll();
+    Collection<AlertPatch> getRoutePatches(AgencyAndId route);
 
-	void expireAllExcept(Set<String> ids);
+    void apply(AlertPatch alertPatch);
 
+    void expire(Set<String> ids);
+
+    void expireAll();
+
+    void expireAllExcept(Set<String> ids);
 }

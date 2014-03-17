@@ -16,7 +16,7 @@ package org.opentripplanner.routing.impl;
 import java.io.File;
 
 import org.opentripplanner.model.GraphBundle;
-import org.opentripplanner.routing.services.PatchService;
+import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.PathServiceFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -49,8 +49,8 @@ public class MultipleFilePathServiceFactoryImpl extends GenericMultiplePathServi
     }
 
     @Override
-    public PatchService getPatchService(String routerID) {
-        return doGetPatchService(routerID);
+    public AlertPatchService getAlertPatchService(String routerID) {
+        return doGetAlertPatchService(routerID);
     }
 
     private File getPathFromRouterID(String routerID) {

@@ -13,7 +13,7 @@
 
 package org.opentripplanner.routing.impl;
 
-import org.opentripplanner.routing.services.PatchService;
+import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.PathServiceFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class SingletonPathServiceFactoryImpl implements PathServiceFactory {
 
     private PathService pathService;
 
-    private PatchService patchService;
+    private AlertPatchService alertPatchService;
 
     @Autowired
     public void setPathService(PathService pathService) {
@@ -30,8 +30,8 @@ public class SingletonPathServiceFactoryImpl implements PathServiceFactory {
     }
 
     @Autowired
-    public void setPatchService(PatchService patchService) {
-        this.patchService = patchService;
+    public void setAlertPatchService(AlertPatchService alertPatchService) {
+        this.alertPatchService = alertPatchService;
     }
 
     @Override
@@ -40,7 +40,7 @@ public class SingletonPathServiceFactoryImpl implements PathServiceFactory {
     }
 
     @Override
-    public PatchService getPatchService(String routerID) {
-        return patchService;
+    public AlertPatchService getAlertPatchService(String routerID) {
+        return alertPatchService;
     }
 }

@@ -11,15 +11,13 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.api.model.patch;
+package org.opentripplanner.api.model.alertpatch;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name = "PatchCreationResponse")
-public class PatchCreationResponse {
-
-	@XmlElement
-	public String status;
-
+@XmlRootElement(name = "AlertPatchCreationResponse")
+public class AlertPatchCreationResponse {
+    @XmlElement
+    public String status;
 }
