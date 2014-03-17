@@ -20,7 +20,6 @@ otp.modules.planner.Itinerary = otp.Class({
     tripPlan      : null,
     
     firstStopIDs    : null,
-    stopTimesMap     : null,
 
     hasTransit  : false,
     totalWalk : 0,
@@ -28,52 +27,18 @@ otp.modules.planner.Itinerary = otp.Class({
     initialize : function(itinData, tripPlan) {
         this.itinData = itinData;
         this.tripPlan = tripPlan;
-        
-        this.stopTimesMap = { };
-        
+                
         this.firstStopIDs = [ ];
         for(var l=0; l<this.itinData.legs.length; l++) {
             var leg = this.itinData.legs[l];
             if(otp.util.Itin.isTransit(leg.mode)) {
                 this.hasTransit = true;
                 this.firstStopIDs.push(leg.from.stopId);
-                this.runStopTimesQuery(leg.from.stopId, leg.routeId, leg.startTime);
             }
             if(leg.mode === "WALK") this.totalWalk += leg.distance;
         }
     },
     
-    
-    // TODO : use version in TransitIndex.js instead
-    runStopTimesQuery : function(stopId, routeId, time) {
-        var this_ = this;
-        var hrs = 4;
-        var params = {
-            agency: stopId.agencyId,
-            id: stopId.id,
-            startTime : time-hrs*3600,
-            endTime : time+hrs*3600
-        };
-        if(otp.config.routerId !== undefined) {
-            params.routerId = otp.config.routerId;
-        }
-        
-        var url = otp.config.hostname + '/' + otp.config.restService + '/ws/transit/stopTimesForStop';
-        $.ajax(url, {
-            data:       params,
-            dataType:   'jsonp',
-                
-            success: function(data) {
-                var stopTimes = [];
-                for(var i=0; i<data.stopTimes.length; i++) {
-                    var st = data.stopTimes[i].StopTime || data.stopTimes[i];
-                    if(st.phase == 'departure')
-                        stopTimes.push(st.time);
-                }
-                this_.stopTimesMap[stopId.id] = stopTimes;
-            }
-        });
-    },
 
     getFirstStopID : function() {
         if(this.firstStopIDs.length == 0) return null;

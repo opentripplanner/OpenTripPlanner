@@ -179,44 +179,13 @@ otp.core.TransitIndex = otp.Class({
         return null;*/
     },
 
-    runStopTimesQuery : function(stopId, routeId, time, callbackTarget, callback) {
-        //var this_ = this;
-        var hrs = 4;
-        var params = {
-            agency: stopId.agencyId,
-            id: stopId.id,
-            startTime : time-hrs*3600,
-            endTime : time+hrs*3600
-        };
-        if(otp.config.routerId !== undefined) {
-            params.routerId = otp.config.routerId;
-        }
-        
-        var url = otp.config.hostname + '/' + otp.config.restService + '/ws/transit/stopTimesForStop';
-        $.ajax(url, {
-            data:       params,
-            dataType:   'jsonp',
-                
-            success: function(data) {
-                /*var stopTimes = [];
-                for(var i=0; i<data.stopTimes.length; i++) {
-                    var st = data.stopTimes[i].StopTime || data.stopTimes[i];
-                    if(st.phase == 'departure')
-                        stopTimes.push(st.time);
-                }
-                this_.stopTimesMap[stopId.id] = stopTimes;*/
-                callback.call(callbackTarget, data);                
-            }
-        });
-    },
 
-    runStopTimesQuery2 : function(agencyId, stopId, startTime, endTime, callbackTarget, callback) {
-        //var this_ = this;
+    runStopTimesQuery : function(agencyId, stopId, startTime, endTime, callbackTarget, callback) {
         var params = {
             agency: agencyId,
             id: stopId,
-            startTime : startTime,
-            endTime : endTime,
+            startTime : startTime * 1000, // legacy TransitIndex API still uses milliseconds
+            endTime : endTime * 1000, // legacy TransitIndex API still uses milliseconds
             extended : true,
         };
         if(otp.config.routerId !== undefined) {
