@@ -801,4 +801,25 @@ public class TransitIndex {
         }
         return agencyList;
     }
+
+    /** Returns data for stops matching a fragment of a name. */
+    @GET
+    @Path("/stopsByName")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    public Object getStopsByName(@QueryParam("agency")   String  agency,
+                                 @QueryParam("name")     String  name,
+                                 @QueryParam("extended") Boolean extended,
+                                 @QueryParam("routerId") String  routerId) throws JSONException {
+
+        StopList response = new StopList();
+        for (Stop stop : getGraph(routerId).getAllStops()) {
+            if (stop.getId().getAgencyId().equals(agency) &&
+                stop.getName().toLowerCase().contains(name.toLowerCase())) {
+                response.stops.add(new StopType(stop, extended));
+            }
+        }
+
+        return response;
+    }
+
 }

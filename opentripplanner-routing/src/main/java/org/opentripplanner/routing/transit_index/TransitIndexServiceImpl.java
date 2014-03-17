@@ -231,4 +231,5 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
     public Collection<Stop> getStopsForRoute(AgencyAndId route) {
         return stopsForRoute.get(route);
     }
+
 }
