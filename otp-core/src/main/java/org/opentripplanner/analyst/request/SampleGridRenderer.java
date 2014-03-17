@@ -41,6 +41,13 @@ import com.vividsolutions.jts.geom.Coordinate;
 /**
  * Compute a sample grid from a SPT request.
  * 
+ * First compute a shortest-path-tree from the given routing request. It then build the sample grid
+ * (a regular grid of samples covering the whole SPT area) using an accumulative grid sampling
+ * process.
+ * 
+ * @see ZSampleGrid
+ * @see AccumulativeGridSampler
+ * 
  * @author laurent
  */
 @Component
@@ -109,6 +116,11 @@ public class SampleGridRenderer {
 
         final DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
+        /**
+         * Any given sample is weighted according to the inverse of the squared normalized distance
+         * + 1 to the grid sample. We add to the sampling time a default off-road walk distance to
+         * account for off-road sampling.
+         */
         AccumulativeMetric<WTWD> accMetric = new AccumulativeMetric<WTWD>() {
             @Override
             public WTWD cumulateSample(Coordinate C0, Coordinate Cs, WTWD z, WTWD zS) {
@@ -133,6 +145,15 @@ public class SampleGridRenderer {
                 return zS;
             }
 
+            /**
+             * A Generated closing sample take 1) as off-road distance, the minimum of the off-road
+             * distance of all enclosing samples, plus the grid size, and 2) as time the minimum
+             * time of all enclosing samples plus the grid size * off-road walk speed as additional
+             * time. All this are approximations.
+             * 
+             * TODO Is there a better way of computing this? Here the computation will be different
+             * based on the order where we close the samples.
+             */
             @Override
             public WTWD closeSample(WTWD zUp, WTWD zDown, WTWD zRight, WTWD zLeft) {
                 double dMin = Double.MAX_VALUE;
@@ -212,9 +233,21 @@ public class SampleGridRenderer {
         return 0.8 * precisionMeters;
     }
 
+    /**
+     * The default TZ data we keep for each sample.
+     * 
+     * For now we keep all possible values in the vector; we may want to remove the values that will
+     * not be used in the process (for example # of boardings). Currently the filtering is done
+     * afterwards, it may be faster and surely less memory-intensive to do the filtering when
+     * processing.
+     * 
+     * @author laurent
+     */
     public static class WTWD {
         /* Total weight */
         public double w;
+
+        // TODO Add generalized cost
 
         /* Weighted sum of time in seconds */
         public double wTime;

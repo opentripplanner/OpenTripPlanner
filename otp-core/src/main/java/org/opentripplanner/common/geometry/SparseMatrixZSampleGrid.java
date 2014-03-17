@@ -25,6 +25,8 @@ import com.vividsolutions.jts.geom.Coordinate;
 /**
  * A generic indexed grid of Z samples.
  * 
+ * Internally use a SparseMatrix to store samples.
+ * 
  * @author laurent
  */
 public final class SparseMatrixZSampleGrid<TZ> implements ZSampleGrid<TZ>,
@@ -146,6 +148,7 @@ public final class SparseMatrixZSampleGrid<TZ> implements ZSampleGrid<TZ>,
 
     private Coordinate center;
 
+    @SuppressWarnings("unused")
     private int chunkSize;
 
     private SparseMatrix<SparseMatrixSamplePoint> allSamples;
