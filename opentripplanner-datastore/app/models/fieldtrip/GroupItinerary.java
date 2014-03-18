@@ -1,4 +1,4 @@
-package models;
+package models.fieldtrip;
  
 import java.util.List;
 import javax.persistence.*;
@@ -25,6 +25,9 @@ public class GroupItinerary extends Model {
     @Expose  
     public String itinData;
     
+    @Expose
+    public int timeOffset;
+
     @OneToMany(mappedBy="groupItinerary", cascade=CascadeType.ALL)
     //@OneToMany(cascade=CascadeType.ALL)
     @Expose

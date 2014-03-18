@@ -1,0 +1,27 @@
+#{stylesheet 'main.css' /}
+
+<div class="mainContent">
+
+#{if validRecaptcha}
+
+    <h2>Request Submitted</h2>
+
+    Thank you. Your request has been submitted.
+
+    <p>
+    TriMet Field Trip Program<br>
+    701 SW 6th Ave.<br>
+    Portland, OR 97204<br>
+    Email:  <a href="mailto:fieldtrips@trimet.org">fieldtrips@trimet.org</a><br>
+    Phone:  503-962-2424, option 4<br>
+    Fax:  503-962-2482<br>
+
+#{/if}
+#{else}
+    <h2>Invalid ReCaptcha Response</h2>
+    
+    The user verification text you entered was not valid. Please try again. (You may use your browser's "Back" button to return to the request form.)
+#{/else}
+      
+</div>
+

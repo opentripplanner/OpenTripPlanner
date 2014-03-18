@@ -1,4 +1,4 @@
-package models;
+package models.fieldtrip;
  
 import com.google.gson.annotations.Expose;
 import java.util.Date;
@@ -22,11 +22,32 @@ public class ScheduledFieldTrip extends GenericModel {
     @Expose
     public Long id;
     
+    /*
+    //@Column(nullable=false)
+    @OneToOne
+    public FieldTripRequest outboundRequest;
+
+    //@Column(nullable=false)
+    @OneToOne
+    public FieldTripRequest inboundRequest;
+    
+    public FieldTripRequest getRequest() {
+        if(outboundRequest != null) return outboundRequest;
+        if(inboundRequest != null) return inboundRequest;
+        return null;
+    }*/
+    
+    @ManyToOne(optional=false)
+    public FieldTripRequest request;
+    
+    @Expose
+    public Integer requestOrder;
+
     /** The username of the user who created this trip */
     @Column(nullable=false)
     @Expose
     public String createdBy;
-
+    
     /** When the trip was created */
     @Column(nullable=false)
     @Expose
@@ -68,21 +89,21 @@ public class ScheduledFieldTrip extends GenericModel {
 
     /** A description of the trip ("Morx Elementary school 3rd grade trip to zoo") 
      */
-    @Expose
-    public String description;
+    //@Expose
+    //public String description;
 
 
     /** The name of the school.
      */
-    public String school;
+    //public String school;
 
     /** The name of the teacher leading the trip.
      */
-    public String teacher;
+    //public String teacher;
 
-    @Column(nullable=false)
-    @Expose
-    public boolean mailed = false;
+    //@Column(nullable=false)
+    //@Expose
+    //public boolean mailed = false;
 
     /** The number of passengers on the trip.  A trip is not complete
         unless passengers == sum(passengers) over all group itineraries
@@ -108,26 +129,26 @@ public class ScheduledFieldTrip extends GenericModel {
     }
 
 
-    public ScheduledFieldTrip(String createdBy, Date departure, String origin, String destination, 
-                     String description, int passengers) {
-      
+    public ScheduledFieldTrip() { /*String createdBy, Date departure, String origin, String destination, 
+                     String description, int passengers) {*/
+        /*
         this.createdBy = createdBy;
         //fixme: not quite sure that this is safe
         this.departure = departure;
         this.serviceDay = departure;
         this.origin = origin;
         this.destination = destination;
-        this.description = description;
-        this.passengers = passengers;
+        //this.description = description;
+        this.passengers = passengers;*/
     }
 
-    public String toString() {
+    /*public String toString() {
         GregorianCalendar calendar = new GregorianCalendar();
         calendar.setTime(departure);
         String timeString = String.format("%d:%02d %s", calendar.get(Calendar.HOUR),
                                           calendar.get(Calendar.MINUTE),
                                           (calendar.get(Calendar.AM_PM) == 0 ? "AM" : "PM"));
         String scheduled = isScheduled() ? "scheduled" : "unscheduled";
-        return timeString + " " + description + " (" + passengers + " passengers) " + scheduled;
-    }
+        return timeString + " (" + passengers + " passengers) " + scheduled;
+    }*/
 }

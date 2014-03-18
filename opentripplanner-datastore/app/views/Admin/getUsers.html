@@ -1,0 +1,61 @@
+#{script 'jquery-1.8.2.js' /}
+
+<a href="@{Secure.logout()}">Log out</a>
+
+<p><b>All users:</b>
+<ul>
+#{list users, as:'user'}
+    <li>
+        ${user.username} (${user.role}) [<a href="/admin/deleteUser?id=${user.id}">Delete</a>]
+        
+    </li>
+#{/list}
+</ul>
+
+#{form @Admin.addUser(), id:'addUserForm'}
+
+<input type="hidden" name="username" value="${admin_username}" />
+<input type="hidden" name="password" value="${admin_password}" />
+       
+<p><b>Add new:</b>
+<br> 
+
+Username: <input id="username" name="user.username" />&nbsp;
+
+Role: <select name="user.role">
+    <option value="calltaker">Calltaker</option>
+    <option value="fieldtrip">Field trip scheduler</option>
+    <option value="all">All Roles</option>
+</select>
+
+    
+<!--<input type="submit" value="Add" style="font-size: 14px;" />-->
+<!--<span id="addUserButton" style="cursor:pointer; border: 2px solid gray; width: 60px; padding: 3px; margin: 4px auto; background: white;">Add User</span>-->
+<button id="addUserButton">Add User</button>
+
+#{/form}
+
+
+<div style="margin-top: 20px; text-align: center;"></div>
+
+<script type="text/javascript" language="javascript">
+$(document).ready(function() {
+    $("#addUserButton").click(function(evt) {
+        evt.preventDefault();
+        addUserClicked();
+    });
+});
+
+function addUserClicked() {
+    var username = $("#username").val();
+
+    var regularExpression = /^[a-z0-9]+$/i;
+    if(regularExpression.test(username)) {
+        document.forms["addUserForm"].submit();
+    }
+    else {
+        alert("Not a valid username (alphanumeric only, no spaces or special characters)");
+    }
+}
+
+</script>

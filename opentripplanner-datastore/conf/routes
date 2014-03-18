@@ -6,31 +6,46 @@
 GET     /                                       Calltaker.index
 
 
-GET     /call                                   Calltaker.getCall
-POST    /call                                   Calltaker.newCall
-OPTIONS /call                                   Calltaker.options
+GET     /calltaker/call                         Calltaker.getCall
+POST    /calltaker/call                         Calltaker.newCall
+OPTIONS /calltaker/call                         Calltaker.options
 
-GET     /callQuery                              Calltaker.getQuery
-POST    /callQuery                              Calltaker.newQuery
-DELETE  /callQuery                              Calltaker.deleteQuery
+GET     /calltaker/callQuery                    Calltaker.getQuery
+POST    /calltaker/callQuery                    Calltaker.newQuery
+DELETE  /calltaker/callQuery                    Calltaker.deleteQuery
 
 #Field trip
-GET     /fieldTrip                              FieldTrip.getFieldTrip
-GET     /fieldTrip/getTrips                     FieldTrip.getFieldTrips
-GET     /fieldTrip/getGTFSTripsInUse            FieldTrip.getGTFSTripsInUse
-GET     /fieldTrip/calendar                     FieldTrip.getCalendar
-POST    /fieldTrip/newTrip                      FieldTrip.newTrip
-POST    /fieldTrip/addItinerary                 FieldTrip.addItinerary
-POST    /fieldTrip/addTripFeedback              FieldTrip.addTripFeedback
-POST    /fieldTrip/deleteTrip                   FieldTrip.deleteTrip
-POST    /fieldTrip/newRequest                   FieldTrip.newRequest
-GET     /fieldTrip/getRequests                  FieldTrip.getRequests
+GET     /fieldtrip                              FieldTrip.getFieldTrip
+GET     /fieldtrip/getTrips                     FieldTrip.getFieldTrips
+GET     /fieldtrip/getGTFSTripsInUse            FieldTrip.getGTFSTripsInUse
+GET     /fieldtrip/calendar                     FieldTrip.getCalendar
+POST    /fieldtrip/newTrip                      FieldTrip.newTrip
+POST    /fieldtrip/addItinerary                 FieldTrip.addItinerary
+POST    /fieldtrip/deleteTrip                   FieldTrip.deleteTrip
 
-#Users
-GET      /users                                 UserManagement.getUsers
-POST     /users/delete                          UserManagement.deleteUser
-POST     /users/add                             UserManagement.addUser
+GET     /fieldtrip/getRequests                  FieldTrip.getRequests
+GET     /fieldtrip/searchRequests               FieldTrip.searchRequests
+POST    /fieldtrip/setInboundTrip               FieldTrip.setInboundTrip
+POST    /fieldtrip/setOutboundTrip              FieldTrip.setOutboundTrip
+POST    /fieldtrip/setRequestStatus             FieldTrip.setRequestStatus
 
+POST    /public/fieldtrip/newRequest            FieldTrip.newRequest
+GET     /public/fieldtrip/newRequestForm        FieldTrip.newRequestForm
+GET     /public/fieldtrip/feedbackForm          FieldTrip.feedbackForm
+POST    /public/fieldtrip/addFeedback           FieldTrip.addFeedback
+
+
+#Admin
+GET      /admin/users                           Admin.getUsers
+POST     /admin/deleteUser                      Admin.deleteUser
+POST     /admin/addUser                         Admin.addUser
+
+# Trinet Authentication
+GET      /auth/initLogin                        Application.initLogin
+
+GET      /auth/checkSession                     Application.checkSession
+GET      /auth/newSession                       Application.newSession
+GET      /auth/verifyLogin                      Application.verifyLogin
 
 # Ignore favicon requests
 GET     /favicon.ico                            404

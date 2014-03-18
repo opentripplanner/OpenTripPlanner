@@ -1,0 +1,101 @@
+#{stylesheet 'main.css' /}
+
+<div class="mainContent">
+
+<h2>Receipt for Field Trip Request ${req.id}:</h2>
+<b>Teacher Name</b>: ${req.teacherName}<br>
+<b>School</b>: ${req.schoolName}<br>
+<b>Address</b>: ${req.address}, ${req.city}, ${req.state} ${req.zip}<br>&nbsp;<br>
+
+<b>Travel Date</b>: ${(req.travelDate).format("MMMM dd, yyyy")}<br>
+<b>Destination</b>: ${req.endLocation}<br>&nbsp;<br>
+
+<b>Payment</b>: 
+#{if req.classpassId}
+  Class Pass #${req.classpassId}
+#{/if}
+#{else}
+  Standard Fare
+#{/else}
+
+<table border="0" cellpadding="6px" cellspacing="0" style="width: 100%">
+<tr style="background: #ccc;">
+  <th style="width:60%; text-align: left;"></th>
+  <th style="width:10%; text-align: left;">Quantity</th>
+  <th style="width:15%; text-align: left;">Unit Price</th> 
+  <th style="width:15%; text-align: left;">Total</th>
+</tr>
+
+#{if req.numStudents > 0}
+<tr>
+  <td>Youth Round Trip Passes</td>
+  <td>${req.numStudents}</td>
+  <td>
+    #{if req.classpassId}
+      $1.00
+    #{/if}
+    #{else}
+      $3.30
+    #{/else}    
+  </td>
+  <td>
+    #{if req.classpassId}
+      $${(req.numStudents).format("0.00")}
+    #{/if}
+    #{else}
+      $${(req.numStudents*3.3).format("0.00")}
+    #{/else}    
+  </td>
+</tr>
+#{/if}
+
+#{if req.numChaperones > 0}
+<tr>
+  <td>Adult Round Trip Passes</td>
+  <td>${req.numChaperones}</td>
+  <td>
+    #{if req.classpassId}
+      $1.00
+    #{/if}
+    #{else}
+      $5.00
+    #{/else}    
+  </td>
+  <td>
+    #{if req.classpassId}
+    $${(req.numChaperones).format("0.00")}
+    #{/if}
+    #{else}
+      $${(req.numChaperones*5).format("0.00")}
+    #{/else}    
+  </td>
+</tr>
+#{/if}
+
+#{if req.classpassId}
+<tr>
+  <td>Class Pass processing fee</td>
+  <td></td>
+  <td></td>
+  <td>$2.50</td>
+</tr>
+#{/if}
+
+<tr style="border: 2px solid #ccc;">
+  <td style="border-top: 2px solid #ccc;"><b>Grand Total</b></td>
+  <td style="border-top: 2px solid #ccc;">&nbsp;</td>
+  <td style="border-top: 2px solid #ccc;">&nbsp;</td>
+  <td style="border-top: 2px solid #ccc;">
+    #{if req.classpassId}
+      $${(req.numStudents + req.numChaperones + 2.5).format("0.00")}
+    #{/if}
+    #{else}
+      $${(req.numStudents * 3.3 + req.numChaperones * 5).format("0.00")}
+    #{/else}       
+    
+  </td>
+</tr>
+</table>
+  
+</p>
+</div>

@@ -1,4 +1,4 @@
-package models;
+package models.fieldtrip;
  
 import com.google.gson.annotations.Expose;
 import java.util.Date;
@@ -31,11 +31,29 @@ public class GTFSTrip extends Model {
     public String agencyAndId;
 
     @Expose
+    public String routeName;
+
+    @Expose
     public Integer fromStopIndex;
 
     @Expose
     public Integer toStopIndex;
+
+    @Expose
+    public Integer blockId;
+
+    @Expose
+    public String fromStopName;
     
+    @Expose
+    public String toStopName;
+    
+    @Expose
+    public String headsign;
+
+    @Expose
+    public Integer capacity;
+        
     /*@ManyToOne
     @Expose
     private Trip trip;*/

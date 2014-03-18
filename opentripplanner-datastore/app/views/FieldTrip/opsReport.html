@@ -1,0 +1,81 @@
+#{script 'jquery-1.8.2.js' /}
+#{script 'jquery-ui-1.9.1.custom.js' /}
+#{stylesheet 'jquery-ui/jquery-ui-1.9.1.custom.css' /}
+#{stylesheet 'main.css' /}
+
+<div class="mainContent">
+
+
+<div style="padding: 4px; background: #ddd; margin-bottom: 1em;">
+    <div style="float:left; padding-top: 3px;">&#x25C0; <a id="prevDayLink" href="#">Previous Day</a></div>
+    <div style="float:right; padding-top: 3px;"><a id="nextDayLink" href="#">Next Day</a> &#x25B6;</div>
+    <div style="text-align: center">
+        Jump to Day:
+        <input id="dateInput" type="text" style="width: 80px; text-align: center;"></input>
+        <button id="dateGoButton">Go</button>
+    </div>
+    <div style="clear: both;"></div>
+</div>
+
+<h2>Field trips for ${monthName} ${day}, ${year}:</h2>
+
+  #{list items:gtfsTrips, as:'gtfsTrip'}
+  <div class="tripHeader">${gtfsTrip.groupItinerary.fieldTrip.request.schoolName} Trip to ${gtfsTrip.groupItinerary.fieldTrip.request.endLocation}</div>
+  <div class="tripBody">
+    <b>Date</b>: ${month}/${day}/${year}<br>
+    <b>Number of Passengers</b>: ${gtfsTrip.groupItinerary.passengers}<br>
+    <b>Ages</b>: ${gtfsTrip.groupItinerary.fieldTrip.request.minimumAge} to ${gtfsTrip.groupItinerary.fieldTrip.request.maximumAge}<br>
+    <b>Class Pass</b>: 
+      #{if gtfsTrip.groupItinerary.fieldTrip.request.classpassId}
+        ${gtfsTrip.groupItinerary.fieldTrip.request.classpassId}
+      #{/if}
+      #{else}
+        (None)
+      #{/else}<br>
+    <b>Organization</b>: ${gtfsTrip.groupItinerary.fieldTrip.request.schoolName}<br>
+    <b>Contact</b>: ${gtfsTrip.groupItinerary.fieldTrip.request.teacherName} (${gtfsTrip.groupItinerary.fieldTrip.request.phoneNumber})<br>
+    <b>Block ID</b>: ${gtfsTrip.blockId}<br>
+    <b>Departure Stop/Time</b>: ${gtfsTrip.fromStopName} at ${new Date(gtfsTrip.depart.getTime() + gtfsTrip.groupItinerary.timeOffset*3600000).format("h:mma")}<br>
+    <b>Arrival Stop/Time</b>: ${gtfsTrip.toStopName} at ${new Date(gtfsTrip.arrive.getTime() + gtfsTrip.groupItinerary.timeOffset*3600000).format("h:mma")}<br>
+    <b>Headsign</b>: ${gtfsTrip.headsign}<br>
+    <b>Notes</b>:
+        #{list items:gtfsTrip.groupItinerary.fieldTrip.request.notes, as:'note'}
+            #{if note.type == "operational"}
+                <br>
+                &nbsp;&bull; ${note.note} <i>(${note.userName}, ${(note.timeStamp).format("M-d-yyyy h:mma")})</i>
+            #{/if}
+        #{/list}
+        #{else}
+            (None)
+        #{/else}
+  </div>
+  #{/list}
+  #{else}
+    <i>No trips planned for this day.</i>
+  #{/else}
+
+</div>
+
+
+<script type="text/javascript" language="javascript">
+    
+var month = ${month};
+var day = ${day};
+var year = ${year};
+
+$(document).ready(function() {
+    var date = new Date(year, month-1, day);
+    var msInDay = 24 * 60 * 60 * 1000;
+    var prev = new Date(date.getTime() - msInDay);
+    var next = new Date(date.getTime() + msInDay);
+    $("#prevDayLink").attr("href", "/fieldtrip/opsReport?month=" + (prev.getMonth()+1) + "&day=" + prev.getDate() + "&year=" + prev.getFullYear());
+    $("#nextDayLink").attr("href", "/fieldtrip/opsReport?month=" + (next.getMonth()+1) + "&day=" + next.getDate() + "&year=" + next.getFullYear());
+    
+    $("#dateInput").datepicker().datepicker("setDate", date);
+    
+    $("#dateGoButton").click(function() {
+        var date = $("#dateInput").datepicker("getDate");
+        window.location.href= "/fieldtrip/opsReport?month=" + (date.getMonth()+1) + "&day=" + date.getDate() + "&year=" + date.getFullYear()
+    });
+});
+</script>
