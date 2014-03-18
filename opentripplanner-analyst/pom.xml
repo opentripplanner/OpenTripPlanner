@@ -9,7 +9,7 @@
     <parent>
         <artifactId>opentripplanner</artifactId>
         <groupId>org.opentripplanner</groupId>
-        <version>0.9.2-SNAPSHOT</version>
+        <version>0.10.0</version>
     </parent>
 
 	<dependencies>
@@ -72,12 +72,10 @@
               <configuration>
                 <finalName>otp-analyst</finalName> <!-- the shaded jar file's name --> 
                 <transformers>
-                  <transformer
-                    implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                  <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                     <resource>META-INF/spring.handlers</resource>
                   </transformer>
-                  <transformer
-                    implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                  <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                     <resource>META-INF/spring.schemas</resource>
                   </transformer>
                   <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
