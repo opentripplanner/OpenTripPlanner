@@ -10,7 +10,7 @@ otp.config = {
     /**
      * The OTP web service locations
      */
-    hostname : "http://localhost:8080",
+    hostname : "",
     //municoderHostname : "http://localhost:8080",
     //datastoreUrl : 'http://localhost:9000',
 
@@ -57,7 +57,7 @@ otp.config = {
     // maxZoom : 20,
     
     /* Whether the map should be moved to contain the full itinerary when a result is received. */
-    zoomToFitResults    : true,
+    zoomToFitResults    : false,
 
     /**
      * Site name / description / branding display options

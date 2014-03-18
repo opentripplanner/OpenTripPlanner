@@ -96,7 +96,7 @@
 .otp-stopViewer-timeList {
     position: absolute;
     top: 85px;
-    bottom: 0px;
+    bottom: 20px;
     left: 0px;
     right: 0px;
     background: white;
@@ -132,3 +132,73 @@
 	text-overflow: ellipsis;
 }
 
+.otp-stopViewer-headsignRow {
+    font-size: 10px;
+    color: gray;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.otp-stopViewer-blockRow {
+    font-size: 10px;
+    font-style: italic;
+    color: gray;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.otp-stopViewer-findButtonRow {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    height: 16px;
+    text-align: center;
+}
+
+
+/** Stop Finder **/
+
+.otp-stopFinder {
+    width: 250px;
+    height: 250px;
+}
+
+.otp-stopFinder-container {
+    position: absolute;
+    top: 30px;
+    bottom: 10px;    
+    left: 10px;
+    right: 10px; 
+}
+
+.otp-stopFinder-buttonRow {
+    position: absolute;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    height: 16px;
+    text-align: center;
+}
+
+.otp-stopFinder-stopList {
+    position: absolute;
+    top: 80px;
+    left: 0px;
+    right: 0px;
+    bottom: 5px;
+    border: 1px solid black;
+    background: white;
+    overflow: auto;
+    padding: 5px;
+}
+
+.otp-stopFinder-stopRow {
+    margin: 4px;
+    font-weight: bold;
+    cursor: pointer;
+    background: #f0f0f0;
+    padding: 2px;
+}

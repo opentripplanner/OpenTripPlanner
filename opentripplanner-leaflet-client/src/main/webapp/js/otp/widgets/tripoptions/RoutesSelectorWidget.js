@@ -38,52 +38,38 @@ otp.widgets.RoutesSelectorWidget =
         this.ti = this.routesControl.tripWidget.module.webapp.transitIndex;
 
         this.selectedRouteIds = [];
-        
-        var mainRowHtml = '<div>';
 
-        mainRowHtml += '<div style="float:left">All Routes:<br><select id="'+this.id+'-routeList" size=6 class="otp-preferredRoutesSelectorWidget-list notDraggable"></select></div>';
-        mainRowHtml += '<div style="float:right">' + name + ':<br><select id="'+this.id+'-selectedList" size=6 class="otp-preferredRoutesSelectorWidget-list notDraggable"></select></div>';
-
-        mainRowHtml += '<div class="otp-preferredRoutesSelectorWidget-middle">';
-        mainRowHtml += '<button id="'+this.id+'-addButton" style="margin-bottom: 5px;">&gt;</button><br>';
-        mainRowHtml += '<button id="'+this.id+'-removeButton">&lt;</button><br>';
-        mainRowHtml += '</div>';
+        ich['otp-tripOptions-routesSelector']({
+            widgetId : this.id,
+            name : this.name
+        }).appendTo(this.$());
         
-        mainRowHtml += '<div style="clear:both;" /></div>'
+        this.selectedList = $('#'+this_.id+'-selectedList');
+        this.routeList = $('#'+this_.id+'-routeList');
 
-        $(mainRowHtml).appendTo(this.$());
-        
         $('#'+this.id+'-addButton').button().click(function() {
-            this_.selectRoute($('#'+this_.id+'-routeList').val());
+            this_.selectRoute(this_.routeList.val());
         });
+
         $('#'+this.id+'-removeButton').button().click(function() {
-            var agencyAndId = $('#'+this_.id+'-selectedList').val();
+            var agencyAndId = this_.selectedList.val();
             $('#'+this_.id+'-selectedList option[value="'+agencyAndId+'"]').remove();
             this_.selectedRouteIds.splice( $.inArray(agencyAndId, this_.selectedRouteIds), 1 );
         });
 
-        
-        var buttonRowHtml = '<div class="otp-preferredRoutesSelectorWidget-buttonRow">';
-        buttonRowHtml += '<button id="'+this.id+'-saveButton">Save</button>&nbsp;';
-        buttonRowHtml += '<button id="'+this.id+'-closeButton">Close</button>';
-        buttonRowHtml += '</div>'
-        
-        $(buttonRowHtml).appendTo(this.$());
-
         $('#'+this.id+'-saveButton').button().click(function() {
             var paramStr = '', displayStr = '';
-            //for(var i = 0; i < this_.selectedRouteIndices.length; i++) {
             for(var i = 0; i < this_.selectedRouteIds.length; i++) {
                 var route = this_.ti.routes[this_.selectedRouteIds[i]].routeData;
 
                 paramStr += route.id.agencyId+"__"+route.id.id + (i < this_.selectedRouteIds.length-1 ? ',' : '');
                 displayStr += (route.routeShortName || route.routeLongName) + (i < this_.selectedRouteIds.length-1 ? ', ' : '');
-
             }
             this_.hide();
             
             this_.routesControl.setRoutes(paramStr, displayStr);
         });
+
         $('#'+this.id+'-closeButton').button().click(function() {
             this_.close();
         });
@@ -92,41 +78,40 @@ otp.widgets.RoutesSelectorWidget =
     },
     
     selectRoute : function(agencyAndId) {
-        if(_.contains(this.selectedRouteIds, agencyAndId)) return;
-        $('#'+this.id+'-selectedList').append('<option value="'+agencyAndId+'">'+otp.util.Itin.getRouteDisplayString(this.ti.routes[agencyAndId].routeData)+'</option>');                
+        if(!agencyAndId || _.contains(this.selectedRouteIds, agencyAndId)) return;
+        this.selectedList.append('<option value="'+agencyAndId+'">'+otp.util.Itin.getRouteDisplayString(this.ti.routes[agencyAndId].routeData)+'</option>');                
         this.selectedRouteIds.push(agencyAndId);
     },
     
     updateRouteList : function() {
         if(this.initializedRoutes) return;
-        var routesList = $('#'+this.id+'-routeList'), selectedList = $('#'+this.id+'-selectedList');
         var this_ = this;
         
-        routesList.empty();
-        selectedList.empty();
+        this.routeList.empty();
 
         this.ti.loadRoutes(this, function() {
-            console.log("routes:");
-            console.log(this.ti.routes);
-            //var restoredRouteIdArr = (this_.restoredRouteIds != null) ? this_.restoredRouteIds.split(',') : []; 
-            
-            var i = 0;
-            //console.log('restoredRouteIdArr');
-            //console.log(restoredRouteIdArr);
-            for(agencyAndId in this.ti.routes) {
-                var route = this.ti.routes[agencyAndId].routeData;
-                routesList.append('<option value="'+agencyAndId+'">'+otp.util.Itin.getRouteDisplayString(route)+'</option>');
-                //var combinedId = route.id.agencyId+"_"+route.id.id;
-                if(_.contains(this_.restoredRouteIds, agencyAndId)) {
-                    this_.selectRoute(agencyAndId);
-                }
-                i++;
-            }
+            this_.restoreSelected();
             this_.initializedRoutes = true;
         });
 
     },
-    
 
+    restoreSelected : function() {
+        this.clearSelected();
+        var i = 0;
+        for(agencyAndId in this.ti.routes) {
+            var route = this.ti.routes[agencyAndId].routeData;
+            this.routeList.append('<option value="'+agencyAndId+'">'+otp.util.Itin.getRouteDisplayString(route)+'</option>');
+            if(_.contains(this.restoredRouteIds, agencyAndId)) {
+                this.selectRoute(agencyAndId);
+            }
+            i++;
+        }        
+    },
+    
+    clearSelected : function() {
+        this.selectedList.empty();
+        this.selectedRouteIds = [];
+    }
     
 });

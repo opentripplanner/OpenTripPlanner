@@ -42,6 +42,8 @@ otp.core.Webapp = otp.Class({
         var this_ = this;
         
         otp.config.resourcePath = otp.config.resourcePath || "";
+        otp.config.restService = otp.config.restService || "otp-rest-servlet";
+
 
         // set the urlRoot variable, if needed
         /*if(!otp.config.urlRoot) {
@@ -270,6 +272,8 @@ otp.core.Webapp = otp.Class({
         }
     },
     
+    loadedTemplates: {}, 
+
     setActiveModule : function(module) {
         var this_ = this;
         //console.log("set active module: "+module.moduleName);
@@ -291,14 +295,26 @@ otp.core.Webapp = otp.Class({
         }        
         
         if(!module.activated) {        
-            if(module.templateFile) {
-                $.get(otp.config.resourcePath + 'js/' + module.templateFile)
-                .success(function(data) {
-                    $('<div style="display:none;"></div>').appendTo($("body")).html(data);
-                    ich.grabTemplates();                   
-                    this_.activateModule(module);
-                });
-            }        
+            if(module.templateFiles && module.templateFiles.length > 0) {
+                var loadedTemplateCount = 0;
+                for(var i = 0; i < module.templateFiles.length; i++) {
+                    var templateFile = module.templateFiles[i];
+                    if(templateFile in this.loadedTemplates) { // template loaded already
+                        loadedTemplateCount++;
+                        if(loadedTemplateCount === module.templateFiles.length) this_.activateModule(module);
+                    }
+                    else {
+                        $.get(otp.config.resourcePath + 'js/' + templateFile)
+                        .success(_.bind(function(data) {
+                            $('<div style="display:none;"></div>').appendTo($("body")).html(data);
+                            ich.grabTemplates();
+                            this.webapp.loadedTemplates[this.templateFile] = true;
+                            loadedTemplateCount++;
+                            if(loadedTemplateCount === module.templateFiles.length) this_.activateModule(module);
+                        }, { webapp: this, templateFile: templateFile }));
+                    }
+                }
+            }
             else {
                 this.activateModule(module);
             }         

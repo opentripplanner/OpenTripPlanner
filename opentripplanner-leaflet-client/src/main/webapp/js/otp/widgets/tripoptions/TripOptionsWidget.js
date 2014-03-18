@@ -300,22 +300,11 @@ otp.widgets.tripoptions.TimeSelector =
         otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
         this.id = tripWidget.id+"-timeSelector";
 
-        var html = '<div id="'+this.id+'" class="notDraggable">';
-
-        var depArrId = this.id+'-depArr';
-        html += '<select id="'+depArrId+'">';
-        html += '<option>Depart</option>';
-        html += '<option>Arrive</option>';
-        html += '</select>';
-        
-        //var inputId = this.id+'-datepicker';
-        html += '&nbsp;<input type="text" id="'+this.id+'-date" class="otp-date-input" />';
-        html += '&nbsp;<input type="text" id="'+this.id+'-time" class="otp-time-input" />';
-        
-        html += '</div>';
-        $(html).appendTo(this.$());
+        ich['otp-tripOptions-timeSelector']({
+            widgetId : this.id,
+        }).appendTo(this.$());
     
-        this.epoch = moment().unix()*1000;    
+        this.epoch = moment().unix();    
     },
 
     doAfterLayout : function() {
@@ -324,19 +313,6 @@ otp.widgets.tripoptions.TimeSelector =
         $("#"+this.id+'-depArr').change(function() {
             this_.tripWidget.module.arriveBy = (this.selectedIndex == 1);
         });
-
-
-        /*$('#'+this.id+'-picker').datetimepicker({
-            timeFormat: "hh:mmtt", 
-            onSelect: function(dateTime) {
-                var dateTimeArr = dateTime.split(' ');
-                this_.tripWidget.inputChanged({
-                    date : dateTimeArr[0],
-                    time : dateTimeArr[1],
-                });
-            }
-        });
-        $('#'+this.id+'-picker').datepicker("setDate", new Date());*/
 
         $('#'+this.id+'-date').datepicker({
             timeFormat: "hh:mmtt", 
@@ -351,11 +327,20 @@ otp.widgets.tripoptions.TimeSelector =
         $('#'+this.id+'-time').val(moment().format(otp.config.timeFormat))
         .keyup(function() {
             if(otp.config.timeFormat.toLowerCase().charAt(otp.config.timeFormat.length-1) === 'a') {
-                var val = $(this).val();
+                var val = $(this).val().toLowerCase();
+                if(val.charAt(val.length-1) === 'm') {
+                    val = val.substring(0, val.length-1);
+                }
                 if(val.charAt(val.length-1) === 'a' || val.charAt(val.length-1) === 'p') {
                     if(otp.util.Text.isNumber(val.substring(0, val.length-1))) {
-                        var hour = parseInt(val.substring(0, val.length-1));
-                        if(hour >= 1 && hour <= 12) $(this).val(hour + ":00" + val.charAt(val.length-1) + "m")
+                        var num = parseInt(val.substring(0, val.length-1));
+                        if(num >= 1 && num <= 12) $(this).val(num + ":00" + val.charAt(val.length-1) + "m");
+                        else if(num >= 100) {
+                            var hour = Math.floor(num/100), min = num % 100;
+                            if(hour >= 1 && hour <= 12 && min >= 0 && min < 60) {
+                                $(this).val(hour + ":" + (min < 10 ? "0" : "") + min + val.charAt(val.length-1) + "m");
+                            }
+                        }
                     }
                 }
             }            
@@ -365,6 +350,14 @@ otp.widgets.tripoptions.TimeSelector =
             
         });
         
+        $("#"+this.id+'-nowButton').click(function() {
+            $('#'+this_.id+'-date').datepicker("setDate", new Date());        
+            $('#'+this_.id+'-time').val(moment().format(otp.config.timeFormat))
+            this_.tripWidget.inputChanged({
+                time : $('#'+this_.id+'-time').val(),
+                date : $('#'+this_.id+'-date').val()
+            });
+        });
 
     },
     
@@ -649,10 +642,10 @@ otp.widgets.tripoptions.PreferredRoutes =
     doAfterLayout : function() {
         var this_ = this;
         $('#'+this.id+'-button').button().click(function() {
-            console.log("edit pref rtes");
             this_.selectorWidget.updateRouteList();
 
             this_.selectorWidget.show();
+            if(this_.selectorWidget.isMinimized) this_.selectorWidget.unminimize();
             this_.selectorWidget.bringToFront();
         });
         
@@ -690,9 +683,11 @@ otp.widgets.tripoptions.PreferredRoutes =
                 var agencyAndId = apiIdArr[0] + "_" + apiIdArr.pop();
                 restoredIds.push(agencyAndId);
             }
-            this.selectorWidget.restoredRouteIds = restoredIds; //planData.queryParams.preferredRoutes;
+
+            this.selectorWidget.restoredRouteIds = restoredIds;
+            if(this.selectorWidget.initializedRoutes) this.selectorWidget.restoreSelected();
+
             this.tripWidget.module.preferredRoutes = planData.queryParams.preferredRoutes;
-            //this.selectorWidget.updateRouteList();
             
             // resolve the IDs to user-friendly names
             var ti = this.tripWidget.module.webapp.transitIndex;
@@ -707,6 +702,7 @@ otp.widgets.tripoptions.PreferredRoutes =
             
         }
         else { // none specified
+            this.selectorWidget.clearSelected();
             this.selectorWidget.restoredRouteIds = [];
             $('#'+this.id+'-list').html('(None)');
             this.tripWidget.module.preferredRoutes = null;
@@ -753,6 +749,7 @@ otp.widgets.tripoptions.BannedRoutes =
         $('#'+this.id+'-button').button().click(function() {
             this_.selectorWidget.updateRouteList();
             this_.selectorWidget.show();
+            if(this_.selectorWidget.isMinimized) this_.selectorWidget.unminimize();
             this_.selectorWidget.bringToFront();
         });
     },
@@ -777,7 +774,10 @@ otp.widgets.tripoptions.BannedRoutes =
                 var agencyAndId = apiIdArr[0] + "_" + apiIdArr.pop();
                 restoredIds.push(agencyAndId);
             }
+
             this.selectorWidget.restoredRouteIds = restoredIds;
+            if(this.selectorWidget.initializedRoutes) this.selectorWidget.restoreSelected();
+
             this.tripWidget.module.bannedRoutes = planData.queryParams.bannedRoutes;
             
             // resolve the IDs to user-friendly names
@@ -793,6 +793,7 @@ otp.widgets.tripoptions.BannedRoutes =
             
         }
         else { // none specified
+            this.selectorWidget.clearSelected();
             this.selectorWidget.restoredRouteIds = [];
             $('#'+this.id+'-list').html('(None)');
             this.tripWidget.module.bannedRoutes = null;
@@ -938,7 +939,7 @@ otp.widgets.tripoptions.TripSummary =
         }
     	
         $("#"+this.id+"-distance").html(otp.util.Geo.distanceString(dist));
-        $("#"+this.id+"-duration").html(otp.util.Time.msToHrMin(itin.duration));	
+        $("#"+this.id+"-duration").html(otp.util.Time.secsToHrMin(itin.duration));	
         
         var timeByMode = { };
         for(var i=0; i < itin.legs.length; i++) {
@@ -952,7 +953,7 @@ otp.widgets.tripoptions.TripSummary =
         
         var summaryStr = "";
         for(mode in timeByMode) {
-            summaryStr += otp.util.Time.msToHrMin(timeByMode[mode]) + " " + this.getModeName(mode) + " / ";
+            summaryStr += otp.util.Time.secsToHrMin(timeByMode[mode]) + " " + this.getModeName(mode) + " / ";
         }
         summaryStr = summaryStr.slice(0, -3);
         $("#"+this.id+"-timeSummary").html(summaryStr);	

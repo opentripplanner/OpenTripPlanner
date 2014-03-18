@@ -37,7 +37,7 @@ otp.modules.analyst.AnalystLegendWidget =
     },
     
     refresh : function(params) {
-	    this.img.attr('src', otp.config.hostname+'/opentripplanner-api-webapp/ws/legend.png?width='+this.imgWidth+'&height='+this.imgHeight+'&styles='
-		    + params.styles);
+	    this.img.attr('src', otp.config.hostname+'/' + otp.config.restService + '/ws/legend.png?width='
+       + this.imgWidth+'&height=' + this.imgHeight + '&styles=' + params.styles);
     }
 });

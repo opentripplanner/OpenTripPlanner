@@ -91,8 +91,12 @@ otp.modules.planner.PlannerModule =
     
     icons       : null,
 
+    //templateFile : 'otp/modules/planner/planner-templates.html',
+
     initialize : function(webapp, id, options) {
         otp.modules.Module.prototype.initialize.apply(this, arguments);
+        this.templateFiles.push('otp/modules/planner/planner-templates.html');
+
         this.icons = new otp.modules.planner.IconFactory();
         
         this.planTripFunction = this.planTrip;
@@ -126,7 +130,8 @@ otp.modules.planner.PlannerModule =
         this.addLayer("Start/End Markers", this.markerLayer);
         this.addLayer("Paths", this.pathLayer);
         this.addLayer("Path Markers", this.pathMarkerLayer);
-        
+
+        this.webapp.transitIndex.loadAgencies(this);
         this.webapp.transitIndex.loadRoutes(this, function() {
             this.routesLoaded();
         });
@@ -269,7 +274,7 @@ otp.modules.planner.PlannerModule =
         }
     	
     	apiMethod = apiMethod || 'plan';
-        var url = otp.config.hostname + '/opentripplanner-api-webapp/ws/'+apiMethod;
+        var url = otp.config.hostname + '/' + otp.config.restService + '/ws/' + apiMethod;
         this.pathLayer.clearLayers();        
         
         var this_ = this;
@@ -290,7 +295,7 @@ otp.modules.planner.PlannerModule =
        	    queryParams = {             
                 fromPlace: this.getStartOTPString(),
                 toPlace: this.getEndOTPString(),
-                time : (this.time) ? this.time : moment().format("h:mma"),
+                time : (this.time) ? otp.util.Time.correctAmPmTimeString(this.time) : moment().format("h:mma"),
                 //time : (this.time) ? moment(this.time).add("s", addToStart).format("h:mma") : moment().add("s", addToStart).format("h:mma"),
                 date : (this.date) ? this.date : moment().format("MM-DD-YYYY"),
                 mode: this.mode,
@@ -361,7 +366,7 @@ otp.modules.planner.PlannerModule =
                                 var leg = itin.itinData.legs[l];
                                 if(otp.util.Itin.isTransit(leg.mode)) {
                                     var tripId = leg.agencyId + "_"+leg.tripId;
-                                    if(!this_.checkTripValidity(tripId, leg.from.stopIndex, leg.to.stopIndex, itin)) {
+                                    if(!this_.checkTripValidity(tripId, leg, itin)) {
                                         //console.log("INVALID TRIP");
                                         invalidTrips.push(tripId);
                                     }

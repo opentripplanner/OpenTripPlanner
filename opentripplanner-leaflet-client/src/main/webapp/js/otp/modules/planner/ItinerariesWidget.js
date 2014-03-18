@@ -414,7 +414,7 @@ otp.widgets.ItinerariesWidget =
 
         // add alerts, if applicable
         alerts = alerts || [];
-        if(itin.totalWalk > itin.tripPlan.queryParams.maxWalkDistance && itin.tripPlan.queryParams.maxWalkDistance > 804) {
+        if(itin.totalWalk > itin.tripPlan.queryParams.maxWalkDistance) {
             alerts.push("Total walk distance for this trip exceeds specified maximum");
         }
         
@@ -496,7 +496,12 @@ otp.widgets.ItinerariesWidget =
             
             // show the start time and stop
 
-            $('<div class="otp-itin-leg-leftcol">'+otp.util.Time.formatItinTime(leg.startTime, "h:mma")+"</div>").appendTo(legDiv);
+            // prevaricate if this is a nonstruct frequency trip
+            if( leg.isNonExactFrequency === true ){
+            	$('<div class="otp-itin-leg-leftcol">every '+(leg.headway/60)+" mins</div>").appendTo(legDiv);
+            } else {
+                $('<div class="otp-itin-leg-leftcol">'+otp.util.Time.formatItinTime(leg.startTime, "h:mma")+"</div>").appendTo(legDiv);
+            }
 
             var startHtml = '<div class="otp-itin-leg-endpointDesc">' + (leg.interlineWithPreviousLeg ? "<b>Depart</b> " : "<b>Board</b> at ") +leg.from.name;
             if(otp.config.municoderHostname) {
@@ -537,7 +542,7 @@ otp.widgets.ItinerariesWidget =
 
             var inTransitDiv = $('<div class="otp-itin-leg-elapsedDesc" />').appendTo(legDiv);
 
-            $('<span><i>Time in transit: '+otp.util.Time.msToHrMin(leg.duration)+'</i></span>').appendTo(inTransitDiv);
+            $('<span><i>Time in transit: '+otp.util.Time.secsToHrMin(leg.duration)+'</i></span>').appendTo(inTransitDiv);
 
             $('<span>&nbsp;[<a href="#">Trip Viewer</a>]</span>')
             .appendTo(inTransitDiv)
@@ -596,7 +601,11 @@ otp.widgets.ItinerariesWidget =
 
             $('<div class="otp-itin-leg-buffer"></div>').appendTo(legDiv);            
 
-            $('<div class="otp-itin-leg-leftcol">'+otp.util.Time.formatItinTime(leg.endTime, "h:mma")+"</div>").appendTo(legDiv);           
+            if( leg.isNonExactFrequency === true ) {
+            	$('<div class="otp-itin-leg-leftcol">late as '+otp.util.Time.formatItinTime(leg.endTime, "h:mma")+"</div>").appendTo(legDiv);   
+            } else {
+            	$('<div class="otp-itin-leg-leftcol">'+otp.util.Time.formatItinTime(leg.endTime, "h:mma")+"</div>").appendTo(legDiv);   
+            }
 
             var endAction = (nextLeg && nextLeg.interlineWithPreviousLeg) ? "Stay on board" : "Alight";
             var endHtml = '<div class="otp-itin-leg-endpointDesc"><b>' + endAction + '</b> at '+leg.to.name;
@@ -624,27 +633,22 @@ otp.widgets.ItinerariesWidget =
                 for(var i = 0; i < leg.alerts.length; i++) {
                     var alert = leg.alerts[i];
                     
-                    var alertHtml = '<div class="otp-itin-alert-header">';
-
-                    if(alert.alertUrl && alert.alertUrl.someTranslation) {
-                    	alertHtml += '<a href="' + alert.alertUrl.someTranslation + '" target="_blank">';
-                	}
-                    alertHtml += 'Alert for Route ' + leg.route;
-                    if(alert.alertUrl && alert.alertUrl.someTranslation) {
-                    	alertHtml += '</a>';
-                	}
-
-                    if(alert.alertHeaderText && alert.alertHeaderText.someTranslation) {
-                        alertHtml += ': ' + alert.alertHeaderText.someTranslation;
-                    }
-                    alertHtml += '</div>';
-                    if(alert.alertDescriptionText && alert.alertDescriptionText.someTranslation) {
-                        alertHtml += '<div class="otp-itin-alert-description">' + alert.alertDescriptionText.someTranslation + '</div>';
-                    }
+                    var alertDiv = ich['otp-planner-alert']({ alert: alert, leg: leg }).appendTo(legDiv);
+                    alertDiv.find('.otp-itin-alert-description').hide();
                     
-                    $('<div class="otp-itin-alert" />').appendTo(legDiv)
-                    .append($('<div class="otp-itin-alert-left" />'))
-                    .append($('<div class="otp-itin-alert-main" />').html(alertHtml));                    
+                    alertDiv.find('.otp-itin-alert-toggleButton').data('div', alertDiv).click(function() {
+                        var div = $(this).data('div');
+                        var desc = div.find('.otp-itin-alert-description');
+                        var toggle = div.find('.otp-itin-alert-toggleButton');
+                        if(desc.is(":visible")) {
+                            desc.slideUp();
+                            toggle.html("&#x25BC;");
+                        }
+                        else {
+                            desc.slideDown();
+                            toggle.html("&#x25B2;");
+                        }
+                    });
                 } 
             }
                         

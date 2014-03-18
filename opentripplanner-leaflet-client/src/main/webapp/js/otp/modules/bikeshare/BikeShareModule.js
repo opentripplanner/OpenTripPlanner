@@ -36,7 +36,7 @@ otp.modules.bikeshare.StationModel =
 otp.modules.bikeshare.StationCollection = 
     Backbone.Collection.extend({
     
-    url: otp.config.hostname + '/opentripplanner-api-webapp/ws/bike_rental',
+    url: otp.config.hostname + '/' + otp.config.restService + '/ws/bike_rental',
     model: otp.modules.bikeshare.StationModel,
     
     sync: function(method, model, options) {

@@ -35,11 +35,12 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
         
         //this.contentDiv  = $('<div class="otp-fieldTrip-requestWidget-content notDraggable" />').appendTo(this.mainDiv);
         this.render();
-        this.center();
+        this.centerX();
     },
     
     render : function() {
         var this_ = this;
+
         var context = _.clone(this.request);
         context.widgetId = this.id;
         context.dsUrl = otp.config.datastoreUrl;
@@ -63,7 +64,14 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
         if(outboundTrip) context.outboundPlanInfo = otp.util.FieldTrip.constructPlanInfo(outboundTrip);
         var inboundTrip = otp.util.FieldTrip.getInboundTrip(this.request);
         if(inboundTrip) context.inboundPlanInfo = otp.util.FieldTrip.constructPlanInfo(inboundTrip);
-        //this.contentDiv.empty().append(ich['otp-fieldtrip-request'](context));
+        
+        context.internalNotes = [];
+        context.operationalNotes = [];
+        for(var i = 0; i < context.notes.length; i++) {
+            if(context.notes[i].type === "internal") context.internalNotes.push(context.notes[i]);
+            else if(context.notes[i].type === "operational") context.operationalNotes.push(context.notes[i]);
+        }
+
         if(this.content) this.content.remove();
         this.content = ich['otp-fieldtrip-request'](context).appendTo(this.mainDiv);
         
@@ -88,13 +96,26 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
             this_.module.saveRequestTrip(this_.request, "outbound");
         });
         
-        this.content.find('.inboundPlanButton').click(function(evt) {
-            
+        this.content.find('.inboundPlanButton').click(function(evt) {            
             this_.module.planInbound(this_.request);
         });
 
         this.content.find('.inboundSaveButton').click(function(evt) {
             this_.module.saveRequestTrip(this_.request, "inbound");
+        });
+
+        this.content.find('.changeDateLink').click(function(evt) {
+            otp.widgets.Dialogs.showDateDialog("Select the new travel date:", "Select Date", function(date) {
+                if(otp.util.FieldTrip.getOutboundTrip(this_.request) || otp.util.FieldTrip.getInboundTrip(this_.request)) {
+                    var msg = "This action will delete any itineraries previously planned for this request on the original date. Do you wish to continue?";
+                    otp.widgets.Dialogs.showYesNoDialog(msg, "Continue?", function() {
+                        this_.module.setRequestDate(this_.request, date);
+                    });
+                }
+                else {
+                    this_.module.setRequestDate(this_.request, date);
+                }
+            });
         });
         
         this.content.find('.printablePlanLink').click(function(evt) {
@@ -115,15 +136,16 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
             if(outboundTrip) context.outboundItineraries = outboundTrip.groupItineraries;
             if(inboundTrip) context.inboundItineraries = inboundTrip.groupItineraries;
             
+            console.log(context);
             var content = ich['otp-fieldtrip-printablePlan'](context);
             
             // populate itin details
-            console.log(outboundTrip);
             if(outboundTrip) {
                 var itins = outboundTrip.groupItineraries;
                 for(var i = 0; i < itins.length; i++) {
                     var itinData = otp.util.FieldTrip.readItinData(itins[i]);
                     var itin = new otp.modules.planner.Itinerary(itinData, null);
+                    if(req.classpassId) itin.fareDisplayOverride = '(Class Pass: #' + req.classpassId + ')';
                     content.find('.outbound-itinBody-'+i).html(itin.getHtmlNarrative());
                 }
             }
@@ -133,6 +155,7 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
                 for(var i = 0; i < itins.length; i++) {
                     var itinData = otp.util.FieldTrip.readItinData(itins[i]);
                     var itin = new otp.modules.planner.Itinerary(itinData, null);
+                    if(req.classpassId) itin.fareDisplayOverride = '(Class Pass: #' + req.classpassId + ')';
                     content.find('.inbound-itinBody-'+i).html(itin.getHtmlNarrative());
                 }
             }
@@ -158,10 +181,10 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
             }
         });
         this.content.find('.addNoteButton').click(function(evt) {
-            otp.widgets.Dialogs.showInputDialog("Note to be attached to this request:", "Add Note", function(input) {
-                console.log(input);
-                this_.module.addNote(this_.request, input);
-            });
+            /*otp.widgets.Dialogs.showInputDialog("Note to be attached to this request:", "Add Note", function(input) {
+                this_.module.addNote(this_.request, input, "internal");
+            });*/
+            this_.showNoteDialog();
         });
         
         for(var i = 0; i < this.request.notes.length; i++) {
@@ -185,6 +208,31 @@ otp.modules.fieldtrip.FieldTripRequestWidget =
     tripPlanned : function() {
         $('#' + this.id + '-outboundSaveButton').removeAttr("disabled");
         $('#' + this.id + '-inboundSaveButton').removeAttr("disabled");
-    }
+    },
+
+    showNoteDialog : function() {
+        var this_ = this;
+
+        var dialog = ich['otp-fieldtrip-noteDialog']({
+            message : "Note to be attached to this request:"
+        }).dialog({
+            title : "Add Note",
+            appendTo: 'body',
+            modal: true,
+            zIndex: 100000,
+            height: 180
+        });
+        
+        dialog.find(".okButton").button().click(function() {
+            var text = dialog.find(".textarea").val();
+            var type = dialog.find('input:radio[name=type]:checked').val();
+            this_.module.addNote(this_.request, text, type);
+            dialog.dialog("close");
+        });
+
+        dialog.find(".cancelButton").button().click(function() {
+            dialog.dialog("close");
+        });
+    },     
     
 });

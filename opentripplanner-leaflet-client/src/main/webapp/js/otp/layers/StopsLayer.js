@@ -74,7 +74,9 @@ otp.layers.StopsLayer =
             
             var icon = new StopIcon20();
             
-            var popupContent = ich['otp-stopsLayer-popup'](stop);
+            var context = _.clone(stop);
+            context.agencyStopLinkText = otp.config.agencyStopLinkText || "Agency Stop URL";
+            var popupContent = ich['otp-stopsLayer-popup'](context);
 
             popupContent.find('.stopViewerLink').data('stop', stop).click(function() {
                 var thisStop = $(this).data('stop');
@@ -112,10 +114,6 @@ otp.layers.StopsLayer =
             }).addTo(this)
             .bindPopup(popupContent.get(0));
             
-            
-
-            
         }
-
     },
 });
