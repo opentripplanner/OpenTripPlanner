@@ -156,25 +156,6 @@
 			</plugin>
 
             <plugin>
-                <groupId>org.codehaus.enunciate</groupId>
-                <artifactId>maven-enunciate-plugin</artifactId>
-                <version>1.25</version>
-                <executions>
-                  <execution>
-                    <!-- default binding for docs goal is process-sources phase -->
-                    <phase>site</phase>
-                    <goals>
-                      <goal>docs</goal>
-                    </goals>
-                  </execution>
-                </executions>
-                <configuration>
-                  <!-- change this to wherever you want the docs -->
-                  <docsDir>${project.build.directory}/site/enunciate</docsDir>
-                </configuration>
-            </plugin>
-
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
