@@ -16,11 +16,25 @@ package org.opentripplanner.common.geometry;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
+ * Generic interface for a class that compute an isoline out of a TZ 2D "field".
  * 
  * @author laurent
  */
 public interface IsolineBuilder<TZ> {
 
+    /**
+     * A ZMetric is a metric for some generic TZ value.
+     * 
+     * By metric here we understand:
+     * <ul>
+     * <li>Cutting detection on a range, z0 in [Za, Zb] (rely on TZ to be an ordered set)</li>
+     * <li>Interpolation on a range, z0 in [Za, Zb].</li>
+     * </ul>
+     * Cutting detection could be easily implemented using interpolation, but usually interpolating
+     * is rather more expansive than cutting detection so we split the two operations.
+     * 
+     * @author laurent
+     */
     public interface ZMetric<TZ> {
         /**
          * Check if the edge [AB] between two samples A and B "intersect" the zz0 plane.
@@ -45,5 +59,5 @@ public interface IsolineBuilder<TZ> {
     }
 
     public Geometry computeIsoline(TZ z0);
-    
+
 }

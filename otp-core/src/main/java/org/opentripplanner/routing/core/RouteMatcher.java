@@ -54,9 +54,12 @@ public class RouteMatcher implements Cloneable, Serializable {
     /**
      * Build a new RouteMatcher from a string representation.
      * 
-     * @param routeSpecList A comma-separated list of route spec, each of the format [agencyId]_[routeName]_[routeId] Please note that this format is
-     *        not really intuitive as it does not follow the OBA-gtfslib AgencyAndId standard ('agencyID_routeId'). This was kept for
-     *        backward-compatibility purposes. If the original routeName contains some "_" each *must* be replaced by a space.
+     * @param routeSpecList A comma-separated list of route spec, each of the format
+     *        [agencyId]_[routeName]_[routeId] Please note that this format is not really intuitive
+     *        as it does not follow the OBA-gtfslib AgencyAndId standard ('agencyID_routeId'). This
+     *        was kept for backward-compatibility purposes. If the original routeName contains some
+     *        "_" each *must* be replaced by a space. If the agency or route ID contains a "_" they
+     *        must be escaped using a backslash.
      * @return A RouteMatcher
      * @throws IllegalArgumentException If the string representation is invalid.
      */
@@ -69,10 +72,14 @@ public class RouteMatcher implements Cloneable, Serializable {
             if (element.length() == 0)
                 continue;
             n++;
-            String[] routeSpec = element.split("_", 3);
+            String[] routeSpec = element.split("(?<!\\\\)_", 3);
             if (routeSpec.length != 2 && routeSpec.length != 3) {
                 throw new IllegalArgumentException("Wrong route spec format: " + element);
             }
+            routeSpec[0] = routeSpec[0].replace("\\_", "_");
+            routeSpec[1] = routeSpec[1].replace("\\_", " ");
+            if (routeSpec.length >= 3)
+                routeSpec[2] = routeSpec[2].replace("\\_", "_");
             String agencyId = routeSpec[0];
             if (agencyId.length() == 0)
                 agencyId = null;

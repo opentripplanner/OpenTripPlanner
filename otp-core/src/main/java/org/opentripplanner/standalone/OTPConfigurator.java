@@ -8,10 +8,13 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import org.opentripplanner.analyst.core.GeometryIndex;
+import org.opentripplanner.analyst.request.IsoChroneSPTRendererAccSampling;
+import org.opentripplanner.analyst.request.IsoChroneSPTRendererRecursiveGrid;
 import org.opentripplanner.analyst.request.Renderer;
 import org.opentripplanner.analyst.request.SPTCache;
 import org.opentripplanner.analyst.request.SampleFactory;
 import org.opentripplanner.analyst.request.TileCache;
+import org.opentripplanner.analyst.request.SampleGridRenderer;
 import org.opentripplanner.api.ws.PlanGenerator;
 import org.opentripplanner.api.ws.services.MetadataService;
 import org.opentripplanner.graph_builder.GraphBuilderTask;
@@ -109,6 +112,9 @@ public class OTPConfigurator {
             cpf.bind(TileCache.class);
             cpf.bind(GeometryIndex.class);
             cpf.bind(SampleFactory.class);
+            cpf.bind(IsoChroneSPTRendererAccSampling.class);
+            cpf.bind(IsoChroneSPTRendererRecursiveGrid.class);
+            cpf.bind(SampleGridRenderer.class);
         }
         
         // Perform field injection on bound instances and call post-construct methods

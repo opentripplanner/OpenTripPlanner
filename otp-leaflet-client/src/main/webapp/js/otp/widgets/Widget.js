@@ -103,11 +103,11 @@ otp.widgets.Widget = otp.Class({
         this.contextMenu = new otp.core.ContextMenu(this.mainDiv, function() {
             //console.log("widget cm clicked");
         });
-        this.contextMenu.addItem("Minimize", function() {
+        this.contextMenu.addItem(otp.config.locale.contextMenu.minimize, function() {
             this_.minimize();
-        }).addItem("Bring to Front", function() {
+        }).addItem(otp.config.locale.contextMenu.bringToFront, function() {
             this_.bringToFront();            
-        }).addItem("Send to Back", function() {
+        }).addItem(otp.config.locale.contextMenu.sendToBack, function() {
             this_.sendToBack();            
         });
         

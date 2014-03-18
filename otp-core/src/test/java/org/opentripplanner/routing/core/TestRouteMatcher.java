@@ -87,7 +87,20 @@ public class TestRouteMatcher extends TestCase {
             thrown = true;
         }
         assertTrue(thrown);
+        
+        Route r1c = new Route();
+        r1c.setId(new AgencyAndId("A_1", "R_42"));
+        r1c.setShortName("R_42");
 
+        RouteMatcher matcherR1c = RouteMatcher.parse("A\\_1_R 42");
+        assertTrue(matcherR1c.matches(r1c));
+        assertFalse(matcherR1c.matches(r1));
+        assertFalse(matcherR1c.matches(r1b));
+
+        RouteMatcher matcherR1c2 = RouteMatcher.parse("A\\_1__R\\_42");
+        assertTrue(matcherR1c2.matches(r1c));
+        assertFalse(matcherR1c2.matches(r1));
+        assertFalse(matcherR1c2.matches(r1b));
     }
 
 }

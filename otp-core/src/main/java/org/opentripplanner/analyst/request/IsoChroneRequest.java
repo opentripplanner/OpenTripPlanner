@@ -19,6 +19,8 @@ import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
+import com.vividsolutions.jts.geom.Coordinate;
+
 /**
  * A request for an isochrone vector.
  * 
@@ -40,6 +42,10 @@ public class IsoChroneRequest {
     @Getter
     @Setter
     private int maxTimeSec = 0;
+
+    @Getter
+    @Setter
+    private Coordinate coordinateOrigin;
 
     @Getter
     private int minCutoffSec = Integer.MAX_VALUE;

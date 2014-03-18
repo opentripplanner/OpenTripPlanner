@@ -25,6 +25,8 @@ import com.vividsolutions.jts.geom.Coordinate;
 /**
  * A generic indexed grid of Z samples.
  * 
+ * Internally use a SparseMatrix to store samples.
+ * 
  * @author laurent
  */
 public final class SparseMatrixZSampleGrid<TZ> implements ZSampleGrid<TZ>,
@@ -146,6 +148,9 @@ public final class SparseMatrixZSampleGrid<TZ> implements ZSampleGrid<TZ>,
 
     private Coordinate center;
 
+    @SuppressWarnings("unused")
+    private int chunkSize;
+
     private SparseMatrix<SparseMatrixSamplePoint> allSamples;
 
     private List<GridDelaunayEdge> triangulation = null;
@@ -162,6 +167,7 @@ public final class SparseMatrixZSampleGrid<TZ> implements ZSampleGrid<TZ>,
         this.center = center;
         this.dX = dX;
         this.dY = dY;
+        this.chunkSize = chunkSize;
         allSamples = new SparseMatrix<SparseMatrixSamplePoint>(chunkSize, totalSize);
     }
 
@@ -231,7 +237,37 @@ public final class SparseMatrixZSampleGrid<TZ> implements ZSampleGrid<TZ>,
         return new int[] { (int) Math.round((C.x - center.x - dX / 2) / dX),
                 (int) Math.round((C.y - center.y - dY / 2) / dY) };
     }
+    
+    @Override
+    public Coordinate getCenter() {
+        return center;
+    }
+    
+    @Override
+    public Coordinate getCellSize() {
+        return new Coordinate(dX, dY);
+    }
 
+    @Override
+    public int getXMin() {
+        return allSamples.getXMin();
+    }
+
+    @Override
+    public int getXMax() {
+        return allSamples.getXMax();
+    }
+
+    @Override
+    public int getYMin() {
+        return allSamples.getYMin();
+    }
+
+    @Override
+    public int getYMax() {
+        return allSamples.getYMax();
+    }
+    
     @Override
     public int size() {
         return allSamples.size();

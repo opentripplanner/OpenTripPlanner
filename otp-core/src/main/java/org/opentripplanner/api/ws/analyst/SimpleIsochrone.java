@@ -302,7 +302,6 @@ public class SimpleIsochrone extends RoutingResource {
         SimpleFeatureCollection contourFeatures = makeContourFeatures(); 
         /* Output the staged features to Shapefile */
         final File shapeDir = Files.createTempDir();
-        shapeDir.deleteOnExit();
         File shapeFile = new File(shapeDir, shpName + ".shp");
         LOG.debug("writing out shapefile {}", shapeFile);
         ShapefileDataStore outStore = new ShapefileDataStore(shapeFile.toURI().toURL());
@@ -313,6 +312,9 @@ public class SimpleIsochrone extends RoutingResource {
         SimpleFeatureStore featureStore = (SimpleFeatureStore) outStore.getFeatureSource();
         featureStore.addFeatures(contourFeatures);
         // close?
+        shapeDir.deleteOnExit(); // Note: the order is important
+        for (File f : shapeDir.listFiles())
+            f.deleteOnExit();
         /* Zip up the shapefile components */  
         StreamingOutput output = new DirectoryZipper(shapeDir);
         if (stream) {
@@ -321,6 +323,7 @@ public class SimpleIsochrone extends RoutingResource {
             File zipFile = new File(shapeDir, shpName + ".zip");
             OutputStream fos = new FileOutputStream(zipFile);
             output.write(fos);
+            zipFile.deleteOnExit();
             return Response.ok().entity(zipFile).build();
         }
     }   
