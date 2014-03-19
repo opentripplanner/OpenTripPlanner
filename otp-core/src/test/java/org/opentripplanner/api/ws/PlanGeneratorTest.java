@@ -594,7 +594,6 @@ public class PlanGeneratorTest {
         // Edge initialization that can't be done using the constructor
         e3.setElevationProfile(elevation3, false);
         e17.addTrip(firstTrip, secondTrip, 4, 0, 0);
-        e29.addAlertPatch(alertPatch);
         e39.setElevationProfile(elevation39, false);
         e41.setElevationProfile(elevation41, false);
         e41.setHasBogusName(true);
@@ -677,6 +676,7 @@ public class PlanGeneratorTest {
         graph.addAgency(trainAgency);
         graph.addAgency(ferryAgency);
         graph.setTimetableSnapshotSource(timetableSnapshotSource);
+        graph.addAlertPatch(e29, alertPatch);
 
         // Routing context creation and initialization
         ServiceDay serviceDay = new ServiceDay(graph, 0, calendarServiceImpl, null);

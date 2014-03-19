@@ -15,15 +15,13 @@ package org.opentripplanner.routing.core;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Set;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.alertpatch.Alert;
-import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.automata.AutomatonState;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
@@ -142,8 +140,6 @@ public class StateEditor {
                         child.backEdge);
                 return null;
             }
-
-            applyPatches();
         }
         if (!parsePath(this.child)) {
             return null;
@@ -495,33 +491,6 @@ public class StateEditor {
     }
 
     /* PRIVATE METHODS */
-
-    /**
-     * Find any patches that have been applied to the edge being traversed (i.e. the new child
-     * state's back edge) and allow these patches to manipulate the StateEditor before the child
-     * state is put to use.
-     */
-    private void applyPatches() {
-        List<AlertPatch> alertPatches = child.backEdge.getAlertPatches();
-        boolean display = false, active = false;
-
-        if (alertPatches != null) {
-            for (AlertPatch alertPatch : alertPatches) {
-                display = false;
-                active = alertPatch.activeDuring(child.stateData.opt, child.getStartTimeSeconds(),
-                                            child.getTimeSeconds());
-
-                if(!active) {
-                    display = alertPatch.displayDuring(child.stateData.opt, child.getStartTimeSeconds(),
-                                                  child.getTimeSeconds());
-                }
-
-                if(display || active) {
-                    alertPatch.filterTraverseResult(this);
-                }
-            }
-        }
-    }
 
     /**
      * To be called before modifying anything in the child's StateData. Makes sure that changes are

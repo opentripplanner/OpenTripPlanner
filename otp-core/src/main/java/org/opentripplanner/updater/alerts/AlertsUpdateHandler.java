@@ -69,8 +69,7 @@ public class AlertsUpdateHandler {
         alertText.alertDescriptionText = deBuffer(alert.getDescriptionText());
         alertText.alertHeaderText = deBuffer(alert.getHeaderText());
         alertText.alertUrl = deBuffer(alert.getUrl());
-        ArrayList<TimePeriod> periods        = new ArrayList<TimePeriod>();
-        ArrayList<TimePeriod> displayPeriods = new ArrayList<TimePeriod>();
+        ArrayList<TimePeriod> periods = new ArrayList<TimePeriod>();
         if(alert.getActivePeriodCount() > 0) {
             long bestStartTime = Long.MAX_VALUE;
             for (TimeRange activePeriod : alert.getActivePeriodList()) {
@@ -80,9 +79,7 @@ public class AlertsUpdateHandler {
                     bestStartTime = realStart;
                 }
                 final long end = activePeriod.hasEnd() ? activePeriod.getEnd() : Long.MAX_VALUE;
-                periods.add(new TimePeriod(realStart, end));
-                if(earlyStart > 0 && start != realStart)
-                    displayPeriods.add(new TimePeriod(start, realStart));
+                periods.add(new TimePeriod(start, end));
             }
             if (bestStartTime != Long.MAX_VALUE) {
                 alertText.effectiveStartDate = new Date(bestStartTime * 1000);
@@ -134,7 +131,6 @@ public class AlertsUpdateHandler {
                 patch.setAgencyId(agencyId);
             }
             patch.setTimePeriods(periods);
-            patch.setDisplayTimePeriods(displayPeriods);
             patch.setAlert(alertText);
 
             patch.setId(patchId);

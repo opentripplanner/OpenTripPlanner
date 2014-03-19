@@ -17,9 +17,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -27,7 +24,6 @@ import lombok.Getter;
 
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.MavenVersion;
-import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
@@ -57,8 +53,6 @@ public abstract class Edge implements Serializable {
     protected Vertex fromv;
 
     protected Vertex tov;
-
-    private List<AlertPatch> alertPatches;
 
     protected Edge(Vertex v1, Vertex v2) {
         if (v1 == null || v2 == null) {
@@ -231,31 +225,6 @@ public abstract class Edge implements Serializable {
     public double timeLowerBound(RoutingRequest options) {
         // No edge should take less than zero time to traverse.
         return 0;
-    }
-
-    public void addAlertPatch(AlertPatch alertPatch) {
-        if (alertPatches == null) {
-            alertPatches = new ArrayList<AlertPatch>();
-        }
-        if (!alertPatches.contains(alertPatch)) {
-            alertPatches.add(alertPatch);
-        }
-    }
-
-    public List<AlertPatch> getAlertPatches() {
-        if (alertPatches == null) {
-            return Collections.emptyList();
-        }
-        return alertPatches;
-    }
-
-    public void removeAlertPatch(AlertPatch alertPatch) {
-        if (alertPatches != null) {
-            alertPatches.remove(alertPatch);
-            if (alertPatches.isEmpty()) {
-                alertPatches = null;
-            }
-        }
     }
 
     public abstract String getName();

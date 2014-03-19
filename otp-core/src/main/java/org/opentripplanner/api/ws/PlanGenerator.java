@@ -35,6 +35,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.alertpatch.Alert;
+import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
@@ -236,7 +237,7 @@ public class PlanGenerator {
         }
 
         for (State[] legStates : legsStates) {
-            itinerary.addLeg(generateLeg(legStates, showIntermediateStops));
+            itinerary.addLeg(generateLeg(graph, legStates, showIntermediateStops));
         }
 
         addWalkSteps(itinerary.legs, legsStates);
@@ -358,7 +359,7 @@ public class PlanGenerator {
      * @param showIntermediateStops Whether to include intermediate stops in the leg or not
      * @return The generated leg
      */
-    private Leg generateLeg(State[] states, boolean showIntermediateStops) {
+    private Leg generateLeg(Graph graph, State[] states, boolean showIntermediateStops) {
         Leg leg = new Leg();
 
         Edge[] edges = new Edge[states.length - 1];
@@ -373,7 +374,7 @@ public class PlanGenerator {
             leg.distance += edges[i].getDistance();
         }
 
-        addModeAndAlerts(leg, states);
+        addModeAndAlerts(graph, leg, states);
 
         TimeZone timeZone = leg.startTime.getTimeZone();
         leg.agencyTimeZoneOffset = timeZone.getOffset(leg.startTime.getTimeInMillis());
@@ -540,10 +541,11 @@ public class PlanGenerator {
      * @param leg The leg to add the mode and alerts to
      * @param states The states that go with the leg
      */
-    private void addModeAndAlerts(Leg leg, State[] states) {
+    private void addModeAndAlerts(Graph graph, Leg leg, State[] states) {
         for (State state : states) {
             TraverseMode mode = state.getBackMode();
             Set<Alert> alerts = state.getBackAlerts();
+            Edge edge = state.getBackEdge();
 
             if (mode != null) {
                 leg.mode = mode.toString();
@@ -552,6 +554,12 @@ public class PlanGenerator {
             if (alerts != null) {
                 for (Alert alert : alerts) {
                     leg.addAlert(alert);
+                }
+            }
+
+            for (AlertPatch alertPatch : graph.getAlertPatches(edge)) {
+                if (alertPatch.displayDuring(state)) {
+                    leg.addAlert(alertPatch.getAlert());
                 }
             }
         }

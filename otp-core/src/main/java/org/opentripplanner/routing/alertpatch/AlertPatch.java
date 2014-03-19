@@ -25,8 +25,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
-import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.StateEditor;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.TransitIndexService;
@@ -42,14 +41,13 @@ import org.opentripplanner.routing.transit_index.adapters.AgencyAndIdAdapter;
  */
 @XmlRootElement(name = "AlertPatch")
 public class AlertPatch implements Serializable {
-    private static final long serialVersionUID = 20140317L;
+    private static final long serialVersionUID = 20140319L;
 
     private String id;
 
     private Alert alert;
 
     private List<TimePeriod> timePeriods = new ArrayList<TimePeriod>();
-    private List<TimePeriod> displayTimePeriods = new ArrayList<TimePeriod>();
 
     private String agency;
 
@@ -66,19 +64,12 @@ public class AlertPatch implements Serializable {
         return alert;
     }
 
-    public boolean activeDuring(RoutingRequest options, long start, long end) {
-        for (TimePeriod period : timePeriods) {
-            if (!(end <= period.startTime || start >= period.endTime)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean displayDuring(RoutingRequest options, long start, long end) {
-        for (TimePeriod period : displayTimePeriods) {
-            if (!(end <= period.startTime || start >= period.endTime)) {
-                return true;
+    public boolean displayDuring(State state) {
+        for (TimePeriod timePeriod : timePeriods) {
+            if (state.getTimeSeconds() >= timePeriod.startTime) {
+                if (state.getStartTimeSeconds() < timePeriod.endTime) {
+                    return true;
+                }
             }
         }
         return false;
@@ -117,23 +108,17 @@ public class AlertPatch implements Serializable {
                 }
                 for (RouteSegment segment : variant.getSegments()) {
                     if (stop == null || segment.stop.equals(stop)) {
-                        if (segment.board != null) {
-                            segment.board.addAlertPatch(this);
-                        }
-                        if(segment.alight != null) {
-                            segment.alight.addAlertPatch(this);
-                        }
+                        graph.addAlertPatch(segment.board, this);
+                        graph.addAlertPatch(segment.alight, this);
                     }
                 }
             }
         } else if (stop != null) {
             Edge edge = index.getPreBoardEdge(stop);
-            if(edge != null)
-                edge.addAlertPatch(this);
+            graph.addAlertPatch(edge, this);
 
             edge = index.getPreAlightEdge(stop);
-            if(edge != null)
-                edge.addAlertPatch(this);
+            graph.addAlertPatch(edge, this);
         }
     }
 
@@ -161,28 +146,18 @@ public class AlertPatch implements Serializable {
                 }
                 for (RouteSegment segment : variant.getSegments()) {
                     if (stop == null || segment.stop.equals(stop)) {
-                        if (segment.board != null) {
-                            segment.board.removeAlertPatch(this);
-                        }
-                        if(segment.alight != null) {
-                            segment.alight.removeAlertPatch(this);
-                        }
+                        graph.removeAlertPatch(segment.board, this);
+                        graph.removeAlertPatch(segment.alight, this);
                     }
                 }
             }
         } else if (stop != null) {
             Edge edge = index.getPreBoardEdge(stop);
-            if(edge != null)
-                edge.removeAlertPatch(this);
+            graph.removeAlertPatch(edge, this);
 
             edge = index.getPreAlightEdge(stop);
-            if(edge != null)
-                edge.removeAlertPatch(this);
+            graph.removeAlertPatch(edge, this);
         }
-    }
-
-    public void filterTraverseResult(StateEditor result) {
-        result.addAlert(alert);
     }
 
     public void setAlert(Alert alert) {
@@ -196,20 +171,8 @@ public class AlertPatch implements Serializable {
         os.defaultWriteObject();
     }
 
-    public void addTimePeriod(long start, long end) {
-        timePeriods.add(new TimePeriod(start, end));
-    }
-
     public void setTimePeriods(List<TimePeriod> periods) {
         timePeriods = periods;
-    }
-
-    public void addDisplayTimePeriod(long start, long end) {
-        displayTimePeriods.add(new TimePeriod(start, end));
-    }
-
-    public void setDisplayTimePeriods(List<TimePeriod> periods) {
-        displayTimePeriods = periods;
     }
 
     public String getAgency() {
@@ -333,15 +296,6 @@ public class AlertPatch implements Serializable {
             }
         } else {
             if (!timePeriods.equals(other.timePeriods)) {
-                return false;
-            }
-        }
-        if (displayTimePeriods == null) {
-            if (other.displayTimePeriods != null) {
-                return false;
-            }
-        } else {
-            if (!displayTimePeriods.equals(other.displayTimePeriods)) {
                 return false;
             }
         }
