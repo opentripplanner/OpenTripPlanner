@@ -372,6 +372,12 @@ public class RoutingRequest implements Cloneable, Serializable {
 	private double softWalkPenalty = 0.0; // a jump in cost when stepping over the walking limit
 	private double softWalkOverageRate = 2.0; // a jump in cost for every meter over the walking limit
 
+    /* Additional flags affecting mode transitions. This is a temporary solution, as it only covers parking and rental at the beginning of the trip. */
+    public boolean allowBikeRental = false;
+    public boolean bikeParkAndRide = false;
+    public boolean parkAndRide  = false;
+    public boolean kissAndRide  = false;
+
     /* CONSTRUCTORS */
 
     /** Constructor for options; modes defaults to walk and transit */
@@ -380,7 +386,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         walkSpeed = 1.33; // 1.33 m/s ~ 3mph, avg. human speed
         bikeSpeed = 5; // 5 m/s, ~11 mph, a random bicycling speed
         carSpeed = 15; // 15 m/s, ~35 mph, a random driving speed
-        setModes(new TraverseModeSet(new TraverseMode[] { TraverseMode.WALK, TraverseMode.TRANSIT }));
+        setModes(new TraverseModeSet(TraverseMode.WALK, TraverseMode.TRANSIT));
         bikeWalkingOptions = this;
 
         // So that they are never null.

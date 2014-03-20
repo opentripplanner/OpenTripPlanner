@@ -113,11 +113,11 @@ public class State implements Cloneable {
         this.stateData.opt = options;
         this.stateData.startTime = timeSeconds;
         this.stateData.usingRentedBike = false;
-        boolean parkAndRideEnabled = options.getModes().getCar() && options.getModes().getWalk();
-        this.stateData.carParked = options.isArriveBy() && parkAndRideEnabled;
-        if (parkAndRideEnabled) {
-            this.stateData.nonTransitMode = this.stateData.carParked ? TraverseMode.WALK
-                    : TraverseMode.CAR;
+        /* If the itinerary is to begin with a car that is left for transit, the initial state of arriveBy searches is
+           with the car already "parked" and in WALK mode. Otherwise, we are in CAR mode and "unparked". */
+        if (options.parkAndRide || options.kissAndRide) {
+            this.stateData.carParked = options.isArriveBy();
+            this.stateData.nonTransitMode = this.stateData.carParked ? TraverseMode.WALK : TraverseMode.CAR;
         }
         this.walkDistance = 0;
         this.time = timeSeconds * 1000;
@@ -266,12 +266,12 @@ public class State implements Cloneable {
      * @return True if the state at vertex can be the end of path.
      */
     public boolean isFinal() {
-        boolean parkAndRide = stateData.opt.getModes().getCar()
-                && stateData.opt.getModes().getWalk();
+        // When drive-to-transit is enabled, we need to check whether the car has been parked (or whether it has been picked up in reverse).
+        boolean checkPark = stateData.opt.parkAndRide || stateData.opt.kissAndRide;
         if (stateData.opt.isArriveBy())
-            return !isBikeRenting() && !(parkAndRide && isCarParked());
+            return !isBikeRenting() && !(checkPark && isCarParked());
         else
-            return !isBikeRenting() && !(parkAndRide && !isCarParked());
+            return !isBikeRenting() && !(checkPark && !isCarParked());
     }
 
     public Stop getPreviousStop() {
@@ -477,10 +477,12 @@ public class State implements Cloneable {
     }
     
     /* will return BICYCLE if routing with an owned bicycle, or if at this state the user is holding
-     * on to a rented bicycle */
+     * on to a rented bicycle. */
     public TraverseMode getNonTransitMode() {
         return stateData.nonTransitMode;
     }
+    // TODO: There is no documentation about what this means. No one knows precisely.
+    // Needs to be replaced with clearly defined fields.
 
     public State reversedClone() {
         // We no longer compensate for schedule slack (minTransferTime) here.

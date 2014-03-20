@@ -78,14 +78,20 @@ public class StreetTransitLink extends Edge {
         if (s0.getOptions().wheelchairAccessible && !wheelchairAccessible) {
             return null;
         }
-        if (s0.getNonTransitMode() == TraverseMode.CAR) {
-            // Forbid enter station in CAR mode
-            return null;
-        }
-        // Do not check here whether transit modes are selected. A check for the presence of 
+        // Do not check here whether transit modes are selected. A check for the presence of
         // transit modes will instead be done in the following PreBoard edge.
         // This allows finding transit stops with walk-only options.
         StateEditor s1 = s0.edit(this);
+        if (s0.getNonTransitMode() == TraverseMode.CAR) {
+            // Only enter station in CAR mode if parking is not required (kiss and ride)
+            // TODO note that in arriveBy this is re-entering transit, which is the only reason transfers work at all!
+            // i.e. the transition to parked is happening even in arriveBy...
+            if (s0.getOptions().kissAndRide && ! s0.isCarParked()) {
+                s1.setCarParked(true); // has the effect of switching to WALK nontransit mode.
+            } else {
+                return null;
+            }
+        }
         s1.incrementTimeInSeconds(transitStop.getStreetToStopTime() + 1);
         s1.incrementWeight(STL_TRAVERSE_COST + transitStop.getStreetToStopTime());
         s1.setBackMode(TraverseMode.LEG_SWITCH);

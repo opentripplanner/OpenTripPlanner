@@ -60,6 +60,7 @@ import org.opentripplanner.api.model.transit.RouteDataList;
 import org.opentripplanner.api.model.transit.RouteList;
 import org.opentripplanner.api.model.transit.StopList;
 import org.opentripplanner.api.model.transit.StopTimeList;
+import org.opentripplanner.api.parameter.QualifiedModeSetSequence;
 import org.opentripplanner.api.resource.BikeRental;
 import org.opentripplanner.api.resource.BikeRentalStationList;
 import org.opentripplanner.api.resource.GraphMetadata;
@@ -1046,7 +1047,7 @@ public class TestRequest extends TestCase {
             this.walkReluctance = Arrays.asList(8.0);
             this.walkSpeed = Arrays.asList(1.33);
             this.optimize = Arrays.asList(OptimizeType.QUICK);
-            this.modes = Arrays.asList(new TraverseModeSet("WALK,TRANSIT"));
+            this.modes = Arrays.asList(new QualifiedModeSetSequence("WALK,TRANSIT"));
             this.numItineraries = Arrays.asList(1);
             this.transferPenalty = Arrays.asList(0);
             this.nonpreferredTransferPenalty = Arrays.asList(180);
@@ -1060,7 +1061,7 @@ public class TestRequest extends TestCase {
 
         public TestPlanner(String routerId, String v1, String v2, List<String> intermediates) {
             this(routerId, v1, v2);
-            this.modes = Arrays.asList(new TraverseModeSet("WALK"));
+            this.modes = Arrays.asList(new QualifiedModeSetSequence("WALK"));
             this.intermediatePlaces = intermediates;
             TravelingSalesmanPathService tsp = new TravelingSalesmanPathService();
             tsp.setChainedPathService(Context.getInstance().pathService);

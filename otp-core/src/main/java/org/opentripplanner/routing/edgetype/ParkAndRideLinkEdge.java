@@ -41,10 +41,13 @@ public class ParkAndRideLinkEdge extends Edge {
      * By how much we have to really walk compared to straight line distance. This is a magic factor
      * as we really can't guess, unless we know 1) where the user will park, and 2) we route inside
      * the parking lot.
+     *
+     * TODO: perhaps all of this obstruction and distance calculation should just be reduced to
+     * a single static cost. Parking lots are not that big, and these are all guesses.
      */
-    private double WALK_GEOMETRIC_CONVOLUTION_FACTOR = 2.0;
+    private double WALK_OBSTRUCTION_FACTOR = 2.0;
 
-    private double DRIVE_GEOMETRIC_CONVOLUTION_FACTOR = 2.0;
+    private double DRIVE_OBSTRUCTION_FACTOR = 2.0;
 
     /* This is magic too. Driver tend to drive slowly in P+R. */
     private double DRIVE_SPEED_MS = 3;
@@ -90,6 +93,10 @@ public class ParkAndRideLinkEdge extends Edge {
 
     @Override
     public State traverse(State s0) {
+        // Do not enter park and ride mechanism if it's not activated in the routing request.
+        if ( ! s0.getOptions().parkAndRide) {
+            return null;
+        }
         Edge backEdge = s0.getBackEdge();
         boolean back = s0.getOptions().isArriveBy();
         // If we are exiting (or entering-backward), check if we
@@ -102,14 +109,14 @@ public class ParkAndRideLinkEdge extends Edge {
         TraverseMode mode = s0.getNonTransitMode();
         if (mode == TraverseMode.WALK) {
             // Walking
-            double walkTime = linkDistance * WALK_GEOMETRIC_CONVOLUTION_FACTOR
+            double walkTime = linkDistance * WALK_OBSTRUCTION_FACTOR
                     / s0.getOptions().getWalkSpeed();
             s1.incrementTimeInSeconds((int) Math.round(walkTime));
             s1.incrementWeight(walkTime);
             s1.incrementWalkDistance(linkDistance);
         } else if (mode == TraverseMode.CAR) {
             // Driving
-            double driveTime = linkDistance * DRIVE_GEOMETRIC_CONVOLUTION_FACTOR / DRIVE_SPEED_MS;
+            double driveTime = linkDistance * DRIVE_OBSTRUCTION_FACTOR / DRIVE_SPEED_MS;
             s1.incrementTimeInSeconds((int) Math.round(driveTime));
             s1.incrementWeight(driveTime);
         } else {
