@@ -374,7 +374,11 @@ public class StateEditor {
             child.stateData.nonTransitMode = TraverseMode.WALK;
         }
     }
-    
+
+    /**
+     * This has two effects: marks the car as parked, and switches the current mode.
+     * Marking the car parked is important for allowing co-dominance of walking and driving states.
+     */
     public void setCarParked(boolean carParked) {
         cloneStateDataAsNeeded();
         child.stateData.carParked = carParked;
