@@ -25,6 +25,7 @@ import javax.ws.rs.QueryParam;
 import javax.xml.datatype.DatatypeConfigurationException;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.api.parameter.QualifiedModeSetSequence;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -119,8 +120,8 @@ public abstract class RoutingResource {
     /** The set of characteristics that the user wants to optimize for. @See OptimizeType */
     @DefaultValue("QUICK") @QueryParam("optimize") protected List<OptimizeType> optimize;
     
-    /** The set of modes that a user is willing to use. */
-    @DefaultValue("TRANSIT,WALK") @QueryParam("mode") protected List<TraverseModeSet> modes;
+    /** The set of modes that a user is willing to use, with qualifiers stating whether vehicles should be parked, rented, etc. */
+    @DefaultValue("TRANSIT,WALK") @QueryParam("mode") protected List<QualifiedModeSetSequence> modes;
 
     /** The minimum time, in seconds, between successive trips on different vehicles.
      *  This is designed to allow for imperfect schedule adherence.  This is a minimum;
@@ -407,12 +408,14 @@ public abstract class RoutingResource {
         }
         request.setBatch(get(batch, n, new Boolean(request.isBatch())));
         request.setOptimize(opt);
-        TraverseModeSet modeSet = get(modes, n, request.getModes());
-        request.setModes(modeSet);
-        if (modeSet.getBicycle() && modeSet.getWalk() && bikeSpeedParam == -1) {
+        /* Temporary code to get bike/car parking and renting working. */
+        modes.get(0).applyToRequest(request);
+
+        if (request.allowBikeRental && bikeSpeedParam == -1) {
             //slower bike speed for bike sharing, based on empirical evidence from DC.
             request.setBikeSpeed(4.3);
         }
+
         request.setBoardSlack(get(boardSlack, n, request.getBoardSlack()));
         request.setAlightSlack(get(alightSlack, n, request.getAlightSlack()));
         request.setTransferSlack(get(minTransferTime, n, request.getTransferSlack()));

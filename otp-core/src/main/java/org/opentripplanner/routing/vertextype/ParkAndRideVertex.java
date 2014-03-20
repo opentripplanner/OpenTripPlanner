@@ -22,6 +22,8 @@ import org.opentripplanner.routing.graph.Vertex;
 
 /**
  * A vertex for a park and ride area.
+ * Connected to streets by ParkAndRideLinkEdge.
+ * Transition for parking the car is handled by ParkAndRideEdge.
  * 
  * @author laurent
  * 

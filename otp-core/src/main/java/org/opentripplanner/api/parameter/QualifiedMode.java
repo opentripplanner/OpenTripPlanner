@@ -18,7 +18,7 @@ public class QualifiedMode {
         if (mode == null) {
             throw new InvalidParameterException();
         }
-        for (int i = 0; i < elements.length; i++) {
+        for (int i = 1; i < elements.length; i++) {
             Qualifier q = Qualifier.valueOf(elements[i]);
             if (q == null) {
                 throw new InvalidParameterException();

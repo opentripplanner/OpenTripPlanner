@@ -61,11 +61,16 @@ public class StreetBikeRentalLink extends Edge {
     }
 
     public State traverse(State s0) {
-        // disallow traversing two StreetBikeRentalLinks in a row.
-        // prevents router using bike rental stations as shortcuts to get around
-        // turn restrictions.
-        if (s0.getBackEdge() instanceof StreetBikeRentalLink)
+        // Do not even consider bike rental vertices unless bike rental is enabled.
+        if ( ! s0.getOptions().allowBikeRental) {
             return null;
+        }
+        // Disallow traversing two StreetBikeRentalLinks in a row.
+        // This prevents the router from using bike rental stations as shortcuts to get around
+        // turn restrictions.
+        if (s0.getBackEdge() instanceof StreetBikeRentalLink) {
+            return null;
+        }
 
         StateEditor s1 = s0.edit(this);
         //assume bike rental stations are more-or-less on-street

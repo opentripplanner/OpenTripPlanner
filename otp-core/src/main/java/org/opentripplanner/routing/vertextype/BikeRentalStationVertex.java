@@ -20,7 +20,9 @@ import org.opentripplanner.routing.graph.Vertex;
 
 /**
  * A vertex for a bike rental station.
- * 
+ * It is connected to the streets by a StreetBikeRentalLink.
+ * To allow transitions on and off a bike, it has RentABike* loop edges.
+ *
  * @author laurent
  * 
  */

@@ -458,13 +458,16 @@ otp.locale.English = {
 
         modes : // leaflet client
         {
-            "TRANSIT,WALK"      : "Transit", 
-            "BUSISH,WALK"       : "Bus Only", 
-            "TRAINISH,WALK"     : "Rail Only", 
-            "BICYCLE"           : 'Bicycle Only',
-            "WALK"              : 'Walk Only',
-            "TRANSIT,BICYCLE"   : "Bicycle &amp; Transit",
-            "CAR"               : 'Drive Only'
+            "TRANSIT,WALK"              : "Transit", 
+            "BUSISH,WALK"               : "Bus Only", 
+            "TRAINISH,WALK"             : "Rail Only", 
+            "BICYCLE"                   : 'Bicycle Only',
+            "WALK"                      : 'Walk Only',
+            "TRANSIT,BICYCLE"           : "Bicycle &amp; Transit",
+            "CAR"                       : 'Drive Only'
+            "CAR_PARK,WALK,TRANSIT"     : 'Park and Ride',
+            "CAR,WALK,TRANSIT"          : 'Kiss and Ride',
+            "BICYCLE_PARK,WALK,TRANSIT" : 'Bicycle Park and Ride'
         },
 
         mode : // OL client
