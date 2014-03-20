@@ -377,6 +377,8 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean bikeParkAndRide = false;
     public boolean parkAndRide  = false;
     public boolean kissAndRide  = false;
+    /** Weight multiplier for pre-transit travel when using drive-to-transit (park and ride or kiss and ride). */
+    public double firstLegReluctance = 3;
 
     /* CONSTRUCTORS */
 

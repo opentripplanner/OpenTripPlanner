@@ -422,9 +422,9 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         if (options.kissAndRide || options.parkAndRide) {
             // On the pre-kiss/pre-park leg, make both walking and driving bad relative to transit.
             if (options.arriveBy) {
-                if ( ! s0.isCarParked()) weight *= 4;
+                if ( ! s0.isCarParked()) weight *= options.firstLegReluctance;
             } else {
-                if ( ! s0.isEverBoarded()) weight *= 4;
+                if ( ! s0.isEverBoarded()) weight *= options.firstLegReluctance;
             }
         }
         
