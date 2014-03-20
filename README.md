@@ -4,7 +4,7 @@ OpenTripPlanner (OTP) is an open source multi-modal trip planner. It depends on 
 
 ##### INSTALL
 
-Installation instructions are available on the website: http://opentripplanner.org/wiki/
+Installation instructions are available on the website: https://github.com/opentripplanner/OpenTripPlanner/wiki
 
 ##### FILES
 
