@@ -258,31 +258,36 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         backWalkingBike &= TraverseMode.WALK.equals(backMode);
         walkingBike &= TraverseMode.WALK.equals(traverseMode);
 
-        /* In arriveBy KNR, branch search to "unparked" CAR mode wherever possible as long as transit has been used. */
-        // final walk check is needed to avoid infinite recursion.
-        if (options.arriveBy && options.kissAndRide && s0.isCarParked() && s0.isEverBoarded() && traverseMode == TraverseMode.WALK) {
-            StateEditor editor = doTraverse(s0, options, TraverseMode.CAR);
-            if (editor != null) {
-                editor.setCarParked(false); // has the effect of irrevocably switching to CAR
-                return editor;
+        /* Kiss and ride support: switch to WALK mode and "park" the car. */
+        if (options.kissAndRide) {
+            if (options.arriveBy) {
+                // Branch search to "unparked" CAR mode ASAP after transit has been used.
+                // Final WALK check prevents infinite recursion.
+                if (s0.isCarParked() && s0.isEverBoarded() && traverseMode == TraverseMode.WALK) {
+                    StateEditor editor = doTraverse(s0, options, TraverseMode.CAR);
+                    if (editor != null) {
+                        editor.setCarParked(false); // Also has the effect of switching to CAR
+                        return editor;
+                    }
+                }
+            } else { /* departAfter */
+                // Irrevocable transition from driving to walking. "Parking" means being dropped off in this case.
+                // Final CAR check needed to prevent infinite recursion.
+                if ( ! s0.isCarParked() && ! permission.allows(TraverseMode.CAR) && traverseMode == TraverseMode.CAR) {
+                    StateEditor editor = doTraverse(s0, options, TraverseMode.WALK);
+                    if (editor != null) {
+                        editor.setCarParked(true); // has the effect of switching to WALK and preventing further car use
+                        return editor;
+                    }
+
+                }
             }
         }
 
+        /* Check whether this street allows the current mode. If not and we are biking, attempt to walk the bike. */
         if (!canTraverse(options, traverseMode)) {
             if (traverseMode == TraverseMode.BICYCLE) {
-                // try walking bike since you can't ride here
-                return doTraverse(s0, options.getBikeWalkingOptions(),
-                        TraverseMode.WALK);
-            }
-            // TODO pull the following if clause out into a common if(options.kissAndRide) above
-            // Final CAR check needed to prevent infinite recursion
-            if (!options.arriveBy && traverseMode == TraverseMode.CAR && options.kissAndRide && ! s0.isCarParked()) {
-                // allow a single transition from driving to walking -- being dropped off in this case, though it's called "parking".
-                StateEditor editor = doTraverse(s0, options, TraverseMode.WALK);
-                if (editor != null) {
-                    editor.setCarParked(true); // has the effect of switching to WALK and preventing further car use
-                    return editor;
-                }
+                return doTraverse(s0, options.getBikeWalkingOptions(), TraverseMode.WALK);
             }
             return null;
         }
@@ -351,12 +356,13 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
                 */
             }
         }
+
         if (isStairs()) {
             weight *= options.stairsReluctance;
         } else {
             weight *= options.walkReluctance;
         }
-        
+
         StateEditor s1 = s0.edit(this);
         s1.setBackMode(traverseMode);
         s1.setBackWalkingBike(walkingBike);
@@ -365,6 +371,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             s1.addAlerts(wheelchairNotes);
         }
 
+        /* Compute turn cost. */
         PlainStreetEdge backPSE;
         if (backEdge != null && backEdge instanceof PlainStreetEdge) {
             backPSE = (PlainStreetEdge) backEdge;
@@ -372,8 +379,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             double backSpeed = backPSE.calculateSpeed(backOptions, backMode);
             final double realTurnCost;  // Units are seconds.
             
-            /* Compute turn cost.
-             * 
+            /*
              * This is a subtle piece of code. Turn costs are evaluated differently during
              * forward and reverse traversal. During forward traversal of an edge, the turn
              * *into* that edge is used, while during reverse traversal, the turn *out of*
@@ -419,8 +425,8 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             s1.incrementWalkDistance(length);
         }
 
+        /* On the pre-kiss/pre-park leg, make both walking and driving bad relative to transit. */
         if (options.kissAndRide || options.parkAndRide) {
-            // On the pre-kiss/pre-park leg, make both walking and driving bad relative to transit.
             if (options.arriveBy) {
                 if ( ! s0.isCarParked()) weight *= options.firstLegReluctance;
             } else {
@@ -428,7 +434,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
             }
         }
         
-        // apply strategy for avoiding walking too far, either soft or hard.
+        /* Apply a strategy for avoiding walking too far, either soft (weight increases) or hard limiting (pruning). */
         if (s1.weHaveWalkedTooFar(options)) {
         	
         	// if we're using a soft walk-limit
