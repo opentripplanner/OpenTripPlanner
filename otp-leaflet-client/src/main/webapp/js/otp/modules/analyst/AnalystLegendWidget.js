@@ -22,7 +22,7 @@ otp.modules.analyst.AnalystLegendWidget =
     
     initialize : function(id, module, width, height) {
         otp.widgets.Widget.prototype.initialize.call(this, id, module, {
-            title : 'Legend',
+            title : otp.config.locale.widgets.AnalystLegend.title,
             cssClass : 'otp-analyst-legendWidget'
         });
         
@@ -37,7 +37,7 @@ otp.modules.analyst.AnalystLegendWidget =
     },
     
     refresh : function(params) {
-	    this.img.attr('src', otp.config.hostname+'/' + otp.config.restService + '/legend.png?width='
+	    this.img.attr('src', otp.config.hostname+'/' + otp.config.restService + '/ws/legend.png?width='
        + this.imgWidth+'&height=' + this.imgHeight + '&styles=' + params.styles);
     }
 });

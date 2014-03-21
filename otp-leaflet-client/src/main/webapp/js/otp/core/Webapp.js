@@ -41,6 +41,10 @@ otp.core.Webapp = otp.Class({
         $.support.cors = true;
         var this_ = this;
         
+        otp.config.resourcePath = otp.config.resourcePath || "";
+        otp.config.restService = otp.config.restService || "otp-rest-servlet";
+
+
         // set the urlRoot variable, if needed
         /*if(!otp.config.urlRoot) {
             otp.config.urlRoot = window.location.pathname;

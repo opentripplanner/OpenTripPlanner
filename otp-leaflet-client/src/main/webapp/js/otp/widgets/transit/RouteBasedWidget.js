@@ -83,31 +83,6 @@ otp.widgets.transit.RouteBasedWidget =
         this.setActiveVariant(this.module.webapp.transitIndex.routes[this.agency_id].variants[variantName]);
     },
     
-    /*newStopSelected : function() {
-        this.clearTimes();
-        var stop = this.activeVariant.stops[this.stopSelect.prop("selectedIndex")];
-        
-        var this_ = this;
-        this.module.webapp.transitIndex.runStopTimesQuery(stop.id, null, this.activeTime, this, function(data) {
-            var stopTimes = [];
-            for(var i=0; i<data.stopTimes.length; i++) {
-                var st = data.stopTimes[i].StopTime || data.stopTimes[i];
-                if(st.phase == 'departure')
-                    stopTimes.push(st.time);
-            }
-            this_.times = stopTimes;
-            this_.updateTimes();
-        });
-    },*/
-        
-    /*clearTimes : function() {
-        this.times = null;
-        this.timeIndex = null;
-        if(this.rightTime) this.rightTime.remove();
-        if(this.centerTime) this.centerTime.remove();
-        if(this.leftTime) this.leftTime.remove();    
-    },*/
-        
     update : function(leg) {
         //this.clearTimes();
         this.activeLeg = leg;
