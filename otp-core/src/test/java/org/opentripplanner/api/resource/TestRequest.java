@@ -247,8 +247,9 @@ class Context {
                 throw new RuntimeException(e);
             }
         }
-
-        pathService.setSptService(new GenericAStar());
+        GenericAStar star = new GenericAStar();
+        star.setNPaths(1); // to make test results more deterministic, only find the single best path
+        pathService.setSptService(star);
         pathService.setGraphService(graphService);
         planGenerator.pathService = pathService;
     }
@@ -256,7 +257,7 @@ class Context {
     private void initTransit() {
         GtfsGraphBuilderImpl gtfsBuilder = new GtfsGraphBuilderImpl();
         GtfsBundle bundle = new GtfsBundle();
-        bundle.setPath(new File("../otp-core/src/test/resources/google_transit.zip"));
+        bundle.setPath(new File("src/test/resources/google_transit.zip"));
 
         ArrayList<GtfsBundle> bundleList = new ArrayList<GtfsBundle>();
         bundleList.add(bundle);
@@ -1057,6 +1058,7 @@ public class TestRequest extends TestCase {
             this.graphService = Context.getInstance().graphService;
             this.planGenerator.graphService = Context.getInstance().graphService;
             this.prototypeRoutingRequest = new RoutingRequest();
+            this.numItineraries = Arrays.asList(1); // make results more deterministic by returning only one path
         }
 
         public TestPlanner(String routerId, String v1, String v2, List<String> intermediates) {
