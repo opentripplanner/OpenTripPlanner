@@ -173,8 +173,7 @@ public class PlanGeneratorTest {
      */
     private GraphPath[] buildPaths() {
         // This set of requested traverse modes implies that bike rental is a possibility.
-        RoutingRequest options = new RoutingRequest(new TraverseModeSet(
-                TraverseMode.WALK, TraverseMode.BICYCLE, TraverseMode.TRANSIT));
+        RoutingRequest options = new RoutingRequest("BICYCLE_RENT,TRANSIT");
 
         Graph graph = new Graph();
 
