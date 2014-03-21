@@ -63,7 +63,7 @@ public class QualifiedModeSetSequence {
                     req.bikeParkAndRide = qMode.qualifiers.contains(Qualifier.PARK);
                 }
             }
-            if (qMode.mode == TraverseMode.CAR) {
+            if (qMode.mode == TraverseMode.CAR && req.modes.isTransit()) { // this is ugly, using both kinds of modeset at once
                 if (qMode.qualifiers.contains(Qualifier.PARK)) {
                     req.parkAndRide = true;
                 } else {
