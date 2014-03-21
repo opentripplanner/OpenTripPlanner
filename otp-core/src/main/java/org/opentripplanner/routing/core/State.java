@@ -314,9 +314,10 @@ public class State implements Cloneable {
             return false;
 
         if (this.routeSequenceSubset(other)) {
-            // TODO subset is not really the right idea, try adding || this.getNumBoardings() <= other.getNumBoardings()
+            // TODO subset is not really the right idea
             return this.weight <= other.weight &&
                     other.getElapsedTimeSeconds() >= this.getElapsedTimeSeconds();
+            // && this.getNumBoardings() <= other.getNumBoardings();
         }
 
         // If returning more than one result from GenericAStar, the search can be very slow
