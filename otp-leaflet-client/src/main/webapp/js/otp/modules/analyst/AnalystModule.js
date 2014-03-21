@@ -27,7 +27,7 @@ otp.modules.analyst.AnalystModule =
         //otp.modules.planner.PlannerModule.prototype.initialize.apply(this, arguments);
         otp.modules.planner.PlannerModule.prototype.initialize.apply(this, arguments);
                 
-        this.analystUrl = otp.config.hostname + "/" + otp.config.restService + "/tile/{z}/{x}/{y}.png";
+        this.analystUrl = otp.config.hostname + "/" + otp.config.restService + "/ws/tile/{z}/{x}/{y}.png";
     },
 
     activate : function() {
