@@ -14,12 +14,12 @@ public class QualifiedMode {
     
     public QualifiedMode(String qMode) {
         String[] elements = qMode.split("_");
-        mode = TraverseMode.valueOf(elements[0]);
+        mode = TraverseMode.valueOf(elements[0].trim());
         if (mode == null) {
             throw new InvalidParameterException();
         }
         for (int i = 1; i < elements.length; i++) {
-            Qualifier q = Qualifier.valueOf(elements[i]);
+            Qualifier q = Qualifier.valueOf(elements[i].trim());
             if (q == null) {
                 throw new InvalidParameterException();
             } else {
