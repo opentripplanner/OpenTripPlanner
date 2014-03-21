@@ -23,6 +23,9 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
 import com.vividsolutions.jts.geom.LineString;
 
+// TODO: Why is there an OSMPlainStreetEdgeFactory?
+// What is wrong with just calling the constructor?
+
 public interface OSMPlainStreetEdgeFactory {
     public PlainStreetEdge createEdge(OSMNode fromNode, OSMNode toNode, OSMWithTags wayOrArea,
             IntersectionVertex startEndpoint, IntersectionVertex endEndpoint, LineString geometry,
