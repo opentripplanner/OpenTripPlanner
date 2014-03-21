@@ -95,7 +95,7 @@ public class TestParkAndRide extends TestCase {
         assertNull(path);
 
         // But we can go from A to C with CAR+WALK mode using P+R.
-        options = new RoutingRequest("WALK,CAR_PARK");
+        options = new RoutingRequest("WALK,CAR_PARK,TRANSIT");
         options.setRoutingContext(graph, A, C);
         tree = aStar.getShortestPathTree(options);
         path = tree.getPath(C, false);
