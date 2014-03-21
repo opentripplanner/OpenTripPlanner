@@ -274,7 +274,7 @@ otp.modules.planner.PlannerModule =
         }
     	
     	apiMethod = apiMethod || 'plan';
-        var url = otp.config.hostname + '/' + otp.config.restService + '/ws/' + apiMethod;
+        var url = otp.config.hostname + '/' + otp.config.restService + '/' + apiMethod;
         this.pathLayer.clearLayers();        
         
         var this_ = this;
