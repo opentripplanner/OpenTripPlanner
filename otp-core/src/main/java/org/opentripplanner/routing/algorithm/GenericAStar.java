@@ -57,7 +57,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     private TraverseVisitor traverseVisitor;
     
     /** The number of paths to attempt to find */
-    @Setter private int nPaths = 3;
+    @Setter private int nPaths = 3; // TODO: just use the number of paths from the request, and get rid of retrying wrapper.
     
     enum RunStatus {
         RUNNING, STOPPED
