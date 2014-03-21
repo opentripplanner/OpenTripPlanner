@@ -366,6 +366,7 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
         if (isStairs()) {
             weight *= options.stairsReluctance;
         } else {
+            // TODO: this is being applied even when biking or driving.
             weight *= options.walkReluctance;
         }
 
