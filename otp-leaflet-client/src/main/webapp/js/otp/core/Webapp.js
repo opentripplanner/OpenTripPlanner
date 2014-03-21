@@ -42,7 +42,7 @@ otp.core.Webapp = otp.Class({
         var this_ = this;
         
         otp.config.resourcePath = otp.config.resourcePath || "";
-        otp.config.restService = otp.config.restService || "otp-rest-servlet/default";
+        otp.config.restService = otp.config.restService || "otp-rest-servlet";
 
 
         // set the urlRoot variable, if needed

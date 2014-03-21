@@ -31,7 +31,7 @@ otp.widgets.RoutesSelectorWidget =
         var this_ = this;
         otp.widgets.Widget.prototype.initialize.call(this, id, routesControl.tripWidget.owner, {
             openInitially : false,
-            title : name
+            title : name + ' Selector'
         });
 
         this.routesControl = routesControl;
@@ -41,10 +41,7 @@ otp.widgets.RoutesSelectorWidget =
 
         ich['otp-tripOptions-routesSelector']({
             widgetId : this.id,
-            name : this.name,
-            allRoutes : otp.config.locale.instructions.allRoutes,
-            save : otp.config.locale.instructions.save,
-            close : otp.config.locale.instructions.close
+            name : this.name
         }).appendTo(this.$());
         
         this.selectedList = $('#'+this_.id+'-selectedList');
