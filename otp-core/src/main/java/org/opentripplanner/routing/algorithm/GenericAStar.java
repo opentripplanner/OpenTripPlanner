@@ -212,7 +212,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 
                 // Iterate over traversal results. When an edge leads nowhere (as indicated by
                 // returning NULL), the iteration is over. TODO Use this to board multiple trips.
-                    for (State v = edge.traverse(u); v != null; v = v.getNextResult()) {
+                for (State v = edge.traverse(u); v != null; v = v.getNextResult()) {
                     // Could be: for (State v : traverseEdge...)
 
                     if (traverseVisitor != null) {
