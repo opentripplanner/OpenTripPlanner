@@ -101,6 +101,12 @@ public class TripTimes implements Serializable {
     private int[] stopSequences;
 
     /**
+     * Is this trip cancelled?
+     */
+    @Getter
+    private boolean cancelled = false;
+
+    /**
      * The provided stopTimes are assumed to be pre-filtered, valid, and monotonically increasing.
      */
     public TripTimes(Trip trip, List<StopTime> stopTimes) {
@@ -521,6 +527,7 @@ public class TripTimes implements Serializable {
 
     /** Cancel this entire trip */
     public void cancel() {
+        cancelled = true;
         departureTimes = new int[getNumHops()];
         Arrays.fill(departureTimes, UNAVAILABLE);
         arrivalTimes = departureTimes;
