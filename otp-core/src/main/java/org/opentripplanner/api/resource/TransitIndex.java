@@ -25,6 +25,7 @@ import java.util.Set;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
@@ -89,9 +90,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
 
-// NOTE - /ws/transit is the full path -- see web.xml
-
-@Path("/transit")
+@Path("/{routerId}/transit")
 @XmlRootElement
 @Autowire
 public class TransitIndex {
@@ -112,7 +111,7 @@ public class TransitIndex {
     @GET
     @Path("/agencyIds")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public AgencyList getAgencyIds(@QueryParam("routerId") String routerId) throws JSONException {
+    public AgencyList getAgencyIds(@PathParam("routerId") String routerId) throws JSONException {
 
         Graph graph = getGraph(routerId);
 
@@ -144,7 +143,7 @@ public class TransitIndex {
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public Object getRouteData(@QueryParam("agency") String agency, @QueryParam("id") String id,
             @QueryParam("references") Boolean references, @QueryParam("extended") Boolean extended,
-            @QueryParam("routerId") String routerId) throws JSONException {
+            @PathParam("routerId") String routerId) throws JSONException {
 
         TransitIndexService transitIndexService = getGraph(routerId).getService(
                 TransitIndexService.class);
@@ -194,7 +193,7 @@ public class TransitIndex {
     @Path("/routes")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public Object getRoutes(@QueryParam("agency") String agency,
-            @QueryParam("extended") Boolean extended, @QueryParam("routerId") String routerId)
+            @QueryParam("extended") Boolean extended, @PathParam("routerId") String routerId)
             throws JSONException {
 
         TransitIndexService transitIndexService = getGraph(routerId).getService(
@@ -209,7 +208,7 @@ public class TransitIndex {
     }
 
     private RouteList makeRouteList(Collection<AgencyAndId> routeIds, String agencyFilter,
-            @QueryParam("extended") Boolean extended, @QueryParam("routerId") String routerId) {
+            @QueryParam("extended") Boolean extended, @PathParam("routerId") String routerId) {
         RouteList response = new RouteList();
         TransitIndexService transitIndexService = getGraph(routerId).getService(
                 TransitIndexService.class);
@@ -234,7 +233,7 @@ public class TransitIndex {
     @Path("/stopData")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public Object getStopData(@QueryParam("agency") String agency, @QueryParam("id") String id,
-            @QueryParam("extended") Boolean extended, @QueryParam("routerId") String routerId)
+            @QueryParam("extended") Boolean extended, @PathParam("routerId") String routerId)
             throws JSONException {
     	
         TransitIndexService transitIndexService = getGraph(routerId).getService(
@@ -268,7 +267,7 @@ public class TransitIndex {
     @Path("/stopsByName")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public Object getStopsByName(@QueryParam("agency") String agency, @QueryParam("name") String name,
-            @QueryParam("extended") Boolean extended, @QueryParam("routerId") String routerId)
+            @QueryParam("extended") Boolean extended, @PathParam("routerId") String routerId)
             throws JSONException {
     	
         TransitIndexService transitIndexService = getGraph(routerId).getService(
@@ -299,7 +298,7 @@ public class TransitIndex {
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public Object getStopsNearPoint(@QueryParam("agency") String agency,
             @QueryParam("lat") Double lat, @QueryParam("lon") Double lon,
-            @QueryParam("extended") Boolean extended, @QueryParam("routerId") String routerId,
+            @QueryParam("extended") Boolean extended, @PathParam("routerId") String routerId,
             @QueryParam("radius") Double radius) throws JSONException {
 
         // default search radius.
@@ -341,7 +340,7 @@ public class TransitIndex {
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public Object getRoutesForStop(@QueryParam("agency") String agency,
             @QueryParam("id") String id, @QueryParam("extended") Boolean extended,
-            @QueryParam("routerId") String routerId) throws JSONException {
+            @PathParam("routerId") String routerId) throws JSONException {
 
         TransitIndexService transitIndexService = getGraph(routerId).getService(
                 TransitIndexService.class);
@@ -371,7 +370,7 @@ public class TransitIndex {
             @QueryParam("id") String stopId, @QueryParam("startTime") long startTime,
             @QueryParam("endTime") Long endTime, @QueryParam("extended") Boolean extended,
             @QueryParam("references") Boolean references, @QueryParam("routeId") String routeId,
-            @QueryParam("routerId") String routerId) throws JSONException {
+            @PathParam("routerId") String routerId) throws JSONException {
 
 
         if (endTime == null) {
@@ -499,7 +498,7 @@ public class TransitIndex {
     @Path("/variantForTrip")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public Object getVariantForTrip(@QueryParam("tripAgency") String tripAgency,
-            @QueryParam("tripId") String tripId, @QueryParam("routerId") String routerId)
+            @QueryParam("tripId") String tripId, @PathParam("routerId") String routerId)
             throws JSONException {
 
         TransitIndexService transitIndexService = getGraph(routerId).getService(
@@ -523,7 +522,7 @@ public class TransitIndex {
     @Path("/calendar")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public Object getCalendar(@QueryParam("agency") String agency,
-            @QueryParam("routerId") String routerId) throws JSONException {
+            @PathParam("routerId") String routerId) throws JSONException {
 
         TransitIndexService transitIndexService = getGraph(routerId).getService(
                 TransitIndexService.class);
@@ -562,7 +561,7 @@ public class TransitIndex {
     public Object getStopTimesForTrip(@QueryParam("stopAgency") String stopAgency,
             @QueryParam("stopId") String stopId, @QueryParam("tripAgency") String tripAgency,
             @QueryParam("tripId") String tripId, @QueryParam("time") long time,
-            @QueryParam("extended") Boolean extended, @QueryParam("routerId") String routerId)
+            @QueryParam("extended") Boolean extended, @PathParam("routerId") String routerId)
             throws JSONException {
 
         AgencyAndId firstStop = null;
@@ -690,7 +689,7 @@ public class TransitIndex {
     @GET
     @Path("/modes")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public Object getModes(@QueryParam("routerId") String routerId) throws JSONException {
+    public Object getModes(@PathParam("routerId") String routerId) throws JSONException {
         TransitIndexService transitIndexService = getGraph(routerId).getService(
                 TransitIndexService.class);
         if (transitIndexService == null) {
@@ -737,7 +736,7 @@ public class TransitIndex {
             @QueryParam("leftUpLat") Double leftUpLat, @QueryParam("leftUpLon") Double leftUpLon,
             @QueryParam("rightDownLat") Double rightDownLat,
             @QueryParam("rightDownLon") Double rightDownLon, @QueryParam("extended") Boolean extended,
-            @QueryParam("routerId") String routerId) throws JSONException {
+            @PathParam("routerId") String routerId) throws JSONException {
 
         Graph graph = getGraph(routerId);
         StopList response = new StopList();
@@ -792,7 +791,7 @@ public class TransitIndex {
             @QueryParam("endAgency") String endAgency,
             @QueryParam("startStopId") String startStopId,
             @QueryParam("endStopId") String endStopId, @QueryParam("extended") Boolean extended,
-            @QueryParam("routerId") String routerId) throws JSONException {
+            @PathParam("routerId") String routerId) throws JSONException {
 
         RouteList response = new RouteList();
 
@@ -855,7 +854,7 @@ public class TransitIndex {
             @QueryParam("latitude") Double latitude, @QueryParam("longitude") Double longitude,
             @QueryParam("maxReturnedValues") Integer maxReturnedValues,
             @QueryParam("timeSec") Long timeSec, @QueryParam("extended") Boolean extended,
-            @QueryParam("routerId") String routerId) throws JSONException {
+            @PathParam("routerId") String routerId) throws JSONException {
 
         // Specify sensible default values if not present
         if (timeSec == null)
