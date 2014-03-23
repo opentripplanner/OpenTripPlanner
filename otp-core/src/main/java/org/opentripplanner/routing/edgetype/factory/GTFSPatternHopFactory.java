@@ -45,6 +45,7 @@ import org.opentripplanner.common.model.T2;
 import org.opentripplanner.gbannotation.BogusShapeDistanceTraveled;
 import org.opentripplanner.gbannotation.BogusShapeGeometry;
 import org.opentripplanner.gbannotation.BogusShapeGeometryCaught;
+import org.opentripplanner.gbannotation.NonStationParentStation;
 import org.opentripplanner.gbannotation.HopSpeedFast;
 import org.opentripplanner.gbannotation.HopSpeedSlow;
 import org.opentripplanner.gbannotation.HopZeroTime;
@@ -1603,7 +1604,7 @@ public class GTFSPatternHopFactory {
      * pathparsers should ensure that it is effectively ignored in other path services, and even in
      * the long distance path service anywhere but the beginning or end of a path.
      */
-    public void linkStopsToParentStations () {
+    public void linkStopsToParentStations(Graph graph) {
         for (Stop stop : _dao.getAllStops()) {
             String parentStation = stop.getParentStation();
             if (parentStation != null) {
@@ -1611,10 +1612,14 @@ public class GTFSPatternHopFactory {
                 String agencyId = stop.getId().getAgencyId();
                 AgencyAndId parentStationId = new AgencyAndId(agencyId, parentStation);
                 Stop parentStop = _dao.getStopForId(parentStationId);
-                TransitStation parentStopVertex = (TransitStation)
-                        context.stationStopNodes.get(parentStop);
-                new StationStopEdge(parentStopVertex, stopVertex);
-                new StationStopEdge(stopVertex, parentStopVertex);
+                if(context.stationStopNodes.get(parentStop) instanceof TransitStation) {
+                    TransitStation parentStopVertex = (TransitStation)
+                            context.stationStopNodes.get(parentStop);
+                    new StationStopEdge(parentStopVertex, stopVertex);
+                    new StationStopEdge(stopVertex, parentStopVertex);
+                } else {
+                    LOG.warn(graph.addBuilderAnnotation(new NonStationParentStation(stopVertex)));
+                }
             }
         }        
     }
