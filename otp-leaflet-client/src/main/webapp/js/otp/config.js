@@ -13,7 +13,10 @@ otp.config = {
     hostname : "",
     //municoderHostname : "http://localhost:8080",
     //datastoreUrl : 'http://localhost:9000',
-
+    // In the 0.10.x API the base path is "otp-rest-servlet/ws"
+    // From 0.11.x onward the routerId is a required part of the base path.
+    // If using a servlet container, the OTP WAR should be deployed to context path /otp/v0
+    restService: "otp/routers/default",
 
     /**
      * Base layers: the base map tile layers available for use by all modules.
