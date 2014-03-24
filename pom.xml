@@ -18,7 +18,6 @@
   <modules>
     <module>otp-core</module>
     <module>otp-rest-servlet</module>
-    <module>otp-thrift-api</module>    
     <module>otp-leaflet-client</module>
     <module>otp-openlayers-client</module>
     <module>otp-analyst-client</module>
