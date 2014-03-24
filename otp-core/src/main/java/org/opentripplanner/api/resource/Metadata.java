@@ -29,7 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.sun.jersey.api.core.InjectParam;
 import com.sun.jersey.api.spring.Autowire;
 
-@Path("{routerId}/metadata")
+@Path("/routers/{routerId}/metadata")
 @XmlRootElement
 @Autowire
 public class Metadata {
@@ -50,9 +50,7 @@ public class Metadata {
      */
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public GraphMetadata getMetadata(
-            @DefaultValue("default") @PathParam("routerId") String routerId)
-            throws JSONException {
+    public GraphMetadata getMetadata(@PathParam("routerId") String routerId) throws JSONException {
         GraphMetadata data = getMetadataService().getMetadata(routerId);
         return data;
     }

@@ -93,7 +93,7 @@ import com.vividsolutions.jts.geom.Point;
  * occurs). Putting "@Setter" on all the parameters would allow resource classes to be used outside
  * Jersey.
  */
-@Path("/{routerId}/simpleIsochrone")
+@Path("/routers/{routerId}/simpleIsochrone")
 @Autowire
 public class SimpleIsochrone extends RoutingResource {
     

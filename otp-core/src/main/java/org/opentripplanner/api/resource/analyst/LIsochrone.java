@@ -68,7 +68,7 @@ import com.vividsolutions.jts.geom.MultiPolygon;
  * 
  * @author laurent
  */
-@Path("{routerId}/isochrone")
+@Path("/routers/{routerId}/isochrone")
 public class LIsochrone extends RoutingResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(LIsochrone.class);

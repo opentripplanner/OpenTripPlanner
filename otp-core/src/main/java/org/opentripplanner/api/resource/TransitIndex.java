@@ -101,7 +101,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
 
-@Path("/{routerId}/transit")
+@Path("routers/{routerId}/transit")
 @XmlRootElement
 @Autowire
 public class TransitIndex {
@@ -790,7 +790,7 @@ public class TransitIndex {
     }
 
     public Object getCalendarServiceDataForAgency(@QueryParam("agency") String agency,
-            @QueryParam("routerId") String routerId) {
+            @PathParam("routerId") String routerId) {
         TransitIndexService transitIndexService = getGraph(routerId).getService(
                 TransitIndexService.class);
         if (transitIndexService == null) {

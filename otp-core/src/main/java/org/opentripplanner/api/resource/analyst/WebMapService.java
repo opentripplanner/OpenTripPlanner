@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
 import com.sun.jersey.api.core.InjectParam;
 import com.sun.jersey.api.spring.Autowire;
 
-@Path("/{routerId}/analyst/wms")
+@Path("/routers/{routerId}/analyst/wms")
 @Autowire
 public class WebMapService extends RoutingResource {
     
