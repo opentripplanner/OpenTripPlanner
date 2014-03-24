@@ -400,14 +400,17 @@ otp.widgets.tripoptions.ModeSelector =
     
     id           :  null,
 
-    modes        : { "TRANSIT,WALK" : "Transit", 
-                     "BUSISH,WALK" : "Bus Only", 
-                     "TRAINISH,WALK" : "Rail Only", 
-                     "BICYCLE" : 'Bicycle Only',
-                     "WALK" : 'Walk Only',
-                     "TRANSIT,BICYCLE" : "Bicycle &amp; Transit",
-                     "CAR" : 'Drive Only',
-                   },
+    modes : {
+        "TRANSIT,WALK" : "Transit",
+        "BUSISH,WALK" : "Bus Only",
+        "TRAINISH,WALK" : "Rail Only",
+        "BICYCLE" : 'Bicycle Only',
+        "WALK" : 'Walk Only',
+        "TRANSIT,BICYCLE" : "Bicycle &amp; Transit",
+        "CAR" : 'Drive Only',
+        "CAR_PARK,TRANSIT,WALK" : "Park and ride",
+        "CAR,TRANSIT,WALK" : "Kiss and ride",
+    },
     
     optionLookup : null,
     modeControls : null,
