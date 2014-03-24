@@ -71,7 +71,7 @@ otp.core.Map = otp.Class({
         
       
         if(!otp.config.initLatLng) {
-            var url = otp.config.hostname + '/' + otp.config.restService + '/ws/metadata';
+            var url = otp.config.hostname + '/' + otp.config.restService + '/metadata';
             $.ajax(url, {
                 data: { routerId : otp.config.routerId },            
                 dataType:   'jsonp',
