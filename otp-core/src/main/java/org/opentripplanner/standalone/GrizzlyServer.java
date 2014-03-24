@@ -154,7 +154,7 @@ public class GrizzlyServer {
         /* ADD A COUPLE OF HANDLERS (~= SERVLETS) */
         /* 1. A Grizzly wrapper around the Jersey WebApplication. */
         HttpHandler handler = ContainerFactory.createContainer(HttpHandler.class, rc, iocFactory);
-        httpServer.getServerConfiguration().addHttpHandler(handler, "/otp-rest-servlet/");
+        httpServer.getServerConfiguration().addHttpHandler(handler, "/otp");
         /* 2. A static content server for the client JS apps etc.
               This is a filesystem path, not classpath. Files are relative to the project dir, so
               from ./ we can reach e.g. target/classes/data-sources.xml */
