@@ -71,8 +71,6 @@ import org.opentripplanner.api.resource.Planner;
 import org.opentripplanner.api.resource.Response;
 import org.opentripplanner.api.resource.Routers;
 import org.opentripplanner.api.resource.TransitIndex;
-import org.opentripplanner.api.resource.internals.Components;
-import org.opentripplanner.api.resource.internals.GraphInternals;
 import org.opentripplanner.api.resource.services.MetadataService;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -572,33 +570,6 @@ public class TestRequest extends TestCase {
         // assertTrue(stopTimesForTrip.stopTimes.size() > 0);
     }
 
-    public void testComponents() {
-        Components components = new Components();
-        components.setGraphService(Context.getInstance().graphService);
-        // GraphComponentPolygons componentPolygons = components.getComponentPolygons(
-        // new TraverseModeSet(TraverseMode.WALK), "2009/10/1", "12:00:00", "", "portland");
-        // assertTrue(componentPolygons.components.size() >= 1);
-    }
-
-    public void testGraphInternals() {
-        GraphInternals internals = new GraphInternals();
-        internals.setGraphService(Context.getInstance().graphService);
-        FeatureCount counts = internals.countVertices("45.5,-122.6", "45.6,-122.5", "portland");
-        assertTrue(counts.vertices > 0);
-        assertTrue(counts.edges > 0);
-
-        WithGraph obj = (WithGraph) internals.getEdges("45.5,-122.6", "45.55,-122.55", "", false,
-                false, true, "portland");
-        EdgeSet edges = (EdgeSet) obj.getObject();
-        assertTrue(edges.edges.size() > 0);
-
-        obj = (WithGraph) internals.getVertices("45.5,-122.6", "45.55,-122.55", false, "", false,
-                false, "portland");
-        VertexSet vertices = (VertexSet) obj.getObject();
-        assertTrue(vertices.vertices.size() > 0);
-
-    }
-    
     public void testBannedTrips() throws JSONException {
         // Plan short trip along NE GLISAN ST
         TestPlanner planner = new TestPlanner("portland", "NE 57TH AVE at NE GLISAN ST #2", "NE 30TH AVE at NE GLISAN ST");
