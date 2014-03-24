@@ -43,8 +43,10 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
  * and JSON writing are performed automatically by Jersey.
  */
 
-@Provider
-@Produces(MediaType.APPLICATION_JSON)
+// Provider annotation is commented out to disable this adapter (Spring will not detect it)
+// It is here as an example for the 1.0 API.
+//@Provider
+//@Produces(MediaType.APPLICATION_JSON)
 public class OTPObjectMapperProvider implements ContextResolver<ObjectMapper> {
 
     private final ObjectMapper mapper;
