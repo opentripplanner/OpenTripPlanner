@@ -48,7 +48,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @author laurent
  */
-@Path("{routerId}/isochrone")
+@Path("/routers/{routerId}/isochrone")
 public class LIsochrone extends RoutingResource {
 
     @SuppressWarnings("unused")

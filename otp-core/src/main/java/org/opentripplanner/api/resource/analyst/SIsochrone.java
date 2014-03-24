@@ -58,7 +58,7 @@ import com.vividsolutions.jts.linearref.LengthIndexedLine;
  * This is the original Isochrone class provided by Stefan Steineger.
  * Another implementation has been provided by Laurent Grégoire (isochrone2).
  */
-@Path("{routerId}/isochroneOld")
+@Path("/routers/{routerId}/isochroneOld")
 @XmlRootElement
 @Autowire
 public class SIsochrone extends RoutingResource {

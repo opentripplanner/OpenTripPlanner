@@ -31,7 +31,7 @@ import lombok.Getter;
 import org.codehaus.jettison.json.JSONException;
 import org.opentripplanner.common.MavenVersion;
 
-@Path("/serverinfo")
+@Path("/")
 @XmlRootElement 
 public class ServerInfo {
     

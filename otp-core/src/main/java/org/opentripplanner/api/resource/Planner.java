@@ -50,7 +50,7 @@ import com.sun.jersey.api.spring.Autowire;
  */
 @XmlRootElement
 @Autowire
-@Path("/{routerId}")
+@Path("routers/{routerId}/plan") // final element needed here rather than on method to distinguish from routers API
 public class Planner extends RoutingResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(Planner.class);
@@ -100,7 +100,6 @@ public class Planner extends RoutingResource {
 
     @GET
     @Produces( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    @Path("/plan")
     public Response getItineraries() throws JSONException {
         return wrapGenerate(new OneArgFunc<TripPlan, RoutingRequest>() {
             public TripPlan call(RoutingRequest request) {

@@ -19,6 +19,7 @@ import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
@@ -34,7 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.sun.jersey.api.spring.Autowire;
 import com.vividsolutions.jts.geom.Envelope;
 
-@Path("/bike_rental")
+@Path("/routers/{routerId}/bike_rental")
 @XmlRootElement
 @Autowire
 public class BikeRental {
@@ -50,7 +51,7 @@ public class BikeRental {
     public BikeRentalStationList getBikeRentalStations(
             @QueryParam("lowerLeft") String lowerLeft,
             @QueryParam("upperRight") String upperRight,
-            @QueryParam("routerId") String routerId) {
+            @PathParam("routerId") String routerId) {
 
         Graph graph = graphService.getGraph(routerId);
         if (graph == null) return null;

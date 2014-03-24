@@ -39,7 +39,7 @@ import org.springframework.stereotype.Component;
 
 import com.sun.jersey.api.core.InjectParam;
 
-@Path("/{routerId}/analyst/raster")
+@Path("/routers/{routerId}/analyst/raster")
 @Component
 @Scope("request")
 public class Raster {
