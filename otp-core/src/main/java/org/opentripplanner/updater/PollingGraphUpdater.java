@@ -13,14 +13,12 @@
 
 package org.opentripplanner.updater;
 
-import java.util.prefs.Preferences;
-
 import lombok.Getter;
-
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.updater.GraphUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.prefs.Preferences;
 
 /**
  * This abstract class implements logic that is shared between all polling updaters.
@@ -65,6 +63,7 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
     @Override
     final public void run() {
         try {
+            LOG.error("Polling updater {}@{} started.", this.getClass().getName(), this.hashCode());
             // Run "forever"
             while (true) {
                 try {
@@ -84,8 +83,8 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
             }
         } catch (InterruptedException e) {
             // When updater is interrupted
-            LOG.error("Polling updater {} is interrupted, updater stops.", this.getClass()
-                    .getName());
+            LOG.error("Polling updater {}@{} is interrupted, updater stops.", this.getClass()
+                    .getName(), this.hashCode());
         }
     }
 
