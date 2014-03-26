@@ -79,6 +79,8 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
      * The number of seconds to wait before reconnecting after a failed connection.
      */
     private int reconnectPeriodSec;
+    
+    private Graph graph;
 
     @Override
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
@@ -88,6 +90,7 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
     @Override
     public void configure(Graph graph, Preferences preferences) throws Exception {
         // Read configuration
+        this.graph = graph;
         url = preferences.get("url", null);
         agencyId = preferences.get("defaultAgencyId", "");
         reconnectPeriodSec = preferences.getInt("reconnectPeriodSec", DEFAULT_RECONNECT_PERIOD_SEC);
@@ -171,7 +174,7 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
             try {
                 // Decode message into TripUpdateList
                 FeedMessage feed = GtfsRealtime.FeedMessage.PARSER.parseFrom(message);
-                List<TripUpdateList> updates = TripUpdateList.decodeFromGtfsRealtime(feed, agencyId);
+                List<TripUpdateList> updates = TripUpdateList.decodeFromGtfsRealtime(feed, agencyId, graph.getTimeZone());
 
                 // Handle trip updates via graph writer runnable
                 TripUpdateGraphWriterRunnable runnable = new TripUpdateGraphWriterRunnable(updates);

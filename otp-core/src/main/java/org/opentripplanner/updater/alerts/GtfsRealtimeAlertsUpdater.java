@@ -92,9 +92,9 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
     @Override
     protected void runPolling() throws Exception {
         try {
-            InputStream data = HttpUtils.getData(url);
+            InputStream data = HttpUtils.getData(url, lastTimestamp);
             if (data == null) {
-                throw new RuntimeException("Failed to get data from url " + url);
+                return;
             }
 
             final GtfsRealtime.FeedMessage feed = GtfsRealtime.FeedMessage.PARSER.parseFrom(data);
@@ -114,7 +114,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
             });
 
             lastTimestamp = feedTimestamp;
-        } catch (IOException e) {
+        } catch (Exception e) {
             LOG.error("Eror reading gtfs-realtime feed from " + url, e);
         }
     }

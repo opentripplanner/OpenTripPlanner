@@ -16,23 +16,38 @@ package org.opentripplanner.util;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.cookie.DateUtils;
 
 public class HttpUtils {
+    
+    private static final String HEADER_IFMODSINCE = "If-Modified-Since";
 
     public static InputStream getData(String url) throws ClientProtocolException, IOException {
+        return getData(url, -1);
+    }
+
+    public static InputStream getData(String url, long timestamp) throws ClientProtocolException, IOException {
         HttpGet httpget = new HttpGet(url);
+        if(timestamp >= 0)
+            httpget.addHeader(HEADER_IFMODSINCE, DateUtils.formatDate(new Date(timestamp * 1000)));
+        
         HttpClient httpclient = new DefaultHttpClient();
         HttpResponse response = httpclient.execute(httpget);
-        if(response.getStatusLine().getStatusCode() != 200)
+        if(response.getStatusLine().getStatusCode() == HttpStatus.SC_NOT_MODIFIED)
+            return null;
+        
+        if(response.getStatusLine().getStatusCode() != HttpStatus.SC_OK)
             return null;
 
         HttpEntity entity = response.getEntity();

@@ -42,10 +42,13 @@ public class GtfsRealtimeZmqTripUpdateSource implements TripUpdateSource, Prefer
      * Default agency id that is used for the trip id's in the TripUpdateLists
      */
     private String agencyId;
+    
+    private Graph graph;
 
     @Override
     public void configure(Graph graph, Preferences preferences) throws Exception {
         this.agencyId = preferences.get("defaultAgencyId", null);
+        this.graph = graph;
     }
 
     @Override
@@ -54,10 +57,8 @@ public class GtfsRealtimeZmqTripUpdateSource implements TripUpdateSource, Prefer
         List<TripUpdateList> updates = null;
         try {
             InputStream is = new FileInputStream(file);
-            if (is != null) {
-                feed = GtfsRealtime.FeedMessage.PARSER.parseFrom(is);
-                updates = TripUpdateList.decodeFromGtfsRealtime(feed, agencyId);
-            }
+            feed = GtfsRealtime.FeedMessage.PARSER.parseFrom(is);
+            updates = TripUpdateList.decodeFromGtfsRealtime(feed, agencyId, graph.getTimeZone());
         } catch (IOException e) {
             LOG.warn("Failed to parse gtfs-rt feed at " + file + ":", e);
         }
@@ -65,7 +66,7 @@ public class GtfsRealtimeZmqTripUpdateSource implements TripUpdateSource, Prefer
     }
 
     public String toString() {
-        return "GTFSZMQUpdateStreamer(" + file + ")";
+        return "GtfsRealtimeZmqTripUpdateSource(" + file + ")";
     }
 
 }

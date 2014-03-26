@@ -13,6 +13,7 @@
 
 package org.opentripplanner.updater.stoptime;
 
+import java.util.Collection;
 import java.util.List;
 
 import lombok.Setter;
@@ -103,7 +104,7 @@ public class TimetableSnapshotSource {
     /**
      * Method to apply a trip update list to the most recent version of the timetable snapshot.
      */
-    public void applyTripUpdateLists(List<TripUpdateList> updates) {
+    public void applyTripUpdateLists(Collection<TripUpdateList> updates) {
         if (updates == null) {
             LOG.debug("updates is null");
             return;
