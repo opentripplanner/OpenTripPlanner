@@ -99,8 +99,8 @@ otp.widgets.tripoptions.TripOptionsWidget =
     restoreDefaults : function(useCurrentTime) {
         var params = _.clone(this.module.defaultQueryParams);
         if(useCurrentTime) {
-            params['date'] = moment().format("MM-DD-YYYY");
-            params['time'] = moment().format("h:mma");
+            params['date'] = moment().format(otp.config.locale.time.date_format);
+            params['time'] = moment().format(otp.config.locale.time.time_format);
         }
         this.applyQueryParams(params);
     },
