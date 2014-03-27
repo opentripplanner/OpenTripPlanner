@@ -48,7 +48,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 
     private static final Logger LOG = LoggerFactory.getLogger(GenericAStar.class);
     private static final MonitoringStore store = MonitoringStoreFactory.getStore();
-	private static final double OVERSEARCH_MULTIPLIER = 4.0;
+    private static final double OVERSEARCH_MULTIPLIER = 4.0;
 
     private boolean verbose = false;
 
@@ -57,7 +57,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
     private TraverseVisitor traverseVisitor;
     
     /** The number of paths to attempt to find */
-    @Setter private int nPaths = 3; // TODO: just use the number of paths from the request, and get rid of retrying wrapper.
+    @Setter private int nPaths = 3; // TODO this should really be set based on the routing request
     
     enum RunStatus {
         RUNNING, STOPPED
@@ -146,7 +146,6 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
 //        options.setMaxWalkDistance(Math.max(options.getMaxWalkDistance(), rctx.getMinWalkDistance()));
 
         runState.nVisited = 0;
-        
         runState.targetAcceptedStates = Lists.newArrayList();
         
         return runState;
@@ -245,10 +244,6 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
         return true;
     }
     
-    /**
-     * 
-     * @param abortTime - negative means no abort time
-     */
     void runSearch(RunState runState, long abortTime){
         /* the core of the A* algorithm */
         while (!runState.pq.empty()) { // Until the priority queue is empty:
@@ -296,7 +291,7 @@ public class GenericAStar implements SPTService { // maybe this should be wrappe
             // TODO AMB: Replace isFinal with bicycle conditions in BasicPathParser
             }  else if (!runState.options.batch && runState.u_vertex == runState.rctx.target && runState.u.isFinal() && runState.u.allPathParsersAccept()) {
                 runState.targetAcceptedStates.add(runState.u);
-                runState.foundPathWeight = u.getWeight();
+                runState.foundPathWeight = runState.u.getWeight();
                 runState.options.rctx.debugOutput.foundPath();
                 if (runState.targetAcceptedStates.size() >= nPaths) {
                     LOG.debug("total vertices visited {}", runState.nVisited);
