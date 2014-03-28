@@ -215,8 +215,7 @@ public class Graph implements Serializable {
         }        
     }
 
-    /* convenient in tests and such, but avoid using in general */
-    @Deprecated
+    /* Fetching vertices by label is convenient in tests and such, but avoid using in general. */
     public Vertex getVertex(String label) {
         return vertices.get(label);
     }
