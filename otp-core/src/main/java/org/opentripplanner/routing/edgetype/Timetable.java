@@ -598,16 +598,15 @@ public class Timetable implements Serializable {
      * Add a trip to this Timetable. The Timetable must be analyzed, compacted, and indexed
      * any time trips are added, but this is not done automatically because it is time consuming
      * and should only be done once after an entire batch of trips are added.
+     * Note that the trip is not added to the enclosing pattern here, but in the pattern's wrapper function.
+     * Here we don't know if it's a scheduled trip or a realtime-added trip.
      */
-    public void addTrip(Trip trip, List<StopTime> stopTimes) {
-        TripTimes newTripTimes = new TripTimes(trip, stopTimes);
-        if(!tripTimes.isEmpty()) {
-            TripTimes firstTripTimes = tripTimes.get(0);
-            newTripTimes.compactStopSequence(firstTripTimes); // TODO: explain with a comment
+    public void addTripTimes(TripTimes tt) {
+        if ( ! tripTimes.isEmpty()) {
+            // TODO: maybe this should be done with all the other compacting and analysing mentioned above.
+            tt.compactStopSequence(tripTimes.get(0));
         }
-        tripTimes.add(newTripTimes);
-        // Note that the trip is not added to the enclosing pattern here, but in the pattern's wrapper function.
-        // Here we don't know if it's a scheduled trip or an added trip. 
+        tripTimes.add(tt);
     }
 
     /**

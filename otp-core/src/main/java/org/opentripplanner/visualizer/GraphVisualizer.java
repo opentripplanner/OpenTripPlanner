@@ -156,7 +156,7 @@ class TripPatternListModel extends AbstractListModel {
     ArrayList<String> departureTimes = new ArrayList<String>();
 
     public TripPatternListModel(TripPattern pattern, int stopIndex) {
-        Iterator<Integer> departureTimeIterator = pattern.getDepartureTimes(stopIndex);
+        Iterator<Integer> departureTimeIterator = null; // TODO pattern.getDepartureTimes(stopIndex);
         while (departureTimeIterator.hasNext()) {
             int dt = departureTimeIterator.next();
 
@@ -837,7 +837,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
                 ListModel model = new TripPatternListModel(pattern, stopIndex);
                 departurePattern.setModel(model);
 
-                Trip trip = pattern.getExemplar();
+                Trip trip = null; // pattern.getExemplar();
                 serviceIdLabel.setText(trip.getServiceId().toString());
             }
 

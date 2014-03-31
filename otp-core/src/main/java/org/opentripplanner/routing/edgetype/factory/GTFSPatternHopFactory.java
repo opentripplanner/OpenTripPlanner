@@ -41,7 +41,6 @@ import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.common.model.T2;
 import org.opentripplanner.gbannotation.BogusShapeDistanceTraveled;
 import org.opentripplanner.gbannotation.BogusShapeGeometry;
 import org.opentripplanner.gbannotation.BogusShapeGeometryCaught;
@@ -54,13 +53,10 @@ import org.opentripplanner.gbannotation.NegativeHopTime;
 import org.opentripplanner.gbannotation.RepeatedStops;
 import org.opentripplanner.gbannotation.TripDegenerate;
 import org.opentripplanner.gbannotation.TripUndefinedService;
-import org.opentripplanner.gtfs.BikeAccess;
 import org.opentripplanner.gtfs.GtfsContext;
-import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.routing.core.StopTransfer;
 import org.opentripplanner.routing.core.TransferTable;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.HopEdge;
 import org.opentripplanner.routing.edgetype.StationStopEdge;
@@ -79,15 +75,13 @@ import org.opentripplanner.routing.impl.OnBoardDepartServiceImpl;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.FareServiceFactory;
 import org.opentripplanner.routing.services.OnBoardDepartService;
+import org.opentripplanner.routing.trippattern.FrequencyTripTimes;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.routing.vertextype.PatternArriveVertex;
-import org.opentripplanner.routing.vertextype.PatternDepartVertex;
 import org.opentripplanner.routing.vertextype.TransitStation;
 import org.opentripplanner.routing.vertextype.TransitStationStop;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.routing.vertextype.TransitStopArrive;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
-import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -337,9 +331,9 @@ public class GTFSPatternHopFactory {
 
 //    private Map<InterlineSwitchoverKey, PatternInterlineDwell> interlineDwells = new HashMap<InterlineSwitchoverKey, PatternInterlineDwell>();
 
-    private Map<StopPattern, TripPattern> tableTripPatterns = Maps.newHashMap();
+    private Map<StopPattern, TripPattern> tripPatterns = Maps.newHashMap();
 
-    private Map<StopPattern, TripPattern> frequencyTripPatterns = Maps.newHashMap();
+//    private Map<StopPattern, TripPattern> frequencyTripPatterns = Maps.newHashMap(); NOT USED, all patterns are mixed for the moment
 
     private GtfsStopContext context = new GtfsStopContext();
 
@@ -361,7 +355,6 @@ public class GTFSPatternHopFactory {
 
     /** Generate the edges. */
     public void run(Graph graph) {
-        LOG.info("BEGIN HOP GENERATION");
         if (fareServiceFactory == null) {
             fareServiceFactory = new DefaultFareServiceFactory();
         }
@@ -377,6 +370,7 @@ public class GTFSPatternHopFactory {
 
         /* Assign 0-based numeric codes to all GTFS service IDs. */
         for (AgencyAndId serviceId : _dao.getAllServiceIds()) {
+            // TODO: FIX Service code collision for multiple feeds.
             graph.serviceCodes.put(serviceId, graph.serviceCodes.size());
         }
         
@@ -384,7 +378,11 @@ public class GTFSPatternHopFactory {
         Collection<Trip> trips = _dao.getAllTrips();
         int tripCount = 0;
 
-        /* First, record which trips are used by one or more frequency entries. */
+        /* First, record which trips are used by one or more frequency entries.
+         * These trips will be ignored for the purposes of non-frequency routing, and
+         * all the frequency entries referencing the same trip can be added at once to the same
+         * timetable.
+         */
         ListMultimap<Trip, Frequency> frequenciesForTrip = ArrayListMultimap.create();        
         for(Frequency freq : _dao.getAllFrequencies()) {
             frequenciesForTrip.put(freq.getTrip(), freq);
@@ -394,9 +392,10 @@ public class GTFSPatternHopFactory {
         TRIP : for (Trip trip : trips) {
 
             if (++tripCount % 100000 == 0) {
-                LOG.debug("trips=" + tripCount + "/" + trips.size());
+                LOG.debug("loading trips {}/{}", tripCount, trips.size());
             }
-            
+
+            // TODO: move to a validator module
             if ( ! _calendarService.getServiceIds().contains(trip.getServiceId())) {
                 LOG.warn(graph.addBuilderAnnotation(new TripUndefinedService(trip)));
             }
@@ -416,64 +415,42 @@ public class GTFSPatternHopFactory {
                 LOG.warn(graph.addBuilderAnnotation(new TripDegenerate(trip)));
                 continue TRIP;
             }
-            
-            /* check to see if this trip is used by one or more frequency entries */
-            List<Frequency> frequencies = frequenciesForTrip.get(trip);
-            if(frequencies != null && ! frequencies.isEmpty()) {
-                Collections.sort(frequencies, new Comparator<Frequency>() {
-                    @Override
-                    public int compare(Frequency o1, Frequency o2) {
-                        return o1.getStartTime() - o2.getStartTime();
-                    }
-                });
 
-                // before creating frequency-based trips, check for single-instance frequencies.
-                Frequency frequency = frequencies.get(0);
-                if (frequencies.size() > 1 || 
-                    frequency.getStartTime() != stopTimes.get(0).getDepartureTime() ||
-                    frequency.getEndTime() - frequency.getStartTime() > frequency.getHeadwaySecs()) {
-// TODO replace
-//                    T2<FrequencyBasedTripPattern,List<FrequencyHop>> patternAndHops =
-//                            makeFrequencyPattern(graph, trip, stopTimes);
-//                    List<FrequencyHop> hops = patternAndHops.getSecond();
-//                    FrequencyBasedTripPattern frequencyPattern = patternAndHops.getFirst();
-//                    if (frequencyPattern != null)
-//                        frequencyPattern.createRanges(frequencies);
-//                    createGeometry(graph, trip, stopTimes, hops);
-                    continue TRIP;
-                } 
-                // Else fall through and treat this trip as a non-frequency (table-based) one
-            }
-
-            /* This trip is not frequency-based, so it must be table-based. */
-
-            /* Convert this trip and associated filtered stoptimes into a TripTimes object */
+            /* Get the existing TripPattern for this filtered StopPattern, or create one. */
             StopPattern stopPattern = new StopPattern(stopTimes);
-            TripTimes tripTimes = new TripTimes(trip, stopTimes);
-
-            /* Group TripTimes with all others sharing the same block ID (for interlining later) */
-            if (trip.getBlockId() != null && ! trip.getBlockId().equals("")) {
-                tripTimesForBlock.put(new BlockIdAndServiceId(tripTimes.getTrip()), tripTimes);
+            TripPattern tripPattern = tripPatterns.get(stopPattern);
+            if (tripPattern == null) {
+                tripPattern = new TripPattern(trip.getRoute(), stopPattern);
+                tripPatterns.put(stopPattern, tripPattern);
             }
 
-            /* Get the existing TripPattern for this StopPattern, or create one. */
-            TripPattern tableTripPattern = tableTripPatterns.get(stopPattern);
-            if (tableTripPattern == null) {
-                tableTripPattern = new TripPattern(trip.getRoute(), stopPattern);
-                tableTripPatterns.put(stopPattern, tableTripPattern);
+            /* Check whether this trip is referenced by one or more frequency entries. */
+            List<Frequency> frequencies = frequenciesForTrip.get(trip);
+            if (frequencies != null && !(frequencies.isEmpty())) {
+                for (Frequency freq : frequencies) {
+                    tripPattern.add(new FrequencyTripTimes(trip, stopTimes, freq));
+                }
+                // TODO replace: createGeometry(graph, trip, stopTimes, hops);
             }
 
-            /* Add the stoptimes for the current trip to the appropriate TripPattern. */
-            /* This effectively groups trips by the sequence of stops they visit. */
-            tableTripPattern.addTrip(trip, stopTimes);
-            
-        } // END foreach (TRIP)
+            /* This trip was not frequency-based, so it must be table-based. */
+            else {
+                TripTimes tripTimes = new TripTimes(trip, stopTimes);
+                tripPattern.add(tripTimes);
+                // For interlining, group TripTimes with all others sharing the same block ID.
+                // Block semantics seem undefined for frequency trips.
+                if (trip.getBlockId() != null && ! trip.getBlockId().equals("")) {
+                    tripTimesForBlock.put(new BlockIdAndServiceId(trip), tripTimes);
+                }
+            }
+
+        } // end foreach TRIP
 
         /* Generate unique names for all the TableTripPatterns. */
-        TripPattern.generateUniqueNames(tableTripPatterns.values());
+        TripPattern.generateUniqueNames(tripPatterns.values());
 
         /* Loop over all new TableTripPatterns, creating the vertices and edges for each pattern. */
-        for (TripPattern tableTripPattern : tableTripPatterns.values()) {
+        for (TripPattern tableTripPattern : tripPatterns.values()) {
             tableTripPattern.makePatternVerticesAndEdges(graph, context);
             tableTripPattern.setServiceCodes(graph.serviceCodes); // TODO this could be more elegant
         }
@@ -517,15 +494,13 @@ public class GTFSPatternHopFactory {
 
         /* Is this the wrong place to do this? It should be done on all feeds at once, or at deserialization. */
         // it is already done at deserialization, but standalone mode allows using graphs without serializing them.
-        for (TripPattern tableTripPattern : tableTripPatterns.values()) {
+        for (TripPattern tableTripPattern : tripPatterns.values()) {
             tableTripPattern.getScheduledTimetable().finish();
         }
         
         clearCachedData(); // eh?
         graph.putService(FareService.class, fareServiceFactory.makeFareService());
         graph.putService(OnBoardDepartService.class, new OnBoardDepartServiceImpl());
-        LOG.info("END HOP GENERATION");
-
     }
     
     static int cg = 0;

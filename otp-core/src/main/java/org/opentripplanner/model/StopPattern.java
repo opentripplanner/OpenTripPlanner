@@ -83,7 +83,8 @@ public class StopPattern implements Serializable {
         pickups   = new int[size];
         dropoffs  = new int[size];
     }
-    
+
+    /** Assumes that stopTimes are already sorted by time. */
     public StopPattern (List<StopTime> stopTimes) {
         this (stopTimes.size());
         if (size == 0) return;

@@ -383,10 +383,15 @@ public class TripTimes implements Serializable, Comparable<TripTimes> {
         return true;
     }
 
+    /**
+     * In GTFS, each trip on the same pattern can have different stop sequence numbers.
+     * In practice they are often the same for all trips on the same pattern. This method
+     * deduplicates identical lists of stop sequence numbers.
+     */
     public void compactStopSequence(TripTimes firstTripTime) {
-        if(firstTripTime.stopSequences == null || stopSequences == null) {
+        if (firstTripTime.stopSequences == null || stopSequences == null) {
             return;
-        } else if(firstTripTime.stopSequences.equals(stopSequences)) {
+        } else if (firstTripTime.stopSequences.equals(stopSequences)) {
             stopSequences = firstTripTime.stopSequences;
         }
     }
