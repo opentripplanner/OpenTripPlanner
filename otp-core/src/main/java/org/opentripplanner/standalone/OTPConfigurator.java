@@ -57,7 +57,6 @@ import org.opentripplanner.routing.impl.GraphServiceBeanImpl;
 import org.opentripplanner.routing.impl.GraphServiceImpl;
 import org.opentripplanner.routing.impl.RetryingPathServiceImpl;
 import org.opentripplanner.routing.impl.LongDistancePathService;
-import org.opentripplanner.routing.impl.raptor.Raptor;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
@@ -108,14 +107,7 @@ public class OTPConfigurator {
         cpf.bind(SPTService.class, new GenericAStar());
 
         // Choose a PathService to wrap the SPTService, depending on expected maximum path lengths
-        if (params.raptor) {
-            Raptor raptor = new Raptor();
-            raptor.setMultiPathTimeout(1.0);
-            raptor.setShortPathCutoff(1000);
-            cpf.bind(PathService.class, raptor);
-            cpf.bind(RemainingWeightHeuristicFactory.class,
-                    new DefaultRemainingWeightHeuristicFactoryImpl());
-        } else if (params.longDistance) {
+        if (params.longDistance) {
             LongDistancePathService pathService = new LongDistancePathService();
             pathService.setTimeout(10);
             cpf.bind(PathService.class, pathService);
@@ -268,15 +260,9 @@ public class OTPConfigurator {
                 }
             }
             List<GraphBuilderWithGtfsDao> gtfsBuilders = new ArrayList<GraphBuilderWithGtfsDao>();
-            if (params.transitIndex || params.raptor) {
-                gtfsBuilders.add(new TransitIndexBuilder());
-            }
             gtfsBuilder.setFareServiceFactory(new DefaultFareServiceFactory());
             gtfsBuilder.setGtfsGraphBuilders(gtfsBuilders);
             gtfsBuilder.setDeleteUselessDwells(params.deleteUselessDwells);
-        }
-        if(params.raptor) {
-            graphBuilder.addGraphBuilder(new RaptorDataBuilder());
         }
         if (configFile != null) {
             EmbeddedConfigGraphBuilderImpl embeddedConfigBuilder = new EmbeddedConfigGraphBuilderImpl();

@@ -98,10 +98,6 @@ public class CommandLineParameters {
     description = "Skip embedding config in graph (Embed.properties)")
     boolean noEmbedConfig = false;
 
-    @Parameter(names = {"--transitIndex"},
-    description = "build a transit index for GTFS data")
-    boolean transitIndex;
-
     /* Options for the server sub-task. */
 
     @Parameter( names = { "-a", "--analyst"}, 
