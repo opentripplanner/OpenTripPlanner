@@ -41,7 +41,7 @@ public class PatternDwell extends TablePatternEdge implements OnboardEdge, Dwell
     }
 
     public String getDirection() {
-        return getPattern().getExemplar().getTripHeadsign();
+        return getPattern().getDirection();
     }
 
     public double getDistance() {
