@@ -55,8 +55,8 @@ public class TimetableTest {
     private static Graph graph;
     private GenericAStar aStar = new GenericAStar();
     private static GtfsContext context;
-    private static Map<AgencyAndId, TableTripPattern> patternIndex;
-    private static TableTripPattern pattern;
+    private static Map<AgencyAndId, TripPattern> patternIndex;
+    private static TripPattern pattern;
     private static Timetable timetable;
     private static TimeZone timeZone = TimeZone.getTimeZone("America/New_York");
     private static ServiceDate serviceDate = new ServiceDate(2009, 8, 7);
@@ -72,12 +72,12 @@ public class TimetableTest {
         graph.putService(CalendarServiceData.class,
                 GtfsLibrary.createCalendarServiceData(context.getDao()));
 
-        patternIndex = new HashMap<AgencyAndId, TableTripPattern>();
+        patternIndex = new HashMap<AgencyAndId, TripPattern>();
         for (TransitStopDepart tsd : filter(graph.getVertices(), TransitStopDepart.class)) {
             for (TransitBoardAlight tba : filter(tsd.getOutgoing(), TransitBoardAlight.class)) {
                 if (!tba.isBoarding())
                     continue;
-                TableTripPattern pattern = tba.getPattern();
+                TripPattern pattern = tba.getPattern();
                 for (Trip trip : pattern.getTrips()) {
                     patternIndex.put(trip.getId(), pattern);
                 }

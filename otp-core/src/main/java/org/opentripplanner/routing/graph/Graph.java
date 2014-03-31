@@ -60,7 +60,7 @@ import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
@@ -572,11 +572,11 @@ public class Graph implements Serializable {
         LOG.debug("street index built.");
         LOG.debug("Rebuilding edge and vertex indices.");
         rebuildVertexAndEdgeIndices();
-        Set<TableTripPattern> tableTripPatterns = Sets.newHashSet();
+        Set<TripPattern> tableTripPatterns = Sets.newHashSet();
         for (PatternArriveVertex pav : IterableLibrary.filter(this.getVertices(), PatternArriveVertex.class)) {
             tableTripPatterns.add(pav.getTripPattern());
         }
-        for (TableTripPattern ttp : tableTripPatterns) {
+        for (TripPattern ttp : tableTripPatterns) {
             if (ttp != null) ttp.getScheduledTimetable().finish(); // skip frequency-based patterns with no table (null)
         }
         // TODO: Move this ^ stuff into the graph index

@@ -37,10 +37,8 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.GenericAStar;
-import org.opentripplanner.routing.edgetype.FrequencyAlight;
-import org.opentripplanner.routing.edgetype.FrequencyBoard;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
-import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.TimedTransferEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableResolver;
@@ -182,7 +180,7 @@ public class TestTransfers extends TestCase {
     /**
      * Apply an update to a table trip pattern and check whether the update was applied correctly
      */
-    private void applyUpdateToTripPattern(TableTripPattern pattern, String tripId, String stopId,
+    private void applyUpdateToTripPattern(TripPattern pattern, String tripId, String stopId,
             int stopSeq, int arrive, int depart, ScheduleRelationship scheduleRelationship,
             int timestamp, ServiceDate serviceDate) throws ParseException {
         TimetableResolver snapshot = graph.getTimetableSnapshotSource().getTimetableSnapshot();
@@ -571,7 +569,7 @@ public class TestTransfers extends TestCase {
         // Now apply a real-time update: let the to-trip be early by 27600 seconds,
         // resulting in a transfer time of 0 seconds
         @SuppressWarnings("deprecation")
-        TableTripPattern pattern = ((PatternStopVertex) graph
+        TripPattern pattern = ((PatternStopVertex) graph
                 .getVertex("agency_F_agency_4.3_1_D")).getTripPattern();
         applyUpdateToTripPattern(pattern, "4.2", "F", 1, 55200, 55200,
                 ScheduleRelationship.SCHEDULED, 0, serviceDate);

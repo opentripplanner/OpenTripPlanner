@@ -60,28 +60,8 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.WrappedCurrency;
-import org.opentripplanner.routing.edgetype.AreaEdge;
-import org.opentripplanner.routing.edgetype.AreaEdgeList;
-import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
-import org.opentripplanner.routing.edgetype.OnBoardDepartPatternHop;
-import org.opentripplanner.routing.edgetype.PartialPlainStreetEdge;
-import org.opentripplanner.routing.edgetype.PatternDwell;
-import org.opentripplanner.routing.edgetype.PatternHop;
-import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
-import org.opentripplanner.routing.edgetype.PlainStreetEdge;
-import org.opentripplanner.routing.edgetype.PreAlightEdge;
-import org.opentripplanner.routing.edgetype.PreBoardEdge;
-import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
-import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
-import org.opentripplanner.routing.edgetype.ScheduledStopPattern;
-import org.opentripplanner.routing.edgetype.SimpleTransfer;
-import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
-import org.opentripplanner.routing.edgetype.StreetTransitLink;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.edgetype.TableTripPattern;
-import org.opentripplanner.routing.edgetype.TimetableResolver;
-import org.opentripplanner.routing.edgetype.TransitBoardAlight;
+import org.opentripplanner.routing.edgetype.*;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.FareService;
@@ -369,9 +349,9 @@ public class PlanGeneratorTest {
         ScheduledStopPattern thirdStopPattern = ScheduledStopPattern.fromTrip(
                 thirdTrip, thirdStopTimes);
 
-        TableTripPattern firstTripPattern = new TableTripPattern(firstTrip, firstStopPattern, 0);
-        TableTripPattern secondTripPattern = new TableTripPattern(secondTrip, secondStopPattern, 1);
-        TableTripPattern thirdTripPattern = new TableTripPattern(thirdTrip, thirdStopPattern, 2);
+        TripPattern firstTripPattern = new TripPattern(firstTrip, firstStopPattern, 0);
+        TripPattern secondTripPattern = new TripPattern(secondTrip, secondStopPattern, 1);
+        TripPattern thirdTripPattern = new TripPattern(thirdTrip, thirdStopPattern, 2);
 
         firstTripPattern.addTrip(firstTrip, firstStopTimes);
         secondTripPattern.addTrip(secondTrip, secondStopTimes);

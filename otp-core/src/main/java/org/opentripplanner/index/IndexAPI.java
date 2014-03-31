@@ -43,7 +43,7 @@ import org.opentripplanner.index.model.RouteShort;
 import org.opentripplanner.index.model.StopShort;
 import org.opentripplanner.index.model.TripShort;
 import org.opentripplanner.index.model.TripTimeShort;
-import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
@@ -183,7 +183,7 @@ public class IndexAPI {
        Stop stop = graph.getIndex().stopForId.get(id);
        if (stop != null) {
            Set<Route> routes = Sets.newHashSet();
-           for (TableTripPattern pattern : graph.getIndex().patternsForStop.get(stop)) {
+           for (TripPattern pattern : graph.getIndex().patternsForStop.get(stop)) {
                routes.add(pattern.route);
            }
            return Response.status(Status.OK).entity(RouteShort.list(routes)).build();
@@ -200,7 +200,7 @@ public class IndexAPI {
        AgencyAndId id = AgencyAndId.convertFromString(string);
        Stop stop = graph.getIndex().stopForId.get(id);
        if (stop != null) {
-           Collection<TableTripPattern> patterns = graph.getIndex().patternsForStop.get(stop);
+           Collection<TripPattern> patterns = graph.getIndex().patternsForStop.get(stop);
            return Response.status(Status.OK).entity(PatternShort.list(patterns)).build();
        } else { 
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
@@ -241,7 +241,7 @@ public class IndexAPI {
        AgencyAndId routeId = AgencyAndId.convertFromString(routeIdString);
        Route route = graph.getIndex().routeForId.get(routeId);
        if (route != null) {
-           List<TableTripPattern> patterns = graph.getIndex().patternsForRoute.get(route);
+           List<TripPattern> patterns = graph.getIndex().patternsForRoute.get(route);
            return Response.status(Status.OK).entity(PatternShort.list(patterns)).build();
        } else { 
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
@@ -258,8 +258,8 @@ public class IndexAPI {
        Route route = graph.getIndex().routeForId.get(routeId);
        if (route != null) {
            Set<Stop> stops = Sets.newHashSet();
-           Collection<TableTripPattern> patterns = graph.getIndex().patternsForRoute.get(route);
-           for (TableTripPattern pattern : patterns) {
+           Collection<TripPattern> patterns = graph.getIndex().patternsForRoute.get(route);
+           for (TripPattern pattern : patterns) {
                stops.addAll(pattern.getStops());
            }
            return Response.status(Status.OK).entity(StopShort.list(stops)).build();
@@ -278,8 +278,8 @@ public class IndexAPI {
        Route route = graph.getIndex().routeForId.get(routeId);
        if (route != null) {
            List<Trip> trips = Lists.newArrayList();
-           Collection<TableTripPattern> patterns = graph.getIndex().patternsForRoute.get(route);
-           for (TableTripPattern pattern : patterns) {
+           Collection<TripPattern> patterns = graph.getIndex().patternsForRoute.get(route);
+           for (TripPattern pattern : patterns) {
                trips.addAll(pattern.getTrips());
            }
            return Response.status(Status.OK).entity(TripShort.list(trips)).build();
@@ -314,7 +314,7 @@ public class IndexAPI {
        AgencyAndId tripId = AgencyAndId.convertFromString(tripIdString);
        Trip trip = graph.getIndex().tripForId.get(tripId);
        if (trip != null) {
-           TableTripPattern pattern = graph.getIndex().patternForTrip.get(trip);
+           TripPattern pattern = graph.getIndex().patternForTrip.get(trip);
            Collection<Stop> stops = pattern.getStops();
            return Response.status(Status.OK).entity(StopShort.list(stops)).build();
        } else { 
@@ -330,7 +330,7 @@ public class IndexAPI {
        AgencyAndId tripId = AgencyAndId.convertFromString(tripIdString);
        Trip trip = graph.getIndex().tripForId.get(tripId);
        if (trip != null) {
-           TableTripPattern pattern = graph.getIndex().patternForTrip.get(trip);
+           TripPattern pattern = graph.getIndex().patternForTrip.get(trip);
            Timetable table = pattern.getScheduledTimetable();
            return Response.status(Status.OK).entity(TripTimeShort.fromTripTimes(table, trip)).build();
        } else { 
@@ -343,7 +343,7 @@ public class IndexAPI {
    @Produces({ MediaType.APPLICATION_JSON })
    public Response getPatterns () {
        Graph graph = graphService.getGraph();
-       Collection<TableTripPattern> patterns = graph.getIndex().patternForId.values();
+       Collection<TripPattern> patterns = graph.getIndex().patternForId.values();
        return Response.status(Status.OK).entity(PatternShort.list(patterns)).build();
    }
 
@@ -352,7 +352,7 @@ public class IndexAPI {
    @Produces({ MediaType.APPLICATION_JSON })
    public Response getPattern (@PathParam("id") String string) {
        Graph graph = graphService.getGraph();
-       TableTripPattern pattern = graph.getIndex().patternForId.get(string);
+       TripPattern pattern = graph.getIndex().patternForId.get(string);
        if (pattern != null) {
            return Response.status(Status.OK).entity(new PatternDetail(pattern)).build();
        } else { 
@@ -365,7 +365,7 @@ public class IndexAPI {
    @Produces({ MediaType.APPLICATION_JSON })
    public Response getTripsForPattern (@PathParam("id") String string) {
        Graph graph = graphService.getGraph();
-       TableTripPattern pattern = graph.getIndex().patternForId.get(string);
+       TripPattern pattern = graph.getIndex().patternForId.get(string);
        if (pattern != null) {
            List<Trip> trips = pattern.getTrips();
            return Response.status(Status.OK).entity(TripShort.list(trips)).build();
@@ -379,7 +379,7 @@ public class IndexAPI {
    @Produces({ MediaType.APPLICATION_JSON })
    public Response getStopsForPattern (@PathParam("id") String string) {
        Graph graph = graphService.getGraph();
-       TableTripPattern pattern = graph.getIndex().patternForId.get(string);
+       TripPattern pattern = graph.getIndex().patternForId.get(string);
        if (pattern != null) {
            List<Stop> stops = pattern.getStops();
            return Response.status(Status.OK).entity(StopShort.list(stops)).build();

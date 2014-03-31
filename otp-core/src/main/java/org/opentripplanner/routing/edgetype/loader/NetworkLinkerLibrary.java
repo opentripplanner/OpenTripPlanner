@@ -150,11 +150,6 @@ public class NetworkLinkerLibrary {
 //        }
 //    }
 
-    /****
-     * Private Methods
-     ****/
-
-
     public DistanceLibrary getDistanceLibrary() {
         return distanceLibrary ;
     }

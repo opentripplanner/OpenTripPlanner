@@ -35,7 +35,7 @@ public class PatternDwell extends TablePatternEdge implements OnboardEdge, Dwell
 
     private int stopIndex;
     
-    public PatternDwell(PatternArriveVertex from, PatternDepartVertex to, int stopIndex, TableTripPattern tripPattern) {
+    public PatternDwell(PatternArriveVertex from, PatternDepartVertex to, int stopIndex, TripPattern tripPattern) {
         super(from, to);
         this.stopIndex = stopIndex;
     }

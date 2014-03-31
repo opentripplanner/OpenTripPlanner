@@ -76,7 +76,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -155,7 +155,7 @@ class TripPatternListModel extends AbstractListModel {
 
     ArrayList<String> departureTimes = new ArrayList<String>();
 
-    public TripPatternListModel(TableTripPattern pattern, int stopIndex) {
+    public TripPatternListModel(TripPattern pattern, int stopIndex) {
         Iterator<Integer> departureTimeIterator = pattern.getDepartureTimes(stopIndex);
         while (departureTimeIterator.hasNext()) {
             int dt = departureTimeIterator.next();
@@ -818,7 +818,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
                 metadataList.revalidate();
 
                 // figure out the pattern, if any
-                TableTripPattern pattern = null;
+                TripPattern pattern = null;
                 int stopIndex = 0;
                 if (selected instanceof TransitBoardAlight
                         && ((TransitBoardAlight) selected).isBoarding()) {

@@ -29,14 +29,10 @@ import org.onebusaway.gtfs.model.ServiceCalendar;
 import org.onebusaway.gtfs.model.ServiceCalendarDate;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.FrequencyAlight;
-import org.opentripplanner.routing.edgetype.FrequencyBasedTripPattern;
-import org.opentripplanner.routing.edgetype.FrequencyBoard;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
-import org.opentripplanner.routing.edgetype.TableTripPattern;
-import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.util.MapUtils;
@@ -60,7 +56,7 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
 
     private HashMap<AgencyAndId, PreBoardEdge> preBoardEdges;
 
-    private HashMap<AgencyAndId, TableTripPattern> tableTripPatternsByTrip;
+    private HashMap<AgencyAndId, TripPattern> tableTripPatternsByTrip;
 
     private HashMap<AgencyAndId, HashSet<String>> directionsForRoute;
 
@@ -88,7 +84,7 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
             HashMap<AgencyAndId, RouteVariant> variantsByTrip,
             HashMap<AgencyAndId, PreBoardEdge> preBoardEdges,
             HashMap<AgencyAndId, PreAlightEdge> preAlightEdges,
-            HashMap<AgencyAndId, TableTripPattern> tableTripPatternsByTrip,
+            HashMap<AgencyAndId, TripPattern> tableTripPatternsByTrip,
             HashMap<AgencyAndId, HashSet<String>> directionsByRoute,
             HashMap<AgencyAndId, HashSet<Stop>> stopsByRoute,
             HashMap<AgencyAndId, Route> routes,
@@ -114,7 +110,7 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
             HashMap<AgencyAndId, RouteVariant> variantsByTrip,
             HashMap<AgencyAndId, PreBoardEdge> preBoardEdges,
             HashMap<AgencyAndId, PreAlightEdge> preAlightEdges,
-            HashMap<AgencyAndId, TableTripPattern> tableTripPatternsByTrip,
+            HashMap<AgencyAndId, TripPattern> tableTripPatternsByTrip,
             HashMap<AgencyAndId, HashSet<String>> directionsByRoute,
             HashMap<AgencyAndId, HashSet<Stop>> stopsByRoute,
             HashMap<AgencyAndId, Route> routes,
@@ -177,7 +173,7 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
     }
 
     @Override
-    public TableTripPattern getTripPatternForTrip(AgencyAndId tripId) {
+    public TripPattern getTripPatternForTrip(AgencyAndId tripId) {
         return tableTripPatternsByTrip.get(tripId);
     }
 
@@ -254,8 +250,8 @@ public class TransitIndexServiceImpl implements TransitIndexService, Serializabl
         HashSet<AgencyAndId> routes = new HashSet<AgencyAndId>();
 
         for (TripPattern pattern : getTripPatternsForStop(stop)) {
-            if (pattern instanceof TableTripPattern) {
-                routes.add(((TableTripPattern) pattern).getRoute().getId());
+            if (pattern instanceof TripPattern) {
+                routes.add(((TripPattern) pattern).getRoute().getId());
             } else if (pattern instanceof FrequencyBasedTripPattern) {
                 routes.add(((FrequencyBasedTripPattern) pattern).getTrip().getRoute().getId());
             }

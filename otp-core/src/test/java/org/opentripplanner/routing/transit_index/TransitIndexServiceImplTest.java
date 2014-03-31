@@ -30,7 +30,7 @@ import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
-import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
@@ -51,7 +51,7 @@ public class TransitIndexServiceImplTest {
         Vertex boardVertex = mock(Vertex.class);
         TransitBoardAlight alightEdge = mock(TransitBoardAlight.class);
         TransitBoardAlight boardEdge = mock(TransitBoardAlight.class);
-        TableTripPattern tableTripPattern = mock(TableTripPattern.class);
+        TripPattern tableTripPattern = mock(TripPattern.class);
 
         when(preAlightEdge.getFromVertex()).thenReturn(alightVertex);
         when(preBoardEdge.getToVertex()).thenReturn(boardVertex);

@@ -57,8 +57,8 @@ public class TimetableResolver {
     // if this turns out to be slow/spacious we can use an array with integer pattern indexes
     // The SortedSet members are copy-on-write
     // FIXME: this could be made into a flat hashtable with compound keys.
-    private HashMap<TableTripPattern, SortedSet<Timetable>> timetables =
-            new HashMap<TableTripPattern, SortedSet<Timetable>>();
+    private HashMap<TripPattern, SortedSet<Timetable>> timetables =
+            new HashMap<TripPattern, SortedSet<Timetable>>();
 
     /** A set of all timetables which have been modified and are waiting to be indexed. */
     private Set<Timetable> dirty = new HashSet<Timetable>();
@@ -67,7 +67,7 @@ public class TimetableResolver {
      * Returns an updated timetable for the specified pattern if one is available in this snapshot,
      * or the originally scheduled timetable if there are no updates in this snapshot.
      */
-    public Timetable resolve(TableTripPattern pattern, ServiceDate serviceDate) {
+    public Timetable resolve(TripPattern pattern, ServiceDate serviceDate) {
         SortedSet<Timetable> sortedTimetables = timetables.get(pattern);
 
         if(sortedTimetables != null && serviceDate != null) {
@@ -85,7 +85,7 @@ public class TimetableResolver {
     /**
      * @return whether or not the update was actually applied
      */
-    public boolean update(TableTripPattern pattern, TripUpdate tripUpdate, String agencyId,
+    public boolean update(TripPattern pattern, TripUpdate tripUpdate, String agencyId,
             TimeZone timeZone, ServiceDate serviceDate) {
         // synchronization prevents commits/snapshots while update is in progress
         synchronized(this) {
@@ -143,7 +143,7 @@ public class TimetableResolver {
                 tt.finish(); // summarize, index, etc. the new timetables
             }
             ret.timetables =
-                    (HashMap<TableTripPattern, SortedSet<Timetable>>) this.timetables.clone();
+                    (HashMap<TripPattern, SortedSet<Timetable>>) this.timetables.clone();
             this.dirty.clear();
         }
         ret.dirty = null; // mark the snapshot as henceforth immutable
@@ -160,8 +160,8 @@ public class TimetableResolver {
             }
 
             boolean modified = false;
-            for (Iterator<TableTripPattern> it = timetables.keySet().iterator(); it.hasNext();){
-                TableTripPattern pattern = it.next();
+            for (Iterator<TripPattern> it = timetables.keySet().iterator(); it.hasNext();){
+                TripPattern pattern = it.next();
                 SortedSet<Timetable> sortedTimetables = timetables.get(pattern);
                 SortedSet<Timetable> toKeepTimetables =
                         new TreeSet<Timetable>(new SortedTimetableComparator());

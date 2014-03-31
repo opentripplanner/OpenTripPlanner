@@ -428,9 +428,7 @@ public class State implements Cloneable {
     }
 
     /**
-     * Optional next result that allows {@link Edge} to return multiple results from
-     * {@link Edge#traverse(State, RoutingRequest)} or
-     * {@link Edge#traverseBack(State, RoutingRequest)}
+     * Optional next result that allows {@link Edge} to return multiple results.
      * 
      * @return the next additional result from an edge traversal, or null if no more results
      */

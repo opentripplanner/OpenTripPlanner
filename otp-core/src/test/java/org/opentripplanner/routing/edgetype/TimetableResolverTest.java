@@ -47,7 +47,7 @@ import com.google.transit.realtime.GtfsRealtime.TripDescriptor.ScheduleRelations
 public class TimetableResolverTest {
     private static Graph graph;
     private static GtfsContext context;
-    private static Map<AgencyAndId, TableTripPattern> patternIndex;
+    private static Map<AgencyAndId, TripPattern> patternIndex;
     private static TimeZone timeZone = TimeZone.getTimeZone("GMT");
 
     @BeforeClass
@@ -60,11 +60,11 @@ public class TimetableResolverTest {
         graph.putService(CalendarServiceData.class,
                 GtfsLibrary.createCalendarServiceData(context.getDao()));
 
-        patternIndex = new HashMap<AgencyAndId, TableTripPattern>();
+        patternIndex = new HashMap<AgencyAndId, TripPattern>();
         for (TransitStopDepart tsd : filter(graph.getVertices(), TransitStopDepart.class)) {
             for (TransitBoardAlight tba : filter(tsd.getOutgoing(), TransitBoardAlight.class)) {
                 if (!tba.isBoarding()) continue;
-                TableTripPattern pattern = tba.getPattern();
+                TripPattern pattern = tba.getPattern();
                 for (Trip trip : pattern.getTrips()) {
                     patternIndex.put(trip.getId(), pattern);
                 }
@@ -85,7 +85,7 @@ public class TimetableResolverTest {
         ServiceDate today = new ServiceDate();
         ServiceDate yesterday = today.previous();
         ServiceDate tomorrow = today.next();
-        TableTripPattern pattern = patternIndex.get(new AgencyAndId("agency", "1.1"));
+        TripPattern pattern = patternIndex.get(new AgencyAndId("agency", "1.1"));
         TimetableResolver resolver = new TimetableResolver();
 
         Timetable scheduled = resolver.resolve(pattern, today);
@@ -123,7 +123,7 @@ public class TimetableResolverTest {
     public void testUpdate() {
         ServiceDate today = new ServiceDate();
         ServiceDate yesterday = today.previous();
-        TableTripPattern pattern = patternIndex.get(new AgencyAndId("agency", "1.1"));
+        TripPattern pattern = patternIndex.get(new AgencyAndId("agency", "1.1"));
 
         TimetableResolver resolver = new TimetableResolver();
         Timetable origNow = resolver.resolve(pattern, today);
@@ -162,7 +162,7 @@ public class TimetableResolverTest {
     public void testCommit() {
         ServiceDate today = new ServiceDate();
         ServiceDate yesterday = today.previous();
-        TableTripPattern pattern = patternIndex.get(new AgencyAndId("agency", "1.1"));
+        TripPattern pattern = patternIndex.get(new AgencyAndId("agency", "1.1"));
 
         TimetableResolver resolver = new TimetableResolver();
 
@@ -209,7 +209,7 @@ public class TimetableResolverTest {
     public void testPurge() {
         ServiceDate today = new ServiceDate();
         ServiceDate yesterday = today.previous();
-        TableTripPattern pattern = patternIndex.get(new AgencyAndId("agency", "1.1"));
+        TripPattern pattern = patternIndex.get(new AgencyAndId("agency", "1.1"));
 
         TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 

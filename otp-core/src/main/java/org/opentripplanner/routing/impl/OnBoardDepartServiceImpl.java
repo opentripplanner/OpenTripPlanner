@@ -26,7 +26,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.edgetype.OnBoardDepartPatternHop;
 import org.opentripplanner.routing.edgetype.PatternHop;
-import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.services.OnBoardDepartService;
@@ -69,7 +69,7 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
         /* 1. Get the list of PatternHop for the given trip ID. */
         AgencyAndId tripId = opt.getStartingTransitTripId();
         TransitIndexService transitIndexService = ctx.graph.getService(TransitIndexService.class);
-        TableTripPattern tripPattern = transitIndexService.getTripPatternForTrip(tripId);
+        TripPattern tripPattern = transitIndexService.getTripPatternForTrip(tripId);
         if (tripPattern == null) {
             // TODO Shouldn't we bailout on a normal trip plan here, returning null ?
             throw new IllegalArgumentException("Unknown/invalid trip ID: " + tripId);
@@ -132,7 +132,7 @@ public class OnBoardDepartServiceImpl implements OnBoardDepartService {
             int actDelta = 0;
             for (ServiceDay serviceDay : ctx.serviceDays) {
                 ServiceDate serviceDate = serviceDay.getServiceDate();
-                TableTripPattern pattern = nextStop.getTripPattern();
+                TripPattern pattern = nextStop.getTripPattern();
                 TripTimes tripTimes = pattern.getTripTimes(pattern.getTripIndex(tripId));
                 // Get the tripTimes including real-time updates for the serviceDay
                 if (ctx.timetableSnapshot != null) {

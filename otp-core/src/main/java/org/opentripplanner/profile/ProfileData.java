@@ -16,7 +16,7 @@ import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.api.resource.analyst.SimpleIsochrone.MinMap;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
@@ -37,7 +37,7 @@ public class ProfileData {
     @AllArgsConstructor
     public static class Transfer implements Comparable<Transfer> {
 
-        TableTripPattern tp1, tp2;
+        TripPattern tp1, tp2;
         Stop s1, s2;
         int distance; // meters
 
@@ -56,10 +56,10 @@ public class ProfileData {
 
     private static SphericalDistanceLibrary distlib = new SphericalDistanceLibrary();
     private Graph graph;
-    private List<TableTripPattern> patterns = Lists.newArrayList();
-    Multimap<Stop, TableTripPattern> patternsForStop = HashMultimap.create();
+    private List<TripPattern> patterns = Lists.newArrayList();
+    Multimap<Stop, TripPattern> patternsForStop = HashMultimap.create();
     Multimap<Stop, Transfer> transfersForStop = HashMultimap.create();
-    Multimap<Route, TableTripPattern> patternsForRoute = HashMultimap.create();
+    Multimap<Route, TripPattern> patternsForRoute = HashMultimap.create();
 
     /** An OBA Service Date is a local date without timezone, only year month and day. */
     public BitSet servicesRunning (ServiceDate date) {
@@ -105,10 +105,10 @@ public class ProfileData {
      * @return transfers to all nearby patterns, with only one transfer per pattern (the closest
      *         one).
      */
-    public Map<TableTripPattern, StopAtDistance> closestPatterns(double lon, double lat) {
-        MinMap<TableTripPattern, StopAtDistance> closest = new MinMap<TableTripPattern, StopAtDistance>();
+    public Map<TripPattern, StopAtDistance> closestPatterns(double lon, double lat) {
+        MinMap<TripPattern, StopAtDistance> closest = new MinMap<TripPattern, StopAtDistance>();
         for (StopAtDistance stopDist : findTransitStops(lon, lat, WALK_RADIUS)) {
-            for (TableTripPattern pattern : patternsForStop.get(stopDist.stop)) {
+            for (TripPattern pattern : patternsForStop.get(stopDist.stop)) {
                 closest.putMin(pattern, stopDist);
             }
         }
@@ -116,20 +116,20 @@ public class ProfileData {
     }
 
     private void findTransfers() {
-        MinMap<P2<TableTripPattern>, Transfer> bestTransfers = new MinMap<P2<TableTripPattern>, ProfileData.Transfer>();
+        MinMap<P2<TripPattern>, Transfer> bestTransfers = new MinMap<P2<TripPattern>, ProfileData.Transfer>();
         LOG.info("Finding transfers...");
         for (Stop s0 : graph.getIndex().stopForId.values()) {
-            Collection<TableTripPattern> ps0 = patternsForStop.get(s0);
+            Collection<TripPattern> ps0 = patternsForStop.get(s0);
             for (StopAtDistance sd : findTransitStops(s0.getLon(), s0.getLat(), WALK_RADIUS)) {
                 Stop s1 = sd.stop;
                 if (s0 == s1)
                     continue;
-                Collection<TableTripPattern> ps1 = patternsForStop.get(s1);
-                for (TableTripPattern p0 : ps0) {
-                    for (TableTripPattern p1 : ps1) {
+                Collection<TripPattern> ps1 = patternsForStop.get(s1);
+                for (TripPattern p0 : ps0) {
+                    for (TripPattern p1 : ps1) {
                         if (p0 == p1)
                             continue;
-                        bestTransfers.putMin(new P2<TableTripPattern>(p0, p1), new Transfer(p0, p1,
+                        bestTransfers.putMin(new P2<TripPattern>(p0, p1), new Transfer(p0, p1,
                                 s0, s1, sd.distance));
                     }
                 }

@@ -20,8 +20,6 @@ import java.io.IOException;
 import org.junit.Test;
 import org.onebusaway.gtfs.services.MockGtfs;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.edgetype.FrequencyBasedTripPattern;
-import org.opentripplanner.routing.edgetype.FrequencyBoard;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 

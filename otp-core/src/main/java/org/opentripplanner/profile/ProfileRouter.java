@@ -1,6 +1,5 @@
 package org.opentripplanner.profile;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -13,11 +12,10 @@ import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
-import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.api.param.LatLon;
 import org.opentripplanner.profile.ProfileData.StopAtDistance;
 import org.opentripplanner.profile.ProfileData.Transfer;
-import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +38,7 @@ public class ProfileRouter {
     
     @NonNull ProfileData data;
     Multimap<Stop, Ride> rides = ArrayListMultimap.create();
-    Map<TableTripPattern, StopAtDistance> fromStops, toStops;
+    Map<TripPattern, StopAtDistance> fromStops, toStops;
     Set<Ride> targetRides = Sets.newHashSet();
     TimeWindow window;
 
@@ -93,7 +91,7 @@ public class ProfileRouter {
     /**
      * @return true if the given stop has at least one transfer from the given pattern.
      */
-    private boolean hasTransfers(Stop stop, TableTripPattern pattern) {
+    private boolean hasTransfers(Stop stop, TripPattern pattern) {
         for (Transfer tr : data.transfersForStop.get(stop)) {
             if (tr.tp1 == pattern) return true;
         }
@@ -145,8 +143,8 @@ public class ProfileRouter {
          * can generate the same PatternRide many times. FIXME */
         Set<PatternRide> queue = Sets.newHashSet();
         /* Enqueue one or more PatternRides for each pattern/stop near the origin. */
-        for (Entry<TableTripPattern, StopAtDistance> entry : fromStops.entrySet()) {
-            TableTripPattern pattern = entry.getKey();
+        for (Entry<TripPattern, StopAtDistance> entry : fromStops.entrySet()) {
+            TripPattern pattern = entry.getKey();
             StopAtDistance sd = entry.getValue();
             for (int i = 0; i < pattern.getStops().size(); ++i) {
                 if (pattern.getStops().get(i) == sd.stop) {

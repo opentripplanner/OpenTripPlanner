@@ -28,7 +28,7 @@ import org.geotools.referencing.GeodeticCalculator;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.routing.edgetype.PatternHop;
-import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -222,7 +222,7 @@ public class GraphStats {
                         double distance = ph.getDistance();
                         if (distance < 3)
                             continue;
-                        TableTripPattern ttp = ph.getPattern();
+                        TripPattern ttp = ph.getPattern();
                         List<Trip> trips = ttp.getTrips();
                         int hop = ph.stopIndex;
                         String route = ttp.getRoute().getId().toString();
@@ -258,10 +258,10 @@ public class GraphStats {
                         "nTripsInPattern", "frequency", 
                         "cumulativePatterns", "empiricalDistPatterns",
                         "cumulativeTrips", "empiricalDistTrips" } );
-                Set<TableTripPattern> patterns = new HashSet<TableTripPattern>();
+                Set<TripPattern> patterns = new HashSet<TripPattern>();
                 for (Vertex v : graph.getVertices()) {
                     for (PatternHop ph : IterableLibrary.filter(v.getOutgoing(), PatternHop.class)) {
-                        TableTripPattern ttp = ph.getPattern();
+                        TripPattern ttp = ph.getPattern();
                         patterns.add(ttp);
                     }
                 }
@@ -269,7 +269,7 @@ public class GraphStats {
                 int nPatterns = patterns.size();
                 LOG.info("total number of patterns is: {}", nPatterns);
                 int nTrips = 0;
-                for (TableTripPattern ttp : patterns) {
+                for (TripPattern ttp : patterns) {
                     List<Trip> trips = ttp.getTrips();
                     counts.add(trips.size());
                     nTrips += trips.size();

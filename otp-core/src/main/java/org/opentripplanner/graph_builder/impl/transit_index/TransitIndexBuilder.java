@@ -39,15 +39,12 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.services.GraphBuilderWithGtfsDao;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.FrequencyAlight;
-import org.opentripplanner.routing.edgetype.FrequencyBasedTripPattern;
-import org.opentripplanner.routing.edgetype.FrequencyBoard;
 import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
-import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -86,7 +83,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
 
     private HashMap<AgencyAndId, PreAlightEdge> preAlightEdges = new HashMap<AgencyAndId, PreAlightEdge>();
     
-    private HashMap<AgencyAndId, TableTripPattern> tableTripPatternsByTrip = new HashMap<AgencyAndId, TableTripPattern>();
+    private HashMap<AgencyAndId, TripPattern> tableTripPatternsByTrip = new HashMap<AgencyAndId, TripPattern>();
 
     private HashMap<AgencyAndId, PreBoardEdge> preBoardEdges = new HashMap<AgencyAndId, PreBoardEdge>();
 
@@ -378,7 +375,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
         for (TransitVertex gv : IterableLibrary.filter(graph.getVertices(), TransitVertex.class)) {
             boolean start = false;
             boolean noStart = false;
-            TableTripPattern pattern = null;
+            TripPattern pattern = null;
             FrequencyBasedTripPattern fpattern = null;
             Trip trip = null;
             for (Edge e : gv.getIncoming()) {
@@ -508,7 +505,7 @@ public class TransitIndexBuilder implements GraphBuilderWithGtfsDao {
             for (TransitBoardAlight tba : filter(tsd.getOutgoing(), TransitBoardAlight.class)) {
                 if (!tba.isBoarding())
                     continue;
-                TableTripPattern pattern = tba.getPattern();
+                TripPattern pattern = tba.getPattern();
                 for (Trip trip : pattern.getTrips()) {
                     tableTripPatternsByTrip.put(trip.getId(), pattern);
                 }

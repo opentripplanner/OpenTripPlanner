@@ -27,7 +27,7 @@ import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.edgetype.PatternHop;
-import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -61,7 +61,7 @@ public class OnBoardDepartServiceImplTest {
         PatternArriveVertex arrive = mock(PatternArriveVertex.class);
         PatternHop patternHop = mock(PatternHop.class);
         TripTimes tripTimes = mock(TripTimes.class);
-        TableTripPattern tableTripPattern = mock(TableTripPattern.class);
+        TripPattern tableTripPattern = mock(TripPattern.class);
         TransitIndexService transitIndexService = mock(TransitIndexService.class);
         Graph graph = mock(Graph.class);
         RoutingRequest routingRequest = mock(RoutingRequest.class);
@@ -129,7 +129,7 @@ public class OnBoardDepartServiceImplTest {
         PatternArriveVertex arrive = mock(PatternArriveVertex.class);
         PatternHop patternHop = mock(PatternHop.class);
         TripTimes tripTimes = mock(TripTimes.class);
-        TableTripPattern tableTripPattern = mock(TableTripPattern.class);
+        TripPattern tableTripPattern = mock(TripPattern.class);
         TransitIndexService transitIndexService = mock(TransitIndexService.class);
         Graph graph = mock(Graph.class);
         RoutingRequest routingRequest = mock(RoutingRequest.class);
@@ -190,7 +190,7 @@ public class OnBoardDepartServiceImplTest {
         PatternHop patternHop0 = mock(PatternHop.class);
         PatternHop patternHop1 = mock(PatternHop.class);
         TripTimes tripTimes = mock(TripTimes.class);
-        TableTripPattern tableTripPattern = mock(TableTripPattern.class);
+        TripPattern tableTripPattern = mock(TripPattern.class);
         TransitIndexService transitIndexService = mock(TransitIndexService.class);
         Graph graph = mock(Graph.class);
         RoutingRequest routingRequest = mock(RoutingRequest.class);

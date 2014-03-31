@@ -94,8 +94,8 @@ public class PatternInterlineDwellTest {
         ScheduledStopPattern secondStopPattern = ScheduledStopPattern.fromTrip(
                 secondTrip, secondStopTimes);
 
-        TableTripPattern firstTripPattern = new TableTripPattern(firstTrip, firstStopPattern, 0);
-        TableTripPattern secondTripPattern = new TableTripPattern(secondTrip, secondStopPattern, 1);
+        TripPattern firstTripPattern = new TripPattern(firstTrip, firstStopPattern, 0);
+        TripPattern secondTripPattern = new TripPattern(secondTrip, secondStopPattern, 1);
 
         firstTripPattern.addTrip(firstTrip, firstStopTimes);
         secondTripPattern.addTrip(secondTrip, secondStopTimes);
@@ -104,7 +104,7 @@ public class PatternInterlineDwellTest {
 
         TimetableResolver resolver = new TimetableResolver() {
             @Override
-            public Timetable resolve(TableTripPattern pattern, ServiceDate serviceDate) {
+            public Timetable resolve(TripPattern pattern, ServiceDate serviceDate) {
                 Trip trip = new Trip();
                 StopTime stopTime = new StopTime();
                 ArrayList<StopTime> stopTimes = new ArrayList<StopTime>();

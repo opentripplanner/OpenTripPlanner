@@ -64,7 +64,7 @@ public class Timetable implements Serializable {
      * Be careful during serialization. 
      */
     @Getter
-    private final TableTripPattern pattern;
+    private final TripPattern pattern;
 
     /**
      * Contains one TripTimes object for each scheduled trip (even cancelled ones) and possibly
@@ -105,7 +105,7 @@ public class Timetable implements Serializable {
     private transient int minDepart, maxArrive;
     
     /** Construct an empty Timetable. */
-    public Timetable(TableTripPattern pattern) {
+    public Timetable(TripPattern pattern) {
         tripTimes = new ArrayList<TripTimes>();
         this.pattern = pattern;
         this.serviceDate = null;

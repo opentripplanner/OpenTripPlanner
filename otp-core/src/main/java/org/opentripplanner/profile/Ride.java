@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +69,7 @@ public class Ride {
         for (Ride r : rides) LOG.info("  {}", r);                
     }
 
-    public boolean containsPattern(TableTripPattern pattern) {
+    public boolean containsPattern(TripPattern pattern) {
         for (PatternRide patternRide : patternRides) {
             if (patternRide.pattern == pattern) return true;
         }

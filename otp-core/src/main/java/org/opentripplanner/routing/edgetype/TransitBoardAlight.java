@@ -82,13 +82,13 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
     }
     
     /** 
-     * Find the TableTripPattern this edge is boarding or alighting from. Overrides the general
+     * Find the TripPattern this edge is boarding or alighting from. Overrides the general
      * method which always looks at the from-vertex.
      * @return the pattern of the to-vertex when boarding, and that of the from-vertex 
      * when alighting. 
      */
     @Override 
-    public TableTripPattern getPattern() {
+    public TripPattern getPattern() {
         if (boarding)
             return ((PatternStopVertex) tov).getTripPattern();
         else
@@ -233,7 +233,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
              * 00:30 tommorrow. The 00:30 trip should be taken, but if we stopped the search after
              * finding today's 25:00 trip we would never find tomorrow's 00:30 trip.
              */
-            TableTripPattern tripPattern = this.getPattern();
+            TripPattern tripPattern = this.getPattern();
             int bestWait = -1;
             TripTimes  bestTripTimes  = null;
             ServiceDay bestServiceDay = null;

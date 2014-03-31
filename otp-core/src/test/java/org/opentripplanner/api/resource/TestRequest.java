@@ -92,7 +92,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.TimedTransferEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableResolver;
@@ -811,7 +811,7 @@ public class TestRequest extends TestCase {
 
         // Now apply a real-time update: let the to-trip have a delay of 3 seconds
         @SuppressWarnings("deprecation")
-        TableTripPattern pattern = ((PatternStopVertex) graph
+        TripPattern pattern = ((PatternStopVertex) graph
                 .getVertex("TriMet_7452_TriMet_751W1090_79_A")).getTripPattern();
         applyUpdateToTripPattern(pattern, "751W1330", "7452", 79, 41228, 41228,
                 ScheduleRelationship.SCHEDULED, 0, serviceDate);
@@ -933,7 +933,7 @@ public class TestRequest extends TestCase {
         // Now apply a real-time update: let the to-trip be early by 240 seconds,
         // resulting in a transfer time of 0 seconds
         @SuppressWarnings("deprecation")
-        TableTripPattern pattern = ((PatternStopVertex) graph
+        TripPattern pattern = ((PatternStopVertex) graph
                 .getVertex("TriMet_9756_TriMet_120W1320_22_A")).getTripPattern();
         applyUpdateToTripPattern(pattern, "120W1320", "9756", 22, 41580, 41580,
                 ScheduleRelationship.SCHEDULED, 0, serviceDate);
@@ -992,7 +992,7 @@ public class TestRequest extends TestCase {
         // Now apply a real-time update: let the to-trip be early by 240 seconds,
         // resulting in a transfer time of 0 seconds
         @SuppressWarnings("deprecation")
-        TableTripPattern pattern = ((PatternStopVertex) graph
+        TripPattern pattern = ((PatternStopVertex) graph
                 .getVertex("TriMet_9756_TriMet_120W1320_22_A")).getTripPattern();
         applyUpdateToTripPattern(pattern, "120W1320", "9756", 22, 41580, 41580,
                 ScheduleRelationship.SCHEDULED, 0, serviceDate);
@@ -1109,7 +1109,7 @@ public class TestRequest extends TestCase {
     /**
      * Apply an update to a table trip pattern and check whether the update was applied correctly
      */
-    private void applyUpdateToTripPattern(TableTripPattern pattern, String tripId, String stopId,
+    private void applyUpdateToTripPattern(TripPattern pattern, String tripId, String stopId,
             int stopSeq, int arrive, int depart, ScheduleRelationship scheduleRelationship,
             int timestamp, ServiceDate serviceDate) throws ParseException {
         Graph graph = Context.getInstance().graph;

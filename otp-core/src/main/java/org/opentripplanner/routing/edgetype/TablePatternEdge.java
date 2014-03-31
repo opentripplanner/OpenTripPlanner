@@ -29,7 +29,7 @@ public abstract class TablePatternEdge extends Edge implements PatternEdge {
         super(fromv, tov);
     }
 
-    public TableTripPattern getPattern() {
+    public TripPattern getPattern() {
         return ((OnboardVertex)fromv).getTripPattern();
     }
 

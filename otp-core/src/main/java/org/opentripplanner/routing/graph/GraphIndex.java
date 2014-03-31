@@ -11,7 +11,7 @@ import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.geometry.HashGrid;
 import org.opentripplanner.routing.edgetype.TablePatternEdge;
-import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,11 +35,11 @@ public class GraphIndex {
     public final Map<AgencyAndId, Stop> stopForId = Maps.newHashMap();
     public final Map<AgencyAndId, Trip> tripForId = Maps.newHashMap();
     public final Map<AgencyAndId, Route> routeForId = Maps.newHashMap();
-    public final Map<String, TableTripPattern> patternForId = Maps.newHashMap();
+    public final Map<String, TripPattern> patternForId = Maps.newHashMap();
     public final Map<Stop, TransitStop>   stopVertexForStop = Maps.newHashMap();
-    public final Map<Trip, TableTripPattern> patternForTrip = Maps.newHashMap();
-    public final ListMultimap<Route, TableTripPattern> patternsForRoute = ArrayListMultimap.create();
-    public final ListMultimap<Stop, TableTripPattern>  patternsForStop  = ArrayListMultimap.create(); 
+    public final Map<Trip, TripPattern> patternForTrip = Maps.newHashMap();
+    public final ListMultimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
+    public final ListMultimap<Stop, TripPattern>  patternsForStop  = ArrayListMultimap.create();
     
     public final HashGrid<TransitStop> stopSpatialIndex = new HashGrid<TransitStop>();
         
@@ -54,7 +54,7 @@ public class GraphIndex {
             vertices.add(edge.getToVertex());
             if (edge instanceof TablePatternEdge) {
                 TablePatternEdge patternEdge = (TablePatternEdge) edge;
-                TableTripPattern pattern = patternEdge.getPattern();
+                TripPattern pattern = patternEdge.getPattern();
                 patternForId.put(pattern.getCode(), pattern);
             }
         }
@@ -70,7 +70,7 @@ public class GraphIndex {
         for (TransitStop stopVertex : stopVertexForStop.values()) {
             stopSpatialIndex.put(stopVertex.getCoordinate(), stopVertex);
         }
-        for (TableTripPattern pattern : patternForId.values()) {
+        for (TripPattern pattern : patternForId.values()) {
             patternsForRoute.put(pattern.route, pattern);
             for (Trip trip : pattern.getTrips()) {
                 patternForTrip.put(trip, pattern);

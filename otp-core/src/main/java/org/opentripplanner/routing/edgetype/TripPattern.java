@@ -13,19 +13,614 @@
 
 package org.opentripplanner.routing.edgetype;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import lombok.Getter;
+import lombok.Setter;
+
+import org.onebusaway.gtfs.model.AgencyAndId;
+import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.StopTime;
+import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.model.StopPattern;
+import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.factory.GtfsStopContext;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.routing.vertextype.PatternArriveVertex;
+import org.opentripplanner.routing.vertextype.PatternDepartVertex;
+import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.TransitStopArrive;
+import org.opentripplanner.routing.vertextype.TransitStopDepart;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/* simple interface for trip patterns */
-public interface TripPattern {
-    @XmlTransient
-    List<Stop> getStops();
+import com.beust.jcommander.internal.Maps;
+import com.beust.jcommander.internal.Sets;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+
+/**
+ * Represents a group of trips that all call at the same sequence of stops. For each stop, there
+ * is a list of departure times, running times, arrival times, dwell times, and wheelchair
+ * accessibility information (one of each of these per trip per stop).
+ * Trips are assumed to be non-overtaking, so that an earlier trip never arrives after a later trip.
+ */
+public class TripPattern implements Serializable {
+
+    private static final Logger LOG = LoggerFactory.getLogger(TripPattern.class);
+
+    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
     
-    int getHopCount(); 
+    public static final int FLAG_WHEELCHAIR_ACCESSIBLE = 1;
+    public static final int MASK_PICKUP = 2|4;
+    public static final int SHIFT_PICKUP = 1;
+    public static final int MASK_DROPOFF = 8|16;
+    public static final int SHIFT_DROPOFF = 3;
+    public static final int NO_PICKUP = 1;
+    public static final int FLAG_BIKES_ALLOWED = 32;
 
-    int getAlightType(int stopIndex);
-    int getBoardType(int stopIndex);
+    /**
+     * The GTFS Route of all trips in this pattern. GTFS allows the same pattern to appear in more
+     * than one route, but we make the assumption that all trips with the same pattern belong to the
+     * same Route.
+     */
+    @Getter 
+    public final Route route;
+    
+    /**
+     * All trips in this pattern call at this sequence of stops. This includes information about GTFS
+     * pick-up and drop-off types.
+     */
+    @Getter
+    public final StopPattern stopPattern;
+    
+    /** 
+     * This timetable holds the 'official' stop times from GTFS. If realtime stoptime updates are 
+     * applied, trips searches will be conducted using another timetable and this one will serve to 
+     * find early/late offsets, or as a fallback if the other timetable becomes corrupted or
+     * expires.
+     */
+    @Getter
+    protected final Timetable scheduledTimetable = new Timetable(this);
+
+    /** The human-readable, unique name for this trip pattern. */
+    @Getter @Setter
+    private String name;
+    
+    /** The short unique identifier for this trip pattern. */
+    @Getter @Setter
+    private String code = Integer.toHexString(System.identityHashCode(this));
+    
+    /* The vertices in the Graph that correspond to each Stop in this pattern. */
+    public final TransitStop[] stopVertices; // these are not unique to this pattern, can be shared. are they even used?
+    public final PatternDepartVertex[] departVertices;
+    public final PatternArriveVertex[] arriveVertices;
+    
+    /* The Edges in the graph that correspond to each Stop in this pattern. */
+    public final TransitBoardAlight[]  boardEdges;
+    public final TransitBoardAlight[]  alightEdges;
+    public final PatternHop[]          hopEdges;
+    public final PatternDwell[]        dwellEdges;
+
+    // redundant since tripTimes have a trip
+    // however it's nice to have for order reference, since all timetables must have tripTimes
+    // in this order, e.g. for interlining. 
+    // potential optimization: trip fields can be removed from TripTimes?
+    // TODO: this field can be removed, and interlining can be done differently?
+    /**
+     * This pattern may have multiple Timetable objects, but they should all contain TripTimes
+     * for the same trips, in the same order (that of the scheduled Timetable). An exception to 
+     * this rule may arise if unscheduled trips are added to a Timetable. For that case we need 
+     * to search for trips/TripIds in the Timetable rather than the enclosing TripPattern.  
+     */
+    final ArrayList<Trip> trips = new ArrayList<Trip>();
+
+    /**
+     * An ordered list of PatternHop edges associated with this pattern. All trips in a pattern have
+     * the same stops and a PatternHop apply to all those trips, so this array apply to every trip
+     * in every timetable in this pattern. Please note that the array size is the number of stops
+     * minus 1. This also allow to access the ordered list of stops.
+     * 
+     * This appears to only be used for on-board departure. TODO: stops can now be grabbed from
+     * stopPattern.
+     */
+    private PatternHop[] patternHops; // TODO rename/merge with hopEdges
+
+    /** Holds stop-specific information such as wheelchair accessibility and pickup/dropoff roles. */
+    // TODO: is this necessary? Can we just look at the Stop and StopPattern objects directly?
+    @XmlElement int[] perStopFlags;
+    
+    /** Optimized serviceId codes. Trips in a pattern are NO LONGER NECESSARILY on the same service. */
+    // this is a set of all the running services on this pattern.
+    // TODO MOVE single codes INTO Timetable or trip
+    BitSet services;
+
+    public TripPattern(Route route, StopPattern stopPattern) {
+        this.route = route;
+        this.stopPattern = stopPattern;
+        int size = stopPattern.size;
+        setStopsFromStopPattern(stopPattern);
+
+        /* Create properly dimensioned arrays for all the vertices/edges associated with this pattern. */
+        stopVertices   = new TransitStop[size];
+        departVertices = new PatternDepartVertex[size];
+        arriveVertices = new PatternArriveVertex[size];
+        boardEdges     = new TransitBoardAlight[size];
+        alightEdges    = new TransitBoardAlight[size];
+        hopEdges       = new PatternHop[size];
+        dwellEdges     = new PatternDwell[size];
+    }
+
+    private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        // The serialized graph contains cyclic references TripPattern <--> Timetable.
+        // The Timetable must be indexed from here (rather than in its own readObject method) 
+        // to ensure that the stops field it uses in TripPattern is already deserialized.
+        finish();
+    }
+            
+    // TODO verify correctness after substitution of StopPattern for ScheduledStopPattern
+    // also, maybe get rid of the per stop flags and just use the values in StopPattern, or an Enum
+    private void setStopsFromStopPattern(StopPattern stopPattern) {
+        patternHops = new PatternHop[stopPattern.size - 1];
+        perStopFlags = new int[stopPattern.size];
+        int i = 0;
+        for (Stop stop : stopPattern.stops) {
+            // Assume that stops can be boarded with wheelchairs by default (defer to per-trip data)
+            if (stop.getWheelchairBoarding() != 2) {
+                perStopFlags[i] |= FLAG_WHEELCHAIR_ACCESSIBLE;
+            }
+            perStopFlags[i] |= stopPattern.pickups[i] << SHIFT_PICKUP;
+            perStopFlags[i] |= stopPattern.dropoffs[i] << SHIFT_DROPOFF;
+            ++i;
+        }
+    }
+    
+    public Stop getStop(int stopIndex) {
+        if (stopIndex == patternHops.length) {
+            return patternHops[stopIndex - 1].getEndStop();
+        } else {
+            return patternHops[stopIndex].getBeginStop();
+        }
+    }
+
+    public List<Stop> getStops() {
+        return Arrays.asList(stopPattern.stops);
+    }
+    
+    public List<PatternHop> getPatternHops() {
+        return Arrays.asList(patternHops);
+    }
+
+    /* package private */
+    void setPatternHop(int stopIndex, PatternHop patternHop) {
+        patternHops[stopIndex] = patternHop;
+    }
+
+    public int getHopCount() {
+        return patternHops.length;
+    }
+
+    public Trip getTrip(int tripIndex) {
+        return trips.get(tripIndex);
+    }
+    
+    @XmlTransient
+    public List<Trip> getTrips() {
+        return trips;
+    }
+
+    public int getTripIndex(Trip trip) {
+        return trips.indexOf(trip);
+    }
+
+    /** Returns whether passengers can alight at a given stop */
+    public boolean canAlight(int stopIndex) {
+        return getAlightType(stopIndex) != NO_PICKUP;
+    }
+
+    /** Returns whether passengers can board at a given stop */
+    public boolean canBoard(int stopIndex) {
+        return getBoardType(stopIndex) != NO_PICKUP;
+    }
+
+    /** Returns whether a given stop is wheelchair-accessible. */
+    public boolean wheelchairAccessible(int stopIndex) {
+        return (perStopFlags[stopIndex] & FLAG_WHEELCHAIR_ACCESSIBLE) != 0;
+    }
+    
+    /** Returns the zone of a given stop */
+    public String getZone(int stopIndex) {
+        return getStop(stopIndex).getZoneId();
+    }
+
+    public int getAlightType(int stopIndex) {
+        return (perStopFlags[stopIndex] & MASK_DROPOFF) >> SHIFT_DROPOFF;
+    }
+
+    public int getBoardType(int stopIndex) {
+        return (perStopFlags[stopIndex] & MASK_PICKUP) >> SHIFT_PICKUP;
+    }
+
+    /** 
+     * Gets the number of scheduled trips on this pattern. Note that when stop time updates are
+     * being applied, there may be other Timetables for this pattern which contain a larger number
+     * of trips. However, all trips with indexes from 0 through getNumTrips()-1 will always 
+     * correspond to the scheduled trips.
+     */
+    public int getNumScheduledTrips () {
+        return trips.size();
+    }
+        
+    public TripTimes getResolvedTripTimes(int tripIndex, State state0) {
+        ServiceDate serviceDate = state0.getServiceDay().getServiceDate();
+        RoutingRequest options = state0.getOptions();
+        Timetable timetable = scheduledTimetable;
+        TimetableResolver snapshot = options.rctx.timetableSnapshot;
+        if (snapshot != null) {
+            timetable = snapshot.resolve(this, serviceDate);
+        }
+        return timetable.getTripTimes(tripIndex);
+    }
+
+    /* METHODS THAT DELEGATE TO THE SCHEDULED TIMETABLE */
+
+    // TODO: These should probably be deprecated. That would require grabbing the scheduled timetable,
+    // and would avoid mistakes where real-time updates are accidentally not taken into account.
+
+    /**
+     * Add a trip to this TableTripPattern.
+     */
+    public void addTrip(Trip trip, List<StopTime> stopTimes) {
+        // Only scheduled trips (added via the pattern rather than directly to the timetable) are in the trips list.
+        this.trips.add(trip);
+        this.scheduledTimetable.addTrip(trip, stopTimes);
+        // Check that all trips added to this pattern are on the initially declared route.
+        if (this.route != trip.getRoute()){
+            // Identity equality is valid on GTFS entity objects
+            LOG.warn("The trip {} is on a different route than its stop pattern, which is on {}.", trip, route);
+        }
+    }
+
+    /** Gets the running time after a given stop (i.e. for the given hop) on a given trip */
+    public int getRunningTime(int stopIndex, int trip) {
+        return scheduledTimetable.getRunningTime(stopIndex, trip);
+    }
+
+    /** @return the index of TripTimes for this Trip(Id) in this particular TableTripPattern */
+    public int getTripIndex(AgencyAndId tripId) {
+        return scheduledTimetable.getTripIndex(tripId);
+    }
+
+    /** Gets the scheduled (!) TripTimes for a given trip */
+    public TripTimes getTripTimes(int tripIndex) {
+        return scheduledTimetable.getTripTimes(tripIndex);
+    }
+
+    /** Gets the departure time for a given hop on a given trip */
+    public int getDepartureTime(int hop, int trip) {
+        return scheduledTimetable.getDepartureTime(hop, trip);
+    }
+
+    /** Gets the arrival time for a given hop on a given trip */
+    public int getArrivalTime(int hop, int trip) {
+        return scheduledTimetable.getArrivalTime(hop, trip);
+    }
+
+    /** Gets all the departure times at a given stop (not used in routing) */
+    public Iterator<Integer> getDepartureTimes(int stopIndex) {
+        return scheduledTimetable.getDepartureTimes(stopIndex);
+    }
+
+    /** Gets all the arrival times at a given stop (not used in routing) */
+    public Iterator<Integer> getArrivalTimes(int stopIndex) {
+        return scheduledTimetable.getArrivalTimes(stopIndex);
+    }
+
+    /** Returns the shortest possible running time for this stop */
+    public int getBestRunningTime(int stopIndex) {
+        return scheduledTimetable.getBestRunningTime(stopIndex);
+    }
+
+    /** Returns the shortest possible dwell time at this stop */
+    public int getBestDwellTime(int stopIndex) {
+        return scheduledTimetable.getBestDwellTime(stopIndex);
+    }
+
+    /**
+     * Finish off a TableTripPattern once all TripTimes have been added to it.
+     */
+    public void finish() {
+        scheduledTimetable.finish();
+    }
+
+    /* OTHER METHODS */
+    
+    /**
+     * Rather than the scheduled timetable, get the one that has been updated with real-time updates.
+     * The view is consistent across a single request, and depends on the routing context in the request.
+     */
+    public Timetable getUpdatedTimetable (RoutingRequest req) {
+        return null;
+    }
+    
+    private static String stopNameAndId (Stop stop) {
+        return stop.getName() + " (" + stop.getId() + ")";
+    }
+
+
+    /**
+     * Static method that creates unique human-readable names for a collection of TableTripPatterns.
+     * Perhaps this should be in TripPattern, and apply to Frequency patterns as well. TODO: resove
+     * this question: can a frequency and table pattern have the same stoppattern? If so should they
+     * have the same "unique" name?
+     * 
+     * The names should be dataset unique, not just route-unique?
+     * 
+     * A TripPattern groups all trips visiting a particular pattern of stops on a particular route.
+     * GFTS Route names are intended for very general customer information, but sometimes there is a
+     * need to know where a particular trip actually goes. For example, the New York City N train
+     * has at least four different variants: express (over the Manhattan bridge) and local (via
+     * lower Manhattan and the tunnel), in two directions (to Astoria or to Coney Island). During
+     * construction, a fifth variant sometimes appears: trains use the D line to Coney Island after
+     * 59th St (or from Coney Island to 59th in the opposite direction).
+     * 
+     * TripPattern names are machine-generated on a best-effort basis. They are guaranteed to be
+     * unique (among TripPatterns for a single Route) but not stable across graph builds, especially
+     * when different versions of GTFS inputs are used. For instance, if a variant is the only
+     * variant of the N that ends at Coney Island, the name will be "N to Coney Island". But if
+     * multiple variants end at Coney Island (but have different stops elsewhere), that name would
+     * not be chosen. OTP also tries start and intermediate stations ("from Coney Island", or "via
+     * Whitehall", or even combinations ("from Coney Island via Whitehall"). But if there is no way
+     * to create a unique name from start/end/intermediate stops, then the best we can do is to
+     * create a "like [trip id]" name, which at least tells you where in the GTFS you can find a
+     * related trip.
+     */
+    // TODO: pass in a transit index that contains a Multimap<Route, TripPattern> and derive all TableTripPatterns
+    // TODO: use headsigns before attempting to machine-generate names
+    // TODO: combine from/to and via in a single name. this could be accomplished by grouping the trips by destination,
+    // then disambiguating in groups of size greater than 1.
+    /*
+     * Another possible approach: for each route, determine the necessity of each field (which
+     * combination will create unique names). from, to, via, express. Then concatenate all necessary
+     * fields. Express should really be determined from number of stops and/or run time of trips.
+     */
+    public static void generateUniqueNames (Collection<TripPattern> tableTripPatterns) {
+        LOG.info("Generating unique names for stop patterns on each route.");
+        Set<String> usedRouteNames = Sets.newHashSet();
+        Map<Route, String> uniqueRouteNames = Maps.newHashMap();
+
+        /* Group TripPatterns by Route */
+        Multimap<Route, TripPattern> patternsByRoute = ArrayListMultimap.create();
+        for (TripPattern ttp : tableTripPatterns) {
+            patternsByRoute.put(ttp.route, ttp);
+        }
+
+        /* Ensure we have a unique name for every Route */
+        for (Route route : patternsByRoute.keySet()) {
+            String routeName = GtfsLibrary.getRouteName(route);
+            if (usedRouteNames.contains(routeName)) {
+                int i = 2;
+                String generatedRouteName;
+                do generatedRouteName = routeName + " " + (i++);
+                while (usedRouteNames.contains(generatedRouteName));
+                LOG.warn("Route had non-unique name. Generated one to ensure uniqueness of TripPattern names: {}", generatedRouteName);
+                routeName = generatedRouteName;
+            }
+            usedRouteNames.add(routeName);
+            uniqueRouteNames.put(route, routeName);
+        }
+        
+        /* Iterate over all routes, giving the patterns within each route unique names. */
+        ROUTE : for (Route route : patternsByRoute.keySet()) {
+            Collection<TripPattern> routeTripPatterns = patternsByRoute.get(route);
+            String routeName = uniqueRouteNames.get(route);
+
+            /* Simplest case: there's only one route variant, so we'll just give it the route's name. */
+            if (routeTripPatterns.size() == 1) {
+                routeTripPatterns.iterator().next().setName(routeName);
+                continue;
+            }
+
+            /* Do the patterns within this Route have a unique start, end, or via Stop? */
+            Multimap<String, TripPattern> signs   = ArrayListMultimap.create(); // prefer headsigns
+            Multimap<Stop, TripPattern> starts  = ArrayListMultimap.create();
+            Multimap<Stop, TripPattern> ends    = ArrayListMultimap.create();
+            Multimap<Stop, TripPattern> vias    = ArrayListMultimap.create();
+            for (TripPattern pattern : routeTripPatterns) {
+                List<Stop> stops = pattern.getStops();
+                Stop start = stops.get(0);
+                Stop end   = stops.get(stops.size() - 1);
+                starts.put(start, pattern);
+                ends.put(end, pattern);
+                for (Stop stop : stops) vias.put(stop, pattern);
+            }
+            PATTERN : for (TripPattern pattern : routeTripPatterns) {
+                List<Stop> stops = pattern.getStops();
+                StringBuilder sb = new StringBuilder(routeName);
+
+                /* First try to name with destination. */
+                Stop end = stops.get(stops.size() - 1);
+                sb.append(" to " + stopNameAndId(end));
+                if (ends.get(end).size() == 1) {
+                    pattern.setName(sb.toString());
+                    continue PATTERN; // only pattern with this last stop
+                }
+
+                /* Then try to name with origin. */
+                Stop start = stops.get(0);
+                sb.append(" from " + stopNameAndId(start));
+                if (starts.get(start).size() == 1) {
+                    pattern.setName(sb.toString());
+                    continue PATTERN; // only pattern with this first stop
+                }
+
+                /* Check whether (end, start) is unique. */
+                Set<TripPattern> remainingPatterns = Sets.newHashSet();
+                remainingPatterns.addAll(starts.get(start));
+                remainingPatterns.retainAll(ends.get(end)); // set intersection
+                if (remainingPatterns.size() == 1) {
+                    pattern.setName(sb.toString());
+                    continue PATTERN;
+                }
+
+                /* Still not unique; try (end, start, via) for each via. */
+                for (Stop via : stops) {
+                    if (via.equals(start) || via.equals(end)) continue;
+                    Set<TripPattern> intersection = Sets.newHashSet();
+                    intersection.addAll(remainingPatterns);
+                    intersection.retainAll(vias.get(via));
+                    if (intersection.size() == 1) {
+                        sb.append(" via " + stopNameAndId(via));
+                        pattern.setName(sb.toString());
+                        continue PATTERN;
+                    }
+                }
+                
+                /* Still not unique; check for express. */
+                if (remainingPatterns.size() == 2) {
+                    // There are exactly two patterns sharing this start/end.
+                    // The current one must be a subset of the other, because it has no unique via. 
+                    // Therefore we call it the express.
+                    sb.append(" express");
+                } else {
+                    // The final fallback: reference a specific trip ID.
+                    sb.append(" like trip " + pattern.getTrips().get(0).getId());
+                }
+                pattern.setName(sb.toString());
+            } // END foreach PATTERN
+        } // END foreach ROUTE
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Done generating unique names for stop patterns on each route.");
+            for (Route route : patternsByRoute.keySet()) {
+                Collection<TripPattern> routeTripPatterns = patternsByRoute.get(route);
+                LOG.debug("Named {} patterns in route {}", routeTripPatterns.size(), uniqueRouteNames.get(route));
+                for (TripPattern pattern : routeTripPatterns) {
+                    LOG.debug("    {} ({} stops)", pattern.getName(), pattern.stopPattern.size);
+                }
+            }
+        }
+        
+    }
+    
+    /**
+     * Repetitive logic pulled out of makePatternVerticesAndEdges().
+     * No longer works because we don't have access to the DAO here.
+     * But moving the makePatternVerticesAndEdges into TripPattern seems cleaner (certainly looks cleaner).
+     */
+    private <T> T getStopOrParent(Map<Stop, T> map, Stop stop, Graph graph) {
+        T vertex = map.get(stop);
+        if (vertex == null) {
+            Stop parent = null; //_dao.getStopForId(new AgencyAndId(stop.getId().getAgencyId(), stop.getParentStation()));
+            vertex = map.get(parent);
+            /* FIXME: this is adding an annotation for a specific problem, but all we know is that the stop vertex does not exist. */
+            if (vertex == null) {
+                //LOG.warn(graph.addBuilderAnnotation(new StopAtEntrance(stop, false)));
+            } else {
+                //LOG.warn(graph.addBuilderAnnotation(new StopAtEntrance(stop, true)));
+            }
+        }
+        return vertex;
+    }
+    
+    /**
+     * Create the PatternStop vertices and PatternBoard/Hop/Dwell/Alight edges corresponding to a
+     * StopPattern/TripPattern. StopTimes are passed in instead of Stops only because they are
+     * needed for shape distances (actually, stop sequence numbers?).
+     * 
+     * TODO move GtfsStopContext into Graph.
+     */
+    public void makePatternVerticesAndEdges(Graph graph, GtfsStopContext context) {
+
+        /* Create arrive/depart vertices and hop/dwell/board/alight edges for each hop in this pattern. */ 
+        PatternArriveVertex pav0, pav1 = null;
+        PatternDepartVertex pdv0;
+        for (int hop = 0; hop < this.getHopCount(); hop++) {
+            Stop s0 = stopPattern.stops[hop];
+            Stop s1 = stopPattern.stops[hop + 1];
+            pdv0 = new PatternDepartVertex(graph, this, hop);
+            departVertices[hop] = pdv0;
+            if (hop > 0) {
+                pav0 = pav1;
+                dwellEdges[hop] = new PatternDwell(pav0, pdv0, hop, this);
+            }
+            pav1 = new PatternArriveVertex(graph, this, hop + 1);
+            arriveVertices[hop + 1] = pav1;
+            hopEdges[hop] = new PatternHop(pdv0, pav1, s0, s1, hop);
+
+            /* Get the arrive and depart vertices for the current stop (not pattern stop). */
+            TransitStopDepart stopDepart = getStopOrParent(context.stopDepartNodes, s0, graph);
+            TransitStopArrive stopArrive = getStopOrParent(context.stopArriveNodes, s1, graph);
+
+            /* Add this pattern's route's mode to the modes for this Stop. */
+            // This is updating a TraverseModeSet (which is a bitmask). 
+            // Maybe we should just store that mask in the pattern when it is created.
+            // Isn't this skipping the first stop in the pattern?
+            // Do we actually need a set of modes for each stop? 
+            TraverseMode mode = GtfsLibrary.getTraverseMode(this.route);
+            stopArrive.getStopVertex().addMode(mode); 
+
+            /* Create board/alight edges, but only if pickup/dropoff is enabled in GTFS. */
+            if (this.canBoard(hop)) {
+                boardEdges[hop] = new TransitBoardAlight(stopDepart, pdv0, hop, mode);
+            }
+            if (this.canAlight(hop + 1)) {
+                alightEdges[hop +1] = new TransitBoardAlight(pav1, stopArrive, hop + 1, mode);
+            }
+        }        
+    }
+
+    public void dumpServices() {
+        Set<AgencyAndId> services = Sets.newHashSet();
+        for (Trip trip : this.trips) {
+            services.add(trip.getServiceId());
+        }
+        LOG.info("route {} : {}", route, services);
+    }
+
+    public void dumpVertices() {
+        for (int i = 0; i < this.stopPattern.size; ++i) {
+            Vertex arrive = arriveVertices[i];
+            Vertex depart = departVertices[i];
+            System.out.format("%s %02d %s %s\n", this.getCode(), i, 
+                    arrive == null ? "NULL" : arrive.getLabel(),
+                    depart == null ? "NULL" : depart.getLabel());
+        }
+    }
+
+    /**
+     * A bit of a strange place to set service codes all at once when TripTimes are already added,
+     * but we need a reference to the Graph or at least the codes map. This could also be 
+     * placed in the hop factory itself.
+     */
+    public void setServiceCodes (Map<AgencyAndId, Integer> serviceCodes) {
+        services = new BitSet();
+        for (Trip trip : trips) {
+            services.set(serviceCodes.get(trip.getServiceId()));
+        }
+        scheduledTimetable.setServiceCodes (serviceCodes);
+    }
+
 }

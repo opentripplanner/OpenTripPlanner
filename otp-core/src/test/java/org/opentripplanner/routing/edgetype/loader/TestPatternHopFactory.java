@@ -42,14 +42,12 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StopTransfer;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.FrequencyBasedTripPattern;
-import org.opentripplanner.routing.edgetype.FrequencyBoard;
 import org.opentripplanner.routing.edgetype.PatternDwell;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
@@ -139,7 +137,7 @@ public class TestPatternHopFactory extends TestCase {
         Vertex stop_b_arrive = graph.getVertex("agency_C_arrive");
         Vertex stop_b_depart = graph.getVertex("agency_C_depart");
         
-        Map<TableTripPattern, Integer> stopIndex = new HashMap<TableTripPattern, Integer>();
+        Map<TripPattern, Integer> stopIndex = new HashMap<TripPattern, Integer>();
         for(Edge edge : stop_b_depart.getOutgoing()) {
             TransitBoardAlight tba = (TransitBoardAlight) edge;
             stopIndex.put(tba.getPattern(), tba.getStopIndex());

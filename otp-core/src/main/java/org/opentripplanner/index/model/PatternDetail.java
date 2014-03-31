@@ -2,7 +2,7 @@ package org.opentripplanner.index.model;
 
 import java.util.Collection;
 
-import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.routing.edgetype.TripPattern;
 
 import com.beust.jcommander.internal.Lists;
 
@@ -15,7 +15,7 @@ public class PatternDetail extends PatternShort {
     
     // Include all known headsigns
     
-    public PatternDetail(TableTripPattern pattern) {
+    public PatternDetail(TripPattern pattern) {
         super (pattern);
         routeId = pattern.route.getId().getId();
         stops = StopShort.list(pattern.getStops());

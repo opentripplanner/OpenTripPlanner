@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import lombok.Getter;
 
-import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
 /**
@@ -79,7 +79,7 @@ class Stats implements Cloneable {
     }
     
     /** Scan through all trips on this pattern and summarize those that are running. */
-    public static Stats create (TableTripPattern pattern, int hop0, int hop1, TimeWindow window) {
+    public static Stats create (TripPattern pattern, int hop0, int hop1, TimeWindow window) {
         Stats s = new Stats ();
         s.min = Integer.MAX_VALUE;
         s.num = 0;

@@ -36,7 +36,7 @@ import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.model.transit.StopTimeList;
 import org.opentripplanner.api.model.transit.TripTimesPair;
-import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.graph.Graph;
@@ -60,7 +60,7 @@ public class TransitIndexTest {
         Graph graph = mock(Graph.class);
         TransitIndexService transitIndexService = mock(TransitIndexService.class);
         CalendarService calendarService = mock(CalendarService.class);
-        TableTripPattern tableTripPattern = mock(TableTripPattern.class);
+        TripPattern tableTripPattern = mock(TripPattern.class);
         TripTimes scheduledTripTimes = mock(TripTimes.class);
         TripTimes resolvedTripTimes = mock(TripTimes.class);
         TimetableSnapshotSource timetableSnapshotSource = mock(TimetableSnapshotSource.class);
@@ -90,7 +90,7 @@ public class TransitIndexTest {
         when(resolvedTripTimes.getArrivalTime(1)).thenReturn(6);
         when(calendarService.getServiceIdsOnDate(Matchers.any(ServiceDate.class))).thenReturn(set);
         when(timetableSnapshotSource.getTimetableSnapshot()).thenReturn(timetableResolver);
-        when(timetableResolver.resolve(Matchers.any(TableTripPattern.class),
+        when(timetableResolver.resolve(Matchers.any(TripPattern.class),
                 Matchers.any(ServiceDate.class))).thenReturn(timetable);
         when(timetable.getTripTimes(Matchers.anyInt())).thenReturn(resolvedTripTimes);
 

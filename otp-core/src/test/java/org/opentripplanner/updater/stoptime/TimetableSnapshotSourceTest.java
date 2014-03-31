@@ -29,7 +29,7 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.impl.transit_index.TransitIndexBuilder;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
@@ -105,7 +105,7 @@ public class TimetableSnapshotSourceTest {
     public void testHandleCanceledTrip() throws InvalidProtocolBufferException {
         AgencyAndId tripId = new AgencyAndId("agency", "1.1");
         AgencyAndId tripId2 = new AgencyAndId("agency", "1.2");
-        TableTripPattern pattern = transitIndexService.getTripPatternForTrip(tripId);
+        TripPattern pattern = transitIndexService.getTripPatternForTrip(tripId);
         int tripIndex = pattern.getTripIndex(tripId);
         int tripIndex2 = pattern.getTripIndex(tripId2);
 
@@ -129,7 +129,7 @@ public class TimetableSnapshotSourceTest {
     public void testHandleModifiedTrip() {
         AgencyAndId tripId = new AgencyAndId("agency", "1.1");
         AgencyAndId tripId2 = new AgencyAndId("agency", "1.2");
-        TableTripPattern pattern = transitIndexService.getTripPatternForTrip(tripId);
+        TripPattern pattern = transitIndexService.getTripPatternForTrip(tripId);
         int tripIndex = pattern.getTripIndex(tripId);
         int tripIndex2 = pattern.getTripIndex(tripId2);
 
@@ -173,7 +173,7 @@ public class TimetableSnapshotSourceTest {
     public void testPurgeExpiredData() throws InvalidProtocolBufferException {
         AgencyAndId tripId = new AgencyAndId("agency", "1.1");
         ServiceDate previously = serviceDate.previous().previous(); // Just to be safe...
-        TableTripPattern pattern = transitIndexService.getTripPatternForTrip(tripId);
+        TripPattern pattern = transitIndexService.getTripPatternForTrip(tripId);
 
         updater.setMaxSnapshotFrequency(0);
         updater.setPurgeExpiredData(false);

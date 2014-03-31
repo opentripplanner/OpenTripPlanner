@@ -52,7 +52,6 @@ import org.opentripplanner.gbannotation.HopZeroTime;
 import org.opentripplanner.gbannotation.NegativeDwellTime;
 import org.opentripplanner.gbannotation.NegativeHopTime;
 import org.opentripplanner.gbannotation.RepeatedStops;
-import org.opentripplanner.gbannotation.StopAtEntrance;
 import org.opentripplanner.gbannotation.TripDegenerate;
 import org.opentripplanner.gbannotation.TripUndefinedService;
 import org.opentripplanner.gtfs.BikeAccess;
@@ -63,24 +62,15 @@ import org.opentripplanner.routing.core.StopTransfer;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.edgetype.FrequencyAlight;
-import org.opentripplanner.routing.edgetype.FrequencyBasedTripPattern;
-import org.opentripplanner.routing.edgetype.FrequencyBoard;
-import org.opentripplanner.routing.edgetype.FrequencyDwell;
-import org.opentripplanner.routing.edgetype.FrequencyHop;
 import org.opentripplanner.routing.edgetype.HopEdge;
 import org.opentripplanner.routing.edgetype.StationStopEdge;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.PatternDwell;
-import org.opentripplanner.routing.edgetype.PatternHop;
-import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
 import org.opentripplanner.routing.edgetype.PreBoardEdge;
-import org.opentripplanner.routing.edgetype.ScheduledStopPattern;
-import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.TimedTransferEdge;
 import org.opentripplanner.routing.edgetype.TransferEdge;
-import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -101,11 +91,9 @@ import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Maps;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
-import com.google.common.collect.Multimap;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Geometry;
@@ -122,9 +110,9 @@ class InterliningTrip  implements Comparable<InterliningTrip> {
     public Trip trip;
     public StopTime firstStopTime;
     public StopTime lastStopTime;
-    TableTripPattern tripPattern;
+    TripPattern tripPattern;
 
-    InterliningTrip(Trip trip, List<StopTime> stopTimes, TableTripPattern tripPattern) {
+    InterliningTrip(Trip trip, List<StopTime> stopTimes, TripPattern tripPattern) {
         this.trip = trip;
         this.firstStopTime = stopTimes.get(0);
         this.lastStopTime = stopTimes.get(stopTimes.size() - 1);
@@ -179,10 +167,10 @@ class BlockIdAndServiceId {
 class InterlineSwitchoverKey {
 
     public Stop s0, s1;
-    public TableTripPattern pattern1, pattern2;
+    public TripPattern pattern1, pattern2;
 
     public InterlineSwitchoverKey(Stop s0, Stop s1, 
-        TableTripPattern pattern1, TableTripPattern pattern2) {
+        TripPattern pattern1, TripPattern pattern2) {
         this.s0 = s0;
         this.s1 = s1;
         this.pattern1 = pattern1;
@@ -349,7 +337,7 @@ public class GTFSPatternHopFactory {
 
 //    private Map<InterlineSwitchoverKey, PatternInterlineDwell> interlineDwells = new HashMap<InterlineSwitchoverKey, PatternInterlineDwell>();
 
-    private Map<StopPattern, TableTripPattern> tableTripPatterns = Maps.newHashMap();
+    private Map<StopPattern, TripPattern> tableTripPatterns = Maps.newHashMap();
 
     private Map<StopPattern, FrequencyBasedTripPattern> frequencyTripPatterns = Maps.newHashMap();
 
@@ -467,24 +455,24 @@ public class GTFSPatternHopFactory {
                 tripTimesForBlock.put(new BlockIdAndServiceId(tripTimes.getTrip()), tripTimes);
             }
 
-            /* Get the existing TableTripPattern for this StopPattern, or create one. */
-            TableTripPattern tableTripPattern = tableTripPatterns.get(stopPattern);
+            /* Get the existing TripPattern for this StopPattern, or create one. */
+            TripPattern tableTripPattern = tableTripPatterns.get(stopPattern);
             if (tableTripPattern == null) {
-                tableTripPattern = new TableTripPattern(trip.getRoute(), stopPattern);
+                tableTripPattern = new TripPattern(trip.getRoute(), stopPattern);
                 tableTripPatterns.put(stopPattern, tableTripPattern);
             }
 
-            /* Add the stoptimes for the current trip to the appropriate TableTripPattern. */
+            /* Add the stoptimes for the current trip to the appropriate TripPattern. */
             /* This effectively groups trips by the sequence of stops they visit. */
             tableTripPattern.addTrip(trip, stopTimes);
             
         } // END foreach (TRIP)
 
         /* Generate unique names for all the TableTripPatterns. */
-        TableTripPattern.generateUniqueNames(tableTripPatterns.values());
+        TripPattern.generateUniqueNames(tableTripPatterns.values());
 
         /* Loop over all new TableTripPatterns, creating the vertices and edges for each pattern. */
-        for (TableTripPattern tableTripPattern : tableTripPatterns.values()) {
+        for (TripPattern tableTripPattern : tableTripPatterns.values()) {
             tableTripPattern.makePatternVerticesAndEdges(graph, context);
             tableTripPattern.setServiceCodes(graph.serviceCodes); // TODO this could be more elegant
         }
@@ -528,7 +516,7 @@ public class GTFSPatternHopFactory {
 
         /* Is this the wrong place to do this? It should be done on all feeds at once, or at deserialization. */
         // it is already done at deserialization, but standalone mode allows using graphs without serializing them.
-        for (TableTripPattern tableTripPattern : tableTripPatterns.values()) {
+        for (TripPattern tableTripPattern : tableTripPatterns.values()) {
             tableTripPattern.getScheduledTimetable().finish();
         }
         
@@ -825,12 +813,12 @@ public class GTFSPatternHopFactory {
 
         int wheelchair = 0;
         if (trip.getWheelchairAccessible() == 1) {
-            wheelchair = TableTripPattern.FLAG_WHEELCHAIR_ACCESSIBLE;
+            wheelchair = TripPattern.FLAG_WHEELCHAIR_ACCESSIBLE;
         }
 
         int bikes = 0;
         if (BikeAccess.fromTrip(trip) == BikeAccess.ALLOWED) {
-            bikes = TableTripPattern.FLAG_BIKES_ALLOWED;
+            bikes = TripPattern.FLAG_BIKES_ALLOWED;
         }
 
         pattern.setTripFlags(wheelchair | bikes);

@@ -102,7 +102,7 @@ public class PatternInterlineDwell extends Edge implements OnboardEdge {
     public State traverse(State state0) {
         int arrivalTime;
         int departureTime;
-        TableTripPattern pattern;
+        TripPattern pattern;
         TripTimes newTripTimes;
         TripTimes oldTripTimes = state0.getTripTimes();
         RoutingRequest options = state0.getOptions();

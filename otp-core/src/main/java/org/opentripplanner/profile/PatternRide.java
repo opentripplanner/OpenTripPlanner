@@ -4,7 +4,7 @@ import lombok.EqualsAndHashCode;
 
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.profile.ProfileData.Transfer;
-import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.routing.edgetype.TripPattern;
 
 /**
  * A ride between two stops on a single pattern. One or more PatternRides can be included in a Ride.
@@ -19,7 +19,7 @@ import org.opentripplanner.routing.edgetype.TableTripPattern;
 @EqualsAndHashCode(exclude="xfer")
 class PatternRide {
     
-    TableTripPattern pattern; // uses identity hash code
+    TripPattern pattern; // uses identity hash code
     int fromIndex;
     int toIndex = -1;
     Ride previous;
@@ -27,7 +27,7 @@ class PatternRide {
     Stats stats = null;
     
     /** Construct an unfinished PatternRide, lacking a toIndex and stats. */
-    public PatternRide (TableTripPattern pattern, int fromIndex, Ride previous, Transfer xfer) {
+    public PatternRide (TripPattern pattern, int fromIndex, Ride previous, Transfer xfer) {
         this.pattern   = pattern;
         this.fromIndex = fromIndex;
         this.previous  = previous;

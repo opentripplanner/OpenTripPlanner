@@ -21,7 +21,7 @@ import lombok.Setter;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
-import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.TransitIndexService;
@@ -190,7 +190,7 @@ public class TimetableSnapshotSource {
             ServiceDate serviceDate) {
         TripDescriptor tripDescriptor = tripUpdate.getTrip();
         AgencyAndId tripId = new AgencyAndId(agencyId, tripDescriptor.getTripId());
-        TableTripPattern pattern = getPatternForTrip(tripId);
+        TripPattern pattern = getPatternForTrip(tripId);
 
         if (pattern == null) {
             LOG.warn("No pattern found for tripId {}, skipping TripUpdate.", tripId);
@@ -224,7 +224,7 @@ public class TimetableSnapshotSource {
             ServiceDate serviceDate) {
         TripDescriptor tripDescriptor = tripUpdate.getTrip();
         AgencyAndId tripId = new AgencyAndId(agencyId, tripDescriptor.getTripId());
-        TableTripPattern pattern = getPatternForTrip(tripId);
+        TripPattern pattern = getPatternForTrip(tripId);
 
         if (pattern == null) {
             LOG.warn("No pattern found for tripId {}, skipping TripUpdate.", tripId);
@@ -257,8 +257,8 @@ public class TimetableSnapshotSource {
         return buffer.purgeExpiredData(previously);
     }
 
-    protected TableTripPattern getPatternForTrip(AgencyAndId tripId) {
-        TableTripPattern pattern = transitIndexService.getTripPatternForTrip(tripId);
+    protected TripPattern getPatternForTrip(AgencyAndId tripId) {
+        TripPattern pattern = transitIndexService.getTripPatternForTrip(tripId);
         return pattern;
     }
 }

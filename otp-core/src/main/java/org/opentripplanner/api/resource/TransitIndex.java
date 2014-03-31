@@ -72,7 +72,7 @@ import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.OnboardEdge;
 import org.opentripplanner.routing.edgetype.PatternHop;
-import org.opentripplanner.routing.edgetype.TableTripPattern;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableResolver;
 import org.opentripplanner.routing.graph.Edge;
@@ -1003,7 +1003,7 @@ public class TransitIndex {
             return new TransitError("No calendar service found.");
         }
 
-        TableTripPattern pattern = transitIndexService.getTripPatternForTrip(trip);
+        TripPattern pattern = transitIndexService.getTripPatternForTrip(trip);
 
         if (pattern == null) {
             return new TransitError("Could not find trip pattern.");
@@ -1112,7 +1112,7 @@ public class TransitIndex {
         for (RouteSegment segment : variant.getSegments()) {
             if (segment.hopOut != null && segment.hopOut instanceof PatternHop) {
                 PatternHop patternHop = (PatternHop) segment.hopOut;
-                TableTripPattern tripPattern = patternHop.getPattern();
+                TripPattern tripPattern = patternHop.getPattern();
                 int serviceId = tripPattern.getServiceId();
                 for (Trip trip : tripPattern.getTrips()) {
                     if (!processedTrips.contains(trip.getId())) {
