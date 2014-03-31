@@ -339,7 +339,7 @@ public class GTFSPatternHopFactory {
 
     private Map<StopPattern, TripPattern> tableTripPatterns = Maps.newHashMap();
 
-    private Map<StopPattern, FrequencyBasedTripPattern> frequencyTripPatterns = Maps.newHashMap();
+    private Map<StopPattern, TripPattern> frequencyTripPatterns = Maps.newHashMap();
 
     private GtfsStopContext context = new GtfsStopContext();
 
@@ -432,13 +432,14 @@ public class GTFSPatternHopFactory {
                 if (frequencies.size() > 1 || 
                     frequency.getStartTime() != stopTimes.get(0).getDepartureTime() ||
                     frequency.getEndTime() - frequency.getStartTime() > frequency.getHeadwaySecs()) {
-                    T2<FrequencyBasedTripPattern,List<FrequencyHop>> patternAndHops =
-                            makeFrequencyPattern(graph, trip, stopTimes);
-                    List<FrequencyHop> hops = patternAndHops.getSecond();
-                    FrequencyBasedTripPattern frequencyPattern = patternAndHops.getFirst();
-                    if (frequencyPattern != null) 
-                        frequencyPattern.createRanges(frequencies);
-                    createGeometry(graph, trip, stopTimes, hops);
+// TODO replace
+//                    T2<FrequencyBasedTripPattern,List<FrequencyHop>> patternAndHops =
+//                            makeFrequencyPattern(graph, trip, stopTimes);
+//                    List<FrequencyHop> hops = patternAndHops.getSecond();
+//                    FrequencyBasedTripPattern frequencyPattern = patternAndHops.getFirst();
+//                    if (frequencyPattern != null)
+//                        frequencyPattern.createRanges(frequencies);
+//                    createGeometry(graph, trip, stopTimes, hops);
                     continue TRIP;
                 } 
                 // Else fall through and treat this trip as a non-frequency (table-based) one
@@ -718,113 +719,9 @@ public class GTFSPatternHopFactory {
         return null;
     }
 
-    private T2<FrequencyBasedTripPattern, List<FrequencyHop>> makeFrequencyPattern(Graph graph, Trip trip,
-            List<StopTime> stopTimes) {
-        
-        FrequencyBasedTripPattern pattern = new FrequencyBasedTripPattern(trip, stopTimes.size(), getServiceId(trip));
-        TraverseMode mode = GtfsLibrary.getTraverseMode(trip.getRoute());
-        int lastStop = stopTimes.size() - 1;
 
-        int i;
-        StopTime st1 = null;
-        TransitVertex psv0arrive, psv1arrive = null;
-        TransitVertex psv0depart;
-        ArrayList<Edge> createdEdges = new ArrayList<Edge>();
-        ArrayList<Vertex> createdVertices = new ArrayList<Vertex>();
-        List<Stop> stops = new ArrayList<Stop>();
-        int offset = stopTimes.get(0).getDepartureTime();
-        ArrayList<FrequencyHop> hops = new ArrayList<FrequencyHop>();
-        for (i = 0; i < lastStop; i++) {    
-            StopTime st0 = stopTimes.get(i);
-            Stop s0 = st0.getStop();
-            stops.add(s0);
-            st1 = stopTimes.get(i + 1);
-            Stop s1 = st1.getStop();
-            if (i == lastStop - 1)
-                stops.add(s1);
-            
-            int arrivalTime = st1.getArrivalTime() - offset;
-            int departureTime = st0.getDepartureTime() - offset;
+// TODO makeFrequencyPattern(Graph graph, Trip trip, List<StopTime> stopTimes) {
 
-            int dwellTime = st0.getDepartureTime() - st0.getArrivalTime();
-            int runningTime = arrivalTime - departureTime;
-
-            if (runningTime < 0) {
-                LOG.warn(graph.addBuilderAnnotation(new NegativeHopTime(st0, st1)));
-                //back out hops and give up
-                for (Edge e: createdEdges) {
-                    e.getFromVertex().removeOutgoing(e);
-                    e.getToVertex().removeIncoming(e);
-                }
-                for (Vertex v : createdVertices) {
-                    graph.removeVertexAndEdges(v);
-                }
-                return null;
-            }
-
-            // create journey vertices
-
-            if (i != 0) {
-                //dwells are possible on stops after the first
-                psv0arrive = psv1arrive;
-                
-                if (dwellTime == 0) {
-                    //if dwell time is zero, we would like to not create psv0depart
-                    //use psv0arrive instead
-                    psv0depart = psv0arrive;
-                } else {
-
-                    psv0depart = new PatternDepartVertex(graph, trip, st0);
-                    createdVertices.add(psv0depart);
-                    FrequencyDwell dwell = new FrequencyDwell(psv0arrive, psv0depart, i, pattern);
-                    createdEdges.add(dwell);
-                }
-            } else {
-                psv0depart = new PatternDepartVertex(graph, trip, st0);
-                createdVertices.add(psv0depart);
-            }
-
-            psv1arrive = new PatternArriveVertex(graph, trip, st1);
-            createdVertices.add(psv1arrive);
-
-            FrequencyHop hop = new FrequencyHop(psv0depart, psv1arrive, s0, s1, i,
-                    pattern);
-            createdEdges.add(hop);
-            hops.add(hop);
-
-            String headsign = st0.getStopHeadsign();
-            if (headsign == null) {
-                headsign = trip.getTripHeadsign();
-            }
-            pattern.addHop(i, departureTime, runningTime, arrivalTime, dwellTime,
-                    headsign);
-
-            TransitStopDepart stopDepart = context.stopDepartNodes.get(s0);
-            TransitStopArrive stopArrive = context.stopArriveNodes.get(s1);
-
-            final int serviceId = getServiceId(trip);
-            Edge board = new FrequencyBoard(stopDepart, psv0depart, pattern, i, mode, serviceId);
-            Edge alight = new FrequencyAlight(psv1arrive, stopArrive, pattern, i, mode, serviceId);
-            createdEdges.add(board);
-            createdEdges.add(alight);
-        }
-
-        pattern.setStops(stops);
-
-        int wheelchair = 0;
-        if (trip.getWheelchairAccessible() == 1) {
-            wheelchair = TripPattern.FLAG_WHEELCHAIR_ACCESSIBLE;
-        }
-
-        int bikes = 0;
-        if (BikeAccess.fromTrip(trip) == BikeAccess.ALLOWED) {
-            bikes = TripPattern.FLAG_BIKES_ALLOWED;
-        }
-
-        pattern.setTripFlags(wheelchair | bikes);
-
-        return new T2<FrequencyBasedTripPattern, List<FrequencyHop>>(pattern, hops);
-    }
 
     /**
      * Scan through the given list, looking for clearly incorrect series of stoptimes and unsetting
