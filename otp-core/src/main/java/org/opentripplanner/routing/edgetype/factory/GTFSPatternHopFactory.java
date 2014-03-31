@@ -475,6 +475,7 @@ public class GTFSPatternHopFactory {
         }
 
      // FIXME MAKE PATTERN INTERLINE DWELL edges for patterns
+     // FIXME store next linked TripTimes in each TripTimes
      // do we already have a PatternInterlineDwell edge for this dwell?
 //                 PatternInterlineDwell dwell = getInterlineDwell(dwellKey);
 //                 if (dwell == null) { 
@@ -490,6 +491,7 @@ public class GTFSPatternHopFactory {
 //                         fromInterlineTrip.getPatternIndex(), toInterlineTrip.getPatternIndex());
 
         loadTransfers(graph);
+        // TODO just remove dwell deletion entirely
         if (_deleteUselessDwells) deleteUselessDwells(graph);
 
         /* Is this the wrong place to do this? It should be done on all feeds at once, or at deserialization. */
@@ -503,11 +505,9 @@ public class GTFSPatternHopFactory {
         graph.putService(OnBoardDepartService.class, new OnBoardDepartServiceImpl());
     }
     
-    static int cg = 0;
     private <T extends Edge & HopEdge> void createGeometry(Graph graph, Trip trip,
             List<StopTime> stopTimes, List<T> hops) {
 
-        cg += 1;
         AgencyAndId shapeId = trip.getShapeId();
         if (shapeId == null || shapeId.getId() == null || shapeId.getId().equals(""))
             return; // this trip has no associated shape_id, bail out

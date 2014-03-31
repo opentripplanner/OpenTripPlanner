@@ -81,7 +81,7 @@ public class TripPattern implements Serializable {
     public static final int FLAG_BIKES_ALLOWED = 32;
 
     /**
-     * The GTFS Route of all trips in this pattern. GTFS allows the same pattern to appear in more
+     * The GTFS Route of all trips in this pattern. GTFS technically allows the same pattern to appear in more
      * than one route, but we make the assumption that all trips with the same pattern belong to the
      * same Route.
      */
@@ -96,10 +96,9 @@ public class TripPattern implements Serializable {
     public final StopPattern stopPattern;
     
     /** 
-     * This timetable holds the 'official' stop times from GTFS. If realtime stoptime updates are 
-     * applied, trips searches will be conducted using another timetable and this one will serve to 
-     * find early/late offsets, or as a fallback if the other timetable becomes corrupted or
-     * expires.
+     * This timetable holds the scheduled stop times from GTFS. If realtime stoptime updates are
+     * applied, trip searches will be conducted using a different, updated timetable and this one will serve to
+     * find early/late offsets, or as a fallback if the updated timetable expires or becomes corrupted.
      */
     @Getter
     protected final Timetable scheduledTimetable = new Timetable(this);
@@ -151,9 +150,11 @@ public class TripPattern implements Serializable {
     // TODO: is this necessary? Can we just look at the Stop and StopPattern objects directly?
     @XmlElement int[] perStopFlags;
     
-    /** Optimized serviceId codes. Trips in a pattern are NO LONGER NECESSARILY on the same service. */
-    // this is a set of all the running services on this pattern.
-    // TODO MOVE single codes INTO Timetable or trip
+    /**
+     * A set of serviceIds with at least one trip in this pattern.
+     * Trips in a pattern are no longer necessarily running on the same service ID.
+     */
+    // TODO MOVE codes INTO Timetable or TripTimes
     BitSet services;
 
     public TripPattern(Route route, StopPattern stopPattern) {
