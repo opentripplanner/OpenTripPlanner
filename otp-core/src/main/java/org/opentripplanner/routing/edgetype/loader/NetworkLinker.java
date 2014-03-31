@@ -58,8 +58,6 @@ public class NetworkLinker {
     /**
      * Link the transit network to the street network. Connect each transit vertex to the nearest
      * Street edge with a StreetTransitLink.
-     * 
-     * @param index
      */
     public void createLinkage() {
 
@@ -111,9 +109,9 @@ public class NetworkLinker {
                 }
             }
         }
-        
+
         FindMaxWalkDistances.find(graph);
-        
+
         LOG.debug("Linking bike rental stations...");
         for (BikeRentalStationVertex brsv : IterableLibrary.filter(vertices,
                 BikeRentalStationVertex.class)) {
