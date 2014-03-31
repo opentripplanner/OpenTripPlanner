@@ -72,7 +72,6 @@ import org.opentripplanner.graph_builder.impl.shapefile.CaseBasedTraversalPermis
 import org.opentripplanner.graph_builder.impl.shapefile.ShapefileFeatureSourceFactoryImpl;
 import org.opentripplanner.graph_builder.impl.shapefile.ShapefileStreetGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.shapefile.ShapefileStreetSchema;
-import org.opentripplanner.graph_builder.impl.transit_index.TransitIndexBuilder;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.model.GtfsBundles;
 import org.opentripplanner.graph_builder.services.GraphBuilderWithGtfsDao;

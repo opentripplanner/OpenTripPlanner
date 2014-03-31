@@ -42,8 +42,6 @@ import org.opentripplanner.graph_builder.impl.ned.NEDGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.ned.NEDGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.impl.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.impl.osm.OpenStreetMapGraphBuilderImpl;
-import org.opentripplanner.graph_builder.impl.raptor.RaptorDataBuilder;
-import org.opentripplanner.graph_builder.impl.transit_index.TransitIndexBuilder;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.graph_builder.services.GraphBuilderWithGtfsDao;

@@ -26,7 +26,6 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.CalendarServiceData;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.graph_builder.impl.transit_index.TransitIndexBuilder;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.edgetype.TripPattern;

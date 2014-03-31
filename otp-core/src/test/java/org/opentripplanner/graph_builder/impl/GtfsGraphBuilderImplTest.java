@@ -28,7 +28,6 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.IdentityBean;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.services.MockGtfs;
-import org.opentripplanner.graph_builder.impl.transit_index.TransitIndexBuilder;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.model.GtfsBundles;
 import org.opentripplanner.graph_builder.services.GraphBuilderWithGtfsDao;
