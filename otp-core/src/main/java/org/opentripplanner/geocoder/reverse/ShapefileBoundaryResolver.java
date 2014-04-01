@@ -1,4 +1,4 @@
-package org.opentripplanner.municoder.resolver;
+package org.opentripplanner.geocoder.reverse;
 
 import java.io.File;
 import java.io.IOException;

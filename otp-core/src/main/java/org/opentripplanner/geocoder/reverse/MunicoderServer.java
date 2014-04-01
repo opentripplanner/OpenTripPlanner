@@ -11,7 +11,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.municoder.ws;
+package org.opentripplanner.geocoder.reverse;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -21,7 +21,6 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.opentripplanner.municoder.resolver.BoundaryResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.sun.jersey.api.spring.Autowire;
@@ -33,7 +32,16 @@ import com.vividsolutions.jts.geom.Envelope;*/
 @Path("/municoder")
 @Autowire
 public class MunicoderServer {
-   
+
+    /* FIXME Spring config looked like this:
+        <bean id="boundaryResolver" class="org.opentripplanner.municoder.ShapefileBoundaryResolver"
+    	  init-method="initialize">
+    	<property name="shapefile" value="/var/otp/shp/pdx_boundaries.shp" />
+    	<property name="nameField" value="CITYNAME" />
+    </bean>
+
+     */
+
     @Autowired
     private BoundaryResolver boundaryResolver;
    
