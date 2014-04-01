@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ApplicationHandler;
+import org.opentripplanner.api.model.OTPObjectMapperProvider;
 import org.opentripplanner.api.resource.BikeRental;
 import org.opentripplanner.api.resource.GeocoderResource;
 import org.opentripplanner.api.resource.Metadata;
@@ -63,9 +64,9 @@ public class OTPApplication extends Application {
             Metadata.class,
             ProfileEndpoint.class,
             SimpleIsochrone.class,
-            ServerInfo.class
-            // Enable Jackson POJO JSON serialization
-            // JacksonFeature.class
+            ServerInfo.class,
+            // Enable Jackson JSON and XML serialization
+            OTPObjectMapperProvider.class
         );
 
         // JerseyInjector
