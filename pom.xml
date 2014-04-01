@@ -17,7 +17,6 @@
 
   <modules>
     <module>otp-core</module>
-    <module>otp-analyst-client</module>
   </modules>
 
   <build>
