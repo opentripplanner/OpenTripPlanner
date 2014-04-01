@@ -1,7 +1,0 @@
-# Application dependencies
-
-require:
-    - play
-    - play -> secure
-    - com.lambdaworks -> scrypt 1.3.3
-    - com.google.code.maven-play-plugin.net.tanesha.recaptcha4j -> recaptcha4j 0.0.8    
