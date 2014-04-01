@@ -1,3 +1,0 @@
-LIB VERSION: v0.7 
-UPDATED:     May 2010
-BY:          Frank Purcell
