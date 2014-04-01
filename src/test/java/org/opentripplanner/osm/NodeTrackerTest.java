@@ -2,14 +2,17 @@ package org.opentripplanner.osm;
 
 import java.util.Set;
 
-import junit.framework.TestCase;
-
 import com.beust.jcommander.internal.Sets;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
-public class NodeTrackerTest extends TestCase {
+import org.junit.Test;
+
+public class NodeTrackerTest {
 
     /** Check the NodeTracker against a stock Set<Long>. */
-    public static void testAgainstSet() {
+    @Test
+    public void testAgainstSet() {
         // track big numbers > 2^32
         for (long lo : new long[] {1L << 6, 1L << 16, 1L << 34, 1L << 50} ) {
             Set<Long> numbers = Sets.newHashSet();

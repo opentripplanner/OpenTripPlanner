@@ -1,4 +1,5 @@
 target/
+build/
 dist/
 docs/_build/
 otp-core/build/
@@ -12,6 +13,7 @@ otp-openlayers-client/src/main/webapp/js/otp-min.js
 .project
 .pydevproject
 .settings
+.gradle
 *.ipr
 *.iml
 *.iws
