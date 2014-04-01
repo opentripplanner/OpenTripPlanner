@@ -9,7 +9,7 @@
 	</context-param>
 	
     <listener>
-        <listener-class>org.opentripplanner.api.servlet.LoggingConfigurationListener</listener-class>
+        <listener-class>org.opentripplanner.servlet.LoggingConfigurationListener</listener-class>
     </listener>
 
 	<listener>
@@ -47,7 +47,7 @@
 
 	<servlet>
 		<servlet-name>Jersey</servlet-name>
-		<servlet-class>org.opentripplanner.api.servlet.ApiServlet</servlet-class>
+		<servlet-class>org.opentripplanner.servlet.ApiServlet</servlet-class>
 		<!-- scan the semicolon-separated list packages for JAX-RS resource and parameter provider classes -->
 		<init-param>
 			<param-name>com.sun.jersey.config.property.packages</param-name>

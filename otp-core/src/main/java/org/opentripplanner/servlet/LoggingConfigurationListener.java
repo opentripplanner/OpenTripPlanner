@@ -1,4 +1,4 @@
-package org.opentripplanner.api.servlet;
+package org.opentripplanner.servlet;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
