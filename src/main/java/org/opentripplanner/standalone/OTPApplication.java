@@ -1,6 +1,9 @@
 package org.opentripplanner.standalone;
 
 import com.google.common.collect.Sets;
+import org.glassfish.grizzly.http.server.HttpServer;
+import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
+import org.glassfish.jersey.server.ApplicationHandler;
 import org.opentripplanner.api.resource.BikeRental;
 import org.opentripplanner.api.resource.GeocoderResource;
 import org.opentripplanner.api.resource.Metadata;
@@ -17,8 +20,12 @@ import org.opentripplanner.api.resource.analyst.SimpleIsochrone;
 import org.opentripplanner.api.resource.analyst.TileService;
 import org.opentripplanner.api.resource.analyst.WebMapService;
 import org.opentripplanner.api.ws.analyst.TimeGridWs;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import javax.ws.rs.core.Application;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Set;
 
 /**
@@ -65,6 +72,24 @@ public class OTPApplication extends Application {
         // replace with simple Parameter classes that have String constructors.
         // CRSStringReaderProvider.class,
         // EnvelopeStringReaderProvider.class
-
     }
+
+    static {
+        // Remove existing handlers attached to the j.u.l root logger
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        // Bridge j.u.l (used by Jersey) to the SLF4J root logger
+        SLF4JBridgeHandler.install();
+    }
+
+    public static void main(String[] args) throws IOException, URISyntaxException {
+        final URI uri = new URI("http://localhost:3232");
+        System.out.println("Starting grizzly...");
+        OTPApplication otpApplication = new OTPApplication();
+        ApplicationHandler appHandler = new ApplicationHandler(otpApplication);
+        HttpServer server = GrizzlyHttpServerFactory.createHttpServer(uri, appHandler);
+        server.start();
+        System.in.read();
+        System.exit(0);
+    }
+
 }

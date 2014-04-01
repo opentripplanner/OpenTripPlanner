@@ -46,4 +46,8 @@ public class OTPServer {
         return routers.get(routerId);
     }
 
+    public OTPServer () {
+        // wire the thing up
+    }
+
 }

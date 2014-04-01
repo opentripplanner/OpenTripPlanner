@@ -17,17 +17,13 @@
     </scm>
 
     <properties>
-        <geotools.version>9.2</geotools.version>
-        <slf4j.version>1.7.5</slf4j.version>
-        <jersey.version>1.17.1</jersey.version>
-        <jackson.version>2.3.0</jackson.version>
+        <geotools.version>10.5</geotools.version>
+        <slf4j.version>1.7.6</slf4j.version>
+        <jersey.version>2.6</jersey.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <distribution_id>opengeo</distribution_id>
         <distribution_name>OpenGeo Maven Repository</distribution_name>
         <distribution_url>dav:http://repo.opengeo.org</distribution_url>
-        <snapshot_distribution_id>opengeo</snapshot_distribution_id>
-        <snapshot_distribution_name>OpenGeo Maven Repository</snapshot_distribution_name>
-        <snapshot_distribution_url>dav:http://repo.opengeo.org</snapshot_distribution_url>
     </properties>
 
     <build>
@@ -250,12 +246,6 @@
             <name>${distribution_name}</name>
             <url>${distribution_url}</url>
         </repository>
-        <snapshotRepository>
-            <id>${snapshot_distribution_id}</id>
-            <name>${snapshot_distribution_name}</name>
-            <url>${snapshot_distribution_url}</url>
-            <uniqueVersion>false</uniqueVersion>
-        </snapshotRepository>
         <site>
             <id>opentripplanner-docs</id>
             <name>OpenTripPlanner Docs</name>
@@ -445,13 +435,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <!-- what is this used for? -->
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-client</artifactId>
-            <version>${jersey.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
             <version>1.9.0</version>
@@ -459,19 +442,21 @@
         </dependency>
 
         <!-- JERSEY JAX-RS annontation-driven REST -->
+
         <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-core</artifactId>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-server</artifactId>
             <version>${jersey.version}</version>
         </dependency>
         <dependency>
-            <!-- Jersey-Grizzly integration. -->
-            <!-- Grizzly is a NIO framework we use in the embedded (standalone) server. -->
-            <!-- Jersey integrates with Grizzly 2.2.16 by default -->
-            <!-- But seems to work properly with 2.3.5 via artifact excludes. -->
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-grizzly2</artifactId>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-json-jackson</artifactId>
             <version>${jersey.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.containers</groupId>
+            <artifactId>jersey-container-grizzly2-http</artifactId>
+            <version>2.6</version>
         </dependency>
 
         <!-- Asynchronous Websocket-capable client, for message-driven incremental GTFS-RT -->
@@ -556,19 +541,6 @@
 
         <!-- JSON -->
         <dependency>
-            <!-- Jackson XML support - use the same lib for JSON and XML. -->
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
-            <artifactId>jackson-dataformat-xml</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <!-- Provides a message body writer for application/json instead of just XML -->
-            <!-- https://github.com/FasterXML/jackson-jaxrs-providers -->
-            <groupId>com.fasterxml.jackson.jaxrs</groupId>
-            <artifactId>jackson-jaxrs-json-provider</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
             <groupId>net.sf.json-lib</groupId>
             <artifactId>json-lib</artifactId>
             <version>2.1</version>
@@ -579,21 +551,6 @@
             <groupId>org.codehaus.jettison</groupId>
             <artifactId>jettison</artifactId>
             <version>1.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.module</groupId>
-            <artifactId>jackson-module-jaxb-annotations</artifactId>
-            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <!-- More JSON used by Nominatim geocoder module -->
