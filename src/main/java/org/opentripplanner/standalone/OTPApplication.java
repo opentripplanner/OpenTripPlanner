@@ -72,7 +72,7 @@ public class OTPApplication extends Application {
             ServerInfo.class,
             // Enable Jackson JSON and XML serialization
             OTPObjectMapperProvider.class,
-            // Filters
+            // Filters -- confirmed, these are picked up by Jersey.
             AuthFilter.class,
             JsonpFilter.class
         );

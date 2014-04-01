@@ -51,7 +51,7 @@ public class JsonpFilter implements ContainerResponseFilter {
             //ContainerResponseWriter writer = response..getContainerResponseWriter();
             //response.setContainerResponseWriter(new JsonpResponseWriter(writer, callback));
         }
-
+        // TODO can we handle JSONP in the objectMapper (JSON serializer itself)?
     }
 
     /*
