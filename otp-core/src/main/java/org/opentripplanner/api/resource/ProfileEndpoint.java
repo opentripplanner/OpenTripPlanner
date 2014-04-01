@@ -17,9 +17,10 @@ import lombok.Setter;
 import org.opentripplanner.api.param.HourMinuteSecond;
 import org.opentripplanner.api.param.LatLon;
 import org.opentripplanner.api.param.YearMonthDay;
+import org.opentripplanner.profile.Option;
 import org.opentripplanner.profile.ProfileData;
+import org.opentripplanner.profile.ProfileResponse;
 import org.opentripplanner.profile.ProfileRouter;
-import org.opentripplanner.profile.Response;
 import org.opentripplanner.routing.services.GraphService;
 
 import com.sun.jersey.api.core.InjectParam;
