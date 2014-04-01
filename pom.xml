@@ -21,7 +21,6 @@
     <module>otp-leaflet-client</module>
     <module>otp-openlayers-client</module>
     <module>otp-analyst-client</module>
-    <module>otp-admin-client</module>
     <module>otp-municoder</module>
   </modules>
 
