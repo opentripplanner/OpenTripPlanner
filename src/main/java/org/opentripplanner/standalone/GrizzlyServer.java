@@ -35,10 +35,12 @@ public class GrizzlyServer {
 
     /** The command line parameters, including things like port number and content directories. */
     private CommandLineParameters params;
+    private OTPServer server;
 
     /** Construct a Grizzly server with the given IoC injector and command line parameters. */
-    public GrizzlyServer (CommandLineParameters params) {
+    public GrizzlyServer (CommandLineParameters params, OTPServer server) {
         this.params = params;
+        this.server = server;
     }
 
     public void run() {
@@ -57,7 +59,7 @@ public class GrizzlyServer {
 
         /* Application is the JAX-RS way to configure a web app.
            ResourceConfig is a Jersey-specific subclass of Application for package scanning etc. */
-        Application app = new OTPApplication();
+        Application app = new OTPApplication(server);
 
         /* Add a couple of handlers (~= servlets) to the Grizzly server. */
 

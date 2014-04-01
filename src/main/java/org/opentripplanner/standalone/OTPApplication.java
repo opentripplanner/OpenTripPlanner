@@ -41,8 +41,8 @@ public class OTPApplication extends Application {
 
     public final OTPServer server;
 
-    public OTPApplication () {
-        server = new OTPServer();
+    public OTPApplication (OTPServer server) {
+        this.server = server;
     }
 
     /**
@@ -97,17 +97,6 @@ public class OTPApplication extends Application {
         SLF4JBridgeHandler.removeHandlersForRootLogger();
         // Bridge j.u.l (used by Jersey) to the SLF4J root logger
         SLF4JBridgeHandler.install();
-    }
-
-    public static void main(String[] args) throws IOException, URISyntaxException {
-        final URI uri = new URI("http://localhost:3232");
-        System.out.println("Starting grizzly...");
-        OTPApplication otpApplication = new OTPApplication();
-        ApplicationHandler appHandler = new ApplicationHandler(otpApplication);
-        HttpServer server = GrizzlyHttpServerFactory.createHttpServer(uri, appHandler);
-        server.start();
-        System.in.read();
-        System.exit(0);
     }
 
 }

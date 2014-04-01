@@ -76,68 +76,22 @@ public class OTPConfigurator {
     
     private GraphService graphService = null;
     
-    private OTPComponentProviderFactory componentProviderFactory = null;
-    
     public OTPConfigurator (CommandLineParameters params) {
         this.params = params;
     }
 
-    /** 
-     * Return an adapter that makes Jersey see OTP as a dependency injection framework. 
-     * This will associate our specific OTP component instances with their interface classes.
-     * 
-     * We could even do this at Configurator construct time (rather than lazy initializing), using 
-     * the inMemory param to create the right kind of graphservice ahead of time. However that 
-     * would create indexes even when only a build was going to happen. 
+    private OTPServer server;
+    
+    /**
+     * We could even do this at Configurator construct time (rather than lazy initializing), using
+     * the inMemory param to create the right kind of GraphService ahead of time. However that
+     * would create indexes even when only a build was going to happen.
      */
-    public OTPComponentProviderFactory getComponentProviderFactory() {
-        
-        if (componentProviderFactory != null)
-            return componentProviderFactory;
-        
-        LOG.info("Wiring up and configuring server task.");
-        
-        
-        // Core OTP modules
-        OTPComponentProviderFactory cpf = new OTPComponentProviderFactory(); 
-        cpf.bind(GraphService.class, getGraphService());
-        cpf.bind(RoutingRequest.class);
-        cpf.bind(PlanGenerator.class);
-        cpf.bind(MetadataService.class);
-        cpf.bind(SPTService.class, new GenericAStar());
-
-        // Choose a PathService to wrap the SPTService, depending on expected maximum path lengths
-        if (params.longDistance) {
-            LongDistancePathService pathService = new LongDistancePathService();
-            pathService.setTimeout(10);
-            cpf.bind(PathService.class, pathService);
-        } else {
-            RetryingPathServiceImpl pathService = new RetryingPathServiceImpl();
-            pathService.setFirstPathTimeout(10.0);
-            pathService.setMultiPathTimeout(1.0);
-            cpf.bind(PathService.class, pathService);
-            cpf.bind(RemainingWeightHeuristicFactory.class, 
-                    new DefaultRemainingWeightHeuristicFactoryImpl()); 
+    public OTPServer getServer() {
+        if (server == null) {
+            server = new OTPServer(params, getGraphService());
         }
-        
-        // Optional Analyst Modules
-        if (params.analyst) {
-            cpf.bind(Renderer.class);
-            cpf.bind(SPTCache.class);
-            cpf.bind(TileCache.class);
-            cpf.bind(GeometryIndex.class);
-            cpf.bind(SampleFactory.class);
-            cpf.bind(IsoChroneSPTRendererAccSampling.class);
-            cpf.bind(IsoChroneSPTRendererRecursiveGrid.class);
-            cpf.bind(SampleGridRenderer.class);
-        }
-        
-        // Perform field injection on bound instances and call post-construct methods
-        cpf.doneBinding();   
-        
-        this.componentProviderFactory = cpf;
-        return cpf;         
-        
+        return server;
     }
 
     /** Create a cached GraphService that will be shared between all OTP components. */
@@ -168,8 +122,9 @@ public class OTPConfigurator {
 
     /** Return the cached, shared GraphService, making one as needed. */
     public GraphService getGraphService () {
-        if (graphService == null)
+        if (graphService == null) {
             makeGraphService(null);
+        }
         return graphService;
     }
     
@@ -281,16 +236,15 @@ public class OTPConfigurator {
 
     public GrizzlyServer serverFromParameters() {
         if (params.server) {
-            OTPComponentProviderFactory cpf = getComponentProviderFactory();
-            GrizzlyServer server = new GrizzlyServer(cpf, params);
+            GrizzlyServer server = new GrizzlyServer(params, getServer());
             return server;
         } else return null;
     }
     
     public GraphVisualizer visualizerFromParameters() {
         if (params.visualize) {
-            @SuppressWarnings("unused") // get a component provider factory to force injection/post-construct
-            OTPComponentProviderFactory cpf = getComponentProviderFactory();
+            // FIXME get OTPServer into visualizer.
+            getServer();
             GraphVisualizer visualizer = new GraphVisualizer(getGraphService());
             return visualizer;
         } else return null;
