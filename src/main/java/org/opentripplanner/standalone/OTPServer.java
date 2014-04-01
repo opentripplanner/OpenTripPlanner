@@ -66,11 +66,11 @@ public class OTPServer {
 
         // Choose a PathService to wrap the SPTService, depending on expected maximum path lengths
         if (params.longDistance) {
-            LongDistancePathService pathService = new LongDistancePathService();
+            LongDistancePathService pathService = new LongDistancePathService(graphService, sptService);
             pathService.setTimeout(10);
             this.pathService = pathService;
         } else {
-            RetryingPathServiceImpl pathService = new RetryingPathServiceImpl();
+            RetryingPathServiceImpl pathService = new RetryingPathServiceImpl(graphService, sptService);
             pathService.setFirstPathTimeout(10.0);
             pathService.setMultiPathTimeout(1.0);
             this.pathService = pathService;

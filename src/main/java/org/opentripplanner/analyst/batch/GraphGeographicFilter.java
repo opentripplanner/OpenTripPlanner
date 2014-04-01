@@ -27,7 +27,6 @@ import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -40,15 +39,20 @@ public class GraphGeographicFilter implements IndividualFilter {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphGeographicFilter.class);
 
-    @Autowired private RoutingRequest prototypeRoutingRequest;
-    @Autowired private GraphService graphService;
+    private RoutingRequest prototypeRoutingRequest;
+    private GraphService graphService;
+
+    public GraphGeographicFilter(RoutingRequest prototypeRoutingRequest, GraphService graphService) {
+        this.prototypeRoutingRequest = prototypeRoutingRequest;
+        this.graphService = graphService;
+        findHull();
+    }
 
     private double bufferMeters = 2000;
     private boolean useOnlyStops = true;
     private static GeometryFactory gf = new GeometryFactory();
     private Geometry hull;
     
-    @PostConstruct
     public void findHull() {
         LOG.info("finding hull of graph...");
         LOG.debug("using only stops? {}", useOnlyStops);

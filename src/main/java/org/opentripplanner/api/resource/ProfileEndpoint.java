@@ -8,6 +8,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -23,13 +24,11 @@ import org.opentripplanner.profile.ProfileResponse;
 import org.opentripplanner.profile.ProfileRouter;
 import org.opentripplanner.routing.services.GraphService;
 
-import com.sun.jersey.api.core.InjectParam;
-import com.sun.jersey.api.spring.Autowire;
-
-@Autowire @Singleton @Path("/profile")
+@Path("/profile")
 public class ProfileEndpoint {
 
-    @Setter @InjectParam private GraphService graphService;
+    @Context // FIXME inject Application
+    private GraphService graphService;
     private static ProfileData data = null;
     
     @GET

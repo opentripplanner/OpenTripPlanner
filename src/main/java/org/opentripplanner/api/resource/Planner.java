@@ -30,9 +30,6 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.jersey.api.core.InjectParam;
-import com.sun.jersey.api.spring.Autowire;
-
 /**
  * This is the primary entry point for the trip planning web service.
  * All parameters are passed in the query string. These parameters are defined in the abstract
@@ -48,14 +45,12 @@ import com.sun.jersey.api.spring.Autowire;
  * 
  * @throws JSONException
  */
-@XmlRootElement
-@Autowire
 @Path("routers/{routerId}/plan") // final element needed here rather than on method to distinguish from routers API
 public class Planner extends RoutingResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(Planner.class);
-    
-    @Setter @InjectParam 
+
+    @Context // FIXME inject Application
     public PlanGenerator planGenerator;
 
     // We inject info about the incoming request so we can include the incoming query 

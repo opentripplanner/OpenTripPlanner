@@ -187,8 +187,6 @@ public class Graph implements Serializable {
     
     /**
      * Add the given vertex to the graph. Ideally, only vertices should add themselves to the graph, when they are constructed or deserialized.
-     * 
-     * @param vv the vertex to add
      */
     public void addVertex(Vertex v) {
         Vertex old = vertices.put(v.getLabel(), v);

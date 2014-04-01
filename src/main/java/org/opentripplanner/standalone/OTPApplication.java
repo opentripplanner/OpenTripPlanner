@@ -8,10 +8,10 @@ import org.glassfish.jersey.server.ApplicationHandler;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.opentripplanner.api.model.OTPObjectMapperProvider;
+import org.opentripplanner.api.resource.AlertPatcher;
 import org.opentripplanner.api.resource.BikeRental;
 import org.opentripplanner.api.resource.GeocoderResource;
 import org.opentripplanner.api.resource.Metadata;
-import org.opentripplanner.api.resource.Patcher;
 import org.opentripplanner.api.resource.Planner;
 import org.opentripplanner.api.resource.ProfileEndpoint;
 import org.opentripplanner.api.resource.Routers;
@@ -22,8 +22,8 @@ import org.opentripplanner.api.resource.analyst.Raster;
 import org.opentripplanner.api.resource.analyst.SIsochrone;
 import org.opentripplanner.api.resource.analyst.SimpleIsochrone;
 import org.opentripplanner.api.resource.analyst.TileService;
+import org.opentripplanner.api.resource.analyst.TimeGridWs;
 import org.opentripplanner.api.resource.analyst.WebMapService;
-import org.opentripplanner.api.ws.analyst.TimeGridWs;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import javax.ws.rs.core.Application;
@@ -60,7 +60,7 @@ public class OTPApplication extends Application {
             GeocoderResource.class,
             TimeGridWs.class,
             WebMapService.class,
-            Patcher.class,
+            AlertPatcher.class,
             Planner.class,
             SIsochrone.class,
             Routers.class,
@@ -78,8 +78,7 @@ public class OTPApplication extends Application {
         );
         // JerseyInjector
         // replace with simple Parameter classes that have String constructors.
-        // CRSStringReaderProvider.class,
-        // EnvelopeStringReaderProvider.class
+
     }
 
     @Override

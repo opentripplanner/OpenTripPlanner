@@ -21,16 +21,11 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.sun.jersey.api.spring.Autowire;
-
 /*import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;*/
 
 
 @Path("/municoder")
-@Autowire
 public class MunicoderServer {
 
     /* FIXME Spring config looked like this:
@@ -42,7 +37,7 @@ public class MunicoderServer {
 
      */
 
-    @Autowired
+    // FIXME inject context
     private BoundaryResolver boundaryResolver;
    
     public void setBoundaryResolver(BoundaryResolver boundaryResolver) {

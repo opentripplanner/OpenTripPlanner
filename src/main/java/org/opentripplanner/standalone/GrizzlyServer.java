@@ -68,7 +68,7 @@ public class GrizzlyServer {
         httpServer.getServerConfiguration().addHttpHandler(dynamicHandler, "/otp");
 
         /* 2. A static content server for the client JS apps etc. Now using classpath! */
-        HttpHandler staticHandler = new CLStaticHttpHandler(GrizzlyServer.class.getClassLoader());
+        HttpHandler staticHandler = new CLStaticHttpHandler(GrizzlyServer.class.getClassLoader(), "/");
         httpServer.getServerConfiguration().addHttpHandler(staticHandler, "/");
 
         /* 3. Test alternate method (no Jersey). */

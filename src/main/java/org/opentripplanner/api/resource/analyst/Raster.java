@@ -30,6 +30,8 @@ import org.opentripplanner.analyst.request.RenderRequest;
 import org.opentripplanner.analyst.request.Renderer;
 import org.opentripplanner.analyst.request.SPTRequest;
 import org.opentripplanner.analyst.request.TileRequest;
+import org.opentripplanner.api.parameter.CRSParameter;
+import org.opentripplanner.api.parameter.IsoTimeParameter;
 import org.opentripplanner.api.parameter.Layer;
 import org.opentripplanner.api.parameter.MIMEImageFormat;
 import org.opentripplanner.api.parameter.Style;
@@ -54,19 +56,19 @@ public class Raster {
            @QueryParam("width")  Integer width,  
            @QueryParam("height") Integer height,  
            @QueryParam("resolution") Double resolution,  
-           @QueryParam("time") GregorianCalendar time,
+           @QueryParam("time") IsoTimeParameter time,
            @QueryParam("format") @DefaultValue("image/geotiff") MIMEImageFormat format,
-           @QueryParam("crs") @DefaultValue("EPSG:4326") CoordinateReferenceSystem crs 
+           @QueryParam("crs") @DefaultValue("EPSG:4326") CRSParameter crs
            ) throws Exception {
         
         // BoundingBox is a subclass of Envelope, an Envelope2D constructor parameter
-        Envelope2D bbox = new Envelope2D(index.getBoundingBox(crs));
+        Envelope2D bbox = new Envelope2D(index.getBoundingBox(crs.crs));
         if (resolution != null) {
             width  = (int) Math.ceil(bbox.width  / resolution);
             height = (int) Math.ceil(bbox.height / resolution);
         }
         TileRequest tileRequest = new TileRequest(bbox, width, height);
-        SPTRequest sptRequest = new SPTRequest(x, y, time);
+        SPTRequest sptRequest = new SPTRequest(x, y, time.cal);
         RenderRequest renderRequest = new RenderRequest(format, Layer.TRAVELTIME, Style.GRAY, false, false);
 
         return null; //renderer.getResponse(tileRequest, sptRequest, null, renderRequest);

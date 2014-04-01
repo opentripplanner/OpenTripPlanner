@@ -259,7 +259,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
     private JLabel serviceIdLabel;
     
-    private RetryingPathServiceImpl pathservice = new RetryingPathServiceImpl();
+    private RetryingPathServiceImpl pathservice;
     
     private ShortestPathTreeFactory sptFactory = new DefaultShortestPathTreeFactory();
     
@@ -318,8 +318,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         this.graphService = graphService;
         this.graph = graphService.getGraph();
         sptService.setShortestPathTreeFactory(sptFactory);
-        pathservice.setGraphService(graphService);
-        pathservice.setSptService(sptService);
+        this.pathservice = new RetryingPathServiceImpl(graphService, sptService);
         setTitle("GraphVisualizer");
         
         init();

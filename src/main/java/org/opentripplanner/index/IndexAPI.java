@@ -54,14 +54,11 @@ import org.slf4j.LoggerFactory;
 
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Sets;
-import com.sun.jersey.api.core.InjectParam;
-import com.sun.jersey.api.spring.Autowire;
 import com.vividsolutions.jts.geom.Coordinate;
 
 /* NOTE that in a servlet, the full path is /ws/transit (see web_client.xml) */
 
 @Path("/index")
-@Autowire
 public class IndexAPI {
 
    private static final Logger LOG = LoggerFactory.getLogger(IndexAPI.class);
@@ -72,8 +69,8 @@ public class IndexAPI {
            
    private static final String MSG_404 = "FOUR ZERO FOUR";
    private static final String MSG_400 = "FOUR HUNDRED";
-   
-   @Setter @InjectParam 
+
+    @Context // FIXME inject Application
    private GraphService graphService;
 
    /* Needed to check whether query parameter map is empty, rather than chaining " && x == null"s */

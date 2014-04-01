@@ -31,7 +31,8 @@ import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.ws.rs.core.Context;
 
 public class RetryingPathServiceImpl implements PathService {
 
@@ -42,9 +43,13 @@ public class RetryingPathServiceImpl implements PathService {
 
     private static final double MAX_WALK_MULTIPLE = 16;
 
-    @Autowired
     private GraphService graphService;
-    @Autowired
+
+    public RetryingPathServiceImpl(GraphService graphService, SPTService sptService) {
+        this.graphService = graphService;
+        this.sptService = sptService;
+    }
+
     private SPTService sptService;
 
     private double firstPathTimeout = 0; // seconds

@@ -39,7 +39,7 @@ import org.opentripplanner.util.monitoring.MonitoringStore;
 import org.opentripplanner.util.monitoring.MonitoringStoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+
 /**
  * Implements a multi-objective goal-directed search algorithm like the one in Sec. 4.2 of: 
  * Perny and Spanjaard. Near Admissible Algorithms for Multiobjective Search.
@@ -65,10 +65,14 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author andrewbyrd
  */
-//@Component
+
 public class MultiObjectivePathServiceImpl implements PathService {
 
-    @Autowired public GraphService graphService;
+    public MultiObjectivePathServiceImpl(GraphService graphService) {
+        this.graphService = graphService;
+    }
+
+    public GraphService graphService;
 
     private static final Logger LOG = LoggerFactory.getLogger(MultiObjectivePathServiceImpl.class);
 

@@ -37,16 +37,18 @@ import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class TravelingSalesmanPathService implements PathService {
 
     private static final Logger LOG = LoggerFactory.getLogger(TravelingSalesmanPathService.class);
 
-    @Autowired
     public GraphService graphService;
 
-    @Autowired @Getter @Setter
+    public TravelingSalesmanPathService(GraphService graphService, PathService chainedPathService) {
+        this.graphService = graphService;
+        this.chainedPathService = chainedPathService;
+    }
+
     private PathService chainedPathService;
 
     @Override

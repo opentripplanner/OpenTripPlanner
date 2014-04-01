@@ -15,6 +15,8 @@ package org.opentripplanner.api.resource;
 
 import java.io.InputStream;
 
+import javax.annotation.security.PermitAll;
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -26,6 +28,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -41,11 +44,6 @@ import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.access.annotation.Secured;
-
-import com.sun.jersey.api.Responses;
-import com.sun.jersey.api.core.InjectParam;
-import com.sun.jersey.api.spring.Autowire;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
@@ -88,21 +86,20 @@ import com.vividsolutions.jts.geom.Geometry;
  * See documentation for individual methods for additional parameters.
  */
 @Path("/routers")
-@XmlRootElement
-@Autowire
+@PermitAll // exceptions on methods
 public class Routers {
 
     private static final Logger LOG = LoggerFactory.getLogger(Routers.class);
 
-    @InjectParam public GraphService graphService;
+    @Context // FIXME inject Application
+    public GraphService graphService;
     
     /** 
      * Returns a list of routers and their bounds. 
      * @return a representation of the graphs and their geographic bounds, in JSON or XML depending
      * on the Accept header in the HTTP request.
      */
-    @GET
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    @GET @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public RouterList getRouterIds()
             throws JSONException {
         RouterList routerList = new RouterList();
@@ -121,7 +118,7 @@ public class Routers {
         // factor out build one entry
         RouterInfo routerInfo = getRouterInfo(routerId);
         if (routerInfo == null)
-            throw new WebApplicationException(Responses.notFound()
+            throw new WebApplicationException(Response.status(Status.NOT_FOUND)
                     .entity("Graph id '" + routerId + "' not registered.\n").type("text/plain")
                     .build());
         return routerInfo;
@@ -146,7 +143,7 @@ public class Routers {
     /** 
      * Reload the graphs for all registered routerIds from disk.
      */
-    @Secured({ "ROLE_ROUTERS" })
+    @RolesAllowed({ "ROLE_ROUTERS" })
     @PUT @Produces({ MediaType.APPLICATION_JSON })
     public Response reloadGraphs(@QueryParam("path") String path, 
             @QueryParam("preEvict") @DefaultValue("true") boolean preEvict) {
@@ -159,9 +156,10 @@ public class Routers {
      * @param preEvict before reloading each graph, evict the existing graph. This will prevent 
      * memory usage from increasing during the reload, but routing will be unavailable on this 
      * routerId for the duration of the operation.
-     * @param upload read the graph from the PUT data stream instead of from disk.
+     *
+     *                FIXME @param upload read the graph from the PUT data stream instead of from disk.
      */
-    @Secured({ "ROLE_ROUTERS" })
+    @RolesAllowed({ "ROLE_ROUTERS" })
     @PUT @Path("{routerId}") @Produces({ MediaType.TEXT_PLAIN })
     public Response putGraphId(
             @PathParam("routerId") String routerId, 
@@ -182,7 +180,7 @@ public class Routers {
      * Deserialize a graph sent with the HTTP request as POST data, associating it with the given 
      * routerId.
      */
-    @Secured({ "ROLE_ROUTERS" })
+    @RolesAllowed({ "ROLE_ROUTERS" })
     @POST @Path("{routerId}") @Produces({ MediaType.TEXT_PLAIN })
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
     public Response postGraphOverWire (
@@ -209,7 +207,7 @@ public class Routers {
      * Save the graph data, but don't load it in memory. The file location is based on routerId.
      * If the graph already exists, the graph will be overwritten.
      */
-    @Secured({ "ROLE_ROUTERS" })
+    @RolesAllowed({ "ROLE_ROUTERS" })
     @POST @Path("/save") @Produces({ MediaType.TEXT_PLAIN })
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
     public Response saveGraphOverWire (
@@ -229,7 +227,7 @@ public class Routers {
     }
 
     /** De-register all registered routerIds, evicting them from memory. */
-    @Secured({ "ROLE_ROUTERS" })
+    @RolesAllowed({ "ROLE_ROUTERS" })
     @DELETE @Produces({ MediaType.TEXT_PLAIN })
     public Response deleteAll() {
         int nEvicted = graphService.evictAll();
@@ -242,7 +240,7 @@ public class Routers {
      * @return status code 200 if the routerId was de-registered, 
      * 404 if the routerId was not registered. 
      */
-    @Secured({ "ROLE_ROUTERS" })
+    @RolesAllowed({ "ROLE_ROUTERS" })
     @DELETE @Path("{routerId}") @Produces({ MediaType.TEXT_PLAIN })
     public Response deleteGraphId(@PathParam("routerId") String routerId) {
         boolean existed = graphService.evictGraph(routerId);

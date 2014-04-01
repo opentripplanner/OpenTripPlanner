@@ -116,6 +116,7 @@ public class OTPConfigurator {
                 graphService.setDefaultRouterId(params.routerIds.get(0));
                 graphService.setAutoRegister(params.routerIds);
             }
+            graphService.startup();
             this.graphService = graphService;
         }
     }

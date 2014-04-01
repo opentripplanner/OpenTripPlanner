@@ -36,24 +36,19 @@ import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
-import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.FileSystemResource;
 
 public class BatchProcessor {
 
     private static final Logger LOG = LoggerFactory.getLogger(BatchProcessor.class);
     private static final String EXAMPLE_CONTEXT = "batch-context.xml";
     
-    @Autowired private GraphService graphService;
-    @Autowired private SPTService sptService;
-    @Autowired private SampleFactory sampleFactory;
+    private GraphService graphService;
+    private SPTService sptService;
+    private SampleFactory sampleFactory;
 
-    @Resource private Population origins;
-    @Resource private Population destinations;
-    @Resource private RoutingRequest prototypeRoutingRequest;
+    @Setter private Population origins;
+    @Setter private Population destinations;
+    @Setter private RoutingRequest prototypeRoutingRequest;
 
     @Setter private Aggregator aggregator;
     @Setter private Accumulator accumulator;
@@ -86,7 +81,8 @@ public class BatchProcessor {
     public void setSearchCutoffMinutes(int minutes) {
         this.searchCutoffSeconds = minutes * 60;
     }
-    
+
+    /*
     public static void main(String[] args) throws IOException {
         org.springframework.core.io.Resource appContextResource;
         if( args.length == 0) {
@@ -107,6 +103,7 @@ public class BatchProcessor {
         else
             processor.run();
     }
+    */
 
     private void run() {
         origins.setup();

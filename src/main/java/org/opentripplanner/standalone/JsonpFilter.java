@@ -1,12 +1,15 @@
 package org.opentripplanner.standalone;
 
+import org.glassfish.jersey.server.ContainerResponse;
+import org.glassfish.jersey.server.spi.ContainerResponseWriter;
+
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.concurrent.TimeUnit;
 
-import com.sun.jersey.spi.container.ContainerRequest;
-import com.sun.jersey.spi.container.ContainerResponse;
-import com.sun.jersey.spi.container.ContainerResponseFilter;
-import com.sun.jersey.spi.container.ContainerResponseWriter;
+import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.container.ContainerResponseContext;
+import javax.ws.rs.container.ContainerResponseFilter;
 
 /**
  * The Same Origin Policy states that JavaScript code (or other scripts) running on a web page may
@@ -41,15 +44,17 @@ import com.sun.jersey.spi.container.ContainerResponseWriter;
 public class JsonpFilter implements ContainerResponseFilter {
 
     @Override
-    public ContainerResponse filter(ContainerRequest request, ContainerResponse response) {
-        String callback = request.getQueryParameters().getFirst("callback");
+    public void filter(ContainerRequestContext request, ContainerResponseContext response) throws IOException {
+
+        String callback = request.getUriInfo().getQueryParameters().getFirst("callback");
         if (callback != null) {
-            ContainerResponseWriter writer = response.getContainerResponseWriter();
-            response.setContainerResponseWriter(new JsonpResponseWriter(writer, callback));
+            //ContainerResponseWriter writer = response..getContainerResponseWriter();
+            //response.setContainerResponseWriter(new JsonpResponseWriter(writer, callback));
         }
-        return response;
+
     }
 
+    /*
     public static class JsonpResponseWriter implements ContainerResponseWriter {
 
         private ContainerResponseWriter writer;
@@ -79,5 +84,10 @@ public class JsonpFilter implements ContainerResponseFilter {
             writer.finish();
         }
 
+        @Override
+        public boolean suspend(long timeOut, TimeUnit timeUnit, TimeoutHandler timeoutHandler) {
+            return false;
+        }
     }
+    */
 }

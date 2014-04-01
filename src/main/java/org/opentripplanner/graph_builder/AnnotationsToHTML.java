@@ -21,6 +21,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+// TODO just write the annotations out to a log file in the first place.
 public class AnnotationsToHTML {
 
     private static Logger LOG = LoggerFactory.getLogger(AnnotationsToHTML .class); 

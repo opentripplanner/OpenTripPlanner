@@ -49,7 +49,6 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * This PathService is intended to provide faster response times when routing over longer
@@ -64,13 +63,15 @@ public class LongDistancePathService implements PathService {
 
     private static final Logger LOG = LoggerFactory.getLogger(LongDistancePathService.class);
 
-    @Autowired @Setter
     private GraphService graphService;
-    
-    @Autowired @Setter
     private SPTService sptService;
 
-    @Setter 
+    public LongDistancePathService(GraphService graphService, SPTService sptService) {
+        this.graphService = graphService;
+        this.sptService = sptService;
+    }
+
+    @Setter
     private double timeout = 0; // seconds
     
     @Override

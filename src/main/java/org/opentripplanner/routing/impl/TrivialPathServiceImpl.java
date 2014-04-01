@@ -22,15 +22,16 @@ import org.opentripplanner.routing.services.PathService;
 import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class TrivialPathServiceImpl implements PathService {
 
-    @Autowired
     GraphService graphService;
-
-    @Autowired
     SPTService sptService;
+
+    public TrivialPathServiceImpl(GraphService graphService, SPTService sptService) {
+        this.graphService = graphService;
+        this.sptService = sptService;
+    }
 
     @Override
     public List<GraphPath> getPaths(RoutingRequest options) {

@@ -32,6 +32,8 @@ import org.opentripplanner.analyst.request.RenderRequest;
 import org.opentripplanner.analyst.request.Renderer;
 import org.opentripplanner.analyst.request.TileRequest;
 import org.opentripplanner.api.common.RoutingResource;
+import org.opentripplanner.api.parameter.CRSParameter;
+import org.opentripplanner.api.parameter.EnvelopeParameter;
 import org.opentripplanner.api.parameter.Layer;
 import org.opentripplanner.api.parameter.LayerList;
 import org.opentripplanner.api.parameter.MIMEImageFormat;
@@ -42,16 +44,12 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.jersey.api.core.InjectParam;
-import com.sun.jersey.api.spring.Autowire;
-
 @Path("/routers/{routerId}/analyst/wms")
-@Autowire
 public class WebMapService extends RoutingResource {
     
     private static final Logger LOG = LoggerFactory.getLogger(WebMapService.class);
 
-    @InjectParam
+    @Context // FIXME inject Application
     private Renderer renderer;
     
     /** @param bbox order is minx,miny,maxx,maxy */
@@ -64,9 +62,9 @@ public class WebMapService extends RoutingResource {
            @QueryParam("layers")  @DefaultValue("traveltime")    LayerList layers, 
            @QueryParam("styles")  @DefaultValue("gray")          StyleList styles,
            // SRS is called CRS in 1.3.0
-           @QueryParam("srs")     @DefaultValue("EPSG:4326")     CoordinateReferenceSystem srs,
-           @QueryParam("crs")     CoordinateReferenceSystem crs,
-           @QueryParam("bbox")    Envelope2D bbox, 
+           @QueryParam("srs")     @DefaultValue("EPSG:4326")     CRSParameter srs,
+           @QueryParam("crs")                                    CRSParameter crs,
+           @QueryParam("bbox")                                   EnvelopeParameter bbox,
            @QueryParam("width")   @DefaultValue("256")           int width, 
            @QueryParam("height")  @DefaultValue("256")           int height, 
            @QueryParam("format")  @DefaultValue("image/png")     MIMEImageFormat format,
@@ -90,15 +88,15 @@ public class WebMapService extends RoutingResource {
         //bbox.setCoordinateReferenceSystem(srs);
         if (reproject) {
             LOG.info("reprojecting envelope from WGS84 to {}", srs);
-            ReferencedEnvelope renv = new ReferencedEnvelope(bbox, DefaultGeographicCRS.WGS84);
+            ReferencedEnvelope renv = new ReferencedEnvelope(bbox.env, DefaultGeographicCRS.WGS84);
             LOG.debug("WGS84 = {}", renv);
-            bbox = new Envelope2D(renv.transform(srs, false));
+            bbox.env = new Envelope2D(renv.transform(srs.crs, false));
             LOG.debug("reprojected envelope is {}", bbox);
         }
 
         if (resolution != null) {
-            width  = (int) Math.ceil(bbox.width  / resolution);
-            height = (int) Math.ceil(bbox.height / resolution);
+            width  = (int) Math.ceil(bbox.env.width  / resolution);
+            height = (int) Math.ceil(bbox.env.height / resolution);
             LOG.debug("resolution (pixel size) set to {} map units", resolution);
             LOG.debug("resulting raster dimensions are {}w x {}h", width, height);
         }
@@ -110,7 +108,7 @@ public class WebMapService extends RoutingResource {
         LOG.debug("layers = {}", layers);
         LOG.debug("styles = {}", styles);
         LOG.debug("version = {}", version);
-        LOG.debug("srs = {}", srs.getName());
+        LOG.debug("srs = {}", srs.crs.getName());
         LOG.debug("bbox = {}", bbox);
         LOG.debug("search time = {}", reqA.getDateTime());
         
@@ -125,7 +123,7 @@ public class WebMapService extends RoutingResource {
 //            sptRequestB = new SPTRequest(originLonB, originLatB, timeB);
 //        } 
 //        
-        TileRequest tileRequest = new TileRequest(bbox, width, height);
+        TileRequest tileRequest = new TileRequest(bbox.env, width, height);
         Layer layer = layers.get(0);
         Style style = styles.get(0);
         RenderRequest renderRequest = new RenderRequest(format, layer, style, transparent, timestamp);

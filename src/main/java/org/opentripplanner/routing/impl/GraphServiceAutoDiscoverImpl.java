@@ -32,13 +32,11 @@ import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
 
 /**
  * An implementation of the file-based GraphServiceFileImpl which auto-configure itself by scanning
  * the root resource directory.
  */
-@Scope("singleton")
 public class GraphServiceAutoDiscoverImpl implements GraphService {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphServiceAutoDiscoverImpl.class);

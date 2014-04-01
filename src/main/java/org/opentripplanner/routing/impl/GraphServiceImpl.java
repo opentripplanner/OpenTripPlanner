@@ -28,7 +28,6 @@ import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
 
 /**
  * The primary implementation of the GraphService interface. It can handle multiple graphs, each
@@ -39,7 +38,6 @@ import org.springframework.context.annotation.Scope;
  * 
  * @see GraphServiceFileImpl
  */
-@Scope("singleton")
 public class GraphServiceImpl implements GraphService {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphServiceImpl.class);
@@ -83,9 +81,7 @@ public class GraphServiceImpl implements GraphService {
      * graph file in a subdirectory of the resourceBase path. Also register and load the graph for
      * the defaultRouterId and warn if no routerIds are registered.
      */
-    @PostConstruct
-    // PostConstruct means run on startup after all injection has occurred
-    private void startup() {
+    public void startup() {
         if (autoRegister != null && !autoRegister.isEmpty()) {
             LOG.info("attempting to automatically register routerIds {}", autoRegister);
             LOG.info("graph files will be sought in paths relative to {}",
