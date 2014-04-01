@@ -26,28 +26,26 @@ import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.SPTService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 /**
  * Compute isochrones out of a shortest path tree request (AccSampling isoline algorithm).
  * 
  * @author laurent
  */
-@Component
 public class IsoChroneSPTRendererAccSampling implements IsoChroneSPTRenderer {
 
     private static final Logger LOG = LoggerFactory
             .getLogger(IsoChroneSPTRendererAccSampling.class);
 
-    @Autowired
     private GraphService graphService;
-
-    @Autowired
     private SPTService sptService;
-
-    @Autowired
     private SampleGridRenderer sampleGridRenderer;
+
+    public IsoChroneSPTRendererAccSampling(GraphService graphService, SPTService sptService, SampleGridRenderer sampleGridRenderer) {
+        this.graphService = graphService;
+        this.sptService = sptService;
+        this.sampleGridRenderer = sampleGridRenderer;
+    }
 
     /**
      * @param isoChroneRequest

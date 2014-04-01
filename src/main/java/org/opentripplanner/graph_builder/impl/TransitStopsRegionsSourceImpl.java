@@ -22,7 +22,6 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -36,8 +35,9 @@ public class TransitStopsRegionsSourceImpl implements RegionsSource {
 
     private static final double METERS_PER_DEGREE_LAT = 111111;
     private double distance = 2000;
-    
-    @Autowired GraphBuilderTask task;
+
+    // FIXME replace autowiring
+    GraphBuilderTask task;
     
     public void setDistance(double distance) {
         this.distance = distance;

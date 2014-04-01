@@ -33,8 +33,6 @@ import org.opentripplanner.routing.spt.SPTWalker.SPTVisitor;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -50,16 +48,17 @@ import com.vividsolutions.jts.geom.Coordinate;
  * 
  * @author laurent
  */
-@Component
 public class SampleGridRenderer {
 
     private static final Logger LOG = LoggerFactory.getLogger(SampleGridRenderer.class);
 
-    @Autowired
     private GraphService graphService;
-
-    @Autowired
     private SPTService sptService;
+
+    public SampleGridRenderer(GraphService graphService, SPTService sptService) {
+        this.graphService = graphService;
+        this.sptService = sptService;
+    }
 
     /**
      * @param spgRequest

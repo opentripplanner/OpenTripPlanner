@@ -21,7 +21,6 @@ import org.opentripplanner.analyst.core.TemplateTile;
 import org.opentripplanner.analyst.core.Tile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -33,27 +32,20 @@ public class TileCache extends CacheLoader<TileRequest, Tile>
     
     private static final Logger LOG = LoggerFactory.getLogger(TileCache.class);
 
-    @Autowired
     private SampleFactory sampleFactory;
-    
-//    @Autowired
-//    private HashGridSampler hashSampler;
-//
-//    @Autowired
-//    private SampleCache sampleCache;
 
-    private LoadingCache<TileRequest, Tile> tileCache;
-    @Setter private int size = 200;
-    @Setter private int concurrency = 16;
-            
-    @PostConstruct
-    private void runAfterInjection() {
+    public TileCache(SampleFactory sampleFactory) {
+        this.sampleFactory = sampleFactory;
         this.tileCache = CacheBuilder.newBuilder()
                 .concurrencyLevel(concurrency)
                 .maximumSize(size)
                 .build(this);
     }
-    
+
+    private LoadingCache<TileRequest, Tile> tileCache;
+    @Setter private int size = 200;
+    @Setter private int concurrency = 16;
+
     @Override
     /** completes the abstract CacheLoader superclass */
     public Tile load(TileRequest req) throws Exception {

@@ -4,13 +4,14 @@ import java.util.HashMap;
 
 import org.opentripplanner.api.resource.GraphMetadata;
 import org.opentripplanner.routing.services.GraphService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-@Component
 public class MetadataService {
-    @Autowired
+
     private GraphService graphService;
+
+    public MetadataService(GraphService graphService) {
+        this.graphService = graphService;
+    }
 
     HashMap<String, GraphMetadata> metadata = new HashMap<String, GraphMetadata>();
     

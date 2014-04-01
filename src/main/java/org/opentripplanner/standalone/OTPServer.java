@@ -2,6 +2,7 @@ package org.opentripplanner.standalone;
 
 import com.google.common.collect.Maps;
 import org.opentripplanner.analyst.core.GeometryIndex;
+import org.opentripplanner.analyst.request.IsoChroneSPTRenderer;
 import org.opentripplanner.analyst.request.IsoChroneSPTRendererAccSampling;
 import org.opentripplanner.analyst.request.IsoChroneSPTRendererRecursiveGrid;
 import org.opentripplanner.analyst.request.Renderer;
@@ -38,8 +39,7 @@ public class OTPServer {
     protected TileCache tileCache;
     protected GeometryIndex geometryIndex;
     protected SampleFactory sampleFactory;
-    protected IsoChroneSPTRendererAccSampling isoChroneSPTRendererAccSampling;
-    protected IsoChroneSPTRendererRecursiveGrid isoChroneSPTRendererRecursiveGrid;
+    protected IsoChroneSPTRenderer isoChroneSPTRenderer;
     protected SampleGridRenderer sampleGridRenderer;
 
     public Router getRouter(String routerId) {

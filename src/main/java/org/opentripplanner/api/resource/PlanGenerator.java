@@ -70,25 +70,26 @@ import org.opentripplanner.routing.vertextype.TransitVertex;
 import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Service;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 
-@Service @Scope("singleton")
 public class PlanGenerator {
 
     private static final Logger LOG = LoggerFactory.getLogger(PlanGenerator.class);
 
     private static final double MAX_ZAG_DISTANCE = 30;
 
-    @Autowired public PathService pathService;
-    @Autowired public GraphService graphService;
-    
+    public PathService pathService;
+    public GraphService graphService;
+
+    public PlanGenerator(GraphService graphService, PathService pathService) {
+        this.graphService = graphService;
+        this.pathService = pathService;
+    }
+
     /** Generates a TripPlan from a Request */
     public TripPlan generate(RoutingRequest options) {
 

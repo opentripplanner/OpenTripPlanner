@@ -23,20 +23,20 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.CoordinateSequence;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.LineString;
 
-@Component
 public class SampleFactory implements SampleSource {
 
     private static DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
-    @Autowired
+    public SampleFactory(GeometryIndex index) {
+        this.index = index;
+    }
+
     private GeometryIndex index;
 
     private double searchRadiusM;

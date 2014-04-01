@@ -29,7 +29,6 @@ import org.opentripplanner.graph_builder.services.ned.NEDTileSource;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * A coverage factory that works off of the NED caches from {@link NEDDownloader}.
@@ -59,7 +58,7 @@ public class NEDGridCoverageFactoryImpl implements NEDGridCoverageFactory {
         this.cacheDirectory = cacheDirectory;
     }
 
-    @Autowired(required=false)
+    // FIXME replace Autowiring
     public void setTileSource(NEDTileSource source) {
         this.tileSource = source;
     }

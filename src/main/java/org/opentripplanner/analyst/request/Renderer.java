@@ -30,21 +30,20 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-@Component
 public class Renderer {
 
     private static final Logger LOG = LoggerFactory.getLogger(Renderer.class);
 
-    @Autowired
     private TileCache tileCache;
-
-    @Autowired
     private SPTCache sptCache;
 
-    public Response getResponse (TileRequest tileRequest, 
+    public Renderer(TileCache tileCache, SPTCache sptCache) {
+        this.tileCache = tileCache;
+        this.sptCache = sptCache;
+    }
+
+    public Response getResponse (TileRequest tileRequest,
             RoutingRequest sptRequestA, RoutingRequest sptRequestB, 
             RenderRequest renderRequest) throws Exception {
 

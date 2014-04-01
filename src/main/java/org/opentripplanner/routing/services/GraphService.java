@@ -19,7 +19,6 @@ import java.util.Collection;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Service classes that need access to core graph objects like {@link Graph},

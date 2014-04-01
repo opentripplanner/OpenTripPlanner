@@ -31,8 +31,6 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
@@ -41,20 +39,20 @@ import com.vividsolutions.jts.geom.Coordinate;
  * 
  * @author laurent
  */
-@Component
 public class IsoChroneSPTRendererRecursiveGrid implements IsoChroneSPTRenderer {
 
     private static final Logger LOG = LoggerFactory
             .getLogger(IsoChroneSPTRendererRecursiveGrid.class);
 
-    @Autowired
     private GraphService graphService;
-
-    @Autowired
     private SPTService sptService;
-
-    @Autowired
     private SampleSource sampleSource;
+
+    public IsoChroneSPTRendererRecursiveGrid(GraphService graphService, SPTService sptService, SampleSource sampleSource) {
+        this.graphService = graphService;
+        this.sptService = sptService;
+        this.sampleSource = sampleSource;
+    }
 
     /**
      * @param isoChroneRequest

@@ -34,7 +34,6 @@ import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.collect.Maps;
 import com.vividsolutions.jts.geom.Envelope;
@@ -50,14 +49,13 @@ public class GeometryIndex implements GeometryIndexService {
     private static final Logger LOG = LoggerFactory.getLogger(GeometryIndex.class);
     private static final double SEARCH_RADIUS_M = 100; // meters
     private static final double SEARCH_RADIUS_DEG = SphericalDistanceLibrary.metersToDegrees(SEARCH_RADIUS_M);
-    
-    @Autowired @Setter
+
     GraphService graphService;
     
     private STRtree pedestrianIndex;
-    
-    @PostConstruct
-    public void initialzeComponent() {
+
+    public GeometryIndex(GraphService graphService) {
+        this.graphService = graphService;
         Graph graph = graphService.getGraph();
         if (graph == null) { // analyst currently depends on there being a single default graph
             String message = "Could not retrieve default Graph from GraphService. Check its configuration.";
