@@ -6,6 +6,7 @@ buildscript {
     dependencies { classpath 'com.github.jengelman.gradle.plugins:shadow:0.8' }
 }
 
+apply plugin: 'eclipse'
 apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'shadow'
@@ -21,6 +22,12 @@ jar {
     }
 }
 
+eclipse {
+    classpath {
+        downloadSources=true
+    }
+}
+
 repositories {
     // place this repo first, because of license issues on jai_core
     maven { url 'http://download.osgeo.org/webdav/geotools' }
@@ -32,8 +39,10 @@ repositories {
     maven { url "http://download.java.net/maven/2" }
 }
 
-def spring_version = "3.0.5.RELEASE"
-def jersey_version = "1.18"
+ext {
+    spring_version = "3.0.5.RELEASE"
+    jersey_version = "1.18"
+}
 
 dependencies {
 
