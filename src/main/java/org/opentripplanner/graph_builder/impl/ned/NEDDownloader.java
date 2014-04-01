@@ -55,7 +55,6 @@ import org.opentripplanner.openstreetmap.impl.OSMDownloader;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -68,7 +67,6 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author novalis
  *
  */
-@Component
 public class NEDDownloader implements NEDTileSource {
 
     private static Logger log = LoggerFactory.getLogger(NEDDownloader.class);

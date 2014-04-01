@@ -23,8 +23,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.CacheControl;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
+import org.glassfish.jersey.internal.util.Base64;
 import org.opentripplanner.analyst.request.SampleGridRenderer;
 import org.opentripplanner.analyst.request.SampleGridRenderer.WTWD;
 import org.opentripplanner.analyst.request.SampleGridRequest;
@@ -42,9 +44,6 @@ import ar.com.hjg.pngj.ImageLineInt;
 import ar.com.hjg.pngj.PngWriter;
 import ar.com.hjg.pngj.chunks.PngChunkTEXT;
 import ar.com.hjg.pngj.chunks.PngChunkTextVar;
-
-import com.sun.jersey.api.core.InjectParam;
-import com.sun.jersey.core.util.Base64;
 
 /**
  * Return a grid with time for a set of points.
@@ -69,7 +68,7 @@ public class TimeGridWs extends RoutingResource {
     @SuppressWarnings("unused")
     private static final Logger LOG = LoggerFactory.getLogger(TimeGridWs.class);
 
-    @InjectParam
+    @Context // FIXME use Application injection
     private SampleGridRenderer sampleGridRenderer;
 
     @QueryParam("maxTimeSec")

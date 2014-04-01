@@ -19,6 +19,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 import org.geotools.geometry.Envelope2D;
@@ -36,15 +37,13 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.jersey.api.core.InjectParam;
-
 // removed component, mixing spring and jersey annotations is bad?
 @Path("/routers/{routerId}/analyst/tile/{z}/{x}/{y}.png")
 public class TileService extends RoutingResource {
     
     private static final Logger LOG = LoggerFactory.getLogger(TileService.class);
 
-    @InjectParam
+    @Context // FIXME inject Application context
     private Renderer renderer;
 
     @PathParam("x") int x; 

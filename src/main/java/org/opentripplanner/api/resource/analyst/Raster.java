@@ -20,6 +20,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 import org.geotools.geometry.Envelope2D;
@@ -34,22 +35,16 @@ import org.opentripplanner.api.parameter.MIMEImageFormat;
 import org.opentripplanner.api.parameter.Style;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
-
-import com.sun.jersey.api.core.InjectParam;
 
 @Path("/routers/{routerId}/analyst/raster")
-@Component
-@Scope("request")
 public class Raster {
     
     private static final Logger LOG = LoggerFactory.getLogger(Raster.class);
 
-    @InjectParam
+    @Context // FIXME inject Application context
     private GeometryIndex index;
 
-    @InjectParam
+    @Context // FIXME inject Application context
     private Renderer renderer;
     
     @GET @Produces("image/*")

@@ -17,7 +17,6 @@ import java.io.File;
 import java.util.List;
 
 import org.opentripplanner.routing.graph.Graph;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * A source of NED tiles for NEDGridCoverageFactoryImpl -- maybe the USGS streaming
@@ -27,7 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public interface NEDTileSource {
 
-    @Autowired
+    // FIXME replace autowiring
     public abstract void setGraph(Graph graph);
 
     /**

@@ -19,22 +19,18 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jettison.json.JSONException;
 import org.opentripplanner.api.resource.services.MetadataService;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import com.sun.jersey.api.core.InjectParam;
-import com.sun.jersey.api.spring.Autowire;
 
 @Path("/routers/{routerId}/metadata")
 @XmlRootElement
-@Autowire
 public class Metadata {
 
-    @InjectParam
+    @Context // FIXME inject Application context
     private MetadataService metadataService;
     
     /**

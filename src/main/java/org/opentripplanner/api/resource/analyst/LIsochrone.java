@@ -28,6 +28,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.CacheControl;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
@@ -54,7 +55,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.io.Files;
-import com.sun.jersey.api.core.InjectParam;
 import com.vividsolutions.jts.geom.MultiPolygon;
 
 /**
@@ -73,10 +73,10 @@ public class LIsochrone extends RoutingResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(LIsochrone.class);
 
-    @InjectParam
+    @Context // FIXME inject Application context
     private IsoChroneSPTRendererAccSampling accSamplingRenderer;
 
-    @InjectParam
+    @Context // FIXME inject Application context
     private IsoChroneSPTRendererRecursiveGrid recursiveGridRenderer;
 
     @QueryParam("cutoffSec")

@@ -15,6 +15,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -41,10 +42,8 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.util.GeoJSONBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.collect.Maps;
-import com.sun.jersey.api.spring.Autowire;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
@@ -60,7 +59,6 @@ import com.vividsolutions.jts.linearref.LengthIndexedLine;
  */
 @Path("/routers/{routerId}/isochroneOld")
 @XmlRootElement
-@Autowire
 public class SIsochrone extends RoutingResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(SIsochrone.class);
@@ -77,13 +75,13 @@ public class SIsochrone extends RoutingResource {
 
     private List tooFastTraversedEdgeGeoms = null;
 
-    @Autowired
+    @Context // FIXME inject Application context
     GraphService graphService;
 
-    @Autowired
+    @Context // FIXME inject Application context
     private SPTService sptService;
 
-    @Autowired
+    @Context // FIXME inject Application context
     private GeometryIndex index;
 
     /** Walkspeed between user indicated position and road 3000 m/h = 0.83333 m/sec */

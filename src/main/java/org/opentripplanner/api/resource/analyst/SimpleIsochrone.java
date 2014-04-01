@@ -33,6 +33,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 
@@ -71,7 +72,6 @@ import com.beust.jcommander.internal.Maps;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.io.Files;
-import com.sun.jersey.api.spring.Autowire;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
@@ -94,10 +94,10 @@ import com.vividsolutions.jts.geom.Point;
  * Jersey.
  */
 @Path("/routers/{routerId}/simpleIsochrone")
-@Autowire
 public class SimpleIsochrone extends RoutingResource {
     
     private static final Logger LOG = LoggerFactory.getLogger(SimpleIsochrone.class);
+
     private static final SPTService sptService = new EarliestArrivalSPTService();
 
     /* Parameters shared between all methods. */
