@@ -40,7 +40,6 @@ repositories {
 }
 
 ext {
-    spring_version = "3.0.5.RELEASE"
     jersey_version = "1.18"
 }
 
@@ -96,17 +95,6 @@ dependencies {
         'org.geotools:gt-geotiff:9.2',
         'org.geotools:gt-referencing:9.2',
         'org.geotools:gt-shapefile:9.2',
-
-        "org.springframework:spring-aop:$spring_version",
-        "org.springframework:spring-beans:$spring_version",
-        "org.springframework:spring-context:$spring_version",
-        "org.springframework:spring-core:$spring_version",
-        "org.springframework:spring-jdbc:$spring_version",
-        "org.springframework:spring-orm:$spring_version",
-        "org.springframework:spring-web:$spring_version",
-        "org.springframework.security:spring-security-config:$spring_version",
-        "org.springframework.security:spring-security-core:$spring_version",
-        "org.springframework.security:spring-security-web:$spring_version",
 
         'org.jeromq:jeromq:0.2.0',
         'org.onebusaway:onebusaway-gtfs:1.3.3',

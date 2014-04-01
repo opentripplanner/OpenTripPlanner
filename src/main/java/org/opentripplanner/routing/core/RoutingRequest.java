@@ -27,6 +27,7 @@ import java.util.TimeZone;
 import lombok.Getter;
 import lombok.Setter;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
@@ -41,7 +42,6 @@ import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.ObjectUtils;
 
 /**
  * A trip planning request. Some parameters may not be honored by the trip planner for some or all itineraries. For example, maxWalkDistance may be
@@ -803,7 +803,6 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
     }
 
-    /** @param finalTime in seconds since the epoch */
     public RoutingRequest reversedClone() {
         RoutingRequest ret = this.clone();
         ret.setArriveBy(!ret.isArriveBy());
@@ -932,7 +931,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && reverseOptimizeOnTheFly == other.reverseOptimizeOnTheFly
                 && ignoreRealtimeUpdates == other.ignoreRealtimeUpdates
                 && disableRemainingWeightHeuristic == other.disableRemainingWeightHeuristic
-                && ObjectUtils.nullSafeEquals(startingTransitTripId, other.startingTransitTripId);
+                && ObjectUtils.equals(startingTransitTripId, other.startingTransitTripId);
     }
 
     /**
