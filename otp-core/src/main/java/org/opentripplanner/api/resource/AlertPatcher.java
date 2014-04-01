@@ -36,7 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.sun.jersey.api.spring.Autowire;
 
-// NOTE - /ws/patch is the full path -- see web.xml
+// NOTE - /ws/patch is the full path -- see web_client.xml
 
 @Path("/patch")
 @XmlRootElement

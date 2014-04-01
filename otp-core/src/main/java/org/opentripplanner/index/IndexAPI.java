@@ -58,7 +58,7 @@ import com.sun.jersey.api.core.InjectParam;
 import com.sun.jersey.api.spring.Autowire;
 import com.vividsolutions.jts.geom.Coordinate;
 
-/* NOTE that in a servlet, the full path is /ws/transit (see web.xml) */
+/* NOTE that in a servlet, the full path is /ws/transit (see web_client.xml) */
 
 @Path("/index")
 @Autowire
