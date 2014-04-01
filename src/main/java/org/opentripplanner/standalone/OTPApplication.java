@@ -1,9 +1,12 @@
 package org.opentripplanner.standalone;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ApplicationHandler;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.server.ServerProperties;
 import org.opentripplanner.api.model.OTPObjectMapperProvider;
 import org.opentripplanner.api.resource.BikeRental;
 import org.opentripplanner.api.resource.GeocoderResource;
@@ -27,6 +30,8 @@ import javax.ws.rs.core.Application;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -66,13 +71,25 @@ public class OTPApplication extends Application {
             SimpleIsochrone.class,
             ServerInfo.class,
             // Enable Jackson JSON and XML serialization
-            OTPObjectMapperProvider.class
+            OTPObjectMapperProvider.class,
+            // Filters
+            AuthFilter.class,
+            JsonpFilter.class
         );
-
         // JerseyInjector
         // replace with simple Parameter classes that have String constructors.
         // CRSStringReaderProvider.class,
         // EnvelopeStringReaderProvider.class
+    }
+
+    @Override
+    public Map<String, Object> getProperties() {
+        Map props = Maps.newHashMap();
+        props.put(ServerProperties.TRACING, Boolean.TRUE);
+        /* Register a custom authentication filter and a filter that wraps JSON in method calls as needed. */
+        // props.put(org.glassfish.jersey.server PROPERTY_CONTAINER_REQUEST_FILTERS, Arrays.asList());
+        // props.put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS, Arrays.asList(JsonpFilter.class));
+        return props;
     }
 
     static {
