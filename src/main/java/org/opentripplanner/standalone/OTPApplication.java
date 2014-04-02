@@ -84,13 +84,13 @@ public class OTPApplication extends Application {
      * Like getClasses, this method declares web resources, providers, and features to the JAX-RS implementation.
      * However, these are single instances that will be reused for all requests (they are singleton-scoped).
      *
-     * Leave <Object> out of type signature to avoid confusing type inference.
+     * Leave <Object> out of type signature to avoid confusing the Guava type inference.
      */
     @Override
     public Set getSingletons() {
         return Sets.newHashSet (
             new OTPObjectMapperProvider(),
-            server.new Binder()
+            server.makeBinder()
         );
     }
 

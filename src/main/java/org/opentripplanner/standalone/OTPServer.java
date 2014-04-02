@@ -96,16 +96,18 @@ public class OTPServer {
     }
 
     /**
-     * Inner class that binds an OTPServer instance (using HK2), so OTPServer can be injected into Jersey resources.
-     * This should be registered in the ResourceConfig (Jersey) or Application (JAX-RS), as a singleton.
-     * On custom injection in Jersey 2:
+     * Return an HK2 Binder that injects this specific OTPServer instance into Jersey web resources.
+     * This should be registered in the ResourceConfig (Jersey) or Application (JAX-RS) as a singleton.
+     * More on custom injection in Jersey 2:
      * http://jersey.576304.n2.nabble.com/Custom-providers-in-Jersey-2-tp7580699p7580715.html
      */
-     public class Binder extends AbstractBinder {
-        @Override
-        protected void configure() {
-            bind(OTPServer.this).to(OTPServer.class);
-        }
+     public AbstractBinder makeBinder() {
+        return new AbstractBinder() {
+            @Override
+            protected void configure() {
+                bind(OTPServer.this).to(OTPServer.class);
+            }
+        };
     }
 
 }
