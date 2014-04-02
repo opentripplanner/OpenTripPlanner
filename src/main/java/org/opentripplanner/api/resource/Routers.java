@@ -17,6 +17,7 @@ import java.io.InputStream;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -28,6 +29,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -42,6 +44,8 @@ import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.services.GraphService;
+import org.opentripplanner.standalone.OTPApplication;
+import org.opentripplanner.standalone.OTPServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.vividsolutions.jts.geom.Geometry;
@@ -91,9 +95,8 @@ public class Routers {
 
     private static final Logger LOG = LoggerFactory.getLogger(Routers.class);
 
-    @Context // FIXME inject Application
-    public GraphService graphService;
-    
+    @Inject OTPServer server;
+
     /** 
      * Returns a list of routers and their bounds. 
      * @return a representation of the graphs and their geographic bounds, in JSON or XML depending
@@ -103,7 +106,7 @@ public class Routers {
     public RouterList getRouterIds()
             throws JSONException {
         RouterList routerList = new RouterList();
-        for (String id : graphService.getRouterIds()) {
+        for (String id : server.graphService.getRouterIds()) {
             routerList.routerInfo.add(getRouterInfo(id));
         }
         return routerList;
@@ -125,7 +128,7 @@ public class Routers {
     }
     
     private RouterInfo getRouterInfo(String routerId) {
-        Graph graph = graphService.getGraph(routerId);
+        Graph graph = server.graphService.getGraph(routerId);
         if (graph == null)
             return null;
         RouterInfo routerInfo = new RouterInfo();
@@ -147,7 +150,7 @@ public class Routers {
     @PUT @Produces({ MediaType.APPLICATION_JSON })
     public Response reloadGraphs(@QueryParam("path") String path, 
             @QueryParam("preEvict") @DefaultValue("true") boolean preEvict) {
-        graphService.reloadGraphs(preEvict);
+        server.graphService.reloadGraphs(preEvict);
         return Response.status(Status.OK).build();
     }
 
@@ -166,10 +169,10 @@ public class Routers {
             @QueryParam("preEvict") @DefaultValue("true") boolean preEvict) {
         if (preEvict) {
             LOG.debug("pre-evicting graph");
-            graphService.evictGraph(routerId);
+            server.graphService.evictGraph(routerId);
         }
         LOG.debug("attempting to load graph from server's local filsystem.\n");
-        boolean success = graphService.registerGraph(routerId, preEvict);
+        boolean success = server.graphService.registerGraph(routerId, preEvict);
         if (success)
             return Response.status(201).entity("graph registered.\n").build();
         else
@@ -190,13 +193,13 @@ public class Routers {
             InputStream is) {
         if (preEvict) {
             LOG.debug("pre-evicting graph");
-            graphService.evictGraph(routerId);
+            server.graphService.evictGraph(routerId);
         }
         LOG.debug("deserializing graph from POST data stream...");
         Graph graph;
         try {
             graph = Graph.load(is, level);
-            graphService.registerGraph(routerId, graph);
+            server.graphService.registerGraph(routerId, graph);
             return Response.status(Status.CREATED).entity(graph.toString() + "\n").build();
         } catch (Exception e) {
             return Response.status(Status.BAD_REQUEST).entity(e.toString() + "\n").build();
@@ -215,7 +218,7 @@ public class Routers {
             InputStream is) {
         LOG.debug("save graph from POST data stream...");
         try {
-        	boolean success = graphService.save(routerId, is);
+        	boolean success = server.graphService.save(routerId, is);
         	if (success) {
         		return Response.status(201).entity("graph saved.\n").build();
         	} else {
@@ -230,7 +233,7 @@ public class Routers {
     @RolesAllowed({ "ROLE_ROUTERS" })
     @DELETE @Produces({ MediaType.TEXT_PLAIN })
     public Response deleteAll() {
-        int nEvicted = graphService.evictAll();
+        int nEvicted = server.graphService.evictAll();
         String message = String.format("%d graphs evicted.\n", nEvicted);
         return Response.status(200).entity(message).build();
     }
@@ -243,7 +246,7 @@ public class Routers {
     @RolesAllowed({ "ROLE_ROUTERS" })
     @DELETE @Path("{routerId}") @Produces({ MediaType.TEXT_PLAIN })
     public Response deleteGraphId(@PathParam("routerId") String routerId) {
-        boolean existed = graphService.evictGraph(routerId);
+        boolean existed = server.graphService.evictGraph(routerId);
         if (existed)
             return Response.status(200).entity("graph evicted.\n").build();
         else

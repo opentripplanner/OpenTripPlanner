@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone;
 
 import com.google.common.collect.Maps;
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.opentripplanner.analyst.core.GeometryIndex;
 import org.opentripplanner.analyst.request.IsoChroneSPTRenderer;
 import org.opentripplanner.analyst.request.IsoChroneSPTRendererAccSampling;
@@ -22,6 +23,7 @@ import org.opentripplanner.routing.services.SPTService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.ext.Provider;
 import java.util.Map;
 
 /**
@@ -91,6 +93,19 @@ public class OTPServer {
             isoChroneSPTRenderer = new IsoChroneSPTRendererAccSampling(graphService, sptService, sampleGridRenderer);
         }
 
+    }
+
+    /**
+     * Inner class that binds an OTPServer instance (using HK2), so OTPServer can be injected into Jersey resources.
+     * This should be registered in the ResourceConfig (Jersey) or Application (JAX-RS), as a singleton.
+     * On custom injection in Jersey 2:
+     * http://jersey.576304.n2.nabble.com/Custom-providers-in-Jersey-2-tp7580699p7580715.html
+     */
+     public class Binder extends AbstractBinder {
+        @Override
+        protected void configure() {
+            bind(OTPServer.this).to(OTPServer.class);
+        }
     }
 
 }

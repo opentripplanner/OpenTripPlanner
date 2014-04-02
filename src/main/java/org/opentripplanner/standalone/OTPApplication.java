@@ -2,10 +2,6 @@ package org.opentripplanner.standalone;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.glassfish.grizzly.http.server.HttpServer;
-import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
-import org.glassfish.jersey.server.ApplicationHandler;
-import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.opentripplanner.api.model.OTPObjectMapperProvider;
 import org.opentripplanner.api.resource.AlertPatcher;
@@ -27,15 +23,16 @@ import org.opentripplanner.api.resource.analyst.WebMapService;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import javax.ws.rs.core.Application;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * A Jersey Application subclass which provides hard-wired configuration of an OTP server. Avoids injection of any kind.
+ * A JAX-RS Application subclass which provides hard-wired configuration of an OTP server. Avoids injection of any kind.
+ *
+ * Jersey has its own ResourceConfig class which is a subclass of Application. It seems that we can get away with
+ * not using any Jersey-specific functionality and stick with stock JAX-RS.
+ * https://jersey.java.net/apidocs/latest/jersey/javax/ws/rs/core/Application.html#getSingletons()
+ *
  */
 public class OTPApplication extends Application {
 
@@ -46,7 +43,11 @@ public class OTPApplication extends Application {
     }
 
     /**
-     * This method tells Jersey which classes define web resources, and which features it should enable.
+     * This method registers classes with Jersey to define web resources and enable custom features.
+     * These are classes (not instances) that will be instantiated by Jersey for each request (they are request-scoped).
+     * Types that have been confirmed to work are: annotated resources, ContextResolver<ObjectMapper> implementation,
+     * ContainerResponseFilter and ContainerRequestFilter.
+     * Note that the listed classes do not need to be annotated with @Provider -- that is for scanning config.
      */
     @Override
     public Set<Class<?>> getClasses() {
@@ -71,14 +72,26 @@ public class OTPApplication extends Application {
             SimpleIsochrone.class,
             ServerInfo.class,
             // Enable Jackson JSON and XML serialization
-            OTPObjectMapperProvider.class,
+            // OTPObjectMapperProvider.class,
             // Filters -- confirmed, these are picked up by Jersey.
             AuthFilter.class,
             JsonpFilter.class
         );
         // JerseyInjector
-        // replace with simple Parameter classes that have String constructors.
+    }
 
+    /**
+     * Like getClasses, this method declares web resources, providers, and features to the JAX-RS implementation.
+     * However, these are single instances that will be reused for all requests (they are singleton-scoped).
+     *
+     * Leave <Object> out of type signature to avoid confusing type inference.
+     */
+    @Override
+    public Set getSingletons() {
+        return Sets.newHashSet (
+            new OTPObjectMapperProvider(),
+            server.new Binder()
+        );
     }
 
     @Override
