@@ -34,6 +34,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.SecurityContext;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jettison.json.JSONException;
@@ -97,6 +98,8 @@ public class Routers {
 
     @Inject OTPServer server;
 
+    @Context SecurityContext sctx;
+
     /** 
      * Returns a list of routers and their bounds. 
      * @return a representation of the graphs and their geographic bounds, in JSON or XML depending
@@ -146,7 +149,7 @@ public class Routers {
     /** 
      * Reload the graphs for all registered routerIds from disk.
      */
-    @RolesAllowed({ "ROLE_ROUTERS" })
+    @RolesAllowed({ "ROUTERS" })
     @PUT @Produces({ MediaType.APPLICATION_JSON })
     public Response reloadGraphs(@QueryParam("path") String path, 
             @QueryParam("preEvict") @DefaultValue("true") boolean preEvict) {
@@ -162,7 +165,7 @@ public class Routers {
      *
      *                FIXME @param upload read the graph from the PUT data stream instead of from disk.
      */
-    @RolesAllowed({ "ROLE_ROUTERS" })
+    @RolesAllowed({ "ROUTERS" })
     @PUT @Path("{routerId}") @Produces({ MediaType.TEXT_PLAIN })
     public Response putGraphId(
             @PathParam("routerId") String routerId, 
@@ -183,7 +186,7 @@ public class Routers {
      * Deserialize a graph sent with the HTTP request as POST data, associating it with the given 
      * routerId.
      */
-    @RolesAllowed({ "ROLE_ROUTERS" })
+    @RolesAllowed({ "ROUTERS" })
     @POST @Path("{routerId}") @Produces({ MediaType.TEXT_PLAIN })
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
     public Response postGraphOverWire (
@@ -210,7 +213,7 @@ public class Routers {
      * Save the graph data, but don't load it in memory. The file location is based on routerId.
      * If the graph already exists, the graph will be overwritten.
      */
-    @RolesAllowed({ "ROLE_ROUTERS" })
+    @RolesAllowed({ "ROUTERS" })
     @POST @Path("/save") @Produces({ MediaType.TEXT_PLAIN })
     @Consumes(MediaType.APPLICATION_OCTET_STREAM)
     public Response saveGraphOverWire (
@@ -230,7 +233,7 @@ public class Routers {
     }
 
     /** De-register all registered routerIds, evicting them from memory. */
-    @RolesAllowed({ "ROLE_ROUTERS" })
+    @RolesAllowed({ "ROUTERS" })
     @DELETE @Produces({ MediaType.TEXT_PLAIN })
     public Response deleteAll() {
         int nEvicted = server.graphService.evictAll();
@@ -243,7 +246,7 @@ public class Routers {
      * @return status code 200 if the routerId was de-registered, 
      * 404 if the routerId was not registered. 
      */
-    @RolesAllowed({ "ROLE_ROUTERS" })
+    @RolesAllowed({ "ROUTERS" })
     @DELETE @Path("{routerId}") @Produces({ MediaType.TEXT_PLAIN })
     public Response deleteGraphId(@PathParam("routerId") String routerId) {
         boolean existed = server.graphService.evictGraph(routerId);

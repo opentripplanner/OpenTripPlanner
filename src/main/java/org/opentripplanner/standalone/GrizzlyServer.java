@@ -7,15 +7,10 @@ import org.glassfish.grizzly.http.server.CLStaticHttpHandler;
 import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.NetworkListener;
+import org.glassfish.grizzly.ssl.SSLContextConfigurator;
+import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 import org.glassfish.grizzly.threadpool.ThreadPoolConfig;
-import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
-import org.glassfish.jersey.server.ApplicationHandler;
 import org.glassfish.jersey.server.ContainerFactory;
-import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.server.ServerProperties;
-import org.opentripplanner.api.OTPHttpHandler;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -45,25 +40,31 @@ public class GrizzlyServer {
 
     public void run() {
         
-        /* Rather than use Jersey's GrizzlyServerFactory we will construct one manually, so we can
-           set the number of threads, etc. The code below does roughly the same steps as GrizzlyServerFactory. */
+        /* The code below does roughly the same steps as Jersey's GrizzlyServerFactory, but we will instead construct
+           an HttpServer and NetworkListener manually so we can set the number of threads, etc.  */
         LOG.info("Starting OTP Grizzly server on port {} using graphs at {}", params.port, params.graphDirectory);
         HttpServer httpServer = new HttpServer();
+
+        /* Configure SSL */
+        SSLContextConfigurator sslConfig = new SSLContextConfigurator();
+        sslConfig.setKeyStoreFile("/var/otp/ssh/keystore_server");
+        sslConfig.setKeyStorePass("opentrip");
+
         // TODO add option for address to listen on
         NetworkListener networkListener = new NetworkListener("otp_listener", "0.0.0.0", params.port);
-        // OTP is CPU-bound!
+        // OTP is CPU-bound, we don't want more threads than cores. We should switch to async handling.
         ThreadPoolConfig threadPoolConfig = ThreadPoolConfig.defaultConfig()
                 .setCorePoolSize(1).setMaxPoolSize(Runtime.getRuntime().availableProcessors());
         networkListener.getTransport().setWorkerThreadPoolConfig(threadPoolConfig);
+        networkListener.setSecure(true);
+        networkListener.setSSLEngineConfig(new SSLEngineConfigurator(sslConfig)
+                .setClientMode(false).setNeedClientAuth(false));
         httpServer.addListener(networkListener);
 
-        /* Application is the JAX-RS way to configure a web app.
-           ResourceConfig is a Jersey-specific subclass of Application for package scanning etc. */
-        Application app = new OTPApplication(server);
-
-        /* Add a couple of handlers (~= servlets) to the Grizzly server. */
+        /* Add a few handlers (~= servlets) to the Grizzly server. */
 
         /* 1. A Grizzly wrapper around the Jersey Application. */
+        Application app = new OTPApplication(server);
         HttpHandler dynamicHandler = ContainerFactory.createContainer(HttpHandler.class, app);
         httpServer.getServerConfiguration().addHttpHandler(dynamicHandler, "/otp");
 

@@ -3,6 +3,7 @@ package org.opentripplanner.standalone;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.glassfish.jersey.server.ServerProperties;
+import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.opentripplanner.api.model.OTPObjectMapperProvider;
 import org.opentripplanner.api.resource.AlertPatcher;
 import org.opentripplanner.api.resource.BikeRental;
@@ -27,17 +28,28 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A JAX-RS Application subclass which provides hard-wired configuration of an OTP server. Avoids injection of any kind.
+ * A JAX-RS Application subclass which provides hard-wired configuration of an OTP server.
+ * Avoids auto-scanning of any kind, and keeps injection to a bare minimum using HK2 like Jersey itself.
  *
- * Jersey has its own ResourceConfig class which is a subclass of Application. It seems that we can get away with
- * not using any Jersey-specific functionality and stick with stock JAX-RS.
- * https://jersey.java.net/apidocs/latest/jersey/javax/ws/rs/core/Application.html#getSingletons()
- *
+ * Jersey has its own ResourceConfig class which is a subclass of Application.
+ * We can get away with not using any Jersey-specific "conveniences" and stick with stock JAX-RS.
  */
 public class OTPApplication extends Application {
 
+    static {
+        // Remove existing handlers attached to the j.u.l root logger
+        SLF4JBridgeHandler.removeHandlersForRootLogger();
+        // Bridge j.u.l (used by Jersey) to the SLF4J root logger
+        SLF4JBridgeHandler.install();
+    }
+
     public final OTPServer server;
 
+    /**
+     * The OTPServer provides entry points to OTP routing functionality for a collection of OTPRouters.
+     * It provides a Java API, not an HTTP API.
+     * The OTPApplication wraps an OTPServer in a Jersey (JAX-RS) Application, configuring an HTTP API.
+     */
     public OTPApplication (OTPServer server) {
         this.server = server;
     }
@@ -52,7 +64,7 @@ public class OTPApplication extends Application {
     @Override
     public Set<Class<?>> getClasses() {
         return Sets.newHashSet(
-            // Jersey Web resource definition classes
+            /* Jersey resource classes: define web services, i.e. an HTTP API. */
             Planner.class,
             SimpleIsochrone.class,
             TileService.class,
@@ -71,19 +83,18 @@ public class OTPApplication extends Application {
             ProfileEndpoint.class,
             SimpleIsochrone.class,
             ServerInfo.class,
-            // Enable Jackson JSON and XML serialization
-            // OTPObjectMapperProvider.class,
-            // Filters -- confirmed, these are picked up by Jersey.
+            /* Features and Filters: extend Jersey, manipulate requests and responses. */
             AuthFilter.class,
-            JsonpFilter.class
+            JsonpFilter.class,
+            // Enforce roles annotations defined by JSR-250
+            RolesAllowedDynamicFeature.class
         );
-        // JerseyInjector
     }
 
     /**
      * Like getClasses, this method declares web resources, providers, and features to the JAX-RS implementation.
      * However, these are single instances that will be reused for all requests (they are singleton-scoped).
-     *
+     * https://jersey.java.net/apidocs/latest/jersey/javax/ws/rs/core/Application.html#getSingletons()
      * Leave <Object> out of type signature to avoid confusing the Guava type inference.
      */
     @Override
@@ -94,21 +105,12 @@ public class OTPApplication extends Application {
         );
     }
 
+    /** Enabling tracing allows us to see how web resource names were matched from the client, in headers. */
     @Override
     public Map<String, Object> getProperties() {
         Map props = Maps.newHashMap();
         props.put(ServerProperties.TRACING, Boolean.TRUE);
-        /* Register a custom authentication filter and a filter that wraps JSON in method calls as needed. */
-        // props.put(org.glassfish.jersey.server PROPERTY_CONTAINER_REQUEST_FILTERS, Arrays.asList());
-        // props.put(ResourceConfig.PROPERTY_CONTAINER_RESPONSE_FILTERS, Arrays.asList(JsonpFilter.class));
         return props;
-    }
-
-    static {
-        // Remove existing handlers attached to the j.u.l root logger
-        SLF4JBridgeHandler.removeHandlersForRootLogger();
-        // Bridge j.u.l (used by Jersey) to the SLF4J root logger
-        SLF4JBridgeHandler.install();
     }
 
 }
