@@ -8,7 +8,7 @@
     <parent>
       <groupId>org.opentripplanner</groupId>
       <artifactId>opentripplanner</artifactId>
-      <version>0.9.2-SNAPSHOT</version>
+      <version>1.0.0-SNAPSHOT</version>
     </parent>
 
     <dependencies>
@@ -244,6 +244,12 @@
           <artifactId>joda-time</artifactId>
           <version>2.1</version>
         </dependency>
+        <!-- PNGJ -->
+        <dependency>
+          <groupId>ar.com.hjg</groupId>
+          <artifactId>pngj</artifactId>
+          <version>2.0.1</version>
+        </dependency>
 
         <!-- JSON -->
         <dependency>
@@ -455,22 +461,18 @@
                   <excludes>
                     <!-- Do not explode the client WAR. -->
                     <!-- Actually, shade seems to skip the WAR even without this exclusion (verify) -->
-                    <exclude>org.opentripplanner:otp-leaflet-client</exclude> -->
+                    <exclude>org.opentripplanner:otp-leaflet-client</exclude> --&gt;
                   </excludes>
                 </artifactSet>                
                 <transformers>
-                  <transformer
-                    implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                  <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                     <resource>META-INF/spring.handlers</resource>
                   </transformer>
-                  <transformer
-                    implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
+                  <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                     <resource>META-INF/spring.schemas</resource>
                   </transformer>
-                  <transformer
-                    implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
-                  <transformer
-                    implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                  <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+                  <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                     <manifestEntries>
                       <Main-Class>org.opentripplanner.standalone.OTPMain</Main-Class>
                       <!-- The ImageIO lines allow some image reader plugins to work (TODO elaborate) -->

@@ -272,13 +272,6 @@ public class RaptorSearch {
 
                 if (stopNo != lastBoardStop) {
 
-                    if (stop.stopVertex.isLocal() && nBoardings > 1) {
-                        // cannot transfer at a local stop
-                        createdStates.addAll(newStates);
-                        states.addAll(newStates);
-                        continue;
-                    }
-
                     // try boarding here
                     TRYBOARD: for (RaptorState oldState : states) {
                         if (oldState.nBoardings != nBoardings - 1)
@@ -550,13 +543,6 @@ public class RaptorSearch {
 
                 if (options.rctx.target != null) {
                     double minWalk = distanceToNearestTransitStop;
-                    double targetDistance = bounder.getTargetDistance(stopVertex);
-
-                    if (targetDistance + state.walkDistance > options.getMaxWalkDistance()) {
-                        // can't walk to destination, so we can't alight at a local vertex
-                        if (state.stop.stopVertex.isLocal())
-                            continue;
-                    }
 
                     if (minWalk + state.walkDistance > options.getMaxWalkDistance()) {
                         continue;

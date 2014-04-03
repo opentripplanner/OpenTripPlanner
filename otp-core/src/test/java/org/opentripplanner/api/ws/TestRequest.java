@@ -568,9 +568,8 @@ public class TestRequest extends TestCase {
                 -122.578918, false, routerId, null);
         assertTrue(stopsNearPoint.stops.size() > 0);
 
-        long startTime =
-                TestUtils.dateInSeconds("America/Los_Angeles", 2009, 9, 1, 7, 50, 0) * 1000L;
-        long endTime = startTime + 60 * 60 * 1000;
+        long startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 9, 1, 7, 50, 0);
+        long endTime = startTime + 60 * 60;
         StopTimeList stopTimesForStop = (StopTimeList) index.getStopTimesForStop("TriMet", "10579",
                 startTime, endTime, false, false, null, routerId);
         assertTrue(stopTimesForStop.stopTimes.size() > 0);
@@ -743,7 +742,7 @@ public class TestRequest extends TestCase {
 
         Response response = planner.getItineraries();
         Itinerary itinerary = response.getPlan().itinerary.get(0);
-        Long duration = itinerary.duration;
+        Double duration = itinerary.duration;
 
         // Some walking is expected here, because it's slightly faster than staying onboard the bus.
         assertTrue(itinerary.walkDistance > 0);
@@ -1064,7 +1063,7 @@ public class TestRequest extends TestCase {
 
         Response response = planner.getItineraries();
         Itinerary itinerary = response.getPlan().itinerary.get(0);
-        Long duration = itinerary.duration;
+        Double duration = itinerary.duration;
 
         // Add a time penalty without changing the cost
         planner.setBikeSwitchTime(Arrays.asList(30));
@@ -1073,7 +1072,7 @@ public class TestRequest extends TestCase {
         itinerary = response.getPlan().itinerary.get(0);
 
         // Now the itinerary should be 30 seconds longer
-        assertTrue(duration + 30000L == itinerary.duration);
+        assertTrue(duration + 30.0 == itinerary.duration);
 
         // Change the cost as well, so the routing result changes
         planner.setBikeSwitchCost(Arrays.asList(99));
@@ -1083,7 +1082,7 @@ public class TestRequest extends TestCase {
 
         // Now the length of the itinerary should be in between the lengths of the other itineraries
         assertTrue(duration < itinerary.duration);
-        assertTrue(duration + 30000L > itinerary.duration);
+        assertTrue(duration + 30.0 > itinerary.duration);
     }
 
     /**

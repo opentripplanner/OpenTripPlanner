@@ -270,7 +270,7 @@ public class StateEditor {
     public void incrementNumBoardings() {
         cloneStateDataAsNeeded();
         child.stateData.numBoardings++;
-        setEverBoarded();
+        setEverBoarded(true);
     }
 
     /* Basic Setters */
@@ -356,13 +356,7 @@ public class StateEditor {
         child.stateData.numBoardings = numBoardings;
     }
 
-    public void setAlightedLocal(boolean alightedLocal) {
-        cloneStateDataAsNeeded();
-        child.stateData.alightedLocal = alightedLocal;
-    }
-
-    public void setEverBoarded() {
-        if (child.stateData.everBoarded) return;
+    public void setEverBoarded(boolean everBoarded) {
         cloneStateDataAsNeeded();
         child.stateData.everBoarded = true;
     }
@@ -464,10 +458,6 @@ public class StateEditor {
 
     public int getNumBoardings() {
         return child.getNumBoardings();
-    }
-
-    public boolean isAlightedLocal() {
-        return child.isAlightedLocal();
     }
 
     public boolean isEverBoarded() {

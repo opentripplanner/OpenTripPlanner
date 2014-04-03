@@ -124,7 +124,7 @@ public class OnBoardDepartPatternHop extends Edge implements OnboardEdge {
         s1.incrementTimeInSeconds(remainingTime);
         s1.incrementWeight(remainingTime);
         s1.setBackMode(getMode());
-        s1.setEverBoarded();
+        s1.setEverBoarded(true);
         return s1.makeState();
     }
 

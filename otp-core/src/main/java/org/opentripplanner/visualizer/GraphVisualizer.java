@@ -297,6 +297,20 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
 	private JTextField bikeSpeed;
 
+	private JTextField heuristicWeight;
+
+	private JCheckBox softWalkLimiting;
+
+	private JTextField softWalkPenalty;
+
+	private JTextField softWalkOverageRate;
+
+	private JCheckBox arriveByCheckBox;
+
+	private JLabel searchTimeElapsedLabel;
+
+	private JCheckBox dontUseGraphicalCallbackCheckBox;
+
     public GraphVisualizer(GraphService graphService) {
         super();
         LOG.info("Starting up graph visualizer...");
@@ -384,6 +398,12 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         pane.add(carCheckBox);
         cmvCheckBox = new JCheckBox("custom vehicle");
         pane.add(cmvCheckBox);
+        
+        // row: arrive by?
+        JLabel arriveByLabel = new JLabel("Arrive by?:");
+        pane.add(arriveByLabel);
+        arriveByCheckBox = new JCheckBox("arrive by");
+        pane.add(arriveByCheckBox);
 
         // row: boarding penalty
         JLabel boardPenaltyLabel = new JLabel("Boarding penalty (min):");
@@ -408,6 +428,30 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         pane.add(bikeSpeedLabel);
         bikeSpeed = new JTextField("5.0");
         pane.add(bikeSpeed);
+        
+        // row: heuristic weight
+        JLabel heuristicWeightLabel = new JLabel("Heuristic weight:");
+        pane.add(heuristicWeightLabel);
+        heuristicWeight = new JTextField("1.0");
+        pane.add(heuristicWeight);
+        
+        // row: soft walk?
+        JLabel softWalkLimitLabel = new JLabel("Soft walk-limit?:");
+        pane.add(softWalkLimitLabel);
+        softWalkLimiting = new JCheckBox("soft walk-limiting");
+        pane.add(softWalkLimiting);
+        
+        // row: soft walk-limit penalty
+        JLabel softWalkLimitPenaltyLabel = new JLabel("Soft walk-limiting penalty:");
+        pane.add(softWalkLimitPenaltyLabel);
+        softWalkPenalty = new JTextField("60.0");
+        pane.add(softWalkPenalty);
+        
+        // row: soft walk-limit overage
+        JLabel softWalkLimitOverageLabel = new JLabel("Soft walk-limiting overage:");
+        pane.add(softWalkLimitOverageLabel);
+        softWalkOverageRate = new JTextField("5.0");
+        pane.add(softWalkOverageRate);
         
         // radio buttons: optimize type
         JLabel optimizeTypeLabel = new JLabel("Optimize type:");
@@ -911,6 +955,14 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
             }
         });
         routingPanel.add(clearRouteButton);
+        
+        //label: search time elapsed
+        searchTimeElapsedLabel = new JLabel("search time elapsed:");
+        routingPanel.add(searchTimeElapsedLabel);
+        
+        //option: don't use graphical callback. useful for doing a quick profile
+        dontUseGraphicalCallbackCheckBox = new JCheckBox("no graphics");
+        routingPanel.add(dontUseGraphicalCallbackCheckBox);
 	}
 
     protected void trace() {
@@ -1022,6 +1074,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         if (transitCheckBox.isSelected())
             modeSet.setTransit(true);
         RoutingRequest options = new RoutingRequest(modeSet);
+        options.setArriveBy(arriveByCheckBox.isSelected());
         options.setWalkBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60); // override low 2-4 minute values
         // TODO LG Add ui element for bike board cost (for now bike = 2 * walk)
         options.setBikeBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60 * 2);
@@ -1033,13 +1086,29 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         options.setToString(to);
         options.setWalkSpeed(Float.parseFloat(walkSpeed.getText()));
         options.setBikeSpeed(Float.parseFloat(bikeSpeed.getText()));
+        options.setHeuristicWeight(Float.parseFloat(heuristicWeight.getText()));
+        options.setSoftWalkLimiting( softWalkLimiting.isSelected() );
+        options.setSoftWalkPenalty(Float.parseFloat(softWalkPenalty.getText()));
+        options.setSoftWalkOverageRate(Float.parseFloat(this.softWalkOverageRate.getText()));
         options.numItineraries = 1;
         System.out.println("--------");
         System.out.println("Path from " + from + " to " + to + " at " + when);
         System.out.println("\tModes: " + modeSet);
         System.out.println("\tOptions: " + options);
+        
+        // apply callback if the options call for it
+        if( dontUseGraphicalCallbackCheckBox.isSelected() ){
+        	sptService.setTraverseVisitor(null);
+        } else {
+        	sptService.setTraverseVisitor(new VisualTraverseVisitor(showGraph));
+        }
+        
+        long t0 = System.currentTimeMillis();
         // TODO: check options properly intialized (AMB)
         List<GraphPath> paths = pathservice.getPaths(options);
+        long dt = System.currentTimeMillis() - t0;
+        searchTimeElapsedLabel.setText( "search time elapsed: "+dt+"ms" );
+        
         if (paths == null) {
             System.out.println("no path");
             showGraph.highlightGraphPath(null);

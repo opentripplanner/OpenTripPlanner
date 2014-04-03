@@ -30,9 +30,9 @@ import org.opentripplanner.routing.core.Fare;
 public class Itinerary {
 
     /**
-     * Duration of the trip on this itinerary, in milliseconds.
+     * Duration of the trip on this itinerary, in seconds.
      */
-    public long duration = 0;
+    public Double duration = 0.0;
 
     /**
      * Time that the trip departs.

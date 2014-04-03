@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.BindException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import net.lingala.zip4j.core.ZipFile;
-import net.lingala.zip4j.exception.ZipException;
 
 import org.glassfish.grizzly.http.server.HttpHandler;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -80,14 +82,16 @@ public class GrizzlyServer {
         File clientDir = Files.createTempDir();
         /* Eclipse does not seem to be copying this file. Maven is. */
         File clientWar = new File(clientDir, CLIENT_WAR_FILENAME);
-        boolean fallback = false;
         try {
             Files.copy(new ClientWarSupplier(), clientWar);
             ZipFile zip = new ZipFile(clientWar);
             zip.extractAll(clientDir.toString());
         } catch (Exception e) {
             LOG.error("Error copying or expanding client WAR: {}", e.getMessage());
-            for (String fallbackClientDir : FALLBACK_CLIENT_DIRS) {
+            List<String> allStaticDirs = new ArrayList<String>();
+            allStaticDirs.add(params.staticDirectory);
+            allStaticDirs.addAll(Arrays.asList(FALLBACK_CLIENT_DIRS));
+            for (String fallbackClientDir : allStaticDirs) {
                 File f = new File(fallbackClientDir);
                 if (f.isDirectory() && f.canRead()) {
                     clientDir = f;
@@ -97,7 +101,11 @@ public class GrizzlyServer {
             }
         }
         LOG.info("Serving static client files from {}", clientDir);
-        return new StaticHttpHandler(clientDir.toString());
+        StaticHttpHandler handler = new StaticHttpHandler(clientDir.toString());
+        // Having a cache is really painful during development, and this
+        // does probally do not bring much performance improvement either.
+        handler.setFileCacheEnabled(false);
+        return handler;
     }
     
     public void run() {

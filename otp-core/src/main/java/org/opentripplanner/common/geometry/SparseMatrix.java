@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import lombok.Getter;
+
 /**
  * Implementation of a fast sparse 2D matrix of T elements.
  * 
@@ -29,13 +31,19 @@ import java.util.Map;
  */
 public class SparseMatrix<T> implements Iterable<T> {
 
+    /* The biggest negative 32 bits value that is a multiple of 128 */
+    private static final long INDEX_OFFSET = 2147483520L;
+
     private int shift;
 
     private int mask;
 
     private Map<Long, T[]> chunks;
 
-    int size = 0, matSize;
+    int size = 0, matSize, chunkSize;
+
+    @Getter
+    int xMin, xMax, yMin, yMax;
 
     /**
      * @param chunkSize Chunk size, must be a power of two. Keep it small (8, 16, 32...). Number of
@@ -44,6 +52,7 @@ public class SparseMatrix<T> implements Iterable<T> {
      */
     public SparseMatrix(int chunkSize, int totalSize) {
         shift = 0;
+        this.chunkSize = chunkSize;
         mask = chunkSize - 1;
         while (chunkSize > 1) {
             if (chunkSize % 2 != 0)
@@ -54,13 +63,15 @@ public class SparseMatrix<T> implements Iterable<T> {
         this.matSize = (mask + 1) * (mask + 1);
         // We assume here that each chunk will be filled at ~25% (thus the x4)
         this.chunks = new HashMap<Long, T[]>(totalSize / matSize * 4);
+        this.xMin = Integer.MAX_VALUE;
+        this.yMin = Integer.MAX_VALUE;
+        this.xMax = Integer.MIN_VALUE;
+        this.yMax = Integer.MIN_VALUE;
     }
 
     public final T get(int x, int y) {
-        x += 0x7FFFFFFF;
-        y += 0x7FFFFFFF;
-        long x0 = x >> shift;
-        long y0 = y >> shift;
+        long x0 = ((long) x + INDEX_OFFSET) >> shift;
+        long y0 = ((long) y + INDEX_OFFSET) >> shift;
         Long key = x0 + (y0 << 32);
         T[] ts = chunks.get(key);
         if (ts == null) {
@@ -72,10 +83,16 @@ public class SparseMatrix<T> implements Iterable<T> {
 
     @SuppressWarnings("unchecked")
     public final T put(int x, int y, T t) {
-        x += 0x7FFFFFFF;
-        y += 0x7FFFFFFF;
-        long x0 = x >> shift;
-        long y0 = y >> shift;
+        if (x < xMin)
+            xMin = x;
+        if (x > xMax)
+            xMax = x;
+        if (y < yMin)
+            yMin = y;
+        if (y > yMax)
+            yMax = y;
+        long x0 = ((long) x + INDEX_OFFSET) >> shift;
+        long y0 = ((long) y + INDEX_OFFSET) >> shift;
         Long key = x0 + (y0 << 32);
         T[] ts = chunks.get(key);
         if (ts == null) {
@@ -92,6 +109,10 @@ public class SparseMatrix<T> implements Iterable<T> {
 
     public int size() {
         return size;
+    }
+
+    public int getChunkSize() {
+        return chunkSize;
     }
 
     /*
@@ -151,6 +172,63 @@ public class SparseMatrix<T> implements Iterable<T> {
     @Override
     public Iterator<T> iterator() {
         return new SparseMatrixIterator();
+    }
+
+    /**
+     * A public representation of the internal structure of the sparse matrix, ie a map of chunks
+     * (bi-dimentional array). We need to publish the internal structure to be able to efficiently
+     * export it through web-services.
+     */
+    public class SparseMatrixChunk {
+
+        @Getter
+        public int x0, y0;
+
+        public T[] ts;
+
+        private SparseMatrixChunk(int x0, int y0, T[] ts) {
+            this.x0 = x0;
+            this.y0 = y0;
+            this.ts = ts;
+        }
+
+        public T getT(int x, int y) {
+            return ts[x * chunkSize + y];
+        }
+    }
+
+    public Iterable<SparseMatrixChunk> getChunks() {
+        return new Iterable<SparseMatrixChunk>() {
+            @Override
+            public Iterator<SparseMatrixChunk> iterator() {
+                // Again, we rely on the indexIterator to check for concurrent modification.
+                final Iterator<Long> indexIterator = chunks.keySet().iterator();
+                return new Iterator<SparseMatrixChunk>() {
+
+                    @Override
+                    public boolean hasNext() {
+                        return indexIterator.hasNext();
+                    }
+
+                    @Override
+                    public SparseMatrixChunk next() {
+                        long index = indexIterator.next();
+                        T[] ts = chunks.get(index);
+                        if (ts == null) {
+                            return null;
+                        }
+                        int x0 = (int) (((index & 0xFFFFFFFFL) << shift) - INDEX_OFFSET);
+                        int y0 = (int) ((((index & 0xFFFFFFFF00000000L) >> 32) << shift) - INDEX_OFFSET);
+                        return new SparseMatrixChunk(x0, y0, ts);
+                    }
+
+                    @Override
+                    public void remove() {
+                        throw new UnsupportedOperationException("remove");
+                    }
+                };
+            }
+        };
     }
 
 }
