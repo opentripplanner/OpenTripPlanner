@@ -50,16 +50,27 @@ public class GrizzlyServer {
         sslConfig.setKeyStoreFile("/var/otp/ssh/keystore_server");
         sslConfig.setKeyStorePass("opentrip");
 
-        // TODO add option for address to listen on
-        NetworkListener networkListener = new NetworkListener("otp_listener", "0.0.0.0", params.port);
+        /* HTTP (non-encrypted) listener */
+        NetworkListener httpListener = new NetworkListener("otp_insecure_listener", "0.0.0.0", params.port); // TODO add option for address to listen on
         // OTP is CPU-bound, we don't want more threads than cores. We should switch to async handling.
         ThreadPoolConfig threadPoolConfig = ThreadPoolConfig.defaultConfig()
-                .setCorePoolSize(1).setMaxPoolSize(Runtime.getRuntime().availableProcessors());
-        networkListener.getTransport().setWorkerThreadPoolConfig(threadPoolConfig);
-        networkListener.setSecure(true);
-        networkListener.setSSLEngineConfig(new SSLEngineConfigurator(sslConfig)
-                .setClientMode(false).setNeedClientAuth(false));
-        httpServer.addListener(networkListener);
+            .setCorePoolSize(1)
+            .setMaxPoolSize(Runtime.getRuntime().availableProcessors());
+        httpListener.getTransport().setWorkerThreadPoolConfig(threadPoolConfig);
+        httpListener.setSecure(false);
+        httpServer.addListener(httpListener);
+
+        /* HTTPS listener */
+        NetworkListener httpsListener = new NetworkListener("otp_secure_listener", "0.0.0.0", params.port + 1);
+        // Ideally we'd share the threads between HTTP and HTTPS.
+        httpsListener.getTransport().setWorkerThreadPoolConfig(threadPoolConfig);
+        httpsListener.setSecure(true);
+        httpsListener.setSSLEngineConfig(
+                new SSLEngineConfigurator(sslConfig)
+                        .setClientMode(false)
+                        .setNeedClientAuth(false)
+        );
+        httpServer.addListener(httpsListener);
 
         /* Add a few handlers (~= servlets) to the Grizzly server. */
 
