@@ -491,7 +491,6 @@ public class TransitIndex {
 
     /**
      * Return stop times for all stops comprising a station, in seconds since the epoch
-     * startTime and endTime are in milliseconds since epoch
      */
     @GET
     @Path("/stopTimesForStation")
