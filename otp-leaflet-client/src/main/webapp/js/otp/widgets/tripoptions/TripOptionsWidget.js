@@ -330,9 +330,9 @@ otp.widgets.tripoptions.TimeSelector =
         });
         $('#'+this.id+'-date').datepicker("setDate", new Date());
         
-        $('#'+this.id+'-time').val(moment().format(otp.config.timeFormat))
+        $('#'+this.id+'-time').val(moment().format(otp.config.locale.time.time_format))
         .keyup(function() {
-            if(otp.config.timeFormat.toLowerCase().charAt(otp.config.timeFormat.length-1) === 'a') {
+            if(otp.config.locale.time.time_format.toLowerCase().charAt(otp.config.locale.time.time_format.length-1) === 'a') {
                 var val = $(this).val().toLowerCase();
                 if(val.charAt(val.length-1) === 'm') {
                     val = val.substring(0, val.length-1);
