@@ -33,6 +33,7 @@ import com.beust.jcommander.ParameterException;
 public class CommandLineParameters {
 
     private static final int DEFAULT_PORT = 8080;
+    private static final int DEFAULT_SECURE_PORT = 8081;
     private static final String DEFAULT_STATIC_DIRECTORY = "/var/otp/static";
     private static final String DEFAULT_GRAPH_DIRECTORY  = "/var/otp/graphs";
     private static final String DEFAULT_CACHE_DIRECTORY  = "/var/otp/cache";
@@ -103,12 +104,21 @@ public class CommandLineParameters {
     @Parameter( names = { "-a", "--analyst"}, 
             description = "enable OTP Analyst extensions")
     boolean analyst;
-    
+
+    @Parameter( names = {"--bindAddress"},
+            description = "enable OTP Analyst extensions")
+    String bindAddress = "0.0.0.0";
+
+    @Parameter( names = { "--securePort"}, validateWith = AvailablePort.class,
+            description = "server port")
+    Integer securePort;
+
     @Parameter( names = { "-f", "--graphConfigFile"}, validateWith = ReadableFile.class,
             description = "path to graph configuration file")
     String graphConfigFile;
 
-    @Parameter( names = { "-g", "--graphs"}, validateWith = ReadableDirectory.class, 
+    // --basePath (rather than --graphs). Maybe just eliminate most short options.
+    @Parameter( names = { "-g", "--graphs"}, validateWith = ReadableDirectory.class,
             description = "path to graph directory")
     String graphDirectory;
 
@@ -154,8 +164,12 @@ public class CommandLineParameters {
             port = DEFAULT_PORT;
             new AvailablePort().validate(port);
         }
+        if (server && securePort == null) {
+            securePort = DEFAULT_SECURE_PORT;
+            new AvailablePort().validate(securePort);
+        }
     }
-    
+
     public static class ReadableFile implements IParameterValidator {
         @Override
         public void validate(String name, String value) throws ParameterException {

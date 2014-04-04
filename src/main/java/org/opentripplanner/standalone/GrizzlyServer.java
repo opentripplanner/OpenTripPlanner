@@ -38,11 +38,15 @@ public class GrizzlyServer {
         this.server = server;
     }
 
+    /**
+     * This function goes through roughly the same steps as Jersey's GrizzlyServerFactory, but we instead construct
+     * an HttpServer and NetworkListener manually so we can set the number of threads and other details.
+     */
     public void run() {
         
-        /* The code below does roughly the same steps as Jersey's GrizzlyServerFactory, but we will instead construct
-           an HttpServer and NetworkListener manually so we can set the number of threads, etc.  */
-        LOG.info("Starting OTP Grizzly server on port {} using graphs at {}", params.port, params.graphDirectory);
+        LOG.info("Starting OTP Grizzly server on ports {} (HTTP) and {} (HTTPS) of interface {}",
+            params.port, params.securePort, params.bindAddress);
+        LOG.info("Base path is X, graphs are at {}", params.graphDirectory);
         HttpServer httpServer = new HttpServer();
 
         /* Configure SSL */
@@ -51,7 +55,7 @@ public class GrizzlyServer {
         sslConfig.setKeyStorePass("opentrip");
 
         /* HTTP (non-encrypted) listener */
-        NetworkListener httpListener = new NetworkListener("otp_insecure_listener", "0.0.0.0", params.port); // TODO add option for address to listen on
+        NetworkListener httpListener = new NetworkListener("otp_insecure", params.bindAddress, params.port);
         // OTP is CPU-bound, we don't want more threads than cores. We should switch to async handling.
         ThreadPoolConfig threadPoolConfig = ThreadPoolConfig.defaultConfig()
             .setCorePoolSize(1)
@@ -61,7 +65,7 @@ public class GrizzlyServer {
         httpServer.addListener(httpListener);
 
         /* HTTPS listener */
-        NetworkListener httpsListener = new NetworkListener("otp_secure_listener", "0.0.0.0", params.port + 1);
+        NetworkListener httpsListener = new NetworkListener("otp_secure", params.bindAddress, params.securePort);
         // Ideally we'd share the threads between HTTP and HTTPS.
         httpsListener.getTransport().setWorkerThreadPoolConfig(threadPoolConfig);
         httpsListener.setSecure(true);
