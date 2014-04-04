@@ -918,7 +918,7 @@ public class PlanGeneratorTest {
             assertEquals(60.0, itinerary.duration.doubleValue(), 0.0);
             assertEquals(0L, itinerary.startTime.getTimeInMillis());
         } else if (type == Type.ONBOARD) {
-            assertEquals(54, itinerary.duration.doubleValue(), 0.0);
+            assertEquals(54.0, itinerary.duration.doubleValue(), 0.0);
             assertEquals(6000L, itinerary.startTime.getTimeInMillis());
         }
         assertEquals(60000L, itinerary.endTime.getTimeInMillis());
