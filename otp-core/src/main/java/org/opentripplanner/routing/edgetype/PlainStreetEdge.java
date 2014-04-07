@@ -351,7 +351,14 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
                     s0.getOptions().bikeWalkingOptions : s0.getOptions();
             double backSpeed = backPSE.calculateSpeed(backOptions, backMode);
             final double realTurnCost;  // Units are seconds.
-            
+
+            // Apply turn restrictions
+            if (options.arriveBy && !canTurnOnto(backPSE, s0, backMode)) {
+                return null;
+            } else if (!options.arriveBy && !backPSE.canTurnOnto(this, s0, traverseMode)) {
+                return null;
+            }
+
             /* Compute turn cost.
              * 
              * This is a subtle piece of code. Turn costs are evaluated differently during
@@ -365,18 +372,14 @@ public class PlainStreetEdge extends StreetEdge implements Cloneable {
              * the backEdge, rather than of the current edge.
              */
             if (options.arriveBy && tov instanceof IntersectionVertex) { // arrive-by search
-                if (!canTurnOnto(backPSE, s0, backMode)) {
-                    return null;
-                }
                 IntersectionVertex traversedVertex = ((IntersectionVertex) tov);
+
                 realTurnCost = backOptions.getIntersectionTraversalCostModel().computeTraversalCost(
                         traversedVertex, this, backPSE, backMode, backOptions, (float) speed,
                         (float) backSpeed);
-            } else if (fromv instanceof IntersectionVertex) { // depart-after search
-                if (!backPSE.canTurnOnto(this, s0, traverseMode)) {
-                    return null;
-                }
+            } else if (!options.arriveBy && fromv instanceof IntersectionVertex) { // depart-after search
                 IntersectionVertex traversedVertex = ((IntersectionVertex) fromv);
+
                 realTurnCost = options.getIntersectionTraversalCostModel().computeTraversalCost(
                         traversedVertex, backPSE, this, traverseMode, options, (float) backSpeed,
                         (float) speed);                
