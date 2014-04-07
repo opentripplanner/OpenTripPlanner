@@ -46,6 +46,7 @@ import org.opentripplanner.routing.services.RemainingWeightHeuristicFactory;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,7 +99,7 @@ public class RoutingContext implements Cloneable {
     public final TransferTable transferTable;
 
     /** The timetableSnapshot is a {@link TimetableResolver} for looking up real-time updates. */
-    public final TimetableResolver timetableSnapshot; 
+    public final TimetableResolver timetableSnapshot;
 
     /**
      * Cache lists of which transit services run on which midnight-to-midnight periods. This ties a TraverseOptions to a particular start time for the
@@ -222,12 +223,16 @@ public class RoutingContext implements Cloneable {
 
         // the graph's snapshot may be frequently updated.
         // Grab a reference to ensure a coherent view of the timetables throughout this search.
-        if (routingRequest.isIgnoreRealtimeUpdates() == false
-                && graph.getTimetableSnapshotSource() != null) {
-            timetableSnapshot = graph.getTimetableSnapshotSource().getTimetableSnapshot();
-        }
-        else {
+        if (routingRequest.isIgnoreRealtimeUpdates()) {
             timetableSnapshot = null;
+        } else {
+            TimetableSnapshotSource timetableSnapshotSource = graph.getTimetableSnapshotSource();
+
+            if (timetableSnapshotSource == null) {
+                timetableSnapshot = null;
+            } else {
+                timetableSnapshot = timetableSnapshotSource.getTimetableSnapshot();
+            }
         }
         calendarService = graph.getCalendarService();
         setServiceDays();
