@@ -39,7 +39,7 @@ public class OTPServer {
     // Core OTP modules
     public GraphService graphService;
     public PathService pathService;
-    public RoutingRequest routingRequest;
+    public RoutingRequest routingRequest; // the prototype routing request which establishes default parameter values
     public PlanGenerator planGenerator;
     public MetadataService metadataService;
     public SPTService sptService;

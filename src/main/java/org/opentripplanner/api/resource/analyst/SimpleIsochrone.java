@@ -162,7 +162,7 @@ public class SimpleIsochrone extends RoutingResource {
     private Map<Vertex, Double> makePoints () throws Exception {
         rangeCheckParameters();
         request = buildRequest(0);
-        Graph graph = graphService.getGraph();
+        Graph graph = otpServer.graphService.getGraph();
         //double speed = request.getWalkSpeed();
         Coordinate originCoord = request.getFrom().getCoordinate();
         if (originCoord == null) return null;

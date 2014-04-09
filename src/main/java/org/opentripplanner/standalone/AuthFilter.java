@@ -29,7 +29,8 @@ import javax.ws.rs.core.SecurityContext;
  *
  * In Jersey 2 this filter should configure the SecurityContext which will be passed through to the web resources.
  */
-@Priority(Priorities.AUTHENTICATION) // Authentication comes before Authorization, which is handled by DynamicFeature
+@Priority(Priorities.AUTHENTICATION)
+// Authentication priority comes before Authorization, which is handled by RolesAllowedDynamicFeature
 public class AuthFilter implements ContainerRequestFilter {
 
     private final Map<String, String> passwords = Maps.newHashMap(); // roles are same as user names

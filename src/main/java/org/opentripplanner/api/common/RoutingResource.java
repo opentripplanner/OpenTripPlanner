@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import javax.inject.Inject;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
@@ -32,6 +33,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.routing.services.GraphService;
+import org.opentripplanner.standalone.OTPServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -287,12 +289,8 @@ public abstract class RoutingResource {
      * Alternatively, we could eliminate the separate RoutingRequest objects and just resolve
      * vertices and timezones here right away, but just ignore them in semantic equality checks.
      */
-    @Context // FIXME inject Application context
-    protected GraphService graphService;
-
-    @Context // FIXME inject Application context
-    protected RoutingRequest prototypeRoutingRequest;
-
+    @Inject
+    protected OTPServer otpServer;
 
     /** 
      * Build the 0th Request object from the query parameter lists. 
@@ -309,7 +307,7 @@ public abstract class RoutingResource {
      * @throws ParameterException when there is a problem interpreting a query parameter
      */
     protected RoutingRequest buildRequest(int n) throws ParameterException {
-        RoutingRequest request = prototypeRoutingRequest.clone();
+        RoutingRequest request = otpServer.routingRequest.clone();
         request.setFromString(get(fromPlace, n, request.getFromPlace().getRepresentation()));
         request.setToString(get(toPlace, n, request.getToPlace().getRepresentation()));
         request.setRouterId(routerId);
@@ -318,8 +316,8 @@ public abstract class RoutingResource {
             String d = get(date, n, null);
             String t = get(time, n, null);
             TimeZone tz;
-            if (graphService != null) { // in tests it will be null
-                tz = graphService.getGraph(request.routerId).getTimeZone();
+            if (otpServer.graphService != null) { // in tests it will be null
+                tz = otpServer.graphService.getGraph(request.routerId).getTimeZone();
             } else {
                 LOG.warn("no graph service available, using default timezone.");
                 tz = TimeZone.getDefault();
