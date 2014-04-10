@@ -67,7 +67,7 @@ otp.layers.StopsLayer =
             stop.lon = stop.lon || stop.stopLon;
 
             // temporary TriMet specific code
-            if(stop.stopUrl.indexOf("http://trimet.org") === 0) {
+            if(stop.stopUrl && stop.stopUrl.indexOf("http://trimet.org") === 0) {
                 stop.titleLink = 'http://www.trimet.org/go/cgi-bin/cstops.pl?action=entry&resptype=U&lang=en&noCat=Landmark&Loc=' + stop.id.id;
             }
             //console.log(stop);
