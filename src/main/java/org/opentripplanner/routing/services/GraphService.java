@@ -21,14 +21,8 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
 
 /**
- * Service classes that need access to core graph objects like {@link Graph},
- * {@link ContractionHierarchySet} and {@link CalendarService} should access
- * them through this service interface. Instead of injecting a {@link Autowired}
- * dependency on {@link Graph}, instead inject an instance of
- * {@link GraphService} and use the {@link #getGraph()} method to access the
- * graph as needed. A routerId can also be supplied to choose between several graphs if
- * the GraphService implementation provides this functionality.
- * 
+ * A GraphService maps RouterIds to Graphs.
+ *
  * The service interface allows us to decouple the deserialization, loading, and management of 
  * the underlying graph objects from the classes that need access to the objects. This indirection
  * allows us to provide multiple graphs distringuished by routerIds or to dynamically swap in 
