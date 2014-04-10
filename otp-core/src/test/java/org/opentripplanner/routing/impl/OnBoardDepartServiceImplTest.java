@@ -13,15 +13,11 @@
 
 package org.opentripplanner.routing.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.Collections;
-
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.CoordinateSequence;
+import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
 import org.junit.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
@@ -40,11 +36,15 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
-import com.vividsolutions.jts.geom.CoordinateSequenceFactory;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.TimeZone;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class OnBoardDepartServiceImplTest {
     OnBoardDepartServiceImpl onBoardDepartServiceImpl = new OnBoardDepartServiceImpl();
@@ -66,6 +66,8 @@ public class OnBoardDepartServiceImplTest {
         Graph graph = mock(Graph.class);
         RoutingRequest routingRequest = mock(RoutingRequest.class);
         ServiceDay serviceDay = mock(ServiceDay.class);
+
+        when(graph.getTimeZone()).thenReturn(TimeZone.getTimeZone("Greenwhich"));
 
         GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
         CoordinateSequenceFactory coordinateSequenceFactory =
@@ -133,6 +135,8 @@ public class OnBoardDepartServiceImplTest {
         RoutingRequest routingRequest = mock(RoutingRequest.class);
         ServiceDay serviceDay = mock(ServiceDay.class);
 
+        when(graph.getTimeZone()).thenReturn(TimeZone.getTimeZone("Greenwhich"));
+
         GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
         CoordinateSequenceFactory coordinateSequenceFactory =
                 geometryFactory.getCoordinateSequenceFactory();
@@ -191,6 +195,8 @@ public class OnBoardDepartServiceImplTest {
         Graph graph = mock(Graph.class);
         RoutingRequest routingRequest = mock(RoutingRequest.class);
         ServiceDay serviceDay = mock(ServiceDay.class);
+
+        when(graph.getTimeZone()).thenReturn(TimeZone.getTimeZone("Greenwhich"));
 
         ArrayList<PatternHop> hops = new ArrayList<PatternHop>(2);
         RoutingContext routingContext = new RoutingContext(routingRequest, graph, null, arrive);

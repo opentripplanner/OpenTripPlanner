@@ -13,29 +13,12 @@
 
 package org.opentripplanner.api.ws;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimeZone;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.annotation.XmlRootElement;
-
+import com.sun.jersey.api.core.InjectParam;
+import com.sun.jersey.api.spring.Autowire;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.LineString;
 import lombok.Setter;
-
 import org.codehaus.jettison.json.JSONException;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
@@ -47,19 +30,7 @@ import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.model.error.TransitError;
-import org.opentripplanner.api.model.transit.AgencyList;
-import org.opentripplanner.api.model.transit.CalendarData;
-import org.opentripplanner.api.model.transit.ModeList;
-import org.opentripplanner.api.model.transit.RouteData;
-import org.opentripplanner.api.model.transit.RouteDataList;
-import org.opentripplanner.api.model.transit.RouteList;
-import org.opentripplanner.api.model.transit.ServiceCalendarData;
-import org.opentripplanner.api.model.transit.StopList;
-import org.opentripplanner.api.model.transit.StopTime;
-import org.opentripplanner.api.model.transit.StopTimeList;
-import org.opentripplanner.api.model.transit.TripList;
-import org.opentripplanner.api.model.transit.TripMatch;
-import org.opentripplanner.api.model.transit.TripTimesPair;
+import org.opentripplanner.api.model.transit.*;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -94,11 +65,14 @@ import org.opentripplanner.util.DateUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sun.jersey.api.core.InjectParam;
-import com.sun.jersey.api.spring.Autowire;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.LineString;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.annotation.XmlRootElement;
+import java.util.*;
+
 
 // NOTE - /ws/transit is the full path -- see web.xml
 
@@ -1186,13 +1160,15 @@ public class TransitIndex {
      * @return 3 service days: yesterday, today and tomorrow for an agency.
      */
     private List<ServiceDay> getServiceDays(Graph graph, long epochSec, String agencyId) {
-        final long SEC_IN_DAY = 60 * 60 * 24;
+        Calendar c = Calendar.getInstance();
+        c.setTime(new Date(epochSec * 1000));
+        c.setTimeZone(graph.getTimeZone());
+
+        ServiceDate serviceDate = new ServiceDate(c);
         List<ServiceDay> serviceDays = new ArrayList<ServiceDay>(3);
-        serviceDays.add(new ServiceDay(graph, epochSec - SEC_IN_DAY, graph.getCalendarService(),
-                agencyId));
-        serviceDays.add(new ServiceDay(graph, epochSec, graph.getCalendarService(), agencyId));
-        serviceDays.add(new ServiceDay(graph, epochSec + SEC_IN_DAY, graph.getCalendarService(),
-                agencyId));
+        serviceDays.add(new ServiceDay(graph, serviceDate.previous(), graph.getCalendarService(), agencyId));
+        serviceDays.add(new ServiceDay(graph, serviceDate, graph.getCalendarService(), agencyId));
+        serviceDays.add(new ServiceDay(graph, serviceDate.next(), graph.getCalendarService(), agencyId));
         return serviceDays;
     }
 

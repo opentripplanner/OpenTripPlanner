@@ -47,8 +47,19 @@ public class ServiceDay implements Serializable {
         TimeZone timeZone = cs.getTimeZoneForAgencyId(agencyId);
         GregorianCalendar calendar = new GregorianCalendar(timeZone);
         calendar.setTime(new Date(time * 1000));
-
         serviceDate = new ServiceDate(calendar);
+
+        init(graph, cs, timeZone);
+    }
+
+    public ServiceDay(Graph graph, ServiceDate serviceDate, CalendarService cs, String agencyId) {
+        TimeZone timeZone = cs.getTimeZoneForAgencyId(agencyId);
+        this.serviceDate = new ServiceDate(serviceDate);
+
+        init(graph, cs, timeZone);
+    }
+
+    private void init(Graph graph, CalendarService cs, TimeZone timeZone) {
         Date d = serviceDate.getAsDate(timeZone);
         this.midnight = d.getTime() / 1000;
         serviceIdsRunning = new BitSet(cs.getServiceIds().size());
