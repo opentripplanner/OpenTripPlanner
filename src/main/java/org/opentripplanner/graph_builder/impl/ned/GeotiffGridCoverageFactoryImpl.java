@@ -19,17 +19,13 @@ import java.io.IOException;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.gce.geotiff.GeoTiffFormat;
 import org.geotools.gce.geotiff.GeoTiffReader;
-import org.opentripplanner.graph_builder.services.ned.NEDGridCoverageFactory;
+import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.routing.graph.Graph;
 
 /**
- * Implementation of NEDGridCoverageFactory for Geotiff data (one of the default NED formats).
- * 
- * @author demory
- * 
+ * Implementation of ElevationGridCoverageFactory for Geotiff data.
  */
-
-public class GeotiffGridCoverageFactoryImpl implements NEDGridCoverageFactory {
+public class GeotiffGridCoverageFactoryImpl implements ElevationGridCoverageFactory {
 
     private File path = null;
     private GridCoverage2D coverage;
@@ -67,7 +63,7 @@ public class GeotiffGridCoverageFactoryImpl implements NEDGridCoverageFactory {
     @Override
     public void checkInputs() {
         if (!path.canRead()) {
-            throw new RuntimeException("Can't read NED path: " + path);
+            throw new RuntimeException("Can't read elevation path: " + path);
         }
     }
 

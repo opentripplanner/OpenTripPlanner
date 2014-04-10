@@ -33,7 +33,7 @@ import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.gbannotation.ElevationFlattened;
 import org.opentripplanner.graph_builder.impl.extra_elevation_data.ElevationPoint;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
-import org.opentripplanner.graph_builder.services.ned.NEDGridCoverageFactory;
+import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.routing.edgetype.EdgeWithElevation;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -45,20 +45,19 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 
 /**
- * {@link GraphBuilder} plugin that takes a constructed (@link Graph} and overlays it onto National
- * Elevation Dataset (NED) raster data, creating elevation profiles for each Street encountered in
- * the Graph. The elevation profile is stored as a {@link PackedCoordinateSequence}, where each
- * (x,y) pair represents one sample, with the x-coord representing the distance along the edge as,
- * measured from the start, and the y-coord representing the sampled elevation at that point (both
- * in meters).
- * 
- * @author demory, novalis (missing elevation interp)
- * 
+ * {@link GraphBuilder} plugin that applies elevation data to street data that has already
+ * been loaded into a (@link Graph}, creating elevation profiles for each Street encountered
+ * in the Graph. Depending on the {@link ElevationGridCoverageFactory} specified
+ * this could be auto-downloaded and cached National Elevation Dataset (NED) raster data or
+ * a GeoTIFF file. The elevation profiles are stored as {@link PackedCoordinateSequence} objects,
+ * where each (x,y) pair represents one sample, with the x-coord representing the distance along
+ * the edge measured from the start, and the y-coord representing the sampled elevation at that
+ * point (both in meters).
  */
-public class NEDGraphBuilderImpl implements GraphBuilder {
-    private static final Logger log = LoggerFactory.getLogger(NEDGraphBuilderImpl.class);
+public class ElevationGraphBuilderImpl implements GraphBuilder {
+    private static final Logger log = LoggerFactory.getLogger(ElevationGraphBuilderImpl.class);
 
-    private NEDGridCoverageFactory gridCoverageFactory;
+    private ElevationGridCoverageFactory gridCoverageFactory;
 
     private Coverage coverage;
 
@@ -70,9 +69,9 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
 
     private DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
 
-    public NEDGraphBuilderImpl() { /* This makes me a "bean" */ };
+    public ElevationGraphBuilderImpl() { /* This makes me a "bean" */ };
     
-    public NEDGraphBuilderImpl(NEDGridCoverageFactory factory) {
+    public ElevationGraphBuilderImpl(ElevationGridCoverageFactory factory) {
         this.setGridCoverageFactory(factory);
     }
 
@@ -84,7 +83,7 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
         return Arrays.asList("streets");
     }
     
-    public void setGridCoverageFactory(NEDGridCoverageFactory factory) {
+    public void setGridCoverageFactory(ElevationGridCoverageFactory factory) {
         gridCoverageFactory = factory;
     }
 
@@ -321,7 +320,7 @@ public class NEDGraphBuilderImpl implements GraphBuilder {
     }
 
     /**
-     * Processes a single {@link Street} edge, creating and assigning the elevation profile.
+     * Processes a single street edge, creating and assigning the elevation profile.
      * 
      * @param ee the street edge
      * @param graph the graph (used only for error handling)

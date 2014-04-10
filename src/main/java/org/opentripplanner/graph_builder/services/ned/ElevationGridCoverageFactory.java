@@ -25,10 +25,9 @@ import org.opentripplanner.routing.graph.Graph;
  *
  */
 
-public interface NEDGridCoverageFactory {
+public interface ElevationGridCoverageFactory {
     public Coverage getGridCoverage();
 
-    /** @see GraphBuilder.checkInputs() */
     public void checkInputs();
 
     public void setGraph(Graph graph);

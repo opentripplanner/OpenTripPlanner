@@ -24,7 +24,7 @@ import javax.media.jai.InterpolationBilinear;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.Interpolator2D;
 import org.opengis.coverage.Coverage;
-import org.opentripplanner.graph_builder.services.ned.NEDGridCoverageFactory;
+import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.graph_builder.services.ned.NEDTileSource;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A coverage factory that works off of the NED caches from {@link NEDDownloader}.
  */
-public class NEDGridCoverageFactoryImpl implements NEDGridCoverageFactory {
+public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(NEDGridCoverageFactoryImpl.class);
 
