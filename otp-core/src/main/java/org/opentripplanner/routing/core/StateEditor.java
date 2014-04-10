@@ -251,10 +251,10 @@ public class StateEditor {
      * backward when traversing backward.
      */
     public void incrementTimeInSeconds(int seconds) {
-        incrementTimeInMilliseconds(seconds * 1000);
+        incrementTimeInMilliseconds(seconds * 1000L);
     }
     
-    public void incrementTimeInMilliseconds(int milliseconds) {
+    public void incrementTimeInMilliseconds(long milliseconds) {
         if (milliseconds < 0) {
             LOG.warn("A state's time is being incremented by a negative amount while traversing edge "
                     + child.getBackEdge());

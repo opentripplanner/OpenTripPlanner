@@ -1,7 +1,7 @@
 otp.config = {
     debug: false,
 
-    locale: otp.locale.French,
+    locale: otp.locale.English,
 
     /**
      * The OTP web service locations
