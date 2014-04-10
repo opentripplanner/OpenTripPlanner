@@ -85,7 +85,7 @@ public class OTPApplication extends Application {
             ServerInfo.class,
             /* Features and Filters: extend Jersey, manipulate requests and responses. */
             AuthFilter.class,
-            JsonpFilter.class,
+            CorsFilter.class,
             // Enforce roles annotations defined by JSR-250
             RolesAllowedDynamicFeature.class
         );
