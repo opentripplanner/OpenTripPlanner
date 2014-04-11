@@ -12,6 +12,7 @@ import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.geometry.HashGrid;
 import org.opentripplanner.routing.edgetype.TablePatternEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.vertextype.TransitStation;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +41,8 @@ public class GraphIndex {
     public final Map<Trip, TripPattern> patternForTrip = Maps.newHashMap();
     public final ListMultimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
     public final ListMultimap<Stop, TripPattern>  patternsForStop  = ArrayListMultimap.create();
-    
+    // TODO: consistently key on model object or id string
+    public final ListMultimap<String, Stop> stopsForParentStation = ArrayListMultimap.create();
     public final HashGrid<TransitStop> stopSpatialIndex = new HashGrid<TransitStop>();
         
     public GraphIndex (Graph graph) {
@@ -67,6 +69,7 @@ public class GraphIndex {
                 TransitStop transitStop = (TransitStop) vertex; 
                 stopForId.put(transitStop.getStop().getId(), transitStop.getStop());
                 stopVertexForStop.put(transitStop.getStop(), transitStop);
+                stopsForParentStation.put(transitStop.getStop().getParentStation(), transitStop.getStop());
             }
         }
         stopSpatialIndex.setProjectionMeridian(vertices.iterator().next().getCoordinate().x);
