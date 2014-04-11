@@ -45,6 +45,9 @@ public class GraphIndex {
         
     public GraphIndex (Graph graph) {
         LOG.info("Indexing graph...");
+        for (Agency a : graph.getAgencies()) {
+            agencyForId.put(a.getId(), a);
+        }
         Collection<Edge> edges = graph.getEdges();
         /* We will keep a separate set of all vertices in case some have the same label. 
          * Maybe we should just guarantee unique labels. */

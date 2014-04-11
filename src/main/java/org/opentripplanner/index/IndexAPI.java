@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -49,6 +50,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.standalone.OTPServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,22 +58,23 @@ import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Sets;
 import com.vividsolutions.jts.geom.Coordinate;
 
-/* NOTE that in a servlet, the full path is /ws/transit (see web_client.xml) */
-
-@Path("/index")
+@Path("/routers/{routerId}/index") // would be nice to get rid of the final /index
 public class IndexAPI {
 
-   private static final Logger LOG = LoggerFactory.getLogger(IndexAPI.class);
+    private static final Logger LOG = LoggerFactory.getLogger(IndexAPI.class);
 
-   private static final double MAX_STOP_SEARCH_RADIUS = 5000;
+    private static final double MAX_STOP_SEARCH_RADIUS = 5000;
 
-   private static final DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
+    private static final DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
            
-   private static final String MSG_404 = "FOUR ZERO FOUR";
-   private static final String MSG_400 = "FOUR HUNDRED";
+    private static final String MSG_404 = "FOUR ZERO FOUR";
+    private static final String MSG_400 = "FOUR HUNDRED";
 
-    @Context // FIXME inject Application
-   private GraphService graphService;
+    private final GraphIndex index;
+
+    public IndexAPI (@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
+        index = otpServer.graphService.getGraph(routerId).getIndex();
+    }
 
    /* Needed to check whether query parameter map is empty, rather than chaining " && x == null"s */
    @Context UriInfo ui;
@@ -81,8 +84,7 @@ public class IndexAPI {
    @Path("/agencies")
    @Produces({ MediaType.APPLICATION_JSON })
    public Response getAgencies () {
-       Graph graph = graphService.getGraph();
-       return Response.status(Status.OK).entity(graph.getAgencies()).build();
+       return Response.status(Status.OK).entity(index.agencyForId.values()).build();
    }
 
    /** Return specific agency in the graph, by ID. */
@@ -90,8 +92,7 @@ public class IndexAPI {
    @Path("/agencies/{id}")
    @Produces({ MediaType.APPLICATION_JSON })
    public Response getAgency (@PathParam("id") String id) {
-       Graph graph = graphService.getGraph();
-       for (Agency agency : graph.getAgencies()) {
+       for (Agency agency : index.agencyForId.values()) {
            if (agency.getId().equals(id)) {
                return Response.status(Status.OK).entity(agency).build();
            }
@@ -104,9 +105,8 @@ public class IndexAPI {
    @Path("/stops/{id}")
    @Produces({ MediaType.APPLICATION_JSON })
    public Response getStop (@PathParam("id") String string) {
-       Graph graph = graphService.getGraph();
        AgencyAndId id = AgencyAndId.convertFromString(string);
-       Stop stop = graph.getIndex().stopForId.get(id);
+       Stop stop = index.stopForId.get(id);
        if (stop != null) {
            return Response.status(Status.OK).entity(stop).build();
        } else { 
@@ -127,7 +127,6 @@ public class IndexAPI {
            @QueryParam("lon")    Double lon,
            @QueryParam("radius") Double radius) {
 
-       GraphIndex index = graphService.getGraph().getIndex();
        /* When no parameters are supplied, return all stops. */
        if (ui.getQueryParameters().isEmpty()) {
            Collection<Stop> stops = index.stopForId.values();
@@ -175,12 +174,11 @@ public class IndexAPI {
    @Path("/stops/{id}/routes")
    @Produces({ MediaType.APPLICATION_JSON })
    public Response getRoutesForStop (@PathParam("id") String string) {
-       Graph graph = graphService.getGraph();
        AgencyAndId id = AgencyAndId.convertFromString(string);
-       Stop stop = graph.getIndex().stopForId.get(id);
+       Stop stop = index.stopForId.get(id);
        if (stop != null) {
            Set<Route> routes = Sets.newHashSet();
-           for (TripPattern pattern : graph.getIndex().patternsForStop.get(stop)) {
+           for (TripPattern pattern : index.patternsForStop.get(stop)) {
                routes.add(pattern.route);
            }
            return Response.status(Status.OK).entity(RouteShort.list(routes)).build();
@@ -193,11 +191,10 @@ public class IndexAPI {
    @Path("/stops/{id}/patterns")
    @Produces({ MediaType.APPLICATION_JSON })
    public Response getPatternsForStop (@PathParam("id") String string) {
-       Graph graph = graphService.getGraph();
        AgencyAndId id = AgencyAndId.convertFromString(string);
-       Stop stop = graph.getIndex().stopForId.get(id);
+       Stop stop = index.stopForId.get(id);
        if (stop != null) {
-           Collection<TripPattern> patterns = graph.getIndex().patternsForStop.get(stop);
+           Collection<TripPattern> patterns = index.patternsForStop.get(stop);
            return Response.status(Status.OK).entity(PatternShort.list(patterns)).build();
        } else { 
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
@@ -209,8 +206,7 @@ public class IndexAPI {
    @Path("/routes")
    @Produces({ MediaType.APPLICATION_JSON })
    public Response getRoutes () {
-       Graph graph = graphService.getGraph();
-       Collection<Route> routes = graph.getIndex().routeForId.values();
+       Collection<Route> routes = index.routeForId.values();
        return Response.status(Status.OK).entity(RouteShort.list(routes)).build();
    }
 
@@ -219,9 +215,8 @@ public class IndexAPI {
    @Path("/routes/{id}")
    @Produces({ MediaType.APPLICATION_JSON })
    public Response getRoute (@PathParam("id") String routeIdString) {
-       Graph graph = graphService.getGraph();
        AgencyAndId routeId = AgencyAndId.convertFromString(routeIdString);
-       Route route = graph.getIndex().routeForId.get(routeId);
+       Route route = index.routeForId.get(routeId);
        if (route != null) {
            return Response.status(Status.OK).entity(route).build();
        } else { 
@@ -234,11 +229,10 @@ public class IndexAPI {
    @Path("/routes/{id}/patterns")
    @Produces({ MediaType.APPLICATION_JSON })
    public Response getPatternsForRoute (@PathParam("id") String routeIdString) {
-       Graph graph = graphService.getGraph();
        AgencyAndId routeId = AgencyAndId.convertFromString(routeIdString);
-       Route route = graph.getIndex().routeForId.get(routeId);
+       Route route = index.routeForId.get(routeId);
        if (route != null) {
-           List<TripPattern> patterns = graph.getIndex().patternsForRoute.get(route);
+           List<TripPattern> patterns = index.patternsForRoute.get(route);
            return Response.status(Status.OK).entity(PatternShort.list(patterns)).build();
        } else { 
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
@@ -250,12 +244,11 @@ public class IndexAPI {
    @Path("/routes/{id}/stops")
    @Produces({ MediaType.APPLICATION_JSON })
    public Response getStopsForRoute (@PathParam("id") String routeIdString) {
-       Graph graph = graphService.getGraph();
        AgencyAndId routeId = AgencyAndId.convertFromString(routeIdString);
-       Route route = graph.getIndex().routeForId.get(routeId);
+       Route route = index.routeForId.get(routeId);
        if (route != null) {
            Set<Stop> stops = Sets.newHashSet();
-           Collection<TripPattern> patterns = graph.getIndex().patternsForRoute.get(route);
+           Collection<TripPattern> patterns = index.patternsForRoute.get(route);
            for (TripPattern pattern : patterns) {
                stops.addAll(pattern.getStops());
            }
@@ -270,12 +263,11 @@ public class IndexAPI {
    @Path("/routes/{id}/trips")
    @Produces({ MediaType.APPLICATION_JSON })
    public Response getTripsForRoute (@PathParam("id") String routeIdString) {
-       Graph graph = graphService.getGraph();
        AgencyAndId routeId = AgencyAndId.convertFromString(routeIdString);
-       Route route = graph.getIndex().routeForId.get(routeId);
+       Route route = index.routeForId.get(routeId);
        if (route != null) {
            List<Trip> trips = Lists.newArrayList();
-           Collection<TripPattern> patterns = graph.getIndex().patternsForRoute.get(route);
+           Collection<TripPattern> patterns = index.patternsForRoute.get(route);
            for (TripPattern pattern : patterns) {
                trips.addAll(pattern.getTrips());
            }
@@ -293,9 +285,8 @@ public class IndexAPI {
    @Path("/trips/{id}")
    @Produces({ MediaType.APPLICATION_JSON })
    public Response getTrip (@PathParam("id") String tripIdString) {
-       Graph graph = graphService.getGraph();
        AgencyAndId tripId = AgencyAndId.convertFromString(tripIdString);
-       Trip trip = graph.getIndex().tripForId.get(tripId);
+       Trip trip = index.tripForId.get(tripId);
        if (trip != null) {
            return Response.status(Status.OK).entity(trip).build();
        } else { 
@@ -307,11 +298,10 @@ public class IndexAPI {
    @Path("/trips/{id}/stops")
    @Produces({ MediaType.APPLICATION_JSON })
    public Response getStopsForTrip (@PathParam("id") String tripIdString) {
-       Graph graph = graphService.getGraph();
        AgencyAndId tripId = AgencyAndId.convertFromString(tripIdString);
-       Trip trip = graph.getIndex().tripForId.get(tripId);
+       Trip trip = index.tripForId.get(tripId);
        if (trip != null) {
-           TripPattern pattern = graph.getIndex().patternForTrip.get(trip);
+           TripPattern pattern = index.patternForTrip.get(trip);
            Collection<Stop> stops = pattern.getStops();
            return Response.status(Status.OK).entity(StopShort.list(stops)).build();
        } else { 
@@ -323,11 +313,10 @@ public class IndexAPI {
    @Path("/trips/{id}/stoptimes")
    @Produces({ MediaType.APPLICATION_JSON })
    public Response getStoptimesForTrip (@PathParam("id") String tripIdString) {
-       Graph graph = graphService.getGraph();
        AgencyAndId tripId = AgencyAndId.convertFromString(tripIdString);
-       Trip trip = graph.getIndex().tripForId.get(tripId);
+       Trip trip = index.tripForId.get(tripId);
        if (trip != null) {
-           TripPattern pattern = graph.getIndex().patternForTrip.get(trip);
+           TripPattern pattern = index.patternForTrip.get(trip);
            Timetable table = pattern.getScheduledTimetable();
            return Response.status(Status.OK).entity(TripTimeShort.fromTripTimes(table, trip)).build();
        } else { 
@@ -339,8 +328,7 @@ public class IndexAPI {
    @Path("/patterns")
    @Produces({ MediaType.APPLICATION_JSON })
    public Response getPatterns () {
-       Graph graph = graphService.getGraph();
-       Collection<TripPattern> patterns = graph.getIndex().patternForId.values();
+       Collection<TripPattern> patterns = index.patternForId.values();
        return Response.status(Status.OK).entity(PatternShort.list(patterns)).build();
    }
 
@@ -348,8 +336,7 @@ public class IndexAPI {
    @Path("/patterns/{id}")
    @Produces({ MediaType.APPLICATION_JSON })
    public Response getPattern (@PathParam("id") String string) {
-       Graph graph = graphService.getGraph();
-       TripPattern pattern = graph.getIndex().patternForId.get(string);
+       TripPattern pattern = index.patternForId.get(string);
        if (pattern != null) {
            return Response.status(Status.OK).entity(new PatternDetail(pattern)).build();
        } else { 
@@ -361,8 +348,7 @@ public class IndexAPI {
    @Path("/patterns/{id}/trips")
    @Produces({ MediaType.APPLICATION_JSON })
    public Response getTripsForPattern (@PathParam("id") String string) {
-       Graph graph = graphService.getGraph();
-       TripPattern pattern = graph.getIndex().patternForId.get(string);
+       TripPattern pattern = index.patternForId.get(string);
        if (pattern != null) {
            List<Trip> trips = pattern.getTrips();
            return Response.status(Status.OK).entity(TripShort.list(trips)).build();
@@ -375,8 +361,7 @@ public class IndexAPI {
    @Path("/patterns/{id}/stops")
    @Produces({ MediaType.APPLICATION_JSON })
    public Response getStopsForPattern (@PathParam("id") String string) {
-       Graph graph = graphService.getGraph();
-       TripPattern pattern = graph.getIndex().patternForId.get(string);
+       TripPattern pattern = index.patternForId.get(string);
        if (pattern != null) {
            List<Stop> stops = pattern.getStops();
            return Response.status(Status.OK).entity(StopShort.list(stops)).build();
@@ -386,7 +371,7 @@ public class IndexAPI {
    }
 
    private AgencyAndId makeAgencyAndId (String string) {
-       final String defaultAgency = "fjdsakl";
+       final String defaultAgency = "DEFAULT";
        String agency, id;
        int i = string.indexOf('_');
        if (i == -1) {

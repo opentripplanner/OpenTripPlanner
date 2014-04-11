@@ -19,4 +19,10 @@ public class FrequencyTripTimes extends TripTimes {
         this.freq = freq;
     }
 
+    // funcs for: trip is running, trip is acceptable according to params.
+
+    void getNextDeparture (int time) {
+
+    }
+
 }
