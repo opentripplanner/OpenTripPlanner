@@ -107,5 +107,13 @@ public class StopPattern implements Serializable {
         dropoffs[0] = 0;
         pickups[size - 1] = 0;
     }
-   
+
+    /**
+     * @param stopId in agency_id format
+     */
+    public boolean containsStop (String stopId) {
+        if (stopId == null) return false;
+        for (Stop stop : stops) if (stopId.equals(stop.getId().toString())) return true;
+        return false;
+    }
 }

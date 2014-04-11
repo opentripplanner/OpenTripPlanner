@@ -21,6 +21,7 @@ import org.opentripplanner.api.resource.analyst.SimpleIsochrone;
 import org.opentripplanner.api.resource.analyst.TileService;
 import org.opentripplanner.api.resource.analyst.TimeGridWs;
 import org.opentripplanner.api.resource.analyst.WebMapService;
+import org.opentripplanner.index.IndexAPI;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import javax.ws.rs.core.Application;
@@ -66,6 +67,7 @@ public class OTPApplication extends Application {
         return Sets.newHashSet(
             /* Jersey resource classes: define web services, i.e. an HTTP API. */
             Planner.class,
+            IndexAPI.class,
             SimpleIsochrone.class,
             TileService.class,
             BikeRental.class,

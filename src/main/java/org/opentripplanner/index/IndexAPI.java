@@ -14,7 +14,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.index;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -29,6 +31,8 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import lombok.Setter;
 
 import org.onebusaway.gtfs.model.Agency;
@@ -169,44 +173,50 @@ public class IndexAPI {
        }
 }
 
-
    @GET
-   @Path("/stops/{id}/routes")
+   @Path("/stops/{stopId}/routes")
    @Produces({ MediaType.APPLICATION_JSON })
-   public Response getRoutesForStop (@PathParam("id") String string) {
-       AgencyAndId id = AgencyAndId.convertFromString(string);
-       Stop stop = index.stopForId.get(id);
-       if (stop != null) {
-           Set<Route> routes = Sets.newHashSet();
-           for (TripPattern pattern : index.patternsForStop.get(stop)) {
-               routes.add(pattern.route);
-           }
-           return Response.status(Status.OK).entity(RouteShort.list(routes)).build();
-       } else { 
-           return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
+   public Response getRoutesForStop (@PathParam("stopId") String stopId) {
+       Stop stop = index.stopForId.get(AgencyAndId.convertFromString(stopId));
+       if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
+       Set<Route> routes = Sets.newHashSet();
+       for (TripPattern pattern : index.patternsForStop.get(stop)) {
+           routes.add(pattern.route);
        }
+       return Response.status(Status.OK).entity(RouteShort.list(routes)).build();
    }
 
    @GET
-   @Path("/stops/{id}/patterns")
+   @Path("/stops/{stopId}/patterns")
    @Produces({ MediaType.APPLICATION_JSON })
-   public Response getPatternsForStop (@PathParam("id") String string) {
+   public Response getPatternsForStop (@PathParam("stopId") String string) {
        AgencyAndId id = AgencyAndId.convertFromString(string);
        Stop stop = index.stopForId.get(id);
-       if (stop != null) {
-           Collection<TripPattern> patterns = index.patternsForStop.get(stop);
-           return Response.status(Status.OK).entity(PatternShort.list(patterns)).build();
-       } else { 
-           return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
-       }
+       if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
+       Collection<TripPattern> patterns = index.patternsForStop.get(stop);
+       return Response.status(Status.OK).entity(PatternShort.list(patterns)).build();
    }
 
    /** Return a list of all routes in the graph. */
    @GET
    @Path("/routes")
    @Produces({ MediaType.APPLICATION_JSON })
-   public Response getRoutes () {
+   public Response getRoutes (@QueryParam("hasStop") List<String> stopIds) {
        Collection<Route> routes = index.routeForId.values();
+       // Filter routes to include only those that pass through all given stops
+       if (stopIds != null) {
+           // Protective copy, we are going to calculate the intersection destructively
+           routes = Lists.newArrayList(routes);
+           for (String stopId : stopIds) {
+               Stop stop = index.stopForId.get(AgencyAndId.convertFromString(stopId));
+               if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
+               Set<Route> routesHere = Sets.newHashSet();
+               for (TripPattern pattern : index.patternsForStop.get(stop)) {
+                   routesHere.add(pattern.route);
+               }
+               routes.retainAll(routesHere);
+           }
+       }
        return Response.status(Status.OK).entity(RouteShort.list(routes)).build();
    }
 
