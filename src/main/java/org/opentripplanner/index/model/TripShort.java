@@ -3,6 +3,7 @@ package org.opentripplanner.index.model;
 import java.util.Collection;
 import java.util.List;
 
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Trip;
 
 import com.beust.jcommander.internal.Lists;
@@ -23,7 +24,8 @@ public class TripShort {
         id = trip.getId().getId();
         tripHeadsign = trip.getTripHeadsign();
         serviceId = trip.getServiceId().getId();
-        shapeId = trip.getShapeId().getId();
+        AgencyAndId shape = trip.getShapeId();
+        shapeId = shape == null ? null : shape.getId();
         direction = Integer.parseInt(trip.getDirectionId());
     }
 
