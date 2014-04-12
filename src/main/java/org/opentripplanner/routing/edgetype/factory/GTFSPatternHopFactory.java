@@ -449,6 +449,9 @@ public class GTFSPatternHopFactory {
         /* Generate unique names for all the TableTripPatterns. */
         TripPattern.generateUniqueNames(tripPatterns.values());
 
+        /* Generate unique IDs for all the TableTripPatterns. */
+        TripPattern.generateUniqueIds(tripPatterns.values());
+
         /* Loop over all new TableTripPatterns, creating the vertices and edges for each pattern. */
         for (TripPattern tableTripPattern : tripPatterns.values()) {
             tableTripPattern.makePatternVerticesAndEdges(graph, context);

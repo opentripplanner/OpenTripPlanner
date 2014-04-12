@@ -28,6 +28,7 @@ import java.util.Set;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import com.google.common.collect.HashMultimap;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -109,7 +110,7 @@ public class TripPattern implements Serializable {
     
     /** The short unique identifier for this trip pattern. */
     @Getter @Setter
-    private String code = Integer.toHexString(System.identityHashCode(this));
+    private String code;
     
     /* The vertices in the Graph that correspond to each Stop in this pattern. */
     public final TransitStop[] stopVertices; // these are not unique to this pattern, can be shared. are they even used?
@@ -627,4 +628,20 @@ public class TripPattern implements Serializable {
     public String getDirection() {
         return trips.get(0).getTripHeadsign();
     }
+
+    /**
+     * Patterns do not have unique IDs in GTFS, so we make some by concatenating agency id, route id, and an integer.
+     * We impose our assumption that all trips in the same pattern are on the same route.
+     * This only works if the Collection of TripPattern includes every TripPattern for the agency.
+     */
+    public static void generateUniqueIds(Collection<TripPattern> tripPatterns) {
+        Multimap<Route, TripPattern> patternsForRoute = HashMultimap.create();
+        for (TripPattern pattern : tripPatterns) {
+            patternsForRoute.put(pattern.route, pattern);
+            int count = patternsForRoute.get(pattern.route).size();
+            String id = String.format("%s_%02d", pattern.route.getId(), count);
+            pattern.setCode(id);
+        }
+    }
+
 }
