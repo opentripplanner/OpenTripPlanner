@@ -340,7 +340,7 @@ otp.modules.planner.PlannerModule =
         var this_ = this;
         this.currentRequest = $.ajax(url, {
             data:       queryParams,
-            dataType:   'jsonp',
+            dataType:   'JSON',
                 
             success: function(data) {
                 $('#otp-spinner').hide();
