@@ -41,7 +41,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Provider
 @Produces(MediaType.APPLICATION_JSON)
-public class OTPObjectMapperProvider implements ContextResolver<ObjectMapper> {
+public class JSONObjectMapperProvider implements ContextResolver<ObjectMapper> {
 
     private final ObjectMapper mapper;
 
@@ -49,14 +49,14 @@ public class OTPObjectMapperProvider implements ContextResolver<ObjectMapper> {
      * Pre-instantiate a Jackson ObjectMapper that will be handed off to all incoming Jersey
      * requests, and used to construct the ObjectWriters that will produce JSON responses.
      */
-    public OTPObjectMapperProvider() {
+    public JSONObjectMapperProvider() {
         // Create a module, i.e. a group of one or more Jackson extensions.
         // Our module includes a single class-serializer relationship.
         // Constructors are available for both unnamed, unversioned throwaway modules
         // and named, versioned reusable modules.
-        mapper = new ObjectMapper();
-        mapper.registerModule(AgencyAndIdSerializer.makeModule());
-        mapper.setSerializationInclusion(Include.NON_NULL); // skip null fields
+        mapper = new ObjectMapper()
+                .registerModule(AgencyAndIdSerializer.makeModule())
+                .setSerializationInclusion(Include.NON_NULL); // skip null fields
     }
 
     /**

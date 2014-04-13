@@ -2,9 +2,10 @@ package org.opentripplanner.standalone;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.glassfish.jersey.CommonProperties;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
-import org.opentripplanner.api.model.OTPObjectMapperProvider;
+import org.opentripplanner.api.model.JSONObjectMapperProvider;
 import org.opentripplanner.api.resource.AlertPatcher;
 import org.opentripplanner.api.resource.BikeRental;
 import org.opentripplanner.api.resource.GeocoderResource;
@@ -96,22 +97,29 @@ public class OTPApplication extends Application {
     /**
      * Like getClasses, this method declares web resources, providers, and features to the JAX-RS implementation.
      * However, these are single instances that will be reused for all requests (they are singleton-scoped).
-     * https://jersey.java.net/apidocs/latest/jersey/javax/ws/rs/core/Application.html#getSingletons()
-     * Leave <Object> out of type signature to avoid confusing the Guava type inference.
+     * See https://jersey.java.net/apidocs/latest/jersey/javax/ws/rs/core/Application.html#getSingletons()
+     * Leave <Object> out of method signature to avoid confusing the Guava type inference.
      */
     @Override
     public Set getSingletons() {
         return Sets.newHashSet (
-            new OTPObjectMapperProvider(),
+            // Serialize POJOs (unannotated) JSON using Jackson
+            new JSONObjectMapperProvider(),
+            // Allow injecting the OTP server object into Jersey resource classes
             server.makeBinder()
         );
     }
 
-    /** Enabling tracing allows us to see how web resource names were matched from the client, in headers. */
+    /**
+     * Enabling tracing allows us to see how web resource names were matched from the client, in headers.
+     * Disable auto-discovery of features because it's extremely obnoxious to debug and interacts
+     * in confusing ways with manually registered features.
+     */
     @Override
     public Map<String, Object> getProperties() {
         Map props = Maps.newHashMap();
         props.put(ServerProperties.TRACING, Boolean.TRUE);
+        props.put(CommonProperties.FEATURE_AUTO_DISCOVERY_DISABLE, Boolean.TRUE);
         return props;
     }
 
