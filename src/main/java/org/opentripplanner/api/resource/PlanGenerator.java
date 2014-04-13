@@ -1076,7 +1076,8 @@ public class PlanGenerator {
         return out;
     }
 
-    /** Returns the first trip of the service day. */
+    /** Returns the first trip of the service day. Currently unused.
+     * TODO This should probably be done with a special time value. */
     public TripPlan generateFirstTrip(RoutingRequest request) {
         Graph graph = graphService.getGraph(request.getRouterId());
 
@@ -1098,7 +1099,8 @@ public class PlanGenerator {
         return generate(request);
     }
 
-    /** Return the last trip of the service day */
+    /** Return the last trip of the service day. Currently unused.
+     * TODO This should probably be done with a special time value. */
     public TripPlan generateLastTrip(RoutingRequest request) {
         Graph graph = graphService.getGraph(request.getRouterId());
 

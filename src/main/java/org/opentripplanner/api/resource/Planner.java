@@ -14,6 +14,7 @@ package org.opentripplanner.api.resource;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -27,6 +28,8 @@ import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.standalone.OTPServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,19 +53,12 @@ public class Planner extends RoutingResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(Planner.class);
 
-    @Context // FIXME inject Application
-    public PlanGenerator planGenerator;
-
-    // We inject info about the incoming request so we can include the incoming query 
+    // We inject info about the incoming request so we can include the incoming query
     // parameters in the outgoing response. This is a TriMet requirement.
-    // Jersey seems to use @Context to inject internal types and @InjectParam or @Resource for DI objects.
-    @Context UriInfo uriInfo;
-    
-    /** Java is immensely painful. TODO: Guava should cover this. */
-    interface OneArgFunc<T,U> {
-        public T call(U arg);
-    }
-    private Response wrapGenerate(OneArgFunc<TripPlan, RoutingRequest> func) {
+    // Jersey uses @Context to inject internal types and @InjectParam or @Resource for DI objects.
+    @GET
+    @Produces( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
+    public Response getItineraries(@Context OTPServer otpServer, @Context UriInfo uriInfo) {
 
         /*
          * TODO: add Lang / Locale parameter, and thus get localized content (Messages & more...)
@@ -78,7 +74,7 @@ public class Planner extends RoutingResource {
         try {
             // fill in request from query parameters via shared superclass method
             request = super.buildRequest();
-            TripPlan plan = func.call(request);
+            TripPlan plan = otpServer.planGenerator.generate(request);
             response.setPlan(plan);
         } catch (Exception e) {
             PlannerError error = new PlannerError(e);
@@ -94,34 +90,4 @@ public class Planner extends RoutingResource {
         return response;
     }
 
-    @GET
-    @Produces( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public Response getItineraries() throws JSONException {
-        return wrapGenerate(new OneArgFunc<TripPlan, RoutingRequest>() {
-            public TripPlan call(RoutingRequest request) {
-                return planGenerator.generate(request);
-            }});
-    }
-
-    @GET
-    @Path("/first")
-    @Produces( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public Response getFirstTrip() throws JSONException {
-
-        return wrapGenerate(new OneArgFunc<TripPlan, RoutingRequest>() {
-            public TripPlan call(RoutingRequest request) {
-                return planGenerator.generateFirstTrip(request);
-            }});
-    }
-
-    @GET
-    @Path("/last")
-    @Produces( { MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public Response getLastTrip() throws JSONException {
-
-        return wrapGenerate(new OneArgFunc<TripPlan, RoutingRequest>() {
-            public TripPlan call(RoutingRequest request) {
-                return planGenerator.generateLastTrip(request);
-            }});
-    }
 }

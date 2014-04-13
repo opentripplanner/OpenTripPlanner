@@ -31,7 +31,8 @@ import java.util.Set;
 
 /**
  * A JAX-RS Application subclass which provides hard-wired configuration of an OTP server.
- * Avoids auto-scanning of any kind, and keeps injection to a bare minimum using HK2 like Jersey itself.
+ * Avoids auto-scanning of any kind, and keeps injection to a bare minimum using HK2, the injection
+ * library Jersey itself uses.
  *
  * Jersey has its own ResourceConfig class which is a subclass of Application.
  * We can get away with not using any Jersey-specific "conveniences" and stick with stock JAX-RS.
