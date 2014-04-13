@@ -9,10 +9,10 @@ import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.common.LuceneIndex;
 import org.opentripplanner.common.geometry.HashGrid;
 import org.opentripplanner.routing.edgetype.TablePatternEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
-import org.opentripplanner.routing.vertextype.TransitStation;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +44,10 @@ public class GraphIndex {
     // TODO: consistently key on model object or id string
     public final ListMultimap<String, Stop> stopsForParentStation = ArrayListMultimap.create();
     public final HashGrid<TransitStop> stopSpatialIndex = new HashGrid<TransitStop>();
-        
+
+    // Full-text search extensions
+    public LuceneIndex luceneIndex;
+
     public GraphIndex (Graph graph) {
         LOG.info("Indexing graph...");
         for (Agency a : graph.getAgencies()) {
@@ -89,7 +92,8 @@ public class GraphIndex {
         for (Route route : patternsForRoute.asMap().keySet()) {
             routeForId.put(route.getId(), route);
         }
+        luceneIndex = new LuceneIndex(this, true);
         LOG.info("Done indexing graph.");
-    }  
+    }
     
 }

@@ -380,7 +380,15 @@ public class IndexAPI {
        }
    }
 
-   private AgencyAndId makeAgencyAndId (String string) {
+    @GET
+    @Path("/lucene")
+    // Client geocoder modules usually read XML, but GeocoderBuiltin uses JSON.
+    @Produces({ MediaType.APPLICATION_JSON })
+    public Response textSearch (@QueryParam("query") String query) {
+        return Response.status(Status.OK).entity(index.luceneIndex.query(query)).build();
+    }
+
+    private AgencyAndId makeAgencyAndId (String string) {
        final String defaultAgency = "DEFAULT";
        String agency, id;
        int i = string.indexOf('_');
