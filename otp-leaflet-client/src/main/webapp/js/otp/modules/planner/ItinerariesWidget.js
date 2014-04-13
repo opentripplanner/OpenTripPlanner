@@ -38,7 +38,8 @@ otp.widgets.ItinerariesWidget =
         this.module = module;
 
         otp.widgets.Widget.prototype.initialize.call(this, id, module, {
-            title : otp.config.locale.widgets.ItinerariesWidget.title,
+            //TRANSLATORS: Widget title
+            title : _tr("Itineraries"),
             cssClass : module.itinerariesWidgetCssClass || 'otp-defaultItinsWidget',
             resizable : true,
             closeable : true,
@@ -93,7 +94,8 @@ otp.widgets.ItinerariesWidget =
         this.itineraries = itineraries;
 
         this.clear();
-        this.setTitle(this.itineraries.length + " " + otp.config.locale.widgets.ItinerariesWidget.itinerariesLength);
+        //TRANSLATORS: widget title
+        this.setTitle(ngettext("%d Itinerary Returned", "%d Itineraries Returned", this.itineraries.length));
         
         var html = "<div id='"+divId+"' class='otp-itinsAccord'></div>";
         this.itinsAccord = $(html).appendTo(this.$());
@@ -106,7 +108,8 @@ otp.widgets.ItinerariesWidget =
             var link = this.constructLink(queryParams, 
                                           jQuery.isFunction(this.module.getAdditionalUrlParams) ?
                                               this.module.getAdditionalUrlParams() : null);
-            $('<div class="otp-itinsWidget-searchLink">[<a href="'+link+'">'+otp.config.locale.widgets.ItinerariesWidget.linkToSearch+'</a>]</div>').appendTo(this.footer);
+                                          //TODO: Where does this link?
+            $('<div class="otp-itinsWidget-searchLink">[<a href="'+link+'">'+_tr("Link to search")+'</a>]</div>').appendTo(this.footer);
         }
         
         var header;
@@ -164,7 +167,8 @@ otp.widgets.ItinerariesWidget =
         var serviceBreakTime = "03:00am";
         var this_ = this;
         var buttonRow = $("<div class='otp-itinsButtonRow'></div>").appendTo(this.footer);
-        $('<button>'+otp.config.locale.widgets.ItinerariesWidget.buttons.first+'</button>').button().appendTo(buttonRow).click(function() {
+        //TRANSLATORS: button to first itinerary
+        $('<button>'+_tr("First")+'</button>').button().appendTo(buttonRow).click(function() {
             var itin = this_.itineraries[this_.activeIndex];
             var params = itin.tripPlan.queryParams;
             var stopId = itin.getFirstStopID();
@@ -178,7 +182,8 @@ otp.widgets.ItinerariesWidget =
             this_.module.updateActiveOnly = true;
             this_.module.planTripFunction.call(this_.module, params);
         });
-        $('<button>'+otp.config.locale.widgets.ItinerariesWidget.buttons.previous+'</button>').button().appendTo(buttonRow).click(function() {
+        //TRANSLATORS: button to previous itinerary
+        $('<button>'+_tr("Previous")+'</button>').button().appendTo(buttonRow).click(function() {
             var itin = this_.itineraries[this_.activeIndex];
             var params = itin.tripPlan.queryParams;
             var newEndTime = itin.itinData.endTime - 90000;
@@ -193,7 +198,8 @@ otp.widgets.ItinerariesWidget =
             this_.module.updateActiveOnly = true;
             this_.module.planTripFunction.call(this_.module, params);
         });
-        $('<button>'+otp.config.locale.widgets.ItinerariesWidget.buttons.next+'</button>').button().appendTo(buttonRow).click(function() {
+        //TRANSLATORS: button to next itinerary
+        $('<button>'+_tr("Next")+'</button>').button().appendTo(buttonRow).click(function() {
             var itin = this_.itineraries[this_.activeIndex];
             var params = itin.tripPlan.queryParams;
             var newStartTime = itin.itinData.startTime + 90000;
@@ -208,7 +214,8 @@ otp.widgets.ItinerariesWidget =
             this_.module.updateActiveOnly = true;
             this_.module.planTripFunction.call(this_.module, params);
         });
-        $('<button>'+otp.config.locale.widgets.ItinerariesWidget.buttons.last+'</button>').button().appendTo(buttonRow).click(function() {
+        //TRANSLATORS: button to last itinerary
+        $('<button>'+_tr("Last")+'</button>').button().appendTo(buttonRow).click(function() {
             var itin = this_.itineraries[this_.activeIndex];
             var params = itin.tripPlan.queryParams;
             var stopId = itin.getFirstStopID();
@@ -341,11 +348,14 @@ otp.widgets.ItinerariesWidget =
             if (leg.realTime && typeof(leg.arrivalDelay) === 'number') {
                 var minDelay = Math.round(leg.arrivalDelay / 60)
                 if (minDelay > 0) {
-                    headerHtml += ' <span style="color:red;">(' + minDelay + otp.config.locale.widgets.ItinerariesWidget.realtimeDelay.late + ')</span>';
+                    //TRANSLATORS: Something in Public transport is x minutes late
+                    headerHtml += ' <span style="color:red;">(' + ngettext("%d min late", "%d mins late", minDelay) + ')</span>';
                 } else if (minDelay < 0) {
-                    headerHtml += ' <span style="color:green;">(' + (minDelay * -1) + otp.config.locale.widgets.ItinerariesWidget.realtimeDelay.early + ')</span>';
+                    //TRANSLATORS: Something in Public transport is x minutes early
+                    headerHtml += ' <span style="color:green;">(' + ngettext("%d min early", "%d mins early", (minDelay * -1)) + ')</span>';
                 } else {
-                    headerHtml += ' <span style="color:green;">(' + otp.config.locale.widgets.ItinerariesWidget.realtimeDelay.onTime + ')</span>';
+                    //TRANSLATORS: Something in Public transport is on time
+                    headerHtml += ' <span style="color:green;">(' + _tr("on time") + ')</span>';
                 }
             }
 
@@ -367,7 +377,9 @@ otp.widgets.ItinerariesWidget =
                 }
 
                 if(leg.headsign) {
-                    headerHtml +=  " " + otp.config.locale.directions.to + " " + leg.headsign;
+                    /*TRANSLATORS: used in sentence like: <Long name of public transport route> "to" <Public transport
+                    headsign>. Used in showing itinerary*/
+                    headerHtml +=  " " + _tr("to") + " " + leg.headsign;
                 }
                 
                 if(leg.alerts) {
@@ -415,7 +427,8 @@ otp.widgets.ItinerariesWidget =
         // add alerts, if applicable
         alerts = alerts || [];
         if(itin.totalWalk > itin.tripPlan.queryParams.maxWalkDistance) {
-            alerts.push("Total walk distance for this trip exceeds specified maximum");
+            //TRANSLATORS: Shown as alert text before showing itinerary.
+            alerts.push(_tr("Total walk distance for this trip exceeds specified maximum"));
         }
         
         for(var i = 0; i < alerts.length; i++) {
