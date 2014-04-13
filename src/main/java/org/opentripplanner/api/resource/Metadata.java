@@ -13,50 +13,28 @@
 
 package org.opentripplanner.api.resource;
 
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.codehaus.jettison.json.JSONException;
-import org.opentripplanner.api.resource.services.MetadataService;
+import org.opentripplanner.standalone.OTPServer;
 
 @Path("/routers/{routerId}/metadata")
 @XmlRootElement
 public class Metadata {
 
-    @Context // FIXME inject Application context
-    private MetadataService metadataService;
-    
-    /**
-     * Returns metadata about the graph -- presently, this is just the extent of the graph.
-     *
-     * @param routerId
-     *             Router ID used when in multiple graph mode. Unused in singleton graph mode.
-     *
-     * @return Returns either an XML or a JSON document, depending on the HTTP Accept header of the
-     *         client making the request.
-     *
-     * @throws JSONException
-     */
+    @Context
+    private OTPServer otpServer;
+
+    /** Returns metadata about the graph -- presently, this is just the extent of the graph. */
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public GraphMetadata getMetadata(@PathParam("routerId") String routerId) throws JSONException {
-        GraphMetadata data = getMetadataService().getMetadata(routerId);
-        return data;
-    }
-
-    public MetadataService getMetadataService() {
-        return metadataService;
-    }
-
-    public void setMetadataService(MetadataService metadataService) {
-        this.metadataService = metadataService;
+    public GraphMetadata getMetadata(@PathParam("routerId") String routerId) {
+        return otpServer.graphService.getGraph(routerId).getMetadata();
     }
 
 }

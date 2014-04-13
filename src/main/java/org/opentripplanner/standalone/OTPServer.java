@@ -12,7 +12,6 @@ import org.opentripplanner.analyst.request.SampleFactory;
 import org.opentripplanner.analyst.request.SampleGridRenderer;
 import org.opentripplanner.analyst.request.TileCache;
 import org.opentripplanner.api.resource.PlanGenerator;
-import org.opentripplanner.api.resource.services.MetadataService;
 import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.impl.LongDistancePathService;
@@ -41,7 +40,6 @@ public class OTPServer {
     public PathService pathService;
     public RoutingRequest routingRequest; // the prototype routing request which establishes default parameter values
     public PlanGenerator planGenerator;
-    public MetadataService metadataService;
     public SPTService sptService;
 
     // Optional Analyst Modules
@@ -64,7 +62,6 @@ public class OTPServer {
         graphService = gs;
         routingRequest = new RoutingRequest();
         sptService = new GenericAStar();
-        metadataService = new MetadataService(graphService);
 
         // Choose a PathService to wrap the SPTService, depending on expected maximum path lengths
         if (params.longDistance) {
