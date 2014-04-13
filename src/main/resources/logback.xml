@@ -7,18 +7,16 @@ depends on otp-routing.
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <encoder>
-      <!-- simple logging -->
-<!-- 	  <pattern>%d{HH:mm:ss} %level %msg%n</pattern> -->
-      <!-- debug logging: print out file and line number in parenthesis, which Eclipse will link -->
+      <!-- print out file and line number in parenthesis, which Eclipse and IDEA will link -->
       <pattern>%d{HH:mm:ss.SSS} %level \(%F:%L\) %msg%n</pattern>
     </encoder>
   </appender>
 
-  <root level="info">
+  <root level="debug">
     <appender-ref ref="STDOUT" />
   </root>
   
-  <logger name="org.opentripplanner" level="info" />
+  <logger name="org.opentripplanner" level="debug" />
   <logger name="org.opentripplanner.analyst" level="info" />
   <logger name="org.opentripplanner.routing" level="info" />
   <logger name="org.opentripplanner.routing.impl.RetryingPathServiceImpl" level="debug" />
@@ -32,7 +30,6 @@ depends on otp-routing.
   <!-- Avoid printing ugly warning message when unable to create websocket connection -->
   <logger name="com.ning.http.client.providers.netty.NettyAsyncHttpProvider" level="error" />
   
-  <logger name="org.springframework" level="warn" />
   <logger name="com.sun.jersey" level="debug" />
   
 </configuration>
