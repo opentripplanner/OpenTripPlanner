@@ -74,8 +74,7 @@ otp.core.Map = otp.Class({
             var url = otp.config.hostname + '/' + otp.config.restService + '/metadata';
             $.ajax(url, {
                 data: { routerId : otp.config.routerId },            
-                dataType:   'jsonp',
-                
+                dataType: 'JSON',
                 success: function(data) {
                     this_.lmap.fitBounds([
                         [data.lowerLeftLatitude, data.lowerLeftLongitude],
