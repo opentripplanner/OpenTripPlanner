@@ -27,7 +27,7 @@ public class Individual {
     @Setter public String label;
     @Setter public double lon;
     @Setter public double lat;
-    @Setter @NonNull public double input;  // not final to allow clamping and scaling by filters
+    @Setter public double input;  // not final to allow clamping and scaling by filters
     public Sample sample= null; // not final, allowing sampling to occur after filterings
     
     public Individual(String label, double lon, double lat, double input) {
