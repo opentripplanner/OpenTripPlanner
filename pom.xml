@@ -347,7 +347,7 @@
     <dependencies>
 
         <dependency>
-            <!-- MapDB, for GTFS loading experiments. -->
+            <!-- MapDB, for GTFS and OSM loading experiments. -->
             <groupId>org.mapdb</groupId>
             <artifactId>mapdb</artifactId>
             <version>0.9.10</version>
@@ -375,7 +375,7 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <!-- Guava provides improved collections -->
+            <!-- Guava provides improved collections, among other things. -->
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>14.0.1</version>
@@ -387,12 +387,7 @@
         </dependency>
 
         <!-- GEOTOOLS AND JTS TOPOLOGY (geometry, rasters and projection) -->
-        <!-- GEOTOOLS includes JTS
-                <dependency>
-                    <groupId>com.vividsolutions</groupId>
-                    <artifactId>jts</artifactId>
-                </dependency>
-        -->
+        <!-- GEOTOOLS includes JTS as a transitive dependency -->
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-geojson</artifactId>
@@ -482,8 +477,7 @@
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <version>2.5</version>
-            <scope>provided</scope>
-            <!-- this dependency is provided by the servlet container -->
+            <scope>provided</scope> <!-- this dependency is provided by the servlet container -->
         </dependency>
         <dependency>
             <groupId>javax.annotation</groupId>
@@ -499,18 +493,6 @@
             <groupId>javax.inject</groupId>
             <artifactId>javax.inject</artifactId>
             <version>1</version>
-        </dependency>
-        <dependency>
-            <!-- Bytecode manipulator -->
-            <groupId>javassist</groupId>
-            <artifactId>javassist</artifactId>
-            <version>3.8.0.GA</version>
-        </dependency>
-        <dependency>
-            <!-- Java ZeroMQ -->
-            <groupId>org.jeromq</groupId>
-            <artifactId>jeromq</artifactId>
-            <version>0.2.0</version>
         </dependency>
         <dependency>
             <!-- OBA GTFS loader -->
@@ -542,7 +524,7 @@
             <artifactId>joda-time</artifactId>
             <version>2.1</version>
         </dependency>
-        <!-- PNGJ -->
+        <!-- PNGJ, used for Analyst TimeGrids-->
         <dependency>
             <groupId>ar.com.hjg</groupId>
             <artifactId>pngj</artifactId>
@@ -634,11 +616,6 @@
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-queries</artifactId>
-            <version>4.7.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-test-framework</artifactId>
             <version>4.7.1</version>
         </dependency>
         <dependency>
