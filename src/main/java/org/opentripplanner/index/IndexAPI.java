@@ -54,8 +54,8 @@ import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Sets;
 import com.vividsolutions.jts.geom.Coordinate;
 
-@Path("/routers/{routerId}/index") // would be nice to get rid of the final /index
-@Produces(MediaType.APPLICATION_JSON) // one produces annotation for all endpoints
+@Path("/routers/{routerId}/index")    // It would be nice to get rid of the final /index.
+@Produces(MediaType.APPLICATION_JSON) // One @Produces annotation for all endpoints.
 public class IndexAPI {
 
     private static final Logger LOG = LoggerFactory.getLogger(IndexAPI.class);
@@ -65,10 +65,10 @@ public class IndexAPI {
     private static final String MSG_400 = "FOUR HUNDRED";
 
     /** Choose short or long form of results. */
-    @QueryParam("detail") private final boolean detail = false;
+    @QueryParam("detail") private boolean detail = false;
 
     /** Include GTFS entities referenced by ID in the result. */
-    @QueryParam("refs") private final boolean refs = false;
+    @QueryParam("refs") private boolean refs = false;
 
     private final GraphIndex index;
 
@@ -88,10 +88,10 @@ public class IndexAPI {
 
    /** Return specific agency in the graph, by ID. */
    @GET
-   @Path("/agencies/{id}")
-   public Response getAgency (@PathParam("id") String id) {
+   @Path("/agencies/{agencyId}")
+   public Response getAgency (@PathParam("agencyId") String agencyId) {
        for (Agency agency : index.agencyForId.values()) {
-           if (agency.getId().equals(id)) {
+           if (agency.getId().equals(agencyId)) {
                return Response.status(Status.OK).entity(agency).build();
            }
        }
@@ -100,10 +100,10 @@ public class IndexAPI {
    
    /** Return specific transit stop in the graph, by ID. */
    @GET
-   @Path("/stops/{id}")
-   public Response getStop (@PathParam("id") String string) {
-       AgencyAndId id = AgencyAndId.convertFromString(string);
-       Stop stop = index.stopForId.get(id);
+   @Path("/stops/{stopId}")
+   public Response getStop (@PathParam("stopId") String stopIdString) {
+       AgencyAndId stopId = AgencyAndId.convertFromString(stopIdString);
+       Stop stop = index.stopForId.get(stopId);
        if (stop != null) {
            return Response.status(Status.OK).entity(stop).build();
        } else { 
@@ -179,8 +179,8 @@ public class IndexAPI {
 
    @GET
    @Path("/stops/{stopId}/patterns")
-   public Response getPatternsForStop (@PathParam("stopId") String string) {
-       AgencyAndId id = AgencyAndId.convertFromString(string);
+   public Response getPatternsForStop (@PathParam("stopId") String stopIdString) {
+       AgencyAndId id = AgencyAndId.convertFromString(stopIdString);
        Stop stop = index.stopForId.get(id);
        if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        Collection<TripPattern> patterns = index.patternsForStop.get(stop);
@@ -190,8 +190,8 @@ public class IndexAPI {
     /** Return all vehicle arrival/departure times at a specific stop. */
     @GET
     @Path("/stops/{stopId}/stoptimes")
-    public Response getStoptimesForStop (@PathParam("stopId") String string) {
-        Stop stop = index.stopForId.get(AgencyAndId.convertFromString(string));
+    public Response getStoptimesForStop (@PathParam("stopId") String stopIdString) {
+        Stop stop = index.stopForId.get(AgencyAndId.convertFromString(stopIdString));
         if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
         Collection<StopTime> stopTimes;
         // TODO build response, filter by date and servicecode
@@ -223,8 +223,8 @@ public class IndexAPI {
 
    /** Return specific route in the graph, for the given ID. */
    @GET
-   @Path("/routes/{id}")
-   public Response getRoute (@PathParam("id") String routeIdString) {
+   @Path("/routes/{routeId}")
+   public Response getRoute (@PathParam("routeId") String routeIdString) {
        AgencyAndId routeId = AgencyAndId.convertFromString(routeIdString);
        Route route = index.routeForId.get(routeId);
        if (route != null) {
@@ -236,8 +236,8 @@ public class IndexAPI {
 
    /** Return all stop patterns used by trips on the given route. */
    @GET
-   @Path("/routes/{id}/patterns")
-   public Response getPatternsForRoute (@PathParam("id") String routeIdString) {
+   @Path("/routes/{routeId}/patterns")
+   public Response getPatternsForRoute (@PathParam("routeId") String routeIdString) {
        AgencyAndId routeId = AgencyAndId.convertFromString(routeIdString);
        Route route = index.routeForId.get(routeId);
        if (route != null) {
@@ -250,8 +250,8 @@ public class IndexAPI {
 
    /** Return all stops in any pattern on a given route. */
    @GET
-   @Path("/routes/{id}/stops")
-   public Response getStopsForRoute (@PathParam("id") String routeIdString) {
+   @Path("/routes/{routeId}/stops")
+   public Response getStopsForRoute (@PathParam("routeId") String routeIdString) {
        AgencyAndId routeId = AgencyAndId.convertFromString(routeIdString);
        Route route = index.routeForId.get(routeId);
        if (route != null) {
@@ -268,8 +268,8 @@ public class IndexAPI {
 
    /** Return all trips in any pattern on the given route. */
    @GET
-   @Path("/routes/{id}/trips")
-   public Response getTripsForRoute (@PathParam("id") String routeIdString) {
+   @Path("/routes/{routeId}/trips")
+   public Response getTripsForRoute (@PathParam("routeId") String routeIdString) {
        AgencyAndId routeId = AgencyAndId.convertFromString(routeIdString);
        Route route = index.routeForId.get(routeId);
        if (route != null) {
@@ -285,12 +285,12 @@ public class IndexAPI {
    }
    
    
-// Disabled, results are too voluminous.
-//   @Path("/trips")
+    // Not implemented, results would be too voluminous.
+    // @Path("/trips")
 
    @GET
-   @Path("/trips/{id}")
-   public Response getTrip (@PathParam("id") String tripIdString) {
+   @Path("/trips/{tripId}")
+   public Response getTrip (@PathParam("tripId") String tripIdString) {
        AgencyAndId tripId = AgencyAndId.convertFromString(tripIdString);
        Trip trip = index.tripForId.get(tripId);
        if (trip != null) {
@@ -301,8 +301,8 @@ public class IndexAPI {
    }
 
    @GET
-   @Path("/trips/{id}/stops")
-   public Response getStopsForTrip (@PathParam("id") String tripIdString) {
+   @Path("/trips/{tripId}/stops")
+   public Response getStopsForTrip (@PathParam("tripId") String tripIdString) {
        AgencyAndId tripId = AgencyAndId.convertFromString(tripIdString);
        Trip trip = index.tripForId.get(tripId);
        if (trip != null) {
@@ -315,8 +315,8 @@ public class IndexAPI {
    }
 
    @GET
-   @Path("/trips/{id}/stoptimes")
-   public Response getStoptimesForTrip (@PathParam("id") String tripIdString) {
+   @Path("/trips/{tripId}/stoptimes")
+   public Response getStoptimesForTrip (@PathParam("tripId") String tripIdString) {
        AgencyAndId tripId = AgencyAndId.convertFromString(tripIdString);
        Trip trip = index.tripForId.get(tripId);
        if (trip != null) {
@@ -336,9 +336,9 @@ public class IndexAPI {
    }
 
    @GET
-   @Path("/patterns/{id}")
-   public Response getPattern (@PathParam("id") String string) {
-       TripPattern pattern = index.patternForId.get(string);
+   @Path("/patterns/{patternId}")
+   public Response getPattern (@PathParam("patternId") String patternIdString) {
+       TripPattern pattern = index.patternForId.get(patternIdString);
        if (pattern != null) {
            return Response.status(Status.OK).entity(new PatternDetail(pattern)).build();
        } else { 
@@ -347,9 +347,9 @@ public class IndexAPI {
    }
 
    @GET
-   @Path("/patterns/{id}/trips")
-   public Response getTripsForPattern (@PathParam("id") String string) {
-       TripPattern pattern = index.patternForId.get(string);
+   @Path("/patterns/{patternId}/trips")
+   public Response getTripsForPattern (@PathParam("patternId") String patternIdString) {
+       TripPattern pattern = index.patternForId.get(patternIdString);
        if (pattern != null) {
            List<Trip> trips = pattern.getTrips();
            return Response.status(Status.OK).entity(TripShort.list(trips)).build();
@@ -359,10 +359,10 @@ public class IndexAPI {
    }
 
    @GET
-   @Path("/patterns/{id}/stops")
-   public Response getStopsForPattern (@PathParam("id") String string) {
+   @Path("/patterns/{patternId}/stops")
+   public Response getStopsForPattern (@PathParam("patternId") String patternIdString) {
        // Pattern names are graph-unique because we made them up.
-       TripPattern pattern = index.patternForId.get(string);
+       TripPattern pattern = index.patternForId.get(patternIdString);
        if (pattern != null) {
            List<Stop> stops = pattern.getStops();
            return Response.status(Status.OK).entity(StopShort.list(stops)).build();
@@ -393,20 +393,5 @@ public class IndexAPI {
     public Response textSearch (@QueryParam("query") String query) {
         return Response.status(Status.OK).entity(index.luceneIndex.query(query)).build();
     }
-
-    private AgencyAndId makeAgencyAndId (String string) {
-       final String defaultAgency = "DEFAULT";
-       String agency, id;
-       int i = string.indexOf('_');
-       if (i == -1) {
-           agency = defaultAgency;
-           id = string;
-       }
-       else {
-           agency = string.substring(0, i);
-           id = string.substring(i + 1);
-       }
-       return new AgencyAndId(agency, id);
-   }
 
 }
