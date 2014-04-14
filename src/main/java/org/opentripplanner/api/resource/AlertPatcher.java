@@ -26,7 +26,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.codehaus.jettison.json.JSONException;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.api.model.alertpatch.AlertPatchCreationResponse;
 import org.opentripplanner.api.model.alertpatch.AlertPatchResponse;
@@ -46,14 +45,12 @@ public class AlertPatcher {
      *
      * @return Returns either an XML or a JSON document, depending on the HTTP Accept header of the
      *         client making the request.
-     *
-     * @throws JSONException
      */
     @GET
     @Path("/stopPatches")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public AlertPatchResponse getStopPatches(@QueryParam("agency") String agency,
-            @QueryParam("id") String id) throws JSONException {
+            @QueryParam("id") String id) {
 
         AlertPatchResponse response = new AlertPatchResponse();
         Collection<AlertPatch> alertPatches = alertPatchService.getStopPatches(new AgencyAndId(agency, id));
@@ -68,14 +65,12 @@ public class AlertPatcher {
      *
      * @return Returns either an XML or a JSON document, depending on the HTTP Accept header of the
      *         client making the request.
-     *
-     * @throws JSONException
      */
     @GET
     @Path("/routePatches")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public AlertPatchResponse getRoutePatches(@QueryParam("agency") String agency,
-            @QueryParam("id") String id) throws JSONException {
+            @QueryParam("id") String id) {
 
         AlertPatchResponse response = new AlertPatchResponse();
         Collection<AlertPatch> alertPatches =
@@ -91,7 +86,7 @@ public class AlertPatcher {
     @Path("/patch")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public AlertPatchCreationResponse createPatches(AlertPatchSet alertPatches) throws JSONException {
+    public AlertPatchCreationResponse createPatches(AlertPatchSet alertPatches) {
         AlertPatchCreationResponse response = new AlertPatchCreationResponse();
         for (AlertPatch alertPatch : alertPatches.alertPatches) {
             if (alertPatch.getId() == null) {

@@ -21,6 +21,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.geotools.geojson.geom.GeometryJSON;
 import org.geotools.referencing.GeodeticCalculator;
 import org.opensphere.geometry.algorithm.ConcaveHull;
 import org.opentripplanner.analyst.core.GeometryIndex;
@@ -39,7 +40,6 @@ import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.services.SPTService;
 import org.opentripplanner.routing.spt.ShortestPathTree;
-import org.opentripplanner.util.GeoJSONBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -341,7 +341,7 @@ public class SIsochrone extends RoutingResource {
                 allConnectingEdges.add(tedge);
         }
         StringWriter sw = new StringWriter();
-        GeoJSONBuilder json = new GeoJSONBuilder(sw);
+        GeometryJSON geometryJSON = new GeometryJSON();
         //
         // -- create the different outputs ---
         //
@@ -355,7 +355,7 @@ public class SIsochrone extends RoutingResource {
                 }
                 // -- the states/nodes with time elapsed <= X min.
                 LOG.debug("write multipoint geom with {} points", coords.length);
-                json.writeGeom(gf.createMultiPoint(coords));
+                geometryJSON.write(gf.createMultiPoint(coords), sw);
                 LOG.debug("done");
             } else if (output.equals(SIsochrone.RESULT_TYPE_SHED)) {
 
@@ -363,7 +363,7 @@ public class SIsochrone extends RoutingResource {
                 // in case there was no road we create a circle
                 if (noRoadNearBy) {
                     Geometry circleShape = createCirle(dropPoint, pathToStreet);
-                    json.writeGeom(circleShape);
+                    geometryJSON.write(circleShape, sw);
                 } else {
                     if (maxTime > shedCalcMethodSwitchTimeInSec) { // eg., walkshed > 20 min
                         // -- create a point-based walkshed
@@ -412,13 +412,13 @@ public class SIsochrone extends RoutingResource {
                         LOG.debug("Could not generate ConcaveHull for WalkShed, using ConvexHull instead.");
                     }
                     LOG.debug("write shed geom");
-                    json.writeGeom(outputHull);
+                    geometryJSON.write(outputHull, sw);
                     LOG.debug("done");
                 }
             } else if (output.equals(SIsochrone.RESULT_TYPE_EDGES)) {
                 // in case there was no road we return only the suggested path to the street
                 if (noRoadNearBy) {
-                    json.writeGeom(pathToStreet);
+                    geometryJSON.write(pathToStreet, sw);
                 } else {
                     // -- if we would use only the edges from the paths to the origin we will miss
                     // some edges that will be never on the shortest path (e.g. loops/crescents).
@@ -444,7 +444,7 @@ public class SIsochrone extends RoutingResource {
                     LOG.debug("create multilinestring from {} geoms", edges.length);
                     mls = gf.createMultiLineString(edges);
                     LOG.debug("write geom");
-                    json.writeGeom(mls);
+                    geometryJSON.write(mls, sw);
                     LOG.debug("done");
                 }
             } else if (output.equals("DEBUGEDGES")) {
@@ -467,11 +467,10 @@ public class SIsochrone extends RoutingResource {
                 }
                 Geometry mls = gf.createMultiLineString(edges);
                 LOG.debug("write debug geom");
-                json.writeGeom(mls);
+                geometryJSON.write(mls, sw);
                 LOG.debug("done");
             }
-        } catch (org.codehaus.jettison.json.JSONException e) {
-            // TODO Auto-generated catch block
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return sw.toString();

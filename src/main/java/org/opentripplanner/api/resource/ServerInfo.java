@@ -28,7 +28,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import lombok.Getter;
 
-import org.codehaus.jettison.json.JSONException;
 import org.opentripplanner.common.MavenVersion;
 
 @Path("/")
@@ -39,12 +38,12 @@ public class ServerInfo {
     
     @GET
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public static ServerInfo getServerInfo() throws JSONException {
+    public static ServerInfo getServerInfo() {
         return SERVER_INFO;
     }    
     
     /* Fields must be public or have a public getter to be auto-serialized to JSON;
-    they are annotated with @XmlElement to be serialized to XML.
+    they are annotated with @XmlElement to be serialized to XML elements (as opposed to attributes).
     Adding Lombok @Getter does not work because the name of the auto-generated getNCores getter 
     function confuses JSON field capitalization. */
 

@@ -23,7 +23,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import lombok.Setter;
 
-import org.codehaus.jettison.json.JSONException;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.error.PlannerError;
@@ -45,8 +44,6 @@ import org.slf4j.LoggerFactory;
  * 
  * @return Returns either an XML or a JSON document, depending on the HTTP Accept header of the
  *         client making the request.
- * 
- * @throws JSONException
  */
 @Path("routers/{routerId}/plan") // final element needed here rather than on method to distinguish from routers API
 public class Planner extends RoutingResource {

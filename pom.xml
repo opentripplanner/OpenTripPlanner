@@ -541,13 +541,6 @@
             <classifier>jdk15</classifier>
         </dependency>
         <dependency>
-            <!-- Used for home-rolled GeoJSON writer. -->
-            <!-- Could probably be done with Geotools or Jackson. -->
-            <groupId>org.codehaus.jettison</groupId>
-            <artifactId>jettison</artifactId>
-            <version>1.1</version>
-        </dependency>
-        <dependency>
             <!-- Used for deserializing JSON in Nominatim/Yahoo/Google geocoder modules. -->
             <!-- Could probably be done with Jackson. -->
             <groupId>net.sf.flexjson</groupId>
