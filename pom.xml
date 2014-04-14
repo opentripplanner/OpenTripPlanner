@@ -368,10 +368,10 @@
 
         <!-- JAVA STANDARD LIBRARY EXTENSIONS -->
         <dependency>
-            <!-- Lombok provides annotation-driven field accessor methods -->
+            <!-- Lombok provides annotation-driven field accessor methods. -->
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>0.11.8</version>
+            <version>1.12.6</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
