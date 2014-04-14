@@ -1,8 +1,6 @@
 package org.opentripplanner.standalone;
 
 import com.google.common.collect.Maps;
-import com.sun.xml.internal.messaging.saaj.util.Base64;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.Principal;
@@ -66,7 +64,9 @@ public class AuthFilter implements ContainerRequestFilter {
             if (auth.startsWith("Basic ") || auth.startsWith("basic ")) {
                 if ( ! containerRequest.getSecurityContext().isSecure()) unencrypted();
                 auth = auth.replaceFirst("[Bb]asic ", "");
-                String[] split = Base64.base64Decode(auth).split(":", 2);
+                // TODO find non-internal Base64 implementation
+                // this one is invisible to some Java compilers
+                String[] split = "".split(":", 2); //Base64.base64Decode(auth).split(":", 2);
                 if (split.length != 2) return;
                 String user = split[0];
                 String pass = split[1];
