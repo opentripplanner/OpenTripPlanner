@@ -13,11 +13,16 @@
 
 package org.opentripplanner.api.resource;
 
-import java.io.InputStream;
+import org.opentripplanner.api.model.RouterInfo;
+import org.opentripplanner.api.model.RouterList;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Graph.LoadLevel;
+import org.opentripplanner.standalone.OTPServer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.security.PermitAll;
 import javax.annotation.security.RolesAllowed;
-import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -29,26 +34,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.SecurityContext;
-import javax.xml.bind.annotation.XmlRootElement;
-
-import org.codehaus.jettison.json.JSONException;
-import org.opentripplanner.api.model.RouterInfo;
-import org.opentripplanner.api.model.RouterList;
-import org.opentripplanner.common.geometry.GraphUtils;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Graph.LoadLevel;
-import org.opentripplanner.routing.services.GraphService;
-import org.opentripplanner.standalone.OTPApplication;
-import org.opentripplanner.standalone.OTPServer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.vividsolutions.jts.geom.Geometry;
+import java.io.InputStream;
 
 /**
  * This REST API endpoint allows remotely loading, reloading, and evicting graphs on a running server.
@@ -103,8 +93,7 @@ public class Routers {
      * on the Accept header in the HTTP request.
      */
     @GET @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
-    public RouterList getRouterIds()
-            throws JSONException {
+    public RouterList getRouterIds() {
         RouterList routerList = new RouterList();
         for (String id : server.graphService.getRouterIds()) {
             routerList.routerInfo.add(getRouterInfo(id));
