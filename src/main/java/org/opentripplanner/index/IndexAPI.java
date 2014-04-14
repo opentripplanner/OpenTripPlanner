@@ -14,12 +14,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 package org.opentripplanner.index;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
-import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -30,10 +27,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
-
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
-import lombok.Setter;
 
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -50,9 +43,7 @@ import org.opentripplanner.index.model.TripShort;
 import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.Timetable;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
-import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.standalone.OTPServer;
 import org.slf4j.Logger;
@@ -63,6 +54,7 @@ import com.beust.jcommander.internal.Sets;
 import com.vividsolutions.jts.geom.Coordinate;
 
 @Path("/routers/{routerId}/index") // would be nice to get rid of the final /index
+@Produces(MediaType.APPLICATION_JSON) // one produces annotation for all endpoints
 public class IndexAPI {
 
     private static final Logger LOG = LoggerFactory.getLogger(IndexAPI.class);
@@ -81,12 +73,11 @@ public class IndexAPI {
     }
 
    /* Needed to check whether query parameter map is empty, rather than chaining " && x == null"s */
-   @Context UriInfo ui;
+   @Context UriInfo uriInfo;
 
    /** Return a list of all agencies in the graph. */
    @GET
    @Path("/agencies")
-   @Produces({ MediaType.APPLICATION_JSON })
    public Response getAgencies () {
        return Response.status(Status.OK).entity(index.agencyForId.values()).build();
    }
@@ -94,7 +85,6 @@ public class IndexAPI {
    /** Return specific agency in the graph, by ID. */
    @GET
    @Path("/agencies/{id}")
-   @Produces({ MediaType.APPLICATION_JSON })
    public Response getAgency (@PathParam("id") String id) {
        for (Agency agency : index.agencyForId.values()) {
            if (agency.getId().equals(id)) {
@@ -107,7 +97,6 @@ public class IndexAPI {
    /** Return specific transit stop in the graph, by ID. */
    @GET
    @Path("/stops/{id}")
-   @Produces({ MediaType.APPLICATION_JSON })
    public Response getStop (@PathParam("id") String string) {
        AgencyAndId id = AgencyAndId.convertFromString(string);
        Stop stop = index.stopForId.get(id);
@@ -121,7 +110,6 @@ public class IndexAPI {
    /** Return a list of all stops within a circle around the given coordinate. */
    @GET
    @Path("/stops")
-   @Produces({ MediaType.APPLICATION_JSON })
    public Response getStopsInRadius (
            @QueryParam("minLat") Double minLat,
            @QueryParam("minLon") Double minLon,
@@ -132,7 +120,7 @@ public class IndexAPI {
            @QueryParam("radius") Double radius) {
 
        /* When no parameters are supplied, return all stops. */
-       if (ui.getQueryParameters().isEmpty()) {
+       if (uriInfo.getQueryParameters().isEmpty()) {
            Collection<Stop> stops = index.stopForId.values();
            return Response.status(Status.OK).entity(StopShort.list(stops)).build();
        }
@@ -175,7 +163,6 @@ public class IndexAPI {
 
    @GET
    @Path("/stops/{stopId}/routes")
-   @Produces({ MediaType.APPLICATION_JSON })
    public Response getRoutesForStop (@PathParam("stopId") String stopId) {
        Stop stop = index.stopForId.get(AgencyAndId.convertFromString(stopId));
        if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
@@ -188,7 +175,6 @@ public class IndexAPI {
 
    @GET
    @Path("/stops/{stopId}/patterns")
-   @Produces({ MediaType.APPLICATION_JSON })
    public Response getPatternsForStop (@PathParam("stopId") String string) {
        AgencyAndId id = AgencyAndId.convertFromString(string);
        Stop stop = index.stopForId.get(id);
@@ -200,7 +186,6 @@ public class IndexAPI {
    /** Return a list of all routes in the graph. */
    @GET
    @Path("/routes")
-   @Produces({ MediaType.APPLICATION_JSON })
    public Response getRoutes (@QueryParam("hasStop") List<String> stopIds) {
        Collection<Route> routes = index.routeForId.values();
        // Filter routes to include only those that pass through all given stops
@@ -223,7 +208,6 @@ public class IndexAPI {
    /** Return specific route in the graph, for the given ID. */
    @GET
    @Path("/routes/{id}")
-   @Produces({ MediaType.APPLICATION_JSON })
    public Response getRoute (@PathParam("id") String routeIdString) {
        AgencyAndId routeId = AgencyAndId.convertFromString(routeIdString);
        Route route = index.routeForId.get(routeId);
@@ -237,7 +221,6 @@ public class IndexAPI {
    /** Return all stop patterns used by trips on the given route. */
    @GET
    @Path("/routes/{id}/patterns")
-   @Produces({ MediaType.APPLICATION_JSON })
    public Response getPatternsForRoute (@PathParam("id") String routeIdString) {
        AgencyAndId routeId = AgencyAndId.convertFromString(routeIdString);
        Route route = index.routeForId.get(routeId);
@@ -252,7 +235,6 @@ public class IndexAPI {
    /** Return all stops in any pattern on a given route. */
    @GET
    @Path("/routes/{id}/stops")
-   @Produces({ MediaType.APPLICATION_JSON })
    public Response getStopsForRoute (@PathParam("id") String routeIdString) {
        AgencyAndId routeId = AgencyAndId.convertFromString(routeIdString);
        Route route = index.routeForId.get(routeId);
@@ -271,7 +253,6 @@ public class IndexAPI {
    /** Return all trips in any pattern on the given route. */
    @GET
    @Path("/routes/{id}/trips")
-   @Produces({ MediaType.APPLICATION_JSON })
    public Response getTripsForRoute (@PathParam("id") String routeIdString) {
        AgencyAndId routeId = AgencyAndId.convertFromString(routeIdString);
        Route route = index.routeForId.get(routeId);
@@ -293,7 +274,6 @@ public class IndexAPI {
 
    @GET
    @Path("/trips/{id}")
-   @Produces({ MediaType.APPLICATION_JSON })
    public Response getTrip (@PathParam("id") String tripIdString) {
        AgencyAndId tripId = AgencyAndId.convertFromString(tripIdString);
        Trip trip = index.tripForId.get(tripId);
@@ -306,7 +286,6 @@ public class IndexAPI {
 
    @GET
    @Path("/trips/{id}/stops")
-   @Produces({ MediaType.APPLICATION_JSON })
    public Response getStopsForTrip (@PathParam("id") String tripIdString) {
        AgencyAndId tripId = AgencyAndId.convertFromString(tripIdString);
        Trip trip = index.tripForId.get(tripId);
@@ -321,7 +300,6 @@ public class IndexAPI {
 
    @GET
    @Path("/trips/{id}/stoptimes")
-   @Produces({ MediaType.APPLICATION_JSON })
    public Response getStoptimesForTrip (@PathParam("id") String tripIdString) {
        AgencyAndId tripId = AgencyAndId.convertFromString(tripIdString);
        Trip trip = index.tripForId.get(tripId);
@@ -336,7 +314,6 @@ public class IndexAPI {
 
    @GET
    @Path("/patterns")
-   @Produces({ MediaType.APPLICATION_JSON })
    public Response getPatterns () {
        Collection<TripPattern> patterns = index.patternForId.values();
        return Response.status(Status.OK).entity(PatternShort.list(patterns)).build();
@@ -344,7 +321,6 @@ public class IndexAPI {
 
    @GET
    @Path("/patterns/{id}")
-   @Produces({ MediaType.APPLICATION_JSON })
    public Response getPattern (@PathParam("id") String string) {
        TripPattern pattern = index.patternForId.get(string);
        if (pattern != null) {
@@ -356,7 +332,6 @@ public class IndexAPI {
 
    @GET
    @Path("/patterns/{id}/trips")
-   @Produces({ MediaType.APPLICATION_JSON })
    public Response getTripsForPattern (@PathParam("id") String string) {
        TripPattern pattern = index.patternForId.get(string);
        if (pattern != null) {
@@ -369,7 +344,6 @@ public class IndexAPI {
 
    @GET
    @Path("/patterns/{id}/stops")
-   @Produces({ MediaType.APPLICATION_JSON })
    public Response getStopsForPattern (@PathParam("id") String string) {
        TripPattern pattern = index.patternForId.get(string);
        if (pattern != null) {
@@ -383,7 +357,6 @@ public class IndexAPI {
     @GET
     @Path("/lucene")
     // Client geocoder modules usually read XML, but GeocoderBuiltin uses JSON.
-    @Produces({ MediaType.APPLICATION_JSON })
     public Response textSearch (@QueryParam("query") String query) {
         return Response.status(Status.OK).entity(index.luceneIndex.query(query)).build();
     }
