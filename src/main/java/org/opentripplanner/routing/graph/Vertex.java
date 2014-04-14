@@ -222,22 +222,12 @@ public abstract class Vertex implements Serializable, Cloneable {
         return new Coordinate(getX(), getY());
     }
 
-    /**
-     * Get the bearing, in degrees, between this vertex and another coordinate.
-     *
-     * @param other
-     * @return
-     */
+    /** Get the bearing, in degrees, between this vertex and another coordinate. */
     public double azimuthTo(Coordinate other) {
         return DirectionUtils.getAzimuth(getCoordinate(), other);
     }
 
-    /**
-     * Get the bearing, in degrees, between this vertex and another.
-     *
-     * @param other
-     * @return
-     */
+    /** Get the bearing, in degrees, between this vertex and another. */
     public double azimuthTo(Vertex other) {
         return azimuthTo(other.getCoordinate());
     }
