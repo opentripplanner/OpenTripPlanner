@@ -25,8 +25,8 @@ import java.util.prefs.Preferences;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.opentripplanner.updater.PreferencesConfigurable;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
@@ -85,20 +85,17 @@ public class CityBikesBikeRentalDataSource implements BikeRentalDataSource, Pref
             IOException {
         ArrayList<BikeRentalStation> out = new ArrayList<BikeRentalStation>();
 
-        JSONArray stationArray = JSONArray.fromObject(data);
-
-        for (int i = 0; i < stationArray.size(); ++i) {
-            JSONObject station = stationArray.getJSONObject(i);
-
-            BikeRentalStation brstation = new BikeRentalStation();
-            brstation.id = station.getString("id");
-            brstation.x = station.getLong("lng") / 1000000.0;
-            brstation.y = station.getLong("lat") / 1000000.0;
-            brstation.name = station.getString("name");
-            brstation.bikesAvailable = station.getInt("bikes");
-            brstation.spacesAvailable = station.getInt("free");
-            if (brstation != null)
-                out.add(brstation);
+        // Jackson ObjectMapper to read in JSON
+        // TODO: test against real data
+        ObjectMapper mapper = new ObjectMapper();
+        for (JsonNode stationNode : mapper.readTree(data)) {
+            BikeRentalStation brStation = new BikeRentalStation();
+            brStation.id = stationNode.get("id").textValue();
+            brStation.x = stationNode.get("lng").doubleValue() / 1000000.0;
+            brStation.y = stationNode.get("lat").doubleValue() / 1000000.0;
+            brStation.name = stationNode.get("name").textValue();
+            brStation.bikesAvailable = stationNode.get("bikes").intValue();
+            brStation.spacesAvailable = stationNode.get("free").intValue();
         }
         synchronized (this) {
             stations = out;

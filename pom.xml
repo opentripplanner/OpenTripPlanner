@@ -533,14 +533,6 @@
 
         <!-- JSON -->
         <dependency>
-            <!-- Used in CityBikesBikeRentalDataSource and GeoJSONBuilder -->
-            <!-- Could probably be done directly with Geotools. -->
-            <groupId>net.sf.json-lib</groupId>
-            <artifactId>json-lib</artifactId>
-            <version>2.1</version>
-            <classifier>jdk15</classifier>
-        </dependency>
-        <dependency>
             <!-- Used for deserializing JSON in Nominatim/Yahoo/Google geocoder modules. -->
             <!-- Could probably be done with Jackson. -->
             <groupId>net.sf.flexjson</groupId>
