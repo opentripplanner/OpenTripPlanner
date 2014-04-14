@@ -14,10 +14,15 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
+import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
@@ -122,9 +127,13 @@ public class LuceneIndex {
 
     /** Return a list of results in in the format expected by GeocoderBuiltin.js in the OTP Leaflet client. */
     public List<LuceneResult> query (String queryString) {
+        /* Turn the query string into a Lucene query. Terms are fuzzy and should all be present. */
+        BooleanQuery query = new BooleanQuery();
+        for (String term : queryString.split(" ")) {
+            query.add(new FuzzyQuery(new Term("name", term)), BooleanClause.Occur.SHOULD);
+        }
         List<LuceneResult> result = Lists.newArrayList();
         try {
-            Query query = parser.parse(queryString);
             TopScoreDocCollector collector = TopScoreDocCollector.create(10, true);
             searcher.search(query, collector);
             ScoreDoc[] docs = collector.topDocs().scoreDocs;
