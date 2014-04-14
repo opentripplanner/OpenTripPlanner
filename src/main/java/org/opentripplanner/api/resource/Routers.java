@@ -40,7 +40,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.codehaus.jettison.json.JSONException;
 import org.opentripplanner.api.model.RouterInfo;
 import org.opentripplanner.api.model.RouterList;
-import org.opentripplanner.api.resource.services.HullService;
 import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Graph.LoadLevel;
@@ -96,9 +95,7 @@ public class Routers {
 
     private static final Logger LOG = LoggerFactory.getLogger(Routers.class);
 
-    @Inject OTPServer server;
-
-    @Context SecurityContext sctx;
+    @Context OTPServer server;
 
     /** 
      * Returns a list of routers and their bounds. 
@@ -132,17 +129,10 @@ public class Routers {
     
     private RouterInfo getRouterInfo(String routerId) {
         Graph graph = server.graphService.getGraph(routerId);
-        if (graph == null)
-            return null;
+        if (graph == null) return null;
         RouterInfo routerInfo = new RouterInfo();
         routerInfo.routerId = routerId;
-        HullService service = graph.getService(HullService.class);
-        if (service == null) {
-            Geometry hull = GraphUtils.makeConvexHull(graph);
-            service = new StoredHullService(hull);
-            graph.putService(HullService.class, service);
-        }
-        routerInfo.polygon = service.getHull();
+        routerInfo.polygon = graph.getHull();
         return routerInfo;
     }
 

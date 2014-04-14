@@ -41,6 +41,7 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.vividsolutions.jts.geom.Geometry;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -53,6 +54,7 @@ import org.onebusaway.gtfs.services.calendar.CalendarService;
 import org.opentripplanner.api.resource.GraphMetadata;
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.gbannotation.GraphBuilderAnnotation;
 import org.opentripplanner.gbannotation.NoFutureDates;
 import org.opentripplanner.graph_builder.impl.EmbeddedConfigGraphBuilderImpl;
@@ -157,10 +159,10 @@ public class Graph implements Serializable {
 
     private transient GraphMetadata graphMetadata = null;
 
+    private transient Geometry hull = null;
+
     /**
      * Makes it possible to embed a default configuration inside a graph.
-     * 
-     * @see EmbeddedConfigGraphBuilderImpl
      */
     @Getter
     @Setter
@@ -844,4 +846,14 @@ public class Graph implements Serializable {
         }
         return graphMetadata;
     }
+
+    public Geometry getHull() {
+        // Lazy-initialize the graph hull since it is not serialized.
+        if (hull == null) {
+            hull = GraphUtils.makeConvexHull(this);
+        }
+        return hull;
+
+    }
+
 }
