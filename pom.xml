@@ -18,7 +18,6 @@
 
     <properties>
         <geotools.version>10.5</geotools.version>
-        <slf4j.version>1.7.6</slf4j.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <distribution_id>opengeo</distribution_id>
         <distribution_name>OpenGeo Maven Repository</distribution_name>
@@ -345,49 +344,47 @@
     </repositories>
 
     <dependencies>
-
+        <!-- MapDB, for GTFS and OSM loading experiments. -->
         <dependency>
-            <!-- MapDB, for GTFS and OSM loading experiments. -->
             <groupId>org.mapdb</groupId>
             <artifactId>mapdb</artifactId>
             <version>0.9.10</version>
         </dependency>
-
-        <!-- LOGGING -->
+        <!-- Logging library -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.0.13</version>
         </dependency>
+        <!-- Jersey uses java.util logging, redirect it via slf4j API to Logback -->
         <dependency>
-            <!-- Jersey uses java.util logging, redirect it via slf4j API to Logback -->
             <groupId>org.slf4j</groupId>
             <artifactId>jul-to-slf4j</artifactId>
-            <version>${slf4j.version}</version>
+            <version>1.7.6</version>
         </dependency>
-
-        <!-- JAVA STANDARD LIBRARY EXTENSIONS -->
+        <!-- Lombok provides annotation-driven field accessor methods. -->
         <dependency>
-            <!-- Lombok provides annotation-driven field accessor methods. -->
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.12.6</version>
             <scope>provided</scope>
         </dependency>
+        <!-- Guava provides improved collections, among other things. -->
         <dependency>
-            <!-- Guava provides improved collections, among other things. -->
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>14.0.1</version>
         </dependency>
+
+
         <dependency>
             <groupId>net.lingala.zip4j</groupId>
             <artifactId>zip4j</artifactId>
             <version>1.3.1</version>
         </dependency>
 
-        <!-- GEOTOOLS AND JTS TOPOLOGY (geometry, rasters and projection) -->
-        <!-- GEOTOOLS includes JTS as a transitive dependency -->
+        <!-- GEOTOOLS AND JTS TOPOLOGY: geometry, rasters and projections. -->
+        <!-- GEOTOOLS includes JTS as a transitive dependency. -->
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-geojson</artifactId>
@@ -418,8 +415,8 @@
             <artifactId>gt-geotiff</artifactId>
             <version>${geotools.version}</version>
         </dependency>
+        <!-- provides EPSG database for projections (shapefile loading) -->
         <dependency>
-            <!-- provides EPSG database for projections (shapefile loading) -->
             <groupId>org.geotools</groupId>
             <artifactId>gt-epsg-hsql</artifactId>
             <version>${geotools.version}</version>
@@ -439,25 +436,26 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- JERSEY JAX-RS annontation-driven REST -->
-
+        <!-- Jersey annontation-driven REST web services (JAX-RS implementation) -->
         <dependency>
             <groupId>org.glassfish.jersey.core</groupId>
             <artifactId>jersey-server</artifactId>
             <version>2.6</version>
         </dependency>
+        <!-- Deploy Jersey apps in stand-alone Grizzly server instead of a servlet container. -->
         <dependency>
             <groupId>org.glassfish.jersey.containers</groupId>
             <artifactId>jersey-container-grizzly2-http</artifactId>
             <version>2.6</version>
         </dependency>
 
-        <!-- JACKSON will be used to serialize objects to JSON and XML for Jersey responses -->
+        <!-- Jackson modules to serialize Jersey response objects to JSON. -->
         <dependency>
             <groupId>com.fasterxml.jackson.jaxrs</groupId>
             <artifactId>jackson-jaxrs-json-provider</artifactId>
             <version>2.3.2</version>
         </dependency>
+        <!-- Jackson modules to serialize Jersey response objects to XML. -->
         <dependency>
             <groupId>com.fasterxml.jackson.jaxrs</groupId>
             <artifactId>jackson-jaxrs-xml-provider</artifactId>
@@ -494,53 +492,53 @@
             <artifactId>javax.inject</artifactId>
             <version>1</version>
         </dependency>
+        <!-- OBA GTFS loader -->
         <dependency>
-            <!-- OBA GTFS loader -->
             <groupId>org.onebusaway</groupId>
             <artifactId>onebusaway-gtfs</artifactId>
             <version>1.3.3</version>
         </dependency>
+        <!-- Processing is used for the debug GUI (though we could probably use just Java2D) -->
         <dependency>
-            <!-- Processing is used for the debug GUI (though we could probably use just Java2D) -->
             <groupId>org.processing</groupId>
             <artifactId>core</artifactId>
             <version>1.0.7</version>
         </dependency>
+        <!-- Google Protocol Buffers compact binary serialization format -->
         <dependency>
-            <!-- Google Protocol Buffers -->
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
             <version>2.5.0</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
+        <!-- Joda Time is a widely used replacement for flaky Java time classes. -->
         <dependency>
-            <!-- Joda Time is a widely used replacement for flaky Java time classes. -->
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
             <version>2.1</version>
         </dependency>
+        <!-- PNGJ is used for making Analyst TimeGrids-->
         <dependency>
-            <!-- PNGJ is used for making Analyst TimeGrids-->
             <groupId>ar.com.hjg</groupId>
             <artifactId>pngj</artifactId>
             <version>2.0.1</version>
         </dependency>
+        <!-- FlexJSON deserializes JSON in Nominatim/Yahoo/Google geocoder modules. -->
+        <!-- Could be done with Jackson JSON trees. -->
         <dependency>
-            <!-- Used for deserializing JSON in Nominatim/Yahoo/Google geocoder modules. -->
-            <!-- Could be done with Jackson JSON trees. -->
             <groupId>net.sf.flexjson</groupId>
             <artifactId>flexjson</artifactId>
             <version>2.0</version>
         </dependency>
+        <!-- Apache Axis: Used in NEDDownloader to fetch elevation tiles. -->
         <dependency>
-            <!-- Apache Axis: Used in NEDDownloader to fetch elevation tiles. -->
             <groupId>org.apache.axis</groupId>
             <artifactId>axis</artifactId>
             <version>1.4</version>
         </dependency>
+        <!-- Apache Axis: Used in NEDDownloader to fetch elevation tiles. -->
         <dependency>
-            <!-- Apache Axis: Used in NEDDownloader to fetch elevation tiles. -->
             <groupId>org.apache.axis</groupId>
             <artifactId>axis-jaxrpc</artifactId>
             <version>1.4</version>
@@ -550,26 +548,26 @@
             <artifactId>commons-compress</artifactId>
             <version>1.0</version>
         </dependency>
+        <!-- Used in DegreeGridNEDTileSource to fetch tiles from Amazon S3 -->
         <dependency>
-            <!-- Used in DegreeGridNEDTileSource to fetch tiles from Amazon S3 -->
             <groupId>net.java.dev.jets3t</groupId>
             <artifactId>jets3t</artifactId>
             <version>0.8.1</version>
         </dependency>
+        <!-- OpenStreetMap protobuf (PBF) definitions -->
         <dependency>
-            <!-- OpenStreetMap protobuf (PBF) definitions -->
             <groupId>crosby.binary</groupId>
             <artifactId>osmpbf</artifactId>
             <version>1.2.1</version>
         </dependency>
+        <!-- Command line parameter parsing -->
         <dependency>
-            <!-- Command line parameter parsing -->
             <groupId>com.beust</groupId>
             <artifactId>jcommander</artifactId>
             <version>1.27</version>
         </dependency>
+        <!-- CSV parser -->
         <dependency>
-            <!-- CSV parser -->
             <groupId>net.sourceforge.javacsv</groupId>
             <artifactId>javacsv</artifactId>
             <version>2.0</version>
