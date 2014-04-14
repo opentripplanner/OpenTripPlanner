@@ -40,7 +40,9 @@ import com.vividsolutions.jts.geom.Polygon;
  * the draft 5 version of the spec on http://geojson.org
  * 
  * @author Chris Holmes, OpenPlans
- * @version $Id$  
+ * @version $Id$
+ *
+ * TODO replace with org.geotools.geojson.geom.GeometryJSON ??
  * 
  */
 public class GeoJSONBuilder extends JSONBuilder {

@@ -533,39 +533,38 @@
 
         <!-- JSON -->
         <dependency>
+            <!-- Used in CityBikesBikeRentalDataSource and GeoJSONBuilder -->
+            <!-- Could probably be done directly with Geotools. -->
             <groupId>net.sf.json-lib</groupId>
             <artifactId>json-lib</artifactId>
             <version>2.1</version>
             <classifier>jdk15</classifier>
         </dependency>
         <dependency>
-            <!-- more JSON -->
+            <!-- Used for home-rolled GeoJSON writer. -->
+            <!-- Could probably be done with Geotools or Jackson. -->
             <groupId>org.codehaus.jettison</groupId>
             <artifactId>jettison</artifactId>
             <version>1.1</version>
         </dependency>
         <dependency>
-            <!-- More JSON used by Nominatim geocoder module -->
+            <!-- Used for deserializing JSON in Nominatim/Yahoo/Google geocoder modules. -->
+            <!-- Could probably be done with Jackson. -->
             <groupId>net.sf.flexjson</groupId>
             <artifactId>flexjson</artifactId>
             <version>2.0</version>
-            <type>jar</type>
-            <scope>compile</scope>
         </dependency>
         <dependency>
+            <!-- Apache Axis: Used in NEDDownloader to fetch elevation tiles. -->
             <groupId>org.apache.axis</groupId>
             <artifactId>axis</artifactId>
             <version>1.4</version>
         </dependency>
         <dependency>
+            <!-- Apache Axis: Used in NEDDownloader to fetch elevation tiles. -->
             <groupId>org.apache.axis</groupId>
             <artifactId>axis-jaxrpc</artifactId>
             <version>1.4</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-discovery</groupId>
-            <artifactId>commons-discovery</artifactId>
-            <version>0.4</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -573,6 +572,7 @@
             <version>1.0</version>
         </dependency>
         <dependency>
+            <!-- Used in DegreeGridNEDTileSource to fetch tiles from Amazon S3 -->
             <groupId>net.java.dev.jets3t</groupId>
             <artifactId>jets3t</artifactId>
             <version>0.8.1</version>
@@ -607,7 +607,6 @@
         </dependency>
 
         <!-- Lucene for sophisticated text search -->
-
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
