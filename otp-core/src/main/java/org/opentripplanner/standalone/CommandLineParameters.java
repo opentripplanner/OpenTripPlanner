@@ -82,6 +82,10 @@ public class CommandLineParameters {
     description = "skip linking of stops to parent stops (GTFS)")
     boolean noParentStopLinking;
 
+    @Parameter(names = {"--useStreetsForLinking"},
+    description = "use street network to link stops to each other")
+    boolean useStreetsForLinking;
+
     @Parameter(names = {"--parentStationTransfers"},
     description = "create direct transfers between the constituent stops of each parent station")
     boolean parentStationTransfers = false;

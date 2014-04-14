@@ -32,7 +32,7 @@ public class TransitToStreetNetworkGraphBuilderImpl implements GraphBuilder {
     private static final Logger LOG = LoggerFactory.getLogger(TransitToStreetNetworkGraphBuilderImpl.class);
 
     public List<String> provides() {
-        return Arrays.asList("linking");
+        return Arrays.asList("street to transit", "linking");
     }
 
     public List<String> getPrerequisites() {

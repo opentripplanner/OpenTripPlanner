@@ -119,7 +119,7 @@ class Context {
     private void createSimpleTransfer(String from, String to, int distance) {
         TransitStop fromv = ((TransitStop) graph.getVertex(from));
         TransitStop tov = ((TransitStop) graph.getVertex(to));
-        new SimpleTransfer(fromv, tov, distance);
+        new SimpleTransfer(fromv, tov, distance, null);
     }
 }
 

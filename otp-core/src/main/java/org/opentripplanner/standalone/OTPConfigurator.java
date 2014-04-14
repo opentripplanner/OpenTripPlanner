@@ -1,3 +1,16 @@
+/* This program is free software: you can redistribute it and/or
+ modify it under the terms of the GNU Lesser General Public License
+ as published by the Free Software Foundation, either version 3 of
+ the License, or (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+
 package org.opentripplanner.standalone;
 
 import java.io.File;
@@ -22,6 +35,7 @@ import org.opentripplanner.graph_builder.GraphBuilderTask;
 import org.opentripplanner.graph_builder.impl.EmbeddedConfigGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.PruneFloatingIslands;
+import org.opentripplanner.graph_builder.impl.StreetfulStopLinker;
 import org.opentripplanner.graph_builder.impl.StreetlessStopLinker;
 import org.opentripplanner.graph_builder.impl.TransitToStreetNetworkGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.ned.NEDGraphBuilderImpl;
@@ -238,16 +252,22 @@ public class OTPConfigurator {
             }
             GtfsGraphBuilderImpl gtfsBuilder = new GtfsGraphBuilderImpl(gtfsBundles);
             graphBuilder.addGraphBuilder(gtfsBuilder);
-            // When using the simplified path service, or when there is no street data,
+            // When using the long distance path service, or when there is no street data,
             // link stops to each other based on distance only, unless user has requested linking
-            // based on transfers.txt.
-            if ( ( ! hasOSM ) || params.longDistance ) {
-                if ( ! params.useTransfersTxt) {
-                    graphBuilder.addGraphBuilder(new StreetlessStopLinker());
+            // based on transfers.txt or the street network (if available).
+            if ((!hasOSM ) || params.longDistance) {
+                if (!params.useTransfersTxt) {
+                    if (!hasOSM || !params.useStreetsForLinking) {
+                        graphBuilder.addGraphBuilder(new StreetlessStopLinker());
+                    }
                 }
             } 
             if ( hasOSM ) {
                 graphBuilder.addGraphBuilder(new TransitToStreetNetworkGraphBuilderImpl());
+                // The stops can be linked to each other once they have links to the street network.
+                if (params.longDistance && params.useStreetsForLinking && !params.useTransfersTxt) {
+                    graphBuilder.addGraphBuilder(new StreetfulStopLinker());
+                }
             }
             List<GraphBuilderWithGtfsDao> gtfsBuilders = new ArrayList<GraphBuilderWithGtfsDao>();
             if (params.transitIndex || params.raptor) {
@@ -286,7 +306,7 @@ public class OTPConfigurator {
     public GraphVisualizer visualizerFromParameters() {
         if (params.visualize) {
             @SuppressWarnings("unused") // get a component provider factory to force injection/post-construct
-			OTPComponentProviderFactory cpf = getComponentProviderFactory();
+            OTPComponentProviderFactory cpf = getComponentProviderFactory();
             GraphVisualizer visualizer = new GraphVisualizer(getGraphService());
             return visualizer;
         } else return null;

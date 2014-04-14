@@ -35,7 +35,7 @@ import com.vividsolutions.jts.geom.LineString;
 public class StreetTransitLink extends Edge {
 
     private static final long serialVersionUID = -3311099256178798981L;
-    private static final double STL_TRAVERSE_COST = 1;
+    static final int STL_TRAVERSE_COST = 1;
 
     private boolean wheelchairAccessible;
 
@@ -86,7 +86,7 @@ public class StreetTransitLink extends Edge {
         // transit modes will instead be done in the following PreBoard edge.
         // This allows finding transit stops with walk-only options.
         StateEditor s1 = s0.edit(this);
-        s1.incrementTimeInSeconds(transitStop.getStreetToStopTime() + 1);
+        s1.incrementTimeInSeconds(transitStop.getStreetToStopTime() + STL_TRAVERSE_COST);
         s1.incrementWeight(STL_TRAVERSE_COST + transitStop.getStreetToStopTime());
         s1.setBackMode(TraverseMode.LEG_SWITCH);
         return s1.makeState();
