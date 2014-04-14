@@ -515,26 +515,20 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>2.6</version>
-        </dependency>
-        <dependency>
+            <!-- Joda Time is a widely used replacement for flaky Java time classes. -->
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
             <version>2.1</version>
         </dependency>
-        <!-- PNGJ, used for Analyst TimeGrids-->
         <dependency>
+            <!-- PNGJ is used for making Analyst TimeGrids-->
             <groupId>ar.com.hjg</groupId>
             <artifactId>pngj</artifactId>
             <version>2.0.1</version>
         </dependency>
-
-        <!-- JSON -->
         <dependency>
             <!-- Used for deserializing JSON in Nominatim/Yahoo/Google geocoder modules. -->
-            <!-- Could probably be done with Jackson. -->
+            <!-- Could be done with Jackson JSON trees. -->
             <groupId>net.sf.flexjson</groupId>
             <artifactId>flexjson</artifactId>
             <version>2.0</version>

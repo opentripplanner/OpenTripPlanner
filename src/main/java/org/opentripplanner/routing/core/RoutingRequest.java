@@ -24,10 +24,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
+import com.google.common.base.Objects;
 import lombok.Getter;
 import lombok.Setter;
 
-import org.apache.commons.lang.ObjectUtils;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Trip;
@@ -931,7 +931,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && reverseOptimizeOnTheFly == other.reverseOptimizeOnTheFly
                 && ignoreRealtimeUpdates == other.ignoreRealtimeUpdates
                 && disableRemainingWeightHeuristic == other.disableRemainingWeightHeuristic
-                && ObjectUtils.equals(startingTransitTripId, other.startingTransitTripId);
+                && Objects.equal(startingTransitTripId, other.startingTransitTripId);
     }
 
     /**
