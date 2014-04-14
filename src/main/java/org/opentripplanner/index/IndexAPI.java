@@ -32,6 +32,7 @@ import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -58,13 +59,16 @@ import com.vividsolutions.jts.geom.Coordinate;
 public class IndexAPI {
 
     private static final Logger LOG = LoggerFactory.getLogger(IndexAPI.class);
-
     private static final double MAX_STOP_SEARCH_RADIUS = 5000;
-
     private static final DistanceLibrary distanceLibrary = SphericalDistanceLibrary.getInstance();
-           
     private static final String MSG_404 = "FOUR ZERO FOUR";
     private static final String MSG_400 = "FOUR HUNDRED";
+
+    /** Choose short or long form of results. */
+    @QueryParam("detail") private final boolean detail = false;
+
+    /** Include GTFS entities referenced by ID in the result. */
+    @QueryParam("refs") private final boolean refs = false;
 
     private final GraphIndex index;
 
@@ -183,7 +187,19 @@ public class IndexAPI {
        return Response.status(Status.OK).entity(PatternShort.list(patterns)).build();
    }
 
+    /** Return all vehicle arrival/departure times at a specific stop. */
+    @GET
+    @Path("/stops/{stopId}/stoptimes")
+    public Response getStoptimesForStop (@PathParam("stopId") String string) {
+        Stop stop = index.stopForId.get(AgencyAndId.convertFromString(string));
+        if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
+        Collection<StopTime> stopTimes;
+        // TODO build response, filter by date and servicecode
+        return Response.status(Status.OK).build(); //.entity(StopTimeShort.list(stopTimes)).build();
+    }
+
    /** Return a list of all routes in the graph. */
+   // with repeated hasStop parameters, replaces old routesBetweenStops
    @GET
    @Path("/routes")
    public Response getRoutes (@QueryParam("hasStop") List<String> stopIds) {
@@ -345,6 +361,7 @@ public class IndexAPI {
    @GET
    @Path("/patterns/{id}/stops")
    public Response getStopsForPattern (@PathParam("id") String string) {
+       // Pattern names are graph-unique because we made them up.
        TripPattern pattern = index.patternForId.get(string);
        if (pattern != null) {
            List<Stop> stops = pattern.getStops();
@@ -353,6 +370,22 @@ public class IndexAPI {
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }
    }
+
+    @GET
+    @Path("/services")
+    /** List basic information about all service IDs. */
+    public Response getServices() {
+        index.serviceForId.values(); // TODO complete
+        return Response.status(Status.OK).entity("NONE").build();
+    }
+
+    @GET
+    @Path("/services/{serviceId}")
+    /** List details about a specific service ID including which dates it runs on. Replaces the old /calendar. */
+    public Response getServices(@PathParam("serviceId") String serviceId) {
+        index.serviceForId.get(serviceId); // TODO complete
+        return Response.status(Status.OK).entity("NONE").build();
+    }
 
     @GET
     @Path("/lucene")

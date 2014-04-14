@@ -31,17 +31,18 @@ public class GraphIndex {
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphIndex.class);
 
-    public final Map<String, Vertex>  vertexForId = Maps.newHashMap();
-    public final Map<String, Agency>  agencyForId = Maps.newHashMap();
+    // TODO: consistently key on model object or id string
+    public final Map<String, Vertex> vertexForId = Maps.newHashMap();
+    public final Map<String, Agency> agencyForId = Maps.newHashMap();
     public final Map<AgencyAndId, Stop> stopForId = Maps.newHashMap();
     public final Map<AgencyAndId, Trip> tripForId = Maps.newHashMap();
     public final Map<AgencyAndId, Route> routeForId = Maps.newHashMap();
+    public final Map<AgencyAndId, String> serviceForId = Maps.newHashMap();
     public final Map<String, TripPattern> patternForId = Maps.newHashMap();
-    public final Map<Stop, TransitStop>   stopVertexForStop = Maps.newHashMap();
+    public final Map<Stop, TransitStop> stopVertexForStop = Maps.newHashMap();
     public final Map<Trip, TripPattern> patternForTrip = Maps.newHashMap();
     public final ListMultimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
-    public final ListMultimap<Stop, TripPattern>  patternsForStop  = ArrayListMultimap.create();
-    // TODO: consistently key on model object or id string
+    public final ListMultimap<Stop, TripPattern> patternsForStop = ArrayListMultimap.create();
     public final ListMultimap<String, Stop> stopsForParentStation = ArrayListMultimap.create();
     public final HashGrid<TransitStop> stopSpatialIndex = new HashGrid<TransitStop>();
 
@@ -92,8 +93,16 @@ public class GraphIndex {
         for (Route route : patternsForRoute.asMap().keySet()) {
             routeForId.put(route.getId(), route);
         }
+        analyzeServices();
         luceneIndex = new LuceneIndex(this, true);
         LOG.info("Done indexing graph.");
     }
-    
+
+
+    private void analyzeServices() {
+        // This is a mess because CalendarService, CalendarServiceData, etc. are all in OBA.
+        // TODO catalog days of the week and exceptions for each service day.
+        // Make a table of which services are running on each calendar day.
+    }
+
 }
