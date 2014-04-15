@@ -241,7 +241,7 @@ public class IndexAPI {
        AgencyAndId routeId = AgencyAndId.convertFromString(routeIdString);
        Route route = index.routeForId.get(routeId);
        if (route != null) {
-           List<TripPattern> patterns = index.patternsForRoute.get(route);
+           Collection<TripPattern> patterns = index.patternsForRoute.get(route);
            return Response.status(Status.OK).entity(PatternShort.list(patterns)).build();
        } else { 
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();

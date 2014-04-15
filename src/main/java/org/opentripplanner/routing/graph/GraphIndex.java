@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Multimap;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
@@ -11,6 +12,7 @@ import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.opentripplanner.common.LuceneIndex;
 import org.opentripplanner.common.geometry.HashGrid;
+import org.opentripplanner.profile.ProfileData;
 import org.opentripplanner.routing.edgetype.TablePatternEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -41,13 +43,16 @@ public class GraphIndex {
     public final Map<String, TripPattern> patternForId = Maps.newHashMap();
     public final Map<Stop, TransitStop> stopVertexForStop = Maps.newHashMap();
     public final Map<Trip, TripPattern> patternForTrip = Maps.newHashMap();
-    public final ListMultimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
-    public final ListMultimap<Stop, TripPattern> patternsForStop = ArrayListMultimap.create();
-    public final ListMultimap<String, Stop> stopsForParentStation = ArrayListMultimap.create();
+    public final Multimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
+    public final Multimap<Stop, TripPattern> patternsForStop = ArrayListMultimap.create();
+    public final Multimap<String, Stop> stopsForParentStation = ArrayListMultimap.create();
     public final HashGrid<TransitStop> stopSpatialIndex = new HashGrid<TransitStop>();
 
-    // Full-text search extensions
-    public LuceneIndex luceneIndex;
+    /* Full-text search extensions */
+    public LuceneIndex lucene;
+
+    /* Profile routing extensions */
+    public ProfileData profile;
 
     public GraphIndex (Graph graph) {
         LOG.info("Indexing graph...");
