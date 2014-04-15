@@ -30,8 +30,11 @@ import org.opentripplanner.geocoder.GeocoderResults;
 
 import com.vividsolutions.jts.geom.Envelope;
 
+/**
+ * Maybe the internal geocoder resource should just chain to defined external geocoders?
+ */
 @Path("/geocode")
-public class GeocoderResource {
+public class ExternalGeocoderResource {
   
 // uncommenting injectparam will require a specific Geocoder to be instantiated
 //    @InjectParam 

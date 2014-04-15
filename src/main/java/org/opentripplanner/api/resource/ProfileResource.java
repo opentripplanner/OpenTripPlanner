@@ -6,6 +6,7 @@ import javax.inject.Singleton;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
@@ -22,15 +23,25 @@ import org.opentripplanner.profile.Option;
 import org.opentripplanner.profile.ProfileData;
 import org.opentripplanner.profile.ProfileResponse;
 import org.opentripplanner.profile.ProfileRouter;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.GraphService;
+import org.opentripplanner.standalone.OTPServer;
 
-@Path("/profile")
-public class ProfileEndpoint {
+/**
+ * A Jersey resource class which exposes OTP profile routing functionality
+ * as a web service.
+ */
+@Path("routers/{routerId}/profile")
+public class ProfileResource {
 
-    @Context // FIXME inject Application
-    private GraphService graphService;
-    private static ProfileData data = null;
-    
+    private ProfileRouter router;
+
+    public ProfileResource (@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
+        Graph graph = otpServer.graphService.getGraph(routerId);
+        ProfileData profileData = graph.getProfileData();
+        router = new ProfileRouter(profileData);
+    }
+
     @GET
     @Produces({ MediaType.APPLICATION_JSON })
     public Response profileRoute(
@@ -42,8 +53,6 @@ public class ProfileEndpoint {
             @QueryParam("orderBy")   @DefaultValue("MIN")   Option.SortOrder orderBy,
             @QueryParam("limit")     @DefaultValue("10")    Integer limit) {
 
-        if (data == null) data = new ProfileData(graphService.getGraph());
-        ProfileRouter router = new ProfileRouter (data);
         List<Option> options = router.route(from, to, fromTime.toSeconds(), toTime.toSeconds(), date.toJoda());
         ProfileResponse pr = new ProfileResponse(options, orderBy, limit);
         return Response.status(Status.OK).entity(pr).build();

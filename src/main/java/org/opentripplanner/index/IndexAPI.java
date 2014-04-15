@@ -387,11 +387,4 @@ public class IndexAPI {
         return Response.status(Status.OK).entity("NONE").build();
     }
 
-    @GET
-    @Path("/lucene")
-    // Client geocoder modules usually read XML, but GeocoderBuiltin uses JSON.
-    public Response textSearch (@QueryParam("query") String query) {
-        return Response.status(Status.OK).entity(index.luceneIndex.query(query)).build();
-    }
-
 }

@@ -16,7 +16,7 @@ otp.namespace("otp.core");
 
 otp.core.GeocoderBuiltin = otp.Class({
 
-    url: 'otp/routers/default/index/lucene',
+    url: 'otp/routers/default/geocode',
 
     initialize : function(url, addressParam) {
         // Do nothing, the proper address and query param are already known.

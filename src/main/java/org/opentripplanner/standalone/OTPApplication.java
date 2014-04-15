@@ -8,10 +8,10 @@ import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.opentripplanner.api.model.JSONObjectMapperProvider;
 import org.opentripplanner.api.resource.AlertPatcher;
 import org.opentripplanner.api.resource.BikeRental;
-import org.opentripplanner.api.resource.GeocoderResource;
+import org.opentripplanner.api.resource.ExternalGeocoderResource;
 import org.opentripplanner.api.resource.Metadata;
 import org.opentripplanner.api.resource.Planner;
-import org.opentripplanner.api.resource.ProfileEndpoint;
+import org.opentripplanner.api.resource.ProfileResource;
 import org.opentripplanner.api.resource.Routers;
 import org.opentripplanner.api.resource.ServerInfo;
 import org.opentripplanner.api.resource.analyst.LIsochrone;
@@ -22,6 +22,7 @@ import org.opentripplanner.api.resource.analyst.SimpleIsochrone;
 import org.opentripplanner.api.resource.analyst.TileService;
 import org.opentripplanner.api.resource.analyst.TimeGridWs;
 import org.opentripplanner.api.resource.analyst.WebMapService;
+import org.opentripplanner.index.GeocoderResource;
 import org.opentripplanner.index.IndexAPI;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
@@ -70,11 +71,13 @@ public class OTPApplication extends Application {
             /* Jersey resource classes: define web services, i.e. an HTTP API. */
             Planner.class,
             IndexAPI.class,
+            ExternalGeocoderResource.class,
+            GeocoderResource.class,
             SimpleIsochrone.class,
             TileService.class,
             BikeRental.class,
             LIsochrone.class,
-            GeocoderResource.class,
+            ExternalGeocoderResource.class,
             TimeGridWs.class,
             WebMapService.class,
             AlertPatcher.class,
@@ -84,7 +87,7 @@ public class OTPApplication extends Application {
             Raster.class,
             LegendResource.class,
             Metadata.class,
-            ProfileEndpoint.class,
+            ProfileResource.class,
             SimpleIsochrone.class,
             ServerInfo.class,
             /* Features and Filters: extend Jersey, manipulate requests and responses. */

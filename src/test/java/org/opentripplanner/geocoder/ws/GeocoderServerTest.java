@@ -22,7 +22,7 @@ import javax.ws.rs.WebApplicationException;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.opentripplanner.api.resource.GeocoderResource;
+import org.opentripplanner.api.resource.ExternalGeocoderResource;
 import org.opentripplanner.geocoder.Geocoder;
 import org.opentripplanner.geocoder.GeocoderResult;
 import org.opentripplanner.geocoder.GeocoderResults;
@@ -31,11 +31,11 @@ import com.vividsolutions.jts.geom.Envelope;
 
 public class GeocoderServerTest {
 
-    private GeocoderResource geocoderServer;
+    private ExternalGeocoderResource geocoderServer;
 
     @Before
     public void setUp() {
-        geocoderServer = new GeocoderResource();
+        geocoderServer = new ExternalGeocoderResource();
     }
     
     @Test(expected = WebApplicationException.class)
