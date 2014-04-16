@@ -27,7 +27,8 @@ otp.widgets.transit.StopFinderWidget =
     initialize : function(id, module, stopViewer) {
     
         otp.widgets.Widget.prototype.initialize.call(this, id, module, {
-            title : 'Stop Finder',
+            //TRANSLATORS: Widget title
+            title : _tr('Stop Finder'),
             cssClass : 'otp-stopFinder',
             closeable : true,
             resizable : true,
@@ -80,7 +81,7 @@ otp.widgets.transit.StopFinderWidget =
         var this_ = this;
 
         if(!stops || stops.length === 0) {
-            this.stopList.html("No Stops Found");
+            this.stopList.html(_tr("No Stops Found"));
             return;
         }
 

@@ -27,7 +27,8 @@ otp.widgets.transit.StopViewerWidget =
     initialize : function(id, module) {
     
         otp.widgets.Widget.prototype.initialize.call(this, id, module, {
-            title : 'Stop Viewer',
+            //TRANSLATORS: widget title
+            title : _tr('Stop Viewer'),
             cssClass : 'otp-stopViewer',
             closeable : true,
             resizable : true,
@@ -78,7 +79,8 @@ otp.widgets.transit.StopViewerWidget =
         this.agencyId = agencyId;
         this.stopId = stopId;
         this.clearTimes();
-        this.stopInfo.html("<b>Stop:</b> " + stopName + " (" + agencyId + " #" + stopId + ")");
+        //TRANSLATORS: Public transport <Stop> (stop name)
+        this.stopInfo.html("<b>" + _tr("Stop") + ":</b> " + stopName + " (" + agencyId + " #" + stopId + ")");
         this.runTimesQuery();
     },
     

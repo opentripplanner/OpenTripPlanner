@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-04-16 21:14+0200\n"
+"POT-Creation-Date: 2014-04-16 21:21+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -141,6 +141,25 @@ msgstr ""
 #. Send widget to back in context menu
 #: widgets/Widget.js:113
 msgid "Send to back"
+msgstr ""
+
+#. Widget title
+#: widgets/transit/StopFinderWidget.js:31
+msgid "Stop Finder"
+msgstr ""
+
+#: widgets/transit/StopFinderWidget.js:84
+msgid "No Stops Found"
+msgstr ""
+
+#. widget title
+#: widgets/transit/StopViewerWidget.js:31
+msgid "Stop Viewer"
+msgstr ""
+
+#. Public transport <Stop> (stop name)
+#: widgets/transit/StopViewerWidget.js:83
+msgid "Stop"
 msgstr ""
 
 #. Optimization for bicycle shown in bike triangle. Optimized
