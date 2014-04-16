@@ -14,13 +14,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import lombok.Setter;
-
 import org.opentripplanner.api.param.HourMinuteSecond;
 import org.opentripplanner.api.param.LatLon;
 import org.opentripplanner.api.param.YearMonthDay;
 import org.opentripplanner.profile.Option;
-import org.opentripplanner.profile.ProfileData;
 import org.opentripplanner.profile.ProfileResponse;
 import org.opentripplanner.profile.ProfileRouter;
 import org.opentripplanner.routing.graph.Graph;
@@ -38,8 +35,7 @@ public class ProfileResource {
 
     public ProfileResource (@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
         Graph graph = otpServer.graphService.getGraph(routerId);
-        ProfileData profileData = graph.getProfileData();
-        router = new ProfileRouter(profileData);
+        router = new ProfileRouter(graph.index);
     }
 
     @GET

@@ -5,17 +5,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-
 import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.opentripplanner.api.param.LatLon;
-import org.opentripplanner.profile.ProfileData.StopAtDistance;
-import org.opentripplanner.profile.ProfileData.Transfer;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.graph.GraphIndex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,19 +20,24 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
-@RequiredArgsConstructor
 public class ProfileRouter {
 
     private static final Logger LOG = LoggerFactory.getLogger(ProfileRouter.class);
     static final double WALK_SPEED = 1.4; // m/sec
+    static final double WALK_DISTANCE = 500; // meters
     static final int SLACK = 60; // sec
     static final Stop fakeTargetStop = new Stop();
     
     static {
         fakeTargetStop.setId(new AgencyAndId("FAKE", "TARGET"));
     }
-    
-    @NonNull ProfileData data;
+
+    private GraphIndex index;
+
+    public ProfileRouter(GraphIndex index) {
+        this.index = index;
+    }
+
     Multimap<Stop, Ride> rides = ArrayListMultimap.create();
     Map<TripPattern, StopAtDistance> fromStops, toStops;
     Set<Ride> targetRides = Sets.newHashSet();
@@ -92,7 +93,7 @@ public class ProfileRouter {
      * @return true if the given stop has at least one transfer from the given pattern.
      */
     private boolean hasTransfers(Stop stop, TripPattern pattern) {
-        for (Transfer tr : data.transfersForStop.get(stop)) {
+        for (ProfileTransfer tr : index.transfersForStop.get(stop)) {
             if (tr.tp1 == pattern) return true;
         }
         return false;
@@ -134,11 +135,11 @@ public class ProfileRouter {
         final int ROUNDS = 2;
         int finalRound = ROUNDS - 1;
         int penultimateRound = ROUNDS - 2;
-        fromStops = data.closestPatterns(from.lon, from.lat);
-        toStops   = data.closestPatterns(to.lon, to.lat);
+        fromStops = index.closestPatterns(from.lon, from.lat, WALK_DISTANCE);
+        toStops   = index.closestPatterns(to.lon, to.lat, WALK_DISTANCE);
         LOG.info("from stops: {}", fromStops);
         LOG.info("to stops: {}", toStops);
-        this.window = new TimeWindow (fromTime, toTime, data.servicesRunning(date));
+        this.window = new TimeWindow (fromTime, toTime, index.servicesRunning(date));
         /* Our per-round work queue is actually a set, because transferring from a group of patterns
          * can generate the same PatternRide many times. FIXME */
         Set<PatternRide> queue = Sets.newHashSet();
@@ -149,7 +150,7 @@ public class ProfileRouter {
             for (int i = 0; i < pattern.getStops().size(); ++i) {
                 if (pattern.getStops().get(i) == sd.stop) {
                     /* Pseudo-transfer from null indicates first leg. */
-                    Transfer xfer = new Transfer(null, pattern, null, sd.stop, sd.distance);
+                    ProfileTransfer xfer = new ProfileTransfer(null, pattern, null, sd.stop, sd.distance);
                     queue.add(new PatternRide(pattern, i, null, xfer));
                     /* Do not break in case stop appears more than once in the same pattern. */
                 }
@@ -178,7 +179,7 @@ public class ProfileRouter {
                 /* Rides is cleared at the end of each round. */
                 for (Ride ride : rides.values()) {
                     // LOG.info("RIDE {}", ride);
-                    for (Transfer tr : data.transfersForStop.get(ride.to)) {
+                    for (ProfileTransfer tr : index.transfersForStop.get(ride.to)) {
                         // LOG.info("  TRANSFER {}", tr);
                         if (round == penultimateRound && !toStops.containsKey(tr.tp2)) continue;
                         if (ride.containsPattern(tr.tp1)) {
@@ -207,5 +208,5 @@ public class ProfileRouter {
         }
         return options;
     }
-    
+
 }

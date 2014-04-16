@@ -73,7 +73,7 @@ public class IndexAPI {
     private final GraphIndex index;
 
     public IndexAPI (@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
-        index = otpServer.graphService.getGraph(routerId).getIndex();
+        index = otpServer.graphService.getGraph(routerId).index;
     }
 
    /* Needed to check whether query parameter map is empty, rather than chaining " && x == null"s */

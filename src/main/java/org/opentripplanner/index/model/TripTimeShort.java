@@ -11,22 +11,30 @@ import com.beust.jcommander.internal.Lists;
 
 public class TripTimeShort {
 
+    public static final int UNDEFINED = -1;
     public String stopId;
-    public int scheduledDeparture;
-    public int realtimeDeparture;
-    public int departureDelay;
-    public int scheduledArrival;
-    public int realtimeArrival;
-    public int arrivalDelay;
-        
+    public int scheduledArrival = UNDEFINED ;
+    public int scheduledDeparture = UNDEFINED ;
+    public int realtimeArrival = UNDEFINED ;
+    public int realtimeDeparture = UNDEFINED ;
+    public int arrivalDelay = UNDEFINED ;
+    public int departureDelay = UNDEFINED ;
+
+    /**
+     * This is stop-specific, so the index i is a stop index, not a hop index.
+     */
     public TripTimeShort(TripTimes tt, int i, Stop stop) {
         stopId = stop.getId().getId();
-        scheduledArrival   = tt.getScheduledArrivalTime(i);
-        scheduledDeparture = tt.getScheduledDepartureTime(i);
-        realtimeArrival    = tt.getArrivalTime(i);
-        realtimeDeparture  = tt.getDepartureTime(i);
-        arrivalDelay   = tt.getArrivalDelay(i);
-        departureDelay = tt.getDepartureDelay(i);
+        if (i > 0) {
+            scheduledArrival = tt.getScheduledArrivalTime(i - 1);
+            realtimeArrival  = tt.getArrivalTime(i - 1);
+            arrivalDelay     = tt.getArrivalDelay(i - 1);
+        }
+        if (i < tt.getNumHops()) {
+            scheduledDeparture = tt.getScheduledDepartureTime(i);
+            realtimeDeparture  = tt.getDepartureTime(i);
+            departureDelay     = tt.getDepartureDelay(i);
+        }
     }
 
     /**
@@ -35,7 +43,8 @@ public class TripTimeShort {
     public static List<TripTimeShort> fromTripTimes (Timetable table, Trip trip) {
         TripTimes times = table.getTripTimes(table.getTripIndex(trip.getId()));        
         List<TripTimeShort> out = Lists.newArrayList();
-        for (int i = 0; i < times.getNumHops(); ++i) {
+        // one per stop, not one per hop, thus the <= operator
+        for (int i = 0; i <= times.getNumHops(); ++i) {
             out.add(new TripTimeShort(times, i, table.getPattern().getStop(i)));
         }
         return out;

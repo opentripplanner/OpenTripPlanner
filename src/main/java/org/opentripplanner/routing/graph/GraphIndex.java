@@ -1,18 +1,30 @@
 package org.opentripplanner.routing.graph;
 
+import java.util.BitSet;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
+import org.onebusaway.gtfs.model.calendar.ServiceDate;
+import org.onebusaway.gtfs.services.calendar.CalendarService;
+import org.opentripplanner.api.resource.analyst.SimpleIsochrone;
 import org.opentripplanner.common.LuceneIndex;
+import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.HashGrid;
-import org.opentripplanner.profile.ProfileData;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.common.model.P2;
+import org.opentripplanner.profile.ProfileTransfer;
+import org.opentripplanner.profile.StopAtDistance;
 import org.opentripplanner.routing.edgetype.TablePatternEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -20,7 +32,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -48,11 +59,15 @@ public class GraphIndex {
     public final Multimap<String, Stop> stopsForParentStation = ArrayListMultimap.create();
     public final HashGrid<TransitStop> stopSpatialIndex = new HashGrid<TransitStop>();
 
-    /* Full-text search extensions */
-    public LuceneIndex lucene;
+    /* Should eventually be replaced with new serviceId indexes. */
+    private final CalendarService calendarService;
+    private final Map<AgencyAndId,Integer> serviceCodes;
 
-    /* Profile routing extensions */
-    public ProfileData profile;
+    /* Full-text search extensions */
+    public LuceneIndex luceneIndex;
+
+    /* Separate transfers for profile routing */
+    public Multimap<Stop, ProfileTransfer> transfersForStop = HashMultimap.create();
 
     public GraphIndex (Graph graph) {
         LOG.info("Indexing graph...");
@@ -98,16 +113,118 @@ public class GraphIndex {
         for (Route route : patternsForRoute.asMap().keySet()) {
             routeForId.put(route.getId(), route);
         }
-        analyzeServices();
+        // Copy these two service indexes from the graph until we have better ones.
+        calendarService = graph.getCalendarService();
+        serviceCodes = graph.serviceCodes;
         luceneIndex = new LuceneIndex(this, true);
         LOG.info("Done indexing graph.");
     }
 
+    public Collection<ProfileTransfer> getTransfersForStop(Stop stop) {
+        if (transfersForStop == null) {
+            LOG.info("Lazy-initializing profile router transfers.");
+            findProfileTransfers();
+        }
+        return transfersForStop.get(stop);
+    }
 
     private void analyzeServices() {
         // This is a mess because CalendarService, CalendarServiceData, etc. are all in OBA.
         // TODO catalog days of the week and exceptions for each service day.
         // Make a table of which services are running on each calendar day.
+        // Really the calendarService should be entirely replaced with a set
+        // of simple indexes in GraphIndex.
     }
+
+    private static DistanceLibrary distlib = new SphericalDistanceLibrary();
+
+
+    /**
+     * For profile routing.
+     */
+    public List<StopAtDistance> findTransitStops(double lon, double lat, double radius) {
+        List<StopAtDistance> ret = Lists.newArrayList();
+        for (TransitStop tstop : stopSpatialIndex.query(lon, lat, radius)) {
+            Stop stop = tstop.getStop();
+            int distance = (int) distlib.distance(lat, lon, stop.getLat(), stop.getLon());
+            if (distance < radius)
+                ret.add(new StopAtDistance(stop, distance));
+        }
+        return ret;
+    }
+
+    /**
+     * For profile routing.
+     * Find all patterns that stop close to a given lat,lon coordinate.
+     * Return a map from each pattern to the closest stop on that pattern.
+     * We want a single stop object rather than an index within the pattern because we want to consider
+     * stops that appear more than once in a pattern at every index where they occur (in profile routing).
+     * Therefore this is not the right place to convert to stop indexes from stop objects.
+     */
+    public Map<TripPattern, StopAtDistance> closestPatterns(double lon, double lat, double radius) {
+        SimpleIsochrone.MinMap<TripPattern, StopAtDistance> closest = new SimpleIsochrone.MinMap<TripPattern, StopAtDistance>();
+        for (StopAtDistance stopDist : findTransitStops(lon, lat, radius)) {
+            for (TripPattern pattern : patternsForStop.get(stopDist.stop)) {
+                closest.putMin(pattern, stopDist);
+            }
+        }
+        return closest;
+    }
+
+    /**
+     * Lazy-initialize additional transfer data for profile routing.
+     * Find best transfers between each pair of routes that pass near one another.
+     */
+    private void findProfileTransfers() {
+        final double TRANSFER_RADIUS = 500.0; // meters
+        SimpleIsochrone.MinMap<P2<TripPattern>, ProfileTransfer> bestTransfers = new SimpleIsochrone.MinMap<P2<TripPattern>, ProfileTransfer>();
+        LOG.info("Finding transfers...");
+        for (Stop s0 : stopForId.values()) {
+            Collection<TripPattern> ps0 = patternsForStop.get(s0);
+            for (StopAtDistance sd : findTransitStops(s0.getLon(), s0.getLat(), TRANSFER_RADIUS)) {
+                Stop s1 = sd.stop;
+                if (s0 == s1)
+                    continue;
+                Collection<TripPattern> ps1 = patternsForStop.get(s1);
+                for (TripPattern p0 : ps0) {
+                    for (TripPattern p1 : ps1) {
+                        if (p0 == p1)
+                            continue;
+                        bestTransfers.putMin(new P2<TripPattern>(p0, p1), new ProfileTransfer(p0, p1,
+                                s0, s1, sd.distance));
+                    }
+                }
+            }
+        }
+        for (ProfileTransfer tr : bestTransfers.values()) {
+            transfersForStop.put(tr.s1, tr);
+        }
+        /*
+         * for (Stop stop : transfersForStop.keys()) { System.out.println("STOP " + stop); for
+         * (Transfer transfer : transfersForStop.get(stop)) { System.out.println("    " +
+         * transfer.toString()); } }
+         */
+        LOG.info("Done finding transfers.");
+    }
+
+    /** An OBA Service Date is a local date without timezone, only year month and day. */
+    public BitSet servicesRunning (ServiceDate date) {
+        BitSet services = new BitSet(calendarService.getServiceIds().size());
+        for (AgencyAndId serviceId : calendarService.getServiceIdsOnDate(date)) {
+            int n = serviceCodes.get(serviceId);
+            if (n < 0) continue;
+            services.set(n);
+        }
+        return services;
+    }
+
+    /**
+     * Wraps the other servicesRunning whose parameter is an OBA ServiceDate.
+     * Joda LocalDate is a similar class.
+     */
+    public BitSet servicesRunning (LocalDate date) {
+        return servicesRunning(new ServiceDate(date.getYear(), date.getMonthOfYear(), date.getDayOfMonth()));
+    }
+
 
 }

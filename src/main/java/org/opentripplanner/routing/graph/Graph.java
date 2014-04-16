@@ -28,6 +28,7 @@ import java.io.ObjectOutputStream;
 import java.io.ObjectStreamClass;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -45,6 +46,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import lombok.Getter;
 import lombok.Setter;
 
+import org.joda.time.LocalDate;
 import org.onebusaway.gtfs.impl.calendar.CalendarServiceImpl;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
@@ -59,7 +61,6 @@ import org.opentripplanner.gbannotation.GraphBuilderAnnotation;
 import org.opentripplanner.gbannotation.NoFutureDates;
 import org.opentripplanner.graph_builder.impl.EmbeddedConfigGraphBuilderImpl;
 import org.opentripplanner.model.GraphBundle;
-import org.opentripplanner.profile.ProfileData;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
 import org.opentripplanner.routing.core.TransferTable;
@@ -133,8 +134,7 @@ public class Graph implements Serializable {
 
     public transient StreetVertexIndexService streetIndex;
 
-    @Getter
-    private transient GraphIndex index;
+    public transient GraphIndex index;
     
     /** 
      * Map from GTFS ServiceIds to integers close to 0. Allows using BitSets instead of Set<Object>.
@@ -161,8 +161,6 @@ public class Graph implements Serializable {
     private transient GraphMetadata graphMetadata = null;
 
     private transient Geometry hull = null;
-
-    private transient ProfileData profileData = null;
 
     /**
      * Makes it possible to embed a default configuration inside a graph.
@@ -524,14 +522,6 @@ public class Graph implements Serializable {
 
     public List<GraphBuilderAnnotation> getBuilderAnnotations() {
         return this.graphBuilderAnnotations;
-    }
-
-    public ProfileData getProfileData() {
-        if (profileData == null) {
-            LOG.info("Lazy-initializing profile router data.");
-            profileData = new ProfileData(this);
-        }
-        return profileData;
     }
 
     /* (de) serialization */

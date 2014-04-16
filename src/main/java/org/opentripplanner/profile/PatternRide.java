@@ -3,7 +3,6 @@ package org.opentripplanner.profile;
 import lombok.EqualsAndHashCode;
 
 import org.onebusaway.gtfs.model.Stop;
-import org.opentripplanner.profile.ProfileData.Transfer;
 import org.opentripplanner.routing.edgetype.TripPattern;
 
 /**
@@ -23,11 +22,11 @@ class PatternRide {
     int fromIndex;
     int toIndex = -1;
     Ride previous;
-    Transfer xfer; // how did we get here
+    ProfileTransfer xfer; // how did we get here
     Stats stats = null;
     
     /** Construct an unfinished PatternRide, lacking a toIndex and stats. */
-    public PatternRide (TripPattern pattern, int fromIndex, Ride previous, Transfer xfer) {
+    public PatternRide (TripPattern pattern, int fromIndex, Ride previous, ProfileTransfer xfer) {
         this.pattern   = pattern;
         this.fromIndex = fromIndex;
         this.previous  = previous;
