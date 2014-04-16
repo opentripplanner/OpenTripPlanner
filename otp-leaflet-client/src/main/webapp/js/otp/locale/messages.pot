@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-04-13 16:16+0200\n"
+"POT-Creation-Date: 2014-04-16 21:14+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,7 +26,8 @@ msgstr ""
 msgid "Unminimize all"
 msgstr ""
 
-#: modules/analyst/AnalystLegendWidget.js:25
+#. Legend title in Analyst
+#: modules/analyst/AnalystLegendWidget.js:26
 msgid "Legend : travel time in minutes"
 msgstr ""
 
@@ -45,14 +46,15 @@ msgstr ""
 msgid "Set as Analysis Location"
 msgstr ""
 
+#. widget name
+#: modules/bikeshare/BikeShareModule.js:108
+#: modules/multimodal/MultimodalPlannerModule.js:44
+msgid "Trip Options"
+msgstr ""
+
 #. module name
 #: modules/multimodal/MultimodalPlannerModule.js:22
 msgid "Multimodal Trip Planner"
-msgstr ""
-
-#. widget name
-#: modules/multimodal/MultimodalPlannerModule.js:44
-msgid "Trip Options"
 msgstr ""
 
 #. Widget title
@@ -196,94 +198,109 @@ msgstr ""
 msgid "Travel Options"
 msgstr ""
 
-#: widgets/tripoptions/TripOptionsWidget.js:183
+#: widgets/tripoptions/TripOptionsWidget.js:184
 msgid "Start"
 msgstr ""
 
-#: widgets/tripoptions/TripOptionsWidget.js:184
+#: widgets/tripoptions/TripOptionsWidget.js:185
 msgid "End"
 msgstr ""
 
-#: widgets/tripoptions/TripOptionsWidget.js:185
+#: widgets/tripoptions/TripOptionsWidget.js:186
 msgid "Geocoder"
 msgstr ""
 
 #. Depart [time dropdown] [date dropdown]. Used in
 #. dropdown as a label to choose wanted time/date of departure
-#: widgets/tripoptions/TripOptionsWidget.js:311
+#: widgets/tripoptions/TripOptionsWidget.js:312
 msgid "Depart"
 msgstr ""
 
 #. Arrive [time dropdown] [date dropdown]. Used in
 #. dropdown as a label to choose wanted time/date of arrival.
-#: widgets/tripoptions/TripOptionsWidget.js:314
+#: widgets/tripoptions/TripOptionsWidget.js:315
 msgid "Arrive"
 msgstr ""
 
 #. on button that sets time and date of arrival/departure to now
-#: widgets/tripoptions/TripOptionsWidget.js:316
+#: widgets/tripoptions/TripOptionsWidget.js:317
 msgid "Now"
 msgstr ""
 
 #. Label for dropdown Travel by: [mode of transport]
-#: widgets/tripoptions/TripOptionsWidget.js:427
+#: widgets/tripoptions/TripOptionsWidget.js:428
 msgid "Travel by"
 msgstr ""
 
 #. default value for preset values of maximum walk
 #. distances in Trip Options
-#: widgets/tripoptions/TripOptionsWidget.js:533
+#: widgets/tripoptions/TripOptionsWidget.js:534
 msgid "Presets"
 msgstr ""
 
 #. label for choosing how much should person's trip on foot be
-#: widgets/tripoptions/TripOptionsWidget.js:596
+#: widgets/tripoptions/TripOptionsWidget.js:597
 msgid "Maximum walk"
 msgstr ""
 
 #. label for choosing how much should person's trip on bicycle be
-#: widgets/tripoptions/TripOptionsWidget.js:619
+#: widgets/tripoptions/TripOptionsWidget.js:620
 msgid "Maximum bike"
 msgstr ""
 
 #. label Preferred Routes: (routes/None)
 #. widget title
-#: widgets/tripoptions/TripOptionsWidget.js:651
-#: widgets/tripoptions/TripOptionsWidget.js:662
+#: widgets/tripoptions/TripOptionsWidget.js:652
+#: widgets/tripoptions/TripOptionsWidget.js:663
 msgid "Preferred Routes"
 msgstr ""
 
 #. button to edit Preffered public transport Routes
 #. buton edit Banned public transport routes
-#: widgets/tripoptions/TripOptionsWidget.js:653
-#: widgets/tripoptions/TripOptionsWidget.js:762
+#: widgets/tripoptions/TripOptionsWidget.js:654
+#: widgets/tripoptions/TripOptionsWidget.js:763
 msgid "Edit"
 msgstr ""
 
 #. Words in brackets when no Preffered public transport route is set
-#: widgets/tripoptions/TripOptionsWidget.js:655
-#: widgets/tripoptions/TripOptionsWidget.js:730
-#: widgets/tripoptions/TripOptionsWidget.js:765
-#: widgets/tripoptions/TripOptionsWidget.js:825
+#: widgets/tripoptions/TripOptionsWidget.js:656
+#: widgets/tripoptions/TripOptionsWidget.js:731
+#: widgets/tripoptions/TripOptionsWidget.js:766
+#: widgets/tripoptions/TripOptionsWidget.js:826
 msgid "None"
 msgstr ""
 
 #. Label for Weight slider  to set to preffered public
 #. transport routes
-#: widgets/tripoptions/TripOptionsWidget.js:658
+#: widgets/tripoptions/TripOptionsWidget.js:659
 msgid "Weight"
 msgstr ""
 
 #. label Banned public transport Routes: (routes/None)
 #. (Routes you don't want to take)
 #. Widget title
-#: widgets/tripoptions/TripOptionsWidget.js:765
-#: widgets/tripoptions/TripOptionsWidget.js:771
+#: widgets/tripoptions/TripOptionsWidget.js:766
+#: widgets/tripoptions/TripOptionsWidget.js:772
 msgid "Banned routes"
 msgstr ""
 
+#. In Bike share planner radio button: <Use>: My Own Bike A shared bike
+#: widgets/tripoptions/TripOptionsWidget.js:901
+msgid "Use"
+msgstr ""
+
+#. In Bike share planner radio button: Use: <My Own Bike> A shared bike
+#: widgets/tripoptions/TripOptionsWidget.js:903
+msgid "My Own Bike"
+msgstr ""
+
+#. In Bike share planner radio button: Use: My Own Bike <A Shared bike>
+#: widgets/tripoptions/TripOptionsWidget.js:905
+msgid "A Shared Bike"
+msgstr ""
+
 #. button to send query for trip planning
-#: widgets/tripoptions/TripOptionsWidget.js:1042
+#: widgets/tripoptions/TripOptionsWidget.js:1046
 msgid "Plan Your Trip"
 msgstr ""
 

@@ -105,7 +105,7 @@ otp.modules.bikeshare.BikeShareModule =
     initOptionsWidget : function() {
         this.optionsWidget = new otp.widgets.tripoptions.TripOptionsWidget(
             'otp-'+this.id+'-optionsWidget', this, {
-                title : 'Trip Options'
+                title : _tr('Trip Options')
             }
         );
 

@@ -22,6 +22,7 @@ otp.modules.analyst.AnalystLegendWidget =
     
     initialize : function(id, module, width, height) {
         otp.widgets.Widget.prototype.initialize.call(this, id, module, {
+            //TRANSLATORS: Legend title in Analyst
             title : _tr("Legend : travel time in minutes"),
             cssClass : 'otp-analyst-legendWidget'
         });

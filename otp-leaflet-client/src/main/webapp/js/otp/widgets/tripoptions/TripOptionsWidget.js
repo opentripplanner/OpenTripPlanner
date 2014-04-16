@@ -897,9 +897,12 @@ otp.widgets.tripoptions.BikeType =
         this.$().addClass('notDraggable');
 
         var content = '';        
-        content += 'Use: ';
-        content += '<input id="'+this.id+'-myOwnBikeRBtn" type="radio" name="bikeType" value="my_bike" checked> My Own Bike&nbsp;&nbsp;';
-        content += '<input id="'+this.id+'-sharedBikeRBtn" type="radio" name="bikeType" value="shared_bike"> A Shared Bike';
+        //TRANSLATORS: In Bike share planner radio button: <Use>: My Own Bike A shared bike
+        content += _tr('Use') + ': ';
+        //TRANSLATORS: In Bike share planner radio button: Use: <My Own Bike> A shared bike
+        content += '<input id="'+this.id+'-myOwnBikeRBtn" type="radio" name="bikeType" value="my_bike" checked> ' + _tr("My Own Bike") + '&nbsp;&nbsp;';
+        //TRANSLATORS: In Bike share planner radio button: Use: My Own Bike <A Shared bike>
+        content += '<input id="'+this.id+'-sharedBikeRBtn" type="radio" name="bikeType" value="shared_bike"> ' + _tr("A Shared Bike");
         
         this.setContent(content);
     },
