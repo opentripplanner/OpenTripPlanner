@@ -309,7 +309,7 @@ otp.widgets.tripoptions.TimeSelector =
             widgetId : this.id,
             //TRANSLATORS: Depart [time dropdown] [date dropdown]. Used in
             //dropdown as a label to choose wanted time/date of departure
-            depart   : _tr("Depart"),
+            depart   : pgettext("tripoptions", "Depart"),
             //TRANSLATORS: Arrive [time dropdown] [date dropdown]. Used in
             //dropdown as a label to choose wanted time/date of arrival.
             arrive   : _tr("Arrive"),

@@ -9,8 +9,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-04-13 16:16+0200\n"
-"PO-Revision-Date: 2014-04-13 16:17+0200\n"
+"POT-Creation-Date: 2014-04-16 22:10+0200\n"
+"PO-Revision-Date: 2014-04-16 22:11+0200\n"
 "Last-Translator: Marko Burjek <email4marko@gmail.com>\n"
 "Language-Team: Slovenian <lugos-slo@lugos.si>\n"
 "Language: sl\n"
@@ -30,7 +30,8 @@ msgstr "Skrči vse"
 msgid "Unminimize all"
 msgstr "Razširi vse"
 
-#: modules/analyst/AnalystLegendWidget.js:25
+#. Legend title in Analyst
+#: modules/analyst/AnalystLegendWidget.js:26
 msgid "Legend : travel time in minutes"
 msgstr "Legenda: potovalni čas v minutah"
 
@@ -50,15 +51,16 @@ msgstr "Osveži"
 msgid "Set as Analysis Location"
 msgstr ""
 
+#. widget name
+#: modules/bikeshare/BikeShareModule.js:108
+#: modules/multimodal/MultimodalPlannerModule.js:44
+msgid "Trip Options"
+msgstr "Nastavitve potovanja"
+
 #. module name
 #: modules/multimodal/MultimodalPlannerModule.js:22
 msgid "Multimodal Trip Planner"
-msgstr ""
-
-#. widget name
-#: modules/multimodal/MultimodalPlannerModule.js:44
-msgid "Trip Options"
-msgstr ""
+msgstr "Večmodalni načrtovalnik potovanj"
 
 #. Widget title
 #: modules/multimodal/MultimodalPlannerModule.js:131
@@ -139,6 +141,115 @@ msgstr "smer"
 msgid "Total walk distance for this trip exceeds specified maximum"
 msgstr "Skupna dolžina hoje za to pot je več kot nastavljen maksimum."
 
+#: modules/planner/ItinerariesWidget.js:446
+msgid "Trip Summary"
+msgstr "Povzetek potovanja"
+
+#. Travel: hour date on which this trip is made
+#: modules/planner/ItinerariesWidget.js:448
+msgid "Travel"
+msgstr "Potuj na"
+
+#. Time: minutes How long is this trip
+#: modules/planner/ItinerariesWidget.js:450
+msgid "Time"
+msgstr "Trajanje"
+
+#. Total foot distance for trip
+#: modules/planner/ItinerariesWidget.js:455
+msgid "Total Walk"
+msgstr "Skupno hoje"
+
+#. Total distance on a bike for this trip
+#: modules/planner/ItinerariesWidget.js:462
+msgid "Total Bike"
+msgstr "Skupno kolesa"
+
+#. how many public transit transfers in a trip
+#: modules/planner/ItinerariesWidget.js:468
+msgid "Transfers"
+msgstr ""
+
+#. cost of trip
+#: modules/planner/ItinerariesWidget.js:474
+msgid "Fare"
+msgstr "Cena"
+
+#. Valid date time; When is this trip correct
+#: modules/planner/ItinerariesWidget.js:482
+msgid "Valid"
+msgstr "Veljavno"
+
+#. Links to this itinerary
+#: modules/planner/ItinerariesWidget.js:487
+msgid "Link to Itinerary"
+msgstr "Povezava na potovanje"
+
+#. Default subject when sending trip to email
+#: modules/planner/ItinerariesWidget.js:502
+msgid "Your Trip"
+msgstr "Vaše potovanje"
+
+#. Link to send trip by email
+#: modules/planner/ItinerariesWidget.js:505
+msgid "Email"
+msgstr "E-pošta"
+
+#. public transport drives every N minutes
+#: modules/planner/ItinerariesWidget.js:525
+#, python-format
+msgid "every %d min"
+msgid_plural "every %d mins"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
+
+#. Depart on to street / Board at station in itinerary
+#: modules/planner/ItinerariesWidget.js:531
+#, fuzzy
+msgctxt "itinerary"
+msgid "Depart"
+msgstr "Odidi"
+
+#: modules/planner/ItinerariesWidget.js:531
+msgid "<b>Board</b> at "
+msgstr "<b>Vstopi</b> na "
+
+#. Public transport <Stop> (stop name)
+#: modules/planner/ItinerariesWidget.js:550
+#: widgets/transit/StopViewerWidget.js:83
+msgid "Stop"
+msgstr "Postaja"
+
+#. widget title
+#: modules/planner/ItinerariesWidget.js:550
+#: widgets/transit/StopViewerWidget.js:31
+msgid "Stop Viewer"
+msgstr "Pregledovalnik postaj"
+
+#: modules/planner/ItinerariesWidget.js:571
+msgid "Time in transit"
+msgstr "Časa na vožnji"
+
+#: modules/planner/ItinerariesWidget.js:573
+#, fuzzy
+msgid "Trip Viewer"
+msgstr "Pregledovalnik poti"
+
+#: modules/planner/ItinerariesWidget.js:631
+msgid "late as"
+msgstr ""
+
+#: modules/planner/ItinerariesWidget.js:636
+#, fuzzy
+msgid "Stay on board"
+msgstr "Ostanite na vozilu"
+
+#: modules/planner/ItinerariesWidget.js:636
+msgid "Alight"
+msgstr ""
+
 #. Minimize widget in context menu
 #: widgets/Widget.js:107
 msgid "Minimize"
@@ -153,6 +264,15 @@ msgstr "Postavi v ospredje"
 #: widgets/Widget.js:113
 msgid "Send to back"
 msgstr "Pošlji v ozadje"
+
+#. Widget title
+#: widgets/transit/StopFinderWidget.js:31
+msgid "Stop Finder"
+msgstr "Iskalnik postaj"
+
+#: widgets/transit/StopFinderWidget.js:84
+msgid "No Stops Found"
+msgstr "Ni najdenih postaj"
 
 #. Optimization for bicycle shown in bike triangle. Optimized
 #. for speed
@@ -210,100 +330,122 @@ msgstr "Zapri"
 msgid "Travel Options"
 msgstr "Možnosti potovanja"
 
-#: widgets/tripoptions/TripOptionsWidget.js:183
+#: widgets/tripoptions/TripOptionsWidget.js:184
 msgid "Start"
 msgstr "Začetek"
 
-#: widgets/tripoptions/TripOptionsWidget.js:184
+#: widgets/tripoptions/TripOptionsWidget.js:185
 #, fuzzy
 msgid "End"
 msgstr "Konec"
 
-#: widgets/tripoptions/TripOptionsWidget.js:185
+#: widgets/tripoptions/TripOptionsWidget.js:186
 msgid "Geocoder"
 msgstr ""
 
 #. Depart [time dropdown] [date dropdown]. Used in
 #. dropdown as a label to choose wanted time/date of departure
-#: widgets/tripoptions/TripOptionsWidget.js:311
+#: widgets/tripoptions/TripOptionsWidget.js:312
+msgctxt "tripoptions"
 msgid "Depart"
 msgstr "Odhod ob"
 
 #. Arrive [time dropdown] [date dropdown]. Used in
 #. dropdown as a label to choose wanted time/date of arrival.
-#: widgets/tripoptions/TripOptionsWidget.js:314
+#: widgets/tripoptions/TripOptionsWidget.js:315
 msgid "Arrive"
 msgstr "Prihod do"
 
 #. on button that sets time and date of arrival/departure to now
-#: widgets/tripoptions/TripOptionsWidget.js:316
+#: widgets/tripoptions/TripOptionsWidget.js:317
 msgid "Now"
 msgstr "Zdaj"
 
 #. Label for dropdown Travel by: [mode of transport]
-#: widgets/tripoptions/TripOptionsWidget.js:427
+#: widgets/tripoptions/TripOptionsWidget.js:428
 msgid "Travel by"
 msgstr "Potuj z"
 
 #. default value for preset values of maximum walk
 #. distances in Trip Options
-#: widgets/tripoptions/TripOptionsWidget.js:533
+#: widgets/tripoptions/TripOptionsWidget.js:534
 #, fuzzy
 msgid "Presets"
 msgstr "Prednastavljene"
 
 #. label for choosing how much should person's trip on foot be
-#: widgets/tripoptions/TripOptionsWidget.js:596
+#: widgets/tripoptions/TripOptionsWidget.js:597
 #, fuzzy
 msgid "Maximum walk"
 msgstr "Največja razdalja peš"
 
 #. label for choosing how much should person's trip on bicycle be
-#: widgets/tripoptions/TripOptionsWidget.js:619
+#: widgets/tripoptions/TripOptionsWidget.js:620
 #, fuzzy
 msgid "Maximum bike"
 msgstr "Največja razdalja kolesarjenja"
 
 #. label Preferred Routes: (routes/None)
 #. widget title
-#: widgets/tripoptions/TripOptionsWidget.js:651
-#: widgets/tripoptions/TripOptionsWidget.js:662
+#: widgets/tripoptions/TripOptionsWidget.js:652
+#: widgets/tripoptions/TripOptionsWidget.js:663
 msgid "Preferred Routes"
 msgstr "Priljubljene linije"
 
 #. button to edit Preffered public transport Routes
 #. buton edit Banned public transport routes
-#: widgets/tripoptions/TripOptionsWidget.js:653
-#: widgets/tripoptions/TripOptionsWidget.js:762
+#: widgets/tripoptions/TripOptionsWidget.js:654
+#: widgets/tripoptions/TripOptionsWidget.js:763
 #, fuzzy
 msgid "Edit"
 msgstr "Uredi"
 
 #. Words in brackets when no Preffered public transport route is set
-#: widgets/tripoptions/TripOptionsWidget.js:655
-#: widgets/tripoptions/TripOptionsWidget.js:730
-#: widgets/tripoptions/TripOptionsWidget.js:765
-#: widgets/tripoptions/TripOptionsWidget.js:825
+#: widgets/tripoptions/TripOptionsWidget.js:656
+#: widgets/tripoptions/TripOptionsWidget.js:731
+#: widgets/tripoptions/TripOptionsWidget.js:766
+#: widgets/tripoptions/TripOptionsWidget.js:826
 #, fuzzy
 msgid "None"
 msgstr "Brez"
 
 #. Label for Weight slider  to set to preffered public
 #. transport routes
-#: widgets/tripoptions/TripOptionsWidget.js:658
+#: widgets/tripoptions/TripOptionsWidget.js:659
 msgid "Weight"
 msgstr "Utež"
 
 #. label Banned public transport Routes: (routes/None)
 #. (Routes you don't want to take)
 #. Widget title
-#: widgets/tripoptions/TripOptionsWidget.js:765
-#: widgets/tripoptions/TripOptionsWidget.js:771
+#: widgets/tripoptions/TripOptionsWidget.js:766
+#: widgets/tripoptions/TripOptionsWidget.js:772
 #, fuzzy
 msgid "Banned routes"
 msgstr "Neželjene linije"
 
+#. In Bike share planner radio button: <Use>: My Own Bike A shared bike
+#: widgets/tripoptions/TripOptionsWidget.js:901
+msgid "Use"
+msgstr "Uporabi"
+
+#. In Bike share planner radio button: Use: <My Own Bike> A shared bike
+#: widgets/tripoptions/TripOptionsWidget.js:903
+msgid "My Own Bike"
+msgstr "Lastno kolo"
+
+#. In Bike share planner radio button: Use: My Own Bike <A Shared bike>
+#: widgets/tripoptions/TripOptionsWidget.js:905
+msgid "A Shared Bike"
+msgstr "Sposojeno kolo"
+
 #. button to send query for trip planning
-#: widgets/tripoptions/TripOptionsWidget.js:1042
+#: widgets/tripoptions/TripOptionsWidget.js:1046
 msgid "Plan Your Trip"
-msgstr ""
+msgstr "Načrtujte pot"
+
+#~ msgid "Time in transit:"
+#~ msgstr "Časa na vožnji:"
+
+#~ msgid "Depart"
+#~ msgstr "Odhod ob"

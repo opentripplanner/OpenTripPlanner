@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-04-16 21:21+0200\n"
+"POT-Creation-Date: 2014-04-16 22:10+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -128,6 +128,110 @@ msgstr ""
 msgid "Total walk distance for this trip exceeds specified maximum"
 msgstr ""
 
+#: modules/planner/ItinerariesWidget.js:446
+msgid "Trip Summary"
+msgstr ""
+
+#. Travel: hour date on which this trip is made
+#: modules/planner/ItinerariesWidget.js:448
+msgid "Travel"
+msgstr ""
+
+#. Time: minutes How long is this trip
+#: modules/planner/ItinerariesWidget.js:450
+msgid "Time"
+msgstr ""
+
+#. Total foot distance for trip
+#: modules/planner/ItinerariesWidget.js:455
+msgid "Total Walk"
+msgstr ""
+
+#. Total distance on a bike for this trip
+#: modules/planner/ItinerariesWidget.js:462
+msgid "Total Bike"
+msgstr ""
+
+#. how many public transit transfers in a trip
+#: modules/planner/ItinerariesWidget.js:468
+msgid "Transfers"
+msgstr ""
+
+#. cost of trip
+#: modules/planner/ItinerariesWidget.js:474
+msgid "Fare"
+msgstr ""
+
+#. Valid date time; When is this trip correct
+#: modules/planner/ItinerariesWidget.js:482
+msgid "Valid"
+msgstr ""
+
+#. Links to this itinerary
+#: modules/planner/ItinerariesWidget.js:487
+msgid "Link to Itinerary"
+msgstr ""
+
+#. Default subject when sending trip to email
+#: modules/planner/ItinerariesWidget.js:502
+msgid "Your Trip"
+msgstr ""
+
+#. Link to send trip by email
+#: modules/planner/ItinerariesWidget.js:505
+msgid "Email"
+msgstr ""
+
+#. public transport drives every N minutes
+#: modules/planner/ItinerariesWidget.js:525
+#, python-format
+msgid "every %d min"
+msgid_plural "every %d mins"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Depart on to street / Board at station in itinerary
+#: modules/planner/ItinerariesWidget.js:531
+msgctxt "itinerary"
+msgid "Depart"
+msgstr ""
+
+#: modules/planner/ItinerariesWidget.js:531
+msgid "<b>Board</b> at "
+msgstr ""
+
+#. Public transport <Stop> (stop name)
+#: modules/planner/ItinerariesWidget.js:550
+#: widgets/transit/StopViewerWidget.js:83
+msgid "Stop"
+msgstr ""
+
+#. widget title
+#: modules/planner/ItinerariesWidget.js:550
+#: widgets/transit/StopViewerWidget.js:31
+msgid "Stop Viewer"
+msgstr ""
+
+#: modules/planner/ItinerariesWidget.js:571
+msgid "Time in transit"
+msgstr ""
+
+#: modules/planner/ItinerariesWidget.js:573
+msgid "Trip Viewer"
+msgstr ""
+
+#: modules/planner/ItinerariesWidget.js:631
+msgid "late as"
+msgstr ""
+
+#: modules/planner/ItinerariesWidget.js:636
+msgid "Stay on board"
+msgstr ""
+
+#: modules/planner/ItinerariesWidget.js:636
+msgid "Alight"
+msgstr ""
+
 #. Minimize widget in context menu
 #: widgets/Widget.js:107
 msgid "Minimize"
@@ -150,16 +254,6 @@ msgstr ""
 
 #: widgets/transit/StopFinderWidget.js:84
 msgid "No Stops Found"
-msgstr ""
-
-#. widget title
-#: widgets/transit/StopViewerWidget.js:31
-msgid "Stop Viewer"
-msgstr ""
-
-#. Public transport <Stop> (stop name)
-#: widgets/transit/StopViewerWidget.js:83
-msgid "Stop"
 msgstr ""
 
 #. Optimization for bicycle shown in bike triangle. Optimized
@@ -232,6 +326,7 @@ msgstr ""
 #. Depart [time dropdown] [date dropdown]. Used in
 #. dropdown as a label to choose wanted time/date of departure
 #: widgets/tripoptions/TripOptionsWidget.js:312
+msgctxt "tripoptions"
 msgid "Depart"
 msgstr ""
 
