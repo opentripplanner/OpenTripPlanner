@@ -58,6 +58,10 @@ public class CommandLineParameters {
             description = "the directory under which to cache OSM and NED tiles")
     String cacheDirectory;
 
+    @Parameter( names = { "--congestion"},
+            description = "supply a congestion CSV file")
+    String congestionCsv;
+
     @Parameter(names = { "-e", "--elevation"},
             description = "download and use elevation data for the graph")
     boolean elevation;
@@ -124,7 +128,7 @@ public class CommandLineParameters {
     description = "path to static content")
     String staticDirectory;
 
-    @Parameter( names = { "-z", "--visualize"}, 
+    @Parameter( names = { "-z", "--visualize"},
     description = "open a debugging graph visualizer")
     boolean visualize;
 

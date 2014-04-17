@@ -15,6 +15,7 @@ import org.opentripplanner.analyst.request.TileCache;
 import org.opentripplanner.api.resource.PlanGenerator;
 import org.opentripplanner.api.resource.services.MetadataService;
 import org.opentripplanner.graph_builder.GraphBuilderTask;
+import org.opentripplanner.graph_builder.impl.CongestionGraphBuilder;
 import org.opentripplanner.graph_builder.impl.EmbeddedConfigGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.GtfsGraphBuilderImpl;
 import org.opentripplanner.graph_builder.impl.PruneFloatingIslands;
@@ -199,7 +200,10 @@ public class OTPConfigurator {
             DefaultWayPropertySetSource defaultWayPropertySetSource = new DefaultWayPropertySetSource();
             osmBuilder.setDefaultWayPropertySetSource(defaultWayPropertySetSource);
             graphBuilder.addGraphBuilder(osmBuilder);
-            graphBuilder.addGraphBuilder(new PruneFloatingIslands());            
+            graphBuilder.addGraphBuilder(new PruneFloatingIslands());
+            if (params.congestionCsv != null) {
+                graphBuilder.addGraphBuilder(new CongestionGraphBuilder(params.congestionCsv));
+            }
         }
         if ( hasGTFS ) {
             List<GtfsBundle> gtfsBundles = Lists.newArrayList();

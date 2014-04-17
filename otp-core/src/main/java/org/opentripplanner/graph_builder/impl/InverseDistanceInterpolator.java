@@ -153,7 +153,11 @@ public class InverseDistanceInterpolator {
     }
 
     public static void main(String[] params) {
-        InverseDistanceInterpolator idi = InverseDistanceInterpolator.fromCSV("/home/abyrd/speeds.csv");
-        idi.writeGeotiff("/home/abyrd/speed.tiff", 500, 500);
+        if (params.length != 1) {
+            LOG.error("Supply the path to the input CSV file as a command line parameter.");
+            System.exit(1);
+        }
+        InverseDistanceInterpolator idi = InverseDistanceInterpolator.fromCSV(params[0]);
+        idi.writeGeotiff(params[0] + ".tiff", 500, 500);
     }
 }
