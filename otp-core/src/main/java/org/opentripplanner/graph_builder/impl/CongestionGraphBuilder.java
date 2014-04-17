@@ -52,6 +52,7 @@ public class CongestionGraphBuilder implements GraphBuilder {
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
+        LOG.info("Scaling street speeds to account for congestion.");
         for (PlainStreetEdge pse : Iterables.filter(graph.getEdges(), PlainStreetEdge.class)) {
             CoordinateSequence coords = pse.getGeometry().getCoordinateSequence();
             if (coords == null || coords.size() == 0) continue;
@@ -64,8 +65,10 @@ public class CongestionGraphBuilder implements GraphBuilder {
             // Clamp speed range and update edge
             if (speed < MIN_SPEED) speed = MIN_SPEED;
             if (speed > MAX_SPEED) speed = MAX_SPEED;
+            // LOG.info("edge {} speed {} scaled by {} to {}", pse.getName(), pse.getCarSpeed(), avg, speed);
             pse.setCarSpeed((float)speed);
         }
+        LOG.info("Done scaling street speeds to account for congestion.");
     }
 
     @Override

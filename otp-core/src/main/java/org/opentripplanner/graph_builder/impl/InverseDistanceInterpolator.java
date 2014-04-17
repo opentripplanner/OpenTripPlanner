@@ -27,13 +27,14 @@ import java.util.List;
 
 /**
  * Inverse distance weighting 2D interpolation.
+ * See http://en.wikipedia.org/wiki/Inverse_distance_weighting
  * Time complexity of each interpolation operation is linear in the number of interpolation points.
  * Do not use this with huge point sets.
  */
 public class InverseDistanceInterpolator {
 
     private static final Logger LOG = LoggerFactory.getLogger(InverseDistanceInterpolator.class);
-    private static final double RADIUS_M = 250; // smoothing radius
+    private static final double RADIUS_M = 300; // smoothing radius
     private static final double RADIUS_DEG = RADIUS_M / 111111;
     private static final double RADIUS_DEG_2 = RADIUS_DEG * RADIUS_DEG;
 
@@ -52,11 +53,11 @@ public class InverseDistanceInterpolator {
         for (Point p1 : points) {
             double d2 = p0.squaredDistance(p1); // twice as slow using non-squared distance
             // Avoid division by zero and smooth extreme points
-            // by truncating the part of the function near 0
+            // by shifting past the part of the function near 0
             d2 += RADIUS_DEG_2;
+            // if (d2 < RADIUS_DEG_2) d2 = RADIUS_DEG_2; // causes ringing
             // if (d2 == 0) return p1.z;
-            // if (d2 < EPSILON) d2 = EPSILON;
-            d2 *= d2; // d^4 (sharper than d^2)
+            d2 *= d2; // d^4 (regions are more distinct than d^2)
             //d2 *= d2; // d^8
             //d2 *= d2; // d^16
             double weight = 1.0 / d2;
@@ -136,7 +137,7 @@ public class InverseDistanceInterpolator {
                 }
             }
         }
-        coverage = new GridCoverageFactory().create("interpolated", imagePixelData, refEnv);
+        //coverage = new GridCoverageFactory().create("interpolated", imagePixelData, refEnv);
         try {
             GeoTiffWriteParams wp = new GeoTiffWriteParams();
             wp.setCompressionMode(GeoTiffWriteParams.MODE_EXPLICIT);
@@ -158,6 +159,6 @@ public class InverseDistanceInterpolator {
             System.exit(1);
         }
         InverseDistanceInterpolator idi = InverseDistanceInterpolator.fromCSV(params[0]);
-        idi.writeGeotiff(params[0] + ".tiff", 500, 500);
+        idi.writeGeotiff(params[0] + ".tiff", 1000, 800);
     }
 }
