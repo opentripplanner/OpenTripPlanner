@@ -32,9 +32,17 @@ public class Admin extends Controller {
     }
     
     public static void deleteUser(long id) {
-       TrinetUser user = TrinetUser.findById(id);
-       user.delete();
-       getUsers();
+        TrinetUser user = TrinetUser.findById(id);
+       
+        List<Session> sessions;
+
+        sessions = Session.find("byUser", user).fetch();
+        for(Session sess : sessions) {
+            sess.delete();
+        }
+       
+        user.delete();
+        getUsers();
     }
-          
+
 }
