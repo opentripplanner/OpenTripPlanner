@@ -3,14 +3,35 @@
 <a href="@{Secure.logout()}">Log out</a>
 
 <p><b>All users:</b>
-<ul>
+<table border=0 cellpadding=4 cellspacing=6>
+    <tr>
+        <td style='background-color: #444; color: white'>TriNet Username</td> 
+        <td style='background-color: #444; color: white'>User Role</td> 
+        <td style='background-color: #444; color: white'>Other Actions</td> 
+    </tr>    
 #{list users, as:'user'}
-    <li>
-        ${user.username} (${user.role}) [<a href="/admin/deleteUser?id=${user.id}">Delete</a>]
-        
-    </li>
+    <tr>
+        <td style='background-color: #ddd;'>${user.username}</td> 
+        <td style='background-color: #ddd;'>
+            <b>${user.role}</b>&nbsp;&nbsp;
+            [ Reassign: 
+                #{if user.role != "calltaker"}
+                    (<a href="/admin/changeUserRole?id=${user.id}&role=calltaker">calltaker</a>) 
+                #{/if}
+                #{if user.role != "fieldtrip"}
+                    (<a href="/admin/changeUserRole?id=${user.id}&role=fieldtrip">fieldtrip</a>) 
+                #{/if}
+                #{if user.role != "all"}
+                    (<a href="/admin/changeUserRole?id=${user.id}&role=all">all</a>) 
+                #{/if}
+            ]
+        </td>
+        <td style='background-color: #ddd;'>
+            [<a href="javascript:deleteUser(${user.id}, '${user.username}')">Delete</a>]
+        </td>
+    </tr>
 #{/list}
-</ul>
+</table>
 
 #{form @Admin.addUser(), id:'addUserForm'}
 
@@ -55,6 +76,14 @@ function addUserClicked() {
     }
     else {
         alert("Not a valid username (alphanumeric only, no spaces or special characters)");
+    }
+}
+
+function deleteUser(id, name) {
+    var response = confirm('Are you sure you want to delete user ' + name + '?');
+    if(response === true) {    
+        console.log('delete '+id);
+        window.location = "/admin/deleteUser?id=" + id;
     }
 }
 
