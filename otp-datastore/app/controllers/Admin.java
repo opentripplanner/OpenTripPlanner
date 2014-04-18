@@ -45,4 +45,11 @@ public class Admin extends Controller {
         getUsers();
     }
 
+    public static void changeUserRole(long id, String role) {
+        TrinetUser user = TrinetUser.findById(id);
+        user.role = role;
+        user.save();       
+        getUsers();
+    }
+    
 }
