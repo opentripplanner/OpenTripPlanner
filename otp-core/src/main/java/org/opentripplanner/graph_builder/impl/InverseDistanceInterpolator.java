@@ -66,6 +66,7 @@ public class InverseDistanceInterpolator {
             total += p1.z * weight;
             totalWeight += weight;
         }
+        // LOG.info("{}/{}", total, totalWeight);
         return total / totalWeight;
     }
 
@@ -137,7 +138,9 @@ public class InverseDistanceInterpolator {
                 }
             }
         }
-        //coverage = new GridCoverageFactory().create("interpolated", imagePixelData, refEnv);
+        // updating the backing pixel array above does not affect the existing coverage. make a new one.
+        // TODO: make this less hackish
+        coverage = new GridCoverageFactory().create("interpolated", imagePixelData, refEnv);
         try {
             GeoTiffWriteParams wp = new GeoTiffWriteParams();
             wp.setCompressionMode(GeoTiffWriteParams.MODE_EXPLICIT);
