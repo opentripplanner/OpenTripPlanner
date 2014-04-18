@@ -36,8 +36,13 @@ import com.vividsolutions.jts.geom.Polygon;
  * It will compute an isoline for a given z0 value. The isoline is composed of a list of n polygons,
  * CW for normal polygons, CCW for "holes". The isoline computation can be called multiple times on
  * the same builder for different z0 value: this will reduce the number of Fz sampling as they are
- * cached in the builder. Please note that the initial covering points must touch all isolines you
- * want to cover.
+ * cached in the builder, and reduce the number of time the Delaunay triangulation has to be built.
+ * 
+ * The algorithm is rather simple: for each edges of the triangulation check if the edge is
+ * "cutting" (ie crossing the z0 plane). Then start for each unprocessed cutting edge using a walk
+ * algorithm, keeping high z0 always one the same side, to build a set of closed polygons. Then
+ * process each polygons to punch holes: a CW polygon is a hole in a larger CCW polygon, a CCW
+ * polygon is an islan (shell).
  * 
  * @author laurent
  */
@@ -56,8 +61,8 @@ public class DelaunayIsolineBuilder<TZ> implements IsolineBuilder<TZ> {
     private List<Geometry> debugGeom = new ArrayList<Geometry>();
 
     /**
-     * Create an object to compute isochrones. One may call several time isochronify on the same
-     * object.
+     * Create an object to compute isolines. One may call several time computeIsoline on the same
+     * object, with different z0 values.
      * 
      * @param triangulation The triangulation to process. Must be closed (no edge at the border
      *        should intersect).

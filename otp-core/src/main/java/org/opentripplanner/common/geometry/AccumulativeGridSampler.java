@@ -28,10 +28,23 @@ import com.vividsolutions.jts.geom.Coordinate;
  * The process is customized by an "accumulative" metric which gives the behavior of cumulating
  * several values onto one sampling point.
  * 
+ * To use this class, create an instance giving an AccumulativeMetric implementation as parameter.
+ * Then for each source sample, call "addSample" with the its TZ value. At the end, call close() to
+ * close the sample grid (ie add grid node at the edge to make sure borders are correctly defined,
+ * the definition of correct is left to the client).
+ * 
  * @author laurent
  */
 public class AccumulativeGridSampler<TZ> {
 
+    /**
+     * An accumulative metric give the behavior of combining several samples to a regular sample
+     * grid, ie how we should weight and add several TZ values from inside a cell to compute the
+     * cell corner TZ values.
+     * 
+     * @author laurent
+     * @param <TZ>
+     */
     public interface AccumulativeMetric<TZ> {
         /**
          * Callback function to handle a new added sample.
@@ -43,13 +56,13 @@ public class AccumulativeGridSampler<TZ> {
          *        up to the caller to initialize the z value.
          * @return The modified z value for the sample.
          */
-        public TZ cumulateSample(Coordinate C0, Coordinate Cs, double z, TZ zS);
+        public TZ cumulateSample(Coordinate C0, Coordinate Cs, TZ z, TZ zS);
 
         /**
          * Callback function to handle a "closing" sample (that is a sample post-created to surround
          * existing samples and provide nice and smooth edges for the algorithm).
          * 
-         * @param zUp Sampled value of the up neighbor.
+         * @param zUp Sampled value of the up neighbor. Can be null if undefined.
          * @param zDown Idem
          * @param zRight Idem
          * @param zLeft Idem
@@ -75,7 +88,7 @@ public class AccumulativeGridSampler<TZ> {
         this.sampleGrid = sampleGrid;
     }
 
-    public final void addSamplingPoint(Coordinate C0, double z) {
+    public final void addSamplingPoint(Coordinate C0, TZ z) {
         if (closed)
             throw new IllegalStateException("Can't add a sample after closing.");
         int[] xy = sampleGrid.getLowerLeftIndex(C0);
@@ -105,8 +118,13 @@ public class AccumulativeGridSampler<TZ> {
             processList.add(A);
         }
         int n = 0;
+        /*
+         * TODO The magic "2" below should be automatically computed according to some return value
+         * from the metric.
+         */
         for (int i = 0; i < 2; i++) {
-            List<ZSamplePoint<TZ>> newProcessList = new ArrayList<ZSamplePoint<TZ>>(processList.size());
+            List<ZSamplePoint<TZ>> newProcessList = new ArrayList<ZSamplePoint<TZ>>(
+                    processList.size());
             for (ZSamplePoint<TZ> A : processList) {
                 if (A.right() == null) {
                     newProcessList.add(closeSample(A.getX() + 1, A.getY()));

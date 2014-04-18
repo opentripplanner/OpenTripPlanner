@@ -50,8 +50,13 @@ public class TripTimes implements Serializable {
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
     private static final Logger LOG = LoggerFactory.getLogger(TripTimes.class);
 
-    public static final int PASSED = -1;
-    public static final int CANCELED = -2;
+    /**
+     * This constant is used for indicating passed stops, fully canceled trips and trips that are
+     * otherwise unavailable during routing. It should only be used in a contiguous block at the
+     * beginning of the trip and may or may not cover the entire trip. Partially canceling a trip in
+     * this way is specifically not allowed.
+     */
+    public static final int UNAVAILABLE = -1;
 
     /** The trips whose arrivals and departures are represented by this TripTimes */
     @Getter private final Trip trip;
@@ -244,29 +249,26 @@ public class TripTimes implements Serializable {
      */
     public int getDwellTime(int hop) {
         if (hop <= 0 || hop >= getNumHops()) return -1;
-        int arrivalTime = getArrivalTime(hop-1);
+
+        int arrivalTime   = getArrivalTime(hop - 1);
         int departureTime = getDepartureTime(hop);
+
         return departureTime - arrivalTime;
     }
 
     /**
      * @return the length of time time in seconds that it takes for the vehicle to traverse each
-     * inter-stop segment ("hop").
+     * inter-stop segment ("hop"). It is undefined for hops that don't exist. A value of -1
+     * indicates such a range error.
      */
     public int getRunningTime(int hop) {
+        if (hop < 0 || hop >= getNumHops()) return -1;
+
         int arrivalTime   = getArrivalTime(hop);
         int departureTime = getDepartureTime(hop);
 
-        if(arrivalTime == TripTimes.CANCELED) {
-            return 0;
-        }
-
-        while(--hop >= 0 && departureTime == TripTimes.CANCELED) {
-            departureTime = getDepartureTime(hop);
-        }
-
-        if(departureTime == TripTimes.CANCELED) {
-            return 0;
+        if(departureTime == UNAVAILABLE) {
+            return -1;
         }
 
         return arrivalTime - departureTime;
@@ -380,9 +382,6 @@ public class TripTimes implements Serializable {
         for (int hop = 0; hop < nHops; hop++) {
             int dep = getDepartureTime(hop);
             int arr = getArrivalTime(hop);
-            if(arr == CANCELED || dep == CANCELED) {
-                continue;
-            }
 
             if (arr < dep) { // negative hop time
                 LOG.error("Negative hop time in TripTimes at index {}.", hop);
@@ -523,7 +522,7 @@ public class TripTimes implements Serializable {
     /** Cancel this entire trip */
     public void cancel() {
         departureTimes = new int[getNumHops()];
-        Arrays.fill(departureTimes, CANCELED);
+        Arrays.fill(departureTimes, UNAVAILABLE);
         arrivalTimes = departureTimes;
     }
 

@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.routing.patch.Alert;
+import org.opentripplanner.routing.alertpatch.Alert;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 

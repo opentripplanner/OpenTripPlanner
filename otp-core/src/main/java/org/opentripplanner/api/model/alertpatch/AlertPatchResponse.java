@@ -11,15 +11,30 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.api.model.patch;
+package org.opentripplanner.api.model.alertpatch;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(name = "PatchCreationResponse")
-public class PatchCreationResponse {
+import org.opentripplanner.routing.alertpatch.AlertPatch;
 
-	@XmlElement
-	public String status;
+@XmlRootElement
+public class AlertPatchResponse {
+    @XmlElementWrapper
+    @XmlElements({
+        @XmlElement(name = "AlertPatch", type = AlertPatch.class)
+        })
+    public List<AlertPatch> alertPatches;
 
+    public void addAlertPatch(AlertPatch alertPatch) {
+        if (alertPatches == null) {
+            alertPatches = new ArrayList<AlertPatch>();
+        }
+        alertPatches.add(alertPatch);
+    }
 }

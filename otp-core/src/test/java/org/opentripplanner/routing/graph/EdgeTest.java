@@ -13,86 +13,23 @@
 
 package org.opentripplanner.routing.graph;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-import org.junit.Before;
 import org.junit.Test;
-import org.opentripplanner.routing.patch.Alert;
-import org.opentripplanner.routing.patch.AlertPatch;
 
 public class EdgeTest {
+    @Test
+    public void testConstruct() {
+        Graph graph = new Graph();
+        Vertex head = new SimpleConcreteVertex(
+                graph, "head", 47.669457, -122.387577);
+        Vertex tail = new SimpleConcreteVertex(
+                graph, "tail", 47.669462, -122.384739);
+        Edge e = new SimpleConcreteEdge(head, tail);
 
-	Graph _graph;
-
-	@Before
-	public void before() {
-		_graph = new Graph();
-	}
-
-	@Test
-	public void testConstruct() {
-		Vertex head = new SimpleConcreteVertex(
-				_graph, "head", 47.669457, -122.387577);
-		Vertex tail = new SimpleConcreteVertex(
-				_graph, "tail", 47.669462, -122.384739);
-		Edge e = new SimpleConcreteEdge(head, tail);
-
-		assertEquals(head, e.getFromVertex());
-		assertEquals(tail, e.getToVertex());
-		assertTrue(e.getId() >= 0);
-	}
-
-	/**
-	 * Creates a simple edge without an ID.
-	 * 
-	 * @return
-	 */
-	private SimpleConcreteEdge makeSimpleEdge() {
-		Vertex head = new SimpleConcreteVertex(_graph, "head", 47.669457,
-				-122.387577);
-		Vertex tail = new SimpleConcreteVertex(_graph, "tail", 47.669462,
-				-122.384739);
-		return new SimpleConcreteEdge(head, tail);
-	}
-
-	@Test
-	public void testGetId() {
-		Edge e = makeSimpleEdge();
-		assertTrue(e.getId() >= 0);
-	}
-        
-        @Test
-        public void testPatches() {
-            Edge edge = makeSimpleEdge();
-            AlertPatch[] alerts = new AlertPatch[]{ new AlertPatch(), new AlertPatch(), new AlertPatch() };
-
-            alerts[0].setAlert(new Alert());
-            alerts[1].setAlert(new Alert());
-            alerts[2].setAlert(new Alert());
-
-            alerts[0].setId("0");
-            alerts[1].setId("1");
-            alerts[2].setId("2");
-            
-            edge.addPatch(alerts[0]);
-            edge.addPatch(alerts[1]);
-            
-            assertEquals(2, edge.getPatches().size());
-            assertTrue(edge.getPatches().contains(alerts[0]));
-            assertTrue(edge.getPatches().contains(alerts[1]));
-            
-            edge.removePatch(alerts[0]);
-            
-            assertEquals(1, edge.getPatches().size());
-            assertFalse(edge.getPatches().contains(alerts[0]));
-            assertTrue(edge.getPatches().contains(alerts[1]));
-            
-            edge.removePatch(alerts[0]);
-            assertEquals(1, edge.getPatches().size());
-            assertFalse(edge.getPatches().contains(alerts[0]));
-            assertTrue(edge.getPatches().contains(alerts[1]));
-            
-            edge.removePatch(alerts[1]);
-            assertTrue(edge.getPatches().isEmpty());
-        }
+        assertEquals(head, e.getFromVertex());
+        assertEquals(tail, e.getToVertex());
+        assertTrue(e.getId() >= 0);
+    }
 }

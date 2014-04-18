@@ -11,7 +11,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.patches;
+package org.opentripplanner.routing.alertpatch;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -36,6 +37,7 @@ import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.algorithm.GenericAStar;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.PatternHop;
 import org.opentripplanner.routing.edgetype.PreAlightEdge;
@@ -44,10 +46,9 @@ import org.opentripplanner.routing.edgetype.TableTripPattern;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.edgetype.factory.GTFSPatternHopFactory;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.patch.Alert;
-import org.opentripplanner.routing.patch.AlertPatch;
 import org.opentripplanner.routing.services.TransitIndexService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -57,13 +58,13 @@ import org.opentripplanner.util.TestUtils;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-public class TestPatch extends TestCase {
+public class AlertPatchTest extends TestCase {
     private Graph graph;
 
     private RoutingRequest options;
 
     private GenericAStar aStar = new GenericAStar();
-    
+
     public void setUp() throws Exception {
 
         GtfsContext context = GtfsLibrary.readGtfs(new File(ConstantsForTests.FAKE_GTFS));
@@ -72,17 +73,19 @@ public class TestPatch extends TestCase {
         GTFSPatternHopFactory factory = new GTFSPatternHopFactory(context);
         factory.run(graph);
         graph.putService(CalendarServiceData.class, GtfsLibrary.createCalendarServiceData(context.getDao()));
-        
+
         TransitIndexService index = new TransitIndexService() {
             /*
              * mock TransitIndexService always returns preboard/prealight edges for stop A and a
              * subset of variants for route 1
              */
+            @SuppressWarnings("deprecation")
             @Override
             public PreAlightEdge getPreAlightEdge(AgencyAndId stop) {
                 return (PreAlightEdge) graph.getVertex("agency_A_arrive").getOutgoing().iterator().next();
             }
 
+            @SuppressWarnings("deprecation")
             @Override
             public PreBoardEdge getPreBoardEdge(AgencyAndId stop) {
                 return (PreBoardEdge) graph.getVertex("agency_A_depart").getIncoming().iterator().next();
@@ -98,6 +101,7 @@ public class TestPatch extends TestCase {
                 return null;
             }
 
+            @SuppressWarnings("deprecation")
             @Override
             public List<RouteVariant> getVariantsForRoute(AgencyAndId routeId) {
                 Route route = new Route();
@@ -218,9 +222,11 @@ public class TestPatch extends TestCase {
         graph.putService(TransitIndexService.class, index);
     }
 
+    @SuppressWarnings("deprecation")
     public void testStopAlertPatch() {
         AlertPatch snp1 = new AlertPatch();
-        snp1.addTimePeriod(0, 1000L * 60 * 60 * 24 * 365 * 40); // until ~1/1/2011
+        snp1.setTimePeriods(Collections.singletonList(new TimePeriod(
+                0, 1000L * 60 * 60 * 24 * 365 * 40))); // until ~1/1/2011
         Alert note1 = Alert.createSimpleAlerts("The first note");
         snp1.setAlert(note1);
         snp1.setId("id1");
@@ -231,29 +237,43 @@ public class TestPatch extends TestCase {
         Vertex stop_e = graph.getVertex("agency_E_arrive");
 
         ShortestPathTree spt;
-        GraphPath path, unoptimizedPath;
+        GraphPath optimizedPath, unoptimizedPath;
 
-        options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0); 
+        options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0);
         options.setRoutingContext(graph, stop_a, stop_e);
         spt = aStar.getShortestPathTree(options);
 
-        path = spt.getPath(stop_e, true);
+        optimizedPath = spt.getPath(stop_e, true);
         unoptimizedPath = spt.getPath(stop_e, false);
-        assertNotNull(path);
-        HashSet<Alert> expectedNotes = new HashSet<Alert>();
-        expectedNotes.add(note1);
-        assertEquals(expectedNotes, path.states.get(1).getBackAlerts());
-        assertEquals(expectedNotes, unoptimizedPath.states.get(1).getBackAlerts());
+        assertNotNull(optimizedPath);
+        HashSet<Alert> expectedAlerts = new HashSet<Alert>();
+        expectedAlerts.add(note1);
 
+        Edge optimizedEdge = optimizedPath.states.get(1).getBackEdge();
+        HashSet<Alert> optimizedAlerts = new HashSet<Alert>();
+        for (AlertPatch alertPatch : graph.getAlertPatches(optimizedEdge)) {
+            optimizedAlerts.add(alertPatch.getAlert());
+        }
+        assertEquals(expectedAlerts, optimizedAlerts);
+
+        Edge unoptimizedEdge = unoptimizedPath.states.get(1).getBackEdge();
+        HashSet<Alert> unoptimizedAlerts = new HashSet<Alert>();
+        for (AlertPatch alertPatch : graph.getAlertPatches(unoptimizedEdge)) {
+            unoptimizedAlerts.add(alertPatch.getAlert());
+        }
+        assertEquals(expectedAlerts, unoptimizedAlerts);
     }
 
+    @SuppressWarnings("deprecation")
     public void testTimeRanges() {
         AlertPatch snp1 = new AlertPatch();
+        LinkedList<TimePeriod> timePeriods = new LinkedList<TimePeriod>();
         long breakTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0);
-        snp1.addTimePeriod(0, breakTime); // until the beginning of the day
+        timePeriods.add(new TimePeriod(0, breakTime)); // until the beginning of the day
         long secondPeriodStartTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 7, 0, 0);
         long secondPeriodEndTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 8, 0, 0, 0);
-        snp1.addTimePeriod(secondPeriodStartTime, secondPeriodEndTime);
+        timePeriods.add(new TimePeriod(secondPeriodStartTime, secondPeriodEndTime));
+        snp1.setTimePeriods(timePeriods);
         Alert note1 = Alert.createSimpleAlerts("The first note");
         snp1.setAlert(note1);
         snp1.setId("id1");
@@ -273,7 +293,15 @@ public class TestPatch extends TestCase {
         path = spt.getPath(stop_e, true);
         assertNotNull(path);
         // expect no notes because we are during the break
-        assertNull(path.states.get(1).getBackAlerts());
+        State noAlertPatchesState = path.states.get(1);
+        Edge noAlertPatchesEdge = noAlertPatchesState.getBackEdge();
+        HashSet<Alert> noAlertPatchesAlerts = new HashSet<Alert>();
+        for (AlertPatch alertPatch : graph.getAlertPatches(noAlertPatchesEdge)) {
+            if (alertPatch.displayDuring(noAlertPatchesState)) {
+                noAlertPatchesAlerts.add(alertPatch.getAlert());
+            }
+        }
+        assertEquals(new HashSet<Alert>(), noAlertPatchesAlerts);
 
         // now a trip during the second period
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 8, 0, 0);
@@ -284,13 +312,23 @@ public class TestPatch extends TestCase {
         assertNotNull(path);
         HashSet<Alert> expectedNotes = new HashSet<Alert>();
         expectedNotes.add(note1);
-        assertEquals(expectedNotes, path.states.get(1).getBackAlerts());
+        State oneAlertPatchState = path.states.get(1);
+        Edge oneAlertPatchEdge = oneAlertPatchState.getBackEdge();
+        HashSet<Alert> oneAlertPatchAlerts = new HashSet<Alert>();
+        for (AlertPatch alertPatch : graph.getAlertPatches(oneAlertPatchEdge)) {
+            if (alertPatch.displayDuring(oneAlertPatchState)) {
+                oneAlertPatchAlerts.add(alertPatch.getAlert());
+            }
+        }
+        assertEquals(expectedNotes, oneAlertPatchAlerts);
     }
 
+    @SuppressWarnings("deprecation")
     public void testRouteNotePatch() {
         AlertPatch rnp1 = new AlertPatch();
 
-        rnp1.addTimePeriod(0, 1000L * 60 * 60 * 24 * 365 * 40); // until ~1/1/2011
+        rnp1.setTimePeriods(Collections.singletonList(new TimePeriod(
+                0, 1000L * 60 * 60 * 24 * 365 * 40))); // until ~1/1/2011
         Alert note1 = Alert.createSimpleAlerts("The route note");
         rnp1.setAlert(note1);
         rnp1.setId("id1");
@@ -303,15 +341,18 @@ public class TestPatch extends TestCase {
         ShortestPathTree spt;
         GraphPath path;
 
-        long startTime = 
-        options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 7, 0, 0);
         options.setRoutingContext(graph, stop_a, stop_e);
         spt = aStar.getShortestPathTree(options);
 
         path = spt.getPath(stop_e, false);
         assertNotNull(path);
-        HashSet<Alert> expectedNotes = new HashSet<Alert>();
-        expectedNotes.add(note1);
-        assertEquals(expectedNotes, path.states.get(2).getBackAlerts());
+        HashSet<Alert> expectedAlerts = new HashSet<Alert>();
+        expectedAlerts.add(note1);
+        Edge actualEdge = path.states.get(2).getBackEdge();
+        HashSet<Alert> actualAlerts = new HashSet<Alert>();
+        for (AlertPatch alertPatch : graph.getAlertPatches(actualEdge)) {
+            actualAlerts.add(alertPatch.getAlert());
+        }
+        assertEquals(expectedAlerts, actualAlerts);
     }
 }

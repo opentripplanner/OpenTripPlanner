@@ -18,14 +18,15 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import lombok.Delegate;
-
+import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
+import org.onebusaway.gtfs.model.StopTime;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.opentripplanner.common.MavenVersion;
@@ -72,10 +73,8 @@ public class TableTripPattern implements TripPattern, Serializable {
      * This timetable holds the 'official' stop times from GTFS. If realtime stoptime updates are 
      * applied, trips searches will be conducted using another timetable and this one will serve to 
      * find early/late offsets, or as a fallback if the other timetable becomes corrupted or
-     * expires. Via Lombok Delegate, calling timetable methods on a TableTripPattern will call 
-     * them on its scheduled timetable.
+     * expires.
      */
-    @Delegate
     protected final Timetable scheduledTimetable = new Timetable(this);
 
     // redundant since tripTimes have a trip
@@ -115,7 +114,7 @@ public class TableTripPattern implements TripPattern, Serializable {
         // The serialized graph contains cyclic references TableTripPattern <--> Timetable.
         // The Timetable must be indexed from here (rather than in its own readObject method) 
         // to ensure that the stops field it uses in TableTripPattern is already deserialized.
-        this.scheduledTimetable.finish();
+        finish();
     }
             
     private void setStopsFromStopPattern(ScheduledStopPattern stopPattern) {
@@ -262,5 +261,63 @@ public class TableTripPattern implements TripPattern, Serializable {
             timetable = snapshot.resolve(this, serviceDate);
         }
         return timetable.getTripTimes(tripIndex);
+    }
+
+    /** Gets the running time after a given stop (i.e. for the given hop) on a given trip */
+    public int getRunningTime(int stopIndex, int trip) {
+        return scheduledTimetable.getRunningTime(stopIndex, trip);
+    }
+
+    /** @return the index of TripTimes for this Trip(Id) in this particular TableTripPattern */
+    public int getTripIndex(AgencyAndId tripId) {
+        return scheduledTimetable.getTripIndex(tripId);
+    }
+
+    public TripTimes getTripTimes(int tripIndex) {
+        return scheduledTimetable.getTripTimes(tripIndex);
+    }
+
+    /** Gets the departure time for a given hop on a given trip */
+    public int getDepartureTime(int hop, int trip) {
+        return scheduledTimetable.getDepartureTime(hop, trip);
+    }
+
+    /** Gets the arrival time for a given hop on a given trip */
+    public int getArrivalTime(int hop, int trip) {
+        return scheduledTimetable.getArrivalTime(hop, trip);
+    }
+
+    /** Gets all the departure times at a given stop (not used in routing) */
+    public Iterator<Integer> getDepartureTimes(int stopIndex) {
+        return scheduledTimetable.getDepartureTimes(stopIndex);
+    }
+
+    /** Gets all the arrival times at a given stop (not used in routing) */
+    public Iterator<Integer> getArrivalTimes(int stopIndex) {
+        return scheduledTimetable.getArrivalTimes(stopIndex);
+    }
+
+    /** Returns the shortest possible running time for this stop */
+    public int getBestRunningTime(int stopIndex) {
+        return scheduledTimetable.getBestRunningTime(stopIndex);
+    }
+
+    /** Returns the shortest possible dwell time at this stop */
+    public int getBestDwellTime(int stopIndex) {
+        return scheduledTimetable.getBestDwellTime(stopIndex);
+    }
+
+    /**
+     * Add a trip to this TableTripPattern.
+     */
+    public void addTrip(Trip trip, List<StopTime> stopTimes) {
+        scheduledTimetable.addTrip(trip, stopTimes);
+    }
+
+    /**
+     * Finish off a TableTripPattern once all TripTimes have been added to it.
+     */
+    public void finish() {
+        scheduledTimetable.finish();
     }
 }

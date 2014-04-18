@@ -15,19 +15,17 @@ package org.opentripplanner.routing.core;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Set;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Set;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.automata.AutomatonState;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.patch.Alert;
-import org.opentripplanner.routing.patch.Patch;
 import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
@@ -140,10 +138,6 @@ public class StateEditor {
                     : (child.getTimeDeltaSeconds() < 0)) {
                 LOG.trace("Time was incremented the wrong direction during state editing. {}",
                         child.backEdge);
-                return null;
-            }
-
-            if(!applyPatches()) {
                 return null;
             }
         }
@@ -276,7 +270,7 @@ public class StateEditor {
     public void incrementNumBoardings() {
         cloneStateDataAsNeeded();
         child.stateData.numBoardings++;
-        setEverBoarded();
+        setEverBoarded(true);
     }
 
     /* Basic Setters */
@@ -362,13 +356,7 @@ public class StateEditor {
         child.stateData.numBoardings = numBoardings;
     }
 
-    public void setAlightedLocal(boolean alightedLocal) {
-        cloneStateDataAsNeeded();
-        child.stateData.alightedLocal = alightedLocal;
-    }
-
-    public void setEverBoarded() {
-        if (child.stateData.everBoarded) return;
+    public void setEverBoarded(boolean everBoarded) {
         cloneStateDataAsNeeded();
         child.stateData.everBoarded = true;
     }
@@ -472,10 +460,6 @@ public class StateEditor {
         return child.getNumBoardings();
     }
 
-    public boolean isAlightedLocal() {
-        return child.isAlightedLocal();
-    }
-
     public boolean isEverBoarded() {
         return child.isEverBoarded();
     }
@@ -497,38 +481,6 @@ public class StateEditor {
     }
 
     /* PRIVATE METHODS */
-
-    /**
-     * Find any patches that have been applied to the edge being traversed (i.e. the new child
-     * state's back edge) and allow these patches to manipulate the StateEditor before the child
-     * state is put to use.
-     * 
-     * @return false if a patch blocked traversal
-     */
-    private boolean applyPatches() {
-        List<Patch> patches = child.backEdge.getPatches();
-        boolean display = false, active = false;
-
-        if (patches != null) {
-            for (Patch patch : patches) {
-                display = false;
-                active = patch.activeDuring(child.stateData.opt, child.getStartTimeSeconds(),
-                                            child.getTimeSeconds());
-
-                if(!active) {
-                    display = patch.displayDuring(child.stateData.opt, child.getStartTimeSeconds(),
-                                                  child.getTimeSeconds());
-                }
-
-                if(display || active) {
-                    if(!patch.filterTraverseResult(this, display))
-                        return false;
-                }
-            }
-        }
-
-        return true;
-    }
 
     /**
      * To be called before modifying anything in the child's StateData. Makes sure that changes are

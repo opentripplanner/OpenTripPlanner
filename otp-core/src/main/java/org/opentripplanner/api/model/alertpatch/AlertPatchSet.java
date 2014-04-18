@@ -11,28 +11,20 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.services;
+package org.opentripplanner.api.model.alertpatch;
 
-import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 
-import org.onebusaway.gtfs.model.AgencyAndId;
-import org.opentripplanner.routing.patch.Patch;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.XmlRootElement;
 
-public interface PatchService {
-    
-        Collection<Patch> getAllPatches();
-    
-	Collection<Patch> getStopPatches(AgencyAndId stop);
+import org.opentripplanner.routing.alertpatch.AlertPatch;
 
-	Collection<Patch> getRoutePatches(AgencyAndId route);
-	
-	void apply(Patch patch);
-	
-	void expire(Set<String> ids);
-
-	void expireAll();
-
-	void expireAllExcept(Set<String> ids);
-
+@XmlRootElement(name="AlertPatchSet")
+public class AlertPatchSet {
+    @XmlElements({
+        @XmlElement(name = "AlertPatch", type = AlertPatch.class)
+    })
+    public List<AlertPatch> alertPatches;
 }

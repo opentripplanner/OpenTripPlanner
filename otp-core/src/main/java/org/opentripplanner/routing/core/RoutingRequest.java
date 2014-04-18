@@ -373,6 +373,13 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     private boolean walkingBike;
 
+	private double heuristicWeight = 1.0;
+	
+	private boolean softWalkLimiting = false;
+	
+	private double softWalkPenalty = 60.0; // a jump in cost when stepping over the walking limit
+	private double softWalkOverageRate = 5.0; // a jump in cost for every meter over the walking limit
+
     /* CONSTRUCTORS */
 
     /** Constructor for options; modes defaults to walk and transit */
@@ -380,7 +387,8 @@ public class RoutingRequest implements Cloneable, Serializable {
         // http://en.wikipedia.org/wiki/Walking
         walkSpeed = 1.33; // 1.33 m/s ~ 3mph, avg. human speed
         bikeSpeed = 5; // 5 m/s, ~11 mph, a random bicycling speed
-        carSpeed = 15; // 15 m/s, ~35 mph, a random driving speed
+        // http://en.wikipedia.org/wiki/Speed_limit
+        carSpeed = 40; // 40 m/s, 144 km/h, above the maximum (finite) driving speed limit worldwide
         setModes(new TraverseModeSet(new TraverseMode[] { TraverseMode.WALK, TraverseMode.TRANSIT }));
         bikeWalkingOptions = this;
 
@@ -1122,4 +1130,5 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     	return preferences_penalty;
     }
+
 }

@@ -1,0 +1,205 @@
+<html>
+
+<head>
+<meta charset="utf-8" />
+<title>OTPA Marseille</title>
+<link rel="stylesheet" href="http://leafletjs.com/dist/leaflet.css" />
+<script src="http://leafletjs.com/dist/leaflet.js"></script>
+
+<script
+	src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<link rel="stylesheet"
+	href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.css"
+	type="text/css" media="all" />
+<script
+	src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.js"></script>
+
+<link rel="stylesheet" type="text/css" href="client.css" />
+</head>
+
+<body>
+	<div id="toolbox">
+		<h1>Prototype OpenTripPlanner Analyst Marseille Métropole</h1>
+
+		<p>
+			<button id="about">A propos</button>
+			<button id="contact">Contacts</button>
+		</p>
+
+		<h2>Paramètres de calcul</h2>
+		<div id="widget1"></div>
+		<p>
+			<button id="refresh">Rafraîchir</button>
+		</p>
+
+		<h2>Légende</h2>
+		<canvas id="legend" width="300" height="16"></canvas>
+
+		<h2>Outils</h2>
+		<p>
+			<button id="downloadIsoimage">Télécharger image calque</button>
+		</p>
+		<p>
+			<label>Isochrones: <input id="cutoffSec" type="text" size="6"
+				value="30;60" />mns
+			</label> <label><input id="isoEnable" type="checkbox" /> Afficher</label>
+			<button id="downloadIsoVector">Télécharger isochrone GeoJSON</button>
+		</p>
+
+		<h2>Exemple d'indicateurs d'accessibilité</h2>
+		<table>
+			<thead>
+				<tr>
+					<th>Catégorie</th>
+					<th id="cutoff1"></th>
+					<th id="cutoff2"></th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Collèges (Nombre)</td>
+					<td id="c1"></td>
+					<td id="c2"></td>
+				</tr>
+				<tr>
+					<td>Collèges (Places)</td>
+					<td id="cp1"></td>
+					<td id="cp2"></td>
+				</tr>
+				<tr>
+					<td>Lycées (Nombre)</td>
+					<td id="l1"></td>
+					<td id="l2"></td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div id="map"></div>
+
+	<div id="aboutContent" title="À propos" style="display: none;">
+		<p>
+			Ce prototype a été mis en place à l'initiative de la <a
+				href="http://www.paca.developpement-durable.gouv.fr/les-transports-en-paca-r139.html">DREAL
+				PACA</a>), qui anime auprès de la mission Métropole attachée à la
+			Préfecture la réflexion sur l'organisation des déplacements dans la
+			métropole Marseille Provence. <a
+				href="http://mim.cete-aix.fr/article.php3?id_article=360">Pour
+				en savoir plus sur le projet.</a>
+		</p>
+
+		<p>Le prototype s'appuie sur le logiciel libre de recherche
+			d'itinéraires multimodaux Open Trip Planner (OTP), qui est doté d'un
+			module Analyst permettant de produire des cartes isochrones
+			interactives et de calculer des indicateurs d'accessibilité
+			transport. La prestation a été confiée à un groupement réunissant les
+			sociétés Mecatran, Modulaweb et Conveyal, qui contribuent activement
+			à OpenTripPlanner.</p>
+
+		<p>Des développements sont prévus concernant le calcul
+			d'indicateurs d'accessibilité, qui seront mis en ligne dans les
+			semaines qui viennent.</p>
+
+		<p>Le réseau multimodal utilisé pour les calculs comprend:</p>
+		<ul>
+			<li>l'offre de transport collectif (<a
+				href="http://www.lepilote.com/presentation/?rub_code=92">LePilote</a>
+				plus TER)
+			</li>
+			<li>le réseau routier disponible par la base de données
+				collaborative <a href="http://www.openstreetmap.org/about">Open
+					Street Map</a>.
+			</li>
+		</ul>
+
+		<h2>Pour utiliser ANALYST:</h2>
+		<p>Déplacez avec la souris le pointeur bleu dans la carte pour
+			définir le point d'origine: la carte se met à jour et affiche alors
+			les surfaces isochrones indiquant les zones que l'on peut atteindre
+			en moins d'une heure (cette durée est paramétrable) depuis l'origine
+			choisie (cf. Légende pour les codes couleurs).</p>
+		<p>La carte comporte en haut à gauche des boutons +/- pour changer
+			l'échelle (on peut déplacer la carte en glissant/déplaçant la souris)
+			et en haut à droite un bouton pour choisir les couches affichées:
+			fond de plan OSM Transport ou OSM standard, affichages des surfaces
+			en dégradé (gradient) ou des contours (isochrones), et des points
+			d'intérêt collèges/lycées utilisés pour le calcul des indicateurs.
+			Les calculs peuvent prendre quelques secondes à s'afficher.</p>
+		<p>Les isochrones dépendent des options que l'on peut définir dans
+			la fenêtre à gauche:</p>
+		<ul>
+			<li><b>Départ à (par défaut) / Arriver à</b>: indique l'heure et
+				le jour pour le calcul depuis le point Origine (ou vers ce point);</li>
+			<li><b>Mode</b>: choix des modes de transport (pour Voiture -
+				les données ne tiennent pas compte de la congestion, dans la version
+				actuelle)</li>
+			<li><b>Durée max.</b>: extension maximale des surfaces
+				isochrones calculées (par défaut 1H);</li>
+			<li>Pour les modes TC, les paramètres supplémentaires <b>Marche
+					max. / Vitesse</b> permettent de définir la distance maximale de marche
+				au total, et la vitesse de marche;
+			</li>
+			<li>Pour les modes TC également, il est possible de choisir
+				d'autres <b>«Données à afficher»</b> que le temps de parcours:
+				nombre d'embarquements TC, distance de marche.
+			</li>
+			<li>le bouton <b>Rafraîchir</b> réactualise la carte.
+			</li>
+		</ul>
+
+		<p>
+			Le bouton <b>«Télécharger Image Calque»</b> ouvre un onglet contenant
+			l'image des surfaces isochrones au format PNG, qui peut être ensuite
+			utilisée avec des logiciels de bureautique.
+		</p>
+		<p>
+			Le menu <b>Isochrones</b> permet de calculer les contours isochrones
+			à partir du point d'origine, pour des durées en minutes séparées par
+			un point-virgule (par défaut 30;60); cochez la cache 'Afficher' pour
+			fait apparaître ces contours (en trait bleu) sur la carte.
+		</p>
+		<p>
+			Le bouton <b>«Télécharger Isochrones GeoJSON»</b> ouvre un nouvel
+			onglet dans le navigateur avec le contenu des isochrones en GeoJSON,
+			un format texte utilisable dans tout SIG (faire «Enregistrer sous»
+			pour sauver ce fichier).
+		</p>
+		<p>
+			La rubrique <b>Exemples d'indicateurs d'accessibilité</b> illustre
+			les possibilités de calcul d'indicateurs d'OTP Analyst, à partir de 2
+			fichiers fournis par l'Agence d'Urbanisme (AGAM) localisant les
+			collèges et les lycées sur le territoire métropolitain: Nombre de
+			collèges, nombre de places en collège, nombre de lycées, à moins de:
+			30 et 60 minutes, 0 et 1 correspondances, 400 et 800m de marche (en
+			fonction du type de donnée affichée). Pour ceux qui veulent
+			comprendre comment sont fait les calculs, il est possible d'étudier
+			le code (clic droit, 'Code source de la page').
+		</p>
+		<p>
+			N'hésitez pas à <a
+				href="mailto:Frederique.Reffet@developpement-durable.gouv.fr,pat.gendre@cerema.fr?subject=OTP+Analyst+Métropole+Marseillaise">nous
+				contacter</a> si l'outil vous intéresse, merci d'avance.
+		</p>
+	</div>
+
+	<div id="contactContent" title="Contact" style="display: none;">
+		<p>
+			Contactez-nous pour vous faire part de vos remarques ou de vos
+			questions: <a
+				href="mailto:Frederique.Reffet@developpement-durable.gouv.fr,pat.gendre@cerema.fr?subject=OTP+Analyst+Métropole+Marseillaise">
+				Frederique.Reffet@developpement-durable.gouv.fr,
+				pat.gendre@cerema.fr</a>
+		</p>
+	</div>
+
+	<script type="text/javascript" src="../js/otp/otpa.js"></script>
+	<script type="text/javascript" src="../js/otp/French.js"></script>
+	<script type="text/javascript" src="../js/otp/Widgets.js"></script>
+	<script type="text/javascript" src="../js/otp/TimeGrid.js"></script>
+	<script type="text/javascript" src="../js/otp/ColorMap.js"></script>
+	<script type="text/javascript" src="../js/otp/Isochrone.js"></script>
+	<script type="text/javascript" src="../js/otp/Population.js"></script>
+	<script type="text/javascript" src="../js/otp/Scoring.js"></script>
+	<script type="text/javascript" src="client.js"></script>
+</body>
+
+</html>

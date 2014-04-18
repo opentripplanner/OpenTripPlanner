@@ -24,8 +24,8 @@ import java.util.regex.Pattern;
 
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.patch.Alert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import lombok.Data;

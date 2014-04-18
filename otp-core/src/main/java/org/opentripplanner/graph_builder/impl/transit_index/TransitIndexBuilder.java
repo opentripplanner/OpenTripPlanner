@@ -24,9 +24,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.LinkedListMultimap;
-import com.google.common.collect.ListMultimap;
 import org.onebusaway.gtfs.model.Agency;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
@@ -61,10 +58,11 @@ import org.opentripplanner.routing.transit_index.TransitIndexServiceImpl;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.routing.vertextype.TransitStopDepart;
 import org.opentripplanner.routing.vertextype.TransitVertex;
-import org.opentripplanner.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import com.vividsolutions.jts.geom.Coordinate;
 
 /**

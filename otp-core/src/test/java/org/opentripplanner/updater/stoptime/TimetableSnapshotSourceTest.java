@@ -120,8 +120,8 @@ public class TimetableSnapshotSourceTest {
 
         TripTimes tripTimes = forToday.getTripTimes(tripIndex);
         for (int i = 0; i < tripTimes.getNumHops(); i++) {
-            assertEquals(TripTimes.CANCELED, tripTimes.getDepartureTime(i));
-            assertEquals(TripTimes.CANCELED, tripTimes.getArrivalTime(i));
+            assertEquals(TripTimes.UNAVAILABLE, tripTimes.getDepartureTime(i));
+            assertEquals(TripTimes.UNAVAILABLE, tripTimes.getArrivalTime(i));
         }
     }
 

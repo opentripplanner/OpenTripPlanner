@@ -17,9 +17,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -30,7 +27,6 @@ import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
-import org.opentripplanner.routing.patch.Patch;
 import org.opentripplanner.routing.util.IncrementingIdGenerator;
 import org.opentripplanner.routing.util.UniqueIdGenerator;
 
@@ -57,8 +53,6 @@ public abstract class Edge implements Serializable {
     protected Vertex fromv;
 
     protected Vertex tov;
-
-    private List<Patch> patches;
 
     protected Edge(Vertex v1, Vertex v2) {
         if (v1 == null || v2 == null) {
@@ -231,31 +225,6 @@ public abstract class Edge implements Serializable {
     public double timeLowerBound(RoutingRequest options) {
         // No edge should take less than zero time to traverse.
         return 0;
-    }
-
-    public void addPatch(Patch patch) {
-        if (patches == null) {
-            patches = new ArrayList<Patch>();
-        }
-        if (!patches.contains(patch)) {
-            patches.add(patch);
-        }
-    }
-
-    public List<Patch> getPatches() {
-        if (patches == null) {
-            return Collections.emptyList();
-        }
-        return patches;
-    }
-
-    public void removePatch(Patch patch) {
-        if (patches != null) {
-            patches.remove(patch);
-            if (patches.isEmpty()) {
-                patches = null;
-            }
-        }
     }
 
     public abstract String getName();

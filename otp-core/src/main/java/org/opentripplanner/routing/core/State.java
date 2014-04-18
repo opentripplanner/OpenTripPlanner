@@ -20,6 +20,7 @@ import java.util.Set;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
+import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.automata.AutomatonState;
 import org.opentripplanner.routing.edgetype.OnboardEdge;
@@ -30,7 +31,6 @@ import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
@@ -245,9 +245,6 @@ public class State implements Cloneable {
         return stateData.numBoardings;
     }
 
-    public boolean isAlightedLocal() {
-        return stateData.alightedLocal;
-    }
 
     /**
      * Whether this path has ever previously boarded (or alighted from, in a reverse search) a

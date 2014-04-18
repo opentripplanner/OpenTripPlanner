@@ -36,17 +36,17 @@ public class GenericDijkstra {
 
     private RoutingRequest options;
 
-    private ShortestPathTreeFactory _shortestPathTreeFactory;
+    private ShortestPathTreeFactory shortestPathTreeFactory;
 
-    private OTPPriorityQueueFactory _priorityQueueFactory;
+    private OTPPriorityQueueFactory priorityQueueFactory;
 
-    private SearchTerminationStrategy _searchTerminationStrategy;
+    private SearchTerminationStrategy searchTerminationStrategy;
 
-    private SkipEdgeStrategy _skipEdgeStrategy;
+    private SkipEdgeStrategy skipEdgeStrategy;
 
-    private SkipTraverseResultStrategy _skipTraverseResultStrategy;
+    private SkipTraverseResultStrategy skipTraverseResultStrategy;
 
-    private boolean _verbose = false;
+    private boolean verbose = false;
 
     private RemainingWeightHeuristic heuristic = new TrivialRemainingWeightHeuristic();
 
@@ -55,23 +55,23 @@ public class GenericDijkstra {
     }
 
     public void setShortestPathTreeFactory(ShortestPathTreeFactory shortestPathTreeFactory) {
-        _shortestPathTreeFactory = shortestPathTreeFactory;
+        this.shortestPathTreeFactory = shortestPathTreeFactory;
     }
 
     public void setPriorityQueueFactory(OTPPriorityQueueFactory priorityQueueFactory) {
-        _priorityQueueFactory = priorityQueueFactory;
+        this.priorityQueueFactory = priorityQueueFactory;
     }
 
     public void setSearchTerminationStrategy(SearchTerminationStrategy searchTerminationStrategy) {
-        _searchTerminationStrategy = searchTerminationStrategy;
+        this.searchTerminationStrategy = searchTerminationStrategy;
     }
 
     public void setSkipEdgeStrategy(SkipEdgeStrategy skipEdgeStrategy) {
-        _skipEdgeStrategy = skipEdgeStrategy;
+        this.skipEdgeStrategy = skipEdgeStrategy;
     }
 
     public void setSkipTraverseResultStrategy(SkipTraverseResultStrategy skipTraverseResultStrategy) {
-        _skipTraverseResultStrategy = skipTraverseResultStrategy;
+        this.skipTraverseResultStrategy = skipTraverseResultStrategy;
     }
 
     public ShortestPathTree getShortestPathTree(State initialState) {
@@ -93,20 +93,20 @@ public class GenericDijkstra {
                 continue;
             }
 
-            if (_verbose) {
+            if (verbose) {
                 System.out.println("min," + u.getWeight());
                 System.out.println(u_vertex);
             }
 
-            if (_searchTerminationStrategy != null
-                    && !_searchTerminationStrategy.shouldSearchContinue(initialState.getVertex(), 
+            if (searchTerminationStrategy != null
+                    && !searchTerminationStrategy.shouldSearchContinue(initialState.getVertex(), 
                     null, u, spt, options))
                         break;
 
             for (Edge edge : options.isArriveBy() ? u_vertex.getIncoming() : u_vertex.getOutgoing()) {
 
-                if (_skipEdgeStrategy != null
-                        && _skipEdgeStrategy.shouldSkipEdge(initialState.getVertex(), null, u, edge, spt,
+                if (skipEdgeStrategy != null
+                        && skipEdgeStrategy.shouldSkipEdge(initialState.getVertex(), null, u, edge, spt,
                                 options))
                     continue;
 
@@ -114,12 +114,12 @@ public class GenericDijkstra {
                 // returning NULL), the iteration is over.
                 for (State v = edge.traverse(u); v != null; v = v.getNextResult()) {
 
-                    if (_skipTraverseResultStrategy != null
-                            && _skipTraverseResultStrategy.shouldSkipTraversalResult(initialState.getVertex(),
+                    if (skipTraverseResultStrategy != null
+                            && skipTraverseResultStrategy.shouldSkipTraversalResult(initialState.getVertex(),
                                     null, u, v, spt, options))
                         continue;
 
-                    if (_verbose)
+                    if (verbose)
                         System.out.printf("  w = %f + %f = %f %s", u.getWeight(), v.getWeightDelta(), 
                         		v.getWeight(),  v.getVertex());
                     
@@ -139,14 +139,14 @@ public class GenericDijkstra {
     }
 
     protected OTPPriorityQueue<State> createPriorityQueue() {
-        if (_priorityQueueFactory != null)
-            return _priorityQueueFactory.create(10);
+        if (priorityQueueFactory != null)
+            return priorityQueueFactory.create(10);
         return new BinHeap<State>();
     }
 
     protected ShortestPathTree createShortestPathTree(RoutingRequest options) {
-        if (_shortestPathTreeFactory != null)
-            return _shortestPathTreeFactory.create(options);
+        if (shortestPathTreeFactory != null)
+            return shortestPathTreeFactory.create(options);
         return new BasicShortestPathTree(options);
     }
 

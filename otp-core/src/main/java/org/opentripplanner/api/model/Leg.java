@@ -22,8 +22,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
+import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.patch.Alert;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -60,6 +60,18 @@ public class Leg {
      * Whether there is real-time data about this Leg
      */
     public Boolean realTime = false;
+    
+    /**
+     * Is this a frequency-based trip with non-strict departure times?
+     */
+    public Boolean isNonExactFrequency = null;
+    
+    /**
+     * The best estimate of the time between two arriving vehicles. This is particularly important 
+     * for non-strict frequency trips, but could become important for real-time trips, strict 
+     * frequency trips, and scheduled trips with empirical headways.
+     */
+    public Integer headway = null;
     
     /**
      * The distance traveled while traversing the leg in meters.
@@ -255,12 +267,12 @@ public class Leg {
     }
     
     /** 
-     * The leg's duration in milliseconds
+     * The leg's duration in seconds
      */
     @XmlElement
     @JsonSerialize
-    public long getDuration() {
-        return endTime.getTimeInMillis() - startTime.getTimeInMillis();
+    public double getDuration() {
+        return endTime.getTimeInMillis()/1000.0 - startTime.getTimeInMillis()/1000.0;
     }
 
     public void addAlert(Alert alert) {

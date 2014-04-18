@@ -19,11 +19,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.onebusaway.gtfs.model.AgencyAndId;
-import org.opentripplanner.routing.patch.Alert;
-import org.opentripplanner.routing.patch.AlertPatch;
-import org.opentripplanner.routing.patch.TimePeriod;
-import org.opentripplanner.routing.patch.TranslatedString;
-import org.opentripplanner.routing.services.PatchService;
+import org.opentripplanner.routing.alertpatch.Alert;
+import org.opentripplanner.routing.alertpatch.AlertPatch;
+import org.opentripplanner.routing.alertpatch.TimePeriod;
+import org.opentripplanner.routing.alertpatch.TranslatedString;
+import org.opentripplanner.routing.services.AlertPatchService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,13 +45,13 @@ public class AlertsUpdateHandler {
 
     private Set<String> patchIds = new HashSet<String>();
 
-    private PatchService patchService;
+    private AlertPatchService alertPatchService;
 
     /** How long before the posted start of an event it should be displayed to users */
     private long earlyStart;
 
     public void update(FeedMessage message) {
-        patchService.expire(patchIds);
+        alertPatchService.expire(patchIds);
         patchIds.clear();
 
         for (FeedEntity entity : message.getEntityList()) {
@@ -69,8 +69,7 @@ public class AlertsUpdateHandler {
         alertText.alertDescriptionText = deBuffer(alert.getDescriptionText());
         alertText.alertHeaderText = deBuffer(alert.getHeaderText());
         alertText.alertUrl = deBuffer(alert.getUrl());
-        ArrayList<TimePeriod> periods        = new ArrayList<TimePeriod>();
-        ArrayList<TimePeriod> displayPeriods = new ArrayList<TimePeriod>();
+        ArrayList<TimePeriod> periods = new ArrayList<TimePeriod>();
         if(alert.getActivePeriodCount() > 0) {
             long bestStartTime = Long.MAX_VALUE;
             for (TimeRange activePeriod : alert.getActivePeriodList()) {
@@ -80,9 +79,7 @@ public class AlertsUpdateHandler {
                     bestStartTime = realStart;
                 }
                 final long end = activePeriod.hasEnd() ? activePeriod.getEnd() : Long.MAX_VALUE;
-                periods.add(new TimePeriod(realStart, end));
-                if(earlyStart > 0 && start != realStart)
-                    displayPeriods.add(new TimePeriod(start, realStart));
+                periods.add(new TimePeriod(start, end));
             }
             if (bestStartTime != Long.MAX_VALUE) {
                 alertText.effectiveStartDate = new Date(bestStartTime * 1000);
@@ -133,15 +130,13 @@ public class AlertsUpdateHandler {
             if(agencyId != null && routeId == null && tripId == null && stopId == null) {
                 patch.setAgencyId(agencyId);
             }
-            patch.setCancelled(alert.getEffect() == GtfsRealtime.Alert.Effect.NO_SERVICE);
             patch.setTimePeriods(periods);
-            patch.setDisplayTimePeriods(displayPeriods);
             patch.setAlert(alertText);
 
             patch.setId(patchId);
             patchIds.add(patchId);
 
-            patchService.apply(patch);
+            alertPatchService.apply(patch);
         }
     }
 
@@ -174,8 +169,8 @@ public class AlertsUpdateHandler {
             this.defaultAgencyId = defaultAgencyId.intern();
     }
 
-    public void setPatchService(PatchService patchService) {
-        this.patchService = patchService;
+    public void setAlertPatchService(AlertPatchService alertPatchService) {
+        this.alertPatchService = alertPatchService;
     }
 
     public long getEarlyStart() {

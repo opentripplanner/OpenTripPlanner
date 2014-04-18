@@ -35,13 +35,6 @@ public class TransitStop extends TransitStationStop {
      */
     private int streetToStopTime = 0;
 
-    /** A stop is local iff, for each of its possible transfers to another trip pattern,
-     * the same transfers can be made at the previous stop or the next stop.  Once
-     * one boards at a local stop, one can never board at another local stop; once 
-     * one alights from a local stop, one can never board again at all. 
-     */
-    private boolean local = false;
-
     public TransitStop(Graph graph, Stop stop) {
         super(graph, stop);
         this.wheelchairEntrance = stop.getWheelchairBoarding() == 1;
@@ -54,13 +47,6 @@ public class TransitStop extends TransitStationStop {
 
     public boolean isEntrance() {
         return isEntrance;
-    }
-
-    public void setLocal(boolean local) {
-        this.local  = local;
-    }
-    public boolean isLocal() {
-        return local;
     }
 
     public boolean hasEntrances() {

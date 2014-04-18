@@ -17,8 +17,8 @@ import java.io.InputStream;
 import java.util.prefs.Preferences;
 
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.PatchServiceImpl;
-import org.opentripplanner.routing.services.PatchService;
+import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
+import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.PollingGraphUpdater;
@@ -52,7 +52,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
 
     private String defaultAgencyId;
 
-    private PatchService patchService;
+    private AlertPatchService alertPatchService;
 
     private long earlyStart;
 
@@ -66,8 +66,8 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
     @Override
     protected void configurePolling(Graph graph, Preferences preferences) throws Exception {
         // TODO: add options to choose different patch services
-        PatchService patchService = new PatchServiceImpl(graph);
-        this.patchService = patchService;
+        AlertPatchService alertPatchService = new AlertPatchServiceImpl(graph);
+        this.alertPatchService = alertPatchService;
         String url = preferences.get("url", null);
         if (url == null) {
             throw new IllegalArgumentException("Missing mandatory 'url' parameter");
@@ -86,7 +86,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
         }
         updateHandler.setEarlyStart(earlyStart);
         updateHandler.setDefaultAgencyId(defaultAgencyId);
-        updateHandler.setPatchService(patchService);
+        updateHandler.setAlertPatchService(alertPatchService);
     }
 
     @Override

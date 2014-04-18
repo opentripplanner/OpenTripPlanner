@@ -11,8 +11,6 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-/* this is in api.common so it can set package-private fields */
-
 package org.opentripplanner.mmri;
 
 import org.opentripplanner.api.model.Leg;

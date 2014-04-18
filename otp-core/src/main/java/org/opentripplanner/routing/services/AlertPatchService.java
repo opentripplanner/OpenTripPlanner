@@ -11,10 +11,26 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.routing.patch;
+package org.opentripplanner.routing.services;
 
-import org.opentripplanner.routing.core.State;
+import java.util.Collection;
+import java.util.Set;
 
-public interface TraverseResultFilter {
-	State filter(State result);
+import org.onebusaway.gtfs.model.AgencyAndId;
+import org.opentripplanner.routing.alertpatch.AlertPatch;
+
+public interface AlertPatchService {
+    Collection<AlertPatch> getAllAlertPatches();
+
+    Collection<AlertPatch> getStopPatches(AgencyAndId stop);
+
+    Collection<AlertPatch> getRoutePatches(AgencyAndId route);
+
+    void apply(AlertPatch alertPatch);
+
+    void expire(Set<String> ids);
+
+    void expireAll();
+
+    void expireAllExcept(Set<String> ids);
 }

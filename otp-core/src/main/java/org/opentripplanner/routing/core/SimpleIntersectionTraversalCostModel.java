@@ -14,6 +14,7 @@
 package org.opentripplanner.routing.core;
 
 import lombok.Setter;
+
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
@@ -56,8 +57,6 @@ public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTr
         if (v.inferredFreeFlowing()) {
             return 0;
         }
-
-
 
         // Non-driving cases are much simpler. Handled generically in the base class.
         if (!mode.isDriving()) {

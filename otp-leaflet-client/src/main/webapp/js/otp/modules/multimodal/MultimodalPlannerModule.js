@@ -18,7 +18,7 @@ otp.namespace("otp.modules.multimodal");
 otp.modules.multimodal.MultimodalPlannerModule = 
     otp.Class(otp.modules.planner.PlannerModule, {
 
-    moduleName  : "Multimodal Trip Planner",
+    moduleName  : otp.config.locale.modules.multimodal.MultimodalPlannerModule.name,
     
     itinWidget  : null,
     
@@ -39,7 +39,7 @@ otp.modules.multimodal.MultimodalPlannerModule =
         // set up options widget
         
         var optionsWidgetConfig = {
-                title : 'Trip Options',
+                title : otp.config.locale.widgets.MultimodalPlannerModule.title,
                 closeable : true,
                 persistOnClose: true,
         };
@@ -125,7 +125,7 @@ otp.modules.multimodal.MultimodalPlannerModule =
         if(this.itinWidget !== null) {
             this.itinWidget.close();
             this.itinWidget.clear();
-            this.itinWidget.setTitle("Itineraries");
+            this.itinWidget.setTitle(otp.config.locale.widgets.ItinerariesWidget.title);
         }
  },
         

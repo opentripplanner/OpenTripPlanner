@@ -123,7 +123,7 @@ otp.widgets.CallView = Backbone.View.extend({
         $(this.el).addClass('otp-callHistory-callListItem')
         .html('<span>'+moment(this.model.get('startTime')).format("h:mma")
             + ', ' + moment(this.model.get('startTime')).format("MMM D") + '<br>'
-            + '(Length: '+otp.util.Time.msToHrMinSec(duration)+')</span>');
+            + '(Length: '+otp.util.Time.secsToHrMinSec(duration)+')</span>');
         return this; // for chainable calls, like .render().el
     }, 
     

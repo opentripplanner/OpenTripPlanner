@@ -11,8 +11,6 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-/* this is in api.common so it can set package-private fields */
-
 package org.opentripplanner.mmri;
 
 import java.io.File;
@@ -42,7 +40,7 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.LongDistancePathService;
-import org.opentripplanner.routing.impl.PatchServiceImpl;
+import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
 import org.opentripplanner.updater.alerts.AlertsUpdateHandler;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 
@@ -74,7 +72,7 @@ abstract class MmriTest extends TestCase {
     Graph graph;
     ArrayList<ServiceDay> serviceDayList;
     TimetableSnapshotSource timetableSnapshotSource;
-    PatchServiceImpl patchServiceImpl;
+    AlertPatchServiceImpl alertPatchServiceImpl;
 
     abstract String getFeedName();
 
@@ -95,8 +93,8 @@ abstract class MmriTest extends TestCase {
         timetableSnapshotSource = new TimetableSnapshotSource(graph);
         timetableSnapshotSource.setPurgeExpiredData(false);
         graph.setTimetableSnapshotSource(timetableSnapshotSource);
-        patchServiceImpl = new PatchServiceImpl(graph);
-        alertsUpdateHandler.setPatchService(patchServiceImpl);
+        alertPatchServiceImpl = new AlertPatchServiceImpl(graph);
+        alertsUpdateHandler.setAlertPatchService(alertPatchServiceImpl);
         alertsUpdateHandler.setDefaultAgencyId("MMRI");
 
         try {

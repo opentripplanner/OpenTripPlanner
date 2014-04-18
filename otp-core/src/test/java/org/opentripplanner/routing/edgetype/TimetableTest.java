@@ -202,8 +202,8 @@ public class TimetableTest {
 
         TripTimes tripTimes = timetable.getTripTimes(trip_1_1_index);
         for (int i = 0; i < tripTimes.getNumHops(); i++) {
-            assertEquals(TripTimes.CANCELED, tripTimes.getDepartureTime(i));
-            assertEquals(TripTimes.CANCELED, tripTimes.getArrivalTime(i));
+            assertEquals(TripTimes.UNAVAILABLE, tripTimes.getDepartureTime(i));
+            assertEquals(TripTimes.UNAVAILABLE, tripTimes.getArrivalTime(i));
         }
 
         //---

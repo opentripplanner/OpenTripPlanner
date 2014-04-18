@@ -17,6 +17,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -270,6 +271,18 @@ public class PlainStreetEdgeTest {
         assertEquals(42, s5.getElapsedTimeSeconds());
         assertEquals(42, s6.getElapsedTimeSeconds());
         assertEquals(42, s7.getElapsedTimeSeconds());
+    }
+
+    @Test
+    public void testTurnRestriction() {
+        PlainStreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.ALL);
+        PlainStreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.ALL);
+        State state = new State(v2, 0, proto.clone());
+
+        state.getOptions().setArriveBy(true);
+        e1.addTurnRestriction(new TurnRestriction(e1, e0, null, TraverseModeSet.allModes()));
+
+        assertNotNull(e0.traverse(e1.traverse(state)));
     }
 
     /****
