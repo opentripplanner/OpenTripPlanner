@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<document>
+    <data>
+        <element>
+            <name>A</name>
+            <lat>45</lat>
+            <lon>1</lon>
+        </element>
+        <element>
+            <name>B</name>
+            <lat>45.1</lat>
+            <lon>1</lon>
+        </element>
+        <element>
+            <name>C</name>
+            <lat>45.2</lat>
+            <lon>1.1</lon>
+        </element>
+    </data>
+</document>

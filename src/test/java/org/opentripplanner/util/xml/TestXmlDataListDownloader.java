@@ -30,32 +30,30 @@ public class TestXmlDataListDownloader extends TestCase {
 
     public void testKML() {
         XmlDataListDownloader<DataTest> xmlDataListDownloader = new XmlDataListDownloader<DataTest>();
-        xmlDataListDownloader
-                .setPath("//*[local-name()='kml']/*[local-name()='Document']/*[local-name()='Placemark']");
+        xmlDataListDownloader.setPath("//document/data/element");
         xmlDataListDownloader.setDataFactory(new XmlDataFactory<DataTest>() {
             @Override
             public DataTest build(Map<String, String> attributes) {
                 DataTest t = new DataTest();
                 t.name = attributes.get("name");
-                String[] coords = attributes.get("Point").trim().split(",");
-                t.lon = Double.parseDouble(coords[0]);
-                t.lat = Double.parseDouble(coords[1]);
+                t.lat = Double.parseDouble(attributes.get("lat"));
+                t.lon = Double.parseDouble(attributes.get("lon"));
                 return t;
             }
         });
         List<DataTest> data = xmlDataListDownloader
-                .download("file:src/test/resources/bike/NSFietsenstallingen.kml");
-        assertEquals(5, data.size());
+                .download("file:src/test/resources/xml/test-data.xml");
+        assertEquals(3, data.size());
         for (DataTest dt : data) {
             System.out.println(String.format("%s (%.6f,%.6f)", dt.name, dt.lat, dt.lon));
         }
-        DataTest alkmaar = data.get(0);
-        DataTest zwolle = data.get(4);
-        assertEquals("Station Alkmaar", alkmaar.name);
-        assertEquals("Station Zwolle", zwolle.name);
-        assertTrue(alkmaar.lat >= 52.637531 && alkmaar.lat <= 52.637532);
-        assertTrue(alkmaar.lon >= 4.739850 && alkmaar.lon <= 4.739851);
-        assertTrue(zwolle.lat >= 52.504990 && zwolle.lat <= 52.504991);
-        assertTrue(zwolle.lon >= 6.091060 && zwolle.lon <= 6.091061);
+        DataTest a = data.get(0);
+        DataTest c = data.get(2);
+        assertEquals("A", a.name);
+        assertEquals(45.0, a.lat);
+        assertEquals(1.0, a.lon);
+        assertEquals("C", c.name);
+        assertEquals(45.2, c.lat);
+        assertEquals(1.1, c.lon);
     }
 }
