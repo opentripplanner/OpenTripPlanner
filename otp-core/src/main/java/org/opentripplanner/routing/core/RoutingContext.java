@@ -13,12 +13,9 @@
 
 package org.opentripplanner.routing.core;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.collect.Iterables;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
@@ -50,9 +47,13 @@ import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Iterables;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A RoutingContext holds information needed to carry out a search for a particular TraverseOptions, on a specific graph. Includes things like
@@ -358,22 +359,23 @@ public class RoutingContext implements Cloneable {
      * TraverseOptions already has a CalendarService set.
      */
     private void setServiceDays() {
-        final long SEC_IN_DAY = 60 * 60 * 24;
-        final long time = opt.getSecondsSinceEpoch();
+        Calendar c = Calendar.getInstance();
+        c.setTime(new Date(opt.getSecondsSinceEpoch() * 1000));
+        c.setTimeZone(graph.getTimeZone());
+
+        final ServiceDate serviceDate = new ServiceDate(c);
         this.serviceDays = new ArrayList<ServiceDay>(3);
         if (calendarService == null && graph.getCalendarService() != null
                 && (opt.getModes() == null || opt.getModes().contains(TraverseMode.TRANSIT))) {
             LOG.warn("RoutingContext has no CalendarService. Transit will never be boarded.");
             return;
         }
-        // This should be a valid way to find yesterday and tomorrow,
-        // since DST changes more than one hour after midnight in US/EU.
-        // But is this true everywhere?
+
         for (String agency : graph.getAgencyIds()) {
-            addIfNotExists(this.serviceDays, new ServiceDay(graph, time - SEC_IN_DAY,
+            addIfNotExists(this.serviceDays, new ServiceDay(graph, serviceDate.previous(),
                     calendarService, agency));
-            addIfNotExists(this.serviceDays, new ServiceDay(graph, time, calendarService, agency));
-            addIfNotExists(this.serviceDays, new ServiceDay(graph, time + SEC_IN_DAY,
+            addIfNotExists(this.serviceDays, new ServiceDay(graph, serviceDate, calendarService, agency));
+            addIfNotExists(this.serviceDays, new ServiceDay(graph, serviceDate.next(),
                     calendarService, agency));
         }
     }

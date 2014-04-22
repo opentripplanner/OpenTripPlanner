@@ -44,7 +44,7 @@ public class AnnotationsToHTML {
             path = path.getParentFile();
         }
         try {
-            Graph graph = Graph.load(new File(graphPath), Graph.LoadLevel.BASIC);
+            Graph graph = Graph.load(new File(graphPath), Graph.LoadLevel.DEBUG);
             process(graph, graphPath);
         } catch (Exception e) {
             e.printStackTrace();

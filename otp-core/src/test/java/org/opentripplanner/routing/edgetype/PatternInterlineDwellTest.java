@@ -13,13 +13,6 @@
 
 package org.opentripplanner.routing.edgetype;
 
-import static org.junit.Assert.assertNotSame;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import org.junit.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Route;
@@ -38,6 +31,14 @@ import org.opentripplanner.routing.pathparser.PathParser;
 import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.routing.vertextype.OnboardVertex;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.TimeZone;
+
+import static org.junit.Assert.assertNotSame;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class PatternInterlineDwellTest {
     @Test
@@ -115,6 +116,7 @@ public class PatternInterlineDwellTest {
             }
         };
 
+        when(graph.getTimeZone()).thenReturn(TimeZone.getTimeZone("Greenwhich"));
         when(routingRequest.getModes()).thenReturn(TraverseModeSet.allModes());
         when(endJourney.getTripPattern()).thenReturn(secondTripPattern);
         when(serviceDay.getServiceDate()).thenReturn(serviceDate);

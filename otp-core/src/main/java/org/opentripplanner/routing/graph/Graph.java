@@ -76,6 +76,7 @@ import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multiset;
 import com.vividsolutions.jts.geom.Envelope;
+import lombok.Getter;
 
 /**
  * A graph is really just one or more indexes into a set of vertexes. It used to keep edgelists for each vertex, but those are in the vertex now.
@@ -87,12 +88,17 @@ public class Graph implements Serializable {
     private final MavenVersion mavenVersion = MavenVersion.VERSION;
 
     private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
+    
+    @Setter @Getter
+    private String routerId;
 
     private final Map<Edge, Set<AlertPatch>> alertPatches = new HashMap<Edge, Set<AlertPatch>>(0);
 
     // transit feed validity information in seconds since epoch
+    @Getter
     private long transitServiceStarts = Long.MAX_VALUE;
 
+    @Getter
     private long transitServiceEnds = 0;
 
     private Map<Class<?>, Object> _services = new HashMap<Class<?>, Object>();

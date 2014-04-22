@@ -78,7 +78,7 @@ public class GrizzlyServer {
      * command-line Maven build that left a WAR in /target/classes. Therefore we check for the
      * existence of source directories that would be seen from Eclipse, and serve those as fallbacks.
      */
-    public HttpHandler makeClientStaticHandler () {
+    public HttpHandler makeClientWarHandler () {
         File clientDir = Files.createTempDir();
         /* Eclipse does not seem to be copying this file. Maven is. */
         File clientWar = new File(clientDir, CLIENT_WAR_FILENAME);
@@ -108,6 +108,18 @@ public class GrizzlyServer {
         return handler;
     }
     
+    public HttpHandler makeClientStaticDirectoryHandler () {
+        LOG.info("Serving static files from {}", params.staticDirectory);
+        return new StaticHttpHandler(params.staticDirectory);
+    }
+
+    public HttpHandler makeClientStaticHandler () {
+        if(params.staticDirectory != null)
+            return makeClientStaticDirectoryHandler();
+        else
+            return makeClientWarHandler();
+    }
+
     public void run() {
         
         /* Rather than use Jersey's GrizzlyServerFactory we will construct one manually, so we can
@@ -140,6 +152,8 @@ public class GrizzlyServer {
               from ./ we can reach e.g. target/classes/data-sources.xml */
         HttpHandler staticHandler = makeClientStaticHandler();
         httpServer.getServerConfiguration().addHttpHandler(staticHandler, "/");
+
+        for (NetworkListener l : httpServer.getListeners()) { l.getFileCache().setEnabled(false); }
         
         /* RELINQUISH CONTROL TO THE SERVER THREAD */
         try {

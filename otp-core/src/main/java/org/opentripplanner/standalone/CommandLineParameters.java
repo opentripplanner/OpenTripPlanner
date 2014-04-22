@@ -111,7 +111,11 @@ public class CommandLineParameters {
     @Parameter( names = { "-g", "--graphs"}, validateWith = ReadableDirectory.class, 
             description = "path to graph directory")
     String graphDirectory;
-    
+
+    @Parameter( names = { "--raptor"},
+            description = "use the RAPTOR algorithm for routing")
+    boolean raptor = false;
+
     @Parameter( names = { "-l", "--longDistance"}, 
             description = "use an algorithm tailored for long-distance routing")
     boolean longDistance = false;
@@ -128,7 +132,7 @@ public class CommandLineParameters {
             description = "run a server")
     boolean server = false;
     
-    @Parameter( names = { "-t", "--static"}, 
+    @Parameter( names = { "-t", "--static"}, validateWith = ReadableDirectory.class,
     description = "path to static content")
     String staticDirectory;
 
@@ -145,8 +149,7 @@ public class CommandLineParameters {
         server |= ( inMemory || port != null );
         if (graphDirectory  == null) graphDirectory  = DEFAULT_GRAPH_DIRECTORY;
         if (routerIds == null) routerIds = Arrays.asList(DEFAULT_ROUTER_ID);
-        if (staticDirectory == null) staticDirectory = DEFAULT_STATIC_DIRECTORY;        
-        if (cacheDirectory == null)  cacheDirectory  = DEFAULT_CACHE_DIRECTORY;        
+        if (cacheDirectory == null)  cacheDirectory  = DEFAULT_CACHE_DIRECTORY;
         if (server && port == null) {
             port = DEFAULT_PORT;
             new AvailablePort().validate(port);

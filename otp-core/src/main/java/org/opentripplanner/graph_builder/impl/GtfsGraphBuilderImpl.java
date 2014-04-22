@@ -194,7 +194,7 @@ public class GtfsGraphBuilderImpl implements GraphBuilder {
                     hf.createTransfersTxtTransfers();
                 }
                 if (gtfsBundle.isLinkStopsToParentStations()) {
-                    hf.linkStopsToParentStations();
+                    hf.linkStopsToParentStations(graph);
                 } 
                 if (gtfsBundle.isParentStationTransfers()) {
                     hf.createParentStationTransfers();

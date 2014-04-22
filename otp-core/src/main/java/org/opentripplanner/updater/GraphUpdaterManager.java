@@ -13,6 +13,7 @@
 
 package org.opentripplanner.updater;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -20,6 +21,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import org.opentripplanner.routing.graph.Graph;
@@ -41,6 +43,17 @@ import org.slf4j.LoggerFactory;
 public class GraphUpdaterManager {
 
     private static Logger LOG = LoggerFactory.getLogger(GraphUpdaterManager.class);
+    
+    /**
+     * Text used for naming threads when the graph lacks a routerId.
+     */
+    private static String DEFAULT_ROUTER_ID = "(default)";
+    
+    /**
+     * Thread factory used to create new threads.
+     */
+    
+    private ThreadFactory threadFactory;
 
     /**
      * OTP's multi-version concurrency control model for graph updating allows simultaneous reads,
@@ -72,6 +85,14 @@ public class GraphUpdaterManager {
      */
     public GraphUpdaterManager(Graph graph) {
         this.graph = graph;
+        
+        String routerId = graph.getRouterId();
+        if(routerId == null || routerId.isEmpty())
+            routerId = DEFAULT_ROUTER_ID;
+        
+        threadFactory = new ThreadFactoryBuilder().setNameFormat("GraphUpdater-" + routerId + "-%d").build();
+        scheduler = Executors.newSingleThreadScheduledExecutor(threadFactory);
+        updaterPool = Executors.newCachedThreadPool(threadFactory);
     }
 
     public void stop() {
