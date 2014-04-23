@@ -119,6 +119,9 @@ public class State implements Cloneable {
         if (options.parkAndRide || options.kissAndRide) {
             this.stateData.carParked = options.arriveBy;
             this.stateData.nonTransitMode = this.stateData.carParked ? TraverseMode.WALK : TraverseMode.CAR;
+        } else if (options.bikeParkAndRide) {
+            this.stateData.nonTransitMode = this.stateData.bikeParked ? TraverseMode.WALK
+                    : TraverseMode.BICYCLE;
         }
         this.walkDistance = 0;
         this.preTransitTime = 0;
@@ -265,16 +268,30 @@ public class State implements Cloneable {
         return stateData.carParked;
     }
 
+    public boolean isBikeParked() {
+        return stateData.bikeParked;
+    }
+
     /**
      * @return True if the state at vertex can be the end of path.
      */
     public boolean isFinal() {
         // When drive-to-transit is enabled, we need to check whether the car has been parked (or whether it has been picked up in reverse).
-        boolean checkPark = stateData.opt.parkAndRide || stateData.opt.kissAndRide;
-        if (stateData.opt.arriveBy)
-            return !isBikeRenting() && !(checkPark && isCarParked());
-        else
-            return !isBikeRenting() && !(checkPark && !isCarParked());
+        boolean parkAndRide = stateData.opt.parkAndRide || stateData.opt.kissAndRide;
+        boolean bikeParkAndRide = stateData.opt.bikeParkAndRide;
+        boolean bikeRentingOk = false;
+        boolean bikeParkAndRideOk = false;
+        boolean carParkAndRideOk = false;
+        if (stateData.opt.arriveBy) {
+            bikeRentingOk = !isBikeRenting();
+            bikeParkAndRideOk = !bikeParkAndRide || !isBikeParked();
+            carParkAndRideOk = !parkAndRide || !isCarParked();
+        } else {
+            bikeRentingOk = !isBikeRenting();
+            bikeParkAndRideOk = !bikeParkAndRide || isBikeParked();
+            carParkAndRideOk = !parkAndRide || isCarParked();
+        }
+        return bikeRentingOk && bikeParkAndRideOk && carParkAndRideOk;
     }
 
     public Stop getPreviousStop() {
@@ -727,6 +744,8 @@ public class State implements Cloneable {
                     editor.setBikeRenting(!orig.isBikeRenting());
                 if (orig.isCarParked() != orig.getBackState().isCarParked())
                     editor.setCarParked(!orig.isCarParked());
+                if (orig.isBikeParked() != orig.getBackState().isBikeParked())
+                    editor.setBikeParked(!orig.isBikeParked());
 
                 editor.setNumBoardings(getNumBoardings() - orig.getNumBoardings());
 
