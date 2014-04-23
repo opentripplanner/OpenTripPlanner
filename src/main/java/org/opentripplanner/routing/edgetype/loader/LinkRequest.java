@@ -72,25 +72,6 @@ public class LinkRequest {
         this.distanceLibrary = linker.getDistanceLibrary();
     }
     
-    /**
-     * The entry point for networklinker to link each bike rental station.
-     * 
-     * @param v
-     * Sets result to true if the links were successfully added, otherwise false
-     */
-    public void connectVertexToStreets(BikeRentalStationVertex v) {
-        Collection<StreetVertex> nearbyStreetVertices = getNearbyStreetVertices(v, null, null);
-        if (nearbyStreetVertices == null) {
-            result = false;
-        } else {
-            for (StreetVertex sv : nearbyStreetVertices) {
-                addEdges(new StreetBikeRentalLink(sv, v), 
-                         new StreetBikeRentalLink(v, sv));
-            }
-            result = true;
-        }
-    }
-
     public boolean getResult() {
         if (result == null) {
             throw new IllegalStateException("Can't get result of LinkRequest; no operation performed");
@@ -366,6 +347,32 @@ public class LinkRequest {
             for (StreetVertex sv : nearbyStreetVertices) {
                 new StreetTransitLink(sv, v, wheelchairAccessible);
                 new StreetTransitLink(v, sv, wheelchairAccessible);
+            }
+            result = true;
+        }
+    }
+
+    /**
+     * Link a generic vertex.
+     * 
+     * @param v The vertex to link to the street network
+     * @param modes The required traverse mode permissions for the street to link to (optional, can be null).
+     * @param streetLinkFactory Factory of linking edges to link this vertex to any found street vertices.
+     * Sets result to true if the links were successfully added, otherwise false
+     */
+    public <V extends Vertex> void connectVertexToStreets(V v, TraverseModeSet modes,
+            StreetLinkFactory<V> streetLinkFactory) {
+        RoutingRequest request = null;
+        if (modes != null) {
+            request = new RoutingRequest(modes);
+        }
+        Collection<StreetVertex> nearbyStreetVertices = getNearbyStreetVertices(v, null, request);
+        if (nearbyStreetVertices == null) {
+            result = false;
+        } else {
+            for (StreetVertex sv : nearbyStreetVertices) {
+                Collection<? extends Edge> edges = streetLinkFactory.connect(sv, v);
+                addEdges(edges.toArray(new Edge[0]));
             }
             result = true;
         }
