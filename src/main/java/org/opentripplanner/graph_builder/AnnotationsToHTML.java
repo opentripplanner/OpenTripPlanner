@@ -16,7 +16,7 @@ package org.opentripplanner.graph_builder;
 import java.io.File;
 import java.io.IOException;
 
-import org.opentripplanner.gbannotation.GraphBuilderAnnotation;
+import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

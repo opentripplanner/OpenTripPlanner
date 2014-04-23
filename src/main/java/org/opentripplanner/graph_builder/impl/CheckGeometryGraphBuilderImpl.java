@@ -20,9 +20,9 @@ import java.util.List;
 
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.gbannotation.BogusEdgeGeometry;
-import org.opentripplanner.gbannotation.BogusVertexGeometry;
-import org.opentripplanner.gbannotation.VertexShapeError;
+import org.opentripplanner.graph_builder.annotation.BogusEdgeGeometry;
+import org.opentripplanner.graph_builder.annotation.BogusVertexGeometry;
+import org.opentripplanner.graph_builder.annotation.VertexShapeError;
 import org.opentripplanner.graph_builder.services.GraphBuilder;
 import org.opentripplanner.routing.edgetype.HopEdge;
 import org.opentripplanner.routing.graph.Edge;

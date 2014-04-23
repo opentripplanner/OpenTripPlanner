@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Queue;
 
 import org.opentripplanner.common.geometry.Subgraph;
-import org.opentripplanner.gbannotation.GraphConnectivity;
+import org.opentripplanner.graph_builder.annotation.GraphConnectivity;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;

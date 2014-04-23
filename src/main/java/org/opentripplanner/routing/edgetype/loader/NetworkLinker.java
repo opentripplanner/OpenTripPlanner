@@ -20,8 +20,8 @@ import java.util.LinkedList;
 
 import org.opentripplanner.common.IterableLibrary;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.gbannotation.BikeRentalStationUnlinked;
-import org.opentripplanner.gbannotation.StopUnlinked;
+import org.opentripplanner.graph_builder.annotation.BikeRentalStationUnlinked;
+import org.opentripplanner.graph_builder.annotation.StopUnlinked;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.PlainStreetEdge;
