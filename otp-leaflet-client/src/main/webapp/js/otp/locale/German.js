@@ -463,5 +463,5 @@ otp.locale.German = {
         ]
     },
 
-    CLASS_NAME: "otp.locale.French"
+    CLASS_NAME: "otp.locale.German"
 };
