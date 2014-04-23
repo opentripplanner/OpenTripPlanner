@@ -102,10 +102,11 @@ public class ProfileRouter {
     /* Maybe don't even try to accumulate stats and weights on the fly, just enumerate options. */
     
     /**
-     * Complete a PatternRide by scanning through its Pattern, creating rides to all downstream
-     * stops that are near the destination or have relevant transfers.
+     * Complete a partial PatternRide (with only pattern and beginning stop) which was enqueued in the last round.
+     * This is done by scanning through the Pattern, creating rides to all downstream stops that are near the
+     * destination or have relevant transfers.
      */
-    private void makeRides (PatternRide pr, Multimap<Stop, Ride> rides) {
+    private void makeRides (PatternRide pr) {
         List<Stop> stops = pr.pattern.getStops();
         Stop targetStop = null;
         if (toStops.containsKey(pr.pattern)) {
@@ -126,9 +127,7 @@ public class ProfileRouter {
         }
     }
     
-    // why do we not have a latlon class? we don't need super detailed geodesy.
-    // (latlon from, latlon to, timewindow window)
-    // TimeWindow should actually be resolved and created in the caller, which does have access to the profiledata.
+    // TimeWindow could actually be resolved and created in the caller, which does have access to the profiledata.
     public ProfileResponse route (ProfileRequest req) {
 
         /* Set to 2 until we have better pruning. There are a lot of 3-combinations. */
@@ -162,7 +161,7 @@ public class ProfileRouter {
         for (int round = 0; round < ROUNDS; ++round) {
             LOG.info("ROUND {}", round);
             for (PatternRide pr : queue) {
-                makeRides(pr, rides);
+                makeRides(pr);
             }
             LOG.info("number of rides: {}", rides.size());
             /* Check rides reaching the targets */
