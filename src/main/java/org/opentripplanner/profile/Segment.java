@@ -6,6 +6,7 @@ import java.util.List;
 import lombok.Getter;
 
 import com.beust.jcommander.internal.Lists;
+import org.opentripplanner.gtfs.GtfsLibrary;
 
 public class Segment {
 
@@ -33,6 +34,7 @@ public class Segment {
     @Getter Stats waitStats;
 
     @Getter String route;
+    @Getter String mode;
     @Getter String from;
     @Getter String to;
     @Getter String fromName;
@@ -44,6 +46,7 @@ public class Segment {
 
     public Segment (Ride ride, TimeWindow window) {
         route = ride.route.getId().getId();
+        mode = GtfsLibrary.getTraverseMode(ride.route).toString();
         routeShortName = ride.route.getShortName();
         routeLongName = ride.route.getLongName();
         from = ride.from.getId().getId();
