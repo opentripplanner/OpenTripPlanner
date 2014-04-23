@@ -6,7 +6,7 @@ import javax.ws.rs.core.Response.Status;
 
 public abstract class QueryParameter {
 
-    static void checkRangeInclusive(double x, double min, double max) throws Exception {
+    public static void checkRangeInclusive(double x, double min, double max) throws Exception {
         boolean ok = (x >= min && x <= max);
         if (!ok) throw new Exception(String.format("%f is not in range [%f,%f]", x, min, max));
     }

@@ -129,17 +129,17 @@ public class ProfileRouter {
     // why do we not have a latlon class? we don't need super detailed geodesy.
     // (latlon from, latlon to, timewindow window)
     // TimeWindow should actually be resolved and created in the caller, which does have access to the profiledata.
-    public List<Option> route (LatLon from, LatLon to, int fromTime, int toTime, LocalDate date) {
+    public ProfileResponse route (ProfileRequest req) {
 
         /* Set to 2 until we have better pruning. There are a lot of 3-combinations. */
         final int ROUNDS = 2;
         int finalRound = ROUNDS - 1;
         int penultimateRound = ROUNDS - 2;
-        fromStops = index.closestPatterns(from.lon, from.lat, WALK_DISTANCE);
-        toStops   = index.closestPatterns(to.lon, to.lat, WALK_DISTANCE);
+        fromStops = index.closestPatterns(req.from.lon, req.from.lat, WALK_DISTANCE);
+        toStops   = index.closestPatterns(req.to.lon, req.to.lat, WALK_DISTANCE);
         LOG.info("from stops: {}", fromStops);
         LOG.info("to stops: {}", toStops);
-        this.window = new TimeWindow (fromTime, toTime, index.servicesRunning(date));
+        this.window = new TimeWindow (req.fromTime, req.toTime, index.servicesRunning(req.date));
         /* Our per-round work queue is actually a set, because transferring from a group of patterns
          * can generate the same PatternRide many times. FIXME */
         Set<PatternRide> queue = Sets.newHashSet();
@@ -206,7 +206,7 @@ public class ProfileRouter {
             Option option = new Option (ride, dist, window); // TODO Convert distance to time.
             if ( ! option.hasEmptyRides()) options.add(option); 
         }
-        return options;
+        return new ProfileResponse(options, req.orderBy, req.limit);
     }
 
 }
