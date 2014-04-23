@@ -160,7 +160,9 @@ public class ProfileRouter {
         for (int round = 0; round < ROUNDS; ++round) {
             LOG.info("ROUND {}", round);
             for (PatternRide pr : queue) {
-                makeRides(pr, rides);
+                if (req.modes.contains(pr.pattern.mode)) {
+                    makeRides(pr, rides);
+                }
             }
             LOG.info("number of rides: {}", rides.size());
             /* Check rides reaching the targets */

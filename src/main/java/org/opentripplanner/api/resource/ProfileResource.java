@@ -51,7 +51,7 @@ public class ProfileResource {
             @QueryParam("endTime")   @DefaultValue("09:00") HourMinuteSecond toTime,
             @QueryParam("orderBy")   @DefaultValue("MIN")   Option.SortOrder orderBy,
             @QueryParam("limit")     @DefaultValue("10")    Integer limit,
-            @QueryParam("modes")     @DefaultValue("WALK")  TraverseModeSet modes)
+            @QueryParam("modes")     @DefaultValue("WALK,TRANSIT") TraverseModeSet modes)
             throws Exception {
 
         QueryParameter.checkRangeInclusive(limit, 0, Integer.MAX_VALUE);
