@@ -17,7 +17,7 @@ import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.model.calendar.ServiceDate;
 import org.onebusaway.gtfs.services.calendar.CalendarService;
-import org.opentripplanner.api.resource.analyst.SimpleIsochrone;
+import org.opentripplanner.api.resource.SimpleIsochrone;
 import org.opentripplanner.common.LuceneIndex;
 import org.opentripplanner.common.geometry.DistanceLibrary;
 import org.opentripplanner.common.geometry.HashGrid;

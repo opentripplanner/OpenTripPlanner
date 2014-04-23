@@ -11,7 +11,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.api.resource.analyst;
+package org.opentripplanner.api.resource;
  
 import java.io.InputStream;
 
@@ -27,7 +27,6 @@ import javax.ws.rs.core.UriInfo;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opentripplanner.analyst.request.RenderRequest;
 import org.opentripplanner.analyst.request.Renderer;
 import org.opentripplanner.analyst.request.TileRequest;

@@ -1,4 +1,4 @@
-package org.opentripplanner.api.resource.analyst;
+package org.opentripplanner.api.resource;
 
 import java.io.StringWriter;
 import java.util.ArrayList;

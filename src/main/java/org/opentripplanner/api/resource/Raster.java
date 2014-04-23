@@ -11,9 +11,7 @@
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
-package org.opentripplanner.api.resource.analyst;
-
-import java.util.GregorianCalendar;
+package org.opentripplanner.api.resource;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -24,7 +22,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 import org.geotools.geometry.Envelope2D;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opentripplanner.analyst.core.GeometryIndex;
 import org.opentripplanner.analyst.request.RenderRequest;
 import org.opentripplanner.analyst.request.Renderer;
