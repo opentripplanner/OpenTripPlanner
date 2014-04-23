@@ -20,6 +20,7 @@ import java.util.LinkedList;
 
 import com.google.common.collect.Iterables;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.gbannotation.BikeParkUnlinked;
 import org.opentripplanner.graph_builder.annotation.BikeRentalStationUnlinked;
 import org.opentripplanner.graph_builder.annotation.StopUnlinked;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -118,6 +119,13 @@ public class NetworkLinker {
                 BikeRentalStationVertex.class)) {
             if (!networkLinkerLibrary.connectVertexToStreets(brsv).getResult()) {
                 LOG.warn(graph.addBuilderAnnotation(new BikeRentalStationUnlinked(brsv)));
+            }
+        }
+
+        LOG.debug("Linking bike parks...");
+        for (BikeParkVertex bpv : IterableLibrary.filter(vertices, BikeParkVertex.class)) {
+            if (!networkLinkerLibrary.connectVertexToStreets(bpv).getResult()) {
+                LOG.warn(graph.addBuilderAnnotation(new BikeParkUnlinked(bpv)));
             }
         }
     }

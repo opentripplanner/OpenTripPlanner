@@ -27,12 +27,14 @@ import org.opentripplanner.extra_graph.EdgesForRoute;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
 import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
+import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -98,6 +100,23 @@ public class NetworkLinkerLibrary {
             public Collection<? extends Edge> connect(StreetVertex sv, BikeRentalStationVertex v) {
                 return Arrays.asList(new StreetBikeRentalLink(sv, v), new StreetBikeRentalLink(v,
                         sv));
+            }
+        });
+        return request;
+    }
+
+   /** 
+     * The entry point for networklinker to link each bike park.
+     * 
+     * @param v
+     */
+    public LinkRequest connectVertexToStreets(BikeParkVertex v) {
+        LinkRequest request = new LinkRequest(this);
+        request.connectVertexToStreets(v, new TraverseModeSet(TraverseMode.WALK,
+                TraverseMode.BICYCLE), new StreetLinkFactory<BikeParkVertex>() {
+            @Override
+            public Collection<? extends Edge> connect(StreetVertex sv, BikeParkVertex v) {
+                return Arrays.asList(new StreetBikeParkLink(sv, v), new StreetBikeParkLink(v, sv));
             }
         });
         return request;
