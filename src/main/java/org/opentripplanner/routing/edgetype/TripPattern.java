@@ -85,10 +85,17 @@ public class TripPattern implements Serializable {
      * The GTFS Route of all trips in this pattern. GTFS technically allows the same pattern to appear in more
      * than one route, but we make the assumption that all trips with the same pattern belong to the
      * same Route.
+     * TODO: consider the case where there is a replacement bus that makes the same stops as a train. We may need to split out multiple patterns for multiple routes.
      */
     @Getter
     public final Route route;
-    
+
+    /**
+     * As for the route field, this depends on there being a single GFTFS route per journey pattern. That is not always true.
+     */
+    @Getter
+    public final TraverseMode mode;
+
     /**
      * All trips in this pattern call at this sequence of stops. This includes information about GTFS
      * pick-up and drop-off types.
@@ -160,6 +167,7 @@ public class TripPattern implements Serializable {
 
     public TripPattern(Route route, StopPattern stopPattern) {
         this.route = route;
+        this.mode = GtfsLibrary.getTraverseMode(this.route);
         this.stopPattern = stopPattern;
         int size = stopPattern.size;
         setStopsFromStopPattern(stopPattern);
